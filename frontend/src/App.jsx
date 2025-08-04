@@ -25,7 +25,6 @@ import VideoLesson from "./VideoLesson";
 import IdeaLog from "./IdeaLog";
 import FeatureRoadmap from "./FeatureRoadmap";
 import FutureApp from "./FutureApp";
-import SavedVideos from "./SavedVideos";
 import AIStudyBuddy from "./AIStudyBuddy";
 import KnowledgeMap from "./KnowledgeMap";
 
