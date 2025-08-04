@@ -1,0 +1,1 @@
+# This file will handle connection to Couchbase Capella for vector search and storage 
