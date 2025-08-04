@@ -375,24 +375,53 @@ const KnowledgeMap = () => {
           setSelectedTopic(node);
         });
 
-        // Create text label
+        // Create text label with background for better visibility
+        const textBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        textBackground.setAttribute('x', node.radius + 2);
+        textBackground.setAttribute('y', -8);
+        textBackground.setAttribute('width', node.label.length * 7 + 10);
+        textBackground.setAttribute('height', 20);
+        textBackground.setAttribute('fill', colors.background);
+        textBackground.setAttribute('stroke', colors.border);
+        textBackground.setAttribute('stroke-width', '1');
+        textBackground.setAttribute('rx', '3');
+        textBackground.setAttribute('opacity', '0.9');
+        group.appendChild(textBackground);
+
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', node.radius + 5);
+        text.setAttribute('x', node.radius + 7);
         text.setAttribute('y', 4);
-        text.setAttribute('font-size', '12px');
+        text.setAttribute('font-size', '11px');
         text.setAttribute('fill', colors.text);
-        text.setAttribute('font-weight', '500');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
         text.textContent = node.label;
 
-        // Create mastery indicator
+        // Create mastery indicator with background
+        const masteryBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        masteryBackground.setAttribute('x', node.radius + 2);
+        masteryBackground.setAttribute('y', 8);
+        masteryBackground.setAttribute('width', 35);
+        masteryBackground.setAttribute('height', 14);
+        masteryBackground.setAttribute('fill', colors.background);
+        masteryBackground.setAttribute('stroke', colors.border);
+        masteryBackground.setAttribute('stroke-width', '1');
+        masteryBackground.setAttribute('rx', '2');
+        masteryBackground.setAttribute('opacity', '0.9');
+        group.appendChild(masteryBackground);
+
         const masteryText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        masteryText.setAttribute('x', node.radius + 5);
+        masteryText.setAttribute('x', node.radius + 7);
         masteryText.setAttribute('y', 18);
-        masteryText.setAttribute('font-size', '10px');
+        masteryText.setAttribute('font-size', '9px');
         masteryText.setAttribute('fill', colors.textSecondary);
+        masteryText.setAttribute('font-weight', '500');
+        masteryText.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
         masteryText.textContent = `${Math.round(node.mastery * 100)}%`;
 
         group.appendChild(circle);
+        group.appendChild(textBackground);
+        group.appendChild(masteryBackground);
         group.appendChild(text);
         group.appendChild(masteryText);
         svg.appendChild(group);
@@ -403,7 +432,7 @@ const KnowledgeMap = () => {
       }
     });
 
-    // Add cluster labels
+    // Add cluster labels with better positioning and visibility
     Object.entries(clusters).forEach(([clusterName, topicIds], index) => {
       try {
         const clusterNodes = nodes.filter(node => topicIds.includes(node.id));
@@ -411,13 +440,27 @@ const KnowledgeMap = () => {
           const avgX = clusterNodes.reduce((sum, node) => sum + node.x, 0) / clusterNodes.length;
           const avgY = clusterNodes.reduce((sum, node) => sum + node.y, 0) / clusterNodes.length;
 
+          // Add background rectangle for better visibility
+          const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          background.setAttribute('x', avgX - 80);
+          background.setAttribute('y', avgY - 70);
+          background.setAttribute('width', 160);
+          background.setAttribute('height', 30);
+          background.setAttribute('fill', colors.background);
+          background.setAttribute('stroke', clusterColors[clusterName] || '#666');
+          background.setAttribute('stroke-width', '2');
+          background.setAttribute('rx', '5');
+          background.setAttribute('opacity', '0.9');
+          svg.appendChild(background);
+
           const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           label.setAttribute('x', avgX);
           label.setAttribute('y', avgY - 50);
-          label.setAttribute('font-size', '14px');
+          label.setAttribute('font-size', '16px');
           label.setAttribute('font-weight', 'bold');
           label.setAttribute('fill', clusterColors[clusterName] || '#666');
           label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
           label.textContent = clusterName;
 
           svg.appendChild(label);
@@ -453,6 +496,53 @@ const KnowledgeMap = () => {
         Visualize your learning journey across different knowledge domains. 
         Node size indicates your mastery level, and colors represent knowledge clusters.
       </p>
+
+      {/* Knowledge Clusters Summary - Moved to main panel */}
+      <div style={{
+        background: colors.cardBackground,
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 20,
+        border: `1px solid ${colors.border}`,
+        boxShadow: colors.shadow
+      }}>
+        <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>
+          📊 Knowledge Clusters
+        </h4>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          {Object.entries(clusters).map(([clusterName, topicIds]) => {
+            const clusterTopics = topicIds.map(id => topics[id]).filter(Boolean);
+            const avgMastery = clusterTopics.length > 0 
+              ? clusterTopics.reduce((sum, topic) => {
+                  const mastery = userData?.mastery_scores?.[topic.id] || 0;
+                  return sum + mastery;
+                }, 0) / clusterTopics.length
+              : 0;
+            
+            return (
+              <div key={clusterName} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 12px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.background
+              }}>
+                <div style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  backgroundColor: clusterColors[clusterName] || '#666'
+                }} />
+                <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>
+                  {clusterName}: {clusterTopics.length} topics, Avg: {Math.round(avgMastery * 100)}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Search and Filter Toolbar */}
       <div style={{
@@ -571,12 +661,13 @@ const KnowledgeMap = () => {
         width: "100%",
         boxSizing: "border-box",
         overflow: "hidden",
-        maxWidth: "100%"
+        maxWidth: "100%",
+        position: "relative"
       }}>
         <svg
           ref={svgRef}
           width="100%"
-          height="400"
+          height="500"
           style={{ 
             background: colors.background,
             borderRadius: 8,
@@ -584,6 +675,99 @@ const KnowledgeMap = () => {
             maxWidth: "100%"
           }}
         />
+        
+        {/* Zoom Controls - Positioned inside the map container */}
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          zIndex: 100
+        }}>
+          <button
+            onClick={() => {
+              const svg = svgRef.current;
+              if (svg) {
+                d3.select(svg).transition().duration(300).call(
+                  d3.zoom().transform,
+                  d3.zoomIdentity.scale(zoomLevel * 1.2)
+                );
+              }
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.background,
+              color: colors.textPrimary,
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            +
+          </button>
+          <button
+            onClick={() => {
+              const svg = svgRef.current;
+              if (svg) {
+                d3.select(svg).transition().duration(300).call(
+                  d3.zoom().transform,
+                  d3.zoomIdentity.scale(zoomLevel * 0.8)
+                );
+              }
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.background,
+              color: colors.textPrimary,
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            −
+          </button>
+          <button
+            onClick={() => {
+              const svg = svgRef.current;
+              if (svg) {
+                d3.select(svg).transition().duration(300).call(
+                  d3.zoom().transform,
+                  d3.zoomIdentity
+                );
+              }
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.background,
+              color: colors.textPrimary,
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            🏠
+          </button>
+        </div>
       </div>
 
              {/* Legend */}
@@ -594,17 +778,25 @@ const KnowledgeMap = () => {
          border: `1px solid ${colors.border}`,
          marginBottom: 20
        }}>
-         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>Legend</h4>
+         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>📋 Map Legend</h4>
          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
            {Object.entries(clusterColors).map(([clusterName, color]) => (
-             <div key={clusterName} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+             <div key={clusterName} style={{ 
+               display: 'flex', 
+               alignItems: 'center', 
+               gap: 8,
+               padding: '4px 8px',
+               borderRadius: '4px',
+               backgroundColor: colors.background,
+               border: `1px solid ${colors.border}`
+             }}>
                <div style={{
                  width: 12,
                  height: 12,
                  borderRadius: '50%',
                  backgroundColor: color
                }} />
-               <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>
+               <span style={{ fontSize: '0.9em', color: colors.textSecondary, fontWeight: '500' }}>
                  {clusterName}
                </span>
              </div>
@@ -612,6 +804,9 @@ const KnowledgeMap = () => {
          </div>
          <div style={{ marginTop: 12, fontSize: '0.9em', color: colors.textSecondary }}>
            <strong>Node size:</strong> Larger nodes indicate higher mastery levels
+         </div>
+         <div style={{ marginTop: 8, fontSize: '0.9em', color: colors.textSecondary }}>
+           <strong>Zoom:</strong> Use the controls on the map or mouse wheel to zoom in/out
          </div>
        </div>
 
@@ -747,109 +942,8 @@ const KnowledgeMap = () => {
           />
         )}
 
-        {/* Cluster Legend */}
-        <ClusterLegend
-          clusters={clusters}
-          clusterColors={clusterColors}
-          onClusterToggle={(clusterName) => {
-            setActiveClusters(prev => 
-              prev.includes(clusterName) 
-                ? prev.filter(c => c !== clusterName)
-                : [...prev, clusterName]
-            );
-          }}
-          activeClusters={activeClusters}
-        />
-
-        {/* Zoom Controls */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          zIndex: 100
-        }}>
-          <button
-            onClick={() => {
-              const svg = svgRef.current;
-              if (svg) {
-                d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
-                  d3.zoomIdentity.scale(zoomLevel * 1.2)
-                );
-              }
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.background,
-              color: colors.textPrimary,
-              cursor: 'pointer',
-              fontSize: '1.2rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            +
-          </button>
-          <button
-            onClick={() => {
-              const svg = svgRef.current;
-              if (svg) {
-                d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
-                  d3.zoomIdentity.scale(zoomLevel * 0.8)
-                );
-              }
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.background,
-              color: colors.textPrimary,
-              cursor: 'pointer',
-              fontSize: '1.2rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            −
-          </button>
-          <button
-            onClick={() => {
-              const svg = svgRef.current;
-              if (svg) {
-                d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
-                  d3.zoomIdentity
-                );
-              }
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.background,
-              color: colors.textPrimary,
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            ⌂
-          </button>
-        </div>
+        {/* Cluster Legend - Removed from here, now in main panel */}
+        {/* Zoom Controls - Moved inside map container */}
 
         {/* CSS Animations */}
         <style>{`
