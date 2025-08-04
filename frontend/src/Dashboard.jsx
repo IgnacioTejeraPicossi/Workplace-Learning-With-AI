@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "./firebase";
-import { fetchLessons } from "./api";
+import { fetchLessons, fetchSavedVideos } from "./api";
 import ProgressCard from "./ProgressCard";
 import LearningTrendsChart from "./LearningTrendsChart";
 import TopicBreakdownChart from "./TopicBreakdownChart";
@@ -87,10 +87,16 @@ function Dashboard({ user, onSectionSelect }) {
         const lessons = lessonsData.lessons || lessonsData || [];
         const actualLessonsCount = lessons.length;
         
+        // Fetch saved videos count
+        const videosData = await fetchSavedVideos();
+        const videos = videosData.videos || [];
+        const actualVideosCount = videos.length;
+        
         // Update progress with real data
         const updatedProgress = {
           ...userProgress,
           lessonsCompleted: actualLessonsCount,
+          videosCompleted: actualVideosCount, // Add videos count
           lastActivity: userProgress.lastActivity || (lessons[0]?.created_at || new Date().toISOString())
         };
         setProgress(updatedProgress);

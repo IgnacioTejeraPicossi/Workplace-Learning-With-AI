@@ -1276,6 +1276,134 @@ async def update_user_activity(request: Request):
     except Exception as e:
         return {"error": str(e)}, 400 
 
+# Saved Videos endpoints
+@app.get("/api/saved-videos")
+async def get_saved_videos(user=Depends(verify_token)):
+    """Get all saved videos for the authenticated user"""
+    try:
+        user_id = user.get("uid")
+        cursor = saved_videos_collection.find({"user_id": user_id})
+        videos = await cursor.to_list(length=100)
+        
+        # Convert ObjectId to string for JSON serialization
+        for video in videos:
+            video["_id"] = str(video["_id"])
+        
+        # If no videos exist, create initial data
+        if not videos:
+            initial_videos = [
+                {
+                    "user_id": user_id,
+                    "title": "Agile Scrum Basics",
+                    "description": "Learn the fundamentals of Agile methodology and Scrum framework for effective project management.",
+                    "duration": "15:30",
+                    "url": "https://www.youtube.com/embed/9TycLR0TqFA",
+                    "topic": "Agile",
+                    "saved_at": "2025-01-15T10:00:00Z"
+                },
+                {
+                    "user_id": user_id,
+                    "title": "Python for Beginners",
+                    "description": "Complete introduction to Python programming language with hands-on examples and exercises.",
+                    "duration": "25:45",
+                    "url": "https://www.youtube.com/embed/kqtD5dpn9C8",
+                    "topic": "Programming",
+                    "saved_at": "2025-01-14T14:30:00Z"
+                },
+                {
+                    "user_id": user_id,
+                    "title": "Leadership Communication",
+                    "description": "Master the art of effective communication in leadership roles and team management.",
+                    "duration": "18:20",
+                    "url": "https://www.youtube.com/embed/8jPQjjsBbIc",
+                    "topic": "Leadership",
+                    "saved_at": "2025-01-13T09:15:00Z"
+                },
+                {
+                    "user_id": user_id,
+                    "title": "JavaScript Fundamentals",
+                    "description": "Essential JavaScript concepts for web development and modern applications.",
+                    "duration": "22:15",
+                    "url": "https://www.youtube.com/embed/W6NZfCO5SIk",
+                    "topic": "Programming",
+                    "saved_at": "2025-01-12T16:45:00Z"
+                },
+                {
+                    "user_id": user_id,
+                    "title": "Data Science Essentials",
+                    "description": "Introduction to data science concepts, tools, and methodologies for beginners.",
+                    "duration": "28:30",
+                    "url": "https://www.youtube.com/embed/ua-CiDNNj30",
+                    "topic": "Data Science",
+                    "saved_at": "2025-01-11T11:20:00Z"
+                }
+            ]
+            
+            # Insert initial videos
+            for video in initial_videos:
+                result = await saved_videos_collection.insert_one(video)
+                video["_id"] = str(result.inserted_id)
+            
+            videos = initial_videos
+        
+        return {"videos": videos}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching saved videos: {str(e)}")
+
+@app.post("/api/saved-videos")
+async def save_video(request: Request, user=Depends(verify_token)):
+    """Save a new video for the authenticated user"""
+    try:
+        user_id = user.get("uid")
+        video_data = await request.json()
+        
+        # Add user_id and timestamp
+        video_data["user_id"] = user_id
+        video_data["saved_at"] = datetime.utcnow().isoformat()
+        
+        result = await saved_videos_collection.insert_one(video_data)
+        video_data["_id"] = str(result.inserted_id)
+        
+        return video_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving video: {str(e)}")
+
+@app.delete("/api/saved-videos/{video_id}")
+async def delete_saved_video(video_id: str, user=Depends(verify_token)):
+    """Delete a saved video for the authenticated user"""
+    try:
+        user_id = user.get("uid")
+        result = await saved_videos_collection.delete_one({
+            "_id": ObjectId(video_id),
+            "user_id": user_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Video not found or not owned by user")
+        
+        return {"message": "Video deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting video: {str(e)}")
+
+@app.put("/api/saved-videos/{video_id}")
+async def update_saved_video(video_id: str, request: Request, user=Depends(verify_token)):
+    """Update a saved video for the authenticated user"""
+    try:
+        user_id = user.get("uid")
+        update_data = await request.json()
+        
+        result = await saved_videos_collection.update_one(
+            {"_id": ObjectId(video_id), "user_id": user_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Video not found or not owned by user")
+        
+        return {"message": "Video updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating video: {str(e)}")
+
 @app.get("/api/knowledge-map/recommendations/{user_id}")
 async def get_learning_recommendations(user_id: str):
     """Get advanced vector-based learning recommendations with proximity analysis"""

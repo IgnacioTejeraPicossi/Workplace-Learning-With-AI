@@ -1,53 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
+import { fetchSavedVideos, deleteSavedVideo, updateSavedVideo } from './api';
 
 function SavedVideos({ user }) {
   const [savedVideos, setSavedVideos] = useState([]);
   const [filter, setFilter] = useState('');
   const [expandedVideo, setExpandedVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { colors } = useTheme();
 
-  // Mock data for saved videos
+  // Load saved videos from API
+  const loadSavedVideos = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchSavedVideos();
+      setSavedVideos(data.videos || []);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      setSavedVideos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setSavedVideos([
-      {
-        id: 1,
-        title: "Agile Scrum Basics",
-        description: "Learn the fundamentals of Agile methodology and Scrum framework for effective project management.",
-        duration: "15:30",
-        url: "https://www.youtube.com/embed/9TycLR0TqFA",
-        topic: "Agile",
-        savedAt: "2025-01-15"
-      },
-      {
-        id: 2,
-        title: "Python for Beginners",
-        description: "Complete introduction to Python programming language with hands-on examples and exercises.",
-        duration: "25:45",
-        url: "https://www.youtube.com/embed/kqtD5dpn9C8",
-        topic: "Programming",
-        savedAt: "2025-01-14"
-      },
-      {
-        id: 3,
-        title: "Leadership Communication",
-        description: "Master the art of effective communication in leadership roles and team management.",
-        duration: "18:20",
-        url: "https://www.youtube.com/embed/8jPQjjsBbIc",
-        topic: "Leadership",
-        savedAt: "2025-01-13"
-      },
-      {
-        id: 4,
-        title: "JavaScript Fundamentals",
-        description: "Essential JavaScript concepts for web development and modern applications.",
-        duration: "22:15",
-        url: "https://www.youtube.com/embed/W6NZfCO5SIk",
-        topic: "Programming",
-        savedAt: "2025-01-12"
-      }
-    ]);
-  }, []);
+    if (user) {
+      loadSavedVideos();
+    } else {
+      setLoading(false);
+      setSavedVideos([]);
+    }
+  }, [user]);
 
   const filteredVideos = savedVideos.filter(video =>
     video.title.toLowerCase().includes(filter.toLowerCase()) ||
@@ -59,8 +44,14 @@ function SavedVideos({ user }) {
     window.open(video.url, '_blank');
   };
 
-  const handleDelete = (videoId) => {
-    setSavedVideos(savedVideos.filter(video => video.id !== videoId));
+  const handleDelete = async (videoId) => {
+    if (!window.confirm("Delete this video?")) return;
+    try {
+      await deleteSavedVideo(videoId);
+      await loadSavedVideos();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleShare = (video) => {
@@ -91,6 +82,9 @@ function SavedVideos({ user }) {
   const toggleExpand = (videoId) => {
     setExpandedVideo(expandedVideo === videoId ? null : videoId);
   };
+
+  if (loading) return <div>Loading saved videos...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
     <div style={{ padding: '2rem' }}>

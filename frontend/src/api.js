@@ -268,3 +268,20 @@ Would you like to know more about any specific feature?`;
 export async function saveMicroLesson(topic, lesson) {
   return apiCall('/micro-lesson', 'POST', { topic, lesson });
 }
+
+// Saved Videos API functions
+export async function fetchSavedVideos() {
+  return apiCall('/api/saved-videos', 'GET');
+}
+
+export async function saveVideo(videoData) {
+  return apiCall('/api/saved-videos', 'POST', videoData);
+}
+
+export async function deleteSavedVideo(videoId) {
+  return apiCall(`/api/saved-videos/${videoId}`, 'DELETE');
+}
+
+export async function updateSavedVideo(videoId, data) {
+  return apiCall(`/api/saved-videos/${videoId}`, 'PUT', data);
+}
