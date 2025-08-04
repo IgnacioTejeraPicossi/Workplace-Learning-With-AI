@@ -9,7 +9,7 @@ import SavedVideos from './SavedVideos';
 const EXAMPLE_VIDEO = "https://www.youtube.com/embed/1hHMwLxN6EM";
 const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, including its iterative approach, team collaboration, and adaptability to change. Key points: Agile is not waterfall, it values individuals and interactions, and it uses sprints to deliver value incrementally.";
 
-function VideoLesson() {
+function VideoLesson({ user }) {
   const [videoUrl, setVideoUrl] = useState('');
   const [summary, setSummary] = useState('');
   const [quiz, setQuiz] = useState([]);
@@ -340,7 +340,7 @@ function VideoLesson() {
       {/* Saved Videos Section */}
       <div style={{ marginTop: "40px" }}>
         <h3>🎬 Saved Videos</h3>
-        <SavedVideos user={null} />
+        <SavedVideos user={user} />
       </div>
     </div>
   );

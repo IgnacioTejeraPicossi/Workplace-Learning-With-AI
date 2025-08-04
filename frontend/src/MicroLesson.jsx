@@ -3,7 +3,7 @@ import { askStream, saveMicroLesson } from "./api";
 import ModalDialog from "./ModalDialog";
 import LessonList from "./LessonList";
 
-function MicroLesson({ query }) {
+function MicroLesson({ query, user }) {
   const [topic, setTopic] = useState(query || "");
   const [modalOpen, setModalOpen] = useState(false);
   const [aiOutput, setAiOutput] = useState("");
@@ -71,7 +71,7 @@ function MicroLesson({ query }) {
       {/* Saved Micro-lessons Section */}
       <div style={{ marginTop: "40px" }}>
         <h3>📚 Saved Micro-lessons</h3>
-        <LessonList user={null} />
+        <LessonList user={user} />
       </div>
       <ModalDialog
         isOpen={modalOpen}

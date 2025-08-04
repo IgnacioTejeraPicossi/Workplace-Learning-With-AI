@@ -21,3 +21,6 @@ certification_simulations_collection = database.get_collection("certification_si
 
 unknown_intents_collection = database.get_collection("unknown_intents")
 scaffold_history_collection = database.get_collection("scaffold_history")
+
+# Video Collections
+saved_videos_collection = database.get_collection("saved_videos")

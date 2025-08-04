@@ -6,7 +6,6 @@ import Recommendation from "./Recommendation";
 import Simulator from "./Simulator";
 import Dashboard from "./Dashboard";
 import WebSearch from "./WebSearch";
-import LessonList from "./LessonList";
 import CareerCoach from "./CareerCoach";
 import SkillsForecast from "./SkillsForecast";
 import TeamDynamics from "./TeamDynamics";
@@ -328,20 +327,19 @@ function AppContent() {
             <Auth user={user} setUser={setUser} />
             {/* Render the routed module if set, otherwise fall back to section navigation */}
             {activeModule === 'concepts' && <Concepts query={userQuery} />}
-            {activeModule === 'microlesson' && <MicroLesson query={userQuery} />}
+            {activeModule === 'microlesson' && <MicroLesson query={userQuery} user={user} />}
             {activeModule === 'simulation' && <Simulator query={userQuery} />}
             {activeModule === 'recommendation' && <Recommendation query={userQuery} />}
             {activeModule === 'coach' && <CareerCoach query={userQuery} />}
             {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
             {activeModule === 'certification' && <Certifications query={userQuery} />}
-            {activeModule === 'video-lessons' && <VideoLesson query={userQuery} />}
-            {activeModule === 'saved-videos' && <SavedVideos user={user} />}
+            {activeModule === 'video-lessons' && <VideoLesson query={userQuery} user={user} />}
             {activeModule === 'presentation-agent' && <PresentationAgent query={userQuery} />}
             {activeModule === 'ai-study-buddy' && <AIStudyBuddy user={user} query={userQuery} />}
             {activeModule === 'ai-training' && <AITrainingModule query={userQuery} />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
-            {!activeModule && section === "micro-lessons" && <MicroLesson />}
+            {!activeModule && section === "micro-lessons" && <MicroLesson user={user} />}
             {!activeModule && section === "recommendation" && <Recommendation />}
             {!activeModule && section === "simulations" && <Simulator />}
             {!activeModule && section === "web-search" && <WebSearch />}
@@ -354,7 +352,7 @@ function AppContent() {
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
                     {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
         {!activeModule && section === "run-test" && <RunTest />}
-            {!activeModule && section === "video-lessons" && <VideoLesson />}
+            {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
             {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}
