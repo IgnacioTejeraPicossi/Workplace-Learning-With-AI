@@ -18,23 +18,26 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       
+      // Base progression with realistic learning curves
+      const baseProgress = Math.min(0.8, 0.1 + (i * 0.008)); // Slower, more realistic progression
+      
       const dayData = {
         date: date.toISOString().split('T')[0],
         timestamp: date.getTime(),
-        // More realistic progression with some variability
-        prompt_engineering: Math.min(0.5, 0.1 + (i * 0.013) + (Math.random() * 0.02 - 0.01)),
-        ai_ethics: Math.min(0.4, 0.05 + (i * 0.012) + (Math.random() * 0.015 - 0.0075)),
-        machine_learning: Math.min(0.1, 0.01 + (i * 0.003) + (Math.random() * 0.01 - 0.005)),
-        team_leadership: Math.min(0.4, 0.2 + (i * 0.007) + (Math.random() * 0.018 - 0.009)),
-        project_management: Math.min(0.2, 0.05 + (i * 0.005) + (Math.random() * 0.012 - 0.006)),
-        customer_service: Math.min(0.3, 0.1 + (i * 0.007) + (Math.random() * 0.014 - 0.007)),
-        sales_negotiation: Math.min(0.2, 0.05 + (i * 0.005) + (Math.random() * 0.01 - 0.005)),
-        conflict_resolution: Math.min(0.1, 0.01 + (i * 0.003) + (Math.random() * 0.008 - 0.004)),
-        presentation_skills: Math.min(0.3, 0.1 + (i * 0.007) + (Math.random() * 0.016 - 0.008)),
-        data_analysis: Math.min(0.1, 0.01 + (i * 0.003) + (Math.random() * 0.006 - 0.003)),
-        communication: Math.min(0.0, 0.0 + (i * 0.002) + (Math.random() * 0.004 - 0.002)),
-        strategic_thinking: Math.min(0.0, 0.0 + (i * 0.001) + (Math.random() * 0.003 - 0.0015)),
-        innovation_management: Math.min(0.0, 0.0 + (i * 0.001) + (Math.random() * 0.002 - 0.001))
+        // More realistic progression with gradual improvement
+        prompt_engineering: Math.min(0.6, 0.15 + (i * 0.006) + (Math.random() * 0.01 - 0.005)),
+        ai_ethics: Math.min(0.5, 0.1 + (i * 0.005) + (Math.random() * 0.008 - 0.004)),
+        machine_learning: Math.min(0.3, 0.05 + (i * 0.003) + (Math.random() * 0.006 - 0.003)),
+        team_leadership: Math.min(0.7, 0.2 + (i * 0.006) + (Math.random() * 0.012 - 0.006)),
+        project_management: Math.min(0.4, 0.1 + (i * 0.004) + (Math.random() * 0.008 - 0.004)),
+        customer_service: Math.min(0.5, 0.15 + (i * 0.004) + (Math.random() * 0.01 - 0.005)),
+        sales_negotiation: Math.min(0.3, 0.08 + (i * 0.003) + (Math.random() * 0.006 - 0.003)),
+        conflict_resolution: Math.min(0.2, 0.05 + (i * 0.002) + (Math.random() * 0.004 - 0.002)),
+        presentation_skills: Math.min(0.4, 0.12 + (i * 0.004) + (Math.random() * 0.008 - 0.004)),
+        data_analysis: Math.min(0.25, 0.06 + (i * 0.002) + (Math.random() * 0.004 - 0.002)),
+        communication: Math.min(0.35, 0.08 + (i * 0.003) + (Math.random() * 0.006 - 0.003)),
+        strategic_thinking: Math.min(0.2, 0.04 + (i * 0.002) + (Math.random() * 0.004 - 0.002)),
+        innovation_management: Math.min(0.15, 0.03 + (i * 0.001) + (Math.random() * 0.003 - 0.0015))
       };
       
       timelineData.push(dayData);
@@ -76,52 +79,56 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
     const daysToShow = selectedTimeRange === '7d' ? 7 : selectedTimeRange === '30d' ? 30 : 90;
     const recentData = timelineData.slice(-daysToShow);
     
-    // Calculate average mastery over time
+    // Calculate average mastery over time (only topic values, exclude date and timestamp)
     const averageOverTime = recentData.map(day => {
-      const values = Object.values(day).filter(val => typeof val === 'number');
-      return values.reduce((sum, val) => sum + val, 0) / values.length;
+      const topicValues = Object.entries(day)
+        .filter(([key, val]) => key !== 'date' && key !== 'timestamp' && typeof val === 'number')
+        .map(([key, val]) => val);
+      return topicValues.length > 0 ? topicValues.reduce((sum, val) => sum + val, 0) / topicValues.length : 0;
     });
 
-    // Calculate improvement metrics
+    // Calculate improvement metrics (more stable calculation)
     const firstWeek = averageOverTime.slice(0, Math.min(7, averageOverTime.length));
     const lastWeek = averageOverTime.slice(-7);
-    const improvement = lastWeek.length > 0 && firstWeek.length > 0 
-      ? (lastWeek[lastWeek.length - 1] - firstWeek[0]) / firstWeek[0] * 100 
-      : 0;
+    const firstAvg = firstWeek.length > 0 ? firstWeek.reduce((sum, val) => sum + val, 0) / firstWeek.length : 0;
+    const lastAvg = lastWeek.length > 0 ? lastWeek.reduce((sum, val) => sum + val, 0) / lastWeek.length : 0;
+    const improvement = firstAvg > 0 ? ((lastAvg - firstAvg) / firstAvg) * 100 : 0;
 
     // Find top improving topics
     const topicImprovements = Object.keys(currentMastery).map(topicId => {
       const topicData = recentData.map(day => day[topicId] || 0);
       const startValue = topicData[0] || 0;
       const endValue = topicData[topicData.length - 1] || 0;
-      const improvement = startValue > 0 ? (endValue - startValue) / startValue * 100 : 0;
+      const improvement = startValue > 0 ? ((endValue - startValue) / startValue) * 100 : 0;
       
       return {
         topicId,
         label: topics[topicId]?.label || topicId,
-        improvement,
+        improvement: Math.min(improvement, 100), // Cap at 100%
         currentMastery: currentMastery[topicId] || 0,
         color: getTopicColor(topicId)
       };
     }).sort((a, b) => b.improvement - a.improvement);
 
-    // Calculate learning velocity (mastery gained per day)
+    // Calculate learning velocity (mastery gained per day) - more reasonable calculation
     const learningVelocity = recentData.length > 1 
-      ? (averageOverTime[averageOverTime.length - 1] - averageOverTime[0]) / recentData.length
+      ? Math.min(((averageOverTime[averageOverTime.length - 1] - averageOverTime[0]) / recentData.length) * 100, 10) // Cap at 10% per day
       : 0;
 
     // Find consistency score (how regularly user learns)
     const consistencyScore = recentData.filter(day => {
-      const values = Object.values(day).filter(val => typeof val === 'number');
-      const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
-      return avg > 0.1; // Threshold for "active learning day"
+      const topicValues = Object.entries(day)
+        .filter(([key, val]) => key !== 'date' && key !== 'timestamp' && typeof val === 'number')
+        .map(([key, val]) => val);
+      const avg = topicValues.length > 0 ? topicValues.reduce((sum, val) => sum + val, 0) / topicValues.length : 0;
+      return avg > 0.05; // Lower threshold for "active learning day"
     }).length / recentData.length * 100;
 
     return {
       averageMastery: masteryValues.reduce((sum, val) => sum + val, 0) / masteryValues.length,
-      improvement,
-      learningVelocity,
-      consistencyScore,
+      improvement: Math.min(improvement, 50), // Cap improvement at 50%
+      learningVelocity: Math.max(learningVelocity, 0), // Ensure non-negative
+      consistencyScore: Math.min(consistencyScore, 100), // Cap at 100%
       topImprovingTopics: topicImprovements.slice(0, 5),
       averageOverTime,
       recentData
@@ -129,6 +136,17 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
   };
 
   const metrics = calculateMetrics();
+  
+  // Ensure metrics are valid
+  const safeMetrics = {
+    averageMastery: metrics.averageMastery || 0,
+    improvement: metrics.improvement || 0,
+    learningVelocity: metrics.learningVelocity || 0,
+    consistencyScore: metrics.consistencyScore || 0,
+    topImprovingTopics: metrics.topImprovingTopics || [],
+    averageOverTime: metrics.averageOverTime || [],
+    recentData: metrics.recentData || []
+  };
 
   const getMetricColor = (value, type = 'positive') => {
     if (type === 'positive') {
@@ -236,9 +254,9 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           onMouseEnter={() => setHoveredMetric('average')}
           onMouseLeave={() => setHoveredMetric(null)}
           >
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: colors.primary }}>
-              {formatMetric(metrics.averageMastery * 100, 'percentage')}
-            </div>
+                         <div style={{ fontSize: '2rem', fontWeight: 'bold', color: colors.primary }}>
+               {formatMetric(safeMetrics.averageMastery * 100, 'percentage')}
+             </div>
             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
               Average Mastery
             </div>
@@ -269,40 +287,40 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           onMouseEnter={() => setHoveredMetric('improvement')}
           onMouseLeave={() => setHoveredMetric(null)}
           >
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: getMetricColor(metrics.improvement, 'positive')
-            }}>
-              {formatMetric(metrics.improvement, 'percentage')}
-            </div>
+                         <div style={{ 
+               fontSize: '2rem', 
+               fontWeight: 'bold', 
+               color: getMetricColor(safeMetrics.improvement, 'positive')
+             }}>
+               {formatMetric(safeMetrics.improvement, 'percentage')}
+             </div>
             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
               {selectedTimeRange} Improvement
             </div>
           </div>
 
-          {/* Learning Velocity */}
-          <div style={{
-            padding: '20px',
-            backgroundColor: colors.background,
-            borderRadius: '12px',
-            border: `1px solid ${colors.border}`,
-            textAlign: 'center'
-          }}
-          onMouseEnter={() => setHoveredMetric('velocity')}
-          onMouseLeave={() => setHoveredMetric(null)}
-          >
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: getMetricColor(metrics.learningVelocity * 100, 'positive')
-            }}>
-              {formatMetric(metrics.learningVelocity * 100, 'percentage')}
-            </div>
-            <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
-              Daily Learning Rate
-            </div>
-          </div>
+                     {/* Learning Velocity */}
+           <div style={{
+             padding: '20px',
+             backgroundColor: colors.background,
+             borderRadius: '12px',
+             border: `1px solid ${colors.border}`,
+             textAlign: 'center'
+           }}
+           onMouseEnter={() => setHoveredMetric('velocity')}
+           onMouseLeave={() => setHoveredMetric(null)}
+           >
+             <div style={{ 
+               fontSize: '2rem', 
+               fontWeight: 'bold', 
+               color: getMetricColor(safeMetrics.learningVelocity, 'positive')
+             }}>
+               {formatMetric(safeMetrics.learningVelocity, 'percentage')}
+             </div>
+             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
+               Daily Learning Rate
+             </div>
+           </div>
 
           {/* Consistency */}
           <div style={{
@@ -315,13 +333,13 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           onMouseEnter={() => setHoveredMetric('consistency')}
           onMouseLeave={() => setHoveredMetric(null)}
           >
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: getMetricColor(metrics.consistencyScore, 'consistency')
-            }}>
-              {formatMetric(metrics.consistencyScore, 'percentage')}
-            </div>
+                         <div style={{ 
+               fontSize: '2rem', 
+               fontWeight: 'bold', 
+               color: getMetricColor(safeMetrics.consistencyScore, 'consistency')
+             }}>
+               {formatMetric(safeMetrics.consistencyScore, 'percentage')}
+             </div>
             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
               Learning Consistency
             </div>
@@ -336,53 +354,66 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
       }}>
         <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>📈 Mastery Progression Timeline</h3>
         
-        <div style={{
-          width: '100%',
-          height: '300px',
-          backgroundColor: colors.surface,
-          borderRadius: '12px',
-          border: `1px solid ${colors.border}`,
-          padding: '20px',
-          position: 'relative'
-        }}>
-          <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
-            {/* Grid lines */}
-            {[0, 25, 50, 75, 100].map(y => (
-              <line
-                key={y}
-                x1="0"
-                y1={y * 2.6}
-                x2="100%"
-                y2={y * 2.6}
-                stroke={colors.border}
-                strokeWidth="1"
-                opacity="0.3"
-              />
-            ))}
-            
-            {/* Average mastery line */}
-            <path
-              d={d3.line()
-                .x((d, i) => (i / (metrics.averageOverTime.length - 1)) * 100)
-                .y(d => 260 - (d * 260))
-                (metrics.averageOverTime)}
-              fill="none"
-              stroke={colors.primary}
-              strokeWidth="3"
-              opacity="0.8"
-            />
-            
-            {/* Area under the line */}
-            <path
-              d={d3.area()
-                .x((d, i) => (i / (metrics.averageOverTime.length - 1)) * 100)
-                .y0(260)
-                .y1(d => 260 - (d * 260))
-                (metrics.averageOverTime)}
-              fill={colors.primary}
-              opacity="0.1"
-            />
-          </svg>
+                 <div style={{
+           width: '100%',
+           height: '300px',
+           backgroundColor: colors.surface,
+           borderRadius: '12px',
+           border: `1px solid ${colors.border}`,
+           padding: '20px',
+           position: 'relative'
+         }}>
+           {safeMetrics.averageOverTime && safeMetrics.averageOverTime.length > 0 ? (
+             <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
+               {/* Grid lines */}
+               {[0, 25, 50, 75, 100].map(y => (
+                 <line
+                   key={y}
+                   x1="0"
+                   y1={y * 2.6}
+                   x2="100%"
+                   y2={y * 2.6}
+                   stroke={colors.border}
+                   strokeWidth="1"
+                   opacity="0.3"
+                 />
+               ))}
+               
+               {/* Average mastery line */}
+               <path
+                 d={d3.line()
+                   .x((d, i) => (i / (safeMetrics.averageOverTime.length - 1)) * 100)
+                   .y(d => 260 - (d * 260))
+                   (safeMetrics.averageOverTime)}
+                 fill="none"
+                 stroke={colors.primary}
+                 strokeWidth="3"
+                 opacity="0.8"
+               />
+               
+               {/* Area under the line */}
+               <path
+                 d={d3.area()
+                   .x((d, i) => (i / (safeMetrics.averageOverTime.length - 1)) * 100)
+                   .y0(260)
+                   .y1(d => 260 - (d * 260))
+                   (safeMetrics.averageOverTime)}
+                 fill={colors.primary}
+                 opacity="0.1"
+               />
+             </svg>
+           ) : (
+             <div style={{
+               display: 'flex',
+               alignItems: 'center',
+               justifyContent: 'center',
+               height: '100%',
+               color: colors.textSecondary,
+               fontSize: '1.1rem'
+             }}>
+               📊 Timeline data will appear here as you complete more learning activities
+             </div>
+           )}
           
           {/* Y-axis labels */}
           <div style={{
@@ -412,11 +443,11 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
             fontSize: '0.8rem',
             color: colors.textSecondary
           }}>
-            {metrics.recentData.length > 0 && (
+                         {safeMetrics.recentData.length > 0 && (
               <>
-                <span>{new Date(metrics.recentData[0].timestamp).toLocaleDateString()}</span>
-                <span>{new Date(metrics.recentData[Math.floor(metrics.recentData.length / 2)].timestamp).toLocaleDateString()}</span>
-                <span>{new Date(metrics.recentData[metrics.recentData.length - 1].timestamp).toLocaleDateString()}</span>
+                                 <span>{new Date(safeMetrics.recentData[0].timestamp).toLocaleDateString()}</span>
+                 <span>{new Date(safeMetrics.recentData[Math.floor(safeMetrics.recentData.length / 2)].timestamp).toLocaleDateString()}</span>
+                 <span>{new Date(safeMetrics.recentData[safeMetrics.recentData.length - 1].timestamp).toLocaleDateString()}</span>
               </>
             )}
           </div>
@@ -436,7 +467,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           flexDirection: 'column',
           gap: '12px'
         }}>
-          {metrics.topImprovingTopics.map((topic, index) => (
+                     {safeMetrics.topImprovingTopics.map((topic, index) => (
             <div
               key={topic.topicId}
               style={{
@@ -507,14 +538,14 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
               border: `1px solid ${colors.border}`
             }}>
               <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>📅 Learning Consistency</h4>
-              <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                {metrics.consistencyScore > 80 
-                  ? "Excellent! You're maintaining a very consistent learning schedule."
-                  : metrics.consistencyScore > 60
-                  ? "Good consistency! Consider setting daily learning reminders."
-                  : "Try to establish a more regular learning routine for better results."
-                }
-              </p>
+                             <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
+                 {safeMetrics.consistencyScore > 80 
+                   ? "Excellent! You're maintaining a very consistent learning schedule."
+                   : safeMetrics.consistencyScore > 60
+                   ? "Good consistency! Consider setting daily learning reminders."
+                   : "Try to establish a more regular learning routine for better results."
+                 }
+               </p>
             </div>
 
             {/* Velocity Insight */}
@@ -525,14 +556,14 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
               border: `1px solid ${colors.border}`
             }}>
               <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>⚡ Learning Velocity</h4>
-              <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                {metrics.learningVelocity > 0.01
-                  ? "Great pace! You're making steady progress in your learning journey."
-                  : metrics.learningVelocity > 0.005
-                  ? "Steady progress! Consider increasing study time for faster growth."
-                  : "Consider dedicating more time to learning to accelerate your progress."
-                }
-              </p>
+                             <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
+                 {safeMetrics.learningVelocity > 0.01
+                   ? "Great pace! You're making steady progress in your learning journey."
+                   : safeMetrics.learningVelocity > 0.005
+                   ? "Steady progress! Consider increasing study time for faster growth."
+                   : "Consider dedicating more time to learning to accelerate your progress."
+                 }
+               </p>
             </div>
 
             {/* Recommendations Insight */}
