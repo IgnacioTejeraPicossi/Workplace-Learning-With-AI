@@ -45,6 +45,26 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
 
   const timelineData = generateAdvancedTimelineData();
 
+  // Color mapping function (moved before usage)
+  const getTopicColor = (topicId) => {
+    const colorMap = {
+      'prompt_engineering': '#FF6B6B',
+      'ai_ethics': '#4ECDC4',
+      'machine_learning': '#45B7D1',
+      'team_leadership': '#96CEB4',
+      'project_management': '#FFEAA7',
+      'customer_service': '#DDA0DD',
+      'sales_negotiation': '#98D8C8',
+      'conflict_resolution': '#F7DC6F',
+      'presentation_skills': '#BB8FCE',
+      'data_analysis': '#85C1E9',
+      'communication': '#F8C471',
+      'strategic_thinking': '#82E0AA',
+      'innovation_management': '#F1948A'
+    };
+    return colorMap[topicId] || '#95A5A6';
+  };
+
   // Calculate advanced metrics
   const calculateMetrics = () => {
     if (!userData?.mastery_scores) return {};
@@ -109,22 +129,6 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
   };
 
   const metrics = calculateMetrics();
-
-  const getTopicColor = (topicId) => {
-    const topic = topics[topicId];
-    if (!topic) return '#666';
-    
-    const clusterColors = {
-      'AI Fundamentals': '#4CAF50',
-      'Leadership': '#2196F3', 
-      'Business Applications': '#FF9800',
-      'Communication': '#9C27B0',
-      'Strategic Thinking': '#9C27B0',
-      'Innovation Management': '#FF9800'
-    };
-    
-    return clusterColors[topic.category] || '#666';
-  };
 
   const getMetricColor = (value, type = 'positive') => {
     if (type === 'positive') {
