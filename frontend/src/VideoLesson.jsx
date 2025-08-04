@@ -4,6 +4,7 @@ import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
 import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
 import { useTheme } from './ThemeContext';
+import SavedVideos from './SavedVideos';
 
 const EXAMPLE_VIDEO = "https://www.youtube.com/embed/1hHMwLxN6EM";
 const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, including its iterative approach, team collaboration, and adaptability to change. Key points: Agile is not waterfall, it values individuals and interactions, and it uses sprints to deliver value incrementally.";
@@ -335,6 +336,12 @@ function VideoLesson() {
       >
         🗑️ Clear All
       </button>
+      
+      {/* Saved Videos Section */}
+      <div style={{ marginTop: "40px" }}>
+        <h3>🎬 Saved Videos</h3>
+        <SavedVideos user={null} />
+      </div>
     </div>
   );
 }

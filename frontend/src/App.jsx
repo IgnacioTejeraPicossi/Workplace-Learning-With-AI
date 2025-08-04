@@ -353,10 +353,8 @@ function AppContent() {
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
-            {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
-            {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
-            {!activeModule && section === "saved-videos" && <SavedVideos user={user} />}
-            {!activeModule && section === "run-test" && <RunTest />}
+                    {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
+        {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "video-lessons" && <VideoLesson />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}

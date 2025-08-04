@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { askStream, saveMicroLesson } from "./api";
 import ModalDialog from "./ModalDialog";
+import LessonList from "./LessonList";
 
 function MicroLesson({ query }) {
   const [topic, setTopic] = useState(query || "");
@@ -66,6 +67,12 @@ function MicroLesson({ query }) {
       >
         Get Micro-lesson
       </button>
+      
+      {/* Saved Micro-lessons Section */}
+      <div style={{ marginTop: "40px" }}>
+        <h3>📚 Saved Micro-lessons</h3>
+        <LessonList user={null} />
+      </div>
       <ModalDialog
         isOpen={modalOpen}
         onRequestClose={() => { setModalOpen(false); setShowQuiz(false); }}

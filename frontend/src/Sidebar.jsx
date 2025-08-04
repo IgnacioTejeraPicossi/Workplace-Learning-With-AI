@@ -32,9 +32,8 @@ const Icon = ({ name, size = 20 }) => {
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
-  { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "video-lessons", label: "Video Lessons", icon: "play-circle" },
-  { key: "recommendation", label: "Recommendation", icon: "star" },
+  { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "simulations", label: "Simulations", icon: "play-circle" },
   { key: "web-search", label: "Web Search", icon: "globe" },
   { key: "team-dynamics", label: "Team Dynamics", icon: "team" },
@@ -45,12 +44,10 @@ const navItems = [
   { key: "knowledge-map", label: "Map of Knowledge", icon: "globe" },
   { key: "presentation-agent", label: "Presentation Agent", icon: "microphone" },
   { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot" },
-  { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
-  { key: "saved-videos", label: "Saved Videos", icon: "play-circle" },
+  { key: "run-test", label: "Run Test", icon: "test" },
+  { key: "future-app", label: "Future App", icon: "robot" },
   { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
   { key: "feature-roadmap", label: "Feature Roadmap", icon: "star" },
-  { key: "future-app", label: "Future App", icon: "robot" },
-  { key: "run-test", label: "Run Test", icon: "test" },
 ];
 
 function Sidebar({ selected, onSelect }) {
