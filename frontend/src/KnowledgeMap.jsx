@@ -238,11 +238,11 @@ const KnowledgeMap = () => {
       hasClusters: !!clusters
     });
     
-    if (!loading && Object.keys(filteredTopics).length > 0 && svgRef.current) {
-      console.log('🎨 Rendering map with filtered topics...');
+    if (!loading && Object.keys(topics).length > 0 && svgRef.current) {
+      console.log('🎨 Rendering map with all topics...');
       renderMap();
     }
-  }, [filteredTopics, userData, clusters, loading]);
+  }, [topics, filteredTopics, userData, clusters, loading]);
 
   const renderMap = () => {
     const svg = svgRef.current;
@@ -257,8 +257,8 @@ const KnowledgeMap = () => {
     const centerX = width / 2;
     const centerY = height / 2;
 
-    // Create nodes with improved positioning
-    const nodes = Object.entries(filteredTopics).map(([id, topic]) => {
+    // Create nodes with improved positioning - Use all topics, not filtered
+    const nodes = Object.entries(topics).map(([id, topic]) => {
       const mastery = userData?.mastery_scores?.[id] || 0;
       const cluster = Object.entries(clusters).find(([clusterName, topicIds]) =>
         topicIds.includes(id)
@@ -266,6 +266,9 @@ const KnowledgeMap = () => {
       
       // Check if this topic is recommended
       const isRecommended = recommendations.some(rec => rec.topic_id === id);
+      
+      // Check if this topic should be visible based on filters
+      const isVisible = Object.keys(filteredTopics).includes(id);
       
       return {
         id, 
@@ -279,10 +282,14 @@ const KnowledgeMap = () => {
         radius: 15 + mastery * 20,
         color: clusterColors[cluster] || '#666',
         isRecommended,
+        isVisible,
         originalRadius: 15 + mastery * 20
       };
     });
     console.log('📊 Created advanced nodes:', nodes);
+    console.log('🔍 Topics count:', Object.keys(topics).length);
+    console.log('🔍 Filtered topics count:', Object.keys(filteredTopics).length);
+    console.log('🔍 Visible nodes count:', nodes.filter(n => n.isVisible).length);
 
     // Setup D3 zoom behavior
     const zoom = d3.zoom()
@@ -301,6 +308,13 @@ const KnowledgeMap = () => {
     // Create SVG elements with advanced features
     nodes.forEach((node, index) => {
       try {
+        // Skip nodes that are not visible based on filters
+        if (!node.isVisible) {
+          console.log(`⏭️ Skipping filtered node: ${node.label}`);
+          // Temporarily show all nodes for debugging
+          // return;
+        }
+        
         // Create node group with class for D3 selection
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('class', 'node-group');
