@@ -1032,13 +1032,19 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
 | `web_search`          | ❌         | Falls back to standard LLM       |
 | `web_search_preview`  | ❓ (beta)   | Falls back to standard LLM       |
 | (no tools)            | ✅         | Standard LLM always works        |
-Standard endpoints (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
-Web Search endpoint uses GPT-4.1 with the web search tool if available, otherwise falls back to standard LLM.
-Both approaches work independently and do not interfere with each other.
-Tech Stack
-Backend: Python, FastAPI, OpenAI API, python-dotenv
-Frontend: React, JavaScript
-Dev Tools: Docker (planned), Google Cloud Run (planned)
+- **Standard endpoints** (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
+- **Web Search endpoint** uses GPT-4.1 with the web search tool if available, otherwise falls back to standard LLM.
+- Both approaches work independently and do not interfere with each other.
+
+---
+
+## Tech Stack
+- **Backend:** Python, FastAPI, OpenAI API, python-dotenv
+- **Frontend:** React, JavaScript
+- **Dev Tools:** Docker (planned), Google Cloud Run (planned)
+
+---
+
 Project Structure
 AI Learning with AI/
   backend/
