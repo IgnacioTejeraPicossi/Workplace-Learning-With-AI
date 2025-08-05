@@ -291,7 +291,7 @@ const KnowledgeMap = () => {
     console.log('🔍 Filtered topics count:', Object.keys(filteredTopics).length);
     console.log('🔍 Visible nodes count:', nodes.filter(n => n.isVisible).length);
 
-    // Setup D3 zoom behavior
+    // Setup D3 zoom behavior - Move after creating elements
     const zoom = d3.zoom()
       .scaleExtent([0.5, 3])
       .on('zoom', (event) => {
@@ -299,11 +299,20 @@ const KnowledgeMap = () => {
         setZoomLevel(transform.k);
         setPanOffset({ x: transform.x, y: transform.y });
         
-        // Apply transform to all node groups
-        d3.selectAll('.node-group').attr('transform', transform);
+        // Apply transform to all node groups and cluster labels
+        d3.selectAll('.node-group').attr('transform', (d, i, nodes) => {
+          const group = nodes[i];
+          const originalTransform = group.getAttribute('data-original-transform') || `translate(0,0)`;
+          return `${originalTransform} scale(${transform.k}) translate(${transform.x / transform.k}, ${transform.y / transform.k})`;
+        });
+        
+        // Apply transform to cluster labels
+        d3.selectAll('.cluster-label').attr('transform', (d, i, nodes) => {
+          const label = nodes[i];
+          const originalTransform = label.getAttribute('data-original-transform') || `translate(0,0)`;
+          return `${originalTransform} scale(${transform.k}) translate(${transform.x / transform.k}, ${transform.y / transform.k})`;
+        });
       });
-
-    d3.select(svg).call(zoom);
 
     // Create SVG elements with advanced features
     nodes.forEach((node, index) => {
@@ -318,7 +327,9 @@ const KnowledgeMap = () => {
         // Create node group with class for D3 selection
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('class', 'node-group');
-        group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+        const originalTransform = `translate(${node.x}, ${node.y})`;
+        group.setAttribute('transform', originalTransform);
+        group.setAttribute('data-original-transform', originalTransform);
         group.style.cursor = 'pointer';
 
         // Create main circle with animation
@@ -467,17 +478,20 @@ const KnowledgeMap = () => {
           background.setAttribute('opacity', '0.9');
           svg.appendChild(background);
 
-          const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          label.setAttribute('x', avgX);
-          label.setAttribute('y', avgY - 50);
-          label.setAttribute('font-size', '16px');
-          label.setAttribute('font-weight', 'bold');
-          label.setAttribute('fill', clusterColors[clusterName] || '#666');
-          label.setAttribute('text-anchor', 'middle');
-          label.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
-          label.textContent = clusterName;
+                     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+           label.setAttribute('x', avgX);
+           label.setAttribute('y', avgY - 50);
+           label.setAttribute('font-size', '16px');
+           label.setAttribute('font-weight', 'bold');
+           label.setAttribute('fill', clusterColors[clusterName] || '#666');
+           label.setAttribute('text-anchor', 'middle');
+           label.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
+           label.setAttribute('class', 'cluster-label');
+           const originalTransform = `translate(${avgX}, ${avgY - 50})`;
+           label.setAttribute('data-original-transform', originalTransform);
+           label.textContent = clusterName;
 
-          svg.appendChild(label);
+           svg.appendChild(label);
           console.log(`✅ Added cluster label: ${clusterName}`);
         }
       } catch (error) {
@@ -485,6 +499,9 @@ const KnowledgeMap = () => {
       }
     });
 
+    // Apply zoom behavior after all elements are created
+    d3.select(svg).call(zoom);
+    
     console.log('🎉 Map rendering completed!');
   };
 
@@ -704,9 +721,11 @@ const KnowledgeMap = () => {
             onClick={() => {
               const svg = svgRef.current;
               if (svg) {
+                const currentZoom = d3.zoomTransform(svg);
+                const newScale = Math.min(currentZoom.k * 1.2, 3);
                 d3.select(svg).transition().duration(300).call(
                   d3.zoom().transform,
-                  d3.zoomIdentity.scale(zoomLevel * 1.2)
+                  d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y)
                 );
               }
             }}
@@ -731,9 +750,11 @@ const KnowledgeMap = () => {
             onClick={() => {
               const svg = svgRef.current;
               if (svg) {
+                const currentZoom = d3.zoomTransform(svg);
+                const newScale = Math.max(currentZoom.k * 0.8, 0.5);
                 d3.select(svg).transition().duration(300).call(
                   d3.zoom().transform,
-                  d3.zoomIdentity.scale(zoomLevel * 0.8)
+                  d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y)
                 );
               }
             }}
@@ -760,7 +781,7 @@ const KnowledgeMap = () => {
               if (svg) {
                 d3.select(svg).transition().duration(300).call(
                   d3.zoom().transform,
-                  d3.zoomIdentity
+                  d3.zoomIdentity.scale(1).translate(0, 0)
                 );
               }
             }}
