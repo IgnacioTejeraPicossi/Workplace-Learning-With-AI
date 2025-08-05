@@ -167,4 +167,78 @@ def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
         feature_name=feature_name,
         feature_summary=feature_summary
     )
-    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=800) 
+    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=800)
+
+async def generate_summary(filename: str, content: str) -> str:
+    """Generate a summary of a code file for documentation"""
+    prompt = f"""
+You are a technical documentation assistant. Analyze the following code file and provide a clear, concise summary.
+
+File: {filename}
+Content:
+{content[:3000]}
+
+Please provide a summary that includes:
+1. What this file does (purpose and functionality)
+2. Key components or functions
+3. Important dependencies or relationships
+4. Any notable patterns or architecture decisions
+
+Write in clear, professional language suitable for technical documentation.
+"""
+    return ask_openai(prompt, max_tokens=500)
+
+async def generate_quiz_questions(markdown_content: str, num_questions: int = 3, difficulty: str = "medium") -> list:
+    """Generate quiz questions from markdown content"""
+    prompt = f"""
+You are a workplace learning assistant. Based on this markdown documentation, generate {num_questions} multiple-choice quiz questions.
+
+Documentation:
+{markdown_content[:4000]}
+
+Difficulty Level: {difficulty}
+
+Please generate questions in this exact JSON format:
+[
+  {{
+    "question": "What is the main purpose of this component?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correct_answer": "Option B",
+    "explanation": "This is the correct answer because..."
+  }}
+]
+
+Make sure the questions are relevant to the content and appropriate for the specified difficulty level.
+"""
+    
+    try:
+        response = ask_openai(prompt, max_tokens=1000)
+        # Try to parse the JSON response
+        import json
+        import re
+        
+        # Extract JSON from the response
+        json_match = re.search(r'\[.*\]', response, re.DOTALL)
+        if json_match:
+            quiz_data = json.loads(json_match.group())
+            return quiz_data
+        else:
+            # Fallback: return a simple quiz structure
+            return [
+                {
+                    "question": "What is the main purpose of this documentation?",
+                    "options": ["To explain the codebase", "To provide installation instructions", "To list all files", "To show examples"],
+                    "correct_answer": "To explain the codebase",
+                    "explanation": "The documentation explains the structure and purpose of the codebase."
+                }
+            ]
+    except Exception as e:
+        # Return a fallback quiz if parsing fails
+        return [
+            {
+                "question": "What is the main purpose of this documentation?",
+                "options": ["To explain the codebase", "To provide installation instructions", "To list all files", "To show examples"],
+                "correct_answer": "To explain the codebase",
+                "explanation": "The documentation explains the structure and purpose of the codebase."
+            }
+        ] 

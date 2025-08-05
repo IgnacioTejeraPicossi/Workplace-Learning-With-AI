@@ -233,6 +233,7 @@ Modular API endpoints for:
 - **Dynamic Skills Forecasting**: Predicts future skill needs based on user learning history and transcript keywords via a /skills-forecast endpoint.
 - **AI-Powered Certifications**: Get personalized certification recommendations and study plans via /certifications endpoints with user-specific data persistence.
 - **Map of Knowledge**: Advanced learning visualization system with vector-based recommendations, mastery tracking, and interactive clustering via /knowledge-map endpoints.
+- **Repository Documentation Generator**: AI-powered repository analysis and documentation generation with quiz creation via /api/analyze-repo and /api/generate-documentation endpoints.
 - **Team Dynamics Analyzer**: Comprehensive team management and analytics with AI-powered insights via /teams endpoints.
 - **Firebase Authentication**: Secure user authentication with Google Sign-In
 - **User-Specific Data**: All data (lessons, career sessions, forecasts, certifications, knowledge map data) is saved per user
@@ -264,6 +265,12 @@ Modular API endpoints for:
   - 📊 **Advanced Mastery Panel**: Real-time analytics with timeline visualization and KPIs
   - 🔍 **Search & Filter System**: Real-time filtering by topic, category, and mastery level
   - 🎮 **Interactive Controls**: Zoom, pan, and hover effects for enhanced user experience
+- **Repository Analyzer** (RepoAnalyzer.jsx):
+  - 🔍 **Repository Analysis**: Clone and analyze GitHub/GitLab/Bitbucket repositories
+  - 📝 **AI Documentation Generation**: Automatically generate comprehensive documentation from code analysis
+  - 🧠 **Quiz Generation**: Create interactive quizzes from generated documentation
+  - 📄 **PDF Export**: Download documentation in PDF format
+  - 🎯 **Template Support**: Quick access to common repository templates
 - **Saved Micro-lessons** (LessonList.jsx):
   - View all previously generated micro-lessons at the bottom of the app
   - Filter lessons by topic in real time
@@ -634,6 +641,10 @@ The Map of Knowledge is a sophisticated learning visualization system that provi
 - **GET /api/knowledge-map/clusters**: Returns knowledge cluster definitions
 - **GET /api/knowledge-map/user/{user_id}**: User-specific mastery data and progress
 - **GET /api/knowledge-map/recommendations/{user_id}**: Advanced vectorial recommendations
+- **POST /api/analyze-repo**: Analyze repository and generate file summaries
+- **POST /api/generate-documentation**: Generate markdown and PDF documentation
+- **POST /api/generate-quiz**: Create quizzes from documentation content
+- **GET /api/repo-templates**: Get common repository templates
 
 #### Database Collections
 - **topics**: Learning topics with embeddings and metadata

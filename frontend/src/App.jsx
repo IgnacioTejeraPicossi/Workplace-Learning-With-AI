@@ -26,6 +26,7 @@ import FeatureRoadmap from "./FeatureRoadmap";
 import FutureApp from "./FutureApp";
 import AIStudyBuddy from "./AIStudyBuddy";
 import KnowledgeMap from "./KnowledgeMap";
+import RepoAnalyzer from "./RepoAnalyzer";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -365,8 +366,9 @@ function AppContent() {
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
+            {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
-                    {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
+            {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
         {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
             {!activeModule && section === "idea-log" && <IdeaLog />}

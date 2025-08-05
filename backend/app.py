@@ -11,6 +11,8 @@ import uuid
 from typing import List, Optional, Dict, Any
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
 from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+from backend.repo_analysis import router as repo_router
+from backend.documentation_generator import router as doc_router
 from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 from bson import ObjectId
 
@@ -30,6 +32,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include new routers
+app.include_router(repo_router, prefix="/api", tags=["Repository Analysis"])
+app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 
 import os
 from fastapi.staticfiles import StaticFiles
