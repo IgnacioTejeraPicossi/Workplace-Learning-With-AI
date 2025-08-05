@@ -8,7 +8,7 @@ docs/
 docs-md/
 
 # README.md - Temporarily hidden until after hackathon 
-README.md 
+# README.md 
 
 # Build output
 dist/
