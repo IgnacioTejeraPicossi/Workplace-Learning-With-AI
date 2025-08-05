@@ -976,49 +976,62 @@ Certifications (Recommendations, Study Plan, Practice Test)
 Video Lessons (Summary & Quiz Generation)
 This streaming-first approach makes the app feel fast, modern, and AI-native.
 
-4. Summary Table
-Feature/Endpoint	Uses Web Search Tool?	Uses Standard LLM?	User-Specific?	Type
-Global Search	❌	❌	❌	Frontend
-/concepts	❌	✅	❌	Backend
-/micro-lesson	❌	✅	✅	Backend
-/recommendation	❌	✅	❌	Backend
-/simulation	❌	✅	❌	Backend
-/web-search	✅	✅ (with tool)	❌	Backend
-/lessons	❌	❌	✅	Backend
-/career-coach	❌	✅	✅	Backend
-/skills-forecast	❌	✅	✅	Backend
-/teams	❌	✅	✅	Backend
-/teams/{id}/analytics	❌	✅	✅	Backend
-/knowledge-map/topics	❌	❌	❌	Backend
-/knowledge-map/clusters	❌	❌	❌	Backend
-/knowledge-map/user/{id}	❌	❌	✅	Backend
-/knowledge-map/recommendations/{id}	❌	✅	✅	Backend
-Note: Two Backend Servers
-This project uses two backend servers:
+## 4. Summary Table
 
-Python FastAPI backend (main API):
-Handles concepts, micro-lesson, recommendation, simulation, etc.
-Firebase authentication for user security
-User-specific data storage in MongoDB
-Run with:
-uvicorn backend.app:app --reload
-Node.js Express backend (web search):
-Handles /web-search endpoint using OpenAI's web search tool (if available)
-Run with:
-cd websearch-backend
-node index.js
+| Feature/Endpoint    | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? | Type |
+|-------------------|:--------------------:|:------------------:|:--------------:|:----:|
+| Global Search     | ❌                   | ❌                 | ❌             | Frontend |
+| `/concepts`       | ❌                   | ✅                 | ❌             | Backend |
+| `/micro-lesson`   | ❌                   | ✅                 | ✅             | Backend |
+| `/recommendation` | ❌                   | ✅                 | ❌             | Backend |
+| `/simulation`     | ❌                   | ✅                 | ❌             | Backend |
+| `/web-search`     | ✅                   | ✅ (with tool)     | ❌             | Backend |
+| `/lessons`        | ❌                   | ❌                 | ✅             | Backend |
+| `/career-coach`   | ❌                   | ✅                 | ✅             | Backend |
+| `/skills-forecast`| ❌                   | ✅                 | ✅             | Backend |
+| `/teams`          | ❌                   | ✅                 | ✅             | Backend |
+| `/teams/{id}/analytics` | ❌        | ✅                 | ✅             | Backend |
+
+---
+
+## Note: Two Backend Servers
+
+This project uses **two backend servers**:
+
+- **Python FastAPI backend** (main API):
+  - Handles concepts, micro-lesson, recommendation, simulation, etc.
+  - **Firebase authentication** for user security
+  - **User-specific data storage** in MongoDB
+  - Run with:
+    ```bash
+    uvicorn backend.app:app --reload
+    ```
+- **Node.js Express backend** (web search):
+  - Handles `/web-search` endpoint using OpenAI's web search tool (if available)
+  - Run with:
+    ```bash
+    cd websearch-backend
+    node index.js
+    ```
+
 Your React frontend will call both as needed. This is a common pattern for hackathons and microservice architectures.
 
-Web Search Functionality: Tool Support and Fallback
-The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 model with the web search tool. This tool is only available to some OpenAI users/organizations.
+---
 
-If your OpenAI account supports the web search tool (web_search_preview), you will get live, up-to-date answers from the internet.
-If not, the backend will automatically fall back to a standard LLM response (no web search, but still a high-quality answer).
-Summary Table: Web Search Tool Support
-Tool Parameter	Supported?	Fallback Behavior
-web_search	❌	Falls back to standard LLM
-web_search_preview	❓ (beta)	Falls back to standard LLM
-(no tools)	✅	Standard LLM always works
+## Web Search Functionality: Tool Support and Fallback
+
+The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 model with the web search tool. **This tool is only available to some OpenAI users/organizations.**
+
+- If your OpenAI account supports the web search tool (`web_search_preview`), you will get live, up-to-date answers from the internet.
+- If not, the backend will **automatically fall back to a standard LLM response** (no web search, but still a high-quality answer).
+
+### Summary Table: Web Search Tool Support
+
+| Tool Parameter         | Supported? | Fallback Behavior                |
+|-----------------------|------------|----------------------------------|
+| `web_search`          | ❌         | Falls back to standard LLM       |
+| `web_search_preview`  | ❓ (beta)   | Falls back to standard LLM       |
+| (no tools)            | ✅         | Standard LLM always works        |
 Standard endpoints (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
 Web Search endpoint uses GPT-4.1 with the web search tool if available, otherwise falls back to standard LLM.
 Both approaches work independently and do not interfere with each other.
