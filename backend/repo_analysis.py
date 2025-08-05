@@ -22,12 +22,13 @@ class RepoInput(BaseModel):
     branch: Optional[str] = None  # Made optional to auto-detect
 
 class RepoAnalysisResponse(BaseModel):
-    message: str
-    file_count: int
-    files: List[str]
-    summaries: Dict[str, str]
     repo_name: str
     branch_used: str
+    files_analyzed: int
+    summaries: Dict[str, str]
+    structure: Dict[str, any]
+    insights: Dict[str, any]
+    architecture: Dict[str, any]
 
 def safe_remove_directory(path):
     """Safely remove a directory with retry logic for Windows permission issues"""
@@ -52,11 +53,11 @@ def safe_remove_directory(path):
                 print(f"Warning: Could not remove temporary directory {path}: {e}")
 
 @router.post("/analyze-repo", response_model=RepoAnalysisResponse)
-async def analyze_repo(input: RepoInput):
-    """Analyze a repository and generate documentation summaries"""
+async def analyze_repo(input: RepoInput) -> RepoAnalysisResponse:
+    """Analyze a Git repository and generate comprehensive documentation"""
     tmp_dir = None
     try:
-        # Step 1: Clone the repo into a temp folder
+        # Step 1: Create temporary directory
         tmp_dir = tempfile.mkdtemp()
         repo_path = os.path.join(tmp_dir, "repo")
         
@@ -109,67 +110,446 @@ async def analyze_repo(input: RepoInput):
             else:
                 raise HTTPException(status_code=400, detail=f"Error cloning repository: {str(e)}")
         
-        repo_name = os.path.basename(input.repo_url.replace('.git', ''))
+        # Step 3: Analyze repository structure
+        repo_name = os.path.basename(input.repo_url.rstrip('/').rstrip('.git'))
         
-        # Step 3: Identify relevant files
-        docs = {}
-        relevant_extensions = ('.py', '.js', '.ts', '.jsx', '.tsx', '.md', '.txt', '.json', '.yaml', '.yml')
+        # Get repository structure
+        structure = analyze_repository_structure(repo_path)
+        
+        # Step 4: Analyze files and generate summaries
+        summaries = {}
+        file_analysis = {}
         
         for root, dirs, files in os.walk(repo_path):
-            # Skip common directories that don't contain documentation
-            dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules', '__pycache__', '.venv', 'venv')]
-            
+            # Skip .git directory
+            if '.git' in root:
+                continue
+                
             for file in files:
-                if file.endswith(relevant_extensions):
-                    file_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(file_path, repo_path)
-                    
-                    try:
-                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                            content = f.read()
-                            # Only include files with meaningful content
-                            if len(content.strip()) > 50:
-                                docs[relative_path] = content
-                    except Exception as e:
-                        print(f"Error reading {file_path}: {e}")
-                        continue
-
-        # Step 4: Generate summaries using AI
-        summaries = {}
-        
-        if LLM_AVAILABLE:
-            # Use AI-generated summaries
-            for filename, content in docs.items():
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, repo_path)
+                
+                # Skip binary files and large files
+                if should_skip_file(file, file_path):
+                    continue
+                
                 try:
-                    # Truncate content if too long for API
-                    truncated_content = content[:3000] if len(content) > 3000 else content
-                    summary = await generate_summary(filename, truncated_content)
-                    summaries[filename] = summary
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content = f.read()
+                    
+                    # Generate comprehensive analysis
+                    analysis = analyze_file_content(file, content, relative_path)
+                    summaries[relative_path] = analysis['summary']
+                    file_analysis[relative_path] = analysis
+                    
                 except Exception as e:
-                    summaries[filename] = f"Error summarizing: {str(e)}"
-        else:
-            # Fallback to simple summaries
-            for filename, content in docs.items():
-                # Create a simple summary based on file content
-                truncated_content = content[:500] if len(content) > 500 else content
-                file_type = filename.split('.')[-1] if '.' in filename else 'unknown'
-                summaries[filename] = f"File: {filename}\nType: {file_type}\nContent preview: {truncated_content[:200]}..."
-
+                    print(f"Error reading file {relative_path}: {e}")
+                    continue
+        
+        # Step 5: Generate project insights
+        project_insights = generate_project_insights(file_analysis, structure)
+        
+        # Step 6: Generate architecture diagram data
+        architecture_data = generate_architecture_data(file_analysis, structure)
+        
         return RepoAnalysisResponse(
-            message="Repository analyzed successfully",
-            file_count=len(docs),
-            files=list(docs.keys()),
-            summaries=summaries,
             repo_name=repo_name,
-            branch_used=branch_to_use
+            branch_used=branch_to_use,
+            files_analyzed=len(summaries),
+            summaries=summaries,
+            structure=structure,
+            insights=project_insights,
+            architecture=architecture_data
         )
-
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error analyzing repository: {str(e)}")
-    
     finally:
-        # Clean up temporary directory safely
-        safe_remove_directory(tmp_dir)
+        if tmp_dir:
+            safe_remove_directory(tmp_dir)
+
+def analyze_repository_structure(repo_path: str) -> dict:
+    """Analyze the repository structure and organization"""
+    structure = {
+        'root_files': [],
+        'directories': {},
+        'file_types': {},
+        'total_files': 0,
+        'total_dirs': 0
+    }
+    
+    for root, dirs, files in os.walk(repo_path):
+        # Skip .git directory
+        if '.git' in root:
+            continue
+            
+        relative_root = os.path.relpath(root, repo_path)
+        
+        # Count files by type
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            structure['file_types'][ext] = structure['file_types'].get(ext, 0) + 1
+            structure['total_files'] += 1
+        
+        # Organize directories
+        if relative_root == '.':
+            structure['root_files'] = files
+        else:
+            structure['directories'][relative_root] = {
+                'files': files,
+                'subdirs': dirs
+            }
+            structure['total_dirs'] += 1
+    
+    return structure
+
+def should_skip_file(filename: str, file_path: str) -> bool:
+    """Determine if a file should be skipped from analysis"""
+    # Skip binary files
+    binary_extensions = {'.exe', '.dll', '.so', '.dylib', '.bin', '.obj', '.o', '.a', '.lib'}
+    ext = os.path.splitext(filename)[1].lower()
+    if ext in binary_extensions:
+        return True
+    
+    # Skip large files (> 1MB)
+    try:
+        if os.path.getsize(file_path) > 1024 * 1024:
+            return True
+    except:
+        return True
+    
+    # Skip common files to ignore
+    skip_patterns = [
+        '.git', 'node_modules', '__pycache__', '.pytest_cache',
+        '.DS_Store', 'Thumbs.db', '.env', '.env.local'
+    ]
+    
+    for pattern in skip_patterns:
+        if pattern in filename or pattern in file_path:
+            return True
+    
+    return False
+
+def analyze_file_content(filename: str, content: str, relative_path: str) -> dict:
+    """Analyze file content and generate comprehensive insights"""
+    ext = os.path.splitext(filename)[1].lower()
+    
+    analysis = {
+        'filename': filename,
+        'path': relative_path,
+        'extension': ext,
+        'size': len(content),
+        'lines': len(content.split('\n')),
+        'summary': '',
+        'type': 'unknown',
+        'dependencies': [],
+        'apis': [],
+        'classes': [],
+        'functions': [],
+        'imports': []
+    }
+    
+    # Determine file type
+    if ext in ['.py']:
+        analysis['type'] = 'python'
+        analysis.update(analyze_python_file(content))
+    elif ext in ['.js', '.jsx', '.ts', '.tsx']:
+        analysis['type'] = 'javascript'
+        analysis.update(analyze_javascript_file(content))
+    elif ext in ['.json']:
+        analysis['type'] = 'json'
+        analysis.update(analyze_json_file(content))
+    elif ext in ['.md', '.txt']:
+        analysis['type'] = 'documentation'
+        analysis.update(analyze_documentation_file(content))
+    elif ext in ['.yml', '.yaml']:
+        analysis['type'] = 'configuration'
+        analysis.update(analyze_config_file(content))
+    elif ext in ['.html', '.htm']:
+        analysis['type'] = 'html'
+        analysis.update(analyze_html_file(content))
+    elif ext in ['.css', '.scss', '.sass']:
+        analysis['type'] = 'stylesheet'
+        analysis.update(analyze_css_file(content))
+    
+    # Generate summary
+    if LLM_AVAILABLE:
+        try:
+            analysis['summary'] = generate_summary(content, filename, analysis['type'])
+        except:
+            analysis['summary'] = generate_fallback_summary(analysis)
+    else:
+        analysis['summary'] = generate_fallback_summary(analysis)
+    
+    return analysis
+
+def analyze_python_file(content: str) -> dict:
+    """Analyze Python file content"""
+    analysis = {
+        'classes': [],
+        'functions': [],
+        'imports': [],
+        'dependencies': []
+    }
+    
+    lines = content.split('\n')
+    for line in lines:
+        line = line.strip()
+        
+        # Find imports
+        if line.startswith('import ') or line.startswith('from '):
+            analysis['imports'].append(line)
+        
+        # Find class definitions
+        if line.startswith('class '):
+            class_name = line.split('class ')[1].split('(')[0].split(':')[0].strip()
+            analysis['classes'].append(class_name)
+        
+        # Find function definitions
+        if line.startswith('def '):
+            func_name = line.split('def ')[1].split('(')[0].strip()
+            analysis['functions'].append(func_name)
+    
+    return analysis
+
+def analyze_javascript_file(content: str) -> dict:
+    """Analyze JavaScript/TypeScript file content"""
+    analysis = {
+        'classes': [],
+        'functions': [],
+        'imports': [],
+        'exports': []
+    }
+    
+    lines = content.split('\n')
+    for line in lines:
+        line = line.strip()
+        
+        # Find imports
+        if line.startswith('import ') or line.startswith('const ') and 'require(' in line:
+            analysis['imports'].append(line)
+        
+        # Find exports
+        if line.startswith('export '):
+            analysis['exports'].append(line)
+        
+        # Find class definitions
+        if 'class ' in line and line.endswith('{'):
+            class_name = line.split('class ')[1].split(' ')[0].split('{')[0].strip()
+            analysis['classes'].append(class_name)
+        
+        # Find function definitions
+        if line.startswith('function ') or 'function(' in line or '=>' in line:
+            if 'function ' in line:
+                func_name = line.split('function ')[1].split('(')[0].strip()
+                analysis['functions'].append(func_name)
+    
+    return analysis
+
+def analyze_json_file(content: str) -> dict:
+    """Analyze JSON file content"""
+    try:
+        import json
+        data = json.loads(content)
+        return {
+            'keys': list(data.keys()) if isinstance(data, dict) else [],
+            'type': type(data).__name__,
+            'size': len(str(data))
+        }
+    except:
+        return {'error': 'Invalid JSON'}
+
+def analyze_documentation_file(content: str) -> dict:
+    """Analyze documentation file content"""
+    lines = content.split('\n')
+    headers = []
+    
+    for line in lines:
+        if line.startswith('#'):
+            headers.append(line.strip())
+    
+    return {
+        'headers': headers,
+        'word_count': len(content.split()),
+        'has_code_blocks': '```' in content
+    }
+
+def analyze_config_file(content: str) -> dict:
+    """Analyze configuration file content"""
+    lines = content.split('\n')
+    config_keys = []
+    
+    for line in lines:
+        if ':' in line and not line.startswith('#'):
+            key = line.split(':')[0].strip()
+            config_keys.append(key)
+    
+    return {
+        'config_keys': config_keys,
+        'lines': len(lines)
+    }
+
+def analyze_html_file(content: str) -> dict:
+    """Analyze HTML file content"""
+    return {
+        'has_scripts': '<script' in content,
+        'has_styles': '<style' in content or 'css' in content,
+        'has_forms': '<form' in content,
+        'has_links': '<a ' in content
+    }
+
+def analyze_css_file(content: str) -> dict:
+    """Analyze CSS file content"""
+    return {
+        'selectors': len([line for line in content.split('\n') if '{' in line]),
+        'has_media_queries': '@media' in content,
+        'has_animations': '@keyframes' in content
+    }
+
+def generate_fallback_summary(analysis: dict) -> str:
+    """Generate a fallback summary when LLM is not available"""
+    file_type = analysis['type']
+    filename = analysis['filename']
+    
+    summary = f"File: {filename}\n"
+    summary += f"Type: {file_type}\n"
+    summary += f"Size: {analysis['size']} characters, {analysis['lines']} lines\n"
+    
+    if analysis['classes']:
+        summary += f"Classes: {', '.join(analysis['classes'])}\n"
+    if analysis['functions']:
+        summary += f"Functions: {', '.join(analysis['functions'][:5])}\n"
+    if analysis['imports']:
+        summary += f"Imports: {len(analysis['imports'])} import statements\n"
+    
+    # Add content preview
+    if analysis['size'] > 0:
+        preview = analysis.get('content', '')[:200] + '...' if len(str(analysis.get('content', ''))) > 200 else str(analysis.get('content', ''))
+        summary += f"Content preview: {preview}"
+    
+    return summary
+
+def generate_project_insights(file_analysis: dict, structure: dict) -> dict:
+    """Generate insights about the project structure and architecture"""
+    insights = {
+        'project_type': 'unknown',
+        'framework': 'unknown',
+        'language': 'unknown',
+        'architecture_pattern': 'unknown',
+        'has_frontend': False,
+        'has_backend': False,
+        'has_database': False,
+        'has_tests': False,
+        'has_docs': False,
+        'deployment_ready': False,
+        'complexity_score': 0
+    }
+    
+    # Analyze file types
+    file_types = {}
+    for file_info in file_analysis.values():
+        ext = file_info['extension']
+        file_types[ext] = file_types.get(ext, 0) + 1
+    
+    # Determine project type
+    if file_types.get('.py', 0) > 0:
+        insights['language'] = 'Python'
+        if any('fastapi' in str(imports).lower() for imports in [f.get('imports', []) for f in file_analysis.values()]):
+            insights['framework'] = 'FastAPI'
+        elif any('django' in str(imports).lower() for imports in [f.get('imports', []) for f in file_analysis.values()]):
+            insights['framework'] = 'Django'
+        elif any('flask' in str(imports).lower() for imports in [f.get('imports', []) for f in file_analysis.values()]):
+            insights['framework'] = 'Flask'
+        insights['has_backend'] = True
+    
+    if file_types.get('.js', 0) > 0 or file_types.get('.jsx', 0) > 0 or file_types.get('.ts', 0) > 0:
+        insights['language'] = 'JavaScript/TypeScript'
+        if any('react' in str(imports).lower() for imports in [f.get('imports', []) for f in file_analysis.values()]):
+            insights['framework'] = 'React'
+        elif any('vue' in str(imports).lower() for imports in [f.get('imports', []) for f in file_analysis.values()]):
+            insights['framework'] = 'Vue.js'
+        insights['has_frontend'] = True
+    
+    # Check for common patterns
+    if insights['has_frontend'] and insights['has_backend']:
+        insights['project_type'] = 'Full-stack Web Application'
+        insights['architecture_pattern'] = 'Client-Server'
+    elif insights['has_frontend']:
+        insights['project_type'] = 'Frontend Application'
+    elif insights['has_backend']:
+        insights['project_type'] = 'Backend API'
+    
+    # Check for database
+    if any('sql' in f['filename'].lower() or 'database' in f['filename'].lower() for f in file_analysis.values()):
+        insights['has_database'] = True
+    
+    # Check for tests
+    if any('test' in f['filename'].lower() or 'spec' in f['filename'].lower() for f in file_analysis.values()):
+        insights['has_tests'] = True
+    
+    # Check for documentation
+    if any(f['type'] == 'documentation' for f in file_analysis.values()):
+        insights['has_docs'] = True
+    
+    # Check for deployment files
+    deployment_files = ['dockerfile', 'docker-compose', 'package.json', 'requirements.txt', 'pom.xml', 'build.gradle']
+    if any(any(df in f['filename'].lower() for df in deployment_files) for f in file_analysis.values()):
+        insights['deployment_ready'] = True
+    
+    # Calculate complexity score
+    insights['complexity_score'] = len(file_analysis) + len(structure['directories']) * 2
+    
+    return insights
+
+def generate_architecture_data(file_analysis: dict, structure: dict) -> dict:
+    """Generate data for architecture diagrams"""
+    architecture = {
+        'components': [],
+        'relationships': [],
+        'layers': {
+            'frontend': [],
+            'backend': [],
+            'database': [],
+            'configuration': []
+        }
+    }
+    
+    # Categorize files by layer
+    for file_path, file_info in file_analysis.items():
+        component = {
+            'name': file_info['filename'],
+            'path': file_path,
+            'type': file_info['type'],
+            'layer': 'unknown'
+        }
+        
+        # Determine layer
+        if file_info['type'] in ['html', 'stylesheet', 'javascript']:
+            component['layer'] = 'frontend'
+            architecture['layers']['frontend'].append(component)
+        elif file_info['type'] in ['python', 'javascript'] and 'api' in file_path.lower():
+            component['layer'] = 'backend'
+            architecture['layers']['backend'].append(component)
+        elif file_info['type'] == 'configuration':
+            component['layer'] = 'configuration'
+            architecture['layers']['configuration'].append(component)
+        
+        architecture['components'].append(component)
+    
+    # Generate relationships based on imports and dependencies
+    for file_path, file_info in file_analysis.items():
+        if 'imports' in file_info:
+            for import_stmt in file_info['imports']:
+                # This is a simplified relationship detection
+                # In a real implementation, you'd parse the imports more carefully
+                relationship = {
+                    'from': file_path,
+                    'to': import_stmt,
+                    'type': 'import'
+                }
+                architecture['relationships'].append(relationship)
+    
+    return architecture
 
 @router.get("/repo-templates")
 async def get_repo_templates():

@@ -19,8 +19,8 @@ class QuizRequest(BaseModel):
     num_questions: int = 3
     difficulty: str = "medium"  # easy, medium, hard
 
-def generate_markdown_documentation(summaries: Dict[str, str], repo_name: str) -> str:
-    """Generate comprehensive markdown documentation from repository summaries"""
+def generate_markdown_documentation(summaries: Dict[str, str], repo_name: str, insights: Dict[str, any] = None, architecture: Dict[str, any] = None) -> str:
+    """Generate comprehensive markdown documentation from repository analysis"""
     
     md_content = f"""# {repo_name} - Technical Documentation
 
@@ -30,6 +30,53 @@ Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 This documentation was automatically generated from the repository analysis. It provides insights into the codebase structure, key components, and their purposes.
 
+"""
+    
+    # Add project insights if available
+    if insights:
+        md_content += f"""
+## Project Analysis
+
+### Project Type
+- **Type**: {insights.get('project_type', 'Unknown')}
+- **Language**: {insights.get('language', 'Unknown')}
+- **Framework**: {insights.get('framework', 'Unknown')}
+- **Architecture Pattern**: {insights.get('architecture_pattern', 'Unknown')}
+
+### Components
+- **Frontend**: {'✅ Yes' if insights.get('has_frontend') else '❌ No'}
+- **Backend**: {'✅ Yes' if insights.get('has_backend') else '❌ No'}
+- **Database**: {'✅ Yes' if insights.get('has_database') else '❌ No'}
+- **Tests**: {'✅ Yes' if insights.get('has_tests') else '❌ No'}
+- **Documentation**: {'✅ Yes' if insights.get('has_docs') else '❌ No'}
+- **Deployment Ready**: {'✅ Yes' if insights.get('deployment_ready') else '❌ No'}
+
+### Complexity
+- **Complexity Score**: {insights.get('complexity_score', 0)} (based on file count and structure)
+
+"""
+    
+    # Add architecture diagram if available
+    if architecture:
+        md_content += f"""
+## Architecture Overview
+
+### Components by Layer
+
+"""
+        
+        for layer, components in architecture.get('layers', {}).items():
+            if components:
+                md_content += f"\n#### {layer.title()} Layer\n\n"
+                for component in components:
+                    md_content += f"- **{component['name']}** (`{component['path']}`) - {component['type']}\n"
+        
+        if architecture.get('relationships'):
+            md_content += f"\n#### Key Dependencies\n\n"
+            for rel in architecture['relationships'][:10]:  # Show first 10 relationships
+                md_content += f"- `{rel['from']}` → `{rel['to']}`\n"
+    
+    md_content += f"""
 ## File Analysis
 
 """
@@ -63,14 +110,29 @@ This documentation was automatically generated from the repository analysis. It 
                 md_content += f"#### {filename}\n\n{summary}\n\n"
     
     md_content += """
-## Architecture Insights
+## Learning Path Recommendations
 
-Based on the analysis, this application appears to be a modern web application with the following characteristics:
+Based on the analysis, here's a suggested learning path:
 
-- **Frontend**: React/TypeScript components with modern tooling
-- **Backend**: Python FastAPI or Node.js server
-- **Configuration**: Standard configuration files for deployment and development
-- **Documentation**: README and other documentation files
+### 1. Start with Documentation
+- Review README files and documentation
+- Understand the project's purpose and goals
+
+### 2. Explore the Architecture
+- Study the main entry points
+- Understand the data flow between components
+
+### 3. Dive into Core Components
+- Examine key business logic files
+- Study API endpoints and data models
+
+### 4. Understand Configuration
+- Review deployment and environment setup
+- Study dependency management
+
+### 5. Practice with Tests
+- Run existing tests to understand expected behavior
+- Add new tests to reinforce learning
 
 ## Next Steps
 
@@ -78,6 +140,8 @@ Based on the analysis, this application appears to be a modern web application w
 2. Add missing documentation for critical components
 3. Update documentation as the codebase evolves
 4. Consider implementing automated documentation updates
+5. Create micro-lessons based on this documentation
+6. Develop simulations for key user flows
 
 ---
 
@@ -89,52 +153,71 @@ Based on the analysis, this application appears to be a modern web application w
 def markdown_to_pdf(md_text: str, output_filename: str = "documentation.pdf") -> str:
     """Convert markdown to PDF"""
     try:
-        # Convert markdown to HTML
-        html = markdown.markdown(md_text, extensions=['tables', 'fenced_code', 'codehilite'])
+        # Ensure static directory exists
+        static_dir = "static"
+        os.makedirs(static_dir, exist_ok=True)
         
         # Create PDF
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
         
-        # Simple HTML to PDF conversion
-        lines = html.split('\n')
+        # Simple text processing - avoid HTML parsing issues
+        lines = md_text.split('\n')
         for line in lines:
-            if line.startswith('<h1>'):
-                pdf.set_font("Arial", 'B', 16)
-                text = line.replace('<h1>', '').replace('</h1>', '')
-                pdf.cell(0, 10, text, ln=True)
-                pdf.set_font("Arial", size=12)
-            elif line.startswith('<h2>'):
-                pdf.set_font("Arial", 'B', 14)
-                text = line.replace('<h2>', '').replace('</h2>', '')
-                pdf.cell(0, 10, text, ln=True)
-                pdf.set_font("Arial", size=12)
-            elif line.startswith('<h3>'):
-                pdf.set_font("Arial", 'B', 12)
-                text = line.replace('<h3>', '').replace('</h3>', '')
-                pdf.cell(0, 10, text, ln=True)
-                pdf.set_font("Arial", size=12)
-            elif line.startswith('<p>'):
-                text = line.replace('<p>', '').replace('</p>', '')
-                pdf.multi_cell(0, 10, text)
-            elif line.strip():
-                pdf.multi_cell(0, 10, line)
+            try:
+                line = line.strip()
+                if not line:
+                    pdf.ln(5)  # Add some space
+                    continue
+                
+                # Handle headers
+                if line.startswith('# '):
+                    pdf.set_font("Arial", 'B', 16)
+                    text = line.replace('# ', '')
+                    pdf.cell(0, 10, text, ln=True)
+                    pdf.set_font("Arial", size=12)
+                elif line.startswith('## '):
+                    pdf.set_font("Arial", 'B', 14)
+                    text = line.replace('## ', '')
+                    pdf.cell(0, 10, text, ln=True)
+                    pdf.set_font("Arial", size=12)
+                elif line.startswith('### '):
+                    pdf.set_font("Arial", 'B', 12)
+                    text = line.replace('### ', '')
+                    pdf.cell(0, 10, text, ln=True)
+                    pdf.set_font("Arial", size=12)
+                elif line.startswith('#### '):
+                    pdf.set_font("Arial", 'B', 11)
+                    text = line.replace('#### ', '')
+                    pdf.cell(0, 10, text, ln=True)
+                    pdf.set_font("Arial", size=12)
+                else:
+                    # Regular text
+                    pdf.multi_cell(0, 10, line)
+                    
+            except Exception as line_error:
+                print(f"Error processing line in PDF: {line_error}")
+                continue
         
         # Save PDF
-        output_path = f"static/{output_filename}"
-        os.makedirs("static", exist_ok=True)
+        output_path = os.path.join(static_dir, output_filename)
         pdf.output(output_path)
         
         return output_path
         
     except Exception as e:
+        print(f"Error in markdown_to_pdf: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
 
 @router.post("/generate-documentation")
 async def generate_documentation(request: DocumentationRequest):
     """Generate documentation from repository analysis"""
     try:
+        print(f"Generating documentation for repo: {request.repo_name}")
+        print(f"Format requested: {request.format}")
+        print(f"Number of summaries: {len(request.summaries)}")
+        
         # Generate markdown
         md_content = generate_markdown_documentation(request.summaries, request.repo_name)
         
@@ -146,25 +229,48 @@ async def generate_documentation(request: DocumentationRequest):
         
         # Generate PDF if requested
         if request.format in ["pdf", "both"]:
-            pdf_path = markdown_to_pdf(md_content, f"{request.repo_name}_documentation.pdf")
-            result["pdf_path"] = pdf_path
+            try:
+                pdf_path = markdown_to_pdf(md_content, f"{request.repo_name}_documentation.pdf")
+                result["pdf_path"] = pdf_path
+                print(f"PDF generated successfully: {pdf_path}")
+            except Exception as pdf_error:
+                print(f"PDF generation failed: {pdf_error}")
+                # Continue without PDF if it fails
+                result["pdf_error"] = str(pdf_error)
         
         return result
         
     except Exception as e:
+        print(f"Error in generate_documentation: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error generating documentation: {str(e)}")
 
 @router.post("/generate-quiz")
 async def generate_quiz(request: QuizRequest):
     """Generate quiz questions from markdown content"""
     try:
-        from llm import generate_quiz_questions
-        
-        quiz = await generate_quiz_questions(
-            request.markdown_content, 
-            request.num_questions, 
-            request.difficulty
-        )
+        try:
+            from llm import generate_quiz_questions
+            
+            quiz = await generate_quiz_questions(
+                request.markdown_content, 
+                request.num_questions, 
+                request.difficulty
+            )
+        except ImportError:
+            # Fallback if llm module is not available
+            quiz = [
+                {
+                    "question": "What is the main purpose of this documentation?",
+                    "options": [
+                        "To explain the codebase structure",
+                        "To provide installation instructions", 
+                        "To list all dependencies",
+                        "To show deployment steps"
+                    ],
+                    "correct_answer": "To explain the codebase structure",
+                    "explanation": "The documentation was generated to explain the structure and purpose of the codebase."
+                }
+            ]
         
         return {
             "quiz": quiz,
