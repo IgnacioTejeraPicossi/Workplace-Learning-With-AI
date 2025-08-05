@@ -7,6 +7,14 @@ import shutil
 from typing import Dict, List, Optional
 import time
 
+# Import llm functions at module level
+try:
+    from llm import generate_summary
+    LLM_AVAILABLE = True
+except ImportError:
+    LLM_AVAILABLE = False
+    print("Warning: llm module not available, will use fallback summaries")
+
 router = APIRouter()
 
 class RepoInput(BaseModel):
@@ -127,10 +135,10 @@ async def analyze_repo(input: RepoInput):
                         continue
 
         # Step 4: Generate summaries using AI
-        try:
-            from llm import generate_summary
-            summaries = {}
-            
+        summaries = {}
+        
+        if LLM_AVAILABLE:
+            # Use AI-generated summaries
             for filename, content in docs.items():
                 try:
                     # Truncate content if too long for API
@@ -139,13 +147,13 @@ async def analyze_repo(input: RepoInput):
                     summaries[filename] = summary
                 except Exception as e:
                     summaries[filename] = f"Error summarizing: {str(e)}"
-        except ImportError:
-            # Fallback if llm module is not available
-            summaries = {}
+        else:
+            # Fallback to simple summaries
             for filename, content in docs.items():
                 # Create a simple summary based on file content
                 truncated_content = content[:500] if len(content) > 500 else content
-                summaries[filename] = f"File: {filename}\nContent preview: {truncated_content[:200]}..."
+                file_type = filename.split('.')[-1] if '.' in filename else 'unknown'
+                summaries[filename] = f"File: {filename}\nType: {file_type}\nContent preview: {truncated_content[:200]}..."
 
         return RepoAnalysisResponse(
             message="Repository analyzed successfully",
