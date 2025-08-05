@@ -151,27 +151,35 @@ This methodology is not only valuable for hackathons, but also for onboarding ne
 In summary:
 This project is a proof of concept for the next generation of software development, where clear documentation and AI collaboration can achieve results previously possible only with direct code access. We invite you to explore, build, and extend this application—using only the instructions provided—as a testament to what’s possible with today’s AI.
 
-For Cursor AI or Automated Build Systems
-IMPORTANT:
+## For Cursor AI or Automated Build Systems
+
+**IMPORTANT:**
 
 This project is designed to be built by both humans and AI systems (such as Cursor AI).
 You MUST read and follow BOTH this README.md and the full Build AI Workplace Learning Application from Scratch.md document.
 The build document contains exhaustive, step-by-step, and troubleshooting details. This README provides a high-level overview, quick start, and essential configuration.
 Cross-reference both documents for maximum reliability and error recovery.
-🟢 First Run Checklist
- MongoDB is running and accessible on localhost:27017
- Backend .env is configured with all required variables (see below)
- Frontend .env is configured with all required variables (see below)
- Firebase service account file is present in backend/
- All dependencies installed (npm install in frontend, pip install -r requirements.txt in backend)
- Both frontend and backend servers are running (see start commands below)
- Cypress tests pass (npm run test:comprehensive in frontend)
-🔑 Environment Variables (REQUIRED)
-Backend .env (place in backend/)
+
+### 🟢 First Run Checklist
+- MongoDB is running and accessible on localhost:27017
+- Backend .env is configured with all required variables (see below)
+- Frontend .env is configured with all required variables (see below)
+- Firebase service account file is present in backend/
+- All dependencies installed (npm install in frontend, pip install -r requirements.txt in backend)
+- Both frontend and backend servers are running (see start commands below)
+- Cypress tests pass (npm run test:comprehensive in frontend)
+
+### 🔑 Environment Variables (REQUIRED)
+
+**Backend .env (place in backend/)**
+```
 OPENAI_API_KEY=your_openai_api_key_here
 MONGO_URI=mongodb://localhost:27017
 FIREBASE_CREDENTIALS=serviceAccountKey.json
-Frontend .env (place in frontend/)
+```
+
+**Frontend .env (place in frontend/)**
+```
 REACT_APP_API_BASE_URL=http://localhost:8000
 REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
 REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -179,217 +187,247 @@ REACT_APP_FIREBASE_PROJECT_ID=your_project_id
 REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 REACT_APP_FIREBASE_APP_ID=your_app_id
-⚠️ Common Pitfalls & Troubleshooting
-npm start fails with 'Missing script: start': Ensure you are in the frontend directory and package.json contains a "start" script.
-uvicorn app:app --reload fails: Ensure you are in the backend directory and app.py exists.
-MongoDB connection errors: Ensure MongoDB is running and accessible at the URI in your .env.
-Firebase errors: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in backend/.
-Cypress tests hang: Ensure both frontend and backend servers are running. Check for port conflicts.
-Port already in use: Kill the process using the port or change the port in your start script.
-Node/Python version issues: Use Node.js 18+ and Python 3.10+ for best compatibility.
-Component/file naming: All references must match exactly (e.g., Certifications.jsx, not Certification.jsx).
-CORS errors: Ensure CORS is enabled in FastAPI and frontend is using the correct API base URL.
-Cannot find module: Ensure all dependencies are installed and paths are correct.
-🧠 AI-Specific Guidance
-Always check for missing or misnamed files/components.
-Always check for missing or misconfigured environment variables.
-Always check for port conflicts before starting servers.
-Always check for dependency installation before running any scripts.
-Always check for correct casing in file and directory names (case-sensitive on Unix).
-Always check for correct API base URLs in both frontend and backend.
-Always check for correct Firebase configuration and credentials.
-Always check for CORS settings in backend.
-Always check for MongoDB running and accessible.
-Always check for Node.js and Python versions.
-Features
-Backend (FastAPI + Node.js)
+```
+### ⚠️ Common Pitfalls & Troubleshooting
+
+- **npm start fails with 'Missing script: start'**: Ensure you are in the frontend directory and package.json contains a "start" script.
+- **uvicorn app:app --reload fails**: Ensure you are in the backend directory and app.py exists.
+- **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your .env.
+- **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in backend/.
+- **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
+- **Port already in use**: Kill the process using the port or change the port in your start script.
+- **Node/Python version issues**: Use Node.js 18+ and Python 3.10+ for best compatibility.
+- **Component/file naming**: All references must match exactly (e.g., Certifications.jsx, not Certification.jsx).
+- **CORS errors**: Ensure CORS is enabled in FastAPI and frontend is using the correct API base URL.
+- **Cannot find module**: Ensure all dependencies are installed and paths are correct.
+### 🧠 AI-Specific Guidance
+
+- Always check for missing or misnamed files/components.
+- Always check for missing or misconfigured environment variables.
+- Always check for port conflicts before starting servers.
+- Always check for dependency installation before running any scripts.
+- Always check for correct casing in file and directory names (case-sensitive on Unix).
+- Always check for correct API base URLs in both frontend and backend.
+- Always check for correct Firebase configuration and credentials.
+- Always check for CORS settings in backend.
+- Always check for MongoDB running and accessible.
+- Always check for Node.js and Python versions.
+## Features
+
+### Backend (FastAPI + Node.js)
+
 Modular API endpoints for:
-AI Concepts generation
-Micro-Lesson generation (with dynamic user input)
-Scenario Simulation
-AI Recommendation/Analysis
-Web Search (GPT-4.1 + tools, Node.js backend) for up-to-date answers
-Saved Micro-lessons: All generated micro-lessons are stored in a MongoDB database for later review, with endpoints for listing, editing, and deleting lessons
-AI Career Coach: An intelligent mentor that guides users through soft skills, leadership scenarios, and career goals via a /career-coach endpoint. Supports multi-turn conversations by accepting and responding to conversation history.
-Dynamic Skills Forecasting: Predicts future skill needs based on user learning history and transcript keywords via a /skills-forecast endpoint.
-AI-Powered Certifications: Get personalized certification recommendations and study plans via /certifications endpoints with user-specific data persistence.
-Map of Knowledge: Advanced learning visualization system with vector-based recommendations, mastery tracking, and interactive clustering via /knowledge-map endpoints.
-Team Dynamics Analyzer: Comprehensive team management and analytics with AI-powered insights via /teams endpoints.
-Firebase Authentication: Secure user authentication with Google Sign-In
-User-Specific Data: All data (lessons, career sessions, forecasts, certifications, knowledge map data) is saved per user
-Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
-Mocked AI responses if OpenAI API key is missing or invalid
-CORS enabled for frontend-backend communication
-MongoDB integration for persistent storage of user-specific data
-Frontend (React + Shoelace)
-Google Sign-In via Firebase Authentication for secure, personalized access
-Global Search Functionality (GlobalSearch.jsx):
-🔍 Search Button: Located in the header next to the theme toggle
-⌨️ Keyboard Shortcuts: Press Ctrl+K (or Cmd+K on Mac) to open search
-📱 Modal Interface: Clean, modern search overlay with real-time filtering
-🎯 Comprehensive Coverage: Search across all 12 sections (Dashboard, AI Concepts, Micro-lessons, Map of Knowledge, etc.)
-⚡ Smart Search: Searches titles, descriptions, and keywords for instant results
-🎨 Theme Aware: Adapts to light/dark mode automatically
-⌨️ Keyboard Navigation: Use arrow keys to navigate results, Enter to select, Escape to close
-Modular, professional UI with each feature in its own card:
-Concepts (Concepts.jsx)
-Micro-lesson (MicroLesson.jsx)
-Recommendation (Recommendation.jsx)
-Scenario Simulator (Simulator.jsx)
-Web Search (WebSearch.jsx)
-Map of Knowledge (KnowledgeMap.jsx):
-🗺️ Interactive Learning Visualization: D3.js-powered map with 13 knowledge topics
-🎯 Advanced Vectorial Recommendations: AI-powered learning suggestions based on vector proximity
-📊 Advanced Mastery Panel: Real-time analytics with timeline visualization and KPIs
-🔍 Search & Filter System: Real-time filtering by topic, category, and mastery level
-🎮 Interactive Controls: Zoom, pan, and hover effects for enhanced user experience
-Saved Micro-lessons (LessonList.jsx):
-View all previously generated micro-lessons at the bottom of the app
-Filter lessons by topic in real time
-Expand/Compress each lesson to show only the topic or the full content
-Edit lesson topic and content inline
-Delete lessons with a single click
-AI Career Coach (CareerCoach.jsx):
-Start a conversation with an AI mentor for career guidance, goal setting, and soft skills development
-Multi-turn chat interface: Continue the conversation by sending and receiving messages in a chat-like UI
-End Session button to reset the conversation and start over
-Sessions are automatically saved per user
-Skills Forecasting (SkillsForecast.jsx):
-Enter your learning history and transcript keywords
-Get AI-powered predictions for the next skills you should develop, with explanations
-Forecasts are saved per user for future reference
-Certifications (Certifications.jsx):
-AI-Powered Recommendations: Get personalized certification suggestions based on your role, skills, and goals
-Smart Skills Management:
-Individual Skill Tags: Skills display as removable blue tags instead of plain text
-Comma-Separated Input: Type multiple skills separated by commas (e.g., "Jira, Confluence, Slack")
-Quick Add Button: 🧪 Quick Add button to instantly add typed skills
-Paste Support: Paste multiple skills and they'll be automatically split
-Auto-Sync: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
-Visual Feedback: Clear indication when skills are auto-filled from saved profile
-Study Plan Generation: Create personalized weekly study plans for selected certifications
-Practice Tests: Interactive certification interview simulations
-History Tracking: View previous study plans and recommendations
-Profile Persistence: Your role, skills, and goals are automatically saved and restored
-🧪 Run Test (RunTest.jsx):
-Comprehensive Testing Suite: Built-in testing functionality accessible from the sidebar
-Manual Testing: Quick verification that all panels load correctly
-Automated Testing: Cypress-powered tests for all sidebar options and features
-Visual Results: Real-time test results with pass/fail status and execution times
-Screenshot Capture: Automatic screenshots for visual verification of each panel
-Test Coverage: Tests all 11 sidebar options, global search, theme toggle, and responsive design
-Easy Access: Click the test tube icon (🧪) in the sidebar to run tests
-Shoelace-based UI:
-Uses Shoelace Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
-Consistent, modern design with accessible, themeable components
-Easy to extend with more Shoelace elements (dialogs, alerts, etc.)
-Tooltips/hints on all main options and inputs for user guidance
-Responsive, modern design with color-coded buttons
-Per-section Clear buttons for Concepts, Micro-lesson, and Recommendation to reset results and inputs
-Robust progress tracking and personalized dashboard
-Displays API results in a styled, readable format with proper text wrapping
-Ready for further expansion (user input for other endpoints, authentication, etc.)
-Recent Improvements: Enhanced Certifications Module
-🎯 Smart Skills Management System
+- **AI Concepts generation**
+- **Micro-Lesson generation** (with dynamic user input)
+- **Scenario Simulation**
+- **AI Recommendation/Analysis**
+- **Web Search** (GPT-4.1 + tools, Node.js backend) for up-to-date answers
+- **Saved Micro-lessons**: All generated micro-lessons are stored in a MongoDB database for later review, with endpoints for listing, editing, and deleting lessons
+- **AI Career Coach**: An intelligent mentor that guides users through soft skills, leadership scenarios, and career goals via a /career-coach endpoint. Supports multi-turn conversations by accepting and responding to conversation history.
+- **Dynamic Skills Forecasting**: Predicts future skill needs based on user learning history and transcript keywords via a /skills-forecast endpoint.
+- **AI-Powered Certifications**: Get personalized certification recommendations and study plans via /certifications endpoints with user-specific data persistence.
+- **Map of Knowledge**: Advanced learning visualization system with vector-based recommendations, mastery tracking, and interactive clustering via /knowledge-map endpoints.
+- **Team Dynamics Analyzer**: Comprehensive team management and analytics with AI-powered insights via /teams endpoints.
+- **Firebase Authentication**: Secure user authentication with Google Sign-In
+- **User-Specific Data**: All data (lessons, career sessions, forecasts, certifications, knowledge map data) is saved per user
+- **Dynamic prompt handling** with user input (e.g., custom micro-lesson topics)
+- **Mocked AI responses** if OpenAI API key is missing or invalid
+- **CORS enabled** for frontend-backend communication
+- **MongoDB integration** for persistent storage of user-specific data
+### Frontend (React + Shoelace)
+
+- **Google Sign-In via Firebase Authentication** for secure, personalized access
+- **Global Search Functionality** (GlobalSearch.jsx):
+  - 🔍 **Search Button**: Located in the header next to the theme toggle
+  - ⌨️ **Keyboard Shortcuts**: Press Ctrl+K (or Cmd+K on Mac) to open search
+  - 📱 **Modal Interface**: Clean, modern search overlay with real-time filtering
+  - 🎯 **Comprehensive Coverage**: Search across all 12 sections (Dashboard, AI Concepts, Micro-lessons, Map of Knowledge, etc.)
+  - ⚡ **Smart Search**: Searches titles, descriptions, and keywords for instant results
+  - 🎨 **Theme Aware**: Adapts to light/dark mode automatically
+  - ⌨️ **Keyboard Navigation**: Use arrow keys to navigate results, Enter to select, Escape to close
+
+**Modular, professional UI with each feature in its own card:**
+- **Concepts** (Concepts.jsx)
+- **Micro-lesson** (MicroLesson.jsx)
+- **Recommendation** (Recommendation.jsx)
+- **Scenario Simulator** (Simulator.jsx)
+- **Web Search** (WebSearch.jsx)
+- **Map of Knowledge** (KnowledgeMap.jsx):
+  - 🗺️ **Interactive Learning Visualization**: D3.js-powered map with 13 knowledge topics
+  - 🎯 **Advanced Vectorial Recommendations**: AI-powered learning suggestions based on vector proximity
+  - 📊 **Advanced Mastery Panel**: Real-time analytics with timeline visualization and KPIs
+  - 🔍 **Search & Filter System**: Real-time filtering by topic, category, and mastery level
+  - 🎮 **Interactive Controls**: Zoom, pan, and hover effects for enhanced user experience
+- **Saved Micro-lessons** (LessonList.jsx):
+  - View all previously generated micro-lessons at the bottom of the app
+  - Filter lessons by topic in real time
+  - Expand/Compress each lesson to show only the topic or the full content
+- Edit lesson topic and content inline
+- Delete lessons with a single click
+
+**AI Career Coach** (CareerCoach.jsx):
+- Start a conversation with an AI mentor for career guidance, goal setting, and soft skills development
+- Multi-turn chat interface: Continue the conversation by sending and receiving messages in a chat-like UI
+- End Session button to reset the conversation and start over
+- Sessions are automatically saved per user
+
+**Skills Forecasting** (SkillsForecast.jsx):
+- Enter your learning history and transcript keywords
+- Get AI-powered predictions for the next skills you should develop, with explanations
+- Forecasts are saved per user for future reference
+
+**Certifications** (Certifications.jsx):
+- **AI-Powered Recommendations**: Get personalized certification suggestions based on your role, skills, and goals
+- **Smart Skills Management**:
+  - Individual Skill Tags: Skills display as removable blue tags instead of plain text
+  - Comma-Separated Input: Type multiple skills separated by commas (e.g., "Jira, Confluence, Slack")
+  - Quick Add Button: 🧪 Quick Add button to instantly add typed skills
+  - Paste Support: Paste multiple skills and they'll be automatically split
+  - Auto-Sync: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
+  - Visual Feedback: Clear indication when skills are auto-filled from saved profile
+- **Study Plan Generation**: Create personalized weekly study plans for selected certifications
+- **Practice Tests**: Interactive certification interview simulations
+- **History Tracking**: View previous study plans and recommendations
+- **Profile Persistence**: Your role, skills, and goals are automatically saved and restored
+**🧪 Run Test** (RunTest.jsx):
+- **Comprehensive Testing Suite**: Built-in testing functionality accessible from the sidebar
+- **Manual Testing**: Quick verification that all panels load correctly
+- **Automated Testing**: Cypress-powered tests for all sidebar options and features
+- **Visual Results**: Real-time test results with pass/fail status and execution times
+- **Screenshot Capture**: Automatic screenshots for visual verification of each panel
+- **Test Coverage**: Tests all 11 sidebar options, global search, theme toggle, and responsive design
+- **Easy Access**: Click the test tube icon (🧪) in the sidebar to run tests
+**Shoelace-based UI:**
+- Uses Shoelace Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
+- Consistent, modern design with accessible, themeable components
+- Easy to extend with more Shoelace elements (dialogs, alerts, etc.)
+- Tooltips/hints on all main options and inputs for user guidance
+- Responsive, modern design with color-coded buttons
+- Per-section Clear buttons for Concepts, Micro-lesson, and Recommendation to reset results and inputs
+- Robust progress tracking and personalized dashboard
+- Displays API results in a styled, readable format with proper text wrapping
+- Ready for further expansion (user input for other endpoints, authentication, etc.)
+## Recent Improvements: Enhanced Certifications Module
+
+### 🎯 Smart Skills Management System
+
 The Certifications module has been significantly enhanced with a sophisticated skills management system:
 
-Individual Skill Tags
-Visual Display: Skills now appear as individual blue tags with remove buttons (×)
-Easy Removal: Click the × on any skill tag to remove it instantly
-Professional Look: Clean, modern tag-based interface instead of plain text
-Advanced Input Methods
-Comma-Separated Input: Type multiple skills at once (e.g., "Jira, Confluence, Slack")
-Semicolon Support: Also supports semicolon separation (e.g., "Jira; Confluence; Slack")
-Paste Functionality: Paste a list of skills and they'll be automatically parsed
-Quick Add Button: 🧪 Quick Add button to instantly add whatever you've typed
-Auto-Sync Between Tabs
-Seamless Integration: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
-Visual Feedback: Clear status messages when skills are auto-filled from your saved profile
-Persistent Storage: Your skills are saved and restored automatically
-Enhanced User Experience
-Input Tracking: The input field tracks what you type for the Quick Add button
-Smart Parsing: Automatically splits comma/semicolon-separated skills into individual tags
-Duplicate Prevention: Prevents adding the same skill multiple times
-Real-time Updates: Skills update immediately as you add or remove them
-🔧 Technical Improvements
-Fixed Compilation Issues
-State Management: Added missing state variables (studyPlanResult, simulation)
-Function References: Fixed incorrect field references in study plan generation
-Error Handling: Improved error handling and validation
-Enhanced Testing
-Cypress Integration: Comprehensive end-to-end testing for all sidebar options
-Visual Verification: Automatic screenshots for each panel test
-Reliable Tests: Fixed hanging issues and improved test stability
-Timeout Management: Proper timeouts to prevent test failures
-📋 Usage Examples
-Adding Skills
-Type: "Jira, Confluence, Slack" in the skills input
-Click: 🧪 Quick Add button
-Result: Three separate blue tags appear: "Jira", "Confluence", "Slack"
-Pasting Skills
-Copy: "Selenium; Cypress; Test Automation" from another source
-Paste: Into the skills input field
-Result: Three skills automatically split and added as tags
-Switching Between Tabs
-Add skills in "Get Recommendations" tab
-Switch to "Study Plan" tab
-See: Skills automatically appear in the "Current Skills" section
-Profile Persistence
-Fill out your role, skills, and goals
-Click: "Get Recommendations" to save your profile
-Refresh the page or return later
-See: All your data is automatically restored
-🎨 Visual Improvements
-Modern Tag Design: Professional blue tags with hover effects
-Clear Visual Hierarchy: Better spacing and typography
-Responsive Layout: Works perfectly on all screen sizes
-Theme Integration: Adapts to light/dark mode automatically
-Prompt Evolution: Improving with prompts.chat
+**Individual Skill Tags**
+- **Visual Display**: Skills now appear as individual blue tags with remove buttons (×)
+- **Easy Removal**: Click the × on any skill tag to remove it instantly
+- **Professional Look**: Clean, modern tag-based interface instead of plain text
+
+**Advanced Input Methods**
+- **Comma-Separated Input**: Type multiple skills at once (e.g., "Jira, Confluence, Slack")
+- **Semicolon Support**: Also supports semicolon separation (e.g., "Jira; Confluence; Slack")
+- **Paste Functionality**: Paste a list of skills and they'll be automatically parsed
+- **Quick Add Button**: 🧪 Quick Add button to instantly add whatever you've typed
+
+**Auto-Sync Between Tabs**
+- **Seamless Integration**: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
+- **Visual Feedback**: Clear status messages when skills are auto-filled from your saved profile
+- **Persistent Storage**: Your skills are saved and restored automatically
+
+**Enhanced User Experience**
+- **Input Tracking**: The input field tracks what you type for the Quick Add button
+- **Smart Parsing**: Automatically splits comma/semicolon-separated skills into individual tags
+- **Duplicate Prevention**: Prevents adding the same skill multiple times
+- **Real-time Updates**: Skills update immediately as you add or remove them
+### 🔧 Technical Improvements
+
+**Fixed Compilation Issues**
+- **State Management**: Added missing state variables (studyPlanResult, simulation)
+- **Function References**: Fixed incorrect field references in study plan generation
+- **Error Handling**: Improved error handling and validation
+
+**Enhanced Testing**
+- **Cypress Integration**: Comprehensive end-to-end testing for all sidebar options
+- **Visual Verification**: Automatic screenshots for each panel test
+- **Reliable Tests**: Fixed hanging issues and improved test stability
+- **Timeout Management**: Proper timeouts to prevent test failures
+### 📋 Usage Examples
+
+**Adding Skills**
+- **Type**: "Jira, Confluence, Slack" in the skills input
+- **Click**: 🧪 Quick Add button
+- **Result**: Three separate blue tags appear: "Jira", "Confluence", "Slack"
+
+**Pasting Skills**
+- **Copy**: "Selenium; Cypress; Test Automation" from another source
+- **Paste**: Into the skills input field
+- **Result**: Three skills automatically split and added as tags
+
+**Switching Between Tabs**
+- **Add skills** in "Get Recommendations" tab
+- **Switch** to "Study Plan" tab
+- **See**: Skills automatically appear in the "Current Skills" section
+
+**Profile Persistence**
+- **Fill out** your role, skills, and goals
+- **Click**: "Get Recommendations" to save your profile
+- **Refresh** the page or return later
+- **See**: All your data is automatically restored
+### 🎨 Visual Improvements
+
+- **Modern Tag Design**: Professional blue tags with hover effects
+- **Clear Visual Hierarchy**: Better spacing and typography
+- **Responsive Layout**: Works perfectly on all screen sizes
+- **Theme Integration**: Adapts to light/dark mode automatically
+## Prompt Evolution: Improving with prompts.chat
+
 To ensure our AI responses are always high quality and up-to-date with the latest best practices, this project leverages the prompts.chat directory and its open-source community.
 
-We regularly review and incorporate new prompt patterns and techniques from prompts.chat and its GitHub repository.
-This allows our application to continuously evolve, using the most effective prompt engineering strategies for better, more consistent AI results.
-In the future, we plan to automate prompt updates and allow user/admin feedback to help select and refine the best prompts for each feature.
-Learn more or contribute your own prompts at prompts.chat!
+- We regularly review and incorporate new prompt patterns and techniques from prompts.chat and its GitHub repository.
+- This allows our application to continuously evolve, using the most effective prompt engineering strategies for better, more consistent AI results.
+- In the future, we plan to automate prompt updates and allow user/admin feedback to help select and refine the best prompts for each feature.
 
-Authentication: Google Sign-In with Firebase
+Learn more or contribute your own prompts at [prompts.chat](https://prompts.chat)!
+
+## Authentication: Google Sign-In with Firebase
+
 The app supports secure, personalized access using Google Sign-In via Firebase Authentication.
 
-Users can sign in with their Google account to access all features.
-User-specific data: All saved lessons, career coach sessions, and skills forecasts are linked to the user's Google account.
-Privacy and security: Users can only access and modify their own data.
-Sign-in and sign-out are handled with Shoelace-styled buttons for a seamless UI.
-Backend protection: All API endpoints require valid Firebase authentication tokens.
-Database Architecture: Two Databases for Different Purposes
+- **Users can sign in** with their Google account to access all features.
+- **User-specific data**: All saved lessons, career coach sessions, and skills forecasts are linked to the user's Google account.
+- **Privacy and security**: Users can only access and modify their own data.
+- **Sign-in and sign-out** are handled with Shoelace-styled buttons for a seamless UI.
+- **Backend protection**: All API endpoints require valid Firebase authentication tokens.
+## Database Architecture: Two Databases for Different Purposes
+
 This project uses two separate databases for different purposes:
 
-1. Firebase Authentication Database
-Purpose: User identity and authentication
-Stores: User credentials, email, UID, profile information
-What you get: Secure way to know "who is this user?"
-Access: Managed by Firebase (no direct database access needed)
-2. MongoDB (Application Database)
-Purpose: Store your app's business data
-Stores:
-Micro-lessons with user associations
-Career coach sessions per user
-Skills forecasts per user
-User progress and activity
-What you get: Your app's data with user associations
-Collections:
-lessons: User-specific micro-lessons
-career_coach_sessions: User's career coaching history
-skills_forecasts: User's skills predictions
-teams: User-created teams with metadata
-team_members: Team member details and roles
-team_analytics: AI-generated team analysis and insights
-users: (Future) Additional user profile data
-Why Use Both?
-Separation of Concerns: Authentication vs. business data
-Firebase Auth is NOT a Database: It only handles user identity, not app data
-Scalability: Each database optimized for its specific purpose
-Security: User data is properly isolated and protected
-Data Structure Example:
+### 1. Firebase Authentication Database
+- **Purpose**: User identity and authentication
+- **Stores**: User credentials, email, UID, profile information
+- **What you get**: Secure way to know "who is this user?"
+- **Access**: Managed by Firebase (no direct database access needed)
+
+### 2. MongoDB (Application Database)
+- **Purpose**: Store your app's business data
+- **Stores**:
+  - Micro-lessons with user associations
+  - Career coach sessions per user
+  - Skills forecasts per user
+  - User progress and activity
+- **What you get**: Your app's data with user associations
+- **Collections**:
+  - `lessons`: User-specific micro-lessons
+  - `career_coach_sessions`: User's career coaching history
+  - `skills_forecasts`: User's skills predictions
+  - `teams`: User-created teams with metadata
+  - `team_members`: Team member details and roles
+  - `team_analytics`: AI-generated team analysis and insights
+  - `users`: (Future) Additional user profile data
+
+### Why Use Both?
+- **Separation of Concerns**: Authentication vs. business data
+- **Firebase Auth is NOT a Database**: It only handles user identity, not app data
+- **Scalability**: Each database optimized for its specific purpose
+- **Security**: User data is properly isolated and protected
+### Data Structure Example:
+
+```javascript
 // MongoDB lesson document
 {
   "_id": "ObjectId(...)",
@@ -399,55 +437,64 @@ Data Structure Example:
   "user_email": "user@example.com",
   "created_at": "2024-01-15T10:30:00Z"
 }
-User-Specific Features
-Personalized Data Storage
-Micro-lessons: Each user sees only their own saved lessons
-Career coach sessions: Conversations are saved per user
-Skills forecasts: Predictions are stored per user
-Security: Users can only access and modify their own data
-New User-Specific Endpoints
-GET /user/career-sessions: Retrieve user's career coaching history
-GET /user/skills-forecasts: Retrieve user's skills predictions
-All existing endpoints now filter by user ID
-Frontend Integration
-All API calls include Firebase authentication tokens
-User-specific data is automatically loaded
-Seamless personalization without additional user setup
-UI Styling: Shoelace Web Components
+```
+## User-Specific Features
+
+### Personalized Data Storage
+- **Micro-lessons**: Each user sees only their own saved lessons
+- **Career coach sessions**: Conversations are saved per user
+- **Skills forecasts**: Predictions are stored per user
+- **Security**: Users can only access and modify their own data
+
+### New User-Specific Endpoints
+- `GET /user/career-sessions`: Retrieve user's career coaching history
+- `GET /user/skills-forecasts`: Retrieve user's skills predictions
+- All existing endpoints now filter by user ID
+
+### Frontend Integration
+- All API calls include Firebase authentication tokens
+- User-specific data is automatically loaded
+- Seamless personalization without additional user setup
+## UI Styling: Shoelace Web Components
+
 The app uses Shoelace for a modern, accessible, and consistent UI. Shoelace provides:
 
-Cards (<sl-card>) for feature panels
-Buttons (<sl-button>) for all actions (primary, secondary, danger, etc.)
-Utility classes and layout for spacing and alignment
-Theme support for easy customization
-How to customize or extend:
+- **Cards** (`<sl-card>`) for feature panels
+- **Buttons** (`<sl-button>`) for all actions (primary, secondary, danger, etc.)
+- **Utility classes** and layout for spacing and alignment
+- **Theme support** for easy customization
 
-Add more Shoelace components (dialogs, alerts, inputs) as needed
-Change themes or use Shoelace's utility classes for layout tweaks
-See Shoelace documentation for more options
-Saved Micro-lessons
+### How to customize or extend:
+
+- Add more Shoelace components (dialogs, alerts, inputs) as needed
+- Change themes or use Shoelace's utility classes for layout tweaks
+- See [Shoelace documentation](https://shoelace.style/) for more options
+## Saved Micro-lessons
+
 All micro-lessons generated by the user are automatically saved to the MongoDB database with user-specific associations. You can view your entire history of generated micro-lessons in the Saved Micro-lessons section at the bottom of the app. This allows you to revisit, review, and reuse any lesson at any time.
 
-Features of the Saved Micro-lessons section:
+### Features of the Saved Micro-lessons section:
 
-User-specific: Only shows lessons created by the logged-in user
-Filter: Instantly filter lessons by topic as you type.
-Expand/Compress: Toggle each lesson to show only the topic or the full lesson content.
-Edit: Edit the topic and content of any lesson inline and save changes to the database.
-Delete: Remove any lesson from your history with a single click.
-Secure: Users can only access and modify their own lessons.
-Lessons are stored with their topic, full content, user ID, and creation timestamp.
-The list is always up to date and loads automatically.
+- **User-specific**: Only shows lessons created by the logged-in user
+- **Filter**: Instantly filter lessons by topic as you type.
+- **Expand/Compress**: Toggle each lesson to show only the topic or the full lesson content.
+- **Edit**: Edit the topic and content of any lesson inline and save changes to the database.
+- **Delete**: Remove any lesson from your history with a single click.
+- **Secure**: Users can only access and modify their own lessons.
+- **Lessons are stored** with their topic, full content, user ID, and creation timestamp.
+- **The list is always up to date** and loads automatically.
+
 This feature demonstrates persistent storage, retrieval, and management in a real-world AI learning app.
-AI Career Coach
+## AI Career Coach
+
 The AI Career Coach is an intelligent mentor module that guides users through soft skills, leadership scenarios, and career planning. It simulates manager-employee dialogues, helps set learning goals, and offers personalized feedback in real time.
 
-How it works:
-The backend exposes a /career-coach endpoint powered by a dedicated prompt and the LLM.
-The frontend provides a CareerCoach.jsx component with a chat-like interface.
-Users can start a session, send messages, and receive contextual responses from the AI coach.
-The conversation can be reset at any time using the End Session button.
-User-specific sessions: All conversations are saved per user for future reference.
+### How it works:
+- The backend exposes a `/career-coach` endpoint powered by a dedicated prompt and the LLM.
+- The frontend provides a `CareerCoach.jsx` component with a chat-like interface.
+- Users can start a session, send messages, and receive contextual responses from the AI coach.
+- The conversation can be reset at any time using the End Session button.
+- **User-specific sessions**: All conversations are saved per user for future reference.
 Planned enhancements:
 Allow users to input their role and learning focus
 Multi-turn conversations with state/history
