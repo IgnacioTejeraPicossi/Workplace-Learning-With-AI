@@ -90,7 +90,7 @@ function AppContent() {
       <div style={{ 
         flex: 1, 
         minWidth: 0, 
-        maxWidth: "calc(100vw - 220px)", // Account for sidebar width
+        maxWidth: isAIFullScreen ? "100vw" : "calc(100vw - 220px)", // Full width when AI full screen
         overflowX: "hidden"
       }}>
         <header style={{ 
@@ -101,7 +101,12 @@ function AppContent() {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
-          boxSizing: "border-box"
+          boxSizing: "border-box",
+          position: isAIFullScreen ? "fixed" : "relative",
+          top: isAIFullScreen ? 0 : "auto",
+          left: isAIFullScreen ? 0 : "auto",
+          right: isAIFullScreen ? 0 : "auto",
+          zIndex: isAIFullScreen ? 1000 : "auto"
         }}>
           <div style={{
             width: "100%",
@@ -191,9 +196,10 @@ function AppContent() {
             justifyContent: "center",
             minHeight: "calc(100vh - 80px)",
             padding: "2rem",
+            paddingTop: "calc(2rem + 60px)", // Add space for fixed header
             overflow: "hidden"
           }}>
-            {/* Left Side Background Message */}
+            {/* Left Side Background Messages */}
             <div
               style={{
                 position: "absolute",
@@ -206,31 +212,41 @@ function AppContent() {
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxWidth: "200px",
+                maxWidth: "250px",
                 textAlign: "left"
               }}
             >
               I'm not just building a learning app —
+              <br /><br />
+              I'm creating a co-evolving AI learning assistant where users shape its growth.
+              <br /><br />
+              <span style={{ fontStyle: "italic", fontSize: "0.9em" }}>— Ignacio Tejera</span>
             </div>
             
-            {/* Right Side Background Message */}
+            {/* Top Right Background Message */}
             <div
               style={{
                 position: "absolute",
                 right: "2rem",
-                bottom: "20%",
-                fontSize: "clamp(1rem, 2.5vw, 1.5rem)",
+                top: "15%",
+                fontSize: "clamp(0.9rem, 2vw, 1.3rem)",
                 fontWeight: 400,
-                color: "rgba(103, 58, 183, 0.15)", // More visible purple
+                color: "rgba(103, 58, 183, 0.15)", // Same purple color as others
                 lineHeight: 1.4,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxWidth: "250px",
+                maxWidth: "280px",
                 textAlign: "right"
               }}
             >
-              I'm creating a co-evolving AI learning assistant where users shape its growth.
+              We are not replacing human creativity — we are amplifying it 100 times.
+              <br /><br />
+              Those who win are those with the best ideas, not those with the most technical skills.
+              <br /><br />
+              This changes everything about who can build companies.
+              <br />
+              <span style={{ fontStyle: "italic", fontSize: "0.9em" }}>— Jensen Huang</span>
             </div>
             {/* Main Content */}
             <div style={{

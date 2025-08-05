@@ -31,23 +31,28 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 const navItems = [
-  { key: "dashboard", label: "Dashboard", icon: "house" },
-  { key: "video-lessons", label: "Video Lessons", icon: "play-circle" },
-  { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
-  { key: "simulations", label: "Simulations", icon: "play-circle" },
-  { key: "web-search", label: "Web Search", icon: "globe" },
-  { key: "team-dynamics", label: "Team Dynamics", icon: "team" },
-  { key: "certifications", label: "Certifications", icon: "award" },
-  { key: "coach", label: "AI Career Coach", icon: "user-check" },
-  { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
-  { key: "ai-learning", label: "AI Learning & Training", icon: "robot" },
-  { key: "knowledge-map", label: "Map of Knowledge", icon: "globe" },
-  { key: "presentation-agent", label: "Presentation Agent", icon: "microphone" },
-  { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot" },
-  { key: "run-test", label: "Run Test", icon: "test" },
-  { key: "future-app", label: "Future App", icon: "robot" },
-  { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
-  { key: "feature-roadmap", label: "Feature Roadmap", icon: "star" },
+  // Grupo 1: Opciones de aprendizaje (sin fondo especial)
+  { key: "dashboard", label: "Dashboard", icon: "house", group: "learning" },
+  { key: "video-lessons", label: "Video Lessons", icon: "play-circle", group: "learning" },
+  { key: "micro-lessons", label: "Micro-lessons", icon: "book", group: "learning" },
+  { key: "simulations", label: "Simulations", icon: "play-circle", group: "learning" },
+  { key: "web-search", label: "Web Search", icon: "globe", group: "learning" },
+  { key: "team-dynamics", label: "Team Dynamics", icon: "team", group: "learning" },
+  { key: "certifications", label: "Certifications", icon: "award", group: "learning" },
+  { key: "coach", label: "AI Career Coach", icon: "user-check", group: "learning" },
+  { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart", group: "learning" },
+  { key: "ai-learning", label: "AI Learning & Training", icon: "robot", group: "learning" },
+  { key: "knowledge-map", label: "Map of Knowledge", icon: "globe", group: "learning" },
+  
+  // Grupo 2: Ayuda del sistema (fondo verde)
+  { key: "presentation-agent", label: "Presentation Agent", icon: "microphone", group: "help" },
+  { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot", group: "help" },
+  
+  // Grupo 3: Operaciones internas del programador (fondo azul claro)
+  { key: "run-test", label: "Run Test", icon: "test", group: "developer" },
+  { key: "future-app", label: "Future App", icon: "robot", group: "developer" },
+  { key: "idea-log", label: "Idea Log", icon: "lightbulb", group: "developer" },
+  { key: "feature-roadmap", label: "Feature Roadmap", icon: "star", group: "developer" },
 ];
 
 function Sidebar({ selected, onSelect }) {
@@ -113,54 +118,74 @@ function Sidebar({ selected, onSelect }) {
       </div>
       
       <nav>
-        {navItems.map(item => (
-          <button
-            key={item.key}
-            data-testid={`sidebar-${item.key}`}
-            className={selected === item.key ? 'active' : ''}
-            onClick={() => onSelect(item.key)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: isCollapsed ? 0 : 12,
-              width: "100%",
-              background: selected === item.key ? colors.primaryLight : "transparent",
-              color: selected === item.key ? colors.primary : colors.text,
-              border: "none",
-              borderRadius: 8,
-              padding: isCollapsed ? "12px 0" : "12px 24px",
-              fontWeight: 500,
-              fontSize: isCollapsed ? 14 : 16,
-              cursor: "pointer",
-              marginBottom: 4,
-              transition: "all 0.2s ease",
-              justifyContent: isCollapsed ? "center" : "flex-start",
-              ":hover": {
-                background: selected === item.key ? colors.primaryLight : colors.primaryLight,
-                color: colors.primary,
-                transform: "translateX(4px)"
-              }
-            }}
-            title={isCollapsed ? item.label : ""}
-            onMouseEnter={(e) => {
-              if (selected !== item.key) {
-                e.target.style.background = colors.primaryLight;
-                e.target.style.color = colors.primary;
-                e.target.style.transform = "translateX(4px)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (selected !== item.key) {
-                e.target.style.background = "transparent";
-                e.target.style.color = colors.text;
-                e.target.style.transform = "translateX(0px)";
-              }
-            }}
-          >
-            <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
-            {!isCollapsed && item.label}
-          </button>
-        ))}
+        {navItems.map(item => {
+          // Determinar el fondo según el grupo
+          let backgroundColor = "transparent";
+          if (selected === item.key) {
+            backgroundColor = colors.primaryLight;
+          } else if (item.group === "help") {
+            backgroundColor = "#e8f5e8"; // Verde claro para ayuda del sistema
+          } else if (item.group === "developer") {
+            backgroundColor = "#e3f2fd"; // Azul claro para operaciones del programador
+          }
+
+          return (
+            <button
+              key={item.key}
+              data-testid={`sidebar-${item.key}`}
+              className={selected === item.key ? 'active' : ''}
+              onClick={() => onSelect(item.key)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: isCollapsed ? 0 : 12,
+                width: "100%",
+                background: backgroundColor,
+                color: selected === item.key ? colors.primary : colors.text,
+                border: "none",
+                borderRadius: 8,
+                padding: isCollapsed ? "12px 0" : "12px 24px",
+                fontWeight: 500,
+                fontSize: isCollapsed ? 14 : 16,
+                cursor: "pointer",
+                marginBottom: 4,
+                transition: "all 0.2s ease",
+                justifyContent: isCollapsed ? "center" : "flex-start",
+                ":hover": {
+                  background: selected === item.key ? colors.primaryLight : colors.primaryLight,
+                  color: colors.primary,
+                  transform: "translateX(4px)"
+                }
+              }}
+              title={isCollapsed ? item.label : ""}
+              onMouseEnter={(e) => {
+                if (selected !== item.key) {
+                  e.target.style.background = colors.primaryLight;
+                  e.target.style.color = colors.primary;
+                  e.target.style.transform = "translateX(4px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selected !== item.key) {
+                  // Restaurar el fondo original según el grupo
+                  let originalBackground = "transparent";
+                  if (item.group === "help") {
+                    originalBackground = "#e8f5e8"; // Verde claro
+                  } else if (item.group === "developer") {
+                    originalBackground = "#e3f2fd"; // Azul claro
+                  }
+                  
+                  e.target.style.background = originalBackground;
+                  e.target.style.color = colors.text;
+                  e.target.style.transform = "translateX(0px)";
+                }
+              }}
+            >
+              <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
+              {!isCollapsed && item.label}
+            </button>
+          );
+        })}
       </nav>
       <div style={{ flex: 1 }} />
     </aside>
