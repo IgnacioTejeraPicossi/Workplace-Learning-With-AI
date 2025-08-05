@@ -1,6 +1,10 @@
 ```mermaid
 graph TD
-  subgraph Frontend
+  %% Enhanced graph styling for better visibility
+  %% Increase font size and add better spacing
+  %% Use more vibrant colors for subgraphs
+  
+  subgraph Frontend["🎨 Frontend Components"]
     App[App.jsx]
     Concepts[Concepts.jsx]
     MicroLesson[MicroLesson.jsx]
@@ -26,7 +30,7 @@ graph TD
     ClusterLegend[ClusterLegend.jsx]
     MasteryTimeline[MasteryTimeline.jsx]
   end
-  subgraph Backend
+  subgraph Backend["⚙️ Backend Services"]
     AppPy[app.py]
     LLM[llm.py]
     Prompts[prompts.py]
@@ -36,15 +40,15 @@ graph TD
     DB[(MongoDB)]
     Firebase[(Firebase Auth)]
   end
-  subgraph Testing
+  subgraph Testing["🧪 Testing Framework"]
     Cypress[Cypress Tests]
     ManualTests[Manual Tests]
     APITests[API Tests]
     TestResults[Test Results]
   end
-  OpenAI(OpenAI API)
+  OpenAI(🤖 OpenAI API)
 
-  User((User)) -->|Interacts with| App
+  User((👤 User)) -->|Interacts with| App
   App --> Concepts
   App --> MicroLesson
   App --> Recommendation
@@ -109,13 +113,19 @@ graph TD
   APITests -->|Tests backend endpoints| AppPy
   TestResults -->|Displays results| RunTest
 
-  classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
-  classDef frontend fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
-  classDef testing fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+  %% Enhanced styling for better visibility
+  classDef backend fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#ffffff,font-size:14px;
+  classDef frontend fill:#74b9ff,stroke:#0984e3,stroke-width:3px,color:#ffffff,font-size:14px;
+  classDef testing fill:#a29bfe,stroke:#6c5ce7,stroke-width:3px,color:#ffffff,font-size:14px;
+  classDef external fill:#00b894,stroke:#00a085,stroke-width:3px,color:#ffffff,font-size:14px;
+  classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#2d3436,font-size:14px;
+  
   class Backend backend;
   class Frontend frontend;
   class Testing testing;
-  ```
+  class OpenAI external;
+  class User user;
+```
 🤖 I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth.
 Philosophy & Approach: Building with AI, Not Just Code
 In this project, we intentionally chose a documentation-driven, AI-first approach to software development. Our goal was to demonstrate that, with the right architectural blueprints and explicit instructions, a modern AI system—such as Cursor AI—can build a complex, full-stack application from scratch, even in environments where pre-existing code is not allowed.
