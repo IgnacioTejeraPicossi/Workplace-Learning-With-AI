@@ -153,7 +153,26 @@ export default function RepoAnalyzer() {
   const loadAnalysis = async (analysisId) => {
     try {
       const response = await axios.get(`/api/saved-analyses/${analysisId}`);
-      setAnalysisResult(response.data.analysis);
+      
+      // Extract data from the saved analysis structure
+      const savedAnalysis = response.data.analysis;
+      const analysisData = savedAnalysis.analysis_data || {};
+      
+      // Reconstruct the original analysis result structure
+      const reconstructedAnalysis = {
+        repo_name: savedAnalysis.repo_name,
+        branch_used: savedAnalysis.branch_used,
+        files_analyzed: savedAnalysis.analysis_data?.summaries ? Object.keys(savedAnalysis.analysis_data.summaries).length : 0,
+        summaries: analysisData.summaries || {},
+        structure: analysisData.structure || {},
+        insights: analysisData.insights || {},
+        architecture: analysisData.architecture || {},
+        analysis_id: savedAnalysis.analysis_id,
+        documentation: response.data.documentation?.documentation,
+        quiz: response.data.quiz?.quiz_data
+      };
+      
+      setAnalysisResult(reconstructedAnalysis);
       setError(null);
     } catch (err) {
       setError('Error loading analysis: ' + err.message);

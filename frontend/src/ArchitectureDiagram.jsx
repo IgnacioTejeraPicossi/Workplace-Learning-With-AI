@@ -20,17 +20,17 @@ const ArchitectureDiagram = ({ architectureData }) => {
     // Debug logging
     console.log('Architecture data:', architectureData);
     
-    // Parse architecture data
-    const layersData = architectureData.layers || {};
-    const components = architectureData.components || [];
-    const connections = architectureData.relationships || [];
+    // Parse architecture data with better error handling
+    const layersData = architectureData?.layers || {};
+    const components = architectureData?.components || [];
+    const connections = architectureData?.relationships || [];
     
     // Convert layers object to array format for rendering
     const layers = Object.entries(layersData).map(([layerName, layerComponents]) => ({
       name: layerName.charAt(0).toUpperCase() + layerName.slice(1),
       type: layerName,
-      description: `${layerComponents.length} components`,
-      components: layerComponents
+      description: `${Array.isArray(layerComponents) ? layerComponents.length : 0} components`,
+      components: Array.isArray(layerComponents) ? layerComponents : []
     }));
     
     // Colors for different layer types
@@ -80,6 +80,8 @@ const ArchitectureDiagram = ({ architectureData }) => {
     const startX = 50;
     
     components.forEach((component, index) => {
+      if (!component || typeof component !== 'object') return;
+      
       const x = startX + (index * componentSpacing);
       const y = startY + 40; // Center in first layer
       
@@ -98,7 +100,7 @@ const ArchitectureDiagram = ({ architectureData }) => {
       ctx.fillStyle = '#FFF';
       ctx.font = 'bold 12px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(component.name, x, y + 4);
+      ctx.fillText(component.name || 'Unknown', x, y + 4);
       
       // Draw component type
       ctx.font = '10px Arial';
@@ -107,8 +109,10 @@ const ArchitectureDiagram = ({ architectureData }) => {
     
     // Draw connections
     connections.forEach(connection => {
-      const fromComponent = components.find(c => c.name === connection.from);
-      const toComponent = components.find(c => c.name === connection.to);
+      if (!connection || typeof connection !== 'object') return;
+      
+      const fromComponent = components.find(c => c && c.name === connection.from);
+      const toComponent = components.find(c => c && c.name === connection.to);
       
       if (fromComponent && toComponent) {
         const fromIndex = components.indexOf(fromComponent);
