@@ -163,12 +163,9 @@ function Simulator() {
 Make it educational and realistic for step ${currentStep + 1} of the simulation.`;
     
     try {
-      console.log('Sending prompt to API:', promptText);
       const response = await askStream({ prompt: promptText });
-      console.log('API response received:', response);
       setSimulationResponse(response);
     } catch (error) {
-      console.error('Error in handleOptionSelect:', error);
       // Fallback responses for each step
       const fallbackResponses = {
         0: {

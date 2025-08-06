@@ -637,7 +637,7 @@ This feature is currently being used by ${liveUserData.activeUsers} active users
         {
           statusMessages: STATUS_MESSAGES.PRESENTATION,
           onComplete: () => {
-            console.log('Live demo script generated');
+            // Live demo script generated
           }
         }
       );

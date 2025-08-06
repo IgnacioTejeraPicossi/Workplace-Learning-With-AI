@@ -111,7 +111,6 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy"];
 
   const handleSubmit = async (value) => {
-    console.log('handleSubmit called', { value, input });
     const prompt = value || input; // || transcript;
     if (!prompt.trim()) return;
     setLoading(true);
@@ -127,7 +126,6 @@ function CommandBar({ onRoute, inputPlaceholder }) {
       const isKnownModule = knownModules
         .map(m => m.replace(/[-_ ]/g, ''))
         .includes(normalizedModule);
-      console.log('DEBUG', {res, normalizedModule, isKnownModule, backendConfidence, threshold, confidenceLevel});
       // Only show modal/notification for ambiguous/partial matches
       if (!isKnownModule || backendConfidence < threshold || isLowConfidence) {
         // Always log the idea

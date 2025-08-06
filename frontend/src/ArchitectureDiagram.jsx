@@ -17,8 +17,7 @@ const ArchitectureDiagram = ({ architectureData }) => {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Debug logging
-    console.log('Architecture data:', architectureData);
+
     
     // Parse architecture data with better error handling
     const layersData = architectureData?.layers || {};

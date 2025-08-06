@@ -233,7 +233,6 @@ export async function askStream({ prompt, messages, model = "gpt-4", max_tokens 
       if (onData) onData(result, chunk);
     }
   } catch (error) {
-    console.error('Streaming error:', error);
     throw error;
   } finally {
     reader.releaseLock();

@@ -79,16 +79,11 @@ const KnowledgeMap = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('🔄 Fetching knowledge map data...');
-        
         // Fetch all data in parallel
         const [topicsRes, clustersRes] = await Promise.all([
           fetch('/api/knowledge-map/topics'),
           fetch('/api/knowledge-map/clusters')
         ]);
-
-        console.log('📡 Topics response status:', topicsRes.status);
-        console.log('📡 Clusters response status:', clustersRes.status);
 
         if (!topicsRes.ok) {
           throw new Error(`Topics API error: ${topicsRes.status}`);
@@ -100,28 +95,20 @@ const KnowledgeMap = () => {
         const topicsData = await topicsRes.json();
         const clustersData = await clustersRes.json();
 
-        console.log('📊 Topics data:', topicsData);
-        console.log('📊 Clusters data:', clustersData);
-
         setTopics(topicsData.topics);
         setClusters(clustersData.clusters);
 
         // Fetch user data if authenticated
         if (auth.currentUser) {
-          console.log('👤 Fetching user data for:', auth.currentUser.uid);
           const userRes = await fetch(`/api/knowledge-map/user/${auth.currentUser.uid}`);
           if (userRes.ok) {
             const userData = await userRes.json();
-            console.log('👤 User data:', userData);
             setUserData(userData);
             
             // Fetch recommendations after user data is loaded
             await fetchRecommendations(auth.currentUser.uid);
-          } else {
-            console.warn('⚠️ User data fetch failed:', userRes.status);
           }
         } else {
-          console.log('👤 No authenticated user, using mock data');
           // Use mock user data for testing
           const mockUserData = {
             user_id: 'test-user',
@@ -153,7 +140,6 @@ const KnowledgeMap = () => {
 
         setLoading(false);
       } catch (error) {
-        console.error('❌ Error fetching knowledge map data:', error);
         setLoading(false);
         
         // Set fallback data for testing
@@ -203,23 +189,19 @@ const KnowledgeMap = () => {
   const fetchRecommendations = async (userId) => {
     try {
       setRecommendationsLoading(true);
-      console.log('🧭 Fetching advanced recommendations for user:', userId);
       
       const response = await fetch(`/api/knowledge-map/recommendations/${userId}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('🧭 Advanced recommendations data:', data);
         setRecommendations(data.recommendations || []);
         setLearningPaths(data.learning_paths || []);
         setVectorAnalysis(data.vector_analysis || null);
       } else {
-        console.warn('⚠️ Advanced recommendations fetch failed:', response.status);
         setRecommendations([]);
         setLearningPaths([]);
         setVectorAnalysis(null);
       }
     } catch (error) {
-      console.error('❌ Error fetching advanced recommendations:', error);
       setRecommendations([]);
       setLearningPaths([]);
       setVectorAnalysis(null);
@@ -229,25 +211,14 @@ const KnowledgeMap = () => {
   };
 
   useEffect(() => {
-    console.log('🎯 Render effect triggered:', {
-      loading,
-      topicsCount: Object.keys(topics).length,
-      filteredTopicsCount: Object.keys(filteredTopics).length,
-      hasSvgRef: !!svgRef.current,
-      hasUserData: !!userData,
-      hasClusters: !!clusters
-    });
-    
     if (!loading && Object.keys(topics).length > 0 && svgRef.current) {
-      console.log('🎨 Rendering map with all topics...');
       renderMap();
     }
   }, [topics, filteredTopics, userData, clusters, loading]);
 
   const renderMap = () => {
     const svg = svgRef.current;
-    if (!svg) { console.error('❌ SVG ref is null'); return; }
-    console.log('🎨 Starting advanced map render...');
+    if (!svg) return;
     svg.innerHTML = ''; // Clear previous content
 
     // Get dynamic dimensions from container

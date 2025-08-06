@@ -54,7 +54,6 @@ export const useStreaming = (initialStatus = '') => {
         }
       );
 
-      console.log('Streaming completed, final content length:', finalContent.length);
       setStatus('Complete');
       setProgress(100);
       onComplete(finalContent);
