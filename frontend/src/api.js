@@ -282,5 +282,58 @@ export async function deleteSavedVideo(videoId) {
 }
 
 export async function updateSavedVideo(videoId, data) {
-  return apiCall(`/api/saved-videos/${videoId}`, 'PUT', data);
+  return apiCall(`/api/saved-videos/${videoId}`, "PUT", data);
+}
+
+// Repo Analyzer Cursor AI API Functions
+export async function analyzeRepository(repoUrl, branch = null) {
+  return apiCall("/api/analyze-repo", "POST", {
+    repo_url: repoUrl,
+    branch: branch
+  });
+}
+
+export async function detectRepositoryBranches(repoUrl) {
+  const encodedUrl = encodeURIComponent(repoUrl);
+  return apiCall(`/api/detect-branch/${encodedUrl}`, "GET");
+}
+
+export async function getRepoTemplates() {
+  return apiCall("/api/repo-templates", "GET");
+}
+
+export async function getSavedAnalyses(limit = 10) {
+  return apiCall(`/api/saved-analyses?limit=${limit}`, "GET");
+}
+
+export async function getSavedAnalysis(analysisId) {
+  return apiCall(`/api/saved-analyses/${analysisId}`, "GET");
+}
+
+export async function deleteSavedAnalysis(analysisId) {
+  return apiCall(`/api/saved-analyses/${analysisId}`, "DELETE");
+}
+
+export async function getUserAnalyses(userId, limit = 10) {
+  return apiCall(`/api/user-analyses/${userId}?limit=${limit}`, "GET");
+}
+
+// Cursor AI README Generator API Functions
+export async function generateCursorReadme(files, template = "professional") {
+  return apiCall("/api/cursor-readme/generate", "POST", {
+    files: files,
+    template: template
+  });
+}
+
+export async function getCursorReadmeTemplates() {
+  return apiCall("/api/cursor-readme/templates", "GET");
+}
+
+export async function saveCursorReadme(readmeData) {
+  return apiCall("/api/cursor-readme/save", "POST", readmeData);
+}
+
+export async function getCursorReadmeHistory() {
+  return apiCall("/api/cursor-readme/history", "GET");
 }
