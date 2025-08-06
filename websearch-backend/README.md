@@ -22,7 +22,7 @@ El servidor lee las variables de entorno del archivo `.env` del directorio raíz
 
 ```
 OPENAI_API_KEY=tu_api_key_de_openai
-WEBSEARCH_PORT=3001  # Opcional, por defecto 3001
+WEBSEARCH_PORT=8080  # Opcional, por defecto 8080
 ```
 
 ## Uso
@@ -69,6 +69,6 @@ Información del servicio.
 Este servidor trabaja en conjunto con el backend principal de FastAPI:
 
 - **FastAPI (Puerto 8000)**: Maneja la mayoría de endpoints
-- **Node.js Express (Puerto 3001)**: Maneja específicamente la búsqueda web
+- **Node.js Express (Puerto 8080)**: Maneja específicamente la búsqueda web
 
 El frontend React puede llamar a ambos servidores según necesite. 
