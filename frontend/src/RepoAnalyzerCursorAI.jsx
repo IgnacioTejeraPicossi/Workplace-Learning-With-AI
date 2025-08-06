@@ -23,6 +23,7 @@ export default function RepoAnalyzerCursorAI() {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showRawData, setShowRawData] = useState(false);
 
   // File upload refs
   const fileInputRef = useRef();
@@ -416,9 +417,163 @@ export default function RepoAnalyzerCursorAI() {
             <span className="section-icon">📊</span>
             Analysis Results
           </h3>
-          <div className="result-content">
-            {JSON.stringify(analysisResult, null, 2)}
+          
+          {/* Executive Summary */}
+          <div className="result-section">
+            <h4 className="result-section-title">
+              <span className="result-icon">📋</span>
+              Executive Summary
+            </h4>
+            <div className="summary-grid">
+              <div className="summary-card">
+                <div className="summary-label">Repository</div>
+                <div className="summary-value">{analysisResult.repo_name}</div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-label">Branch</div>
+                <div className="summary-value">{analysisResult.branch_used}</div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-label">Files Analyzed</div>
+                <div className="summary-value">{analysisResult.files_analyzed}</div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-label">Analysis ID</div>
+                <div className="summary-value">{analysisResult.analysis_id || 'N/A'}</div>
+              </div>
+            </div>
           </div>
+
+          {/* Project Structure */}
+          {analysisResult.structure && (
+            <div className="result-section">
+              <h4 className="result-section-title">
+                <span className="result-icon">📁</span>
+                Project Structure
+              </h4>
+              <div className="structure-content">
+                <div className="structure-item">
+                  <div className="structure-label">Backend Files:</div>
+                  <div className="structure-value">
+                    {Object.keys(analysisResult.summaries || {}).filter(file => 
+                      file.includes('.py') || file.includes('backend') || file.includes('api')
+                    ).length} files
+                  </div>
+                </div>
+                <div className="structure-item">
+                  <div className="structure-label">Frontend Files:</div>
+                  <div className="structure-value">
+                    {Object.keys(analysisResult.summaries || {}).filter(file => 
+                      file.includes('.js') || file.includes('.jsx') || file.includes('.ts') || file.includes('.tsx') || file.includes('frontend')
+                    ).length} files
+                  </div>
+                </div>
+                <div className="structure-item">
+                  <div className="structure-label">Configuration Files:</div>
+                  <div className="structure-value">
+                    {Object.keys(analysisResult.summaries || {}).filter(file => 
+                      file.includes('package.json') || file.includes('requirements.txt') || file.includes('dockerfile') || file.includes('.env') || file.includes('.config')
+                    ).length} files
+                  </div>
+                </div>
+                <div className="structure-item">
+                  <div className="structure-label">Documentation:</div>
+                  <div className="structure-value">
+                    {Object.keys(analysisResult.summaries || {}).filter(file => 
+                      file.includes('.md') || file.includes('README') || file.includes('docs')
+                    ).length} files
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Key Insights */}
+          {analysisResult.insights && (
+            <div className="result-section">
+              <h4 className="result-section-title">
+                <span className="result-icon">💡</span>
+                Key Insights
+              </h4>
+              <div className="insights-content">
+                {analysisResult.insights.technologies && (
+                  <div className="insight-item">
+                    <div className="insight-label">Technologies Detected:</div>
+                    <div className="insight-value">
+                      {analysisResult.insights.technologies.join(', ')}
+                    </div>
+                  </div>
+                )}
+                {analysisResult.insights.architecture && (
+                  <div className="insight-item">
+                    <div className="insight-label">Architecture Pattern:</div>
+                    <div className="insight-value">{analysisResult.insights.architecture}</div>
+                  </div>
+                )}
+                {analysisResult.insights.complexity && (
+                  <div className="insight-item">
+                    <div className="insight-label">Project Complexity:</div>
+                    <div className="insight-value">{analysisResult.insights.complexity}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Generated Documentation */}
+          <div className="result-section">
+            <h4 className="result-section-title">
+              <span className="result-icon">📄</span>
+              Generated Documentation
+            </h4>
+            <div className="documentation-actions">
+              <button className="doc-action-btn primary">
+                <span>📥</span>
+                Download README.md
+              </button>
+              <button className="doc-action-btn secondary">
+                <span>🎓</span>
+                Create Learning Module
+              </button>
+              <button className="doc-action-btn secondary">
+                <span>📊</span>
+                View Full Analysis
+              </button>
+            </div>
+            <div className="documentation-preview">
+              <div className="preview-header">
+                <span className="preview-title">README.md Preview</span>
+                <span className="preview-filename">{analysisResult.repo_name}-README.md</span>
+              </div>
+              <div className="preview-content">
+                <pre>{generateReadmePreview(analysisResult)}</pre>
+              </div>
+            </div>
+          </div>
+
+          {/* Raw Data Toggle */}
+          <div className="raw-data-toggle">
+            <button 
+              className="toggle-btn"
+              onClick={() => setShowRawData(!showRawData)}
+            >
+              <span>{showRawData ? '👁️' : '🔍'}</span>
+              {showRawData ? 'Hide Raw Data' : 'Show Raw Analysis Data'}
+            </button>
+          </div>
+
+          {/* Raw Data (Collapsible) */}
+          {showRawData && (
+            <div className="raw-data-section">
+              <h4 className="result-section-title">
+                <span className="result-icon">🔧</span>
+                Raw Analysis Data
+              </h4>
+              <div className="result-content">
+                {JSON.stringify(analysisResult, null, 2)}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -431,4 +586,49 @@ export default function RepoAnalyzerCursorAI() {
       )}
     </div>
   );
+}
+
+// Helper function to generate README preview
+function generateReadmePreview(analysisResult) {
+  const repoName = analysisResult.repo_name;
+  const fileCount = analysisResult.files_analyzed;
+  const technologies = analysisResult.insights?.technologies || [];
+  
+  return `# ${repoName}
+
+## Overview
+This repository contains ${fileCount} files and appears to be a ${technologies.length > 0 ? technologies.join(', ') : 'software'} project.
+
+## Quick Start
+\`\`\`bash
+# Clone the repository
+git clone https://github.com/username/${repoName}.git
+
+# Install dependencies
+npm install  # or yarn install
+
+# Start development server
+npm start    # or yarn start
+\`\`\`
+
+## Project Structure
+- **Backend**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
+    file.includes('.py') || file.includes('backend') || file.includes('api')
+  ).length} files
+- **Frontend**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
+    file.includes('.js') || file.includes('.jsx') || file.includes('.ts') || file.includes('.tsx')
+  ).length} files
+- **Configuration**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
+    file.includes('package.json') || file.includes('requirements.txt')
+  ).length} files
+
+## Technologies
+${technologies.map(tech => `- ${tech}`).join('\n')}
+
+## Contributing
+Please read our contributing guidelines before submitting pull requests.
+
+## License
+This project is licensed under the MIT License.
+`;
 } 
