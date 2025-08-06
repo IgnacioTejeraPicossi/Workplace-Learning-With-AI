@@ -4,6 +4,29 @@ import { useTheme } from './ThemeContext';
 
 const LearningTrendsChart = ({ data }) => {
   const { colors } = useTheme();
+  
+  // Add fallback display for debugging
+  if (!data || data.length === 0) {
+    return (
+      <div style={{ 
+        background: colors.cardBackground, 
+        borderRadius: 12, 
+        boxShadow: colors.shadow, 
+        padding: 16, 
+        marginBottom: 24, 
+        color: colors.text,
+        width: "100%",
+        boxSizing: "border-box",
+        maxWidth: "100%"
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>Lessons Completed Over Time</h3>
+        <div style={{ textAlign: 'center', color: colors.textSecondary, padding: '40px 20px' }}>
+          No data available for trends chart.
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div style={{ 
       background: colors.cardBackground, 

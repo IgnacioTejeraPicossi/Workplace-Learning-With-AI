@@ -44,6 +44,7 @@ const navItems = [
   { key: "ai-learning", label: "AI Learning & Training", icon: "robot", group: "learning" },
   { key: "knowledge-map", label: "Map of Knowledge", icon: "globe", group: "learning" },
   { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive", group: "learning" },
+  { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot", group: "learning" },
   
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "presentation-agent", label: "Presentation Agent", icon: "microphone", group: "help" },

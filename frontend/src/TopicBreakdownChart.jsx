@@ -7,6 +7,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 
 const TopicBreakdownChart = ({ data }) => {
   const { colors } = useTheme();
+  
   // If no data, show empty state
   if (!data || data.length === 0) {
     return (

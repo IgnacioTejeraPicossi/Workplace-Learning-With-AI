@@ -133,12 +133,27 @@ function Dashboard({ user, onSectionSelect }) {
         
         // Combine all weeks and create chart data
         const allWeeks = [...new Set([...Object.keys(weekMap), ...Object.keys(videoWeekMap)])].sort();
-        const trends = allWeeks.map(week => ({ 
-          week, 
-          microLessons: weekMap[week] || 0,
-          videoLessons: videoWeekMap[week] || 0
-        }));
-        setLessonTrends(trends);
+        
+        // If no real data, create some sample data for demonstration
+        if (allWeeks.length === 0) {
+          const currentWeek = getISOWeek(new Date().toISOString());
+          const lastWeek = getISOWeek(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+          const twoWeeksAgo = getISOWeek(new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString());
+          
+          const trends = [
+            { week: twoWeeksAgo, microLessons: 2, videoLessons: 1 },
+            { week: lastWeek, microLessons: 5, videoLessons: 3 },
+            { week: currentWeek, microLessons: 8, videoLessons: 4 }
+          ];
+          setLessonTrends(trends);
+        } else {
+          const trends = allWeeks.map(week => ({ 
+            week, 
+            microLessons: weekMap[week] || 0,
+            videoLessons: videoWeekMap[week] || 0
+          }));
+          setLessonTrends(trends);
+        }
 
         // Group lessons by topic for pie chart
         const topicMap = {};
@@ -147,12 +162,32 @@ function Dashboard({ user, onSectionSelect }) {
             topicMap[lesson.topic] = (topicMap[lesson.topic] || 0) + 1;
           }
         });
+        
+        // Add mock video topics to the breakdown
+        mockVideoLessons.forEach(video => {
+          if (video.topic) {
+            topicMap[video.topic] = (topicMap[video.topic] || 0) + 1;
+          }
+        });
+        
         // Convert to array for pie chart
         const breakdown = Object.keys(topicMap).map(topic => ({
           name: topic,
           value: topicMap[topic]
         }));
-        setTopicBreakdown(breakdown);
+        
+        // If no real data, create sample breakdown
+        if (breakdown.length === 0) {
+          const sampleBreakdown = [
+            { name: 'Programming', value: 5 },
+            { name: 'Leadership', value: 3 },
+            { name: 'Agile', value: 2 },
+            { name: 'Communication', value: 1 }
+          ];
+          setTopicBreakdown(sampleBreakdown);
+        } else {
+          setTopicBreakdown(breakdown);
+        }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         setProgress(userProgress);
