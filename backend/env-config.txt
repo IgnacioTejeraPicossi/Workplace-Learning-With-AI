@@ -1,0 +1,6 @@
+# Backend Environment Configuration
+# Copy this content to a file named .env in the backend directory
+
+OPENAI_API_KEY=your_openai_api_key_here
+MONGO_URI=mongodb://localhost:27017
+FIREBASE_CREDENTIALS=serviceAccountKey.json 
