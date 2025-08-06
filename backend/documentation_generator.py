@@ -3,9 +3,12 @@ from fpdf import FPDF
 import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import json
 from datetime import datetime
+
+# Import storage module
+from backend.repo_storage import RepoStorage
 
 router = APIRouter()
 
@@ -13,13 +16,20 @@ class DocumentationRequest(BaseModel):
     summaries: Dict[str, str]
     repo_name: str
     format: str = "markdown"  # markdown, pdf, or both
+    insights: Optional[Dict[str, Any]] = None
+    architecture: Optional[Dict[str, Any]] = None
+    analysis_id: Optional[str] = None
+    
+    class Config:
+        arbitrary_types_allowed = True
 
 class QuizRequest(BaseModel):
     markdown_content: str
     num_questions: int = 3
     difficulty: str = "medium"  # easy, medium, hard
+    analysis_id: Optional[str] = None
 
-def generate_markdown_documentation(summaries: Dict[str, str], repo_name: str, insights: Dict[str, any] = None, architecture: Dict[str, any] = None) -> str:
+def generate_markdown_documentation(summaries: Dict[str, str], repo_name: str, insights: Optional[Dict[str, Any]] = None, architecture: Optional[Dict[str, Any]] = None) -> str:
     """Generate comprehensive markdown documentation from repository analysis"""
     
     md_content = f"""# {repo_name} - Technical Documentation
@@ -219,7 +229,12 @@ async def generate_documentation(request: DocumentationRequest):
         print(f"Number of summaries: {len(request.summaries)}")
         
         # Generate markdown
-        md_content = generate_markdown_documentation(request.summaries, request.repo_name)
+        md_content = generate_markdown_documentation(
+            request.summaries, 
+            request.repo_name, 
+            request.insights, 
+            request.architecture
+        )
         
         result = {
             "markdown": md_content,
@@ -237,6 +252,20 @@ async def generate_documentation(request: DocumentationRequest):
                 print(f"PDF generation failed: {pdf_error}")
                 # Continue without PDF if it fails
                 result["pdf_error"] = str(pdf_error)
+        
+        # Save documentation to database if analysis_id is provided
+        if request.analysis_id:
+            try:
+                doc_id = await RepoStorage.save_documentation(
+                    analysis_id=request.analysis_id,
+                    documentation_data=result,
+                    format_type=request.format
+                )
+                result["documentation_id"] = doc_id
+                print(f"Documentation saved to database with ID: {doc_id}")
+            except Exception as e:
+                print(f"Warning: Could not save documentation to database: {e}")
+                result["save_error"] = str(e)
         
         return result
         
@@ -272,12 +301,28 @@ async def generate_quiz(request: QuizRequest):
                 }
             ]
         
-        return {
+        result = {
             "quiz": quiz,
             "num_questions": request.num_questions,
             "difficulty": request.difficulty,
             "generated_at": datetime.now().isoformat()
         }
+        
+        # Save quiz to database if analysis_id is provided
+        if request.analysis_id:
+            try:
+                quiz_id = await RepoStorage.save_quiz(
+                    analysis_id=request.analysis_id,
+                    quiz_data=result,
+                    difficulty=request.difficulty
+                )
+                result["quiz_id"] = quiz_id
+                print(f"Quiz saved to database with ID: {quiz_id}")
+            except Exception as e:
+                print(f"Warning: Could not save quiz to database: {e}")
+                result["save_error"] = str(e)
+        
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")

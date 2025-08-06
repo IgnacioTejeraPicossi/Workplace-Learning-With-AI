@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ArchitectureDiagram from './ArchitectureDiagram';
 
 export default function RepoAnalyzer() {
   const [repoUrl, setRepoUrl] = useState('');
@@ -11,6 +12,8 @@ export default function RepoAnalyzer() {
   const [templates, setTemplates] = useState([]);
   const [detectingBranch, setDetectingBranch] = useState(false);
   const [availableBranches, setAvailableBranches] = useState([]);
+  const [savedAnalyses, setSavedAnalyses] = useState([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
 
   // Load templates on component mount
   React.useEffect(() => {
@@ -93,7 +96,10 @@ export default function RepoAnalyzer() {
       const response = await axios.post('/api/generate-documentation', {
         summaries: analysisResult.summaries,
         repo_name: analysisResult.repo_name,
-        format: 'both' // Generate both markdown and PDF
+        format: 'both', // Generate both markdown and PDF
+        insights: analysisResult.insights,
+        architecture: analysisResult.architecture,
+        analysis_id: analysisResult.analysis_id
       });
       
       // Update the analysis result with documentation
@@ -113,7 +119,8 @@ export default function RepoAnalyzer() {
       const response = await axios.post('/api/generate-quiz', {
         markdown_content: analysisResult.documentation.markdown,
         num_questions: 5,
-        difficulty: 'medium'
+        difficulty: 'medium',
+        analysis_id: analysisResult.analysis_id
       });
       
       // Update the analysis result with quiz
@@ -123,6 +130,47 @@ export default function RepoAnalyzer() {
       }));
     } catch (err) {
       setError('Error generating quiz: ' + err.message);
+    }
+  };
+
+  // Load saved analyses on component mount
+  useEffect(() => {
+    loadSavedAnalyses();
+  }, []);
+
+  const loadSavedAnalyses = async () => {
+    try {
+      setLoadingSaved(true);
+      const response = await axios.get('/api/saved-analyses?limit=5');
+      setSavedAnalyses(response.data.analyses);
+    } catch (err) {
+      console.error('Error loading saved analyses:', err);
+    } finally {
+      setLoadingSaved(false);
+    }
+  };
+
+  const loadAnalysis = async (analysisId) => {
+    try {
+      const response = await axios.get(`/api/saved-analyses/${analysisId}`);
+      setAnalysisResult(response.data.analysis);
+      setError(null);
+    } catch (err) {
+      setError('Error loading analysis: ' + err.message);
+    }
+  };
+
+  const deleteAnalysis = async (analysisId) => {
+    if (!window.confirm('Are you sure you want to delete this analysis?')) return;
+    
+    try {
+      await axios.delete(`/api/saved-analyses/${analysisId}`);
+      await loadSavedAnalyses(); // Reload the list
+      if (analysisResult?.analysis_id === analysisId) {
+        setAnalysisResult(null);
+      }
+    } catch (err) {
+      setError('Error deleting analysis: ' + err.message);
     }
   };
 
@@ -293,9 +341,62 @@ export default function RepoAnalyzer() {
             border: '1px solid #ddd',
             marginBottom: '1rem'
           }}>
-            <p><strong>Files Analyzed:</strong> {analysisResult.file_count}</p>
+            <p><strong>Files Analyzed:</strong> {analysisResult.files_analyzed}</p>
             <p><strong>Repository:</strong> {analysisResult.repo_name}</p>
             <p><strong>Branch Used:</strong> <span style={{ color: '#28a745', fontWeight: 'bold' }}>{analysisResult.branch_used}</span></p>
+            
+            {/* Project Insights */}
+            {analysisResult.insights && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: '#e7f3ff', borderRadius: '4px' }}>
+                <h4 style={{ marginBottom: '0.5rem' }}>🔍 Project Insights</h4>
+                <p><strong>Type:</strong> {analysisResult.insights.project_type}</p>
+                <p><strong>Language:</strong> {analysisResult.insights.language}</p>
+                <p><strong>Framework:</strong> {analysisResult.insights.framework}</p>
+                <p><strong>Architecture:</strong> {analysisResult.insights.architecture_pattern}</p>
+                <p><strong>Complexity Score:</strong> {analysisResult.insights.complexity_score}</p>
+                
+                <div style={{ marginTop: '0.5rem' }}>
+                  <strong>Components:</strong>
+                  <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
+                    <li>Frontend: {analysisResult.insights.has_frontend ? '✅' : '❌'}</li>
+                    <li>Backend: {analysisResult.insights.has_backend ? '✅' : '❌'}</li>
+                    <li>Database: {analysisResult.insights.has_database ? '✅' : '❌'}</li>
+                    <li>Tests: {analysisResult.insights.has_tests ? '✅' : '❌'}</li>
+                    <li>Documentation: {analysisResult.insights.has_docs ? '✅' : '❌'}</li>
+                    <li>Deployment Ready: {analysisResult.insights.deployment_ready ? '✅' : '❌'}</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
+            {/* Architecture Overview */}
+            {analysisResult.architecture && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '4px' }}>
+                <h4 style={{ marginBottom: '0.5rem' }}>🏗️ Architecture Overview</h4>
+                <p><strong>Total Components:</strong> {analysisResult.architecture.components?.length || 0}</p>
+                <p><strong>Dependencies:</strong> {analysisResult.architecture.relationships?.length || 0}</p>
+                
+                {analysisResult.architecture.layers && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <strong>Layers:</strong>
+                    <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
+                      {Object.entries(analysisResult.architecture.layers).map(([layer, components]) => (
+                        <li key={layer}>
+                          {layer.charAt(0).toUpperCase() + layer.slice(1)}: {components.length} components
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Architecture Diagram */}
+            {analysisResult.architecture && (
+              <div style={{ marginTop: '1rem' }}>
+                <ArchitectureDiagram architectureData={analysisResult.architecture} />
+              </div>
+            )}
           </div>
 
           {/* File Summaries */}
@@ -453,6 +554,68 @@ export default function RepoAnalyzer() {
           </div>
         </div>
       )}
+
+      {/* Saved Analyses */}
+      <div style={{ marginTop: '2rem' }}>
+        <h2>💾 Saved Analyses</h2>
+        {loadingSaved ? (
+          <p>Loading saved analyses...</p>
+        ) : savedAnalyses.length === 0 ? (
+          <p>No saved analyses found. Analyze a repository to save it!</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {savedAnalyses.map((analysis) => (
+              <div key={analysis.analysis_id} style={{ 
+                background: '#f8f9fa', 
+                padding: '1rem', 
+                borderRadius: '8px', 
+                border: '1px solid #ddd',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <h4 style={{ marginBottom: '0.5rem' }}>
+                    Analysis ID: {analysis.analysis_id}
+                  </h4>
+                  <p><strong>Repository:</strong> {analysis.repo_name}</p>
+                  <p><strong>Branch:</strong> {analysis.branch_used}</p>
+                  <p><strong>Files Analyzed:</strong> {analysis.files_analyzed}</p>
+                  <p><strong>Date:</strong> {new Date(analysis.created_at).toLocaleDateString()}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => loadAnalysis(analysis.analysis_id)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Load Analysis
+                  </button>
+                  <button
+                    onClick={() => deleteAnalysis(analysis.analysis_id)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#dc3545',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 } 

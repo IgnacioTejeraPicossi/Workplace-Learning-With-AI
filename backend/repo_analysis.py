@@ -4,7 +4,7 @@ import git
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 import shutil
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import time
 
 # Import llm functions at module level
@@ -14,6 +14,9 @@ try:
 except ImportError:
     LLM_AVAILABLE = False
     print("Warning: llm module not available, will use fallback summaries")
+
+# Import storage module
+from backend.repo_storage import RepoStorage
 
 router = APIRouter()
 
@@ -26,9 +29,13 @@ class RepoAnalysisResponse(BaseModel):
     branch_used: str
     files_analyzed: int
     summaries: Dict[str, str]
-    structure: Dict[str, any]
-    insights: Dict[str, any]
-    architecture: Dict[str, any]
+    structure: Dict[str, Any]
+    insights: Dict[str, Any]
+    architecture: Dict[str, Any]
+    analysis_id: Optional[str] = None
+    
+    class Config:
+        arbitrary_types_allowed = True
 
 def safe_remove_directory(path):
     """Safely remove a directory with retry logic for Windows permission issues"""
@@ -152,6 +159,30 @@ async def analyze_repo(input: RepoInput) -> RepoAnalysisResponse:
         # Step 6: Generate architecture diagram data
         architecture_data = generate_architecture_data(file_analysis, structure)
         
+        # Step 7: Save analysis to database
+        analysis_data = {
+            "summaries": summaries,
+            "structure": structure,
+            "insights": project_insights,
+            "architecture": architecture_data,
+            "file_analysis": file_analysis
+        }
+        
+        # Get user_id from request if available (you can implement user authentication)
+        user_id = None  # TODO: Extract from request headers or session
+        
+        try:
+            analysis_id = await RepoStorage.save_repo_analysis(
+                repo_url=input.repo_url,
+                repo_name=repo_name,
+                branch_used=branch_to_use,
+                analysis_data=analysis_data,
+                user_id=user_id
+            )
+        except Exception as e:
+            print(f"Warning: Could not save analysis to database: {e}")
+            analysis_id = None
+        
         return RepoAnalysisResponse(
             repo_name=repo_name,
             branch_used=branch_to_use,
@@ -159,7 +190,8 @@ async def analyze_repo(input: RepoInput) -> RepoAnalysisResponse:
             summaries=summaries,
             structure=structure,
             insights=project_insights,
-            architecture=architecture_data
+            architecture=architecture_data,
+            analysis_id=analysis_id
         )
         
     except Exception as e:
@@ -612,3 +644,54 @@ async def detect_branch(repo_url: str):
         
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error detecting branches: {str(e)}") 
+
+@router.get("/saved-analyses")
+async def get_saved_analyses(limit: int = 10):
+    """Get recent saved analyses"""
+    try:
+        analyses = await RepoStorage.get_recent_analyses(limit=limit)
+        return {
+            "analyses": analyses,
+            "total": len(analyses)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving analyses: {str(e)}")
+
+@router.get("/saved-analyses/{analysis_id}")
+async def get_saved_analysis(analysis_id: str):
+    """Get a specific saved analysis with all its data"""
+    try:
+        analysis_data = await RepoStorage.get_analysis_with_documentation(analysis_id)
+        if not analysis_data:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        return analysis_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving analysis: {str(e)}")
+
+@router.delete("/saved-analyses/{analysis_id}")
+async def delete_saved_analysis(analysis_id: str):
+    """Delete a saved analysis and all its associated data"""
+    try:
+        success = await RepoStorage.delete_analysis(analysis_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete analysis")
+        return {"message": "Analysis deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting analysis: {str(e)}")
+
+@router.get("/user-analyses/{user_id}")
+async def get_user_analyses(user_id: str, limit: int = 10):
+    """Get all analyses for a specific user"""
+    try:
+        analyses = await RepoStorage.get_user_analyses(user_id, limit=limit)
+        return {
+            "analyses": analyses,
+            "total": len(analyses),
+            "user_id": user_id
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving user analyses: {str(e)}") 

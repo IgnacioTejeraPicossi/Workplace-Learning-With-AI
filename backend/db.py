@@ -24,3 +24,9 @@ scaffold_history_collection = database.get_collection("scaffold_history")
 
 # Video Collections
 saved_videos_collection = database.get_collection("saved_videos")
+
+# Repository Analysis Collections
+repo_analyses_collection = database.get_collection("repo_analyses")
+repo_documentation_collection = database.get_collection("repo_documentation")
+repo_quizzes_collection = database.get_collection("repo_quizzes")
+repo_learning_paths_collection = database.get_collection("repo_learning_paths")
