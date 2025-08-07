@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './RepoAnalyzerCursorAI.css';
 
-export default function RepoAnalyzerCursorAI() {
+export default function RepoAnalyzerWithAPIs() {
   // File upload state
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -424,7 +424,7 @@ export default function RepoAnalyzerCursorAI() {
 
   return (
     <div className="repo-analyzer-cursor-ai">
-      <h1>Repo Analyzer Cursor AI</h1>
+      <h1>Repo Analyzer with APIs</h1>
       <p className="description">
         Analyze Git repositories and generate professional documentation with AI-powered insights.
         Get comprehensive analysis including architecture patterns, code quality assessment, and learning modules.

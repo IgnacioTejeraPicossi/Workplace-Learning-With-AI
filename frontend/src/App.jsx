@@ -28,6 +28,7 @@ import AIStudyBuddy from "./AIStudyBuddy";
 import KnowledgeMap from "./KnowledgeMap";
 import RepoAnalyzer from "./RepoAnalyzer";
 import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
+import AgentCursorAI from "./AgentCursorAI";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -369,6 +370,7 @@ function AppContent() {
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
+            {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
         {!activeModule && section === "run-test" && <RunTest />}
