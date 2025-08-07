@@ -27,28 +27,12 @@ export default function AgentCursorAI() {
   // File input ref
   const fileInputRef = useRef();
 
-  // Quick template URLs
+  // Quick template URLs - using smaller repos to avoid Windows filename length issues
   const quickTemplates = [
-    {
-      name: "React",
-      url: "https://github.com/facebook/react",
-      description: "Official React library"
-    },
-    {
-      name: "FastAPI",
-      url: "https://github.com/tiangolo/fastapi",
-      description: "Modern Python web framework"
-    },
-    {
-      name: "Express.js",
-      url: "https://github.com/expressjs/express",
-      description: "Fast, unopinionated web framework"
-    },
-    {
-      name: "Vue.js",
-      url: "https://github.com/vuejs/vue",
-      description: "Progressive JavaScript framework"
-    }
+    { name: "FastAPI", url: "https://github.com/tiangolo/fastapi", description: "Modern Python web framework" },
+    { name: "Express.js", url: "https://github.com/expressjs/express", description: "Fast, unopinionated web framework" },
+    { name: "Vue.js", url: "https://github.com/vuejs/vue", description: "Progressive JavaScript framework" },
+    { name: "Flask", url: "https://github.com/pallets/flask", description: "Lightweight Python web framework" }
   ];
 
   const handleTemplateClick = (template) => {

@@ -271,6 +271,27 @@ Modular API endpoints for:
   - 🧠 **Quiz Generation**: Create interactive quizzes from generated documentation
   - 📄 **PDF Export**: Download documentation in PDF format
   - 🎯 **Template Support**: Quick access to common repository templates
+
+- **Repo Analyzer with APIs** (RepoAnalyzerCursorAI.jsx):
+  - 🔍 **Dual Analysis Modes**: Repository URL analysis and individual file uploads
+  - 🤖 **Cursor AI Integration**: High-quality analysis using Cursor AI API (when available)
+  - ⚡ **Enhanced OpenAI Fallback**: Advanced fallback system for Cursor AI-like quality
+  - 📊 **Quality Scoring**: Automatic quality assessment (Cursor AI: 85-95%, Enhanced OpenAI: 75-85%)
+  - 🎯 **Quick Templates**: Pre-configured repository templates (FastAPI, Express.js, Vue.js, Flask)
+  - 📝 **Structured Output**: Professional documentation, learning modules, and advanced insights
+  - 🔄 **Branch Detection**: Automatic branch detection and selection
+  - 💾 **Analysis Storage**: Save and retrieve analysis results from MongoDB
+
+- **Agent Cursor AI** (AgentCursorAI.jsx):
+  - 🚀 **Direct Cursor AI Integration**: Launch local Cursor AI application for repository analysis
+  - 📁 **Repository Cloning**: Automatic cloning of repositories to local temporary directories
+  - 🤖 **Local Cursor AI Launch**: Direct integration with installed Cursor AI application
+  - 📝 **Professional README Generation**: Generate high-quality documentation using Cursor AI
+  - 🎯 **Quick Templates**: Pre-configured repository templates for common frameworks
+  - 🔄 **Branch Management**: Automatic branch detection and selection
+  - 💾 **Result Storage**: Store generated documentation for later retrieval
+  - 🧹 **Cleanup Management**: Automatic cleanup of temporary directories
+  - 🔧 **Simulation Mode**: Fallback mode when Cursor AI is not installed locally
 - **Saved Micro-lessons** (LessonList.jsx):
   - View all previously generated micro-lessons at the bottom of the app
   - Filter lessons by topic in real time
@@ -740,143 +761,168 @@ The Map of Knowledge is a sophisticated learning visualization system that provi
 - **Achievement Tracking**: Milestones and learning achievements
 - **Goal Setting**: Personalized learning goals and targets
 - **Performance Analytics**: Detailed performance insights and trends
-AI Analytics Features
-Overall Team Assessment: Comprehensive evaluation of team dynamics
-Individual Member Analysis: Detailed insights on each team member's contributions
-Recommendations for Improvement: AI-generated suggestions for team enhancement
-Collaboration Insights: Analysis of team interaction patterns and effectiveness
-Global Search Functionality
+### AI Analytics Features
+
+- **Overall Team Assessment**: Comprehensive evaluation of team dynamics
+- **Individual Member Analysis**: Detailed insights on each team member's contributions
+- **Recommendations for Improvement**: AI-generated suggestions for team enhancement
+- **Collaboration Insights**: Analysis of team interaction patterns and effectiveness
+## 🔍 Global Search Functionality
+
 The Global Search feature provides instant access to all sections and features of the application through a powerful search interface. This modern, intuitive search system allows users to quickly navigate to any part of the application.
 
-Core Features:
-🔍 Search Interface
-Search Button: Located in the header next to the theme toggle
-Modal Overlay: Clean, modern search interface that appears over the current page
-Real-time Search: Instant results as you type
-Theme Aware: Automatically adapts to light/dark mode
-⌨️ Keyboard Shortcuts
-Open Search: Press Ctrl+K (Windows/Linux) or Cmd+K (Mac)
-Navigate Results: Use arrow keys (↑↓) to move through results
-Select Result: Press Enter to navigate to the selected section
-Close Search: Press Escape to close the search modal
-🎯 Comprehensive Coverage
+### Core Features:
+
+#### 🔍 Search Interface
+- **Search Button**: Located in the header next to the theme toggle
+- **Modal Overlay**: Clean, modern search interface that appears over the current page
+- **Real-time Search**: Instant results as you type
+- **Theme Aware**: Automatically adapts to light/dark mode
+
+#### ⌨️ Keyboard Shortcuts
+- **Open Search**: Press Ctrl+K (Windows/Linux) or Cmd+K (Mac)
+- **Navigate Results**: Use arrow keys (↑↓) to move through results
+- **Select Result**: Press Enter to navigate to the selected section
+- **Close Search**: Press Escape to close the search modal
+
+#### 🎯 Comprehensive Coverage
 The search covers all 12 sections of the application:
 
-Dashboard - View learning progress and overview
-AI Concepts - Explore innovative AI learning concepts
-Micro-lessons - Create and manage bite-sized learning lessons
-Map of Knowledge - Interactive learning visualization and analytics
-Recommendation - Get personalized learning recommendations
-Simulations - Practice with interactive workplace scenarios
-Web Search - Search the web for up-to-date information
-Team Dynamics - Analyze and improve team collaboration
-Certifications - Get certification recommendations and study plans
-AI Career Coach - Get career guidance and professional advice
-Skills Forecast - Predict future skills and career trends
-Saved Lessons - View and manage your saved micro-lessons
-⚡ Smart Search Algorithm
-Title Search: Matches section names exactly
-Description Search: Searches through feature descriptions
-Keyword Search: Includes relevant keywords for each section
-Fuzzy Matching: Finds results even with partial matches
-Instant Results: No loading delays or waiting
-🎨 User Experience
-Visual Feedback: Selected items are highlighted
-Icons: Each result shows the section's icon for easy recognition
-Descriptions: Clear descriptions help users understand what each section does
-Responsive Design: Works perfectly on all screen sizes
-Accessibility: Full keyboard navigation and screen reader support
-How to Use:
-Click the 🔍 button in the header, or
-Press Ctrl+K (or Cmd+K on Mac) to open search
-Type to search - e.g., "certification", "coach", "skills", "team"
-Use arrow keys to navigate through results
-Press Enter or click to navigate to the selected section
-Press Escape to close the search
-Technical Implementation
-Component: GlobalSearch.jsx - React component with modal interface
-Integration: Seamlessly integrated into App.jsx with header button
-State Management: Uses React hooks for search state and navigation
-Styling: Theme-aware styling that matches the application design
-Performance: Optimized for fast search with minimal re-renders
-AI Presentation Agent 🎤
+- **Dashboard** - View learning progress and overview
+- **AI Concepts** - Explore innovative AI learning concepts
+- **Micro-lessons** - Create and manage bite-sized learning lessons
+- **Map of Knowledge** - Interactive learning visualization and analytics
+- **Recommendation** - Get personalized learning recommendations
+- **Simulations** - Practice with interactive workplace scenarios
+- **Web Search** - Search the web for up-to-date information
+- **Team Dynamics** - Analyze and improve team collaboration
+- **Certifications** - Get certification recommendations and study plans
+- **AI Career Coach** - Get career guidance and professional advice
+- **Skills Forecast** - Predict future skills and career trends
+- **Saved Lessons** - View and manage your saved micro-lessons
+
+#### ⚡ Smart Search Algorithm
+- **Title Search**: Matches section names exactly
+- **Description Search**: Searches through feature descriptions
+- **Keyword Search**: Includes relevant keywords for each section
+- **Fuzzy Matching**: Finds results even with partial matches
+- **Instant Results**: No loading delays or waiting
+
+#### 🎨 User Experience
+- **Visual Feedback**: Selected items are highlighted
+- **Icons**: Each result shows the section's icon for easy recognition
+- **Descriptions**: Clear descriptions help users understand what each section does
+- **Responsive Design**: Works perfectly on all screen sizes
+- **Accessibility**: Full keyboard navigation and screen reader support
+
+### How to Use:
+1. Click the 🔍 button in the header, or
+2. Press Ctrl+K (or Cmd+K on Mac) to open search
+3. Type to search - e.g., "certification", "coach", "skills", "team"
+4. Use arrow keys to navigate through results
+5. Press Enter or click to navigate to the selected section
+6. Press Escape to close the search
+
+### Technical Implementation
+- **Component**: GlobalSearch.jsx - React component with modal interface
+- **Integration**: Seamlessly integrated into App.jsx with header button
+- **State Management**: Uses React hooks for search state and navigation
+- **Styling**: Theme-aware styling that matches the application design
+- **Performance**: Optimized for fast search with minimal re-renders
+## 🎤 AI Presentation Agent
+
 The AI Presentation Agent is a cutting-edge presentation tool designed specifically for hackathons and professional presentations. It combines AI-powered script generation, live demonstrations, intelligent Q&A, and voice cloning technology to create compelling, personalized presentations.
 
-Core Features:
-🎬 Script Generation
-AI-Powered Scripts: Generate professional 4-minute presentation scripts
-Hackathon Optimized: Perfect timing and structure for competition presentations
-Content Customization: Tailored scripts based on your project and audience
-Real-time Streaming: Scripts appear word-by-word with professional formatting
-Export Options: Save scripts as text files or copy to clipboard
-🎤 Voice Training & Cloning
-Personal Voice Recording: Record 30-60 seconds of your voice for cloning
-Multi-language Support: Train in your native language (Spanish, Norwegian, etc.)
-Voice Selection: Choose between Male, Female, or Your Trained Voice
-Professional Interface: Clean recording UI with live timer and status indicators
-Secure Storage: Your voice data is stored privately and securely
-Cross-language Generation: Use your voice in any supported language
-🚀 Live Demo Mode
-Real-time Demonstrations: Show live platform features and statistics
-System Statistics: Display real-time performance metrics and user analytics
-Feature Showcases: Individual feature demonstrations with live data
-User Journey: Complete learning path demonstrations
-Professional UI: Visual slide progression with timers and progress bars
-❓ Enhanced Q&A System
-Intelligent Responses: AI-powered answers with live data integration
-Category-based Questions: Technical, Business, Features, Implementation
-Live Data Integration: Real-time platform statistics in responses
-Smart Question Matching: Automatic similarity detection for best answers
-Professional Formatting: Markdown-formatted responses with live data
-🌍 Multi-language Support
-International Ready: Norwegian, Swedish, Spanish, German, French, English
-Voice Cloning: Your voice works in all supported languages
-Cultural Adaptation: Presentations adapted for different audiences
-Perfect for Hackathons: Ideal for international competitions
-⚙️ Advanced Settings
-Custom Timing: Adjust presentation duration (30-120 seconds per slide)
-Export Options: Download presentations or copy to clipboard
-Language Selection: Choose presentation language
-Voice Controls: Select voice type and gender
-Professional Statistics: Track script length, slide count, and duration
-📊 Live Integration
-Real App Data: Connect with actual platform statistics
-Live Performance Metrics: Show real-time system performance
-User Analytics: Display actual user engagement and learning data
-Feature Demonstrations: Show real platform capabilities
-Professional Credibility: No fake numbers, actual performance data
-Technical Architecture:
-Frontend Components
-PresentationAgent.jsx - Main presentation agent component
-Voice recording interface with MediaRecorder API
-Real-time streaming text display
-Professional UI with theme support
-Voice selection and training interface
-Backend Integration
-Voice cloning API endpoints (planned)
-Coqui TTS or Real-Time Voice Cloning integration
-User-specific voice model storage
-Multi-language text-to-speech processing
-Voice Cloning Technology
-Coqui TTS: Modern, maintained voice cloning library
-Real-Time Voice Cloning: Fast voice cloning for immediate results
-OpenVoice: Zero-shot voice cloning with style control
-Bark + RVC: Advanced voice cloning pipeline
-How to Use:
-1. Generate Presentation Script
-Navigate to "Presentation Agent" in the sidebar
-Click "📝 Generate Script" to create your 4-minute presentation
-Review the AI-generated script with streaming text
-Use "🔊 Speak Script" to hear it delivered
-2. Train Your Voice
-Click "🎤 Train Your Agent's Voice"
-Follow recording instructions (30-60 seconds of clear speech)
-Record in your native language (Spanish recommended)
-Preview your recording and train the voice model
-Your voice becomes available as "My Voice" option
-3. Run Live Demo
-Click "🎬 Live Demo" to start automated presentation
-Watch real-time feature demonstrations
+### Core Features:
+
+#### 🎬 Script Generation
+- **AI-Powered Scripts**: Generate professional 4-minute presentation scripts
+- **Hackathon Optimized**: Perfect timing and structure for competition presentations
+- **Content Customization**: Tailored scripts based on your project and audience
+- **Real-time Streaming**: Scripts appear word-by-word with professional formatting
+- **Export Options**: Save scripts as text files or copy to clipboard
+
+#### 🎤 Voice Training & Cloning
+- **Personal Voice Recording**: Record 30-60 seconds of your voice for cloning
+- **Multi-language Support**: Train in your native language (Spanish, Norwegian, etc.)
+- **Voice Selection**: Choose between Male, Female, or Your Trained Voice
+- **Professional Interface**: Clean recording UI with live timer and status indicators
+- **Secure Storage**: Your voice data is stored privately and securely
+- **Cross-language Generation**: Use your voice in any supported language
+
+#### 🚀 Live Demo Mode
+- **Real-time Demonstrations**: Show live platform features and statistics
+- **System Statistics**: Display real-time performance metrics and user analytics
+- **Feature Showcases**: Individual feature demonstrations with live data
+- **User Journey**: Complete learning path demonstrations
+- **Professional UI**: Visual slide progression with timers and progress bars
+
+#### ❓ Enhanced Q&A System
+- **Intelligent Responses**: AI-powered answers with live data integration
+- **Category-based Questions**: Technical, Business, Features, Implementation
+- **Live Data Integration**: Real-time platform statistics in responses
+- **Smart Question Matching**: Automatic similarity detection for best answers
+- **Professional Formatting**: Markdown-formatted responses with live data
+
+#### 🌍 Multi-language Support
+- **International Ready**: Norwegian, Swedish, Spanish, German, French, English
+- **Voice Cloning**: Your voice works in all supported languages
+- **Cultural Adaptation**: Presentations adapted for different audiences
+- **Perfect for Hackathons**: Ideal for international competitions
+
+#### ⚙️ Advanced Settings
+- **Custom Timing**: Adjust presentation duration (30-120 seconds per slide)
+- **Export Options**: Download presentations or copy to clipboard
+- **Language Selection**: Choose presentation language
+- **Voice Controls**: Select voice type and gender
+- **Professional Statistics**: Track script length, slide count, and duration
+
+#### 📊 Live Integration
+- **Real App Data**: Connect with actual platform statistics
+- **Live Performance Metrics**: Show real-time system performance
+- **User Analytics**: Display actual user engagement and learning data
+- **Feature Demonstrations**: Show real platform capabilities
+- **Professional Credibility**: No fake numbers, actual performance data
+
+### Technical Architecture:
+
+#### Frontend Components
+- **PresentationAgent.jsx** - Main presentation agent component
+- **Voice recording interface** with MediaRecorder API
+- **Real-time streaming text display**
+- **Professional UI** with theme support
+- **Voice selection and training interface**
+
+#### Backend Integration
+- **Voice cloning API endpoints** (planned)
+- **Coqui TTS or Real-Time Voice Cloning** integration
+- **User-specific voice model storage**
+- **Multi-language text-to-speech processing**
+
+#### Voice Cloning Technology
+- **Coqui TTS**: Modern, maintained voice cloning library
+- **Real-Time Voice Cloning**: Fast voice cloning for immediate results
+- **OpenVoice**: Zero-shot voice cloning with style control
+- **Bark + RVC**: Advanced voice cloning pipeline
+
+### How to Use:
+
+#### 1. Generate Presentation Script
+1. Navigate to "Presentation Agent" in the sidebar
+2. Click "📝 Generate Script" to create your 4-minute presentation
+3. Review the AI-generated script with streaming text
+4. Use "🔊 Speak Script" to hear it delivered
+
+#### 2. Train Your Voice
+1. Click "🎤 Train Your Agent's Voice"
+2. Follow recording instructions (30-60 seconds of clear speech)
+3. Record in your native language (Spanish recommended)
+4. Preview your recording and train the voice model
+5. Your voice becomes available as "My Voice" option
+
+#### 3. Run Live Demo
+1. Click "🎬 Live Demo" to start automated presentation
+2. Watch real-time feature demonstrations
 See live platform statistics and performance data
 Perfect for hackathon presentations
 4. Handle Q&A
@@ -987,6 +1033,168 @@ Certifications (Recommendations, Study Plan, Practice Test)
 Video Lessons (Summary & Quiz Generation)
 This streaming-first approach makes the app feel fast, modern, and AI-native.
 
+## 🤖 Agent Cursor AI - Direct Local Integration
+
+The Agent Cursor AI module represents the pinnacle of repository analysis technology, providing direct integration with a locally installed Cursor AI application for the highest quality documentation generation.
+
+### 🎯 Core Features
+
+#### 🚀 Direct Cursor AI Integration
+- **Local Application Launch**: Directly launches the installed Cursor AI application
+- **Repository Context**: Opens Cursor AI with the cloned repository loaded
+- **Professional Analysis**: Leverages Cursor AI's advanced code analysis capabilities
+- **Automatic Workflow**: Handles the entire process from cloning to documentation generation
+
+#### 📁 Repository Management
+- **Automatic Cloning**: Clones repositories to local temporary directories
+- **Branch Detection**: Automatically detects and allows selection of available branches
+- **Template Support**: Quick access to popular repository templates (FastAPI, Express.js, Vue.js, Flask)
+- **Cleanup Management**: Automatic cleanup of temporary directories after analysis
+
+#### 📝 Professional Documentation Generation
+- **High-Quality README**: Generates professional-grade README.md files
+- **Cursor AI Quality**: Leverages Cursor AI's superior code understanding and documentation skills
+- **Structured Output**: Professional formatting with comprehensive project analysis
+- **Metadata Inclusion**: Includes analysis date, source repository, and tool information
+
+### 🔧 Technical Architecture
+
+#### Frontend Components
+- **AgentCursorAI.jsx**: Main component with repository input and analysis controls
+- **Quick Templates**: Pre-configured repository templates for common frameworks
+- **Branch Management**: Automatic branch detection and selection interface
+- **Status Tracking**: Real-time status updates during analysis process
+
+#### Backend API Endpoints
+- **POST /api/cursor-agent/clone-repo**: Clone repository to local temporary directory
+- **POST /api/cursor-agent/launch-analysis**: Launch Cursor AI analysis process
+- **GET /api/cursor-agent/get-readme**: Retrieve generated README content
+- **POST /api/cursor-agent/cleanup**: Clean up temporary directories
+
+#### Database Collections
+- **cursor_agent_analyses**: Stores analysis results and generated documentation
+- **temp_directories**: Tracks temporary directories for cleanup management
+
+### 🎮 How It Works
+
+#### 1. Repository Cloning
+```bash
+# System automatically clones the repository
+git clone https://github.com/tiangolo/fastapi /temp/cursor_agent_xxx/fastapi
+```
+
+#### 2. Cursor AI Launch
+```bash
+# Launches Cursor AI with the cloned repository
+cursor /temp/cursor_agent_xxx/fastapi
+```
+
+#### 3. Documentation Generation
+- Cursor AI analyzes the repository structure and code
+- Generates professional README.md documentation
+- Saves the documentation to the repository directory
+
+#### 4. Result Retrieval
+- System retrieves the generated README.md file
+- Displays the content in the frontend interface
+- Provides download and sharing options
+
+#### 5. Cleanup
+- Automatically removes temporary directories
+- Frees up system resources
+- Maintains clean workspace
+
+### 🛠️ Prerequisites
+
+#### Cursor AI Installation
+- **Download**: Install Cursor AI from https://cursor.sh/
+- **Command Line Access**: Ensure `cursor` command is available in system PATH
+- **Version Check**: Verify installation with `cursor --version`
+
+#### System Requirements
+- **Git**: Must be installed and configured for repository cloning
+- **Temporary Storage**: Sufficient disk space for repository cloning
+- **Permissions**: Write access to temporary directories
+
+### 🎯 Quality Comparison
+
+| Analysis Method | Quality Score | Features |
+|----------------|---------------|----------|
+| **Cursor AI Local** | 95-100% | Highest quality, full Cursor AI capabilities |
+| **Simulation Mode** | 80-90% | Professional templates, fallback option |
+| **Enhanced OpenAI** | 75-85% | Advanced prompt engineering |
+| **Standard Analysis** | 50-70% | Basic repository analysis |
+
+### 🔧 Simulation Mode
+
+When Cursor AI is not installed locally, the system automatically falls back to simulation mode:
+
+#### Features
+- **Professional Templates**: Uses advanced documentation templates
+- **Repository Analysis**: Analyzes repository structure and metadata
+- **Quality Output**: Generates professional-grade documentation
+- **Clear Indication**: Shows "Simulation Mode" in generated content
+
+#### Benefits
+- **No Installation Required**: Works without Cursor AI installation
+- **Consistent Workflow**: Maintains the same user experience
+- **Development Friendly**: Perfect for testing and development
+- **Quality Assurance**: Professional output even in simulation mode
+
+### 📋 Usage Guide
+
+#### 1. Quick Start with Templates
+1. Navigate to "Agent Cursor AI" in the sidebar
+2. Select a Quick Template (FastAPI, Express.js, Vue.js, Flask)
+3. Click "Launch Cursor AI Analysis"
+4. Wait for the analysis to complete
+5. Review the generated documentation
+
+#### 2. Custom Repository Analysis
+1. Enter a repository URL in the input field
+2. Optionally click "Detect Branches" to see available branches
+3. Select your preferred branch (defaults to "main")
+4. Click "Launch Cursor AI Analysis"
+5. Monitor the progress and review results
+
+#### 3. Understanding the Results
+- **Repository Information**: Shows source URL and analysis details
+- **Analysis Type**: Indicates whether Cursor AI or simulation mode was used
+- **Quality Score**: Displays the quality assessment of the analysis
+- **Generated README**: Professional documentation ready for use
+
+### 🚀 Advanced Features
+
+#### Branch Management
+- **Automatic Detection**: Detects all available branches in the repository
+- **Branch Selection**: Choose specific branches for analysis
+- **Default Handling**: Automatically uses "main" branch if available
+
+#### Template System
+- **Popular Frameworks**: Pre-configured templates for common frameworks
+- **Quick Access**: One-click access to popular repositories
+- **Customizable**: Easy to add new templates and repositories
+
+#### Error Handling
+- **Graceful Fallbacks**: Automatic fallback to simulation mode
+- **Clear Error Messages**: Informative error messages for troubleshooting
+- **Recovery Options**: Options to retry or use alternative methods
+
+### 🔮 Future Enhancements
+
+#### Planned Features
+- **Batch Processing**: Analyze multiple repositories simultaneously
+- **Custom Templates**: User-defined repository templates
+- **Advanced Filtering**: Filter repositories by language, framework, or size
+- **Integration APIs**: Direct integration with GitHub/GitLab APIs
+- **Collaborative Analysis**: Share analysis results with team members
+
+#### Technical Improvements
+- **Performance Optimization**: Faster cloning and analysis processes
+- **Memory Management**: Improved memory usage for large repositories
+- **Caching System**: Cache analysis results for faster subsequent runs
+- **Plugin Architecture**: Extensible system for custom analysis plugins
+
 ## 4. Summary Table
 
 | Feature/Endpoint    | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? | Type |
@@ -1002,6 +1210,10 @@ This streaming-first approach makes the app feel fast, modern, and AI-native.
 | `/skills-forecast`| ❌                   | ✅                 | ✅             | Backend |
 | `/teams`          | ❌                   | ✅                 | ✅             | Backend |
 | `/teams/{id}/analytics` | ❌        | ✅                 | ✅             | Backend |
+| `/analyze-repo`   | ❌                   | ✅                 | ❌             | Backend |
+| `/cursor-agent/clone-repo` | ❌      | ❌                 | ❌             | Backend |
+| `/cursor-agent/launch-analysis` | ❌ | ❌                 | ❌             | Backend |
+| `/cursor-agent/get-readme` | ❌      | ❌                 | ❌             | Backend |
 
 ---
 
