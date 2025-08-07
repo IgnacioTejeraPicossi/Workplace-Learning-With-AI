@@ -5,7 +5,9 @@ import './RepoAnalyzerCursorAI.css';
 export default function RepoAnalyzerCursorAI() {
   // File upload state
   const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [isDragOver, setIsDragOver] = useState(false);
   
   // Repository URL state
   const [repoUrl, setRepoUrl] = useState('');
@@ -64,7 +66,10 @@ export default function RepoAnalyzerCursorAI() {
 
   const handleTemplateClick = (template) => {
     setRepoUrl(template.url);
+    setSelectedTemplate(template.name);
     setBranch('main'); // Default to main branch
+    setSuccess(`Template "${template.name}" selected!`);
+    setError(''); // Clear any previous errors
   };
 
   const detectBranches = async () => {
@@ -119,32 +124,33 @@ export default function RepoAnalyzerCursorAI() {
 
   // File upload handlers
   const handleFileSelect = (event) => {
-    const selectedFiles = Array.from(event.target.files);
-    setFiles(prev => [...prev, ...selectedFiles]);
+    const newFiles = Array.from(event.target.files);
+    setSelectedFiles(prev => [...prev, ...newFiles]);
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
+    setIsDragOver(false);
     const droppedFiles = Array.from(event.dataTransfer.files);
-    setFiles(prev => [...prev, ...droppedFiles]);
+    setSelectedFiles(prev => [...prev, ...droppedFiles]);
   };
 
   const handleDragOver = (event) => {
     event.preventDefault();
-    dropZoneRef.current?.classList.add('dragover');
+    setIsDragOver(true);
   };
 
   const handleDragLeave = (event) => {
     event.preventDefault();
-    dropZoneRef.current?.classList.remove('dragover');
+    setIsDragOver(false);
   };
 
   const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const uploadFiles = async () => {
-    if (files.length === 0) {
+    if (selectedFiles.length === 0) {
       setError('Please select files to upload');
       return;
     }
@@ -154,7 +160,7 @@ export default function RepoAnalyzerCursorAI() {
 
     try {
       const formData = new FormData();
-      files.forEach(file => {
+      selectedFiles.forEach(file => {
         formData.append('files', file);
       });
 
@@ -164,8 +170,8 @@ export default function RepoAnalyzerCursorAI() {
         }
       });
 
-      setUploadedFiles(files);
-      setSuccess(`Successfully uploaded ${files.length} files`);
+      setUploadedFiles(selectedFiles);
+      setSuccess(`Successfully uploaded ${selectedFiles.length} files`);
     } catch (error) {
       setError('Failed to upload files. Please try again.');
       console.error('Upload error:', error);
@@ -174,11 +180,254 @@ export default function RepoAnalyzerCursorAI() {
     }
   };
 
+  const generateReadmePreview = (documentation) => {
+    if (!documentation || !documentation.readme) {
+      return "No README documentation available.";
+    }
+    
+    // Truncate if too long
+    const content = documentation.readme;
+    if (content.length > 500) {
+      return content.substring(0, 500) + "...\n\n[Click to view full README]";
+    }
+    return content;
+  };
+
+  const getQualityBadge = (qualityScore, analysisType) => {
+    let badgeClass = "quality-badge";
+    let qualityText = "Unknown";
+    
+    if (analysisType === "cursor_ai") {
+      badgeClass += " cursor-ai";
+      qualityText = "Cursor AI";
+    } else if (analysisType === "enhanced_openai") {
+      badgeClass += " enhanced";
+      qualityText = "Enhanced OpenAI";
+    } else {
+      badgeClass += " basic";
+      qualityText = "Basic";
+    }
+    
+    return (
+      <div className={badgeClass}>
+        <span className="badge-icon">⚡</span>
+        <span className="badge-text">{qualityText}</span>
+        <span className="badge-score">{(qualityScore * 100).toFixed(0)}%</span>
+      </div>
+    );
+  };
+
+  const renderDocumentationSection = (documentation) => {
+    if (!documentation) return null;
+    
+    return (
+      <div className="result-section">
+        <div className="result-section-title">
+          <span className="result-icon">📚</span>
+          Generated Documentation
+        </div>
+        <div className="documentation-content">
+          {documentation.readme && (
+            <div className="doc-section">
+              <h4>README.md</h4>
+              <div className="preview-content">
+                <pre>{generateReadmePreview(documentation)}</pre>
+              </div>
+            </div>
+          )}
+          
+          {documentation.api_documentation && (
+            <div className="doc-section">
+              <h4>API Documentation</h4>
+              <div className="preview-content">
+                <pre>{documentation.api_documentation.substring(0, 300)}...</pre>
+              </div>
+            </div>
+          )}
+          
+          {documentation.setup_guide && (
+            <div className="doc-section">
+              <h4>Setup Guide</h4>
+              <div className="preview-content">
+                <pre>{documentation.setup_guide.substring(0, 300)}...</pre>
+              </div>
+            </div>
+          )}
+          
+          {documentation.contributing_guide && (
+            <div className="doc-section">
+              <h4>Contributing Guide</h4>
+              <div className="preview-content">
+                <pre>{documentation.contributing_guide.substring(0, 300)}...</pre>
+              </div>
+            </div>
+          )}
+          
+          {documentation.deployment_guide && (
+            <div className="doc-section">
+              <h4>Deployment Guide</h4>
+              <div className="preview-content">
+                <pre>{documentation.deployment_guide.substring(0, 300)}...</pre>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderLearningModule = (learningModule) => {
+    if (!learningModule) return null;
+    
+    return (
+      <div className="result-section">
+        <div className="result-section-title">
+          <span className="result-icon">🎓</span>
+          Learning Module
+        </div>
+        <div className="learning-content">
+          <div className="learning-header">
+            <h3>{learningModule.title || "Learning Module"}</h3>
+            <p>{learningModule.description || "Comprehensive learning module for this repository"}</p>
+          </div>
+          
+          {learningModule.objectives && learningModule.objectives.length > 0 && (
+            <div className="learning-section">
+              <h4>Learning Objectives</h4>
+              <ul>
+                {learningModule.objectives.map((objective, index) => (
+                  <li key={index}>{objective}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {learningModule.estimated_duration && (
+            <div className="learning-section">
+              <h4>Estimated Duration</h4>
+              <p>{learningModule.estimated_duration}</p>
+            </div>
+          )}
+          
+          {learningModule.exercises && learningModule.exercises.length > 0 && (
+            <div className="learning-section">
+              <h4>Exercises</h4>
+              <ul>
+                {learningModule.exercises.slice(0, 3).map((exercise, index) => (
+                  <li key={index}>
+                    <strong>{exercise.title}</strong>: {exercise.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderAdvancedInsights = (insights) => {
+    if (!insights) return null;
+    
+    return (
+      <div className="result-section">
+        <div className="result-section-title">
+          <span className="result-icon">🔍</span>
+          Advanced Insights
+        </div>
+        <div className="insights-content">
+          {insights.technology_stack && (
+            <div className="insight-item">
+              <div className="insight-label">Technology Stack</div>
+              <div className="insight-value">
+                {insights.technology_stack.languages && insights.technology_stack.languages.length > 0 && (
+                  <div>
+                    <strong>Languages:</strong> {insights.technology_stack.languages.join(', ')}
+                  </div>
+                )}
+                {insights.technology_stack.frameworks && insights.technology_stack.frameworks.length > 0 && (
+                  <div>
+                    <strong>Frameworks:</strong> {insights.technology_stack.frameworks.join(', ')}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {insights.architecture_patterns && (
+            <div className="insight-item">
+              <div className="insight-label">Architecture Pattern</div>
+              <div className="insight-value">
+                {insights.architecture_patterns.pattern || "Not identified"}
+              </div>
+            </div>
+          )}
+          
+          {insights.code_quality && (
+            <div className="insight-item">
+              <div className="insight-label">Code Quality</div>
+              <div className="insight-value">
+                <span className={`quality-indicator ${insights.code_quality.score?.toLowerCase()}`}>
+                  {insights.code_quality.score || "Unknown"}
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {insights.security_analysis && (
+            <div className="insight-item">
+              <div className="insight-label">Security Assessment</div>
+              <div className="insight-value">
+                <span className={`security-indicator ${insights.security_analysis.score?.toLowerCase()}`}>
+                  {insights.security_analysis.score || "Unknown"}
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {insights.performance_insights && (
+            <div className="insight-item">
+              <div className="insight-label">Performance</div>
+              <div className="insight-value">
+                <span className={`performance-indicator ${insights.performance_insights.score?.toLowerCase()}`}>
+                  {insights.performance_insights.score || "Unknown"}
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {insights.complexity_assessment && (
+            <div className="insight-item">
+              <div className="insight-label">Complexity Level</div>
+              <div className="insight-value">
+                {insights.complexity_assessment.level || "Unknown"}
+              </div>
+            </div>
+          )}
+          
+          {insights.improvement_recommendations && insights.improvement_recommendations.length > 0 && (
+            <div className="insight-item">
+              <div className="insight-label">Improvement Recommendations</div>
+              <div className="insight-value">
+                <ul>
+                  {insights.improvement_recommendations.slice(0, 5).map((rec, index) => (
+                    <li key={index}>{rec}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="repo-analyzer-cursor-ai">
-      <h1>🚀 Repo Analyzer Cursor AI</h1>
+      <h1>Repo Analyzer Cursor AI</h1>
       <p className="description">
-        Generate Cursor AI-quality documentation and learning modules from your project files
+        Analyze Git repositories and generate professional documentation with AI-powered insights.
+        Get comprehensive analysis including architecture patterns, code quality assessment, and learning modules.
       </p>
 
       {/* Analysis Mode Toggle */}
@@ -187,52 +436,66 @@ export default function RepoAnalyzerCursorAI() {
           className={`mode-button ${analysisMode === 'url' ? 'active' : ''}`}
           onClick={() => setAnalysisMode('url')}
         >
-          <span className="mode-icon">🌐</span>
-          <span>Repository URL</span>
+          <span className="mode-icon">🔗</span>
+          Repository URL
         </button>
         <button 
           className={`mode-button ${analysisMode === 'files' ? 'active' : ''}`}
           onClick={() => setAnalysisMode('files')}
         >
           <span className="mode-icon">📁</span>
-          <span>Individual Files</span>
+          Individual Files
         </button>
       </div>
 
-      {/* Error and Success Messages */}
-      {error && (
-        <div className="error-message">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
-      {success && (
-        <div className="success-message">
-          <strong>Success:</strong> {success}
-        </div>
-      )}
-
-      {/* Repository URL Analysis Mode */}
       {analysisMode === 'url' && (
         <div className="repo-url-section">
-          <h3>
-            <span className="section-icon">🌐</span>
-            Repository Analysis
-          </h3>
-
           {/* Quick Templates */}
-          <div className="quick-templates">
-            <h4>Quick Templates</h4>
-            <div className="template-buttons">
-              {quickTemplates.map((template, index) => (
-                <button
-                  key={index}
-                  className="template-button"
-                  onClick={() => handleTemplateClick(template)}
+          <div className="template-section">
+            <h3>Quick Templates</h3>
+            <div className="quick-templates">
+              <div className="template-buttons">
+                <button 
+                  className={`template-button ${selectedTemplate === 'React' ? 'active' : ''}`}
+                  onClick={() => handleTemplateClick({
+                    name: "React",
+                    url: "https://github.com/facebook/react",
+                    description: "Official React library"
+                  })}
                 >
-                  <div className="template-name">{template.name}</div>
-                  <div className="template-url">{template.url}</div>
+                  React
                 </button>
-              ))}
+                <button 
+                  className={`template-button ${selectedTemplate === 'FastAPI' ? 'active' : ''}`}
+                  onClick={() => handleTemplateClick({
+                    name: "FastAPI",
+                    url: "https://github.com/tiangolo/fastapi",
+                    description: "Modern Python web framework"
+                  })}
+                >
+                  FastAPI
+                </button>
+                <button 
+                  className={`template-button ${selectedTemplate === 'Express.js' ? 'active' : ''}`}
+                  onClick={() => handleTemplateClick({
+                    name: "Express.js",
+                    url: "https://github.com/expressjs/express",
+                    description: "Fast, unopinionated web framework"
+                  })}
+                >
+                  Express.js
+                </button>
+                <button 
+                  className={`template-button ${selectedTemplate === 'Vue.js' ? 'active' : ''}`}
+                  onClick={() => handleTemplateClick({
+                    name: "Vue.js",
+                    url: "https://github.com/vuejs/vue",
+                    description: "Progressive JavaScript framework"
+                  })}
+                >
+                  Vue.js
+                </button>
+              </div>
             </div>
           </div>
 
@@ -242,57 +505,50 @@ export default function RepoAnalyzerCursorAI() {
               <input
                 type="text"
                 className="url-input"
-                placeholder="https://github.com/username/repository"
+                placeholder="Enter GitHub repository URL (e.g., https://github.com/username/repo)"
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
               />
+              <button 
+                className="detect-branch-btn"
+                onClick={detectBranches}
+                disabled={detectingBranch}
+              >
+                {detectingBranch ? 'Detecting...' : 'Detect Branches'}
+              </button>
             </div>
-            <p style={{ color: '#6c757d', fontSize: '0.9rem', margin: '0.5rem 0' }}>
-              Supports GitHub, GitLab, and Bitbucket repositories
-            </p>
+            
+            {availableBranches.length > 0 && (
+              <div className="branch-selection">
+                <label>Select Branch:</label>
+                <select 
+                  className="branch-select"
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                >
+                  {availableBranches.map((branchName) => (
+                    <option key={branchName} value={branchName}>
+                      {branchName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
-          {/* Branch Selection */}
-          <div className="branch-selection">
-            <label style={{ fontWeight: '600', color: '#495057' }}>Branch:</label>
-            <select
-              className="branch-select"
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-            >
-              {availableBranches.length > 0 ? (
-                availableBranches.map((branchName, index) => (
-                  <option key={index} value={branchName}>
-                    {branchName}
-                  </option>
-                ))
-              ) : (
-                <option value="main">main</option>
-              )}
-            </select>
-            <button
-              className="detect-branch-btn"
-              onClick={detectBranches}
-              disabled={detectingBranch || !repoUrl}
-            >
-              {detectingBranch ? 'Detecting...' : 'Detect Branches'}
-            </button>
-          </div>
-
-          {/* Analyze Button */}
-          <button
+          <button 
             className="analyze-repo-btn"
             onClick={analyzeRepository}
             disabled={analyzing || !repoUrl}
           >
             {analyzing ? (
               <>
-                <div className="loading-spinner"></div>
+                <span className="loading-spinner"></span>
                 Analyzing Repository...
               </>
             ) : (
               <>
-                <span>🔍</span>
+                <span className="analyze-icon">🔍</span>
                 Analyze Repository
               </>
             )}
@@ -300,57 +556,47 @@ export default function RepoAnalyzerCursorAI() {
         </div>
       )}
 
-      {/* File Upload Mode */}
       {analysisMode === 'files' && (
         <div className="file-upload-section">
-          <h3>
-            <span className="section-icon">📁</span>
-            File Upload Analysis
-          </h3>
-
-          <div
-            className="upload-area"
-            ref={dropZoneRef}
+          <div 
+            className={`upload-area ${isDragOver ? 'drag-over' : ''}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onClick={() => fileInputRef.current?.click()}
           >
-            <div className="upload-icon">📤</div>
-            <div className="upload-text">Drop files here or click to browse</div>
-            <div className="upload-hint">
-              Supports .py, .js, .ts, .jsx, .tsx, .html, .css, .json, .md, and more
-            </div>
+            <div className="upload-icon">📁</div>
+            <div className="upload-text">Drop files here or click to select</div>
+            <div className="upload-hint">Supports: .py, .js, .jsx, .ts, .tsx, .json, .md, .yml, .yaml, .html, .css</div>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              accept=".py,.js,.jsx,.ts,.tsx,.json,.md,.yml,.yaml,.html,.css"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+            />
           </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="file-input"
-            onChange={handleFileSelect}
-            accept=".py,.js,.ts,.jsx,.tsx,.html,.css,.json,.md,.txt,.yml,.yaml,.xml,.sql,.sh,.bat,.ps1"
-          />
-
-          {files.length > 0 && (
+          {selectedFiles.length > 0 && (
             <div className="file-list">
-              <h4 style={{ marginBottom: '1rem', color: '#495057' }}>Selected Files:</h4>
-              {files.map((file, index) => (
+              <h3>Selected Files ({selectedFiles.length})</h3>
+              {selectedFiles.map((file, index) => (
                 <div key={index} className="file-item">
                   <div className="file-info">
                     <span className="file-icon">📄</span>
                     <span className="file-name">{file.name}</span>
                     <span className="file-size">({(file.size / 1024).toFixed(1)} KB)</span>
                   </div>
-                  <button
+                  <button 
                     className="remove-file"
                     onClick={() => removeFile(index)}
                   >
-                    Remove
+                    ✕
                   </button>
                 </div>
               ))}
-              <button
+              <button 
                 className="analyze-repo-btn"
                 onClick={uploadFiles}
                 disabled={analyzing}
@@ -358,12 +604,12 @@ export default function RepoAnalyzerCursorAI() {
               >
                 {analyzing ? (
                   <>
-                    <div className="loading-spinner"></div>
+                    <span className="loading-spinner"></span>
                     Uploading Files...
                   </>
                 ) : (
                   <>
-                    <span>📤</span>
+                    <span className="analyze-icon">📤</span>
                     Upload & Analyze Files
                   </>
                 )}
@@ -373,57 +619,20 @@ export default function RepoAnalyzerCursorAI() {
         </div>
       )}
 
-      {/* Template Selection */}
-      <div className="template-section">
-        <h3>
-          <span className="section-icon">📋</span>
-          Documentation Template
-        </h3>
-        <div className="template-grid">
-          <div
-            className={`template-card ${selectedTemplate === 'professional' ? 'selected' : ''}`}
-            onClick={() => setSelectedTemplate('professional')}
-          >
-            <div className="template-title">Professional README</div>
-            <div className="template-description">
-              Comprehensive documentation with installation, usage, API reference, and contribution guidelines.
-            </div>
-          </div>
-          <div
-            className={`template-card ${selectedTemplate === 'minimal' ? 'selected' : ''}`}
-            onClick={() => setSelectedTemplate('minimal')}
-          >
-            <div className="template-title">Minimal README</div>
-            <div className="template-description">
-              Simple and clean documentation focusing on essential information and quick start guide.
-            </div>
-          </div>
-          <div
-            className={`template-card ${selectedTemplate === 'learning' ? 'selected' : ''}`}
-            onClick={() => setSelectedTemplate('learning')}
-          >
-            <div className="template-title">Learning Module</div>
-            <div className="template-description">
-              Educational documentation with concepts, examples, exercises, and learning objectives.
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Analysis Results */}
       {analysisResult && (
         <div className="analysis-results">
-          <h3>
-            <span className="section-icon">📊</span>
-            Analysis Results
-          </h3>
-          
+          <div className="results-header">
+            <h2>Analysis Results</h2>
+            {getQualityBadge(analysisResult.quality_score, analysisResult.analysis_type)}
+          </div>
+
           {/* Executive Summary */}
           <div className="result-section">
-            <h4 className="result-section-title">
-              <span className="result-icon">📋</span>
+            <div className="result-section-title">
+              <span className="result-icon">📊</span>
               Executive Summary
-            </h4>
+            </div>
             <div className="summary-grid">
               <div className="summary-card">
                 <div className="summary-label">Repository</div>
@@ -438,8 +647,12 @@ export default function RepoAnalyzerCursorAI() {
                 <div className="summary-value">{analysisResult.files_analyzed}</div>
               </div>
               <div className="summary-card">
-                <div className="summary-label">Analysis ID</div>
-                <div className="summary-value">{analysisResult.analysis_id || 'N/A'}</div>
+                <div className="summary-label">Analysis Type</div>
+                <div className="summary-value">
+                  {analysisResult.analysis_type === 'cursor_ai' ? 'Cursor AI' : 
+                   analysisResult.analysis_type === 'enhanced_openai' ? 'Enhanced OpenAI' : 
+                   'Basic Analysis'}
+                </div>
               </div>
             </div>
           </div>
@@ -447,108 +660,66 @@ export default function RepoAnalyzerCursorAI() {
           {/* Project Structure */}
           {analysisResult.structure && (
             <div className="result-section">
-              <h4 className="result-section-title">
-                <span className="result-icon">📁</span>
+              <div className="result-section-title">
+                <span className="result-icon">🏗️</span>
                 Project Structure
-              </h4>
-              <div className="structure-content">
-                <div className="structure-item">
-                  <div className="structure-label">Backend Files:</div>
-                  <div className="structure-value">
-                    {Object.keys(analysisResult.summaries || {}).filter(file => 
-                      file.includes('.py') || file.includes('backend') || file.includes('api')
-                    ).length} files
-                  </div>
-                </div>
-                <div className="structure-item">
-                  <div className="structure-label">Frontend Files:</div>
-                  <div className="structure-value">
-                    {Object.keys(analysisResult.summaries || {}).filter(file => 
-                      file.includes('.js') || file.includes('.jsx') || file.includes('.ts') || file.includes('.tsx') || file.includes('frontend')
-                    ).length} files
-                  </div>
-                </div>
-                <div className="structure-item">
-                  <div className="structure-label">Configuration Files:</div>
-                  <div className="structure-value">
-                    {Object.keys(analysisResult.summaries || {}).filter(file => 
-                      file.includes('package.json') || file.includes('requirements.txt') || file.includes('dockerfile') || file.includes('.env') || file.includes('.config')
-                    ).length} files
-                  </div>
-                </div>
-                <div className="structure-item">
-                  <div className="structure-label">Documentation:</div>
-                  <div className="structure-value">
-                    {Object.keys(analysisResult.summaries || {}).filter(file => 
-                      file.includes('.md') || file.includes('README') || file.includes('docs')
-                    ).length} files
-                  </div>
-                </div>
               </div>
-            </div>
-          )}
-
-          {/* Key Insights */}
-          {analysisResult.insights && (
-            <div className="result-section">
-              <h4 className="result-section-title">
-                <span className="result-icon">💡</span>
-                Key Insights
-              </h4>
-              <div className="insights-content">
-                {analysisResult.insights.technologies && (
-                  <div className="insight-item">
-                    <div className="insight-label">Technologies Detected:</div>
-                    <div className="insight-value">
-                      {analysisResult.insights.technologies.join(', ')}
+              <div className="structure-content">
+                {analysisResult.structure.raw_response ? (
+                  <div className="structure-analysis">
+                    <pre>{analysisResult.structure.raw_response}</pre>
+                  </div>
+                ) : (
+                  <div className="structure-basic">
+                    <div className="structure-item">
+                      <div className="structure-label">Project Type</div>
+                      <div className="structure-value">{analysisResult.structure.project_type || 'Unknown'}</div>
+                    </div>
+                    <div className="structure-item">
+                      <div className="structure-label">Languages</div>
+                      <div className="structure-value">
+                        {analysisResult.structure.languages && analysisResult.structure.languages.length > 0 
+                          ? analysisResult.structure.languages.join(', ') 
+                          : 'Not detected'}
+                      </div>
+                    </div>
+                    <div className="structure-item">
+                      <div className="structure-label">Frameworks</div>
+                      <div className="structure-value">
+                        {analysisResult.structure.frameworks && analysisResult.structure.frameworks.length > 0 
+                          ? analysisResult.structure.frameworks.join(', ') 
+                          : 'Not detected'}
+                      </div>
                     </div>
                   </div>
                 )}
-                {analysisResult.insights.architecture && (
-                  <div className="insight-item">
-                    <div className="insight-label">Architecture Pattern:</div>
-                    <div className="insight-value">{analysisResult.insights.architecture}</div>
-                  </div>
-                )}
-                {analysisResult.insights.complexity && (
-                  <div className="insight-item">
-                    <div className="insight-label">Project Complexity:</div>
-                    <div className="insight-value">{analysisResult.insights.complexity}</div>
-                  </div>
-                )}
               </div>
             </div>
           )}
 
+          {/* Advanced Insights */}
+          {analysisResult.insights && renderAdvancedInsights(analysisResult.insights)}
+
           {/* Generated Documentation */}
-          <div className="result-section">
-            <h4 className="result-section-title">
-              <span className="result-icon">📄</span>
-              Generated Documentation
-            </h4>
-            <div className="documentation-actions">
-              <button className="doc-action-btn primary">
-                <span>📥</span>
-                Download README.md
-              </button>
-              <button className="doc-action-btn secondary">
-                <span>🎓</span>
-                Create Learning Module
-              </button>
-              <button className="doc-action-btn secondary">
-                <span>📊</span>
-                View Full Analysis
-              </button>
-            </div>
-            <div className="documentation-preview">
-              <div className="preview-header">
-                <span className="preview-title">README.md Preview</span>
-                <span className="preview-filename">{analysisResult.repo_name}-README.md</span>
-              </div>
-              <div className="preview-content">
-                <pre>{generateReadmePreview(analysisResult)}</pre>
-              </div>
-            </div>
+          {analysisResult.documentation && renderDocumentationSection(analysisResult.documentation)}
+
+          {/* Learning Module */}
+          {analysisResult.learning_module && renderLearningModule(analysisResult.learning_module)}
+
+          {/* Documentation Actions */}
+          <div className="documentation-actions">
+            <button className="doc-action-btn">
+              <span className="action-icon">💾</span>
+              Save Analysis
+            </button>
+            <button className="doc-action-btn">
+              <span className="action-icon">📥</span>
+              Download README
+            </button>
+            <button className="doc-action-btn">
+              <span className="action-icon">🎓</span>
+              Create Learning Module
+            </button>
           </div>
 
           {/* Raw Data Toggle */}
@@ -557,78 +728,41 @@ export default function RepoAnalyzerCursorAI() {
               className="toggle-btn"
               onClick={() => setShowRawData(!showRawData)}
             >
-              <span>{showRawData ? '👁️' : '🔍'}</span>
-              {showRawData ? 'Hide Raw Data' : 'Show Raw Analysis Data'}
+              {showRawData ? 'Hide' : 'Show'} Raw Analysis Data
             </button>
           </div>
 
-          {/* Raw Data (Collapsible) */}
           {showRawData && (
             <div className="raw-data-section">
-              <h4 className="result-section-title">
-                <span className="result-icon">🔧</span>
-                Raw Analysis Data
-              </h4>
-              <div className="result-content">
-                {JSON.stringify(analysisResult, null, 2)}
-              </div>
+              <pre>{JSON.stringify(analysisResult, null, 2)}</pre>
             </div>
           )}
         </div>
       )}
 
       {/* Loading State */}
-      {analyzing && !analysisResult && (
+      {analyzing && (
         <div className="loading">
           <div className="loading-spinner"></div>
-          Analyzing repository...
+          <p>Analyzing repository... This may take a few minutes for comprehensive analysis.</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="error-message">
+          <span className="error-icon">❌</span>
+          {error}
+        </div>
+      )}
+
+      {/* Success State */}
+      {success && (
+        <div className="success-message">
+          <span className="success-icon">✅</span>
+          {success}
         </div>
       )}
     </div>
   );
-}
-
-// Helper function to generate README preview
-function generateReadmePreview(analysisResult) {
-  const repoName = analysisResult.repo_name;
-  const fileCount = analysisResult.files_analyzed;
-  const technologies = analysisResult.insights?.technologies || [];
-  
-  return `# ${repoName}
-
-## Overview
-This repository contains ${fileCount} files and appears to be a ${technologies.length > 0 ? technologies.join(', ') : 'software'} project.
-
-## Quick Start
-\`\`\`bash
-# Clone the repository
-git clone https://github.com/username/${repoName}.git
-
-# Install dependencies
-npm install  # or yarn install
-
-# Start development server
-npm start    # or yarn start
-\`\`\`
-
-## Project Structure
-- **Backend**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
-    file.includes('.py') || file.includes('backend') || file.includes('api')
-  ).length} files
-- **Frontend**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
-    file.includes('.js') || file.includes('.jsx') || file.includes('.ts') || file.includes('.tsx')
-  ).length} files
-- **Configuration**: ${Object.keys(analysisResult.summaries || {}).filter(file => 
-    file.includes('package.json') || file.includes('requirements.txt')
-  ).length} files
-
-## Technologies
-${technologies.map(tech => `- ${tech}`).join('\n')}
-
-## Contributing
-Please read our contributing guidelines before submitting pull requests.
-
-## License
-This project is licensed under the MIT License.
-`;
 } 

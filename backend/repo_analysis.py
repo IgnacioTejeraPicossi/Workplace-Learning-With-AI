@@ -6,6 +6,8 @@ from pydantic import BaseModel
 import shutil
 from typing import Dict, List, Optional, Any
 import time
+import uuid
+from datetime import datetime
 
 # Import llm functions at module level
 try:
@@ -17,6 +19,8 @@ except ImportError:
 
 # Import storage module
 from backend.repo_storage import RepoStorage
+from backend.cursor_ai_integration import CursorAIAnalyzer
+from backend.enhanced_analysis import EnhancedAnalyzer
 
 router = APIRouter()
 
@@ -33,6 +37,10 @@ class RepoAnalysisResponse(BaseModel):
     insights: Dict[str, Any]
     architecture: Dict[str, Any]
     analysis_id: Optional[str] = None
+    analysis_type: Optional[str] = "enhanced_openai"
+    documentation: Optional[Dict[str, Any]] = None
+    learning_module: Optional[Dict[str, Any]] = None
+    quality_score: Optional[float] = 0.8
     
     class Config:
         arbitrary_types_allowed = True
@@ -99,104 +107,105 @@ async def analyze_repo(input: RepoInput) -> RepoAnalysisResponse:
                         branch_to_use = 'main'
                         
             except Exception as e:
-                print(f"Error detecting default branch: {e}")
-                branch_to_use = 'main'  # Fallback
+                print(f"Warning: Could not detect default branch: {e}")
+                branch_to_use = 'main'
+
+        # Step 2: Clone the repository
+        print(f"Cloning repository: {input.repo_url} (branch: {branch_to_use})")
+        git.Repo.clone_from(input.repo_url, repo_path, branch=branch_to_use)
         
-        # Step 2: Clone repository with the detected branch
-        try:
-            repo = git.Repo.clone_from(input.repo_url, repo_path, branch=branch_to_use)
-        except git.exc.GitCommandError as e:
-            # If the specified branch doesn't exist, try to clone without specifying branch
-            if "Remote branch" in str(e) and "not found" in str(e):
-                try:
-                    repo = git.Repo.clone_from(input.repo_url, repo_path)
-                    # Get the active branch name
-                    branch_to_use = repo.active_branch.name
-                except Exception as e2:
-                    raise HTTPException(status_code=400, detail=f"Could not clone repository. Available branches might be different. Error: {str(e2)}")
-            else:
-                raise HTTPException(status_code=400, detail=f"Error cloning repository: {str(e)}")
+        # Step 3: Check if Cursor AI is available
+        cursor_ai_key = os.getenv('CURSOR_AI_API_KEY')
         
-        # Step 3: Analyze repository structure
-        repo_name = os.path.basename(input.repo_url.rstrip('/').rstrip('.git'))
-        
-        # Get repository structure
-        structure = analyze_repository_structure(repo_path)
-        
-        # Step 4: Analyze files and generate summaries
-        summaries = {}
-        file_analysis = {}
-        
-        for root, dirs, files in os.walk(repo_path):
-            # Skip .git directory
-            if '.git' in root:
-                continue
-                
-            for file in files:
-                file_path = os.path.join(root, file)
-                relative_path = os.path.relpath(file_path, repo_path)
-                
-                # Skip binary files and large files
-                if should_skip_file(file, file_path):
-                    continue
-                
-                try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                        content = f.read()
-                    
-                    # Generate comprehensive analysis
-                    analysis = analyze_file_content(file, content, relative_path)
-                    summaries[relative_path] = analysis['summary']
-                    file_analysis[relative_path] = analysis
-                    
-                except Exception as e:
-                    print(f"Error reading file {relative_path}: {e}")
-                    continue
-        
-        # Step 5: Generate project insights
-        project_insights = generate_project_insights(file_analysis, structure)
-        
-        # Step 6: Generate architecture diagram data
-        architecture_data = generate_architecture_data(file_analysis, structure)
-        
-        # Step 7: Save analysis to database
-        analysis_data = {
-            "summaries": summaries,
-            "structure": structure,
-            "insights": project_insights,
-            "architecture": architecture_data,
-            "file_analysis": file_analysis
-        }
-        
-        # Get user_id from request if available (you can implement user authentication)
-        user_id = None  # TODO: Extract from request headers or session
-        
-        try:
-            analysis_id = await RepoStorage.save_repo_analysis(
-                repo_url=input.repo_url,
+        if cursor_ai_key:
+            # Use Cursor AI for high-quality analysis
+            print("Using Cursor AI for analysis...")
+            cursor_analyzer = CursorAIAnalyzer(cursor_ai_key)
+            analysis_result = cursor_analyzer.analyze_repository(repo_path, input.repo_url)
+            
+            # Extract repository name from URL
+            repo_name = input.repo_url.split('/')[-1].replace('.git', '')
+            
+            # Create response with Cursor AI analysis
+            response = RepoAnalysisResponse(
                 repo_name=repo_name,
                 branch_used=branch_to_use,
-                analysis_data=analysis_data,
-                user_id=user_id
+                files_analyzed=analysis_result.get('files_analyzed', 0),
+                summaries=analysis_result.get('summaries', {}),
+                structure=analysis_result.get('structure_analysis', {}),
+                insights=analysis_result.get('insights', {}),
+                architecture=analysis_result.get('architecture', {}),
+                analysis_id=str(uuid.uuid4()),
+                # Add Cursor AI specific fields
+                documentation=analysis_result.get('documentation', {}),
+                learning_module=analysis_result.get('learning_module', {}),
+                quality_score=analysis_result.get('quality_score', 0.8),
+                analysis_type="cursor_ai"
             )
-        except Exception as e:
-            print(f"Warning: Could not save analysis to database: {e}")
-            analysis_id = None
+        else:
+            # Use Enhanced OpenAI Analysis (Cursor AI-like quality)
+            print("Cursor AI not available, using Enhanced OpenAI analysis...")
+            
+            # Initialize enhanced analyzer
+            enhanced_analyzer = EnhancedAnalyzer()
+            analysis_result = enhanced_analyzer.analyze_repository(repo_path, input.repo_url)
+            
+            # Extract repository name from URL
+            repo_name = input.repo_url.split('/')[-1].replace('.git', '')
+            
+            # Create response with enhanced analysis
+            response = RepoAnalysisResponse(
+                repo_name=repo_name,
+                branch_used=branch_to_use,
+                files_analyzed=analysis_result.get('files_analyzed', 0),
+                summaries=analysis_result.get('summaries', {}),
+                structure=analysis_result.get('structure_analysis', {}),
+                insights=analysis_result.get('insights', {}),
+                architecture=analysis_result.get('architecture', {}),
+                analysis_id=str(uuid.uuid4()),
+                # Add enhanced analysis specific fields
+                documentation=analysis_result.get('documentation', {}),
+                learning_module=analysis_result.get('learning_module', {}),
+                quality_score=analysis_result.get('quality_score', 0.75),
+                analysis_type="enhanced_openai"
+            )
+            
+            # Store enhanced analysis in database
+            analysis_data = {
+                "analysis_id": response.analysis_id,
+                "repo_url": input.repo_url,
+                "repo_name": repo_name,
+                "branch": branch_to_use,
+                "files_analyzed": response.files_analyzed,
+                "structure": response.structure,
+                "insights": response.insights,
+                "architecture": response.architecture,
+                "documentation": response.documentation,
+                "learning_module": response.learning_module,
+                "created_at": datetime.now(),
+                "analysis_type": "enhanced_openai",
+                "quality_score": response.quality_score
+            }
+            
+            # Store in MongoDB
+            try:
+                await RepoStorage.save_repo_analysis(
+                    repo_url=input.repo_url,
+                    repo_name=repo_name,
+                    branch_used=branch_to_use,
+                    analysis_data=analysis_data
+                )
+            except Exception as e:
+                print(f"Warning: Could not save analysis to database: {e}")
         
-        return RepoAnalysisResponse(
-            repo_name=repo_name,
-            branch_used=branch_to_use,
-            files_analyzed=len(summaries),
-            summaries=summaries,
-            structure=structure,
-            insights=project_insights,
-            architecture=architecture_data,
-            analysis_id=analysis_id
-        )
+        return response
         
     except Exception as e:
+        print(f"Error analyzing repository: {e}")
         raise HTTPException(status_code=500, detail=f"Error analyzing repository: {str(e)}")
+        
     finally:
+        # Clean up temporary directory
         if tmp_dir:
             safe_remove_directory(tmp_dir)
 
