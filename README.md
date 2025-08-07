@@ -529,97 +529,110 @@ The AI Career Coach is an intelligent mentor module that guides users through so
 - Users can start a session, send messages, and receive contextual responses from the AI coach.
 - The conversation can be reset at any time using the End Session button.
 - **User-specific sessions**: All conversations are saved per user for future reference.
-Planned enhancements:
-Allow users to input their role and learning focus
-Multi-turn conversations with state/history
-Progress tracking and suggested resources
-Save coaching sessions to the database
-How to use:
 
-Scroll to the "AI Career Coach" section in the app
-Click "Start Coaching" to begin a session
-Type your answers and click Send to continue the conversation
-Click End Session to reset and start over
-Dynamic Skills Forecasting
+### Planned Enhancements:
+- Allow users to input their role and learning focus
+- Multi-turn conversations with state/history
+- Progress tracking and suggested resources
+- Save coaching sessions to the database
+
+### How to Use:
+1. Scroll to the "AI Career Coach" section in the app
+2. Click "Start Coaching" to begin a session
+3. Type your answers and click Send to continue the conversation
+4. Click End Session to reset and start over
+## 🔮 Dynamic Skills Forecasting
+
 The Dynamic Skills Forecasting module analyzes your learning history and transcript keywords to predict which skills you should develop next. This helps you stay ahead in your career by proactively identifying emerging skill needs.
 
-Current Features:
+### Current Features:
 
-✅ Real-time streaming with progress indicators and status messages
-✅ Sample inputs for quick testing (3 predefined examples)
-✅ AI-powered analysis with detailed skill recommendations
-✅ Professional UI with consistent styling and animations
-✅ User-specific forecasts: All predictions are saved per user for tracking over time
-✅ Saved Forecasts Management: View, organize, and delete saved forecasts with timestamps
-✅ Learning Resources Generation: AI-powered recommendations for courses, books, projects, and communities
-✅ Review Scheduling: Set up follow-up reminders with date picker and localStorage persistence
-Action Buttons (Fully Implemented):
+- ✅ **Real-time streaming** with progress indicators and status messages
+- ✅ **Sample inputs** for quick testing (3 predefined examples)
+- ✅ **AI-powered analysis** with detailed skill recommendations
+- ✅ **Professional UI** with consistent styling and animations
+- ✅ **User-specific forecasts**: All predictions are saved per user for tracking over time
+- ✅ **Saved Forecasts Management**: View, organize, and delete saved forecasts with timestamps
+- ✅ **Learning Resources Generation**: AI-powered recommendations for courses, books, projects, and communities
+- ✅ **Review Scheduling**: Set up follow-up reminders with date picker and localStorage persistence
 
-✅ 📋 Save Forecast - Saves the forecast to user profile with timestamp and persistence
-✅ 📚 Find Learning Resources - Generates AI-powered learning resources based on the forecast
-✅ 📅 Schedule Review - Sets up follow-up reminders with date picker and notifications
-How it works:
+### Action Buttons (Fully Implemented):
 
-The backend exposes a /skills-forecast endpoint powered by a dedicated prompt and the LLM.
-The frontend provides a SkillsForecast.jsx component with streaming UI.
-The AI analyzes patterns and predicts which skills will be most valuable for your career development.
-Results include specific skill recommendations, learning timelines, and resource suggestions.
-Planned enhancements:
+- ✅ **📋 Save Forecast** - Saves the forecast to user profile with timestamp and persistence
+- ✅ **📚 Find Learning Resources** - Generates AI-powered learning resources based on the forecast
+- ✅ **📅 Schedule Review** - Sets up follow-up reminders with date picker and notifications
 
-Automatically extract history and keywords from user activity and meeting transcripts
-Visualize skill trends over time
-Export forecasts to PDF or other formats
-Integration with calendar apps for scheduled reviews
-How to use:
+### How It Works:
 
-Navigate to the "Skills Forecast" section in the app
-Enter your current skills and career goals (or use sample inputs)
-Click 🔮 Get Forecast to receive personalized predictions
-Review the AI-generated skill development roadmap with streaming text
-Team Dynamics Analyzer
+- The backend exposes a `/skills-forecast` endpoint powered by a dedicated prompt and the LLM.
+- The frontend provides a `SkillsForecast.jsx` component with streaming UI.
+- The AI analyzes patterns and predicts which skills will be most valuable for your career development.
+- Results include specific skill recommendations, learning timelines, and resource suggestions.
+
+### Planned Enhancements:
+
+- Automatically extract history and keywords from user activity and meeting transcripts
+- Visualize skill trends over time
+- Export forecasts to PDF or other formats
+- Integration with calendar apps for scheduled reviews
+
+### How to Use:
+
+1. Navigate to the "Skills Forecast" section in the app
+2. Enter your current skills and career goals (or use sample inputs)
+3. Click 🔮 **Get Forecast** to receive personalized predictions
+4. Review the AI-generated skill development roadmap with streaming text
+## 👥 Team Dynamics Analyzer
+
 The Team Dynamics Analyzer is a comprehensive team management and analytics module that helps users create teams, manage members, and generate AI-powered insights for team collaboration and performance.
 
-Core Features:
-Team Creation & Management
-Create Teams: Set up teams with name, description, and detailed member information
-Member Management: Add team members with roles, skills, and performance metrics
-Team Analytics: Generate AI-powered analysis of team dynamics, collaboration patterns, and performance insights
-User-Specific Teams: All teams are created and managed by authenticated users
-AI-Powered Analytics
-Collaboration Analysis: AI analyzes team member interactions and collaboration patterns
-Productivity Insights: Identify team productivity trends and bottlenecks
-Communication Assessment: Evaluate team communication effectiveness
-Leadership Development: Provide insights on leadership opportunities and skill gaps
-Personalized Recommendations: Get AI-generated suggestions for team improvement
-Backend API Endpoints
-POST /teams - Create a new team with members
-GET /teams - Get all teams for the authenticated user
-GET /teams/{team_id} - Get specific team details with members
-PUT /teams/{team_id} - Update team details
-DELETE /teams/{team_id} - Delete a team and all its members
-POST /teams/{team_id}/members - Add a new member to a team
-PUT /teams/{team_id}/members/{member_id} - Update a team member's details
-DELETE /teams/{team_id}/members/{member_id} - Remove a member from a team
-POST /teams/{team_id}/analytics - Generate AI-powered team analytics
-GET /teams/{team_id}/analytics - Get historical analytics for a team
-Database Collections
-teams - Stores team information (name, description, creator, timestamps)
-team_members - Stores team member details (name, role, email, skills, performance)
-team_analytics - Stores AI-generated team analysis and insights
-Frontend Features
-Interactive Team Creation: Form-based team setup with member management
-Real-time Analytics: Generate and view AI-powered team insights
-Member Management: Add, edit, and remove team members with detailed information
-Tooltips: Helpful information on hover for all major features
-Theme Support: Consistent styling with light/dark theme compatibility
-How to use:
-Navigate to the "Team Dynamics" section in the sidebar
-Click "Create New Team" to set up a new team with members
-Add team members with their roles, skills, and contact information
-Click "Generate Analytics" on any team to get AI-powered insights
-View detailed analysis covering collaboration, productivity, communication, and leadership
-Use "Start Team Simulation" for interactive team scenarios (planned feature)
-Access "View Team Analytics" for historical performance tracking
+### Core Features:
+
+#### Team Creation & Management
+- **Create Teams**: Set up teams with name, description, and detailed member information
+- **Member Management**: Add team members with roles, skills, and performance metrics
+- **Team Analytics**: Generate AI-powered analysis of team dynamics, collaboration patterns, and performance insights
+- **User-Specific Teams**: All teams are created and managed by authenticated users
+
+#### AI-Powered Analytics
+- **Collaboration Analysis**: AI analyzes team member interactions and collaboration patterns
+- **Productivity Insights**: Identify team productivity trends and bottlenecks
+- **Communication Assessment**: Evaluate team communication effectiveness
+- **Leadership Development**: Provide insights on leadership opportunities and skill gaps
+- **Personalized Recommendations**: Get AI-generated suggestions for team improvement
+
+### Backend API Endpoints
+- `POST /teams` - Create a new team with members
+- `GET /teams` - Get all teams for the authenticated user
+- `GET /teams/{team_id}` - Get specific team details with members
+- `PUT /teams/{team_id}` - Update team details
+- `DELETE /teams/{team_id}` - Delete a team and all its members
+- `POST /teams/{team_id}/members` - Add a new member to a team
+- `PUT /teams/{team_id}/members/{member_id}` - Update a team member's details
+- `DELETE /teams/{team_id}/members/{member_id}` - Remove a member from a team
+- `POST /teams/{team_id}/analytics` - Generate AI-powered team analytics
+- `GET /teams/{team_id}/analytics` - Get historical analytics for a team
+
+### Database Collections
+- **teams** - Stores team information (name, description, creator, timestamps)
+- **team_members** - Stores team member details (name, role, email, skills, performance)
+- **team_analytics** - Stores AI-generated team analysis and insights
+
+### Frontend Features
+- **Interactive Team Creation**: Form-based team setup with member management
+- **Real-time Analytics**: Generate and view AI-powered team insights
+- **Member Management**: Add, edit, and remove team members with detailed information
+- **Tooltips**: Helpful information on hover for all major features
+- **Theme Support**: Consistent styling with light/dark theme compatibility
+
+### How to Use:
+1. Navigate to the "Team Dynamics" section in the sidebar
+2. Click "Create New Team" to set up a new team with members
+3. Add team members with their roles, skills, and contact information
+4. Click "Generate Analytics" on any team to get AI-powered insights
+5. View detailed analysis covering collaboration, productivity, communication, and leadership
+6. Use "Start Team Simulation" for interactive team scenarios (planned feature)
+7. Access "View Team Analytics" for historical performance tracking
 
 ## 🗺️ Map of Knowledge - Advanced Learning Visualization
 
