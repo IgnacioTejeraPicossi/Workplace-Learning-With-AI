@@ -15,9 +15,9 @@ from backend.readme_generator import (
 )
 from backend.repo_storage import RepoStorage
 
-router = APIRouter()
+router = APIRouter(prefix="/cursor-readme", tags=["Cursor AI README Generator"])
 
-@router.post("/api/cursor-readme/upload-files")
+@router.post("/upload-files")
 async def upload_project_files(files: List[UploadFile] = File(...)):
     """Upload project files for Cursor AI-style README generation"""
     try:
@@ -71,7 +71,7 @@ async def upload_project_files(files: List[UploadFile] = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing files: {str(e)}")
 
-@router.post("/api/cursor-readme/generate")
+@router.post("/generate")
 async def generate_cursor_readme(
     project_name: str = Form(...),
     project_description: Optional[str] = Form(""),
@@ -211,7 +211,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating README: {str(e)}")
 
-@router.post("/api/cursor-readme/save-learning-module")
+@router.post("/save-learning-module")
 async def save_learning_module(
     project_name: str = Form(...),
     readme_content: str = Form(...),
@@ -236,7 +236,7 @@ async def save_learning_module(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving learning module: {str(e)}")
 
-@router.get("/api/cursor-readme/learning-modules")
+@router.get("/learning-modules")
 async def get_learning_modules(limit: int = 10):
     """Get list of saved learning modules"""
     try:
@@ -264,7 +264,7 @@ async def get_learning_modules(limit: int = 10):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching learning modules: {str(e)}")
 
-@router.get("/api/cursor-readme/learning-module/{module_id}")
+@router.get("/learning-module/{module_id}")
 async def get_learning_module(module_id: str):
     """Get specific learning module content"""
     try:
