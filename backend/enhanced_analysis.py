@@ -64,7 +64,13 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            # Use GPT-5 for enhanced structure analysis
+            response = ask_openai(
+                prompt=prompt,
+                task_type="repository_analysis",
+                complexity="high",
+                max_tokens=2048
+            )
             return self._parse_structure_analysis(response)
         except Exception as e:
             print(f"Error in structure analysis: {e}")
@@ -155,7 +161,13 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            # Use GPT-5 for professional README generation
+            return ask_openai(
+                prompt=prompt,
+                task_type="documentation",
+                complexity="high",
+                max_tokens=2048
+            )
         except Exception as e:
             print(f"Error generating README: {e}")
             return self._fallback_readme(repo_path, repo_url)
@@ -170,7 +182,13 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            # Use GPT-5 for API documentation generation
+            return ask_openai(
+                prompt=prompt,
+                task_type="documentation",
+                complexity="medium",
+                max_tokens=2048
+            )
         except Exception as e:
             print(f"Error generating API documentation: {e}")
             return "API documentation could not be generated."
@@ -244,7 +262,13 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            # Use GPT-5 for technology stack analysis
+            response = ask_openai(
+                prompt=prompt,
+                task_type="repository_analysis",
+                complexity="medium",
+                max_tokens=1024
+            )
             return self._parse_technology_stack(response)
         except Exception as e:
             print(f"Error analyzing technology stack: {e}")

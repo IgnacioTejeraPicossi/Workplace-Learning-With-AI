@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Import llm functions at module level
 try:
-    from llm import generate_summary
+    from backend.llm import generate_summary, ask_openai
     LLM_AVAILABLE = True
 except ImportError:
     LLM_AVAILABLE = False
@@ -469,6 +469,42 @@ def generate_fallback_summary(analysis: dict) -> str:
         summary += f"Content preview: {preview}"
     
     return summary
+
+def generate_gpt5_enhanced_summary(analysis: dict) -> str:
+    """Generate an enhanced summary using GPT-5 for better quality"""
+    if not LLM_AVAILABLE:
+        return generate_fallback_summary(analysis)
+    
+    filename = analysis.get('filename', 'Unknown file')
+    content = analysis.get('content', '')
+    file_type = analysis.get('type', 'unknown')
+    
+    prompt = f"""
+You are a technical documentation expert powered by GPT-5. Analyze this {file_type} file and provide a clear, professional summary.
+
+File: {filename}
+Content: {content[:2000]}
+
+Please provide a concise summary that includes:
+1. The main purpose of this file
+2. Key components or functionality
+3. Important patterns or architecture decisions
+4. Any notable dependencies or relationships
+
+Write in clear, professional language suitable for technical documentation.
+"""
+    
+    try:
+        # Use GPT-5 for enhanced analysis
+        return ask_openai(
+            prompt=prompt,
+            task_type="documentation",
+            complexity="medium",
+            max_tokens=300
+        )
+    except Exception as e:
+        print(f"Error generating GPT-5 summary: {e}")
+        return generate_fallback_summary(analysis)
 
 def generate_project_insights(file_analysis: dict, structure: dict) -> dict:
     """Generate insights about the project structure and architecture"""

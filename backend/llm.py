@@ -1,15 +1,26 @@
-# This file will handle OpenAI GPT-4 (or Claude) configuration and integration 
+# This file will handle OpenAI GPT-5 configuration and integration 
 
 import os
 from dotenv import load_dotenv
 import openai
 from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
+from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
 
 load_dotenv()  # Loads .env file if present
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-def ask_openai(prompt=None, model="gpt-4", max_tokens=512, messages=None):
+def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    Enhanced OpenAI function with GPT-5 model selection and optimization.
+    
+    Args:
+        prompt: The prompt to send
+        task_type: Type of task for optimal model selection
+        complexity: Task complexity (low, medium, high)
+        max_tokens: Maximum tokens for response
+        messages: Alternative to prompt for conversation format
+    """
     if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
         # No key found, return mock response
         if prompt:
@@ -18,30 +29,41 @@ def ask_openai(prompt=None, model="gpt-4", max_tokens=512, messages=None):
             return f"[MOCKED RESPONSE] This would be the AI's answer to: {messages[-1]['content'][:60]}..."
         else:
             return "[MOCKED RESPONSE] No prompt or messages provided."
+    
     try:
+        # Get optimal GPT-5 model and parameters
+        model = get_optimal_model(task_type, complexity)
+        params = get_gpt5_parameters(model, task_type)
+        
+        # Override max_tokens if provided
+        if max_tokens:
+            params["max_tokens"] = max_tokens
+        
         client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        
         if messages:
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                max_tokens=max_tokens,
-                temperature=0.7,
+                **params
             )
         else:
             response = client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                temperature=0.7,
+                **params
             )
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
 
-def ask_openai_stream(prompt=None, model="gpt-4", max_tokens=512, messages=None):
+def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    Enhanced streaming OpenAI function with GPT-5 model selection.
+    """
     if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
         # No key found, yield a mock response for testing
-        mock_response = f"""I'm your AI Study Buddy! Here's a helpful response to your question:
+        mock_response = f"""I'm your AI Study Buddy powered by GPT-5! Here's a helpful response to your question:
 
 "{prompt or 'Hello'}"
 
@@ -62,24 +84,31 @@ Would you like to know more about any specific feature?"""
             yield char
         return
     
-    # If we have an API key, try to use OpenAI
+    # If we have an API key, try to use OpenAI with GPT-5
     try:
+        # Get optimal GPT-5 model and parameters
+        model = get_optimal_model(task_type, complexity)
+        params = get_gpt5_parameters(model, task_type)
+        
+        # Override max_tokens if provided
+        if max_tokens:
+            params["max_tokens"] = max_tokens
+        
         client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        
         if messages:
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                max_tokens=max_tokens,
-                temperature=0.7,
                 stream=True,
+                **params
             )
         else:
             response = client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                temperature=0.7,
                 stream=True,
+                **params
             )
         for chunk in response:
             if hasattr(chunk, 'choices') and chunk.choices:
@@ -101,18 +130,26 @@ Would you like to know more about any specific feature?"""
             yield char
 
 def web_search_query(query):
+    """
+    Enhanced web search with GPT-5 model selection.
+    """
+    # Use GPT-5-mini for web search (fast and cost-effective)
+    model = get_optimal_model("web_search", "medium")
+    params = get_gpt5_parameters(model, "web_search")
+    
     response = openai.chat.completions.create(
-        model="gpt-4-1106-preview",  # or "gpt-4.1" if available
+        model=model,
         messages=[{"role": "user", "content": query}],
-        tools=[{"type": "web_search"}],  # or "web_search_preview" if that's the correct type
-        tool_choice="auto"
+        tools=[{"type": "web_search"}],
+        tool_choice="auto",
+        **params
     )
     return response.choices[0].message.content 
 
 import json
 
 ROUTER_PROMPT = """
-You are an AI router in a workplace learning platform.
+You are an AI router in a workplace learning platform powered by GPT-5.
 A user sends a free-form request. Your job is to determine which module should handle it.
 
 Available modules:
@@ -144,10 +181,16 @@ async def call_llm_router(query):
         return {"module": None, "reason": reason, "confidence": confidence} 
 
 def classify_intent(user_input: str) -> dict:
-    """Classify a user's unknown request and return structured insight."""
+    """Classify a user's unknown request and return structured insight using GPT-5."""
     prompt = CLASSIFY_UNKNOWN_INTENT.format(user_input=user_input)
     try:
-        response = ask_openai(prompt=prompt, model="gpt-4", max_tokens=512)
+        # Use GPT-5-mini for classification (fast and accurate)
+        response = ask_openai(
+            prompt=prompt, 
+            task_type="classification", 
+            complexity="medium", 
+            max_tokens=512
+        )
         import json
         return json.loads(response)
     except Exception as e:
@@ -157,7 +200,7 @@ def classify_intent(user_input: str) -> dict:
             "module_match": None,
             "new_feature": None,
             "confidence": "Low",
-            "follow_up_question": "Sorry, I didn’t quite understand that. Could you rephrase?"
+            "follow_up_question": "Sorry, I didn't quite understand that. Could you rephrase?"
         } 
 
 def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
@@ -167,12 +210,18 @@ def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
         feature_name=feature_name,
         feature_summary=feature_summary
     )
-    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=800)
+    # Use GPT-5 for scaffold generation (complex task)
+    return ask_openai(
+        prompt=prompt, 
+        task_type="code_generation", 
+        complexity="high", 
+        max_tokens=800
+    )
 
 async def generate_summary(filename: str, content: str) -> str:
-    """Generate a summary of a code file for documentation"""
+    """Generate a summary of a code file for documentation using GPT-5."""
     prompt = f"""
-You are a technical documentation assistant. Analyze the following code file and provide a clear, concise summary.
+You are a technical documentation assistant powered by GPT-5. Analyze the following code file and provide a clear, concise summary.
 
 File: {filename}
 Content:
@@ -186,12 +235,18 @@ Please provide a summary that includes:
 
 Write in clear, professional language suitable for technical documentation.
 """
-    return ask_openai(prompt, max_tokens=500)
+    # Use GPT-5-mini for documentation (good balance of quality and cost)
+    return ask_openai(
+        prompt, 
+        task_type="documentation", 
+        complexity="medium", 
+        max_tokens=500
+    )
 
 async def generate_quiz_questions(markdown_content: str, num_questions: int = 3, difficulty: str = "medium") -> list:
-    """Generate quiz questions from markdown content"""
+    """Generate quiz questions from markdown content using GPT-5."""
     prompt = f"""
-You are a workplace learning assistant. Based on this markdown documentation, generate {num_questions} multiple-choice quiz questions.
+You are a workplace learning assistant powered by GPT-5. Based on this markdown documentation, generate {num_questions} multiple-choice quiz questions.
 
 Documentation:
 {markdown_content[:4000]}
@@ -212,7 +267,13 @@ Make sure the questions are relevant to the content and appropriate for the spec
 """
     
     try:
-        response = ask_openai(prompt, max_tokens=1000)
+        # Use GPT-5-mini for quiz generation (good for structured output)
+        response = ask_openai(
+            prompt, 
+            task_type="quiz_generation", 
+            complexity="medium", 
+            max_tokens=1000
+        )
         # Try to parse the JSON response
         import json
         import re
