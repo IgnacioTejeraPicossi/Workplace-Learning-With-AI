@@ -34,21 +34,36 @@ function TeamDynamics() {
   };
 
   const handleCreateTeam = async () => {
-    if (!newTeam.name.trim() || !newTeam.description.trim()) return;
+    if (!newTeam.name.trim() || !newTeam.description.trim()) {
+      alert("Please fill in team name and description");
+      return;
+    }
+    
+    // Validate members
+    const validMembers = newTeam.members.filter(member => 
+      member.name.trim() && member.role.trim() && member.email.trim()
+    );
+    
+    if (validMembers.length === 0) {
+      alert("Please add at least one team member with name, role, and email");
+      return;
+    }
     
     try {
       setLoading(true);
       const response = await createTeam({
-        name: newTeam.name,
-        description: newTeam.description,
-        members: newTeam.members
+        name: newTeam.name.trim(),
+        description: newTeam.description.trim(),
+        members: validMembers
       });
       
       setTeams([...teams, { ...newTeam, id: response.team_id }]);
       setNewTeam({ name: "", description: "", members: [] });
       setShowCreateTeam(false);
+      alert("Team created successfully!");
     } catch (error) {
       console.error("Error creating team:", error);
+      alert("Error creating team. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -88,6 +103,17 @@ function TeamDynamics() {
       ...prev,
       members: prev.members.map((member, i) => 
         i === index ? { ...member, [field]: value } : member
+      )
+    }));
+  };
+
+  const updateMemberSkills = (index, skillsString) => {
+    // Convert comma-separated skills string to array
+    const skills = skillsString.split(',').map(skill => skill.trim()).filter(skill => skill);
+    setNewTeam(prev => ({
+      ...prev,
+      members: prev.members.map((member, i) => 
+        i === index ? { ...member, skills } : member
       )
     }));
   };
@@ -172,17 +198,83 @@ function TeamDynamics() {
               <h4 style={{ color: colors.text, marginBottom: 12 }}>Team Members</h4>
               {newTeam.members.map((member, index) => (
                 <div key={index} style={{ 
-                  display: "grid", 
-                  gridTemplateColumns: "1fr 1fr 1fr auto", 
-                  gap: 12, 
-                  marginBottom: 12,
-                  alignItems: "center"
+                  display: "flex", 
+                  flexDirection: "column",
+                  gap: 8, 
+                  marginBottom: 16,
+                  padding: 16,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  background: colors.background
                 }}>
+                  <div style={{ 
+                    display: "grid", 
+                    gridTemplateColumns: "1fr 1fr 1fr auto", 
+                    gap: 12, 
+                    alignItems: "center"
+                  }}>
+                    <input
+                      type="text"
+                      value={member.name}
+                      onChange={(e) => updateMember(index, "name", e.target.value)}
+                      placeholder="Name"
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border}`,
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        fontSize: 14
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={member.role}
+                      onChange={(e) => updateMember(index, "role", e.target.value)}
+                      placeholder="Role"
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border}`,
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        fontSize: 14
+                      }}
+                    />
+                    <input
+                      type="email"
+                      value={member.email}
+                      onChange={(e) => updateMember(index, "email", e.target.value)}
+                      placeholder="Email"
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border}`,
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        fontSize: 14
+                      }}
+                    />
+                    <button
+                      onClick={() => removeMember(index)}
+                      style={{
+                        background: colors.buttonDanger,
+                        color: "#fff",
+                        border: 0,
+                        borderRadius: 6,
+                        padding: "8px 12px",
+                        cursor: "pointer",
+                        fontSize: 14
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                   <input
                     type="text"
-                    value={member.name}
-                    onChange={(e) => updateMember(index, "name", e.target.value)}
-                    placeholder="Name"
+                    value={member.skills.join(', ')}
+                    onChange={(e) => updateMemberSkills(index, e.target.value)}
+                    placeholder="Skills (comma-separated): e.g., JavaScript, React, Python"
                     style={{
                       padding: "8px 12px",
                       borderRadius: 6,
@@ -192,48 +284,6 @@ function TeamDynamics() {
                       fontSize: 14
                     }}
                   />
-                  <input
-                    type="text"
-                    value={member.role}
-                    onChange={(e) => updateMember(index, "role", e.target.value)}
-                    placeholder="Role"
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: `1px solid ${colors.border}`,
-                      background: colors.cardBackground,
-                      color: colors.text,
-                      fontSize: 14
-                    }}
-                  />
-                  <input
-                    type="email"
-                    value={member.email}
-                    onChange={(e) => updateMember(index, "email", e.target.value)}
-                    placeholder="Email"
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: 6,
-                      border: `1px solid ${colors.border}`,
-                      background: colors.cardBackground,
-                      color: colors.text,
-                      fontSize: 14
-                    }}
-                  />
-                  <button
-                    onClick={() => removeMember(index)}
-                    style={{
-                      background: colors.buttonDanger,
-                      color: "#fff",
-                      border: 0,
-                      borderRadius: 6,
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                      fontSize: 14
-                    }}
-                  >
-                    Remove
-                  </button>
                 </div>
               ))}
               <button

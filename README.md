@@ -154,8 +154,35 @@ graph TB
   AgentCursorAI --> CursorAI[Cursor AI Local]
   RepoAnalyzer --> GitHub[GitHub/GitLab]
   
-  %% Note: Click events are not supported in GitHub README
-  %% Use the navigation links above to explore specific sections
+  %% Click Events for Navigation (Note: These work in Mermaid Live Editor but not in GitHub)
+  click Dashboard "#dashboard" "Go to Dashboard section"
+  click Concepts "#ai-concepts" "Go to AI Concepts section"
+  click MicroLesson "#micro-lessons" "Go to Micro Lessons section"
+  click Recommendation "#recommendations" "Go to Recommendations section"
+  click Simulator "#scenario-simulator" "Go to Scenario Simulator section"
+  click WebSearch "#web-search" "Go to Web Search section"
+  click CareerCoach "#ai-career-coach" "Go to AI Career Coach section"
+  click SkillsForecast "#skills-forecast" "Go to Skills Forecast section"
+  click Certifications "#certifications" "Go to Certifications section"
+  click VideoLesson "#video-lessons" "Go to Video Lessons section"
+  click KnowledgeMap "#knowledge-map" "Go to Knowledge Map section"
+  click AgentCursorAI "#agent-cursor-ai" "Go to Agent Cursor AI section"
+  click RepoAnalyzer "#repository-analyzer" "Go to Repository Analyzer section"
+  click PresentationAgent "#presentation-agent" "Go to Presentation Agent section"
+  click AIStudyBuddy "#ai-study-buddy" "Go to AI Study Buddy section"
+  click RunTest "#run-test" "Go to Run Test section"
+  click IdeaLog "#idea-log" "Go to Idea Log section"
+  click FeatureRoadmap "#feature-roadmap" "Go to Feature Roadmap section"
+  click GlobalSearch "#global-search" "Go to Global Search section"
+  click Cypress "#cypress-tests" "Go to Cypress Tests section"
+  click ManualTests "#manual-tests" "Go to Manual Tests section"
+  click APITests "#api-tests" "Go to API Tests section"
+  click TestResults "#test-results" "Go to Test Results section"
+  click FastAPI "#fastapi-server" "Go to FastAPI Server section"
+  click LLM "#openai-gpt5" "Go to OpenAI GPT-5 section"
+  click MongoDB "#mongodb" "Go to MongoDB section"
+  click Firebase "#firebase-auth" "Go to Firebase Auth section"
+  click WebSearchAPI "#web-search-api" "Go to Web Search API section"
   
   %% Styling
   classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#2d3436,font-size:16px;
