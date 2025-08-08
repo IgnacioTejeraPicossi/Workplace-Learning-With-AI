@@ -152,3 +152,8 @@ graph TB
   class CursorAI,GitHub external;
   class MongoDB,Firebase database;
   class Cypress,ManualTests,APITests,TestResults testing;
+```
+
+# 🤖 AI-Powered Workplace Learning Platform
+
+> **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**
