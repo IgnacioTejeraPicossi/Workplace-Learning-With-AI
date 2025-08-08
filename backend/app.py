@@ -109,7 +109,6 @@ class TeamMemberUpdateRequest(BaseModel):
     performance_score: Optional[float] = None
 
 class TeamAnalyticsRequest(BaseModel):
-    team_id: str
     metrics: List[str]  # e.g., ["collaboration", "productivity", "communication"]
 
 # Certification Models
@@ -321,6 +320,13 @@ async def get_skills_forecasts(user=Depends(verify_token)):
 @app.post("/teams")
 async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
     """Create a new team."""
+    print(f"[TEAM CREATION] Creating team: {request.name} with {len(request.members)} members")
+    
+    # Validate members - check for duplicate emails
+    emails = [member.email.lower().strip() for member in request.members]
+    if len(emails) != len(set(emails)):
+        raise HTTPException(status_code=400, detail="Duplicate emails are not allowed in the same team")
+    
     team_data = {
         "name": request.name,
         "description": request.description,
@@ -333,15 +339,17 @@ async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
     # Insert team
     team_result = await teams_collection.insert_one(team_data)
     team_id = str(team_result.inserted_id)
+    print(f"[TEAM CREATION] Team created with ID: {team_id}")
     
     # Insert team members
     member_docs = []
-    for member in request.members:
+    for i, member in enumerate(request.members):
+        print(f"[TEAM CREATION] Processing member {i+1}: {member.name} ({member.email})")
         member_doc = {
             "team_id": team_id,
-            "name": member.name,
-            "role": member.role,
-            "email": member.email,
+            "name": member.name.strip(),
+            "role": member.role.strip(),
+            "email": member.email.lower().strip(),
             "skills": member.skills,
             "performance_score": member.performance_score,
             "created_at": datetime.utcnow()
@@ -349,20 +357,27 @@ async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
         member_docs.append(member_doc)
     
     if member_docs:
-        await team_members_collection.insert_many(member_docs)
+        print(f"[TEAM CREATION] Inserting {len(member_docs)} members into database")
+        result = await team_members_collection.insert_many(member_docs)
+        print(f"[TEAM CREATION] Members inserted: {len(result.inserted_ids)}")
+    else:
+        print("[TEAM CREATION] No members to insert")
     
     return {"team_id": team_id, "message": "Team created successfully"}
 
 @app.get("/teams")
 async def get_teams(user=Depends(verify_token)):
     """Get all teams created by the user."""
+    print(f"[GET TEAMS] Getting teams for user: {user['uid']}")
     teams = []
     async for team in teams_collection.find({"created_by": user["uid"]}):
         team["_id"] = str(team["_id"])
         # Get member count for each team
         member_count = await team_members_collection.count_documents({"team_id": team["_id"]})
         team["member_count"] = member_count
+        print(f"[GET TEAMS] Team {team['name']} has {member_count} members")
         teams.append(team)
+    print(f"[GET TEAMS] Returning {len(teams)} teams")
     return {"teams": teams}
 
 @app.get("/teams/{team_id}")

@@ -162,7 +162,6 @@ export async function removeTeamMember(teamId, memberId) {
 
 export async function generateTeamAnalytics(teamId, metrics) {
   return apiCall(`/teams/${teamId}/analytics`, "POST", {
-    team_id: teamId,
     metrics
   });
 }

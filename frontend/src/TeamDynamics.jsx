@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { getTeams, createTeam, generateTeamAnalytics } from "./api";
+import { getTeams, createTeam, generateTeamAnalytics, getTeam } from "./api";
+import { auth } from "./firebase";
 
 function TeamDynamics() {
   const [teams, setTeams] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [teamDetails, setTeamDetails] = useState({});
   const [newTeam, setNewTeam] = useState({
     name: "",
     description: "",
@@ -22,18 +23,35 @@ function TeamDynamics() {
   }, []);
 
   const loadTeams = async () => {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      console.log("User not authenticated, skipping team load");
+      setTeams([]);
+      return;
+    }
+    
     try {
       setLoading(true);
       const response = await getTeams();
       setTeams(response.teams || []);
     } catch (error) {
       console.error("Error loading teams:", error);
+      if (error.response?.status === 401) {
+        console.log("User not authenticated, clearing teams");
+        setTeams([]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreateTeam = async () => {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      alert("Please sign in to create teams. You need to be authenticated to save team data.");
+      return;
+    }
+    
     if (!newTeam.name.trim() || !newTeam.description.trim()) {
       alert("Please fill in team name and description");
       return;
@@ -49,6 +67,17 @@ function TeamDynamics() {
       return;
     }
     
+    // Check for duplicate emails
+    const emails = validMembers.map(member => member.email.toLowerCase().trim());
+    const uniqueEmails = new Set(emails);
+    if (emails.length !== uniqueEmails.size) {
+      alert("Duplicate emails are not allowed in the same team");
+      return;
+    }
+    
+    console.log("Creating team with members:", validMembers);
+    console.log("User authenticated:", auth.currentUser.email);
+    
     try {
       setLoading(true);
       const response = await createTeam({
@@ -57,13 +86,21 @@ function TeamDynamics() {
         members: validMembers
       });
       
-      setTeams([...teams, { ...newTeam, id: response.team_id }]);
+      console.log("Team created successfully:", response);
+      
+      // Reload teams to get the updated list
+      await loadTeams();
+      
       setNewTeam({ name: "", description: "", members: [] });
       setShowCreateTeam(false);
       alert("Team created successfully!");
     } catch (error) {
       console.error("Error creating team:", error);
-      alert("Error creating team. Please try again.");
+      if (error.response?.data?.detail) {
+        alert(`Error: ${error.response.data.detail}`);
+      } else {
+        alert("Error creating team. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -72,7 +109,7 @@ function TeamDynamics() {
   const handleGenerateAnalytics = async (teamId) => {
     try {
       setLoading(true);
-      const response = await generateTeamAnalytics(teamId);
+      const response = await generateTeamAnalytics(teamId, ["collaboration", "productivity", "communication"]);
       
       setAnalytics(prev => ({
         ...prev,
@@ -80,9 +117,52 @@ function TeamDynamics() {
       }));
     } catch (error) {
       console.error("Error generating analytics:", error);
+      alert("Error generating analytics. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewDetails = async (teamId) => {
+    try {
+      setLoading(true);
+      const response = await getTeam(teamId);
+      setTeamDetails(prev => ({
+        ...prev,
+        [teamId]: response.team
+      }));
+      setSelectedTeam(teamId);
+    } catch (error) {
+      console.error("Error loading team details:", error);
+      alert("Error loading team details. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartTeamSimulation = () => {
+    if (!auth.currentUser) {
+      alert("Please sign in to start team simulations.");
+      return;
+    }
+    
+    // For now, show a placeholder message
+    alert("Team Simulation feature is coming soon! This will include:\n\n• Interactive role-playing scenarios\n• Conflict resolution exercises\n• Leadership development simulations\n• Team collaboration challenges\n\nStay tuned for updates!");
+  };
+
+  const handleViewTeamAnalytics = () => {
+    if (!auth.currentUser) {
+      alert("Please sign in to view team analytics.");
+      return;
+    }
+    
+    if (teams.length === 0) {
+      alert("No teams available. Create a team first to view analytics.");
+      return;
+    }
+    
+    // For now, show a placeholder message
+    alert("Team Analytics Dashboard is coming soon! This will include:\n\n• Team performance metrics\n• Collaboration patterns\n• Skill gap analysis\n• Progress tracking\n• AI-powered insights\n\nStay tuned for updates!");
   };
 
   const addMemberToTeam = () => {
@@ -128,6 +208,33 @@ function TeamDynamics() {
   return (
     <div style={{ color: colors.text }}>
       <h2 style={{ color: colors.text, marginBottom: 24 }}>Team Dynamics Analyzer</h2>
+      
+      {/* Authentication Status */}
+      {!auth.currentUser && (
+        <div style={{ 
+          background: colors.buttonDanger, 
+          color: "#fff", 
+          padding: "12px", 
+          borderRadius: "8px", 
+          marginBottom: "16px",
+          textAlign: "center"
+        }}>
+          ⚠️ Please sign in to create and manage teams. Your data will be saved securely.
+        </div>
+      )}
+      
+      {auth.currentUser && (
+        <div style={{ 
+          background: colors.buttonSuccess, 
+          color: "#fff", 
+          padding: "8px 12px", 
+          borderRadius: "6px", 
+          marginBottom: "16px",
+          fontSize: "14px"
+        }}>
+          ✅ Signed in as: {auth.currentUser.email}
+        </div>
+      )}
       
       {/* Team Creation Section */}
       <div style={{ 
@@ -388,41 +495,100 @@ function TeamDynamics() {
                 >
                   {loading ? "Analyzing..." : "Generate Analytics"}
                 </button>
-                <button
-                  style={{
-                    background: colors.cardBackground,
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: 6,
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    fontSize: 14
-                  }}
-                >
-                  View Details
-                </button>
+                                 <button
+                   onClick={() => handleViewDetails(team._id)}
+                   disabled={loading}
+                   style={{
+                     background: colors.cardBackground,
+                     color: colors.text,
+                     border: `1px solid ${colors.border}`,
+                     borderRadius: 6,
+                     padding: "8px 16px",
+                     cursor: loading ? "not-allowed" : "pointer",
+                     fontSize: 14,
+                     opacity: loading ? 0.6 : 1
+                   }}
+                 >
+                   {loading ? "Loading..." : "View Details"}
+                 </button>
               </div>
               
-              {/* Analytics Results */}
-              {analytics[team._id] && (
-                <div style={{ 
-                  marginTop: 16, 
-                  padding: 16, 
-                  background: colors.cardBackground, 
-                  borderRadius: 8,
-                  border: `1px solid ${colors.border}`
-                }}>
-                  <h5 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>AI Analysis</h5>
-                  <div style={{ 
-                    color: colors.textSecondary, 
-                    fontSize: 14, 
-                    lineHeight: 1.5,
-                    whiteSpace: "pre-wrap"
-                  }}>
-                    {analytics[team._id]}
-                  </div>
-                </div>
-              )}
+                             {/* Team Details */}
+               {selectedTeam === team._id && teamDetails[team._id] && (
+                 <div style={{ 
+                   marginTop: 16, 
+                   padding: 16, 
+                   background: colors.cardBackground, 
+                   borderRadius: 8,
+                   border: `1px solid ${colors.border}`
+                 }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                     <h5 style={{ color: colors.text, margin: 0 }}>Team Members</h5>
+                     <button
+                       onClick={() => setSelectedTeam(null)}
+                       style={{
+                         background: colors.buttonDanger,
+                         color: "#fff",
+                         border: 0,
+                         borderRadius: 4,
+                         padding: "4px 8px",
+                         cursor: "pointer",
+                         fontSize: 12
+                       }}
+                     >
+                       ✕ Close
+                     </button>
+                   </div>
+                   {teamDetails[team._id].members && teamDetails[team._id].members.length > 0 ? (
+                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                       {teamDetails[team._id].members.map((member, index) => (
+                         <div key={index} style={{ 
+                           padding: 12, 
+                           background: colors.background, 
+                           borderRadius: 6,
+                           border: `1px solid ${colors.border}`
+                         }}>
+                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                             <strong style={{ color: colors.text }}>{member.name}</strong>
+                             <span style={{ color: colors.textSecondary, fontSize: 12 }}>{member.role}</span>
+                           </div>
+                           <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>
+                             📧 {member.email}
+                           </div>
+                           {member.skills && member.skills.length > 0 && (
+                             <div style={{ color: colors.textSecondary, fontSize: 12 }}>
+                               🛠️ Skills: {member.skills.join(", ")}
+                             </div>
+                           )}
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
+                     <p style={{ color: colors.textSecondary, fontSize: 14 }}>No members found for this team.</p>
+                   )}
+                 </div>
+               )}
+               
+               {/* Analytics Results */}
+               {analytics[team._id] && (
+                 <div style={{ 
+                   marginTop: 16, 
+                   padding: 16, 
+                   background: colors.cardBackground, 
+                   borderRadius: 8,
+                   border: `1px solid ${colors.border}`
+                 }}>
+                   <h5 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>AI Analysis</h5>
+                   <div style={{ 
+                     color: colors.textSecondary, 
+                     fontSize: 14, 
+                     lineHeight: 1.5,
+                     whiteSpace: "pre-wrap"
+                   }}>
+                     {analytics[team._id]}
+                   </div>
+                 </div>
+               )}
             </div>
           ))}
         </div>
@@ -441,37 +607,39 @@ function TeamDynamics() {
           Analyze team dynamics and get AI-powered recommendations for team-based learning paths.
         </p>
         
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button
-            title="Launch interactive team scenarios and role-playing exercises. Practice team collaboration, conflict resolution, and leadership skills in a safe environment."
-            style={{
-              background: colors.buttonPrimary,
-              color: "#fff",
-              border: 0,
-              borderRadius: 6,
-              padding: "12px 24px",
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: "pointer"
-            }}
-          >
-            Start Team Simulation
-          </button>
-          <button
-            title="View detailed team performance metrics, collaboration patterns, and AI-generated insights. Track team progress and identify areas for improvement."
-            style={{
-              background: colors.cardBackground,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: 6,
-              padding: "12px 24px",
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: "pointer"
-            }}
-          >
-            View Team Analytics
-          </button>
+                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+           <button
+             onClick={handleStartTeamSimulation}
+             title="Launch interactive team scenarios and role-playing exercises. Practice team collaboration, conflict resolution, and leadership skills in a safe environment."
+             style={{
+               background: colors.buttonPrimary,
+               color: "#fff",
+               border: 0,
+               borderRadius: 6,
+               padding: "12px 24px",
+               fontWeight: 600,
+               fontSize: 16,
+               cursor: "pointer"
+             }}
+           >
+             Start Team Simulation
+           </button>
+                     <button
+             onClick={handleViewTeamAnalytics}
+             title="View detailed team performance metrics, collaboration patterns, and AI-generated insights. Track team progress and identify areas for improvement."
+             style={{
+               background: colors.cardBackground,
+               color: colors.text,
+               border: `1px solid ${colors.border}`,
+               borderRadius: 6,
+               padding: "12px 24px",
+               fontWeight: 600,
+               fontSize: 16,
+               cursor: "pointer"
+             }}
+           >
+             View Team Analytics
+           </button>
         </div>
       </div>
     </div>
