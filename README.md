@@ -1,3 +1,4 @@
+```mermaid
 graph TB
   %% Main User Interface
   User((👤 User)) --> App[🎨 Main App]
