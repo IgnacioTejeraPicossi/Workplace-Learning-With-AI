@@ -132,7 +132,8 @@ class CertificationSimulation(BaseModel):
 class LLMStreamRequest(BaseModel):
     prompt: str = None
     messages: list = None
-    model: str = "gpt-4"
+    task_type: str = "general"  # New parameter for GPT-5
+    complexity: str = "medium"   # New parameter for GPT-5
     max_tokens: int = 512
 
 @app.get("/")
@@ -764,7 +765,8 @@ async def llm_stream(request: LLMStreamRequest):
     def event_stream():
         for chunk in ask_openai_stream(
             prompt=request.prompt,
-            model=request.model,
+            task_type=request.task_type,  # Use new parameter
+            complexity=request.complexity,   # Use new parameter
             max_tokens=request.max_tokens,
             messages=request.messages
         ):

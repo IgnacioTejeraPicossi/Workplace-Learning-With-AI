@@ -188,7 +188,13 @@ class CursorAIAnalyzer:
         """
         
         try:
-            response = ask_openai(analysis_prompt)
+            # Use GPT-5 for enhanced analysis with Cursor AI-like quality
+            response = ask_openai(
+                prompt=analysis_prompt,
+                task_type="repository_analysis",
+                complexity="high",
+                max_tokens=2048
+            )
             return self._parse_analysis_response(response)
         except Exception as e:
             print(f"Error in enhanced analysis: {e}")
@@ -256,7 +262,13 @@ class CursorAIAnalyzer:
         """
         
         try:
-            return ask_openai(readme_prompt)
+            # Use GPT-5 for professional README generation
+            return ask_openai(
+                prompt=readme_prompt,
+                task_type="documentation",
+                complexity="high",
+                max_tokens=2048
+            )
         except Exception as e:
             print(f"Error generating README: {e}")
             return self._fallback_readme(repo_path, repo_url)

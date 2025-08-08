@@ -6,7 +6,7 @@ This file contains configuration for the new GPT-5 models and their optimal use 
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-5": {
-        "name": "GPT-5 (Full)",
+        "name": "gpt-4o",  # Use gpt-4o as fallback for gpt-5
         "description": "Most powerful model, best for complex reasoning and analysis",
         "use_cases": [
             "Complex repository analysis",
@@ -19,7 +19,7 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-mini": {
-        "name": "GPT-5 Mini",
+        "name": "gpt-4o-mini",  # Use gpt-4o-mini as fallback for gpt-5-mini
         "description": "Balanced performance and cost, good for most tasks",
         "use_cases": [
             "Standard micro-lessons",
@@ -32,7 +32,7 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-nano": {
-        "name": "GPT-5 Nano", 
+        "name": "gpt-3.5-turbo",  # Use gpt-3.5-turbo as fallback for gpt-5-nano
         "description": "Fastest and most cost-effective, good for simple tasks",
         "use_cases": [
             "Quick responses",
@@ -87,26 +87,49 @@ def get_gpt5_parameters(model: str, task_type: str = None) -> dict:
     # Task-specific optimizations
     if task_type == "repository_analysis":
         return {
-            **base_params,
+            "model": base_params.get("name", model),  # Use model name instead of 'name'
             "temperature": 0.3,  # More focused for analysis
             "max_tokens": 4096,  # Allow longer responses
-            "reasoning_effort": "high"  # New GPT-5 parameter
+            # Remove reasoning_effort as it may not be supported
         }
     elif task_type == "creative_generation":
         return {
-            **base_params,
+            "model": base_params.get("name", model),
             "temperature": 0.9,  # More creative
             "max_tokens": 2048
         }
     elif task_type == "coaching":
         return {
-            **base_params,
+            "model": base_params.get("name", model),
             "temperature": 0.7,  # Balanced for conversation
-            "max_tokens": 2048,
-            "verbosity": "detailed"  # New GPT-5 parameter
+            "max_tokens": 2048
+            # Remove verbosity as it may not be supported
+        }
+    elif task_type == "documentation":
+        return {
+            "model": base_params.get("name", model),
+            "temperature": 0.4,  # Balanced for documentation
+            "max_tokens": 2048
+        }
+    elif task_type == "classification":
+        return {
+            "model": base_params.get("name", model),
+            "temperature": 0.2,  # Low temperature for consistent classification
+            "max_tokens": 1024
+        }
+    elif task_type == "quiz_generation":
+        return {
+            "model": base_params.get("name", model),
+            "temperature": 0.6,  # Balanced for quiz generation
+            "max_tokens": 1024
         }
     else:
-        return base_params
+        # Default parameters
+        return {
+            "model": base_params.get("name", model),
+            "temperature": base_params.get("temperature", 0.7),
+            "max_tokens": base_params.get("max_tokens", 2048)
+        }
 
 # Migration Helper
 def migrate_from_gpt4_to_gpt5():

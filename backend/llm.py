@@ -35,6 +35,9 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
         
+        # Extract model from params and remove it to avoid conflict
+        model_to_use = params.pop("model", model)
+        
         # Override max_tokens if provided
         if max_tokens:
             params["max_tokens"] = max_tokens
@@ -43,13 +46,13 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         
         if messages:
             response = client.chat.completions.create(
-                model=model,
+                model=model_to_use,
                 messages=messages,
                 **params
             )
         else:
             response = client.chat.completions.create(
-                model=model,
+                model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 **params
             )
@@ -90,6 +93,9 @@ Would you like to know more about any specific feature?"""
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
         
+        # Extract model from params and remove it to avoid conflict
+        model_to_use = params.pop("model", model)
+        
         # Override max_tokens if provided
         if max_tokens:
             params["max_tokens"] = max_tokens
@@ -98,14 +104,14 @@ Would you like to know more about any specific feature?"""
         
         if messages:
             response = client.chat.completions.create(
-                model=model,
+                model=model_to_use,
                 messages=messages,
                 stream=True,
                 **params
             )
         else:
             response = client.chat.completions.create(
-                model=model,
+                model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 stream=True,
                 **params
