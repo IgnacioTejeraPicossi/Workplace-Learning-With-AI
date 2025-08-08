@@ -34,6 +34,14 @@ graph TB
     GlobalSearch[🔍 Global Search]
   end
   
+  %% Testing Framework
+  subgraph "🧪 Testing Framework"
+    Cypress[Cypress E2E Tests]
+    ManualTests[Manual Tests]
+    APITests[API Tests]
+    TestResults[Test Results]
+  end
+  
   %% Backend Services
   subgraph "⚙️ Backend Services"
     FastAPI[FastAPI Server]
@@ -81,6 +89,15 @@ graph TB
   PresentationAgent --> FastAPI
   AIStudyBuddy --> FastAPI
   
+  %% Testing Connections
+  RunTest --> Cypress
+  RunTest --> ManualTests
+  RunTest --> APITests
+  Cypress --> TestResults
+  ManualTests --> TestResults
+  APITests --> TestResults
+  APITests --> FastAPI
+  
   %% AI & Database
   FastAPI --> LLM
   FastAPI --> MongoDB
@@ -97,12 +114,14 @@ graph TB
   classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
   classDef external fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#ffffff,font-size:14px;
   classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#ffffff,font-size:14px;
   
   class User user;
   class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
   class FastAPI,LLM,WebSearchAPI backend;
   class CursorAI,GitHub external;
   class MongoDB,Firebase database;
+  class Cypress,ManualTests,APITests,TestResults testing;
 ```
 
 # 🤖 AI-Powered Workplace Learning Platform
