@@ -1,3 +1,49 @@
+# 🤖 AI-Powered Workplace Learning Platform
+
+> **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**
+
+## 🧭 Quick Navigation
+
+**💡 Tip:** Since GitHub doesn't support Mermaid click events, use these direct links to navigate to specific sections:
+
+### 🎯 Core Learning Modules
+- [Dashboard](#dashboard) - Progress tracking and analytics
+- [AI Concepts](#ai-concepts) - AI-powered learning content
+- [Micro Lessons](#micro-lessons) - Bite-sized learning modules
+- [Recommendations](#recommendations) - Personalized suggestions
+- [Scenario Simulator](#scenario-simulator) - Interactive simulations
+- [Web Search](#web-search) - Real-time information retrieval
+- [AI Career Coach](#ai-career-coach) - Personalized career guidance
+- [Skills Forecast](#skills-forecast) - Future skill predictions
+- [Certifications](#certifications) - Professional development
+- [Video Lessons](#video-lessons) - Multimedia learning
+
+### 🚀 Advanced Features
+- [Knowledge Map](#knowledge-map) - Interactive learning visualization
+- [Agent Cursor AI](#agent-cursor-ai) - Repository analysis and documentation
+- [Repository Analyzer](#repository-analyzer) - Code analysis and learning modules
+- [Presentation Agent](#presentation-agent) - AI-generated presentations
+- [AI Study Buddy](#ai-study-buddy) - Conversational learning support
+
+### 🛠️ Admin & Development
+- [Run Test](#run-test) - Comprehensive testing suite
+- [Idea Log](#idea-log) - Feature tracking and suggestions
+- [Feature Roadmap](#feature-roadmap) - Development planning
+- [Global Search](#global-search) - Cross-module search functionality
+
+### ⚙️ Backend Services
+- [FastAPI Server](#fastapi-server) - High-performance API server
+- [OpenAI GPT-5](#openai-gpt5) - Advanced AI integration
+- [MongoDB](#mongodb) - Flexible document storage
+- [Firebase Auth](#firebase-auth) - Secure authentication
+- [Web Search API](#web-search-api) - Real-time data retrieval
+
+---
+
+## 🏗️ System Architecture
+
+*The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
+
 ```mermaid
 graph TB
   %% Main User Interface
@@ -108,35 +154,8 @@ graph TB
   AgentCursorAI --> CursorAI[Cursor AI Local]
   RepoAnalyzer --> GitHub[GitHub/GitLab]
   
-  %% Click Events for Navigation
-  click Dashboard "#dashboard" "Go to Dashboard section"
-  click Concepts "#ai-concepts" "Go to AI Concepts section"
-  click MicroLesson "#micro-lessons" "Go to Micro Lessons section"
-  click Recommendation "#recommendations" "Go to Recommendations section"
-  click Simulator "#scenario-simulator" "Go to Scenario Simulator section"
-  click WebSearch "#web-search" "Go to Web Search section"
-  click CareerCoach "#ai-career-coach" "Go to AI Career Coach section"
-  click SkillsForecast "#skills-forecast" "Go to Skills Forecast section"
-  click Certifications "#certifications" "Go to Certifications section"
-  click VideoLesson "#video-lessons" "Go to Video Lessons section"
-  click KnowledgeMap "#knowledge-map" "Go to Knowledge Map section"
-  click AgentCursorAI "#agent-cursor-ai" "Go to Agent Cursor AI section"
-  click RepoAnalyzer "#repository-analyzer" "Go to Repository Analyzer section"
-  click PresentationAgent "#presentation-agent" "Go to Presentation Agent section"
-  click AIStudyBuddy "#ai-study-buddy" "Go to AI Study Buddy section"
-  click RunTest "#run-test" "Go to Run Test section"
-  click IdeaLog "#idea-log" "Go to Idea Log section"
-  click FeatureRoadmap "#feature-roadmap" "Go to Feature Roadmap section"
-  click GlobalSearch "#global-search" "Go to Global Search section"
-  click Cypress "#cypress-tests" "Go to Cypress Tests section"
-  click ManualTests "#manual-tests" "Go to Manual Tests section"
-  click APITests "#api-tests" "Go to API Tests section"
-  click TestResults "#test-results" "Go to Test Results section"
-  click FastAPI "#fastapi-server" "Go to FastAPI Server section"
-  click LLM "#openai-gpt5" "Go to OpenAI GPT-5 section"
-  click MongoDB "#mongodb" "Go to MongoDB section"
-  click Firebase "#firebase-auth" "Go to Firebase Auth section"
-  click WebSearchAPI "#web-search-api" "Go to Web Search API section"
+  %% Note: Click events are not supported in GitHub README
+  %% Use the navigation links above to explore specific sections
   
   %% Styling
   classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#2d3436,font-size:16px;
@@ -157,6 +176,48 @@ graph TB
 # 🤖 AI-Powered Workplace Learning Platform
 
 > **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**
+
+## 🧭 Quick Navigation
+
+**💡 Tip:** Since GitHub doesn't support Mermaid click events, use these direct links to navigate to specific sections:
+
+### 🎯 Core Learning Modules
+- [Dashboard](#dashboard) - Progress tracking and analytics
+- [AI Concepts](#ai-concepts) - AI-powered learning content
+- [Micro Lessons](#micro-lessons) - Bite-sized learning modules
+- [Recommendations](#recommendations) - Personalized suggestions
+- [Scenario Simulator](#scenario-simulator) - Interactive simulations
+- [Web Search](#web-search) - Real-time information retrieval
+- [AI Career Coach](#ai-career-coach) - Personalized career guidance
+- [Skills Forecast](#skills-forecast) - Future skill predictions
+- [Certifications](#certifications) - Professional development
+- [Video Lessons](#video-lessons) - Multimedia learning
+
+### 🚀 Advanced Features
+- [Knowledge Map](#knowledge-map) - Interactive learning visualization
+- [Agent Cursor AI](#agent-cursor-ai) - Repository analysis and documentation
+- [Repository Analyzer](#repository-analyzer) - Code analysis and learning modules
+- [Presentation Agent](#presentation-agent) - AI-generated presentations
+- [AI Study Buddy](#ai-study-buddy) - Conversational learning support
+
+### 🛠️ Admin & Development
+- [Run Test](#run-test) - Comprehensive testing suite
+- [Idea Log](#idea-log) - Feature tracking and suggestions
+- [Feature Roadmap](#feature-roadmap) - Development planning
+- [Global Search](#global-search) - Cross-module search functionality
+
+### ⚙️ Backend Services
+- [FastAPI Server](#fastapi-server) - High-performance API server
+- [OpenAI GPT-5](#openai-gpt5) - Advanced AI integration
+- [MongoDB](#mongodb) - Flexible document storage
+- [Firebase Auth](#firebase-auth) - Secure authentication
+- [Web Search API](#web-search-api) - Real-time data retrieval
+
+---
+
+## 🏗️ System Architecture
+
+*The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
 
 ## 🎯 Project Overview {#project-overview}
 
