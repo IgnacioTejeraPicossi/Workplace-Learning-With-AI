@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateVideoQuiz, generateVideoSummary, askStream, saveVideo } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
@@ -20,11 +20,92 @@ function VideoLesson({ user }) {
   const [transcript, setTranscript] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [extractingTitle, setExtractingTitle] = useState(false);
   const { colors } = useTheme();
 
   // Use streaming hooks for different operations
   const summaryStreaming = useStreaming('Ready to generate summary');
   const quizStreaming = useStreaming('Ready to generate quiz');
+
+  // Extract video ID from YouTube URL
+  const extractVideoId = (url) => {
+    if (!url) return null;
+    
+    if (url.includes('youtube.com/watch?v=')) {
+      return url.split('v=')[1]?.split('&')[0];
+    }
+    
+    if (url.includes('youtu.be/')) {
+      return url.split('youtu.be/')[1]?.split('?')[0];
+    }
+    
+    if (url.includes('/embed/')) {
+      return url.split('/embed/')[1]?.split('?')[0];
+    }
+    
+    return null;
+  };
+
+  // Extract title from YouTube using oEmbed API
+  const extractYouTubeTitle = async (videoId) => {
+    if (!videoId) return;
+    
+    setExtractingTitle(true);
+    try {
+      const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.title) {
+          setVideoTitle(data.title);
+          // Auto-suggest topic based on title
+          const suggestedTopic = suggestTopicFromTitle(data.title);
+          if (suggestedTopic) {
+            setVideoTopic(suggestedTopic);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Could not extract title automatically:', error);
+      // Fallback: try to extract from URL parameters
+      try {
+        const url = new URL(`https://www.youtube.com/watch?v=${videoId}`);
+        const titleParam = url.searchParams.get('title');
+        if (titleParam) {
+          setVideoTitle(decodeURIComponent(titleParam));
+        }
+      } catch (urlError) {
+        console.log('URL parsing failed:', urlError);
+      }
+    } finally {
+      setExtractingTitle(false);
+    }
+  };
+
+  // Suggest topic based on video title
+  const suggestTopicFromTitle = (title) => {
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('programming') || titleLower.includes('coding') || titleLower.includes('python') || titleLower.includes('javascript')) {
+      return 'Programming';
+    }
+    if (titleLower.includes('ai') || titleLower.includes('artificial intelligence') || titleLower.includes('machine learning')) {
+      return 'AI & Machine Learning';
+    }
+    if (titleLower.includes('leadership') || titleLower.includes('management') || titleLower.includes('business')) {
+      return 'Leadership & Business';
+    }
+    if (titleLower.includes('design') || titleLower.includes('ui') || titleLower.includes('ux')) {
+      return 'Design & UX';
+    }
+    if (titleLower.includes('data') || titleLower.includes('analytics') || titleLower.includes('statistics')) {
+      return 'Data & Analytics';
+    }
+    if (titleLower.includes('marketing') || titleLower.includes('social media') || titleLower.includes('branding')) {
+      return 'Marketing';
+    }
+    
+    return '';
+  };
 
   // Convert YouTube URL to embed format
   const convertToEmbedUrl = (url) => {
@@ -51,8 +132,8 @@ function VideoLesson({ user }) {
     return url; // Return original if can't convert
   };
 
-  // Handle URL input change with auto-conversion
-  const handleUrlChange = (e) => {
+  // Handle URL input change with auto-conversion and title extraction
+  const handleUrlChange = async (e) => {
     const url = e.target.value;
     setVideoUrl(url);
     
@@ -61,6 +142,24 @@ function VideoLesson({ user }) {
       const embedUrl = convertToEmbedUrl(url);
       if (embedUrl !== url) {
         setVideoUrl(embedUrl);
+      }
+      
+      // Extract title automatically
+      const videoId = extractVideoId(url);
+      if (videoId) {
+        await extractYouTubeTitle(videoId);
+      }
+    }
+  };
+
+  // Handle URL paste (for better title extraction)
+  const handleUrlPaste = async (e) => {
+    const pastedText = e.clipboardData.getData('text');
+    if (pastedText && (pastedText.includes('youtube.com/watch') || pastedText.includes('youtu.be/'))) {
+      // Extract title immediately when pasting
+      const videoId = extractVideoId(pastedText);
+      if (videoId) {
+        await extractYouTubeTitle(videoId);
       }
     }
   };
@@ -136,11 +235,24 @@ function VideoLesson({ user }) {
     }
 
     summaryStreaming.startStreaming(
-      `Summarize this video transcript into 5 key points for learning purposes: ${transcript}`,
+      `Generating summary from transcript...`,
       {
         statusMessages: STATUS_MESSAGES.VIDEO_ANALYSIS,
-        onComplete: (output) => {
-          setSummary(output);
+        onComplete: async (output) => {
+          try {
+            // Use the backend API instead of local streaming
+            const response = await generateVideoSummary({ transcript: transcript.trim() });
+            if (response.summary) {
+              setSummary(response.summary);
+            } else {
+              throw new Error('Invalid summary response');
+            }
+          } catch (error) {
+            console.error('Summary generation error:', error);
+            alert('Failed to generate summary. Please try again.');
+            // Fallback to local content if backend fails
+            setSummary(output);
+          }
         }
       }
     );
@@ -202,7 +314,7 @@ function VideoLesson({ user }) {
       }}>
         <h4 style={{ marginBottom: 8 }}>💡 How to Use Video Lessons</h4>
         <ol style={{ marginLeft: 20, marginBottom: 0 }}>
-          <li><strong>Paste a YouTube URL</strong> - It will automatically convert to embed format</li>
+          <li><strong>Paste a YouTube URL</strong> - It will automatically convert to embed format and extract title</li>
           <li><strong>Fill in video details</strong> - Title, topic, and description (required)</li>
           <li><strong>Save the video</strong> - Add it to your personal video library</li>
           <li><strong>Paste transcript</strong> - Generate AI-powered summaries and quizzes</li>
@@ -220,6 +332,7 @@ function VideoLesson({ user }) {
             type="text"
             value={videoUrl}
             onChange={handleUrlChange}
+            onPaste={handleUrlPaste}
             placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
             style={{ 
               flex: 1, 
@@ -245,8 +358,13 @@ function VideoLesson({ user }) {
           </button>
         </div>
         <small style={{ color: colors.textSecondary }}>
-          Paste a YouTube URL (auto-converts to embed) or direct MP4 link. *Required
+          Paste a YouTube URL (auto-converts to embed and extracts title) or direct MP4 link. *Required
         </small>
+        {extractingTitle && (
+          <div style={{ marginTop: 8, color: '#2196f3', fontSize: '14px' }}>
+            🔍 Extracting video title...
+          </div>
+        )}
       </div>
 
       {/* Video Save Form */}
@@ -257,19 +375,20 @@ function VideoLesson({ user }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Video Title: *
+                Video Title: * {extractingTitle && '⏳'}
               </label>
               <input
                 type="text"
                 value={videoTitle}
                 onChange={(e) => setVideoTitle(e.target.value)}
-                placeholder="Enter a descriptive title for this video"
+                placeholder={extractingTitle ? "Extracting title..." : "Enter a descriptive title for this video"}
+                disabled={extractingTitle}
                 style={{ 
                   width: '100%', 
                   padding: 8, 
                   borderRadius: 4, 
                   border: `1px solid ${colors.border}`,
-                  background: colors.background,
+                  background: extractingTitle ? '#f5f5f5' : colors.background,
                   color: colors.text
                 }}
               />
@@ -277,7 +396,7 @@ function VideoLesson({ user }) {
             
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Topic/Category:
+                Topic/Category: *
               </label>
               <input
                 type="text"
@@ -318,19 +437,19 @@ function VideoLesson({ user }) {
             
             <button 
               onClick={handleSaveVideo}
-              disabled={saving || !videoTitle.trim() || !videoTopic.trim()}
+              disabled={saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle}
               style={{ 
                 padding: '10px 20px', 
                 borderRadius: 6, 
                 border: 'none',
                 background: colors.primary,
                 color: '#fff',
-                cursor: saving || !videoTitle.trim() || !videoTopic.trim() ? 'not-allowed' : 'pointer',
-                opacity: saving || !videoTitle.trim() || !videoTopic.trim() ? 0.6 : 1,
+                cursor: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? 'not-allowed' : 'pointer',
+                opacity: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? 0.6 : 1,
                 alignSelf: 'flex-start'
               }}
             >
-              {saving ? '⏳ Saving...' : '💾 Save Video'}
+              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Wait for title...' : '💾 Save Video'}
             </button>
           </div>
         </div>
