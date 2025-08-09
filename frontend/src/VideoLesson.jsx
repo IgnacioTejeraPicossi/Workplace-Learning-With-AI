@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateVideoQuiz, generateVideoSummary, askStream } from './api';
+import { generateVideoQuiz, generateVideoSummary, askStream, saveVideo } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
 import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
@@ -11,15 +11,96 @@ const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, in
 
 function VideoLesson({ user }) {
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
+  const [videoDescription, setVideoDescription] = useState('');
+  const [videoTopic, setVideoTopic] = useState('');
   const [summary, setSummary] = useState('');
   const [quiz, setQuiz] = useState([]);
   const [userAnswers, setUserAnswers] = useState({});
   const [transcript, setTranscript] = useState('');
+  const [showSaveForm, setShowSaveForm] = useState(false);
+  const [saving, setSaving] = useState(false);
   const { colors } = useTheme();
 
   // Use streaming hooks for different operations
   const summaryStreaming = useStreaming('Ready to generate summary');
   const quizStreaming = useStreaming('Ready to generate quiz');
+
+  // Convert YouTube URL to embed format
+  const convertToEmbedUrl = (url) => {
+    if (!url) return '';
+    
+    // If already embed format, return as is
+    if (url.includes('/embed/')) return url;
+    
+    // Convert watch URLs to embed
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // Convert youtu.be URLs to embed
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // If it's an MP4 or other direct link, return as is
+    if (url.match(/\.(mp4|webm|ogg)$/i)) return url;
+    
+    return url; // Return original if can't convert
+  };
+
+  // Handle URL input change with auto-conversion
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setVideoUrl(url);
+    
+    // Auto-convert and update the URL field
+    if (url && (url.includes('youtube.com/watch') || url.includes('youtu.be/'))) {
+      const embedUrl = convertToEmbedUrl(url);
+      if (embedUrl !== url) {
+        setVideoUrl(embedUrl);
+      }
+    }
+  };
+
+  // Save video to database
+  const handleSaveVideo = async () => {
+    if (!videoUrl.trim() || !videoTitle.trim() || !videoTopic.trim()) {
+      alert('Please fill in all required fields: URL, Title, and Topic');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const videoData = {
+        title: videoTitle.trim(),
+        description: videoDescription.trim() || 'No description provided',
+        topic: videoTopic.trim(),
+        url: videoUrl.trim(),
+        duration: 'Unknown', // Could be enhanced with YouTube API
+        saved_at: new Date().toISOString()
+      };
+
+      await saveVideo(videoData);
+      
+      // Reset form
+      setVideoTitle('');
+      setVideoDescription('');
+      setVideoTopic('');
+      setShowSaveForm(false);
+      
+      // Show success message
+      alert('Video saved successfully! You can find it in the Saved Videos section below.');
+      
+    } catch (error) {
+      console.error('Error saving video:', error);
+      alert('Failed to save video. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleGenerateQuiz = async () => {
     if (!summary.trim()) {
@@ -74,6 +155,9 @@ function VideoLesson({ user }) {
 
   const handlePasteExample = () => {
     setVideoUrl(EXAMPLE_VIDEO);
+    setVideoTitle('Agile Scrum Basics - Example Video');
+    setVideoDescription('Learn the fundamentals of Agile methodology and Scrum framework for effective project management.');
+    setVideoTopic('Agile');
     setSummary(EXAMPLE_SUMMARY);
     setQuiz([]);
     setUserAnswers({});
@@ -83,10 +167,14 @@ function VideoLesson({ user }) {
 
   const handleClear = () => {
     setVideoUrl('');
+    setVideoTitle('');
+    setVideoDescription('');
+    setVideoTopic('');
     setSummary('');
     setQuiz([]);
     setUserAnswers({});
     setTranscript('');
+    setShowSaveForm(false);
     summaryStreaming.clearStreaming();
     quizStreaming.clearStreaming();
   };
@@ -96,21 +184,43 @@ function VideoLesson({ user }) {
   const score = quiz.length > 0 ? Math.round((correctCount / quiz.length) * 100) : 0;
   const showBadge = score >= 80 && quiz.length > 0;
 
+  // Check if URL is valid for display
+  const isValidVideoUrl = videoUrl && (videoUrl.includes('/embed/') || videoUrl.match(/\.(mp4|webm|ogg)$/i));
+
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
       <h2 style={{ marginBottom: 16, color: colors.text }}>🎥 Video-Based Learning</h2>
       
+      {/* Info Box */}
+      <div style={{ 
+        marginBottom: 24, 
+        padding: 16, 
+        background: '#e3f2fd', 
+        borderRadius: 8, 
+        border: '1px solid #2196f3',
+        color: '#1565c0'
+      }}>
+        <h4 style={{ marginBottom: 8 }}>💡 How to Use Video Lessons</h4>
+        <ol style={{ marginLeft: 20, marginBottom: 0 }}>
+          <li><strong>Paste a YouTube URL</strong> - It will automatically convert to embed format</li>
+          <li><strong>Fill in video details</strong> - Title, topic, and description (required)</li>
+          <li><strong>Save the video</strong> - Add it to your personal video library</li>
+          <li><strong>Paste transcript</strong> - Generate AI-powered summaries and quizzes</li>
+          <li><strong>Learn & test</strong> - Take quizzes and track your progress</li>
+        </ol>
+      </div>
+      
       {/* Video URL Input */}
       <div style={{ marginBottom: 20 }}>
         <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
-          Video URL:
+          Video URL: *
         </label>
         <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
           <input
             type="text"
             value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            placeholder="https://www.youtube.com/embed/..."
+            onChange={handleUrlChange}
+            placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
             style={{ 
               flex: 1, 
               padding: 12, 
@@ -135,23 +245,173 @@ function VideoLesson({ user }) {
           </button>
         </div>
         <small style={{ color: colors.textSecondary }}>
-          Paste a YouTube embed URL or direct MP4 link
+          Paste a YouTube URL (auto-converts to embed) or direct MP4 link. *Required
         </small>
       </div>
 
-      {/* Video Player */}
+      {/* Video Save Form */}
       {videoUrl && (
+        <div style={{ marginBottom: 20, padding: 16, background: colors.cardBackground, borderRadius: 8, border: `1px solid ${colors.border}` }}>
+          <h3 style={{ marginBottom: 16, color: colors.text }}>💾 Save Video Information</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
+                Video Title: *
+              </label>
+              <input
+                type="text"
+                value={videoTitle}
+                onChange={(e) => setVideoTitle(e.target.value)}
+                placeholder="Enter a descriptive title for this video"
+                style={{ 
+                  width: '100%', 
+                  padding: 8, 
+                  borderRadius: 4, 
+                  border: `1px solid ${colors.border}`,
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
+                Topic/Category:
+              </label>
+              <input
+                type="text"
+                value={videoTopic}
+                onChange={(e) => setVideoTopic(e.target.value)}
+                placeholder="e.g., Programming, Leadership, Design"
+                style={{ 
+                  width: '100%', 
+                  padding: 8, 
+                  borderRadius: 4, 
+                  border: `1px solid ${colors.border}`,
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
+                Description:
+              </label>
+              <textarea
+                rows={3}
+                value={videoDescription}
+                onChange={(e) => setVideoDescription(e.target.value)}
+                placeholder="Brief description of what this video covers..."
+                style={{ 
+                  width: '100%', 
+                  padding: 8, 
+                  borderRadius: 4, 
+                  border: `1px solid ${colors.border}`,
+                  background: colors.background,
+                  color: colors.text,
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+            
+            <button 
+              onClick={handleSaveVideo}
+              disabled={saving || !videoTitle.trim() || !videoTopic.trim()}
+              style={{ 
+                padding: '10px 20px', 
+                borderRadius: 6, 
+                border: 'none',
+                background: colors.primary,
+                color: '#fff',
+                cursor: saving || !videoTitle.trim() || !videoTopic.trim() ? 'not-allowed' : 'pointer',
+                opacity: saving || !videoTitle.trim() || !videoTopic.trim() ? 0.6 : 1,
+                alignSelf: 'flex-start'
+              }}
+            >
+              {saving ? '⏳ Saving...' : '💾 Save Video'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Video Player */}
+      {isValidVideoUrl && (
         <div style={{ marginBottom: 20 }}>
-          <iframe
-            width="100%"
-            height="315"
-            src={videoUrl}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            title="Video"
-            style={{ borderRadius: 8 }}
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ margin: 0, color: colors.text }}>🎬 Video Player</h3>
+            {videoUrl.includes('/embed/') && (
+              <button
+                onClick={() => window.open(videoUrl.replace('/embed/', '/watch?v='), '_blank')}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 6,
+                  border: `1px solid ${colors.border}`,
+                  background: colors.cardBackground,
+                  color: colors.text,
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                🔗 Open in New Tab
+              </button>
+            )}
+          </div>
+          {videoUrl.includes('/embed/') ? (
+            <iframe
+              width="100%"
+              height="315"
+              src={videoUrl}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title="Video"
+              style={{ borderRadius: 8 }}
+            />
+          ) : (
+            <video
+              width="100%"
+              height="315"
+              controls
+              style={{ borderRadius: 8 }}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              <source src={videoUrl} type="video/webm" />
+              <source src={videoUrl} type="video/ogg" />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
+      )}
+
+      {/* Security Notice for YouTube */}
+      {videoUrl && videoUrl.includes('youtube.com') && !isValidVideoUrl && (
+        <div style={{ 
+          marginBottom: 20, 
+          padding: 16, 
+          background: '#fff3cd', 
+          borderRadius: 8, 
+          border: '1px solid #ffeaa7',
+          color: '#856404'
+        }}>
+          <h4 style={{ marginBottom: 8 }}>⚠️ Browser Security Notice</h4>
+          <p style={{ marginBottom: 8 }}>
+            Some browsers may block YouTube videos for security reasons. If the video doesn't load:
+          </p>
+          <ul style={{ marginLeft: 20, marginBottom: 8 }}>
+            <li>Try opening the video in a new tab</li>
+            <li>Check your browser's security settings</li>
+            <li>Use the transcript feature below for learning</li>
+          </ul>
+          <a 
+            href={videoUrl.replace('/embed/', '/watch?v=')} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ color: '#007bff', textDecoration: 'underline' }}
+          >
+            Open video in new tab →
+          </a>
         </div>
       )}
 
