@@ -1496,6 +1496,99 @@ async def get_learning_recommendations(user_id: str):
             "error": "Failed to generate advanced recommendations"
         }
 
+# Learning Module Creation from Repository Analysis
+class LearningModuleRequest(BaseModel):
+    title: str
+    description: str
+    content: str
+    analysis_data: dict
+    type: str = "repository_analysis"
+    created_at: Optional[str] = None
+
+@app.post("/api/create-learning-module")
+async def create_learning_module(request: LearningModuleRequest):
+    try:
+        # Generate a unique ID for the learning module
+        module_id = str(uuid.uuid4())
+        
+        # Prepare the learning module data
+        learning_module = {
+            "_id": module_id,
+            "title": request.title,
+            "description": request.description,
+            "content": request.content,
+            "analysis_data": request.analysis_data,
+            "type": request.type,
+            "created_at": request.created_at or datetime.now().isoformat(),
+            "status": "active",
+            "difficulty": "intermediate",
+            "estimated_duration": "30-45 minutes",
+            "topics": ["repository_analysis", "documentation", "code_review"],
+            "prerequisites": [],
+            "learning_objectives": [
+                "Understand the repository structure",
+                "Learn from the generated documentation",
+                "Apply best practices identified in the analysis"
+            ]
+        }
+        
+        # Save to database (using lessons_collection for now)
+        result = await lessons_collection.insert_one(learning_module)
+        
+        # Check if the insert was successful
+        if result and hasattr(result, 'inserted_id') and result.inserted_id:
+            return {
+                "success": True,
+                "message": "Learning module created successfully",
+                "module_id": module_id,
+                "module": learning_module
+            }
+        else:
+            return {"success": False, "message": "Failed to create learning module"}
+            
+    except Exception as e:
+        print(f"Error creating learning module: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
+@app.get("/api/learning-modules")
+async def get_learning_modules():
+    try:
+        # Get all learning modules from the database
+        modules = list(lessons_collection.find({"type": "repository_analysis"}))
+        
+        # Convert ObjectId to string for JSON serialization
+        for module in modules:
+            if "_id" in module:
+                module["_id"] = str(module["_id"])
+        
+        return {
+            "success": True,
+            "modules": modules,
+            "total": len(modules)
+        }
+        
+    except Exception as e:
+        print(f"Error fetching learning modules: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
+@app.get("/api/learning-modules/{module_id}")
+async def get_learning_module(module_id: str):
+    try:
+        # Get specific learning module by ID
+        module = lessons_collection.find_one({"_id": module_id})
+        
+        if module:
+            # Convert ObjectId to string for JSON serialization
+            if "_id" in module:
+                module["_id"] = str(module["_id"])
+            return {"success": True, "module": module}
+        else:
+            return {"success": False, "message": "Learning module not found"}
+            
+    except Exception as e:
+        print(f"Error fetching learning module: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
 def calculate_user_learning_vector(mastery_scores, all_topics):
     """Calculate user's learning vector based on mastered topics"""
     user_vector = [0.0] * 10  # Assuming 10-dimensional embeddings

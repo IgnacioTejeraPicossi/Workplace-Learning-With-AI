@@ -180,6 +180,107 @@ export default function RepoAnalyzerWithAPIs() {
     }
   };
 
+  // Handle Save Analysis
+  const handleSaveAnalysis = async () => {
+    if (!analysisResult) {
+      setError('No analysis result to save');
+      return;
+    }
+
+    try {
+      setSuccess('Saving analysis...');
+      const response = await axios.post('/api/save-analysis', {
+        analysis: analysisResult,
+        repo_url: repoUrl,
+        timestamp: new Date().toISOString()
+      });
+      
+      setSuccess('Analysis saved successfully!');
+      console.log('Analysis saved:', response.data);
+    } catch (error) {
+      setError('Failed to save analysis');
+      console.error('Save analysis error:', error);
+    }
+  };
+
+  // Handle Download README
+  const handleDownloadREADME = () => {
+    if (!analysisResult?.documentation?.readme) {
+      setError('No README content to download');
+      return;
+    }
+
+    try {
+      const content = analysisResult.documentation.readme;
+      const blob = new Blob([content], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'README.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setSuccess('README.md downloaded successfully!');
+    } catch (error) {
+      setError('Failed to download README');
+      console.error('Download error:', error);
+    }
+  };
+
+  // Handle Create Learning Module
+  const handleCreateLearningModule = async () => {
+    if (!analysisResult) {
+      setError('No analysis result to create learning module from');
+      return;
+    }
+
+    try {
+      setSuccess('Creating learning module...');
+      console.log('Creating learning module with data:', analysisResult);
+      
+      // Create learning module data with proper fallbacks
+      const learningModuleData = {
+        title: `Learning Module: ${analysisResult.repo_name || analysisResult.repository_name || 'Repository Analysis'}`,
+        description: `Comprehensive learning module based on analysis of ${repoUrl || 'repository'}`,
+        content: analysisResult.documentation?.readme || analysisResult.readme || 'No content available',
+        analysis_data: analysisResult,
+        created_at: new Date().toISOString(),
+        type: 'repository_analysis'
+      };
+
+      console.log('Sending learning module data:', learningModuleData);
+      
+      // Save to backend
+      const response = await axios.post('/api/create-learning-module', learningModuleData);
+      
+      if (response.data.success) {
+        setSuccess('Learning module created successfully! Check AI Training Module section.');
+        console.log('Learning module created:', response.data);
+      } else {
+        setError(`Failed to create learning module: ${response.data.message}`);
+        console.error('Backend error:', response.data);
+      }
+      
+      // Optionally redirect to learning module
+      // window.location.href = '/ai-training-module';
+      
+    } catch (error) {
+      console.error('Create learning module error:', error);
+      if (error.response) {
+        setError(`Failed to create learning module: ${error.response.data.message || error.response.statusText}`);
+        console.error('Backend response error:', error.response.data);
+      } else if (error.request) {
+        setError('Failed to create learning module: No response from server');
+        console.error('Network error:', error.request);
+      } else {
+        setError(`Failed to create learning module: ${error.message}`);
+        console.error('Other error:', error.message);
+      }
+    }
+  };
+
   const generateReadmePreview = (documentation) => {
     if (!documentation || !documentation.readme) {
       return "No README documentation available.";
@@ -708,15 +809,15 @@ export default function RepoAnalyzerWithAPIs() {
 
           {/* Documentation Actions */}
           <div className="documentation-actions">
-            <button className="doc-action-btn">
+            <button className="doc-action-btn" onClick={handleSaveAnalysis}>
               <span className="action-icon">💾</span>
               Save Analysis
             </button>
-            <button className="doc-action-btn">
+            <button className="doc-action-btn" onClick={handleDownloadREADME}>
               <span className="action-icon">📥</span>
               Download README
             </button>
-            <button className="doc-action-btn">
+            <button className="doc-action-btn" onClick={handleCreateLearningModule}>
               <span className="action-icon">🎓</span>
               Create Learning Module
             </button>

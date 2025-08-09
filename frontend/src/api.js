@@ -207,6 +207,23 @@ export async function generateVideoSummary(transcript) {
   return apiCall('/video-summary', 'POST', { transcript });
 }
 
+// Function for video summary without authentication (backend endpoint doesn't require it)
+export async function generateVideoSummaryNoAuth(transcript) {
+  const response = await fetch(`${API_BASE}/video-summary`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ transcript })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
 export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {
   const response = await fetch("http://127.0.0.1:8000/llm-stream", {
     method: "POST",

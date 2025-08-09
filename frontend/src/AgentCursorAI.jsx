@@ -167,6 +167,54 @@ export default function AgentCursorAI() {
     );
   };
 
+  const handleCreateLearningModule = async () => {
+    if (!analysisResult) {
+      setError('No analysis result to create learning module from');
+      return;
+    }
+
+    try {
+      setSuccess('Creating learning module...');
+      console.log('Creating learning module with data:', analysisResult);
+      
+      // Create learning module data with proper fallbacks
+      const learningModuleData = {
+        title: `Learning Module: ${analysisResult.repo_name || 'Repository Analysis'}`,
+        description: `Comprehensive learning module based on Cursor AI analysis of ${repoUrl || 'repository'}`,
+        content: readmeContent || 'No content available',
+        analysis_data: analysisResult,
+        created_at: new Date().toISOString(),
+        type: 'cursor_ai_analysis'
+      };
+
+      console.log('Sending learning module data:', learningModuleData);
+      
+      // Save to backend
+      const response = await axios.post('/api/create-learning-module', learningModuleData);
+      
+      if (response.data.success) {
+        setSuccess('Learning module created successfully! Check AI Training Module section.');
+        console.log('Learning module created:', response.data);
+      } else {
+        setError(`Failed to create learning module: ${response.data.message}`);
+        console.error('Backend error:', response.data);
+      }
+      
+    } catch (error) {
+      console.error('Create learning module error:', error);
+      if (error.response) {
+        setError(`Failed to create learning module: ${error.response.data.message || error.response.statusText}`);
+        console.error('Backend response error:', error.response.data);
+      } else if (error.request) {
+        setError('Failed to create learning module: No response from server');
+        console.error('Network error:', error.request);
+      } else {
+        setError(`Failed to create learning module: ${error.message}`);
+        console.error('Other error:', error.message);
+      }
+    }
+  };
+
   return (
     <div className="agent-cursor-ai">
       <h1>Agent Cursor AI</h1>
@@ -320,7 +368,7 @@ export default function AgentCursorAI() {
               <span className="action-icon">📥</span>
               Download README
             </button>
-            <button className="doc-action-btn">
+            <button className="doc-action-btn" onClick={handleCreateLearningModule}>
               <span className="action-icon">🎓</span>
               Create Learning Module
             </button>
