@@ -4,7 +4,7 @@
 
 ## 🧭 Quick Navigation
 
-**💡 Tip:** Since GitHub doesn't support Mermaid click events, use these direct links to navigate to specific sections:
+**💡 Tip:** Click on any link below to navigate directly to that section within this document:
 
 ### 🎯 Core Learning Modules
 - [Dashboard](#dashboard) - Progress tracking and analytics
@@ -40,7 +40,15 @@
 
 ---
 
-## 🏗️ System Architecture
+## 🎯 Project Overview {#project-overview}
+
+This is a comprehensive **AI-powered workplace learning platform** that combines cutting-edge artificial intelligence with modern web technologies to create an intelligent, adaptive learning experience. Built with React.js frontend and FastAPI backend, it features advanced AI capabilities including personalized recommendations, interactive simulations, and a sophisticated knowledge mapping system.
+
+## 🏗️ Philosophy & Approach: Building with AI, Not Just Code {#philosophy-approach}
+
+In this project, we intentionally chose a documentation-driven, AI-first approach to software development. Our goal was to demonstrate that, with the right architectural blueprints and explicit instructions, a modern AI system—such as Cursor AI—can build a complex, full-stack application from scratch, even in environments where pre-existing code is not allowed.
+
+## 🏗️ System Architecture {#system-architecture}
 
 *The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
 
@@ -154,36 +162,6 @@ graph TB
   AgentCursorAI --> CursorAI[Cursor AI Local]
   RepoAnalyzer --> GitHub[GitHub/GitLab]
   
-  %% Click Events for Navigation (Note: These work in Mermaid Live Editor but not in GitHub)
-  click Dashboard "#dashboard" "Go to Dashboard section"
-  click Concepts "#ai-concepts" "Go to AI Concepts section"
-  click MicroLesson "#micro-lessons" "Go to Micro Lessons section"
-  click Recommendation "#recommendations" "Go to Recommendations section"
-  click Simulator "#scenario-simulator" "Go to Scenario Simulator section"
-  click WebSearch "#web-search" "Go to Web Search section"
-  click CareerCoach "#ai-career-coach" "Go to AI Career Coach section"
-  click SkillsForecast "#skills-forecast" "Go to Skills Forecast section"
-  click Certifications "#certifications" "Go to Certifications section"
-  click VideoLesson "#video-lessons" "Go to Video Lessons section"
-  click KnowledgeMap "#knowledge-map" "Go to Knowledge Map section"
-  click AgentCursorAI "#agent-cursor-ai" "Go to Agent Cursor AI section"
-  click RepoAnalyzer "#repository-analyzer" "Go to Repository Analyzer section"
-  click PresentationAgent "#presentation-agent" "Go to Presentation Agent section"
-  click AIStudyBuddy "#ai-study-buddy" "Go to AI Study Buddy section"
-  click RunTest "#run-test" "Go to Run Test section"
-  click IdeaLog "#idea-log" "Go to Idea Log section"
-  click FeatureRoadmap "#feature-roadmap" "Go to Feature Roadmap section"
-  click GlobalSearch "#global-search" "Go to Global Search section"
-  click Cypress "#cypress-tests" "Go to Cypress Tests section"
-  click ManualTests "#manual-tests" "Go to Manual Tests section"
-  click APITests "#api-tests" "Go to API Tests section"
-  click TestResults "#test-results" "Go to Test Results section"
-  click FastAPI "#fastapi-server" "Go to FastAPI Server section"
-  click LLM "#openai-gpt5" "Go to OpenAI GPT-5 section"
-  click MongoDB "#mongodb" "Go to MongoDB section"
-  click Firebase "#firebase-auth" "Go to Firebase Auth section"
-  click WebSearchAPI "#web-search-api" "Go to Web Search API section"
-  
   %% Styling
   classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#2d3436,font-size:16px;
   classDef frontend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#ffffff,font-size:14px;
@@ -200,59 +178,7 @@ graph TB
   class Cypress,ManualTests,APITests,TestResults testing;
 ```
 
-# 🤖 AI-Powered Workplace Learning Platform
-
-> **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**
-
-## 🧭 Quick Navigation
-
-**💡 Tip:** Since GitHub doesn't support Mermaid click events, use these direct links to navigate to specific sections:
-
-### 🎯 Core Learning Modules
-- [Dashboard](#dashboard) - Progress tracking and analytics
-- [AI Concepts](#ai-concepts) - AI-powered learning content
-- [Micro Lessons](#micro-lessons) - Bite-sized learning modules
-- [Recommendations](#recommendations) - Personalized suggestions
-- [Scenario Simulator](#scenario-simulator) - Interactive simulations
-- [Web Search](#web-search) - Real-time information retrieval
-- [AI Career Coach](#ai-career-coach) - Personalized career guidance
-- [Skills Forecast](#skills-forecast) - Future skill predictions
-- [Certifications](#certifications) - Professional development
-- [Video Lessons](#video-lessons) - Multimedia learning
-
-### 🚀 Advanced Features
-- [Knowledge Map](#knowledge-map) - Interactive learning visualization
-- [Agent Cursor AI](#agent-cursor-ai) - Repository analysis and documentation
-- [Repository Analyzer](#repository-analyzer) - Code analysis and learning modules
-- [Presentation Agent](#presentation-agent) - AI-generated presentations
-- [AI Study Buddy](#ai-study-buddy) - Conversational learning support
-
-### 🛠️ Admin & Development
-- [Run Test](#run-test) - Comprehensive testing suite
-- [Idea Log](#idea-log) - Feature tracking and suggestions
-- [Feature Roadmap](#feature-roadmap) - Development planning
-- [Global Search](#global-search) - Cross-module search functionality
-
-### ⚙️ Backend Services
-- [FastAPI Server](#fastapi-server) - High-performance API server
-- [OpenAI GPT-5](#openai-gpt5) - Advanced AI integration
-- [MongoDB](#mongodb) - Flexible document storage
-- [Firebase Auth](#firebase-auth) - Secure authentication
-- [Web Search API](#web-search-api) - Real-time data retrieval
-
 ---
-
-## 🏗️ System Architecture
-
-*The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
-
-## 🎯 Project Overview {#project-overview}
-
-This is a comprehensive **AI-powered workplace learning platform** that combines cutting-edge artificial intelligence with modern web technologies to create an intelligent, adaptive learning experience. Built with React.js frontend and FastAPI backend, it features advanced AI capabilities including personalized recommendations, interactive simulations, and a sophisticated knowledge mapping system.
-
-## 🏗️ Philosophy & Approach: Building with AI, Not Just Code {#philosophy-approach}
-
-In this project, we intentionally chose a documentation-driven, AI-first approach to software development. Our goal was to demonstrate that, with the right architectural blueprints and explicit instructions, a modern AI system—such as Cursor AI—can build a complex, full-stack application from scratch, even in environments where pre-existing code is not allowed.
 
 ## 🎯 Core Learning Modules {#core-learning-modules}
 
@@ -306,6 +232,8 @@ In this project, we intentionally chose a documentation-driven, AI-first approac
 - **AI-Generated Quizzes**: Interactive assessments
 - **Progress Tracking**: Monitor video completion
 
+---
+
 ## 🚀 Advanced Features {#advanced-features}
 
 ### Knowledge Map {#knowledge-map}
@@ -333,6 +261,8 @@ In this project, we intentionally chose a documentation-driven, AI-first approac
 - **Contextual Help**: Situation-specific assistance
 - **Learning Support**: Comprehensive study aid
 
+---
+
 ## 🛠️ Admin & Development {#admin-development}
 
 ### Run Test {#run-test}
@@ -355,6 +285,8 @@ In this project, we intentionally chose a documentation-driven, AI-first approac
 - **Keyboard Shortcuts**: Quick access navigation
 - **Smart Filtering**: Intelligent search results
 
+---
+
 ## 🧪 Testing Framework {#testing-framework}
 
 ### Cypress E2E Tests {#cypress-tests}
@@ -376,6 +308,8 @@ In this project, we intentionally chose a documentation-driven, AI-first approac
 - **Comprehensive Reports**: Detailed test summaries
 - **Performance Metrics**: Execution time and success rates
 - **Issue Tracking**: Problem identification and resolution
+
+---
 
 ## ⚙️ Backend Services {#backend-services}
 
