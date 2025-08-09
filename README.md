@@ -318,107 +318,166 @@ npm run test:comprehensive
 ```
 AI Learning with AI/
 ├── backend/
-│   ├── app.py                 # Main FastAPI application
-│   ├── llm.py                 # OpenAI GPT-5 integration
+│   ├── app.py                 # Main FastAPI application with all endpoints
+│   ├── llm.py                 # OpenAI GPT-5 integration and streaming
 │   ├── gpt5_config.py         # GPT-5 model configuration
 │   ├── cursor_agent_routes.py # Agent Cursor AI integration
+│   ├── prompts.py             # AI prompt templates and configurations
+│   ├── vector_store.py        # Vector database for knowledge mapping
+│   ├── enhanced_analysis.py   # Repository analysis and documentation
 │   ├── requirements.txt       # Python dependencies
 │   └── .env                   # Environment variables
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx            # Main application component
+│   │   ├── App.jsx            # Main application component with routing
 │   │   ├── components/        # Feature components
-│   │   ├── api.js             # API integration
-│   │   └── ThemeContext.jsx   # Theme management
+│   │   ├── api.js             # API integration and streaming
+│   │   ├── ThemeContext.jsx   # Theme management (light/dark)
+│   │   ├── hooks/
+│   │   │   └── useStreaming.js # Streaming LLM responses hook
+│   │   ├── Dashboard.jsx      # Learning progress and analytics
+│   │   ├── Concepts.jsx       # AI-powered learning concepts
+│   │   ├── MicroLesson.jsx    # Bite-sized learning modules
+│   │   ├── Recommendation.jsx # Personalized learning suggestions
+│   │   ├── Simulator.jsx      # Interactive workplace scenarios
+│   │   ├── WebSearch.jsx      # Real-time web search with AI
+│   │   ├── CareerCoach.jsx    # AI career guidance and coaching
+│   │   ├── SkillsForecast.jsx # Future skills prediction
+│   │   ├── Certifications.jsx # Professional certification planning
+│   │   ├── VideoLesson.jsx    # Video-based learning with AI quizzes
+│   │   ├── KnowledgeMap.jsx   # Interactive learning visualization
+│   │   ├── TeamDynamics.jsx   # Team collaboration analysis
+│   │   ├── IdeaLog.jsx        # Feature tracking and suggestions
+│   │   ├── FeatureRoadmap.jsx # Development planning and AI code generation
+│   │   ├── PresentationAgent.jsx # AI-powered presentations and voice cloning
+│   │   ├── AIStudyBuddy.jsx   # Conversational learning support
+│   │   ├── RunTest.jsx        # Comprehensive testing suite
+│   │   ├── GlobalSearch.jsx   # Cross-module search functionality
+│   │   ├── CommandBar.jsx     # Zero-UI natural language interface
+│   │   ├── AdvancedMasteryPanel.jsx # Learning analytics dashboard
+│   │   ├── AdvancedRecommendations.jsx # AI-powered learning suggestions
+│   │   ├── AdvancedTooltip.jsx # Rich hover information system
+│   │   ├── ClusterLegend.jsx  # Knowledge cluster filtering
+│   │   ├── MasteryTimeline.jsx # Learning progress timeline
+│   │   ├── StreamingProgress.jsx # Real-time progress indicators
+│   │   ├── StreamingText.jsx   # Streaming text display
+│   │   └── Sidebar.jsx        # Navigation and module selection
+│   ├── cypress/               # End-to-end testing framework
+│   │   ├── e2e/               # Test specifications
+│   │   ├── fixtures/          # Test data
+│   │   └── support/           # Test utilities and commands
 │   ├── package.json           # Node.js dependencies
 │   └── .env                   # Frontend environment variables
 ├── websearch-backend/
 │   ├── index.js               # Web search Node.js server
 │   └── package.json           # Web search dependencies
-└── README.md                  # This documentation
+├── deployment/                 # Deployment configurations
+│   ├── cloudrun.yaml          # Google Cloud Run configuration
+│   └── Dockerfile             # Docker container setup
+├── docs/                      # Additional documentation
+├── install-voice-cloning.sh   # Voice cloning setup script
+└── README.md                  # This comprehensive documentation
 ```
 
 ### Detailed Project Structure
 
 ```
 AI Learning with AI/
-  backend/
-    app.py
-    db.py
-    llm.py
-    prompts.py
-    vector_store.py
-    static/
-      favicon.ico
-    tests/
-      test_app.py
-  deployment/
-    cloudrun.yaml
-    Dockerfile
-  docs/
-  frontend/
-    cypress/
-      cypress.config.js
-      e2e/
-        app.cy.js
-        appOption.cy.js
-        clearButtons.cy.js
-        savedMicro-lessons.cy.js
-        scenarioSimulator.cy.js
-        webSearch.cy.js
-      fixtures/
-        example.json
-      support/
-        commands.js
-        e2e.js
-    cypress.config.js
-    package.json
-    public/
-      favicon.ico
-      index.html
-      logo192.png
-      logo512.png
-      manifest.json
-      robots.txt
-    README.md
-    src/
-      _tests_/
-        Concepts.test.jsx
-      api.js
-      App.css
-      App.jsx
-      App.test.js
-      Auth.jsx
-      CareerCoach.jsx
-      Certifications.jsx
-      Concepts.jsx
-      cypress.config.js
-      Dashboard.jsx
-      GlobalSearch.jsx
-      index.css
-      index.js
-      LessonList.jsx
-      logo.svg
-      MicroLesson.jsx
-      Recommendation.jsx
-      reportWebVitals.js
-      setupTests.js
-      Simulator.jsx
-      SkillsForecast.jsx
-      TeamDynamics.jsx
-      ThemeContext.jsx
-      WebSearch.jsx
-      KnowledgeMap.jsx
-      AdvancedMasteryPanel.jsx
-      AdvancedRecommendations.jsx
-      AdvancedTooltip.jsx
-      ClusterLegend.jsx
-      MasteryTimeline.jsx
-  package.json
-  README.md
-  serviceAccountKey.json (ignored, not in repo)
-  websearch-backend/
-    index.js
+├── backend/
+│   ├── app.py                 # Main FastAPI application with all endpoints
+│   ├── llm.py                 # OpenAI GPT-5 integration and streaming
+│   ├── gpt5_config.py         # GPT-5 model configuration
+│   ├── cursor_agent_routes.py # Agent Cursor AI integration
+│   ├── prompts.py             # AI prompt templates and configurations
+│   ├── vector_store.py        # Vector database for knowledge mapping
+│   ├── enhanced_analysis.py   # Repository analysis and documentation
+│   ├── db.py                  # Database models and connections
+│   ├── static/
+│   │   └── favicon.ico
+│   ├── tests/
+│   │   └── test_app.py
+│   ├── requirements.txt       # Python dependencies
+│   └── .env                   # Environment variables
+├── deployment/
+│   ├── cloudrun.yaml          # Google Cloud Run configuration
+│   └── Dockerfile             # Docker container setup
+├── docs/                      # Additional documentation
+├── frontend/
+│   ├── cypress/               # End-to-end testing framework
+│   │   ├── cypress.config.js
+│   │   ├── e2e/
+│   │   │   ├── app.cy.js
+│   │   │   ├── appOption.cy.js
+│   │   │   ├── clearButtons.cy.js
+│   │   │   ├── savedMicro-lessons.cy.js
+│   │   │   ├── scenarioSimulator.cy.js
+│   │   │   └── webSearch.cy.js
+│   │   ├── fixtures/
+│   │   │   └── example.json
+│   │   └── support/
+│   │       ├── commands.js
+│   │       └── e2e.js
+│   ├── cypress.config.js
+│   ├── package.json
+│   ├── public/
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── README.md
+│   └── src/
+│       ├── _tests_/
+│       │   └── Concepts.test.jsx
+│       ├── api.js             # API integration and streaming
+│       ├── App.css
+│       ├── App.jsx            # Main application component with routing
+│       ├── App.test.js
+│       ├── Auth.jsx           # Firebase authentication
+│       ├── CareerCoach.jsx    # AI career guidance and coaching
+│       ├── Certifications.jsx # Professional certification planning
+│       ├── Concepts.jsx       # AI-powered learning concepts
+│       ├── Dashboard.jsx      # Learning progress and analytics
+│       ├── GlobalSearch.jsx   # Cross-module search functionality
+│       ├── index.css
+│       ├── index.js
+│       ├── LessonList.jsx     # Saved micro-lessons management
+│       ├── logo.svg
+│       ├── MicroLesson.jsx    # Bite-sized learning modules
+│       ├── Recommendation.jsx # Personalized learning suggestions
+│       ├── reportWebVitals.js
+│       ├── setupTests.js
+│       ├── Simulator.jsx      # Interactive workplace scenarios
+│       ├── SkillsForecast.jsx # Future skills prediction
+│       ├── TeamDynamics.jsx   # Team collaboration analysis
+│       ├── ThemeContext.jsx   # Theme management (light/dark)
+│       ├── WebSearch.jsx      # Real-time web search with AI
+│       ├── KnowledgeMap.jsx   # Interactive learning visualization
+│       ├── AdvancedMasteryPanel.jsx # Learning analytics dashboard
+│       ├── AdvancedRecommendations.jsx # AI-powered learning suggestions
+│       ├── AdvancedTooltip.jsx # Rich hover information system
+│       ├── ClusterLegend.jsx  # Knowledge cluster filtering
+│       ├── MasteryTimeline.jsx # Learning progress timeline
+│       ├── hooks/
+│       │   └── useStreaming.js # Streaming LLM responses hook
+│       ├── StreamingProgress.jsx # Real-time progress indicators
+│       ├── StreamingText.jsx   # Streaming text display
+│       ├── Sidebar.jsx        # Navigation and module selection
+│       ├── CommandBar.jsx     # Zero-UI natural language interface
+│       ├── IdeaLog.jsx        # Feature tracking and suggestions
+│       ├── FeatureRoadmap.jsx # Development planning and AI code generation
+│       ├── PresentationAgent.jsx # AI-powered presentations and voice cloning
+│       ├── AIStudyBuddy.jsx   # Conversational learning support
+│       ├── RunTest.jsx        # Comprehensive testing suite
+│       └── VideoLesson.jsx    # Video-based learning with AI quizzes
+├── package.json
+├── README.md
+├── serviceAccountKey.json     # Firebase service account (ignored, not in repo)
+├── websearch-backend/
+│   ├── index.js               # Web search Node.js server
+│   └── package.json           # Web search dependencies
+└── install-voice-cloning.sh   # Voice cloning setup script
 ```
 
 ---
