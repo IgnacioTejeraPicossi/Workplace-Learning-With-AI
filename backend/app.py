@@ -53,7 +53,7 @@ from backend.llm import ask_openai_stream
 
 @app.get("/favicon.ico")
 async def favicon():
-    favicon_path = os.path.join("static", "favicon.ico")
+    favicon_path = os.path.join(os.path.dirname(__file__), "static", "favicon.ico")
     return FileResponse(favicon_path)
 
 async def verify_token(request: Request):

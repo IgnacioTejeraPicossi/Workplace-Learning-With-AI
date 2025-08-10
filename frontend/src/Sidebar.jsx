@@ -20,7 +20,8 @@ const Icon = ({ name, size = 20 }) => {
     "chevron-right": "▶️",
     test: "🧪",
     robot: "🤖",
-    microphone: "🎤"
+    microphone: "🎤",
+    shield: "🛡️"
   };
 
   return (
@@ -52,8 +53,10 @@ const navItems = [
   { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot", group: "help" },
   
   // Grupo 3: Operaciones internas del programador (fondo azul claro)
-  { key: "run-test", label: "Run Test", icon: "test", group: "developer" },
-  { key: "future-app", label: "Future App", icon: "robot", group: "developer" },
+          { key: "run-test", label: "Run Test", icon: "test", group: "developer" },
+        { key: "security", label: "Security", icon: "shield", group: "developer" },
+        { key: "filter-test", label: "Filter Test", icon: "test", group: "developer" },
+        { key: "future-app", label: "Future App", icon: "robot", group: "developer" },
   { key: "idea-log", label: "Idea Log", icon: "lightbulb", group: "developer" },
   { key: "feature-roadmap", label: "Feature Roadmap", icon: "star", group: "developer" },
 ];

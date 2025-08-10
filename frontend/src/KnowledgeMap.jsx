@@ -69,11 +69,24 @@ const KnowledgeMap = () => {
         matchesMastery = mastery >= 0.7;
       }
 
+      // Debug logging for mastery filter
+      if (selectedMasteryLevel !== 'all') {
+        console.log(`🔍 Filtering ${topic.label}: mastery=${(mastery * 100).toFixed(0)}%, filter=${selectedMasteryLevel}, matches=${matchesMastery}`);
+      }
+
       return matchesSearch && matchesCategory && matchesMastery;
     });
 
     const filteredTopicsObj = Object.fromEntries(filtered);
     setFilteredTopics(filteredTopicsObj);
+    
+    // Log filtered results
+    console.log(`📊 Filter Results: ${Object.keys(filteredTopicsObj).length} topics match filters`);
+    console.log(`📊 Filtered Topics:`, Object.keys(filteredTopicsObj).map(id => ({
+      id,
+      label: topics[id]?.label,
+      mastery: userData?.mastery_scores?.[id] || 0
+    })));
   }, [topics, searchTerm, selectedCategory, selectedMasteryLevel, userData]);
 
   useEffect(() => {
@@ -290,9 +303,8 @@ const KnowledgeMap = () => {
       try {
         // Skip nodes that are not visible based on filters
         if (!node.isVisible) {
-          console.log(`⏭️ Skipping filtered node: ${node.label}`);
-          // Temporarily show all nodes for debugging
-          // return;
+          console.log(`⏭️ Skipping filtered node: ${node.label} (mastery: ${(node.mastery * 100).toFixed(0)}%)`);
+          return;
         }
         
         // Create node group with class for D3 selection
@@ -622,6 +634,23 @@ const KnowledgeMap = () => {
               <option value="medium">Medium Mastery (30-70%)</option>
               <option value="high">High Mastery (&gt;70%)</option>
             </select>
+          </div>
+
+          {/* Filter Results Counter */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            padding: '8px 12px',
+            background: colors.sidebarBackground,
+            borderRadius: 6,
+            fontSize: '14px',
+            color: colors.textSecondary
+          }}>
+            <span>📊</span>
+            <span>
+              {Object.keys(filteredTopics).length} of {Object.keys(topics).length} topics
+            </span>
           </div>
 
           {/* Clear Filters Button */}
