@@ -30,7 +30,6 @@ import RepoAnalyzer from "./RepoAnalyzer";
 import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
 import AgentCursorAI from "./AgentCursorAI";
 import SecurityPanel from "./SecurityPanel";
-import FilterTest from "./FilterTest";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -375,10 +374,9 @@ function AppContent() {
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
-                {!activeModule && section === "run-test" && <RunTest />}
-        {!activeModule && section === "security" && <SecurityPanel />}
-        {!activeModule && section === "filter-test" && <FilterTest />}
-        {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
+                              {!activeModule && section === "run-test" && <RunTest />}
+              {!activeModule && section === "security" && <SecurityPanel />}
+              {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
             {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}

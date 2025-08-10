@@ -9,19 +9,29 @@ const Icon = ({ name, size = 20 }) => {
     book: "📚",
     star: "⭐",
     "play-circle": "▶️",
+    play: "▶️",
     "user-check": "👤",
     "bar-chart": "📊",
     archive: "📦",
     layers: "📋",
     globe: "🌐",
     team: "👥",
+    users: "👥",
     award: "🏆",
+    trophy: "🏆",
+    user: "👤",
     "chevron-left": "◀️",
     "chevron-right": "▶️",
     test: "🧪",
     robot: "🤖",
     microphone: "🎤",
-    shield: "🛡️"
+    presentation: "🎤",
+    shield: "🛡️",
+    rocket: "🚀",
+    "chevron-down": "⬇️",
+    "chevron-up": "⬆️",
+    help: "❓",
+    map: "🗺️"
   };
 
   return (
@@ -32,41 +42,69 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 const navItems = [
-  // Grupo 1: Opciones de aprendizaje (sin fondo especial)
-  { key: "dashboard", label: "Dashboard", icon: "house", group: "learning" },
-  { key: "video-lessons", label: "Video Lessons", icon: "play-circle", group: "learning" },
-  { key: "micro-lessons", label: "Micro-lessons", icon: "book", group: "learning" },
-  { key: "simulations", label: "Simulations", icon: "play-circle", group: "learning" },
-  { key: "web-search", label: "Web Search", icon: "globe", group: "learning" },
-  { key: "team-dynamics", label: "Team Dynamics", icon: "team", group: "learning" },
-  { key: "certifications", label: "Certifications", icon: "award", group: "learning" },
-  { key: "coach", label: "AI Career Coach", icon: "user-check", group: "learning" },
-  { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart", group: "learning" },
-  { key: "ai-learning", label: "AI Learning & Training", icon: "robot", group: "learning" },
+  // Dashboard - Módulo principal que se muestra al entrar
+  { key: "dashboard", label: "Dashboard", icon: "house", group: "main" },
+  
+  // Grupo 1: Módulos de aprendizaje (expandible)
+  { key: "learning-modules", label: "Learning Modules", icon: "book", group: "learning", isExpandable: true, subItems: [
+    { key: "video-lessons", label: "Video Lessons", icon: "play" },
+    { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
+    { key: "simulations", label: "Simulations", icon: "play" },
+    { key: "web-search", label: "Web Search", icon: "globe" },
+    { key: "team-dynamics", label: "Team Dynamics", icon: "users" },
+    { key: "certifications", label: "Certifications", icon: "trophy" },
+    { key: "ai-career-coach", label: "AI Career Coach", icon: "user" },
+    { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
+    { key: "ai-learning", label: "AI Learning & Training", icon: "robot" }
+  ]},
+  
+  // Mapa de conocimiento (opción especial que permanece visible)
   { key: "knowledge-map", label: "Map of Knowledge", icon: "globe", group: "learning" },
-  { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive", group: "learning" },
-  { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot", group: "learning" },
-  { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot", group: "learning" },
+  
+  // Grupo 1.5: Análisis de repositorios (expandible)
+  { key: "repository-analyzer", label: "Repository Analyzer", icon: "archive", group: "learning", isExpandable: true, subItems: [
+    { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive" },
+    { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot" },
+    { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" }
+  ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)
-  { key: "presentation-agent", label: "Presentation Agent", icon: "microphone", group: "help" },
-  { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot", group: "help" },
+  { key: "help", label: "Help", icon: "help", group: "help", isExpandable: true, subItems: [
+    { key: "presentation-agent", label: "Presentation Agent", icon: "presentation" },
+    { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot" }
+  ]},
   
-  // Grupo 3: Operaciones internas del programador (fondo azul claro)
-          { key: "run-test", label: "Run Test", icon: "test", group: "developer" },
-        { key: "security", label: "Security", icon: "shield", group: "developer" },
-        { key: "filter-test", label: "Filter Test", icon: "test", group: "developer" },
-        { key: "future-app", label: "Future App", icon: "robot", group: "developer" },
-  { key: "idea-log", label: "Idea Log", icon: "lightbulb", group: "developer" },
-  { key: "feature-roadmap", label: "Feature Roadmap", icon: "star", group: "developer" },
+  // Grupo 3: Herramientas de desarrollo (fondo azul)
+  { key: "security", label: "Security", icon: "shield", group: "developer" },
+  { key: "run-test", label: "Run Test", icon: "play", group: "developer" },
+  
+  // Grupo 4: Funcionalidades futuras (expandible)
+  { key: "future", label: "Future", icon: "rocket", group: "developer", isExpandable: true, subItems: [
+    { key: "future-app", label: "Future App", icon: "rocket" },
+    { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
+    { key: "feature-roadmap", label: "Feature Roadmap", icon: "map" }
+  ]}
 ];
 
 function Sidebar({ selected, onSelect }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedItems, setExpandedItems] = useState(new Set());
   const { colors } = useTheme();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const toggleExpanded = (itemKey) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemKey)) {
+        newSet.delete(itemKey);
+      } else {
+        newSet.add(itemKey);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -129,67 +167,166 @@ function Sidebar({ selected, onSelect }) {
           let backgroundColor = "transparent";
           if (selected === item.key) {
             backgroundColor = colors.primaryLight;
+          } else if (item.group === "main") {
+            backgroundColor = "#fff3e0"; // Naranja muy claro para el módulo principal
           } else if (item.group === "help") {
             backgroundColor = "#e8f5e8"; // Verde claro para ayuda del sistema
           } else if (item.group === "developer") {
             backgroundColor = "#e3f2fd"; // Azul claro para operaciones del programador
+          } else if (item.group === "learning") {
+            backgroundColor = "#f3e5f5"; // Púrpura muy claro para módulos de aprendizaje
           }
 
+          const isExpanded = expandedItems.has(item.key);
+          const hasSubItems = item.subItems && item.subItems.length > 0;
+
           return (
-            <button
-              key={item.key}
-              data-testid={`sidebar-${item.key}`}
-              className={selected === item.key ? 'active' : ''}
-              onClick={() => onSelect(item.key)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: isCollapsed ? 0 : 12,
-                width: "100%",
-                background: backgroundColor,
-                color: selected === item.key ? colors.primary : colors.text,
-                border: "none",
-                borderRadius: 8,
-                padding: isCollapsed ? "12px 0" : "12px 24px",
-                fontWeight: 500,
-                fontSize: isCollapsed ? 14 : 16,
-                cursor: "pointer",
-                marginBottom: 4,
-                transition: "all 0.2s ease",
-                justifyContent: isCollapsed ? "center" : "flex-start",
-                ":hover": {
-                  background: selected === item.key ? colors.primaryLight : colors.primaryLight,
-                  color: colors.primary,
-                  transform: "translateX(4px)"
-                }
-              }}
-              title={isCollapsed ? item.label : ""}
-              onMouseEnter={(e) => {
-                if (selected !== item.key) {
-                  e.target.style.background = colors.primaryLight;
-                  e.target.style.color = colors.primary;
-                  e.target.style.transform = "translateX(4px)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selected !== item.key) {
-                  // Restaurar el fondo original según el grupo
-                  let originalBackground = "transparent";
-                  if (item.group === "help") {
-                    originalBackground = "#e8f5e8"; // Verde claro
-                  } else if (item.group === "developer") {
-                    originalBackground = "#e3f2fd"; // Azul claro
+            <div key={item.key}>
+              <button
+                data-testid={`sidebar-${item.key}`}
+                className={selected === item.key ? 'active' : ''}
+                onClick={() => {
+                  if (hasSubItems) {
+                    toggleExpanded(item.key);
+                  } else {
+                    onSelect(item.key);
                   }
-                  
-                  e.target.style.background = originalBackground;
-                  e.target.style.color = colors.text;
-                  e.target.style.transform = "translateX(0px)";
-                }
-              }}
-            >
-              <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
-              {!isCollapsed && item.label}
-            </button>
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: isCollapsed ? 0 : 12,
+                  width: "100%",
+                  background: backgroundColor,
+                  color: selected === item.key ? colors.primary : colors.text,
+                  border: "none",
+                  borderRadius: 8,
+                  padding: isCollapsed ? "12px 0" : "12px 24px",
+                  fontWeight: 500,
+                  fontSize: isCollapsed ? 14 : 16,
+                  cursor: "pointer",
+                  marginBottom: 4,
+                  transition: "all 0.2s ease",
+                  justifyContent: isCollapsed ? "center" : "flex-start",
+                  ":hover": {
+                    background: selected === item.key ? colors.primaryLight : colors.primaryLight,
+                    color: colors.primary,
+                    transform: "translateX(4px)"
+                  }
+                }}
+                title={isCollapsed ? item.label : ""}
+                onMouseEnter={(e) => {
+                  if (selected !== item.key) {
+                    e.target.style.background = colors.primaryLight;
+                    e.target.style.color = colors.primary;
+                    e.target.style.transform = "translateX(4px)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selected !== item.key) {
+                    // Restaurar el fondo original según el grupo
+                    let originalBackground = "transparent";
+                    if (item.group === "main") {
+                      originalBackground = "#fff3e0"; // Naranja muy claro para el módulo principal
+                    } else if (item.group === "help") {
+                      originalBackground = "#e8f5e8"; // Verde claro
+                    } else if (item.group === "developer") {
+                      originalBackground = "#e3f2fd"; // Azul claro
+                    } else if (item.group === "learning") {
+                      originalBackground = "#f3e5f5"; // Púrpura muy claro para módulos de aprendizaje
+                    }
+                    
+                    e.target.style.background = originalBackground;
+                    e.target.style.color = colors.text;
+                    e.target.style.transform = "translateX(0px)";
+                  }
+                }}
+              >
+                <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
+                {!isCollapsed && (
+                  <>
+                    <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
+                    {hasSubItems && (
+                      <Icon 
+                        name={isExpanded ? "chevron-up" : "chevron-down"} 
+                        size={16} 
+                        style={{ marginLeft: "auto" }}
+                      />
+                    )}
+                  </>
+                )}
+                {isCollapsed && hasSubItems && (
+                  <Icon 
+                    name={isExpanded ? "chevron-up" : "chevron-down"} 
+                    size={14} 
+                  />
+                )}
+              </button>
+
+              {/* Renderizar subelementos si están expandidos */}
+              {hasSubItems && isExpanded && !isCollapsed && (
+                <div style={{ marginLeft: 24, marginBottom: 4 }}>
+                  {item.subItems.map(subItem => {
+                    const isSubItemSelected = selected === subItem.key;
+                    let subItemBackground = "transparent";
+                    if (isSubItemSelected) {
+                      subItemBackground = colors.primaryLight;
+                    } else {
+                      subItemBackground = "#f0f8ff"; // Azul muy claro para subelementos
+                    }
+
+                    return (
+                      <button
+                        key={subItem.key}
+                        data-testid={`sidebar-${subItem.key}`}
+                        className={isSubItemSelected ? 'active' : ''}
+                        onClick={() => onSelect(subItem.key)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          width: "100%",
+                          background: subItemBackground,
+                          color: isSubItemSelected ? colors.primary : colors.textSecondary,
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "8px 16px",
+                          fontWeight: 400,
+                          fontSize: 14,
+                          cursor: "pointer",
+                          marginBottom: 2,
+                          transition: "all 0.2s ease",
+                          justifyContent: "flex-start",
+                          borderLeft: `3px solid ${colors.border}`,
+                          ":hover": {
+                            background: isSubItemSelected ? colors.primaryLight : colors.primaryLight,
+                            color: colors.primary,
+                            transform: "translateX(4px)"
+                          }
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSubItemSelected) {
+                            e.target.style.background = colors.primaryLight;
+                            e.target.style.color = colors.primary;
+                            e.target.style.transform = "translateX(4px)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSubItemSelected) {
+                            e.target.style.background = isSubItemSelected ? colors.primaryLight : "#f0f8ff";
+                            e.target.style.color = isSubItemSelected ? colors.primary : colors.textSecondary;
+                            e.target.style.transform = "translateX(0px)";
+                          }
+                        }}
+                      >
+                        <Icon name={subItem.icon} size={16} />
+                        {subItem.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>

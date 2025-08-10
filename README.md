@@ -238,7 +238,7 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 ### ⚠️ Common Pitfalls & Troubleshooting
 
 - **npm start fails with 'Missing script: start'**: Ensure you are in the frontend directory and package.json contains a "start" script.
-- **uvicorn app:app --reload fails**: Ensure you are in the backend directory and app.py exists.
+- **uvicorn app:app --reload fails**: This command is INCORRECT. Always run from the root directory with `uvicorn backend.app:app --reload`
 - **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your .env.
 - **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in backend/.
 - **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
@@ -484,6 +484,15 @@ AI Learning with AI/
 
 ## 🔧 Installation & Setup
 
+> **⚠️ IMPORTANT BACKEND STARTUP NOTE:**
+> 
+> The Python FastAPI backend **MUST be started from the root directory** (not from inside the `backend/` folder) using:
+> ```bash
+> uvicorn backend.app:app --reload
+> ```
+> 
+> This is because the backend code uses relative imports that expect to be run from the project root. Starting from inside `backend/` will cause import errors.
+
 ### Prerequisites
 - **Node.js 18+** and **npm**
 - **Python 3.10+** and **pip**
@@ -523,8 +532,8 @@ AI Learning with AI/
 
 5. **Start All Services**
    ```bash
-   # Terminal 1: Backend
-   cd backend && uvicorn app:app --reload
+   # Terminal 1: Backend (IMPORTANT: Run from root directory)
+   uvicorn backend.app:app --reload
    
    # Terminal 2: Frontend
    cd frontend && npm start
@@ -1457,6 +1466,7 @@ This project uses **two backend servers**:
   - Handles concepts, micro-lesson, recommendation, simulation, etc.
   - **Firebase authentication** for user security
   - **User-specific data storage** in MongoDB
+  - **IMPORTANT**: Must be run from the root directory (not from inside backend/)
   - Run with:
     ```bash
     uvicorn backend.app:app --reload
@@ -1470,6 +1480,26 @@ This project uses **two backend servers**:
     ```
 
 Your React frontend will call both as needed. This is a common pattern for hackathons and microservice architectures.
+
+### Why Backend Must Start from Root Directory?
+
+The Python backend uses relative imports like `from backend.prompts import ...` which only work when Python's working directory is the project root. This design choice was made to:
+
+1. **Maintain consistent import paths** across all backend modules
+2. **Access shared resources** like `serviceAccountKey.json` in the root directory
+3. **Support Firebase configuration** that expects paths relative to the root
+4. **Enable proper module resolution** for the `backend` package
+
+**Incorrect approach** (will cause import errors):
+```bash
+cd backend
+uvicorn app:app --reload  # ❌ This will fail
+```
+
+**Correct approach** (from project root):
+```bash
+uvicorn backend.app:app --reload  # ✅ This works correctly
+```
 
 ---
 
