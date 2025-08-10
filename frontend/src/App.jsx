@@ -346,17 +346,17 @@ function AppContent() {
           }}>
             <Auth user={user} setUser={setUser} />
             {/* Render the routed module if set, otherwise fall back to section navigation */}
-            {activeModule === 'concepts' && <Concepts query={userQuery} />}
-            {activeModule === 'microlesson' && <MicroLesson query={userQuery} user={user} />}
-            {activeModule === 'simulation' && <Simulator query={userQuery} />}
+            {activeModule === 'ai-concepts' && <Concepts query={userQuery} />}
+            {activeModule === 'micro-lessons' && <MicroLesson query={userQuery} user={user} />}
+            {activeModule === 'simulations' && <Simulator query={userQuery} />}
             {activeModule === 'recommendation' && <Recommendation query={userQuery} />}
-            {activeModule === 'coach' && <CareerCoach query={userQuery} />}
-            {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
-            {activeModule === 'certification' && <Certifications query={userQuery} />}
+            {activeModule === 'ai-career-coach' && <CareerCoach query={userQuery} />}
+            {activeModule === 'skills-forecast' && <SkillsForecast query={userQuery} />}
+            {activeModule === 'certifications' && <Certifications query={userQuery} />}
             {activeModule === 'video-lessons' && <VideoLesson query={userQuery} user={user} />}
             {activeModule === 'presentation-agent' && <PresentationAgent query={userQuery} />}
             {activeModule === 'ai-study-buddy' && <AIStudyBuddy user={user} query={userQuery} />}
-            {activeModule === 'ai-training' && <AITrainingModule query={userQuery} />}
+            {activeModule === 'ai-learning' && <AITrainingModule query={userQuery} />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson user={user} />}
@@ -365,11 +365,12 @@ function AppContent() {
             {!activeModule && section === "web-search" && <WebSearch />}
             {!activeModule && section === "team-dynamics" && <TeamDynamics />}
             {!activeModule && section === "certifications" && <Certifications />}
-            {!activeModule && section === "coach" && <CareerCoach />}
+            {!activeModule && section === "ai-career-coach" && <CareerCoach />}
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
+{!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
@@ -380,6 +381,9 @@ function AppContent() {
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
             {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}
+{!activeModule && section === "help" && <div style={{ padding: "2rem", textAlign: "center" }}>Help section - Select a specific tool from the sidebar</div>}
+{!activeModule && section === "learning-modules" && <div style={{ padding: "2rem", textAlign: "center" }}>Learning Modules - Select a specific module from the sidebar</div>}
+{!activeModule && section === "future" && <div style={{ padding: "2rem", textAlign: "center" }}>Future section - Select a specific feature from the sidebar</div>}
           </div>
         )}
       </div>
