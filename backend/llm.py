@@ -189,6 +189,12 @@ async def call_llm_router(query):
 def classify_intent(user_input: str) -> dict:
     """Classify a user's unknown request and return structured insight using GPT-5."""
     prompt = CLASSIFY_UNKNOWN_INTENT.format(user_input=user_input)
+    
+    # Check if we have OpenAI API key first
+    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+        # No API key - return a smart mock classification based on keywords
+        return classify_with_keywords(user_input)
+    
     try:
         # Use GPT-5-mini for classification (fast and accurate)
         response = ask_openai(
@@ -197,14 +203,85 @@ def classify_intent(user_input: str) -> dict:
             complexity="medium", 
             max_tokens=512
         )
-        import json
-        return json.loads(response)
+        
+        # Check if response is already a valid JSON string
+        if response.startswith('{') and response.endswith('}'):
+            import json
+            return json.loads(response)
+        elif '```json' in response and '```' in response:
+            # Response is in Markdown code block format, extract JSON
+            try:
+                import json
+                import re
+                # Extract content between ```json and ```
+                json_match = re.search(r'```json\s*(\{.*?\})\s*```', response, re.DOTALL)
+                if json_match:
+                    json_content = json_match.group(1)
+                    return json.loads(json_content)
+                else:
+                    print("Could not extract JSON from Markdown block, using keyword classification")
+                    return classify_with_keywords(user_input)
+            except Exception as e:
+                print(f"Error parsing JSON from Markdown: {e}, using keyword classification")
+                return classify_with_keywords(user_input)
+        else:
+            # Response is not JSON, use keyword classification as fallback
+            print("AI response is not valid JSON, using keyword classification")
+            return classify_with_keywords(user_input)
+            
     except Exception as e:
         print("Classification error:", e)
+        return classify_with_keywords(user_input)
+
+def classify_with_keywords(user_input: str) -> dict:
+    """Fallback classification using keyword matching when AI is not available."""
+    input_lower = user_input.lower()
+    
+    # Define keyword mappings for modules
+    module_keywords = {
+        "ai-concepts": ["concept", "concepto", "idea", "learn", "aprender", "knowledge", "conocimiento"],
+        "micro-lessons": ["micro", "lesson", "lección", "short", "corto", "quick", "rápido"],
+        "video-lessons": ["video", "video lesson", "lección de video", "watch", "ver"],
+        "simulations": ["simulation", "simulación", "scenario", "escenario", "practice", "práctica"],
+        "ai-career-coach": ["coach", "career", "carrera", "advice", "consejo", "planning", "planificación"],
+        "skills-forecast": ["forecast", "predicción", "future", "futuro", "skill", "habilidad"],
+        "certifications": ["certification", "certificación", "cert", "study plan", "plan de estudio"],
+        "web-search": ["search", "buscar", "web", "internet", "research", "investigar"],
+        "recommendations": ["recommend", "recomendar", "what to learn", "qué aprender", "next", "siguiente"]
+    }
+    
+    # Find the best module match
+    best_match = None
+    best_score = 0
+    
+    for module, keywords in module_keywords.items():
+        score = sum(1 for keyword in keywords if keyword in input_lower)
+        if score > best_score:
+            best_score = score
+            best_match = module
+    
+    # Determine confidence based on match quality
+    if best_score >= 2:
+        confidence = "High"
+    elif best_score >= 1:
+        confidence = "Medium"
+    else:
+        confidence = "Low"
+    
+    # Generate appropriate response
+    if best_match and confidence in ["High", "Medium"]:
         return {
-            "intent": None,
-            "module_match": None,
+            "intent": f"User wants to access {best_match.replace('-', ' ')}",
+            "module_match": best_match,
             "new_feature": None,
+            "confidence": confidence,
+            "follow_up_question": "Is this what you were looking for?"
+        }
+    else:
+        return {
+            "intent": "User request unclear",
+            "module_match": None,
+            "new_feature": "Enhanced Intent Recognition",
             "confidence": "Low",
             "follow_up_question": "Sorry, I didn't quite understand that. Could you rephrase?"
         } 

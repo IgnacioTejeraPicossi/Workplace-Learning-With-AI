@@ -72,11 +72,11 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'Certification': 'certifications',
     'Certifications': 'certifications',
     // Coach
-    coach: 'coach',
-    'ai coach': 'coach',
-    'career coach': 'coach',
-    'AI Coach': 'coach',
-    'Career Coach': 'coach',
+    coach: 'ai-career-coach',
+    'ai coach': 'ai-career-coach',
+    'career coach': 'ai-career-coach',
+    'AI Coach': 'ai-career-coach',
+    'Career Coach': 'ai-career-coach',
     // Skills Forecast
     forecast: 'skills-forecast',
     'skills-forecast': 'skills-forecast',
@@ -108,7 +108,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'AI Buddy': 'ai-study-buddy',
   };
 
-  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy"];
+  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "ai-career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy"];
 
   const handleSubmit = async (value) => {
     const prompt = value || input; // || transcript;
@@ -122,12 +122,51 @@ function CommandBar({ onRoute, inputPlaceholder }) {
       const threshold = confidenceToValue(confidenceLevel);
       const backendConfidence = confidenceToValue(res.confidence);
       const isLowConfidence = res.confidence && typeof res.confidence === 'string' && res.confidence.toLowerCase() === 'low';
+      // Normalize module names for comparison (ignore case and special characters)
       const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
-      const isKnownModule = knownModules
-        .map(m => m.replace(/[-_ ]/g, ''))
-        .includes(normalizedModule);
-      // Only show modal/notification for ambiguous/partial matches
-      if (!isKnownModule || backendConfidence < threshold || isLowConfidence) {
+      const normalizedKnownModules = knownModules.map(m => m.toLowerCase().replace(/[-_ ]/g, ''));
+      
+      // Check if we have a direct module match
+      const isKnownModule = normalizedKnownModules.includes(normalizedModule);
+      
+      // Enhanced module matching using keywords
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      if (!isKnownModule) {
+        // Try to find the best match using keyword analysis
+        const inputWords = prompt.toLowerCase().split(/\s+/);
+        
+        for (const module of knownModules) {
+          const moduleWords = module.toLowerCase().replace(/[-_]/g, ' ').split(/\s+/);
+          let score = 0;
+          
+          // Score based on word matches
+          for (const inputWord of inputWords) {
+            for (const moduleWord of moduleWords) {
+              if (moduleWord.includes(inputWord) || inputWord.includes(moduleWord)) {
+                score += 1;
+              }
+            }
+          }
+          
+          // Bonus for exact word matches
+          if (inputWords.some(word => moduleWords.includes(word))) {
+            score += 2;
+          }
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = module;
+          }
+        }
+      }
+      
+      // Determine if we should route directly or show modal
+      const shouldRouteDirectly = isKnownModule && backendConfidence >= threshold;
+      const hasGoodKeywordMatch = bestMatch && bestScore >= 1;
+      
+      if (shouldRouteDirectly) {
         // Always log the idea
         const classifyRes = await fetch('http://localhost:8000/classify-intent', {
           method: 'POST',
@@ -142,12 +181,18 @@ function CommandBar({ onRoute, inputPlaceholder }) {
           onRoute(normalizedModule, prompt);
           setInput("");
           await askStream({ prompt }, (output) => setStreamedOutput(output));
-        } else {
-          // No known module, show modal as fallback
-          setModalOpen(true);
-        }
-        setLoading(false);
-        return;
+              } else if (hasGoodKeywordMatch && backendConfidence >= 1) { // Medium confidence or higher
+        // Route to best keyword match with notification
+        setNotification(`We found a good match: ${bestMatch}. If this isn't what you wanted, click here to give feedback.`);
+        onRoute(bestMatch, prompt);
+        setInput("");
+        await askStream({ prompt }, (output) => setStreamedOutput(output));
+      } else {
+        // No known module, show modal as fallback
+        setModalOpen(true);
+      }
+      setLoading(false);
+      return;
       }
       // For exact/strong match: route directly, no modal/notification
       // Use moduleMap to ensure correct mapping for App routing
