@@ -12,9 +12,11 @@ const AITrainingModule = ({ user }) => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [view, setView] = useState('lessons'); // 'lessons', 'certifications', 'path'
+  const [difficultyFilter, setDifficultyFilter] = useState('all'); // 'all', 'Beginner', 'Intermediate', 'Advanced', 'Expert'
 
-  // Sample lesson data (in real implementation, this would come from API)
+  // Comprehensive AI Learning Curriculum with 4 levels
   const lessons = [
+    // ===== BEGINNER LEVEL =====
     {
       id: "ai_intro_001",
       title: "Introduction to AI",
@@ -77,7 +79,44 @@ const AITrainingModule = ({ user }) => {
       ]
     },
     {
-      id: "ml_fundamentals_002",
+      id: "ai_ethics_002",
+      title: "AI Ethics & Responsible AI",
+      description: "Understanding bias, fairness, and responsible AI development",
+      difficulty: "Beginner",
+      duration: "25 min",
+      sections: [
+        {
+          heading: "Why AI Ethics Matter",
+          content: "As AI becomes more powerful, ethical considerations become crucial. We need to ensure AI systems are fair, transparent, and beneficial to society.",
+          type: "text"
+        },
+        {
+          heading: "Key Ethical Principles",
+          content: [
+            "Fairness: AI should not discriminate based on protected characteristics",
+            "Transparency: AI decisions should be explainable",
+            "Accountability: Humans remain responsible for AI outcomes",
+            "Privacy: AI should respect user data and privacy"
+          ],
+          type: "list"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is a key principle of AI ethics?",
+          options: {
+            "a": "Speed at all costs",
+            "b": "Fairness and transparency", 
+            "c": "Maximum complexity"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+
+    // ===== INTERMEDIATE LEVEL =====
+    {
+      id: "ml_fundamentals_003",
       title: "Machine Learning Fundamentals",
       description: "Master the basics of ML algorithms and techniques",
       difficulty: "Intermediate",
@@ -87,6 +126,21 @@ const AITrainingModule = ({ user }) => {
           heading: "Types of Machine Learning",
           content: "Machine Learning can be categorized into three main types: Supervised Learning, Unsupervised Learning, and Reinforcement Learning.",
           type: "text"
+        },
+        {
+          heading: "Supervised Learning",
+          content: "Uses labeled training data to learn the relationship between input features and output labels. Examples include classification and regression.",
+          type: "text"
+        },
+        {
+          heading: "Common Algorithms",
+          content: [
+            "Linear Regression: For predicting continuous values",
+            "Logistic Regression: For binary classification",
+            "Decision Trees: For both classification and regression",
+            "Random Forest: Ensemble of decision trees"
+          ],
+          type: "list"
         }
       ],
       quiz: [
@@ -98,6 +152,369 @@ const AITrainingModule = ({ user }) => {
             "c": "Reinforcement Learning"
           },
           correct_answer: "b"
+        },
+        {
+          question: "What is Random Forest?",
+          options: {
+            "a": "A single decision tree",
+            "b": "An ensemble of decision trees",
+            "c": "A neural network"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "deep_learning_004",
+      title: "Deep Learning Basics",
+      description: "Neural networks, CNNs, RNNs and their applications",
+      difficulty: "Intermediate",
+      duration: "60 min",
+      sections: [
+        {
+          heading: "What are Neural Networks?",
+          content: "Neural networks are computing systems inspired by biological brains. They consist of interconnected nodes (neurons) that process information in layers.",
+          type: "text"
+        },
+        {
+          heading: "Convolutional Neural Networks (CNNs)",
+          content: "Specialized for processing grid-like data such as images. They use convolutional layers to detect features like edges, textures, and patterns.",
+          type: "text"
+        },
+        {
+          heading: "Recurrent Neural Networks (RNNs)",
+          content: "Designed for sequential data like text or time series. They maintain internal memory to process sequences of varying lengths.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What are CNNs best suited for?",
+          options: {
+            "a": "Text processing",
+            "b": "Image processing",
+            "c": "Audio processing"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "data_science_005",
+      title: "Data Science Essentials",
+      description: "Data preprocessing, feature engineering, and analysis",
+      difficulty: "Intermediate",
+      duration: "50 min",
+      sections: [
+        {
+          heading: "Data Preprocessing",
+          content: "The crucial first step in any ML project. Includes cleaning data, handling missing values, and normalizing features.",
+          type: "text"
+        },
+        {
+          heading: "Feature Engineering",
+          content: "Creating new features from existing data to improve model performance. This is often where the most impact is made.",
+          type: "text"
+        },
+        {
+          heading: "Data Visualization",
+          content: "Using charts and graphs to understand data patterns, identify outliers, and communicate insights effectively.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is feature engineering?",
+          options: {
+            "a": "Building physical features",
+            "b": "Creating new features from existing data",
+            "c": "Designing UI features"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+
+    // ===== ADVANCED LEVEL =====
+    {
+      id: "advanced_ml_006",
+      title: "Advanced ML Algorithms",
+      description: "Ensemble methods, optimization, and advanced techniques",
+      difficulty: "Advanced",
+      duration: "75 min",
+      sections: [
+        {
+          heading: "Ensemble Methods",
+          content: "Combining multiple models to improve performance. Popular methods include Bagging, Boosting, and Stacking.",
+          type: "text"
+        },
+        {
+          heading: "Gradient Boosting",
+          content: "Sequentially builds models where each new model focuses on the errors of previous models. XGBoost and LightGBM are popular implementations.",
+          type: "text"
+        },
+        {
+          heading: "Hyperparameter Tuning",
+          content: "Optimizing model parameters using techniques like Grid Search, Random Search, and Bayesian Optimization.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is the main idea behind ensemble methods?",
+          options: {
+            "a": "Using only one model",
+            "b": "Combining multiple models",
+            "c": "Ignoring model performance"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "nlp_advanced_007",
+      title: "Natural Language Processing",
+      description: "Transformers, BERT, GPT and modern NLP techniques",
+      difficulty: "Advanced",
+      duration: "80 min",
+      sections: [
+        {
+          heading: "The Transformer Architecture",
+          content: "Revolutionary architecture that uses attention mechanisms to process sequences. It's the foundation for models like BERT and GPT.",
+          type: "text"
+        },
+        {
+          heading: "BERT (Bidirectional Encoder Representations)",
+          content: "Pre-trained model that understands context from both directions. Excellent for tasks like question answering and text classification.",
+          type: "text"
+        },
+        {
+          heading: "GPT (Generative Pre-trained Transformer)",
+          content: "Autoregressive model that generates text one token at a time. Used for text generation, completion, and conversation.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What does BERT stand for?",
+          options: {
+            "a": "Bidirectional Encoder Representations from Transformers",
+            "b": "Basic Encoding and Recognition Tool",
+            "c": "Binary Encoding and Response Technology"
+          },
+          correct_answer: "a"
+        }
+      ]
+    },
+    {
+      id: "computer_vision_008",
+      title: "Computer Vision Deep Dive",
+      description: "Object detection, segmentation, and advanced CV techniques",
+      difficulty: "Advanced",
+      duration: "70 min",
+      sections: [
+        {
+          heading: "Object Detection",
+          content: "Identifying and locating objects in images. Popular models include YOLO, Faster R-CNN, and SSD.",
+          type: "text"
+        },
+        {
+          heading: "Image Segmentation",
+          content: "Dividing images into meaningful regions. Includes semantic segmentation, instance segmentation, and panoptic segmentation.",
+          type: "text"
+        },
+        {
+          heading: "Transfer Learning",
+          content: "Using pre-trained models on new tasks. This approach significantly reduces training time and improves performance.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What does YOLO stand for?",
+          options: {
+            "a": "You Only Look Once",
+            "b": "Your Object Learning Online",
+            "c": "Yet Another Learning Object"
+          },
+          correct_answer: "a"
+        }
+      ]
+    },
+    {
+      id: "mlops_009",
+      title: "MLOps & Production",
+      description: "Model deployment, monitoring, and production ML systems",
+      difficulty: "Advanced",
+      duration: "65 min",
+      sections: [
+        {
+          heading: "Model Deployment",
+          content: "Moving models from development to production. Includes containerization, API development, and infrastructure setup.",
+          type: "text"
+        },
+        {
+          heading: "Model Monitoring",
+          content: "Tracking model performance in production. Monitoring for data drift, model decay, and system health.",
+          type: "text"
+        },
+        {
+          heading: "CI/CD for ML",
+          content: "Continuous Integration and Deployment for machine learning models. Automating testing, building, and deployment.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is MLOps?",
+          options: {
+            "a": "Machine Learning Operations",
+            "b": "Model Learning Online",
+            "c": "Machine Learning Online"
+          },
+          correct_answer: "a"
+        }
+      ]
+    },
+
+    // ===== EXPERT LEVEL =====
+    {
+      id: "research_frontiers_010",
+      title: "Research Frontiers in AI",
+      description: "Latest papers, cutting-edge techniques, and research directions",
+      difficulty: "Expert",
+      duration: "90 min",
+      sections: [
+        {
+          heading: "Current Research Areas",
+          content: "Exploring the latest developments in AI research including multimodal learning, few-shot learning, and AI alignment.",
+          type: "text"
+        },
+        {
+          heading: "Multimodal AI",
+          content: "AI systems that can process and understand multiple types of data simultaneously (text, images, audio, video).",
+          type: "text"
+        },
+        {
+          heading: "AI Alignment",
+          content: "Ensuring AI systems pursue the goals intended by their designers. A critical challenge for advanced AI systems.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is multimodal AI?",
+          options: {
+            "a": "AI that only processes text",
+            "b": "AI that processes multiple data types",
+            "c": "AI that only processes images"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "custom_models_011",
+      title: "Custom AI Model Development",
+      description: "Architecture design, optimization, and custom model building",
+      difficulty: "Expert",
+      duration: "100 min",
+      sections: [
+        {
+          heading: "Model Architecture Design",
+          content: "Designing custom neural network architectures for specific tasks. Understanding when and how to modify existing architectures.",
+          type: "text"
+        },
+        {
+          heading: "Advanced Optimization",
+          content: "Techniques for training large models efficiently including mixed precision, gradient accumulation, and distributed training.",
+          type: "text"
+        },
+        {
+          heading: "Model Compression",
+          content: "Reducing model size while maintaining performance. Techniques include pruning, quantization, and knowledge distillation.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is model compression?",
+          options: {
+            "a": "Making models physically smaller",
+            "b": "Reducing model size while maintaining performance",
+            "c": "Compressing model files"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "ai_architecture_012",
+      title: "AI System Architecture",
+      description: "Scalable AI infrastructure and system design",
+      difficulty: "Expert",
+      duration: "85 min",
+      sections: [
+        {
+          heading: "Scalable AI Infrastructure",
+          content: "Designing systems that can handle increasing loads and complexity. Includes microservices, load balancing, and auto-scaling.",
+          type: "text"
+        },
+        {
+          heading: "AI Pipeline Design",
+          content: "End-to-end workflows from data ingestion to model serving. Includes data preprocessing, training, validation, and deployment.",
+          type: "text"
+        },
+        {
+          heading: "Performance Optimization",
+          content: "Techniques for optimizing AI system performance including caching, batching, and asynchronous processing.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is an AI pipeline?",
+          options: {
+            "a": "A physical pipeline for AI",
+            "b": "End-to-end workflow from data to deployment",
+            "c": "A type of neural network"
+          },
+          correct_answer: "b"
+        }
+      ]
+    },
+    {
+      id: "ai_strategy_013",
+      title: "AI Strategy & Leadership",
+      description: "Business AI implementation and strategic planning",
+      difficulty: "Expert",
+      duration: "70 min",
+      sections: [
+        {
+          heading: "AI Strategy Development",
+          content: "Creating comprehensive AI strategies that align with business objectives. Identifying opportunities and prioritizing initiatives.",
+          type: "text"
+        },
+        {
+          heading: "Change Management",
+          content: "Managing organizational change when implementing AI. Training teams, updating processes, and measuring impact.",
+          type: "text"
+        },
+        {
+          heading: "AI ROI Measurement",
+          content: "Measuring the return on investment for AI initiatives. Tracking metrics, costs, and business impact.",
+          type: "text"
+        }
+      ],
+      quiz: [
+        {
+          question: "What is AI ROI?",
+          options: {
+            "a": "Return on Investment for AI initiatives",
+            "b": "AI Return Online",
+            "c": "Artificial Intelligence Return"
+          },
+          correct_answer: "a"
         }
       ]
     }
@@ -367,99 +784,324 @@ const AITrainingModule = ({ user }) => {
         {view === 'path' && renderLearningPath()}
         
         {view === 'lessons' && !currentLesson && (
-          <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-            {lessons.map((lesson) => {
-              const lessonProgress = progress[lesson.id];
-              const sectionProgress = lessonProgress?.section || 0;
-              const progressPercent = (sectionProgress / lesson.sections.length) * 100;
+          <div>
+            {/* Difficulty Level Headers */}
+            <div style={{ marginBottom: 24 }}>
+              <h2 style={{ color: colors.text, marginBottom: 16, textAlign: 'center' }}>Choose Your Learning Path</h2>
               
-              return (
-                <div
-                  key={lesson.id}
-                  onClick={() => handleLessonSelect(lesson)}
+              {/* Difficulty Filter Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
+                <button
+                  onClick={() => setDifficultyFilter('all')}
                   style={{
-                    background: colors.cardBackground,
-                    borderRadius: 12,
-                    padding: 24,
+                    background: difficultyFilter === 'all' ? colors.primary : 'transparent',
+                    color: difficultyFilter === 'all' ? 'white' : colors.text,
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    fontSize: '0.9em',
+                    fontWeight: 600,
+                    border: `2px solid ${colors.primary}`,
                     cursor: 'pointer',
-                    border: `1px solid ${colors.border}`,
-                    transition: 'all 0.2s ease',
-                    boxShadow: colors.shadow
+                    transition: 'all 0.2s ease'
                   }}
-                  onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
-                  onMouseLeave={(e) => e.target.style.borderColor = colors.border}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                    <h3 style={{ color: colors.text, marginBottom: 8 }}>{lesson.title}</h3>
-                    <span style={{
-                      background: lesson.difficulty === 'Beginner' ? '#e8f5e8' : '#fff3e0',
-                      color: lesson.difficulty === 'Beginner' ? '#4CAF50' : '#FF9800',
-                      padding: '2px 8px',
-                      borderRadius: 8,
-                      fontSize: '0.7em',
-                      fontWeight: 600
+                  🌟 All Levels
+                </button>
+                <button
+                  onClick={() => setDifficultyFilter('Beginner')}
+                  style={{
+                    background: difficultyFilter === 'Beginner' ? '#4CAF50' : 'transparent',
+                    color: difficultyFilter === 'Beginner' ? 'white' : '#4CAF50',
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    fontSize: '0.9em',
+                    fontWeight: 600,
+                    border: '2px solid #4CAF50',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🟢 Beginner (2)
+                </button>
+                <button
+                  onClick={() => setDifficultyFilter('Intermediate')}
+                  style={{
+                    background: difficultyFilter === 'Intermediate' ? '#FF9800' : 'transparent',
+                    color: difficultyFilter === 'Intermediate' ? 'white' : '#FF9800',
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    fontSize: '0.9em',
+                    fontWeight: 600,
+                    border: '2px solid #FF9800',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🟡 Intermediate (3)
+                </button>
+                <button
+                  onClick={() => setDifficultyFilter('Advanced')}
+                  style={{
+                    background: difficultyFilter === 'Advanced' ? '#2196F3' : 'transparent',
+                    color: difficultyFilter === 'Advanced' ? 'white' : '#2196F3',
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    fontSize: '0.9em',
+                    fontWeight: 600,
+                    border: '2px solid #2196F3',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🔵 Advanced (4)
+                </button>
+                <button
+                  onClick={() => setDifficultyFilter('Expert')}
+                  style={{
+                    background: difficultyFilter === 'Expert' ? '#E91E63' : 'transparent',
+                    color: difficultyFilter === 'Expert' ? 'white' : '#E91E63',
+                    padding: '8px 16px',
+                    borderRadius: 20,
+                    fontSize: '0.9em',
+                    fontWeight: 600,
+                    border: '2px solid #E91E63',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🔴 Expert (4)
+                </button>
+              </div>
+              
+              {/* Difficulty Level Info */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 24 }}>
+                <div style={{
+                  background: '#e8f5e8',
+                  color: '#4CAF50',
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  fontSize: '0.9em',
+                  fontWeight: 600,
+                  border: '2px solid #4CAF50'
+                }}>
+                  🟢 Beginner (2 modules)
+                </div>
+                <div style={{
+                  background: '#fff3e0',
+                  color: '#FF9800',
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  fontSize: '0.9em',
+                  fontWeight: 600,
+                  border: '2px solid #FF9800'
+                }}>
+                  🟡 Intermediate (3 modules)
+                </div>
+                <div style={{
+                  background: '#e3f2fd',
+                  color: '#2196F3',
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  fontSize: '0.9em',
+                  fontWeight: 600,
+                  border: '2px solid #2196F3'
+                }}>
+                  🔵 Advanced (4 modules)
+                </div>
+                <div style={{
+                  background: '#fce4ec',
+                  color: '#E91E63',
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  fontSize: '0.9em',
+                  fontWeight: 600,
+                  border: '2px solid #E91E63'
+                }}>
+                  🔴 Expert (4 modules)
+                </div>
+              </div>
+            </div>
+
+                          {/* Lessons Grid */}
+              <div style={{ marginBottom: 16, textAlign: 'center' }}>
+                <span style={{ 
+                  color: colors.textSecondary, 
+                  fontSize: '0.9em',
+                  background: colors.cardBackground,
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  border: `1px solid ${colors.border}`
+                }}>
+                  📚 Showing {lessons.filter(lesson => difficultyFilter === 'all' || lesson.difficulty === difficultyFilter).length} of {lessons.length} modules
+                </span>
+              </div>
+              
+              <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+                {lessons
+                  .filter(lesson => difficultyFilter === 'all' || lesson.difficulty === difficultyFilter)
+                  .map((lesson) => {
+                const lessonProgress = progress[lesson.id];
+                const sectionProgress = lessonProgress?.section || 0;
+                const progressPercent = (sectionProgress / lesson.sections.length) * 100;
+                
+                // Get difficulty colors
+                const getDifficultyColors = (difficulty) => {
+                  switch(difficulty) {
+                    case 'Beginner':
+                      return { bg: '#e8f5e8', color: '#4CAF50', border: '#4CAF50' };
+                    case 'Intermediate':
+                      return { bg: '#fff3e0', color: '#FF9800', border: '#FF9800' };
+                    case 'Advanced':
+                      return { bg: '#e3f2fd', color: '#2196F3', border: '#2196F3' };
+                    case 'Expert':
+                      return { bg: '#fce4ec', color: '#E91E63', border: '#E91E63' };
+                    default:
+                      return { bg: '#f5f5f5', color: '#666', border: '#666' };
+                  }
+                };
+                
+                const difficultyColors = getDifficultyColors(lesson.difficulty);
+                
+                return (
+                  <div
+                    key={lesson.id}
+                    onClick={() => handleLessonSelect(lesson)}
+                    style={{
+                      background: colors.cardBackground,
+                      borderRadius: 16,
+                      padding: 24,
+                      cursor: 'pointer',
+                      border: `2px solid ${difficultyColors.border}`,
+                      transition: 'all 0.3s ease',
+                      boxShadow: colors.shadow,
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-4px)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = colors.shadow;
+                    }}
+                  >
+                    {/* Difficulty Badge */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 16,
+                      right: 16,
+                      background: difficultyColors.bg,
+                      color: difficultyColors.color,
+                      padding: '6px 12px',
+                      borderRadius: 20,
+                      fontSize: '0.75em',
+                      fontWeight: 700,
+                      border: `1px solid ${difficultyColors.border}`
                     }}>
                       {lesson.difficulty}
-                    </span>
-                  </div>
-                  <p style={{ color: colors.textSecondary, marginBottom: 16 }}>{lesson.description}</p>
-                  
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>Progress</span>
-                      <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>
-                        {sectionProgress} of {lesson.sections.length} sections
-                      </span>
                     </div>
-                    <div style={{
-                      background: colors.border,
-                      borderRadius: 4,
-                      height: 8,
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        background: colors.primary,
-                        height: '100%',
-                        width: `${progressPercent}%`,
-                        transition: 'width 0.3s ease'
-                      }} />
-                    </div>
-                  </div>
-                  
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{
-                      background: colors.primaryLight,
-                      color: colors.primary,
-                      padding: '4px 8px',
-                      borderRadius: 12,
-                      fontSize: '0.8em'
-                    }}>
-                      ⏱️ {lesson.duration}
-                    </span>
-                    <span style={{
-                      background: colors.primaryLight,
-                      color: colors.primary,
-                      padding: '4px 8px',
-                      borderRadius: 12,
-                      fontSize: '0.8em'
-                    }}>
-                      Quiz included
-                    </span>
-                    {lessonProgress?.quizCompleted && (
-                      <span style={{
-                        background: '#e8f5e8',
-                        color: '#4CAF50',
-                        padding: '4px 8px',
-                        borderRadius: 12,
-                        fontSize: '0.8em'
+                    
+                    {/* Lesson Content */}
+                    <div style={{ marginTop: 8 }}>
+                      <h3 style={{ 
+                        color: colors.text, 
+                        marginBottom: 12, 
+                        fontSize: '1.2em',
+                        fontWeight: 600,
+                        lineHeight: 1.3
                       }}>
-                        ✅ Quiz completed
-                      </span>
-                    )}
+                        {lesson.title}
+                      </h3>
+                      <p style={{ 
+                        color: colors.textSecondary, 
+                        marginBottom: 20,
+                        lineHeight: 1.5,
+                        fontSize: '0.95em'
+                      }}>
+                        {lesson.description}
+                      </p>
+                      
+                      {/* Progress Bar */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ fontSize: '0.85em', color: colors.textSecondary, fontWeight: 500 }}>
+                            Progress
+                          </span>
+                          <span style={{ fontSize: '0.85em', color: colors.textSecondary, fontWeight: 500 }}>
+                            {sectionProgress} of {lesson.sections.length} sections
+                          </span>
+                        </div>
+                        <div style={{
+                          background: colors.border,
+                          borderRadius: 8,
+                          height: 10,
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            background: `linear-gradient(90deg, ${difficultyColors.color}, ${difficultyColors.border})`,
+                            height: '100%',
+                            width: `${progressPercent}%`,
+                            transition: 'width 0.4s ease',
+                            borderRadius: 8
+                          }} />
+                        </div>
+                      </div>
+                      
+                      {/* Tags */}
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{
+                          background: difficultyColors.bg,
+                          color: difficultyColors.color,
+                          padding: '6px 12px',
+                          borderRadius: 16,
+                          fontSize: '0.8em',
+                          fontWeight: 500,
+                          border: `1px solid ${difficultyColors.border}`
+                        }}>
+                          ⏱️ {lesson.duration}
+                        </span>
+                        <span style={{
+                          background: difficultyColors.bg,
+                          color: difficultyColors.color,
+                          padding: '6px 12px',
+                          borderRadius: 16,
+                          fontSize: '0.8em',
+                          fontWeight: 500,
+                          border: `1px solid ${difficultyColors.border}`
+                        }}>
+                          📚 {lesson.sections.length} sections
+                        </span>
+                        <span style={{
+                          background: difficultyColors.bg,
+                          color: difficultyColors.color,
+                          padding: '6px 12px',
+                          borderRadius: 16,
+                          fontSize: '0.8em',
+                          fontWeight: 500,
+                          border: `1px solid ${difficultyColors.border}`
+                        }}>
+                          🧠 Quiz included
+                        </span>
+                        {lessonProgress?.quizCompleted && (
+                          <span style={{
+                            background: '#e8f5e8',
+                            color: '#4CAF50',
+                            padding: '6px 12px',
+                            borderRadius: 16,
+                            fontSize: '0.8em',
+                            fontWeight: 500,
+                            border: '1px solid #4CAF50'
+                          }}>
+                            ✅ Quiz completed
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
 
