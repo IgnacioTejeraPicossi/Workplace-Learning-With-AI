@@ -63,9 +63,11 @@ function AppContent() {
   };
 
   const handleRoute = (module, query) => {
+    console.log(`🚀 handleRoute called with:`, module, query);
     setUserQuery(query);
     setActiveModule(module);
     setIsAIFullScreen(false); // Exit full-screen mode when a module is selected
+    console.log(`✅ State updated: activeModule = ${module}, userQuery = ${query}`);
   };
 
   const handleAIFullScreen = () => {
@@ -345,6 +347,8 @@ function AppContent() {
             maxWidth: "100%"
           }}>
             <Auth user={user} setUser={setUser} />
+            {/* Debug info */}
+            {console.log(`🔍 Current state: activeModule=${activeModule}, section=${section}`)}
             {/* Render the routed module if set, otherwise fall back to section navigation */}
             {activeModule === 'ai-concepts' && <Concepts query={userQuery} />}
             {activeModule === 'micro-lessons' && <MicroLesson query={userQuery} user={user} />}
@@ -370,14 +374,13 @@ function AppContent() {
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
-{!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
+            {!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
-                              {!activeModule && section === "run-test" && <RunTest />}
-              {!activeModule && section === "security" && <SecurityPanel />}
-              {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
+            {!activeModule && section === "run-test" && <RunTest />}
+            {!activeModule && section === "security" && <SecurityPanel />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
             {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}

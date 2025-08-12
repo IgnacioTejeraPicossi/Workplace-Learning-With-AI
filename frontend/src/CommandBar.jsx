@@ -84,7 +84,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'skill forecast': 'skills-forecast',
     'Skill Forecast': 'skills-forecast',
     'Skills Forecast': 'skills-forecast',
-    // Video Lessons (already robust)
+    // Video Lessons (enhanced mapping)
     videolesson: 'video-lessons',
     videolessons: 'video-lessons',
     'video-lesson': 'video-lessons',
@@ -95,6 +95,9 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'Video Lesson': 'video-lessons',
     'VIDEO LESSONS': 'video-lessons',
     'VIDEO LESSON': 'video-lessons',
+    'Video': 'video-lessons',
+    'video': 'video-lessons',
+    'VIDEO': 'video-lessons',
     // AI Study Buddy
     'ai study buddy': 'ai-study-buddy',
     'study buddy': 'ai-study-buddy',
@@ -117,14 +120,47 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     setError(null);
     setStreamedOutput("");
     setNotification("");
+    
     try {
+      // First, try local keyword detection for common patterns
+      const inputLower = prompt.toLowerCase();
+      let localModule = null;
+      
+      // Enhanced local detection for Video Lessons
+      if (inputLower.includes('video') || inputLower.includes('lección') || inputLower.includes('lesson')) {
+        if (inputLower.includes('video') || inputLower.includes('lección') || inputLower.includes('lesson')) {
+          localModule = 'video-lessons';
+        }
+      }
+      
+      // If we have a strong local match, use it directly
+      if (localModule) {
+        console.log(`🎯 Local detection: routing to ${localModule}`);
+        console.log(`📞 Calling onRoute with:`, localModule, prompt);
+        onRoute(localModule, prompt);
+        setInput("");
+        await askStream({ prompt }, (output) => setStreamedOutput(output));
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise, proceed with backend routing
+      console.log(`🔄 Backend routing for: "${prompt}"`);
       const res = await postRoute(prompt);
+      console.log(`📡 Backend response:`, res);
       const threshold = confidenceToValue(confidenceLevel);
       const backendConfidence = confidenceToValue(res.confidence);
       const isLowConfidence = res.confidence && typeof res.confidence === 'string' && res.confidence.toLowerCase() === 'low';
       // Normalize module names for comparison (ignore case and special characters)
       const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
       const normalizedKnownModules = knownModules.map(m => m.toLowerCase().replace(/[-_ ]/g, ''));
+      
+      console.log(`🔍 Module analysis:`, {
+        normalizedModule,
+        backendConfidence,
+        threshold,
+        isKnownModule: normalizedKnownModules.includes(normalizedModule)
+      });
       
       // Check if we have a direct module match
       const isKnownModule = normalizedKnownModules.includes(normalizedModule);
@@ -177,11 +213,15 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         setUnknownIntent(classifyData);
         // Route to nearest module if possible
         if (isKnownModule) {
-          setNotification(`We routed you to the closest match: ${res.module}. If this isn’t what you wanted, click here to give feedback.`);
-          onRoute(normalizedModule, prompt);
+          setNotification(`We routed you to the closest match: ${res.module}. If this isn't what you wanted, click here to give feedback.`);
+          // Use moduleMap to ensure correct mapping for App routing
+          let mappedModule = moduleMap[res.module] || moduleMap[normalizedModule] || normalizedModule;
+          console.log(`🎯 Backend routing: calling onRoute with:`, mappedModule, prompt);
+          onRoute(mappedModule, prompt);
           setInput("");
           await askStream({ prompt }, (output) => setStreamedOutput(output));
-              } else if (hasGoodKeywordMatch && backendConfidence >= 1) { // Medium confidence or higher
+        }
+      } else if (hasGoodKeywordMatch && backendConfidence >= 1) { // Medium confidence or higher
         // Route to best keyword match with notification
         setNotification(`We found a good match: ${bestMatch}. If this isn't what you wanted, click here to give feedback.`);
         onRoute(bestMatch, prompt);
@@ -193,14 +233,8 @@ function CommandBar({ onRoute, inputPlaceholder }) {
       }
       setLoading(false);
       return;
-      }
-      // For exact/strong match: route directly, no modal/notification
-      // Use moduleMap to ensure correct mapping for App routing
-      let mappedModule = moduleMap[res.module] || moduleMap[normalizedModule] || normalizedModule;
-      onRoute(mappedModule, prompt);
-      setInput("");
-      await askStream({ prompt }, (output) => setStreamedOutput(output));
     } catch (err) {
+      console.error('Routing error:', err);
       setError("Sorry, I couldn't understand your request. Try rephrasing.");
     } finally {
       setLoading(false);
