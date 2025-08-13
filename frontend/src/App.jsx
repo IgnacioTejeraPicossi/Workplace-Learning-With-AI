@@ -373,6 +373,7 @@ function AppContent() {
             {!activeModule && section === "ai-career-coach" && <CareerCoach />}
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
+            {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
