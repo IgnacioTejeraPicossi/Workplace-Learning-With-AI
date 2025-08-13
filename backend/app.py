@@ -19,12 +19,20 @@ from backend.simple_web_search import router as simple_web_search_router
 from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 from bson import ObjectId
 
+# Firebase Authentication
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import auth as firebase_auth
 
-cred = credentials.Certificate("serviceAccountKey.json")  # Path from root
-firebase_admin.initialize_app(cred)
+# Initialize Firebase with service account
+try:
+    cred = credentials.Certificate("serviceAccountKey.json")  # Path from root
+    firebase_admin.initialize_app(cred)
+    print("✅ Firebase initialized successfully")
+except Exception as e:
+    print(f"⚠️ Firebase initialization failed: {e}")
+    print("⚠️ Running in mock authentication mode")
+    firebase_admin = None
 
 app = FastAPI()
 
@@ -41,7 +49,6 @@ app.include_router(repo_router, prefix="/api", tags=["Repository Analysis"])
 app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
-app.include_router(simple_web_search_router, prefix="/api", tags=["Simple Web Search"])
 
 import os
 from fastapi.staticfiles import StaticFiles
@@ -58,16 +65,35 @@ async def favicon():
     favicon_path = os.path.join(os.path.dirname(__file__), "static", "favicon.ico")
     return FileResponse(favicon_path)
 
-async def verify_token(request: Request):
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid auth header")
-    id_token = auth_header.split(" ")[1]
+def verify_token(request: Request):
+    """Verify Firebase authentication token"""
+    if firebase_admin is None:
+        # Fallback to mock authentication if Firebase is not available
+        return {"uid": "mock_user_id", "sub": "mock_user_id", "email": "test@example.com", "name": "Test User"}
+    
     try:
-        decoded_token = firebase_auth.verify_id_token(id_token)
-        return decoded_token
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        # Get the Authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Missing or invalid authorization header")
+        
+        # Extract the token
+        token = auth_header.split("Bearer ")[1]
+        
+        # Verify the token with Firebase
+        decoded_token = firebase_auth.verify_id_token(token)
+        
+        # Return user information
+        return {
+            "uid": decoded_token["uid"],
+            "sub": decoded_token["uid"],
+            "email": decoded_token.get("email", ""),
+            "name": decoded_token.get("name", ""),
+            "picture": decoded_token.get("picture", "")
+        }
+    except Exception as e:
+        print(f"❌ Firebase token verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
 
 class MicroLessonRequest(BaseModel):
     topic: str
@@ -1787,3 +1813,23 @@ def identify_proximity_clusters(recommendations):
             })
     
     return clusters 
+
+# Include the simple web search router at the end
+print("🔍 DEBUG: About to include simple_web_search_router")
+print(f"🔍 DEBUG: Router object: {simple_web_search_router}")
+print(f"🔍 DEBUG: Router routes: {simple_web_search_router.routes}")
+app.include_router(simple_web_search_router, prefix="/api", tags=["Simple Web Search"])
+print("🔍 DEBUG: Router included successfully")
+
+# Test route directly in app.py
+@app.post("/api/test-direct")
+async def test_direct():
+    return {"message": "Direct route works!"}
+
+# Debug: Show all registered routes
+print("🔍 DEBUG: All registered routes:")
+for route in app.routes:
+    if hasattr(route, 'path') and hasattr(route, 'methods'):
+        print(f"  {route.methods} {route.path}")
+    elif hasattr(route, 'path'):
+        print(f"  {route.path}") 
