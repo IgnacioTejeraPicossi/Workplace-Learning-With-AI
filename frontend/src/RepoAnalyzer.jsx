@@ -15,6 +15,16 @@ export default function RepoAnalyzer() {
   const [savedAnalyses, setSavedAnalyses] = useState([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
 
+  // Helper function to safely access nested properties
+  const safeGet = (obj, path, defaultValue = '') => {
+    try {
+      return path.split('.').reduce((current, key) => current?.[key], obj) ?? defaultValue;
+    } catch (error) {
+      console.warn('Error accessing property:', path, error);
+      return defaultValue;
+    }
+  };
+
   // Load templates on component mount
   React.useEffect(() => {
     loadTemplates();
@@ -81,6 +91,10 @@ export default function RepoAnalyzer() {
         branch: branch || null  // Send null if branch is empty to auto-detect
       });
       
+      // Log the response structure for debugging
+      console.log('Analysis response structure:', response.data);
+      console.log('Documentation structure:', response.data?.documentation);
+      
       setAnalysisResult(response.data);
     } catch (err) {
       setError(err.response?.data?.detail || 'Error analyzing repository');
@@ -113,7 +127,10 @@ export default function RepoAnalyzer() {
   };
 
   const handleGenerateQuiz = async () => {
-    if (!analysisResult?.documentation?.markdown) return;
+    if (!analysisResult?.documentation?.markdown) {
+      setError('No documentation available. Please generate documentation first.');
+      return;
+    }
 
     try {
       const response = await axios.post('/api/generate-quiz', {
@@ -160,16 +177,16 @@ export default function RepoAnalyzer() {
       
       // Reconstruct the original analysis result structure
       const reconstructedAnalysis = {
-        repo_name: savedAnalysis.repo_name,
-        branch_used: savedAnalysis.branch_used,
-        files_analyzed: savedAnalysis.analysis_data?.summaries ? Object.keys(savedAnalysis.analysis_data.summaries).length : 0,
-        summaries: analysisData.summaries || {},
-        structure: analysisData.structure || {},
-        insights: analysisData.insights || {},
-        architecture: analysisData.architecture || {},
-        analysis_id: savedAnalysis.analysis_id,
-        documentation: response.data.documentation?.documentation,
-        quiz: response.data.quiz?.quiz_data
+        repo_name: safeGet(savedAnalysis, 'repo_name', 'Unknown Repository'),
+        branch_used: safeGet(savedAnalysis, 'branch_used', 'Unknown'),
+        files_analyzed: safeGet(savedAnalysis, 'analysis_data.summaries') ? Object.keys(safeGet(savedAnalysis, 'analysis_data.summaries', {})).length : 0,
+        summaries: safeGet(analysisData, 'summaries', {}),
+        structure: safeGet(analysisData, 'structure', {}),
+        insights: safeGet(analysisData, 'insights', {}),
+        architecture: safeGet(analysisData, 'architecture', {}),
+        analysis_id: safeGet(savedAnalysis, 'analysis_id', ''),
+        documentation: safeGet(response.data, 'documentation.documentation', {}),
+        quiz: safeGet(response.data, 'quiz.quiz_data', [])
       };
       
       setAnalysisResult(reconstructedAnalysis);
@@ -346,12 +363,26 @@ export default function RepoAnalyzer() {
         )}
       </div>
 
-      {/* Analysis Results */}
-      {analysisResult && (
+            {/* Analysis Results */}
+      {analysisResult && typeof analysisResult === 'object' && (
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ marginBottom: '1rem' }}>
-            📊 Analysis Results: {analysisResult.repo_name}
+            📊 Analysis Results: {safeGet(analysisResult, 'repo_name', 'Unknown Repository')}
           </h2>
+          
+          {/* Show warning if data structure is incomplete */}
+          {!safeGet(analysisResult, 'summaries') && (
+            <div style={{ 
+              background: '#fff3cd', 
+              border: '1px solid #ffeaa7', 
+              color: '#856404', 
+              padding: '1rem', 
+              borderRadius: '4px', 
+              marginBottom: '1rem' 
+            }}>
+              ⚠️ Warning: Analysis data appears to be incomplete. Some features may not work properly.
+            </div>
+          )}
           
           <div style={{ 
             background: '#fff', 
@@ -360,48 +391,48 @@ export default function RepoAnalyzer() {
             border: '1px solid #ddd',
             marginBottom: '1rem'
           }}>
-            <p><strong>Files Analyzed:</strong> {analysisResult.files_analyzed}</p>
-            <p><strong>Repository:</strong> {analysisResult.repo_name}</p>
-            <p><strong>Branch Used:</strong> <span style={{ color: '#28a745', fontWeight: 'bold' }}>{analysisResult.branch_used}</span></p>
+            <p><strong>Files Analyzed:</strong> {safeGet(analysisResult, 'files_analyzed', 0)}</p>
+            <p><strong>Repository:</strong> {safeGet(analysisResult, 'repo_name', 'Unknown')}</p>
+            <p><strong>Branch Used:</strong> <span style={{ color: '#28a745', fontWeight: 'bold' }}>{safeGet(analysisResult, 'branch_used', 'Unknown')}</span></p>
             
             {/* Project Insights */}
-            {analysisResult.insights && (
+            {safeGet(analysisResult, 'insights') && (
               <div style={{ marginTop: '1rem', padding: '1rem', background: '#e7f3ff', borderRadius: '4px' }}>
                 <h4 style={{ marginBottom: '0.5rem' }}>🔍 Project Insights</h4>
-                <p><strong>Type:</strong> {analysisResult.insights.project_type}</p>
-                <p><strong>Language:</strong> {analysisResult.insights.language}</p>
-                <p><strong>Framework:</strong> {analysisResult.insights.framework}</p>
-                <p><strong>Architecture:</strong> {analysisResult.insights.architecture_pattern}</p>
-                <p><strong>Complexity Score:</strong> {analysisResult.insights.complexity_score}</p>
+                <p><strong>Type:</strong> {safeGet(analysisResult, 'insights.project_type', 'Unknown')}</p>
+                <p><strong>Language:</strong> {safeGet(analysisResult, 'insights.language', 'Unknown')}</p>
+                <p><strong>Framework:</strong> {safeGet(analysisResult, 'insights.framework', 'Unknown')}</p>
+                <p><strong>Architecture:</strong> {safeGet(analysisResult, 'insights.architecture_pattern', 'Unknown')}</p>
+                <p><strong>Complexity Score:</strong> {safeGet(analysisResult, 'insights.complexity_score', 'Unknown')}</p>
                 
                 <div style={{ marginTop: '0.5rem' }}>
                   <strong>Components:</strong>
                   <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
-                    <li>Frontend: {analysisResult.insights.has_frontend ? '✅' : '❌'}</li>
-                    <li>Backend: {analysisResult.insights.has_backend ? '✅' : '❌'}</li>
-                    <li>Database: {analysisResult.insights.has_database ? '✅' : '❌'}</li>
-                    <li>Tests: {analysisResult.insights.has_tests ? '✅' : '❌'}</li>
-                    <li>Documentation: {analysisResult.insights.has_docs ? '✅' : '❌'}</li>
-                    <li>Deployment Ready: {analysisResult.insights.deployment_ready ? '✅' : '❌'}</li>
+                    <li>Frontend: {safeGet(analysisResult, 'insights.has_frontend') ? '✅' : '❌'}</li>
+                    <li>Backend: {safeGet(analysisResult, 'insights.has_backend') ? '✅' : '❌'}</li>
+                    <li>Database: {safeGet(analysisResult, 'insights.has_database') ? '✅' : '❌'}</li>
+                    <li>Tests: {safeGet(analysisResult, 'insights.has_tests') ? '✅' : '❌'}</li>
+                    <li>Documentation: {safeGet(analysisResult, 'insights.has_docs') ? '✅' : '❌'}</li>
+                    <li>Deployment Ready: {safeGet(analysisResult, 'insights.deployment_ready') ? '✅' : '❌'}</li>
                   </ul>
                 </div>
               </div>
             )}
             
             {/* Architecture Overview */}
-            {analysisResult.architecture && (
+            {safeGet(analysisResult, 'architecture') && (
               <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '4px' }}>
                 <h4 style={{ marginBottom: '0.5rem' }}>🏗️ Architecture Overview</h4>
-                <p><strong>Total Components:</strong> {analysisResult.architecture.components?.length || 0}</p>
-                <p><strong>Dependencies:</strong> {analysisResult.architecture.relationships?.length || 0}</p>
+                <p><strong>Total Components:</strong> {safeGet(analysisResult, 'architecture.components', []).length}</p>
+                <p><strong>Dependencies:</strong> {safeGet(analysisResult, 'architecture.relationships', []).length}</p>
                 
-                {analysisResult.architecture.layers && (
+                {safeGet(analysisResult, 'architecture.layers') && (
                   <div style={{ marginTop: '0.5rem' }}>
                     <strong>Layers:</strong>
                     <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
-                      {Object.entries(analysisResult.architecture.layers).map(([layer, components]) => (
+                      {Object.entries(safeGet(analysisResult, 'architecture.layers', {})).map(([layer, components]) => (
                         <li key={layer}>
-                          {layer.charAt(0).toUpperCase() + layer.slice(1)}: {components.length} components
+                          {layer.charAt(0).toUpperCase() + layer.slice(1)}: {Array.isArray(components) ? components.length : 0} components
                         </li>
                       ))}
                     </ul>
@@ -411,9 +442,9 @@ export default function RepoAnalyzer() {
             )}
 
             {/* Architecture Diagram */}
-            {analysisResult.architecture && (
+            {safeGet(analysisResult, 'architecture') && (
               <div style={{ marginTop: '1rem' }}>
-                <ArchitectureDiagram architectureData={analysisResult.architecture} />
+                <ArchitectureDiagram architectureData={safeGet(analysisResult, 'architecture', {})} />
               </div>
             )}
           </div>
@@ -422,7 +453,7 @@ export default function RepoAnalyzer() {
           <div style={{ marginBottom: '1rem' }}>
             <h3>📄 File Summaries</h3>
             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {Object.entries(analysisResult.summaries).map(([filename, summary]) => (
+              {Object.entries(safeGet(analysisResult, 'summaries', {})).map(([filename, summary]) => (
                 <div key={filename} style={{ 
                   marginBottom: '1rem', 
                   padding: '1rem', 
@@ -453,7 +484,7 @@ export default function RepoAnalyzer() {
               📝 Generate Documentation
             </button>
             
-            {analysisResult.documentation && (
+            {safeGet(analysisResult, 'documentation.markdown') && (
               <button
                 onClick={handleGenerateQuiz}
                 style={{
@@ -473,7 +504,7 @@ export default function RepoAnalyzer() {
       )}
 
       {/* Generated Documentation */}
-      {analysisResult?.documentation && (
+                  {analysisResult?.documentation?.markdown && (
         <div style={{ marginBottom: '2rem' }}>
           <h2>📚 Generated Documentation</h2>
           
@@ -498,10 +529,10 @@ export default function RepoAnalyzer() {
               {analysisResult.documentation.markdown.substring(0, 1000)}...
             </div>
             
-            {analysisResult.documentation.pdf_path && (
+            {safeGet(analysisResult, 'documentation.pdf_path') && (
               <div style={{ marginTop: '1rem' }}>
                 <a 
-                  href={`/api/download-pdf/${analysisResult.documentation.pdf_path.split('/').pop()}`}
+                  href={`/api/download-pdf/${safeGet(analysisResult, 'documentation.pdf_path', '').split('/').pop()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -522,7 +553,7 @@ export default function RepoAnalyzer() {
       )}
 
       {/* Generated Quiz */}
-      {analysisResult?.quiz && (
+      {safeGet(analysisResult, 'quiz') && Array.isArray(safeGet(analysisResult, 'quiz')) && (
         <div style={{ marginBottom: '2rem' }}>
           <h2>🧠 Generated Quiz</h2>
           
@@ -532,7 +563,7 @@ export default function RepoAnalyzer() {
             borderRadius: '8px', 
             border: '1px solid #ddd'
           }}>
-            {analysisResult.quiz.map((question, index) => (
+            {safeGet(analysisResult, 'quiz', []).map((question, index) => (
               <div key={index} style={{ 
                 marginBottom: '2rem', 
                 padding: '1rem', 
