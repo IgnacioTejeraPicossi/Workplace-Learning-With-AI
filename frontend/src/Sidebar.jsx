@@ -31,7 +31,8 @@ const Icon = ({ name, size = 20 }) => {
     "chevron-down": "⬇️",
     "chevron-up": "⬆️",
     help: "❓",
-    map: "🗺️"
+    map: "🗺️",
+    "graduation-cap": "🎓"
   };
 
   return (
@@ -65,7 +66,8 @@ const navItems = [
   { key: "repository-analyzer", label: "Repository Analyzer", icon: "archive", group: "learning", isExpandable: true, subItems: [
     { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive" },
     { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot" },
-    { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" }
+    { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" },
+    { key: "learning-repo", label: "Learning Repo", icon: "graduation-cap" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)

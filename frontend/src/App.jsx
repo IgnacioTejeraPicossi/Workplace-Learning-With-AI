@@ -29,6 +29,7 @@ import KnowledgeMap from "./KnowledgeMap";
 import RepoAnalyzer from "./RepoAnalyzer";
 import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
 import AgentCursorAI from "./AgentCursorAI";
+import LearningRepo from "./LearningRepo";
 import SecurityPanel from "./SecurityPanel";
 
 function AppContent() {
@@ -377,6 +378,7 @@ function AppContent() {
             {!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
+            {!activeModule && section === "learning-repo" && <LearningRepo />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
