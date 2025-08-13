@@ -739,4 +739,40 @@ async def get_user_analyses(user_id: str, limit: int = 10):
             "user_id": user_id
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving user analyses: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Error retrieving user analyses: {str(e)}")
+
+# New endpoint for manually saving analysis
+class SaveAnalysisRequest(BaseModel):
+    analysis: Dict[str, Any]
+    repo_url: str
+    timestamp: str
+
+@router.post("/save-analysis")
+async def save_analysis(request: SaveAnalysisRequest):
+    """Manually save an analysis result"""
+    try:
+        # Extract repository name from the analysis data
+        repo_name = request.analysis.get('repo_name', 'Unknown Repository')
+        
+        # Save the analysis using the existing storage method
+        analysis_id = await RepoStorage.save_repo_analysis(
+            repo_url=request.repo_url,
+            repo_name=repo_name,
+            branch_used=request.analysis.get('branch_used', 'Unknown'),
+            analysis_data=request.analysis,
+            user_id=None  # TODO: Add user authentication later
+        )
+        
+        return {
+            "success": True,
+            "message": "Analysis saved successfully",
+            "analysis_id": analysis_id,
+            "timestamp": request.timestamp
+        }
+        
+    except Exception as e:
+        print(f"Error saving analysis: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to save analysis: {str(e)}"
+        ) 

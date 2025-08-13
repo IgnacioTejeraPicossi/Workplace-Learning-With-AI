@@ -31,6 +31,16 @@ export default function RepoAnalyzerWithAPIs() {
   const fileInputRef = useRef();
   const dropZoneRef = useRef();
 
+  // Helper function to clear messages
+  const clearMessages = () => {
+    setError('');
+    setSuccess('');
+  };
+
+  // State for saved analyses
+  const [savedAnalyses, setSavedAnalyses] = useState([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+
   // Quick template URLs
   const quickTemplates = [
     {
@@ -53,7 +63,14 @@ export default function RepoAnalyzerWithAPIs() {
   useEffect(() => {
     // Load templates on component mount
     loadTemplates();
+    // Load saved analyses on component mount
+    loadSavedAnalyses();
   }, []);
+
+  // Clear messages when analysis mode changes
+  useEffect(() => {
+    clearMessages();
+  }, [analysisMode]);
 
   const loadTemplates = async () => {
     try {
@@ -68,8 +85,13 @@ export default function RepoAnalyzerWithAPIs() {
     setRepoUrl(template.url);
     setSelectedTemplate(template.name);
     setBranch('main'); // Default to main branch
+    clearMessages();
     setSuccess(`Template "${template.name}" selected!`);
-    setError(''); // Clear any previous errors
+    
+    // Auto-clear success message after 3 seconds
+    setTimeout(() => {
+      setSuccess('');
+    }, 3000);
   };
 
   const detectBranches = async () => {
@@ -88,6 +110,11 @@ export default function RepoAnalyzerWithAPIs() {
         setBranch(response.data.branches[0]); // Set first branch as default
       }
       setSuccess(`Found ${response.data.branches?.length || 0} branches`);
+      
+      // Auto-clear success message after 4 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 4000);
     } catch (error) {
       setError('Failed to detect branches. Please check the URL and try again.');
       console.error('Branch detection error:', error);
@@ -103,7 +130,7 @@ export default function RepoAnalyzerWithAPIs() {
     }
 
     setAnalyzing(true);
-    setError('');
+    clearMessages();
     setAnalysisResult(null);
 
     try {
@@ -114,6 +141,11 @@ export default function RepoAnalyzerWithAPIs() {
 
       setAnalysisResult(response.data);
       setSuccess('Repository analyzed successfully!');
+      
+      // Auto-clear success message after 4 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 4000);
     } catch (error) {
       setError('Failed to analyze repository. Please check the URL and try again.');
       console.error('Analysis error:', error);
@@ -156,7 +188,7 @@ export default function RepoAnalyzerWithAPIs() {
     }
 
     setAnalyzing(true);
-    setError('');
+    clearMessages();
 
     try {
       const formData = new FormData();
@@ -172,6 +204,11 @@ export default function RepoAnalyzerWithAPIs() {
 
       setUploadedFiles(selectedFiles);
       setSuccess(`Successfully uploaded ${selectedFiles.length} files`);
+      
+      // Auto-clear success message after 4 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 4000);
     } catch (error) {
       setError('Failed to upload files. Please try again.');
       console.error('Upload error:', error);
@@ -183,23 +220,44 @@ export default function RepoAnalyzerWithAPIs() {
   // Handle Save Analysis
   const handleSaveAnalysis = async () => {
     if (!analysisResult) {
+      clearMessages();
       setError('No analysis result to save');
       return;
     }
 
     try {
+      clearMessages();
       setSuccess('Saving analysis...');
-      const response = await axios.post('/api/save-analysis', {
+      
+      // Log the data being sent
+      const saveData = {
         analysis: analysisResult,
         repo_url: repoUrl,
         timestamp: new Date().toISOString()
-      });
+      };
+      console.log('Sending save data:', saveData);
+      
+      const response = await axios.post('/api/save-analysis', saveData);
       
       setSuccess('Analysis saved successfully!');
       console.log('Analysis saved:', response.data);
+      
+      // Reload the saved analyses list
+      await loadSavedAnalyses();
+      
+      // Auto-clear success message after 5 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 5000);
     } catch (error) {
-      setError('Failed to save analysis');
-      console.error('Save analysis error:', error);
+      clearMessages();
+      console.error('Save analysis error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      setError(`Failed to save analysis: ${error.response?.data?.detail || error.message}`);
     }
   };
 
@@ -223,6 +281,11 @@ export default function RepoAnalyzerWithAPIs() {
       URL.revokeObjectURL(url);
       
       setSuccess('README.md downloaded successfully!');
+      
+      // Auto-clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
     } catch (error) {
       setError('Failed to download README');
       console.error('Download error:', error);
@@ -232,11 +295,13 @@ export default function RepoAnalyzerWithAPIs() {
   // Handle Create Learning Module
   const handleCreateLearningModule = async () => {
     if (!analysisResult) {
+      clearMessages();
       setError('No analysis result to create learning module from');
       return;
     }
 
     try {
+      clearMessages();
       setSuccess('Creating learning module...');
       console.log('Creating learning module with data:', analysisResult);
       
@@ -258,7 +323,13 @@ export default function RepoAnalyzerWithAPIs() {
       if (response.data.success) {
         setSuccess('Learning module created successfully! Check AI Training Module section.');
         console.log('Learning module created:', response.data);
+        
+        // Auto-clear success message after 5 seconds
+        setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       } else {
+        clearMessages();
         setError(`Failed to create learning module: ${response.data.message}`);
         console.error('Backend error:', response.data);
       }
@@ -268,6 +339,8 @@ export default function RepoAnalyzerWithAPIs() {
       
     } catch (error) {
       console.error('Create learning module error:', error);
+      clearMessages();
+      
       if (error.response) {
         setError(`Failed to create learning module: ${error.response.data.message || error.response.statusText}`);
         console.error('Backend response error:', error.response.data);
@@ -278,6 +351,85 @@ export default function RepoAnalyzerWithAPIs() {
         setError(`Failed to create learning module: ${error.message}`);
         console.error('Other error:', error.message);
       }
+    }
+  };
+
+  // Load saved analyses
+  const loadSavedAnalyses = async () => {
+    try {
+      setLoadingSaved(true);
+      const response = await axios.get('/api/saved-analyses?limit=10');
+      setSavedAnalyses(response.data.analyses || []);
+    } catch (err) {
+      console.error('Error loading saved analyses:', err);
+    } finally {
+      setLoadingSaved(false);
+    }
+  };
+
+  // Load a specific analysis
+  const loadAnalysis = async (analysisId) => {
+    try {
+      const response = await axios.get(`/api/saved-analyses/${analysisId}`);
+      
+      // Extract data from the saved analysis structure
+      const savedAnalysis = response.data.analysis;
+      const analysisData = savedAnalysis.analysis_data || {};
+      
+      // Reconstruct the original analysis result structure
+      const reconstructedAnalysis = {
+        repo_name: savedAnalysis.repo_name || 'Unknown Repository',
+        branch_used: savedAnalysis.branch_used || 'Unknown',
+        files_analyzed: savedAnalysis.analysis_data?.summaries ? Object.keys(savedAnalysis.analysis_data.summaries).length : 0,
+        summaries: analysisData.summaries || {},
+        structure: analysisData.structure || {},
+        insights: analysisData.insights || {},
+        architecture: analysisData.architecture || {},
+        analysis_id: savedAnalysis.analysis_id || '',
+        documentation: response.data.documentation?.documentation || {},
+        quiz: response.data.quiz?.quiz_data || []
+      };
+      
+      setAnalysisResult(reconstructedAnalysis);
+      setRepoUrl(savedAnalysis.repo_url || '');
+      setBranch(savedAnalysis.branch_used || '');
+      clearMessages();
+      setSuccess('Analysis loaded successfully!');
+      
+      // Auto-clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
+      
+    } catch (err) {
+      setError('Error loading analysis: ' + err.message);
+    }
+  };
+
+  // Delete a saved analysis
+  const deleteAnalysis = async (analysisId) => {
+    if (!window.confirm('Are you sure you want to delete this analysis?')) return;
+    
+    try {
+      await axios.delete(`/api/saved-analyses/${analysisId}`);
+      await loadSavedAnalyses(); // Reload the list
+      if (analysisResult?.analysis_id === analysisId) {
+        setAnalysisResult(null);
+        setRepoUrl('');
+        setBranch('');
+      }
+      setSuccess('Analysis deleted successfully!');
+      
+      // Reload the saved analyses list
+      await loadSavedAnalyses();
+      
+      // Auto-clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
+      
+    } catch (err) {
+      setError('Error deleting analysis: ' + err.message);
     }
   };
 
@@ -854,6 +1006,19 @@ export default function RepoAnalyzerWithAPIs() {
         <div className="error-message">
           <span className="error-icon">❌</span>
           {error}
+          <button 
+            onClick={clearMessages}
+            style={{
+              marginLeft: '10px',
+              background: 'none',
+              border: 'none',
+              color: '#dc3545',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -862,8 +1027,186 @@ export default function RepoAnalyzerWithAPIs() {
         <div className="success-message">
           <span className="success-icon">✅</span>
           {success}
+          <button 
+            onClick={clearMessages}
+            style={{
+              marginLeft: '10px',
+              background: 'none',
+              border: 'none',
+              color: '#28a745',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
+
+      {/* Saved Analyses Section */}
+      <div style={{ marginTop: '2rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '1rem'
+        }}>
+          <h2 style={{ 
+            color: '#333', 
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            💾 Saved Analyses
+            {savedAnalyses.length > 0 && (
+              <span style={{
+                background: '#007bff',
+                color: '#fff',
+                fontSize: '0.8rem',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '12px',
+                marginLeft: '0.5rem'
+              }}>
+                {savedAnalyses.length}
+              </span>
+            )}
+          </h2>
+          
+          <button
+            onClick={loadSavedAnalyses}
+            disabled={loadingSaved}
+            style={{
+              padding: '0.5rem 1rem',
+              background: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: loadingSaved ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: loadingSaved ? 0.6 : 1,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => !loadingSaved && (e.target.style.background = '#218838')}
+            onMouseOut={(e) => !loadingSaved && (e.target.style.background = '#28a745')}
+          >
+            {loadingSaved ? '🔄 Loading...' : '🔄 Refresh'}
+          </button>
+        </div>
+        
+        {loadingSaved ? (
+          <p>Loading saved analyses...</p>
+        ) : savedAnalyses.length === 0 ? (
+          <div style={{ 
+            padding: '2rem',
+            background: '#f8f9fa',
+            borderRadius: '8px',
+            border: '1px solid #e9ecef',
+            textAlign: 'center'
+          }}>
+            <div style={{ 
+              fontSize: '3rem', 
+              marginBottom: '1rem',
+              opacity: 0.5
+            }}>
+              💾
+            </div>
+            <p style={{ 
+              color: '#666', 
+              fontStyle: 'italic',
+              margin: '0.5rem 0',
+              fontSize: '1.1rem'
+            }}>
+              No saved analyses found
+            </p>
+            <p style={{ 
+              color: '#999', 
+              fontSize: '0.9rem',
+              margin: 0
+            }}>
+              Analyze a repository and save it to see it here!
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {savedAnalyses.map((analysis) => (
+              <div key={analysis._id} style={{ 
+                background: '#f8f9fa', 
+                padding: '1.5rem', 
+                borderRadius: '8px', 
+                border: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                transition: 'all 0.2s ease'
+              }}>
+                <div style={{ flex: '1' }}>
+                  <h4 style={{ 
+                    marginBottom: '0.5rem', 
+                    color: '#007bff',
+                    fontSize: '1.1rem'
+                  }}>
+                    {analysis.repo_name || 'Unknown Repository'}
+                  </h4>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '0.5rem',
+                    fontSize: '0.9rem',
+                    color: '#666'
+                  }}>
+                    <p><strong>Repository:</strong> {analysis.repo_url}</p>
+                    <p><strong>Branch:</strong> {analysis.branch_used || 'Unknown'}</p>
+                    <p><strong>Files Analyzed:</strong> {analysis.analysis_data?.summaries ? Object.keys(analysis.analysis_data.summaries).length : 0}</p>
+                    <p><strong>Date:</strong> {new Date(analysis.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '0.5rem',
+                  flexShrink: 0
+                }}>
+                  <button
+                    onClick={() => loadAnalysis(analysis._id)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.background = '#0056b3'}
+                    onMouseOut={(e) => e.target.style.background = '#007bff'}
+                  >
+                    📂 Load Analysis
+                  </button>
+                  <button
+                    onClick={() => deleteAnalysis(analysis._id)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#dc3545',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.background = '#c82333'}
+                    onMouseOut={(e) => e.target.style.background = '#dc3545'}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
