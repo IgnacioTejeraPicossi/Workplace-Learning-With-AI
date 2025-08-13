@@ -6,6 +6,7 @@ import AdvancedRecommendations from './AdvancedRecommendations';
 import AdvancedTooltip from './AdvancedTooltip';
 import ClusterLegend from './ClusterLegend';
 import AdvancedMasteryPanel from './AdvancedMasteryPanel';
+import WebSearchResults from './WebSearchResults';
 import * as d3 from 'd3';
 
 const KnowledgeMap = () => {
@@ -18,6 +19,12 @@ const KnowledgeMap = () => {
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [learningPaths, setLearningPaths] = useState([]);
   const [vectorAnalysis, setVectorAnalysis] = useState(null);
+  
+  // Web search states
+  const [webSearchResults, setWebSearchResults] = useState([]);
+  const [webSearchLoading, setWebSearchLoading] = useState(false);
+  const [webSearchTopic, setWebSearchTopic] = useState('');
+  const [showWebSearch, setShowWebSearch] = useState(false);
   
   // Tooltip and interaction states
   const [tooltipData, setTooltipData] = useState(null);
@@ -42,6 +49,39 @@ const KnowledgeMap = () => {
     'Leadership': '#2196F3', 
     'Business Applications': '#FF9800',
     'Communication': '#9C27B0'
+  };
+
+  // Web search function
+  const performWebSearch = async (topic) => {
+    setWebSearchTopic(topic);
+    setWebSearchLoading(true);
+    setShowWebSearch(true);
+    
+    try {
+      const response = await fetch('/api/simple-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          topic: topic,
+          limit: 10
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setWebSearchResults(data.results || []);
+      } else {
+        console.error('Web search failed:', response.statusText);
+        setWebSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Web search error:', error);
+      setWebSearchResults([]);
+    } finally {
+      setWebSearchLoading(false);
+    }
   };
 
   // Filter topics based on search and filter criteria
@@ -381,6 +421,9 @@ const KnowledgeMap = () => {
         circle.addEventListener('click', () => {
           console.log('🖱️ Clicked node:', node);
           setSelectedTopic(node);
+          
+          // Trigger web search for this topic
+          performWebSearch(node.label);
         });
 
         // Create text label with background for better visibility
@@ -1006,6 +1049,16 @@ const KnowledgeMap = () => {
             pointer-events: none;
           }
         `}</style>
+
+        {/* Web Search Results Panel */}
+        {showWebSearch && (
+          <WebSearchResults
+            topic={webSearchTopic}
+            results={webSearchResults}
+            isLoading={webSearchLoading}
+            onClose={() => setShowWebSearch(false)}
+          />
+        )}
     </div>
   );
 };

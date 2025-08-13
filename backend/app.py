@@ -15,6 +15,7 @@ from backend.repo_analysis import router as repo_router
 from backend.documentation_generator import router as doc_router
 from backend.cursor_readme_routes import router as cursor_readme_router
 from backend.cursor_agent_routes import router as cursor_agent_router
+from backend.simple_web_search import router as simple_web_search_router
 from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 from bson import ObjectId
 
@@ -40,6 +41,7 @@ app.include_router(repo_router, prefix="/api", tags=["Repository Analysis"])
 app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
+app.include_router(simple_web_search_router, prefix="/api", tags=["Simple Web Search"])
 
 import os
 from fastapi.staticfiles import StaticFiles
