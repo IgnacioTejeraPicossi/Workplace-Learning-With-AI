@@ -25,6 +25,13 @@
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
 
+### 🏢 Enterprise Architecture (NEW!)
+- [EA Dashboard](#enterprise-architecture) - Enterprise architecture overview and navigation
+- [Process Designer](#process-designer) - Visual process modeling with React Flow
+- [Catalog Manager](#catalog-manager) - Enterprise catalog management (CRUD)
+- [Heatmap View](#heatmap-view) - Risk and maturity visualization with Chart.js
+- [Impact Analysis](#impact-analysis) - Dependency analysis with BFS algorithm
+
 ### 🛠️ Admin & Development
 - [Run Test](#run-test) - Comprehensive testing suite
 - [Idea Log](#idea-log) - Feature tracking and suggestions
@@ -302,6 +309,9 @@ npm run test:comprehensive
 - **React.js**: Modern JavaScript library for building user interfaces
 - **Shoelace Web Components**: Professional UI components and styling
 - **D3.js**: Interactive data visualization for knowledge mapping
+- **React Flow**: Professional node-based editor for process modeling
+- **Chart.js**: Flexible JavaScript charting library for data visualization
+- **React-Chartjs-2**: React wrapper for Chart.js integration
 - **Cypress**: End-to-end testing framework
 
 ### Key Features
@@ -310,6 +320,9 @@ npm run test:comprehensive
 - **User Authentication**: Secure Firebase-based user management
 - **Responsive Design**: Works on all devices and screen sizes
 - **Theme Support**: Light/dark mode with automatic adaptation
+- **Enterprise Architecture**: Professional process modeling, catalog management, and impact analysis
+- **Advanced Visualizations**: Interactive charts, heatmaps, and process diagrams
+- **Comprehensive Analytics**: Risk assessment, maturity tracking, and dependency mapping
 
 ---
 
@@ -325,6 +338,9 @@ AI Learning with AI/
 │   ├── prompts.py             # AI prompt templates and configurations
 │   ├── vector_store.py        # Vector database for knowledge mapping
 │   ├── enhanced_analysis.py   # Repository analysis and documentation
+│   ├── ea_models.py           # Enterprise Architecture data models
+│   ├── ea_processes.py        # EA process management endpoints
+│   ├── ea_catalog.py          # EA catalog management endpoints
 │   ├── requirements.txt       # Python dependencies
 │   └── .env                   # Environment variables
 ├── frontend/
@@ -361,7 +377,18 @@ AI Learning with AI/
 │   │   ├── MasteryTimeline.jsx # Learning progress timeline
 │   │   ├── StreamingProgress.jsx # Real-time progress indicators
 │   │   ├── StreamingText.jsx   # Streaming text display
-│   │   └── Sidebar.jsx        # Navigation and module selection
+│   │   ├── Sidebar.jsx        # Navigation and module selection
+│   │   └── ea/                # Enterprise Architecture module
+│   │       ├── EAHome.jsx     # EA main dashboard and navigation
+│   │       ├── EAHome.css     # EA dashboard styling
+│   │       ├── ProcessDesigner.jsx # Visual process modeling with React Flow
+│   │       ├── ProcessDesigner.css # Process designer styling
+│   │       ├── CatalogManager.jsx # Enterprise catalog management (CRUD)
+│   │       ├── CatalogManager.css # Catalog manager styling
+│   │       ├── HeatmapView.jsx # Risk and maturity visualization with Chart.js
+│   │       ├── HeatmapView.css # Heatmap view styling
+│   │       ├── ImpactAnalysis.jsx # Dependency analysis with BFS algorithm
+│   │       └── ImpactAnalysis.css # Impact analysis styling
 │   ├── cypress/               # End-to-end testing framework
 │   │   ├── e2e/               # Test specifications
 │   │   ├── fixtures/          # Test data
@@ -391,6 +418,9 @@ AI Learning with AI/
 │   ├── prompts.py             # AI prompt templates and configurations
 │   ├── vector_store.py        # Vector database for knowledge mapping
 │   ├── enhanced_analysis.py   # Repository analysis and documentation
+│   ├── ea_models.py           # Enterprise Architecture data models
+│   ├── ea_processes.py        # EA process management endpoints
+│   ├── ea_catalog.py          # EA catalog management endpoints
 │   ├── db.py                  # Database models and connections
 │   ├── static/
 │   │   └── favicon.ico
@@ -586,8 +616,9 @@ Modular API endpoints for:
 - **Map of Knowledge**: Advanced learning visualization system with vector-based recommendations, mastery tracking, and interactive clustering via /knowledge-map endpoints.
 - **Repository Documentation Generator**: AI-powered repository analysis and documentation generation with quiz creation via /api/analyze-repo and /api/generate-documentation endpoints.
 - **Team Dynamics Analyzer**: Comprehensive team management and analytics with AI-powered insights via /teams endpoints.
+- **Enterprise Architecture (EA) Module**: Comprehensive enterprise-grade solution with process modeling, catalog management, heatmap visualizations, and impact analysis via /api/ea endpoints.
 - **Firebase Authentication**: Secure user authentication with Google Sign-In
-- **User-Specific Data**: All data (lessons, career sessions, forecasts, certifications, knowledge map data) is saved per user
+- **User-Specific Data**: All data (lessons, career sessions, forecasts, certifications, knowledge map data, EA data) is saved per user
 - **Dynamic prompt handling** with user input (e.g., custom micro-lesson topics)
 - **Mocked AI responses** if OpenAI API key is missing or invalid
 - **CORS enabled** for frontend-backend communication
@@ -1650,4 +1681,226 @@ This project is designed to be built by both humans and AI systems (such as Curs
 You MUST read and follow BOTH this README.md and the full Build AI Workplace Learning Application from Scratch.md document.
 The build document contains exhaustive, step-by-step, and troubleshooting details. This README provides a high-level overview, quick start, and essential configuration.
 Cross-reference both documents for maximum reliability and error recovery.
+
+---
+
+## 🏢 Enterprise Architecture (EA) Module
+
+The **Enterprise Architecture (EA) Module** is a comprehensive enterprise-grade solution inspired by LeanIX, designed to help organizations manage their business processes, applications, capabilities, and their interrelationships. This module provides visual process modeling, impact analysis, heatmap visualizations, and comprehensive catalog management.
+
+### 🎯 Core EA Features
+
+#### 🏠 EA Dashboard
+- **Unified Overview**: Central dashboard with statistics and navigation to all EA sub-modules
+- **Quick Actions**: Direct access to create processes, applications, and capabilities
+- **Real-time Statistics**: Live counts of processes, applications, and capabilities
+- **Navigation Tabs**: Seamless switching between different EA components
+- **Demo Data Initialization**: One-click setup with sample enterprise data
+
+#### 🔄 Process Designer
+- **Visual Process Modeling**: Interactive canvas powered by React Flow
+- **Node Types**: Start, Task, Decision, System, Data, and End nodes
+- **Process Properties**: Risk scores, application links, training module integration
+- **Real-time Editing**: Add, delete, and modify processes on the fly
+- **Process Information**: Name, description, owner, and lifecycle status
+- **Save & Export**: Persist processes to database with unique IDs
+
+#### 📋 Catalog Manager
+- **Comprehensive CRUD Operations**: Create, Read, Update, Delete for all EA entities
+- **Multi-Entity Management**: Applications, Business Capabilities, and Processes
+- **Advanced Search & Filtering**: Real-time search with category and status filters
+- **Dynamic Forms**: Intelligent form generation based on entity type
+- **Data Validation**: Input validation and error handling
+- **Bulk Operations**: Efficient management of multiple items
+
+#### 📊 Heatmap View
+- **Multi-Dimensional Visualizations**: 4 distinct chart types using Chart.js
+- **Process Risk vs Maturity Matrix**: Bar chart showing risk-maturity relationships
+- **Application Lifecycle Analysis**: Line chart for lifecycle and risk trends
+- **Capability Maturity Scatter Plot**: Scatter chart for capability assessment
+- **Risk Distribution Analysis**: Comprehensive risk overview across all entities
+- **Interactive Charts**: Hover effects, tooltips, and responsive design
+
+#### 🔍 Impact Analysis
+- **BFS Algorithm Implementation**: Breadth-First Search for dependency traversal
+- **Dependency Mapping**: Visual representation of process and application relationships
+- **Impact Metrics**: Calculation of impact scores and dependency levels
+- **Tree Visualization**: Hierarchical display of impact relationships
+- **Sample Data Generation**: Built-in demo data for testing and demonstration
+- **Real-time Analysis**: Instant impact assessment for any selected entity
+
+### 🏗️ Technical Architecture
+
+#### Frontend Components
+- **EAHome.jsx**: Main dashboard with navigation and overview
+- **ProcessDesigner.jsx**: React Flow-based process modeling interface
+- **CatalogManager.jsx**: Comprehensive catalog management interface
+- **HeatmapView.jsx**: Chart.js-powered visualization dashboard
+- **ImpactAnalysis.jsx**: BFS algorithm implementation with tree visualization
+
+#### Backend API Endpoints
+- **Process Management**: `/api/ea/processes` (CRUD operations)
+- **Application Management**: `/api/ea/applications` (CRUD operations)
+- **Capability Management**: `/api/ea/capabilities` (CRUD operations)
+- **Catalog Overview**: `/api/ea/catalog/overview` (statistics and metrics)
+- **Demo Data**: `/api/ea/init-demo-data` (sample data initialization)
+
+#### Database Collections
+- **ea_processes**: Process definitions with nodes, edges, and metadata
+- **ea_applications**: Application information with lifecycle and risk data
+- **ea_capabilities**: Business capability definitions and maturity levels
+
+### 🎨 User Experience Features
+
+#### Professional Interface
+- **Modern Design**: Clean, professional UI with consistent styling
+- **Responsive Layout**: Works perfectly on all screen sizes
+- **Theme Integration**: Automatic light/dark mode adaptation
+- **Intuitive Navigation**: Clear tab structure and navigation flow
+
+#### Interactive Elements
+- **Drag & Drop**: Intuitive process design with React Flow
+- **Real-time Updates**: Live data synchronization across all components
+- **Visual Feedback**: Hover effects, tooltips, and status indicators
+- **Error Handling**: Graceful error handling with user-friendly messages
+
+#### Data Management
+- **Auto-save**: Automatic saving of all changes
+- **Data Validation**: Input validation and error prevention
+- **Search & Filter**: Powerful search and filtering capabilities
+- **Export Options**: Data export and sharing capabilities
+
+### 🚀 Use Cases
+
+#### Enterprise Planning
+- **Process Documentation**: Visual documentation of business processes
+- **Application Portfolio Management**: Comprehensive application catalog
+- **Capability Mapping**: Business capability assessment and planning
+- **Risk Assessment**: Risk analysis across all enterprise components
+
+#### Change Management
+- **Impact Analysis**: Understand the impact of proposed changes
+- **Dependency Mapping**: Identify critical dependencies and relationships
+- **Risk Mitigation**: Proactive risk identification and management
+- **Stakeholder Communication**: Visual communication of complex relationships
+
+#### Strategic Planning
+- **Technology Roadmap**: Plan technology investments and migrations
+- **Capability Development**: Identify and prioritize capability improvements
+- **Resource Planning**: Optimize resource allocation across processes
+- **Performance Monitoring**: Track and measure enterprise performance
+
+### 🔧 Technical Implementation
+
+#### React Flow Integration
+- **Canvas Management**: Professional-grade process modeling canvas
+- **Node Customization**: Custom node types and styling
+- **Edge Management**: Process flow connections and relationships
+- **State Persistence**: Automatic saving and restoration of canvas state
+
+#### Chart.js Visualization
+- **Multiple Chart Types**: Bar, Line, Scatter, and custom visualizations
+- **Real-time Data**: Live data updates and chart refreshes
+- **Interactive Features**: Hover effects, click events, and zoom capabilities
+- **Responsive Design**: Charts adapt to different screen sizes
+
+#### BFS Algorithm
+- **Dependency Traversal**: Efficient traversal of entity relationships
+- **Impact Calculation**: Mathematical impact scoring and analysis
+- **Tree Visualization**: Hierarchical display of impact relationships
+- **Performance Optimization**: Efficient algorithm implementation
+
+### 📊 Data Models
+
+#### Process Model
+```javascript
+{
+  id: "process_id",
+  name: "Process Name",
+  description: "Process description",
+  nodes: [
+    { id: "node1", type: "start", position: { x: 0, y: 0 } },
+    { id: "node2", type: "task", position: { x: 100, y: 100 } }
+  ],
+  edges: [
+    { id: "edge1", source: "node1", target: "node2" }
+  ],
+  risk_score: 30,
+  application_id: "app_id",
+  training_module_id: "training_id"
+}
+```
+
+#### Application Model
+```javascript
+{
+  id: "app_id",
+  name: "Application Name",
+  description: "Application description",
+  category: "Business Application",
+  lifecycle_status: "active",
+  risk_score: 25,
+  owner: ["IT Team"],
+  technology_stack: ["React", "Node.js", "MongoDB"]
+}
+```
+
+#### Capability Model
+```javascript
+{
+  id: "capability_id",
+  name: "Capability Name",
+  description: "Capability description",
+  category: "Strategic",
+  level: "Strategic",
+  risk: 20,
+  maturity: 4,
+  owner: ["Business Team"]
+}
+```
+
+### 🎯 Getting Started
+
+#### 1. Access the EA Module
+- Navigate to "🏢 Enterprise Architecture" in the sidebar
+- Click on "EA Dashboard" to access the main overview
+
+#### 2. Initialize Demo Data
+- Click "🚀 Initialize Backend Data" in the Quick Actions section
+- This creates sample processes, applications, and capabilities
+
+#### 3. Explore Components
+- **Process Designer**: Create visual process models
+- **Catalog Manager**: Manage applications and capabilities
+- **Heatmap View**: Analyze risk and maturity patterns
+- **Impact Analysis**: Understand dependencies and relationships
+
+#### 4. Create Your Own Data
+- Use the "Create" buttons in each component
+- Fill out the forms with your enterprise information
+- Save and manage your EA catalog items
+
+### 🔮 Future Enhancements
+
+#### Advanced Process Modeling
+- **BPMN Support**: Full BPMN 2.0 compliance
+- **Process Templates**: Pre-built process templates
+- **Version Control**: Process versioning and change tracking
+- **Collaboration**: Multi-user process editing
+
+#### Enhanced Analytics
+- **Predictive Analytics**: AI-powered trend analysis
+- **Performance Metrics**: KPI dashboards and reporting
+- **Cost Analysis**: Cost impact analysis and optimization
+- **Compliance Tracking**: Regulatory compliance monitoring
+
+#### Integration Capabilities
+- **API Connectors**: Integration with external systems
+- **Data Import/Export**: Support for various data formats
+- **Real-time Sync**: Live synchronization with source systems
+- **Workflow Automation**: Automated process execution
+
+---
+
+## 🎯 Core Learning Modules
 

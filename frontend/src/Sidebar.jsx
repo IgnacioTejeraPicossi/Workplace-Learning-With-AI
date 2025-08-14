@@ -32,7 +32,8 @@ const Icon = ({ name, size = 20 }) => {
     "chevron-up": "⬆️",
     help: "❓",
     map: "🗺️",
-    "graduation-cap": "🎓"
+    "graduation-cap": "🎓",
+    building: "🏢"
   };
 
   return (
@@ -68,6 +69,13 @@ const navItems = [
     { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot" },
     { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" },
     { key: "learning-repo", label: "Learning Repo", icon: "graduation-cap" }
+  ]},
+  
+  // Grupo 1.6: Enterprise Architecture (nuevo módulo)
+  { key: "enterprise-architecture", label: "Enterprise Architecture", icon: "🏢", group: "learning", isExpandable: true, subItems: [
+    { key: "ea-home", label: "EA Dashboard", icon: "🏢" },
+    { key: "process-designer", label: "Process Designer", icon: "🔄" },
+    { key: "catalog-manager", label: "Catalog Manager", icon: "📋" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)

@@ -30,7 +30,10 @@ import RepoAnalyzer from "./RepoAnalyzer";
 import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
 import AgentCursorAI from "./AgentCursorAI";
 import LearningRepo from "./LearningRepo";
+import EAHome from "./ea/EAHome";
+import ProcessDesigner from "./ea/ProcessDesigner";
 import SecurityPanel from "./SecurityPanel";
+import CatalogManager from "./ea/CatalogManager";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -380,6 +383,9 @@ function AppContent() {
             {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "learning-repo" && <LearningRepo />}
+            {!activeModule && section === "ea-home" && <EAHome />}
+            {!activeModule && section === "process-designer" && <ProcessDesigner />}
+            {!activeModule && section === "catalog-manager" && <CatalogManager />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}

@@ -50,6 +50,13 @@ app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
+# Enterprise Architecture routers
+from backend.ea_processes import router as ea_processes_router
+from backend.ea_catalog import router as ea_catalog_router
+
+app.include_router(ea_processes_router)
+app.include_router(ea_catalog_router)
+
 import os
 from fastapi.staticfiles import StaticFiles
 
