@@ -1584,12 +1584,9 @@ async def create_learning_module(request: LearningModuleRequest):
 @app.get("/api/learning-modules")
 async def get_learning_modules():
     try:
-        print("Fetching learning modules...")
-        
-        # Get all learning modules from the database
-        modules = list(lessons_collection.find({"type": "repository_analysis"}))
-        
-        print(f"Found {len(modules)} learning modules")
+        # Get all learning modules from the database using async cursor
+        cursor = lessons_collection.find({"type": "repository_analysis"})
+        modules = await cursor.to_list(length=None)
         
         # Convert ObjectId to string for JSON serialization
         for module in modules:
@@ -1604,8 +1601,6 @@ async def get_learning_modules():
         
     except Exception as e:
         print(f"Error fetching learning modules: {e}")
-        import traceback
-        traceback.print_exc()
         return {"success": False, "message": f"Error: {str(e)}"}
 
 @app.get("/api/learning-modules/{module_id}")

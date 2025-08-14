@@ -15,6 +15,8 @@ export default function LearningRepo() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [activeModule, setActiveModule] = useState(null);
+  const [learningProgress, setLearningProgress] = useState({});
 
   // Load saved analyses on component mount
   useEffect(() => {
@@ -77,6 +79,293 @@ export default function LearningRepo() {
     } catch (error) {
       console.error('Create learning module error:', error);
       setError(`Failed to create learning module: ${error.response?.data?.detail || error.message}`);
+    }
+  };
+
+  // Start learning a specific module
+  const startLearning = (module) => {
+    setActiveModule(module);
+    // Initialize progress if not exists
+    if (!learningProgress[module._id]) {
+      setLearningProgress(prev => ({
+        ...prev,
+        [module._id]: {
+          started: new Date().toISOString(),
+          completed: false,
+          currentSection: 0,
+          sections: generateLearningSections(module)
+        }
+      }));
+    }
+  };
+
+  // Generate learning sections from module content
+  const generateLearningSections = (module) => {
+    const sections = [];
+    
+    // Add overview section
+    sections.push({
+      title: "Overview",
+      content: module.description,
+      type: "text"
+    });
+    
+    // Add repository analysis content
+    if (module.analysis_data) {
+      if (module.analysis_data.structure) {
+        sections.push({
+          title: "Project Structure",
+          content: module.analysis_data.structure,
+          type: "analysis"
+        });
+      }
+      
+      if (module.analysis_data.insights) {
+        sections.push({
+          title: "Key Insights",
+          content: module.analysis_data.insights,
+          type: "insights"
+        });
+      }
+      
+      if (module.analysis_data.documentation?.readme) {
+        sections.push({
+          title: "Documentation",
+          content: module.analysis_data.documentation.readme,
+          type: "documentation"
+        });
+      }
+    }
+    
+    // Add learning objectives
+    if (module.learning_objectives) {
+      sections.push({
+        title: "Learning Objectives",
+        content: module.learning_objectives,
+        type: "objectives"
+      });
+    }
+    
+    return sections;
+  };
+
+  // Navigate to next section
+  const nextSection = () => {
+    if (activeModule && learningProgress[activeModule._id]) {
+      const progress = learningProgress[activeModule._id];
+      if (progress.currentSection < progress.sections.length - 1) {
+        setLearningProgress(prev => ({
+          ...prev,
+          [activeModule._id]: {
+            ...prev[activeModule._id],
+            currentSection: prev[activeModule._id].currentSection + 1
+          }
+        }));
+      }
+    }
+  };
+
+  // Navigate to previous section
+  const prevSection = () => {
+    if (activeModule && learningProgress[activeModule._id]) {
+      const progress = learningProgress[activeModule._id];
+      if (progress.currentSection > 0) {
+        setLearningProgress(prev => ({
+          ...prev,
+          [activeModule._id]: {
+            ...prev[activeModule._id],
+            currentSection: prev[activeModule._id].currentSection - 1
+          }
+        }));
+      }
+    }
+  };
+
+  // Complete module
+  const completeModule = () => {
+    if (activeModule) {
+      setLearningProgress(prev => ({
+        ...prev,
+        [activeModule._id]: {
+          ...prev[activeModule._id],
+          completed: true,
+          completedAt: new Date().toISOString()
+        }
+      }));
+      setSuccess(`🎉 Congratulations! You've completed "${activeModule.title}"`);
+      setTimeout(() => setSuccess(''), 5000);
+    }
+  };
+
+  // Go back to modules list
+  const backToModules = () => {
+    setActiveModule(null);
+  };
+
+  // Render section content based on type
+  const renderSectionContent = (section) => {
+    switch (section.type) {
+      case 'text':
+        return <p style={{ margin: 0, lineHeight: '1.6' }}>{section.content}</p>;
+      
+      case 'analysis':
+        return (
+          <div>
+            {section.content.languages && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Languages:</h4>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {section.content.languages.map((lang, index) => (
+                    <span key={index} style={{
+                      background: '#e3f2fd',
+                      color: '#1976d2',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.9rem'
+                    }}>
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {section.content.frameworks && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Frameworks:</h4>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {section.content.frameworks.map((fw, index) => (
+                    <span key={index} style={{
+                      background: '#f3e5f5',
+                      color: '#7b1fa2',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.9rem'
+                    }}>
+                      {fw}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {section.content.file_structure && (
+              <div>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>File Structure:</h4>
+                <pre style={{
+                  background: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  overflow: 'auto',
+                  fontSize: '0.9rem',
+                  border: '1px solid #e0e0e0'
+                }}>
+                  {JSON.stringify(section.content.file_structure, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'insights':
+        return (
+          <div>
+            {section.content.architecture_pattern && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Architecture Pattern:</h4>
+                <p style={{ margin: 0, padding: '0.5rem', background: '#e8f5e8', borderRadius: '4px', color: '#2e7d32' }}>
+                  {section.content.architecture_pattern}
+                </p>
+              </div>
+            )}
+            
+            {section.content.project_type && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Project Type:</h4>
+                <p style={{ margin: 0, padding: '0.5rem', background: '#fff3e0', borderRadius: '4px', color: '#f57c00' }}>
+                  {section.content.project_type}
+                </p>
+              </div>
+            )}
+            
+            {section.content.complexity_score && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Complexity Score:</h4>
+                <div style={{
+                  background: '#f5f5f5',
+                  borderRadius: '4px',
+                  padding: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <div style={{
+                    width: '100px',
+                    height: '8px',
+                    background: '#e0e0e0',
+                    borderRadius: '4px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${section.content.complexity_score}%`,
+                      height: '100%',
+                      background: section.content.complexity_score > 70 ? '#f44336' : 
+                                section.content.complexity_score > 40 ? '#ff9800' : '#4caf50',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                  <span style={{ fontSize: '0.9rem', color: '#666' }}>
+                    {section.content.complexity_score}/100
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'documentation':
+        return (
+          <div>
+            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Documentation:</h4>
+            <div style={{
+              background: '#f5f5f5',
+              padding: '1rem',
+              borderRadius: '4px',
+              border: '1px solid #e0e0e0',
+              maxHeight: '400px',
+              overflow: 'auto'
+            }}>
+              <pre style={{
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                fontSize: '0.9rem',
+                lineHeight: '1.4'
+              }}>
+                {section.content}
+              </pre>
+            </div>
+          </div>
+        );
+      
+      case 'objectives':
+        return (
+          <div>
+            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Learning Objectives:</h4>
+            <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+              {Array.isArray(section.content) ? section.content.map((objective, index) => (
+                <li key={index} style={{ marginBottom: '0.5rem', lineHeight: '1.4' }}>
+                  {objective}
+                </li>
+              )) : (
+                <li>{section.content}</li>
+              )}
+            </ul>
+          </div>
+        );
+      
+      default:
+        return <p style={{ margin: 0, lineHeight: '1.6' }}>{JSON.stringify(section.content, null, 2)}</p>;
     }
   };
 
@@ -902,6 +1191,23 @@ export default function LearningRepo() {
                    🎓 Module
                  </div>
                  
+                 {/* Progress indicator */}
+                 {learningProgress[module._id] && (
+                   <div style={{
+                     position: 'absolute',
+                     top: '0.5rem',
+                     left: '0.5rem',
+                     background: learningProgress[module._id].completed ? '#28a745' : '#ffc107',
+                     color: '#fff',
+                     padding: '0.25rem 0.5rem',
+                     borderRadius: '4px',
+                     fontSize: '0.8rem',
+                     fontWeight: 'bold'
+                   }}>
+                     {learningProgress[module._id].completed ? '✅ Completed' : '🔄 In Progress'}
+                   </div>
+                 )}
+                 
                  <h3 style={{ color: '#007bff', marginBottom: '1rem', paddingRight: '4rem' }}>
                    {module.title}
                  </h3>
@@ -939,6 +1245,7 @@ export default function LearningRepo() {
                  
                  <div style={{ display: 'flex', gap: '0.5rem' }}>
                    <button
+                     onClick={() => startLearning(module)}
                      style={{
                        padding: '0.5rem 1rem',
                        background: '#007bff',
@@ -972,6 +1279,166 @@ export default function LearningRepo() {
            </div>
          )}
       </div>
+
+      {/* Active Learning Module View */}
+      {activeModule && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.9)',
+          zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '1.5rem',
+              borderBottom: '1px solid #e9ecef',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: '#f8f9fa'
+            }}>
+              <div>
+                <h2 style={{ margin: 0, color: '#007bff' }}>
+                  📚 {activeModule.title}
+                </h2>
+                <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                  {learningProgress[activeModule._id]?.sections?.length || 0} sections • 
+                  {learningProgress[activeModule._id]?.completed ? ' ✅ Completed' : ' 🔄 In Progress'}
+                </p>
+              </div>
+              <button
+                onClick={backToModules}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#6c757d',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '2rem'
+            }}>
+              {learningProgress[activeModule._id]?.sections && (
+                <div>
+                  {/* Progress Bar */}
+                  <div style={{
+                    marginBottom: '2rem',
+                    background: '#e9ecef',
+                    borderRadius: '10px',
+                    height: '8px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      background: '#28a745',
+                      height: '100%',
+                      width: `${((learningProgress[activeModule._id].currentSection + 1) / learningProgress[activeModule._id].sections.length) * 100}%`,
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+
+                  {/* Current Section */}
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h3 style={{ color: '#333', marginBottom: '1rem' }}>
+                      {learningProgress[activeModule._id].sections[learningProgress[activeModule._id].currentSection].title}
+                    </h3>
+                    
+                    <div style={{
+                      background: '#f8f9fa',
+                      padding: '1.5rem',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      {renderSectionContent(learningProgress[activeModule._id].sections[learningProgress[activeModule._id].currentSection])}
+                    </div>
+                  </div>
+
+                  {/* Navigation */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <button
+                      onClick={prevSection}
+                      disabled={learningProgress[activeModule._id].currentSection === 0}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: learningProgress[activeModule._id].currentSection === 0 ? '#ccc' : '#6c757d',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: learningProgress[activeModule._id].currentSection === 0 ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      ← Previous
+                    </button>
+
+                    <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                      Section {learningProgress[activeModule._id].currentSection + 1} of {learningProgress[activeModule._id].sections.length}
+                    </div>
+
+                    {learningProgress[activeModule._id].currentSection === learningProgress[activeModule._id].sections.length - 1 ? (
+                      <button
+                        onClick={completeModule}
+                        style={{
+                          padding: '0.75rem 1.5rem',
+                          background: '#28a745',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🎉 Complete Module
+                      </button>
+                    ) : (
+                      <button
+                        onClick={nextSection}
+                        style={{
+                          padding: '0.75rem 1.5rem',
+                          background: '#007bff',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Next →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
