@@ -18,7 +18,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       }}>
         <div style={{ textAlign: 'center', padding: '40px' }}>
           <div>🔍</div>
-          <div>Buscando "{topic}"...</div>
+          <div>Searching for "{topic}"...</div>
         </div>
       </div>
     );
@@ -40,7 +40,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
         boxShadow: '-2px 0 10px rgba(0,0,0,0.1)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3>🔍 Resultados para "{topic}"</h3>
+          <h3>🔍 Results for "{topic}"</h3>
           <button 
             onClick={onClose}
             style={{
@@ -55,7 +55,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
           </button>
         </div>
         <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-          No se encontraron resultados
+          No results found
         </div>
       </div>
     );
@@ -76,7 +76,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       boxShadow: '-2px 0 10px rgba(0,0,0,0.1)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3>🔍 Resultados para "{topic}"</h3>
+        <h3>🔍 Results for "{topic}"</h3>
         <button 
           onClick={onClose}
           style={{
@@ -92,7 +92,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       </div>
       
       <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
-        Se encontraron {results.length} resultados
+        Found {results.length} results
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

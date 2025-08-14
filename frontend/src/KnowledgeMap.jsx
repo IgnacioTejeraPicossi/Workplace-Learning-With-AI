@@ -33,6 +33,8 @@ const KnowledgeMap = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [activeClusters, setActiveClusters] = useState(Object.keys(clusters));
+  const [isZoomMode, setIsZoomMode] = useState(true);
+  const [nodes, setNodes] = useState([]);
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +44,7 @@ const KnowledgeMap = () => {
   
   const svgRef = useRef(null);
   const { colors } = useTheme();
+  const zoomRef = useRef(null);
 
   // Color palette for different clusters
   const clusterColors = {
@@ -282,7 +285,7 @@ const KnowledgeMap = () => {
     const centerY = height / 2;
 
     // Create nodes with improved positioning - Use all topics, not filtered
-    const nodes = Object.entries(topics).map(([id, topic]) => {
+    const newNodes = Object.entries(topics).map(([id, topic]) => {
       const mastery = userData?.mastery_scores?.[id] || 0;
       const cluster = Object.entries(clusters).find(([clusterName, topicIds]) =>
         topicIds.includes(id)
@@ -310,10 +313,13 @@ const KnowledgeMap = () => {
         originalRadius: 15 + mastery * 20
       };
     });
-    console.log('📊 Created advanced nodes:', nodes);
+    
+    // Update nodes state
+    setNodes(newNodes);
+    console.log('📊 Created advanced nodes:', newNodes);
     console.log('🔍 Topics count:', Object.keys(topics).length);
     console.log('🔍 Filtered topics count:', Object.keys(filteredTopics).length);
-    console.log('🔍 Visible nodes count:', nodes.filter(n => n.isVisible).length);
+    console.log('🔍 Visible nodes count:', newNodes.filter(n => n.isVisible).length);
 
     // Setup D3 zoom behavior - Move after creating elements
     const zoom = d3.zoom()
@@ -323,23 +329,32 @@ const KnowledgeMap = () => {
         setZoomLevel(transform.k);
         setPanOffset({ x: transform.x, y: transform.y });
         
-        // Apply transform to all node groups and cluster labels
-        d3.selectAll('.node-group').attr('transform', (d, i, nodes) => {
-          const group = nodes[i];
-          const originalTransform = group.getAttribute('data-original-transform') || `translate(0,0)`;
-          return `${originalTransform} scale(${transform.k}) translate(${transform.x / transform.k}, ${transform.y / transform.k})`;
-        });
-        
-        // Apply transform to cluster labels
-        d3.selectAll('.cluster-label').attr('transform', (d, i, nodes) => {
-          const label = nodes[i];
-          const originalTransform = label.getAttribute('data-original-transform') || `translate(0,0)`;
-          return `${originalTransform} scale(${transform.k}) translate(${transform.x / transform.k}, ${transform.y / transform.k})`;
-        });
+        // Apply transform to the main container instead of individual elements
+        d3.select(svg).select('.zoom-container').attr('transform', transform);
+      })
+      .on('start', () => {
+        // Add visual feedback during zoom/pan
+        d3.select(svg).style('cursor', 'grabbing');
+        // Add a subtle visual indicator
+        d3.select(svg).style('filter', 'brightness(0.95)');
+      })
+      .on('end', () => {
+        // Reset cursor after zoom/pan
+        d3.select(svg).style('cursor', 'default');
+        // Remove visual indicator
+        d3.select(svg).style('filter', 'none');
       });
+    
+    // Store zoom reference for use in buttons
+    zoomRef.current = zoom;
+
+    // Create zoom container
+    const zoomContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    zoomContainer.setAttribute('class', 'zoom-container');
+    svg.appendChild(zoomContainer);
 
     // Create SVG elements with advanced features
-    nodes.forEach((node, index) => {
+    newNodes.forEach((node, index) => {
       try {
         // Skip nodes that are not visible based on filters
         if (!node.isVisible) {
@@ -475,7 +490,7 @@ const KnowledgeMap = () => {
         group.appendChild(masteryBackground);
         group.appendChild(text);
         group.appendChild(masteryText);
-        svg.appendChild(group);
+        zoomContainer.appendChild(group);
 
         console.log(`✅ Added node ${index + 1}/${nodes.length}:`, node.label);
       } catch (error) {
@@ -486,7 +501,7 @@ const KnowledgeMap = () => {
     // Add cluster labels with better positioning and visibility
     Object.entries(clusters).forEach(([clusterName, topicIds], index) => {
       try {
-        const clusterNodes = nodes.filter(node => topicIds.includes(node.id));
+        const clusterNodes = newNodes.filter(node => topicIds.includes(node.id));
         if (clusterNodes.length > 0) {
           const avgX = clusterNodes.reduce((sum, node) => sum + node.x, 0) / clusterNodes.length;
           const avgY = clusterNodes.reduce((sum, node) => sum + node.y, 0) / clusterNodes.length;
@@ -502,7 +517,7 @@ const KnowledgeMap = () => {
           background.setAttribute('stroke-width', '2');
           background.setAttribute('rx', '5');
           background.setAttribute('opacity', '0.9');
-          svg.appendChild(background);
+          zoomContainer.appendChild(background);
 
                      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
            label.setAttribute('x', avgX);
@@ -517,7 +532,7 @@ const KnowledgeMap = () => {
            label.setAttribute('data-original-transform', originalTransform);
            label.textContent = clusterName;
 
-           svg.appendChild(label);
+           zoomContainer.appendChild(label);
           console.log(`✅ Added cluster label: ${clusterName}`);
         }
       } catch (error) {
@@ -527,6 +542,14 @@ const KnowledgeMap = () => {
 
     // Apply zoom behavior after all elements are created
     d3.select(svg).call(zoom);
+    
+    // Add double-click to reset zoom
+    d3.select(svg).on('dblclick', () => {
+      d3.select(svg).transition().duration(300).call(
+        zoomRef.current.transform,
+        d3.zoomIdentity.scale(1).translate(0, 0)
+      );
+    });
     
     console.log('🎉 Map rendering completed!');
   };
@@ -760,16 +783,27 @@ const KnowledgeMap = () => {
           gap: '8px',
           zIndex: 100
         }}>
+          {/* Zoom Level Indicator */}
+          <div style={{
+            background: colors.background,
+            border: `1px solid ${colors.border}`,
+            borderRadius: '6px',
+            padding: '4px 8px',
+            fontSize: '0.8rem',
+            color: colors.textSecondary,
+            textAlign: 'center',
+            minWidth: '40px'
+          }}>
+            {Math.round(zoomLevel * 100)}%
+          </div>
           <button
             onClick={() => {
               const svg = svgRef.current;
-              if (svg) {
+              if (svg && zoomRef.current) {
                 const currentZoom = d3.zoomTransform(svg);
                 const newScale = Math.min(currentZoom.k * 1.2, 3);
-                d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
-                  d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y)
-                );
+                const newTransform = d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y);
+                d3.select(svg).transition().duration(300).call(zoomRef.current.transform, newTransform);
               }
             }}
             style={{
@@ -778,7 +812,7 @@ const KnowledgeMap = () => {
               borderRadius: '50%',
               border: `1px solid ${colors.border}`,
               backgroundColor: colors.background,
-              color: colors.textPrimary,
+              color: colors.text,
               cursor: 'pointer',
               fontSize: '1.2rem',
               display: 'flex',
@@ -786,19 +820,18 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
+            title="Zoom in"
           >
             +
           </button>
           <button
             onClick={() => {
               const svg = svgRef.current;
-              if (svg) {
+              if (svg && zoomRef.current) {
                 const currentZoom = d3.zoomTransform(svg);
-                const newScale = Math.max(currentZoom.k * 0.8, 0.5);
-                d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
-                  d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y)
-                );
+                const newScale = Math.max(currentZoom.k * 0.5, 0.5);
+                const newTransform = d3.zoomIdentity.scale(newScale).translate(currentZoom.x, currentZoom.y);
+                d3.select(svg).transition().duration(300).call(zoomRef.current.transform, newTransform);
               }
             }}
             style={{
@@ -807,7 +840,7 @@ const KnowledgeMap = () => {
               borderRadius: '50%',
               border: `1px solid ${colors.border}`,
               backgroundColor: colors.background,
-              color: colors.textPrimary,
+              color: colors.text,
               cursor: 'pointer',
               fontSize: '1.2rem',
               display: 'flex',
@@ -815,15 +848,16 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
+            title="Zoom out"
           >
             −
           </button>
           <button
             onClick={() => {
               const svg = svgRef.current;
-              if (svg) {
+              if (svg && zoomRef.current) {
                 d3.select(svg).transition().duration(300).call(
-                  d3.zoom().transform,
+                  zoomRef.current.transform,
                   d3.zoomIdentity.scale(1).translate(0, 0)
                 );
               }
@@ -834,7 +868,7 @@ const KnowledgeMap = () => {
               borderRadius: '50%',
               border: `1px solid ${colors.border}`,
               backgroundColor: colors.background,
-              color: colors.textPrimary,
+              color: colors.text,
               cursor: 'pointer',
               fontSize: '1.2rem',
               display: 'flex',
@@ -842,8 +876,85 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
+            title="Reset zoom and center"
           >
             🏠
+          </button>
+          <button
+            onClick={() => {
+              const svg = svgRef.current;
+              if (svg && zoomRef.current) {
+                // Center on visible nodes
+                const visibleNodes = nodes.filter(n => n.isVisible);
+                if (visibleNodes.length > 0) {
+                  const avgX = visibleNodes.reduce((sum, n) => sum + n.x, 0) / visibleNodes.length;
+                  const avgY = visibleNodes.reduce((sum, n) => sum + n.y, 0) / visibleNodes.length;
+                  const container = svg.parentElement;
+                  const width = container ? container.clientWidth - 48 : 800;
+                  const height = 600;
+                  const centerX = width / 2;
+                  const centerY = height / 2;
+                  const translateX = centerX - avgX;
+                  const translateY = centerY - avgY;
+                  
+                  d3.select(svg).transition().duration(300).call(
+                    zoomRef.current.transform,
+                    d3.zoomIdentity.scale(zoomLevel).translate(translateX, translateY)
+                  );
+                }
+              }
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.background,
+              color: colors.text,
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            title="Center on visible nodes"
+          >
+            🎯
+          </button>
+          <button
+            onClick={() => {
+              setIsZoomMode(!isZoomMode);
+              const svg = svgRef.current;
+              if (svg && zoomRef.current) {
+                if (isZoomMode) {
+                  // Disable zoom behavior
+                  d3.select(svg).on('.zoom', null);
+                  d3.select(svg).style('cursor', 'crosshair');
+                } else {
+                  // Re-enable zoom behavior
+                  d3.select(svg).call(zoomRef.current);
+                  d3.select(svg).style('cursor', 'default');
+                }
+              }
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: isZoomMode ? colors.primary : colors.background,
+              color: isZoomMode ? colors.background : colors.text,
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            title={isZoomMode ? "Disable zoom mode" : "Enable zoom mode"}
+          >
+            {isZoomMode ? "🔒" : "🔓"}
           </button>
         </div>
       </div>
@@ -884,7 +995,10 @@ const KnowledgeMap = () => {
            <strong>Node size:</strong> Larger nodes indicate higher mastery levels
          </div>
          <div style={{ marginTop: 8, fontSize: '0.9em', color: colors.textSecondary }}>
-           <strong>Zoom:</strong> Use the controls on the map or mouse wheel to zoom in/out
+           <strong>Zoom:</strong> Use the controls on the map, mouse wheel, or double-click to reset
+         </div>
+         <div style={{ marginTop: 8, fontSize: '0.9em', color: colors.textSecondary }}>
+           <strong>Pan:</strong> Click and drag to move around the map
          </div>
        </div>
 

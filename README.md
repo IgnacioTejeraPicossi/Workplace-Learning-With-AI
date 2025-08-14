@@ -1063,10 +1063,30 @@ The Map of Knowledge is a sophisticated learning visualization system that provi
 - **Results Counter**: Shows filtered vs. total topics count
 
 #### 🎮 Interactive Controls
-- **Zoom Controls**: +, -, and home buttons for map navigation
+- **Advanced Zoom Controls**: 
+  - **+ Button**: Zoom in with smooth transitions (20% increase per click)
+  - **− Button**: Zoom out with smooth transitions (50% decrease per click)
+  - **🏠 Button**: Reset zoom to 100% and center the map
+  - **🎯 Button**: Center the map on currently visible nodes
+  - **🔒/🔓 Button**: Toggle between zoom mode and selection mode
+- **Zoom Level Indicator**: Real-time display of current zoom percentage
 - **Mouse Wheel Zoom**: Natural zoom in/out with mouse wheel
-- **Pan Navigation**: Click and drag to move around the map
+- **Double-Click Reset**: Double-click anywhere on the map to reset zoom
+- **Pan Navigation**: Click and drag to move around the map with visual feedback
 - **Node Selection**: Click nodes to view detailed topic information
+- **Visual Feedback**: Cursor changes and subtle brightness effects during zoom/pan operations
+
+#### 🎯 Advanced Zoom & Navigation System
+- **Professional Zoom Controls**: 
+  - **Zoom Range**: 50% (minimum) to 300% (maximum) zoom levels
+  - **Smooth Transitions**: 300ms animations for all zoom operations
+  - **Smart Centering**: Automatic centering on filtered/visible nodes
+  - **Mode Toggle**: Switch between zoom mode and selection mode
+- **Enhanced User Experience**:
+  - **Tooltips**: Helpful information on hover for all zoom controls
+  - **Visual Indicators**: Cursor changes and brightness effects during operations
+  - **Responsive Design**: Works perfectly on all screen sizes and devices
+  - **Accessibility**: Full keyboard and mouse support
 
 #### 📈 Data Synchronization
 - **Real-time Updates**: Mastery scores update automatically as you learn
@@ -1525,6 +1545,100 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
 ---
 
 
+
+---
+
+## 🎮 Enhanced Knowledge Map Zoom & Navigation Features
+
+The Knowledge Map has been significantly enhanced with professional-grade zoom and navigation capabilities, making it easier than ever to explore your learning landscape.
+
+### 🎯 Advanced Zoom Controls
+
+**Professional Zoom Interface**
+- **Zoom In (+)**: Increases zoom by 20% with smooth 300ms transitions
+- **Zoom Out (−)**: Decreases zoom by 50% with smooth 300ms transitions  
+- **Reset (🏠)**: Returns to 100% zoom and centers the map
+- **Center (🎯)**: Automatically centers the map on currently visible nodes
+- **Mode Toggle (🔒/🔓)**: Switch between zoom mode and selection mode
+
+**Smart Zoom Features**
+- **Zoom Range**: 50% (minimum) to 300% (maximum) zoom levels
+- **Real-time Indicator**: Shows current zoom percentage (e.g., "150%")
+- **Smooth Animations**: All zoom operations use 300ms transitions
+- **Intelligent Centering**: Respects current filters and focuses on visible content
+
+### 🖱️ Enhanced Navigation
+
+**Mouse & Touch Support**
+- **Mouse Wheel**: Natural zoom in/out with wheel
+- **Double-Click**: Reset zoom from anywhere on the map
+- **Click & Drag**: Pan navigation with visual feedback
+- **Touch Support**: Works perfectly on tablets and mobile devices
+
+**Visual Feedback System**
+- **Cursor Changes**: Cursor adapts during zoom/pan operations
+- **Brightness Effects**: Subtle visual indicators during navigation
+- **Smooth Transitions**: Professional animations for all interactions
+- **Responsive Design**: Adapts to all screen sizes and devices
+
+### 🔧 Technical Implementation
+
+**D3.js Integration**
+- **Zoom Behavior**: Professional D3.js zoom with scale limits
+- **Transform Management**: Efficient SVG transform handling
+- **Performance Optimization**: Smooth 60fps animations
+- **Memory Management**: Proper cleanup and reference management
+
+**State Management**
+- **Zoom Level Tracking**: Real-time zoom state management
+- **Pan Offset Tracking**: Precise position tracking
+- **Mode Switching**: Seamless transition between zoom and selection modes
+- **Filter Integration**: Zoom controls respect current search and filter states
+
+### 📱 User Experience Improvements
+
+**Professional Interface**
+- **Tooltips**: Helpful information on hover for all controls
+- **Visual Hierarchy**: Clear button design with consistent styling
+- **Accessibility**: Full keyboard and mouse support
+- **Theme Integration**: Adapts to light/dark mode automatically
+
+**Smart Features**
+- **Filter-Aware Centering**: Center button focuses on filtered results
+- **Zoom Memory**: Maintains zoom level when switching between modes
+- **Responsive Layout**: Controls adapt to different screen sizes
+- **Error Prevention**: Prevents zoom operations when not available
+
+### 🎨 How to Use
+
+1. **Basic Zoom**
+   - Use **+** and **−** buttons for precise zoom control
+   - Use mouse wheel for natural zooming
+   - Double-click anywhere to reset zoom
+
+2. **Smart Navigation**
+   - Click **🎯** to center on your current learning topics
+   - Use **🏠** to reset and get an overview
+   - Toggle **🔒/🔓** to switch between zoom and selection modes
+
+3. **Advanced Features**
+   - Pan by clicking and dragging
+   - Use filters to focus on specific topics
+   - Combine zoom with search for precise navigation
+
+### 🚀 Performance Benefits
+
+**Optimized Rendering**
+- **Efficient Updates**: Only necessary elements are re-rendered
+- **Smooth Animations**: Hardware-accelerated transitions
+- **Memory Efficient**: Proper cleanup prevents memory leaks
+- **Responsive**: Maintains performance on all devices
+
+**User Experience**
+- **Instant Feedback**: Immediate response to all controls
+- **Professional Feel**: Smooth, polished interactions
+- **Intuitive Design**: Natural and expected behavior
+- **Accessibility**: Works for all users and devices
 
 ---
 
