@@ -50,7 +50,7 @@ export default function LearningRepo() {
         repo_name: analysis.repo_name,
         branch_used: analysis.branch_used,
         created_at: new Date().toISOString(),
-        type: 'repository_learning',
+        type: 'repository_analysis',
         difficulty: 'intermediate',
         estimated_time: '2-3 hours',
         topics: extractTopics(analysis.analysis_data),
@@ -61,9 +61,16 @@ export default function LearningRepo() {
       const response = await axios.post('/api/create-learning-module', learningModuleData);
       
       if (response.data.success) {
-        setSuccess('Learning module created successfully!');
+        setSuccess(`Learning module created successfully! Module ID: ${response.data.module_id}`);
+        console.log('Created learning module:', response.data.module);
+        
+        // Add the new module to the list immediately
+        const newModule = response.data.module;
+        setLearningModules(prev => [newModule, ...prev]);
+        
+        // Also reload from server to ensure consistency
         await loadLearningModules();
-        setTimeout(() => setSuccess(''), 3000);
+        setTimeout(() => setSuccess(''), 5000);
       } else {
         setError(`Failed to create learning module: ${response.data.message}`);
       }
@@ -161,10 +168,20 @@ export default function LearningRepo() {
   // Load learning modules
   const loadLearningModules = async () => {
     try {
+      console.log('Loading learning modules...');
       const response = await axios.get('/api/learning-modules');
-      setLearningModules(response.data.modules || []);
+      console.log('Learning modules response:', response.data);
+      
+      if (response.data.success) {
+        setLearningModules(response.data.modules || []);
+        console.log(`Loaded ${response.data.modules?.length || 0} learning modules`);
+      } else {
+        console.error('Failed to load learning modules:', response.data.message);
+        setError(`Failed to load learning modules: ${response.data.message}`);
+      }
     } catch (err) {
       console.error('Error loading learning modules:', err);
+      setError(`Error loading learning modules: ${err.message}`);
     }
   };
 
@@ -803,11 +820,30 @@ export default function LearningRepo() {
         </div>
       )}
 
-      {/* Learning Modules Section */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-          📖 Your Learning Modules
-        </h2>
+             {/* Learning Modules Section */}
+       <div style={{ marginBottom: '2rem' }}>
+         <div style={{ 
+           display: 'flex', 
+           justifyContent: 'space-between', 
+           alignItems: 'center',
+           marginBottom: '1rem'
+         }}>
+           <h2 style={{ color: '#333', margin: 0 }}>
+             📖 Your Learning Modules
+           </h2>
+           {learningModules.length > 0 && (
+             <span style={{ 
+               background: '#28a745', 
+               color: '#fff', 
+               padding: '0.25rem 0.75rem', 
+               borderRadius: '20px',
+               fontSize: '0.9rem',
+               fontWeight: 'bold'
+             }}>
+               {learningModules.length} module{learningModules.length !== 1 ? 's' : ''}
+             </span>
+           )}
+         </div>
         
         <button
           onClick={loadLearningModules}
@@ -824,51 +860,117 @@ export default function LearningRepo() {
           🔄 Load Learning Modules
         </button>
         
-        {learningModules.length === 0 ? (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>
-            No learning modules created yet. Create your first one from a repository analysis above!
-          </p>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1rem' }}>
-            {learningModules.map((module) => (
-              <div key={module._id} style={{ 
-                background: '#fff', 
-                padding: '1.5rem', 
-                borderRadius: '8px', 
-                border: '1px solid #e9ecef',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                <h3 style={{ color: '#007bff', marginBottom: '1rem' }}>
-                  {module.title}
-                </h3>
-                
-                <p style={{ color: '#666', marginBottom: '1rem' }}>
-                  {module.description}
-                </p>
-                
-                <div style={{ marginBottom: '1rem' }}>
-                  <p><strong>Difficulty:</strong> {module.difficulty}</p>
-                  <p><strong>Estimated Time:</strong> {module.estimated_time}</p>
-                  <p><strong>Topics:</strong> {module.topics?.join(', ') || 'General'}</p>
-                </div>
-                
-                <button
-                  style={{
-                    padding: '0.5rem 1rem',
-                    background: '#007bff',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  📚 Start Learning
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                 {learningModules.length === 0 ? (
+           <div style={{ 
+             padding: '2rem',
+             background: '#f8f9fa',
+             borderRadius: '8px',
+             border: '1px solid #e9ecef',
+             textAlign: 'center'
+           }}>
+             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📖</div>
+             <p style={{ color: '#666', fontStyle: 'italic', margin: '0.5rem 0' }}>
+               No learning modules created yet
+             </p>
+             <p style={{ color: '#999', fontSize: '0.9rem', margin: 0 }}>
+               Create your first one from a repository analysis above!
+             </p>
+           </div>
+         ) : (
+           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1rem' }}>
+             {learningModules.map((module) => (
+               <div key={module._id} style={{ 
+                 background: '#fff', 
+                 padding: '1.5rem', 
+                 borderRadius: '8px', 
+                 border: '1px solid #e9ecef',
+                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                 position: 'relative'
+               }}>
+                 {/* Module type indicator */}
+                 <div style={{
+                   position: 'absolute',
+                   top: '0.5rem',
+                   right: '0.5rem',
+                   background: '#28a745',
+                   color: '#fff',
+                   padding: '0.25rem 0.5rem',
+                   borderRadius: '4px',
+                   fontSize: '0.8rem',
+                   fontWeight: 'bold'
+                 }}>
+                   🎓 Module
+                 </div>
+                 
+                 <h3 style={{ color: '#007bff', marginBottom: '1rem', paddingRight: '4rem' }}>
+                   {module.title}
+                 </h3>
+                 
+                 <p style={{ color: '#666', marginBottom: '1rem' }}>
+                   {module.description}
+                 </p>
+                 
+                 {/* Repository info */}
+                 {module.repo_name && (
+                   <div style={{ 
+                     marginBottom: '1rem', 
+                     padding: '0.5rem', 
+                     background: '#f8f9fa', 
+                     borderRadius: '4px',
+                     fontSize: '0.9rem'
+                   }}>
+                     <p style={{ margin: '0.25rem 0' }}>
+                       <strong>Repository:</strong> {module.repo_name}
+                     </p>
+                     {module.repo_url && (
+                       <p style={{ margin: '0.25rem 0', fontSize: '0.8rem', color: '#666' }}>
+                         {module.repo_url}
+                       </p>
+                     )}
+                   </div>
+                 )}
+                 
+                 <div style={{ marginBottom: '1rem' }}>
+                   <p><strong>Difficulty:</strong> {module.difficulty}</p>
+                   <p><strong>Estimated Time:</strong> {module.estimated_time}</p>
+                   <p><strong>Topics:</strong> {module.topics?.join(', ') || 'General'}</p>
+                   <p><strong>Created:</strong> {new Date(module.created_at).toLocaleDateString()}</p>
+                 </div>
+                 
+                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+                   <button
+                     style={{
+                       padding: '0.5rem 1rem',
+                       background: '#007bff',
+                       color: '#fff',
+                       border: 'none',
+                       borderRadius: '4px',
+                       cursor: 'pointer',
+                       flex: 1
+                     }}
+                   >
+                     📚 Start Learning
+                   </button>
+                   
+                   <button
+                     style={{
+                       padding: '0.5rem 1rem',
+                       background: '#6c757d',
+                       color: '#fff',
+                       border: 'none',
+                       borderRadius: '4px',
+                       cursor: 'pointer',
+                       fontSize: '0.9rem'
+                     }}
+                     title="View module details"
+                   >
+                     👁️ View
+                   </button>
+                 </div>
+               </div>
+             ))}
+           </div>
+         )}
       </div>
     </div>
   );
