@@ -111,6 +111,52 @@ export default function LearningRepo() {
     return objectives;
   };
 
+  // Generate basic markdown from analysis data for quiz generation
+  const generateBasicMarkdown = (analysis) => {
+    let markdown = `# ${analysis.repo_name || 'Repository'} Analysis\n\n`;
+    
+    if (analysis.analysis_data?.insights) {
+      const insights = analysis.analysis_data.insights;
+      markdown += `## Project Overview\n\n`;
+      markdown += `- **Project Type**: ${insights.project_type || 'Unknown'}\n`;
+      markdown += `- **Language**: ${insights.language || 'Unknown'}\n`;
+      markdown += `- **Framework**: ${insights.framework || 'Unknown'}\n`;
+      markdown += `- **Architecture Pattern**: ${insights.architecture_pattern || 'Unknown'}\n`;
+      markdown += `- **Complexity Score**: ${insights.complexity_score || 'Unknown'}\n\n`;
+    }
+    
+    if (analysis.analysis_data?.structure) {
+      const structure = analysis.analysis_data.structure;
+      markdown += `## Code Structure\n\n`;
+      
+      if (structure.languages && structure.languages.length > 0) {
+        markdown += `### Languages Used\n`;
+        structure.languages.forEach(lang => {
+          markdown += `- ${lang}\n`;
+        });
+        markdown += `\n`;
+      }
+      
+      if (structure.frameworks && structure.frameworks.length > 0) {
+        markdown += `### Frameworks\n`;
+        structure.frameworks.forEach(fw => {
+          markdown += `- ${fw}\n`;
+        });
+        markdown += `\n`;
+      }
+    }
+    
+    if (analysis.analysis_data?.summaries) {
+      markdown += `## File Analysis\n\n`;
+      Object.entries(analysis.analysis_data.summaries).forEach(([filename, summary]) => {
+        markdown += `### ${filename}\n`;
+        markdown += `${summary}\n\n`;
+      });
+    }
+    
+    return markdown;
+  };
+
   // Load learning modules
   const loadLearningModules = async () => {
     try {
@@ -127,29 +173,49 @@ export default function LearningRepo() {
       setError('');
       setSuccess('Generating quiz...');
       
+      // First, we need to get the markdown content from the analysis
+      // or generate it if it doesn't exist
+      let markdownContent = '';
+      
+      if (analysis.analysis_data?.documentation?.readme) {
+        markdownContent = analysis.analysis_data.documentation.readme;
+      } else if (analysis.analysis_data?.summaries) {
+        // Generate basic markdown from summaries if no documentation exists
+        markdownContent = generateBasicMarkdown(analysis);
+      } else {
+        throw new Error('No content available for quiz generation');
+      }
+      
       const quizData = {
-        analysis_id: analysis._id,
+        markdown_content: markdownContent,
         num_questions: 10,
         difficulty: 'medium',
-        topics: extractTopics(analysis.analysis_data)
+        analysis_id: analysis._id
       };
+
+      console.log('Sending quiz data:', quizData);
+      console.log('Markdown content length:', markdownContent.length);
 
       const response = await axios.post('/api/generate-quiz', quizData);
       
-      if (response.data.quiz) {
+      console.log('Quiz response:', response.data);
+      
+      if (response.data.quiz && Array.isArray(response.data.quiz) && response.data.quiz.length > 0) {
         setQuizQuestions(response.data.quiz);
         setCurrentQuestionIndex(0);
         setUserAnswers({});
         setQuizCompleted(false);
         setScore(0);
-        setSuccess('Quiz generated successfully! Start learning!');
+        setSuccess(`Quiz generated successfully! ${response.data.quiz.length} questions ready. Start learning!`);
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError('Failed to generate quiz');
+        console.error('Invalid quiz response:', response.data);
+        setError('Failed to generate quiz: Invalid response format from server');
       }
     } catch (error) {
       console.error('Generate quiz error:', error);
-      setError(`Failed to generate quiz: ${error.response?.data?.detail || error.message}`);
+      const errorMessage = error.response?.data?.detail || error.message;
+      setError(`Failed to generate quiz: ${errorMessage}`);
     }
   };
 

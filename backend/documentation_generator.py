@@ -277,6 +277,9 @@ async def generate_documentation(request: DocumentationRequest):
 async def generate_quiz(request: QuizRequest):
     """Generate quiz questions from markdown content"""
     try:
+        print(f"Generating quiz with {request.num_questions} questions, difficulty: {request.difficulty}")
+        print(f"Markdown content length: {len(request.markdown_content)}")
+        
         try:
             from llm import generate_quiz_questions
             
@@ -285,8 +288,44 @@ async def generate_quiz(request: QuizRequest):
                 request.num_questions, 
                 request.difficulty
             )
-        except ImportError:
+            
+            print(f"Generated quiz with {len(quiz) if quiz else 0} questions")
+            
+        except ImportError as import_error:
+            print(f"Import error: {import_error}")
             # Fallback if llm module is not available
+            quiz = [
+                {
+                    "question": "What is the main purpose of this documentation?",
+                    "options": [
+                        "To explain the codebase structure",
+                        "To provide installation instructions", 
+                        "To list all dependencies",
+                        "To show deployment steps"
+                    ],
+                    "correct_answer": "To explain the codebase structure",
+                    "explanation": "The documentation was generated to explain the structure and purpose of the codebase."
+                }
+            ]
+        except Exception as llm_error:
+            print(f"LLM error: {llm_error}")
+            # Fallback if LLM generation fails
+            quiz = [
+                {
+                    "question": "What is the main purpose of this documentation?",
+                    "options": [
+                        "To explain the codebase structure",
+                        "To provide installation instructions", 
+                        "To list all dependencies",
+                        "To show deployment steps"
+                    ],
+                    "correct_answer": "To explain the codebase structure",
+                    "explanation": "The documentation was generated to explain the structure and purpose of the codebase."
+                }
+            ]
+        
+        if not quiz or not isinstance(quiz, list):
+            print(f"Invalid quiz format: {type(quiz)} - {quiz}")
             quiz = [
                 {
                     "question": "What is the main purpose of this documentation?",
@@ -322,9 +361,13 @@ async def generate_quiz(request: QuizRequest):
                 print(f"Warning: Could not save quiz to database: {e}")
                 result["save_error"] = str(e)
         
+        print(f"Returning quiz result: {len(result.get('quiz', []))} questions")
         return result
         
     except Exception as e:
+        print(f"Error in generate_quiz endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
 
 @router.get("/download-pdf/{filename}")

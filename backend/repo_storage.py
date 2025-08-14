@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 from bson import ObjectId
 from backend.db import (
@@ -27,8 +27,8 @@ class RepoStorage:
                 "branch_used": branch_used,
                 "analysis_data": analysis_data,
                 "user_id": user_id,
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow(),
+                            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
                 "status": "completed"
             }
             

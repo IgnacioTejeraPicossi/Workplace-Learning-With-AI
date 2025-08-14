@@ -377,6 +377,7 @@ Make sure the questions are relevant to the content and appropriate for the spec
                 }
             ]
     except Exception as e:
+        print(f"Error generating quiz questions: {e}")
         # Return a fallback quiz if parsing fails
         return [
             {
