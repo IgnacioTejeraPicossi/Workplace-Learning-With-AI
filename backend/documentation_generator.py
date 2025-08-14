@@ -370,6 +370,55 @@ async def generate_quiz(request: QuizRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
 
+@router.delete("/delete-analysis/{analysis_id}")
+async def delete_analysis(analysis_id: str):
+    """Delete repository analysis and all associated data"""
+    try:
+        print(f"Deleting analysis with ID: {analysis_id}")
+        
+        # Delete the analysis and all associated data
+        success = await RepoStorage.delete_analysis(analysis_id)
+        
+        if success:
+            print(f"Successfully deleted analysis: {analysis_id}")
+            return {
+                "success": True,
+                "message": "Analysis deleted successfully",
+                "deleted_at": datetime.now().isoformat()
+            }
+        else:
+            print(f"Failed to delete analysis: {analysis_id}")
+            raise HTTPException(status_code=500, detail="Failed to delete analysis")
+            
+    except Exception as e:
+        print(f"Error deleting analysis {analysis_id}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error deleting analysis: {str(e)}")
+
+@router.post("/cleanup-old-analyses")
+async def cleanup_old_analyses():
+    """Clean up analyses older than 30 days"""
+    try:
+        print("Starting cleanup of old analyses...")
+        
+        # Delete analyses older than 30 days
+        deleted_count = await RepoStorage.cleanup_old_analyses(days_old=30)
+        
+        print(f"Cleanup completed. Deleted {deleted_count} old analyses.")
+        return {
+            "success": True,
+            "message": f"Cleanup completed successfully",
+            "deleted_count": deleted_count,
+            "cleaned_at": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        print(f"Error during cleanup: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error during cleanup: {str(e)}")
+
 @router.get("/download-pdf/{filename}")
 async def download_pdf(filename: str):
     """Download generated PDF file"""

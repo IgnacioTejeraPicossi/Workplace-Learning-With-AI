@@ -14,6 +14,7 @@ export default function LearningRepo() {
   const [score, setScore] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   // Load saved analyses on component mount
   useEffect(() => {
@@ -219,6 +220,51 @@ export default function LearningRepo() {
     }
   };
 
+  // Delete analysis
+  const deleteAnalysis = async (analysis) => {
+    try {
+      setError('');
+      setSuccess('Deleting analysis...');
+      
+      const response = await axios.delete(`/api/delete-analysis/${analysis._id}`);
+      
+      if (response.data.success) {
+        setSuccess('Analysis deleted successfully!');
+        await loadSavedAnalyses(); // Reload the list
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(`Failed to delete analysis: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Delete analysis error:', error);
+      const errorMessage = error.response?.data?.detail || error.message;
+      setError(`Failed to delete analysis: ${errorMessage}`);
+    }
+  };
+
+  // Cleanup old analyses (older than 30 days)
+  const cleanupOldAnalyses = async () => {
+    try {
+      setError('');
+      setSuccess('Cleaning up old analyses...');
+      
+      const response = await axios.post('/api/cleanup-old-analyses');
+      
+      if (response.data.success) {
+        const deletedCount = response.data.deleted_count || 0;
+        setSuccess(`Cleanup completed! Removed ${deletedCount} old analyses.`);
+        await loadSavedAnalyses(); // Reload the list
+        setTimeout(() => setSuccess(''), 5000);
+      } else {
+        setError(`Failed to cleanup: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      const errorMessage = error.response?.data?.detail || error.message;
+      setError(`Failed to cleanup: ${errorMessage}`);
+    }
+  };
+
   // Handle quiz answer
   const handleQuizAnswer = (questionIndex, answer) => {
     setUserAnswers(prev => ({
@@ -321,6 +367,71 @@ export default function LearningRepo() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: '2rem',
+            borderRadius: '8px',
+            maxWidth: '500px',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ color: '#dc3545', marginBottom: '1rem' }}>
+              🗑️ Confirm Deletion
+            </h3>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              Are you sure you want to delete the analysis for <strong>{deleteConfirm.repo_name}</strong>?
+            </p>
+            <p style={{ color: '#999', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              This will permanently remove the analysis, documentation, quizzes, and learning modules associated with this repository.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#6c757d',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  deleteAnalysis(deleteConfirm);
+                  setDeleteConfirm(null);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#dc3545',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Saved Analyses Section */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ 
@@ -329,25 +440,62 @@ export default function LearningRepo() {
           alignItems: 'center',
           marginBottom: '1rem'
         }}>
-          <h2 style={{ color: '#333', margin: 0 }}>
-            📚 Available Repositories for Learning
-          </h2>
-          <button
-            onClick={loadSavedAnalyses}
-            disabled={loadingSaved}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#28a745',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loadingSaved ? 'not-allowed' : 'pointer',
-              fontSize: '0.9rem',
-              opacity: loadingSaved ? 0.6 : 1
-            }}
-          >
-            {loadingSaved ? '🔄 Loading...' : '🔄 Refresh'}
-          </button>
+          <div>
+            <h2 style={{ color: '#333', margin: 0 }}>
+              📚 Available Repositories for Learning
+            </h2>
+            {savedAnalyses.length > 0 && (
+              <div style={{ 
+                marginTop: '0.5rem', 
+                fontSize: '0.9rem', 
+                color: '#666',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'center'
+              }}>
+                <span>📊 Total: {savedAnalyses.length} repositories</span>
+                {savedAnalyses.some(analysis => {
+                  const daysOld = (new Date() - new Date(analysis.created_at)) / (1000 * 60 * 60 * 24);
+                  return daysOld > 30;
+                }) && (
+                  <span style={{ color: '#ffc107' }}>⚠️ Some analyses are over 30 days old</span>
+                )}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={loadSavedAnalyses}
+              disabled={loadingSaved}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#28a745',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: loadingSaved ? 'not-allowed' : 'pointer',
+                fontSize: '0.9rem',
+                opacity: loadingSaved ? 0.6 : 1
+              }}
+            >
+              {loadingSaved ? '🔄 Loading...' : '🔄 Refresh'}
+            </button>
+            <button
+              onClick={() => cleanupOldAnalyses()}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#6c757d',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}
+              title="Remove analyses older than 30 days"
+            >
+              🧹 Cleanup Old
+            </button>
+          </div>
         </div>
 
         {loadingSaved ? (
@@ -377,8 +525,32 @@ export default function LearningRepo() {
                 borderRadius: '8px', 
                 border: '1px solid #e9ecef',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                position: 'relative'
               }}>
+                {/* Age indicator */}
+                {(() => {
+                  const daysOld = (new Date() - new Date(analysis.created_at)) / (1000 * 60 * 60 * 24);
+                  if (daysOld > 30) {
+                    return (
+                      <div style={{
+                        position: 'absolute',
+                        top: '0.5rem',
+                        right: '0.5rem',
+                        background: '#ffc107',
+                        color: '#212529',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold'
+                      }}>
+                        ⚠️ {Math.floor(daysOld)}d old
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <h3 style={{ 
                   color: '#007bff', 
                   marginBottom: '1rem',
@@ -392,6 +564,29 @@ export default function LearningRepo() {
                   <p><strong>Branch:</strong> {analysis.branch_used || 'Unknown'}</p>
                   <p><strong>Files Analyzed:</strong> {analysis.analysis_data?.summaries ? Object.keys(analysis.analysis_data.summaries).length : 0}</p>
                   <p><strong>Date:</strong> {new Date(analysis.created_at).toLocaleDateString()}</p>
+                  
+                  {/* Additional Analysis Info */}
+                  {analysis.analysis_data?.insights && (
+                    <div style={{ 
+                      marginTop: '0.5rem', 
+                      padding: '0.5rem', 
+                      background: '#f8f9fa', 
+                      borderRadius: '4px',
+                      fontSize: '0.9rem'
+                    }}>
+                      <p style={{ margin: '0.25rem 0' }}>
+                        <strong>Type:</strong> {analysis.analysis_data.insights.project_type || 'Unknown'}
+                      </p>
+                      <p style={{ margin: '0.25rem 0' }}>
+                        <strong>Language:</strong> {analysis.analysis_data.insights.language || 'Unknown'}
+                      </p>
+                      {analysis.analysis_data.insights.complexity_score && (
+                        <p style={{ margin: '0.25rem 0' }}>
+                          <strong>Complexity:</strong> {analysis.analysis_data.insights.complexity_score}/10
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ 
@@ -427,6 +622,22 @@ export default function LearningRepo() {
                     }}
                   >
                     🧠 Generate Quiz
+                  </button>
+                  
+                  <button
+                    onClick={() => setDeleteConfirm(analysis)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#dc3545',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem'
+                    }}
+                    title="Delete this repository analysis"
+                  >
+                    🗑️ Delete
                   </button>
                 </div>
               </div>

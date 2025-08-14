@@ -237,7 +237,7 @@ class RepoStorage:
                 {
                     "$set": {
                         "status": status,
-                        "updated_at": datetime.utcnow()
+                        "updated_at": datetime.now(timezone.utc)
                     }
                 }
             )
@@ -245,4 +245,41 @@ class RepoStorage:
             
         except Exception as e:
             print(f"Error updating analysis status: {e}")
-            return False 
+            return False
+
+    @staticmethod
+    async def cleanup_old_analyses(days_old: int = 30) -> int:
+        """Clean up analyses older than specified days"""
+        try:
+            from datetime import timedelta
+            
+            # Calculate cutoff date
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_old)
+            
+            # Find old analyses
+            old_analyses = await repo_analyses_collection.find({
+                "created_at": {"$lt": cutoff_date}
+            }).to_list(length=None)
+            
+            deleted_count = 0
+            
+            # Delete each old analysis and its associated data
+            for analysis in old_analyses:
+                analysis_id = str(analysis["_id"])
+                try:
+                    success = await RepoStorage.delete_analysis(analysis_id)
+                    if success:
+                        deleted_count += 1
+                        print(f"Deleted old analysis: {analysis_id}")
+                    else:
+                        print(f"Failed to delete old analysis: {analysis_id}")
+                except Exception as e:
+                    print(f"Error deleting old analysis {analysis_id}: {e}")
+                    continue
+            
+            print(f"Cleanup completed. Deleted {deleted_count} old analyses.")
+            return deleted_count
+            
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
+            return 0 
