@@ -21,6 +21,11 @@ export default function EAHome() {
   const [editingApplication, setEditingApplication] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
+  // Edit capability modal state
+  const [showEditCapabilityModal, setShowEditCapabilityModal] = useState(false);
+  const [editingCapability, setEditingCapability] = useState(null);
+  const [editCapabilityFormData, setEditCapabilityFormData] = useState({});
+
   // Load catalog overview on mount
   useEffect(() => {
     loadCatalogOverview();
@@ -155,6 +160,52 @@ export default function EAHome() {
     } catch (err) {
       console.error('Error updating application:', err);
       setError('Failed to update application');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle capability editing
+  const handleEditCapability = (capability) => {
+    setEditingCapability(capability);
+    setEditCapabilityFormData({
+      name: capability.name,
+      description: capability.description,
+      level: capability.level || 'Strategic',
+      owner: capability.owner || [],
+      tags: capability.tags || [],
+      strategic_importance: capability.strategic_importance || 'High',
+      maturity: capability.maturity || 1,
+      risk: capability.risk || 'Low'
+    });
+    setShowEditCapabilityModal(true);
+  };
+
+  const handleUpdateCapability = async () => {
+    try {
+      setLoading(true);
+      
+      const response = await axios.put(`/api/ea/capabilities/${editingCapability._id}`, editCapabilityFormData);
+      
+      if (response.data.success) {
+        // Update local state
+        setCapabilities(capabilities.map(cap => 
+          cap._id === editingCapability._id 
+            ? { ...cap, ...editCapabilityFormData }
+            : cap
+        ));
+        
+        setSuccess('Capability updated successfully!');
+        setShowEditCapabilityModal(false);
+        setEditingCapability(null);
+        setEditCapabilityFormData({});
+        
+        // Reload catalog overview
+        await loadCatalogOverview();
+      }
+    } catch (err) {
+      console.error('Error updating capability:', err);
+      setError('Failed to update capability');
     } finally {
       setLoading(false);
     }
@@ -399,7 +450,7 @@ export default function EAHome() {
             
             <div className="ea-cap-actions">
               <button className="ea-btn primary">👁️ View</button>
-              <button className="ea-btn secondary">✏️ Edit</button>
+              <button className="ea-btn secondary" onClick={() => handleEditCapability(cap)}>✏️ Edit</button>
               <button className="ea-btn secondary">🔗 Link Apps</button>
             </div>
           </div>
@@ -673,6 +724,134 @@ export default function EAHome() {
               <button 
                 className="ea-btn primary"
                 onClick={handleUpdateApplication}
+                disabled={loading}
+              >
+                {loading ? 'Updating...' : 'Update'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Capability Modal */}
+      {showEditCapabilityModal && editingCapability && (
+        <div className="ea-modal-overlay">
+          <div className="ea-modal">
+            <div className="ea-modal-header">
+              <h3>✏️ Edit Capability</h3>
+              <button 
+                className="ea-modal-close"
+                onClick={() => {
+                  setShowEditCapabilityModal(false);
+                  setEditingCapability(null);
+                  setEditCapabilityFormData({});
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="ea-modal-body">
+              <div className="ea-form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={editCapabilityFormData.name}
+                  onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, name: e.target.value})}
+                  placeholder="Enter capability name"
+                />
+              </div>
+              
+              <div className="ea-form-group">
+                <label>Description</label>
+                <textarea
+                  value={editCapabilityFormData.description}
+                  onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, description: e.target.value})}
+                  placeholder="Enter capability description"
+                  rows="3"
+                />
+              </div>
+              
+              <div className="ea-form-row">
+                <div className="ea-form-group">
+                  <label>Level</label>
+                  <select
+                    value={editCapabilityFormData.level}
+                    onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, level: e.target.value})}
+                  >
+                    <option value="Strategic">Strategic</option>
+                    <option value="Core">Core</option>
+                    <option value="Supporting">Supporting</option>
+                    <option value="Enabling">Enabling</option>
+                  </select>
+                </div>
+                
+                <div className="ea-form-group">
+                  <label>Strategic Importance</label>
+                  <select
+                    value={editCapabilityFormData.strategic_importance}
+                    onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, strategic_importance: e.target.value})}
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="ea-form-row">
+                <div className="ea-form-group">
+                  <label>Maturity Level (1-5)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={editCapabilityFormData.maturity}
+                    onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, maturity: parseInt(e.target.value)})}
+                  />
+                </div>
+                
+                <div className="ea-form-group">
+                  <label>Risk Level</label>
+                  <select
+                    value={editCapabilityFormData.risk}
+                    onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, risk: e.target.value})}
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="ea-form-group">
+                <label>Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={editCapabilityFormData.tags.join(', ')}
+                  onChange={(e) => setEditCapabilityFormData({
+                    ...editCapabilityFormData, 
+                    tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
+                  })}
+                  placeholder="Enter tags separated by commas"
+                />
+              </div>
+            </div>
+            
+            <div className="ea-modal-footer">
+              <button 
+                className="ea-btn secondary"
+                onClick={() => {
+                  setShowEditCapabilityModal(false);
+                  setEditingCapability(null);
+                  setEditCapabilityFormData({});
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                className="ea-btn primary"
+                onClick={handleUpdateCapability}
                 disabled={loading}
               >
                 {loading ? 'Updating...' : 'Update'}
