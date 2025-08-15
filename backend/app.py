@@ -53,9 +53,11 @@ app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 # Enterprise Architecture routers
 from backend.ea_processes import router as ea_processes_router
 from backend.ea_catalog import router as ea_catalog_router
+from backend.ea_ai_risk import router as ea_ai_risk_router
 
 app.include_router(ea_processes_router)
 app.include_router(ea_catalog_router)
+app.include_router(ea_ai_risk_router)
 
 import os
 from fastapi.staticfiles import StaticFiles

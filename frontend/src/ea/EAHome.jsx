@@ -5,6 +5,7 @@ import ProcessDesigner from './ProcessDesigner';
 import HeatmapView from './HeatmapView';
 import ImpactAnalysis from './ImpactAnalysis';
 import CatalogManager from './CatalogManager';
+import AIRiskAnalysis from './AIRiskAnalysis';
 
 export default function EAHome() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -26,10 +27,25 @@ export default function EAHome() {
   const [editingCapability, setEditingCapability] = useState(null);
   const [editCapabilityFormData, setEditCapabilityFormData] = useState({});
 
-  // Load catalog overview on mount
+  // Load all data on mount
   useEffect(() => {
-    loadCatalogOverview();
+    const loadAllData = async () => {
+      await Promise.all([
+        loadCatalogOverview(),
+        loadProcesses(),
+        loadApplications(),
+        loadCapabilities()
+      ]);
+    };
+    loadAllData();
   }, []);
+
+  // Update catalog overview whenever data arrays change
+  useEffect(() => {
+    if (processes.length > 0 || applications.length > 0 || capabilities.length > 0) {
+      updateCatalogOverview();
+    }
+  }, [processes, applications, capabilities]);
 
   const loadCatalogOverview = async () => {
     try {
@@ -55,10 +71,25 @@ export default function EAHome() {
     }
   };
 
+  // Update catalog overview with real data counts
+  const updateCatalogOverview = () => {
+    const overview = {
+      total_capabilities: capabilities.length,
+      total_applications: applications.length,
+      total_processes: processes.length,
+      lifecycle_distribution: [],
+      risk_distribution: []
+    };
+    console.log('Updating catalog overview:', overview);
+    console.log('Current state:', { processes: processes.length, applications: applications.length, capabilities: capabilities.length });
+    setCatalogOverview(overview);
+  };
+
   const loadProcesses = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/api/ea/processes');
+      console.log('Processes loaded:', response.data);
       setProcesses(response.data);
     } catch (err) {
       console.error('Error loading processes:', err);
@@ -72,6 +103,7 @@ export default function EAHome() {
     try {
       setLoading(true);
       const response = await axios.get('/api/ea/applications');
+      console.log('Applications loaded:', response.data);
       setApplications(response.data);
     } catch (err) {
       console.error('Error loading applications:', err);
@@ -85,6 +117,7 @@ export default function EAHome() {
     try {
       setLoading(true);
       const response = await axios.get('/api/ea/capabilities');
+      console.log('Capabilities loaded:', response.data);
       setCapabilities(response.data);
     } catch (err) {
       console.error('Error loading capabilities:', err);
@@ -109,8 +142,8 @@ export default function EAHome() {
       
       setSuccess('Process deleted successfully!');
       
-      // Reload catalog overview
-      await loadCatalogOverview();
+      // Update catalog overview
+      updateCatalogOverview();
     } catch (err) {
       console.error('Error deleting process:', err);
       setError('Failed to delete process');
@@ -154,8 +187,8 @@ export default function EAHome() {
         setEditingApplication(null);
         setEditFormData({});
         
-        // Reload catalog overview
-        await loadCatalogOverview();
+        // Update catalog overview
+        updateCatalogOverview();
       }
     } catch (err) {
       console.error('Error updating application:', err);
@@ -200,8 +233,8 @@ export default function EAHome() {
         setEditingCapability(null);
         setEditCapabilityFormData({});
         
-        // Reload catalog overview
-        await loadCatalogOverview();
+        // Update catalog overview
+        updateCatalogOverview();
       }
     } catch (err) {
       console.error('Error updating capability:', err);
@@ -471,10 +504,11 @@ export default function EAHome() {
         setSuccess(`Backend demo data initialized successfully! ${response.data.capabilities_inserted} capabilities, ${response.data.applications_inserted} applications, ${response.data.processes_inserted} processes created.`);
         
         // Reload overview and data
-        await loadCatalogOverview();
         await loadCapabilities();
         await loadApplications();
         await loadProcesses();
+        // Update catalog overview with new data
+        updateCatalogOverview();
       }
     } catch (err) {
       console.error('Error initializing backend demo data:', err);
@@ -554,6 +588,12 @@ export default function EAHome() {
           💥 Impact Analysis
         </button>
         <button 
+          className={`ea-tab ${activeTab === 'ai-risk' ? 'active' : ''}`}
+          onClick={() => setActiveTab('ai-risk')}
+        >
+          🤖 AI Risk Analysis
+        </button>
+        <button 
           className={`ea-tab ${activeTab === 'process-designer' ? 'active' : ''}`}
           onClick={() => setActiveTab('process-designer')}
         >
@@ -582,8 +622,9 @@ export default function EAHome() {
             {activeTab === 'processes' && renderProcesses()}
             {activeTab === 'applications' && renderApplications()}
             {activeTab === 'capabilities' && renderCapabilities()}
-            {activeTab === 'heatmap' && <HeatmapView />}
-                         {activeTab === 'impact' && <ImpactAnalysis />}
+                        {activeTab === 'heatmap' && <HeatmapView />}
+            {activeTab === 'impact' && <ImpactAnalysis />}
+            {activeTab === 'ai-risk' && <AIRiskAnalysis />}
             {activeTab === 'process-designer' && (
               <ProcessDesigner 
                 onSave={(processId) => {
