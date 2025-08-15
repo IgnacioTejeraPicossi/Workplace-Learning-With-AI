@@ -16,6 +16,11 @@ export default function EAHome() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingApplication, setEditingApplication] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+
   // Load catalog overview on mount
   useEffect(() => {
     loadCatalogOverview();
@@ -79,6 +84,77 @@ export default function EAHome() {
     } catch (err) {
       console.error('Error loading capabilities:', err);
       setError('Failed to load capabilities');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle process deletion
+  const handleDeleteProcess = async (processId) => {
+    if (!window.confirm('Are you sure you want to delete this process? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.delete(`/api/ea/processes/${processId}`);
+      
+      // Update local state
+      setProcesses(processes.filter(proc => proc._id !== processId));
+      
+      setSuccess('Process deleted successfully!');
+      
+      // Reload catalog overview
+      await loadCatalogOverview();
+    } catch (err) {
+      console.error('Error deleting process:', err);
+      setError('Failed to delete process');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle application editing
+  const handleEditApplication = (application) => {
+    setEditingApplication(application);
+    setEditFormData({
+      name: application.name,
+      description: application.description,
+      category: application.category || '',
+      risk: application.risk || 0,
+      maturity: application.maturity || 1,
+      vendor: application.vendor || '',
+      lifecycle: application.lifecycle || 'Development',
+      status: application.status || 'Active'
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateApplication = async () => {
+    try {
+      setLoading(true);
+      
+      const response = await axios.put(`/api/ea/applications/${editingApplication._id}`, editFormData);
+      
+      if (response.data.success) {
+        // Update local state
+        setApplications(applications.map(app => 
+          app._id === editingApplication._id 
+            ? { ...app, ...editFormData }
+            : app
+        ));
+        
+        setSuccess('Application updated successfully!');
+        setShowEditModal(false);
+        setEditingApplication(null);
+        setEditFormData({});
+        
+        // Reload catalog overview
+        await loadCatalogOverview();
+      }
+    } catch (err) {
+      console.error('Error updating application:', err);
+      setError('Failed to update application');
     } finally {
       setLoading(false);
     }
@@ -228,6 +304,12 @@ export default function EAHome() {
               <button className="ea-btn primary">👁️ View</button>
               <button className="ea-btn secondary">✏️ Edit</button>
               <button className="ea-btn secondary">📋 Clone</button>
+              <button 
+                className="ea-btn danger" 
+                onClick={() => handleDeleteProcess(process._id)}
+              >
+                🗑️ Delete
+              </button>
             </div>
           </div>
         ))}
@@ -271,7 +353,12 @@ export default function EAHome() {
             
             <div className="ea-app-actions">
               <button className="ea-btn primary">👁️ View</button>
-              <button className="ea-btn secondary">✏️ Edit</button>
+              <button 
+                className="ea-btn secondary" 
+                onClick={() => handleEditApplication(app)}
+              >
+                ✏️ Edit
+              </button>
               <button className="ea-btn secondary">🔗 Link Process</button>
             </div>
           </div>
@@ -458,6 +545,142 @@ export default function EAHome() {
           </>
         )}
       </div>
+
+      {/* Edit Application Modal */}
+      {showEditModal && editingApplication && (
+        <div className="ea-modal-overlay">
+          <div className="ea-modal">
+            <div className="ea-modal-header">
+              <h3>Edit Application</h3>
+              <button 
+                className="ea-modal-close"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingApplication(null);
+                  setEditFormData({});
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="ea-modal-body">
+              <div className="ea-form-group">
+                <label>Name*</label>
+                <input
+                  type="text"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                  placeholder="Enter application name"
+                />
+              </div>
+              
+              <div className="ea-form-group">
+                <label>Description*</label>
+                <textarea
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                  placeholder="Enter description"
+                  rows="3"
+                />
+              </div>
+              
+              <div className="ea-form-row">
+                <div className="ea-form-group">
+                  <label>Category</label>
+                  <input
+                    type="text"
+                    value={editFormData.category}
+                    onChange={(e) => setEditFormData({...editFormData, category: e.target.value})}
+                    placeholder="Enter category"
+                  />
+                </div>
+                
+                <div className="ea-form-group">
+                  <label>Risk Level (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={editFormData.risk}
+                    onChange={(e) => setEditFormData({...editFormData, risk: parseInt(e.target.value)})}
+                  />
+                </div>
+              </div>
+              
+              <div className="ea-form-row">
+                <div className="ea-form-group">
+                  <label>Maturity Level (1-5)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={editFormData.maturity}
+                    onChange={(e) => setEditFormData({...editFormData, maturity: parseInt(e.target.value)})}
+                  />
+                </div>
+                
+                <div className="ea-form-group">
+                  <label>Vendor</label>
+                  <input
+                    type="text"
+                    value={editFormData.vendor}
+                    onChange={(e) => setEditFormData({...editFormData, vendor: e.target.value})}
+                    placeholder="Enter vendor name"
+                  />
+                </div>
+              </div>
+              
+              <div className="ea-form-row">
+                <div className="ea-form-group">
+                  <label>Lifecycle</label>
+                  <select
+                    value={editFormData.lifecycle}
+                    onChange={(e) => setEditFormData({...editFormData, lifecycle: e.target.value})}
+                  >
+                    <option value="Development">Development</option>
+                    <option value="Production">Production</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Retirement">Retirement</option>
+                  </select>
+                </div>
+                
+                <div className="ea-form-group">
+                  <label>Status</label>
+                  <select
+                    value={editFormData.status}
+                    onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Deprecated">Deprecated</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div className="ea-modal-footer">
+              <button 
+                className="ea-btn secondary"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingApplication(null);
+                  setEditFormData({});
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                className="ea-btn primary"
+                onClick={handleUpdateApplication}
+                disabled={loading}
+              >
+                {loading ? 'Updating...' : 'Update'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

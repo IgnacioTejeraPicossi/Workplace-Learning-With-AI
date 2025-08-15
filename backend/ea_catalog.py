@@ -26,7 +26,7 @@ def get_ea_db():
 
 @router.post("/capabilities", response_model=dict)
 async def create_capability(capability: CapabilityCreate, db=Depends(get_ea_db)):
-    """Create a new business capability"""
+    """Create a new capability"""
     try:
         doc = capability.dict()
         doc.update({
@@ -34,7 +34,7 @@ async def create_capability(capability: CapabilityCreate, db=Depends(get_ea_db))
             "updatedAt": datetime.now()
         })
         
-        result = db["ea_capabilities"].insert_one(doc)
+        result = await db["ea_capabilities"].insert_one(doc)
         
         return {
             "success": True,
@@ -50,7 +50,7 @@ async def list_capabilities(
     level: Optional[str] = Query(None),
     owner: Optional[str] = Query(None)
 ):
-    """List business capabilities"""
+    """List capabilities with optional filters"""
     try:
         query = {}
         if level:
@@ -58,12 +58,15 @@ async def list_capabilities(
         if owner:
             query["owner"] = {"$in": [owner]}
         
-        capabilities = list(db["ea_capabilities"].find(query).sort("name", 1))
+        cursor = db["ea_capabilities"].find(query).sort("name", 1)
+        capabilities = await cursor.to_list(length=None)
         
-        for cap in capabilities:
-            cap["_id"] = str(cap["_id"])
-            cap["createdAt"] = cap["createdAt"].isoformat()
-            cap["updatedAt"] = cap["updatedAt"].isoformat()
+        for capability in capabilities:
+            capability["_id"] = str(capability["_id"])
+            if "createdAt" in capability:
+                capability["createdAt"] = capability["createdAt"].isoformat()
+            if "updatedAt" in capability:
+                capability["updatedAt"] = capability["updatedAt"].isoformat()
         
         return capabilities
     except Exception as e:
@@ -76,19 +79,80 @@ async def get_capability(capability_id: str, db=Depends(get_ea_db)):
         if not ObjectId.is_valid(capability_id):
             raise HTTPException(status_code=400, detail="Invalid capability ID")
         
-        capability = db["ea_capabilities"].find_one({"_id": ObjectId(capability_id)})
+        capability = await db["ea_capabilities"].find_one({"_id": ObjectId(capability_id)})
         if not capability:
             raise HTTPException(status_code=404, detail="Capability not found")
         
         capability["_id"] = str(capability["_id"])
-        capability["createdAt"] = capability["createdAt"].isoformat()
-        capability["updatedAt"] = capability["updatedAt"].isoformat()
+        if "createdAt" in capability:
+            capability["createdAt"] = capability["createdAt"].isoformat()
+        if "updatedAt" in capability:
+            capability["updatedAt"] = capability["updatedAt"].isoformat()
         
         return capability
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get capability: {str(e)}")
+
+@router.put("/capabilities/{capability_id}", response_model=dict)
+async def update_capability(
+    capability_id: str,
+    capability_update: dict,
+    db=Depends(get_ea_db)
+):
+    """Update an existing capability"""
+    try:
+        if not ObjectId.is_valid(capability_id):
+            raise HTTPException(status_code=400, detail="Invalid capability ID")
+        
+        # Check if capability exists
+        existing = await db["ea_capabilities"].find_one({"_id": ObjectId(capability_id)})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Capability not found")
+        
+        # Prepare update data
+        update_data = capability_update.copy()
+        update_data["updatedAt"] = datetime.now()
+        
+        # Update capability
+        result = await db["ea_capabilities"].update_one(
+            {"_id": ObjectId(capability_id)},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made")
+        
+        return {
+            "success": True,
+            "message": "Capability updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update capability: {str(e)}")
+
+@router.delete("/capabilities/{capability_id}", response_model=dict)
+async def delete_capability(capability_id: str, db=Depends(get_ea_db)):
+    """Delete a capability"""
+    try:
+        if not ObjectId.is_valid(capability_id):
+            raise HTTPException(status_code=400, detail="Invalid capability ID")
+        
+        result = await db["ea_capabilities"].delete_one({"_id": ObjectId(capability_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Capability not found")
+        
+        return {
+            "success": True,
+            "message": "Capability deleted successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete capability: {str(e)}")
 
 # ============================================================================
 # APPLICATIONS API
@@ -104,7 +168,7 @@ async def create_application(application: ApplicationCreate, db=Depends(get_ea_d
             "updatedAt": datetime.now()
         })
         
-        result = db["ea_applications"].insert_one(doc)
+        result = await db["ea_applications"].insert_one(doc)
         
         return {
             "success": True,
@@ -134,12 +198,15 @@ async def list_applications(
         if data_class:
             query["dataClasses"] = {"$in": [data_class]}
         
-        applications = list(db["ea_applications"].find(query).sort("name", 1))
+        cursor = db["ea_applications"].find(query).sort("name", 1)
+        applications = await cursor.to_list(length=None)
         
         for app in applications:
             app["_id"] = str(app["_id"])
-            app["createdAt"] = app["createdAt"].isoformat()
-            app["updatedAt"] = app["updatedAt"].isoformat()
+            if "createdAt" in app:
+                app["createdAt"] = app["createdAt"].isoformat()
+            if "updatedAt" in app:
+                app["updatedAt"] = app["updatedAt"].isoformat()
         
         return applications
     except Exception as e:
@@ -152,13 +219,15 @@ async def get_application(application_id: str, db=Depends(get_ea_db)):
         if not ObjectId.is_valid(application_id):
             raise HTTPException(status_code=400, detail="Invalid application ID")
         
-        application = db["ea_applications"].find_one({"_id": ObjectId(application_id)})
+        application = await db["ea_applications"].find_one({"_id": ObjectId(application_id)})
         if not application:
             raise HTTPException(status_code=404, detail="Application not found")
         
         application["_id"] = str(application["_id"])
-        application["createdAt"] = application["createdAt"].isoformat()
-        application["updatedAt"] = application["updatedAt"].isoformat()
+        if "createdAt" in application:
+            application["createdAt"] = application["createdAt"].isoformat()
+        if "updatedAt" in application:
+            application["updatedAt"] = application["updatedAt"].isoformat()
         
         return application
     except HTTPException:
@@ -178,16 +247,16 @@ async def update_application(
             raise HTTPException(status_code=400, detail="Invalid application ID")
         
         # Check if application exists
-        existing = db["ea_applications"].find_one({"_id": ObjectId(application_id)})
+        existing = await db["ea_applications"].find_one({"_id": ObjectId(application_id)})
         if not existing:
             raise HTTPException(status_code=404, detail="Application not found")
         
         # Prepare update data
-        update_data = {k: v for k, v in application_update.items() if v is not None}
+        update_data = application_update.copy()
         update_data["updatedAt"] = datetime.now()
         
         # Update application
-        result = db["ea_applications"].update_one(
+        result = await db["ea_applications"].update_one(
             {"_id": ObjectId(application_id)},
             {"$set": update_data}
         )
@@ -211,7 +280,7 @@ async def delete_application(application_id: str, db=Depends(get_ea_db)):
         if not ObjectId.is_valid(application_id):
             raise HTTPException(status_code=400, detail="Invalid application ID")
         
-        result = db["ea_applications"].delete_one({"_id": ObjectId(application_id)})
+        result = await db["ea_applications"].delete_one({"_id": ObjectId(application_id)})
         
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Application not found")
@@ -405,30 +474,33 @@ async def search_catalog(
     """Search across catalog items"""
     try:
         # Search in capabilities
-        capabilities = list(db["ea_capabilities"].find({
+        capabilities_cursor = db["ea_capabilities"].find({
             "$or": [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"description": {"$regex": query, "$options": "i"}}
             ]
-        }).limit(10))
+        }).limit(10)
+        capabilities = await capabilities_cursor.to_list(length=None)
         
         # Search in applications
-        applications = list(db["ea_applications"].find({
+        applications_cursor = db["ea_applications"].find({
             "$or": [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"description": {"$regex": query, "$options": "i"}},
                 {"vendor": {"$regex": query, "$options": "i"}}
             ]
-        }).limit(10))
+        }).limit(10)
+        applications = await applications_cursor.to_list(length=None)
         
         # Search in processes
-        processes = list(db["ea_processes"].find({
+        processes_cursor = db["ea_processes"].find({
             "$or": [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"description": {"$regex": query, "$options": "i"}},
                 {"category": {"$regex": query, "$options": "i"}}
             ]
-        }).limit(10))
+        }).limit(10)
+        processes = await processes_cursor.to_list(length=None)
         
         # Format results
         results = []
@@ -436,19 +508,22 @@ async def search_catalog(
         for cap in capabilities:
             cap["_id"] = str(cap["_id"])
             cap["type"] = "capability"
-            cap["createdAt"] = cap["createdAt"].isoformat()
+            if "createdAt" in cap:
+                cap["createdAt"] = cap["createdAt"].isoformat()
             results.append(cap)
         
         for app in applications:
             app["_id"] = str(app["_id"])
             app["type"] = "application"
-            app["createdAt"] = app["createdAt"].isoformat()
+            if "createdAt" in app:
+                app["createdAt"] = app["createdAt"].isoformat()
             results.append(app)
         
         for proc in processes:
             proc["_id"] = str(proc["_id"])
             proc["type"] = "process"
-            proc["createdAt"] = proc["createdAt"].isoformat()
+            if "createdAt" in proc:
+                proc["createdAt"] = proc["createdAt"].isoformat()
             results.append(proc)
         
         # Sort by relevance (simple: name matches first)
