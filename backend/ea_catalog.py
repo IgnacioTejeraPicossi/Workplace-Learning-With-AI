@@ -17,9 +17,8 @@ router = APIRouter(prefix="/api/ea", tags=["Enterprise Architecture"])
 
 # Database connection
 def get_ea_db():
-    from backend.db import get_database
-    db = get_database()
-    return db
+    from backend.db import database
+    return database
 
 # ============================================================================
 # CAPABILITIES API

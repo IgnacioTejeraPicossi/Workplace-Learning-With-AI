@@ -4,7 +4,7 @@ Handles process creation, updates, and management
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Query
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List, Optional
 from datetime import datetime
 import uuid
@@ -19,12 +19,11 @@ router = APIRouter(prefix="/api/ea", tags=["Enterprise Architecture"])
 
 # Database connection
 def get_ea_db():
-    from backend.db import get_database
-    db = get_database()
-    return db
+    from backend.db import database
+    return database
 
 @router.post("/processes", response_model=dict)
-async def create_process(process: ProcessCreate, db=Depends(get_ea_db)):
+async def create_process(process: ProcessCreate, db: AsyncIOMotorDatabase = Depends(get_ea_db)):
     """Create a new process"""
     try:
         # Generate unique IDs for nodes and edges if not provided
@@ -45,7 +44,7 @@ async def create_process(process: ProcessCreate, db=Depends(get_ea_db)):
         })
         
         # Insert into database
-        result = db["ea_processes"].insert_one(doc)
+        result = await db["ea_processes"].insert_one(doc)
         
         return {
             "success": True,
@@ -55,9 +54,14 @@ async def create_process(process: ProcessCreate, db=Depends(get_ea_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create process: {str(e)}")
 
+@router.get("/test", response_model=dict)
+async def test_endpoint():
+    """Test endpoint to verify the router is working"""
+    return {"message": "EA Processes router is working", "status": "ok"}
+
 @router.get("/processes", response_model=List[dict])
 async def list_processes(
-    db=Depends(get_ea_db),
+    db: AsyncIOMotorDatabase = Depends(get_ea_db),
     owner: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
@@ -83,33 +87,37 @@ async def list_processes(
             query["risk"] = risk_query
         
         # Execute query
-        processes = list(db["ea_processes"].find(
+        cursor = db["ea_processes"].find(
             query, 
             {
                 "_id": 1, "name": 1, "owner": 1, "risk": 1, 
                 "maturity": 1, "status": 1, "category": 1,
                 "createdAt": 1, "updatedAt": 1
             }
-        ).sort("createdAt", -1))
+        ).sort("createdAt", -1)
+        
+        processes = await cursor.to_list(length=None)
         
         # Convert ObjectId to string
         for process in processes:
             process["_id"] = str(process["_id"])
-            process["createdAt"] = process["createdAt"].isoformat()
-            process["updatedAt"] = process["updatedAt"].isoformat()
+            if "createdAt" in process:
+                process["createdAt"] = process["createdAt"].isoformat()
+            if "updatedAt" in process:
+                process["updatedAt"] = process["updatedAt"].isoformat()
         
         return processes
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list processes: {str(e)}")
 
 @router.get("/processes/{process_id}", response_model=dict)
-async def get_process(process_id: str, db=Depends(get_ea_db)):
+async def get_process(process_id: str, db: AsyncIOMotorDatabase = Depends(get_ea_db)):
     """Get a specific process by ID"""
     try:
         if not ObjectId.is_valid(process_id):
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
-        process = db["ea_processes"].find_one({"_id": ObjectId(process_id)})
+        process = await db["ea_processes"].find_one({"_id": ObjectId(process_id)})
         if not process:
             raise HTTPException(status_code=404, detail="Process not found")
         
@@ -128,7 +136,7 @@ async def get_process(process_id: str, db=Depends(get_ea_db)):
 async def update_process(
     process_id: str, 
     process_update: ProcessUpdate, 
-    db=Depends(get_ea_db)
+    db: AsyncIOMotorDatabase = Depends(get_ea_db)
 ):
     """Update an existing process"""
     try:
@@ -136,7 +144,7 @@ async def update_process(
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
         # Check if process exists
-        existing = db["ea_processes"].find_one({"_id": ObjectId(process_id)})
+        existing = await db["ea_processes"].find_one({"_id": ObjectId(process_id)})
         if not existing:
             raise HTTPException(status_code=404, detail="Process not found")
         
@@ -145,7 +153,7 @@ async def update_process(
         update_data["updatedAt"] = datetime.now()
         
         # Update process
-        result = db["ea_processes"].update_one(
+        result = await db["ea_processes"].update_one(
             {"_id": ObjectId(process_id)},
             {"$set": update_data}
         )
@@ -163,13 +171,13 @@ async def update_process(
         raise HTTPException(status_code=500, detail=f"Failed to update process: {str(e)}")
 
 @router.delete("/processes/{process_id}", response_model=dict)
-async def delete_process(process_id: str, db=Depends(get_ea_db)):
+async def delete_process(process_id: str, db: AsyncIOMotorDatabase = Depends(get_ea_db)):
     """Delete a process"""
     try:
         if not ObjectId.is_valid(process_id):
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
-        result = db["ea_processes"].delete_one({"_id": ObjectId(process_id)})
+        result = await db["ea_processes"].delete_one({"_id": ObjectId(process_id)})
         
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Process not found")
@@ -184,14 +192,14 @@ async def delete_process(process_id: str, db=Depends(get_ea_db)):
         raise HTTPException(status_code=500, detail=f"Failed to delete process: {str(e)}")
 
 @router.post("/processes/{process_id}/clone", response_model=dict)
-async def clone_process(process_id: str, db=Depends(get_ea_db)):
+async def clone_process(process_id: str, db: AsyncIOMotorDatabase = Depends(get_ea_db)):
     """Clone a process with version bump"""
     try:
         if not ObjectId.is_valid(process_id):
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
         # Get original process
-        original = db["ea_processes"].find_one({"_id": ObjectId(process_id)})
+        original = await db["ea_processes"].find_one({"_id": ObjectId(process_id)})
         if not original:
             raise HTTPException(status_code=404, detail="Process not found")
         
@@ -205,7 +213,7 @@ async def clone_process(process_id: str, db=Depends(get_ea_db)):
         clone["updatedAt"] = datetime.now()
         
         # Insert clone
-        result = db["ea_processes"].insert_one(clone)
+        result = await db["ea_processes"].insert_one(clone)
         
         return {
             "success": True,
@@ -218,13 +226,13 @@ async def clone_process(process_id: str, db=Depends(get_ea_db)):
         raise HTTPException(status_code=500, detail=f"Failed to clone process: {str(e)}")
 
 @router.post("/processes/{process_id}/approve", response_model=dict)
-async def approve_process(process_id: str, db=Depends(get_ea_db)):
+async def approve_process(process_id: str, db: AsyncIOMotorDatabase = Depends(get_ea_db)):
     """Approve a process (change status to approved)"""
     try:
         if not ObjectId.is_valid(process_id):
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
-        result = db["ea_processes"].update_one(
+        result = await db["ea_processes"].update_one(
             {"_id": ObjectId(process_id)},
             {
                 "$set": {
@@ -250,14 +258,14 @@ async def approve_process(process_id: str, db=Depends(get_ea_db)):
 async def link_application(
     process_id: str, 
     app_id: str, 
-    db=Depends(get_ea_db)
+    db: AsyncIOMotorDatabase = Depends(get_ea_db)
 ):
     """Link an application to a process"""
     try:
         if not ObjectId.is_valid(process_id):
             raise HTTPException(status_code=400, detail="Invalid process ID")
         
-        result = db["ea_processes"].update_one(
+        result = await db["ea_processes"].update_one(
             {"_id": ObjectId(process_id)},
             {
                 "$addToSet": {"linkedApps": app_id},
@@ -280,7 +288,7 @@ async def attach_training(
     process_id: str,
     node_id: Optional[str] = None,
     training_module_id: str = None,
-    db=Depends(get_ea_db)
+    db: AsyncIOMotorDatabase = Depends(get_ea_db)
 ):
     """Attach a training module to a process or specific node"""
     try:
@@ -289,7 +297,7 @@ async def attach_training(
         
         if node_id:
             # Attach to specific node
-            result = db["ea_processes"].update_one(
+            result = await db["ea_processes"].update_one(
                 {
                     "_id": ObjectId(process_id),
                     "nodes.id": node_id
@@ -303,7 +311,7 @@ async def attach_training(
             )
         else:
             # Attach to process level (store in metadata)
-            result = db["ea_processes"].update_one(
+            result = await db["ea_processes"].update_one(
                 {"_id": ObjectId(process_id)},
                 {
                     "$set": {
