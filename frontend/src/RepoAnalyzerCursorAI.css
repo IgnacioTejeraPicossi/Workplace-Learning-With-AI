@@ -131,6 +131,38 @@
   transform: translateY(-2px);
 }
 
+/* Demo Button Special Styling */
+.demo-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+  color: white !important;
+  border: 2px solid #28a745 !important;
+  font-weight: bold !important;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-btn:hover {
+  background: linear-gradient(135deg, #218838 0%, #1ea085 100%) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4) !important;
+}
+
+.demo-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.demo-btn:hover::before {
+  left: 100%;
+}
+
 /* URL Input Section */
 .url-input-section {
   background: white;
@@ -1689,3 +1721,36 @@
     grid-template-columns: 1fr;
   }
 } 
+
+/* README Content Styling */
+.readme-content {
+  background: #f8f9fa !important;
+  padding: 20px !important;
+  border-radius: 8px !important;
+  border: 1px solid #e9ecef !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  white-space: pre-wrap !important;
+  color: #212529 !important;
+}
+
+.readme-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.readme-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.readme-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.readme-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
