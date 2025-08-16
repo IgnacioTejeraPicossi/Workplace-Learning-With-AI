@@ -42,16 +42,17 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         if max_tokens:
             params["max_tokens"] = max_tokens
         
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        # Use old OpenAI syntax for compatibility with openai==0.28.1
+        openai.api_key = OPENAI_API_KEY
         
         if messages:
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model=model_to_use,
                 messages=messages,
                 **params
             )
         else:
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 **params
@@ -100,17 +101,18 @@ Would you like to know more about any specific feature?"""
         if max_tokens:
             params["max_tokens"] = max_tokens
         
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        # Use old OpenAI syntax for compatibility with openai==0.28.1
+        openai.api_key = OPENAI_API_KEY
         
         if messages:
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model=model_to_use,
                 messages=messages,
                 stream=True,
                 **params
             )
         else:
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 stream=True,
@@ -143,7 +145,7 @@ def web_search_query(query):
     model = get_optimal_model("web_search", "medium")
     params = get_gpt5_parameters(model, "web_search")
     
-    response = openai.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model=model,
         messages=[{"role": "user", "content": query}],
         tools=[{"type": "web_search"}],
