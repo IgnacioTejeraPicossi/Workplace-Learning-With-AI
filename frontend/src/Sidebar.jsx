@@ -33,7 +33,8 @@ const Icon = ({ name, size = 20 }) => {
     help: "❓",
     map: "🗺️",
     "graduation-cap": "🎓",
-    building: "🏢"
+    building: "🏢",
+    temple: "🏛️"
   };
 
   return (
@@ -57,7 +58,8 @@ const navItems = [
     { key: "certifications", label: "Certifications", icon: "trophy" },
     { key: "ai-career-coach", label: "AI Career Coach", icon: "user" },
     { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
-    { key: "ai-learning", label: "AI Learning & Training", icon: "robot" }
+    { key: "ai-learning", label: "AI Learning & Training", icon: "robot" },
+    { key: "babel-library", label: "Babel Library", icon: "temple" }
   ]},
   
   // Mapa de conocimiento (opción especial que permanece visible)

@@ -14,6 +14,7 @@ import GlobalSearch from "./GlobalSearch";
 import RunTest from "./RunTest";
 import PresentationAgent from "./PresentationAgent";
 import AITrainingModule from "./AITrainingModule";
+import BabelLibrary from './BabelLibrary';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -365,6 +366,7 @@ function AppContent() {
             {activeModule === 'presentation-agent' && <PresentationAgent query={userQuery} />}
             {activeModule === 'ai-study-buddy' && <AIStudyBuddy user={user} query={userQuery} />}
             {activeModule === 'ai-learning' && <AITrainingModule query={userQuery} />}
+            {activeModule === 'babel-library' && <BabelLibrary />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson user={user} />}
@@ -376,6 +378,7 @@ function AppContent() {
             {!activeModule && section === "ai-career-coach" && <CareerCoach />}
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
             {!activeModule && section === "ai-learning" && <AITrainingModule user={user} />}
+            {!activeModule && section === "babel-library" && <BabelLibrary />}
             {!activeModule && section === "video-lessons" && <VideoLesson user={user} />}
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
