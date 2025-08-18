@@ -132,36 +132,23 @@ function SavedVideos({ user }) {
               boxShadow: colors.shadow
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-              <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 0.5rem 0', color: colors.text }}>
-                  🎥 {video.title}
-                </h3>
-                <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                  Duration: {video.duration} | Topic: {video.topic}
-                </p>
-                
-                {expandedVideo === video.id && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <p style={{ color: colors.text, lineHeight: 1.5 }}>
-                      {video.description}
-                    </p>
-                    <div style={{ marginTop: '1rem' }}>
-                      <iframe
-                        width="100%"
-                        height="200"
-                        src={video.url}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={video.title}
-                      ></iframe>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                      <div style={{ 
+               display: 'grid', 
+               gridTemplateColumns: '1fr auto',
+               gap: '1rem',
+               alignItems: 'start',
+               width: '100%'
+             }}>
+               <div style={{ minWidth: 0 }}>
+                 <h3 style={{ margin: '0 0 0.5rem 0', color: colors.text }}>
+                   🎥 {video.title}
+                 </h3>
+                 <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>
+                   Duration: {video.duration} | Topic: {video.topic}
+                 </p>
+               </div>
+               
+               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flexShrink: 0 }}>
                 <button
                   onClick={() => handlePlay(video)}
                   style={{
@@ -250,11 +237,50 @@ function SavedVideos({ user }) {
                 >
                   🗑️ Delete
                 </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                             </div>
+             </div>
+             
+             {/* Video expandido fuera del grid para ocupar todo el ancho */}
+             {expandedVideo === video.id && (
+               <div style={{ 
+                 marginTop: '1rem',
+                 padding: '1rem',
+                 background: colors.cardBackground,
+                 borderRadius: '8px',
+                 border: `1px solid ${colors.border}`,
+                 width: '100%'
+               }}>
+                 <p style={{ color: colors.text, lineHeight: 1.5, marginBottom: '1rem' }}>
+                   {video.description}
+                 </p>
+                 <div style={{ 
+                   marginTop: '1rem',
+                   position: 'relative',
+                   overflow: 'hidden',
+                   width: '100%'
+                 }}>
+                   <iframe
+                     width="100%"
+                     height="400"
+                     src={video.url}
+                     frameBorder="0"
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                     allowFullScreen
+                     title={video.title}
+                     style={{
+                       borderRadius: '8px',
+                       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                       display: 'block',
+                       width: '100%',
+                       minWidth: '100%'
+                     }}
+                   ></iframe>
+                 </div>
+               </div>
+             )}
+           </div>
+         ))}
+       </div>
 
       {filteredVideos.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: colors.textSecondary }}>
