@@ -216,22 +216,27 @@ function AppContent() {
                 position: "absolute",
                 left: "2rem",
                 top: "20%",
-                fontSize: "clamp(1rem, 2.5vw, 1.5rem)",
-                fontWeight: 400,
-                color: "rgba(103, 58, 183, 0.15)", // More visible purple
-                lineHeight: 1.4,
+                fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+                fontWeight: 600,
+                color: "rgba(103, 58, 183, 0.85)", // Much more visible purple
+                lineHeight: 1.5,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxWidth: "250px",
-                textAlign: "left"
+                maxWidth: "300px",
+                textAlign: "left",
+                textShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                background: "rgba(255, 255, 255, 0.95)",
+                padding: "20px",
+                borderRadius: "12px",
+                border: "2px solid rgba(103, 58, 183, 0.3)"
               }}
             >
-              I'm not just building a learning app —
+              <strong>I'm not just building a learning app —</strong>
               <br /><br />
-              I'm creating a co-evolving AI learning assistant where users shape its growth.
+              <strong>I'm creating a co-evolving AI learning assistant where users shape its growth.</strong>
               <br /><br />
-              <span style={{ fontStyle: "italic", fontSize: "0.9em" }}>— Ignacio Tejera</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(103, 58, 183, 1)" }}>— Ignacio Tejera</span>
             </div>
             
             {/* Top Right Background Message */}
@@ -240,24 +245,29 @@ function AppContent() {
                 position: "absolute",
                 right: "2rem",
                 top: "15%",
-                fontSize: "clamp(0.9rem, 2vw, 1.3rem)",
-                fontWeight: 400,
-                color: "rgba(103, 58, 183, 0.15)", // Same purple color as others
-                lineHeight: 1.4,
+                fontSize: "clamp(1.1rem, 2.5vw, 1.6rem)",
+                fontWeight: 600,
+                color: "rgba(103, 58, 183, 0.85)", // Much more visible purple
+                lineHeight: 1.5,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxWidth: "280px",
-                textAlign: "right"
+                maxWidth: "320px",
+                textAlign: "right",
+                textShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                background: "rgba(255, 255, 255, 0.95)",
+                padding: "20px",
+                borderRadius: "12px",
+                border: "2px solid rgba(103, 58, 183, 0.3)"
               }}
             >
-              We are not replacing human creativity — we are amplifying it 100 times.
+              <strong>We are not replacing human creativity — we are amplifying it 100 times.</strong>
               <br /><br />
-              Those who win are those with the best ideas, not those with the most technical skills.
+              <strong>Those who win are those with the best ideas, not those with the most technical skills.</strong>
               <br /><br />
-              This changes everything about who can build companies.
+              <strong>This changes everything about who can build companies.</strong>
               <br />
-              <span style={{ fontStyle: "italic", fontSize: "0.9em" }}>— Jensen Huang</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(103, 58, 183, 1)" }}>— Jensen Huang</span>
             </div>
             {/* Main Content */}
             <div style={{

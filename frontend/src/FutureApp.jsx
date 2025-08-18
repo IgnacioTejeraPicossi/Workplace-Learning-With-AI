@@ -204,6 +204,9 @@ function FutureApp({ onSectionSelect }) {
               <p style={{ color: colors.textSecondary, fontSize: "0.9rem" }}>
                 Inject new code without full restart
               </p>
+              <p style={{ color: colors.textSecondary, fontSize: "0.8rem", fontStyle: "italic" }}>
+                The closest today is Rolling updates without downtime with Docker + Kubernetes
+              </p>
             </div>
           </div>
         </div>
