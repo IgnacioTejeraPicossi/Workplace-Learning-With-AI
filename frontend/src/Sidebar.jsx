@@ -34,7 +34,8 @@ const Icon = ({ name, size = 20 }) => {
     map: "🗺️",
     "graduation-cap": "🎓",
     building: "🏢",
-    temple: "🏛️"
+    temple: "🏛️",
+    settings: "⚙️"
   };
 
   return (
@@ -89,6 +90,7 @@ const navItems = [
   // Grupo 3: Herramientas de desarrollo (fondo azul)
   { key: "security", label: "Security", icon: "shield", group: "developer" },
   { key: "run-test", label: "Run Test", icon: "play", group: "developer" },
+  { key: "api-config", label: "API Config", icon: "settings", group: "developer" },
   
   // Grupo 4: Funcionalidades futuras (expandible)
   { key: "future", label: "Future", icon: "rocket", group: "developer", isExpandable: true, subItems: [

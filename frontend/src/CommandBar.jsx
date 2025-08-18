@@ -114,9 +114,15 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'library': 'babel-library',
     'Babel Library': 'babel-library',
     'Library': 'babel-library',
+    // API Config
+    'api config': 'api-config',
+    'API config': 'api-config',
+    'API Config': 'api-config',
+    'configure api': 'api-config',
+    'api configuration': 'api-config',
   };
 
-  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "ai-career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy", "babel-library"];
+  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "ai-career-coach", "skills-forecast", "certifications", "web-search", "ai-study-buddy", "babel-library", "api-config"];
 
   const handleSubmit = async (value) => {
     const prompt = value || input; // || transcript;

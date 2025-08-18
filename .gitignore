@@ -19,6 +19,9 @@ build/
 .env.local
 .env.*.local
 
+# API Configuration files (may contain sensitive examples)
+backend/API_SETUP.md
+
 # IDE files
 .idea/
 .vscode/

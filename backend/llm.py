@@ -6,13 +6,25 @@ import openai
 from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
 from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
 
+# OpenRouter support
+try:
+    import openrouter
+except ImportError:
+    openrouter = None
+
 load_dotenv()  # Loads .env file if present
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+
+# API Provider Selection (can be 'openai' or 'openrouter')
+API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
 def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
     """
     Enhanced OpenAI function with GPT-5 model selection and optimization.
+    Now supports both OpenAI and OpenRouter APIs.
     
     Args:
         prompt: The prompt to send
@@ -21,6 +33,16 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         max_tokens: Maximum tokens for response
         messages: Alternative to prompt for conversation format
     """
+    # Try OpenRouter first if configured and selected
+    if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
+        try:
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                return result
+        except Exception as e:
+            print(f"OpenRouter failed, falling back to OpenAI: {e}")
+    
+    # Fallback to OpenAI
     if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
         # No key found, return mock response
         if prompt:
@@ -59,12 +81,69 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             )
         return response.choices[0].message.content.strip()
     except Exception as e:
+        return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..."
+
+def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    OpenRouter API function with model selection and optimization.
+    
+    Args:
+        prompt: The prompt to send
+        task_type: Type of task for optimal model selection
+        complexity: Task complexity (low, medium, high)
+        max_tokens: Maximum tokens for response
+        messages: Alternative to prompt for conversation format
+    """
+    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY.strip() == "":
+        return f"[MOCKED RESPONSE] OpenRouter API key not configured."
+    
+    try:
+        # Get optimal model and parameters
+        model = get_optimal_model(task_type, complexity)
+        params = get_gpt5_parameters(model, task_type)
+        
+        # Extract model from params and remove it to avoid conflict
+        model_to_use = params.pop("model", model)
+        
+        # Override max_tokens if provided
+        if max_tokens:
+            params["max_tokens"] = max_tokens
+        
+        # Configure OpenRouter client
+        openrouter.api_key = OPENROUTER_API_KEY
+        openrouter.api_base = OPENROUTER_BASE_URL
+        
+        if messages:
+            response = openrouter.ChatCompletion.create(
+                model=model_to_use,
+                messages=messages,
+                **params
+            )
+        else:
+            response = openrouter.ChatCompletion.create(
+                model=model_to_use,
+                messages=[{"role": "user", "content": prompt}],
+                **params
+            )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
 
 def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
     """
     Enhanced streaming OpenAI function with GPT-5 model selection.
+    Now supports both OpenAI and OpenRouter APIs.
     """
+    # Try OpenRouter first if configured and selected
+    if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
+        try:
+            for chunk in ask_openrouter_stream(prompt, task_type, complexity, max_tokens, messages):
+                yield chunk
+            return
+        except Exception as e:
+            print(f"OpenRouter streaming failed, falling back to OpenAI: {e}")
+    
+    # Fallback to OpenAI
     if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
         # No key found, yield a mock response for testing
         mock_response = f"""I'm your AI Study Buddy powered by GPT-5! Here's a helpful response to your question:
@@ -140,7 +219,16 @@ Would you like to know more about any specific feature?"""
 def web_search_query(query):
     """
     Enhanced web search with GPT-5 model selection.
+    Now supports both OpenAI and OpenRouter APIs.
     """
+    # Try OpenRouter first if configured and selected
+    if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
+        try:
+            return web_search_openrouter(query)
+        except Exception as e:
+            print(f"OpenRouter web search failed, falling back to OpenAI: {e}")
+    
+    # Fallback to OpenAI
     # Use GPT-5-mini for web search (fast and cost-effective)
     model = get_optimal_model("web_search", "medium")
     params = get_gpt5_parameters(model, "web_search")
@@ -152,7 +240,92 @@ def web_search_query(query):
         tool_choice="auto",
         **params
     )
+    return response.choices[0].message.content
+
+def web_search_openrouter(query):
+    """
+    OpenRouter web search function.
+    """
+    # Use optimal model for web search
+    model = get_optimal_model("web_search", "medium")
+    params = get_gpt5_parameters(model, "web_search")
+    
+    # Configure OpenRouter client
+    openrouter.api_key = OPENROUTER_API_KEY
+    openrouter.api_base = OPENROUTER_BASE_URL
+    
+    response = openrouter.ChatCompletion.create(
+        model=model,
+        messages=[{"role": "user", "content": query}],
+        tools=[{"type": "web_search"}],
+        tool_choice="auto",
+        **params
+    )
     return response.choices[0].message.content 
+
+def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    OpenRouter streaming API function with model selection and optimization.
+    
+    Args:
+        prompt: The prompt to send
+        task_type: Type of task for optimal model selection
+        complexity: Task complexity (low, medium, high)
+        max_tokens: Maximum tokens for response
+        messages: Alternative to prompt for conversation format
+    """
+    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY.strip() == "":
+        yield f"[MOCKED RESPONSE] OpenRouter API key not configured."
+        return
+    
+    try:
+        # Get optimal model and parameters
+        model = get_optimal_model(task_type, complexity)
+        params = get_gpt5_parameters(model, task_type)
+        
+        # Extract model from params and remove it to avoid conflict
+        model_to_use = params.pop("model", model)
+        
+        # Override max_tokens if provided
+        if max_tokens:
+            params["max_tokens"] = max_tokens
+        
+        # Configure OpenRouter client
+        openrouter.api_key = OPENROUTER_API_KEY
+        openrouter.api_base = OPENROUTER_BASE_URL
+        
+        if messages:
+            response = openrouter.ChatCompletion.create(
+                model=model_to_use,
+                messages=messages,
+                stream=True,
+                **params
+            )
+        else:
+            response = openrouter.ChatCompletion.create(
+                model=model_to_use,
+                messages=[{"role": "user", "content": prompt}],
+                stream=True,
+                **params
+            )
+        for chunk in response:
+            if hasattr(chunk, 'choices') and chunk.choices:
+                delta = chunk.choices[0].delta
+                content = getattr(delta, 'content', None)
+                if content:
+                    yield content
+    except Exception as e:
+        # Fallback to mock response if API call fails
+        mock_response = f"Sorry, I encountered an error: {str(e)}. Here's a helpful response instead:\n\n"
+        mock_response += f"Regarding your question about '{prompt or 'learning'}', here are some general insights:\n"
+        mock_response += "- Micro-lessons are bite-sized learning modules\n"
+        mock_response += "- AI can personalize your learning experience\n"
+        mock_response += "- Skills forecasting helps plan your career path\n"
+        mock_response += "- Scenario simulations provide hands-on practice\n\n"
+        mock_response += "Would you like to know more about any specific topic?"
+        
+        for char in mock_response:
+            yield char
 
 import json
 
