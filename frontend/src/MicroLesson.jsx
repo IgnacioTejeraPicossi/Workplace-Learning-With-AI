@@ -94,7 +94,23 @@ function MicroLesson({ query, user }) {
           </div>
         ) : (
           <>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{aiOutput}</pre>
+            <div style={{
+              maxHeight: '400px',
+              overflowY: 'auto',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              padding: '16px',
+              backgroundColor: '#fafafa',
+              marginBottom: '16px'
+            }}>
+              <pre style={{ 
+                whiteSpace: "pre-wrap",
+                margin: 0,
+                fontSize: '14px',
+                lineHeight: '1.5',
+                fontFamily: 'inherit'
+              }}>{aiOutput}</pre>
+            </div>
             {aiOutput && (
               <button onClick={handleTakeQuiz} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 16 }}>Take Quiz</button>
             )}
