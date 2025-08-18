@@ -138,7 +138,8 @@ const BabelLibrary = () => {
           {[
             { key: 'catalog', label: '📚 Library Catalog', icon: '📚' },
             { key: 'add', label: '➕ Add Resource', icon: '➕' },
-            { key: 'search', label: '🔍 Advanced Search', icon: '🔍' }
+            { key: 'search', label: '🔍 Advanced Search', icon: '🔍' },
+            { key: 'ai-search', label: '🤖 AI Search', icon: '🤖' }
           ].map(tab => (
             <button
               key={tab.key}
@@ -585,6 +586,220 @@ const BabelLibrary = () => {
                 }}>
                   <strong>Future Enhancement:</strong> This search will integrate with AI-powered content analysis, 
                   semantic search, and personalized recommendations based on your learning history.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'ai-search' && (
+          <div>
+            <h2 style={{ color: colors.text, marginBottom: 24 }}>🤖 AI-Powered Search & Intelligence</h2>
+            
+            <div style={{
+              background: colors.primaryLight,
+              padding: '24px',
+              borderRadius: 12,
+              border: `1px solid ${colors.primary}`
+            }}>
+              <h3 style={{ color: colors.primary, marginBottom: 16 }}>🚀 Future AI Capabilities</h3>
+              
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>🧠 Intelligent Content Analysis</h4>
+                <ul style={{ 
+                  color: colors.text, 
+                  lineHeight: 1.6,
+                  paddingLeft: '20px',
+                  marginBottom: 16
+                }}>
+                  <li><strong>Automatic Classification:</strong> AI categorizes resources by topic, difficulty, and audience</li>
+                  <li><strong>Concept Extraction:</strong> Identifies key concepts and creates dynamic taxonomies</li>
+                  <li><strong>Duplicate Detection:</strong> Finds similar content and suggests consolidation</li>
+                  <li><strong>Quality Assessment:</strong> Analyzes content quality based on multiple criteria</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>🔍 Semantic Search & Discovery</h4>
+                <ul style={{ 
+                  color: colors.text, 
+                  lineHeight: 1.6,
+                  paddingLeft: '20px',
+                  marginBottom: 16
+                }}>
+                  <li><strong>Meaning-Based Search:</strong> Find content by concept, not just keywords</li>
+                  <li><strong>Intelligent Recommendations:</strong> AI suggests related resources based on patterns</li>
+                  <li><strong>Multimodal Search:</strong> Search across text, images, and audio content</li>
+                  <li><strong>Learning Context:</strong> Understands your learning journey for better suggestions</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>📊 Personalization & Adaptation</h4>
+                <ul style={{ 
+                  color: colors.text, 
+                  lineHeight: 1.6,
+                  paddingLeft: '20px',
+                  marginBottom: 16
+                }}>
+                  <li><strong>Smart User Profiles:</strong> AI learns from your reading and learning behavior</li>
+                  <li><strong>Adaptive Learning Paths:</strong> Personalized routes that evolve with your progress</li>
+                  <li><strong>Contextual Recommendations:</strong> Suggests resources based on time, mood, and context</li>
+                  <li><strong>Content Adaptation:</strong> Adjusts content complexity to your experience level</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>⚡ AI-Generated Content</h4>
+                <ul style={{ 
+                  color: colors.text, 
+                  lineHeight: 1.6,
+                  paddingLeft: '20px',
+                  marginBottom: 16
+                }}>
+                  <li><strong>Automatic Summaries:</strong> AI creates executive summaries of long resources</li>
+                  <li><strong>Comprehension Questions:</strong> Generated questions to test understanding</li>
+                  <li><strong>Multi-language Translation:</strong> Instant translation to multiple languages</li>
+                  <li><strong>Content Simplification:</strong> Creates versions for different audience levels</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>🔮 Predictive Intelligence</h4>
+                <ul style={{ 
+                  color: colors.text, 
+                  lineHeight: 1.6,
+                  paddingLeft: '20px',
+                  marginBottom: 16
+                }}>
+                  <li><strong>Emerging Trends:</strong> Identifies new topics and learning demands</li>
+                  <li><strong>Demand Prediction:</strong> Forecasts which resources will be needed</li>
+                  <li><strong>Knowledge Gap Analysis:</strong> Finds areas where content is missing</li>
+                  <li><strong>Expert Identification:</strong> Discovers subject matter experts in your network</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Real-World Examples */}
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ color: colors.text, marginBottom: 16 }}>🌐 Real-World Examples Today</h3>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+                gap: 16 
+              }}>
+                <div style={{
+                  background: colors.background,
+                  padding: '20px',
+                  borderRadius: 12,
+                  border: `1px solid ${colors.border}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>🔬 Academic Platforms</h4>
+                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
+                    <li><strong>Google Scholar:</strong> AI-powered ranking and recommendations</li>
+                    <li><strong>Mendeley:</strong> Citation analysis and paper suggestions</li>
+                    <li><strong>Zotero:</strong> Automatic reference classification</li>
+                    <li><strong>arXiv:</strong> AI categorization of scientific papers</li>
+                  </ul>
+                </div>
+
+                <div style={{
+                  background: colors.background,
+                  padding: '20px',
+                  borderRadius: 12,
+                  border: `1px solid ${colors.border}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>📚 Learning Management</h4>
+                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
+                    <li><strong>Coursera:</strong> Personalized course recommendations</li>
+                    <li><strong>edX:</strong> AI-driven learning path optimization</li>
+                    <li><strong>Khan Academy:</strong> Adaptive content difficulty</li>
+                    <li><strong>Duolingo:</strong> AI-powered language learning</li>
+                  </ul>
+                </div>
+
+                <div style={{
+                  background: colors.background,
+                  padding: '20px',
+                  borderRadius: 12,
+                  border: `1px solid ${colors.border}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>🏢 Enterprise Solutions</h4>
+                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
+                    <li><strong>Microsoft Viva:</strong> AI-powered learning insights</li>
+                    <li><strong>LinkedIn Learning:</strong> Skill-based recommendations</li>
+                    <li><strong>Workday Learning:</strong> AI-driven career development</li>
+                    <li><strong>Degreed:</strong> Intelligent skill mapping</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Implementation Roadmap */}
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ color: colors.text, marginBottom: 16 }}>🗺️ Implementation Roadmap</h3>
+              
+              <div style={{
+                background: colors.background,
+                padding: '24px',
+                borderRadius: 12,
+                border: `1px solid ${colors.border}`,
+                color: colors.text
+              }}>
+                <div style={{ marginBottom: 16 }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 1: Intelligent Analysis (Q2 2024)</h4>
+                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
+                    AI-powered content classification, automatic tagging, and basic semantic search capabilities.
+                  </p>
+                </div>
+                
+                <div style={{ marginBottom: 16 }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 2: Smart Recommendations (Q3 2024)</h4>
+                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
+                    Personalized content suggestions, learning path optimization, and intelligent resource matching.
+                  </p>
+                </div>
+                
+                <div style={{ marginBottom: 16 }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 3: AI Content Generation (Q4 2024)</h4>
+                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
+                    Automatic summaries, comprehension questions, and adaptive content creation.
+                  </p>
+                </div>
+                
+                <div style={{ marginBottom: 16 }}>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 4: Predictive Intelligence (Q1 2025)</h4>
+                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
+                    Trend analysis, demand forecasting, and proactive knowledge gap identification.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Vision Statement */}
+            <div style={{ marginTop: 32 }}>
+              <div style={{
+                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.primary}25)`,
+                padding: '24px',
+                borderRadius: 12,
+                border: `2px solid ${colors.primary}30`,
+                textAlign: 'center'
+              }}>
+                <h3 style={{ color: colors.primary, marginBottom: 16 }}>🎯 Our Vision</h3>
+                <p style={{ 
+                  color: colors.text, 
+                  fontSize: '1.1em', 
+                  lineHeight: 1.6,
+                  fontStyle: 'italic',
+                  margin: 0
+                }}>
+                  "Babel Library will be the first learning repository that doesn't just store knowledge, 
+                  but understands it, analyzes it, and adapts it dynamically to each user's unique learning journey. 
+                  We're building the future of intelligent knowledge management."
                 </p>
               </div>
             </div>
