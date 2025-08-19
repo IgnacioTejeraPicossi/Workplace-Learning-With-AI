@@ -33,6 +33,7 @@
 - [Impact Analysis](#impact-analysis) - Dependency analysis with BFS algorithm
 
 ### 🛠️ Admin & Development
+- [API Config](#api-config) - OpenAI and OpenRouter API configuration
 - [Run Test](#run-test) - Comprehensive testing suite
 - [Idea Log](#idea-log) - Feature tracking and suggestions
 - [Feature Roadmap](#feature-roadmap) - Development planning
@@ -111,6 +112,7 @@ graph TB
   
   %% Admin & Development
   subgraph "🛠️ Admin & Development"
+    APIConfig[⚙️ API Config]
     RunTest[🧪 Run Test]
     IdeaLog[📝 Idea Log]
     FeatureRoadmap[🗺️ Feature Roadmap]
@@ -150,6 +152,7 @@ graph TB
   App --> RepoAnalyzer
   App --> PresentationAgent
   App --> AIStudyBuddy
+  App --> APIConfig
   App --> RunTest
   App --> IdeaLog
   App --> FeatureRoadmap
@@ -171,6 +174,7 @@ graph TB
   RepoAnalyzer --> FastAPI
   PresentationAgent --> FastAPI
   AIStudyBuddy --> FastAPI
+  APIConfig --> FastAPI
   
   %% Testing Connections
   RunTest --> Cypress
@@ -200,7 +204,7 @@ graph TB
   classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#ffffff,font-size:14px;
   
   class User user;
-  class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
+  class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
   class FastAPI,LLM,WebSearchAPI backend;
   class CursorAI,GitHub external;
   class MongoDB,Firebase database;
@@ -694,6 +698,16 @@ Modular API endpoints for:
 - **Screenshot Capture**: Automatic screenshots for visual verification of each panel
 - **Test Coverage**: Tests all 11 sidebar options, global search, theme toggle, and responsive design
 - **Easy Access**: Click the test tube icon (🧪) in the sidebar to run tests
+
+**⚙️ API Config** (APIConfig.jsx):
+- **Dual API Support**: Configure and switch between OpenAI and OpenRouter APIs
+- **API Key Management**: Secure storage of API keys in browser localStorage
+- **Connection Testing**: Built-in API connection testing for both providers
+- **Automatic Fallback**: Seamless fallback from OpenRouter to OpenAI if needed
+- **Cost Optimization**: Access to multiple AI providers through OpenRouter for better pricing
+- **Provider Selection**: Easy switching between API providers with visual indicators
+- **Security**: API keys are stored locally and never sent to external servers
+- **Easy Access**: Click the gear icon (⚙️) in the sidebar under Developer section
 
 **Shoelace-based UI:**
 - Uses Shoelace Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
