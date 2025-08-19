@@ -751,28 +751,28 @@ const BabelLibrary = () => {
                 color: colors.text
               }}>
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 1: Intelligent Analysis (Q2 2024)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 1: Intelligent Analysis (Q3 2025)</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
                     AI-powered content classification, automatic tagging, and basic semantic search capabilities.
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 2: Smart Recommendations (Q3 2024)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 2: Smart Recommendations (Q4 2025)</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
                     Personalized content suggestions, learning path optimization, and intelligent resource matching.
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 3: AI Content Generation (Q4 2024)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 3: AI Content Generation (Q1 2026)</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
                     Automatic summaries, comprehension questions, and adaptive content creation.
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 4: Predictive Intelligence (Q1 2025)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 4: Predictive Intelligence (Q2 2026)</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
                     Trend analysis, demand forecasting, and proactive knowledge gap identification.
                   </p>
