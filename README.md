@@ -204,11 +204,11 @@ graph TB
   RepoAnalyzer --> GitHub[GitHub/GitLab]
   
   %% Styling
-  classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#2d3436,font-size:16px;
-  classDef frontend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef external fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#000000,font-size:18px;
+  classDef frontend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#000000,font-size:16px;
+  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000,font-size:16px;
+  classDef external fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#000000,font-size:16px;
+  classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#000000,font-size:16px;
   
   class User user;
   class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,EAHome,ProcessDesigner,CatalogManager,HeatmapView,ImpactAnalysis,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
@@ -256,9 +256,9 @@ graph TB
   TestResults --> IntegrationTests
   
   %% Styling
-  classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef results fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef backend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#000000,font-size:16px;
+  classDef results fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000,font-size:16px;
+  classDef backend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#000000,font-size:16px;
   
   class RunTest,TestSuite,Cypress,ManualTests,APITests testing;
   class TestResults,FrontendTests,BackendTests,IntegrationTests results;
@@ -340,10 +340,10 @@ graph TB
   Firebase --> JWT
   
   %% Styling
-  classDef frontend fill:#61dafb,stroke:#21a1cb,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef ai fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef frontend fill:#61dafb,stroke:#21a1cb,stroke-width:2px,color:#000000,font-size:16px;
+  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000,font-size:16px;
+  classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#000000,font-size:16px;
+  classDef ai fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#000000,font-size:16px;
   
   class React,Router,Context,Hooks,CSS,Icons,Theme,Webpack,Babel,ESLint frontend;
   class FastAPI,Uvicorn,Python,Pydantic,Motor,NodeJS,Express,Axios,Cheerio backend;
