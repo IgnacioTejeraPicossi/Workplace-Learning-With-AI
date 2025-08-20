@@ -283,8 +283,8 @@ function Dashboard({ user, onSectionSelect }) {
           
           <ProgressCard
             title="Learning Streak"
-            value={progress.lastActivity ? 1 : 0}
-            total={1}
+            value={20}
+            total={20}
             icon="🔥"
             color="#F44336"
             backgroundColor="#ffebee"
