@@ -82,6 +82,12 @@ This project is a **proof of concept for the next generation of software develop
 
 *The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
 
+## 🏗️ System Architecture {#system-architecture}
+
+*The diagrams below show the system architecture divided into two clear sections for better readability.*
+
+### 📱 Application Architecture
+
 ```mermaid
 graph TB
   %% Main User Interface
@@ -110,6 +116,15 @@ graph TB
     AIStudyBuddy[🤝 AI Study Buddy]
   end
   
+  %% Enterprise Architecture
+  subgraph "🏢 Enterprise Architecture"
+    EAHome[EA Dashboard]
+    ProcessDesigner[Process Designer]
+    CatalogManager[Catalog Manager]
+    HeatmapView[Heatmap View]
+    ImpactAnalysis[Impact Analysis]
+  end
+  
   %% Admin & Development
   subgraph "🛠️ Admin & Development"
     APIConfig[⚙️ API Config]
@@ -117,14 +132,6 @@ graph TB
     IdeaLog[📝 Idea Log]
     FeatureRoadmap[🗺️ Feature Roadmap]
     GlobalSearch[🔍 Global Search]
-  end
-  
-  %% Testing Framework
-  subgraph "🧪 Testing Framework"
-    Cypress[Cypress E2E Tests]
-    ManualTests[Manual Tests]
-    APITests[API Tests]
-    TestResults[Test Results]
   end
   
   %% Backend Services
@@ -152,6 +159,11 @@ graph TB
   App --> RepoAnalyzer
   App --> PresentationAgent
   App --> AIStudyBuddy
+  App --> EAHome
+  App --> ProcessDesigner
+  App --> CatalogManager
+  App --> HeatmapView
+  App --> ImpactAnalysis
   App --> APIConfig
   App --> RunTest
   App --> IdeaLog
@@ -174,16 +186,12 @@ graph TB
   RepoAnalyzer --> FastAPI
   PresentationAgent --> FastAPI
   AIStudyBuddy --> FastAPI
+  EAHome --> FastAPI
+  ProcessDesigner --> FastAPI
+  CatalogManager --> FastAPI
+  HeatmapView --> FastAPI
+  ImpactAnalysis --> FastAPI
   APIConfig --> FastAPI
-  
-  %% Testing Connections
-  RunTest --> Cypress
-  RunTest --> ManualTests
-  RunTest --> APITests
-  Cypress --> TestResults
-  ManualTests --> TestResults
-  APITests --> TestResults
-  APITests --> FastAPI
   
   %% AI & Database
   FastAPI --> LLM
@@ -201,14 +209,60 @@ graph TB
   classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
   classDef external fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#ffffff,font-size:14px;
   classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#ffffff,font-size:14px;
-  classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#ffffff,font-size:14px;
   
   class User user;
-  class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
+  class App,Dashboard,Concepts,MicroLesson,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,PresentationAgent,AIStudyBuddy,EAHome,ProcessDesigner,CatalogManager,HeatmapView,ImpactAnalysis,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
   class FastAPI,LLM,WebSearchAPI backend;
   class CursorAI,GitHub external;
   class MongoDB,Firebase database;
-  class Cypress,ManualTests,APITests,TestResults testing;
+```
+
+### 🧪 Testing Architecture
+
+```mermaid
+graph TB
+  %% Testing Framework Overview
+  RunTest[🧪 Run Test Module] --> TestSuite[Test Suite]
+  
+  %% Three Types of Tests
+  subgraph "🧪 Testing Framework"
+    Cypress[Cypress E2E Tests]
+    ManualTests[Manual Tests]
+    APITests[API Tests]
+  end
+  
+  %% Test Execution Flow
+  TestSuite --> Cypress
+  TestSuite --> ManualTests
+  TestSuite --> APITests
+  
+  %% Test Results
+  Cypress --> TestResults[📊 Test Results]
+  ManualTests --> TestResults
+  APITests --> TestResults
+  
+  %% Backend Testing
+  APITests --> FastAPI[FastAPI Server]
+  
+  %% Test Coverage
+  subgraph "📈 Test Coverage"
+    FrontendTests[Frontend Components]
+    BackendTests[Backend APIs]
+    IntegrationTests[Integration Tests]
+  end
+  
+  TestResults --> FrontendTests
+  TestResults --> BackendTests
+  TestResults --> IntegrationTests
+  
+  %% Styling
+  classDef testing fill:#e17055,stroke:#d63031,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef results fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef backend fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#ffffff,font-size:14px;
+  
+  class RunTest,TestSuite,Cypress,ManualTests,APITests testing;
+  class TestResults,FrontendTests,BackendTests,IntegrationTests results;
+  class FastAPI backend;
 ```
 
 
