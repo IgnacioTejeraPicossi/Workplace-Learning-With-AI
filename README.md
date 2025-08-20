@@ -265,6 +265,92 @@ graph TB
   class FastAPI backend;
 ```
 
+### 🏗️ Technical Stack Architecture
+
+```mermaid
+graph TB
+  %% Frontend Layer
+  subgraph "🎨 Frontend Layer"
+    React[React.js 18+]
+    subgraph "📚 Core Libraries"
+      Router[React Router]
+      Context[Context API]
+      Hooks[React Hooks]
+    end
+    subgraph "🎨 UI & Styling"
+      CSS[CSS3 + Flexbox/Grid]
+      Icons[Custom Icons + Emojis]
+      Theme[Theme Context]
+    end
+    subgraph "🔧 Development Tools"
+      Webpack[Webpack 5]
+      Babel[Babel]
+      ESLint[ESLint]
+    end
+  end
+  
+  %% Backend Layer
+  subgraph "⚙️ Backend Layer"
+    subgraph "🐍 FastAPI Backend"
+      FastAPI[FastAPI Server]
+      Uvicorn[Uvicorn ASGI]
+      Python[Python 3.10+]
+      Pydantic[Pydantic Models]
+      Motor[Motor Async MongoDB]
+    end
+    subgraph "🟨 WebSearch Backend"
+      NodeJS[Node.js 18+]
+      Express[Express.js]
+      Axios[Axios HTTP Client]
+      Cheerio[Cheerio Web Scraping]
+    end
+  end
+  
+  %% Database Layer
+  subgraph "🗄️ Database Layer"
+    MongoDB[(MongoDB 6.0+)]
+    Firebase[(Firebase 10+)]
+    subgraph "🔐 Authentication"
+      FirebaseAuth[Firebase Auth]
+      GoogleSignIn[Google Sign-In]
+      JWT[JWT Tokens]
+    end
+  end
+  
+  %% AI & External Services
+  subgraph "🤖 AI & External Services"
+    OpenAI[OpenAI GPT-5 API]
+    OpenRouter[OpenRouter API]
+    WebSearch[Web Search APIs]
+  end
+  
+  %% Connections
+  React --> FastAPI
+  React --> NodeJS
+  React --> FirebaseAuth
+  
+  FastAPI --> MongoDB
+  FastAPI --> OpenAI
+  FastAPI --> OpenRouter
+  
+  NodeJS --> WebSearch
+  NodeJS --> Cheerio
+  
+  FirebaseAuth --> Firebase
+  Firebase --> JWT
+  
+  %% Styling
+  classDef frontend fill:#61dafb,stroke:#21a1cb,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#ffffff,font-size:14px;
+  classDef ai fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#ffffff,font-size:14px;
+  
+  class React,Router,Context,Hooks,CSS,Icons,Theme,Webpack,Babel,ESLint frontend;
+  class FastAPI,Uvicorn,Python,Pydantic,Motor,NodeJS,Express,Axios,Cheerio backend;
+  class MongoDB,Firebase,FirebaseAuth,GoogleSignIn,JWT database;
+  class OpenAI,OpenRouter,WebSearch ai;
+```
+
 
 
 ---
