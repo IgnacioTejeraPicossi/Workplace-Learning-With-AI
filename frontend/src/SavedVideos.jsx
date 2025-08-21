@@ -34,6 +34,21 @@ function SavedVideos({ user }) {
     }
   }, [user]);
 
+  // Listen for video saved events to refresh the list
+  useEffect(() => {
+    const handleVideoSaved = () => {
+      if (user) {
+        loadSavedVideos();
+      }
+    };
+
+    window.addEventListener('videoSaved', handleVideoSaved);
+    
+    return () => {
+      window.removeEventListener('videoSaved', handleVideoSaved);
+    };
+  }, [user]);
+
   const filteredVideos = savedVideos.filter(video =>
     video.title.toLowerCase().includes(filter.toLowerCase()) ||
     video.topic.toLowerCase().includes(filter.toLowerCase())
@@ -123,7 +138,7 @@ function SavedVideos({ user }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {filteredVideos.map(video => (
           <div
-            key={video.id}
+            key={video._id}
             style={{
               background: colors.cardBackground,
               border: `1px solid ${colors.border}`,
@@ -165,7 +180,7 @@ function SavedVideos({ user }) {
                 </button>
                 
                 <button
-                  onClick={() => toggleExpand(video.id)}
+                  onClick={() => toggleExpand(video._id)}
                   style={{
                     padding: '0.5rem 1rem',
                     background: 'transparent',
@@ -175,7 +190,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  {expandedVideo === video.id ? '📁 Compress' : '📂 Expand'}
+                  {expandedVideo === video._id ? '📁 Compress' : '📂 Expand'}
                 </button>
                 
                 <button
@@ -224,7 +239,7 @@ function SavedVideos({ user }) {
                 </button>
                 
                 <button
-                  onClick={() => handleDelete(video.id)}
+                  onClick={() => handleDelete(video._id)}
                   style={{
                     padding: '0.5rem 1rem',
                     background: '#dc3545',
@@ -241,7 +256,7 @@ function SavedVideos({ user }) {
              </div>
              
              {/* Video expandido fuera del grid para ocupar todo el ancho */}
-             {expandedVideo === video.id && (
+             {expandedVideo === video._id && (
                <div style={{ 
                  marginTop: '1rem',
                  padding: '1rem',

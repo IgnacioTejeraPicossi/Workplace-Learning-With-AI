@@ -184,11 +184,19 @@ function VideoLesson({ user }) {
 
       await saveVideo(videoData);
       
-      // Reset form
-      setVideoTitle('');
-      setVideoDescription('');
-      setVideoTopic('');
+      // Reset form - Keep title and topic for better UX
+      setVideoDescription('');  // Clear description as it's user-specific
+      // Keep videoTitle, videoTopic, and videoUrl for better UX
+      // User can manually clear them if needed
       setShowSaveForm(false);
+      
+      // Reload saved videos list by triggering a component refresh
+      // This ensures the SavedVideos component shows the new video without page reload
+      setTimeout(() => {
+        // Force a re-render of the SavedVideos component
+        const event = new CustomEvent('videoSaved');
+        window.dispatchEvent(event);
+      }, 100);
       
       // Show success message
       alert('Video saved successfully! You can find it in the Saved Videos section below.');
