@@ -1,6 +1,6 @@
 // Scenario Simulator component skeleton
 import React, { useState } from "react";
-import { askStream } from "./api";
+import { askStream, saveSimulationResult } from "./api";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
 import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
@@ -87,9 +87,31 @@ function Simulator() {
       Make it engaging and educational.`,
       {
         statusMessages: STATUS_MESSAGES.SIMULATION,
-        onComplete: (content) => {
-          // Could save simulation progress
-          console.log('Simulation created');
+        onComplete: async (content) => {
+          // Save simulation result to MongoDB
+          try {
+            const simulationData = {
+              simulation_type: type.key,
+              title: `${type.label} Simulation`,
+              topic: type.label,
+              description: `Interactive scenario-based training simulation for ${type.label}`,
+              content: content,
+              difficulty: 'intermediate',
+              duration: 30,
+              scenario_type: type.label,
+              learning_objectives: [
+                'Practice real-world decision making',
+                'Learn from consequences of choices',
+                'Develop critical thinking skills',
+                'Improve workplace problem-solving'
+              ]
+            };
+            
+            await saveSimulationResult(simulationData);
+            console.log('Simulation result saved to MongoDB');
+          } catch (error) {
+            console.error('Error saving simulation result:', error);
+          }
         }
       }
     );
@@ -116,9 +138,31 @@ function Simulator() {
       Make it engaging and educational.`,
       {
         statusMessages: STATUS_MESSAGES.SIMULATION,
-        onComplete: (content) => {
-          // Could save simulation progress
-          console.log('Custom simulation created');
+        onComplete: async (content) => {
+          // Save custom simulation result to MongoDB
+          try {
+            const simulationData = {
+              simulation_type: 'custom',
+              title: `Custom Simulation: ${customScenario}`,
+              topic: customScenario,
+              description: `Custom interactive scenario-based training simulation for ${customScenario}`,
+              content: content,
+              difficulty: 'intermediate',
+              duration: 30,
+              scenario_type: 'Custom Scenario',
+              learning_objectives: [
+                'Practice real-world decision making',
+                'Learn from consequences of choices',
+                'Develop critical thinking skills',
+                'Improve workplace problem-solving'
+              ]
+            };
+            
+            await saveSimulationResult(simulationData);
+            console.log('Custom simulation result saved to MongoDB');
+          } catch (error) {
+            console.error('Error saving custom simulation result:', error);
+          }
         }
       }
     );

@@ -498,3 +498,58 @@ export const updateCareerCoachSession = async (sessionId, data) => {
     throw error;
   }
 };
+
+// Simulation Results API functions
+export const fetchSimulationResults = async () => {
+  try {
+    const response = await fetch('/api/simulation-results/');
+    if (!response.ok) throw new Error('Failed to fetch simulation results');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching simulation results:', error);
+    return [];
+  }
+};
+
+export const saveSimulationResult = async (resultData) => {
+  try {
+    const response = await fetch('/api/simulation-results/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(resultData)
+    });
+    if (!response.ok) throw new Error('Failed to save simulation result');
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving simulation result:', error);
+    throw error;
+  }
+};
+
+export const deleteSimulationResult = async (resultId) => {
+  try {
+    const response = await fetch(`/api/simulation-results/${resultId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete simulation result');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting simulation result:', error);
+    throw error;
+  }
+};
+
+export const updateSimulationResult = async (resultId, data) => {
+  try {
+    const response = await fetch(`/api/simulation-results/${resultId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update simulation result');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating simulation result:', error);
+    throw error;
+  }
+};

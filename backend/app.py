@@ -56,12 +56,14 @@ from backend.micro_lessons import micro_lessons_router
 from backend.web_search import web_search_router
 from backend.skills_forecast import skills_forecast_router
 from backend.career_coach import career_coach_router
+from backend.simulation_results import simulation_results_router
 
 app.include_router(certifications_router)
 app.include_router(micro_lessons_router)
 app.include_router(web_search_router)
 app.include_router(skills_forecast_router)
 app.include_router(career_coach_router)
+app.include_router(simulation_results_router)
 
 # Enterprise Architecture routers
 from backend.ea_processes import router as ea_processes_router

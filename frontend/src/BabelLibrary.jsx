@@ -6,7 +6,8 @@ import {
   fetchMicroLessons,
   fetchWebSearchResults,
   fetchSkillsForecasts,
-  fetchCareerCoachSessions
+  fetchCareerCoachSessions,
+  fetchSimulationResults
 } from './api';
 
 const BabelLibrary = () => {
@@ -19,6 +20,7 @@ const BabelLibrary = () => {
   const [webSearchResults, setWebSearchResults] = useState([]);
   const [skillsForecasts, setSkillsForecasts] = useState([]);
   const [careerCoachSessions, setCareerCoachSessions] = useState([]);
+  const [simulationResults, setSimulationResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newBook, setNewBook] = useState({
     title: '',
@@ -111,6 +113,19 @@ const BabelLibrary = () => {
     }
   };
 
+  // Load simulation results from MongoDB
+  const loadSimulationResults = async () => {
+    try {
+      const data = await fetchSimulationResults();
+      console.log('Simulation results loaded:', data);
+      if (data) {
+        setSimulationResults(data);
+      }
+    } catch (error) {
+      console.error('Error loading simulation results:', error);
+    }
+  };
+
   // Demo data for the prototype
   useEffect(() => {
     const demoBooks = [
@@ -172,6 +187,8 @@ const BabelLibrary = () => {
     loadSkillsForecasts();
     // Load career coach sessions from MongoDB
     loadCareerCoachSessions();
+    // Load simulation results from MongoDB
+    loadSimulationResults();
   }, []);
 
   const handleAddBook = (e) => {
@@ -265,6 +282,20 @@ const BabelLibrary = () => {
        addedDate: session.created_at ? session.created_at.split('T')[0] : 'Unknown',
        growthArea: session.growth_area,
        customTopic: session.custom_topic
+     })),
+     ...simulationResults.map(result => ({
+       id: result.id,
+       title: result.title,
+       author: 'Simulation Result',
+       topic: result.topic,
+       description: result.description,
+       type: 'simulation',
+       addedDate: result.created_at ? result.created_at.split('T')[0] : 'Unknown',
+       difficulty: result.difficulty,
+       duration: result.duration,
+       scenarioType: result.scenario_type,
+       userScore: result.user_score,
+       completionTime: result.completion_time
      }))
   ];
 
@@ -564,7 +595,7 @@ const BabelLibrary = () => {
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>🎮</div>
                  <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Simulations / Coach</div>
-                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{careerCoachSessions.length}</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{careerCoachSessions.length + simulationResults.length}</div>
                </button>
              </div>
 
