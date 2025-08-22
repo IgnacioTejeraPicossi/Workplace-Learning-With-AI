@@ -64,17 +64,17 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         if max_tokens:
             params["max_tokens"] = max_tokens
         
-        # Use old OpenAI syntax for compatibility with openai==0.28.1
-        openai.api_key = OPENAI_API_KEY
+        # Use OpenAI client syntax for compatibility with openai>=1.0.0
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
         
         if messages:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model=model_to_use,
                 messages=messages,
                 **params
             )
         else:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 **params

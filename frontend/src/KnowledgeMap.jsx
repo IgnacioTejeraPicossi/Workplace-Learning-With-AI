@@ -46,12 +46,21 @@ const KnowledgeMap = () => {
   const { colors } = useTheme();
   const zoomRef = useRef(null);
 
-  // Color palette for different clusters
+  // Color palette for different clusters - Updated for dynamic categories
   const clusterColors = {
+    // Original categories (fallback)
     'AI Fundamentals': '#4CAF50',
     'Leadership': '#2196F3', 
     'Business Applications': '#FF9800',
-    'Communication': '#9C27B0'
+    'Communication': '#9C27B0',
+    
+    // New dynamic categories
+    'AI & Technology': '#00BCD4',
+    'Leadership & Management': '#3F51B5',
+    'Business & Sales': '#FF5722',
+    'Communication Skills': '#E91E63',
+    'Conflict Resolution': '#795548',
+    'General Skills': '#607D8B'
   };
 
   // Web search function
@@ -287,7 +296,8 @@ const KnowledgeMap = () => {
     // Create nodes with improved positioning - Use all topics, not filtered
     const newNodes = Object.entries(topics).map(([id, topic]) => {
       const mastery = userData?.mastery_scores?.[id] || 0;
-      const cluster = Object.entries(clusters).find(([clusterName, topicIds]) =>
+      // Use the topic's category directly from MongoDB data, fallback to cluster lookup
+      const cluster = topic.category || Object.entries(clusters).find(([clusterName, topicIds]) =>
         topicIds.includes(id)
       )?.[0] || 'Other';
       
@@ -498,10 +508,22 @@ const KnowledgeMap = () => {
       }
     });
 
-    // Add cluster labels with better positioning and visibility
-    Object.entries(clusters).forEach(([clusterName, topicIds], index) => {
+    // Add cluster labels with better positioning and visibility - Now using dynamic categories
+    const dynamicClusters = {};
+    
+    // Group nodes by their category
+    newNodes.forEach(node => {
+      if (node.cluster && node.cluster !== 'Other') {
+        if (!dynamicClusters[node.cluster]) {
+          dynamicClusters[node.cluster] = [];
+        }
+        dynamicClusters[node.cluster].push(node);
+      }
+    });
+    
+    // Render cluster labels for dynamic categories
+    Object.entries(dynamicClusters).forEach(([clusterName, clusterNodes], index) => {
       try {
-        const clusterNodes = newNodes.filter(node => topicIds.includes(node.id));
         if (clusterNodes.length > 0) {
           const avgX = clusterNodes.reduce((sum, node) => sum + node.x, 0) / clusterNodes.length;
           const avgY = clusterNodes.reduce((sum, node) => sum + node.y, 0) / clusterNodes.length;
@@ -519,21 +541,21 @@ const KnowledgeMap = () => {
           background.setAttribute('opacity', '0.9');
           zoomContainer.appendChild(background);
 
-                     const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-           label.setAttribute('x', avgX);
-           label.setAttribute('y', avgY - 50);
-           label.setAttribute('font-size', '16px');
-           label.setAttribute('font-weight', 'bold');
-           label.setAttribute('fill', clusterColors[clusterName] || '#666');
-           label.setAttribute('text-anchor', 'middle');
-           label.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
-           label.setAttribute('class', 'cluster-label');
-           const originalTransform = `translate(${avgX}, ${avgY - 50})`;
-           label.setAttribute('data-original-transform', originalTransform);
-           label.textContent = clusterName;
+          const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          label.setAttribute('x', avgX);
+          label.setAttribute('y', avgY - 50);
+          label.setAttribute('font-size', '16px');
+          label.setAttribute('font-weight', 'bold');
+          label.setAttribute('fill', clusterColors[clusterName] || '#666');
+          label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('pointer-events', 'none'); // Prevent interference with zoom
+          label.setAttribute('class', 'cluster-label');
+          const originalTransform = `translate(${avgX}, ${avgY - 50})`;
+          label.setAttribute('data-original-transform', originalTransform);
+          label.textContent = clusterName;
 
-           zoomContainer.appendChild(label);
-          console.log(`✅ Added cluster label: ${clusterName}`);
+          zoomContainer.appendChild(label);
+          console.log(`✅ Added dynamic cluster label: ${clusterName} with ${clusterNodes.length} nodes`);
         }
       } catch (error) {
         console.error(`❌ Error creating cluster label ${index}:`, error);

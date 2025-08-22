@@ -1117,102 +1117,45 @@ async def get_quiz_results(user_id: str):
 # Knowledge Map endpoints
 @app.get("/api/knowledge-map/topics")
 async def get_knowledge_topics():
-    """Get all available knowledge topics with their embeddings and metadata"""
-    topics = {
-        "prompt_engineering": {
-            "id": "prompt_engineering",
-            "label": "Prompt Engineering",
-            "description": "Master the art of crafting effective AI prompts for optimal results",
-            "embedding": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-            "category": "AI Fundamentals"
-        },
-        "ai_ethics": {
-            "id": "ai_ethics",
-            "label": "AI Ethics",
-            "description": "Understanding ethical considerations and responsible AI development",
-            "embedding": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 0.1],
-            "category": "AI Fundamentals"
-        },
-        "machine_learning": {
-            "id": "machine_learning",
-            "label": "Machine Learning",
-            "description": "Learn the fundamentals of ML algorithms and data-driven decision making",
-            "embedding": [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 0.1, 0.2],
-            "category": "AI Fundamentals"
-        },
-        "team_leadership": {
-            "id": "team_leadership",
-            "label": "Team Leadership",
-            "description": "Develop skills to lead and motivate teams effectively",
-            "embedding": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 0.1, 0.2, 0.3],
-            "category": "Leadership"
-        },
-        "project_management": {
-            "id": "project_management",
-            "label": "Project Management",
-            "description": "Master project planning, execution, and delivery methodologies",
-            "embedding": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4],
-            "category": "Business Applications"
-        },
-        "customer_service": {
-            "id": "customer_service",
-            "label": "Customer Service",
-            "description": "Excel in customer interactions and satisfaction management",
-            "embedding": [0.6, 0.7, 0.8, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5],
-            "category": "Business Applications"
-        },
-        "sales_negotiation": {
-            "id": "sales_negotiation",
-            "label": "Sales & Negotiation",
-            "description": "Master sales techniques and negotiation strategies",
-            "embedding": [0.7, 0.8, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
-            "category": "Business Applications"
-        },
-        "conflict_resolution": {
-            "id": "conflict_resolution",
-            "label": "Conflict Resolution",
-            "description": "Learn to resolve workplace conflicts and build consensus",
-            "embedding": [0.8, 0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
-            "category": "Leadership"
-        },
-        "presentation_skills": {
-            "id": "presentation_skills",
-            "label": "Presentation Skills",
-            "description": "Deliver compelling presentations and public speaking",
-            "embedding": [0.9, 1.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
-            "category": "Communication"
-        },
-        "data_analysis": {
-            "id": "data_analysis",
-            "label": "Data Analysis",
-            "description": "Analyze data to drive business insights and decisions",
-            "embedding": [1.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
-            "category": "AI Fundamentals"
-        },
-        "communication": {
-            "id": "communication",
-            "label": "Communication",
-            "description": "Master effective communication in professional settings",
-            "embedding": [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 0.05],
-            "category": "Communication"
-        },
-        "strategic_thinking": {
-            "id": "strategic_thinking",
-            "label": "Strategic Thinking",
-            "description": "Develop long-term strategic planning and decision-making skills",
-            "embedding": [0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 0.05, 0.15],
-            "category": "Leadership"
-        },
-        "innovation_management": {
-            "id": "innovation_management",
-            "label": "Innovation Management",
-            "description": "Lead innovation initiatives and creative problem-solving",
-            "embedding": [0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 0.05, 0.15, 0.25],
-            "category": "Business Applications"
-        }
-    }
-    
-    return {"topics": topics}
+    """Get all available knowledge topics with their embeddings and metadata from MongoDB"""
+    try:
+        from backend.knowledge_map_utils import extract_topics_from_modules, generate_topic_embedding, categorize_topic
+        
+        # Extract topics from MongoDB
+        raw_topics = await extract_topics_from_modules()
+        
+        # Transform to expected format
+        topics = {}
+        for topic_key, topic_data in raw_topics.items():
+            topics[topic_key] = {
+                "id": topic_data["id"],
+                "label": topic_data["label"],
+                "description": topic_data["description"],
+                "embedding": generate_topic_embedding(topic_data["label"]),
+                "category": categorize_topic(topic_data["label"]),
+                "source": topic_data["source"],
+                "count": topic_data["count"]
+            }
+        
+        if not topics:
+            # Fallback to original data if no MongoDB topics found
+            topics = {
+                "programming": {
+                    "id": "programming",
+                    "label": "Programming",
+                    "description": "Computer programming and software development",
+                    "embedding": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+                    "category": "AI & Technology"
+                }
+            }
+        
+        print(f"🚀 Using {len(topics)} topics for knowledge map")
+        return {"topics": topics}
+        
+    except Exception as e:
+        print(f"❌ Error loading topics: {e}")
+        # Fallback to original data
+        return {"topics": {"programming": {"id": "programming", "label": "Programming", "description": "Computer programming", "embedding": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "category": "AI & Technology"}}}
 
 @app.get("/api/knowledge-map/user/{user_id}")
 async def get_user_knowledge_map(user_id: str):
@@ -1305,32 +1248,44 @@ async def get_user_knowledge_map(user_id: str):
 
 @app.get("/api/knowledge-map/clusters")
 async def get_knowledge_clusters():
-    """Get knowledge topic clusters for visualization"""
-    clusters = {
-        "AI Fundamentals": [
-            "prompt_engineering", 
-            "ai_ethics", 
-            "machine_learning", 
-            "data_analysis"
-        ],
-        "Leadership": [
-            "team_leadership", 
-            "conflict_resolution", 
-            "strategic_thinking"
-        ],
-        "Business Applications": [
-            "project_management", 
-            "customer_service", 
-            "sales_negotiation", 
-            "innovation_management"
-        ],
-        "Communication": [
-            "presentation_skills", 
-            "communication"
-        ]
-    }
-    
-    return {"clusters": clusters}
+    """Get knowledge topic clusters for visualization based on MongoDB data"""
+    try:
+        from backend.knowledge_map_utils import extract_topics_from_modules, categorize_topic
+        
+        # Extract topics from MongoDB to get current categories
+        raw_topics = await extract_topics_from_modules()
+        
+        # Group topics by their auto-generated categories
+        clusters = {}
+        for topic_key, topic_data in raw_topics.items():
+            category = categorize_topic(topic_data["label"])
+            
+            if category not in clusters:
+                clusters[category] = []
+            
+            clusters[category].append(topic_key)
+        
+        # Ensure we have at least some basic clusters if extraction fails
+        if not clusters:
+            clusters = {
+                "AI & Technology": ["programming"],
+                "Leadership & Management": ["agile"],
+                "General Skills": ["communication"]
+            }
+        
+        print(f"🗺️ Generated {len(clusters)} clusters: {list(clusters.keys())}")
+        return {"clusters": clusters}
+        
+    except Exception as e:
+        print(f"❌ Error in get_knowledge_clusters: {e}")
+        # Fallback clusters
+        return {
+            "clusters": {
+                "AI & Technology": ["programming"],
+                "Leadership & Management": ["agile"],
+                "General Skills": ["communication"]
+            }
+        }
 
 @app.post("/api/knowledge-map/activity")
 async def update_user_activity(request: Request):
@@ -1357,7 +1312,63 @@ async def update_user_activity(request: Request):
             }
         }
     except Exception as e:
-        return {"error": str(e)}, 400 
+                return {"error": str(e)}, 400
+
+@app.post("/api/knowledge-map/web-search")
+async def perform_web_search(request: Request):
+    """Perform web search for a topic and prepare results for future library integration"""
+    try:
+        data = await request.json()
+        topic = data.get("topic", "")
+        limit = data.get("limit", 10)
+        
+        if not topic:
+            return {"error": "Topic is required"}, 400
+        
+        # Perform web search (this would integrate with your existing search service)
+        # For now, we'll simulate the search results
+        search_results = [
+            {
+                "title": f"Search result 1 for {topic}",
+                "url": f"https://example.com/result1",
+                "snippet": f"This is a search result about {topic}",
+                "score": 0.95,
+                "topic": topic,
+                "search_timestamp": "2025-01-30T10:00:00Z",
+                "ready_for_library": True,
+                "library_metadata": {
+                    "type": "web_article",
+                    "source": "web_search",
+                    "topic": topic,
+                    "relevance_score": 0.95
+                }
+            },
+            {
+                "title": f"Search result 2 for {topic}",
+                "url": f"https://example.com/result2",
+                "snippet": f"Another search result about {topic}",
+                "score": 0.87,
+                "topic": topic,
+                "search_timestamp": "2025-01-30T10:00:00Z",
+                "ready_for_library": True,
+                "library_metadata": {
+                    "type": "web_article",
+                    "source": "web_search",
+                    "topic": topic,
+                    "relevance_score": 0.87
+                }
+            }
+        ]
+        
+        # Limit results
+        search_results = search_results[:limit]
+        
+        print(f"🔍 Web search for '{topic}' returned {len(search_results)} results")
+        return {"results": search_results}
+        
+    except Exception as e:
+        print(f"❌ Error in web search: {e}")
+        return {"error": str(e)}, 500
 
 # Saved Videos endpoints
 @app.get("/api/saved-videos")
