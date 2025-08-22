@@ -16,6 +16,7 @@ team_analytics_collection = database.get_collection("team_analytics")
 
 # Certification Collections
 certifications_collection = database.get_collection("certifications")
+micro_lessons_collection = database.get_collection("micro_lessons")
 study_plans_collection = database.get_collection("study_plans")
 certification_simulations_collection = database.get_collection("certification_simulations")
 
@@ -30,3 +31,10 @@ repo_analyses_collection = database.get_collection("repo_analyses")
 repo_documentation_collection = database.get_collection("repo_documentation")
 repo_quizzes_collection = database.get_collection("repo_quizzes")
 repo_learning_paths_collection = database.get_collection("repo_learning_paths")
+
+# Collections
+applications_collection = database.get_collection("ea_applications")
+micro_lessons_collection = database.get_collection("micro_lessons")
+certifications_collection = database.get_collection("certifications")
+web_search_collection = database.get_collection("web_search")
+skills_forecast_collection = database.get_collection("skills_forecast")

@@ -87,26 +87,7 @@ export async function postSkillsForecast(input) {
   return res.json();
 }
 
-export async function fetchLessons() {
-  const res = await fetchWithAuth(`${API_BASE}/lessons`);
-  return res.json();
-}
-
-export async function deleteLesson(id) {
-  const res = await fetchWithAuth(`${API_BASE}/lessons/${id}`, {
-    method: "DELETE"
-  });
-  return res;
-}
-
-export async function updateLesson(id, data) {
-  const res = await fetchWithAuth(`${API_BASE}/lessons/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-  return res;
-}
+// Removed old lesson APIs - now using MongoDB micro-lessons API
 
 export async function webSearch(query) {
   const res = await fetchWithAuth("http://localhost:8080/web-search", {
@@ -122,10 +103,7 @@ export async function fetchCareerSessions() {
   return res.json();
 }
 
-export async function fetchSkillsForecasts() {
-  const res = await fetchWithAuth(`${API_BASE}/user/skills-forecasts`);
-  return res.json();
-}
+// Removed duplicate function - using the new one below
 
 // Team Management API Functions
 export async function createTeam(teamData) {
@@ -280,9 +258,7 @@ Would you like to know more about any specific feature?`;
   return result;
 }
 
-export async function saveMicroLesson(topic, lesson) {
-  return apiCall('/micro-lesson', 'POST', { topic, lesson });
-}
+// Old saveMicroLesson function - replaced by new one below
 
 // Saved Videos API functions
 export async function fetchSavedVideos() {
@@ -353,3 +329,117 @@ export async function saveCursorReadme(readmeData) {
 export async function getCursorReadmeHistory() {
   return apiCall("/api/cursor-readme/history", "GET");
 }
+
+// Certifications API functions
+export async function fetchCertifications() {
+  return apiCall('/api/certifications/', 'GET');
+}
+
+export async function saveCertification(certificationData) {
+  return apiCall('/api/certifications/', 'POST', certificationData);
+}
+
+export async function deleteCertification(certificationId) {
+  return apiCall(`/api/certifications/${certificationId}`, 'DELETE');
+}
+
+export async function updateCertification(certificationId, data) {
+  return apiCall(`/api/certifications/${certificationId}`, "PUT", data);
+}
+
+// Micro-lessons API functions
+export async function fetchMicroLessons() {
+  return apiCall('/api/micro-lessons/', 'GET');
+}
+
+export async function saveMicroLesson(microLessonData) {
+  return apiCall('/api/micro-lessons/', 'POST', microLessonData);
+}
+
+export async function deleteMicroLesson(microLessonId) {
+  return apiCall(`/api/micro-lessons/${microLessonId}`, 'DELETE');
+}
+
+export async function updateMicroLesson(microLessonId, data) {
+  return apiCall(`/api/micro-lessons/${microLessonId}`, 'PUT', data);
+}
+
+// Web Search API functions
+export const fetchWebSearchResults = async () => {
+  try {
+    const response = await fetch('/api/web-search/');
+    if (!response.ok) throw new Error('Failed to fetch web search results');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching web search results:', error);
+    return [];
+  }
+};
+
+export const saveWebSearchResult = async (resultData) => {
+  try {
+    const response = await fetch('/api/web-search/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(resultData)
+    });
+    if (!response.ok) throw new Error('Failed to save web search result');
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving web search result:', error);
+    throw error;
+  }
+};
+
+export const deleteWebSearchResult = async (resultId) => {
+  try {
+    const response = await fetch(`/api/web-search/${resultId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete web search result');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting web search result:', error);
+    throw error;
+  }
+};
+
+// Skills Forecast API functions
+export const fetchSkillsForecasts = async () => {
+  try {
+    const response = await fetch('/api/skills-forecast/');
+    if (!response.ok) throw new Error('Failed to fetch skills forecasts');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching skills forecasts:', error);
+    return [];
+  }
+};
+
+export const saveSkillsForecast = async (forecastData) => {
+  try {
+    const response = await fetch('/api/skills-forecast/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(forecastData)
+    });
+    if (!response.ok) throw new Error('Failed to save skills forecast');
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving skills forecast:', error);
+    throw error;
+  }
+};
+
+export const deleteSkillsForecast = async (forecastId) => {
+  try {
+    const response = await fetch(`/api/skills-forecast/${forecastId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete skills forecast');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting skills forecast:', error);
+    throw error;
+  }
+};

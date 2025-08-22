@@ -50,6 +50,17 @@ app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
+# Learning modules routers
+from backend.certifications import certifications_router
+from backend.micro_lessons import micro_lessons_router
+from backend.web_search import web_search_router
+from backend.skills_forecast import skills_forecast_router
+
+app.include_router(certifications_router)
+app.include_router(micro_lessons_router)
+app.include_router(web_search_router)
+app.include_router(skills_forecast_router)
+
 # Enterprise Architecture routers
 from backend.ea_processes import router as ea_processes_router
 from backend.ea_catalog import router as ea_catalog_router

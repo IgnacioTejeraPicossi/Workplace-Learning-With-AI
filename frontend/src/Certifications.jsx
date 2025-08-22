@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { apiCall, getUserProfile, saveUserProfile, askStream } from "./api";
+import { apiCall, getUserProfile, saveUserProfile, askStream, saveCertification, fetchCertifications, deleteCertification } from "./api";
 
 function Certifications() {
   const [profile, setProfile] = useState({
@@ -24,6 +24,7 @@ function Certifications() {
   const [simulation, setSimulation] = useState("");
   const [history, setHistory] = useState([]);
   const [expandedPlan, setExpandedPlan] = useState(null);
+  const [certifications, setCertifications] = useState([]);
   const { colors } = useTheme();
 
   const experienceLevels = [
@@ -31,6 +32,41 @@ function Certifications() {
     { value: "intermediate", label: "Intermediate (2-5 years)" },
     { value: "advanced", label: "Advanced (5+ years)" }
   ];
+
+  // Load certifications from MongoDB (used by BabelLibrary and for refreshing after save)
+  const loadCertifications = async () => {
+    try {
+      const data = await fetchCertifications();
+      if (data) {
+        setCertifications(data);
+      }
+    } catch (error) {
+      console.error('Error loading certifications:', error);
+    }
+  };
+
+  // Fetch study plan history from MongoDB
+  const fetchHistory = async () => {
+    try {
+      // Use the certifications from MongoDB instead of the old endpoint
+      const data = await fetchCertifications();
+      if (data) {
+        // Transform MongoDB data to match the expected format
+        const transformedHistory = data.map(cert => ({
+          id: cert.id,
+          certification_name: cert.title,
+          created_at: cert.created_at,
+          status: cert.status,
+          level: cert.level,
+          topics: cert.topics,
+          study_plan: cert.study_plan || 'No study plan content available'  // Include study plan content
+        }));
+        setHistory(transformedHistory);
+      }
+    } catch (e) {
+      console.error('Error fetching history:', e);
+    }
+  };
 
   useEffect(() => {
     // Auto-fill profile from saved user profile
@@ -71,18 +107,11 @@ function Certifications() {
       }
     }
     fetchUserProfile();
-  }, []);
-
-  useEffect(() => {
-    // Fetch study plan history
-    async function fetchHistory() {
-      try {
-        const res = await apiCall("/certifications/user-recommendations", "GET");
-        if (res && res.study_plans) {
-          setHistory(res.study_plans);
-        }
-      } catch (e) {}
-    }
+    
+    // Load certifications from MongoDB
+    loadCertifications();
+    
+    // Fetch study plan history from MongoDB
     fetchHistory();
   }, []);
 
@@ -118,7 +147,35 @@ function Certifications() {
     try {
       setLoading(true);
       setStudyPlanResult("");
-      await askStream({ prompt: `Generate a personalized study plan for the ${studyPlan.certification_name} certification. My current skills: ${studyPlan.current_skills.join(", ")}. I can study ${studyPlan.study_time} hours/week. Target date: ${studyPlan.target_date}.` }, (output) => setStudyPlanResult(output));
+      
+      // Generate the study plan with AI FIRST
+      let generatedPlan = "";
+      await askStream({ 
+        prompt: `Generate a personalized study plan for the ${studyPlan.certification_name} certification. My current skills: ${studyPlan.current_skills.join(", ")}. I can study ${studyPlan.study_time} hours/week. Target date: ${studyPlan.target_date}.` 
+      }, (output) => {
+        generatedPlan = output; // Store the generated plan
+        setStudyPlanResult(output); // Update UI
+      });
+      
+      // NOW save the certification to MongoDB with the COMPLETE study plan
+      const certificationData = {
+        title: studyPlan.certification_name,
+        description: `Study plan for ${studyPlan.certification_name} certification`,
+        level: profile.experience_level,
+        duration: studyPlan.study_time ? `${studyPlan.study_time} hours/week` : 'Flexible',
+        topics: studyPlan.current_skills,
+        status: 'in_progress',
+        study_plan: generatedPlan  // Use the stored generated plan
+      };
+      
+      console.log('Saving certification with study plan:', certificationData);
+      const savedCert = await saveCertification(certificationData);
+      console.log('Certification saved:', savedCert);
+      
+      // Reload certifications to update the list in both Certifications and Babel Library
+      await loadCertifications();
+      await fetchHistory(); // Also refresh the history list
+      
     } catch (error) {
       console.error("Error generating study plan:", error);
     } finally {
@@ -779,7 +836,7 @@ function Certifications() {
           ) : (
             <ul style={{ listStyle: "none", padding: 0 }}>
               {history.map(plan => (
-                <li key={plan._id} style={{ marginBottom: 16, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}>
+                <li key={plan.id} style={{ marginBottom: 16, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <strong>{plan.certification_name}</strong>
@@ -788,7 +845,7 @@ function Certifications() {
                       </span>
                     </div>
                     <button
-                      onClick={() => setExpandedPlan(expandedPlan === plan._id ? null : plan._id)}
+                      onClick={() => setExpandedPlan(expandedPlan === plan.id ? null : plan.id)}
                       style={{
                         background: colors.buttonSecondary,
                         color: colors.text,
@@ -799,10 +856,10 @@ function Certifications() {
                         fontSize: 14
                       }}
                     >
-                      {expandedPlan === plan._id ? "Hide" : "View"}
+                      {expandedPlan === plan.id ? "Hide" : "View"}
                     </button>
                   </div>
-                  {expandedPlan === plan._id && (
+                  {expandedPlan === plan.id && (
                     <div style={{ marginTop: 12, background: colors.primaryLight, borderRadius: 8, padding: 16, color: colors.textSecondary, fontSize: 14, whiteSpace: "pre-wrap" }}>
                       {plan.study_plan}
                     </div>

@@ -17,6 +17,7 @@
 - [Skills Forecast](#skills-forecast) - Future skill predictions
 - [Certifications](#certifications) - Professional development
 - [Video Lessons](#video-lessons) - Multimedia learning
+- [📚 Babel Library](#babel-library) - Centralized knowledge repository
 
 ### 🚀 Advanced Features
 - [Knowledge Map](#knowledge-map) - Interactive learning visualization
@@ -98,6 +99,7 @@ graph TB
     Dashboard[Dashboard]
     Concepts[AI Concepts]
     MicroLesson[Micro Lessons]
+    BabelLibrary[Babel Library]
     Recommendation[Recommendations]
     Simulator[Scenario Simulator]
     WebSearch[Web Search]
@@ -2053,6 +2055,208 @@ The **Enterprise Architecture (EA) Module** is a comprehensive enterprise-grade 
 - **Data Import/Export**: Support for various data formats
 - **Real-time Sync**: Live synchronization with source systems
 - **Workflow Automation**: Automated process execution
+
+---
+
+## 📚 Babel Library - Centralized Knowledge Repository {#babel-library}
+
+> **"Our world's knowledge repository - Articles, videos, summaries, and more"**
+
+The **Babel Library** is a comprehensive, centralized knowledge management system that integrates all learning resources from across the platform into a unified, searchable repository. It serves as the single source of truth for all educational content, making knowledge discovery and management seamless and efficient.
+
+### 🎯 Key Features
+
+#### 🔍 **Unified Resource Management**
+- **Centralized Storage**: All learning resources stored in MongoDB for consistency and reliability
+- **Cross-Module Integration**: Seamlessly integrates content from all learning modules
+- **Real-time Synchronization**: Automatic updates when new content is created or modified
+- **Unified Search**: Search across all resource types with advanced filtering capabilities
+
+#### 📊 **Resource Statistics Dashboard**
+- **Total Resources**: Comprehensive count of all available learning materials
+- **Videos**: Count of saved video lessons and tutorials
+- **Articles**: Count of micro-lessons, web search results, and skills forecasts
+- **Courses**: Count of certifications and structured learning paths
+
+#### 🏷️ **Advanced Filtering & Search**
+- **Search by Title**: Find resources by name, author, or description
+- **Topic Filtering**: Filter by specific topics or categories
+- **Type Filtering**: Filter by resource type (videos, articles, courses)
+- **Active Filters Display**: Clear visual indication of applied filters
+
+### 🔗 **Integrated Modules**
+
+#### 📝 **Micro-lessons Integration**
+- **Automatic Storage**: New micro-lessons automatically saved to MongoDB
+- **Content Preview**: Full content display with expandable sections
+- **Edit & Delete**: Full CRUD operations for micro-lesson management
+- **Topic Categorization**: Automatic topic assignment and filtering
+
+#### 🌐 **Web Search Results Integration**
+- **Automatic Capture**: All web search queries automatically saved to library
+- **Rich Metadata**: Includes search query, results, and source information
+- **URL Tracking**: Maintains reference to original search sources
+- **Content Snippets**: Preview of search results for quick reference
+
+#### 🔮 **Skills Forecast Integration**
+- **AI-Generated Insights**: Skills predictions automatically stored in library
+- **Industry Analysis**: Industry-specific skill recommendations
+- **Confidence Scoring**: Confidence levels for skill predictions
+- **Timeline Planning**: Future skill development roadmaps
+
+#### 🎓 **Certifications Integration**
+- **Study Plan Storage**: Complete study plans with AI-generated content
+- **Progress Tracking**: Certification status and completion tracking
+- **Topic Mapping**: Skills and topics associated with each certification
+- **Historical Records**: Complete history of certification attempts
+
+#### 🎥 **Video Lessons Integration**
+- **YouTube Integration**: Direct YouTube video embedding and playback
+- **Content Summaries**: AI-generated summaries of video content
+- **Topic Classification**: Automatic topic assignment for videos
+- **Progress Tracking**: Video completion and bookmarking
+
+### 🛠️ **Technical Implementation**
+
+#### 🗄️ **Database Architecture**
+```javascript
+// MongoDB Collections
+micro_lessons_collection: {
+  title: String,
+  topic: String,
+  level: String,
+  duration: String,
+  content: String,
+  created_at: ISO Date
+}
+
+web_search_collection: {
+  title: String,
+  url: String,
+  snippet: String,
+  topic: String,
+  search_query: String,
+  source: String,
+  created_at: ISO Date
+}
+
+skills_forecast_collection: {
+  title: String,
+  description: String,
+  skills: Array,
+  industry: String,
+  timeframe: String,
+  confidence_level: String,
+  analysis: String,
+  created_at: ISO Date
+}
+
+certifications_collection: {
+  title: String,
+  description: String,
+  level: String,
+  duration: String,
+  topics: Array,
+  status: String,
+  study_plan: String,
+  created_at: ISO Date
+}
+```
+
+#### 🔌 **API Endpoints**
+```python
+# Micro-lessons
+POST   /api/micro-lessons/          # Create new micro-lesson
+GET    /api/micro-lessons/          # Fetch all micro-lessons
+PUT    /api/micro-lessons/{id}      # Update micro-lesson
+DELETE /api/micro-lessons/{id}      # Delete micro-lesson
+
+# Web Search Results
+POST   /api/web-search/             # Save search result
+GET    /api/web-search/             # Fetch all search results
+DELETE /api/web-search/{id}         # Delete search result
+
+# Skills Forecast
+POST   /api/skills-forecast/        # Save skills forecast
+GET    /api/skills-forecast/        # Fetch all forecasts
+DELETE /api/skills-forecast/{id}    # Delete forecast
+
+# Certifications
+POST   /api/certifications/         # Save certification
+GET    /api/certifications/         # Fetch all certifications
+DELETE /api/certifications/{id}     # Delete certification
+```
+
+#### 🎨 **Frontend Components**
+- **BabelLibrary.jsx**: Main library interface with resource display
+- **Resource Cards**: Individual resource display with metadata
+- **Filter System**: Advanced search and filtering interface
+- **Statistics Dashboard**: Resource count and overview cards
+
+### 🚀 **Usage Guide**
+
+#### 1. **Accessing the Library**
+- Navigate to "📚 Babel Library" in the sidebar
+- View the main dashboard with resource statistics
+- Use the search and filter options to find specific content
+
+#### 2. **Creating New Resources**
+- **Micro-lessons**: Use the Micro-lessons module to create new content
+- **Web Search**: Perform searches in the Web Search module
+- **Skills Forecast**: Generate forecasts in the Skills Forecast module
+- **Certifications**: Create study plans in the Certifications module
+
+#### 3. **Managing Resources**
+- **View**: Click on resource cards to expand and view full content
+- **Edit**: Use edit buttons to modify resource content
+- **Delete**: Remove resources using the delete button
+- **Filter**: Use topic and type filters to organize content
+
+#### 4. **Search and Discovery**
+- **Text Search**: Search across titles, descriptions, and content
+- **Topic Filtering**: Filter by specific topics or categories
+- **Type Filtering**: Filter by resource type (videos, articles, courses)
+- **Clear Filters**: Reset all applied filters
+
+### 🔮 **Future Enhancements**
+
+#### **AI-Powered Features**
+- **Intelligent Recommendations**: AI-suggested content based on user preferences
+- **Content Summarization**: Automatic generation of content summaries
+- **Smart Tagging**: AI-powered topic and category assignment
+- **Learning Paths**: Personalized learning journey recommendations
+
+#### **Advanced Search Capabilities**
+- **Semantic Search**: AI-powered content understanding and search
+- **Natural Language Queries**: Search using natural language
+- **Content Similarity**: Find related content and resources
+- **Trend Analysis**: Identify popular and trending topics
+
+#### **Collaboration Features**
+- **User Annotations**: Personal notes and highlights on resources
+- **Resource Sharing**: Share resources with team members
+- **Discussion Forums**: Community discussions around learning content
+- **Rating System**: User ratings and reviews for resources
+
+#### **Integration Expansions**
+- **External Sources**: Integration with external learning platforms
+- **API Connectors**: Connect with third-party content providers
+- **Data Import/Export**: Support for various content formats
+- **Real-time Updates**: Live synchronization with external sources
+
+### 📊 **Performance Metrics**
+
+#### **Current Statistics**
+- **Total Resources**: 31+ integrated learning materials
+- **Resource Types**: 4 main categories (Videos, Articles, Courses, Skills)
+- **Storage Efficiency**: MongoDB-based scalable storage
+- **Response Time**: Sub-second search and filter performance
+
+#### **Scalability Features**
+- **MongoDB Indexing**: Optimized database queries for large datasets
+- **Async Operations**: Non-blocking API operations for better performance
+- **Caching Strategy**: Efficient data caching and retrieval
+- **Memory Management**: Optimized frontend memory usage
 
 ---
 

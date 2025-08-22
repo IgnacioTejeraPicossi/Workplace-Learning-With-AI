@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { webSearch } from "./api";
+import { webSearch, saveWebSearchResult } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function WebSearch() {
@@ -15,6 +15,24 @@ function WebSearch() {
       // Extract the actual result content from the response
       const resultContent = data.result || data.results || JSON.stringify(data, null, 2);
       setResults(resultContent);
+      
+      // Save the search result to MongoDB
+      if (query && resultContent) {
+        try {
+          const searchResultData = {
+            title: `Search: ${query}`,
+            url: `https://search.example.com?q=${encodeURIComponent(query)}`,
+            snippet: resultContent.substring(0, 200) + '...',
+            topic: 'Web Search',
+            search_query: query,
+            source: 'web_search'
+          };
+          await saveWebSearchResult(searchResultData);
+          console.log('Web search result saved to MongoDB');
+        } catch (saveError) {
+          console.error('Error saving web search result:', saveError);
+        }
+      }
     } catch (error) {
       console.error("Failed to search:", error);
       setResults("Error performing web search.");

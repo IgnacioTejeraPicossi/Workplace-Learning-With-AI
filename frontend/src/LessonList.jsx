@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchLessons, deleteLesson, updateLesson } from "./api";
+import { fetchMicroLessons, deleteMicroLesson, updateMicroLesson } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function LessonList({ user }) {
@@ -15,8 +15,8 @@ function LessonList({ user }) {
   const loadLessons = async () => {
     setLoading(true);
     try {
-      const data = await fetchLessons();
-      setLessons(data.lessons || []);
+      const data = await fetchMicroLessons();
+      setLessons(data || []);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -41,7 +41,7 @@ function LessonList({ user }) {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this lesson?")) return;
     try {
-      await deleteLesson(id);
+      await deleteMicroLesson(id);
       await loadLessons();
     } catch (err) {
       alert(err.message);
@@ -63,7 +63,14 @@ function LessonList({ user }) {
   const handleEditSave = async (id) => {
     const { topic, lesson } = editContent[id];
     try {
-      await updateLesson(id, { topic, lesson });
+      const updateData = {
+        title: topic,
+        topic: topic,
+        level: 'beginner',
+        duration: '5-10 minutes',
+        content: lesson
+      };
+      await updateMicroLesson(id, updateData);
       setEditing({ ...editing, [id]: false });
       await loadLessons();
     } catch (err) {
@@ -117,148 +124,148 @@ function LessonList({ user }) {
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
           {filteredLessons.map(lesson => (
-            <li
-              key={lesson._id}
-              style={{
-                marginBottom: "1.5rem",
-                background: colors.primaryLight,
-                borderRadius: "8px",
-                padding: "1rem",
-                boxShadow: colors.shadow,
-                color: colors.text
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <strong>Topic:</strong>
-                {editing[lesson._id] ? (
-                  <input
-                    value={editContent[lesson._id]?.topic || ""}
-                    onChange={e =>
-                      handleEditChange(lesson._id, "topic", e.target.value)
-                    }
-                    style={{ flex: 1, background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, borderRadius: 6, padding: 6 }}
-                  />
-                ) : (
-                  <span>{lesson.topic}</span>
-                )}
-                <button
-                  onClick={() => handleExpandToggle(lesson._id)}
-                  style={{
-                    background: colors.cardBackground,
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: 6,
-                    padding: "4px 12px",
-                    fontWeight: 600,
-                    fontSize: 14,
-                    cursor: "pointer"
-                  }}
-                >
-                  {expanded[lesson._id] ? "Compress" : "Expand"}
-                </button>
-                <button
-                  onClick={() => handleDelete(lesson._id)}
-                  style={{
-                    background: "#d32f2f",
-                    color: "#fff",
-                    border: 0,
-                    borderRadius: 6,
-                    padding: "4px 12px",
-                    fontWeight: 600,
-                    fontSize: 14,
-                    cursor: "pointer"
-                  }}
-                >
-                  Delete
-                </button>
-                {editing[lesson._id] ? (
-                  <>
-                    <button
-                      onClick={() => handleEditSave(lesson._id)}
-                      style={{
-                        background: colors.buttonPrimary,
-                        color: "#fff",
-                        border: 0,
-                        borderRadius: 6,
-                        padding: "4px 12px",
-                        fontWeight: 600,
-                        fontSize: 14,
-                        cursor: "pointer"
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditing({ ...editing, [lesson._id]: false })}
-                      style={{
-                        background: colors.cardBackground,
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: 6,
-                        padding: "4px 12px",
-                        fontWeight: 600,
-                        fontSize: 14,
-                        cursor: "pointer"
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => handleEdit(lesson._id, lesson.topic, lesson.lesson)}
-                    style={{
-                      background: colors.buttonPrimary,
-                      color: "#fff",
-                      border: 0,
-                      borderRadius: 6,
-                      padding: "4px 12px",
-                      fontWeight: 600,
-                      fontSize: 14,
-                      cursor: "pointer"
-                    }}
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-              {expanded[lesson._id] && (
-                <div>
-                  {editing[lesson._id] ? (
-                    <textarea
-                      value={editContent[lesson._id]?.lesson || ""}
-                      onChange={e =>
-                        handleEditChange(lesson._id, "lesson", e.target.value)
-                      }
-                      rows={8}
-                      style={{
-                        width: "100%",
-                        marginTop: 8,
-                        fontFamily: "monospace",
-                        background: colors.cardBackground,
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: 6,
-                        padding: 8
-                      }}
-                    />
-                  ) : (
-                    <pre
-                      style={{
-                        whiteSpace: "pre-wrap",
-                        background: colors.cardBackground,
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                        marginTop: "0.5rem",
-                        color: colors.text
-                      }}
-                    >
-                      {lesson.lesson}
-                    </pre>
-                  )}
-                </div>
-              )}
-            </li>
+                         <li
+               key={lesson.id}
+               style={{
+                 marginBottom: "1.5rem",
+                 background: colors.primaryLight,
+                 borderRadius: "8px",
+                 padding: "1rem",
+                 boxShadow: colors.shadow,
+                 color: colors.text
+               }}
+             >
+               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                 <strong>Topic:</strong>
+                 {editing[lesson.id] ? (
+                   <input
+                     value={editContent[lesson.id]?.topic || ""}
+                     onChange={e =>
+                       handleEditChange(lesson.id, "topic", e.target.value)
+                     }
+                     style={{ flex: 1, background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, borderRadius: 6, padding: 6 }}
+                   />
+                 ) : (
+                   <span>{lesson.topic}</span>
+                 )}
+                 <button
+                   onClick={() => handleExpandToggle(lesson.id)}
+                   style={{
+                     background: colors.cardBackground,
+                     color: colors.text,
+                     border: `1px solid ${colors.border}`,
+                     borderRadius: 6,
+                     padding: "4px 12px",
+                     fontWeight: 600,
+                     fontSize: 14,
+                     cursor: "pointer"
+                   }}
+                 >
+                   {expanded[lesson.id] ? "Compress" : "Expand"}
+                 </button>
+                 <button
+                   onClick={() => handleDelete(lesson.id)}
+                   style={{
+                     background: "#d32f2f",
+                     color: "#fff",
+                     border: 0,
+                     borderRadius: 6,
+                     padding: "4px 12px",
+                     fontWeight: 600,
+                     fontSize: 14,
+                     cursor: "pointer"
+                   }}
+                 >
+                   Delete
+                 </button>
+                 {editing[lesson.id] ? (
+                   <>
+                     <button
+                       onClick={() => handleEditSave(lesson.id)}
+                       style={{
+                         background: colors.buttonPrimary,
+                         color: "#fff",
+                         border: 0,
+                         borderRadius: 6,
+                         padding: "4px 12px",
+                         fontWeight: 600,
+                         fontSize: 14,
+                         cursor: "pointer"
+                       }}
+                     >
+                       Save
+                     </button>
+                     <button
+                       onClick={() => setEditing({ ...editing, [lesson.id]: false })}
+                       style={{
+                         background: colors.cardBackground,
+                         color: colors.text,
+                         border: `1px solid ${colors.border}`,
+                         borderRadius: 6,
+                         padding: "4px 12px",
+                         fontWeight: 600,
+                         fontSize: 14,
+                         cursor: "pointer"
+                       }}
+                     >
+                       Cancel
+                     </button>
+                   </>
+                 ) : (
+                   <button
+                     onClick={() => handleEdit(lesson.id, lesson.topic, lesson.content)}
+                     style={{
+                       background: colors.buttonPrimary,
+                       color: "#fff",
+                       border: 0,
+                       borderRadius: 6,
+                       padding: "4px 12px",
+                       fontWeight: 600,
+                       fontSize: 14,
+                       cursor: "pointer"
+                       }}
+                     >
+                     Edit
+                   </button>
+                 )}
+               </div>
+               {expanded[lesson.id] && (
+                 <div>
+                   {editing[lesson.id] ? (
+                     <textarea
+                       value={editContent[lesson.id]?.lesson || ""}
+                       onChange={e =>
+                         handleEditChange(lesson.id, "lesson", e.target.value)
+                       }
+                       rows={8}
+                       style={{
+                         width: "100%",
+                         marginTop: 8,
+                         fontFamily: "monospace",
+                         background: colors.cardBackground,
+                         color: colors.text,
+                         border: `1px solid ${colors.border}`,
+                         borderRadius: 6,
+                         padding: 8
+                       }}
+                     />
+                   ) : (
+                     <pre
+                       style={{
+                         whiteSpace: "pre-wrap",
+                         background: colors.cardBackground,
+                         padding: "0.5rem",
+                         borderRadius: "4px",
+                         marginTop: "0.5rem",
+                         color: colors.text
+                       }}
+                     >
+                       {lesson.content}
+                     </pre>
+                   )}
+                 </div>
+               )}
+             </li>
           ))}
         </ul>
       )}

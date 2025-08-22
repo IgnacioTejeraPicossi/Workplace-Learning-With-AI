@@ -26,7 +26,14 @@ function MicroLesson({ query, user }) {
       );
       // Save the lesson after streaming is complete
       if (topic && finalOutput) {
-        await saveMicroLesson(topic, finalOutput);
+        const microLessonData = {
+          title: topic,
+          topic: topic,
+          level: 'beginner',
+          duration: '5-10 minutes',
+          content: finalOutput
+        };
+        await saveMicroLesson(microLessonData);
       }
     } catch (err) {
       setAiOutput("Error fetching micro-lesson.");

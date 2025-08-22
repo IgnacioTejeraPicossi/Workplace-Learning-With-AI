@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
-import { fetchSavedVideos } from './api';
+import { 
+  fetchSavedVideos, 
+  fetchCertifications, 
+  fetchMicroLessons,
+  fetchWebSearchResults,
+  fetchSkillsForecasts
+} from './api';
 
 const BabelLibrary = () => {
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('catalog');
   const [books, setBooks] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [certifications, setCertifications] = useState([]);
+  const [microLessons, setMicroLessons] = useState([]);
+  const [webSearchResults, setWebSearchResults] = useState([]);
+  const [skillsForecasts, setSkillsForecasts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newBook, setNewBook] = useState({
     title: '',
     author: '',
@@ -31,6 +41,58 @@ const BabelLibrary = () => {
       console.error('Error loading videos:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load certifications from MongoDB
+  const loadCertifications = async () => {
+    try {
+      const data = await fetchCertifications();
+      console.log('Certifications loaded:', data);
+      if (data) {
+        setCertifications(data);
+      }
+    } catch (error) {
+      console.error('Error loading certifications:', error);
+    }
+  };
+
+  // Load micro-lessons from MongoDB
+  const loadMicroLessons = async () => {
+    try {
+      const data = await fetchMicroLessons();
+      console.log('Micro-lessons loaded:', data);
+      if (data) {
+        setMicroLessons(data);
+      }
+    } catch (error) {
+      console.error('Error loading micro-lessons:', error);
+    }
+  };
+
+  // Load web search results from MongoDB
+  const loadWebSearchResults = async () => {
+    try {
+      const data = await fetchWebSearchResults();
+      console.log('Web search results loaded:', data);
+      if (data) {
+        setWebSearchResults(data);
+      }
+    } catch (error) {
+      console.error('Error loading web search results:', error);
+    }
+  };
+
+  // Load skills forecasts from MongoDB
+  const loadSkillsForecasts = async () => {
+    try {
+      const data = await fetchSkillsForecasts();
+      console.log('Skills forecasts loaded:', data);
+      if (data) {
+        setSkillsForecasts(data);
+      }
+    } catch (error) {
+      console.error('Error loading skills forecasts:', error);
     }
   };
 
@@ -87,6 +149,12 @@ const BabelLibrary = () => {
     
     // Load videos from MongoDB
     loadVideos();
+    // Load certifications and micro-lessons from MongoDB
+    loadCertifications();
+    loadMicroLessons();
+    // Load web search results and skills forecasts from MongoDB
+    loadWebSearchResults();
+    loadSkillsForecasts();
   }, []);
 
   const handleAddBook = (e) => {
@@ -113,16 +181,64 @@ const BabelLibrary = () => {
   };
 
   // Combine books and videos for unified search
-  const allResources = [...books, ...videos.map(video => ({
-    id: video._id,
-    title: video.title,
-    author: 'YouTube Video',
-    topic: video.topic,
-    description: video.description,
-    type: 'video',
-    addedDate: video.saved_at ? video.saved_at.split('T')[0] : 'Unknown',
-    url: video.url
-  }))];
+  const allResources = [
+    ...books, 
+    ...videos.map(video => ({
+      id: video._id,
+      title: video.title,
+      author: 'YouTube Video',
+      topic: video.topic,
+      description: video.description,
+      type: 'video',
+      addedDate: video.saved_at ? video.saved_at.split('T')[0] : 'Unknown',
+      url: video.url
+    })),
+    ...certifications.map(cert => ({
+      id: cert.id,
+      title: cert.title,
+      author: 'Certification',
+      topic: cert.topics.join(', '),
+      description: cert.description,
+      type: 'course',
+      addedDate: cert.created_at ? cert.created_at.split('T')[0] : 'Unknown',
+      level: cert.level,
+      duration: cert.duration
+    })),
+    ...microLessons.map(lesson => ({
+      id: lesson.id,
+      title: lesson.title,
+      author: 'Micro-lesson',
+      topic: lesson.topic,
+      description: lesson.content.substring(0, 100) + '...',
+      type: 'article',
+      addedDate: lesson.created_at ? lesson.created_at.split('T')[0] : 'Unknown',
+      level: lesson.level,
+      duration: lesson.duration
+    })),
+    ...webSearchResults.map(result => ({
+      id: result.id,
+      title: result.title,
+      author: 'Web Search',
+      topic: result.topic,
+      description: result.snippet,
+      type: 'article',
+      addedDate: result.created_at ? result.created_at.split('T')[0] : 'Unknown',
+      url: result.url,
+      searchQuery: result.search_query
+    })),
+    ...skillsForecasts.map(forecast => ({
+      id: forecast.id,
+      title: forecast.title,
+      author: 'Skills Forecast',
+      topic: forecast.industry,
+      description: forecast.description,
+      type: 'article',
+      addedDate: forecast.created_at ? forecast.created_at.split('T')[0] : 'Unknown',
+      skills: forecast.skills,
+      timeframe: forecast.timeframe,
+      confidenceLevel: forecast.confidence_level
+    }))
+  ];
 
   const filteredResources = allResources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -133,7 +249,14 @@ const BabelLibrary = () => {
     return matchesSearch && matchesTopic && matchesType;
   });
 
-  const topics = ['all', ...Array.from(new Set([...books.map(book => book.topic), ...videos.map(video => video.topic)]))];
+  const topics = ['all', ...Array.from(new Set([
+    ...books.map(book => book.topic), 
+    ...videos.map(video => video.topic),
+    ...certifications.flatMap(cert => cert.topics),
+    ...microLessons.map(lesson => lesson.topic),
+    ...webSearchResults.map(result => result.topic),
+    ...skillsForecasts.map(forecast => forecast.industry)
+  ]))];
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -338,70 +461,62 @@ const BabelLibrary = () => {
                 }}
               >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📚</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
-                  {allResources.length}
-                </div>
-                <div>Total Resources</div>
+                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Total Resources</div>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{allResources.length}</div>
               </button>
               
               <button
                 onClick={() => setSelectedType('video')}
                 style={{
-                  background: selectedType === 'video' ? '#28a745' : '#e8f5e8',
-                  color: selectedType === 'video' ? 'white' : '#28a745',
+                  background: selectedType === 'video' ? colors.primary : colors.primaryLight,
+                  color: selectedType === 'video' ? 'white' : colors.primary,
                   padding: '20px',
                   borderRadius: 12,
                   textAlign: 'center',
-                  border: '1px solid #28a745',
+                  border: `1px solid ${colors.primary}`,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease'
                 }}
               >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎥</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
-                  {videos.length}
-                </div>
-                <div>Videos</div>
+                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Videos</div>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{videos.length}</div>
               </button>
               
               <button
                 onClick={() => setSelectedType('article')}
                 style={{
-                  background: selectedType === 'article' ? '#ffc107' : '#fff3cd',
-                  color: selectedType === 'article' ? 'white' : '#ffc107',
+                  background: selectedType === 'article' ? colors.primary : colors.primaryLight,
+                  color: selectedType === 'article' ? 'white' : colors.primary,
                   padding: '20px',
                   borderRadius: 12,
                   textAlign: 'center',
-                  border: '1px solid #ffc107',
+                  border: `1px solid ${colors.primary}`,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease'
                 }}
               >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📄</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
-                  {books.filter(b => b.type === 'article').length}
-                </div>
-                <div>Articles</div>
+                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Articles</div>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{microLessons.length + webSearchResults.length + skillsForecasts.length}</div>
               </button>
               
               <button
                 onClick={() => setSelectedType('course')}
                 style={{
-                  background: selectedType === 'course' ? '#6f42c1' : '#f3e5f5',
-                  color: selectedType === 'course' ? 'white' : '#6f42c1',
+                  background: selectedType === 'course' ? colors.primary : colors.primaryLight,
+                  color: selectedType === 'course' ? 'white' : colors.primary,
                   padding: '20px',
                   borderRadius: 12,
-              textAlign: 'center',
-                  border: '1px solid #6f42c1',
+                  textAlign: 'center',
+                  border: `1px solid ${colors.primary}`,
                   cursor: 'pointer',
                   transition: 'all 0.3s ease'
                 }}
               >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎓</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
-                  {books.filter(b => b.type === 'course').length}
-                </div>
-                <div>Courses</div>
+                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Courses</div>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{certifications.length}</div>
               </button>
             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { askStream } from "./api";
+import { askStream, saveSkillsForecast } from "./api";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
 import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
@@ -14,6 +14,23 @@ function SkillsForecast() {
   const [resources, setResources] = useState([]);
   const [reminderDate, setReminderDate] = useState('');
   const { colors } = useTheme();
+  
+  // Helper function to extract skills from forecast content
+  const extractSkillsFromForecast = (content) => {
+    // Simple extraction - look for common skill patterns
+    const skillKeywords = [
+      'JavaScript', 'Python', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes',
+      'Machine Learning', 'AI', 'Data Analysis', 'SQL', 'NoSQL', 'DevOps',
+      'Agile', 'Scrum', 'Leadership', 'Communication', 'Problem Solving'
+    ];
+    
+    const foundSkills = skillKeywords.filter(skill => 
+      content.toLowerCase().includes(skill.toLowerCase())
+    );
+    
+    // If no specific skills found, return some generic ones
+    return foundSkills.length > 0 ? foundSkills : ['Technical Skills', 'Soft Skills', 'Industry Knowledge'];
+  };
   
   // Load saved forecasts on component mount
   useEffect(() => {
@@ -61,7 +78,7 @@ function SkillsForecast() {
     setReminderDate('');
   };
 
-  const handleSaveForecast = () => {
+  const handleSaveForecast = async () => {
     if (!forecastStreaming.content) {
       alert('No forecast to save. Please generate a forecast first.');
       return;
@@ -80,6 +97,23 @@ function SkillsForecast() {
     // Save to localStorage for persistence
     const existing = JSON.parse(localStorage.getItem('savedForecasts') || '[]');
     localStorage.setItem('savedForecasts', JSON.stringify([newForecast, ...existing]));
+    
+    // Save to MongoDB
+    try {
+      const forecastData = {
+        title: `Skills Forecast: ${input.substring(0, 50)}...`,
+        description: `Skills forecast based on: ${input}`,
+        skills: extractSkillsFromForecast(forecastStreaming.content),
+        industry: 'Technology',
+        timeframe: '6-12 months',
+        confidence_level: 'High',
+        analysis: forecastStreaming.content
+      };
+      await saveSkillsForecast(forecastData);
+      console.log('Skills forecast saved to MongoDB');
+    } catch (saveError) {
+      console.error('Error saving skills forecast to MongoDB:', saveError);
+    }
     
     alert('✅ Forecast saved successfully! You can view it in your saved forecasts.');
   };

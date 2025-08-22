@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "./firebase";
-import { fetchLessons, fetchSavedVideos } from "./api";
+import { fetchMicroLessons, fetchSavedVideos } from "./api";
 import ProgressCard from "./ProgressCard";
 import LearningTrendsChart from "./LearningTrendsChart";
 import TopicBreakdownChart from "./TopicBreakdownChart";
@@ -83,8 +83,8 @@ function Dashboard({ user, onSectionSelect }) {
     // Fetch actual lessons count from backend
     const fetchUserData = async () => {
       try {
-        const lessonsData = await fetchLessons();
-        const lessons = lessonsData.lessons || lessonsData || [];
+        const lessonsData = await fetchMicroLessons();
+        const lessons = lessonsData || [];
         const actualLessonsCount = lessons.length;
         
         // Fetch saved videos count
