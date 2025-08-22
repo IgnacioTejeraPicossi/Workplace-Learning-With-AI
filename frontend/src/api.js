@@ -443,3 +443,58 @@ export const deleteSkillsForecast = async (forecastId) => {
     throw error;
   }
 };
+
+// AI Career Coach API functions
+export const fetchCareerCoachSessions = async () => {
+  try {
+    const response = await fetch('/api/career-coach/');
+    if (!response.ok) throw new Error('Failed to fetch career coach sessions');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching career coach sessions:', error);
+    return [];
+  }
+};
+
+export const saveCareerCoachSession = async (sessionData) => {
+  try {
+    const response = await fetch('/api/career-coach/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sessionData)
+    });
+    if (!response.ok) throw new Error('Failed to save career coach session');
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving career coach session:', error);
+    throw error;
+  }
+};
+
+export const deleteCareerCoachSession = async (sessionId) => {
+  try {
+    const response = await fetch(`/api/career-coach/${sessionId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete career coach session');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting career coach session:', error);
+    throw error;
+  }
+};
+
+export const updateCareerCoachSession = async (sessionId, data) => {
+  try {
+    const response = await fetch(`/api/career-coach/${sessionId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update career coach session');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating career coach session:', error);
+    throw error;
+  }
+};

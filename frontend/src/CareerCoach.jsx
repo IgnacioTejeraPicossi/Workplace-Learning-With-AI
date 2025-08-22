@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { askStream } from './api';
+import { askStream, saveCareerCoachSession, fetchCareerCoachSessions, deleteCareerCoachSession } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
 import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
@@ -18,9 +18,18 @@ export default function CareerCoach() {
 
   // Load saved sessions on component mount
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('savedCoachingSessions') || '[]');
-    setSavedSessions(saved);
+    loadCareerCoachSessions();
   }, []);
+
+  const loadCareerCoachSessions = async () => {
+    try {
+      const sessions = await fetchCareerCoachSessions();
+      setSavedSessions(sessions);
+    } catch (error) {
+      console.error('Error loading career coach sessions:', error);
+      setSavedSessions([]);
+    }
+  };
 
   const growthAreas = [
     { key: 'leadership', label: 'Leadership', icon: '👑', description: 'Team management, decision-making, strategic thinking' },
@@ -79,7 +88,7 @@ export default function CareerCoach() {
     );
   };
 
-  const handleSaveSession = () => {
+  const handleSaveSession = async () => {
     if (!coachingStreaming.content) {
       alert('No session to save. Please complete a coaching session first.');
       return;
@@ -87,28 +96,52 @@ export default function CareerCoach() {
 
     const sessionTitle = growthArea === 'custom' ? customTopic : growthAreas.find(a => a.key === growthArea)?.label;
     
-    const newSession = {
-      id: Date.now(),
+    const sessionData = {
       title: sessionTitle,
       topic: growthArea === 'custom' ? customTopic : growthAreas.find(a => a.key === growthArea)?.label,
       content: coachingStreaming.content,
-      timestamp: new Date().toISOString(),
-      status: 'active'
+      status: 'active',
+      growth_area: growthArea === 'custom' ? null : growthArea,
+      custom_topic: growthArea === 'custom' ? customTopic : null
     };
 
-    setSavedSessions(prev => [newSession, ...prev]);
-    
-    // Save to localStorage for persistence
-    const existing = JSON.parse(localStorage.getItem('savedCoachingSessions') || '[]');
-    localStorage.setItem('savedCoachingSessions', JSON.stringify([newSession, ...existing]));
-    
-    alert('✅ Coaching session saved successfully! You can view it in your saved sessions.');
+    try {
+      const savedSession = await saveCareerCoachSession(sessionData);
+      
+      // Add the new session to the local state instead of reloading everything
+      const newSession = {
+        id: savedSession.id,
+        title: savedSession.title,
+        topic: savedSession.topic,
+        content: savedSession.content,
+        status: savedSession.status,
+        growth_area: savedSession.growth_area,
+        custom_topic: savedSession.custom_topic,
+        created_at: savedSession.created_at
+      };
+      
+      setSavedSessions(prev => [newSession, ...prev]);
+      
+      // Clear the current session to allow starting a new one
+      handleClear();
+      
+      alert('✅ Coaching session saved successfully!');
+    } catch (error) {
+      console.error('Error saving career coach session:', error);
+      alert('❌ Error saving coaching session. Please try again.');
+    }
   };
 
-  const handleDeleteSession = (id) => {
-    const updated = savedSessions.filter(s => s.id !== id);
-    setSavedSessions(updated);
-    localStorage.setItem('savedCoachingSessions', JSON.stringify(updated));
+  const handleDeleteSession = async (id) => {
+    try {
+      await deleteCareerCoachSession(id);
+      
+      // Remove the session from local state instead of reloading everything
+      setSavedSessions(prev => prev.filter(session => session.id !== id));
+    } catch (error) {
+      console.error('Error deleting career coach session:', error);
+      alert('❌ Error deleting session. Please try again.');
+    }
   };
 
   const handleClear = () => {
@@ -184,7 +217,7 @@ export default function CareerCoach() {
                         color: colors.textSecondary,
                         marginTop: 4
                       }}>
-                        {new Date(session.timestamp).toLocaleDateString()} at {new Date(session.timestamp).toLocaleTimeString()}
+                        {new Date(session.created_at).toLocaleDateString()} at {new Date(session.created_at).toLocaleTimeString()}
                       </div>
                     </div>
                     <button

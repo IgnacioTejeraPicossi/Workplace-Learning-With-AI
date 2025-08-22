@@ -5,7 +5,8 @@ import {
   fetchCertifications, 
   fetchMicroLessons,
   fetchWebSearchResults,
-  fetchSkillsForecasts
+  fetchSkillsForecasts,
+  fetchCareerCoachSessions
 } from './api';
 
 const BabelLibrary = () => {
@@ -17,6 +18,7 @@ const BabelLibrary = () => {
   const [microLessons, setMicroLessons] = useState([]);
   const [webSearchResults, setWebSearchResults] = useState([]);
   const [skillsForecasts, setSkillsForecasts] = useState([]);
+  const [careerCoachSessions, setCareerCoachSessions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newBook, setNewBook] = useState({
     title: '',
@@ -96,6 +98,19 @@ const BabelLibrary = () => {
     }
   };
 
+  // Load career coach sessions from MongoDB
+  const loadCareerCoachSessions = async () => {
+    try {
+      const data = await fetchCareerCoachSessions();
+      console.log('Career coach sessions loaded:', data);
+      if (data) {
+        setCareerCoachSessions(data);
+      }
+    } catch (error) {
+      console.error('Error loading career coach sessions:', error);
+    }
+  };
+
   // Demo data for the prototype
   useEffect(() => {
     const demoBooks = [
@@ -155,6 +170,8 @@ const BabelLibrary = () => {
     // Load web search results and skills forecasts from MongoDB
     loadWebSearchResults();
     loadSkillsForecasts();
+    // Load career coach sessions from MongoDB
+    loadCareerCoachSessions();
   }, []);
 
   const handleAddBook = (e) => {
@@ -237,7 +254,18 @@ const BabelLibrary = () => {
       skills: forecast.skills,
       timeframe: forecast.timeframe,
       confidenceLevel: forecast.confidence_level
-    }))
+    })),
+         ...careerCoachSessions.map(session => ({
+       id: session.id,
+       title: session.title,
+       author: 'AI Career Coach',
+       topic: session.topic,
+       description: session.content.substring(0, 100) + '...',
+       type: 'simulation',
+       addedDate: session.created_at ? session.created_at.split('T')[0] : 'Unknown',
+       growthArea: session.growth_area,
+       customTopic: session.custom_topic
+     }))
   ];
 
   const filteredResources = allResources.filter(resource => {
@@ -264,6 +292,7 @@ const BabelLibrary = () => {
       case 'video': return '🎥';
       case 'article': return '📄';
       case 'course': return '🎓';
+      case 'simulation': return '🎮';
       default: return '📖';
     }
   };
@@ -274,6 +303,7 @@ const BabelLibrary = () => {
       case 'video': return '#28a745';
       case 'article': return '#ffc107';
       case 'course': return '#6f42c1';
+      case 'simulation': return '#fd7e14';
       default: return '#6c757d';
     }
   };
@@ -440,85 +470,103 @@ const BabelLibrary = () => {
               </div>
             )}
 
-            {/* Library Stats - Interactive Filter Buttons */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-              gap: 16, 
-              marginBottom: 24 
-            }}>
-              <button
-                onClick={() => setSelectedType('all')}
-                style={{
-                  background: selectedType === 'all' ? colors.primary : colors.primaryLight,
-                  color: selectedType === 'all' ? 'white' : colors.primary,
-                  padding: '20px',
-                  borderRadius: 12,
-                  textAlign: 'center',
-                  border: `1px solid ${colors.primary}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <div style={{ fontSize: '2em', marginBottom: 8 }}>📚</div>
-                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Total Resources</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{allResources.length}</div>
-              </button>
-              
-              <button
-                onClick={() => setSelectedType('video')}
-                style={{
-                  background: selectedType === 'video' ? colors.primary : colors.primaryLight,
-                  color: selectedType === 'video' ? 'white' : colors.primary,
-                  padding: '20px',
-                  borderRadius: 12,
-                  textAlign: 'center',
-                  border: `1px solid ${colors.primary}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <div style={{ fontSize: '2em', marginBottom: 8 }}>🎥</div>
-                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Videos</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{videos.length}</div>
-              </button>
-              
-              <button
-                onClick={() => setSelectedType('article')}
-                style={{
-                  background: selectedType === 'article' ? colors.primary : colors.primaryLight,
-                  color: selectedType === 'article' ? 'white' : colors.primary,
-                  padding: '20px',
-                  borderRadius: 12,
-                  textAlign: 'center',
-                  border: `1px solid ${colors.primary}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <div style={{ fontSize: '2em', marginBottom: 8 }}>📄</div>
-                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Articles</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{microLessons.length + webSearchResults.length + skillsForecasts.length}</div>
-              </button>
-              
-              <button
-                onClick={() => setSelectedType('course')}
-                style={{
-                  background: selectedType === 'course' ? colors.primary : colors.primaryLight,
-                  color: selectedType === 'course' ? 'white' : colors.primary,
-                  padding: '20px',
-                  borderRadius: 12,
-                  textAlign: 'center',
-                  border: `1px solid ${colors.primary}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <div style={{ fontSize: '2em', marginBottom: 8 }}>🎓</div>
-                <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Courses</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{certifications.length}</div>
-              </button>
-            </div>
+                         {/* Library Stats - Interactive Filter Buttons */}
+             <div style={{ 
+               display: 'grid', 
+               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+               gap: 16, 
+               marginBottom: 24 
+             }}>
+               <button
+                 onClick={() => setSelectedType('all')}
+                 style={{
+                   background: selectedType === 'all' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'all' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📚</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Total Resources</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{allResources.length}</div>
+               </button>
+               
+               <button
+                 onClick={() => setSelectedType('video')}
+                 style={{
+                   background: selectedType === 'video' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'video' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎥</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Videos</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{videos.length}</div>
+               </button>
+               
+               <button
+                 onClick={() => setSelectedType('article')}
+                 style={{
+                   background: selectedType === 'article' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'article' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📄</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Articles</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{microLessons.length + webSearchResults.length + skillsForecasts.length}</div>
+               </button>
+               
+               <button
+                 onClick={() => setSelectedType('course')}
+                 style={{
+                   background: selectedType === 'course' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'course' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎓</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Courses</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{certifications.length}</div>
+               </button>
+               
+               <button
+                 onClick={() => setSelectedType('simulation')}
+                 style={{
+                   background: selectedType === 'simulation' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'simulation' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎮</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Simulations / Coach</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{careerCoachSessions.length}</div>
+               </button>
+             </div>
 
             {/* Resources Grid */}
             <div style={{ 
