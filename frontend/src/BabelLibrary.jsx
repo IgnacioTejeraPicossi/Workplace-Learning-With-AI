@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
+import { fetchSavedVideos } from './api';
 
 const BabelLibrary = () => {
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('catalog');
   const [books, setBooks] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [newBook, setNewBook] = useState({
     title: '',
     author: '',
@@ -14,6 +17,22 @@ const BabelLibrary = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
+
+  // Load videos from MongoDB
+  const loadVideos = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchSavedVideos();
+      if (data.videos) {
+        setVideos(data.videos);
+      }
+    } catch (error) {
+      console.error('Error loading videos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Demo data for the prototype
   useEffect(() => {
@@ -65,6 +84,9 @@ const BabelLibrary = () => {
       }
     ];
     setBooks(demoBooks);
+    
+    // Load videos from MongoDB
+    loadVideos();
   }, []);
 
   const handleAddBook = (e) => {
@@ -90,15 +112,28 @@ const BabelLibrary = () => {
     setBooks(books.filter(book => book.id !== id));
   };
 
-  const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTopic = selectedTopic === 'all' || book.topic === selectedTopic;
-    return matchesSearch && matchesTopic;
+  // Combine books and videos for unified search
+  const allResources = [...books, ...videos.map(video => ({
+    id: video._id,
+    title: video.title,
+    author: 'YouTube Video',
+    topic: video.topic,
+    description: video.description,
+    type: 'video',
+    addedDate: video.saved_at ? video.saved_at.split('T')[0] : 'Unknown',
+    url: video.url
+  }))];
+
+  const filteredResources = allResources.filter(resource => {
+    const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         resource.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         resource.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTopic = selectedTopic === 'all' || resource.topic === selectedTopic;
+    const matchesType = selectedType === 'all' || resource.type === selectedType;
+    return matchesSearch && matchesTopic && matchesType;
   });
 
-  const topics = ['all', ...Array.from(new Set(books.map(book => book.topic)))];
+  const topics = ['all', ...Array.from(new Set([...books.map(book => book.topic), ...videos.map(video => video.topic)]))];
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -163,6 +198,12 @@ const BabelLibrary = () => {
         {/* Content based on active tab */}
         {activeTab === 'catalog' && (
           <div>
+            {/* Loading indicator */}
+            {loading && (
+              <div style={{ textAlign: 'center', padding: '20px', color: colors.textSecondary }}>
+                Loading resources... ⏳
+              </div>
+            )}
             {/* Search and Filter */}
             <div style={{ 
               display: 'flex', 
@@ -208,76 +249,170 @@ const BabelLibrary = () => {
                 ))}
               </select>
             </div>
+            
+            {/* Active Filters Display */}
+            {(selectedType !== 'all' || selectedTopic !== 'all' || searchTerm) && (
+              <div style={{ 
+                display: 'flex', 
+                gap: 8, 
+                marginBottom: 16,
+                flexWrap: 'wrap',
+                alignItems: 'center'
+              }}>
+                <span style={{ color: colors.textSecondary, fontSize: '0.9em' }}>Active filters:</span>
+                {selectedType !== 'all' && (
+                  <span style={{
+                    background: getTypeColor(selectedType),
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.8em',
+                    fontWeight: '500'
+                  }}>
+                    {getTypeIcon(selectedType)} {selectedType}
+                  </span>
+                )}
+                {selectedTopic !== 'all' && (
+                  <span style={{
+                    background: colors.primaryLight,
+                    color: colors.primary,
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.8em',
+                    fontWeight: '500'
+                  }}>
+                    🏷️ {selectedTopic}
+                  </span>
+                )}
+                {searchTerm && (
+                  <span style={{
+                    background: '#e3f2fd',
+                    color: '#1976d2',
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.8em',
+                    fontWeight: '500'
+                  }}>
+                    🔍 "{searchTerm}"
+                  </span>
+                )}
+                <button
+                  onClick={() => {
+                    setSelectedType('all');
+                    setSelectedTopic('all');
+                    setSearchTerm('');
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${colors.border}`,
+                    color: colors.textSecondary,
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.8em',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ✕ Clear All
+                </button>
+              </div>
+            )}
 
-            {/* Library Stats */}
+            {/* Library Stats - Interactive Filter Buttons */}
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
               gap: 16, 
               marginBottom: 24 
             }}>
-              <div style={{
-                background: colors.primaryLight,
-                padding: '20px',
-                borderRadius: 12,
-                textAlign: 'center',
-                border: `1px solid ${colors.primary}`
-              }}>
+              <button
+                onClick={() => setSelectedType('all')}
+                style={{
+                  background: selectedType === 'all' ? colors.primary : colors.primaryLight,
+                  color: selectedType === 'all' ? 'white' : colors.primary,
+                  padding: '20px',
+                  borderRadius: 12,
+                  textAlign: 'center',
+                  border: `1px solid ${colors.primary}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📚</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: colors.primary }}>
-                  {books.length}
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
+                  {allResources.length}
                 </div>
-                <div style={{ color: colors.textSecondary }}>Total Resources</div>
-              </div>
-              <div style={{
-                background: '#e8f5e8',
-                padding: '20px',
-                borderRadius: 12,
-                textAlign: 'center',
-                border: '1px solid #28a745'
-              }}>
+                <div>Total Resources</div>
+              </button>
+              
+              <button
+                onClick={() => setSelectedType('video')}
+                style={{
+                  background: selectedType === 'video' ? '#28a745' : '#e8f5e8',
+                  color: selectedType === 'video' ? 'white' : '#28a745',
+                  padding: '20px',
+                  borderRadius: 12,
+                  textAlign: 'center',
+                  border: '1px solid #28a745',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎥</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#28a745' }}>
-                  {books.filter(b => b.type === 'video').length}
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
+                  {videos.length}
                 </div>
-                <div style={{ color: colors.textSecondary }}>Videos</div>
-              </div>
-              <div style={{
-                background: '#fff3cd',
-                padding: '20px',
-                borderRadius: 12,
-                textAlign: 'center',
-                border: '1px solid #ffc107'
-              }}>
+                <div>Videos</div>
+              </button>
+              
+              <button
+                onClick={() => setSelectedType('article')}
+                style={{
+                  background: selectedType === 'article' ? '#ffc107' : '#fff3cd',
+                  color: selectedType === 'article' ? 'white' : '#ffc107',
+                  padding: '20px',
+                  borderRadius: 12,
+                  textAlign: 'center',
+                  border: '1px solid #ffc107',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📄</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#ffc107' }}>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
                   {books.filter(b => b.type === 'article').length}
                 </div>
-                <div style={{ color: colors.textSecondary }}>Articles</div>
-              </div>
-              <div style={{
-                background: '#f3e5f5',
-                padding: '20px',
-                borderRadius: 12,
-                textAlign: 'center',
-                border: '1px solid #6f42c1'
-              }}>
+                <div>Articles</div>
+              </button>
+              
+              <button
+                onClick={() => setSelectedType('course')}
+                style={{
+                  background: selectedType === 'course' ? '#6f42c1' : '#f3e5f5',
+                  color: selectedType === 'course' ? 'white' : '#6f42c1',
+                  padding: '20px',
+                  borderRadius: 12,
+              textAlign: 'center',
+                  border: '1px solid #6f42c1',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
                 <div style={{ fontSize: '2em', marginBottom: 8 }}>🎓</div>
-                <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#6f42c1' }}>
+                <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
                   {books.filter(b => b.type === 'course').length}
                 </div>
-                <div style={{ color: colors.textSecondary }}>Courses</div>
-              </div>
+                <div>Courses</div>
+              </button>
             </div>
 
-            {/* Books Grid */}
+            {/* Resources Grid */}
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
               gap: 20 
             }}>
-              {filteredBooks.map(book => (
-                <div key={book.id} style={{
+              {filteredResources.map(resource => (
+                <div key={resource.id} style={{
                   background: colors.background,
                   border: `1px solid ${colors.border}`,
                   borderRadius: 12,
@@ -290,14 +425,14 @@ const BabelLibrary = () => {
                     position: 'absolute',
                     top: '12px',
                     right: '12px',
-                    background: getTypeColor(book.type),
+                    background: getTypeColor(resource.type),
                     color: 'white',
                     padding: '4px 8px',
                     borderRadius: '12px',
                     fontSize: '0.8em',
                     fontWeight: 'bold'
                   }}>
-                    {getTypeIcon(book.type)} {book.type}
+                    {getTypeIcon(resource.type)} {resource.type}
                   </div>
 
                   {/* Content */}
@@ -307,7 +442,7 @@ const BabelLibrary = () => {
                     fontSize: '1.2em',
                     paddingRight: '80px'
                   }}>
-                    {book.title}
+                    {resource.title}
                   </h3>
                   
                   <p style={{ 
@@ -316,7 +451,7 @@ const BabelLibrary = () => {
                     fontWeight: 500,
                     fontSize: '0.9em'
                   }}>
-                    👤 {book.author}
+                    👤 {resource.author}
                   </p>
                   
                   <p style={{ 
@@ -325,8 +460,24 @@ const BabelLibrary = () => {
                     fontSize: '0.9em',
                     lineHeight: 1.5
                   }}>
-                    {book.description}
+                    {resource.description}
                   </p>
+                  
+                  {/* Video Player for video resources */}
+                  {resource.type === 'video' && resource.url && (
+                    <div style={{ marginBottom: 12 }}>
+                      <iframe
+                        width="100%"
+                        height="200"
+                        src={resource.url}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={resource.title}
+                        style={{ borderRadius: '8px' }}
+                      />
+                    </div>
+                  )}
                   
                   <div style={{ 
                     display: 'flex', 
@@ -341,11 +492,11 @@ const BabelLibrary = () => {
                       fontSize: '0.8em',
                       fontWeight: '500'
                     }}>
-                      🏷️ {book.topic}
+                      🏷️ {resource.topic}
                     </span>
                     
                     <button
-                      onClick={() => handleDeleteBook(book.id)}
+                      onClick={() => handleDeleteBook(resource.id)}
                       style={{
                         background: '#dc3545',
                         color: 'white',
@@ -367,13 +518,13 @@ const BabelLibrary = () => {
                     color: colors.textSecondary,
                     textAlign: 'right'
                   }}>
-                    Added: {book.addedDate}
+                    Added: {resource.addedDate}
                   </div>
                 </div>
               ))}
             </div>
 
-            {filteredBooks.length === 0 && (
+            {filteredResources.length === 0 && (
               <div style={{
                 textAlign: 'center',
                 padding: '40px',
