@@ -95,64 +95,64 @@ const APIConfig = () => {
         <div style={{ marginBottom: 32 }}>
           <h2 style={{ color: colors.text, marginBottom: 16 }}>Select API Provider</h2>
           
-          <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
-                         <button
-               onClick={() => handleProviderChange('itemai')}
-               style={{
-                 background: apiProvider === 'itemai' ? '#e3f2fd' : 'transparent',
-                 color: apiProvider === 'itemai' ? '#1565c0' : colors.text,
-                 border: `2px solid ${apiProvider === 'itemai' ? '#1976d2' : colors.border}`,
-                 padding: '16px 24px',
-                 borderRadius: 12,
-                 cursor: 'pointer',
-                 fontSize: '1em',
-                 fontWeight: 500,
-                 flex: '1',
-                 minWidth: '200px',
-                 transition: 'all 0.3s ease'
-               }}
-             >
-               🏠 ItemAI API
-             </button>
-            
-                         <button
-               onClick={() => handleProviderChange('openai')}
-               style={{
-                 background: apiProvider === 'openai' ? '#e3f2fd' : 'transparent',
-                 color: apiProvider === 'openai' ? '#1565c0' : colors.text,
-                 border: `2px solid ${apiProvider === 'openai' ? '#1976d2' : colors.border}`,
-                 padding: '16px 24px',
-                 borderRadius: 12,
-                 cursor: 'pointer',
-                 fontSize: '1em',
-                 fontWeight: 500,
-                 flex: 1,
-                 minWidth: '200px',
-                 transition: 'all 0.3s ease'
-               }}
-             >
-               🚀 OpenAI API
-             </button>
-            
-                         <button
-               onClick={() => handleProviderChange('openrouter')}
-               style={{
-                 background: apiProvider === 'openrouter' ? '#e3f2fd' : 'transparent',
-                 color: apiProvider === 'openrouter' ? '#1565c0' : colors.text,
-                 border: `2px solid ${apiProvider === 'openrouter' ? '#1976d2' : colors.border}`,
-                 padding: '16px 24px',
-                 borderRadius: 12,
-                 cursor: 'pointer',
-                 fontSize: '1em',
-                 fontWeight: 500,
-                 flex: 1,
-                 minWidth: '200px',
-                 transition: 'all 0.3s ease'
-               }}
-             >
-               🌐 OpenRouter API
-             </button>
-          </div>
+                    <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+                          <button
+                onClick={() => handleProviderChange('itemai')}
+                style={{
+                  background: apiProvider === 'itemai' ? '#e3f2fd' : 'transparent',
+                  color: apiProvider === 'itemai' ? '#1565c0' : colors.text,
+                  border: `2px solid ${apiProvider === 'itemai' ? '#1976d2' : colors.border}`,
+                  padding: '16px 24px',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 500,
+                  flex: '1',
+                  minWidth: '200px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                🏠 ItemAI API
+              </button>
+             
+                          <button
+                onClick={() => handleProviderChange('openrouter')}
+                style={{
+                  background: apiProvider === 'openrouter' ? '#e3f2fd' : 'transparent',
+                  color: apiProvider === 'openrouter' ? '#1565c0' : colors.text,
+                  border: `2px solid ${apiProvider === 'openrouter' ? '#1976d2' : colors.border}`,
+                  padding: '16px 24px',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 500,
+                  flex: 1,
+                  minWidth: '200px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                🌐 OpenRouter API
+              </button>
+             
+                          <button
+                onClick={() => handleProviderChange('openai')}
+                style={{
+                  background: apiProvider === 'openai' ? '#e3f2fd' : 'transparent',
+                  color: apiProvider === 'openai' ? '#1565c0' : colors.text,
+                  border: `2px solid ${apiProvider === 'openai' ? '#1976d2' : colors.border}`,
+                  padding: '16px 24px',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 500,
+                  flex: 1,
+                  minWidth: '200px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                🚀 OpenAI API
+              </button>
+           </div>
 
           <div style={{
             background: colors.primaryLight,
@@ -343,12 +343,12 @@ const APIConfig = () => {
         }}>
           <h3 style={{ color: colors.text, marginBottom: 16 }}>📖 How to Use</h3>
           
-          <div style={{ marginBottom: 16 }}>
-            <h4 style={{ color: colors.primary, marginBottom: 8 }}>1. Select API Provider</h4>
-            <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-              Choose between OpenAI (direct access) or OpenRouter (multiple providers, often cheaper).
-            </p>
-          </div>
+                     <div style={{ marginBottom: 16 }}>
+             <h4 style={{ color: colors.primary, marginBottom: 8 }}>1. Select API Provider</h4>
+             <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
+               Choose between ItemAI API (free local), OpenRouter (cost-effective), or OpenAI (premium quality).
+             </p>
+           </div>
           
           <div style={{ marginBottom: 16 }}>
             <h4 style={{ color: colors.primary, marginBottom: 8 }}>2. Configure API Keys</h4>
@@ -387,38 +387,38 @@ const APIConfig = () => {
         }}>
           <h3 style={{ color: colors.text, marginBottom: 16 }}>⚖️ API Comparison</h3>
           
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: 20 
-          }}>
-            <div>
-              <h4 style={{ color: colors.primary, marginBottom: 12 }}>🏠 ItemAI API</h4>
-              <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
-                <li><strong>Pros:</strong> 100% free, 100% private, no rate limits</li>
-                <li><strong>Cons:</strong> Requires local setup, model quality varies</li>
-                <li><strong>Best for:</strong> Privacy, cost savings, local development</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 style={{ color: colors.primary, marginBottom: 12 }}>🚀 OpenAI</h4>
-              <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
-                <li><strong>Pros:</strong> Direct access, reliable, latest models</li>
-                <li><strong>Cons:</strong> Higher costs, potential rate limits</li>
-                <li><strong>Best for:</strong> Production use, reliability</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 style={{ color: colors.primary, marginBottom: 12 }}>🌐 OpenRouter</h4>
-              <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
-                <li><strong>Pros:</strong> Lower costs, multiple providers, Claude/Gemini access</li>
-                <li><strong>Cons:</strong> Additional dependency, potential latency</li>
-                <li><strong>Best for:</strong> Cost optimization, model variety</li>
-              </ul>
-            </div>
-          </div>
+                     <div style={{ 
+             display: 'grid', 
+             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+             gap: 20 
+           }}>
+             <div>
+               <h4 style={{ color: colors.primary, marginBottom: 12 }}>🏠 ItemAI API</h4>
+               <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
+                 <li><strong>Pros:</strong> 100% free, 100% private, no rate limits</li>
+                 <li><strong>Cons:</strong> Requires local setup, model quality varies</li>
+                 <li><strong>Best for:</strong> Privacy, cost savings, local development</li>
+               </ul>
+             </div>
+             
+             <div>
+               <h4 style={{ color: colors.primary, marginBottom: 12 }}>🌐 OpenRouter</h4>
+               <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
+                 <li><strong>Pros:</strong> Lower costs, multiple providers, Claude/Gemini access</li>
+                 <li><strong>Cons:</strong> Additional dependency, potential latency</li>
+                 <li><strong>Best for:</strong> Cost optimization, model variety</li>
+               </ul>
+             </div>
+             
+             <div>
+               <h4 style={{ color: colors.primary, marginBottom: 12 }}>🚀 OpenAI</h4>
+               <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
+                 <li><strong>Pros:</strong> Direct access, reliable, latest models</li>
+                 <li><strong>Cons:</strong> Higher costs, potential rate limits</li>
+                 <li><strong>Best for:</strong> Production use, reliability</li>
+               </ul>
+             </div>
+           </div>
         </div>
       </div>
     </div>
