@@ -74,9 +74,12 @@ app.include_router(ea_processes_router)
 app.include_router(ea_catalog_router)
 app.include_router(ea_ai_risk_router)
 
-# API Configuration router
+# API Configuration routers
 from backend.api_test import router as api_test_router
+from backend.itemai_api import router as itemai_api_router
+
 app.include_router(api_test_router)
+app.include_router(itemai_api_router)
 
 import os
 from fastapi.staticfiles import StaticFiles

@@ -6,6 +6,7 @@ const APIConfig = () => {
   const [apiProvider, setApiProvider] = useState('openai');
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
+  const [itemaiUrl, setItemaiUrl] = useState('http://localhost:1234');
   const [status, setStatus] = useState('');
 
   useEffect(() => {
@@ -13,10 +14,12 @@ const APIConfig = () => {
     const savedProvider = localStorage.getItem('apiProvider') || 'openai';
     const savedOpenaiKey = localStorage.getItem('openaiKey') || '';
     const savedOpenrouterKey = localStorage.getItem('openrouterKey') || '';
+    const savedItemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
     
     setApiProvider(savedProvider);
     setOpenaiKey(savedOpenaiKey);
     setOpenrouterKey(savedOpenrouterKey);
+    setItemaiUrl(savedItemaiUrl);
   }, []);
 
   const handleProviderChange = (provider) => {
@@ -29,30 +32,47 @@ const APIConfig = () => {
   const handleSaveKeys = () => {
     localStorage.setItem('openaiKey', openaiKey);
     localStorage.setItem('openrouterKey', openrouterKey);
-    setStatus('API keys saved successfully!');
+    localStorage.setItem('itemaiUrl', itemaiUrl);
+    setStatus('API configuration saved successfully!');
     setTimeout(() => setStatus(''), 3000);
   };
 
   const handleTestAPI = async () => {
     setStatus('Testing API connection...');
     try {
-      const response = await fetch('/api/test-api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          provider: apiProvider,
-          openaiKey: apiProvider === 'openai' ? openaiKey : '',
-          openrouterKey: apiProvider === 'openrouter' ? openrouterKey : ''
-        })
-      });
+      let response;
+      
+      if (apiProvider === 'itemai') {
+        // Test ItemAI API
+        response = await fetch('/api/test-itemai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            local_url: itemaiUrl
+          })
+        });
+      } else {
+        // Test OpenAI or OpenRouter
+        response = await fetch('/api/test-api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            provider: apiProvider,
+            openaiKey: apiProvider === 'openai' ? openaiKey : '',
+            openrouterKey: apiProvider === 'openrouter' ? openrouterKey : ''
+          })
+        });
+      }
       
       if (response.ok) {
         const result = await response.json();
         setStatus(`✅ API test successful: ${result.message}`);
       } else {
-        setStatus('❌ API test failed. Check your keys and try again.');
+        setStatus('❌ API test failed. Check your configuration and try again.');
       }
     } catch (error) {
       setStatus('❌ API test failed. Network error.');
@@ -75,42 +95,63 @@ const APIConfig = () => {
         <div style={{ marginBottom: 32 }}>
           <h2 style={{ color: colors.text, marginBottom: 16 }}>Select API Provider</h2>
           
-          <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-            <button
-              onClick={() => handleProviderChange('openai')}
-              style={{
-                background: apiProvider === 'openai' ? colors.primary : 'transparent',
-                color: apiProvider === 'openai' ? 'white' : colors.text,
-                border: `2px solid ${apiProvider === 'openai' ? colors.primary : colors.border}`,
-                padding: '16px 24px',
-                borderRadius: 12,
-                cursor: 'pointer',
-                fontSize: '1em',
-                fontWeight: 500,
-                flex: 1,
-                transition: 'all 0.3s ease'
-              }}
-            >
-              🚀 OpenAI API
-            </button>
+          <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+                         <button
+               onClick={() => handleProviderChange('itemai')}
+               style={{
+                 background: apiProvider === 'itemai' ? '#e3f2fd' : 'transparent',
+                 color: apiProvider === 'itemai' ? '#1565c0' : colors.text,
+                 border: `2px solid ${apiProvider === 'itemai' ? '#1976d2' : colors.border}`,
+                 padding: '16px 24px',
+                 borderRadius: 12,
+                 cursor: 'pointer',
+                 fontSize: '1em',
+                 fontWeight: 500,
+                 flex: '1',
+                 minWidth: '200px',
+                 transition: 'all 0.3s ease'
+               }}
+             >
+               🏠 ItemAI API
+             </button>
             
-            <button
-              onClick={() => handleProviderChange('openrouter')}
-              style={{
-                background: apiProvider === 'openrouter' ? colors.primary : 'transparent',
-                color: apiProvider === 'openrouter' ? 'white' : colors.text,
-                border: `2px solid ${apiProvider === 'openrouter' ? colors.primary : colors.border}`,
-                padding: '16px 24px',
-                borderRadius: 12,
-                cursor: 'pointer',
-                fontSize: '1em',
-                fontWeight: 500,
-                flex: 1,
-                transition: 'all 0.3s ease'
-              }}
-            >
-              🌐 OpenRouter API
-            </button>
+                         <button
+               onClick={() => handleProviderChange('openai')}
+               style={{
+                 background: apiProvider === 'openai' ? '#e3f2fd' : 'transparent',
+                 color: apiProvider === 'openai' ? '#1565c0' : colors.text,
+                 border: `2px solid ${apiProvider === 'openai' ? '#1976d2' : colors.border}`,
+                 padding: '16px 24px',
+                 borderRadius: 12,
+                 cursor: 'pointer',
+                 fontSize: '1em',
+                 fontWeight: 500,
+                 flex: 1,
+                 minWidth: '200px',
+                 transition: 'all 0.3s ease'
+               }}
+             >
+               🚀 OpenAI API
+             </button>
+            
+                         <button
+               onClick={() => handleProviderChange('openrouter')}
+               style={{
+                 background: apiProvider === 'openrouter' ? '#e3f2fd' : 'transparent',
+                 color: apiProvider === 'openrouter' ? '#1565c0' : colors.text,
+                 border: `2px solid ${apiProvider === 'openrouter' ? '#1976d2' : colors.border}`,
+                 padding: '16px 24px',
+                 borderRadius: 12,
+                 cursor: 'pointer',
+                 fontSize: '1em',
+                 fontWeight: 500,
+                 flex: 1,
+                 minWidth: '200px',
+                 transition: 'all 0.3s ease'
+               }}
+             >
+               🌐 OpenRouter API
+             </button>
           </div>
 
           <div style={{
@@ -120,10 +161,13 @@ const APIConfig = () => {
             border: `1px solid ${colors.primary}`
           }}>
             <h3 style={{ color: colors.primary, marginBottom: 12 }}>
-              {apiProvider === 'openai' ? '🚀 OpenAI API' : '🌐 OpenRouter API'}
+              {apiProvider === 'itemai' ? '🏠 ItemAI API' : 
+               apiProvider === 'openai' ? '🚀 OpenAI API' : '🌐 OpenRouter API'}
             </h3>
             <p style={{ color: colors.text, lineHeight: 1.6 }}>
-              {apiProvider === 'openai' 
+              {apiProvider === 'itemai' 
+                ? 'Local AI powered by LM Studio - 100% free, 100% private, runs on your own computer with downloaded models.'
+                : apiProvider === 'openai' 
                 ? 'Direct access to OpenAI models (GPT-3.5, GPT-4, etc.) with full control and reliability.'
                 : 'Access to multiple AI providers through OpenRouter, often more cost-effective with access to Claude, Gemini, and other models.'
               }
@@ -133,73 +177,112 @@ const APIConfig = () => {
 
         {/* API Keys Configuration */}
         <div style={{ marginBottom: 32 }}>
-          <h2 style={{ color: colors.text, marginBottom: 16 }}>API Keys Configuration</h2>
-          
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: 8, 
-              color: colors.text,
-              fontWeight: '500'
-            }}>
-              OpenAI API Key
-            </label>
-            <input
-              type="password"
-              value={openaiKey}
-              onChange={(e) => setOpenaiKey(e.target.value)}
-              placeholder="sk-..."
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 8,
-                fontSize: '1em',
-                background: colors.background,
-                color: colors.text
-              }}
-            />
-            <p style={{ 
-              color: colors.textSecondary, 
-              fontSize: '0.9em', 
-              marginTop: 4 
-            }}>
-              Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: colors.primary }}>OpenAI Platform</a>
-            </p>
-          </div>
+          <h2 style={{ color: colors.text, marginBottom: 16 }}>API Configuration</h2>
 
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: 8, 
-              color: colors.text,
-              fontWeight: '500'
-            }}>
-              OpenRouter API Key
-            </label>
-            <input
-              type="password"
-              value={openrouterKey}
-              onChange={(e) => setOpenrouterKey(e.target.value)}
-              placeholder="sk-or-v1-..."
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 8,
-                fontSize: '1em',
-                background: colors.background,
-                color: colors.text
-              }}
-            />
-            <p style={{ 
-              color: colors.textSecondary, 
-              fontSize: '0.9em', 
-              marginTop: 4 
-            }}>
-              Get your key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" style={{ color: colors.primary }}>OpenRouter</a>
-            </p>
-          </div>
+          {apiProvider === 'itemai' && (
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: colors.text,
+                fontWeight: '500'
+              }}>
+                ItemAI Local URL
+              </label>
+              <input
+                type="text"
+                value={itemaiUrl}
+                onChange={(e) => setItemaiUrl(e.target.value)}
+                placeholder="http://localhost:1234"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  fontSize: '1em',
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em', 
+                marginTop: 4 
+              }}>
+                Local URL where LM Studio is running (default: http://localhost:1234)
+              </p>
+            </div>
+          )}
+
+          {apiProvider === 'openai' && (
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: colors.text,
+                fontWeight: '500'
+              }}>
+                OpenAI API Key
+              </label>
+              <input
+                type="password"
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                placeholder="sk-..."
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  fontSize: '1em',
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em', 
+                marginTop: 4 
+              }}>
+                Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: colors.primary }}>OpenAI Platform</a>
+              </p>
+            </div>
+          )}
+
+          {apiProvider === 'openrouter' && (
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: colors.text,
+                fontWeight: '500'
+              }}>
+                OpenRouter API Key
+              </label>
+              <input
+                type="password"
+                value={openrouterKey}
+                onChange={(e) => setOpenrouterKey(e.target.value)}
+                placeholder="sk-or-v1-..."
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  fontSize: '1em',
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em', 
+                marginTop: 4 
+              }}>
+                Get your key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" style={{ color: colors.primary }}>OpenRouter</a>
+              </p>
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: 16 }}>
             <button
@@ -282,9 +365,14 @@ const APIConfig = () => {
           </div>
           
           <div style={{ marginBottom: 16 }}>
-            <h4 style={{ color: colors.primary, marginBottom: 8 }}>4. Automatic Fallback</h4>
+            <h4 style={{ color: colors.primary, marginBottom: 8 }}>4. Intelligent Fallback System</h4>
             <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-              If OpenRouter fails, the system automatically falls back to OpenAI for reliability.
+              {apiProvider === 'itemai' 
+                ? 'If ItemAI API fails, the system automatically falls back to OpenRouter, then OpenAI for maximum reliability.'
+                : apiProvider === 'openrouter'
+                ? 'If OpenRouter fails, the system automatically falls back to OpenAI for reliability.'
+                : 'OpenAI provides direct access with fallback to mock responses if needed.'
+              }
             </p>
           </div>
         </div>
@@ -304,6 +392,15 @@ const APIConfig = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
             gap: 20 
           }}>
+            <div>
+              <h4 style={{ color: colors.primary, marginBottom: 12 }}>🏠 ItemAI API</h4>
+              <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
+                <li><strong>Pros:</strong> 100% free, 100% private, no rate limits</li>
+                <li><strong>Cons:</strong> Requires local setup, model quality varies</li>
+                <li><strong>Best for:</strong> Privacy, cost savings, local development</li>
+              </ul>
+            </div>
+            
             <div>
               <h4 style={{ color: colors.primary, marginBottom: 12 }}>🚀 OpenAI</h4>
               <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>

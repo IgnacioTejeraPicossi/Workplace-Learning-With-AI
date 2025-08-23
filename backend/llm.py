@@ -18,13 +18,13 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
-# API Provider Selection (can be 'openai' or 'openrouter')
+# API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
 def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
     """
     Enhanced OpenAI function with GPT-5 model selection and optimization.
-    Now supports both OpenAI and OpenRouter APIs.
+    Now supports ItemAI API (local), OpenRouter, and OpenAI APIs with intelligent fallback.
     
     Args:
         prompt: The prompt to send
@@ -33,7 +33,16 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         max_tokens: Maximum tokens for response
         messages: Alternative to prompt for conversation format
     """
-    # Try OpenRouter first if configured and selected
+    # Try ItemAI API first if configured and selected (local, free)
+    if API_PROVIDER == "itemai":
+        try:
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                return result
+        except Exception as e:
+            print(f"ItemAI API failed, falling back to OpenRouter: {e}")
+    
+    # Try OpenRouter if configured and selected
     if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
         try:
             result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
@@ -561,4 +570,58 @@ Make sure the questions are relevant to the content and appropriate for the spec
                 "correct_answer": "To explain the codebase",
                 "explanation": "The documentation explains the structure and purpose of the codebase."
             }
-        ] 
+        ]
+
+def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    ItemAI API function for local LM Studio integration.
+    
+    Args:
+        prompt: The prompt to send
+        task_type: Type of task for optimal model selection
+        complexity: Task complexity (low, medium, high)
+        max_tokens: Maximum tokens for response
+        messages: Alternative to prompt for conversation format
+    """
+    try:
+        import httpx
+        
+        # Default local URL for LM Studio
+        local_url = "http://localhost:1234"
+        
+        # Prepare the request payload
+        if messages:
+            payload = {
+                "model": "default",  # LM Studio will use the loaded model
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": 0.7,
+                "stream": False
+            }
+        else:
+            payload = {
+                "model": "default",
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens,
+                "temperature": 0.7,
+                "stream": False
+            }
+        
+        # Make request to local LM Studio
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(
+                f"{local_url}/v1/chat/completions",
+                json=payload,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                completion_text = response_data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                return completion_text.strip()
+            else:
+                raise Exception(f"ItemAI API returned status {response.status_code}: {response.text}")
+                
+    except Exception as e:
+        print(f"ItemAI API error: {e}")
+        raise e 
