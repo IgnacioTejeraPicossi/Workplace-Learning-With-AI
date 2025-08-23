@@ -51,6 +51,26 @@ function AppContent() {
     return () => unsubscribe();
   }, []);
 
+  // Listen for navigation events from Babel Library
+  useEffect(() => {
+    const handleNavigateToModule = (event) => {
+      const { module, resourceId } = event.detail;
+      console.log(`🚀 Navigating to ${module} with resource ID: ${resourceId}`);
+      
+      // Set the section to navigate to the module
+      setSection(module);
+      setActiveModule(null); // Clear active module to use section navigation
+      
+      // Store the resource ID for the module to use
+      if (resourceId) {
+        localStorage.setItem('editResourceId', resourceId);
+      }
+    };
+
+    window.addEventListener('navigateToModule', handleNavigateToModule);
+    return () => window.removeEventListener('navigateToModule', handleNavigateToModule);
+  }, []);
+
   // Handle keyboard shortcut for search
   useEffect(() => {
     const handleKeyDown = (e) => {

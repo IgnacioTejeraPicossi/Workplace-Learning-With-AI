@@ -214,6 +214,56 @@ const BabelLibrary = () => {
     setBooks(books.filter(book => book.id !== id));
   };
 
+  const handleEditMicroLesson = (id) => {
+    // Navigate to Micro-lessons module
+    // We'll use a custom event to communicate with the parent component
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'micro-lessons',
+        resourceId: id
+      }
+    }));
+    
+    // Also show a user-friendly message
+    alert(`Redirecting to Micro-lessons module to edit: ${id}`);
+  };
+
+  const handleEditCertification = (id) => {
+    // Navigate to Certifications module
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'certifications',
+        resourceId: id
+      }
+    }));
+    
+    alert(`Redirecting to Certifications module to edit: ${id}`);
+  };
+
+  const handleEditCareerCoach = (id) => {
+    // Navigate to AI Career Coach module
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'ai-career-coach',
+        resourceId: id
+      }
+    }));
+    
+    alert(`Redirecting to AI Career Coach module to edit: ${id}`);
+  };
+
+  const handleEditVideo = (id) => {
+    // Navigate to Video Lessons module
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'video-lessons',
+        resourceId: id
+      }
+    }));
+    
+    alert(`Redirecting to Video Lessons module to edit: ${id}`);
+  };
+
   // Combine books and videos for unified search
   const allResources = [
     ...books, 
@@ -689,21 +739,108 @@ const BabelLibrary = () => {
                       🏷️ {resource.topic}
                     </span>
                     
-                    <button
-                      onClick={() => handleDeleteBook(resource.id)}
-                      style={{
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '0.8em'
-                      }}
-                      title="Delete resource"
-                    >
-                      🗑️
-                    </button>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {/* Action buttons based on resource type */}
+                      {resource.author === 'Micro-lesson' && (
+                        <button
+                          onClick={() => handleEditMicroLesson(resource.id)}
+                          style={{
+                            background: colors.primary,
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.8em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Edit in Micro-lessons module"
+                        >
+                          ✏️ Edit
+                        </button>
+                      )}
+                      
+                      {resource.author === 'Certification' && (
+                        <button
+                          onClick={() => handleEditCertification(resource.id)}
+                          style={{
+                            background: colors.primary,
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.8em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Edit in Certifications module"
+                        >
+                          ✏️ Edit
+                        </button>
+                      )}
+                      
+                      {resource.author === 'AI Career Coach' && (
+                        <button
+                          onClick={() => handleEditCareerCoach(resource.id)}
+                          style={{
+                            background: colors.primary,
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.8em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Edit in AI Career Coach module"
+                        >
+                          ✏️ Edit
+                        </button>
+                      )}
+                      
+                      {resource.author === 'YouTube Video' && (
+                        <button
+                          onClick={() => handleEditVideo(resource.id)}
+                          style={{
+                            background: colors.primary,
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.8em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Edit in Video Lessons module"
+                        >
+                          ✏️ Edit
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={() => handleDeleteBook(resource.id)}
+                        style={{
+                          background: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.8em'
+                        }}
+                        title="Delete resource"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                   
                   <div style={{
