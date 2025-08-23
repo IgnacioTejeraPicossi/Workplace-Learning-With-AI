@@ -86,9 +86,9 @@ const APIConfig = () => {
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ color: colors.text, marginBottom: 8 }}>🔧 API Configuration</h1>
-          <p style={{ color: colors.textSecondary, fontSize: '1.1em' }}>
-            Configure and switch between OpenAI and OpenRouter APIs
-          </p>
+                     <p style={{ color: colors.textSecondary, fontSize: '1.1em' }}>
+             Configure and switch between ItemAI API, OpenAI, and OpenRouter APIs
+           </p>
         </div>
 
         {/* API Provider Selection */}
