@@ -54,16 +54,28 @@ function AppContent() {
   // Listen for navigation events from Babel Library
   useEffect(() => {
     const handleNavigateToModule = (event) => {
-      const { module, resourceId } = event.detail;
-      console.log(`🚀 Navigating to ${module} with resource ID: ${resourceId}`);
+      const { module, resourceId, resourceTitle, targetPage, action, autoExpand } = event.detail;
+      console.log(`🚀 Navigating to ${module} with resource ID: ${resourceId}, title: "${resourceTitle}", target page: ${targetPage}, action: ${action}, autoExpand: ${autoExpand}`);
       
       // Set the section to navigate to the module
       setSection(module);
       setActiveModule(null); // Clear active module to use section navigation
       
-      // Store the resource ID for the module to use
+      // Store additional navigation info for the module to use
       if (resourceId) {
         localStorage.setItem('editResourceId', resourceId);
+      }
+      if (resourceTitle) {
+        localStorage.setItem('editResourceTitle', resourceTitle);
+      }
+      if (targetPage) {
+        localStorage.setItem('targetPage', targetPage);
+      }
+      if (action) {
+        localStorage.setItem('action', action);
+      }
+      if (autoExpand) {
+        localStorage.setItem('autoExpand', autoExpand);
       }
     };
 

@@ -10,6 +10,7 @@ function LessonList({ user }) {
   const [expanded, setExpanded] = useState({});
   const [editing, setEditing] = useState({});
   const [editContent, setEditContent] = useState({});
+  const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
 
   const loadLessons = async () => {
@@ -35,6 +36,94 @@ function LessonList({ user }) {
       setLessons([]);
     }
   }, [user]);
+
+  // Navigation intelligence from Babel Library
+  useEffect(() => {
+    // Check for navigation instructions from Babel Library
+    const checkNavigationInstructions = () => {
+      const targetPage = localStorage.getItem('targetPage');
+      const action = localStorage.getItem('action');
+      const resourceId = localStorage.getItem('editResourceId');
+      const resourceTitle = localStorage.getItem('editResourceTitle');
+      const autoExpand = localStorage.getItem('autoExpand');
+      
+      console.log(`🔍 [Micro-lessons] Checking for navigation instructions:`, {
+        targetPage,
+        action,
+        resourceId,
+        resourceTitle,
+        autoExpand
+      });
+      
+      if (targetPage && action && resourceId) {
+        console.log(`🎯 [Micro-lessons] Navigation instructions found:`, {
+          targetPage,
+          action,
+          resourceId,
+          resourceTitle,
+          autoExpand
+        });
+        
+        // If autoExpand is enabled, find and expand the specific micro-lesson
+        if (autoExpand === 'true' && resourceTitle) {
+          // Set a flag to auto-expand after lessons are loaded
+          setAutoExpandTarget({ id: resourceId, title: resourceTitle });
+        }
+        
+        // Clear the navigation instructions from localStorage
+        localStorage.removeItem('targetPage');
+        localStorage.removeItem('editResourceId');
+        localStorage.removeItem('editResourceTitle');
+        localStorage.removeItem('autoExpand');
+        
+        console.log(`🧹 [Micro-lessons] Navigation instructions cleared from localStorage`);
+      } else {
+        console.log(`ℹ️ [Micro-lessons] No navigation instructions found in localStorage`);
+      }
+    };
+    
+    // Check for navigation instructions after a short delay to ensure component is fully loaded
+    const timer = setTimeout(checkNavigationInstructions, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Auto-expand specific micro-lesson when lessons are loaded
+  useEffect(() => {
+    if (autoExpandTarget && lessons.length > 0) {
+      console.log(`🔍 [Micro-lessons] Looking for lesson to auto-expand:`, autoExpandTarget);
+      
+      // Find the lesson by title (more reliable than ID)
+      const targetLesson = lessons.find(lesson => 
+        lesson.title.toLowerCase().includes(autoExpandTarget.title.toLowerCase()) ||
+        autoExpandTarget.title.toLowerCase().includes(lesson.title.toLowerCase())
+      );
+      
+      if (targetLesson) {
+        console.log(`✅ [Micro-lessons] Found lesson to expand:`, targetLesson);
+        
+        // Expand the lesson
+        setExpanded({ ...expanded, [targetLesson.id]: true });
+        
+        // Show success message briefly
+        console.log(`✅ [Micro-lessons] Automatically expanded: "${targetLesson.title}"`);
+        
+        // Scroll to the expanded lesson after a short delay
+        setTimeout(() => {
+          const expandedElement = document.querySelector(`[data-lesson-id="${targetLesson.id}"]`);
+          if (expandedElement) {
+            expandedElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 100);
+        
+        // Clear the auto-expand target
+        setAutoExpandTarget(null);
+      }
+    }
+  }, [lessons, autoExpandTarget, expanded]);
 
   const handleExpandToggle = id => setExpanded({ ...expanded, [id]: !expanded[id] });
   
@@ -94,6 +183,24 @@ function LessonList({ user }) {
       <h2 
         data-testid="saved-lessons-heading"
         style={{ marginTop: 0, color: colors.text }}>Saved Micro-lessons</h2>
+      
+      {/* Navigation status message */}
+      {autoExpandTarget && (
+        <div style={{ 
+          background: colors.primaryLight, 
+          color: colors.primary, 
+          padding: "12px 16px", 
+          borderRadius: 8, 
+          marginBottom: 16, 
+          border: `1px solid ${colors.primary}`,
+          fontSize: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+        </div>
+      )}
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
@@ -126,6 +233,7 @@ function LessonList({ user }) {
           {filteredLessons.map(lesson => (
                          <li
                key={lesson.id}
+               data-lesson-id={lesson.id}
                style={{
                  marginBottom: "1.5rem",
                  background: colors.primaryLight,

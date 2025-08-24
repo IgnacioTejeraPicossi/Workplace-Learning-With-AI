@@ -11,6 +11,7 @@ export default function CareerCoach() {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [savedSessions, setSavedSessions] = useState([]);
   const [showSavedSessions, setShowSavedSessions] = useState(false);
+  const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
   
   // Use streaming hook for career coaching
@@ -20,6 +21,94 @@ export default function CareerCoach() {
   useEffect(() => {
     loadCareerCoachSessions();
   }, []);
+
+  // Navigation intelligence from Babel Library
+  useEffect(() => {
+    // Check for navigation instructions from Babel Library
+    const checkNavigationInstructions = () => {
+      const targetPage = localStorage.getItem('targetPage');
+      const action = localStorage.getItem('action');
+      const resourceId = localStorage.getItem('editResourceId');
+      const resourceTitle = localStorage.getItem('editResourceTitle');
+      const autoExpand = localStorage.getItem('autoExpand');
+      
+      console.log(`🔍 [AI Career Coach] Checking for navigation instructions:`, {
+        targetPage,
+        action,
+        resourceId,
+        resourceTitle,
+        autoExpand
+      });
+      
+      if (targetPage && action && resourceId) {
+        console.log(`🎯 [AI Career Coach] Navigation instructions found:`, {
+          targetPage,
+          action,
+          resourceId,
+          resourceTitle,
+          autoExpand
+        });
+        
+        // If autoExpand is enabled, find and expand the specific session
+        if (autoExpand === 'true' && resourceTitle) {
+          // Set a flag to auto-expand after sessions are loaded
+          setAutoExpandTarget({ id: resourceId, title: resourceTitle });
+          
+          // Show saved sessions automatically
+          setShowSavedSessions(true);
+        }
+        
+        // Clear the navigation instructions from localStorage
+        localStorage.removeItem('targetPage');
+        localStorage.removeItem('editResourceId');
+        localStorage.removeItem('editResourceTitle');
+        localStorage.removeItem('autoExpand');
+        
+        console.log(`🧹 [AI Career Coach] Navigation instructions cleared from localStorage`);
+      } else {
+        console.log(`ℹ️ [AI Career Coach] No navigation instructions found in localStorage`);
+      }
+    };
+    
+    // Check for navigation instructions after a short delay to ensure component is fully loaded
+    const timer = setTimeout(checkNavigationInstructions, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Auto-expand specific session when sessions are loaded
+  useEffect(() => {
+    if (autoExpandTarget && savedSessions.length > 0) {
+      console.log(`🔍 [AI Career Coach] Looking for session to auto-expand:`, autoExpandTarget);
+      
+      // Find the session by title (more reliable than ID)
+      const targetSession = savedSessions.find(session => 
+        session.title.toLowerCase().includes(autoExpandTarget.title.toLowerCase()) ||
+        autoExpandTarget.title.toLowerCase().includes(session.title.toLowerCase())
+      );
+      
+      if (targetSession) {
+        console.log(`✅ [AI Career Coach] Found session to expand:`, targetSession);
+        
+        // Show success message briefly
+        console.log(`✅ [AI Career Coach] Automatically found: "${targetSession.title}"`);
+        
+        // Scroll to the session after a short delay
+        setTimeout(() => {
+          const sessionElement = document.querySelector(`[data-session-id="${targetSession.id}"]`);
+          if (sessionElement) {
+            sessionElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 100);
+        
+        // Clear the auto-expand target
+        setAutoExpandTarget(null);
+      }
+    }
+  }, [savedSessions, autoExpandTarget]);
 
   const loadCareerCoachSessions = async () => {
     try {
@@ -173,6 +262,24 @@ export default function CareerCoach() {
             <h3 style={{ margin: 0, color: colors.text }}>
               💬 Saved Sessions ({savedSessions.length})
             </h3>
+            
+            {/* Navigation status message */}
+            {autoExpandTarget && (
+              <div style={{ 
+                background: colors.primaryLight, 
+                color: colors.primary, 
+                padding: "8px 12px", 
+                borderRadius: 6, 
+                marginTop: 8,
+                border: `1px solid ${colors.primary}`,
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}"
+              </div>
+            )}
             <button
               onClick={() => setShowSavedSessions(!showSavedSessions)}
               style={{
@@ -194,6 +301,7 @@ export default function CareerCoach() {
               {savedSessions.map((session, index) => (
                 <div 
                   key={session.id}
+                  data-session-id={session.id}
                   style={{ 
                     padding: 12, 
                     marginBottom: 8, 

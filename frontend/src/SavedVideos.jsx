@@ -8,6 +8,7 @@ function SavedVideos({ user }) {
   const [expandedVideo, setExpandedVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
 
   // Load saved videos from API
@@ -34,6 +35,57 @@ function SavedVideos({ user }) {
     }
   }, [user]);
 
+  // Navigation intelligence from Babel Library
+  useEffect(() => {
+    // Check for navigation instructions from Babel Library
+    const checkNavigationInstructions = () => {
+      const targetPage = localStorage.getItem('targetPage');
+      const action = localStorage.getItem('action');
+      const resourceId = localStorage.getItem('editResourceId');
+      const resourceTitle = localStorage.getItem('editResourceTitle');
+      const autoExpand = localStorage.getItem('autoExpand');
+      
+      console.log(`🔍 [Video Lessons] Checking for navigation instructions:`, {
+        targetPage,
+        action,
+        resourceId,
+        resourceTitle,
+        autoExpand
+      });
+      
+      if (targetPage && action && resourceId) {
+        console.log(`🎯 [Video Lessons] Navigation instructions found:`, {
+          targetPage,
+          action,
+          resourceId,
+          resourceTitle,
+          autoExpand
+        });
+        
+        // If autoExpand is enabled, find and expand the specific video
+        if (autoExpand === 'true' && resourceTitle) {
+          // Set a flag to auto-expand after videos are loaded
+          setAutoExpandTarget({ id: resourceId, title: resourceTitle });
+        }
+        
+        // Clear the navigation instructions from localStorage
+        localStorage.removeItem('targetPage');
+        localStorage.removeItem('editResourceId');
+        localStorage.removeItem('editResourceTitle');
+        localStorage.removeItem('autoExpand');
+        
+        console.log(`🧹 [Video Lessons] Navigation instructions cleared from localStorage`);
+      } else {
+        console.log(`ℹ️ [Video Lessons] No navigation instructions found in localStorage`);
+      }
+    };
+    
+    // Check for navigation instructions after a short delay to ensure component is fully loaded
+    const timer = setTimeout(checkNavigationInstructions, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Listen for video saved events to refresh the list
   useEffect(() => {
     const handleVideoSaved = () => {
@@ -48,6 +100,43 @@ function SavedVideos({ user }) {
       window.removeEventListener('videoSaved', handleVideoSaved);
     };
   }, [user]);
+
+  // Auto-expand specific video when videos are loaded
+  useEffect(() => {
+    if (autoExpandTarget && savedVideos.length > 0) {
+      console.log(`🔍 [Video Lessons] Looking for video to auto-expand:`, autoExpandTarget);
+      
+      // Find the video by title (more reliable than ID)
+      const targetVideo = savedVideos.find(video => 
+        video.title.toLowerCase().includes(autoExpandTarget.title.toLowerCase()) ||
+        autoExpandTarget.title.toLowerCase().includes(video.title.toLowerCase())
+      );
+      
+      if (targetVideo) {
+        console.log(`✅ [Video Lessons] Found video to expand:`, targetVideo);
+        
+        // Expand the video
+        setExpandedVideo(targetVideo._id);
+        
+        // Show success message briefly
+        console.log(`✅ [Video Lessons] Automatically expanded: "${targetVideo.title}"`);
+        
+        // Scroll to the video after a short delay
+        setTimeout(() => {
+          const videoElement = document.querySelector(`[data-video-id="${targetVideo._id}"]`);
+          if (videoElement) {
+            videoElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 100);
+        
+        // Clear the auto-expand target
+        setAutoExpandTarget(null);
+      }
+    }
+  }, [savedVideos, autoExpandTarget]);
 
   const filteredVideos = savedVideos.filter(video =>
     video.title.toLowerCase().includes(filter.toLowerCase()) ||
@@ -103,7 +192,25 @@ function SavedVideos({ user }) {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2 style={{ marginBottom: '2rem', color: colors.text }}>Saved Videos</h2>
+              <h2 style={{ marginBottom: '2rem', color: colors.text }}>Saved Videos</h2>
+        
+        {/* Navigation status message */}
+        {autoExpandTarget && (
+          <div style={{ 
+            background: colors.primaryLight, 
+            color: colors.primary, 
+            padding: "12px 16px", 
+            borderRadius: 8, 
+            marginBottom: 16,
+            border: `1px solid ${colors.primary}`,
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+          </div>
+        )}
       
       {/* Filter */}
       <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -139,6 +246,7 @@ function SavedVideos({ user }) {
         {filteredVideos.map(video => (
           <div
             key={video._id}
+            data-video-id={video._id}
             style={{
               background: colors.cardBackground,
               border: `1px solid ${colors.border}`,

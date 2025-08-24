@@ -1,11 +1,21 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from datetime import datetime
 from bson import ObjectId
 from typing import List, Optional
 from backend.db import database
+from motor.motor_asyncio import AsyncIOMotorClient
 
 simulation_results_router = APIRouter(prefix='/api/simulation-results', tags=['simulation-results'])
+
+# Create unique index for _id field to prevent duplicates
+async def ensure_unique_indexes(db: AsyncIOMotorClient):
+    try:
+        # Create unique index on _id field
+        await db.simulation_results.create_index("_id", unique=True)
+        print("✅ Unique index created on _id field for simulation_results collection")
+    except Exception as e:
+        print(f"⚠️ Warning: Could not create unique index: {e}")
 
 class SimulationResultCreate(BaseModel):
     simulation_type: str
@@ -51,15 +61,21 @@ async def create_simulation_result(result: SimulationResultCreate):
 
 @simulation_results_router.get('/', response_model=List[SimulationResultResponse])
 async def get_simulation_results():
-    results = []
-    cursor = database.simulation_results_collection.find()
-    
-    async for doc in cursor:
-        doc['id'] = str(doc['_id'])
-        del doc['_id']
-        results.append(doc)
-    
-    return results
+    try:
+        # Ensure unique indexes are created
+        await ensure_unique_indexes(database)
+        
+        results = []
+        cursor = database.simulation_results_collection.find()
+        
+        async for doc in cursor:
+            doc['id'] = str(doc['_id'])
+            del doc['_id']
+            results.append(doc)
+        
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @simulation_results_router.put('/{result_id}')
 async def update_simulation_result(result_id: str, result: SimulationResultCreate):

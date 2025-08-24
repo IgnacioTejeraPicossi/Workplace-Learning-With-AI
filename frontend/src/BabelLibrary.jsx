@@ -214,54 +214,84 @@ const BabelLibrary = () => {
     setBooks(books.filter(book => book.id !== id));
   };
 
-  const handleEditMicroLesson = (id) => {
-    // Navigate to Micro-lessons module
-    // We'll use a custom event to communicate with the parent component
+  const handleEditMicroLesson = (id, title) => {
+    // Navigate to Micro-lessons module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
       detail: {
         module: 'micro-lessons',
-        resourceId: id
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'list', // Navigate to the list where micro-lessons are shown
+        action: 'edit',
+        autoExpand: true // Flag to automatically expand the specific micro-lesson
       }
     }));
     
     // Also show a user-friendly message
-    alert(`Redirecting to Micro-lessons module to edit: ${id}`);
+    alert(`Redirecting to Micro-lessons module list to edit: "${title}"`);
   };
 
-  const handleEditCertification = (id) => {
-    // Navigate to Certifications module
+  const handleEditCertification = (id, title) => {
+    // Navigate to Certifications module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
       detail: {
         module: 'certifications',
-        resourceId: id
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'history', // Navigate to History tab where certifications are listed
+        action: 'edit',
+        autoExpand: true // Flag to automatically expand the specific certification
       }
     }));
     
-    alert(`Redirecting to Certifications module to edit: ${id}`);
+    alert(`Redirecting to Certifications module History tab to edit: "${title}"`);
   };
 
-  const handleEditCareerCoach = (id) => {
-    // Navigate to AI Career Coach module
+  const handleEditCareerCoach = (id, title) => {
+    // Navigate to AI Career Coach module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
       detail: {
         module: 'ai-career-coach',
-        resourceId: id
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'sessions', // Navigate to Saved Sessions tab
+        action: 'edit',
+        autoExpand: true // Flag to automatically expand the specific session
       }
     }));
     
-    alert(`Redirecting to AI Career Coach module to edit: ${id}`);
+    alert(`Redirecting to AI Career Coach module Saved Sessions to edit: "${title}"`);
   };
 
-  const handleEditVideo = (id) => {
-    // Navigate to Video Lessons module
+  const handleEditVideo = (id, title) => {
+    // Navigate to Video Lessons module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
       detail: {
         module: 'video-lessons',
-        resourceId: id
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'list', // Navigate to the saved videos list
+        action: 'edit',
+        autoExpand: true // Flag to automatically expand the specific video
       }
     }));
     
-    alert(`Redirecting to Video Lessons module to edit: ${id}`);
+    alert(`Redirecting to Video Lessons module saved videos list to edit: "${title}"`);
+  };
+
+  const handleEditSimulation = (id, title) => {
+    // Navigate to Simulations module with specific page info and object details
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'simulations',
+        resourceId: id,
+        resourceTitle: title,
+        action: 'edit',
+        autoExpand: true // Flag to automatically expand the specific simulation
+      }
+    }));
+    
+    alert(`Redirecting to Simulations module list to edit: "${title}"`);
   };
 
   // Combine books and videos for unified search
@@ -741,89 +771,110 @@ const BabelLibrary = () => {
                     
                     <div style={{ display: 'flex', gap: 8 }}>
                       {/* Action buttons based on resource type */}
-                      {resource.author === 'Micro-lesson' && (
-                        <button
-                          onClick={() => handleEditMicroLesson(resource.id)}
-                          style={{
-                            background: colors.primary,
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.8em',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                          title="Edit in Micro-lessons module"
-                        >
-                          ✏️ Edit
-                        </button>
-                      )}
+                                             {resource.author === 'Micro-lesson' && (
+                         <button
+                           onClick={() => handleEditMicroLesson(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Micro-lessons module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
                       
-                      {resource.author === 'Certification' && (
-                        <button
-                          onClick={() => handleEditCertification(resource.id)}
-                          style={{
-                            background: colors.primary,
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.8em',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                          title="Edit in Certifications module"
-                        >
-                          ✏️ Edit
-                        </button>
-                      )}
+                                             {resource.author === 'Certification' && (
+                         <button
+                           onClick={() => handleEditCertification(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Certifications module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
                       
-                      {resource.author === 'AI Career Coach' && (
-                        <button
-                          onClick={() => handleEditCareerCoach(resource.id)}
-                          style={{
-                            background: colors.primary,
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.8em',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                          title="Edit in AI Career Coach module"
-                        >
-                          ✏️ Edit
-                        </button>
-                      )}
+                                             {resource.author === 'AI Career Coach' && (
+                         <button
+                           onClick={() => handleEditCareerCoach(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in AI Career Coach module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
                       
-                      {resource.author === 'YouTube Video' && (
-                        <button
-                          onClick={() => handleEditVideo(resource.id)}
-                          style={{
-                            background: colors.primary,
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.8em',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                          title="Edit in Video Lessons module"
-                        >
-                          ✏️ Edit
-                        </button>
-                      )}
+                                             {resource.author === 'YouTube Video' && (
+                         <button
+                           onClick={() => handleEditVideo(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Video Lessons module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
+                      
+                                             {resource.author === 'Simulation Result' && (
+                         <button
+                           onClick={() => handleEditSimulation(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Simulations module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
                       
                       <button
                         onClick={() => handleDeleteBook(resource.id)}

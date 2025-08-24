@@ -25,6 +25,7 @@ function Certifications() {
   const [history, setHistory] = useState([]);
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [certifications, setCertifications] = useState([]);
+  const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
 
   const experienceLevels = [
@@ -114,6 +115,115 @@ function Certifications() {
     // Fetch study plan history from MongoDB
     fetchHistory();
   }, []);
+
+  // Navigation intelligence from Babel Library
+  useEffect(() => {
+    // Check for navigation instructions from Babel Library
+    const checkNavigationInstructions = () => {
+      const targetPage = localStorage.getItem('targetPage');
+      const action = localStorage.getItem('action');
+      const resourceId = localStorage.getItem('editResourceId');
+      const resourceTitle = localStorage.getItem('editResourceTitle');
+      const autoExpand = localStorage.getItem('autoExpand');
+      
+      console.log(`🔍 Checking for navigation instructions:`, {
+        targetPage,
+        action,
+        resourceId,
+        resourceTitle,
+        autoExpand
+      });
+      
+      if (targetPage && action && resourceId) {
+        console.log(`🎯 Navigation instructions found:`, {
+          targetPage,
+          action,
+          resourceId,
+          resourceTitle,
+          autoExpand
+        });
+        
+        // Navigate to the specified tab
+        if (targetPage === 'history') {
+          setActiveTab('history');
+          
+          // If autoExpand is enabled, find and expand the specific certification
+          if (autoExpand === 'true' && resourceTitle) {
+            // Set a flag to auto-expand after certifications are loaded
+            setAutoExpandTarget({ id: resourceId, title: resourceTitle });
+          }
+        }
+        
+        // Clear the navigation instructions from localStorage
+        localStorage.removeItem('targetPage');
+        localStorage.removeItem('editResourceId');
+        localStorage.removeItem('editResourceTitle');
+        localStorage.removeItem('autoExpand');
+        
+        console.log(`🧹 Navigation instructions cleared from localStorage`);
+      } else {
+        console.log(`ℹ️ No navigation instructions found in localStorage`);
+      }
+    };
+    
+    // Check for navigation instructions after a short delay to ensure component is fully loaded
+    const timer = setTimeout(checkNavigationInstructions, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Auto-expand specific certification when certifications are loaded
+  useEffect(() => {
+    if (autoExpandTarget && certifications.length > 0) {
+      console.log(`🔍 Looking for certification to auto-expand:`, autoExpandTarget);
+      
+      // Find the certification by title (more reliable than ID)
+      const targetCert = certifications.find(cert => 
+        cert.title.toLowerCase().includes(autoExpandTarget.title.toLowerCase()) ||
+        autoExpandTarget.title.toLowerCase().includes(cert.title.toLowerCase())
+      );
+      
+      if (targetCert) {
+        console.log(`✅ Found certification to expand:`, targetCert);
+        
+        // Find the corresponding history entry
+        const historyEntry = history.find(h => 
+          h.certification_name === targetCert.title
+        );
+        
+        if (historyEntry) {
+          console.log(`📚 Expanding history entry:`, historyEntry);
+          setExpandedPlan(historyEntry.id);
+          
+          // Show success message briefly
+          setAutoFillStatus(`✅ Automatically expanded: "${targetCert.title}"`);
+          setTimeout(() => setAutoFillStatus(""), 3000);
+          
+          // Scroll to the expanded certification after a short delay
+          setTimeout(() => {
+            const expandedElement = document.querySelector(`[data-plan-id="${historyEntry.id}"]`);
+            if (expandedElement) {
+              expandedElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+              });
+            }
+          }, 100);
+          
+          // Clear the auto-expand target
+          setAutoExpandTarget(null);
+        }
+      }
+    }
+  }, [certifications, history, autoExpandTarget]);
+
+  // Additional navigation check when activeTab changes
+  useEffect(() => {
+    if (activeTab === 'history' && autoExpandTarget) {
+      console.log(`🔄 Active tab changed to history, checking for auto-expand target:`, autoExpandTarget);
+      // The auto-expand will be handled by the previous useEffect when certifications are loaded
+    }
+  }, [activeTab, autoExpandTarget]);
 
   const handleGetRecommendations = async () => {
     if (!profile.role || !profile.goals) return;
@@ -831,12 +941,34 @@ function Certifications() {
       {activeTab === "history" && (
         <div style={{ background: colors.cardBackground, borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: colors.shadow, border: `1px solid ${colors.border}` }}>
           <h3 style={{ color: colors.text, marginTop: 0 }}>Study Plan History</h3>
+          
+          {/* Navigation status message */}
+          {autoExpandTarget && (
+            <div style={{ 
+              background: colors.primaryLight, 
+              color: colors.primary, 
+              padding: "12px 16px", 
+              borderRadius: 8, 
+              marginBottom: 16, 
+              border: `1px solid ${colors.primary}`,
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+            </div>
+          )}
           {history.length === 0 ? (
             <div style={{ color: colors.textSecondary }}>No study plans found.</div>
           ) : (
             <ul style={{ listStyle: "none", padding: 0 }}>
               {history.map(plan => (
-                <li key={plan.id} style={{ marginBottom: 16, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}>
+                <li 
+                  key={plan.id} 
+                  data-plan-id={plan.id}
+                  style={{ marginBottom: 16, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}
+                >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <strong>{plan.certification_name}</strong>

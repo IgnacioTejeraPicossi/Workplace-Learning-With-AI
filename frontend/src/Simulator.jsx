@@ -6,6 +6,7 @@ import StreamingText from "./StreamingText";
 import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
 import { useTheme } from "./ThemeContext";
 import { updateProgress, getCurrentProgress } from "./Dashboard";
+import SimulationResults from "./SimulationResults";
 
 function Simulator() {
   const [scenarioType, setScenarioType] = useState("");
@@ -956,6 +957,11 @@ Learning points: While moving forward is important, learning from past experienc
           )}
         </div>
       )}
+
+             {/* Simulation Results Section */}
+       <div style={{ marginTop: '3rem', borderTop: `2px solid ${colors.border}`, paddingTop: '2rem' }}>
+         <SimulationResults user={null} />
+       </div>
     </div>
   );
 }
