@@ -65,7 +65,55 @@ function Dashboard({ user, onSectionSelect }) {
   const [loading, setLoading] = useState(true);
   const [lessonTrends, setLessonTrends] = useState([]);
   const [topicBreakdown, setTopicBreakdown] = useState([]);
+  const [learningStreak, setLearningStreak] = useState(0);
   const { colors } = useTheme();
+
+  // Learning Streak Management
+  useEffect(() => {
+    const updateLearningStreak = () => {
+      const today = new Date().toDateString();
+      const lastVisit = localStorage.getItem('lastVisitDate');
+      const currentStreak = parseInt(localStorage.getItem('learningStreak') || '0');
+      const highestStreak = parseInt(localStorage.getItem('highestStreak') || '0');
+      
+      if (lastVisit === today) {
+        // Already visited today, keep current streak
+        setLearningStreak(currentStreak);
+      } else if (lastVisit) {
+        // Check if yesterday was visited
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toDateString();
+        
+        if (lastVisit === yesterdayStr) {
+          // Consecutive day, increment streak
+          const newStreak = currentStreak + 1;
+          localStorage.setItem('learningStreak', newStreak.toString());
+          
+          // Update highest streak if current is higher
+          if (newStreak > highestStreak) {
+            localStorage.setItem('highestStreak', newStreak.toString());
+          }
+          
+          setLearningStreak(newStreak);
+        } else {
+          // Gap found, reset streak
+          localStorage.setItem('learningStreak', '1');
+          setLearningStreak(1);
+        }
+      } else {
+        // First visit ever
+        localStorage.setItem('learningStreak', '1');
+        localStorage.setItem('highestStreak', '1');
+        setLearningStreak(1);
+      }
+      
+      // Update last visit date
+      localStorage.setItem('lastVisitDate', today);
+    };
+    
+    updateLearningStreak();
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -283,14 +331,44 @@ function Dashboard({ user, onSectionSelect }) {
           
           <ProgressCard
             title="Learning Streak"
-            value={20}
-            total={20}
+            value={learningStreak}
+            total={Math.max(learningStreak, parseInt(localStorage.getItem('highestStreak') || '1'))}
             icon="🔥"
             color="#F44336"
             backgroundColor="#ffebee"
             showProgress={false}
           />
         </div>
+        
+        {/* Learning Streak Info */}
+        {learningStreak > 0 && (
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: 16,
+            padding: '12px',
+            background: colors.cardBackground,
+            borderRadius: 8,
+            border: `1px solid ${colors.border}`
+          }}>
+            <div style={{ 
+              fontSize: '1.1em', 
+              color: colors.primary, 
+              fontWeight: '600',
+              marginBottom: 4
+            }}>
+              🔥 {learningStreak} día{learningStreak !== 1 ? 's' : ''} consecutivo{learningStreak !== 1 ? 's' : ''} de aprendizaje
+            </div>
+            <div style={{ 
+              fontSize: '0.9em', 
+              color: colors.textSecondary 
+            }}>
+              {learningStreak === 1 ? '¡Empieza tu racha!' : 
+               learningStreak < 7 ? '¡Sigue así!' : 
+               learningStreak < 30 ? '¡Excelente consistencia!' : 
+               '¡Eres un maestro del aprendizaje!'}
+            </div>
+          </div>
+        )}
         
         <div style={{ 
           fontWeight: 500, 
