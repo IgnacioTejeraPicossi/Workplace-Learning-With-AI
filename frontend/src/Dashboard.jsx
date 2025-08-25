@@ -356,16 +356,16 @@ function Dashboard({ user, onSectionSelect }) {
               fontWeight: '600',
               marginBottom: 4
             }}>
-              🔥 {learningStreak} día{learningStreak !== 1 ? 's' : ''} consecutivo{learningStreak !== 1 ? 's' : ''} de aprendizaje
+              🔥 {learningStreak} day{learningStreak !== 1 ? 's' : ''} consecutive{learningStreak !== 1 ? 's' : ''} of learning
             </div>
             <div style={{ 
               fontSize: '0.9em', 
               color: colors.textSecondary 
             }}>
-              {learningStreak === 1 ? '¡Empieza tu racha!' : 
-               learningStreak < 7 ? '¡Sigue así!' : 
-               learningStreak < 30 ? '¡Excelente consistencia!' : 
-               '¡Eres un maestro del aprendizaje!'}
+              {learningStreak === 1 ? 'Start your streak!' : 
+               learningStreak < 7 ? 'Keep it up!' : 
+               learningStreak < 30 ? 'Excellent consistency!' : 
+               'You are a master of learning!'}
             </div>
           </div>
         )}
