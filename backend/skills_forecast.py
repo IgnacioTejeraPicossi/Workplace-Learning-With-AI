@@ -41,22 +41,33 @@ async def create_skills_forecast(forecast: SkillsForecastCreate):
 
 @skills_forecast_router.get('/', response_model=List[SkillsForecastResponse])
 async def get_skills_forecasts():
-    forecasts = []
-    cursor = database.skills_forecast_collection.find()
-    
-    async for doc in cursor:
-        doc['id'] = str(doc['_id'])
-        del doc['_id']
-        forecasts.append(doc)
-    
-    return forecasts
+    try:
+        forecasts = []
+        cursor = database.skills_forecast_collection.find()
+        
+        async for doc in cursor:
+            doc['id'] = str(doc['_id'])
+            del doc['_id']
+            forecasts.append(doc)
+        
+        return forecasts
+    except Exception as e:
+        print(f"Error in get_skills_forecasts: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @skills_forecast_router.delete('/{forecast_id}')
 async def delete_skills_forecast(forecast_id: str):
     try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(forecast_id):
+            raise HTTPException(status_code=400, detail='Invalid forecast ID format')
+            
         result = await database.skills_forecast_collection.delete_one({'_id': ObjectId(forecast_id)})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail='Skills forecast not found')
         return {'message': 'Skills forecast deleted successfully'}
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"Error in delete_skills_forecast: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

@@ -37,6 +37,6 @@ applications_collection = database.get_collection("ea_applications")
 micro_lessons_collection = database.get_collection("micro_lessons")
 certifications_collection = database.get_collection("certifications")
 web_search_collection = database.get_collection("web_search")
-skills_forecast_collection = database.get_collection("skills_forecast")
+skills_forecast_collection = database.get_collection("skills_forecasts")  # CORRECTED: Use consistent name
 career_coach_collection = database.get_collection("career_coach")
 simulation_results_collection = database.get_collection("simulation_results")
