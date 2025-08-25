@@ -214,6 +214,112 @@ const BabelLibrary = () => {
     setBooks(books.filter(book => book.id !== id));
   };
 
+  // Delete functions for different resource types
+  const handleDeleteVideo = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este video?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/saved-videos/${id}`, { method: 'DELETE' });
+        // Update local state
+        setVideos(prev => prev.filter(video => video._id !== id));
+        alert('✅ Video eliminado exitosamente');
+      } catch (error) {
+        console.error('Error deleting video:', error);
+        alert('❌ Error al eliminar el video');
+      }
+    }
+  };
+
+  const handleDeleteCertification = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta certificación?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/certifications/${id}`, { method: 'DELETE' });
+        // Update local state
+        setCertifications(prev => prev.filter(cert => cert.id !== id));
+        alert('✅ Certificación eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting certification:', error);
+        alert('❌ Error al eliminar la certificación');
+      }
+    }
+  };
+
+  const handleDeleteMicroLesson = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta micro-lección?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/micro-lessons/${id}`, { method: 'DELETE' });
+        // Update local state
+        setMicroLessons(prev => prev.filter(lesson => lesson.id !== id));
+        alert('✅ Micro-lección eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting micro-lesson:', error);
+        alert('❌ Error al eliminar la micro-lección');
+      }
+    }
+  };
+
+  const handleDeleteWebSearch = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta búsqueda web?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/web-search/${id}`, { method: 'DELETE' });
+        // Update local state
+        setWebSearchResults(prev => prev.filter(result => result.id !== id));
+        alert('✅ Búsqueda web eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting web search:', error);
+        alert('❌ Error al eliminar la búsqueda web');
+      }
+    }
+  };
+
+  const handleDeleteSkillsForecast = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este forecast?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/skills-forecast/${id}`, { method: 'DELETE' });
+        // Update local state
+        setSkillsForecasts(prev => prev.filter(forecast => forecast.id !== id));
+        alert('✅ Skills Forecast eliminado exitosamente');
+      } catch (error) {
+        console.error('Error deleting skills forecast:', error);
+        alert('❌ Error al eliminar el skills forecast');
+      }
+    }
+  };
+
+  const handleDeleteCareerCoach = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta sesión?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/career-coach/${id}`, { method: 'DELETE' });
+        // Update local state
+        setCareerCoachSessions(prev => prev.filter(session => session.id !== id));
+        alert('✅ Sesión eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting career coach session:', error);
+        alert('❌ Error al eliminar la sesión');
+      }
+    }
+  };
+
+  const handleDeleteSimulation = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta simulación?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/simulation-results/${id}`, { method: 'DELETE' });
+        // Update local state
+        setSimulationResults(prev => prev.filter(result => result.id !== id));
+        alert('✅ Simulación eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting simulation:', error);
+        alert('❌ Error al eliminar la simulación');
+      }
+    }
+  };
+
   const handleEditMicroLesson = (id, title) => {
     // Navigate to Micro-lessons module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
@@ -876,21 +982,155 @@ const BabelLibrary = () => {
                          </button>
                        )}
                       
-                      <button
-                        onClick={() => handleDeleteBook(resource.id)}
-                        style={{
-                          background: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontSize: '0.8em'
-                        }}
-                        title="Delete resource"
-                      >
-                        🗑️
-                      </button>
+                                             {/* Delete button - calls appropriate function based on resource type */}
+                       {resource.author === 'Micro-lesson' && (
+                         <button
+                           onClick={() => handleDeleteMicroLesson(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete micro-lesson"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Certification' && (
+                         <button
+                           onClick={() => handleDeleteCertification(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete certification"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'AI Career Coach' && (
+                         <button
+                           onClick={() => handleDeleteCareerCoach(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete career coach session"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'YouTube Video' && (
+                         <button
+                           onClick={() => handleDeleteVideo(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete video"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Simulation Result' && (
+                         <button
+                           onClick={() => handleDeleteSimulation(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete simulation"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Skills Forecast' && (
+                         <button
+                           onClick={() => handleDeleteSkillsForecast(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete skills forecast"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Web Search' && (
+                         <button
+                           onClick={() => handleDeleteWebSearch(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete web search result"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {/* For demo books (hardcoded), use the original handleDeleteBook */}
+                       {(resource.author === 'Dr. Sarah Chen' || 
+                         resource.author === 'Prof. Michael Rodriguez' || 
+                         resource.author === 'Dr. Emily Watson' || 
+                         resource.author === 'Prof. David Kim' || 
+                         resource.author === 'Dr. Lisa Thompson') && (
+                         <button
+                           onClick={() => handleDeleteBook(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete demo resource"
+                         >
+                           🗑️
+                         </button>
+                       )}
                     </div>
                   </div>
                   
