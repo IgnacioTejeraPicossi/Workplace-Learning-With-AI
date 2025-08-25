@@ -1,412 +1,361 @@
-import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react';
 import './AgentCursorAI.css';
 
-export default function AgentCursorAI() {
-  // Repository state
+const AgentCursorAI = () => {
   const [repoUrl, setRepoUrl] = useState('');
-  const [repoPath, setRepoPath] = useState('');
   const [branch, setBranch] = useState('main');
-  const [availableBranches, setAvailableBranches] = useState([]);
-  const [detectingBranch, setDetectingBranch] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [currentJob, setCurrentJob] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState('');
+  const [showProgress, setShowProgress] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
   
-  // Analysis state
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analysisStatus, setAnalysisStatus] = useState('');
-  const [readmeContent, setReadmeContent] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  // Results state
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [showRawData, setShowRawData] = useState(false);
-  
-  // Quick templates
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-  
-  // File input ref
-  const fileInputRef = useRef();
+  const progressIntervalRef = useRef(null);
+  const statusIntervalRef = useRef(null);
 
-  // Quick template URLs - using smaller repos to avoid Windows filename length issues
+  // Quick templates for common repositories
   const quickTemplates = [
-    { name: "FastAPI", url: "https://github.com/tiangolo/fastapi", description: "Modern Python web framework" },
-    { name: "Express.js", url: "https://github.com/expressjs/express", description: "Fast, unopinionated web framework" },
-    { name: "Vue.js", url: "https://github.com/vuejs/vue", description: "Progressive JavaScript framework" },
-    { name: "Flask", url: "https://github.com/pallets/flask", description: "Lightweight Python web framework" }
+    { name: 'FastAPI', url: 'https://github.com/tiangolo/fastapi', branch: 'master' },
+    { name: 'Express.js', url: 'https://github.com/expressjs/express', branch: 'master' },
+    { name: 'Vue.js', url: 'https://github.com/vuejs/vue', branch: 'main' },
+    { name: 'Flask', url: 'https://github.com/pallets/flask', branch: 'main' }
   ];
 
   const handleTemplateClick = (template) => {
     setRepoUrl(template.url);
-    setSelectedTemplate(template.name);
-    setBranch('main');
-    setSuccess(`Template "${template.name}" selected!`);
-    setError('');
+    setBranch(template.branch);
   };
 
   const detectBranches = async () => {
-    if (!repoUrl) {
-      setError('Please enter a repository URL first');
-      return;
-    }
-
-    setDetectingBranch(true);
-    setError('');
-
+    if (!repoUrl) return;
+    
     try {
-      const response = await axios.get(`/api/detect-branch/${encodeURIComponent(repoUrl)}`);
-      setAvailableBranches(response.data.branches || []);
-      if (response.data.branches && response.data.branches.length > 0) {
-        setBranch(response.data.branches[0]);
+      // Extract owner and repo from URL
+      const urlParts = repoUrl.split('/');
+      const owner = urlParts[urlParts.length - 2];
+      const repo = urlParts[urlParts.length - 1];
+      
+      // Try common branch names
+      const commonBranches = ['main', 'master', 'develop', 'dev'];
+      
+      for (const branchName of commonBranches) {
+        try {
+          const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/branches/${branchName}`);
+          if (response.ok) {
+            setBranch(branchName);
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
       }
-      setSuccess(`Found ${response.data.branches?.length || 0} branches`);
     } catch (error) {
-      setError('Failed to detect branches. Please check the URL and try again.');
-      console.error('Branch detection error:', error);
-    } finally {
-      setDetectingBranch(false);
+      console.log('Branch detection failed, using default');
     }
   };
 
-  const launchCursorAnalysis = async () => {
-    if (!repoUrl) {
+  const startAnalysis = async () => {
+    if (!repoUrl.trim()) {
       setError('Please enter a repository URL');
       return;
     }
 
-    setAnalyzing(true);
-    setError('');
-    setAnalysisResult(null);
-    setReadmeContent('');
-    setAnalysisStatus('Starting Cursor AI analysis...');
-
     try {
-      // Step 1: Clone repository and get local path
-      setAnalysisStatus('Cloning repository...');
-      const cloneResponse = await axios.post('/api/cursor-agent/clone-repo', {
-        repo_url: repoUrl,
-        branch: branch || 'main'
+      setError(null);
+      setResult(null);
+      setIsAnalyzing(true);
+      setShowProgress(true);
+      setProgress(0);
+      setCurrentStep('Initializing...');
+
+      const response = await fetch('/api/cursor/automation/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          repo_url: repoUrl,
+          branch: branch,
+          timeout_seconds: 900
+        }),
       });
 
-      if (cloneResponse.data.status === 'success') {
-        const localPath = cloneResponse.data.repo_path;
-        setRepoPath(localPath);
-        setAnalysisStatus('Repository cloned successfully. Launching Cursor AI...');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        // Step 2: Launch Cursor AI analysis
-        const cursorResponse = await axios.post('/api/cursor-agent/launch-analysis', {
-          repo_path: localPath,
-          repo_url: repoUrl
-        });
+      const data = await response.json();
+      setCurrentJob(data.job_id);
+      setProgress(data.progress);
+      setCurrentStep(data.current_step);
 
-        if (cursorResponse.data.status === 'success') {
-          setAnalysisStatus('Cursor AI analysis completed. Loading results...');
+      // Start progress monitoring
+      startProgressMonitoring(data.job_id);
+
+    } catch (error) {
+      console.error('Error starting analysis:', error);
+      setError(`Failed to start analysis: ${error.message}`);
+      setIsAnalyzing(false);
+      setShowProgress(false);
+    }
+  };
+
+  const startProgressMonitoring = (jobId) => {
+    // Monitor job status every 2 seconds
+    statusIntervalRef.current = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/cursor/automation/status/${jobId}`);
+        if (response.ok) {
+          const status = await response.json();
           
-          // Step 3: Get the generated README
-          setTimeout(async () => {
-            try {
-              const readmeResponse = await axios.get('/api/cursor-agent/get-readme', {
-                params: { repo_path: localPath }
-              });
-
-              if (readmeResponse.data.content) {
-                setReadmeContent(readmeResponse.data.content);
-                setAnalysisResult({
-                  repo_name: repoUrl.split('/').pop(),
-                  branch_used: branch || 'main',
-                  analysis_type: 'cursor_ai_local',
-                  quality_score: 0.95,
-                  documentation: {
-                    readme: readmeResponse.data.content
-                  }
-                });
-                setSuccess('✅ Cursor AI analysis completed successfully!');
-              } else {
-                setError('⚠️ README not found after Cursor AI analysis.');
-              }
-            } catch (readmeError) {
-              setError('Failed to retrieve README from Cursor AI analysis.');
-              console.error('README retrieval error:', readmeError);
-            } finally {
-              setAnalyzing(false);
-            }
-          }, 2000); // Wait for file generation
-        } else {
-          setError(`Cursor AI analysis failed: ${cursorResponse.data.error}`);
-          setAnalyzing(false);
+          setProgress(status.progress);
+          setCurrentStep(status.current_step);
+          
+          if (status.status === 'completed') {
+            handleAnalysisComplete(jobId);
+          } else if (status.status === 'failed' || status.status === 'timeout') {
+            handleAnalysisError(status.status, status.error_message || 'Analysis failed');
+          }
         }
-      } else {
-        setError(`Repository cloning failed: ${cloneResponse.data.error}`);
-        setAnalyzing(false);
+      } catch (error) {
+        console.error('Error monitoring status:', error);
       }
-    } catch (error) {
-      setError('Failed to launch Cursor AI analysis. Please check the URL and try again.');
-      console.error('Cursor AI analysis error:', error);
-      setAnalyzing(false);
-    }
+    }, 2000);
+
+    // Simulate progress bar movement
+    progressIntervalRef.current = setInterval(() => {
+      if (progress < 95) {
+        setProgress(prev => Math.min(prev + 1, 95));
+      }
+    }, 1000);
   };
 
-  const generateReadmePreview = (content) => {
-    if (!content) {
-      return "No README content available.";
-    }
-    
-    // Truncate if too long
-    if (content.length > 800) {
-      return content.substring(0, 800) + "...\n\n[Click to view full README]";
-    }
-    return content;
-  };
-
-  const getQualityBadge = () => {
-    return (
-      <div className="quality-badge cursor-ai">
-        <span className="badge-icon">🚀</span>
-        <span className="badge-text">Cursor AI Local</span>
-        <span className="badge-score">95%</span>
-      </div>
-    );
-  };
-
-  const handleCreateLearningModule = async () => {
-    if (!analysisResult) {
-      setError('No analysis result to create learning module from');
-      return;
-    }
-
+  const handleAnalysisComplete = async (jobId) => {
     try {
-      setSuccess('Creating learning module...');
-      console.log('Creating learning module with data:', analysisResult);
-      
-      // Create learning module data with proper fallbacks
-      const learningModuleData = {
-        title: `Learning Module: ${analysisResult.repo_name || 'Repository Analysis'}`,
-        description: `Comprehensive learning module based on Cursor AI analysis of ${repoUrl || 'repository'}`,
-        content: readmeContent || 'No content available',
-        analysis_data: analysisResult,
-        created_at: new Date().toISOString(),
-        type: 'cursor_ai_analysis'
-      };
-
-      console.log('Sending learning module data:', learningModuleData);
-      
-      // Save to backend
-      const response = await axios.post('/api/create-learning-module', learningModuleData);
-      
-      if (response.data.success) {
-        setSuccess('Learning module created successfully! Check AI Training Module section.');
-        console.log('Learning module created:', response.data);
-      } else {
-        setError(`Failed to create learning module: ${response.data.message}`);
-        console.error('Backend error:', response.data);
+      const response = await fetch(`/api/cursor/automation/result/${jobId}`);
+      if (response.ok) {
+        const resultData = await response.json();
+        setResult(resultData);
+        setProgress(100);
+        setCurrentStep('Analysis completed successfully!');
       }
-      
     } catch (error) {
-      console.error('Create learning module error:', error);
-      if (error.response) {
-        setError(`Failed to create learning module: ${error.response.data.message || error.response.statusText}`);
-        console.error('Backend response error:', error.response.data);
-      } else if (error.request) {
-        setError('Failed to create learning module: No response from server');
-        console.error('Network error:', error.request);
+      console.error('Error fetching result:', error);
+    }
+
+    // Clean up intervals
+    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    
+    setIsAnalyzing(false);
+    setCurrentJob(null);
+  };
+
+  const handleAnalysisError = (status, message) => {
+    setError(`Analysis ${status}: ${message}`);
+    setProgress(0);
+    setCurrentStep('Analysis failed');
+    
+    // Clean up intervals
+    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    
+    setIsAnalyzing(false);
+    setCurrentJob(null);
+  };
+
+  const resetForm = () => {
+    setRepoUrl('');
+    setBranch('main');
+    setIsAnalyzing(false);
+    setCurrentJob(null);
+    setProgress(0);
+    setCurrentStep('');
+    setShowProgress(false);
+    setResult(null);
+    setError(null);
+    
+    // Clean up intervals
+    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+  };
+
+  const saveToLibrary = async () => {
+    if (!result?.readme_content) return;
+    
+    try {
+      const response = await fetch('/api/docs/import-from-readme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `README - ${repoUrl.split('/').pop()}`,
+          markdown: result.readme_content
+        }),
+      });
+
+      if (response.ok) {
+        alert('README saved to Training Library successfully!');
       } else {
-        setError(`Failed to create learning module: ${error.message}`);
-        console.error('Other error:', error.message);
+        throw new Error('Failed to save to library');
       }
+    } catch (error) {
+      console.error('Error saving to library:', error);
+      alert('Failed to save to Training Library');
     }
   };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup intervals on component unmount
+      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, []);
 
   return (
     <div className="agent-cursor-ai">
-      <h1>Agent Cursor AI</h1>
-      <p className="description">
-        Trigger Cursor AI locally to analyze Git repositories and generate professional documentation.
-        This module launches Cursor AI as a local application to provide the highest quality analysis.
-      </p>
+      {/* Header */}
+      <div className="header-banner">
+        <h1>Agent Cursor AI</h1>
+        <p>
+          Trigger Cursor AI locally to analyze Git repositories and generate professional documentation. 
+          This module launches Cursor AI as a local application to provide the highest quality analysis.
+        </p>
+      </div>
 
-      {/* Repository URL Input */}
-      <div className="repo-input-section">
-        {/* Quick Templates */}
-        <div className="template-section">
-          <h3>Quick Templates</h3>
-          <div className="quick-templates">
-            <div className="template-buttons">
-              {quickTemplates.map((template) => (
-                <button 
-                  key={template.name}
-                  className={`template-button ${selectedTemplate === template.name ? 'active' : ''}`}
-                  onClick={() => handleTemplateClick(template)}
-                >
-                  {template.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* URL Input */}
-        <div className="url-input-group">
-          <div className="url-input-row">
-            <input
-              type="text"
-              className="url-input"
-              placeholder="Enter GitHub repository URL (e.g., https://github.com/username/repo)"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-            />
-            <button 
-              className="detect-branch-btn"
-              onClick={detectBranches}
-              disabled={detectingBranch}
+      {/* Quick Templates */}
+      <div className="quick-templates">
+        <h3>Quick Templates</h3>
+        <div className="template-buttons">
+          {quickTemplates.map((template) => (
+            <button
+              key={template.name}
+              className="template-btn"
+              onClick={() => handleTemplateClick(template)}
+              disabled={isAnalyzing}
             >
-              {detectingBranch ? 'Detecting...' : 'Detect Branches'}
+              {template.name}
             </button>
-          </div>
-          
-          {availableBranches.length > 0 && (
-            <div className="branch-selection">
-              <label>Select Branch:</label>
-              <select 
-                className="branch-select"
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-              >
-                {availableBranches.map((branchName) => (
-                  <option key={branchName} value={branchName}>
-                    {branchName}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          ))}
         </div>
+      </div>
 
-        <button 
-          className="launch-cursor-btn"
-          onClick={launchCursorAnalysis}
-          disabled={analyzing || !repoUrl}
+      {/* Repository Input */}
+      <div className="repository-input">
+        <label htmlFor="repoUrl">GitHub Repository URL</label>
+        <div className="input-group">
+          <input
+            id="repoUrl"
+            type="text"
+            value={repoUrl}
+            onChange={(e) => setRepoUrl(e.target.value)}
+            placeholder="Enter GitHub repository URL (e.g., https://github.com/username/repo)"
+            disabled={isAnalyzing}
+          />
+          <button 
+            className="detect-btn"
+            onClick={detectBranches}
+            disabled={isAnalyzing || !repoUrl}
+          >
+            Detect Branches
+          </button>
+        </div>
+        
+        <div className="branch-input">
+          <label htmlFor="branch">Branch:</label>
+          <input
+            id="branch"
+            type="text"
+            value={branch}
+            onChange={(e) => setBranch(e.target.value)}
+            placeholder="main"
+            disabled={isAnalyzing}
+          />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="action-buttons">
+        <button
+          className="launch-btn"
+          onClick={startAnalysis}
+          disabled={isAnalyzing || !repoUrl.trim()}
         >
-          {analyzing ? (
-            <>
-              <span className="loading-spinner"></span>
-              Launching Cursor AI...
-            </>
-          ) : (
-            <>
-              <span className="cursor-icon">🚀</span>
-              Launch Cursor AI Analysis
-            </>
-          )}
+          🚀 Launch Cursor AI Analysis
+        </button>
+        <button
+          className="reset-btn"
+          onClick={resetForm}
+          disabled={isAnalyzing}
+        >
+          🔄 Reset Form
         </button>
       </div>
 
-      {/* Analysis Status */}
-      {analyzing && (
-        <div className="analysis-status">
-          <div className="status-content">
-            <div className="loading-spinner"></div>
-            <p>{analysisStatus}</p>
+      {/* Progress Bar */}
+      {showProgress && (
+        <div className="progress-container">
+          <div className="progress-header">
+            <h3>Analysis Progress</h3>
+            <span className="progress-percentage">{progress}%</span>
           </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="current-step">{currentStep}</div>
         </div>
       )}
 
-      {/* Analysis Results */}
-      {analysisResult && (
-        <div className="analysis-results">
-          <div className="results-header">
-            <h2>Cursor AI Analysis Results</h2>
-            {getQualityBadge()}
-          </div>
-
-          {/* Executive Summary */}
-          <div className="result-section">
-            <div className="result-section-title">
-              <span className="result-icon">📊</span>
-              Executive Summary
-            </div>
-            <div className="summary-grid">
-              <div className="summary-card">
-                <div className="summary-label">Repository</div>
-                <div className="summary-value">{analysisResult.repo_name}</div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-label">Branch</div>
-                <div className="summary-value">{analysisResult.branch_used}</div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-label">Analysis Type</div>
-                <div className="summary-value">Cursor AI Local</div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-label">Quality Score</div>
-                <div className="summary-value">95%</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Generated README */}
-          {readmeContent && (
-            <div className="result-section">
-              <div className="result-section-title">
-                <span className="result-icon">📚</span>
-                Generated README.md
-              </div>
-              <div className="readme-content">
-                <div className="readme-preview">
-                  <pre>{generateReadmePreview(readmeContent)}</pre>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="documentation-actions">
-            <button className="doc-action-btn">
-              <span className="action-icon">💾</span>
-              Save Analysis
-            </button>
-            <button className="doc-action-btn">
-              <span className="action-icon">📥</span>
-              Download README
-            </button>
-            <button className="doc-action-btn" onClick={handleCreateLearningModule}>
-              <span className="action-icon">🎓</span>
-              Create Learning Module
-            </button>
-          </div>
-
-          {/* Raw Data Toggle */}
-          <div className="raw-data-toggle">
-            <button 
-              className="toggle-btn"
-              onClick={() => setShowRawData(!showRawData)}
-            >
-              {showRawData ? 'Hide' : 'Show'} Raw Analysis Data
-            </button>
-          </div>
-
-          {showRawData && (
-            <div className="raw-data-section">
-              <pre>{JSON.stringify(analysisResult, null, 2)}</pre>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Error State */}
+      {/* Error Display */}
       {error && (
         <div className="error-message">
-          <span className="error-icon">❌</span>
+          <span className="error-icon">⚠️</span>
           {error}
         </div>
       )}
 
-      {/* Success State */}
-      {success && (
-        <div className="success-message">
-          <span className="success-icon">✅</span>
-          {success}
+      {/* Results Display */}
+      {result && (
+        <div className="results-container">
+          <div className="results-header">
+            <h3>Generated README.md</h3>
+            <button className="save-btn" onClick={saveToLibrary}>
+              💾 Save to Training Library
+            </button>
+          </div>
+          <div className="readme-preview">
+            <pre>{result.readme_content}</pre>
+          </div>
         </div>
       )}
+
+      {/* How It Works */}
+      <div className="how-it-works">
+        <h3>How It Works</h3>
+        <ol>
+          <li><strong>Enter Repository URL:</strong> Provide a GitHub repository URL to analyze</li>
+          <li><strong>Launch Analysis:</strong> Click the launch button to start Cursor AI</li>
+          <li><strong>Automatic Analysis:</strong> Cursor AI will open locally and analyze the repository</li>
+          <li><strong>Document Generation:</strong> Professional README.md will be generated automatically</li>
+          <li><strong>Results:</strong> View and save the generated documentation to your Training Library</li>
+        </ol>
+      </div>
+
+      {/* Important Note */}
+      <div className="important-note">
+        <strong>Note:</strong> This module requires Cursor AI to be installed on your local machine. 
+        The system will automatically launch Cursor AI, trigger the documentation generation, 
+        and monitor the process until completion.
+      </div>
     </div>
   );
-} 
+};
+
+export default AgentCursorAI; 

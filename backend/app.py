@@ -50,6 +50,10 @@ app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
+# Cursor AI Automation router
+from backend.cursor_ai_automation import router as cursor_automation_router
+app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
+
 # Learning modules routers
 from backend.certifications import certifications_router
 from backend.micro_lessons import micro_lessons_router
@@ -1627,7 +1631,10 @@ async def create_learning_module(request: LearningModuleRequest):
 async def get_learning_modules():
     try:
         # Get all learning modules from the database using async cursor
-        cursor = lessons_collection.find({"type": "repository_analysis"})
+        # Include both repository_analysis and cursor_ai_analysis types
+        cursor = lessons_collection.find({
+            "type": {"$in": ["repository_analysis", "cursor_ai_analysis", "imported_readme"]}
+        })
         modules = await cursor.to_list(length=None)
         
         # Convert ObjectId to string for JSON serialization
@@ -1661,6 +1668,82 @@ async def get_learning_module(module_id: str):
             
     except Exception as e:
         print(f"Error fetching learning module: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
+@app.get("/api/cursor-ai-docs")
+async def get_cursor_ai_docs():
+    """Get all Cursor AI generated documentation"""
+    try:
+        # Get all Cursor AI generated documents
+        cursor = lessons_collection.find({
+            "type": {"$in": ["cursor_ai_analysis", "imported_readme"]}
+        }).sort("created_at", -1)  # Sort by newest first
+        
+        docs = await cursor.to_list(length=None)
+        
+        # Convert ObjectId to string for JSON serialization
+        for doc in docs:
+            if "_id" in doc:
+                doc["_id"] = str(doc["_id"])
+        
+        return {
+            "success": True,
+            "docs": docs,
+            "total": len(docs)
+        }
+        
+    except Exception as e:
+        print(f"Error fetching Cursor AI docs: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
+# Import README to Training Library endpoint
+@app.post("/api/docs/import-from-readme")
+async def import_readme_to_library(request: Request):
+    """Import README.md content to the Training Library"""
+    try:
+        # Get request body
+        body = await request.json()
+        title = body.get("title", "Imported README")
+        markdown = body.get("markdown", "")
+        
+        if not markdown.strip():
+            return {"success": False, "message": "No markdown content provided"}
+        
+        # Create learning module from README
+        learning_module = {
+            "title": title,
+            "content": markdown,
+            "type": "imported_readme",
+            "source": "cursor_ai_automation",
+            "created_at": datetime.now().isoformat(),
+            "user_id": "system",  # System-generated content
+            "difficulty": "intermediate",
+            "estimated_time": "15-30 minutes",
+            "topics": ["documentation", "repository_analysis", "imported_content"],
+            "prerequisites": [],
+            "learning_objectives": [
+                "Understand the repository structure and purpose",
+                "Learn from the generated documentation",
+                "Apply best practices identified in the analysis"
+            ],
+            "status": "active"
+        }
+        
+        # Save to lessons collection
+        result = await lessons_collection.insert_one(learning_module)
+        
+        if result and hasattr(result, 'inserted_id') and result.inserted_id:
+            return {
+                "success": True,
+                "message": "README imported to Training Library successfully",
+                "module_id": str(result.inserted_id),
+                "title": title
+            }
+        else:
+            return {"success": False, "message": "Failed to save to Training Library"}
+            
+    except Exception as e:
+        print(f"Error importing README to library: {e}")
         return {"success": False, "message": f"Error: {str(e)}"}
 
 def calculate_user_learning_vector(mastery_scores, all_topics):
