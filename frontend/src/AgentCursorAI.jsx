@@ -398,6 +398,7 @@ const AgentCursorAI = () => {
         <h3>How It Works</h3>
         <ol>
           <li><strong>Enter Repository URL:</strong> Provide a GitHub repository URL to analyze</li>
+          <li><strong>User Prompt for Analysis:</strong> Enter custom instructions for Cursor AI analysis (optional)</li>
           <li><strong>Launch Analysis:</strong> Click the launch button to start Cursor AI</li>
           <li><strong>Automatic Analysis:</strong> Cursor AI will open locally and analyze the repository</li>
           <li><strong>Document Generation:</strong> Professional README.md will be generated automatically</li>
