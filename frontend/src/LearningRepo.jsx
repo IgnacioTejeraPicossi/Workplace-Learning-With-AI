@@ -643,6 +643,33 @@ export default function LearningRepo() {
     setSuccess('');
   };
 
+  // Delete Cursor AI document
+  const deleteCursorAIDoc = async (docId) => {
+    try {
+      setError('');
+      setSuccess('Deleting Cursor AI document...');
+      
+      // Debug logging
+      console.log('Attempting to delete document with ID:', docId);
+      console.log('ID type:', typeof docId);
+      console.log('ID length:', docId ? docId.length : 'undefined');
+      
+      const response = await axios.delete(`/api/delete-cursor-ai-doc/${docId}`);
+      
+      if (response.data.success) {
+        setSuccess('Cursor AI document deleted successfully!');
+        await loadCursorAIDocs(); // Reload the list
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(`Failed to delete Cursor AI document: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Delete Cursor AI document error:', error);
+      const errorMessage = error.response?.data?.detail || error.message;
+      setError(`Failed to delete Cursor AI document: ${errorMessage}`);
+    }
+  };
+
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ color: '#333', marginBottom: '2rem' }}>
@@ -930,6 +957,22 @@ export default function LearningRepo() {
                     }}
                   >
                     🧠 Generate Quiz
+                  </button>
+
+                  <button
+                    onClick={() => deleteCursorAIDoc(doc._id)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#dc3545',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem'
+                    }}
+                    title="Delete this Cursor AI document"
+                  >
+                    🗑️ Delete
                   </button>
                 </div>
               </div>

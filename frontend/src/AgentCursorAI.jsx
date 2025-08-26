@@ -11,6 +11,7 @@ const AgentCursorAI = () => {
   const [showProgress, setShowProgress] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [userPrompt, setUserPrompt] = useState('');
   
   const progressIntervalRef = useRef(null);
   const statusIntervalRef = useRef(null);
@@ -78,7 +79,8 @@ const AgentCursorAI = () => {
         body: JSON.stringify({
           repo_url: repoUrl,
           branch: branch,
-          timeout_seconds: 900
+          timeout_seconds: 900,
+          user_prompt: userPrompt
         }),
       });
 
@@ -145,12 +147,26 @@ const AgentCursorAI = () => {
       console.error('Error fetching result:', error);
     }
 
-    // Clean up intervals
-    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    // Clean up intervals and reset all states
+    if (statusIntervalRef.current) {
+      clearInterval(statusIntervalRef.current);
+      statusIntervalRef.current = null;
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
     
+    // Reset all states completely
     setIsAnalyzing(false);
     setCurrentJob(null);
+    setShowProgress(false);
+    
+    // Force UI update
+    setTimeout(() => {
+      setProgress(0);
+      setCurrentStep('');
+    }, 100);
   };
 
   const handleAnalysisError = (status, message) => {
@@ -158,12 +174,26 @@ const AgentCursorAI = () => {
     setProgress(0);
     setCurrentStep('Analysis failed');
     
-    // Clean up intervals
-    if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    // Clean up intervals and reset all states
+    if (statusIntervalRef.current) {
+      clearInterval(statusIntervalRef.current);
+      statusIntervalRef.current = null;
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
     
+    // Reset all states completely
     setIsAnalyzing(false);
     setCurrentJob(null);
+    setShowProgress(false);
+    
+    // Force UI update
+    setTimeout(() => {
+      setProgress(0);
+      setCurrentStep('');
+    }, 100);
   };
 
   const resetForm = () => {
@@ -176,6 +206,7 @@ const AgentCursorAI = () => {
     setShowProgress(false);
     setResult(null);
     setError(null);
+    setUserPrompt(''); // Reset user prompt
     
     // Clean up intervals
     if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
@@ -210,9 +241,15 @@ const AgentCursorAI = () => {
 
   useEffect(() => {
     return () => {
-      // Cleanup intervals on component unmount
-      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      // Cleanup function to prevent memory leaks
+      if (statusIntervalRef.current) {
+        clearInterval(statusIntervalRef.current);
+        statusIntervalRef.current = null;
+      }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
     };
   }, []);
 
@@ -276,24 +313,44 @@ const AgentCursorAI = () => {
             disabled={isAnalyzing}
           />
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="action-buttons">
-        <button
-          className="launch-btn"
-          onClick={startAnalysis}
-          disabled={isAnalyzing || !repoUrl.trim()}
-        >
-          🚀 Launch Cursor AI Analysis
-        </button>
-        <button
-          className="reset-btn"
-          onClick={resetForm}
-          disabled={isAnalyzing}
-        >
-          🔄 Reset Form
-        </button>
+        {/* Agregar campo de texto entre Branch y Launch Cursor AI Analysis */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+            User prompt for analysis:
+          </label>
+          <textarea
+            value={userPrompt}
+            onChange={(e) => setUserPrompt(e.target.value)}
+            placeholder="Enter custom instructions for Cursor AI analysis (optional)"
+            style={{
+              width: '100%',
+              minHeight: '80px',
+              padding: '0.75rem',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <button
+            className="launch-btn"
+            onClick={startAnalysis}
+            disabled={isAnalyzing || !repoUrl.trim()}
+          >
+            🚀 Launch Cursor AI Analysis
+          </button>
+          <button
+            className="reset-btn"
+            onClick={resetForm}
+            disabled={isAnalyzing}
+          >
+            🔄 Reset Form
+          </button>
+        </div>
       </div>
 
       {/* Progress Bar */}

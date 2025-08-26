@@ -1696,6 +1696,35 @@ async def get_cursor_ai_docs():
         print(f"Error fetching Cursor AI docs: {e}")
         return {"success": False, "message": f"Error: {str(e)}"}
 
+@app.delete("/api/delete-cursor-ai-doc/{doc_id}")
+async def delete_cursor_ai_doc(doc_id: str):
+    """Delete a Cursor AI generated document"""
+    try:
+        from bson import ObjectId
+        
+        # Validate ObjectId format
+        if not ObjectId.is_valid(doc_id):
+            return {"success": False, "message": "Invalid document ID format"}
+        
+        # Convert string to ObjectId
+        object_id = ObjectId(doc_id)
+        
+        # Find and delete the document
+        result = await lessons_collection.delete_one({"_id": object_id})
+        
+        if result.deleted_count > 0:
+            return {
+                "success": True,
+                "message": "Cursor AI document deleted successfully",
+                "deleted_id": doc_id
+            }
+        else:
+            return {"success": False, "message": "Document not found"}
+            
+    except Exception as e:
+        print(f"Error deleting Cursor AI document: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
 # Import README to Training Library endpoint
 @app.post("/api/docs/import-from-readme")
 async def import_readme_to_library(request: Request):

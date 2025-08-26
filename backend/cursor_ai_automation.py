@@ -1,6 +1,6 @@
 """
-Cursor AI Automation System - COMPLETE AUTOMATION
-Fully automated repository analysis and README generation
+Cursor AI Automation System - SIMPLIFIED VERSION
+Fast and efficient repository analysis and README generation
 """
 
 import os
@@ -25,7 +25,7 @@ JOBS = {}
 class AutomationRequest(BaseModel):
     repo_url: str
     branch: Optional[str] = "main"
-    timeout_seconds: Optional[int] = 900  # 15 minutes default
+    timeout_seconds: Optional[int] = 300  # 5 minutes default - much faster!
 
 class AutomationResponse(BaseModel):
     job_id: str
@@ -181,9 +181,29 @@ Please analyze this repository and generate a professional README.md NOW.
         raise
 
 def _launch_cursor_ai_automated(repo: Path, job_id: str) -> bool:
-    """Launch Cursor AI with full automation"""
+    """Launch Cursor AI with full automation - Prevents duplicate instances"""
     try:
         _update_job_progress(job_id, 70, "Launching Cursor AI...")
+        
+        # Check if Cursor AI is already running to prevent duplicate instances
+        try:
+            result = subprocess.run([
+                "powershell.exe", 
+                "-Command", 
+                "Get-Process -Name 'Cursor' -ErrorAction SilentlyContinue | Measure-Object | Select-Object -ExpandProperty Count"
+            ], capture_output=True, text=True)
+            
+            if result.returncode == 0 and result.stdout.strip().isdigit():
+                cursor_count = int(result.stdout.strip())
+                if cursor_count > 0:
+                    print(f"Cursor AI is already running ({cursor_count} instances). Using existing instance.")
+                    _update_job_progress(job_id, 75, "Using existing Cursor AI instance...")
+                else:
+                    print("No Cursor AI instances found. Launching new instance.")
+            else:
+                print("Could not check Cursor AI status. Proceeding with launch.")
+        except Exception as e:
+            print(f"Warning: Could not check Cursor AI status: {e}")
         
         # Create automation script
         script_content = f"""param([string]$repoPath, [string]$jobId)
@@ -201,13 +221,25 @@ if (-not (Test-Path $cursorPath)) {{
 }}
 
 try {{
-    # Step 1: Open Cursor AI with repository
-    Write-Host "Opening Cursor AI with repository..."
-    Start-Process -FilePath $cursorPath -ArgumentList $repoPath -PassThru
+    # Step 1: Check if Cursor AI is already running
+    Write-Host "Checking if Cursor AI is already running..."
+    $existingProcesses = Get-Process -Name "Cursor" -ErrorAction SilentlyContinue
+    if ($existingProcesses) {{
+        Write-Host "Cursor AI is already running. Using existing instance."
+        # Focus on existing window instead of opening new one
+        $existingProcesses[0].MainWindowHandle | ForEach-Object {{
+            Add-Type -AssemblyName System.Windows.Forms
+            [System.Windows.Forms.SendKeys]::SendWait("%{{$_}}")
+        }}
+    }} else {{
+        # Step 2: Open Cursor AI with repository (only if not running)
+        Write-Host "Opening Cursor AI with repository..."
+        Start-Process -FilePath $cursorPath -ArgumentList $repoPath
+    }}
     
-    # Step 2: Wait for app to open
-    Write-Host "Waiting for Cursor AI to open..."
-    Start-Sleep -Seconds 5
+    # Step 3: Wait for app to open/focus
+    Write-Host "Waiting for Cursor AI to be ready..."
+    Start-Sleep -Seconds 3
     
     # Step 3: Send Ctrl+Shift+G for README generation
     Write-Host "Sending Ctrl+Shift+G for README generation..."
@@ -262,76 +294,112 @@ try {{
         _update_job_progress(job_id, 0, f"Error launching Cursor AI: {e}", "failed")
         return False
 
-def _monitor_automation_progress(job_id: str, repo: Path, timeout_sec: int = 900):
-    """Monitor automation progress with detailed tracking"""
+async def _monitor_simple_progress(job_id: str, repo: Path, timeout_sec: int = 300):
+    """Simple and efficient progress monitoring"""
     try:
-        _update_job_progress(job_id, 85, "Monitoring automation progress...")
+        _update_job_progress(job_id, 85, "Monitoring for README generation...")
         
         readme = repo / "README.md"
         start = time.time()
-        initial_hash = _hash_file(readme)
         
-        print(f"Starting automation monitoring for {repo}")
-        print(f"Initial README hash: {initial_hash}")
+        print(f"Starting simple monitoring for {repo}")
         
         check_count = 0
         while time.time() - start < timeout_sec:
             check_count += 1
-            current_time = time.strftime('%H:%M:%S')
             elapsed = int(time.time() - start)
             
-            # Update progress based on elapsed time
-            progress = min(85 + int((elapsed / timeout_sec) * 10), 95)
-            
             if readme.exists():
-                current_hash = _hash_file(readme)
-                file_size = readme.stat().st_size
-                
-                if current_hash and current_hash != initial_hash:
-                    # README has changed!
-                    try:
-                        content = readme.read_text(encoding='utf-8')
-                        if len(content.strip()) > 100:  # Basic validation
-                            _update_job_progress(job_id, 100, "README.md generated successfully!", "completed")
-                            
-                            JOBS[job_id].update({
-                                "status": "completed",
-                                "completion_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                                "readme_path": str(readme),
-                                "readme_content": content
-                            })
-                            
-                            print(f"🎉 AUTOMATION COMPLETED! README.md generated successfully")
-                            return True
-                        else:
-                            _update_job_progress(job_id, progress, f"README.md updated but content seems short ({len(content)} chars)")
-                    except Exception as e:
-                        _update_job_progress(job_id, progress, f"Error reading README.md: {e}")
-                else:
-                    _update_job_progress(job_id, progress, f"Monitoring... README.md unchanged (check #{check_count})")
-            else:
-                _update_job_progress(job_id, progress, f"Monitoring... README.md not found yet (check #{check_count})")
-            
-            # Log every 10 checks
-            if check_count % 10 == 0:
-                print(f"Check #{check_count} at {current_time} (elapsed: {elapsed}s)")
-                # List repository contents for debugging
-                print(f"Repository contents:")
-                for item in repo.iterdir():
-                    if item.is_file():
-                        print(f"  📄 {item.name} ({item.stat().st_size} bytes)")
+                try:
+                    content = readme.read_text(encoding='utf-8')
+                    if len(content.strip()) > 100:  # Basic validation
+                        _update_job_progress(job_id, 100, "README.md generated successfully!", "completed")
+                        
+                        JOBS[job_id].update({
+                            "status": "completed",
+                            "completion_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                            "readme_path": str(readme),
+                            "readme_content": content
+                        })
+                        
+                        # Automatically save to Learning Repository
+                        await _save_to_learning_repository(job_id, content, repo)
+                        
+                        print(f"🎉 README.md generated successfully in {elapsed} seconds!")
+                        return True
                     else:
-                        print(f"  📁 {item.name}/")
+                        _update_job_progress(job_id, 90, f"README.md exists but content short ({len(content)} chars)")
+                except Exception as e:
+                    print(f"Error reading README: {e}")
             
-            time.sleep(3)
+            # Update progress based on time (simple approach)
+            progress = min(95, 85 + int((elapsed / timeout_sec) * 10))
+            _update_job_progress(job_id, progress, f"Waiting for README.md... ({elapsed}s elapsed)")
+            
+            # Check every 10 seconds instead of 3
+            time.sleep(10)
         
         # Timeout reached
-        _update_job_progress(job_id, 0, f"Automation timeout after {timeout_sec} seconds", "timeout")
+        _update_job_progress(job_id, 0, f"Timeout after {timeout_sec} seconds", "timeout")
         JOBS[job_id]["status"] = "timeout"
         return False
         
     except Exception as e:
-        _update_job_progress(job_id, 0, f"Error in automation monitoring: {e}", "failed")
+        _update_job_progress(job_id, 0, f"Error in monitoring: {e}", "failed")
+        return False
+
+async def _save_to_learning_repository(job_id: str, readme_content: str, repo: Path):
+    """Save generated README to Learning Repository"""
+    try:
+        from datetime import datetime
+        
+        # Get job info
+        job = JOBS.get(job_id)
+        if not job:
+            print(f"Job {job_id} not found for saving to Learning Repository")
+            return False
+        
+        # Extract repository name from URL
+        repo_url = job.get("repo_url", "")
+        repo_name = repo_url.split("/")[-1] if repo_url else "Unknown Repository"
+        
+        # Create learning module data
+        learning_module = {
+            "title": f"README - {repo_name}",
+            "content": readme_content,
+            "type": "imported_readme",
+            "source": "cursor_ai_automation",
+            "created_at": datetime.now().isoformat(),
+            "user_id": "system",
+            "difficulty": "intermediate",
+            "estimated_time": "15-30 minutes",
+            "topics": ["documentation", "repository_analysis", "imported_content"],
+            "prerequisites": [],
+            "learning_objectives": [
+                "Understand the repository structure and purpose",
+                "Learn from the generated documentation",
+                "Apply best practices identified in the analysis"
+            ],
+            "status": "active",
+            "repo_url": repo_url,
+            "repo_name": repo_name
+        }
+        
+        # Import the collection
+        from backend.app import lessons_collection
+        
+        # Save to lessons collection
+        result = await lessons_collection.insert_one(learning_module)
+        
+        if result and hasattr(result, 'inserted_id') and result.inserted_id:
+            print(f"✅ README saved to Learning Repository with ID: {result.inserted_id}")
+            return True
+        else:
+            print("❌ Failed to save README to Learning Repository")
+            return False
+            
+    except Exception as e:
+        print(f"Error saving to Learning Repository: {e}")
         return False
 
 @router.post("/start", response_model=AutomationResponse)
@@ -371,7 +439,7 @@ async def start_automation(req: AutomationRequest, bg: BackgroundTasks):
             raise HTTPException(status_code=500, detail="Failed to launch Cursor AI")
         
         # Start background monitoring
-        bg.add_task(_monitor_automation_progress, job_id, repo_path, req.timeout_seconds)
+        bg.add_task(_monitor_simple_progress, job_id, repo_path, req.timeout_seconds)
         
         print(f"✅ Automation job {job_id} started successfully")
         
