@@ -365,6 +365,64 @@ graph TB
 
 ---
 
+## 🔧 API Configuration Architecture
+
+### System Overview
+The API Configuration module provides a flexible interface to manage multiple AI service providers with intelligent fallback capabilities.
+
+```mermaid
+graph TD
+    A[API Configuration Module] --> B[Provider Selection]
+    A --> C[Configuration Management]
+    A --> D[Fallback System]
+    A --> E[Testing & Validation]
+
+    B --> B1[ItemAI API]
+    B --> B2[OpenRouter API]
+    B --> B3[OpenAI API]
+
+    C --> C1[URL Configuration]
+    C --> C2[API Key Management]
+    C --> C3[Local Storage]
+
+    D --> D1[Primary Provider]
+    D --> D2[Secondary Provider]
+    D --> D3[Fallback Chain]
+
+    E --> E1[Connection Testing]
+    E --> E2[API Validation]
+    E --> E3[Error Handling]
+
+    F[Frontend Components] --> G[Backend API]
+    G --> H[Database Storage]
+    H --> I[Configuration Cache]
+```
+
+### Key Features
+- **Multi-provider support** with intelligent fallback
+- **Secure API key management** and storage
+- **Real-time connection testing** and validation
+- **Automatic provider switching** on failures
+- **Local configuration persistence**
+- **API testing utilities** for validation
+- **Environment variable management** for secure configuration
+
+### File Structure
+```
+frontend/src/components/
+├── APIConfig.jsx          # Main configuration interface
+
+backend/
+├── app.py                # API configuration endpoints
+├── config.py             # General configuration management
+├── env_config.py         # Environment variable management
+├── itemai_api.py         # ItemAI API integration
+├── api_test.py           # API testing utilities
+└── test_api_key.py       # API key validation
+```
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### 🟢 First Run Checklist
