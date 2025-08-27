@@ -371,31 +371,36 @@ graph TB
 The API Configuration module provides a flexible interface to manage multiple AI service providers with intelligent fallback capabilities.
 
 ```mermaid
-graph TD
-    A[API Configuration Module] --> B[Provider Selection]
-    A --> C[Configuration Management]
-    A --> D[Fallback System]
-    A --> E[Testing & Validation]
-
-    B --> B1[ItemAI API]
-    B --> B2[OpenRouter API]
-    B --> B3[OpenAI API]
-
-    C --> C1[URL Configuration]
-    C --> C2[API Key Management]
-    C --> C3[Local Storage]
-
-    D --> D1[Primary Provider]
-    D --> D2[Secondary Provider]
-    D --> D3[Fallback Chain]
-
-    E --> E1[Connection Testing]
-    E --> E2[API Validation]
-    E --> E3[Error Handling]
-
-    F[Frontend Components] --> G[Backend API]
-    G --> H[Database Storage]
-    H --> I[Configuration Cache]
+graph TB
+    %% Main Configuration Module
+    Config[🔧 API Configuration Module] --> Providers[Provider Selection]
+    Config --> Management[Configuration Management]
+    Config --> Fallback[Fallback System]
+    Config --> Testing[Testing & Validation]
+    
+    %% Provider Selection
+    Providers --> ItemAI[ItemAI API]
+    Providers --> OpenRouter[OpenRouter API]
+    Providers --> OpenAI[OpenAI API]
+    
+    %% Configuration Management
+    Management --> URLs[URL Configuration]
+    Management --> Keys[API Key Management]
+    Management --> Storage[Local Storage]
+    
+    %% Fallback System
+    Fallback --> Primary[Primary Provider]
+    Fallback --> Secondary[Secondary Provider]
+    Fallback --> Chain[Fallback Chain]
+    
+    %% Testing & Validation
+    Testing --> Connection[Connection Testing]
+    Testing --> Validation[API Validation]
+    Testing --> Errors[Error Handling]
+    
+    %% Backend Integration
+    Testing --> Backend[Backend API]
+    Backend --> Database[Database Storage]
 ```
 
 ### Key Features
