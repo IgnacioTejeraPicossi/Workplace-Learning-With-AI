@@ -251,7 +251,7 @@ function AppContent() {
                 top: "20%",
                 fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
                 fontWeight: 600,
-                color: "rgba(103, 58, 183, 0.85)", // Much more visible purple
+                color: "rgba(135, 206, 235, 0.6)", // Light blue with reduced intensity
                 lineHeight: 1.5,
                 zIndex: 0,
                 pointerEvents: "none",
@@ -262,14 +262,14 @@ function AppContent() {
                 background: "rgba(255, 255, 255, 0.95)",
                 padding: "20px",
                 borderRadius: "12px",
-                border: "2px solid rgba(103, 58, 183, 0.3)"
+                border: "2px solid rgba(135, 206, 235, 0.2)"
               }}
             >
               <strong>I'm not just building a learning app —</strong>
               <br /><br />
               <strong>I'm creating a co-evolving AI learning assistant where users shape its growth.</strong>
               <br /><br />
-              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(103, 58, 183, 1)" }}>— Ignacio Tejera</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>— Ignacio Tejera</span>
             </div>
             
             {/* Top Right Background Message */}
@@ -280,7 +280,7 @@ function AppContent() {
                 top: "15%",
                 fontSize: "clamp(1.1rem, 2.5vw, 1.6rem)",
                 fontWeight: 600,
-                color: "rgba(103, 58, 183, 0.85)", // Much more visible purple
+                color: "rgba(135, 206, 235, 0.6)", // Light blue with reduced intensity
                 lineHeight: 1.5,
                 zIndex: 0,
                 pointerEvents: "none",
@@ -291,7 +291,7 @@ function AppContent() {
                 background: "rgba(255, 255, 255, 0.95)",
                 padding: "20px",
                 borderRadius: "12px",
-                border: "2px solid rgba(103, 58, 183, 0.3)"
+                border: "2px solid rgba(135, 206, 235, 0.2)"
               }}
             >
               <strong>We are not replacing human creativity — we are amplifying it 100 times.</strong>
@@ -300,7 +300,7 @@ function AppContent() {
               <br /><br />
               <strong>This changes everything about who can build companies.</strong>
               <br />
-              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(103, 58, 183, 1)" }}>— Jensen Huang</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>— Jensen Huang</span>
             </div>
             {/* Main Content */}
             <div style={{
