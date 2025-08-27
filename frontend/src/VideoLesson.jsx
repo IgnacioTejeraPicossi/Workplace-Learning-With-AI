@@ -196,6 +196,10 @@ function VideoLesson({ user }) {
         // Force a re-render of the SavedVideos component
         const event = new CustomEvent('videoSaved');
         window.dispatchEvent(event);
+        
+        // Also emit videoUpdated event for Dashboard refresh
+        const updateEvent = new CustomEvent('videoUpdated');
+        window.dispatchEvent(updateEvent);
       }, 100);
       
       // Show success message

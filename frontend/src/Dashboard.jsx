@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { auth } from "./firebase";
 import { fetchMicroLessons, fetchSavedVideos } from "./api";
 import ProgressCard from "./ProgressCard";
@@ -115,6 +115,118 @@ function Dashboard({ user, onSectionSelect }) {
     updateLearningStreak();
   }, []);
 
+  // Define fetchUserData function with useCallback to prevent infinite loops
+  const fetchUserData = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const lessonsData = await fetchMicroLessons();
+      const lessons = lessonsData || [];
+      const actualLessonsCount = lessons.length;
+      
+      // Fetch saved videos count
+      const videosData = await fetchSavedVideos();
+      const videos = videosData.videos || [];
+      const actualVideosCount = videos.length;
+      
+      // Update progress with real data
+      const userProgress = getInitialProgress(user.uid);
+      const updatedProgress = {
+        ...userProgress,
+        lessonsCompleted: actualLessonsCount,
+        videosCompleted: actualVideosCount, // Add videos count
+        lastActivity: userProgress.lastActivity || (lessons[0]?.created_at || new Date().toISOString())
+      };
+      setProgress(updatedProgress);
+      localStorage.setItem(getProgressKey(user.uid), JSON.stringify(updatedProgress));
+
+      // Group lessons by week for line chart
+      const weekMap = {};
+      const videoWeekMap = {};
+      
+      // Process micro-lessons
+      lessons.forEach(lesson => {
+        if (lesson.created_at) {
+          const week = getISOWeek(lesson.created_at);
+          weekMap[week] = (weekMap[week] || 0) + 1;
+        }
+      });
+      
+      // Process video lessons from real API data
+      videos.forEach(video => {
+        if (video.saved_at) {
+          const week = getISOWeek(video.saved_at);
+          videoWeekMap[week] = (videoWeekMap[week] || 0) + 1;
+        }
+      });
+      
+      // Combine all weeks and create chart data
+      const allWeeks = [...new Set([...Object.keys(weekMap), ...Object.keys(videoWeekMap)])].sort();
+      
+      // If no real data, create some sample data for demonstration
+      if (allWeeks.length === 0) {
+        const currentWeek = getISOWeek(new Date().toISOString());
+        const lastWeek = getISOWeek(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+        const twoWeeksAgo = getISOWeek(new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString());
+        
+        const trends = [
+          { week: twoWeeksAgo, microLessons: 2, videoLessons: 1 },
+          { week: lastWeek, microLessons: 5, videoLessons: 3 },
+          { week: currentWeek, microLessons: 8, videoLessons: 4 }
+        ];
+        setLessonTrends(trends);
+      } else {
+        const trends = allWeeks.map(week => ({ 
+          week, 
+          microLessons: weekMap[week] || 0,
+          videoLessons: videoWeekMap[week] || 0
+        }));
+        setLessonTrends(trends);
+      }
+
+      // Group lessons by topic for pie chart
+      const topicMap = {};
+      lessons.forEach(lesson => {
+        if (lesson.topic) {
+          topicMap[lesson.topic] = (topicMap[lesson.topic] || 0) + 1;
+        }
+      });
+      
+      // Add real video topics to the breakdown
+      videos.forEach(video => {
+        if (video.topic) {
+          topicMap[video.topic] = (topicMap[video.topic] || 0) + 1;
+        }
+      });
+      
+      // Convert to array for pie chart
+      const breakdown = Object.keys(topicMap).map(topic => ({
+        name: topic,
+        value: topicMap[topic]
+      }));
+      
+      // If no real data, create sample breakdown
+      if (breakdown.length === 0) {
+        const sampleBreakdown = [
+          { name: 'Programming', value: 5 },
+          { name: 'Leadership', value: 3 },
+          { name: 'Agile', value: 2 },
+          { name: 'Communication', value: 1 }
+        ];
+        setTopicBreakdown(sampleBreakdown);
+      } else {
+        setTopicBreakdown(breakdown);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      const userProgress = getInitialProgress(user.uid);
+      setProgress(userProgress);
+      setLessonTrends([]);
+      setTopicBreakdown([]);
+    }
+  }, [user]);
+
+  // Load user data on component mount
   useEffect(() => {
     if (!user) {
       setProgress(getDefaultProgress());
@@ -124,130 +236,13 @@ function Dashboard({ user, onSectionSelect }) {
       return;
     }
 
-    // Load user-specific progress
+        // Load user-specific progress
     const userProgress = getInitialProgress(user.uid);
     setProgress(userProgress);
 
-    // Fetch actual lessons count from backend
-    const fetchUserData = async () => {
-      try {
-        const lessonsData = await fetchMicroLessons();
-        const lessons = lessonsData || [];
-        const actualLessonsCount = lessons.length;
-        
-        // Fetch saved videos count
-        const videosData = await fetchSavedVideos();
-        const videos = videosData.videos || [];
-        const actualVideosCount = videos.length;
-        
-        // Update progress with real data
-        const updatedProgress = {
-          ...userProgress,
-          lessonsCompleted: actualLessonsCount,
-          videosCompleted: actualVideosCount, // Add videos count
-          lastActivity: userProgress.lastActivity || (lessons[0]?.created_at || new Date().toISOString())
-        };
-        setProgress(updatedProgress);
-        localStorage.setItem(getProgressKey(user.uid), JSON.stringify(updatedProgress));
-
-        // Group lessons by week for line chart
-        const weekMap = {};
-        const videoWeekMap = {};
-        
-        // Process micro-lessons
-        lessons.forEach(lesson => {
-          if (lesson.created_at) {
-            const week = getISOWeek(lesson.created_at);
-            weekMap[week] = (weekMap[week] || 0) + 1;
-          }
-        });
-        
-        // Mock video lessons data (replace with actual API call when available)
-        const mockVideoLessons = [
-          { created_at: '2025-01-15', topic: 'Agile' },
-          { created_at: '2025-01-15', topic: 'Programming' },
-          { created_at: '2025-01-14', topic: 'Leadership' },
-          { created_at: '2025-01-13', topic: 'Programming' },
-          { created_at: '2025-01-12', topic: 'Programming' }
-        ];
-        
-        // Process video lessons
-        mockVideoLessons.forEach(video => {
-          if (video.created_at) {
-            const week = getISOWeek(video.created_at);
-            videoWeekMap[week] = (videoWeekMap[week] || 0) + 1;
-          }
-        });
-        
-        // Combine all weeks and create chart data
-        const allWeeks = [...new Set([...Object.keys(weekMap), ...Object.keys(videoWeekMap)])].sort();
-        
-        // If no real data, create some sample data for demonstration
-        if (allWeeks.length === 0) {
-          const currentWeek = getISOWeek(new Date().toISOString());
-          const lastWeek = getISOWeek(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
-          const twoWeeksAgo = getISOWeek(new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString());
-          
-          const trends = [
-            { week: twoWeeksAgo, microLessons: 2, videoLessons: 1 },
-            { week: lastWeek, microLessons: 5, videoLessons: 3 },
-            { week: currentWeek, microLessons: 8, videoLessons: 4 }
-          ];
-          setLessonTrends(trends);
-        } else {
-          const trends = allWeeks.map(week => ({ 
-            week, 
-            microLessons: weekMap[week] || 0,
-            videoLessons: videoWeekMap[week] || 0
-          }));
-          setLessonTrends(trends);
-        }
-
-        // Group lessons by topic for pie chart
-        const topicMap = {};
-        lessons.forEach(lesson => {
-          if (lesson.topic) {
-            topicMap[lesson.topic] = (topicMap[lesson.topic] || 0) + 1;
-          }
-        });
-        
-        // Add mock video topics to the breakdown
-        mockVideoLessons.forEach(video => {
-          if (video.topic) {
-            topicMap[video.topic] = (topicMap[video.topic] || 0) + 1;
-          }
-        });
-        
-        // Convert to array for pie chart
-        const breakdown = Object.keys(topicMap).map(topic => ({
-          name: topic,
-          value: topicMap[topic]
-        }));
-        
-        // If no real data, create sample breakdown
-        if (breakdown.length === 0) {
-          const sampleBreakdown = [
-            { name: 'Programming', value: 5 },
-            { name: 'Leadership', value: 3 },
-            { name: 'Agile', value: 2 },
-            { name: 'Communication', value: 1 }
-          ];
-          setTopicBreakdown(sampleBreakdown);
-        } else {
-          setTopicBreakdown(breakdown);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        setProgress(userProgress);
-        setLessonTrends([]);
-        setTopicBreakdown([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
+    // Fetch actual data
+    fetchUserData().finally(() => setLoading(false));
+  }, [user, fetchUserData]);
 
   // Listen for storage events to update progress when it changes
   useEffect(() => {
@@ -258,14 +253,23 @@ function Dashboard({ user, onSectionSelect }) {
       }
     };
 
+    const handleVideoUpdate = () => {
+      if (user) {
+        // Refresh video data when videos are updated
+        fetchUserData();
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('progressUpdated', handleStorageChange);
+    window.addEventListener('videoUpdated', handleVideoUpdate);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('progressUpdated', handleStorageChange);
+      window.removeEventListener('videoUpdated', handleVideoUpdate);
     };
-  }, [user]);
+  }, [user, fetchUserData]);
 
   if (loading) {
     return (
@@ -293,7 +297,26 @@ function Dashboard({ user, onSectionSelect }) {
         boxShadow: colors.shadow,
         color: colors.text
       }}>
-        <h2 style={{ marginTop: 0, marginBottom: 20, color: colors.text }}>Your Progress</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 0, color: colors.text }}>Your Progress</h2>
+          <button 
+            onClick={() => {
+              setLoading(true);
+              fetchUserData().finally(() => setLoading(false));
+            }}
+            style={{
+              background: colors.accent,
+              color: 'white',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            🔄 Refresh Data
+          </button>
+        </div>
         
         <div style={{ 
           display: "flex", 

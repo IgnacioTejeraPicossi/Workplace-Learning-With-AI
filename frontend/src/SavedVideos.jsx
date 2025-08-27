@@ -153,6 +153,10 @@ function SavedVideos({ user }) {
     try {
       await deleteSavedVideo(videoId);
       await loadSavedVideos();
+      
+      // Emit videoUpdated event for Dashboard refresh
+      const updateEvent = new CustomEvent('videoUpdated');
+      window.dispatchEvent(updateEvent);
     } catch (err) {
       alert(err.message);
     }
