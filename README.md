@@ -370,37 +370,84 @@ graph TB
 ### System Overview
 The API Configuration module provides a flexible interface to manage multiple AI service providers with intelligent fallback capabilities.
 
+### 1. Provider Selection Architecture
+
 ```mermaid
 graph TB
-    %% Main Configuration Module
-    Config[🔧 API Configuration Module] --> Providers[Provider Selection]
-    Config --> Management[Configuration Management]
-    Config --> Fallback[Fallback System]
-    Config --> Testing[Testing & Validation]
-    
-    %% Provider Selection
-    Providers --> ItemAI[ItemAI API]
+    %% Provider Selection Module
+    Providers[🔌 Provider Selection] --> ItemAI[ItemAI API]
     Providers --> OpenRouter[OpenRouter API]
     Providers --> OpenAI[OpenAI API]
     
-    %% Configuration Management
-    Management --> URLs[URL Configuration]
+    %% Implementation Files
+    ItemAI --> ItemAIFile[backend/itemai_api.py]
+    OpenRouter --> OpenRouterFile[backend/llm.py]
+    OpenAI --> OpenAIFile[backend/gpt5_config.py]
+    
+    %% Key Features
+    ItemAIFile --> ItemAIFeatures[Local AI Service]
+    OpenRouterFile --> OpenRouterFeatures[Multiple Models]
+    OpenAIFile --> OpenAIFeatures[GPT-5 Integration]
+```
+
+### 2. Configuration Management Architecture
+
+```mermaid
+graph TB
+    %% Configuration Management Module
+    Management[⚙️ Configuration Management] --> URLs[URL Configuration]
     Management --> Keys[API Key Management]
     Management --> Storage[Local Storage]
     
-    %% Fallback System
-    Fallback --> Primary[Primary Provider]
+    %% Implementation Files
+    URLs --> ConfigFile[backend/config.py]
+    Keys --> EnvFile[backend/env_config.py]
+    Storage --> AppFile[backend/app.py]
+    
+    %% Key Features
+    ConfigFile --> ConfigFeatures[Environment Variables]
+    EnvFile --> EnvFeatures[Secure Key Storage]
+    AppFile --> AppFeatures[Configuration Endpoints]
+```
+
+### 3. Fallback System Architecture
+
+```mermaid
+graph TB
+    %% Fallback System Module
+    Fallback[🔄 Fallback System] --> Primary[Primary Provider]
     Fallback --> Secondary[Secondary Provider]
     Fallback --> Chain[Fallback Chain]
     
-    %% Testing & Validation
-    Testing --> Connection[Connection Testing]
+    %% Implementation Files
+    Primary --> LLMFile[backend/llm.py]
+    Secondary --> GPTFile[backend/gpt5_config.py]
+    Chain --> FallbackFile[backend/app.py]
+    
+    %% Key Features
+    LLMFile --> LLMFeatures[Provider Selection]
+    GPTFile --> GPTFeatures[Backup Service]
+    FallbackFile --> FallbackFeatures[Automatic Switching]
+```
+
+### 4. Testing & Validation Architecture
+
+```mermaid
+graph TB
+    %% Testing & Validation Module
+    Testing[🧪 Testing & Validation] --> Connection[Connection Testing]
     Testing --> Validation[API Validation]
     Testing --> Errors[Error Handling]
     
-    %% Backend Integration
-    Testing --> Backend[Backend API]
-    Backend --> Database[Database Storage]
+    %% Implementation Files
+    Connection --> TestFile[backend/api_test.py]
+    Validation --> KeyFile[backend/test_api_key.py]
+    Errors --> AppFile[backend/app.py]
+    
+    %% Key Features
+    TestFile --> TestFeatures[API Connectivity]
+    KeyFile --> KeyFeatures[Key Validation]
+    AppFile --> AppFeatures[Error Responses]
 ```
 
 ### Key Features
