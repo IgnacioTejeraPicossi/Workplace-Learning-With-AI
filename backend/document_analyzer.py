@@ -19,7 +19,14 @@ except ImportError:
     DocxDocument = None
 
 # ---- LLM integration ----
-from llm import get_llm_client
+try:
+    from .llm import ask_openai
+except ImportError:
+    try:
+        from llm import ask_openai
+    except ImportError:
+        # Fallback for when running from root directory
+        from backend.llm import ask_openai
 
 router = APIRouter(prefix="/document-analyzer", tags=["Document Analyzer"])
 
@@ -144,7 +151,6 @@ def length_instructions(length: str) -> str:
 def summarize_text(text: str, length: str = "medium") -> str:
     """Summarize text using the existing LLM client"""
     try:
-        llm_client = get_llm_client()
         instr = length_instructions(length)
         
         prompt = (
@@ -154,7 +160,7 @@ def summarize_text(text: str, length: str = "medium") -> str:
             "=== DOCUMENT END ==="
         )
         
-        response = llm_client.chat(prompt)
+        response = ask_openai(prompt, task_type="summarization", complexity="medium", max_tokens=800)
         return response.strip()
         
     except Exception as e:

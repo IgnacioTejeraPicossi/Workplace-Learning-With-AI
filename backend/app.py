@@ -9,14 +9,28 @@ import os
 from datetime import datetime
 import uuid
 from typing import List, Optional, Dict, Any
-from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
-from backend.repo_analysis import router as repo_router
-from backend.documentation_generator import router as doc_router
-from backend.cursor_readme_routes import router as cursor_readme_router
-from backend.cursor_agent_routes import router as cursor_agent_router
-from backend.simple_web_search import router as simple_web_search_router
-from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+
+# Fix imports to work from both root and backend directories
+try:
+    from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
+    from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+    from backend.repo_analysis import router as repo_router
+    from backend.documentation_generator import router as doc_router
+    from backend.cursor_readme_routes import router as cursor_readme_router
+    from backend.cursor_agent_routes import router as cursor_agent_router
+    from backend.simple_web_search import router as simple_web_search_router
+    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+except ImportError:
+    # Fallback for when running from root directory
+    from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
+    from llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+    from repo_analysis import router as repo_router
+    from documentation_generator import router as doc_router
+    from cursor_readme_routes import router as cursor_readme_router
+    from cursor_agent_routes import router as cursor_agent_router
+    from simple_web_search import router as simple_web_search_router
+    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+
 from bson import ObjectId
 
 # Firebase Authentication
@@ -38,7 +52,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Add both!
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,20 +70,34 @@ app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README 
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
 # Document Analyzer router
-from backend.document_analyzer import router as document_analyzer_router
+try:
+    from backend.document_analyzer import router as document_analyzer_router
+except ImportError:
+    from document_analyzer import router as document_analyzer_router
 app.include_router(document_analyzer_router, prefix="/api", tags=["Document Analyzer"])
 
 # Cursor AI Automation router
-from backend.cursor_ai_automation import router as cursor_automation_router
+try:
+    from backend.cursor_ai_automation import router as cursor_automation_router
+except ImportError:
+    from cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
 
 # Learning modules routers
-from backend.certifications import certifications_router
-from backend.micro_lessons import micro_lessons_router
-from backend.web_search import web_search_router
-from backend.skills_forecast import skills_forecast_router
-from backend.career_coach import career_coach_router
-from backend.simulation_results import simulation_results_router
+try:
+    from backend.certifications import certifications_router
+    from backend.micro_lessons import micro_lessons_router
+    from backend.web_search import web_search_router
+    from backend.skills_forecast import skills_forecast_router
+    from backend.career_coach import career_coach_router
+    from backend.simulation_results import simulation_results_router
+except ImportError:
+    from certifications import certifications_router
+    from micro_lessons import micro_lessons_router
+    from web_search import web_search_router
+    from skills_forecast import skills_forecast_router
+    from career_coach import career_coach_router
+    from simulation_results import simulation_results_router
 
 app.include_router(certifications_router)
 app.include_router(micro_lessons_router)
@@ -74,17 +107,26 @@ app.include_router(career_coach_router)
 app.include_router(simulation_results_router)
 
 # Enterprise Architecture routers
-from backend.ea_processes import router as ea_processes_router
-from backend.ea_catalog import router as ea_catalog_router
-from backend.ea_ai_risk import router as ea_ai_risk_router
+try:
+    from backend.ea_processes import router as ea_processes_router
+    from backend.ea_catalog import router as ea_catalog_router
+    from backend.ea_ai_risk import router as ea_ai_risk_router
+except ImportError:
+    from ea_processes import router as ea_processes_router
+    from ea_catalog import router as ea_catalog_router
+    from ea_ai_risk import router as ea_ai_risk_router
 
 app.include_router(ea_processes_router)
 app.include_router(ea_catalog_router)
 app.include_router(ea_ai_risk_router)
 
 # API Configuration routers
-from backend.api_test import router as api_test_router
-from backend.itemai_api import router as itemai_api_router
+try:
+    from backend.api_test import router as api_test_router
+    from backend.itemai_api import router as itemai_api_router
+except ImportError:
+    from api_test import router as api_test_router
+    from itemai_api import router as itemai_api_router
 
 app.include_router(api_test_router)
 app.include_router(itemai_api_router)
@@ -97,7 +139,10 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
-from backend.llm import ask_openai_stream
+try:
+    from backend.llm import ask_openai_stream
+except ImportError:
+    from llm import ask_openai_stream
 
 @app.get("/favicon.ico")
 async def favicon():

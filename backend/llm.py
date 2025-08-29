@@ -3,8 +3,13 @@
 import os
 from dotenv import load_dotenv
 import openai
-from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+try:
+    from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
+    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+except ImportError:
+    # Fallback for when running from root directory
+    from prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
+    from gpt5_config import get_optimal_model, get_gpt5_parameters
 
 # OpenRouter support
 try:

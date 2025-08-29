@@ -7,6 +7,11 @@ const DocumentsAnalyzer = () => {
   const [summaryLength, setSummaryLength] = useState("medium");
   const [combineFiles, setCombineFiles] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState({
+    currentFile: 0,
+    totalFiles: 0,
+    currentStep: "preparing"
+  });
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -50,6 +55,11 @@ const DocumentsAnalyzer = () => {
     setIsAnalyzing(true);
     setError(null);
     setResults(null);
+    setAnalysisProgress({
+      currentFile: 0,
+      totalFiles: files.length,
+      currentStep: "preparing"
+    });
 
     try {
       const formData = new FormData();
@@ -339,6 +349,133 @@ const DocumentsAnalyzer = () => {
         >
           {isAnalyzing ? "🔄 Analyzing..." : "🚀 Analyze Documents"}
         </button>
+
+        {/* Progress Bar */}
+        {isAnalyzing && (
+          <div style={{ marginTop: "20px" }}>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+              marginBottom: "8px"
+            }}>
+              <span style={{ 
+                color: colors.text, 
+                fontSize: "14px",
+                fontWeight: "500"
+              }}>
+                {analysisProgress.currentStep === "preparing" && "Preparing analysis..."}
+                {analysisProgress.currentStep === "processing" && `Processing file ${analysisProgress.currentFile + 1} of ${analysisProgress.totalFiles}`}
+                {analysisProgress.currentStep === "analyzing" && "AI analysis in progress..."}
+                {analysisProgress.currentStep === "finalizing" && "Finalizing results..."}
+              </span>
+              <span style={{ 
+                color: colors.textSecondary, 
+                fontSize: "12px"
+              }}>
+                {analysisProgress.currentFile + 1} / {analysisProgress.totalFiles} files
+              </span>
+            </div>
+            <div style={{ 
+              height: "8px", 
+              background: colors.background, 
+              borderRadius: "4px", 
+              overflow: "hidden",
+              border: `1px solid ${colors.border}`
+            }}>
+              <div style={{ 
+                width: `${Math.max(10, (analysisProgress.currentFile / analysisProgress.totalFiles) * 100)}%`, 
+                height: '100%', 
+                background: colors.primary, 
+                transition: 'width 0.5s ease',
+                borderRadius: "4px"
+              }} />
+            </div>
+            <style>{`
+              @keyframes documentProgressBar { 
+                0% { width: 10%; opacity: 0.8; } 
+                50% { width: 60%; opacity: 1; }
+                100% { width: 90%; opacity: 0.8; } 
+              }
+            `}</style>
+            
+            {/* Processing Steps */}
+            <div style={{ 
+              marginTop: "16px",
+              padding: "16px",
+              background: colors.background,
+              borderRadius: "8px",
+              border: `1px solid ${colors.border}`
+            }}>
+              <h5 style={{ 
+                color: colors.text, 
+                margin: "0 0 12px 0",
+                fontSize: "14px",
+                fontWeight: "500"
+              }}>
+                Analysis Progress
+              </h5>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  color: analysisProgress.currentStep === "preparing" ? colors.primary : colors.textSecondary,
+                  fontSize: "12px",
+                  fontWeight: analysisProgress.currentStep === "preparing" ? "500" : "400"
+                }}>
+                  <span style={{ fontSize: "16px" }}>📁</span>
+                  <span>Preparing files for analysis</span>
+                  {analysisProgress.currentStep === "preparing" && <span style={{ fontSize: "12px" }}>✓</span>}
+                </div>
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  color: analysisProgress.currentStep === "processing" ? colors.primary : colors.textSecondary,
+                  fontSize: "12px",
+                  fontWeight: analysisProgress.currentStep === "processing" ? "500" : "400"
+                }}>
+                  <span style={{ fontSize: "16px" }}>🔄</span>
+                  <span>Processing documents ({analysisProgress.currentFile + 1}/{analysisProgress.totalFiles})</span>
+                  {analysisProgress.currentStep === "processing" && <span style={{ fontSize: "12px" }}>🔄</span>}
+                </div>
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  color: analysisProgress.currentStep === "analyzing" ? colors.primary : colors.textSecondary,
+                  fontSize: "12px",
+                  fontWeight: analysisProgress.currentStep === "analyzing" ? "500" : "400"
+                }}>
+                  <span style={{ fontSize: "16px" }}>🤖</span>
+                  <span>AI analysis and summarization</span>
+                  {analysisProgress.currentStep === "analyzing" && <span style={{ fontSize: "12px" }}>🔄</span>}
+                </div>
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  color: analysisProgress.currentStep === "finalizing" ? colors.primary : colors.textSecondary,
+                  fontSize: "12px",
+                  fontWeight: analysisProgress.currentStep === "finalizing" ? "500" : "400"
+                }}>
+                  <span style={{ fontSize: "16px" }}>📊</span>
+                  <span>Finalizing results</span>
+                  {analysisProgress.currentStep === "finalizing" && <span style={{ fontSize: "12px" }}>🔄</span>}
+                </div>
+              </div>
+              <p style={{ 
+                margin: "12px 0 0 0",
+                color: colors.textSecondary,
+                fontSize: "11px",
+                fontStyle: "italic"
+              }}>
+                ⏱️ Estimated time: {files.length === 1 ? "30 seconds - 2 minutes" : `${Math.ceil(files.length * 1.5)} - ${Math.ceil(files.length * 3)} minutes`} depending on document size and complexity
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Error Display */}

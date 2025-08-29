@@ -12,7 +12,7 @@ export async function fetchWithAuth(url, options = {}) {
   return fetch(url, options);
 }
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://localhost:8000";
 
 // Generic API call function
 export async function apiCall(endpoint, method = "GET", data = null) {
@@ -61,7 +61,7 @@ export async function fetchRecommendation(skill_gap) {
 }
 
 export async function fetchSimulationStep(history, user_input) {
-  const res = await fetchWithAuth("http://127.0.0.1:8000/simulation-step", {
+  const res = await fetchWithAuth(`${API_BASE}/simulation-step`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ history, user_input }),
@@ -70,7 +70,7 @@ export async function fetchSimulationStep(history, user_input) {
 }
 
 export async function postCareerCoach(body) {
-  const res = await fetchWithAuth("http://127.0.0.1:8000/career-coach", {
+  const res = await fetchWithAuth(`${API_BASE}/career-coach`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -79,7 +79,7 @@ export async function postCareerCoach(body) {
 }
 
 export async function postSkillsForecast(input) {
-  const res = await fetchWithAuth("http://127.0.0.1:8000/skills-forecast", {
+  const res = await fetchWithAuth(`${API_BASE}/skills-forecast`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -203,7 +203,7 @@ export async function generateVideoSummaryNoAuth(transcript) {
 }
 
 export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {
-  const response = await fetch("http://127.0.0.1:8000/llm-stream", {
+  const response = await fetch(`${API_BASE}/llm-stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, messages, model, max_tokens })
