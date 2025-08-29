@@ -63,7 +63,7 @@ class SaveAnalysisResponse(BaseModel):
 
 # ========= Temporary Storage (In-Memory) =========
 # This will be replaced with actual database storage later
-_saved_analyses = []
+_saved_analyses = {}  # Changed to dict for better persistence and lookup
 
 # ========= Helpers =========
 TEXT_EXTS = {".txt", ".md", ".markdown"}
@@ -381,7 +381,7 @@ async def save_analysis(request: SaveAnalysisRequest):
         
         # Save to temporary in-memory storage
         global _saved_analyses
-        _saved_analyses.append(analysis_data)
+        _saved_analyses[analysis_data["id"]] = analysis_data
         
         return SaveAnalysisResponse(
             success=True,
@@ -403,10 +403,13 @@ async def get_saved_analyses():
         # Return actual saved analyses from temporary in-memory storage
         global _saved_analyses
         
+        # Convert dict values to list for frontend compatibility
+        analyses_list = list(_saved_analyses.values())
+        
         return JSONResponse({
             "success": True,
-            "analyses": _saved_analyses,
-            "total": len(_saved_analyses)
+            "analyses": analyses_list,
+            "total": len(analyses_list)
         })
         
     except Exception as e:

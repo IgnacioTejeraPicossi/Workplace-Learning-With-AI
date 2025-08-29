@@ -8,6 +8,10 @@ const LearningDocument = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("date");
+  const [expanded, setExpanded] = useState({});
+  const [editing, setEditing] = useState({});
+  const [editContent, setEditContent] = useState({});
+  const [status, setStatus] = useState("");
 
   // Fetch real data from Document Analyzer backend
   useEffect(() => {
@@ -167,6 +171,113 @@ const LearningDocument = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Expand/Collapse functionality
+  const handleExpandToggle = (docId) => {
+    console.log(`🔍 [DEBUG] Toggling document ${docId}, current expanded state:`, expanded[docId]);
+    setExpanded(prev => {
+      const newState = {
+        ...prev,
+        [docId]: !prev[docId]
+      };
+      console.log(`🔍 [DEBUG] New expanded state:`, newState);
+      return newState;
+    });
+  };
+
+  // Edit functionality
+  const handleEdit = (docId, filename, summary) => {
+    setEditing(prev => ({
+      ...prev,
+      [docId]: true
+    }));
+    setEditContent(prev => ({
+      ...prev,
+      [docId]: { filename, summary }
+    }));
+  };
+
+  const handleEditChange = (docId, field, value) => {
+    setEditContent(prev => ({
+      ...prev,
+      [docId]: {
+        ...prev[docId],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleEditSave = async (docId) => {
+    try {
+      // Here you would typically call an API to update the document
+      // For now, we'll just update the local state
+      const updatedDoc = documents.find(doc => doc.id === docId);
+      if (updatedDoc) {
+        const newDocuments = documents.map(doc => 
+          doc.id === docId 
+            ? { 
+                ...doc, 
+                filename: editContent[docId].filename,
+                summary: editContent[docId].summary,
+                displayName: `${editContent[docId].filename} - Analyzed`
+              }
+            : doc
+        );
+        setDocuments(newDocuments);
+      }
+      
+      setEditing(prev => ({
+        ...prev,
+        [docId]: false
+      }));
+      setStatus("✅ Document updated successfully");
+      setTimeout(() => setStatus(""), 3000);
+    } catch (error) {
+      setStatus("❌ Failed to update document");
+      setTimeout(() => setStatus(""), 3000);
+    }
+  };
+
+  const handleEditCancel = (docId) => {
+    setEditing(prev => ({
+      ...prev,
+      [docId]: false
+    }));
+    setEditContent(prev => ({
+      ...prev,
+      [docId]: undefined
+    }));
+  };
+
+  // Delete functionality
+  const handleDelete = async (docId) => {
+    if (window.confirm("Are you sure you want to delete this analysis?")) {
+      try {
+        // Here you would typically call an API to delete the document
+        // For now, we'll just update the local state
+        const newDocuments = documents.filter(doc => doc.id !== docId);
+        setDocuments(newDocuments);
+        
+        // Clear expanded/editing state for deleted document
+        setExpanded(prev => {
+          const newExpanded = { ...prev };
+          delete newExpanded[docId];
+          return newExpanded;
+        });
+        setEditing(prev => {
+          const newEditing = { ...prev };
+          delete newEditing[docId];
+          return newEditing;
+        });
+        
+        setStatus("✅ Document deleted successfully");
+        setTimeout(() => setStatus(""), 3000);
+      } catch (error) {
+        setStatus("❌ Failed to delete document");
+        setTimeout(() => setStatus(""), 3000);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ 
@@ -196,13 +307,29 @@ const LearningDocument = () => {
         }}>
           📚 Learning Document Library
         </h1>
-        <p style={{ 
-          color: colors.textSecondary, 
-          fontSize: "16px",
-          lineHeight: "1.5"
-        }}>
-          Access and manage your previously analyzed documents. Search, filter, and organize your learning materials.
-        </p>
+                 <p style={{ 
+           color: colors.textSecondary, 
+           fontSize: "16px",
+           lineHeight: "1.5"
+         }}>
+           Access and manage your previously analyzed documents. Search, filter, and organize your learning materials.
+         </p>
+         
+         {/* Status Messages */}
+         {status && (
+           <div style={{
+             marginTop: "12px",
+             padding: "12px 16px",
+             borderRadius: "8px",
+             background: status.includes("✅") ? "#dcfce7" : "#fef2f2",
+             color: status.includes("✅") ? "#166534" : "#dc2626",
+             border: `1px solid ${status.includes("✅") ? "#bbf7d0" : "#fecaca"}`,
+             fontSize: "14px",
+             fontWeight: "500"
+           }}>
+             {status}
+           </div>
+         )}
       </div>
 
       {/* Search and Filters */}
@@ -417,32 +544,34 @@ const LearningDocument = () => {
                 </div>
               </div>
 
-                             {/* Summary */}
-               <div style={{ 
-                 background: colors.background, 
-                 padding: "16px", 
-                 borderRadius: "8px",
-                 marginBottom: "16px"
-               }}>
-                 <h4 style={{ 
-                   color: colors.primary, 
-                   margin: "0 0 12px 0",
-                   fontSize: "16px",
-                   fontWeight: "500"
-                 }}>
-                   📋 AI-Generated Summary
-                 </h4>
+                                            {/* Summary - Only show when expanded */}
+               {expanded[doc.id] && (
                  <div style={{ 
-                   color: colors.text, 
-                   fontSize: "14px",
-                   lineHeight: "1.6",
-                   whiteSpace: "pre-wrap",
-                   maxHeight: "200px",
-                   overflowY: "auto"
+                   background: colors.background, 
+                   padding: "16px", 
+                   borderRadius: "8px",
+                   marginBottom: "16px"
                  }}>
-                   {doc.summary}
+                   <h4 style={{ 
+                     color: colors.primary, 
+                     margin: "0 0 12px 0",
+                     fontSize: "16px",
+                     fontWeight: "500"
+                   }}>
+                     📋 AI-Generated Summary
+                   </h4>
+                   <div style={{ 
+                     color: colors.text, 
+                     fontSize: "14px",
+                     lineHeight: "1.6",
+                     whiteSpace: "pre-wrap",
+                     maxHeight: "200px",
+                     overflowY: "auto"
+                   }}>
+                     {doc.summary}
+                   </div>
                  </div>
-               </div>
+               )}
 
               {/* Tags */}
               <div style={{ 
@@ -465,62 +594,237 @@ const LearningDocument = () => {
                 ))}
               </div>
 
-              {/* Actions */}
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  onClick={() => copyToClipboard(doc.summary)}
-                  style={{
-                    background: colors.secondary,
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  📋 Copy Summary
-                </button>
-                <button
-                  onClick={() => downloadDocument(doc)}
-                  style={{
-                    background: colors.primary,
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  💾 Download
-                </button>
-                <button
-                  style={{
-                    background: colors.background,
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  🔍 View Details
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                             {/* Actions */}
+               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                 <button
+                   onClick={() => copyToClipboard(doc.summary)}
+                   style={{
+                     background: colors.secondary,
+                     color: "white",
+                     border: "none",
+                     borderRadius: "6px",
+                     padding: "8px 16px",
+                     fontSize: "14px",
+                     cursor: "pointer",
+                     display: "flex",
+                     alignItems: "center",
+                     gap: "6px"
+                   }}
+                 >
+                   📋 Copy Summary
+                 </button>
+                 <button
+                   onClick={() => downloadDocument(doc)}
+                   style={{
+                     background: colors.primary,
+                     color: "white",
+                     border: "none",
+                     borderRadius: "6px",
+                     padding: "8px 16px",
+                     fontSize: "14px",
+                     cursor: "pointer",
+                     display: "flex",
+                     alignItems: "center",
+                     gap: "6px"
+                   }}
+                 >
+                   💾 Download
+                 </button>
+                 <button
+                   onClick={() => handleExpandToggle(doc.id)}
+                   style={{
+                     background: colors.background,
+                     color: colors.text,
+                     border: `1px solid ${colors.border}`,
+                     borderRadius: "6px",
+                     padding: "8px 16px",
+                     fontSize: "14px",
+                     cursor: "pointer",
+                     display: "flex",
+                     alignItems: "center",
+                     gap: "6px"
+                   }}
+                 >
+                                                                               {expanded[doc.id] ? "📖 Compress" : "📖 Expand"}
+                 </button>
+                 <button
+                   onClick={() => handleEdit(doc.id, doc.filename, doc.summary)}
+                   style={{
+                     background: colors.primary,
+                     color: "white",
+                     border: "none",
+                     borderRadius: "6px",
+                     padding: "8px 16px",
+                     fontSize: "14px",
+                     cursor: "pointer",
+                     display: "flex",
+                     alignItems: "center",
+                     gap: "6px"
+                   }}
+                 >
+                   ✏️ Edit
+                 </button>
+                 <button
+                   onClick={() => handleDelete(doc.id)}
+                   style={{
+                     background: "#d32f2f",
+                     color: "white",
+                     border: "none",
+                     borderRadius: "6px",
+                     padding: "8px 16px",
+                     fontSize: "14px",
+                     cursor: "pointer",
+                     display: "flex",
+                     alignItems: "center",
+                     gap: "6px"
+                   }}
+                 >
+                   🗑️ Delete
+                 </button>
+                              </div>
+
+               {/* Expanded Content */}
+               {expanded[doc.id] && (
+                 <div style={{ 
+                   marginTop: "16px",
+                   padding: "16px",
+                   background: colors.background,
+                   borderRadius: "8px",
+                   border: `1px solid ${colors.border}`
+                 }}>
+                   <h4 style={{ 
+                     color: colors.primary, 
+                     marginBottom: "12px",
+                     fontSize: "16px",
+                     fontWeight: "500"
+                   }}>
+                     📋 Full Content
+                   </h4>
+                   
+                   {editing[doc.id] ? (
+                     <div>
+                       <div style={{ marginBottom: "12px" }}>
+                         <label style={{ 
+                           display: "block", 
+                           marginBottom: "4px",
+                           color: colors.text,
+                           fontWeight: "500"
+                         }}>
+                           Filename:
+                         </label>
+                         <input
+                           type="text"
+                           value={editContent[doc.id]?.filename || ""}
+                           onChange={(e) => handleEditChange(doc.id, "filename", e.target.value)}
+                           style={{
+                             width: "100%",
+                             padding: "8px",
+                             borderRadius: "4px",
+                             border: `1px solid ${colors.border}`,
+                             background: colors.cardBackground,
+                             color: colors.text
+                           }}
+                         />
+                       </div>
+                       
+                       <div style={{ marginBottom: "16px" }}>
+                         <label style={{ 
+                           display: "block", 
+                           marginBottom: "4px",
+                           color: colors.text,
+                           fontWeight: "500"
+                         }}>
+                           Summary:
+                         </label>
+                         <textarea
+                           value={editContent[doc.id]?.summary || ""}
+                           onChange={(e) => handleEditChange(doc.id, "summary", e.target.value)}
+                           rows={8}
+                           style={{
+                             width: "100%",
+                             padding: "8px",
+                             borderRadius: "4px",
+                             border: `1px solid ${colors.border}`,
+                             background: colors.cardBackground,
+                             color: colors.text,
+                             fontFamily: "monospace",
+                             resize: "vertical"
+                           }}
+                         />
+                       </div>
+                       
+                       <div style={{ display: "flex", gap: "8px" }}>
+                         <button
+                           onClick={() => handleEditSave(doc.id)}
+                           style={{
+                             background: colors.primary,
+                             color: "white",
+                             border: "none",
+                             borderRadius: "6px",
+                             padding: "8px 16px",
+                             fontSize: "14px",
+                             cursor: "pointer"
+                           }}
+                         >
+                           💾 Save
+                         </button>
+                         <button
+                           onClick={() => handleEditCancel(doc.id)}
+                           style={{
+                             background: colors.background,
+                             color: colors.text,
+                             border: `1px solid ${colors.border}`,
+                             borderRadius: "6px",
+                             padding: "8px 16px",
+                             fontSize: "14px",
+                             cursor: "pointer"
+                           }}
+                         >
+                           ❌ Cancel
+                         </button>
+                       </div>
+                     </div>
+                   ) : (
+                     <div style={{ 
+                       color: colors.text,
+                       fontSize: "14px",
+                       lineHeight: "1.6",
+                       whiteSpace: "pre-wrap",
+                       maxHeight: "400px",
+                       overflowY: "auto"
+                     }}>
+                       {/* Show additional details when expanded, not duplicate summary */}
+                       <div style={{ marginBottom: "16px" }}>
+                         <strong>Document Details:</strong>
+                         <ul style={{ margin: "8px 0", paddingLeft: "20px" }}>
+                           <li>Original filename: {doc.filename}</li>
+                           <li>File size: {doc.size}</li>
+                           <li>Character count: {doc.chars}</li>
+                           <li>Processing chunks: {doc.chunks}</li>
+                           <li>Analysis length: {doc.length}</li>
+                           <li>Created: {doc.date}</li>
+                         </ul>
+                       </div>
+                       
+                       <div>
+                         <strong>Full Summary:</strong>
+                         <div style={{ 
+                           marginTop: "8px",
+                           padding: "12px",
+                           background: colors.cardBackground,
+                           borderRadius: "6px",
+                           border: `1px solid ${colors.border}`
+                         }}>
+                           {doc.summary}
+                         </div>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               )}
+             </div>
+           ))}
+         </div>
       )}
 
       {/* Quick Actions */}
