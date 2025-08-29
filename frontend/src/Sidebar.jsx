@@ -35,7 +35,9 @@ const Icon = ({ name, size = 20 }) => {
     "graduation-cap": "🎓",
     building: "🏢",
     temple: "🏛️",
-    settings: "⚙️"
+    settings: "⚙️",
+    document: "📄",
+    "document-text": "📝"
   };
 
   return (
@@ -74,7 +76,13 @@ const navItems = [
     { key: "learning-repo", label: "Learning Repo", icon: "graduation-cap" }
   ]},
   
-  // Grupo 1.6: Enterprise Architecture (nuevo módulo)
+  // Grupo 1.6: Document Analyzer (nuevo módulo)
+  { key: "document-analyzer", label: "Document Analyzer", icon: "document", group: "learning", isExpandable: true, subItems: [
+    { key: "documents-analyzer", label: "Documents Analyzer", icon: "document-text" },
+    { key: "learning-document", label: "Learning Document", icon: "book" }
+  ]},
+  
+  // Grupo 1.7: Enterprise Architecture (expandible)
   { key: "enterprise-architecture", label: "Enterprise Architecture", icon: "🏢", group: "learning", isExpandable: true, subItems: [
     { key: "ea-home", label: "EA Dashboard", icon: "🏢" },
     { key: "process-designer", label: "Process Designer", icon: "🔄" },
