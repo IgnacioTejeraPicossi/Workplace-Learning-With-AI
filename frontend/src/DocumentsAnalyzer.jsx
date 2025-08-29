@@ -15,10 +15,35 @@ const DocumentsAnalyzer = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [status, setStatus] = useState("");
 
   const handleFileChange = useCallback((e) => {
     const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
+    
+    // Validate files before setting them
+    const validFiles = selectedFiles.filter(file => {
+      if (!(file instanceof File)) {
+        console.error("Invalid file object:", file);
+        return false;
+      }
+      if (file.size === 0) {
+        console.error("File has 0 size:", file.name);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        console.error("File too large:", file.name, file.size);
+        return false;
+      }
+      return true;
+    });
+    
+    if (validFiles.length === 0) {
+      setError("No valid files selected. Files must be under 5MB each.");
+      return;
+    }
+    
+    console.log("Valid files selected:", validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
+    setFiles(validFiles);
     setError(null);
   }, []);
 
@@ -38,8 +63,24 @@ const DocumentsAnalyzer = () => {
     setDragActive(false);
     
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(droppedFiles);
+    
+    // Validate dropped files
+    const validFiles = droppedFiles.filter(file => {
+      if (file.size === 0) {
+        console.warn(`File ${file.name} has 0 size, skipping...`);
+        return false;
+      }
+      return true;
+    });
+    
+    if (validFiles.length === 0) {
+      setError("Dropped files appear to be empty. Please try using the browse button instead.");
+      return;
+    }
+    
+    setFiles(validFiles);
     setError(null);
+    console.log("Dropped files:", validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
   }, []);
 
   const removeFile = (index) => {
@@ -63,15 +104,69 @@ const DocumentsAnalyzer = () => {
 
     try {
       const formData = new FormData();
-      files.forEach(file => {
-        formData.append("files", file);
+      
+      // Debug: Log file information
+      console.log("Files to upload:", files);
+      files.forEach((file, index) => {
+        console.log(`File ${index}:`, file.name, file.size, file.type);
+        // Ensure file is properly attached
+        if (file instanceof File && file.size > 0) {
+          formData.append("files", file, file.name);
+        } else {
+          throw new Error(`Invalid file: ${file.name} (size: ${file.size})`);
+        }
       });
+      
       formData.append("length", summaryLength);
       formData.append("combine_across_files", combineFiles);
 
-      const response = await fetch("/api/document-analyzer/analyze", {
+      // Debug: Log FormData contents
+      console.log("FormData entries:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      // Verify FormData has content
+      if (formData.entries().next().done) {
+        throw new Error("FormData is empty - no files were attached");
+      }
+
+      // Convert files to base64 and send as JSON instead of FormData
+      const fileData = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64String = reader.result.split(',')[1]; // Remove data:application/...;base64, prefix
+            resolve(base64String);
+          };
+          reader.readAsDataURL(file);
+        });
+        
+        fileData.push({
+          filename: file.name,
+          content: base64,
+          size: file.size,
+          type: file.type
+        });
+      }
+      
+      console.log("Files converted to base64:", fileData.map(f => ({ name: f.filename, size: f.size })));
+      
+      // Send as JSON instead of FormData
+      const response = await fetch("http://localhost:8000/api/document-analyzer/analyze-json", {
         method: "POST",
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+        },
+        body: JSON.stringify({
+          files: fileData,
+          length: summaryLength,
+          combine_across_files: combineFiles
+        }),
       });
 
       if (!response.ok) {
@@ -80,6 +175,7 @@ const DocumentsAnalyzer = () => {
       }
 
       const data = await response.json();
+      
       setResults(data);
     } catch (err) {
       setError(err.message || "An error occurred while analyzing documents");
@@ -102,6 +198,39 @@ const DocumentsAnalyzer = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const saveAnalysis = async (summary) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/document-analyzer/save-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename: summary.filename,
+          summary: summary.summary,
+          chars: summary.chars,
+          chunks: summary.chunks,
+          length: summaryLength,
+          user_id: null // Will be implemented with user authentication later
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Show success message
+        setStatus(`✅ ${result.message}`);
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus('❌ Failed to save analysis');
+        setTimeout(() => setStatus(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      setStatus('❌ Error saving analysis');
+      setTimeout(() => setStatus(''), 3000);
+    }
   };
 
   const formatFileSize = (bytes) => {
@@ -188,12 +317,12 @@ const DocumentsAnalyzer = () => {
           }}>
             {dragActive ? "Drop files here" : "Drag & drop files here or click to browse"}
           </p>
-          <p style={{ 
-            color: colors.textSecondary, 
-            fontSize: "14px"
-          }}>
-            Supports PDF, DOCX, TXT, MD (max 5 files, 50MB each)
-          </p>
+                      <p style={{ 
+              color: colors.textSecondary, 
+              fontSize: "14px"
+            }}>
+              Supports PDF, DOCX, TXT, MD (max 5 files, 5MB each)
+            </p>
         </div>
 
         <input
@@ -492,6 +621,20 @@ const DocumentsAnalyzer = () => {
         </div>
       )}
 
+      {/* Status Display */}
+      {status && (
+        <div style={{
+          background: status.includes("✅") ? colors.successBackground || "#efe" : colors.errorBackground,
+          border: `1px solid ${status.includes("✅") ? colors.success || "#cfc" : colors.error}`,
+          borderRadius: "8px",
+          padding: "16px",
+          marginBottom: "24px",
+          color: status.includes("✅") ? colors.success || "#3a3" : colors.error
+        }}>
+          {status}
+        </div>
+      )}
+
       {/* Results Section */}
       {results && (
         <div style={{ 
@@ -600,6 +743,20 @@ const DocumentsAnalyzer = () => {
                       }}
                     >
                       💾 Download
+                    </button>
+                    <button
+                      onClick={() => saveAnalysis(summary)}
+                      style={{
+                        background: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "6px 12px",
+                        fontSize: "12px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      💾 Save
                     </button>
                   </div>
                 </div>

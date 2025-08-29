@@ -9,47 +9,50 @@ const LearningDocument = () => {
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("date");
 
-  // Mock data for demonstration - in real app this would come from backend
+  // Fetch real data from Document Analyzer backend
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setDocuments([
-        {
-          id: 1,
-          filename: "Annual_Report_2024.pdf",
-          summary: "Comprehensive analysis of company performance, revenue growth of 15%, new market expansion, and strategic initiatives for Q1 2025.",
-          type: "pdf",
-          date: "2024-12-15",
-          tags: ["business", "finance", "strategy"],
-          rating: 9.2,
-          size: "2.4 MB",
-          chunks: 8
-        },
-        {
-          id: 2,
-          filename: "Technical_Specifications.docx",
-          summary: "Detailed technical specifications for the new AI-powered learning platform, including architecture, APIs, and deployment requirements.",
-          type: "docx",
-          date: "2024-12-14",
-          tags: ["technical", "AI", "development"],
-          rating: 8.8,
-          size: "1.8 MB",
-          chunks: 5
-        },
-        {
-          id: 3,
-          filename: "Market_Research.txt",
-          summary: "Market analysis of AI learning platforms, competitive landscape, user preferences, and growth opportunities in the education sector.",
-          type: "txt",
-          date: "2024-12-13",
-          tags: ["market", "research", "AI"],
-          rating: 9.0,
-          size: "0.9 MB",
-          chunks: 3
+    const fetchAnalyses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8000/api/document-analyzer/get-saved-analyses');
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+                         // Transform backend data to match frontend format
+             const transformedDocs = data.analyses.map(analysis => ({
+               id: analysis.id,
+               filename: analysis.filename,
+               summary: analysis.summary,
+               type: analysis.filename.split('.').pop()?.toLowerCase() || 'txt',
+               date: analysis.created_at.split('T')[0], // Extract date part
+               tags: [analysis.length, analysis.module], // Use length and module as tags
+               rating: 9.0, // Default rating for now
+               size: `${(analysis.chars / 1024).toFixed(1)} KB`, // Convert chars to KB
+               chunks: analysis.chunks,
+               chars: analysis.chars,
+               length: analysis.length,
+               // Create a more descriptive display name
+               displayName: `${analysis.filename} - Analyzed`
+             }));
+            setDocuments(transformedDocs);
+          } else {
+            console.error('Failed to fetch analyses:', data.error);
+            setDocuments([]);
+          }
+        } else {
+          console.error('Failed to fetch analyses:', response.status);
+          setDocuments([]);
         }
-      ]);
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error('Error fetching analyses:', error);
+        setDocuments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalyses();
   }, []);
 
   const filteredDocuments = documents.filter(doc => {
@@ -95,7 +98,59 @@ const LearningDocument = () => {
   };
 
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
+    try {
+      navigator.clipboard.writeText(text);
+      // Show success feedback
+      alert('Copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Copied to clipboard!');
+    }
+  };
+
+  const refreshAnalyses = () => {
+    // Re-fetch analyses from backend
+    const fetchAnalyses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8000/api/document-analyzer/get-saved-analyses');
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+                         const transformedDocs = data.analyses.map(analysis => ({
+               id: analysis.id,
+               filename: analysis.filename,
+               summary: analysis.summary,
+               type: analysis.filename.split('.').pop()?.toLowerCase() || 'txt',
+               date: analysis.created_at.split('T')[0],
+               tags: [analysis.length, analysis.module],
+               rating: 9.0,
+               size: `${(analysis.chars / 1024).toFixed(1)} KB`,
+               chunks: analysis.chunks,
+               chars: analysis.chars,
+               length: analysis.length,
+               // Create a more descriptive display name
+               displayName: `${analysis.filename} - Analyzed`
+             }));
+            setDocuments(transformedDocs);
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing analyses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAnalyses();
   };
 
   const downloadDocument = (doc) => {
@@ -221,6 +276,27 @@ const LearningDocument = () => {
               <option value="size">Sort by Size</option>
             </select>
           </div>
+
+          {/* Refresh Button */}
+          <button
+            onClick={refreshAnalyses}
+            disabled={loading}
+            style={{
+              padding: "12px 16px",
+              borderRadius: "8px",
+              border: "none",
+              background: colors.primary,
+              color: "white",
+              fontSize: "14px",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.6 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px"
+            }}
+          >
+            🔄 {loading ? "Loading..." : "Refresh"}
+          </button>
         </div>
 
         {/* Results Count */}
@@ -289,14 +365,14 @@ const LearningDocument = () => {
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span style={{ fontSize: "24px" }}>{getFileIcon(doc.type)}</span>
                   <div>
-                    <h3 style={{ 
-                      color: colors.text, 
-                      margin: "0 0 4px 0",
-                      fontSize: "18px",
-                      fontWeight: "600"
-                    }}>
-                      {doc.filename}
-                    </h3>
+                                         <h3 style={{ 
+                       color: colors.text, 
+                       margin: "0 0 4px 0",
+                       fontSize: "18px",
+                       fontWeight: "600"
+                     }}>
+                       {doc.displayName || doc.filename}
+                     </h3>
                     <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                       <span style={{ 
                         color: colors.textSecondary, 
@@ -341,22 +417,32 @@ const LearningDocument = () => {
                 </div>
               </div>
 
-              {/* Summary */}
-              <div style={{ 
-                background: colors.background, 
-                padding: "16px", 
-                borderRadius: "8px",
-                marginBottom: "16px"
-              }}>
-                <p style={{ 
-                  color: colors.text, 
-                  margin: 0,
-                  fontSize: "14px",
-                  lineHeight: "1.6"
-                }}>
-                  {doc.summary}
-                </p>
-              </div>
+                             {/* Summary */}
+               <div style={{ 
+                 background: colors.background, 
+                 padding: "16px", 
+                 borderRadius: "8px",
+                 marginBottom: "16px"
+               }}>
+                 <h4 style={{ 
+                   color: colors.primary, 
+                   margin: "0 0 12px 0",
+                   fontSize: "16px",
+                   fontWeight: "500"
+                 }}>
+                   📋 AI-Generated Summary
+                 </h4>
+                 <div style={{ 
+                   color: colors.text, 
+                   fontSize: "14px",
+                   lineHeight: "1.6",
+                   whiteSpace: "pre-wrap",
+                   maxHeight: "200px",
+                   overflowY: "auto"
+                 }}>
+                   {doc.summary}
+                 </div>
+               </div>
 
               {/* Tags */}
               <div style={{ 

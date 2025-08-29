@@ -2039,4 +2039,6 @@ for route in app.routes:
     if hasattr(route, 'path') and hasattr(route, 'methods'):
         print(f"  {route.methods} {route.path}")
     elif hasattr(route, 'path'):
-        print(f"  {route.path}") 
+        print(f"  {route.path}")
+
+ 
