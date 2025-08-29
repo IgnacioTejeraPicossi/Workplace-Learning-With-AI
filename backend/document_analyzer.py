@@ -1,0 +1,294 @@
+from __future__ import annotations
+import io
+import os
+from typing import List, Optional, Literal, Dict, Any
+
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from pydantic import BaseModel, Field
+from fastapi.responses import JSONResponse
+
+# ---- parsers ----
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None
+
+try:
+    from docx import Document as DocxDocument
+except ImportError:
+    DocxDocument = None
+
+# ---- LLM integration ----
+from llm import get_llm_client
+
+router = APIRouter(prefix="/document-analyzer", tags=["Document Analyzer"])
+
+# ========= Pydantic models =========
+class SummaryRequest(BaseModel):
+    length: Literal["short", "medium", "long"] = "medium"
+    combine_across_files: bool = True
+
+class DocSummary(BaseModel):
+    filename: str
+    chars: int
+    chunks: int
+    summary: str
+
+class SummaryResponse(BaseModel):
+    summaries: List[DocSummary]
+    combined_summary: Optional[str] = None
+    meta: Dict[str, Any] = Field(default_factory=dict)
+
+# ========= Helpers =========
+TEXT_EXTS = {".txt", ".md", ".markdown"}
+DOC_EXTS = {".docx"}
+PDF_EXTS = {".pdf"}
+
+def _ext(name: str) -> str:
+    name = (name or "").lower()
+    dot = name.rfind(".")
+    return name[dot:] if dot >= 0 else ""
+
+def read_text_from_upload(file: UploadFile) -> str:
+    """Extract text from uploaded file with memory management"""
+    ext = _ext(file.filename)
+    
+    try:
+        # Read file in chunks to manage memory
+        data = b""
+        chunk_size = 1024 * 1024  # 1MB chunks
+        
+        while True:
+            chunk = file.file.read(chunk_size)
+            if not chunk:
+                break
+            data += chunk
+            
+        if not data:
+            return ""
+
+        # PDF processing
+        if ext in PDF_EXTS or (file.content_type or "").endswith("pdf"):
+            if PdfReader is None:
+                raise HTTPException(status_code=400, detail="PDF processing not available. Install pypdf")
+            
+            try:
+                reader = PdfReader(io.BytesIO(data))
+                parts = []
+                for page in reader.pages:
+                    try:
+                        text = page.extract_text() or ""
+                        if text.strip():  # Only add non-empty pages
+                            parts.append(text)
+                    except Exception:
+                        continue
+                return "\n".join(parts).strip()
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"PDF processing error: {str(e)}")
+
+        # DOCX processing
+        if ext in DOC_EXTS or (file.content_type or "").endswith("wordprocessingml.document"):
+            if DocxDocument is None:
+                raise HTTPException(status_code=400, detail="DOCX processing not available. Install python-docx")
+            
+            try:
+                doc = DocxDocument(io.BytesIO(data))
+                return "\n".join(p.text for p in doc.paragraphs if p.text.strip()).strip()
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"DOCX processing error: {str(e)}")
+
+        # Text files
+        try:
+            return data.decode("utf-8", errors="ignore")
+        except Exception:
+            return data.decode("latin-1", errors="ignore")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File processing error: {str(e)}")
+    finally:
+        # Ensure file is closed
+        try:
+            file.file.close()
+        except Exception:
+            pass
+
+def chunk_text(text: str, max_chars: int = 3000, overlap: int = 200) -> List[str]:
+    """Simple char-based chunking with memory management"""
+    text = text.strip()
+    if not text:
+        return []
+    
+    chunks = []
+    i = 0
+    n = len(text)
+    
+    while i < n:
+        j = min(i + max_chars, n)
+        chunk = text[i:j]
+        if chunk.strip():  # Only add non-empty chunks
+            chunks.append(chunk)
+        i = j - overlap
+        if i < 0:
+            i = 0
+    
+    return chunks
+
+def length_instructions(length: str) -> str:
+    if length == "short":
+        return "Return 3-5 concise bullet points and one-sentence summary."
+    if length == "long":
+        return "Return a detailed outline with: Overview, Key Findings, Data/Methods, Action Items. Keep under 500 words."
+    return "Return a compact executive summary (100-150 words) plus 3 bullet highlights."
+
+# ========= LLM calls =========
+def summarize_text(text: str, length: str = "medium") -> str:
+    """Summarize text using the existing LLM client"""
+    try:
+        llm_client = get_llm_client()
+        instr = length_instructions(length)
+        
+        prompt = (
+            f"Summarize the following document. {instr}\n\n"
+            "=== DOCUMENT START ===\n"
+            f"{text}\n"
+            "=== DOCUMENT END ==="
+        )
+        
+        response = llm_client.chat(prompt)
+        return response.strip()
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM processing error: {str(e)}")
+
+# ========= Routes =========
+@router.post("/analyze", response_model=SummaryResponse)
+async def analyze_documents(
+    files: List[UploadFile] = File(..., description="One or more files"),
+    length: Literal["short", "medium", "long"] = Form("medium"),
+    combine_across_files: bool = Form(True),
+) -> SummaryResponse:
+    """Analyze uploaded documents and return summaries"""
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided.")
+    
+    if len(files) > 5:  # Limit number of files to prevent memory issues
+        raise HTTPException(status_code=400, detail="Maximum 5 files allowed per request.")
+
+    results: List[DocSummary] = []
+
+    for f in files:
+        try:
+            raw_text = read_text_from_upload(f)
+            
+            if not raw_text:
+                results.append(DocSummary(
+                    filename=f.filename or "unnamed", 
+                    chars=0, 
+                    chunks=0, 
+                    summary="(empty or unreadable)"
+                ))
+                continue
+
+            # Chunk the text for processing
+            chunks = chunk_text(raw_text)
+            
+            if not chunks:
+                results.append(DocSummary(
+                    filename=f.filename or "unnamed",
+                    chars=len(raw_text),
+                    chunks=0,
+                    summary="(no content to summarize)"
+                ))
+                continue
+
+            # Process chunks and create summary
+            if len(chunks) == 1:
+                # Single chunk - summarize directly
+                summary = summarize_text(chunks[0], length=length)
+            else:
+                # Multiple chunks - summarize each and combine
+                chunk_summaries = []
+                for idx, chunk in enumerate(chunks, 1):
+                    try:
+                        chunk_prompt = (
+                            f"Part {idx}/{len(chunks)} of a larger document. "
+                            f"Summarize this part briefly. {length_instructions(length)}\n\n{chunk}"
+                        )
+                        chunk_summary = summarize_text(chunk_prompt, length=length)
+                        chunk_summaries.append(chunk_summary)
+                    except Exception as e:
+                        chunk_summaries.append(f"Error processing part {idx}: {str(e)}")
+
+                # Combine chunk summaries
+                if chunk_summaries:
+                    combine_prompt = (
+                        "Combine these partial summaries into a single coherent summary. "
+                        f"{length_instructions(length)}\n\n"
+                        "PARTIAL SUMMARIES:\n" + "\n\n---\n".join(chunk_summaries)
+                    )
+                    summary = summarize_text(combine_prompt, length=length)
+                else:
+                    summary = "Error: Could not process document chunks"
+
+            results.append(DocSummary(
+                filename=f.filename or "unnamed",
+                chars=len(raw_text),
+                chunks=len(chunks),
+                summary=summary,
+            ))
+
+        except Exception as e:
+            results.append(DocSummary(
+                filename=f.filename or "unnamed",
+                chars=0,
+                chunks=0,
+                summary=f"Error processing file: {str(e)}"
+            ))
+
+    # Generate combined summary if requested and multiple files
+    combined: Optional[str] = None
+    if combine_across_files and len(results) > 1 and all(r.summary and not r.summary.startswith("Error") for r in results):
+        try:
+            combined_prompt = (
+                "You are given summaries of multiple documents. Produce a unified summary that "
+                "highlights common themes, key differences, and actionable insights.\n\n"
+                + "\n\n====\n".join([f"FILE: {r.filename}\nSUMMARY:\n{r.summary}" for r in results])
+            )
+            combined = summarize_text(combined_prompt, length=length)
+        except Exception as e:
+            combined = f"Error generating combined summary: {str(e)}"
+
+    return SummaryResponse(
+        summaries=results,
+        combined_summary=combined,
+        meta={
+            "files_processed": len(files),
+            "length": length,
+            "combine_across_files": combine_across_files
+        },
+    )
+
+@router.get("/health")
+async def health():
+    """Health check endpoint"""
+    return JSONResponse({
+        "status": "ok", 
+        "module": "document-analyzer",
+        "pdf_support": PdfReader is not None,
+        "docx_support": DocxDocument is not None
+    })
+
+@router.get("/supported-formats")
+async def supported_formats():
+    """Get list of supported file formats"""
+    formats = {
+        "text": list(TEXT_EXTS),
+        "documents": list(DOC_EXTS),
+        "pdf": list(PDF_EXTS)
+    }
+    
+    return JSONResponse({
+        "supported_formats": formats,
+        "max_files_per_request": 5,
+        "max_file_size_mb": 50
+    })

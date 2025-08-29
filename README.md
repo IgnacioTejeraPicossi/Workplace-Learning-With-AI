@@ -23,6 +23,7 @@
 - [Knowledge Map](#knowledge-map) - Interactive learning visualization
 - [Agent Cursor AI](#agent-cursor-ai) - Repository analysis and documentation
 - [Repository Analyzer](#repository-analyzer) - Code analysis and learning modules
+- [Document Analyzer](#document-analyzer) - AI-powered document analysis and summarization
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
 
@@ -114,6 +115,7 @@ graph TB
     KnowledgeMap[🗺️ Knowledge Map]
     AgentCursorAI[🤖 Agent Cursor AI]
     RepoAnalyzer[📁 Repository Analyzer]
+    DocumentAnalyzer[📄 Document Analyzer]
     PresentationAgent[🎤 Presentation Agent]
     AIStudyBuddy[🤝 AI Study Buddy]
   end
@@ -921,6 +923,21 @@ Modular API endpoints for:
   - 🧠 **Quiz Generation**: Create interactive quizzes from generated documentation
   - 📄 **PDF Export**: Download documentation in PDF format
   - 🎯 **Template Support**: Quick access to common repository templates
+- **Document Analyzer** (DocumentsAnalyzer.jsx):
+  - 📄 **Multi-Format Support**: Process PDF, DOCX, TXT, and Markdown files
+  - 🤖 **AI-Powered Summarization**: Generate summaries in three levels (short, medium, long)
+  - 🔄 **Batch Processing**: Analyze up to 5 documents simultaneously
+  - 📊 **Smart Chunking**: Intelligent text segmentation for large documents
+  - 💾 **Learning Library**: Store and manage analyzed documents for future reference
+  - 📋 **Export Options**: Copy to clipboard and download summaries in multiple formats
+  - 🎯 **Memory Optimized**: Efficient processing with 1MB chunk reading to prevent memory issues
+- **Learning Document Library** (LearningDocument.jsx):
+  - 📚 **Document Management**: Browse, search, and filter previously analyzed documents
+  - 🏷️ **Smart Tagging**: Automatic categorization with searchable tags
+  - ⭐ **Quality Ratings**: AI-generated quality scores for each document analysis
+  - 🔍 **Advanced Search**: Search by filename, content, tags, or document type
+  - 📊 **Sorting Options**: Sort by date, name, rating, or file size
+  - 🔗 **Seamless Integration**: Direct access to Document Analyzer for new analyses
 - **Saved Micro-lessons** (LessonList.jsx):
   - View all previously generated micro-lessons at the bottom of the app
   - Filter lessons by topic in real time
@@ -1057,6 +1074,128 @@ The Certifications module has been significantly enhanced with a sophisticated s
 - **Clear Visual Hierarchy**: Better spacing and typography
 - **Responsive Layout**: Works perfectly on all screen sizes
 - **Theme Integration**: Adapts to light/dark mode automatically
+
+---
+
+## 📄 Document Analyzer: AI-Powered Document Intelligence
+
+### 🎯 Overview
+
+The **Document Analyzer** is a comprehensive AI-powered document processing system that transforms how users interact with their learning materials. Built with memory optimization in mind, it provides intelligent document summarization, analysis, and management capabilities.
+
+### 🚀 Core Features
+
+**Multi-Format Document Support**
+- **PDF Processing**: Extract text from PDF files with intelligent page handling
+- **Word Documents**: Process DOCX files with structured content extraction
+- **Text Files**: Support for TXT and Markdown files with encoding detection
+- **Batch Processing**: Analyze up to 5 documents simultaneously for comprehensive insights
+
+**AI-Powered Analysis Engine**
+- **Smart Summarization**: Three levels of summary detail (short, medium, long)
+- **Intelligent Chunking**: Break large documents into manageable 3,000-character segments
+- **Memory Optimization**: 1MB chunk reading prevents memory overflow issues
+- **LLM Integration**: Leverages existing OpenAI/GPT-5 infrastructure for consistent results
+
+**Advanced Processing Options**
+- **Summary Length Control**: 
+  - **Short**: 3-5 bullet points with one-sentence summary
+  - **Medium**: Executive summary (100-150 words) with 3 key highlights
+  - **Long**: Detailed outline with sections (Overview, Key Findings, Data/Methods, Action Items)
+- **Cross-Document Analysis**: Generate combined summaries highlighting common themes and differences
+- **Quality Assurance**: Automatic error handling and validation for robust processing
+
+### 💾 Learning Document Library
+
+**Document Management System**
+- **Persistent Storage**: All analyzed documents are automatically saved and indexed
+- **Smart Organization**: Automatic categorization by file type, content, and analysis date
+- **Quality Ratings**: AI-generated quality scores (1-10) for each document analysis
+- **Metadata Tracking**: File size, character count, processing chunks, and analysis parameters
+
+**Advanced Search & Filtering**
+- **Full-Text Search**: Search across filenames, summaries, and content
+- **Type Filtering**: Filter by document format (PDF, DOCX, TXT, MD)
+- **Sorting Options**: Sort by date, name, rating, or file size
+- **Real-Time Results**: Instant search results with dynamic filtering
+
+**User Experience Features**
+- **Drag & Drop Interface**: Intuitive file upload with visual feedback
+- **Progress Tracking**: Real-time analysis progress with status indicators
+- **Export Options**: Copy summaries to clipboard or download as text files
+- **Responsive Design**: Works seamlessly across all device sizes
+
+### 🔧 Technical Architecture
+
+**Backend Implementation**
+- **FastAPI Router**: `/api/document-analyzer` with comprehensive endpoints
+- **Memory Management**: Efficient file processing with chunked reading
+- **Error Handling**: Robust error handling with detailed user feedback
+- **File Validation**: Type checking and size validation for security
+
+**Frontend Components**
+- **DocumentsAnalyzer.jsx**: Main analysis interface with drag & drop
+- **LearningDocument.jsx**: Document library and management interface
+- **Theme Integration**: Seamless integration with existing design system
+- **Responsive Layout**: Mobile-friendly interface with touch support
+
+**Security & Performance**
+- **File Size Limits**: Maximum 50MB per file to prevent abuse
+- **Format Validation**: Strict file type checking for security
+- **Memory Optimization**: Prevents the 16MB memory issues experienced previously
+- **Efficient Processing**: Optimized for large document handling
+
+### 📋 Usage Examples
+
+**Single Document Analysis**
+1. **Upload**: Drag and drop a PDF report
+2. **Select**: Choose "Medium" summary length
+3. **Analyze**: Click "Analyze Documents"
+4. **Review**: Get AI-generated executive summary with key highlights
+5. **Export**: Copy to clipboard or download summary
+
+**Batch Document Processing**
+1. **Upload**: Select multiple related documents (e.g., project reports)
+2. **Enable**: "Combine summaries across files" option
+3. **Process**: Generate individual and combined summaries
+4. **Compare**: Identify common themes and key differences
+5. **Store**: All results automatically saved to Learning Library
+
+**Document Library Management**
+1. **Browse**: View all previously analyzed documents
+2. **Search**: Find specific content or topics
+3. **Filter**: Narrow down by document type or date
+4. **Organize**: Use tags and ratings for better organization
+5. **Access**: Quick access to Document Analyzer for new analyses
+
+### 🎨 User Interface
+
+**Modern Design Language**
+- **Consistent Theming**: Integrates with existing color scheme and typography
+- **Visual Feedback**: Clear status indicators and progress tracking
+- **Accessibility**: Keyboard navigation and screen reader support
+- **Responsive Grid**: Adapts to different screen sizes automatically
+
+**Interactive Elements**
+- **Drag & Drop Zone**: Visual feedback during file upload
+- **Progress Indicators**: Real-time analysis status updates
+- **Action Buttons**: Clear call-to-action buttons with icons
+- **Results Display**: Structured presentation of analysis results
+
+### 🔮 Future Enhancements
+
+**Planned Features**
+- **Vector Search**: Semantic search across document content
+- **Document Comparison**: Side-by-side analysis of multiple documents
+- **Template Library**: Pre-built analysis templates for common document types
+- **Collaboration**: Share analysis results with team members
+- **Advanced Analytics**: Document usage patterns and learning insights
+
+**Integration Opportunities**
+- **Knowledge Map**: Connect analyzed documents to learning pathways
+- **AI Study Buddy**: Use document insights for personalized learning
+- **Certifications**: Incorporate document analysis into skill development
+- **Team Dynamics**: Collaborative document analysis and sharing
 
 ---
 

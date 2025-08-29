@@ -50,6 +50,10 @@ app.include_router(doc_router, prefix="/api", tags=["Documentation Generation"])
 app.include_router(cursor_readme_router, prefix="/api", tags=["Cursor AI README Generator"])
 app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
+# Document Analyzer router
+from backend.document_analyzer import router as document_analyzer_router
+app.include_router(document_analyzer_router, prefix="/api", tags=["Document Analyzer"])
+
 # Cursor AI Automation router
 from backend.cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
