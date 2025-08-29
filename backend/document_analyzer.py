@@ -173,7 +173,7 @@ def length_instructions(length: str) -> str:
 
 # ========= LLM calls =========
 def summarize_text(text: str, length: str = "medium") -> str:
-    """Summarize text using direct API calls (OpenAI only, since that's what's available)"""
+    """Summarize text using the unified AI system (ItemAI → OpenRouter → OpenAI)"""
     try:
         instr = length_instructions(length)
         
@@ -184,28 +184,46 @@ def summarize_text(text: str, length: str = "medium") -> str:
             "=== DOCUMENT END ==="
         )
         
-        # Try OpenAI directly (what's actually available)
+        # Use the unified AI system from llm.py
         try:
-            import openai
-            import os
+            # Try different import paths for the unified system
+            try:
+                from llm import ask_openai
+            except ImportError:
+                try:
+                    from backend.llm import ask_openai
+                except ImportError:
+                    from ..llm import ask_openai
             
-            openai_key = os.getenv("OPENAI_API_KEY")
-            if openai_key and openai_key.strip():
-                openai.api_key = openai_key
-                
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=800,
-                    temperature=0.2
-                )
-                return response.choices[0].message.content.strip()
-            else:
-                print("No OpenAI API key found in environment variables")
+            # The unified system will try ItemAI → OpenRouter → OpenAI automatically
+            response = ask_openai(prompt, max_tokens=800, temperature=0.2)
+            return response.strip()
+            
         except Exception as e:
-            print(f"OpenAI failed: {e}")
+            print(f"Unified AI system failed: {e}")
+            
+            # Fallback to direct OpenAI if unified system fails
+            try:
+                import openai
+                import os
+                
+                openai_key = os.getenv("OPENAI_API_KEY")
+                if openai_key and openai_key.strip():
+                    openai.api_key = openai_key
+                    
+                    response = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=800,
+                        temperature=0.2
+                    )
+                    return response.choices[0].message.content.strip()
+                else:
+                    print("No OpenAI API key found in environment variables")
+            except Exception as openai_error:
+                print(f"Direct OpenAI fallback also failed: {openai_error}")
         
-        # Fallback to mock response
+        # Final fallback to mock response
         return f"[MOCKED RESPONSE] This would be the AI's answer to: {prompt[:100]}..."
         
     except Exception as e:
