@@ -56,7 +56,7 @@ class LLMClient:
                     from ..llm import ask_openai
             
             # The unified system will try ItemAI → OpenRouter → OpenAI automatically
-            response = ask_openai(prompt, max_tokens=800, temperature=0.2)
+            response = ask_openai(prompt, max_tokens=800)
             return response.strip()
             
         except Exception as e:

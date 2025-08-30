@@ -138,6 +138,19 @@ def ask_agentic(doc_ids: List[str], question: str, depth:int, k_init:int, use_hy
     selected = recursive_navigate(question, doc_ids, cand_ids, max_paragraphs, use_hybrid)
 
     synthesis = synthesize(llm, question, selected)
+    
+    # Validate synthesis result
+    if not synthesis or "answer" not in synthesis:
+        print(f"❌ Synthesis failed or missing answer: {synthesis}")
+        # Return error response
+        return {
+            "run_id": run_id,
+            "doc_ids": doc_ids,
+            "question": question,
+            "error": "Failed to generate answer from document analysis",
+            "elapsed_sec": round(time.time()-t0, 3),
+        }
+    
     scores = judge(llm, question, synthesis["answer"], synthesis.get("citations", []))
     metrics = llm.metrics()
 

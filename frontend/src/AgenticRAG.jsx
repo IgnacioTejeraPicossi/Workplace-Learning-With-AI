@@ -11,6 +11,7 @@ const AgenticRAG = () => {
   const [indexing, setIndexing] = useState(false);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState("");
+  const [analyses, setAnalyses] = useState([]);
 
   // Agentic RAG parameters
   const [depth, setDepth] = useState(2);
@@ -32,6 +33,69 @@ const AgenticRAG = () => {
       console.error("Error fetching indexed documents:", error);
     }
   };
+
+
+
+  const saveAnalysis = async (analysisData) => {
+    try {
+      const response = await fetch('/api/agentic-rag/save-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(analysisData),
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        console.log('Analysis saved successfully:', data.analysis_id);
+        setStatus('✅ Analysis saved successfully!');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        console.error('Failed to save analysis:', data.message);
+        setStatus('❌ Failed to save analysis: ' + data.message);
+        setTimeout(() => setStatus(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      setStatus('❌ Error saving analysis');
+      setTimeout(() => setStatus(''), 3000);
+    }
+  };
+
+  const saveCurrentAnalysis = () => {
+    if (!result || !selectedDocIds.length) {
+      setStatus('❌ No result to save or no documents selected');
+      setTimeout(() => setStatus(''), 3000);
+      return;
+    }
+
+    const analysisData = {
+      doc_id: selectedDocIds[0], // Use first selected document
+      filename: indexedDocs.find(doc => doc.doc_id === selectedDocIds[0])?.filename || 'Unknown',
+      question: question,
+      answer: result.answer,
+      citations: result.citations || [],
+      scores: result.scores || {},
+      parameters: {
+        depth: depth,
+        k_init: kInit,
+        use_hybrid: useHybrid,
+        max_paragraphs: maxParagraphs
+      },
+      // Store all additional analysis data for complete traceability
+      metrics: result.metrics || {},
+      router_selected: result.router_selected || [],
+      used_paragraphs: result.used_paragraphs || [],
+      run_id: result.run_id || '',
+      elapsed_sec: result.elapsed_sec || 0,
+      user_id: "anonymous"
+    };
+
+    saveAnalysis(analysisData);
+  };
+
+
 
   const handleFileUpload = (event) => {
     const newFiles = Array.from(event.target.files);
@@ -204,6 +268,8 @@ const AgenticRAG = () => {
         const data = await response.json();
         setResult(data);
         setStatus(`✅ Answer generated successfully in ${data.elapsed_sec || 'unknown'} seconds!`);
+        
+
       } else {
         const error = await response.text();
         setStatus(`❌ Question failed: ${error}`);
@@ -292,14 +358,14 @@ const AgenticRAG = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          🚀 Agentic RAG (Beta)
+          🚀 Agentic RAG Analyzer
         </h1>
         <p style={{ 
           color: colors.textSecondary, 
           fontSize: "16px",
           lineHeight: "1.5"
         }}>
-          Advanced document analysis using intelligent agents for deep reasoning and grounded answers.
+          Advanced document analysis using intelligent agents for deep reasoning and grounded answers with citations.
         </p>
         
         {/* Status Messages */}
@@ -656,14 +722,23 @@ const AgenticRAG = () => {
         border: `1px solid ${colors.border}`,
         boxShadow: colors.shadow
       }}>
-        <h2 style={{ 
-          color: colors.text, 
-          marginBottom: "16px",
-          fontSize: "20px",
-          fontWeight: "600"
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          marginBottom: "16px"
         }}>
-          🤖 Ask Questions
-        </h2>
+          <h2 style={{ 
+            color: colors.text, 
+            fontSize: "20px",
+            fontWeight: "600",
+            margin: "0"
+          }}>
+            🤖 Ask Questions
+          </h2>
+          
+
+        </div>
 
         {/* Document Selection */}
         {indexedDocs.length > 0 && (
@@ -903,6 +978,8 @@ const AgenticRAG = () => {
         </div>
       </div>
 
+
+
       {/* Results Section */}
       {result && (
         <div style={{ 
@@ -1012,21 +1089,40 @@ const AgenticRAG = () => {
             }}>
               {result.answer}
             </div>
-            <button
-              onClick={() => copyToClipboard(result.answer)}
-              style={{
-                marginTop: "8px",
-                padding: "6px 12px",
-                borderRadius: "4px",
-                border: "none",
-                background: colors.secondary,
-                color: "white",
-                fontSize: "12px",
-                cursor: "pointer"
-              }}
-            >
-              📋 Copy Answer
-            </button>
+            <div style={{ 
+              display: "flex", 
+              gap: "8px", 
+              marginTop: "8px"
+            }}>
+              <button
+                onClick={() => copyToClipboard(result.answer)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "4px",
+                  border: "none",
+                  background: colors.secondary,
+                  color: "white",
+                  fontSize: "12px",
+                  cursor: "pointer"
+                }}
+              >
+                📋 Copy Answer
+              </button>
+              <button
+                onClick={() => saveCurrentAnalysis()}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "4px",
+                  border: "none",
+                  background: colors.primary,
+                  color: "white",
+                  fontSize: "12px",
+                  cursor: "pointer"
+                }}
+              >
+                💾 Save Analysis
+              </button>
+            </div>
           </div>
 
           {/* Citations */}
@@ -1160,14 +1256,14 @@ const AgenticRAG = () => {
           fontSize: "18px",
           fontWeight: "500"
         }}>
-          Need help with Agentic RAG?
+          Need help with Agentic RAG Analyzer?
         </h3>
         <p style={{ 
           color: colors.textSecondary, 
           marginBottom: "20px",
           fontSize: "16px"
         }}>
-          This advanced system uses intelligent agents to navigate documents, reason about content, and provide grounded answers with citations.
+          This advanced system uses intelligent agents to navigate documents, reason about content, and provide grounded answers with citations and quality assessment.
         </p>
         <div style={{ 
           display: "flex", 

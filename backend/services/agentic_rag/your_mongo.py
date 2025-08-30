@@ -84,5 +84,13 @@ def get_analyses(doc_id: Optional[str] = None, limit: int = 50) -> List[Dict[str
 
 def delete_analysis(analysis_id: str) -> bool:
     """Delete an analysis by ID"""
-    result = analyses.delete_one({"_id": analysis_id})
-    return result.deleted_count > 0
+    try:
+        from bson import ObjectId
+        # Convert string ID to ObjectId for MongoDB query
+        object_id = ObjectId(analysis_id)
+        result = analyses.delete_one({"_id": object_id})
+        print(f"🗑️ Deleting analysis {analysis_id} -> ObjectId: {object_id}, deleted: {result.deleted_count}")
+        return result.deleted_count > 0
+    except Exception as e:
+        print(f"❌ Error deleting analysis {analysis_id}: {e}")
+        return False
