@@ -79,7 +79,8 @@ const navItems = [
   // Grupo 1.6: Document Analyzer (nuevo módulo)
   { key: "document-analyzer", label: "Document Analyzer", icon: "document", group: "learning", isExpandable: true, subItems: [
     { key: "documents-analyzer", label: "Documents Analyzer", icon: "document-text" },
-    { key: "learning-document", label: "Learning Document", icon: "book" }
+    { key: "learning-document", label: "Learning Document", icon: "book" },
+    { key: "agentic-rag", label: "Agentic RAG (Beta)", icon: "🚀" }
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)

@@ -61,9 +61,9 @@ class SaveAnalysisResponse(BaseModel):
     message: str
     analysis_id: Optional[str] = None
 
-# ========= Temporary Storage (In-Memory) =========
-# This will be replaced with actual database storage later
-_saved_analyses = {}  # Changed to dict for better persistence and lookup
+# ========= Simple In-Memory Storage =========
+# Using simple in-memory storage that works reliably
+_saved_analyses = {}
 
 # ========= Helpers =========
 TEXT_EXTS = {".txt", ".md", ".markdown"}
@@ -364,7 +364,7 @@ async def supported_formats():
 
 @router.post("/save-analysis", response_model=SaveAnalysisResponse)
 async def save_analysis(request: SaveAnalysisRequest):
-    """Save document analysis to database for Learning Document module"""
+    """Save document analysis to in-memory storage for Learning Document module"""
     try:
         # Create analysis document
         analysis_data = {
@@ -379,7 +379,7 @@ async def save_analysis(request: SaveAnalysisRequest):
             "module": "document_analyzer"
         }
         
-        # Save to temporary in-memory storage
+        # Save to in-memory storage
         global _saved_analyses
         _saved_analyses[analysis_data["id"]] = analysis_data
         
@@ -398,9 +398,9 @@ async def save_analysis(request: SaveAnalysisRequest):
 
 @router.get("/get-saved-analyses")
 async def get_saved_analyses():
-    """Get all saved document analyses for Learning Document module"""
+    """Get all saved document analyses from in-memory storage for Learning Document module"""
     try:
-        # Return actual saved analyses from temporary in-memory storage
+        # Return actual saved analyses from in-memory storage
         global _saved_analyses
         
         # Convert dict values to list for frontend compatibility
@@ -419,6 +419,8 @@ async def get_saved_analyses():
             "analyses": [],
             "total": 0
         })
+
+
 
 # New endpoint for JSON-based file uploads (base64 encoded)
 @router.post("/analyze-json", response_model=SummaryResponse)

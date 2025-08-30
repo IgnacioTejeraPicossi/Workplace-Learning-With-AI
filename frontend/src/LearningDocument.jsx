@@ -544,34 +544,7 @@ const LearningDocument = () => {
                 </div>
               </div>
 
-                                            {/* Summary - Only show when expanded */}
-               {expanded[doc.id] && (
-                 <div style={{ 
-                   background: colors.background, 
-                   padding: "16px", 
-                   borderRadius: "8px",
-                   marginBottom: "16px"
-                 }}>
-                   <h4 style={{ 
-                     color: colors.primary, 
-                     margin: "0 0 12px 0",
-                     fontSize: "16px",
-                     fontWeight: "500"
-                   }}>
-                     📋 AI-Generated Summary
-                   </h4>
-                   <div style={{ 
-                     color: colors.text, 
-                     fontSize: "14px",
-                     lineHeight: "1.6",
-                     whiteSpace: "pre-wrap",
-                     maxHeight: "200px",
-                     overflowY: "auto"
-                   }}>
-                     {doc.summary}
-                   </div>
-                 </div>
-               )}
+                                                                                         {/* Summary - REMOVED: List should be compressed by default */}
 
               {/* Tags */}
               <div style={{ 

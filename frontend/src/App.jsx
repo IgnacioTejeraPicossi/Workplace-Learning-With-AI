@@ -34,6 +34,7 @@ import AgentCursorAI from "./AgentCursorAI";
 import LearningRepo from "./LearningRepo";
 import DocumentsAnalyzer from "./DocumentsAnalyzer";
 import LearningDocument from "./LearningDocument";
+import AgenticRAG from "./AgenticRAG";
 import EAHome from "./ea/EAHome";
 import ProcessDesigner from "./ea/ProcessDesigner";
 import SecurityPanel from "./SecurityPanel";
@@ -435,6 +436,7 @@ function AppContent() {
             {!activeModule && section === "learning-repo" && <LearningRepo />}
             {!activeModule && section === "documents-analyzer" && <DocumentsAnalyzer />}
             {!activeModule && section === "learning-document" && <LearningDocument />}
+{!activeModule && section === "agentic-rag" && <AgenticRAG />}
             {!activeModule && section === "ea-home" && <EAHome />}
             {!activeModule && section === "process-designer" && <ProcessDesigner />}
             {!activeModule && section === "catalog-manager" && <CatalogManager />}

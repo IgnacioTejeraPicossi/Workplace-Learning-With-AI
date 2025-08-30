@@ -76,6 +76,22 @@ except ImportError:
     from document_analyzer import router as document_analyzer_router
 app.include_router(document_analyzer_router, prefix="/api", tags=["Document Analyzer"])
 
+# Agentic RAG router
+try:
+    from backend.routers.agentic_rag import router as agentic_rag_router
+except ImportError:
+    try:
+        from routers.agentic_rag import router as agentic_rag_router
+    except ImportError:
+        try:
+            from .routers.agentic_rag import router as agentic_rag_router
+        except ImportError:
+            # Skip Agentic RAG if not available - don't break other modules
+            agentic_rag_router = None
+
+if agentic_rag_router:
+    app.include_router(agentic_rag_router, prefix="/api", tags=["Agentic RAG"])
+
 # Cursor AI Automation router
 try:
     from backend.cursor_ai_automation import router as cursor_automation_router
