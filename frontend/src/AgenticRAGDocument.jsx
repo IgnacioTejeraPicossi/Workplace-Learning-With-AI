@@ -664,20 +664,52 @@ const AgenticRAGDocument = () => {
                   flexWrap: "wrap",
                   marginBottom: "12px"
                 }}>
-                  {Object.entries(doc.scores).map(([key, value]) => (
-                    <div key={key} style={{ textAlign: "center" }}>
-                      <div style={{ 
-                        fontSize: "16px", 
-                        fontWeight: "600",
-                        color: value >= 8 ? "#22c55e" : value >= 6 ? "#eab308" : "#ef4444"
-                      }}>
-                        {value}/10
+                  {/* Solo mostrar scores numéricos, no el comentario */}
+                  {Object.entries(doc.scores)
+                    .filter(([key, value]) => key !== 'comment' && typeof value === 'number')
+                    .map(([key, value]) => (
+                      <div key={key} style={{ textAlign: "center" }}>
+                        <div style={{ 
+                          fontSize: "16px", 
+                          fontWeight: "600",
+                          color: value >= 8 ? "#22c55e" : value >= 6 ? "#eab308" : "#ef4444"
+                        }}>
+                          {value}/10
+                        </div>
+                        <div style={{ color: colors.textSecondary, fontSize: "10px" }}>
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </div>
                       </div>
-                      <div style={{ color: colors.textSecondary, fontSize: "10px" }}>
-                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                    ))}
+                  
+                  {/* Comentario con estilos específicos */}
+                  {doc.scores.comment && (
+                    <div style={{ 
+                      marginTop: "8px",
+                      padding: "8px 12px",
+                      background: colors.background,
+                      borderRadius: "6px",
+                      border: `1px solid ${colors.border}`,
+                      width: "100%"
+                    }}>
+                      <div style={{ 
+                        color: colors.primary, 
+                        fontSize: "12px", 
+                        fontWeight: "500",
+                        marginBottom: "4px"
+                      }}>
+                        Comment:
+                      </div>
+                      <div style={{ 
+                        color: colors.textSecondary, 
+                        fontSize: "12px",
+                        lineHeight: "1.4",
+                        fontStyle: "italic"
+                      }}>
+                        {doc.scores.comment}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
 
