@@ -79,11 +79,6 @@ This methodology is not only valuable for hackathons, but also for onboarding ne
 This project is a **proof of concept for the next generation of software development**, where clear documentation and AI collaboration can achieve results previously possible only with direct code access. We invite you to explore, build, and extend this application—using only the instructions provided—as a testament to what's possible with today's AI.
 
 ---
-
-## 🏗️ System Architecture {#system-architecture}
-
-*The diagram below shows the complete system architecture. For detailed information about each component, use the navigation links above.*
-
 ## 🏗️ System Architecture {#system-architecture}
 
 *The diagrams below show the system architecture divided into two clear sections for better readability.*
