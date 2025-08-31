@@ -1852,549 +1852,160 @@ The Team Dynamics Analyzer is a comprehensive team management and analytics modu
 
 ---
 
-## 🗺️ Map of Knowledge - Advanced Learning Visualization
+## 🗺️ Map of Knowledge - Real-Time Learning Visualization
 
-The Map of Knowledge is a sophisticated learning visualization system that provides an interactive, AI-powered view of your learning journey across different knowledge domains. It combines vector-based recommendations, mastery tracking, and intelligent clustering to create a comprehensive learning experience.
+The Knowledge Map is a sophisticated, **data-driven learning visualization system** that dynamically generates interactive maps of your learning journey using **real data from your actual learning activities**.
 
-### Core Features:
+### 🎯 **Real Data Integration (NEW!)**
 
-#### 🎯 Advanced Vectorial Recommendations
-- **Vector Proximity Analysis**: Uses cosine similarity to find topics closely related to your current learning vector
-- **Intelligent Prioritization**: AI-powered scoring system that considers mastery gaps, learning continuity, and cluster proximity
-- **Learning Paths**: Generates personalized learning sequences with optimal progression paths
-- **Deduction Logic**: Identifies knowledge gaps and suggests logical next steps in your learning journey
+**Dynamic Topic Extraction**
+- **Micro-lessons**: Automatically extracts topics from completed micro-lessons
+- **Video Lessons**: Integrates topics from saved video content
+- **Real-time Updates**: Topics update automatically as you complete new lessons
+- **No Mock Data**: 100% real content from your learning activities
 
-#### 🎨 Advanced Visual UX
-- **Interactive SVG Map**: D3.js-powered visualization with zoom, pan, and hover effects
-- **Knowledge Clusters**: Color-coded clusters (AI Fundamentals, Leadership, Business Applications, Communication)
-- **Node Visualization**: Topics displayed as interactive nodes with size indicating mastery level
-- **Tooltips & Animations**: Rich hover information and smooth animations for recommended topics
-- **Responsive Design**: Adapts to all screen sizes with touch support
+**Smart Categorization System**
+- **Automatic Clustering**: AI-powered topic grouping based on content analysis
+- **Dynamic Categories**: Categories adapt to your actual learning content
+- **Pattern Recognition**: Intelligent grouping using semantic analysis
+- **Scalable Architecture**: Handles hundreds of topics efficiently
 
-#### 📊 Advanced Mastery Panel
-- **Real-time Analytics**: Live mastery scores and progress tracking across all 13 topics
-- **Timeline Visualization**: Interactive charts showing learning progression over time
-- **KPI Dashboard**: Key performance indicators including average mastery, topics completed, and learning velocity
-- **Cluster Analysis**: Detailed breakdown of mastery by knowledge cluster
-- **Recommendation Engine**: AI-powered suggestions based on current progress and goals
+### 🎨 **Visual Learning Landscape**
 
-### Technical Architecture:
+**Interactive Node System**
+- **Topic Nodes**: Each learning topic represented as an interactive circle
+- **Mastery Indicators**: Node size reflects your proficiency level (0-100%)
+- **Color-Coded Categories**: Consistent color scheme across clusters and topics
+- **Real-time Filtering**: Dynamic filtering by category and mastery level
 
-#### Frontend Components
-- **KnowledgeMap.jsx**: Main visualization component with D3.js integration
-- **AdvancedMasteryPanel.jsx**: Analytics dashboard with charts and KPIs
-- **AdvancedRecommendations.jsx**: AI-powered recommendation display
-- **AdvancedTooltip.jsx**: Rich hover information system
-- **ClusterLegend.jsx**: Interactive cluster filtering and legend
-- **MasteryTimeline.jsx**: Timeline visualization component
+**Knowledge Clusters**
+- **Programming & Development** 🟢 (Green) - Programming languages, development concepts
+- **AI & Machine Learning** 🔵 (Blue) - AI, ML, LLM, RAG technologies
+- **Development Tools** 🟠 (Orange) - IDEs, localhost, development environments
+- **Web Technologies** 🟣 (Purple) - APIs, web development, frontend/backend
+- **Data & Analytics** 🔵 (Teal) - Data science, analytics, databases
+- **General Skills** ⚫ (Gray) - General knowledge and skills
 
-#### Backend API Endpoints
-- **GET /api/knowledge-map/topics**: Retrieves all 13 learning topics with embeddings
-- **GET /api/knowledge-map/clusters**: Returns knowledge cluster definitions
-- **GET /api/knowledge-map/user/{user_id}**: User-specific mastery data and progress
-- **GET /api/knowledge-map/recommendations/{user_id}**: Advanced vectorial recommendations
-- **POST /api/analyze-repo**: Analyze repository and generate file summaries
-- **POST /api/generate-documentation**: Generate markdown and PDF documentation
-- **POST /api/generate-quiz**: Create quizzes from documentation content
-- **GET /api/repo-templates**: Get common repository templates
+### 🔍 **Advanced Search & Filtering**
 
-#### Database Collections
-- **topics**: Learning topics with embeddings and metadata
-- **clusters**: Knowledge cluster definitions and topic associations
-- **user_mastery**: User-specific mastery scores and progress tracking
-- **learning_paths**: Generated learning sequences and recommendations
+**Smart Search System**
+- **Real-time Search**: Instant search across all your learning topics
+- **Semantic Matching**: Finds topics by name, description, or content
+- **Filter Integration**: Combines search with category and mastery filters
+- **Dynamic Results**: Updates in real-time as you type
 
-### Advanced Features:
+**Intelligent Filtering**
+- **Category Filters**: Filter by dynamic categories (e.g., "AI & Machine Learning")
+- **Mastery Filters**: Filter by proficiency level (Low, Medium, High)
+- **Combined Filters**: Use multiple filters simultaneously
+- **Clear Filters**: One-click reset to show all topics
 
-#### 🔍 Search & Filter System
-- **Real-time Search**: Instant filtering of topics by name or description
-- **Category Filtering**: Filter by knowledge cluster (AI Fundamentals, Leadership, etc.)
-- **Mastery Level Filtering**: Filter by current mastery level (Low, Medium, High)
-- **Results Counter**: Shows filtered vs. total topics count
+### 📊 **Data Sources & Integration**
 
-#### 🎮 Interactive Controls
-- **Advanced Zoom Controls**: 
-  - **+ Button**: Zoom in with smooth transitions (20% increase per click)
-  - **− Button**: Zoom out with smooth transitions (50% decrease per click)
-  - **🏠 Button**: Reset zoom to 100% and center the map
-  - **🎯 Button**: Center the map on currently visible nodes
-  - **🔒/🔓 Button**: Toggle between zoom mode and selection mode
-- **Zoom Level Indicator**: Real-time display of current zoom percentage
-- **Mouse Wheel Zoom**: Natural zoom in/out with mouse wheel
-- **Double-Click Reset**: Double-click anywhere on the map to reset zoom
-- **Pan Navigation**: Click and drag to move around the map with visual feedback
-- **Node Selection**: Click nodes to view detailed topic information
-- **Visual Feedback**: Cursor changes and subtle brightness effects during zoom/pan operations
-
-#### 🎯 Advanced Zoom & Navigation System
-- **Professional Zoom Controls**: 
-  - **Zoom Range**: 50% (minimum) to 300% (maximum) zoom levels
-  - **Smooth Transitions**: 300ms animations for all zoom operations
-  - **Smart Centering**: Automatic centering on filtered/visible nodes
-  - **Mode Toggle**: Switch between zoom mode and selection mode
-- **Enhanced User Experience**:
-  - **Tooltips**: Helpful information on hover for all zoom controls
-  - **Visual Indicators**: Cursor changes and brightness effects during operations
-  - **Responsive Design**: Works perfectly on all screen sizes and devices
-  - **Accessibility**: Full keyboard and mouse support
-
-#### 📈 Data Synchronization
-- **Real-time Updates**: Mastery scores update automatically as you learn
-- **Cross-module Integration**: Connects with Micro-lessons, Certifications, and other modules
-- **Progress Tracking**: Automatic tracking of learning activities and achievements
-- **Recommendation Updates**: AI recommendations adapt to your changing progress
-
-### How to Use:
-
-1. **Navigate to Map of Knowledge**
-   - Click "🗺️ Map of Knowledge" in the sidebar
-   - View your learning landscape with 13 interactive topic nodes
-
-2. **Explore Your Knowledge**
-   - Hover over nodes to see topic details and mastery levels
-   - Use zoom controls to focus on specific areas
-   - Click nodes to view detailed topic information
-
-3. **Use Advanced Filters**
-   - Search for specific topics using the search bar
-   - Filter by category or mastery level
-   - Clear filters to see all topics
-
-4. **Review Analytics**
-   - Check the Advanced Mastery Panel for detailed analytics
-   - View your learning timeline and progress trends
-   - Review AI-powered recommendations
-
-5. **Follow Learning Paths**
-   - Review recommended learning sequences
-   - Focus on topics with the highest recommendation scores
-   - Track your progress through the learning paths
-
-### Knowledge Topics (13 Total):
-
-#### 🤖 AI Fundamentals Cluster
-- **Prompt Engineering**: Master the art of crafting effective AI prompts
-- **AI Ethics**: Understanding ethical considerations in AI development
-- **Machine Learning**: Core concepts and practical applications
-
-#### 👥 Leadership Cluster
-- **Team Leadership**: Effective team management and motivation
-- **Project Management**: Planning, execution, and delivery
-- **Conflict Resolution**: Handling workplace conflicts professionally
-
-#### 💼 Business Applications Cluster
-- **Customer Service**: Excellence in customer interactions
-- **Sales Negotiation**: Effective sales and negotiation techniques
-- **Data Analysis**: Interpreting and presenting business data
-
-#### 🗣️ Communication Cluster
-- **Presentation Skills**: Delivering compelling presentations
-- **Business Writing**: Professional written communication
-- **Active Listening**: Improving communication through better listening
-- **Public Speaking**: Confidence in public speaking situations
-
-### Advanced Analytics Features:
-
-#### 📊 Mastery Metrics
-- **Individual Topic Mastery**: Percentage-based mastery for each of 13 topics
-- **Cluster Averages**: Average mastery across knowledge clusters
-- **Learning Velocity**: Rate of mastery improvement over time
-- **Gap Analysis**: Identification of knowledge gaps and opportunities
-
-#### 🎯 Recommendation Engine
-- **Vector Similarity**: Mathematical proximity between topics
-- **Learning Continuity**: Logical progression through related topics
-- **Cluster Proximity**: Bonus scoring for topics in the same cluster
-- **Personalization**: Adapts to individual learning patterns and preferences
-
-#### 📈 Progress Tracking
-- **Timeline Visualization**: Historical mastery progression
-- **Achievement Tracking**: Milestones and learning achievements
-- **Goal Setting**: Personalized learning goals and targets
-- **Performance Analytics**: Detailed performance insights and trends
-
----
-
-## 🔍 Global Search Functionality
-
-The Global Search feature provides instant access to all sections and features of the application through a powerful search interface. This modern, intuitive search system allows users to quickly navigate to any part of the application.
-
-### Core Features:
-**🔍 Search Interface**
-- Search Button: Located in the header next to the theme toggle
-- Modal Overlay: Clean, modern search interface that appears over the current page
-- Real-time Search: Instant results as you type
-- Theme Aware: Automatically adapts to light/dark mode
-
-**⌨️ Keyboard Shortcuts**
-- Open Search: Press Ctrl+K (Windows/Linux) or Cmd+K (Mac)
-- Navigate Results: Use arrow keys (↑↓) to move through results
-- Select Result: Press Enter to navigate to the selected section
-- Close Search: Press Escape to close the search modal
-
-**🎯 Comprehensive Coverage**
-The search covers all 12 sections of the application:
-
-- Dashboard - View learning progress and overview
-- AI Concepts - Explore innovative AI learning concepts
-- Micro-lessons - Create and manage bite-sized learning lessons
-- Map of Knowledge - Interactive learning visualization and analytics
-- Recommendation - Get personalized learning recommendations
-- Simulations - Practice with interactive workplace scenarios
-- Web Search - Search the web for up-to-date information
-- Team Dynamics - Analyze and improve team collaboration
-- Certifications - Get certification recommendations and study plans
-- AI Career Coach - Get career guidance and professional advice
-- Skills Forecast - Predict future skills and career trends
-- Saved Lessons - View and manage your saved micro-lessons
-
-**⚡ Smart Search Algorithm**
-- Title Search: Matches section names exactly
-- Description Search: Searches through feature descriptions
-- Keyword Search: Includes relevant keywords for each section
-- Fuzzy Matching: Finds results even with partial matches
-- Instant Results: No loading delays or waiting
-
-**�� User Experience**
-- Visual Feedback: Selected items are highlighted
-- Icons: Each result shows the section's icon for easy recognition
-- Descriptions: Clear descriptions help users understand what each section does
-- Responsive Design: Works perfectly on all screen sizes
-- Accessibility: Full keyboard navigation and screen reader support
-
-### How to Use:
-1. Click the 🔍 button in the header, or
-2. Press Ctrl+K (or Cmd+K on Mac) to open search
-3. Type to search - e.g., "certification", "coach", "skills", "team"
-4. Use arrow keys to navigate through results
-5. Press Enter or click to navigate to the selected section
-6. Press Escape to close the search
-
-### Technical Implementation
-- Component: GlobalSearch.jsx - React component with modal interface
-- Integration: Seamlessly integrated into App.jsx with header button
-- State Management: Uses React hooks for search state and navigation
-- Styling: Theme-aware styling that matches the application design
-- Performance: Optimized for fast search with minimal re-renders
-
----
-
-## 🎤 AI Presentation Agent
-
-The AI Presentation Agent is a cutting-edge presentation tool designed specifically for hackathons and professional presentations. It combines AI-powered script generation, live demonstrations, intelligent Q&A, and voice cloning technology to create compelling, personalized presentations.
-
-### Core Features:
-
-#### 🎬 Script Generation
-- **AI-Powered Scripts**: Generate professional 4-minute presentation scripts
-- **Hackathon Optimized**: Perfect timing and structure for competition presentations
-- **Content Customization**: Tailored scripts based on your project and audience
-- **Real-time Streaming**: Scripts appear word-by-word with professional formatting
-- **Export Options**: Save scripts as text files or copy to clipboard
-
-#### 🎤 Voice Training & Cloning
-- **Personal Voice Recording**: Record 30-60 seconds of your voice for cloning
-- **Multi-language Support**: Train in your native language (Spanish, Norwegian, etc.)
-- **Voice Selection**: Choose between Male, Female, or Your Trained Voice
-- **Professional Interface**: Clean recording UI with live timer and status indicators
-- **Secure Storage**: Your voice data is stored privately and securely
-- **Cross-language Generation**: Use your voice in any supported language
-
-#### 🚀 Live Demo Mode
-- **Real-time Demonstrations**: Show live platform features and statistics
-- **System Statistics**: Display real-time performance metrics and user analytics
-- **Feature Showcases**: Individual feature demonstrations with live data
-- **User Journey**: Complete learning path demonstrations
-- **Professional UI**: Visual slide progression with timers and progress bars
-
-#### ❓ Enhanced Q&A System
-- **Intelligent Responses**: AI-powered answers with live data integration
-- **Category-based Questions**: Technical, Business, Features, Implementation
-- **Live Data Integration**: Real-time platform statistics in responses
-- **Smart Question Matching**: Automatic similarity detection for best answers
-- **Professional Formatting**: Markdown-formatted responses with live data
-
-#### 🌍 Multi-language Support
-- **International Ready**: Norwegian, Swedish, Spanish, German, French, English
-- **Voice Cloning**: Your voice works in all supported languages
-- **Cultural Adaptation**: Presentations adapted for different audiences
-- **Perfect for Hackathons**: Ideal for international competitions
-
-#### ⚙️ Advanced Settings
-- **Custom Timing**: Adjust presentation duration (30-120 seconds per slide)
-- **Export Options**: Download presentations or copy to clipboard
-- **Language Selection**: Choose presentation language
-- **Voice Controls**: Select voice type and gender
-- **Professional Statistics**: Track script length, slide count, and duration
-
-#### 📊 Live Integration
-- **Real App Data**: Connect with actual platform statistics
-- **Live Performance Metrics**: Show real-time system performance
-- **User Analytics**: Display actual user engagement and learning data
-- **Feature Demonstrations**: Show real platform capabilities
-- **Professional Credibility**: No fake numbers, actual performance data
-
-### Technical Architecture:
-**Frontend Components**
-- PresentationAgent.jsx - Main presentation agent component
-- Voice recording interface with MediaRecorder API
-- Real-time streaming text display
-- Professional UI with theme support
-- Voice selection and training interface
+**Primary Data Sources**
+- **Micro-lessons Collection**: Real topics from completed lessons
+- **Video Lessons**: Topics from saved video content
+- **User Progress**: Actual completion data and mastery scores
+- **Learning History**: Timestamped activity tracking
 
 **Backend Integration**
-- Voice cloning API endpoints (planned)
-- Coqui TTS or Real-Time Voice Cloning integration
-- User-specific voice model storage
-- Multi-language text-to-speech processing
+- **MongoDB Collections**: Direct integration with learning data
+- **API Endpoints**: Uses existing `/api/micro-lessons/` and `/api/saved-videos`
+- **Real-time Updates**: Automatic refresh when new content is added
+- **Performance Optimized**: Efficient data extraction and processing
 
-**Voice Cloning Technology**
-- Coqui TTS: Modern, maintained voice cloning library
-- Real-Time Voice Cloning: Fast voice cloning for immediate results
-- OpenVoice: Zero-shot voice cloning with style control
-- Bark + RVC: Advanced voice cloning pipeline
+### 🚀 **Technical Architecture**
 
-### How to Use:
+**Frontend Implementation**
+- **React.js**: Modern, responsive user interface
+- **D3.js**: Professional data visualization and interaction
+- **Dynamic Rendering**: Real-time updates without page refresh
+- **Responsive Design**: Works on all devices and screen sizes
 
-1. **Generate Presentation Script**
-   - Navigate to "Presentation Agent" in the sidebar
-   - Click "📝 Generate Script" to create your 4-minute presentation
-   - Review the AI-generated script with streaming text
-   - Use "🔊 Speak Script" to hear it delivered
+**Backend Services**
+- **FastAPI**: High-performance API endpoints
+- **Dynamic Clustering**: Real-time category generation
+- **MongoDB Integration**: Direct access to learning collections
+- **Smart Caching**: Optimized data retrieval and processing
 
-2. **Train Your Voice**
-   - Click "🎤 Train Your Agent's Voice"
-   - Follow recording instructions (30-60 seconds of clear speech)
-   - Record in your native language (Spanish recommended)
-   - Preview your recording and train the voice model
-   - Your voice becomes available as "My Voice" option
-
-3. **Run Live Demo**
-   - Click "🎬 Live Demo" to start automated presentation
-   - Watch real-time feature demonstrations
-   - See live platform statistics and performance data
-   - Perfect for hackathon presentations
-
-4. **Handle Q&A**
-   - Click "❓ Q&A Mode" for intelligent question handling
-   - Choose question categories (Technical, Business, Features, Implementation)
-   - Get AI-powered responses with live data integration
-   - Professional answers for any audience question
-
-5. **Customize Settings**
-   - Access "⚙️ Advanced Settings" for customization
-   - Adjust timing, language, voice selection
-   - Export presentations in various formats
-   - Configure professional presentation parameters
-
-### Perfect for Hackathons:
-**🏆 Stockholm Hackathon Ready**
-- 4-minute Perfect Timing: Exactly what judges expect
-- Live Demonstrations: Show real platform capabilities
-- Professional Voice: Your trained voice or professional alternatives
-- Intelligent Q&A: Handle any judge question with confidence
-- Multi-language: Present in English, Norwegian, or Swedish
-- Real Data: No fake numbers, actual platform performance
-
-### Competitive Advantages
-- Voice Cloning: Unique personal touch with your voice
-- Live Integration: Real-time platform demonstrations
-- Professional Polish: Clean, modern interface
-- International Appeal: Multi-language support
-- Technical Innovation: Cutting-edge AI voice technology
-
-### Future Enhancements:
-- Emotion Control: Adjust voice emotion and style
-- Advanced Voice Fine-tuning: Pitch, speed, and accent controls
-- Presentation Templates: Different styles for different audiences
-- Live Feature Demonstrations: Real-time platform interactions
-- Voice Command Control: Control presentations with voice commands
-- Advanced Export Options: Video presentations and slides
-
----
-
-## 🏆 Certification Path Recommendation (AI-powered)
-
-The Certification Path Recommendation module helps users discover, plan, and practice for professional certifications using AI. It is designed for IT professionals and knowledge workers who want to boost their career prospects with official certificates.
-
-### Core Features:
-**AI-Powered Certification Suggestions**
-- Users input their role, skills, experience level, and career goals
-- GPT-4 recommends 3-5 relevant certifications (e.g., AWS, Azure, Google Cloud, Scrum Master, etc.)
-- Explains why each certification fits the user's profile, expected time commitment, cost, and ROI
-
-**Personalized Study Plan Generator**
-- Users select a certification and get a week-by-week study plan
-- Plan adapts to user's available study time and target completion date
-- Includes recommended resources, practice exercises, and milestones
-
-**Practice Test/Simulation**
-- Users can simulate a certification interview or exam
-- AI generates realistic questions, expected answers, and feedback
-
-**Certifications Dashboard**
-- Progress bar toward selected certificate
-- Suggested resources and links
-- "Why this matters" AI-generated explanations
-- All recommendations, study plans, and simulations are saved per user
-
-### Backend API Endpoints
-- `POST /certifications/recommend` — Get AI-powered certification recommendations
-- `POST /certifications/study-plan` — Generate a personalized study plan
-- `POST /certifications/simulate` — Practice certification interview/exam
-- `GET /certifications/user-recommendations` — Get user's certification history
-
-### Database Collections
-- `certifications` — Stores user certification recommendations
-- `study_plans` — Stores user study plans
-- `certification_simulations` — Stores user practice test results
-
-### Frontend Features
-- Certifications.jsx: Tabbed UI for Recommendations, Study Plan, and Practice Test
-- Skill tag input for easy skill management
-- Tooltips on all major actions and tabs
-- Theme support for light/dark mode
-- Progress tracking and history for each user
-
-### How to use:
-1. Go to the "Certifications" section in the sidebar (🏆)
-2. Enter your role, skills, and goals to get recommendations
-3. Generate a study plan for your chosen certification
-4. Practice with realistic AI-generated questions
-5. Track your progress and revisit your history anytime
-
-### AI Prompts Used
-- Certification Recommendation
-- Study Plan Generator
-- Certification Interview Simulation
-- Career Coach + Certification Planning
-
----
-
-## ✨ New Features
-
-### Video Lessons
-Enhance learning with short, focused video content followed by adaptive AI-generated quizzes. Users can:
-
-- Paste a YouTube embed URL or MP4 link.
-- Optionally paste a transcript/captions and auto-generate a summary.
-- Generate a quiz based on the video summary using AI.
-- Take the quiz, receive instant feedback, and earn a badge for high scores.
-- Use cases: Soft skills, technical tutorials, compliance, and more.
-
-### Interface-less UX (Zero-UI CommandBar)
-A signature innovation: users can interact with the app using a single natural language input bar ("Ask AI anything…"). The AI routes requests to the correct module, including:
-
-Concepts, Micro-lessons, Simulations, Recommendations, Certifications, Career Coach, Skills Forecast, Team Dynamics, and now Video Lessons.
-
-**Example prompts:**
-- "Show me a video lesson on Agile."
-- "Give me a micro-lesson on conflict resolution."
-- "What's my next best skill to develop?"
-
-The app dynamically displays the right experience, reducing the need for manual navigation.
-
-### Streaming LLM Responses (ChatGPT-like Experience)
-All AI-powered features now stream their responses in real time, just like ChatGPT. Users see answers, lessons, recommendations, simulations, and quizzes appear word-by-word or chunk-by-chunk, dramatically improving perceived speed and engagement. This applies to:
-
-- CommandBar (Interface-less UX)
-- Micro-lessons
-- Recommendations
-- Scenario Simulations
-- AI Career Coach
-- Skills Forecast
-- Certifications (Recommendations, Study Plan, Practice Test)
-- Video Lessons (Summary & Quiz Generation)
-
-This streaming-first approach makes the app feel fast, modern, and AI-native.
-
----
-
-## 📊 Summary Table
-
-| Feature/Endpoint    | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? | Type |
-|-------------------|:--------------------:|:------------------:|:--------------:|:----:|
-| Global Search     | ❌                   | ❌                 | ❌             | Frontend |
-| `/concepts`       | ❌                   | ✅                 | ❌             | Backend |
-| `/micro-lesson`   | ❌                   | ✅                 | ✅             | Backend |
-| `/recommendation` | ❌                   | ✅                 | ❌             | Backend |
-| `/simulation`     | ❌                   | ✅                 | ❌             | Backend |
-| `/web-search`     | ✅                   | ✅ (with tool)     | ❌             | Backend |
-| `/lessons`        | ❌                   | ❌                 | ✅             | Backend |
-| `/career-coach`   | ❌                   | ✅                 | ✅             | Backend |
-| `/skills-forecast`| ❌                   | ✅                 | ✅             | Backend |
-| `/teams`          | ❌                   | ✅                 | ✅             | Backend |
-| `/teams/{id}/analytics` | ❌        | ✅                 | ✅             | Backend |
-
----
-
-## 📝 Note: Two Backend Servers
-
-This project uses **two backend servers**:
-
-- **Python FastAPI backend** (main API):
-  - Handles concepts, micro-lesson, recommendation, simulation, etc.
-  - **Firebase authentication** for user security
-  - **User-specific data storage** in MongoDB
-  - **IMPORTANT**: Must be run from the root directory (not from inside backend/)
-  - Run with:
-    ```bash
-    uvicorn backend.app:app --reload
-    ```
-- **Node.js Express backend** (web search):
-  - Handles `/web-search` endpoint using OpenAI's web search tool (if available)
-  - Run with:
-    ```bash
-    cd websearch-backend
-    node index.js
-    ```
-
-Your React frontend will call both as needed. This is a common pattern for hackathons and microservice architectures.
-
-### Why Backend Must Start from Root Directory?
-
-The Python backend uses relative imports like `from backend.prompts import ...` which only work when Python's working directory is the project root. This design choice was made to:
-
-1. **Maintain consistent import paths** across all backend modules
-2. **Access shared resources** like `serviceAccountKey.json` in the root directory
-3. **Support Firebase configuration** that expects paths relative to the root
-4. **Enable proper module resolution** for the `backend` package
-
-**Incorrect approach** (will cause import errors):
-```bash
-cd backend
-uvicorn app:app --reload  # ❌ This will fail
+**Data Processing Pipeline**
+```
+User Learning Activity → MongoDB Collections → Topic Extraction → 
+Dynamic Categorization → Interactive Visualization → Real-time Updates
 ```
 
-**Correct approach** (from project root):
-```bash
-uvicorn backend.app:app --reload  # ✅ This works correctly
-```
+### 🎮 **Enhanced Navigation & Interaction**
 
----
+**Professional Zoom Controls**
+- **Zoom Range**: 50% to 300% with smooth transitions
+- **Pan Navigation**: Click and drag to explore the map
+- **Smart Centering**: Focus on filtered or selected content
+- **Mode Switching**: Toggle between zoom and selection modes
 
-## 🌐 Web Search Functionality: Tool Support and Fallback
+**Interactive Features**
+- **Node Selection**: Click topics for detailed information
+- **Cluster Exploration**: Navigate through knowledge domains
+- **Search Integration**: Find and focus on specific topics
+- **Filter Awareness**: Navigation respects current filters
 
-The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 model with the web search tool. **This tool is only available to some OpenAI users/organizations.**
+### 📈 **Performance & Scalability**
 
-- If your OpenAI account supports the web search tool (`web_search_preview`), you will get live, up-to-date answers from the internet.
-- If not, the backend will **automatically fall back to a standard LLM response** (no web search, but still a high-quality answer).
+**Optimization Features**
+- **Efficient Rendering**: Only visible nodes are rendered
+- **Smart Filtering**: Client-side filtering for instant response
+- **Memory Management**: Proper cleanup and reference management
+- **Responsive Updates**: Smooth 60fps animations
 
-### Summary Table: Web Search Tool Support
+**Scalability Considerations**
+- **Topic Growth**: Handles hundreds of topics efficiently
+- **Category Evolution**: Categories adapt as content grows
+- **Performance Monitoring**: Real-time performance tracking
+- **Future-Proof**: Designed for extensive learning content
 
-| Tool Parameter         | Supported? | Fallback Behavior                |
-|-----------------------|------------|----------------------------------|
-| `web_search`          | ❌         | Falls back to standard LLM       |
-| `web_search_preview`  | ❓ (beta)   | Falls back to standard LLM       |
-| (no tools)            | ✅         | Standard LLM always works        |
+### 🔧 **How It Works**
 
-- **Standard endpoints** (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
-- **Web Search endpoint** uses GPT-4.1 with the web search tool if available, otherwise falls back to standard LLM.
-- Both approaches work independently and do not interfere with each other.
+1. **Data Extraction**
+   - Backend scans MongoDB collections for learning activities
+   - Extracts unique topics with metadata and timestamps
+   - Generates dynamic categories using pattern recognition
 
----
+2. **Visualization Generation**
+   - Creates interactive nodes for each topic
+   - Applies consistent color coding by category
+   - Generates cluster representations with topic counts
 
+3. **Real-time Interaction**
+   - Users can search, filter, and navigate the map
+   - All interactions update in real-time
+   - Performance optimized for smooth user experience
 
+### 🎯 **Use Cases & Benefits**
+
+**For Learners**
+- **Visual Progress Tracking**: See your learning journey at a glance
+- **Topic Discovery**: Find related topics and learning paths
+- **Progress Monitoring**: Track mastery levels across categories
+- **Learning Planning**: Identify areas for improvement
+
+**For Educators**
+- **Content Analysis**: Understand learning patterns and preferences
+- **Curriculum Planning**: Identify knowledge gaps and opportunities
+- **Progress Tracking**: Monitor individual and group progress
+- **Resource Allocation**: Optimize learning content distribution
+
+### 🚀 **Future Enhancements**
+
+**Planned Features**
+- **ML-powered Categorization**: Advanced AI for topic grouping
+- **Learning Paths**: Suggested sequences for optimal learning
+- **Collaborative Features**: Share and compare learning maps
+- **Advanced Analytics**: Deep insights into learning patterns
+
+**Integration Opportunities**
+- **External Learning Platforms**: Connect with other learning systems
+- **Skill Assessment**: Integrate with certification and testing systems
+- **Career Mapping**: Connect learning to career development
+- **Enterprise Integration**: Corporate learning and development tools
 
 ---
 
