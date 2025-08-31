@@ -1320,44 +1320,36 @@ async def get_user_knowledge_map(user_id: str):
 
 @app.get("/api/knowledge-map/clusters")
 async def get_knowledge_clusters():
-    """Get knowledge topic clusters for visualization based on MongoDB data"""
+    """Get dynamic knowledge clusters based on actual topics from MongoDB"""
     try:
-        from backend.knowledge_map_utils import extract_topics_from_modules, categorize_topic
+        from backend.knowledge_map_utils import extract_topics_from_modules, generate_dynamic_categories
         
-        # Extract topics from MongoDB to get current categories
+        # Extract topics from MongoDB
         raw_topics = await extract_topics_from_modules()
         
-        # Group topics by their auto-generated categories
-        clusters = {}
-        for topic_key, topic_data in raw_topics.items():
-            category = categorize_topic(topic_data["label"])
-            
-            if category not in clusters:
-                clusters[category] = []
-            
-            clusters[category].append(topic_key)
-        
-        # Ensure we have at least some basic clusters if extraction fails
-        if not clusters:
-            clusters = {
-                "AI & Technology": ["programming"],
-                "Leadership & Management": ["agile"],
+        if raw_topics:
+            # Generate dynamic categories based on actual topics
+            clusters = generate_dynamic_categories(raw_topics)
+            print(f"🚀 Generated {len(clusters)} dynamic clusters from {len(raw_topics)} topics")
+            return {"clusters": clusters}
+        else:
+            # Fallback to basic clusters if no topics found
+            fallback_clusters = {
+                "Programming & Development": ["python", "javascript"],
+                "AI & Machine Learning": ["ai_basics"],
                 "General Skills": ["communication"]
             }
-        
-        print(f"🗺️ Generated {len(clusters)} clusters: {list(clusters.keys())}")
-        return {"clusters": clusters}
-        
+            print(f"⚠️ No topics found, using fallback clusters: {len(fallback_clusters)} clusters")
+            return {"clusters": fallback_clusters}
+            
     except Exception as e:
-        print(f"❌ Error in get_knowledge_clusters: {e}")
-        # Fallback clusters
-        return {
-            "clusters": {
-                "AI & Technology": ["programming"],
-                "Leadership & Management": ["agile"],
-                "General Skills": ["communication"]
-            }
-        }
+        print(f"❌ Error loading clusters: {e}")
+        # Fallback to basic clusters
+        return {"clusters": {
+            "Programming & Development": ["python", "javascript"],
+            "AI & Machine Learning": ["ai_basics"],
+            "General Skills": ["communication"]
+        }}
 
 @app.post("/api/knowledge-map/activity")
 async def update_user_activity(request: Request):
@@ -2056,5 +2048,48 @@ for route in app.routes:
         print(f"  {route.methods} {route.path}")
     elif hasattr(route, 'path'):
         print(f"  {route.path}")
+
+@app.get("/api/knowledge-map/debug")
+async def debug_knowledge_map():
+    """Debug endpoint to check MongoDB connection and available data"""
+    try:
+        from backend.db import micro_lessons_collection, saved_videos_collection
+        
+        print("🔍 Debug: Checking MongoDB collections...")
+        
+        # Check micro-lessons collection
+        micro_lessons_count = await micro_lessons_collection.count_documents({})
+        print(f"📚 Micro-lessons count: {micro_lessons_count}")
+        
+        # Check videos collection
+        videos_count = await saved_videos_collection.count_documents({})
+        print(f"🎥 Videos count: {videos_count}")
+        
+        # Get sample data
+        sample_micro_lessons = await micro_lessons_collection.find({}, {"topic": 1, "title": 1}).limit(3).to_list(length=None)
+        sample_videos = await saved_videos_collection.find({}, {"topic": 1, "title": 1}).limit(3).to_list(length=None)
+        
+        debug_info = {
+            "collections": {
+                "micro_lessons": {
+                    "count": micro_lessons_count,
+                    "sample": sample_micro_lessons
+                },
+                "videos": {
+                    "count": videos_count,
+                    "sample": sample_videos
+                }
+            },
+            "message": "MongoDB connection successful"
+        }
+        
+        print(f"✅ Debug info: {debug_info}")
+        return debug_info
+        
+    except Exception as e:
+        print(f"❌ Debug error: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "MongoDB connection failed"}
 
  

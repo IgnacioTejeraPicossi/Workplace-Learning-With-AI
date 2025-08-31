@@ -685,20 +685,22 @@ const KnowledgeMap = () => {
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               style={{
-                width: '100%',
                 padding: '8px 12px',
-                borderRadius: 6,
+                borderRadius: '6px',
                 border: `1px solid ${colors.border}`,
                 background: colors.background,
                 color: colors.text,
-                fontSize: '14px'
+                cursor: 'pointer',
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
               }}
             >
               <option value="all">All Categories</option>
-              <option value="AI Fundamentals">AI Fundamentals</option>
-              <option value="Leadership">Leadership</option>
-              <option value="Business Applications">Business Applications</option>
-              <option value="Communication">Communication</option>
+              {clusters && Object.keys(clusters).map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -766,6 +768,16 @@ const KnowledgeMap = () => {
         {/* Results Counter */}
         <div style={{ marginTop: 12, fontSize: '0.9rem', color: colors.textSecondary }}>
           Showing {Object.keys(filteredTopics).length} of {Object.keys(topics).length} topics
+          {Object.keys(topics).length > 0 && (
+            <div style={{ marginTop: 4, fontSize: '0.8rem', opacity: 0.8 }}>
+              📊 Data sources: {Object.keys(topics).map(id => topics[id]?.source).filter((source, index, arr) => arr.indexOf(source) === index).join(', ')}
+              {userData?.real_stats && (
+                <div style={{ marginTop: 4 }}>
+                  🎯 Your learning: {userData.real_stats.total_lessons} lessons, {userData.real_stats.unique_topics} topics
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
