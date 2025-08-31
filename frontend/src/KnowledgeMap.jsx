@@ -48,19 +48,20 @@ const KnowledgeMap = () => {
 
   // Color palette for different clusters - Updated for dynamic categories
   const clusterColors = {
-    // Original categories (fallback)
-    'AI Fundamentals': '#4CAF50',
-    'Leadership': '#2196F3', 
-    'Business Applications': '#FF9800',
-    'Communication': '#9C27B0',
+    // Dynamic categories from backend
+    'Programming & Development': '#4CAF50',      // Green
+    'AI & Machine Learning': '#2196F3',         // Blue
+    'Development Tools': '#FF9800',              // Orange
+    'Web Technologies': '#9C27B0',               // Purple
+    'Data & Analytics': '#00BCD4',               // Teal
+    'General Skills': '#607D8B',                 // Gray
     
-    // New dynamic categories
+    // Fallback colors for any other categories
     'AI & Technology': '#00BCD4',
     'Leadership & Management': '#3F51B5',
     'Business & Sales': '#FF5722',
     'Communication Skills': '#E91E63',
-    'Conflict Resolution': '#795548',
-    'General Skills': '#607D8B'
+    'Conflict Resolution': '#795548'
   };
 
   // Web search function
@@ -106,9 +107,15 @@ const KnowledgeMap = () => {
         topic.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
         topic.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Category filter
-      const matchesCategory = selectedCategory === 'all' || 
-        topic.category === selectedCategory;
+      // Category filter - use the topic's actual category from clusters
+      let matchesCategory = true;
+      if (selectedCategory !== 'all') {
+        // Find which cluster contains this topic
+        const topicCluster = Object.entries(clusters).find(([clusterName, topicIds]) => 
+          topicIds.includes(id)
+        );
+        matchesCategory = topicCluster && topicCluster[0] === selectedCategory;
+      }
 
       // Mastery level filter
       const mastery = userData?.mastery_scores?.[id] || 0;
@@ -139,7 +146,7 @@ const KnowledgeMap = () => {
       label: topics[id]?.label,
       mastery: userData?.mastery_scores?.[id] || 0
     })));
-  }, [topics, searchTerm, selectedCategory, selectedMasteryLevel, userData]);
+  }, [topics, searchTerm, selectedCategory, selectedMasteryLevel, userData, clusters]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -296,10 +303,12 @@ const KnowledgeMap = () => {
     // Create nodes with improved positioning - Use all topics, not filtered
     const newNodes = Object.entries(topics).map(([id, topic]) => {
       const mastery = userData?.mastery_scores?.[id] || 0;
-      // Use the topic's category directly from MongoDB data, fallback to cluster lookup
-      const cluster = topic.category || Object.entries(clusters).find(([clusterName, topicIds]) =>
+      
+      // Find which cluster contains this topic to get the correct category and color
+      const topicCluster = Object.entries(clusters).find(([clusterName, topicIds]) =>
         topicIds.includes(id)
-      )?.[0] || 'Other';
+      );
+      const cluster = topicCluster ? topicCluster[0] : 'General Skills';
       
       // Check if this topic is recommended
       const isRecommended = recommendations.some(rec => rec.topic_id === id);
@@ -307,17 +316,22 @@ const KnowledgeMap = () => {
       // Check if this topic should be visible based on filters
       const isVisible = Object.keys(filteredTopics).includes(id);
       
+      // Get the color for this cluster
+      const nodeColor = clusterColors[cluster] || '#666';
+      
+      console.log(`🎨 Topic ${topic.label} → Cluster: ${cluster} → Color: ${nodeColor}`);
+      
       return {
         id, 
         label: topic.label, 
         description: topic.description, 
         mastery, 
         cluster,
-        category: topic.category,
+        category: cluster, // Use the cluster as category for consistency
         x: centerX + (Math.random() - 0.5) * (width * 0.6),
         y: centerY + (Math.random() - 0.5) * (height * 0.6),
         radius: 15 + mastery * 20,
-        color: clusterColors[cluster] || '#666',
+        color: nodeColor,
         isRecommended,
         isVisible,
         originalRadius: 15 + mastery * 20
@@ -685,22 +699,21 @@ const KnowledgeMap = () => {
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               style={{
+                width: '100%',
                 padding: '8px 12px',
-                borderRadius: '6px',
+                borderRadius: 6,
                 border: `1px solid ${colors.border}`,
                 background: colors.background,
                 color: colors.text,
-                cursor: 'pointer',
-                fontSize: '14px',
-                whiteSpace: 'nowrap'
+                fontSize: '14px'
               }}
             >
               <option value="all">All Categories</option>
-              {clusters && Object.keys(clusters).map(category => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+                             {clusters && Object.keys(clusters).map(category => (
+                 <option key={category} value={category}>
+                   {category}
+                 </option>
+               ))}
             </select>
           </div>
 
