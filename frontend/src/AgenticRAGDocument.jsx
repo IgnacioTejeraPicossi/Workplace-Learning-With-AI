@@ -271,14 +271,14 @@ const AgenticRAGDocument = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          🚀 Agentic RAG Analyzer
+          📋 Agentic RAG Documents
         </h1>
         <p style={{ 
           color: colors.textSecondary, 
           fontSize: "16px",
           lineHeight: "1.5"
         }}>
-          Advanced document analysis using intelligent agents for deep reasoning and grounded answers with citations.
+          Browse, search, and manage your saved Agentic RAG analyses with quality metrics and citations.
         </p>
         
         {/* Status Messages */}

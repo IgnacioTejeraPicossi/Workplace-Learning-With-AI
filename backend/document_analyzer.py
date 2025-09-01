@@ -61,9 +61,9 @@ class SaveAnalysisResponse(BaseModel):
     message: str
     analysis_id: Optional[str] = None
 
-# ========= Simple In-Memory Storage =========
-# Using simple in-memory storage that works reliably
-_saved_analyses = {}
+# ========= MongoDB Storage =========
+# Import MongoDB collection for persistent storage
+from backend.db import document_analyses_collection
 
 # ========= Helpers =========
 TEXT_EXTS = {".txt", ".md", ".markdown"}
@@ -379,9 +379,28 @@ async def save_analysis(request: SaveAnalysisRequest):
             "module": "document_analyzer"
         }
         
-        # Save to in-memory storage
-        global _saved_analyses
-        _saved_analyses[analysis_data["id"]] = analysis_data
+        # Save to MongoDB for persistent storage
+        try:
+            # Convert string ID to ObjectId for MongoDB
+            from bson import ObjectId
+            analysis_data["_id"] = ObjectId(analysis_data["id"])
+            
+            # Insert into MongoDB collection
+            result = await document_analyses_collection.insert_one(analysis_data)
+            
+            if not result.inserted_id:
+                raise Exception("Failed to save to MongoDB")
+                
+            print(f"✅ Document analysis saved to MongoDB with ID: {result.inserted_id}")
+            
+        except Exception as db_error:
+            print(f"❌ MongoDB save error: {db_error}")
+            # Fallback to in-memory storage if MongoDB fails
+            global _saved_analyses
+            if '_saved_analyses' not in globals():
+                _saved_analyses = {}
+            _saved_analyses[analysis_data["id"]] = analysis_data
+            print("⚠️ Fallback to in-memory storage")
         
         return SaveAnalysisResponse(
             success=True,
@@ -398,13 +417,24 @@ async def save_analysis(request: SaveAnalysisRequest):
 
 @router.get("/get-saved-analyses")
 async def get_saved_analyses():
-    """Get all saved document analyses from in-memory storage for Learning Document module"""
+    """Get all saved document analyses from MongoDB for Learning Document module"""
     try:
-        # Return actual saved analyses from in-memory storage
-        global _saved_analyses
+        # Get analyses from MongoDB
+        cursor = document_analyses_collection.find({})
+        analyses_list = []
         
-        # Convert dict values to list for frontend compatibility
-        analyses_list = list(_saved_analyses.values())
+        async for analysis in cursor:
+            # Convert ObjectId to string for JSON serialization
+            analysis["id"] = str(analysis["_id"])
+            del analysis["_id"]  # Remove ObjectId from response
+            analyses_list.append(analysis)
+        
+        # If no MongoDB data, try fallback to in-memory storage
+        if not analyses_list:
+            global _saved_analyses
+            if '_saved_analyses' in globals():
+                analyses_list = list(_saved_analyses.values())
+                print("⚠️ Using fallback in-memory storage")
         
         return JSONResponse({
             "success": True,
@@ -420,7 +450,86 @@ async def get_saved_analyses():
             "total": 0
         })
 
+@router.delete("/delete-analysis/{analysis_id}")
+async def delete_analysis(analysis_id: str):
+    """Delete a saved document analysis from MongoDB"""
+    try:
+        from bson import ObjectId
+        
+        # Try to delete from MongoDB
+        result = await document_analyses_collection.delete_one({"_id": ObjectId(analysis_id)})
+        
+        if result.deleted_count > 0:
+            print(f"✅ Document analysis deleted from MongoDB: {analysis_id}")
+            return JSONResponse({
+                "success": True,
+                "message": f"Analysis {analysis_id} deleted successfully"
+            })
+        else:
+            # Try fallback to in-memory storage
+            global _saved_analyses
+            if '_saved_analyses' in globals() and analysis_id in _saved_analyses:
+                del _saved_analyses[analysis_id]
+                print(f"⚠️ Deleted from fallback in-memory storage: {analysis_id}")
+                return JSONResponse({
+                    "success": True,
+                    "message": f"Analysis {analysis_id} deleted from fallback storage"
+                })
+            else:
+                return JSONResponse({
+                    "success": False,
+                    "message": f"Analysis {analysis_id} not found"
+                })
+                
+    except Exception as e:
+        print(f"❌ Delete error: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": f"Failed to delete analysis: {str(e)}"
+        })
 
+@router.get("/debug-storage")
+async def debug_storage():
+    """Debug endpoint to check storage status"""
+    try:
+        # Check MongoDB collection
+        mongo_count = await document_analyses_collection.count_documents({})
+        
+        # Check in-memory storage
+        global _saved_analyses
+        memory_count = len(_saved_analyses) if '_saved_analyses' in globals() else 0
+        
+        # Get sample data from MongoDB
+        sample_docs = []
+        cursor = document_analyses_collection.find({}).limit(3)
+        async for doc in cursor:
+            sample_docs.append({
+                "id": str(doc["_id"]),
+                "filename": doc.get("filename", "Unknown"),
+                "created_at": doc.get("created_at", "Unknown")
+            })
+        
+        return JSONResponse({
+            "success": True,
+            "storage_status": {
+                "mongodb": {
+                    "count": mongo_count,
+                    "sample_documents": sample_docs
+                },
+                "memory": {
+                    "count": memory_count,
+                    "available": '_saved_analyses' in globals()
+                }
+            },
+            "message": f"MongoDB: {mongo_count} docs, Memory: {memory_count} docs"
+        })
+        
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "error": str(e),
+            "message": "Debug storage check failed"
+        })
 
 # New endpoint for JSON-based file uploads (base64 encoded)
 @router.post("/analyze-json", response_model=SummaryResponse)
