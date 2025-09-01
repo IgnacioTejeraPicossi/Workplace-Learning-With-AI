@@ -2092,4 +2092,62 @@ async def debug_knowledge_map():
         traceback.print_exc()
         return {"error": str(e), "message": "MongoDB connection failed"}
 
+@app.get("/api/debug/topic-comparison")
+async def debug_topic_comparison():
+    """Debug endpoint to compare topics between Dashboard and Knowledge Map"""
+    try:
+        from backend.db import micro_lessons_collection, saved_videos_collection
+        from backend.knowledge_map_utils import extract_topics_from_modules
+        
+        print("🔍 Debug: Comparing topics between Dashboard and Knowledge Map...")
+        
+        # Get raw data from MongoDB (like Dashboard does)
+        micro_lessons = await micro_lessons_collection.find({}).to_list(length=None)
+        videos = await saved_videos_collection.find({}).to_list(length=None)
+        
+        # Extract topics like Dashboard does
+        dashboard_topics = {}
+        for lesson in micro_lessons:
+            if lesson.get("topic"):
+                topic = lesson["topic"]
+                dashboard_topics[topic] = dashboard_topics.get(topic, 0) + 1
+        
+        for video in videos:
+            if video.get("topic"):
+                topic = video["topic"]
+                dashboard_topics[topic] = dashboard_topics.get(topic, 0) + 1
+        
+        # Get topics like Knowledge Map does
+        knowledge_map_topics = await extract_topics_from_modules()
+        
+        # Convert to simple format for comparison
+        km_topics_simple = {topic_data["label"]: topic_data["count"] for topic_data in knowledge_map_topics.values()}
+        
+        comparison = {
+            "dashboard_topics": {
+                "count": len(dashboard_topics),
+                "topics": dashboard_topics
+            },
+            "knowledge_map_topics": {
+                "count": len(knowledge_map_topics),
+                "topics": km_topics_simple
+            },
+            "missing_in_km": list(set(dashboard_topics.keys()) - set(km_topics_simple.keys())),
+            "missing_in_dashboard": list(set(km_topics_simple.keys()) - set(dashboard_topics.keys())),
+            "common_topics": list(set(dashboard_topics.keys()) & set(km_topics_simple.keys()))
+        }
+        
+        print(f"📊 Dashboard topics: {len(dashboard_topics)}")
+        print(f"🗺️ Knowledge Map topics: {len(knowledge_map_topics)}")
+        print(f"❌ Missing in KM: {comparison['missing_in_km']}")
+        print(f"❌ Missing in Dashboard: {comparison['missing_in_dashboard']}")
+        
+        return comparison
+        
+    except Exception as e:
+        print(f"❌ Debug comparison error: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "Topic comparison failed"}
+
  
