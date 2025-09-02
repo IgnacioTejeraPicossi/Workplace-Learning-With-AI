@@ -37,7 +37,12 @@ const Icon = ({ name, size = 20 }) => {
     temple: "🏛️",
     settings: "⚙️",
     document: "📄",
-    "document-text": "📝"
+    "document-text": "📝",
+    "refresh-cw": "🔄",
+    "refresh": "🔄",
+    "process": "🔄",
+    "catalog": "📋",
+    "list": "📋"
   };
 
   return (
@@ -85,10 +90,10 @@ const navItems = [
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)
-  { key: "enterprise-architecture", label: "Enterprise Architecture", icon: "🏢", group: "learning", isExpandable: true, subItems: [
-    { key: "ea-home", label: "EA Dashboard", icon: "🏢" },
-    { key: "process-designer", label: "Process Designer", icon: "🔄" },
-    { key: "catalog-manager", label: "Catalog Manager", icon: "📋" }
+  { key: "enterprise-architecture", label: "Enterprise Architecture", icon: "building", group: "learning", isExpandable: true, subItems: [
+    { key: "ea-home", label: "EA Dashboard", icon: "building" },
+    { key: "process-designer", label: "Process Designer", icon: "process" },
+    { key: "catalog-manager", label: "Catalog Manager", icon: "catalog" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)
