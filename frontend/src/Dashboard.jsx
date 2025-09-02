@@ -5,6 +5,7 @@ import ProgressCard from "./ProgressCard";
 import LearningTrendsChart from "./LearningTrendsChart";
 import TopicBreakdownChart from "./TopicBreakdownChart";
 import { useTheme } from "./ThemeContext";
+import { useTranslation } from 'react-i18next';
 
 const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
@@ -42,11 +43,11 @@ function formatDate(dateStr) {
   return d.toLocaleString();
 }
 
-function getRecommendation(progress) {
-  if (progress.lessonsCompleted === 0) return "Try your first micro-lesson!";
-  if (progress.simulationsCompleted === 0) return "Try your first scenario simulation!";
-  if (progress.simulationScore < progress.simulationsCompleted) return "Aim for more 'good' responses in simulations!";
-  return "Great job! Keep learning or try a new scenario.";
+function getRecommendation(progress, t) {
+  if (progress.lessonsCompleted === 0) return t('dashboard.recommendations.startLearning');
+  if (progress.simulationsCompleted === 0) return t('dashboard.recommendations.trySimulation');
+  if (progress.simulationScore < progress.simulationsCompleted) return t('dashboard.recommendations.aimForBetter');
+  return t('dashboard.greatJob');
 }
 
 // Helper to get ISO week string (YYYY-Www)
@@ -67,6 +68,7 @@ function Dashboard({ user, onSectionSelect }) {
   const [topicBreakdown, setTopicBreakdown] = useState([]);
   const [learningStreak, setLearningStreak] = useState(0);
   const { colors } = useTheme();
+  const { t } = useTranslation('common');
 
   // Learning Streak Management
   useEffect(() => {
@@ -281,7 +283,7 @@ function Dashboard({ user, onSectionSelect }) {
         boxShadow: colors.shadow,
         color: colors.text
       }}>
-        <h2 style={{ marginTop: 0, color: colors.text }}>Your Progress</h2>
+        <h2 style={{ marginTop: 0, color: colors.text }}>{t('dashboard.progress.title')}</h2>
         <div>Loading your progress...</div>
       </div>
     );
@@ -298,7 +300,7 @@ function Dashboard({ user, onSectionSelect }) {
         color: colors.text
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 0, color: colors.text }}>Your Progress</h2>
+          <h2 style={{ marginTop: 0, marginBottom: 0, color: colors.text }}>{t('dashboard.progress.title')}</h2>
           <button 
             onClick={() => {
               setLoading(true);
@@ -325,7 +327,7 @@ function Dashboard({ user, onSectionSelect }) {
           marginBottom: 20 
         }}>
           <ProgressCard
-            title="Lessons Completed"
+            title={t('dashboard.lessonsCompleted')}
             value={progress.lessonsCompleted}
             total={Math.max(progress.lessonsCompleted, 10)}
             icon="📚"
@@ -334,7 +336,7 @@ function Dashboard({ user, onSectionSelect }) {
           />
           
           <ProgressCard
-            title="Simulations Completed"
+            title={t('dashboard.simulationsCompleted')}
             value={progress.simulationsCompleted}
             total={5}
             icon="▶️"
@@ -343,7 +345,7 @@ function Dashboard({ user, onSectionSelect }) {
           />
           
           <ProgressCard
-            title="Simulation Score"
+            title={t('dashboard.simulationScore')}
             value={progress.simulationScore}
             total={progress.simulationsCompleted || 1}
             icon="🎯"
@@ -353,7 +355,7 @@ function Dashboard({ user, onSectionSelect }) {
           />
           
           <ProgressCard
-            title="Learning Streak"
+            title={t('dashboard.learningStreak')}
             value={learningStreak}
             total={Math.max(learningStreak, parseInt(localStorage.getItem('highestStreak') || '1'))}
             icon="🔥"
@@ -379,7 +381,7 @@ function Dashboard({ user, onSectionSelect }) {
               fontWeight: '600',
               marginBottom: 4
             }}>
-              🔥 {learningStreak} day{learningStreak !== 1 ? 's' : ''} consecutive{learningStreak !== 1 ? 's' : ''} of learning
+              🔥 {t('dashboard.daysInARow', { count: learningStreak })}
             </div>
             <div style={{ 
               fontSize: '0.9em', 
@@ -387,7 +389,7 @@ function Dashboard({ user, onSectionSelect }) {
             }}>
               {learningStreak === 1 ? 'Start your streak!' : 
                learningStreak < 7 ? 'Keep it up!' : 
-               learningStreak < 30 ? 'Excellent consistency!' : 
+               learningStreak < 30 ? t('dashboard.excellentConsistency') : 
                'You are a master of learning!'}
             </div>
           </div>
@@ -401,7 +403,7 @@ function Dashboard({ user, onSectionSelect }) {
           borderRadius: 8,
           border: `1px solid ${colors.border}`
         }}>
-          💡 <strong>Recommended next step:</strong> {getRecommendation(progress)}
+          💡 <strong>{t('dashboard.recommendedNextStep')}:</strong> {getRecommendation(progress, t)}
         </div>
       </div>
       

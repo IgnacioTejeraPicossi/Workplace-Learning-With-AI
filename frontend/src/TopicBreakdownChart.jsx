@@ -1,18 +1,20 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTheme } from './ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 // Color palette for different topics
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B6B'];
 
 const TopicBreakdownChart = ({ data }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation('common');
   
   // If no data, show empty state
   if (!data || data.length === 0) {
     return (
       <div style={{ background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, padding: 24, marginBottom: 24, color: colors.text }}>
-        <h3 style={{ marginTop: 0, marginBottom: 16, color: colors.text }}>Lessons by Topic</h3>
+        <h3 style={{ marginTop: 0, marginBottom: 16, color: colors.text }}>{t('dashboard.lessonsByTopic')}</h3>
         <div style={{ textAlign: 'center', color: colors.textSecondary, padding: '40px 20px' }}>
           No lessons completed yet. Start learning to see your topic breakdown!
         </div>
@@ -32,7 +34,7 @@ const TopicBreakdownChart = ({ data }) => {
       boxSizing: "border-box",
       maxWidth: "100%"
     }}>
-      <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>Lessons by Topic</h3>
+      <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>{t('dashboard.lessonsByTopic')}</h3>
       <div style={{ width: "100%", height: 250, minWidth: 0, maxWidth: "100%" }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

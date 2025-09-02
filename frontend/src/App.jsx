@@ -28,6 +28,7 @@ import FeatureRoadmap from "./FeatureRoadmap";
 import FutureApp from "./FutureApp";
 import AIStudyBuddy from "./AIStudyBuddy";
 import KnowledgeMap from "./KnowledgeMap";
+import TopBarLanguageMenu from "./components/TopBarLanguageMenu";
 import RepoAnalyzer from "./RepoAnalyzer";
 import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
 import AgentCursorAI from "./AgentCursorAI";
@@ -232,6 +233,8 @@ function AppContent() {
               >
                 {isDark ? "☀️" : "🌙"}
               </button>
+              {/* Language Selector */}
+              <TopBarLanguageMenu />
             </div>
           </div>
         </header>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useTheme } from './ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const LearningTrendsChart = ({ data }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation('common');
   
   // Add fallback display for debugging
   if (!data || data.length === 0) {
@@ -19,7 +21,7 @@ const LearningTrendsChart = ({ data }) => {
         boxSizing: "border-box",
         maxWidth: "100%"
       }}>
-        <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>Lessons Completed Over Time</h3>
+        <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>{t('dashboard.lessonsOverTime')}</h3>
         <div style={{ textAlign: 'center', color: colors.textSecondary, padding: '40px 20px' }}>
           No data available for trends chart.
         </div>
@@ -39,7 +41,7 @@ const LearningTrendsChart = ({ data }) => {
       boxSizing: "border-box",
       maxWidth: "100%"
     }}>
-      <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>Lessons Completed Over Time</h3>
+      <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: "1.1rem" }}>{t('dashboard.lessonsOverTime')}</h3>
       <div style={{ width: "100%", height: 200, minWidth: 0, maxWidth: "100%" }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 15 }}>
@@ -51,7 +53,7 @@ const LearningTrendsChart = ({ data }) => {
             <Line 
               type="monotone" 
               dataKey="microLessons" 
-              name="Micro-lessons"
+              name={t('dashboard.microLessons')}
               stroke={colors.primary} 
               strokeWidth={2} 
               dot={{ r: 3, fill: colors.primary }} 
@@ -59,7 +61,7 @@ const LearningTrendsChart = ({ data }) => {
             <Line 
               type="monotone" 
               dataKey="videoLessons" 
-              name="Video Lessons"
+              name={t('dashboard.videoLessons')}
               stroke="#28a745" 
               strokeWidth={2} 
               dot={{ r: 3, fill: "#28a745" }} 

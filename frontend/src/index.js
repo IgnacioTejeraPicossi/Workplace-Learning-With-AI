@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import '@shoelace-style/shoelace/dist/shoelace.js';
+import './i18n'; // Initialize i18n
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

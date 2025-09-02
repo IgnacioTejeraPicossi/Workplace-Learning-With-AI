@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTheme } from "./ThemeContext";
+import { useTranslation } from 'react-i18next';
 
 // Simple icon component using Unicode symbols
 const Icon = ({ name, size = 20 }) => {
@@ -52,12 +53,13 @@ const Icon = ({ name, size = 20 }) => {
   );
 };
 
-const navItems = [
+// Function to get navigation items with translations
+const getNavItems = (t) => [
   // Dashboard - Módulo principal que se muestra al entrar
-  { key: "dashboard", label: "Dashboard", icon: "house", group: "main" },
+  { key: "dashboard", label: t('sidebar.dashboard'), icon: "house", group: "main" },
   
   // Grupo 1: Módulos de aprendizaje (expandible)
-  { key: "learning-modules", label: "Learning Modules", icon: "book", group: "learning", isExpandable: true, subItems: [
+  { key: "learning-modules", label: t('sidebar.learningModules'), icon: "book", group: "learning", isExpandable: true, subItems: [
     { key: "video-lessons", label: "Video Lessons", icon: "play" },
     { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
     { key: "simulations", label: "Simulations", icon: "play" },
@@ -71,10 +73,10 @@ const navItems = [
   ]},
   
   // Mapa de conocimiento (opción especial que permanece visible)
-  { key: "knowledge-map", label: "Map of Knowledge", icon: "globe", group: "learning" },
+  { key: "knowledge-map", label: t('sidebar.mapOfKnowledge'), icon: "globe", group: "learning" },
   
   // Grupo 1.5: Análisis de repositorios (expandible)
-  { key: "repository-analyzer", label: "Repository Analyzer", icon: "archive", group: "learning", isExpandable: true, subItems: [
+  { key: "repository-analyzer", label: t('sidebar.repositoryAnalyzer'), icon: "archive", group: "learning", isExpandable: true, subItems: [
     { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive" },
     { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot" },
     { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" },
@@ -82,7 +84,7 @@ const navItems = [
   ]},
   
   // Grupo 1.6: Document Analyzer (nuevo módulo)
-  { key: "document-analyzer", label: "Document Analyzer", icon: "document", group: "learning", isExpandable: true, subItems: [
+  { key: "document-analyzer", label: t('sidebar.documentAnalyzer'), icon: "document", group: "learning", isExpandable: true, subItems: [
     { key: "documents-analyzer", label: "Documents Analyzer", icon: "document-text" },
     { key: "learning-document", label: "Learning Document", icon: "book" },
     { key: "agentic-rag", label: "Agentic RAG Analyzer", icon: "🚀" },
@@ -90,25 +92,25 @@ const navItems = [
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)
-  { key: "enterprise-architecture", label: "Enterprise Architecture", icon: "building", group: "learning", isExpandable: true, subItems: [
+  { key: "enterprise-architecture", label: t('sidebar.enterpriseArchitecture'), icon: "building", group: "learning", isExpandable: true, subItems: [
     { key: "ea-home", label: "EA Dashboard", icon: "building" },
     { key: "process-designer", label: "Process Designer", icon: "process" },
     { key: "catalog-manager", label: "Catalog Manager", icon: "catalog" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)
-  { key: "help", label: "Help", icon: "help", group: "help", isExpandable: true, subItems: [
-    { key: "presentation-agent", label: "Presentation Agent", icon: "presentation" },
-    { key: "ai-study-buddy", label: "AI Study Buddy", icon: "robot" }
+  { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
+    { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
+    { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" }
   ]},
   
   // Grupo 3: Herramientas de desarrollo (fondo azul)
-  { key: "security", label: "Security", icon: "shield", group: "developer" },
-  { key: "run-test", label: "Run Test", icon: "play", group: "developer" },
-  { key: "api-config", label: "API Config", icon: "settings", group: "developer" },
+  { key: "security", label: t('sidebar.security'), icon: "shield", group: "developer" },
+  { key: "run-test", label: t('sidebar.runTest'), icon: "play", group: "developer" },
+  { key: "api-config", label: t('sidebar.apiConfig'), icon: "settings", group: "developer" },
   
   // Grupo 4: Funcionalidades futuras (expandible)
-  { key: "future", label: "Future", icon: "rocket", group: "developer", isExpandable: true, subItems: [
+  { key: "future", label: t('sidebar.future'), icon: "rocket", group: "developer", isExpandable: true, subItems: [
     { key: "future-app", label: "Future App", icon: "rocket" },
     { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
     { key: "feature-roadmap", label: "Feature Roadmap", icon: "map" }
@@ -119,6 +121,7 @@ function Sidebar({ selected, onSelect }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState(new Set());
   const { colors } = useTheme();
+  const { t } = useTranslation('common');
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -191,7 +194,7 @@ function Sidebar({ selected, onSelect }) {
       </div>
       
       <nav>
-        {navItems.map(item => {
+        {getNavItems(t).map(item => {
           // Determinar el fondo según el grupo
           let backgroundColor = "transparent";
           if (selected === item.key) {

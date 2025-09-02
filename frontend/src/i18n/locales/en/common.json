@@ -1,0 +1,67 @@
+{
+  "language": "Language",
+  "english": "English",
+  "norwegian": "Norwegian",
+
+  "dashboard": {
+    "title": "Dashboard",
+    "progress": {
+      "title": "Your Progress",
+      "subtitle": "Keep up the streak!"
+    },
+    "lessonsCompleted": "Lessons Completed",
+    "simulationsCompleted": "Simulations Completed",
+    "simulationScore": "Simulation Score",
+    "learningStreak": "Learning Streak",
+    "daysInARow": "{{count}} days consecutive of learning",
+    "excellentConsistency": "Excellent consistency!",
+    "recommendedNextStep": "Recommended next step",
+    "greatJob": "Great job! Keep learning or try a new scenario.",
+    "lessonsOverTime": "Lessons Completed Over Time",
+    "lessonsByTopic": "Lessons by Topic",
+    "microLessons": "Micro-lessons",
+    "videoLessons": "Video Lessons",
+    "simulationScore": "Simulation Score",
+    "recommendations": {
+      "startLearning": "Try your first micro-lesson!",
+      "trySimulation": "Try your first scenario simulation!",
+      "aimForBetter": "Aim for more 'good' responses in simulations!"
+    }
+  },
+
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "learningModules": "Learning Modules",
+    "mapOfKnowledge": "Map of Knowledge",
+    "repositoryAnalyzer": "Repository Analyzer",
+    "documentAnalyzer": "Document Analyzer",
+    "enterpriseArchitecture": "Enterprise Architecture",
+    "help": "Help",
+    "runTest": "Run Test",
+    "apiConfig": "API Config",
+    "future": "Future",
+    "presentationAgent": "Presentation Agent",
+    "aiStudyBuddy": "AI Study Buddy",
+    "security": "Security"
+  },
+
+  "actions": {
+    "refreshData": "Refresh Data",
+    "signOut": "Sign Out",
+    "analyze": "Analyze",
+    "save": "Save",
+    "clear": "Clear",
+    "delete": "Delete",
+    "search": "Search",
+    "edit": "Edit",
+    "view": "View",
+    "clone": "Clone",
+    "create": "Create",
+    "update": "Update"
+  },
+
+  "welcome": {
+    "title": "Welcome to AI Learning with AI",
+    "subtitle": "Your personalized learning journey powered by artificial intelligence"
+  }
+}

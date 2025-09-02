@@ -41,6 +41,7 @@
 - [Idea Log](#idea-log) - Feature tracking and suggestions
 - [Feature Roadmap](#feature-roadmap) - Development planning
 - [Global Search](#global-search) - Cross-module search functionality
+- [Multi-Language Support](#multi-language-support) - i18n infrastructure and translations
 
 ### ⚙️ Backend Services
 - [FastAPI Server](#fastapi-server) - High-performance API server
@@ -2632,6 +2633,138 @@ The platform now features **ItemAI API**, a groundbreaking integration that brin
 - **Collaboration Features**: User annotations and sharing
 - **External Integrations**: Third-party content providers
 - **Advanced Analytics**: Learning pattern analysis
+
+---
+
+## 🌐 **Multi-Language Support (i18n) - Phase 1 Implementation** {#multi-language-support}
+
+### ✅ **Infrastructure Implemented**
+
+#### 🏗️ **i18next Framework Setup**
+- **Status**: ✅ **COMPLETE & FUNCTIONAL**
+- **Framework**: i18next with react-i18next integration
+- **Language Detection**: Browser language detection with localStorage persistence
+- **Supported Languages**: English (🇬🇧) and Norwegian (🇳🇴)
+- **Fallback System**: Automatic fallback to English if translation missing
+
+#### 🎨 **Language Selector Interface**
+- **Status**: ✅ **COMPLETE & FUNCTIONAL**
+- **Custom Dropdown**: React component with proper flag display
+- **Flag Integration**: Correct national flags (🇬🇧 UK, 🇳🇴 Norway)
+- **Smart Fallback**: Automatic text fallback ([GB], [NO]) if flags don't render
+- **Persistence**: Language choice saved across browser sessions
+- **Accessibility**: Proper ARIA labels and keyboard navigation
+
+#### 📁 **Translation Architecture**
+- **File Structure**: Organized i18n folder with locales
+- **Namespace System**: Common translations with extensible structure
+- **JSON Format**: Clean, maintainable translation files
+- **Hot Reload**: Instant language switching without page refresh
+
+### 🎯 **Currently Translated Components**
+
+#### ✅ **Dashboard Module - FULLY TRANSLATED**
+- **Progress Cards**: "Din fremdrift", "Fullførte leksjoner", "Læringsstreak"
+- **Chart Titles**: "Fullførte leksjoner over tid", "Leksjoner per tema"
+- **Chart Legends**: "Mikro-leksjoner", "Video-leksjoner"
+- **Dynamic Messages**: "Svært god konsistens!", "Anbefalt neste steg"
+- **Recommendations**: Contextual learning suggestions in Norwegian
+
+#### ✅ **Sidebar Navigation - FULLY TRANSLATED**
+- **Main Navigation**: "Dashbord", "Læringsmoduler", "Kunnskapskart"
+- **Enterprise Architecture**: "Enterprise-arkitektur", "Prosessdesigner"
+- **Admin Tools**: "Hjelp", "Sikkerhet", "Kjør test", "API-konfig"
+- **All Sub-items**: Complete hierarchical translation structure
+
+### 🔧 **Technical Implementation**
+
+#### **Frontend Architecture**
+```javascript
+// i18n Configuration
+- Language Detection: localStorage → browser → fallback
+- Resource Loading: Dynamic JSON file loading
+- React Integration: useTranslation hook throughout components
+- Component Structure: Translation keys with fallback values
+```
+
+#### **Translation Files Structure**
+```
+frontend/src/i18n/
+├── index.js (i18next configuration)
+└── locales/
+    ├── en/common.json (English translations)
+    └── no/common.json (Norwegian translations)
+```
+
+#### **Key Features**
+- **Smart Detection**: Automatic browser language detection
+- **Persistence**: User choice saved in localStorage
+- **Performance**: Lazy loading of translation resources
+- **Extensibility**: Easy addition of new languages and modules
+
+### 🚧 **Implementation Status - Phase 1 Complete**
+
+#### ✅ **Completed in Phase 1**
+- **Core Infrastructure**: i18next framework fully operational
+- **Language Selector**: Professional dropdown with correct flags
+- **Dashboard Translation**: 100% translated to Norwegian
+- **Sidebar Translation**: Complete navigation translation
+- **Persistence**: Language choice maintained across sessions
+
+#### 🔄 **Future Phases (Planned)**
+- **Micro-lessons Module**: Complete Norwegian translation
+- **Video Lessons Module**: Interface and content translation
+- **Knowledge Map Module**: Interactive elements translation
+- **Document Analyzer**: Form labels and messages translation
+- **Enterprise Architecture**: Process designer and catalog translation
+- **All Remaining Modules**: Systematic translation rollout
+
+### 🎯 **Usage Instructions**
+
+#### **For Users**
+1. **Language Selection**: Click the language selector in the top-right corner
+2. **Flag Display**: Choose between 🇬🇧 English or 🇳🇴 Norwegian
+3. **Instant Switch**: Language changes immediately without page reload
+4. **Persistence**: Your choice is remembered for future visits
+
+#### **For Developers**
+1. **Adding Translations**: Update `frontend/src/i18n/locales/[lang]/common.json`
+2. **Using in Components**: Import `useTranslation` and use `t('key')` function
+3. **New Languages**: Add new locale files and update i18next configuration
+4. **Testing**: Use language selector to verify translations
+
+### 🔮 **Future Enhancements**
+
+#### **Phase 2 - Module Translation**
+- **Priority Modules**: Micro-lessons, Video Lessons, Knowledge Map
+- **Content Translation**: Learning materials and AI responses
+- **Form Translation**: All input fields and validation messages
+
+#### **Phase 3 - Advanced Features**
+- **RTL Support**: Right-to-left language support
+- **Pluralization**: Advanced plural forms for different languages
+- **Date/Time Formatting**: Locale-specific formatting
+- **Number Formatting**: Regional number and currency formats
+
+#### **Phase 4 - Content Localization**
+- **AI Responses**: Localized AI-generated content
+- **Learning Materials**: Translated educational content
+- **Cultural Adaptation**: Region-specific learning approaches
+
+### 📊 **Translation Coverage Status**
+
+| Module | English | Norwegian | Status |
+|--------|---------|-----------|---------|
+| Dashboard | ✅ 100% | ✅ 100% | Complete |
+| Sidebar | ✅ 100% | ✅ 100% | Complete |
+| Language Selector | ✅ 100% | ✅ 100% | Complete |
+| Micro-lessons | ✅ 100% | 🔄 0% | Pending |
+| Video Lessons | ✅ 100% | 🔄 0% | Pending |
+| Knowledge Map | ✅ 100% | 🔄 0% | Pending |
+| Document Analyzer | ✅ 100% | 🔄 0% | Pending |
+| Enterprise Architecture | ✅ 100% | 🔄 0% | Pending |
+
+**Overall Progress**: 25% of modules fully translated, 100% infrastructure complete
 
 ---
 

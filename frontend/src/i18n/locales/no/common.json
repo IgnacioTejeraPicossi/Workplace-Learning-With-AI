@@ -1,0 +1,67 @@
+{
+  "language": "Språk",
+  "english": "Engelsk",
+  "norwegian": "Norsk",
+
+  "dashboard": {
+    "title": "Dashbord",
+    "progress": {
+      "title": "Din fremdrift",
+      "subtitle": "Fortsett å holde streaken!"
+    },
+    "lessonsCompleted": "Fullførte leksjoner",
+    "simulationsCompleted": "Fullførte simuleringer",
+    "simulationScore": "Simuleringsscore",
+    "learningStreak": "Læringsstreak",
+    "daysInARow": "{{count}} dager på rad med læring",
+    "excellentConsistency": "Svært god konsistens!",
+    "recommendedNextStep": "Anbefalt neste steg",
+    "greatJob": "Bra jobbet! Fortsett å lære eller prøv et nytt scenario.",
+    "lessonsOverTime": "Fullførte leksjoner over tid",
+    "lessonsByTopic": "Leksjoner per tema",
+    "microLessons": "Mikro-leksjoner",
+    "videoLessons": "Video-leksjoner",
+    "simulationScore": "Simulasjonspoeng",
+    "recommendations": {
+      "startLearning": "Prøv din første mikroleksjon!",
+      "trySimulation": "Prøv din første scenariosimulering!",
+      "aimForBetter": "Sikt mot flere 'gode' svar i simuleringer!"
+    }
+  },
+
+  "sidebar": {
+    "dashboard": "Dashbord",
+    "learningModules": "Læringsmoduler",
+    "mapOfKnowledge": "Kunnskapskart",
+    "repositoryAnalyzer": "Repository-analyse",
+    "documentAnalyzer": "Dokumentanalyse",
+    "enterpriseArchitecture": "Enterprise-arkitektur",
+    "help": "Hjelp",
+    "runTest": "Kjør test",
+    "apiConfig": "API-konfig",
+    "future": "Fremtid",
+    "presentationAgent": "Presentasjonsagent",
+    "aiStudyBuddy": "AI-studieassistent",
+    "security": "Sikkerhet"
+  },
+
+  "actions": {
+    "refreshData": "Oppdater data",
+    "signOut": "Logg ut",
+    "analyze": "Analyser",
+    "save": "Lagre",
+    "clear": "Tøm",
+    "delete": "Slett",
+    "search": "Søk",
+    "edit": "Rediger",
+    "view": "Vis",
+    "clone": "Klon",
+    "create": "Opprett",
+    "update": "Oppdater"
+  },
+
+  "welcome": {
+    "title": "Velkommen til AI Learning with AI",
+    "subtitle": "Din personlige læringsreise drevet av kunstig intelligens"
+  }
+}
