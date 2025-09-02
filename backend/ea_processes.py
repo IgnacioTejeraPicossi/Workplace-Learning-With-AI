@@ -90,8 +90,8 @@ async def list_processes(
         cursor = db["ea_processes"].find(
             query, 
             {
-                "_id": 1, "name": 1, "owner": 1, "risk": 1, 
-                "maturity": 1, "status": 1, "category": 1,
+                "_id": 1, "name": 1, "description": 1, "owner": 1, "risk": 1, 
+                "maturity": 1, "status": 1, "category": 1, "nodes": 1, "edges": 1,
                 "createdAt": 1, "updatedAt": 1
             }
         ).sort("createdAt", -1)

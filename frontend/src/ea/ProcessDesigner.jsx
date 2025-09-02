@@ -13,19 +13,32 @@ import axios from 'axios';
 import './ProcessDesigner.css';
 
 // Custom Node Types
-const CustomNode = ({ data, selected }) => (
-  <div className={`custom-node ${data.type} ${selected ? 'selected' : ''}`}>
-    <div className="node-icon">{data.icon}</div>
-    <div className="node-label">{data.label}</div>
-    {data.riskScore > 0 && (
-      <div className="risk-indicator" style={{ 
-        backgroundColor: data.riskScore > 70 ? '#dc3545' : data.riskScore > 40 ? '#ffc107' : '#28a745' 
-      }}>
-        {data.riskScore}%
+const CustomNode = ({ data, selected }) => {
+  // Add safety check for data
+  if (!data) {
+    console.warn('CustomNode: data is undefined');
+    return (
+      <div className="custom-node error">
+        <div className="node-icon">❌</div>
+        <div className="node-label">Error</div>
       </div>
-    )}
-  </div>
-);
+    );
+  }
+
+  return (
+    <div className={`custom-node ${data.type || 'default'} ${selected ? 'selected' : ''}`}>
+      <div className="node-icon">{data.icon || '📄'}</div>
+      <div className="node-label">{data.label || 'Unnamed'}</div>
+      {data.riskScore > 0 && (
+        <div className="risk-indicator" style={{ 
+          backgroundColor: data.riskScore > 70 ? '#dc3545' : data.riskScore > 40 ? '#ffc107' : '#28a745' 
+        }}>
+          {data.riskScore}%
+        </div>
+      )}
+    </div>
+  );
+};
 
 const nodeTypes = {
   start: CustomNode,
@@ -33,7 +46,8 @@ const nodeTypes = {
   decision: CustomNode,
   system: CustomNode,
   data: CustomNode,
-  end: CustomNode
+  end: CustomNode,
+  custom: CustomNode
 };
 
 export default function ProcessDesigner({ onSave, initialData = null }) {
@@ -51,17 +65,58 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Helper function to get node icon
+  const getNodeIcon = (type) => {
+    const icons = {
+      start: '🟢',
+      task: '📋',
+      decision: '❓',
+      system: '💻',
+      data: '🗄️',
+      end: '🔴'
+    };
+    return icons[type] || '📄';
+  };
+
   // Initialize with sample data if provided
   React.useEffect(() => {
     if (initialData) {
-      setNodes(initialData.nodes || []);
-      setEdges(initialData.edges || []);
+      console.log('Loading initial data:', initialData);
+      
+      // Convert database nodes to ReactFlow format
+      const reactFlowNodes = (initialData.nodes || []).map(node => ({
+        id: node.id,
+        type: 'custom',
+        position: node.position || { x: 100, y: 100 },
+        data: {
+          type: node.type,
+          label: node.label,
+          icon: getNodeIcon(node.type),
+          appId: node.appId,
+          trainingModuleId: node.trainingModuleId,
+          riskScore: node.riskScore || 0
+        }
+      }));
+      
+      // Convert database edges to ReactFlow format
+      const reactFlowEdges = (initialData.edges || []).map(edge => ({
+        id: edge.id,
+        source: edge.from,
+        target: edge.to,
+        label: edge.label,
+        type: 'smoothstep'
+      }));
+      
+      setNodes(reactFlowNodes);
+      setEdges(reactFlowEdges);
       setProcessName(initialData.name || '');
       setProcessDescription(initialData.description || '');
       setProcessCategory(initialData.category || 'General');
       setProcessOwner(initialData.owner || '');
       setProcessMaturity(initialData.maturity || 3);
       setProcessRisk(initialData.risk || 0);
+      console.log('Loaded nodes:', reactFlowNodes);
+      console.log('Loaded edges:', reactFlowEdges);
     }
   }, [initialData]);
 
@@ -100,19 +155,6 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
       }
     };
     setNodes((nds) => [...nds, newNode]);
-  };
-
-  // Get node icon
-  const getNodeIcon = (type) => {
-    const icons = {
-      start: '🟢',
-      task: '📋',
-      decision: '❓',
-      system: '💻',
-      data: '💾',
-      end: '🔴'
-    };
-    return icons[type] || '📄';
   };
 
   // Update node properties
@@ -178,11 +220,22 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
         risk: processRisk
       };
 
-      const response = await axios.post('/api/ea/processes', processData);
+      console.log('Saving process data:', processData);
+      console.log('Nodes to save:', processData.nodes);
+      console.log('Edges to save:', processData.edges);
+
+      let response;
+      if (initialData && initialData._id) {
+        // Update existing process
+        response = await axios.put(`/api/ea/processes/${initialData._id}`, processData);
+      } else {
+        // Create new process
+        response = await axios.post('/api/ea/processes', processData);
+      }
       
       if (response.data.success) {
-        setSuccess('Process saved successfully!');
-        if (onSave) onSave(response.data.process_id);
+        setSuccess(initialData ? 'Process updated successfully!' : 'Process saved successfully!');
+        if (onSave) onSave(initialData ? initialData._id : response.data.process_id);
       }
     } catch (err) {
       console.error('Error saving process:', err);
@@ -202,14 +255,14 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
     <div className="process-designer">
       {/* Header */}
       <div className="designer-header">
-        <h2>🔄 Process Designer</h2>
+        <h2>🔄 {initialData ? 'Edit Process' : 'Process Designer'}</h2>
         <div className="header-actions">
           <button 
             className="save-btn"
             onClick={saveProcess}
             disabled={loading}
           >
-            {loading ? '💾 Saving...' : '💾 Save Process'}
+            {loading ? '💾 Saving...' : (initialData ? '💾 Update Process' : '💾 Save Process')}
           </button>
         </div>
       </div>

@@ -27,6 +27,9 @@ export default function EAHome() {
   const [editingCapability, setEditingCapability] = useState(null);
   const [editCapabilityFormData, setEditCapabilityFormData] = useState({});
 
+  // Edit process state
+  const [editingProcess, setEditingProcess] = useState(null);
+
   // Load all data on mount
   useEffect(() => {
     const loadAllData = async () => {
@@ -150,6 +153,12 @@ export default function EAHome() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle process editing
+  const handleEditProcess = (process) => {
+    setEditingProcess(process);
+    setActiveTab('process-designer');
   };
 
   // Handle application editing
@@ -386,7 +395,12 @@ export default function EAHome() {
             
             <div className="ea-process-actions">
               <button className="ea-btn primary">👁️ View</button>
-              <button className="ea-btn secondary">✏️ Edit</button>
+              <button 
+                className="ea-btn secondary" 
+                onClick={() => handleEditProcess(process)}
+              >
+                ✏️ Edit
+              </button>
               <button className="ea-btn secondary">📋 Clone</button>
               <button 
                 className="ea-btn danger" 
@@ -627,9 +641,16 @@ export default function EAHome() {
             {activeTab === 'ai-risk' && <AIRiskAnalysis />}
             {activeTab === 'process-designer' && (
               <ProcessDesigner 
+                initialData={editingProcess}
                 onSave={(processId) => {
-                  setSuccess(`Process created successfully! ID: ${processId}`);
+                  if (editingProcess) {
+                    setSuccess(`Process updated successfully! ID: ${processId}`);
+                  } else {
+                    setSuccess(`Process created successfully! ID: ${processId}`);
+                  }
+                  setEditingProcess(null);
                   setActiveTab('processes');
+                  loadProcesses(); // Reload processes to show updated data
                 }}
               />
             )}
