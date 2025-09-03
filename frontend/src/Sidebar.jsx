@@ -78,7 +78,7 @@ const getNavItems = (t) => [
   // Grupo 1.5: Análisis de repositorios (expandible)
   { key: "repository-analyzer", label: t('sidebar.repositoryAnalyzer'), icon: "archive", group: "learning", isExpandable: true, subItems: [
     { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive" },
-    { key: "repo-analyzer-cursor", label: "Repo Analyzer Cursor AI", icon: "robot" },
+    { key: "repo-analyzer-cursor", label: "Repo Analyzer with APIs", icon: "robot" },
     { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" },
     { key: "learning-repo", label: "Learning Repo", icon: "graduation-cap" }
   ]},
