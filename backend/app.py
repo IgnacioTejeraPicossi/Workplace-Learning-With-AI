@@ -1195,7 +1195,7 @@ async def get_knowledge_topics():
     try:
         from backend.knowledge_map_utils import extract_topics_from_modules, generate_topic_embedding, categorize_topic
         
-        # Extract topics from MongoDB
+        # Extract topics from MongoDB (global, no user filtering)
         raw_topics = await extract_topics_from_modules()
         
         # Transform to expected format
@@ -1326,7 +1326,7 @@ async def get_knowledge_clusters():
     try:
         from backend.knowledge_map_utils import extract_topics_from_modules, generate_dynamic_categories
         
-        # Extract topics from MongoDB
+        # Extract topics from MongoDB (global, no user filtering)
         raw_topics = await extract_topics_from_modules()
         
         if raw_topics:

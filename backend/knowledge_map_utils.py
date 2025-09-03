@@ -4,17 +4,19 @@ from backend.db import database, saved_videos_collection, certifications_collect
                        simulation_results_collection, career_coach_collection, skills_forecast_collection, \
                        web_search_collection
 
-async def extract_topics_from_modules():
+async def extract_topics_from_modules(user_id: str = None):
     """Extract unique topics using direct MongoDB access for better performance"""
     all_topics = {}
     
-    print("🔍 Starting topic extraction using direct MongoDB access...")
+    print(f"🔍 Starting topic extraction using direct MongoDB access for user: {user_id}")
     
     try:
         # Direct MongoDB access - much faster than HTTP calls
         print("📚 Fetching micro-lessons from MongoDB...")
+        
+        # Micro-lessons are global (shared between users), so we get all of them
         micro_lessons = await database.micro_lessons_collection.find({}).to_list(length=None)
-        print(f"  Found {len(micro_lessons)} micro-lessons from MongoDB")
+        print(f"  Found {len(micro_lessons)} micro-lessons from MongoDB (global)")
         
         # Process micro-lessons
         for lesson in micro_lessons:
@@ -74,13 +76,13 @@ async def extract_topics_from_modules():
         print(f"❌ Error in MongoDB access: {e}")
         return {}
 
-async def extract_topics_from_modules_fallback():
+async def extract_topics_from_modules_fallback(user_id: str = None):
     """Fallback function using direct MongoDB access"""
     all_topics = {}
     
-    print("🔄 Using fallback: direct MongoDB access...")
+    print(f"🔄 Using fallback: direct MongoDB access for user: {user_id}")
     
-    # Direct MongoDB access
+    # Direct MongoDB access - micro-lessons are global
     micro_lessons = await database.micro_lessons_collection.find({}).to_list(length=None)
     videos = await saved_videos_collection.find({}).to_list(length=None)
     
