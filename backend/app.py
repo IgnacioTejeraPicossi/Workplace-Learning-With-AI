@@ -268,6 +268,8 @@ def root():
     return {"message": "AI Workplace Learning API is running."}
 
 
+
+
 @app.get("/concepts")
 async def generate_concepts(user=Depends(verify_token)):
     """Generate AI-based workplace learning concepts."""
