@@ -1,64 +1,57 @@
 from datetime import datetime
 import hashlib
-from backend.db import micro_lessons_collection, saved_videos_collection, certifications_collection, \
+from backend.db import database, saved_videos_collection, certifications_collection, \
                        simulation_results_collection, career_coach_collection, skills_forecast_collection, \
                        web_search_collection
 
 async def extract_topics_from_modules():
-    """Extract unique topics using the SAME logic as Dashboard - exact same API calls"""
-    import httpx
-    
+    """Extract unique topics using direct MongoDB access for better performance"""
     all_topics = {}
     
-    print("🔍 Starting topic extraction using SAME logic as Dashboard...")
+    print("🔍 Starting topic extraction using direct MongoDB access...")
     
     try:
-        # Use the SAME API calls as Dashboard
-        print("📚 Fetching micro-lessons via API (same as Dashboard)...")
-        async with httpx.AsyncClient() as client:
-            micro_lessons_response = await client.get("http://localhost:8000/api/micro-lessons/")
-            micro_lessons = micro_lessons_response.json() if micro_lessons_response.status_code == 200 else []
+        # Direct MongoDB access - much faster than HTTP calls
+        print("📚 Fetching micro-lessons from MongoDB...")
+        micro_lessons = await database.micro_lessons_collection.find({}).to_list(length=None)
+        print(f"  Found {len(micro_lessons)} micro-lessons from MongoDB")
         
-        print(f"  Found {len(micro_lessons)} micro-lessons from API")
-        
-        # Debug: Print all micro-lesson topics
-        print("📋 All micro-lesson topics:")
-        for i, lesson in enumerate(micro_lessons):
-            print(f"  {i+1}. Topic: '{lesson.get('topic', 'NO_TOPIC')}' - ID: {lesson.get('id')}")
-        
-        # Process micro-lessons exactly like Dashboard
+        # Process micro-lessons
         for lesson in micro_lessons:
             if lesson.get("topic"):
                 topic_key = lesson["topic"]
-                if topic_key not in all_topics:
+                print(f"  📝 Processing micro-lesson: '{topic_key}'")
+                
+                # Check if we already have this topic (case-insensitive)
+                existing_key = None
+                for existing_topic in all_topics.keys():
+                    if existing_topic.lower() == topic_key.lower():
+                        existing_key = existing_topic
+                        break
+                
+                if existing_key:
+                    # Update existing topic
+                    all_topics[existing_key]["count"] += 1
+                    print(f"    🔄 Updated existing topic: '{existing_key}' (count: {all_topics[existing_key]['count']})")
+                else:
+                    # Add new topic
                     all_topics[topic_key] = {
                         "id": topic_key.lower().replace(" ", "_").replace("-", "_").replace("(", "").replace(")", ""),
                         "label": lesson["topic"],
                         "description": lesson.get("content", "")[:100] + "..." if lesson.get("content") else f"Micro-lesson about {lesson['topic']}",
                         "source": "micro_lessons",
-                        "module_data": {
-                            "module_type": "micro_lessons",
-                            "module_id": str(lesson.get("id", "")),
-                            "created_at": lesson.get("created_at", ""),
-                            "user_id": lesson.get("user_id", "")
-                        },
                         "count": 1,
                         "last_activity": lesson.get("created_at", "")
                     }
-                    print(f"  + Added topic: {lesson['topic']}")
-                else:
-                    all_topics[topic_key]["count"] += 1
-                    print(f"  ++ Updated topic: {lesson['topic']} (count: {all_topics[topic_key]['count']})")
-        
-        print("🎥 Fetching videos via API (same as Dashboard)...")
-        async with httpx.AsyncClient() as client:
-            videos_response = await client.get("http://localhost:8000/api/saved-videos")
-            videos_data = videos_response.json() if videos_response.status_code == 200 else {}
-            videos = videos_data.get("videos", [])
-        
-        print(f"  Found {len(videos)} videos from API")
-        
-        # Process videos exactly like Dashboard
+                    print(f"    ✅ Added new topic: '{topic_key}'")
+            else:
+                print(f"  ⚠️ Micro-lesson without topic: {lesson.get('title', 'Unknown')}")
+
+        print("🎥 Fetching videos from MongoDB...")
+        videos = await saved_videos_collection.find({}).to_list(length=None)
+        print(f"  Found {len(videos)} videos from MongoDB")
+
+        # Process videos
         for video in videos:
             if video.get("topic"):
                 topic_key = video["topic"]
@@ -68,32 +61,18 @@ async def extract_topics_from_modules():
                         "label": video["topic"],
                         "description": video.get("description", "")[:100] + "..." if video.get("description") else f"Video about {video['topic']}",
                         "source": "videos",
-                        "module_data": {
-                            "module_type": "videos",
-                            "module_id": str(video.get("id", "")),
-                            "created_at": video.get("saved_at", ""),
-                            "user_id": video.get("user_id", "")
-                        },
                         "count": 1,
                         "last_activity": video.get("saved_at", "")
                     }
-                    print(f"  + Added video topic: {video['topic']}")
                 else:
                     all_topics[topic_key]["count"] += 1
-                    print(f"  ++ Updated video topic: {video['topic']} (count: {all_topics[topic_key]['count']})")
-        
+
         print(f"✅ Total topics extracted: {len(all_topics)}")
-        print("📊 Final topics list:")
-        for i, (key, topic) in enumerate(all_topics.items()):
-            print(f"  {i+1}. Key: '{key}' -> Label: '{topic['label']}' (count: {topic['count']})")
-        
         return all_topics
-        
+
     except Exception as e:
-        print(f"❌ Error in API calls: {e}")
-        # Fallback to direct MongoDB access
-        print("🔄 Falling back to direct MongoDB access...")
-        return await extract_topics_from_modules_fallback()
+        print(f"❌ Error in MongoDB access: {e}")
+        return {}
 
 async def extract_topics_from_modules_fallback():
     """Fallback function using direct MongoDB access"""
@@ -102,7 +81,7 @@ async def extract_topics_from_modules_fallback():
     print("🔄 Using fallback: direct MongoDB access...")
     
     # Direct MongoDB access
-    micro_lessons = await micro_lessons_collection.find({}).to_list(length=None)
+    micro_lessons = await database.micro_lessons_collection.find({}).to_list(length=None)
     videos = await saved_videos_collection.find({}).to_list(length=None)
     
     # Process micro-lessons

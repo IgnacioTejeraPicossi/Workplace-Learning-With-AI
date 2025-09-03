@@ -177,8 +177,8 @@ const KnowledgeMap = () => {
             const userData = await userRes.json();
             setUserData(userData);
             
-            // Fetch recommendations after user data is loaded
-            await fetchRecommendations(auth.currentUser.uid);
+            // Fetch recommendations in background (don't await)
+            fetchRecommendations(auth.currentUser.uid);
           }
         } else {
           // Use mock user data for testing

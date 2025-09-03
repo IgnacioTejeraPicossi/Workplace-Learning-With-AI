@@ -2055,7 +2055,7 @@ for route in app.routes:
 async def debug_knowledge_map():
     """Debug endpoint to check MongoDB connection and available data"""
     try:
-        from backend.db import micro_lessons_collection, saved_videos_collection
+        from backend.db import database, saved_videos_collection
         
         print("🔍 Debug: Checking MongoDB collections...")
         
@@ -2093,6 +2093,68 @@ async def debug_knowledge_map():
         import traceback
         traceback.print_exc()
         return {"error": str(e), "message": "MongoDB connection failed"}
+
+@app.delete("/api/knowledge-map/clean-all")
+async def clean_all_knowledge_data():
+    """Temporary endpoint to clean all knowledge map data"""
+    try:
+        from backend.db import micro_lessons_collection, saved_videos_collection
+        
+        print("🧹 Cleaning all knowledge map data...")
+        
+        # Delete all micro-lessons
+        micro_result = await micro_lessons_collection.delete_many({})
+        print(f"🗑️ Deleted {micro_result.deleted_count} micro-lessons")
+        
+        # Delete all videos
+        videos_result = await saved_videos_collection.delete_many({})
+        print(f"🗑️ Deleted {videos_result.deleted_count} videos")
+        
+        return {
+            "message": "All knowledge data cleaned successfully",
+            "deleted": {
+                "micro_lessons": micro_result.deleted_count,
+                "videos": videos_result.deleted_count
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ Clean error: {e}")
+        return {"error": str(e), "message": "Failed to clean data"}
+
+@app.get("/api/knowledge-map/debug-micro-lessons")
+async def debug_micro_lessons():
+    """Debug endpoint to check micro-lessons directly"""
+    try:
+        from backend.db import database
+        
+        print("🔍 Debug: Checking micro-lessons directly...")
+        
+        # Get all micro-lessons
+        micro_lessons = await database.micro_lessons_collection.find({}).to_list(length=None)
+        print(f"📚 Found {len(micro_lessons)} micro-lessons")
+        
+        # Extract topics
+        topics = []
+        for lesson in micro_lessons:
+            if lesson.get("topic"):
+                topics.append(lesson["topic"])
+                print(f"  📝 Topic: '{lesson['topic']}' - Title: '{lesson.get('title', 'No title')}'")
+            else:
+                print(f"  ⚠️ No topic: {lesson.get('title', 'Unknown')}")
+        
+        return {
+            "total_micro_lessons": len(micro_lessons),
+            "topics_found": len(topics),
+            "topics": topics,
+            "micro_lessons": micro_lessons
+        }
+        
+    except Exception as e:
+        print(f"❌ Debug error: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "Failed to debug micro-lessons"}
 
 @app.get("/api/debug/topic-comparison")
 async def debug_topic_comparison():
