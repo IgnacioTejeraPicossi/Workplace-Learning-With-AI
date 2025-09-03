@@ -20,6 +20,7 @@ export default function LearningRepo() {
   const [cursorAIDocs, setCursorAIDocs] = useState([]);
   const [loadingCursorAI, setLoadingCursorAI] = useState(false);
   const [selectedDocForReading, setSelectedDocForReading] = useState(null);
+  const [selectedModuleForViewing, setSelectedModuleForViewing] = useState(null);
 
   // Load saved analyses on component mount
   useEffect(() => {
@@ -1582,6 +1583,7 @@ export default function LearningRepo() {
                    </button>
                    
                    <button
+                     onClick={() => setSelectedModuleForViewing(module)}
                      style={{
                        padding: '0.5rem 1rem',
                        background: '#6c757d',
@@ -1899,6 +1901,207 @@ export default function LearningRepo() {
                 }}
               >
                 🧠 Generate Quiz
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Learning Module Details Modal */}
+      {selectedModuleForViewing && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '2rem'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            padding: '2rem',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedModuleForViewing(null)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: '#dc3545',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '2rem',
+                height: '2rem',
+                cursor: 'pointer',
+                fontSize: '1.2rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Close module details"
+            >
+              ×
+            </button>
+
+            {/* Module header */}
+            <div style={{ marginBottom: '1.5rem', paddingRight: '3rem' }}>
+              <h2 style={{ color: '#333', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
+                {selectedModuleForViewing.title}
+              </h2>
+              <p style={{ color: '#666', margin: '0 0 1rem 0', fontSize: '1rem' }}>
+                {selectedModuleForViewing.description}
+              </p>
+            </div>
+
+            {/* Module details */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Module Details</h3>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                gap: '1rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                  <strong>Type:</strong> {selectedModuleForViewing.type}
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                  <strong>Difficulty:</strong> {selectedModuleForViewing.difficulty}
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                  <strong>Estimated Time:</strong> {selectedModuleForViewing.estimated_time}
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                  <strong>Created:</strong> {new Date(selectedModuleForViewing.created_at).toLocaleDateString()}
+                </div>
+              </div>
+              
+              {selectedModuleForViewing.topics && selectedModuleForViewing.topics.length > 0 && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <strong>Topics:</strong>
+                  <div style={{ marginTop: '0.5rem' }}>
+                    {selectedModuleForViewing.topics.map((topic, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.25rem 0.5rem',
+                          margin: '0.25rem',
+                          backgroundColor: '#007bff',
+                          color: '#fff',
+                          borderRadius: '12px',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedModuleForViewing.learning_objectives && selectedModuleForViewing.learning_objectives.length > 0 && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <strong>Learning Objectives:</strong>
+                  <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
+                    {selectedModuleForViewing.learning_objectives.map((objective, index) => (
+                      <li key={index} style={{ marginBottom: '0.25rem' }}>{objective}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedModuleForViewing.repo_url && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <strong>Repository URL:</strong>
+                  <div style={{ 
+                    marginTop: '0.5rem', 
+                    padding: '0.5rem', 
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '4px',
+                    wordBreak: 'break-all',
+                    fontSize: '0.9rem'
+                  }}>
+                    {selectedModuleForViewing.repo_url}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Module content preview */}
+            {selectedModuleForViewing.content && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Content Preview</h3>
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #e0e0e0',
+                  maxHeight: '300px',
+                  overflow: 'auto',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.6',
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'monospace'
+                }}>
+                  {selectedModuleForViewing.content.length > 1000 ? 
+                    `${selectedModuleForViewing.content.substring(0, 1000)}...` : 
+                    selectedModuleForViewing.content
+                  }
+                </div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => {
+                  setSelectedModuleForViewing(null);
+                  startLearning(selectedModuleForViewing);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#007bff',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                📚 Start Learning
+              </button>
+              
+              <button
+                onClick={() => setSelectedModuleForViewing(null)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#6c757d',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Close
               </button>
             </div>
           </div>
