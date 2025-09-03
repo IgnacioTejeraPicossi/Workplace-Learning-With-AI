@@ -48,8 +48,16 @@ export default function LearningRepo() {
       setLoadingCursorAI(true);
       const response = await axios.get('/api/cursor-ai-docs');
       if (response.data.success) {
-        setCursorAIDocs(response.data.docs || []);
-        console.log(`Loaded ${response.data.docs?.length || 0} Cursor AI documents`);
+        const docs = response.data.docs || [];
+        setCursorAIDocs(docs);
+        console.log(`Loaded ${docs.length} Cursor AI documents`);
+        
+        // Debug: Log the structure of the first document
+        if (docs.length > 0) {
+          console.log('First document structure:', docs[0]);
+          console.log('First document ID:', docs[0]._id);
+          console.log('First document ID type:', typeof docs[0]._id);
+        }
       } else {
         console.error('Failed to load Cursor AI docs:', response.data.message);
       }
@@ -717,6 +725,13 @@ export default function LearningRepo() {
       console.log('Attempting to delete document with ID:', docId);
       console.log('ID type:', typeof docId);
       console.log('ID length:', docId ? docId.length : 'undefined');
+      console.log('Full document object:', cursorAIDocs.find(doc => doc._id === docId));
+      
+      // Validate ID before sending
+      if (!docId || typeof docId !== 'string' || docId.trim() === '') {
+        setError('Invalid document ID: ID is empty or not a string');
+        return;
+      }
       
       const response = await axios.delete(`/api/delete-cursor-ai-doc/${docId}`);
       
@@ -729,7 +744,7 @@ export default function LearningRepo() {
       }
     } catch (error) {
       console.error('Delete Cursor AI document error:', error);
-      const errorMessage = error.response?.data?.detail || error.message;
+      const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message;
       setError(`Failed to delete Cursor AI document: ${errorMessage}`);
     }
   };
