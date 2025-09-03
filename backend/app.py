@@ -1729,6 +1729,24 @@ async def get_learning_module(module_id: str):
         print(f"Error fetching learning module: {e}")
         return {"success": False, "message": f"Error: {str(e)}"}
 
+@app.delete("/api/learning-modules/{module_id}")
+async def delete_learning_module(module_id: str):
+    """Delete a learning module by ID"""
+    try:
+        # Delete the learning module from the database
+        result = await lessons_collection.delete_one({"_id": module_id})
+        
+        if result.deleted_count > 0:
+            print(f"✅ Learning module deleted successfully: {module_id}")
+            return {"success": True, "message": "Learning module deleted successfully"}
+        else:
+            print(f"❌ Learning module not found: {module_id}")
+            return {"success": False, "message": "Learning module not found"}
+            
+    except Exception as e:
+        print(f"❌ Error deleting learning module: {e}")
+        return {"success": False, "message": f"Error: {str(e)}"}
+
 @app.get("/api/cursor-ai-docs")
 async def get_cursor_ai_docs():
     """Get all Cursor AI generated documentation"""

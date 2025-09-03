@@ -19,6 +19,7 @@ export default function LearningRepo() {
   const [learningProgress, setLearningProgress] = useState({});
   const [cursorAIDocs, setCursorAIDocs] = useState([]);
   const [loadingCursorAI, setLoadingCursorAI] = useState(false);
+  const [selectedDocForReading, setSelectedDocForReading] = useState(null);
 
   // Load saved analyses on component mount
   useEffect(() => {
@@ -58,28 +59,61 @@ export default function LearningRepo() {
     }
   };
 
-  // Create learning module from analysis
-  const createLearningModule = async (analysis) => {
+  // Create learning module from analysis or Cursor AI document
+  const createLearningModule = async (doc) => {
     try {
       setError('');
       setSuccess('Creating learning module...');
       
-      const learningModuleData = {
-        title: `Learning Module: ${analysis.repo_name || 'Repository Analysis'}`,
-        description: `Structured learning material based on analysis of ${analysis.repo_url}`,
-        content: analysis.analysis_data?.documentation?.readme || 'No content available',
-        analysis_data: analysis.analysis_data,
-        repo_url: analysis.repo_url,
-        repo_name: analysis.repo_name,
-        branch_used: analysis.branch_used,
-        created_at: new Date().toISOString(),
-        type: 'repository_analysis',
-        difficulty: 'intermediate',
-        estimated_time: '2-3 hours',
-        topics: extractTopics(analysis.analysis_data),
-        prerequisites: [],
-        learning_objectives: generateLearningObjectives(analysis.analysis_data)
-      };
+      // Handle both Cursor AI documents and repository analyses
+      let learningModuleData;
+      
+      if (doc.type === 'imported_readme' && doc.source === 'cursor_ai_automation') {
+        // This is a Cursor AI document
+        learningModuleData = {
+          title: `Learning Module: ${doc.title}`,
+          description: `Structured learning material based on Cursor AI analysis of ${doc.repo_name || 'repository'}`,
+          content: doc.content || 'No content available',
+          analysis_data: {
+            documentation: { readme: doc.content },
+            source: 'cursor_ai_automation',
+            repo_name: doc.repo_name,
+            repo_url: doc.repo_url
+          },
+          repo_url: doc.repo_url || '',
+          repo_name: doc.repo_name || doc.title.replace('README - ', ''),
+          branch_used: doc.branch_used || 'main',
+          created_at: new Date().toISOString(),
+          type: 'cursor_ai_analysis',
+          difficulty: 'intermediate',
+          estimated_time: '2-3 hours',
+          topics: ['documentation', 'repository_analysis', 'cursor_ai'],
+          prerequisites: [],
+          learning_objectives: [
+            'Understand the repository structure and purpose',
+            'Learn from the generated documentation',
+            'Apply best practices identified in the analysis'
+          ]
+        };
+      } else {
+        // This is a repository analysis
+        learningModuleData = {
+          title: `Learning Module: ${doc.repo_name || 'Repository Analysis'}`,
+          description: `Structured learning material based on analysis of ${doc.repo_url}`,
+          content: doc.analysis_data?.documentation?.readme || 'No content available',
+          analysis_data: doc.analysis_data,
+          repo_url: doc.repo_url,
+          repo_name: doc.repo_name,
+          branch_used: doc.branch_used,
+          created_at: new Date().toISOString(),
+          type: 'repository_analysis',
+          difficulty: 'intermediate',
+          estimated_time: '2-3 hours',
+          topics: extractTopics(doc.analysis_data),
+          prerequisites: [],
+          learning_objectives: generateLearningObjectives(doc.analysis_data)
+        };
+      }
 
       const response = await axios.post('/api/create-learning-module', learningModuleData);
       
@@ -495,30 +529,37 @@ export default function LearningRepo() {
     }
   };
 
-  // Generate quiz from analysis
-  const generateQuiz = async (analysis) => {
+  // Generate quiz from analysis or Cursor AI document
+  const generateQuiz = async (doc) => {
     try {
       setError('');
       setSuccess('Generating quiz...');
       
-      // First, we need to get the markdown content from the analysis
-      // or generate it if it doesn't exist
+      // Get markdown content from either Cursor AI document or repository analysis
       let markdownContent = '';
       
-      if (analysis.analysis_data?.documentation?.readme) {
-        markdownContent = analysis.analysis_data.documentation.readme;
-      } else if (analysis.analysis_data?.summaries) {
+      if (doc.type === 'imported_readme' && doc.source === 'cursor_ai_automation') {
+        // This is a Cursor AI document - use the content directly
+        markdownContent = doc.content || '';
+      } else if (doc.analysis_data?.documentation?.readme) {
+        // This is a repository analysis
+        markdownContent = doc.analysis_data.documentation.readme;
+      } else if (doc.analysis_data?.summaries) {
         // Generate basic markdown from summaries if no documentation exists
-        markdownContent = generateBasicMarkdown(analysis);
+        markdownContent = generateBasicMarkdown(doc);
       } else {
         throw new Error('No content available for quiz generation');
+      }
+      
+      if (!markdownContent || markdownContent.trim().length < 100) {
+        throw new Error('Content too short for quiz generation');
       }
       
       const quizData = {
         markdown_content: markdownContent,
         num_questions: 10,
         difficulty: 'medium',
-        analysis_id: analysis._id
+        analysis_id: doc._id
       };
 
       console.log('Sending quiz data:', quizData);
@@ -566,6 +607,28 @@ export default function LearningRepo() {
       console.error('Delete analysis error:', error);
       const errorMessage = error.response?.data?.detail || error.message;
       setError(`Failed to delete analysis: ${errorMessage}`);
+    }
+  };
+
+  // Delete learning module
+  const deleteLearningModule = async (module) => {
+    try {
+      setError('');
+      setSuccess('Deleting learning module...');
+      
+      const response = await axios.delete(`/api/learning-modules/${module._id}`);
+      
+      if (response.data.success) {
+        setSuccess('Learning module deleted successfully!');
+        await loadLearningModules(); // Reload the list
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(`Failed to delete learning module: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Delete learning module error:', error);
+      const errorMessage = error.response?.data?.detail || error.message;
+      setError(`Failed to delete learning module: ${errorMessage}`);
     }
   };
 
@@ -929,6 +992,22 @@ export default function LearningRepo() {
                   gap: '0.5rem',
                   flexWrap: 'wrap'
                 }}>
+                  <button
+                    onClick={() => setSelectedDocForReading(doc)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem'
+                    }}
+                    title="Read the complete document"
+                  >
+                    📖 Read
+                  </button>
+                  
                   <button
                     onClick={() => createLearningModule(doc)}
                     style={{
@@ -1516,6 +1595,22 @@ export default function LearningRepo() {
                    >
                      👁️ View
                    </button>
+
+                   <button
+                     onClick={() => deleteLearningModule(module)}
+                     style={{
+                       padding: '0.5rem 1rem',
+                       background: '#dc3545',
+                       color: '#fff',
+                       border: 'none',
+                       borderRadius: '4px',
+                       cursor: 'pointer',
+                       fontSize: '0.9rem'
+                     }}
+                     title="Delete this learning module"
+                   >
+                     🗑️ Delete
+                   </button>
                  </div>
                </div>
              ))}
@@ -1678,6 +1773,133 @@ export default function LearningRepo() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document Reading Modal */}
+      {selectedDocForReading && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '2rem'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            padding: '2rem',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedDocForReading(null)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: '#dc3545',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '2rem',
+                height: '2rem',
+                cursor: 'pointer',
+                fontSize: '1.2rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Close document"
+            >
+              ×
+            </button>
+
+            {/* Document header */}
+            <div style={{ marginBottom: '1.5rem', paddingRight: '3rem' }}>
+              <h2 style={{ color: '#333', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
+                {selectedDocForReading.title}
+              </h2>
+              <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
+                <p><strong>Type:</strong> {selectedDocForReading.type}</p>
+                <p><strong>Source:</strong> {selectedDocForReading.source}</p>
+                <p><strong>Created:</strong> {new Date(selectedDocForReading.created_at).toLocaleDateString()}</p>
+                <p><strong>Content Length:</strong> {selectedDocForReading.content?.length || 0} characters</p>
+                {selectedDocForReading.repo_name && <p><strong>Repository:</strong> {selectedDocForReading.repo_name}</p>}
+                {selectedDocForReading.repo_url && <p><strong>URL:</strong> {selectedDocForReading.repo_url}</p>}
+              </div>
+            </div>
+
+            {/* Document content */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '1.5rem',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0',
+              maxHeight: '60vh',
+              overflow: 'auto',
+              fontSize: '0.9rem',
+              lineHeight: '1.6',
+              whiteSpace: 'pre-wrap',
+              fontFamily: 'monospace'
+            }}>
+              {selectedDocForReading.content || 'No content available'}
+            </div>
+
+            {/* Action buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              marginTop: '1.5rem',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => {
+                  setSelectedDocForReading(null);
+                  createLearningModule(selectedDocForReading);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#28a745',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                🎓 Create Learning Module
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedDocForReading(null);
+                  generateQuiz(selectedDocForReading);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#ffc107',
+                  color: '#212529',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                🧠 Generate Quiz
+              </button>
             </div>
           </div>
         </div>
