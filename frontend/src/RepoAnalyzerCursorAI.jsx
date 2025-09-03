@@ -462,19 +462,25 @@ This is a comprehensive analysis of the repository structure, architecture, and 
       clearMessages();
       setSuccess('Saving analysis...');
       
-      const analysisData = {
-        repository_name: analysisResult.repository_name,
-        repo_name: analysisResult.repo_name,
-        branch: analysisResult.branch,
-        files_analyzed: analysisResult.files_analyzed,
-        analysis_type: analysisResult.analysis_type,
-        documentation: analysisResult.documentation,
-        insights: analysisResult.insights,
-        learning_module: analysisResult.learning_module,
-        created_at: new Date().toISOString()
+      // Format data according to the backend API expectations
+      const requestData = {
+        analysis: {
+          repository_name: analysisResult.repository_name,
+          repo_name: analysisResult.repo_name,
+          branch: analysisResult.branch,
+          branch_used: analysisResult.branch,
+          files_analyzed: analysisResult.files_analyzed,
+          analysis_type: analysisResult.analysis_type,
+          documentation: analysisResult.documentation,
+          insights: analysisResult.insights,
+          learning_module: analysisResult.learning_module,
+          created_at: new Date().toISOString()
+        },
+        repo_url: repoUrl || analysisResult.repository_name || 'Unknown Repository',
+        timestamp: new Date().toISOString()
       };
 
-      const response = await axios.post('/api/save-analysis', analysisData);
+      const response = await axios.post('/api/save-analysis', requestData);
       
       if (response.data.success) {
         setSuccess('Analysis saved successfully! Check Saved Analyses section.');
