@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from './ThemeContext';
+import ModalDialog from './ModalDialog';
 
 const RunTest = () => {
   const { colors } = useTheme();
@@ -8,11 +9,15 @@ const RunTest = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [apiTestResults, setApiTestResults] = useState(null);
   const [isRunningApi, setIsRunningApi] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [progressMessage, setProgressMessage] = useState('');
 
   const runCypressTests = async () => {
     setIsRunning(true);
     setTestResults(null);
     setApiTestResults(null);
+    setShowProgressModal(true);
+    setProgressMessage('Running Cypress Tests...');
     
     // Simulate Cypress test execution
     setTimeout(() => {
@@ -119,6 +124,7 @@ const RunTest = () => {
         }
       });
       setIsRunning(false);
+      setShowProgressModal(false);
     }, 5000);
   };
 
@@ -126,6 +132,8 @@ const RunTest = () => {
     setIsRunning(true);
     setTestResults(null);
     setApiTestResults(null);
+    setShowProgressModal(true);
+    setProgressMessage('Running Manual Tests...');
     
     // Simulate manual test checklist
     setTimeout(() => {
@@ -209,6 +217,7 @@ const RunTest = () => {
         }
       });
       setIsRunning(false);
+      setShowProgressModal(false);
     }, 3000);
   };
 
@@ -216,6 +225,8 @@ const RunTest = () => {
     setIsRunningApi(true);
     setTestResults(null);
     setApiTestResults(null);
+    setShowProgressModal(true);
+    setProgressMessage('Running API Tests...');
     
     const apiEndpoints = [
       // Existing endpoints
@@ -445,6 +456,7 @@ const RunTest = () => {
       }
     });
     setIsRunningApi(false);
+    setShowProgressModal(false);
   };
 
   return (
@@ -672,6 +684,44 @@ const RunTest = () => {
           )}
         </div>
       </div>
+
+      {/* Progress Modal */}
+      <ModalDialog
+        isOpen={showProgressModal}
+        onRequestClose={() => {}} // Prevent closing during tests
+        title="Run Tests"
+      >
+        <div style={{ width: '100%', margin: '24px 0' }}>
+          <div style={{ 
+            marginBottom: '16px',
+            textAlign: 'center',
+            color: colors.text,
+            fontSize: '16px',
+            fontWeight: '500'
+          }}>
+            {progressMessage}
+          </div>
+          <div style={{ 
+            height: 8, 
+            background: '#eee', 
+            borderRadius: 4, 
+            overflow: 'hidden' 
+          }}>
+            <div style={{ 
+              width: '80%', 
+              height: '100%', 
+              background: colors.primary, 
+              animation: 'progressBar 1.2s linear infinite alternate' 
+            }} />
+          </div>
+          <style>{`
+            @keyframes progressBar { 
+              0% { width: 10%; } 
+              100% { width: 90%; } 
+            }
+          `}</style>
+        </div>
+      </ModalDialog>
     </div>
   );
 };
