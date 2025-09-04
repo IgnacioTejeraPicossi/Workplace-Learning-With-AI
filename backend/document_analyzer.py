@@ -381,9 +381,11 @@ async def save_analysis(request: SaveAnalysisRequest):
         
         # Save to MongoDB for persistent storage
         try:
-            # Convert string ID to ObjectId for MongoDB
+            # Create a proper ObjectId for MongoDB
             from bson import ObjectId
-            analysis_data["_id"] = ObjectId(analysis_data["id"])
+            analysis_data["_id"] = ObjectId()
+            # Keep the original string ID for reference
+            analysis_data["original_id"] = analysis_data["id"]
             
             # Insert into MongoDB collection
             result = await document_analyses_collection.insert_one(analysis_data)
