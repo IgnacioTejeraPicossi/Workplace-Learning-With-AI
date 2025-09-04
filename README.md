@@ -585,7 +585,12 @@ backend/
 
 ### 🔑 Environment Variables (REQUIRED)
 
-**Backend .env (place in backend/)**
+> **⚠️ IMPORTANT: Environment File Locations**
+> - **Backend .env**: Located in **ROOT directory** (same level as `backend/` folder)
+> - **Frontend .env**: Located in **frontend/** directory
+> - **Web Search .env**: Located in **websearch-backend/** directory
+
+**Backend .env (place in ROOT directory)**
 ```
 OPENAI_API_KEY=your_openai_api_key_here
 MONGO_URI=mongodb://localhost:27017
@@ -609,7 +614,8 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 - **uvicorn app:app --reload fails**: This command is INCORRECT. Always run from the root directory with `uvicorn backend.app:app --reload`
 - **Import errors when starting backend**: You're probably running from the wrong directory. The backend MUST be started from the ROOT directory, not from inside `backend/`
 - **pip install fails with "requirements.txt not found"**: You're probably in the wrong directory. Run `pip install -r requirements.txt` from the ROOT directory, not from `backend/`
-- **Environment variables not loading**: Ensure your `.env` file is in the ROOT directory, not in `backend/`
+- **Environment variables not loading**: Ensure your `.env` file is in the ROOT directory, not in `backend/`. The backend looks for `.env` at the project root level.
+- **"Backend .env (place in backend/)" confusion**: This is INCORRECT documentation. The backend `.env` file must be in the ROOT directory, not in the `backend/` subdirectory.
 - **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your .env.
 - **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in backend/.
 - **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
@@ -938,18 +944,20 @@ cd websearch-backend && node index.js
 AI-Learning-with-AI/
 ├── backend/                 # FastAPI backend code
 ├── frontend/               # React frontend code
+│   └── .env               # Frontend environment variables
 ├── websearch-backend/      # Node.js web search service
+│   └── .env               # Web search environment variables
 ├── requirements.txt        # Python dependencies (ROOT LEVEL)
-├── .env                   # Environment variables (ROOT LEVEL)
+├── .env                   # Backend environment variables (ROOT LEVEL)
 └── README.md
 ```
 
 **⚠️ IMPORTANT DIRECTORY STRUCTURE NOTES:**
 - **Backend FastAPI**: Must be started from ROOT directory with `uvicorn backend.app:app --reload`
 - **Python dependencies**: Install from ROOT directory with `pip install -r requirements.txt`
-- **Environment file**: Located at ROOT level (`.env`)
-- **Frontend**: Install and run from `frontend/` directory
-- **Web Search**: Install and run from `websearch-backend/` directory
+- **Backend .env file**: Located at ROOT level (`.env`) - NOT inside `backend/` folder
+- **Frontend**: Install and run from `frontend/` directory (has its own `.env`)
+- **Web Search**: Install and run from `websearch-backend/` directory (has its own `.env`)
 
 ### Step-by-Step Setup
 
