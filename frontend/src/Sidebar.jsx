@@ -60,16 +60,16 @@ const getNavItems = (t) => [
   
   // Grupo 1: Módulos de aprendizaje (expandible)
   { key: "learning-modules", label: t('sidebar.learningModules'), icon: "book", group: "learning", isExpandable: true, subItems: [
-    { key: "video-lessons", label: "Video Lessons", icon: "play" },
-    { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
-    { key: "simulations", label: "Simulations", icon: "play" },
-    { key: "web-search", label: "Web Search", icon: "globe" },
-    { key: "team-dynamics", label: "Team Dynamics", icon: "users" },
-    { key: "certifications", label: "Certifications", icon: "trophy" },
-    { key: "ai-career-coach", label: "AI Career Coach", icon: "user" },
-    { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
-    { key: "ai-learning", label: "AI Learning & Training", icon: "robot" },
-    { key: "babel-library", label: "Babel Library", icon: "temple" }
+    { key: "video-lessons", label: t('sidebar.learningModulesSubmenu.videoLessons'), icon: "play" },
+    { key: "micro-lessons", label: t('sidebar.learningModulesSubmenu.microLessons'), icon: "book" },
+    { key: "simulations", label: t('sidebar.learningModulesSubmenu.simulations'), icon: "play" },
+    { key: "web-search", label: t('sidebar.learningModulesSubmenu.webSearch'), icon: "globe" },
+    { key: "team-dynamics", label: t('sidebar.learningModulesSubmenu.teamDynamics'), icon: "users" },
+    { key: "certifications", label: t('sidebar.learningModulesSubmenu.certifications'), icon: "trophy" },
+    { key: "ai-career-coach", label: t('sidebar.learningModulesSubmenu.aiCareerCoach'), icon: "user" },
+    { key: "skills-forecast", label: t('sidebar.learningModulesSubmenu.skillsForecast'), icon: "bar-chart" },
+    { key: "ai-learning", label: t('sidebar.learningModulesSubmenu.aiLearning'), icon: "robot" },
+    { key: "babel-library", label: t('sidebar.learningModulesSubmenu.babelLibrary'), icon: "temple" }
   ]},
   
   // Mapa de conocimiento (opción especial que permanece visible)
@@ -77,25 +77,25 @@ const getNavItems = (t) => [
   
   // Grupo 1.5: Análisis de repositorios (expandible)
   { key: "repository-analyzer", label: t('sidebar.repositoryAnalyzer'), icon: "archive", group: "learning", isExpandable: true, subItems: [
-    { key: "repo-analyzer", label: "Repo Analyzer", icon: "archive" },
-    { key: "repo-analyzer-cursor", label: "Repo Analyzer with APIs", icon: "robot" },
-    { key: "agent-cursor-ai", label: "Agent Cursor AI", icon: "robot" },
-    { key: "learning-repo", label: "Learning Repo", icon: "graduation-cap" }
+    { key: "repo-analyzer", label: t('sidebar.repositoryAnalyzerSubmenu.repoAnalyzer'), icon: "archive" },
+    { key: "repo-analyzer-cursor", label: t('sidebar.repositoryAnalyzerSubmenu.repoAnalyzerWithAPIs'), icon: "robot" },
+    { key: "agent-cursor-ai", label: t('sidebar.repositoryAnalyzerSubmenu.agentCursorAI'), icon: "robot" },
+    { key: "learning-repo", label: t('sidebar.repositoryAnalyzerSubmenu.learningRepo'), icon: "graduation-cap" }
   ]},
   
   // Grupo 1.6: Document Analyzer (nuevo módulo)
   { key: "document-analyzer", label: t('sidebar.documentAnalyzer'), icon: "document", group: "learning", isExpandable: true, subItems: [
-    { key: "documents-analyzer", label: "Documents Analyzer", icon: "document-text" },
-    { key: "learning-document", label: "Learning Document", icon: "book" },
-    { key: "agentic-rag", label: "Agentic RAG Analyzer", icon: "🚀" },
-    { key: "agentic-rag-document", label: "Agentic RAG Documents", icon: "📋" }
+    { key: "documents-analyzer", label: t('sidebar.documentAnalyzerSubmenu.documentsAnalyzer'), icon: "document-text" },
+    { key: "learning-document", label: t('sidebar.documentAnalyzerSubmenu.learningDocument'), icon: "book" },
+    { key: "agentic-rag", label: t('sidebar.documentAnalyzerSubmenu.agenticRAGAnalyzer'), icon: "🚀" },
+    { key: "agentic-rag-document", label: t('sidebar.documentAnalyzerSubmenu.agenticRAGDocuments'), icon: "📋" }
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)
   { key: "enterprise-architecture", label: t('sidebar.enterpriseArchitecture'), icon: "building", group: "learning", isExpandable: true, subItems: [
-    { key: "ea-home", label: "EA Dashboard", icon: "building" },
-    { key: "process-designer", label: "Process Designer", icon: "process" },
-    { key: "catalog-manager", label: "Catalog Manager", icon: "catalog" }
+    { key: "ea-home", label: t('sidebar.enterpriseArchitectureSubmenu.eaDashboard'), icon: "building" },
+    { key: "process-designer", label: t('sidebar.enterpriseArchitectureSubmenu.processDesigner'), icon: "process" },
+    { key: "catalog-manager", label: t('sidebar.enterpriseArchitectureSubmenu.catalogManager'), icon: "catalog" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)
@@ -111,9 +111,9 @@ const getNavItems = (t) => [
   
   // Grupo 4: Funcionalidades futuras (expandible)
   { key: "future", label: t('sidebar.future'), icon: "rocket", group: "developer", isExpandable: true, subItems: [
-    { key: "future-app", label: "Future App", icon: "rocket" },
-    { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
-    { key: "feature-roadmap", label: "Feature Roadmap", icon: "map" }
+    { key: "future-app", label: t('sidebar.futureSubmenu.futureApp'), icon: "rocket" },
+    { key: "idea-log", label: t('sidebar.futureSubmenu.ideaLog'), icon: "lightbulb" },
+    { key: "feature-roadmap", label: t('sidebar.futureSubmenu.featureRoadmap'), icon: "map" }
   ]}
 ];
 

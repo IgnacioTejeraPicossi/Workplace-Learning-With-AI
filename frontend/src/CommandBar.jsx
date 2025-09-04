@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { postRoute, askStream } from './api';
 // import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import ModalDialog from './ModalDialog';
 
-const CONFIDENCE_LEVELS = [
-  { key: 'High', label: 'High (100%)', value: 2, tooltip: 'Only exact or very close matches (strict).' },
-  { key: 'Medium', label: 'Medium (50%)', value: 1, tooltip: 'Allow some flexibility, but avoid weak matches.' },
-  { key: 'Low', label: 'Low (0%)', value: 0, tooltip: 'Route to the closest available option, even if not a strong match.' },
+const getConfidenceLevels = (t) => [
+  { key: 'High', label: t('askAI.confidence.high'), value: 2, tooltip: t('askAI.confidence.highTooltip') },
+  { key: 'Medium', label: t('askAI.confidence.medium'), value: 1, tooltip: t('askAI.confidence.mediumTooltip') },
+  { key: 'Low', label: t('askAI.confidence.low'), value: 0, tooltip: t('askAI.confidence.lowTooltip') },
 ];
 
 function confidenceToValue(conf) {
@@ -17,6 +18,7 @@ function confidenceToValue(conf) {
 }
 
 function CommandBar({ onRoute, inputPlaceholder }) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -304,8 +306,8 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
       {/* Confidence Bar UI */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontWeight: 600, fontSize: 15 }}>Confidence:</span>
-        {CONFIDENCE_LEVELS.map(level => (
+        <span style={{ fontWeight: 600, fontSize: 15 }}>{t('askAI.confidence.title')}:</span>
+        {getConfidenceLevels(t).map(level => (
           <div
             key={level.key}
             onClick={() => setConfidenceLevel(level.key)}

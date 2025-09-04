@@ -1,5 +1,6 @@
 // React app skeleton for AI Workplace Learning
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Concepts from "./Concepts";
 import MicroLesson from "./MicroLesson";
 import Recommendation from "./Recommendation";
@@ -43,6 +44,7 @@ import SecurityPanel from "./SecurityPanel";
 import CatalogManager from "./ea/CatalogManager";
 
 function AppContent() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("dashboard");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -166,7 +168,7 @@ function AppContent() {
             maxWidth: "100%",
             boxSizing: "border-box"
           }}>
-            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{isAIFullScreen ? "🤖 Ask AI About Workplace Learning" : "Workplace Learning With AI"}</h1>
+            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{isAIFullScreen ? `🤖 ${t('askAI.title')}` : "Workplace Learning With AI"}</h1>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               {/* Search Button */}
               {!isAIFullScreen && (
@@ -208,7 +210,7 @@ function AppContent() {
                   fontSize: 14,
                   transition: "all 0.2s"
                 }}
-                title="Ask AI About Workplace Learning"
+                title={t('askAI.title')}
               >
                 🤖
               </button>
@@ -272,9 +274,7 @@ function AppContent() {
                 border: "2px solid rgba(135, 206, 235, 0.2)"
               }}
             >
-              <strong>I'm not just building a learning app —</strong>
-              <br /><br />
-              <strong>I'm creating a co-evolving AI learning assistant where users shape its growth.</strong>
+              <strong>{t('askAI.quotes.ignacio')}</strong>
               <br /><br />
               <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>— Ignacio Tejera</span>
             </div>
@@ -301,13 +301,9 @@ function AppContent() {
                 border: "2px solid rgba(135, 206, 235, 0.2)"
               }}
             >
-              <strong>We are not replacing human creativity — we are amplifying it 100 times.</strong>
+              <strong>{t('askAI.quotes.jensen')}</strong>
               <br /><br />
-              <strong>Those who win are those with the best ideas, not those with the most technical skills.</strong>
-              <br /><br />
-              <strong>This changes everything about who can build companies.</strong>
-              <br />
-              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>— Jensen Huang</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>{t('askAI.quotes.jensenAuthor')}</span>
             </div>
             {/* Main Content */}
             <div style={{
@@ -319,13 +315,13 @@ function AppContent() {
               {!user && (
                 <div style={{ marginBottom: 32, textAlign: 'center' }}>
                   <h2 style={{ marginBottom: "1rem", fontSize: "2rem", color: colors.text }}>
-                    🤖 Ask AI About Workplace Learning
+                    🤖 {t('askAI.title')}
                   </h2>
                   <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
-                    Interface-less UX / Zero-UI mode
+                    {t('askAI.subtitle')}
                   </p>
                   <Auth user={user} setUser={setUser} />
-                  <p style={{ color: colors.textSecondary, marginTop: 12 }}>Sign in to use AI-powered workplace learning features.</p>
+                  <p style={{ color: colors.textSecondary, marginTop: 12 }}>{t('askAI.signInMessage')}</p>
                   <button
                     onClick={handleBackToApp}
                     style={{
@@ -339,7 +335,7 @@ function AppContent() {
                       fontSize: "0.9rem"
                     }}
                   >
-                    ← Back to App
+                    {t('askAI.backToApp')}
                   </button>
                 </div>
               )}
@@ -351,21 +347,21 @@ function AppContent() {
                 {user && (
                   <>
                     <h2 style={{ marginBottom: "2rem", fontSize: "2rem", color: colors.text }}>
-                      🤖 Ask AI About Workplace Learning
+                      🤖 {t('askAI.title')}
                     </h2>
                     <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
-                      Interface-less UX / Zero-UI mode
+                      {t('askAI.subtitle')}
                     </p>
-                    <CommandBar onRoute={handleRoute} inputPlaceholder="Ask AI about workplace learning..." />
+                    <CommandBar onRoute={handleRoute} inputPlaceholder={t('askAI.inputPlaceholder')} />
                     <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                        💡 "Show me a video lesson on Agile"
+                        💡 "{t('askAI.suggestions.videoLesson')}"
                       </div>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                        💡 "Give me a micro-lesson on leadership"
+                        💡 "{t('askAI.suggestions.microLesson')}"
                       </div>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                        💡 "What should I learn next?"
+                        💡 "{t('askAI.suggestions.whatNext')}"
                       </div>
                     </div>
                     <button
@@ -381,7 +377,7 @@ function AppContent() {
                         fontSize: "0.9rem"
                       }}
                     >
-                      ← Back to App
+                      {t('askAI.backToApp')}
                     </button>
                   </>
                 )}

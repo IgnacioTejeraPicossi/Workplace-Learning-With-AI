@@ -42,7 +42,46 @@
     "future": "Fremtid",
     "presentationAgent": "Presentasjonsagent",
     "aiStudyBuddy": "AI-studieassistent",
-    "security": "Sikkerhet"
+    "security": "Sikkerhet",
+    
+    "learningModulesSubmenu": {
+      "videoLessons": "Video-leksjoner",
+      "microLessons": "Mikro-leksjoner",
+      "simulations": "Simuleringer",
+      "webSearch": "Websøk",
+      "teamDynamics": "Teamdynamikk",
+      "certifications": "Sertifiseringer",
+      "aiCareerCoach": "AI-karriereveileder",
+      "skillsForecast": "Ferdighetsprognose",
+      "aiLearning": "AI-læring og opplæring",
+      "babelLibrary": "Babel-bibliotek"
+    },
+    
+    "repositoryAnalyzerSubmenu": {
+      "repoAnalyzer": "Repo-analysator",
+      "repoAnalyzerWithAPIs": "Repo-analysator med APIer",
+      "agentCursorAI": "Agent Cursor AI",
+      "learningRepo": "Læringsrepo"
+    },
+    
+    "documentAnalyzerSubmenu": {
+      "documentsAnalyzer": "Dokumentanalysator",
+      "learningDocument": "Læringsdokument",
+      "agenticRAGAnalyzer": "Agentic RAG-analysator",
+      "agenticRAGDocuments": "Agentic RAG-dokumenter"
+    },
+    
+    "enterpriseArchitectureSubmenu": {
+      "eaDashboard": "EA-dashbord",
+      "processDesigner": "Prosessdesigner",
+      "catalogManager": "Katalogadministrator"
+    },
+    
+    "futureSubmenu": {
+      "futureApp": "Fremtidsapp",
+      "ideaLog": "Ide-loggbok",
+      "featureRoadmap": "Funksjonskart"
+    }
   },
 
   "actions": {
@@ -63,5 +102,32 @@
   "welcome": {
     "title": "Velkommen til AI Learning with AI",
     "subtitle": "Din personlige læringsreise drevet av kunstig intelligens"
+  },
+
+  "askAI": {
+    "title": "Spør AI om arbeidsplasslæring",
+    "subtitle": "Grensesnittløs UX / Zero-UI-modus",
+    "inputPlaceholder": "Spør AI om arbeidsplasslæring...",
+    "signInMessage": "Logg inn for å bruke AI-drevne arbeidsplasslæringsfunksjoner.",
+    "backToApp": "← Tilbake til appen",
+    "confidence": {
+      "title": "Tillit",
+      "high": "Høy (100%)",
+      "medium": "Middels (50%)",
+      "low": "Lav (0%)",
+      "highTooltip": "Kun nøyaktige eller svært nære treff (streng).",
+      "mediumTooltip": "Tillat litt fleksibilitet, men unngå svake treff.",
+      "lowTooltip": "Ruter til det nærmeste tilgjengelige alternativet, selv om det ikke er et sterkt treff."
+    },
+    "suggestions": {
+      "videoLesson": "Vis meg en videoleksjon om Agile",
+      "microLesson": "Gi meg en mikroleksjon om ledelse",
+      "whatNext": "Hva bør jeg lære neste?"
+    },
+    "quotes": {
+      "ignacio": "Jeg bygger ikke bare en læringsapp — jeg skaper en medutviklende AI-læringsassistent hvor brukere former dens vekst.",
+      "jensen": "Vi erstatter ikke menneskelig kreativitet — vi forsterker den 100 ganger. De som vinner er de med de beste ideene, ikke de med de mest tekniske ferdighetene. Dette endrer alt om hvem som kan bygge bedrifter.",
+      "jensenAuthor": "— Jensen Huang (om AI)"
+    }
   }
 }

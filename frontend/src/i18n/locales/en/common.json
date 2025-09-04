@@ -42,7 +42,46 @@
     "future": "Future",
     "presentationAgent": "Presentation Agent",
     "aiStudyBuddy": "AI Study Buddy",
-    "security": "Security"
+    "security": "Security",
+    
+    "learningModulesSubmenu": {
+      "videoLessons": "Video Lessons",
+      "microLessons": "Micro-lessons",
+      "simulations": "Simulations",
+      "webSearch": "Web Search",
+      "teamDynamics": "Team Dynamics",
+      "certifications": "Certifications",
+      "aiCareerCoach": "AI Career Coach",
+      "skillsForecast": "Skills Forecast",
+      "aiLearning": "AI Learning & Training",
+      "babelLibrary": "Babel Library"
+    },
+    
+    "repositoryAnalyzerSubmenu": {
+      "repoAnalyzer": "Repo Analyzer",
+      "repoAnalyzerWithAPIs": "Repo Analyzer with APIs",
+      "agentCursorAI": "Agent Cursor AI",
+      "learningRepo": "Learning Repo"
+    },
+    
+    "documentAnalyzerSubmenu": {
+      "documentsAnalyzer": "Documents Analyzer",
+      "learningDocument": "Learning Document",
+      "agenticRAGAnalyzer": "Agentic RAG Analyzer",
+      "agenticRAGDocuments": "Agentic RAG Documents"
+    },
+    
+    "enterpriseArchitectureSubmenu": {
+      "eaDashboard": "EA Dashboard",
+      "processDesigner": "Process Designer",
+      "catalogManager": "Catalog Manager"
+    },
+    
+    "futureSubmenu": {
+      "futureApp": "Future App",
+      "ideaLog": "Idea Log",
+      "featureRoadmap": "Feature Roadmap"
+    }
   },
 
   "actions": {
@@ -63,5 +102,32 @@
   "welcome": {
     "title": "Welcome to AI Learning with AI",
     "subtitle": "Your personalized learning journey powered by artificial intelligence"
+  },
+
+  "askAI": {
+    "title": "Ask AI About Workplace Learning",
+    "subtitle": "Interface-less UX / Zero-UI mode",
+    "inputPlaceholder": "Ask AI about workplace learning...",
+    "signInMessage": "Sign in to use AI-powered workplace learning features.",
+    "backToApp": "← Back to App",
+    "confidence": {
+      "title": "Confidence",
+      "high": "High (100%)",
+      "medium": "Medium (50%)",
+      "low": "Low (0%)",
+      "highTooltip": "Only exact or very close matches (strict).",
+      "mediumTooltip": "Allow some flexibility, but avoid weak matches.",
+      "lowTooltip": "Route to the closest available option, even if not a strong match."
+    },
+    "suggestions": {
+      "videoLesson": "Show me a video lesson on Agile",
+      "microLesson": "Give me a micro-lesson on leadership",
+      "whatNext": "What should I learn next?"
+    },
+    "quotes": {
+      "ignacio": "I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth.",
+      "jensen": "We are not replacing human creativity — we are amplifying it 100 times. Those who win are those with the best ideas, not those with the most technical skills. This changes everything about who can build companies.",
+      "jensenAuthor": "— Jensen Huang (about AI)"
+    }
   }
 }
