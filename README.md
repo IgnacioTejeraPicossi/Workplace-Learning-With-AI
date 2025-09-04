@@ -579,7 +579,7 @@ backend/
 - Backend .env is configured with all required variables (see below)
 - Frontend .env is configured with all required variables (see below)
 - Firebase service account file is present in backend/
-- All dependencies installed (npm install in frontend, pip install -r requirements.txt in backend)
+- All dependencies installed (npm install in frontend, pip install -r requirements.txt in root directory)
 - Both frontend and backend servers are running (see start commands below)
 - Cypress tests pass (npm run test:comprehensive in frontend)
 
@@ -607,6 +607,9 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 
 - **npm start fails with 'Missing script: start'**: Ensure you are in the frontend directory and package.json contains a "start" script.
 - **uvicorn app:app --reload fails**: This command is INCORRECT. Always run from the root directory with `uvicorn backend.app:app --reload`
+- **Import errors when starting backend**: You're probably running from the wrong directory. The backend MUST be started from the ROOT directory, not from inside `backend/`
+- **pip install fails with "requirements.txt not found"**: You're probably in the wrong directory. Run `pip install -r requirements.txt` from the ROOT directory, not from `backend/`
+- **Environment variables not loading**: Ensure your `.env` file is in the ROOT directory, not in `backend/`
 - **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your .env.
 - **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in backend/.
 - **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
@@ -633,8 +636,8 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 
 **Backend (FastAPI)**
 ```bash
-cd backend
-uvicorn app:app --reload
+# Run from root directory
+uvicorn backend.app:app --reload
 ```
 
 **Frontend (React)**
@@ -891,6 +894,27 @@ AI Learning with AI/
 
 ---
 
+## 🚀 Quick Start (For Impatient Developers)
+
+```bash
+# 1. Install dependencies (from ROOT directory)
+pip install -r requirements.txt
+cd frontend && npm install && cd ..
+cd websearch-backend && npm install && cd ..
+
+# 2. Start all services (3 terminals)
+# Terminal 1 - Backend (from ROOT directory)
+uvicorn backend.app:app --reload
+
+# Terminal 2 - Frontend
+cd frontend && npm start
+
+# Terminal 3 - Web Search
+cd websearch-backend && node index.js
+```
+
+> **⚠️ CRITICAL: Backend MUST be started from ROOT directory, not from `backend/` folder!**
+
 ## 🔧 Installation & Setup
 
 > **⚠️ IMPORTANT BACKEND STARTUP NOTE:**
@@ -909,6 +933,24 @@ AI Learning with AI/
 - **Firebase project** with authentication enabled
 - **OpenAI API key** with GPT-5 access
 
+### 📁 Project Structure
+```
+AI-Learning-with-AI/
+├── backend/                 # FastAPI backend code
+├── frontend/               # React frontend code
+├── websearch-backend/      # Node.js web search service
+├── requirements.txt        # Python dependencies (ROOT LEVEL)
+├── .env                   # Environment variables (ROOT LEVEL)
+└── README.md
+```
+
+**⚠️ IMPORTANT DIRECTORY STRUCTURE NOTES:**
+- **Backend FastAPI**: Must be started from ROOT directory with `uvicorn backend.app:app --reload`
+- **Python dependencies**: Install from ROOT directory with `pip install -r requirements.txt`
+- **Environment file**: Located at ROOT level (`.env`)
+- **Frontend**: Install and run from `frontend/` directory
+- **Web Search**: Install and run from `websearch-backend/` directory
+
 ### Step-by-Step Setup
 
 1. **Clone the Repository**
@@ -919,8 +961,10 @@ AI Learning with AI/
 
 2. **Backend Setup**
    ```bash
-   cd backend
+   # Install Python dependencies (run from root directory)
    pip install -r requirements.txt
+   
+   # Copy environment file (if .env.example exists)
    cp .env.example .env
    # Edit .env with your API keys and configuration
    ```
@@ -961,9 +1005,10 @@ AI Learning with AI/
 
 #### 1. Backend Dependencies
 ```bash
-pip install fastapi uvicorn openai python-dotenv
+# Install from root directory
+pip install -r requirements.txt
 
-# Document Analyzer & Agentic RAG Dependencies
+# Document Analyzer & Agentic RAG Dependencies (install from root directory)
 pip install pypdf python-docx rank-bm25 sentence-transformers
 ```
 
