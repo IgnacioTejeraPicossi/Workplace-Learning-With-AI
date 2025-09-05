@@ -122,6 +122,9 @@ const AgenticRAGDocument = () => {
 
   const startEditing = (docId) => {
     const doc = documents.find(d => d.id === docId);
+    console.log('🔍 [DEBUG] Starting edit for docId:', docId);
+    console.log('🔍 [DEBUG] Found document:', doc);
+    console.log('🔍 [DEBUG] Document answer:', doc?.answer);
     if (doc) {
       setEditContent(prev => ({
         ...prev,
@@ -746,21 +749,31 @@ const AgenticRAGDocument = () => {
                       whiteSpace: "pre-wrap"
                     }}>
                       {editing[doc.id] ? (
-                        <textarea
-                          value={editContent[doc.id]?.answer || doc.answer}
-                          onChange={(e) => handleEditChange(doc.id, 'answer', e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "8px 12px",
-                            borderRadius: "4px",
-                            border: `1px solid ${colors.border}`,
-                            background: colors.background,
-                            color: colors.text,
-                            fontSize: "14px",
-                            minHeight: "120px",
-                            resize: "vertical"
-                          }}
-                        />
+                        (() => {
+                          console.log('🔍 [DEBUG] Rendering textarea for doc.id:', doc.id);
+                          console.log('🔍 [DEBUG] editContent[doc.id]:', editContent[doc.id]);
+                          console.log('🔍 [DEBUG] editContent[doc.id]?.answer:', editContent[doc.id]?.answer);
+                          console.log('🔍 [DEBUG] doc.answer:', doc.answer);
+                          console.log('🔍 [DEBUG] Final value:', editContent[doc.id]?.answer || doc.answer);
+                          return (
+                            <textarea
+                              value={editContent[doc.id]?.answer || doc.answer}
+                              onChange={(e) => handleEditChange(doc.id, 'answer', e.target.value)}
+                              style={{
+                                width: "100%",
+                                padding: "8px 12px",
+                                borderRadius: "4px",
+                                border: `1px solid ${colors.border}`,
+                                background: colors.background,
+                                color: colors.text,
+                                fontSize: "14px",
+                                minHeight: "120px",
+                                resize: "vertical"
+                              }}
+                              placeholder="Enter your answer here..."
+                            />
+                          );
+                        })()
                       ) : (
                         doc.answer
                       )}
