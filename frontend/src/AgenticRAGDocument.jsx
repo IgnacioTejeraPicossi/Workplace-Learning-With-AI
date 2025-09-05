@@ -66,6 +66,56 @@ const AgenticRAGDocument = () => {
     fetchAnalyses();
   }, []);
 
+  // Handle navigation events from Babel Library
+  useEffect(() => {
+    const handleNavigateToModule = (event) => {
+      const { resourceId, resourceTitle, targetPage, action, autoExpand, expandDocument } = event.detail;
+      
+      if (targetPage === 'document' && resourceId && expandDocument) {
+        console.log(`🔍 [AgenticRAGDocument] Navigating to document: ${resourceId}, title: "${resourceTitle}"`);
+        
+        // Find the document by ID
+        const targetDoc = documents.find(doc => doc.id === resourceId);
+        if (targetDoc) {
+          // Expand the specific document
+          setExpanded(prev => ({
+            ...prev,
+            [resourceId]: true
+          }));
+          
+          // If action is edit, also start editing
+          if (action === 'edit') {
+            setEditing(prev => ({
+              ...prev,
+              [resourceId]: true
+            }));
+            
+            // Set edit content
+            setEditContent(prev => ({
+              ...prev,
+              [resourceId]: {
+                filename: targetDoc.filename,
+                question: targetDoc.question,
+                answer: targetDoc.answer
+              }
+            }));
+          }
+          
+          // Scroll to the document (optional)
+          setTimeout(() => {
+            const element = document.getElementById(`document-${resourceId}`);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+        }
+      }
+    };
+
+    window.addEventListener('navigateToModule', handleNavigateToModule);
+    return () => window.removeEventListener('navigateToModule', handleNavigateToModule);
+  }, [documents]);
+
   const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doc.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -449,7 +499,7 @@ const AgenticRAGDocument = () => {
       ) : (
         <div style={{ display: "grid", gap: "20px" }}>
           {sortedDocuments.map(doc => (
-            <div key={doc.id} style={{
+            <div key={doc.id} id={`document-${doc.id}`} style={{
               background: colors.cardBackground,
               borderRadius: "12px",
               padding: "24px",

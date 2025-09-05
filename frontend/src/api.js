@@ -28,8 +28,29 @@ export async function apiCall(endpoint, method = "GET", data = null) {
     options.body = JSON.stringify(data);
   }
   
-  const response = await fetchWithAuth(url, options);
-  return response.json();
+  console.log(`🔍 [API] Making ${method} request to: ${url}`);
+  if (data) {
+    console.log(`🔍 [API] Request data:`, data);
+  }
+  
+  try {
+    const response = await fetchWithAuth(url, options);
+    
+    console.log(`🔍 [API] Response status: ${response.status} ${response.statusText}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ [API] Error response:`, errorText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    console.log(`✅ [API] Success response:`, result);
+    return result;
+  } catch (error) {
+    console.error(`❌ [API] Request failed:`, error);
+    throw error;
+  }
 }
 
 export async function fetchConcepts() {
@@ -551,5 +572,41 @@ export const updateSimulationResult = async (resultId, data) => {
   } catch (error) {
     console.error('Error updating simulation result:', error);
     throw error;
+  }
+};
+
+// Document Analysis API functions
+export const fetchDocumentAnalyses = async () => {
+  try {
+    const response = await fetch('/api/document-analyzer/get-saved-analyses');
+    if (!response.ok) throw new Error('Failed to fetch document analyses');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching document analyses:', error);
+    return [];
+  }
+};
+
+// Repository Analysis API functions
+export const fetchRepositoryAnalyses = async () => {
+  try {
+    const response = await fetch('/api/saved-analyses?limit=50');
+    if (!response.ok) throw new Error('Failed to fetch repository analyses');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching repository analyses:', error);
+    return [];
+  }
+};
+
+// Agentic RAG Analysis API functions
+export const fetchAgenticRAGAnalyses = async () => {
+  try {
+    const response = await fetch('/api/agentic-rag/get-analyses?limit=50');
+    if (!response.ok) throw new Error('Failed to fetch agentic RAG analyses');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching agentic RAG analyses:', error);
+    return [];
   }
 };

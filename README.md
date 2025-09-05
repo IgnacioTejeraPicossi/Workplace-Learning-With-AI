@@ -2405,6 +2405,8 @@ The **Babel Library** is a comprehensive, centralized knowledge management syste
 - **Videos**: Count of saved video lessons and tutorials
 - **Articles**: Count of micro-lessons, web search results, and skills forecasts
 - **Courses**: Count of certifications and structured learning paths
+- **Simulations/Coach**: Count of simulation results and AI career coach sessions
+- **Repository/Document Analysis**: Count of document analyses, repository analyses, and Agentic RAG analyses
 
 #### 🏷️ **Advanced Filtering & Search**
 - **Search by Title**: Find resources by name, author, or description
@@ -2443,6 +2445,14 @@ The **Babel Library** is a comprehensive, centralized knowledge management syste
 - **Content Summaries**: AI-generated summaries of video content
 - **Topic Classification**: Automatic topic assignment for videos
 - **Progress Tracking**: Video completion and bookmarking
+
+#### 📊 **Document Analysis Integration** (NEW!)
+- **Document Analyzer**: AI-powered document analysis and summarization results
+- **Repository Analyzer**: Code repository analysis and learning module generation
+- **Agentic RAG**: Conversational document analysis with question-answer pairs
+- **Unified Storage**: All analysis results stored in MongoDB for centralized access
+- **Rich Metadata**: Includes file information, analysis summaries, and confidence scores
+- **Cross-Reference**: Direct links to original analysis modules for detailed editing
 
 ### 🛠️ **Technical Implementation**
 
@@ -2489,6 +2499,36 @@ certifications_collection: {
   study_plan: String,
   created_at: ISO Date
 }
+
+document_analyses_collection: {
+  filename: String,
+  summary: String,
+  chars: Number,
+  chunks: Number,
+  length: String,
+  user_id: String,
+  module: String,
+  created_at: ISO Date
+}
+
+repo_analyses_collection: {
+  repo_name: String,
+  repo_url: String,
+  summary: String,
+  language: String,
+  stars: Number,
+  user_id: String,
+  created_at: ISO Date
+}
+
+agentic_analyses_collection: {
+  filename: String,
+  question: String,
+  answer: String,
+  confidence: Number,
+  user_id: String,
+  created_at: ISO Date
+}
 ```
 
 #### 🔌 **API Endpoints**
@@ -2513,6 +2553,19 @@ DELETE /api/skills-forecast/{id}    # Delete forecast
 POST   /api/certifications/         # Save certification
 GET    /api/certifications/         # Fetch all certifications
 DELETE /api/certifications/{id}     # Delete certification
+
+# Document Analysis
+POST   /api/document-analyzer/save-analysis    # Save document analysis
+GET    /api/document-analyzer/get-saved-analyses  # Fetch all document analyses
+DELETE /api/document-analyzer/delete-analysis/{id}  # Delete document analysis
+
+# Repository Analysis
+GET    /api/saved-analyses          # Fetch all repository analyses
+DELETE /api/saved-analyses/{id}     # Delete repository analysis
+
+# Agentic RAG Analysis
+GET    /api/agentic-rag/get-analyses  # Fetch all agentic RAG analyses
+DELETE /api/agentic-rag/delete-analysis/{id}  # Delete agentic RAG analysis
 ```
 
 #### 🎨 **Frontend Components**
@@ -2576,7 +2629,8 @@ DELETE /api/certifications/{id}     # Delete certification
 
 #### **Current Statistics**
 - **Total Resources**: 31+ integrated learning materials
-- **Resource Types**: 4 main categories (Videos, Articles, Courses, Skills)
+- **Resource Types**: 6 main categories (Videos, Articles, Courses, Simulations/Coach, Repository/Document Analysis)
+- **Analysis Integration**: 3 analysis modules fully integrated (Document Analyzer, Repository Analyzer, Agentic RAG)
 - **Storage Efficiency**: MongoDB-based scalable storage
 - **Response Time**: Sub-second search and filter performance
 
@@ -2645,7 +2699,8 @@ The platform now features **ItemAI API**, a groundbreaking integration that brin
 - **Database**: MongoDB storage fully operational
 - **Frontend**: Complete React.js interface with advanced filtering
 - **Backend**: Full CRUD API endpoints implemented
-- **Modules Connected**: Micro-lessons, Web Search, Skills Forecast, Certifications, Video Lessons
+- **Modules Connected**: Micro-lessons, Web Search, Skills Forecast, Certifications, Video Lessons, Document Analysis, Repository Analysis, Agentic RAG
+- **NEW**: Document Analysis Integration - All analysis results from Document Analyzer, Repository Analyzer, and Agentic RAG modules are now automatically integrated into the centralized library
 
 #### 🔄 **Unified Data Architecture**
 - **Status**: ✅ **COMPLETE**

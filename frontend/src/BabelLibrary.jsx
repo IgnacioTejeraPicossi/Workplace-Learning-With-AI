@@ -7,7 +7,10 @@ import {
   fetchWebSearchResults,
   fetchSkillsForecasts,
   fetchCareerCoachSessions,
-  fetchSimulationResults
+  fetchSimulationResults,
+  fetchDocumentAnalyses,
+  fetchRepositoryAnalyses,
+  fetchAgenticRAGAnalyses
 } from './api';
 
 const BabelLibrary = () => {
@@ -21,6 +24,9 @@ const BabelLibrary = () => {
   const [skillsForecasts, setSkillsForecasts] = useState([]);
   const [careerCoachSessions, setCareerCoachSessions] = useState([]);
   const [simulationResults, setSimulationResults] = useState([]);
+  const [documentAnalyses, setDocumentAnalyses] = useState([]);
+  const [repositoryAnalyses, setRepositoryAnalyses] = useState([]);
+  const [agenticRAGAnalyses, setAgenticRAGAnalyses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newBook, setNewBook] = useState({
     title: '',
@@ -126,6 +132,45 @@ const BabelLibrary = () => {
     }
   };
 
+  // Load document analyses from MongoDB
+  const loadDocumentAnalyses = async () => {
+    try {
+      const data = await fetchDocumentAnalyses();
+      console.log('Document analyses loaded:', data);
+      if (data && data.analyses) {
+        setDocumentAnalyses(data.analyses);
+      }
+    } catch (error) {
+      console.error('Error loading document analyses:', error);
+    }
+  };
+
+  // Load repository analyses from MongoDB
+  const loadRepositoryAnalyses = async () => {
+    try {
+      const data = await fetchRepositoryAnalyses();
+      console.log('Repository analyses loaded:', data);
+      if (data && data.analyses) {
+        setRepositoryAnalyses(data.analyses);
+      }
+    } catch (error) {
+      console.error('Error loading repository analyses:', error);
+    }
+  };
+
+  // Load agentic RAG analyses from MongoDB
+  const loadAgenticRAGAnalyses = async () => {
+    try {
+      const data = await fetchAgenticRAGAnalyses();
+      console.log('Agentic RAG analyses loaded:', data);
+      if (data && data.analyses) {
+        setAgenticRAGAnalyses(data.analyses);
+      }
+    } catch (error) {
+      console.error('Error loading agentic RAG analyses:', error);
+    }
+  };
+
   // Demo data for the prototype
   useEffect(() => {
     const demoBooks = [
@@ -189,6 +234,12 @@ const BabelLibrary = () => {
     loadCareerCoachSessions();
     // Load simulation results from MongoDB
     loadSimulationResults();
+    // Load document analyses from MongoDB
+    loadDocumentAnalyses();
+    // Load repository analyses from MongoDB
+    loadRepositoryAnalyses();
+    // Load agentic RAG analyses from MongoDB
+    loadAgenticRAGAnalyses();
   }, []);
 
   const handleAddBook = (e) => {
@@ -320,6 +371,51 @@ const BabelLibrary = () => {
     }
   };
 
+  const handleDeleteDocumentAnalysis = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de documento?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/document-analyzer/delete-analysis/${id}`, { method: 'DELETE' });
+        // Update local state
+        setDocumentAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
+        alert('✅ Análisis de documento eliminado exitosamente');
+      } catch (error) {
+        console.error('Error deleting document analysis:', error);
+        alert('❌ Error al eliminar el análisis de documento');
+      }
+    }
+  };
+
+  const handleDeleteRepositoryAnalysis = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de repositorio?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/saved-analyses/${id}`, { method: 'DELETE' });
+        // Update local state
+        setRepositoryAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
+        alert('✅ Análisis de repositorio eliminado exitosamente');
+      } catch (error) {
+        console.error('Error deleting repository analysis:', error);
+        alert('❌ Error al eliminar el análisis de repositorio');
+      }
+    }
+  };
+
+  const handleDeleteAgenticRAGAnalysis = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de Agentic RAG?')) {
+      try {
+        // Remove from MongoDB
+        await fetch(`/api/agentic-rag/delete-analysis/${id}`, { method: 'DELETE' });
+        // Update local state
+        setAgenticRAGAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
+        alert('✅ Análisis de Agentic RAG eliminado exitosamente');
+      } catch (error) {
+        console.error('Error deleting agentic RAG analysis:', error);
+        alert('❌ Error al eliminar el análisis de Agentic RAG');
+      }
+    }
+  };
+
   const handleEditMicroLesson = (id, title) => {
     // Navigate to Micro-lessons module with specific page info and object details
     window.dispatchEvent(new CustomEvent('navigateToModule', {
@@ -398,6 +494,57 @@ const BabelLibrary = () => {
     }));
     
     alert(`Redirecting to Simulations module list to edit: "${title}"`);
+  };
+
+  const handleEditDocumentAnalysis = (id, title) => {
+    // Navigate to Document Analyzer module with specific document expanded
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'learning-document',
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'document', // Navigate directly to the specific document
+        action: 'edit',
+        autoExpand: true, // Flag to automatically expand the specific analysis
+        expandDocument: true // Additional flag to ensure document is expanded
+      }
+    }));
+    
+    alert(`Redirecting to Learning Document module to edit: "${title}"`);
+  };
+
+  const handleEditRepositoryAnalysis = (id, title) => {
+    // Navigate to Learning Repo module with specific document expanded
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'learning-repo',
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'document', // Navigate directly to the specific document
+        action: 'edit',
+        autoExpand: true, // Flag to automatically expand the specific analysis
+        expandDocument: true // Additional flag to ensure document is expanded
+      }
+    }));
+    
+    alert(`Redirecting to Learning Repo module to edit: "${title}"`);
+  };
+
+  const handleEditAgenticRAGAnalysis = (id, title) => {
+    // Navigate to Agentic RAG Documents module with specific document expanded
+    window.dispatchEvent(new CustomEvent('navigateToModule', {
+      detail: {
+        module: 'agentic-rag-document',
+        resourceId: id,
+        resourceTitle: title,
+        targetPage: 'document', // Navigate directly to the specific document
+        action: 'edit',
+        autoExpand: true, // Flag to automatically expand the specific analysis
+        expandDocument: true // Additional flag to ensure document is expanded
+      }
+    }));
+    
+    alert(`Redirecting to Agentic RAG Documents module to edit: "${title}"`);
   };
 
   // Combine books and videos for unified search
@@ -482,6 +629,41 @@ const BabelLibrary = () => {
        scenarioType: result.scenario_type,
        userScore: result.user_score,
        completionTime: result.completion_time
+     })),
+     ...documentAnalyses.map(analysis => ({
+       id: analysis.id || analysis._id,
+       title: analysis.filename || 'Document Analysis',
+       author: 'Document Analyzer',
+       topic: 'Document Analysis',
+       description: analysis.summary ? analysis.summary.substring(0, 100) + '...' : 'Document analysis result',
+       type: 'analysis',
+       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : 'Unknown',
+       chars: analysis.chars,
+       chunks: analysis.chunks,
+       length: analysis.length
+     })),
+     ...repositoryAnalyses.map(analysis => ({
+       id: analysis.id || analysis._id,
+       title: analysis.repo_name || 'Repository Analysis',
+       author: 'Repository Analyzer',
+       topic: 'Repository Analysis',
+       description: analysis.summary ? analysis.summary.substring(0, 100) + '...' : 'Repository analysis result',
+       type: 'analysis',
+       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : 'Unknown',
+       repoUrl: analysis.repo_url,
+       language: analysis.language,
+       stars: analysis.stars
+     })),
+     ...agenticRAGAnalyses.map(analysis => ({
+       id: analysis.id || analysis._id,
+       title: analysis.filename || 'Agentic RAG Analysis',
+       author: 'Agentic RAG',
+       topic: 'Agentic RAG Analysis',
+       description: analysis.answer ? analysis.answer.substring(0, 100) + '...' : 'Agentic RAG analysis result',
+       type: 'analysis',
+       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : 'Unknown',
+       question: analysis.question,
+       confidence: analysis.confidence
      }))
   ];
 
@@ -510,6 +692,7 @@ const BabelLibrary = () => {
       case 'article': return '📄';
       case 'course': return '🎓';
       case 'simulation': return '🎮';
+      case 'analysis': return '📊';
       default: return '📖';
     }
   };
@@ -521,6 +704,7 @@ const BabelLibrary = () => {
       case 'article': return '#ffc107';
       case 'course': return '#6f42c1';
       case 'simulation': return '#fd7e14';
+      case 'analysis': return '#17a2b8';
       default: return '#6c757d';
     }
   };
@@ -783,6 +967,24 @@ const BabelLibrary = () => {
                  <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Simulations / Coach</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{careerCoachSessions.length + simulationResults.length}</div>
                </button>
+               
+               <button
+                 onClick={() => setSelectedType('analysis')}
+                 style={{
+                   background: selectedType === 'analysis' ? colors.primary : colors.primaryLight,
+                   color: selectedType === 'analysis' ? 'white' : colors.primary,
+                   padding: '20px',
+                   borderRadius: 12,
+                   textAlign: 'center',
+                   border: `1px solid ${colors.primary}`,
+                   cursor: 'pointer',
+                   transition: 'all 0.3s ease'
+                 }}
+               >
+                 <div style={{ fontSize: '2em', marginBottom: 8 }}>📊</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Repository/Document Analysis</div>
+                 <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{documentAnalyses.length + repositoryAnalyses.length + agenticRAGAnalyses.length}</div>
+               </button>
              </div>
 
             {/* Resources Grid */}
@@ -981,6 +1183,69 @@ const BabelLibrary = () => {
                            ✏️ Edit
                          </button>
                        )}
+                       
+                       {resource.author === 'Document Analyzer' && (
+                         <button
+                           onClick={() => handleEditDocumentAnalysis(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Learning Document module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Repository Analyzer' && (
+                         <button
+                           onClick={() => handleEditRepositoryAnalysis(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Learning Repo module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Agentic RAG' && (
+                         <button
+                           onClick={() => handleEditAgenticRAGAnalysis(resource.id, resource.title)}
+                           style={{
+                             background: colors.primary,
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '4px'
+                           }}
+                           title="Edit in Agentic RAG Documents module"
+                         >
+                           ✏️ Edit
+                         </button>
+                       )}
                       
                                              {/* Delete button - calls appropriate function based on resource type */}
                        {resource.author === 'Micro-lesson' && (
@@ -1109,6 +1374,60 @@ const BabelLibrary = () => {
                          </button>
                        )}
                        
+                       {resource.author === 'Document Analyzer' && (
+                         <button
+                           onClick={() => handleDeleteDocumentAnalysis(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete document analysis"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Repository Analyzer' && (
+                         <button
+                           onClick={() => handleDeleteRepositoryAnalysis(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete repository analysis"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
+                       {resource.author === 'Agentic RAG' && (
+                         <button
+                           onClick={() => handleDeleteAgenticRAGAnalysis(resource.id)}
+                           style={{
+                             background: '#dc3545',
+                             color: 'white',
+                             border: 'none',
+                             padding: '6px 12px',
+                             borderRadius: '6px',
+                             cursor: 'pointer',
+                             fontSize: '0.8em'
+                           }}
+                           title="Delete agentic RAG analysis"
+                         >
+                           🗑️
+                         </button>
+                       )}
+                       
                        {/* For demo books (hardcoded), use the original handleDeleteBook */}
                        {(resource.author === 'Dr. Sarah Chen' || 
                          resource.author === 'Prof. Michael Rodriguez' || 
@@ -1191,6 +1510,7 @@ const BabelLibrary = () => {
                   <option value="video">🎥 Video</option>
                   <option value="article">📄 Article</option>
                   <option value="course">🎓 Course</option>
+                  <option value="analysis">📊 Repository/Document Analysis</option>
                 </select>
               </div>
 

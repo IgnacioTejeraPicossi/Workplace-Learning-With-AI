@@ -28,6 +28,50 @@ export default function LearningRepo() {
     loadCursorAIDocs();
   }, []);
 
+  // Handle navigation events from Babel Library
+  useEffect(() => {
+    const handleNavigateToModule = (event) => {
+      const { resourceId, resourceTitle, targetPage, action, autoExpand, expandDocument } = event.detail;
+      
+      if (targetPage === 'document' && resourceId && expandDocument) {
+        console.log(`🔍 [LearningRepo] Navigating to document: ${resourceId}, title: "${resourceTitle}"`);
+        
+        // Find the document by ID in saved analyses
+        const targetAnalysis = savedAnalyses.find(analysis => analysis._id === resourceId);
+        if (targetAnalysis) {
+          // Set the selected analysis to show details
+          setSelectedAnalysis(targetAnalysis);
+          
+          // Scroll to the document (optional)
+          setTimeout(() => {
+            const element = document.getElementById(`analysis-${resourceId}`);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+        }
+        
+        // Find the document by ID in Cursor AI docs
+        const targetDoc = cursorAIDocs.find(doc => doc._id === resourceId);
+        if (targetDoc) {
+          // Set the selected doc for reading
+          setSelectedDocForReading(targetDoc);
+          
+          // Scroll to the document (optional)
+          setTimeout(() => {
+            const element = document.getElementById(`cursor-doc-${resourceId}`);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+        }
+      }
+    };
+
+    window.addEventListener('navigateToModule', handleNavigateToModule);
+    return () => window.removeEventListener('navigateToModule', handleNavigateToModule);
+  }, [savedAnalyses, cursorAIDocs]);
+
   // Load saved analyses
   const loadSavedAnalyses = async () => {
     try {
@@ -932,7 +976,7 @@ export default function LearningRepo() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1rem' }}>
             {cursorAIDocs.map((doc) => (
-              <div key={doc._id} style={{ 
+              <div key={doc._id} id={`cursor-doc-${doc._id}`} style={{ 
                 background: '#fff', 
                 padding: '1.5rem', 
                 borderRadius: '8px', 
@@ -1163,7 +1207,7 @@ export default function LearningRepo() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1rem' }}>
             {savedAnalyses.map((analysis) => (
-              <div key={analysis._id} style={{ 
+              <div key={analysis._id} id={`analysis-${analysis._id}`} style={{ 
                 background: '#fff', 
                 padding: '1.5rem', 
                 borderRadius: '8px', 

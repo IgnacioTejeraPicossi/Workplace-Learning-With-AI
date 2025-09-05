@@ -46,37 +46,88 @@ function VideoLesson({ user }) {
     return null;
   };
 
-  // Extract title from YouTube using oEmbed API
+  // Extract title from YouTube using oEmbed API with better error handling
   const extractYouTubeTitle = async (videoId) => {
     if (!videoId) return;
     
     setExtractingTitle(true);
+    console.log(`🔍 [VideoLesson] Extracting title for video ID: ${videoId}`);
+    
+    // Set a timeout to ensure extractingTitle doesn't stay true forever
+    const timeoutId = setTimeout(() => {
+      console.log(`⚠️ [VideoLesson] Title extraction timeout, using fallback`);
+      setVideoTitle(`YouTube Video ${videoId}`);
+      setExtractingTitle(false);
+    }, 10000); // 10 second timeout
+    
     try {
-      const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.title) {
-          setVideoTitle(data.title);
-          // Auto-suggest topic based on title
-          const suggestedTopic = suggestTopicFromTitle(data.title);
-          if (suggestedTopic) {
-            setVideoTopic(suggestedTopic);
+      // Try multiple methods to get the title
+      const methods = [
+        // Method 1: Direct oEmbed API
+        `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+        // Method 2: Alternative oEmbed endpoint
+        `https://www.youtube.com/oembed?url=https://youtu.be/${videoId}&format=json`,
+        // Method 3: No-cors proxy (if available)
+        `https://api.allorigins.win/get?url=${encodeURIComponent(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)}`
+      ];
+      
+      let title = null;
+      
+      for (const url of methods) {
+        try {
+          console.log(`🔍 [VideoLesson] Trying method: ${url}`);
+          const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Accept': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`✅ [VideoLesson] Response data:`, data);
+            
+            // Handle proxy response
+            if (data.contents) {
+              const parsedData = JSON.parse(data.contents);
+              title = parsedData.title;
+            } else if (data.title) {
+              title = data.title;
+            }
+            
+            if (title) {
+              console.log(`✅ [VideoLesson] Title extracted: ${title}`);
+              break;
+            }
+          } else {
+            console.log(`❌ [VideoLesson] Method failed with status: ${response.status}`);
           }
+        } catch (methodError) {
+          console.log(`❌ [VideoLesson] Method error:`, methodError.message);
+          continue;
         }
       }
+      
+      if (title) {
+        setVideoTitle(title);
+        // Auto-suggest topic based on title
+        const suggestedTopic = suggestTopicFromTitle(title);
+        if (suggestedTopic) {
+          setVideoTopic(suggestedTopic);
+        }
+      } else {
+        // Fallback: Set a default title based on video ID
+        setVideoTitle(`YouTube Video ${videoId}`);
+        console.log(`⚠️ [VideoLesson] Could not extract title, using fallback`);
+      }
+      
     } catch (error) {
-      console.log('Could not extract title automatically:', error);
-      // Fallback: try to extract from URL parameters
-      try {
-        const url = new URL(`https://www.youtube.com/watch?v=${videoId}`);
-        const titleParam = url.searchParams.get('title');
-        if (titleParam) {
-          setVideoTitle(decodeURIComponent(titleParam));
-        }
-      } catch (urlError) {
-        console.log('URL parsing failed:', urlError);
-      }
+      console.error('❌ [VideoLesson] All title extraction methods failed:', error);
+      // Fallback: Set a default title
+      setVideoTitle(`YouTube Video ${videoId}`);
     } finally {
+      clearTimeout(timeoutId);
       setExtractingTitle(false);
     }
   };
@@ -102,6 +153,32 @@ function VideoLesson({ user }) {
     }
     if (titleLower.includes('marketing') || titleLower.includes('social media') || titleLower.includes('branding')) {
       return 'Marketing';
+    }
+    if (titleLower.includes('n8n') || titleLower.includes('workflow') || titleLower.includes('automation')) {
+      return 'Workflow Automation';
+    }
+    
+    return '';
+  };
+
+  // Suggest topic based on video URL
+  const suggestTopicFromUrl = (url) => {
+    const urlLower = url.toLowerCase();
+    
+    if (urlLower.includes('n8n')) {
+      return 'Workflow Automation';
+    }
+    if (urlLower.includes('python') || urlLower.includes('javascript') || urlLower.includes('programming')) {
+      return 'Programming';
+    }
+    if (urlLower.includes('ai') || urlLower.includes('machine-learning')) {
+      return 'AI & Machine Learning';
+    }
+    if (urlLower.includes('devops') || urlLower.includes('deployment')) {
+      return 'DevOps & Infrastructure';
+    }
+    if (urlLower.includes('cloud') || urlLower.includes('aws') || urlLower.includes('azure')) {
+      return 'Cloud Computing';
     }
     
     return '';
@@ -144,6 +221,13 @@ function VideoLesson({ user }) {
         setVideoUrl(embedUrl);
       }
       
+      // Suggest topic based on URL first
+      const suggestedTopic = suggestTopicFromUrl(url);
+      if (suggestedTopic && !videoTopic.trim()) {
+        setVideoTopic(suggestedTopic);
+        console.log(`🔍 [VideoLesson] Suggested topic from URL: ${suggestedTopic}`);
+      }
+      
       // Extract title automatically
       const videoId = extractVideoId(url);
       if (videoId) {
@@ -182,7 +266,10 @@ function VideoLesson({ user }) {
         saved_at: new Date().toISOString()
       };
 
-      await saveVideo(videoData);
+      console.log('🔍 [VideoLesson] Attempting to save video:', videoData);
+      
+      const result = await saveVideo(videoData);
+      console.log('✅ [VideoLesson] Video saved successfully:', result);
       
       // Reset form - Keep title and topic for better UX
       setVideoDescription('');  // Clear description as it's user-specific
@@ -206,8 +293,24 @@ function VideoLesson({ user }) {
       alert('Video saved successfully! You can find it in the Saved Videos section below.');
       
     } catch (error) {
-      console.error('Error saving video:', error);
-      alert('Failed to save video. Please try again.');
+      console.error('❌ [VideoLesson] Error saving video:', error);
+      console.error('❌ [VideoLesson] Error details:', {
+        message: error.message,
+        status: error.status,
+        response: error.response
+      });
+      
+      // More detailed error message
+      let errorMessage = 'Failed to save video. ';
+      if (error.message) {
+        errorMessage += `Error: ${error.message}`;
+      } else if (error.status) {
+        errorMessage += `HTTP ${error.status}: ${error.statusText || 'Unknown error'}`;
+      } else {
+        errorMessage += 'Please check your internet connection and try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -460,8 +563,15 @@ function VideoLesson({ user }) {
                 opacity: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? 0.6 : 1,
                 alignSelf: 'flex-start'
               }}
+              title={
+                !videoTitle.trim() ? 'Please enter a video title' :
+                !videoTopic.trim() ? 'Please enter a topic' :
+                extractingTitle ? 'Extracting title from YouTube...' :
+                saving ? 'Saving video...' :
+                'Save video to your library'
+              }
             >
-              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Wait for title...' : '💾 Save Video'}
+              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Extracting title...' : '💾 Save Video'}
             </button>
           </div>
         </div>
