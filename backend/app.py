@@ -99,63 +99,6 @@ except ImportError:
     from cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
 
-# Human+Humanoid Lab router
-try:
-    from backend.routers.humanoid_lab import router as humanoid_lab_router
-    print("✅ Humanoid Lab router imported successfully")
-except ImportError as e:
-    print(f"❌ Failed to import humanoid_lab_router from backend.routers: {e}")
-    try:
-        from routers.humanoid_lab import router as humanoid_lab_router
-        print("✅ Humanoid Lab router imported from routers")
-    except ImportError as e2:
-        print(f"❌ Failed to import humanoid_lab_router from routers: {e2}")
-        # Skip Humanoid Lab if not available - don't break other modules
-        humanoid_lab_router = None
-
-if humanoid_lab_router:
-    app.include_router(humanoid_lab_router, prefix="/api", tags=["Human+Humanoid Lab"])
-    print("✅ Humanoid Lab router included successfully")
-else:
-    print("❌ Humanoid Lab router not included - router is None")
-
-# AgentOps Orchestrator router
-try:
-    from backend.routers.agentops import router as agentops_router
-    print("✅ AgentOps router imported successfully")
-except ImportError as e:
-    print(f"❌ Failed to import agentops_router from backend.routers: {e}")
-    try:
-        from routers.agentops import router as agentops_router
-        print("✅ AgentOps router imported from routers/")
-    except ImportError as e2:
-        print(f"❌ Failed to import agentops_router from routers/: {e2}")
-        agentops_router = None
-
-if agentops_router:
-    app.include_router(agentops_router, tags=["AgentOps Orchestrator"])
-    print("✅ AgentOps router included successfully")
-else:
-    print("❌ AgentOps router not included - router is None")
-
-# Digital Lab router
-try:
-    from backend.routers.digital_lab import router as digital_lab_router
-    print("✅ Digital Lab router imported successfully")
-except ImportError as e:
-    print(f"❌ Failed to import digital_lab_router from backend.routers: {e}")
-    try:
-        from routers.digital_lab import router as digital_lab_router
-        print("✅ Digital Lab router imported from routers/")
-    except ImportError as e2:
-        print(f"❌ Failed to import digital_lab_router from routers/: {e2}")
-        digital_lab_router = None
-
-if digital_lab_router:
-    app.include_router(digital_lab_router, tags=["Digital Lab"])
-    print("✅ Digital Lab router included successfully")
-else:
-    print("❌ Digital Lab router not included - router is None")
 
 # Learning modules routers
 try:
