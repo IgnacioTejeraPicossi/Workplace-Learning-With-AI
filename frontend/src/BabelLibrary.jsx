@@ -874,8 +874,8 @@ const BabelLibrary = () => {
                          {/* Library Stats - Interactive Filter Buttons */}
              <div style={{ 
                display: 'grid', 
-               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-               gap: 16, 
+               gridTemplateColumns: 'repeat(6, 1fr)', 
+               gap: 12, 
                marginBottom: 24 
              }}>
                <button
@@ -883,7 +883,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'all' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'all' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
@@ -901,7 +901,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'video' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'video' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
@@ -919,7 +919,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'article' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'article' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
@@ -937,7 +937,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'course' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'course' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
@@ -955,7 +955,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'simulation' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'simulation' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
@@ -973,7 +973,7 @@ const BabelLibrary = () => {
                  style={{
                    background: selectedType === 'analysis' ? colors.primary : colors.primaryLight,
                    color: selectedType === 'analysis' ? 'white' : colors.primary,
-                   padding: '20px',
+                   padding: '16px 12px',
                    borderRadius: 12,
                    textAlign: 'center',
                    border: `1px solid ${colors.primary}`,
