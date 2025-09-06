@@ -101,6 +101,9 @@ const getNavItems = (t) => [
   // Grupo 1.8: Human-Humanoid Lab (nuevo módulo)
   { key: "human-humanoid-lab", label: t('sidebar.humanHumanoidLab'), icon: "robot", group: "learning" },
   
+  // Grupo 1.9: AgentOps Orchestrator (n8n Bridge)
+  { key: "agentops-orchestrator", label: t('sidebar.agentopsOrchestrator'), icon: "rocket", group: "learning" },
+  
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },

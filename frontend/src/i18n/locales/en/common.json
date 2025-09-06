@@ -37,6 +37,7 @@
     "documentAnalyzer": "Document Analyzer",
     "enterpriseArchitecture": "Enterprise Architecture",
     "humanHumanoidLab": "Human-Humanoid Lab",
+    "agentopsOrchestrator": "AgentOps Orchestrator (n8n Bridge)",
     "help": "Help",
     "runTest": "Run Test",
     "apiConfig": "API Config",

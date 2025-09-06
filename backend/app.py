@@ -119,6 +119,25 @@ if humanoid_lab_router:
 else:
     print("❌ Humanoid Lab router not included - router is None")
 
+# AgentOps Orchestrator router
+try:
+    from backend.routers.agentops import router as agentops_router
+    print("✅ AgentOps router imported successfully")
+except ImportError as e:
+    print(f"❌ Failed to import agentops_router from backend.routers: {e}")
+    try:
+        from routers.agentops import router as agentops_router
+        print("✅ AgentOps router imported from routers/")
+    except ImportError as e2:
+        print(f"❌ Failed to import agentops_router from routers/: {e2}")
+        agentops_router = None
+
+if agentops_router:
+    app.include_router(agentops_router, tags=["AgentOps Orchestrator"])
+    print("✅ AgentOps router included successfully")
+else:
+    print("❌ AgentOps router not included - router is None")
+
 # Learning modules routers
 try:
     from backend.certifications import certifications_router
