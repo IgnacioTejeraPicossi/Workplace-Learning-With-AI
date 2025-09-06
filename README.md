@@ -28,6 +28,11 @@
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
 
+### 🤖 AI-Powered Collaboration Modules (NEW!)
+- [🤖 Human-Humanoid Lab](#human-humanoid-lab) - Digital twin simulation and task planning
+- [🚀 AgentOps Orchestrator](#agentops-orchestrator) - n8n workflow automation and orchestration
+- [🔗 Digital Lab Integration](#digital-lab-integration) - Seamless collaboration between modules
+
 ### 🏢 Enterprise Architecture (NEW!)
 - [EA Dashboard](#enterprise-architecture) - Enterprise architecture overview and navigation
 - [Process Designer](#process-designer) - Visual process modeling with React Flow
@@ -118,6 +123,13 @@ graph TB
     AIStudyBuddy[🤝 AI Study Buddy]
   end
   
+  %% AI-Powered Collaboration Modules
+  subgraph "🤖 AI-Powered Collaboration"
+    HumanoidLab[🤖 Human-Humanoid Lab]
+    AgentOps[🚀 AgentOps Orchestrator]
+    DigitalLab[🔗 Digital Lab Integration]
+  end
+  
   %% Enterprise Architecture
   subgraph "🏢 Enterprise Architecture"
     EAHome[EA Dashboard]
@@ -162,6 +174,9 @@ graph TB
   App --> AgenticRAG
   App --> PresentationAgent
   App --> AIStudyBuddy
+  App --> HumanoidLab
+  App --> AgentOps
+  App --> DigitalLab
   App --> EAHome
   App --> ProcessDesigner
   App --> CatalogManager
@@ -192,12 +207,21 @@ graph TB
   SkillsForecast --> BabelLibrary
   Certifications --> BabelLibrary
   VideoLesson --> BabelLibrary
+  
+  %% AI-Powered Collaboration Integration
+  HumanoidLab --> DigitalLab
+  AgentOps --> DigitalLab
+  DigitalLab --> HumanoidLab
+  DigitalLab --> AgentOps
   KnowledgeMap --> FastAPI
   AgentCursorAI --> FastAPI
   RepoAnalyzer --> FastAPI
   AgenticRAG --> FastAPI
   PresentationAgent --> FastAPI
   AIStudyBuddy --> FastAPI
+  HumanoidLab --> FastAPI
+  AgentOps --> FastAPI
+  DigitalLab --> FastAPI
   EAHome --> FastAPI
   ProcessDesigner --> FastAPI
   CatalogManager --> FastAPI
@@ -223,7 +247,7 @@ graph TB
   classDef database fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#000000,font-size:16px;
   
   class User user;
-  class App,Dashboard,Concepts,MicroLesson,BabelLibrary,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,DocumentAnalyzer,AgenticRAG,PresentationAgent,AIStudyBuddy,EAHome,ProcessDesigner,CatalogManager,HeatmapView,ImpactAnalysis,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
+  class App,Dashboard,Concepts,MicroLesson,BabelLibrary,Recommendation,Simulator,WebSearch,CareerCoach,SkillsForecast,Certifications,VideoLesson,KnowledgeMap,AgentCursorAI,RepoAnalyzer,DocumentAnalyzer,AgenticRAG,PresentationAgent,AIStudyBuddy,HumanoidLab,AgentOps,DigitalLab,EAHome,ProcessDesigner,CatalogManager,HeatmapView,ImpactAnalysis,APIConfig,RunTest,IdeaLog,FeatureRoadmap,GlobalSearch frontend;
   class FastAPI,LLM,WebSearchAPI backend;
   class CursorAI,GitHub external;
   class MongoDB,Firebase database;
@@ -2873,6 +2897,396 @@ frontend/src/i18n/
 | Enterprise Architecture | ✅ 100% | 🔄 0% | Pending |
 
 **Overall Progress**: 25% of modules fully translated, 100% infrastructure complete
+
+---
+
+## 🤖 Human-Humanoid Lab: Digital Twin Simulation & Task Planning ✅
+
+### 🎯 Overview
+
+The **Human-Humanoid Lab** is a cutting-edge module that enables the design, simulation, and evaluation of human-humanoid workflows using agentic AI. This module allows users to create digital twins, define complex tasks, and simulate human-robot collaboration scenarios without requiring real hardware. **This module is fully functional and production-ready.**
+
+### 🧠 Core Architecture
+
+**Digital Twin Builder**
+- **Persona Configuration**: Define human roles, skills, and constraints
+- **Capability Mapping**: Map human skills to specific task requirements
+- **Constraint Management**: Set physical and operational limitations
+- **Policy Definition**: Establish safety and operational policies
+
+**Task Playbook Designer**
+- **Action Definition**: Create complex task sequences with multiple actions
+- **Parameter Configuration**: Define inputs, outputs, and dependencies
+- **Workflow Design**: Visual task flow creation and management
+- **Playbook Persistence**: Save and manage task playbooks in database
+
+**AI Agent System**
+- **Planner Agent**: LLM-powered task planning and optimization
+- **Safety Agent**: Real-time safety evaluation and risk assessment
+- **Judge Agent**: Performance evaluation and quality scoring
+- **Simulator**: Cost and latency prediction for task execution
+
+### 🔧 Technical Implementation
+
+**Backend Services**
+- **FastAPI Router**: `/api/humanoid` with comprehensive endpoints
+- **Task Planning**: `/plan` endpoint for intelligent task planning
+- **Safety Evaluation**: `/safety-check` endpoint for risk assessment
+- **Simulation**: `/simulate` endpoint for performance prediction
+- **Judgment**: `/judge` endpoint for quality evaluation
+- **MongoDB Integration**: Collections for runs, plans, and evaluations
+
+**Advanced Features**
+- **Pipeline Execution**: One-click Plan → Safety → Sim workflow
+- **Playbook Management**: CRUD operations for task playbooks
+- **Real-time Simulation**: Live cost and performance estimation
+- **Safety Validation**: Multi-level safety checks and constraints
+- **Export Capabilities**: CSV/JSON export of simulation results
+
+### 📊 API Endpoints
+
+**Core Workflow**
+```bash
+POST /api/humanoid/plan
+# Generate intelligent task plans based on twin and task specifications
+
+POST /api/humanoid/safety-check
+# Evaluate safety and risk factors for planned tasks
+
+POST /api/humanoid/simulate
+# Simulate task execution with cost and performance prediction
+
+POST /api/humanoid/judge
+# Evaluate task performance and quality metrics
+```
+
+**Playbook Management**
+```bash
+POST /api/digital/playbooks
+# Create and save task playbooks
+
+GET /api/digital/playbooks
+# Retrieve all saved playbooks
+
+POST /api/digital/run/pipeline
+# Execute complete Plan → Safety → Sim pipeline
+```
+
+### 🎨 Frontend Interface
+
+**HumanoidLab.jsx - Main Interface**
+- **Tab Navigation**: Overview, Twin Builder, Task Playbook, Sim Arena, Teleop Console, Safety & Ethics
+- **Example Workflow**: Complete demo with realistic data
+- **Real-time Updates**: Live simulation results and status updates
+- **Professional UI**: Modern, intuitive interface design
+
+**TaskPlaybook.jsx - Task Designer**
+- **One-Click Pipeline**: "Run One-Click: Plan → Safety → Sim" button
+- **Action Editor**: Visual action definition with parameters
+- **Twin Configuration**: Digital twin setup and customization
+- **Results Display**: Real-time plan, safety, and simulation results
+
+### 🚀 Use Cases
+
+**Workplace Automation**
+- **Warehouse Operations**: Picking, packing, and inventory management
+- **Manufacturing**: Assembly line optimization and quality control
+- **Healthcare**: Patient care assistance and medical procedures
+- **Research**: Laboratory automation and data collection
+
+**Training & Education**
+- **Skill Development**: Human-robot collaboration training
+- **Safety Training**: Risk assessment and mitigation strategies
+- **Process Optimization**: Workflow improvement and efficiency gains
+- **Scenario Planning**: What-if analysis and contingency planning
+
+---
+
+## 🚀 AgentOps Orchestrator: n8n Workflow Automation ✅
+
+### 🎯 Overview
+
+The **AgentOps Orchestrator** is a powerful workflow automation platform that bridges the gap between AI planning and real-world execution. It integrates with n8n workflows, manages complex automation pipelines, and provides comprehensive monitoring and control capabilities. **This module is fully functional and production-ready.**
+
+### 🧠 Core Architecture
+
+**Flow Management System**
+- **Flow Registration**: Register and manage n8n workflows
+- **Version Control**: Track workflow versions and changes
+- **Schema Validation**: Validate input/output schemas
+- **Metadata Management**: Comprehensive flow documentation
+
+**Run Execution Engine**
+- **Webhook Integration**: Start workflows via n8n webhooks
+- **Input Processing**: Transform and validate input data
+- **Status Tracking**: Real-time execution monitoring
+- **Callback Handling**: Process workflow results and updates
+
+**Security & Authentication**
+- **HMAC Verification**: Secure webhook authentication
+- **Secret Management**: Encrypted credential storage
+- **Access Control**: Role-based permissions
+- **Audit Logging**: Comprehensive activity tracking
+
+### 🔧 Technical Implementation
+
+**Backend Services**
+- **FastAPI Router**: `/api/agentops` with comprehensive endpoints
+- **Flow Management**: CRUD operations for n8n workflows
+- **Run Execution**: Start, monitor, and manage workflow runs
+- **Callback Processing**: Handle n8n webhook callbacks
+- **Export Capabilities**: CSV/JSON export of run data
+- **MongoDB Integration**: Collections for flows and runs
+
+**Advanced Features**
+- **Filtering & Search**: Advanced filtering by status, date, score
+- **Pagination**: Efficient data loading and navigation
+- **Real-time Updates**: Live status updates and notifications
+- **Error Handling**: Comprehensive error management and recovery
+- **Performance Metrics**: Detailed execution statistics
+
+### 📊 API Endpoints
+
+**Flow Management**
+```bash
+POST /api/agentops/flows
+# Register new n8n workflows
+
+GET /api/agentops/flows
+# List all registered flows
+
+PATCH /api/agentops/flows/{flow_id}
+# Update flow configuration
+
+DELETE /api/agentops/flows/{flow_id}
+# Remove flow from system
+```
+
+**Run Execution**
+```bash
+POST /api/agentops/runs/start
+# Start new workflow execution
+
+GET /api/agentops/runs
+# List runs with filtering and pagination
+
+GET /api/agentops/runs/{run_id}
+# Get detailed run information
+
+POST /api/agentops/callback/{flow_id}
+# Handle n8n webhook callbacks
+```
+
+**Analytics & Export**
+```bash
+GET /api/agentops/runs/summary
+# Get execution statistics and KPIs
+
+GET /api/agentops/runs/export
+# Export run data in CSV/JSON format
+```
+
+### 🎨 Frontend Interface
+
+**AgentOps.jsx - Main Interface**
+- **Tab Navigation**: Overview, Flow Catalog, Run Builder, Runs, Settings
+- **Dashboard**: KPIs, statistics, and quick actions
+- **Flow Management**: Visual flow registration and configuration
+- **Run Monitoring**: Real-time execution tracking and status
+
+**Runs.jsx - Advanced Monitoring**
+- **KPI Cards**: Total runs, success rate, average duration
+- **Filter Controls**: Advanced filtering by flow, status, date, score
+- **Data Table**: Comprehensive run listing with actions
+- **Export Options**: CSV/JSON download capabilities
+
+### 🚀 Use Cases
+
+**Business Process Automation**
+- **Data Processing**: ETL workflows and data transformation
+- **API Integration**: Connect multiple services and systems
+- **Notification Systems**: Automated alerts and communications
+- **Report Generation**: Scheduled report creation and distribution
+
+**AI Workflow Orchestration**
+- **Model Training**: Automated ML pipeline execution
+- **Data Analysis**: Complex analytical workflow automation
+- **Content Generation**: AI-powered content creation workflows
+- **Quality Assurance**: Automated testing and validation
+
+---
+
+## 🔗 Digital Lab Integration: Seamless Module Collaboration ✅
+
+### 🎯 Overview
+
+The **Digital Lab Integration** represents a revolutionary approach to AI-powered workflow automation, seamlessly connecting the **Human-Humanoid Lab** and **AgentOps Orchestrator** modules. This integration enables users to design digital workflows, validate them through simulation, and execute them in real-world environments. **This integration is fully functional and production-ready.**
+
+### 🧠 Integration Architecture
+
+**Workflow Design Phase**
+- **Task Definition**: Create complex tasks using the Task Playbook designer
+- **Digital Twin Configuration**: Define human personas and capabilities
+- **Action Sequencing**: Design step-by-step workflow actions
+- **Parameter Mapping**: Configure inputs, outputs, and dependencies
+
+**Validation & Simulation Phase**
+- **AI Planning**: LLM-powered task planning and optimization
+- **Safety Evaluation**: Real-time safety checks and risk assessment
+- **Performance Simulation**: Cost and latency prediction
+- **Quality Validation**: AI judge evaluation of workflow quality
+
+**Execution & Orchestration Phase**
+- **n8n Integration**: Deploy workflows to n8n automation platform
+- **Real-time Monitoring**: Track execution status and performance
+- **Callback Processing**: Handle results and status updates
+- **Analytics & Reporting**: Comprehensive execution analytics
+
+### 🔧 Technical Implementation
+
+**Shared Data Models**
+- **Playbook Schema**: Standardized task and workflow definitions
+- **Twin Configuration**: Human persona and capability specifications
+- **Execution Metadata**: Run status, timing, and result tracking
+- **Safety Constraints**: Risk assessment and mitigation data
+
+**API Integration**
+- **Digital Lab APIs**: `/api/digital` endpoints for playbook management
+- **Humanoid Lab APIs**: `/api/humanoid` endpoints for simulation
+- **AgentOps APIs**: `/api/agentops` endpoints for execution
+- **Cross-Module Communication**: Seamless data flow between modules
+
+**Database Collections**
+- **digital_playbooks**: Task playbook definitions and metadata
+- **humanoid_runs**: Simulation runs and results
+- **agent_flows**: n8n workflow registrations
+- **agent_runs**: Workflow execution tracking
+
+### 🎨 User Experience
+
+**Unified Workflow**
+1. **Design**: Create tasks and configure digital twins in Human-Humanoid Lab
+2. **Validate**: Run safety checks and performance simulations
+3. **Deploy**: Register workflows in AgentOps Orchestrator
+4. **Execute**: Monitor real-world workflow execution
+5. **Analyze**: Review results and optimize performance
+
+**Seamless Navigation**
+- **Cross-Module Links**: Direct navigation between related components
+- **Shared Context**: Consistent data and state across modules
+- **Unified Interface**: Cohesive user experience across all tools
+- **Real-time Updates**: Live status updates and notifications
+
+### 🚀 Advanced Features
+
+**One-Click Pipeline**
+- **Automated Workflow**: Single-click execution of complete pipeline
+- **Intelligent Routing**: Automatic module selection based on task type
+- **Error Handling**: Comprehensive error management and recovery
+- **Progress Tracking**: Real-time status updates and notifications
+
+**Playbook Management**
+- **Version Control**: Track changes and maintain playbook history
+- **Template Library**: Pre-built workflow templates and examples
+- **Collaboration**: Share playbooks across teams and projects
+- **Analytics**: Usage statistics and performance metrics
+
+**Integration Monitoring**
+- **Health Checks**: Monitor module connectivity and status
+- **Performance Metrics**: Track execution times and success rates
+- **Error Reporting**: Comprehensive error logging and analysis
+- **Audit Trail**: Complete activity tracking and compliance
+
+### 📊 Collaboration Diagram
+
+```mermaid
+graph TB
+  %% User Interface Layer
+  User((👤 User)) --> HDL[🤖 Human-Humanoid Lab]
+  User --> AOS[🚀 AgentOps Orchestrator]
+  
+  %% Human-Humanoid Lab Components
+  subgraph "🤖 Human-Humanoid Lab"
+    TwinBuilder[Twin Builder]
+    TaskPlaybook[Task Playbook]
+    SimArena[Sim Arena]
+    SafetyEthics[Safety & Ethics]
+  end
+  
+  %% AgentOps Orchestrator Components
+  subgraph "🚀 AgentOps Orchestrator"
+    FlowCatalog[Flow Catalog]
+    RunBuilder[Run Builder]
+    Runs[Runs Monitor]
+    Settings[Settings]
+  end
+  
+  %% Digital Lab Integration
+  subgraph "🔗 Digital Lab Integration"
+    PlaybookDB[(Playbook Database)]
+    PipelineAPI[Pipeline API]
+    CrossModule[Cross-Module Communication]
+  end
+  
+  %% External Systems
+  subgraph "🌐 External Systems"
+    N8N[n8n Workflows]
+    LMStudio[LM Studio]
+    Webhooks[Webhook Callbacks]
+  end
+  
+  %% Workflow Connections
+  HDL --> PlaybookDB
+  AOS --> PlaybookDB
+  HDL --> PipelineAPI
+  AOS --> PipelineAPI
+  PipelineAPI --> N8N
+  N8N --> LMStudio
+  N8N --> Webhooks
+  Webhooks --> AOS
+  
+  %% Data Flow
+  TwinBuilder --> TaskPlaybook
+  TaskPlaybook --> SimArena
+  SimArena --> SafetyEthics
+  SafetyEthics --> FlowCatalog
+  FlowCatalog --> RunBuilder
+  RunBuilder --> Runs
+  Runs --> Settings
+  
+  %% Styling
+  classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#000000;
+  classDef humanoid fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#000000;
+  classDef agentops fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000;
+  classDef integration fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#000000;
+  classDef external fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#000000;
+  
+  class User user;
+  class HDL,TwinBuilder,TaskPlaybook,SimArena,SafetyEthics humanoid;
+  class AOS,FlowCatalog,RunBuilder,Runs,Settings agentops;
+  class PlaybookDB,PipelineAPI,CrossModule integration;
+  class N8N,LMStudio,Webhooks external;
+```
+
+### 🎯 Use Cases
+
+**Enterprise Automation**
+- **Process Optimization**: Design, validate, and deploy business processes
+- **Quality Assurance**: Automated testing and validation workflows
+- **Compliance Monitoring**: Regulatory compliance and audit workflows
+- **Resource Management**: Human resource allocation and optimization
+
+**AI-Powered Workflows**
+- **Content Generation**: AI-driven content creation and publishing
+- **Data Analysis**: Automated data processing and insights generation
+- **Customer Service**: Intelligent customer interaction workflows
+- **Research & Development**: Scientific research and experimentation automation
+
+**Training & Development**
+- **Skill Assessment**: Automated skill evaluation and gap analysis
+- **Learning Paths**: Personalized learning journey creation
+- **Performance Tracking**: Employee performance monitoring and improvement
+- **Knowledge Management**: Organizational knowledge capture and sharing
 
 ---
 

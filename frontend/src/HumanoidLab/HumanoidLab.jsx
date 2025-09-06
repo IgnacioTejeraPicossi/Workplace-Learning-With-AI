@@ -265,13 +265,6 @@ export default function HumanHumanoidLab() {
       case "TaskPlaybook":
         return (
           <TaskPlaybook 
-            task={task}
-            twin={twin}
-            onTaskUpdate={handleTaskUpdate}
-            onPlanGenerated={handlePlanGenerated}
-            plan={plan}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
             onLoadExample={loadExampleData}
           />
         );

@@ -138,6 +138,25 @@ if agentops_router:
 else:
     print("❌ AgentOps router not included - router is None")
 
+# Digital Lab router
+try:
+    from backend.routers.digital_lab import router as digital_lab_router
+    print("✅ Digital Lab router imported successfully")
+except ImportError as e:
+    print(f"❌ Failed to import digital_lab_router from backend.routers: {e}")
+    try:
+        from routers.digital_lab import router as digital_lab_router
+        print("✅ Digital Lab router imported from routers/")
+    except ImportError as e2:
+        print(f"❌ Failed to import digital_lab_router from routers/: {e2}")
+        digital_lab_router = None
+
+if digital_lab_router:
+    app.include_router(digital_lab_router, tags=["Digital Lab"])
+    print("✅ Digital Lab router included successfully")
+else:
+    print("❌ Digital Lab router not included - router is None")
+
 # Learning modules routers
 try:
     from backend.certifications import certifications_router

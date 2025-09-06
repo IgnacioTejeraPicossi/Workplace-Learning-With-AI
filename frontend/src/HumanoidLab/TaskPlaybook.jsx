@@ -1,497 +1,423 @@
-// Task Playbook Component - Task Definition and Planning
-import React, { useState, useEffect } from "react";
-import { humanoidApi } from "./humanoidApi";
+import React, { useEffect, useState } from "react";
+import { planApi, safetyApi, simApi, runPipeline, savePlaybook, listPlaybooks } from "./digitalApi";
 
-export default function TaskPlaybook({ task, twin, onTaskUpdate, onPlanGenerated, plan, isLoading, setIsLoading, onLoadExample }) {
-  const [localTask, setLocalTask] = useState(task);
-  const [isEditing, setIsEditing] = useState(false);
-  const [planningStep, setPlanningStep] = useState(0);
-  const [planningStatus, setPlanningStatus] = useState("");
+export default function TaskPlaybook({ onLoadExample }) {
+
+  // Playbook state
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [task, setTask] = useState({ 
+    name: "", 
+    description: "", 
+    inputs: {}, 
+    actions: [] 
+  });
+
+  // Twin (minimal software twin for checks)
+  const [twin, setTwin] = useState({
+    name: "Research Analyst",
+    skills: ["web_research", "summarization"],
+    policies: { 
+      respect_robots: true, 
+      rate_limit_rps: 1, 
+      allowed_domains: [], 
+      blocked_domains: [] 
+    }
+  });
+
+  // Results
+  const [plan, setPlan] = useState(null);
+  const [safety, setSafety] = useState(null);
+  const [sim, setSim] = useState(null);
+
+  // UX
+  const [imported, setImported] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [playbooks, setPlaybooks] = useState([]);
+
+  // Load import from Prompt Lab (localStorage) - simplified version
+  useEffect(() => {
+    const raw = localStorage.getItem("HDL_PLAYBOOK_IMPORT");
+    if (!raw) return;
+    try {
+      const pb = JSON.parse(raw);
+      setName(pb.name || "Imported Playbook");
+      setDescription(pb.description || "");
+      const t = pb.task || {};
+      setTask({
+        name: t.name || pb.name || "Imported Task",
+        description: t.description || pb.description || "",
+        inputs: t.inputs || {},
+        actions: Array.isArray(t.actions) ? t.actions : []
+      });
+      setImported(true);
+    } catch (e) {
+      console.error("Invalid HDL_PLAYBOOK_IMPORT:", e);
+    } finally {
+      localStorage.removeItem("HDL_PLAYBOOK_IMPORT");
+    }
+  }, []);
 
   useEffect(() => {
-    setLocalTask(task);
-  }, [task]);
+    // Optional: show existing playbooks for quick load/compare
+    listPlaybooks().then(r => setPlaybooks(r.items || [])).catch(()=>{});
+  }, []);
 
-  const handleInputChange = (field, value) => {
-    setLocalTask(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleStepChange = (index, value) => {
-    setLocalTask(prev => ({
-      ...prev,
-      steps_hint: prev.steps_hint.map((step, i) => 
-        i === index ? value : step
-      )
-    }));
-  };
-
-  const handleAddStep = () => {
-    setLocalTask(prev => ({
-      ...prev,
-      steps_hint: [...prev.steps_hint, ""]
-    }));
-  };
-
-  const handleRemoveStep = (index) => {
-    setLocalTask(prev => ({
-      ...prev,
-      steps_hint: prev.steps_hint.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleSave = () => {
-    onTaskUpdate(localTask);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setLocalTask(task);
-    setIsEditing(false);
-  };
-
-  const handleGeneratePlan = async () => {
-    if (!twin || !localTask) {
-      alert("Please configure both Twin and Task before generating a plan.");
-      return;
-    }
-
-    setIsLoading(true);
-    setPlanningStep(0);
-    setPlanningStatus("Preparing plan request...");
-
+  async function oneClickPipeline() {
+    setBusy(true); 
+    setError(""); 
+    setPlan(null); 
+    setSafety(null); 
+    setSim(null);
     try {
-      // Step 1: Prepare request
-      setPlanningStep(1);
-      setPlanningStatus("Sending request to AI planner...");
-      
-      const planRequest = {
-        twin: twin,
-        task: localTask,
-        quality_goal: "balanced"
-      };
-
-      // Step 2: Generate plan
-      setPlanningStep(2);
-      setPlanningStatus("AI is analyzing task and generating plan...");
-      
-      const response = await humanoidApi.generatePlan(planRequest);
-      
-      // Step 3: Process response
-      setPlanningStep(3);
-      setPlanningStatus("Processing plan response...");
-      
-      if (response.plan) {
-        onPlanGenerated(response.plan);
-        setPlanningStatus("Plan generated successfully!");
-      } else {
-        throw new Error("No plan received from server");
-      }
-
-    } catch (error) {
-      console.error("Plan generation failed:", error);
-      setPlanningStatus(`Plan generation failed: ${error.message}`);
-      alert(`Failed to generate plan: ${error.message}`);
+      // You can also call planApi/safetyApi/simApi sequentially.
+      const out = await runPipeline({ twin, task });
+      setPlan(out.plan);
+      setSafety(out.safety);
+      setSim(out.sim);
+    } catch (e) {
+      setError(String(e));
     } finally {
-      setIsLoading(false);
-      setPlanningStep(0);
+      setBusy(false);
     }
-  };
+  }
 
-  const planningSteps = [
-    "Preparing request",
-    "Sending to AI planner", 
-    "AI analyzing task",
-    "Processing response"
-  ];
+  async function doPlan() {
+    setBusy(true); 
+    setError(""); 
+    setPlan(null);
+    try {
+      const out = await planApi({ twin, task });
+      setPlan(out.plan || out); // depending on your planner return shape
+    } catch (e) { 
+      setError(String(e)); 
+    }
+    finally { 
+      setBusy(false); 
+    }
+  }
+  
+  async function doSafety() {
+    if (!plan) { 
+      alert("Run Plan first."); 
+      return; 
+    }
+    setBusy(true); 
+    setError(""); 
+    setSafety(null);
+    try {
+      const out = await safetyApi({ twin, task, plan });
+      setSafety(out);
+    } catch (e) { 
+      setError(String(e)); 
+    }
+    finally { 
+      setBusy(false); 
+    }
+  }
+  
+  async function doSim() {
+    if (!plan) { 
+      alert("Run Plan first."); 
+      return; 
+    }
+    setBusy(true); 
+    setError(""); 
+    setSim(null);
+    try {
+      const out = await simApi({ plan });
+      setSim(out);
+    } catch (e) { 
+      setError(String(e)); 
+    }
+    finally { 
+      setBusy(false); 
+    }
+  }
 
+  async function saveToDB() {
+    try {
+      const doc = await savePlaybook({ name, description, task });
+      alert(`Saved Playbook: ${doc._id || "(ok)"}`);
+      // refresh list
+      const r = await listPlaybooks();
+      setPlaybooks(r.items || []);
+    } catch (e) {
+      alert(`Save failed: ${e}`);
+    }
+  }
+
+  // --- UI ---
   return (
-    <div style={{ padding: "1rem" }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        marginBottom: "1.5rem" 
-      }}>
-        <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "600" }}>
-          📋 Task Playbook
-        </h2>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={onLoadExample}
-            style={{
-              padding: "0.5rem 1rem",
-              backgroundColor: "#10b981",
-              color: "white",
-              border: "none",
-              borderRadius: "0.375rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem"
-            }}
+    <div className="p-4 space-y-4" data-cy="task-playbook">
+      <h2 className="text-xl font-semibold">Task Playbook</h2>
+      {imported && <p className="text-green-700">Imported playbook loaded from Prompt Lab.</p>}
+
+      {/* One-click toolbar */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <button 
+          className="bg-blue-600 text-white px-3 py-1 rounded" 
+          onClick={oneClickPipeline} 
+          disabled={busy}
+        >
+          {busy ? "Running…" : "Run One-Click: Plan → Safety → Sim"}
+        </button>
+        <button 
+          className="bg-gray-200 px-3 py-1 rounded" 
+          onClick={doPlan} 
+          disabled={busy}
+        >
+          Plan
+        </button>
+        <button 
+          className="bg-gray-200 px-3 py-1 rounded" 
+          onClick={doSafety} 
+          disabled={busy || !plan}
+        >
+          Safety
+        </button>
+        <button 
+          className="bg-gray-200 px-3 py-1 rounded" 
+          onClick={doSim} 
+          disabled={busy || !plan}
+        >
+          Sim Preview
+        </button>
+
+        <div className="ml-auto flex gap-2">
+          <button 
+            className="bg-purple-600 text-white px-3 py-1 rounded" 
+            onClick={saveToDB}
           >
-            🎯 Load Example
+            Save to DB
           </button>
-          {!isEditing ? (
+          {onLoadExample && (
             <button
-              onClick={() => setIsEditing(true)}
+              onClick={onLoadExample}
               style={{
-                padding: "0.5rem 1rem",
-                backgroundColor: "#3b82f6",
-                color: "white",
-                border: "none",
-                borderRadius: "0.375rem",
-                cursor: "pointer"
+                padding: '0.5rem 1rem',
+                backgroundColor: '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: '500'
               }}
             >
-              Edit Task
+              🎯 Load Example
             </button>
-          ) : (
-            <>
-              <button
-                onClick={handleSave}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#10b981",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.375rem",
-                  cursor: "pointer"
-                }}
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancel}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#6b7280",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.375rem",
-                  cursor: "pointer"
-                }}
-              >
-                Cancel
-              </button>
-            </>
           )}
         </div>
       </div>
 
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", 
-        gap: "1.5rem" 
-      }}>
-        {/* Task Definition */}
-        <div style={{
-          backgroundColor: "#f8fafc",
-          border: "1px solid #e5e7eb",
-          borderRadius: "0.5rem",
-          padding: "1rem"
-        }}>
-          <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", fontWeight: "600" }}>
-            Task Definition
-          </h3>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div>
-              <label style={{ 
-                display: "block", 
-                fontSize: "0.9rem", 
-                fontWeight: "500", 
-                marginBottom: "0.25rem" 
-              }}>
-                Task Name
-              </label>
-              <input
-                type="text"
-                value={localTask.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                disabled={!isEditing}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.25rem",
-                  backgroundColor: isEditing ? "white" : "#f3f4f6"
-                }}
-              />
-            </div>
-            
-            <div>
-              <label style={{ 
-                display: "block", 
-                fontSize: "0.9rem", 
-                fontWeight: "500", 
-                marginBottom: "0.25rem" 
-              }}>
-                Description
-              </label>
-              <textarea
-                value={localTask.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-                disabled={!isEditing}
-                rows={3}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.25rem",
-                  backgroundColor: isEditing ? "white" : "#f3f4f6",
-                  resize: "vertical"
-                }}
-              />
-            </div>
+      {error && <div className="text-red-700">{error}</div>}
+
+      {/* Editor */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="block text-sm">Playbook Name</label>
+          <input 
+            className="w-full border rounded px-2 py-1" 
+            value={name} 
+            onChange={e=>setName(e.target.value)} 
+          />
+          <label className="block text-sm">Description</label>
+          <input 
+            className="w-full border rounded px-2 py-1" 
+            value={description} 
+            onChange={e=>setDescription(e.target.value)} 
+          />
+          <label className="block text-sm">Task Name</label>
+          <input 
+            className="w-full border rounded px-2 py-1" 
+            value={task.name} 
+            onChange={e=>setTask({...task, name:e.target.value})} 
+          />
+          <label className="block text-sm">Task Description</label>
+          <input 
+            className="w-full border rounded px-2 py-1" 
+            value={task.description} 
+            onChange={e=>setTask({...task, description:e.target.value})} 
+          />
+          {/* Minimal Twin editor */}
+          <div className="mt-3">
+            <div className="font-semibold">Software Twin (minimal)</div>
+            <label className="block text-sm">Persona Name</label>
+            <input 
+              className="w-full border rounded px-2 py-1" 
+              value={twin.name} 
+              onChange={e=>setTwin({...twin, name:e.target.value})} 
+            />
+            <label className="block text-sm">Allowed domains (CSV)</label>
+            <input 
+              className="w-full border rounded px-2 py-1"
+              onChange={e=>setTwin({...twin, policies:{...twin.policies, allowed_domains: splitCsv(e.target.value)}})} 
+            />
           </div>
         </div>
 
-        {/* Task Steps */}
-        <div style={{
-          backgroundColor: "#f8fafc",
-          border: "1px solid #e5e7eb",
-          borderRadius: "0.5rem",
-          padding: "1rem"
-        }}>
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center", 
-            marginBottom: "1rem" 
-          }}>
-            <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "600" }}>
-              Task Steps (Hints)
-            </h3>
-            {isEditing && (
-              <button
-                onClick={handleAddStep}
-                style={{
-                  padding: "0.25rem 0.5rem",
-                  backgroundColor: "#10b981",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.25rem",
-                  cursor: "pointer",
-                  fontSize: "0.8rem"
-                }}
-              >
-                + Add Step
-              </button>
-            )}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="font-semibold">Actions</div>
           </div>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {localTask.steps_hint.map((step, index) => (
-              <div key={index} style={{ 
-                display: "flex", 
-                gap: "0.5rem", 
-                alignItems: "center" 
-              }}>
-                <span style={{ 
-                  fontSize: "0.9rem", 
-                  fontWeight: "500", 
-                  minWidth: "20px" 
-                }}>
-                  {index + 1}.
-                </span>
-                <input
-                  type="text"
-                  value={step}
-                  onChange={(e) => handleStepChange(index, e.target.value)}
-                  disabled={!isEditing}
-                  placeholder={`Step ${index + 1} description`}
-                  style={{
-                    flex: 1,
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.25rem",
-                    backgroundColor: isEditing ? "white" : "#f3f4f6"
-                  }}
-                />
-                {isEditing && (
-                  <button
-                    onClick={() => handleRemoveStep(index)}
-                    style={{
-                      padding: "0.25rem 0.5rem",
-                      backgroundColor: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "0.25rem",
-                      cursor: "pointer",
-                      fontSize: "0.8rem"
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            {localTask.steps_hint.length === 0 && (
-              <p style={{ 
-                color: "#6b7280", 
-                fontStyle: "italic", 
-                textAlign: "center",
-                margin: "1rem 0"
-              }}>
-                No steps defined. Add steps to help the AI planner.
-              </p>
-            )}
-          </div>
+          <ActionList task={task} setTask={setTask} />
         </div>
       </div>
 
-      {/* Plan Generation */}
-      <div style={{
-        marginTop: "1.5rem",
-        backgroundColor: "#f0f9ff",
-        border: "1px solid #0ea5e9",
-        borderRadius: "0.5rem",
-        padding: "1rem"
-      }}>
-        <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", fontWeight: "600", color: "#0c4a6e" }}>
-          AI Plan Generation
-        </h3>
-        
-        {isLoading && (
-          <div style={{ marginBottom: "1rem" }}>
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "0.75rem",
-              marginBottom: "0.5rem"
-            }}>
-              <div style={{
-                width: "20px",
-                height: "20px",
-                border: "2px solid #e5e7eb",
-                borderTop: "2px solid #0ea5e9",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite"
-              }}></div>
-              <span style={{ fontWeight: "500", color: "#0c4a6e" }}>
-                {planningStatus}
-              </span>
-            </div>
-            <div style={{ 
-              display: "flex", 
-              gap: "0.5rem",
-              marginLeft: "2rem"
-            }}>
-              {planningSteps.map((step, index) => (
-                <div
-                  key={index}
-                  style={{
-                    padding: "0.25rem 0.5rem",
-                    borderRadius: "0.25rem",
-                    fontSize: "0.8rem",
-                    backgroundColor: index <= planningStep ? "#0ea5e9" : "#e5e7eb",
-                    color: index <= planningStep ? "white" : "#6b7280"
-                  }}
-                >
-                  {step}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <button
-            onClick={handleGeneratePlan}
-            disabled={isLoading || !twin || !localTask}
-            style={{
-              padding: "0.75rem 1.5rem",
-              backgroundColor: isLoading ? "#9ca3af" : "#0ea5e9",
-              color: "white",
-              border: "none",
-              borderRadius: "0.375rem",
-              cursor: isLoading ? "not-allowed" : "pointer",
-              fontSize: "0.9rem",
-              fontWeight: "500"
-            }}
-          >
-            {isLoading ? "Generating..." : "Generate AI Plan"}
-          </button>
-          
-          {plan && (
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "0.5rem",
-              color: "#10b981",
-              fontSize: "0.9rem"
-            }}>
-              <span>✅</span>
-              <span>Plan ready ({plan.steps?.length || 0} steps)</span>
-            </div>
-          )}
+      {/* Results */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <div>
+          <h3 className="font-semibold">Plan</h3>
+          <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto">
+            {JSON.stringify(plan, null, 2)}
+          </pre>
         </div>
-        
-        {!twin && (
-          <p style={{ 
-            color: "#f59e0b", 
-            fontSize: "0.9rem", 
-            margin: "0.5rem 0 0 0" 
-          }}>
-            ⚠️ Please configure your Digital Twin first
-          </p>
-        )}
+        <div>
+          <h3 className="font-semibold">Safety</h3>
+          <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto">
+            {JSON.stringify(safety, null, 2)}
+          </pre>
+        </div>
+        <div>
+          <h3 className="font-semibold">Sim Preview</h3>
+          <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto">
+            {JSON.stringify(sim, null, 2)}
+          </pre>
+        </div>
       </div>
 
-      {/* Generated Plan Display */}
-      {plan && (
-        <div style={{
-          marginTop: "1.5rem",
-          backgroundColor: "#f0fdf4",
-          border: "1px solid #10b981",
-          borderRadius: "0.5rem",
-          padding: "1rem"
-        }}>
-          <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", fontWeight: "600", color: "#065f46" }}>
-            Generated Plan: {plan.task_name}
-          </h3>
-          
-          <div style={{ marginBottom: "0.5rem", color: "#065f46" }}>
-            <strong>Estimated Total Time:</strong> {plan.est_total_seconds}s
-          </div>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {plan.steps?.map((step, index) => (
-              <div key={index} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0.5rem",
-                backgroundColor: "white",
-                borderRadius: "0.25rem",
-                border: "1px solid #d1d5db"
-              }}>
-                <span style={{ fontWeight: "500" }}>
-                  {step.index}. {step.action}
-                </span>
-                <span style={{ 
-                  color: "#6b7280", 
-                  fontSize: "0.9rem" 
-                }}>
-                  ~{step.est_seconds}s
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* CSS for loading animation */}
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* Optional: quick list of saved playbooks */}
+      <div>
+        <h3 className="font-semibold mt-4">Saved Playbooks</h3>
+        <ul className="list-disc ml-5">
+          {playbooks.map(pb => (
+            <li key={pb._id}>
+              <b>{pb.name}</b> — {pb.description}
+            </li>
+          ))}
+          {playbooks.length === 0 && <li>No saved playbooks yet.</li>}
+        </ul>
+      </div>
     </div>
   );
+}
+
+function ActionList({ task, setTask }) {
+  function updateAction(idx, field, value) {
+    const next = [...task.actions];
+    next[idx] = { ...next[idx], [field]: value };
+    setTask({ ...task, actions: next });
+  }
+  
+  function updateActionParam(idx, key, value) {
+    const next = [...task.actions];
+    next[idx] = { ...next[idx], params: { ...(next[idx].params || {}), [key]: value } };
+    setTask({ ...task, actions: next });
+  }
+  
+  function addAction() {
+    setTask({ ...task, actions: [...task.actions, { type: "fetch_url", params: { url: "" } }] });
+  }
+  
+  function removeAction(i) {
+    const next = [...task.actions];
+    next.splice(i, 1);
+    setTask({ ...task, actions: next });
+  }
+  
+  return (
+    <div className="space-y-3">
+      <button 
+        className="bg-gray-200 px-3 py-1 rounded" 
+        onClick={addAction}
+      >
+        + Add Action
+      </button>
+      {task.actions.map((a, i) => (
+        <div key={i} className="border rounded p-2">
+          <div className="flex gap-2 items-center">
+            <label className="text-sm">Type</label>
+            <select 
+              className="border rounded px-2 py-1"
+              value={a.type} 
+              onChange={e=>updateAction(i, "type", e.target.value)}
+            >
+              <option value="fetch_url">fetch_url</option>
+              <option value="extract_text">extract_text</option>
+              <option value="prompt_chain">prompt_chain</option>
+              <option value="classify">classify</option>
+              <option value="transform">transform</option>
+              <option value="http_request">http_request</option>
+              <option value="write_file">write_file</option>
+              <option value="send_webhook">send_webhook</option>
+            </select>
+            <button 
+              className="ml-auto bg-red-600 text-white px-2 py-1 rounded" 
+              onClick={()=>removeAction(i)}
+            >
+              Delete
+            </button>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {Object.entries(a.params || {}).map(([k,v]) => (
+              <div key={k}>
+                <label className="text-xs text-gray-600">{k}</label>
+                <input 
+                  className="w-full border rounded px-2 py-1"
+                  value={String(v)} 
+                  onChange={e=>updateActionParam(i, k, e.target.value)} 
+                />
+              </div>
+            ))}
+            <ParamAdder onAdd={(k,v)=>updateActionParam(i, k, v)} />
+          </div>
+        </div>
+      ))}
+      {task.actions.length === 0 && (
+        <div className="text-sm text-gray-600">No actions yet.</div>
+      )}
+    </div>
+  );
+}
+
+function ParamAdder({ onAdd }) {
+  const [key, setKey] = useState("");
+  const [val, setVal] = useState("");
+  return (
+    <div className="col-span-2 flex gap-2 items-end">
+      <div>
+        <label className="text-xs text-gray-600">+ Param key</label>
+        <input 
+          className="border rounded px-2 py-1" 
+          value={key} 
+          onChange={e=>setKey(e.target.value)} 
+          placeholder="url / prompt / ..." 
+        />
+      </div>
+      <div className="flex-1">
+        <label className="text-xs text-gray-600">value</label>
+        <input 
+          className="w-full border rounded px-2 py-1" 
+          value={val} 
+          onChange={e=>setVal(e.target.value)} 
+        />
+      </div>
+      <button 
+        className="bg-gray-200 px-2 py-1 rounded" 
+        onClick={()=>{ 
+          if(key) onAdd(key, val); 
+          setKey(""); 
+          setVal(""); 
+        }}
+      >
+        Add
+      </button>
+    </div>
+  );
+}
+
+function splitCsv(s) {
+  return (s || "").split(",").map(x => x.trim()).filter(Boolean);
 }
