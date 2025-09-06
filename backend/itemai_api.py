@@ -8,11 +8,15 @@ router = APIRouter(prefix="/api", tags=["itemai-api"])
 
 class ItemAITestRequest(BaseModel):
     """Request model for testing ItemAI API connection"""
+    model_config = {"protected_namespaces": ()}
+    
     local_url: str = "http://localhost:1234"
     model_name: Optional[str] = None
 
 class ItemAICompletionRequest(BaseModel):
     """Request model for ItemAI API completions"""
+    model_config = {"protected_namespaces": ()}
+    
     prompt: str
     model_name: Optional[str] = None
     max_tokens: int = 512
@@ -21,6 +25,8 @@ class ItemAICompletionRequest(BaseModel):
 
 class ItemAIResponse(BaseModel):
     """Response model for ItemAI API"""
+    model_config = {"protected_namespaces": ()}
+    
     success: bool
     message: str
     response: Optional[str] = None

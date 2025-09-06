@@ -42,6 +42,7 @@ import EAHome from "./ea/EAHome";
 import ProcessDesigner from "./ea/ProcessDesigner";
 import SecurityPanel from "./SecurityPanel";
 import CatalogManager from "./ea/CatalogManager";
+import HumanHumanoidLab from "./HumanoidLab/HumanoidLab";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -441,6 +442,7 @@ function AppContent() {
             {!activeModule && section === "ea-home" && <EAHome />}
             {!activeModule && section === "process-designer" && <ProcessDesigner />}
             {!activeModule && section === "catalog-manager" && <CatalogManager />}
+            {!activeModule && section === "human-humanoid-lab" && <HumanHumanoidLab />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
