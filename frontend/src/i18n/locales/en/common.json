@@ -36,6 +36,7 @@
     "repositoryAnalyzer": "Repository Analyzer",
     "documentAnalyzer": "Document Analyzer",
     "enterpriseArchitecture": "Enterprise Architecture",
+    "agentopsStudio": "AgentOps Studio",
     "help": "Help",
     "runTest": "Run Test",
     "apiConfig": "API Config",

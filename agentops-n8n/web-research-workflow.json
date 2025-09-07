@@ -1,0 +1,199 @@
+{
+  "name": "AgentOps - Web Research → Report → Sheets + Slack + Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agentops-web-research-ext",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "agentops-web-research-ext"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.input.url }}",
+        "options": {}
+      },
+      "id": "fetch-url",
+      "name": "Fetch URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text content from HTML\nconst cheerio = require('cheerio');\nconst $ = cheerio.load($input.first().json.body);\n\n// Remove script and style elements\n$('script, style').remove();\n\n// Extract text content\nconst text = $('body').text()\n  .replace(/\\s+/g, ' ')\n  .trim()\n  .substring(0, 4000); // Limit to 4000 chars\n\nreturn {\n  json: {\n    url: $input.first().json.input.url,\n    topic: $input.first().json.input.topic,\n    extracted_text: text,\n    run_id: $input.first().json.run_id,\n    callback_url: $input.first().json.callback_url,\n    lm_base: $input.first().json.input.lm_base\n  }\n};"
+      },
+      "id": "extract-text",
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.lm_base }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-r1-distill-qwen-7b"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are a research assistant. Analyze the provided text and create a comprehensive report about the topic.\"}, {\"role\": \"user\", \"content\": \"Topic: {{ $json.topic }}\\n\\nText: {{ $json.extracted_text }}\\n\\nPlease create a detailed report with key insights, findings, and recommendations.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "2000"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "lm-studio-call",
+      "name": "LM Studio Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process LM Studio response and prepare report\nconst lmResponse = $input.first().json;\nconst report = lmResponse.choices[0].message.content;\n\n// Create structured report\nconst structuredReport = {\n  run_id: $input.first().json.run_id,\n  url: $input.first().json.url,\n  topic: $input.first().json.topic,\n  report: report,\n  timestamp: new Date().toISOString(),\n  status: 'completed',\n  score: 85 // Example score\n};\n\nreturn {\n  json: structuredReport\n};"
+      },
+      "id": "process-report",
+      "name": "Process Report",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.callback_url }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-AgentOps-Signature",
+              "value": "={{ $json.run_id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "run_id",
+              "value": "={{ $json.run_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "result",
+              "value": "={{ $json.report }}"
+            },
+            {
+              "name": "score",
+              "value": "={{ $json.score }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "callback-agentops",
+      "name": "Callback AgentOps",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch URL": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "LM Studio Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LM Studio Call": {
+      "main": [
+        [
+          {
+            "node": "Process Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Report": {
+      "main": [
+        [
+          {
+            "node": "Callback AgentOps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

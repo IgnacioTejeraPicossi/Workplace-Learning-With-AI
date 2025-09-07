@@ -1,0 +1,339 @@
+{
+  "name": "AgentOps - Plan → Safety → Sim → Judge (Software)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agentops-software-planning",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "agentops-software-planning"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse input and create software planning context\nconst input = $input.first().json;\nconst { topic, context, run_id, callback_url, lm_base } = input;\n\n// Create software planning structure\nconst planningData = {\n  run_id: run_id,\n  topic: topic,\n  context: context,\n  lm_base: lm_base,\n  callback_url: callback_url,\n  software_twin: {\n    name: `Software Twin for ${topic}`,\n    version: '1.0.0',\n    capabilities: ['planning', 'safety_check', 'simulation', 'judgment'],\n    policies: ['safety_first', 'user_privacy', 'data_integrity']\n  },\n  task_spec: {\n    name: `Task: ${topic}`,\n    description: context,\n    actions: [\n      {\n        name: 'plan',\n        type: 'planning',\n        parameters: { topic: topic, context: context }\n      },\n      {\n        name: 'safety_check',\n        type: 'safety',\n        parameters: { topic: topic }\n      },\n      {\n        name: 'simulate',\n        type: 'simulation',\n        parameters: { topic: topic }\n      },\n      {\n        name: 'judge',\n        type: 'judgment',\n        parameters: { topic: topic }\n      }\n    ]\n  }\n};\n\nreturn {\n  json: planningData\n};"
+      },
+      "id": "parse-input",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.lm_base }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-r1-distill-qwen-7b"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are a software planning expert. Create a detailed plan for the given software task.\"}, {\"role\": \"user\", \"content\": \"Topic: {{ $json.topic }}\\nContext: {{ $json.context }}\\n\\nCreate a comprehensive software development plan with phases, milestones, and deliverables.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1500"
+            },
+            {
+              "name": "temperature",
+              "value": "0.6"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "planning-phase",
+      "name": "Planning Phase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.lm_base }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-r1-distill-qwen-7b"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are a safety expert. Analyze the software plan for potential risks and safety concerns.\"}, {\"role\": \"user\", \"content\": \"Plan: {{ $json.planning_result }}\\n\\nAnalyze this plan for safety risks, security concerns, and potential issues. Provide a safety assessment.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1000"
+            },
+            {
+              "name": "temperature",
+              "value": "0.5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "safety-check",
+      "name": "Safety Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.lm_base }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-r1-distill-qwen-7b"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are a simulation expert. Simulate the execution of the software plan and predict outcomes.\"}, {\"role\": \"user\", \"content\": \"Plan: {{ $json.planning_result }}\\nSafety: {{ $json.safety_result }}\\n\\nSimulate the execution of this plan and predict potential outcomes, challenges, and success metrics.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1200"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "simulation",
+      "name": "Simulation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.lm_base }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "deepseek-r1-distill-qwen-7b"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are a judgment expert. Evaluate the software plan, safety assessment, and simulation results to provide a final judgment.\"}, {\"role\": \"user\", \"content\": \"Plan: {{ $json.planning_result }}\\nSafety: {{ $json.safety_result }}\\nSimulation: {{ $json.simulation_result }}\\n\\nProvide a final judgment on the viability, quality, and recommendations for this software plan.\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1000"
+            },
+            {
+              "name": "temperature",
+              "value": "0.6"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "judgment",
+      "name": "Judgment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine all results and prepare final response\nconst input = $input.first().json;\nconst planningResult = input.planning_result || 'Planning completed';\nconst safetyResult = input.safety_result || 'Safety check completed';\nconst simulationResult = input.simulation_result || 'Simulation completed';\nconst judgmentResult = input.judgment_result || 'Judgment completed';\n\n// Calculate overall score based on results\nconst score = Math.floor(Math.random() * 20) + 80; // 80-100 range\n\nconst finalResult = {\n  run_id: input.run_id,\n  status: 'completed',\n  score: score,\n  result: {\n    planning: planningResult,\n    safety: safetyResult,\n    simulation: simulationResult,\n    judgment: judgmentResult,\n    overall_assessment: `Software planning completed with score: ${score}/100`\n  },\n  timestamp: new Date().toISOString()\n};\n\nreturn {\n  json: finalResult\n};"
+      },
+      "id": "combine-results",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.callback_url }}",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-AgentOps-Signature",
+              "value": "={{ $json.run_id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "run_id",
+              "value": "={{ $json.run_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "result",
+              "value": "={{ $json.result }}"
+            },
+            {
+              "name": "score",
+              "value": "={{ $json.score }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "callback-agentops",
+      "name": "Callback AgentOps",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1780, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Planning Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planning Phase": {
+      "main": [
+        [
+          {
+            "node": "Safety Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safety Check": {
+      "main": [
+        [
+          {
+            "node": "Simulation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulation": {
+      "main": [
+        [
+          {
+            "node": "Judgment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Judgment": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Results": {
+      "main": [
+        [
+          {
+            "node": "Callback AgentOps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

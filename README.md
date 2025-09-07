@@ -29,9 +29,7 @@
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
 
 ### 🤖 AI-Powered Collaboration Modules (NEW!)
-- [🤖 Human-Humanoid Lab](#human-humanoid-lab) - Digital twin simulation and task planning
-- [🚀 AgentOps Orchestrator](#agentops-orchestrator) - n8n workflow automation and orchestration
-- [🔗 Digital Lab Integration](#digital-lab-integration) - Seamless collaboration between modules
+- [🚀 AgentOps Studio](#agentops-studio) - Unified AI Workflow Lab for design, simulation, and execution
 
 ### 🏢 Enterprise Architecture (NEW!)
 - [EA Dashboard](#enterprise-architecture) - Enterprise architecture overview and navigation
@@ -125,9 +123,7 @@ graph TB
   
   %% AI-Powered Collaboration Modules
   subgraph "🤖 AI-Powered Collaboration"
-    HumanoidLab[🤖 Human-Humanoid Lab]
-    AgentOps[🚀 AgentOps Orchestrator]
-    DigitalLab[🔗 Digital Lab Integration]
+    AgentOpsStudio[🚀 AgentOps Studio]
   end
   
   %% Enterprise Architecture
@@ -662,18 +658,88 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 - Always check for MongoDB running and accessible.
 - Always check for Node.js and Python versions.
 
+### 🔧 Environment Troubleshooting
+
+**❌ Common Backend Startup Issues:**
+
+1. **"email-validator is not installed"**
+   ```bash
+   # Solution: Use virtual environment
+   .venv\Scripts\Activate.ps1
+   pip install "pydantic[email]"
+   ```
+
+2. **"ModuleNotFoundError: No module named 'backend.routers.agentops'"**
+   ```bash
+   # Solution: Run from project root directory
+   cd "C:\Test\AI\AI Learning with AI"
+   .venv\Scripts\Activate.ps1
+   python -m uvicorn backend.app:app --reload --port 8000
+   ```
+
+3. **"Python 3.11" instead of virtual environment Python**
+   ```bash
+   # Problem: Using system Python instead of .venv
+   # Solution: Always activate virtual environment first
+   .venv\Scripts\Activate.ps1
+   # Verify: python --version should show .venv path
+   ```
+
+4. **AgentOps Studio endpoints return "Not Found"**
+   ```bash
+   # Problem: Routers not loaded due to import failures
+   # Solution: Check backend logs for import errors
+   # Ensure all dependencies are installed in .venv
+   ```
+
 ### 🚀 Start Commands
 
 **Backend (FastAPI)**
 ```bash
-# Run from root directory
-uvicorn backend.app:app --reload
+# ⚠️ IMPORTANT: Always run from the project root directory
+# 1. Activate virtual environment
+.venv\Scripts\Activate.ps1
+
+# 2. Verify Python environment (should show .venv path)
+python --version
+
+# 3. Start FastAPI server
+python -m uvicorn backend.app:app --reload --port 8000
 ```
 
 **Frontend (React)**
 ```bash
 cd frontend
 npm start
+```
+
+**🔧 Why this specific startup process?**
+- **Virtual Environment**: Ensures all dependencies (like `email-validator`) are available
+- **Root Directory**: Required for correct Python imports (`backend.routers.agentops.*`)
+- **Python -m uvicorn**: Uses the virtual environment's Python interpreter
+- **Port 8000**: Standard port for the backend API
+
+**📋 Environment Setup Checklist**
+```bash
+# 1. Verify you're in the project root directory
+pwd
+# Should show: C:\Test\AI\AI Learning with AI
+
+# 2. Check virtual environment exists
+ls .venv\Scripts\
+# Should show: Activate.ps1, python.exe, etc.
+
+# 3. Activate virtual environment
+.venv\Scripts\Activate.ps1
+# Prompt should change to: (.venv) PS C:\Test\AI\AI Learning with AI>
+
+# 4. Verify Python environment
+python --version
+# Should show: Python 3.x.x (from .venv)
+
+# 5. Install dependencies if needed
+pip install -r backend/requirements.txt
+pip install "pydantic[email]"  # For AgentOps Studio
 ```
 
 **Web Search Backend (Node.js)**
@@ -2900,393 +2966,322 @@ frontend/src/i18n/
 
 ---
 
-## 🤖 Human-Humanoid Lab: Digital Twin Simulation & Task Planning ✅
+## 🚀 AgentOps Studio: Unified AI Workflow Lab ✅
 
 ### 🎯 Overview
 
-The **Human-Humanoid Lab** is a cutting-edge module that enables the design, simulation, and evaluation of human-humanoid workflows using agentic AI. This module allows users to create digital twins, define complex tasks, and simulate human-robot collaboration scenarios without requiring real hardware. **This module is fully functional and production-ready.**
+The **AgentOps Studio** is a comprehensive, unified platform that combines AI-powered workflow design, simulation, and execution capabilities. This cutting-edge module enables users to create intelligent software workflows, validate them through AI simulation, and execute them via n8n automation platform. **This module is fully functional and production-ready.**
 
 ### 🧠 Core Architecture
 
-**Digital Twin Builder**
-- **Persona Configuration**: Define human roles, skills, and constraints
-- **Capability Mapping**: Map human skills to specific task requirements
-- **Constraint Management**: Set physical and operational limitations
-- **Policy Definition**: Establish safety and operational policies
+**Digital Lab - AI Planning & Simulation**
+- **Software Twin Builder**: Define software capabilities, constraints, and policies
+- **Task Specification**: Create complex task sequences with AI-powered actions
+- **AI Agent System**: LLM-powered planning, safety evaluation, and performance simulation
+- **Pipeline Execution**: One-click Plan → Safety → Sim → Judge workflow
 
-**Task Playbook Designer**
-- **Action Definition**: Create complex task sequences with multiple actions
-- **Parameter Configuration**: Define inputs, outputs, and dependencies
-- **Workflow Design**: Visual task flow creation and management
-- **Playbook Persistence**: Save and manage task playbooks in database
+**Prompt Lab - AI Model Integration**
+- **LM Studio Integration**: Local AI model execution and testing
+- **Prompt Engineering**: Advanced prompt design and optimization
+- **Safety Policies**: Content filtering and domain restrictions
+- **Performance Monitoring**: Latency tracking and quality scoring
 
-**AI Agent System**
-- **Planner Agent**: LLM-powered task planning and optimization
-- **Safety Agent**: Real-time safety evaluation and risk assessment
-- **Judge Agent**: Performance evaluation and quality scoring
-- **Simulator**: Cost and latency prediction for task execution
+**Playbook Designer - Workflow Creation**
+- **Visual Task Design**: Drag-and-drop workflow creation
+- **Action Library**: Pre-built actions for common software tasks
+- **Parameter Configuration**: Input/output mapping and validation
+- **Template Management**: Reusable workflow templates and examples
+
+**Flow Catalog - n8n Integration**
+- **Workflow Registration**: Register and manage n8n workflows
+- **Schema Validation**: Input/output schema validation
+- **Version Control**: Track workflow versions and changes
+- **Metadata Management**: Comprehensive flow documentation
+
+**Run Monitor - Execution Tracking**
+- **Real-time Monitoring**: Live execution status and performance tracking
+- **Webhook Integration**: Secure n8n webhook callbacks
+- **Analytics Dashboard**: KPIs, success rates, and performance metrics
+- **Export Capabilities**: CSV/JSON export of execution data
+
+**Settings - Global Configuration**
+- **Destination Defaults**: Configure default output destinations (Google Sheets, Slack, Email)
+- **Flow Presets**: Default flow selection and configuration
+- **LM Studio Settings**: Local AI model configuration
+- **Security Policies**: Global safety and access control settings
 
 ### 🔧 Technical Implementation
 
 **Backend Services**
-- **FastAPI Router**: `/api/humanoid` with comprehensive endpoints
-- **Task Planning**: `/plan` endpoint for intelligent task planning
-- **Safety Evaluation**: `/safety-check` endpoint for risk assessment
-- **Simulation**: `/simulate` endpoint for performance prediction
-- **Judgment**: `/judge` endpoint for quality evaluation
-- **MongoDB Integration**: Collections for runs, plans, and evaluations
+- **FastAPI Routers**: 6 specialized routers with comprehensive endpoints
+  - `/api/digital` - AI planning and simulation
+  - `/api/prompt` - LM Studio integration
+  - `/api/playbooks` - Workflow management
+  - `/api/flows` - n8n workflow registration
+  - `/api/runs` - Execution monitoring
+  - `/api/settings` - Global configuration
+- **MongoDB Integration**: Collections for playbooks, flows, runs, and settings
+- **HMAC Security**: Secure webhook authentication
+- **Error Handling**: Comprehensive error management and recovery
 
 **Advanced Features**
-- **Pipeline Execution**: One-click Plan → Safety → Sim workflow
-- **Playbook Management**: CRUD operations for task playbooks
-- **Real-time Simulation**: Live cost and performance estimation
-- **Safety Validation**: Multi-level safety checks and constraints
-- **Export Capabilities**: CSV/JSON export of simulation results
+- **Unified API**: Single entry point for all workflow operations
+- **Real-time Updates**: Live status updates and notifications
+- **Cross-Module Integration**: Seamless data flow between components
+- **Export Capabilities**: CSV/JSON export of all data types
+- **Performance Metrics**: Detailed execution statistics and analytics
 
 ### 📊 API Endpoints
 
-**Core Workflow**
+**Digital Lab - AI Planning**
 ```bash
-POST /api/humanoid/plan
-# Generate intelligent task plans based on twin and task specifications
+POST /api/digital/plan
+# Generate intelligent task plans using AI agents
 
-POST /api/humanoid/safety-check
+POST /api/digital/safety-check
 # Evaluate safety and risk factors for planned tasks
 
-POST /api/humanoid/simulate
+POST /api/digital/simulate
 # Simulate task execution with cost and performance prediction
 
-POST /api/humanoid/judge
+POST /api/digital/judge
 # Evaluate task performance and quality metrics
+
+POST /api/digital/run/pipeline
+# Execute complete Plan → Safety → Sim → Judge pipeline
+```
+
+**Prompt Lab - AI Integration**
+```bash
+POST /api/prompt/run
+# Execute prompts through LM Studio with safety checks
 ```
 
 **Playbook Management**
 ```bash
-POST /api/digital/playbooks
-# Create and save task playbooks
+POST /api/playbooks
+# Create and save workflow playbooks
 
-GET /api/digital/playbooks
+GET /api/playbooks
 # Retrieve all saved playbooks
 
-POST /api/digital/run/pipeline
-# Execute complete Plan → Safety → Sim pipeline
+PATCH /api/playbooks/{playbook_id}
+# Update playbook configuration
+
+DELETE /api/playbooks/{playbook_id}
+# Remove playbook from system
 ```
 
-### 🎨 Frontend Interface
-
-**HumanoidLab.jsx - Main Interface**
-- **Tab Navigation**: Overview, Twin Builder, Task Playbook, Sim Arena, Teleop Console, Safety & Ethics
-- **Example Workflow**: Complete demo with realistic data
-- **Real-time Updates**: Live simulation results and status updates
-- **Professional UI**: Modern, intuitive interface design
-
-**TaskPlaybook.jsx - Task Designer**
-- **One-Click Pipeline**: "Run One-Click: Plan → Safety → Sim" button
-- **Action Editor**: Visual action definition with parameters
-- **Twin Configuration**: Digital twin setup and customization
-- **Results Display**: Real-time plan, safety, and simulation results
-
-### 🚀 Use Cases
-
-**Workplace Automation**
-- **Warehouse Operations**: Picking, packing, and inventory management
-- **Manufacturing**: Assembly line optimization and quality control
-- **Healthcare**: Patient care assistance and medical procedures
-- **Research**: Laboratory automation and data collection
-
-**Training & Education**
-- **Skill Development**: Human-robot collaboration training
-- **Safety Training**: Risk assessment and mitigation strategies
-- **Process Optimization**: Workflow improvement and efficiency gains
-- **Scenario Planning**: What-if analysis and contingency planning
-
----
-
-## 🚀 AgentOps Orchestrator: n8n Workflow Automation ✅
-
-### 🎯 Overview
-
-The **AgentOps Orchestrator** is a powerful workflow automation platform that bridges the gap between AI planning and real-world execution. It integrates with n8n workflows, manages complex automation pipelines, and provides comprehensive monitoring and control capabilities. **This module is fully functional and production-ready.**
-
-### 🧠 Core Architecture
-
-**Flow Management System**
-- **Flow Registration**: Register and manage n8n workflows
-- **Version Control**: Track workflow versions and changes
-- **Schema Validation**: Validate input/output schemas
-- **Metadata Management**: Comprehensive flow documentation
-
-**Run Execution Engine**
-- **Webhook Integration**: Start workflows via n8n webhooks
-- **Input Processing**: Transform and validate input data
-- **Status Tracking**: Real-time execution monitoring
-- **Callback Handling**: Process workflow results and updates
-
-**Security & Authentication**
-- **HMAC Verification**: Secure webhook authentication
-- **Secret Management**: Encrypted credential storage
-- **Access Control**: Role-based permissions
-- **Audit Logging**: Comprehensive activity tracking
-
-### 🔧 Technical Implementation
-
-**Backend Services**
-- **FastAPI Router**: `/api/agentops` with comprehensive endpoints
-- **Flow Management**: CRUD operations for n8n workflows
-- **Run Execution**: Start, monitor, and manage workflow runs
-- **Callback Processing**: Handle n8n webhook callbacks
-- **Export Capabilities**: CSV/JSON export of run data
-- **MongoDB Integration**: Collections for flows and runs
-
-**Advanced Features**
-- **Filtering & Search**: Advanced filtering by status, date, score
-- **Pagination**: Efficient data loading and navigation
-- **Real-time Updates**: Live status updates and notifications
-- **Error Handling**: Comprehensive error management and recovery
-- **Performance Metrics**: Detailed execution statistics
-
-### 📊 API Endpoints
-
-**Flow Management**
+**Flow Catalog - n8n Integration**
 ```bash
-POST /api/agentops/flows
+POST /api/flows
 # Register new n8n workflows
 
-GET /api/agentops/flows
+GET /api/flows
 # List all registered flows
 
-PATCH /api/agentops/flows/{flow_id}
+PATCH /api/flows/{flow_id}
 # Update flow configuration
 
-DELETE /api/agentops/flows/{flow_id}
+DELETE /api/flows/{flow_id}
 # Remove flow from system
 ```
 
-**Run Execution**
+**Run Monitor - Execution Tracking**
 ```bash
-POST /api/agentops/runs/start
+POST /api/runs/start
 # Start new workflow execution
 
-GET /api/agentops/runs
+GET /api/runs
 # List runs with filtering and pagination
 
-GET /api/agentops/runs/{run_id}
-# Get detailed run information
+GET /api/runs/summary
+# Get execution statistics and KPIs
 
-POST /api/agentops/callback/{flow_id}
+GET /api/runs/export
+# Export run data in CSV/JSON format
+
+POST /api/runs/callback/{flow_id}
 # Handle n8n webhook callbacks
 ```
 
-**Analytics & Export**
+**Settings - Global Configuration**
 ```bash
-GET /api/agentops/runs/summary
-# Get execution statistics and KPIs
+GET /api/settings
+# Get global configuration settings
 
-GET /api/agentops/runs/export
-# Export run data in CSV/JSON format
+PUT /api/settings
+# Update global configuration
+
+PATCH /api/settings
+# Partial update of configuration
 ```
 
 ### 🎨 Frontend Interface
 
-**AgentOps.jsx - Main Interface**
-- **Tab Navigation**: Overview, Flow Catalog, Run Builder, Runs, Settings
-- **Dashboard**: KPIs, statistics, and quick actions
-- **Flow Management**: Visual flow registration and configuration
-- **Run Monitoring**: Real-time execution tracking and status
+**AgentOpsStudio.jsx - Main Interface**
+- **Tab Navigation**: Overview, Prompt Lab, Playbook, Flow Catalog, Runs, Settings
+- **Modern UI**: Gradient headers, card layouts, and professional styling
+- **Real-time Updates**: Live status updates and notifications
+- **Responsive Design**: Optimized for desktop and mobile devices
 
-**Runs.jsx - Advanced Monitoring**
-- **KPI Cards**: Total runs, success rate, average duration
-- **Filter Controls**: Advanced filtering by flow, status, date, score
-- **Data Table**: Comprehensive run listing with actions
+**PromptLab.jsx - AI Model Testing**
+- **LM Studio Integration**: Direct connection to local AI models
+- **Safety Policies**: Content filtering and domain restrictions
+- **Performance Monitoring**: Latency tracking and quality scoring
+- **Prompt Templates**: Pre-built prompts for common use cases
+
+**Playbook.jsx - Workflow Designer**
+- **Visual Designer**: Drag-and-drop workflow creation
+- **Action Library**: Pre-built actions for software tasks
+- **Execute via AgentOps**: One-click workflow execution
+- **Destinations**: Configure output to Google Sheets, Slack, Email
+
+**FlowCatalog.jsx - n8n Management**
+- **Flow Registration**: Visual n8n workflow registration
+- **Schema Validation**: Input/output schema management
+- **Version Control**: Track workflow changes
+- **Metadata Management**: Comprehensive flow documentation
+
+**Runs.jsx - Execution Monitor**
+- **KPI Dashboard**: Total runs, success rate, average duration
+- **Advanced Filtering**: Filter by flow, status, date, score
+- **Real-time Updates**: Live execution status
 - **Export Options**: CSV/JSON download capabilities
 
-### 🚀 Use Cases
+**Settings.jsx - Global Configuration**
+- **Destination Defaults**: Configure default outputs
+- **Flow Presets**: Default flow selection
+- **LM Studio Settings**: Local AI configuration
+- **Security Policies**: Global safety settings
 
-**Business Process Automation**
-- **Data Processing**: ETL workflows and data transformation
-- **API Integration**: Connect multiple services and systems
-- **Notification Systems**: Automated alerts and communications
-- **Report Generation**: Scheduled report creation and distribution
-
-**AI Workflow Orchestration**
-- **Model Training**: Automated ML pipeline execution
-- **Data Analysis**: Complex analytical workflow automation
-- **Content Generation**: AI-powered content creation workflows
-- **Quality Assurance**: Automated testing and validation
-
----
-
-## 🔗 Digital Lab Integration: Seamless Module Collaboration ✅
-
-### 🎯 Overview
-
-The **Digital Lab Integration** represents a revolutionary approach to AI-powered workflow automation, seamlessly connecting the **Human-Humanoid Lab** and **AgentOps Orchestrator** modules. This integration enables users to design digital workflows, validate them through simulation, and execute them in real-world environments. **This integration is fully functional and production-ready.**
-
-### 🧠 Integration Architecture
-
-**Workflow Design Phase**
-- **Task Definition**: Create complex tasks using the Task Playbook designer
-- **Digital Twin Configuration**: Define human personas and capabilities
-- **Action Sequencing**: Design step-by-step workflow actions
-- **Parameter Mapping**: Configure inputs, outputs, and dependencies
-
-**Validation & Simulation Phase**
-- **AI Planning**: LLM-powered task planning and optimization
-- **Safety Evaluation**: Real-time safety checks and risk assessment
-- **Performance Simulation**: Cost and latency prediction
-- **Quality Validation**: AI judge evaluation of workflow quality
-
-**Execution & Orchestration Phase**
-- **n8n Integration**: Deploy workflows to n8n automation platform
-- **Real-time Monitoring**: Track execution status and performance
-- **Callback Processing**: Handle results and status updates
-- **Analytics & Reporting**: Comprehensive execution analytics
-
-### 🔧 Technical Implementation
-
-**Shared Data Models**
-- **Playbook Schema**: Standardized task and workflow definitions
-- **Twin Configuration**: Human persona and capability specifications
-- **Execution Metadata**: Run status, timing, and result tracking
-- **Safety Constraints**: Risk assessment and mitigation data
-
-**API Integration**
-- **Digital Lab APIs**: `/api/digital` endpoints for playbook management
-- **Humanoid Lab APIs**: `/api/humanoid` endpoints for simulation
-- **AgentOps APIs**: `/api/agentops` endpoints for execution
-- **Cross-Module Communication**: Seamless data flow between modules
-
-**Database Collections**
-- **digital_playbooks**: Task playbook definitions and metadata
-- **humanoid_runs**: Simulation runs and results
-- **agent_flows**: n8n workflow registrations
-- **agent_runs**: Workflow execution tracking
-
-### 🎨 User Experience
-
-**Unified Workflow**
-1. **Design**: Create tasks and configure digital twins in Human-Humanoid Lab
-2. **Validate**: Run safety checks and performance simulations
-3. **Deploy**: Register workflows in AgentOps Orchestrator
-4. **Execute**: Monitor real-world workflow execution
-5. **Analyze**: Review results and optimize performance
-
-**Seamless Navigation**
-- **Cross-Module Links**: Direct navigation between related components
-- **Shared Context**: Consistent data and state across modules
-- **Unified Interface**: Cohesive user experience across all tools
-- **Real-time Updates**: Live status updates and notifications
-
-### 🚀 Advanced Features
-
-**One-Click Pipeline**
-- **Automated Workflow**: Single-click execution of complete pipeline
-- **Intelligent Routing**: Automatic module selection based on task type
-- **Error Handling**: Comprehensive error management and recovery
-- **Progress Tracking**: Real-time status updates and notifications
-
-**Playbook Management**
-- **Version Control**: Track changes and maintain playbook history
-- **Template Library**: Pre-built workflow templates and examples
-- **Collaboration**: Share playbooks across teams and projects
-- **Analytics**: Usage statistics and performance metrics
-
-**Integration Monitoring**
-- **Health Checks**: Monitor module connectivity and status
-- **Performance Metrics**: Track execution times and success rates
-- **Error Reporting**: Comprehensive error logging and analysis
-- **Audit Trail**: Complete activity tracking and compliance
-
-### 📊 Collaboration Diagram
+### 📊 Architecture Diagram
 
 ```mermaid
 graph TB
   %% User Interface Layer
-  User((👤 User)) --> HDL[🤖 Human-Humanoid Lab]
-  User --> AOS[🚀 AgentOps Orchestrator]
+  User((👤 User)) --> AOS[🚀 AgentOps Studio]
   
-  %% Human-Humanoid Lab Components
-  subgraph "🤖 Human-Humanoid Lab"
-    TwinBuilder[Twin Builder]
-    TaskPlaybook[Task Playbook]
-    SimArena[Sim Arena]
-    SafetyEthics[Safety & Ethics]
+  %% AgentOps Studio Components
+  subgraph "🚀 AgentOps Studio"
+    Overview[📊 Overview]
+    PromptLab[🤖 Prompt Lab]
+    Playbook[📋 Playbook]
+    FlowCatalog[🔄 Flow Catalog]
+    Runs[🏃 Runs]
+    Settings[⚙️ Settings]
   end
   
-  %% AgentOps Orchestrator Components
-  subgraph "🚀 AgentOps Orchestrator"
-    FlowCatalog[Flow Catalog]
-    RunBuilder[Run Builder]
-    Runs[Runs Monitor]
-    Settings[Settings]
+  %% Backend Services
+  subgraph "🔧 Backend Services"
+    DigitalAPI[Digital API]
+    PromptAPI[Prompt API]
+    PlaybookAPI[Playbook API]
+    FlowAPI[Flow API]
+    RunAPI[Run API]
+    SettingsAPI[Settings API]
   end
   
-  %% Digital Lab Integration
-  subgraph "🔗 Digital Lab Integration"
-    PlaybookDB[(Playbook Database)]
-    PipelineAPI[Pipeline API]
-    CrossModule[Cross-Module Communication]
+  %% AI Services
+  subgraph "🧠 AI Services"
+    PlannerAgent[Planner Agent]
+    SafetyAgent[Safety Agent]
+    Simulator[Simulator]
+    JudgeAgent[Judge Agent]
   end
   
   %% External Systems
   subgraph "🌐 External Systems"
     N8N[n8n Workflows]
     LMStudio[LM Studio]
-    Webhooks[Webhook Callbacks]
+    GoogleSheets[Google Sheets]
+    Slack[Slack]
+    Email[Email]
+  end
+  
+  %% Database
+  subgraph "💾 Database"
+    MongoDB[(MongoDB)]
+    PlaybooksDB[digital_playbooks]
+    FlowsDB[agent_flows]
+    RunsDB[agent_runs]
+    SettingsDB[studio_settings]
   end
   
   %% Workflow Connections
-  HDL --> PlaybookDB
-  AOS --> PlaybookDB
-  HDL --> PipelineAPI
-  AOS --> PipelineAPI
-  PipelineAPI --> N8N
-  N8N --> LMStudio
-  N8N --> Webhooks
-  Webhooks --> AOS
+  AOS --> DigitalAPI
+  AOS --> PromptAPI
+  AOS --> PlaybookAPI
+  AOS --> FlowAPI
+  AOS --> RunAPI
+  AOS --> SettingsAPI
+  
+  DigitalAPI --> PlannerAgent
+  DigitalAPI --> SafetyAgent
+  DigitalAPI --> Simulator
+  DigitalAPI --> JudgeAgent
+  
+  PromptAPI --> LMStudio
+  FlowAPI --> N8N
+  RunAPI --> N8N
+  
+  PlaybookAPI --> MongoDB
+  FlowAPI --> MongoDB
+  RunAPI --> MongoDB
+  SettingsAPI --> MongoDB
+  
+  N8N --> GoogleSheets
+  N8N --> Slack
+  N8N --> Email
   
   %% Data Flow
-  TwinBuilder --> TaskPlaybook
-  TaskPlaybook --> SimArena
-  SimArena --> SafetyEthics
-  SafetyEthics --> FlowCatalog
-  FlowCatalog --> RunBuilder
-  RunBuilder --> Runs
+  Overview --> PromptLab
+  PromptLab --> Playbook
+  Playbook --> FlowCatalog
+  FlowCatalog --> Runs
   Runs --> Settings
   
   %% Styling
   classDef user fill:#fdcb6e,stroke:#e17055,stroke-width:3px,color:#000000;
-  classDef humanoid fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#000000;
-  classDef agentops fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000;
-  classDef integration fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#000000;
+  classDef agentops fill:#74b9ff,stroke:#0984e3,stroke-width:2px,color:#000000;
+  classDef backend fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000000;
+  classDef ai fill:#a29bfe,stroke:#6c5ce7,stroke-width:2px,color:#000000;
   classDef external fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#000000;
+  classDef database fill:#fdcb6e,stroke:#e17055,stroke-width:2px,color:#000000;
   
   class User user;
-  class HDL,TwinBuilder,TaskPlaybook,SimArena,SafetyEthics humanoid;
-  class AOS,FlowCatalog,RunBuilder,Runs,Settings agentops;
-  class PlaybookDB,PipelineAPI,CrossModule integration;
-  class N8N,LMStudio,Webhooks external;
+  class AOS,Overview,PromptLab,Playbook,FlowCatalog,Runs,Settings agentops;
+  class DigitalAPI,PromptAPI,PlaybookAPI,FlowAPI,RunAPI,SettingsAPI backend;
+  class PlannerAgent,SafetyAgent,Simulator,JudgeAgent ai;
+  class N8N,LMStudio,GoogleSheets,Slack,Email external;
+  class MongoDB,PlaybooksDB,FlowsDB,RunsDB,SettingsDB database;
 ```
 
-### 🎯 Use Cases
+### 🚀 Use Cases
 
-**Enterprise Automation**
-- **Process Optimization**: Design, validate, and deploy business processes
-- **Quality Assurance**: Automated testing and validation workflows
+**Software Development Automation**
+- **Code Analysis**: Automated code review and quality assessment
+- **Testing Workflows**: Automated testing and validation pipelines
+- **Deployment Automation**: CI/CD pipeline orchestration
+- **Documentation Generation**: Automated API and code documentation
+
+**Business Process Automation**
+- **Data Processing**: ETL workflows and data transformation
+- **Report Generation**: Automated report creation and distribution
+- **Customer Service**: Intelligent customer interaction workflows
 - **Compliance Monitoring**: Regulatory compliance and audit workflows
-- **Resource Management**: Human resource allocation and optimization
 
 **AI-Powered Workflows**
 - **Content Generation**: AI-driven content creation and publishing
 - **Data Analysis**: Automated data processing and insights generation
-- **Customer Service**: Intelligent customer interaction workflows
-- **Research & Development**: Scientific research and experimentation automation
+- **Model Training**: Automated ML pipeline execution
+- **Quality Assurance**: AI-powered testing and validation
 
-**Training & Development**
-- **Skill Assessment**: Automated skill evaluation and gap analysis
-- **Learning Paths**: Personalized learning journey creation
-- **Performance Tracking**: Employee performance monitoring and improvement
-- **Knowledge Management**: Organizational knowledge capture and sharing
+**Integration & Orchestration**
+- **API Integration**: Connect multiple services and systems
+- **Webhook Management**: Secure webhook processing and routing
+- **Notification Systems**: Automated alerts and communications
+- **Cross-Platform Sync**: Data synchronization across platforms
 
 ---
 

@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      # Basic instance config
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+
+      # Credentials encryption (generate a 32+ char secret)
+      - N8N_ENCRYPTION_KEY=agentops-studio-n8n-encryption-key-2025-secure
+
+      # Our AgentOps callback signing
+      - AGENTOPS_HMAC_SECRET=agentops-hmac-secret-2025
+
+      # Allow Function-nodes to use modules we need
+      - NODE_FUNCTION_ALLOW_BUILTIN=crypto
+      - NODE_FUNCTION_ALLOW_EXTERNAL=cheerio
+
+      # Optional, set your timezone
+      - TZ=Europe/Madrid
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    restart: unless-stopped

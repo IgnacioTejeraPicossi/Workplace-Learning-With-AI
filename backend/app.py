@@ -8,6 +8,24 @@ import json
 import os
 from datetime import datetime
 import uuid
+import sys
+import importlib.util
+
+# ↓ Debug para verificar el entorno
+print("PY:", sys.executable)
+print("HAS email_validator?:", importlib.util.find_spec("email_validator"))
+
+# ↓ Import tracing para AgentOps Studio
+import importlib
+def _trace_mod(name):
+    try:
+        m = importlib.import_module(name)
+        print(f"✅ imported {name} from", getattr(m, "__file__", "?"))
+        return m
+    except Exception as e:
+        print(f"❌ import failed for {name}:", e)
+        return None
+
 from typing import List, Optional, Dict, Any
 
 # Fix imports to work from both root and backend directories
@@ -99,6 +117,24 @@ except ImportError:
     from cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
 
+# AgentOps Studio routers - Direct import method
+try:
+    from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings
+    print("✅ AgentOps Studio routers imported successfully")
+    
+    # Include routers with specific prefixes to avoid route conflicts
+    app.include_router(digital.router, prefix="/api/digital", tags=["AgentOps Digital"])
+    app.include_router(prompt.router, prefix="/api/prompt", tags=["AgentOps Prompt"])
+    app.include_router(playbooks.router, prefix="/api/playbooks", tags=["AgentOps Playbooks"])
+    app.include_router(flows.router, prefix="/api/flows", tags=["AgentOps Flows"])
+    app.include_router(runs.router, prefix="/api/runs", tags=["AgentOps Runs"])
+    app.include_router(settings.router, prefix="/api/settings", tags=["AgentOps Settings"])
+    
+    print("✅ AgentOps Studio: 6 routers included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import AgentOps Studio routers: {e}")
+except Exception as e:
+    print(f"❌ Error including AgentOps Studio routers: {e}")
 
 # Learning modules routers
 try:
@@ -2232,5 +2268,11 @@ async def debug_topic_comparison():
         import traceback
         traceback.print_exc()
         return {"error": str(e), "message": "Topic comparison failed"}
+
+# Debug endpoint para verificar rutas
+@app.get("/__debug/routes")
+def _debug_routes():
+    return [{"path": r.path, "name": getattr(r.endpoint, "__name__", "?"), "methods": list(getattr(r, "methods", []))} 
+            for r in app.routes]
 
  

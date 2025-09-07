@@ -98,6 +98,8 @@ const getNavItems = (t) => [
     { key: "catalog-manager", label: t('sidebar.enterpriseArchitectureSubmenu.catalogManager'), icon: "catalog" }
   ]},
   
+  // Grupo 1.8: AgentOps Studio (nuevo módulo unificado)
+  { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot", group: "learning" },
   
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
