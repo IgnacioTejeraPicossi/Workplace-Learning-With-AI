@@ -54,11 +54,21 @@ async def runs_summary():
     completed = await database[COLL].count_documents({"status": "completed"})
     failed = await database[COLL].count_documents({"status": "failed"})
     
+    # Count today's runs
+    from datetime import datetime, timedelta
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_runs = await database[COLL].count_documents({
+        "created_at": {"$gte": today_start.isoformat()}
+    })
+    
     return {
-        "total": total,
-        "running": running,
-        "completed": completed,
-        "failed": failed,
+        "total_runs": total,
+        "status_counts": {
+            "running": running,
+            "done": completed,
+            "failed": failed
+        },
+        "recent_runs": today_runs,
         "success_rate": completed / total if total > 0 else 0
     }
 
