@@ -5,7 +5,7 @@ from bson import ObjectId
 def get_ea_db():
     from backend.db import database
     return database
-from backend.llm import ask_openai
+from backend.llm import ask_ai_unified_sync
 import asyncio
 from typing import List, Dict, Any
 from datetime import datetime, timezone
@@ -229,12 +229,12 @@ async def generate_ai_risk_assessment(application: Dict, risk_factors: Dict) -> 
     """
     
     try:
-        response = ask_openai(prompt)
+        response = ask_ai_unified_sync(prompt, task_type="risk_analysis", complexity="high", max_tokens=1000)
         
         # Check if it's a mock response (no API key)
         if response.startswith("[MOCKED RESPONSE"):
             return {
-                "risk_evaluation": "AI assessment requires OpenAI API key configuration",
+                "risk_evaluation": "AI assessment requires API key configuration",
                 "critical_factors": ["API key not configured", "Mock response generated"],
                 "immediate_recommendations": [
                     "Configure OPENAI_API_KEY in .env file",
@@ -313,12 +313,12 @@ async def generate_ai_portfolio_assessment(portfolio_metrics: Dict) -> Dict[str,
     """
     
     try:
-        response = ask_openai(prompt)
+        response = ask_ai_unified_sync(prompt, task_type="portfolio_analysis", complexity="high", max_tokens=1000)
         
         # Check if it's a mock response (no API key)
         if response.startswith("[MOCKED RESPONSE"):
             return {
-                "portfolio_status": "AI assessment requires OpenAI API key configuration",
+                "portfolio_status": "AI assessment requires API key configuration",
                 "concern_areas": ["API key not configured", "Mock response generated"],
                 "improvement_opportunities": [
                     "Configure OPENAI_API_KEY in .env file",
@@ -378,7 +378,7 @@ async def generate_ai_risk_recommendations(risk_data: Dict) -> Dict[str, Any]:
     """
     
     try:
-        response = ask_openai(prompt)
+        response = ask_ai_unified_sync(prompt, task_type="recommendations", complexity="high", max_tokens=1000)
         
         # Check if it's a mock response (no API key)
         if response.startswith("[MOCKED RESPONSE"):

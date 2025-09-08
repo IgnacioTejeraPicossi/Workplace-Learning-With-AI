@@ -149,13 +149,13 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                 top: '12px',
                 right: '12px',
                 padding: '4px 8px',
-                backgroundColor: getPriorityColor(rec.priority),
+                backgroundColor: getPriorityColor(rec.priority || 'medium'),
                 color: 'white',
                 borderRadius: '12px',
                 fontSize: '0.7rem',
                 fontWeight: 'bold'
               }}>
-                {rec.priority.toUpperCase()}
+                {(rec.priority || 'medium').toUpperCase()}
               </div>
 
               {/* Main Content */}
@@ -165,7 +165,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                   color: colors.textPrimary,
                   fontSize: '1.1rem'
                 }}>
-                  {index + 1}. {rec.topic_name}
+                  {index + 1}. {rec.topic_name || rec.topic_label || 'Unknown Topic'}
                 </h4>
                 
                 <p style={{ 
@@ -174,7 +174,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                   fontSize: '0.9rem',
                   lineHeight: '1.4'
                 }}>
-                  {rec.description}
+                  {rec.description || 'No description available'}
                 </p>
 
                 {/* Meta Information */}
@@ -188,7 +188,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       borderRadius: '12px',
                       fontSize: '0.8rem'
                     }}>
-                      {rec.category}
+                      {rec.category || 'General'}
                     </span>
                   </div>
                   
@@ -196,12 +196,12 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                     <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Difficulty:</span>
                     <span style={{ 
                       padding: '2px 8px', 
-                      backgroundColor: getDifficultyColor(rec.learning_difficulty) + '20', 
-                      color: getDifficultyColor(rec.learning_difficulty),
+                      backgroundColor: getDifficultyColor(rec.learning_difficulty || 'intermediate') + '20', 
+                      color: getDifficultyColor(rec.learning_difficulty || 'intermediate'),
                       borderRadius: '12px',
                       fontSize: '0.8rem'
                     }}>
-                      {rec.learning_difficulty}
+                      {rec.learning_difficulty || 'intermediate'}
                     </span>
                   </div>
                   
@@ -215,14 +215,14 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       overflow: 'hidden'
                     }}>
                       <div style={{
-                        width: `${rec.current_mastery * 100}%`,
+                        width: `${(rec.current_mastery || 0) * 100}%`,
                         height: '100%',
                         backgroundColor: colors.primary,
                         transition: 'width 0.3s ease'
                       }} />
                     </div>
                     <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>
-                      {Math.round(rec.current_mastery * 100)}%
+                      {Math.round((rec.current_mastery || 0) * 100)}%
                     </span>
                   </div>
                 </div>
@@ -243,25 +243,25 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Mastery Priority:</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
-                          {formatScore(rec.score_breakdown.mastery_priority)}
+                          {formatScore(rec.score_breakdown?.mastery_priority || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Vector Proximity:</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
-                          {formatScore(rec.score_breakdown.proximity_score)}
+                          {formatScore(rec.score_breakdown?.proximity_score || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Learning Continuity:</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
-                          {formatScore(rec.score_breakdown.continuity_score)}
+                          {formatScore(rec.score_breakdown?.continuity_score || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Cluster Bonus:</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
-                          {formatScore(rec.score_breakdown.cluster_bonus)}
+                          {formatScore(rec.score_breakdown?.cluster_bonus || 0)}
                         </span>
                       </div>
                       <div style={{ 
@@ -273,7 +273,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       }}>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>Final Score:</span>
                         <span style={{ fontSize: '0.8rem', color: colors.primary }}>
-                          {formatScore(rec.recommendation_score)}
+                          {formatScore(rec.recommendation_score || 0)}
                         </span>
                       </div>
                     </div>

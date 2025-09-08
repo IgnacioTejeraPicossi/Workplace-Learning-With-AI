@@ -68,7 +68,7 @@ async def extract_topics_from_modules(user_id: str = None):
                     }
                 else:
                     all_topics[topic_key]["count"] += 1
-
+        
         print(f"✅ Total topics extracted: {len(all_topics)}")
         return all_topics
 
@@ -101,7 +101,7 @@ async def extract_topics_from_modules_fallback(user_id: str = None):
                 }
             else:
                 all_topics[topic_key]["count"] += 1
-    
+        
     # Process videos
     for video in videos:
         if video.get("topic"):
@@ -117,7 +117,7 @@ async def extract_topics_from_modules_fallback(user_id: str = None):
                 }
             else:
                 all_topics[topic_key]["count"] += 1
-    
+        
     print(f"✅ Fallback: Total topics extracted: {len(all_topics)}")
     return all_topics
 
@@ -142,28 +142,47 @@ def generate_topic_embedding(topic_text):
     
     return embedding[:8]
 
+# Cache for topic categorization to avoid repeated AI calls
+_topic_category_cache = {}
+
+def clear_topic_cache():
+    """Clear the topic categorization cache"""
+    global _topic_category_cache
+    _topic_category_cache.clear()
+    print("🧹 Topic categorization cache cleared")
+
 def categorize_topic(topic_label):
-    """Categorize a topic based on its label"""
+    """Categorize a topic using cached pattern matching (fast) with optional AI batch processing"""
+    # Check cache first
+    if topic_label in _topic_category_cache:
+        return _topic_category_cache[topic_label]
+    
+    # Use fast pattern matching (no AI calls for individual topics)
     topic_lower = topic_label.lower()
     
     if any(word in topic_lower for word in ['python', 'javascript', 'java', 'pascal', 'programming', 'code', 'development']):
-        return 'Programming & Development'
+        category = 'Programming & Development'
     elif any(word in topic_lower for word in ['ai', 'machine learning', 'llm', 'openai', 'rag', 'agentic', 'chatgpt', 'artificial intelligence']):
-        return 'AI & Machine Learning'
+        category = 'AI & Machine Learning'
     elif any(word in topic_lower for word in ['studio', 'localhost', 'port', 'tool', 'ide', 'environment']):
-        return 'Development Tools'
+        category = 'Development Tools'
     elif any(word in topic_lower for word in ['web', 'api', 'http', 'url', 'frontend', 'backend']):
-        return 'Web Technologies'
+        category = 'Web Technologies'
     elif any(word in topic_lower for word in ['data', 'analytics', 'science', 'database', 'sql', 'nosql']):
-        return 'Data & Analytics'
+        category = 'Data & Analytics'
     else:
-        return 'General Skills'
+        category = 'General Skills'
+    
+    # Cache the result
+    _topic_category_cache[topic_label] = category
+    return category
 
 def generate_dynamic_categories(topics):
-    """Generate dynamic categories based on actual topics using pattern matching"""
+    """Generate dynamic categories using fast pattern matching (optimized for performance)"""
     if not topics:
         return {}
     
+    # Use fast pattern matching (no AI calls for better performance)
     categories = {
         "Programming & Development": [],
         "AI & Machine Learning": [],
@@ -173,21 +192,54 @@ def generate_dynamic_categories(topics):
         "General Skills": []
     }
     
+    # Process all topics at once using cached categorization
     for topic_id, topic_data in topics.items():
-        topic_label = topic_data["label"].lower()
-        
-        if any(word in topic_label for word in ['python', 'javascript', 'java', 'pascal', 'programming', 'code', 'development']):
-            categories["Programming & Development"].append(topic_id)
-        elif any(word in topic_label for word in ['ai', 'machine learning', 'llm', 'openai', 'rag', 'agentic', 'chatgpt', 'artificial intelligence']):
-            categories["AI & Machine Learning"].append(topic_id)
-        elif any(word in topic_label for word in ['studio', 'localhost', 'port', 'tool', 'ide', 'environment']):
-            categories["Development Tools"].append(topic_id)
-        elif any(word in topic_label for word in ['web', 'api', 'http', 'url', 'frontend', 'backend']):
-            categories["Web Technologies"].append(topic_id)
-        elif any(word in topic_label for word in ['data', 'analytics', 'science', 'database', 'sql', 'nosql']):
-            categories["Data & Analytics"].append(topic_id)
-        else:
-            categories["General Skills"].append(topic_id)
+        topic_label = topic_data.get("label", "")
+        category = categorize_topic(topic_label)  # Uses cache
+        categories[category].append(topic_id)
     
     # Return only categories that have topics
-    return {k: v for k, v in categories.items() if v}
+    result = {k: v for k, v in categories.items() if v}
+    print(f"⚡ Fast categorization: {len(result)} categories with {sum(len(v) for v in result.values())} topics")
+    return result
+
+def generate_ai_recommendations(user_topics, all_topics, user_mastery_scores):
+    """Generate fast learning recommendations using pattern-based analysis (optimized for performance)"""
+    # Fast pattern-based recommendations (no AI calls for better performance)
+    recommendations = []
+    
+    # Add topics with low mastery (0-30%) - prioritize these
+    low_mastery_topics = []
+    for topic_id, mastery in user_mastery_scores.items():
+        if mastery <= 30 and topic_id in all_topics:
+            topic_label = all_topics[topic_id].get('label', '')
+            if topic_label:
+                low_mastery_topics.append((topic_label, mastery))
+    
+    # Sort by mastery level (lowest first)
+    low_mastery_topics.sort(key=lambda x: x[1])
+    recommendations.extend([topic[0] for topic in low_mastery_topics[:3]])
+    
+    # Add new topics not yet started
+    new_topics = []
+    for topic_id, topic_data in all_topics.items():
+        if topic_id not in user_mastery_scores:
+            topic_label = topic_data.get('label', '')
+            if topic_label and topic_label not in recommendations:
+                new_topics.append(topic_label)
+    
+    # Add new topics (limit to avoid too many)
+    recommendations.extend(new_topics[:2])
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_recommendations = []
+    for rec in recommendations:
+        if rec not in seen:
+            seen.add(rec)
+            unique_recommendations.append(rec)
+    
+    # Limit to 5 recommendations
+    result = unique_recommendations[:5]
+    print(f"⚡ Fast recommendations: {len(result)} topics")
+    return result

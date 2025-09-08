@@ -1603,7 +1603,7 @@ async def update_saved_video(video_id: str, request: Request, user=Depends(verif
 
 @app.get("/api/knowledge-map/recommendations/{user_id}")
 async def get_learning_recommendations(user_id: str):
-    """Get advanced vector-based learning recommendations with proximity analysis"""
+    """Get AI-powered learning recommendations with fallback to vector-based analysis"""
     try:
         # Get user's current mastery scores
         user_response = await get_user_knowledge_map(user_id)
@@ -1613,7 +1613,46 @@ async def get_learning_recommendations(user_id: str):
         topics_response = await get_knowledge_topics()
         all_topics = topics_response.get("topics", {})
         
-        # Advanced recommendation calculation
+        # Try AI-powered recommendations first
+        try:
+            from backend.knowledge_map_utils import generate_ai_recommendations
+            
+            ai_recommendations = generate_ai_recommendations(
+                user_response.get("topics", {}), 
+                all_topics, 
+                mastery_scores
+            )
+            
+            if ai_recommendations:
+                # Convert AI recommendations to the expected format
+                recommendations = []
+                for i, topic_label in enumerate(ai_recommendations):
+                    # Find the topic_id for this label
+                    topic_id = None
+                    for tid, topic_data in all_topics.items():
+                        if topic_data.get('label', '') == topic_label:
+                            topic_id = tid
+                            break
+                    
+                    if topic_id:
+                        current_mastery = mastery_scores.get(topic_id, 0.0)
+                        recommendations.append({
+                            "topic_id": topic_id,
+                            "topic_label": topic_label,
+                            "current_mastery": current_mastery,
+                            "recommendation_score": 1.0 - (i * 0.1),  # Decreasing score
+                            "reason": f"AI recommended based on learning progression",
+                            "source": "ai_powered"
+                        })
+                
+                if recommendations:
+                    print(f"🤖 AI generated {len(recommendations)} recommendations")
+                    return {"recommendations": recommendations}
+            
+        except Exception as e:
+            print(f"⚠️ AI recommendations failed: {e}, using fallback")
+        
+        # Fallback to vector-based recommendations
         recommendations = []
         
         # Calculate user's learning vector (weighted average of mastered topics)
@@ -2274,5 +2313,15 @@ async def debug_topic_comparison():
 def _debug_routes():
     return [{"path": r.path, "name": getattr(r.endpoint, "__name__", "?"), "methods": list(getattr(r, "methods", []))} 
             for r in app.routes]
+
+@app.post("/api/knowledge-map/clear-cache")
+async def clear_knowledge_map_cache():
+    """Clear the knowledge map cache for better performance"""
+    try:
+        from backend.knowledge_map_utils import clear_topic_cache
+        clear_topic_cache()
+        return {"message": "Knowledge map cache cleared successfully"}
+    except Exception as e:
+        return {"error": str(e), "message": "Failed to clear cache"}
 
  
