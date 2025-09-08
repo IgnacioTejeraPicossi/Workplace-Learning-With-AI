@@ -31,7 +31,6 @@ import AIStudyBuddy from "./AIStudyBuddy";
 import KnowledgeMap from "./KnowledgeMap";
 import TopBarLanguageMenu from "./components/TopBarLanguageMenu";
 import RepoAnalyzer from "./RepoAnalyzer";
-import RepoAnalyzerCursorAI from "./RepoAnalyzerCursorAI";
 import AgentCursorAI from "./AgentCursorAI";
 import LearningRepo from "./LearningRepo";
 import DocumentsAnalyzer from "./DocumentsAnalyzer";
@@ -432,7 +431,6 @@ function AppContent() {
             {!activeModule && section === "knowledge-map" && <KnowledgeMap />}
             {!activeModule && section === "repo-analyzer" && <RepoAnalyzer />}
             {!activeModule && section === "repository-analyzer" && <RepoAnalyzer />}
-            {!activeModule && section === "repo-analyzer-cursor" && <RepoAnalyzerCursorAI />}
             {!activeModule && section === "agent-cursor-ai" && <AgentCursorAI />}
             {!activeModule && section === "learning-repo" && <LearningRepo />}
             {!activeModule && section === "documents-analyzer" && <DocumentsAnalyzer />}

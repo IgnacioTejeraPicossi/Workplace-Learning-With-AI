@@ -60,7 +60,6 @@
     
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Repo Analyzer",
-      "repoAnalyzerWithAPIs": "Repo Analyzer with APIs",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Learning Repo"
     },

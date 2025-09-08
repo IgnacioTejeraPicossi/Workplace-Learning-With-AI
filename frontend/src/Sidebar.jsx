@@ -78,7 +78,6 @@ const getNavItems = (t) => [
   // Grupo 1.5: Análisis de repositorios (expandible)
   { key: "repository-analyzer", label: t('sidebar.repositoryAnalyzer'), icon: "archive", group: "learning", isExpandable: true, subItems: [
     { key: "repo-analyzer", label: t('sidebar.repositoryAnalyzerSubmenu.repoAnalyzer'), icon: "archive" },
-    { key: "repo-analyzer-cursor", label: t('sidebar.repositoryAnalyzerSubmenu.repoAnalyzerWithAPIs'), icon: "robot" },
     { key: "agent-cursor-ai", label: t('sidebar.repositoryAnalyzerSubmenu.agentCursorAI'), icon: "robot" },
     { key: "learning-repo", label: t('sidebar.repositoryAnalyzerSubmenu.learningRepo'), icon: "graduation-cap" }
   ]},

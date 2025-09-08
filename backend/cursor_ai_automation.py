@@ -17,6 +17,12 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 import git
 
+# Import unified AI system for fallback
+try:
+    from backend.llm import ask_ai_unified_sync
+except ImportError:
+    from llm import ask_ai_unified_sync
+
 router = APIRouter(prefix="/cursor/automation", tags=["Cursor AI Automation"])
 
 # In-memory job storage with progress tracking
@@ -26,6 +32,7 @@ class AutomationRequest(BaseModel):
     repo_url: str
     branch: Optional[str] = "main"
     timeout_seconds: Optional[int] = 300  # 5 minutes default - much faster!
+    user_prompt: Optional[str] = ""  # User prompt for analysis
 
 class AutomationResponse(BaseModel):
     job_id: str
@@ -434,12 +441,17 @@ async def start_automation(req: AutomationRequest, bg: BackgroundTasks):
         # Create automation files
         _create_automation_files(repo_path, req.repo_url, job_id)
         
-        # Launch Cursor AI
-        if not _launch_cursor_ai_automated(repo_path, job_id):
-            raise HTTPException(status_code=500, detail="Failed to launch Cursor AI")
+        # Try to launch Cursor AI first
+        cursor_ai_available = _launch_cursor_ai_automated(repo_path, job_id)
         
-        # Start background monitoring
-        bg.add_task(_monitor_simple_progress, job_id, repo_path, req.timeout_seconds)
+        if cursor_ai_available:
+            # Start background monitoring for Cursor AI
+            bg.add_task(_monitor_simple_progress, job_id, repo_path, req.timeout_seconds)
+        else:
+            # Fallback to unified AI system
+            print("⚠️ Cursor AI not available, using unified AI system fallback...")
+            _update_job_progress(job_id, 10, "Cursor AI not available, using AI fallback...")
+            bg.add_task(_fallback_ai_analysis, job_id, repo_path, req.repo_url, getattr(req, 'user_prompt', ''))
         
         print(f"✅ Automation job {job_id} started successfully")
         
@@ -525,4 +537,87 @@ async def cancel_automation_job(job_id: str):
     
     job["status"] = "cancelled"
     return {"status": "cancelled", "message": "Job cancelled successfully"}
+
+async def _fallback_ai_analysis(job_id: str, repo_path: Path, repo_url: str, user_prompt: str = ""):
+    """
+    Fallback analysis using unified AI system when Cursor AI is not available
+    """
+    try:
+        print(f"🔄 Fallback: Using unified AI system for analysis...")
+        _update_job_progress(job_id, 20, "Using unified AI system (fallback)...")
+        
+        # Analyze repository structure
+        files = list(repo_path.rglob('*'))
+        file_types = {}
+        total_size = 0
+        
+        for file_path in files:
+            if file_path.is_file():
+                suffix = file_path.suffix.lower()
+                file_types[suffix] = file_types.get(suffix, 0) + 1
+                total_size += file_path.stat().st_size
+        
+        _update_job_progress(job_id, 40, "Analyzing repository structure...")
+        
+        # Create comprehensive analysis prompt
+        analysis_prompt = f"""
+        Analyze this repository comprehensively and generate a professional README.md:
+        
+        Repository: {repo_url}
+        Path: {repo_path}
+        Total files: {len(files)}
+        File types: {dict(list(file_types.items())[:10])}  # Top 10 file types
+        Total size: {total_size} bytes
+        
+        User prompt: {user_prompt if user_prompt else "Generate a comprehensive README.md"}
+        
+        Please provide a complete analysis including:
+        1. Project overview and description
+        2. Features and capabilities
+        3. Installation and setup instructions
+        4. Usage examples
+        5. Architecture overview
+        6. Contributing guidelines
+        7. License information
+        
+        Format as a professional README.md with proper markdown formatting.
+        """
+        
+        _update_job_progress(job_id, 60, "Generating README with AI...")
+        
+        # Use unified AI system
+        response = ask_ai_unified_sync(
+            prompt=analysis_prompt,
+            task_type="repository_analysis",
+            complexity="high",
+            max_tokens=3000
+        )
+        
+        _update_job_progress(job_id, 80, "Processing AI response...")
+        
+        # Save README.md to repository
+        readme_path = repo_path / "README.md"
+        readme_path.write_text(response, encoding='utf-8')
+        
+        _update_job_progress(job_id, 100, "README.md generated successfully with AI fallback!", "completed")
+        
+        # Update job with results
+        JOBS[job_id].update({
+            "status": "completed",
+            "completion_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+            "readme_path": str(readme_path),
+            "readme_content": response,
+            "analysis_method": "unified_ai_fallback"
+        })
+        
+        # Save to Learning Repository
+        await _save_to_learning_repository(job_id, response, repo_path)
+        
+        print(f"✅ Fallback analysis completed successfully!")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Fallback analysis failed: {e}")
+        _update_job_progress(job_id, 0, f"Fallback analysis failed: {e}", "failed")
+        return False
 

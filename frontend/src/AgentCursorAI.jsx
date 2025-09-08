@@ -80,7 +80,7 @@ const AgentCursorAI = () => {
           repo_url: repoUrl,
           branch: branch,
           timeout_seconds: 900,
-          user_prompt: userPrompt
+          user_prompt: userPrompt || "Generate a comprehensive README.md for this repository"
         }),
       });
 
