@@ -184,46 +184,28 @@ def summarize_text(text: str, length: str = "medium") -> str:
             "=== DOCUMENT END ==="
         )
         
-        # Use the unified AI system from llm.py
+        # Use the unified AI system from llm.py (ItemAI → OpenRouter → OpenAI)
         try:
             # Try different import paths for the unified system
             try:
-                from llm import ask_openai
+                from llm import ask_ai_unified_sync
             except ImportError:
                 try:
-                    from backend.llm import ask_openai
+                    from backend.llm import ask_ai_unified_sync
                 except ImportError:
-                    from ..llm import ask_openai
+                    from ..llm import ask_ai_unified_sync
             
             # The unified system will try ItemAI → OpenRouter → OpenAI automatically
-            response = ask_openai(prompt, max_tokens=800, temperature=0.2)
-            return response.strip()
+            response = ask_ai_unified_sync(prompt, task_type="document_analysis", complexity="medium", max_tokens=800)
+            if response and not response.startswith("[MOCKED RESPONSE"):
+                print("✅ Document Analyzer: Unified AI system successful")
+                return response.strip()
             
         except Exception as e:
-            print(f"Unified AI system failed: {e}")
-            
-            # Fallback to direct OpenAI if unified system fails
-            try:
-                import openai
-                import os
-                
-                openai_key = os.getenv("OPENAI_API_KEY")
-                if openai_key and openai_key.strip():
-                    openai.api_key = openai_key
-                    
-                    response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo",
-                        messages=[{"role": "user", "content": prompt}],
-                        max_tokens=800,
-                        temperature=0.2
-                    )
-                    return response.choices[0].message.content.strip()
-                else:
-                    print("No OpenAI API key found in environment variables")
-            except Exception as openai_error:
-                print(f"Direct OpenAI fallback also failed: {openai_error}")
+            print(f"❌ Document Analyzer: Unified AI system failed: {e}")
         
         # Final fallback to mock response
+        print("❌ Document Analyzer: All AI providers failed, using mock response")
         return f"[MOCKED RESPONSE] This would be the AI's answer to: {prompt[:100]}..."
         
     except Exception as e:

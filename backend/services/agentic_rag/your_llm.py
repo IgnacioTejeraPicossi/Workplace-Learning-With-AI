@@ -71,7 +71,7 @@ class LLMClient:
                 if openai_key and openai_key.strip():
                     openai.api_key = openai_key
                     
-                    response = openai.ChatCompletion.create(
+                    response = openai.chat.completions.create(
                         model="gpt-3.5-turbo",
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=800,

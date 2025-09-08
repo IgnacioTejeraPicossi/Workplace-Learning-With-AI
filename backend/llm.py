@@ -26,6 +26,119 @@ OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/ap
 # API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
+def get_api_config_from_headers(request_headers=None):
+    """
+    Get API configuration from request headers or use defaults
+    This allows the frontend to pass API configuration via headers
+    """
+    if request_headers:
+        # Try to get configuration from headers
+        api_provider = request_headers.get('x-api-provider', API_PROVIDER)
+        itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
+        openai_key = request_headers.get('x-openai-key', OPENAI_API_KEY)
+        openrouter_key = request_headers.get('x-openrouter-key', OPENROUTER_API_KEY)
+        
+        return {
+            'provider': api_provider,
+            'itemai_url': itemai_url,
+            'openai_key': openai_key,
+            'openrouter_key': openrouter_key
+        }
+    
+    # Fallback to environment variables
+    return {
+        'provider': API_PROVIDER,
+        'itemai_url': 'http://localhost:1234',
+        'openai_key': OPENAI_API_KEY,
+        'openrouter_key': OPENROUTER_API_KEY
+    }
+
+def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
+    """
+    Synchronous version of unified AI system
+    ItemAI (local) → OpenRouter → OpenAI with automatic fallback
+    """
+    config = get_api_config_from_headers(request_headers)
+    
+    # Try ItemAI first if configured
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
+        try:
+            print("🔄 Trying ItemAI (LM Studio)...")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, config['itemai_url'])
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ ItemAI (LM Studio) successful")
+                return result
+        except Exception as e:
+            print(f"❌ ItemAI failed: {e}")
+    
+    # Fallback to OpenRouter if configured
+    if config['openrouter_key']:
+        try:
+            print("🔄 Trying OpenRouter...")
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenRouter successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenRouter failed: {e}")
+    
+    # Fallback to OpenAI if configured
+    if config['openai_key']:
+        try:
+            print("🔄 Trying OpenAI...")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenAI successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenAI failed: {e}")
+    
+    print("❌ All AI providers failed")
+    return "[MOCKED RESPONSE] All AI providers unavailable"
+
+async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
+    """
+    Unified AI system that reads configuration from API Config and tries all providers
+    ItemAI (local) → OpenRouter → OpenAI with automatic fallback
+    """
+    config = get_api_config_from_headers(request_headers)
+    
+    # Try ItemAI first if configured
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
+        try:
+            print("🔄 Trying ItemAI (LM Studio)...")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, config['itemai_url'])
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ ItemAI (LM Studio) successful")
+                return result
+        except Exception as e:
+            print(f"❌ ItemAI failed: {e}")
+    
+    # Fallback to OpenRouter if configured
+    if config['openrouter_key']:
+        try:
+            print("🔄 Trying OpenRouter...")
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenRouter successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenRouter failed: {e}")
+    
+    # Fallback to OpenAI if configured
+    if config['openai_key']:
+        try:
+            print("🔄 Trying OpenAI...")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenAI successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenAI failed: {e}")
+    
+    print("❌ All AI providers failed")
+    return "[MOCKED RESPONSE] All AI providers unavailable"
+
 def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
     """
     Enhanced OpenAI function with GPT-5 model selection and optimization.
@@ -82,13 +195,13 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         openai.api_key = OPENAI_API_KEY
         
         if messages:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=model_to_use,
                 messages=messages,
                 **params
             )
         else:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 **params
@@ -198,14 +311,14 @@ Would you like to know more about any specific feature?"""
         openai.api_key = OPENAI_API_KEY
         
         if messages:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=model_to_use,
                 messages=messages,
                 stream=True,
                 **params
             )
         else:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=model_to_use,
                 messages=[{"role": "user", "content": prompt}],
                 stream=True,
@@ -247,7 +360,7 @@ def web_search_query(query):
     model = get_optimal_model("web_search", "medium")
     params = get_gpt5_parameters(model, "web_search")
     
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": query}],
         tools=[{"type": "web_search"}],

@@ -28,7 +28,7 @@ async def test_api_connection(request: APITestRequest):
             
             # Test OpenAI
             openai.api_key = request.openaiKey
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenAI API is working correctly.'"}],
                 max_tokens=50
