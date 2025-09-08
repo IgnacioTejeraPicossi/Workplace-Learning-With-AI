@@ -508,9 +508,8 @@ const RunTest = () => {
             case '/api/flows':
               testData = {
                 name: 'Test Flow',
-                description: 'A test flow for API testing',
-                webhook_url: 'https://example.com/webhook',
-                status: 'active'
+                n8n_webhook_url: 'http://localhost:5678/webhook/test-flow',
+                description: 'Test flow for API testing'
               };
               break;
             case '/api/runs/start':
@@ -526,13 +525,6 @@ const RunTest = () => {
                 status: 'completed',
                 result: 'Test execution result',
                 duration: '1200ms'
-              };
-              break;
-            case '/api/flows':
-              testData = {
-                name: 'Test Flow',
-                n8n_webhook_url: 'http://localhost:5678/webhook/test-flow',
-                description: 'Test flow for API testing'
               };
               break;
             case '/api/settings':

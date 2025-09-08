@@ -629,4 +629,65 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
                 
     except Exception as e:
         print(f"ItemAI API error: {e}")
-        raise e 
+        raise e
+
+# --- Unified AI System for AgentOps Studio ---
+async def ask_openai_unified(messages, model=None, temperature=None, max_tokens=None, **kwargs):
+    """
+    Unified AI system for AgentOps Studio with automatic fallback:
+    ItemAI (local) → OpenRouter → OpenAI
+    
+    Args:
+        messages: List of message dictionaries
+        model: Model name (optional)
+        temperature: Temperature for AI responses (optional)
+        max_tokens: Maximum tokens (optional)
+        **kwargs: Additional parameters
+    """
+    try:
+        # Try ItemAI (LM Studio) first
+        print("🔄 Trying ItemAI (LM Studio)...")
+        response = ask_itemai(
+            messages=messages,
+            max_tokens=max_tokens or 512,
+            task_type="general",
+            complexity="medium"
+        )
+        if response and not response.startswith("[MOCKED RESPONSE"):
+            print("✅ ItemAI (LM Studio) successful")
+            return response
+    except Exception as e:
+        print(f"❌ ItemAI failed: {e}")
+    
+    # Fallback to OpenRouter
+    try:
+        print("🔄 Trying OpenRouter...")
+        response = ask_openrouter(
+            messages=messages,
+            max_tokens=max_tokens or 512,
+            task_type="general",
+            complexity="medium"
+        )
+        if response and not response.startswith("[MOCKED RESPONSE"):
+            print("✅ OpenRouter successful")
+            return response
+    except Exception as e:
+        print(f"❌ OpenRouter failed: {e}")
+    
+    # Fallback to OpenAI
+    try:
+        print("🔄 Trying OpenAI...")
+        response = ask_openai(
+            messages=messages,
+            max_tokens=max_tokens or 512,
+            task_type="general",
+            complexity="medium"
+        )
+        if response and not response.startswith("[MOCKED RESPONSE"):
+            print("✅ OpenAI successful")
+            return response
+    except Exception as e:
+        print(f"❌ OpenAI failed: {e}")
+    
+    print("❌ All AI providers failed")
+    return "[MOCKED RESPONSE] All AI providers unavailable" 

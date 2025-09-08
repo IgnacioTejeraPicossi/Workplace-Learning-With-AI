@@ -24,19 +24,21 @@ async def run_prompt(payload: Dict[str, Any]):
         
         # Use unified AI system (ItemAI → OpenRouter → OpenAI)
         try:
-            from backend.llm import ask_openai
+            from backend.llm import ask_openai_unified
         except ImportError:
-            from llm import ask_openai
+            from llm import ask_openai_unified
         
-        # Prepare the prompt for the unified system
-        full_prompt = f"System: {prompt_run.system}\n\nUser: {prompt_run.user}"
+        # Prepare messages for the unified system
+        messages = [
+            {"role": "system", "content": prompt_run.system},
+            {"role": "user", "content": prompt_run.user}
+        ]
         
         # Call unified AI system
-        response = ask_openai(
-            prompt=full_prompt,
+        response = await ask_openai_unified(
+            messages=messages,
             max_tokens=prompt_run.max_tokens,
-            task_type="general",
-            complexity="medium"
+            temperature=prompt_run.temperature
         )
         
         # Check if response is valid (not mocked)
