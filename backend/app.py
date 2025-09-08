@@ -310,12 +310,12 @@ def root():
 @app.get("/concepts")
 async def generate_concepts(user=Depends(verify_token)):
     """Generate AI-based workplace learning concepts."""
-    result = ask_openai(CONCEPT_PROMPT)
+    result = ask_ai_unified_sync(CONCEPT_PROMPT, task_type="concepts", complexity="medium", max_tokens=800)
     return {"concepts": result}
 
 def generate_micro_lesson(topic: str) -> str:
     prompt = f"Write a concise, practical micro-lesson for the following workplace topic: {topic}"
-    return ask_openai(prompt)
+    return ask_ai_unified_sync(prompt, task_type="micro_lesson", complexity="medium", max_tokens=600)
 
 @app.post("/micro-lesson")
 async def micro_lesson(request: Request, user=Depends(verify_token)):
@@ -343,7 +343,7 @@ async def generate_simulation(user=Depends(verify_token)):
 @app.post("/recommendation")
 async def generate_recommendation(request: RecommendationRequest, user=Depends(verify_token)):
     prompt = RECOMMENDATION_PROMPT.replace("{skill_gap}", request.skill_gap)
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="recommendation", complexity="medium", max_tokens=600)
     return {"recommendation": result}
 
 @app.post("/simulation-step")
@@ -425,7 +425,7 @@ async def career_coach(request: Request, user=Depends(verify_token)):
         messages = [{"role": "system", "content": PROMPTS["career_coach"]}]
     else:
         messages = history
-    result = ask_openai(messages=messages)
+    result = ask_ai_unified_sync(messages=messages, task_type="career_coach", complexity="high", max_tokens=800)
     
     # Optionally save the session for the user
     try:
@@ -448,7 +448,7 @@ async def skills_forecast(request: Request, user=Depends(verify_token)):
     keywords = data.get("keywords", "")
     context = f"User history:\n{history}\n\nTranscript keywords:\n{keywords}\n\n"
     prompt = PROMPTS["skills_forecast"] + "\n" + context
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="skills_forecast", complexity="high", max_tokens=800)
     
     # Optionally save the forecast for the user
     try:
@@ -842,7 +842,7 @@ async def recommend_certifications(request: CertificationProfile, user=Depends(v
         experience_level=request.experience_level
     )
     
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="certification_recommendation", complexity="medium", max_tokens=600)
     
     # Save recommendation for user
     try:
@@ -868,7 +868,7 @@ async def generate_study_plan(request: CertificationStudyPlan, user=Depends(veri
         target_date=request.target_date
     )
     
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="certification_study_plan", complexity="high", max_tokens=1000)
     
     # Save study plan for user
     try:
@@ -891,7 +891,7 @@ async def certification_simulation(request: CertificationSimulation, user=Depend
         certification_name=request.certification_name
     )
     
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="certification_simulation", complexity="medium", max_tokens=800)
     
     # Save simulation for user
     try:
@@ -965,7 +965,7 @@ async def video_quiz(request: Request):
             return {"error": "Summary is required"}
         
         prompt = video_quiz_prompt.format(summary=summary)
-        result = ask_openai(prompt)
+        result = ask_ai_unified_sync(prompt, task_type="video_quiz", complexity="medium", max_tokens=600)
         
         try:
             questions = json.loads(result)
@@ -984,7 +984,7 @@ async def video_summary(request: Request):
     data = await request.json()
     transcript = data.get("transcript", "")
     prompt = video_summary_prompt.format(transcript=transcript)
-    summary = ask_openai(prompt)
+    summary = ask_ai_unified_sync(prompt, task_type="video_summary", complexity="medium", max_tokens=500)
     return {"summary": summary} 
 
 class IntentInput(BaseModel):
