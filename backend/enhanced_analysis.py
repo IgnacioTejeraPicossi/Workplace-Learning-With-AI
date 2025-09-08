@@ -3,7 +3,7 @@ import json
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 from datetime import datetime
-from backend.llm import ask_openai
+from backend.llm import ask_ai_unified_sync
 from backend.env_config import EnvConfig
 
 class EnhancedAnalyzer:
@@ -23,20 +23,27 @@ class EnhancedAnalyzer:
         try:
             print("Starting enhanced repository analysis...")
             
-            # Step 1: Comprehensive structure analysis
-            structure_analysis = self._analyze_project_structure(repo_path)
+            # Step 1: Basic structure analysis (fast, no AI)
+            structure_analysis = self._basic_structure_analysis(repo_path)
             
-            # Step 2: Generate professional documentation
-            documentation = self._generate_comprehensive_documentation(repo_path, repo_url, structure_analysis)
-            
-            # Step 3: Create learning module
-            learning_module = self._create_learning_module(repo_path, structure_analysis)
-            
-            # Step 4: Generate advanced insights
-            insights = self._generate_advanced_insights(repo_path, structure_analysis)
-            
-            # Step 5: Calculate quality score
-            quality_score = self._calculate_enhanced_quality_score(structure_analysis, documentation, learning_module, insights)
+            # Step 2: Single AI call for comprehensive analysis
+            try:
+                print("🔄 Making single AI call for comprehensive analysis...")
+                comprehensive_analysis = self._single_ai_analysis(repo_path, repo_url, structure_analysis)
+                
+                # Extract components from single response
+                documentation = comprehensive_analysis.get('documentation', {})
+                learning_module = comprehensive_analysis.get('learning_module', {})
+                insights = comprehensive_analysis.get('insights', {})
+                quality_score = comprehensive_analysis.get('quality_score', 0.8)
+                
+            except Exception as e:
+                print(f"❌ AI analysis failed: {e}")
+                # Fallback to basic analysis
+                documentation = {"overview": "Analysis failed, using basic structure"}
+                learning_module = {"title": "Basic Learning Module", "content": "Analysis incomplete"}
+                insights = {"summary": "Basic analysis only"}
+                quality_score = 0.5
             
             return {
                 "repo_name": Path(repo_path).name,
@@ -65,7 +72,7 @@ class EnhancedAnalyzer:
         
         try:
             # Use GPT-5 for enhanced structure analysis
-            response = ask_openai(
+            response = ask_ai_unified_sync(
                 prompt=prompt,
                 task_type="repository_analysis",
                 complexity="high",
@@ -112,7 +119,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_learning_module(response)
         except Exception as e:
             print(f"Error generating learning module: {e}")
@@ -162,7 +169,7 @@ class EnhancedAnalyzer:
         
         try:
             # Use GPT-5 for professional README generation
-            return ask_openai(
+            return ask_ai_unified_sync(
                 prompt=prompt,
                 task_type="documentation",
                 complexity="high",
@@ -183,7 +190,7 @@ class EnhancedAnalyzer:
         
         try:
             # Use GPT-5 for API documentation generation
-            return ask_openai(
+            return ask_ai_unified_sync(
                 prompt=prompt,
                 task_type="documentation",
                 complexity="medium",
@@ -203,7 +210,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            return ask_ai_unified_sync(prompt, task_type="documentation", complexity="medium", max_tokens=800)
         except Exception as e:
             print(f"Error generating setup guide: {e}")
             return "Setup guide could not be generated."
@@ -218,7 +225,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            return ask_ai_unified_sync(prompt, task_type="documentation", complexity="medium", max_tokens=800)
         except Exception as e:
             print(f"Error generating contributing guide: {e}")
             return "Contributing guide could not be generated."
@@ -233,7 +240,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            return ask_ai_unified_sync(prompt, task_type="documentation", complexity="medium", max_tokens=800)
         except Exception as e:
             print(f"Error generating deployment guide: {e}")
             return "Deployment guide could not be generated."
@@ -248,7 +255,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            return ask_openai(prompt)
+            return ask_ai_unified_sync(prompt, task_type="documentation", complexity="medium", max_tokens=800)
         except Exception as e:
             print(f"Error generating architecture docs: {e}")
             return "Architecture documentation could not be generated."
@@ -263,7 +270,7 @@ class EnhancedAnalyzer:
         
         try:
             # Use GPT-5 for technology stack analysis
-            response = ask_openai(
+            response = ask_ai_unified_sync(
                 prompt=prompt,
                 task_type="repository_analysis",
                 complexity="medium",
@@ -283,7 +290,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_architecture_patterns(response)
         except Exception as e:
             print(f"Error identifying architecture patterns: {e}")
@@ -298,7 +305,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_code_quality(response)
         except Exception as e:
             print(f"Error assessing code quality: {e}")
@@ -313,7 +320,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_security_assessment(response)
         except Exception as e:
             print(f"Error in security assessment: {e}")
@@ -328,7 +335,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_performance_analysis(response)
         except Exception as e:
             print(f"Error in performance analysis: {e}")
@@ -343,7 +350,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_best_practices(response)
         except Exception as e:
             print(f"Error evaluating best practices: {e}")
@@ -358,7 +365,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_improvement_recommendations(response)
         except Exception as e:
             print(f"Error generating improvement recommendations: {e}")
@@ -373,7 +380,7 @@ class EnhancedAnalyzer:
         )
         
         try:
-            response = ask_openai(prompt)
+            response = ask_ai_unified_sync(prompt, task_type="learning_module", complexity="medium", max_tokens=1000)
             return self._parse_complexity_assessment(response)
         except Exception as e:
             print(f"Error assessing complexity: {e}")
@@ -855,4 +862,65 @@ Evaluate:
     
     def _fallback_readme(self, repo_path: str, repo_url: str) -> str:
         """Fallback README"""
-        return f"# {Path(repo_path).name}\n\nBasic README for {repo_url}" 
+        return f"# {Path(repo_path).name}\n\nBasic README for {repo_url}"
+    
+    def _basic_structure_analysis(self, repo_path: str) -> Dict[str, Any]:
+        """Fast structure analysis without AI calls"""
+        try:
+            files = list(Path(repo_path).rglob('*'))
+            file_types = {}
+            total_size = 0
+            
+            for file_path in files:
+                if file_path.is_file():
+                    suffix = file_path.suffix.lower()
+                    file_types[suffix] = file_types.get(suffix, 0) + 1
+                    total_size += file_path.stat().st_size
+            
+            return {
+                "total_files": len(files),
+                "file_types": file_types,
+                "total_size": total_size,
+                "structure": "Basic analysis completed",
+                "languages": list(set([suffix[1:] for suffix in file_types.keys() if suffix])),
+                "overview": f"Repository with {len(files)} files, {len(file_types)} file types"
+            }
+        except Exception as e:
+            print(f"Error in basic structure analysis: {e}")
+            return {"overview": "Structure analysis failed", "total_files": 0}
+    
+    def _single_ai_analysis(self, repo_path: str, repo_url: str, structure_analysis: Dict) -> Dict[str, Any]:
+        """Single AI call for comprehensive analysis"""
+        prompt = f"""
+        Analyze this repository comprehensively:
+        
+        Repository: {repo_url}
+        Path: {repo_path}
+        Structure: {json.dumps(structure_analysis, indent=2)}
+        
+        Provide a complete analysis including:
+        1. Documentation overview
+        2. Learning module structure
+        3. Key insights
+        4. Quality score (0-1)
+        
+        Return as JSON with keys: documentation, learning_module, insights, quality_score
+        """
+        
+        try:
+            response = ask_ai_unified_sync(prompt, task_type="repository_analysis", complexity="high", max_tokens=2000)
+            
+            # Try to parse JSON response
+            try:
+                return json.loads(response)
+            except:
+                # Fallback parsing
+                return {
+                    "documentation": {"overview": response[:500]},
+                    "learning_module": {"title": "AI Analysis", "content": response},
+                    "insights": {"summary": response[:200]},
+                    "quality_score": 0.7
+                }
+        except Exception as e:
+            print(f"Error in single AI analysis: {e}")
+            raise e 

@@ -64,10 +64,12 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, config['itemai_url'])
-            if result and not result.startswith("[MOCKED RESPONSE"):
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
+            else:
+                print("❌ ItemAI returned empty or mocked response")
         except Exception as e:
             print(f"❌ ItemAI failed: {e}")
     
@@ -107,10 +109,12 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, config['itemai_url'])
-            if result and not result.startswith("[MOCKED RESPONSE"):
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
+            else:
+                print("❌ ItemAI returned empty or mocked response")
         except Exception as e:
             print(f"❌ ItemAI failed: {e}")
     
@@ -726,7 +730,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             }
         
         # Make request to local LM Studio
-        with httpx.Client(timeout=30.0) as client:
+        with httpx.Client(timeout=5.0) as client:
             response = client.post(
                 f"{local_url}/v1/chat/completions",
                 json=payload,
@@ -742,7 +746,8 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
                 
     except Exception as e:
         print(f"ItemAI API error: {e}")
-        raise e
+        # Don't raise, let the fallback system handle it
+        return None
 
 # --- Unified AI System for AgentOps Studio ---
 async def ask_openai_unified(messages, model=None, temperature=None, max_tokens=None, **kwargs):
