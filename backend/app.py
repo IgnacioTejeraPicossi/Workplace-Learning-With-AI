@@ -31,7 +31,7 @@ from typing import List, Optional, Dict, Any
 # Fix imports to work from both root and backend directories
 try:
     from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-    from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+    from backend.llm import ask_openai, ask_ai_unified_sync, web_search_query, classify_intent, generate_scaffold
     from backend.repo_analysis import router as repo_router
     from backend.documentation_generator import router as doc_router
     from backend.cursor_readme_routes import router as cursor_readme_router
@@ -41,7 +41,7 @@ try:
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-    from llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+    from llm import ask_openai, ask_ai_unified_sync, web_search_query, classify_intent, generate_scaffold
     from repo_analysis import router as repo_router
     from documentation_generator import router as doc_router
     from cursor_readme_routes import router as cursor_readme_router
@@ -337,7 +337,7 @@ async def micro_lesson(request: Request, user=Depends(verify_token)):
 @app.get("/simulation")
 async def generate_simulation(user=Depends(verify_token)):
     """Generate a customer conversation simulation."""
-    result = ask_openai(SIMULATION_PROMPT)
+    result = ask_ai_unified_sync(SIMULATION_PROMPT, task_type="simulation", complexity="medium", max_tokens=1000)
     return {"simulation": result}
 
 @app.post("/recommendation")
@@ -363,7 +363,7 @@ async def simulation_step(request: SimulationRequest, user=Depends(verify_token)
         f"Employee's next response: {request.user_input}\n"
         "Continue the scenario."
     )
-    result = ask_openai(prompt)
+    result = ask_ai_unified_sync(prompt, task_type="simulation", complexity="medium", max_tokens=1000)
     print("LLM raw response:", result)
     # Try to parse the LLM's response as JSON
     import json
