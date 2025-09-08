@@ -134,7 +134,7 @@ class CursorAIAnalyzer:
         """
         Enhanced structure analysis using OpenAI with Cursor AI-like prompts
         """
-        from backend.llm import ask_openai
+        from backend.llm import ask_ai_unified_sync
         
         # Create a comprehensive analysis prompt
         analysis_prompt = f"""
@@ -189,7 +189,7 @@ class CursorAIAnalyzer:
         
         try:
             # Use GPT-5 for enhanced analysis with Cursor AI-like quality
-            response = ask_openai(
+            response = ask_ai_unified_sync(
                 prompt=analysis_prompt,
                 task_type="repository_analysis",
                 complexity="high",
@@ -204,7 +204,7 @@ class CursorAIAnalyzer:
         """
         Generate professional README.md content
         """
-        from backend.llm import ask_openai
+        from backend.llm import ask_ai_unified_sync
         
         readme_prompt = f"""
         You are Cursor AI, an expert technical writer. Create a professional README.md for the repository at {repo_path}.
@@ -263,7 +263,7 @@ class CursorAIAnalyzer:
         
         try:
             # Use GPT-5 for professional README generation
-            return ask_openai(
+            return ask_ai_unified_sync(
                 prompt=readme_prompt,
                 task_type="documentation",
                 complexity="high",

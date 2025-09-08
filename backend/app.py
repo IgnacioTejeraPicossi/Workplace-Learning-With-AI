@@ -750,7 +750,7 @@ async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, u
     4. Collaboration insights
     """
     
-    analysis_result = ask_openai(analysis_prompt)
+    analysis_result = ask_ai_unified_sync(analysis_prompt, task_type="team_analytics", complexity="high", max_tokens=1000)
     
     # Save analytics
     analytics_doc = {
