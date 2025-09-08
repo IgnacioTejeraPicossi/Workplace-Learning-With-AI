@@ -36,6 +36,10 @@ async def list_flows():
         items.append(_clean(doc))
     return {"items": items}
 
+@router.get("/_ping")
+def flows_ping():
+    return {"ok": True, "module": "flows"}
+
 @router.get("/{flow_id}")
 async def get_flow(flow_id: str):
     """Get flow by ID"""
@@ -59,7 +63,3 @@ async def delete_flow(flow_id: str):
     """Delete flow"""
     result = await database[COLL].delete_one({"_id": _oid(flow_id)})
     return {"deleted": result.deleted_count == 1}
-
-@router.get("/_ping")
-def flows_ping():
-    return {"ok": True, "module": "flows"}

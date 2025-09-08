@@ -152,7 +152,7 @@ export default function Playbook() {
       depth: task.inputs?.depth || 1,
       model,
       prompt_override: prompt || null,
-      lm_base: process.env.REACT_APP_LMSTUDIO_BASE || "http://localhost:1234/v1/chat/completions",
+      lm_base: "unified_ai_system", // Uses ItemAI → OpenRouter → OpenAI automatically
       callback_url: `${process.env.REACT_APP_API_BASE_URL}/api/runs/callback/${selectedFlowId}`,
 
       // NEW: destinations (n8n checks each flag)

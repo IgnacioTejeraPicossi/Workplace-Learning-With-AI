@@ -59,3 +59,7 @@ async def delete_playbook(playbook_id: str):
     """Delete playbook"""
     result = await database[COLL].delete_one({"_id": _oid(playbook_id)})
     return {"deleted": result.deleted_count == 1}
+
+@router.get("/_ping")
+def playbooks_ping():
+    return {"ok": True, "module": "playbooks"}

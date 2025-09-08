@@ -92,7 +92,6 @@ class StudioSettings(BaseModel):
 
     # Optional UX / infra hints
     default_flow_id: Optional[str] = None             # Flow to preselect in dropdown
-    lmstudio_base: Optional[str] = None               # e.g., http://localhost:1234/v1
 
     # Flags
     destinations_enabled_by_default: Optional[bool] = False

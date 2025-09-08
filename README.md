@@ -692,6 +692,20 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
    # Ensure all dependencies are installed in .venv
    ```
 
+5. **AI responses show "[MOCKED RESPONSE]"**
+   ```bash
+   # Problem: No AI providers configured
+   # Solution: Configure at least one AI provider in "API Config" module
+   # Options: ItemAI (local), OpenRouter (cloud), or OpenAI (cloud)
+   ```
+
+6. **"Unified AI system error" in AgentOps Studio**
+   ```bash
+   # Problem: AI system fallback failed
+   # Solution: Check API keys in "API Config" module
+   # The system tries: ItemAI → OpenRouter → OpenAI automatically
+   ```
+
 ### 🚀 Start Commands
 
 **Backend (FastAPI)**
@@ -742,6 +756,32 @@ pip install -r backend/requirements.txt
 pip install "pydantic[email]"  # For AgentOps Studio
 ```
 
+**🤖 AI System Requirements**
+
+The application uses a **unified AI system** with automatic fallback, so you have multiple options:
+
+**Option 1: Local AI (Recommended for development)**
+- **ItemAI API**: Uses LM Studio running locally on `http://localhost:1234`
+- **Cost**: 100% FREE
+- **Privacy**: 100% local, no data leaves your computer
+- **Setup**: Install LM Studio and load a model
+
+**Option 2: Cloud AI (No local setup required)**
+- **OpenRouter API**: Cost-effective cloud AI models
+- **OpenAI API**: Premium cloud AI models
+- **Setup**: Configure API keys in "API Config" module
+
+**Option 3: Hybrid (Best of both worlds)**
+- **Automatic Fallback**: ItemAI → OpenRouter → OpenAI
+- **Maximum Reliability**: System never fails due to AI unavailability
+- **Cost Optimization**: Uses the cheapest available option
+
+**⚠️ Important Notes:**
+- **LM Studio is NOT required** - the app works with cloud AI only
+- **n8n is NOT required** - AgentOps Studio works without automation workflows
+- **Docker is NOT required** - only needed for n8n integration
+- **The app is fully functional** with just cloud AI providers
+
 **Web Search Backend (Node.js)**
 ```bash
 cd websearch-backend
@@ -760,7 +800,7 @@ npm run test:comprehensive
 
 ### Backend Services
 - **FastAPI**: High-performance Python web framework
-- **AI Integration**: Multi-provider AI system with ItemAI API (local), OpenAI GPT-5, and OpenRouter
+- **AI Integration**: Unified AI system with automatic fallback (ItemAI API → OpenRouter → OpenAI)
 - **MongoDB**: Flexible document storage for user-specific data
 - **Firebase Auth**: Secure Google Sign-In authentication
 - **Node.js Express**: Web search backend for real-time information
@@ -776,7 +816,7 @@ npm run test:comprehensive
 
 ### Key Features
 - **AI-Powered Learning**: Personalized content generation and recommendations
-- **Multi-Provider AI**: Choose between local AI (ItemAI), cloud AI (OpenAI), or cost-effective alternatives (OpenRouter)
+- **Unified AI System**: Automatic fallback between local AI (ItemAI), cost-effective cloud AI (OpenRouter), and premium AI (OpenAI)
 - **Intelligent Fallback**: Automatic fallback system for maximum reliability and cost optimization
 - **Real-time Streaming**: ChatGPT-like streaming responses
 - **User Authentication**: Secure Firebase-based user management
@@ -2981,7 +3021,7 @@ The **AgentOps Studio** is a comprehensive, unified platform that combines AI-po
 - **Pipeline Execution**: One-click Plan → Safety → Sim → Judge workflow
 
 **Prompt Lab - AI Model Integration**
-- **LM Studio Integration**: Local AI model execution and testing
+- **Unified AI System**: Automatic fallback between ItemAI (local), OpenRouter, and OpenAI
 - **Prompt Engineering**: Advanced prompt design and optimization
 - **Safety Policies**: Content filtering and domain restrictions
 - **Performance Monitoring**: Latency tracking and quality scoring
@@ -3007,7 +3047,7 @@ The **AgentOps Studio** is a comprehensive, unified platform that combines AI-po
 **Settings - Global Configuration**
 - **Destination Defaults**: Configure default output destinations (Google Sheets, Slack, Email)
 - **Flow Presets**: Default flow selection and configuration
-- **LM Studio Settings**: Local AI model configuration
+- **AI System Status**: Unified AI system status and configuration
 - **Security Policies**: Global safety and access control settings
 
 ### 🔧 Technical Implementation
@@ -3054,7 +3094,7 @@ POST /api/digital/run/pipeline
 **Prompt Lab - AI Integration**
 ```bash
 POST /api/prompt/run
-# Execute prompts through LM Studio with safety checks
+# Execute prompts through unified AI system (ItemAI → OpenRouter → OpenAI)
 ```
 
 **Playbook Management**

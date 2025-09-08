@@ -188,24 +188,28 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* LM Studio */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            {/* AI System */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
               <div className="flex items-center mb-3">
-                <span className="text-2xl mr-3">🤖</span>
-                <h4 className="text-lg font-medium text-gray-900">LM Studio</h4>
+                <span className="text-2xl mr-3">🧠</span>
+                <h4 className="text-lg font-medium text-gray-900">AI System</h4>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Base URL
-                </label>
-                <input
-                  type="url"
-                  value={s.lmstudio_base || ""}
-                  onChange={e => setS({...s, lmstudio_base: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="http://localhost:1234/v1"
-                />
-                <p className="text-xs text-gray-500 mt-1">Optional: LM Studio endpoint for local AI</p>
+                <div className="bg-white rounded-lg p-3 border border-blue-100">
+                  <div className="flex items-center mb-2">
+                    <span className="text-green-500 mr-2">✅</span>
+                    <span className="text-sm font-medium text-gray-700">Unified AI System Active</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">
+                    <strong>ItemAI API</strong> (LM Studio) → <strong>OpenRouter API</strong> → <strong>OpenAI API</strong>
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Automatic fallback ensures maximum reliability and cost optimization
+                  </p>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Configure AI providers in the main "API Config" module
+                </p>
               </div>
             </div>
 
