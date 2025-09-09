@@ -916,6 +916,14 @@ AI Learning with AI/
 ├── websearch-backend/
 │   ├── index.js               # Web search Node.js server
 │   └── package.json           # Web search dependencies
+├── agentops-n8n/              # n8n workflow automation for AgentOps Studio
+│   ├── docker-compose.yml     # n8n Docker configuration
+│   ├── start-n8n.ps1          # PowerShell script to start n8n
+│   ├── INSTALLATION_GUIDE.md  # n8n setup and configuration guide
+│   ├── web-research-workflow.json    # Web research automation workflow
+│   ├── software-planning-workflow.json # Software planning automation workflow
+│   └── n8n_data/              # n8n persistent data and database
+│       └── database.sqlite    # n8n SQLite database
 ├── deployment/                 # Deployment configurations
 │   ├── cloudrun.yaml          # Google Cloud Run configuration
 │   └── Dockerfile             # Docker container setup
@@ -924,109 +932,6 @@ AI Learning with AI/
 └── README.md                  # This comprehensive documentation
 ```
 
-### Detailed Project Structure
-
-```
-AI Learning with AI/
-├── backend/
-│   ├── app.py                 # Main FastAPI application with all endpoints
-│   ├── llm.py                 # OpenAI GPT-5 integration and streaming
-│   ├── gpt5_config.py         # GPT-5 model configuration
-│   ├── cursor_agent_routes.py # Agent Cursor AI integration
-│   ├── prompts.py             # AI prompt templates and configurations
-│   ├── vector_store.py        # Vector database for knowledge mapping
-│   ├── enhanced_analysis.py   # Repository analysis and documentation
-│   ├── ea_models.py           # Enterprise Architecture data models
-│   ├── ea_processes.py        # EA process management endpoints
-│   ├── ea_catalog.py          # EA catalog management endpoints
-│   ├── db.py                  # Database models and connections
-│   ├── static/
-│   │   └── favicon.ico
-│   ├── tests/
-│   │   └── test_app.py
-│   ├── requirements.txt       # Python dependencies
-│   └── .env                   # Environment variables
-├── deployment/
-│   ├── cloudrun.yaml          # Google Cloud Run configuration
-│   └── Dockerfile             # Docker container setup
-├── docs/                      # Additional documentation
-├── frontend/
-│   ├── cypress/               # End-to-end testing framework
-│   │   ├── cypress.config.js
-│   │   ├── e2e/
-│   │   │   ├── app.cy.js
-│   │   │   ├── appOption.cy.js
-│   │   │   ├── clearButtons.cy.js
-│   │   │   ├── savedMicro-lessons.cy.js
-│   │   │   ├── scenarioSimulator.cy.js
-│   │   │   └── webSearch.cy.js
-│   │   ├── fixtures/
-│   │   │   └── example.json
-│   │   └── support/
-│   │       ├── commands.js
-│   │       └── e2e.js
-│   ├── cypress.config.js
-│   ├── package.json
-│   ├── public/
-│   │   ├── favicon.ico
-│   │   ├── index.html
-│   │   ├── logo192.png
-│   │   ├── logo512.png
-│   │   ├── manifest.json
-│   │   └── robots.txt
-│   ├── README.md
-│   └── src/
-│       ├── _tests_/
-│       │   └── Concepts.test.jsx
-│       ├── api.js             # API integration and streaming
-│       ├── App.css
-│       ├── App.jsx            # Main application component with routing
-│       ├── App.test.js
-│       ├── Auth.jsx           # Firebase authentication
-│       ├── CareerCoach.jsx    # AI career guidance and coaching
-│       ├── Certifications.jsx # Professional certification planning
-│       ├── Concepts.jsx       # AI-powered learning concepts
-│       ├── Dashboard.jsx      # Learning progress and analytics
-│       ├── GlobalSearch.jsx   # Cross-module search functionality
-│       ├── index.css
-│       ├── index.js
-│       ├── LessonList.jsx     # Saved micro-lessons management
-│       ├── logo.svg
-│       ├── MicroLesson.jsx    # Bite-sized learning modules
-│       ├── Recommendation.jsx # Personalized learning suggestions
-│       ├── reportWebVitals.js
-│       ├── setupTests.js
-│       ├── Simulator.jsx      # Interactive workplace scenarios
-│       ├── SkillsForecast.jsx # Future skills prediction
-│       ├── TeamDynamics.jsx   # Team collaboration analysis
-│       ├── ThemeContext.jsx   # Theme management (light/dark)
-│       ├── WebSearch.jsx      # Real-time web search with AI
-│       ├── KnowledgeMap.jsx   # Interactive learning visualization
-│       ├── AdvancedMasteryPanel.jsx # Learning analytics dashboard
-│       ├── AdvancedRecommendations.jsx # AI-powered learning suggestions
-│       ├── AdvancedTooltip.jsx # Rich hover information system
-│       ├── ClusterLegend.jsx  # Knowledge cluster filtering
-│       ├── MasteryTimeline.jsx # Learning progress timeline
-│       ├── hooks/
-│       │   └── useStreaming.js # Streaming LLM responses hook
-│       ├── StreamingProgress.jsx # Real-time progress indicators
-│       ├── StreamingText.jsx   # Streaming text display
-│       ├── Sidebar.jsx        # Navigation and module selection
-│       ├── CommandBar.jsx     # Zero-UI natural language interface
-│       ├── IdeaLog.jsx        # Feature tracking and suggestions
-│       ├── FeatureRoadmap.jsx # Development planning and AI code generation
-│       ├── PresentationAgent.jsx # AI-powered presentations and voice cloning
-│       ├── AIStudyBuddy.jsx   # Conversational learning support
-│       ├── RunTest.jsx        # Comprehensive testing suite
-│       └── VideoLesson.jsx    # Video-based learning with AI quizzes
-├── package.json
-├── README.md
-├── serviceAccountKey.json     # Firebase service account (ignored, not in repo)
-├── websearch-backend/
-│   ├── index.js               # Web search Node.js server
-│   └── package.json           # Web search dependencies
-└── install-voice-cloning.sh   # Voice cloning setup script
-```
 
 ---
 
@@ -1038,15 +943,25 @@ pip install -r requirements.txt
 cd frontend && npm install && cd ..
 cd websearch-backend && npm install && cd ..
 
-# 2. Start all services (3 terminals)
-# Terminal 1 - Backend (from ROOT directory)
-uvicorn backend.app:app --reload
+# 2. Start all services (4 terminals)
+# Terminal 1 - Backend (from ROOT directory with virtual environment)
+# Activate virtual environment first
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+# source .venv/bin/activate
+
+# Then start backend
+uvicorn backend.app:app --reload --port 8000
 
 # Terminal 2 - Frontend
 cd frontend && npm start
 
 # Terminal 3 - Web Search
 cd websearch-backend && node index.js
+
+# Terminal 4 - n8n (Optional - for AgentOps Studio workflows)
+cd agentops-n8n && .\start-n8n.ps1
 ```
 
 > **⚠️ CRITICAL: Backend MUST be started from ROOT directory, not from `backend/` folder!**
@@ -1068,6 +983,14 @@ cd websearch-backend && node index.js
 - **MongoDB** running locally or accessible
 - **Firebase project** with authentication enabled
 - **OpenAI API key** with GPT-5 access
+- **Docker Desktop** (for n8n workflows - optional)
+
+### 🌐 Service Ports
+- **Backend API**: http://localhost:8000
+- **Frontend**: http://localhost:3000
+- **Web Search**: http://localhost:3001
+- **n8n Workflows**: http://localhost:5678 (optional)
+- **LM Studio**: http://localhost:1234 (if using local AI)
 
 ### 📁 Project Structure
 ```
@@ -1077,6 +1000,8 @@ AI-Learning-with-AI/
 │   └── .env               # Frontend environment variables
 ├── websearch-backend/      # Node.js web search service
 │   └── .env               # Web search environment variables
+├── agentops-n8n/          # n8n workflow automation (Docker-based)
+│   └── n8n_data/          # n8n persistent data and database
 ├── requirements.txt        # Python dependencies (ROOT LEVEL)
 ├── .env                   # Backend environment variables (ROOT LEVEL)
 └── README.md
@@ -1088,6 +1013,7 @@ AI-Learning-with-AI/
 - **Backend .env file**: Located at ROOT level (`.env`) - NOT inside `backend/` folder
 - **Frontend**: Install and run from `frontend/` directory (has its own `.env`)
 - **Web Search**: Install and run from `websearch-backend/` directory (has its own `.env`)
+- **n8n Workflows**: Run from `agentops-n8n/` directory with Docker (requires Docker Desktop)
 
 ### Step-by-Step Setup
 
@@ -1099,6 +1025,14 @@ AI-Learning-with-AI/
 
 2. **Backend Setup**
    ```bash
+   # Create and activate virtual environment (recommended)
+   python -m venv .venv
+   
+   # Windows:
+   .venv\Scripts\activate
+   # Linux/Mac:
+   # source .venv/bin/activate
+   
    # Install Python dependencies (run from root directory)
    pip install -r requirements.txt
    
@@ -1121,19 +1055,45 @@ AI-Learning-with-AI/
    npm install
    ```
 
-5. **Start All Services**
+5. **n8n Workflow Automation Setup (Optional)**
    ```bash
-   # Terminal 1: Backend (IMPORTANT: Run from root directory)
-   uvicorn backend.app:app --reload
+   # Prerequisites: Install Docker Desktop first
+   # Download from: https://www.docker.com/products/docker-desktop/
+   
+   # Navigate to n8n directory
+   cd agentops-n8n
+   
+   # Start n8n with Docker
+   .\start-n8n.ps1
+   
+   # Access n8n at: http://localhost:5678
+   # Import workflows and configure webhooks
+   # See agentops-n8n/INSTALLATION_GUIDE.md for detailed setup
+   ```
+
+6. **Start All Services**
+   ```bash
+   # Terminal 1: Backend (IMPORTANT: Run from root directory with virtual environment)
+   # Activate virtual environment first
+   # Windows:
+   .venv\Scripts\activate
+   # Linux/Mac:
+   # source .venv/bin/activate
+   
+   # Then start backend
+   uvicorn backend.app:app --reload --port 8000
    
    # Terminal 2: Frontend
    cd frontend && npm start
    
    # Terminal 3: Web Search
    cd websearch-backend && node index.js
+   
+   # Terminal 4: n8n Workflows (Optional - for AgentOps Studio)
+   cd agentops-n8n && .\start-n8n.ps1
    ```
 
-6. **Run Tests**
+7. **Run Tests**
    ```bash
    cd frontend
    npm run test:comprehensive
@@ -1781,6 +1741,117 @@ frontend/src/
 - **Integration**: Connect with Knowledge Map and other learning modules
 - **Advanced Search**: Semantic search across analysis history
 - **Export Options**: PDF reports and presentation-ready summaries
+
+---
+
+## 🔄 n8n Workflow Automation: AgentOps Studio Integration ✅
+
+### 🎯 Overview
+
+The **n8n Workflow Automation** system provides powerful workflow orchestration for the AgentOps Studio module, enabling complex automation tasks through visual workflow design. This system integrates seamlessly with the main application to provide advanced automation capabilities. **This module is fully functional and production-ready.**
+
+### 🧠 Core Features
+
+**Visual Workflow Design**
+- **Drag-and-Drop Interface**: Create complex workflows without coding
+- **Node-Based Architecture**: Connect different services and APIs visually
+- **Real-Time Execution**: Monitor workflow progress and debug issues
+- **Webhook Integration**: Trigger workflows from external applications
+
+**Pre-Built Workflows**
+- **Web Research Agent**: Automated web research with content extraction and AI analysis
+- **Software Planning Agent**: Comprehensive software development planning with safety checks
+- **Custom Workflows**: Create your own automation workflows for specific needs
+
+**Docker-Based Deployment**
+- **Containerized Service**: Runs in Docker for consistent deployment
+- **Persistent Data**: SQLite database for workflow and execution data
+- **Easy Setup**: One-command startup with PowerShell script
+- **Port Configuration**: Accessible at http://localhost:5678
+
+### 🚀 Quick Start
+
+**Prerequisites**
+```bash
+# Install Docker Desktop
+# Download from: https://www.docker.com/products/docker-desktop/
+```
+
+**Start n8n**
+```bash
+# Navigate to n8n directory
+cd agentops-n8n
+
+# Start n8n with Docker
+.\start-n8n.ps1
+
+# Access n8n interface
+# Open: http://localhost:5678
+```
+
+**Import Workflows**
+1. Open http://localhost:5678 in your browser
+2. Complete initial setup (create admin user)
+3. Import workflows:
+   - `web-research-workflow.json`
+   - `software-planning-workflow.json`
+
+**Register in AgentOps Studio**
+1. Go to AgentOps Studio → Flow Catalog
+2. Click "+ Register New Flow"
+3. Register each workflow with its webhook URL
+4. Test integration in Playbook Designer
+
+### 🔧 Configuration
+
+**Environment Variables**
+- **N8N_HOST**: localhost
+- **N8N_PORT**: 5678
+- **N8N_PROTOCOL**: http
+- **WEBHOOK_URL**: http://localhost:5678/
+- **N8N_ENCRYPTION_KEY**: agentops-studio-n8n-encryption-key-2025-secure
+- **AGENTOPS_HMAC_SECRET**: agentops-hmac-secret-2025
+
+**Webhook Endpoints**
+- **Web Research**: `/webhook/agentops-web-research-ext`
+- **Software Planning**: `/webhook/agentops-software-planning`
+
+### 📊 Workflow Details
+
+**Web Research Workflow**
+- **Input**: URL, topic, LM Studio base URL
+- **Process**: Fetch → Extract → LM Studio → Report
+- **Output**: Structured report with insights
+
+**Software Planning Workflow**
+- **Input**: Topic, context, LM Studio base URL
+- **Process**: Plan → Safety → Simulate → Judge
+- **Output**: Comprehensive software development plan
+
+### 🛠️ Troubleshooting
+
+**Common Issues**
+1. **Docker not running**: Start Docker Desktop
+2. **Port conflicts**: Change port in docker-compose.yml
+3. **Webhook not responding**: Check n8n logs
+4. **LM Studio not responding**: Verify LM Studio is running
+5. **Callback failures**: Check AGENTOPS_HMAC_SECRET matches
+
+**Logs and Debugging**
+```bash
+# n8n logs
+docker compose logs
+
+# AgentOps Studio logs
+# Check backend terminal output
+```
+
+### 📚 Documentation
+
+- **Installation Guide**: `agentops-n8n/INSTALLATION_GUIDE.md`
+- **Docker Configuration**: `agentops-n8n/docker-compose.yml`
+- **Workflow Files**: `agentops-n8n/*.json`
+- **Database**: `agentops-n8n/n8n_data/database.sqlite`
 
 ---
 
