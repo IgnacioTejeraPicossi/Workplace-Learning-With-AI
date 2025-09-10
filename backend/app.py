@@ -1474,6 +1474,21 @@ async def perform_web_search(request: Request):
         return {"error": str(e)}, 500
 
 # Saved Videos endpoints
+@app.get("/api/saved-videos/test")
+async def get_saved_videos_test():
+    """Get saved videos for testing (no auth required)"""
+    try:
+        cursor = saved_videos_collection.find({})
+        videos = await cursor.to_list(length=100)
+        
+        # Convert ObjectId to string for JSON serialization
+        for video in videos:
+            video["_id"] = str(video["_id"])
+        
+        return {"videos": videos, "count": len(videos)}
+    except Exception as e:
+        return {"error": str(e), "videos": [], "count": 0}
+
 @app.get("/api/saved-videos")
 async def get_saved_videos(user=Depends(verify_token)):
     """Get all saved videos for the authenticated user"""
@@ -2323,5 +2338,14 @@ async def clear_knowledge_map_cache():
         return {"message": "Knowledge map cache cleared successfully"}
     except Exception as e:
         return {"error": str(e), "message": "Failed to clear cache"}
+
+# Health check endpoints
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "Backend is running"}
+
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "ok", "message": "API is running", "timestamp": datetime.utcnow().isoformat()}
 
  

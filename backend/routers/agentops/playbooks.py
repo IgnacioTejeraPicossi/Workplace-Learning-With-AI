@@ -36,6 +36,11 @@ async def list_playbooks():
         items.append(_clean(doc))
     return {"items": items}
 
+@router.get("/_ping")
+async def ping_playbooks():
+    """Ping playbooks service"""
+    return {"status": "ok", "service": "playbooks"}
+
 @router.get("/{playbook_id}")
 async def get_playbook(playbook_id: str):
     """Get playbook by ID"""
