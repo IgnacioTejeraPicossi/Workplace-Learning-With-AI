@@ -30,14 +30,14 @@ from typing import List, Optional, Dict, Any
 
 # Fix imports to work from both root and backend directories
 try:
-    from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-    from backend.llm import ask_openai, ask_ai_unified_sync, web_search_query, classify_intent, generate_scaffold
-    from backend.repo_analysis import router as repo_router
-    from backend.documentation_generator import router as doc_router
-    from backend.cursor_readme_routes import router as cursor_readme_router
-    from backend.cursor_agent_routes import router as cursor_agent_router
-    from backend.simple_web_search import router as simple_web_search_router
-    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+    from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
+    from llm import ask_openai, ask_ai_unified_sync, web_search_query, classify_intent, generate_scaffold
+    from repo_analysis import router as repo_router
+    from documentation_generator import router as doc_router
+    from cursor_readme_routes import router as cursor_readme_router
+    from cursor_agent_routes import router as cursor_agent_router
+    from simple_web_search import router as simple_web_search_router
+    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
@@ -89,14 +89,14 @@ app.include_router(cursor_agent_router, prefix="/api", tags=["Cursor Agent"])
 
 # Document Analyzer router
 try:
-    from backend.document_analyzer import router as document_analyzer_router
+    from document_analyzer import router as document_analyzer_router
 except ImportError:
     from document_analyzer import router as document_analyzer_router
 app.include_router(document_analyzer_router, prefix="/api", tags=["Document Analyzer"])
 
 # Agentic RAG router
 try:
-    from backend.routers.agentic_rag import router as agentic_rag_router
+    from routers.agentic_rag import router as agentic_rag_router
 except ImportError:
     try:
         from routers.agentic_rag import router as agentic_rag_router
@@ -112,14 +112,14 @@ if agentic_rag_router:
 
 # Cursor AI Automation router
 try:
-    from backend.cursor_ai_automation import router as cursor_automation_router
+    from cursor_ai_automation import router as cursor_automation_router
 except ImportError:
     from cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
 
 # AgentOps Studio routers - Direct import method
 try:
-    from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings
+    from routers.agentops import digital, prompt, playbooks, flows, runs, settings
     print("✅ AgentOps Studio routers imported successfully")
     
     # Include routers with specific prefixes to avoid route conflicts
@@ -138,12 +138,12 @@ except Exception as e:
 
 # Learning modules routers
 try:
-    from backend.certifications import certifications_router
-    from backend.micro_lessons import micro_lessons_router
-    from backend.web_search import web_search_router
-    from backend.skills_forecast import skills_forecast_router
-    from backend.career_coach import career_coach_router
-    from backend.simulation_results import simulation_results_router
+    from certifications import certifications_router
+    from micro_lessons import micro_lessons_router
+    from web_search import web_search_router
+    from skills_forecast import skills_forecast_router
+    from career_coach import career_coach_router
+    from simulation_results import simulation_results_router
 except ImportError:
     from certifications import certifications_router
     from micro_lessons import micro_lessons_router
@@ -161,9 +161,9 @@ app.include_router(simulation_results_router)
 
 # Enterprise Architecture routers
 try:
-    from backend.ea_processes import router as ea_processes_router
-    from backend.ea_catalog import router as ea_catalog_router
-    from backend.ea_ai_risk import router as ea_ai_risk_router
+    from ea_processes import router as ea_processes_router
+    from ea_catalog import router as ea_catalog_router
+    from ea_ai_risk import router as ea_ai_risk_router
 except ImportError:
     from ea_processes import router as ea_processes_router
     from ea_catalog import router as ea_catalog_router
@@ -175,8 +175,8 @@ app.include_router(ea_ai_risk_router)
 
 # API Configuration routers
 try:
-    from backend.api_test import router as api_test_router
-    from backend.itemai_api import router as itemai_api_router
+    from api_test import router as api_test_router
+    from itemai_api import router as itemai_api_router
 except ImportError:
     from api_test import router as api_test_router
     from itemai_api import router as itemai_api_router
@@ -193,7 +193,7 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
 try:
-    from backend.llm import ask_openai_stream
+    from llm import ask_openai_stream
 except ImportError:
     from llm import ask_openai_stream
 
@@ -931,7 +931,7 @@ async def get_user_certifications(user=Depends(verify_token)):
         "simulations": simulations
     } 
 
-from backend.llm import call_llm_router
+from llm import call_llm_router
 
 class RouteRequest(BaseModel):
     prompt: str
@@ -1230,7 +1230,7 @@ async def get_quiz_results(user_id: str):
 async def get_knowledge_topics():
     """Get all available knowledge topics with their embeddings and metadata from MongoDB"""
     try:
-        from backend.knowledge_map_utils import extract_topics_from_modules, generate_topic_embedding, categorize_topic
+        from knowledge_map_utils import extract_topics_from_modules, generate_topic_embedding, categorize_topic
         
         # Extract topics from MongoDB (global, no user filtering)
         raw_topics = await extract_topics_from_modules()
@@ -1361,7 +1361,7 @@ async def get_user_knowledge_map(user_id: str):
 async def get_knowledge_clusters():
     """Get dynamic knowledge clusters based on actual topics from MongoDB"""
     try:
-        from backend.knowledge_map_utils import extract_topics_from_modules, generate_dynamic_categories
+        from knowledge_map_utils import extract_topics_from_modules, generate_dynamic_categories
         
         # Extract topics from MongoDB (global, no user filtering)
         raw_topics = await extract_topics_from_modules()
@@ -1630,7 +1630,7 @@ async def get_learning_recommendations(user_id: str):
         
         # Try AI-powered recommendations first
         try:
-            from backend.knowledge_map_utils import generate_ai_recommendations
+            from knowledge_map_utils import generate_ai_recommendations
             
             ai_recommendations = generate_ai_recommendations(
                 user_response.get("topics", {}), 
@@ -2164,7 +2164,7 @@ for route in app.routes:
 async def debug_knowledge_map():
     """Debug endpoint to check MongoDB connection and available data"""
     try:
-        from backend.db import database, saved_videos_collection
+        from db import database, saved_videos_collection
         
         print("🔍 Debug: Checking MongoDB collections...")
         
@@ -2207,7 +2207,7 @@ async def debug_knowledge_map():
 async def clean_all_knowledge_data():
     """Temporary endpoint to clean all knowledge map data"""
     try:
-        from backend.db import micro_lessons_collection, saved_videos_collection
+        from db import micro_lessons_collection, saved_videos_collection
         
         print("🧹 Cleaning all knowledge map data...")
         
@@ -2235,7 +2235,7 @@ async def clean_all_knowledge_data():
 async def debug_micro_lessons():
     """Debug endpoint to check micro-lessons directly"""
     try:
-        from backend.db import database
+        from db import database
         
         print("🔍 Debug: Checking micro-lessons directly...")
         
@@ -2269,8 +2269,8 @@ async def debug_micro_lessons():
 async def debug_topic_comparison():
     """Debug endpoint to compare topics between Dashboard and Knowledge Map"""
     try:
-        from backend.db import micro_lessons_collection, saved_videos_collection
-        from backend.knowledge_map_utils import extract_topics_from_modules
+        from db import micro_lessons_collection, saved_videos_collection
+        from knowledge_map_utils import extract_topics_from_modules
         
         print("🔍 Debug: Comparing topics between Dashboard and Knowledge Map...")
         
@@ -2333,7 +2333,7 @@ def _debug_routes():
 async def clear_knowledge_map_cache():
     """Clear the knowledge map cache for better performance"""
     try:
-        from backend.knowledge_map_utils import clear_topic_cache
+        from knowledge_map_utils import clear_topic_cache
         clear_topic_cache()
         return {"message": "Knowledge map cache cleared successfully"}
     except Exception as e:

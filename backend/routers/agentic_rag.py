@@ -6,13 +6,13 @@ from pydantic import BaseModel
 # Since backend is run from root with: uvicorn backend.app:app --reload --port 8000
 # The imports should be relative to the root directory
 try:
-    from backend.services.agentic_rag.agentic_rag_service import (
+    from services.agentic_rag.agentic_rag_service import (
         build_or_update_index, ask_agentic, summarize_agentic
     )
-    from backend.services.agentic_rag.your_mongo import save_analysis, get_analyses, delete_analysis
-    print("✅ Successfully imported agentic_rag_service from backend.services.agentic_rag")
+    from services.agentic_rag.your_mongo import save_analysis, get_analyses, delete_analysis
+    print("✅ Successfully imported agentic_rag_service from services.agentic_rag")
 except ImportError as e:
-    print(f"❌ Error importing from backend.services.agentic_rag: {e}")
+    print(f"❌ Error importing from services.agentic_rag: {e}")
     try:
         # Fallback: try direct import
         from services.agentic_rag.agentic_rag_service import (

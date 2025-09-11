@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime
 from typing import Dict, Any
 from bson import ObjectId
-from backend.db import database
-from backend.services.agentops.schemas import StudioSettings
+from db import database
+from services.agentops.schemas import StudioSettings
 
 router = APIRouter(tags=["settings"])
 

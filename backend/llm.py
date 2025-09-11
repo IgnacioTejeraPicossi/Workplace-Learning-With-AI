@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 import openai
 try:
-    from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
-    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+    from prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
+    from gpt5_config import get_optimal_model, get_gpt5_parameters
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
@@ -593,7 +593,7 @@ def classify_with_keywords(user_input: str) -> dict:
         } 
 
 def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
-    from backend.prompts import SCAFFOLD_TYPE_PROMPT
+    from prompts import SCAFFOLD_TYPE_PROMPT
     prompt = SCAFFOLD_TYPE_PROMPT.format(
         scaffold_type=scaffold_type,
         feature_name=feature_name,

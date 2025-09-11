@@ -8,12 +8,12 @@ from pathlib import Path
 import json
 from datetime import datetime
 
-from backend.readme_generator import (
+from readme_generator import (
     generate_enhanced_readme,
     create_learning_module_from_readme,
     analyze_project_structure
 )
-from backend.repo_storage import RepoStorage
+from repo_storage import RepoStorage
 
 router = APIRouter(prefix="/cursor-readme", tags=["Cursor AI README Generator"])
 

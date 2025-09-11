@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import git
-from backend.env_config import EnvConfig
+from env_config import EnvConfig
 
 router = APIRouter(prefix="/cursor-agent", tags=["Cursor Agent"])
 

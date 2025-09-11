@@ -31,7 +31,7 @@ class CertificationResponse(BaseModel):
     study_plan: Optional[str] = ''  # Make study_plan optional
 
 # Base de datos
-from backend.db import database
+from db import database
 
 @certifications_router.post('/', response_model=CertificationResponse)
 async def create_certification(certification: CertificationCreate):

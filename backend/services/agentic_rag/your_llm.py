@@ -51,7 +51,7 @@ class LLMClient:
                 from llm import ask_openai
             except ImportError:
                 try:
-                    from backend.llm import ask_openai
+                    from llm import ask_openai
                 except ImportError:
                     from ..llm import ask_openai
             

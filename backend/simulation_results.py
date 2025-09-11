@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from bson import ObjectId
 from typing import List, Optional
-from backend.db import database
+from db import database
 from motor.motor_asyncio import AsyncIOMotorClient
 
 simulation_results_router = APIRouter(prefix='/api/simulation-results', tags=['simulation-results'])

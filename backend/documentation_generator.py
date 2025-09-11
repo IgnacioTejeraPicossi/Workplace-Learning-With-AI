@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 # Import storage module
-from backend.repo_storage import RepoStorage
+from repo_storage import RepoStorage
 
 router = APIRouter()
 

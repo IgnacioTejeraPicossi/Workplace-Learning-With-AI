@@ -27,7 +27,7 @@ except ImportError:
         from llm import ask_openai
     except ImportError:
         # Fallback for when running from root directory
-        from backend.llm import ask_openai
+        from llm import ask_openai
 
 router = APIRouter(prefix="/document-analyzer", tags=["Document Analyzer"])
 
@@ -63,7 +63,7 @@ class SaveAnalysisResponse(BaseModel):
 
 # ========= MongoDB Storage =========
 # Import MongoDB collection for persistent storage
-from backend.db import document_analyses_collection
+from db import document_analyses_collection
 
 # ========= Helpers =========
 TEXT_EXTS = {".txt", ".md", ".markdown"}
@@ -191,7 +191,7 @@ def summarize_text(text: str, length: str = "medium") -> str:
                 from llm import ask_ai_unified_sync
             except ImportError:
                 try:
-                    from backend.llm import ask_ai_unified_sync
+                    from llm import ask_ai_unified_sync
                 except ImportError:
                     from ..llm import ask_ai_unified_sync
             

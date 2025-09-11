@@ -134,7 +134,7 @@ class CursorAIAnalyzer:
         """
         Enhanced structure analysis using OpenAI with Cursor AI-like prompts
         """
-        from backend.llm import ask_ai_unified_sync
+        from llm import ask_ai_unified_sync
         
         # Create a comprehensive analysis prompt
         analysis_prompt = f"""
@@ -204,7 +204,7 @@ class CursorAIAnalyzer:
         """
         Generate professional README.md content
         """
-        from backend.llm import ask_ai_unified_sync
+        from llm import ask_ai_unified_sync
         
         readme_prompt = f"""
         You are Cursor AI, an expert technical writer. Create a professional README.md for the repository at {repo_path}.

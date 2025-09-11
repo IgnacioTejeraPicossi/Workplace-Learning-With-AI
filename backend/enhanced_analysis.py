@@ -3,8 +3,8 @@ import json
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 from datetime import datetime
-from backend.llm import ask_ai_unified_sync
-from backend.env_config import EnvConfig
+from llm import ask_ai_unified_sync
+from env_config import EnvConfig
 
 class EnhancedAnalyzer:
     """

@@ -1,7 +1,7 @@
 # AgentOps Studio - Prompt Router
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
-from backend.services.agentops.schemas import PromptRun, SafetyPolicy
+from services.agentops.schemas import PromptRun, SafetyPolicy
 
 router = APIRouter(tags=["prompt"])
 
@@ -24,7 +24,7 @@ async def run_prompt(payload: Dict[str, Any]):
         
         # Use unified AI system (ItemAI → OpenRouter → OpenAI)
         try:
-            from backend.llm import ask_openai_unified
+            from llm import ask_openai_unified
         except ImportError:
             from llm import ask_openai_unified
         

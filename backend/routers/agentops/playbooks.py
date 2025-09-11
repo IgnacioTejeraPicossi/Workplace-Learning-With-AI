@@ -1,7 +1,7 @@
 # AgentOps Studio - Playbook Router
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
-from backend.db import database
+from db import database
 from bson import ObjectId
 from datetime import datetime
 
