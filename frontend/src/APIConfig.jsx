@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
+import { apiCall } from './api';
 
 const APIConfig = () => {
   const { colors } = useTheme();
@@ -40,42 +41,35 @@ const APIConfig = () => {
   const handleTestAPI = async () => {
     setStatus('Testing API connection...');
     try {
-      let response;
+      let success;
+      let message;
+      let error;
       
       if (apiProvider === 'itemai') {
         // Test ItemAI API
-        response = await fetch('/api/test-itemai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            local_url: itemaiUrl
-          })
-        });
+        const response = await apiCall('/api/test-itemai', 'POST', { local_url: itemaiUrl });
+        success = response.success;
+        message = response.message;
+        error = response.error;
       } else {
         // Test OpenAI or OpenRouter
-        response = await fetch('/api/test-api', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            provider: apiProvider,
-            openaiKey: apiProvider === 'openai' ? openaiKey : '',
-            openrouterKey: apiProvider === 'openrouter' ? openrouterKey : ''
-          })
+        const response = await apiCall('/api/test-api', 'POST', { 
+          provider: apiProvider, 
+          openaiKey: apiProvider === 'openai' ? openaiKey : '',
+          openrouterKey: apiProvider === 'openrouter' ? openrouterKey : ''
         });
+        success = response.success;
+        message = response.message;
+        error = response.error;
       }
       
-      if (response.ok) {
-        const result = await response.json();
-        setStatus(`✅ API test successful: ${result.message}`);
+      if (success) {
+        setStatus(`✅ API test successful: ${message}`);
       } else {
-        setStatus('❌ API test failed. Check your configuration and try again.');
+        setStatus(`❌ API test failed: ${error}`);
       }
     } catch (error) {
-      setStatus('❌ API test failed. Network error.');
+      setStatus(`❌ API test error: ${error.message}`);
     }
     setTimeout(() => setStatus(''), 5000);
   };

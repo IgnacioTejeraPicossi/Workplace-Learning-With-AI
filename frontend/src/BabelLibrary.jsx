@@ -10,7 +10,8 @@ import {
   fetchSimulationResults,
   fetchDocumentAnalyses,
   fetchRepositoryAnalyses,
-  fetchAgenticRAGAnalyses
+  fetchAgenticRAGAnalyses,
+  apiCall
 } from './api';
 
 const BabelLibrary = () => {
@@ -270,7 +271,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este video?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/saved-videos/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/saved-videos/${id}`, 'DELETE');
         // Update local state
         setVideos(prev => prev.filter(video => video._id !== id));
         alert('✅ Video eliminado exitosamente');
@@ -285,7 +286,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta certificación?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/certifications/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/certifications/${id}`, 'DELETE');
         // Update local state
         setCertifications(prev => prev.filter(cert => cert.id !== id));
         alert('✅ Certificación eliminada exitosamente');
@@ -300,7 +301,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta micro-lección?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/micro-lessons/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/micro-lessons/${id}`, 'DELETE');
         // Update local state
         setMicroLessons(prev => prev.filter(lesson => lesson.id !== id));
         alert('✅ Micro-lección eliminada exitosamente');
@@ -315,7 +316,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta búsqueda web?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/web-search/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/web-search/${id}`, 'DELETE');
         // Update local state
         setWebSearchResults(prev => prev.filter(result => result.id !== id));
         alert('✅ Búsqueda web eliminada exitosamente');
@@ -330,7 +331,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este forecast?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/skills-forecast/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/skills-forecast/${id}`, 'DELETE');
         // Update local state
         setSkillsForecasts(prev => prev.filter(forecast => forecast.id !== id));
         alert('✅ Skills Forecast eliminado exitosamente');
@@ -345,7 +346,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta sesión?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/career-coach/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/career-coach/${id}`, 'DELETE');
         // Update local state
         setCareerCoachSessions(prev => prev.filter(session => session.id !== id));
         alert('✅ Sesión eliminada exitosamente');
@@ -360,7 +361,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta simulación?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/simulation-results/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/simulation-results/${id}`, 'DELETE');
         // Update local state
         setSimulationResults(prev => prev.filter(result => result.id !== id));
         alert('✅ Simulación eliminada exitosamente');
@@ -375,7 +376,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de documento?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/document-analyzer/delete-analysis/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/document-analyzer/delete-analysis/${id}`, 'DELETE');
         // Update local state
         setDocumentAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
         alert('✅ Análisis de documento eliminado exitosamente');
@@ -390,7 +391,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de repositorio?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/saved-analyses/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/saved-analyses/${id}`, 'DELETE');
         // Update local state
         setRepositoryAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
         alert('✅ Análisis de repositorio eliminado exitosamente');
@@ -405,7 +406,7 @@ const BabelLibrary = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de Agentic RAG?')) {
       try {
         // Remove from MongoDB
-        await fetch(`/api/agentic-rag/delete-analysis/${id}`, { method: 'DELETE' });
+        await apiCall(`/api/agentic-rag/delete-analysis/${id}`, 'DELETE');
         // Update local state
         setAgenticRAGAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
         alert('✅ Análisis de Agentic RAG eliminado exitosamente');

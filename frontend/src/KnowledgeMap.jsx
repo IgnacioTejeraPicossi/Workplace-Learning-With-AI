@@ -8,6 +8,7 @@ import ClusterLegend from './ClusterLegend';
 import AdvancedMasteryPanel from './AdvancedMasteryPanel';
 import WebSearchResults from './WebSearchResults';
 import * as d3 from 'd3';
+import { apiCall } from './api';
 
 const KnowledgeMap = () => {
   const [topics, setTopics] = useState({});
@@ -153,8 +154,8 @@ const KnowledgeMap = () => {
       try {
         // Fetch all data in parallel
         const [topicsRes, clustersRes] = await Promise.all([
-          fetch('/api/knowledge-map/topics'),
-          fetch('/api/knowledge-map/clusters')
+          apiCall('/api/knowledge-map/topics'),
+          apiCall('/api/knowledge-map/clusters')
         ]);
 
         if (!topicsRes.ok) {
@@ -172,14 +173,10 @@ const KnowledgeMap = () => {
 
         // Fetch user data if authenticated
         if (auth.currentUser) {
-          const userRes = await fetch(`/api/knowledge-map/user/${auth.currentUser.uid}`);
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            setUserData(userData);
-            
-            // Fetch recommendations in background (don't await)
-            fetchRecommendations(auth.currentUser.uid);
-          }
+          const userData = await apiCall(`/api/knowledge-map/user/${auth.currentUser.uid}`);
+          setUserData(userData);
+          // Fetch recommendations in background (don't await)
+          fetchRecommendations(auth.currentUser.uid);
         } else {
           // Use mock user data for testing
           const mockUserData = {
@@ -262,17 +259,11 @@ const KnowledgeMap = () => {
     try {
       setRecommendationsLoading(true);
       
-      const response = await fetch(`/api/knowledge-map/recommendations/${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setRecommendations(data.recommendations || []);
-        setLearningPaths(data.learning_paths || []);
-        setVectorAnalysis(data.vector_analysis || null);
-      } else {
-        setRecommendations([]);
-        setLearningPaths([]);
-        setVectorAnalysis(null);
-      }
+      const data = await apiCall(`/api/knowledge-map/recommendations/${userId}`);
+      
+      setRecommendations(data.recommendations || []);
+      setLearningPaths(data.learning_paths || []);
+      setVectorAnalysis(data.vector_analysis || null);
     } catch (error) {
       setRecommendations([]);
       setLearningPaths([]);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
+import { apiCall } from './api';
 
 const AgenticRAG = () => {
   const { colors } = useTheme();
@@ -38,15 +39,8 @@ const AgenticRAG = () => {
 
   const saveAnalysis = async (analysisData) => {
     try {
-      const response = await fetch('/api/agentic-rag/save-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(analysisData),
-      });
+      const data = await apiCall('/api/agentic-rag/save-analysis', 'POST', analysisData);
       
-      const data = await response.json();
       if (data.success) {
         console.log('Analysis saved successfully:', data.analysis_id);
         setStatus('✅ Analysis saved successfully!');

@@ -12,7 +12,7 @@ export async function fetchWithAuth(url, options = {}) {
   return fetch(url, options);
 }
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.BACKEND_URL || "http://localhost:8000";
 
 // Generic API call function
 export async function apiCall(endpoint, method = "GET", data = null) {
@@ -59,7 +59,7 @@ export async function fetchConcepts() {
 }
 
 export async function fetchMicroLesson(topic) {
-  const res = await fetchWithAuth("http://localhost:8000/micro-lesson", {
+  const res = await fetchWithAuth(`${API_BASE}/micro-lesson`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic }),
@@ -111,7 +111,7 @@ export async function postSkillsForecast(input) {
 // Removed old lesson APIs - now using MongoDB micro-lessons API
 
 export async function webSearch(query) {
-  const res = await fetchWithAuth("http://localhost:8080/web-search", {
+  const res = await fetchWithAuth(`${API_BASE}/web-search`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query }),
@@ -388,9 +388,7 @@ export async function updateMicroLesson(microLessonId, data) {
 // Web Search API functions
 export const fetchWebSearchResults = async () => {
   try {
-    const response = await fetch('/api/web-search/');
-    if (!response.ok) throw new Error('Failed to fetch web search results');
-    return await response.json();
+    return apiCall('/api/web-search/');
   } catch (error) {
     console.error('Error fetching web search results:', error);
     return [];
@@ -398,39 +396,17 @@ export const fetchWebSearchResults = async () => {
 };
 
 export const saveWebSearchResult = async (resultData) => {
-  try {
-    const response = await fetch('/api/web-search/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(resultData)
-    });
-    if (!response.ok) throw new Error('Failed to save web search result');
-    return await response.json();
-  } catch (error) {
-    console.error('Error saving web search result:', error);
-    throw error;
-  }
+  return apiCall('/api/web-search/', 'POST', resultData);
 };
 
 export const deleteWebSearchResult = async (resultId) => {
-  try {
-    const response = await fetch(`/api/web-search/${resultId}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete web search result');
-    return await response.json();
-  } catch (error) {
-    console.error('Error deleting web search result:', error);
-    throw error;
-  }
+  return apiCall(`/api/web-search/${resultId}`, "DELETE");
 };
 
 // Skills Forecast API functions
 export const fetchSkillsForecasts = async () => {
   try {
-    const response = await fetch('/api/skills-forecast/');
-    if (!response.ok) throw new Error('Failed to fetch skills forecasts');
-    return await response.json();
+    return apiCall('/api/skills-forecast/');
   } catch (error) {
     console.error('Error fetching skills forecasts:', error);
     return [];
@@ -438,39 +414,17 @@ export const fetchSkillsForecasts = async () => {
 };
 
 export const saveSkillsForecast = async (forecastData) => {
-  try {
-    const response = await fetch('/api/skills-forecast/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(forecastData)
-    });
-    if (!response.ok) throw new Error('Failed to save skills forecast');
-    return await response.json();
-  } catch (error) {
-    console.error('Error saving skills forecast:', error);
-    throw error;
-  }
+  return apiCall('/api/skills-forecast/', "POST", forecastData);
 };
 
 export const deleteSkillsForecast = async (forecastId) => {
-  try {
-    const response = await fetch(`/api/skills-forecast/${forecastId}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete skills forecast');
-    return await response.json();
-  } catch (error) {
-    console.error('Error deleting skills forecast:', error);
-    throw error;
-  }
+  return apiCall(`/api-skills-forecast/${forecastId}`, "DELETE");
 };
 
 // AI Career Coach API functions
 export const fetchCareerCoachSessions = async () => {
   try {
-    const response = await fetch('/api/career-coach/');
-    if (!response.ok) throw new Error('Failed to fetch career coach sessions');
-    return await response.json();
+    return apiCall('/api/career-coach/');
   } catch (error) {
     console.error('Error fetching career coach sessions:', error);
     return [];
@@ -478,54 +432,21 @@ export const fetchCareerCoachSessions = async () => {
 };
 
 export const saveCareerCoachSession = async (sessionData) => {
-  try {
-    const response = await fetch('/api/career-coach/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sessionData)
-    });
-    if (!response.ok) throw new Error('Failed to save career coach session');
-    return await response.json();
-  } catch (error) {
-    console.error('Error saving career coach session:', error);
-    throw error;
-  }
+  return apiCall('/api/career-coach', "POST", sessionData);
 };
 
 export const deleteCareerCoachSession = async (sessionId) => {
-  try {
-    const response = await fetch(`/api/career-coach/${sessionId}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete career coach session');
-    return await response.json();
-  } catch (error) {
-    console.error('Error deleting career coach session:', error);
-    throw error;
-  }
+  return apiCall(`/api/career-coach/${sessionId}`, "DELETE");
 };
 
 export const updateCareerCoachSession = async (sessionId, data) => {
-  try {
-    const response = await fetch(`/api/career-coach/${sessionId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to update career coach session');
-    return await response.json();
-  } catch (error) {
-    console.error('Error updating career coach session:', error);
-    throw error;
-  }
+  return apiCall(`/api/career-coach/${sessionId}`, "PUT", data);
 };
 
 // Simulation Results API functions
 export const fetchSimulationResults = async () => {
   try {
-    const response = await fetch('/api/simulation-results/');
-    if (!response.ok) throw new Error('Failed to fetch simulation results');
-    return await response.json();
+    return apiCall('/api/simulation-results/');
   } catch (error) {
     console.error('Error fetching simulation results:', error);
     return [];
@@ -533,54 +454,21 @@ export const fetchSimulationResults = async () => {
 };
 
 export const saveSimulationResult = async (resultData) => {
-  try {
-    const response = await fetch('/api/simulation-results/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(resultData)
-    });
-    if (!response.ok) throw new Error('Failed to save simulation result');
-    return await response.json();
-  } catch (error) {
-    console.error('Error saving simulation result:', error);
-    throw error;
-  }
+  return apiCall('/api/simulation-results/', "POST", resultData);
 };
 
 export const deleteSimulationResult = async (resultId) => {
-  try {
-    const response = await fetch(`/api/simulation-results/${resultId}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error('Failed to delete simulation result');
-    return await response.json();
-  } catch (error) {
-    console.error('Error deleting simulation result:', error);
-    throw error;
-  }
+  return apiCall(`/api/simulation-results/${resultId}`, "DELETE");
 };
 
 export const updateSimulationResult = async (resultId, data) => {
-  try {
-    const response = await fetch(`/api/simulation-results/${resultId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to update simulation result');
-    return await response.json();
-  } catch (error) {
-    console.error('Error updating simulation result:', error);
-    throw error;
-  }
+  return apiCall(`/api/simulation-results/${resultId}`, "PUT", data);
 };
 
 // Document Analysis API functions
 export const fetchDocumentAnalyses = async () => {
   try {
-    const response = await fetch('/api/document-analyzer/get-saved-analyses');
-    if (!response.ok) throw new Error('Failed to fetch document analyses');
-    return await response.json();
+    return apiCall('/api/document-analyzer/get-saved-analyses');
   } catch (error) {
     console.error('Error fetching document analyses:', error);
     return [];
@@ -590,9 +478,7 @@ export const fetchDocumentAnalyses = async () => {
 // Repository Analysis API functions
 export const fetchRepositoryAnalyses = async () => {
   try {
-    const response = await fetch('/api/saved-analyses?limit=50');
-    if (!response.ok) throw new Error('Failed to fetch repository analyses');
-    return await response.json();
+    return apiCall('/api/saved-analyses?limit=50');
   } catch (error) {
     console.error('Error fetching repository analyses:', error);
     return [];
@@ -602,9 +488,7 @@ export const fetchRepositoryAnalyses = async () => {
 // Agentic RAG Analysis API functions
 export const fetchAgenticRAGAnalyses = async () => {
   try {
-    const response = await fetch('/api/agentic-rag/get-analyses?limit=50');
-    if (!response.ok) throw new Error('Failed to fetch agentic RAG analyses');
-    return await response.json();
+    return apiCall('/api/agentic-rag/get-analyses?limit=50');
   } catch (error) {
     console.error('Error fetching agentic RAG analyses:', error);
     return [];

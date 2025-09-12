@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiCall } from './api';
 import './AgentCursorAI.css';
 
 const AgentCursorAI = () => {
@@ -71,24 +72,13 @@ const AgentCursorAI = () => {
       setProgress(0);
       setCurrentStep('Initializing...');
 
-      const response = await fetch('/api/cursor/automation/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          repo_url: repoUrl,
-          branch: branch,
-          timeout_seconds: 900,
-          user_prompt: userPrompt || "Generate a comprehensive README.md for this repository"
-        }),
+      const data = await apiCall('/api/cursor/automation/start', 'POST', {
+        repo_url: repoUrl,
+        branch: branch,
+        timeout_seconds: 900,
+        user_prompt: userPrompt || "Generate a comprehensive README.md for this repository"
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      
       setCurrentJob(data.job_id);
       setProgress(data.progress);
       setCurrentStep(data.current_step);
@@ -108,18 +98,15 @@ const AgentCursorAI = () => {
     // Monitor job status every 2 seconds
     statusIntervalRef.current = setInterval(async () => {
       try {
-        const response = await fetch(`/api/cursor/automation/status/${jobId}`);
-        if (response.ok) {
-          const status = await response.json();
+        const status = await apiCall(`/api/cursor/automation/status/${jobId}`);
           
-          setProgress(status.progress);
-          setCurrentStep(status.current_step);
-          
-          if (status.status === 'completed') {
-            handleAnalysisComplete(jobId);
-          } else if (status.status === 'failed' || status.status === 'timeout') {
-            handleAnalysisError(status.status, status.error_message || 'Analysis failed');
-          }
+        setProgress(status.progress);
+        setCurrentStep(status.current_step);
+        
+        if (status.status === 'completed') {
+          handleAnalysisComplete(jobId);
+        } else if (status.status === 'failed' || status.status === 'timeout') {
+          handleAnalysisError(status.status, status.error_message || 'Analysis failed');
         }
       } catch (error) {
         console.error('Error monitoring status:', error);
@@ -136,13 +123,11 @@ const AgentCursorAI = () => {
 
   const handleAnalysisComplete = async (jobId) => {
     try {
-      const response = await fetch(`/api/cursor/automation/result/${jobId}`);
-      if (response.ok) {
-        const resultData = await response.json();
-        setResult(resultData);
-        setProgress(100);
-        setCurrentStep('Analysis completed successfully!');
-      }
+      const resultData = await apiCall(`/api/cursor/automation/result/${jobId}`);
+      
+      setResult(resultData);
+      setProgress(100);
+      setCurrentStep('Analysis completed successfully!');
     } catch (error) {
       console.error('Error fetching result:', error);
     }
@@ -217,18 +202,12 @@ const AgentCursorAI = () => {
     if (!result?.readme_content) return;
     
     try {
-      const response = await fetch('/api/docs/import-from-readme', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: `README - ${repoUrl.split('/').pop()}`,
+      const response = await apiCall('/api/docs/import-from-readme', 'POST', {
+        title: `README - ${repoUrl.split('/').pop()}`,
           markdown: result.readme_content
-        }),
       });
 
-      if (response.ok) {
+      if (response.success) {
         alert('README saved to Training Library successfully!');
       } else {
         throw new Error('Failed to save to library');
