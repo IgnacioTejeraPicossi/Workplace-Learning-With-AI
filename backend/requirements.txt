@@ -1,3 +1,10 @@
+# sentence-transformers depend on torch, which by default depends on several GBs of Nvidia dependencies
+# Explicitly ask for the cpu version of torch to avoid downloading those Nvidia dependencies
+# See https://stackoverflow.com/a/63012079
+# If we want to run models on GPU with CUDA, look into dynamically loading those dependencies on demand instead of at build time
+-f https://download.pytorch.org/whl/torch_stable.html 
+torch==2.3.1+cpu 
+
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
@@ -9,10 +16,10 @@ httpx==0.25.2
 pypdf==3.17.4
 python-docx==1.1.0
 rank-bm25==0.2.2
-sentence-transformers==2.2.2
+sentence-transformers==2.2.2 
 openai==1.107.0
 gitpython
 markdown
 fpdf
 firebase_admin
-pydantic[email] 
+pydantic[email]
