@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build: ./frontend
+    image: learningwithai_frontend:latest
+    environment:
+      - BACKEND_URL=http://backend:8000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    networks:
+      - learningwithai-network
+  backend:
+    build: ./backend
+    image: learningwithai_backend:latest
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mongodb
+    networks:
+      - learningwithai-network
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - learningwithai-network
+
+volumes:
+  mongodb_data: 
+
+networks:
+  learningwithai-network:
+    driver: bridge
