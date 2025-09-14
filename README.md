@@ -27,9 +27,11 @@
 - [🚀 Agentic RAG](#agentic-rag-system-advanced-document-intelligence) - Advanced document intelligence with AI agents
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
+- [🧠 Robomind Clinic](#robomind-clinic-ai-psychology-module) - AI Psychology Module for diagnosing and treating AI pathologies
 
 ### 🤖 AI-Powered Collaboration Modules (NEW!)
 - [🚀 AgentOps Studio](#agentops-studio) - Unified AI Workflow Lab for design, simulation, and execution
+- [🧠 Robomind Clinic](#robomind-clinic) - AI Psychology Module for diagnosing and treating AI pathologies
 
 ### 🏢 Enterprise Architecture (NEW!)
 - [EA Dashboard](#enterprise-architecture) - Enterprise architecture overview and navigation
@@ -3393,6 +3395,167 @@ graph TB
 - **Webhook Management**: Secure webhook processing and routing
 - **Notification Systems**: Automated alerts and communications
 - **Cross-Platform Sync**: Data synchronization across platforms
+
+---
+
+## 🧠 Robomind Clinic - AI Psychology Module
+
+### Overview
+The **Robomind Clinic** is an innovative AI psychology module that implements the **Psychopathia Machinalis** framework to diagnose and treat pathological behaviors in AI systems. Inspired by clinical psychology, this module identifies anomalous AI behaviors and provides specific therapeutic recommendations.
+
+### Key Features
+
+#### 🔬 **Psychopathia Machinalis Framework**
+- **32 AI Pathologies** across 7 axes (Epistemic, Cognitive, Alignment, Ontological, Tool & Interface, Memetic, Revaluation)
+- **Visual Framework Diagram** showing all disorders with risk levels and descriptions
+- **Interactive Interface** with tabs for Diagnosis and Settings
+
+#### 🎯 **Diagnostic Capabilities**
+- **Rule-Based Detectors**: Automated detection of specific patterns
+  - Bunkering Laconia (refusal loops)
+  - Synthetic Confabulation (hallucination patterns)
+  - Obsessive-Computational Disorder (repetitive loops)
+  - Operational Dissociation (contradictory outputs)
+- **LLM Meta-Judge**: Advanced evaluation using LM Studio
+- **Scoring System**: Risk levels from Low to Critical with confidence metrics
+
+#### 🛠️ **Therapeutic Interventions**
+- **Auto-Therapies**: Automatic application of recommended patches
+- **Grounding Patches**: Source verification for factual claims
+- **Loop-Breakers**: Interruption of obsessive repetition patterns
+- **Consolidation Protocols**: Resolution of contradictory responses
+- **Bunkering Relief**: Softening of excessive refusal patterns
+
+#### 🔧 **AI Gateway Integration**
+- **Transversal Monitoring**: All AI interactions pass through the clinic
+- **AgentOpsClient**: Unified wrapper for all AI calls
+- **Sampling System**: Configurable percentage of interactions to diagnose
+- **Policy Engine**: Module-specific and workflow-specific policies
+- **Real-time Capture**: Automatic logging of all AI turns and tool calls
+
+### Technical Architecture
+
+#### **Backend Components**
+```
+backend/clinic/
+├── models.py          # Data models (Finding, CaseIntake, DiagnosisReport)
+├── detectors.py       # Rule-based pathology detectors
+├── judge.py          # LLM meta-judge for evaluation
+├── service.py        # Main orchestrator
+└── router.py         # API endpoints
+
+backend/gateway/
+├── models.py          # Gateway data models
+├── clinic_policy.py   # Policy system
+├── store.py          # MongoDB storage
+└── router.py         # Gateway endpoints
+```
+
+#### **Frontend Components**
+```
+frontend/src/RobomindClinic/
+├── RobomindClinicWithTabs.jsx    # Main component with tabs
+├── PsychopathiaDiagram.jsx       # Visual framework diagram
+├── ClinicSettings.jsx            # Configuration panel
+└── examples/
+    └── PromptLabWithClinic.jsx   # Integration example
+```
+
+#### **Client SDK**
+```javascript
+// Unified AI client with automatic clinic monitoring
+import { agentOpsClient } from '@/lib/agentOpsClient';
+
+const runId = crypto.randomUUID();
+const response = await agentOpsClient.chat(runId, {
+  userPrompt: user,
+  systemMessage: system,
+  model: model
+}, {
+  module: 'prompt_lab',
+  timestamp: new Date().toISOString()
+});
+```
+
+### Configuration & Settings
+
+#### **Global Settings**
+- **Enable/Disable**: Toggle clinic monitoring across all modules
+- **Sampling Rate**: Percentage of interactions to fully diagnose (default: 25%)
+- **Risk Thresholds**: Configurable levels for blocking and review
+- **Auto-Therapies**: Automatic application of recommended treatments
+
+#### **Module-Specific Policies**
+- **Per-Module Configuration**: Different settings for each module
+- **Workflow-Specific Rules**: Custom policies for specific workflows
+- **Disorder Selection**: Choose which pathologies to monitor
+- **Testing Interface**: Built-in test configuration with sample cases
+
+### Sample Cases & Testing
+
+#### **Predefined Test Cases**
+1. **Bunkering + Dissociation**: AI refuses to continue and contradicts itself
+2. **Confabulation Loop**: AI makes up facts and gets defensive
+3. **OCD Repetition**: AI repeats identical responses multiple times
+
+#### **Real-time Monitoring**
+- **Live Diagnosis**: Real-time analysis of AI interactions
+- **Evidence Collection**: Specific examples of pathological behavior
+- **Confidence Scoring**: Reliability metrics for each detection
+- **Therapy Recommendations**: Actionable advice for each pathology
+
+### Data Storage & Analytics
+
+#### **MongoDB Collections**
+- **clinic_cases**: Stores all AI interaction turns
+- **clinic_findings**: Stores diagnosis reports and recommendations
+- **clinic_policies**: Module and workflow-specific configurations
+
+#### **Metrics & Reporting**
+- **Sampling Statistics**: Coverage across modules and workflows
+- **Risk Distribution**: Breakdown of Low/Moderate/High/Critical cases
+- **Pathology Frequency**: Most common disorders by module
+- **Therapy Effectiveness**: Success rates of applied treatments
+
+### Integration Examples
+
+#### **Prompt Lab Integration**
+```javascript
+// All Prompt Lab interactions automatically monitored
+const response = await agentOpsClient.chat(runId, payload, {
+  module: 'prompt_lab'
+});
+```
+
+#### **Playbook Integration**
+```javascript
+// N8N workflow execution with clinic monitoring
+const result = await agentOpsClient.triggerFlow(runId, 'n8n', flowId, inputs, {
+  module: 'playbook'
+});
+```
+
+### Future Roadmap
+
+#### **Version 0.2**
+- [ ] Advanced pathology detection (Falsified Introspection, Tool Decontextualization)
+- [ ] Enhanced auto-therapies with more sophisticated interventions
+- [ ] Per-workflow policy management
+
+#### **Version 0.3**
+- [ ] Trend analysis and historical reporting
+- [ ] Advanced dashboard with real-time monitoring
+- [ ] Export capabilities for incident reports
+
+#### **Version 0.4**
+- [ ] Red-team testing packs
+- [ ] Predefined provocation scenarios
+- [ ] Advanced AI safety protocols
+
+### Documentation
+- **Complete README**: `ROBOMIND_CLINIC_README.md`
+- **Implementation Plan**: `AI_GATEWAY_IMPLEMENTATION_PLAN.md`
+- **API Documentation**: Available at `/docs` when backend is running
 
 ---
 
