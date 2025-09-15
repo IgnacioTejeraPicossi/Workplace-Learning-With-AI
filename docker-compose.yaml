@@ -2,6 +2,7 @@ services:
   frontend:
     build: ./frontend
     image: learningwithai_frontend:latest
+    container_name: learningwithai-frontend
     environment:
       - BACKEND_URL=http://backend:8000
     ports:
@@ -13,6 +14,7 @@ services:
   backend:
     build: ./backend
     image: learningwithai_backend:latest
+    container_name: learningwithai-backend
     environment:
       - MONGO_URI=mongodb://mongodb:27017
     ports:
@@ -23,7 +25,7 @@ services:
       - learningwithai-network
   mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: learningwithai-mongodb
     ports:
       - "27017:27017"
     volumes:
