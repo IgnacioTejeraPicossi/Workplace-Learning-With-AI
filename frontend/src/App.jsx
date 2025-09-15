@@ -42,6 +42,7 @@ import ProcessDesigner from "./ea/ProcessDesigner";
 import SecurityPanel from "./SecurityPanel";
 import CatalogManager from "./ea/CatalogManager";
 import AgentOpsStudio from "./AgentOpsStudio/AgentOpsStudio";
+import RobomindClinic from "./RobomindClinic/RobomindClinicWithTabs";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -441,6 +442,7 @@ function AppContent() {
             {!activeModule && section === "process-designer" && <ProcessDesigner />}
             {!activeModule && section === "catalog-manager" && <CatalogManager />}
             {!activeModule && section === "agentops-studio" && <AgentOpsStudio />}
+            {!activeModule && section === "robomind-clinic" && <RobomindClinic />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}

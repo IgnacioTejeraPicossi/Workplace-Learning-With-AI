@@ -2145,6 +2145,36 @@ print("🔍 DEBUG: About to include simple_web_search_router")
 print(f"🔍 DEBUG: Router object: {simple_web_search_router}")
 print(f"🔍 DEBUG: Router routes: {simple_web_search_router.routes}")
 app.include_router(simple_web_search_router, prefix="/api", tags=["Simple Web Search"])
+
+# Robomind Clinic router
+try:
+    from backend.clinic.router import router as clinic_router
+    app.include_router(clinic_router, prefix="/api", tags=["Robomind Clinic"])
+    print("✅ Robomind Clinic router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import Robomind Clinic router: {e}")
+except Exception as e:
+    print(f"❌ Error including Robomind Clinic router: {e}")
+
+# Enhanced Robomind Clinic router
+try:
+    from backend.clinic.enhanced_router import router as enhanced_clinic_router
+    app.include_router(enhanced_clinic_router, tags=["Enhanced Robomind Clinic"])
+    print("✅ Enhanced Robomind Clinic router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import Enhanced Robomind Clinic router: {e}")
+except Exception as e:
+    print(f"❌ Error including Enhanced Robomind Clinic router: {e}")
+
+# AI Gateway router
+try:
+    from backend.gateway.router import router as gateway_router
+    app.include_router(gateway_router, tags=["AI Gateway"])
+    print("✅ AI Gateway router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import AI Gateway router: {e}")
+except Exception as e:
+    print(f"❌ Error including AI Gateway router: {e}")
 print("🔍 DEBUG: Router included successfully")
 
 # Test route directly in app.py

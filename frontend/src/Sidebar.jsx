@@ -43,7 +43,8 @@ const Icon = ({ name, size = 20 }) => {
     "refresh": "🔄",
     "process": "🔄",
     "catalog": "📋",
-    "list": "📋"
+    "list": "📋",
+    "brain": "🧠"
   };
 
   return (
@@ -99,6 +100,9 @@ const getNavItems = (t) => [
   
   // Grupo 1.8: AgentOps Studio (nuevo módulo unificado)
   { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot", group: "learning" },
+  
+  // Grupo 1.9: Robomind Clinic (Machine Psychology)
+  { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain", group: "learning" },
   
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
