@@ -10,7 +10,7 @@ from datetime import datetime
 import uuid
 from bson import ObjectId
 
-from ea_models import (
+from .ea_models import (
     ProcessCreate, ProcessUpdate, ProcessResponse, 
     Node, Edge, ProcessStatus
 )
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api/ea", tags=["Enterprise Architecture"])
 
 # Database connection
 def get_ea_db():
-    from db import database
+    from backend.db import database
     return database
 
 @router.post("/processes", response_model=dict)

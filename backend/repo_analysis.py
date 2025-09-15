@@ -11,16 +11,16 @@ from datetime import datetime
 
 # Import llm functions at module level
 try:
-    from llm import generate_summary, ask_openai
+    from backend.llm import generate_summary, ask_openai
     LLM_AVAILABLE = True
 except ImportError:
     LLM_AVAILABLE = False
     print("Warning: llm module not available, will use fallback summaries")
 
 # Import storage module
-from repo_storage import RepoStorage
-from cursor_ai_integration import CursorAIAnalyzer
-from enhanced_analysis import EnhancedAnalyzer
+from backend.repo_storage import RepoStorage
+from backend.cursor_ai_integration import CursorAIAnalyzer
+from backend.enhanced_analysis import EnhancedAnalyzer
 
 router = APIRouter()
 

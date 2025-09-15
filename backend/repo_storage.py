@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 from bson import ObjectId
-from db import (
+from backend.db import (
     repo_analyses_collection,
     repo_documentation_collection,
     repo_quizzes_collection,

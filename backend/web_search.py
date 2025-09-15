@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from bson import ObjectId
 from typing import List, Optional
-from db import database
+from backend.db import database
 
 web_search_router = APIRouter(prefix='/api/web-search', tags=['web-search'])
 

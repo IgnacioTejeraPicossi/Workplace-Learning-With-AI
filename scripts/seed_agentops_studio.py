@@ -14,7 +14,7 @@ import random
 # Agregar el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from services.agentic_rag.your_mongo import _db
+from backend.services.agentic_rag.your_mongo import _db
 
 def seed_agentops_data():
     """Inicializar datos de ejemplo para AgentOps Studio"""

@@ -26,7 +26,7 @@ class MicroLessonResponse(BaseModel):
     created_at: str
 
 # Base de datos
-from db import database
+from backend.db import database
 
 @micro_lessons_router.post('/', response_model=MicroLessonResponse)
 async def create_micro_lesson(micro_lesson: MicroLessonCreate):

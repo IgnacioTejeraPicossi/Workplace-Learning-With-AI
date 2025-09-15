@@ -19,7 +19,7 @@ import git
 
 # Import unified AI system for fallback
 try:
-    from llm import ask_ai_unified_sync
+    from backend.llm import ask_ai_unified_sync
 except ImportError:
     from llm import ask_ai_unified_sync
 
@@ -393,7 +393,7 @@ async def _save_to_learning_repository(job_id: str, readme_content: str, repo: P
         }
         
         # Import the collection
-        from app import lessons_collection
+        from backend.app import lessons_collection
         
         # Save to lessons collection
         result = await lessons_collection.insert_one(learning_module)

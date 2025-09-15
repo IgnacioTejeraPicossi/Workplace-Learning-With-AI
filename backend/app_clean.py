@@ -9,14 +9,14 @@ import os
 from datetime import datetime
 import uuid
 from typing import List, Optional, Dict, Any
-from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-from llm import ask_openai, web_search_query, classify_intent, generate_scaffold
-from repo_analysis import router as repo_router
-from documentation_generator import router as doc_router
-from cursor_readme_routes import router as cursor_readme_router
-from cursor_agent_routes import router as cursor_agent_router
-from simple_web_search import router as simple_web_search_router
-from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
+from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
+from backend.repo_analysis import router as repo_router
+from backend.documentation_generator import router as doc_router
+from backend.cursor_readme_routes import router as cursor_readme_router
+from backend.cursor_agent_routes import router as cursor_agent_router
+from backend.simple_web_search import router as simple_web_search_router
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 from bson import ObjectId
 from fastapi.staticfiles import StaticFiles
 

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from bson import ObjectId
 from typing import List, Optional
-from db import database
+from backend.db import database
 
 career_coach_router = APIRouter(prefix='/api/career-coach', tags=['career-coach'])
 

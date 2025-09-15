@@ -13,7 +13,7 @@ import logging
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
 
 # Import custom logging config
-from logging_config import LOGGING_CONFIG
+from backend.logging_config import LOGGING_CONFIG
 
 def main():
     """Start the server with clean configuration"""

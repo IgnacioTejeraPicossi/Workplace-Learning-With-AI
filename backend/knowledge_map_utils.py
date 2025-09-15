@@ -1,6 +1,6 @@
 from datetime import datetime
 import hashlib
-from db import database, saved_videos_collection, certifications_collection, \
+from backend.db import database, saved_videos_collection, certifications_collection, \
                        simulation_results_collection, career_coach_collection, skills_forecast_collection, \
                        web_search_collection
 

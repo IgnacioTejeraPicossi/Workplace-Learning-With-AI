@@ -2,8 +2,8 @@
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 import os
-from services.agentops.schemas import SoftwareTwin, TaskSpec, TaskAction
-from services.agentops import planner, safety, simulator, judge
+from backend.services.agentops.schemas import SoftwareTwin, TaskSpec, TaskAction
+from backend.services.agentops import planner, safety, simulator, judge
 
 router = APIRouter(tags=["digital"])
 N8N_TIMEOUT = float(os.getenv("N8N_TIMEOUT", "60"))

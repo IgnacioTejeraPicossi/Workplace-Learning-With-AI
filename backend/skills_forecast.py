@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from bson import ObjectId
 from typing import List, Optional
-from db import database
+from backend.db import database
 
 skills_forecast_router = APIRouter(prefix='/api/skills-forecast', tags=['skills-forecast'])
 

@@ -8,7 +8,7 @@ from typing import List, Optional
 from datetime import datetime
 from bson import ObjectId
 
-from ea_models import (
+from .ea_models import (
     CapabilityCreate, ApplicationCreate, 
     LifecycleStatus
 )
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/ea", tags=["Enterprise Architecture"])
 
 # Database connection
 def get_ea_db():
-    from db import database
+    from backend.db import database
     return database
 
 # ============================================================================

@@ -3,9 +3,9 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 # Database connection
 def get_ea_db():
-    from db import database
+    from backend.db import database
     return database
-from llm import ask_ai_unified_sync
+from backend.llm import ask_ai_unified_sync
 import asyncio
 from typing import List, Dict, Any
 from datetime import datetime, timezone
