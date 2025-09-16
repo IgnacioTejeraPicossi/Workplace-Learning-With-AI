@@ -40,6 +40,11 @@
 - [Heatmap View](#heatmap-view) - Risk and maturity visualization with Chart.js
 - [Impact Analysis](#impact-analysis) - Dependency analysis with BFS algorithm
 
+### 🤖 Item Agents (NEW!)
+- [AgentOps Studio](#agentops-studio) - Unified AI Workflow Lab for design, simulation, and execution
+- [Robomind Clinic](#robomind-clinic) - AI Psychology Module for diagnosing and treating AI pathologies
+- [Agent Theory & Documentation](#agent-theory--documentation) - Comprehensive AI agent theory, tools, and hackathon preparation
+
 ### 🛠️ Admin & Development
 - [API Config](#api-config) - ItemAI API, OpenAI, and OpenRouter API configuration
 - [Run Test](#run-test) - Comprehensive testing suite
@@ -3662,6 +3667,339 @@ const result = await agentOpsClient.triggerFlow(runId, 'n8n', flowId, inputs, {
 **Status**: 🚀 **READY FOR DEPLOYMENT**  
 **Confidence Level**: 🟢 **HIGH** - Complete technical foundation  
 **Next Action**: 🎯 **BEGIN TESTING AND INTEGRATION**
+
+---
+
+## 🤖 Agent Theory & Documentation
+
+### Overview
+
+The **Agent Theory & Documentation** module is a comprehensive knowledge base and preparation center for AI agent development and hackathon participation. This module serves as a centralized hub for:
+
+- **AI Agent Theory**: Fundamental concepts, implementation patterns, and best practices
+- **Tool Documentation**: Complete catalog of AI agent tools and frameworks
+- **Hackathon Preparation**: Detailed information for upcoming competitions
+- **Learning Resources**: Videos, articles, and educational content
+
+### 🎯 Key Features
+
+#### **📊 Overview Dashboard**
+- **Statistics**: 2 documents, 16 web apps, 3 videos
+- **Real-time Updates**: Last updated information
+- **Quick Access**: Direct links to all resources
+
+#### **📚 Theory Section**
+- **Getting Started Guides**: Step-by-step methodologies
+- **Fundamental Concepts**: Core AI agent principles
+- **Implementation Patterns**: ReAct, Tool Use, Memory Systems
+
+#### **🌐 Web Applications Catalog**
+- **Hackathon Tools**: Temporal AI, OutSystems Agent Workbench
+- **Business AI Agents**: Bika.ai, Resea AI, Momen, Mailgo, AutoBlocks
+- **Automation & Workflow**: n8n.io, Zapier Agents, Kiva, Taskade, You.com
+- **Agent Frameworks**: LangChain, AutoGen, CrewAI
+- **LLM Providers**: OpenAI, Claude, Gemini
+
+#### **🏆 Hackathon Information**
+- **AI-Assisted Workflow Coding Hackathon** (Oct 1-2, 2025, Stockholm)
+- **OutSystems Low-Code Agent Builder Hackathon** (Oct 14, 2025, Oslo)
+- **Complete Details**: Challenges, schedules, juries, tools, benefits
+
+#### **🎥 Learning Resources**
+- **Video Content**: Temporal, OutSystems, n8n tutorials
+- **Educational Materials**: Research papers, tutorials, code examples
+
+### 🛠️ Technical Implementation
+
+#### **Frontend Components**
+```javascript
+// Main component structure
+frontend/src/components/AgentTheoryDocs/
+├── AgentTheoryDocs.jsx          // Main component with tabbed interface
+├── AgentTheoryDocs.css          // Comprehensive styling
+└── README.md                    // Component documentation
+```
+
+#### **Data Structure**
+```javascript
+const documentationData = {
+  overview: {
+    title: "Agent Theory & Documentation",
+    description: "Comprehensive collection of AI agent theory...",
+    stats: { totalDocs: 2, webApps: 16, examples: 3, lastUpdated: "Today" }
+  },
+  theory: {
+    sections: [
+      { title: "Getting Started Guides", items: [...] },
+      { title: "Fundamental Concepts", items: [...] },
+      { title: "Implementation Patterns", items: [...] }
+    ]
+  },
+  webApps: {
+    categories: [
+      { name: "Hackathon Tools", apps: [...] },
+      { name: "Business AI Agents", apps: [...] },
+      { name: "Automation & Workflow Agents", apps: [...] },
+      { name: "Agent Frameworks", apps: [...] },
+      { name: "LLM Providers", apps: [...] }
+    ]
+  },
+  hackathons: {
+    events: [
+      {
+        id: "hackathon-1",
+        name: "AI-Assisted Workflow Coding Hackathon",
+        organizer: "Kolomolo, Proxify, Polytope & Cillers",
+        date: "October 1-2, 2025",
+        location: "Ersta Conference Center, Stockholm, Sweden",
+        format: "Hybrid (In Person & Online)",
+        challenge: "AI-generate a business-critical workflow",
+        tools: ["Temporal AI", "n8n.io", "AI-assisted coding tools"],
+        jury: ["IKEA", "Spotify", "Volvo Group", "H&M", ...]
+      },
+      {
+        id: "hackathon-2",
+        name: "OutSystems Low-Code Agent Builder Hackathon",
+        organizer: "AVO Consulting, AWS, Innovation Pioneers & Cillers",
+        date: "October 14, 2025",
+        location: "AVO Consulting, Oslo, Norway",
+        format: "In Person",
+        challenge: "Build a tireless teammate that empowers your team",
+        tools: ["OutSystems Agent Workbench", "AWS", "Low-code platform"],
+        jury: ["DNB Bank", "Aker BP", "Avinor", "Equinor", ...]
+      }
+    ]
+  },
+  resources: {
+    items: [
+      { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
+      { title: "Tutorials", count: 0, description: "Step-by-step guides" },
+      { title: "Code Examples", count: 0, description: "Practical implementations" },
+      { title: "Video Content", count: 3, description: "Educational videos and demos" }
+    ],
+    videos: [
+      {
+        title: "Temporal - Workflow Orchestration for AI Agents",
+        description: "Essential tool for hackathon development...",
+        url: "https://www.youtube.com/watch?v=GEXllEH2XiQ",
+        platform: "YouTube",
+        category: "Hackathon Tools",
+        importance: "High - Required for competition"
+      },
+      {
+        title: "OutSystems Agent Workbench - Introduction",
+        description: "Short introduction to OutSystems Agent Workbench...",
+        url: "https://www.youtube.com/watch?v=IXmCeAPX9GY",
+        platform: "YouTube",
+        category: "Hackathon Tools",
+        importance: "High - Required for competition"
+      },
+      {
+        title: "n8n Workflow Automation",
+        description: "Essential workflow automation tool...",
+        url: "https://www.youtube.com/watch?v=AURnISajubk",
+        platform: "YouTube",
+        category: "Integrated Tools",
+        importance: "High - Currently in use"
+      }
+    ]
+  }
+};
+```
+
+### 🎯 Hackathon Preparation Details
+
+#### **Hackathon 1: AI-Assisted Workflow Coding (Oct 1-2, 2025)**
+
+**Challenge**: AI-generate a business-critical workflow
+- Build complex workflows and agents that are scalable, fault-tolerant, and easy to maintain
+- Explore human-in-the-loop and long-running workflows
+- Examples: Order-to-delivery, AI content enhancement, software development pipelines, billing, vendor management, credentials rotation, ML pipelines, incident response, periodic compliance reporting
+
+**Tools & Technologies**:
+- **Temporal AI**: Durable Execution of tools, LLMs, and conversations
+- **n8n.io**: Flexible AI workflow automation for technical teams
+- **AI-assisted coding tools**: Various development tools
+
+**Jury & Networking**:
+- IKEA, Spotify, Volvo Group, H&M, Atlas Copco, Assa Abloy, Lego, Carlsberg, Nordea, SEB, Ericsson, Scania, Electrolux, Husqvarna, Getinge, Volvo Cars, SAAB, Telia, Telenor, Tele 2, Länsförsäkringar
+
+**Schedule**:
+- **Oct 1**: 08:30 - 17:00 (CET) - Hack Day
+- **Oct 2**: 16:30 - 20:30 (CET) - Grand Finale & Awards Ceremony
+
+#### **Hackathon 2: OutSystems Low-Code Agent Builder (Oct 14, 2025)**
+
+**Challenge**: Build a tireless teammate that empowers your team to deliver better results more effectively
+- Create custom AI solutions that transform team productivity
+- Build AI agents that handle repetitive tasks 24/7
+- Free people for strategic work
+
+**Platform Features**:
+- OutSystems low-code agent platform
+- Compliant, secure and reliable agents
+- Days to value development
+- Enterprise-grade security and compliance
+- Consistent governance across agents
+- Built-in reliability and scalability
+- Library of reusable components
+- Advanced access control with unified auth
+- Pre-built connectors to enterprise systems
+
+**Jury & Networking**:
+- DNB Bank, Aker BP, Avinor, Equinor, Telenor, Norsk Hydro, Mowi, Yara International, Orkla, Gjensidige Forsikring, Kongsberg Gruppen, SalMar, Storebrand, SpareBank, Schibsted
+
+**Schedule**:
+- **Oct 14**: 08:30 - 20:30 (CET) - Full Day Event
+
+### 🛠️ Available Tools & Resources
+
+#### **Hackathon Tools**
+1. **Temporal AI** - Workflow orchestration for AI agents
+2. **OutSystems Agent Workbench** - Low-code agent development platform
+
+#### **Business AI Agents**
+1. **Bika.ai** - Business organization with AI agent
+2. **Resea AI** - World's first academic agent
+3. **Momen** - No-code app builder with AI
+4. **Mailgo** - AI email platform for outreach
+5. **AutoBlocks** - Agent simulation platform
+
+#### **Automation & Workflow Agents**
+1. **n8n.io** - Flexible workflow automation (integrated in app)
+2. **Zapier Agents** - Custom AI agents in plain English
+3. **Kiva (Wellows)** - AI-powered SEO agent
+4. **Taskade Agents** - AI workspace for task automation
+5. **You.com** - AI-powered search and task automation
+
+#### **Agent Frameworks**
+1. **LangChain** - Framework for LLM applications
+2. **AutoGen** - Multi-agent conversation framework
+3. **CrewAI** - Role-playing AI agents framework
+
+#### **LLM Providers**
+1. **OpenAI GPT** - Leading AI model provider
+2. **Anthropic Claude** - AI assistant
+3. **Google Gemini** - Multimodal AI model
+
+### 📚 Learning Content
+
+#### **Theory Articles**
+1. **"Building your first AI Agent: A clear path!"**
+   - Step-by-step methodology for building AI agents
+   - Key steps: Pick clear problem, choose base LLM, decide interactions, build skeleton workflow, add memory, wrap in interface, iterate
+   - Core loop: Model → Tool → Result → Model
+
+2. **"7 AI Terms You Need to Know — Beyond the Basics"** by Alex Wang
+   - Agentic AI, Multi-Agent Orchestration, Mixture of Experts (MoE)
+   - Self-RAG vs Agentic RAG, Autonomous Workflows, Trust Layers, AI-Native Protocols
+   - Key insight: Shift from models to systems for enterprise AI
+
+#### **Video Resources**
+1. **Temporal - Workflow Orchestration for AI Agents**
+   - Essential for hackathon development
+   - Autonomous workflows and agent orchestration
+
+2. **OutSystems Agent Workbench - Introduction**
+   - Short introduction for hackathon preparation
+   - Agent development in hackathons
+
+3. **n8n Workflow Automation**
+   - Currently integrated in AgentOps Studio
+   - Workflow automation for technical teams
+
+### 🎯 Implementation Plan for ChatGPT5
+
+#### **Phase 1: Preparation (Pre-Hackathon)**
+1. **Tool Familiarization**: Study Temporal AI and OutSystems documentation
+2. **Workflow Design**: Plan business-critical workflows for each hackathon
+3. **Team Formation**: Connect with other participants
+4. **Environment Setup**: Prepare development environments
+
+#### **Phase 2: Development (During Hackathon)**
+1. **Hackathon 1 (Stockholm)**:
+   - Focus on Temporal AI for workflow orchestration
+   - Implement scalable, fault-tolerant workflows
+   - Include human-in-the-loop scenarios
+
+2. **Hackathon 2 (Oslo)**:
+   - Leverage OutSystems low-code platform
+   - Build team productivity agents
+   - Focus on enterprise-grade features
+
+#### **Phase 3: Post-Hackathon**
+1. **Documentation**: Record learnings and implementations
+2. **Integration**: Incorporate successful patterns into main application
+3. **Networking**: Follow up with jury members and participants
+
+### 🔧 Technical Integration
+
+#### **Sidebar Navigation**
+```javascript
+// Updated sidebar structure
+{ key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
+  { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
+  { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain" },
+  { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" }
+]}
+```
+
+#### **Internationalization**
+```json
+// English translations
+"sidebar": {
+  "itemAgents": "Item Agents",
+  "agentopsStudio": "AgentOps Studio", 
+  "robomindClinic": "Robomind Clinic",
+  "agentTheoryDocs": "Agent Theory & Documentation"
+}
+
+// Norwegian translations
+"sidebar": {
+  "itemAgents": "Element-agenter",
+  "agentopsStudio": "AgentOps Studio",
+  "robomindClinic": "Robomind Klinikk", 
+  "agentTheoryDocs": "Agent-teori og dokumentasjon"
+}
+```
+
+### 📊 Statistics & Metrics
+
+- **Total Documents**: 2 comprehensive theory articles
+- **Web Applications**: 16 categorized tools and platforms
+- **Video Content**: 3 essential tutorial videos
+- **Hackathons**: 2 upcoming competitions with complete details
+- **Categories**: 5 organized tool categories
+- **Jury Members**: 40+ executives from leading companies
+
+### 🚀 Future Enhancements
+
+#### **Planned Features**
+- **Real-time Updates**: Live hackathon information
+- **Progress Tracking**: Hackathon preparation milestones
+- **Team Collaboration**: Participant networking features
+- **Resource Management**: Bookmark and favorite tools
+- **Analytics**: Usage tracking and recommendations
+
+#### **Integration Opportunities**
+- **AgentOps Studio**: Direct workflow creation from documentation
+- **Robomind Clinic**: AI agent health monitoring
+- **Knowledge Map**: Visual learning path connections
+- **Career Coach**: Hackathon skill development recommendations
+
+### 📋 Documentation Status
+
+- **✅ Complete**: Module implementation, UI/UX, data structure
+- **✅ Complete**: Hackathon information, tool catalog, learning resources
+- **✅ Complete**: Internationalization, responsive design, accessibility
+- **🔄 In Progress**: Real-time updates, advanced analytics
+- **📋 Planned**: Team collaboration, progress tracking, advanced integrations
+
+---
+
+**Status**: 🚀 **READY FOR HACKATHON PREPARATION**  
+**Confidence Level**: 🟢 **HIGH** - Complete documentation and tool catalog  
+**Next Action**: 🎯 **BEGIN HACKATHON PREPARATION WITH CHATGPT5**
 
 ---
 
