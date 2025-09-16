@@ -160,14 +160,85 @@ const AgentTheoryDocs = () => {
         }
       ]
     },
-    resources: {
-      title: "Learning Resources",
-      items: [
-        { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
-        { title: "Tutorials", count: 0, description: "Step-by-step guides" },
-        { title: "Code Examples", count: 0, description: "Practical implementations" },
-        { title: "Video Content", count: 3, description: "Educational videos and demos" }
-      ],
+        hackathons: {
+          title: "Upcoming Hackathons",
+          events: [
+            {
+              id: "hackathon-1",
+              name: "AI-Assisted Workflow Coding Hackathon",
+              organizer: "Kolomolo, Proxify, Polytope & Cillers",
+              date: "October 1-2, 2025",
+              location: "Ersta Conference Center, Stockholm, Sweden",
+              format: "Hybrid (In Person & Online)",
+              challenge: "AI-generate a business-critical workflow",
+              description: "Build complex workflows and agents that are scalable, fault-tolerant, and easy to maintain. Explore human-in-the-loop and long-running workflows.",
+              examples: [
+                "Order-to-delivery workflows",
+                "AI content enhancement",
+                "AI agents development",
+                "Software development pipelines",
+                "Billing and vendor management",
+                "Credentials rotation",
+                "ML pipelines",
+                "Incident response",
+                "Periodic compliance reporting"
+              ],
+              jury: [
+                "IKEA", "Spotlight", "Volvo Group", "H&M", "Atlas Copco", "Assa Abloy", 
+                "Lego", "Carlsberg", "Nordea", "SEB", "Ericsson", "Scania", 
+                "Electrolux", "Husqvarna", "Getinge", "Volvo Cars", "SAAB", 
+                "Telia", "Telenor", "Tele 2", "Länsförsäkringar"
+              ],
+              schedule: {
+                "Oct 1": "08:30 - 17:00 (CET) - Hack Day",
+                "Oct 2": "16:30 - 20:30 (CET) - Grand Finale & Awards Ceremony"
+              },
+              benefits: "Free of charge, food & beverages included, networking with Nordic tech executives",
+              tools: ["Temporal AI", "n8n.io", "AI-assisted coding tools"],
+              status: "upcoming"
+            },
+            {
+              id: "hackathon-2", 
+              name: "OutSystems Low-Code Agent Builder Hackathon",
+              organizer: "AVO Consulting, AWS, Innovation Pioneers & Cillers",
+              date: "October 14, 2025",
+              location: "AVO Consulting, Schweigaards Gate 16, 0190 Oslo, Norway",
+              format: "In Person",
+              challenge: "Build a tireless teammate that empowers your team to deliver better results more effectively",
+              description: "Create custom AI solutions that transform team productivity. Build AI agents that handle repetitive tasks 24/7, freeing people for strategic work.",
+              features: [
+                "OutSystems low-code agent platform",
+                "Compliant, secure and reliable agents",
+                "Days to value development",
+                "Enterprise-grade security and compliance",
+                "Consistent governance across agents",
+                "Built-in reliability and scalability",
+                "Library of reusable components",
+                "Advanced access control with unified auth",
+                "Pre-built connectors to enterprise systems"
+              ],
+              jury: [
+                "DNB Bank", "Aker BP", "Avinor", "Equinor", "Telenor", "Norsk Hydro",
+                "Mowi", "Yara International", "Orkla", "Gjensidige Forsikring", 
+                "Kongsberg Gruppen", "SalMar", "Storebrand", "SpareBank", "Schibsted"
+              ],
+              schedule: {
+                "Oct 14": "08:30 - 20:30 (CET) - Full Day Event"
+              },
+              benefits: "Free of charge, breakfast, lunch, fika, dinner & beverages included",
+              tools: ["OutSystems Agent Workbench", "AWS", "Low-code platform"],
+              status: "upcoming"
+            }
+          ]
+        },
+        resources: {
+          title: "Learning Resources",
+          items: [
+            { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
+            { title: "Tutorials", count: 0, description: "Step-by-step guides" },
+            { title: "Code Examples", count: 0, description: "Practical implementations" },
+            { title: "Video Content", count: 3, description: "Educational videos and demos" }
+          ],
       videos: [
         {
           title: "Temporal - Workflow Orchestration for AI Agents",
@@ -363,6 +434,102 @@ const AgentTheoryDocs = () => {
     </div>
   );
 
+  const renderHackathons = () => (
+    <div className="hackathons-section">
+      <h3>🏆 Upcoming Hackathons</h3>
+      <p className="section-description">
+        Detailed information about the hackathons we'll be participating in. 
+        This information is available for Ignacio, Cursor AI, and ChatGPT5 to help with implementation planning.
+      </p>
+      
+      {documentationData.hackathons.events.map((hackathon, index) => (
+        <div key={hackathon.id} className="hackathon-card">
+          <div className="hackathon-header">
+            <h4>{hackathon.name}</h4>
+            <span className={`status-badge ${hackathon.status}`}>
+              {hackathon.status === 'upcoming' ? '📅 Upcoming' : '✅ Completed'}
+            </span>
+          </div>
+          
+          <div className="hackathon-meta">
+            <div className="meta-item">
+              <strong>📅 Date:</strong> {hackathon.date}
+            </div>
+            <div className="meta-item">
+              <strong>📍 Location:</strong> {hackathon.location}
+            </div>
+            <div className="meta-item">
+              <strong>🏢 Organizer:</strong> {hackathon.organizer}
+            </div>
+            <div className="meta-item">
+              <strong>💻 Format:</strong> {hackathon.format}
+            </div>
+          </div>
+
+          <div className="hackathon-challenge">
+            <h5>🎯 Challenge</h5>
+            <p>{hackathon.challenge}</p>
+            <p className="challenge-description">{hackathon.description}</p>
+          </div>
+
+          {hackathon.examples && (
+            <div className="hackathon-examples">
+              <h5>💡 Example Workflows</h5>
+              <ul className="examples-list">
+                {hackathon.examples.map((example, idx) => (
+                  <li key={idx}>{example}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {hackathon.features && (
+            <div className="hackathon-features">
+              <h5>🔧 Platform Features</h5>
+              <ul className="features-list">
+                {hackathon.features.map((feature, idx) => (
+                  <li key={idx}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="hackathon-schedule">
+            <h5>⏰ Schedule</h5>
+            {Object.entries(hackathon.schedule).map(([day, time]) => (
+              <div key={day} className="schedule-item">
+                <strong>{day}:</strong> {time}
+              </div>
+            ))}
+          </div>
+
+          <div className="hackathon-tools">
+            <h5>🛠️ Recommended Tools</h5>
+            <div className="tools-tags">
+              {hackathon.tools.map((tool, idx) => (
+                <span key={idx} className="tool-tag">{tool}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="hackathon-jury">
+            <h5>👥 Jury & Executives</h5>
+            <div className="jury-grid">
+              {hackathon.jury.map((company, idx) => (
+                <span key={idx} className="jury-company">{company}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="hackathon-benefits">
+            <h5>🎁 Benefits</h5>
+            <p>{hackathon.benefits}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderResources = () => (
     <div className="resources-section">
       <h3>Learning Resources</h3>
@@ -456,6 +623,12 @@ const AgentTheoryDocs = () => {
           🌐 Web Apps
         </button>
         <button 
+          className={`tab-button ${activeTab === 'hackathons' ? 'active' : ''}`}
+          onClick={() => setActiveTab('hackathons')}
+        >
+          🏆 Hackathons
+        </button>
+        <button 
           className={`tab-button ${activeTab === 'resources' ? 'active' : ''}`}
           onClick={() => setActiveTab('resources')}
         >
@@ -467,6 +640,7 @@ const AgentTheoryDocs = () => {
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'theory' && renderTheory()}
         {activeTab === 'webapps' && renderWebApps()}
+        {activeTab === 'hackathons' && renderHackathons()}
         {activeTab === 'resources' && renderResources()}
       </div>
     </div>
