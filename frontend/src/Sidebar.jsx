@@ -101,7 +101,8 @@ const getNavItems = (t) => [
   // Grupo 1.8: Item Agents (nuevo grupo para agentes)
   { key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
     { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
-    { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain" }
+    { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain" },
+    { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" }
   ]},
   
   // Grupo 2: Ayuda del sistema (fondo verde)

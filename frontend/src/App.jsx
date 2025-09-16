@@ -43,6 +43,7 @@ import SecurityPanel from "./SecurityPanel";
 import CatalogManager from "./ea/CatalogManager";
 import AgentOpsStudio from "./AgentOpsStudio/AgentOpsStudio";
 import RobomindClinic from "./RobomindClinic/RobomindClinicWithTabs";
+import AgentTheoryDocs from "./components/AgentTheoryDocs/AgentTheoryDocs";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -443,6 +444,7 @@ function AppContent() {
             {!activeModule && section === "catalog-manager" && <CatalogManager />}
             {!activeModule && section === "agentops-studio" && <AgentOpsStudio />}
             {!activeModule && section === "robomind-clinic" && <RobomindClinic />}
+            {!activeModule && section === "agent-theory-docs" && <AgentTheoryDocs />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
