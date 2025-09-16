@@ -237,35 +237,116 @@ const AgentTheoryDocs = () => {
             { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
             { title: "Tutorials", count: 0, description: "Step-by-step guides" },
             { title: "Code Examples", count: 0, description: "Practical implementations" },
-            { title: "Video Content", count: 3, description: "Educational videos and demos" }
+            { title: "Video Content", count: 3, description: "Educational videos and demos" },
+            { title: "Hackathon Plans", count: 1, description: "Complete implementation plans for competitions" }
           ],
-      videos: [
-        {
-          title: "Temporal - Workflow Orchestration for AI Agents",
-          description: "Essential tool for hackathon development of autonomous workflows and agent orchestration",
-          url: "https://www.youtube.com/watch?v=GEXllEH2XiQ",
-          platform: "YouTube",
-          category: "Hackathon Tools",
-          importance: "High - Required for competition"
-        },
-        {
-          title: "OutSystems Agent Workbench - Introduction",
-          description: "Short introduction to OutSystems Agent Workbench for agent development in hackathons",
-          url: "https://www.youtube.com/watch?v=IXmCeAPX9GY",
-          platform: "YouTube",
-          category: "Hackathon Tools",
-          importance: "High - Required for competition"
-        },
-        {
-          title: "n8n Workflow Automation",
-          description: "Essential workflow automation tool already integrated in our AgentOps Studio module",
-          url: "https://www.youtube.com/watch?v=AURnISajubk",
-          platform: "YouTube",
-          category: "Integrated Tools",
-          importance: "High - Currently in use"
+          videos: [
+            {
+              title: "Temporal - Workflow Orchestration for AI Agents",
+              description: "Essential tool for hackathon development of autonomous workflows and agent orchestration",
+              url: "https://www.youtube.com/watch?v=GEXllEH2XiQ",
+              platform: "YouTube",
+              category: "Hackathon Tools",
+              importance: "High - Required for competition"
+            },
+            {
+              title: "OutSystems Agent Workbench - Introduction",
+              description: "Short introduction to OutSystems Agent Workbench for agent development in hackathons",
+              url: "https://www.youtube.com/watch?v=IXmCeAPX9GY",
+              platform: "YouTube",
+              category: "Hackathon Tools",
+              importance: "High - Required for competition"
+            },
+            {
+              title: "n8n Workflow Automation",
+              description: "Essential workflow automation tool already integrated in our AgentOps Studio module",
+              url: "https://www.youtube.com/watch?v=AURnISajubk",
+              platform: "YouTube",
+              category: "Integrated Tools",
+              importance: "High - Currently in use"
+            }
+          ],
+          hackathonPlans: [
+            {
+              id: "workflow-orchestrator-plan",
+              title: "Workflow Orchestrator - Kolomolo Agentic Hackathon Plan",
+              hackathon: "AI-Assisted Workflow Coding Hackathon",
+              date: "October 1-2, 2025",
+              location: "Stockholm, Sweden",
+              status: "ready",
+              description: "Complete implementation plan for Temporal-based workflow orchestration with human-in-the-loop approval",
+              mvp: {
+                useCase: "Insight → Reliable Action: Upload URLs/PDFs → Extract text → Generate executive brief → Dispatch to Slack/Sheets with automatic retries",
+                keyFeature: "If you kill the worker mid-run, Temporal resumes from exactly where it left off",
+                showcase: "Perfect demonstration of Temporal's durability, retries, signals/queries"
+              },
+              architecture: {
+                backend: "FastAPI + React UI (existing Workplace Learning With AI app)",
+                llm: "LM Studio (local) or cloud LLM provider",
+                database: "MongoDB for workflow runs and status",
+                orchestration: "Temporal for workflow management"
+              },
+              executionPlan: {
+                day1: [
+                  "Local Temporal Stack (Docker): temporal, temporal-ui, mongo",
+                  "Worker in TypeScript with 3 activities: fetchAndExtract, summarize, dispatch",
+                  "Workflow L2AWorkflow with Query: currentStatus() and Signal: approveProceed()",
+                  "Starter HTTP Service (Node) on :3080/start",
+                  "FastAPI endpoint /api/actions/from-playbook",
+                  "UI: 'Run via Temporal' button + runs list with polling status"
+                ],
+                day2: [
+                  "Add RetryPolicies for each activity (backoff & jitter)",
+                  "Add Heartbeats in fetchAndExtract and dispatch",
+                  "Add Human-in-the-loop step (Signal from UI)",
+                  "Prepare demo script: kill worker → restart → show resume capability"
+                ]
+              },
+              codeStructure: {
+                temporal: [
+                  "src/activities/activities.ts - Core business logic",
+                  "src/workflows/learningToAction.ts - Workflow definition",
+                  "src/worker.ts - Temporal worker",
+                  "src/starter.ts - HTTP starter service"
+                ],
+                docker: [
+                  "backend/Dockerfile - FastAPI container",
+                  "temporal-worker/Dockerfile - TypeScript worker",
+                  "temporal-starter/Dockerfile - Express starter"
+                ],
+                integration: [
+                  "backend/routers/actions.py - FastAPI endpoints",
+                  "frontend/src/components/TemporalRunCard.jsx - UI component",
+                  "frontend/src/components/TemporalApproveCard.jsx - Approval UI"
+                ]
+              },
+              demoScript: [
+                "Open Temporal UI (:8233) — show no running workflows",
+                "In app: paste 1–2 URLs → click 'Run via Temporal'",
+                "Show workflow running in Temporal UI",
+                "Kill the worker mid-'summarizing'",
+                "Restart worker → Temporal resumes exactly where it left off",
+                "Show Slack message + 'Sheet appended' result + callback received",
+                "End by showing full execution history in Temporal Web"
+              ],
+              tools: [
+                "Temporal AI - Workflow orchestration",
+                "n8n.io - Workflow automation (already integrated)",
+                "LM Studio - Local LLM",
+                "MongoDB - Data persistence",
+                "Docker - Containerization"
+              ],
+              features: [
+                "Durable Execution - Never lose state",
+                "Automatic Retries - Built-in fault tolerance",
+                "Human-in-the-loop - Approval signals",
+                "Real-time Status - Query current state",
+                "Callbacks - Integration with existing app",
+                "Health Checks - Production monitoring"
+              ]
+            }
+          ]
         }
-      ]
-    }
   };
 
   const filteredData = (data) => {
@@ -560,6 +641,153 @@ const AgentTheoryDocs = () => {
                 >
                   Watch Video →
                 </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Hackathon Plans Section */}
+      {documentationData.resources.hackathonPlans && documentationData.resources.hackathonPlans.length > 0 && (
+        <div className="hackathon-plans-section">
+          <h4>🏆 Hackathon Implementation Plans</h4>
+          <div className="hackathon-plans-grid">
+            {documentationData.resources.hackathonPlans.map((plan, index) => (
+              <div key={plan.id} className="hackathon-plan-card">
+                <div className="plan-header">
+                  <h5>{plan.title}</h5>
+                  <span className={`status-badge ${plan.status}`}>
+                    {plan.status.toUpperCase()}
+                  </span>
+                </div>
+                
+                <div className="plan-meta">
+                  <div className="plan-hackathon">🏆 {plan.hackathon}</div>
+                  <div className="plan-date">📅 {plan.date}</div>
+                  <div className="plan-location">📍 {plan.location}</div>
+                </div>
+                
+                <p className="plan-description">{plan.description}</p>
+                
+                {/* MVP Section */}
+                <div className="plan-section">
+                  <h6>🎯 MVP Use Case</h6>
+                  <p className="mvp-use-case">{plan.mvp.useCase}</p>
+                  <div className="mvp-features">
+                    <div className="mvp-feature">
+                      <strong>Key Feature:</strong> {plan.mvp.keyFeature}
+                    </div>
+                    <div className="mvp-showcase">
+                      <strong>Showcase:</strong> {plan.mvp.showcase}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Architecture Section */}
+                <div className="plan-section">
+                  <h6>🏗️ Architecture</h6>
+                  <div className="architecture-grid">
+                    <div className="arch-item">
+                      <strong>Backend:</strong> {plan.architecture.backend}
+                    </div>
+                    <div className="arch-item">
+                      <strong>LLM:</strong> {plan.architecture.llm}
+                    </div>
+                    <div className="arch-item">
+                      <strong>Database:</strong> {plan.architecture.database}
+                    </div>
+                    <div className="arch-item">
+                      <strong>Orchestration:</strong> {plan.architecture.orchestration}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Execution Plan */}
+                <div className="plan-section">
+                  <h6>📋 Execution Plan</h6>
+                  <div className="execution-days">
+                    <div className="execution-day">
+                      <h7>Day 1 - Build and Wire Up MVP</h7>
+                      <ul>
+                        {plan.executionPlan.day1.map((task, taskIndex) => (
+                          <li key={taskIndex}>{task}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="execution-day">
+                      <h7>Day 2 - Resilience & Demo Polish</h7>
+                      <ul>
+                        {plan.executionPlan.day2.map((task, taskIndex) => (
+                          <li key={taskIndex}>{task}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Code Structure */}
+                <div className="plan-section">
+                  <h6>💻 Code Structure</h6>
+                  <div className="code-structure">
+                    <div className="code-category">
+                      <strong>Temporal:</strong>
+                      <ul>
+                        {plan.codeStructure.temporal.map((file, fileIndex) => (
+                          <li key={fileIndex}>{file}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="code-category">
+                      <strong>Docker:</strong>
+                      <ul>
+                        {plan.codeStructure.docker.map((file, fileIndex) => (
+                          <li key={fileIndex}>{file}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="code-category">
+                      <strong>Integration:</strong>
+                      <ul>
+                        {plan.codeStructure.integration.map((file, fileIndex) => (
+                          <li key={fileIndex}>{file}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Demo Script */}
+                <div className="plan-section">
+                  <h6>🎬 Demo Script (5 Min)</h6>
+                  <ol className="demo-script">
+                    {plan.demoScript.map((step, stepIndex) => (
+                      <li key={stepIndex}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                
+                {/* Tools & Features */}
+                <div className="plan-section">
+                  <h6>🛠️ Tools & Features</h6>
+                  <div className="tools-features">
+                    <div className="tools-list">
+                      <strong>Tools:</strong>
+                      <ul>
+                        {plan.tools.map((tool, toolIndex) => (
+                          <li key={toolIndex}>{tool}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="features-list">
+                      <strong>Features:</strong>
+                      <ul>
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
