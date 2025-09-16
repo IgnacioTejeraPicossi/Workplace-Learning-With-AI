@@ -10,12 +10,12 @@ const AgentTheoryDocs = () => {
     overview: {
       title: "Agent Theory & Documentation",
       description: "Comprehensive collection of AI agent theory, documentation, and web applications",
-      stats: {
-        totalDocs: 2,
-        webApps: 5,
-        examples: 3,
-        lastUpdated: "Today"
-      }
+        stats: {
+          totalDocs: 2,
+          webApps: 16,
+          examples: 3,
+          lastUpdated: "Today"
+        }
     },
     theory: {
       title: "Agent Theory",
@@ -116,6 +116,33 @@ const AgentTheoryDocs = () => {
       title: "Web Applications & Examples",
       categories: [
         {
+          name: "Hackathon Tools",
+          apps: [
+            { name: "Temporal AI", url: "https://temporal.io/ai/agentic-ai", description: "Durable Execution of tools, LLMs, and conversations. Simplifies workflows by managing state across single and multi-agent systems, ensuring massive scale and parallelism", status: "active" },
+            { name: "OutSystems Agent Workbench", url: "https://www.outsystems.com/low-code-platform/agentic-ai-workbench", description: "Fuel enterprise innovation with custom agents. Create custom AI agents that streamline operations, elevate experiences, and grow revenue on the AI-powered low-code platform", status: "active" }
+          ]
+        },
+        {
+          name: "Business AI Agents",
+          apps: [
+            { name: "Bika.ai", url: "https://bika.ai/", description: "Organize your business with an AI agent that manages tasks, automations, databases, dashboards, and docs all in one place", status: "active" },
+            { name: "Resea AI", url: "https://resea.ai/", description: "The World's First Academic Agent - handles research and writing tasks from start to finish", status: "active" },
+            { name: "Momen", url: "http://go.momen.app/nocode", description: "No-code builder that lets non-technical founders turn app ideas into production-ready apps with UI, database, workflow, and AI", status: "active" },
+            { name: "Mailgo", url: "http://aisecret.co/mailgo", description: "AI email platform that combines lead generation, inbox management, and automation for high-converting outreach campaigns", status: "active" },
+            { name: "AutoBlocks", url: "https://shorturl.at/BdnyZ", description: "First agent simulation platform that helps AI teams prototype, test, and launch reliable AI agents at scale", status: "active" }
+          ]
+        },
+        {
+          name: "Automation & Workflow Agents",
+          apps: [
+            { name: "n8n.io", url: "https://n8n.io", description: "Flexible AI workflow automation for technical teams. Build with the precision of code or the speed of drag-n-drop. Host with on-prem control or in-the-cloud convenience", status: "active" },
+            { name: "Zapier Agents", url: "https://zapier.com/agents", description: "Build custom AI agents in minutes using plain English to process leads, answer emails, manage calendars, and more", status: "active" },
+            { name: "Kiva (Wellows)", url: "http://wellows.com", description: "AI-powered SEO agent that streamlines keyword research and content strategy with AI-driven insights", status: "active" },
+            { name: "Taskade Agents", url: "http://taskade.com/agents", description: "AI-powered workspace that enables you to build, train, and deploy custom AI agents to automate tasks and enhance workflows", status: "active" },
+            { name: "You.com", url: "http://you.com", description: "AI-powered agent that provides personalized search, content creation, and task automation", status: "active" }
+          ]
+        },
+        {
           name: "Agent Frameworks",
           apps: [
             { name: "LangChain", url: "https://langchain.com", description: "Framework for developing applications with LLMs", status: "active" },
@@ -124,10 +151,11 @@ const AgentTheoryDocs = () => {
           ]
         },
         {
-          name: "Agent Platforms",
+          name: "LLM Providers",
           apps: [
             { name: "OpenAI Assistants API", url: "https://platform.openai.com/docs/assistants", description: "OpenAI's agent platform", status: "active" },
-            { name: "Anthropic Claude", url: "https://claude.ai", description: "Anthropic's AI assistant", status: "active" }
+            { name: "Anthropic Claude", url: "https://claude.ai", description: "Anthropic's AI assistant", status: "active" },
+            { name: "Google Gemini", url: "https://gemini.google.com/", description: "Google's multimodal AI model", status: "active" }
           ]
         }
       ]
@@ -138,7 +166,33 @@ const AgentTheoryDocs = () => {
         { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
         { title: "Tutorials", count: 0, description: "Step-by-step guides" },
         { title: "Code Examples", count: 0, description: "Practical implementations" },
-        { title: "Video Content", count: 0, description: "Educational videos and demos" }
+        { title: "Video Content", count: 3, description: "Educational videos and demos" }
+      ],
+      videos: [
+        {
+          title: "Temporal - Workflow Orchestration for AI Agents",
+          description: "Essential tool for hackathon development of autonomous workflows and agent orchestration",
+          url: "https://www.youtube.com/watch?v=GEXllEH2XiQ",
+          platform: "YouTube",
+          category: "Hackathon Tools",
+          importance: "High - Required for competition"
+        },
+        {
+          title: "OutSystems Agent Workbench - Introduction",
+          description: "Short introduction to OutSystems Agent Workbench for agent development in hackathons",
+          url: "https://www.youtube.com/watch?v=IXmCeAPX9GY",
+          platform: "YouTube",
+          category: "Hackathon Tools",
+          importance: "High - Required for competition"
+        },
+        {
+          title: "n8n Workflow Automation",
+          description: "Essential workflow automation tool already integrated in our AgentOps Studio module",
+          url: "https://www.youtube.com/watch?v=AURnISajubk",
+          platform: "YouTube",
+          category: "Integrated Tools",
+          importance: "High - Currently in use"
+        }
       ]
     }
   };
@@ -312,17 +366,54 @@ const AgentTheoryDocs = () => {
   const renderResources = () => (
     <div className="resources-section">
       <h3>Learning Resources</h3>
-      <div className="resources-grid">
-        {documentationData.resources.items.map((resource, index) => (
-          <div key={index} className="resource-card">
-            <div className="resource-icon">📁</div>
-            <div className="resource-content">
-              <h5>{resource.title}</h5>
-              <div className="resource-count">{resource.count} items</div>
-              <p>{resource.description}</p>
-            </div>
+      
+      {/* Video Content Section */}
+      {documentationData.resources.videos && documentationData.resources.videos.length > 0 && (
+        <div className="videos-section">
+          <h4>🎥 Video Content</h4>
+          <div className="videos-grid">
+            {documentationData.resources.videos.map((video, index) => (
+              <div key={index} className="video-card">
+                <div className="video-header">
+                  <h5>{video.title}</h5>
+                  <span className={`importance-badge ${video.importance.toLowerCase().includes('high') ? 'high' : 'medium'}`}>
+                    {video.importance}
+                  </span>
+                </div>
+                <p className="video-description">{video.description}</p>
+                <div className="video-meta">
+                  <span className="video-platform">📺 {video.platform}</span>
+                  <span className="video-category">🏷️ {video.category}</span>
+                </div>
+                <a 
+                  href={video.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="video-link"
+                >
+                  Watch Video →
+                </a>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+      )}
+      
+      {/* Other Resources */}
+      <div className="other-resources">
+        <h4>📚 Other Resources</h4>
+        <div className="resources-grid">
+          {documentationData.resources.items.map((resource, index) => (
+            <div key={index} className="resource-card">
+              <div className="resource-icon">📁</div>
+              <div className="resource-content">
+                <h5>{resource.title}</h5>
+                <div className="resource-count">{resource.count} items</div>
+                <p>{resource.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
