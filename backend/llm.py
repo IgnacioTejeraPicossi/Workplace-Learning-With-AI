@@ -265,6 +265,14 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
     Enhanced streaming OpenAI function with GPT-5 model selection.
     Now supports both OpenAI and OpenRouter APIs.
     """
+    # Try ItemAI first
+    try:
+        for chunk in ask_itemai_stream(prompt, task_type, complexity, max_tokens, messages):
+            yield chunk
+        return
+    except Exception as e:
+        print(f"ItemAI streaming failed, falling back to OpenRouter: {e}", flush=True)
+
     # Try OpenRouter first if configured and selected
     if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
         try:
@@ -743,6 +751,73 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
                 return completion_text.strip()
             else:
                 raise Exception(f"ItemAI API returned status {response.status_code}: {response.text}")
+                
+    except Exception as e:
+        print(f"ItemAI API error: {e}")
+        # Don't raise, let the fallback system handle it
+        return None
+    
+def ask_itemai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+    """
+    ItemAI API function for local LM Studio integration.
+    
+    Args:
+        prompt: The prompt to send
+        task_type: Type of task for optimal model selection
+        complexity: Task complexity (low, medium, high)
+        max_tokens: Maximum tokens for response
+        messages: Alternative to prompt for conversation format
+    """
+    try:
+        import httpx
+        
+        # Default local URL for LM Studio
+        local_url = "http://host.docker.internal:1234" 
+        
+        # Prepare the request payload
+        if messages:
+            payload = {
+                "model": "default",  # LM Studio will use the loaded model
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": 0.7,
+                "stream": True
+            }
+        else:
+            payload = {
+                "model": "default",
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": max_tokens,
+                "temperature": 0.7,
+                "stream": True
+            }
+        
+        print("[ask_itemai_stream] starting request to LM Studio")
+
+        # Make request to local LM Studio
+        with httpx.stream(method='POST', 
+                          url=f"{local_url}/v1/chat/completions", 
+                          json=payload, 
+                          headers={"Content-Type": "application/json"}, 
+                          timeout=5.0) as response:
+            if response.status_code == 200:
+                for line in response.iter_lines():
+                    if line and line.startswith("data:"):
+                        try:
+                            json_text = line[len('data:'):].strip()
+                            if json_text == '[DONE]':
+                                print(f"ItemAI stream finished", flush=True)
+                                return
+                            json_data = json.loads(json_text)
+                            content = json_data.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                            yield content
+                        except json.JSONDecodeError as e:
+                            print(f"❌ ItemAI streaming failed to parse chunk: {e}", flush=True)
+                        except Exception as e:
+                            print(f"❌ ItemAI streaming error: {e}", flush=True)
+            else:
+                content = response.read()
+                raise Exception(f"ItemAI API returned status {response.status_code}: {content.decode()}")
                 
     except Exception as e:
         print(f"ItemAI API error: {e}")
