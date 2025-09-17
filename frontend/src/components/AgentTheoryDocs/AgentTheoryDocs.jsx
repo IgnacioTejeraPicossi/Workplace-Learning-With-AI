@@ -13,7 +13,7 @@ const AgentTheoryDocs = () => {
         stats: {
           totalDocs: 2,
           webApps: 16,
-          examples: 3,
+          examples: 5,
           lastUpdated: "Today"
         }
     },
@@ -237,7 +237,7 @@ const AgentTheoryDocs = () => {
             { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
             { title: "Tutorials", count: 0, description: "Step-by-step guides" },
             { title: "Code Examples", count: 0, description: "Practical implementations" },
-            { title: "Video Content", count: 3, description: "Educational videos and demos" },
+            { title: "Video Content", count: 5, description: "Educational videos and demos" },
             { title: "Hackathon Plans", count: 1, description: "Complete implementation plans for competitions" }
           ],
           videos: [
@@ -264,6 +264,22 @@ const AgentTheoryDocs = () => {
               platform: "YouTube",
               category: "Integrated Tools",
               importance: "High - Currently in use"
+            },
+            {
+              title: "n8n Tutorial - Complete Workflow Automation Guide",
+              description: "Comprehensive tutorial covering n8n workflow automation from basics to advanced features",
+              url: "https://www.youtube.com/watch?v=Eh24sZWGxzA",
+              platform: "YouTube",
+              category: "Learning Resources",
+              importance: "High - Essential for n8n mastery"
+            },
+            {
+              title: "n8n Advanced Workflows - AI Integration & Automation",
+              description: "Advanced n8n techniques for AI agent integration and complex workflow automation",
+              url: "https://www.youtube.com/watch?v=Eh24sZWGxzA",
+              platform: "YouTube",
+              category: "Learning Resources",
+              importance: "High - Advanced n8n techniques"
             }
           ],
           hackathonPlans: [
