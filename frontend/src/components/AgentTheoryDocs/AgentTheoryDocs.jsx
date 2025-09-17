@@ -362,6 +362,354 @@ const AgentTheoryDocs = () => {
               ]
             }
           ]
+        },
+        toolStack: {
+          title: "The Ultimate Tool Stack for AI Agents",
+          description: "Comprehensive collection of tools and platforms for building, deploying, and managing AI agents across all development stages",
+          categories: [
+            {
+              id: "orchestration-platforms",
+              name: "Orchestration Platforms",
+              focus: "Run and scale AI agents in real workflows",
+              color: "#3498db",
+              icon: "🎯",
+              tools: [
+                {
+                  name: "LangChain Hub",
+                  description: "Share agent workflows and prompts",
+                  category: "Orchestration",
+                  importance: "High"
+                },
+                {
+                  name: "Make.com",
+                  description: "Visual no-code orchestrator for agents & APIs",
+                  category: "Orchestration",
+                  importance: "High"
+                },
+                {
+                  name: "n8n",
+                  description: "Node-based automation builder integrating AI workflows",
+                  category: "Orchestration",
+                  importance: "High"
+                },
+                {
+                  name: "Reka",
+                  description: "Agent flow manager with task tracking",
+                  category: "Orchestration",
+                  importance: "Medium"
+                },
+                {
+                  name: "CrewAI + LangGraph",
+                  description: "Hybrid orchestration using graphs",
+                  category: "Orchestration",
+                  importance: "High"
+                },
+                {
+                  name: "PromptLayer",
+                  description: "Manage, version, and observe prompt performance",
+                  category: "Orchestration",
+                  importance: "Medium"
+                },
+                {
+                  name: "Cognosys",
+                  description: "Autonomous agent deployment with memory",
+                  category: "Orchestration",
+                  importance: "Medium"
+                },
+                {
+                  name: "Flowise",
+                  description: "Drag-and-drop visual builder for agent apps",
+                  category: "Orchestration",
+                  importance: "High"
+                }
+              ]
+            },
+            {
+              id: "tool-use-api-integration",
+              name: "Tool Use & API Integration",
+              focus: "Tools that enable agents to interact with real-world APIs and platforms",
+              color: "#2ecc71",
+              icon: "🔧",
+              tools: [
+                {
+                  name: "BrowserPilot",
+                  description: "Agent-powered browser automation",
+                  category: "API Integration",
+                  importance: "High"
+                },
+                {
+                  name: "AutoGPT Plugins",
+                  description: "Modular tool expansion for AutoGPT agents",
+                  category: "API Integration",
+                  importance: "Medium"
+                },
+                {
+                  name: "SerpAPI",
+                  description: "Real-time search tool for web-enabled agents",
+                  category: "API Integration",
+                  importance: "High"
+                },
+                {
+                  name: "ShellGPT",
+                  description: "Terminal-based shell interaction via agents",
+                  category: "API Integration",
+                  importance: "Medium"
+                },
+                {
+                  name: "OpenAI Functions",
+                  description: "Native tool-use via function calling",
+                  category: "API Integration",
+                  importance: "High"
+                },
+                {
+                  name: "Anthropic Tools",
+                  description: "Claude's API calling interface",
+                  category: "API Integration",
+                  importance: "High"
+                },
+                {
+                  name: "LangChain Tools",
+                  description: "Pre-built wrappers for APIs and utilities",
+                  category: "API Integration",
+                  importance: "High"
+                },
+                {
+                  name: "Zapier AI Actions",
+                  description: "Connect LLMs with 6000+ apps",
+                  category: "API Integration",
+                  importance: "High"
+                }
+              ]
+            },
+            {
+              id: "agent-safety-guardrails",
+              name: "Agent Safety & Guardrails",
+              focus: "Ensure secure, ethical, and reliable agent behavior",
+              color: "#27ae60",
+              icon: "🛡️",
+              tools: [
+                {
+                  name: "PromptLayer Monitor",
+                  description: "Audit and inspect prompt behavior",
+                  category: "Safety",
+                  importance: "High"
+                },
+                {
+                  name: "TruLens",
+                  description: "Evaluate agent outputs for accuracy, toxicity, etc.",
+                  category: "Safety",
+                  importance: "High"
+                },
+                {
+                  name: "HumanLoop",
+                  description: "Add human-in-the-loop to AI pipelines",
+                  category: "Safety",
+                  importance: "High"
+                },
+                {
+                  name: "Aegis AI",
+                  description: "Agent security and safety evaluation suite",
+                  category: "Safety",
+                  importance: "Medium"
+                },
+                {
+                  name: "GuardrailsAI",
+                  description: "Add safety, validation, and structure to LLM outputs",
+                  category: "Safety",
+                  importance: "High"
+                },
+                {
+                  name: "Llama Guard",
+                  description: "Meta's open-source moderation for agents",
+                  category: "Safety",
+                  importance: "Medium"
+                },
+                {
+                  name: "Rebuff",
+                  description: "Protect agents from prompt injection",
+                  category: "Safety",
+                  importance: "High"
+                },
+                {
+                  name: "Prompt Armor",
+                  description: "Prompt sanitizer & security wrapper",
+                  category: "Safety",
+                  importance: "Medium"
+                }
+              ]
+            },
+            {
+              id: "agent-frameworks",
+              name: "Agent Frameworks",
+              focus: "Building, orchestrating, and managing AI agents with multi-step reasoning",
+              color: "#f39c12",
+              icon: "🤖",
+              tools: [
+                {
+                  name: "LangChain",
+                  description: "Modular framework for LLM apps with agent/tool integration",
+                  category: "Framework",
+                  importance: "High"
+                },
+                {
+                  name: "AutoGen",
+                  description: "Microsoft's multi-agent conversation framework",
+                  category: "Framework",
+                  importance: "High"
+                },
+                {
+                  name: "CrewAI",
+                  description: "Role-based multi-agent collaboration platform",
+                  category: "Framework",
+                  importance: "High"
+                },
+                {
+                  name: "LangGraph",
+                  description: "Graph-based agent orchestration atop LangChain",
+                  category: "Framework",
+                  importance: "High"
+                },
+                {
+                  name: "MetaGPT",
+                  description: "Agents with SOP-style team collaboration",
+                  category: "Framework",
+                  importance: "Medium"
+                },
+                {
+                  name: "AgentOps",
+                  description: "Platform for testing, evaluating, and deploying agents",
+                  category: "Framework",
+                  importance: "High"
+                },
+                {
+                  name: "Camel AI",
+                  description: "Role-based roleplay between agents for task planning",
+                  category: "Framework",
+                  importance: "Medium"
+                },
+                {
+                  name: "SuperAgent",
+                  description: "Plug-and-play agent development with integrations",
+                  category: "Framework",
+                  importance: "Medium"
+                }
+              ]
+            },
+            {
+              id: "multi-agent-collaboration",
+              name: "Multi-Agent Collaboration",
+              focus: "Allow agents to talk, delegate, and collaborate on tasks",
+              color: "#9b59b6",
+              icon: "👥",
+              tools: [
+                {
+                  name: "AutoGen Agents",
+                  description: "Role-based agent dialogue with memory",
+                  category: "Collaboration",
+                  importance: "High"
+                },
+                {
+                  name: "CrewAI Roles",
+                  description: "Assign manager, developer, critic, etc.",
+                  category: "Collaboration",
+                  importance: "High"
+                },
+                {
+                  name: "Camel Agents",
+                  description: "Simulate structured conversations for brainstorming",
+                  category: "Collaboration",
+                  importance: "Medium"
+                },
+                {
+                  name: "MetaGPT",
+                  description: "Hierarchical collaboration with defined work roles",
+                  category: "Collaboration",
+                  importance: "Medium"
+                },
+                {
+                  name: "LangGraph Multi-Agent",
+                  description: "Directed graphs for collaborative agent paths",
+                  category: "Collaboration",
+                  importance: "High"
+                },
+                {
+                  name: "AutoGPT Chains",
+                  description: "Sequential task breakdowns with multiple agents",
+                  category: "Collaboration",
+                  importance: "Medium"
+                },
+                {
+                  name: "OpenAgents",
+                  description: "Collaborative execution with chat interfaces",
+                  category: "Collaboration",
+                  importance: "Medium"
+                },
+                {
+                  name: "Devika",
+                  description: "AI software developer agent using collaborative planning",
+                  category: "Collaboration",
+                  importance: "Medium"
+                }
+              ]
+            },
+            {
+              id: "memory-vector-databases",
+              name: "Memory & Vector Databases",
+              focus: "Store and retrieve long-term context and facts",
+              color: "#8e44ad",
+              icon: "🧠",
+              tools: [
+                {
+                  name: "Pinecone",
+                  description: "High-performance vector DB for fast semantic search",
+                  category: "Database",
+                  importance: "High"
+                },
+                {
+                  name: "Weaviate",
+                  description: "Modular, schema-flexible vector DB",
+                  category: "Database",
+                  importance: "High"
+                },
+                {
+                  name: "Chroma",
+                  description: "Open-source embedding DB, works well with LangChain",
+                  category: "Database",
+                  importance: "High"
+                },
+                {
+                  name: "FAISS",
+                  description: "Facebook's open-source vector search library",
+                  category: "Database",
+                  importance: "High"
+                },
+                {
+                  name: "Milvus",
+                  description: "Scalable, GPU-accelerated vector DB",
+                  category: "Database",
+                  importance: "Medium"
+                },
+                {
+                  name: "Redis Vector Store",
+                  description: "In-memory DB with vector support",
+                  category: "Database",
+                  importance: "Medium"
+                },
+                {
+                  name: "Zep",
+                  description: "Memory backend for conversational agents",
+                  category: "Database",
+                  importance: "Medium"
+                },
+                {
+                  name: "Qdrant",
+                  description: "Production-ready open-source vector engine",
+                  category: "Database",
+                  importance: "High"
+                }
+              ]
+            }
+          ]
         }
   };
 
@@ -627,6 +975,66 @@ const AgentTheoryDocs = () => {
     </div>
   );
 
+  const renderToolStack = () => (
+    <div className="tool-stack-section">
+      <div className="tool-stack-header">
+        <h3>{documentationData.toolStack.title}</h3>
+        <p className="tool-stack-description">{documentationData.toolStack.description}</p>
+      </div>
+      
+      <div className="tool-stack-overview">
+        <div className="overview-stats">
+          <div className="stat-card">
+            <div className="stat-number">{documentationData.toolStack.categories.length}</div>
+            <div className="stat-label">Categories</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">
+              {documentationData.toolStack.categories.reduce((total, category) => total + category.tools.length, 0)}
+            </div>
+            <div className="stat-label">Tools</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">
+              {documentationData.toolStack.categories.reduce((total, category) => 
+                total + category.tools.filter(tool => tool.importance === 'High').length, 0)}
+            </div>
+            <div className="stat-label">Essential Tools</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="categories-grid">
+        {documentationData.toolStack.categories.map((category, index) => (
+          <div key={category.id} className="category-card" style={{ borderLeftColor: category.color }}>
+            <div className="category-header">
+              <div className="category-icon">{category.icon}</div>
+              <div className="category-info">
+                <h4>{category.name}</h4>
+                <p className="category-focus">{category.focus}</p>
+              </div>
+            </div>
+            
+            <div className="tools-grid">
+              {category.tools.map((tool, toolIndex) => (
+                <div key={toolIndex} className="tool-card">
+                  <div className="tool-header">
+                    <h5>{tool.name}</h5>
+                    <span className={`importance-badge ${tool.importance.toLowerCase()}`}>
+                      {tool.importance}
+                    </span>
+                  </div>
+                  <p className="tool-description">{tool.description}</p>
+                  <div className="tool-category">{tool.category}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderResources = () => (
     <div className="resources-section">
       <h3>Learning Resources</h3>
@@ -861,6 +1269,12 @@ const AgentTheoryDocs = () => {
           📚 Theory
         </button>
         <button 
+          className={`tab-button ${activeTab === 'toolstack' ? 'active' : ''}`}
+          onClick={() => setActiveTab('toolstack')}
+        >
+          🛠️ Tool Stack
+        </button>
+        <button 
           className={`tab-button ${activeTab === 'webapps' ? 'active' : ''}`}
           onClick={() => setActiveTab('webapps')}
         >
@@ -883,6 +1297,7 @@ const AgentTheoryDocs = () => {
       <div className="docs-content">
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'theory' && renderTheory()}
+        {activeTab === 'toolstack' && renderToolStack()}
         {activeTab === 'webapps' && renderWebApps()}
         {activeTab === 'hackathons' && renderHackathons()}
         {activeTab === 'resources' && renderResources()}
