@@ -64,14 +64,16 @@ const KnowledgeMap = () => {
     'Conflict Resolution': '#795548'
   };
 
-  // Web search function
+  // Web search function - RESTORED TO ORIGINAL FUNCTIONALITY
   const performWebSearch = async (topic) => {
+    console.log('🔍 Starting web search for topic:', topic);
     setWebSearchTopic(topic);
     setWebSearchLoading(true);
     setShowWebSearch(true);
     
     try {
-              const response = await fetch('http://127.0.0.1:8000/api/simple-search', {
+      console.log('📡 Making request to:', 'http://127.0.0.1:8000/api/simple-search');
+      const response = await fetch('http://127.0.0.1:8000/api/simple-search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,15 +84,22 @@ const KnowledgeMap = () => {
         })
       });
       
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response ok:', response.ok);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('📡 Response data:', data);
+        
+        // Use results directly as in original
         setWebSearchResults(data.results || []);
       } else {
-        console.error('Web search failed:', response.statusText);
+        const errorText = await response.text();
+        console.error('❌ Web search failed:', response.status, response.statusText, errorText);
         setWebSearchResults([]);
       }
     } catch (error) {
-      console.error('Web search error:', error);
+      console.error('❌ Web search error:', error);
       setWebSearchResults([]);
     } finally {
       setWebSearchLoading(false);
@@ -457,8 +466,10 @@ const KnowledgeMap = () => {
           setTooltipVisible(false);
         });
 
-        circle.addEventListener('click', () => {
+        circle.addEventListener('click', (event) => {
           console.log('🖱️ Clicked node:', node);
+          console.log('🖱️ Event details:', event);
+          event.stopPropagation(); // Prevent zoom from interfering
           setSelectedTopic(node);
           
           // Trigger web search for this topic
@@ -692,6 +703,31 @@ const KnowledgeMap = () => {
               }}
             />
           </div>
+          
+          {/* Test button for debugging */}
+          <button 
+            onClick={() => {
+              console.log('🧪 Test button clicked');
+              console.log('🧪 showWebSearch state:', showWebSearch);
+              console.log('🧪 webSearchResults:', webSearchResults);
+              console.log('🧪 searchTerm:', searchTerm);
+              // Use the search term from the input field, or default to a test term
+              const searchQuery = searchTerm || 'test search';
+              performWebSearch(searchQuery);
+            }}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            Test Search
+          </button>
+          
 
           {/* Category Filter */}
           <div style={{ minWidth: '150px' }}>
@@ -975,13 +1011,15 @@ const KnowledgeMap = () => {
               const svg = svgRef.current;
               if (svg && zoomRef.current) {
                 if (isZoomMode) {
-                  // Disable zoom behavior
+                  // Disable zoom behavior but keep other events
                   d3.select(svg).on('.zoom', null);
                   d3.select(svg).style('cursor', 'crosshair');
+                  console.log('🔓 Zoom disabled - clicks should work now');
                 } else {
                   // Re-enable zoom behavior
                   d3.select(svg).call(zoomRef.current);
                   d3.select(svg).style('cursor', 'default');
+                  console.log('🔒 Zoom enabled');
                 }
               }
             }}

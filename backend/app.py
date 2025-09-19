@@ -1417,6 +1417,95 @@ async def update_user_activity(request: Request):
     except Exception as e:
                 return {"error": str(e)}, 400
 
+@app.post("/api/knowledge-map/vector-search")
+async def perform_vector_search(request: Request):
+    """Perform vector similarity search for documents similar to the given topic"""
+    try:
+        data = await request.json()
+        topic = data.get("topic", "")
+        limit = data.get("limit", 10)
+        
+        if not topic:
+            return {"error": "Topic is required"}, 400
+        
+        print(f"🔍 Vector search for topic: '{topic}'")
+        
+        # Get all micro-lessons from database
+        from backend.db import micro_lessons_collection, saved_videos_collection
+        
+        # Search in micro-lessons
+        micro_lessons = await micro_lessons_collection.find({}).to_list(length=None)
+        print(f"📚 Found {len(micro_lessons)} micro-lessons")
+        
+        # Simple text similarity search (in real implementation, this would use vector embeddings)
+        results = []
+        
+        for lesson in micro_lessons:
+            title = lesson.get("title", "")
+            content = lesson.get("content", "")
+            topic_key = lesson.get("topic", "")
+            
+            # Calculate simple text similarity
+            similarity_score = calculate_text_similarity(topic.lower(), f"{title} {content} {topic_key}".lower())
+            
+            if similarity_score > 0.1:  # Only include results with some similarity
+                results.append({
+                    "title": title,
+                    "content": content[:200] + "..." if len(content) > 200 else content,
+                    "topic": topic_key,
+                    "source": "micro_lessons",
+                    "similarity_score": round(similarity_score, 3),
+                    "url": f"/micro-lessons/{lesson.get('_id')}",
+                    "type": "micro_lesson"
+                })
+        
+        # Search in saved videos
+        videos = await saved_videos_collection.find({}).to_list(length=None)
+        print(f"🎥 Found {len(videos)} videos")
+        
+        for video in videos:
+            title = video.get("title", "")
+            description = video.get("description", "")
+            
+            similarity_score = calculate_text_similarity(topic.lower(), f"{title} {description}".lower())
+            
+            if similarity_score > 0.1:
+                results.append({
+                    "title": title,
+                    "content": description[:200] + "..." if len(description) > 200 else description,
+                    "topic": video.get("topic", ""),
+                    "source": "videos",
+                    "similarity_score": round(similarity_score, 3),
+                    "url": video.get("url", ""),
+                    "type": "video"
+                })
+        
+        # Sort by similarity score (highest first)
+        results.sort(key=lambda x: x["similarity_score"], reverse=True)
+        
+        # Limit results
+        results = results[:limit]
+        
+        print(f"🔍 Vector search for '{topic}' returned {len(results)} similar documents")
+        return {"results": results, "query": topic, "total_found": len(results)}
+        
+    except Exception as e:
+        print(f"❌ Error in vector search: {e}")
+        return {"error": str(e)}, 500
+
+def calculate_text_similarity(query, text):
+    """Calculate simple text similarity using word overlap"""
+    query_words = set(query.split())
+    text_words = set(text.split())
+    
+    if not query_words or not text_words:
+        return 0.0
+    
+    intersection = query_words.intersection(text_words)
+    union = query_words.union(text_words)
+    
+    return len(intersection) / len(union) if union else 0.0
+
 @app.post("/api/knowledge-map/web-search")
 async def perform_web_search(request: Request):
     """Perform web search for a topic and prepare results for future library integration"""
