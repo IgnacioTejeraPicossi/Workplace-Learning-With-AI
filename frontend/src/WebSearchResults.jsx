@@ -103,16 +103,31 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
             padding: '15px',
             background: '#fafafa'
           }}>
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
-              <a 
-                href={result.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{ color: '#007bff', textDecoration: 'none' }}
-              >
-                {result.title}
-              </a>
-            </h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+              <h4 style={{ margin: '0', fontSize: '16px', flex: 1 }}>
+                <a 
+                  href={result.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#007bff', textDecoration: 'none' }}
+                >
+                  {result.title}
+                </a>
+              </h4>
+              {result.similarity_score && (
+                <div style={{ 
+                  background: '#e8f5e8', 
+                  color: '#2d5a2d', 
+                  padding: '2px 8px', 
+                  borderRadius: '12px', 
+                  fontSize: '12px', 
+                  fontWeight: 'bold',
+                  marginLeft: '10px'
+                }}>
+                  {(result.similarity_score * 100).toFixed(1)}% match
+                </div>
+              )}
+            </div>
             <p style={{ 
               margin: '0 0 10px 0', 
               fontSize: '14px', 
@@ -121,7 +136,21 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
             }}>
               {result.snippet}
             </p>
-            <div style={{ fontSize: '12px', color: '#888' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#888' }}>
+              <div>
+                <span style={{ 
+                  background: result.source === 'micro_lessons' ? '#e3f2fd' : '#fff3e0', 
+                  color: result.source === 'micro_lessons' ? '#1976d2' : '#f57c00',
+                  padding: '2px 6px', 
+                  borderRadius: '4px', 
+                  marginRight: '8px'
+                }}>
+                  {result.source === 'micro_lessons' ? '📚 Micro-lesson' : '🎥 Video'}
+                </span>
+                {result.rank && (
+                  <span style={{ color: '#666' }}>Rank #{result.rank}</span>
+                )}
+              </div>
               <a 
                 href={result.url} 
                 target="_blank" 

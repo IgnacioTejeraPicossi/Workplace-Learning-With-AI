@@ -74,6 +74,7 @@ async def simple_web_search(request: SimpleSearchRequest):
             
             # If regex parsing didn't work well, provide fallback results
             if not results:
+                print(f"⚠️ DuckDuckGo parsing failed, using fallback results for: {request.topic}")
                 results = [
                     SearchResult(
                         title=f"{request.topic} - Tutorial and Best Practices",
@@ -84,6 +85,46 @@ async def simple_web_search(request: SimpleSearchRequest):
                         title=f"{request.topic} - Learning Resources",
                         url=f"https://duckduckgo.com/?q={request.topic}+learning+resources",
                         snippet=f"Find learning resources, documentation, and educational content about {request.topic}."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Official Documentation",
+                        url=f"https://duckduckgo.com/?q={request.topic}+official+documentation",
+                        snippet=f"Official documentation and guides for {request.topic}. Comprehensive reference materials and API documentation."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Community Forum",
+                        url=f"https://duckduckgo.com/?q={request.topic}+community+forum+discussion",
+                        snippet=f"Community discussions, Q&A, and support forums for {request.topic}. Get help from other users and experts."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Video Tutorials",
+                        url=f"https://duckduckgo.com/?q={request.topic}+video+tutorial+youtube",
+                        snippet=f"Video tutorials and step-by-step guides for {request.topic}. Learn through visual demonstrations and examples."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Best Practices Guide",
+                        url=f"https://duckduckgo.com/?q={request.topic}+best+practices+guide",
+                        snippet=f"Best practices, tips, and advanced techniques for {request.topic}. Optimize your workflow and avoid common pitfalls."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Examples and Use Cases",
+                        url=f"https://duckduckgo.com/?q={request.topic}+examples+use+cases",
+                        snippet=f"Real-world examples and practical use cases for {request.topic}. See how others are using it successfully."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Troubleshooting Guide",
+                        url=f"https://duckduckgo.com/?q={request.topic}+troubleshooting+problems+solutions",
+                        snippet=f"Common problems and solutions for {request.topic}. Troubleshooting guide and FAQ section."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Advanced Features",
+                        url=f"https://duckduckgo.com/?q={request.topic}+advanced+features+capabilities",
+                        snippet=f"Advanced features and capabilities of {request.topic}. Explore powerful tools and hidden functionality."
+                    ),
+                    SearchResult(
+                        title=f"{request.topic} - Integration Guide",
+                        url=f"https://duckduckgo.com/?q={request.topic}+integration+setup+configuration",
+                        snippet=f"Integration and setup guide for {request.topic}. Learn how to integrate it with other tools and systems."
                     )
                 ]
             
