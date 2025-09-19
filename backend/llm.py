@@ -26,6 +26,8 @@ OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/ap
 # API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
+ITEMAI_URL = os.getenv("ITEMAI_URL", "http://localhost:1234")
+
 def get_api_config_from_headers(request_headers=None):
     """
     Get API configuration from request headers or use defaults
@@ -34,7 +36,7 @@ def get_api_config_from_headers(request_headers=None):
     if request_headers:
         # Try to get configuration from headers
         api_provider = request_headers.get('x-api-provider', API_PROVIDER)
-        itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
+        itemai_url = request_headers.get('x-itemai-url', ITEMAI_URL)
         openai_key = request_headers.get('x-openai-key', OPENAI_API_KEY)
         openrouter_key = request_headers.get('x-openrouter-key', OPENROUTER_API_KEY)
         
@@ -48,7 +50,7 @@ def get_api_config_from_headers(request_headers=None):
     # Fallback to environment variables
     return {
         'provider': API_PROVIDER,
-        'itemai_url': 'http://localhost:1234',
+        'itemai_url': ITEMAI_URL,
         'openai_key': OPENAI_API_KEY,
         'openrouter_key': OPENROUTER_API_KEY
     }
@@ -717,7 +719,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         import httpx
         
         # Default local URL for LM Studio
-        local_url = "http://localhost:1234"
+        local_url = ITEMAI_URL
         
         # Prepare the request payload
         if messages:
@@ -772,7 +774,7 @@ def ask_itemai_stream(prompt=None, task_type=None, complexity="medium", max_toke
         import httpx
         
         # Default local URL for LM Studio
-        local_url = "http://host.docker.internal:1234" 
+        local_url = ITEMAI_URL
         
         # Prepare the request payload
         if messages:
