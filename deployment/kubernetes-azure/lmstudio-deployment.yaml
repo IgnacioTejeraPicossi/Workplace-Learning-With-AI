@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: lmstudio
+  name: lmstudio
+  namespace: learningwithai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: lmstudio
+  template:
+    metadata:
+      labels:
+        io.kompose.service: lmstudio
+    spec:
+      containers:
+        - image: crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_lmstudio:latest
+          name: learningwithai-lmstudio
+          ports:
+            - containerPort: 1234
+              protocol: TCP
+      restartPolicy: Always
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
