@@ -684,9 +684,9 @@ const KnowledgeMap = () => {
           🔍 Search & Filter Topics
         </h4>
         
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           {/* Search Input */}
-          <div style={{ flex: '1', minWidth: '200px' }}>
+          <div style={{ flex: '1', minWidth: '250px', maxWidth: '400px' }}>
             <input
               type="text"
               placeholder="Search topics..."
@@ -694,12 +694,13 @@ const KnowledgeMap = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px 12px',
+                padding: '10px 14px',
                 borderRadius: 6,
                 border: `1px solid ${colors.border}`,
                 background: colors.background,
                 color: colors.text,
-                fontSize: '14px'
+                fontSize: '14px',
+                boxSizing: 'border-box'
               }}
             />
           </div>
@@ -716,13 +717,18 @@ const KnowledgeMap = () => {
               performWebSearch(searchQuery);
             }}
             style={{
-              padding: '8px 16px',
+              padding: '10px 20px',
               backgroundColor: '#28a745',
               color: 'white',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '12px'
+              fontSize: '14px',
+              fontWeight: '500',
+              whiteSpace: 'nowrap',
+              minWidth: '120px',
+              height: '42px',
+              boxSizing: 'border-box'
             }}
           >
             Test Search
