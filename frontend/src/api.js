@@ -12,7 +12,7 @@ export async function fetchWithAuth(url, options = {}) {
   return fetch(url, options);
 }
 
-const API_BASE = process.env.BACKEND_URL || "http://localhost:8000";
+const API_BASE = "/api";
 
 // Generic API call function
 export async function apiCall(endpoint, method = "GET", data = null) {
