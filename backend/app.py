@@ -2238,7 +2238,7 @@ app.include_router(simple_web_search_router, prefix="/api", tags=["Simple Web Se
 # Robomind Clinic router
 try:
     from backend.clinic.router import router as clinic_router
-    app.include_router(clinic_router, prefix="/api", tags=["Robomind Clinic"])
+    app.include_router(clinic_router, tags=["Robomind Clinic"])
     print("✅ Robomind Clinic router included successfully")
 except ImportError as e:
     print(f"❌ Failed to import Robomind Clinic router: {e}")
