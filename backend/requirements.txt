@@ -23,3 +23,7 @@ markdown
 fpdf
 firebase_admin
 pydantic[email]
+argon2-cffi==23.1.0
+pyjwt==2.9.0
+pyotp==2.9.0
+qrcode==7.4.2 

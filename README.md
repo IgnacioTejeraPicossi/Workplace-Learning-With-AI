@@ -714,6 +714,14 @@ backend/
 
 ## 🚀 Quick Start Guide
 
+### ⚡ **CRITICAL: Backend Startup Command**
+```bash
+# From project root directory with virtual environment activated:
+python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+**⚠️ IMPORTANT:** The `--host 0.0.0.0` parameter is **ESSENTIAL** for frontend-backend communication. Without it, the frontend may not be able to connect to the backend API.
+
 ### 🟢 First Run Checklist
 - MongoDB is running and accessible on localhost:27017
 - Backend .env is configured with all required variables (see below)
@@ -751,7 +759,8 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 ### ⚠️ Common Pitfalls & Troubleshooting
 
 - **npm start fails with 'Missing script: start'**: Ensure you are in the frontend directory and package.json contains a "start" script.
-- **uvicorn app:app --reload fails**: This command is INCORRECT. Always run from the root directory with `uvicorn backend.app:app --reload`
+- **uvicorn app:app --reload fails**: This command is INCORRECT. Always run from the root directory with `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000`
+- **Frontend can't connect to backend**: Missing `--host 0.0.0.0` parameter. The backend must be started with `--host 0.0.0.0` to be accessible from all network interfaces.
 - **Import errors when starting backend**: You're probably running from the wrong directory. The backend MUST be started from the ROOT directory, not from inside `backend/`
 - **pip install fails with "requirements.txt not found"**: You're probably in the wrong directory. Run `pip install -r requirements.txt` from the ROOT directory, not from `backend/`
 - **Environment variables not loading**: Ensure your `.env` file is in the ROOT directory, not in `backend/`. The backend looks for `.env` at the project root level.
@@ -794,7 +803,7 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
    # Solution: Run from project root directory
    cd "C:\Test\AI\AI Learning with AI"
    .venv\Scripts\Activate.ps1
-   python -m uvicorn backend.app:app --reload --port 8000
+   python -m python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000 --host 0.0.0.0 --port 8000
    ```
 
 3. **"Python 3.11" instead of virtual environment Python**
@@ -838,7 +847,7 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 python --version
 
 # 3. Start FastAPI server
-python -m uvicorn backend.app:app --reload --port 8000
+python -m python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000 --host 0.0.0.0 --port 8000
 ```
 
 **Frontend (React)**
@@ -851,6 +860,7 @@ npm start
 - **Virtual Environment**: Ensures all dependencies (like `email-validator`) are available
 - **Root Directory**: Required for correct Python imports (`backend.routers.agentops.*`)
 - **Python -m uvicorn**: Uses the virtual environment's Python interpreter
+- **--host 0.0.0.0**: **CRITICAL** - Makes the server accessible from all network interfaces (localhost, 127.0.0.1, and other IPs). Without this, the frontend may not be able to connect to the backend.
 - **Port 8000**: Standard port for the backend API
 
 **📋 Environment Setup Checklist**
@@ -1072,7 +1082,7 @@ cd websearch-backend && npm install && cd ..
 # source .venv/bin/activate
 
 # Then start backend
-uvicorn backend.app:app --reload --port 8000
+python -m python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000 --host 0.0.0.0 --port 8000
 
 # Terminal 2 - Frontend
 cd frontend && npm start
@@ -1092,7 +1102,7 @@ cd agentops-n8n && .\start-n8n.ps1
 > 
 > The Python FastAPI backend **MUST be started from the root directory** (not from inside the `backend/` folder) using:
 > ```bash
-> uvicorn backend.app:app --reload
+> python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 > ```
 > 
 > This is because the backend code uses relative imports that expect to be run from the project root. Starting from inside `backend/` will cause import errors.
@@ -1128,7 +1138,7 @@ AI-Learning-with-AI/
 ```
 
 **⚠️ IMPORTANT DIRECTORY STRUCTURE NOTES:**
-- **Backend FastAPI**: Must be started from ROOT directory with `uvicorn backend.app:app --reload`
+- **Backend FastAPI**: Must be started from ROOT directory with `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000`
 - **Python dependencies**: Install from ROOT directory with `pip install -r requirements.txt`
 - **Backend .env file**: Located at ROOT level (`.env`) - NOT inside `backend/` folder
 - **Frontend**: Install and run from `frontend/` directory (has its own `.env`)
@@ -1201,7 +1211,7 @@ AI-Learning-with-AI/
    # source .venv/bin/activate
    
    # Then start backend
-   uvicorn backend.app:app --reload --port 8000
+   python -m python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000 --host 0.0.0.0 --port 8000
    
    # Terminal 2: Frontend
    cd frontend && npm start
