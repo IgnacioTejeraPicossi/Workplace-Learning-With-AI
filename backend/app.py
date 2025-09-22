@@ -203,7 +203,7 @@ async def favicon():
     return FileResponse(favicon_path)
 
 def verify_token(request: Request):
-    """Verify Firebase authentication token"""
+    """Verify authentication token (Firebase or MongoDB JWT)"""
     if firebase_admin is None:
         # Fallback to mock authentication if Firebase is not available
         return {"uid": "mock_user_id", "sub": "mock_user_id", "email": "test@example.com", "name": "Test User"}
@@ -217,19 +217,43 @@ def verify_token(request: Request):
         # Extract the token
         token = auth_header.split("Bearer ")[1]
         
-        # Verify the token with Firebase
-        decoded_token = firebase_auth.verify_id_token(token)
-        
-        # Return user information
-        return {
-            "uid": decoded_token["uid"],
-            "sub": decoded_token["uid"],
-            "email": decoded_token.get("email", ""),
-            "name": decoded_token.get("name", ""),
-            "picture": decoded_token.get("picture", "")
-        }
+        # First try to verify as MongoDB JWT token
+        try:
+            from backend.core.security import verify_access
+            decoded_token = verify_access(token)
+            
+            # Return MongoDB user information in Firebase format
+            return {
+                "uid": decoded_token["sub"],
+                "sub": decoded_token["sub"],
+                "email": decoded_token.get("email", ""),
+                "name": decoded_token.get("email", "").split("@")[0],  # Use email prefix as name
+                "picture": None,
+                "roles": decoded_token.get("roles", [])
+            }
+        except Exception as jwt_error:
+            # If JWT verification fails, try Firebase verification
+            try:
+                decoded_token = firebase_auth.verify_id_token(token)
+                
+                # Return Firebase user information
+                return {
+                    "uid": decoded_token["uid"],
+                    "sub": decoded_token["uid"],
+                    "email": decoded_token.get("email", ""),
+                    "name": decoded_token.get("name", ""),
+                    "picture": decoded_token.get("picture", "")
+                }
+            except Exception as firebase_error:
+                print(f"❌ Both JWT and Firebase token verification failed:")
+                print(f"   JWT error: {jwt_error}")
+                print(f"   Firebase error: {firebase_error}")
+                raise HTTPException(status_code=401, detail="Invalid authentication token")
+                
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"❌ Firebase token verification failed: {e}")
+        print(f"❌ Token verification failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid authentication token")
 
 class MicroLessonRequest(BaseModel):
@@ -2264,6 +2288,17 @@ except ImportError as e:
     print(f"❌ Failed to import AI Gateway router: {e}")
 except Exception as e:
     print(f"❌ Error including AI Gateway router: {e}")
+
+# MongoDB Authentication router
+try:
+    from backend.routers.auth import router as auth_router
+    app.include_router(auth_router, tags=["MongoDB Authentication"])
+    print("✅ MongoDB Authentication router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import MongoDB Authentication router: {e}")
+except Exception as e:
+    print(f"❌ Error including MongoDB Authentication router: {e}")
+
 print("🔍 DEBUG: Router included successfully")
 
 # Test route directly in app.py

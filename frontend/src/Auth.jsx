@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { auth, googleProvider } from './firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
+import AuthSelector from './components/Auth/AuthSelector';
 
 export default function Auth({ user, setUser }) {
   const [error, setError] = useState(null);
@@ -15,20 +16,24 @@ export default function Auth({ user, setUser }) {
   };
 
   const handleSignOut = async () => {
+    // Clear MongoDB token if it exists
+    localStorage.removeItem('mongodb_access_token');
+    
+    // Sign out from Firebase
     await signOut(auth);
     setUser(null);
   };
 
+  // Si no hay usuario, mostrar el selector de autenticación
+  if (!user) {
+    return <AuthSelector onGoogleSignIn={setUser} />;
+  }
+
+  // Si hay usuario, mostrar el botón de logout
   return (
     <div>
-      {user ? (
-        <>
-          <div>Welcome, {user.displayName}!</div>
-          <sl-button variant="default" onClick={handleSignOut}>Sign Out</sl-button>
-        </>
-      ) : (
-        <sl-button variant="primary" onClick={handleSignIn}>Sign in with Google</sl-button>
-      )}
+      <div>Welcome, {user.displayName}!</div>
+      <sl-button variant="default" onClick={handleSignOut}>Sign Out</sl-button>
       {error && <div style={{ color: 'red' }}>{error}</div>}
     </div>
   );

@@ -1,6 +1,21 @@
 import { auth } from './firebase';
+import { apiFetch, setAccessToken } from './api/apiInterceptor';
 
+// Unified authentication function that works with both Firebase and MongoDB tokens
 export async function fetchWithAuth(url, options = {}) {
+  // First try to get MongoDB JWT token from our interceptor
+  const mongoToken = localStorage.getItem('mongodb_access_token');
+  
+  if (mongoToken) {
+    // Use MongoDB JWT token
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${mongoToken}`,
+    };
+    return fetch(url, options);
+  }
+  
+  // Fallback to Firebase token
   const user = auth.currentUser;
   if (user) {
     const token = await user.getIdToken();
