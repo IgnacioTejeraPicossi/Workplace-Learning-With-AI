@@ -6,7 +6,7 @@ export type Turn = {
   ts?: string 
 };
 
-export type Runner = 'n8n'|'outsystems'|'temporal'|'lmstudio';
+export type Runner = 'n8n';
 
 export class AgentOpsClient {
   constructor(private base = '/api/gateway') {}

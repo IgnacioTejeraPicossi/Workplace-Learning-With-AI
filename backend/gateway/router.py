@@ -48,10 +48,7 @@ async def flow_trigger(body: FlowReq):
 
 def _runner_url(runner:str)->str:
     m = {
-        "n8n": os.getenv("N8N_BRIDGE","http://localhost:8000/api/n8n/trigger"),
-        "outsystems": os.getenv("OUT_BRIDGE","http://localhost:8000/api/outsystems/trigger"),
-        "temporal": os.getenv("TMP_BRIDGE","http://localhost:8000/api/temporal/start"),
-        "lmstudio": os.getenv("LMST_BRIDGE","http://localhost:8000/api/lmstudio/run")
+        "n8n": os.getenv("N8N_BRIDGE","http://localhost:8000/api/n8n/trigger")
     }
     return m[runner]
 
