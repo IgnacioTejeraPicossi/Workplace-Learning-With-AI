@@ -37,9 +37,6 @@ CLINIC_SAMPLING=0.25
 MONGO_URI=mongodb://localhost:27017/app
 CHAT_BACKEND=http://localhost:1234/v1/chat/completions
 N8N_BRIDGE=http://localhost:8000/api/n8n/trigger
-OUT_BRIDGE=http://localhost:8000/api/outsystems/trigger
-TMP_BRIDGE=http://localhost:8000/api/temporal/start
-LMST_BRIDGE=http://localhost:8000/api/lmstudio/run
 ```
 
 #### **Políticas por Defecto**
