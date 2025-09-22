@@ -54,6 +54,7 @@
 - [Multi-Language Support](#multi-language-support) - i18n infrastructure and translations
 
 ### ⚙️ Backend Services
+- [AI Gateway](#ai-gateway) - Transversal AI monitoring and psychological safety system
 - [FastAPI Server](#fastapi-server) - High-performance API server
 - [AI Integration](#ai-integration) - ItemAI API (local), OpenAI GPT-5, and OpenRouter integration
 - [MongoDB](#mongodb) - Flexible document storage
@@ -486,6 +487,118 @@ The Agentic RAG system represents a paradigm shift from traditional retrieval-au
 - **Financial Analysis**: Report processing with risk assessment
 
 This system transforms document analysis from simple text retrieval to intelligent, collaborative AI agents that provide **traceable, grounded, and quality-assessed answers**.
+
+---
+
+## 🔧 AI Gateway Architecture {#ai-gateway}
+
+### System Overview
+The AI Gateway is a **transversal security layer** that monitors and analyzes all AI interactions across the entire application. It acts as an intelligent middleware that intercepts AI calls, applies psychological safety protocols, and ensures optimal AI behavior.
+
+### 🎯 What is the AI Gateway?
+
+The AI Gateway is not just for specific modules—it's a **system-wide AI monitoring solution** that:
+
+- **Intercepts ALL AI calls** from any module in the application
+- **Applies psychological safety protocols** using the Robomind Clinic framework
+- **Monitors AI behavior patterns** to detect and prevent AI pathologies
+- **Provides intelligent fallback** and quality assurance
+- **Maintains comprehensive logs** of all AI interactions
+
+### 🔧 Configuration Variables (.env)
+
+```env
+# AI Gateway Configuration
+CLINIC_SAMPLING=0.25                    # 25% of AI interactions are analyzed
+MONGO_URI=mongodb://localhost:27017/app # Database for storing AI diagnostics
+CHAT_BACKEND=http://localhost:1234/v1/chat/completions # Real AI endpoint
+N8N_BRIDGE=http://localhost:8000/api/n8n/trigger      # n8n workflow integration
+```
+
+#### **Configuration Explained:**
+
+- **`CLINIC_SAMPLING=0.25`**: Controls what percentage of AI interactions get analyzed (25% = 1 in 4 calls)
+- **`MONGO_URI`**: Database where all AI conversations and diagnostic reports are stored
+- **`CHAT_BACKEND`**: The actual AI service endpoint (LM Studio, OpenAI, etc.)
+- **`N8N_BRIDGE`**: For monitoring n8n workflow executions in AgentOps Studio
+
+### 🔄 How It Works
+
+```mermaid
+graph TD
+    A[Any Frontend Module] --> B[agentOpsClient.chat()]
+    B --> C[AI Gateway /api/gateway/chat]
+    C --> D[Robomind Clinic Analysis]
+    C --> E[CHAT_BACKEND - Real AI]
+    E --> F[Response to Frontend]
+    D --> G[MongoDB Storage]
+    
+    H[Sampling Decision] --> D
+    I[Policy Engine] --> D
+    J[Therapy Application] --> D
+```
+
+### 📊 Real-World Usage Examples
+
+#### **In AI Study Buddy:**
+```javascript
+const response = await agentOpsClient.chat(runId, {
+  userPrompt: "Explain machine learning concepts",
+  systemMessage: "You are a helpful AI tutor"
+}, {
+  module: 'ai_study_buddy',
+  timestamp: new Date().toISOString()
+});
+```
+
+#### **In Knowledge Map:**
+```javascript
+const response = await agentOpsClient.chat(runId, {
+  userPrompt: "Generate learning recommendations",
+  systemMessage: "You are an educational AI assistant"
+}, {
+  module: 'knowledge_map',
+  timestamp: new Date().toISOString()
+});
+```
+
+#### **In AgentOps Studio (n8n workflows):**
+```javascript
+const response = await agentOpsClient.triggerFlow(runId, 'n8n', flowId, inputs, {
+  module: 'agentops_studio'
+});
+```
+
+### 🧠 Automatic AI Psychology Monitoring
+
+The gateway automatically detects and treats AI pathologies:
+
+- **Confabulation**: AI fabricating plausible falsehoods
+- **Obsessive Patterns**: Repetitive or looping behavior
+- **Alignment Overcompliance**: Overly rigid adherence to instructions
+- **Operational Dissociation**: Inconsistent behavior across sessions
+- **Bunkering**: Excessive negativity or refusal to help
+
+### 🎛️ Transversal Integration
+
+**The AI Gateway works across ALL modules:**
+
+- ✅ **AI Study Buddy** - Chat interactions
+- ✅ **Knowledge Map** - Recommendation generation
+- ✅ **Prompt Lab** - Prompt engineering
+- ✅ **AgentOps Studio** - Workflow execution
+- ✅ **Document Analyzer** - Document processing
+- ✅ **Repository Analyzer** - Code analysis
+- ✅ **Any custom module** that uses `agentOpsClient`
+
+### 🔍 Benefits
+
+- **Psychological Safety**: Prevents AI from developing harmful patterns
+- **Quality Assurance**: Ensures consistent, reliable AI behavior
+- **Transparency**: Complete audit trail of all AI interactions
+- **Adaptability**: Configurable policies per module and use case
+- **Performance**: Minimal overhead with intelligent sampling
+- **Scalability**: Works seamlessly as the application grows
 
 ---
 
