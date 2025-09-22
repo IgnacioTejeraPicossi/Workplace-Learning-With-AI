@@ -1,0 +1,55 @@
+name: AKS Deploy CI
+on:
+  push:
+    branches: [ "kubernetes" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get current date for use as container tag
+      id: date
+      run: echo "::set-output name=date::$(date +%s)"
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}      
+    - name: Login to ACR
+      uses: docker/login-action@v3
+      with:
+        registry: <registry-name>.azurecr.io
+        username: ${{ secrets.AZURE_REGISTRY_CLIENT_ID }}
+        password: ${{ secrets.AZURE_REGISTRY_CLIENT_SECRET }}
+
+    - name: Build frontend Docker image
+      run: docker build ./frontend --file ./frontend/Dockerfile --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_frontend:${{ steps.date.outputs.date }}
+    - name: Build backend Docker image
+      run: docker build ./backend --file ./backend/Dockerfile --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
+    - name: Push frontend Docker image to ACR
+      run: docker push --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_frontend:${{ steps.date.outputs.date }}
+    - name: Push backend Docker image to ACR
+      run: docker push --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v4
+      with:
+        resource-group: ${{ env.AZURE_AKS_RG }}
+        cluster-name: ${{ env.AZURE_AKS_NAME }}
+    - name: Deploy to AKS
+      uses: azure/k8s-deploy@v5
+      with:
+        resource-group: ${{ env.AZURE_AKS_RG }}
+        name: ${{ env.AZURE_AKS_NAME }}
+        namespace: learningwithai
+        action: deploy
+        strategy: basic
+        private-cluster: true
+        manifests: |
+          deployment/kubernetes-azure
+        images: 
+          crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_frontend:${{ steps.date.outputs.date }}
+          crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
