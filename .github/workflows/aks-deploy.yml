@@ -2,6 +2,7 @@ name: AKS Deploy CI
 on:
   push:
     branches: [ "kubernetes" ]
+  pull_request:
 
 jobs:
   build:
@@ -30,9 +31,9 @@ jobs:
     - name: Build backend Docker image
       run: docker build ./backend --file ./backend/Dockerfile --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
     - name: Push frontend Docker image to ACR
-      run: docker push --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_frontend:${{ steps.date.outputs.date }}
+      run: docker push crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_frontend:${{ steps.date.outputs.date }}
     - name: Push backend Docker image to ACR
-      run: docker push --tag crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
+      run: docker push crolaworkplacelearningwithai-argehzhfhjaeagbp.azurecr.io/learningwithai_backend:${{ steps.date.outputs.date }}
 
     - name: Set AKS context
       uses: azure/aks-set-context@v4
