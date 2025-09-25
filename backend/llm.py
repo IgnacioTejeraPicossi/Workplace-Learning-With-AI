@@ -730,7 +730,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             }
         
         # Make request to local LM Studio
-        with httpx.Client(timeout=5.0) as client:
+        with httpx.Client(timeout=60.0) as client:
             response = client.post(
                 f"{local_url}/v1/chat/completions",
                 json=payload,
