@@ -332,14 +332,14 @@ def root():
 
 
 @app.get("/concepts")
-async def generate_concepts(user=Depends(verify_token)):
+async def generate_concepts(request: Request, user=Depends(verify_token)):
     """Generate AI-based workplace learning concepts."""
-    result = ask_ai_unified_sync(CONCEPT_PROMPT, task_type="concepts", complexity="medium", max_tokens=800)
+    result = ask_ai_unified_sync(CONCEPT_PROMPT, task_type="concepts", complexity="medium", max_tokens=800, request_headers=request.headers)
     return {"concepts": result}
 
-def generate_micro_lesson(topic: str) -> str:
+def generate_micro_lesson(topic: str, request_headers=None) -> str:
     prompt = f"Write a concise, practical micro-lesson for the following workplace topic: {topic}"
-    return ask_ai_unified_sync(prompt, task_type="micro_lesson", complexity="medium", max_tokens=600)
+    return ask_ai_unified_sync(prompt, task_type="micro_lesson", complexity="medium", max_tokens=600, request_headers=request_headers)
 
 @app.post("/micro-lesson")
 async def micro_lesson(request: Request, user=Depends(verify_token)):
@@ -347,7 +347,7 @@ async def micro_lesson(request: Request, user=Depends(verify_token)):
     topic = data.get("topic", "default topic")
     lesson_text = data.get("lesson")
     if not lesson_text:
-        lesson_text = generate_micro_lesson(topic)
+        lesson_text = generate_micro_lesson(topic, request.headers)
     # Save to MongoDB with user ID
     await lessons_collection.insert_one({
         "topic": topic,
@@ -359,22 +359,22 @@ async def micro_lesson(request: Request, user=Depends(verify_token)):
     return {"lesson": lesson_text}
 
 @app.get("/simulation")
-async def generate_simulation(user=Depends(verify_token)):
+async def generate_simulation(request: Request, user=Depends(verify_token)):
     """Generate a customer conversation simulation."""
-    result = ask_ai_unified_sync(SIMULATION_PROMPT, task_type="simulation", complexity="medium", max_tokens=1000)
+    result = ask_ai_unified_sync(SIMULATION_PROMPT, task_type="simulation", complexity="medium", max_tokens=1000, request_headers=request.headers)
     return {"simulation": result}
 
 @app.post("/recommendation")
-async def generate_recommendation(request: RecommendationRequest, user=Depends(verify_token)):
-    prompt = RECOMMENDATION_PROMPT.replace("{skill_gap}", request.skill_gap)
-    result = ask_ai_unified_sync(prompt, task_type="recommendation", complexity="medium", max_tokens=600)
+async def generate_recommendation(recommendation_request: RecommendationRequest, http_request: Request, user=Depends(verify_token)):
+    prompt = RECOMMENDATION_PROMPT.replace("{skill_gap}", recommendation_request.skill_gap)
+    result = ask_ai_unified_sync(prompt, task_type="recommendation", complexity="medium", max_tokens=600, request_headers=http_request.headers)
     return {"recommendation": result}
 
 @app.post("/simulation-step")
-async def simulation_step(request: SimulationRequest, user=Depends(verify_token)):
+async def simulation_step(simulation_request: SimulationRequest, http_request: Request, user=Depends(verify_token)):
     # Build conversation history as text
     history_text = ""
-    for turn in request.history:
+    for turn in simulation_request.history:
         if not isinstance(turn, dict) or 'speaker' not in turn or 'text' not in turn:
             print("Malformed turn in history:", turn)
             continue  # or raise an error, or handle as needed
@@ -384,10 +384,10 @@ async def simulation_step(request: SimulationRequest, user=Depends(verify_token)
     prompt = (
         f"{SIMULATION_PROMPT}\n"
         f"Conversation so far:\n{history_text}\n"
-        f"Employee's next response: {request.user_input}\n"
+        f"Employee's next response: {simulation_request.user_input}\n"
         "Continue the scenario."
     )
-    result = ask_ai_unified_sync(prompt, task_type="simulation", complexity="medium", max_tokens=1000)
+    result = ask_ai_unified_sync(prompt, task_type="simulation", complexity="medium", max_tokens=1000, request_headers=http_request.headers)
     print("LLM raw response:", result)
     # Try to parse the LLM's response as JSON
     import json
@@ -449,7 +449,7 @@ async def career_coach(request: Request, user=Depends(verify_token)):
         messages = [{"role": "system", "content": PROMPTS["career_coach"]}]
     else:
         messages = history
-    result = ask_ai_unified_sync(messages=messages, task_type="career_coach", complexity="high", max_tokens=800)
+    result = ask_ai_unified_sync(messages=messages, task_type="career_coach", complexity="high", max_tokens=800, request_headers=request.headers)
     
     # Optionally save the session for the user
     try:
@@ -472,7 +472,7 @@ async def skills_forecast(request: Request, user=Depends(verify_token)):
     keywords = data.get("keywords", "")
     context = f"User history:\n{history}\n\nTranscript keywords:\n{keywords}\n\n"
     prompt = PROMPTS["skills_forecast"] + "\n" + context
-    result = ask_ai_unified_sync(prompt, task_type="skills_forecast", complexity="high", max_tokens=800)
+    result = ask_ai_unified_sync(prompt, task_type="skills_forecast", complexity="high", max_tokens=800, request_headers=request.headers)
     
     # Optionally save the forecast for the user
     try:
@@ -731,7 +731,7 @@ async def remove_team_member(team_id: str, member_id: str, user=Depends(verify_t
     return {"message": "Member removed successfully"}
 
 @app.post("/teams/{team_id}/analytics")
-async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, user=Depends(verify_token)):
+async def generate_team_analytics(team_id: str, analytics_request: TeamAnalyticsRequest, http_request: Request, user=Depends(verify_token)):
     """Generate AI-powered team analytics."""
     # Verify team ownership
     team = await teams_collection.find_one({
@@ -752,7 +752,7 @@ async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, u
         "team_name": team["name"],
         "team_description": team["description"],
         "members": members,
-        "metrics": request.metrics
+        "metrics": analytics_request.metrics
     }
     
     # Generate AI analysis
@@ -765,7 +765,7 @@ async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, u
     Team Members:
     {chr(10).join([f"- {m['name']} ({m['role']}): Skills: {', '.join(m['skills'])}" for m in members])}
     
-    Requested Metrics: {', '.join(request.metrics)}
+    Requested Metrics: {', '.join(analytics_request.metrics)}
     
     Please provide:
     1. Overall team assessment
@@ -774,13 +774,13 @@ async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, u
     4. Collaboration insights
     """
     
-    analysis_result = ask_ai_unified_sync(analysis_prompt, task_type="team_analytics", complexity="high", max_tokens=1000)
+    analysis_result = ask_ai_unified_sync(analysis_prompt, task_type="team_analytics", complexity="high", max_tokens=1000, request_headers=http_request.headers)
     
     # Save analytics
     analytics_doc = {
         "team_id": team_id,
         "user_id": user["uid"],
-        "metrics": request.metrics,
+        "metrics": analytics_request.metrics,
         "analysis": analysis_result,
         "created_at": datetime.utcnow()
     }
@@ -857,16 +857,16 @@ async def get_user_profile(user=Depends(verify_token)):
         return {"profile": None}
 
 @app.post("/certifications/recommend")
-async def recommend_certifications(request: CertificationProfile, user=Depends(verify_token)):
+async def recommend_certifications(certification_request: CertificationProfile, http_request: Request, user=Depends(verify_token)):
     """Generate AI-powered certification recommendations based on user profile."""
     prompt = CERTIFICATION_RECOMMENDATION_PROMPT.format(
-        role=request.role,
-        skills=", ".join(request.skills),
-        goals=request.goals,
-        experience_level=request.experience_level
+        role=certification_request.role,
+        skills=", ".join(certification_request.skills),
+        goals=certification_request.goals,
+        experience_level=certification_request.experience_level
     )
     
-    result = ask_ai_unified_sync(prompt, task_type="certification_recommendation", complexity="medium", max_tokens=600)
+    result = ask_ai_unified_sync(prompt, task_type="certification_recommendation", complexity="medium", max_tokens=600, request_headers=http_request.headers)
     
     # Save recommendation for user
     try:
@@ -883,16 +883,16 @@ async def recommend_certifications(request: CertificationProfile, user=Depends(v
     return {"recommendation": result}
 
 @app.post("/certifications/study-plan")
-async def generate_study_plan(request: CertificationStudyPlan, user=Depends(verify_token)):
+async def generate_study_plan(study_plan_request: CertificationStudyPlan, http_request: Request, user=Depends(verify_token)):
     """Generate a personalized study plan for a specific certification."""
     prompt = CERTIFICATION_STUDY_PLAN_PROMPT.format(
-        certification_name=request.certification_name,
-        current_skills=", ".join(request.current_skills),
-        study_time=request.study_time,
-        target_date=request.target_date
+        certification_name=study_plan_request.certification_name,
+        current_skills=", ".join(study_plan_request.current_skills),
+        study_time=study_plan_request.study_time,
+        target_date=study_plan_request.target_date
     )
     
-    result = ask_ai_unified_sync(prompt, task_type="certification_study_plan", complexity="high", max_tokens=1000)
+    result = ask_ai_unified_sync(prompt, task_type="certification_study_plan", complexity="high", max_tokens=1000, request_headers=http_request.headers)
     
     # Save study plan for user
     try:
@@ -909,13 +909,13 @@ async def generate_study_plan(request: CertificationStudyPlan, user=Depends(veri
     return {"study_plan": result}
 
 @app.post("/certifications/simulate")
-async def certification_simulation(request: CertificationSimulation, user=Depends(verify_token)):
+async def certification_simulation(simulation_request: CertificationSimulation, http_request: Request, user=Depends(verify_token)):
     """Generate certification interview simulation."""
     prompt = CERTIFICATION_SIMULATION_PROMPT.format(
-        certification_name=request.certification_name
+        certification_name=simulation_request.certification_name
     )
     
-    result = ask_ai_unified_sync(prompt, task_type="certification_simulation", complexity="medium", max_tokens=800)
+    result = ask_ai_unified_sync(prompt, task_type="certification_simulation", complexity="medium", max_tokens=800, request_headers=http_request.headers)
     
     # Save simulation for user
     try:
@@ -966,15 +966,16 @@ async def route_prompt(request: RouteRequest):
     return result 
 
 @app.post("/llm-stream")
-async def llm_stream(request: LLMStreamRequest):
-    print(f"[LLM STREAM] New request: {request}", flush=True)
+async def llm_stream(llm_request: LLMStreamRequest, http_request: Request):
+    print(f"[LLM STREAM] New request: {llm_request}", flush=True)
     def event_stream():
         for chunk in ask_openai_stream(
-            prompt=request.prompt,
-            task_type=request.task_type,  # Use new parameter
-            complexity=request.complexity,   # Use new parameter
-            max_tokens=request.max_tokens,
-            messages=request.messages
+            prompt=llm_request.prompt,
+            task_type=llm_request.task_type,  # Use new parameter
+            complexity=llm_request.complexity,   # Use new parameter
+            max_tokens=llm_request.max_tokens,
+            messages=llm_request.messages,
+            request_headers=http_request.headers
         ):
             print(f"[LLM STREAM] Sending chunk: {chunk}", flush=True)
             yield chunk
@@ -989,7 +990,7 @@ async def video_quiz(request: Request):
             return {"error": "Summary is required"}
         
         prompt = video_quiz_prompt.format(summary=summary)
-        result = ask_ai_unified_sync(prompt, task_type="video_quiz", complexity="medium", max_tokens=600)
+        result = ask_ai_unified_sync(prompt, task_type="video_quiz", complexity="medium", max_tokens=600, request_headers=request.headers)
         
         try:
             questions = json.loads(result)
@@ -1008,7 +1009,7 @@ async def video_summary(request: Request):
     data = await request.json()
     transcript = data.get("transcript", "")
     prompt = video_summary_prompt.format(transcript=transcript)
-    summary = ask_ai_unified_sync(prompt, task_type="video_summary", complexity="medium", max_tokens=500)
+    summary = ask_ai_unified_sync(prompt, task_type="video_summary", complexity="medium", max_tokens=500, request_headers=request.headers)
     return {"summary": summary} 
 
 class IntentInput(BaseModel):
@@ -2298,6 +2299,21 @@ except ImportError as e:
     print(f"❌ Failed to import MongoDB Authentication router: {e}")
 except Exception as e:
     print(f"❌ Error including MongoDB Authentication router: {e}")
+
+# AI Agent Bridge Platform routers
+try:
+    from backend.routers.agent_runs import router as agent_runs_router
+    from backend.routers.compliance_agent import router as compliance_agent_router
+    from backend.routers.productivity_agent import router as productivity_agent_router
+    
+    app.include_router(agent_runs_router, tags=["AI Agent Bridge Platform"])
+    app.include_router(compliance_agent_router, tags=["AI Compliance Agent"])
+    app.include_router(productivity_agent_router, tags=["AI Productivity Agent"])
+    print("✅ AI Agent Bridge Platform routers included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import AI Agent Bridge Platform routers: {e}")
+except Exception as e:
+    print(f"❌ Error including AI Agent Bridge Platform routers: {e}")
 
 print("🔍 DEBUG: Router included successfully")
 

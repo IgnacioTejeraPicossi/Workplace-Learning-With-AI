@@ -40,6 +40,8 @@
     "agentopsStudio": "AgentOps Studio",
     "robomindClinic": "Robomind Clinic",
     "agentTheoryDocs": "Agent Theory & Documentation",
+    "aiComplianceAgent": "AI Compliance Agent",
+    "aiProductivityAgent": "AI Productivity Agent",
     "help": "Help",
     "runTest": "Run Test",
     "apiConfig": "API Config",

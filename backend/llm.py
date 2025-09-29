@@ -260,14 +260,34 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
     except Exception as e:
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
 
-def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
     """
     Enhanced streaming OpenAI function with GPT-5 model selection.
     Now supports both OpenAI and OpenRouter APIs.
     """
-    # Try OpenRouter first if configured and selected
-    if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
+    # Get configuration from headers if available
+    config = get_api_config_from_headers(request_headers)
+    
+    # Try ItemAI first if configured
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
+            print("🔄 Trying ItemAI (LM Studio) streaming...")
+            # For now, use the sync version and stream it character by character
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
+                print("✅ ItemAI (LM Studio) streaming successful")
+                for char in result:
+                    yield char
+                return
+            else:
+                print("❌ ItemAI returned empty or mocked response")
+        except Exception as e:
+            print(f"❌ ItemAI streaming failed: {e}")
+    
+    # Try OpenRouter if configured
+    if config['openrouter_key']:
+        try:
+            print("🔄 Trying OpenRouter streaming...")
             for chunk in ask_openrouter_stream(prompt, task_type, complexity, max_tokens, messages):
                 yield chunk
             return
@@ -275,7 +295,7 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
             print(f"OpenRouter streaming failed, falling back to OpenAI: {e}")
     
     # Fallback to OpenAI
-    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+    if not config['openai_key'] or config['openai_key'].strip() == "":
         # No key found, yield a mock response for testing
         mock_response = f"""I'm your AI Study Buddy powered by GPT-5! Here's a helpful response to your question:
 
@@ -730,7 +750,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             }
         
         # Make request to local LM Studio
-        with httpx.Client(timeout=60.0) as client:
+        with httpx.Client(timeout=120.0) as client:
             response = client.post(
                 f"{local_url}/v1/chat/completions",
                 json=payload,
