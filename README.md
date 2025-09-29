@@ -44,6 +44,8 @@
 - [AgentOps Studio](#agentops-studio) - Unified AI Workflow Lab for design, simulation, and execution
 - [Robomind Clinic](#robomind-clinic) - AI Psychology Module for diagnosing and treating AI pathologies
 - [Agent Theory & Documentation](#agent-theory--documentation) - Comprehensive AI agent theory, tools, and hackathon preparation
+- [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
+- [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
 
 ### 🛠️ Admin & Development
 - [API Config](#api-config) - ItemAI API, OpenAI, and OpenRouter API configuration
@@ -4123,6 +4125,101 @@ const documentationData = {
 **Status**: 🚀 **READY FOR HACKATHON PREPARATION**  
 **Confidence Level**: 🟢 **HIGH** - Complete documentation and tool catalog  
 **Next Action**: 🎯 **BEGIN HACKATHON PREPARATION WITH CHATGPT5**
+
+---
+
+## 🤖 AI Compliance Agent
+
+### Overview
+The AI Compliance Agent transforms regulatory documents (ESG/GDPR/ISO) into auditable team actions via OutSystems enterprise execution.
+
+### Key Features
+- **Document Analysis**: Upload compliance documents and extract key risks
+- **Risk Assessment**: AI-powered identification of compliance risks and requirements
+- **Action Generation**: Automatic creation of Jira tasks, Slack alerts, and audit logs
+- **Enterprise Integration**: Secure execution via OutSystems with full governance
+- **Audit Trail**: Complete tracking of compliance actions and status
+
+### Demo Flow
+1. **Upload Document**: ESG/GDPR guideline in Document Analyzer
+2. **AI Analysis**: Get summary + extracted key risks
+3. **Send to Agent**: Click "Send to OutSystems Agent" via modal
+4. **Enterprise Execution**: OutSystems creates:
+   - Jira issue(s) in compliance project
+   - Slack alert in compliance channel
+   - Google Sheets row for audit log
+5. **Status Tracking**: Monitor progress in AgentOps Studio
+
+### Technical Implementation
+- **Backend**: FastAPI router (`/api/compliance/dispatch`)
+- **Security**: HMAC-signed requests to OutSystems
+- **Data Model**: `agent_runs` collection in MongoDB
+- **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
+
+---
+
+## 🚀 AI Productivity Agent
+
+### Overview
+The AI Productivity Agent converts research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.
+
+### Key Features
+- **Research Analysis**: Process URLs, documents, or text input
+- **Action Planning**: Generate Top 5 next actions automatically
+- **Multi-Task Creation**: Create multiple Jira issues (one per action)
+- **Team Coordination**: Slack digests and Google Sheets snapshots
+- **Rapid Execution**: Enterprise-scale task distribution via OutSystems
+
+### Demo Flow
+1. **Research Input**: Use Agentic RAG to analyze competitor website
+2. **AI Processing**: Get summary + Top 5 Next Actions
+3. **Action Review**: Edit assignees and priorities if needed
+4. **Send to Agent**: Click "Send to OutSystems Agent" via modal
+5. **Enterprise Execution**: OutSystems creates:
+   - Multiple Jira issues (one per action)
+   - Slack digest with all actions
+   - Google Sheets snapshot of summary + actions
+6. **Progress Tracking**: Monitor all tasks in AgentOps Studio
+
+### Technical Implementation
+- **Backend**: FastAPI router (`/api/productivity/dispatch`)
+- **Security**: HMAC-signed requests to OutSystems
+- **Data Model**: `agent_runs` collection in MongoDB
+- **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
+
+---
+
+## 🏗️ AI Agent Bridge Platform
+
+### Architecture Overview
+The AI Agent Bridge Platform provides shared infrastructure for both Compliance and Productivity agents:
+
+```
+Insights (Document Analyzer/Agentic RAG) 
+    ↓
+Summary + Actions 
+    ↓
+Send to OutSystems Agent 
+    ↓
+Action Bundle (HMAC-signed)
+    ↓
+OutSystems Execution (Jira/Slack/Sheets)
+    ↓
+Callback → AgentOps Studio (Audit)
+```
+
+### Shared Components
+- **Data Model**: `agent_runs` MongoDB collection
+- **API Endpoints**: `/api/agent-runs` (list + callback)
+- **UI Components**: `ActionDispatchModal`, `AgentOpsRuns`
+- **Security**: HMAC-SHA256 signing for OutSystems communication
+- **Monitoring**: Real-time status updates and artifact tracking
+
+### Enterprise Benefits
+- **Governance**: OutSystems-first execution ensures compliance and security
+- **Scalability**: Enterprise-grade infrastructure and connectors
+- **Audit**: Complete trail of AI-generated actions and outcomes
+- **Flexibility**: Support for both OutSystems and n8n execution engines
 
 ---
 
