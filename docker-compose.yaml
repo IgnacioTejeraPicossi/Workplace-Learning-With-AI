@@ -17,6 +17,7 @@ services:
     container_name: learningwithai-backend
     environment:
       - MONGO_URI=mongodb://mongodb:27017
+      - ITEMAI_URL=http://host.docker.internal:1234
     ports:
       - '8000:8000'
     depends_on:
