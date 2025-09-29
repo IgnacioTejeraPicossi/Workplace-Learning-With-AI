@@ -118,7 +118,6 @@ const AgentTheoryDocs = () => {
         {
           name: "Hackathon Tools",
           apps: [
-            { name: "Temporal AI", url: "https://temporal.io/ai/agentic-ai", description: "Durable Execution of tools, LLMs, and conversations. Simplifies workflows by managing state across single and multi-agent systems, ensuring massive scale and parallelism", status: "active" },
             { name: "OutSystems Agent Workbench", url: "https://www.outsystems.com/low-code-platform/agentic-ai-workbench", description: "Fuel enterprise innovation with custom agents. Create custom AI agents that streamline operations, elevate experiences, and grow revenue on the AI-powered low-code platform", status: "active" }
           ]
         },
@@ -164,41 +163,7 @@ const AgentTheoryDocs = () => {
           title: "Upcoming Hackathons",
           events: [
             {
-              id: "hackathon-1",
-              name: "AI-Assisted Workflow Coding Hackathon",
-              organizer: "Kolomolo, Proxify, Polytope & Cillers",
-              date: "October 1-2, 2025",
-              location: "Ersta Conference Center, Stockholm, Sweden",
-              format: "Hybrid (In Person & Online)",
-              challenge: "AI-generate a business-critical workflow",
-              description: "Build complex workflows and agents that are scalable, fault-tolerant, and easy to maintain. Explore human-in-the-loop and long-running workflows.",
-              examples: [
-                "Order-to-delivery workflows",
-                "AI content enhancement",
-                "AI agents development",
-                "Software development pipelines",
-                "Billing and vendor management",
-                "Credentials rotation",
-                "ML pipelines",
-                "Incident response",
-                "Periodic compliance reporting"
-              ],
-              jury: [
-                "IKEA", "Spotlight", "Volvo Group", "H&M", "Atlas Copco", "Assa Abloy", 
-                "Lego", "Carlsberg", "Nordea", "SEB", "Ericsson", "Scania", 
-                "Electrolux", "Husqvarna", "Getinge", "Volvo Cars", "SAAB", 
-                "Telia", "Telenor", "Tele 2", "Länsförsäkringar"
-              ],
-              schedule: {
-                "Oct 1": "08:30 - 17:00 (CET) - Hack Day",
-                "Oct 2": "16:30 - 20:30 (CET) - Grand Finale & Awards Ceremony"
-              },
-              benefits: "Free of charge, food & beverages included, networking with Nordic tech executives",
-              tools: ["Temporal AI", "n8n.io", "AI-assisted coding tools"],
-              status: "upcoming"
-            },
-            {
-              id: "hackathon-2", 
+              id: "hackathon-1", 
               name: "OutSystems Low-Code Agent Builder Hackathon",
               organizer: "AVO Consulting, AWS, Innovation Pioneers & Cillers",
               date: "October 14, 2025",
@@ -237,18 +202,10 @@ const AgentTheoryDocs = () => {
             { title: "Research Papers", count: 0, description: "Academic papers on agent theory" },
             { title: "Tutorials", count: 0, description: "Step-by-step guides" },
             { title: "Code Examples", count: 0, description: "Practical implementations" },
-            { title: "Video Content", count: 5, description: "Educational videos and demos" },
-            { title: "Hackathon Plans", count: 1, description: "Complete implementation plans for competitions" }
+            { title: "Video Content", count: 4, description: "Educational videos and demos" },
+            { title: "Hackathon Plans", count: 0, description: "Complete implementation plans for competitions" }
           ],
           videos: [
-            {
-              title: "Temporal - Workflow Orchestration for AI Agents",
-              description: "Essential tool for hackathon development of autonomous workflows and agent orchestration",
-              url: "https://www.youtube.com/watch?v=GEXllEH2XiQ",
-              platform: "YouTube",
-              category: "Hackathon Tools",
-              importance: "High - Required for competition"
-            },
             {
               title: "OutSystems Agent Workbench - Introduction",
               description: "Short introduction to OutSystems Agent Workbench for agent development in hackathons",
@@ -282,86 +239,7 @@ const AgentTheoryDocs = () => {
               importance: "High - Advanced n8n techniques"
             }
           ],
-          hackathonPlans: [
-            {
-              id: "workflow-orchestrator-plan",
-              title: "Workflow Orchestrator - Kolomolo Agentic Hackathon Plan",
-              hackathon: "AI-Assisted Workflow Coding Hackathon",
-              date: "October 1-2, 2025",
-              location: "Stockholm, Sweden",
-              status: "ready",
-              description: "Complete implementation plan for Temporal-based workflow orchestration with human-in-the-loop approval",
-              mvp: {
-                useCase: "Insight → Reliable Action: Upload URLs/PDFs → Extract text → Generate executive brief → Dispatch to Slack/Sheets with automatic retries",
-                keyFeature: "If you kill the worker mid-run, Temporal resumes from exactly where it left off",
-                showcase: "Perfect demonstration of Temporal's durability, retries, signals/queries"
-              },
-              architecture: {
-                backend: "FastAPI + React UI (existing Workplace Learning With AI app)",
-                llm: "LM Studio (local) or cloud LLM provider",
-                database: "MongoDB for workflow runs and status",
-                orchestration: "Temporal for workflow management"
-              },
-              executionPlan: {
-                day1: [
-                  "Local Temporal Stack (Docker): temporal, temporal-ui, mongo",
-                  "Worker in TypeScript with 3 activities: fetchAndExtract, summarize, dispatch",
-                  "Workflow L2AWorkflow with Query: currentStatus() and Signal: approveProceed()",
-                  "Starter HTTP Service (Node) on :3080/start",
-                  "FastAPI endpoint /api/actions/from-playbook",
-                  "UI: 'Run via Temporal' button + runs list with polling status"
-                ],
-                day2: [
-                  "Add RetryPolicies for each activity (backoff & jitter)",
-                  "Add Heartbeats in fetchAndExtract and dispatch",
-                  "Add Human-in-the-loop step (Signal from UI)",
-                  "Prepare demo script: kill worker → restart → show resume capability"
-                ]
-              },
-              codeStructure: {
-                temporal: [
-                  "src/activities/activities.ts - Core business logic",
-                  "src/workflows/learningToAction.ts - Workflow definition",
-                  "src/worker.ts - Temporal worker",
-                  "src/starter.ts - HTTP starter service"
-                ],
-                docker: [
-                  "backend/Dockerfile - FastAPI container",
-                  "temporal-worker/Dockerfile - TypeScript worker",
-                  "temporal-starter/Dockerfile - Express starter"
-                ],
-                integration: [
-                  "backend/routers/actions.py - FastAPI endpoints",
-                  "frontend/src/components/TemporalRunCard.jsx - UI component",
-                  "frontend/src/components/TemporalApproveCard.jsx - Approval UI"
-                ]
-              },
-              demoScript: [
-                "Open Temporal UI (:8233) — show no running workflows",
-                "In app: paste 1–2 URLs → click 'Run via Temporal'",
-                "Show workflow running in Temporal UI",
-                "Kill the worker mid-'summarizing'",
-                "Restart worker → Temporal resumes exactly where it left off",
-                "Show Slack message + 'Sheet appended' result + callback received",
-                "End by showing full execution history in Temporal Web"
-              ],
-              tools: [
-                "Temporal AI - Workflow orchestration",
-                "n8n.io - Workflow automation (already integrated)",
-                "LM Studio - Local LLM",
-                "MongoDB - Data persistence",
-                "Docker - Containerization"
-              ],
-              features: [
-                "Durable Execution - Never lose state",
-                "Automatic Retries - Built-in fault tolerance",
-                "Human-in-the-loop - Approval signals",
-                "Real-time Status - Query current state",
-                "Callbacks - Integration with existing app",
-                "Health Checks - Production monitoring"
-              ]
-            }
-          ]
+          hackathonPlans: []
         },
         toolStack: {
           title: "The Ultimate Tool Stack for AI Agents",
