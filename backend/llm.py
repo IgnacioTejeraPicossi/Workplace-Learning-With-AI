@@ -268,12 +268,13 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
     Now supports both OpenAI and OpenRouter APIs.
     """
     # Try ItemAI first
-    try:
-        for chunk in ask_itemai_stream(prompt, task_type, complexity, max_tokens, messages):
-            yield chunk
-        return
-    except Exception as e:
-        print(f"ItemAI streaming failed, falling back to OpenRouter: {e}", flush=True)
+    if API_PROVIDER == "itemai":
+        try:
+            for chunk in ask_itemai_stream(prompt, task_type, complexity, max_tokens, messages):
+                yield chunk
+            return
+        except Exception as e:
+            print(f"ItemAI streaming failed, falling back to OpenRouter: {e}", flush=True)
 
     # Try OpenRouter first if configured and selected
     if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
