@@ -341,7 +341,7 @@ const RunTest = () => {
           
           // NEW: AI Productivity Agent endpoints (CORRECTED - using real endpoints)
           { name: 'GET /api/agentic-rag/get-analyses', endpoint: '/api/agentic-rag/get-analyses', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/agentic-rag/ask', endpoint: '/api/agentic-rag/ask', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/productivity/analyze-url', endpoint: '/api/productivity/analyze-url', method: 'POST', requiresAuth: false },
           
           // NEW: MongoDB Authentication endpoints
           { name: 'POST /auth/register', endpoint: '/auth/register', method: 'POST', requiresAuth: false },
@@ -502,6 +502,12 @@ const RunTest = () => {
                 doc_ids: ["6605617820830ff0"],
                 question: 'What are the key productivity metrics?',
                 depth: 2
+              };
+              break;
+            case '/api/productivity/analyze-url':
+              testData = { 
+                url: 'https://www.outsystems.com/blog/outsystems-low-code-platform/',
+                analysis_type: 'productivity'
               };
               break;
             case '/auth/register':

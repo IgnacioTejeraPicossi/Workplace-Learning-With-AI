@@ -47,6 +47,9 @@
 - [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
 - [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
 
+### 🔗 n8n Integration (Hackathon Demo)
+- [n8n Webhook Setup](#n8n-webhook-setup) - Local n8n webhooks for Compliance and Productivity agents
+
 ### 🛠️ Admin & Development
 - [API Config](#api-config) - ItemAI API, OpenAI, and OpenRouter API configuration
 - [Run Test](#run-test) - Comprehensive testing suite
@@ -4214,6 +4217,102 @@ Callback → AgentOps Studio (Audit)
 - **UI Components**: `ActionDispatchModal`, `AgentOpsRuns`
 - **Security**: HMAC-SHA256 signing for OutSystems communication
 - **Monitoring**: Real-time status updates and artifact tracking
+
+---
+
+## 🔗 n8n Webhook Setup
+
+### Overview
+This section documents the n8n webhook integration for the **OutSystems Low-Code Agent Builder Hackathon** (October 14th). The system uses local n8n webhooks as a temporary engine for immediate demo functionality, with the option to migrate to OutSystems later.
+
+### Architecture
+```
+AI Compliance Agent / AI Productivity Agent
+    ↓
+Send to OutSystems Agent (Button)
+    ↓
+Action Bundle (HMAC-signed)
+    ↓
+n8n Webhook (localhost:5678)
+    ↓
+n8n Workflow Processing
+    ↓
+Callback → AgentOps Studio (Audit)
+```
+
+### Environment Configuration
+The following environment variables are configured in `.env`:
+
+```env
+# OutSystems Integration (Hackathon) - Using n8n local
+OUTSYSTEMS_COMPLIANCE_URL=http://localhost:5678/webhook/compliance-agent
+OUTSYSTEMS_PRODUCTIVITY_URL=http://localhost:5678/webhook/productivity-agent
+AGENTOPS_HMAC_SECRET=hackathon-secret-key-2024
+OUTSYSTEMS_CALLBACK_URL=http://localhost:8000/api/agent-runs/callback
+
+# n8n Webhook URLs (Using existing Docker setup)
+N8N_COMPLIANCE_WEBHOOK=http://localhost:5678/webhook/compliance-agent
+N8N_PRODUCTIVITY_WEBHOOK=http://localhost:5678/webhook/productivity-agent
+```
+
+### n8n Workflow Configuration
+
+#### Compliance Agent Webhook
+- **URL**: `http://localhost:5678/webhook/compliance-agent`
+- **Method**: POST
+- **Response**: 
+  ```json
+  {
+    "status": "success",
+    "message": "Compliance agent webhook received"
+  }
+  ```
+
+#### Productivity Agent Webhook
+- **URL**: `http://localhost:5678/webhook/productivity-agent`
+- **Method**: POST
+- **Response**: 
+  ```json
+  {
+    "status": "success",
+    "message": "Productivity agent webhook received"
+  }
+  ```
+
+### Testing Webhooks
+Both webhooks can be tested using PowerShell:
+
+```powershell
+# Test Compliance Agent Webhook
+Invoke-WebRequest -Uri "http://localhost:5678/webhook/compliance-agent" -Method POST -ContentType "application/json" -Body '{"test": "compliance-webhook-test"}'
+
+# Test Productivity Agent Webhook
+Invoke-WebRequest -Uri "http://localhost:5678/webhook/productivity-agent" -Method POST -ContentType "application/json" -Body '{"test": "productivity-webhook-test"}'
+```
+
+Expected response for both:
+- **Status Code**: 200
+- **Response**: `{"status":"success","message":"[Agent] webhook received"}`
+
+### Integration Flow
+1. **User Action**: User clicks "Send to OutSystems Agent" in AI Compliance Agent or AI Productivity Agent
+2. **Backend Processing**: Backend creates action bundle with HMAC signature
+3. **n8n Webhook Call**: Backend sends POST request to appropriate n8n webhook
+4. **n8n Processing**: n8n workflow processes the request and returns success response
+5. **Callback**: n8n can optionally send callback to `OUTSYSTEMS_CALLBACK_URL` for audit trail
+6. **Agent Runs Monitor**: User can view execution status in AgentOps Studio
+
+### Migration Path
+This implementation provides a **dual-path approach**:
+- **Immediate**: Use n8n local webhooks for hackathon demo
+- **Future**: Migrate to OutSystems by updating URLs in `.env` file
+
+The payload format is identical for both n8n and OutSystems, making migration seamless.
+
+### Files Created
+- `n8n_webhook_setup.md` - Step-by-step setup guide
+- `scripts/test_webhooks.ps1` - Webhook testing script
+- `hackathon_config.env` - Environment variables template
 
 ### Enterprise Benefits
 - **Governance**: OutSystems-first execution ensures compliance and security

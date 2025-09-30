@@ -30,6 +30,17 @@ async def dispatch(spec: ComplianceSpec):
         raise HTTPException(500, "OUTSYSTEMS_COMPLIANCE_URL not configured")
 
     run_id = f"comp-{int(time.time())}"
+    
+    # Create initial run record in database
+    from backend.models.agent_runs import AgentRun, save_run
+    initial_run = AgentRun(
+        run_id=run_id,
+        module="compliance",
+        topic=f"[Compliance] {spec.doc_title}",
+        status="RUNNING"
+    )
+    await save_run(initial_run)
+    
     bundle = {
         "run_id": run_id,
         "topic": f"[Compliance] {spec.doc_title}",
@@ -46,5 +57,8 @@ async def dispatch(spec: ComplianceSpec):
     async with httpx.AsyncClient(timeout=60) as client:
         r = await client.post(OUTSYSTEMS_ENDPOINT, content=body, headers=headers)
     if r.status_code >= 300:
+        # Update status to FAILED if OutSystems call fails
+        from backend.models.agent_runs import update_run
+        await update_run(run_id, status="FAILED", error=f"OutSystems error: {r.text}")
         raise HTTPException(r.status_code, f"OutSystems error: {r.text}")
     return {"ok": True, "run_id": run_id}

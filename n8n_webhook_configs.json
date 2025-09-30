@@ -1,0 +1,218 @@
+# n8n Webhook Configuration for Hackathon Demo
+# Use these configurations in your existing n8n instance
+
+## Webhook 1: Compliance Agent
+# URL: http://localhost:5678/webhook/compliance-agent
+# Method: POST
+# Path: compliance-agent
+
+{
+  "nodes": [
+    {
+      "id": "webhook-compliance",
+      "name": "Compliance Agent Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "compliance-agent",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "hmac-verify-compliance",
+      "name": "HMAC Verification",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// Verify HMAC signature\nconst crypto = require('crypto');\nconst secret = 'hackathon-secret-key-2024';\nconst receivedSignature = $input.first().json.headers['x-signature'];\nconst body = JSON.stringify($input.first().json.body);\n\nconst computedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(body)\n    .digest('hex');\n\nif (computedSignature !== receivedSignature) {\n    throw new Error('HMAC verification failed');\n}\n\nreturn $input.first().json.body;"
+      }
+    },
+    {
+      "id": "process-compliance-actions",
+      "name": "Process Compliance Actions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// Process compliance actions and simulate responses\nconst actions = $input.first().json.actions || [];\nconst artifacts = {\n    jira: [],\n    slack: 'simulated-slack-ts-' + Date.now(),\n    sheets: 'simulated-sheets-url-' + Date.now()\n};\n\n// Simulate Jira issue creation\nactions.forEach(action => {\n    if (action.type === 'jira.createIssue') {\n        artifacts.jira.push('LEARN-' + Math.floor(Math.random() * 1000));\n    }\n});\n\nreturn {\n    run_id: $input.first().json.run_id,\n    status: 'DONE',\n    artifacts: artifacts,\n    processed_at: new Date().toISOString(),\n    module: 'compliance'\n};"
+      }
+    },
+    {
+      "id": "callback-compliance",
+      "name": "Send Callback",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "http://localhost:8000/api/agent-runs/callback",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "={{ $json }}"
+      }
+    },
+    {
+      "id": "response-compliance",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "ok": true,
+          "message": "Compliance agent executed successfully",
+          "run_id": "={{ $('hmac-verify-compliance').first().json.run_id }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "webhook-compliance": {
+      "main": [
+        [
+          {
+            "node": "hmac-verify-compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "hmac-verify-compliance": {
+      "main": [
+        [
+          {
+            "node": "process-compliance-actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-compliance-actions": {
+      "main": [
+        [
+          {
+            "node": "callback-compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "callback-compliance": {
+      "main": [
+        [
+          {
+            "node": "response-compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+
+## Webhook 2: Productivity Agent
+# URL: http://localhost:5678/webhook/productivity-agent
+# Method: POST
+# Path: productivity-agent
+
+{
+  "nodes": [
+    {
+      "id": "webhook-productivity",
+      "name": "Productivity Agent Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "productivity-agent",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "hmac-verify-productivity",
+      "name": "HMAC Verification",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// Verify HMAC signature\nconst crypto = require('crypto');\nconst secret = 'hackathon-secret-key-2024';\nconst receivedSignature = $input.first().json.headers['x-signature'];\nconst body = JSON.stringify($input.first().json.body);\n\nconst computedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(body)\n    .digest('hex');\n\nif (computedSignature !== receivedSignature) {\n    throw new Error('HMAC verification failed');\n}\n\nreturn $input.first().json.body;"
+      }
+    },
+    {
+      "id": "process-productivity-actions",
+      "name": "Process Productivity Actions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// Process productivity actions and simulate responses\nconst actions = $input.first().json.actions || [];\nconst artifacts = {\n    jira: [],\n    slack: 'simulated-slack-ts-' + Date.now(),\n    sheets: 'simulated-sheets-url-' + Date.now()\n};\n\n// Simulate multiple Jira issues for productivity\nactions.forEach(action => {\n    if (action.type === 'jira.createIssue') {\n        artifacts.jira.push('PROD-' + Math.floor(Math.random() * 1000));\n    }\n});\n\nreturn {\n    run_id: $input.first().json.run_id,\n    status: 'DONE',\n    artifacts: artifacts,\n    processed_at: new Date().toISOString(),\n    module: 'productivity'\n};"
+      }
+    },
+    {
+      "id": "callback-productivity",
+      "name": "Send Callback",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "http://localhost:8000/api/agent-runs/callback",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "={{ $json }}"
+      }
+    },
+    {
+      "id": "response-productivity",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "ok": true,
+          "message": "Productivity agent executed successfully",
+          "run_id": "={{ $('hmac-verify-productivity').first().json.run_id }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "webhook-productivity": {
+      "main": [
+        [
+          {
+            "node": "hmac-verify-productivity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "hmac-verify-productivity": {
+      "main": [
+        [
+          {
+            "node": "process-productivity-actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-productivity-actions": {
+      "main": [
+        [
+          {
+            "node": "callback-productivity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "callback-productivity": {
+      "main": [
+        [
+          {
+            "node": "response-productivity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
