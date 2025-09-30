@@ -4167,16 +4167,18 @@ The AI Compliance Agent transforms regulatory documents (ESG/GDPR/ISO) into audi
 The AI Productivity Agent converts research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.
 
 ### Key Features
-- **Research Analysis**: Process URLs, documents, or text input
-- **Action Planning**: Generate Top 5 next actions automatically
+- **URL Analysis**: Direct analysis of external URLs (blogs, articles, documentation)
+- **AI-Powered Insights**: Uses unified AI system for consistent, high-quality analysis
+- **Action Planning**: Generate Top 5 next actions automatically from URL content
 - **Multi-Task Creation**: Create multiple Jira issues (one per action)
 - **Team Coordination**: Slack digests and Google Sheets snapshots
 - **Rapid Execution**: Enterprise-scale task distribution via OutSystems
+- **Dedicated Endpoint**: Specific `/api/productivity/analyze-url` for URL analysis
 
 ### Demo Flow
-1. **Research Input**: Use Agentic RAG to analyze competitor website
-2. **AI Processing**: Get summary + Top 5 Next Actions
-3. **Action Review**: Edit assignees and priorities if needed
+1. **Research Input**: Enter URL in the "Analyze URL" field (e.g., competitor website, blog post)
+2. **AI Processing**: Click purple analyze button to get summary + Top 5 Next Actions
+3. **Action Review**: Review generated actions and edit assignees/priorities if needed
 4. **Send to Agent**: Click "Send to OutSystems Agent" via modal
 5. **Enterprise Execution**: OutSystems creates:
    - Multiple Jira issues (one per action)
@@ -4185,10 +4187,12 @@ The AI Productivity Agent converts research briefs and competitive analysis into
 6. **Progress Tracking**: Monitor all tasks in AgentOps Studio
 
 ### Technical Implementation
-- **Backend**: FastAPI router (`/api/productivity/dispatch`)
+- **Backend**: FastAPI router (`/api/productivity/dispatch`) + specific URL analysis endpoint (`/api/productivity/analyze-url`)
+- **URL Analysis**: Dedicated endpoint for analyzing external URLs with AI-powered insights
 - **Security**: HMAC-signed requests to OutSystems
 - **Data Model**: `agent_runs` collection in MongoDB
 - **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
+- **AI Integration**: Uses unified AI system (`ask_ai_unified_sync`) for consistent analysis
 
 ---
 
@@ -4299,8 +4303,14 @@ Expected response for both:
 2. **Backend Processing**: Backend creates action bundle with HMAC signature
 3. **n8n Webhook Call**: Backend sends POST request to appropriate n8n webhook
 4. **n8n Processing**: n8n workflow processes the request and returns success response
-5. **Callback**: n8n can optionally send callback to `OUTSYSTEMS_CALLBACK_URL` for audit trail
+5. **Callback**: n8n sends callback to `OUTSYSTEMS_CALLBACK_URL` for audit trail
 6. **Agent Runs Monitor**: User can view execution status in AgentOps Studio
+
+### API Endpoints
+- **AI Compliance Agent**: `/api/compliance/dispatch` - Processes compliance documents
+- **AI Productivity Agent**: 
+  - `/api/productivity/analyze-url` - Analyzes external URLs with AI
+  - `/api/productivity/dispatch` - Executes productivity actions via OutSystems
 
 ### Migration Path
 This implementation provides a **dual-path approach**:
@@ -4319,6 +4329,8 @@ The payload format is identical for both n8n and OutSystems, making migration se
 - **Scalability**: Enterprise-grade infrastructure and connectors
 - **Audit**: Complete trail of AI-generated actions and outcomes
 - **Flexibility**: Support for both OutSystems and n8n execution engines
+- **Separation of Concerns**: Dedicated endpoints for different agent functionalities
+- **Maintainability**: Independent modules that can be updated without affecting others
 
 ---
 
