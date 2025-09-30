@@ -22,7 +22,7 @@ export default function AgentOpsStudio() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview />;
+        return <Overview setActiveTab={setActiveTab} />;
       case 'prompt-lab':
         return <PromptLab />;
       case 'playbook':

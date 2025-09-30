@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Runs } from './agentopsApi';
 
-export default function Overview() {
+export default function Overview({ setActiveTab }) {
   const [summary, setSummary] = useState(null);
   const [recentRuns, setRecentRuns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -211,16 +211,18 @@ export default function Overview() {
           <p style={{ margin: '0 0 1rem 0', color: '#64748b', fontSize: '0.9rem' }}>
             Test AI prompts with LM Studio integration
           </p>
-          <button style={{
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.375rem',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            fontWeight: '500'
-          }}>
+          <button 
+            onClick={() => setActiveTab('prompt-lab')}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: '500'
+            }}>
             Go to Prompt Lab
           </button>
         </div>
@@ -238,16 +240,18 @@ export default function Overview() {
           <p style={{ margin: '0 0 1rem 0', color: '#64748b', fontSize: '0.9rem' }}>
             Design and test software workflows
           </p>
-          <button style={{
-            backgroundColor: '#10b981',
-            color: 'white',
-            border: 'none',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.375rem',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            fontWeight: '500'
-          }}>
+          <button 
+            onClick={() => setActiveTab('playbook')}
+            style={{
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: '500'
+            }}>
             Create Playbook
           </button>
         </div>
