@@ -1,6 +1,5 @@
 // AgentOps Studio - Overview Component
 import React, { useState, useEffect } from 'react';
-import { Runs } from './agentopsApi';
 
 export default function Overview({ setActiveTab }) {
   const [summary, setSummary] = useState(null);
@@ -14,12 +13,27 @@ export default function Overview({ setActiveTab }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [summaryData, runsData] = await Promise.all([
-        Runs.summary(),
-        Runs.list({ limit: 5 })
-      ]);
+      // Use the same API as Agent Runs Monitor
+      const response = await fetch('http://localhost:8000/api/agent-runs');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const data = await response.json();
+      const agentRuns = data.items || [];
+      
+      // Create summary from agent runs data
+      const summaryData = {
+        total_runs: agentRuns.length,
+        completed_runs: agentRuns.filter(run => run.status === 'DONE').length,
+        running_runs: agentRuns.filter(run => run.status === 'RUNNING').length,
+        today_runs: agentRuns.filter(run => {
+          const today = new Date().toDateString();
+          return new Date(run.updated_at).toDateString() === today;
+        }).length
+      };
+      
       setSummary(summaryData);
-      setRecentRuns(runsData.items || []);
+      setRecentRuns(agentRuns.slice(0, 5)); // Show latest 5 runs
     } catch (error) {
       console.error('Error loading overview data:', error);
     } finally {
@@ -82,7 +96,7 @@ export default function Overview({ setActiveTab }) {
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Completed</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>
-            {summary?.status_counts?.done || 0}
+            {summary?.completed_runs || 0}
           </div>
         </div>
 
@@ -98,7 +112,7 @@ export default function Overview({ setActiveTab }) {
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Running</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f59e0b' }}>
-            {summary?.status_counts?.running || 0}
+            {summary?.running_runs || 0}
           </div>
         </div>
 
@@ -114,7 +128,7 @@ export default function Overview({ setActiveTab }) {
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Today</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#8b5cf6' }}>
-            {summary?.recent_runs || 0}
+            {summary?.today_runs || 0}
           </div>
         </div>
       </div>
@@ -150,15 +164,15 @@ export default function Overview({ setActiveTab }) {
                   <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                     <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Run ID</th>
                     <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Started</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Score</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Updated</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Module</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentRuns.map(run => (
-                    <tr key={run._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <tr key={run.run_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                       <td style={{ padding: '0.75rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
-                        {run._id.slice(-8)}
+                        {run.run_id.slice(-8)}
                       </td>
                       <td style={{ padding: '0.75rem' }}>
                         <span style={{
@@ -166,21 +180,21 @@ export default function Overview({ setActiveTab }) {
                           borderRadius: '9999px',
                           fontSize: '0.75rem',
                           fontWeight: '500',
-                          backgroundColor: run.status === 'done' ? '#dcfce7' : 
-                                         run.status === 'running' ? '#fef3c7' : 
-                                         run.status === 'error' ? '#fee2e2' : '#f1f5f9',
-                          color: run.status === 'done' ? '#166534' : 
-                                run.status === 'running' ? '#92400e' : 
-                                run.status === 'error' ? '#991b1b' : '#475569'
+                          backgroundColor: run.status === 'DONE' ? '#dcfce7' : 
+                                         run.status === 'RUNNING' ? '#fef3c7' : 
+                                         run.status === 'FAILED' ? '#fee2e2' : '#f1f5f9',
+                          color: run.status === 'DONE' ? '#166534' : 
+                                run.status === 'RUNNING' ? '#92400e' : 
+                                run.status === 'FAILED' ? '#991b1b' : '#475569'
                         }}>
                           {run.status}
                         </span>
                       </td>
                       <td style={{ padding: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>
-                        {run.started_at ? new Date(run.started_at).toLocaleString() : '—'}
+                        {run.updated_at ? new Date(run.updated_at).toLocaleString() : '—'}
                       </td>
                       <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>
-                        {run.output?.judge?.score ? `${run.output.judge.score}/100` : '—'}
+                        {run.module || '—'}
                       </td>
                     </tr>
                   ))}
