@@ -301,26 +301,50 @@ const LearningDocument = () => {
   const handleDelete = async (docId) => {
     if (window.confirm("Are you sure you want to delete this analysis?")) {
       try {
-        // Here you would typically call an API to delete the document
-        // For now, we'll just update the local state
-        const newDocuments = documents.filter(doc => doc.id !== docId);
-        setDocuments(newDocuments);
+        console.log(`🗑️ Attempting to delete analysis with ID: ${docId}`);
         
-        // Clear expanded/editing state for deleted document
-        setExpanded(prev => {
-          const newExpanded = { ...prev };
-          delete newExpanded[docId];
-          return newExpanded;
-        });
-        setEditing(prev => {
-          const newEditing = { ...prev };
-          delete newEditing[docId];
-          return newEditing;
+        // Call API to delete from MongoDB
+        const response = await fetch(`http://localhost:8000/api/document-analyzer/delete-analysis/${docId}`, {
+          method: 'DELETE',
         });
         
-        setStatus("✅ Document deleted successfully");
-        setTimeout(() => setStatus(""), 3000);
+        console.log(`📡 Delete response status: ${response.status}`);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log(`📊 Delete response:`, result);
+          
+          if (result.success) {
+            // Remove from local state
+            const newDocuments = documents.filter(doc => doc.id !== docId);
+            setDocuments(newDocuments);
+            
+            // Clear expanded/editing state for deleted document
+            setExpanded(prev => {
+              const newExpanded = { ...prev };
+              delete newExpanded[docId];
+              return newExpanded;
+            });
+            setEditing(prev => {
+              const newEditing = { ...prev };
+              delete newEditing[docId];
+              return newEditing;
+            });
+            
+            setStatus(`✅ ${result.message}`);
+            setTimeout(() => setStatus(""), 3000);
+          } else {
+            setStatus(`❌ ${result.message}`);
+            setTimeout(() => setStatus(""), 3000);
+          }
+        } else {
+          const errorText = await response.text();
+          console.error(`❌ Delete failed: ${response.status} - ${errorText}`);
+          setStatus(`❌ Failed to delete document: ${response.status}`);
+          setTimeout(() => setStatus(""), 3000);
+        }
       } catch (error) {
+        console.error('Delete error:', error);
         setStatus("❌ Failed to delete document");
         setTimeout(() => setStatus(""), 3000);
       }
