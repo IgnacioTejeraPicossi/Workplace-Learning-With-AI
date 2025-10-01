@@ -2305,10 +2305,12 @@ try:
     from backend.routers.agent_runs import router as agent_runs_router
     from backend.routers.compliance_agent import router as compliance_agent_router
     from backend.routers.productivity_agent import router as productivity_agent_router
+    from backend.routers.unified_documents import router as unified_documents_router
     
     app.include_router(agent_runs_router, tags=["AI Agent Bridge Platform"])
     app.include_router(compliance_agent_router, tags=["AI Compliance Agent"])
     app.include_router(productivity_agent_router, tags=["AI Productivity Agent"])
+    app.include_router(unified_documents_router, prefix="/api", tags=["Unified Documents"])
     print("✅ AI Agent Bridge Platform routers included successfully")
 except ImportError as e:
     print(f"❌ Failed to import AI Agent Bridge Platform routers: {e}")

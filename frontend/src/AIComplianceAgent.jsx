@@ -22,13 +22,15 @@ const AIComplianceAgent = () => {
 
   const loadDocumentAnalyses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/document-analyzer/get-saved-analyses');
+      // Use unified endpoint to get documents from both sources
+      const response = await fetch('http://localhost:8000/api/unified-documents');
       if (response.ok) {
         const data = await response.json();
-        setDocuments(data.analyses || []);
+        setDocuments(data.documents || []);
+        console.log(`📋 Loaded ${data.documents?.length || 0} unified documents:`, data.sources);
       }
     } catch (error) {
-      console.error('Failed to load document analyses:', error);
+      console.error('Failed to load unified documents:', error);
     }
   };
 
@@ -168,7 +170,8 @@ const AIComplianceAgent = () => {
               <option value="">Select a document...</option>
               {documents.map(doc => (
                 <option key={doc.id} value={doc.id}>
-                  {doc.title || doc.filename || 'Untitled Document'}
+                  {doc.title || doc.filename || 'Untitled Document'} 
+                  {doc.source === 'document_analyzer' ? ' (📄 Doc)' : ' (🤖 RAG)'}
                 </option>
               ))}
             </select>
@@ -394,6 +397,16 @@ const AIComplianceAgent = () => {
                         flex: 1
                       }}>
                         {doc.title || doc.filename || 'Untitled Document'}
+                      </span>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        color: '#64748b',
+                        backgroundColor: doc.source === 'document_analyzer' ? '#e0f2fe' : '#f0fdf4',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        marginRight: '8px'
+                      }}>
+                        {doc.source === 'document_analyzer' ? '📄 Doc' : '🤖 RAG'}
                       </span>
                       <span style={{ 
                         fontSize: '0.8rem', 
