@@ -4455,6 +4455,71 @@ curl -X POST "http://localhost:8000/api/cyber/rag/ask" \
 
 ---
 
+## 🔒 Security vs. Cybersecurity — Scope and Complementarity
+
+There is no duplication between the two modules. They address different layers of protection and together provide a complete view of platform hardening and software security posture.
+
+### 🛡️ Security (Security Center) — Platform Security & Privacy
+
+**Focuses on how this application and its deployment protect user data and access.**
+
+- **Installation & Hardening**: Encryption at rest, local hardening, firewall, automatic updates/patches
+- **Identity & Access (RBAC/SSO)**: Who can sign in and what they can do
+- **Data & Privacy**: Retention/automatic deletion, anonymization, user data visibility/export
+- **Secrets & Keys**: Token/key storage and rotation practices
+- **Auditability & Evidence**: Platform security logs and configuration evidence
+- **Policies (Toggles)**: E.g., enforce MFA, require TLS, retention windows, etc.
+
+**Think of Security as**: *"Settings + Privacy + Hardening of the platform itself."*
+
+### 🔒 Cybersecurity — AppSec/SecOps & Risk Posture
+
+**Focuses on threats, vulnerabilities, and controls related to the software, dependencies, and runtime.**
+
+- **Risk Dashboard**: Overall risk score and KPIs (patch latency, number of high/critical vulns, control coverage)
+- **Vulnerabilities**: Results from package and container scanners (e.g., npm audit, pip-audit, secrets scanning, container image scanning)
+- **Threat Library**: Catalog (CIA triad) with recommended controls mapped to frameworks
+- **Posture & Risk**: Radar by NIST domains (Identify / Protect / Detect / Respond / Recover)
+- **Secure Coding Coach**: Suggested fixes and micro-lessons based on real findings
+- **Compliance Tracker (Security)**: Technical controls mapped to NIST/ISO/OWASP/CIS
+- **Incident Drills**: Guided simulations and after-action reports
+- **Knowledge (RAG)**: Q&A across security frameworks and best-practice guides
+
+**Think of Cybersecurity as**: *"Detecting, analyzing, and continuously improving the security of the software you build and run."*
+
+### 🔗 How They Connect (Without Overlapping)
+
+#### Security → Cybersecurity
+- Policies enabled in Security (e.g., MFA required, key rotation) contribute to Cybersecurity KPIs and control coverage
+
+#### Cybersecurity → Security
+- Findings (vulnerabilities, secrets, misconfigurations) suggest changes to platform Security policies/hardening
+
+### 📋 Compliance Split
+
+- **AI Compliance Agent**: Governance and risk for AI systems (e.g., EU AI Act aspects)
+- **Cybersecurity Compliance Tracker**: Technical security controls (NIST/ISO/OWASP/CIS) and their implementation status
+- **Security Center**: Evidence of platform configuration (what the app enforces and proves)
+
+### 🎯 Source-of-Truth Boundaries
+
+- **Policies & Audit Logs** → Security
+- **Findings, Scans, and Risk Score** → Cybersecurity
+- **Control Catalog** → Shared, with clear scope: "platform" or "appsec" attribute
+
+### 👥 Roles (Example RBAC)
+
+- **Security Admin**: Manages Security (policies, keys, audit evidence)
+- **DevSecOps**: Runs/monitors scans and dashboards in Cybersecurity
+- **Viewer**: Read-only access to both modules
+
+### 📊 Summary
+
+- **Security**: Protects how the platform and data are configured and governed
+- **Cybersecurity**: Improves how software is developed and operated securely and measures the risk posture over time
+
+---
+
 ## 🏗️ AI Agent Bridge Platform
 
 ### Architecture Overview
