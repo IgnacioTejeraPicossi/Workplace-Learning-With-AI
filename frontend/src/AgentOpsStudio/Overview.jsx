@@ -33,7 +33,15 @@ export default function Overview({ setActiveTab }) {
       };
       
       setSummary(summaryData);
-      setRecentRuns(agentRuns.slice(0, 5)); // Show latest 5 runs
+      
+      // Show a balanced mix of both modules (up to 8 runs)
+      const complianceRuns = agentRuns.filter(run => run.module === 'compliance').slice(0, 4);
+      const productivityRuns = agentRuns.filter(run => run.module === 'productivity').slice(0, 4);
+      const mixedRuns = [...complianceRuns, ...productivityRuns]
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        .slice(0, 8);
+      
+      setRecentRuns(mixedRuns);
     } catch (error) {
       console.error('Error loading overview data:', error);
     } finally {
@@ -142,9 +150,31 @@ export default function Overview({ setActiveTab }) {
       }}>
         <div style={{
           padding: '1.5rem',
-          borderBottom: '1px solid #e2e8f0'
+          borderBottom: '1px solid #e2e8f0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
           <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>Recent Runs</h3>
+          <button 
+            onClick={loadData}
+            disabled={loading}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              opacity: loading ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+            {loading ? '⏳' : '🔄'} Refresh
+          </button>
         </div>
         
         <div style={{ padding: '1.5rem' }}>
@@ -194,7 +224,23 @@ export default function Overview({ setActiveTab }) {
                         {run.updated_at ? new Date(run.updated_at).toLocaleString() : '—'}
                       </td>
                       <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>
-                        {run.module || '—'}
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '9999px',
+                          fontSize: '0.75rem',
+                          fontWeight: '500',
+                          backgroundColor: run.module === 'compliance' ? '#dbeafe' : 
+                                         run.module === 'productivity' ? '#dcfce7' : '#f1f5f9',
+                          color: run.module === 'compliance' ? '#1e40af' : 
+                                run.module === 'productivity' ? '#166534' : '#475569',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem'
+                        }}>
+                          {run.module === 'compliance' ? '🛡️' : 
+                           run.module === 'productivity' ? '🚀' : '📋'} 
+                          {run.module || 'Unknown'}
+                        </span>
                       </td>
                     </tr>
                   ))}
