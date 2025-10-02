@@ -107,6 +107,9 @@ const getNavItems = (t) => [
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" }
   ]},
   
+  // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)
+  { key: "cybersecurity", label: t('sidebar.cybersecurity'), icon: "shield", group: "learning" },
+  
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },

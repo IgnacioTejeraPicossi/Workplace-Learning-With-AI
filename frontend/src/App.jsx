@@ -46,6 +46,7 @@ import RobomindClinic from "./RobomindClinic/RobomindClinicWithTabs";
 import AgentTheoryDocs from "./components/AgentTheoryDocs/AgentTheoryDocs";
 import AIComplianceAgent from "./AIComplianceAgent";
 import AIProductivityAgent from "./AIProductivityAgent";
+import Cybersecurity from "./cyber/Cybersecurity";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -449,6 +450,7 @@ function AppContent() {
             {!activeModule && section === "agent-theory-docs" && <AgentTheoryDocs />}
             {!activeModule && section === "ai-compliance-agent" && <AIComplianceAgent />}
             {!activeModule && section === "ai-productivity-agent" && <AIProductivityAgent />}
+            {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}

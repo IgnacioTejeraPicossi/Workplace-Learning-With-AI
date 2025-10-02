@@ -46,6 +46,7 @@
 - [Agent Theory & Documentation](#agent-theory--documentation) - Comprehensive AI agent theory, tools, and hackathon preparation
 - [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
 - [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
+- [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
 - [n8n Webhook Setup](#n8n-webhook-setup) - Local n8n webhooks for Compliance and Productivity agents
@@ -4193,6 +4194,264 @@ The AI Productivity Agent converts research briefs and competitive analysis into
 - **Data Model**: `agent_runs` collection in MongoDB
 - **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
 - **AI Integration**: Uses unified AI system (`ask_ai_unified_sync`) for consistent analysis
+
+---
+
+## 🔒 Cybersecurity Module
+
+### Overview
+The Cybersecurity Module provides comprehensive security management and threat intelligence capabilities, integrating seamlessly with the existing AI-powered learning platform. It offers real-time vulnerability scanning, threat assessment, compliance tracking, and secure coding guidance.
+
+### Key Features
+- **🛡️ Threat Library**: Comprehensive database of cybersecurity threats with CIA Triad impact assessment
+- **📊 Security Dashboard**: Real-time risk scoring, KPIs, and vulnerability monitoring
+- **🔍 Vulnerability Management**: Automated scanning for npm, pip, and secret detection
+- **📈 Posture & Risk Assessment**: NIST CSF, Zero-Trust, and compliance framework integration
+- **👨‍🏫 Secure Coding Coach**: AI-powered micro-lessons and coding guidance
+- **📋 Compliance Tracker**: NIST, ISO, OWASP, and CIS framework mapping
+- **🚨 Incident Response Drills**: Simulated incident response training
+- **📚 Knowledge Base**: AI-powered cybersecurity Q&A using Agentic RAG
+
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Cybersecurity Module Architecture"
+        A[Cybersecurity Dashboard] --> B[Threat Library]
+        A --> C[Vulnerability Scanner]
+        A --> D[Risk Assessment]
+        A --> E[Compliance Tracker]
+        
+        B --> F[CIA Triad Framework]
+        B --> G[Threat Categories]
+        B --> H[Control Mapping]
+        
+        C --> I[npm Audit]
+        C --> J[pip Audit]
+        C --> K[Secret Detection]
+        
+        D --> L[NIST CSF]
+        D --> M[Zero-Trust Model]
+        D --> N[Risk Scoring]
+        
+        E --> O[Framework Compliance]
+        E --> P[Control Status]
+        E --> Q[Evidence Tracking]
+        
+        R[AI Integration] --> S[Agentic RAG]
+        R --> T[Secure Coding Coach]
+        R --> U[Micro-lessons]
+        
+        V[Backend API] --> W[FastAPI Router]
+        V --> X[MongoDB Storage]
+        V --> Y[Real-time Updates]
+    end
+    
+    subgraph "Integration Points"
+        Z[Existing Modules] --> AA[Agentic RAG]
+        Z --> BB[AI Gateway]
+        Z --> CC[Micro-lessons]
+        Z --> DD[Knowledge Map]
+    end
+    
+    A -.-> R
+    V -.-> Z
+```
+
+### Module Components
+
+#### 🛡️ Threat Library
+- **Threat Database**: Comprehensive collection of cybersecurity threats
+- **CIA Impact Assessment**: Confidentiality, Integrity, Availability scoring (0-10)
+- **Control Mapping**: Links threats to NIST CSF, OWASP, CIS controls
+- **Category Filtering**: Social Engineering, Malware, Vulnerabilities, etc.
+- **Interactive UI**: Click-to-expand threat details with mitigation guidance
+
+#### 📊 Security Dashboard
+- **Risk Score**: Overall security posture (0-100 scale)
+- **Key Performance Indicators**: Patch latency, open vulnerabilities, compliance coverage
+- **Vulnerability Overview**: Recent findings with severity classification
+- **Trend Analysis**: Security posture improvement/degradation tracking
+- **Real-time Updates**: Live vulnerability scanning and status updates
+
+#### 🔍 Vulnerability Management
+- **Automated Scanning**: npm audit, pip audit, secret detection
+- **Severity Classification**: CRITICAL, HIGH, MEDIUM, LOW, INFO
+- **Project-based Organization**: Separate vulnerability tracking per project
+- **Risk Scoring**: Calculated risk scores for each vulnerability
+- **Remediation Guidance**: AI-powered recommendations for fixes
+
+#### 📈 Posture & Risk Assessment
+- **NIST Cybersecurity Framework**: Identify, Protect, Detect, Respond, Recover
+- **Zero-Trust Architecture**: Verify every access attempt
+- **Compliance Mapping**: Framework-specific control implementation
+- **Risk Calculation**: Multi-factor risk scoring algorithm
+- **Trend Monitoring**: Historical risk score tracking
+
+### Technical Implementation
+
+#### Backend Architecture
+```python
+# FastAPI Router Structure
+/api/cyber/
+├── /threats              # GET threats, GET threat by ID
+├── /controls             # GET controls, GET control by ID
+├── /vulnerabilities      # GET vulnerabilities, POST scan
+├── /posture/kpis         # GET security KPIs
+├── /risk/score          # GET risk assessment
+├── /rag/ask             # POST cybersecurity Q&A
+├── /coach/lesson        # POST secure coding lessons
+├── /compliance/status   # GET compliance status
+└── /health              # GET module health
+```
+
+#### Data Models
+- **Threat**: ID, name, category, CIA impact, description, controls, tags
+- **ControlMap**: Framework controls with implementation guidance
+- **Vulnerability**: Source, severity, package, CVE, recommendations
+- **RiskScore**: Overall score, factors, trend analysis
+- **PostureKPI**: Key performance indicators with targets
+
+#### Frontend Components
+- **Cybersecurity.jsx**: Main module container with tab navigation
+- **CyberDashboard.jsx**: Risk score, KPIs, vulnerability overview
+- **ThreatLibrary.jsx**: Interactive threat database with filtering
+- **Integration**: Seamless integration with existing UI patterns
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/cyber/health` | GET | Module health check |
+| `/api/cyber/threats` | GET | List all threats |
+| `/api/cyber/threats/{id}` | GET | Get specific threat |
+| `/api/cyber/controls` | GET | List security controls |
+| `/api/cyber/vulnerabilities` | GET | List vulnerabilities |
+| `/api/cyber/vulnerabilities/scan` | POST | Run vulnerability scans |
+| `/api/cyber/posture/kpis` | GET | Get security KPIs |
+| `/api/cyber/risk/score` | GET | Calculate risk score |
+| `/api/cyber/rag/ask` | POST | Cybersecurity Q&A |
+| `/api/cyber/coach/lesson` | POST | Generate secure coding lesson |
+| `/api/cyber/compliance/status` | GET | Get compliance status |
+
+### Integration with Existing Modules
+
+#### 🤖 Agentic RAG Integration
+- **Knowledge Base**: Cybersecurity-specific document collection
+- **AI-Powered Q&A**: Context-aware security guidance
+- **Source Attribution**: Reliable security framework references
+- **Confidence Scoring**: AI confidence in security recommendations
+
+#### 🎓 Micro-lessons Integration
+- **Secure Coding**: Automated micro-lessons based on vulnerabilities
+- **Threat Awareness**: Interactive threat education modules
+- **Compliance Training**: Framework-specific learning content
+- **Personalized Learning**: Adaptive content based on risk profile
+
+#### 🧠 AI Gateway Integration
+- **Safety Monitoring**: AI response validation for security content
+- **Cost Tracking**: API usage monitoring for security queries
+- **Quality Assurance**: AI response quality scoring
+- **Audit Trail**: Complete security guidance history
+
+### Security Frameworks Supported
+
+#### NIST Cybersecurity Framework 2.0
+- **Identify**: Asset management, risk assessment
+- **Protect**: Access control, data security, maintenance
+- **Detect**: Anomaly detection, continuous monitoring
+- **Respond**: Response planning, communications
+- **Recover**: Recovery planning, communications
+
+#### OWASP Standards
+- **OWASP Top 10**: Most critical web application security risks
+- **OWASP ASVS**: Application Security Verification Standard
+- **OWASP SAMM**: Software Assurance Maturity Model
+
+#### CIS Controls
+- **CIS Controls v8**: Critical security controls
+- **CIS Benchmarks**: Configuration guidelines
+- **CIS Hardened Images**: Secure system images
+
+#### ISO 27001
+- **Information Security Management**: ISMS framework
+- **Risk Management**: Systematic risk assessment
+- **Continuous Improvement**: PDCA cycle implementation
+
+### Future Enhancements
+
+#### Phase 1: Advanced Scanning
+- **Container Security**: Docker image vulnerability scanning
+- **Infrastructure as Code**: Terraform/CloudFormation security analysis
+- **Dependency Management**: Automated dependency updates
+- **License Compliance**: Open source license tracking
+
+#### Phase 2: AI-Powered Security
+- **Threat Intelligence**: Real-time threat feed integration
+- **Behavioral Analysis**: User behavior anomaly detection
+- **Predictive Security**: AI-powered risk prediction
+- **Automated Response**: Self-healing security controls
+
+#### Phase 3: Enterprise Integration
+- **SIEM Integration**: Security Information and Event Management
+- **SOAR Integration**: Security Orchestration, Automation and Response
+- **Compliance Automation**: Automated compliance reporting
+- **Executive Dashboards**: C-level security metrics
+
+### Usage Examples
+
+#### Basic Threat Assessment
+```bash
+# Get current risk score
+curl -X GET "http://localhost:8000/api/cyber/risk/score"
+
+# Response
+{
+  "overall": 68.35,
+  "factors": {
+    "patch_latency_days": 6.2,
+    "open_high_vulns": 3.0,
+    "compliance_coverage": 78.5
+  },
+  "trend": "stable"
+}
+```
+
+#### Vulnerability Scanning
+```bash
+# Run vulnerability scan
+curl -X POST "http://localhost:8000/api/cyber/vulnerabilities/scan" \
+  -H "Content-Type: application/json" \
+  -d '{"project": "default", "scan_types": ["npm", "pip", "secrets"]}'
+```
+
+#### Cybersecurity Q&A
+```bash
+# Ask cybersecurity question
+curl -X POST "http://localhost:8000/api/cyber/rag/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How do I prevent SQL injection attacks?"}'
+```
+
+### Benefits
+
+#### For Developers
+- **Secure Coding Guidance**: AI-powered recommendations for secure code
+- **Vulnerability Awareness**: Real-time vulnerability detection and education
+- **Compliance Support**: Framework-specific implementation guidance
+- **Learning Integration**: Security education within existing learning platform
+
+#### For Security Teams
+- **Centralized Dashboard**: Unified view of security posture
+- **Automated Scanning**: Continuous vulnerability assessment
+- **Compliance Tracking**: Framework compliance monitoring
+- **Risk Management**: Quantitative risk assessment and trending
+
+#### for Organizations
+- **Security Culture**: Integrated security education and awareness
+- **Compliance Readiness**: Automated compliance framework support
+- **Risk Reduction**: Proactive vulnerability management
+- **Cost Efficiency**: Integrated security within existing learning platform
 
 ---
 
