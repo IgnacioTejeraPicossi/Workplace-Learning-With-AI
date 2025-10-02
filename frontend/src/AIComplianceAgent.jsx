@@ -452,18 +452,6 @@ const AIComplianceAgent = () => {
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         border: '1px solid #e2e8f0'
       }}>
-        <h2 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: '600', 
-          color: '#1e293b',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <span style={{ fontSize: '1.75rem' }}>📊</span>
-          Agent Runs Monitor
-        </h2>
         <AgentOpsRuns />
       </div>
 

@@ -89,9 +89,9 @@ export default function AgentOpsRuns() {
             }}>
               Filter by Module
             </label>
-        <select 
-          value={module} 
-          onChange={e => setModule(e.target.value)}
+            <select
+              value={module}
+              onChange={e => setModule(e.target.value)}
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -106,12 +106,12 @@ export default function AgentOpsRuns() {
               <option value="">All Modules</option>
               <option value="compliance">🤖 Compliance Agent</option>
               <option value="productivity">🚀 Productivity Agent</option>
-        </select>
+            </select>
           </div>
           <div style={{ alignSelf: 'flex-end' }}>
-        <button 
-          onClick={load}
-          disabled={loading}
+            <button
+              onClick={load}
+              disabled={loading}
               style={{
                 backgroundColor: loading ? '#9ca3af' : '#3b82f6',
                 color: 'white',
@@ -128,11 +128,11 @@ export default function AgentOpsRuns() {
               }}
             >
               {loading ? '⏳' : '🔄'} {loading ? 'Loading...' : 'Refresh'}
-        </button>
+            </button>
           </div>
         </div>
       </div>
-      
+
       {/* Agent Runs Table */}
       <div style={{
         backgroundColor: 'white',
@@ -140,14 +140,6 @@ export default function AgentOpsRuns() {
         padding: '1.5rem',
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
-        <h2 style={{ 
-          fontSize: '1.25rem', 
-          fontWeight: '600', 
-          color: '#1f2937', 
-          marginBottom: '1rem' 
-        }}>
-          Agent Runs
-        </h2>
         
         {items.length === 0 && !loading ? (
           <div style={{ 
