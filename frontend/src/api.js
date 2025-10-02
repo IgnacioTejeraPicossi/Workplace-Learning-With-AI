@@ -1,5 +1,6 @@
 import { auth } from './firebase';
 import { apiFetch, setAccessToken } from './api/apiInterceptor';
+import APIConfig from './APIConfig';
 
 // Unified authentication function that works with both Firebase and MongoDB tokens
 export async function fetchWithAuth(url, options = {}) {
@@ -238,10 +239,20 @@ export async function generateVideoSummaryNoAuth(transcript) {
   return response.json();
 }
 
-export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {
+export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {  
+  const apiProvider = localStorage.getItem('apiProvider') || 'openai';
+  const openaiKey = localStorage.getItem('openaiKey') || '';
+  const openrouterKey = localStorage.getItem('openrouterKey') || '';
+  const itemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
+
   const response = await fetch(`${API_BASE}/llm-stream`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json",
+               "x-api-provider": apiProvider,
+               "x-itemai-url": itemaiUrl,
+               "x-openai-key": openaiKey,
+               "x-openrouter-key": openrouterKey
+             },
     body: JSON.stringify({ prompt, messages, model, max_tokens })
   });
   

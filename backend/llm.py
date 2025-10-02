@@ -1,6 +1,7 @@
 # This file will handle OpenAI GPT-5 configuration and integration 
 
 import os
+from typing import Any
 from dotenv import load_dotenv
 import openai
 try:
@@ -262,22 +263,25 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
     except Exception as e:
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
 
-def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
     """
     Enhanced streaming OpenAI function with GPT-5 model selection.
     Now supports both OpenAI and OpenRouter APIs.
     """
+
+    config = get_api_config_from_headers(request_headers)
+
     # Try ItemAI first
-    if API_PROVIDER == "itemai":
+    if config['provider'] == 'itemai':
         try:
-            for chunk in ask_itemai_stream(prompt, task_type, complexity, max_tokens, messages):
+            for chunk in ask_itemai_stream(prompt, task_type, complexity, max_tokens, messages, config):
                 yield chunk
             return
         except Exception as e:
             print(f"ItemAI streaming failed, falling back to OpenRouter: {e}", flush=True)
 
     # Try OpenRouter first if configured and selected
-    if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
+    if config['provider'] == 'openrouter' and config['openrouter_key'] and openrouter:
         try:
             for chunk in ask_openrouter_stream(prompt, task_type, complexity, max_tokens, messages):
                 yield chunk
@@ -286,7 +290,7 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
             print(f"OpenRouter streaming failed, falling back to OpenAI: {e}")
     
     # Fallback to OpenAI
-    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+    if not config['openai_key'] or config['openai_key'].strip() == "":
         # No key found, yield a mock response for testing
         mock_response = f"""I'm your AI Study Buddy powered by GPT-5! Here's a helpful response to your question:
 
@@ -323,7 +327,7 @@ Would you like to know more about any specific feature?"""
             params["max_tokens"] = max_tokens
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
-        openai.api_key = OPENAI_API_KEY
+        openai.api_key = config['openai_key']
         
         if messages:
             response = openai.chat.completions.create(
@@ -760,7 +764,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         # Don't raise, let the fallback system handle it
         return None
     
-def ask_itemai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_itemai_stream(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, config: dict[str, Any] = None):
     """
     ItemAI API function for local LM Studio integration.
     
@@ -775,7 +779,7 @@ def ask_itemai_stream(prompt=None, task_type=None, complexity="medium", max_toke
         import httpx
         
         # Default local URL for LM Studio
-        local_url = ITEMAI_URL
+        local_url = config['itemai_url']
         
         # Prepare the request payload
         if messages:

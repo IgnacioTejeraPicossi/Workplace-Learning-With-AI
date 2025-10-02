@@ -1,8 +1,8 @@
 # FastAPI app skeleton for AI Workplace Learning
-from fastapi import FastAPI, Request, Body, HTTPException, Depends, status, UploadFile, Form, File
+from fastapi import FastAPI, Header, Request, Body, HTTPException, Depends, status, UploadFile, Form, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pathlib import Path
 import json
 import os
@@ -26,7 +26,7 @@ def _trace_mod(name):
         print(f"❌ import failed for {name}:", e)
         return None
 
-from typing import List, Optional, Dict, Any
+from typing import Annotated, List, Optional, Dict, Any
 
 # Fix imports to work from both root and backend directories
 try:
@@ -966,17 +966,21 @@ async def route_prompt(request: RouteRequest):
     return result 
 
 @app.post("/llm-stream")
-async def llm_stream(request: LLMStreamRequest):
-    print(f"[LLM STREAM] New request: {request}", flush=True)
+async def llm_stream(request: LLMStreamRequest, x_api_provider: str = Header(), x_itemai_url: str = Header(), x_openai_key: str = Header(), x_openrouter_key: str = Header()):
+    print(f"[LLM STREAM] New request: {request}, x_api_provider: {x_api_provider}", flush=True)
     def event_stream():
         for chunk in ask_openai_stream(
             prompt=request.prompt,
             task_type=request.task_type,  # Use new parameter
             complexity=request.complexity,   # Use new parameter
             max_tokens=request.max_tokens,
-            messages=request.messages
+            messages=request.messages,
+            request_headers={"x-api-provider": x_api_provider, 
+                             "x-itemai-url": x_itemai_url, 
+                             "x-openai-key": x_openai_key, 
+                             "x-openrouter-key": x_openrouter_key}
         ):
-            print(f"[LLM STREAM] Sending chunk: {chunk}", flush=True)
+            #print(f"[LLM STREAM] Sending chunk: {chunk}", flush=True)
             yield chunk
     return StreamingResponse(event_stream(), media_type="text/plain")
 
