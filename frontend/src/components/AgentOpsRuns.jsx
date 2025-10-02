@@ -29,103 +29,337 @@ export default function AgentOpsRuns() {
     load();
   }, [module]);
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'DONE': return '#10b981'; // green
+      case 'RUNNING': return '#f59e0b'; // yellow
+      case 'FAILED': return '#ef4444'; // red
+      default: return '#6b7280'; // gray
+    }
+  };
+
+  const getModuleColor = (module) => {
+    switch (module) {
+      case 'compliance': return '#3b82f6'; // blue
+      case 'productivity': return '#10b981'; // green
+      default: return '#6b7280'; // gray
+    }
+  };
+
   return (
-    <div className="p-4">
-      <div className="flex gap-3 items-center mb-3">
-        <h1 className="text-xl font-bold">Agent Runs</h1>
+    <div style={{ padding: '1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ 
+          fontSize: '1.875rem', 
+          fontWeight: 'bold', 
+          color: '#1f2937',
+          marginBottom: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          📊 Agent Runs Monitor
+        </h1>
+        <p style={{ 
+          color: '#6b7280', 
+          fontSize: '1rem',
+          margin: 0
+        }}>
+          Monitor and track agent execution status and results
+        </p>
+      </div>
+
+      {/* Controls */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '0.75rem',
+        padding: '1.5rem',
+        marginBottom: '1.5rem',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+      }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ 
+              display: 'block', 
+              fontSize: '0.875rem', 
+              fontWeight: '500', 
+              color: '#374151', 
+              marginBottom: '0.5rem' 
+            }}>
+              Filter by Module
+            </label>
         <select 
-          className="border p-1 rounded" 
           value={module} 
           onChange={e => setModule(e.target.value)}
-        >
-          <option value="">All</option>
-          <option value="compliance">Compliance</option>
-          <option value="productivity">Productivity</option>
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '1px solid #d1d5db',
+                backgroundColor: 'white',
+                fontSize: '0.875rem',
+                color: '#374151',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">All Modules</option>
+              <option value="compliance">🤖 Compliance Agent</option>
+              <option value="productivity">🚀 Productivity Agent</option>
         </select>
+          </div>
+          <div style={{ alignSelf: 'flex-end' }}>
         <button 
-          className="border px-3 py-1 rounded" 
           onClick={load}
           disabled={loading}
-        >
-          {loading ? 'Loading...' : 'Refresh'}
+              style={{
+                backgroundColor: loading ? '#9ca3af' : '#3b82f6',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s'
+              }}
+            >
+              {loading ? '⏳' : '🔄'} {loading ? 'Loading...' : 'Refresh'}
         </button>
+          </div>
+        </div>
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
+      {/* Agent Runs Table */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '0.75rem',
+        padding: '1.5rem',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+      }}>
+        <h2 style={{ 
+          fontSize: '1.25rem', 
+          fontWeight: '600', 
+          color: '#1f2937', 
+          marginBottom: '1rem' 
+        }}>
+          Agent Runs
+        </h2>
+        
+        {items.length === 0 && !loading ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem 1rem',
+            color: '#6b7280'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '500', marginBottom: '0.5rem' }}>
+              No agent runs found
+            </h3>
+            <p style={{ fontSize: '0.875rem' }}>
+              Try running a compliance or productivity agent first to see results here.
+            </p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="text-left border-b">
-              <th className="p-2">Run ID</th>
-              <th className="p-2">Module</th>
-              <th className="p-2">Topic</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Artifacts</th>
-              <th className="p-2">Updated</th>
+                <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Run ID
+                  </th>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Module
+                  </th>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Topic
+                  </th>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Status
+                  </th>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Artifacts
+                  </th>
+                  <th style={{ 
+                    textAlign: 'left', 
+                    padding: '1rem 0.75rem', 
+                    fontWeight: '600', 
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Updated
+                  </th>
             </tr>
           </thead>
           <tbody>
-            {items.map((x) => (
-              <tr key={x.run_id} className="border-b hover:bg-gray-50">
-                <td className="p-2 font-mono text-xs">{x.run_id}</td>
-                <td className="p-2">
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    x.module === 'compliance' ? 'bg-blue-100 text-blue-800' : 
-                    x.module === 'productivity' ? 'bg-green-100 text-green-800' : 
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {x.module}
+                {items.map((item, index) => (
+                  <tr 
+                    key={item.run_id} 
+                    style={{ 
+                      borderBottom: '1px solid #f3f4f6',
+                      backgroundColor: index % 2 === 0 ? 'white' : '#fafafa',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.closest('tr').style.backgroundColor = '#f8fafc'}
+                    onMouseLeave={(e) => e.target.closest('tr').style.backgroundColor = index % 2 === 0 ? 'white' : '#fafafa'}
+                  >
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <div style={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        color: '#6b7280',
+                        backgroundColor: '#f3f4f6',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        display: 'inline-block'
+                      }}>
+                        {item.run_id.slice(-8)}
+                      </div>
+                </td>
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <span style={{
+                        padding: '0.375rem 0.75rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '500',
+                        backgroundColor: getModuleColor(item.module) + '20',
+                        color: getModuleColor(item.module),
+                        textTransform: 'capitalize',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}>
+                        {item.module === 'compliance' ? '🤖' : '🚀'} {item.module}
                   </span>
                 </td>
-                <td className="p-2">{x.topic}</td>
-                <td className="p-2">
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    x.status === 'DONE' ? 'bg-green-100 text-green-800' :
-                    x.status === 'RUNNING' ? 'bg-yellow-100 text-yellow-800' :
-                    x.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {x.status}
-                  </span>
-                </td>
-                <td className="p-2">
-                  <div className="space-y-1">
-                    {x.artifacts?.jira && (
-                      <div className="text-xs">
-                        <strong>Jira:</strong> {Array.isArray(x.artifacts.jira) ? 
-                          x.artifacts.jira.join(", ") : String(x.artifacts.jira)}
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <div style={{ 
+                        fontSize: '0.875rem', 
+                        color: '#374151',
+                        maxWidth: '300px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {item.topic}
+                      </div>
+                    </td>
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <span style={{
+                        padding: '0.375rem 0.75rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '500',
+                        backgroundColor: getStatusColor(item.status) + '20',
+                        color: getStatusColor(item.status),
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {item.artifacts?.jira && (
+                          <div style={{ fontSize: '0.75rem' }}>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>Jira:</span>
+                            <span style={{ color: '#6b7280', marginLeft: '0.25rem' }}>
+                              {Array.isArray(item.artifacts.jira) ? 
+                                item.artifacts.jira.join(", ") : String(item.artifacts.jira)}
+                            </span>
                       </div>
                     )}
-                    {x.artifacts?.slack && (
-                      <div className="text-xs">
-                        <strong>Slack:</strong> {String(x.artifacts.slack)}
+                        {item.artifacts?.slack && (
+                          <div style={{ fontSize: '0.75rem' }}>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>Slack:</span>
+                            <span style={{ color: '#6b7280', marginLeft: '0.25rem' }}>
+                              {String(item.artifacts.slack)}
+                            </span>
                       </div>
                     )}
-                    {x.artifacts?.sheets && (
-                      <div className="text-xs">
-                        <strong>Sheets:</strong> 
-                        <a 
-                          className="underline ml-1 text-blue-600" 
-                          href={String(x.artifacts.sheets)} 
+                        {item.artifacts?.sheets && (
+                          <div style={{ fontSize: '0.75rem' }}>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>Sheets:</span>
+                            <a 
+                              style={{ 
+                                color: '#3b82f6',
+                                textDecoration: 'none',
+                                marginLeft: '0.25rem',
+                                fontWeight: '500'
+                              }}
+                              href={String(item.artifacts.sheets)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
-                          open
+                              Open →
                         </a>
                       </div>
                     )}
+                        {!item.artifacts?.jira && !item.artifacts?.slack && !item.artifacts?.sheets && (
+                          <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>
+                            No artifacts
+                          </span>
+                        )}
                   </div>
                 </td>
-                <td className="p-2 text-xs text-gray-600">
-                  {new Date(x.updated_at).toLocaleString()}
+                    <td style={{ padding: '1rem 0.75rem' }}>
+                      <div style={{ 
+                        fontSize: '0.75rem', 
+                        color: '#6b7280',
+                        fontFamily: 'monospace'
+                      }}>
+                        {new Date(item.updated_at).toLocaleString()}
+                      </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        
-        {items.length === 0 && !loading && (
-          <div className="text-center py-8 text-gray-500">
-            No agent runs found. Try running a compliance or productivity agent first.
           </div>
         )}
       </div>
