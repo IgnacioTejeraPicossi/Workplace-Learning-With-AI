@@ -2,12 +2,14 @@
 import React, { useState } from 'react';
 import CyberDashboard from './CyberDashboard';
 import ThreatLibrary from './ThreatLibrary';
+import AgentSecurity from './AgentSecurity';
 
 export default function Cybersecurity() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'agent-security', label: 'Agent Security', icon: '🤖' },
     { id: 'threats', label: 'Threat Library', icon: '🛡️' },
     { id: 'posture', label: 'Posture & Risk', icon: '📈' },
     { id: 'vulnerabilities', label: 'Vulnerabilities', icon: '🔍' },
@@ -21,6 +23,8 @@ export default function Cybersecurity() {
     switch (activeTab) {
       case 'dashboard':
         return <CyberDashboard />;
+      case 'agent-security':
+        return <AgentSecurity />;
       case 'threats':
         return <ThreatLibrary />;
       case 'posture':

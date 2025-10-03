@@ -4211,6 +4211,7 @@ The Cybersecurity Module provides comprehensive security management and threat i
 - **📋 Compliance Tracker**: NIST, ISO, OWASP, and CIS framework mapping
 - **🚨 Incident Response Drills**: Simulated incident response training
 - **📚 Knowledge Base**: AI-powered cybersecurity Q&A using Agentic RAG
+- **🤖 Agent Security Monitor**: Advanced security monitoring and threat detection for AI agents with Zero Trust Architecture
 
 ### Architecture Diagram
 
@@ -4279,6 +4280,16 @@ graph TB
 - **Severity Classification**: CRITICAL, HIGH, MEDIUM, LOW, INFO
 - **Project-based Organization**: Separate vulnerability tracking per project
 - **Risk Scoring**: Calculated risk scores for each vulnerability
+
+#### 🤖 Agent Security Monitor
+- **Real-time Monitoring**: Continuous security assessment of all AI agents
+- **Threat Detection**: Advanced detection of prompt injection, model poisoning, and zero-day attacks
+- **Zero Trust Architecture**: Comprehensive security validation for agent interactions
+- **Behavioral Analysis**: AI agent behavior pattern monitoring and anomaly detection
+- **Model Integrity Checks**: Validation of AI model outputs and consistency
+- **Data Protection Audit**: Assessment of data handling and privacy compliance
+- **Incident Response**: Automated threat response and security incident tracking
+- **Security Scoring**: Individual agent security scores with vulnerability tracking
 - **Remediation Guidance**: AI-powered recommendations for fixes
 
 #### 📈 Posture & Risk Assessment
@@ -4333,6 +4344,18 @@ graph TB
 | `/api/cyber/rag/ask` | POST | Cybersecurity Q&A |
 | `/api/cyber/coach/lesson` | POST | Generate secure coding lesson |
 | `/api/cyber/compliance/status` | GET | Get compliance status |
+| `/api/agent-security/overview` | GET | Get agent security overview |
+| `/api/agent-security/agents/{name}/status` | GET | Get specific agent security status |
+| `/api/agent-security/scan` | POST | Run security scan on agents |
+| `/api/agent-security/threat-detection` | POST | Detect threats in agent interactions |
+| `/api/agent-security/incidents` | GET | List security incidents |
+| `/api/agent-security/incidents/{id}/respond` | POST | Respond to security incident |
+| `/api/agent-security/agents/{name}/behavior-analysis` | GET | Analyze agent behavior patterns |
+| `/api/agent-security/agents/{name}/model-integrity` | GET | Check model integrity |
+| `/api/agent-security/agents/{name}/data-protection-audit` | GET | Audit data protection compliance |
+| `/api/agent-security/threat-feed` | GET | Get real-time threat intelligence |
+| `/api/agent-security/zero-trust/status` | GET | Get Zero Trust architecture status |
+| `/api/agent-security/health` | GET | Agent security module health check |
 
 ### Integration with Existing Modules
 
@@ -4391,6 +4414,9 @@ graph TB
 - **Behavioral Analysis**: User behavior anomaly detection
 - **Predictive Security**: AI-powered risk prediction
 - **Automated Response**: Self-healing security controls
+- **Agent Security AI**: Machine learning-based threat detection for AI agents
+- **Zero Trust Automation**: Automated Zero Trust policy enforcement
+- **Model Drift Detection**: AI model performance and integrity monitoring
 
 #### Phase 3: Enterprise Integration
 - **SIEM Integration**: Security Information and Event Management
@@ -4444,6 +4470,9 @@ curl -X POST "http://localhost:8000/api/cyber/rag/ask" \
 #### For Security Teams
 - **Centralized Dashboard**: Unified view of security posture
 - **Automated Scanning**: Continuous vulnerability assessment
+- **AI Agent Security**: Comprehensive monitoring of AI agent security posture
+- **Zero Trust Implementation**: Advanced security architecture for AI systems
+- **Threat Detection**: Real-time detection of AI-specific threats
 - **Compliance Tracking**: Framework compliance monitoring
 - **Risk Management**: Quantitative risk assessment and trending
 
