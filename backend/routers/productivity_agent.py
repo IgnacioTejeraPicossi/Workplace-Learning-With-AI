@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 import httpx, os, time, hmac, hashlib, json
+from backend.utils.attestation import compute_bundle_hash
 
 router = APIRouter(prefix="/api/productivity", tags=["productivity"])
 
@@ -131,16 +132,6 @@ async def dispatch(spec: ProductivitySpec):
 
     run_id = f"prod-{int(time.time())}"
     
-    # Create initial run record in database
-    from backend.models.agent_runs import AgentRun, save_run
-    initial_run = AgentRun(
-        run_id=run_id,
-        module="productivity",
-        topic=f"[Productivity] {spec.brief_title}",
-        status="RUNNING"
-    )
-    await save_run(initial_run)
-    
     bundle = {
         "run_id": run_id,
         "topic": f"[Productivity] {spec.brief_title}",
@@ -150,6 +141,21 @@ async def dispatch(spec: ProductivitySpec):
         "actions": spec.actions,
         "callback_url": os.getenv("OUTSYSTEMS_CALLBACK_URL", "http://localhost:8000/api/agent-runs/callback")
     }
+    
+    # Compute bundle hash for attestation
+    bundle_hash = compute_bundle_hash(bundle)
+    
+    # Create initial run record in database with bundle hash
+    from backend.models.agent_runs import AgentRun, save_run
+    initial_run = AgentRun(
+        run_id=run_id,
+        module="productivity",
+        topic=f"[Productivity] {spec.brief_title}",
+        status="RUNNING",
+        bundle_hash=bundle_hash
+    )
+    await save_run(initial_run)
+    
     body = json.dumps(bundle).encode()
     headers = {"X-Signature": sign(body), "Content-Type": "application/json"}
     async with httpx.AsyncClient(timeout=60) as client:
@@ -159,4 +165,4 @@ async def dispatch(spec: ProductivitySpec):
         from backend.models.agent_runs import update_run
         await update_run(run_id, status="FAILED", error=f"OutSystems error: {r.text}")
         raise HTTPException(r.status_code, f"OutSystems error: {r.text}")
-    return {"ok": True, "run_id": run_id}
+    return {"ok": True, "run_id": run_id, "bundle_hash": bundle_hash}

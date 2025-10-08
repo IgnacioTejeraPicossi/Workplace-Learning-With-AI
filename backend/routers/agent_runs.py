@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, Query, HTTPException
 from typing import Optional
-from backend.models.agent_runs import list_runs, update_run
+from backend.models.agent_runs import list_runs, update_run, runs
+from backend.utils.attestation import compute_attestation
+from datetime import datetime
 
 router = APIRouter(prefix="/api/agent-runs", tags=["agent-runs"])
 
@@ -16,10 +18,26 @@ async def outsystems_callback(req: Request):
     event = await req.json()
     run_id = event.get("run_id")
     status = event.get("status")
+    artifacts = event.get("artifacts", {})
+    
     if not run_id or not status:
         raise HTTPException(400, "run_id and status are required")
-    patch = {"status": status}
-    if "artifacts" in event: patch["artifacts"] = event["artifacts"]
-    if "error" in event: patch["error"] = event["error"]
+    
+    # Fetch bundle_hash for attestation
+    doc = await runs.find_one({"run_id": run_id}, {"bundle_hash": 1})
+    attestation = None
+    
+    if doc and status in ("DONE", "FAILED"):
+        bundle_hash = doc.get("bundle_hash", "")
+        attestation = compute_attestation(bundle_hash, artifacts, signer="outsystems-agent")
+    
+    patch = {
+        "status": status,
+        "artifacts": artifacts,
+        "error": event.get("error"),
+        "attestation": attestation,
+        "updated_at": datetime.utcnow()
+    }
+    
     await update_run(run_id, **patch)
-    return {"ok": True}
+    return {"ok": True, "attestation": attestation is not None}

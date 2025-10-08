@@ -6,6 +6,7 @@ import Playbook from './Playbook';
 import FlowCatalog from './FlowCatalog';
 import Runs from './Runs';
 import Settings from './Settings';
+import AgentCatalog from '../components/AgentCatalog';
 
 export default function AgentOpsStudio() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -16,6 +17,7 @@ export default function AgentOpsStudio() {
     { id: 'playbook', label: 'Playbook', icon: '📋' },
     { id: 'flows', label: 'Flow Catalog', icon: '🔄' },
     { id: 'runs', label: 'Runs', icon: '🏃' },
+    { id: 'agent-catalog', label: 'Agent Catalog', icon: '📚' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];
 
@@ -31,6 +33,8 @@ export default function AgentOpsStudio() {
         return <FlowCatalog />;
       case 'runs':
         return <Runs />;
+      case 'agent-catalog':
+        return <AgentCatalog />;
       case 'settings':
         return <Settings />;
       default:

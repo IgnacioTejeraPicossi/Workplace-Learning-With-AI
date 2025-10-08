@@ -1,0 +1,92 @@
+{
+  "id": "ai-productivity-agent",
+  "name": "AI Productivity Agent",
+  "version": "1.0.0",
+  "module": "productivity",
+  "description": "Turn a research brief into multiple Jira tasks plus Slack/Sheets.",
+  "runner_default": "outsystems",
+  "mcp": { 
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      {
+        "name": "dispatch_action_bundle",
+        "description": "Send an Action Bundle to the selected runner and return a run_id.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "module": { "enum": ["compliance", "productivity"] },
+            "runner": { "enum": ["outsystems", "n8n"] },
+            "bundle": { "type": "object" }
+          },
+          "required": ["module", "runner", "bundle"],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": { "run_id": { "type": "string" } },
+          "required": ["run_id"]
+        }
+      },
+      {
+        "name": "get_run_status",
+        "description": "Return current status and artifacts for a run.",
+        "input_schema": {
+          "type": "object",
+          "properties": { "run_id": { "type": "string" } },
+          "required": ["run_id"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "status": { "enum": ["QUEUED","RUNNING","DONE","FAILED"] },
+            "artifacts": { "type": "object" }
+          },
+          "required": ["status"]
+        }
+      }
+    ]
+  },
+  "capabilities": ["jira.createIssue","slack.postMessage","sheets.appendRow"],
+  "action_bundle_schema": {
+    "type": "object",
+    "properties": {
+      "run_id": { "type": "string" },
+      "topic": { "type": "string" },
+      "summary_md": { "type": "string" },
+      "next_actions": {
+        "type": "array",
+        "items": { 
+          "type": "object", 
+          "properties": {
+            "title": { "type": "string" },
+            "detail": { "type": "string" },
+            "assignee": { "type": "string" }
+          } 
+        }
+      },
+      "primary_url": { "type": "string" },
+      "actions": {
+        "type": "array",
+        "items": { 
+          "type": "object", 
+          "properties": {
+            "type": { "type": "string" },
+            "payload": { "type": "object" }
+          }, 
+          "required": ["type","payload"] 
+        }
+      },
+      "callback_url": { "type": "string" }
+    },
+    "required": ["run_id","topic","summary_md","actions","callback_url"]
+  },
+  "policy": {
+    "owner_required": true,
+    "allowed_jira_projects": ["LEARN","PROD"],
+    "allowed_slack_channels": ["#engineering","#productivity"]
+  },
+  "security": { 
+    "hmac": { "algorithm": "HMAC-SHA256", "header": "X-Signature" } 
+  }
+}
+

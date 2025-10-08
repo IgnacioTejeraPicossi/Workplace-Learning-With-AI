@@ -1,0 +1,82 @@
+{
+  "id": "ai-compliance-agent",
+  "name": "AI Compliance Agent",
+  "version": "1.0.0",
+  "module": "compliance",
+  "description": "Generate key risks from a policy and execute Jira/Slack/Sheets via OutSystems.",
+  "runner_default": "outsystems",
+  "mcp": { 
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      {
+        "name": "dispatch_action_bundle",
+        "description": "Send an Action Bundle to the selected runner and return a run_id.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "module": { "enum": ["compliance", "productivity"] },
+            "runner": { "enum": ["outsystems", "n8n"] },
+            "bundle": { "type": "object" }
+          },
+          "required": ["module", "runner", "bundle"],
+          "additionalProperties": false
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": { "run_id": { "type": "string" } },
+          "required": ["run_id"]
+        }
+      },
+      {
+        "name": "get_run_status",
+        "description": "Return current status and artifacts for a run.",
+        "input_schema": {
+          "type": "object",
+          "properties": { "run_id": { "type": "string" } },
+          "required": ["run_id"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "status": { "enum": ["QUEUED","RUNNING","DONE","FAILED"] },
+            "artifacts": { "type": "object" }
+          },
+          "required": ["status"]
+        }
+      }
+    ]
+  },
+  "capabilities": ["jira.createIssue","slack.postMessage","sheets.appendRow"],
+  "action_bundle_schema": {
+    "type": "object",
+    "properties": {
+      "run_id": { "type": "string" },
+      "topic": { "type": "string" },
+      "summary_md": { "type": "string" },
+      "key_risks": { "type": "array", "items": { "type": "string" } },
+      "doc_url": { "type": "string" },
+      "actions": {
+        "type": "array",
+        "items": { 
+          "type": "object", 
+          "properties": {
+            "type": { "type": "string" },
+            "payload": { "type": "object" }
+          }, 
+          "required": ["type","payload"] 
+        }
+      },
+      "callback_url": { "type": "string" }
+    },
+    "required": ["run_id","topic","summary_md","actions","callback_url"]
+  },
+  "policy": {
+    "owner_required": true,
+    "allowed_jira_projects": ["LEARN","COMP"],
+    "allowed_slack_channels": ["#compliance"]
+  },
+  "security": { 
+    "hmac": { "algorithm": "HMAC-SHA256", "header": "X-Signature" } 
+  }
+}
+

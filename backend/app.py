@@ -2300,6 +2300,16 @@ except ImportError as e:
 except Exception as e:
     print(f"❌ Error including MongoDB Authentication router: {e}")
 
+# Agent Catalog router
+try:
+    from backend.routers.agent_catalog import router as agent_catalog_router
+    app.include_router(agent_catalog_router, tags=["Agent Catalog"])
+    print("✅ Agent Catalog router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import Agent Catalog router: {e}")
+except Exception as e:
+    print(f"❌ Error including Agent Catalog router: {e}")
+
 # AI Agent Bridge Platform routers
 try:
     from backend.routers.agent_runs import router as agent_runs_router

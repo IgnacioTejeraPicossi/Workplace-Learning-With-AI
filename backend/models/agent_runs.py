@@ -2,6 +2,16 @@ from pydantic import BaseModel, Field
 from typing import Optional, Literal, Dict, Any, List
 from datetime import datetime
 
+# Attestation model for execution receipts
+class Attestation(BaseModel):
+    """Execution receipt for agent runs"""
+    bundle_hash: str         # SHA-256 of canonical Action Bundle
+    receipt_hash: str        # SHA-256 of the receipt object
+    signed_by: str           # Service name that signed the receipt
+    algorithm: str = "SHA256"
+    hmac_signature: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
 # Pydantic model for reads/writes
 class AgentRun(BaseModel):
     run_id: str
@@ -12,6 +22,8 @@ class AgentRun(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     artifacts: Dict[str, Any] = {}  # e.g., {"jira":["LEARN-101","LEARN-102"], "slack":"ts123", "sheets":"url"}
     error: Optional[str] = None
+    bundle_hash: Optional[str] = None  # Hash of the action bundle for attestation
+    attestation: Optional[Attestation] = None  # Execution receipt
 
 # Minimal persistence helpers (Motor or PyMongo—example with Motor)
 from motor.motor_asyncio import AsyncIOMotorClient
