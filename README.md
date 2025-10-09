@@ -48,6 +48,7 @@
 - [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
 - [🧠 EA Second Brain Agent](#ea-second-brain-agent) - Ketil's 24/7 Enterprise Architecture watcher for Norwegian (NEW!)
 - [💼 Sales Assistant Agent](#sales-assistant-agent) - Pipeline hygiene, deal risk scoring, and contextual follow-up drafts (NEW!)
+- [🎯 Personal Attention Agent](#personal-attention-agent) - Noise→signal across channels; schedules focus holds and sends actionable briefs (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -4495,6 +4496,161 @@ Registered in Agent Catalog with:
 ### Documentation
 - **Implementation Summary**: [SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md](SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/sales-assistant.json](frontend/src/configs/agents/sales-assistant.json)
+
+---
+
+## 🎯 Personal Attention Agent
+
+### Overview
+The **Personal Attention Agent** is designed for Tom Erik Sundal-Ask (Head of Platform Engineering and Network Management, Telenor) to solve information overload across multiple channels. It transforms noise into actionable signals by ingesting, clustering, and intelligently routing information from Slack, Teams, Webex, SharePoint, RSS feeds, and more.
+
+### Problem Statement
+As stated by Tom Erik:
+> "I see information overload both in multiple channels and content. Also with AI making content. (Slack-channels, Teams, Webex, Workvivo, Workplace, Facebook, Intranet, press releases, media.) Work/social/learning/possibilities etc. People waste time on trying to follow all info or miss what matters."
+
+### Solution
+The Personal Attention Agent addresses this by:
+- **Ingesting** multi-channel signals from Slack, Teams, Webex, SharePoint, RSS, Workplace, Workvivo
+- **Clustering** related information using AI-powered semantic similarity
+- **Scoring** priority based on relevance, urgency, impact, and user preferences
+- **Routing** alerts to appropriate teams and channels automatically
+- **Scheduling** focus holds for critical issues
+- **Generating** daily briefs and digest emails
+
+### Key Features
+- **Multi-Channel Ingestion**: Unified data collection from 7+ communication platforms
+- **AI-Powered Clustering**: Semantic grouping and deduplication of related signals
+- **Priority Scoring**: Intelligent ranking based on relevance × urgency × impact × preferences
+- **Automated Routing**: Smart distribution to appropriate teams and channels
+- **Focus Hold Scheduling**: Automatic calendar blocking for critical issues
+- **Daily Briefs**: Automated digest generation and distribution
+- **Real-Time Alerting**: Instant notifications with adaptive cards
+- **User Preferences**: Customizable filters, mute terms, and priority boosts
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Multi-Channel │───▶│   AI Clustering  │    │   Priority      │
+│   Ingestion     │    │   & Scoring      │    │   Routing       │
+│   (7+ sources)  │    │   Engine         │    │   System        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Slack         │    │   Teams          │    │   Calendar      │
+│   Notifications │    │   Adaptive Cards│    │   Focus Holds    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Email         │    │   User           │    │   AgentOps      │
+│   Digests       │    │   Preferences    │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and recent activity
+- **Sources**: CRUD management for channel sources and connectors
+- **Clusters**: AI-powered signal clustering with priority scoring
+- **Alerts**: Feed of dispatched alerts with execution artifacts
+- **Runs**: Execution history and attestation tracking
+- **Settings**: User preferences, integration configs, and routing rules
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: Slack Bot API, Teams Webhooks, Microsoft Graph API
+- **Security**: HMAC authentication and attestation
+- **Data Model**: Multi-collection MongoDB schema for signals, clusters, alerts
+
+### API Endpoints
+- `POST /agents/attention/execute` - Execute attention action bundle
+- `GET /agents/attention/health` - Health check endpoint
+- `POST /agents/attention/test` - Test execution endpoint
+- `GET /agents/attention/sources` - Manage channel sources
+- `GET /agents/attention/clusters` - View signal clusters
+- `GET /agents/attention/alerts` - Alert feed
+- `POST /agents/attention/preferences` - User preferences
+
+### Data Model
+```python
+class AttentionActionBundle(BaseModel):
+    run_id: str
+    topic: str
+    summary_md: str
+    evidence: List[Evidence] = []
+    recommended_actions: List[NextAction] = []
+    actions: List[Action] = []
+    callback_url: str
+
+class Evidence(BaseModel):
+    url: str
+    source: str
+    snippet: Optional[str] = None
+    published_at: Optional[datetime] = None
+
+class NextAction(BaseModel):
+    title: str
+    detail: Optional[str] = None
+    assignee: Optional[str] = None
+    due_date: Optional[datetime] = None
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Personal Attention Agent**
+2. Go to **Sources** tab to configure channel connectors
+3. Review **Clusters** tab for AI-powered signal grouping
+4. Check **Alerts** tab for dispatched notifications
+5. Configure preferences in **Settings** tab
+6. Monitor execution in **Runs** tab
+
+### Environment Variables
+```bash
+# Microsoft Teams Integration
+TEAMS_WEBHOOK_URL=https://outlook.office.com/webhook/...
+TEAMS_BOT_TOKEN=xoxb-your-bot-token
+
+# Microsoft Graph Integration
+GRAPH_BEARER_TOKEN=your-graph-api-token
+GRAPH_USER_ID=me
+
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+SLACK_DEFAULT_CHANNEL=#cto-brief
+
+# Security
+HMAC_SECRET=your-hmac-secret-key
+```
+
+### Priority Scoring Algorithm
+```
+priority = w1*relevance + w2*urgency + w3*impact + w4*preference_boost - w5*spam
+
+where:
+  relevance   = cosine(cluster.vec, user/team profile vec)
+  urgency     = recency decay + surge in volume + keywords ("outage", "incident", "EOL")
+  impact      = audience × system criticality (mapping table)
+  preference  = boosts from Preference.mustHave / team membership
+```
+
+### Future Enhancements
+- **Machine Learning Models**: Advanced clustering and priority prediction
+- **Real-Time Processing**: Stream processing for instant alerts
+- **Advanced Integrations**: More communication platforms and enterprise tools
+- **Mobile App**: On-the-go attention management
+- **Analytics Dashboard**: Insights into information patterns and team efficiency
+- **Custom Workflows**: User-defined automation rules
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `teams.sendCard`, `slack.postMessage`, `calendar.createEvent`, `email.sendDigest`
+- **Policy**: Low-risk auto-execution with user approval for high-impact actions
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md](PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/attention-agent.json](frontend/src/configs/agents/attention-agent.json)
 
 ---
 
