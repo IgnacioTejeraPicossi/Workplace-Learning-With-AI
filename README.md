@@ -47,6 +47,7 @@
 - [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
 - [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
 - [🧠 EA Second Brain Agent](#ea-second-brain-agent) - Ketil's 24/7 Enterprise Architecture watcher for Norwegian (NEW!)
+- [💼 Sales Assistant Agent](#sales-assistant-agent) - Pipeline hygiene, deal risk scoring, and contextual follow-up drafts (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -4360,6 +4361,140 @@ Registered in Agent Catalog with:
 - **Complete Guide**: [docs/EA_SECOND_BRAIN_AGENT.md](docs/EA_SECOND_BRAIN_AGENT.md)
 - **Implementation Summary**: [EA_AGENT_IMPLEMENTATION_SUMMARY.md](EA_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/ea-second-brain.json](frontend/src/configs/agents/ea-second-brain.json)
+
+---
+
+## 💼 Sales Assistant Agent
+
+### Overview
+The **Sales Assistant Agent** (Amelie) is designed for Yara International's sales team to automate pipeline hygiene, deal risk scoring, and contextual follow-up drafts. It provides intelligent CRM updates, email automation, and deal progression insights.
+
+### Problem Statement
+Sales teams struggle with:
+- **Manual CRM updates** consuming valuable selling time
+- **Inconsistent follow-up** leading to lost opportunities  
+- **Poor pipeline hygiene** affecting forecasting accuracy
+- **Context switching** between multiple tools and systems
+
+### Solution
+The Sales Assistant Agent automates sales processes by:
+- **Analyzing** email and calendar activity for CRM updates
+- **Scoring** deal risk based on communication patterns and timeline
+- **Generating** contextual follow-up drafts and next actions
+- **Integrating** with CRM, Microsoft 365, and Slack seamlessly
+- **Providing** intelligent insights for deal progression
+
+### Key Features
+- **Proactive CRM Updates**: Automatically updates opportunity stages, next steps, and close dates
+- **Email Draft Generation**: Creates contextual follow-up emails based on communication history
+- **Deal Risk Scoring**: Analyzes patterns to identify at-risk opportunities
+- **Task Automation**: Creates CRM tasks and calendar events automatically
+- **Slack Integration**: Sends notifications and updates to sales channels
+- **Microsoft 365 Integration**: Accesses email and calendar data for context
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Sales Agent   │───▶│   CRM Systems    │    │   Microsoft 365 │
+│   (Amelie)      │    │  (Salesforce/    │    │   (Email/       │
+│                 │    │   Dynamics/HubSpot)│    │    Calendar)    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Slack         │    │   Google Sheets   │    │   AgentOps      │
+│   Notifications │    │   Reporting       │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, metrics, and data sources
+- **Hygiene**: Pipeline cleanliness analysis and recommendations
+- **Deals**: Active deals monitoring and risk scoring
+- **Runs**: Execution history and audit trail
+- **Settings**: Configuration and integration management
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: CRM, Microsoft 365 Graph API, Slack API
+- **Security**: HMAC authentication and attestation
+- **Data Model**: SalesActionBundle with TargetRef and NextAction
+
+### API Endpoints
+- `POST /agents/sales/execute` - Execute sales action bundle
+- `GET /agents/sales/runs` - Get execution history
+- `POST /agents/sales/callback` - Handle integration callbacks
+
+### Data Model
+```python
+class SalesActionBundle(BaseModel):
+    run_id: str
+    topic: str
+    summary_md: str
+    targets: List[TargetRef] = []
+    recommended_actions: List[NextAction] = []
+    actions: List[Action]
+    callback_url: str
+
+class TargetRef(BaseModel):
+    type: Literal["Opportunity","Contact","Account"]
+    crm_id: str
+    name: Optional[str] = None
+
+class NextAction(BaseModel):
+    title: str
+    detail: Optional[str] = None
+    assignee: Optional[str] = None
+    due_date: Optional[datetime] = None
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Sales Assistant Agent**
+2. Go to **Hygiene** tab to analyze pipeline cleanliness
+3. Review **Deals** tab for risk scoring and recommendations
+4. Check **Runs** tab for execution history and audit trail
+5. Configure integrations in **Settings** tab
+
+### Environment Variables
+```bash
+# CRM Integration
+CRM_PROVIDER=salesforce  # or dynamics, hubspot
+CRM_BASE_URL=https://your-crm-instance.com
+CRM_BEARER_TOKEN=your-api-token
+
+# Microsoft 365 Integration
+M365_TENANT_ID=your-tenant-id
+M365_CLIENT_ID=your-client-id
+M365_CLIENT_SECRET=your-client-secret
+
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+SLACK_DEFAULT_CHANNEL=#sales
+
+# Security
+HMAC_SECRET=your-hmac-secret-key
+```
+
+### Future Enhancements
+- **AI-powered deal scoring** with machine learning models
+- **Predictive analytics** for pipeline forecasting
+- **Advanced email templates** with personalization
+- **Integration with more CRM systems** (Pipedrive, Zoho)
+- **Mobile app** for on-the-go sales management
+- **Real-time notifications** for urgent follow-ups
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `crm.updateOpportunity`, `crm.createTask`, `email.createDraft`, `slack.postMessage`
+- **Policy**: Sales team approval required for high-value actions
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md](SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/sales-assistant.json](frontend/src/configs/agents/sales-assistant.json)
 
 ---
 
