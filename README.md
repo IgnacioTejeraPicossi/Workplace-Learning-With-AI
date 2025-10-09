@@ -49,6 +49,7 @@
 - [🧠 EA Second Brain Agent](#ea-second-brain-agent) - Ketil's 24/7 Enterprise Architecture watcher for Norwegian (NEW!)
 - [💼 Sales Assistant Agent](#sales-assistant-agent) - Pipeline hygiene, deal risk scoring, and contextual follow-up drafts (NEW!)
 - [🎯 Personal Attention Agent](#personal-attention-agent) - Noise→signal across channels; schedules focus holds and sends actionable briefs (NEW!)
+- [📡 Telco Ops Decisioning Agent](#telco-ops-decisioning-agent) - Data-driven telco operations with TMF APIs and safe autonomy (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -4651,6 +4652,176 @@ Registered in Agent Catalog with:
 ### Documentation
 - **Implementation Summary**: [PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md](PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/attention-agent.json](frontend/src/configs/agents/attention-agent.json)
+
+---
+
+## 📡 Telco Ops Decisioning Agent
+
+### Overview
+The **Telco Ops Decisioning Agent** is designed for Helge Sølvberg (Country Chief Analytics IT Architect, Telia) to enable data-driven telco operations with safe autonomy. It transforms telco signals into actionable operations by reasoning, deciding, and acting across order management, subscription changes, appointments, communications, and CRM case creation.
+
+### Problem Statement
+As stated by Helge:
+> "Agents based on data, both company data and external sources. Reasoning and make decisions, and then do the action; could be to place an order, perform an upgrade, change a subscription, send a communication etc. Either autonomously, or with enough details that a human can confirm with single-click."
+
+### Solution
+The Telco Ops Decisioning Agent addresses this by:
+- **Data-Driven Decision Making**: Processes internal BSS/CRM data and external signals
+- **TMF API Integration**: Leverages TM Forum standards (TMF622, TMF679) for telco operations
+- **Safe Autonomy**: Executes low-risk operations automatically, requires approval for high-impact actions
+- **Multi-Channel Actions**: Order placement, subscription changes, appointment scheduling, communications, CRM case creation
+- **Policy Guardrails**: Configurable thresholds for automatic vs. manual execution
+
+### Key Features
+- **TMF622 Integration**: Product ordering and modification via industry-standard APIs
+- **TMF679 Integration**: Product offering qualification and eligibility checks
+- **Smart Appointment Scheduling**: Field service management integration
+- **Multi-Channel Communications**: Email, SMS, and push notifications
+- **CRM Case Management**: Automated case creation and tracking
+- **Policy-Based Guardrails**: Configurable risk thresholds and approval workflows
+- **HMAC Security**: Cryptographic verification for all operations
+- **Attestation & Audit**: Complete audit trail with cryptographic attestation
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Data Sources  │───▶│   AI Reasoning   │    │   Policy        │
+│   BSS/CRM       │    │   Engine         │    │   Guardrails    │
+│   External APIs │    │   Decision Logic │    │   Risk Assessment│
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   TMF622        │    │   TMF679         │    │   Appointment   │
+│   Ordering      │    │   Qualification  │    │   Scheduling    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Communications│    │   CRM Case       │    │   AgentOps      │
+│   Email/SMS/Push│    │   Management     │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and execution modes
+- **Recommendations**: AI-generated recommendations ready for approval
+- **Actions**: Action execution history and detailed artifacts
+- **Runs**: Execution runs with attestation and audit trails
+- **Settings**: Policy configuration and integration settings
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: TMF622/TMF679 APIs, appointment systems, communication providers, CRM systems
+- **Security**: HMAC authentication and cryptographic attestation
+- **Data Model**: Multi-collection MongoDB schema for recommendations, signals, customers, policies
+
+### API Endpoints
+- `POST /agents/ops/execute` - Execute telco operations action bundle
+- `GET /agents/ops/health` - Health check endpoint
+- `POST /agents/ops/test` - Test execution endpoint
+- `GET /agents/ops/recommendations` - Get pending recommendations
+- `POST /agents/ops/recommendations/{id}/approve` - Approve and dispatch recommendation
+
+### Data Model
+```python
+class ActionBundle(BaseModel):
+    run_id: str
+    customer_id: str
+    topic: str
+    summary_md: str
+    recommendations: List[NextAction] = []
+    actions: List[Action]
+    callback_url: str
+
+class Action(BaseModel):
+    type: Literal[
+        "tmf622.order.create",
+        "tmf622.order.change", 
+        "subscription.change",
+        "appointment.schedule",
+        "comm.send",
+        "crm.case.create"
+    ]
+    payload: Dict[str, Any]
+
+class CustomerContext(BaseModel):
+    customer_id: str
+    current_plan: Optional[str] = None
+    devices: List[str] = []
+    tenure: Optional[int] = None
+    arpu: Optional[float] = None
+    risk_score: Optional[float] = Field(default=0.0, ge=0.0, le=100.0)
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Telco Ops Decisioning Agent**
+2. Go to **Recommendations** tab to review AI-generated suggestions
+3. Click **Approve & Dispatch** for one-click confirmation
+4. Monitor execution in **Runs** tab with attestation hashes
+5. Configure policies in **Settings** tab
+
+### Environment Variables
+```bash
+# TMF Integration
+TMF_BASE_URL=https://tmf.example.com
+TMF_AUTH_TOKEN=your-tmf-token
+
+# Appointment Integration  
+APPOINT_BASE_URL=https://appointments.example.com
+APPOINT_TOKEN=your-appointment-token
+
+# Communication Integration
+COMMS_PROVIDER=m365
+COMMS_API_KEY=your-comms-key
+GRAPH_USER_ID=me
+GRAPH_BEARER_TOKEN=your-graph-token
+
+# CRM Integration
+CRM_BASE_URL=https://crm.example.com
+CRM_BEARER_TOKEN=your-crm-token
+```
+
+### Policy Configuration
+```python
+policy = {
+    "max_auto_value": 50.0,        # Max € for automatic execution
+    "confidence_threshold": 0.7,   # Min confidence for recommendations
+    "risk_threshold": 70.0,        # Max risk % before requiring approval
+    "required_approval_roles": ["ops-supervisor"]
+}
+```
+
+### Decision Scoring Algorithm
+```
+decision_score = w1*confidence + w2*expected_value - w3*risk - w4*churn_prob
+
+where:
+  confidence     = AI model confidence (0.0 - 1.0)
+  expected_value = Expected revenue impact (€)
+  risk          = Customer/operation risk score (0-100)
+  churn_prob    = Customer churn probability (0.0 - 1.0)
+```
+
+### Future Enhancements
+- **Advanced ML Models**: Predictive analytics for customer behavior and network optimization
+- **Real-Time Processing**: Stream processing for instant response to network events
+- **Extended TMF Support**: Additional TM Forum APIs (TMF633, TMF640, TMF641)
+- **Network Analytics**: Integration with network monitoring and optimization systems
+- **Customer Journey**: End-to-end customer lifecycle management
+- **Compliance Automation**: Automated regulatory compliance checks and reporting
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `tmf622.order.create`, `tmf622.order.change`, `subscription.change`, `appointment.schedule`, `comm.send`, `crm.case.create`
+- **Policy**: Configurable auto-execution thresholds with approval workflows
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md](TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/telco-ops-agent.json](frontend/src/configs/agents/telco-ops-agent.json)
 
 ---
 

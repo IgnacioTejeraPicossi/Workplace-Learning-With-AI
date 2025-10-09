@@ -8,7 +8,7 @@ from backend.models.sales import SalesActionBundle, AgentCallback
 from backend.security.hmac import verify, sign
 from backend.store.runs import create_start, finish_success, finish_error
 from backend.attestation.hash import compute_attestation
-from backend.integrations.crm import update_opportunity, create_task
+from backend.integrations.crm import create_case, update_case
 from backend.integrations.m365 import create_draft
 from backend.integrations.slack import post_message
 import httpx
@@ -47,7 +47,7 @@ async def execute_sales_bundle(
         # Execute each action
         for action in bundle.actions:
             if action.type == "crm.updateOpportunity":
-                result = await update_opportunity(action.payload)
+                result = await update_case(action.payload.get("opportunity_id"), action.payload)
                 artifacts.setdefault("crm_updates", []).append({
                     "action": "updateOpportunity",
                     "result": result,
@@ -55,7 +55,7 @@ async def execute_sales_bundle(
                 })
                 
             elif action.type == "crm.createTask":
-                result = await create_task(action.payload)
+                result = await create_case(action.payload)
                 artifacts.setdefault("crm_tasks", []).append({
                     "action": "createTask", 
                     "result": result,
@@ -82,7 +82,7 @@ async def execute_sales_bundle(
         attestation_hash = compute_attestation(bundle.dict(), artifacts)
         
         # Update run as successful
-        await update_run_status(run_id, "DONE", artifacts, attestation_hash)
+        await finish_success(run_record["_id"], artifacts, attestation_hash)
         
         return {
             "status": "success",
@@ -93,7 +93,7 @@ async def execute_sales_bundle(
         
     except Exception as e:
         # Update run as failed
-        await update_run_status(run_id, "FAILED", {}, None, str(e))
+        await finish_error(run_record["_id"], str(e))
         
         raise HTTPException(
             status_code=500, 
@@ -111,12 +111,17 @@ async def get_sales_runs(limit: int = 50):
 @router.post("/callback")
 async def sales_callback(callback: AgentCallback):
     """Handle callback from external systems"""
-    await update_run_status(
-        callback.run_id, 
-        callback.status, 
-        callback.artifacts,
-        error=callback.error
-    )
+    # Find the run by run_id
+    from backend.store.runs import runs
+    run = await runs.find_one({"run_id": callback.run_id})
+    
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+    
+    if callback.status == "DONE":
+        await finish_success(run["_id"], callback.artifacts, None)
+    elif callback.status == "FAILED":
+        await finish_error(run["_id"], callback.error or "Unknown error")
     
     return {"status": "success", "message": "Callback processed"}
 

@@ -1,0 +1,61 @@
+{
+  "id": "telco-ops-agent",
+  "name": "Telco Ops Decisioning Agent",
+  "version": "1.0.0",
+  "module": "ops",
+  "description": "Decides and executes orders, plan changes, appointments, comms, and CRM cases with safe autonomy. Transforms telco signals into actionable operations.",
+  "runner_default": "outsystems",
+  "mcp": {
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      { "name": "dispatch_action_bundle" },
+      { "name": "get_run_status" }
+    ]
+  },
+  "capabilities": [
+    "tmf622.order.create",
+    "tmf622.order.change", 
+    "subscription.change",
+    "appointment.schedule",
+    "comm.send",
+    "crm.case.create"
+  ],
+  "policy": {
+    "max_auto_value": 50,
+    "confidence_threshold": 0.7,
+    "risk_threshold": 70.0,
+    "required_approval_roles": ["ops-supervisor"]
+  },
+  "features": [
+    "Data-driven decision making",
+    "TMF622/TMF679 API integration", 
+    "Automated order processing",
+    "Smart appointment scheduling",
+    "Multi-channel communications",
+    "CRM case management",
+    "Policy-based guardrails",
+    "HMAC security verification",
+    "Attestation and audit trails"
+  ],
+  "sources": {
+    "internal": [
+      "BSS/CRM systems",
+      "Customer usage data",
+      "Billing systems",
+      "Network monitoring"
+    ],
+    "external": [
+      "Coverage maps",
+      "Outage notifications", 
+      "Vendor announcements",
+      "Market signals"
+    ]
+  },
+  "integrations": {
+    "tmf622": "Product Ordering API",
+    "tmf679": "Product Offering Qualification",
+    "appointments": "Field Service Management",
+    "communications": "Email/SMS/Push notifications",
+    "crm": "Case management system"
+  }
+}

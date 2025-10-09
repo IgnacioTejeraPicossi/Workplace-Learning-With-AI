@@ -45,6 +45,7 @@
     "eaSecondBrain": "EA Second Brain Agent",
     "salesAssistant": "Sales Assistant Agent",
   "personalAttentionAgent": "Personal Attention Agent",
+    "telcoOpsAgent": "Telco Ops Decisioning Agent",
     "cybersecurity": "Cybersecurity",
     "help": "Help",
     "runTest": "Run Test",

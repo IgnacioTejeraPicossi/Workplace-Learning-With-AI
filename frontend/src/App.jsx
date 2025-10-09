@@ -49,6 +49,7 @@ import AIProductivityAgent from "./AIProductivityAgent";
 import EASecondBrain from "./EASecondBrain";
 import SalesAssistant from "./SalesAssistant";
 import PersonalAttentionAgent from "./PersonalAttentionAgent";
+import TelcoOpsAgent from "./TelcoOpsAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
 
 function AppContent() {
@@ -456,6 +457,7 @@ function AppContent() {
             {!activeModule && section === "ea-second-brain" && <EASecondBrain />}
             {!activeModule && section === "sales-assistant" && <SalesAssistant />}
             {!activeModule && section === "personal-attention-agent" && <PersonalAttentionAgent />}
+            {!activeModule && section === "telco-ops-agent" && <TelcoOpsAgent />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
