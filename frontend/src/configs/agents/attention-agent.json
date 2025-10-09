@@ -1,0 +1,89 @@
+{
+  "id": "attention-agent",
+  "name": "Personal Attention Agent",
+  "version": "1.0.0",
+  "module": "attention",
+  "description": "Noise→signal across channels; schedules focus holds and sends actionable briefs for Tom Erik Sundal-Ask (Telenor)",
+  "runner_default": "outsystems",
+  "mcp": {
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      {"name": "dispatch_action_bundle"},
+      {"name": "get_run_status"}
+    ]
+  },
+  "capabilities": [
+    "teams.sendCard",
+    "slack.postMessage", 
+    "calendar.createEvent",
+    "email.sendDigest"
+  ],
+  "policy": {
+    "channels": ["#cto-brief"],
+    "max_auto_mode": "low_risk",
+    "quiet_hours": "22:00-08:00",
+    "priority_threshold": 0.7
+  },
+  "sources": {
+    "internal": [
+      "Slack Channels",
+      "Microsoft Teams",
+      "Webex Messages", 
+      "SharePoint Sites",
+      "Workplace Posts",
+      "Workvivo Updates",
+      "Intranet News"
+    ],
+    "external": [
+      "RSS Feeds",
+      "Press Releases",
+      "Media Coverage",
+      "Vendor Status Pages",
+      "Industry News"
+    ]
+  },
+  "features": [
+    "Multi-channel signal ingestion and normalization",
+    "AI-powered clustering and deduplication",
+    "Priority scoring based on relevance, urgency, and impact",
+    "Automated routing to appropriate teams and channels",
+    "Focus hold scheduling for critical issues",
+    "Daily digest generation and distribution",
+    "Real-time alerting with adaptive cards",
+    "User preference management and filtering"
+  ],
+  "integrations": {
+    "slack": {
+      "type": "bot_token",
+      "capabilities": ["post_message", "send_card", "webhook"]
+    },
+    "teams": {
+      "type": "webhook",
+      "capabilities": ["send_card", "adaptive_cards"]
+    },
+    "calendar": {
+      "type": "graph_api",
+      "capabilities": ["create_event", "focus_holds"]
+    },
+    "email": {
+      "type": "graph_api", 
+      "capabilities": ["send_digest", "send_alert"]
+    }
+  },
+  "data_model": {
+    "collections": [
+      "channel_sources",
+      "attention_signals", 
+      "attention_clusters",
+      "attention_alerts",
+      "attention_preferences"
+    ]
+  },
+  "environment_variables": [
+    "TEAMS_WEBHOOK_URL",
+    "GRAPH_BEARER_TOKEN",
+    "GRAPH_USER_ID",
+    "SLACK_BOT_TOKEN",
+    "HMAC_SECRET"
+  ]
+}

@@ -106,7 +106,8 @@ const getNavItems = (t) => [
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
     { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" },
-    { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" }
+    { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" },
+    { key: "personal-attention-agent", label: t('sidebar.personalAttentionAgent'), icon: "target" }
   ]},
   
   // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)
