@@ -50,6 +50,7 @@
 - [💼 Sales Assistant Agent](#sales-assistant-agent) - Pipeline hygiene, deal risk scoring, and contextual follow-up drafts (NEW!)
 - [🎯 Personal Attention Agent](#personal-attention-agent) - Noise→signal across channels; schedules focus holds and sends actionable briefs (NEW!)
 - [📡 Telco Ops Decisioning Agent](#telco-ops-decisioning-agent) - Data-driven telco operations with TMF APIs and safe autonomy (NEW!)
+- [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -4822,6 +4823,187 @@ Registered in Agent Catalog with:
 ### Documentation
 - **Implementation Summary**: [TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md](TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/telco-ops-agent.json](frontend/src/configs/agents/telco-ops-agent.json)
+
+---
+
+## 🛡️ Responsible AI Ops (GRC)
+
+### Overview
+The **Responsible AI Ops (GRC)** agent is designed for Erica Domingos (Principal Lead for Technology Ownership, Norsk Hydro) to address the critical challenges in Finance, Procurement, Supply Chain, and ESG reporting functions. It embodies Responsible AI principles from the ground up, ensuring transparency, accountability, and ethical use while scaling effectively across high-workload domains with complex governance requirements.
+
+### Problem Statement
+As stated by Erica Domingos:
+> "I encourage participating teams to explore solutions that support finance, procurement, supply chain, and ESG reporting functions—domains that consistently face high workloads, data quality challenges, and complex governance requirements, all while managing significant risk exposure. What would be truly valuable is a solution that not only scales effectively across these areas but also embodies the principles of responsible AI—ensuring transparency, accountability, and ethical use from the ground up."
+
+### Solution
+The Responsible AI Ops (GRC) agent addresses these challenges by:
+- **Data-Driven Compliance**: Monitors business objects (POs, invoices, shipments, materials, ESG metrics) for data quality issues, policy breaches, and risks
+- **Automated Remediation**: Executes fixes, holds, and notifications with full audit trails
+- **Responsible AI Guardrails**: Implements provenance, separation of duties, confidence thresholds, PII minimization, and attestation
+- **Multi-System Integration**: Connects SAP S/4HANA, ESG stores, Slack, Teams, and notification systems
+- **Policy-Based Automation**: Configurable thresholds for automatic vs. manual execution
+
+### Key Features
+- **SAP S/4HANA Integration**: OData/REST API integration for FI/MM/SD modules
+- **ESG Metrics Management**: Environmental, Social, and Governance metric monitoring and recalculation
+- **Multi-Channel Notifications**: Slack and Microsoft Teams integration for alerts and updates
+- **Policy Enforcement**: Configurable guardrails for automatic execution limits
+- **Audit Trail**: Complete cryptographic attestation and audit logging
+- **Separation of Duties**: Role-based approval workflows for high-impact actions
+- **Data Quality Monitoring**: Automated detection of missing GL codes, negative quantities, duplicate vendors
+- **Risk Scoring**: Intelligent risk assessment with configurable thresholds
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Data Sources  │───▶│   GRC Engine     │    │   Policy        │
+│   SAP S/4HANA   │    │   Monitoring     │    │   Guardrails    │
+│   ESG Store     │    │   Detection      │    │   SoD Check     │
+│   External APIs │    │   Scoring        │    │   Thresholds    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   ERP Actions   │    │   ESG Actions    │    │   Notifications │
+│   Fix/Block/Hold│    │   Recalculate    │    │   Slack/Teams   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Audit Trail  │    │   Attestation    │    │   AgentOps      │
+│   MongoDB      │    │   Hash           │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and Responsible AI features
+- **Findings**: Data quality, policy, and risk findings with priority scoring
+- **Actions**: Executed actions across ERP, ESG, and notification systems
+- **Runs**: Execution runs with attestation and audit trails
+- **Policies**: Configuration of thresholds, roles, and automation limits
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence and HMAC security
+- **Frontend**: React components with professional UI and real-time updates
+- **Integrations**: SAP OData, ESG APIs, Slack Bot API, Microsoft Teams webhooks
+- **Security**: HMAC authentication, cryptographic attestation, role-based access
+- **Data Model**: Multi-collection MongoDB schema for objects, signals, findings, actions, policies
+
+### API Endpoints
+- `POST /agents/grc/execute` - Execute GRC action bundle with HMAC verification
+- `GET /agents/grc/health` - Health check endpoint
+- `POST /agents/grc/test` - Test execution with sample data
+- `GET /agents/grc/runs` - Get GRC agent runs
+- `POST /agents/grc/callback` - Handle external system callbacks
+
+### Data Model
+```python
+class GrcActionBundle(BaseModel):
+    run_id: str
+    object_ref: str              # e.g., PO# / Invoice# / Metric id
+    topic: str
+    summary_md: str
+    evidence: List[Evidence] = []
+    actions: List[Action]
+    callback_url: str
+
+class Action(BaseModel):
+    type: Literal[
+        "erp.fix",           # Apply fix to ERP system
+        "po.block",          # Block purchase order
+        "invoice.hold",      # Hold invoice
+        "esg.recalc",        # Recalculate ESG metric
+        "notify.slack",      # Send Slack notification
+        "notify.teams"       # Send Teams notification
+    ]
+    payload: Dict[str, Any]
+    mode: Literal["Auto", "OneClick"] = "OneClick"
+
+class Finding(BaseModel):
+    object_id: str
+    title: str
+    summary_md: str
+    severity: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    materiality: float = Field(ge=0.0, le=1.0)
+    category: str
+    status: Literal["Open", "InProgress", "Resolved", "Closed"]
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Responsible AI Ops (GRC)**
+2. Go to **Findings** tab to review detected issues
+3. Click **Test Hold Invoice** to execute sample GRC action
+4. Monitor execution in **Runs** tab with attestation hashes
+5. Configure policies in **Policies** tab
+
+### Environment Variables
+```bash
+# SAP Integration
+SAP_BASE_URL=https://sap.example.com
+SAP_BEARER_TOKEN=your-sap-bearer-token
+
+# ESG Integration
+ESG_BASE_URL=https://esg.example.com
+ESG_BEARER_TOKEN=your-esg-bearer-token
+
+# Notification Integration
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+TEAMS_WEBHOOK_URL=https://your-domain.webhook.office.com/webhookb2/your-webhook-url
+
+# Policy Configuration
+MAX_AUTO_IMPACT=1000
+```
+
+### Policy Configuration
+```python
+policy = {
+    "max_auto_impact": 1000.0,        # Max € for automatic execution
+    "sod_required_roles": ["controller", "procurement-approver"],
+    "confidence_threshold": 0.7,       # Min confidence for auto-execution
+    "severity_threshold": 0.5,         # Min severity for action
+    "materiality_threshold": 0.3       # Min materiality for action
+}
+```
+
+### Priority Scoring Algorithm
+```
+priority_score = 0.5*severity + 0.2*confidence + 0.2*materiality + 0.1*recency
+
+where:
+  severity     = Issue severity (0.0 - 1.0)
+  confidence   = Detection confidence (0.0 - 1.0)
+  materiality  = Business impact (0.0 - 1.0)
+  recency      = Time since detection (0.0 - 1.0)
+```
+
+### Responsible AI Features
+- **✅ Provenance**: All actions tracked with full audit trails
+- **✅ Separation of Duties**: High-impact actions require multiple approvals
+- **✅ Confidence Thresholds**: Only high-confidence decisions are auto-executed
+- **✅ PII Minimization**: Personal data handled according to privacy policies
+- **✅ Attestation**: All executions are cryptographically attested
+- **✅ Audit Trail**: Complete logging and traceability
+
+### Future Enhancements
+- **Advanced ML Models**: Predictive analytics for compliance risk
+- **Real-Time Processing**: Stream processing for instant compliance monitoring
+- **Extended ERP Support**: Additional SAP modules and other ERP systems
+- **Regulatory Compliance**: Automated regulatory compliance checks
+- **Advanced Analytics**: Machine learning for pattern detection
+- **Integration Expansion**: Additional notification channels and systems
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `erp.fix`, `po.block`, `invoice.hold`, `esg.recalc`, `notify.slack`, `notify.teams`
+- **Policy**: Configurable auto-execution thresholds with approval workflows
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/grc-agent.json](frontend/src/configs/agents/grc-agent.json)
+- **Backend Models**: [backend/models/grc.py](backend/models/grc.py)
+- **Router Implementation**: [backend/routers/grc_execute.py](backend/routers/grc_execute.py)
 
 ---
 

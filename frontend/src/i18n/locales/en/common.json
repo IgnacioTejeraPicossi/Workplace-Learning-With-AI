@@ -46,6 +46,7 @@
     "salesAssistant": "Sales Assistant Agent",
   "personalAttentionAgent": "Personal Attention Agent",
     "telcoOpsAgent": "Telco Ops Decisioning Agent",
+    "grcAgent": "Responsible AI Ops (GRC)",
     "cybersecurity": "Cybersecurity",
     "help": "Help",
     "runTest": "Run Test",

@@ -1,0 +1,57 @@
+{
+  "id": "grc-agent",
+  "name": "Responsible AI Ops (GRC)",
+  "version": "1.0.0",
+  "module": "grc",
+  "description": "Detects data-quality, policy, and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit.",
+  "runner_default": "outsystems",
+  "mcp": {
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      { "name": "dispatch_action_bundle" },
+      { "name": "get_run_status" }
+    ]
+  },
+  "capabilities": [
+    "erp.fix",
+    "po.block",
+    "invoice.hold",
+    "esg.recalc",
+    "notify.slack",
+    "notify.teams"
+  ],
+  "policy": {
+    "max_auto_impact": 1000,
+    "sod_required_roles": ["controller", "procurement-approver"],
+    "confidence_threshold": 0.7,
+    "severity_threshold": 0.5,
+    "materiality_threshold": 0.3
+  },
+  "integrations": {
+    "sap": {
+      "base_url": "SAP_BASE_URL",
+      "auth_token": "SAP_BEARER_TOKEN"
+    },
+    "esg": {
+      "base_url": "ESG_BASE_URL", 
+      "auth_token": "ESG_BEARER_TOKEN"
+    },
+    "notifications": {
+      "slack_token": "SLACK_BOT_TOKEN",
+      "teams_webhook": "TEAMS_WEBHOOK_URL"
+    }
+  },
+  "scoring": {
+    "priority_formula": "0.5*severity + 0.2*confidence + 0.2*materiality + 0.1*recency",
+    "auto_threshold": 0.7,
+    "max_auto_impact": 1000
+  },
+  "responsible_ai": {
+    "provenance": true,
+    "separation_of_duties": true,
+    "confidence_thresholds": true,
+    "pii_minimization": true,
+    "attestation": true,
+    "audit_trail": true
+  }
+}

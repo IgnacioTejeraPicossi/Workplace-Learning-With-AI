@@ -49,7 +49,14 @@ const Icon = ({ name, size = 20 }) => {
   };
 
   return (
-    <span style={{ fontSize: size, display: "inline-block", width: size, textAlign: "center" }}>
+    <span style={{ 
+      fontSize: size <= 16 ? '0.75em' : size <= 18 ? '0.85em' : '1em',
+      display: "inline-block", 
+      width: size, 
+      textAlign: "center",
+      lineHeight: 1,
+      verticalAlign: 'middle'
+    }}>
       {icons[name] || "📄"}
     </span>
   );
@@ -109,7 +116,8 @@ const getNavItems = (t) => [
     { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" },
     { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" },
     { key: "personal-attention-agent", label: t('sidebar.personalAttentionAgent'), icon: "target" },
-    { key: "telco-ops-agent", label: t('sidebar.telcoOpsAgent'), icon: "broadcast" }
+    { key: "telco-ops-agent", label: t('sidebar.telcoOpsAgent'), icon: "broadcast" },
+    { key: "grc-agent", label: t('sidebar.grcAgent'), icon: "shield" }
   ]},
   
   // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)
