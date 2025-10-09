@@ -1,0 +1,70 @@
+{
+  "id": "ea-second-brain",
+  "name": "EA Second Brain Agent",
+  "version": "1.0.0",
+  "module": "ea",
+  "description": "Ketil's 24/7 Enterprise Architecture watcher that turns signals into portfolio-aware actions. Monitors tech changes, vendor updates, deprecations, and new projects, providing continuous insights based on Norwegian's strategy, architecture, and application portfolio.",
+  "icon": "🧠",
+  "runner_default": "outsystems",
+  "mcp": {
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      {
+        "name": "dispatch_action_bundle",
+        "input_schema_ref": "#/schemas/InsightBundle"
+      },
+      {
+        "name": "get_run_status",
+        "input_schema_ref": "#/schemas/GetRunStatus"
+      }
+    ]
+  },
+  "capabilities": [
+    "jira.createIssue",
+    "slack.postMessage",
+    "confluence.updatePage",
+    "sheets.appendRow"
+  ],
+  "policy": {
+    "jira": ["EA", "ARCH"],
+    "slack_channels": ["#ea-updates", "#engineering", "#cto-brief"],
+    "max_auto_mode": "low_risk"
+  },
+  "schemas": {
+    "InsightBundle": {
+      "$ref": "file://schemas/ea/InsightBundle.json"
+    },
+    "GetRunStatus": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string"
+        }
+      },
+      "required": ["run_id"]
+    }
+  },
+  "sources": {
+    "internal": [
+      "EA tools",
+      "Confluence",
+      "Jira",
+      "Architecture Repository"
+    ],
+    "external": [
+      "Vendor release notes",
+      "Tech news",
+      "CVE feeds",
+      "GitHub releases",
+      "EOL datasets"
+    ]
+  },
+  "features": [
+    "24/7 monitoring of technology landscape",
+    "Portfolio-aware impact analysis",
+    "Automatic action dispatch (Jira, Slack, Confluence, Sheets)",
+    "Audit trail with attestation hashes",
+    "Norwegian context-aware insights"
+  ]
+}
+

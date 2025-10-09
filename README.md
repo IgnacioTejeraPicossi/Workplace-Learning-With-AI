@@ -46,6 +46,7 @@
 - [Agent Theory & Documentation](#agent-theory--documentation) - Comprehensive AI agent theory, tools, and hackathon preparation
 - [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
 - [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
+- [🧠 EA Second Brain Agent](#ea-second-brain-agent) - Ketil's 24/7 Enterprise Architecture watcher for Norwegian (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -4194,6 +4195,171 @@ The AI Productivity Agent converts research briefs and competitive analysis into
 - **Data Model**: `agent_runs` collection in MongoDB
 - **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
 - **AI Integration**: Uses unified AI system (`ask_ai_unified_sync`) for consistent analysis
+
+---
+
+## 🧠 EA Second Brain Agent
+
+### Overview
+The **EA Second Brain Agent** is Ketil Stadskleiv's (Director Enterprise Architecture & CTO, Norwegian) 24/7 AI-powered watcher that monitors the technology landscape and provides continuous, portfolio-aware insights to the Enterprise Architecture team.
+
+### Problem Statement
+As stated by Ketil:
+> "As an Enterprise Architecture we are covering all aspects of IT, and keeping up with changes, news from vendors, tech breakthroughs, deprecations, new projects etc. is impossible."
+
+### Solution
+The EA Second Brain Agent acts as an intelligent monitoring system that:
+- **Monitors** technology landscape 24/7 (vendor updates, tech changes, deprecations, new projects)
+- **Understands** Norwegian's context (strategy, architecture, application portfolio, business priorities)
+- **Analyzes** impact of external signals on Norwegian's systems
+- **Executes** actions automatically (Jira tickets, Slack notifications, Confluence updates, audit logs)
+- **Provides** trust receipts (attestation hashes) for compliance and auditability
+
+### Key Features
+- 🌐 **Continuous Monitoring**: 24/7 monitoring of internal and external data sources
+- 📊 **Portfolio-Aware Analysis**: Matches external signals to Norwegian's application portfolio
+- ⚡ **Automatic Action Dispatch**: Creates Jira tasks, sends Slack notifications, updates Confluence, logs to Sheets
+- 🔐 **Trust & Auditability**: SHA-256 attestation hashes for immutable audit trail
+- 🎯 **Norwegian Context-Aware**: Understands Norwegian's strategy, priorities, and technical stack
+
+### Architecture
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Data Sources                          │
+├──────────────────────┬──────────────────────────────────┤
+│  Internal            │  External (Open Data)            │
+│  • EA tools          │  • Vendor release notes          │
+│  • Confluence        │  • Tech news (RSS/Atom)          │
+│  • Jira              │  • CVE feeds                     │
+│  • Arch Repository   │  • GitHub releases               │
+│                      │  • EOL datasets                  │
+└──────────────────────┴──────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────────────┐
+│         /agents/ea/execute (FastAPI)                     │
+│  • Verify HMAC signature                                 │
+│  • Execute actions (Jira, Slack, Confluence, Sheets)     │
+│  • Compute attestation hash                              │
+│  • Store in MongoDB                                      │
+└─────────────────────────────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────────────┐
+│                  Integrations                            │
+├──────────┬──────────┬──────────┬────────────────────────┤
+│  Jira    │  Slack   │Confluence│  Google Sheets         │
+│  Issues  │ Messages │  Pages   │  Audit Logs            │
+└──────────┴──────────┴──────────┴────────────────────────┘
+```
+
+### UI Components
+The agent features a modern, professional UI with:
+- **Overview Tab**: Hero section with agent description, stats cards with gradients, capabilities showcase
+- **Insights Tab**: Demo functionality to send sample insights (Kubernetes deprecation alerts)
+- **Runs Tab**: Execution history with attestation hashes (trust receipts)
+- **Settings Tab**: Integration status and configuration
+
+### API Endpoints
+- **POST `/agents/ea/execute`** - Execute insight bundle (HMAC-secured)
+- **GET `/agents/ea/runs`** - Get execution history
+- **POST `/api/dev/sign`** - Development helper for HMAC signing
+
+### Data Model: InsightBundle
+```json
+{
+  "run_id": "ea-1234567890",
+  "topic": "Kubernetes 1.31 Deprecation Alert",
+  "summary_md": "## Impact on Norwegian Portfolio...",
+  "evidence": [
+    {
+      "url": "https://kubernetes.io/blog/...",
+      "source": "Kubernetes Blog",
+      "snippet": "Several APIs are being deprecated..."
+    }
+  ],
+  "portfolio_matches": [
+    {
+      "id": "APP-123",
+      "name": "Payments API",
+      "score": 0.86,
+      "reason": "Uses deprecated PodSecurityPolicy"
+    }
+  ],
+  "recommended_actions": [
+    {
+      "title": "Plan upgrade window",
+      "detail": "Schedule maintenance for Q1 2025",
+      "assignee": "team-platform"
+    }
+  ],
+  "actions": [
+    {
+      "type": "jira.createIssue",
+      "payload": { "projectKey": "EA", "summary": "..." }
+    },
+    {
+      "type": "slack.postMessage",
+      "payload": { "text": "🚨 EA Alert..." }
+    }
+  ],
+  "callback_url": "/api/agent-runs/callback"
+}
+```
+
+### Technical Implementation
+- **Backend**: FastAPI with async MongoDB storage (`agent_runs`, `ea_insights` collections)
+- **Security**: HMAC-SHA256 signature verification + attestation hashes for audit trail
+- **Frontend**: React with Tailwind CSS, gradient-based professional UI design
+- **Integrations**: Jira (REST API v3), Slack (Webhook/Bot), Confluence (REST API), Google Sheets (Service Account)
+- **Agent Catalog**: MCP-compliant descriptor at `configs/agents/ea-second-brain.json`
+
+### Usage Example
+1. Navigate to **Item Agents** → **EA Second Brain Agent**
+2. Go to **Insights** tab
+3. Click **"Send Sample Insight"** to test Kubernetes deprecation alert
+4. Verify Jira issue created and Slack message sent
+5. Check **Runs** tab for execution history with attestation hash
+
+### Environment Variables
+```bash
+# HMAC Security
+HMAC_SECRET=hackathon-secret-key-2024
+
+# Jira Integration
+JIRA_BASE_URL=https://itemtest.atlassian.net
+JIRA_EMAIL=ignacio.tejera@item.no
+JIRA_API_TOKEN=***
+
+# Slack Integration
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# Confluence Integration
+CONFLUENCE_BASE=https://itemtest.atlassian.net/wiki
+CONFLUENCE_AUTH=base64(user:apitoken)
+
+# Google Sheets Integration
+SHEETS_SPREADSHEET_ID=1e97xVkDTW8gUNSTKNclYSvaoJEoojCias3iAp1YLxF4
+GOOGLE_SA_JSON={"type":"service_account",...}
+```
+
+### Future Enhancements (Not in MVP)
+- Pulse job (automated scheduler for continuous monitoring)
+- Real data source integration (RSS, CVE, GitHub, vendor feeds)
+- Portfolio matching algorithm with impact scoring
+- Norwegian-specific context loading from EA tools
+- Auto-execution policies for low-risk insights
+- Email notifications and dashboard analytics
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `jira.createIssue`, `slack.postMessage`, `confluence.updatePage`, `sheets.appendRow`
+- **Policy**: Low-risk auto-execution mode
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Complete Guide**: [docs/EA_SECOND_BRAIN_AGENT.md](docs/EA_SECOND_BRAIN_AGENT.md)
+- **Implementation Summary**: [EA_AGENT_IMPLEMENTATION_SUMMARY.md](EA_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/ea-second-brain.json](frontend/src/configs/agents/ea-second-brain.json)
 
 ---
 

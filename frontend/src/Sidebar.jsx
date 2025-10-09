@@ -104,7 +104,8 @@ const getNavItems = (t) => [
     { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain" },
     { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
-    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" }
+    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
+    { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" }
   ]},
   
   // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)
