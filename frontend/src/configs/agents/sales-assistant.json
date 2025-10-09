@@ -1,0 +1,66 @@
+{
+  "id": "sales-assistant",
+  "name": "Sales Assistant Agent",
+  "version": "1.0.0",
+  "module": "sales",
+  "description": "Pipeline hygiene, deal risk scoring, and contextual follow-up drafts for Amelie Tique (Yara International). Automates CRM updates, creates follow-up emails, and provides intelligent deal progression insights.",
+  "runner_default": "outsystems",
+  "mcp": {
+    "endpoint": "mcp://localhost:5678",
+    "tools": [
+      { "name": "dispatch_action_bundle" },
+      { "name": "get_run_status" }
+    ]
+  },
+  "capabilities": [
+    "crm.updateOpportunity",
+    "crm.createTask",
+    "email.createDraft",
+    "slack.postMessage"
+  ],
+  "policy": {
+    "crm": "salesforce",
+    "slack_channels": ["#sales"],
+    "auto_execution": "low_risk_only"
+  },
+  "sources": {
+    "internal": [
+      "CRM Opportunities",
+      "Email Activity",
+      "Calendar Events",
+      "Meeting Transcripts"
+    ],
+    "external": [
+      "Customer Communication",
+      "Market Signals",
+      "Competitive Intelligence"
+    ]
+  },
+  "features": [
+    "Proactive CRM updates based on email/calendar activity",
+    "High-risk/high-potential deal flagging",
+    "Contextual follow-up email drafts",
+    "Pipeline hygiene monitoring and auto-fixes",
+    "Slack notifications for critical deals",
+    "Meeting outcome analysis and next steps",
+    "Deal progression scoring and alerts"
+  ],
+  "integrations": {
+    "crm": {
+      "providers": ["salesforce", "dynamics", "hubspot"],
+      "operations": ["updateOpportunity", "createTask", "getOpportunity"]
+    },
+    "email": {
+      "provider": "microsoft_graph",
+      "operations": ["createDraft", "getCalendarEvents"]
+    },
+    "slack": {
+      "operations": ["postMessage", "postDealAlert", "postPipelineSummary"]
+    }
+  },
+  "metrics": {
+    "hygiene_score": "0-100 (higher = more issues)",
+    "risk_score": "0-100 (higher = more risk)",
+    "potential_score": "0-100 (higher = more potential)"
+  }
+}

@@ -2319,6 +2319,7 @@ try:
     from backend.routers.cybersecurity import router as cybersecurity_router
     from backend.routers.agent_security import router as agent_security_router
     from backend.routers.ea_execute import router as ea_execute_router
+    from backend.routers.sales_agent import router as sales_agent_router
     from backend.routers.dev_helpers import router as dev_helpers_router
     
     app.include_router(agent_runs_router, tags=["AI Agent Bridge Platform"])
@@ -2328,6 +2329,7 @@ try:
     app.include_router(cybersecurity_router, tags=["Cybersecurity"])
     app.include_router(agent_security_router, tags=["Agent Security"])
     app.include_router(ea_execute_router, tags=["EA Second Brain Agent"])
+    app.include_router(sales_agent_router, tags=["Sales Assistant Agent"])
     app.include_router(dev_helpers_router, tags=["Development Helpers"])
     print("✅ AI Agent Bridge Platform routers included successfully")
 except ImportError as e:

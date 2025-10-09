@@ -47,6 +47,7 @@ import AgentTheoryDocs from "./components/AgentTheoryDocs/AgentTheoryDocs";
 import AIComplianceAgent from "./AIComplianceAgent";
 import AIProductivityAgent from "./AIProductivityAgent";
 import EASecondBrain from "./EASecondBrain";
+import SalesAssistant from "./SalesAssistant";
 import Cybersecurity from "./cyber/Cybersecurity";
 
 function AppContent() {
@@ -452,6 +453,7 @@ function AppContent() {
             {!activeModule && section === "ai-compliance-agent" && <AIComplianceAgent />}
             {!activeModule && section === "ai-productivity-agent" && <AIProductivityAgent />}
             {!activeModule && section === "ea-second-brain" && <EASecondBrain />}
+            {!activeModule && section === "sales-assistant" && <SalesAssistant />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}

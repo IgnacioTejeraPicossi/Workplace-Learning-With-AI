@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import descriptor from '../configs/agents/ea-second-brain.json';
+import descriptor from '../configs/agents/sales-assistant.json';
 
 const Overview = () => {
   const [stats, setStats] = useState({
@@ -10,7 +10,7 @@ const Overview = () => {
 
   useEffect(() => {
     // Load stats from API
-    fetch('/agents/ea/runs?limit=100')
+    fetch('/agents/sales/runs?limit=100')
       .then((res) => res.json())
       .then((runs) => {
         const total = runs.length;
@@ -29,15 +29,15 @@ const Overview = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="text-5xl">🧠</div>
+            <div className="text-5xl">💼</div>
             <div>
               <h1 className="text-3xl font-bold mb-2">{descriptor.name}</h1>
-              <p className="text-blue-100 text-lg">
-                Ketil's 24/7 Enterprise Architecture watcher for Norwegian
+              <p className="text-green-100 text-lg">
+                Pipeline hygiene, deal risk scoring, and contextual follow-up drafts
               </p>
             </div>
           </div>
@@ -80,16 +80,16 @@ const Overview = () => {
               {descriptor.capabilities.map((cap, i) => (
                 <div
                   key={i}
-                  className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"
+                  className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg"
                 >
                   <span className="text-xl">
-                    {cap.includes('jira')
-                      ? '📋'
+                    {cap.includes('crm')
+                      ? '📊'
+                      : cap.includes('email')
+                      ? '📧'
                       : cap.includes('slack')
                       ? '💬'
-                      : cap.includes('confluence')
-                      ? '📝'
-                      : '📊'}
+                      : '🔧'}
                   </span>
                   <span className="text-sm font-medium text-gray-700">{cap}</span>
                 </div>
@@ -121,7 +121,7 @@ const Overview = () => {
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <span className="mr-2">🌐</span>
-                  External (Open Data)
+                  External
                 </h3>
                 <ul className="space-y-2">
                   {descriptor.sources.external.map((source, i) => (
