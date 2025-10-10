@@ -51,6 +51,7 @@
 - [🎯 Personal Attention Agent](#personal-attention-agent) - Noise→signal across channels; schedules focus holds and sends actionable briefs (NEW!)
 - [📡 Telco Ops Decisioning Agent](#telco-ops-decisioning-agent) - Data-driven telco operations with TMF APIs and safe autonomy (NEW!)
 - [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
+- [🏛️ Council of Diverse Lenses](#council-of-diverse-lenses) - AI-powered council deliberation system for diverse perspectives and auditable decisions (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -5004,6 +5005,217 @@ Registered in Agent Catalog with:
 - **Agent Descriptor**: [frontend/src/configs/agents/grc-agent.json](frontend/src/configs/agents/grc-agent.json)
 - **Backend Models**: [backend/models/grc.py](backend/models/grc.py)
 - **Router Implementation**: [backend/routers/grc_execute.py](backend/routers/grc_execute.py)
+
+---
+
+## 🏛️ Council of Diverse Lenses
+
+### Overview
+The **Council of Diverse Lenses** agent is an AI-powered council deliberation system designed to create diverse personas that debate topics, surface agreements/disagreements/unknowns, and produce auditable Council Briefs with optional publishing to Slack and Confluence. This agent embodies the principle of "steel-manning" arguments by presenting the strongest possible case for each perspective, ensuring comprehensive and balanced deliberation.
+
+### Problem Statement
+Organizations often struggle with:
+- **Echo chambers** and confirmation bias in decision-making
+- **Limited perspectives** in complex problem-solving
+- **Lack of auditable deliberation** processes
+- **Difficulty synthesizing** diverse viewpoints into actionable insights
+- **Poor documentation** of reasoning and consensus-building
+
+### Solution
+The Council Agent creates a virtual council of diverse personas with different:
+- **Ideological backgrounds** (progressive, conservative, libertarian, etc.)
+- **Regional perspectives** (Nordic, European, American, Asian, etc.)
+- **Disciplinary expertise** (technical, business, legal, ethical, etc.)
+- **Experience levels** (junior, senior, executive, academic)
+
+Each persona provides:
+- **Steel-manned arguments** with citations and confidence scores
+- **Agreement/disagreement mapping** with reasoning
+- **Unknown areas** that require further research
+- **Consensus synthesis** with transparent scoring
+
+### Key Features
+
+#### 🧠 **Diverse Persona Generation**
+- **8 Active Personas** with configurable ideologies and expertise
+- **Dynamic persona selection** based on topic relevance
+- **Balanced representation** across multiple dimensions
+- **Persona library** with pre-configured archetypes
+
+#### 🗣️ **Council Room Interface**
+- **Column-based layout** showing each persona's perspective
+- **Steel-manned arguments** with confidence scores
+- **Citation tracking** and source attribution
+- **"Challenge me more/less"** toggle for argument depth
+
+#### 🗺️ **Argument Mapping**
+- **Agreements/Disagreements/Unknowns** visualization
+- **Score chips** showing argument strength
+- **Consensus indicators** and divergence points
+- **Transparent reasoning** chains
+
+#### 📊 **Auditable Deliberation**
+- **Attestation hashes** for all deliberations
+- **Provenance tracking** of sources and reasoning
+- **Version control** for deliberation iterations
+- **Compliance-ready** documentation
+
+#### 🔄 **Integration & Publishing**
+- **Slack publishing** with rich card formats
+- **Confluence integration** for knowledge management
+- **MCP-enabled** for external tool integration
+- **Callback system** for status tracking
+
+### Architecture
+
+#### **Backend Components**
+- **Models**: `PersonaSpec`, `DeliberationBundle`, `CouncilBrief`
+- **Router**: `/agents/council/execute` with HMAC verification
+- **Integrations**: Slack, Confluence, attestation system
+- **Store**: MongoDB collections for personas, deliberations, briefs
+
+#### **Frontend Components**
+- **Overview**: Agent descriptor, KPIs, and capabilities
+- **Council Room**: Persona columns with arguments and confidence
+- **Argument Map**: Visual mapping of agreements/disagreements
+- **Runs**: Execution history with attestation hashes
+- **Settings**: Persona configuration and safety thresholds
+
+#### **Safety & Scoring**
+- **Harm detection** with configurable thresholds
+- **Quality scoring** based on relevance, depth, and citations
+- **Diversity weighting** to ensure balanced perspectives
+- **Safety gating** to prevent harmful content
+
+### Technical Implementation
+
+#### **API Endpoints**
+- `GET /agents/council/stats` - Dashboard metrics and KPIs
+- `GET /agents/council/personas` - Available persona configurations
+- `POST /agents/council/execute` - Start deliberation process
+- `POST /agents/council/callback` - Status updates from external systems
+- `GET /agents/council/runs` - Execution history and results
+- `GET /agents/council/health` - System health check
+
+#### **Data Model**
+```json
+{
+  "persona_spec": {
+    "name": "Technical Pragmatist",
+    "ideology": "pragmatic",
+    "region": "nordic",
+    "discipline": "technical",
+    "experience": "senior"
+  },
+  "deliberation_bundle": {
+    "topic": "AI Ethics in Healthcare",
+    "sources": ["research_paper_1", "policy_doc_2"],
+    "personas": ["persona_1", "persona_2", "persona_3"],
+    "arguments": [...],
+    "agreements": [...],
+    "disagreements": [...],
+    "unknowns": [...]
+  }
+}
+```
+
+#### **Scoring Algorithm**
+```python
+Score = 0.40 * Relevance01 + 0.30 * Quality01 + 0.30 * Diversity
+# Gate to zero if Harm > 0.35
+```
+
+### Usage Example
+
+#### **1. Start Deliberation**
+```bash
+POST /agents/council/execute
+{
+  "topic": "Should we implement AI-powered hiring decisions?",
+  "sources": ["hr_policy.pdf", "ai_ethics_guidelines.pdf"],
+  "personas": ["technical_pragmatist", "legal_expert", "ethics_scholar"],
+  "challenge_level": "moderate"
+}
+```
+
+#### **2. Monitor Progress**
+- **Council Room** shows real-time persona arguments
+- **Argument Map** visualizes consensus building
+- **Confidence scores** indicate argument strength
+
+#### **3. Review Results**
+- **Council Brief** with synthesized insights
+- **Attestation hash** for audit trail
+- **Actionable recommendations** with reasoning
+
+#### **4. Publish & Share**
+- **Slack notification** with summary card
+- **Confluence page** with full deliberation
+- **Team collaboration** on next steps
+
+### Environment Variables
+```bash
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_CHANNEL_ID=C1234567890
+
+# Confluence Integration
+CONFLUENCE_BASE_URL=https://your-domain.atlassian.net
+CONFLUENCE_USER=your-email@company.com
+CONFLUENCE_TOKEN=your-api-token
+
+# Safety Configuration
+HARM_GATE=0.35
+DIVERSITY_WEIGHT=0.30
+QUALITY_WEIGHT=0.30
+RELEVANCE_WEIGHT=0.40
+```
+
+### Safety & Guardrails
+
+#### **Harm Detection**
+- **Content filtering** for harmful or biased content
+- **Configurable thresholds** for different risk levels
+- **Human oversight** for high-stakes decisions
+- **Audit logging** of all safety interventions
+
+#### **Quality Assurance**
+- **Citation requirements** for all arguments
+- **Source verification** and credibility scoring
+- **Argument coherence** checking
+- **Consensus validation** mechanisms
+
+#### **Transparency**
+- **Full audit trail** of deliberation process
+- **Attestation hashes** for tamper detection
+- **Provenance tracking** of all sources
+- **Open reasoning** chains for all conclusions
+
+### Future Enhancements
+
+#### **Advanced Features**
+- **Multi-language support** for global deliberations
+- **Real-time collaboration** with human participants
+- **Integration with decision management** systems
+- **Advanced visualization** of argument networks
+
+#### **Enterprise Integration**
+- **SSO authentication** with corporate systems
+- **Compliance reporting** for regulatory requirements
+- **Custom persona libraries** for specific industries
+- **API rate limiting** and usage analytics
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `council.generate`, `publish.slack`, `publish.confluence`
+- **Policy**: Configurable auto-execution with safety gating
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/council-agent.json](frontend/src/configs/agents/council-agent.json)
+- **Backend Models**: [backend/models/council.py](backend/models/council.py)
+- **Router Implementation**: [backend/routers/council_execute.py](backend/routers/council_execute.py)
 
 ---
 
