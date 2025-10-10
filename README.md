@@ -52,6 +52,7 @@
 - [📡 Telco Ops Decisioning Agent](#telco-ops-decisioning-agent) - Data-driven telco operations with TMF APIs and safe autonomy (NEW!)
 - [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
 - [🏛️ Council of Diverse Lenses](#council-of-diverse-lenses) - AI-powered council deliberation system for diverse perspectives and auditable decisions (NEW!)
+- [⚙️ Operations Efficiency Agent](#operations-efficiency-agent) - Automates invoice handling, cost allocations, and CV ranking for Posten Bring (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -5216,6 +5217,335 @@ Registered in Agent Catalog with:
 - **Agent Descriptor**: [frontend/src/configs/agents/council-agent.json](frontend/src/configs/agents/council-agent.json)
 - **Backend Models**: [backend/models/council.py](backend/models/council.py)
 - **Router Implementation**: [backend/routers/council_execute.py](backend/routers/council_execute.py)
+
+---
+
+## ⚙️ Operations Efficiency Agent
+
+### Overview
+The **Operations Efficiency Agent** is an AI-powered automation system designed for Posten Bring to streamline three critical operational areas: invoice handling, cost allocation suggestions, and CV ranking. This agent embodies Anne Gjerstad's vision of "value automation and suggestions to improve efficiency, which would free up time for more value generation and strategic work."
+
+### Problem Statement
+Posten Bring faces operational challenges in:
+- **Manual invoice processing** with 3-way matching and variance detection
+- **Time-consuming cost allocation** decisions without historical pattern analysis
+- **Inefficient CV screening** and candidate ranking processes
+- **Limited automation** in routine operational tasks
+- **Lack of explainable AI** for operational decisions
+
+### Solution
+The Operations Efficiency Agent provides:
+- **Automated invoice processing** with 3-way matching (PO/GR/Invoice)
+- **AI-powered cost allocation** suggestions based on vendor patterns
+- **Intelligent CV ranking** against job criteria with evidence highlighting
+- **Explainable automation** with confidence scoring and rationale
+- **Seamless integration** with ERP, ATS, and notification systems
+
+### Key Features
+
+#### **📄 Invoice Management**
+- **3-way matching** with PO, GR, and Invoice validation
+- **Variance detection** with configurable thresholds
+- **Automated approval** for low-risk, low-variance invoices
+- **Manual hold** for high-variance or high-value invoices
+- **Real-time notifications** to finance teams via Slack
+
+#### **💰 Cost Allocation**
+- **Pattern analysis** from historical vendor data
+- **Confidence scoring** for allocation suggestions
+- **One-click posting** to ERP systems
+- **Explainable rationale** for allocation decisions
+- **Audit trail** with attestation hashes
+
+#### **👥 CV Ranking**
+- **Multi-format support** for PDF, DOC, DOCX files
+- **Skills extraction** and keyword matching
+- **Evidence highlighting** with relevance scoring
+- **Export capabilities** to Google Sheets
+- **Ranking transparency** with detailed scoring
+
+#### **🔧 Automation Features**
+- **Configurable thresholds** for auto vs manual processing
+- **Confidence-based decisions** with safety gates
+- **HMAC verification** for secure execution
+- **Attestation hashing** for audit compliance
+- **Real-time monitoring** and health checks
+
+### Architecture
+
+```mermaid
+graph TB
+    subgraph "Operations Efficiency Agent Architecture"
+        A[Ops Efficiency Dashboard] --> B[Invoice Management]
+        A --> C[Cost Allocations]
+        A --> D[CV Ranking]
+        A --> E[Execution History]
+        
+        B --> F[3-Way Matching]
+        B --> G[Variance Detection]
+        B --> H[Auto Approval]
+        
+        C --> I[Pattern Analysis]
+        C --> J[Allocation Suggestions]
+        C --> K[Confidence Scoring]
+        
+        D --> L[CV Parsing]
+        D --> M[Skills Extraction]
+        D --> N[Ranking Algorithm]
+        
+        E --> O[Run Monitoring]
+        E --> P[Attestation Tracking]
+        
+        F --> Q[ERP Integration]
+        G --> Q
+        H --> Q
+        I --> Q
+        J --> Q
+        
+        L --> R[ATS Integration]
+        M --> R
+        N --> R
+        
+        Q --> S[Slack Notifications]
+        R --> S
+        Q --> T[Google Sheets]
+        R --> T
+    end
+```
+
+### UI Components
+
+#### **📊 Overview Dashboard**
+- **System health** indicators for all integrations
+- **Key metrics** (invoices processed, allocations posted, candidates ranked)
+- **Quick actions** for common operations
+- **Real-time status** of automation systems
+
+#### **📄 Invoice Management**
+- **Invoice table** with status badges and variance indicators
+- **3-way match** visualization and variance analysis
+- **Approve/Hold** buttons with one-click execution
+- **Detailed view** with extracted fields and audit trail
+
+#### **💰 Cost Allocations**
+- **Allocation suggestions** with confidence scores
+- **Side-by-side comparison** of current vs suggested splits
+- **Rationale display** with historical pattern analysis
+- **One-click posting** to ERP systems
+
+#### **👥 CV Ranking**
+- **File upload** interface with drag-and-drop support
+- **Job criteria** input with skills and requirements
+- **Ranking results** with scores and evidence highlights
+- **Export functionality** to Google Sheets
+
+#### **📈 Execution History**
+- **Run monitoring** with status tracking
+- **Attestation hashes** for audit compliance
+- **Artifact visualization** with action details
+- **Filtering and search** capabilities
+
+#### **⚙️ Settings & Configuration**
+- **Threshold configuration** for automation rules
+- **Integration settings** for ERP, ATS, notifications
+- **Health monitoring** for all connected systems
+- **Policy management** for security and compliance
+
+### Technical Implementation
+
+#### **Backend Architecture**
+- **FastAPI router** (`/agents/opsx/execute`) with HMAC verification
+- **Pydantic models** for type-safe data contracts
+- **MongoDB integration** for persistent storage
+- **Async/await** patterns for non-blocking operations
+
+#### **Integration Layer**
+- **ERP Integration** (SAP/Business Central/Coupa)
+- **ATS Integration** (Local files/Greenhouse/Workable)
+- **Notification Services** (Slack/Microsoft Graph)
+- **Export Services** (Google Sheets API)
+
+#### **Security & Compliance**
+- **HMAC-SHA256** signature verification
+- **Attestation hashing** for audit trails
+- **Role-based access** control
+- **Data retention** policies
+
+### API Endpoints
+
+#### **Core Execution**
+- `POST /agents/opsx/execute` - Main execution endpoint
+- `POST /agents/opsx/callback` - External system callbacks
+- `GET /agents/opsx/stats` - Operational statistics
+- `GET /agents/opsx/health` - System health status
+- `GET /agents/opsx/runs` - Execution history
+
+#### **Invoice Operations**
+- `POST /agents/opsx/invoices/approve` - Approve invoice
+- `POST /agents/opsx/invoices/hold` - Put invoice on hold
+- `GET /agents/opsx/invoices/{id}` - Get invoice details
+- `POST /agents/opsx/invoices/three-way-match` - 3-way matching
+
+#### **Allocation Operations**
+- `POST /agents/opsx/allocations/suggest` - Generate allocation suggestion
+- `POST /agents/opsx/allocations/post` - Post allocation to ERP
+- `GET /agents/opsx/allocations/{id}` - Get allocation details
+
+#### **CV Ranking Operations**
+- `POST /agents/opsx/candidates/rank` - Rank candidates
+- `POST /agents/opsx/candidates/export` - Export to Sheets
+- `GET /agents/opsx/candidates/{job_id}` - Get ranked candidates
+
+### Data Model
+
+#### **Invoice Model**
+```python
+class Invoice(BaseModel):
+    invoice_id: str
+    vendor: str
+    invoice_date: datetime
+    total_amount: float
+    currency: str = "NOK"
+    status: InvoiceStatus
+    lines: List[InvoiceLine]
+    po_number: Optional[str]
+    gr_number: Optional[str]
+    variance_percent: Optional[float]
+    variance_amount: Optional[float]
+```
+
+#### **Allocation Model**
+```python
+class CostAllocation(BaseModel):
+    allocation_id: str
+    document_id: str
+    vendor: str
+    description: str
+    total_amount: float
+    lines: List[AllocationLine]
+    status: AllocationStatus
+    confidence_score: float
+    rationale: str
+```
+
+#### **Candidate Model**
+```python
+class Candidate(BaseModel):
+    candidate_id: str
+    name: str
+    cv_text: str
+    score: float
+    highlights: List[Dict[str, Any]]
+```
+
+### Usage Example
+
+#### **Invoice Processing Workflow**
+1. **Upload invoice** or receive via ERP integration
+2. **Extract data** using OCR and parsing
+3. **Perform 3-way match** with PO and GR
+4. **Calculate variance** percentage and amount
+5. **Apply automation rules** based on thresholds
+6. **Execute action** (approve/hold) with notifications
+7. **Update ERP** system with new status
+8. **Log execution** with attestation hash
+
+#### **Cost Allocation Workflow**
+1. **Analyze vendor** patterns from historical data
+2. **Generate suggestion** with confidence scoring
+3. **Present rationale** with supporting evidence
+4. **User review** and approval of suggestion
+5. **Post allocation** to ERP system
+6. **Send notifications** to relevant stakeholders
+7. **Audit trail** creation with attestation
+
+#### **CV Ranking Workflow**
+1. **Upload CV files** or receive from ATS
+2. **Parse content** and extract skills/experience
+3. **Define job criteria** and requirements
+4. **Score candidates** against criteria
+5. **Generate highlights** with evidence
+6. **Export results** to Google Sheets
+7. **Notify HR team** with ranking summary
+
+### Environment Variables
+
+#### **Required Configuration**
+```bash
+# ERP Integration
+ERP_BASE_URL=https://erp.example.com
+ERP_BEARER_TOKEN=your_erp_token
+
+# Notifications
+SLACK_BOT_TOKEN=xoxb-your-slack-token
+```
+
+#### **Optional Configuration**
+```bash
+# ATS Integration
+ATS_PROVIDER=local|greenhouse|workable
+ATS_BASE_URL=https://ats.example.com
+ATS_TOKEN=your_ats_token
+
+# Email Notifications
+GRAPH_BEARER_TOKEN=your_graph_token
+GRAPH_USER_ID=me
+
+# Google Sheets Export
+GOOGLE_SA_JSON={"type":"service_account",...}
+SHEETS_SPREADSHEET_ID=your_sheet_id
+
+# Automation Thresholds
+MAX_AUTO_AMOUNT=500
+MIN_CONFIDENCE_AUTO=0.8
+```
+
+### Policy Configuration
+
+#### **Automation Rules**
+- **Max Auto Amount**: NOK 500 (configurable)
+- **Min Confidence**: 80% for automatic processing
+- **Variance Threshold**: 5% for 3-way matching
+- **Auto Approval**: Under NOK 1,000 with high confidence
+
+#### **Security Policies**
+- **HMAC Required**: All executions must be signed
+- **Attestation Enabled**: Audit trail for all operations
+- **Data Retention**: 90 days for operational data
+- **Role-based Access**: Finance, HR, and Operations roles
+
+### Future Enhancements
+
+#### **Advanced Automation**
+- **Machine learning** models for pattern recognition
+- **Predictive analytics** for cost allocation
+- **Natural language** processing for CV analysis
+- **Computer vision** for invoice data extraction
+
+#### **Integration Expansion**
+- **Additional ERP** systems (Oracle, NetSuite)
+- **More ATS providers** (BambooHR, Workday)
+- **Advanced notifications** (Teams, Discord)
+- **Business intelligence** integration (Power BI, Tableau)
+
+#### **Enterprise Features**
+- **Multi-tenant** support for different business units
+- **Custom workflows** for specific processes
+- **Advanced reporting** and analytics
+- **Compliance frameworks** (SOX, GDPR)
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `invoice.process`, `cost.allocate`, `ats.rank`, `notify.slack`, `notify.email`, `sheets.appendRow`
+- **Policy**: Configurable auto-execution with monetary and confidence thresholds
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/ops-efficiency-agent.json](frontend/src/configs/agents/ops-efficiency-agent.json)
+- **Backend Models**: [backend/models/opsx.py](backend/models/opsx.py)
+- **Router Implementation**: [backend/routers/opsx_execute.py](backend/routers/opsx_execute.py)
+- **Integration Layer**: [backend/integrations/](backend/integrations/)
 
 ---
 

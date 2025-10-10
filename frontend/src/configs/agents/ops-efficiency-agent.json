@@ -1,0 +1,195 @@
+{
+  "id": "ops-efficiency-agent",
+  "name": "Operations Efficiency Agent",
+  "version": "1.0.0",
+  "module": "opsx",
+  "description": "Automates invoice handling, suggests cost allocations, and ranks CVs with explainability for Posten Bring operations efficiency.",
+  "runner_default": "outsystems",
+  "capabilities": [
+    "invoice.process",
+    "invoice.approve",
+    "invoice.hold",
+    "cost.allocate",
+    "ats.rank",
+    "notify.slack",
+    "notify.email",
+    "sheets.appendRow"
+  ],
+  "policy": {
+    "max_auto_amount": 500,
+    "min_confidence_auto": 0.8,
+    "sod_roles": ["finance-approver", "hr-lead"],
+    "auto_approval_threshold": 1000,
+    "variance_threshold": 0.05
+  },
+  "integrations": {
+    "erp": {
+      "providers": ["sap", "business_central", "coupa"],
+      "required": true,
+      "endpoints": ["invoices", "allocations", "three-way-match"]
+    },
+    "ats": {
+      "providers": ["local", "greenhouse", "workable"],
+      "required": false,
+      "features": ["cv_parsing", "ranking", "export"]
+    },
+    "notifications": {
+      "slack": {
+        "required": true,
+        "channels": ["#finance", "#hr", "#operations"]
+      },
+      "email": {
+        "required": false,
+        "provider": "microsoft_graph"
+      }
+    },
+    "sheets": {
+      "required": false,
+      "features": ["export", "reporting", "collaboration"]
+    }
+  },
+  "workflows": {
+    "invoice_processing": {
+      "steps": [
+        "extract_invoice_data",
+        "three_way_match",
+        "variance_check",
+        "approval_decision",
+        "notification"
+      ],
+      "auto_threshold": 1000,
+      "confidence_threshold": 0.8
+    },
+    "cost_allocation": {
+      "steps": [
+        "analyze_vendor_patterns",
+        "suggest_allocation",
+        "confidence_scoring",
+        "post_allocation",
+        "notification"
+      ],
+      "auto_threshold": 500,
+      "confidence_threshold": 0.7
+    },
+    "cv_ranking": {
+      "steps": [
+        "parse_cv_content",
+        "extract_skills",
+        "score_against_criteria",
+        "generate_highlights",
+        "export_results"
+      ],
+      "min_candidates": 1,
+      "max_candidates": 50
+    }
+  },
+  "metrics": {
+    "invoice_metrics": [
+      "total_processed",
+      "auto_approved",
+      "manual_hold",
+      "variance_detected",
+      "processing_time"
+    ],
+    "allocation_metrics": [
+      "suggestions_generated",
+      "auto_posted",
+      "confidence_scores",
+      "accuracy_rate"
+    ],
+    "recruitment_metrics": [
+      "candidates_ranked",
+      "avg_score",
+      "top_candidate_rate",
+      "processing_time"
+    ]
+  },
+  "security": {
+    "hmac_required": true,
+    "attestation_enabled": true,
+    "audit_logging": true,
+    "data_retention_days": 90
+  },
+  "environment_variables": {
+    "required": [
+      "ERP_BASE_URL",
+      "ERP_BEARER_TOKEN",
+      "SLACK_BOT_TOKEN"
+    ],
+    "optional": [
+      "ATS_PROVIDER",
+      "ATS_BASE_URL",
+      "ATS_TOKEN",
+      "GRAPH_BEARER_TOKEN",
+      "GRAPH_USER_ID",
+      "GOOGLE_SA_JSON",
+      "SHEETS_SPREADSHEET_ID",
+      "MAX_AUTO_AMOUNT",
+      "MIN_CONFIDENCE_AUTO"
+    ]
+  },
+  "ui_components": {
+    "overview": {
+      "title": "Operations Efficiency Dashboard",
+      "description": "Monitor invoice processing, cost allocations, and recruitment efficiency",
+      "metrics": ["total_invoices", "auto_approved", "total_allocations", "ranked_candidates"]
+    },
+    "invoices": {
+      "title": "Invoice Management",
+      "description": "Process invoices with 3-way matching and variance detection",
+      "actions": ["approve", "hold", "export"]
+    },
+    "allocations": {
+      "title": "Cost Allocations",
+      "description": "AI-powered cost allocation suggestions with explainability",
+      "actions": ["suggest", "post", "export"]
+    },
+    "recruitment": {
+      "title": "CV Ranking",
+      "description": "Rank candidates against job criteria with evidence highlighting",
+      "actions": ["rank", "export", "share"]
+    },
+    "runs": {
+      "title": "Execution History",
+      "description": "View all Operations Efficiency Agent executions with attestation",
+      "features": ["filtering", "search", "export"]
+    },
+    "settings": {
+      "title": "Configuration",
+      "description": "Configure thresholds, integrations, and automation rules",
+      "sections": ["thresholds", "integrations", "notifications", "security"]
+    }
+  },
+  "demo_data": {
+    "sample_invoice": {
+      "invoice_id": "INV-2024-001",
+      "vendor": "Office Supplies AS",
+      "amount": 2500.00,
+      "po_number": "PO-2024-001",
+      "variance_percent": 2.5
+    },
+    "sample_allocation": {
+      "vendor": "SaaS Provider",
+      "amount": 5000.00,
+      "suggested_split": {
+        "IT_Department": 0.6,
+        "Operations": 0.4
+      },
+      "confidence": 0.85
+    },
+    "sample_candidates": [
+      {
+        "id": "CAND-001",
+        "name": "John Doe",
+        "skills": ["Python", "FastAPI", "MongoDB"],
+        "score": 0.92
+      },
+      {
+        "id": "CAND-002", 
+        "name": "Jane Smith",
+        "skills": ["Java", "Spring", "PostgreSQL"],
+        "score": 0.78
+      }
+    ]
+  }
+}

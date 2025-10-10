@@ -2324,6 +2324,7 @@ try:
     from backend.routers.telco_ops import router as telco_ops_router
     from backend.routers.grc_execute import router as grc_execute_router
     from backend.routers.council_execute import router as council_execute_router
+    from backend.routers.opsx_execute import router as opsx_execute_router
     from backend.routers.dev_helpers import router as dev_helpers_router
     
     app.include_router(agent_runs_router, tags=["AI Agent Bridge Platform"])
@@ -2338,6 +2339,7 @@ try:
     app.include_router(telco_ops_router, tags=["Telco Ops Decisioning Agent"])
     app.include_router(grc_execute_router, tags=["Responsible AI Ops (GRC)"])
     app.include_router(council_execute_router, tags=["Council of Diverse Lenses"])
+    app.include_router(opsx_execute_router, tags=["Operations Efficiency Agent"])
     app.include_router(dev_helpers_router, tags=["Development Helpers"])
     print("✅ AI Agent Bridge Platform routers included successfully")
 except ImportError as e:

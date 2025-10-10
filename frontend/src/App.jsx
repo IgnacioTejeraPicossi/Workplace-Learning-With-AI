@@ -52,6 +52,7 @@ import PersonalAttentionAgent from "./PersonalAttentionAgent";
 import TelcoOpsAgent from "./TelcoOpsAgent";
 import GRCAgent from "./GRCAgent";
 import CouncilAgent from "./CouncilAgent";
+import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
 
 function AppContent() {
@@ -462,6 +463,7 @@ function AppContent() {
             {!activeModule && section === "telco-ops-agent" && <TelcoOpsAgent />}
             {!activeModule && section === "grc-agent" && <GRCAgent />}
             {!activeModule && section === "council-agent" && <CouncilAgent />}
+            {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}

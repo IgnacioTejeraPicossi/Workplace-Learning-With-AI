@@ -48,6 +48,7 @@
     "telcoOpsAgent": "Telco Ops Decisioning Agent",
     "grcAgent": "Responsible AI Ops (GRC)",
     "councilAgent": "Council of Diverse Lenses",
+    "opsEfficiencyAgent": "Operations Efficiency Agent",
     "cybersecurity": "Cybersecurity",
     "help": "Help",
     "runTest": "Run Test",
