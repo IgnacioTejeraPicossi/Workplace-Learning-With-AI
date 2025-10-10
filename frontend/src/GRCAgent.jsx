@@ -5,35 +5,16 @@ import Actions from './grc-agent/Actions';
 import Runs from './grc-agent/Runs';
 import Policies from './grc-agent/Policies';
 
-// Icon component for consistent sizing
-const Icon = ({ name, size = 16 }) => {
-  const icons = {
-    'bar-chart': '📊',
-    'search': '🔍',
-    'lightning': '⚡',
-    'running': '🏃',
-    'document': '📋'
-  };
-
-  const icon = icons[name] || '❓';
-  
-  // For emojis, use a smaller font size to control the visual size
-  const emojiSize = size <= 16 ? '0.5em' : size <= 18 ? '0.6em' : '0.7em';
-  
-  return (
-    <span style={{ 
-      fontSize: emojiSize,
-      display: 'inline-block',
-      lineHeight: 1,
-      verticalAlign: 'middle'
-    }}>
-      {icon}
-    </span>
-  );
-};
-
 const GRCAgent = () => {
   const [activeTab, setActiveTab] = useState('overview');
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'findings', label: 'Findings', icon: '🔍' },
+    { id: 'actions', label: 'Actions', icon: '⚡' },
+    { id: 'runs', label: 'Runs', icon: '🏃' },
+    { id: 'policies', label: 'Policies', icon: '📋' },
+  ];
 
   const renderContent = () => {
     switch (activeTab) {
@@ -53,98 +34,49 @@ const GRCAgent = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-      {/* Header Section */}
-      <div style={{ 
-        marginBottom: '32px',
-        padding: '32px',
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #e2e8f0'
-      }}>
-        <h1 style={{ 
-          fontSize: '3rem', 
-          fontWeight: '700', 
-          color: '#1e293b',
-          marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '20px'
-        }}>
-          <span style={{ fontSize: '2.5rem' }}>🛡️</span>
-          Responsible AI Ops (GRC)
-        </h1>
-        <p style={{ 
-          fontSize: '1.25rem', 
-          color: '#64748b',
-          marginBottom: '0',
-          lineHeight: '1.6'
-        }}>
-          Detects data-quality, policy, and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit.
-        </p>
+    <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm px-8 py-6">
+        <div className="flex items-center space-x-4">
+          <div className="text-5xl">🛡️</div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Responsible AI Ops (GRC)
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Detects data-quality, policy, and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        padding: '24px',
-        marginBottom: '32px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #e2e8f0'
-      }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {[
-            { id: 'overview', label: 'Overview', icon: 'bar-chart' },
-            { id: 'findings', label: 'Findings', icon: 'search' },
-            { id: 'actions', label: 'Actions', icon: 'lightning' },
-            { id: 'runs', label: 'Runs', icon: 'running' },
-            { id: 'policies', label: 'Policies', icon: 'document' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '10px',
-                border: 'none',
-                backgroundColor: activeTab === tab.id ? '#3b82f6' : '#f1f5f9',
-                color: activeTab === tab.id ? 'white' : '#64748b',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseOver={(e) => {
-                if (activeTab !== tab.id) {
-                  e.target.style.backgroundColor = '#e2e8f0';
-                }
-              }}
-              onMouseOut={(e) => {
-                if (activeTab !== tab.id) {
-                  e.target.style.backgroundColor = '#f1f5f9';
-                }
-              }}
-            >
-              <Icon name={tab.icon} size={16} />
-              {tab.label}
-            </button>
-          ))}
+      {/* Tabs */}
+      <div className="bg-white shadow-sm">
+        <div className="px-8">
+          <nav className="-mb-px flex space-x-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                <span className="mr-2">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
       </div>
 
       {/* Content */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        padding: '32px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #e2e8f0'
-      }}>
+      <div className="flex-1 overflow-auto">
         {renderContent()}
       </div>
     </div>

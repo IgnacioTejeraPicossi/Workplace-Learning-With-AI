@@ -86,7 +86,8 @@ const Overview = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="p-6">
+      <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center mb-4">
@@ -193,6 +194,7 @@ const Overview = () => {
             </div>
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

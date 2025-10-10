@@ -19,7 +19,8 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="p-6">
+      <div className="space-y-6">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
         <div className="flex items-center space-x-4 mb-4">
@@ -137,6 +138,7 @@ const Overview = () => {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

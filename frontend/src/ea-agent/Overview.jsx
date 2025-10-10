@@ -28,8 +28,8 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="p-6">
+      <div className="space-y-6">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center space-x-4 mb-4">

@@ -33,24 +33,22 @@ const EASecondBrain = () => {
     <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       {/* Header */}
       <div className="bg-white shadow-sm px-8 py-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <div className="text-5xl">🧠</div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                EA Second Brain Agent
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Ketil's 24/7 Enterprise Architecture watcher for Norwegian
-              </p>
-            </div>
+        <div className="flex items-center space-x-4">
+          <div className="text-5xl">🧠</div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              EA Second Brain Agent
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Ketil's 24/7 Enterprise Architecture watcher for Norwegian
+            </p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-8">
+        <div className="px-8">
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => (
               <button

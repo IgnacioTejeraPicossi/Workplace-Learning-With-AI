@@ -19,7 +19,8 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="p-6">
+      <div className="space-y-6">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white">
         <div className="flex items-center space-x-4 mb-4">
@@ -165,6 +166,7 @@ const Overview = () => {
           <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">publish.slack</span>
           <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">publish.confluence</span>
         </div>
+      </div>
       </div>
     </div>
   );
