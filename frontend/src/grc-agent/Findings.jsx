@@ -58,6 +58,32 @@ const Findings = () => {
     }
   };
 
+  // Generate HMAC signature for GRC actions
+  const generateHMACSignature = async (payload) => {
+    const secret = 'change-me'; // Should match HMAC_SECRET from backend
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    // Canonicalize JSON exactly like backend does (recursive sort_keys=True, separators=(',', ':'))
+    const canonicalJson = JSON.stringify(payload, (key, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const sorted = {};
+        Object.keys(value).sort().forEach(k => sorted[k] = value[k]);
+        return sorted;
+      }
+      return value;
+    });
+    const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(canonicalJson));
+    return Array.from(new Uint8Array(signature))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  };
+
   const dispatchHold = async () => {
     setSending(true);
     try {
@@ -94,11 +120,14 @@ const Findings = () => {
         callback_url: "/api/agent-runs/callback"
       };
 
+      // Generate proper HMAC signature
+      const signature = await generateHMACSignature(bundle);
+
       const response = await fetch('/agents/grc/execute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Signature': 'test-signature' // In real implementation, this would be properly signed
+          'X-Signature': signature
         },
         body: JSON.stringify(bundle)
       });

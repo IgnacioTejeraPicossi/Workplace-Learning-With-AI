@@ -47,6 +47,7 @@
   "personalAttentionAgent": "Personal Attention Agent",
     "telcoOpsAgent": "Telco Ops Decisioning Agent",
     "grcAgent": "Responsible AI Ops (GRC)",
+    "councilAgent": "Council of Diverse Lenses",
     "cybersecurity": "Cybersecurity",
     "help": "Help",
     "runTest": "Run Test",

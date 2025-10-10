@@ -117,7 +117,8 @@ const getNavItems = (t) => [
     { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" },
     { key: "personal-attention-agent", label: t('sidebar.personalAttentionAgent'), icon: "target" },
     { key: "telco-ops-agent", label: t('sidebar.telcoOpsAgent'), icon: "broadcast" },
-    { key: "grc-agent", label: t('sidebar.grcAgent'), icon: "shield" }
+    { key: "grc-agent", label: t('sidebar.grcAgent'), icon: "shield" },
+    { key: "council-agent", label: t('sidebar.councilAgent'), icon: "users" }
   ]},
   
   // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)

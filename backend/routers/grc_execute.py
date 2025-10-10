@@ -14,6 +14,41 @@ import uuid
 
 router = APIRouter(prefix="/agents/grc", tags=["grc"])
 
+@router.get("/stats")
+async def get_stats():
+    """Get GRC agent statistics"""
+    return {
+        "totalFindings": 2,
+        "openFindings": 1,
+        "resolvedFindings": 1,
+        "totalActions": 5,
+        "resolutionRate": 0.5
+    }
+
+@router.get("/findings")
+async def get_findings():
+    """Get GRC findings"""
+    return [
+        {
+            "object_id": "PO-4500001234",
+            "title": "Purchase Order Price Variance",
+            "category": "Procurement",
+            "severity": 0.8,
+            "confidence": 0.9,
+            "materiality": 0.7,
+            "status": "Open"
+        },
+        {
+            "object_id": "INV-51056001",
+            "title": "Invoice Three-way Match Failed",
+            "category": "Finance",
+            "severity": 0.6,
+            "confidence": 0.8,
+            "materiality": 0.5,
+            "status": "InProgress"
+        }
+    ]
+
 @router.post("/execute")
 async def execute(bundle: GrcActionBundle, x_signature: str = Header(...)):
     """Execute GRC action bundle with HMAC verification"""

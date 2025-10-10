@@ -1,0 +1,55 @@
+{
+  "id": "council-agent",
+  "name": "Council of Diverse Lenses",
+  "version": "1.0.0",
+  "module": "council",
+  "description": "Multi-persona deliberation with safety gates and auditable briefs. Creates diverse perspectives to debate complex topics and surface agreements, disagreements, and unknowns.",
+  "runner_default": "outsystems",
+  "capabilities": ["council.generate", "publish.slack", "publish.confluence"],
+  "policy": {
+    "max_auto_publish": "off",
+    "harm_gate": 0.35,
+    "min_personas": 3,
+    "max_personas": 8
+  },
+  "personas": [
+    {
+      "id": "p1",
+      "name": "CISO Zero-Trust",
+      "lens": "Security",
+      "region": "Nordics",
+      "expertise_tags": "authn,iam,zero-trust",
+      "values": {"security_first": true, "user_experience": 0.7}
+    },
+    {
+      "id": "p2",
+      "name": "Consumer Rights Advocate", 
+      "lens": "Ethics",
+      "region": "EU",
+      "expertise_tags": "gdpr,ux,privacy",
+      "values": {"privacy_first": true, "accessibility": 0.9}
+    },
+    {
+      "id": "p3",
+      "name": "Ops Cost Controller",
+      "lens": "Finance",
+      "region": "Global", 
+      "expertise_tags": "tco,ops,efficiency",
+      "values": {"cost_efficiency": true, "roi_focus": 0.95}
+    },
+    {
+      "id": "p4",
+      "name": "Global South Policy",
+      "lens": "Policy",
+      "region": "APAC",
+      "expertise_tags": "regulation,access,equity", 
+      "values": {"equity_first": true, "accessibility": 0.9}
+    }
+  ],
+  "scoring": {
+    "relevance_weight": 0.40,
+    "quality_weight": 0.30,
+    "diversity_weight": 0.30,
+    "harm_gate": 0.35
+  }
+}
