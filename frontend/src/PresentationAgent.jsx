@@ -30,6 +30,13 @@ function PresentationAgent() {
   const [presentationScript, setPresentationScript] = useState('');
   const { colors } = useTheme();
   
+  // New state: Agent Demonstrations
+  const [agents, setAgents] = useState([]);
+  const [selectedAgentId, setSelectedAgentId] = useState('');
+  const agentHelpStreaming = useStreaming();
+  const [useReadme, setUseReadme] = useState(false);
+  const [readmeSnippet, setReadmeSnippet] = useState('');
+  
   // Voice cloning removed - using browser TTS instead
   
   // Use streaming hooks for different modes
@@ -37,13 +44,49 @@ function PresentationAgent() {
   const qaStreaming = useStreaming();
   const demoStreaming = useStreaming();
 
-  // Speech synthesis
+  // Fetch agents catalog once
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const res = await fetch('/api/agents/catalog');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.items || data);
+        setAgents(list || []);
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchAgents();
+  }, []);
+
+  // Load README when toggle is on
+  useEffect(() => {
+    const fetchReadme = async () => {
+      if (!useReadme) { setReadmeSnippet(''); return; }
+      try {
+        const res = await fetch('/api/readme');
+        const data = await res.json();
+        if (data?.success && data?.markdown) {
+          // Keep first ~3,000 chars to keep prompts compact
+          const text = data.markdown.slice(0, 3000);
+          setReadmeSnippet(text);
+        } else {
+          setReadmeSnippet('');
+        }
+      } catch {
+        setReadmeSnippet('');
+      }
+    };
+    fetchReadme();
+  }, [useReadme]);
+  
+  // Voice synthesis
   const speechRef = useRef(null);
   // Voice recording features removed - using browser TTS instead
 
   // Voice cloning feature removed - using standard text-to-speech instead
   const synthesizeWithTrainedVoice = async (text, language = 'en') => {
-    // Fallback to browser's built-in speech synthesis
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = language;
@@ -56,6 +99,8 @@ function PresentationAgent() {
       return null;
     }
   };
+
+  // (explainAgent defined later; duplicate removed)
 
   // Presentation slides structure
   const presentationSlides = [
@@ -157,6 +202,22 @@ function PresentationAgent() {
   ];
 
   // Enhanced Q&A with live data will be defined after liveSystemStats and liveUserData
+
+  // Generate agent help from catalog descriptor
+  const explainAgent = async (agent) => {
+    if (!agent) return;
+    setSelectedAgentId(agent.id || agent.agent_id || agent.name);
+
+    const readmeContext = useReadme && readmeSnippet ? `\n\nREADME context (truncated):\n${readmeSnippet}` : '';
+
+    agentHelpStreaming.startStreaming(
+      `You are the Presentation Agent. Explain to a non-technical audience how to use the "${agent.name || agent.title}" module inside THIS app.\n\nGoals:\n- Give a succinct overview (what it does, when to use it)\n- Step-by-step to run a quick demo from the UI (which tab to open, buttons to press)\n- Mention key API endpoints or flows if applicable (dispatch, runs monitor, n8n callback) but keep it short\n- List required environment variables or external services if relevant (e.g., HMAC secret, Slack/Jira/Sheets)\n- End with a 3-bullet value pitch\n\nAgent descriptor JSON:\n${JSON.stringify(agent, null, 2)}${readmeContext}\n\nKeep it to ~10-15 lines, bullet style, crisp and demo-oriented.`,
+      {
+        statusMessages: STATUS_MESSAGES.PRESENTATION,
+        onComplete: () => {}
+      }
+    );
+  };
 
   // Generate presentation script
   const handleGenerateScript = async () => {
@@ -530,6 +591,7 @@ Would you like me to elaborate on any specific aspect of our platform?`,
     scriptStreaming.clearStreaming();
     qaStreaming.clearStreaming();
     demoStreaming.clearStreaming();
+    agentHelpStreaming.clearStreaming();
   };
 
   // Export presentation to PDF or slides
@@ -1960,6 +2022,74 @@ This demonstrates the comprehensive learning journey our platform provides.`,
               </div>
             </div>
 
+            {/* Agent Demonstrations */}
+            <div style={{ marginBottom: 20 }}>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🤖 Agent Demonstrations</h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <input
+                  id="use-readme"
+                  type="checkbox"
+                  checked={useReadme}
+                  onChange={(e) => setUseReadme(e.target.checked)}
+                  style={{ transform: 'scale(1.1)' }}
+                />
+                <label htmlFor="use-readme" style={{ fontSize: '0.9em', color: colors.textSecondary }}>
+                  Use README context
+                </label>
+              </div>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                gap: 12 
+              }}>
+                {agents.map((agent) => (
+                  <button
+                    key={agent.id || agent.agent_id || agent.name}
+                    onClick={() => explainAgent(agent)}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: 8,
+                      border: `1px solid ${colors.border}`,
+                      background: colors.cardBackground,
+                      color: colors.text,
+                      textAlign: 'left',
+                      transition: 'all 0.2s ease',
+                      cursor: 'pointer'
+                    }}
+                    title={agent.description || agent.summary}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: '1.2em' }}>{agent.icon || '🤖'}</span>
+                      <div style={{ fontWeight: 'bold' }}>{agent.name || agent.title}</div>
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: colors.textSecondary, lineHeight: 1.4 }}>
+                      {(agent.description || agent.summary || '').slice(0, 120)}{(agent.description || agent.summary || '').length > 120 ? '…' : ''}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Agent Help Output */}
+              {selectedAgentId && (
+                <div style={{ marginTop: 12 }}>
+                  {agentHelpStreaming.loading && (
+                    <StreamingProgress 
+                      loading={agentHelpStreaming.loading}
+                      status={agentHelpStreaming.status}
+                      progress={agentHelpStreaming.progress}
+                      color="info"
+                    />
+                  )}
+                  <StreamingText 
+                    content={agentHelpStreaming.content}
+                    loading={agentHelpStreaming.loading}
+                    placeholder="Select an agent to get a concise demo-oriented explanation..."
+                    style={{ minHeight: '200px' }}
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Live Demo Status */}
             {isLiveDemoActive && (
               <div style={{ 
@@ -2120,7 +2250,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
       </div>
 
       {/* Error Handling */}
-      {(scriptStreaming.error || qaStreaming.error || demoStreaming.error) && (
+      {(scriptStreaming.error || qaStreaming.error || demoStreaming.error || agentHelpStreaming.error) && (
         <div style={{ 
           padding: 16, 
           background: '#ffebee', 
@@ -2128,7 +2258,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
           borderRadius: 8,
           marginBottom: 16
         }}>
-          <strong>Error:</strong> {scriptStreaming.error || qaStreaming.error || demoStreaming.error}
+          <strong>Error:</strong> {scriptStreaming.error || qaStreaming.error || demoStreaming.error || agentHelpStreaming.error}
           <button
             onClick={handleClear}
             style={{

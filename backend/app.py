@@ -2057,6 +2057,19 @@ async def import_readme_to_library(request: Request):
         print(f"Error importing README to library: {e}")
         return {"success": False, "message": f"Error: {str(e)}"}
 
+# Simple endpoint to read the root README.md so the frontend can use it as context
+@app.get("/api/readme")
+async def get_root_readme():
+    try:
+        # Read README.md from repository root
+        with open("README.md", "r", encoding="utf-8") as f:
+            content = f.read()
+        return {"success": True, "markdown": content}
+    except FileNotFoundError:
+        return {"success": False, "message": "README.md not found"}
+    except Exception as e:
+        return {"success": False, "message": f"Error reading README: {str(e)}"}
+
 def calculate_user_learning_vector(mastery_scores, all_topics):
     """Calculate user's learning vector based on mastered topics"""
     user_vector = [0.0] * 10  # Assuming 10-dimensional embeddings
