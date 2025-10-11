@@ -22,34 +22,34 @@ const Overview = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-    fetchHealth();
+    (async () => {
+      try {
+        await Promise.all([fetchStats(), fetchHealth()]);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchJsonSafe = async (url) => {
     try {
-      const response = await fetch('/agents/opsx/stats');
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      return null; // caller handles fallback
     }
   };
 
+  const fetchStats = async () => {
+    // Prefer /agents/ops; fallback to /agents/opsx
+    const data = await (fetchJsonSafe('/agents/ops/stats') || fetchJsonSafe('/agents/opsx/stats'));
+    if (data) setStats(data);
+  };
+
   const fetchHealth = async () => {
-    try {
-      const response = await fetch('/agents/opsx/health');
-      if (response.ok) {
-        const data = await response.json();
-        setHealth(data);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('Failed to fetch health:', error);
-      setLoading(false);
-    }
+    const data = await (fetchJsonSafe('/agents/ops/health') || fetchJsonSafe('/agents/opsx/health'));
+    if (data) setHealth(data);
   };
 
   const card = {
