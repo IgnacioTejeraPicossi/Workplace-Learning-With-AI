@@ -45,7 +45,6 @@ const Allocations = () => {
           created_at: '2024-01-14T14:20:00Z'
         }
       ];
-      
       setAllocations(mockAllocations);
       setLoading(false);
     } catch (error) {
@@ -64,7 +63,6 @@ const Allocations = () => {
         },
         body: JSON.stringify(bundle)
       });
-      
       if (response.ok) {
         const result = await response.json();
         console.log('Ops Efficiency execution result:', result);
@@ -87,57 +85,11 @@ const Allocations = () => {
         topic: "Cost Allocation Suggestion",
         summary_md: "AI-powered cost allocation suggestion based on vendor patterns",
         actions: [
-          {
-            type: "cost.allocate",
-            payload: {
-              docId: "JRN-001",
-              lines: [
-                { amount: 3000, gl: "6020", costCenter: "IT_DEPT", project: null, note: "IT Department" },
-                { amount: 2000, gl: "6020", costCenter: "OPS_DEPT", project: null, note: "Operations" }
-              ]
-            }
-          },
-          {
-            type: "notify.slack",
-            payload: {
-              channel: "#finance",
-              text: "New cost allocation suggestion generated with 85% confidence",
-              blocks: [
-                {
-                  type: "header",
-                  text: {
-                    type: "plain_text",
-                    text: "💰 Cost Allocation Suggestion"
-                  }
-                },
-                {
-                  type: "section",
-                  fields: [
-                    {
-                      type: "mrkdwn",
-                      text: "*Document:*\nJRN-001"
-                    },
-                    {
-                      type: "mrkdwn",
-                      text: "*Total Amount:*\nNOK 5,000"
-                    },
-                    {
-                      type: "mrkdwn",
-                      text: "*Confidence:*\n85%"
-                    },
-                    {
-                      type: "mrkdwn",
-                      text: "*Rationale:*\nHistorical pattern analysis"
-                    }
-                  ]
-                }
-              ]
-            }
-          }
+          { type: "cost.allocate", payload: { docId: "JRN-001", lines: [ { amount: 3000, gl: "6020", costCenter: "IT_DEPT", project: null, note: "IT Department" }, { amount: 2000, gl: "6020", costCenter: "OPS_DEPT", project: null, note: "Operations" } ] } },
+          { type: "notify.slack", payload: { channel: "#finance", text: "New cost allocation suggestion generated with 85% confidence" } }
         ],
         callback_url: "/api/agent-runs/callback"
       };
-
       await executeOpsx(bundle);
       setShowSuggestion(true);
       alert('Cost allocation suggestion generated successfully!');
@@ -157,57 +109,13 @@ const Allocations = () => {
         topic: `Post Allocation ${allocation.id}`,
         summary_md: `Posting cost allocation ${allocation.id} to ERP system`,
         actions: [
-          {
-            type: "cost.allocate",
-            payload: {
-              docId: allocation.document_id,
-              lines: allocation.lines
-            }
-          },
-          {
-            type: "notify.slack",
-            payload: {
-              channel: "#finance",
-              text: `Allocation ${allocation.id} posted successfully`,
-              blocks: [
-                {
-                  type: "header",
-                  text: {
-                    type: "plain_text",
-                    text: "✅ Allocation Posted"
-                  }
-                },
-                {
-                  type: "section",
-                  fields: [
-                    {
-                      type: "mrkdwn",
-                      text: `*Allocation ID:*\n${allocation.id}`
-                    },
-                    {
-                      type: "mrkdwn",
-                      text: `*Amount:*\nNOK ${allocation.total_amount.toLocaleString()}`
-                    },
-                    {
-                      type: "mrkdwn",
-                      text: `*Lines:*\n${allocation.lines.length}`
-                    }
-                  ]
-                }
-              ]
-            }
-          }
+          { type: "cost.allocate", payload: { docId: allocation.document_id, lines: allocation.lines } },
+          { type: "notify.slack", payload: { channel: "#finance", text: `Allocation ${allocation.id} posted successfully` } }
         ],
         callback_url: "/api/agent-runs/callback"
       };
-
       await executeOpsx(bundle);
-      
-      // Update local state
-      setAllocations(prev => prev.map(alloc => 
-        alloc.id === allocation.id ? { ...alloc, status: 'posted' } : alloc
-      ));
-      
+      setAllocations(prev => prev.map(alloc => alloc.id === allocation.id ? { ...alloc, status: 'posted' } : alloc));
       alert(`Allocation ${allocation.id} posted successfully!`);
     } catch (error) {
       alert(`Failed to post allocation: ${error.message}`);
@@ -217,186 +125,147 @@ const Allocations = () => {
   };
 
   const getStatusBadge = (status) => {
-    const badges = {
-      draft: 'bg-yellow-100 text-yellow-800',
-      posted: 'bg-green-100 text-green-800',
-      cancelled: 'bg-gray-100 text-gray-800'
-    };
-    
+    const map = { draft: { bg: '#FEF3C7', color: '#92400E', label: 'Draft' }, posted: { bg: '#DCFCE7', color: '#166534', label: 'Posted' }, cancelled: { bg: '#E5E7EB', color: '#374151', label: 'Cancelled' } };
+    const s = map[status] || { bg: '#E5E7EB', color: '#374151', label: status };
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badges[status]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
+      <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: s.bg, color: s.color }}>{s.label}</span>
     );
   };
 
   const getConfidenceBadge = (confidence) => {
-    const color = confidence >= 0.8 ? 'bg-green-100 text-green-800' : 
-                  confidence >= 0.6 ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-red-100 text-red-800';
-    
+    const pct = Math.round(confidence * 100);
+    const isHigh = pct >= 80;
+    const isMid = pct >= 60 && pct < 80;
+    const styles = isHigh ? { bg: '#DCFCE7', color: '#166534' } : isMid ? { bg: '#FEF3C7', color: '#92400E' } : { bg: '#FEE2E2', color: '#991B1B' };
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
-        {(confidence * 100).toFixed(0)}%
-      </span>
+      <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: styles.bg, color: styles.color }}>{pct}%</span>
     );
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <div style={{ fontSize: '1.5rem' }}>⏳</div>
+        <p>Loading allocations...</p>
       </div>
     );
   }
 
+  const container = { maxWidth: '1200px', margin: '0 auto', padding: '1.5rem' };
+  const card = { backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' };
+  const cardHeader = { padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
+  const cardTitle = { margin: 0, fontSize: '1.1rem', fontWeight: 600, color: '#111827' };
+  const tableWrap = { overflowX: 'auto' };
+  const table = { width: '100%', borderCollapse: 'collapse' };
+  const th = { textAlign: 'left', padding: '0.75rem', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', backgroundColor: '#F9FAFB', borderBottom: '1px solid #e5e7eb' };
+  const td = { padding: '0.75rem', borderBottom: '1px solid #F3F4F6', fontSize: '0.9rem', color: '#111827' };
+  const btn = (color) => ({ padding: '0.35rem 0.6rem', borderRadius: '8px', border: `1px solid ${color.border}`, backgroundColor: color.bg, color: color.text, cursor: 'pointer' });
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Cost Allocations</h1>
-        <p className="text-lg text-gray-600 mt-2">AI-powered cost allocation suggestions with explainability</p>
+    <div style={container}>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>Cost Allocations</h1>
+        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>AI-powered cost allocation suggestions with explainability</p>
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-6">
-        <button
-          onClick={handleSuggestAllocation}
-          disabled={sending}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+      <div style={{ marginBottom: '1rem' }}>
+        <button onClick={handleSuggestAllocation} disabled={sending} style={btn({ bg: '#2563EB', border: '#1D4ED8', text: '#FFFFFF' })}>
           {sending ? 'Generating...' : 'Suggest New Allocation'}
         </button>
       </div>
 
       {/* Allocation Suggestions */}
       {showSuggestion && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">New Allocation Suggestion</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+          <h3 style={{ marginTop: 0, color: '#1E3A8A', fontWeight: 600 }}>New Allocation Suggestion</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <h4 className="font-medium text-gray-900">Suggested Split:</h4>
-              <ul className="mt-2 space-y-1">
-                <li className="text-sm text-gray-600">IT Department: NOK 3,000 (60%)</li>
-                <li className="text-sm text-gray-600">Operations: NOK 2,000 (40%)</li>
+              <h4 style={{ margin: 0, fontWeight: 600 }}>Suggested Split:</h4>
+              <ul style={{ margin: '8px 0', paddingLeft: 18, color: '#4B5563' }}>
+                <li>IT Department: NOK 3,000 (60%)</li>
+                <li>Operations: NOK 2,000 (40%)</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900">Rationale:</h4>
-              <p className="text-sm text-gray-600 mt-2">
-                Historical pattern analysis shows consistent 60/40 split for SaaS subscriptions
-              </p>
+              <h4 style={{ margin: 0, fontWeight: 600 }}>Rationale:</h4>
+              <p style={{ margin: '8px 0', color: '#4B5563' }}>Historical pattern analysis shows consistent 60/40 split for SaaS subscriptions</p>
             </div>
           </div>
-          <div className="mt-4 flex space-x-3">
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-              Accept Suggestion
-            </button>
-            <button 
-              onClick={() => setShowSuggestion(false)}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-            >
-              Dismiss
-            </button>
+          <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+            <button style={btn({ bg: '#10B981', border: '#059669', text: '#FFFFFF' })}>Accept Suggestion</button>
+            <button onClick={() => setShowSuggestion(false)} style={btn({ bg: '#E5E7EB', border: '#D1D5DB', text: '#374151' })}>Dismiss</button>
           </div>
         </div>
       )}
 
       {/* Allocations Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Allocations</h2>
+      <div style={card}>
+        <div style={cardHeader}>
+          <h2 style={cardTitle}>Recent Allocations</h2>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Allocation ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vendor
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Confidence
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {allocations.map((allocation) => (
-                <tr key={allocation.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{allocation.id}</div>
-                    <div className="text-sm text-gray-500">Doc: {allocation.document_id}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{allocation.vendor}</div>
-                    <div className="text-sm text-gray-500">{allocation.description}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      NOK {allocation.total_amount.toLocaleString()}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(allocation.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getConfidenceBadge(allocation.confidence_score)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      {allocation.status === 'draft' && (
-                        <button
-                          onClick={() => handlePostAllocation(allocation)}
-                          disabled={sending}
-                          className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                        >
-                          Post
-                        </button>
-                      )}
-                      <button className="text-blue-600 hover:text-blue-900">
-                        Details
-                      </button>
-                    </div>
-                  </td>
+        <div style={{ padding: '0.25rem 0 1rem 0' }}>
+          <div style={tableWrap}>
+            <table style={table}>
+              <thead>
+                <tr>
+                  <th style={th}>Allocation ID</th>
+                  <th style={th}>Vendor</th>
+                  <th style={th}>Amount</th>
+                  <th style={th}>Status</th>
+                  <th style={th}>Confidence</th>
+                  <th style={th}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {allocations.map((allocation) => (
+                  <tr key={allocation.id}>
+                    <td style={td}>
+                      <div style={{ fontWeight: 600 }}>{allocation.id}</div>
+                      <div style={{ color: '#6B7280', fontSize: '0.85rem' }}>Doc: {allocation.document_id}</div>
+                    </td>
+                    <td style={td}>
+                      <div>{allocation.vendor}</div>
+                      <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>{allocation.description}</div>
+                    </td>
+                    <td style={td}>NOK {allocation.total_amount.toLocaleString()}</td>
+                    <td style={td}>{getStatusBadge(allocation.status)}</td>
+                    <td style={td}>{getConfidenceBadge(allocation.confidence_score)}</td>
+                    <td style={td}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {allocation.status === 'draft' && (
+                          <button onClick={() => handlePostAllocation(allocation)} disabled={sending} style={btn({ bg: '#ECFDF5', border: '#10B981', text: '#065F46' })}>Post</button>
+                        )}
+                        <button style={btn({ bg: '#EFF6FF', border: '#3B82F6', text: '#1D4ED8' })}>Details</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {/* Allocation Details */}
-      <div className="mt-6 bg-white shadow-md rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Allocation Breakdown</h3>
-        <div className="space-y-4">
+      <div style={{ marginTop: 16, ...card, padding: 16 }}>
+        <h3 style={{ ...cardTitle, marginBottom: 12 }}>Allocation Breakdown</h3>
+        <div style={{ display: 'grid', rowGap: 12 }}>
           {allocations.map((allocation) => (
-            <div key={allocation.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-3">
-                <h4 className="font-medium text-gray-900">{allocation.id}</h4>
-                <div className="flex space-x-2">
+            <div key={allocation.id} style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <h4 style={{ margin: 0 }}>{allocation.id}</h4>
+                <div style={{ display: 'flex', gap: 8 }}>
                   {getStatusBadge(allocation.status)}
                   {getConfidenceBadge(allocation.confidence_score)}
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mb-3">{allocation.rationale}</p>
-              <div className="space-y-2">
+              <p style={{ color: '#6B7280', marginTop: 0 }}>{allocation.rationale}</p>
+              <div style={{ display: 'grid', rowGap: 6 }}>
                 {allocation.lines.map((line, index) => (
-                  <div key={index} className="flex justify-between text-sm">
-                    <span className="text-gray-600">
-                      {line.cost_center} {line.project && `(${line.project})`}
-                    </span>
-                    <span className="font-medium">NOK {line.amount.toLocaleString()}</span>
+                  <div key={index} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                    <span style={{ color: '#6B7280' }}>{line.cost_center} {line.project ? `(${line.project})` : ''}</span>
+                    <span style={{ fontWeight: 600 }}>NOK {line.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
