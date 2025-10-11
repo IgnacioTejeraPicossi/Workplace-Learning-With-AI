@@ -30,6 +30,7 @@ from ..models.agent_security_models import (
 router = APIRouter(prefix="/api/agent-security", tags=["Agent Security"])
 
 # Mock data for demonstration
+# Base mock used as seed. We'll enrich dynamically to include all Item Agents.
 MOCK_AGENT_SECURITY_DATA = {
     "overall_score": 85,
     "total_agents": 4,
@@ -152,12 +153,87 @@ MOCK_AGENT_SECURITY_DATA = {
 
 @router.get("/overview", response_model=AgentSecurityOverview)
 async def get_agent_security_overview():
-    """Get comprehensive agent security overview"""
+    """Get comprehensive agent security overview.
+
+    Dynamically includes all Item Agents, including the 7 most recently added
+    modules, and computes KPIs from the list to avoid hardcoded totals.
+    """
     try:
-        return AgentSecurityOverview(
-            **MOCK_AGENT_SECURITY_DATA,
-            last_updated=datetime.now()
+        # Target list of Item Agents (existing + 7 new)
+        desired_agents = [
+            "AI Compliance Agent",
+            "AI Productivity Agent",
+            "Robomind Clinic",
+            "Agent Theory & Documentation",
+            # New agents
+            "EA Second Brain Agent",
+            "Sales Assistant Agent",
+            "Personal Attention Agent",
+            "Telco Ops Decisioning Agent",
+            "Responsible AI Ops (GRC)",
+            "Council of Diverse Lenses",
+            "Operations Efficiency Agent",
+        ]
+
+        base = MOCK_AGENT_SECURITY_DATA.copy()
+        status_list = list(base["agent_security_status"])  # copy
+
+        # Helper to synthesize a reasonable default status if missing
+        def default_status(name: str, score: int, at_risk: bool = False):
+            return {
+                "agent_name": name,
+                "status": "at_risk" if at_risk else "secure",
+                "security_score": score,
+                "last_scan": datetime.now() - timedelta(minutes=15),
+                "vulnerabilities_count": 1 if at_risk else 0,
+                "threats_detected": 1 if at_risk else 0,
+                "zero_trust_compliance": not at_risk,
+                "model_integrity_score": min(100, score + 5),
+                "data_protection_score": max(70, score - 2),
+                "access_control_score": max(70, score - 4),
+                "monitoring_active": True,
+                "last_incident": datetime.now() - timedelta(hours=3) if at_risk else None,
+            }
+
+        existing_names = {a["agent_name"] for a in status_list}
+        for name in desired_agents:
+            if name in existing_names:
+                continue
+            # Assign a stable score per name
+            if name in {"Sales Assistant Agent", "Council of Diverse Lenses"}:
+                status_list.append(default_status(name, 79 if name == "Council of Diverse Lenses" else 81, at_risk=True))
+            else:
+                status_list.append(default_status(name, 84 if name == "Telco Ops Decisioning Agent" else 86))
+
+        # Compute KPIs
+        total_agents = len(status_list)
+        secure_agents = sum(1 for a in status_list if a["status"] == "secure")
+        at_risk_agents = total_agents - secure_agents
+        overall_score = round(sum(a["security_score"] for a in status_list) / total_agents)
+        zero_trust_rate = round((sum(1 for a in status_list if a["zero_trust_compliance"]) / total_agents) * 100)
+
+        # Align critical alert count with UI red indicators (vulnerabilities > 0)
+        critical_alerts = sum(1 for a in status_list if (a.get("vulnerabilities_count", 0) or 0) > 0)
+
+        overview = AgentSecurityOverview(
+            overall_score=overall_score,
+            total_agents=total_agents,
+            secure_agents=secure_agents,
+            at_risk_agents=at_risk_agents,
+            critical_agents=0,
+            critical_alerts=critical_alerts,
+            recent_incidents=base["recent_incidents"],
+            agent_security_status=status_list,
+            security_metrics=base["security_metrics"],
+            zero_trust_status={
+                **base["zero_trust_status"],
+                "compliance_rate": float(zero_trust_rate),
+                "passed_checks": int(base["zero_trust_status"]["total_checks"] * (zero_trust_rate / 100)),
+                "failed_checks": int(base["zero_trust_status"]["total_checks"] * (1 - zero_trust_rate / 100)),
+            },
+            last_updated=datetime.now(),
         )
+        return overview
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving agent security overview: {str(e)}")
 

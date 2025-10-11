@@ -52,149 +52,116 @@ const Overview = () => {
     }
   };
 
-  const StatCard = ({ title, value, subtitle, icon, color = "blue" }) => (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center">
-        <div className={`p-3 rounded-full bg-${color}-100`}>
-          <span className={`text-${color}-600 text-xl`}>{icon}</span>
+  const card = {
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    border: '1px solid #e2e8f0'
+  };
+
+  const StatCard = ({ title, value, subtitle, icon }) => (
+    <div style={card}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ padding: 12, borderRadius: 9999, background: '#e0e7ff', marginRight: 12 }}>
+          <span style={{ color: '#2563eb', fontSize: 18 }}>{icon}</span>
         </div>
-        <div className="ml-4">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-semibold text-gray-900">{value}</p>
-          {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+        <div>
+          <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>{title}</p>
+          <p style={{ margin: '6px 0 0', fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{value}</p>
+          {subtitle && <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>{subtitle}</p>}
         </div>
       </div>
     </div>
   );
 
-  const HealthIndicator = ({ label, status, connected }) => (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
-      <span className="text-sm font-medium text-gray-700">{label}</span>
-      <div className="flex items-center">
-        <div className={`w-3 h-3 rounded-full mr-2 ${connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-        <span className="text-sm text-gray-600">{connected ? 'Connected' : 'Disconnected'}</span>
+  const HealthIndicator = ({ label, connected }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 12, background: 'white', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+      <span style={{ fontSize: 13, color: '#334155', fontWeight: 500 }}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ width: 12, height: 12, borderRadius: 9999, marginRight: 8, background: connected ? '#22c55e' : '#ef4444' }}></div>
+        <span style={{ fontSize: 12, color: '#64748b' }}>{connected ? 'Connected' : 'Disconnected'}</span>
       </div>
     </div>
   );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
+      <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>Loading...</div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center mb-4">
-          <div className="p-3 rounded-full bg-blue-100 mr-4">
-            <span className="text-blue-600 text-2xl">⚙️</span>
+    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      <div style={{ display: 'grid', gap: '24px' }}>
+        {/* Hero */}
+        <div style={{ borderRadius: 16, padding: 24, color: 'white', background: 'linear-gradient(90deg,#2563eb,#7c3aed)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ padding: 12, borderRadius: 9999, background: 'rgba(255,255,255,0.2)', marginRight: 12 }}>
+              <span style={{ fontSize: 22 }}>⚙️</span>
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{agentDescriptor.name}</h2>
+              <p style={{ margin: '6px 0 0', opacity: 0.9 }}>{agentDescriptor.description}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{agentDescriptor.name}</h1>
-            <p className="text-lg text-gray-600 mt-2">{agentDescriptor.description}</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-            MCP Enabled
-          </span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-            v{agentDescriptor.version}
-          </span>
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-            health.status === 'healthy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-          }`}>
-            {health.status === 'healthy' ? 'Healthy' : 'Degraded'}
-          </span>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="Total Invoices"
-          value={stats.total_invoices}
-          subtitle={`${stats.auto_approved} auto-approved`}
-          icon="📄"
-          color="blue"
-        />
-        <StatCard
-          title="Manual Holds"
-          value={stats.manual_hold}
-          subtitle="Requiring review"
-          icon="⚠️"
-          color="yellow"
-        />
-        <StatCard
-          title="Cost Allocations"
-          value={stats.total_allocations}
-          subtitle={`${stats.posted_allocations} posted`}
-          icon="💰"
-          color="green"
-        />
-        <StatCard
-          title="Candidates Ranked"
-          value={stats.total_candidates}
-          subtitle={`${(stats.avg_confidence * 100).toFixed(1)}% avg confidence`}
-          icon="👥"
-          color="purple"
-        />
-      </div>
-
-      {/* Health Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">System Health</h3>
-          <div className="space-y-3">
-            <HealthIndicator label="ERP System" status={health.status} connected={health.erp_connected} />
-            <HealthIndicator label="ATS System" status={health.status} connected={health.ats_connected} />
-            <HealthIndicator label="Slack Notifications" status={health.status} connected={health.slack_connected} />
-            <HealthIndicator label="Google Sheets" status={health.status} connected={health.sheets_connected} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ padding: '6px 10px', background: '#dcfce7', color: '#047857', borderRadius: 999, fontSize: 12 }}>MCP Enabled</span>
+            <span style={{ padding: '6px 10px', background: '#dbeafe', color: '#1d4ed8', borderRadius: 999, fontSize: 12 }}>v{agentDescriptor.version}</span>
+            <span style={{ padding: '6px 10px', background: health.status === 'healthy' ? '#dcfce7' : '#fef3c7', color: health.status === 'healthy' ? '#047857' : '#92400e', borderRadius: 999, fontSize: 12 }}>{health.status === 'healthy' ? 'Healthy' : 'Degraded'}</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Capabilities</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {agentDescriptor.capabilities.map((capability, index) => (
-              <div key={index} className="flex items-center p-2 bg-gray-50 rounded">
-                <span className="text-sm text-gray-700">{capability}</span>
-              </div>
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+          <StatCard title="Total Invoices" value={stats.total_invoices} subtitle={`${stats.auto_approved} auto-approved`} icon="📄" />
+          <StatCard title="Manual Holds" value={stats.manual_hold} subtitle="Requiring review" icon="⚠️" />
+          <StatCard title="Cost Allocations" value={stats.total_allocations} subtitle={`${stats.posted_allocations} posted`} icon="💰" />
+          <StatCard title="Candidates Ranked" value={stats.total_candidates} subtitle={`${(stats.avg_confidence * 100).toFixed(1)}% avg confidence`} icon="👥" />
+        </div>
+
+        {/* Health & Capabilities */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={card}>
+            <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>System Health</h3>
+            <div style={{ display: 'grid', gap: 10 }}>
+              <HealthIndicator label="ERP System" connected={health.erp_connected} />
+              <HealthIndicator label="ATS System" connected={health.ats_connected} />
+              <HealthIndicator label="Slack Notifications" connected={health.slack_connected} />
+              <HealthIndicator label="Google Sheets" connected={health.sheets_connected} />
+            </div>
+          </div>
+
+          <div style={card}>
+            <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>Capabilities</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {agentDescriptor.capabilities.map((capability, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center', padding: 8, background: '#f8fafc', borderRadius: 8 }}>
+                  <span style={{ fontSize: 13, color: '#334155' }}>{capability}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div style={card}>
+          <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>Quick Actions</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            {[
+              { icon: '📄', label: 'Process Invoice' },
+              { icon: '💰', label: 'Suggest Allocation' },
+              { icon: '👥', label: 'Rank Candidates' }
+            ].map((a) => (
+              <button key={a.label} style={{ padding: 16, borderRadius: 12, border: '2px dashed #cbd5e1', background: 'white', cursor: 'pointer' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ display: 'block', fontSize: 20, marginBottom: 6 }}>{a.icon}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#334155' }}>{a.label}</span>
+                </div>
+              </button>
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-            <div className="text-center">
-              <span className="text-2xl mb-2 block">📄</span>
-              <span className="text-sm font-medium text-gray-700">Process Invoice</span>
-            </div>
-          </button>
-          <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-            <div className="text-center">
-              <span className="text-2xl mb-2 block">💰</span>
-              <span className="text-sm font-medium text-gray-700">Suggest Allocation</span>
-            </div>
-          </button>
-          <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <div className="text-center">
-              <span className="text-2xl mb-2 block">👥</span>
-              <span className="text-sm font-medium text-gray-700">Rank Candidates</span>
-            </div>
-          </button>
-        </div>
-      </div>
       </div>
     </div>
   );

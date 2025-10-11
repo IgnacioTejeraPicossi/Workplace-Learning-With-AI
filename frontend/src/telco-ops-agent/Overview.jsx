@@ -22,14 +22,12 @@ const Overview = () => {
         const successful = opsRuns.filter((r) => r.status === 'DONE').length;
         const successRate = total > 0 ? (successful / total) * 100 : 0;
         const lastRun = opsRuns[0];
-        
-        // Count execution modes (mock data for now)
         const autoExecutions = opsRuns.filter((r) => r.bundle?.mode === 'auto').length;
         const oneClickApprovals = opsRuns.filter((r) => r.bundle?.mode === 'one_click').length;
 
         setStats({
           totalRuns: total,
-          successRate: successRate.toFixed(1),
+          successRate: Number(successRate.toFixed(1)),
           lastRun: lastRun?.started_at,
           autoExecutions,
           oneClickApprovals
@@ -38,27 +36,24 @@ const Overview = () => {
       .catch((err) => console.error('Failed to load stats:', err));
   }, []);
 
-  const StatCard = ({ label, value, icon, color }) => {
-    const colorClasses = {
-      blue: 'from-blue-500 to-blue-600',
-      green: 'from-green-500 to-green-600',
-      purple: 'from-purple-500 to-purple-600',
-      orange: 'from-orange-500 to-orange-600'
-    };
+  const cardStyle = {
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    border: '1px solid #e2e8f0',
+  };
 
+  const StatCard = ({ label, value, icon }) => {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
-        <div className="flex items-center justify-between">
+      <div style={cardStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              {label}
-            </p>
-            <p className="text-4xl font-bold text-gray-900 mt-2">{value}</p>
+            <p style={{ margin: 0, fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
+            <p style={{ margin: '6px 0 0', fontSize: '28px', fontWeight: 700, color: '#0f172a' }}>{value}</p>
           </div>
-          <div
-            className={`text-4xl bg-gradient-to-br ${colorClasses[color]} p-4 rounded-2xl shadow-lg`}
-          >
-            <span className="filter drop-shadow-lg">{icon}</span>
+          <div style={{ fontSize: '24px', background: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(147,51,234,0.15))', padding: '12px', borderRadius: '12px' }}>
+            <span>{icon}</span>
           </div>
         </div>
       </div>
@@ -66,137 +61,117 @@ const Overview = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="text-5xl">📡</div>
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{descriptor.name}</h1>
-            <p className="text-blue-100 text-lg">
-              Data-driven telco operations with TMF APIs and safe autonomy
-            </p>
-          </div>
-        </div>
-        <p className="text-white/90 mt-4">
-          {descriptor.description}
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Runs"
-          value={stats.totalRuns}
-          icon="🔄"
-          color="blue"
-        />
-        <StatCard
-          label="Success Rate"
-          value={`${stats.successRate}%`}
-          icon="✅"
-          color="green"
-        />
-        <StatCard
-          label="Auto Executions"
-          value={stats.autoExecutions}
-          icon="🤖"
-          color="purple"
-        />
-        <StatCard
-          label="One-Click Approvals"
-          value={stats.oneClickApprovals}
-          icon="👆"
-          color="orange"
-        />
-      </div>
-
-      {/* Two Column Layout */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Left Column - Capabilities */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl">⚡</span>
-            <h2 className="text-xl font-bold text-gray-900">Capabilities</h2>
-          </div>
-          <div className="space-y-3">
-            {descriptor.capabilities.map((cap, i) => (
-              <div
-                key={i}
-                className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"
-              >
-                <span className="text-xl">
-                  {cap.includes('order') ? '📦' :
-                   cap.includes('subscription') ? '📋' :
-                   cap.includes('appointment') ? '📅' :
-                   cap.includes('comm') ? '📧' :
-                   cap.includes('crm') ? '🎫' : '🔧'}
-                </span>
-                <span className="text-sm font-medium text-gray-700">{cap}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column - Integrations */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="text-2xl">🔌</span>
-            <h2 className="text-xl font-bold text-gray-900">Integrations</h2>
-          </div>
-          <div className="space-y-4">
-            {Object.entries(descriptor.integrations).map(([key, value], i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">
-                    {key.includes('tmf622') ? '📦' :
-                     key.includes('tmf679') ? '✅' :
-                     key.includes('appoint') ? '📅' :
-                     key.includes('comm') ? '📧' :
-                     key.includes('crm') ? '🎫' : '🔧'}
-                  </span>
-                  <span className="font-medium text-gray-700">{key.toUpperCase()}</span>
-                </div>
-                <span className="text-sm text-gray-500">{value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="text-2xl">✨</span>
-          <h2 className="text-xl font-bold text-gray-900">Key Features</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-3">
-          {descriptor.features.map((feature, i) => (
-            <div
-              key={i}
-              className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg"
-            >
-              <span className="text-blue-500 mt-1">✓</span>
-              <span className="text-sm text-gray-700">{feature}</span>
+    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      <div style={{ display: 'grid', gap: '24px' }}>
+        {/* Hero */}
+        <div
+          style={{
+            borderRadius: '16px',
+            padding: '24px',
+            color: 'white',
+            background: 'linear-gradient(90deg, #2563eb 0%, #7c3aed 100%)',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+            <div style={{ fontSize: '40px' }}>📡</div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>{descriptor.name}</h2>
+              <p style={{ margin: '4px 0 0', opacity: 0.9 }}>Data-driven telco operations with TMF APIs and safe autonomy</p>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Policy Info */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="text-3xl">🛡️</span>
-          <h2 className="text-xl font-bold">Policy Guardrails</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-white/90 mb-2">Max Auto Value: €{descriptor.policy.max_auto_value}</p>
-            <p className="text-white/90 mb-2">Confidence Threshold: {descriptor.policy.confidence_threshold * 100}%</p>
           </div>
-          <div>
-            <p className="text-white/90 mb-2">Risk Threshold: {descriptor.policy.risk_threshold}%</p>
-            <p className="text-white/90">Approval Roles: {descriptor.policy.required_approval_roles.join(', ')}</p>
+          <p style={{ marginTop: '12px', opacity: 0.95 }}>{descriptor.description}</p>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+          <StatCard label="Total Runs" value={stats.totalRuns} icon="🔄" />
+          <StatCard label="Success Rate" value={`${stats.successRate}%`} icon="✅" />
+          <StatCard label="Auto Executions" value={stats.autoExecutions} icon="🤖" />
+          <StatCard label="One-Click Approvals" value={stats.oneClickApprovals} icon="👆" />
+        </div>
+
+        {/* Two Columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          {/* Capabilities */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span style={{ fontSize: '20px' }}>⚡</span>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Capabilities</h3>
+            </div>
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {descriptor.capabilities.map((cap, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px', background: '#eff6ff', borderRadius: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>
+                    {cap.includes('order') ? '📦' : cap.includes('subscription') ? '📋' : cap.includes('appointment') ? '📅' : cap.includes('comm') ? '📧' : cap.includes('crm') ? '🎫' : '🔧'}
+                  </span>
+                  <span style={{ fontSize: '13px', color: '#334155', fontWeight: 500 }}>{cap}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Integrations */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span style={{ fontSize: '20px' }}>🔌</span>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Integrations</h3>
+            </div>
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {Object.entries(descriptor.integrations).map(([key, value], i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', background: '#f8fafc', borderRadius: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>
+                      {key.includes('tmf622') ? '📦' : key.includes('tmf679') ? '✅' : key.includes('appoint') ? '📅' : key.includes('comm') ? '📧' : key.includes('crm') ? '🎫' : '🔧'}
+                    </span>
+                    <span style={{ fontWeight: 600, color: '#334155' }}>{key.toUpperCase()}</span>
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '20px' }}>✨</span>
+            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Key Features</h3>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {descriptor.features.map((feature, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '10px', background: '#eff6ff', borderRadius: '10px' }}>
+                <span style={{ color: '#2563eb', marginTop: 2 }}>✓</span>
+                <span style={{ fontSize: '13px', color: '#334155' }}>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Policy */}
+        <div
+          style={{
+            borderRadius: '16px',
+            padding: '24px',
+            color: 'white',
+            background: 'linear-gradient(90deg, #16a34a 0%, #2563eb 100%)',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '22px' }}>🛡️</span>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>Policy Guardrails</h3>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
+              <p style={{ margin: 0, marginBottom: '6px', opacity: 0.95 }}>Max Auto Value: €{descriptor.policy.max_auto_value}</p>
+              <p style={{ margin: 0, opacity: 0.95 }}>Confidence Threshold: {descriptor.policy.confidence_threshold * 100}%</p>
+            </div>
+            <div>
+              <p style={{ margin: 0, marginBottom: '6px', opacity: 0.95 }}>Risk Threshold: {descriptor.policy.risk_threshold}%</p>
+              <p style={{ margin: 0, opacity: 0.95 }}>Approval Roles: {descriptor.policy.required_approval_roles.join(', ')}</p>
+            </div>
           </div>
         </div>
       </div>

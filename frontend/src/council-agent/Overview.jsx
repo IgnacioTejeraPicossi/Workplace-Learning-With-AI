@@ -18,158 +18,132 @@ const Overview = () => {
       .catch(error => console.error("Failed to fetch Council stats:", error));
   }, []);
 
+  const card = {
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    border: '1px solid #e2e8f0'
+  };
+
   return (
-    <div className="p-6">
-      <div className="space-y-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <span className="text-white text-lg">🏛️</span>
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">{descriptor.name}</h2>
-            <p className="text-purple-100">{descriptor.description}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Deliberations</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalDeliberations}</p>
+    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      <div style={{ display: 'grid', gap: '24px' }}>
+        {/* Hero */}
+        <div style={{ borderRadius: '16px', padding: '24px', color: 'white', background: 'linear-gradient(90deg,#7c3aed 0%, #2563eb 100%)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div style={{ width: 32, height: 32, background: 'rgba(255,255,255,0.2)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff', fontSize: 18 }}>🏛️</span>
             </div>
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-blue-600 text-sm">🏛️</span>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{descriptor.name}</h2>
+              <p style={{ margin: 0, opacity: 0.9 }}>{descriptor.description}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Personas Used</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.personasUsed}</p>
-            </div>
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <span className="text-green-600 text-sm">👥</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Briefs Published</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.briefsPublished}</p>
-            </div>
-            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <span className="text-purple-600 text-sm">📄</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Avg Diversity Score</p>
-              <p className="text-2xl font-bold text-gray-900">{(stats.avgDiversityScore * 100).toFixed(1)}%</p>
-            </div>
-            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <span className="text-orange-600 text-sm">🎯</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Features */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Features</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start space-x-3">
-            <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-blue-600 text-xs">🔍</span>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900">Multi-Persona Deliberation</h4>
-              <p className="text-sm text-gray-600">Debate topics from diverse perspectives including Security, Ethics, Finance, and Policy lenses</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-green-600 text-xs">🛡️</span>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900">Safety Gates</h4>
-              <p className="text-sm text-gray-600">Built-in harm detection and content filtering to ensure responsible AI usage</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-purple-600 text-xs">📊</span>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900">Auditable Briefs</h4>
-              <p className="text-sm text-gray-600">Complete audit trail with attestation hashes for transparency and compliance</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3">
-            <div className="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-orange-600 text-xs">🔗</span>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900">Integration Ready</h4>
-              <p className="text-sm text-gray-600">Publish directly to Slack and Confluence with customizable templates</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Available Personas */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Personas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {descriptor.personas.map((persona, index) => (
-            <div key={persona.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-blue-600 text-xs">{persona.lens.charAt(0)}</span>
-                </div>
-                <h4 className="font-medium text-gray-900">{persona.name}</h4>
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px' }}>
+          <div style={card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Total Deliberations</p>
+                <p style={{ margin: '6px 0 0', fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{stats.totalDeliberations}</p>
               </div>
-              <p className="text-sm text-gray-600 mb-2">{persona.lens} • {persona.region}</p>
-              <p className="text-xs text-gray-500">{persona.expertise_tags}</p>
+              <div style={{ width: 32, height: 32, background: '#dbeafe', color: '#2563eb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏛️</div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* MCP Integration Info */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200 p-6">
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-            <span className="text-blue-600 text-sm">🔌</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">MCP Integration</h3>
+          <div style={card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Personas Used</p>
+                <p style={{ margin: '6px 0 0', fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{stats.personasUsed}</p>
+              </div>
+              <div style={{ width: 32, height: 32, background: '#dcfce7', color: '#16a34a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👥</div>
+            </div>
+          </div>
+          <div style={card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Briefs Published</p>
+                <p style={{ margin: '6px 0 0', fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{stats.briefsPublished}</p>
+              </div>
+              <div style={{ width: 32, height: 32, background: '#ede9fe', color: '#7c3aed', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📄</div>
+            </div>
+          </div>
+          <div style={card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: '#64748b' }}>Avg Diversity Score</p>
+                <p style={{ margin: '6px 0 0', fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{(stats.avgDiversityScore * 100).toFixed(1)}%</p>
+              </div>
+              <div style={{ width: 32, height: 32, background: '#ffedd5', color: '#f59e0b', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎯</div>
+            </div>
+          </div>
         </div>
-        <p className="text-gray-700 mb-3">
-          The Council Agent supports Model Context Protocol (MCP) for seamless integration with external AI systems and tools.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">council.generate</span>
-          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">publish.slack</span>
-          <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">publish.confluence</span>
+
+        {/* Key Features */}
+        <div style={card}>
+          <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>Key Features</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <Feature icon="🔍" title="Multi-Persona Deliberation" desc="Debate topics from diverse perspectives including Security, Ethics, Finance, and Policy lenses" color="#2563eb" bg="#dbeafe" />
+            <Feature icon="🛡️" title="Safety Gates" desc="Built-in harm detection and content filtering to ensure responsible AI usage" color="#16a34a" bg="#dcfce7" />
+            <Feature icon="📊" title="Auditable Briefs" desc="Complete audit trail with attestation hashes for transparency and compliance" color="#7c3aed" bg="#ede9fe" />
+            <Feature icon="🔗" title="Integration Ready" desc="Publish directly to Slack and Confluence with customizable templates" color="#f59e0b" bg="#ffedd5" />
+          </div>
         </div>
-      </div>
+
+        {/* Personas */}
+        <div style={card}>
+          <h3 style={{ margin: 0, marginBottom: 12, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>Available Personas</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
+            {descriptor.personas.map((persona) => (
+              <div key={persona.id} style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div style={{ width: 24, height: 24, background: '#dbeafe', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: '#2563eb', fontSize: 12 }}>{persona.lens.charAt(0)}</span>
+                  </div>
+                  <h4 style={{ margin: 0, fontWeight: 600, color: '#0f172a' }}>{persona.name}</h4>
+                </div>
+                <p style={{ margin: 0, marginBottom: 6, fontSize: 12, color: '#475569' }}>{persona.lens} • {persona.region}</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>{persona.expertise_tags}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* MCP */}
+        <div style={{ border: '1px solid #bfdbfe', background: 'linear-gradient(90deg,#eff6ff,#f5f3ff)', borderRadius: 16, padding: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ width: 32, height: 32, background: '#dbeafe', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#2563eb', fontSize: 16 }}>🔌</span>
+            </div>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>MCP Integration</h3>
+          </div>
+          <p style={{ margin: 0, marginBottom: 10, color: '#334155' }}>The Council Agent supports Model Context Protocol (MCP) for seamless integration with external AI systems and tools.</p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ padding: '6px 10px', background: '#dbeafe', color: '#1d4ed8', borderRadius: 999, fontSize: 12 }}>council.generate</span>
+            <span style={{ padding: '6px 10px', background: '#dcfce7', color: '#047857', borderRadius: 999, fontSize: 12 }}>publish.slack</span>
+            <span style={{ padding: '6px 10px', background: '#efe9ff', color: '#6b21a8', borderRadius: 999, fontSize: 12 }}>publish.confluence</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+function Feature({ icon, title, desc, color, bg }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      <div style={{ width: 24, height: 24, background: bg, color, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <span style={{ fontSize: 12 }}>{icon}</span>
+      </div>
+      <div>
+        <h4 style={{ margin: 0, fontWeight: 600, color: '#0f172a' }}>{title}</h4>
+        <p style={{ margin: '4px 0 0', fontSize: 13, color: '#475569' }}>{desc}</p>
+      </div>
+    </div>
+  );
+}
 
 export default Overview;
