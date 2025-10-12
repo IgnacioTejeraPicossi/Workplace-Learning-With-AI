@@ -4,6 +4,7 @@ export default function AgentOpsRuns() {
   const [items, setItems] = useState([]);
   const [module, setModule] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showAllRuns, setShowAllRuns] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -156,7 +157,11 @@ export default function AgentOpsRuns() {
             </p>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div>
+            <div style={{ 
+              overflowX: 'auto',
+              ...(showAllRuns ? { maxHeight: '420px', overflowY: 'auto' } : {})
+            }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
                 <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
@@ -229,7 +234,7 @@ export default function AgentOpsRuns() {
             </tr>
           </thead>
           <tbody>
-                {items.map((item, index) => (
+                {(showAllRuns ? items : items.slice(0, 8)).map((item, index) => (
                   <tr 
                     key={item.run_id} 
                     style={{ 
@@ -352,6 +357,34 @@ export default function AgentOpsRuns() {
             ))}
           </tbody>
         </table>
+            </div>
+
+            {items.length > 8 && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.75rem' }}>
+                <button
+                  onClick={() => setShowAllRuns(!showAllRuns)}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#374151',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#f9fafb';
+                    e.target.style.borderColor = '#3b82f6';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#ffffff';
+                    e.target.style.borderColor = '#d1d5db';
+                  }}
+                >
+                  {showAllRuns ? 'Show less' : `Show all (${items.length - 8} more)`}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

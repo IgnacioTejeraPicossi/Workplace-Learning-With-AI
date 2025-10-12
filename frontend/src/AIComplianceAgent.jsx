@@ -14,6 +14,7 @@ const AIComplianceAgent = () => {
   const [risks, setRisks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showAllDocs, setShowAllDocs] = useState(false);
 
   // Load saved document analyses
   useEffect(() => {
@@ -363,8 +364,14 @@ const AIComplianceAgent = () => {
                 Available Documents:
               </h3>
               {documents.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {documents.map(doc => (
+                <div>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '8px',
+                    ...(showAllDocs ? { maxHeight: '360px', overflowY: 'auto', paddingRight: '4px' } : {})
+                  }}>
+                    {(showAllDocs ? documents : documents.slice(0, 4)).map(doc => (
                     <div
                       key={doc.id}
                       onClick={() => {
@@ -418,7 +425,35 @@ const AIComplianceAgent = () => {
                         Click to analyze
                       </span>
                     </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  {documents.length > 4 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                      <button
+                        onClick={() => setShowAllDocs(!showAllDocs)}
+                        style={{
+                          backgroundColor: '#ffffff',
+                          color: '#374151',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          padding: '8px 12px',
+                          fontSize: '0.9rem',
+                          cursor: 'pointer'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.backgroundColor = '#f9fafb';
+                          e.target.style.borderColor = '#3b82f6';
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.backgroundColor = '#ffffff';
+                          e.target.style.borderColor = '#d1d5db';
+                        }}
+                      >
+                        {showAllDocs ? 'Show less' : `Show all (${documents.length - 4} more)`}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div style={{
