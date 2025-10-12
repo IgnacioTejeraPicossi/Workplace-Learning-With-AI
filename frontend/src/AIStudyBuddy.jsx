@@ -12,6 +12,13 @@ function AIStudyBuddy({ user, query = "" }) {
   // Use streaming for AI responses
   const aiStreaming = useStreaming();
 
+  // Context for agents and README (optional, non-breaking)
+  const [agentsBrief, setAgentsBrief] = useState("");
+  const [agentOptions, setAgentOptions] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState("");
+  const [useReadme, setUseReadme] = useState(false);
+  const [readmeSnippet, setReadmeSnippet] = useState("");
+
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -36,6 +43,53 @@ What would you like to learn about today?`,
       ]);
     }
   }, []);
+
+  // Load agent catalog (concise) once
+  useEffect(() => {
+    const loadAgents = async () => {
+      try {
+        const res = await fetch('/api/agents/catalog');
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        // Build options for quick selector
+        const options = (items || []).map((a) => ({
+          id: a.id || a.agent_id || a.slug || (a.name || a.title || 'agent').toLowerCase().replace(/\s+/g, '-'),
+          name: a.name || a.title || 'Agent'
+        }));
+        setAgentOptions(options);
+        const briefLines = (items || []).map((a) => {
+          const name = a.name || a.title || 'Agent';
+          const desc = (a.description || a.summary || '').replace(/\s+/g, ' ').trim();
+          const short = desc.length > 120 ? desc.slice(0, 120) + '…' : desc;
+          return `- ${name}: ${short}`;
+        });
+        setAgentsBrief(briefLines.slice(0, 12).join('\n'));
+      } catch (e) {
+        // ignore silently to keep current behavior
+      }
+    };
+    loadAgents();
+  }, []);
+
+  // Load README when toggle is on
+  useEffect(() => {
+    const fetchReadme = async () => {
+      if (!useReadme) { setReadmeSnippet(''); return; }
+      try {
+        const res = await fetch('/api/readme');
+        const data = await res.json();
+        if (data?.success && data?.markdown) {
+          setReadmeSnippet(data.markdown.slice(0, 2500));
+        } else {
+          setReadmeSnippet('');
+        }
+      } catch {
+        setReadmeSnippet('');
+      }
+    };
+    fetchReadme();
+  }, [useReadme]);
 
   // Handle initial query if provided
   useEffect(() => {
@@ -73,25 +127,45 @@ What would you like to learn about today?`,
     }));
 
     // Generate AI response using streaming
+    const readmeContext = useReadme && readmeSnippet ? `\n\nREADME context (truncated):\n${readmeSnippet}` : '';
+
+    // Try to match question to a known agent for a focused answer
+    const findBestAgent = (q) => {
+      try {
+        const ql = q.toLowerCase();
+        const names = (agentsBrief && agentsBrief.split('\n')) || [];
+        // We also keep a parsed list from the catalog fetch by reusing brief lines
+        // Simple match: pick first line containing a word from the question
+        let best = null;
+        let bestScore = 0;
+        const tokens = ql.split(/[^a-z0-9]+/).filter(Boolean);
+        names.forEach((line) => {
+          const name = line.replace(/^[-\s]*/, '').split(':')[0] || '';
+          const nl = name.toLowerCase();
+          const overlap = tokens.filter(t => nl.includes(t)).length;
+          if (overlap > bestScore) { bestScore = overlap; best = name; }
+        });
+        return bestScore > 0 ? best : null;
+      } catch { return null; }
+    };
+
+    const matchedAgentName = findBestAgent(messageText);
+
+    const focusedPromptForAgent = (agentName) => `Answer ONLY about "${agentName}".
+- What it does (1–2 lines)
+- How to demo it in the UI (path + botones exactos)
+- Key API endpoints
+- Required env vars/external services
+- 3 value bullets
+Formato: 7–10 líneas, con viñetas, sin preámbulos, sin otros agentes.`;
+
+    const generalPrompt = `User question: "${messageText}"
+Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita información no solicitada.`;
+
+    const promptToUse = matchedAgentName ? focusedPromptForAgent(matchedAgentName) : generalPrompt;
+
     aiStreaming.startStreaming(
-      `You are an AI Study Buddy for a workplace learning platform. A user is asking questions about learning content, career development, or workplace skills.
-
-User Question: "${messageText}"
-
-Context about the platform:
-- This is an AI-powered workplace learning platform
-- Features include: AI Concepts Generation, Micro-lessons, Scenario Simulator, AI Career Coach, Skills Forecasting, Team Dynamics Analyzer, Certifications, Video Lessons
-- The platform uses GPT-4 for content generation
-- Users can save lessons and track progress
-
-Please provide a helpful, educational response that:
-1. Directly answers the user's question
-2. Provides practical examples when relevant
-3. Suggests related learning opportunities
-4. Maintains a friendly, encouraging tone
-5. Keeps responses concise but informative
-
-If the user asks about specific features, explain how they work and their benefits.`,
+      promptToUse,
       {
         statusMessages: STATUS_MESSAGES.QA,
         onComplete: (content) => {
@@ -280,7 +354,68 @@ If the user asks about specific features, explain how they work and their benefi
         borderRadius: '0 0 12px 12px',
         borderTop: `1px solid ${colors.border}`
       }}>
+        {/* Controls Row: README toggle + Agent selector */}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: 12 }}>
+          {/* Toggle for README context (non-intrusive) */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85em', color: colors.textSecondary }}>
+            <input
+              type="checkbox"
+              checked={useReadme}
+              onChange={(e) => setUseReadme(e.target.checked)}
+              style={{ transform: 'scale(1.1)' }}
+            />
+            Use README context
+          </label>
+
+          {/* Quick Agent Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>Agent:</span>
+            <select
+              value={selectedAgent}
+              onChange={(e) => {
+                const name = e.target.value;
+                setSelectedAgent(name);
+                if (name) {
+                  setInputMessage(`Explain ${name}`);
+                }
+              }}
+              style={{
+                minWidth: 220,
+                padding: '8px 10px',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: '0.9em'
+              }}
+            >
+              <option value="">Select an agent…</option>
+              {agentOptions.map((opt) => (
+                <option key={opt.id} value={opt.name}>{opt.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* README Preview (3–4 lines) */}
+        {useReadme && readmeSnippet && (
+          <div style={{
+            marginBottom: 12,
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px solid ${colors.border}`,
+            background: colors.background,
+            color: colors.textSecondary,
+            fontSize: '0.85em',
+            whiteSpace: 'pre-wrap'
+          }}>
+            {(readmeSnippet.split('\n').slice(0, 4).join('\n')).trim()}
+            {readmeSnippet.split('\n').length > 4 ? ' …' : ''}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: '12px' }}>
+
           <input
             type="text"
             value={inputMessage}
