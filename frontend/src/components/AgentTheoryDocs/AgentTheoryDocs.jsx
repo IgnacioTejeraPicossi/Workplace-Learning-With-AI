@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './AgentTheoryDocs.css';
 
 const AgentTheoryDocs = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
+  const [results, setResults] = useState([]);
+
+  const slugify = (str) =>
+    (str || '')
+      .toString()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
 
   // Datos de ejemplo - se reemplazarán con la información real del usuario
   const documentationData = {
@@ -591,10 +599,141 @@ const AgentTheoryDocs = () => {
         }
   };
 
-  const filteredData = (data) => {
-    if (!searchTerm) return data;
-    // Simple search implementation - can be enhanced
-    return data;
+  // Build a simple in-memory search index across tabs (titles only)
+  const searchIndex = useMemo(() => {
+    const idx = [];
+
+    // Theory: sections and items
+    try {
+      (documentationData.theory.sections || []).forEach((section) => {
+        const sectionId = `theory-${slugify(section.title)}`;
+        idx.push({
+          tab: 'theory',
+          anchorId: sectionId,
+          title: section.title,
+          path: 'Theory'
+        });
+        (section.items || []).forEach((item) => {
+          const itemId = `theory-${slugify(item.title)}`;
+          idx.push({
+            tab: 'theory',
+            anchorId: itemId,
+            title: item.title,
+            subtitle: item.description,
+            path: `Theory › ${section.title}`
+          });
+        });
+      });
+    } catch {}
+
+    // Tool Stack: categories and tools
+    try {
+      (documentationData.toolStack.categories || []).forEach((category) => {
+        const catId = `toolstack-${slugify(category.name)}`;
+        idx.push({
+          tab: 'toolstack',
+          anchorId: catId,
+          title: category.name,
+          subtitle: category.focus,
+          path: 'Tool Stack'
+        });
+        (category.tools || []).forEach((tool) => {
+          const toolId = `toolstack-${slugify(tool.name)}`;
+          idx.push({
+            tab: 'toolstack',
+            anchorId: toolId,
+            title: tool.name,
+            subtitle: tool.description,
+            path: `Tool Stack › ${category.name}`
+          });
+        });
+      });
+    } catch {}
+
+    // Web Apps: categories and apps
+    try {
+      (documentationData.webApps.categories || []).forEach((category) => {
+        const catId = `webapps-${slugify(category.name)}`;
+        idx.push({
+          tab: 'webapps',
+          anchorId: catId,
+          title: category.name,
+          path: 'Web Apps'
+        });
+        (category.apps || []).forEach((app) => {
+          const appId = `webapps-${slugify(app.name)}`;
+          idx.push({
+            tab: 'webapps',
+            anchorId: appId,
+            title: app.name,
+            subtitle: app.description,
+            path: `Web Apps › ${category.name}`
+          });
+        });
+      });
+    } catch {}
+
+    // Hackathons: events
+    try {
+      (documentationData.hackathons.events || []).forEach((ev) => {
+        const evId = `hackathons-${ev.id || slugify(ev.name)}`;
+        idx.push({
+          tab: 'hackathons',
+          anchorId: evId,
+          title: ev.name,
+          subtitle: ev.description,
+          path: 'Hackathons'
+        });
+      });
+    } catch {}
+
+    // Resources: items and videos
+    try {
+      (documentationData.resources.items || []).forEach((res) => {
+        const resId = `resources-${slugify(res.title)}`;
+        idx.push({
+          tab: 'resources',
+          anchorId: resId,
+          title: res.title,
+          subtitle: res.description,
+          path: 'Resources'
+        });
+      });
+      (documentationData.resources.videos || []).forEach((vid) => {
+        const vidId = `resources-video-${slugify(vid.title)}`;
+        idx.push({
+          tab: 'resources',
+          anchorId: vidId,
+          title: vid.title,
+          subtitle: vid.description,
+          path: 'Resources › Video'
+        });
+      });
+    } catch {}
+
+    return idx;
+  }, []);
+
+  useEffect(() => {
+    const q = (searchTerm || '').trim().toLowerCase();
+    if (!q) { setResults([]); return; }
+    const matched = searchIndex.filter(r =>
+      r.title.toLowerCase().includes(q) || (r.subtitle && r.subtitle.toLowerCase().includes(q))
+    );
+    setResults(matched.slice(0, 20));
+  }, [searchTerm, searchIndex]);
+
+  const navigateToResult = (res) => {
+    setActiveTab(res.tab);
+    // Wait one tick for tab content to render before scrolling
+    setTimeout(() => {
+      const el = document.getElementById(res.anchorId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.add('search-hit');
+        setTimeout(() => el.classList.remove('search-hit'), 1200);
+      }
+    }, 0);
   };
 
   const renderOverview = () => (
@@ -641,11 +780,11 @@ const AgentTheoryDocs = () => {
     <div className="theory-section">
       <h3>Agent Theory & Concepts</h3>
       {documentationData.theory.sections.map((section, index) => (
-        <div key={index} className="theory-category">
+        <div key={index} className="theory-category" id={`theory-${slugify(section.title)}`}>
           <h4>{section.title}</h4>
           <div className="theory-items">
             {section.items.map((item, itemIndex) => (
-              <div key={itemIndex} className="theory-item">
+              <div key={itemIndex} className="theory-item" id={`theory-${slugify(item.title)}`}>
                 <div className="item-header">
                   <h5>{item.title}</h5>
                   <span className={`status-badge ${item.status}`}>
@@ -734,11 +873,11 @@ const AgentTheoryDocs = () => {
     <div className="webapps-section">
       <h3>Web Applications & Tools</h3>
       {documentationData.webApps.categories.map((category, index) => (
-        <div key={index} className="webapp-category">
+        <div key={index} className="webapp-category" id={`webapps-${slugify(category.name)}`}>
           <h4>{category.name}</h4>
           <div className="webapp-grid">
             {category.apps.map((app, appIndex) => (
-              <div key={appIndex} className="webapp-card">
+              <div key={appIndex} className="webapp-card" id={`webapps-${slugify(app.name)}`}>
                 <div className="webapp-header">
                   <h5>{app.name}</h5>
                   <span className={`status-badge ${app.status}`}>
@@ -766,7 +905,7 @@ const AgentTheoryDocs = () => {
       </p>
       
       {documentationData.hackathons.events.map((hackathon, index) => (
-        <div key={hackathon.id} className="hackathon-card">
+        <div key={hackathon.id} className="hackathon-card" id={`hackathons-${hackathon.id || slugify(hackathon.name)}`}>
           <div className="hackathon-header">
             <h4>{hackathon.name}</h4>
             <span className={`status-badge ${hackathon.status}`}>
@@ -884,7 +1023,7 @@ const AgentTheoryDocs = () => {
 
       <div className="categories-grid">
         {documentationData.toolStack.categories.map((category, index) => (
-          <div key={category.id} className="category-card" style={{ borderLeftColor: category.color }}>
+          <div key={category.id} className="category-card" id={`toolstack-${slugify(category.name)}`} style={{ borderLeftColor: category.color }}>
             <div className="category-header">
               <div className="category-icon">{category.icon}</div>
               <div className="category-info">
@@ -895,7 +1034,7 @@ const AgentTheoryDocs = () => {
             
             <div className="tools-grid">
               {category.tools.map((tool, toolIndex) => (
-                <div key={toolIndex} className="tool-card">
+                <div key={toolIndex} className="tool-card" id={`toolstack-${slugify(tool.name)}`}>
                   <div className="tool-header">
                     <h5>{tool.name}</h5>
                     <span className={`importance-badge ${tool.importance.toLowerCase()}`}>
@@ -923,7 +1062,7 @@ const AgentTheoryDocs = () => {
           <h4>🎥 Video Content</h4>
           <div className="videos-grid">
             {documentationData.resources.videos.map((video, index) => (
-              <div key={index} className="video-card">
+              <div key={index} className="video-card" id={`resources-video-${slugify(video.title)}`}>
                 <div className="video-header">
                   <h5>{video.title}</h5>
                   <span className={`importance-badge ${video.importance.toLowerCase().includes('high') ? 'high' : 'medium'}`}>
@@ -1101,7 +1240,7 @@ const AgentTheoryDocs = () => {
         <h4>📚 Other Resources</h4>
         <div className="resources-grid">
           {documentationData.resources.items.map((resource, index) => (
-            <div key={index} className="resource-card">
+            <div key={index} className="resource-card" id={`resources-${slugify(resource.title)}`}>
               <div className="resource-icon">📁</div>
               <div className="resource-content">
                 <h5>{resource.title}</h5>
@@ -1131,6 +1270,29 @@ const AgentTheoryDocs = () => {
           />
           <button className="search-button">🔍</button>
         </div>
+
+        {searchTerm && (
+          <div className="search-results">
+            {results.length === 0 ? (
+              <div className="search-result-empty">No results</div>
+            ) : (
+              results.map((r, i) => (
+                <button
+                  key={`${r.anchorId}-${i}`}
+                  className="search-result-item"
+                  onClick={() => navigateToResult(r)}
+                  title={r.subtitle || ''}
+                >
+                  <div className="result-title">{r.title}</div>
+                  <div className="result-meta">
+                    <span className={`result-badge result-${r.tab}`}>{r.tab}</span>
+                    <span className="result-path">{r.path}</span>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       <div className="docs-tabs">
