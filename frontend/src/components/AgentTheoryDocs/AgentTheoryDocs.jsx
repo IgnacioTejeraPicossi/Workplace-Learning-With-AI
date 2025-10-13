@@ -602,6 +602,7 @@ const AgentTheoryDocs = () => {
   // Build a simple in-memory search index across tabs (titles only)
   const searchIndex = useMemo(() => {
     const idx = [];
+    const join = (arr) => (arr || []).filter(Boolean).join(' ');
 
     // Theory: sections and items
     try {
@@ -611,16 +612,22 @@ const AgentTheoryDocs = () => {
           tab: 'theory',
           anchorId: sectionId,
           title: section.title,
-          path: 'Theory'
+          path: 'Theory',
+          blob: [section.title].join(' ')
         });
         (section.items || []).forEach((item) => {
           const itemId = `theory-${slugify(item.title)}`;
+          const content = item.content || {};
+          const keyPoints = join(content.keyPoints);
+          const keyTerms = join((content.keyTerms || []).map((t) => `${t.term} ${t.definition} ${t.useCase}`));
+          const extra = [content.coreLoop, content.keyInsight, content.advice, content.source].filter(Boolean).join(' ');
           idx.push({
             tab: 'theory',
             anchorId: itemId,
             title: item.title,
             subtitle: item.description,
-            path: `Theory › ${section.title}`
+            path: `Theory › ${section.title}`,
+            blob: [item.title, item.description, keyPoints, keyTerms, extra].filter(Boolean).join(' ')
           });
         });
       });
@@ -635,7 +642,8 @@ const AgentTheoryDocs = () => {
           anchorId: catId,
           title: category.name,
           subtitle: category.focus,
-          path: 'Tool Stack'
+          path: 'Tool Stack',
+          blob: [category.name, category.focus].join(' ')
         });
         (category.tools || []).forEach((tool) => {
           const toolId = `toolstack-${slugify(tool.name)}`;
@@ -644,7 +652,8 @@ const AgentTheoryDocs = () => {
             anchorId: toolId,
             title: tool.name,
             subtitle: tool.description,
-            path: `Tool Stack › ${category.name}`
+            path: `Tool Stack › ${category.name}`,
+            blob: [tool.name, tool.description, tool.category, tool.importance].join(' ')
           });
         });
       });
@@ -658,7 +667,8 @@ const AgentTheoryDocs = () => {
           tab: 'webapps',
           anchorId: catId,
           title: category.name,
-          path: 'Web Apps'
+          path: 'Web Apps',
+          blob: [category.name].join(' ')
         });
         (category.apps || []).forEach((app) => {
           const appId = `webapps-${slugify(app.name)}`;
@@ -667,7 +677,8 @@ const AgentTheoryDocs = () => {
             anchorId: appId,
             title: app.name,
             subtitle: app.description,
-            path: `Web Apps › ${category.name}`
+            path: `Web Apps › ${category.name}`,
+            blob: [app.name, app.description, app.url, app.status].join(' ')
           });
         });
       });
@@ -682,7 +693,17 @@ const AgentTheoryDocs = () => {
           anchorId: evId,
           title: ev.name,
           subtitle: ev.description,
-          path: 'Hackathons'
+          path: 'Hackathons',
+          blob: [
+            ev.name,
+            ev.description,
+            ev.challenge,
+            join(ev.features),
+            ev.benefits,
+            ev.organizer,
+            ev.location,
+            ev.date
+          ].join(' ')
         });
       });
     } catch {}
@@ -696,7 +717,8 @@ const AgentTheoryDocs = () => {
           anchorId: resId,
           title: res.title,
           subtitle: res.description,
-          path: 'Resources'
+          path: 'Resources',
+          blob: [res.title, res.description].join(' ')
         });
       });
       (documentationData.resources.videos || []).forEach((vid) => {
@@ -706,7 +728,8 @@ const AgentTheoryDocs = () => {
           anchorId: vidId,
           title: vid.title,
           subtitle: vid.description,
-          path: 'Resources › Video'
+          path: 'Resources › Video',
+          blob: [vid.title, vid.description, vid.category, vid.platform].join(' ')
         });
       });
     } catch {}
@@ -717,9 +740,10 @@ const AgentTheoryDocs = () => {
   useEffect(() => {
     const q = (searchTerm || '').trim().toLowerCase();
     if (!q) { setResults([]); return; }
-    const matched = searchIndex.filter(r =>
-      r.title.toLowerCase().includes(q) || (r.subtitle && r.subtitle.toLowerCase().includes(q))
-    );
+    const matched = searchIndex.filter(r => {
+      const blob = (r.blob || `${r.title} ${r.subtitle || ''}`).toLowerCase();
+      return blob.includes(q);
+    });
     setResults(matched.slice(0, 20));
   }, [searchTerm, searchIndex]);
 
@@ -1288,6 +1312,21 @@ const AgentTheoryDocs = () => {
                     <span className={`result-badge result-${r.tab}`}>{r.tab}</span>
                     <span className="result-path">{r.path}</span>
                   </div>
+                  {r.blob && (
+                    <div className="result-snippet">
+                      {(() => {
+                        const blob = (r.blob || '').toString();
+                        const ql = (searchTerm || '').toLowerCase();
+                        const pos = blob.toLowerCase().indexOf(ql);
+                        if (pos === -1) return null;
+                        const start = Math.max(0, pos - 40);
+                        const end = Math.min(blob.length, pos + ql.length + 40);
+                        const prefix = start > 0 ? '…' : '';
+                        const suffix = end < blob.length ? '…' : '';
+                        return `${prefix}${blob.slice(start, end)}${suffix}`;
+                      })()}
+                    </div>
+                  )}
                 </button>
               ))
             )}
