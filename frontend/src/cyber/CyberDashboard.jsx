@@ -297,27 +297,13 @@ export default function CyberDashboard() {
           Comprehensive overview of cybersecurity concepts, threats, frameworks, and ecosystem
         </p>
         
-        {/* Cybersecurity 101 Visual Diagram */}
+        {/* Cybersecurity 101 Visual Diagram + Content */}
         <div style={{ 
           backgroundColor: '#f8fafc',
           borderRadius: '0.5rem',
           padding: '1.5rem',
           border: '1px solid #e2e8f0'
         }}>
-          {/* Cybersecurity 101 Diagram Image */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <img 
-              src="/images/cybersecurity-101-diagram.png" 
-              alt="Cybersecurity 101 Comprehensive Diagram"
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                border: '1px solid #e5e7eb'
-              }}
-            />
-          </div>
 
           {/* Threat Categories Grid */}
           <div style={{ 
@@ -453,6 +439,21 @@ export default function CyberDashboard() {
                 <div>Signals analyzed daily by Microsoft</div>
               </div>
             </div>
+          </div>
+
+          {/* Cybersecurity 101 Diagram Image moved to bottom */}
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <img 
+              src="/images/cybersecurity-101-diagram.png" 
+              alt="Cybersecurity 101 Comprehensive Diagram"
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: '0.5rem',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #e5e7eb'
+              }}
+            />
           </div>
         </div>
       </div>

@@ -109,8 +109,6 @@ const getNavItems = (t) => [
   // Grupo 1.8: Item Agents (nuevo grupo para agentes)
   { key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
     { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
-    { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain" },
-    { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
     { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" },
@@ -122,11 +120,15 @@ const getNavItems = (t) => [
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" }
   ]},
   
+  // Robomind Clinic (moved out of Item Agents, placed above Cybersecurity)
+  { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain", group: "learning" },
+  
   // Grupo 1.9: Cybersecurity (nuevo grupo para seguridad)
   { key: "cybersecurity", label: t('sidebar.cybersecurity'), icon: "shield", group: "learning" },
   
   // Grupo 2: Ayuda del sistema (fondo verde)
   { key: "help", label: t('sidebar.help'), icon: "help", group: "help", isExpandable: true, subItems: [
+    { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
     { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" }
   ]},

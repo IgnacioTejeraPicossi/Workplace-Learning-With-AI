@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import ActionDispatchModal from './components/ActionDispatchModal';
 import AgentOpsRuns from './components/AgentOpsRuns';
+import PromptPanel from './components/PromptPanel';
 import { buildComplianceSpec } from './utils/complianceMapper';
 
 const AIComplianceAgent = () => {
@@ -42,7 +43,7 @@ const AIComplianceAgent = () => {
     // Simulate analysis delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Always set the analysis results
+    // Default baseline (native) outcome; can be overwritten by PromptPanel test
     setSummary('This document contains compliance requirements that need to be implemented in OutSystems applications.');
     setRisks([
       'Data Privacy Compliance',
@@ -478,6 +479,19 @@ const AIComplianceAgent = () => {
           )}
         </div>
       </div>
+
+      {/* Prompt Manager (always available) */}
+      <PromptPanel
+        agent="compliance"
+        colors={colors}
+        nativePromptText={
+          `Summarize a compliance document into a concise brief and list 3-5 key risks.
+Return markdown in two sections:\n\nSummary:\n- ...\n\nKey Risks:\n- ...\n`}
+        onUseResult={(r)=>{
+          if (r?.summary) setSummary(r.summary);
+          if (Array.isArray(r?.risks) && r.risks.length) setRisks(r.risks);
+        }}
+      />
 
       {/* Agent Runs Monitor */}
       <div style={{ 

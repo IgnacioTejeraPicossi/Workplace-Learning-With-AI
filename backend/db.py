@@ -43,3 +43,6 @@ web_search_collection = database.get_collection("web_search")
 skills_forecast_collection = database.get_collection("skills_forecasts")  # CORRECTED: Use consistent name
 career_coach_collection = database.get_collection("career_coach")
 simulation_results_collection = database.get_collection("simulation_results")
+
+# Prompts Collection
+prompts_collection = database.get_collection("prompts")

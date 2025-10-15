@@ -82,7 +82,7 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
       };
 
       // Sign the bundle (in production, this is done server-side)
-      const signRes = await fetch('/api/dev/sign', {
+      const signRes = await fetch('http://localhost:8000/api/dev/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bundle),
@@ -90,7 +90,7 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
       const signature = await signRes.text();
 
       // Execute the bundle
-      const res = await fetch('/agents/ea/execute', {
+      const res = await fetch('http://localhost:8000/agents/ea/execute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

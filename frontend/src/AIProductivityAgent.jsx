@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import ActionDispatchModal from './components/ActionDispatchModal';
 import AgentOpsRuns from './components/AgentOpsRuns';
+import PromptPanel from './components/PromptPanel';
 import { buildProductivitySpec } from './utils/productivityMapper';
 
 const AIProductivityAgent = () => {
@@ -484,6 +485,19 @@ const AIProductivityAgent = () => {
           )}
         </div>
       </div>
+
+      {/* Prompt Manager (always available) */}
+      <PromptPanel
+        agent="productivity"
+        colors={colors}
+        nativePromptText={
+          `Analyze the given URL and produce:\n1) SUMMARY (5-7 sentences)\n2) ACTIONS: five concrete next steps (imperative voice).\nFormat exactly as:\nSUMMARY: ...\n\nACTIONS:\n1. ...\n2. ...\n3. ...\n4. ...\n5. ...`
+        }
+        onUseResult={(r)=>{
+          if (r?.summary) setSummary(r.summary);
+          if (Array.isArray(r?.actions) && r.actions.length) setNextActions(r.actions);
+        }}
+      />
 
       {/* Agent Runs Monitor */}
       <div style={{ 

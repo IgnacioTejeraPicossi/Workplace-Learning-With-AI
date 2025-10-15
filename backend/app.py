@@ -117,6 +117,13 @@ except ImportError:
     from cursor_ai_automation import router as cursor_automation_router
 app.include_router(cursor_automation_router, prefix="/api", tags=["Cursor AI Automation"])
 
+# Prompts Editor router
+try:
+    from backend.routers.prompts_editor import router as prompts_editor_router
+except ImportError:
+    from routers.prompts_editor import router as prompts_editor_router
+app.include_router(prompts_editor_router)
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings

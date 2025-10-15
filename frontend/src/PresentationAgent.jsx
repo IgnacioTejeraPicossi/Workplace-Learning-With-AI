@@ -263,6 +263,44 @@ function PresentationAgent() {
     );
   };
 
+  // Generate script summarizing all implemented agents (hackathon agents overview)
+  const handleGenerateAgentsScript = async () => {
+    setPresentationMode('script-agents');
+
+    const list = (agents || []).slice(0, 24).map((a) => {
+      const name = a.name || a.title || 'Agent';
+      const desc = (a.description || a.summary || '').replace(/\s+/g, ' ').trim();
+      const short = desc.length > 160 ? desc.slice(0, 160) + '…' : desc;
+      return `- ${name}: ${short}`;
+    }).join('\n');
+
+    const readmeContext = useReadme && readmeSnippet ? `\n\nREADME context (truncated):\n${readmeSnippet}` : '';
+
+    scriptStreaming.startStreaming(
+      `Create a 4–5 minute hackathon presentation script called "Hackathon Agents in 5 Minutes". Audience: mixed business + technical judges. Tone: energetic, crisp, confident.
+
+Goals:
+- Introduce the overall app in 2–3 sentences
+- For each agent below: name, what it does (1 line), how to demo it in THIS UI (tab/path + 1–2 clicks), key API/flow if relevant (dispatch/runs/n8n), and 1 value bullet
+- Keep pace fast, bullet-heavy, speaker-ready
+- End with a 3-bullet closing value pitch
+
+Agents implemented (name: short summary):\n${list}${readmeContext}
+
+Constraints:
+- English
+- 4–5 minutes spoken (~600–750 words)
+- Do not invent agents not in the list
+- Use clear section headers per agent`,
+      {
+        statusMessages: STATUS_MESSAGES.PRESENTATION,
+        onComplete: (content) => {
+          setPresentationScript(content || 'No script generated');
+        }
+      }
+    );
+  };
+
   // Enhanced Q&A handling with knowledge base
   const handleAskQuestion = async () => {
     // Show the complete Q&A panel immediately when clicked
@@ -1008,6 +1046,32 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             </p>
           </div>
 
+          {/* Generate Script Hackathon Agents */}
+          <div
+            style={{
+              padding: 20,
+              background: colors.cardBackground,
+              borderRadius: 12,
+              border: `2px solid ${colors.border}`,
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onClick={handleGenerateAgentsScript}
+            onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
+            onMouseLeave={(e) => e.target.style.borderColor = colors.border}
+          >
+            <div style={{ fontSize: '2.5em', marginBottom: 12 }}>🏆</div>
+            <h3 style={{ marginBottom: 8, color: colors.text }}>Generate Script Hackathon Agents</h3>
+            <p style={{ 
+              color: colors.textSecondary, 
+              fontSize: '0.9em',
+              lineHeight: 1.4
+            }}>
+              One-click script that presents all implemented agents in 5 minutes
+            </p>
+          </div>
+
           {/* Q&A Mode */}
           <div
             style={{
@@ -1064,8 +1128,8 @@ This demonstrates the comprehensive learning journey our platform provides.`,
         </div>
       </div>
 
-      {/* Script Generation Mode - MOVED ABOVE Advanced Settings */}
-      {presentationMode === 'script' && (
+      {/* Script Generation Panels */}
+      {(presentationMode === 'script' || presentationMode === 'script-agents') && (
         <div style={{ marginBottom: 24 }}>
           <div style={{ 
             display: 'flex', 
@@ -1078,9 +1142,11 @@ This demonstrates the comprehensive learning journey our platform provides.`,
           }}>
             <span style={{ fontSize: '1.5em' }}>📝</span>
             <div>
-              <h3 style={{ margin: 0, color: colors.text }}>Generating Presentation Script</h3>
+              <h3 style={{ margin: 0, color: colors.text }}>
+                {presentationMode === 'script-agents' ? 'Generating Script: Hackathon Agents in 5 Minutes' : 'Generating Presentation Script'}
+              </h3>
               <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
-                4-Minute Hackathon Presentation
+                {presentationMode === 'script-agents' ? 'Overview of all implemented agents with demo steps' : '4-Minute Hackathon Presentation'}
               </p>
             </div>
           </div>

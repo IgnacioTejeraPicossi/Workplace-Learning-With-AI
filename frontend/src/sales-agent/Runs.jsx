@@ -5,222 +5,70 @@ const Runs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRuns();
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('http://localhost:8000/agents/sales/runs');
+        const data = await res.json();
+        setRuns(Array.isArray(data) ? data : data.items || []);
+      } catch (e) {
+        setRuns([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
-  const fetchRuns = async () => {
-    try {
-      const response = await fetch('/agents/sales/runs?limit=50');
-      const data = await response.json();
-      // Ensure data is an array
-      setRuns(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Failed to fetch runs:', error);
-      setRuns([]); // Set empty array on error
-    } finally {
-      setLoading(false);
-    }
+  const card = {
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    border: '1px solid #e2e8f0'
   };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'DONE':
-        return 'bg-green-100 text-green-800';
-      case 'RUNNING':
-        return 'bg-blue-100 text-blue-800';
-      case 'FAILED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'DONE':
-        return '✅';
-      case 'RUNNING':
-        return '⏳';
-      case 'FAILED':
-        return '❌';
-      default:
-        return '❓';
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">▶️</span>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Sales Agent Runs</h1>
-                <p className="text-gray-600">Monitor execution history and results</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={fetchRuns}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              🔄 Refresh
-            </button>
-          </div>
+    <div style={{ padding: 24, background: '#f8fafc', minHeight: '100vh' }}>
+      <div style={card}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <span style={{ fontSize: 20 }}>▶️</span>
+          <h3 style={{ margin: 0, fontSize: 18, color: '#0f172a' }}>Agent Runs</h3>
         </div>
-
-        {/* Runs Table */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Run ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Topic
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Attestation
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Updated
-                  </th>
+        {loading ? (
+          <div style={{ textAlign: 'center', color: '#64748b' }}>Loading runs…</div>
+        ) : runs.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#64748b' }}>No runs yet</div>
+        ) : (
+          <div style={{ overflowX: 'auto', maxHeight: 460 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Run ID</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Status</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Created</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Error</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {(!runs || !Array.isArray(runs) || runs.length === 0) ? (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
-                      <div className="flex flex-col items-center space-y-2">
-                        <span className="text-4xl">📊</span>
-                        <p>No sales agent runs found</p>
-                        <p className="text-sm">Execute some actions to see them here</p>
-                      </div>
+              <tbody>
+                {runs.map((r, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                    <td style={{ padding: '12px' }}>{r.run_id || r.id}</td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={{
+                        padding: '4px 8px', borderRadius: 8,
+                        background: r.status === 'DONE' ? '#dcfce7' : r.status === 'FAILED' ? '#fee2e2' : '#e0f2fe',
+                        color: r.status === 'DONE' ? '#166534' : r.status === 'FAILED' ? '#991b1b' : '#1d4ed8'
+                      }}>{r.status}</span>
                     </td>
+                    <td style={{ padding: '12px' }}>{r.created_at || '-'}</td>
+                    <td style={{ padding: '12px', color: '#991b1b' }}>{r.error || ''}</td>
                   </tr>
-                ) : (
-                  (runs || []).map((run, index) => (
-                    <tr key={run.run_id || index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {run.run_id || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {run.topic || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(run.status)}`}>
-                          <span className="mr-1">{getStatusIcon(run.status)}</span>
-                          {run.status || 'UNKNOWN'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {run.artifacts ? Object.keys(run.artifacts).length : 0} actions
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-mono text-gray-600">
-                          {run.attestation_hash ? 
-                            `${run.attestation_hash.substring(0, 8)}...` : 
-                            'N/A'
-                          }
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {run.updated_at ? 
-                          new Date(run.updated_at).toLocaleString() : 
-                          'N/A'
-                        }
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* Summary Stats */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total Runs</p>
-                <p className="text-3xl font-bold text-gray-900">{runs?.length || 0}</p>
-              </div>
-              <div className="text-4xl text-gray-500">📊</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Successful</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {runs?.filter(r => r.status === 'DONE').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-green-500">✅</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Running</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  {runs?.filter(r => r.status === 'RUNNING').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-blue-500">⏳</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Failed</p>
-                <p className="text-3xl font-bold text-red-600">
-                  {runs?.filter(r => r.status === 'FAILED').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-red-500">❌</div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

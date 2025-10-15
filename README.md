@@ -1,3 +1,87 @@
+## ✍️ Agent Prompt Manager (Compliance & Productivity)
+
+This release adds a built‑in Prompt Manager to two item agents:
+
+- AI Compliance Agent
+- AI Productivity Agent
+
+The Prompt Manager lets you view the native prompt, create and test new prompts, and save or delete prompts for later reuse. It is designed to make each agent flexible without editing code.
+
+### Where to find it
+
+In each agent screen, the new panel appears between the main “Analysis Results” area and the “Agent Runs Monitor” section. It is always available for the agent.
+
+### What you can do
+
+- Native prompt: Read‑only display of the default prompt the agent uses.
+- Editor: Write a temporary prompt and click “Test” to preview the output.
+- Save: Store a prompt with a name. Saved prompts are listed below with Edit and Delete actions.
+- Update: Modify the selected saved prompt and click “Update”.
+- Test result: Shows the raw LLM output; for these agents the panel also extracts structured fields (see below).
+
+### Behavior by agent
+
+- Compliance:
+  - Test returns a structured response `{ summary, risks[] }` in addition to the raw text.
+  - When you test a prompt, the panel updates the on‑screen “Summary” and “Key Risks” so you can immediately see how it looks.
+
+- Productivity:
+  - Test returns `{ summary, actions[] }` (five suggested next steps) plus the raw text.
+  - When you test a prompt, the panel updates “Summary” and the “Top 5 Next Actions”.
+
+Note: The native analysis flow remains available; if you don’t test a custom prompt, the agents behave as before.
+
+### Storage
+
+- Saved prompts are persisted in MongoDB collection `prompts` with fields:
+  - `agent` ('compliance' | 'productivity'), `name`, `prompt`, `isNative`, `isActive`, timestamps.
+- The native prompt is displayed but not editable nor deletable.
+
+### Backend API
+
+New FastAPI endpoints (all return JSON):
+
+```
+GET    /api/prompts/{agent}                  # list saved prompts
+POST   /api/prompts/{agent}                  # create { name, prompt }
+PUT    /api/prompts/{agent}/{prompt_id}      # update { name?, prompt?, isActive? }
+DELETE /api/prompts/{agent}/{prompt_id}      # delete (blocked for native)
+POST   /api/prompts/{agent}/test             # dry‑run prompt; returns raw output
+                                           # and structured fields per agent
+```
+
+The `/test` endpoint enriches the prompt with minimal context and returns:
+
+- Compliance: `{ ok, output, summary, risks }`
+- Productivity: `{ ok, output, summary, actions }`
+
+### Frontend component
+
+The UI uses a shared component `PromptPanel` with these props:
+
+```
+<PromptPanel
+  agent="compliance" | "productivity"
+  nativePromptText={...}
+  onUseResult={(result) => { /* apply summary/risks or summary/actions */ }}
+  colors={colorsFromTheme}
+/> 
+```
+
+It handles loading/saving prompts, testing, and applying the structured result back into the page.
+
+### Quick workflow
+
+1) Open an agent (Compliance or Productivity)
+2) Scroll to “Prompt Manager”
+3) Write a prompt → Test → Inspect the updated analysis
+4) Save if useful; later you can Edit/Update or Delete from “Saved prompts”
+
+### Notes & next steps
+
+- Current implementation updates the on‑screen analysis from the test result; native flow remains intact.
+- Future enhancements (optional): remember the “last used” prompt per agent, tags & search, and richer context injection for higher‑quality tests.
+
 # 🤖 AI-Powered Workplace Learning Platform
 
 > **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**

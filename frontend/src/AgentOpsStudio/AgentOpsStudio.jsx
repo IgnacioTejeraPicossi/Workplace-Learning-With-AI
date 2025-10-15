@@ -9,15 +9,15 @@ import Settings from './Settings';
 import AgentCatalog from '../components/AgentCatalog';
 
 export default function AgentOpsStudio() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('agent-catalog');
 
   const tabs = [
+    { id: 'agent-catalog', label: 'Agent Catalog', icon: '📚' },
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'prompt-lab', label: 'Prompt Lab', icon: '🧪' },
     { id: 'playbook', label: 'Playbook', icon: '📋' },
     { id: 'flows', label: 'Flow Catalog', icon: '🔄' },
     { id: 'runs', label: 'Runs', icon: '🏃' },
-    { id: 'agent-catalog', label: 'Agent Catalog', icon: '📚' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];
 

@@ -25,20 +25,24 @@ async def execute(bundle: InsightBundle, x_signature: str = Header(...)):
     # Create run in RUNNING state
     run = await runs.create_start(bundle.run_id, module="ea", bundle=bundle.dict())
     
-    artifacts = {}
+    artifacts = {"errors": []}
     try:
-        # Execute actions
+        # Execute actions (tolerant to individual failures)
         for action in bundle.actions:
-            if action.type == "jira.createIssue":
-                artifacts.setdefault("jira", []).append(
-                    await jira.create_issue(action.payload)
-                )
-            elif action.type == "slack.postMessage":
-                artifacts["slack"] = await slack.post_message(action.payload)
-            elif action.type == "confluence.updatePage":
-                artifacts["confluence"] = await confluence.update_page(action.payload)
-            elif action.type == "sheets.appendRow":
-                artifacts["sheets"] = await sheets.append_row(action.payload)
+            try:
+                if action.type == "jira.createIssue":
+                    artifacts.setdefault("jira", []).append(
+                        await jira.create_issue(action.payload)
+                    )
+                elif action.type == "slack.postMessage":
+                    artifacts["slack"] = await slack.post_message(action.payload)
+                elif action.type == "confluence.updatePage":
+                    artifacts["confluence"] = await confluence.update_page(action.payload)
+                elif action.type == "sheets.appendRow":
+                    artifacts["sheets"] = await sheets.append_row(action.payload)
+            except Exception as action_e:
+                # Collect error but continue
+                artifacts["errors"].append(f"{action.type} failed: {str(action_e)}")
         
         # Compute attestation hash
         att_hash = compute_attestation(bundle.dict(), artifacts)
@@ -53,8 +57,14 @@ async def execute(bundle: InsightBundle, x_signature: str = Header(...)):
             "attestation_hash": att_hash
         }
     except Exception as e:
+        # Final safety: mark error but return graceful payload to preserve CORS headers
         await runs.finish_error(run["_id"], str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+        return {
+            "ok": False,
+            "run_id": bundle.run_id,
+            "error": str(e),
+            "artifacts": artifacts
+        }
 
 @router.get("/runs")
 async def get_runs(limit: int = 50):
