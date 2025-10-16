@@ -9,6 +9,14 @@ router = APIRouter(prefix="/api/compliance", tags=["compliance"])
 OUTSYSTEMS_ENDPOINT = os.getenv("OUTSYSTEMS_COMPLIANCE_URL")  # e.g. https://.../agents/compliance/execute
 HMAC_SECRET = os.getenv("AGENTOPS_HMAC_SECRET", "change-me")
 
+# Fallback to n8n webhook when OutSystems URL is not configured
+if not OUTSYSTEMS_ENDPOINT:
+    n8n_url = os.getenv("N8N_COMPLIANCE_WEBHOOK", "http://localhost:5678/webhook/compliance-agent")
+    OUTSYSTEMS_ENDPOINT = n8n_url
+    print(
+        f"[ComplianceAgent] OUTSYSTEMS_COMPLIANCE_URL not set. Falling back to n8n webhook: {n8n_url}"
+    )
+
 def sign(body: bytes) -> str:
     return hmac.new(HMAC_SECRET.encode(), body, hashlib.sha256).hexdigest()
 

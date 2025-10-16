@@ -9,6 +9,14 @@ router = APIRouter(prefix="/api/productivity", tags=["productivity"])
 OUTSYSTEMS_ENDPOINT = os.getenv("OUTSYSTEMS_PRODUCTIVITY_URL")
 HMAC_SECRET = os.getenv("AGENTOPS_HMAC_SECRET", "change-me")
 
+# Fallback to n8n webhook when OutSystems URL is not configured
+if not OUTSYSTEMS_ENDPOINT:
+    n8n_url = os.getenv("N8N_PRODUCTIVITY_WEBHOOK", "http://localhost:5678/webhook/productivity-agent")
+    OUTSYSTEMS_ENDPOINT = n8n_url
+    print(
+        f"[ProductivityAgent] OUTSYSTEMS_PRODUCTIVITY_URL not set. Falling back to n8n webhook: {n8n_url}"
+    )
+
 def sign(b: bytes) -> str:
     import hashlib, hmac
     return hmac.new(HMAC_SECRET.encode(), b, hashlib.sha256).hexdigest()
