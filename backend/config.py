@@ -1,4 +1,30 @@
 """
+Centralized configuration for base URLs and common settings.
+
+This allows containerized deployments to override a single env var
+instead of touching many files.
+"""
+
+import os
+
+# Base URL where this backend is exposed (protocol + host + port)
+BACKEND_BASE_URL: str = os.getenv("BACKEND_BASE_URL", "http://localhost:8000")
+
+# Default callback URL for agent runs
+CALLBACK_URL_DEFAULT: str = os.getenv(
+    "OUTSYSTEMS_CALLBACK_URL",
+    f"{BACKEND_BASE_URL}/api/agent-runs/callback"
+)
+
+# n8n webhooks (optional); used as fallbacks when OutSystems URLs are not set
+N8N_COMPLIANCE_WEBHOOK: str = os.getenv(
+    "N8N_COMPLIANCE_WEBHOOK", "http://localhost:5678/webhook/compliance-agent"
+)
+N8N_PRODUCTIVITY_WEBHOOK: str = os.getenv(
+    "N8N_PRODUCTIVITY_WEBHOOK", "http://localhost:5678/webhook/productivity-agent"
+)
+
+"""
 Configuration file for the AI Learning Backend
 Controls logging levels and other settings
 """

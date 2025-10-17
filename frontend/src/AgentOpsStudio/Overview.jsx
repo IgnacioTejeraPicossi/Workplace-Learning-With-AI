@@ -14,7 +14,8 @@ export default function Overview({ setActiveTab }) {
     try {
       setLoading(true);
       // Use the same API as Agent Runs Monitor
-      const response = await fetch('http://localhost:8000/api/agent-runs');
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agent-runs`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

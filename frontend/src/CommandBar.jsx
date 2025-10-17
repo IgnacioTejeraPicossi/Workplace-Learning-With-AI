@@ -217,7 +217,8 @@ function CommandBar({ onRoute, inputPlaceholder }) {
       
       if (shouldRouteDirectly) {
         // Always log the idea
-        const classifyRes = await fetch('http://localhost:8000/classify-intent', {
+        const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+        const classifyRes = await fetch(`${API_BASE}/classify-intent`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: prompt })
@@ -260,7 +261,8 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     // Combine original input and clarification for re-classification
     const combinedQuery = `${input} ${clarification}`;
     try {
-      const classifyRes = await fetch('http://localhost:8000/classify-intent', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const classifyRes = await fetch(`${API_BASE}/classify-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: combinedQuery })

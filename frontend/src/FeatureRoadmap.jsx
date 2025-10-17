@@ -32,7 +32,8 @@ function FeatureRoadmap() {
   const fetchFeatures = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/admin/unknown-intents");
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/admin/unknown-intents`);
       const data = await res.json();
       setFeatures(data.ideas || []);
       setError(null);
@@ -50,7 +51,8 @@ function FeatureRoadmap() {
 
   const handleUpvote = async (id) => {
     setUpvoting(id);
-    await fetch(`http://localhost:8000/admin/unknown-intents/${id}/upvote`, { method: "POST" });
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    await fetch(`${API_BASE}/admin/unknown-intents/${id}/upvote`, { method: "POST" });
     await fetchFeatures();
     setUpvoting("");
   };
@@ -59,7 +61,8 @@ function FeatureRoadmap() {
     setSubscribing(id);
     const email = prompt("Enter your email to be notified about this feature:");
     if (email) {
-      await fetch(`http://localhost:8000/admin/unknown-intents/${id}/subscribe`, {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      await fetch(`${API_BASE}/admin/unknown-intents/${id}/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
@@ -71,7 +74,8 @@ function FeatureRoadmap() {
 
   const handleStatusChange = async (id, status) => {
     setStatusUpdating(id);
-    await fetch(`http://localhost:8000/admin/unknown-intents/${id}/status`, {
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    await fetch(`${API_BASE}/admin/unknown-intents/${id}/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status })
@@ -84,7 +88,8 @@ function FeatureRoadmap() {
     // Call backend to generate scaffold
     let codeStub = "";
     try {
-      const res = await fetch("http://localhost:8000/generate-scaffold", {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/generate-scaffold`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,7 +110,8 @@ function FeatureRoadmap() {
     setLoadingHistory(true);
     setHistoryModal({ open: true, idea, history: [] });
     try {
-      const res = await fetch(`http://localhost:8000/scaffold-history/${encodeURIComponent(idea.classification?.new_feature || idea.user_input)}`);
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/scaffold-history/${encodeURIComponent(idea.classification?.new_feature || idea.user_input)}`);
       const data = await res.json();
       setHistoryModal({ open: true, idea, history: data.history || [] });
     } catch (err) {
@@ -118,7 +124,8 @@ function FeatureRoadmap() {
   const handleApproveScaffold = async (scaffold) => {
     const admin_comment = prompt("Enter approval comment (optional):", "");
     const approved_by = "admin"; // Replace with real user if available
-    const res = await fetch(`http://localhost:8000/scaffold-history/${scaffold._id}/approve`, {
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    const res = await fetch(`${API_BASE}/scaffold-history/${scaffold._id}/approve`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ admin_comment, approved_by })

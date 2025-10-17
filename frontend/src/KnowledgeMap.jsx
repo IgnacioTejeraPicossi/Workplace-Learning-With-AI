@@ -72,8 +72,9 @@ const KnowledgeMap = () => {
     setShowWebSearch(true);
     
     try {
-      console.log('📡 Making request to:', 'http://127.0.0.1:8000/api/simple-search');
-      const response = await fetch('http://127.0.0.1:8000/api/simple-search', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      console.log('📡 Making request to:', `${API_BASE}/api/simple-search`);
+      const response = await fetch(`${API_BASE}/api/simple-search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

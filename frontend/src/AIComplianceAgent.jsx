@@ -25,7 +25,8 @@ const AIComplianceAgent = () => {
   const loadDocumentAnalyses = async () => {
     try {
       // Use unified endpoint to get documents from both sources
-      const response = await fetch('http://localhost:8000/api/unified-documents');
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/unified-documents`);
       if (response.ok) {
         const data = await response.json();
         setDocuments(data.documents || []);

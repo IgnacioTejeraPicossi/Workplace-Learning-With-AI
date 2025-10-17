@@ -24,7 +24,8 @@ const AIProductivityAgent = () => {
 
   const loadAnalyses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/agentic-rag/get-analyses');
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agentic-rag/get-analyses`);
       if (response.ok) {
         const data = await response.json();
         setAnalyses(data.analyses || []);
@@ -40,7 +41,8 @@ const AIProductivityAgent = () => {
     setLoading(true);
     try {
       // Use the new specific endpoint for productivity URL analysis
-      const response = await fetch('http://localhost:8000/api/productivity/analyze-url', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/productivity/analyze-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

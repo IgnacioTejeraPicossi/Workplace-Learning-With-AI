@@ -192,7 +192,8 @@ const AgenticRAG = () => {
       });
 
       console.log("🌐 Sending request to backend...");
-      const response = await fetch('http://localhost:8000/api/agentic-rag/index', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agentic-rag/index`, {
         method: 'POST',
         body: formData,
       });
@@ -221,7 +222,7 @@ const AgenticRAG = () => {
     } catch (error) {
       console.error('❌ Error indexing documents:', error);
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        const errorMsg = '❌ Cannot connect to backend. Please ensure the server is running on http://localhost:8000';
+        const errorMsg = `❌ Cannot connect to backend. Please ensure the server is running on ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}`;
         console.log("📝 Setting error status:", errorMsg);
         setStatus(errorMsg);
       } else {
@@ -249,7 +250,8 @@ const AgenticRAG = () => {
     setStatus("🤖 Processing with Agentic RAG... This may take 10-30 seconds...");
 
     try {
-      const response = await fetch('http://localhost:8000/api/agentic-rag/ask', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agentic-rag/ask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -277,7 +279,7 @@ const AgenticRAG = () => {
     } catch (error) {
       console.error('Error asking question:', error);
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setStatus('❌ Cannot connect to backend. Please ensure the server is running on http://localhost:8000');
+        setStatus(`❌ Cannot connect to backend. Please ensure the server is running on ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}`);
       } else {
         setStatus('❌ Error processing question: ' + error.message);
       }
@@ -300,7 +302,8 @@ const AgenticRAG = () => {
       selectedDocIds.forEach(id => formData.append("doc_ids", id));
       formData.append("length", "medium");
 
-      const response = await fetch('http://localhost:8000/api/agentic-rag/summarize', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agentic-rag/summarize`, {
         method: 'POST',
         body: formData,
       });

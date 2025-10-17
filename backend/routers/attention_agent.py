@@ -104,7 +104,7 @@ async def test_execution():
                 }
             }
         ],
-        callback_url="http://localhost:8000/api/agent-runs/callback"
+        callback_url=__import__("backend.config").config.CALLBACK_URL_DEFAULT
     )
     
     # Sign the bundle

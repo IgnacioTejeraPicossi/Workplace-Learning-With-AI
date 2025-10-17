@@ -18,7 +18,8 @@ const AgenticRAGDocument = () => {
     const fetchAnalyses = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/api/agentic-rag/get-analyses');
+        const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+        const response = await fetch(`${API_BASE}/api/agentic-rag/get-analyses`);
         
         if (response.ok) {
           const data = await response.json();
@@ -250,7 +251,8 @@ const AgenticRAGDocument = () => {
       try {
         console.log(`🗑️ Attempting to delete analysis with ID: ${docId}`);
         
-        const response = await fetch(`http://localhost:8000/api/agentic-rag/delete-analysis/${docId}`, {
+        const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+        const response = await fetch(`${API_BASE}/api/agentic-rag/delete-analysis/${docId}`, {
           method: 'DELETE',
         });
         

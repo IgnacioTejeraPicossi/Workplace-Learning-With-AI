@@ -10,7 +10,8 @@ export default function AgentOpsRuns() {
     setLoading(true);
     try {
       const q = module ? `?module=${module}` : "";
-      const response = await fetch(`http://localhost:8000/api/agent-runs${q}`);
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/agent-runs${q}`);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

@@ -27,7 +27,8 @@ export async function fetchWithAuth(url, options = {}) {
   return fetch(url, options);
 }
 
-const API_BASE = "http://localhost:8000";
+// Centralized API base URL: prefer env var set at build time
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 // Generic API call function
 export async function apiCall(endpoint, method = "GET", data = null) {
@@ -74,7 +75,7 @@ export async function fetchConcepts() {
 }
 
 export async function fetchMicroLesson(topic) {
-  const res = await fetchWithAuth("http://localhost:8000/micro-lesson", {
+  const res = await fetchWithAuth(`${API_BASE}/micro-lesson`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic }),
@@ -126,7 +127,7 @@ export async function postSkillsForecast(input) {
 // Removed old lesson APIs - now using MongoDB micro-lessons API
 
 export async function webSearch(query) {
-  const res = await fetchWithAuth("http://localhost:8080/web-search", {
+  const res = await fetchWithAuth(`${process.env.REACT_APP_WEBSEARCH_BASE_URL || "http://localhost:8080"}/web-search`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query }),

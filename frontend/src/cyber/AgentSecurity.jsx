@@ -11,7 +11,8 @@ export default function AgentSecurity() {
   }, []);
 
   const fetchFromApi = async () => {
-    const res = await fetch('http://localhost:8000/api/agent-security/overview');
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    const res = await fetch(`${API_BASE}/api/agent-security/overview`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   };

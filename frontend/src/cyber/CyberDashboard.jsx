@@ -15,10 +15,11 @@ export default function CyberDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
       const [riskResponse, kpisResponse, vulnsResponse] = await Promise.all([
-        fetch('http://localhost:8000/api/cyber/risk/score'),
-        fetch('http://localhost:8000/api/cyber/posture/kpis'),
-        fetch('http://localhost:8000/api/cyber/vulnerabilities')
+        fetch(`${API_BASE}/api/cyber/risk/score`),
+        fetch(`${API_BASE}/api/cyber/posture/kpis`),
+        fetch(`${API_BASE}/api/cyber/vulnerabilities`)
       ]);
 
       if (riskResponse.ok) {
@@ -45,7 +46,8 @@ export default function CyberDashboard() {
   const runVulnerabilityScan = async () => {
     try {
       setScanning(true);
-      const response = await fetch('http://localhost:8000/api/cyber/vulnerabilities/scan', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/cyber/vulnerabilities/scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

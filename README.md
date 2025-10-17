@@ -6048,6 +6048,85 @@ N8N_COMPLIANCE_WEBHOOK=http://localhost:5678/webhook/compliance-agent
 N8N_PRODUCTIVITY_WEBHOOK=http://localhost:5678/webhook/productivity-agent
 ```
 
+### Centralized Base URL Configuration (New)
+
+To simplify Docker/Container/Kubernetes deployments, backend and frontend base URLs are now centralized:
+
+```env
+# Backend base URL (used to derive default callback URL)
+BACKEND_BASE_URL=http://localhost:8000
+
+# Default callback URL (override only if different from BACKEND_BASE_URL)
+OUTSYSTEMS_CALLBACK_URL=${BACKEND_BASE_URL}/api/agent-runs/callback
+
+# Frontend base URL for API calls
+REACT_APP_API_BASE_URL=http://localhost:8000
+
+# Optional: websearch service base
+REACT_APP_WEBSEARCH_BASE_URL=http://localhost:8080
+```
+
+Backend config module: `backend/config.py`
+- Exposes `BACKEND_BASE_URL`, `CALLBACK_URL_DEFAULT`, `N8N_COMPLIANCE_WEBHOOK`, `N8N_PRODUCTIVITY_WEBHOOK`.
+- Routers use `CALLBACK_URL_DEFAULT` instead of hardcoded `http://localhost:8000`.
+
+Frontend API base
+- All API calls now resolve from `REACT_APP_API_BASE_URL`. No scattered `:8000` literals.
+
+### OutSystems → n8n Fallback Logic (New)
+
+- If `OUTSYSTEMS_COMPLIANCE_URL`/`OUTSYSTEMS_PRODUCTIVITY_URL` are NOT set, the backend automatically falls back to:
+  - `N8N_COMPLIANCE_WEBHOOK`
+  - `N8N_PRODUCTIVITY_WEBHOOK`
+- A warning is logged indicating the fallback in use.
+
+This allows switching between OutSystems and n8n by changing only environment variables.
+
+### Updated Architecture (Mermaid)
+
+```mermaid
+flowchart LR
+  subgraph Frontend
+    UI[React App]
+  end
+
+  subgraph Config
+    FEB[REACT_APP_API_BASE_URL]
+    BEB[BACKEND_BASE_URL]
+  end
+
+  subgraph Backend
+    API[FastAPI]
+    CFG[backend/config.py\nCALLBACK_URL_DEFAULT\nN8N_*_WEBHOOK]
+    R1[/compliance/dispatch/]
+    R2[/productivity/dispatch/]
+    CB[/api/agent-runs/callback/]
+  end
+
+  subgraph Execution
+    OS[OutSystems Endpoint]
+    N8N[n8n Webhook]
+  end
+
+  UI -- API calls --> API
+  UI -.reads.-> FEB
+  API -.reads.-> CFG
+  CFG -.derives.-> CB
+  API --> R1
+  API --> R2
+
+  R1 -- if OUTSYSTEMS_COMPLIANCE_URL set --> OS
+  R1 -- else fallback --> N8N
+  R2 -- if OUTSYSTEMS_PRODUCTIVITY_URL set --> OS
+  R2 -- else fallback --> N8N
+
+  OS --> CB
+  N8N --> CB
+
+  FEB -. configured by -> UI
+  BEB -. configured by -> CFG
+```
+
 ### n8n Workflow Configuration
 
 #### Compliance Agent Webhook

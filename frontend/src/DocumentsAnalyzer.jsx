@@ -156,7 +156,8 @@ const DocumentsAnalyzer = () => {
       console.log("Files converted to base64:", fileData.map(f => ({ name: f.filename, size: f.size })));
       
       // Send as JSON instead of FormData
-      const response = await fetch("http://localhost:8000/api/document-analyzer/analyze-json", {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/document-analyzer/analyze-json`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +203,8 @@ const DocumentsAnalyzer = () => {
 
   const saveAnalysis = async (summary) => {
     try {
-      const response = await fetch('http://localhost:8000/api/document-analyzer/save-analysis', {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/document-analyzer/save-analysis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

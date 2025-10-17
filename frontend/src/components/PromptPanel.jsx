@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 export default function PromptPanel({ agent, nativePromptText, colors, onUseResult }) {
   const [items, setItems] = useState([]);
@@ -10,7 +11,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const load = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/prompts/${agent}`);
+      const res = await fetch(`${API_BASE}/api/prompts/${agent}`);
       const data = await res.json();
       setItems(data.items || []);
     } catch {}
@@ -20,7 +21,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const save = async () => {
     if (!prompt.trim()) return;
-    const res = await fetch(`http://localhost:8000/api/prompts/${agent}`, {
+    const res = await fetch(`${API_BASE}/api/prompts/${agent}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name || 'Untitled', prompt })
@@ -30,7 +31,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const update = async () => {
     if (!selectedId) return;
-    const res = await fetch(`http://localhost:8000/api/prompts/${agent}/${selectedId}`, {
+    const res = await fetch(`${API_BASE}/api/prompts/${agent}/${selectedId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, prompt })
@@ -39,7 +40,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   };
 
   const remove = async (id) => {
-    await fetch(`http://localhost:8000/api/prompts/${agent}/${id}`, { method: 'DELETE' });
+    await fetch(`${API_BASE}/api/prompts/${agent}/${id}`, { method: 'DELETE' });
     if (selectedId === id) { setSelectedId(''); setName(''); setPrompt(''); }
     load();
   };
@@ -47,7 +48,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   const test = async () => {
     setTesting(true); setTestOutput('');
     try {
-      const res = await fetch(`http://localhost:8000/api/prompts/${agent}/test`, {
+      const res = await fetch(`${API_BASE}/api/prompts/${agent}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt })

@@ -15,9 +15,10 @@ export default function ThreatLibrary() {
   const loadThreatData = async () => {
     try {
       setLoading(true);
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
       const [threatsResponse, controlsResponse] = await Promise.all([
-        fetch('http://localhost:8000/api/cyber/threats'),
-        fetch('http://localhost:8000/api/cyber/controls')
+        fetch(`${API_BASE}/api/cyber/threats`),
+        fetch(`${API_BASE}/api/cyber/controls`)
       ]);
 
       if (threatsResponse.ok) {

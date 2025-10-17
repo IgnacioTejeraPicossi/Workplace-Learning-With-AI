@@ -8,7 +8,8 @@ const Runs = () => {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:8000/agents/sales/runs');
+        const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+        const res = await fetch(`${API_BASE}/agents/sales/runs`);
         const data = await res.json();
         setRuns(Array.isArray(data) ? data : data.items || []);
       } catch (e) {

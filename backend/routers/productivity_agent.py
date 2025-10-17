@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
 import httpx, os, time, hmac, hashlib, json
 from backend.utils.attestation import compute_bundle_hash
+from backend.config import CALLBACK_URL_DEFAULT, N8N_PRODUCTIVITY_WEBHOOK
 
 router = APIRouter(prefix="/api/productivity", tags=["productivity"])
 
@@ -11,7 +12,7 @@ HMAC_SECRET = os.getenv("AGENTOPS_HMAC_SECRET", "change-me")
 
 # Fallback to n8n webhook when OutSystems URL is not configured
 if not OUTSYSTEMS_ENDPOINT:
-    n8n_url = os.getenv("N8N_PRODUCTIVITY_WEBHOOK", "http://localhost:5678/webhook/productivity-agent")
+    n8n_url = N8N_PRODUCTIVITY_WEBHOOK
     OUTSYSTEMS_ENDPOINT = n8n_url
     print(
         f"[ProductivityAgent] OUTSYSTEMS_PRODUCTIVITY_URL not set. Falling back to n8n webhook: {n8n_url}"
@@ -147,7 +148,7 @@ async def dispatch(spec: ProductivitySpec):
         "next_actions": [na.dict() for na in spec.next_actions],
         "primary_url": spec.primary_url,
         "actions": spec.actions,
-        "callback_url": os.getenv("OUTSYSTEMS_CALLBACK_URL", "http://localhost:8000/api/agent-runs/callback")
+        "callback_url": CALLBACK_URL_DEFAULT
     }
     
     # Compute bundle hash for attestation

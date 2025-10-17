@@ -14,7 +14,8 @@ function IdeaLog() {
     const fetchIdeas = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8000/admin/unknown-intents");
+        const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+        const res = await fetch(`${API_BASE}/admin/unknown-intents`);
         const data = await res.json();
         setIdeas(data.ideas || []);
         setError(null);
@@ -31,7 +32,8 @@ function IdeaLog() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this idea?')) return;
     try {
-      await fetch(`http://localhost:8000/admin/unknown-intents/${id}`, { method: 'DELETE' });
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      await fetch(`${API_BASE}/admin/unknown-intents/${id}`, { method: 'DELETE' });
       setIdeas(ideas => ideas.filter(idea => idea._id !== id));
     } catch (err) {
       alert('Failed to delete idea.');
