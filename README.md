@@ -1,5 +1,91 @@
 # 🤖 AI-Powered Workplace Learning Platform
 
+## ✍️ Agent Prompt Manager (Compliance & Productivity)
+
+This release adds a built‑in Prompt Manager to two item agents:
+
+- AI Compliance Agent
+- AI Productivity Agent
+
+The Prompt Manager lets you view the native prompt, create and test new prompts, and save or delete prompts for later reuse. It is designed to make each agent flexible without editing code.
+
+### Where to find it
+
+In each agent screen, the new panel appears between the main “Analysis Results” area and the “Agent Runs Monitor” section. It is always available for the agent.
+
+### What you can do
+
+- Native prompt: Read‑only display of the default prompt the agent uses.
+- Editor: Write a temporary prompt and click “Test” to preview the output.
+- Save: Store a prompt with a name. Saved prompts are listed below with Edit and Delete actions.
+- Update: Modify the selected saved prompt and click “Update”.
+- Test result: Shows the raw LLM output; for these agents the panel also extracts structured fields (see below).
+
+### Behavior by agent
+
+- Compliance:
+  - Test returns a structured response `{ summary, risks[] }` in addition to the raw text.
+  - When you test a prompt, the panel updates the on‑screen “Summary” and “Key Risks” so you can immediately see how it looks.
+
+- Productivity:
+  - Test returns `{ summary, actions[] }` (five suggested next steps) plus the raw text.
+  - When you test a prompt, the panel updates “Summary” and the “Top 5 Next Actions”.
+
+Note: The native analysis flow remains available; if you don’t test a custom prompt, the agents behave as before.
+
+### Storage
+
+- Saved prompts are persisted in MongoDB collection `prompts` with fields:
+  - `agent` ('compliance' | 'productivity'), `name`, `prompt`, `isNative`, `isActive`, timestamps.
+- The native prompt is displayed but not editable nor deletable.
+
+### Backend API
+
+New FastAPI endpoints (all return JSON):
+
+```
+GET    /api/prompts/{agent}                  # list saved prompts
+POST   /api/prompts/{agent}                  # create { name, prompt }
+PUT    /api/prompts/{agent}/{prompt_id}      # update { name?, prompt?, isActive? }
+DELETE /api/prompts/{agent}/{prompt_id}      # delete (blocked for native)
+POST   /api/prompts/{agent}/test             # dry‑run prompt; returns raw output
+                                           # and structured fields per agent
+```
+
+The `/test` endpoint enriches the prompt with minimal context and returns:
+
+- Compliance: `{ ok, output, summary, risks }`
+- Productivity: `{ ok, output, summary, actions }`
+
+### Frontend component
+
+The UI uses a shared component `PromptPanel` with these props:
+
+```
+<PromptPanel
+  agent="compliance" | "productivity"
+  nativePromptText={...}
+  onUseResult={(result) => { /* apply summary/risks or summary/actions */ }}
+  colors={colorsFromTheme}
+/> 
+```
+
+It handles loading/saving prompts, testing, and applying the structured result back into the page.
+
+### Quick workflow
+
+1) Open an agent (Compliance or Productivity)
+2) Scroll to “Prompt Manager”
+3) Write a prompt → Test → Inspect the updated analysis
+4) Save if useful; later you can Edit/Update or Delete from “Saved prompts”
+
+### Notes & next steps
+
+- Current implementation updates the on‑screen analysis from the test result; native flow remains intact.
+- Future enhancements (optional): remember the “last used” prompt per agent, tags & search, and richer context injection for higher‑quality tests.
+
+# 🤖 AI-Powered Workplace Learning Platform
+
 > **"I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth."**
 
 ## 🧭 Quick Navigation
@@ -44,6 +130,19 @@
 - [AgentOps Studio](#agentops-studio) - Unified AI Workflow Lab for design, simulation, and execution
 - [Robomind Clinic](#robomind-clinic) - AI Psychology Module for diagnosing and treating AI pathologies
 - [Agent Theory & Documentation](#agent-theory--documentation) - Comprehensive AI agent theory, tools, and hackathon preparation
+- [🤖 AI Compliance Agent](#ai-compliance-agent) - Transform compliance documents into auditable team actions via OutSystems
+- [🚀 AI Productivity Agent](#ai-productivity-agent) - Convert research and insights into productive tasks via OutSystems
+- [🧠 EA Second Brain Agent](#ea-second-brain-agent) - Ketil's 24/7 Enterprise Architecture watcher for Norwegian (NEW!)
+- [💼 Sales Assistant Agent](#sales-assistant-agent) - Pipeline hygiene, deal risk scoring, and contextual follow-up drafts (NEW!)
+- [🎯 Personal Attention Agent](#personal-attention-agent) - Noise→signal across channels; schedules focus holds and sends actionable briefs (NEW!)
+- [📡 Telco Ops Decisioning Agent](#telco-ops-decisioning-agent) - Data-driven telco operations with TMF APIs and safe autonomy (NEW!)
+- [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
+- [🏛️ Council of Diverse Lenses](#council-of-diverse-lenses) - AI-powered council deliberation system for diverse perspectives and auditable decisions (NEW!)
+- [⚙️ Operations Efficiency Agent](#operations-efficiency-agent) - Automates invoice handling, cost allocations, and CV ranking for Posten Bring (NEW!)
+- [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
+
+### 🔗 n8n Integration (Hackathon Demo)
+- [n8n Webhook Setup](#n8n-webhook-setup) - Local n8n webhooks for Compliance and Productivity agents
 
 ### 🛠️ Admin & Development
 - [API Config](#api-config) - ItemAI API, OpenAI, and OpenRouter API configuration
@@ -63,9 +162,9 @@
 
 ---
 
-## 🎯 Project Overview {#project-overview} 
+## 🎯 Project Overview {#project-overview}
 
-This is a comprehensive **AI-powered workplace learning platform** that combines cutting-edge artificial intelligence with modern web technologies to create an intelligent, adaptive learning experience. Built with React.js frontend and FastAPI backend, it features advanced AI capabilities including personalized recommendations, interactive simulations, and a sophisticated knowledge mapping system.Test
+This is a comprehensive **AI-powered workplace learning platform** that combines cutting-edge artificial intelligence with modern web technologies to create an intelligent, adaptive learning experience. Built with React.js frontend and FastAPI backend, it features advanced AI capabilities including personalized recommendations, interactive simulations, and a sophisticated knowledge mapping system.
 
 ## 🏗️ Philosophy & Approach: Building with AI, Not Just Code {#philosophy-approach}
 
@@ -4123,6 +4222,1985 @@ const documentationData = {
 **Status**: 🚀 **READY FOR HACKATHON PREPARATION**  
 **Confidence Level**: 🟢 **HIGH** - Complete documentation and tool catalog  
 **Next Action**: 🎯 **BEGIN HACKATHON PREPARATION WITH CHATGPT5**
+
+---
+
+## 🤖 AI Compliance Agent
+
+### Overview
+The AI Compliance Agent transforms regulatory documents (ESG/GDPR/ISO) into auditable team actions via OutSystems enterprise execution.
+
+### Key Features
+- **Document Analysis**: Upload compliance documents and extract key risks
+- **Risk Assessment**: AI-powered identification of compliance risks and requirements
+- **Action Generation**: Automatic creation of Jira tasks, Slack alerts, and audit logs
+- **Enterprise Integration**: Secure execution via OutSystems with full governance
+- **Audit Trail**: Complete tracking of compliance actions and status
+
+### Demo Flow
+1. **Upload Document**: ESG/GDPR guideline in Document Analyzer
+2. **AI Analysis**: Get summary + extracted key risks
+3. **Send to Agent**: Click "Send to OutSystems Agent" via modal
+4. **Enterprise Execution**: OutSystems creates:
+   - Jira issue(s) in compliance project
+   - Slack alert in compliance channel
+   - Google Sheets row for audit log
+5. **Status Tracking**: Monitor progress in AgentOps Studio
+
+### Technical Implementation
+- **Backend**: FastAPI router (`/api/compliance/dispatch`)
+- **Security**: HMAC-signed requests to OutSystems
+- **Data Model**: `agent_runs` collection in MongoDB
+- **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
+
+---
+
+## 🚀 AI Productivity Agent
+
+### Overview
+The AI Productivity Agent converts research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.
+
+### Key Features
+- **URL Analysis**: Direct analysis of external URLs (blogs, articles, documentation)
+- **AI-Powered Insights**: Uses unified AI system for consistent, high-quality analysis
+- **Action Planning**: Generate Top 5 next actions automatically from URL content
+- **Multi-Task Creation**: Create multiple Jira issues (one per action)
+- **Team Coordination**: Slack digests and Google Sheets snapshots
+- **Rapid Execution**: Enterprise-scale task distribution via OutSystems
+- **Dedicated Endpoint**: Specific `/api/productivity/analyze-url` for URL analysis
+
+### Demo Flow
+1. **Research Input**: Enter URL in the "Analyze URL" field (e.g., competitor website, blog post)
+2. **AI Processing**: Click purple analyze button to get summary + Top 5 Next Actions
+3. **Action Review**: Review generated actions and edit assignees/priorities if needed
+4. **Send to Agent**: Click "Send to OutSystems Agent" via modal
+5. **Enterprise Execution**: OutSystems creates:
+   - Multiple Jira issues (one per action)
+   - Slack digest with all actions
+   - Google Sheets snapshot of summary + actions
+6. **Progress Tracking**: Monitor all tasks in AgentOps Studio
+
+### Technical Implementation
+- **Backend**: FastAPI router (`/api/productivity/dispatch`) + specific URL analysis endpoint (`/api/productivity/analyze-url`)
+- **URL Analysis**: Dedicated endpoint for analyzing external URLs with AI-powered insights
+- **Security**: HMAC-signed requests to OutSystems
+- **Data Model**: `agent_runs` collection in MongoDB
+- **UI Components**: Reusable `ActionDispatchModal` and `AgentOpsRuns`
+- **AI Integration**: Uses unified AI system (`ask_ai_unified_sync`) for consistent analysis
+
+---
+
+## 🧠 EA Second Brain Agent
+
+### Overview
+The **EA Second Brain Agent** is Ketil Stadskleiv's (Director Enterprise Architecture & CTO, Norwegian) 24/7 AI-powered watcher that monitors the technology landscape and provides continuous, portfolio-aware insights to the Enterprise Architecture team.
+
+### Problem Statement
+As stated by Ketil:
+> "As an Enterprise Architecture we are covering all aspects of IT, and keeping up with changes, news from vendors, tech breakthroughs, deprecations, new projects etc. is impossible."
+
+### Solution
+The EA Second Brain Agent acts as an intelligent monitoring system that:
+- **Monitors** technology landscape 24/7 (vendor updates, tech changes, deprecations, new projects)
+- **Understands** Norwegian's context (strategy, architecture, application portfolio, business priorities)
+- **Analyzes** impact of external signals on Norwegian's systems
+- **Executes** actions automatically (Jira tickets, Slack notifications, Confluence updates, audit logs)
+- **Provides** trust receipts (attestation hashes) for compliance and auditability
+
+### Key Features
+- 🌐 **Continuous Monitoring**: 24/7 monitoring of internal and external data sources
+- 📊 **Portfolio-Aware Analysis**: Matches external signals to Norwegian's application portfolio
+- ⚡ **Automatic Action Dispatch**: Creates Jira tasks, sends Slack notifications, updates Confluence, logs to Sheets
+- 🔐 **Trust & Auditability**: SHA-256 attestation hashes for immutable audit trail
+- 🎯 **Norwegian Context-Aware**: Understands Norwegian's strategy, priorities, and technical stack
+
+### Architecture
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Data Sources                          │
+├──────────────────────┬──────────────────────────────────┤
+│  Internal            │  External (Open Data)            │
+│  • EA tools          │  • Vendor release notes          │
+│  • Confluence        │  • Tech news (RSS/Atom)          │
+│  • Jira              │  • CVE feeds                     │
+│  • Arch Repository   │  • GitHub releases               │
+│                      │  • EOL datasets                  │
+└──────────────────────┴──────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────────────┐
+│         /agents/ea/execute (FastAPI)                     │
+│  • Verify HMAC signature                                 │
+│  • Execute actions (Jira, Slack, Confluence, Sheets)     │
+│  • Compute attestation hash                              │
+│  • Store in MongoDB                                      │
+└─────────────────────────────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────────────┐
+│                  Integrations                            │
+├──────────┬──────────┬──────────┬────────────────────────┤
+│  Jira    │  Slack   │Confluence│  Google Sheets         │
+│  Issues  │ Messages │  Pages   │  Audit Logs            │
+└──────────┴──────────┴──────────┴────────────────────────┘
+```
+
+### UI Components
+The agent features a modern, professional UI with:
+- **Overview Tab**: Hero section with agent description, stats cards with gradients, capabilities showcase
+- **Insights Tab**: Demo functionality to send sample insights (Kubernetes deprecation alerts)
+- **Runs Tab**: Execution history with attestation hashes (trust receipts)
+- **Settings Tab**: Integration status and configuration
+
+### API Endpoints
+- **POST `/agents/ea/execute`** - Execute insight bundle (HMAC-secured)
+- **GET `/agents/ea/runs`** - Get execution history
+- **POST `/api/dev/sign`** - Development helper for HMAC signing
+
+### Data Model: InsightBundle
+```json
+{
+  "run_id": "ea-1234567890",
+  "topic": "Kubernetes 1.31 Deprecation Alert",
+  "summary_md": "## Impact on Norwegian Portfolio...",
+  "evidence": [
+    {
+      "url": "https://kubernetes.io/blog/...",
+      "source": "Kubernetes Blog",
+      "snippet": "Several APIs are being deprecated..."
+    }
+  ],
+  "portfolio_matches": [
+    {
+      "id": "APP-123",
+      "name": "Payments API",
+      "score": 0.86,
+      "reason": "Uses deprecated PodSecurityPolicy"
+    }
+  ],
+  "recommended_actions": [
+    {
+      "title": "Plan upgrade window",
+      "detail": "Schedule maintenance for Q1 2025",
+      "assignee": "team-platform"
+    }
+  ],
+  "actions": [
+    {
+      "type": "jira.createIssue",
+      "payload": { "projectKey": "EA", "summary": "..." }
+    },
+    {
+      "type": "slack.postMessage",
+      "payload": { "text": "🚨 EA Alert..." }
+    }
+  ],
+  "callback_url": "/api/agent-runs/callback"
+}
+```
+
+### Technical Implementation
+- **Backend**: FastAPI with async MongoDB storage (`agent_runs`, `ea_insights` collections)
+- **Security**: HMAC-SHA256 signature verification + attestation hashes for audit trail
+- **Frontend**: React with Tailwind CSS, gradient-based professional UI design
+- **Integrations**: Jira (REST API v3), Slack (Webhook/Bot), Confluence (REST API), Google Sheets (Service Account)
+- **Agent Catalog**: MCP-compliant descriptor at `configs/agents/ea-second-brain.json`
+
+### Usage Example
+1. Navigate to **Item Agents** → **EA Second Brain Agent**
+2. Go to **Insights** tab
+3. Click **"Send Sample Insight"** to test Kubernetes deprecation alert
+4. Verify Jira issue created and Slack message sent
+5. Check **Runs** tab for execution history with attestation hash
+
+### Environment Variables
+```bash
+# HMAC Security
+HMAC_SECRET=hackathon-secret-key-2024
+
+# Jira Integration
+JIRA_BASE_URL=https://itemtest.atlassian.net
+JIRA_EMAIL=ignacio.tejera@item.no
+JIRA_API_TOKEN=***
+
+# Slack Integration
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# Confluence Integration
+CONFLUENCE_BASE=https://itemtest.atlassian.net/wiki
+CONFLUENCE_AUTH=base64(user:apitoken)
+
+# Google Sheets Integration
+SHEETS_SPREADSHEET_ID=1e97xVkDTW8gUNSTKNclYSvaoJEoojCias3iAp1YLxF4
+GOOGLE_SA_JSON={"type":"service_account",...}
+```
+
+### Future Enhancements (Not in MVP)
+- Pulse job (automated scheduler for continuous monitoring)
+- Real data source integration (RSS, CVE, GitHub, vendor feeds)
+- Portfolio matching algorithm with impact scoring
+- Norwegian-specific context loading from EA tools
+- Auto-execution policies for low-risk insights
+- Email notifications and dashboard analytics
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `jira.createIssue`, `slack.postMessage`, `confluence.updatePage`, `sheets.appendRow`
+- **Policy**: Low-risk auto-execution mode
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Complete Guide**: [docs/EA_SECOND_BRAIN_AGENT.md](docs/EA_SECOND_BRAIN_AGENT.md)
+- **Implementation Summary**: [EA_AGENT_IMPLEMENTATION_SUMMARY.md](EA_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/ea-second-brain.json](frontend/src/configs/agents/ea-second-brain.json)
+
+---
+
+## 💼 Sales Assistant Agent
+
+### Overview
+The **Sales Assistant Agent** (Amelie) is designed for Yara International's sales team to automate pipeline hygiene, deal risk scoring, and contextual follow-up drafts. It provides intelligent CRM updates, email automation, and deal progression insights.
+
+### Problem Statement
+Sales teams struggle with:
+- **Manual CRM updates** consuming valuable selling time
+- **Inconsistent follow-up** leading to lost opportunities  
+- **Poor pipeline hygiene** affecting forecasting accuracy
+- **Context switching** between multiple tools and systems
+
+### Solution
+The Sales Assistant Agent automates sales processes by:
+- **Analyzing** email and calendar activity for CRM updates
+- **Scoring** deal risk based on communication patterns and timeline
+- **Generating** contextual follow-up drafts and next actions
+- **Integrating** with CRM, Microsoft 365, and Slack seamlessly
+- **Providing** intelligent insights for deal progression
+
+### Key Features
+- **Proactive CRM Updates**: Automatically updates opportunity stages, next steps, and close dates
+- **Email Draft Generation**: Creates contextual follow-up emails based on communication history
+- **Deal Risk Scoring**: Analyzes patterns to identify at-risk opportunities
+- **Task Automation**: Creates CRM tasks and calendar events automatically
+- **Slack Integration**: Sends notifications and updates to sales channels
+- **Microsoft 365 Integration**: Accesses email and calendar data for context
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Sales Agent   │───▶│   CRM Systems    │    │   Microsoft 365 │
+│   (Amelie)      │    │  (Salesforce/    │    │   (Email/       │
+│                 │    │   Dynamics/HubSpot)│    │    Calendar)    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Slack         │    │   Google Sheets   │    │   AgentOps      │
+│   Notifications │    │   Reporting       │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, metrics, and data sources
+- **Hygiene**: Pipeline cleanliness analysis and recommendations
+- **Deals**: Active deals monitoring and risk scoring
+- **Runs**: Execution history and audit trail
+- **Settings**: Configuration and integration management
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: CRM, Microsoft 365 Graph API, Slack API
+- **Security**: HMAC authentication and attestation
+- **Data Model**: SalesActionBundle with TargetRef and NextAction
+
+### API Endpoints
+- `POST /agents/sales/execute` - Execute sales action bundle
+- `GET /agents/sales/runs` - Get execution history
+- `POST /agents/sales/callback` - Handle integration callbacks
+
+### Data Model
+```python
+class SalesActionBundle(BaseModel):
+    run_id: str
+    topic: str
+    summary_md: str
+    targets: List[TargetRef] = []
+    recommended_actions: List[NextAction] = []
+    actions: List[Action]
+    callback_url: str
+
+class TargetRef(BaseModel):
+    type: Literal["Opportunity","Contact","Account"]
+    crm_id: str
+    name: Optional[str] = None
+
+class NextAction(BaseModel):
+    title: str
+    detail: Optional[str] = None
+    assignee: Optional[str] = None
+    due_date: Optional[datetime] = None
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Sales Assistant Agent**
+2. Go to **Hygiene** tab to analyze pipeline cleanliness
+3. Review **Deals** tab for risk scoring and recommendations
+4. Check **Runs** tab for execution history and audit trail
+5. Configure integrations in **Settings** tab
+
+### Environment Variables
+```bash
+# CRM Integration
+CRM_PROVIDER=salesforce  # or dynamics, hubspot
+CRM_BASE_URL=https://your-crm-instance.com
+CRM_BEARER_TOKEN=your-api-token
+
+# Microsoft 365 Integration
+M365_TENANT_ID=your-tenant-id
+M365_CLIENT_ID=your-client-id
+M365_CLIENT_SECRET=your-client-secret
+
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+SLACK_DEFAULT_CHANNEL=#sales
+
+# Security
+HMAC_SECRET=your-hmac-secret-key
+```
+
+### Future Enhancements
+- **AI-powered deal scoring** with machine learning models
+- **Predictive analytics** for pipeline forecasting
+- **Advanced email templates** with personalization
+- **Integration with more CRM systems** (Pipedrive, Zoho)
+- **Mobile app** for on-the-go sales management
+- **Real-time notifications** for urgent follow-ups
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `crm.updateOpportunity`, `crm.createTask`, `email.createDraft`, `slack.postMessage`
+- **Policy**: Sales team approval required for high-value actions
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md](SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/sales-assistant.json](frontend/src/configs/agents/sales-assistant.json)
+
+---
+
+## 🎯 Personal Attention Agent
+
+### Overview
+The **Personal Attention Agent** is designed for Tom Erik Sundal-Ask (Head of Platform Engineering and Network Management, Telenor) to solve information overload across multiple channels. It transforms noise into actionable signals by ingesting, clustering, and intelligently routing information from Slack, Teams, Webex, SharePoint, RSS feeds, and more.
+
+### Problem Statement
+As stated by Tom Erik:
+> "I see information overload both in multiple channels and content. Also with AI making content. (Slack-channels, Teams, Webex, Workvivo, Workplace, Facebook, Intranet, press releases, media.) Work/social/learning/possibilities etc. People waste time on trying to follow all info or miss what matters."
+
+### Solution
+The Personal Attention Agent addresses this by:
+- **Ingesting** multi-channel signals from Slack, Teams, Webex, SharePoint, RSS, Workplace, Workvivo
+- **Clustering** related information using AI-powered semantic similarity
+- **Scoring** priority based on relevance, urgency, impact, and user preferences
+- **Routing** alerts to appropriate teams and channels automatically
+- **Scheduling** focus holds for critical issues
+- **Generating** daily briefs and digest emails
+
+### Key Features
+- **Multi-Channel Ingestion**: Unified data collection from 7+ communication platforms
+- **AI-Powered Clustering**: Semantic grouping and deduplication of related signals
+- **Priority Scoring**: Intelligent ranking based on relevance × urgency × impact × preferences
+- **Automated Routing**: Smart distribution to appropriate teams and channels
+- **Focus Hold Scheduling**: Automatic calendar blocking for critical issues
+- **Daily Briefs**: Automated digest generation and distribution
+- **Real-Time Alerting**: Instant notifications with adaptive cards
+- **User Preferences**: Customizable filters, mute terms, and priority boosts
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Multi-Channel │───▶│   AI Clustering  │    │   Priority      │
+│   Ingestion     │    │   & Scoring      │    │   Routing       │
+│   (7+ sources)  │    │   Engine         │    │   System        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Slack         │    │   Teams          │    │   Calendar      │
+│   Notifications │    │   Adaptive Cards│    │   Focus Holds    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Email         │    │   User           │    │   AgentOps      │
+│   Digests       │    │   Preferences    │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and recent activity
+- **Sources**: CRUD management for channel sources and connectors
+- **Clusters**: AI-powered signal clustering with priority scoring
+- **Alerts**: Feed of dispatched alerts with execution artifacts
+- **Runs**: Execution history and attestation tracking
+- **Settings**: User preferences, integration configs, and routing rules
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: Slack Bot API, Teams Webhooks, Microsoft Graph API
+- **Security**: HMAC authentication and attestation
+- **Data Model**: Multi-collection MongoDB schema for signals, clusters, alerts
+
+### API Endpoints
+- `POST /agents/attention/execute` - Execute attention action bundle
+- `GET /agents/attention/health` - Health check endpoint
+- `POST /agents/attention/test` - Test execution endpoint
+- `GET /agents/attention/sources` - Manage channel sources
+- `GET /agents/attention/clusters` - View signal clusters
+- `GET /agents/attention/alerts` - Alert feed
+- `POST /agents/attention/preferences` - User preferences
+
+### Data Model
+```python
+class AttentionActionBundle(BaseModel):
+    run_id: str
+    topic: str
+    summary_md: str
+    evidence: List[Evidence] = []
+    recommended_actions: List[NextAction] = []
+    actions: List[Action] = []
+    callback_url: str
+
+class Evidence(BaseModel):
+    url: str
+    source: str
+    snippet: Optional[str] = None
+    published_at: Optional[datetime] = None
+
+class NextAction(BaseModel):
+    title: str
+    detail: Optional[str] = None
+    assignee: Optional[str] = None
+    due_date: Optional[datetime] = None
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Personal Attention Agent**
+2. Go to **Sources** tab to configure channel connectors
+3. Review **Clusters** tab for AI-powered signal grouping
+4. Check **Alerts** tab for dispatched notifications
+5. Configure preferences in **Settings** tab
+6. Monitor execution in **Runs** tab
+
+### Environment Variables
+```bash
+# Microsoft Teams Integration
+TEAMS_WEBHOOK_URL=https://outlook.office.com/webhook/...
+TEAMS_BOT_TOKEN=xoxb-your-bot-token
+
+# Microsoft Graph Integration
+GRAPH_BEARER_TOKEN=your-graph-api-token
+GRAPH_USER_ID=me
+
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+SLACK_DEFAULT_CHANNEL=#cto-brief
+
+# Security
+HMAC_SECRET=your-hmac-secret-key
+```
+
+### Priority Scoring Algorithm
+```
+priority = w1*relevance + w2*urgency + w3*impact + w4*preference_boost - w5*spam
+
+where:
+  relevance   = cosine(cluster.vec, user/team profile vec)
+  urgency     = recency decay + surge in volume + keywords ("outage", "incident", "EOL")
+  impact      = audience × system criticality (mapping table)
+  preference  = boosts from Preference.mustHave / team membership
+```
+
+### Future Enhancements
+- **Machine Learning Models**: Advanced clustering and priority prediction
+- **Real-Time Processing**: Stream processing for instant alerts
+- **Advanced Integrations**: More communication platforms and enterprise tools
+- **Mobile App**: On-the-go attention management
+- **Analytics Dashboard**: Insights into information patterns and team efficiency
+- **Custom Workflows**: User-defined automation rules
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `teams.sendCard`, `slack.postMessage`, `calendar.createEvent`, `email.sendDigest`
+- **Policy**: Low-risk auto-execution with user approval for high-impact actions
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md](PERSONAL_ATTENTION_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/attention-agent.json](frontend/src/configs/agents/attention-agent.json)
+
+---
+
+## 📡 Telco Ops Decisioning Agent
+
+### Overview
+The **Telco Ops Decisioning Agent** is designed for Helge Sølvberg (Country Chief Analytics IT Architect, Telia) to enable data-driven telco operations with safe autonomy. It transforms telco signals into actionable operations by reasoning, deciding, and acting across order management, subscription changes, appointments, communications, and CRM case creation.
+
+### Problem Statement
+As stated by Helge:
+> "Agents based on data, both company data and external sources. Reasoning and make decisions, and then do the action; could be to place an order, perform an upgrade, change a subscription, send a communication etc. Either autonomously, or with enough details that a human can confirm with single-click."
+
+### Solution
+The Telco Ops Decisioning Agent addresses this by:
+- **Data-Driven Decision Making**: Processes internal BSS/CRM data and external signals
+- **TMF API Integration**: Leverages TM Forum standards (TMF622, TMF679) for telco operations
+- **Safe Autonomy**: Executes low-risk operations automatically, requires approval for high-impact actions
+- **Multi-Channel Actions**: Order placement, subscription changes, appointment scheduling, communications, CRM case creation
+- **Policy Guardrails**: Configurable thresholds for automatic vs. manual execution
+
+### Key Features
+- **TMF622 Integration**: Product ordering and modification via industry-standard APIs
+- **TMF679 Integration**: Product offering qualification and eligibility checks
+- **Smart Appointment Scheduling**: Field service management integration
+- **Multi-Channel Communications**: Email, SMS, and push notifications
+- **CRM Case Management**: Automated case creation and tracking
+- **Policy-Based Guardrails**: Configurable risk thresholds and approval workflows
+- **HMAC Security**: Cryptographic verification for all operations
+- **Attestation & Audit**: Complete audit trail with cryptographic attestation
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Data Sources  │───▶│   AI Reasoning   │    │   Policy        │
+│   BSS/CRM       │    │   Engine         │    │   Guardrails    │
+│   External APIs │    │   Decision Logic │    │   Risk Assessment│
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   TMF622        │    │   TMF679         │    │   Appointment   │
+│   Ordering      │    │   Qualification  │    │   Scheduling    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Communications│    │   CRM Case       │    │   AgentOps      │
+│   Email/SMS/Push│    │   Management     │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and execution modes
+- **Recommendations**: AI-generated recommendations ready for approval
+- **Actions**: Action execution history and detailed artifacts
+- **Runs**: Execution runs with attestation and audit trails
+- **Settings**: Policy configuration and integration settings
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence
+- **Frontend**: React components with professional UI
+- **Integrations**: TMF622/TMF679 APIs, appointment systems, communication providers, CRM systems
+- **Security**: HMAC authentication and cryptographic attestation
+- **Data Model**: Multi-collection MongoDB schema for recommendations, signals, customers, policies
+
+### API Endpoints
+- `POST /agents/ops/execute` - Execute telco operations action bundle
+- `GET /agents/ops/health` - Health check endpoint
+- `POST /agents/ops/test` - Test execution endpoint
+- `GET /agents/ops/recommendations` - Get pending recommendations
+- `POST /agents/ops/recommendations/{id}/approve` - Approve and dispatch recommendation
+
+### Data Model
+```python
+class ActionBundle(BaseModel):
+    run_id: str
+    customer_id: str
+    topic: str
+    summary_md: str
+    recommendations: List[NextAction] = []
+    actions: List[Action]
+    callback_url: str
+
+class Action(BaseModel):
+    type: Literal[
+        "tmf622.order.create",
+        "tmf622.order.change", 
+        "subscription.change",
+        "appointment.schedule",
+        "comm.send",
+        "crm.case.create"
+    ]
+    payload: Dict[str, Any]
+
+class CustomerContext(BaseModel):
+    customer_id: str
+    current_plan: Optional[str] = None
+    devices: List[str] = []
+    tenure: Optional[int] = None
+    arpu: Optional[float] = None
+    risk_score: Optional[float] = Field(default=0.0, ge=0.0, le=100.0)
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Telco Ops Decisioning Agent**
+2. Go to **Recommendations** tab to review AI-generated suggestions
+3. Click **Approve & Dispatch** for one-click confirmation
+4. Monitor execution in **Runs** tab with attestation hashes
+5. Configure policies in **Settings** tab
+
+### Environment Variables
+```bash
+# TMF Integration
+TMF_BASE_URL=https://tmf.example.com
+TMF_AUTH_TOKEN=your-tmf-token
+
+# Appointment Integration  
+APPOINT_BASE_URL=https://appointments.example.com
+APPOINT_TOKEN=your-appointment-token
+
+# Communication Integration
+COMMS_PROVIDER=m365
+COMMS_API_KEY=your-comms-key
+GRAPH_USER_ID=me
+GRAPH_BEARER_TOKEN=your-graph-token
+
+# CRM Integration
+CRM_BASE_URL=https://crm.example.com
+CRM_BEARER_TOKEN=your-crm-token
+```
+
+### Policy Configuration
+```python
+policy = {
+    "max_auto_value": 50.0,        # Max € for automatic execution
+    "confidence_threshold": 0.7,   # Min confidence for recommendations
+    "risk_threshold": 70.0,        # Max risk % before requiring approval
+    "required_approval_roles": ["ops-supervisor"]
+}
+```
+
+### Decision Scoring Algorithm
+```
+decision_score = w1*confidence + w2*expected_value - w3*risk - w4*churn_prob
+
+where:
+  confidence     = AI model confidence (0.0 - 1.0)
+  expected_value = Expected revenue impact (€)
+  risk          = Customer/operation risk score (0-100)
+  churn_prob    = Customer churn probability (0.0 - 1.0)
+```
+
+### Future Enhancements
+- **Advanced ML Models**: Predictive analytics for customer behavior and network optimization
+- **Real-Time Processing**: Stream processing for instant response to network events
+- **Extended TMF Support**: Additional TM Forum APIs (TMF633, TMF640, TMF641)
+- **Network Analytics**: Integration with network monitoring and optimization systems
+- **Customer Journey**: End-to-end customer lifecycle management
+- **Compliance Automation**: Automated regulatory compliance checks and reporting
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `tmf622.order.create`, `tmf622.order.change`, `subscription.change`, `appointment.schedule`, `comm.send`, `crm.case.create`
+- **Policy**: Configurable auto-execution thresholds with approval workflows
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Implementation Summary**: [TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md](TELCO_OPS_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Agent Descriptor**: [frontend/src/configs/agents/telco-ops-agent.json](frontend/src/configs/agents/telco-ops-agent.json)
+
+---
+
+## 🛡️ Responsible AI Ops (GRC)
+
+### Overview
+The **Responsible AI Ops (GRC)** agent is designed for Erica Domingos (Principal Lead for Technology Ownership, Norsk Hydro) to address the critical challenges in Finance, Procurement, Supply Chain, and ESG reporting functions. It embodies Responsible AI principles from the ground up, ensuring transparency, accountability, and ethical use while scaling effectively across high-workload domains with complex governance requirements.
+
+### Problem Statement
+As stated by Erica Domingos:
+> "I encourage participating teams to explore solutions that support finance, procurement, supply chain, and ESG reporting functions—domains that consistently face high workloads, data quality challenges, and complex governance requirements, all while managing significant risk exposure. What would be truly valuable is a solution that not only scales effectively across these areas but also embodies the principles of responsible AI—ensuring transparency, accountability, and ethical use from the ground up."
+
+### Solution
+The Responsible AI Ops (GRC) agent addresses these challenges by:
+- **Data-Driven Compliance**: Monitors business objects (POs, invoices, shipments, materials, ESG metrics) for data quality issues, policy breaches, and risks
+- **Automated Remediation**: Executes fixes, holds, and notifications with full audit trails
+- **Responsible AI Guardrails**: Implements provenance, separation of duties, confidence thresholds, PII minimization, and attestation
+- **Multi-System Integration**: Connects SAP S/4HANA, ESG stores, Slack, Teams, and notification systems
+- **Policy-Based Automation**: Configurable thresholds for automatic vs. manual execution
+
+### Key Features
+- **SAP S/4HANA Integration**: OData/REST API integration for FI/MM/SD modules
+- **ESG Metrics Management**: Environmental, Social, and Governance metric monitoring and recalculation
+- **Multi-Channel Notifications**: Slack and Microsoft Teams integration for alerts and updates
+- **Policy Enforcement**: Configurable guardrails for automatic execution limits
+- **Audit Trail**: Complete cryptographic attestation and audit logging
+- **Separation of Duties**: Role-based approval workflows for high-impact actions
+- **Data Quality Monitoring**: Automated detection of missing GL codes, negative quantities, duplicate vendors
+- **Risk Scoring**: Intelligent risk assessment with configurable thresholds
+
+### Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Data Sources  │───▶│   GRC Engine     │    │   Policy        │
+│   SAP S/4HANA   │    │   Monitoring     │    │   Guardrails    │
+│   ESG Store     │    │   Detection      │    │   SoD Check     │
+│   External APIs │    │   Scoring        │    │   Thresholds    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   ERP Actions   │    │   ESG Actions    │    │   Notifications │
+│   Fix/Block/Hold│    │   Recalculate    │    │   Slack/Teams   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Audit Trail  │    │   Attestation    │    │   AgentOps      │
+│   MongoDB      │    │   Hash           │    │   Studio        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### UI Components
+- **Overview**: Agent capabilities, statistics, and Responsible AI features
+- **Findings**: Data quality, policy, and risk findings with priority scoring
+- **Actions**: Executed actions across ERP, ESG, and notification systems
+- **Runs**: Execution runs with attestation and audit trails
+- **Policies**: Configuration of thresholds, roles, and automation limits
+
+### Technical Implementation
+- **Backend**: FastAPI router with MongoDB persistence and HMAC security
+- **Frontend**: React components with professional UI and real-time updates
+- **Integrations**: SAP OData, ESG APIs, Slack Bot API, Microsoft Teams webhooks
+- **Security**: HMAC authentication, cryptographic attestation, role-based access
+- **Data Model**: Multi-collection MongoDB schema for objects, signals, findings, actions, policies
+
+### API Endpoints
+- `POST /agents/grc/execute` - Execute GRC action bundle with HMAC verification
+- `GET /agents/grc/health` - Health check endpoint
+- `POST /agents/grc/test` - Test execution with sample data
+- `GET /agents/grc/runs` - Get GRC agent runs
+- `POST /agents/grc/callback` - Handle external system callbacks
+
+### Data Model
+```python
+class GrcActionBundle(BaseModel):
+    run_id: str
+    object_ref: str              # e.g., PO# / Invoice# / Metric id
+    topic: str
+    summary_md: str
+    evidence: List[Evidence] = []
+    actions: List[Action]
+    callback_url: str
+
+class Action(BaseModel):
+    type: Literal[
+        "erp.fix",           # Apply fix to ERP system
+        "po.block",          # Block purchase order
+        "invoice.hold",      # Hold invoice
+        "esg.recalc",        # Recalculate ESG metric
+        "notify.slack",      # Send Slack notification
+        "notify.teams"       # Send Teams notification
+    ]
+    payload: Dict[str, Any]
+    mode: Literal["Auto", "OneClick"] = "OneClick"
+
+class Finding(BaseModel):
+    object_id: str
+    title: str
+    summary_md: str
+    severity: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    materiality: float = Field(ge=0.0, le=1.0)
+    category: str
+    status: Literal["Open", "InProgress", "Resolved", "Closed"]
+```
+
+### Usage Example
+1. Navigate to **Item Agents** → **Responsible AI Ops (GRC)**
+2. Go to **Findings** tab to review detected issues
+3. Click **Test Hold Invoice** to execute sample GRC action
+4. Monitor execution in **Runs** tab with attestation hashes
+5. Configure policies in **Policies** tab
+
+### Environment Variables
+```bash
+# SAP Integration
+SAP_BASE_URL=https://sap.example.com
+SAP_BEARER_TOKEN=your-sap-bearer-token
+
+# ESG Integration
+ESG_BASE_URL=https://esg.example.com
+ESG_BEARER_TOKEN=your-esg-bearer-token
+
+# Notification Integration
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+TEAMS_WEBHOOK_URL=https://your-domain.webhook.office.com/webhookb2/your-webhook-url
+
+# Policy Configuration
+MAX_AUTO_IMPACT=1000
+```
+
+### Policy Configuration
+```python
+policy = {
+    "max_auto_impact": 1000.0,        # Max € for automatic execution
+    "sod_required_roles": ["controller", "procurement-approver"],
+    "confidence_threshold": 0.7,       # Min confidence for auto-execution
+    "severity_threshold": 0.5,         # Min severity for action
+    "materiality_threshold": 0.3       # Min materiality for action
+}
+```
+
+### Priority Scoring Algorithm
+```
+priority_score = 0.5*severity + 0.2*confidence + 0.2*materiality + 0.1*recency
+
+where:
+  severity     = Issue severity (0.0 - 1.0)
+  confidence   = Detection confidence (0.0 - 1.0)
+  materiality  = Business impact (0.0 - 1.0)
+  recency      = Time since detection (0.0 - 1.0)
+```
+
+### Responsible AI Features
+- **✅ Provenance**: All actions tracked with full audit trails
+- **✅ Separation of Duties**: High-impact actions require multiple approvals
+- **✅ Confidence Thresholds**: Only high-confidence decisions are auto-executed
+- **✅ PII Minimization**: Personal data handled according to privacy policies
+- **✅ Attestation**: All executions are cryptographically attested
+- **✅ Audit Trail**: Complete logging and traceability
+
+### Future Enhancements
+- **Advanced ML Models**: Predictive analytics for compliance risk
+- **Real-Time Processing**: Stream processing for instant compliance monitoring
+- **Extended ERP Support**: Additional SAP modules and other ERP systems
+- **Regulatory Compliance**: Automated regulatory compliance checks
+- **Advanced Analytics**: Machine learning for pattern detection
+- **Integration Expansion**: Additional notification channels and systems
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `erp.fix`, `po.block`, `invoice.hold`, `esg.recalc`, `notify.slack`, `notify.teams`
+- **Policy**: Configurable auto-execution thresholds with approval workflows
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/grc-agent.json](frontend/src/configs/agents/grc-agent.json)
+- **Backend Models**: [backend/models/grc.py](backend/models/grc.py)
+- **Router Implementation**: [backend/routers/grc_execute.py](backend/routers/grc_execute.py)
+
+---
+
+## 🏛️ Council of Diverse Lenses
+
+### Overview
+The **Council of Diverse Lenses** agent is an AI-powered council deliberation system designed to create diverse personas that debate topics, surface agreements/disagreements/unknowns, and produce auditable Council Briefs with optional publishing to Slack and Confluence. This agent embodies the principle of "steel-manning" arguments by presenting the strongest possible case for each perspective, ensuring comprehensive and balanced deliberation.
+
+### Problem Statement
+Organizations often struggle with:
+- **Echo chambers** and confirmation bias in decision-making
+- **Limited perspectives** in complex problem-solving
+- **Lack of auditable deliberation** processes
+- **Difficulty synthesizing** diverse viewpoints into actionable insights
+- **Poor documentation** of reasoning and consensus-building
+
+### Solution
+The Council Agent creates a virtual council of diverse personas with different:
+- **Ideological backgrounds** (progressive, conservative, libertarian, etc.)
+- **Regional perspectives** (Nordic, European, American, Asian, etc.)
+- **Disciplinary expertise** (technical, business, legal, ethical, etc.)
+- **Experience levels** (junior, senior, executive, academic)
+
+Each persona provides:
+- **Steel-manned arguments** with citations and confidence scores
+- **Agreement/disagreement mapping** with reasoning
+- **Unknown areas** that require further research
+- **Consensus synthesis** with transparent scoring
+
+### Key Features
+
+#### 🧠 **Diverse Persona Generation**
+- **8 Active Personas** with configurable ideologies and expertise
+- **Dynamic persona selection** based on topic relevance
+- **Balanced representation** across multiple dimensions
+- **Persona library** with pre-configured archetypes
+
+#### 🗣️ **Council Room Interface**
+- **Column-based layout** showing each persona's perspective
+- **Steel-manned arguments** with confidence scores
+- **Citation tracking** and source attribution
+- **"Challenge me more/less"** toggle for argument depth
+
+#### 🗺️ **Argument Mapping**
+- **Agreements/Disagreements/Unknowns** visualization
+- **Score chips** showing argument strength
+- **Consensus indicators** and divergence points
+- **Transparent reasoning** chains
+
+#### 📊 **Auditable Deliberation**
+- **Attestation hashes** for all deliberations
+- **Provenance tracking** of sources and reasoning
+- **Version control** for deliberation iterations
+- **Compliance-ready** documentation
+
+#### 🔄 **Integration & Publishing**
+- **Slack publishing** with rich card formats
+- **Confluence integration** for knowledge management
+- **MCP-enabled** for external tool integration
+- **Callback system** for status tracking
+
+### Architecture
+
+#### **Backend Components**
+- **Models**: `PersonaSpec`, `DeliberationBundle`, `CouncilBrief`
+- **Router**: `/agents/council/execute` with HMAC verification
+- **Integrations**: Slack, Confluence, attestation system
+- **Store**: MongoDB collections for personas, deliberations, briefs
+
+#### **Frontend Components**
+- **Overview**: Agent descriptor, KPIs, and capabilities
+- **Council Room**: Persona columns with arguments and confidence
+- **Argument Map**: Visual mapping of agreements/disagreements
+- **Runs**: Execution history with attestation hashes
+- **Settings**: Persona configuration and safety thresholds
+
+#### **Safety & Scoring**
+- **Harm detection** with configurable thresholds
+- **Quality scoring** based on relevance, depth, and citations
+- **Diversity weighting** to ensure balanced perspectives
+- **Safety gating** to prevent harmful content
+
+### Technical Implementation
+
+#### **API Endpoints**
+- `GET /agents/council/stats` - Dashboard metrics and KPIs
+- `GET /agents/council/personas` - Available persona configurations
+- `POST /agents/council/execute` - Start deliberation process
+- `POST /agents/council/callback` - Status updates from external systems
+- `GET /agents/council/runs` - Execution history and results
+- `GET /agents/council/health` - System health check
+
+#### **Data Model**
+```json
+{
+  "persona_spec": {
+    "name": "Technical Pragmatist",
+    "ideology": "pragmatic",
+    "region": "nordic",
+    "discipline": "technical",
+    "experience": "senior"
+  },
+  "deliberation_bundle": {
+    "topic": "AI Ethics in Healthcare",
+    "sources": ["research_paper_1", "policy_doc_2"],
+    "personas": ["persona_1", "persona_2", "persona_3"],
+    "arguments": [...],
+    "agreements": [...],
+    "disagreements": [...],
+    "unknowns": [...]
+  }
+}
+```
+
+#### **Scoring Algorithm**
+```python
+Score = 0.40 * Relevance01 + 0.30 * Quality01 + 0.30 * Diversity
+# Gate to zero if Harm > 0.35
+```
+
+### Usage Example
+
+#### **1. Start Deliberation**
+```bash
+POST /agents/council/execute
+{
+  "topic": "Should we implement AI-powered hiring decisions?",
+  "sources": ["hr_policy.pdf", "ai_ethics_guidelines.pdf"],
+  "personas": ["technical_pragmatist", "legal_expert", "ethics_scholar"],
+  "challenge_level": "moderate"
+}
+```
+
+#### **2. Monitor Progress**
+- **Council Room** shows real-time persona arguments
+- **Argument Map** visualizes consensus building
+- **Confidence scores** indicate argument strength
+
+#### **3. Review Results**
+- **Council Brief** with synthesized insights
+- **Attestation hash** for audit trail
+- **Actionable recommendations** with reasoning
+
+#### **4. Publish & Share**
+- **Slack notification** with summary card
+- **Confluence page** with full deliberation
+- **Team collaboration** on next steps
+
+### Environment Variables
+```bash
+# Slack Integration
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_CHANNEL_ID=C1234567890
+
+# Confluence Integration
+CONFLUENCE_BASE_URL=https://your-domain.atlassian.net
+CONFLUENCE_USER=your-email@company.com
+CONFLUENCE_TOKEN=your-api-token
+
+# Safety Configuration
+HARM_GATE=0.35
+DIVERSITY_WEIGHT=0.30
+QUALITY_WEIGHT=0.30
+RELEVANCE_WEIGHT=0.40
+```
+
+### Safety & Guardrails
+
+#### **Harm Detection**
+- **Content filtering** for harmful or biased content
+- **Configurable thresholds** for different risk levels
+- **Human oversight** for high-stakes decisions
+- **Audit logging** of all safety interventions
+
+#### **Quality Assurance**
+- **Citation requirements** for all arguments
+- **Source verification** and credibility scoring
+- **Argument coherence** checking
+- **Consensus validation** mechanisms
+
+#### **Transparency**
+- **Full audit trail** of deliberation process
+- **Attestation hashes** for tamper detection
+- **Provenance tracking** of all sources
+- **Open reasoning** chains for all conclusions
+
+### Future Enhancements
+
+#### **Advanced Features**
+- **Multi-language support** for global deliberations
+- **Real-time collaboration** with human participants
+- **Integration with decision management** systems
+- **Advanced visualization** of argument networks
+
+#### **Enterprise Integration**
+- **SSO authentication** with corporate systems
+- **Compliance reporting** for regulatory requirements
+- **Custom persona libraries** for specific industries
+- **API rate limiting** and usage analytics
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `council.generate`, `publish.slack`, `publish.confluence`
+- **Policy**: Configurable auto-execution with safety gating
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/council-agent.json](frontend/src/configs/agents/council-agent.json)
+- **Backend Models**: [backend/models/council.py](backend/models/council.py)
+- **Router Implementation**: [backend/routers/council_execute.py](backend/routers/council_execute.py)
+
+---
+
+## ⚙️ Operations Efficiency Agent
+
+### Overview
+The **Operations Efficiency Agent** is an AI-powered automation system designed for Posten Bring to streamline three critical operational areas: invoice handling, cost allocation suggestions, and CV ranking. This agent embodies Anne Gjerstad's vision of "value automation and suggestions to improve efficiency, which would free up time for more value generation and strategic work."
+
+### Problem Statement
+Posten Bring faces operational challenges in:
+- **Manual invoice processing** with 3-way matching and variance detection
+- **Time-consuming cost allocation** decisions without historical pattern analysis
+- **Inefficient CV screening** and candidate ranking processes
+- **Limited automation** in routine operational tasks
+- **Lack of explainable AI** for operational decisions
+
+### Solution
+The Operations Efficiency Agent provides:
+- **Automated invoice processing** with 3-way matching (PO/GR/Invoice)
+- **AI-powered cost allocation** suggestions based on vendor patterns
+- **Intelligent CV ranking** against job criteria with evidence highlighting
+- **Explainable automation** with confidence scoring and rationale
+- **Seamless integration** with ERP, ATS, and notification systems
+
+### Key Features
+
+#### **📄 Invoice Management**
+- **3-way matching** with PO, GR, and Invoice validation
+- **Variance detection** with configurable thresholds
+- **Automated approval** for low-risk, low-variance invoices
+- **Manual hold** for high-variance or high-value invoices
+- **Real-time notifications** to finance teams via Slack
+
+#### **💰 Cost Allocation**
+- **Pattern analysis** from historical vendor data
+- **Confidence scoring** for allocation suggestions
+- **One-click posting** to ERP systems
+- **Explainable rationale** for allocation decisions
+- **Audit trail** with attestation hashes
+
+#### **👥 CV Ranking**
+- **Multi-format support** for PDF, DOC, DOCX files
+- **Skills extraction** and keyword matching
+- **Evidence highlighting** with relevance scoring
+- **Export capabilities** to Google Sheets
+- **Ranking transparency** with detailed scoring
+
+#### **🔧 Automation Features**
+- **Configurable thresholds** for auto vs manual processing
+- **Confidence-based decisions** with safety gates
+- **HMAC verification** for secure execution
+- **Attestation hashing** for audit compliance
+- **Real-time monitoring** and health checks
+
+### Architecture
+
+```mermaid
+graph TB
+    subgraph "Operations Efficiency Agent Architecture"
+        A[Ops Efficiency Dashboard] --> B[Invoice Management]
+        A --> C[Cost Allocations]
+        A --> D[CV Ranking]
+        A --> E[Execution History]
+        
+        B --> F[3-Way Matching]
+        B --> G[Variance Detection]
+        B --> H[Auto Approval]
+        
+        C --> I[Pattern Analysis]
+        C --> J[Allocation Suggestions]
+        C --> K[Confidence Scoring]
+        
+        D --> L[CV Parsing]
+        D --> M[Skills Extraction]
+        D --> N[Ranking Algorithm]
+        
+        E --> O[Run Monitoring]
+        E --> P[Attestation Tracking]
+        
+        F --> Q[ERP Integration]
+        G --> Q
+        H --> Q
+        I --> Q
+        J --> Q
+        
+        L --> R[ATS Integration]
+        M --> R
+        N --> R
+        
+        Q --> S[Slack Notifications]
+        R --> S
+        Q --> T[Google Sheets]
+        R --> T
+    end
+```
+
+### UI Components
+
+#### **📊 Overview Dashboard**
+- **System health** indicators for all integrations
+- **Key metrics** (invoices processed, allocations posted, candidates ranked)
+- **Quick actions** for common operations
+- **Real-time status** of automation systems
+
+#### **📄 Invoice Management**
+- **Invoice table** with status badges and variance indicators
+- **3-way match** visualization and variance analysis
+- **Approve/Hold** buttons with one-click execution
+- **Detailed view** with extracted fields and audit trail
+
+#### **💰 Cost Allocations**
+- **Allocation suggestions** with confidence scores
+- **Side-by-side comparison** of current vs suggested splits
+- **Rationale display** with historical pattern analysis
+- **One-click posting** to ERP systems
+
+#### **👥 CV Ranking**
+- **File upload** interface with drag-and-drop support
+- **Job criteria** input with skills and requirements
+- **Ranking results** with scores and evidence highlights
+- **Export functionality** to Google Sheets
+
+#### **📈 Execution History**
+- **Run monitoring** with status tracking
+- **Attestation hashes** for audit compliance
+- **Artifact visualization** with action details
+- **Filtering and search** capabilities
+
+#### **⚙️ Settings & Configuration**
+- **Threshold configuration** for automation rules
+- **Integration settings** for ERP, ATS, notifications
+- **Health monitoring** for all connected systems
+- **Policy management** for security and compliance
+
+### Technical Implementation
+
+#### **Backend Architecture**
+- **FastAPI router** (`/agents/opsx/execute`) with HMAC verification
+- **Pydantic models** for type-safe data contracts
+- **MongoDB integration** for persistent storage
+- **Async/await** patterns for non-blocking operations
+
+#### **Integration Layer**
+- **ERP Integration** (SAP/Business Central/Coupa)
+- **ATS Integration** (Local files/Greenhouse/Workable)
+- **Notification Services** (Slack/Microsoft Graph)
+- **Export Services** (Google Sheets API)
+
+#### **Security & Compliance**
+- **HMAC-SHA256** signature verification
+- **Attestation hashing** for audit trails
+- **Role-based access** control
+- **Data retention** policies
+
+### API Endpoints
+
+#### **Core Execution**
+- `POST /agents/opsx/execute` - Main execution endpoint
+- `POST /agents/opsx/callback` - External system callbacks
+- `GET /agents/opsx/stats` - Operational statistics
+- `GET /agents/opsx/health` - System health status
+- `GET /agents/opsx/runs` - Execution history
+
+#### **Invoice Operations**
+- `POST /agents/opsx/invoices/approve` - Approve invoice
+- `POST /agents/opsx/invoices/hold` - Put invoice on hold
+- `GET /agents/opsx/invoices/{id}` - Get invoice details
+- `POST /agents/opsx/invoices/three-way-match` - 3-way matching
+
+#### **Allocation Operations**
+- `POST /agents/opsx/allocations/suggest` - Generate allocation suggestion
+- `POST /agents/opsx/allocations/post` - Post allocation to ERP
+- `GET /agents/opsx/allocations/{id}` - Get allocation details
+
+#### **CV Ranking Operations**
+- `POST /agents/opsx/candidates/rank` - Rank candidates
+- `POST /agents/opsx/candidates/export` - Export to Sheets
+- `GET /agents/opsx/candidates/{job_id}` - Get ranked candidates
+
+### Data Model
+
+#### **Invoice Model**
+```python
+class Invoice(BaseModel):
+    invoice_id: str
+    vendor: str
+    invoice_date: datetime
+    total_amount: float
+    currency: str = "NOK"
+    status: InvoiceStatus
+    lines: List[InvoiceLine]
+    po_number: Optional[str]
+    gr_number: Optional[str]
+    variance_percent: Optional[float]
+    variance_amount: Optional[float]
+```
+
+#### **Allocation Model**
+```python
+class CostAllocation(BaseModel):
+    allocation_id: str
+    document_id: str
+    vendor: str
+    description: str
+    total_amount: float
+    lines: List[AllocationLine]
+    status: AllocationStatus
+    confidence_score: float
+    rationale: str
+```
+
+#### **Candidate Model**
+```python
+class Candidate(BaseModel):
+    candidate_id: str
+    name: str
+    cv_text: str
+    score: float
+    highlights: List[Dict[str, Any]]
+```
+
+### Usage Example
+
+#### **Invoice Processing Workflow**
+1. **Upload invoice** or receive via ERP integration
+2. **Extract data** using OCR and parsing
+3. **Perform 3-way match** with PO and GR
+4. **Calculate variance** percentage and amount
+5. **Apply automation rules** based on thresholds
+6. **Execute action** (approve/hold) with notifications
+7. **Update ERP** system with new status
+8. **Log execution** with attestation hash
+
+#### **Cost Allocation Workflow**
+1. **Analyze vendor** patterns from historical data
+2. **Generate suggestion** with confidence scoring
+3. **Present rationale** with supporting evidence
+4. **User review** and approval of suggestion
+5. **Post allocation** to ERP system
+6. **Send notifications** to relevant stakeholders
+7. **Audit trail** creation with attestation
+
+#### **CV Ranking Workflow**
+1. **Upload CV files** or receive from ATS
+2. **Parse content** and extract skills/experience
+3. **Define job criteria** and requirements
+4. **Score candidates** against criteria
+5. **Generate highlights** with evidence
+6. **Export results** to Google Sheets
+7. **Notify HR team** with ranking summary
+
+### Environment Variables
+
+#### **Required Configuration**
+```bash
+# ERP Integration
+ERP_BASE_URL=https://erp.example.com
+ERP_BEARER_TOKEN=your_erp_token
+
+# Notifications
+SLACK_BOT_TOKEN=xoxb-your-slack-token
+```
+
+#### **Optional Configuration**
+```bash
+# ATS Integration
+ATS_PROVIDER=local|greenhouse|workable
+ATS_BASE_URL=https://ats.example.com
+ATS_TOKEN=your_ats_token
+
+# Email Notifications
+GRAPH_BEARER_TOKEN=your_graph_token
+GRAPH_USER_ID=me
+
+# Google Sheets Export
+GOOGLE_SA_JSON={"type":"service_account",...}
+SHEETS_SPREADSHEET_ID=your_sheet_id
+
+# Automation Thresholds
+MAX_AUTO_AMOUNT=500
+MIN_CONFIDENCE_AUTO=0.8
+```
+
+### Policy Configuration
+
+#### **Automation Rules**
+- **Max Auto Amount**: NOK 500 (configurable)
+- **Min Confidence**: 80% for automatic processing
+- **Variance Threshold**: 5% for 3-way matching
+- **Auto Approval**: Under NOK 1,000 with high confidence
+
+#### **Security Policies**
+- **HMAC Required**: All executions must be signed
+- **Attestation Enabled**: Audit trail for all operations
+- **Data Retention**: 90 days for operational data
+- **Role-based Access**: Finance, HR, and Operations roles
+
+### Future Enhancements
+
+#### **Advanced Automation**
+- **Machine learning** models for pattern recognition
+- **Predictive analytics** for cost allocation
+- **Natural language** processing for CV analysis
+- **Computer vision** for invoice data extraction
+
+#### **Integration Expansion**
+- **Additional ERP** systems (Oracle, NetSuite)
+- **More ATS providers** (BambooHR, Workday)
+- **Advanced notifications** (Teams, Discord)
+- **Business intelligence** integration (Power BI, Tableau)
+
+#### **Enterprise Features**
+- **Multi-tenant** support for different business units
+- **Custom workflows** for specific processes
+- **Advanced reporting** and analytics
+- **Compliance frameworks** (SOX, GDPR)
+
+### Agent Catalog Integration
+Registered in Agent Catalog with:
+- **MCP endpoint**: `mcp://localhost:5678`
+- **Capabilities**: `invoice.process`, `cost.allocate`, `ats.rank`, `notify.slack`, `notify.email`, `sheets.appendRow`
+- **Policy**: Configurable auto-execution with monetary and confidence thresholds
+- **Tools**: `dispatch_action_bundle`, `get_run_status`
+
+### Documentation
+- **Agent Descriptor**: [frontend/src/configs/agents/ops-efficiency-agent.json](frontend/src/configs/agents/ops-efficiency-agent.json)
+- **Backend Models**: [backend/models/opsx.py](backend/models/opsx.py)
+- **Router Implementation**: [backend/routers/opsx_execute.py](backend/routers/opsx_execute.py)
+- **Integration Layer**: [backend/integrations/](backend/integrations/)
+
+---
+
+## 🔒 Cybersecurity Module
+
+### Overview
+The Cybersecurity Module provides comprehensive security management and threat intelligence capabilities, integrating seamlessly with the existing AI-powered learning platform. It offers real-time vulnerability scanning, threat assessment, compliance tracking, and secure coding guidance.
+
+### Key Features
+- **🛡️ Threat Library**: Comprehensive database of cybersecurity threats with CIA Triad impact assessment
+- **📊 Security Dashboard**: Real-time risk scoring, KPIs, and vulnerability monitoring
+- **🔍 Vulnerability Management**: Automated scanning for npm, pip, and secret detection
+- **📈 Posture & Risk Assessment**: NIST CSF, Zero-Trust, and compliance framework integration
+- **👨‍🏫 Secure Coding Coach**: AI-powered micro-lessons and coding guidance
+- **📋 Compliance Tracker**: NIST, ISO, OWASP, and CIS framework mapping
+- **🚨 Incident Response Drills**: Simulated incident response training
+- **📚 Knowledge Base**: AI-powered cybersecurity Q&A using Agentic RAG
+- **🤖 Agent Security Monitor**: Advanced security monitoring and threat detection for AI agents with Zero Trust Architecture
+
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Cybersecurity Module Architecture"
+        A[Cybersecurity Dashboard] --> B[Threat Library]
+        A --> C[Vulnerability Scanner]
+        A --> D[Risk Assessment]
+        A --> E[Compliance Tracker]
+        
+        B --> F[CIA Triad Framework]
+        B --> G[Threat Categories]
+        B --> H[Control Mapping]
+        
+        C --> I[npm Audit]
+        C --> J[pip Audit]
+        C --> K[Secret Detection]
+        
+        D --> L[NIST CSF]
+        D --> M[Zero-Trust Model]
+        D --> N[Risk Scoring]
+        
+        E --> O[Framework Compliance]
+        E --> P[Control Status]
+        E --> Q[Evidence Tracking]
+        
+        R[AI Integration] --> S[Agentic RAG]
+        R --> T[Secure Coding Coach]
+        R --> U[Micro-lessons]
+        
+        V[Backend API] --> W[FastAPI Router]
+        V --> X[MongoDB Storage]
+        V --> Y[Real-time Updates]
+    end
+    
+    subgraph "Integration Points"
+        Z[Existing Modules] --> AA[Agentic RAG]
+        Z --> BB[AI Gateway]
+        Z --> CC[Micro-lessons]
+        Z --> DD[Knowledge Map]
+    end
+    
+    A -.-> R
+    V -.-> Z
+```
+
+### Module Components
+
+#### 🛡️ Threat Library
+- **Threat Database**: Comprehensive collection of cybersecurity threats
+- **CIA Impact Assessment**: Confidentiality, Integrity, Availability scoring (0-10)
+- **Control Mapping**: Links threats to NIST CSF, OWASP, CIS controls
+- **Category Filtering**: Social Engineering, Malware, Vulnerabilities, etc.
+- **Interactive UI**: Click-to-expand threat details with mitigation guidance
+
+#### 📊 Security Dashboard
+- **Risk Score**: Overall security posture (0-100 scale)
+- **Key Performance Indicators**: Patch latency, open vulnerabilities, compliance coverage
+- **Vulnerability Overview**: Recent findings with severity classification
+- **Trend Analysis**: Security posture improvement/degradation tracking
+- **Real-time Updates**: Live vulnerability scanning and status updates
+
+#### 🔍 Vulnerability Management
+- **Automated Scanning**: npm audit, pip audit, secret detection
+- **Severity Classification**: CRITICAL, HIGH, MEDIUM, LOW, INFO
+- **Project-based Organization**: Separate vulnerability tracking per project
+- **Risk Scoring**: Calculated risk scores for each vulnerability
+
+#### 🤖 Agent Security Monitor
+- **Real-time Monitoring**: Continuous security assessment of all AI agents
+- **Threat Detection**: Advanced detection of prompt injection, model poisoning, and zero-day attacks
+- **Zero Trust Architecture**: Comprehensive security validation for agent interactions
+- **Behavioral Analysis**: AI agent behavior pattern monitoring and anomaly detection
+- **Model Integrity Checks**: Validation of AI model outputs and consistency
+- **Data Protection Audit**: Assessment of data handling and privacy compliance
+- **Incident Response**: Automated threat response and security incident tracking
+- **Security Scoring**: Individual agent security scores with vulnerability tracking
+- **Remediation Guidance**: AI-powered recommendations for fixes
+
+#### 📈 Posture & Risk Assessment
+- **NIST Cybersecurity Framework**: Identify, Protect, Detect, Respond, Recover
+- **Zero-Trust Architecture**: Verify every access attempt
+- **Compliance Mapping**: Framework-specific control implementation
+- **Risk Calculation**: Multi-factor risk scoring algorithm
+- **Trend Monitoring**: Historical risk score tracking
+
+### Technical Implementation
+
+#### Backend Architecture
+```python
+# FastAPI Router Structure
+/api/cyber/
+├── /threats              # GET threats, GET threat by ID
+├── /controls             # GET controls, GET control by ID
+├── /vulnerabilities      # GET vulnerabilities, POST scan
+├── /posture/kpis         # GET security KPIs
+├── /risk/score          # GET risk assessment
+├── /rag/ask             # POST cybersecurity Q&A
+├── /coach/lesson        # POST secure coding lessons
+├── /compliance/status   # GET compliance status
+└── /health              # GET module health
+```
+
+#### Data Models
+- **Threat**: ID, name, category, CIA impact, description, controls, tags
+- **ControlMap**: Framework controls with implementation guidance
+- **Vulnerability**: Source, severity, package, CVE, recommendations
+- **RiskScore**: Overall score, factors, trend analysis
+- **PostureKPI**: Key performance indicators with targets
+
+#### Frontend Components
+- **Cybersecurity.jsx**: Main module container with tab navigation
+- **CyberDashboard.jsx**: Risk score, KPIs, vulnerability overview
+- **ThreatLibrary.jsx**: Interactive threat database with filtering
+- **Integration**: Seamless integration with existing UI patterns
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/cyber/health` | GET | Module health check |
+| `/api/cyber/threats` | GET | List all threats |
+| `/api/cyber/threats/{id}` | GET | Get specific threat |
+| `/api/cyber/controls` | GET | List security controls |
+| `/api/cyber/vulnerabilities` | GET | List vulnerabilities |
+| `/api/cyber/vulnerabilities/scan` | POST | Run vulnerability scans |
+| `/api/cyber/posture/kpis` | GET | Get security KPIs |
+| `/api/cyber/risk/score` | GET | Calculate risk score |
+| `/api/cyber/rag/ask` | POST | Cybersecurity Q&A |
+| `/api/cyber/coach/lesson` | POST | Generate secure coding lesson |
+| `/api/cyber/compliance/status` | GET | Get compliance status |
+| `/api/agent-security/overview` | GET | Get agent security overview |
+| `/api/agent-security/agents/{name}/status` | GET | Get specific agent security status |
+| `/api/agent-security/scan` | POST | Run security scan on agents |
+| `/api/agent-security/threat-detection` | POST | Detect threats in agent interactions |
+| `/api/agent-security/incidents` | GET | List security incidents |
+| `/api/agent-security/incidents/{id}/respond` | POST | Respond to security incident |
+| `/api/agent-security/agents/{name}/behavior-analysis` | GET | Analyze agent behavior patterns |
+| `/api/agent-security/agents/{name}/model-integrity` | GET | Check model integrity |
+| `/api/agent-security/agents/{name}/data-protection-audit` | GET | Audit data protection compliance |
+| `/api/agent-security/threat-feed` | GET | Get real-time threat intelligence |
+| `/api/agent-security/zero-trust/status` | GET | Get Zero Trust architecture status |
+| `/api/agent-security/health` | GET | Agent security module health check |
+
+### Integration with Existing Modules
+
+#### 🤖 Agentic RAG Integration
+- **Knowledge Base**: Cybersecurity-specific document collection
+- **AI-Powered Q&A**: Context-aware security guidance
+- **Source Attribution**: Reliable security framework references
+- **Confidence Scoring**: AI confidence in security recommendations
+
+#### 🎓 Micro-lessons Integration
+- **Secure Coding**: Automated micro-lessons based on vulnerabilities
+- **Threat Awareness**: Interactive threat education modules
+- **Compliance Training**: Framework-specific learning content
+- **Personalized Learning**: Adaptive content based on risk profile
+
+#### 🧠 AI Gateway Integration
+- **Safety Monitoring**: AI response validation for security content
+- **Cost Tracking**: API usage monitoring for security queries
+- **Quality Assurance**: AI response quality scoring
+- **Audit Trail**: Complete security guidance history
+
+### Security Frameworks Supported
+
+#### NIST Cybersecurity Framework 2.0
+- **Identify**: Asset management, risk assessment
+- **Protect**: Access control, data security, maintenance
+- **Detect**: Anomaly detection, continuous monitoring
+- **Respond**: Response planning, communications
+- **Recover**: Recovery planning, communications
+
+#### OWASP Standards
+- **OWASP Top 10**: Most critical web application security risks
+- **OWASP ASVS**: Application Security Verification Standard
+- **OWASP SAMM**: Software Assurance Maturity Model
+
+#### CIS Controls
+- **CIS Controls v8**: Critical security controls
+- **CIS Benchmarks**: Configuration guidelines
+- **CIS Hardened Images**: Secure system images
+
+#### ISO 27001
+- **Information Security Management**: ISMS framework
+- **Risk Management**: Systematic risk assessment
+- **Continuous Improvement**: PDCA cycle implementation
+
+### Future Enhancements
+
+#### Phase 1: Advanced Scanning
+- **Container Security**: Docker image vulnerability scanning
+- **Infrastructure as Code**: Terraform/CloudFormation security analysis
+- **Dependency Management**: Automated dependency updates
+- **License Compliance**: Open source license tracking
+
+#### Phase 2: AI-Powered Security
+- **Threat Intelligence**: Real-time threat feed integration
+- **Behavioral Analysis**: User behavior anomaly detection
+- **Predictive Security**: AI-powered risk prediction
+- **Automated Response**: Self-healing security controls
+- **Agent Security AI**: Machine learning-based threat detection for AI agents
+- **Zero Trust Automation**: Automated Zero Trust policy enforcement
+- **Model Drift Detection**: AI model performance and integrity monitoring
+
+#### Phase 3: Enterprise Integration
+- **SIEM Integration**: Security Information and Event Management
+- **SOAR Integration**: Security Orchestration, Automation and Response
+- **Compliance Automation**: Automated compliance reporting
+- **Executive Dashboards**: C-level security metrics
+
+### Usage Examples
+
+#### Basic Threat Assessment
+```bash
+# Get current risk score
+curl -X GET "http://localhost:8000/api/cyber/risk/score"
+
+# Response
+{
+  "overall": 68.35,
+  "factors": {
+    "patch_latency_days": 6.2,
+    "open_high_vulns": 3.0,
+    "compliance_coverage": 78.5
+  },
+  "trend": "stable"
+}
+```
+
+#### Vulnerability Scanning
+```bash
+# Run vulnerability scan
+curl -X POST "http://localhost:8000/api/cyber/vulnerabilities/scan" \
+  -H "Content-Type: application/json" \
+  -d '{"project": "default", "scan_types": ["npm", "pip", "secrets"]}'
+```
+
+#### Cybersecurity Q&A
+```bash
+# Ask cybersecurity question
+curl -X POST "http://localhost:8000/api/cyber/rag/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How do I prevent SQL injection attacks?"}'
+```
+
+### Benefits
+
+#### For Developers
+- **Secure Coding Guidance**: AI-powered recommendations for secure code
+- **Vulnerability Awareness**: Real-time vulnerability detection and education
+- **Compliance Support**: Framework-specific implementation guidance
+- **Learning Integration**: Security education within existing learning platform
+
+#### For Security Teams
+- **Centralized Dashboard**: Unified view of security posture
+- **Automated Scanning**: Continuous vulnerability assessment
+- **AI Agent Security**: Comprehensive monitoring of AI agent security posture
+- **Zero Trust Implementation**: Advanced security architecture for AI systems
+- **Threat Detection**: Real-time detection of AI-specific threats
+- **Compliance Tracking**: Framework compliance monitoring
+- **Risk Management**: Quantitative risk assessment and trending
+
+#### for Organizations
+- **Security Culture**: Integrated security education and awareness
+- **Compliance Readiness**: Automated compliance framework support
+- **Risk Reduction**: Proactive vulnerability management
+- **Cost Efficiency**: Integrated security within existing learning platform
+
+---
+
+## 🔒 Security vs. Cybersecurity — Scope and Complementarity
+
+There is no duplication between the two modules. They address different layers of protection and together provide a complete view of platform hardening and software security posture.
+
+### 🛡️ Security (Security Center) — Platform Security & Privacy
+
+**Focuses on how this application and its deployment protect user data and access.**
+
+- **Installation & Hardening**: Encryption at rest, local hardening, firewall, automatic updates/patches
+- **Identity & Access (RBAC/SSO)**: Who can sign in and what they can do
+- **Data & Privacy**: Retention/automatic deletion, anonymization, user data visibility/export
+- **Secrets & Keys**: Token/key storage and rotation practices
+- **Auditability & Evidence**: Platform security logs and configuration evidence
+- **Policies (Toggles)**: E.g., enforce MFA, require TLS, retention windows, etc.
+
+**Think of Security as**: *"Settings + Privacy + Hardening of the platform itself."*
+
+### 🔒 Cybersecurity — AppSec/SecOps & Risk Posture
+
+**Focuses on threats, vulnerabilities, and controls related to the software, dependencies, and runtime.**
+
+- **Risk Dashboard**: Overall risk score and KPIs (patch latency, number of high/critical vulns, control coverage)
+- **Vulnerabilities**: Results from package and container scanners (e.g., npm audit, pip-audit, secrets scanning, container image scanning)
+- **Threat Library**: Catalog (CIA triad) with recommended controls mapped to frameworks
+- **Posture & Risk**: Radar by NIST domains (Identify / Protect / Detect / Respond / Recover)
+- **Secure Coding Coach**: Suggested fixes and micro-lessons based on real findings
+- **Compliance Tracker (Security)**: Technical controls mapped to NIST/ISO/OWASP/CIS
+- **Incident Drills**: Guided simulations and after-action reports
+- **Knowledge (RAG)**: Q&A across security frameworks and best-practice guides
+
+**Think of Cybersecurity as**: *"Detecting, analyzing, and continuously improving the security of the software you build and run."*
+
+### 🔗 How They Connect (Without Overlapping)
+
+#### Security → Cybersecurity
+- Policies enabled in Security (e.g., MFA required, key rotation) contribute to Cybersecurity KPIs and control coverage
+
+#### Cybersecurity → Security
+- Findings (vulnerabilities, secrets, misconfigurations) suggest changes to platform Security policies/hardening
+
+### 📋 Compliance Split
+
+- **AI Compliance Agent**: Governance and risk for AI systems (e.g., EU AI Act aspects)
+- **Cybersecurity Compliance Tracker**: Technical security controls (NIST/ISO/OWASP/CIS) and their implementation status
+- **Security Center**: Evidence of platform configuration (what the app enforces and proves)
+
+### 🎯 Source-of-Truth Boundaries
+
+- **Policies & Audit Logs** → Security
+- **Findings, Scans, and Risk Score** → Cybersecurity
+- **Control Catalog** → Shared, with clear scope: "platform" or "appsec" attribute
+
+### 👥 Roles (Example RBAC)
+
+- **Security Admin**: Manages Security (policies, keys, audit evidence)
+- **DevSecOps**: Runs/monitors scans and dashboards in Cybersecurity
+- **Viewer**: Read-only access to both modules
+
+### 📊 Summary
+
+- **Security**: Protects how the platform and data are configured and governed
+- **Cybersecurity**: Improves how software is developed and operated securely and measures the risk posture over time
+
+---
+
+## 🏗️ AI Agent Bridge Platform
+
+### Architecture Overview
+The AI Agent Bridge Platform provides shared infrastructure for both Compliance and Productivity agents:
+
+```
+Insights (Document Analyzer/Agentic RAG) 
+    ↓
+Summary + Actions 
+    ↓
+Send to OutSystems Agent 
+    ↓
+Action Bundle (HMAC-signed)
+    ↓
+OutSystems Execution (Jira/Slack/Sheets)
+    ↓
+Callback → AgentOps Studio (Audit)
+```
+
+### Shared Components
+- **Data Model**: `agent_runs` MongoDB collection
+- **API Endpoints**: `/api/agent-runs` (list + callback)
+- **UI Components**: `ActionDispatchModal`, `AgentOpsRuns`
+- **Security**: HMAC-SHA256 signing for OutSystems communication
+- **Monitoring**: Real-time status updates and artifact tracking
+
+---
+
+## 🔗 n8n Webhook Setup
+
+### Overview
+This section documents the n8n webhook integration for the **OutSystems Low-Code Agent Builder Hackathon** (October 14th). The system uses local n8n webhooks as a temporary engine for immediate demo functionality, with the option to migrate to OutSystems later.
+
+### Architecture
+```
+AI Compliance Agent / AI Productivity Agent
+    ↓
+Send to OutSystems Agent (Button)
+    ↓
+Action Bundle (HMAC-signed)
+    ↓
+n8n Webhook (localhost:5678)
+    ↓
+n8n Workflow Processing
+    ↓
+Callback → AgentOps Studio (Audit)
+```
+
+### Environment Configuration
+The following environment variables are configured in `.env`:
+
+```env
+# OutSystems Integration (Hackathon) - Using n8n local
+OUTSYSTEMS_COMPLIANCE_URL=http://localhost:5678/webhook/compliance-agent
+OUTSYSTEMS_PRODUCTIVITY_URL=http://localhost:5678/webhook/productivity-agent
+AGENTOPS_HMAC_SECRET=hackathon-secret-key-2024
+OUTSYSTEMS_CALLBACK_URL=http://localhost:8000/api/agent-runs/callback
+
+# n8n Webhook URLs (Using existing Docker setup)
+N8N_COMPLIANCE_WEBHOOK=http://localhost:5678/webhook/compliance-agent
+N8N_PRODUCTIVITY_WEBHOOK=http://localhost:5678/webhook/productivity-agent
+```
+
+### Centralized Base URL Configuration (New)
+
+To simplify Docker/Container/Kubernetes deployments, backend and frontend base URLs are now centralized:
+
+```env
+# Backend base URL (used to derive default callback URL)
+BACKEND_BASE_URL=http://localhost:8000
+
+# Default callback URL (override only if different from BACKEND_BASE_URL)
+OUTSYSTEMS_CALLBACK_URL=${BACKEND_BASE_URL}/api/agent-runs/callback
+
+# Frontend base URL for API calls
+REACT_APP_API_BASE_URL=http://localhost:8000
+
+# Optional: websearch service base
+REACT_APP_WEBSEARCH_BASE_URL=http://localhost:8080
+```
+
+Backend config module: `backend/config.py`
+- Exposes `BACKEND_BASE_URL`, `CALLBACK_URL_DEFAULT`, `N8N_COMPLIANCE_WEBHOOK`, `N8N_PRODUCTIVITY_WEBHOOK`.
+- Routers use `CALLBACK_URL_DEFAULT` instead of hardcoded `http://localhost:8000`.
+
+Frontend API base
+- All API calls now resolve from `REACT_APP_API_BASE_URL`. No scattered `:8000` literals.
+
+### OutSystems → n8n Fallback Logic (New)
+
+- If `OUTSYSTEMS_COMPLIANCE_URL`/`OUTSYSTEMS_PRODUCTIVITY_URL` are NOT set, the backend automatically falls back to:
+  - `N8N_COMPLIANCE_WEBHOOK`
+  - `N8N_PRODUCTIVITY_WEBHOOK`
+- A warning is logged indicating the fallback in use.
+
+This allows switching between OutSystems and n8n by changing only environment variables.
+
+### Updated Architecture (Mermaid)
+
+```mermaid
+flowchart LR
+  subgraph Frontend
+    UI[React App]
+  end
+
+  subgraph Config
+    FEB[REACT_APP_API_BASE_URL]
+    BEB[BACKEND_BASE_URL]
+  end
+
+  subgraph Backend
+    API[FastAPI]
+    CFG[backend/config.py\nCALLBACK_URL_DEFAULT\nN8N_*_WEBHOOK]
+    R1[/compliance/dispatch/]
+    R2[/productivity/dispatch/]
+    CB[/api/agent-runs/callback/]
+  end
+
+  subgraph Execution
+    OS[OutSystems Endpoint]
+    N8N[n8n Webhook]
+  end
+
+  UI -- API calls --> API
+  UI -.reads.-> FEB
+  API -.reads.-> CFG
+  CFG -.derives.-> CB
+  API --> R1
+  API --> R2
+
+  R1 -- if OUTSYSTEMS_COMPLIANCE_URL set --> OS
+  R1 -- else fallback --> N8N
+  R2 -- if OUTSYSTEMS_PRODUCTIVITY_URL set --> OS
+  R2 -- else fallback --> N8N
+
+  OS --> CB
+  N8N --> CB
+
+  FEB -. configured by -> UI
+  BEB -. configured by -> CFG
+```
+
+### n8n Workflow Configuration
+
+#### Compliance Agent Webhook
+- **URL**: `http://localhost:5678/webhook/compliance-agent`
+- **Method**: POST
+- **Response**: 
+  ```json
+  {
+    "status": "success",
+    "message": "Compliance agent webhook received"
+  }
+  ```
+
+#### Productivity Agent Webhook
+- **URL**: `http://localhost:5678/webhook/productivity-agent`
+- **Method**: POST
+- **Response**: 
+  ```json
+  {
+    "status": "success",
+    "message": "Productivity agent webhook received"
+  }
+  ```
+
+### Testing Webhooks
+Both webhooks can be tested using PowerShell:
+
+```powershell
+# Test Compliance Agent Webhook
+Invoke-WebRequest -Uri "http://localhost:5678/webhook/compliance-agent" -Method POST -ContentType "application/json" -Body '{"test": "compliance-webhook-test"}'
+
+# Test Productivity Agent Webhook
+Invoke-WebRequest -Uri "http://localhost:5678/webhook/productivity-agent" -Method POST -ContentType "application/json" -Body '{"test": "productivity-webhook-test"}'
+```
+
+Expected response for both:
+- **Status Code**: 200
+- **Response**: `{"status":"success","message":"[Agent] webhook received"}`
+
+### Integration Flow
+1. **User Action**: User clicks "Send to OutSystems Agent" in AI Compliance Agent or AI Productivity Agent
+2. **Backend Processing**: Backend creates action bundle with HMAC signature
+3. **n8n Webhook Call**: Backend sends POST request to appropriate n8n webhook
+4. **n8n Processing**: n8n workflow processes the request and returns success response
+5. **Callback**: n8n sends callback to `OUTSYSTEMS_CALLBACK_URL` for audit trail
+6. **Agent Runs Monitor**: User can view execution status in AgentOps Studio
+
+### API Endpoints
+- **AI Compliance Agent**: `/api/compliance/dispatch` - Processes compliance documents
+- **AI Productivity Agent**: 
+  - `/api/productivity/analyze-url` - Analyzes external URLs with AI
+  - `/api/productivity/dispatch` - Executes productivity actions via OutSystems
+
+### Migration Path
+This implementation provides a **dual-path approach**:
+- **Immediate**: Use n8n local webhooks for hackathon demo
+- **Future**: Migrate to OutSystems by updating URLs in `.env` file
+
+The payload format is identical for both n8n and OutSystems, making migration seamless.
+
+### Files Created
+- `n8n_webhook_setup.md` - Step-by-step setup guide
+- `scripts/test_webhooks.ps1` - Webhook testing script
+- `hackathon_config.env` - Environment variables template
+
+### Enterprise Benefits
+- **Governance**: OutSystems-first execution ensures compliance and security
+- **Scalability**: Enterprise-grade infrastructure and connectors
+- **Audit**: Complete trail of AI-generated actions and outcomes
+- **Flexibility**: Support for both OutSystems and n8n execution engines
+- **Separation of Concerns**: Dedicated endpoints for different agent functionalities
+- **Maintainability**: Independent modules that can be updated without affecting others
 
 ---
 
