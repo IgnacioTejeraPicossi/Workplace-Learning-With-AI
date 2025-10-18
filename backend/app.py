@@ -2077,6 +2077,26 @@ async def get_root_readme():
     except Exception as e:
         return {"success": False, "message": f"Error reading README: {str(e)}"}
 
+# Read a Markdown file from docs/ (safe, read-only)
+@app.get("/api/docs/read")
+async def read_docs_md(path: str):
+    try:
+        import os
+        # Only allow files under ./docs and with .md extension
+        if not path or not path.endswith(".md"):
+            return {"success": False, "message": "Only .md files are allowed"}
+        safe_root = os.path.abspath("docs")
+        target = os.path.abspath(os.path.join(".", path))
+        if not target.startswith(safe_root):
+            return {"success": False, "message": "Access denied"}
+        with open(target, "r", encoding="utf-8") as f:
+            content = f.read()
+        return {"success": True, "markdown": content, "path": path}
+    except FileNotFoundError:
+        return {"success": False, "message": f"File not found: {path}"}
+    except Exception as e:
+        return {"success": False, "message": f"Error reading file: {str(e)}"}
+
 def calculate_user_learning_vector(mastery_scores, all_topics):
     """Calculate user's learning vector based on mastered topics"""
     user_vector = [0.0] * 10  # Assuming 10-dimensional embeddings

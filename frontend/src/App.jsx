@@ -54,6 +54,7 @@ import GRCAgent from "./GRCAgent";
 import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
+import ReadmeViewer from "./ReadmeViewer";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -467,6 +468,7 @@ function AppContent() {
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
+            {!activeModule && section === "readme-viewer" && <ReadmeViewer />}
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "security" && <SecurityPanel />}
             {!activeModule && section === "idea-log" && <IdeaLog />}

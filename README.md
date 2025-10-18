@@ -1,5 +1,17 @@
 # 🤖 AI-Powered Workplace Learning Platform
 
+> Quick access: use the Docs Index below (short pages → GitHub shows “Filter headings” on each), or scroll for the full README.
+
+### 📚 Docs Index (fast navigation)
+- [Architecture](docs/architecture.md)
+- [Deployment](docs/deployment.md)
+- [n8n Webhook Setup](docs/n8n.md)
+- [Agents](docs/agents.md)
+- [Admin & Development](docs/admin-dev.md)
+- [EA Second Brain Agent](docs/EA_SECOND_BRAIN_AGENT.md)
+
+---
+
 ## ✍️ Agent Prompt Manager (Compliance & Productivity)
 
 This release adds a built‑in Prompt Manager to two item agents:
