@@ -124,6 +124,13 @@ except ImportError:
     from routers.prompts_editor import router as prompts_editor_router
 app.include_router(prompts_editor_router)
 
+# AGI Progress router
+try:
+    from backend.routers.agi_progress import router as agi_router
+except ImportError:
+    from routers.agi_progress import router as agi_router
+app.include_router(agi_router)
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings

@@ -131,7 +131,8 @@ const getNavItems = (t) => [
     { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
     { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" },
-    { key: "readme-viewer", label: "Readme", icon: "doc" }
+    { key: "readme-viewer", label: "Readme", icon: "doc" },
+    { key: "agi-progress", label: "AGI Progress", icon: "chart" }
   ]},
   
   // Grupo 3: Herramientas de desarrollo (fondo azul)

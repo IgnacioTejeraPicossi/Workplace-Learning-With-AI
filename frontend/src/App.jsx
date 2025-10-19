@@ -55,6 +55,7 @@ import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
 import ReadmeViewer from "./ReadmeViewer";
+import AgiProgressPage from "./pages/help/AgiProgressPage";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -469,6 +470,7 @@ function AppContent() {
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
             {!activeModule && section === "readme-viewer" && <ReadmeViewer />}
+            {!activeModule && section === "agi-progress" && <AgiProgressPage />}
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "security" && <SecurityPanel />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
