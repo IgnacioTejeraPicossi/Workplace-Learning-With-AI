@@ -125,6 +125,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [🚀 Agentic RAG](#agentic-rag-system-advanced-document-intelligence) - Advanced document intelligence with AI agents
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
+- [AGI Progress Tracker](#agi-progress-tracker) - AGI score and cognitive domains dashboard
 - [🧠 Robomind Clinic](#robomind-clinic-ai-psychology-module) - AI Psychology Module for diagnosing and treating AI pathologies
 
 ### 🤖 AI-Powered Collaboration Modules (NEW!)
@@ -369,6 +370,32 @@ graph TB
 ```
 
 ### 🧪 Testing Architecture
+## AGI Progress Tracker
+
+Location: Help → AGI Progress (frontend `readme-viewer` sibling)
+
+Purpose: Provide a living dashboard of progress toward AGI using the CHC-inspired framework from Hendrycks et al. “A Definition of AGI”. Ten equally weighted cognitive domains (K, RW, M, R, WM, MS, MR, V, A, S) are displayed with an overall score.
+
+Features
+- Overall gauge with estimated AGI level (0–100%)
+- Radar chart of the 10 cognitive domains
+- Trend line (evolution across models, e.g., GPT‑4 → GPT‑5)
+- Model selector (view domain profile by model)
+- Admin mini‑form to add new model entries (POST `/api/agi/progress`)
+
+Backend
+- `GET /api/agi/progress` returns seeded GPT‑4(27) and GPT‑5(58) rows; reads from MongoDB when available and falls back to in‑memory when not
+- `POST /api/agi/progress` adds rows (persisted if Mongo is active)
+- Router: `backend/routers/agi_progress.py` (included in `backend/app.py`)
+
+Frontend
+- Page: `frontend/src/pages/help/AgiProgressPage.jsx`
+- Components: `components/agi/ScoreGauge.jsx`, `components/agi/DomainRadar.jsx`, `components/agi/TrendLine.jsx`
+- Charts: Chart.js via CDN (configured in `public/index.html`)
+
+Source
+- Paper: “A Definition of AGI” (Hendrycks et al., Oxford–MIT–Cornell, CAIS) — https://www.agidefinition.ai/paper.pdf
+
 
 ```mermaid
 graph TB
