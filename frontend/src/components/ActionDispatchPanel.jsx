@@ -9,7 +9,26 @@ export default function ActionDispatchPanel({ title = 'Send to OutSystems Agent'
     if (!ready) return;
     setBusy(true);
     try {
-      const payload = buildPayload(dest);
+      // Normalize inputs before building payload
+      const normalized = { ...dest };
+      // Slack: allow either #channel or full webhook URL
+      const slackInput = dest?.slack?.channel;
+      if (slackInput && typeof slackInput === 'string') {
+        if (/^https?:\/\//i.test(slackInput)) {
+          normalized.slack = { ...dest.slack, webhookUrl: slackInput };
+        } else {
+          normalized.slack = { ...dest.slack, channel: slackInput };
+        }
+      }
+      // Sheets: accept full URL and extract spreadsheet id
+      const sheetInput = dest?.sheets?.sheetId;
+      if (sheetInput && typeof sheetInput === 'string') {
+        const match = sheetInput.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        const onlyId = match ? match[1] : sheetInput.trim();
+        normalized.sheets = { ...dest.sheets, sheetId: onlyId };
+      }
+
+      const payload = buildPayload(normalized);
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const data = await res.json().catch(()=>({}));
       if (!res.ok) throw new Error(data?.error || res.statusText);
@@ -29,17 +48,17 @@ export default function ActionDispatchPanel({ title = 'Send to OutSystems Agent'
         <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <input type="checkbox" checked={!!dest.jira?.enabled} onChange={()=>toggle('jira')} />
           <span style={{ minWidth: 32, fontWeight: 600 }}>Jira</span>
-          <input placeholder="Project Key" onChange={e=>setDest({ ...dest, jira: { ...dest.jira, projectKey: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
+          <input placeholder="Project Key (e.g. TEST)" onChange={e=>setDest({ ...dest, jira: { ...dest.jira, projectKey: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <input type="checkbox" checked={!!dest.slack?.enabled} onChange={()=>toggle('slack')} />
           <span style={{ minWidth: 32, fontWeight: 600 }}>Slack</span>
-          <input placeholder="#channel" onChange={e=>setDest({ ...dest, slack: { ...dest.slack, channel: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
+          <input placeholder="#channel or webhook URL" onChange={e=>setDest({ ...dest, slack: { ...dest.slack, channel: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <input type="checkbox" checked={!!dest.sheets?.enabled} onChange={()=>toggle('sheets')} />
           <span style={{ minWidth: 32, fontWeight: 600 }}>Sheets</span>
-          <input placeholder="Sheet ID" onChange={e=>setDest({ ...dest, sheets: { ...dest.sheets, sheetId: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
+          <input placeholder="Spreadsheet ID or full URL" onChange={e=>setDest({ ...dest, sheets: { ...dest.sheets, sheetId: e.target.value } })} style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 10px' }} />
         </label>
       </div>
       {!ready && (

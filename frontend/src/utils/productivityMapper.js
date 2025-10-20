@@ -30,13 +30,14 @@ export function buildProductivitySpec(
     });
   }
 
-  // Slack digest action
-  if (slack?.enabled && slack.channel) {
+  // Slack digest action (supports channel or direct webhook)
+  if (slack?.enabled && (slack.channel || slack.webhookUrl)) {
     const actionTitles = actionsTop5.map(a => a.title).join('\n• ');
     actions.push({
       type: "slack.postMessage",
       payload: {
         channel: slack.channel,
+        webhookUrl: slack.webhookUrl,
         text: `*Productivity Brief:* ${briefTitle}\n\n*Top Actions:*\n• ${actionTitles}\n\n*Summary:* ${summaryMd.substring(0, 200)}...`
       }
     });

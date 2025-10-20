@@ -27,12 +27,13 @@ export function buildComplianceSpec(
     });
   }
 
-  // Slack action
-  if (slack?.enabled && slack.channel) {
+  // Slack action (supports channel or direct webhook)
+  if (slack?.enabled && (slack.channel || slack.webhookUrl)) {
     actions.push({
       type: "slack.postMessage",
       payload: {
         channel: slack.channel,
+        webhookUrl: slack.webhookUrl,
         text: `*Compliance Update:* ${docTitle}\n\n*Key Risks:* ${risks.slice(0, 3).join(', ')}\n\n*Summary:* ${summaryMd.substring(0, 200)}...`
       }
     });
