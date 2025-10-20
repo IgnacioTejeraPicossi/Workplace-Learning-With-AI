@@ -4,6 +4,7 @@ import { useTheme } from './ThemeContext';
 import ActionDispatchModal from './components/ActionDispatchModal';
 import AgentOpsRuns from './components/AgentOpsRuns';
 import PromptPanel from './components/PromptPanel';
+import ActionDispatchPanel from './components/ActionDispatchPanel';
 import { buildComplianceSpec } from './utils/complianceMapper';
 
 const AIComplianceAgent = () => {
@@ -481,6 +482,16 @@ const AIComplianceAgent = () => {
         </div>
       </div>
 
+      {/* New: Dispatch Panel just below main results */}
+      <div style={{ marginBottom: 24 }}>
+        <ActionDispatchPanel
+          title="Send to OutSystems Agent"
+          endpoint="/api/compliance/dispatch"
+          buildPayload={buildPayload}
+          ready={!!(selectedDoc && summary && risks.length)}
+        />
+      </div>
+
       {/* Prompt Manager (always available) */}
       <PromptPanel
         agent="compliance"
@@ -505,14 +516,8 @@ Return markdown in two sections:\n\nSummary:\n- ...\n\nKey Risks:\n- ...\n`}
         <AgentOpsRuns />
       </div>
 
-      {/* Action Dispatch Modal */}
-      <ActionDispatchModal
-        module="compliance"
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        endpoint="/api/compliance/dispatch"
-        buildPayload={buildPayload}
-      />
+      {/* Action Dispatch Modal (legacy - retained) */}
+      <ActionDispatchModal module="compliance" open={isModalOpen} onClose={() => setIsModalOpen(false)} endpoint="/api/compliance/dispatch" buildPayload={buildPayload} />
     </div>
   );
 };

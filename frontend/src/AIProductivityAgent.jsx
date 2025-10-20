@@ -4,6 +4,7 @@ import { useTheme } from './ThemeContext';
 import ActionDispatchModal from './components/ActionDispatchModal';
 import AgentOpsRuns from './components/AgentOpsRuns';
 import PromptPanel from './components/PromptPanel';
+import ActionDispatchPanel from './components/ActionDispatchPanel';
 import { buildProductivitySpec } from './utils/productivityMapper';
 
 const AIProductivityAgent = () => {
@@ -486,6 +487,16 @@ const AIProductivityAgent = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* New: Dispatch Panel just below main results */}
+      <div style={{ marginBottom: 24 }}>
+        <ActionDispatchPanel
+          title="Send to OutSystems Agent"
+          endpoint="/api/productivity/dispatch"
+          buildPayload={buildPayload}
+          ready={!!(summary && nextActions.length)}
+        />
       </div>
 
       {/* Prompt Manager (always available) */}
