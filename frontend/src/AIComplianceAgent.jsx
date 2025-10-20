@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
-import ActionDispatchModal from './components/ActionDispatchModal';
+// Removed legacy modal
 import AgentOpsRuns from './components/AgentOpsRuns';
 import PromptPanel from './components/PromptPanel';
 import ActionDispatchPanel from './components/ActionDispatchPanel';
@@ -14,7 +14,7 @@ const AIComplianceAgent = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [summary, setSummary] = useState('');
   const [risks, setRisks] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // legacy modal removed
   const [loading, setLoading] = useState(false);
   const [showAllDocs, setShowAllDocs] = useState(false);
 
@@ -59,9 +59,7 @@ const AIComplianceAgent = () => {
     console.log('✅ Analysis completed');
   };
 
-  const handleSendToAgent = () => {
-    setIsModalOpen(true);
-  };
+  const handleSendToAgent = () => {};
 
   const buildPayload = (destConfig) => {
     return buildComplianceSpec(
@@ -321,34 +319,7 @@ const AIComplianceAgent = () => {
             </div>
           )}
 
-          {selectedDoc && summary && risks.length > 0 && (
-            <button
-              onClick={handleSendToAgent}
-              style={{
-                width: '100%',
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '16px 20px',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#2563eb';
-                e.target.style.boxShadow = '0 4px 8px 0 rgba(0, 0, 0, 0.15)';
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#3b82f6';
-                e.target.style.boxShadow = '0 2px 4px 0 rgba(0, 0, 0, 0.1)';
-              }}
-            >
-              🚀 Send to OutSystems Agent
-            </button>
-          )}
+          {/* Primary send button moved to ActionDispatchPanel above */}
 
           {!summary && !loading && (
             <div style={{
@@ -516,8 +487,7 @@ Return markdown in two sections:\n\nSummary:\n- ...\n\nKey Risks:\n- ...\n`}
         <AgentOpsRuns />
       </div>
 
-      {/* Action Dispatch Modal (legacy - retained) */}
-      <ActionDispatchModal module="compliance" open={isModalOpen} onClose={() => setIsModalOpen(false)} endpoint="/api/compliance/dispatch" buildPayload={buildPayload} />
+      {/* Legacy modal fully removed */}
     </div>
   );
 };
