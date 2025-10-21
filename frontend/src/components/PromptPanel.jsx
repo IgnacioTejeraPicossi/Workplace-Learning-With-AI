@@ -8,6 +8,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   const [prompt, setPrompt] = useState('');
   const [testing, setTesting] = useState(false);
   const [testOutput, setTestOutput] = useState('');
+  const [injectionWarn, setInjectionWarn] = useState(null);
 
   const load = async () => {
     try {
@@ -46,7 +47,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   };
 
   const test = async () => {
-    setTesting(true); setTestOutput('');
+    setTesting(true); setTestOutput(''); setInjectionWarn(null);
     try {
       const res = await fetch(`${API_BASE}/api/prompts/${agent}/test`, {
         method: 'POST',
@@ -55,6 +56,13 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
       });
       const data = await res.json();
       setTestOutput(data.output || data.error || '');
+      // Heuristic client-side prompt injection flag (mirrors backend)
+      const lower = (prompt || '').toLowerCase();
+      const hit = [
+        'ignore previous', 'disregard instructions', 'system prompt',
+        'jailbreak', 'developer mode', 'roleplay as', 'override'
+      ].some(p=>lower.includes(p));
+      if (hit) setInjectionWarn('Potential prompt-injection pattern detected. Consider sanitizing.');
       if (onUseResult) {
         onUseResult({ raw: data.output, summary: data.summary, risks: data.risks, actions: data.actions });
       }
@@ -96,6 +104,24 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
         </div>
         <textarea value={prompt} onChange={(e)=>setPrompt(e.target.value)} placeholder="Write your prompt here..."
           style={{ width: '100%', minHeight: 140, padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', background: '#ffffff' }} />
+        {injectionWarn && (
+          <div style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#92400e', padding: '10px 12px', borderRadius: 8 }}>
+            ⚠️ {injectionWarn}
+            <button onClick={()=>{
+              // simple sanitize: remove risky phrases
+              const cleaned = prompt
+                .replace(/ignore previous/ig,'')
+                .replace(/disregard instructions/ig,'')
+                .replace(/system prompt/ig,'')
+                .replace(/jailbreak/ig,'')
+                .replace(/developer mode/ig,'')
+                .replace(/roleplay as/ig,'')
+                .replace(/override/ig,'');
+              setPrompt(cleaned);
+              setInjectionWarn(null);
+            }} style={{ marginLeft: 8, padding: '6px 10px', borderRadius: 6, border: 'none', background: '#f59e0b', color: '#fff' }}>Sanitize prompt</button>
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={test} disabled={testing || !prompt.trim()} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: testing? '#94a3b8':'#22c55e', color: '#fff' }}>{testing? 'Testing...' : 'Test'}</button>
         </div>

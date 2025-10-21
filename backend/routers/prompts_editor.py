@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 try:
-    from backend.db import prompts_collection
+    from backend.db import prompts_collection, security_events_collection
     from backend.llm import ask_ai_unified_sync
 except ImportError:
     from db import prompts_collection
@@ -131,6 +131,31 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
             max_tokens=900,
             request_headers=request.headers,
         )
+
+        # Basic prompt-injection detection (Phase 1): regex/keyword scan
+        inj_patterns = [
+            "ignore previous", "disregard instructions", "system prompt",
+            "jailbreak", "developer mode", "roleplay as", "override"
+        ]
+        lower_input = (body.prompt + "\n" + (body.context.get("text_snippet", "") if isinstance(body.context, dict) else "")).lower()
+        detected = any(pat in lower_input for pat in inj_patterns)
+        if detected:
+            try:
+                await security_events_collection.insert_one({
+                    "timestamp": datetime.utcnow(),
+                    "agent_name": f"{agent.title()} Agent" if agent in ("compliance","productivity") else agent,
+                    "event": "prompt_test",
+                    "threat_type": "prompt_injection",
+                    "severity": "high",
+                    "status": "detected",
+                    "description": "Prompt-injection pattern detected during prompt test",
+                    "detection_method": "keyword_scan",
+                    "affected_components": ["prompts_editor"],
+                    "mitigation_actions": ["Advise sanitize/shorten prompt"],
+                    "evidence": {"matched": True}
+                })
+            except Exception:
+                pass
 
         # Try to parse into structured fields for known agents
         if agent == "compliance":

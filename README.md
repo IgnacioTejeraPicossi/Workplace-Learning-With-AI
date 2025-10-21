@@ -5690,6 +5690,35 @@ The Cybersecurity Module provides comprehensive security management and threat i
 - **📚 Knowledge Base**: AI-powered cybersecurity Q&A using Agentic RAG
 - **🤖 Agent Security Monitor**: Advanced security monitoring and threat detection for AI agents with Zero Trust Architecture
 
+### What is implemented today (real telemetry)
+
+- Backend endpoints:
+  - `GET /api/agent-security/overview` agrega datos reales desde Mongo si existen y utiliza mock solo como respaldo.
+  - Fuentes de datos reales:
+    - Colección `security_events`: eventos de seguridad (e.g., prompt-injection detectada, envíos de acciones) con `agent_name`, `threat_type`, `severity`, `status`, `timestamp`.
+    - Colección `agent_security_status`: snapshot por agente con `security_score`, `last_scan`, `vulnerabilities_count`, `zero_trust_compliance`, etc.
+  - Si hay documentos en Mongo, el monitor muestra incidentes y la tabla de agentes a partir de estas colecciones.
+
+- Telemetría mínima integrada en agentes:
+  - `POST /api/compliance/dispatch` y `POST /api/productivity/dispatch` registran un evento por cada acción enviada (Jira/Slack/Sheets) y actualizan un snapshot del agente.
+  - Estos inserts no afectan al flujo principal (best-effort).
+
+- Detección básica de prompt-injection (fase 1):
+  - En `POST /api/prompts/{agent}/test` se escanean patrones simples ("ignore previous", "system prompt", "jailbreak", "developer mode", etc.).
+  - Si se detecta, se inserta un evento `prompt_injection` con `severity=high` en `security_events`.
+  - La UI del `Prompt Manager` muestra un banner de advertencia y un botón "Sanitize prompt" que elimina frases de riesgo.
+
+- Frontend:
+  - El componente `frontend/src/cyber/AgentSecurity.jsx` primero intenta leer `GET /api/agent-security/overview`; si hay datos reales, los renderiza (incidentes, tabla por agente, KPIs). Si no hay datos, cae a mock para demo.
+  - `PromptPanel.jsx` incluye banner de inyección y saneado básico del prompt.
+
+### Próximas fases (plan)
+
+- Sustituir completamente métricas mock por agregaciones de `security_events` (por tipo, severidad, ventana temporal).
+- Añadir SSE/WebSocket para refresco en vivo del monitor.
+- Registrar eventos de data exfiltration, unauthorized access, y drift desde más módulos.
+- Zero Trust checks de extremo a extremo (HMAC obligatorio, scopes, allow-list de destinos) y reportarlos como `zero_trust_checks`.
+
 ### Architecture Diagram
 
 ```mermaid
