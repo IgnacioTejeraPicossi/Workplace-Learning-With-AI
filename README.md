@@ -5674,6 +5674,25 @@ Registered in Agent Catalog with:
 
 ---
 
+## 🔐 Security Center (Local Installation)
+
+### Implementado
+- **Encryption at rest (localStorage)**: Añadimos un cifrado opcional para datos locales almacenados en `localStorage`.
+  - UI: Panel `Security Center → Local Installation` con botón `Activate`/`Disable`.
+  - Técnica: AES‑GCM 256 con clave derivada PBKDF2 (SHA‑256, 150k), salt persistido en `localStorage`.
+  - Transparente: parchea `localStorage.setItem/getItem` y guarda valores con prefijo `enc:`.
+  - La passphrase no se persiste; debe activarse por sesión (mejor para entornos compartidos).
+- **Local authentication**: La app ya exige autenticación local (Firebase/credenciales) al iniciar sesión.
+
+### Limitaciones actuales
+- Cifra solo `localStorage` (no `IndexedDB` ni archivos subidos).
+- No se guarda la clave ni passphrase (re‑activación por sesión).
+
+### Siguientes pasos sugeridos
+- Extender cifrado a `IndexedDB`/cachés de documentos.
+- Flag de entorno para “must‑encrypt” en producción.
+- Auditoría de uso de almacenamiento y limpieza automática.
+
 ## 🔒 Cybersecurity Module
 
 ### Overview

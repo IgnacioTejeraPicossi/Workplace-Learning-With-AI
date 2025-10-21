@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTheme } from './ThemeContext';
+import { enableLocalEncryption, disableLocalEncryption, isEncryptionActive } from './utils/encryptedStorage';
 
 const SecurityPanel = () => {
   const { colors } = useTheme();
   const [selectedOption, setSelectedOption] = useState('local-installation');
   const [securityStatus, setSecurityStatus] = useState({
-    localInstallation: 'active',
+    localInstallation: isEncryptionActive() ? 'active' : 'warning',
     dataDeletion: 'enabled',
     dataPrivacy: 'protected',
     anonymization: 'enabled',
@@ -104,13 +105,22 @@ const SecurityPanel = () => {
               borderRadius: '8px',
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ marginBottom: '12px' }}>Security Status: ✅ Active</h4>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h4 style={{ margin: 0 }}>Security Status: {isEncryptionActive() ? '✅ Active' : '⚠️ Inactive'}</h4>
+                <div>
+                  {isEncryptionActive() ? (
+                    <button onClick={()=>{ disableLocalEncryption(); setSecurityStatus(s=>({...s, localInstallation: 'warning'})); }} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff' }}>Disable</button>
+                  ) : (
+                    <button onClick={async()=>{ const pw = prompt('Set encryption passphrase (not stored)'); if (!pw) return; await enableLocalEncryption(pw); setSecurityStatus(s=>({...s, localInstallation: 'active'})); }} style={{ padding: '8px 12px', borderRadius: 6, border: 'none', background: '#10b981', color: '#fff' }}>Activate</button>
+                  )}
+                </div>
+              </div>
               <p style={{ marginBottom: '16px', color: colors.textSecondary }}>
                 Your local installation is properly secured with the following features:
               </p>
               <ul style={{ listStyle: 'none', padding: 0 }}>
                 <li style={{ padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
-                  🔐 <strong>Encryption:</strong> All local data is encrypted at rest
+                  🔐 <strong>Encryption:</strong> {isEncryptionActive() ? 'All local data is encrypted at rest' : 'Encryption is currently disabled'}
                 </li>
                 <li style={{ padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
                   🚪 <strong>Access Control:</strong> Local authentication required
