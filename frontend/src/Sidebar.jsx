@@ -106,11 +106,15 @@ const getNavItems = (t) => [
     { key: "catalog-manager", label: t('sidebar.enterpriseArchitectureSubmenu.catalogManager'), icon: "catalog" }
   ]},
   
-  // Grupo 1.8: Item Agents (nuevo grupo para agentes)
+  // Grupo 1.8: Item Agents (implementados)
   { key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
     { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
-    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
+    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" }
+  ]},
+
+  // Nuevo grupo: Future Item Agents (prototipos)
+  { key: "future-item-agents", label: "Future Item Agents", icon: "rocket", group: "learning", isExpandable: true, subItems: [
     { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" },
     { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" },
     { key: "personal-attention-agent", label: t('sidebar.personalAttentionAgent'), icon: "target" },
