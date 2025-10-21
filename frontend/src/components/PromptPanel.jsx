@@ -58,9 +58,12 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
         }
       } catch {}
 
+      const clinicHeader = (() => {
+        try { return JSON.stringify(JSON.parse(window.localStorage.getItem('clinic_policy')||'{}')); } catch { return '{}'; }
+      })();
       const res = await fetch(`${API_BASE}/api/prompts/${agent}/test`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Clinic-Policy': clinicHeader },
         body: JSON.stringify({ prompt: policyNote ? `${policyNote}\n${prompt}` : prompt })
       });
       const data = await res.json();

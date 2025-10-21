@@ -106,11 +106,21 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
     """
     try:
         ctx = body.context or {}
+        # Inject clinic policy from header if present
+        policy_header = request.headers.get('X-Clinic-Policy')
+        policy_text = ''
+        if policy_header:
+            try:
+                pol = json.loads(policy_header)
+                if pol.get('enabled'):
+                    policy_text = f"\n\n[POLICY]\nSampling Rate: {pol.get('samplingRate','')}%\nBlock Threshold: {pol.get('thresholdBlock','')}%\nReview Threshold: {pol.get('thresholdReview','')}%\n"
+            except Exception:
+                policy_text = ''
         # Build a context-aware prompt
         full_prompt = body.prompt
         if agent == "compliance":
             full_prompt = (
-                f"{body.prompt}\n\nContext (Compliance Document):\n"
+                f"{policy_text}{body.prompt}\n\nContext (Compliance Document):\n"
                 f"Title: {ctx.get('doc_title','')}\n"
                 f"URL: {ctx.get('doc_url','')}\n"
                 f"Excerpt: {ctx.get('text_snippet','')}\n"
@@ -118,7 +128,7 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
             )
         elif agent == "productivity":
             full_prompt = (
-                f"{body.prompt}\n\nContext (Productivity Research):\n"
+                f"{policy_text}{body.prompt}\n\nContext (Productivity Research):\n"
                 f"URL: {ctx.get('url','')}\n"
                 f"Excerpt: {ctx.get('page_excerpt','')}\n"
                 "Return exactly one 'SUMMARY:' paragraph followed by 'ACTIONS:' as five numbered items."
