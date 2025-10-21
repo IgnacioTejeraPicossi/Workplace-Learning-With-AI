@@ -176,8 +176,7 @@ async def dispatch(spec: ProductivitySpec):
         from backend.models.agent_runs import update_run
         await update_run(run_id, status="FAILED", error=f"OutSystems error: {r.text}")
         raise HTTPException(r.status_code, f"OutSystems error: {r.text}")
-    return {"ok": True, "run_id": run_id, "bundle_hash": bundle_hash}
-
+    
     # PHASE 1 telemetry (best-effort)
     try:
         for action in spec.actions:
@@ -213,3 +212,5 @@ async def dispatch(spec: ProductivitySpec):
         )
     except Exception:
         pass
+    
+    return {"ok": True, "run_id": run_id, "bundle_hash": bundle_hash}
