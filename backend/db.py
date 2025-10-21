@@ -46,3 +46,7 @@ simulation_results_collection = database.get_collection("simulation_results")
 
 # Prompts Collection
 prompts_collection = database.get_collection("prompts")
+
+# Security Telemetry Collections
+security_events_collection = database.get_collection("security_events")
+agent_security_status_collection = database.get_collection("agent_security_status")

@@ -4,6 +4,8 @@ from typing import Any, Dict, List, Optional
 import httpx, os, time, hmac, hashlib, json
 from backend.utils.attestation import compute_bundle_hash
 from backend.config import CALLBACK_URL_DEFAULT, N8N_PRODUCTIVITY_WEBHOOK
+from backend.db import security_events_collection, agent_security_status_collection
+from datetime import datetime
 
 router = APIRouter(prefix="/api/productivity", tags=["productivity"])
 
@@ -175,3 +177,39 @@ async def dispatch(spec: ProductivitySpec):
         await update_run(run_id, status="FAILED", error=f"OutSystems error: {r.text}")
         raise HTTPException(r.status_code, f"OutSystems error: {r.text}")
     return {"ok": True, "run_id": run_id, "bundle_hash": bundle_hash}
+
+    # PHASE 1 telemetry (best-effort)
+    try:
+        for action in spec.actions:
+            await security_events_collection.insert_one({
+                "timestamp": datetime.utcnow(),
+                "agent_name": "AI Productivity Agent",
+                "event": "dispatch",
+                "threat_type": "unauthorized_access" if action.type == "jira.createIssue" else "prompt_injection",
+                "severity": "low",
+                "status": "detected",
+                "description": f"Dispatched action {action.type}",
+                "detection_method": "agent_dispatch",
+                "affected_components": [action.type.split('.')[0]],
+                "mitigation_actions": []
+            })
+
+        await agent_security_status_collection.update_one(
+            {"agent_name": "AI Productivity Agent"},
+            {"$set": {
+                "agent_name": "AI Productivity Agent",
+                "status": "at_risk",
+                "security_score": 78,
+                "last_scan": datetime.utcnow(),
+                "vulnerabilities_count": 0,
+                "threats_detected": 0,
+                "zero_trust_compliance": False,
+                "model_integrity_score": 82,
+                "data_protection_score": 75,
+                "access_control_score": 70,
+                "last_incident": None
+            }},
+            upsert=True
+        )
+    except Exception:
+        pass

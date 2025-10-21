@@ -26,6 +26,7 @@ from ..models.agent_security_models import (
     AgentStatus,
     IncidentStatus
 )
+from ..db import security_events_collection, agent_security_status_collection
 
 router = APIRouter(prefix="/api/agent-security", tags=["Agent Security"])
 
@@ -177,6 +178,53 @@ async def get_agent_security_overview():
 
         base = MOCK_AGENT_SECURITY_DATA.copy()
         status_list = list(base["agent_security_status"])  # copy
+
+        # PHASE 1: pull minimal real telemetry if available
+        try:
+            # Load last 200 security events
+            events = await security_events_collection.find({}).sort("timestamp", -1).limit(200).to_list(200)
+            # Map to recent_incidents if any
+            real_incidents = []
+            for e in events:
+                real_incidents.append({
+                    "incident_id": str(e.get("_id")),
+                    "agent_name": e.get("agent_name", "Unknown"),
+                    "threat_type": e.get("threat_type", "prompt_injection"),
+                    "severity": e.get("severity", "low"),
+                    "timestamp": e.get("timestamp"),
+                    "status": e.get("status", "detected"),
+                    "description": e.get("description", "Security event"),
+                    "detection_method": e.get("detection_method", "telemetry"),
+                    "affected_components": e.get("affected_components", []),
+                    "mitigation_actions": e.get("mitigation_actions", []),
+                })
+            if real_incidents:
+                base["recent_incidents"] = real_incidents
+        except Exception:
+            pass
+
+        try:
+            # Load latest per-agent status snapshots
+            snapshots = await agent_security_status_collection.find({}).sort("last_scan", -1).limit(100).to_list(100)
+            if snapshots:
+                status_list = []
+                for s in snapshots:
+                    status_list.append({
+                        "agent_name": s.get("agent_name"),
+                        "status": s.get("status", "secure"),
+                        "security_score": int(s.get("security_score", 85)),
+                        "last_scan": s.get("last_scan"),
+                        "vulnerabilities_count": int(s.get("vulnerabilities_count", 0)),
+                        "threats_detected": int(s.get("threats_detected", 0)),
+                        "zero_trust_compliance": bool(s.get("zero_trust_compliance", True)),
+                        "model_integrity_score": int(s.get("model_integrity_score", 90)),
+                        "data_protection_score": int(s.get("data_protection_score", 88)),
+                        "access_control_score": int(s.get("access_control_score", 86)),
+                        "monitoring_active": True,
+                        "last_incident": s.get("last_incident"),
+                    })
+        except Exception:
+            pass
 
         # Helper to synthesize a reasonable default status if missing
         def default_status(name: str, score: int, at_risk: bool = False):

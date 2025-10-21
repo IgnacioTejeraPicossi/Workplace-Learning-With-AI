@@ -34,7 +34,7 @@ export function buildComplianceSpec(
       payload: {
         channel: slack.channel,
         webhookUrl: slack.webhookUrl,
-        text: `*Compliance Update:* ${docTitle}\n\n*Key Risks:* ${risks.slice(0, 3).join(', ')}\n\n*Summary:* ${summaryMd.substring(0, 200)}...`
+        text: `*Compliance Update:* ${docTitle}\n\n*Key Risks:* ${risks.slice(0, 3).join(', ')}\n\n*Summary:* ${summaryMd.substring(0, 200)}...\n\n*Document:* ${docUrl || 'N/A'}`
       }
     });
   }
