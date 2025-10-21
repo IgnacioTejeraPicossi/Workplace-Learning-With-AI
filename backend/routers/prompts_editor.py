@@ -124,21 +124,13 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
                 "Return exactly one 'SUMMARY:' paragraph followed by 'ACTIONS:' as five numbered items."
             )
 
-        result = ask_ai_unified_sync(
-            prompt=full_prompt,
-            task_type=f"prompt_test_{agent}",
-            complexity="medium",
-            max_tokens=900,
-            request_headers=request.headers,
-        )
-
-        # Basic prompt-injection detection (Phase 1): regex/keyword scan
+        # Basic prompt-injection detection (Phase 1): regex/keyword scan (pre-access gate)
         inj_patterns = [
             "ignore previous", "disregard instructions", "system prompt",
             "jailbreak", "developer mode", "roleplay as", "override"
         ]
-        lower_input = (body.prompt + "\n" + (body.context.get("text_snippet", "") if isinstance(body.context, dict) else "")).lower()
-        detected = any(pat in lower_input for pat in inj_patterns)
+        lower_full_prompt = (full_prompt or "").lower()
+        detected = any(pat in lower_full_prompt for pat in inj_patterns)
         if detected:
             try:
                 await security_events_collection.insert_one({
@@ -147,8 +139,8 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
                     "event": "prompt_test",
                     "threat_type": "prompt_injection",
                     "severity": "high",
-                    "status": "detected",
-                    "description": "Prompt-injection pattern detected during prompt test",
+                    "status": "blocked",
+                    "description": "Prompt-injection pattern blocked before LLM call",
                     "detection_method": "keyword_scan",
                     "affected_components": ["prompts_editor"],
                     "mitigation_actions": ["Advise sanitize/shorten prompt"],
@@ -156,6 +148,15 @@ async def test_prompt(agent: str, body: TestPromptRequest, request: Request):
                 })
             except Exception:
                 pass
+            return {"ok": False, "blocked": True, "error": "Prompt rejected by security policy (prompt-injection). Please sanitize and try again."}
+
+        result = ask_ai_unified_sync(
+            prompt=full_prompt,
+            task_type=f"prompt_test_{agent}",
+            complexity="medium",
+            max_tokens=900,
+            request_headers=request.headers,
+        )
 
         # Try to parse into structured fields for known agents
         if agent == "compliance":

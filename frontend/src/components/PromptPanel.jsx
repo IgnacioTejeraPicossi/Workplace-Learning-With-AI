@@ -49,13 +49,27 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   const test = async () => {
     setTesting(true); setTestOutput(''); setInjectionWarn(null);
     try {
+      // Read Robomind Clinic policy sliders to include as guardrails in prompt
+      let policyNote = '';
+      try {
+        const pol = JSON.parse(window.localStorage.getItem('clinic_policy') || '{}');
+        if (pol && pol.enabled) {
+          policyNote = `\n\n[POLICY]\nSampling Rate: ${pol.samplingRate}%\nBlock Threshold: ${pol.thresholdBlock}%\nReview Threshold: ${pol.thresholdReview}%\n`;
+        }
+      } catch {}
+
       const res = await fetch(`${API_BASE}/api/prompts/${agent}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt: policyNote ? `${policyNote}\n${prompt}` : prompt })
       });
       const data = await res.json();
-      setTestOutput(data.output || data.error || '');
+      if (data?.blocked) {
+        setInjectionWarn('Prompt blocked by security policy (possible prompt-injection).');
+        setTestOutput('');
+      } else {
+        setTestOutput(data.output || data.error || '');
+      }
       // Heuristic client-side prompt injection flag (mirrors backend)
       const lower = (prompt || '').toLowerCase();
       const hit = [

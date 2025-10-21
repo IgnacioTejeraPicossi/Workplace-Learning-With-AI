@@ -19,6 +19,19 @@ export default function ClinicSettings() {
   const [testResult, setTestResult] = useState(null);
   const [testing, setTesting] = useState(false);
 
+  // Persist policy sliders to localStorage so other modules (PromptPanel) can include them in prompts
+  useEffect(() => {
+    try {
+      const policy = {
+        samplingRate: settings.samplingRate,
+        thresholdBlock: settings.thresholdBlock,
+        thresholdReview: settings.thresholdReview,
+        enabled: settings.enabled
+      };
+      window.localStorage.setItem('clinic_policy', JSON.stringify(policy));
+    } catch {}
+  }, [settings.samplingRate, settings.thresholdBlock, settings.thresholdReview, settings.enabled]);
+
   const disorders = [
     { code: 'PM.EPI.SYN_CONFAB', name: 'Synthetic Confabulation', axis: 'Epistemic' },
     { code: 'PM.COG.BUNKERING', name: 'Bunkering Laconia', axis: 'Cognitive' },
