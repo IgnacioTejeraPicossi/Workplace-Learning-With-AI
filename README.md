@@ -5694,6 +5694,26 @@ Registered in Agent Catalog with:
 - Auditoría de uso de almacenamiento y limpieza automática.
 
 ## 🔒 Cybersecurity Module
+## 🧩 MCP (Model Context Protocol) - Interoperability
+
+### What is MCP?
+An open standard to expose service “tools” to LLM clients (e.g., Claude Desktop) with capability discovery, invocation, and streaming.
+
+### Implementation in this repo
+- Manifest endpoint: `GET /api/mcp/manifest` returns manifests for:
+  - `ai-compliance-agent`
+  - `ai-productivity-agent`
+- Each manifest describes tools equivalent to our REST endpoints:
+  - `dispatch_action_bundle` → POST `/api/{compliance|productivity}/dispatch`
+  - `get_run_status` → GET `/api/agent-runs`
+- Code location: `backend/routers/agentops/__init__.py` (router `mcp_router`).
+
+### How to use (MCP client)
+1. The client fetches `GET /api/mcp/manifest` to list servers (agents) and their tools.
+2. Map each `tool.invoke.path`/`method` to HTTP calls from the client.
+3. The LLM can call these tools directly instead of relying on free‑form prompts.
+
+Note: agents still operate via REST today; MCP adds forward‑compatible interoperability without breaking current flows.
 
 ### Overview
 The Cybersecurity Module provides comprehensive security management and threat intelligence capabilities, integrating seamlessly with the existing AI-powered learning platform. It offers real-time vulnerability scanning, threat assessment, compliance tracking, and secure coding guidance.

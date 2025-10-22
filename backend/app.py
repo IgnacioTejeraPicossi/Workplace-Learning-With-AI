@@ -133,7 +133,7 @@ app.include_router(agi_router)
 
 # AgentOps Studio routers - Direct import method
 try:
-    from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings
+    from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router
     print("✅ AgentOps Studio routers imported successfully")
     
     # Include routers with specific prefixes to avoid route conflicts
@@ -143,6 +143,8 @@ try:
     app.include_router(flows.router, prefix="/api/flows", tags=["AgentOps Flows"])
     app.include_router(runs.router, prefix="/api/runs", tags=["AgentOps Runs"])
     app.include_router(settings.router, prefix="/api/settings", tags=["AgentOps Settings"])
+    # MCP manifest index
+    app.include_router(mcp_router)
     
     print("✅ AgentOps Studio: 6 routers included successfully")
 except ImportError as e:
