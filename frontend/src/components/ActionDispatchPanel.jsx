@@ -30,8 +30,15 @@ export default function ActionDispatchPanel({ title = 'Send to OutSystems Agent'
 
       const payload = buildPayload(normalized);
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      const data = await res.json().catch(()=>({}));
-      if (!res.ok) throw new Error(data?.error || res.statusText);
+      // Try to extract meaningful error details from JSON or text
+      let data = {};
+      try { data = await res.json(); } catch (_) {
+        try { const t = await res.text(); data = { error: t }; } catch (_) { data = {}; }
+      }
+      if (!res.ok) {
+        const detail = data?.detail || data?.error || data?.message || res.statusText;
+        throw new Error(detail);
+      }
       alert(`Dispatched successfully. Run: ${data?.run_id || 'OK'}`);
     } catch (e) {
       alert('Dispatch error: ' + (e?.message || 'unknown'));

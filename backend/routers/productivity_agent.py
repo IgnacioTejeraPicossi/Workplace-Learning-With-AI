@@ -168,9 +168,22 @@ async def dispatch(spec: ProductivitySpec):
     await save_run(initial_run)
     
     body = json.dumps(bundle).encode()
-    headers = {"X-Signature": sign(body), "Content-Type": "application/json"}
-    async with httpx.AsyncClient(timeout=60) as client:
-        r = await client.post(OUTSYSTEMS_ENDPOINT, content=body, headers=headers)
+    headers = {
+        "X-Signature": sign(body),
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Connection": "close",
+    }
+    # Attempt dispatch; surface network errors clearly instead of crashing the request
+    try:
+        timeout = httpx.Timeout(connect=10.0, read=45.0, write=15.0, pool=30.0)
+        transport = httpx.AsyncHTTPTransport(http2=False)
+        async with httpx.AsyncClient(timeout=timeout, transport=transport, follow_redirects=True) as client:
+            r = await client.post(OUTSYSTEMS_ENDPOINT, content=body, headers=headers)
+    except httpx.RequestError as e:
+        from backend.models.agent_runs import update_run
+        await update_run(run_id, status="FAILED", error=f"Dispatch network error to {OUTSYSTEMS_ENDPOINT}: {e}")
+        raise HTTPException(502, f"Dispatch failed: cannot reach {OUTSYSTEMS_ENDPOINT}: {e}")
     if r.status_code >= 300:
         # Update status to FAILED if OutSystems call fails
         from backend.models.agent_runs import update_run

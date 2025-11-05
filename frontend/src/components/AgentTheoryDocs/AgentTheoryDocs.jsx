@@ -105,7 +105,26 @@ const AgentTheoryDocs = () => {
         {
           title: "Fundamental Concepts",
           items: [
-            { title: "What are AI Agents?", description: "Basic definition and characteristics", status: "pending" },
+            { 
+              title: "What is an AI Agent? (Overview)", 
+              description: "High-level poster: how agents work, traits, tools, memory, and key resources",
+              status: "ready",
+              content: {
+                type: "article",
+                author: "Free Education - AI | Tech | Programming (@DAIEvolutionHub)",
+                imageUrl: "/images/ai-agent-overview.jpg",
+                keyPoints: [
+                  "Agents receive goals/tasks and a system prompt; they sense the environment and act under human/orchestrator oversight",
+                  "Core traits: reason, plan, act, learn, adapt, delegate",
+                  "Tooling surface: web, code, apps, data, functions, MCP",
+                  "Memory: short‑term (working/episodic) + long‑term (vector/SQL/file)",
+                  "Agentic AI in practice: focus on multi‑agent systems and behavior over terminology debates",
+                  "Starter resources: prompt engineering guides and step‑by‑step agent tutorials"
+                ],
+                advice: "AI agents are the future of automation — they think, act, and learn like humans",
+                keyInsight: "For technical discussions, emphasize multi‑agent systems where agents collaborate with/without central orchestration"
+              }
+            },
             { title: "Agent Architectures", description: "Different architectural patterns", status: "pending" },
             { title: "Multi-Agent Systems", description: "Coordination and communication", status: "pending" }
           ]
@@ -835,6 +854,12 @@ const AgentTheoryDocs = () => {
                       </div>
                     )}
                     
+                    {item.content.imageUrl && (
+                      <div className="article-image" style={{ marginTop: '10px' }}>
+                        <img src={item.content.imageUrl} alt={item.title} style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+                      </div>
+                    )}
+                    
                     {item.content.keyTerms && (
                       <div className="key-terms">
                         <h6>7 Key Terms:</h6>
@@ -865,6 +890,13 @@ const AgentTheoryDocs = () => {
                       <div className="key-insight">
                         <h6>Key Insight:</h6>
                         <blockquote>{item.content.keyInsight}</blockquote>
+                      </div>
+                    )}
+                    
+                    {item.content.quote && (
+                      <div className="article-quote">
+                        <h6>Quote:</h6>
+                        <blockquote>{item.content.quote}</blockquote>
                       </div>
                     )}
                     
