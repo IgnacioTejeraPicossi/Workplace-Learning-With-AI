@@ -118,6 +118,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [📚 Babel Library](#babel-library) - Centralized knowledge repository
 
 ### 🚀 Advanced Features
+- [Hologram Portal (3D)](#hologram-portal-3d) - Interactive 3D hologram card with model controls
 - [Knowledge Map](#knowledge-map) - Interactive learning visualization
 - [Agent Cursor AI](#agent-cursor-ai) - Repository analysis and documentation
 - [Repository Analyzer](#repository-analyzer) - Code analysis and learning modules
@@ -165,13 +166,52 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [Global Search](#global-search) - Cross-module search functionality
 - [Multi-Language Support](#multi-language-support) - i18n infrastructure and translations
 
-### ⚙️ Backend Services
+-### ⚙️ Backend Services
 - [AI Gateway](#ai-gateway) - Transversal AI monitoring and psychological safety system
 - [FastAPI Server](#fastapi-server) - High-performance API server
 - [AI Integration](#ai-integration) - ItemAI API (local), OpenAI GPT-5, and OpenRouter integration
 - [MongoDB](#mongodb) - Flexible document storage
 - [Firebase Auth](#firebase-auth) - Secure authentication
 - [Web Search API](#web-search-api) - Real-time data retrieval
+
+---
+
+## Hologram Portal (3D)
+
+An interactive 3D hologram card embedded in the UI, showcasing a floating robot (or any glTF/GLB model). It includes live controls, multiple model sources, and offline support.
+
+### Highlights
+- Embedded inside the `HologramHero` card for a polished look
+- Live controls overlay: Scale and Height sliders
+- Source selector: Local, Remote mirror, or Custom URL (`.glb`/`.gltf`)
+- Automatic preload of the active model for fast switching
+- Settings persisted in `localStorage` (`hologram3d.settings`)
+- WebGL capability check with graceful fallback
+
+### Files
+- Component: `frontend/src/components/HologramPortal3D.jsx`
+- Card container: `frontend/src/components/HologramHero.jsx`
+- Usage: `frontend/src/App.jsx`
+
+### Setup (Local model)
+1) Ensure the default robot model exists at `frontend/public/models/RobotExpressive.glb`.
+2) If missing, download the GLB (e.g., Three.js mirror) and place it under `frontend/public/models/`.
+3) Start the frontend; the hologram loads the local model by default and can switch to remote/custom on demand.
+
+### Usage
+Embed the portal inside the hologram card:
+
+```jsx
+<HologramHero
+  title="Hologram Portal — Future Module"
+  subtitle="Experimental zone: concepts, prototypes and advanced visualizations"
+  onClick={handleOpenFutureApp}
+>
+  <HologramPortal3D embed />
+</HologramHero>
+```
+
+Controls appear in the bottom-right of the card (Scale, Height, and Source selector). Custom URLs must end in `.glb` or `.gltf`. Switching sources does not remove the default robot; you can return to Local at any time.
 
 ---
 
