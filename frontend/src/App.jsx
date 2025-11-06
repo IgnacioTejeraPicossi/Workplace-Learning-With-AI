@@ -375,13 +375,14 @@ function AppContent() {
                       {t('askAI.subtitle')}
                     </p>
                     <CommandBar onRoute={handleRoute} inputPlaceholder={t('askAI.inputPlaceholder')} />
-                    {/* Advanced 3D hologram portal (click to open Future App) */}
-                    <HologramPortal3D onClick={handleOpenFutureApp} />
+                    {/* Hologram card with embedded 3D portal */}
                     <HologramHero
                       title="Hologram Portal — Future Module"
                       subtitle="Experimental zone: concepts, prototypes and advanced visualizations"
                       onClick={handleOpenFutureApp}
-                    />
+                    >
+                      <HologramPortal3D embed />
+                    </HologramHero>
                     <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
                         💡 "{t('askAI.suggestions.videoLesson')}"

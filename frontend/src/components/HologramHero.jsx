@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 
-export default function HologramHero({ title = "Future Module", subtitle = "Click to explore prototypes", onClick }) {
+export default function HologramHero({ title = "Future Module", subtitle = "Click to explore prototypes", onClick, children }) {
   const cardRef = useRef(null);
 
   const styles = useMemo(() => ({
@@ -14,7 +14,7 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
     card: {
       position: 'relative',
       width: 'min(680px, 92vw)',
-      height: 260,
+      height: 380,
       borderRadius: 20,
       padding: 24,
       cursor: 'pointer',
@@ -27,6 +27,15 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
       transformStyle: 'preserve-3d',
       transform: 'perspective(1200px) translateZ(0)',
       transition: 'transform 0.15s ease-out, box-shadow 0.2s ease-out',
+    },
+    canvasSlot: {
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 2,
+      pointerEvents: 'none',
     },
     heading: {
       position: 'relative',
@@ -135,6 +144,8 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
         onClick={onClick}
         title="Open Future Module"
       >
+        {/* 3D content slot */}
+        <div style={styles.canvasSlot}>{children}</div>
         <h3 style={styles.heading}>{title}</h3>
         <div style={styles.sub}>{subtitle}</div>
         <div style={styles.cta}>Enter →</div>
