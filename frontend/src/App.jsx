@@ -56,6 +56,8 @@ import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
 import ReadmeViewer from "./ReadmeViewer";
 import AgiProgressPage from "./pages/help/AgiProgressPage";
+import HologramHero from "./components/HologramHero";
+import HologramPortal3D from "./components/HologramPortal3D";
 
 function AppContent() {
   const { t } = useTranslation();
@@ -137,6 +139,12 @@ function AppContent() {
   const handleBackToApp = () => {
     setIsAIFullScreen(false);
     setActiveModule(null);
+  };
+
+  const handleOpenFutureApp = () => {
+    setIsAIFullScreen(false);
+    setActiveModule(null);
+    setSection("future-app");
   };
 
   return (
@@ -367,6 +375,13 @@ function AppContent() {
                       {t('askAI.subtitle')}
                     </p>
                     <CommandBar onRoute={handleRoute} inputPlaceholder={t('askAI.inputPlaceholder')} />
+                    {/* Advanced 3D hologram portal (click to open Future App) */}
+                    <HologramPortal3D onClick={handleOpenFutureApp} />
+                    <HologramHero
+                      title="Hologram Portal — Future Module"
+                      subtitle="Experimental zone: concepts, prototypes and advanced visualizations"
+                      onClick={handleOpenFutureApp}
+                    />
                     <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
                         💡 "{t('askAI.suggestions.videoLesson')}"
