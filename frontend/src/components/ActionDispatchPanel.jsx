@@ -1,9 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function ActionDispatchPanel({ title = 'Send to OutSystems Agent', endpoint, buildPayload, ready }) {
   const [dest, setDest] = useState({ jira: { enabled: true }, slack: { enabled: true }, sheets: { enabled: true } });
   const [busy, setBusy] = useState(false);
   const toggle = (k) => setDest({ ...dest, [k]: { ...(dest[k] || {}), enabled: !(dest[k]?.enabled) } });
+
+  // Load defaults from localStorage or env on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('dispatch.defaults');
+      const envDefaults = {
+        jira: {
+          enabled: true,
+          projectKey: process.env.REACT_APP_DEFAULT_JIRA_PROJECT_KEY || undefined,
+        },
+        slack: {
+          enabled: true,
+          channel: process.env.REACT_APP_DEFAULT_SLACK_CHANNEL || undefined,
+        },
+        sheets: {
+          enabled: true,
+          sheetId: process.env.REACT_APP_DEFAULT_SHEETS_ID || undefined,
+        },
+      };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setDest((d) => ({
+          jira: { enabled: parsed?.jira?.enabled ?? true, projectKey: parsed?.jira?.projectKey || envDefaults.jira.projectKey },
+          slack: { enabled: parsed?.slack?.enabled ?? true, channel: parsed?.slack?.channel || envDefaults.slack.channel },
+          sheets: { enabled: parsed?.sheets?.enabled ?? true, sheetId: parsed?.sheets?.sheetId || envDefaults.sheets.sheetId },
+        }));
+      } else {
+        setDest((d) => ({ ...d, ...envDefaults }));
+      }
+    } catch (_) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist on change
+  useEffect(() => {
+    try { localStorage.setItem('dispatch.defaults', JSON.stringify(dest)); } catch (_) {}
+  }, [dest]);
 
   async function submit() {
     if (!ready) return;
