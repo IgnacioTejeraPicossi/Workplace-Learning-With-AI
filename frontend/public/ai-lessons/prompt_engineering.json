@@ -1,0 +1,50 @@
+{
+  "id": "prompt_eng_002",
+  "title": "Prompt Engineering",
+  "difficulty": "Beginner",
+  "duration": "35 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Principles",
+      "content": "Good prompts are clear about task, format and constraints. Provide context, role, examples and evaluation criteria. Iterate and compare outputs."
+    },
+    {
+      "type": "list",
+      "heading": "Tactics",
+      "content": [
+        "Specify role (\"You are a security reviewer...\")",
+        "Give structure (headings, tables, JSON schema)",
+        "Provide examples (few-shot)",
+        "Constrain style/length/tone",
+        "Ask for self‑check or chain‑of‑thought (concise)"
+      ]
+    },
+    {
+      "type": "definitions",
+      "heading": "Key Terms",
+      "definitions": [
+        { "term": "Few-shot", "definition": "Demonstrate task with a few examples in the prompt" },
+        { "term": "System prompt", "definition": "High‑level instruction that sets behavior" },
+        { "term": "Guardrails", "definition": "Constraints and checks to prevent unsafe outputs" }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which tactic improves reliability?",
+      "options": { "a": "Add random text", "b": "Provide examples", "c": "Remove instructions" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "What is a system prompt?",
+      "options": { "a": "A log file", "b": "A high-level behavior instruction", "c": "A dataset" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "presentation-agent",
+    "agentops-studio"
+  ]
+}
+

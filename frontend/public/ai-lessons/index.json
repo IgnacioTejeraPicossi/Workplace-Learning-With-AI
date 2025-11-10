@@ -10,6 +10,30 @@
       "ai-study-buddy",
       "simulations"
     ]
+  },
+  {
+    "id": "prompt_eng_002",
+    "title": "Prompt Engineering",
+    "summary": "Techniques to design effective prompts and evaluate model outputs.",
+    "difficulty": "Beginner",
+    "duration": "35 min",
+    "contentUrl": "/ai-lessons/prompt_engineering.json",
+    "relatedModules": [
+      "presentation-agent",
+      "agentops-studio"
+    ]
+  },
+  {
+    "id": "llms_003",
+    "title": "How LLMs Work",
+    "summary": "Tokens, embeddings, attention and inference with large language models.",
+    "difficulty": "Intermediate",
+    "duration": "40 min",
+    "contentUrl": "/ai-lessons/how_llms_work.json",
+    "relatedModules": [
+      "agentic-rag",
+      "documents-analyzer"
+    ]
   }
 ]
 

@@ -1141,14 +1141,18 @@ const AITrainingModule = ({ user }) => {
                           🧠 Quiz included
                         </span>
                         {Array.isArray(lesson.relatedModules) && lesson.relatedModules.length > 0 && lesson.relatedModules.map((m) => (
-                          <span key={m} style={{
+                          <span key={m} onClick={(e)=>{
+                              e.stopPropagation();
+                              window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: m } }));
+                            }} style={{
                             background: colors.primaryLight,
                             color: colors.primary,
                             padding: '6px 10px',
                             borderRadius: 16,
                             fontSize: '0.75em',
                             fontWeight: 500,
-                            border: `1px solid ${colors.primary}`
+                            border: `1px solid ${colors.primary}`,
+                            cursor: 'pointer'
                           }}>
                             🔗 {m}
                           </span>
@@ -1205,7 +1209,9 @@ const AITrainingModule = ({ user }) => {
             {Array.isArray(currentLesson?.relatedModules) && currentLesson.relatedModules.length > 0 && (
               <div style={{ margin: '6px 0 16px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {currentLesson.relatedModules.map((m) => (
-                  <span key={m} style={{ padding: '4px 10px', borderRadius: 12, background: colors.primaryLight, color: colors.primary, fontSize: '0.8em' }}>
+                  <span key={m} onClick={()=>{
+                      window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: m } }));
+                    }} style={{ padding: '4px 10px', borderRadius: 12, background: colors.primaryLight, color: colors.primary, fontSize: '0.8em', cursor: 'pointer' }}>
                     🔗 {m}
                   </span>
                 ))}

@@ -1,0 +1,40 @@
+{
+  "id": "llms_003",
+  "title": "How LLMs Work",
+  "difficulty": "Intermediate",
+  "duration": "40 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Tokens & Embeddings",
+      "content": "Text is split into tokens. Tokens are mapped to vectors (embeddings) that capture semantic relationships."
+    },
+    {
+      "type": "text",
+      "heading": "Attention",
+      "content": "Transformers use attention to weigh relevant tokens when predicting the next token. Multi‑head attention learns different relationships."
+    },
+    {
+      "type": "text",
+      "heading": "Inference & Context Window",
+      "content": "The model predicts one token at a time conditioned on prior tokens (prompt + generated). The maximum sequence length is the context window."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is an embedding?",
+      "options": { "a": "A picture", "b": "A vector representation", "c": "A stylesheet" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "What does attention do?",
+      "options": { "a": "Ignores input", "b": "Weighs relevant tokens", "c": "Changes temperature" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "agentic-rag",
+    "documents-analyzer"
+  ]
+}
+
