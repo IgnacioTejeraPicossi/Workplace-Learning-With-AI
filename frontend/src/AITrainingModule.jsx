@@ -13,9 +13,10 @@ const AITrainingModule = ({ user }) => {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [view, setView] = useState('lessons'); // 'lessons', 'certifications', 'path'
   const [difficultyFilter, setDifficultyFilter] = useState('all'); // 'all', 'Beginner', 'Intermediate', 'Advanced', 'Expert'
+  const [lessonsState, setLessonsState] = useState(null); // dynamic lessons from /ai-lessons/index.json
 
   // Comprehensive AI Learning Curriculum with 4 levels
-  const lessons = [
+  const embeddedLessons = [
     // ===== BEGINNER LEVEL =====
     {
       id: "ai_intro_001",
@@ -520,6 +521,40 @@ const AITrainingModule = ({ user }) => {
     }
   ];
 
+  // Resolve lessons list (dynamic index with fallback to embedded)
+  const lessons = lessonsState || embeddedLessons;
+
+  // Load dynamic index.json from public (graceful fallback)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/ai-lessons/index.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('index not found');
+        const idx = await res.json();
+        const mapped = idx.map((item) => {
+          const fb = embeddedLessons.find(l => l.id === item.id) || {};
+          return {
+            id: item.id,
+            title: item.title || fb.title || item.id,
+            description: item.summary || fb.description || '',
+            difficulty: item.difficulty || fb.difficulty || 'Beginner',
+            duration: item.duration || fb.duration || '',
+            sections: fb.sections || [],
+            quiz: fb.quiz || [],
+            contentUrl: item.contentUrl,
+            relatedModules: item.relatedModules || fb.relatedModules || []
+          };
+        });
+        if (mounted) setLessonsState(mapped);
+      } catch (_) {
+        if (mounted) setLessonsState(null); // fallback is embeddedLessons
+      }
+    })();
+    return () => { mounted = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const certifications = [
     {
       id: "ai_basics_cert",
@@ -574,12 +609,34 @@ const AITrainingModule = ({ user }) => {
   };
 
   const handleLessonSelect = (lesson) => {
-    setCurrentLesson(lesson);
-    const lessonProgress = progress[lesson.id];
-    setCurrentSection(lessonProgress?.section || 0);
-    setQuizCompleted(lessonProgress?.quizCompleted || false);
-    setShowQuiz(false);
-    setView('lessons');
+    const applyLesson = (l) => {
+      setCurrentLesson(l);
+      const lessonProgress = progress[l.id];
+      setCurrentSection(lessonProgress?.section || 0);
+      setQuizCompleted(lessonProgress?.quizCompleted || false);
+      setShowQuiz(false);
+      setView('lessons');
+    };
+
+    if (lesson?.contentUrl) {
+      fetch(lesson.contentUrl, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('content fetch failed')))
+        .then(data => {
+          const merged = {
+            ...lesson,
+            title: data.title || lesson.title,
+            difficulty: data.difficulty || lesson.difficulty,
+            duration: data.duration || lesson.duration,
+            sections: data.sections || lesson.sections || [],
+            quiz: data.quiz || lesson.quiz || [],
+            relatedModules: data.relatedModules || lesson.relatedModules || []
+          };
+          applyLesson(merged);
+        })
+        .catch(() => applyLesson(lesson));
+    } else {
+      applyLesson(lesson);
+    }
   };
 
   const nextSection = () => {
@@ -1083,6 +1140,19 @@ const AITrainingModule = ({ user }) => {
                         }}>
                           🧠 Quiz included
                         </span>
+                        {Array.isArray(lesson.relatedModules) && lesson.relatedModules.length > 0 && lesson.relatedModules.map((m) => (
+                          <span key={m} style={{
+                            background: colors.primaryLight,
+                            color: colors.primary,
+                            padding: '6px 10px',
+                            borderRadius: 16,
+                            fontSize: '0.75em',
+                            fontWeight: 500,
+                            border: `1px solid ${colors.primary}`
+                          }}>
+                            🔗 {m}
+                          </span>
+                        ))}
                         {lessonProgress?.quizCompleted && (
                           <span style={{
                             background: '#e8f5e8',
@@ -1131,6 +1201,16 @@ const AITrainingModule = ({ user }) => {
                 ← Back to Lessons
               </button>
             </div>
+
+            {Array.isArray(currentLesson?.relatedModules) && currentLesson.relatedModules.length > 0 && (
+              <div style={{ margin: '6px 0 16px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {currentLesson.relatedModules.map((m) => (
+                  <span key={m} style={{ padding: '4px 10px', borderRadius: 12, background: colors.primaryLight, color: colors.primary, fontSize: '0.8em' }}>
+                    🔗 {m}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {showQuiz ? (
               <Quiz 

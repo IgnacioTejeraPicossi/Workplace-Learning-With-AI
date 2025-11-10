@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ai_intro_001",
+    "title": "AI Basics",
+    "summary": "Foundations of AI: what it is, subfields, key concepts and risks.",
+    "difficulty": "Beginner",
+    "duration": "30 min",
+    "contentUrl": "/ai-lessons/ai_basics.json",
+    "relatedModules": [
+      "ai-study-buddy",
+      "simulations"
+    ]
+  }
+]
+
