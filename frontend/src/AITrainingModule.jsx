@@ -742,7 +742,7 @@ const AITrainingModule = ({ user }) => {
       
       case 'download':
         return (
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             {section.text && <span style={{ color: colors.text }}>{section.text}</span>}
             <a href={section.href} download style={{ 
               background: colors.primary, 
@@ -754,6 +754,44 @@ const AITrainingModule = ({ user }) => {
             }}>
               ⬇ {section.label || 'Download'}
             </a>
+            <button onClick={async ()=>{
+              try {
+                const res = await fetch(section.href, { cache: 'no-store' });
+                const text = await res.text();
+                await navigator.clipboard.writeText(text);
+                alert('Dataset copied to clipboard');
+              } catch (e) {
+                alert('Could not copy dataset');
+              }
+            }} style={{ 
+              background: colors.cardBackground,
+              color: colors.text,
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: `1px solid ${colors.border}`,
+              cursor: 'pointer'
+            }}>
+              📋 {section.copyLabel || 'Copy JSON'}
+            </button>
+            <button onClick={async ()=>{
+              try {
+                const res = await fetch(section.href, { cache: 'no-store' });
+                const text = await res.text();
+                localStorage.setItem('agenticRag_preload_dataset', text);
+                window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: 'agentic-rag', dataset: 'agenticRag_preload_dataset' } }));
+              } catch (e) {
+                alert('Could not open Agentic RAG with dataset');
+              }
+            }} style={{ 
+              background: colors.primaryLight,
+              color: colors.primary,
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: `1px solid ${colors.primary}`,
+              cursor: 'pointer'
+            }}>
+              🚀 {section.openLabel || 'Open in Agentic RAG'}
+            </button>
           </div>
         );
       

@@ -14,7 +14,7 @@
       "heading": "Transformer at a Glance",
       "src": "/ai-lessons/llm_diagram.svg",
       "alt": "Tokens → Embeddings → Attention → Next‑token prediction",
-      "caption": "Tokens → Embeddings → Attention → Next‑token prediction, all dentro de una *context window*."
+      "caption": "Tokens → Embeddings → Attention → Next‑token prediction, all within a context window."
     },
     {
       "type": "text",
@@ -34,20 +34,22 @@
     {
       "type": "exercise",
       "heading": "Mini‑Exercise: Embedding Similarity",
-      "description": "Compute and comparar similitud de embeddings de frases cortas.",
+      "description": "Compute cosine similarity between embeddings of short phrases.",
       "steps": [
-        "Abre el 🔗 agentic-rag.",
-        "Obtén embeddings de: “The cat sat on the mat” y “A dog rested on the rug”.",
-        "Calcula el coseno: debería ser alto por similitud semántica.",
-        "Prueba con una frase no relacionada (e.g., “The stock market rose today”) y observa cómo cae la similitud.",
-        "Opcional: crea un pequeño índice y recupera los 3 vecinos más cercanos por similitud."
+        "Open 🔗 agentic-rag.",
+        "Embed two phrases: “The cat sat on the mat” and “A dog rested on the rug”.",
+        "Compute cosine similarity — it should be high due to semantic similarity.",
+        "Try an unrelated phrase (e.g., “The stock market rose today”) and observe a drop in similarity.",
+        "Optional: build a tiny index and retrieve the top‑3 nearest neighbors."
       ]
     },
     {
       "type": "download",
-      "heading": "Dataset para el ejercicio",
-      "text": "Descarga un pequeño dataset con 5 frases para probar embeddings:",
+      "heading": "Dataset for the exercise",
+      "text": "Download a small dataset with 5 phrases for embeddings:",
       "label": "Download dataset (JSON)",
+      "copyLabel": "Copy JSON",
+      "openLabel": "Open in Agentic RAG",
       "href": "/ai-lessons/embedding_dataset.json"
     }
   ],
