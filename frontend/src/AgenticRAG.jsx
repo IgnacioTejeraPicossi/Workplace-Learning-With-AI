@@ -14,6 +14,13 @@ const AgenticRAG = () => {
   const [analyses, setAnalyses] = useState([]);
   const [preloadDataset, setPreloadDataset] = useState(null);
   const [preloadName, setPreloadName] = useState('');
+  const [showEmbedDemo, setShowEmbedDemo] = useState(false);
+  const [vecA, setVecA] = useState('');
+  const [vecB, setVecB] = useState('');
+  const [cosine, setCosine] = useState(null);
+  const [cosError, setCosError] = useState('');
+  const [phraseA, setPhraseA] = useState('');
+  const [phraseB, setPhraseB] = useState('');
 
   // Agentic RAG parameters
   const [depth, setDepth] = useState(2);
@@ -29,6 +36,8 @@ const AgenticRAG = () => {
       const key = 'agenticRag_preload_dataset';
       const raw = localStorage.getItem(key);
       if (raw) {
+        // mark as shown for this session
+        sessionStorage.setItem('agenticRag_preload_shown', '1');
         const data = JSON.parse(raw);
         if (data && (Array.isArray(data.items) || Array.isArray(data))) {
           const name = data.name || 'dataset';
@@ -44,6 +53,65 @@ const AgenticRAG = () => {
       console.warn('Failed to load preloaded dataset', e);
     }
   }, []);
+
+  // Helpers for cosine demo
+  const parseVec = (s) => {
+    if (!s) return null;
+    try {
+      const maybeJson = JSON.parse(s);
+      if (Array.isArray(maybeJson)) return maybeJson.map(Number);
+    } catch (_){/* not json */}
+    return s.split(',').map(x=>Number(x.trim())).filter(v=>!Number.isNaN(v));
+  };
+  const toyEmbedding = (text) => {
+    const s = (text || '').toString();
+    let h1 = 0, h2 = 0, h3 = 0;
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      h1 += c * 1.17;
+      h2 += (c * (i + 1)) * 0.63;
+      h3 += (c % 31) - 15;
+    }
+    const norm = Math.sqrt(h1*h1 + h2*h2 + h3*h3) || 1;
+    const arr = [h1/norm, h2/norm, h3/norm].map(x => Math.max(-1, Math.min(1, x)));
+    return arr;
+  };
+  const formatVec = (arr) => `[${arr.map(n => Number(n).toFixed(3)).join(', ')}]`;
+  const computeCosine = () => {
+    const a = parseVec(vecA);
+    const b = parseVec(vecB);
+    if (!a || !b || a.length !== b.length || a.length === 0) {
+      setCosError('Invalid vectors. Provide same-length arrays.');
+      setCosine(null);
+      return;
+    }
+    const dot = a.reduce((acc, v, i)=> acc + v*b[i], 0);
+    const norm = (v)=> Math.sqrt(v.reduce((acc, x)=> acc + x*x, 0));
+    const c = dot / (norm(a)*norm(b));
+    setCosine(c);
+    setCosError('');
+  };
+
+  // When the demo opens, prefill examples and auto-calculate
+  useEffect(() => {
+    if (showEmbedDemo) {
+      const defaultA = '[0.1, 0.3, -0.2]';
+      const defaultB = '[0.05, 0.32, -0.18]';
+      const pA = 'The cat sat on the mat';
+      const pB = 'A dog rested on the rug';
+      if (!vecA) setVecA(defaultA);
+      if (!vecB) setVecB(defaultB);
+      if (!phraseA) setPhraseA(pA);
+      if (!phraseB) setPhraseB(pB);
+      // compute after state update
+      setTimeout(() => computeCosine(), 0);
+    } else {
+      // reset result/error when panel is closed
+      setCosine(null);
+      setCosError('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showEmbedDemo]);
 
   const fetchIndexedDocs = async () => {
     try {
@@ -415,6 +483,10 @@ const AgenticRAG = () => {
                   style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
                 >📋 Copy</button>
                 <button
+                  onClick={()=> setShowEmbedDemo(s => !s)}
+                  style={{ background: colors.primaryLight, color: colors.primary, border: `1px solid ${colors.primary}`, padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
+                >🧮 Use with embeddings demo</button>
+                <button
                   onClick={()=> setPreloadDataset(null)}
                   style={{ background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
                 >✖ Clear</button>
@@ -428,6 +500,50 @@ const AgenticRAG = () => {
             <div style={{ marginTop: 8, color: colors.textSecondary, fontSize: 12 }}>
               Tip: Use this dataset to test embedding similarity (see “How LLMs Work” lesson).
             </div>
+
+            {showEmbedDemo && (
+              <div style={{ marginTop: 12, padding: 12, borderRadius: 8, border: `1px dashed ${colors.primary}` }}>
+                <div style={{ marginBottom: 8, color: colors.text }}><strong>Embedding cosine similarity demo</strong></div>
+                <div style={{ marginBottom: 6, color: colors.textSecondary, fontSize: 12 }}>
+                  Demo uses toy vectors representing the phrases below (you can edit both phrases and vectors).
+                </div>
+                <div style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
+                  <div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Phrase A</div>
+                    <input value={phraseA} onChange={e=>{
+                      const v = e.target.value;
+                      setPhraseA(v);
+                      const tv = toyEmbedding(v);
+                      setVecA(formatVec(tv));
+                      setTimeout(()=>computeCosine(), 0);
+                    }} placeholder='The cat sat on the mat' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
+                  </div>
+                  <div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Phrase B</div>
+                    <input value={phraseB} onChange={e=>{
+                      const v = e.target.value;
+                      setPhraseB(v);
+                      const tv = toyEmbedding(v);
+                      setVecB(formatVec(tv));
+                      setTimeout(()=>computeCosine(), 0);
+                    }} placeholder='A dog rested on the rug' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
+                  </div>
+                  <div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Vector A (JSON or comma‑separated)</div>
+                    <textarea value={vecA} onChange={e=>setVecA(e.target.value)} placeholder='[0.1, 0.3, -0.2]' style={{ width: '100%', minHeight: 70, borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8 }}/>
+                  </div>
+                  <div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Vector B (JSON or comma‑separated)</div>
+                    <textarea value={vecB} onChange={e=>setVecB(e.target.value)} placeholder='[0.05, 0.32, -0.18]' style={{ width: '100%', minHeight: 70, borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8 }}/>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  <button onClick={computeCosine} style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}>Calculate cosine</button>
+                  {cosError && <span style={{ color: '#b91c1c', fontSize: 13 }}>{cosError}</span>}
+                  {cosine !== null && !cosError && <span style={{ color: colors.text, fontSize: 14 }}>cosine = <strong>{cosine.toFixed(4)}</strong></span>}
+                </div>
+              </div>
+            )}
           </div>
         )}
         
