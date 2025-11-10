@@ -12,6 +12,8 @@ const AgenticRAG = () => {
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState("");
   const [analyses, setAnalyses] = useState([]);
+  const [preloadDataset, setPreloadDataset] = useState(null);
+  const [preloadName, setPreloadName] = useState('');
 
   // Agentic RAG parameters
   const [depth, setDepth] = useState(2);
@@ -22,6 +24,25 @@ const AgenticRAG = () => {
   // Fetch indexed documents on component mount
   useEffect(() => {
     fetchIndexedDocs();
+    // Load preloaded dataset from localStorage if present
+    try {
+      const key = 'agenticRag_preload_dataset';
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && (Array.isArray(data.items) || Array.isArray(data))) {
+          const name = data.name || 'dataset';
+          const items = Array.isArray(data.items) ? data.items : data;
+          setPreloadDataset(items);
+          setPreloadName(name);
+          setStatus(`Dataset loaded: ${name} (${items.length} items)`);
+        }
+        // clear after loading to avoid repeated loads
+        localStorage.removeItem(key);
+      }
+    } catch (e) {
+      console.warn('Failed to load preloaded dataset', e);
+    }
   }, []);
 
   const fetchIndexedDocs = async () => {
@@ -370,6 +391,45 @@ const AgenticRAG = () => {
         }}>
           Advanced document analysis using intelligent agents for deep reasoning and grounded answers with citations.
         </p>
+
+        {preloadDataset && (
+          <div style={{ 
+            marginTop: 16,
+            padding: 16,
+            borderRadius: 12,
+            border: `1px solid ${colors.border}`,
+            background: colors.cardBackground
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <strong style={{ color: colors.text }}>Preloaded Dataset: {preloadName}</strong>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={async()=>{
+                    try{
+                      const blob = JSON.stringify({ name: preloadName, items: preloadDataset }, null, 2);
+                      await navigator.clipboard.writeText(blob);
+                      setStatus('Dataset copied to clipboard');
+                      setTimeout(()=>setStatus(''), 1500);
+                    }catch(e){ setStatus('Copy failed'); setTimeout(()=>setStatus(''),1500);}
+                  }}
+                  style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
+                >📋 Copy</button>
+                <button
+                  onClick={()=> setPreloadDataset(null)}
+                  style={{ background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
+                >✖ Clear</button>
+              </div>
+            </div>
+            <div style={{ maxHeight: 140, overflowY: 'auto', fontSize: 14, color: colors.text }}>
+              <ol style={{ marginLeft: 18 }}>
+                {preloadDataset.map((s,i)=> <li key={i} style={{ marginBottom: 6 }}>{s}</li>)}
+              </ol>
+            </div>
+            <div style={{ marginTop: 8, color: colors.textSecondary, fontSize: 12 }}>
+              Tip: Use this dataset to test embedding similarity (see “How LLMs Work” lesson).
+            </div>
+          </div>
+        )}
         
         {/* Status Messages */}
         {status && (
