@@ -10,6 +10,13 @@
       "content": "Text is split into tokens. Tokens are mapped to vectors (embeddings) that capture semantic relationships."
     },
     {
+      "type": "image",
+      "heading": "Transformer at a Glance",
+      "src": "/ai-lessons/llm_diagram.svg",
+      "alt": "Tokens → Embeddings → Attention → Next‑token prediction",
+      "caption": "Tokens → Embeddings → Attention → Next‑token prediction, all dentro de una *context window*."
+    },
+    {
       "type": "text",
       "heading": "Attention",
       "content": "Transformers use attention to weigh relevant tokens when predicting the next token. Multi‑head attention learns different relationships."
@@ -18,6 +25,30 @@
       "type": "text",
       "heading": "Inference & Context Window",
       "content": "The model predicts one token at a time conditioned on prior tokens (prompt + generated). The maximum sequence length is the context window."
+    },
+    {
+      "type": "code",
+      "heading": "Cosine Similarity (pseudocode)",
+      "content": "import numpy as np\\n\\n# two embedding vectors\\na = np.array([0.1, 0.3, -0.2])\\nb = np.array([0.05, 0.32, -0.18])\\n\\ncos = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))\\nprint('similarity:', float(cos))"
+    },
+    {
+      "type": "exercise",
+      "heading": "Mini‑Exercise: Embedding Similarity",
+      "description": "Compute and comparar similitud de embeddings de frases cortas.",
+      "steps": [
+        "Abre el 🔗 agentic-rag.",
+        "Obtén embeddings de: “The cat sat on the mat” y “A dog rested on the rug”.",
+        "Calcula el coseno: debería ser alto por similitud semántica.",
+        "Prueba con una frase no relacionada (e.g., “The stock market rose today”) y observa cómo cae la similitud.",
+        "Opcional: crea un pequeño índice y recupera los 3 vecinos más cercanos por similitud."
+      ]
+    },
+    {
+      "type": "download",
+      "heading": "Dataset para el ejercicio",
+      "text": "Descarga un pequeño dataset con 5 frases para probar embeddings:",
+      "label": "Download dataset (JSON)",
+      "href": "/ai-lessons/embedding_dataset.json"
     }
   ],
   "quiz": [

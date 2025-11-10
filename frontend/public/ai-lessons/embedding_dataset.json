@@ -1,0 +1,12 @@
+{
+  "name": "demo-embedding-dataset",
+  "description": "Five short phrases for embedding similarity exercises.",
+  "items": [
+    "The cat sat on the mat",
+    "A dog rested on the rug",
+    "The stock market rose today",
+    "Neural networks learn representations",
+    "Cooking pasta requires boiling water"
+  ]
+}
+

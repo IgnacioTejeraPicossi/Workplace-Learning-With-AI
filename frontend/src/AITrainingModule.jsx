@@ -713,6 +713,50 @@ const AITrainingModule = ({ user }) => {
           </div>
         );
       
+      case 'image':
+        return (
+          <div style={{ textAlign: 'center' }}>
+            <img src={section.src} alt={section.alt || section.heading || 'diagram'} style={{ maxWidth: '100%', height: 'auto', borderRadius: 8, border: `1px solid ${colors.border}` }} />
+            {section.caption && <div style={{ marginTop: 8, color: colors.textSecondary, fontSize: '0.9em' }}>{section.caption}</div>}
+          </div>
+        );
+
+      case 'code':
+        return (
+          <pre style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8, overflowX: 'auto' }}>
+            <code>{section.content}</code>
+          </pre>
+        );
+
+      case 'exercise':
+        return (
+          <div style={{ border: `1px dashed ${colors.primary}`, padding: 12, borderRadius: 8 }}>
+            {section.description && <p style={{ color: colors.text }}>{section.description}</p>}
+            {Array.isArray(section.steps) && (
+              <ol style={{ lineHeight: 1.6, color: colors.text, marginLeft: 18 }}>
+                {section.steps.map((s, i) => <li key={i} style={{ marginBottom: 8 }}>{s}</li>)}
+              </ol>
+            )}
+          </div>
+        );
+      
+      case 'download':
+        return (
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            {section.text && <span style={{ color: colors.text }}>{section.text}</span>}
+            <a href={section.href} download style={{ 
+              background: colors.primary, 
+              color: 'white',
+              textDecoration: 'none',
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: 'none'
+            }}>
+              ⬇ {section.label || 'Download'}
+            </a>
+          </div>
+        );
+      
       default:
         return <p style={{ color: colors.text }}>{section.content}</p>;
     }
@@ -1127,7 +1171,7 @@ const AITrainingModule = ({ user }) => {
                           fontWeight: 500,
                           border: `1px solid ${difficultyColors.border}`
                         }}>
-                          📚 {lesson.sections.length} sections
+                          📚 {lesson.sections.length > 0 ? `${lesson.sections.length} sections` : (lesson.contentUrl ? 'sections in file' : '0 sections')}
                         </span>
                         <span style={{
                           background: difficultyColors.bg,
