@@ -47,7 +47,7 @@ export default function HologramAgentLauncher() {
         color: "#b9ecff",
         backdropFilter: "blur(6px)"
       }}>
-        <span style={{ fontSize: 12 }}>Chat on click</span>
+        <span style={{ fontSize: 12 }}>Chat on click Hologram</span>
         <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
           <input
             type="checkbox"
