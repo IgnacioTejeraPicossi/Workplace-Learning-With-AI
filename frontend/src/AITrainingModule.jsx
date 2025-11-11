@@ -547,6 +547,25 @@ const AITrainingModule = ({ user }) => {
           };
         });
         if (mounted) setLessonsState(mapped);
+
+        // Background: fetch section counts so cards show accurate totals even before opening
+        try {
+          const withCounts = await Promise.all(
+            mapped.map(async (lesson) => {
+              if (!lesson.contentUrl) return lesson;
+              try {
+                const r = await fetch(lesson.contentUrl, { cache: 'no-store' });
+                if (!r.ok) return lesson;
+                const j = await r.json();
+                const sectionCount = Array.isArray(j.sections) ? j.sections.length : 0;
+                return { ...lesson, sectionCount };
+              } catch {
+                return lesson;
+              }
+            })
+          );
+          if (mounted) setLessonsState(withCounts);
+        } catch {}
       } catch (_) {
         if (mounted) setLessonsState(null); // fallback is embeddedLessons
       }
@@ -980,7 +999,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🟢 Beginner (2)
+                  🟢 Beginner ({lessons.filter(l => l.difficulty === 'Beginner').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Intermediate')}
@@ -996,7 +1015,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🟡 Intermediate (3)
+                  🟡 Intermediate ({lessons.filter(l => l.difficulty === 'Intermediate').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Advanced')}
@@ -1012,7 +1031,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🔵 Advanced (4)
+                  🔵 Advanced ({lessons.filter(l => l.difficulty === 'Advanced').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Expert')}
@@ -1028,7 +1047,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🔴 Expert (4)
+                  🔴 Expert ({lessons.filter(l => l.difficulty === 'Expert').length})
                 </button>
               </div>
               
@@ -1043,7 +1062,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #4CAF50'
                 }}>
-                  🟢 Beginner (2 modules)
+                  🟢 Beginner ({lessons.filter(l => l.difficulty === 'Beginner').length} modules)
                 </div>
                 <div style={{
                   background: '#fff3e0',
@@ -1054,7 +1073,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #FF9800'
                 }}>
-                  🟡 Intermediate (3 modules)
+                  🟡 Intermediate ({lessons.filter(l => l.difficulty === 'Intermediate').length} modules)
                 </div>
                 <div style={{
                   background: '#e3f2fd',
@@ -1065,7 +1084,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #2196F3'
                 }}>
-                  🔵 Advanced (4 modules)
+                  🔵 Advanced ({lessons.filter(l => l.difficulty === 'Advanced').length} modules)
                 </div>
                 <div style={{
                   background: '#fce4ec',
@@ -1076,7 +1095,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #E91E63'
                 }}>
-                  🔴 Expert (4 modules)
+                  🔴 Expert ({lessons.filter(l => l.difficulty === 'Expert').length} modules)
                 </div>
               </div>
             </div>
@@ -1101,7 +1120,10 @@ const AITrainingModule = ({ user }) => {
                   .map((lesson) => {
                 const lessonProgress = progress[lesson.id];
                 const sectionProgress = lessonProgress?.section || 0;
-                const progressPercent = (sectionProgress / lesson.sections.length) * 100;
+                const totalSections = (lesson.sections && lesson.sections.length > 0)
+                  ? lesson.sections.length
+                  : (lesson.sectionCount || 0);
+                const progressPercent = totalSections > 0 ? (sectionProgress / totalSections) * 100 : 0;
                 
                 // Get difficulty colors
                 const getDifficultyColors = (difficulty) => {
@@ -1229,7 +1251,11 @@ const AITrainingModule = ({ user }) => {
                           fontWeight: 500,
                           border: `1px solid ${difficultyColors.border}`
                         }}>
-                          📚 {lesson.sections.length > 0 ? `${lesson.sections.length} sections` : (lesson.contentUrl ? 'sections in file' : '0 sections')}
+                          📚 {lesson.sections.length > 0
+                            ? `${lesson.sections.length} sections`
+                            : (lesson.sectionCount
+                                ? `${lesson.sectionCount} sections`
+                                : (lesson.contentUrl ? 'sections in file' : '0 sections'))}
                         </span>
                         <span style={{
                           background: difficultyColors.bg,
