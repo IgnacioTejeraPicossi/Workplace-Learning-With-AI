@@ -158,7 +158,7 @@ def chunk_text(text: str, max_chars: int = 1500, overlap: int = 50) -> List[str]
             i = 0
         
         # Memory management: strict limit on number of chunks
-        if len(chunks) >= 20:  # Reduced from unlimited to 20 for better memory management
+        if len(chunks) >= 8:  # Cap to 8 chunks to keep latency reasonable
             print(f"Warning: Text truncated at {len(chunks)} chunks to prevent memory issues")
             break
     
@@ -172,7 +172,7 @@ def length_instructions(length: str) -> str:
     return "Return a compact executive summary (100-150 words) plus 3 bullet highlights."
 
 # ========= LLM calls =========
-def summarize_text(text: str, length: str = "medium") -> str:
+def summarize_text(text: str, length: str = "medium", request_headers=None) -> str:
     """Summarize text using the unified AI system (ItemAI → OpenRouter → OpenAI)"""
     try:
         instr = length_instructions(length)
@@ -196,7 +196,7 @@ def summarize_text(text: str, length: str = "medium") -> str:
                     from ..llm import ask_ai_unified_sync
             
             # The unified system will try ItemAI → OpenRouter → OpenAI automatically
-            response = ask_ai_unified_sync(prompt, task_type="document_analysis", complexity="medium", max_tokens=800)
+            response = ask_ai_unified_sync(prompt, task_type="document_analysis", complexity="medium", max_tokens=800, request_headers=request_headers)
             if response and not response.startswith("[MOCKED RESPONSE"):
                 print("✅ Document Analyzer: Unified AI system successful")
                 return response.strip()
@@ -217,6 +217,7 @@ async def analyze_documents(
     files: List[UploadFile] = File(..., description="One or more files"),
     length: Literal["short", "medium", "long"] = Form("medium"),
     combine_across_files: bool = Form(True),
+    http_request: Request = None
 ) -> SummaryResponse:
     """Analyze uploaded documents and return summaries"""
     if not files:
@@ -255,7 +256,7 @@ async def analyze_documents(
             # Process chunks and create summary
             if len(chunks) == 1:
                 # Single chunk - summarize directly
-                summary = summarize_text(chunks[0], length=length)
+                summary = summarize_text(chunks[0], length=length, request_headers=(http_request.headers if http_request else None))
             else:
                 # Multiple chunks - summarize each and combine
                 chunk_summaries = []
@@ -265,7 +266,7 @@ async def analyze_documents(
                             f"Part {idx}/{len(chunks)} of a larger document. "
                             f"Summarize this part briefly. {length_instructions(length)}\n\n{chunk}"
                         )
-                        chunk_summary = summarize_text(chunk_prompt, length=length)
+                        chunk_summary = summarize_text(chunk_prompt, length=length, request_headers=(http_request.headers if http_request else None))
                         chunk_summaries.append(chunk_summary)
                     except Exception as e:
                         chunk_summaries.append(f"Error processing part {idx}: {str(e)}")
@@ -277,7 +278,7 @@ async def analyze_documents(
                         f"{length_instructions(length)}\n\n"
                         "PARTIAL SUMMARIES:\n" + "\n\n---\n".join(chunk_summaries)
                     )
-                    summary = summarize_text(combine_prompt, length=length)
+                    summary = summarize_text(combine_prompt, length=length, request_headers=(http_request.headers if http_request else None))
                 else:
                     summary = "Error: Could not process document chunks"
 
@@ -518,12 +519,13 @@ async def debug_storage():
 # New endpoint for JSON-based file uploads (base64 encoded)
 @router.post("/analyze-json", response_model=SummaryResponse)
 async def analyze_documents_json(
-    request: dict
+    body: dict,
+    http_request: Request = None
 ) -> SummaryResponse:
     """Analyze documents sent as base64-encoded JSON instead of FormData"""
-    files_data = request.get("files", [])
-    length = request.get("length", "medium")
-    combine_across_files = request.get("combine_across_files", True)
+    files_data = body.get("files", [])
+    length = body.get("length", "medium")
+    combine_across_files = body.get("combine_across_files", True)
     
     if not files_data:
         raise HTTPException(status_code=400, detail="No files provided.")
@@ -579,7 +581,7 @@ async def analyze_documents_json(
                 f"Summarize this part briefly. {length_instructions(length)}\n\n{ch}"
             )
             try:
-                s = summarize_text(chunk_prompt, length=length)
+                s = summarize_text(chunk_prompt, length=length, request_headers=(http_request.headers if http_request else None))
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"LLM error: {e}")
             chunk_summaries.append(s)
@@ -589,7 +591,7 @@ async def analyze_documents_json(
             f"{length_instructions(length)}\n\n"
             "PARTIAL SUMMARIES:\n" + "\n\n---\n".join(chunk_summaries)
         )
-        final_summary = summarize_text(stitching_prompt, length=length)
+        final_summary = summarize_text(stitching_prompt, length=length, request_headers=(http_request.headers if http_request else None))
 
         results.append(
             DocSummary(
