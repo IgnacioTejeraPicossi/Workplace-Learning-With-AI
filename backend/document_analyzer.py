@@ -526,6 +526,8 @@ async def analyze_documents_json(
     files_data = body.get("files", [])
     length = body.get("length", "medium")
     combine_across_files = body.get("combine_across_files", True)
+    mode = body.get("mode", "accurate")  # 'fast' | 'accurate'
+    FAST_MAX_CHARS = 9000
     
     if not files_data:
         raise HTTPException(status_code=400, detail="No files provided.")
@@ -573,34 +575,48 @@ async def analyze_documents_json(
             results.append(DocSummary(filename=filename, chars=0, chunks=0, summary="(empty or unreadable)"))
             continue
 
-        chunks = chunk_text(raw_text)
-        chunk_summaries = []
-        for idx, ch in enumerate(chunks, 1):
-            chunk_prompt = (
-                f"Part {idx}/{len(chunks)} of a larger document. "
-                f"Summarize this part briefly. {length_instructions(length)}\n\n{ch}"
+        if mode == "fast":
+            # Single-shot summary with safety cap
+            text_for_summary = raw_text[:FAST_MAX_CHARS]
+            final_summary = summarize_text(text_for_summary, length=length, request_headers=(http_request.headers if http_request else None))
+            results.append(
+                DocSummary(
+                    filename=filename,
+                    chars=len(raw_text),
+                    chunks=1,
+                    summary=final_summary,
+                )
             )
-            try:
-                s = summarize_text(chunk_prompt, length=length, request_headers=(http_request.headers if http_request else None))
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"LLM error: {e}")
-            chunk_summaries.append(s)
+        else:
+            # Accurate hierarchical multi-chunk summary
+            chunks = chunk_text(raw_text)
+            chunk_summaries = []
+            for idx, ch in enumerate(chunks, 1):
+                chunk_prompt = (
+                    f"Part {idx}/{len(chunks)} of a larger document. "
+                    f"Summarize this part briefly. {length_instructions(length)}\n\n{ch}"
+                )
+                try:
+                    s = summarize_text(chunk_prompt, length=length, request_headers=(http_request.headers if http_request else None))
+                except Exception as e:
+                    raise HTTPException(status_code=500, detail=f"LLM error: {e}")
+                chunk_summaries.append(s)
 
-        stitching_prompt = (
-            "Combine the following partial summaries into a single coherent summary. "
-            f"{length_instructions(length)}\n\n"
-            "PARTIAL SUMMARIES:\n" + "\n\n---\n".join(chunk_summaries)
-        )
-        final_summary = summarize_text(stitching_prompt, length=length, request_headers=(http_request.headers if http_request else None))
-
-        results.append(
-            DocSummary(
-                filename=filename,
-                chars=len(raw_text),
-                chunks=len(chunks),
-                summary=final_summary,
+            stitching_prompt = (
+                "Combine the following partial summaries into a single coherent summary. "
+                f"{length_instructions(length)}\n\n"
+                "PARTIAL SUMMARIES:\n" + "\n\n---\n".join(chunk_summaries)
             )
-        )
+            final_summary = summarize_text(stitching_prompt, length=length, request_headers=(http_request.headers if http_request else None))
+
+            results.append(
+                DocSummary(
+                    filename=filename,
+                    chars=len(raw_text),
+                    chunks=len(chunks),
+                    summary=final_summary,
+                )
+            )
 
     combined: Optional[str] = None
     if combine_across_files and len(results) > 1 and all(r.summary and not r.summary.startswith("Error") for r in results):
@@ -620,6 +636,7 @@ async def analyze_documents_json(
         meta={
             "files_processed": len(files_data),
             "length": length,
-            "combine_across_files": combine_across_files
+            "combine_across_files": combine_across_files,
+            "mode": mode
         },
     )

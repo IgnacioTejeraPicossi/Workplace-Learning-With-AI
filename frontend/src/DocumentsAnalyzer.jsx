@@ -6,6 +6,7 @@ const DocumentsAnalyzer = () => {
   const [files, setFiles] = useState([]);
   const [summaryLength, setSummaryLength] = useState("medium");
   const [combineFiles, setCombineFiles] = useState(true);
+  const [mode, setMode] = useState("accurate"); // 'fast' | 'accurate'
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState({
     currentFile: 0,
@@ -166,7 +167,8 @@ const DocumentsAnalyzer = () => {
         body: JSON.stringify({
           files: fileData,
           length: summaryLength,
-          combine_across_files: combineFiles
+          combine_across_files: combineFiles,
+          mode
         }),
       });
 
@@ -437,6 +439,28 @@ const DocumentsAnalyzer = () => {
                 <option value="long">Long (detailed outline)</option>
               </select>
             </div>
+
+          {/* Mode Selector */}
+          <div>
+            <label style={{ color: colors.text, fontSize: "14px", fontWeight: "500" }}>
+              Mode
+            </label>
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "8px",
+                border: `1px solid ${colors.border}`,
+                background: colors.card,
+                color: colors.text
+              }}
+            >
+              <option value="fast">Fast (single-shot)</option>
+              <option value="accurate">Accurate (multi-chunk)</option>
+            </select>
+          </div>
 
             {/* Combine Files */}
             <div>
