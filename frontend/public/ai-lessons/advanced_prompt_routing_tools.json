@@ -1,0 +1,65 @@
+{
+  "id": "prompt_routing_tools_010",
+  "title": "Prompt Routing & Tools",
+  "difficulty": "Advanced",
+  "duration": "50 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why routing matters",
+      "content": "Different requests benefit from different models and tools. A router classifies intent and constraints (latency, cost, safety) and dispatches to: a generation model, a retrieval step, a function/tool, or a chain/agent. Good routing improves quality and efficiency."
+    },
+    {
+      "type": "image",
+      "src": "/ai-lessons/prompt_routing.svg",
+      "alt": "Prompt router diagram",
+      "caption": "Intent → Policy → Route: choose model/tools and constraints; fallback on errors or unsafe inputs."
+    },
+    {
+      "type": "list",
+      "heading": "Signals for routing decisions",
+      "content": [
+        "Task intent: classify as generate, extract, search, transform, classify",
+        "Input size: long inputs may need retrieval or a larger context model",
+        "Latency & budget: choose a smaller/cheaper model for non‑critical tasks",
+        "Safety: if unsafe/PII detected, block or switch to a filtered flow",
+        "Domain: route to a domain‑tuned model or knowledge base"
+      ]
+    },
+    {
+      "type": "code",
+      "heading": "Router (pseudo‑JS)",
+      "content": "function route(req){\n  const intent = classifyIntent(req.text);\n  const policy = pickPolicy({ intent, tokens: countTokens(req.text), latencySLO: req.latencySLO, budget: req.budget });\n  if(!safety.allow(req.text)) return refuse('Unsafe input');\n  switch(intent){\n    case 'search': return ragAnswer(req.text, policy);\n    case 'extract': return extractJSON(req.text, policy);\n    case 'tool': return callTool(req.text, policy.toolName);\n    default: return generate(req.text, policy.model);\n  }\n}\n// Fallback: if provider fails, try a local LM Studio model"
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (AgentOps Studio + API Config)",
+      "description": "Create a simple router that splits between: (A) Draft (generate), (B) Extract JSON (schema), (C) Search (RAG).",
+      "steps": [
+        "In API Config, enable two providers: one fast and one high‑quality",
+        "In AgentOps Studio, create three nodes: generate, extract(schema) and retrieve",
+        "Add an initial node that classifies intent with a few labels",
+        "Wire routes to each node; add a fallback if the provider fails",
+        "Try three different inputs and compare accuracy/latency"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the primary goal of routing?",
+      "options": { "a": "Make prompts longer", "b": "Choose the best flow for each request", "c": "Always use the most expensive model" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which signal justifies using RAG?",
+      "options": { "a": "Short text with no references", "b": "Need to cite sources", "c": "Zero latency requirement" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "agentops-studio",
+    "api-config"
+  ]
+}
+
+

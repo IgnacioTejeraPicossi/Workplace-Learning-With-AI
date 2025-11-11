@@ -106,6 +106,31 @@
       "run-test",
       "cybersecurity"
     ]
+  },
+  {
+    "id": "prompt_routing_tools_010",
+    "title": "Prompt Routing & Tools",
+    "summary": "Route requests to the right model/tools based on task, constraints and safety.",
+    "difficulty": "Advanced",
+    "duration": "50 min",
+    "contentUrl": "/ai-lessons/advanced_prompt_routing_tools.json",
+    "relatedModules": [
+      "agentops-studio",
+      "api-config"
+    ]
+  },
+  {
+    "id": "observability_cost_011",
+    "title": "Observability & Cost Control",
+    "summary": "Track quality, latency and spend with logging, evaluation and guardrails.",
+    "difficulty": "Advanced",
+    "duration": "45 min",
+    "contentUrl": "/ai-lessons/observability_cost_control.json",
+    "relatedModules": [
+      "run-test",
+      "api-config",
+      "agentops-studio"
+    ]
   }
 ]
 

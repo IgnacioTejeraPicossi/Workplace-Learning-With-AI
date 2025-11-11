@@ -1,0 +1,72 @@
+{
+  "id": "observability_cost_011",
+  "title": "Observability & Cost Control",
+  "difficulty": "Advanced",
+  "duration": "45 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why observability",
+      "content": "Without visibility into prompts, latencies, tokens and errors, AI systems drift in quality and cost. Observability adds logs, metrics and evaluations to keep systems reliable and affordable."
+    },
+    {
+      "type": "image",
+      "src": "/ai-lessons/observability_cost.svg",
+      "alt": "Observability dashboard sketch",
+      "caption": "Core metrics: p50/p95 latency, input/output tokens, cost, error/refusal rate, evaluation pass rate."
+    },
+    {
+      "type": "list",
+      "heading": "Metrics to collect",
+      "content": [
+        "Latency p50/p95",
+        "Input/Output tokens per call (and rolling average)",
+        "Estimated cost per call and per user/session",
+        "Error/refusal rate; guardrail triggers",
+        "Evaluation pass rate on a fixed test set"
+      ]
+    },
+    {
+      "type": "code",
+      "heading": "Logging wrapper (JS)",
+      "content": "async function callLLM(model, messages){\n  const t0 = performance.now();\n  const res = await llm.chat({ model, messages });\n  const t1 = performance.now();\n  const meta = { latencyMs: t1-t0, inTokens: res.usage?.prompt_tokens, outTokens: res.usage?.completion_tokens };\n  console.log('[llm]', model, meta);\n  return res;\n}\n// Extend: send meta to your metrics backend"
+    },
+    {
+      "type": "math",
+      "heading": "Cost estimation",
+      "formula": "\\[\\text{Cost} \\approx (T_{in} \\cdot p_{in}) + (T_{out} \\cdot p_{out})\\]",
+      "explainer": "Multiply input and output tokens by the per‑token price on each side. Use this to set per‑task budgets and choose models."
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (Run Test + API Config)",
+      "description": "Measure latency and tokens on 3 prompts. Then switch models and compare cost/latency.",
+      "steps": [
+        "Open Run Test and create 3 cases with expected outputs",
+        "Use a budget model and record latency and tokens",
+        "Switch to a higher‑quality model and repeat",
+        "Compare accuracy (tests), latency and estimated cost",
+        "Decide a policy: when should each model be used?"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which metric captures the tail of latencies?",
+      "options": { "a": "p95", "b": "simple average", "c": "minimum" },
+      "correct_answer": "a"
+    },
+    {
+      "question": "How can you reduce cost without losing control?",
+      "options": { "a": "Remove logs", "b": "Set temperature to 0", "c": "Route by task and budget" },
+      "correct_answer": "c"
+    }
+  ],
+  "relatedModules": [
+    "run-test",
+    "api-config",
+    "agentops-studio"
+  ]
+}
+
+
