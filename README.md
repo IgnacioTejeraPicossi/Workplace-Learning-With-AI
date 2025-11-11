@@ -213,6 +213,38 @@ Embed the portal inside the hologram card:
 
 Controls appear in the bottom-right of the card (Scale, Height, and Source selector). Custom URLs must end in `.glb` or `.gltf`. Switching sources does not remove the default robot; you can return to Local at any time.
 
+### Hologram Guide (Chat)
+Make the hologram an active assistant. A floating launcher opens a chat window where the “Hologram Portal Guide” explains modules, suggests next steps and can navigate inside the app.
+
+- Components
+  - `frontend/src/components/hologram/HologramAgentLauncher.jsx` – floating 🤖 button and “Chat on click Hologram” toggle.
+  - `frontend/src/components/hologram/HologramAgentChat.jsx` – chat UI with Mode selector.
+  - `frontend/src/components/hologram/useHologramAgent.js` – chat state, API calls, action handling.
+  - Card click integration: `frontend/src/components/HologramHero.jsx` emits `open-holo-chat` when the toggle is ON (clicking “Enter →” still navigates to the Future module).
+
+- Backend
+  - Endpoint: `POST /api/hologram-agent/chat` (file: `backend/routers/hologram_agent.py`).
+  - RAG context: loads docs from `docs-md/` (if available) and falls back to lesson JSONs in `frontend/public/ai-lessons/`.
+  - Uses the unified LLM stack (`ask_ai_unified_sync`) so it works with LM Studio, OpenAI or OpenRouter depending on API Config.
+  - Returns `{ reply, actions? }`. Actions with `{ type: "NAVIGATE", target: "<module-id>" }` are dispatched to the app and can jump to modules (e.g., `agentic-rag`, `documents-analyzer`, `future`, `api-config`, etc.).
+
+- Modes (latency vs quality)
+  - Fast: smaller context (k=3, ~2k chars), shorter history (last 4 turns), lower `max_tokens` (~350) and lower complexity. Designed for quick chat‑like responses.
+  - Accurate: larger context (k=6, up to ~8k chars), last 8 turns, higher `max_tokens` (~700). Better grounding for longer answers.
+  - The selected mode is persisted in `localStorage` under `holoChatMode`.
+
+- “Chat on click Hologram” toggle
+  - When ON, clicking anywhere on the hologram card (except the “Enter →” CTA) opens the chat instead of navigating.
+  - Toggle is persisted (`holoChatOnClick`).
+
+- Configuration
+  - Frontend reads `REACT_APP_API_BASE_URL` (defaults to `http://localhost:8000`).
+  - Backend uses the same unified LLM configuration as the rest of the app (ItemAI/LM Studio, OpenAI or OpenRouter). Provide the appropriate keys and base URLs in `.env`.
+
+- Performance tips
+  - For the fastest replies use Mode: Fast, or switch the provider to a faster model (OpenAI mini models or a smaller local model in LM Studio).
+  - You can further reduce latency by lowering `k`, context length, or history in `backend/routers/hologram_agent.py`.
+
 ---
 
 ## 🎯 Project Overview {#project-overview}
