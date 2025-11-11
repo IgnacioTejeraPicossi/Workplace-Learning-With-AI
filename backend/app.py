@@ -2404,6 +2404,16 @@ except ImportError as e:
 except Exception as e:
     print(f"❌ Error including AI Agent Bridge Platform routers: {e}")
 
+# Hologram Agent router (conversational guide for the hologram portal)
+try:
+    from backend.routers.hologram_agent import router as hologram_agent_router
+    app.include_router(hologram_agent_router, prefix="/api", tags=["Hologram Agent"])
+    print("✅ Hologram Agent router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import Hologram Agent router: {e}")
+except Exception as e:
+    print(f"❌ Error including Hologram Agent router: {e}")
+
 print("🔍 DEBUG: Router included successfully")
 
 # Test route directly in app.py

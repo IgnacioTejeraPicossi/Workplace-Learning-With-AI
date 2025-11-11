@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react';
 
 export default function HologramHero({ title = "Future Module", subtitle = "Click to explore prototypes", onClick, children }) {
   const cardRef = useRef(null);
+  const ctaRef = useRef(null);
 
   const styles = useMemo(() => ({
     wrapper: {
@@ -132,6 +133,25 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
     el.style.boxShadow = styles.card.boxShadow;
   };
 
+  const handleClick = (e) => {
+    const chatOnClick = typeof window !== 'undefined' && window.__holoChatOnClick === true;
+    const clickedInsideCTA = ctaRef.current && e && ctaRef.current.contains(e.target);
+
+    try {
+      window.dispatchEvent(new CustomEvent('hologram-card-click'));
+    } catch (_) {}
+
+    // If chat-on-click is enabled and user didn't click the CTA, open chat instead of navigating
+    if (chatOnClick && !clickedInsideCTA) {
+      try {
+        window.dispatchEvent(new CustomEvent('open-holo-chat'));
+      } catch (_) {}
+      return; // prevent navigation
+    }
+
+    if (typeof onClick === 'function') onClick();
+  };
+
   return (
     <div style={styles.wrapper}>
       {/* keyframes injection */}
@@ -141,14 +161,14 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
         style={styles.card}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
-        onClick={onClick}
+        onClick={handleClick}
         title="Open Future Module"
       >
         {/* 3D content slot */}
         <div style={styles.canvasSlot}>{children}</div>
         <h3 style={styles.heading}>{title}</h3>
         <div style={styles.sub}>{subtitle}</div>
-        <div style={styles.cta}>Enter →</div>
+        <div ref={ctaRef} style={styles.cta}>Enter →</div>
 
         {/* holographic layers */}
         <div style={styles.scanlines} />

@@ -383,6 +383,15 @@ function AppContent() {
                     >
                       <HologramPortal3D embed />
                     </HologramHero>
+                    {/** Floating chat launcher for the hologram guide (non-intrusive) */}
+                    {(() => {
+                      try {
+                        const HologramAgentLauncher = require('./components/hologram/HologramAgentLauncher.jsx').default;
+                        return <HologramAgentLauncher />;
+                      } catch (e) {
+                        return null;
+                      }
+                    })()}
                     <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                       <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
                         💡 "{t('askAI.suggestions.videoLesson')}"
