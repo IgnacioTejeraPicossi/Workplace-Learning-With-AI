@@ -14,6 +14,13 @@ export function useHologramAgent() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef(null);
+  const [mode, setMode] = useState(() => localStorage.getItem("holoChatMode") || "fast"); // 'fast' | 'accurate'
+
+  const updateMode = (m) => {
+    const v = m === "accurate" ? "accurate" : "fast";
+    setMode(v);
+    try { localStorage.setItem("holoChatMode", v); } catch (_) {}
+  };
 
   const sendMessage = async (text) => {
     const trimmed = String(text || "").trim();
@@ -32,7 +39,7 @@ export function useHologramAgent() {
       const res = await fetch(`${API_BASE}/api/hologram-agent/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ messages: next, mode }),
         signal: abortRef.current.signal,
       });
       if (!res.ok) {
@@ -60,7 +67,7 @@ export function useHologramAgent() {
     }
   };
 
-  return { messages, sendMessage, isLoading };
+  return { messages, sendMessage, isLoading, mode, setMode: updateMode };
 }
 
 

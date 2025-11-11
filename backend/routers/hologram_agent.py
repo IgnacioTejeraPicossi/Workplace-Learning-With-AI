@@ -13,6 +13,7 @@ class Message(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[Message]
+    mode: Optional[Literal["fast", "accurate"]] = "fast"
 
 class ChatResponse(BaseModel):
     reply: str
@@ -143,9 +144,26 @@ async def hologram_chat(req: ChatRequest, http_request: Request) -> ChatResponse
     if not last_user:
         raise HTTPException(status_code=400, detail="No user message found")
 
+    mode = (req.mode or "fast").lower()
+    if mode not in ("fast", "accurate"):
+        mode = "fast"
+    # Tunables per mode
+    if mode == "fast":
+        k = 3
+        context_limit = 2000
+        history_keep = 4
+        max_tokens = 350
+        complexity = "low"
+    else:
+        k = 6
+        context_limit = 8000
+        history_keep = 8
+        max_tokens = 700
+        complexity = "medium"
+
     # RAG
-    rag_chunks = retrieve_relevant(last_user.content, k=6)
-    context_text = "\n\n---\n\n".join(rag_chunks)[:8000]
+    rag_chunks = retrieve_relevant(last_user.content, k=k)
+    context_text = "\n\n---\n\n".join(rag_chunks)[:context_limit]
 
     # Build LLM messages
     llm_messages: List[Dict[str, str]] = [
@@ -156,10 +174,18 @@ async def hologram_chat(req: ChatRequest, http_request: Request) -> ChatResponse
                 f"CONTEXT START\n{context_text}\nCONTEXT END\n\n{SYSTEM_PROMPT}"
             ),
         },
-        *[{"role": m.role, "content": m.content} for m in req.messages[-8:]],
+        *[{"role": m.role, "content": m.content} for m in req.messages[-history_keep:]],
     ]
 
-    reply = _call_unified_llm(llm_messages, request_headers=http_request.headers if http_request else None)
+    # Forward tunables (complexity / max_tokens) through unified call if supported by implementation
+    try:
+        try:
+            from backend.llm import ask_ai_unified_sync
+        except ImportError:
+            from llm import ask_ai_unified_sync
+        reply = ask_ai_unified_sync(None, messages=llm_messages, task_type="hologram_guide", complexity=complexity, max_tokens=max_tokens, request_headers=http_request.headers if http_request else None)
+    except Exception:
+        reply = _call_unified_llm(llm_messages, request_headers=http_request.headers if http_request else None)
 
     # Extract actions block if present
     actions: List[Dict[str, Any]] = []

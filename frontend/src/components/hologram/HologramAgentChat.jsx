@@ -2,7 +2,7 @@ import React from "react";
 import { useHologramAgent } from "./useHologramAgent";
 
 export default function HologramAgentChat({ onClose }) {
-  const { messages, sendMessage, isLoading } = useHologramAgent();
+  const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,7 +32,20 @@ export default function HologramAgentChat({ onClose }) {
       overflow: "hidden"
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-        <div style={{ fontWeight: 700 }}>Hologram Guide</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontWeight: 700 }}>Hologram Guide</div>
+          <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#374151" }}>
+            Mode
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+              style={{ borderRadius: 10, border: "1px solid rgba(0,0,0,0.15)", padding: "2px 6px", fontSize: 12 }}
+            >
+              <option value="fast">Fast</option>
+              <option value="accurate">Accurate</option>
+            </select>
+          </label>
+        </div>
         <button onClick={onClose} style={{ border: "none", background: "transparent", fontSize: 18, cursor: "pointer" }}>✕</button>
       </div>
       <div style={{ padding: "6px 12px", fontSize: 12, color: "#6b7280" }}>
