@@ -1,0 +1,53 @@
+{
+  "id": "building_ai_apps_007",
+  "title": "Building AI Apps",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Architecture Overview",
+      "content": "Typical components: API gateway, model provider, embeddings, vector DB for retrieval, and optional multi‑agent coordination for complex tasks."
+    },
+    {
+      "type": "list",
+      "heading": "Key Decisions",
+      "content": [
+        "Provider: OpenAI vs. local inference (LM Studio)",
+        "Retrieval: embeddings model, chunking strategy, vector DB",
+        "Orchestration: single prompt vs. multi‑agent flows",
+        "Telemetry: prompts/outputs, latency, cost, and quality metrics"
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (AgentOps Studio)",
+      "description": "Open AgentOps Studio and sketch a 3‑step flow: retrieve → draft → refine. Configure parameters and test with a small document.",
+      "steps": [
+        "Open AgentOps Studio",
+        "Create a flow: retrieve chunks by embeddings",
+        "Draft an answer with citations",
+        "Refine with style and constraints",
+        "Measure: latency and token usage"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which component stores vector representations?",
+      "options": { "a": "Relational DB", "b": "Vector DB", "c": "Object store" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Why chunk documents for retrieval?",
+      "options": { "a": "To make files larger", "b": "To fit in context and improve search precision", "c": "To reduce text quality" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "agentops-studio",
+    "repo-analyzer",
+    "api-config"
+  ]
+}
+

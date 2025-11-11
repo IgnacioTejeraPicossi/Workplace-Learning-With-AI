@@ -1,0 +1,52 @@
+{
+  "id": "debugging_ai_008",
+  "title": "Debugging AI",
+  "difficulty": "Beginner",
+  "duration": "30 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why Debugging is Different",
+      "content": "LLMs are stochastic. Debugging focuses on prompts, context and evaluation. Treat it as iterative design, not just code fixes."
+    },
+    {
+      "type": "list",
+      "heading": "Checklist",
+      "content": [
+        "Is the instruction clear and specific?",
+        "Is there enough context (examples, schema)?",
+        "Are we constraining the output format?",
+        "Do we have tests to prevent regressions?"
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (Run Test)",
+      "description": "Create 2–3 small tests for a prompt (expected outputs), run them, then adjust the prompt until tests pass.",
+      "steps": [
+        "Open Run Test",
+        "Write a simple prompt and 2 expected outputs",
+        "Run the tests and inspect failures",
+        "Add examples/constraints to fix issues",
+        "Re‑run tests and keep the passing cases"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which is a good first step when results are inconsistent?",
+      "options": { "a": "Add clear constraints/examples", "b": "Increase temperature to 1.0", "c": "Remove all instructions" },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Why keep a small test suite?",
+      "options": { "a": "To slow down development", "b": "To detect regressions when prompts change", "c": "To reduce tokens" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "run-test",
+    "documents-analyzer"
+  ]
+}
+

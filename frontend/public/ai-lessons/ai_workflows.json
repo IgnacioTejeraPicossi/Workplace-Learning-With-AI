@@ -1,0 +1,52 @@
+{
+  "id": "ai_workflows_006",
+  "title": "Using AI in Workflows",
+  "difficulty": "Beginner",
+  "duration": "35 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Where AI Helps Today",
+      "content": "Common workflow steps where AI adds value: drafting, refining, classifying, extracting, translating and summarizing. The key is to keep a human in the loop for critical decisions."
+    },
+    {
+      "type": "list",
+      "heading": "Patterns",
+      "content": [
+        "Draft → Review: AI prepares a first version; a human edits and approves",
+        "Extract → Structure: AI pulls facts from documents and outputs JSON/tables",
+        "Research → Synthesize: AI aggregates sources and compiles a brief with citations",
+        "Classify → Route: AI classifies tickets/emails and routes to the right team"
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (Productivity Agent)",
+      "description": "Use the AI Productivity Agent to turn a URL into a brief with next actions. Then copy the actions into your task system.",
+      "steps": [
+        "Open the AI Productivity Agent",
+        "Paste a news or blog URL",
+        "Generate the brief and top 5 next actions",
+        "Decide which actions are worth keeping; copy to your board",
+        "Reflect: what part still needs a human?"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which pattern turns unstructured text into JSON tables?",
+      "options": { "a": "Translate", "b": "Extract → Structure", "c": "Draft → Review" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "What is a best practice for production workflows?",
+      "options": { "a": "No human review", "b": "Always random outputs", "c": "Human‑in‑the‑loop for critical steps" },
+      "correct_answer": "c"
+    }
+  ],
+  "relatedModules": [
+    "ai-productivity-agent",
+    "presentation-agent"
+  ]
+}
+

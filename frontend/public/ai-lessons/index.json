@@ -56,6 +56,43 @@
     "relatedModules": [
       "cybersecurity"
     ]
+  },
+  {
+    "id": "ai_workflows_006",
+    "title": "Using AI in Workflows",
+    "summary": "Automation patterns: drafting, reviewing, data extraction and research with AI tools.",
+    "difficulty": "Beginner",
+    "duration": "35 min",
+    "contentUrl": "/ai-lessons/ai_workflows.json",
+    "relatedModules": [
+      "ai-productivity-agent",
+      "presentation-agent"
+    ]
+  },
+  {
+    "id": "building_ai_apps_007",
+    "title": "Building AI Apps",
+    "summary": "From prompt to product: APIs, embeddings, retrieval and multi‑agent orchestration.",
+    "difficulty": "Intermediate",
+    "duration": "45 min",
+    "contentUrl": "/ai-lessons/building_ai_apps.json",
+    "relatedModules": [
+      "agentops-studio",
+      "repo-analyzer",
+      "api-config"
+    ]
+  },
+  {
+    "id": "debugging_ai_008",
+    "title": "Debugging AI",
+    "summary": "Diagnose prompts and outputs, trace errors and evaluate quality with small tests.",
+    "difficulty": "Beginner",
+    "duration": "30 min",
+    "contentUrl": "/ai-lessons/debugging_ai.json",
+    "relatedModules": [
+      "run-test",
+      "documents-analyzer"
+    ]
   }
 ]
 
