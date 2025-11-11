@@ -1,0 +1,71 @@
+{
+  "id": "advanced_rag_eval_009",
+  "title": "Advanced RAG & Evaluation",
+  "difficulty": "Advanced",
+  "duration": "60 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Goal",
+      "content": "Build a reliable Retrieval‑Augmented Generation pipeline: better chunking, query expansion, re‑ranking, grounded answers with citations, and measurable quality."
+    },
+    {
+      "type": "list",
+      "heading": "Design Choices That Matter",
+      "content": [
+        "Chunking: size, overlap and semantic splitting",
+        "Embeddings model: domain‑specific vs general",
+        "Retrieval: top‑K + re‑ranking (cross‑encoder / MMR)",
+        "Answering: cite sources and refuse when not grounded"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/ai-lessons/rag_eval_diagram.svg",
+      "alt": "RAG pipeline with evaluation",
+      "caption": "Query → Expansion → Retrieve → Re‑rank → Answer with citations → Evaluate"
+    },
+    {
+      "type": "code",
+      "heading": "MMR‑style re‑ranking (pseudo‑JS)",
+      "content": "function mmrRank(queryVec, docVecs, k=5, lambda=0.7){\n  const selected = [];\n  const remaining = docVecs.map((v,i)=>({i,v}));\n  while(selected.length < Math.min(k, remaining.length)){\n    let best = null, bestScore = -Infinity;\n    for(const cand of remaining){\n      const relevance = cosine(queryVec, cand.v);\n      const diversity = selected.length === 0 ? 0 : Math.max(...selected.map(s=>cosine(s.v, cand.v)));\n      const score = lambda*relevance - (1-lambda)*diversity;\n      if(score > bestScore){ bestScore = score; best = cand; }\n    }\n    selected.push(best);\n    remaining.splice(remaining.findIndex(x=>x.i===best.i),1);\n  }\n  return selected;\n}"
+    },
+    {
+      "type": "math",
+      "heading": "Cosine similarity",
+      "formula": "\\[\\cos(\\theta) = \\frac{\\sum_i a_i b_i}{\\sqrt{\\sum_i a_i^2}\\;\\sqrt{\\sum_i b_i^2}}\\]",
+      "explainer": "Use cosine similarity for both relevance and diversity calculations."
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on (Agentic RAG + Run Test)",
+      "description": "Evaluate two retrieval setups on the same dataset: (A) top‑K only, (B) top‑K + MMR re‑ranking.",
+      "steps": [
+        "Open Agentic RAG and load a small dataset",
+        "Run queries with top‑K = 5 and capture citations",
+        "Enable MMR (lambda = 0.7) and rerun",
+        "Use Run Test to record expected supporting citations",
+        "Compare precision/recall of cited passages"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which factor helps avoid redundant passages in results?",
+      "options": { "a": "Higher temperature", "b": "MMR re‑ranking", "c": "Longer answers" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Why include citations in answers?",
+      "options": { "a": "Make responses longer", "b": "Enable grounding and auditability", "c": "Reduce tokens" },
+      "correct_answer": "b"
+    }
+  ],
+  "relatedModules": [
+    "agentic-rag",
+    "run-test",
+    "cybersecurity"
+  ]
+}
+
+

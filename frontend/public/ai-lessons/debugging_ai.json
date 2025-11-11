@@ -20,6 +20,17 @@
       ]
     },
     {
+      "type": "math",
+      "heading": "Precision and Recall",
+      "formula": "\\[\\text{Precision} = \\frac{TP}{TP + FP} \\quad\\quad \\text{Recall} = \\frac{TP}{TP + FN}\\]",
+      "explainer": "For extraction/classification tasks, measure both precision (how many returned are correct) and recall (how many correct were returned)."
+    },
+    {
+      "type": "code",
+      "heading": "Tiny evaluation harness (JS)",
+      "content": "const tests = [\n  { prompt: 'Extract cities: Paris, Rome', expect: ['Paris','Rome'] },\n  { prompt: 'Extract cities: Madrid', expect: ['Madrid'] }\n];\nlet tp=0, fp=0, fn=0;\nfor (const t of tests) {\n  const out = await llm.extractCities(t.prompt); // returns array\n  const setO = new Set(out), setE = new Set(t.expect);\n  for (const x of setO) (setE.has(x) ? tp++ : fp++);\n  for (const x of setE) if (!setO.has(x)) fn++;\n}\nconst precision = tp / (tp + fp); const recall = tp / (tp + fn);\nconsole.log({ precision, recall });"
+    },
+    {
       "type": "exercise",
       "heading": "Hands‑on (Run Test)",
       "description": "Create 2–3 small tests for a prompt (expected outputs), run them, then adjust the prompt until tests pass.",

@@ -10,6 +10,12 @@
       "content": "Typical components: API gateway, model provider, embeddings, vector DB for retrieval, and optional multi‑agent coordination for complex tasks."
     },
     {
+      "type": "image",
+      "src": "/ai-lessons/ai_app_arch.svg",
+      "alt": "AI app architecture",
+      "caption": "From client → API → model provider and retrieval components."
+    },
+    {
       "type": "list",
       "heading": "Key Decisions",
       "content": [
@@ -18,6 +24,11 @@
         "Orchestration: single prompt vs. multi‑agent flows",
         "Telemetry: prompts/outputs, latency, cost, and quality metrics"
       ]
+    },
+    {
+      "type": "code",
+      "heading": "Snippet: simple retrieval (JS)",
+      "content": "const resp = await fetch('/api/embeddings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ inputs: ['query text here'] }) });\nconst { vectors } = await resp.json();\nconst results = await vectorDb.search(vectors[0], { topK: 5 });\n// Build a prompt with citations from 'results' and ask the LLM"
     },
     {
       "type": "exercise",

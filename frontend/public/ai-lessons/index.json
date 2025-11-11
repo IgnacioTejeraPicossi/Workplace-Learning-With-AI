@@ -93,6 +93,19 @@
       "run-test",
       "documents-analyzer"
     ]
+  },
+  {
+    "id": "advanced_rag_eval_009",
+    "title": "Advanced RAG & Evaluation",
+    "summary": "Design high‑quality Retrieval‑Augmented Generation: chunking, re‑ranking, citations and robust evaluation.",
+    "difficulty": "Advanced",
+    "duration": "60 min",
+    "contentUrl": "/ai-lessons/advanced_rag_eval.json",
+    "relatedModules": [
+      "agentic-rag",
+      "run-test",
+      "cybersecurity"
+    ]
   }
 ]
 

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 260" width="760" height="260">
+  <rect width="760" height="260" fill="#0b1020"/>
+  <style>
+    .box { fill:#121a35; stroke:#7dd3fc; stroke-width:2; rx:8; ry:8; }
+    .label { fill:#e6f0ff; font-family:Segoe UI, Arial, sans-serif; font-size:13px; }
+    .arrow { stroke:#7dd3fc; stroke-width:2; marker-end:url(#arrow); fill:none; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+  <rect class="box" x="20" y="100" width="110" height="60"/>
+  <text class="label" x="75" y="135" text-anchor="middle">Query</text>
+
+  <rect class="box" x="150" y="100" width="140" height="60"/>
+  <text class="label" x="220" y="135" text-anchor="middle">Expansion</text>
+
+  <rect class="box" x="310" y="40" width="140" height="60"/>
+  <text class="label" x="380" y="75" text-anchor="middle">Retrieve (top‑K)</text>
+
+  <rect class="box" x="310" y="160" width="140" height="60"/>
+  <text class="label" x="380" y="195" text-anchor="middle">Re‑rank (MMR)</text>
+
+  <rect class="box" x="470" y="100" width="160" height="60"/>
+  <text class="label" x="550" y="135" text-anchor="middle">Answer + Citations</text>
+
+  <rect class="box" x="650" y="100" width="90" height="60"/>
+  <text class="label" x="695" y="135" text-anchor="middle">Evaluate</text>
+
+  <line class="arrow" x1="130" y1="130" x2="150" y2="130"/>
+  <line class="arrow" x1="290" y1="130" x2="310" y2="70"/>
+  <line class="arrow" x1="290" y1="130" x2="310" y2="190"/>
+  <line class="arrow" x1="450" y1="70" x2="470" y2="130"/>
+  <line class="arrow" x1="450" y1="190" x2="470" y2="130"/>
+  <line class="arrow" x1="630" y1="130" x2="650" y2="130"/>
+</svg>
+
+
