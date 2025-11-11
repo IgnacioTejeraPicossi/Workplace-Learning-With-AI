@@ -34,6 +34,28 @@
       "agentic-rag",
       "documents-analyzer"
     ]
+  },
+  {
+    "id": "tools_apis_004",
+    "title": "Tools & APIs",
+    "summary": "Overview of OpenAI, HuggingFace, speech and vision APIs, and when to use each.",
+    "difficulty": "Beginner",
+    "duration": "35 min",
+    "contentUrl": "/ai-lessons/tools_apis.json",
+    "relatedModules": [
+      "api-config"
+    ]
+  },
+  {
+    "id": "ethics_safety_005",
+    "title": "Ethics & Safety",
+    "summary": "Fairness, bias, hallucinations, transparency and guardrails for responsible AI.",
+    "difficulty": "Beginner",
+    "duration": "30 min",
+    "contentUrl": "/ai-lessons/ethics_safety.json",
+    "relatedModules": [
+      "cybersecurity"
+    ]
   }
 ]
 

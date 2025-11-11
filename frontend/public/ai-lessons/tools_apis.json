@@ -1,0 +1,60 @@
+{
+  "id": "tools_apis_004",
+  "title": "Tools & APIs",
+  "difficulty": "Beginner",
+  "duration": "35 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why Tools & APIs",
+      "content": "Modern AI apps compose multiple capabilities: text generation, embeddings, speech, vision, and vector databases. Understanding the tooling helps you choose the right building blocks."
+    },
+    {
+      "type": "list",
+      "heading": "Common Providers",
+      "content": [
+        "OpenAI API: text, embeddings, audio, image",
+        "HuggingFace Inference: hosted models and pipelines",
+        "Local Inference (LM Studio): private, offline development",
+        "Vector DBs: FAISS, Milvus, Pinecone (for retrieval)"
+      ]
+    },
+    {
+      "type": "definitions",
+      "heading": "Key Terms",
+      "definitions": [
+        { "term": "Embedding model", "definition": "Turns text into vectors for search/retrieval" },
+        { "term": "Generation model", "definition": "Creates text/images/audio based on prompts" },
+        { "term": "Inference server", "definition": "Service that runs models and exposes HTTP APIs" }
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on",
+      "description": "Open the API Config module and verify your provider works (ItemAI, OpenAI or OpenRouter). Try a small completion call and an embeddings call.",
+      "steps": [
+        "Go to API Config",
+        "Pick your provider (ItemAI, OpenAI or OpenRouter)",
+        "Save keys / test connection",
+        "Send: completion('Say hello')",
+        "Send: embeddings('hello world') and inspect vector length"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which model type is used for retrieval?",
+      "options": { "a": "Text generation", "b": "Embeddings", "c": "Image generation" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which option is private and runs locally?",
+      "options": { "a": "OpenAI", "b": "HuggingFace Hub", "c": "LM Studio" },
+      "correct_answer": "c"
+    }
+  ],
+  "relatedModules": [
+    "api-config"
+  ]
+}
+

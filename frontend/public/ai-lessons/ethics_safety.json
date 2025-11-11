@@ -1,0 +1,59 @@
+{
+  "id": "ethics_safety_005",
+  "title": "Ethics & Safety",
+  "difficulty": "Beginner",
+  "duration": "30 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why Ethics Matters",
+      "content": "As AI becomes ubiquitous, we must ensure systems are fair, transparent and accountable. Ethics reduces risk and builds trust."
+    },
+    {
+      "type": "list",
+      "heading": "Typical Risks",
+      "content": [
+        "Bias and unfairness",
+        "Privacy and data leakage",
+        "Hallucinations and misinformation",
+        "Security and prompt injection"
+      ]
+    },
+    {
+      "type": "definitions",
+      "heading": "Guardrails",
+      "definitions": [
+        { "term": "Input filtering", "definition": "Block unsafe user inputs (e.g., PII, abusive content)" },
+        { "term": "Output filtering", "definition": "Scan and block problematic model outputs" },
+        { "term": "Traceability", "definition": "Log prompts/outputs for audit and improvement" }
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Apply Guardrails",
+      "description": "Open the Cybersecurity module and review how prompt‑injection is detected. Consider adding an allow/deny list in your prompts.",
+      "steps": [
+        "Open Cybersecurity module",
+        "Read the prompt‑injection examples",
+        "Draft an allow/deny list for your use case",
+        "Add a post‑filter to block banned categories"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which risk relates to 'confident but wrong' model output?",
+      "options": { "a": "Bias", "b": "Hallucination", "c": "Privacy" },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which control reduces exposure of sensitive data?",
+      "options": { "a": "Input filtering", "b": "Temperature", "c": "Max tokens" },
+      "correct_answer": "a"
+    }
+  ],
+  "relatedModules": [
+    "cybersecurity"
+  ]
+}
+
