@@ -131,6 +131,14 @@ except ImportError:
     from routers.agi_progress import router as agi_router
 app.include_router(agi_router)
 
+# Embeddings router (OpenAI REST)
+try:
+    from backend.routers.embeddings import router as embeddings_router
+    app.include_router(embeddings_router, tags=["Embeddings"])
+    print("✅ Embeddings router included successfully")
+except Exception as e:
+    print(f"❌ Error including Embeddings router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router

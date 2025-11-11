@@ -32,6 +32,12 @@
       "content": "import numpy as np\\n\\n# two embedding vectors\\na = np.array([0.1, 0.3, -0.2])\\nb = np.array([0.05, 0.32, -0.18])\\n\\ncos = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))\\nprint('similarity:', float(cos))"
     },
     {
+      "type": "math",
+      "heading": "Cosine Similarity (formula)",
+      "formula": "cos_sim(a, b) = (a · b) / (||a|| · ||b||)\\n\\nwhere\\n  a · b = Σ_i (a_i · b_i)\\n  ||a|| = √(Σ_i a_i^2),  ||b|| = √(Σ_i b_i^2)",
+      "explainer": "The cosine of the angle between vectors a and b is the dot product divided by the product of their magnitudes. Values close to 1 indicate very similar direction (semantic closeness), near 0 indicate orthogonality (little relation), and negative values indicate opposing direction."
+    },
+    {
       "type": "exercise",
       "heading": "Mini‑Exercise: Embedding Similarity",
       "description": "Compute cosine similarity between embeddings of short phrases.",

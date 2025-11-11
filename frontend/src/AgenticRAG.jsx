@@ -21,6 +21,8 @@ const AgenticRAG = () => {
   const [cosError, setCosError] = useState('');
   const [phraseA, setPhraseA] = useState('');
   const [phraseB, setPhraseB] = useState('');
+  const [useRealEmb, setUseRealEmb] = useState(false);
+  const [embBusy, setEmbBusy] = useState(false);
 
   // Agentic RAG parameters
   const [depth, setDepth] = useState(2);
@@ -112,6 +114,21 @@ const AgenticRAG = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showEmbedDemo]);
+
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+  const fetchEmbedding = async (text) => {
+    const res = await fetch(`${API_BASE}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(t || 'embedding error');
+    }
+    const data = await res.json();
+    return data.embedding;
+  };
 
   const fetchIndexedDocs = async () => {
     try {
@@ -507,15 +524,45 @@ const AgenticRAG = () => {
                 <div style={{ marginBottom: 6, color: colors.textSecondary, fontSize: 12 }}>
                   Demo uses toy vectors representing the phrases below (you can edit both phrases and vectors).
                 </div>
+                <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: colors.text }}>
+                    <input type="checkbox" checked={useRealEmb} onChange={(e)=> setUseRealEmb(e.target.checked)} />
+                    Use real embeddings (server)
+                  </label>
+                  {useRealEmb && (
+                    <button
+                      disabled={embBusy}
+                      onClick={async ()=>{
+                        try{
+                          setEmbBusy(true);
+                          const [ea, eb] = await Promise.all([fetchEmbedding(phraseA), fetchEmbedding(phraseB)]);
+                          setVecA(formatVec(ea));
+                          setVecB(formatVec(eb));
+                          setTimeout(()=>computeCosine(), 0);
+                          setStatus('Embeddings generated from server');
+                          setTimeout(()=>setStatus(''), 1500);
+                        }catch(err){
+                          setStatus('Embedding generation failed (configure OPENAI_API_KEY)');
+                          setTimeout(()=>setStatus(''), 2000);
+                        }finally{
+                          setEmbBusy(false);
+                        }
+                      }}
+                      style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
+                    >{embBusy ? 'Generating…' : 'Generate from phrases'}</button>
+                  )}
+                </div>
                 <div style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
                   <div>
                     <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Phrase A</div>
                     <input value={phraseA} onChange={e=>{
                       const v = e.target.value;
                       setPhraseA(v);
-                      const tv = toyEmbedding(v);
-                      setVecA(formatVec(tv));
-                      setTimeout(()=>computeCosine(), 0);
+                      if (!useRealEmb) {
+                        const tv = toyEmbedding(v);
+                        setVecA(formatVec(tv));
+                        setTimeout(()=>computeCosine(), 0);
+                      }
                     }} placeholder='The cat sat on the mat' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
                   </div>
                   <div>
@@ -523,9 +570,11 @@ const AgenticRAG = () => {
                     <input value={phraseB} onChange={e=>{
                       const v = e.target.value;
                       setPhraseB(v);
-                      const tv = toyEmbedding(v);
-                      setVecB(formatVec(tv));
-                      setTimeout(()=>computeCosine(), 0);
+                      if (!useRealEmb) {
+                        const tv = toyEmbedding(v);
+                        setVecB(formatVec(tv));
+                        setTimeout(()=>computeCosine(), 0);
+                      }
                     }} placeholder='A dog rested on the rug' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
                   </div>
                   <div>

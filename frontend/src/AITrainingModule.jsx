@@ -728,6 +728,26 @@ const AITrainingModule = ({ user }) => {
           </pre>
         );
 
+      case 'math':
+        return (
+          <div style={{ 
+            background: colors.cardBackground, 
+            borderRadius: 8, 
+            border: `1px solid ${colors.border}`, 
+            padding: 12 
+          }}>
+            {section.heading && <div style={{ marginBottom: 8, color: colors.text, fontWeight: 600 }}>{section.heading}</div>}
+            <div style={{ color: colors.text, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+              {section.formula}
+            </div>
+            {section.explainer && (
+              <div style={{ marginTop: 6, color: colors.textSecondary, fontSize: '0.95em' }}>
+                {section.explainer}
+              </div>
+            )}
+          </div>
+        );
+
       case 'exercise':
         return (
           <div style={{ border: `1px dashed ${colors.primary}`, padding: 12, borderRadius: 8 }}>
