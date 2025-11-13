@@ -155,6 +155,7 @@
     "duration": "45 min",
     "contentUrl": "/ai-lessons/web_robots.json",
     "relatedModules": [
+      "knowledge-map",
       "web-search",
       "api-config",
       "run-test"

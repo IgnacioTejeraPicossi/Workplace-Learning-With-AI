@@ -129,6 +129,7 @@
     { "label": "robotstxt.org – Frequently Asked Questions", "url": "https://www.robotstxt.org/faq.html" }
   ],
   "relatedModules": [
+    "knowledge-map",
     "web-search",
     "api-config",
     "run-test"
