@@ -1,0 +1,111 @@
+{
+  "id": "hologram_chat_012",
+  "title": "Hologram Guide Chat: Fast vs Accurate",
+  "difficulty": "Intermediate",
+  "duration": "35 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "What is the Hologram Guide?",
+      "content": "The Hologram Guide is an in‑app conversational agent embedded in the Hologram Portal card. It can explain modules, suggest next steps and return structured actions so the UI can navigate automatically. It runs on the same unified AI stack as the rest of the app (LM Studio / OpenAI / OpenRouter)."
+    },
+    {
+      "type": "image",
+      "heading": "Architecture (high level)",
+      "src": "/ai-lessons/hologram_chat_arch.svg",
+      "caption": "Frontend chat → Backend /hologram-agent/chat → RAG over docs → LLM → reply + ACTIONS"
+    },
+    {
+      "type": "definitions",
+      "heading": "Fast vs Accurate modes",
+      "definitions": [
+        {
+          "term": "Fast",
+          "definition": "Optimized for responsiveness: smaller RAG context (k≈3), shorter history (last 4 turns), lower max_tokens (~350) and lower complexity. Best for quick Q&A and short clarifications."
+        },
+        {
+          "term": "Accurate",
+          "definition": "Optimized for grounding: larger RAG context (k≈6), longer history (last 8 turns), higher max_tokens (~700). Best for explanations, references and longer guidance."
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "heading": "Calling the backend (example)",
+      "language": "javascript",
+      "content": "const body = {\\n  messages: [\\n    { role: 'assistant', content: \"Hello, I'm your Hologram Guide.\" },\\n    { role: 'user', content: 'Give me a quick overview of Agentic RAG.' }\\n  ],\\n  mode: 'fast' // or 'accurate'\\n};\\n\\nconst res = await fetch('/api/hologram-agent/chat', {\\n  method: 'POST',\\n  headers: { 'Content-Type': 'application/json' },\\n  body: JSON.stringify(body)\\n});\\nconst data = await res.json();\\n// data.reply contains the answer; data.actions may include NAVIGATE targets"
+    },
+    {
+      "type": "list",
+      "heading": "When to choose each mode",
+      "content": [
+        "Choose Fast when latency matters: short answers, iteration, quick checks.",
+        "Choose Accurate when you need citations, longer guidance or grounded detail.",
+        "If responses feel slow on local models, try Fast first or switch to a faster provider in API Config."
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on",
+      "description": "Practice using the Hologram Guide and compare the two operating modes.",
+      "steps": [
+        "Open the Hologram page. Toggle “Chat on click Hologram” to ON (launcher ➝ menu).",
+        "Click anywhere on the hologram card (outside the “Enter →” CTA) to open the chat.",
+        "Set Mode: Fast. Ask: “Give me a quick overview of Agentic RAG.” Observe latency and answer length.",
+        "Ask a follow‑up: “List 2 next actions and include a navigation action.” Check if the UI suggests a NAVIGATE target.",
+        "Switch to Mode: Accurate. Ask: “Explain our Document Analyzer pipeline with steps and trade‑offs.” Compare depth and latency.",
+        "Optional: Open API Config and switch to a faster provider (e.g., OpenAI mini) then repeat steps 3–5.",
+        "Write down when you would choose Fast vs Accurate for your daily workflow."
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does the Hologram Guide return besides text?",
+      "options": {
+        "a": "Only markdown headings",
+        "b": "Structured actions (e.g., NAVIGATE targets)",
+        "c": "Source code diffs"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Fast mode is primarily optimized for…",
+      "options": {
+        "a": "Lowest latency and short replies",
+        "b": "Highest token usage and longest answers",
+        "c": "Image generation"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Accurate mode typically uses…",
+      "options": {
+        "a": "Smaller RAG context and fewer history turns",
+        "b": "Larger RAG context and more history turns",
+        "c": "No context at all"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "If local models feel slow, a good first step is…",
+      "options": {
+        "a": "Use Accurate and raise max_tokens",
+        "b": "Switch to Fast mode or a faster provider",
+        "c": "Disable RAG entirely"
+      },
+      "correct_answer": "b"
+    }
+  ],
+  "resources": [
+    { "label": "README – Hologram Guide (Chat)", "url": "#hologram-portal-3d" }
+  ],
+  "relatedModules": [
+    "future",
+    "agentic-rag",
+    "documents-analyzer",
+    "api-config"
+  ]
+}
+
+

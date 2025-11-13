@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="512" viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+    <style>
+      .box{fill:#0b1220;stroke:#475569;stroke-width:2;rx:12;ry:12}
+      .title{fill:#e2e8f0;font-family:Inter,Segoe UI,Roboto,Arial;font-size:14px;font-weight:700}
+      .text{fill:#cbd5e1;font-family:Inter,Segoe UI,Roboto,Arial;font-size:12px}
+      .arrow{stroke:#60a5fa;stroke-width:2;fill:none;marker-end:url(#arrowHead)}
+    </style>
+    <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <polygon points="0,0 8,4 0,8" fill="#60a5fa"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1024" height="512" fill="url(#bg)"/>
+
+  <!-- Frontend -->
+  <rect class="box" x="40" y="60" width="260" height="140"/>
+  <text class="title" x="55" y="85">Frontend</text>
+  <text class="text" x="55" y="110">HologramHero + Launcher</text>
+  <text class="text" x="55" y="130">HologramAgentChat (UI)</text>
+  <text class="text" x="55" y="150">useHologramAgent (mode, actions)</text>
+
+  <!-- Backend -->
+  <rect class="box" x="380" y="60" width="280" height="140"/>
+  <text class="title" x="395" y="85">Backend API</text>
+  <text class="text" x="395" y="110">POST /api/hologram-agent/chat</text>
+  <text class="text" x="395" y="130">Fast vs Accurate parameters</text>
+  <text class="text" x="395" y="150">Action extraction (NAVIGATE)</text>
+
+  <!-- Knowledge -->
+  <rect class="box" x="760" y="60" width="220" height="140"/>
+  <text class="title" x="775" y="85">Knowledge</text>
+  <text class="text" x="775" y="110">docs-md/ + ai-lessons/*.json</text>
+  <text class="text" x="775" y="130">RAG retrieval (k)</text>
+  <text class="text" x="775" y="150">Context window control</text>
+
+  <!-- LLM -->
+  <rect class="box" x="520" y="250" width="320" height="140"/>
+  <text class="title" x="535" y="275">LLM Provider</text>
+  <text class="text" x="535" y="300">LM Studio (ItemAI) / OpenAI / OpenRouter</text>
+  <text class="text" x="535" y="320">max_tokens, temperature, complexity</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M300,130 C330,130 350,130 380,130"/>
+  <path class="arrow" d="M660,130 C710,130 720,130 760,130"/>
+  <path class="arrow" d="M520,200 C520,220 520,240 520,250"/>
+  <path class="arrow" d="M680,250 C680,230 680,210 660,200"/>
+  <path class="arrow" d="M360,170 C340,220 340,260 360,300 C380,340 450,350 520,350"/>
+  <path class="arrow" d="M840,200 C840,220 840,240 840,250"/>
+
+  <!-- Caption -->
+  <text class="text" x="40" y="450">Flow: UI sends messages + mode → Backend builds prompt + RAG → LLM → reply + ACTIONS → UI navigation</text>
+</svg>
+
+

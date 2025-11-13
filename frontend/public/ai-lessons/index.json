@@ -131,6 +131,20 @@
       "api-config",
       "agentops-studio"
     ]
+  },
+  {
+    "id": "hologram_chat_012",
+    "title": "Hologram Guide Chat: Fast vs Accurate",
+    "summary": "How the hologram chat works, its AI routing, and when to choose Fast or Accurate mode.",
+    "difficulty": "Intermediate",
+    "duration": "35 min",
+    "contentUrl": "/ai-lessons/hologram_guide_chat.json",
+    "relatedModules": [
+      "future",
+      "agentic-rag",
+      "documents-analyzer",
+      "api-config"
+    ]
   }
 ]
 
