@@ -245,6 +245,35 @@ Make the hologram an active assistant. A floating launcher opens a chat window w
   - For the fastest replies use Mode: Fast, or switch the provider to a faster model (OpenAI mini models or a smaller local model in LM Studio).
   - You can further reduce latency by lowering `k`, context length, or history in `backend/routers/hologram_agent.py`.
 
+#### Quick media (GIFs / screenshots)
+Drop your captures under `docs-media/hologram/` and reference them here:
+
+- Launcher button and toggle  
+  `![Hologram chat launcher](docs-media/hologram/launcher.png)`
+- Fast mode demo (short reply)  
+  `![Fast mode](docs-media/hologram/chat-fast.gif)`
+- Accurate mode demo (longer, more grounded reply)  
+  `![Accurate mode](docs-media/hologram/chat-accurate.gif)`
+- “Chat on click Hologram” toggle ON  
+  `![Toggle on](docs-media/hologram/toggle.png)`
+
+If the files don’t exist yet, create the folder and add your images; the README links will start working automatically.
+
+#### Troubleshooting
+- LM Studio not reachable (using ItemAI/LM Studio)
+  - Ensure LM Studio server is running and the base URL is correct (e.g., `LMSTUDIO_BASE_URL=http://localhost:1234`).
+  - Test with a curl: `curl http://localhost:1234/v1/models` (or your configured path).
+  - If you have an `OPENAI_API_KEY`, the backend can fall back to OpenAI automatically.
+
+- CORS errors from the chat endpoint
+  - Make sure the backend allows the frontend origin (e.g., `http://localhost:3000`) in FastAPI `CORSMiddleware`.
+  - If you changed ports or hosts, update allowed origins accordingly and restart the backend.
+
+- Missing docs/context in answers
+  - Place Markdown docs under `docs-md/` and ensure file names don’t collide.
+  - The router also uses lesson JSONs in `frontend/public/ai-lessons/` as a fallback; confirm those files load in the browser.
+  - Reduce “Mode: Accurate” to “Fast” if the context is too heavy for your current model.
+
 ---
 
 ## 🎯 Project Overview {#project-overview}
