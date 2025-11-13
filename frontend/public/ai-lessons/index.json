@@ -146,6 +146,19 @@
       "documents-analyzer",
       "api-config"
     ]
+  },
+  {
+    "id": "web_robots_013",
+    "title": "Web Robots, Crawlers and robots.txt",
+    "summary": "What web robots are, how they crawl, and how to control them with robots.txt and META tags.",
+    "difficulty": "Expert",
+    "duration": "45 min",
+    "contentUrl": "/ai-lessons/web_robots.json",
+    "relatedModules": [
+      "web-search",
+      "api-config",
+      "run-test"
+    ]
   }
 ]
 

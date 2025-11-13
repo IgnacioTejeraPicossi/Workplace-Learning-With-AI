@@ -1,0 +1,138 @@
+{
+  "id": "web_robots_013",
+  "title": "Web Robots, Crawlers and robots.txt",
+  "difficulty": "Expert",
+  "duration": "45 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "What are Web Robots?",
+      "content": "Web robots (also called crawlers or spiders) are automated programs that fetch pages on the Internet. Indexing robots collect content for search engines; other agents monitor sites, check links, or perform specialized tasks. This lesson covers how robots discover and crawl pages and how site owners can guide their behavior."
+    },
+    {
+      "type": "definitions",
+      "heading": "Key terms",
+      "definitions": [
+        { "term": "Robot / Crawler / Spider", "definition": "Automated agent that fetches web pages following links and rules." },
+        { "term": "Agent", "definition": "A program acting on behalf of a user; robots are a type of agent." },
+        { "term": "Search engine", "definition": "A system that uses crawlers to index content and answer queries." },
+        { "term": "Worms / Ants", "definition": "Historic terms for exploratory agents; not typical for modern search crawling." }
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "How robots decide where to go",
+      "content": [
+        "Seeds: starting URLs provided by the search engine or system.",
+        "Link discovery: following hyperlinks found in pages.",
+        "Sitemaps: XML sitemaps published by sites help discovery.",
+        "Re‑crawling: scheduling based on change frequency and importance."
+      ]
+    },
+    {
+      "type": "text",
+      "heading": "Robots Exclusion Standard (robots.txt)",
+      "content": "Websites can provide a /robots.txt file at the root (e.g., https://example.com/robots.txt) to communicate crawl directives. Typical fields: User-agent, Disallow, Allow. Not all robots comply; reputable crawlers respect it. The file is public, so do not list sensitive paths you wish to keep secret."
+    },
+    {
+      "type": "code",
+      "heading": "robots.txt examples",
+      "language": "text",
+      "content": "# Block everything for one agent\\nUser-agent: BadBot\\nDisallow: /\\n\\n# Allow all agents except admin area\\nUser-agent: *\\nDisallow: /admin/\\nAllow: /\\n\\n# Point to sitemap\\nSitemap: https://example.com/sitemap.xml"
+    },
+    {
+      "type": "text",
+      "heading": "Meta Robots and rel attributes",
+      "content": "Per‑page controls can be set via HTML meta robots tags or HTTP headers (e.g., noindex, nofollow) and via link attributes such as rel=\"nofollow\". These are honored by most search engines for indexing choices."
+    },
+    {
+      "type": "code",
+      "heading": "Meta robots example",
+      "language": "html",
+      "content": "<head>\\n  <meta name=\\\"robots\\\" content=\\\"noindex,nofollow\\\">\\n</head>"
+    },
+    {
+      "type": "list",
+      "heading": "Operational considerations for admins",
+      "content": [
+        "Monitor server logs to distinguish bots from users.",
+        "Rate limiting / crawl rate: some crawlers honor settings in webmaster tools; robots.txt has no standard 'crawl-delay' (some robots use it, but it's not universal).",
+        "Disallow confidential endpoints and use proper auth; robots.txt is advisory, not a security mechanism.",
+        "Publish sitemaps to improve discovery of canonical URLs."
+      ]
+    },
+    {
+      "type": "cta",
+      "heading": "Try in the app",
+      "text": "Open our Web Search module to see how indexed content affects retrieval demos.",
+      "label": "Open Web Search"
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on: design a robots.txt",
+      "description": "Draft rules for a site that blocks /private/, allows everything else, and exposes a sitemap.",
+      "steps": [
+        "Write a robots.txt that disallows /private/ for all agents.",
+        "Add a Sitemap directive pointing to https://your-site.example/sitemap.xml.",
+        "Explain why robots.txt should not list secrets and how to protect content properly."
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Where must robots.txt be located to be effective?",
+      "options": {
+        "a": "Any folder, crawlers scan them all",
+        "b": "At the site root: https://example.com/robots.txt",
+        "c": "Inside /admin/ only"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "What does Disallow: / in robots.txt for an agent mean?",
+      "options": {
+        "a": "Block only images",
+        "b": "Block the whole site for that agent",
+        "c": "Index but do not follow links"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which statement is TRUE about robots.txt?",
+      "options": {
+        "a": "It is a strict security control enforced by browsers",
+        "b": "It is advisory; reputable crawlers comply, but it is public and not a secret keeper",
+        "c": "It hides files from all users if Disallow is present"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which meta setting prevents a page from appearing in search results?",
+      "options": {
+        "a": "noindex",
+        "b": "nofollow",
+        "c": "canonical"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "What is a practical way to improve discovery of pages you want indexed?",
+      "options": {
+        "a": "List them in robots.txt under Disallow",
+        "b": "Publish an XML sitemap and link them internally",
+        "c": "Hide them behind authentication"
+      },
+      "correct_answer": "b"
+    }
+  ],
+  "resources": [
+    { "label": "robotstxt.org – Frequently Asked Questions", "url": "https://www.robotstxt.org/faq.html" }
+  ],
+  "relatedModules": [
+    "web-search",
+    "api-config",
+    "run-test"
+  ]
+}
+
+
