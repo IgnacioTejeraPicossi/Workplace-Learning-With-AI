@@ -92,6 +92,14 @@ function AppContent() {
         return map[m] || m;
       };
       const targetSection = normalizeModule(module);
+      
+      // Special route: open Ask AI full-screen (where the Hologram lives)
+      if (module === 'ask-ai' || module === 'askai' || module === 'ask') {
+        setIsAIFullScreen(true);
+        setActiveModule(null);
+        // Keep whatever section was active; Ask AI overlays it
+        return;
+      }
 
       // Set the section to navigate to the module
       setSection(targetSection);

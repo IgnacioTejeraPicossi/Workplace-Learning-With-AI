@@ -10,6 +10,12 @@
       "content": "The Hologram Guide is an in‑app conversational agent embedded in the Hologram Portal card. It can explain modules, suggest next steps and return structured actions so the UI can navigate automatically. It runs on the same unified AI stack as the rest of the app (LM Studio / OpenAI / OpenRouter)."
     },
     {
+      "type": "cta",
+      "heading": "Try it now",
+      "text": "Jump directly to the Ask AI screen where the hologram lives and open the chat.",
+      "label": "Open Hologram & Chat"
+    },
+    {
       "type": "image",
       "heading": "Architecture (high level)",
       "src": "/ai-lessons/hologram_chat_arch.svg",
@@ -101,6 +107,7 @@
     { "label": "README – Hologram Guide (Chat)", "url": "#hologram-portal-3d" }
   ],
   "relatedModules": [
+    "ask-ai",
     "future",
     "agentic-rag",
     "documents-analyzer",

@@ -140,6 +140,7 @@
     "duration": "35 min",
     "contentUrl": "/ai-lessons/hologram_guide_chat.json",
     "relatedModules": [
+      "ask-ai",
       "future",
       "agentic-rag",
       "documents-analyzer",

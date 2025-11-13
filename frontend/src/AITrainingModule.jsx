@@ -779,6 +779,30 @@ const AITrainingModule = ({ user }) => {
           </div>
         );
       
+      case 'cta':
+        return (
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            {section.text && <span style={{ color: colors.text }}>{section.text}</span>}
+            <button onClick={()=>{
+              // Navigate to Ask AI full-screen where the hologram & chat are
+              window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: 'ask-ai' } }));
+              // Attempt to open the chat after the new view mounts
+              setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('open-holo-chat'));
+              }, 700);
+            }} style={{
+              background: colors.primary,
+              color: 'white',
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: 'none',
+              cursor: 'pointer'
+            }}>
+              {section.label || 'Open Hologram & Chat'}
+            </button>
+          </div>
+        );
+      
       case 'download':
         return (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -1272,6 +1296,11 @@ const AITrainingModule = ({ user }) => {
                           <span key={m} onClick={(e)=>{
                               e.stopPropagation();
                               window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: m } }));
+                              if (m === 'ask-ai') {
+                                setTimeout(() => {
+                                  window.dispatchEvent(new CustomEvent('open-holo-chat'));
+                                }, 700);
+                              }
                             }} style={{
                             background: colors.primaryLight,
                             color: colors.primary,
@@ -1339,6 +1368,11 @@ const AITrainingModule = ({ user }) => {
                 {currentLesson.relatedModules.map((m) => (
                   <span key={m} onClick={()=>{
                       window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: m } }));
+                      if (m === 'ask-ai') {
+                        setTimeout(() => {
+                          window.dispatchEvent(new CustomEvent('open-holo-chat'));
+                        }, 700);
+                      }
                     }} style={{ padding: '4px 10px', borderRadius: 12, background: colors.primaryLight, color: colors.primary, fontSize: '0.8em', cursor: 'pointer' }}>
                     🔗 {m}
                   </span>
