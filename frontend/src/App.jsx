@@ -80,8 +80,21 @@ function AppContent() {
       const { module, resourceId, resourceTitle, targetPage, action, autoExpand } = event.detail;
       console.log(`🚀 Navigating to ${module} with resource ID: ${resourceId}, title: "${resourceTitle}", target page: ${targetPage}, action: ${action}, autoExpand: ${autoExpand}`);
       
+      // Normalize common aliases → internal section ids
+      const normalizeModule = (m) => {
+        if (!m) return m;
+        const map = {
+          'future': 'future-app',
+          'future-module': 'future-app',
+          'hologram': 'future-app',
+          'hologram-portal': 'future-app'
+        };
+        return map[m] || m;
+      };
+      const targetSection = normalizeModule(module);
+
       // Set the section to navigate to the module
-      setSection(module);
+      setSection(targetSection);
       setActiveModule(null); // Clear active module to use section navigation
       
       // Store additional navigation info for the module to use
