@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="500" viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="b1"/>
+      <feMerge>
+        <feMergeNode in="b1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="900" height="500" fill="url(#bg)"/>
+
+  <!-- Hologram card -->
+  <rect x="60" y="60" rx="24" ry="24" width="780" height="300" fill="#0b1220" stroke="#334155" stroke-width="2"/>
+  <text x="90" y="115" fill="#cbd5e1" font-family="Inter, Segoe UI, Roboto, Arial" font-size="28" font-weight="700">
+    Hologram Portal — Future Module
+  </text>
+  <text x="90" y="145" fill="#94a3b8" font-family="Inter, Segoe UI, Roboto, Arial" font-size="14">
+    Experimental zone: concepts, prototypes and advanced visualizations
+  </text>
+
+  <!-- Floating chat launcher -->
+  <g transform="translate(790,390)" filter="url(#glow)">
+    <circle r="38" fill="#0ea5e9" />
+    <circle r="30" fill="#22d3ee" />
+    <text text-anchor="middle" dominant-baseline="central" x="0" y="0" font-family="Segoe UI Emoji, Apple Color Emoji"
+          font-size="26">🤖</text>
+  </g>
+  <text x="720" y="455" fill="#93c5fd" font-family="Inter, Segoe UI, Roboto, Arial" font-size="14">
+    Chat launcher
+  </text>
+
+  <!-- Caption -->
+  <text x="60" y="420" fill="#a5b4fc" font-family="Inter, Segoe UI, Roboto, Arial" font-size="16" font-weight="600">
+    Placeholder: Hologram chat launcher & card
+  </text>
+</svg>
+
+

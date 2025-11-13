@@ -249,13 +249,13 @@ Make the hologram an active assistant. A floating launcher opens a chat window w
 Drop your captures under `docs-media/hologram/` and reference them here:
 
 - Launcher button and toggle  
-  `![Hologram chat launcher](docs-media/hologram/launcher.png)`
+  `![Hologram chat launcher](docs-media/hologram/launcher.svg)`
 - Fast mode demo (short reply)  
-  `![Fast mode](docs-media/hologram/chat-fast.gif)`
+  `![Fast mode](docs-media/hologram/chat-fast.svg)`
 - Accurate mode demo (longer, more grounded reply)  
-  `![Accurate mode](docs-media/hologram/chat-accurate.gif)`
+  `![Accurate mode](docs-media/hologram/chat-accurate.svg)`
 - “Chat on click Hologram” toggle ON  
-  `![Toggle on](docs-media/hologram/toggle.png)`
+  `![Toggle on](docs-media/hologram/toggle.svg)`
 
 If the files don’t exist yet, create the folder and add your images; the README links will start working automatically.
 
