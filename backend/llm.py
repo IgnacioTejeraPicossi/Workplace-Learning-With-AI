@@ -61,7 +61,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     config = get_api_config_from_headers(request_headers)
     
     # Try ItemAI first if configured
-    if config['provider'] == 'itemai':
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
@@ -106,7 +106,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     config = get_api_config_from_headers(request_headers)
     
     # Try ItemAI first if configured
-    if config['provider'] == 'itemai':
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
@@ -196,8 +196,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             params["max_tokens"] = max_tokens
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
-        # Prefer per-request key from headers; fallback to environment
-        openai.api_key = config['openai_key'] or OPENAI_API_KEY
+        openai.api_key = OPENAI_API_KEY
         
         if messages:
             response = openai.chat.completions.create(
@@ -268,13 +267,9 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
     """
     # Get configuration from headers if available
     config = get_api_config_from_headers(request_headers)
-    try:
-        print(f"[LLM STREAM] cfg provider={config.get('provider')} | openai_key_len={len(config.get('openai_key') or '')} | openrouter_key_len={len(config.get('openrouter_key') or '')}")
-    except Exception:
-        pass
     
     # Try ItemAI first if configured
-    if config['provider'] == 'itemai':
+    if config['provider'] == 'itemai' or config['provider'] == 'openai':
         try:
             print("🔄 Trying ItemAI (LM Studio) streaming...")
             # For now, use the sync version and stream it character by character
@@ -337,8 +332,7 @@ Would you like to know more about any specific feature?"""
             params["max_tokens"] = max_tokens
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
-        # Prefer per-request key from headers; fallback to environment
-        openai.api_key = (config.get('openai_key') or OPENAI_API_KEY)
+        openai.api_key = OPENAI_API_KEY
         
         if messages:
             response = openai.chat.completions.create(
@@ -361,40 +355,17 @@ Would you like to know more about any specific feature?"""
                 if content:
                     yield content
     except Exception as e:
-        # Fallback: perform a direct HTTPS call to OpenAI to avoid SDK/auth mismatch
-        try:
-            import requests
-            headers = {
-                "Authorization": f"Bearer {(config.get('openai_key') or OPENAI_API_KEY)}",
-                "Content-Type": "application/json",
-            }
-            payload = {
-                "model": model_to_use,
-                "messages": messages or [{"role": "user", "content": prompt or ""}],
-                "max_tokens": params.get("max_tokens", 512),
-                "temperature": params.get("temperature", 0.7),
-                "stream": False,
-            }
-            r = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=60)
-            r.raise_for_status()
-            data = r.json()
-            text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if not text:
-                raise RuntimeError("Empty response from OpenAI")
-            for ch in text:
-                yield ch
-            return
-        except Exception as inner_e:
-            # Final fallback to mock response
-            mock_response = f"Sorry, I encountered an error: {str(inner_e)}. Here's a helpful response instead:\n\n"
-            mock_response += f"Regarding your question about '{prompt or 'learning'}', here are some general insights:\n"
-            mock_response += "- Micro-lessons are bite-sized learning modules\n"
-            mock_response += "- AI can personalize your learning experience\n"
-            mock_response += "- Skills forecasting helps plan your career path\n"
-            mock_response += "- Scenario simulations provide hands-on practice\n\n"
-            mock_response += "Would you like to know more about any specific topic?"
-            for char in mock_response:
-                yield char
+        # Fallback to mock response if API call fails
+        mock_response = f"Sorry, I encountered an error: {str(e)}. Here's a helpful response instead:\n\n"
+        mock_response += f"Regarding your question about '{prompt or 'learning'}', here are some general insights:\n"
+        mock_response += "- Micro-lessons are bite-sized learning modules\n"
+        mock_response += "- AI can personalize your learning experience\n"
+        mock_response += "- Skills forecasting helps plan your career path\n"
+        mock_response += "- Scenario simulations provide hands-on practice\n\n"
+        mock_response += "Would you like to know more about any specific topic?"
+        
+        for char in mock_response:
+            yield char
 
 def web_search_query(query):
     """
