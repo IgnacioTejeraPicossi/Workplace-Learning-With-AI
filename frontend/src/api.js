@@ -12,6 +12,21 @@ export async function fetchWithAuth(url, options = {}) {
       ...options.headers,
       Authorization: `Bearer ${mongoToken}`,
     };
+    // Inject API Config headers so backend can select provider per-request
+    try {
+      const apiProvider = localStorage.getItem('apiProvider') || 'openai';
+      const itemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
+      const openaiKey = localStorage.getItem('openaiKey') || '';
+      const openrouterKey = localStorage.getItem('openrouterKey') || '';
+      options.headers['x-api-provider'] = apiProvider;
+      options.headers['x-itemai-url'] = itemaiUrl;
+      if (apiProvider === 'openai' && openaiKey) {
+        options.headers['x-openai-key'] = openaiKey;
+      }
+      if (apiProvider === 'openrouter' && openrouterKey) {
+        options.headers['x-openrouter-key'] = openrouterKey;
+      }
+    } catch (_) {}
     return fetch(url, options);
   }
   
@@ -23,6 +38,21 @@ export async function fetchWithAuth(url, options = {}) {
       ...options.headers,
       Authorization: `Bearer ${token}`,
     };
+    // Inject API Config headers here too
+    try {
+      const apiProvider = localStorage.getItem('apiProvider') || 'openai';
+      const itemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
+      const openaiKey = localStorage.getItem('openaiKey') || '';
+      const openrouterKey = localStorage.getItem('openrouterKey') || '';
+      options.headers['x-api-provider'] = apiProvider;
+      options.headers['x-itemai-url'] = itemaiUrl;
+      if (apiProvider === 'openai' && openaiKey) {
+        options.headers['x-openai-key'] = openaiKey;
+      }
+      if (apiProvider === 'openrouter' && openrouterKey) {
+        options.headers['x-openrouter-key'] = openrouterKey;
+      }
+    } catch (_) {}
   }
   return fetch(url, options);
 }
