@@ -5,6 +5,7 @@ export default function AgentSecurity() {
   const [agentSecurityData, setAgentSecurityData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedAgent, setSelectedAgent] = useState('all');
+  const [scanning, setScanning] = useState({});
 
   useEffect(() => {
     loadAgentSecurityData();
@@ -15,6 +16,35 @@ export default function AgentSecurity() {
     const res = await fetch(`${API_BASE}/api/agent-security/overview`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
+  };
+
+  const runAgentScan = async (agentName) => {
+    try {
+      setScanning((s) => ({ ...s, [agentName]: true }));
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/agent-security/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agent_name: agentName,
+          scan_type: 'full',
+          include_zero_trust: true,
+          include_model_integrity: true,
+          include_data_protection: true
+        })
+      });
+      // Fire-and-forget background scan; refresh after short delay
+      if (res.ok) {
+        // Backend simulates ~5s scan; refresh after completion
+        setTimeout(() => {
+          loadAgentSecurityData();
+        }, 6000);
+      }
+    } catch (e) {
+      console.error('Failed to initiate agent scan:', e);
+    } finally {
+      setScanning((s) => ({ ...s, [agentName]: false }));
+    }
   };
 
   const loadAgentSecurityData = async () => {
@@ -217,6 +247,7 @@ export default function AgentSecurity() {
                   <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Vulnerabilities</th>
                   <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Zero Trust</th>
                   <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Last Scan</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -236,6 +267,23 @@ export default function AgentSecurity() {
                       <span style={{ color: agent.zero_trust_compliance ? '#10b981' : '#dc2626' }}>{agent.zero_trust_compliance ? '✅' : '❌'}</span>
                     </td>
                     <td style={{ padding: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>{new Date(agent.last_scan).toLocaleString()}</td>
+                    <td style={{ padding: '0.75rem' }}>
+                      <button
+                        onClick={() => runAgentScan(agent.name)}
+                        disabled={!!scanning[agent.name]}
+                        style={{
+                          background: scanning[agent.name] ? '#9ca3af' : '#2563eb',
+                          color: 'white',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: 8,
+                          cursor: scanning[agent.name] ? 'not-allowed' : 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        {scanning[agent.name] ? 'Scanning…' : 'Scan'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
