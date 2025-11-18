@@ -6,6 +6,23 @@ export async function fetchWithAuth(url, options = {}) {
   // First try to get MongoDB JWT token from our interceptor
   const mongoToken = localStorage.getItem('mongodb_access_token');
   
+  // Inject API Config headers from localStorage so backend knows the selected provider
+  try {
+    const apiProvider = localStorage.getItem('apiProvider');
+    const openaiKey = localStorage.getItem('openaiKey');
+    const openrouterKey = localStorage.getItem('openrouterKey');
+    const itemaiUrl = localStorage.getItem('itemaiUrl');
+    options.headers = {
+      ...options.headers,
+      ...(apiProvider ? { 'x-api-provider': apiProvider } : {}),
+      ...(openaiKey ? { 'x-openai-key': openaiKey } : {}),
+      ...(openrouterKey ? { 'x-openrouter-key': openrouterKey } : {}),
+      ...(itemaiUrl ? { 'x-itemai-url': itemaiUrl } : {}),
+    };
+  } catch (_) {
+    // no-op: if localStorage is blocked we simply skip header injection
+  }
+
   if (mongoToken) {
     // Use MongoDB JWT token
     options.headers = {

@@ -60,8 +60,54 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     """
     config = get_api_config_from_headers(request_headers)
     
-    # Try ItemAI first if configured
-    if config['provider'] == 'itemai' or config['provider'] == 'openai':
+    # Respect explicit provider selection
+    if config['provider'] == 'openai':
+        # Direct OpenAI first
+        try:
+            print("🔄 Trying OpenAI (selected provider)...")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenAI successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenAI failed: {e}")
+        # Optional fallback to OpenRouter if key exists
+        if config.get('openrouter_key'):
+            try:
+                print("🔄 Falling back to OpenRouter...")
+                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                if result and not result.startswith("[MOCKED RESPONSE"):
+                    print("✅ OpenRouter successful")
+                    return result
+            except Exception as e:
+                print(f"❌ OpenRouter failed: {e}")
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
+    
+    # Provider: openrouter → try OpenRouter first, then OpenAI
+    if config['provider'] == 'openrouter':
+        try:
+            print("🔄 Trying OpenRouter (selected provider)...")
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenRouter successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenRouter failed: {e}")
+        if config.get('openai_key'):
+            try:
+                print("🔄 Falling back to OpenAI...")
+                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                if result and not result.startswith("[MOCKED RESPONSE"):
+                    print("✅ OpenAI successful")
+                    return result
+            except Exception as e:
+                print(f"❌ OpenAI failed: {e}")
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
+    
+    # Default/Provider: itemai → try ItemAI, then OpenRouter, then OpenAI
+    if config['provider'] == 'itemai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
@@ -88,7 +134,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     if config['openai_key']:
         try:
             print("🔄 Trying OpenAI...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenAI successful")
                 return result
@@ -105,8 +151,51 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     """
     config = get_api_config_from_headers(request_headers)
     
-    # Try ItemAI first if configured
-    if config['provider'] == 'itemai' or config['provider'] == 'openai':
+    # Respect explicit provider selection
+    if config['provider'] == 'openai':
+        try:
+            print("🔄 Trying OpenAI (selected provider)...")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenAI successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenAI failed: {e}")
+        if config.get('openrouter_key'):
+            try:
+                print("🔄 Falling back to OpenRouter...")
+                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                if result and not result.startswith("[MOCKED RESPONSE"):
+                    print("✅ OpenRouter successful")
+                    return result
+            except Exception as e:
+                print(f"❌ OpenRouter failed: {e}")
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
+    
+    if config['provider'] == 'openrouter':
+        try:
+            print("🔄 Trying OpenRouter (selected provider)...")
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            if result and not result.startswith("[MOCKED RESPONSE"):
+                print("✅ OpenRouter successful")
+                return result
+        except Exception as e:
+            print(f"❌ OpenRouter failed: {e}")
+        if config.get('openai_key'):
+            try:
+                print("🔄 Falling back to OpenAI...")
+                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                if result and not result.startswith("[MOCKED RESPONSE"):
+                    print("✅ OpenAI successful")
+                    return result
+            except Exception as e:
+                print(f"❌ OpenAI failed: {e}")
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
+    
+    # Default/Provider: itemai
+    if config['provider'] == 'itemai':
         try:
             print("🔄 Trying ItemAI (LM Studio)...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
@@ -133,7 +222,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     if config['openai_key']:
         try:
             print("🔄 Trying OpenAI...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenAI successful")
                 return result
@@ -143,7 +232,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     print("❌ All AI providers failed")
     return "[MOCKED RESPONSE] All AI providers unavailable"
 
-def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, override_api_key=None):
     """
     Enhanced OpenAI function with GPT-5 model selection and optimization.
     Now supports ItemAI API (local), OpenRouter, and OpenAI APIs with intelligent fallback.
@@ -174,7 +263,8 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             print(f"OpenRouter failed, falling back to OpenAI: {e}")
     
     # Fallback to OpenAI
-    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+    effective_openai_key = override_api_key or OPENAI_API_KEY
+    if not effective_openai_key or str(effective_openai_key).strip() == "":
         # No key found, return mock response
         if prompt:
             return f"[MOCKED RESPONSE] This would be the AI's answer to: {prompt[:60]}..."
@@ -196,7 +286,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             params["max_tokens"] = max_tokens
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
-        openai.api_key = OPENAI_API_KEY
+        openai.api_key = effective_openai_key
         
         if messages:
             response = openai.chat.completions.create(
@@ -268,8 +358,53 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
     # Get configuration from headers if available
     config = get_api_config_from_headers(request_headers)
     
+    # Respect provider selection for streaming
+    if config['provider'] == 'openai':
+        # Stream directly from OpenAI using per-request key
+        if not config.get('openai_key') or str(config.get('openai_key')).strip() == "":
+            # No key → yield mock
+            mock = "[MOCKED STREAMING ERROR: Missing OpenAI key]"
+            for ch in mock:
+                yield ch
+            return
+        try:
+            print(f"[LLM STREAM] cfg provider=openai | openai_key_len={len(config.get('openai_key') or '')} | openrouter_key_len={len(config.get('openrouter_key') or '')}")
+            # Get optimal model and parameters
+            model = get_optimal_model(task_type, complexity)
+            params = get_gpt5_parameters(model, task_type)
+            model_to_use = params.pop("model", model)
+            if max_tokens:
+                params["max_tokens"] = max_tokens
+            openai.api_key = config.get('openai_key')
+            if messages:
+                response = openai.chat.completions.create(
+                    model=model_to_use,
+                    messages=messages,
+                    stream=True,
+                    **params
+                )
+            else:
+                response = openai.chat.completions.create(
+                    model=model_to_use,
+                    messages=[{"role": "user", "content": prompt}],
+                    stream=True,
+                    **params
+                )
+            for chunk in response:
+                if hasattr(chunk, 'choices') and chunk.choices:
+                    delta = chunk.choices[0].delta
+                    content = getattr(delta, 'content', None)
+                    if content:
+                        yield content
+            return
+        except Exception as e:
+            err = f"Sorry, I encountered an error: {str(e)}"
+            for ch in err:
+                yield ch
+            return
+    
     # Try ItemAI first if configured
-    if config['provider'] == 'itemai' or config['provider'] == 'openai':
+    if config['provider'] == 'itemai':
         try:
             print("🔄 Trying ItemAI (LM Studio) streaming...")
             # For now, use the sync version and stream it character by character
@@ -285,7 +420,7 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
             print(f"❌ ItemAI streaming failed: {e}")
     
     # Try OpenRouter if configured
-    if config['openrouter_key']:
+    if config['provider'] == 'openrouter' and config['openrouter_key']:
         try:
             print("🔄 Trying OpenRouter streaming...")
             for chunk in ask_openrouter_stream(prompt, task_type, complexity, max_tokens, messages):
@@ -332,7 +467,7 @@ Would you like to know more about any specific feature?"""
             params["max_tokens"] = max_tokens
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
-        openai.api_key = OPENAI_API_KEY
+        openai.api_key = config.get('openai_key') or OPENAI_API_KEY
         
         if messages:
             response = openai.chat.completions.create(
