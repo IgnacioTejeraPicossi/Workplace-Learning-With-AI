@@ -6003,6 +6003,59 @@ graph TB
 | `/api/agent-security/zero-trust/status` | GET | Get Zero Trust architecture status |
 | `/api/agent-security/health` | GET | Agent security module health check |
 
+### Agent Security Scan (Real checks)
+
+The Agent Security page includes a Scan button per agent. For the two implemented agents — `AI Compliance Agent` and `AI Productivity Agent` — the scan performs real, lightweight checks and persists the result as a snapshot. Other agents still use synthesized data for demo.
+
+What the real scan checks
+- Zero Trust posture
+  - HMAC secret present: `AGENTOPS_HMAC_SECRET` must be set.
+  - Outbound endpoint uses HTTPS:
+    - Compliance: `OUTSYSTEMS_COMPLIANCE_URL`
+    - Productivity: `OUTSYSTEMS_PRODUCTIVITY_URL`
+  - If either is missing/invalid, `zero_trust_compliance = false`.
+- Model/Prompt integrity (drift proxy)
+  - Reads recent `agent_runs` for the module and inspects `bundle_hash`.
+  - Higher diversity of hashes in the last runs indicates drift; reduces `model_integrity_score`.
+- DLP (Data Loss Prevention)
+  - Scans recent `security_events` for potential PII/API keys (emails, credit‑like sequences, `sk-...`, `api_key=...`).
+  - Findings increase `threats_detected` and lower `data_protection_score`.
+
+Scoring and status
+- The scan computes a weighted `security_score` from:
+  - Zero Trust posture (35%)
+  - Model/Prompt integrity score (30%)
+  - Data protection score (35%)
+- It also sets:
+  - `status`: `secure` when Zero Trust passes and integrity ≥ 80 and data protection ≥ 85; otherwise `at_risk`.
+  - `vulnerabilities_count`: adds 1 if Zero Trust fails and 1 if data protection < 90.
+  - `threats_detected`: 1 if DLP finds potential secrets/PII.
+- A snapshot is saved to Mongo in `agent_security_status` with `last_scan = now`; the in‑memory base is also updated so the UI reflects changes even without DB.
+
+How to get to SECURE
+1) Configure environment:
+   - `AGENTOPS_HMAC_SECRET` set to a strong value.
+   - `OUTSYSTEMS_COMPLIANCE_URL` and `OUTSYSTEMS_PRODUCTIVITY_URL` must be `https://...`.
+2) Stabilize bundles (integrity):
+   - Dispatch two runs with equivalent content so the recent `bundle_hash` diversity is low.
+3) Avoid DLP triggers in recent events:
+   - Don’t log raw API keys (`sk-...`, `api_key=...`) or PII into `security_events`.
+4) Click Scan on each agent; after ~6 seconds the “Last Scan” and scores update.
+
+Troubleshooting
+- UI error 500 on overview:
+  - The endpoint now serializes datetimes and falls back to safe mock if DB values are malformed.
+- “At Risk” unexpectedly:
+  - Check env vars are loaded by the backend process (print or log values).
+  - Confirm endpoints are HTTPS; `http://` will intentionally fail Zero Trust.
+  - Check recent `security_events` for PII patterns and recent `agent_runs` for excessive `bundle_hash` diversity.
+- “Last Scan” not updating:
+  - The scan runs in ~5s; the UI refreshes after ~6s. Ensure the backend log prints “Security scan … completed for agent …”.
+
+Notes and roadmap
+- Integrity uses bundle hash diversity as a practical proxy; we can add a signed baseline (allow‑list of expected hashes) for stricter enforcement.
+- DLP currently inspects security event text; we can extend it to scan stored artifacts (e.g., sanitized summaries) if needed.
+
 ### Integration with Existing Modules
 
 #### 🤖 Agentic RAG Integration

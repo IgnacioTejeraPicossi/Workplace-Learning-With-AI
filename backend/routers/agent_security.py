@@ -4,10 +4,12 @@ Advanced security monitoring and threat detection for AI agents
 """
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from datetime import datetime, timedelta
 import uuid
 import asyncio
+import os
+import re
 
 from ..models.agent_security_models import (
     AgentSecurityOverview,
@@ -27,6 +29,7 @@ from ..models.agent_security_models import (
     IncidentStatus
 )
 from ..db import security_events_collection, agent_security_status_collection
+from ..models.agent_runs import list_runs as list_agent_runs
 
 router = APIRouter(prefix="/api/agent-security", tags=["Agent Security"])
 
@@ -629,31 +632,9 @@ async def simulate_security_scan(scan_id: str, agent_name: str):
         except Exception:
             pass
 
-        # Reasonable defaults per known implemented agents
-        if agent_name == "AI Compliance Agent":
-            snapshot = {
-                "agent_name": agent_name,
-                "status": "secure",
-                "security_score": 92,
-                "vulnerabilities_count": 0,
-                "threats_detected": 0,
-                "zero_trust_compliance": True,
-                "model_integrity_score": 95,
-                "data_protection_score": 90,
-                "access_control_score": 88,
-            }
-        elif agent_name == "AI Productivity Agent":
-            snapshot = {
-                "agent_name": agent_name,
-                "status": "at_risk",
-                "security_score": 78,
-                "vulnerabilities_count": 2,
-                "threats_detected": 1,
-                "zero_trust_compliance": False,
-                "model_integrity_score": 82,
-                "data_protection_score": 75,
-                "access_control_score": 70,
-            }
+        # Real checks for the two implemented agents; defaults otherwise
+        if agent_name in {"AI Compliance Agent", "AI Productivity Agent"}:
+            snapshot = await run_real_security_checks(agent_name)
         else:
             snapshot = {
                 "agent_name": agent_name,
@@ -680,3 +661,83 @@ async def simulate_security_scan(scan_id: str, agent_name: str):
     except Exception as e:
         print(f"[AgentSecurity] Failed to persist scan snapshot for {agent_name}: {e}")
     print(f"Security scan {scan_id} completed for agent {agent_name}")
+
+async def run_real_security_checks(agent_name: str) -> dict:
+    """
+    Execute lightweight, real checks for Zero Trust, model integrity and DLP.
+    Focused on 'AI Compliance Agent' and 'AI Productivity Agent' using available
+    telemetry (env, recent runs, security events). Returns a snapshot dict.
+    """
+    is_compliance = agent_name == "AI Compliance Agent"
+    module = "compliance" if is_compliance else "productivity"
+
+    # 1) Zero Trust basic posture
+    hmac_secret_present = bool(os.getenv("AGENTOPS_HMAC_SECRET"))
+    # Ensure outbound endpoint configured and uses HTTPS
+    endpoint_env = "OUTSYSTEMS_COMPLIANCE_URL" if is_compliance else "OUTSYSTEMS_PRODUCTIVITY_URL"
+    endpoint = os.getenv(endpoint_env, "")
+    https_ok = endpoint.startswith("https://")
+    zero_trust_ok = hmac_secret_present and https_ok
+
+    # 2) Model/Prompt integrity drift using recent bundle hashes
+    try:
+        recent_runs = await list_agent_runs(module=module, limit=20)
+    except Exception:
+        recent_runs = []
+    hashes = [r.get("bundle_hash") for r in recent_runs if r.get("bundle_hash")]
+    unique_hashes = set(hashes)
+    # Score: fewer unique hashes → more stable (simulate 100..60)
+    if not hashes:
+        integrity_score = 80  # unknown, neutral
+    else:
+        diversity = max(1, len(unique_hashes))
+        integrity_score = max(60, 100 - (diversity - 1) * 10)
+
+    # 3) DLP scan on latest security events (PII/API key heuristics)
+    pii_patterns = [
+        re.compile(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", re.I),               # emails
+        re.compile(r"\b(?:\d[ -]*?){13,16}\b"),                                    # credit-like numbers
+        re.compile(r"\bsk-[A-Za-z0-9]{10,}\b"),                                    # OpenAI key
+        re.compile(r"(?i)api[_-]?key[:=]\s*[A-Za-z0-9\-_/+=]{10,}"),               # generic API key
+    ]
+    dlp_findings = 0
+    try:
+        recent_events = await security_events_collection.find(
+            {"agent_name": agent_name}
+        ).sort("timestamp", -1).limit(50).to_list(50)
+        for ev in recent_events:
+            blob = " ".join([
+                str(ev.get("description","")),
+                str(ev.get("details","")),
+                str(ev.get("payload","")),
+            ])
+            if any(p.search(blob) for p in pii_patterns):
+                dlp_findings += 1
+    except Exception:
+        pass
+    # Convert findings to score 100..70
+    data_protection_score = max(70, 100 - dlp_findings * 10)
+
+    # Aggregate snapshot
+    status = "secure" if (zero_trust_ok and integrity_score >= 80 and data_protection_score >= 85) else "at_risk"
+    vulnerabilities = max(0, (0 if zero_trust_ok else 1) + (0 if data_protection_score >= 90 else 1))
+    threats = 1 if dlp_findings > 0 else 0
+    security_score = int(round((
+        (90 if zero_trust_ok else 75) * 0.35 +
+        integrity_score * 0.30 +
+        data_protection_score * 0.35
+    )))
+
+    return {
+        "agent_name": agent_name,
+        "status": status,
+        "security_score": security_score,
+        "vulnerabilities_count": vulnerabilities,
+        "threats_detected": threats,
+        "zero_trust_compliance": bool(zero_trust_ok),
+        "model_integrity_score": int(integrity_score),
+        "data_protection_score": int(data_protection_score),
+        "access_control_score": 88 if zero_trust_ok else 76,
+        "last_scan": datetime.now(),
+        "last_incident": None,
+    }
