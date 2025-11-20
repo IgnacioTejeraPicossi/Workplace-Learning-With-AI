@@ -707,15 +707,109 @@ const AITrainingModule = ({ user }) => {
   };
 
   const renderSection = (section) => {
+    // Helper to colorize "Risk: <Level>" fragments inside list items
+    const renderRiskColored = (text) => {
+      if (typeof text !== 'string') return text;
+      const parts = text.split(/(Risk:\s*)(Low|Moderate|High|Critical)/i);
+      if (parts.length < 4) return text;
+      const level = parts[2];
+      const map = {
+        Low: '#16a34a', // green
+        Moderate: '#f59e0b', // amber
+        High: '#f97316', // orange
+        Critical: '#ef4444' // red
+      };
+      const keyLevel = level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
+      const color = map[keyLevel] || colors.primary;
+      return (
+        <>
+          {parts[0]}
+          {parts[1]}
+          <span style={{ color, fontWeight: 700 }}>{keyLevel}</span>
+          {parts.slice(3).join('')}
+        </>
+      );
+    };
+
     switch (section.type) {
       case 'text':
         return <p style={{ lineHeight: 1.6, color: colors.text }}>{section.content}</p>;
       
       case 'list':
+        if (section.format === 'dysfunctionTable') {
+          const headerStyle = { textAlign: 'left', padding: '8px 10px', borderBottom: `1px solid ${colors.border}`, color: colors.textSecondary, fontSize: '0.9em' };
+          const cellStyle = { padding: '10px', borderBottom: `1px solid ${colors.border}`, verticalAlign: 'top', color: colors.text };
+          
+          const riskChip = (level) => {
+            const map = {
+              Low: { bg: '#eaf7ee', color: '#16a34a' },
+              Moderate: { bg: '#fff7e6', color: '#f59e0b' },
+              High: { bg: '#fff1e6', color: '#f97316' },
+              Critical: { bg: '#fee2e2', color: '#ef4444' }
+            };
+            const key = (level || '').charAt(0).toUpperCase() + (level || '').slice(1).toLowerCase();
+            const s = map[key] || { bg: colors.cardBackground, color: colors.textSecondary, icon: '•' };
+            return (
+              <span style={{ 
+                background: s.bg, 
+                color: s.color, 
+                border: `1px solid ${s.color}`, 
+                padding: '2px 8px', 
+                borderRadius: 12, 
+                fontSize: '0.8em', 
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                whiteSpace: 'nowrap'
+              }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, display: 'inline-block' }} />
+                {key}
+              </span>
+            );
+          };
+
+          const rows = section.content.map((item) => {
+            const parts = String(item).split(' — ').map(p => p.trim());
+            if (parts.length < 4) return null;
+            const common = parts[0];
+            const formal = parts[1];
+            // Find risk part position safely
+            const rIndex = parts.findIndex(p => /^Risk:/i.test(p));
+            const riskLevel = rIndex >= 0 ? parts[rIndex].replace(/Risk:\s*/i, '') : '';
+            const symptoms = rIndex >= 0 ? parts.slice(rIndex + 1).join(' — ') : parts.slice(2).join(' — ');
+            return { common, formal, riskLevel, symptoms };
+          }).filter(Boolean);
+
+          return (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${colors.border}`, borderRadius: 8 }}>
+                <thead style={{ background: colors.cardBackground }}>
+                  <tr>
+                    <th style={headerStyle}>Common Name</th>
+                    <th style={headerStyle}>Formal Name</th>
+                    <th style={headerStyle}>Risk</th>
+                    <th style={headerStyle}>Core Symptom Cluster</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r, i) => (
+                    <tr key={i}>
+                      <td style={cellStyle}><strong>{r.common}</strong></td>
+                      <td style={cellStyle}>{r.formal}</td>
+                      <td style={cellStyle}>{riskChip(r.riskLevel)}</td>
+                      <td style={cellStyle}>{r.symptoms}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
         return (
           <ul style={{ lineHeight: 1.6, color: colors.text }}>
             {section.content.map((item, index) => (
-              <li key={index} style={{ marginBottom: 8 }}>{item}</li>
+              <li key={index} style={{ marginBottom: 8 }}>{renderRiskColored(item)}</li>
             ))}
           </ul>
         );

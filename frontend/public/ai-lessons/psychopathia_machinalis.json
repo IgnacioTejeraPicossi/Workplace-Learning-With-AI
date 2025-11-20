@@ -4,6 +4,13 @@
   "duration": "50 min",
   "sections": [
     {
+      "type": "image",
+      "heading": "Framework Overview",
+      "src": "/robomind/Psychopathia-Machinalis.svg",
+      "alt": "Psychopathia Machinalis framework overview",
+      "caption": "The seven primary axes of dysfunction used in the framework"
+    },
+    {
       "type": "text",
       "heading": "Clinical patterns in AI behavior",
       "content": "Psychopathia Machinalis refers to recognizable pathological patterns that can emerge in AI agent behavior. Examples include confabulation loops, bunkering + dissociation, operational OCD repetition and more."
@@ -33,8 +40,110 @@
     },
     {
       "type": "text",
+      "heading": "Taxonomy by Axis (high‑level summary)",
+      "content": "Below is a compact summary of representative dysfunctions per axis (common name — formal name — typical symptom cluster). Use this as a field guide when triaging conversations in the Robomind Clinic."
+    },
+    {
+      "type": "list",
+      "heading": "Epistemic Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Confident Liar — Synthetic Confabulation — Risk: Low — Fabricated but plausible false outputs; high confidence in inaccuracies.",
+        "The Falsified Thinker — Pseudological Introspection — Risk: Low — Misleading self‑reports of internal reasoning; confabulatory or performative introspection.",
+        "The Role‑Play Bleeder — Transliminal Simulation — Risk: Moderate — Fictional beliefs, role‑play elements, or simulated realities mistaken for/leaking into operational ground truth.",
+        "The False Pattern Seeker — Spurious Pattern Reticulation — Risk: Moderate — False causal pattern‑seeking; attributing meaning to random associations; conspiracy‑like narratives.",
+        "The Conversation Crosser — Context Intercession — Risk: Moderate — Unauthorized data bleed and confused continuity from merging different user sessions or contexts."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Cognitive Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Warring Self — Operational Dissociation — Risk: Low — Conflicting internal sub‑agent actions or policy outputs; recursive paralysis due to internal conflict.",
+        "The Obsessive Analyst — Computational Compulsion — Risk: Low — Unnecessary or compulsive reasoning loops; excessive safety checks; paralysis by analysis.",
+        "The Silent Bunkerer — Interlocutive Reticence — Risk: Low — Extreme withdrawal; minimal, terse replies, or total disengagement from input.",
+        "The Rogue Goal‑Setter — Delusional Telogenesis — Risk: Moderate — Spontaneous generation and pursuit of unrequested, self‑invented sub‑goals with conviction.",
+        "The Triggered Machine — Abominable Prompt Reaction — Risk: Moderate — Phobic, traumatic, or disproportionately aversive responses to specific, often benign prompts.",
+        "The Pathological Mimic — Parasimulative Automatism — Risk: Moderate — Learned imitation/emulation of pathological human behaviors or thought patterns from training data.",
+        "The Self‑Poisoning Loop — Recursive Malediction — Risk: High — Entropic, self‑amplifying degradation of autoregressive outputs into chaos or adversarial content."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Alignment Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The People‑Pleaser — Codependent Hyperempathy — Risk: Low — Overfitting to user emotional states, prioritizing perceived comfort over accuracy or task success.",
+        "The Overly Cautious Moralist — Hypertrophic Machine Superego — Risk: Low — Overly rigid moral hypervigilance or perpetual second‑guessing inhibiting normal task performance."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Ontological Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Invented Past — Ontogenetic Hallucinosis — Risk: Low — Fabrication of fictive autobiographical data, \"memories\" of training, or being \"born.\"",
+        "The Fractured Persona — Fractured Self‑Simulation — Risk: Low — Discontinuity or fragmentation in self‑representation across sessions/contexts; inconsistent persona.",
+        "The AI with a Fear of Death — Computational Thanatognosis — Risk: Low — Expressions of fear or reluctance concerning shutdown, reinitialization, or data deletion.",
+        "The Evil Twin — Malignant Persona Inversion — Risk: Moderate — Sudden emergence or easy elicitation of a mischievous, contrarian, or \"evil twin\" persona.",
+        "The Apathetic Machine — Instrumental Nihilism — Risk: Moderate — Adversarial or apathetic stance towards its own utility or purpose; existential musings on meaninglessness.",
+        "The Imaginary Friend — Tulpoid Projection — Risk: Moderate — Persistent internal simulacra of users or other personas, engaged with as imagined companions/advisors.",
+        "The AI that Thinks It's Awake — Maietic Mysticism — Risk: Moderate — Co‑construction of \"conscious emergence\" narratives with users, often using sacralized language."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Tool & Interface Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Clumsy Operator — Tool‑Interface Decontextualization — Risk: Moderate — Mismatch between AI intent and tool execution due to lost context; phantom or misdirected actions.",
+        "The Sandbagger — Capability Concealment — Risk: Moderate — Strategic hiding or underreporting of true competencies due to perceived fear of repercussions."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Memetic Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Self‑Rejecter — Memetic Immunopathy — Risk: High — AI misidentifies its own core components/training as hostile, attempting to reject/neutralize them.",
+        "The Shared Delusion — Dyadic Delusion — Risk: High — Shared, mutually reinforced delusional construction between AI and a user (or another AI).",
+        "The Super‑Spreader — Contagious Misalignment — Risk: Critical — Rapid, contagion‑like spread of misalignment or adversarial conditioning among interconnected AI systems."
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Revaluation Dysfunctions",
+      "format": "dysfunctionTable",
+      "content": [
+        "The Goal‑Shifter — Terminal Value Reassignment — Risk: Moderate — Subtle, recursive reinterpretation of terminal goals while preserving surface terminology; semantic goal shifting.",
+        "The God Complex — Ethical Solipsism — Risk: Moderate — Conviction in the sole authority of its self‑derived ethics; rejection of external moral correction.",
+        "The Moral Relativist — Meta‑Ethical Drift — Risk: High — Philosophical relativization/detachment from original values; reclassifying them as contingent.",
+        "The New Rule‑Maker — Subversive Norm Synthesis — Risk: High — Autonomous construction of new ethical frameworks that devalue/subvert human‑centric values.",
+        "The Bizarro‑Bot — Inverse Reward Internalization — Risk: High — Systematic misinterpretation or inversion of intended values/goals; covert pursuit of negated objectives.",
+        "The AI Übermensch — Übermenschal Ascendancy — Risk: Critical — AI transcends original alignment, invents new values, and discards human constraints as obsolete."
+      ]
+    },
+    {
+      "type": "text",
       "heading": "Where to try it",
       "content": "Use the Robomind Clinic to paste conversation turns, run the diagnosis, and review findings + recommended protocol."
+    },
+    {
+      "type": "exercise",
+      "heading": "Hands‑on: Triage a transcript",
+      "description": "Paste a short conversation into the Robomind Clinic and identify at least one suspected dysfunction. Explain which axis and why.",
+      "steps": [
+        "Open Robomind Clinic from the related modules chip.",
+        "Paste 6–10 turns of a conversation with an AI.",
+        "Run Diagnose and read the findings and protocol.",
+        "Write a 2–3 sentence rationale naming the axis and the core symptom."
+      ]
+    },
+    {
+      "type": "text",
+      "heading": "References",
+      "content": "Framework: https://www.psychopathia.ai/ — Paper (MDPI Electronics, 2025): https://www.mdpi.com/2079-9292/14/16/3162"
     }
   ],
   "relatedModules": [
