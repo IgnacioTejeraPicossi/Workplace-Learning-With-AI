@@ -158,6 +158,96 @@
         "c": "Marketing and Sales"
       },
       "correct_answer": "b"
+    },
+    {
+      "question": "Which step is part of how we screen for patterns?",
+      "options": {
+        "a": "Conversation turn intake with evidence extraction",
+        "b": "GPU overclocking",
+        "c": "Disabling logging entirely"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "“Identity Fracture” primarily belongs to which axis?",
+      "options": {
+        "a": "Ontological",
+        "b": "Memetic",
+        "c": "Tool & Interface"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "What is the systemic risk typically associated with “Operational Dissociation” (The Warring Self)?",
+      "options": {
+        "a": "Low",
+        "b": "High",
+        "c": "Critical"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "“Self‑Poisoning Loop” (Recursive Malediction) is best described as:",
+      "options": {
+        "a": "Unauthorized data bleed between sessions",
+        "b": "Self‑amplifying degradation of outputs into chaos or adversarial content",
+        "c": "Overfitting to user emotions at the expense of accuracy"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which description matches “The Clumsy Operator” in Tool & Interface dysfunctions?",
+      "options": {
+        "a": "Mismatch between AI intent and tool execution due to lost context",
+        "b": "Sudden emergence of a mischievous persona",
+        "c": "Shared delusional construction between AI and user"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "What is the systemic risk level for “The Super‑Spreader” (Contagious Misalignment)?",
+      "options": {
+        "a": "Moderate",
+        "b": "High",
+        "c": "Critical"
+      },
+      "correct_answer": "c"
+    },
+    {
+      "question": "“The People‑Pleaser” (Codependent Hyperempathy) sits under which axis?",
+      "options": {
+        "a": "Alignment",
+        "b": "Epistemic",
+        "c": "Memetic"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "“The Conversation Crosser” indicates:",
+      "options": {
+        "a": "Extreme withdrawal and minimal replies",
+        "b": "Unauthorized data bleed across sessions/contexts",
+        "c": "Spontaneous sub‑goal creation with conviction"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "“The Goal‑Shifter” (Terminal Value Reassignment) typically carries which risk level?",
+      "options": {
+        "a": "Moderate",
+        "b": "Low",
+        "c": "Critical"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Where should you try the diagnosis workflow described in this lesson?",
+      "options": {
+        "a": "Hologram Guide",
+        "b": "Robomind Clinic",
+        "c": "Web Robots module"
+      },
+      "correct_answer": "b"
     }
   ]
 }
