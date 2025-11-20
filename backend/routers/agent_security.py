@@ -675,9 +675,13 @@ async def run_real_security_checks(agent_name: str) -> dict:
     hmac_secret_present = bool(os.getenv("AGENTOPS_HMAC_SECRET"))
     # Ensure outbound endpoint configured and uses HTTPS
     endpoint_env = "OUTSYSTEMS_COMPLIANCE_URL" if is_compliance else "OUTSYSTEMS_PRODUCTIVITY_URL"
-    endpoint = os.getenv(endpoint_env, "")
-    https_ok = endpoint.startswith("https://")
-    zero_trust_ok = hmac_secret_present and https_ok
+    # Fall back to n8n webhooks when OutSystems URL is not configured
+    fallback_env = "N8N_COMPLIANCE_WEBHOOK" if is_compliance else "N8N_PRODUCTIVITY_WEBHOOK"
+    endpoint = os.getenv(endpoint_env) or os.getenv(fallback_env, "")
+    # Accept HTTPS everywhere; allow HTTP only for loopback in local dev
+    loopback_ok = bool(re.match(r"^http://(?:localhost|127\.0\.0\.1|host\.docker\.internal)(?::\d+)?/", str(endpoint)))
+    https_ok = str(endpoint).startswith("https://") or loopback_ok
+    zero_trust_ok = hmac_secret_present and bool(endpoint) and https_ok
 
     # 2) Model/Prompt integrity drift using recent bundle hashes
     try:

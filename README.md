@@ -6010,9 +6010,11 @@ The Agent Security page includes a Scan button per agent. For the two implemente
 What the real scan checks
 - Zero Trust posture
   - HMAC secret present: `AGENTOPS_HMAC_SECRET` must be set.
-  - Outbound endpoint uses HTTPS:
-    - Compliance: `OUTSYSTEMS_COMPLIANCE_URL`
-    - Productivity: `OUTSYSTEMS_PRODUCTIVITY_URL`
+  - Outbound endpoint configured and secure:
+    - If using OutSystems: `OUTSYSTEMS_COMPLIANCE_URL` / `OUTSYSTEMS_PRODUCTIVITY_URL` must be `https://...`.
+    - If using n8n: `N8N_COMPLIANCE_WEBHOOK` / `N8N_PRODUCTIVITY_WEBHOOK` are supported.
+      - HTTPS is recommended in prod.
+      - In local dev, HTTP is accepted for loopback hosts (`localhost`, `127.0.0.1`, `host.docker.internal`).
   - If either is missing/invalid, `zero_trust_compliance = false`.
 - Model/Prompt integrity (drift proxy)
   - Reads recent `agent_runs` for the module and inspects `bundle_hash`.
