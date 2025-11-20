@@ -155,12 +155,36 @@ const RobomindClinicWithTabs = () => {
     <div className="container" style={{ backgroundColor: colors.background, color: colors.text }}>
       <div className="row">
         <div className="col-md-8">
-          <h2 style={{ color: colors.primary, marginBottom: '20px' }}>
+          <h2 style={{ color: colors.primary, marginBottom: '12px' }}>
             🧠 Robomind Clinic
           </h2>
-          <p style={{ color: colors.textSecondary, marginBottom: '30px' }}>
-            Screen AI runs for Psychopathia Machinalis patterns and get therapy recommendations.
-          </p>
+          {/* Header text with illustration aligned to the right */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              marginBottom: 20,
+              flexWrap: 'wrap'
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <p style={{ color: colors.textSecondary, margin: 0 }}>
+                Screen AI runs for Psychopathia Machinalis patterns and get therapy recommendations.
+              </p>
+            </div>
+            <img
+              src="/robomind/identity-fracture.svg"
+              alt="Robomind Clinic — Identity Fracture"
+              style={{
+                width: 280,
+                maxWidth: '35%',
+                height: 'auto',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`
+              }}
+            />
+          </div>
 
           {/* Tab Navigation */}
           <div style={{ marginBottom: '30px' }}>
