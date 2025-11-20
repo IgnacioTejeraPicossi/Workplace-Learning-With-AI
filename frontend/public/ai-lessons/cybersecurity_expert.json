@@ -1,0 +1,45 @@
+{
+  "title": "Cybersecurity for AI Systems",
+  "difficulty": "Expert",
+  "duration": "40 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Why cybersecurity matters for AI",
+      "content": "AI systems expand the attack surface: prompt injection, data exfiltration, model drift and supply‑chain risks. A practical security posture should include Zero Trust principles, DLP, and continuous monitoring."
+    },
+    {
+      "type": "list",
+      "heading": "Signals monitored in our platform",
+      "content": [
+        "Zero Trust posture: HMAC + secure endpoints (HTTPS) for agent dispatch",
+        "Model/Prompt integrity: drift via bundle hash diversity",
+        "DLP: potential secrets/PII in recent security events",
+        "KPIs: overall score, vulnerabilities, threats detected"
+      ]
+    },
+    {
+      "type": "image",
+      "heading": "Cybersecurity overview",
+      "src": "/images/cybersecurity-101-diagram.png",
+      "alt": "Cybersecurity signals diagram",
+      "caption": "High‑level view of signals used by the Agent Security Monitor"
+    }
+  ],
+  "relatedModules": [
+    "cybersecurity"
+  ],
+  "quiz": [
+    {
+      "question": "Which factors drive the overall security score in our Agent Security Monitor?",
+      "options": {
+        "a": "Only latency",
+        "b": "Zero Trust posture, integrity score and data protection score",
+        "c": "Number of UI components"
+      },
+      "correct_answer": "b"
+    }
+  ]
+}
+
+

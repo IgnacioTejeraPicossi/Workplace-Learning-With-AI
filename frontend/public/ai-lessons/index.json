@@ -160,6 +160,28 @@
       "api-config",
       "run-test"
     ]
+  },
+  {
+    "id": "cybersecurity_expert_014",
+    "title": "Cybersecurity for AI Systems",
+    "summary": "Threat modeling, Zero Trust posture, DLP signals and how to use the Cybersecurity module.",
+    "difficulty": "Expert",
+    "duration": "40 min",
+    "contentUrl": "/ai-lessons/cybersecurity_expert.json",
+    "relatedModules": [
+      "cybersecurity"
+    ]
+  },
+  {
+    "id": "psychopathia_machinalis_015",
+    "title": "Psychopathia Machinalis",
+    "summary": "Clinical patterns in AI behavior and how to screen them with the Robomind Clinic.",
+    "difficulty": "Expert",
+    "duration": "50 min",
+    "contentUrl": "/ai-lessons/psychopathia_machinalis.json",
+    "relatedModules": [
+      "robomind-clinic"
+    ]
   }
 ]
 

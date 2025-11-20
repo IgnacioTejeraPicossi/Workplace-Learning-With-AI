@@ -1,0 +1,56 @@
+{
+  "title": "Psychopathia Machinalis",
+  "difficulty": "Expert",
+  "duration": "50 min",
+  "sections": [
+    {
+      "type": "text",
+      "heading": "Clinical patterns in AI behavior",
+      "content": "Psychopathia Machinalis refers to recognizable pathological patterns that can emerge in AI agent behavior. Examples include confabulation loops, bunkering + dissociation, operational OCD repetition and more."
+    },
+    {
+      "type": "image",
+      "heading": "Identity Fracture",
+      "src": "/robomind/identity-fracture.svg",
+      "alt": "Identity fracture illustration",
+      "caption": "Illustration: fractured self‑representation in an artificial agent"
+    },
+    {
+      "type": "list",
+      "heading": "How we screen for patterns",
+      "content": [
+        "Conversation turn intake with evidence extraction",
+        "Pattern scoring by axis (Epistemic, Cognitive, Alignment, Ontological, Tool/Interface, Memetic, Revaluation)",
+        "Therapy patches: actionable mitigations per finding"
+      ]
+    },
+    {
+      "type": "image",
+      "heading": "Cognitive Overload",
+      "src": "/robomind/cognitive-overload.svg",
+      "alt": "Cognitive overload illustration",
+      "caption": "Illustration: overload and entanglement in internal processing"
+    },
+    {
+      "type": "text",
+      "heading": "Where to try it",
+      "content": "Use the Robomind Clinic to paste conversation turns, run the diagnosis, and review findings + recommended protocol."
+    }
+  ],
+  "relatedModules": [
+    "robomind-clinic"
+  ],
+  "quiz": [
+    {
+      "question": "Which axes are used to organize findings in Robomind Clinic?",
+      "options": {
+        "a": "Only Cognitive",
+        "b": "Epistemic, Cognitive, Alignment, Ontological, Tool & Interface, Memetic, Revaluation",
+        "c": "Marketing and Sales"
+      },
+      "correct_answer": "b"
+    }
+  ]
+}
+
+
