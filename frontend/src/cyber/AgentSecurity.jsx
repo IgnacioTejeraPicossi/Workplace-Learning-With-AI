@@ -6,6 +6,7 @@ export default function AgentSecurity() {
   const [loading, setLoading] = useState(true);
   const [selectedAgent, setSelectedAgent] = useState('all');
   const [scanning, setScanning] = useState({});
+  const [details, setDetails] = useState(null);
 
   useEffect(() => {
     loadAgentSecurityData();
@@ -78,6 +79,7 @@ export default function AgentSecurity() {
           vulnerabilities: a.vulnerabilities_count,
           threats_detected: a.threats_detected,
           zero_trust_compliance: a.zero_trust_compliance,
+          findings: a.findings
         })),
         security_metrics: apiData.security_metrics,
         zero_trust_status: apiData.zero_trust_status,
@@ -278,10 +280,25 @@ export default function AgentSecurity() {
                           padding: '6px 12px',
                           borderRadius: 8,
                           cursor: scanning[agent.name] ? 'not-allowed' : 'pointer',
-                          fontSize: '0.85rem'
+                          fontSize: '0.85rem',
+                          marginRight: 8
                         }}
                       >
                         {scanning[agent.name] ? 'Scanning…' : 'Scan'}
+                      </button>
+                      <button
+                        onClick={() => setDetails({ agent })}
+                        style={{
+                          background: '#111827',
+                          color: 'white',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        Findings
                       </button>
                     </td>
                   </tr>
@@ -292,6 +309,66 @@ export default function AgentSecurity() {
         </div>
       </div>
 
+      {/* Findings Modal */}
+      {details?.agent && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+          }}
+          onClick={() => setDetails(null)}
+        >
+          <div
+            style={{ background: 'white', width: '680px', maxWidth: '95vw', borderRadius: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Findings — {details.agent.name}</h3>
+              <button onClick={() => setDetails(null)} style={{ background: 'transparent', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: 20 }}>
+              {(() => {
+                const f = details.agent.findings || {};
+                const zt = f.zero_trust || {};
+                const integ = f.integrity || {};
+                const dlp = f.dlp || {};
+                const Row = ({ label, value }) => (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.95rem' }}>
+                    <div style={{ color: '#4b5563' }}>{label}</div>
+                    <div style={{ fontWeight: 600 }}>{String(value ?? '—')}</div>
+                  </div>
+                );
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Zero Trust</div>
+                      <Row label="HMAC present" value={zt.hmac_present ? 'Yes' : 'No'} />
+                      <Row label="Endpoint source" value={zt.endpoint_source || '—'} />
+                      <Row label="Endpoint secure" value={zt.endpoint_secure ? 'Yes' : 'No'} />
+                      <div style={{ marginTop: 6, color: '#6b7280', fontSize: '0.85rem', overflowWrap: 'anywhere' }}>{zt.endpoint || ''}</div>
+                    </div>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Integrity</div>
+                      <Row label="Recent runs" value={integ.recent_runs} />
+                      <Row label="Unique bundle hashes" value={integ.unique_bundle_hashes} />
+                      <Row label="Integrity score" value={integ.integrity_score} />
+                    </div>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>DLP (Data Loss Prevention)</div>
+                      <Row label="Events scanned" value={dlp.events_scanned} />
+                      <Row label="Findings" value={dlp.findings} />
+                      <Row label="Data protection score" value={dlp.data_protection_score} />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+            <div style={{ padding: 16, borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => setDetails(null)} style={{ background: '#2563eb', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Recent Security Incidents */}
       <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '2rem' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>

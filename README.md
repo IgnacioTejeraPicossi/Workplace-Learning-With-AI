@@ -6007,6 +6007,12 @@ graph TB
 
 The Agent Security page includes a Scan button per agent. For the two implemented agents — `AI Compliance Agent` and `AI Productivity Agent` — the scan performs real, lightweight checks and persists the result as a snapshot. Other agents still use synthesized data for demo.
 
+Findings panel
+- Click the “Findings” button next to an agent to see what contributed to the score:
+  - Zero Trust: HMAC presence, endpoint source (OutSystems or n8n), whether the endpoint is secure, and the resolved URL.
+  - Integrity: Count of recent runs, unique bundle hashes, and integrity score.
+  - DLP: Events scanned, number of findings, and the data protection score.
+
 What the real scan checks
 - Zero Trust posture
   - HMAC secret present: `AGENTOPS_HMAC_SECRET` must be set.

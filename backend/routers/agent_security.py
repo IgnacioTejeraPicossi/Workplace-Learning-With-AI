@@ -226,6 +226,7 @@ async def get_agent_security_overview():
                         "access_control_score": int(s.get("access_control_score", 86)),
                         "monitoring_active": True,
                         "last_incident": s.get("last_incident"),
+                        "findings": s.get("findings"),
                     })
         except Exception:
             pass
@@ -279,6 +280,7 @@ async def get_agent_security_overview():
                 **a,
                 "last_scan": dt(a.get("last_scan") or datetime.now()),
                 "last_incident": dt(a.get("last_incident")),
+                "findings": a.get("findings"),
             }
             for a in status_list
         ]
@@ -732,6 +734,25 @@ async def run_real_security_checks(agent_name: str) -> dict:
         data_protection_score * 0.35
     )))
 
+    findings = {
+        "zero_trust": {
+            "hmac_present": bool(hmac_secret_present),
+            "endpoint": endpoint,
+            "endpoint_source": "outsystems" if os.getenv(endpoint_env) else "n8n",
+            "endpoint_secure": bool(https_ok),
+        },
+        "integrity": {
+            "recent_runs": len(recent_runs),
+            "unique_bundle_hashes": len(unique_hashes),
+            "integrity_score": int(integrity_score),
+        },
+        "dlp": {
+            "events_scanned": int(len(recent_events)) if 'recent_events' in locals() else 0,
+            "findings": int(dlp_findings),
+            "data_protection_score": int(data_protection_score),
+        }
+    }
+
     return {
         "agent_name": agent_name,
         "status": status,
@@ -742,6 +763,7 @@ async def run_real_security_checks(agent_name: str) -> dict:
         "model_integrity_score": int(integrity_score),
         "data_protection_score": int(data_protection_score),
         "access_control_score": 88 if zero_trust_ok else 76,
+        "findings": findings,
         "last_scan": datetime.now(),
         "last_incident": None,
     }
