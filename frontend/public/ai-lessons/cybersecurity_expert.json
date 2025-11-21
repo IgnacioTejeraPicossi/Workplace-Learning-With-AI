@@ -1,12 +1,89 @@
 {
   "title": "Cybersecurity for AI Systems",
   "difficulty": "Expert",
-  "duration": "40 min",
+  "duration": "65 min",
   "sections": [
+    {
+      "type": "text",
+      "heading": "Session overview",
+      "content": "This Expert lesson synthesizes practices from penetration testing and Red Team exercises (as presented in the Oslo seminar “Cyberangrep og Penetrasjonstesting”), combined with AI‑centric risks and hardening strategies. You will learn methodology, tooling, and how to feed outcomes back into code and architecture."
+    },
     {
       "type": "text",
       "heading": "Why cybersecurity matters for AI",
       "content": "AI systems expand the attack surface: prompt injection, data exfiltration, model drift and supply‑chain risks. A practical security posture should include Zero Trust principles, DLP, and continuous monitoring."
+    },
+    {
+      "type": "list",
+      "heading": "Red Team vs. PenTesting vs. Blue/Purple Team",
+      "content": [
+        "Red Team: emulates realistic adversaries end‑to‑end; objective is detection/response testing across the organization",
+        "Penetration Testing: scoped point‑in‑time security assessment of applications/infrastructure; objective is identifying and proving exploitable weaknesses",
+        "Blue Team: defense, monitoring, incident response; Purple Team: collaborative red+blue to accelerate learning and hardening"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Rules of Engagement (RoE) & Scope",
+      "content": [
+        "Define in/out of scope systems, identities and time window; ensure legal and contractual approvals",
+        "Establish communication channels and escalation paths",
+        "Data handling: how to store, transport and destroy sensitive evidence",
+        "Success criteria: detection thresholds, dwell time, response quality and Mean‑Time‑To‑Detect/Respond"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "ATT&CK & Kill Chain mapping (high‑level)",
+      "content": [
+        "Recon → Resource development → Initial access → Execution → Persistence → Privilege escalation → Defense evasion → Credential access → Discovery → Lateral movement → Collection → Command & Control → Exfiltration → Impact",
+        "Use MITRE ATT&CK as a shared vocabulary for findings and for designing detections"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Reconnaissance methods (app & infra)",
+      "content": [
+        "Open‑source intelligence (OSINT) on domains, repos, leaked secrets",
+        "Service discovery (e.g., nmap) and technology fingerprinting",
+        "Content discovery, endpoint enumeration, parameters and hidden features"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Scanning & discovery",
+      "content": [
+        "Authenticated/unauthenticated scans; differential scanning to avoid noise",
+        "Map surfaces to OWASP Top 10 categories to focus manual testing",
+        "Treat scan results as triage: verify and prove impact, avoid false positives"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Exploitation fundamentals (OWASP Top 10)",
+      "content": [
+        "Broken access control, injection, insecure design/misconfig, vulnerable components, SSRF, authentication/session flaws",
+        "Prove exploitability with minimal, reversible actions; capture evidence responsibly",
+        "Always pair exploitation with remediation guidance"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Post‑exploitation: lateral movement & persistence",
+      "content": [
+        "From foothold to privilege escalation and pivoting across segments",
+        "Create minimal persistence only when RoE allows; clean up artifacts",
+        "Exercise detection/response playbooks"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Data exfiltration & DLP",
+      "content": [
+        "Identify sensitive data in motion/at rest; simulate exfiltration techniques safely",
+        "Test DLP controls and egress filtering; log quality and alert fidelity",
+        "Report business impact clearly (what data, how much, how fast)"
+      ]
     },
     {
       "type": "list",
@@ -19,11 +96,96 @@
       ]
     },
     {
+      "type": "list",
+      "heading": "Reporting & remediation workflow",
+      "content": [
+        "Structure: Finding → Evidence → Impact → Reproduction → Likelihood/Severity → Recommended fix",
+        "Map to CWE/OWASP/ATT&CK where relevant; include code references",
+        "Feed results to backlog with risk‑based prioritization (short‑term hotfix vs. design refactor)"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "AI/LLM‑specific threat model (overview)",
+      "content": [
+        "Prompt injection, jailbreaks and instruction‑hierarchy bypass",
+        "RAG‑specific: retrieval poisoning, context exfiltration, reference subversion",
+        "Tool/Plugin misuse: SSRF via tool calls, credential exposure, data‑plane to control‑plane escalation",
+        "Model/data supply‑chain: dataset poisoning, weight tampering, malicious adapters/LoRAs"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Defenses for AI apps",
+      "content": [
+        "Guardrails: output filtering, policy prompting, tool‑level allowlists and argument validation",
+        "Context hygiene: source signing, chunk provenance, allowlist index, semantic‑distance checks",
+        "Secret management: never inject real credentials to model context; broker tokens server‑side",
+        "Observability: prompt+tool traces, red‑flag heuristics, canary prompts, abuse signatures"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "OWASP Top 10 ↔ LLM failure modes (examples)",
+      "content": [
+        "A01 Broken Access Control → prompt‑controlled actions without server‑side authorization checks",
+        "A03 Injection → prompt injection / tool argument injection",
+        "A06 Vulnerable Components → model adapters/embedders with known vulns",
+        "A08 Software & Data Integrity → poisoned indexes/datasets; unsigned context sources"
+      ]
+    },
+    {
+      "type": "text",
+      "heading": "From findings to code & architecture",
+      "content": "Translate security outcomes into engineering work: add server‑side authorization, parameter schemas for tools, signed context envelopes for RAG, and end‑to‑end test cases to prevent regression. Track risk burn‑down over sprints."
+    },
+    {
       "type": "image",
       "heading": "Cybersecurity overview",
       "src": "/images/cybersecurity-101-diagram.png",
       "alt": "Cybersecurity signals diagram",
       "caption": "High‑level view of signals used by the Agent Security Monitor"
+    },
+    {
+      "type": "exercise",
+      "heading": "Lab 1 — Run Agent Security scan and interpret findings",
+      "description": "Use the Agent Security Monitor to run a scan on an AI agent. Identify the zero‑trust posture, integrity score and DLP findings; propose concrete fixes.",
+      "steps": [
+        "Open the Cybersecurity module and press Scan on an agent",
+        "Capture the Findings panel (zero‑trust, integrity, DLP)",
+        "Write 3 actionable remediations and re‑scan to measure improvement"
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Lab 2 — Prompt injection against a RAG stub",
+      "description": "Simulate a controlled prompt injection and confirm defenses.",
+      "steps": [
+        "Craft an injection that attempts to exfiltrate context or alter instructions",
+        "Observe whether allowlists, argument schemas or output filters stop the action",
+        "Document the gap and propose a deterministic server‑side fix"
+      ]
+    },
+    {
+      "type": "exercise",
+      "heading": "Lab 3 — DLP exfiltration test",
+      "description": "Test whether secrets/PII can leak via model outputs or tool results.",
+      "steps": [
+        "Seed a benign secret in a controlled data source",
+        "Attempt to coerce the model/tool into emitting it",
+        "Verify DLP detections and tune alert thresholds"
+      ]
+    },
+    {
+      "type": "text",
+      "heading": "References",
+      "content": "OWASP Top 10, MITRE ATT&CK, NIST frameworks, vendor hardening guides, and Red Team/penetration testing materials used in the Oslo seminar. Use these references to deepen each step above."
+    },
+    {
+      "type": "download",
+      "text": "Seminar deck (PDF): Defendable Red Team slides",
+      "href": "/docs/cyber/Defendable-Red-Team.pdf",
+      "label": "Open PDF"
     }
   ],
   "relatedModules": [
@@ -38,6 +200,87 @@
         "c": "Number of UI components"
       },
       "correct_answer": "b"
+    },
+    {
+      "question": "What is a key difference between Red Team and Penetration Testing?",
+      "options": {
+        "a": "PenTesting is always unscoped",
+        "b": "Red Team emulates realistic adversaries across the organization; PenTesting is a scoped assessment",
+        "c": "There is no difference"
+      },
+      "correct_answer": "b"
+    },
+    {
+      "question": "Which phase belongs to MITRE ATT&CK / a kill chain?",
+      "options": {
+        "a": "Recon → Initial access → Persistence → Lateral movement",
+        "b": "Design → Build → Ship",
+        "c": "Prompt → Completion → Tokenization"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "A good Rules of Engagement should include:",
+      "options": {
+        "a": "Time window, scope, escalation paths, data handling rules",
+        "b": "Only coffee breaks schedule",
+        "c": "No approvals needed"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Which OWASP Top 10 category best matches prompt/argument injection?",
+      "options": {
+        "a": "A03: Injection",
+        "b": "A09: Security Logging",
+        "c": "A02: Cryptographic Failures"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "A safe exploitation report should always include:",
+      "options": {
+        "a": "Evidence, impact, reproduction and a recommended fix",
+        "b": "Only memes",
+        "c": "Unverified assumptions"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Which is NOT an AI/LLM‑specific risk listed here?",
+      "options": {
+        "a": "Prompt injection and jailbreaks",
+        "b": "Dataset/model supply‑chain poisoning",
+        "c": "Faster CI builds"
+      },
+      "correct_answer": "c"
+    },
+    {
+      "question": "RAG hardening should include:",
+      "options": {
+        "a": "Signed/allowlisted context sources and provenance checks",
+        "b": "Blindly trusting every user upload",
+        "c": "Disabling logs"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "What is the main purpose of a DLP test?",
+      "options": {
+        "a": "Validate that sensitive data cannot be leaked via outputs or tools",
+        "b": "Speed up rendering",
+        "c": "Reduce GPU temperature"
+      },
+      "correct_answer": "a"
+    },
+    {
+      "question": "Which control is recommended for tools/plugins integrated with an LLM?",
+      "options": {
+        "a": "Argument schemas and allowlists verified server‑side",
+        "b": "Let the model decide any endpoint",
+        "c": "Hardcode credentials in prompts"
+      },
+      "correct_answer": "a"
     }
   ]
 }
