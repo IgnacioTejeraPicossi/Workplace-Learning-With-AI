@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import CyberDashboard from './CyberDashboard';
 import ThreatLibrary from './ThreatLibrary';
 import AgentSecurity from './AgentSecurity';
+import ToolsFrameworks from './ToolsFrameworks';
 
 export default function Cybersecurity() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -11,6 +12,7 @@ export default function Cybersecurity() {
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'agent-security', label: 'Agent Security', icon: '🤖' },
     { id: 'threats', label: 'Threat Library', icon: '🛡️' },
+    { id: 'tools', label: 'Tools & Frameworks', icon: '🧰' },
     { id: 'posture', label: 'Posture & Risk', icon: '📈' },
     { id: 'vulnerabilities', label: 'Vulnerabilities', icon: '🔍' },
     { id: 'coach', label: 'Secure Coding Coach', icon: '👨‍🏫' },
@@ -27,6 +29,8 @@ export default function Cybersecurity() {
         return <AgentSecurity />;
       case 'threats':
         return <ThreatLibrary />;
+      case 'tools':
+        return <ToolsFrameworks />;
       case 'posture':
         return (
           <div style={{ padding: '2rem', textAlign: 'center' }}>
