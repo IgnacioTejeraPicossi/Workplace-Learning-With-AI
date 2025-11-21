@@ -6475,3 +6475,124 @@ The payload format is identical for both n8n and OutSystems, making migration se
 
 ## 🎯 Core Learning Modules
 
+### 🔒 Cybersecurity – Tools & Frameworks (new tab)
+
+This tab centralizes quick utilities for OWASP Top 10 checks and MITRE ATT&CK mapping, acting as a lightweight companion for PenTesting/Red Team work.
+
+- Where: App → Cybersecurity → “Tools & Frameworks”
+- Purpose: Run a rapid OWASP assessment, keep per‑project presets, copy Jira‑ready summaries, browse ATT&CK tactics with SIEM detection ideas, and import ZAP/DAST report JSON to update the checklist.
+
+#### 1) OWASP Top 10 Checklist
+- Fields per item (A01–A10):
+  - Status: OK / Issue / N/A
+  - Severity: Low / Medium / High / Critical
+  - Comment: free text
+- Buttons:
+  - Save: persist table + notes locally (browser)
+  - Export: download JSON with checklist + notes
+  - Intruder OWASP Scanner (external resource) for deeper DAST checks  
+    Reference: [Intruder OWASP Top 10 Scanner](https://www.intruder.io/product/owasp-top-10-vulnerability-scanner?msclkid=2fa06fdde0d2149bbc0706c1f833a57e)
+- Notes area at the bottom for general remarks.
+
+#### 2) Project Presets & Jira Export
+- Project: label your current service (e.g., “my-api”).
+- Presets:
+  - Save Preset / Load Preset / Delete Preset (stored in localStorage by project name).
+- Jira settings (for reference in tickets): Jira Base URL + Project Key.
+- Copy Jira Markdown: copies a ready‑to‑paste Markdown summary of the current table (useful to open or update a ticket).
+
+#### 3) MITRE ATT&CK Mapper
+- Cards by tactic (Recon → Impact) with quick examples.
+- Suggested mapping to platform signals/controls (Agent Security Findings, Threat Library, KPIs).
+- Detection ideas for SIEM:
+  - Each tactic card includes an editable snippet and a “Copy snippet” button to take it into your SIEM or documentation.
+- Reference: [Microsoft – What is MITRE ATT&CK?](https://www.microsoft.com/en-us/security/business/security-101/what-is-mitre-attack-framework?msockid=3a414783f9e56a97347354e9f8106b4f)
+
+#### 4) ZAP/DAST Mini‑Lab
+- Goal: Populate the OWASP checklist automatically from a ZAP/DAST JSON report.
+- Steps:
+  1. Run a ZAP/DAST scan against a safe test endpoint (never production without explicit approval).
+  2. Export report to JSON.
+  3. Paste the JSON into the textarea and click “Parse into OWASP checklist”.
+- The parser marks issues heuristically on:
+  - A03 (Injection/XSS), A05 (Security Misconfig),
+  - A06 (Vulnerable/Outdated Components), A07 (Auth/Session),
+  - A08 (Integrity/Data), A10 (SSRF).
+- Review and adjust fields as needed, then Save/Export or Copy Jira Markdown.
+
+#### Recommended flow
+1. Select a Project or create a new one (Save Preset).
+2. If you have a ZAP/DAST report, use the Mini‑Lab to parse it into the checklist.
+3. Complete A01–A10 manually and add notes.
+4. Export JSON or Copy Jira Markdown to document remediation work.
+5. For deeper checks, use the Intruder OWASP Scanner and other DAST/SAST tools.
+
+> Note: The ZAP/DAST parser is heuristic and intended as a convenience. Always validate findings and severity manually before reporting or remediation.
+
+#### Examples
+
+Example: Jira Markdown (Copy/paste into a Jira issue)
+
+```markdown
+# OWASP Top 10 Checklist — Project: payments-service
+
+- **A01 Broken Access Control** — Status: OK, Severity: — 
+- **A02 Cryptographic Failures** — Status: N/A, Severity: — 
+- **A03 Injection** — Status: Issue, Severity: High — Found SQL injection vector in search endpoint
+- **A04 Insecure Design** — Status: OK, Severity: — 
+- **A05 Security Misconfiguration** — Status: Issue, Severity: Medium — Missing security headers on static assets
+- **A06 Vulnerable and Outdated Components** — Status: Issue, Severity: High — Outdated library with known CVE
+- **A07 Identification and Authentication Failures** — Status: Issue, Severity: High — Session fixation risk detected
+- **A08 Software and Data Integrity Failures** — Status: Issue, Severity: High — Integrity tamper risk in update pipeline
+- **A09 Security Logging and Monitoring Failures** — Status: OK, Severity: — 
+- **A10 Server-Side Request Forgery (SSRF)** — Status: Issue, Severity: Critical — SSRF vector via image fetch
+
+## General Notes
+ZAP quick scan completed on staging. Prioritize A03/A06/A07/A10. Follow-up with targeted tests and code review.
+```
+
+Example: ZAP/DAST JSON snippet (paste in the Mini‑Lab to trigger parsing)
+
+```json
+{
+  "site": [
+    {
+      "name": "https://staging.example.com",
+      "alerts": [
+        {
+          "name": "SQL Injection",
+          "riskdesc": "High (High)",
+          "evidence": "parameter 'q' vulnerable to sql injection; possible xss in results rendering"
+        },
+        {
+          "name": "Security Misconfiguration",
+          "riskdesc": "Medium (Medium)",
+          "desc": "configuration missing security headers"
+        },
+        {
+          "name": "Vulnerable Component: Outdated Library",
+          "riskdesc": "High (High)",
+          "desc": "outdated library vulnerable component detected"
+        },
+        {
+          "name": "Authentication / Session Management",
+          "riskdesc": "High (High)",
+          "desc": "authentication weakness; session fixation possible"
+        },
+        {
+          "name": "Data Integrity",
+          "riskdesc": "High (High)",
+          "desc": "integrity check disabled; possible tamper in pipeline"
+        },
+        {
+          "name": "Server-Side Request Forgery",
+          "riskdesc": "Critical (Critical)",
+          "desc": "ssrf via image fetch endpoint"
+        }
+      ]
+    }
+  ],
+  "generated": "2025-11-21T10:00:00Z"
+}
+```
+

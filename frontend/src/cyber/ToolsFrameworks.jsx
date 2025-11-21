@@ -31,14 +31,27 @@ const TACTICS = [
 
 export default function ToolsFrameworks() {
   const storageKey = 'owasp_checklist_v1';
+  const presetsKey = 'owasp_checklist_presets_v1';
+  const settingsKey = 'owasp_tools_settings_v1';
   const [checklist, setChecklist] = useState({});
   const [notes, setNotes] = useState('');
+  const [project, setProject] = useState('default');
+  const [presets, setPresets] = useState({});
+  const [settings, setSettings] = useState({ jiraUrl: '', projectKey: '' });
 
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
       setChecklist(saved.items || {});
       setNotes(saved.notes || '');
+    } catch {}
+    try {
+      const p = JSON.parse(localStorage.getItem(presetsKey) || '{}');
+      setPresets(p);
+    } catch {}
+    try {
+      const s = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+      setSettings({ jiraUrl: s.jiraUrl || '', projectKey: s.projectKey || '' });
     } catch {}
   }, []);
 
@@ -61,6 +74,49 @@ export default function ToolsFrameworks() {
     setChecklist((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), [field]: value } }));
   };
 
+  const savePreset = () => {
+    const p = { ...(presets || {}) };
+    p[project || 'default'] = { items: checklist, notes, ts: new Date().toISOString() };
+    setPresets(p);
+    localStorage.setItem(presetsKey, JSON.stringify(p));
+    alert('Preset saved.');
+  };
+
+  const loadPreset = () => {
+    const p = (presets || {})[project || 'default'];
+    if (!p) return alert('No preset found for this project.');
+    setChecklist(p.items || {});
+    setNotes(p.notes || '');
+  };
+
+  const deletePreset = () => {
+    const p = { ...(presets || {}) };
+    delete p[project || 'default'];
+    setPresets(p);
+    localStorage.setItem(presetsKey, JSON.stringify(p));
+  };
+
+  const copyJiraMarkdown = () => {
+    const lines = [];
+    lines.push(`# OWASP Top 10 Checklist — Project: ${project || 'default'}`);
+    lines.push('');
+    OWASP_ITEMS.forEach((i) => {
+      const r = checklist[i.id] || {};
+      lines.push(`- **${i.id} ${i.name}** — Status: ${r.status || '—'}, Severity: ${r.severity || '—'}${r.comment ? ` — ${r.comment}` : ''}`);
+    });
+    if (notes) {
+      lines.push('');
+      lines.push('## General Notes');
+      lines.push(notes);
+    }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Copied Jira Markdown.'));
+  };
+
+  const saveSettings = () => {
+    localStorage.setItem(settingsKey, JSON.stringify(settings));
+    alert('Settings saved.');
+  };
+
   return (
     <div style={{ padding: '1.5rem' }}>
       <div style={{ marginBottom: 24 }}>
@@ -68,6 +124,34 @@ export default function ToolsFrameworks() {
         <p style={{ color: '#6b7280', marginTop: 6 }}>
           Quick utilities for OWASP Top 10 checks and MITRE ATT&CK mapping. Use this as a lightweight companion to PenTesting/Red Team activities.
         </p>
+      </div>
+
+      {/* Project Presets + Jira Settings */}
+      <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h3 style={{ margin: 0, color: '#111827' }}>Project Presets & Jira Export</h3>
+        </div>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+          <div>
+            <label style={{ display: 'block', color: '#6b7280' }}>Project</label>
+            <input value={project} onChange={(e)=>setProject(e.target.value)} placeholder="my-service" />
+          </div>
+          <div>
+            <label style={{ display: 'block', color: '#6b7280' }}>Jira Base URL</label>
+            <input value={settings.jiraUrl} onChange={(e)=>setSettings(s=>({ ...s, jiraUrl: e.target.value }))} placeholder="https://jira.example.com" />
+          </div>
+          <div>
+            <label style={{ display: 'block', color: '#6b7280' }}>Jira Project Key</label>
+            <input value={settings.projectKey} onChange={(e)=>setSettings(s=>({ ...s, projectKey: e.target.value }))} placeholder="SEC" />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button onClick={savePreset} style={btn}>💾 Save Preset</button>
+          <button onClick={loadPreset} style={btn}>📥 Load Preset</button>
+          <button onClick={deletePreset} style={btn}>🗑️ Delete Preset</button>
+          <button onClick={saveSettings} style={btn}>⚙️ Save Settings</button>
+          <button onClick={copyJiraMarkdown} style={btn}>📋 Copy Jira Markdown</button>
+        </div>
       </div>
 
       {/* OWASP Checklist */}
@@ -157,8 +241,44 @@ export default function ToolsFrameworks() {
                   <li>Dashboard KPIs: risk score, patch latency, vuln counts</li>
                 </ul>
               </div>
+              <div style={{ marginTop: 8 }}>
+                <label style={{ display: 'block', color: '#6b7280', marginBottom: 4 }}>SIEM Detection idea</label>
+                <textarea rows={3} style={{ width: '100%' }} defaultValue={`rule: ${t.name} suspected\nwhen:\n  - abnormal_auth\n  - rare_process_tree\nnotes: Map to ATT&CK ${t.id}\n`} />
+              </div>
+              <div style={{ marginTop: 6 }}>
+                <button onClick={(e)=>navigator.clipboard.writeText(e.currentTarget.parentElement.querySelector('textarea').value)} style={btn}>📋 Copy snippet</button>
+              </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ZAP/DAST Mini Lab */}
+      <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, marginTop: 20 }}>
+        <h3 style={{ marginTop: 0 }}>ZAP/DAST Mini‑Lab</h3>
+        <ol style={{ marginTop: 6 }}>
+          <li>Run a local ZAP/DAST scan against a test endpoint (never production without approval).</li>
+          <li>Export the report as JSON.</li>
+          <li>Paste the JSON below and press “Parse into OWASP checklist”.</li>
+        </ol>
+        <textarea id="zap-json" rows={6} placeholder="Paste ZAP/DAST JSON report..." style={{ width: '100%', marginTop: 8 }} />
+        <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+          <button onClick={()=>{
+            try {
+              const raw = document.getElementById('zap-json').value || '';
+              const txt = raw.toLowerCase();
+              const touch = (id, sev='medium') => setChecklist(prev => ({ ...prev, [id]: { ...(prev[id]||{}), status: 'issue', severity: sev } }));
+              if (txt.includes('sql') || txt.includes('injection') || txt.includes('xss')) touch('A03','high');
+              if (txt.includes('misconfig') || txt.includes('configuration')) touch('A05','medium');
+              if (txt.includes('outdated') || txt.includes('vulnerable component')) touch('A06','high');
+              if (txt.includes('authentication') || txt.includes('session')) touch('A07','high');
+              if (txt.includes('integrity') || txt.includes('tamper')) touch('A08','high');
+              if (txt.includes('ssrf')) touch('A10','critical');
+              alert('Checklist updated from report.');
+            } catch {
+              alert('Could not parse report.');
+            }
+          }} style={btn}>🧪 Parse into OWASP checklist</button>
         </div>
       </div>
     </div>
@@ -167,5 +287,6 @@ export default function ToolsFrameworks() {
 
 const th = { textAlign: 'left', padding: '8px', borderBottom: '1px solid #e5e7eb', color: '#6b7280', fontSize: '0.85em' };
 const td = { padding: '8px', borderBottom: '1px solid #f3f4f6' };
+const btn = { background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb', cursor: 'pointer' };
 
 
