@@ -984,51 +984,22 @@ const RunTest = () => {
             </div>
           )}
 
-          {/* Test Coverage Section */}
+          {/* Test Coverage Section (real E2E only) */}
           <div style={{ marginTop: '24px', background: colors.primaryLight, padding: '16px', borderRadius: '8px' }}>
-            <h3 style={{ color: colors.text, marginTop: 0 }}>Test Coverage</h3>
+            <h3 style={{ color: colors.text, marginTop: 0 }}>Test Coverage (Cypress E2E)</h3>
             <ul style={{ color: colors.textSecondary, margin: 0, paddingLeft: '20px' }}>
-              <li>All sidebar navigation options</li>
-              <li>Panel content loading verification</li>
-              <li>Global search functionality</li>
-              <li>Theme toggle functionality</li>
-              <li>Responsive design testing</li>
-              <li>Authentication flow verification</li>
-              <li>Sidebar navigation works for all modules</li>
-              <li>AI Study Buddy: Chat interface and streaming responses work correctly</li>
-              <li>Presentation Agent: Generate Script functionality and display works correctly</li>
-              <li>AI Training Module: Interactive lessons, quizzes, certifications, and learning paths work correctly</li>
-              <li>Idea Log: Filtering, tagging, and delete work as expected</li>
-              <li>Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected</li>
-              <li>API endpoints: Root, concepts, micro-lessons, intent classification, admin endpoints, scaffold generation, route, LLM streaming, video features</li>
-              
-              {/* NEW: Enhanced Test Coverage */}
-              <li><strong>Babel Library:</strong> Resource loading, intelligent navigation, delete functionality, search/filtering, resource categorization</li>
-              <li><strong>ItemAI API:</strong> Local LM Studio connection, model listing, completion generation, fallback mechanisms</li>
-              <li><strong>Navigation Intelligence:</strong> Custom events, localStorage management, auto-expand, cross-module editing</li>
-              <li><strong>MongoDB Integration:</strong> Skills Forecast, Web Search, Simulations, Career Coach, Micro-lessons, Video Lessons, Certifications CRUD operations</li>
-              <li><strong>Skills Forecast Module:</strong> AI predictions, MongoDB integration, navigation from Library, CRUD operations, UI preservation</li>
-              <li><strong>Enhanced Modules:</strong> Web Search, Simulations, Micro-lessons, Video Lessons, Certifications, AI Career Coach with MongoDB and navigation intelligence</li>
-              <li><strong>Knowledge Map:</strong> Dynamic topic extraction, categorization, MongoDB integration</li>
-              <li><strong>Document Analyzer:</strong> File upload (PDF, DOCX, TXT), document analysis, MongoDB persistence, sub-module navigation, Learning Document and Agentic RAG Documents functionality</li>
-              <li><strong>AgentOps Studio:</strong> Digital Planning (plan, safety-check, simulate, judge, execute), Prompt Lab (LM Studio integration), Playbooks (CRUD operations), Flow Catalog (n8n integration), Runs Monitor (execution tracking), Settings (global configuration)</li>
-              <li><strong>API Endpoints:</strong> ItemAI API (POST methods), Skills Forecast (GET/POST/DELETE), MongoDB collections (GET), Knowledge Map topics, Document Analyzer (GET/POST/DELETE), AgentOps Studio (Digital, Prompt, Playbooks, Flows, Runs, Settings)</li>
-              
-              {/* NEW: Recently Added API Endpoints */}
-              <li><strong>AI Compliance Agent:</strong> Document analysis using Document Analyzer endpoints, compliance checking, analysis retrieval</li>
-              <li><strong>AI Productivity Agent:</strong> Agentic RAG integration, productivity analysis, intelligent question answering</li>
-              <li><strong>MongoDB Authentication:</strong> User registration, login, refresh tokens, email verification, password reset, JWT token management</li>
-              <li><strong>Enhanced Team Dynamics:</strong> Team CRUD operations, member management, analytics generation, team performance tracking</li>
-              <li><strong>Enhanced Micro-lessons:</strong> Lesson creation, management, CRUD operations with MongoDB integration</li>
-              <li><strong>Enhanced Career Coach:</strong> Coaching sessions, user session management, AI-powered career advice</li>
-              <li><strong>Enhanced Skills Forecast:</strong> AI predictions, user-specific forecasts, MongoDB persistence</li>
-              <li><strong>Enhanced Certifications:</strong> Profile management, recommendations, study plans, simulation testing</li>
-              <li><strong>Enhanced LLM Streaming:</strong> Real-time AI responses, streaming with authentication, LM Studio integration</li>
-              <li><strong>Enhanced Video Features:</strong> Quiz generation, summary creation, video analysis</li>
-              <li><strong>Enhanced Simulation:</strong> Interactive simulations, step-by-step guidance, recommendation engine</li>
-              <li><strong>Enhanced Web Search:</strong> Intelligent search, result processing, MongoDB integration</li>
-              <li><strong>Enhanced Concepts:</strong> AI-generated concepts, knowledge extraction, learning material creation</li>
-              <li><strong>Enhanced Route:</strong> Intelligent routing, intent classification, dynamic endpoint selection</li>
+              <li>Sidebar navigation and module routing</li>
+              <li>Help › Agent Theory & Documentation (Overview card → Theory)</li>
+              <li>Cybersecurity › Tools & Frameworks (OWASP checklist, presets, ZAP parser)</li>
+              <li>Cybersecurity › Agent Security (Scan flow, Findings modal)</li>
+              <li>AI Learning & Training (open lesson, navigate sections, complete quiz, progress saved)</li>
+              <li>Micro-lessons (modal open/close)</li>
+              <li>API Config (switch provider, save keys)</li>
+              <li>Babel Library (tabs, Advanced Search)</li>
+              <li>Skills Forecast (input enables forecast, clear)</li>
+              <li>Certifications (tab navigation)</li>
+              <li>Team Dynamics (header + auth banner)</li>
+              <li>Web Search (query submit, results container)</li>
             </ul>
           </div>
 
