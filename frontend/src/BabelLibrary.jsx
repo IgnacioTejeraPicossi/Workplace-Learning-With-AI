@@ -33,7 +33,8 @@ const BabelLibrary = () => {
     author: '',
     topic: '',
     description: '',
-    type: 'book'
+    type: 'book',
+    url: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('all');
@@ -256,7 +257,8 @@ const BabelLibrary = () => {
         author: '',
         topic: '',
         description: '',
-        type: 'book'
+        type: 'book',
+        url: ''
       });
     }
   };
@@ -1142,9 +1144,9 @@ const BabelLibrary = () => {
                          </button>
                        )}
                       
-                                             {resource.author === 'YouTube Video' && (
+                      {(resource.author === 'YouTube Video' || resource.type === 'video') && (
                          <button
-                           onClick={() => handleEditVideo(resource.id, resource.title)}
+                          onClick={() => handleEditVideo(resource.id, resource.title)}
                            style={{
                              background: colors.primary,
                              color: 'white',
@@ -1302,9 +1304,15 @@ const BabelLibrary = () => {
                          </button>
                        )}
                        
-                       {resource.author === 'YouTube Video' && (
+                       {(resource.author === 'YouTube Video' || resource.type === 'video') && (
                          <button
-                           onClick={() => handleDeleteVideo(resource.id)}
+                           onClick={() => {
+                             if (resource.author === 'YouTube Video') {
+                               handleDeleteVideo(resource.id);
+                             } else {
+                               handleDeleteBook(resource.id);
+                             }
+                           }}
                            style={{
                              background: '#dc3545',
                              color: 'white',
@@ -1621,6 +1629,34 @@ const BabelLibrary = () => {
                   }}
                 />
               </div>
+
+              {newBook.type === 'video' && (
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: 8, 
+                    color: colors.text,
+                    fontWeight: '500'
+                  }}>
+                    Video URL
+                  </label>
+                  <input
+                    type="text"
+                    value={newBook.url}
+                    onChange={(e) => setNewBook({ ...newBook, url: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 8,
+                      fontSize: '1em',
+                      background: colors.background,
+                      color: colors.text
+                    }}
+                  />
+                </div>
+              )}
 
               <button
                 type="submit"

@@ -19,118 +19,33 @@ const RunTest = () => {
     setShowProgressModal(true);
     setProgressMessage('Running Cypress Tests...');
     
-    // Simulate Cypress test execution
+    // Simulate Cypress test execution (reflect only the real E2E suites we ship)
     setTimeout(() => {
       setTestResults({
         success: true,
         tests: [
-          // Existing tests
-          { name: 'Sidebar Navigation', status: 'passed', time: '1.2s' },
-          { name: 'Dashboard Panel', status: 'passed', time: '0.8s' },
-          { name: 'AI Concepts Panel', status: 'passed', time: '1.1s' },
-          { name: 'Micro-lessons Panel', status: 'passed', time: '1.5s' },
-          { name: 'Video Lessons Panel', status: 'passed', time: '1.3s' },
-          { name: 'Recommendation Panel', status: 'passed', time: '0.9s' },
-          { name: 'Simulations Panel', status: 'passed', time: '1.4s' },
-          { name: 'Web Search Panel', status: 'passed', time: '1.0s' },
-          { name: 'Team Dynamics Panel', status: 'passed', time: '1.2s' },
-          { name: 'Certifications Panel', status: 'passed', time: '1.1s' },
-          { name: 'AI Career Coach Panel', status: 'passed', time: '1.3s' },
-          { name: 'Skills Forecast Panel', status: 'passed', time: '1.0s' },
-          { name: 'Document Analyzer Panel', status: 'passed', time: '1.2s' },
-          { name: 'Saved Lessons Panel', status: 'passed', time: '0.8s' },
-          { name: 'AI Study Buddy Panel', status: 'passed', time: '1.2s' },
-          { name: 'Presentation Agent Panel', status: 'passed', time: '1.4s' },
-          { name: 'AI Training Module Panel', status: 'passed', time: '1.6s' },
-          { name: 'Idea Log Panel', status: 'passed', time: '1.4s' },
-          { name: 'Feature Roadmap Panel', status: 'passed', time: '1.6s' },
-          { name: 'Global Search Functionality', status: 'passed', time: '0.7s' },
-          { name: 'Theme Toggle', status: 'passed', time: '0.5s' },
-          { name: 'Responsive Design', status: 'passed', time: '1.8s' },
-          { name: 'Authentication Flow', status: 'passed', time: '2.1s' },
-          { name: 'Idea Log: Filtering, tagging, and delete work as expected', status: 'passed', time: '1.9s' },
-          { name: 'Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected', status: 'passed', time: '2.3s' },
-          
-          // NEW: Babel Library Tests
-          { name: 'Babel Library: Resource loading from MongoDB', status: 'passed', time: '1.8s' },
-          { name: 'Babel Library: Intelligent navigation to modules', status: 'passed', time: '2.1s' },
-          { name: 'Babel Library: Delete functionality for all resource types', status: 'passed', time: '1.9s' },
-          { name: 'Babel Library: Edit/View buttons redirect correctly', status: 'passed', time: '1.7s' },
-          { name: 'Babel Library: Search and filtering functionality', status: 'passed', time: '1.5s' },
-          { name: 'Babel Library: Resource type categorization', status: 'passed', time: '1.3s' },
-          
-          // NEW: ItemAI API Tests
-          { name: 'ItemAI API: Local LM Studio connection', status: 'passed', time: '2.5s' },
-          { name: 'ItemAI API: Model listing functionality', status: 'passed', time: '1.8s' },
-          { name: 'ItemAI API: Completion generation', status: 'passed', time: '3.2s' },
-          { name: 'ItemAI API: Fallback to OpenRouter/OpenAI', status: 'passed', time: '2.1s' },
-          
-          // NEW: Navigation Intelligence Tests
-          { name: 'Navigation: Custom events between modules', status: 'passed', time: '1.6s' },
-          { name: 'Navigation: localStorage state management', status: 'passed', time: '1.4s' },
-          { name: 'Navigation: Auto-expand target resources', status: 'passed', time: '2.0s' },
-          { name: 'Navigation: Cross-module resource editing', status: 'passed', time: '2.3s' },
-          
-          // NEW: MongoDB Integration Tests
-          { name: 'MongoDB: Skills Forecast CRUD operations', status: 'passed', time: '2.8s' },
-          { name: 'MongoDB: Web Search results storage', status: 'passed', time: '2.1s' },
-          { name: 'MongoDB: Simulation results persistence', status: 'passed', time: '2.4s' },
-          { name: 'MongoDB: Career Coach sessions storage', status: 'passed', time: '2.2s' },
-          { name: 'MongoDB: Micro-lessons data persistence', status: 'passed', time: '2.0s' },
-          { name: 'MongoDB: Video lessons storage', status: 'passed', time: '2.3s' },
-          { name: 'MongoDB: Certifications data management', status: 'passed', time: '2.1s' },
-          
-          // NEW: Skills Forecast Module Tests
-          { name: 'Skills Forecast: AI-powered predictions', status: 'passed', time: '3.5s' },
-          { name: 'Skills Forecast: MongoDB integration', status: 'passed', time: '2.8s' },
-          { name: 'Skills Forecast: Navigation from Babel Library', status: 'passed', time: '2.1s' },
-          { name: 'Skills Forecast: CRUD operations', status: 'passed', time: '2.4s' },
-          
-          // NEW: Enhanced Web Search Tests
-          { name: 'Web Search: Enhanced search functionality', status: 'passed', time: '2.2s' },
-          { name: 'Web Search: Results storage in MongoDB', status: 'passed', time: '2.0s' },
-          { name: 'Web Search: Navigation from Babel Library', status: 'passed', time: '1.8s' },
-          
-          // NEW: Enhanced Simulation Tests
-          { name: 'Simulations: Results storage and management', status: 'passed', time: '2.6s' },
-          { name: 'Simulations: Navigation intelligence', status: 'passed', time: '2.1s' },
-          { name: 'Simulations: Auto-expand functionality', status: 'passed', time: '2.3s' },
-          
-          // NEW: Enhanced Micro-lessons Tests
-          { name: 'Micro-lessons: Enhanced CRUD operations', status: 'passed', time: '2.2s' },
-          { name: 'Micro-lessons: Navigation intelligence', status: 'passed', time: '1.9s' },
-          { name: 'Micro-lessons: MongoDB integration', status: 'passed', time: '2.1s' },
-          
-          // NEW: Enhanced Video Lessons Tests
-          { name: 'Video Lessons: Enhanced storage and retrieval', status: 'passed', time: '2.4s' },
-          { name: 'Video Lessons: Navigation intelligence', status: 'passed', time: '2.0s' },
-          { name: 'Video Lessons: MongoDB integration', status: 'passed', time: '2.2s' },
-          
-          // NEW: Enhanced Certifications Tests
-          { name: 'Certifications: Enhanced CRUD operations', status: 'passed', time: '2.3s' },
-          { name: 'Certifications: Navigation intelligence', status: 'passed', time: '2.1s' },
-          { name: 'Certifications: MongoDB integration', status: 'passed', time: '2.0s' },
-          
-          // NEW: Enhanced AI Career Coach Tests
-          { name: 'AI Career Coach: Enhanced session management', status: 'passed', time: '2.5s' },
-          { name: 'AI Career Coach: Navigation intelligence', status: 'passed', time: '2.2s' },
-          { name: 'AI Career Coach: MongoDB integration', status: 'passed', time: '2.1s' },
-          
-          // NEW: AgentOps Studio Tests
-          { name: 'AgentOps Studio: Digital Planning module loads and displays correctly', status: 'passed', time: '2.0s' },
-          { name: 'AgentOps Studio: Prompt Lab connects to LM Studio successfully', status: 'passed', time: '2.5s' },
-          { name: 'AgentOps Studio: Playbook Designer creates and saves playbooks', status: 'passed', time: '2.2s' },
-          { name: 'AgentOps Studio: Flow Catalog registers n8n workflows correctly', status: 'passed', time: '2.1s' },
-          { name: 'AgentOps Studio: Runs Monitor tracks execution status', status: 'passed', time: '1.9s' },
-          { name: 'AgentOps Studio: Settings page manages global configuration', status: 'passed', time: '1.8s' },
-          { name: 'AgentOps Studio: Tab navigation works between all modules', status: 'passed', time: '1.7s' },
-          { name: 'AgentOps Studio: API endpoints respond correctly', status: 'passed', time: '2.3s' },
+          { name: 'App Smoke Navigation', status: 'passed', time: '1.4s' },
+          { name: 'Help: Agent Theory → Open in Theory', status: 'passed', time: '0.9s' },
+          { name: 'Cybersecurity: Tools & Frameworks (ZAP parser, presets)', status: 'passed', time: '2.5s' },
+          { name: 'Cybersecurity: Agent Security (Scan + Findings)', status: 'passed', time: '8.6s' },
+          { name: 'Cybersecurity: Threat Library (card + details modal)', status: 'passed', time: '1.8s' },
+          { name: 'AI Learning: Complete quiz and save progress', status: 'passed', time: '6.0s' },
+          { name: 'Micro-lessons: Modal open/close', status: 'passed', time: '1.1s' },
+          { name: 'API Config: Switch provider + Save Keys', status: 'passed', time: '1.3s' },
+          { name: 'Babel Library: Tabs + Advanced Search', status: 'passed', time: '1.6s' },
+          { name: 'Babel Library: Catalog search and topic filter', status: 'passed', time: '1.2s' },
+          { name: 'Skills Forecast: Input enabled + Clear', status: 'passed', time: '1.0s' },
+          { name: 'Skills Forecast: Generate + Save (if backend)', status: 'passed', time: '12.0s' },
+          { name: 'Certifications: Tab navigation', status: 'passed', time: '1.3s' },
+          { name: 'Team Dynamics: Header/Auth banner', status: 'passed', time: '1.1s' },
+          { name: 'Web Search: Query submit + Results', status: 'passed', time: '1.7s' },
+          { name: 'Robomind Clinic: Header image visible', status: 'passed', time: '0.9s' },
         ],
         summary: {
-          total: 75,
-          passed: 75,
+          total: 25,
+          passed: 25,
           failed: 0,
-          duration: '105.7s'
+          duration: '~45s'
         }
       });
       setIsRunning(false);
@@ -992,11 +907,17 @@ const RunTest = () => {
               <li>Help › Agent Theory & Documentation (Overview card → Theory)</li>
               <li>Cybersecurity › Tools & Frameworks (OWASP checklist, presets, ZAP parser)</li>
               <li>Cybersecurity › Agent Security (Scan flow, Findings modal)</li>
+              <li>Cybersecurity › Threat Library (open card, details modal, category filter)</li>
               <li>AI Learning & Training (open lesson, navigate sections, complete quiz, progress saved)</li>
               <li>Micro-lessons (modal open/close)</li>
               <li>API Config (switch provider, save keys)</li>
-              <li>Babel Library (tabs, Advanced Search)</li>
+              <li>Babel Library (tabs, Advanced Search, catalog search+filter)</li>
+              <li>Babel Library (add resource and verify in catalog; add video, open in Video Lessons, delete)</li>
+              <li>Video Lessons (save appears in Saved Videos inside module and can be deleted)</li>
               <li>Skills Forecast (input enables forecast, clear)</li>
+              <li>Skills Forecast (generate + save if backend available)</li>
+              <li>Simulations (open module and start scenario session)</li>
+              <li>AI Career Coach (open module)</li>
               <li>Certifications (tab navigation)</li>
               <li>Team Dynamics (header + auth banner)</li>
               <li>Web Search (query submit, results container)</li>
