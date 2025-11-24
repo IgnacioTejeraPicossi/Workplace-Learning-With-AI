@@ -42,8 +42,8 @@ const RunTest = () => {
           { name: 'Robomind Clinic: Header image visible', status: 'passed', time: '0.9s' },
         ],
         summary: {
-          total: 25,
-          passed: 25,
+          total: 27,
+          passed: 27,
           failed: 0,
           duration: '~45s'
         }
@@ -918,6 +918,8 @@ const RunTest = () => {
               <li>Skills Forecast (generate + save if backend available)</li>
               <li>Simulations (open module and start scenario session)</li>
               <li>AI Career Coach (open module)</li>
+              <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
+              <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
               <li>Certifications (tab navigation)</li>
               <li>Team Dynamics (header + auth banner)</li>
               <li>Web Search (query submit, results container)</li>
