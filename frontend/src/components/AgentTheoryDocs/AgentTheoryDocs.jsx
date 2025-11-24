@@ -125,6 +125,29 @@ const AgentTheoryDocs = () => {
                 keyInsight: "For technical discussions, emphasize multi‑agent systems where agents collaborate with/without central orchestration"
               }
             },
+            { 
+              title: "10 Core Agent Types (Poster + Guide)",
+              description: "From reactive to multi‑agent systems — a concise map of agent families with roles and behaviors",
+              status: "ready",
+              content: {
+                type: "article",
+                author: "Agent Theory",
+                imageUrl: "/agent-theory/agent-types-10.png",
+                keyPoints: [
+                  "Task‑Specific Agent — single focused workflow (e.g., summarize/translate). Fixed process; no learning.",
+                  "Reactive Agent — responds to immediate input; stateless/reflex behavior; no planning.",
+                  "Model‑Based Agent — builds internal world model; simulates outcomes before acting.",
+                  "Goal‑Based Agent — starts from a goal and plans steps backwards to achieve it.",
+                  "Utility‑Based Agent — evaluates options and chooses the action with maximum expected value.",
+                  "Learning Agent — improves over time using feedback; updates policy/strategy and memory.",
+                  "Planning Agent — long‑horizon strategy; defines milestones and adapts along the way.",
+                  "Reflex Agent with Memory — rule‑based but with episodic memory to handle recurring contexts.",
+                  "Multi‑Agent System — multiple agents coordinate/compete; roles, negotiation, shared env.",
+                  "Rational Agent — selects the most logical action under its model/utility and constraints."
+                ],
+                advice: "Use this taxonomy to pick the simplest agent that solves the problem; evolve towards planning/learning or multi‑agent only when necessary."
+              }
+            },
             { title: "Agent Architectures", description: "Different architectural patterns", status: "pending" },
             { title: "Multi-Agent Systems", description: "Coordination and communication", status: "pending" }
           ]
@@ -815,6 +838,31 @@ const AgentTheoryDocs = () => {
           <li>🔬 Research papers and studies</li>
         </ul>
         <p><strong>Ready to add your content!</strong> Share your documentation and I'll organize it here.</p>
+      </div>
+
+      {/* Featured: 10 Core Agent Types */}
+      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+        <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 14, background: 'white', display: 'flex', gap: 12 }}>
+          <img src="/agent-theory/agent-types-10.png" alt="10 Core Agent Types" style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>10 Core Agent Types (Poster + Guide)</div>
+            <div style={{ color: '#6b7280', fontSize: '0.95em', marginBottom: 8 }}>From reactive to multi‑agent systems — concise map of agent families with roles and behaviors.</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => {
+                  setActiveTab('theory');
+                  setTimeout(() => {
+                    const el = document.getElementById('theory-10-core-agent-types-poster-guide');
+                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('search-hit'); setTimeout(()=>el.classList.remove('search-hit'),1200); }
+                  }, 50);
+                }}
+                style={{ background: '#2563eb', color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
+              >
+                Open in Theory
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
