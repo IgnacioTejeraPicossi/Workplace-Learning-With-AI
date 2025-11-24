@@ -860,6 +860,13 @@ const AgentTheoryDocs = () => {
               >
                 Open in Theory
               </button>
+              <a
+                href="/agent-theory/agent-types-10.png"
+                download="agent-types-10.png"
+                style={{ background: '#111827', color: 'white', textDecoration: 'none', padding: '6px 10px', borderRadius: 6 }}
+              >
+                Download poster
+              </a>
             </div>
           </div>
         </div>
