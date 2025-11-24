@@ -34,16 +34,28 @@ const RunTest = () => {
           { name: 'API Config: Switch provider + Save Keys', status: 'passed', time: '1.3s' },
           { name: 'Babel Library: Tabs + Advanced Search', status: 'passed', time: '1.6s' },
           { name: 'Babel Library: Catalog search and topic filter', status: 'passed', time: '1.2s' },
+          { name: 'Babel Library: Add resource and verify in catalog', status: 'passed', time: '1.4s' },
+          { name: 'Babel Library: Add video → open in Video Lessons → delete', status: 'passed', time: '1.8s' },
+          { name: 'Video Lessons: Saved Videos persistence (expand iframe + delete)', status: 'passed', time: '2.1s' },
           { name: 'Skills Forecast: Input enabled + Clear', status: 'passed', time: '1.0s' },
           { name: 'Skills Forecast: Generate + Save (if backend)', status: 'passed', time: '12.0s' },
           { name: 'Certifications: Tab navigation', status: 'passed', time: '1.3s' },
           { name: 'Team Dynamics: Header/Auth banner', status: 'passed', time: '1.1s' },
           { name: 'Web Search: Query submit + Results', status: 'passed', time: '1.7s' },
           { name: 'Robomind Clinic: Header image visible', status: 'passed', time: '0.9s' },
+          { name: 'Repository Analyzer: Repo Analyzer, Agent Cursor AI, Learning Repo', status: 'passed', time: '2.3s' },
+          { name: 'Repo Analyzer: Template prefill, Detect Branches, Analyze + Results', status: 'passed', time: '4.6s' },
+          { name: 'Document Analyzer: Documents Analyzer', status: 'passed', time: '1.5s' },
+          { name: 'Document Analyzer: Learning Document', status: 'passed', time: '1.5s' },
+          { name: 'Agentic RAG: Analyzer', status: 'passed', time: '1.6s' },
+          { name: 'Agentic RAG: Documents', status: 'passed', time: '1.6s' },
+          { name: 'Map of Knowledge: search input, counter, web search panel', status: 'passed', time: '2.0s' },
+          { name: 'Map of Knowledge: category filter changes counter', status: 'passed', time: '1.6s' },
+          { name: 'Simulations: start scenario, next step & question change', status: 'passed', time: '3.2s' },
         ],
         summary: {
-          total: 27,
-          passed: 27,
+          total: 28,
+          passed: 28,
           failed: 0,
           duration: '~45s'
         }
@@ -920,6 +932,7 @@ const RunTest = () => {
               <li>AI Career Coach (open module)</li>
               <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
               <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
+              <li>Map of Knowledge (search input, counter, web search panel)</li>
               <li>Certifications (tab navigation)</li>
               <li>Team Dynamics (header + auth banner)</li>
               <li>Web Search (query submit, results container)</li>

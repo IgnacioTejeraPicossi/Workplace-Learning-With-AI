@@ -48,6 +48,33 @@ describe('Repository Analyzer - Submodules', () => {
         cy.contains('button', 'Analyze Repository').click();
         // If backend processes analysis, this section should appear; if not, test won't fail as we allow generous timeout and optional check
         cy.contains('Analysis Results', { timeout: 20000 }).should('exist');
+        // Optional field assertions when present
+        cy.contains('Repository Information').parent().within(() => {
+          cy.contains('Branch:').then($el => {
+            if ($el && $el.length) {
+              cy.wrap($el).next().should('exist');
+            }
+          });
+          cy.contains('Files Analyzed:').then($el => {
+            if ($el && $el.length) {
+              cy.wrap($el).next().should('exist');
+            }
+          });
+          cy.contains('Quality Score:').then($el => {
+            if ($el && $el.length) {
+              cy.wrap($el).parent().invoke('text').then((text) => {
+                // Expect something like "Quality Score: 85%" (percentage)
+                const pct = /Quality\s+Score:\s*\d{1,3}%/i.test(text);
+                expect(pct).to.eq(true);
+              });
+            }
+          });
+          cy.contains('Analysis Type:').then($el => {
+            if ($el && $el.length) {
+              cy.wrap($el).next().should('exist');
+            }
+          });
+        });
       });
     });
 
