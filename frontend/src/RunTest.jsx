@@ -3,7 +3,7 @@ import { useTheme } from './ThemeContext';
 import ModalDialog from './ModalDialog';
 
 const RunTest = () => {
-  const { colors } = useTheme();
+  const { colors, isDark, toggleTheme } = useTheme();
   const [testType, setTestType] = useState('cypress');
   const [testResults, setTestResults] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -169,9 +169,64 @@ const RunTest = () => {
         console.error('Error running real tests:', error);
       }
 
-      // MOCK TESTS (13) - Tests that require manual verification
+      // MANUAL UI/IN-APP CHECKS (simulate some formerly MOCK items)
+      // 1) Theme toggle simulation
+      try {
+        const themeBefore = localStorage.getItem('theme') || (isDark ? 'dark' : 'light');
+        const t0 = performance.now();
+        toggleTheme();
+        await new Promise(r => setTimeout(r, 50));
+        const themeAfter = localStorage.getItem('theme');
+        // restore
+        toggleTheme();
+        const t1 = performance.now();
+        results.push({
+          name: 'Theme toggle switches between light and dark modes',
+          status: themeAfter && themeAfter !== themeBefore ? 'passed' : 'failed',
+          time: `${Math.round(t1 - t0)}ms`,
+          type: 'real'
+        });
+      } catch (e) {
+        results.push({
+          name: 'Theme toggle switches between light and dark modes',
+          status: 'failed',
+          time: 'N/A',
+          type: 'real',
+          error: e.message
+        });
+      }
+
+      // 2) Document Analyzer supported formats check (basic capability probe)
+      try {
+        const t0 = performance.now();
+        const res = await fetch('http://localhost:8000/api/document-analyzer/supported-formats');
+        const ok = res.ok;
+        let hasPdf = false;
+        if (ok) {
+          const data = await res.json();
+          // Backend returns { supported_formats: { text: [...], documents: [...], pdf: [...] }, ... }
+          const pdfList = data?.supported_formats?.pdf;
+          hasPdf = Array.isArray(pdfList) ? pdfList.length > 0 : false;
+        }
+        const t1 = performance.now();
+        results.push({
+          name: 'Document Analyzer: Supported formats available',
+          status: ok && hasPdf ? 'passed' : 'failed',
+          time: `${Math.round(t1 - t0)}ms`,
+          type: 'real'
+        });
+      } catch (e) {
+        results.push({
+          name: 'Document Analyzer: Supported formats available',
+          status: 'failed',
+          time: 'N/A',
+          type: 'real',
+          error: e.message
+        });
+      }
+
+      // Remaining MOCK TESTS (unable to simulate reliably here)
       const mockTests = [
-        { name: 'Theme toggle switches between light and dark modes (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
         { name: 'Responsive design works on different screen sizes (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
         { name: 'Panel content loads properly for each module (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
         { name: 'Global search functionality works (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
