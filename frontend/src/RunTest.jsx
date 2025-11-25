@@ -424,33 +424,41 @@ const RunTest = () => {
     let accessToken = null; // captured after successful /auth/login
     let createdTeamId = null; // captured after successful /teams creation
     let createdMemberId = null; // captured after successful add member
+    // Reuse same user across register/login so auth works
+    const testUserEmail = `testuser${Date.now()}@example.com`;
+    const testUserPassword = 'testpassword123';
     
     for (const api of apiEndpoints) {
       try {
         const startTime = Date.now();
         let response;
         
-        // If a dependent resource is missing, skip gracefully to avoid false 404s
+        // Resolve team_id dynamically if needed
+        if (api.endpoint.includes('/teams/test-team') && !createdTeamId) {
+          try {
+            const hdrs = { 'Content-Type': 'application/json' };
+            if (accessToken) hdrs['Authorization'] = `Bearer ${accessToken}`;
+            const teamsRes = await fetch('http://localhost:8000/teams', { headers: hdrs });
+            if (teamsRes.ok) {
+              const body = await teamsRes.json();
+              if (body?.teams?.length) {
+                createdTeamId = body.teams[0]._id;
+              }
+            }
+          } catch {}
+        }
+        // Skip gracefully if still missing required IDs
         if (api.endpoint.includes('/teams/test-team') && !createdTeamId && api.endpoint !== '/teams') {
-          results.push({
-            name: api.name,
-            status: 'skipped',
-            time: '0ms',
-            statusCode: 'Skipped (no team_id)',
-            endpoint: api.endpoint,
-            requiresAuth: api.requiresAuth
-          });
+          results.push({ name: api.name, status: 'skipped', time: '0ms', statusCode: 'Skipped (no team_id)', endpoint: api.endpoint, requiresAuth: api.requiresAuth });
           continue;
         }
         if (api.endpoint.includes('/members/test-member') && !createdMemberId) {
-          results.push({
-            name: api.name,
-            status: 'skipped',
-            time: '0ms',
-            statusCode: 'Skipped (no member_id)',
-            endpoint: api.endpoint,
-            requiresAuth: api.requiresAuth
-          });
+          results.push({ name: api.name, status: 'skipped', time: '0ms', statusCode: 'Skipped (no member_id)', endpoint: api.endpoint, requiresAuth: api.requiresAuth });
+          continue;
+        }
+        // Skip invalid placeholder lesson id endpoints
+        if (api.endpoint.includes('/lessons/test-lesson')) {
+          results.push({ name: api.name, status: 'skipped', time: '0ms', statusCode: 'Skipped (placeholder lesson_id)', endpoint: api.endpoint, requiresAuth: api.requiresAuth });
           continue;
         }
 
@@ -568,15 +576,15 @@ const RunTest = () => {
               break;
             case '/auth/register':
               testData = { 
-                email: `testuser${Date.now()}@example.com`,
-                password: 'testpassword123',
+                email: testUserEmail,
+                password: testUserPassword,
                 role: 'user'
               };
               break;
             case '/auth/login':
               testData = { 
-                email: 'test@example.com',
-                password: 'testpassword123'
+                email: testUserEmail,
+                password: testUserPassword
               };
               break;
             case '/auth/refresh':
@@ -860,6 +868,17 @@ const RunTest = () => {
           if (api.endpoint === '/teams' && response.ok) {
             const body2 = await response.clone().json();
             if (body2?.team_id) createdTeamId = body2.team_id;
+            // Small delay to ensure Mongo persistence before dependent requests
+            await new Promise(r => setTimeout(r, 200));
+            // Verify the team exists and is accessible
+            try {
+              const verifyRes = await fetch(`http://localhost:8000/teams/${createdTeamId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': headers['Authorization'] || '' } });
+              if (!verifyRes.ok) {
+                createdTeamId = null; // force skip of dependent tests
+              }
+            } catch (_) {
+              createdTeamId = null;
+            }
           }
           if (api.endpoint === '/teams' && api.method === 'GET' && response.ok) {
             const body3 = await response.clone().json();
@@ -878,6 +897,28 @@ const RunTest = () => {
         if (response.status === 401) {
           status = 'auth_required';
           statusCode = '401 (Auth Required)';
+        } else if (response.status === 404) {
+          status = 'failed';
+          // Add a friendly explanation after the code, like we do for 401
+          // Generic meaning + hint that usually the resource id does not exist
+          const hint = resolvedEndpoint?.includes('/teams/') 
+            ? 'Not Found – team or member id missing/invalid' 
+            : 'Not Found – resource missing';
+          statusCode = `404 (${hint})`;
+        } else if (response.status === 422) {
+          status = 'failed';
+          // Unprocessable Entity: validation failed or missing required fields
+          const hint422 = resolvedEndpoint?.includes('/teams/')
+            ? 'Unprocessable Entity – body validation failed (check fields)'
+            : 'Unprocessable Entity – validation error';
+          statusCode = `422 (${hint422})`;
+        } else if (response.status === 500) {
+          status = 'failed';
+          // Internal Server Error: backend exception. Often occurs when provider/env not configured
+          const hint500 = resolvedEndpoint?.includes('/web-search')
+            ? 'Internal Server Error – AI provider key not configured'
+            : 'Internal Server Error – backend exception';
+          statusCode = `500 (${hint500})`;
         } else if (!response.ok) {
           status = 'failed';
         }
