@@ -1337,7 +1337,7 @@ const AITrainingModule = ({ user }) => {
                             Progress
                           </span>
                           <span style={{ fontSize: '0.85em', color: colors.textSecondary, fontWeight: 500 }}>
-                            {sectionProgress} of {lesson.sections.length} sections
+                            {sectionProgress} of {totalSections} sections
                           </span>
                         </div>
                         <div style={{
@@ -1378,11 +1378,9 @@ const AITrainingModule = ({ user }) => {
                           fontWeight: 500,
                           border: `1px solid ${difficultyColors.border}`
                         }}>
-                          📚 {lesson.sections.length > 0
-                            ? `${lesson.sections.length} sections`
-                            : (lesson.sectionCount
-                                ? `${lesson.sectionCount} sections`
-                                : (lesson.contentUrl ? 'sections in file' : '0 sections'))}
+                          📚 {totalSections > 0
+                            ? `${totalSections} sections`
+                            : (lesson.contentUrl ? 'sections in file' : '0 sections')}
                         </span>
                         <span style={{
                           background: difficultyColors.bg,
