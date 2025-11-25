@@ -312,6 +312,35 @@ const RunTest = () => {
           { name: 'GET /api/document-analyzer/supported-formats', endpoint: '/api/document-analyzer/supported-formats', method: 'GET', requiresAuth: false },
           { name: 'GET /api/document-analyzer/get-saved-analyses', endpoint: '/api/document-analyzer/get-saved-analyses', method: 'GET', requiresAuth: false },
           
+          // Agent Security endpoints (read-only)
+          { name: 'GET /api/agent-security/health', endpoint: '/api/agent-security/health', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agent-security/overview', endpoint: '/api/agent-security/overview', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agent-security/threat-feed', endpoint: '/api/agent-security/threat-feed', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agent-security/zero-trust/status', endpoint: '/api/agent-security/zero-trust/status', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agent-security/incidents', endpoint: '/api/agent-security/incidents', method: 'GET', requiresAuth: false },
+          
+          // Cybersecurity module endpoints
+          { name: 'GET /api/cyber/health', endpoint: '/api/cyber/health', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/threats', endpoint: '/api/cyber/threats', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/controls', endpoint: '/api/cyber/controls', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/vulnerabilities', endpoint: '/api/cyber/vulnerabilities', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/posture/kpis', endpoint: '/api/cyber/posture/kpis', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/risk/score', endpoint: '/api/cyber/risk/score', method: 'GET', requiresAuth: false },
+          
+          // Repository Analyzer lightweight endpoints
+          { name: 'GET /api/repo-templates', endpoint: '/api/repo-templates', method: 'GET', requiresAuth: false },
+          
+          // Unified Documents
+          { name: 'GET /api/unified-documents', endpoint: '/api/unified-documents', method: 'GET', requiresAuth: false },
+          
+          // Agent Catalog
+          { name: 'GET /api/agents/catalog', endpoint: '/api/agents/catalog', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agents/capabilities', endpoint: '/api/agents/capabilities', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/agents/mcp-endpoints', endpoint: '/api/agents/mcp-endpoints', method: 'GET', requiresAuth: false },
+          
+          // Hologram Agent (chat ping)
+          { name: 'POST /api/hologram-agent/chat', endpoint: '/api/hologram-agent/chat', method: 'POST', requiresAuth: false },
+          
           // AgentOps Studio endpoints (GET only)
           { name: 'GET /api/playbooks/_ping', endpoint: '/api/playbooks/_ping', method: 'GET', requiresAuth: false },
           { name: 'GET /api/flows/_ping', endpoint: '/api/flows/_ping', method: 'GET', requiresAuth: false },
@@ -331,8 +360,9 @@ const RunTest = () => {
           { name: 'POST /auth/refresh', endpoint: '/auth/refresh', method: 'POST', requiresAuth: false },
           { name: 'POST /auth/logout', endpoint: '/auth/logout', method: 'POST', requiresAuth: false },
           { name: 'GET /auth/test', endpoint: '/auth/test', method: 'GET', requiresAuth: false },
-          { name: 'POST /auth/verify-email/confirm', endpoint: '/auth/verify-email/confirm', method: 'POST', requiresAuth: false },
-          { name: 'POST /auth/password/reset', endpoint: '/auth/password/reset', method: 'POST', requiresAuth: false },
+          // Use request/forgot flows that don't require special tokens
+          { name: 'POST /auth/password/forgot', endpoint: '/auth/password/forgot', method: 'POST', requiresAuth: false },
+          { name: 'POST /auth/verify-email/request', endpoint: '/auth/verify-email/request', method: 'POST', requiresAuth: true },
           
           // NEW: Enhanced Team Dynamics endpoints
           { name: 'GET /teams', endpoint: '/teams', method: 'GET', requiresAuth: true },
@@ -391,6 +421,7 @@ const RunTest = () => {
     ];
 
     const results = [];
+    let accessToken = null; // captured after successful /auth/login
     
     for (const api of apiEndpoints) {
       try {
@@ -402,7 +433,7 @@ const RunTest = () => {
         
         // Add mock authentication for protected endpoints
         if (api.requiresAuth) {
-          headers['Authorization'] = 'Bearer mock-token-for-testing';
+          headers['Authorization'] = accessToken ? `Bearer ${accessToken}` : 'Bearer mock-token-for-testing';
         }
         
         if (api.method === 'GET') {
@@ -457,6 +488,12 @@ const RunTest = () => {
               testData = { 
                 local_url: 'http://localhost:1234',
                 model_name: 'test-model'
+              };
+              break;
+            case '/api/hologram-agent/chat':
+              testData = {
+                messages: [{ role: 'user', content: 'Hello Hologram, quick self-check.' }],
+                mode: 'fast'
               };
               break;
             case '/api/itemai-completion':
@@ -515,16 +552,13 @@ const RunTest = () => {
                 access_token: 'test-access-token'
               };
               break;
-            case '/auth/verify-email/confirm':
+            case '/auth/password/forgot':
               testData = { 
-                token: 'test-verification-token'
+                email: `testuser${Date.now()}@example.com`
               };
               break;
-            case '/auth/password/reset':
-              testData = { 
-                token: 'test-reset-token',
-                new_password: 'newpassword123'
-              };
+            case '/auth/verify-email/request':
+              testData = {}; // Authorization header carries identity
               break;
             case '/teams':
               testData = { 
@@ -765,6 +799,14 @@ const RunTest = () => {
         const endTime = Date.now();
         const duration = endTime - startTime;
         
+        // Capture access token from login for subsequent auth-required endpoints
+        try {
+          if (api.endpoint === '/auth/login' && response.ok) {
+            const body = await response.clone().json();
+            if (body?.access_token) accessToken = body.access_token;
+          }
+        } catch {}
+
         // Handle different response scenarios
         let status = 'passed';
         let statusCode = response.status;
