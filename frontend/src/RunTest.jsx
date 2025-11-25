@@ -364,9 +364,9 @@ const RunTest = () => {
           { name: 'POST /auth/password/forgot', endpoint: '/auth/password/forgot', method: 'POST', requiresAuth: false },
           { name: 'POST /auth/verify-email/request', endpoint: '/auth/verify-email/request', method: 'POST', requiresAuth: true },
           
-          // NEW: Enhanced Team Dynamics endpoints
-          { name: 'GET /teams', endpoint: '/teams', method: 'GET', requiresAuth: true },
+          // NEW: Enhanced Team Dynamics endpoints (create first to obtain team_id)
           { name: 'POST /teams', endpoint: '/teams', method: 'POST', requiresAuth: true },
+          { name: 'GET /teams', endpoint: '/teams', method: 'GET', requiresAuth: true },
           { name: 'GET /teams/{team_id}', endpoint: '/teams/test-team', method: 'GET', requiresAuth: true },
           { name: 'PUT /teams/{team_id}', endpoint: '/teams/test-team', method: 'PUT', requiresAuth: true },
           { name: 'DELETE /teams/{team_id}', endpoint: '/teams/test-team', method: 'DELETE', requiresAuth: true },
@@ -422,12 +422,38 @@ const RunTest = () => {
 
     const results = [];
     let accessToken = null; // captured after successful /auth/login
+    let createdTeamId = null; // captured after successful /teams creation
+    let createdMemberId = null; // captured after successful add member
     
     for (const api of apiEndpoints) {
       try {
         const startTime = Date.now();
         let response;
         
+        // If a dependent resource is missing, skip gracefully to avoid false 404s
+        if (api.endpoint.includes('/teams/test-team') && !createdTeamId && api.endpoint !== '/teams') {
+          results.push({
+            name: api.name,
+            status: 'skipped',
+            time: '0ms',
+            statusCode: 'Skipped (no team_id)',
+            endpoint: api.endpoint,
+            requiresAuth: api.requiresAuth
+          });
+          continue;
+        }
+        if (api.endpoint.includes('/members/test-member') && !createdMemberId) {
+          results.push({
+            name: api.name,
+            status: 'skipped',
+            time: '0ms',
+            statusCode: 'Skipped (no member_id)',
+            endpoint: api.endpoint,
+            requiresAuth: api.requiresAuth
+          });
+          continue;
+        }
+
         // Prepare headers
         const headers = { 'Content-Type': 'application/json' };
         
@@ -436,8 +462,19 @@ const RunTest = () => {
           headers['Authorization'] = accessToken ? `Bearer ${accessToken}` : 'Bearer mock-token-for-testing';
         }
         
+        // Resolve dynamic team_id if present
+        let resolvedEndpoint = api.endpoint;
+        if (resolvedEndpoint.includes('/teams/test-team')) {
+          const safeId = createdTeamId || '000000000000000000000000'; // valid ObjectId format as fallback
+          resolvedEndpoint = resolvedEndpoint.replace('test-team', safeId);
+        }
+        if (resolvedEndpoint.includes('/members/test-member')) {
+          const safeMember = createdMemberId || '000000000000000000000000';
+          resolvedEndpoint = resolvedEndpoint.replace('test-member', safeMember);
+        }
+
         if (api.method === 'GET') {
-          response = await fetch(`http://localhost:8000${api.endpoint}`, {
+          response = await fetch(`http://localhost:8000${resolvedEndpoint}`, {
             method: 'GET',
             headers: headers
           });
@@ -563,7 +600,15 @@ const RunTest = () => {
             case '/teams':
               testData = { 
                 name: 'Test Team',
-                description: 'A test team for API testing'
+                description: 'A test team for API testing',
+                members: [
+                  {
+                    name: 'Alice Example',
+                    role: 'developer',
+                    email: `alice.${Date.now()}@example.com`,
+                    skills: ['javascript', 'react']
+                  }
+                ]
               };
               break;
             case '/teams/test-team':
@@ -574,8 +619,10 @@ const RunTest = () => {
               break;
             case '/teams/test-team/members':
               testData = { 
-                email: 'member@example.com',
-                role: 'member'
+                name: 'Bob Example',
+                role: 'member',
+                email: `member.${Date.now()}@example.com`,
+                skills: ['communication']
               };
               break;
             case '/teams/test-team/members/test-member':
@@ -585,8 +632,7 @@ const RunTest = () => {
               break;
             case '/teams/test-team/analytics':
               testData = { 
-                analytics_type: 'team_performance',
-                date_range: '30_days'
+                metrics: ['collaboration', 'productivity', 'communication']
               };
               break;
             case '/career-coach':
@@ -602,26 +648,32 @@ const RunTest = () => {
               break;
             case '/certifications/save-profile':
               testData = { 
-                experience_level: 'intermediate',
-                interests: ['cloud', 'ai', 'devops']
+                role: 'Software Engineer',
+                skills: ['python', 'fastapi', 'mongodb'],
+                goals: 'Prepare for cloud certification',
+                experience_level: 'intermediate'
               };
               break;
             case '/certifications/recommend':
               testData = { 
-                user_profile: 'intermediate',
-                focus_areas: ['cloud', 'ai']
+                role: 'Software Engineer',
+                skills: ['python', 'fastapi', 'mongodb'],
+                goals: 'Move into cloud and security',
+                experience_level: 'intermediate'
               };
               break;
             case '/certifications/study-plan':
               testData = { 
-                certification_id: 'aws-solutions-architect',
-                timeline: '3_months'
+                certification_name: 'AWS Solutions Architect Associate',
+                current_skills: ['networking basics', 'linux'],
+                study_time: 6,
+                target_date: '2026-01-15'
               };
               break;
             case '/certifications/simulate':
               testData = { 
-                certification_id: 'aws-solutions-architect',
-                question_count: 10
+                certification_name: 'AWS Solutions Architect Associate',
+                user_responses: []
               };
               break;
             case '/video-quiz':
@@ -788,7 +840,7 @@ const RunTest = () => {
               headers: headers
             });
           } else {
-            response = await fetch(`http://localhost:8000${api.endpoint}`, {
+            response = await fetch(`http://localhost:8000${resolvedEndpoint}`, {
               method: api.method,
               headers: headers,
               body: JSON.stringify(testData)
@@ -804,6 +856,18 @@ const RunTest = () => {
           if (api.endpoint === '/auth/login' && response.ok) {
             const body = await response.clone().json();
             if (body?.access_token) accessToken = body.access_token;
+          }
+          if (api.endpoint === '/teams' && response.ok) {
+            const body2 = await response.clone().json();
+            if (body2?.team_id) createdTeamId = body2.team_id;
+          }
+          if (api.endpoint === '/teams' && api.method === 'GET' && response.ok) {
+            const body3 = await response.clone().json();
+            if (body3?.teams?.length) createdTeamId = body3.teams[0]._id || createdTeamId;
+          }
+          if (api.endpoint === '/teams/test-team/members' && response.ok) {
+            const body4 = await response.clone().json();
+            if (body4?.member?._id) createdMemberId = body4.member._id;
           }
         } catch {}
 
@@ -823,7 +887,7 @@ const RunTest = () => {
           status: status,
           time: `${duration}ms`,
           statusCode: statusCode,
-          endpoint: api.endpoint,
+          endpoint: resolvedEndpoint,
           requiresAuth: api.requiresAuth
         });
       } catch (error) {
