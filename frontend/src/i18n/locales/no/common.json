@@ -270,6 +270,92 @@
         "title": "Verktøy og API‑er",
         "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes."
       },
+      "building_ai_apps_007": {
+        "title": "Bygging av AI‑apper",
+        "description": "Fra prompt til produkt: API‑er, embeddings, gjenfinning og multi‑agent orkestrering.",
+        "sections": {
+          "0": {
+            "heading": "Arkitekturoversikt",
+            "content": "Typiske komponenter: API‑gateway, modellleverandør, embeddings, vektordatabase for gjenfinning, og valgfri multi‑agent‑koordinering for komplekse oppgaver."
+          },
+          "1": {
+            "caption": "Fra klient → API → modellleverandør og gjenfinningskomponenter."
+          },
+          "2": {
+            "heading": "Viktige valg",
+            "items": {
+              "0": "Leverandør: OpenAI vs. lokal inferens (LM Studio)",
+              "1": "Gjenfinning: embeddings‑modell, oppdelingsstrategi, vektordatabase",
+              "2": "Orkestrering: enkel prompt vs. multi‑agent‑flyt",
+              "3": "Telemetri: prompts/utdata, latens, kost og kvalitetsmetrikker"
+            }
+          },
+          "3": {
+            "heading": "Snippet: enkel gjenfinning (JS)"
+          },
+          "4": {
+            "heading": "Hands‑on (AgentOps Studio)",
+            "description": "Åpne AgentOps Studio og skisser en 3‑stegs flyt: gjenfinn → utkast → forbedre. Konfigurer parametere og test med et lite dokument.",
+            "steps": {
+              "0": "Åpne AgentOps Studio",
+              "1": "Lag en flyt: hent biter via embeddings",
+              "2": "Skriv et svar med sitater",
+              "3": "Forbedre med stil og begrensninger",
+              "4": "Mål: latens og tokenbruk"
+            }
+          }
+        }
+      },
+      "hologram_chat_012": {
+        "title": "Hologram‑guidechat: Fast vs Accurate",
+        "description": "Hvordan hologram‑chatten fungerer, AI‑ruting og når du velger Fast eller Accurate.",
+        "sections": {
+          "0": {
+            "heading": "Hva er Hologram‑guiden?",
+            "content": "Hologram‑guiden er en samtaleagent i appen (Hologram‑portalen). Den forklarer moduler, foreslår neste steg og returnerer strukturerte handlinger slik at UI kan navigere automatisk. Den bruker samme AI‑stack som resten av appen (LM Studio / OpenAI / OpenRouter)."
+          },
+          "1": {
+            "heading": "Prøv nå",
+            "text": "Gå direkte til Ask AI der hologrammet bor og åpne chatten.",
+            "label": "Åpne hologram & chat"
+          },
+          "2": {
+            "heading": "Arkitektur (høynivå)",
+            "caption": "Frontend chat → Backend /hologram-agent/chat → RAG over dokumenter → LLM → svar + ACTIONS"
+          },
+          "3": {
+            "heading": "Fast vs Accurate‑moduser",
+            "definitions": {
+              "0": { "term": "Fast", "definition": "Optimalisert for respons: mindre RAG‑kontekst (k≈3), kortere historikk (siste 4), lavere max_tokens (~350) og lavere kompleksitet. Best for korte spørsmål og raske avklaringer." },
+              "1": { "term": "Accurate", "definition": "Optimalisert for forankring: større RAG‑kontekst (k≈6), lengre historikk (siste 8), høyere max_tokens (~700). Best for forklaringer, referanser og lengre veiledning." }
+            }
+          },
+          "4": {
+            "heading": "Kall backend (eksempel)"
+          },
+          "5": {
+            "heading": "Når velge hver modus",
+            "items": {
+              "0": "Velg Fast når latens betyr noe: korte svar, iterasjon, raske sjekker.",
+              "1": "Velg Accurate når du trenger sitater, lengre veiledning eller bedre forankring.",
+              "2": "Hvis lokale modeller føles trege, prøv Fast først eller bytt til raskere leverandør i API Config."
+            }
+          },
+          "6": {
+            "heading": "Hands‑on",
+            "description": "Øv på å bruke Hologram‑guiden og sammenlign de to modusene.",
+            "steps": {
+              "0": "Åpne Hologram‑siden. Slå på «Chat on click Hologram».",
+              "1": "Klikk hvor som helst på hologram‑kortet (utenfor «Enter →») for å åpne chatten.",
+              "2": "Sett Mode: Fast. Spør: «Give me a quick overview of Agentic RAG.» Observer latens og svarlengde.",
+              "3": "Be om oppfølging: «List 2 next actions and include a navigation action.» Sjekk om UI foreslår NAVIGATE.",
+              "4": "Bytt til Mode: Accurate. Spør: «Explain our Document Analyzer pipeline…». Sammenlign dybde og latens.",
+              "5": "Valgfritt: Bytt til raskere leverandør i API Config og gjenta.",
+              "6": "Notér når du ville valgt Fast vs Accurate i hverdagen."
+            }
+          }
+        }
+      },
 
       "ethics_safety_005": {
         "title": "Etikk og sikkerhet",
