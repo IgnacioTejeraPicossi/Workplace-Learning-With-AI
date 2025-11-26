@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
 import Quiz from './Quiz';
 import CertificationBadge from './CertificationBadge';
+import { useTranslation } from 'react-i18next';
 
 const AITrainingModule = ({ user }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation('common');
   const [currentLesson, setCurrentLesson] = useState(null);
   const [currentSection, setCurrentSection] = useState(0);
   const [progress, setProgress] = useState({});
@@ -658,6 +660,22 @@ const AITrainingModule = ({ user }) => {
     }
   };
 
+  // Helpers: difficulty display in current language
+  const displayDifficulty = (difficulty) => {
+    switch (difficulty) {
+      case 'Beginner':
+        return t('aiLearning.filters.beginner');
+      case 'Intermediate':
+        return t('aiLearning.filters.intermediate');
+      case 'Advanced':
+        return t('aiLearning.filters.advanced');
+      case 'Expert':
+        return t('aiLearning.filters.expert');
+      default:
+        return difficulty;
+    }
+  };
+
   const nextSection = () => {
     if (currentLesson && currentSection < currentLesson.sections.length - 1) {
       const newSection = currentSection + 1;
@@ -706,7 +724,9 @@ const AITrainingModule = ({ user }) => {
     return certifications.filter(cert => checkCertificationEligibility(cert));
   };
 
-  const renderSection = (section) => {
+  const tr = (key, def) => t(key, { defaultValue: def });
+
+  const renderSection = (section, sectionIndex, lessonId) => {
     // Helper to colorize "Risk: <Level>" fragments inside list items
     const renderRiskColored = (text) => {
       if (typeof text !== 'string') return text;
@@ -733,7 +753,7 @@ const AITrainingModule = ({ user }) => {
 
     switch (section.type) {
       case 'text':
-        return <p style={{ lineHeight: 1.6, color: colors.text }}>{section.content}</p>;
+        return <p style={{ lineHeight: 1.6, color: colors.text }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.content`, section.content)}</p>;
       
       case 'list':
         if (section.format === 'dysfunctionTable') {
@@ -809,7 +829,7 @@ const AITrainingModule = ({ user }) => {
         return (
           <ul style={{ lineHeight: 1.6, color: colors.text }}>
             {section.content.map((item, index) => (
-              <li key={index} style={{ marginBottom: 8 }}>{renderRiskColored(item)}</li>
+              <li key={index} style={{ marginBottom: 8 }}>{renderRiskColored(tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.items.${index}`, item))}</li>
             ))}
           </ul>
         );
@@ -819,8 +839,8 @@ const AITrainingModule = ({ user }) => {
           <div>
             {section.definitions.map((def, index) => (
               <div key={index} style={{ marginBottom: 16, padding: 12, background: colors.cardBackground, borderRadius: 8 }}>
-                <strong style={{ color: colors.primary }}>{def.term}:</strong>
-                <span style={{ color: colors.text, marginLeft: 8 }}>{def.definition}</span>
+                <strong style={{ color: colors.primary }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.definitions.${index}.term`, def.term)}:</strong>
+                <span style={{ color: colors.text, marginLeft: 8 }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.definitions.${index}.definition`, def.definition)}</span>
               </div>
             ))}
           </div>
@@ -892,7 +912,7 @@ const AITrainingModule = ({ user }) => {
               border: 'none',
               cursor: 'pointer'
             }}>
-              {section.label || 'Open Hologram & Chat'}
+              {section.label || t('aiLearning.openHologram')}
             </button>
           </div>
         );
@@ -909,7 +929,7 @@ const AITrainingModule = ({ user }) => {
               borderRadius: 6,
               border: 'none'
             }}>
-              ⬇ {section.label || 'Download'}
+              ⬇ {section.label || t('aiLearning.download')}
             </a>
             {(() => {
               const href = String(section.href || '').toLowerCase();
@@ -922,9 +942,9 @@ const AITrainingModule = ({ user }) => {
                       const res = await fetch(section.href, { cache: 'no-store' });
                       const text = await res.text();
                       await navigator.clipboard.writeText(text);
-                      alert('Dataset copied to clipboard');
+                      alert(t('aiLearning.copySuccess'));
                     } catch (e) {
-                      alert('Could not copy dataset');
+                      alert(t('aiLearning.copyFail'));
                     }
                   }} style={{ 
                     background: colors.cardBackground,
@@ -934,7 +954,7 @@ const AITrainingModule = ({ user }) => {
                     border: `1px solid ${colors.border}`,
                     cursor: 'pointer'
                   }}>
-                    📋 {section.copyLabel || 'Copy JSON'}
+                    📋 {section.copyLabel || t('aiLearning.copyJson')}
                   </button>
                   <button onClick={async ()=>{
                     try {
@@ -943,7 +963,7 @@ const AITrainingModule = ({ user }) => {
                       localStorage.setItem('agenticRag_preload_dataset', text);
                       window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: 'agentic-rag', dataset: 'agenticRag_preload_dataset' } }));
                     } catch (e) {
-                      alert('Could not open Agentic RAG with dataset');
+                      alert(t('aiLearning.openAgenticFail'));
                     }
                   }} style={{ 
                     background: colors.primaryLight,
@@ -953,7 +973,7 @@ const AITrainingModule = ({ user }) => {
                     border: `1px solid ${colors.primary}`,
                     cursor: 'pointer'
                   }}>
-                    🚀 {section.openLabel || 'Open in Agentic RAG'}
+                    🚀 {section.openLabel || t('aiLearning.openInAgenticRag')}
                   </button>
                 </>
               );
@@ -1045,7 +1065,7 @@ const AITrainingModule = ({ user }) => {
   if (loading) {
     return (
       <div style={{ padding: 24, textAlign: 'center', color: colors.text }}>
-        Loading AI Training Module...
+        {t('aiLearning.loading')}
       </div>
     );
   }
@@ -1054,17 +1074,17 @@ const AITrainingModule = ({ user }) => {
     <div style={{ padding: 24, background: colors.background, minHeight: '100vh' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ color: colors.text, marginBottom: 8 }}>🤖 AI Learning & Training</h1>
+          <h1 style={{ color: colors.text, marginBottom: 8 }}>🤖 {t('aiLearning.title')}</h1>
           <p style={{ color: colors.textSecondary, fontSize: '1.1em' }}>
-            Master AI concepts, tools, and best practices through interactive lessons
+            {t('aiLearning.subtitle')}
           </p>
           
           {/* Navigation Tabs */}
           <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
             {[
-              { key: 'lessons', label: '📚 Lessons', icon: '📚' },
-              { key: 'path', label: '🗺️ Learning Path', icon: '🗺️' },
-              { key: 'certifications', label: '🏆 Certifications', icon: '🏆' }
+              { key: 'lessons', label: `📚 ${t('aiLearning.tabs.lessons')}`, icon: '📚' },
+              { key: 'path', label: `🗺️ ${t('aiLearning.tabs.path')}`, icon: '🗺️' },
+              { key: 'certifications', label: `🏆 ${t('aiLearning.tabs.certifications')}`, icon: '🏆' }
             ].map(tab => (
               <button
                 key={tab.key}
@@ -1092,7 +1112,7 @@ const AITrainingModule = ({ user }) => {
           <div>
             {/* Difficulty Level Headers */}
             <div style={{ marginBottom: 24 }}>
-              <h2 style={{ color: colors.text, marginBottom: 16, textAlign: 'center' }}>Choose Your Learning Path</h2>
+              <h2 style={{ color: colors.text, marginBottom: 16, textAlign: 'center' }}>{t('aiLearning.choosePath')}</h2>
               
               {/* Difficulty Filter Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
@@ -1110,7 +1130,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🌟 All Levels
+                  🌟 {t('aiLearning.filters.allLevels')}
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Beginner')}
@@ -1126,7 +1146,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🟢 Beginner ({lessons.filter(l => l.difficulty === 'Beginner').length})
+                  🟢 {t('aiLearning.filters.beginner')} ({lessons.filter(l => l.difficulty === 'Beginner').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Intermediate')}
@@ -1142,7 +1162,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🟡 Intermediate ({lessons.filter(l => l.difficulty === 'Intermediate').length})
+                  🟡 {t('aiLearning.filters.intermediate')} ({lessons.filter(l => l.difficulty === 'Intermediate').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Advanced')}
@@ -1158,7 +1178,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🔵 Advanced ({lessons.filter(l => l.difficulty === 'Advanced').length})
+                  🔵 {t('aiLearning.filters.advanced')} ({lessons.filter(l => l.difficulty === 'Advanced').length})
                 </button>
                 <button
                   onClick={() => setDifficultyFilter('Expert')}
@@ -1174,7 +1194,7 @@ const AITrainingModule = ({ user }) => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  🔴 Expert ({lessons.filter(l => l.difficulty === 'Expert').length})
+                  🔴 {t('aiLearning.filters.expert')} ({lessons.filter(l => l.difficulty === 'Expert').length})
                 </button>
               </div>
               
@@ -1189,7 +1209,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #4CAF50'
                 }}>
-                  🟢 Beginner ({lessons.filter(l => l.difficulty === 'Beginner').length} modules)
+                  🟢 {t('aiLearning.filters.beginner')} ({lessons.filter(l => l.difficulty === 'Beginner').length} {t('aiLearning.labels.modules')})
                 </div>
                 <div style={{
                   background: '#fff3e0',
@@ -1200,7 +1220,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #FF9800'
                 }}>
-                  🟡 Intermediate ({lessons.filter(l => l.difficulty === 'Intermediate').length} modules)
+                  🟡 {t('aiLearning.filters.intermediate')} ({lessons.filter(l => l.difficulty === 'Intermediate').length} {t('aiLearning.labels.modules')})
                 </div>
                 <div style={{
                   background: '#e3f2fd',
@@ -1211,7 +1231,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #2196F3'
                 }}>
-                  🔵 Advanced ({lessons.filter(l => l.difficulty === 'Advanced').length} modules)
+                  🔵 {t('aiLearning.filters.advanced')} ({lessons.filter(l => l.difficulty === 'Advanced').length} {t('aiLearning.labels.modules')})
                 </div>
                 <div style={{
                   background: '#fce4ec',
@@ -1222,7 +1242,7 @@ const AITrainingModule = ({ user }) => {
                   fontWeight: 600,
                   border: '2px solid #E91E63'
                 }}>
-                  🔴 Expert ({lessons.filter(l => l.difficulty === 'Expert').length} modules)
+                  🔴 {t('aiLearning.filters.expert')} ({lessons.filter(l => l.difficulty === 'Expert').length} {t('aiLearning.labels.modules')})
                 </div>
               </div>
             </div>
@@ -1237,7 +1257,7 @@ const AITrainingModule = ({ user }) => {
                   borderRadius: 20,
                   border: `1px solid ${colors.border}`
                 }}>
-                  📚 Showing {lessons.filter(lesson => difficultyFilter === 'all' || lesson.difficulty === difficultyFilter).length} of {lessons.length} modules
+                  📚 {t('aiLearning.labels.showing')} {lessons.filter(lesson => difficultyFilter === 'all' || lesson.difficulty === difficultyFilter).length} {t('aiLearning.labels.of')} {lessons.length} {t('aiLearning.labels.modules')}
                 </span>
               </div>
               
@@ -1307,7 +1327,7 @@ const AITrainingModule = ({ user }) => {
                       fontWeight: 700,
                       border: `1px solid ${difficultyColors.border}`
                     }}>
-                      {lesson.difficulty}
+                      {displayDifficulty(lesson.difficulty)}
                     </div>
                     
                     {/* Lesson Content */}
@@ -1319,7 +1339,7 @@ const AITrainingModule = ({ user }) => {
                         fontWeight: 600,
                         lineHeight: 1.3
                       }}>
-                        {lesson.title}
+                        {tr(`aiLearning.lessons.${lesson.id}.title`, lesson.title)}
                       </h3>
                       <p style={{ 
                         color: colors.textSecondary, 
@@ -1327,17 +1347,17 @@ const AITrainingModule = ({ user }) => {
                         lineHeight: 1.5,
                         fontSize: '0.95em'
                       }}>
-                        {lesson.description}
+                        {tr(`aiLearning.lessons.${lesson.id}.description`, lesson.description)}
                       </p>
                       
                       {/* Progress Bar */}
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                           <span style={{ fontSize: '0.85em', color: colors.textSecondary, fontWeight: 500 }}>
-                            Progress
+                            {t('aiLearning.labels.progress')}
                           </span>
                           <span style={{ fontSize: '0.85em', color: colors.textSecondary, fontWeight: 500 }}>
-                            {sectionProgress} of {totalSections} sections
+                            {sectionProgress} {t('aiLearning.labels.of')} {totalSections} {t('aiLearning.labels.sections')}
                           </span>
                         </div>
                         <div style={{
@@ -1379,8 +1399,8 @@ const AITrainingModule = ({ user }) => {
                           border: `1px solid ${difficultyColors.border}`
                         }}>
                           📚 {totalSections > 0
-                            ? `${totalSections} sections`
-                            : (lesson.contentUrl ? 'sections in file' : '0 sections')}
+                            ? `${totalSections} ${t('aiLearning.labels.sections')}`
+                            : (lesson.contentUrl ? t('aiLearning.labels.sectionsInFile') : `0 ${t('aiLearning.labels.sections')}`)}
                         </span>
                         <span style={{
                           background: difficultyColors.bg,
@@ -1391,7 +1411,7 @@ const AITrainingModule = ({ user }) => {
                           fontWeight: 500,
                           border: `1px solid ${difficultyColors.border}`
                         }}>
-                          🧠 Quiz included
+                          🧠 {t('aiLearning.labels.quizIncluded')}
                         </span>
                         {Array.isArray(lesson.relatedModules) && lesson.relatedModules.length > 0 && lesson.relatedModules.map((m) => (
                           <span key={m} onClick={(e)=>{
@@ -1425,7 +1445,7 @@ const AITrainingModule = ({ user }) => {
                             fontWeight: 500,
                             border: '1px solid #4CAF50'
                           }}>
-                            ✅ Quiz completed
+                            ✅ {t('aiLearning.labels.quizCompleted')}
                           </span>
                         )}
                       </div>
@@ -1491,9 +1511,9 @@ const AITrainingModule = ({ user }) => {
               <>
                 <div style={{ marginBottom: 24 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>Lesson Progress</span>
+                  <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>{t('aiLearning.lessonProgress')}</span>
                     <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>
-                      {Math.round(((currentSection + 1) / currentLesson.sections.length) * 100)}% complete
+                    {Math.round(((currentSection + 1) / currentLesson.sections.length) * 100)}% {t('aiLearning.labels.completed')}
                     </span>
                   </div>
                   <div style={{
@@ -1513,9 +1533,9 @@ const AITrainingModule = ({ user }) => {
 
                 <div style={{ marginBottom: 32 }}>
                   <h3 style={{ color: colors.text, marginBottom: 16 }}>
-                    {currentLesson.sections[currentSection].heading}
+                    {tr(`aiLearning.lessons.${currentLesson.id}.sections.${currentSection}.heading`, currentLesson.sections[currentSection].heading)}
                   </h3>
-                  {renderSection(currentLesson.sections[currentSection])}
+                  {renderSection(currentLesson.sections[currentSection], currentSection, currentLesson.id)}
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1532,11 +1552,11 @@ const AITrainingModule = ({ user }) => {
                       opacity: currentSection === 0 ? 0.5 : 1
                     }}
                   >
-                    ← Previous
+                    ← {t('aiLearning.prev')}
                   </button>
 
                   <span style={{ color: colors.textSecondary }}>
-                    Section {currentSection + 1} of {currentLesson.sections.length}
+                    {t('aiLearning.sectionXofY', { x: currentSection + 1, y: currentLesson.sections.length })}
                   </span>
 
                   <button
@@ -1550,7 +1570,7 @@ const AITrainingModule = ({ user }) => {
                       cursor: 'pointer'
                     }}
                   >
-                    {currentSection === currentLesson.sections.length - 1 ? '📝 Take Quiz' : 'Next →'}
+                    {currentSection === currentLesson.sections.length - 1 ? `📝 ${t('aiLearning.takeQuiz')}` : `${t('aiLearning.next')} →`}
                   </button>
                 </div>
               </>

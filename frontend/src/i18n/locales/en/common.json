@@ -142,5 +142,47 @@
       "jensen": "We are not replacing human creativity — we are amplifying it 100 times. Those who win are those with the best ideas, not those with the most technical skills. This changes everything about who can build companies.",
       "jensenAuthor": "— Jensen Huang (about AI)"
     }
-  }
+  },
+
+  "aiLearning": {
+    "title": "AI Learning & Training",
+    "subtitle": "Master AI concepts, tools, and best practices through interactive lessons",
+    "loading": "Loading AI Training Module...",
+    "tabs": {
+      "lessons": "Lessons",
+      "path": "Learning Path",
+      "certifications": "Certifications"
+    },
+    "choosePath": "Choose Your Learning Path",
+    "filters": {
+      "allLevels": "All Levels",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "labels": {
+      "modules": "modules",
+      "showing": "Showing",
+      "of": "of",
+      "progress": "Progress",
+      "sections": "sections",
+      "sectionsInFile": "sections in file",
+      "quizIncluded": "Quiz included",
+      "quizCompleted": "Quiz completed",
+      "completed": "complete"
+    },
+    "lessonProgress": "Lesson Progress",
+    "prev": "Previous",
+    "next": "Next",
+    "takeQuiz": "Take Quiz",
+    "sectionXofY": "Section {{x}} of {{y}}",
+    "download": "Download",
+    "copyJson": "Copy JSON",
+    "openInAgenticRag": "Open in Agentic RAG",
+    "copySuccess": "Dataset copied to clipboard",
+    "copyFail": "Could not copy dataset",
+    "openAgenticFail": "Could not open Agentic RAG with dataset",
+    "openHologram": "Open Hologram & Chat"
+    }
 }
