@@ -271,6 +271,45 @@
               "4": "Valgfritt: bygg et lite indeks og hent de 3 nærmeste naboene."
             }
           }
+      },
+
+      "tools_apis_004": {
+        "title": "Verktøy og API‑er",
+        "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes.",
+        "sections": {
+          "0": {
+            "heading": "Hvorfor verktøy & API‑er",
+            "content": "Moderne AI‑apper komponerer flere kapabiliteter: tekstreferat, embeddings, tale, bilde og vektordatabaser. Å forstå verktøyene hjelper deg å velge riktige byggeklosser."
+          },
+          "1": {
+            "heading": "Vanlige leverandører",
+            "items": {
+              "0": "OpenAI API: tekst, embeddings, lyd, bilde",
+              "1": "HuggingFace Inference: hostede modeller og pipelines",
+              "2": "Lokal inferens (LM Studio): privat, frakoblet utvikling",
+              "3": "Vektordatabaser: FAISS, Milvus, Pinecone (for gjenfinning)"
+            }
+          },
+          "2": {
+            "heading": "Nøkkelbegreper",
+            "definitions": {
+              "0": { "term": "Embedding‑modell", "definition": "Gjør tekst om til vektorer for søk/gjenfinning" },
+              "1": { "term": "Generasjonsmodell", "definition": "Skaper tekst/bilder/lyd basert på prompt" },
+              "2": { "term": "Inferensserver", "definition": "Tjeneste som kjører modeller og eksponerer HTTP‑API‑er" }
+            }
+          },
+          "3": {
+            "heading": "Hands‑on",
+            "description": "Åpne modulen API Config og verifiser at leverandøren din fungerer (ItemAI, OpenAI eller OpenRouter). Prøv et lite completion‑kall og et embeddings‑kall.",
+            "steps": {
+              "0": "Gå til API Config",
+              "1": "Velg leverandør (ItemAI, OpenAI eller OpenRouter)",
+              "2": "Lagre nøkler / test tilkobling",
+              "3": "Send: completion('Si hei')",
+              "4": "Send: embeddings('hello world') og se på vektorlengde"
+            }
+          }
+        }
         }
       }
     }

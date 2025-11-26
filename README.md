@@ -3403,6 +3403,137 @@ frontend/src/i18n/
 1. **Language Selection**: Click the language selector in the top-right corner
 2. **Flag Display**: Choose between 🇬🇧 English or 🇳🇴 Norwegian
 3. **Instant Switch**: Language changes immediately without page reload
+
+---
+
+## 🌐 i18n – Phase 2: Deep lesson content (headings, lists, definitions, exercises) {#multi-language-support-phase-2}
+
+In addition to the navigation, dashboard and high‑level module strings, we now support translating the actual lesson content (titles, section headings and text) without touching the lesson JSON files.
+
+### What was added
+- A thin helper `tr()` in `AITrainingModule.jsx` that resolves translated strings from the `common` namespace and falls back to the original English text when a key is missing:
+  ```jsx
+  const tr = (key, def) => t(key, { defaultValue: def });
+  ```
+- All places that render lesson strings now use `tr()`:
+  - Lesson card title and description on the grid
+  - In-lesson header title and “Section X of Y”
+  - Section content by type:
+    - `text`: `aiLearning.lessons.<lessonId>.sections.<index>.content`
+    - `list`: each item at `...sections.<index>.items.<itemIndex>`
+    - `definitions`: each pair at `...sections.<index>.definitions.<defIndex>.term|definition`
+    - `exercise`: `...sections.<index>.description` and each step at `...steps.<stepIndex>`
+    - `download`: `...sections.<index>.text`
+
+> Important: original English lesson JSONs in `frontend/public/ai-lessons/*.json` remain unchanged. We only overlay translations from the i18n files.
+
+### Where to put the translations
+Add keys under the `common` namespace in:
+- English fallback (optional): `frontend/src/i18n/locales/en/common.json`
+- Norwegian: `frontend/src/i18n/locales/no/common.json`
+
+Structure:
+```json
+{
+  "aiLearning": {
+    "lessons": {
+      "<lessonId>": {
+        "title": "...",
+        "description": "...",
+        "sections": {
+          "0": {
+            "heading": "...",
+            "content": "..."                  // for type: "text"
+          },
+          "1": {
+            "heading": "...",
+            "items": {                        // for type: "list"
+              "0": "...",
+              "1": "...",
+              "2": "..."
+            }
+          },
+          "2": {
+            "heading": "...",
+            "definitions": {                  // for type: "definitions"
+              "0": { "term": "...", "definition": "..." },
+              "1": { "term": "...", "definition": "..." }
+            }
+          },
+          "3": {
+            "heading": "...",
+            "description": "...",             // for type: "exercise"
+            "steps": {
+              "0": "...",
+              "1": "..."
+            }
+          },
+          "4": {
+            "heading": "...",
+            "text": "..."                     // for type: "download"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Example (Norwegian) – AI Basics
+```json
+"aiLearning": {
+  "lessons": {
+    "ai_intro_001": {
+      "title": "Introduksjon til AI",
+      "description": "Grunnlaget for AI: hva det er, underdisipliner, nøkkelbegreper og risiko.",
+      "sections": {
+        "0": {
+          "heading": "Hva er kunstig intelligens?",
+          "content": "Kunstig intelligens (AI) er systemer som kan simulere menneskelig intelligens …"
+        },
+        "1": {
+          "heading": "Underdisipliner av AI",
+          "items": {
+            "0": "Maskinlæring (ML): …",
+            "1": "Naturlig språkprosessering (NLP): …",
+            "2": "Datanalyse og datavisjon: …"
+          }
+        },
+        "2": {
+          "heading": "Nøkkelbegreper",
+          "definitions": {
+            "0": { "term": "AI", "definition": "Maskindra kognitiv kapasitet" },
+            "1": { "term": "ML", "definition": "AI‑teknikk som bruker data til å lære" },
+            "2": { "term": "LLM", "definition": "Stor språkmodell trent på store tekstmengder" }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Why your strings might still show in English
+1) Missing key: If a key under `aiLearning.lessons.<lessonId>…` is not present, `tr()` falls back to the English text embedded in the lesson JSON.  
+2) Wrong `<lessonId>`: The key must match the id from `frontend/public/ai-lessons/index.json` (e.g., `prompt_eng_002`, `llms_003`, `tools_apis_004`).  
+3) Cached build: Do a hard refresh (Ctrl+F5) to ensure the latest i18n resources are loaded.
+
+### Checklist to add a new lesson translation
+- [ ] Confirm `<lessonId>` in `frontend/public/ai-lessons/index.json`
+- [ ] Add under `no/common.json` → `aiLearning.lessons.<lessonId>`
+- [ ] Provide `title`, optional `description`
+- [ ] For each section, add `heading` and the content structure (text/list/definitions/exercise/download) as shown
+- [ ] Hard refresh the app
+
+### Current status (Norwegian)
+- ✅ `ai_intro_001` – AI Basics (all sections)
+- ✅ `prompt_eng_002` – Prompt‑teknikker (principles, tactics, key terms)
+- ✅ `llms_003` – Slik fungerer LLM‑er (tokens & embeddings, attention, inference; exercise; download text)
+- ✅ `tools_apis_004` – Verktøy og API‑er (why, providers, key terms; hands‑on)
+
+If a card title or the in‑lesson header still appears in English, verify the `title` key exists at:
+`aiLearning.lessons.<lessonId>.title`
+
 4. **Persistence**: Your choice is remembered for future visits
 
 #### **For Developers**
