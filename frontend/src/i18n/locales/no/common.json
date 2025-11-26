@@ -25,7 +25,7 @@
     "recommendations": {
       "startLearning": "Prøv din første mikroleksjon!",
       "trySimulation": "Prøv din første scenariosimulering!",
-      "aimForBetter": "Sikt mot flere 'gode' svar i simuleringer!"
+      "aimForBetter": "Sikt mot flere «gode» svar i simuleringer!"
     }
   },
 
@@ -174,10 +174,9 @@
     "copySuccess": "Datasettet ble kopiert til utklippstavlen",
     "copyFail": "Kunne ikke kopiere datasettet",
     "openAgenticFail": "Kunne ikke åpne Agentic RAG med datasettet",
-    "openHologram": "Åpne hologram og chat"
-  },
+    "openHologram": "Åpne hologram og chat",
 
-  "aiLearning.lessons": {
+    "lessons": {
     "ai_intro_001": {
       "title": "Introduksjon til AI",
       "description": "Grunnlaget for AI: hva det er, underdisipliner, nøkkelbegreper og risiko.",
@@ -207,11 +206,12 @@
             },
             "2": {
               "term": "LLM",
-              "definition": "Stort språkmodell trent på store tekstmengder"
+              "definition": "Stor språkmodell trent på store tekstmengder"
             }
           }
         }
       }
     }
+  }
   }
 }
