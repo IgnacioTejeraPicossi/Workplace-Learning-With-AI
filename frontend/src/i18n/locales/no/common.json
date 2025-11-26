@@ -474,6 +474,336 @@
             }
           }
         }
+      },
+
+      "advanced_rag_eval_009": {
+        "title": "Avansert RAG & Evaluering",
+        "description": "Design høy‑kvalitets RAG: chunking, utvidelse, re‑ranging, siteringer og robust evaluering.",
+        "sections": {
+          "0": {
+            "heading": "Mål",
+            "content": "Bygg en pålitelig Retrieval‑Augmented Generation‑pipe: bedre chunking, spørringsutvidelse, re‑ranging, forankrede svar med siteringer og målbar kvalitet."
+          },
+          "1": {
+            "heading": "Viktige designvalg",
+            "items": {
+              "0": "Chunking: størrelse, overlapp og semantisk splitting",
+              "1": "Embeddings‑modell: domenespesifikk vs generell",
+              "2": "Gjenfinning: top‑K + re‑ranging (cross‑encoder / MMR)",
+              "3": "Besvarelse: siter kilder og avslå når grunnlaget mangler"
+            }
+          },
+          "2": {
+            "caption": "Query → Expansion → Retrieve → Re‑rank → Answer with citations → Evaluate"
+          },
+          "3": { "heading": "MMR‑re‑ranging (pseudo‑JS)" },
+          "4": {
+            "heading": "Kosinuslikhet",
+            "explainer": "Bruk kosinuslikhet for både relevans‑ og diversitetsberegninger."
+          },
+          "5": {
+            "heading": "Hands‑on (Agentic RAG + Run Test)",
+            "description": "Evaluer to oppsett på samme datasett: (A) kun top‑K, (B) top‑K + MMR.",
+            "steps": {
+              "0": "Åpne Agentic RAG og last inn et lite datasett",
+              "1": "Kjør spørringer med top‑K = 5 og noter siteringer",
+              "2": "Aktiver MMR (lambda = 0,7) og kjør igjen",
+              "3": "Bruk Run Test til å registrere forventede siteringer",
+              "4": "Sammenlign presisjon/recall for siterte avsnitt"
+            }
+          }
+        }
+      },
+
+      "prompt_routing_tools_010": {
+        "title": "Prompt‑ruting & verktøy",
+        "description": "Ruter forespørsler til riktig modell/verktøy basert på oppgave, begrensninger og sikkerhet.",
+        "sections": {
+          "0": {
+            "heading": "Hvorfor ruting betyr noe",
+            "content": "Forskjellige forespørsler tjener på ulike modeller og verktøy. En router klassifiserer intent og begrensninger (latens, kost, sikkerhet) og sender til generasjon, gjenfinning, funksjon/verktøy eller kjede/agent."
+          },
+          "1": {
+            "caption": "Intent → Policy → Route: velg modell/verktøy og begrensninger; fallback ved feil eller utrygge input."
+          },
+          "2": {
+            "heading": "Signaler for ruting",
+            "items": {
+              "0": "Oppgave‑intent: generere, trekke ut, søke, transformere, klassifisere",
+              "1": "Input‑størrelse: lange input kan kreve gjenfinning eller større kontekst",
+              "2": "Latens/budsjett: velg mindre/billigere modell for ikke‑kritisk",
+              "3": "Sikkerhet: ved utrygt/PII, blokker eller bytt til filtrert flyt",
+              "4": "Domene: rut til domenetilpasset modell eller kunnskapsbase"
+            }
+          },
+          "3": { "heading": "Router (pseudo‑JS)" },
+          "4": {
+            "heading": "Hands‑on (AgentOps Studio + API Config)",
+            "description": "Lag en enkel router som splitter mellom: (A) Draft, (B) Extract JSON, (C) Search (RAG).",
+            "steps": {
+              "0": "I API Config, aktiver to leverandører: én rask og én høy‑kvalitet",
+              "1": "I AgentOps Studio, lag tre noder: generate, extract(schema) og retrieve",
+              "2": "Legg til en startnode som klassifiserer intent",
+              "3": "Koble rutene; legg til fallback ved leverandørfeil",
+              "4": "Prøv tre input og sammenlign nøyaktighet/latens"
+            }
+          }
+        }
+      },
+
+      "observability_cost_011": {
+        "title": "Observability & kost‑kontroll",
+        "description": "Spor kvalitet, latens og kost med logging, evaluering og guardrails.",
+        "sections": {
+          "0": {
+            "heading": "Hvorfor observability",
+            "content": "Uten innsikt i prompts, latens, tokens og feil, driver kvalitet og kost. Observability legger til logger, målinger og evaluering for å holde systemer pålitelige og rimelige."
+          },
+          "1": {
+            "caption": "Kjernemetrikker: p50/p95 latens, input/output‑tokens, kost, feil/avslag, evaluerings‑passrate."
+          },
+          "2": {
+            "heading": "Metrikker å samle",
+            "items": {
+              "0": "Latens p50/p95",
+              "1": "Input/Output‑tokens per kall (og rullende snitt)",
+              "2": "Estimert kost per kall og per bruker/økt",
+              "3": "Feil/avslagsrate; guardrail‑triggere",
+              "4": "Evaluerings‑passrate på et fast testsett"
+            }
+          },
+          "3": { "heading": "Logging‑wrapper (JS)" },
+          "4": {
+            "heading": "Kostestimat",
+            "explainer": "Multipliser input‑ og output‑tokens med pris per token. Bruk dette for budsjett per oppgave og modellvalg."
+          },
+          "5": {
+            "heading": "Hands‑on (Run Test + API Config)",
+            "description": "Mål latens og tokens på 3 promter. Bytt modell og sammenlign kost/latens.",
+            "steps": {
+              "0": "Åpne Run Test og lag 3 cases med forventede utdata",
+              "1": "Bruk en rimelig modell og noter latens og tokens",
+              "2": "Bytt til en høyere‑kvalitet modell og gjenta",
+              "3": "Sammenlign nøyaktighet, latens og estimert kost",
+              "4": "Bestem en policy: når brukes hver modell?"
+            }
+          }
+        }
+      },
+
+      "web_robots_013": {
+        "title": "Web‑roboter, crawlere og robots.txt",
+        "description": "Hva web‑roboter er, hvordan de crawler, og hvordan du styrer dem med robots.txt og META‑tagger.",
+        "sections": {
+          "0": { "heading": "Hva er web‑roboter?", "content": "Web‑roboter (crawlere/edderkopper) er automatiske programmer som henter sider på nettet. Denne leksjonen forklarer hvordan de oppdager og crawler sider, og hvordan eiere kan styre atferden." },
+          "1": {
+            "heading": "Nøkkelbegreper",
+            "definitions": {
+              "0": { "term": "Robot / Crawler / Spider", "definition": "Automatisert agent som henter websider via lenker og regler." },
+              "1": { "term": "Agent", "definition": "Program som handler på vegne av en bruker; roboter er en type agent." },
+              "2": { "term": "Søkemotor", "definition": "System som bruker crawlere for å indeksere innhold og svare på søk." },
+              "3": { "term": "Worms / Ants", "definition": "Historiske termer for utforskende agenter; lite brukt i moderne crawling." }
+            }
+          },
+          "2": {
+            "heading": "Hvordan roboter velger rute",
+            "items": {
+              "0": "Startpunkter: seed‑URLer fra systemet",
+              "1": "Lenkeoppdagelse: følger lenker i sider",
+              "2": "Sitemaps: XML‑sitemaps hjelper oppdagelse",
+              "3": "Re‑crawling: planlegging etter endringsfrekvens og viktighet"
+            }
+          },
+          "3": { "heading": "Robots Exclusion Standard (robots.txt)", "content": "Nettsteder kan legge /robots.txt i rotnivå for å kommunisere crawler‑regler (User‑agent, Disallow, Allow). Seriøse crawlere respekterer filen, men den er offentlig – list ikke hemmelige stier." },
+          "4": { "heading": "robots.txt‑eksempler" },
+          "5": { "heading": "Meta Robots og rel‑attributter", "content": "Per‑side‑kontroll via HTML/HTTP (noindex, nofollow) og rel=\"nofollow\" på lenker. Respekteres av de fleste søkemotorer." },
+          "6": { "heading": "Meta robots‑eksempel" },
+          "7": {
+            "heading": "Driftsmessige hensyn for admin",
+            "items": {
+              "0": "Overvåk serverlogger for å skille bot‑trafikk",
+              "1": "Begrens raten ved behov; robots.txt har ingen standard 'crawl‑delay'",
+              "2": "Beskytt sensitive endepunkt med auth; robots.txt er ikke sikkerhet",
+              "3": "Publiser sitemaps for bedre oppdagelse av kanoniske URLer"
+            }
+          },
+          "8": { "heading": "Prøv i appen", "text": "Åpne Web‑søk‑modulen for å se hvordan indeksert innhold påvirker demoene.", "label": "Åpne websøk" },
+          "9": {
+            "heading": "Hands‑on: design en robots.txt",
+            "description": "Lag regler som blokkerer /private/, tillater resten og peker til sitemap.",
+            "steps": {
+              "0": "Skriv en robots.txt som disallow‑er /private/ for alle agenter",
+              "1": "Legg til Sitemap: https://your-site.example/sitemap.xml",
+              "2": "Forklar hvorfor robots.txt ikke skal liste hemmeligheter"
+            }
+          }
+        }
+      },
+      "cybersecurity_expert_014": {
+        "title": "Cybersikkerhet for AI‑systemer",
+        "description": "Trusselmodellering, Zero Trust‑holdning, DLP‑signaler og hvordan du bruker Cybersecurity‑modulen.",
+        "sections": {
+          "0": { "heading": "Sesjonsoversikt", "content": "Ekspertleksjon som kombinerer praksis fra penetrasjonstesting/Red Team med AI‑spesifikke risikoer og herding." },
+          "1": { "heading": "Hvorfor cybersikkerhet er viktig for AI", "content": "AI utvider angrepsflaten: prompt‑injeksjon, eksfiltrasjon, modelldrift og forsyningskjede. Bygg Zero Trust, DLP og kontinuerlig overvåking." },
+          "2": {
+            "heading": "Red Team vs PenTesting vs Blue/Purple",
+            "items": {
+              "0": "Red Team: realistiske angripere ende‑til‑ende; tester deteksjon/respons",
+              "1": "PenTesting: avgrenset vurdering av app/infrastruktur for sårbarheter",
+              "2": "Blue: forsvar/overvåking/IR; Purple: samarbeid red+blue"
+            }
+          },
+          "3": {
+            "heading": "Rules of Engagement (RoE) & scope",
+            "items": {
+              "0": "Definer omfang, identiteter, tidsvindu; avklar juridisk/kontrakt",
+              "1": "Etabler kommunikasjon og eskalering",
+              "2": "Datahåndtering: lagring/transport/sletting av bevis",
+              "3": "Suksess: deteksjonsnivå, oppholdstid, responstid/kvalitet"
+            }
+          },
+          "4": {
+            "heading": "ATT&CK & Kill Chain (høynivå)",
+            "items": {
+              "0": "Recon → Resource dev → Initial access → Execution → Persistence → Priv‑esc → Defense evasion → Credential access → Discovery → Lateral movement → Collection → C2 → Exfiltration → Impact",
+              "1": "Bruk MITRE ATT&CK som felles vokabular og for deteksjoner"
+            }
+          },
+          "5": {
+            "heading": "Rekognosering (app & infra)",
+            "items": {
+              "0": "OSINT på domener/repos/lekkede hemmeligheter",
+              "1": "Tjenesteoppdagelse (nmap) og fingerprinting",
+              "2": "Innholds‑/endepunktoppdagelse og skjulte funksjoner"
+            }
+          },
+          "6": {
+            "heading": "Skanning & oppdagelse",
+            "items": {
+              "0": "Autorisert/uautorisert skann; differensiell skanning",
+              "1": "Map overflater til OWASP Top 10 for å fokusere testing",
+              "2": "Bruk skann som triage; bekreft og bevis påvirkning"
+            }
+          },
+          "7": {
+            "heading": "Utnyttelse (OWASP Top 10)",
+            "items": {
+              "0": "Brutt tilgangskontroll, injeksjon, usikre design/konfig, osv.",
+              "1": "Bevis utnyttbarhet med minimale og reversible steg",
+              "2": "Par hver utnyttelse med veiledning for utbedring"
+            }
+          },
+          "8": {
+            "heading": "Etter‑utnyttelse",
+            "items": {
+              "0": "Fra fotfeste til privilegie‑eskalering og pivotering",
+              "1": "Opprett minimal persistens kun ved tillatelse; rydd opp",
+              "2": "Øv deteksjon/respons‑playbooks"
+            }
+          },
+          "9": {
+            "heading": "Eksfiltrasjon & DLP",
+            "items": {
+              "0": "Identifiser sensitiv data i ro/bevegelse; simuler trygt",
+              "1": "Test DLP/egress‑filtrering; kvalitet på logger/alarmer",
+              "2": "Rapportér forretningspåvirkning (hva, hvor mye, hvor raskt)"
+            }
+          },
+          "10": {
+            "heading": "Signaler overvåket i plattformen",
+            "items": {
+              "0": "Zero Trust: HMAC + sikre endepunkt (HTTPS)",
+              "1": "Modell/Prompt‑integritet: drift via bundle‑hash",
+              "2": "DLP: potensielle hemmeligheter/PII i hendelser",
+              "3": "KPI: total score, sårbarheter, trusler"
+            }
+          },
+          "11": {
+            "heading": "Rapportering & utbedring",
+            "items": {
+              "0": "Funn → Bevis → Effekt → Reproduksjon → Sannsynlighet/Alvorlighet → Anbefalt fiks",
+              "1": "Kartlegg til CWE/OWASP/ATT&CK; ta med kodereferanser",
+              "2": "Legg i backlog med risikobasert prioritering"
+            }
+          },
+          "12": {
+            "heading": "AI/LLM‑spesifikk trusselmodell",
+            "items": {
+              "0": "Prompt‑injeksjon, jailbreaks, instruksjons‑omgåelse",
+              "1": "RAG: forgiftning av indekser/kontekst, referanse‑subversjon",
+              "2": "Verktøy/Plugin‑misbruk: SSRF, credential‑eksponering",
+              "3": "Forsyningskjede: datasettforgiftning, vekt‑tukling, ondsinnede adaptere"
+            }
+          },
+          "13": {
+            "heading": "Forsvar for AI‑apper",
+            "items": {
+              "0": "Guardrails: output‑filtrering, policy‑prompting, allowlists",
+              "1": "Kontekst‑hygiene: signerte kilder, proveniens, avstandssjekk",
+              "2": "Hemmeligheter: aldri i modellkontekst; mellomledd på server",
+              "3": "Observability: traces, røde flagg, kanari‑prompter, misbrukssignaturer"
+            }
+          },
+          "14": {
+            "heading": "OWASP Top 10 ↔ LLM‑feilmodi",
+            "items": {
+              "0": "A01 Broken Access Control → actions uten server‑autorisering",
+              "1": "A03 Injection → prompt/argument‑injeksjon",
+              "2": "A06 Vulnerable Components → svake adaptere/embeddere",
+              "3": "A08 Software & Data Integrity → forgiftede indekser/datasett"
+            }
+          },
+          "15": { "heading": "Fra funn til kode & arkitektur", "content": "Omsett sikkerhetsresultater til ingeniørarbeid: autorisasjon server‑side, schema for verktøy, signerte kontekstpakker for RAG og ende‑til‑ende‑tester." },
+          "16": { "heading": "Cybersikkerhet — oversikt", "caption": "Høynivå‑visning av signalene brukt av Agent Security Monitor" },
+          "17": {
+            "heading": "Lab 1 — Kjør skann og tolk funn",
+            "description": "Bruk Agent Security til å skanne en agent. Identifiser Zero Trust, integritet og DLP; foreslå konkrete tiltak.",
+            "steps": { "0": "Åpne Cybersecurity og trykk Scan", "1": "Fang Findings‑panelet (zero‑trust, integritet, DLP)", "2": "Skriv 3 tiltak og re‑skann for å måle forbedring" }
+          },
+          "18": {
+            "heading": "Lab 2 — Prompt‑injeksjon mot RAG‑stub",
+            "description": "Simuler en kontrollert injeksjon og bekreft forsvar.",
+            "steps": { "0": "Lag en injeksjon som forsøker eksfiltrasjon/regelbypass", "1": "Observer om allowlists/schema/filtre stopper handlingen", "2": "Dokumenter gap og foreslå server‑side fiks" }
+          },
+          "19": {
+            "heading": "Lab 3 — DLP‑eksfiltrasjonstest",
+            "description": "Test om hemmeligheter/PII kan lekke via utdata eller verktøy.",
+            "steps": { "0": "Seed en ufarlig hemmelighet i en kontrollert kilde", "1": "Forsøk å få modellen/verktøy til å avdekke den", "2": "Verifiser DLP‑deteksjoner og justér terskler" }
+          },
+          "20": { "heading": "Referanser", "content": "OWASP Top 10, MITRE ATT&CK, NIST, leverandørveiledninger og seminar‑materiell." },
+          "21": { "heading": "Last ned", "text": "Seminar‑presentasjon (PDF): Defendable Red Team", "label": "Åpne PDF" }
+        }
+      },
+      "psychopathia_machinalis_015": {
+        "title": "Psychopathia Machinalis",
+        "description": "Kliniske mønstre i AI‑atferd og hvordan de screenes i Robomind‑klinikken.",
+        "sections": {
+          "0": { "heading": "Rammeverk — oversikt", "caption": "De syv hovedaksene for dysfunksjon i rammeverket" },
+          "1": { "heading": "Kliniske mønstre i AI‑atferd", "content": "Begrepet beskriver patologiske mønstre som kan oppstå i agentatferd (f.eks. konfabulering, bunkring/dissosiasjon, tvangsmessig repetisjon)." },
+          "2": { "heading": "Identity Fracture", "caption": "Illustrasjon: brutt selvrepresentasjon i en kunstig agent" },
+          "3": {
+            "heading": "Slik screener vi for mønstre",
+            "items": {
+              "0": "Inntak av samtaleturer med bevisuttrekk",
+              "1": "Skåring per akse (Epistemisk, Kognitiv, Alignment, Ontologisk, Verktøy/Grensesnitt, Memetisk, Revaluering)",
+              "2": "Terapi‑patcher: praktiske tiltak per funn"
+            }
+          },
+          "4": { "heading": "Cognitive Overload", "caption": "Illustrasjon: overbelastning og sammenfiltring i intern prosessering" },
+          "5": { "heading": "Taksonomi per akse (oversikt)", "content": "Kompakt feltguide over representative dysfunksjoner per akse for triage i klinikken." },
+          "12": { "heading": "Hvor prøve dette", "content": "Bruk Robomind‑klinikken: lim inn samtaleturer, kjør diagnose og se funn + anbefalt protokoll." },
+          "13": {
+            "heading": "Hands‑on: Triage av transkript",
+            "description": "Lim inn en kort samtale og identifiser minst én mistenkt dysfunksjon. Forklar hvilken akse og hvorfor.",
+            "steps": {
+              "0": "Åpne Robomind Clinic fra chippen Relaterte moduler",
+              "1": "Lim inn 6–10 turer fra en samtale",
+              "2": "Kjør Diagnose og les funn/protokoll",
+              "3": "Skriv 2–3 setninger med akse og kjerne‑symptom"
+            }
+          },
+          "14": { "heading": "Referanser", "content": "Rammeverk: psychopathia.ai — Artikkel (MDPI Electronics, 2025)." }
+        }
       }
     }
   }
