@@ -194,12 +194,76 @@
 
       "prompt_eng_002": {
         "title": "Prompt‑teknikker",
-        "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata."
+        "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata.",
+        "sections": {
+          "0": {
+            "heading": "Prinsipper",
+            "content": "Gode prompt er tydelige på oppgave, format og begrensninger. Gi kontekst, rolle, eksempler og evalueringskriterier. Iterer og sammenlign resultater."
+          },
+          "1": {
+            "heading": "Taktikker",
+            "items": {
+              "0": "Spesifiser rolle («Du er en sikkerhetsrevisor…»)",
+              "1": "Gi struktur (overskrifter, tabeller, JSON‑skjema)",
+              "2": "Gi eksempler (few‑shot)",
+              "3": "Avgrens stil/lengde/tone",
+              "4": "Be om egenkontroll eller tanke‑kjede (kortfattet)"
+            }
+          },
+          "2": {
+            "heading": "Nøkkelbegreper",
+            "definitions": {
+              "0": { "term": "Few‑shot", "definition": "Demonstrer oppgaven med noen få eksempler i prompten" },
+              "1": { "term": "Systemprompt", "definition": "Overordnet instruksjon som setter oppførsel" },
+              "2": { "term": "Guardrails", "definition": "Begrensninger og kontroller som hindrer utrygge svar" }
+            }
+          }
+        }
       },
 
       "llms_003": {
         "title": "Slik fungerer LLM‑er",
-        "description": "Token, embeddings, attention og inferens i store språkmodeller."
+        "description": "Token, embeddings, attention og inferens i store språkmodeller.",
+        "sections": {
+          "0": {
+            "heading": "Token & Embeddings",
+            "content": "Tekst deles opp i token. Token mappes til vektorer (embeddings) som fanger semantiske relasjoner."
+          },
+          "1": {
+            "heading": "Transformer i korte trekk",
+            "caption": "Token → Embeddings → Attention → Neste‑token‑prediksjon, innenfor et kontekstvindu."
+          },
+          "2": {
+            "heading": "Attention",
+            "content": "Transformere bruker attention for å vekte relevante token når neste token skal predikeres. Multi‑head attention lærer ulike relasjoner."
+          },
+          "3": {
+            "heading": "Inferens og kontekstvindu",
+            "content": "Modellen predikerer ett token om gangen basert på tidligere token (prompt + generert). Den maksimale sekvenslengden er kontekstvinduet."
+          },
+          "4": {
+            "heading": "Kosinuslikhet (pseudokode)"
+          },
+          "5": {
+            "heading": "Kosinuslikhet (formel)",
+            "explainer": "Kosinusvinkelen mellom vektorene a og b er skalarproduktet delt på produktet av lengdene. Verdier nær 1 betyr svært lik retning (semantisk nærhet), nær 0 betyr ortogonalitet (liten relasjon), og negative verdier betyr motsatt retning."
+          },
+          "6": {
+            "heading": "Mini‑øvelse: Embedding‑likhet",
+            "description": "Beregn kosinuslikhet mellom embeddingene til korte fraser.",
+            "steps": {
+              "0": "Åpne 🔗 agentic-rag.",
+              "1": "Embed to fraser: «The cat sat on the mat» og «A dog rested on the rug».",
+              "2": "Beregn kosinuslikhet — den bør være høy grunnet semantisk likhet.",
+              "3": "Prøv en ikke‑relatert frase (f.eks. «The stock market rose today») og observer lavere likhet.",
+              "4": "Valgfritt: bygg et lite indeks og hent de 3 nærmeste naboene."
+            }
+          },
+          "7": {
+            "heading": "Datasett til øvelsen",
+            "text": "Last ned et lite datasett med 5 fraser for embedding‑beregninger:"
+          }
+        }
       },
 
       "tools_apis_004": {
