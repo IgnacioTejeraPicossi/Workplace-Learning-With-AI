@@ -47,7 +47,7 @@
     "presentationAgent": "Presentasjonsagent",
     "aiStudyBuddy": "AI-studieassistent",
     "security": "Sikkerhet",
-    
+
     "learningModulesSubmenu": {
       "videoLessons": "Video-leksjoner",
       "microLessons": "Mikro-leksjoner",
@@ -60,27 +60,27 @@
       "aiLearning": "AI-læring og opplæring",
       "babelLibrary": "Babel-bibliotek"
     },
-    
+
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Repo-analysator",
       "repoAnalyzerWithAPIs": "Repo-analysator med APIer",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Læringsrepo"
     },
-    
+
     "documentAnalyzerSubmenu": {
       "documentsAnalyzer": "Dokumentanalysator",
       "learningDocument": "Læringsdokument",
       "agenticRAGAnalyzer": "Agentic RAG-analysator",
       "agenticRAGDocuments": "Agentic RAG-dokumenter"
     },
-    
+
     "enterpriseArchitectureSubmenu": {
       "eaDashboard": "EA-dashbord",
       "processDesigner": "Prosessdesigner",
       "catalogManager": "Katalogadministrator"
     },
-    
+
     "futureSubmenu": {
       "futureApp": "Fremtidsapp",
       "ideaLog": "Ide-loggbok",
@@ -177,146 +177,36 @@
     "openHologram": "Åpne hologram og chat",
 
     "lessons": {
-    "ai_intro_001": {
-      "title": "Introduksjon til AI",
-      "description": "Grunnlaget for AI: hva det er, underdisipliner, nøkkelbegreper og risiko.",
-      "sections": {
-        "0": {
-          "heading": "Hva er kunstig intelligens?",
-          "content": "Kunstig intelligens (AI) er systemer som kan simulere menneskelig intelligens — inkludert resonnering, læring og problemløsning. Den driver alt fra chatboter til autonome kjøretøy."
-        },
-        "1": {
-          "heading": "Underdisipliner av AI",
-          "items": {
-            "0": "Maskinlæring (ML): Lære av data uten eksplisitt programmering",
-            "1": "Naturlig språkprosessering (NLP): Forstå og generere menneskelig språk",
-            "2": "Datanalyse og datavisjon: Tolke og analysere visuelle inntrykk"
-          }
-        },
-        "2": {
-          "heading": "Nøkkelbegreper",
-          "definitions": {
-            "0": {
-              "term": "AI",
-              "definition": "Maskindra kognitiv kapasitet"
-            },
-            "1": {
-              "term": "ML",
-              "definition": "AI-teknikk som bruker data til å lære"
-            },
-            "2": {
-              "term": "LLM",
-              "definition": "Stor språkmodell trent på store tekstmengder"
-    },
-
-    "lessons": {
-      "ai_intro_001": { }, 
-
-      "prompt_eng_002": {
-        "title": "Prompt‑teknikker",
-        "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata.",
+      "ai_intro_001": {
+        "title": "Introduksjon til AI",
+        "description": "Grunnlaget for AI: hva det er, underdisipliner, nøkkelbegreper og risiko.",
         "sections": {
-          "0": {
-            "heading": "Prinsipper",
-            "content": "Gode prompt er tydelige på oppgave, format og begrensninger. Gi kontekst, rolle, eksempler og evalueringskriterier. Iterer og sammenlign resultater."
-          },
-          "1": {
-            "heading": "Taktikker",
-            "items": {
-              "0": "Spesifiser rolle (\"Du er en sikkerhetsrevisor…\")",
-              "1": "Gi struktur (overskrifter, tabeller, JSON‑skjema)",
-              "2": "Gi eksempler (few‑shot)",
-              "3": "Avgrens stil/lengde/tone",
-              "4": "Be om egenkontroll eller tanke‑kjede (kortfattet)"
-            }
-          },
           "2": {
             "heading": "Nøkkelbegreper",
             "definitions": {
-              "0": { "term": "Few‑shot", "definition": "Demonstrer oppgaven med noen få eksempler i prompten" },
-              "1": { "term": "Systemprompt", "definition": "Overordnet instruksjon som setter oppførsel" },
-              "2": { "term": "Guardrails", "definition": "Begrensninger og kontroller som hindrer utrygge svar" }
+              "0": { "term": "AI", "definition": "Maskindra kognitiv kapasitet" },
+              "1": { "term": "ML", "definition": "AI-teknikk som bruker data til å lære" },
+              "2": { "term": "LLM", "definition": "Stor språkmodell trent på store tekstmengder" }
             }
           }
         }
+      },
+
+      "prompt_eng_002": {
+        "title": "Prompt‑teknikker",
+        "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata."
       },
 
       "llms_003": {
         "title": "Slik fungerer LLM‑er",
-        "description": "Token, embeddings, attention og inferens i store språkmodeller.",
-        "sections": {
-          "0": {
-            "heading": "Token & Embeddings",
-            "content": "Tekst deles opp i token. Token maps til vektorer (embeddings) som fanger semantiske relasjoner."
-          },
-          "2": {
-            "heading": "Attention",
-            "content": "Transformere bruker attention for å vekte relevante token når neste token skal predikeres. Multi‑head attention lærer ulike relasjoner."
-          },
-          "3": {
-            "heading": "Inferens & Kontekstvindu",
-            "content": "Modellen predikerer ett token om gangen basert på tidligere token (prompt + generert). Den maksimale sekvenslengden er kontekstvinduet."
-          },
-          "5": {
-            "heading": "Datasett til øvelsen",
-            "text": "Last ned et lite datasett med 5 fraser for embedding‑beregninger:"
-          },
-          "4": {
-            "description": "Beregn kosinus‑likhet mellom embeddingene til korte fraser.",
-            "steps": {
-              "0": "Åpne 🔗 agentic-rag.",
-              "1": "Embed to fraser: “The cat sat on the mat” og “A dog rested on the rug”.",
-              "2": "Beregn kosinus‑likhet — den bør være høy på grunn av semantisk likhet.",
-              "3": "Prøv en ikke‑relatert frase (f.eks. “The stock market rose today”) og observer lavere likhet.",
-              "4": "Valgfritt: bygg et lite indeks og hent de 3 nærmeste naboene."
-            }
-          }
+        "description": "Token, embeddings, attention og inferens i store språkmodeller."
       },
 
       "tools_apis_004": {
         "title": "Verktøy og API‑er",
-        "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes.",
-        "sections": {
-          "0": {
-            "heading": "Hvorfor verktøy & API‑er",
-            "content": "Moderne AI‑apper komponerer flere kapabiliteter: tekstreferat, embeddings, tale, bilde og vektordatabaser. Å forstå verktøyene hjelper deg å velge riktige byggeklosser."
-          },
-          "1": {
-            "heading": "Vanlige leverandører",
-            "items": {
-              "0": "OpenAI API: tekst, embeddings, lyd, bilde",
-              "1": "HuggingFace Inference: hostede modeller og pipelines",
-              "2": "Lokal inferens (LM Studio): privat, frakoblet utvikling",
-              "3": "Vektordatabaser: FAISS, Milvus, Pinecone (for gjenfinning)"
-            }
-          },
-          "2": {
-            "heading": "Nøkkelbegreper",
-            "definitions": {
-              "0": { "term": "Embedding‑modell", "definition": "Gjør tekst om til vektorer for søk/gjenfinning" },
-              "1": { "term": "Generasjonsmodell", "definition": "Skaper tekst/bilder/lyd basert på prompt" },
-              "2": { "term": "Inferensserver", "definition": "Tjeneste som kjører modeller og eksponerer HTTP‑API‑er" }
-            }
-          },
-          "3": {
-            "heading": "Hands‑on",
-            "description": "Åpne modulen API Config og verifiser at leverandøren din fungerer (ItemAI, OpenAI eller OpenRouter). Prøv et lite completion‑kall og et embeddings‑kall.",
-            "steps": {
-              "0": "Gå til API Config",
-              "1": "Velg leverandør (ItemAI, OpenAI eller OpenRouter)",
-              "2": "Lagre nøkler / test tilkobling",
-              "3": "Send: completion('Si hei')",
-              "4": "Send: embeddings('hello world') og se på vektorlengde"
-            }
-          }
-        }
-        }
+        "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes."
       }
     }
-          }
-        }
-      }
-    }
-  }
   }
 }
+
