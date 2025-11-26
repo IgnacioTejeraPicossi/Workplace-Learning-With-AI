@@ -269,6 +269,125 @@
       "tools_apis_004": {
         "title": "Verktøy og API‑er",
         "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes."
+      },
+
+      "ethics_safety_005": {
+        "title": "Etikk og sikkerhet",
+        "description": "Rettferdighet, skjevhet, hallusinasjoner, transparens og sikkerhet for ansvarlig AI.",
+        "sections": {
+          "0": {
+            "heading": "Hvorfor etikk betyr noe",
+            "content": "Etter hvert som AI blir allestedsnærværende, må systemene være rettferdige, transparente og ansvarlige. Etikk reduserer risiko og bygger tillit."
+          },
+          "1": {
+            "heading": "Typiske risikoer",
+            "items": {
+              "0": "Skjevhet og urettferdighet",
+              "1": "Personvern og datalekkasje",
+              "2": "Hallusinasjoner og feilinformasjon",
+              "3": "Sikkerhet og prompt‑injeksjon"
+            }
+          },
+          "2": {
+            "heading": "Sikkerhetsrekkverk",
+            "definitions": {
+              "0": { "term": "Input‑filtrering", "definition": "Blokker utrygge brukerinput (f.eks. PII, krenkende innhold)" },
+              "1": { "term": "Output‑filtrering", "definition": "Skann og blokker problematiske modellutdata" },
+              "2": { "term": "Sporbarhet", "definition": "Logg prompt/utdata for revisjon og forbedring" }
+            }
+          },
+          "3": {
+            "heading": "Bruk rekkverk i praksis",
+            "description": "Åpne modulen Sikkerhet og se hvordan prompt‑injeksjon detekteres. Vurder en allow/deny‑liste i dine promter.",
+            "steps": {
+              "0": "Åpne Sikkerhet‑modulen",
+              "1": "Les eksemplene på prompt‑injeksjon",
+              "2": "Utarbeid allow/deny‑liste for din bruk",
+              "3": "Legg til et etter‑filter for å blokkere forbudte kategorier"
+            }
+          }
+        }
+      },
+
+      "ai_workflows_006": {
+        "title": "Bruke AI i arbeidsflyter",
+        "description": "Automatiseringsmønstre: utkast, gjennomgang, datauttrekk og forskning med AI‑verktøy.",
+        "sections": {
+          "0": {
+            "heading": "Hvor AI hjelper i dag",
+            "content": "Vanlige steg der AI tilfører verdi: utkast, forbedring, klassifisering, uttrekk, oversettelse og oppsummering. Hold mennesket i loopen for kritiske beslutninger."
+          },
+          "1": {
+            "heading": "Mønstre",
+            "items": {
+              "0": "Utkast → Gjennomgang: AI lager første versjon; menneske redigerer og godkjenner",
+              "1": "Uttrekk → Struktur: AI trekker ut fakta og skriver JSON/tabeller",
+              "2": "Research → Syntese: AI samler kilder og lager et notat med sitater",
+              "3": "Klassifiser → Ruter: AI klassifiserer saker/eposter og ruter til riktig team"
+            }
+          },
+          "2": {
+            "heading": "Verktøykasse",
+            "items": {
+              "0": "LLM‑leverandører: ItemAI (LM Studio), OpenAI, OpenRouter",
+              "1": "Orkestrering: n8n, AgentOps Studio, egendefinert Node/Python",
+              "2": "Lagre: Vektordatabaser (FAISS/Pinecone), dokument‑DB, objektlager",
+              "3": "Meldinger: Slack, e‑post, webhooks for human‑in‑the‑loop"
+            }
+          },
+          "3": {
+            "heading": "Minimal orkestrering (pseudo‑JS)"
+          },
+          "4": {
+            "heading": "Hands‑on (Produktivitetsagent)",
+            "description": "Bruk AI Productivity Agent for å gjøre en URL om til et sammendrag med neste handlinger. Kopier deretter handlingene til ditt oppgavesystem.",
+            "steps": {
+              "0": "Åpne AI Productivity Agent",
+              "1": "Lim inn en nyhets‑ eller blogg‑URL",
+              "2": "Generer sammendrag og topp 5 neste handlinger",
+              "3": "Velg hvilke handlinger som er verdt å beholde; kopier til tavlen din",
+              "4": "Refleksjon: hva trenger fortsatt menneskelig vurdering?"
+            }
+          }
+        }
+      },
+
+      "debugging_ai_008": {
+        "title": "Feilsøking i AI",
+        "description": "Diagnostiser promter og utdata; spor feil og evaluer kvalitet med små tester.",
+        "sections": {
+          "0": {
+            "heading": "Hvorfor feilsøking er annerledes",
+            "content": "LLM‑er er stokastiske. Feilsøking handler om prompt, kontekst og evaluering. Tenk iterativ design, ikke bare kodefikser."
+          },
+          "1": {
+            "heading": "Sjekkliste",
+            "items": {
+              "0": "Er instruksjonen klar og spesifikk?",
+              "1": "Er det nok kontekst (eksempler, skjema)?",
+              "2": "Begrenser vi utdataformatet?",
+              "3": "Har vi tester som hindrer regresjoner?"
+            }
+          },
+          "2": {
+            "heading": "Presisjon og Recall",
+            "explainer": "For uttrekk/klassifisering: mål både presisjon (hvor mange returnerte var riktige) og recall (hvor mange riktige ble returnert)."
+          },
+          "3": {
+            "heading": "Liten evalueringsrigg (JS)"
+          },
+          "4": {
+            "heading": "Hands‑on (Run Test)",
+            "description": "Lag 2–3 små tester for en prompt (forventede utdata), kjør dem, og juster prompten til testene består.",
+            "steps": {
+              "0": "Åpne Run Test",
+              "1": "Skriv en enkel prompt og 2 forventede utdata",
+              "2": "Kjør testene og se på feil",
+              "3": "Legg til eksempler/begrensninger for å fikse problemer",
+              "4": "Kjør på nytt og behold de grønne casene"
+            }
+          }
+        }
       }
     }
   }
