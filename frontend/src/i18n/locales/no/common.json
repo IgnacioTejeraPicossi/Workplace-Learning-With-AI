@@ -135,6 +135,27 @@
     }
   },
 
+  "help": {
+    "aiStudyBuddy": {
+      "title": "AI‑studieassistent",
+      "subtitle": "Din intelligente læringsassistent",
+      "welcome": "👋 Hei! Jeg er din AI‑studieassistent. Jeg kan hjelpe deg med spørsmål om arbeidsplasslæring, mikro‑leksjoner, simuleringer eller karriereutvikling.\n\nHva vil du lære om i dag?",
+      "aiThinking": "AI tenker …",
+      "suggestedTitle": "💡 Foreslåtte spørsmål:",
+      "suggested": {
+        "0": "Hva er mikro‑leksjoner og hvordan fungerer de?",
+        "1": "Hvordan kan AI hjelpe karriereutvikling?",
+        "2": "Hva er ferdighetsprognose?",
+        "3": "Fortell om scenario‑simuleringer",
+        "4": "Hvordan følger jeg opp læringsfremdriften min?"
+      },
+      "useReadme": "Bruk README‑kontekst",
+      "agentLabel": "Agent:",
+      "selectPlaceholder": "Velg en agent…",
+      "inputPlaceholder": "Spør meg om arbeidsplasslæring …"
+    }
+  },
+
   "aiLearning": {
     "title": "AI-læring og opplæring",
     "subtitle": "Lær AI-konsepter, verktøy og beste praksis gjennom interaktive leksjoner",

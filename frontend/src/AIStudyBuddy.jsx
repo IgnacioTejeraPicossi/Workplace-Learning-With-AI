@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from './ThemeContext';
 import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
+import { useTranslation } from 'react-i18next';
 
 function AIStudyBuddy({ user, query = "" }) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState(query);
   const [isTyping, setIsTyping] = useState(false);
@@ -35,14 +37,27 @@ function AIStudyBuddy({ user, query = "" }) {
         {
           id: 1,
           type: 'ai',
-          content: `👋 Hello! I'm your AI Study Buddy. I'm here to help you with any questions about workplace learning, micro-lessons, simulations, or career development. 
-
-What would you like to learn about today?`,
+          content: t('help.aiStudyBuddy.welcome', {
+            defaultValue:
+              "👋 Hello! I'm your AI Study Buddy. I'm here to help you with any questions about workplace learning, micro-lessons, simulations, or career development.\n\nWhat would you like to learn about today?"
+          }),
           timestamp: new Date()
         }
       ]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // If user switches language while only the welcome message is present, update it
+  useEffect(() => {
+    const welcome = t('help.aiStudyBuddy.welcome', {
+      defaultValue:
+        "👋 Hello! I'm your AI Study Buddy. I'm here to help you with any questions about workplace learning, micro-lessons, simulations, or career development.\n\nWhat would you like to learn about today?"
+    });
+    if (messages.length === 1 && messages[0]?.type === 'ai' && messages[0]?.id === 1 && messages[0].content !== welcome) {
+      setMessages([{ ...messages[0], content: welcome }]);
+    }
+  }, [t, messages]);
 
   // Load agent catalog (concise) once
   useEffect(() => {
@@ -203,11 +218,11 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
   };
 
   const suggestedQuestions = [
-    "What are micro-lessons and how do they work?",
-    "How can AI help with career development?",
-    "What is skills forecasting?",
-    "Tell me about scenario simulations",
-    "How do I track my learning progress?"
+    t('help.aiStudyBuddy.suggested.0', { defaultValue: 'What are micro-lessons and how do they work?' }),
+    t('help.aiStudyBuddy.suggested.1', { defaultValue: 'How can AI help with career development?' }),
+    t('help.aiStudyBuddy.suggested.2', { defaultValue: 'What is skills forecasting?' }),
+    t('help.aiStudyBuddy.suggested.3', { defaultValue: 'Tell me about scenario simulations' }),
+    t('help.aiStudyBuddy.suggested.4', { defaultValue: 'How do I track my learning progress?' })
   ];
 
   return (
@@ -230,9 +245,9 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
       }}>
         <div style={{ fontSize: '2em' }}>🤖</div>
         <div>
-          <h2 style={{ margin: 0, color: colors.text }}>AI Study Buddy</h2>
+          <h2 style={{ margin: 0, color: colors.text }}>{t('help.aiStudyBuddy.title', { defaultValue: 'AI Study Buddy' })}</h2>
           <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
-            Your intelligent learning assistant
+            {t('help.aiStudyBuddy.subtitle', { defaultValue: 'Your intelligent learning assistant' })}
           </p>
         </div>
       </div>
@@ -297,7 +312,7 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ fontSize: '1.2em' }}>🤔</div>
-                <div>AI is thinking...</div>
+                <div>{t('help.aiStudyBuddy.aiThinking', { defaultValue: 'AI is thinking...' })}</div>
               </div>
             </div>
           </div>
@@ -314,7 +329,7 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
           borderTop: `1px solid ${colors.border}`
         }}>
           <h4 style={{ margin: '0 0 12px 0', color: colors.text, fontSize: '0.9em' }}>
-            💡 Suggested Questions:
+            {t('help.aiStudyBuddy.suggestedTitle', { defaultValue: '💡 Suggested Questions:' })}
           </h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {suggestedQuestions.map((question, index) => (
@@ -364,12 +379,12 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
               onChange={(e) => setUseReadme(e.target.checked)}
               style={{ transform: 'scale(1.1)' }}
             />
-            Use README context
+            {t('help.aiStudyBuddy.useReadme', { defaultValue: 'Use README context' })}
           </label>
 
           {/* Quick Agent Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>Agent:</span>
+            <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>{t('help.aiStudyBuddy.agentLabel', { defaultValue: 'Agent:' })}</span>
             <select
               value={selectedAgent}
               onChange={(e) => {
@@ -389,7 +404,7 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
                 fontSize: '0.9em'
               }}
             >
-              <option value="">Select an agent…</option>
+              <option value="">{t('help.aiStudyBuddy.selectPlaceholder', { defaultValue: 'Select an agent…' })}</option>
               {agentOptions.map((opt) => (
                 <option key={opt.id} value={opt.name}>{opt.name}</option>
               ))}
@@ -420,7 +435,7 @@ Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita 
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Ask me anything about workplace learning..."
+            placeholder={t('help.aiStudyBuddy.inputPlaceholder', { defaultValue: 'Ask me anything about workplace learning...' })}
             disabled={isTyping}
             style={{
               flex: 1,

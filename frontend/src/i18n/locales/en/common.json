@@ -44,7 +44,7 @@
     "aiProductivityAgent": "AI Productivity Agent",
     "eaSecondBrain": "EA Second Brain Agent",
     "salesAssistant": "Sales Assistant Agent",
-  "personalAttentionAgent": "Personal Attention Agent",
+    "personalAttentionAgent": "Personal Attention Agent",
     "telcoOpsAgent": "Telco Ops Decisioning Agent",
     "grcAgent": "Responsible AI Ops (GRC)",
     "councilAgent": "Council of Diverse Lenses",
@@ -57,7 +57,7 @@
     "presentationAgent": "Presentation Agent",
     "aiStudyBuddy": "AI Study Buddy",
     "security": "Security",
-    
+
     "learningModulesSubmenu": {
       "videoLessons": "Video Lessons",
       "microLessons": "Micro-lessons",
@@ -70,26 +70,26 @@
       "aiLearning": "AI Learning & Training",
       "babelLibrary": "Babel Library"
     },
-    
+
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Repo Analyzer",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Learning Repo"
     },
-    
+
     "documentAnalyzerSubmenu": {
       "documentsAnalyzer": "Documents Analyzer",
       "learningDocument": "Learning Document",
       "agenticRAGAnalyzer": "Agentic RAG Analyzer",
       "agenticRAGDocuments": "Agentic RAG Documents"
     },
-    
+
     "enterpriseArchitectureSubmenu": {
       "eaDashboard": "EA Dashboard",
       "processDesigner": "Process Designer",
       "catalogManager": "Catalog Manager"
     },
-    
+
     "futureSubmenu": {
       "futureApp": "Future App",
       "ideaLog": "Idea Log",
@@ -184,5 +184,27 @@
     "copyFail": "Could not copy dataset",
     "openAgenticFail": "Could not open Agentic RAG with dataset",
     "openHologram": "Open Hologram & Chat"
+  },
+
+  "help": {
+    "aiStudyBuddy": {
+      "title": "AI Study Buddy",
+      "subtitle": "Your intelligent learning assistant",
+      "welcome": "👋 Hello! I'm your AI Study Buddy. I'm here to help you with any questions about workplace learning, micro-lessons, simulations, or career development.\n\nWhat would you like to learn about today?",
+      "aiThinking": "AI is thinking...",
+      "suggestedTitle": "💡 Suggested Questions:",
+      "suggested": {
+        "0": "What are micro-lessons and how do they work?",
+        "1": "How can AI help with career development?",
+        "2": "What is skills forecasting?",
+        "3": "Tell me about scenario simulations",
+        "4": "How do I track my learning progress?"
+      },
+      "useReadme": "Use README context",
+      "agentLabel": "Agent:",
+      "selectPlaceholder": "Select an agent…",
+      "inputPlaceholder": "Ask me anything about workplace learning..."
     }
+  }
 }
+
