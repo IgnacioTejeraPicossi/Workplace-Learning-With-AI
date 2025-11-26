@@ -207,7 +207,73 @@
             "2": {
               "term": "LLM",
               "definition": "Stor språkmodell trent på store tekstmengder"
+    },
+
+    "lessons": {
+      "ai_intro_001": { }, 
+
+      "prompt_eng_002": {
+        "title": "Prompt‑teknikker",
+        "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata.",
+        "sections": {
+          "0": {
+            "heading": "Prinsipper",
+            "content": "Gode prompt er tydelige på oppgave, format og begrensninger. Gi kontekst, rolle, eksempler og evalueringskriterier. Iterer og sammenlign resultater."
+          },
+          "1": {
+            "heading": "Taktikker",
+            "items": {
+              "0": "Spesifiser rolle (\"Du er en sikkerhetsrevisor…\")",
+              "1": "Gi struktur (overskrifter, tabeller, JSON‑skjema)",
+              "2": "Gi eksempler (few‑shot)",
+              "3": "Avgrens stil/lengde/tone",
+              "4": "Be om egenkontroll eller tanke‑kjede (kortfattet)"
             }
+          },
+          "2": {
+            "heading": "Nøkkelbegreper",
+            "definitions": {
+              "0": { "term": "Few‑shot", "definition": "Demonstrer oppgaven med noen få eksempler i prompten" },
+              "1": { "term": "Systemprompt", "definition": "Overordnet instruksjon som setter oppførsel" },
+              "2": { "term": "Guardrails", "definition": "Begrensninger og kontroller som hindrer utrygge svar" }
+            }
+          }
+        }
+      },
+
+      "llms_003": {
+        "title": "Slik fungerer LLM‑er",
+        "description": "Token, embeddings, attention og inferens i store språkmodeller.",
+        "sections": {
+          "0": {
+            "heading": "Token & Embeddings",
+            "content": "Tekst deles opp i token. Token maps til vektorer (embeddings) som fanger semantiske relasjoner."
+          },
+          "2": {
+            "heading": "Attention",
+            "content": "Transformere bruker attention for å vekte relevante token når neste token skal predikeres. Multi‑head attention lærer ulike relasjoner."
+          },
+          "3": {
+            "heading": "Inferens & Kontekstvindu",
+            "content": "Modellen predikerer ett token om gangen basert på tidligere token (prompt + generert). Den maksimale sekvenslengden er kontekstvinduet."
+          },
+          "5": {
+            "heading": "Datasett til øvelsen",
+            "text": "Last ned et lite datasett med 5 fraser for embedding‑beregninger:"
+          },
+          "4": {
+            "description": "Beregn kosinus‑likhet mellom embeddingene til korte fraser.",
+            "steps": {
+              "0": "Åpne 🔗 agentic-rag.",
+              "1": "Embed to fraser: “The cat sat on the mat” og “A dog rested on the rug”.",
+              "2": "Beregn kosinus‑likhet — den bør være høy på grunn av semantisk likhet.",
+              "3": "Prøv en ikke‑relatert frase (f.eks. “The stock market rose today”) og observer lavere likhet.",
+              "4": "Valgfritt: bygg et lite indeks og hent de 3 nærmeste naboene."
+            }
+          }
+        }
+      }
+    }
           }
         }
       }

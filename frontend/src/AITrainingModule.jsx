@@ -884,10 +884,10 @@ const AITrainingModule = ({ user }) => {
       case 'exercise':
         return (
           <div style={{ border: `1px dashed ${colors.primary}`, padding: 12, borderRadius: 8 }}>
-            {section.description && <p style={{ color: colors.text }}>{section.description}</p>}
+            {section.description && <p style={{ color: colors.text }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.description`, section.description)}</p>}
             {Array.isArray(section.steps) && (
               <ol style={{ lineHeight: 1.6, color: colors.text, marginLeft: 18 }}>
-                {section.steps.map((s, i) => <li key={i} style={{ marginBottom: 8 }}>{s}</li>)}
+                {section.steps.map((s, i) => <li key={i} style={{ marginBottom: 8 }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.steps.${i}`, s)}</li>)}
               </ol>
             )}
           </div>
@@ -920,7 +920,7 @@ const AITrainingModule = ({ user }) => {
       case 'download':
         return (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-            {section.text && <span style={{ color: colors.text }}>{section.text}</span>}
+            {section.text && <span style={{ color: colors.text }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.text`, section.text)}</span>}
             <a href={section.href} download style={{ 
               background: colors.primary, 
               color: 'white',
@@ -1461,9 +1461,11 @@ const AITrainingModule = ({ user }) => {
           <div style={{ background: colors.cardBackground, borderRadius: 12, padding: 32, boxShadow: colors.shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <div>
-                <h2 style={{ color: colors.text, marginBottom: 4 }}>{currentLesson.title}</h2>
+                <h2 style={{ color: colors.text, marginBottom: 4 }}>
+                  {tr(`aiLearning.lessons.${currentLesson.id}.title`, currentLesson.title)}
+                </h2>
                 <p style={{ color: colors.textSecondary }}>
-                  {showQuiz ? 'Quiz' : `Section ${currentSection + 1} of ${currentLesson.sections.length}`}
+                  {showQuiz ? 'Quiz' : t('aiLearning.sectionXofY', { x: currentSection + 1, y: currentLesson.sections.length })}
                 </p>
               </div>
               <button
