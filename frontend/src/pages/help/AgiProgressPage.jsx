@@ -3,8 +3,10 @@ import { fetchAGIProgress } from '../../api/agiApi';
 import ScoreGauge from '../../components/agi/ScoreGauge';
 import DomainRadar from '../../components/agi/DomainRadar';
 import TrendLine from '../../components/agi/TrendLine';
+import { useTranslation } from 'react-i18next';
 
 export default function AgiProgressPage() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
@@ -23,23 +25,28 @@ export default function AgiProgressPage() {
     return source.find(i => i.model === selected) || source[0];
   }, [items, selected]);
 
-  if (loading) return <div style={{ padding: 24 }}>Loading AGI progress…</div>;
-  if (err) return <div style={{ padding: 24, color: '#dc2626' }}>Error: {err}</div>;
+  if (loading) return <div style={{ padding: 24 }}>{t('help.agiProgress.loading', { defaultValue: 'Loading AGI progress…' })}</div>;
+  if (err) return <div style={{ padding: 24, color: '#dc2626' }}>{t('help.agiProgress.error', { defaultValue: 'Error:' })} {err}</div>;
 
   return (
     <div style={{ padding: 24, display: 'grid', gap: 16 }}>
       <div>
-        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>AGI Progress Tracker</h2>
-        <div style={{ color: '#64748b', fontSize: 14 }}>Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. [<a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">paper</a>]</div>
+        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{t('help.agiProgress.title', { defaultValue: 'AGI Progress Tracker' })}</h2>
+        <div style={{ color: '#64748b', fontSize: 14 }}>
+          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.' })}
+          {' ['}
+          <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">{t('help.agiProgress.paper', { defaultValue: 'paper' })}</a>
+          {']'}
+        </div>
       </div>
 
       {latest && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 8 }}>{latest.model} — Overall</div>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>{latest.model} — {t('help.agiProgress.overall', { defaultValue: 'Overall' })}</div>
             <ScoreGauge value={latest.total} />
             <div style={{ marginTop: 12 }}>
-              <label style={{ fontSize: 12, color: '#64748b' }}>Model:</label>
+              <label style={{ fontSize: 12, color: '#64748b' }}>{t('help.agiProgress.modelLabel', { defaultValue: 'Model:' })}</label>
               <select value={selected} onChange={(e)=>setSelected(e.target.value)} style={{ marginLeft: 8, padding: '6px 8px', borderRadius: 8, border: '1px solid #e5e7eb' }}>
                 {(items||[]).slice().sort((a,b)=>a.year-b.year).map(i => (
                   <option key={`${i.model}-${i.year}`} value={i.model}>{i.model} ({i.year})</option>
@@ -48,36 +55,36 @@ export default function AgiProgressPage() {
             </div>
           </div>
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 8 }}>{latest.model} — Domain Profile</div>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>{latest.model} — {t('help.agiProgress.domainProfile', { defaultValue: 'Domain Profile' })}</div>
             <DomainRadar item={latest} />
           </div>
         </div>
       )}
 
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>Model Trend</div>
+        <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('help.agiProgress.modelTrend', { defaultValue: 'Model Trend' })}</div>
         <TrendLine items={items} />
       </div>
 
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>Methodology</div>
+        <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('help.agiProgress.methodology', { defaultValue: 'Methodology' })}</div>
         <ul style={{ margin: 0, paddingLeft: 18, color: '#374151', lineHeight: 1.6, fontSize: 14 }}>
-          <li>Ten equally weighted cognitive domains (10% each): K, RW, M, R, WM, MS, MR, V, A, S.</li>
-          <li>Numbers are approximations synthesized from public summaries and mappings to CHC abilities.</li>
-          <li>This is a directional indicator, not a certification of “AGI achieved”.</li>
+          <li>{t('help.agiProgress.pt1', { defaultValue: 'Ten equally weighted cognitive domains (10% each): K, RW, M, R, WM, MS, MR, V, A, S.' })}</li>
+          <li>{t('help.agiProgress.pt2', { defaultValue: 'Numbers are approximations synthesized from public summaries and mappings to CHC abilities.' })}</li>
+          <li>{t('help.agiProgress.pt3', { defaultValue: 'This is a directional indicator, not a certification of “AGI achieved”.' })}</li>
         </ul>
         <div style={{ marginTop: 12, fontSize: 13 }}>
-          Source paper: <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">A Definition of AGI (Hendrycks et al., Oxford–MIT–Cornell, CAIS)</a>
+          {t('help.agiProgress.source', { defaultValue: 'Source paper:' })} <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">A Definition of AGI (Hendrycks et al., Oxford–MIT–Cornell, CAIS)</a>
         </div>
       </div>
 
       {/* Admin mini-form */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>Add Model (Admin)</div>
+        <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('help.agiProgress.addModel', { defaultValue: 'Add Model (Admin)' })}</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          <input placeholder="Model (e.g., GPT-6)" value={form.model} onChange={(e)=>setForm({ ...form, model: e.target.value })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
-          <input type="number" placeholder="Year" value={form.year} onChange={(e)=>setForm({ ...form, year: Number(e.target.value) })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
-          <input type="number" placeholder="Total %" value={form.total} onChange={(e)=>setForm({ ...form, total: Number(e.target.value) })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+          <input placeholder={t('help.agiProgress.phModel', { defaultValue: 'Model (e.g., GPT-6)' })} value={form.model} onChange={(e)=>setForm({ ...form, model: e.target.value })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+          <input type="number" placeholder={t('help.agiProgress.phYear', { defaultValue: 'Year' })} value={form.year} onChange={(e)=>setForm({ ...form, year: Number(e.target.value) })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+          <input type="number" placeholder={t('help.agiProgress.phTotal', { defaultValue: 'Total %' })} value={form.total} onChange={(e)=>setForm({ ...form, total: Number(e.target.value) })} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 8, marginTop: 12, fontSize: 12 }}>
           {['K','RW','M','R','WM','MS','MR','V','A','S'].map(k => (
@@ -98,7 +105,7 @@ export default function AgiProgressPage() {
                 setSelected(row.model);
               }
             } catch {}
-          }} style={{ background: '#3b82f6', color: 'white', padding: '8px 14px', borderRadius: 8, border: 'none' }}>Save</button>
+          }} style={{ background: '#3b82f6', color: 'white', padding: '8px 14px', borderRadius: 8, border: 'none' }}>{t('help.agiProgress.save', { defaultValue: 'Save' })}</button>
         </div>
       </div>
     </div>

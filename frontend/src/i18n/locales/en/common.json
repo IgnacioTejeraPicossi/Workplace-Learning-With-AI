@@ -204,6 +204,40 @@
       "agentLabel": "Agent:",
       "selectPlaceholder": "Select an agent…",
       "inputPlaceholder": "Ask me anything about workplace learning..."
+    },
+    "agiProgress": {
+      "title": "AGI Progress Tracker",
+      "subtitle": "Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.",
+      "paper": "paper",
+      "loading": "Loading AGI progress…",
+      "error": "Error:",
+      "overall": "Overall",
+      "domainProfile": "Domain Profile",
+      "modelLabel": "Model:",
+      "modelTrend": "Model Trend",
+      "methodology": "Methodology",
+      "pt1": "Ten equally weighted cognitive domains (10% each): K, RW, M, R, WM, MS, MR, V, A, S.",
+      "pt2": "Numbers are approximations synthesized from public summaries and mappings to CHC abilities.",
+      "pt3": "This is a directional indicator, not a certification of “AGI achieved”.",
+      "source": "Source paper:",
+      "estimated": "Estimated AGI Level",
+      "addModel": "Add Model (Admin)",
+      "phModel": "Model (e.g., GPT-6)",
+      "phYear": "Year",
+      "phTotal": "Total %",
+      "save": "Save",
+      "labels": {
+        "K": "Knowledge",
+        "RW": "Read/Write",
+        "M": "Math",
+        "R": "Reasoning",
+        "WM": "WorkMem",
+        "MS": "MemStore",
+        "MR": "MemRetrieval",
+        "V": "Visual",
+        "A": "Auditory",
+        "S": "Speed"
+      }
     }
   }
 }

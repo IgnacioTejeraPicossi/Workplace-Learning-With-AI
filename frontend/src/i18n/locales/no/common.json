@@ -153,6 +153,40 @@
       "agentLabel": "Agent:",
       "selectPlaceholder": "Velg en agent…",
       "inputPlaceholder": "Spør meg om arbeidsplasslæring …"
+    },
+    "agiProgress": {
+      "title": "AGI‑fremdrift",
+      "subtitle": "Kognitiv bredde på tvers av ti domener (CHC‑inspirert) basert på Hendrycks m.fl.",
+      "paper": "artikkel",
+      "loading": "Laster AGI‑fremdrift …",
+      "error": "Feil:",
+      "overall": "Total",
+      "domainProfile": "Domenprofil",
+      "modelLabel": "Modell:",
+      "modelTrend": "Modell‑trend",
+      "methodology": "Metodikk",
+      "pt1": "Ti like vektede kognitive domener (10 % hver): K, RW, M, R, WM, MS, MR, V, A, S.",
+      "pt2": "Tallene er tilnærminger syntetisert fra offentlige sammendrag og CHC‑mapping.",
+      "pt3": "Dette er en retningsindikator, ikke en sertifisering av «oppnådd AGI».",
+      "source": "Kilde:",
+      "estimated": "Estimert AGI‑nivå",
+      "addModel": "Legg til modell (Admin)",
+      "phModel": "Modell (f.eks. GPT‑6)",
+      "phYear": "År",
+      "phTotal": "Total %",
+      "save": "Lagre",
+      "labels": {
+        "K": "Kunnskap",
+        "RW": "Les/Skriv",
+        "M": "Matematikk",
+        "R": "Resonnering",
+        "WM": "Arbeidsminne",
+        "MS": "Lagringsminne",
+        "MR": "Gjenfinning",
+        "V": "Visuell",
+        "A": "Auditiv",
+        "S": "Hastighet"
+      }
     }
   },
 
