@@ -187,6 +187,142 @@
         "A": "Auditiv",
         "S": "Hastighet"
       }
+    },
+    "presentationAgent": {
+      "title": "AI‑presentasjonsagent",
+      "subtitle": "AI‑drevet presentasjonsagent for hackathon‑demo. Generer manus, håndter Q&A og lever live‑presentasjoner.",
+      "selectMode": "Velg presentasjonsmodus:",
+      "generateScript": "Generer manus",
+      "generateScriptDesc": "Lag et 4‑minutters presentasjonsmanus for hackathon",
+      "generateAgents": "Generer manus: Hackathon‑agenter",
+      "generateAgentsDesc": "Én‑klikk manus som presenterer alle implementerte agenter på 5 minutter",
+      "qaMode": "Q&A‑modus",
+      "qaModeDesc": "Håndter spørsmål fra dommere og publikum",
+      "liveDemo": "Live‑demo",
+      "liveDemoDesc": "Start 4‑minutters automatisert presentasjon",
+      "generatingAgents": "Genererer manus: Hackathon‑agenter på 5 minutter",
+      "generatingScript": "Genererer presentasjonsmanus",
+      "generatingAgentsSub": "Oversikt over alle implementerte agenter med demo‑steg",
+      "generatingScriptSub": "4‑minutters hackathon‑presentasjon",
+      "scriptPlaceholder": "Genererer presentasjonsmanus …",
+      "speaking": "🔊 Leser …",
+      "speakScript": "🔊 Les manus",
+      "stopSpeaking": "🔇 Stopp lesing",
+      "newScript": "🔄 Nytt manus",
+      "qaTitle": "Forbedret Q&A med sanntidsdata",
+      "qaSub": "Intelligente svar med data fra plattformen i sanntid",
+      "questionCategory": "Spørsmålkategori:",
+      "allCategories": "Alle kategorier",
+      "liveData": "Integrasjon av sanntidsdata:",
+      "includeLive": "Inkluder sanntidsdata fra plattformen",
+      "questionPlaceholder": "Skriv et spørsmål om plattformen …",
+      "quickByCategory": "💡 Raske spørsmål per kategori:",
+      "generatingAnswer": "⏳ Genererer svar …",
+      "getAnswer": "❓ Hent forbedret svar",
+      "qaPlaceholder": "Svar for Q&A med sanntidsdata vises her …",
+      "statsCategories": "Kategorier:",
+      "statsQuestions": "Spørsmål:",
+      "statsLiveData": "Sanntidsdata:",
+      "statsAccuracy": "Nøyaktighet:",
+      "advanced": "Avanserte innstillinger",
+      "hide": "🔽 Skjul",
+      "show": "🔼 Vis",
+      "exportTitle": "Eksportalternativer",
+      "exportFormat": "Eksportformat:",
+      "downloadText": "Last ned som tekst",
+      "copyClipboard": "Kopier til utklippstavle",
+      "generateFirst": "Generer manus først",
+      "exportPresentation": "📄 Eksporter presentasjon",
+      "timingTitle": "Tilpasset tid",
+      "secondsPerSlide": "Sekunder per slide:",
+      "s30": "30s",
+      "s120": "120s",
+      "resetDefault": "🔄 Tilbakestill til standard (60s)",
+      "languageTitle": "Språk",
+      "presentationLanguage": "Presentasjonsspråk:",
+      "languageHint": "Språkstøtte for manusgenerering og Q&A‑svar",
+      "voiceTitle": "Stemme",
+      "presentationVoice": "Presentasjonsstemme:",
+      "myVoiceDisabled": "🎤 Min stemme (funksjon fjernet)",
+      "maleVoice": "Mannlig stemme",
+      "femaleVoice": "Kvinnelig stemme",
+      "voiceHint": "Valg av stemme for opplesing og lydpresentasjoner",
+      "statsTitle": "Statistikk",
+      "statScriptLen": "Manuslengde:",
+      "words": "ord",
+      "statSlides": "Antall slides:",
+      "statDuration": "Total varighet:",
+      "statQAPairs": "Q&A‑par:",
+      "liveDesc": "Koble til ekte app‑data for live demonstrasjoner under presentasjonen",
+      "demoModes": "Demomodi",
+      "systemStats": "Systemstatistikk",
+      "liveMetrics": "Sanntidsmålinger",
+      "userJourney": "Brukerreise",
+      "learningPath": "Full læringsløype",
+      "featureDemos": "Funksjonsdemonstrasjoner",
+      "useReadme": "Bruk README‑kontekst",
+      "agentHelpPlaceholder": "Velg en agent for en kort demo‑forklaring …",
+      "stopDemo": "Stopp demo",
+      "liveContent": "Live‑demo innhold:",
+      "demo": "Demo",
+      "livePlaceholder": "Live‑demoinnhold vises her …",
+      "speakDemo": "🔊 Les demo",
+      "agentDemos": "Agent‑demonstrasjoner",
+      "liveIntegration": "Live‑integrasjon",
+      "liveActive": "Live‑demo aktiv:",
+      "features": {
+        "ai-concepts": { "name": "AI‑konseptgenerering", "desc": "Direkte‑streamet undervisningsinnhold" },
+        "micro-lessons": { "name": "Mikro‑leksjoner", "desc": "Små læringsbiter med AI‑drevet innhold" },
+        "scenario-simulator": { "name": "Scenario‑simulator", "desc": "Interaktive arbeidsscenarier" },
+        "career-coach": { "name": "AI‑karriereveileder", "desc": "Personlig karriereveiledning" },
+        "skills-forecast": { "name": "Ferdighetsprognose", "desc": "AI‑drevne prognoser for ferdighetsutvikling" },
+        "team-dynamics": { "name": "Team‑dynamikk‑analysator", "desc": "Innsikt i team‑samarbeid" },
+        "stats": { "name": "Systemstatistikk" }
+      },
+      "agents": {
+        "ai-compliance-agent": {
+          "name": "AI‑etterlevelsesagent",
+          "desc": "Utarbeider nøkkelrisiko fra en policy og utfører Jira/Slack/Sheets via OutSystems."
+        },
+        "ai-productivity-agent": {
+          "name": "AI‑produktivitetsagent",
+          "desc": "Gjør et research‑notat om til flere Jira‑oppgaver + Slack/Sheets."
+        },
+        "personal-attention-agent": {
+          "name": "Personlig oppmerksomhetsagent",
+          "desc": "Støy→signal på tvers av kanaler; planlegger fokusperioder og sender handlingsbare brief."
+        },
+        "council-of-diverse-lenses": {
+          "name": "Råd for mangfoldige linser",
+          "desc": "Fler‑persona drøfting med sikkerhetsporter; ulike perspektiver debatterer komplekse tema."
+        },
+        "ea-second-brain-agent": {
+          "name": "EA Second Brain‑agent",
+          "desc": "EA‑vokter som gjør signaler til portefølje‑bevisste tiltak; overvåker teknologiske endringer."
+        },
+        "responsible-ai-ops-grc": {
+          "name": "Responsible AI Ops (GRC)",
+          "desc": "Avdekker datakvalitet, policy og risikosaker i Finans/Innkjøp/Forsyning/ESG og utfører rettinger med revisjon."
+        },
+        "operations-efficiency-agent": {
+          "name": "Driftseffektivitetsagent",
+          "desc": "Automatiserer fakturahåndtering, foreslår kostnadsallokeringer og rangerer CV‑er med forklarbarhet."
+        },
+        "sales-assistant-agent": {
+          "name": "Salgsassistent‑agent",
+          "desc": "Pipeline‑hygiene, risiko‑score for avtaler og kontekstuelle oppfølginger; automatiserer CRM‑oppgaver."
+        },
+        "telco-ops-decisioning-agent": {
+          "name": "Telco‑driftsbeslutningsagent",
+          "desc": "Utfører ordre, endringer og avtaler; gjør telco‑signaler om til sikker autonomi."
+        }
+      }
+    },
+    "presentationAgentLangs": {
+      "sv": "Svensk",
+      "es": "Spansk",
+      "de": "Tysk",
+      "fr": "Fransk"
     }
   },
 

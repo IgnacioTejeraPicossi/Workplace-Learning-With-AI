@@ -205,6 +205,143 @@
       "selectPlaceholder": "Select an agent…",
       "inputPlaceholder": "Ask me anything about workplace learning..."
     },
+    "presentationAgent": {
+      "title": "AI Presentation Agent",
+      "subtitle": "AI-powered presentation agent for your hackathon demo. Generate scripts, handle Q&A, and deliver live presentations.",
+      "selectMode": "Select Presentation Mode:",
+      "generateScript": "Generate Script",
+      "generateScriptDesc": "Create a 4-minute presentation script for the hackathon",
+      "generateAgents": "Generate Script Hackathon Agents",
+      "generateAgentsDesc": "One-click script that presents all implemented agents in 5 minutes",
+      "qaMode": "Q&A Mode",
+      "qaModeDesc": "Handle questions from judges and audience",
+      "liveDemo": "Live Demo",
+      "liveDemoDesc": "Start 4-minute automated presentation",
+      "generatingAgents": "Generating Script: Hackathon Agents in 5 Minutes",
+      "generatingScript": "Generating Presentation Script",
+      "generatingAgentsSub": "Overview of all implemented agents with demo steps",
+      "generatingScriptSub": "4-Minute Hackathon Presentation",
+      "scriptPlaceholder": "Generating your presentation script...",
+      "speaking": "🔊 Speaking...",
+      "speakScript": "🔊 Speak Script",
+      "stopSpeaking": "🔇 Stop Speaking",
+      "newScript": "🔄 New Script",
+      "qaTitle": "Enhanced Q&A with Live Data",
+      "qaSub": "Intelligent responses with real-time platform data",
+      "questionCategory": "Question Category:",
+      "allCategories": "All Categories",
+      "liveData": "Live Data Integration:",
+      "includeLive": "Include real-time platform data",
+      "questionPlaceholder": "Ask any question about our platform...",
+      "quickByCategory": "💡 Quick questions by category:",
+      "generatingAnswer": "⏳ Generating Answer...",
+      "getAnswer": "❓ Get Enhanced Answer",
+      "qaPlaceholder": "Enhanced Q&A responses with live data will appear here...",
+      "statsCategories": "Categories:",
+      "statsQuestions": "Questions:",
+      "statsLiveData": "Live Data:",
+      "statsAccuracy": "Accuracy:",
+      "advanced": "Advanced Settings",
+      "hide": "🔽 Hide",
+      "show": "🔼 Show",
+      "exportTitle": "Export Options",
+      "exportFormat": "Export Format:",
+      "downloadText": "Download as Text",
+      "copyClipboard": "Copy to Clipboard",
+      "generateFirst": "Generate Script First",
+      "exportPresentation": "📄 Export Presentation",
+      "timingTitle": "Custom Timing",
+      "secondsPerSlide": "Seconds per slide:",
+      "s30": "30s",
+      "s120": "120s",
+      "resetDefault": "🔄 Reset to Default (60s)",
+      "languageTitle": "Language",
+      "presentationLanguage": "Presentation Language:",
+      "languageHint": "Language support for script generation and Q&A responses",
+      "voiceTitle": "Voice",
+      "presentationVoice": "Presentation Voice:",
+      "myVoiceDisabled": "🎤 My Voice (Feature Removed)",
+      "maleVoice": "Male Voice",
+      "femaleVoice": "Female Voice",
+      "voiceHint": "Voice selection for speech synthesis and audio presentations",
+      "statsTitle": "Stats",
+      "statScriptLen": "Script Length:",
+      "words": "words",
+      "statSlides": "Total Slides:",
+      "statDuration": "Total Duration:",
+      "statQAPairs": "Q&A Pairs:",
+      "liveDesc": "Connect with real app data for live demonstrations during your presentation",
+      "demoModes": "Demo Modes",
+      "systemStats": "System Statistics",
+      "liveMetrics": "Live platform metrics",
+      "userJourney": "User Journey",
+      "learningPath": "Complete learning path",
+      "featureDemos": "Feature Demonstrations",
+      "agentDemos": "Agent Demonstrations",
+      "liveIntegration": "Live Integration",
+      "liveActive": "Live Demo Active:",
+      "useReadme": "Use README context",
+      "agentHelpPlaceholder": "Select an agent to get a concise demo-oriented explanation...",
+      "stopDemo": "Stop Demo",
+      "liveContent": "Live Demo Content:",
+      "demo": "Demo",
+      "livePlaceholder": "Live demo content will appear here...",
+      "speakDemo": "🔊 Speak Demo",
+      "features": {
+        "ai-concepts": { "name": "AI Concepts Generation", "desc": "Real-time streaming educational content" },
+        "micro-lessons": { "name": "Micro-lessons", "desc": "Bite-sized learning with AI-powered content" },
+        "scenario-simulator": { "name": "Scenario Simulator", "desc": "Interactive workplace simulations" },
+        "career-coach": { "name": "AI Career Coach", "desc": "Personalized career guidance" },
+        "skills-forecast": { "name": "Skills Forecasting", "desc": "AI-powered skill development predictions" },
+        "team-dynamics": { "name": "Team Dynamics Analyzer", "desc": "Team collaboration insights" },
+        "stats": { "name": "System Statistics" }
+      },
+      "agents": {
+        "ai-compliance-agent": {
+          "name": "AI Compliance Agent",
+          "desc": "Generate key risks from a policy and execute Jira/Slack/Sheets via OutSystems."
+        },
+        "ai-productivity-agent": {
+          "name": "AI Productivity Agent",
+          "desc": "Turn a research brief into multiple Jira tasks plus Slack/Sheets."
+        },
+        "personal-attention-agent": {
+          "name": "Personal Attention Agent",
+          "desc": "Noise→signal across channels; schedules focus holds and sends actionable briefs."
+        },
+        "council-of-diverse-lenses": {
+          "name": "Council of Diverse Lenses",
+          "desc": "Multi‑persona deliberation with safety gates; diverse perspectives to debate complex topics."
+        },
+        "ea-second-brain-agent": {
+          "name": "EA Second Brain Agent",
+          "desc": "Enterprise Architecture watcher that turns signals into portfolio‑aware actions; monitors tech changes."
+        },
+        "responsible-ai-ops-grc": {
+          "name": "Responsible AI Ops (GRC)",
+          "desc": "Detects data‑quality, policy and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit."
+        },
+        "operations-efficiency-agent": {
+          "name": "Operations Efficiency Agent",
+          "desc": "Automates invoice handling, suggests cost allocations, and ranks CVs with explainability."
+        },
+        "sales-assistant-agent": {
+          "name": "Sales Assistant Agent",
+          "desc": "Pipeline hygiene, deal risk scoring and contextual follow‑ups; automates CRM tasks."
+        },
+        "telco-ops-decisioning-agent": {
+          "name": "Telco Ops Decisioning Agent",
+          "desc": "Executes orders, plan changes and appointments; transforms telco signals into safe autonomy."
+        }
+      }
+    },
+    "languages": {},
+    "presentationAgentLangs": {
+      "sv": "Swedish",
+      "es": "Spanish",
+      "de": "German",
+      "fr": "French"
+    },
     "agiProgress": {
       "title": "AGI Progress Tracker",
       "subtitle": "Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.",

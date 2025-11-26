@@ -4,9 +4,11 @@ import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
 import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
 import { useTheme } from './ThemeContext';
+import { useTranslation } from 'react-i18next';
 // Voice context removed - using browser TTS instead
 
 function PresentationAgent() {
+  const { t, i18n } = useTranslation();
   const [presentationMode, setPresentationMode] = useState(''); // 'demo', 'qa', 'script'
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPresenting, setIsPresenting] = useState(false);
@@ -43,6 +45,18 @@ function PresentationAgent() {
   const scriptStreaming = useStreaming();
   const qaStreaming = useStreaming();
   const demoStreaming = useStreaming();
+
+  // Note for LLM to answer in current UI language
+  const languageNote = (() => {
+    const map = {
+      no: 'Respond in Norwegian.',
+      sv: 'Respond in Swedish.',
+      es: 'Respond in Spanish.',
+      de: 'Respond in German.',
+      fr: 'Respond in French.'
+    };
+    return map[i18n.language] || 'Respond in English.';
+  })();
 
   // Fetch agents catalog once
   useEffect(() => {
@@ -288,10 +302,10 @@ Goals:
 Agents implemented (name: short summary):\n${list}${readmeContext}
 
 Constraints:
-- English
 - 4–5 minutes spoken (~600–750 words)
 - Do not invent agents not in the list
-- Use clear section headers per agent`,
+- Use clear section headers per agent
+${languageNote}`,
       {
         statusMessages: STATUS_MESSAGES.PRESENTATION,
         onComplete: (content) => {
@@ -1009,15 +1023,15 @@ This demonstrates the comprehensive learning journey our platform provides.`,
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🎤 AI Presentation Agent</h2>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>🎤 {t('help.presentationAgent.title', { defaultValue: 'AI Presentation Agent' })}</h2>
       
       <p style={{ marginBottom: 20, color: colors.textSecondary }}>
-        AI-powered presentation agent for your hackathon demo. Generate scripts, handle Q&A, and deliver live presentations.
+        {t('help.presentationAgent.subtitle', { defaultValue: 'AI-powered presentation agent for your hackathon demo. Generate scripts, handle Q&A, and deliver live presentations.' })}
       </p>
 
       {/* Mode Selection - Always visible */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ marginBottom: 16, color: colors.text }}>Select Presentation Mode:</h3>
+        <h3 style={{ marginBottom: 16, color: colors.text }}>{t('help.presentationAgent.selectMode', { defaultValue: 'Select Presentation Mode:' })}</h3>
         
         <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
           {/* Generate Script */}
@@ -1036,13 +1050,13 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             onMouseLeave={(e) => e.target.style.borderColor = colors.border}
           >
             <div style={{ fontSize: '2.5em', marginBottom: 12 }}>📝</div>
-            <h3 style={{ marginBottom: 8, color: colors.text }}>Generate Script</h3>
+            <h3 style={{ marginBottom: 8, color: colors.text }}>{t('help.presentationAgent.generateScript', { defaultValue: 'Generate Script' })}</h3>
             <p style={{ 
               color: colors.textSecondary, 
               fontSize: '0.9em',
               lineHeight: 1.4
             }}>
-              Create a 4-minute presentation script for the hackathon
+              {t('help.presentationAgent.generateScriptDesc', { defaultValue: 'Create a 4-minute presentation script for the hackathon' })}
             </p>
           </div>
 
@@ -1062,13 +1076,13 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             onMouseLeave={(e) => e.target.style.borderColor = colors.border}
           >
             <div style={{ fontSize: '2.5em', marginBottom: 12 }}>🏆</div>
-            <h3 style={{ marginBottom: 8, color: colors.text }}>Generate Script Hackathon Agents</h3>
+            <h3 style={{ marginBottom: 8, color: colors.text }}>{t('help.presentationAgent.generateAgents', { defaultValue: 'Generate Script Hackathon Agents' })}</h3>
             <p style={{ 
               color: colors.textSecondary, 
               fontSize: '0.9em',
               lineHeight: 1.4
             }}>
-              One-click script that presents all implemented agents in 5 minutes
+              {t('help.presentationAgent.generateAgentsDesc', { defaultValue: 'One-click script that presents all implemented agents in 5 minutes' })}
             </p>
           </div>
 
@@ -1088,13 +1102,13 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             onMouseLeave={(e) => e.target.style.borderColor = colors.border}
           >
             <div style={{ fontSize: '2.5em', marginBottom: 12 }}>❓</div>
-            <h3 style={{ marginBottom: 8, color: colors.text }}>Q&A Mode</h3>
+            <h3 style={{ marginBottom: 8, color: colors.text }}>{t('help.presentationAgent.qaMode', { defaultValue: 'Q&A Mode' })}</h3>
             <p style={{ 
               color: colors.textSecondary, 
               fontSize: '0.9em',
               lineHeight: 1.4
             }}>
-              Handle questions from judges and audience
+              {t('help.presentationAgent.qaModeDesc', { defaultValue: 'Handle questions from judges and audience' })}
             </p>
           </div>
 
@@ -1114,13 +1128,13 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             onMouseLeave={(e) => e.target.style.borderColor = colors.border}
           >
             <div style={{ fontSize: '2.5em', marginBottom: 12 }}>🎬</div>
-            <h3 style={{ marginBottom: 8, color: colors.text }}>Live Demo</h3>
+            <h3 style={{ marginBottom: 8, color: colors.text }}>{t('help.presentationAgent.liveDemo', { defaultValue: 'Live Demo' })}</h3>
             <p style={{ 
               color: colors.textSecondary, 
               fontSize: '0.9em',
               lineHeight: 1.4
             }}>
-              Start 4-minute automated presentation
+              {t('help.presentationAgent.liveDemoDesc', { defaultValue: 'Start 4-minute automated presentation' })}
             </p>
           </div>
 
@@ -1456,7 +1470,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
           justifyContent: 'space-between',
           marginBottom: 16
         }}>
-          <h3 style={{ margin: 0, color: colors.text }}>⚙️ Advanced Settings</h3>
+          <h3 style={{ margin: 0, color: colors.text }}>⚙️ {t('help.presentationAgent.advanced', { defaultValue: 'Advanced Settings' })}</h3>
           <button
             onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
             style={{
@@ -1469,7 +1483,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
               fontSize: '0.9em'
             }}
           >
-            {showAdvancedSettings ? '🔽 Hide' : '🔼 Show'}
+            {showAdvancedSettings ? t('help.presentationAgent.hide', { defaultValue: '🔽 Hide' }) : t('help.presentationAgent.show', { defaultValue: '🔼 Show' })}
           </button>
         </div>
 
@@ -1477,7 +1491,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {/* Export Options */}
             <div>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>📄 Export Options</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>📄 {t('help.presentationAgent.exportTitle', { defaultValue: 'Export Options' })}</h4>
               <div style={{ marginBottom: 12 }}>
                 <label style={{ 
                   display: 'block', 
@@ -1485,7 +1499,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   color: colors.textSecondary,
                   fontSize: '0.9em'
                 }}>
-                  Export Format:
+                  {t('help.presentationAgent.exportFormat', { defaultValue: 'Export Format:' })}
                 </label>
                 <select
                   value={exportFormat}
@@ -1500,8 +1514,8 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                     fontSize: '0.9em'
                   }}
                 >
-                  <option value="pdf">📄 Download as Text</option>
-                  <option value="clipboard">📋 Copy to Clipboard</option>
+                  <option value="pdf">📄 {t('help.presentationAgent.downloadText', { defaultValue: 'Download as Text' })}</option>
+                  <option value="clipboard">📋 {t('help.presentationAgent.copyClipboard', { defaultValue: 'Copy to Clipboard' })}</option>
                 </select>
               </div>
               <button
@@ -1518,7 +1532,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   fontSize: '0.9em'
                 }}
               >
-                {!presentationScript ? 'Generate Script First' : '📄 Export Presentation'}
+                {!presentationScript ? t('help.presentationAgent.generateFirst', { defaultValue: 'Generate Script First' }) : t('help.presentationAgent.exportPresentation', { defaultValue: '📄 Export Presentation' })}
               </button>
             </div>
 
@@ -1598,12 +1612,12 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                     fontSize: '0.9em'
                   }}
                 >
-                  <option value="en">🇺🇸 English</option>
-                  <option value="no">🇳🇴 Norwegian</option>
-                  <option value="sv">🇸🇪 Swedish</option>
-                  <option value="es">🇪🇸 Spanish</option>
-                  <option value="de">🇩🇪 German</option>
-                  <option value="fr">🇫🇷 French</option>
+                  <option value="en">{`🇺🇸 ${t('english', { defaultValue: 'English' })}`}</option>
+                  <option value="no">{`🇳🇴 ${t('norwegian', { defaultValue: 'Norwegian' })}`}</option>
+                  <option value="sv">{`🇸🇪 ${t('help.presentationAgentLangs.sv', { defaultValue: 'Swedish' })}`}</option>
+                  <option value="es">{`🇪🇸 ${t('help.presentationAgentLangs.es', { defaultValue: 'Spanish' })}`}</option>
+                  <option value="de">{`🇩🇪 ${t('help.presentationAgentLangs.de', { defaultValue: 'German' })}`}</option>
+                  <option value="fr">{`🇫🇷 ${t('help.presentationAgentLangs.fr', { defaultValue: 'French' })}`}</option>
                 </select>
               </div>
               <div style={{ 
@@ -1953,7 +1967,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: '1.5em' }}>🎬</span>
-            <h3 style={{ margin: 0, color: colors.text }}>Live Integration</h3>
+            <h3 style={{ margin: 0, color: colors.text }}>{t('help.presentationAgent.liveIntegration', { defaultValue: 'Live Integration' })}</h3>
           </div>
           <button
             onClick={() => setShowLiveIntegration(!showLiveIntegration)}
@@ -1967,7 +1981,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
               fontSize: '0.9em'
             }}
           >
-            {showLiveIntegration ? '🔽 Hide' : '🔼 Show'}
+            {showLiveIntegration ? t('help.presentationAgent.hide', { defaultValue: '🔽 Hide' }) : t('help.presentationAgent.show', { defaultValue: '🔼 Show' })}
           </button>
         </div>
 
@@ -1978,12 +1992,12 @@ This demonstrates the comprehensive learning journey our platform provides.`,
               color: colors.textSecondary,
               fontSize: '0.9em'
             }}>
-              Connect with real app data for live demonstrations during your presentation
+              {t('help.presentationAgent.liveDesc', { defaultValue: 'Connect with real app data for live demonstrations during your presentation' })}
             </p>
 
             {/* Live Demo Modes */}
             <div style={{ marginBottom: 20 }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🎯 Demo Modes</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🎯 {t('help.presentationAgent.demoModes', { defaultValue: 'Demo Modes' })}</h4>
               <div style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
@@ -2003,9 +2017,9 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   }}
                 >
                   <div style={{ fontSize: '1.2em', marginBottom: 4 }}>📊</div>
-                  <div style={{ fontWeight: 'bold' }}>System Statistics</div>
+                  <div style={{ fontWeight: 'bold' }}>{t('help.presentationAgent.systemStats', { defaultValue: 'System Statistics' })}</div>
                   <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>
-                    Live platform metrics
+                    {t('help.presentationAgent.liveMetrics', { defaultValue: 'Live platform metrics' })}
                   </div>
                 </button>
 
@@ -2023,9 +2037,9 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   }}
                 >
                   <div style={{ fontSize: '1.2em', marginBottom: 4 }}>👤</div>
-                  <div style={{ fontWeight: 'bold' }}>User Journey</div>
+                  <div style={{ fontWeight: 'bold' }}>{t('help.presentationAgent.userJourney', { defaultValue: 'User Journey' })}</div>
                   <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>
-                    Complete learning path
+                    {t('help.presentationAgent.learningPath', { defaultValue: 'Complete learning path' })}
                   </div>
                 </button>
               </div>
@@ -2033,7 +2047,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
 
             {/* Feature Demonstrations */}
             <div style={{ marginBottom: 20 }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🚀 Feature Demonstrations</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🚀 {t('help.presentationAgent.featureDemos', { defaultValue: 'Feature Demonstrations' })}</h4>
               <div style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
@@ -2074,14 +2088,14 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                       marginBottom: 8 
                     }}>
                       <span style={{ fontSize: '1.2em' }}>{feature.icon}</span>
-                      <div style={{ fontWeight: 'bold' }}>{feature.name}</div>
+                      <div style={{ fontWeight: 'bold' }}>{t(`help.presentationAgent.features.${feature.id}.name`, { defaultValue: feature.name })}</div>
                     </div>
                     <div style={{ 
                       fontSize: '0.8em', 
                       color: colors.textSecondary,
                       lineHeight: 1.4
                     }}>
-                      {feature.description}
+                      {t(`help.presentationAgent.features.${feature.id}.desc`, { defaultValue: feature.description })}
                     </div>
                   </button>
                 ))}
@@ -2090,7 +2104,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
 
             {/* Agent Demonstrations */}
             <div style={{ marginBottom: 20 }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🤖 Agent Demonstrations</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🤖 {t('help.presentationAgent.agentDemos', { defaultValue: 'Agent Demonstrations' })}</h4>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <input
                   id="use-readme"
@@ -2100,7 +2114,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   style={{ transform: 'scale(1.1)' }}
                 />
                 <label htmlFor="use-readme" style={{ fontSize: '0.9em', color: colors.textSecondary }}>
-                  Use README context
+                  {t('help.presentationAgent.useReadme', { defaultValue: 'Use README context' })}
                 </label>
               </div>
               <div style={{ 
@@ -2108,7 +2122,16 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
                 gap: 12 
               }}>
-                {agents.map((agent) => (
+                {agents.map((agent) => {
+                  const slug = (agent.id || agent.agent_id || agent.slug || (agent.name || agent.title || 'agent'))
+                    .toString()
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                  const localizedName = t(`help.presentationAgent.agents.${slug}.name`, { defaultValue: agent.name || agent.title });
+                  const localizedDesc = t(`help.presentationAgent.agents.${slug}.desc`, { defaultValue: (agent.description || agent.summary || '') });
+                  const shortDesc = (localizedDesc || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+                  return (
                   <button
                     key={agent.id || agent.agent_id || agent.name}
                     onClick={() => explainAgent(agent)}
@@ -2122,17 +2145,18 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                       transition: 'all 0.2s ease',
                       cursor: 'pointer'
                     }}
-                    title={agent.description || agent.summary}
+                    title={localizedDesc}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                       <span style={{ fontSize: '1.2em' }}>{agent.icon || '🤖'}</span>
-                      <div style={{ fontWeight: 'bold' }}>{agent.name || agent.title}</div>
+                      <div style={{ fontWeight: 'bold' }}>{localizedName}</div>
                     </div>
                     <div style={{ fontSize: '0.8em', color: colors.textSecondary, lineHeight: 1.4 }}>
-                      {(agent.description || agent.summary || '').slice(0, 120)}{(agent.description || agent.summary || '').length > 120 ? '…' : ''}
+                      {shortDesc}{(localizedDesc && localizedDesc.length > 120) ? '…' : ''}
                     </div>
                   </button>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Agent Help Output */}
