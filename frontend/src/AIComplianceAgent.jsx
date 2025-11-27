@@ -94,7 +94,7 @@ const AIComplianceAgent = () => {
           gap: '20px'
         }}>
           <span style={{ fontSize: '2.5rem' }}>🛡️</span>
-          AI Compliance Agent
+          {t('agents.compliance.title', { defaultValue: 'AI Compliance Agent' })}
         </h1>
         <p style={{ 
           fontSize: '1.25rem', 
@@ -102,7 +102,7 @@ const AIComplianceAgent = () => {
           marginBottom: '0',
           lineHeight: '1.6'
         }}>
-          Transform compliance documents into auditable team actions via OutSystems enterprise execution.
+          {t('agents.compliance.tagline', { defaultValue: 'Transform compliance documents into auditable team actions via OutSystems enterprise execution.' })}
         </p>
       </div>
 
@@ -126,7 +126,7 @@ const AIComplianceAgent = () => {
             gap: '12px'
           }}>
             <span style={{ fontSize: '1.75rem' }}>📄</span>
-            Select Compliance Document
+            {t('agents.compliance.selectDocument', { defaultValue: 'Select Compliance Document' })}
           </h2>
           
           <div style={{ marginBottom: '20px' }}>
@@ -136,7 +136,7 @@ const AIComplianceAgent = () => {
               marginBottom: '12px',
               lineHeight: '1.5'
             }}>
-              Choose from your saved document analyses:
+              {t('agents.compliance.chooseFromSaved', { defaultValue: 'Choose from your saved document analyses:' })}
             </p>
             <select 
               style={{
@@ -169,11 +169,11 @@ const AIComplianceAgent = () => {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="">Select a document...</option>
+              <option value="">{t('agents.compliance.selectPlaceholder', { defaultValue: 'Select a document...' })}</option>
               {documents.map(doc => (
                 <option key={doc.id} value={doc.id}>
                   {doc.title || doc.filename || 'Untitled Document'} 
-                  {doc.source === 'document_analyzer' ? ' (📄 Doc)' : ' (🤖 RAG)'}
+                  {doc.source === 'document_analyzer' ? ` (${t('agents.compliance.docTagRag.doc', { defaultValue: '📄 Doc' })})` : ` (${t('agents.compliance.docTagRag.rag', { defaultValue: '🤖 RAG' })})`}
                 </option>
               ))}
             </select>
@@ -192,7 +192,7 @@ const AIComplianceAgent = () => {
                 color: '#374151', 
                 marginBottom: '8px' 
               }}>
-                Selected Document:
+                {t('agents.compliance.selectedDocument', { defaultValue: 'Selected Document:' })}
               </h3>
               <p style={{ 
                 fontSize: '0.95rem', 
@@ -223,7 +223,7 @@ const AIComplianceAgent = () => {
                   if (!loading) e.target.style.backgroundColor = '#10b981';
                 }}
               >
-                {loading ? '⏳ Analyzing...' : '🔍 Analyze Document'}
+                {loading ? `⏳ ${t('agents.compliance.analyzing', { defaultValue: 'Analyzing...' })}` : `🔍 ${t('agents.compliance.analyze', { defaultValue: 'Analyze Document' })}`}
               </button>
             </div>
           )}
@@ -247,7 +247,7 @@ const AIComplianceAgent = () => {
             gap: '12px'
           }}>
             <span style={{ fontSize: '1.75rem' }}>🔍</span>
-            AI Analysis Results
+            {t('agents.compliance.resultsTitle', { defaultValue: 'AI Analysis Results' })}
           </h2>
 
           {loading && (
@@ -259,7 +259,7 @@ const AIComplianceAgent = () => {
               border: '1px solid #e2e8f0'
             }}>
               <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
-              <p style={{ color: '#64748b', fontSize: '1rem', margin: 0 }}>Analyzing document...</p>
+              <p style={{ color: '#64748b', fontSize: '1rem', margin: 0 }}>{t('agents.compliance.analyzing', { defaultValue: 'Analyzing...' })}</p>
             </div>
           )}
 
@@ -271,7 +271,7 @@ const AIComplianceAgent = () => {
                 color: '#374151', 
                 marginBottom: '12px' 
               }}>
-                Summary:
+                {t('agents.compliance.summary', { defaultValue: 'Summary:' })}
               </h3>
               <div style={{
                 backgroundColor: '#f8fafc',
@@ -295,7 +295,7 @@ const AIComplianceAgent = () => {
                 color: '#374151', 
                 marginBottom: '12px' 
               }}>
-                Key Risks Identified:
+                {t('agents.compliance.keyRisks', { defaultValue: 'Key Risks Identified:' })}
               </h3>
               <div style={{
                 backgroundColor: '#fef2f2',
@@ -335,7 +335,7 @@ const AIComplianceAgent = () => {
                 color: '#374151', 
                 marginBottom: '16px' 
               }}>
-                Available Documents:
+                {t('agents.compliance.availableDocs', { defaultValue: 'Available Documents:' })}
               </h3>
               {documents.length > 0 ? (
                 <div>
@@ -387,7 +387,7 @@ const AIComplianceAgent = () => {
                         borderRadius: '4px',
                         marginRight: '8px'
                       }}>
-                        {doc.source === 'document_analyzer' ? '📄 Doc' : '🤖 RAG'}
+                        {doc.source === 'document_analyzer' ? t('agents.compliance.docTagRag.doc', { defaultValue: '📄 Doc' }) : t('agents.compliance.docTagRag.rag', { defaultValue: '🤖 RAG' })}
                       </span>
                       <span style={{ 
                         fontSize: '0.8rem', 
@@ -396,7 +396,7 @@ const AIComplianceAgent = () => {
                         padding: '4px 8px',
                         borderRadius: '4px'
                       }}>
-                        Click to analyze
+                        {t('agents.compliance.clickToAnalyze', { defaultValue: 'Click to analyze' })}
                       </span>
                     </div>
                     ))}
@@ -424,7 +424,7 @@ const AIComplianceAgent = () => {
                           e.target.style.borderColor = '#d1d5db';
                         }}
                       >
-                        {showAllDocs ? 'Show less' : `Show all (${documents.length - 4} more)`}
+                        {showAllDocs ? t('agents.compliance.showLess', { defaultValue: 'Show less' }) : t('agents.compliance.showAll', { count: documents.length - 4, defaultValue: `Show all (${documents.length - 4} more)` })}
                       </button>
                     </div>
                   )}
@@ -444,7 +444,7 @@ const AIComplianceAgent = () => {
                     textAlign: 'center',
                     margin: 0
                   }}>
-                    No documents available. Upload documents in Document Analyzer first.
+                    {t('agents.compliance.noDocs', { defaultValue: 'No documents available. Upload documents in Document Analyzer first.' })}
                   </p>
                 </div>
               )}
@@ -456,7 +456,7 @@ const AIComplianceAgent = () => {
       {/* New: Dispatch Panel just below main results */}
       <div style={{ marginBottom: 24 }}>
         <ActionDispatchPanel
-          title="Send to OutSystems Agent"
+          title={t('agents.compliance.dispatchTitle', { defaultValue: 'Send to OutSystems Agent' })}
           endpoint="/api/compliance/dispatch"
           buildPayload={buildPayload}
           ready={!!(selectedDoc && summary && risks.length)}

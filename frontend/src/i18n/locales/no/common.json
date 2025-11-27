@@ -44,6 +44,8 @@
     "apiConfig": "API-konfig",
     "future": "Fremtiden Item Agenter",
     "presentationAgent": "Presentasjonsagent",
+    "aiComplianceAgent": "AI‑etterlevelsesagent",
+    "aiProductivityAgent": "AI‑produktivitetsagent",
     "aiStudyBuddy": "AI-studieassistent",
     "security": "Sikkerhet",
 
@@ -84,6 +86,31 @@
       "futureApp": "Fremtidsapp",
       "ideaLog": "Ide-loggbok",
       "featureRoadmap": "Funksjonskart"
+    }
+  },
+  "agents": {
+    "compliance": {
+      "title": "AI‑etterlevelsesagent",
+      "tagline": "Gjør etterlevelsesdokumenter om til reviderbare team‑tiltak via OutSystems‑utførelse.",
+      "selectDocument": "Velg etterlevelsesdokument",
+      "chooseFromSaved": "Velg blant dine lagrede dokumentanalyser:",
+      "selectPlaceholder": "Velg et dokument …",
+      "analyzing": "Analyserer …",
+      "analyze": "Analyser dokument",
+      "selectedDocument": "Valgt dokument:",
+      "resultsTitle": "AI‑analyseresultater",
+      "summary": "Sammendrag:",
+      "keyRisks": "Nøkkelrisiko identifisert:",
+      "availableDocs": "Tilgjengelige dokumenter:",
+      "docTagRag": {
+        "doc": "📄 Dok",
+        "rag": "🤖 RAG"
+      },
+      "clickToAnalyze": "Klikk for å analysere",
+      "showLess": "Vis færre",
+      "showAll": "Vis alle ({{count}} flere)",
+      "noDocs": "Ingen dokumenter tilgjengelig. Last opp dokumenter i Dokumentanalysator først.",
+      "dispatchTitle": "Send til OutSystems‑agent"
     }
   },
 
