@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 export default function PromptPanel({ agent, nativePromptText, colors, onUseResult }) {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState('');
   const [name, setName] = useState('');
@@ -98,15 +100,15 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
       marginBottom: '24px'
     }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1e293b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span>🧩</span> Prompt Manager
+        <span>🧩</span> {t('components.prompt.title', { defaultValue: 'Prompt Manager' })}
       </h2>
 
       {/* Native prompt */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>Native prompt</div>
+        <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>{t('components.prompt.native', { defaultValue: 'Native prompt' })}</div>
         <textarea
           readOnly
-          value={nativePromptText || '(no definido en código)'}
+          value={nativePromptText || t('components.prompt.undefined', { defaultValue: '(not defined in code)' })}
           style={{ width: '100%', minHeight: 100, padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b' }}
         />
       </div>
@@ -114,12 +116,12 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
       {/* Editor prompt temporal */}
       <div style={{ marginBottom: 12, display: 'grid', gap: 8 }}>
         <div style={{ display: 'flex', gap: 8 }}>
-          <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Prompt name"
+          <input value={name} onChange={(e)=>setName(e.target.value)} placeholder={t('components.prompt.namePlaceholder', { defaultValue: 'Prompt name' })}
             style={{ flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }} />
-          <button onClick={save} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: '#3b82f6', color: '#fff' }}>Save</button>
-          <button onClick={update} disabled={!selectedId} style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff' }}>Update</button>
+          <button onClick={save} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: '#3b82f6', color: '#fff' }}>{t('components.prompt.save', { defaultValue: 'Save' })}</button>
+          <button onClick={update} disabled={!selectedId} style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff' }}>{t('components.prompt.update', { defaultValue: 'Update' })}</button>
         </div>
-        <textarea value={prompt} onChange={(e)=>setPrompt(e.target.value)} placeholder="Write your prompt here..."
+        <textarea value={prompt} onChange={(e)=>setPrompt(e.target.value)} placeholder={t('components.prompt.writeHere', { defaultValue: 'Write your prompt here...' })}
           style={{ width: '100%', minHeight: 140, padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', background: '#ffffff' }} />
         {injectionWarn && (
           <div style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#92400e', padding: '10px 12px', borderRadius: 8 }}>
@@ -136,19 +138,19 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
                 .replace(/override/ig,'');
               setPrompt(cleaned);
               setInjectionWarn(null);
-            }} style={{ marginLeft: 8, padding: '6px 10px', borderRadius: 6, border: 'none', background: '#f59e0b', color: '#fff' }}>Sanitize prompt</button>
+            }} style={{ marginLeft: 8, padding: '6px 10px', borderRadius: 6, border: 'none', background: '#f59e0b', color: '#fff' }}>{t('components.prompt.sanitize', { defaultValue: 'Sanitize prompt' })}</button>
           </div>
         )}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={test} disabled={testing || !prompt.trim()} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: testing? '#94a3b8':'#22c55e', color: '#fff' }}>{testing? 'Testing...' : 'Test'}</button>
+          <button onClick={test} disabled={testing || !prompt.trim()} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: testing? '#94a3b8':'#22c55e', color: '#fff' }}>{testing? t('components.prompt.testing', { defaultValue: 'Testing...' }) : t('components.prompt.test', { defaultValue: 'Test' })}</button>
         </div>
       </div>
 
       {/* Lista de prompts guardados */}
-      <div style={{ marginTop: 8 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>Saved prompts</div>
+        <div style={{ marginTop: 8 }}>
+        <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>{t('components.prompt.saved', { defaultValue: 'Saved prompts' })}</div>
         {items.length === 0 ? (
-          <div style={{ color: '#94a3b8' }}>No saved prompts.</div>
+          <div style={{ color: '#94a3b8' }}>{t('components.prompt.noSaved', { defaultValue: 'No saved prompts.' })}</div>
         ) : (
           <div style={{ display: 'grid', gap: 8 }}>
             {items.map((it)=> (
@@ -167,8 +169,8 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
                   <div title={it.prompt} style={{ fontSize: '0.85em', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.prompt}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, justifySelf: 'end' }}>
-                  <button onClick={()=>{ setSelectedId(it._id); setName(it.name); setPrompt(it.prompt); }} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff' }}>Edit</button>
-                  <button onClick={()=>remove(it._id)} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #fecaca', background: '#fee2e2', color: '#b91c1c' }}>Delete</button>
+                  <button onClick={()=>{ setSelectedId(it._id); setName(it.name); setPrompt(it.prompt); }} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff' }}>{t('components.prompt.edit', { defaultValue: 'Edit' })}</button>
+                  <button onClick={()=>remove(it._id)} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #fecaca', background: '#fee2e2', color: '#b91c1c' }}>{t('components.prompt.delete', { defaultValue: 'Delete' })}</button>
                 </div>
               </div>
             ))}
@@ -179,7 +181,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
       {/* Test output */}
       {testOutput && (
         <div style={{ marginTop: 16 }}>
-          <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>Test result</div>
+          <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>{t('components.prompt.testResult', { defaultValue: 'Test result' })}</div>
           <pre style={{ whiteSpace: 'pre-wrap', background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', color: '#111827' }}>{testOutput}</pre>
         </div>
       )}

@@ -113,6 +113,32 @@
       "dispatchTitle": "Send til OutSystems‑agent"
     }
   },
+  "components": {
+    "dispatch": {
+      "send": "Send",
+      "jira": { "placeholder": "Prosjektnøkkel (f.eks. TEST)" },
+      "slack": { "placeholder": "#kanal eller webhook‑URL" },
+      "sheets": { "placeholder": "Regneark‑ID eller full URL" },
+      "completeAnalysis": "Fullfør analysen først for å aktivere sending."
+    },
+    "prompt": {
+      "title": "Prompt‑behandler",
+      "native": "Naturlig prompt",
+      "undefined": "(ikke definert i kode)",
+      "namePlaceholder": "Prompt‑navn",
+      "save": "Lagre",
+      "update": "Oppdater",
+      "writeHere": "Skriv prompten din her …",
+      "sanitize": "Rens prompt",
+      "testing": "Tester …",
+      "test": "Test",
+      "saved": "Lagrede prompts",
+      "noSaved": "Ingen lagrede prompts.",
+      "edit": "Rediger",
+      "delete": "Slett",
+      "testResult": "Testrusultat"
+    }
+  },
 
   "actions": {
     "refreshData": "Oppdater data",

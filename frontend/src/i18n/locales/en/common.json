@@ -199,31 +199,6 @@
         "3": "Tell me about scenario simulations",
         "4": "How do I track my learning progress?"
       },
-  "agents": {
-    "compliance": {
-      "title": "AI Compliance Agent",
-      "tagline": "Transform compliance documents into auditable team actions via OutSystems enterprise execution.",
-      "selectDocument": "Select Compliance Document",
-      "chooseFromSaved": "Choose from your saved document analyses:",
-      "selectPlaceholder": "Select a document...",
-      "analyzing": "Analyzing...",
-      "analyze": "Analyze Document",
-      "selectedDocument": "Selected Document:",
-      "resultsTitle": "AI Analysis Results",
-      "summary": "Summary:",
-      "keyRisks": "Key Risks Identified:",
-      "availableDocs": "Available Documents:",
-      "docTagRag": {
-        "doc": "📄 Doc",
-        "rag": "🤖 RAG"
-      },
-      "clickToAnalyze": "Click to analyze",
-      "showLess": "Show less",
-      "showAll": "Show all ({{count}} more)",
-      "noDocs": "No documents available. Upload documents in Document Analyzer first.",
-      "dispatchTitle": "Send to OutSystems Agent"
-    }
-  },
       "useReadme": "Use README context",
       "agentLabel": "Agent:",
       "selectPlaceholder": "Select an agent…",
