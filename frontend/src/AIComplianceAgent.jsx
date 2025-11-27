@@ -456,7 +456,7 @@ const AIComplianceAgent = () => {
       {/* New: Dispatch Panel just below main results */}
       <div style={{ marginBottom: 24 }}>
         <ActionDispatchPanel
-          title={t('agents.compliance.dispatchTitle', { defaultValue: 'Send to OutSystems Agent' })}
+          title={t('agents.compliance.dispatchTitle', { defaultValue: 'Send to n8n/OutSystems Agent' })}
           endpoint="/api/compliance/dispatch"
           buildPayload={buildPayload}
           ready={!!(selectedDoc && summary && risks.length)}

@@ -110,7 +110,7 @@
       "showLess": "Vis færre",
       "showAll": "Vis alle ({{count}} flere)",
       "noDocs": "Ingen dokumenter tilgjengelig. Last opp dokumenter i Dokumentanalysator først.",
-      "dispatchTitle": "Send til OutSystems‑agent"
+      "dispatchTitle": "Send til n8n/OutSystems‑agent"
     }
   },
   "components": {

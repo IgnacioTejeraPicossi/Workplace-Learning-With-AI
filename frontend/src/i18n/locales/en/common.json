@@ -96,6 +96,12 @@
     }
   },
 
+  "agents": {
+    "compliance": {
+      "dispatchTitle": "Send to n8n/OutSystems Agent"
+    }
+  },
+
   "actions": {
     "refreshData": "Refresh Data",
     "signOut": "Sign Out",
