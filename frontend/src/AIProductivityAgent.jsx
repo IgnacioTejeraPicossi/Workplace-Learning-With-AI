@@ -463,7 +463,7 @@ const AIProductivityAgent = () => {
       {/* New: Dispatch Panel just below main results */}
       <div style={{ marginBottom: 24 }}>
         <ActionDispatchPanel
-          title="Send to OutSystems Agent"
+          title="Send to n8n/OutSystems Agent"
           endpoint="/api/productivity/dispatch"
           buildPayload={buildPayload}
           ready={!!(summary && nextActions.length)}
