@@ -111,7 +111,51 @@
       "showAll": "Vis alle ({{count}} flere)",
       "noDocs": "Ingen dokumenter tilgjengelig. Last opp dokumenter i Dokumentanalysator først.",
       "dispatchTitle": "Send til n8n/OutSystems‑agent"
+    },
+    "productivity": {
+      "title": "AI‑produktivitetsagent",
+      "tagline": "Gjør research‑notater og konkurranseanalyse om til handlingsbare team‑oppgaver med gjennomføring i enterprise‑klasse.",
+      "researchInputTitle": "Forskningsinput",
+      "analyzeUrlLabel": "Analyser URL:",
+      "existingAnalysesLabel": "Eller velg fra eksisterende analyser:",
+      "selectAnalysisPlaceholder": "Velg en analyse …",
+      "selectedAnalysis": "Valgt analyse:",
+      "resultsTitle": "AI‑analyseresultater",
+      "analyzing": "Analyserer innhold …",
+      "summary": "Sammendrag:",
+      "nextActions": "Topp 5 neste handlinger:",
+      "emptyState": "Skriv inn en URL eller velg en analyse for å se resultater",
+      "dispatchTitle": "Send til n8n/OutSystems‑agent"
     }
+  },
+  "agentRuns": {
+    "title": "Agent‑kjøringer",
+    "subtitle": "Overvåk og spor status og resultater for agent‑kjøringer",
+    "filterByModule": "Filtrer etter modul",
+    "allModules": "Alle moduler",
+    "moduleCompliance": "Etterlevelsesagent",
+    "moduleProductivity": "Produktivitetsagent",
+    "refresh": "Oppdater",
+    "loading": "Laster …",
+    "emptyTitle": "Ingen agent‑kjøringer funnet",
+    "emptyHint": "Kjør først en etterlevelses‑ eller produktivitetsagent for å se resultater her.",
+    "th": {
+      "runId": "Run ID",
+      "module": "Modul",
+      "topic": "Tema",
+      "status": "Status",
+      "artifacts": "Artefakter",
+      "updated": "Oppdatert"
+    },
+    "artifacts": {
+      "jira": "Jira:",
+      "slack": "Slack:",
+      "sheets": "Sheets:",
+      "open": "Åpne →",
+      "none": "Ingen artefakter"
+    },
+    "showLess": "Vis færre",
+    "showAll": "Vis alle ({{count}} flere)"
   },
   "components": {
     "dispatch": {

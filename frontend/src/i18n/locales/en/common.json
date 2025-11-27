@@ -99,7 +99,51 @@
   "agents": {
     "compliance": {
       "dispatchTitle": "Send to n8n/OutSystems Agent"
+    },
+    "productivity": {
+      "title": "AI Productivity Agent",
+      "tagline": "Convert research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.",
+      "researchInputTitle": "Research Input",
+      "analyzeUrlLabel": "Analyze URL:",
+      "existingAnalysesLabel": "Or select from existing analyses:",
+      "selectAnalysisPlaceholder": "Select an analysis...",
+      "selectedAnalysis": "Selected Analysis:",
+      "resultsTitle": "AI Analysis Results",
+      "analyzing": "Analyzing content...",
+      "summary": "Summary:",
+      "nextActions": "Top 5 Next Actions:",
+      "emptyState": "Enter a URL or select an analysis to view results",
+      "dispatchTitle": "Send to n8n/OutSystems Agent"
     }
+  },
+  "agentRuns": {
+    "title": "Agent Runs Monitor",
+    "subtitle": "Monitor and track agent execution status and results",
+    "filterByModule": "Filter by Module",
+    "allModules": "All Modules",
+    "moduleCompliance": "Compliance Agent",
+    "moduleProductivity": "Productivity Agent",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "emptyTitle": "No agent runs found",
+    "emptyHint": "Try running a compliance or productivity agent first to see results here.",
+    "th": {
+      "runId": "Run ID",
+      "module": "Module",
+      "topic": "Topic",
+      "status": "Status",
+      "artifacts": "Artifacts",
+      "updated": "Updated"
+    },
+    "artifacts": {
+      "jira": "Jira:",
+      "slack": "Slack:",
+      "sheets": "Sheets:",
+      "open": "Open →",
+      "none": "No artifacts"
+    },
+    "showLess": "Show less",
+    "showAll": "Show all ({{count}} more)"
   },
 
   "actions": {

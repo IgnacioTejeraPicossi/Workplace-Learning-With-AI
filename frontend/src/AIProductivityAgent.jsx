@@ -133,7 +133,7 @@ const AIProductivityAgent = () => {
           gap: '20px'
         }}>
           <span style={{ fontSize: '2.5rem' }}>🚀</span>
-          AI Productivity Agent
+          {t('agents.productivity.title', { defaultValue: 'AI Productivity Agent' })}
         </h1>
         <p style={{ 
           fontSize: '1.25rem', 
@@ -141,7 +141,7 @@ const AIProductivityAgent = () => {
           marginBottom: '0',
           lineHeight: '1.6'
         }}>
-          Convert research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.
+          {t('agents.productivity.tagline', { defaultValue: 'Convert research briefs and competitive analysis into actionable team tasks with enterprise-grade execution.' })}
         </p>
       </div>
 
@@ -165,7 +165,7 @@ const AIProductivityAgent = () => {
             gap: '12px'
           }}>
             <span style={{ fontSize: '1.75rem' }}>🔍</span>
-            Research Input
+            {t('agents.productivity.researchInputTitle', { defaultValue: 'Research Input' })}
           </h2>
           
           {/* URL Input */}
@@ -177,7 +177,7 @@ const AIProductivityAgent = () => {
               color: '#374151',
               marginBottom: '12px'
             }}>
-              Analyze URL:
+              {t('agents.productivity.analyzeUrlLabel', { defaultValue: 'Analyze URL:' })}
             </label>
             <div style={{ display: 'flex', gap: '12px' }}>
               <input
@@ -248,7 +248,7 @@ const AIProductivityAgent = () => {
               color: '#374151',
               marginBottom: '12px'
             }}>
-              Or select from existing analyses:
+              {t('agents.productivity.existingAnalysesLabel', { defaultValue: 'Or select from existing analyses:' })}
             </label>
             <select 
               style={{
@@ -276,7 +276,7 @@ const AIProductivityAgent = () => {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              <option value="">Select an analysis...</option>
+              <option value="">{t('agents.productivity.selectAnalysisPlaceholder', { defaultValue: 'Select an analysis...' })}</option>
               {analyses.map(analysis => (
                 <option key={analysis.id} value={analysis.id}>
                   {analysis.title || analysis.query || 'Untitled Analysis'}
@@ -299,7 +299,7 @@ const AIProductivityAgent = () => {
                 color: '#374151', 
                 marginBottom: '8px' 
               }}>
-                Selected Analysis:
+                {t('agents.productivity.selectedAnalysis', { defaultValue: 'Selected Analysis:' })}
               </h3>
               <p style={{ 
                 fontSize: '0.95rem', 
@@ -330,7 +330,7 @@ const AIProductivityAgent = () => {
             gap: '12px'
           }}>
             <span style={{ fontSize: '1.75rem' }}>📋</span>
-            AI Analysis Results
+            {t('agents.productivity.resultsTitle', { defaultValue: 'AI Analysis Results' })}
           </h2>
 
           {loading && (
@@ -342,7 +342,7 @@ const AIProductivityAgent = () => {
               border: '1px solid #e2e8f0'
             }}>
               <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
-              <p style={{ color: '#64748b', fontSize: '1rem', margin: 0 }}>Analyzing content...</p>
+              <p style={{ color: '#64748b', fontSize: '1rem', margin: 0 }}>{t('agents.productivity.analyzing', { defaultValue: 'Analyzing content...' })}</p>
             </div>
           )}
 
@@ -354,7 +354,7 @@ const AIProductivityAgent = () => {
                 color: '#374151', 
                 marginBottom: '12px' 
               }}>
-                Summary:
+                {t('agents.productivity.summary', { defaultValue: 'Summary:' })}
               </h3>
               <div style={{
                 backgroundColor: '#f8fafc',
@@ -378,7 +378,7 @@ const AIProductivityAgent = () => {
                 color: '#374151', 
                 marginBottom: '12px' 
               }}>
-                Top 5 Next Actions:
+                {t('agents.productivity.nextActions', { defaultValue: 'Top 5 Next Actions:' })}
               </h3>
               <div style={{
                 backgroundColor: '#f0f9ff',
@@ -453,7 +453,7 @@ const AIProductivityAgent = () => {
                 textAlign: 'center',
                 margin: 0
               }}>
-                Enter a URL or select an analysis to view results
+                {t('agents.productivity.emptyState', { defaultValue: 'Enter a URL or select an analysis to view results' })}
               </p>
             </div>
           )}
@@ -463,7 +463,7 @@ const AIProductivityAgent = () => {
       {/* New: Dispatch Panel just below main results */}
       <div style={{ marginBottom: 24 }}>
         <ActionDispatchPanel
-          title="Send to n8n/OutSystems Agent"
+          title={t('agents.productivity.dispatchTitle', { defaultValue: 'Send to n8n/OutSystems Agent' })}
           endpoint="/api/productivity/dispatch"
           buildPayload={buildPayload}
           ready={!!(summary && nextActions.length)}

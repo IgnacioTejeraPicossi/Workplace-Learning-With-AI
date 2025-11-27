@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default function AgentOpsRuns() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [module, setModule] = useState("");
   const [loading, setLoading] = useState(false);
@@ -61,14 +63,14 @@ export default function AgentOpsRuns() {
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          📊 Agent Runs Monitor
+          📊 {t('agentRuns.title', { defaultValue: 'Agent Runs Monitor' })}
         </h1>
         <p style={{ 
           color: '#6b7280', 
           fontSize: '1rem',
           margin: 0
         }}>
-          Monitor and track agent execution status and results
+          {t('agentRuns.subtitle', { defaultValue: 'Monitor and track agent execution status and results' })}
         </p>
       </div>
 
@@ -89,7 +91,7 @@ export default function AgentOpsRuns() {
               color: '#374151', 
               marginBottom: '0.5rem' 
             }}>
-              Filter by Module
+              {t('agentRuns.filterByModule', { defaultValue: 'Filter by Module' })}
             </label>
             <select
               value={module}
@@ -105,9 +107,9 @@ export default function AgentOpsRuns() {
                 cursor: 'pointer'
               }}
             >
-              <option value="">All Modules</option>
-              <option value="compliance">🤖 Compliance Agent</option>
-              <option value="productivity">🚀 Productivity Agent</option>
+              <option value="">{t('agentRuns.allModules', { defaultValue: 'All Modules' })}</option>
+              <option value="compliance">🤖 {t('agentRuns.moduleCompliance', { defaultValue: 'Compliance Agent' })}</option>
+              <option value="productivity">🚀 {t('agentRuns.moduleProductivity', { defaultValue: 'Productivity Agent' })}</option>
             </select>
           </div>
           <div style={{ alignSelf: 'flex-end' }}>
@@ -129,7 +131,7 @@ export default function AgentOpsRuns() {
                 transition: 'all 0.2s'
               }}
             >
-              {loading ? '⏳' : '🔄'} {loading ? 'Loading...' : 'Refresh'}
+              {loading ? '⏳' : '🔄'} {loading ? t('agentRuns.loading', { defaultValue: 'Loading...' }) : t('agentRuns.refresh', { defaultValue: 'Refresh' })}
             </button>
           </div>
         </div>
@@ -151,10 +153,10 @@ export default function AgentOpsRuns() {
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
             <h3 style={{ fontSize: '1.125rem', fontWeight: '500', marginBottom: '0.5rem' }}>
-              No agent runs found
+              {t('agentRuns.emptyTitle', { defaultValue: 'No agent runs found' })}
             </h3>
             <p style={{ fontSize: '0.875rem' }}>
-              Try running a compliance or productivity agent first to see results here.
+              {t('agentRuns.emptyHint', { defaultValue: 'Try running a compliance or productivity agent first to see results here.' })}
             </p>
           </div>
         ) : (
@@ -175,7 +177,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Run ID
+                    {t('agentRuns.th.runId', { defaultValue: 'Run ID' })}
                   </th>
                   <th style={{ 
                     textAlign: 'left', 
@@ -186,7 +188,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Module
+                    {t('agentRuns.th.module', { defaultValue: 'Module' })}
                   </th>
                   <th style={{ 
                     textAlign: 'left', 
@@ -197,7 +199,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Topic
+                    {t('agentRuns.th.topic', { defaultValue: 'Topic' })}
                   </th>
                   <th style={{ 
                     textAlign: 'left', 
@@ -208,7 +210,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Status
+                    {t('agentRuns.th.status', { defaultValue: 'Status' })}
                   </th>
                   <th style={{ 
                     textAlign: 'left', 
@@ -219,7 +221,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Artifacts
+                    {t('agentRuns.th.artifacts', { defaultValue: 'Artifacts' })}
                   </th>
                   <th style={{ 
                     textAlign: 'left', 
@@ -230,7 +232,7 @@ export default function AgentOpsRuns() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em'
                   }}>
-                    Updated
+                    {t('agentRuns.th.updated', { defaultValue: 'Updated' })}
                   </th>
             </tr>
           </thead>
@@ -305,7 +307,7 @@ export default function AgentOpsRuns() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {item.artifacts?.jira && (
                           <div style={{ fontSize: '0.75rem' }}>
-                            <span style={{ fontWeight: '500', color: '#374151' }}>Jira:</span>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>{t('agentRuns.artifacts.jira', { defaultValue: 'Jira:' })}</span>
                             <span style={{ color: '#6b7280', marginLeft: '0.25rem' }}>
                               {Array.isArray(item.artifacts.jira) ? 
                                 item.artifacts.jira.join(", ") : String(item.artifacts.jira)}
@@ -314,7 +316,7 @@ export default function AgentOpsRuns() {
                     )}
                         {item.artifacts?.slack && (
                           <div style={{ fontSize: '0.75rem' }}>
-                            <span style={{ fontWeight: '500', color: '#374151' }}>Slack:</span>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>{t('agentRuns.artifacts.slack', { defaultValue: 'Slack:' })}</span>
                             <span style={{ color: '#6b7280', marginLeft: '0.25rem' }}>
                               {String(item.artifacts.slack)}
                             </span>
@@ -322,7 +324,7 @@ export default function AgentOpsRuns() {
                     )}
                         {item.artifacts?.sheets && (
                           <div style={{ fontSize: '0.75rem' }}>
-                            <span style={{ fontWeight: '500', color: '#374151' }}>Sheets:</span>
+                            <span style={{ fontWeight: '500', color: '#374151' }}>{t('agentRuns.artifacts.sheets', { defaultValue: 'Sheets:' })}</span>
                             <a 
                               style={{ 
                                 color: '#3b82f6',
@@ -334,13 +336,13 @@ export default function AgentOpsRuns() {
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
-                              Open →
+                              {t('agentRuns.artifacts.open', { defaultValue: 'Open →' })}
                         </a>
                       </div>
                     )}
                         {!item.artifacts?.jira && !item.artifacts?.slack && !item.artifacts?.sheets && (
                           <span style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic' }}>
-                            No artifacts
+                            {t('agentRuns.artifacts.none', { defaultValue: 'No artifacts' })}
                           </span>
                         )}
                   </div>
@@ -382,7 +384,7 @@ export default function AgentOpsRuns() {
                     e.target.style.borderColor = '#d1d5db';
                   }}
                 >
-                  {showAllRuns ? 'Show less' : `Show all (${items.length - 8} more)`}
+                  {showAllRuns ? t('agentRuns.showLess', { defaultValue: 'Show less' }) : t('agentRuns.showAll', { count: items.length - 8, defaultValue: `Show all (${items.length - 8} more)` })}
                 </button>
               </div>
             )}
