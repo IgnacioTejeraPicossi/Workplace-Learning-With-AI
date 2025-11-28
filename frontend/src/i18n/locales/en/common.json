@@ -163,7 +163,8 @@
         "documents": "Documents",
         "webApps": "Web Apps",
         "examples": "Examples",
-        "lastUpdated": "Last Updated"
+        "lastUpdated": "Last Updated",
+        "today": "Today"
       },
       "welcomeTitle": "Welcome to Agent Theory & Documentation",
       "welcomeIntro": "This section will contain all your accumulated knowledge about AI agents, including:",
@@ -230,7 +231,8 @@
         "title": "Learning Resources",
         "video": { "title": "Video Content", "watch": "Watch Video →" },
         "other": "Other Resources",
-        "items": "items"
+        "items": "items",
+        "itemsList": {}
       }
     }
   },

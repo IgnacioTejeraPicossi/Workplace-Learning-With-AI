@@ -645,6 +645,14 @@ const AgentTheoryDocs = () => {
 
   // Build a simple in-memory search index across tabs (titles only)
   const searchIndex = useMemo(() => {
+    const labels = {
+      theory: t('help.agentTheory.tabs.theory', { defaultValue: 'Theory' }),
+      toolstack: t('help.agentTheory.tabs.toolstack', { defaultValue: 'Tool Stack' }),
+      webapps: t('help.agentTheory.tabs.webapps', { defaultValue: 'Web Apps' }),
+      hackathons: t('help.agentTheory.tabs.hackathons', { defaultValue: 'Hackathons' }),
+      resources: t('help.agentTheory.tabs.resources', { defaultValue: 'Resources' }),
+      video: t('help.agentTheory.resources.video.title', { defaultValue: 'Video' })
+    };
     const idx = [];
     const join = (arr) => (arr || []).filter(Boolean).join(' ');
 
@@ -656,7 +664,7 @@ const AgentTheoryDocs = () => {
           tab: 'theory',
           anchorId: sectionId,
           title: section.title,
-          path: 'Theory',
+          path: labels.theory,
           blob: [section.title].join(' ')
         });
         (section.items || []).forEach((item) => {
@@ -670,7 +678,7 @@ const AgentTheoryDocs = () => {
             anchorId: itemId,
             title: item.title,
             subtitle: item.description,
-            path: `Theory › ${section.title}`,
+            path: `${labels.theory} › ${section.title}`,
             blob: [item.title, item.description, keyPoints, keyTerms, extra].filter(Boolean).join(' ')
           });
         });
@@ -686,7 +694,7 @@ const AgentTheoryDocs = () => {
           anchorId: catId,
           title: category.name,
           subtitle: category.focus,
-          path: 'Tool Stack',
+          path: labels.toolstack,
           blob: [category.name, category.focus].join(' ')
         });
         (category.tools || []).forEach((tool) => {
@@ -696,7 +704,7 @@ const AgentTheoryDocs = () => {
             anchorId: toolId,
             title: tool.name,
             subtitle: tool.description,
-            path: `Tool Stack › ${category.name}`,
+            path: `${labels.toolstack} › ${category.name}`,
             blob: [tool.name, tool.description, tool.category, tool.importance].join(' ')
           });
         });
@@ -711,7 +719,7 @@ const AgentTheoryDocs = () => {
           tab: 'webapps',
           anchorId: catId,
           title: category.name,
-          path: 'Web Apps',
+          path: labels.webapps,
           blob: [category.name].join(' ')
         });
         (category.apps || []).forEach((app) => {
@@ -721,7 +729,7 @@ const AgentTheoryDocs = () => {
             anchorId: appId,
             title: app.name,
             subtitle: app.description,
-            path: `Web Apps › ${category.name}`,
+            path: `${labels.webapps} › ${category.name}`,
             blob: [app.name, app.description, app.url, app.status].join(' ')
           });
         });
@@ -737,7 +745,7 @@ const AgentTheoryDocs = () => {
           anchorId: evId,
           title: ev.name,
           subtitle: ev.description,
-          path: 'Hackathons',
+          path: labels.hackathons,
           blob: [
             ev.name,
             ev.description,
@@ -761,7 +769,7 @@ const AgentTheoryDocs = () => {
           anchorId: resId,
           title: res.title,
           subtitle: res.description,
-          path: 'Resources',
+          path: labels.resources,
           blob: [res.title, res.description].join(' ')
         });
       });
@@ -772,14 +780,14 @@ const AgentTheoryDocs = () => {
           anchorId: vidId,
           title: vid.title,
           subtitle: vid.description,
-          path: 'Resources › Video',
+          path: `${labels.resources} › ${labels.video}`,
           blob: [vid.title, vid.description, vid.category, vid.platform].join(' ')
         });
       });
     } catch {}
 
     return idx;
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const q = (searchTerm || '').trim().toLowerCase();
@@ -824,7 +832,7 @@ const AgentTheoryDocs = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon">🕒</div>
-          <div className="stat-number">{documentationData.overview.stats.lastUpdated}</div>
+          <div className="stat-number">{t('help.agentTheory.stats.today', { defaultValue: documentationData.overview.stats.lastUpdated })}</div>
           <div className="stat-label">{t('help.agentTheory.stats.lastUpdated', { defaultValue: 'Last Updated' })}</div>
         </div>
       </div>
@@ -881,17 +889,17 @@ const AgentTheoryDocs = () => {
       <h3>{t('help.agentTheory.theory.title', { defaultValue: 'Agent Theory & Concepts' })}</h3>
       {documentationData.theory.sections.map((section, index) => (
         <div key={index} className="theory-category" id={`theory-${slugify(section.title)}`}>
-          <h4>{section.title}</h4>
+          <h4>{t(`help.agentTheory.theory.sections.${index}.title`, { defaultValue: section.title })}</h4>
           <div className="theory-items">
             {section.items.map((item, itemIndex) => (
               <div key={itemIndex} className="theory-item" id={`theory-${slugify(item.title)}`}>
                 <div className="item-header">
-                  <h5>{item.title}</h5>
+                  <h5>{t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.title`, { defaultValue: item.title })}</h5>
                   <span className={`status-badge ${item.status}`}>
                     {item.status === 'pending' ? t('help.agentTheory.status.pending', { defaultValue: '⏳ Pending' }) : t('help.agentTheory.status.ready', { defaultValue: '✅ Ready' })}
                   </span>
                 </div>
-                <p>{item.description}</p>
+                <p>{t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.description`, { defaultValue: item.description })}</p>
                 
                 {item.content && item.status === 'ready' && (
                   <div className="article-content">
@@ -987,7 +995,7 @@ const AgentTheoryDocs = () => {
       <h3>{t('help.agentTheory.webapps.title', { defaultValue: 'Web Applications & Tools' })}</h3>
       {documentationData.webApps.categories.map((category, index) => (
         <div key={index} className="webapp-category" id={`webapps-${slugify(category.name)}`}>
-          <h4>{category.name}</h4>
+          <h4>{t(`help.agentTheory.webapps.categories.${index}.name`, { defaultValue: category.name })}</h4>
           <div className="webapp-grid">
             {category.apps.map((app, appIndex) => (
               <div key={appIndex} className="webapp-card" id={`webapps-${slugify(app.name)}`}>
@@ -997,7 +1005,7 @@ const AgentTheoryDocs = () => {
                     {app.status === 'active' ? t('help.agentTheory.webapps.active', { defaultValue: '🟢 Active' }) : t('help.agentTheory.webapps.inactive', { defaultValue: '🔴 Inactive' })}
                   </span>
                 </div>
-                <p>{app.description}</p>
+                <p>{t(`help.agentTheory.webapps.categories.${index}.apps.${appIndex}.description`, { defaultValue: app.description })}</p>
                 <a href={app.url} target="_blank" rel="noopener noreferrer" className="webapp-link">
                   {t('help.agentTheory.webapps.visit', { defaultValue: 'Visit Website →' })}
                 </a>
@@ -1139,8 +1147,8 @@ const AgentTheoryDocs = () => {
             <div className="category-header">
               <div className="category-icon">{category.icon}</div>
               <div className="category-info">
-                <h4>{category.name}</h4>
-                <p className="category-focus">{category.focus}</p>
+                <h4>{t(`help.agentTheory.toolstack.categories.${category.id}.name`, { defaultValue: category.name })}</h4>
+                <p className="category-focus">{t(`help.agentTheory.toolstack.categories.${category.id}.focus`, { defaultValue: category.focus })}</p>
               </div>
             </div>
             
@@ -1148,13 +1156,17 @@ const AgentTheoryDocs = () => {
               {category.tools.map((tool, toolIndex) => (
                 <div key={toolIndex} className="tool-card" id={`toolstack-${slugify(tool.name)}`}>
                   <div className="tool-header">
-                    <h5>{tool.name}</h5>
+                    <h5>{t(`help.agentTheory.toolstack.categories.${category.id}.tools.${toolIndex}.name`, { defaultValue: tool.name })}</h5>
                     <span className={`importance-badge ${tool.importance.toLowerCase()}`}>
-                      {tool.importance}
+                      {t(`help.agentTheory.common.${tool.importance.toLowerCase()}`, { defaultValue: tool.importance })}
                     </span>
                   </div>
-                  <p className="tool-description">{tool.description}</p>
-                  <div className="tool-category">{tool.category}</div>
+                  <p className="tool-description">
+                    {t(`help.agentTheory.toolstack.categories.${category.id}.tools.${toolIndex}.description`, { defaultValue: tool.description })}
+                  </p>
+                  <div className="tool-category">
+                    {t(`help.agentTheory.toolstack.categories.${category.id}.tools.${toolIndex}.category`, { defaultValue: tool.category })}
+                  </div>
                 </div>
               ))}
             </div>
@@ -1351,13 +1363,13 @@ const AgentTheoryDocs = () => {
       <div className="other-resources">
         <h4>📚 {t('help.agentTheory.resources.other', { defaultValue: 'Other Resources' })}</h4>
         <div className="resources-grid">
-          {documentationData.resources.items.map((resource, index) => (
+            {documentationData.resources.items.map((resource, index) => (
             <div key={index} className="resource-card" id={`resources-${slugify(resource.title)}`}>
               <div className="resource-icon">📁</div>
               <div className="resource-content">
-                <h5>{resource.title}</h5>
+                <h5>{t(`help.agentTheory.resources.itemsList.${index}.title`, { defaultValue: resource.title })}</h5>
                 <div className="resource-count">{resource.count} {t('help.agentTheory.resources.items', { defaultValue: 'items' })}</div>
-                <p>{resource.description}</p>
+                <p>{t(`help.agentTheory.resources.itemsList.${index}.description`, { defaultValue: resource.description })}</p>
               </div>
             </div>
           ))}
