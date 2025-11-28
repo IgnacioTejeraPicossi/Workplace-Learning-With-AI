@@ -9,6 +9,146 @@
       "title": "Din fremdrift",
       "subtitle": "Fortsett å holde streaken!"
     },
+    "z_removed_agentTheory": {
+      "webapps": {
+        "categories": {
+          "0": {
+            "name": "Hackathon‑verktøy",
+            "apps": {
+              "0": { "description": "Gi fart på innovasjon med skreddersydde agenter. Bygg AI‑agenter som strømlinjeformer drift, forbedrer opplevelser og skaper verdi på en low‑code‑plattform." }
+            }
+          },
+          "1": {
+            "name": "Forretnings‑AI‑agenter",
+            "apps": {
+              "0": { "description": "Organiser virksomheten din med en AI‑agent som håndterer oppgaver, automasjon, databaser, dashboards og dokumenter – alt på ett sted." },
+              "1": { "description": "Verdens første akademiske agent – håndterer forsknings‑ og skriveoppgaver fra start til slutt." },
+              "2": { "description": "No‑code‑bygger som lar ikke‑tekniske gründere gjøre idé til produksjonsklar app med UI, database, arbeidsflyt og AI." },
+              "3": { "description": "AI‑epostplattform som kombinerer lead‑generering, innboksstyring og automasjon for konverterende kampanjer." },
+              "4": { "description": "Agent‑simulering som hjelper team å prototypere, teste og lansere pålitelige AI‑agenter i skala." }
+            }
+          },
+          "2": {
+            "name": "Automasjon og arbeidsflyt‑agenter",
+            "apps": {
+              "0": { "description": "Fleksibel AI‑arbeidsflyt for tekniske team. Bygg med presisjonen til kode eller farten til drag‑and‑drop. Egen drift eller skytjeneste." },
+              "1": { "description": "Bygg tilpassede AI‑agenter på minutter med naturlig språk for å håndtere leads, e‑post, kalender og mer." },
+              "2": { "description": "AI‑drevet SEO‑agent som effektiviserer nøkkelord‑analyse og innholdsstrategi." },
+              "3": { "description": "Arbeidsflate med AI‑agenter – bygg, tren og distribuer agenter som automatiserer oppgaver og forbedrer arbeidsflyter." },
+              "4": { "description": "Personlig AI‑agent for søk, innhold og produktivitet." }
+            }
+          },
+          "3": {
+            "name": "Agent‑rammeverk",
+            "apps": {
+              "0": { "description": "Rammeverk for utvikling av LLM‑applikasjoner." },
+              "1": { "description": "Flermodell‑samtaler og multi‑agent‑oppsett fra Microsoft." },
+              "2": { "description": "Rollebasert orkestrering av samarbeidende AI‑agenter." }
+            }
+          },
+          "4": {
+            "name": "LLM‑leverandører",
+            "apps": {
+              "0": { "description": "OpenAIs plattform for agenter og assistenter." },
+              "1": { "description": "Anthropics AI‑assistent" },
+              "2": { "description": "Googles multimodale AI‑modell." }
+            }
+          }
+        }
+      },
+      "toolstack": {
+        "categories": {
+          "orchestration-platforms": {
+            "name": "Orkestreringsplattformer",
+            "focus": "Kjør og skaler AI‑agenter i ekte arbeidsflyter",
+            "tools": {
+              "0": { "category": "Orkestrering" },
+              "1": { "category": "Orkestrering" },
+              "2": { "category": "Orkestrering" },
+              "3": { "category": "Orkestrering" },
+              "4": { "category": "Orkestrering" },
+              "5": { "category": "Orkestrering" },
+              "6": { "category": "Orkestrering" },
+              "7": { "category": "Orkestrering" }
+            }
+          },
+          "tool-use-api-integration": {
+            "name": "Verktøybruk og API‑integrasjon",
+            "focus": "Verktøy som lar agenter samhandle med virkelige API‑er og plattformer",
+            "tools": {
+              "0": { "category": "API‑integrasjon" },
+              "1": { "category": "API‑integrasjon" },
+              "2": { "category": "API‑integrasjon" },
+              "3": { "category": "API‑integrasjon" },
+              "4": { "category": "API‑integrasjon" },
+              "5": { "category": "API‑integrasjon" },
+              "6": { "category": "API‑integrasjon" },
+              "7": { "category": "API‑integrasjon" }
+            }
+          },
+          "agent-safety-guardrails": {
+            "name": "Agentsikkerhet og guardrails",
+            "focus": "Sørg for sikker, etisk og pålitelig agentatferd",
+            "tools": {
+              "0": { "category": "Sikkerhet" },
+              "1": { "category": "Sikkerhet" },
+              "2": { "category": "Sikkerhet" },
+              "3": { "category": "Sikkerhet" },
+              "4": { "category": "Sikkerhet" },
+              "5": { "category": "Sikkerhet" },
+              "6": { "category": "Sikkerhet" },
+              "7": { "category": "Sikkerhet" }
+            }
+          },
+          "agent-frameworks": {
+            "name": "Agent‑rammeverk",
+            "focus": "Bygging, orkestrering og styring av AI‑agenter med flertrinns resonnering",
+            "tools": {
+              "0": { "category": "Rammeverk" },
+              "1": { "category": "Rammeverk" },
+              "2": { "category": "Rammeverk" },
+              "3": { "category": "Rammeverk" },
+              "4": { "category": "Rammeverk" },
+              "5": { "category": "Rammeverk" },
+              "6": { "category": "Rammeverk" },
+              "7": { "category": "Rammeverk" }
+            }
+          },
+          "multi-agent-collaboration": {
+            "name": "Samarbeid mellom flere agenter",
+            "focus": "La agenter snakke sammen, delegere og samarbeide om oppgaver",
+            "tools": {
+              "0": { "category": "Samarbeid" },
+              "1": { "category": "Samarbeid" },
+              "2": { "category": "Samarbeid" },
+              "3": { "category": "Samarbeid" },
+              "4": { "category": "Samarbeid" },
+              "5": { "category": "Samarbeid" },
+              "6": { "category": "Samarbeid" },
+              "7": { "category": "Samarbeid" }
+            }
+          },
+          "memory-vector-databases": {
+            "name": "Minne og vektor‑databaser",
+            "focus": "Lagre og hente langtidskontekst og fakta",
+            "tools": {
+              "0": { "category": "Database" },
+              "1": { "category": "Database" },
+              "2": { "category": "Database" },
+              "3": { "category": "Database" },
+              "4": { "category": "Database" },
+              "5": { "category": "Database" },
+              "6": { "category": "Database" },
+              "7": { "category": "Database" }
+            }
+          }
+        }
+      },
+      "common": {
+        "high": "Viktig",
+        "medium": "Middels"
+      }
+    },
     "lessonsCompleted": "Fullførte leksjoner",
     "simulationsCompleted": "Fullførte simuleringer",
     "simulationScore": "Simuleringsscore",
@@ -157,7 +297,7 @@
     "showLess": "Vis færre",
     "showAll": "Vis alle ({{count}} flere)"
   },
-  "help_duplicate": {
+  "z_removed_help": {
     "agentTheory": {
       "header": "Agent‑teori og dokumentasjon",
       "subheader": "Omfattende samling av kunnskap og ressurser om AI‑agenter",
