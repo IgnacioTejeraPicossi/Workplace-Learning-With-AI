@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './AgentTheoryDocs.css';
 
 const AgentTheoryDocs = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
@@ -808,36 +810,36 @@ const AgentTheoryDocs = () => {
         <div className="stat-card">
           <div className="stat-icon">📚</div>
           <div className="stat-number">{documentationData.overview.stats.totalDocs}</div>
-          <div className="stat-label">Documents</div>
+          <div className="stat-label">{t('help.agentTheory.stats.documents', { defaultValue: 'Documents' })}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">🌐</div>
           <div className="stat-number">{documentationData.overview.stats.webApps}</div>
-          <div className="stat-label">Web Apps</div>
+          <div className="stat-label">{t('help.agentTheory.stats.webApps', { defaultValue: 'Web Apps' })}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">💡</div>
           <div className="stat-number">{documentationData.overview.stats.examples}</div>
-          <div className="stat-label">Examples</div>
+          <div className="stat-label">{t('help.agentTheory.stats.examples', { defaultValue: 'Examples' })}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">🕒</div>
           <div className="stat-number">{documentationData.overview.stats.lastUpdated}</div>
-          <div className="stat-label">Last Updated</div>
+          <div className="stat-label">{t('help.agentTheory.stats.lastUpdated', { defaultValue: 'Last Updated' })}</div>
         </div>
       </div>
       
       <div className="welcome-message">
-        <h3>Welcome to Agent Theory & Documentation</h3>
-        <p>This section will contain all your accumulated knowledge about AI agents, including:</p>
+        <h3>{t('help.agentTheory.welcomeTitle', { defaultValue: 'Welcome to Agent Theory & Documentation' })}</h3>
+        <p>{t('help.agentTheory.welcomeIntro', { defaultValue: 'This section will contain all your accumulated knowledge about AI agents, including:' })}</p>
         <ul>
-          <li>📖 Theoretical foundations and concepts</li>
-          <li>🛠️ Practical implementation guides</li>
-          <li>🌐 Web applications and tools</li>
-          <li>📝 Code examples and tutorials</li>
-          <li>🔬 Research papers and studies</li>
+          <li>📖 {t('help.agentTheory.welcome.bullets.0', { defaultValue: 'Theoretical foundations and concepts' })}</li>
+          <li>🛠️ {t('help.agentTheory.welcome.bullets.1', { defaultValue: 'Practical implementation guides' })}</li>
+          <li>🌐 {t('help.agentTheory.welcome.bullets.2', { defaultValue: 'Web applications and tools' })}</li>
+          <li>📝 {t('help.agentTheory.welcome.bullets.3', { defaultValue: 'Code examples and tutorials' })}</li>
+          <li>🔬 {t('help.agentTheory.welcome.bullets.4', { defaultValue: 'Research papers and studies' })}</li>
         </ul>
-        <p><strong>Ready to add your content!</strong> Share your documentation and I'll organize it here.</p>
+        <p><strong>{t('help.agentTheory.welcome.ready', { defaultValue: 'Ready to add your content!' })}</strong> {t('help.agentTheory.welcome.share', { defaultValue: "Share your documentation and I'll organize it here." })}</p>
       </div>
 
       {/* Featured: 10 Core Agent Types */}
@@ -845,8 +847,8 @@ const AgentTheoryDocs = () => {
         <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 14, background: 'white', display: 'flex', gap: 12 }}>
           <img src="/agent-theory/agent-types-10.png" alt="10 Core Agent Types" style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 8, border: '1px solid #e5e7eb' }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>10 Core Agent Types (Poster + Guide)</div>
-            <div style={{ color: '#6b7280', fontSize: '0.95em', marginBottom: 8 }}>From reactive to multi‑agent systems — concise map of agent families with roles and behaviors.</div>
+            <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{t('help.agentTheory.featured.title', { defaultValue: '10 Core Agent Types (Poster + Guide)' })}</div>
+            <div style={{ color: '#6b7280', fontSize: '0.95em', marginBottom: 8 }}>{t('help.agentTheory.featured.desc', { defaultValue: 'From reactive to multi‑agent systems — concise map of agent families with roles and behaviors.' })}</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button
                 onClick={() => {
@@ -858,14 +860,14 @@ const AgentTheoryDocs = () => {
                 }}
                 style={{ background: '#2563eb', color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
               >
-                Open in Theory
+                {t('help.agentTheory.featured.openInTheory', { defaultValue: 'Open in Theory' })}
               </button>
               <a
                 href="/agent-theory/agent-types-10.png"
                 download="agent-types-10.png"
                 style={{ background: '#111827', color: 'white', textDecoration: 'none', padding: '6px 10px', borderRadius: 6 }}
               >
-                Download poster
+                {t('help.agentTheory.featured.download', { defaultValue: 'Download poster' })}
               </a>
             </div>
           </div>
@@ -876,7 +878,7 @@ const AgentTheoryDocs = () => {
 
   const renderTheory = () => (
     <div className="theory-section">
-      <h3>Agent Theory & Concepts</h3>
+      <h3>{t('help.agentTheory.theory.title', { defaultValue: 'Agent Theory & Concepts' })}</h3>
       {documentationData.theory.sections.map((section, index) => (
         <div key={index} className="theory-category" id={`theory-${slugify(section.title)}`}>
           <h4>{section.title}</h4>
@@ -886,7 +888,7 @@ const AgentTheoryDocs = () => {
                 <div className="item-header">
                   <h5>{item.title}</h5>
                   <span className={`status-badge ${item.status}`}>
-                    {item.status === 'pending' ? '⏳ Pending' : '✅ Ready'}
+                    {item.status === 'pending' ? t('help.agentTheory.status.pending', { defaultValue: '⏳ Pending' }) : t('help.agentTheory.status.ready', { defaultValue: '✅ Ready' })}
                   </span>
                 </div>
                 <p>{item.description}</p>
@@ -894,13 +896,13 @@ const AgentTheoryDocs = () => {
                 {item.content && item.status === 'ready' && (
                   <div className="article-content">
                     <div className="article-meta">
-                      <span className="article-author">By: {item.content.author}</span>
+                      <span className="article-author">{t('help.agentTheory.by', { defaultValue: 'By:' })} {item.content.author}</span>
                       <span className="article-type">{item.content.type}</span>
                     </div>
                     
                     {item.content.keyPoints && (
                       <div className="key-points">
-                        <h6>Key Steps:</h6>
+                        <h6>{t('help.agentTheory.keySteps', { defaultValue: 'Key Steps:' })}</h6>
                         <ol>
                           {item.content.keyPoints.map((point, pointIndex) => (
                             <li key={pointIndex}>{point}</li>
@@ -917,14 +919,14 @@ const AgentTheoryDocs = () => {
                     
                     {item.content.keyTerms && (
                       <div className="key-terms">
-                        <h6>7 Key Terms:</h6>
+                        <h6>{t('help.agentTheory.keyTerms', { defaultValue: '7 Key Terms:' })}</h6>
                         <div className="terms-grid">
                           {item.content.keyTerms.map((term, termIndex) => (
                             <div key={termIndex} className="term-card">
                               <h7 className="term-name">{term.term}</h7>
                               <p className="term-definition">{term.definition}</p>
                               <div className="term-use-case">
-                                <strong>Use Case:</strong> {term.useCase}
+                                <strong>{t('help.agentTheory.useCase', { defaultValue: 'Use Case:' })}</strong> {term.useCase}
                               </div>
                             </div>
                           ))}
@@ -934,7 +936,7 @@ const AgentTheoryDocs = () => {
                     
                     {item.content.coreLoop && (
                       <div className="core-loop">
-                        <h6>Core Loop:</h6>
+                        <h6>{t('help.agentTheory.coreLoop', { defaultValue: 'Core Loop:' })}</h6>
                         <div className="loop-diagram">
                           {item.content.coreLoop}
                         </div>
@@ -943,21 +945,21 @@ const AgentTheoryDocs = () => {
                     
                     {item.content.keyInsight && (
                       <div className="key-insight">
-                        <h6>Key Insight:</h6>
+                        <h6>{t('help.agentTheory.keyInsight', { defaultValue: 'Key Insight:' })}</h6>
                         <blockquote>{item.content.keyInsight}</blockquote>
                       </div>
                     )}
                     
                     {item.content.quote && (
                       <div className="article-quote">
-                        <h6>Quote:</h6>
+                        <h6>{t('help.agentTheory.quote', { defaultValue: 'Quote:' })}</h6>
                         <blockquote>{item.content.quote}</blockquote>
                       </div>
                     )}
                     
                     {item.content.source && (
                       <div className="article-source">
-                        <h6>Source:</h6>
+                        <h6>{t('help.agentTheory.source', { defaultValue: 'Source:' })}</h6>
                         <a href={item.content.source} target="_blank" rel="noopener noreferrer" className="source-link">
                           {item.content.source}
                         </a>
@@ -966,7 +968,7 @@ const AgentTheoryDocs = () => {
                     
                     {item.content.advice && (
                       <div className="advice">
-                        <h6>Key Advice:</h6>
+                        <h6>{t('help.agentTheory.keyAdvice', { defaultValue: 'Key Advice:' })}</h6>
                         <blockquote>{item.content.advice}</blockquote>
                       </div>
                     )}
@@ -982,7 +984,7 @@ const AgentTheoryDocs = () => {
 
   const renderWebApps = () => (
     <div className="webapps-section">
-      <h3>Web Applications & Tools</h3>
+      <h3>{t('help.agentTheory.webapps.title', { defaultValue: 'Web Applications & Tools' })}</h3>
       {documentationData.webApps.categories.map((category, index) => (
         <div key={index} className="webapp-category" id={`webapps-${slugify(category.name)}`}>
           <h4>{category.name}</h4>
@@ -992,12 +994,12 @@ const AgentTheoryDocs = () => {
                 <div className="webapp-header">
                   <h5>{app.name}</h5>
                   <span className={`status-badge ${app.status}`}>
-                    {app.status === 'active' ? '🟢 Active' : '🔴 Inactive'}
+                    {app.status === 'active' ? t('help.agentTheory.webapps.active', { defaultValue: '🟢 Active' }) : t('help.agentTheory.webapps.inactive', { defaultValue: '🔴 Inactive' })}
                   </span>
                 </div>
                 <p>{app.description}</p>
                 <a href={app.url} target="_blank" rel="noopener noreferrer" className="webapp-link">
-                  Visit Website →
+                  {t('help.agentTheory.webapps.visit', { defaultValue: 'Visit Website →' })}
                 </a>
               </div>
             ))}
@@ -1009,10 +1011,9 @@ const AgentTheoryDocs = () => {
 
   const renderHackathons = () => (
     <div className="hackathons-section">
-      <h3>🏆 Upcoming Hackathons</h3>
+      <h3>🏆 {t('help.agentTheory.hackathons.title', { defaultValue: 'Upcoming Hackathons' })}</h3>
       <p className="section-description">
-        Detailed information about the hackathons we'll be participating in. 
-        This information is available for Ignacio, Cursor AI, and ChatGPT5 to help with implementation planning.
+        {t('help.agentTheory.hackathons.desc', { defaultValue: "Detailed information about the hackathons we'll be participating in. This information is available for Ignacio, Cursor AI, and ChatGPT5 to help with implementation planning." })}
       </p>
       
       {documentationData.hackathons.events.map((hackathon, index) => (
@@ -1020,27 +1021,27 @@ const AgentTheoryDocs = () => {
           <div className="hackathon-header">
             <h4>{hackathon.name}</h4>
             <span className={`status-badge ${hackathon.status}`}>
-              {hackathon.status === 'upcoming' ? '📅 Upcoming' : '✅ Completed'}
+              {hackathon.status === 'upcoming' ? t('help.agentTheory.hackathons.upcoming', { defaultValue: '📅 Upcoming' }) : t('help.agentTheory.hackathons.completed', { defaultValue: '✅ Completed' })}
             </span>
           </div>
           
           <div className="hackathon-meta">
             <div className="meta-item">
-              <strong>📅 Date:</strong> {hackathon.date}
+              <strong>📅 {t('help.agentTheory.hackathons.date', { defaultValue: 'Date:' })}</strong> {hackathon.date}
             </div>
             <div className="meta-item">
-              <strong>📍 Location:</strong> {hackathon.location}
+              <strong>📍 {t('help.agentTheory.hackathons.location', { defaultValue: 'Location:' })}</strong> {hackathon.location}
             </div>
             <div className="meta-item">
-              <strong>🏢 Organizer:</strong> {hackathon.organizer}
+              <strong>🏢 {t('help.agentTheory.hackathons.organizer', { defaultValue: 'Organizer:' })}</strong> {hackathon.organizer}
             </div>
             <div className="meta-item">
-              <strong>💻 Format:</strong> {hackathon.format}
+              <strong>💻 {t('help.agentTheory.hackathons.format', { defaultValue: 'Format:' })}</strong> {hackathon.format}
             </div>
           </div>
 
           <div className="hackathon-challenge">
-            <h5>🎯 Challenge</h5>
+            <h5>🎯 {t('help.agentTheory.hackathons.challenge', { defaultValue: 'Challenge' })}</h5>
             <p>{hackathon.challenge}</p>
             <p className="challenge-description">{hackathon.description}</p>
           </div>
@@ -1058,7 +1059,7 @@ const AgentTheoryDocs = () => {
 
           {hackathon.features && (
             <div className="hackathon-features">
-              <h5>🔧 Platform Features</h5>
+              <h5>🔧 {t('help.agentTheory.hackathons.platformFeatures', { defaultValue: 'Platform Features' })}</h5>
               <ul className="features-list">
                 {hackathon.features.map((feature, idx) => (
                   <li key={idx}>{feature}</li>
@@ -1068,7 +1069,7 @@ const AgentTheoryDocs = () => {
           )}
 
           <div className="hackathon-schedule">
-            <h5>⏰ Schedule</h5>
+            <h5>⏰ {t('help.agentTheory.hackathons.schedule', { defaultValue: 'Schedule' })}</h5>
             {Object.entries(hackathon.schedule).map(([day, time]) => (
               <div key={day} className="schedule-item">
                 <strong>{day}:</strong> {time}
@@ -1077,7 +1078,7 @@ const AgentTheoryDocs = () => {
           </div>
 
           <div className="hackathon-tools">
-            <h5>🛠️ Recommended Tools</h5>
+            <h5>🛠️ {t('help.agentTheory.hackathons.recommendedTools', { defaultValue: 'Recommended Tools' })}</h5>
             <div className="tools-tags">
               {hackathon.tools.map((tool, idx) => (
                 <span key={idx} className="tool-tag">{tool}</span>
@@ -1086,7 +1087,7 @@ const AgentTheoryDocs = () => {
           </div>
 
           <div className="hackathon-jury">
-            <h5>👥 Jury & Executives</h5>
+            <h5>👥 {t('help.agentTheory.hackathons.jury', { defaultValue: 'Jury & Executives' })}</h5>
             <div className="jury-grid">
               {hackathon.jury.map((company, idx) => (
                 <span key={idx} className="jury-company">{company}</span>
@@ -1095,7 +1096,7 @@ const AgentTheoryDocs = () => {
           </div>
 
           <div className="hackathon-benefits">
-            <h5>🎁 Benefits</h5>
+            <h5>🎁 {t('help.agentTheory.hackathons.benefits', { defaultValue: 'Benefits' })}</h5>
             <p>{hackathon.benefits}</p>
           </div>
         </div>
@@ -1106,28 +1107,28 @@ const AgentTheoryDocs = () => {
   const renderToolStack = () => (
     <div className="tool-stack-section">
       <div className="tool-stack-header">
-        <h3>{documentationData.toolStack.title}</h3>
-        <p className="tool-stack-description">{documentationData.toolStack.description}</p>
+        <h3>{t('help.agentTheory.toolstack.title', { defaultValue: documentationData.toolStack.title })}</h3>
+        <p className="tool-stack-description">{t('help.agentTheory.toolstack.description', { defaultValue: documentationData.toolStack.description })}</p>
       </div>
       
       <div className="tool-stack-overview">
         <div className="overview-stats">
           <div className="stat-card">
             <div className="stat-number">{documentationData.toolStack.categories.length}</div>
-            <div className="stat-label">Categories</div>
+            <div className="stat-label">{t('help.agentTheory.toolstack.stats.categories', { defaultValue: 'Categories' })}</div>
           </div>
           <div className="stat-card">
             <div className="stat-number">
               {documentationData.toolStack.categories.reduce((total, category) => total + category.tools.length, 0)}
             </div>
-            <div className="stat-label">Tools</div>
+            <div className="stat-label">{t('help.agentTheory.toolstack.stats.tools', { defaultValue: 'Tools' })}</div>
           </div>
           <div className="stat-card">
             <div className="stat-number">
               {documentationData.toolStack.categories.reduce((total, category) => 
                 total + category.tools.filter(tool => tool.importance === 'High').length, 0)}
             </div>
-            <div className="stat-label">Essential Tools</div>
+            <div className="stat-label">{t('help.agentTheory.toolstack.stats.essential', { defaultValue: 'Essential Tools' })}</div>
           </div>
         </div>
       </div>
@@ -1165,12 +1166,12 @@ const AgentTheoryDocs = () => {
 
   const renderResources = () => (
     <div className="resources-section">
-      <h3>Learning Resources</h3>
+      <h3>{t('help.agentTheory.resources.title', { defaultValue: 'Learning Resources' })}</h3>
       
       {/* Video Content Section */}
       {documentationData.resources.videos && documentationData.resources.videos.length > 0 && (
         <div className="videos-section">
-          <h4>🎥 Video Content</h4>
+          <h4>🎥 {t('help.agentTheory.resources.video.title', { defaultValue: 'Video Content' })}</h4>
           <div className="videos-grid">
             {documentationData.resources.videos.map((video, index) => (
               <div key={index} className="video-card" id={`resources-video-${slugify(video.title)}`}>
@@ -1191,7 +1192,7 @@ const AgentTheoryDocs = () => {
                   rel="noopener noreferrer" 
                   className="video-link"
                 >
-                  Watch Video →
+                  {t('help.agentTheory.resources.video.watch', { defaultValue: 'Watch Video →' })}
                 </a>
               </div>
             ))}
@@ -1348,14 +1349,14 @@ const AgentTheoryDocs = () => {
       
       {/* Other Resources */}
       <div className="other-resources">
-        <h4>📚 Other Resources</h4>
+        <h4>📚 {t('help.agentTheory.resources.other', { defaultValue: 'Other Resources' })}</h4>
         <div className="resources-grid">
           {documentationData.resources.items.map((resource, index) => (
             <div key={index} className="resource-card" id={`resources-${slugify(resource.title)}`}>
               <div className="resource-icon">📁</div>
               <div className="resource-content">
                 <h5>{resource.title}</h5>
-                <div className="resource-count">{resource.count} items</div>
+                <div className="resource-count">{resource.count} {t('help.agentTheory.resources.items', { defaultValue: 'items' })}</div>
                 <p>{resource.description}</p>
               </div>
             </div>
@@ -1368,13 +1369,13 @@ const AgentTheoryDocs = () => {
   return (
     <div className="agent-theory-docs">
       <div className="docs-header">
-        <h2>🤖 Agent Theory & Documentation</h2>
-        <p>Comprehensive collection of AI agent knowledge and resources</p>
+        <h2>🤖 {t('help.agentTheory.header', { defaultValue: 'Agent Theory & Documentation' })}</h2>
+        <p>{t('help.agentTheory.subheader', { defaultValue: 'Comprehensive collection of AI agent knowledge and resources' })}</p>
         
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Search documentation, apps, or concepts..."
+            placeholder={t('help.agentTheory.searchPlaceholder', { defaultValue: 'Search documentation, apps, or concepts...' })}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -1385,7 +1386,7 @@ const AgentTheoryDocs = () => {
         {searchTerm && (
           <div className="search-results">
             {results.length === 0 ? (
-              <div className="search-result-empty">No results</div>
+              <div className="search-result-empty">{t('help.agentTheory.noResults', { defaultValue: 'No results' })}</div>
             ) : (
               results.map((r, i) => (
                 <button
@@ -1426,37 +1427,37 @@ const AgentTheoryDocs = () => {
           className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          📊 Overview
+          📊 {t('help.agentTheory.tabs.overview', { defaultValue: 'Overview' })}
         </button>
         <button 
           className={`tab-button ${activeTab === 'theory' ? 'active' : ''}`}
           onClick={() => setActiveTab('theory')}
         >
-          📚 Theory
+          📚 {t('help.agentTheory.tabs.theory', { defaultValue: 'Theory' })}
         </button>
         <button 
           className={`tab-button ${activeTab === 'toolstack' ? 'active' : ''}`}
           onClick={() => setActiveTab('toolstack')}
         >
-          🛠️ Tool Stack
+          🛠️ {t('help.agentTheory.tabs.toolstack', { defaultValue: 'Tool Stack' })}
         </button>
         <button 
           className={`tab-button ${activeTab === 'webapps' ? 'active' : ''}`}
           onClick={() => setActiveTab('webapps')}
         >
-          🌐 Web Apps
+          🌐 {t('help.agentTheory.tabs.webapps', { defaultValue: 'Web Apps' })}
         </button>
         <button 
           className={`tab-button ${activeTab === 'hackathons' ? 'active' : ''}`}
           onClick={() => setActiveTab('hackathons')}
         >
-          🏆 Hackathons
+          🏆 {t('help.agentTheory.tabs.hackathons', { defaultValue: 'Hackathons' })}
         </button>
         <button 
           className={`tab-button ${activeTab === 'resources' ? 'active' : ''}`}
           onClick={() => setActiveTab('resources')}
         >
-          📁 Resources
+          📁 {t('help.agentTheory.tabs.resources', { defaultValue: 'Resources' })}
         </button>
       </div>
 

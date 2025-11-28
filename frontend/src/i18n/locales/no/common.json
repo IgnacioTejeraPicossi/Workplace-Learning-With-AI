@@ -157,6 +157,95 @@
     "showLess": "Vis færre",
     "showAll": "Vis alle ({{count}} flere)"
   },
+  "help": {
+    "agentTheory": {
+      "header": "Agent‑teori og dokumentasjon",
+      "subheader": "Omfattende samling av kunnskap og ressurser om AI‑agenter",
+      "searchPlaceholder": "Søk i dokumentasjon, apper eller konsepter …",
+      "noResults": "Ingen treff",
+      "tabs": {
+        "overview": "Oversikt",
+        "theory": "Teori",
+        "toolstack": "Verktøystakk",
+        "webapps": "Web‑apper",
+        "hackathons": "Hackathons",
+        "resources": "Ressurser"
+      },
+      "stats": {
+        "documents": "Dokumenter",
+        "webApps": "Web‑apper",
+        "examples": "Eksempler",
+        "lastUpdated": "Sist oppdatert"
+      },
+      "welcomeTitle": "Velkommen til Agent‑teori og dokumentasjon",
+      "welcomeIntro": "Denne delen samler all opparbeidet kunnskap om AI‑agenter, inkludert:",
+      "welcome": {
+        "bullets": {
+          "0": "Teoretiske grunnlag og konsepter",
+          "1": "Praktiske implementeringsguider",
+          "2": "Web‑applikasjoner og verktøy",
+          "3": "Kodeeksempler og opplæring",
+          "4": "Forskingsartikler og studier"
+        },
+        "ready": "Klar for å legge til innholdet ditt!",
+        "share": "Del dokumentasjonen din, så organiserer jeg den her."
+      },
+      "featured": {
+        "title": "10 kjerne‑agenttyper (plakat + guide)",
+        "desc": "Fra reaktive til multi‑agent‑systemer — kompakt kart over agentfamilier, roller og atferd.",
+        "openInTheory": "Åpne i Teori",
+        "download": "Last ned plakat"
+      },
+      "theory": { "title": "Agent‑teori og konsepter" },
+      "status": { "pending": "⏳ Venter", "ready": "✅ Klar" },
+      "by": "Av:",
+      "keySteps": "Nøkkelsteg:",
+      "keyTerms": "7 nøkkelbegreper:",
+      "useCase": "Brukstilfelle:",
+      "coreLoop": "Kjerneloop:",
+      "keyInsight": "Nøkkelinnsikt:",
+      "quote": "Sitat:",
+      "source": "Kilde:",
+      "keyAdvice": "Nøkkelråd:",
+      "webapps": {
+        "title": "Web‑applikasjoner og verktøy",
+        "active": "🟢 Aktiv",
+        "inactive": "🔴 Inaktiv",
+        "visit": "Besøk nettsted →"
+      },
+      "hackathons": {
+        "title": "Kommende hackathons",
+        "desc": "Detaljert info om hackathons vi deltar på. Denne informasjonen hjelper Ignacio, Cursor AI og ChatGPT5 i planleggingen.",
+        "upcoming": "📅 Kommende",
+        "completed": "✅ Fullført",
+        "date": "Dato:",
+        "location": "Sted:",
+        "organizer": "Arrangør:",
+        "format": "Format:",
+        "challenge": "Utfordring",
+        "platformFeatures": "Plattformfunksjoner",
+        "schedule": "Plan",
+        "recommendedTools": "Anbefalte verktøy",
+        "jury": "Jury og ledelse",
+        "benefits": "Fordeler"
+      },
+      "toolstack": {
+        "title": "Den komplette verktøystakken for AI‑agenter",
+        "description": "Omfattende samling av verktøy og plattformer for å bygge, drifte og styre AI‑agenter i alle faser",
+        "stats": {
+          "categories": "Kategorier",
+          "tools": "Verktøy",
+          "essential": "Viktige verktøy"
+        }
+      },
+      "resources": {
+        "title": "Læringsressurser",
+        "video": { "title": "Videoinnhold", "watch": "Se video →" },
+        "other": "Andre ressurser",
+        "items": "elementer"
+      }
+    }
+  },
   "components": {
     "dispatch": {
       "send": "Send",
