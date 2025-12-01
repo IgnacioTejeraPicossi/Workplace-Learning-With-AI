@@ -1,8 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useHologramAgent } from "./useHologramAgent";
+import { useSpeechCapture } from "./useSpeechCapture";
+import { useSpeechOutput } from "./useSpeechOutput";
+import { VoiceSettingsPanel } from "./VoiceSettingsPanel";
 
 export default function HologramAgentChat({ onClose }) {
   const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent();
+
+  // Voice state
+  const [voiceLanguage, setVoiceLanguage] = useState("en-US");
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [muted, setMuted] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+
+  // STT
+  const {
+    isSupported: sttSupported,
+    isListening,
+    transcript,
+    error: sttError,
+    startListening,
+    stopListening,
+    reset: resetTranscript,
+  } = useSpeechCapture({ lang: voiceLanguage });
+
+  // TTS
+  const {
+    supported: ttsSupported,
+    isSpeaking,
+    speak,
+    stop: stopSpeaking,
+  } = useSpeechOutput({ lang: voiceLanguage, muted });
+
+  const voiceSupported = sttSupported || ttsSupported;
+
+  // When listening stops and we have transcript, send
+  useEffect(() => {
+    if (!isListening && transcript) {
+      const text = transcript.trim();
+      if (text) sendMessage(text);
+      resetTranscript();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isListening, transcript]);
+
+  // Auto-speak last assistant message
+  useEffect(() => {
+    if (!autoSpeak || muted || !ttsSupported) return;
+    if (!messages || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.role === "assistant" && last.content) speak(last.content);
+  }, [messages, autoSpeak, muted, ttsSupported, speak]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -11,6 +59,17 @@ export default function HologramAgentChat({ onClose }) {
     if (!text) return;
     sendMessage(text);
     e.currentTarget.reset();
+  };
+
+  const toggleListening = () => {
+    if (!sttSupported) return;
+    if (isListening) {
+      stopListening();
+    } else {
+      stopSpeaking();
+      resetTranscript();
+      startListening();
+    }
   };
 
   return (
@@ -46,7 +105,19 @@ export default function HologramAgentChat({ onClose }) {
             </select>
           </label>
         </div>
-        <button onClick={onClose} style={{ border: "none", background: "transparent", fontSize: 18, cursor: "pointer" }}>✕</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {voiceSupported && (
+            <button
+              type="button"
+              onClick={() => setShowVoiceSettings((v) => !v)}
+              title="Voice settings"
+              style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 16 }}
+            >
+              ⚙️
+            </button>
+          )}
+          <button onClick={onClose} style={{ border: "none", background: "transparent", fontSize: 18, cursor: "pointer" }}>✕</button>
+        </div>
       </div>
       <div style={{ padding: "6px 12px", fontSize: 12, color: "#6b7280" }}>
         Ask about modules, features, or learning paths in Workplace Learning With AI.
@@ -67,6 +138,16 @@ export default function HologramAgentChat({ onClose }) {
         ))}
         {isLoading && (
           <div style={{ fontSize: 12, color: "#9ca3af" }}>The hologram is thinking…</div>
+        )}
+        {isListening && (
+          <div style={{ fontSize: 12, color: "#2563eb" }}>
+            Listening… {transcript ? `(${transcript})` : ""}
+          </div>
+        )}
+        {sttError && (
+          <div style={{ fontSize: 12, color: "#ea580c" }}>
+            Speech recognition error: {sttError}
+          </div>
         )}
       </div>
       <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, borderTop: "1px solid rgba(0,0,0,0.08)", padding: 10 }}>
@@ -89,6 +170,37 @@ export default function HologramAgentChat({ onClose }) {
           cursor: "pointer"
         }}>Send</button>
       </form>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px 8px 10px", fontSize: 12, color: "#6b7280" }}>
+        {sttSupported ? (
+          <button
+            type="button"
+            onClick={toggleListening}
+            style={{
+              borderRadius: 12,
+              border: "1px solid rgba(37,99,235,0.5)",
+              background: isListening ? "rgba(37,99,235,0.08)" : "transparent",
+              padding: "4px 8px",
+              cursor: "pointer"
+            }}
+          >
+            {isListening ? "🛑 Stop listening" : "🎙️ Talk to the Hologram"}
+          </button>
+        ) : (
+          <span>Voice input not supported.</span>
+        )}
+        <div>{isSpeaking && !muted ? <span style={{ color: "#16a34a" }}>Hologram is speaking…</span> : null}</div>
+      </div>
+      <VoiceSettingsPanel
+        open={showVoiceSettings}
+        onClose={() => setShowVoiceSettings(false)}
+        language={voiceLanguage}
+        setLanguage={setVoiceLanguage}
+        autoSpeak={autoSpeak}
+        setAutoSpeak={setAutoSpeak}
+        muted={muted}
+        setMuted={setMuted}
+        voiceSupported={voiceSupported}
+      />
     </div>
   );
 }
