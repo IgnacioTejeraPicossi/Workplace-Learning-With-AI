@@ -9,6 +9,8 @@ export default function JMessagesLibrary() {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
   const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const load = async () => {
     try {
@@ -31,9 +33,17 @@ export default function JMessagesLibrary() {
     load();
   }, []);
 
+  const allStatuses = Array.from(new Set(items.map((i) => i.status).filter(Boolean))).sort();
+  const allCategories = Array.from(
+    new Set(items.flatMap((i) => Array.isArray(i.categories) ? i.categories : []).filter(Boolean))
+  ).sort();
+
   const filtered = items.filter((it) => {
     const hay = `${it.j_id || ''} ${it.title || ''} ${it.categories?.join(' ') || ''}`.toLowerCase();
-    return hay.includes(query.toLowerCase());
+    const qOk = hay.includes(query.toLowerCase());
+    const sOk = statusFilter === 'all' || (it.status || '') === statusFilter;
+    const cOk = categoryFilter === 'all' || (Array.isArray(it.categories) && it.categories.includes(categoryFilter));
+    return qOk && sOk && cOk;
   });
 
   const deleteItem = async (id) => {
@@ -49,6 +59,87 @@ export default function JMessagesLibrary() {
     } catch (e) {
       alert(`Delete failed: ${String(e)}`);
     }
+  };
+
+  const exportMarkdown = (it) => {
+    const lines = [];
+    if (it.title) lines.push(`# ${it.title}`);
+    const meta = [
+      it.j_id ? `ID: ${it.j_id}` : null,
+      it.status ? `Status: ${it.status}` : null,
+      it.valid_from ? `Valid from: ${it.valid_from}` : null,
+      it.valid_to ? `Valid to: ${it.valid_to}` : null,
+      it.replaces ? `Replaces: ${it.replaces}` : null,
+      (it.categories && it.categories.length) ? `Categories: ${it.categories.join(', ')}` : null
+    ].filter(Boolean);
+    if (meta.length) {
+      lines.push('', meta.map(m => `- ${m}`).join('\n'), '');
+    }
+    if (it.summary) {
+      lines.push('## Executive Summary', '', it.summary, '');
+    }
+    if (Array.isArray(it.toc) && it.toc.length) {
+      lines.push('## Innhold');
+      const renderToc = (items, lvl = 0) => {
+        items.forEach(x => {
+          lines.push(`${'  '.repeat(lvl)}- ${x.title}`);
+          if (x.children) renderToc(x.children, lvl + 1);
+        });
+      };
+      renderToc(it.toc);
+      lines.push('');
+    }
+    // Fallback: use raw_text for markdown body (safer than HTML)
+    if (it.raw_text) {
+      lines.push('---', '', it.raw_text);
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(it.j_id || 'j-message').replace(/\s+/g, '_')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPDF = (it) => {
+    const win = window.open('', '_blank');
+    if (!win) return;
+    const title = it.title || (it.j_id || 'J-message');
+    const meta = `
+      <div style="margin-bottom:8px;color:#555;font-size:12px">
+        ${it.j_id ? `<div><strong>ID:</strong> ${it.j_id}</div>` : ''}
+        ${it.status ? `<div><strong>Status:</strong> ${it.status}</div>` : ''}
+        ${it.valid_from ? `<div><strong>Valid from:</strong> ${it.valid_from}</div>` : ''}
+        ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
+        ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
+        ${it.categories && it.categories.length ? `<div><strong>Categories:</strong> ${it.categories.join(', ')}</div>` : ''}
+      </div>`;
+    const summary = it.summary ? `<h2>Executive Summary</h2><div>${it.summary.replace(/\n/g, '<br/>')}</div>` : '';
+    const html = `
+      <html>
+        <head>
+          <meta charset="utf-8"/>
+          <title>${title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            h1,h2,h3 { color: #111; }
+            .toc ul { margin: 0 0 8px 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          ${meta}
+          ${summary}
+          <hr/>
+          ${it.body_html || ''}
+          <script>window.onload = () => setTimeout(() => window.print(), 200);</script>
+        </body>
+      </html>`;
+    win.document.write(html);
+    win.document.close();
   };
 
   return (
@@ -67,7 +158,8 @@ export default function JMessagesLibrary() {
         padding: 12,
         marginBottom: 16,
         display: 'flex',
-        gap: 8
+        gap: 8,
+        flexWrap: 'wrap'
       }}>
         <input
           value={query}
@@ -82,6 +174,34 @@ export default function JMessagesLibrary() {
             color: colors.text
           }}
         />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{
+            border: `1px solid ${colors.border}`,
+            borderRadius: 8,
+            padding: '8px 12px',
+            background: colors.background,
+            color: colors.text
+          }}
+        >
+          <option value="all">All statuses</option>
+          {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          style={{
+            border: `1px solid ${colors.border}`,
+            borderRadius: 8,
+            padding: '8px 12px',
+            background: colors.background,
+            color: colors.text
+          }}
+        >
+          <option value="all">All categories</option>
+          {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
         <button
           onClick={load}
           style={{
@@ -142,6 +262,32 @@ export default function JMessagesLibrary() {
                   }}
                 >
                   {expanded[it.id] ? 'Collapse' : 'Expand'}
+                </button>
+                <button
+                  onClick={() => exportMarkdown(it)}
+                  style={{
+                    background: '#0ea5e9',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Export MD
+                </button>
+                <button
+                  onClick={() => exportPDF(it)}
+                  style={{
+                    background: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Export PDF
                 </button>
                 <button
                   onClick={() => deleteItem(it.id)}

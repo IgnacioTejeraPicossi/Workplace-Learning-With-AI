@@ -11,6 +11,7 @@ export default function JMessagesAnalyzer() {
   const [showToc, setShowToc] = useState(true);
   const [summaryLength, setSummaryLength] = useState("");
   const [status, setStatus] = useState("");
+  const [dragActive, setDragActive] = useState(false);
 
   const headerStyle = useMemo(() => ({
     background: colors.cardBackground,
@@ -43,6 +44,25 @@ export default function JMessagesAnalyzer() {
       setError(String(e));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+    if (e.type === 'dragleave') setDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length > 0) {
+      const f = files[0];
+      if (f && f.name.toLowerCase().endsWith('.docx')) setFile(f);
+      else setError('Please drop a .docx file');
     }
   };
 
@@ -85,11 +105,44 @@ export default function JMessagesAnalyzer() {
       </p>
 
       <div style={headerStyle}>
+        {/* Drag & Drop Zone (single file) */}
+        <div
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('jmsg-file-input').click()}
+          style={{
+            border: `2px dashed ${dragActive ? colors.primary : colors.border}`,
+            borderRadius: 8,
+            padding: '28px 16px',
+            textAlign: 'center',
+            background: dragActive ? colors.primaryLight : 'transparent',
+            transition: 'all 0.2s ease',
+            cursor: 'pointer',
+            marginBottom: 12
+          }}
+          title="Drag & drop .docx here or click to browse"
+        >
+          <div style={{ fontSize: 36, marginBottom: 8 }}>📁</div>
+          <div style={{ fontWeight: 600, color: colors.text }}>
+            {dragActive ? 'Drop file here' : 'Drag & drop file here or click to browse'}
+          </div>
+          <div style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>
+            Supports DOCX (single file)
+          </div>
+          {file && (
+            <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary }}>
+              Selected: <strong>{file.name}</strong>
+            </div>
+          )}
+        </div>
         <input
+          id="jmsg-file-input"
           type="file"
           accept=".docx"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
-          style={{ marginRight: 12 }}
+          style={{ display: 'none' }}
         />
         <span style={{ marginRight: 8 }}>Summary:</span>
         <select
