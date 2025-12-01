@@ -2407,7 +2407,9 @@ except Exception as e:
 # Hologram Agent router (conversational guide for the hologram portal)
 try:
     from backend.routers.hologram_agent import router as hologram_agent_router
+    from backend.routers.stt import router as stt_router
     app.include_router(hologram_agent_router, prefix="/api", tags=["Hologram Agent"])
+    app.include_router(stt_router, prefix="/api", tags=["Speech to Text"])
     print("✅ Hologram Agent router included successfully")
 except ImportError as e:
     print(f"❌ Failed to import Hologram Agent router: {e}")

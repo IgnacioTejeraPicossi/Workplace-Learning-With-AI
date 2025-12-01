@@ -3,6 +3,7 @@ import { useHologramAgent } from "./useHologramAgent";
 import { useSpeechCapture } from "./useSpeechCapture";
 import { useSpeechOutput } from "./useSpeechOutput";
 import { VoiceSettingsPanel } from "./VoiceSettingsPanel";
+import { useAudioRecorder } from "./useAudioRecorder";
 
 export default function HologramAgentChat({ onClose }) {
   const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent();
@@ -33,6 +34,22 @@ export default function HologramAgentChat({ onClose }) {
   } = useSpeechOutput({ lang: voiceLanguage, muted });
 
   const voiceSupported = sttSupported || ttsSupported;
+
+  // Audio fallback
+  const { supported: recSupported, isRecording, start: startRec, stop: stopRec } = useAudioRecorder();
+
+  const uploadAndTranscribe = async (blob) => {
+    if (!blob) return;
+    try {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+      const fd = new FormData();
+      fd.append("file", blob, "voice.webm");
+      const res = await fetch(`${API_BASE}/api/stt/transcribe`, { method: "POST", body: fd });
+      const data = await res.json();
+      const text = (data && data.transcript) || "";
+      if (text.trim()) sendMessage(text.trim());
+    } catch (_) {}
+  };
 
   // When listening stops and we have transcript, send
   useEffect(() => {
@@ -184,6 +201,29 @@ export default function HologramAgentChat({ onClose }) {
             }}
           >
             {isListening ? "🛑 Stop listening" : "🎙️ Talk to the Hologram"}
+          </button>
+        ) : recSupported ? (
+          <button
+            type="button"
+            onClick={async () => {
+              if (isRecording) {
+                const blob = await stopRec();
+                await uploadAndTranscribe(blob);
+              } else {
+                stopSpeaking();
+                await startRec();
+              }
+            }}
+            style={{
+              borderRadius: 12,
+              border: "1px solid rgba(37,99,235,0.5)",
+              background: isRecording ? "rgba(37,99,235,0.08)" : "transparent",
+              padding: "4px 8px",
+              cursor: "pointer"
+            }}
+            title="Browser STT not available – recording fallback"
+          >
+            {isRecording ? "🛑 Stop & transcribe" : "🎙️ Record & transcribe"}
           </button>
         ) : (
           <span>Voice input not supported.</span>
