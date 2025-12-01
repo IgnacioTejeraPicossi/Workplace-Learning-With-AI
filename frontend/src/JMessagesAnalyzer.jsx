@@ -9,6 +9,8 @@ export default function JMessagesAnalyzer() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [showToc, setShowToc] = useState(true);
+  const [summaryLength, setSummaryLength] = useState("");
+  const [status, setStatus] = useState("");
 
   const headerStyle = useMemo(() => ({
     background: colors.cardBackground,
@@ -26,7 +28,8 @@ export default function JMessagesAnalyzer() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const resp = await fetchWithAuth('/api/j-messages/analyze', {
+      const url = `/api/j-messages/analyze${summaryLength ? `?summary_length=${encodeURIComponent(summaryLength)}` : ''}`;
+      const resp = await fetchWithAuth(url, {
         method: 'POST',
         body: form
       });
@@ -50,6 +53,30 @@ export default function JMessagesAnalyzer() {
     }
   };
 
+  const saveToLibrary = async () => {
+    if (!result) return;
+    try {
+      const resp = await fetchWithAuth('/api/j-messages/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...result,
+          filename: file?.name || ''
+        })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        setStatus('✅ Saved to J-messages Library');
+      } else {
+        setStatus('❌ Save failed');
+      }
+    } catch (e) {
+      setStatus(`❌ Save failed: ${String(e)}`);
+    } finally {
+      setTimeout(() => setStatus(''), 2500);
+    }
+  };
+
   return (
     <div style={{ padding: 16 }}>
       <h2 style={{ marginBottom: 8 }}>📄 J-messages Analyzer</h2>
@@ -64,6 +91,24 @@ export default function JMessagesAnalyzer() {
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ marginRight: 12 }}
         />
+        <span style={{ marginRight: 8 }}>Summary:</span>
+        <select
+          value={summaryLength}
+          onChange={(e) => setSummaryLength(e.target.value)}
+          style={{
+            marginRight: 12,
+            padding: '6px 8px',
+            borderRadius: 6,
+            border: `1px solid ${colors.border}`,
+            background: colors.background,
+            color: colors.text
+          }}
+        >
+          <option value="">None</option>
+          <option value="short">Short (3–5 bullets)</option>
+          <option value="medium">Medium (executive)</option>
+          <option value="long">Long (detailed)</option>
+        </select>
         <button
           onClick={onUpload}
           disabled={!file || isLoading}
@@ -81,6 +126,11 @@ export default function JMessagesAnalyzer() {
         {error && (
           <div style={{ color: '#b91c1c', marginTop: 8, whiteSpace: 'pre-wrap' }}>
             {error}
+          </div>
+        )}
+        {status && (
+          <div style={{ color: status.startsWith('✅') ? '#065f46' : '#b91c1c', marginTop: 8 }}>
+            {status}
           </div>
         )}
       </div>
@@ -140,7 +190,42 @@ export default function JMessagesAnalyzer() {
             {result.title && (
               <h3 style={{ marginTop: 12, marginBottom: 0 }}>{result.title}</h3>
             )}
+            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button
+                onClick={saveToLibrary}
+                style={{
+                  background: '#2563eb',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: 8,
+                  cursor: 'pointer'
+                }}
+              >
+                💾 Save to Library
+              </button>
+            </div>
           </div>
+
+          {/* Optional Summary */}
+          {result.summary && (
+            <div
+              style={{
+                background: colors.cardBackground,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 12,
+                padding: 16,
+                marginBottom: 12
+              }}
+            >
+              <h4 style={{ marginTop: 0, marginBottom: 8, color: colors.text }}>
+                Executive Summary {result.summary_length ? `(${result.summary_length})` : ''}
+              </h4>
+              <div style={{ whiteSpace: 'pre-wrap', color: colors.text }}>
+                {result.summary}
+              </div>
+            </div>
+          )}
 
           {/* TOC */}
           {showToc && (

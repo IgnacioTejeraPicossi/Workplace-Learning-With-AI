@@ -1,7 +1,8 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Request
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Query, Body
 from typing import List, Tuple, Dict, Any
 from io import BytesIO
 import re
+from datetime import datetime
 
 try:
     from docx import Document  # python-docx
@@ -16,6 +17,12 @@ except Exception:
 
 router = APIRouter(prefix="/api/j-messages", tags=["J-messages Analyzer"])
 
+try:
+    # Lazy import DB to avoid import cycles during tool runs
+    from backend.db import database
+    j_messages_collection = database.get_collection("j_messages")
+except Exception:
+    j_messages_collection = None
 
 def _simple_slug(value: str) -> str:
     """
@@ -116,7 +123,11 @@ Tekst:
 
 
 @router.post("/analyze")
-async def analyze_j_message(request: Request, file: UploadFile = File(...)):
+async def analyze_j_message(
+    request: Request,
+    file: UploadFile = File(...),
+    summary_length: str = Query(None, description="short|medium|long to include an AI summary")
+):
     """
     Accept a .docx J-melding and return structured JSON with:
     - metadata (LLM-extracted)
@@ -148,6 +159,8 @@ async def analyze_j_message(request: Request, file: UploadFile = File(...)):
         "categories": []
     }
 
+    summary_text: str = ""
+
     # Prefer unified LLM pipeline if available; otherwise, return without metadata
     try:
         if ask_ai_unified_sync:
@@ -170,6 +183,25 @@ async def analyze_j_message(request: Request, file: UploadFile = File(...)):
             except Exception:
                 # Leave defaults if parsing fails; front-end can still render
                 pass
+            # Optional summary
+            if summary_length:
+                sum_prompt = f"""
+Lag en {summary_length} oppsummering av forskriften nedenfor. 
+Returner ren tekst, uten markers eller Markdown.
+Tekst:
+\"\"\"{body_text[:12000]}\"\"\"
+"""
+                try:
+                    summary_text = ask_ai_unified_sync(
+                        prompt=sum_prompt,
+                        task_type="summarization",
+                        complexity="low",
+                        max_tokens=700,
+                        messages=None,
+                        request_headers=dict(request.headers)
+                    ) or ""
+                except Exception as _:
+                    summary_text = ""
     except Exception as e:
         # Non-fatal; proceed with minimal payload
         print(f"[J-MESSAGES] Metadata extraction failed: {e}")
@@ -185,10 +217,70 @@ async def analyze_j_message(request: Request, file: UploadFile = File(...)):
         "toc": toc,
         "body_html": body_html,
         "raw_text": body_text,
+        "summary": summary_text,
+        "summary_length": summary_length,
         "debug": {
             "header_text": header_text
         }
     }
     return result
+
+
+@router.post("/save")
+async def save_j_message(data: Dict[str, Any] = Body(...)):
+    """
+    Save analyzed J-message to MongoDB.
+    Expects JSON payload similar to /analyze result and optional filename.
+    """
+    if j_messages_collection is None:
+        raise HTTPException(status_code=500, detail="MongoDB not configured")
+    try:
+        doc: Dict[str, Any] = {
+            "title": data.get("title"),
+            "j_id": data.get("id"),
+            "status": data.get("status"),
+            "valid_from": data.get("valid_from"),
+            "valid_to": data.get("valid_to"),
+            "replaces": data.get("replaces"),
+            "categories": data.get("categories") or [],
+            "toc": data.get("toc") or [],
+            "body_html": data.get("body_html") or "",
+            "summary": data.get("summary") or "",
+            "summary_length": data.get("summary_length"),
+            "raw_text": data.get("raw_text") or "",
+            "filename": data.get("filename") or "",
+            "created_at": datetime.utcnow(),
+            "module": "j_messages"
+        }
+        result = await j_messages_collection.insert_one(doc)
+        return {"success": True, "id": str(result.inserted_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Save failed: {e}")
+
+
+@router.get("/list")
+async def list_j_messages():
+    """
+    List saved J-messages from MongoDB.
+    """
+    if j_messages_collection is None:
+        return {"success": True, "items": [], "total": 0}
+    items: List[Dict[str, Any]] = []
+    async for doc in j_messages_collection.find({}).sort("created_at", -1):
+        doc["id"] = str(doc.pop("_id"))
+        items.append(doc)
+    return {"success": True, "items": items, "total": len(items)}
+
+
+@router.delete("/delete/{doc_id}")
+async def delete_j_message(doc_id: str):
+    if j_messages_collection is None:
+        raise HTTPException(status_code=500, detail="MongoDB not configured")
+    try:
+        from bson import ObjectId
+        res = await j_messages_collection.delete_one({"_id": ObjectId(doc_id)})
+        return {"success": res.deleted_count == 1}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Delete failed: {e}")
 
 
