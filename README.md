@@ -1,5 +1,98 @@
 # 🤖 AI-Powered Workplace Learning Platform
 
+## J‑messages Analyzer (Fiskeridirektoratet)
+
+A focused module to ingest Norwegian J‑meldinger (Word-notat), extract structured metadata, build an “Innhold” table of contents from headings, and render the full regulation body for reading and navigation. Includes a Library to persist analyses and export results.
+
+### What it does
+- Extracts metadata (J‑ID, title, valid dates, replaces, status, categories) via the unified LLM pipeline.
+- Splits administrative header from the regulation body using the common marker “Forskriften lyder etter dette” (fallbacks apply).
+- Builds a Table of Contents (TOC) from headings (Kapittel … → H1, “§ …” → H2) and injects anchor ids.
+- Renders the regulation body with clickable TOC and smooth scrolling, plus an optional executive summary.
+- Saves analyzed J‑meldinger to MongoDB and lists them in a Library with search, filters and export.
+
+### Data model (response from analyze)
+```json
+{
+  "id": "J-195-2025",
+  "title": "Forskrift om endring av ...",
+  "status": "Gjeldende",
+  "valid_from": "2025-10-08",
+  "valid_to": "2025-12-31",
+  "replaces": "J-169-2025",
+  "categories": ["Sør for 62° N", "Pelagisk fisk"],
+  "toc": [
+    { "level": 1, "title": "Kapittel 1. Fiskeforbud og kvoter", "anchor": "kapittel-1-fiskeforbud-og-kvoter",
+      "children": [
+        { "level": 2, "title": "§ 1 Generelt forbud", "anchor": "paragraf-1-generelt-forbud" }
+      ]
+    }
+  ],
+  "body_html": "<h1 id='kapittel-1-fiskeforbud-og-kvoter'>...</h1> ...",
+  "raw_text": "Plain text of the body",
+  "summary": "Optional executive summary text",
+  "summary_length": "short|medium|long"
+}
+```
+
+### Backend API
+- Analyze (single .docx; optional summary):
+  - `POST /api/j-messages/analyze?summary_length=short|medium|long`
+  - form-data: `file` (DOCX)
+- Save analyzed result:
+  - `POST /api/j-messages/save`
+  - body: JSON same shape as analyze result (plus optional `filename`)
+- List saved analyses:
+  - `GET /api/j-messages/list`
+- Delete a saved analysis:
+  - `DELETE /api/j-messages/delete/{id}`
+
+Storage: MongoDB collection `j_messages` (created automatically). Each document records metadata, toc, `body_html`, `raw_text`, optional `summary`, and timestamps.
+
+### Frontend UX
+- Module: “J‑messages Analyzer”
+  - Drag & drop or click to upload a single `.docx`.
+  - Optional Summary selector: None, Short, Medium, Long.
+  - Results show metadata header, optional executive summary, TOC (“Innhold”) and render of the body.
+  - TOC entries scroll smoothly to matching headings (`id` equals the `anchor` in the TOC).
+  - “Save to Library” persists the result.
+- Library: “J‑messages Library”
+  - Search by ID/title/category; filter by Status and Category.
+  - Expand to view summary and rendered body.
+  - Export:
+    - Markdown: generates a `.md` including title, metadata, summary, TOC list and `raw_text`.
+    - PDF: opens a print-ready HTML view of the rendered body (use browser “Save as PDF”).
+  - Delete removes the item from MongoDB.
+
+### Heuristics and robustness
+- Header/body split at “Forskriften lyder etter dette”. If absent, the entire file is treated as body and the LLM still extracts metadata.
+- Headings: `Kapittel …` → H1, `§ …` → H2. Future iterations can use DOCX paragraph styles if available or additional patterns (H3, lettered subclauses).
+- LLM extraction:
+  - Runs through the existing unified AI system (ItemAI/OpenRouter/OpenAI) honoring `x-api-provider` and keys from the app’s API Config.
+  - Returns STRICT JSON; if parsing fails, the UI still renders with partial data.
+
+### Quick test (cURL)
+```bash
+curl -F "file=@/path/to/J-xxx-2025.docx" \
+  "http://localhost:8000/api/j-messages/analyze?summary_length=medium"
+```
+Save:
+```bash
+curl -X POST http://localhost:8000/api/j-messages/save \
+  -H "Content-Type: application/json" \
+  -d @result.json
+```
+List:
+```bash
+curl http://localhost:8000/api/j-messages/list
+```
+
+### Notes and next steps
+- Add DOCX style-aware heading detection and more markers for header/body separation.
+- Validate and normalize dates/IDs; flag inconsistencies.
+- Batch import from a directory and bulk-save.
+- Optional export template to match Fiskeridirektoratet site styling more closely.
+
 > Quick access: use the Docs Index below (short pages → GitHub shows “Filter headings” on each), or scroll for the full README.
 
 ### 📚 Docs Index (fast navigation)
