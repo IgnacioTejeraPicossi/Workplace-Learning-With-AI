@@ -2416,6 +2416,16 @@ except ImportError as e:
 except Exception as e:
     print(f"❌ Error including Hologram Agent router: {e}")
 
+# J-messages Analyzer router
+try:
+    from backend.routers.j_messages_analyzer import router as j_messages_router
+    app.include_router(j_messages_router, tags=["J-messages Analyzer"])
+    print("✅ J-messages Analyzer router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import J-messages Analyzer router: {e}")
+except Exception as e:
+    print(f"❌ Error including J-messages Analyzer router: {e}")
+
 print("🔍 DEBUG: Router included successfully")
 
 # Test route directly in app.py

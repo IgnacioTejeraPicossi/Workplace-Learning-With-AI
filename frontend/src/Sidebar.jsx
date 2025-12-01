@@ -99,6 +99,9 @@ const getNavItems = (t) => [
     { key: "agentic-rag-document", label: t('sidebar.documentAnalyzerSubmenu.agenticRAGDocuments'), icon: "📋" }
   ]},
   
+  // J-messages Analyzer (nuevo módulo independiente)
+  { key: "j-messages-analyzer", label: "J-messages Analyzer", icon: "document", group: "learning" },
+  
   // Grupo 1.7: Enterprise Architecture (expandible)
   { key: "enterprise-architecture", label: t('sidebar.enterpriseArchitecture'), icon: "building", group: "learning", isExpandable: true, subItems: [
     { key: "ea-home", label: t('sidebar.enterpriseArchitectureSubmenu.eaDashboard'), icon: "building" },
