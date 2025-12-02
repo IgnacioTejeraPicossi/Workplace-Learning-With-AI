@@ -11,6 +11,7 @@ export default function JMessagesLibrary() {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [tocOpen, setTocOpen] = useState({});
 
   const load = async () => {
     try {
@@ -252,7 +253,14 @@ export default function JMessagesLibrary() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
-                  onClick={() => setExpanded((e) => ({ ...e, [it.id]: !e[it.id] }))}
+                  onClick={() => {
+                    setExpanded((e) => {
+                      const next = !e[it.id];
+                      // Open TOC by default when expanding
+                      if (next) setTocOpen((s) => ({ ...s, [it.id]: true }));
+                      return { ...e, [it.id]: next };
+                    });
+                  }}
                   style={{
                     background: 'transparent',
                     border: `1px solid ${colors.border}`,
@@ -342,6 +350,86 @@ export default function JMessagesLibrary() {
             </div>
             {expanded[it.id] && (
               <div style={{ marginTop: 12 }}>
+                {/* TOC toggle + panel */}
+                {Array.isArray(it.toc) && it.toc.length > 0 && (
+                  <div style={{
+                    background: colors.cardBackground,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 10,
+                    marginBottom: 10
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      borderBottom: `1px solid ${colors.border}`
+                    }}>
+                      <strong>Innhold</strong>
+                      <button
+                        onClick={() => setTocOpen((s) => ({ ...s, [it.id]: !s[it.id] }))}
+                        style={{
+                          background: 'transparent',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          padding: '2px 8px',
+                          cursor: 'pointer'
+                        }}
+                        aria-expanded={!!tocOpen[it.id]}
+                      >
+                        {tocOpen[it.id] ? '−' : '+'}
+                      </button>
+                    </div>
+                    {tocOpen[it.id] && (
+                      <nav style={{ padding: 12 }}>
+                        {it.toc.map((t, idx) => (
+                          <div key={`${t.anchor}-${idx}`} style={{ marginBottom: 6 }}>
+                            <button
+                              onClick={() => {
+                                const el = document.getElementById(t.anchor);
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: colors.primary,
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                              }}
+                            >
+                              {t.title}
+                            </button>
+                            {Array.isArray(t.children) && t.children.length > 0 && (
+                              <ul style={{ marginTop: 4, marginLeft: 18 }}>
+                                {t.children.map((c, cidx) => (
+                                  <li key={`${c.anchor}-${cidx}-${t.anchor}`} style={{ marginBottom: 4 }}>
+                                    <button
+                                      onClick={() => {
+                                        const el = document.getElementById(c.anchor);
+                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                      }}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: colors.primary,
+                                        textDecoration: 'underline',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      {c.title}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </nav>
+                    )}
+                  </div>
+                )}
+
                 {it.summary && (
                   <div style={{ marginBottom: 10 }}>
                     <strong>Summary:</strong>
