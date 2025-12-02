@@ -61,8 +61,9 @@ export default function JMessagesAnalyzer() {
     const files = Array.from(e.dataTransfer.files || []);
     if (files.length > 0) {
       const f = files[0];
-      if (f && f.name.toLowerCase().endsWith('.docx')) setFile(f);
-      else setError('Please drop a .docx file');
+      const name = (f?.name || '').toLowerCase();
+      if (f && (name.endsWith('.docx') || name.endsWith('.pdf'))) setFile(f);
+      else setError('Please drop a .docx or .pdf file');
     }
   };
 
@@ -129,7 +130,7 @@ export default function JMessagesAnalyzer() {
             {dragActive ? 'Drop file here' : 'Drag & drop file here or click to browse'}
           </div>
           <div style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>
-            Supports DOCX (single file)
+            Supports DOCX/PDF (single file)
           </div>
           {file && (
             <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary }}>
@@ -140,7 +141,7 @@ export default function JMessagesAnalyzer() {
         <input
           id="jmsg-file-input"
           type="file"
-          accept=".docx"
+          accept=".docx,.pdf"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />
@@ -174,7 +175,7 @@ export default function JMessagesAnalyzer() {
             cursor: !file || isLoading ? 'not-allowed' : 'pointer'
           }}
         >
-          {isLoading ? 'Analyserer…' : 'Analyser .docx'}
+          {isLoading ? 'Analyserer…' : 'Analyze file'}
         </button>
         {error && (
           <div style={{ color: '#b91c1c', marginTop: 8, whiteSpace: 'pre-wrap' }}>
@@ -292,8 +293,8 @@ export default function JMessagesAnalyzer() {
               }}
             >
               {Array.isArray(result.toc) && result.toc.length > 0 ? (
-                result.toc.map((item) => (
-                  <div key={item.anchor} style={{ marginBottom: 8 }}>
+                result.toc.map((item, idx) => (
+                  <div key={`${item.anchor}-${idx}`} style={{ marginBottom: 8 }}>
                     <button
                       onClick={() => scrollToAnchor(item.anchor)}
                       style={{
@@ -309,8 +310,8 @@ export default function JMessagesAnalyzer() {
                     </button>
                     {Array.isArray(item.children) && item.children.length > 0 && (
                       <ul style={{ marginTop: 6, marginLeft: 18 }}>
-                        {item.children.map((c) => (
-                          <li key={c.anchor} style={{ marginBottom: 4 }}>
+                        {item.children.map((c, cidx) => (
+                          <li key={`${c.anchor}-${cidx}-${item.anchor}`} style={{ marginBottom: 4 }}>
                             <button
                               onClick={() => scrollToAnchor(c.anchor)}
                               style={{

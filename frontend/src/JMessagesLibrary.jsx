@@ -264,6 +264,42 @@ export default function JMessagesLibrary() {
                   {expanded[it.id] ? 'Collapse' : 'Expand'}
                 </button>
                 <button
+                  onClick={async () => {
+                    try {
+                      const resp = await fetchWithAuth('/api/j-messages/export-docx', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(it)
+                      });
+                      if (!resp.ok) {
+                        const txt = await resp.text();
+                        throw new Error(`${resp.status} ${txt}`);
+                      }
+                      const blob = await resp.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${(it.j_id || 'j-message').replace(/\s+/g, '_')}.docx`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    } catch (e) {
+                      alert(`Export DOCX failed: ${String(e)}`);
+                    }
+                  }}
+                  style={{
+                    background: '#6366f1',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Export DOCX
+                </button>
+                <button
                   onClick={() => exportMarkdown(it)}
                   style={{
                     background: '#0ea5e9',
