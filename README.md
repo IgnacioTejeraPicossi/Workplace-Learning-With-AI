@@ -36,9 +36,20 @@ A focused module to ingest Norwegian J‑meldinger (Word-notat), extract structu
 ```
 
 ### Backend API
-- Analyze (single .docx; optional summary):
+
+**Document Analysis**
+- Analyze J-melding document (single .docx or .pdf; optional summary):
   - `POST /api/j-messages/analyze?summary_length=short|medium|long`
-  - form-data: `file` (DOCX)
+  - form-data: `file` (DOCX or PDF)
+  - Returns: metadata, TOC, body_html, raw_text, optional summary
+
+**Note Analysis**
+- Analyze J-melding note (addendum/correction/extension):
+  - `POST /api/j-messages/analyze-note`
+  - form-data: `file` (DOCX or PDF)
+  - Returns: target_j_id, note_type, valid_from, valid_to, affected_sections, actions, summary
+
+**Storage & Management**
 - Save analyzed result:
   - `POST /api/j-messages/save`
   - body: JSON same shape as analyze result (plus optional `filename`)
@@ -47,51 +58,123 @@ A focused module to ingest Norwegian J‑meldinger (Word-notat), extract structu
 - Delete a saved analysis:
   - `DELETE /api/j-messages/delete/{id}`
 
+**Export**
+- Export to DOCX:
+  - `POST /api/j-messages/export-docx`
+  - body: JSON with document data
+  - Returns: DOCX file download
+
 Storage: MongoDB collection `j_messages` (created automatically). Each document records metadata, toc, `body_html`, `raw_text`, optional `summary`, and timestamps.
 
 ### Frontend UX
-- Module: “J‑messages Analyzer”
-  - Drag & drop or click to upload a single `.docx`.
-  - Optional Summary selector: None, Short, Medium, Long.
-  - Results show metadata header, optional executive summary, TOC (“Innhold”) and render of the body.
-  - TOC entries scroll smoothly to matching headings (`id` equals the `anchor` in the TOC).
-  - “Save to Library” persists the result.
-- Library: “J‑messages Library”
-  - Search by ID/title/category; filter by Status and Category.
-  - Expand to view summary and rendered body.
-  - Export:
-    - Markdown: generates a `.md` including title, metadata, summary, TOC list and `raw_text`.
-    - PDF: opens a print-ready HTML view of the rendered body (use browser “Save as PDF”).
-  - Delete removes the item from MongoDB.
 
-### Heuristics and robustness
-- Header/body split at “Forskriften lyder etter dette”. If absent, the entire file is treated as body and the LLM still extracts metadata.
-- Headings: `Kapittel …` → H1, `§ …` → H2. Future iterations can use DOCX paragraph styles if available or additional patterns (H3, lettered subclauses).
-- LLM extraction:
-  - Runs through the existing unified AI system (ItemAI/OpenRouter/OpenAI) honoring `x-api-provider` and keys from the app’s API Config.
-  - Returns STRICT JSON; if parsing fails, the UI still renders with partial data.
+**J-messages Analyzer Module**
+- **File Upload**: Drag & drop or click to browse (supports `.docx` and `.pdf`)
+- **Analysis Options**:
+  - **Analyze file** (blue button): For standard J-meldinger documents
+    - Optional Summary selector: None, Short, Medium, Long
+  - **Analyze note** (green button): For J-melding notes/addendums with specialized extraction
+- **Results Display**:
+  - Metadata header (J-ID, title, dates, status, replaces, categories)
+  - Optional executive summary (if selected)
+  - TOC (“Innhold”) with clickable entries that smoothly scroll to matching headings
+  - Rendered body HTML with proper heading structure
+- **Save to Library**: Persists the complete analysis result to MongoDB
 
-### Quick test (cURL)
+**Prompt Manager** 🆕
+- **Location**: Integrated panel below the file upload and analysis buttons
+- **Features**:
+  - **Native Prompt View**: Display the default prompts used for metadata extraction and note analysis
+  - **Prompt Editor**: Create, edit, and test custom prompts
+  - **Save/Update**: Store named prompts for reuse
+  - **Test Functionality**: Preview LLM output with your custom prompts
+  - **Prompt Injection Detection**: Automatic detection of potential prompt injection patterns with sanitization option
+  - **Agent-Specific**: Prompts are stored per agent (`j-messages`) and independent from other modules
+- **Use Cases**:
+  - Fine-tune metadata extraction accuracy
+  - Adjust note analysis prompts for better results
+  - Test different prompt strategies without code changes
+  - Compare results between different AI providers (LM Studio vs OpenAI)
+
+**J-messages Library**
+- **Search & Filter**: Search by ID/title/category; filter by Status and Category
+- **Document View**: Expand items to view summary, TOC, and rendered body
+- **Export Options**:
+  - **Markdown**: Generates a `.md` file including title, metadata, summary, TOC list and `raw_text`
+  - **PDF**: Opens a print-ready HTML view of the rendered body (use browser "Save as PDF")
+  - **DOCX**: Generates a Word document from the analyzed data
+- **Delete**: Removes the item from MongoDB
+
+### Heuristics and Robustness
+
+**Document Processing**
+- **Header/Body Split**: Detects "Forskriften lyder etter dette" marker. If absent, entire file is treated as body and LLM still extracts metadata
+- **Heading Detection**: 
+  - `Kapittel …` → H1
+  - `§ …` → H2
+  - Future iterations can use DOCX paragraph styles or additional patterns (H3, lettered subclauses)
+- **PDF Support**: Multiple fallback libraries (pypdf, PyPDF2, pdfminer.six) for robust text extraction
+
+**LLM Integration**
+- Runs through the existing unified AI system (ItemAI/OpenRouter/OpenAI) honoring `x-api-provider` and keys from the app's API Config
+- Returns STRICT JSON; if parsing fails, the UI still renders with partial data
+- Prompt Manager allows customization of extraction prompts without backend changes
+
+**Note Analysis**
+- Specialized prompt for analyzing J-melding notes (addendums, corrections, extensions, cancellations)
+- Extracts relationship to base J-melding (`target_j_id`)
+- Identifies affected sections and actions taken
+
+### Quick Test (cURL)
+
+**Analyze Document**:
 ```bash
 curl -F "file=@/path/to/J-xxx-2025.docx" \
   "http://localhost:8000/api/j-messages/analyze?summary_length=medium"
 ```
-Save:
+
+**Analyze Note**:
+```bash
+curl -F "file=@/path/to/note.docx" \
+  "http://localhost:8000/api/j-messages/analyze-note"
+```
+
+**Save Result**:
 ```bash
 curl -X POST http://localhost:8000/api/j-messages/save \
   -H "Content-Type: application/json" \
   -d @result.json
 ```
-List:
+
+**List Saved**:
 ```bash
 curl http://localhost:8000/api/j-messages/list
 ```
 
-### Notes and next steps
-- Add DOCX style-aware heading detection and more markers for header/body separation.
-- Validate and normalize dates/IDs; flag inconsistencies.
-- Batch import from a directory and bulk-save.
-- Optional export template to match Fiskeridirektoratet site styling more closely.
+**Export DOCX**:
+```bash
+curl -X POST http://localhost:8000/api/j-messages/export-docx \
+  -H "Content-Type: application/json" \
+  -d @document.json \
+  -o output.docx
+```
+
+### Notes and Next Steps
+
+**Completed Features** ✅
+- DOCX and PDF format support
+- Note analysis with specialized prompts
+- Prompt Manager for customization
+- DOCX export functionality
+- TOC with smooth scrolling navigation
+- Library with search, filter, and export options
+
+**Future Enhancements**
+- DOCX style-aware heading detection and more markers for header/body separation
+- Validate and normalize dates/IDs; flag inconsistencies
+- Batch import from a directory and bulk-save
+- Optional export template to match Fiskeridirektoratet site styling more closely
+- Provider badge showing which AI model generated each analysis
 
 > Quick access: use the Docs Index below (short pages → GitHub shows “Filter headings” on each), or scroll for the full README.
 
