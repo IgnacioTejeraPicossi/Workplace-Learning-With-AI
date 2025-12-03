@@ -47,6 +47,32 @@ export default function JMessagesAnalyzer() {
     }
   };
 
+  const onUploadNote = async () => {
+    if (!file) return;
+    setIsLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const url = `/api/j-messages/analyze-note`;
+      const resp = await fetchWithAuth(url, {
+        method: 'POST',
+        body: form
+      });
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`${resp.status} ${resp.statusText} - ${txt}`);
+      }
+      const data = await resp.json();
+      setResult(data);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -177,6 +203,22 @@ export default function JMessagesAnalyzer() {
         >
           {isLoading ? 'Analyserer…' : 'Analyze file'}
         </button>
+        <button
+          onClick={onUploadNote}
+          disabled={!file || isLoading}
+          style={{
+            marginLeft: 8,
+            background: '#10b981',
+            color: 'white',
+            border: 'none',
+            padding: '8px 12px',
+            borderRadius: 8,
+            cursor: !file || isLoading ? 'not-allowed' : 'pointer'
+          }}
+          title="Analyze a J-melding note (integrates with a base J-melding)"
+        >
+          {isLoading ? 'Processing…' : 'Analyze note'}
+        </button>
         {error && (
           <div style={{ color: '#b91c1c', marginTop: 8, whiteSpace: 'pre-wrap' }}>
             {error}
@@ -228,6 +270,36 @@ export default function JMessagesAnalyzer() {
 
           {/* Header metadata */}
           <div style={headerStyle}>
+            {result.type === 'note' && result.note && (
+              <div style={{ marginBottom: 12, padding: 12, borderRadius: 8, border: `1px solid ${colors.border}`, background: colors.background }}>
+                <h4 style={{ margin: 0, color: colors.text }}>Note Analysis</h4>
+                <div style={{ marginTop: 8, display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14, color: colors.textSecondary }}>
+                  <div><strong>Target J‑ID:</strong> {result.note.target_j_id || '—'}</div>
+                  <div><strong>Type:</strong> {result.note.note_type || '—'}</div>
+                  <div><strong>Valid from:</strong> {result.note.valid_from || '—'}</div>
+                  <div><strong>Valid to:</strong> {result.note.valid_to || '—'}</div>
+                </div>
+                {Array.isArray(result.note.affected_sections) && result.note.affected_sections.length > 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <strong>Affected sections:</strong>
+                    <ul style={{ marginTop: 6 }}>
+                      {result.note.affected_sections.map((s, i) => (<li key={i}>{s}</li>))}
+                    </ul>
+                  </div>
+                )}
+                {Array.isArray(result.note.actions) && result.note.actions.length > 0 && (
+                  <div style={{ marginTop: 6 }}>
+                    <strong>Actions:</strong> {result.note.actions.join(', ')}
+                  </div>
+                )}
+                {result.note.summary && (
+                  <div style={{ marginTop: 8 }}>
+                    <strong>Summary:</strong>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{result.note.summary}</div>
+                  </div>
+                )}
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
               <div><strong>ID:</strong> {result.id || '—'}</div>
               <div><strong>Status:</strong> {result.status || '—'}</div>

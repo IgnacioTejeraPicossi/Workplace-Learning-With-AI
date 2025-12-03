@@ -343,6 +343,82 @@ async def delete_j_message(doc_id: str):
         raise HTTPException(status_code=400, detail=f"Delete failed: {e}")
 
 
+def build_note_prompt(body_text: str) -> str:
+    return f"""
+You analyze Norwegian J-melding notes (short addendums to a base J‑melding).
+Extract STRICT JSON with:
+- target_j_id: the J‑melding ID this note modifies (e.g., "J-195-2025"), or null if unknown
+- note_type: "addendum" | "correction" | "extension" | "cancellation" | "other"
+- valid_from: YYYY-MM-DD or null
+- valid_to: YYYY-MM-DD or null
+- affected_sections: array of strings listing affected chapters/paragraphs (e.g., "Kapittel 1", "§ 7 (sjette ledd)")
+- actions: array of verbs like ["amend","replace","add","repeal"]
+- summary: short human-readable summary of what the note changes
+Text:
+\"\"\"{body_text[:12000]}\"\"\"
+"""
+
+
+@router.post("/analyze-note")
+async def analyze_j_note(request: Request, file: UploadFile = File(...)):
+    """
+    Analyze a J-melding 'note' document (DOCX/PDF). Returns structured 'note' fields.
+    """
+    file_bytes = await file.read()
+    filename_lower = (file.filename or "").lower()
+
+    # Read text from file
+    try:
+        if filename_lower.endswith(".docx"):
+            paragraphs = read_docx_paragraphs(file_bytes)
+            full_text = "\n".join(paragraphs)
+        elif filename_lower.endswith(".pdf"):
+            full_text = read_pdf_text(file_bytes)
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse file: {e}")
+
+    # Use LLM to extract note structure
+    note_data: Dict[str, Any] = {
+        "target_j_id": None,
+        "note_type": None,
+        "valid_from": None,
+        "valid_to": None,
+        "affected_sections": [],
+        "actions": [],
+        "summary": ""
+    }
+    try:
+        if ask_ai_unified_sync:
+            prompt = build_note_prompt(full_text)
+            resp = ask_ai_unified_sync(
+                prompt=prompt,
+                task_type="extraction",
+                complexity="low",
+                max_tokens=600,
+                messages=None,
+                request_headers=dict(request.headers)
+            )
+            try:
+                import json
+                parsed = json.loads(resp)
+                if isinstance(parsed, dict):
+                    note_data.update(parsed)
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"[J-MESSAGES NOTE] extraction failed: {e}")
+
+    return {
+        "type": "note",
+        "note": note_data,
+        "raw_text": full_text
+    }
+
+
 @router.post("/export-docx")
 async def export_docx(data: Dict[str, Any] = Body(...)):
     """
