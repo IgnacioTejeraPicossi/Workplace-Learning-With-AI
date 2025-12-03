@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
+import PromptPanel from './components/PromptPanel';
 
 export default function JMessagesAnalyzer() {
   const { colors } = useTheme();
@@ -230,6 +231,36 @@ export default function JMessagesAnalyzer() {
           </div>
         )}
       </div>
+
+      {/* Prompt Manager */}
+      <PromptPanel
+        agent="j-messages"
+        colors={colors}
+        nativePromptText={`Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
+Du får teksten fra en J-melding (header + starten på forskriften).
+Trekk ut metadata og returner KUN STRICT JSON uten kommentarer.
+Felt:
+- j_id
+- title
+- replaces_id
+- status
+- valid_from
+- valid_to
+- categories
+
+Tekst:
+\"\"\"{header_text}\\n\\n{body_text[:4000]}\"\"\"
+
+For notes (J-melding notes):
+Extract STRICT JSON with:
+- target_j_id: the J‑melding ID this note modifies (e.g., "J-195-2025"), or null if unknown
+- note_type: "addendum" | "correction" | "extension" | "cancellation" | "other"
+- valid_from: YYYY-MM-DD or null
+- valid_to: YYYY-MM-DD or null
+- affected_sections: array of strings listing affected chapters/paragraphs (e.g., "Kapittel 1", "§ 7 (sjette ledd)")
+- actions: array of verbs like ["amend","replace","add","repeal"]
+- summary: short human-readable summary of what the note changes`}
+      />
 
       {result && (
         <div>
