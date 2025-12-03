@@ -13,6 +13,8 @@ export default function HologramAgentChat({ onClose }) {
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [muted, setMuted] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [messageDraft, setMessageDraft] = useState("");
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   // STT
   const {
@@ -41,25 +43,29 @@ export default function HologramAgentChat({ onClose }) {
   const uploadAndTranscribe = async (blob) => {
     if (!blob) return;
     try {
+      setIsTranscribing(true);
       const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
       const fd = new FormData();
       fd.append("file", blob, "voice.webm");
       const res = await fetch(`${API_BASE}/api/stt/transcribe`, { method: "POST", body: fd });
       const data = await res.json();
       const text = (data && data.transcript) || "";
-      if (text.trim()) sendMessage(text.trim());
-    } catch (_) {}
+      if (text.trim()) {
+        // Prefill the input with the transcription instead of auto-sending
+        setMessageDraft(text.trim());
+      }
+    } catch (_) {
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
-  // When listening stops and we have transcript, send
+  // Reflect interim/final transcript into the input; do not auto-send
   useEffect(() => {
-    if (!isListening && transcript) {
-      const text = transcript.trim();
-      if (text) sendMessage(text);
-      resetTranscript();
+    if (typeof transcript === "string") {
+      setMessageDraft(transcript);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isListening, transcript]);
+  }, [transcript]);
 
   // Auto-speak last assistant message
   useEffect(() => {
@@ -71,11 +77,11 @@ export default function HologramAgentChat({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const text = String(fd.get("message") || "").trim();
+    const text = String(messageDraft || "").trim();
     if (!text) return;
     sendMessage(text);
-    e.currentTarget.reset();
+    setMessageDraft("");
+    resetTranscript();
   };
 
   const toggleListening = () => {
@@ -85,6 +91,7 @@ export default function HologramAgentChat({ onClose }) {
     } else {
       stopSpeaking();
       resetTranscript();
+      setMessageDraft("");
       startListening();
     }
   };
@@ -168,8 +175,10 @@ export default function HologramAgentChat({ onClose }) {
         )}
       </div>
       <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, borderTop: "1px solid rgba(0,0,0,0.08)", padding: 10 }}>
-        <input
+      <input
           name="message"
+          value={messageDraft}
+          onChange={(e) => setMessageDraft(e.target.value)}
           placeholder="Ask me something about the app…"
           style={{
             flex: 1,
