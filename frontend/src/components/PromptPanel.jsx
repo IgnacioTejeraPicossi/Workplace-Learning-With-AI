@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { fetchWithAuth } from '../api';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 export default function PromptPanel({ agent, nativePromptText, colors, onUseResult }) {
@@ -14,7 +15,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const load = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/prompts/${agent}`);
+      const res = await fetchWithAuth(`${API_BASE}/api/prompts/${agent}`);
       const data = await res.json();
       setItems(data.items || []);
     } catch {}
@@ -24,7 +25,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const save = async () => {
     if (!prompt.trim()) return;
-    const res = await fetch(`${API_BASE}/api/prompts/${agent}`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/prompts/${agent}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name || 'Untitled', prompt })
@@ -34,7 +35,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
   const update = async () => {
     if (!selectedId) return;
-    const res = await fetch(`${API_BASE}/api/prompts/${agent}/${selectedId}`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/prompts/${agent}/${selectedId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, prompt })
@@ -43,7 +44,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   };
 
   const remove = async (id) => {
-    await fetch(`${API_BASE}/api/prompts/${agent}/${id}`, { method: 'DELETE' });
+    await fetchWithAuth(`${API_BASE}/api/prompts/${agent}/${id}`, { method: 'DELETE' });
     if (selectedId === id) { setSelectedId(''); setName(''); setPrompt(''); }
     load();
   };
@@ -63,7 +64,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
       const clinicHeader = (() => {
         try { return JSON.stringify(JSON.parse(window.localStorage.getItem('clinic_policy')||'{}')); } catch { return '{}'; }
       })();
-      const res = await fetch(`${API_BASE}/api/prompts/${agent}/test`, {
+      const res = await fetchWithAuth(`${API_BASE}/api/prompts/${agent}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Clinic-Policy': clinicHeader },
         body: JSON.stringify({ prompt: policyNote ? `${policyNote}\n${prompt}` : prompt })

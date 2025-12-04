@@ -6,6 +6,7 @@ import AgentOpsRuns from './components/AgentOpsRuns';
 import PromptPanel from './components/PromptPanel';
 import ActionDispatchPanel from './components/ActionDispatchPanel';
 import { buildComplianceSpec } from './utils/complianceMapper';
+import { fetchWithAuth } from './api';
 
 const AIComplianceAgent = () => {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ const AIComplianceAgent = () => {
     try {
       // Use unified endpoint to get documents from both sources
       const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_BASE}/api/unified-documents`);
+      const response = await fetchWithAuth(`${API_BASE}/api/unified-documents`);
       if (response.ok) {
         const data = await response.json();
         setDocuments(data.documents || []);
