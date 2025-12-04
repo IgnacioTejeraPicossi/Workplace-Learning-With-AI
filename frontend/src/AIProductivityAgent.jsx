@@ -6,6 +6,7 @@ import AgentOpsRuns from './components/AgentOpsRuns';
 import PromptPanel from './components/PromptPanel';
 import ActionDispatchPanel from './components/ActionDispatchPanel';
 import { buildProductivitySpec } from './utils/productivityMapper';
+import { fetchWithAuth } from './api';
 
 const AIProductivityAgent = () => {
   const { t } = useTranslation();
@@ -26,7 +27,7 @@ const AIProductivityAgent = () => {
   const loadAnalyses = async () => {
     try {
       const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_BASE}/api/agentic-rag/get-analyses`);
+      const response = await fetchWithAuth(`${API_BASE}/api/agentic-rag/get-analyses`);
       if (response.ok) {
         const data = await response.json();
         setAnalyses(data.analyses || []);
@@ -43,7 +44,7 @@ const AIProductivityAgent = () => {
     try {
       // Use the new specific endpoint for productivity URL analysis
       const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      const response = await fetch(`${API_BASE}/api/productivity/analyze-url`, {
+      const response = await fetchWithAuth(`${API_BASE}/api/productivity/analyze-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
