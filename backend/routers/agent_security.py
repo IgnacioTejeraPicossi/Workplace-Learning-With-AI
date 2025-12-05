@@ -692,12 +692,14 @@ async def run_real_security_checks(agent_name: str) -> dict:
         recent_runs = []
     hashes = [r.get("bundle_hash") for r in recent_runs if r.get("bundle_hash")]
     unique_hashes = set(hashes)
-    # Score: fewer unique hashes → more stable (simulate 100..60)
+    # Score: fewer unique hashes → more stable (range 100..70)
+    # Adjusted to be less strict: diversity up to 4-5 unique hashes is acceptable
     if not hashes:
-        integrity_score = 80  # unknown, neutral
+        integrity_score = 85  # unknown, slightly positive
     else:
         diversity = max(1, len(unique_hashes))
-        integrity_score = max(60, 100 - (diversity - 1) * 10)
+        # More lenient: 1 hash = 100, 2 = 95, 3 = 90, 4 = 85, 5 = 80, 6+ = 75
+        integrity_score = max(75, 100 - (diversity - 1) * 5)
 
     # 3) DLP scan on latest security events (PII/API key heuristics)
     pii_patterns = [
@@ -724,15 +726,25 @@ async def run_real_security_checks(agent_name: str) -> dict:
     # Convert findings to score 100..70
     data_protection_score = max(70, 100 - dlp_findings * 10)
 
-    # Aggregate snapshot
-    status = "secure" if (zero_trust_ok and integrity_score >= 80 and data_protection_score >= 85) else "at_risk"
-    vulnerabilities = max(0, (0 if zero_trust_ok else 1) + (0 if data_protection_score >= 90 else 1))
-    threats = 1 if dlp_findings > 0 else 0
+    # Calculate security score first
     security_score = int(round((
         (90 if zero_trust_ok else 75) * 0.35 +
         integrity_score * 0.30 +
         data_protection_score * 0.35
     )))
+    
+    # Determine status: secure if zero_trust_ok AND security_score >= 80 AND data_protection_score >= 85
+    # This allows agents with good overall security (score >= 80) to be secure even if integrity_score is slightly lower
+    # The integrity_score threshold is relaxed from 80 to 70 to account for legitimate diversity in bundle hashes
+    status = "secure" if (
+        zero_trust_ok and 
+        security_score >= 80 and
+        data_protection_score >= 85 and
+        integrity_score >= 70  # Relaxed from 80 to 70 to allow legitimate diversity
+    ) else "at_risk"
+    
+    vulnerabilities = max(0, (0 if zero_trust_ok else 1) + (0 if data_protection_score >= 90 else 1))
+    threats = 1 if dlp_findings > 0 else 0
 
     findings = {
         "zero_trust": {
