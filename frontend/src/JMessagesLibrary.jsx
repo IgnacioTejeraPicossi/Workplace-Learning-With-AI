@@ -410,9 +410,9 @@ export default function JMessagesLibrary() {
                   </>
                 )}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', minWidth: '400px' }}>
                 {/* Edit/Manage buttons row (Save/Cancel or Expand/Edit/Delete) */}
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                   {editing[it.id] ? (
                     <>
                       <button
@@ -423,7 +423,9 @@ export default function JMessagesLibrary() {
                           border: 'none',
                           borderRadius: 6,
                           padding: '6px 10px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          flex: 1,
+                          textAlign: 'center'
                         }}
                       >
                         💾 Save
@@ -436,7 +438,9 @@ export default function JMessagesLibrary() {
                           borderRadius: 6,
                           padding: '6px 10px',
                           cursor: 'pointer',
-                          color: colors.text
+                          color: colors.text,
+                          flex: 1,
+                          textAlign: 'center'
                         }}
                       >
                         ❌ Cancel
@@ -458,7 +462,9 @@ export default function JMessagesLibrary() {
                           border: `1px solid ${colors.border}`,
                           borderRadius: 6,
                           padding: '6px 10px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          flex: 1,
+                          textAlign: 'center'
                         }}
                       >
                         {expanded[it.id] ? 'Collapse' : 'Expand'}
@@ -471,7 +477,9 @@ export default function JMessagesLibrary() {
                           border: 'none',
                           borderRadius: 6,
                           padding: '6px 10px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          flex: 1,
+                          textAlign: 'center'
                         }}
                       >
                         ✏️ Edit
@@ -484,7 +492,9 @@ export default function JMessagesLibrary() {
                           border: 'none',
                           borderRadius: 6,
                           padding: '6px 10px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          flex: 1,
+                          textAlign: 'center'
                         }}
                       >
                         Delete
@@ -493,7 +503,7 @@ export default function JMessagesLibrary() {
                   )}
                 </div>
                 {/* Export buttons row */}
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                   <button
                     onClick={async () => {
                       try {
@@ -525,7 +535,9 @@ export default function JMessagesLibrary() {
                       border: 'none',
                       borderRadius: 6,
                       padding: '6px 10px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      flex: 1,
+                      textAlign: 'center'
                     }}
                   >
                     Export DOCX
@@ -538,7 +550,9 @@ export default function JMessagesLibrary() {
                       border: 'none',
                       borderRadius: 6,
                       padding: '6px 10px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      flex: 1,
+                      textAlign: 'center'
                     }}
                   >
                     Export MD
@@ -551,7 +565,9 @@ export default function JMessagesLibrary() {
                       border: 'none',
                       borderRadius: 6,
                       padding: '6px 10px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      flex: 1,
+                      textAlign: 'center'
                     }}
                   >
                     Export PDF
