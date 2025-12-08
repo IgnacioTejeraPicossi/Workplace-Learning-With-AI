@@ -511,7 +511,7 @@ function VideoLesson({ user }) {
             
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Topic/Category: *
+                Topic/Category: * {!videoTopic.trim() && <span style={{ color: '#dc2626', fontSize: '0.9em' }}>(Required)</span>}
               </label>
               <input
                 type="text"
@@ -522,11 +522,17 @@ function VideoLesson({ user }) {
                   width: '100%', 
                   padding: 8, 
                   borderRadius: 4, 
-                  border: `1px solid ${colors.border}`,
+                  border: `1px solid ${!videoTopic.trim() ? '#dc2626' : colors.border}`,
                   background: colors.background,
-                  color: colors.text
+                  color: colors.text,
+                  boxShadow: !videoTopic.trim() ? '0 0 0 2px rgba(220, 38, 38, 0.1)' : 'none'
                 }}
               />
+              {!videoTopic.trim() && (
+                <div style={{ marginTop: 4, fontSize: '0.85em', color: '#dc2626' }}>
+                  ⚠️ Please enter a topic/category to enable saving
+                </div>
+              )}
             </div>
             
             <div>
@@ -557,21 +563,22 @@ function VideoLesson({ user }) {
                 padding: '10px 20px', 
                 borderRadius: 6, 
                 border: 'none',
-                background: colors.primary,
+                background: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? '#9ca3af' : colors.primary,
                 color: '#fff',
                 cursor: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? 'not-allowed' : 'pointer',
                 opacity: saving || !videoTitle.trim() || !videoTopic.trim() || extractingTitle ? 0.6 : 1,
-                alignSelf: 'flex-start'
+                alignSelf: 'flex-start',
+                transition: 'background 0.2s'
               }}
               title={
                 !videoTitle.trim() ? 'Please enter a video title' :
-                !videoTopic.trim() ? 'Please enter a topic' :
+                !videoTopic.trim() ? 'Please enter a topic/category (required field)' :
                 extractingTitle ? 'Extracting title from YouTube...' :
                 saving ? 'Saving video...' :
                 'Save video to your library'
               }
             >
-              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Extracting title...' : '💾 Save Video'}
+              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Extracting title...' : !videoTopic.trim() ? '💾 Save Video (Topic required)' : '💾 Save Video'}
             </button>
           </div>
         </div>
