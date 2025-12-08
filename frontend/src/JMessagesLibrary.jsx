@@ -12,6 +12,9 @@ export default function JMessagesLibrary() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [tocOpen, setTocOpen] = useState({});
+  const [editing, setEditing] = useState({});
+  const [editContent, setEditContent] = useState({});
+  const [status, setStatus] = useState('');
 
   const load = async () => {
     try {
@@ -47,6 +50,89 @@ export default function JMessagesLibrary() {
     return qOk && sOk && cOk;
   });
 
+  const startEditing = (itemId) => {
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      setEditContent(prev => ({
+        ...prev,
+        [itemId]: {
+          title: item.title || '',
+          j_id: item.j_id || '',
+          status: item.status || '',
+          valid_from: item.valid_from || '',
+          valid_to: item.valid_to || '',
+          replaces: item.replaces || '',
+          categories: Array.isArray(item.categories) ? [...item.categories] : [],
+          summary: item.summary || '',
+          body_html: item.body_html || '',
+          raw_text: item.raw_text || ''
+        }
+      }));
+      setEditing(prev => ({
+        ...prev,
+        [itemId]: true
+      }));
+    }
+  };
+
+  const handleEditChange = (itemId, field, value) => {
+    setEditContent(prev => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleEditSave = async (itemId) => {
+    try {
+      const content = editContent[itemId];
+      if (!content) return;
+
+      const resp = await fetchWithAuth(`/api/j-messages/update/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(content)
+      });
+
+      const data = await resp.json();
+      if (data.success) {
+        // Update local state
+        setItems((prev) => prev.map(item =>
+          item.id === itemId
+            ? { ...item, ...content }
+            : item
+        ));
+        setEditing(prev => ({
+          ...prev,
+          [itemId]: false
+        }));
+        setStatus('✅ Document updated successfully');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus('❌ Failed to update document');
+        setTimeout(() => setStatus(''), 3000);
+      }
+    } catch (e) {
+      setStatus(`❌ Failed to update document: ${String(e)}`);
+      setTimeout(() => setStatus(''), 3000);
+    }
+  };
+
+  const handleEditCancel = (itemId) => {
+    setEditing(prev => {
+      const newEditing = { ...prev };
+      delete newEditing[itemId];
+      return newEditing;
+    });
+    setEditContent(prev => {
+      const newContent = { ...prev };
+      delete newContent[itemId];
+      return newContent;
+    });
+  };
+
   const deleteItem = async (id) => {
     if (!window.confirm('Delete this item?')) return;
     try {
@@ -54,6 +140,17 @@ export default function JMessagesLibrary() {
       const data = await resp.json();
       if (data.success) {
         setItems((prev) => prev.filter((i) => i.id !== id));
+        // Clear editing state if item was being edited
+        setEditing(prev => {
+          const newEditing = { ...prev };
+          delete newEditing[id];
+          return newEditing;
+        });
+        setEditContent(prev => {
+          const newContent = { ...prev };
+          delete newContent[id];
+          return newContent;
+        });
       } else {
         alert('Delete failed');
       }
@@ -220,6 +317,18 @@ export default function JMessagesLibrary() {
 
       {loading && <div>Loading…</div>}
       {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
+      {status && (
+        <div style={{
+          padding: '12px',
+          borderRadius: 8,
+          marginBottom: 16,
+          background: status.includes('✅') ? '#d1fae5' : '#fee2e2',
+          color: status.includes('✅') ? '#065f46' : '#991b1b',
+          border: `1px solid ${status.includes('✅') ? '#10b981' : '#dc2626'}`
+        }}>
+          {status}
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {filtered.map((it) => (
@@ -230,122 +339,224 @@ export default function JMessagesLibrary() {
             padding: 12
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: 600, color: colors.primary }}>
-                  {it.title || '(untitled)'}
-                </div>
-                <div style={{ fontSize: 12, color: colors.textSecondary }}>
-                  {it.j_id ? `${it.j_id} • ` : ''}{it.status || ''} {it.valid_from ? `• ${it.valid_from}` : ''} {it.valid_to ? `→ ${it.valid_to}` : ''}
-                </div>
-                {Array.isArray(it.categories) && it.categories.length > 0 && (
-                  <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {it.categories.map((c, idx) => (
-                      <span key={idx} style={{
-                        background: colors.primaryLight,
-                        color: colors.primary,
-                        borderRadius: 999,
-                        padding: '2px 8px',
-                        fontSize: 12
-                      }}>{c}</span>
-                    ))}
+              <div style={{ flex: 1 }}>
+                {editing[it.id] ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <input
+                      value={editContent[it.id]?.title || ''}
+                      onChange={(e) => handleEditChange(it.id, 'title', e.target.value)}
+                      placeholder="Title"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 6,
+                        background: colors.background,
+                        color: colors.text
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        value={editContent[it.id]?.j_id || ''}
+                        onChange={(e) => handleEditChange(it.id, 'j_id', e.target.value)}
+                        placeholder="J-ID"
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      />
+                      <input
+                        value={editContent[it.id]?.status || ''}
+                        onChange={(e) => handleEditChange(it.id, 'status', e.target.value)}
+                        placeholder="Status"
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      />
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <div style={{ fontWeight: 600, color: colors.primary }}>
+                      {it.title || '(untitled)'}
+                    </div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary }}>
+                      {it.j_id ? `${it.j_id} • ` : ''}{it.status || ''} {it.valid_from ? `• ${it.valid_from}` : ''} {it.valid_to ? `→ ${it.valid_to}` : ''}
+                    </div>
+                    {Array.isArray(it.categories) && it.categories.length > 0 && (
+                      <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {it.categories.map((c, idx) => (
+                          <span key={idx} style={{
+                            background: colors.primaryLight,
+                            color: colors.primary,
+                            borderRadius: 999,
+                            padding: '2px 8px',
+                            fontSize: 12
+                          }}>{c}</span>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                  onClick={() => {
-                    setExpanded((e) => {
-                      const next = !e[it.id];
-                      // Open TOC by default when expanding
-                      if (next) setTocOpen((s) => ({ ...s, [it.id]: true }));
-                      return { ...e, [it.id]: next };
-                    });
-                  }}
-                  style={{
-                    background: 'transparent',
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {expanded[it.id] ? 'Collapse' : 'Expand'}
-                </button>
-                <button
-                  onClick={async () => {
-                    try {
-                      const resp = await fetchWithAuth('/api/j-messages/export-docx', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(it)
-                      });
-                      if (!resp.ok) {
-                        const txt = await resp.text();
-                        throw new Error(`${resp.status} ${txt}`);
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                {/* Edit/Manage buttons row (Save/Cancel or Expand/Edit/Delete) */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {editing[it.id] ? (
+                    <>
+                      <button
+                        onClick={() => handleEditSave(it.id)}
+                        style={{
+                          background: '#22c55e',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        💾 Save
+                      </button>
+                      <button
+                        onClick={() => handleEditCancel(it.id)}
+                        style={{
+                          background: 'transparent',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: 'pointer',
+                          color: colors.text
+                        }}
+                      >
+                        ❌ Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setExpanded((e) => {
+                            const next = !e[it.id];
+                            // Open TOC by default when expanding
+                            if (next) setTocOpen((s) => ({ ...s, [it.id]: true }));
+                            return { ...e, [it.id]: next };
+                          });
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {expanded[it.id] ? 'Collapse' : 'Expand'}
+                      </button>
+                      <button
+                        onClick={() => startEditing(it.id)}
+                        style={{
+                          background: '#f59e0b',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => deleteItem(it.id)}
+                        style={{
+                          background: '#dc2626',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 10px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+                {/* Export buttons row */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const resp = await fetchWithAuth('/api/j-messages/export-docx', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(it)
+                        });
+                        if (!resp.ok) {
+                          const txt = await resp.text();
+                          throw new Error(`${resp.status} ${txt}`);
+                        }
+                        const blob = await resp.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${(it.j_id || 'j-message').replace(/\s+/g, '_')}.docx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      } catch (e) {
+                        alert(`Export DOCX failed: ${String(e)}`);
                       }
-                      const blob = await resp.blob();
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `${(it.j_id || 'j-message').replace(/\s+/g, '_')}.docx`;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                    } catch (e) {
-                      alert(`Export DOCX failed: ${String(e)}`);
-                    }
-                  }}
-                  style={{
-                    background: '#6366f1',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Export DOCX
-                </button>
-                <button
-                  onClick={() => exportMarkdown(it)}
-                  style={{
-                    background: '#0ea5e9',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Export MD
-                </button>
-                <button
-                  onClick={() => exportPDF(it)}
-                  style={{
-                    background: '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Export PDF
-                </button>
-                <button
-                  onClick={() => deleteItem(it.id)}
-                  style={{
-                    background: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Delete
-                </button>
+                    }}
+                    style={{
+                      background: '#6366f1',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Export DOCX
+                  </button>
+                  <button
+                    onClick={() => exportMarkdown(it)}
+                    style={{
+                      background: '#0ea5e9',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Export MD
+                  </button>
+                  <button
+                    onClick={() => exportPDF(it)}
+                    style={{
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Export PDF
+                  </button>
+                </div>
               </div>
             </div>
             {expanded[it.id] && (
@@ -433,18 +644,58 @@ export default function JMessagesLibrary() {
                 {it.summary && (
                   <div style={{ marginBottom: 10 }}>
                     <strong>Summary:</strong>
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{it.summary}</div>
+                    {editing[it.id] ? (
+                      <textarea
+                        value={editContent[it.id]?.summary || ''}
+                        onChange={(e) => handleEditChange(it.id, 'summary', e.target.value)}
+                        style={{
+                          width: '100%',
+                          minHeight: 100,
+                          padding: '8px 12px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontFamily: 'inherit',
+                          marginTop: 8
+                        }}
+                      />
+                    ) : (
+                      <div style={{ whiteSpace: 'pre-wrap' }}>{it.summary}</div>
+                    )}
                   </div>
                 )}
-                <article
-                  dangerouslySetInnerHTML={{ __html: it.body_html || '' }}
-                  style={{
-                    background: colors.surface,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: 8,
-                    padding: 12
-                  }}
-                />
+                {editing[it.id] ? (
+                  <div style={{ marginBottom: 10 }}>
+                    <strong>Body HTML:</strong>
+                    <textarea
+                      value={editContent[it.id]?.body_html || ''}
+                      onChange={(e) => handleEditChange(it.id, 'body_html', e.target.value)}
+                      style={{
+                        width: '100%',
+                        minHeight: 300,
+                        padding: '8px 12px',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 6,
+                        background: colors.background,
+                        color: colors.text,
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                        marginTop: 8
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <article
+                    dangerouslySetInnerHTML={{ __html: it.body_html || '' }}
+                    style={{
+                      background: colors.surface,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 8,
+                      padding: 12
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

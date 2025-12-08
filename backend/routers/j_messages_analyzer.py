@@ -331,6 +331,59 @@ async def list_j_messages():
     return {"success": True, "items": items, "total": len(items)}
 
 
+@router.put("/update/{doc_id}")
+async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
+    """
+    Update an existing J-message in MongoDB.
+    """
+    if j_messages_collection is None:
+        raise HTTPException(status_code=500, detail="MongoDB not configured")
+    try:
+        from bson import ObjectId
+        update_doc: Dict[str, Any] = {
+            "updated_at": datetime.utcnow()
+        }
+        # Only update fields that are provided
+        if "title" in data:
+            update_doc["title"] = data.get("title")
+        if "j_id" in data:
+            update_doc["j_id"] = data.get("j_id")
+        if "status" in data:
+            update_doc["status"] = data.get("status")
+        if "valid_from" in data:
+            update_doc["valid_from"] = data.get("valid_from")
+        if "valid_to" in data:
+            update_doc["valid_to"] = data.get("valid_to")
+        if "replaces" in data:
+            update_doc["replaces"] = data.get("replaces")
+        if "categories" in data:
+            update_doc["categories"] = data.get("categories") or []
+        if "toc" in data:
+            update_doc["toc"] = data.get("toc") or []
+        if "body_html" in data:
+            update_doc["body_html"] = data.get("body_html") or ""
+        if "summary" in data:
+            update_doc["summary"] = data.get("summary") or ""
+        if "summary_length" in data:
+            update_doc["summary_length"] = data.get("summary_length")
+        if "raw_text" in data:
+            update_doc["raw_text"] = data.get("raw_text") or ""
+        if "filename" in data:
+            update_doc["filename"] = data.get("filename") or ""
+        
+        result = await j_messages_collection.update_one(
+            {"_id": ObjectId(doc_id)},
+            {"$set": update_doc}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="J-message not found")
+        return {"success": True, "id": doc_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Update failed: {e}")
+
+
 @router.delete("/delete/{doc_id}")
 async def delete_j_message(doc_id: str):
     if j_messages_collection is None:
