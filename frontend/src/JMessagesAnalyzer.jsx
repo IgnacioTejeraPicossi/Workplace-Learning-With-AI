@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
 import PromptPanel from './components/PromptPanel';
@@ -13,6 +13,26 @@ export default function JMessagesAnalyzer() {
   const [summaryLength, setSummaryLength] = useState("");
   const [status, setStatus] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [allCategories, setAllCategories] = useState([]);
+
+  // Load categories from saved J-messages
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const resp = await fetchWithAuth('/api/j-messages/list');
+        const data = await resp.json();
+        if (data.success && Array.isArray(data.items)) {
+          const categories = Array.from(
+            new Set(data.items.flatMap((i) => Array.isArray(i.categories) ? i.categories : []).filter(Boolean))
+          ).sort();
+          setAllCategories(categories);
+        }
+      } catch (e) {
+        console.error('Failed to load categories:', e);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const headerStyle = useMemo(() => ({
     background: colors.cardBackground,
@@ -220,6 +240,24 @@ export default function JMessagesAnalyzer() {
         >
           {isLoading ? 'Processing…' : 'Analyze note'}
         </button>
+        {allCategories.length > 0 && (
+          <select
+            style={{
+              marginLeft: 8,
+              padding: '6px 8px',
+              borderRadius: 6,
+              border: `1px solid ${colors.border}`,
+              background: colors.background,
+              color: colors.text
+            }}
+            title="Available categories from saved J-messages"
+          >
+            <option value="">All categories</option>
+            {allCategories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        )}
         {error && (
           <div style={{ color: '#b91c1c', marginTop: 8, whiteSpace: 'pre-wrap' }}>
             {error}
