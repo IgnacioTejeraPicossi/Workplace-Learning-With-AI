@@ -5945,23 +5945,66 @@ Registered in Agent Catalog with:
 ## 🧩 MCP (Model Context Protocol) - Interoperability
 
 ### What is MCP?
-An open standard to expose service “tools” to LLM clients (e.g., Claude Desktop) with capability discovery, invocation, and streaming.
+An open standard to expose service "tools" to LLM clients (e.g., Claude Desktop, Enonic CMS) with capability discovery, invocation, and streaming.
 
 ### Implementation in this repo
 - Manifest endpoint: `GET /api/mcp/manifest` returns manifests for:
   - `ai-compliance-agent`
   - `ai-productivity-agent`
+  - `wlwai-j-messages-mcp` (J-messages Analyzer)
 - Each manifest describes tools equivalent to our REST endpoints:
-  - `dispatch_action_bundle` → POST `/api/{compliance|productivity}/dispatch`
-  - `get_run_status` → GET `/api/agent-runs`
+  - **Compliance/Productivity agents:**
+    - `dispatch_action_bundle` → POST `/api/{compliance|productivity}/dispatch`
+    - `get_run_status` → GET `/api/agent-runs`
+  - **J-messages Analyzer:**
+    - `analyze_j_melding` → POST `/api/mcp/j-messages/analyze` (accepts `file_url`, downloads and analyzes J-melding)
+    - `list_j_meldinger` → GET `/api/j-messages/list` (with optional filters: status, category, search)
 - Code location: `backend/routers/agentops/__init__.py` (router `mcp_router`).
+
+### J-messages Analyzer MCP Integration
+The J-messages Analyzer module exposes MCP tools for integration with external systems (e.g., Fiskeridirektoratet's Enonic CMS):
+
+#### Tool: `analyze_j_melding`
+- **Description**: Analyzes a J-melding (.docx or .pdf) from Fiskeridirektoratet and extracts structured metadata, table of contents, and HTML body.
+- **Input**:
+  - `file_url` (required): HTTPS URL to a .docx or .pdf J-melding file
+  - `summary_length` (optional): "none" | "short" | "medium" | "long"
+- **Output**: JSON with `id`, `title`, `status`, `valid_from`, `valid_to`, `replaces`, `categories`, `toc`, `body_html`, `summary` (if requested)
+- **Endpoint**: `POST /api/mcp/j-messages/analyze`
+- **Implementation**: Downloads file from URL, forwards to internal `/api/j-messages/analyze` endpoint, preserves API configuration headers
+
+#### Tool: `list_j_meldinger`
+- **Description**: Lists all analyzed J-meldinger stored in the library with optional filtering.
+- **Input** (all optional):
+  - `status`: Filter by status (e.g., "Gjeldende", "Utgått")
+  - `category`: Filter by category
+  - `search`: Search in title, j_id, or content
+- **Output**: JSON with `success`, `items` (array), `total` (count)
+- **Endpoint**: `GET /api/j-messages/list`
 
 ### How to use (MCP client)
 1. The client fetches `GET /api/mcp/manifest` to list servers (agents) and their tools.
 2. Map each `tool.invoke.path`/`method` to HTTP calls from the client.
 3. The LLM can call these tools directly instead of relying on free‑form prompts.
 
-Note: agents still operate via REST today; MCP adds forward‑compatible interoperability without breaking current flows.
+### Example: Using J-messages Analyzer via MCP
+```bash
+# 1. Get manifest
+curl http://localhost:8000/api/mcp/manifest
+
+# 2. Analyze a J-melding from URL
+curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_url": "https://example.com/j-melding-195-2025.docx",
+    "summary_length": "medium"
+  }'
+
+# 3. List all analyzed J-meldinger
+curl "http://localhost:8000/api/j-messages/list?status=Gjeldende&category=Pelagisk%20fisk"
+```
+
+Note: agents still operate via REST today; MCP adds forward‑compatible interoperability without breaking current flows. The MCP server is integrated within WLWAI (Option 1 from the implementation plan), making it accessible to external systems like Enonic CMS.
 
 ### Overview
 The Cybersecurity Module provides comprehensive security management and threat intelligence capabilities, integrating seamlessly with the existing AI-powered learning platform. It offers real-time vulnerability scanning, threat assessment, compliance tracking, and secure coding guidance.

@@ -318,14 +318,33 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
 
 
 @router.get("/list")
-async def list_j_messages():
+async def list_j_messages(
+    status: str = Query(None, description="Filter by status (e.g., 'Gjeldende', 'Utgått')"),
+    category: str = Query(None, description="Filter by category"),
+    search: str = Query(None, description="Search in title or content")
+):
     """
     List saved J-messages from MongoDB.
+    Supports MCP tool: list_j_meldinger
     """
     if j_messages_collection is None:
         return {"success": True, "items": [], "total": 0}
+    
+    # Build query filter
+    query: Dict[str, Any] = {}
+    if status:
+        query["status"] = status
+    if category:
+        query["categories"] = {"$in": [category]}
+    if search:
+        query["$or"] = [
+            {"title": {"$regex": search, "$options": "i"}},
+            {"j_id": {"$regex": search, "$options": "i"}},
+            {"raw_text": {"$regex": search, "$options": "i"}}
+        ]
+    
     items: List[Dict[str, Any]] = []
-    async for doc in j_messages_collection.find({}).sort("created_at", -1):
+    async for doc in j_messages_collection.find(query).sort("created_at", -1):
         doc["id"] = str(doc.pop("_id"))
         items.append(doc)
     return {"success": True, "items": items, "total": len(items)}
