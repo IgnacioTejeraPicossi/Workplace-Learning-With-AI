@@ -225,23 +225,62 @@ async def analyze_j_message(
         if ask_ai_unified_sync:
             prompt = build_metadata_prompt(header_text, body_text)
             # Ask model for STRICT JSON
+            # Pass request headers to allow API config from frontend/MCP
+            request_headers_dict = dict(request.headers) if request else {}
+            # Debug: log if we have API config headers
+            has_api_config = any(
+                k in request_headers_dict 
+                for k in ["x-api-provider", "x-openai-key", "x-openrouter-key", "x-itemai-key"]
+            )
+            if not has_api_config:
+                print("[J-MESSAGES] No API config headers found, will use .env fallback")
+            
             response = ask_ai_unified_sync(
                 prompt=prompt + "\nGi svaret som STRICT JSON.",
                 task_type="extraction",
                 complexity="low",
                 max_tokens=600,
                 messages=None,
-                request_headers=dict(request.headers)
+                request_headers=request_headers_dict
             )
             # Attempt to parse JSON
             try:
                 import json
-                parsed = json.loads(response)
+                import re
+                # Try to extract JSON from response (may be wrapped in markdown or have extra text)
+                json_str = response.strip()
+                
+                # Remove markdown code blocks if present
+                if "```" in json_str:
+                    # Extract content between ```json and ```
+                    match = re.search(r'```(?:json)?\s*(.*?)\s*```', json_str, re.DOTALL)
+                    if match:
+                        json_str = match.group(1).strip()
+                    else:
+                        # Fallback: remove all ``` blocks
+                        json_str = re.sub(r'```[^`]*```', '', json_str).strip()
+                
+                # Try to find JSON object in the string
+                json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                
+                parsed = json.loads(json_str)
                 if isinstance(parsed, dict):
                     metadata.update(parsed)
-            except Exception:
+                    print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
+                    print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}")
+                else:
+                    print(f"[J-MESSAGES] ⚠️ LLM response is not a dict: {type(parsed)}")
+            except json.JSONDecodeError as e:
+                print(f"[J-MESSAGES] ❌ Failed to parse JSON from LLM response: {e}")
+                print(f"[J-MESSAGES] Response preview: {response[:300]}...")
                 # Leave defaults if parsing fails; front-end can still render
-                pass
+            except Exception as e:
+                print(f"[J-MESSAGES] ❌ Unexpected error parsing metadata: {e}")
+                import traceback
+                traceback.print_exc()
+                # Leave defaults if parsing fails; front-end can still render
             # Optional summary
             if summary_length:
                 sum_prompt = f"""
@@ -257,7 +296,7 @@ Tekst:
                         complexity="low",
                         max_tokens=700,
                         messages=None,
-                        request_headers=dict(request.headers)
+                        request_headers=request_headers_dict
                     ) or ""
                 except Exception as _:
                     summary_text = ""

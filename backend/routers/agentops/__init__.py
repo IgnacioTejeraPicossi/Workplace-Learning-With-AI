@@ -186,15 +186,35 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                 params["summary_length"] = summary_length
             
             # Forward request headers (for API config, auth, etc.)
+            # Only forward valid headers to allow .env fallback when headers are missing/invalid
             headers = {}
+            
+            # Forward API provider if present
             if "x-api-provider" in request.headers:
                 headers["x-api-provider"] = request.headers["x-api-provider"]
-            if "x-openai-key" in request.headers:
-                headers["x-openai-key"] = request.headers["x-openai-key"]
-            if "x-openrouter-key" in request.headers:
-                headers["x-openrouter-key"] = request.headers["x-openrouter-key"]
-            if "x-itemai-key" in request.headers:
-                headers["x-itemai-key"] = request.headers["x-itemai-key"]
+            
+            # Only forward OpenAI key if it's valid (not a placeholder)
+            openai_key = request.headers.get("x-openai-key", "")
+            if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
+                headers["x-openai-key"] = openai_key
+            # If invalid or missing, don't pass header - let endpoint use .env
+            
+            # Only forward OpenRouter key if it's valid
+            openrouter_key = request.headers.get("x-openrouter-key", "")
+            if openrouter_key and len(openrouter_key) > 10:
+                headers["x-openrouter-key"] = openrouter_key
+            
+            # Only forward ItemAI key if it's valid
+            itemai_key = request.headers.get("x-itemai-key", "")
+            if itemai_key and len(itemai_key) > 5:
+                headers["x-itemai-key"] = itemai_key
+            
+            # Log headers being sent for debugging
+            logger.debug("MCP calling internal analyzer", extra={
+                "url": analyzer_url,
+                "headers_present": list(headers.keys()),
+                "has_openai_key": "x-openai-key" in headers
+            })
             
             analyze_resp = await client.post(
                 analyzer_url,
@@ -214,7 +234,8 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
             logger.info("analyze_j_melding via MCP succeeded", extra={
                 "file_url": file_url,
                 "j_id": result.get("id"),
-                "title": result.get("title")
+                "title": result.get("title"),
+                "has_metadata": bool(result.get("id") or result.get("title"))
             })
             
             return result

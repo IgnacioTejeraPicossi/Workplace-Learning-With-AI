@@ -17,11 +17,24 @@ try:
 except ImportError:
     openrouter = None
 
-load_dotenv()  # Loads .env file if present
+# Load .env from project root (where backend/ folder is)
+# load_dotenv() searches from current working directory, but we need it from project root
+import pathlib
+project_root = pathlib.Path(__file__).parent.parent.parent  # Go up from backend/llm.py to project root
+env_path = project_root / ".env"
+load_dotenv(dotenv_path=env_path)  # Loads .env file from project root
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+
+# Debug: Log if API key was loaded
+if OPENAI_API_KEY:
+    print(f"[llm.py] ✅ OPENAI_API_KEY loaded from .env (length: {len(OPENAI_API_KEY)}, starts with 'sk-': {OPENAI_API_KEY.startswith('sk-')})")
+else:
+    print(f"[llm.py] ⚠️ OPENAI_API_KEY not found in .env file at: {env_path}")
+    print(f"[llm.py]    Current working directory: {os.getcwd()}")
+    print(f"[llm.py]    Project root: {project_root}")
 
 # API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
@@ -30,13 +43,29 @@ def get_api_config_from_headers(request_headers=None):
     """
     Get API configuration from request headers or use defaults
     This allows the frontend to pass API configuration via headers
+    Validates API keys to avoid using placeholders like "tu-api-key-aqui"
     """
     if request_headers:
         # Try to get configuration from headers
         api_provider = request_headers.get('x-api-provider', API_PROVIDER)
         itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
-        openai_key = request_headers.get('x-openai-key', OPENAI_API_KEY)
-        openrouter_key = request_headers.get('x-openrouter-key', OPENROUTER_API_KEY)
+        
+        # Validate OpenAI key: must start with "sk-" and be reasonably long
+        # If invalid or placeholder, use .env fallback
+        openai_key_header = request_headers.get('x-openai-key', '')
+        if openai_key_header and openai_key_header.startswith('sk-') and len(openai_key_header) > 20:
+            openai_key = openai_key_header
+        else:
+            # Use .env fallback if header key is invalid or placeholder
+            openai_key = OPENAI_API_KEY
+        
+        # Validate OpenRouter key: must be reasonably long
+        openrouter_key_header = request_headers.get('x-openrouter-key', '')
+        if openrouter_key_header and len(openrouter_key_header) > 10:
+            openrouter_key = openrouter_key_header
+        else:
+            # Use .env fallback if header key is invalid or placeholder
+            openrouter_key = OPENROUTER_API_KEY
         
         return {
             'provider': api_provider,
@@ -64,13 +93,19 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     if config['provider'] == 'openai':
         # Direct OpenAI first
         try:
-            print("🔄 Trying OpenAI (selected provider)...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+            openai_key_to_use = config.get('openai_key')
+            print(f"🔄 Trying OpenAI (selected provider)...")
+            print(f"   Using key from: {'header' if request_headers and request_headers.get('x-openai-key') else '.env'}")
+            print(f"   Key length: {len(openai_key_to_use) if openai_key_to_use else 0}")
+            print(f"   Key starts with 'sk-': {openai_key_to_use.startswith('sk-') if openai_key_to_use else False}")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=openai_key_to_use)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenAI successful")
                 return result
         except Exception as e:
             print(f"❌ OpenAI failed: {e}")
+            import traceback
+            traceback.print_exc()
         # Optional fallback to OpenRouter if key exists
         if config.get('openrouter_key'):
             try:
@@ -154,13 +189,19 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     # Respect explicit provider selection
     if config['provider'] == 'openai':
         try:
-            print("🔄 Trying OpenAI (selected provider)...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+            openai_key_to_use = config.get('openai_key')
+            print(f"🔄 Trying OpenAI (selected provider)...")
+            print(f"   Using key from: {'header' if request_headers and request_headers.get('x-openai-key') else '.env'}")
+            print(f"   Key length: {len(openai_key_to_use) if openai_key_to_use else 0}")
+            print(f"   Key starts with 'sk-': {openai_key_to_use.startswith('sk-') if openai_key_to_use else False}")
+            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=openai_key_to_use)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenAI successful")
                 return result
         except Exception as e:
             print(f"❌ OpenAI failed: {e}")
+            import traceback
+            traceback.print_exc()
         if config.get('openrouter_key'):
             try:
                 print("🔄 Falling back to OpenRouter...")
@@ -264,8 +305,13 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
     
     # Fallback to OpenAI
     effective_openai_key = override_api_key or OPENAI_API_KEY
+    print(f"[ask_openai] override_api_key: {override_api_key[:10] + '...' if override_api_key and len(override_api_key) > 10 else override_api_key}")
+    print(f"[ask_openai] OPENAI_API_KEY from .env: {OPENAI_API_KEY[:10] + '...' if OPENAI_API_KEY and len(OPENAI_API_KEY) > 10 else OPENAI_API_KEY}")
+    print(f"[ask_openai] effective_openai_key: {effective_openai_key[:10] + '...' if effective_openai_key and len(effective_openai_key) > 10 else effective_openai_key}")
+    
     if not effective_openai_key or str(effective_openai_key).strip() == "":
         # No key found, return mock response
+        print("[ask_openai] ❌ No valid OpenAI API key found! Check .env file.")
         if prompt:
             return f"[MOCKED RESPONSE] This would be the AI's answer to: {prompt[:60]}..."
         elif messages:
