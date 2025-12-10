@@ -5995,8 +5995,9 @@ curl http://localhost:8000/api/mcp/manifest
 # 2. Analyze a J-melding from URL
 curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
   -H "Content-Type: application/json" \
+  -H "x-api-provider: openai" \
   -d '{
-    "file_url": "https://example.com/j-melding-195-2025.docx",
+    "file_url": "http://localhost:8888/docs/j-melding-test.docx",
     "summary_length": "medium"
   }'
 
@@ -6004,7 +6005,36 @@ curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
 curl "http://localhost:8000/api/j-messages/list?status=Gjeldende&category=Pelagisk%20fisk"
 ```
 
-Note: agents still operate via REST today; MCP adds forward‑compatible interoperability without breaking current flows. The MCP server is integrated within WLWAI (Option 1 from the implementation plan), making it accessible to external systems like Enonic CMS.
+**Note on API Keys:**
+- The MCP endpoint validates API keys from headers. If invalid or missing, it automatically uses `OPENAI_API_KEY` from the `.env` file in the project root.
+- You can omit the `x-openai-key` header if your `.env` is properly configured.
+- Placeholder keys like "tu-api-key-aqui" are automatically rejected and the system falls back to `.env`.
+
+**Testing Setup:**
+For local testing, you can use the included test file server:
+```bash
+# Terminal 1: Start test file server (serves files from project root)
+python backend/test_mcp_server.py
+# Server runs on http://localhost:8888
+
+# Terminal 2: Test MCP endpoint
+curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"file_url": "http://localhost:8888/docs/j-melding-test.docx"}'
+```
+
+**Integration Status:**
+- ✅ MCP Server integrated within WLWAI (Option 1 from implementation plan)
+- ✅ API key validation and `.env` fallback working
+- ✅ Metadata extraction (id, title, status, dates, categories) functional
+- ✅ Ready for integration with external systems like Enonic CMS
+- ✅ All changes are backward compatible (see `docs/MCP_COMPATIBILITY.md`)
+- 📝 See `docs/MCP_TESTING_GUIDE.md` for detailed testing instructions
+
+**Compatibility:**
+All MCP-related changes are backward compatible and do not affect existing modules (Document Analyzer, Hologram Agent, Productivity Agent, etc.). The API key validation improvements actually make the system more robust by automatically falling back to `.env` when invalid keys are provided.
+
+Note: agents still operate via REST today; MCP adds forward‑compatible interoperability without breaking current flows.
 
 ### Overview
 The Cybersecurity Module provides comprehensive security management and threat intelligence capabilities, integrating seamlessly with the existing AI-powered learning platform. It offers real-time vulnerability scanning, threat assessment, compliance tracking, and secure coding guidance.

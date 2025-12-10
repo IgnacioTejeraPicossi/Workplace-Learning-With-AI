@@ -16,6 +16,8 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [EA Second Brain Agent](./EA_SECOND_BRAIN_AGENT.md)
 - Modules
   - [J-messages Analyzer (Fiskeridirektoratet)](./J-messages_Analyzer.md)
+  - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
+  - [MCP Compatibility](./MCP_COMPATIBILITY.md) - Compatibility analysis of MCP changes
 - Admin & Dev
   - [API Config](./admin-dev.md#api-config)
   - [Run Test](./admin-dev.md#run-test)

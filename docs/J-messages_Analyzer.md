@@ -503,6 +503,15 @@ Text:
 
 > **Note**: Track all changes, improvements, and iterations made during development.
 
+### 2025-12-10 - MCP Integration
+- ✅ MCP Server integrated within WLWAI (Option 1)
+- ✅ Endpoint `POST /api/mcp/j-messages/analyze` accepts `file_url` and downloads files automatically
+- ✅ API key validation: rejects placeholders, falls back to `.env` automatically
+- ✅ Tool `list_j_meldinger` added to MCP manifest with filtering support
+- ✅ Enhanced JSON parsing to handle markdown-wrapped responses
+- ✅ Comprehensive logging for debugging API key usage and metadata extraction
+- 📝 See `docs/MCP_TESTING_GUIDE.md` for testing instructions
+
 ### 2025-01-XX - Initial Release
 - ✅ Basic document analysis (DOCX/PDF)
 - ✅ Metadata extraction
