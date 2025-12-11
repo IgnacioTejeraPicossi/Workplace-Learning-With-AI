@@ -24,19 +24,44 @@ The MCP Server now supports using the same API configuration as the web app. Thi
 
 ### Testing with Saved Configuration
 
-If you've saved your API configuration in the "API Config" module, you can test the MCP endpoint without passing headers:
+If you've saved your API configuration in the "API Config" module, you can test the MCP endpoint **without passing headers**. The MCP Server will automatically use the saved configuration.
 
-```bash
-# Test without headers - will use saved server config
-curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "file_url": "http://localhost:8888/docs/j-melding-test.docx",
-    "summary_length": "medium"
-  }'
+**Important**: If you pass headers like `x-api-provider` or `x-openai-key` in your request, those headers will take priority over the saved configuration.
+
+#### PowerShell Example (without headers - uses saved config):
+
+```powershell
+$body = @{
+    file_url = "http://localhost:8888/docs/j-melding-test.docx"
+    summary_length = "medium"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8000/api/mcp/j-messages/analyze" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Body $body
 ```
 
-The MCP Server will automatically use the provider and keys you saved in the "API Config" module.
+#### PowerShell Example (with headers - overrides saved config):
+
+```powershell
+# This will use OpenAI even if you saved ItemAI in API Config
+$body = @{
+    file_url = "http://localhost:8888/docs/j-melding-test.docx"
+    summary_length = "medium"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8000/api/mcp/j-messages/analyze" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Headers @{
+        "x-api-provider" = "openai"
+        "x-openai-key" = "tu-api-key-aqui"
+    } `
+    -Body $body
+```
+
+**To use your saved ItemAI configuration**, simply remove the `-Headers` parameter from your PowerShell command.
 
 ---
 

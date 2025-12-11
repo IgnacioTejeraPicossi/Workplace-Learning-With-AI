@@ -188,6 +188,7 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
             # Forward request headers (for API config, auth, etc.)
             # Priority: 1) Request headers, 2) Saved API config file, 3) .env fallback
             headers = {}
+            config_source = "unknown"
             
             # Try to get config from request headers first
             has_headers = any(
@@ -196,42 +197,65 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
             )
             
             if has_headers:
+                config_source = "request_headers"
+                logger.info("🔵 [MCP] Using API configuration from REQUEST HEADERS (overrides saved config)")
+                
                 # Forward API provider if present
                 if "x-api-provider" in request.headers:
                     headers["x-api-provider"] = request.headers["x-api-provider"]
+                    logger.info(f"   → Provider: {request.headers['x-api-provider']}")
                 
                 # Only forward OpenAI key if it's valid (not a placeholder)
                 openai_key = request.headers.get("x-openai-key", "")
                 if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
                     headers["x-openai-key"] = openai_key
+                    logger.info(f"   → OpenAI key: {openai_key[:10]}... (valid)")
+                elif openai_key:
+                    logger.info(f"   → OpenAI key: invalid/placeholder, will use .env fallback")
                 
                 # Only forward OpenRouter key if it's valid
                 openrouter_key = request.headers.get("x-openrouter-key", "")
                 if openrouter_key and len(openrouter_key) > 10:
                     headers["x-openrouter-key"] = openrouter_key
+                    logger.info(f"   → OpenRouter key: {openrouter_key[:10]}... (valid)")
                 
                 # Forward ItemAI URL if present
                 if "x-itemai-url" in request.headers:
                     headers["x-itemai-url"] = request.headers["x-itemai-url"]
+                    logger.info(f"   → ItemAI URL: {request.headers['x-itemai-url']}")
             else:
                 # No headers provided - try to load from saved API config file
                 try:
-                    from backend.api_config_storage import get_api_config_for_headers
+                    from backend.api_config_storage import get_api_config_for_headers, get_api_config
+                    saved_config = get_api_config()
                     saved_headers = get_api_config_for_headers()
                     headers.update(saved_headers)
-                    logger.debug("MCP using saved API config from file", extra={
-                        "headers_present": list(headers.keys())
-                    })
+                    config_source = "saved_config_file"
+                    
+                    provider = saved_config.get("provider", "unknown")
+                    logger.info(f"🟢 [MCP] Using API configuration from SAVED CONFIG FILE (api_config.json)")
+                    logger.info(f"   → Provider: {provider}")
+                    if provider == "itemai":
+                        logger.info(f"   → ItemAI URL: {saved_config.get('itemai_url', 'N/A')}")
+                    elif provider == "openai":
+                        has_key = bool(saved_config.get("openai_key"))
+                        logger.info(f"   → OpenAI key: {'present' if has_key else 'not set (will use .env)'}")
+                    elif provider == "openrouter":
+                        has_key = bool(saved_config.get("openrouter_key"))
+                        logger.info(f"   → OpenRouter key: {'present' if has_key else 'not set (will use .env)'}")
                 except Exception as e:
-                    logger.warning(f"Could not load saved API config: {e}")
+                    config_source = "env_fallback"
+                    logger.warning(f"🟡 [MCP] Could not load saved API config: {e}")
+                    logger.info(f"   → Falling back to .env file")
                     # Will fall back to .env in get_api_config_from_headers()
             
             # Log headers being sent for debugging
+            logger.info(f"📤 [MCP] Calling internal analyzer with config from: {config_source}")
             logger.debug("MCP calling internal analyzer", extra={
                 "url": analyzer_url,
                 "headers_present": list(headers.keys()),
                 "has_openai_key": "x-openai-key" in headers,
-                "config_source": "request_headers" if has_headers else "saved_config_file"
+                "config_source": config_source
             })
             
             analyze_resp = await client.post(

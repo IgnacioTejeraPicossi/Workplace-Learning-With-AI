@@ -17,6 +17,7 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
 - Modules
   - [J-messages Analyzer (Fiskeridirektoratet)](./J-messages_Analyzer.md)
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
+  - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing
   - [MCP Compatibility](./MCP_COMPATIBILITY.md) - Compatibility analysis of MCP changes
 - Admin & Dev
   - [API Config](./admin-dev.md#api-config)
