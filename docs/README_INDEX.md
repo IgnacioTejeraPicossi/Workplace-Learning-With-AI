@@ -18,6 +18,7 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [J-messages Analyzer (Fiskeridirektoratet)](./J-messages_Analyzer.md)
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
   - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing
+  - [Postman MCP Testing](./POSTMAN_MCP_TESTING.md) - Test WLWAI MCP Server using Postman
   - [Claude Desktop Setup](./CLAUDE_DESKTOP_SETUP.md) - Connect WLWAI MCP Server to Claude Desktop
   - [MCP Compatibility](./MCP_COMPATIBILITY.md) - Compatibility analysis of MCP changes
 - Admin & Dev
