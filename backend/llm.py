@@ -143,38 +143,51 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     
     # Default/Provider: itemai → try ItemAI, then OpenRouter, then OpenAI
     if config['provider'] == 'itemai':
+        itemai_failed = False
         try:
-            print("🔄 Trying ItemAI (LM Studio)...")
+            print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
             else:
+                itemai_failed = True
                 print("❌ ItemAI returned empty or mocked response")
         except Exception as e:
-            print(f"❌ ItemAI failed: {e}")
-    
-    # Fallback to OpenRouter if configured
-    if config['openrouter_key']:
-        try:
-            print("🔄 Trying OpenRouter...")
-            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
-            if result and not result.startswith("[MOCKED RESPONSE"):
-                print("✅ OpenRouter successful")
-                return result
-        except Exception as e:
-            print(f"❌ OpenRouter failed: {e}")
-    
-    # Fallback to OpenAI if configured
-    if config['openai_key']:
-        try:
-            print("🔄 Trying OpenAI...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
-            if result and not result.startswith("[MOCKED RESPONSE"):
-                print("✅ OpenAI successful")
-                return result
-        except Exception as e:
-            print(f"❌ OpenAI failed: {e}")
+            itemai_failed = True
+            error_str = str(e)
+            if "context length" in error_str.lower():
+                print(f"⚠️ ItemAI failed due to context length limitation")
+            elif "connection" in error_str.lower() or "refused" in error_str.lower():
+                print(f"⚠️ ItemAI failed: LM Studio may not be running")
+            else:
+                print(f"❌ ItemAI failed: {e}")
+        
+        # Fallback chain: OpenRouter → OpenAI
+        if itemai_failed:
+            print(f"🔄 Automatic fallback chain activated (ItemAI → OpenRouter → OpenAI)")
+            
+            # Fallback to OpenRouter if configured
+            if config.get('openrouter_key'):
+                try:
+                    print("   → Trying OpenRouter [Fallback 1]...")
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenRouter successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenRouter failed: {e}")
+            
+            # Fallback to OpenAI if configured
+            if config.get('openai_key'):
+                try:
+                    print("   → Trying OpenAI [Fallback 2]...")
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenAI successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenAI failed: {e}")
     
     print("❌ All AI providers failed")
     return "[MOCKED RESPONSE] All AI providers unavailable"
@@ -237,38 +250,51 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     
     # Default/Provider: itemai
     if config['provider'] == 'itemai':
+        itemai_failed = False
         try:
-            print("🔄 Trying ItemAI (LM Studio)...")
+            print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
             result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
             else:
+                itemai_failed = True
                 print("❌ ItemAI returned empty or mocked response")
         except Exception as e:
-            print(f"❌ ItemAI failed: {e}")
-    
-    # Fallback to OpenRouter if configured
-    if config['openrouter_key']:
-        try:
-            print("🔄 Trying OpenRouter...")
-            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
-            if result and not result.startswith("[MOCKED RESPONSE"):
-                print("✅ OpenRouter successful")
-                return result
-        except Exception as e:
-            print(f"❌ OpenRouter failed: {e}")
-    
-    # Fallback to OpenAI if configured
-    if config['openai_key']:
-        try:
-            print("🔄 Trying OpenAI...")
-            result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
-            if result and not result.startswith("[MOCKED RESPONSE"):
-                print("✅ OpenAI successful")
-                return result
-        except Exception as e:
-            print(f"❌ OpenAI failed: {e}")
+            itemai_failed = True
+            error_str = str(e)
+            if "context length" in error_str.lower():
+                print(f"⚠️ ItemAI failed due to context length limitation")
+            elif "connection" in error_str.lower() or "refused" in error_str.lower():
+                print(f"⚠️ ItemAI failed: LM Studio may not be running")
+            else:
+                print(f"❌ ItemAI failed: {e}")
+        
+        # Fallback chain: OpenRouter → OpenAI
+        if itemai_failed:
+            print(f"🔄 Automatic fallback chain activated (ItemAI → OpenRouter → OpenAI)")
+            
+            # Fallback to OpenRouter if configured
+            if config.get('openrouter_key'):
+                try:
+                    print("   → Trying OpenRouter [Fallback 1]...")
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenRouter successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenRouter failed: {e}")
+            
+            # Fallback to OpenAI if configured
+            if config.get('openai_key'):
+                try:
+                    print("   → Trying OpenAI [Fallback 2]...")
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenAI successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenAI failed: {e}")
     
     print("❌ All AI providers failed")
     return "[MOCKED RESPONSE] All AI providers unavailable"
@@ -943,11 +969,33 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
                 completion_text = response_data.get("choices", [{}])[0].get("message", {}).get("content", "")
                 return completion_text.strip()
             else:
-                raise Exception(f"ItemAI API returned status {response.status_code}: {response.text}")
+                error_text = response.text
+                # Check for context length errors
+                if "context length" in error_text.lower() or "context.*overflow" in error_text.lower():
+                    try:
+                        error_json = response.json()
+                        error_msg = error_json.get("error", error_text)
+                        raise Exception(f"ItemAI API context length error: {error_msg}")
+                    except:
+                        raise Exception(f"ItemAI API returned status {response.status_code}: {error_text}")
+                else:
+                    raise Exception(f"ItemAI API returned status {response.status_code}: {error_text}")
                 
+    except httpx.RequestError as e:
+        # Connection errors (LM Studio not running, network issues, etc.)
+        print(f"❌ ItemAI API connection error: {e}")
+        print(f"   → Check if LM Studio is running at {local_url}")
+        return None
     except Exception as e:
-        print(f"ItemAI API error: {e}")
-        # Don't raise, let the fallback system handle it
+        error_str = str(e)
+        # Detect context length errors
+        if "context length" in error_str.lower():
+            print(f"⚠️ ItemAI API context length error: {error_str}")
+            print(f"   → The prompt is too long for the model's context window")
+            print(f"   → Solution: Use a model with larger context (8K, 16K, or 32K tokens)")
+            print(f"   → Falling back to next provider...")
+        else:
+            print(f"❌ ItemAI API error: {e}")
         return None
 
 # --- Unified AI System for AgentOps Studio ---
