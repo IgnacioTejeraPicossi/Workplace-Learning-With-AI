@@ -29,12 +29,38 @@ const APIConfig = () => {
     setTimeout(() => setStatus(''), 3000);
   };
 
-  const handleSaveKeys = () => {
+  const handleSaveKeys = async () => {
+    // Save to localStorage (for frontend use)
     localStorage.setItem('openaiKey', openaiKey);
     localStorage.setItem('openrouterKey', openrouterKey);
     localStorage.setItem('itemaiUrl', itemaiUrl);
-    setStatus('API configuration saved successfully!');
-    setTimeout(() => setStatus(''), 3000);
+    
+    // Also save to server (for MCP Server use)
+    try {
+      const response = await fetch('/api/save-api-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider: apiProvider,
+          openaiKey: openaiKey,
+          openrouterKey: openrouterKey,
+          itemaiUrl: itemaiUrl
+        })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setStatus('✅ API configuration saved successfully! (Local + Server)');
+      } else {
+        setStatus('⚠️ Saved locally, but server save failed: ' + (result.message || 'Unknown error'));
+      }
+    } catch (error) {
+      setStatus('⚠️ Saved locally, but server save failed: ' + error.message);
+    }
+    
+    setTimeout(() => setStatus(''), 5000);
   };
 
   const handleTestAPI = async () => {

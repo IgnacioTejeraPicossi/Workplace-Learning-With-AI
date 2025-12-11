@@ -186,34 +186,52 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                 params["summary_length"] = summary_length
             
             # Forward request headers (for API config, auth, etc.)
-            # Only forward valid headers to allow .env fallback when headers are missing/invalid
+            # Priority: 1) Request headers, 2) Saved API config file, 3) .env fallback
             headers = {}
             
-            # Forward API provider if present
-            if "x-api-provider" in request.headers:
-                headers["x-api-provider"] = request.headers["x-api-provider"]
+            # Try to get config from request headers first
+            has_headers = any(
+                k in request.headers 
+                for k in ["x-api-provider", "x-openai-key", "x-openrouter-key", "x-itemai-url"]
+            )
             
-            # Only forward OpenAI key if it's valid (not a placeholder)
-            openai_key = request.headers.get("x-openai-key", "")
-            if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
-                headers["x-openai-key"] = openai_key
-            # If invalid or missing, don't pass header - let endpoint use .env
-            
-            # Only forward OpenRouter key if it's valid
-            openrouter_key = request.headers.get("x-openrouter-key", "")
-            if openrouter_key and len(openrouter_key) > 10:
-                headers["x-openrouter-key"] = openrouter_key
-            
-            # Only forward ItemAI key if it's valid
-            itemai_key = request.headers.get("x-itemai-key", "")
-            if itemai_key and len(itemai_key) > 5:
-                headers["x-itemai-key"] = itemai_key
+            if has_headers:
+                # Forward API provider if present
+                if "x-api-provider" in request.headers:
+                    headers["x-api-provider"] = request.headers["x-api-provider"]
+                
+                # Only forward OpenAI key if it's valid (not a placeholder)
+                openai_key = request.headers.get("x-openai-key", "")
+                if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
+                    headers["x-openai-key"] = openai_key
+                
+                # Only forward OpenRouter key if it's valid
+                openrouter_key = request.headers.get("x-openrouter-key", "")
+                if openrouter_key and len(openrouter_key) > 10:
+                    headers["x-openrouter-key"] = openrouter_key
+                
+                # Forward ItemAI URL if present
+                if "x-itemai-url" in request.headers:
+                    headers["x-itemai-url"] = request.headers["x-itemai-url"]
+            else:
+                # No headers provided - try to load from saved API config file
+                try:
+                    from backend.api_config_storage import get_api_config_for_headers
+                    saved_headers = get_api_config_for_headers()
+                    headers.update(saved_headers)
+                    logger.debug("MCP using saved API config from file", extra={
+                        "headers_present": list(headers.keys())
+                    })
+                except Exception as e:
+                    logger.warning(f"Could not load saved API config: {e}")
+                    # Will fall back to .env in get_api_config_from_headers()
             
             # Log headers being sent for debugging
             logger.debug("MCP calling internal analyzer", extra={
                 "url": analyzer_url,
                 "headers_present": list(headers.keys()),
-                "has_openai_key": "x-openai-key" in headers
+                "has_openai_key": "x-openai-key" in headers,
+                "config_source": "request_headers" if has_headers else "saved_config_file"
             })
             
             analyze_resp = await client.post(

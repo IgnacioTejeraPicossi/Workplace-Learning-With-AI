@@ -2,6 +2,44 @@
 
 This guide explains how to test the MCP endpoint `analyze_j_melding` with a real J-melding from an accessible URL.
 
+## API Configuration Integration
+
+The MCP Server now supports using the same API configuration as the web app. This means you can configure ItemAI, OpenRouter, or OpenAI in the "API Config" module, and the MCP Server will automatically use that configuration.
+
+### How It Works
+
+1. **Save Configuration**: When you save API configuration in the "API Config" module, it's stored:
+   - In your browser's localStorage (for web app use)
+   - On the server in `api_config.json` (for MCP Server use)
+
+2. **MCP Server Priority**: When the MCP Server receives a request, it uses configuration in this order:
+   - **First**: Request headers (if provided by the client)
+   - **Second**: Saved server config (`api_config.json`)
+   - **Third**: Environment variables (`.env` file)
+
+3. **Benefits**:
+   - No need to pass API keys in every MCP request
+   - Consistent configuration across web app and MCP Server
+   - Easy to switch between providers (ItemAI, OpenRouter, OpenAI)
+
+### Testing with Saved Configuration
+
+If you've saved your API configuration in the "API Config" module, you can test the MCP endpoint without passing headers:
+
+```bash
+# Test without headers - will use saved server config
+curl -X POST http://localhost:8000/api/mcp/j-messages/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_url": "http://localhost:8888/docs/j-melding-test.docx",
+    "summary_length": "medium"
+  }'
+```
+
+The MCP Server will automatically use the provider and keys you saved in the "API Config" module.
+
+---
+
 ## Option 1: Local HTTP Server (Recommended for Development)
 
 ### Step 1: Place your J-melding file

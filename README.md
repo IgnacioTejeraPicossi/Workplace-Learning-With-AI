@@ -6010,6 +6010,12 @@ curl "http://localhost:8000/api/j-messages/list?status=Gjeldende&category=Pelagi
 - You can omit the `x-openai-key` header if your `.env` is properly configured.
 - Placeholder keys like "tu-api-key-aqui" are automatically rejected and the system falls back to `.env`.
 
+**API Configuration Integration:**
+- The MCP Server can now use the same API configuration as the web app (ItemAI, OpenRouter, or OpenAI).
+- When you save API configuration in the "API Config" module, it's stored both in your browser (localStorage) and on the server (`api_config.json`).
+- The MCP Server automatically uses the saved server configuration when no headers are provided in the request.
+- Priority order: 1) Request headers, 2) Saved server config (`api_config.json`), 3) Environment variables (`.env`).
+
 **Testing Setup:**
 For local testing, you can use the included test file server:
 ```bash
