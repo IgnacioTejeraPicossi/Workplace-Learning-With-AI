@@ -151,7 +151,122 @@ Once connected, Postman should display:
    - Input schema (parameters)
    - Example usage
 
-### Test 2: Call `list_j_meldinger`
+### Test 2: Call `analyze_j_melding` (Step-by-Step)
+
+**Prerequisites**: Before testing, ensure:
+1. **Backend is running** on `http://localhost:8000`
+2. **Test file server is running** (serves files for testing)
+
+**Step 1: Start Test File Server** (if not already running)
+
+Open a new terminal/PowerShell window and run:
+```bash
+python backend/test_mcp_server.py
+```
+
+You should see:
+```
+✅ Test file server running on http://localhost:8888
+📁 Serving files from: C:/Test/AI/AI Learning with AI
+```
+
+**Keep this terminal open** - the server needs to keep running.
+
+**Step 2: Prepare a Test File**
+
+You need a J-melding file (.docx or .pdf) to test. Options:
+
+- **Option A**: Use an existing file in your `docs/` folder
+- **Option B**: Place a test file in your project root or `docs/` folder
+- **Option C**: Use a publicly accessible URL (if you have one)
+
+**Step 3: Fill in the Tool Parameters in Postman**
+
+1. **In Postman**, you should see the `analyze_j_melding` tool selected (with blue dot)
+
+2. **Fill `file_url` field**:
+   - Click in the "Enter string" field (highlighted with blue border)
+   - Enter one of these URLs:
+   
+   **If you have a file in `docs/` folder:**
+   ```
+   http://localhost:8888/docs/j-melding-test.docx
+   ```
+   
+   **Or if you have a file in project root:**
+   ```
+   http://localhost:8888/j-melding-test.docx
+   ```
+   
+   **Or use any file path relative to project root:**
+   ```
+   http://localhost:8888/path/to/your/file.docx
+   ```
+
+3. **Select `summary_length` (optional)**:
+   - Click the dropdown next to "summary_length"
+   - Choose one: `none`, `short`, `medium`, or `long`
+   - **Recommendation**: Start with `medium` for a good test
+
+4. **Verify the JSON** (right side):
+   - You should see the JSON update automatically:
+   ```json
+   {
+     "method": "tools/call",
+     "params": {
+       "name": "analyze_j_melding",
+       "arguments": {
+         "file_url": "http://localhost:8888/docs/j-melding-test.docx",
+         "summary_length": "medium"
+       }
+     }
+   }
+   ```
+
+**Step 4: Execute the Tool Call**
+
+1. **Click the "Run" button** (top right, next to "Share")
+   - Or look for a "Send" or "Execute" button
+   - The button might be near the tool configuration
+
+2. **Wait for response**:
+   - Postman will send the MCP request
+   - The bridge server will download the file
+   - The backend will analyze it
+   - Response will appear in the "Response" tab (bottom)
+
+**Step 5: View the Response**
+
+1. **Check the "Response" tab** (bottom panel)
+2. **You should see**:
+   - A JSON-RPC response structure
+   - The actual analysis result inside `result.content[0].text`
+   - Parsed JSON with: `id`, `title`, `status`, `valid_from`, `valid_to`, `categories`, `toc`, `body_html`, `summary`
+
+**Example Response Structure:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"id\": \"J-195-2025\", \"title\": \"...\", \"status\": \"Gjeldende\", ...}"
+      }
+    ]
+  }
+}
+```
+
+**Troubleshooting:**
+
+- **"Connection failed"**: Check that backend is running (`curl http://localhost:8000/api/mcp/manifest`)
+- **"Failed to download file"**: Check that test file server is running on port 8888
+- **"File not found"**: Verify the file path in the URL matches where the file actually is
+- **Empty response**: Check backend logs for errors
+
+### Test 3: Call `list_j_meldinger`
 
 1. Select the **`list_j_meldinger`** tool
 2. Configure parameters (all optional):
