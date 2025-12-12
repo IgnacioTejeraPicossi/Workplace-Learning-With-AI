@@ -11,6 +11,101 @@ Postman has built-in support for Model Context Protocol (MCP) servers, allowing 
 - ✅ Create test collections for automated testing
 - ✅ Debug MCP protocol messages
 
+## Architecture: Document Analysis Flow
+
+The following diagram shows the complete flow of a J-melding document analysis from Postman MCP to the final result:
+
+```mermaid
+sequenceDiagram
+    participant User as 👤 User<br/>(Postman)
+    participant Postman as 🔷 Postman MCP<br/>Client
+    participant Bridge as 🌉 Bridge Server<br/>(mcp_bridge_server.py)
+    participant Backend as ⚙️ Backend API<br/>(FastAPI)
+    participant FileServer as 📁 Test File Server<br/>(port 8888)
+    participant LLM as 🤖 LLM API<br/>(OpenAI/ItemAI)
+    
+    Note over User,LLM: 1. Iniciar Conexión MCP
+    User->>Postman: Configura STDIO con<br/>path al bridge server
+    Postman->>Bridge: Inicia proceso Python<br/>(via STDIO)
+    Bridge->>Backend: GET /api/mcp/manifest
+    Backend-->>Bridge: Lista de tools disponibles
+    Bridge-->>Postman: MCP tools/list response
+    Postman-->>User: Muestra herramientas:<br/>analyze_j_melding,<br/>list_j_meldinger
+    
+    Note over User,LLM: 2. Ejecutar analyze_j_melding
+    User->>Postman: Selecciona tool<br/>analyze_j_melding<br/>+ file_url
+    Postman->>Bridge: MCP tools/call request<br/>{file_url, summary_length}
+    
+    Note over Bridge,Backend: 3. Bridge procesa MCP request
+    Bridge->>FileServer: HTTP GET file_url<br/>(descarga documento)
+    FileServer-->>Bridge: Archivo .docx bytes
+    
+    Note over Bridge,Backend: 4. Backend analiza documento
+    Bridge->>Backend: POST /api/mcp/j-messages/analyze<br/>(multipart/form-data)
+    
+    rect rgb(240, 248, 255)
+        Note over Backend,LLM: Procesamiento Interno
+        Backend->>Backend: 1. Parse DOCX<br/>(python-docx)
+        Backend->>Backend: 2. Split header/body<br/>(texto antes/después<br/>del marcador)
+        Backend->>LLM: 3. Extract metadata<br/>(id, title, status,<br/>dates, categories)
+        LLM-->>Backend: Metadata JSON
+        Backend->>Backend: 4. Build TOC<br/>(H1/H2/H3 headings)
+        Backend->>Backend: 5. Generate HTML<br/>(body_html)
+        Backend->>LLM: 6. Generate summary<br/>(si se solicitó)
+        LLM-->>Backend: Summary text
+    end
+    
+    Backend-->>Bridge: JSON response:<br/>{id, title, status,<br/>toc, body_html,<br/>summary}
+    
+    Note over Bridge,Postman: 5. Bridge formatea respuesta
+    Bridge->>Bridge: Wrap en MCP<br/>result format
+    Bridge-->>Postman: MCP JSON-RPC response<br/>{jsonrpc, id, result}
+    
+    Note over User,Postman: 6. Mostrar resultado
+    Postman->>Postman: Parse JSON response
+    Postman-->>User: Muestra resultado:<br/>- ID: J-195-2025<br/>- Title: Forskrift...<br/>- Status: Gjeldende<br/>- TOC, HTML, Summary
+    
+    User->>User: ✅ Análisis completo
+```
+
+### Flow Explanation
+
+1. **Connection Setup** (Lines 1-10):
+   - Postman starts the bridge server via STDIO
+   - Bridge fetches available tools from backend
+   - Tools are displayed in Postman UI
+
+2. **Tool Invocation** (Lines 12-15):
+   - User selects `analyze_j_melding` and provides `file_url`
+   - Postman sends MCP `tools/call` request to bridge
+
+3. **File Download** (Lines 17-19):
+   - Bridge downloads the document from the provided URL
+   - Test file server (port 8888) serves local files
+
+4. **Document Analysis** (Lines 21-35):
+   - Backend parses DOCX with python-docx
+   - Splits header (metadata) from body (regulation text)
+   - LLM extracts structured metadata (id, title, dates, etc.)
+   - Backend builds Table of Contents from headings
+   - Generates HTML body with anchors
+   - LLM generates summary (if requested)
+
+5. **Response Formatting** (Lines 37-40):
+   - Bridge wraps result in MCP JSON-RPC format
+   - Returns to Postman via STDIO
+
+6. **Result Display** (Lines 42-48):
+   - Postman parses and displays the result
+   - User sees complete analysis with all fields
+
+### Key Components
+
+- **Bridge Server**: Translates MCP protocol (STDIO) to HTTP REST
+- **Backend API**: Performs document analysis and LLM orchestration
+- **Test File Server**: Serves local files for testing
+- **LLM API**: Extracts metadata and generates summaries
+
 ## Prerequisites
 
 1. **Postman Desktop** (latest version with MCP support)
