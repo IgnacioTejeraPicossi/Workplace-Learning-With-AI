@@ -24,48 +24,48 @@ sequenceDiagram
     participant FileServer as 📁 Test File Server<br/>(port 8888)
     participant LLM as 🤖 LLM API<br/>(OpenAI/ItemAI)
     
-    Note over User,LLM: 1. Iniciar Conexión MCP
-    User->>Postman: Configura STDIO con<br/>path al bridge server
-    Postman->>Bridge: Inicia proceso Python<br/>(via STDIO)
+    Note over User,LLM: 1. Establish MCP Connection
+    User->>Postman: Configure STDIO with<br/>path to bridge server
+    Postman->>Bridge: Start Python process<br/>(via STDIO)
     Bridge->>Backend: GET /api/mcp/manifest
-    Backend-->>Bridge: Lista de tools disponibles
+    Backend-->>Bridge: Available tools list
     Bridge-->>Postman: MCP tools/list response
-    Postman-->>User: Muestra herramientas:<br/>analyze_j_melding,<br/>list_j_meldinger
+    Postman-->>User: Display tools:<br/>analyze_j_melding,<br/>list_j_meldinger
     
-    Note over User,LLM: 2. Ejecutar analyze_j_melding
-    User->>Postman: Selecciona tool<br/>analyze_j_melding<br/>+ file_url
+    Note over User,LLM: 2. Execute analyze_j_melding
+    User->>Postman: Select tool<br/>analyze_j_melding<br/>+ file_url
     Postman->>Bridge: MCP tools/call request<br/>{file_url, summary_length}
     
-    Note over Bridge,Backend: 3. Bridge procesa MCP request
-    Bridge->>FileServer: HTTP GET file_url<br/>(descarga documento)
-    FileServer-->>Bridge: Archivo .docx bytes
+    Note over Bridge,Backend: 3. Bridge processes MCP request
+    Bridge->>FileServer: HTTP GET file_url<br/>(download document)
+    FileServer-->>Bridge: .docx file bytes
     
-    Note over Bridge,Backend: 4. Backend analiza documento
+    Note over Bridge,Backend: 4. Backend analyzes document
     Bridge->>Backend: POST /api/mcp/j-messages/analyze<br/>(multipart/form-data)
     
     rect rgb(240, 248, 255)
-        Note over Backend,LLM: Procesamiento Interno
+        Note over Backend,LLM: Internal Processing
         Backend->>Backend: 1. Parse DOCX<br/>(python-docx)
-        Backend->>Backend: 2. Split header/body<br/>(texto antes/después<br/>del marcador)
+        Backend->>Backend: 2. Split header/body<br/>(text before/after<br/>marker)
         Backend->>LLM: 3. Extract metadata<br/>(id, title, status,<br/>dates, categories)
         LLM-->>Backend: Metadata JSON
         Backend->>Backend: 4. Build TOC<br/>(H1/H2/H3 headings)
         Backend->>Backend: 5. Generate HTML<br/>(body_html)
-        Backend->>LLM: 6. Generate summary<br/>(si se solicitó)
+        Backend->>LLM: 6. Generate summary<br/>(if requested)
         LLM-->>Backend: Summary text
     end
     
     Backend-->>Bridge: JSON response:<br/>{id, title, status,<br/>toc, body_html,<br/>summary}
     
-    Note over Bridge,Postman: 5. Bridge formatea respuesta
-    Bridge->>Bridge: Wrap en MCP<br/>result format
+    Note over Bridge,Postman: 5. Bridge formats response
+    Bridge->>Bridge: Wrap in MCP<br/>result format
     Bridge-->>Postman: MCP JSON-RPC response<br/>{jsonrpc, id, result}
     
-    Note over User,Postman: 6. Mostrar resultado
+    Note over User,Postman: 6. Display result
     Postman->>Postman: Parse JSON response
-    Postman-->>User: Muestra resultado:<br/>- ID: J-195-2025<br/>- Title: Forskrift...<br/>- Status: Gjeldende<br/>- TOC, HTML, Summary
+    Postman-->>User: Show result:<br/>- ID: J-195-2025<br/>- Title: Forskrift...<br/>- Status: Gjeldende<br/>- TOC, HTML, Summary
     
-    User->>User: ✅ Análisis completo
+    User->>User: ✅ Analysis complete
 ```
 
 ### Flow Explanation
