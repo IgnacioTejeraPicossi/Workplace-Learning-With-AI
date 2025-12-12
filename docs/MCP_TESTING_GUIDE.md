@@ -8,59 +8,55 @@ The following diagram shows how the MCP Server connects and interacts with all t
 
 ```mermaid
 flowchart TB
-    subgraph External["🌐 External Clients"]
-        Claude["🤖 Claude Desktop<br/>(MCP Client)"]
-        Postman["🔷 Postman<br/>(MCP Testing)"]
-        Enonic["🏢 Enonic CMS<br/>(Future Integration)"]
+    subgraph External["External Clients"]
+        Claude["Claude Desktop (MCP Client)"]
+        Postman["Postman (MCP Testing)"]
+        Enonic["Enonic CMS (Future)"]
     end
     
-    subgraph MCP["🌉 MCP Server Layer"]
-        Bridge["Bridge Server<br/>(mcp_bridge_server.py)<br/>STDIO → HTTP"]
+    subgraph MCP["MCP Server Layer"]
+        Bridge["Bridge Server<br/>mcp_bridge_server.py<br/>STDIO to HTTP"]
         Manifest["/api/mcp/manifest<br/>Tool Discovery"]
         MCPAnalyze["/api/mcp/j-messages/analyze<br/>MCP Endpoint"]
     end
     
-    subgraph Backend["⚙️ J-messages Analyzer Backend"]
-        APIAnalyze["/api/j-messages/analyze<br/>Upload & Analyze"]
-        APIList["/api/j-messages/list<br/>List & Filter"]
+    subgraph Backend["J-messages Analyzer Backend"]
+        APIAnalyze["/api/j-messages/analyze<br/>Upload and Analyze"]
+        APIList["/api/j-messages/list<br/>List and Filter"]
         APIGet["/api/j-messages/:id<br/>Get Single Document"]
         APIUpdate["/api/j-messages/:id<br/>Update Document"]
         APIDelete["/api/j-messages/:id<br/>Delete Document"]
-        APIExport["/api/j-messages/export<br/>Export (DOCX/MD/PDF)"]
+        APIExport["/api/j-messages/export<br/>Export DOCX/MD/PDF"]
     end
     
-    subgraph Storage["💾 Data Storage"]
-        MongoDB[(MongoDB<br/>j_messages<br/>collection)]
+    subgraph Storage["Data Storage"]
+        MongoDB[("MongoDB<br/>j_messages collection")]
     end
     
-    subgraph Processing["📊 Analysis Pipeline"]
+    subgraph Processing["Analysis Pipeline"]
         Parse["DOCX/PDF Parser"]
         TOC["TOC Generator"]
-        LLM["LLM Metadata<br/>Extraction"]
+        LLM["LLM Metadata Extraction"]
         HTML["HTML Generator"]
     end
     
-    subgraph Frontend["🖥️ Web Application"]
-        Analyzer["J-messages Analyzer<br/>(Upload UI)"]
-        Library["J-messages Library<br/>(Browse/Manage)"]
-        PromptMgr["Prompt Manager<br/>(Customize AI)"]
+    subgraph Frontend["Web Application"]
+        Analyzer["J-messages Analyzer<br/>Upload UI"]
+        Library["J-messages Library<br/>Browse/Manage"]
+        PromptMgr["Prompt Manager<br/>Customize AI"]
     end
     
-    %% External to MCP connections
     Claude -->|STDIO| Bridge
     Postman -->|STDIO| Bridge
-    Enonic -.->|HTTP (future)| MCPAnalyze
+    Enonic -.->|HTTP future| MCPAnalyze
     
-    %% MCP internal flow
     Bridge --> Manifest
     Bridge --> MCPAnalyze
-    Manifest -->|Return tools list| Bridge
+    Manifest -->|Return tools| Bridge
     
-    %% MCP to Backend
-    MCPAnalyze -->|1. Download file<br/>2. Forward to analyze| APIAnalyze
-    Bridge -.->|Future: list| APIList
+    MCPAnalyze -->|Download and forward| APIAnalyze
+    Bridge -.->|Future list| APIList
     
-    %% Backend operations
     APIAnalyze --> Parse
     Parse --> TOC
     Parse --> LLM
@@ -74,7 +70,6 @@ flowchart TB
     APIDelete --> MongoDB
     APIExport --> MongoDB
     
-    %% Frontend connections
     Analyzer --> APIAnalyze
     Library --> APIList
     Library --> APIGet
@@ -84,7 +79,6 @@ flowchart TB
     Analyzer --> PromptMgr
     PromptMgr -.->|Configure| LLM
     
-    %% Styling
     style External fill:#e3f2fd
     style MCP fill:#fff3e0
     style Backend fill:#f3e5f5
