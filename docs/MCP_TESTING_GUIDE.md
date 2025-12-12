@@ -2,6 +2,198 @@
 
 This guide explains how to test the MCP endpoint `analyze_j_melding` with a real J-melding from an accessible URL.
 
+## Architecture: MCP Server Integration with J-messages Analyzer
+
+The following diagram shows how the MCP Server connects and interacts with all the operations available in the J-messages Analyzer module:
+
+```mermaid
+flowchart TB
+    subgraph External["🌐 External Clients"]
+        Claude["🤖 Claude Desktop<br/>(MCP Client)"]
+        Postman["🔷 Postman<br/>(MCP Testing)"]
+        Enonic["🏢 Enonic CMS<br/>(Future Integration)"]
+    end
+    
+    subgraph MCP["🌉 MCP Server Layer"]
+        Bridge["Bridge Server<br/>(mcp_bridge_server.py)<br/>STDIO → HTTP"]
+        Manifest["/api/mcp/manifest<br/>Tool Discovery"]
+        MCPAnalyze["/api/mcp/j-messages/analyze<br/>MCP Endpoint"]
+    end
+    
+    subgraph Backend["⚙️ J-messages Analyzer Backend"]
+        APIAnalyze["/api/j-messages/analyze<br/>Upload & Analyze"]
+        APIList["/api/j-messages/list<br/>List & Filter"]
+        APIGet["/api/j-messages/:id<br/>Get Single Document"]
+        APIUpdate["/api/j-messages/:id<br/>Update Document"]
+        APIDelete["/api/j-messages/:id<br/>Delete Document"]
+        APIExport["/api/j-messages/export<br/>Export (DOCX/MD/PDF)"]
+    end
+    
+    subgraph Storage["💾 Data Storage"]
+        MongoDB[(MongoDB<br/>j_messages<br/>collection)]
+    end
+    
+    subgraph Processing["📊 Analysis Pipeline"]
+        Parse["DOCX/PDF Parser"]
+        TOC["TOC Generator"]
+        LLM["LLM Metadata<br/>Extraction"]
+        HTML["HTML Generator"]
+    end
+    
+    subgraph Frontend["🖥️ Web Application"]
+        Analyzer["J-messages Analyzer<br/>(Upload UI)"]
+        Library["J-messages Library<br/>(Browse/Manage)"]
+        PromptMgr["Prompt Manager<br/>(Customize AI)"]
+    end
+    
+    %% External to MCP connections
+    Claude -->|STDIO| Bridge
+    Postman -->|STDIO| Bridge
+    Enonic -.->|HTTP (future)| MCPAnalyze
+    
+    %% MCP internal flow
+    Bridge --> Manifest
+    Bridge --> MCPAnalyze
+    Manifest -->|Return tools list| Bridge
+    
+    %% MCP to Backend
+    MCPAnalyze -->|1. Download file<br/>2. Forward to analyze| APIAnalyze
+    Bridge -.->|Future: list| APIList
+    
+    %% Backend operations
+    APIAnalyze --> Parse
+    Parse --> TOC
+    Parse --> LLM
+    TOC --> HTML
+    LLM --> HTML
+    HTML --> MongoDB
+    
+    APIList --> MongoDB
+    APIGet --> MongoDB
+    APIUpdate --> MongoDB
+    APIDelete --> MongoDB
+    APIExport --> MongoDB
+    
+    %% Frontend connections
+    Analyzer --> APIAnalyze
+    Library --> APIList
+    Library --> APIGet
+    Library --> APIUpdate
+    Library --> APIDelete
+    Library --> APIExport
+    Analyzer --> PromptMgr
+    PromptMgr -.->|Configure| LLM
+    
+    %% Styling
+    style External fill:#e3f2fd
+    style MCP fill:#fff3e0
+    style Backend fill:#f3e5f5
+    style Storage fill:#e8f5e9
+    style Processing fill:#fce4ec
+    style Frontend fill:#f1f8e9
+```
+
+### MCP Server Operations
+
+The MCP Server exposes the following tools through the Model Context Protocol:
+
+#### 1. **analyze_j_melding** (Currently Implemented)
+- **Purpose**: Analyze a J-melding document from a URL
+- **Input**: 
+  - `file_url` (required): HTTPS URL to .docx or .pdf file
+  - `summary_length` (optional): none|short|medium|long
+- **Process**:
+  1. Downloads file from URL
+  2. Forwards to `/api/j-messages/analyze`
+  3. Backend parses document (DOCX/PDF)
+  4. LLM extracts metadata (id, title, status, dates, categories)
+  5. Generates TOC from headings (H1/H2/H3)
+  6. Creates HTML body with anchors
+  7. Optionally generates AI summary
+  8. Saves to MongoDB
+- **Output**: Complete analysis JSON with metadata, TOC, HTML, and optional summary
+
+#### 2. **list_j_meldinger** (Currently Implemented)
+- **Purpose**: List all analyzed J-meldinger from the library
+- **Input** (all optional):
+  - `status`: Filter by status (e.g., "Gjeldende", "Utgått")
+  - `category`: Filter by category
+  - `search`: Search in title, j_id, or content
+- **Process**:
+  1. Queries MongoDB j_messages collection
+  2. Applies filters and search
+  3. Returns paginated results
+- **Output**: Array of J-meldinger with metadata
+
+#### 3. **get_j_melding** (Future)
+- **Purpose**: Retrieve a specific J-melding by ID
+- **Input**: `j_id` (e.g., "J-195-2025")
+- **Output**: Complete document with metadata, TOC, and HTML
+
+#### 4. **update_j_melding_metadata** (Future)
+- **Purpose**: Update metadata of an existing J-melding
+- **Input**: `j_id` + fields to update
+- **Output**: Updated document
+
+#### 5. **export_j_melding** (Future)
+- **Purpose**: Export J-melding in different formats
+- **Input**: 
+  - `j_id`: Document ID
+  - `format`: docx|md|pdf
+- **Output**: Download URL or file bytes
+
+### Integration Points
+
+**Web App → Backend:**
+- Direct HTTP calls from React frontend
+- Full CRUD operations on J-meldinger
+- Real-time prompt customization
+- Interactive UI for document management
+
+**MCP Server → Backend:**
+- Bridge translates MCP protocol to HTTP
+- Reuses existing analysis pipeline
+- Shares API configuration (ItemAI/OpenRouter/OpenAI)
+- Same MongoDB storage
+
+**External Clients → MCP Server:**
+- Claude Desktop: Natural language document analysis
+- Postman: Structured testing and automation
+- Enonic CMS: Future integration for Fiskeridirektoratet
+- Any MCP-compatible tool
+
+### Data Flow Example
+
+**Analyze Document Flow:**
+```
+Claude Desktop → "Analyze this J-melding: [URL]"
+    ↓ (STDIO)
+Bridge Server → tools/call(analyze_j_melding, {file_url})
+    ↓ (HTTP GET)
+Test File Server → Returns .docx bytes
+    ↓
+Bridge → POST /api/mcp/j-messages/analyze
+    ↓
+Backend → Parse → LLM → TOC → HTML → MongoDB
+    ↓
+Response → {id, title, status, toc, body_html, summary}
+    ↓ (STDIO)
+Claude Desktop → "I've analyzed the J-melding: [Summary]"
+```
+
+**List Documents Flow:**
+```
+Postman → tools/call(list_j_meldinger, {status: "Gjeldende"})
+    ↓ (STDIO)
+Bridge → GET /api/j-messages/list?status=Gjeldende
+    ↓
+MongoDB → Query j_messages collection
+    ↓
+Response → {items: [...], total: 10}
+    ↓ (STDIO)
+Postman → Display list of 10 documents
+```
+
 ## API Configuration Integration
 
 The MCP Server now supports using the same API configuration as the web app. This means you can configure ItemAI, OpenRouter, or OpenAI in the "API Config" module, and the MCP Server will automatically use that configuration.
