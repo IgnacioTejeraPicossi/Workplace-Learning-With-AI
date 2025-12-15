@@ -1,24 +1,43 @@
+# Core Web Framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
+pydantic[email]
+
+# HTTP Clients
+httpx==0.25.2
+requests==2.31.0
+
+# Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+argon2-cffi==23.1.0
+pyjwt==2.9.0
+pyotp==2.9.0
+qrcode==7.4.2
+
+# Database
 pymongo==4.6.0
 motor==3.3.2
-httpx==0.25.2
+
+# Document Processing (J-messages Analyzer)
 pypdf==3.17.4
 PyPDF2==3.0.1
 pdfminer.six==20231228
 python-docx==1.1.0
+
+# Search & Embeddings (Agentic RAG)
 rank-bm25==0.2.2
 sentence-transformers==2.2.2
+
+# AI & LLM
 openai==1.107.0
+
+# Utilities
+python-dotenv==1.0.0
 gitpython
 markdown
 fpdf
-firebase_admin
-pydantic[email]
-argon2-cffi==23.1.0
-pyjwt==2.9.0
-pyotp==2.9.0
-qrcode==7.4.2 
+
+# Firebase (optional)
+firebase_admin 
