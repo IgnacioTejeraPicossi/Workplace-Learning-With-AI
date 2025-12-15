@@ -361,7 +361,155 @@ You need a J-melding file (.docx or .pdf) to test. Options:
 - **"File not found"**: Verify the file path in the URL matches where the file actually is
 - **Empty response**: Check backend logs for errors
 
-### Test 3: Call `list_j_meldinger`
+### Test 3: Call `list_j_meldinger` (Step-by-Step)
+
+**Purpose**: List all analyzed J-meldinger from the library with optional filtering.
+
+**Step 1: Select the Tool**
+
+1. In Postman's **"Tools"** tab, click on **`list_j_meldinger`** (tool #2)
+2. The tool should highlight with a blue dot
+3. You'll see the available parameters below
+
+**Step 2: Configure Parameters (All Optional)**
+
+The `list_j_meldinger` tool accepts three optional filter parameters. You can:
+- **Leave all empty** to list ALL J-meldinger
+- **Fill one or more** to filter results
+
+**Parameter Options:**
+
+**A. List ALL documents** (no filters):
+- Leave all fields empty
+- This will return all J-meldinger in the library
+
+**B. Filter by Status:**
+- Click in the `status` field
+- Enter one of:
+  - `Gjeldende` (Active/Current regulations)
+  - `Utgått` (Expired regulations)
+
+**C. Filter by Category:**
+- Click in the `category` field
+- Enter a category name, for example:
+  - `Pelagisk fisk`
+  - `Sør for 62° N`
+  - Or any other category you've seen in your documents
+
+**D. Search by text:**
+- Click in the `search` field
+- Enter any search term, for example:
+  - `sild` (herring)
+  - `makrell` (mackerel)
+  - `kvote` (quota)
+  - Any J-ID like `J-195-2025`
+
+**Step 3: Example Configurations**
+
+**Example 1: List ALL documents**
+```json
+{
+  "status": "",
+  "category": "",
+  "search": ""
+}
+```
+Or simply leave all fields empty.
+
+**Example 2: Only active regulations**
+```json
+{
+  "status": "Gjeldende"
+}
+```
+
+**Example 3: Search for herring regulations**
+```json
+{
+  "search": "sild"
+}
+```
+
+**Example 4: Active pelagic fish regulations**
+```json
+{
+  "status": "Gjeldende",
+  "category": "Pelagisk fisk"
+}
+```
+
+**Step 4: Verify the JSON**
+
+On the right side, you should see the JSON update automatically:
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "list_j_meldinger",
+    "arguments": {
+      "status": "Gjeldende",
+      "category": "Pelagisk fisk",
+      "search": ""
+    }
+  }
+}
+```
+
+**Note**: Empty strings or omitted fields mean "no filter for this parameter".
+
+**Step 5: Execute**
+
+1. **Click the "Run" button** (top right)
+2. **Wait for response** (should be fast, usually < 1 second)
+3. **Check the "Response" tab**
+
+**Step 6: View Results**
+
+The response will contain:
+- **`success`**: true/false
+- **`items`**: Array of J-meldinger documents
+- **`total`**: Total count of matching documents
+
+**Example Response:**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"success\": true, \"items\": [{\"id\": \"J-195-2025\", \"title\": \"Forskrift om...\", \"status\": \"Gjeldende\", ...}], \"total\": 5}"
+      }
+    ]
+  }
+}
+```
+
+**Each item in the array contains:**
+- `id`: J-melding ID (e.g., "J-195-2025")
+- `title`: Full title
+- `status`: Status (Gjeldende/Utgått)
+- `valid_from`, `valid_to`: Date ranges
+- `categories`: Array of categories
+- `analyzed_at`: When it was analyzed
+
+**Troubleshooting:**
+
+- **Empty result (`items: []`)**: No documents match your filters. Try without filters first.
+- **"Not found" error**: Check that you've analyzed at least one document first
+- **Connection error**: Verify backend is running and bridge server is connected
+
+**Recommendation for First Test:**
+
+**Start with no filters** to see all documents:
+1. Leave all three fields empty or with empty strings
+2. Click "Run"
+3. You should see all J-meldinger you've analyzed so far
+
+Then try filtering by status, category, or search terms.
+
+### Test 4: Save Your Test Requests
 
 1. Select the **`list_j_meldinger`** tool
 2. Configure parameters (all optional):
