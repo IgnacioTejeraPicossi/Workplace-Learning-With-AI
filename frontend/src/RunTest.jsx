@@ -422,7 +422,6 @@ const RunTest = () => {
           // NEW: J-messages Analyzer endpoints
           { name: 'GET /api/j-messages/list', endpoint: '/api/j-messages/list', method: 'GET', requiresAuth: false },
           { name: 'POST /api/j-messages/save', endpoint: '/api/j-messages/save', method: 'POST', requiresAuth: false },
-          { name: 'POST /api/j-messages/analyze-note', endpoint: '/api/j-messages/analyze-note', method: 'POST', requiresAuth: false },
           { name: 'POST /api/j-messages/export-docx', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
           
           // NEW: J-messages Analyzer MCP endpoints
@@ -870,22 +869,18 @@ const RunTest = () => {
                 filename: 'test-j-melding.docx'
               };
               break;
-            case '/api/j-messages/analyze-note':
-              testData = {
-                note_text: 'J-195-2025\n\nForskrift om regulering av fisket etter sild i Nordsjøen og Skagerrak i 2025\n\nFastsatt av Fiskeridirektoratet den 20. desember 2024.\n\nKapittel 1. Fiskeforbud og kvoter\n\n§ 1 Generelt forbud\nDet er forbudt for norske fartøy å fiske og lande sild i Nordsjøen sør for 62°N.',
-                summary_length: 'short'
-              };
-              break;
             case '/api/j-messages/export-docx':
               testData = {
                 doc_id: '693fd9d0515760268dae14ec' // Using existing document from DB
               };
               break;
             case '/api/mcp/j-messages/analyze':
-              // Requires test file server on port 9999
-              // To start: cd backend && python test_mcp_server.py
+              // ⚠️ Requires test file server on port 8888
+              // Backend (port 8000): Main FastAPI application (already running)
+              // Test server (port 8888): Serves test files for MCP endpoint testing
+              // To start test server: cd backend && python test_mcp_server.py
               testData = {
-                file_url: 'http://localhost:9999/docs/j-melding-test.docx',
+                file_url: 'http://localhost:8888/docs/j-melding-test.docx',
                 summary_length: 'short'
               };
               break;
@@ -1012,6 +1007,13 @@ const RunTest = () => {
           errorMessage = 'Request timed out';
         }
         
+        // Special handling for J-messages MCP analyze endpoint
+        if (api.endpoint === '/api/mcp/j-messages/analyze') {
+          status = 'requires_setup';
+          statusCode = '⚠️ Requires Setup';
+          errorMessage = 'Test file server not running. Start with: cd backend && python test_mcp_server.py (port 8888)';
+        }
+        
         results.push({
           name: api.name,
           status: status,
@@ -1035,6 +1037,7 @@ const RunTest = () => {
         notSupported: results.filter(r => r.status === 'not_supported').length,
         networkError: results.filter(r => r.status === 'network_error').length,
         timeout: results.filter(r => r.status === 'timeout').length,
+        requiresSetup: results.filter(r => r.status === 'requires_setup').length,
         duration: `${results.reduce((sum, r) => sum + (r.time !== 'N/A' ? parseInt(r.time) : 0), 0)}ms`
       }
     });
@@ -1169,6 +1172,23 @@ const RunTest = () => {
           {/* Test Coverage Section (real E2E only) */}
           <div style={{ marginTop: '24px', background: colors.primaryLight, padding: '16px', borderRadius: '8px' }}>
             <h3 style={{ color: colors.text, marginTop: 0 }}>Test Coverage (Cypress E2E)</h3>
+            {testType === 'api' && (
+              <div style={{ 
+                background: '#e8f5e9', 
+                border: '1px solid #4caf50', 
+                borderRadius: '8px', 
+                padding: '12px', 
+                marginBottom: '16px',
+                fontSize: '14px',
+                color: '#1b5e20'
+              }}>
+                <strong>📡 Server Requirements:</strong>
+                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                  <li><strong>Port 8000:</strong> Main backend (FastAPI) - Should be running ✅</li>
+                  <li><strong>Port 8888:</strong> Test file server - Optional, only needed for MCP analyze endpoint testing. Start with: <code>cd backend && python test_mcp_server.py</code></li>
+                </ul>
+              </div>
+            )}
             <ul style={{ color: colors.textSecondary, margin: 0, paddingLeft: '20px' }}>
               <li>Sidebar navigation and module routing</li>
               <li>Help › Agent Theory & Documentation (Overview card → Theory)</li>
@@ -1231,6 +1251,7 @@ const RunTest = () => {
                         API Summary: {apiTestResults.summary.passed}/{apiTestResults.summary.total} endpoints working
                         {apiTestResults.summary.authRequired > 0 && ` (${apiTestResults.summary.authRequired} require auth)`}
                         {apiTestResults.summary.notSupported > 0 && ` (${apiTestResults.summary.notSupported} not supported)`}
+                        {apiTestResults.summary.requiresSetup > 0 && ` (${apiTestResults.summary.requiresSetup} require setup)`}
                         {apiTestResults.summary.networkError > 0 && ` (${apiTestResults.summary.networkError} network errors)`}
                         {apiTestResults.summary.timeout > 0 && ` (${apiTestResults.summary.timeout} timeouts)`}
                       </span>
@@ -1252,6 +1273,7 @@ const RunTest = () => {
                             color: test.status === 'passed' ? '#2ecc40' : 
                                    test.status === 'auth_required' ? '#f4b400' : 
                                    test.status === 'not_supported' ? '#ff9500' :
+                                   test.status === 'requires_setup' ? '#9b59b6' :
                                    test.status === 'network_error' ? '#ff6b6b' :
                                    test.status === 'timeout' ? '#ffa500' : '#e74c3c', 
                             fontWeight: 600 
@@ -1259,6 +1281,7 @@ const RunTest = () => {
                             {test.status === 'passed' ? '✓' : 
                              test.status === 'auth_required' ? '🔒' : 
                              test.status === 'not_supported' ? '⚠️' :
+                             test.status === 'requires_setup' ? '🔧' :
                              test.status === 'network_error' ? '🌐' :
                              test.status === 'timeout' ? '⏱️' : '✗'}
                           </span>
