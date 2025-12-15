@@ -1,0 +1,6 @@
+{
+  "provider": "openai",
+  "openai_key": "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",
+  "openrouter_key": "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",
+  "itemai_url": "http://localhost:1234"
+}

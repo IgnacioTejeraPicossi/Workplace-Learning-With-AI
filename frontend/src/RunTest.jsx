@@ -418,6 +418,16 @@ const RunTest = () => {
           
           // NEW: Enhanced Route endpoint
           { name: 'POST /route', endpoint: '/route', method: 'POST', requiresAuth: true },
+          
+          // NEW: J-messages Analyzer endpoints
+          { name: 'GET /api/j-messages/list', endpoint: '/api/j-messages/list', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/j-messages/save', endpoint: '/api/j-messages/save', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/analyze-note', endpoint: '/api/j-messages/analyze-note', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/export-docx', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
+          
+          // NEW: J-messages Analyzer MCP endpoints
+          { name: 'GET /api/mcp/manifest', endpoint: '/api/mcp/manifest', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/mcp/j-messages/analyze', endpoint: '/api/mcp/j-messages/analyze', method: 'POST', requiresAuth: false },
     ];
 
     const results = [];
@@ -836,6 +846,49 @@ const RunTest = () => {
                 lm_studio_model: 'test-model'
               };
               break;
+            // NEW: J-messages Analyzer test data
+            case '/api/j-messages/save':
+              testData = {
+                j_id: 'J-TEST-2025',
+                title: 'Test J-melding for API testing',
+                status: 'Gjeldende',
+                valid_from: '2025-01-01',
+                valid_to: null,
+                replaces: [],
+                categories: ['Test Category'],
+                toc: [
+                  {
+                    level: 1,
+                    title: 'Test Section',
+                    anchor: 'test-section',
+                    children: []
+                  }
+                ],
+                body_html: '<h1 id="test-section">Test Section</h1><p>This is test content.</p>',
+                summary: 'This is a test J-melding document for API testing purposes.',
+                raw_text: 'Test Section\n\nThis is test content.',
+                filename: 'test-j-melding.docx'
+              };
+              break;
+            case '/api/j-messages/analyze-note':
+              testData = {
+                note_text: 'J-195-2025\n\nForskrift om regulering av fisket etter sild i Nordsjøen og Skagerrak i 2025\n\nFastsatt av Fiskeridirektoratet den 20. desember 2024.\n\nKapittel 1. Fiskeforbud og kvoter\n\n§ 1 Generelt forbud\nDet er forbudt for norske fartøy å fiske og lande sild i Nordsjøen sør for 62°N.',
+                summary_length: 'short'
+              };
+              break;
+            case '/api/j-messages/export-docx':
+              testData = {
+                doc_id: '693fd9d0515760268dae14ec' // Using existing document from DB
+              };
+              break;
+            case '/api/mcp/j-messages/analyze':
+              // Requires test file server on port 9999
+              // To start: cd backend && python test_mcp_server.py
+              testData = {
+                file_url: 'http://localhost:9999/docs/j-melding-test.docx',
+                summary_length: 'short'
+              };
+              break;
             default:
               testData = { query: 'test query' };
           }
@@ -1134,6 +1187,7 @@ const RunTest = () => {
               <li>AI Career Coach (open module)</li>
               <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
               <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
+              <li>J-messages Analyzer (list, save, analyze-note, export, MCP manifest & analyze)</li>
               <li>Map of Knowledge (search input, counter, web search panel)</li>
               <li>Certifications (tab navigation)</li>
               <li>Team Dynamics (header + auth banner)</li>
