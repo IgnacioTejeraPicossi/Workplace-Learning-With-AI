@@ -16,6 +16,7 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [EA Second Brain Agent](./EA_SECOND_BRAIN_AGENT.md)
 - Modules
   - [J-messages Analyzer (Fiskeridirektoratet)](./J-messages_Analyzer.md)
+  - [J-messages ROS Analysis](./J_MESSAGES_ROS_ANALYSIS.md) - Risk and vulnerability analysis (Norwegian)
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
   - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing
   - [Postman MCP Testing](./POSTMAN_MCP_TESTING.md) - Test WLWAI MCP Server using Postman
