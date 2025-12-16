@@ -338,8 +338,8 @@ export default function JMessagesLibrary() {
             borderRadius: 10,
             padding: 12
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 {editing[it.id] ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <input
@@ -373,7 +373,7 @@ export default function JMessagesLibrary() {
                       <input
                         value={editContent[it.id]?.status || ''}
                         onChange={(e) => handleEditChange(it.id, 'status', e.target.value)}
-                        placeholder="Status"
+                        placeholder="Status (Fastsatt/Utgått)"
                         style={{
                           flex: 1,
                           padding: '6px 10px',
@@ -410,7 +410,7 @@ export default function JMessagesLibrary() {
                   </>
                 )}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', minWidth: '400px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'stretch', minWidth: '380px', flexShrink: 0 }}>
                 {/* Edit/Manage buttons row (Save/Cancel or Expand/Edit/Delete) */}
                 <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                   {editing[it.id] ? (
