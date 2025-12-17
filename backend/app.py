@@ -2426,6 +2426,16 @@ except ImportError as e:
 except Exception as e:
     print(f"❌ Error including J-messages Analyzer router: {e}")
 
+# J-messages Training Pairs router (Retrospective Learning)
+try:
+    from backend.routers.j_messages_training import router as j_messages_training_router
+    app.include_router(j_messages_training_router, tags=["J-messages Training"])
+    print("✅ J-messages Training Pairs router included successfully")
+except ImportError as e:
+    print(f"❌ Failed to import J-messages Training router: {e}")
+except Exception as e:
+    print(f"❌ Error including J-messages Training router: {e}")
+
 print("🔍 DEBUG: Router included successfully")
 
 # Test route directly in app.py

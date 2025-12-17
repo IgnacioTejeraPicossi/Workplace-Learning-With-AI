@@ -10,35 +10,81 @@ export default function JMessagesPairsLibrary() {
   const [selectedPair, setSelectedPair] = useState(null);
   const [viewMode, setViewMode] = useState('side-by-side'); // 'side-by-side' or 'overlay'
   const [query, setQuery] = useState('');
+  const [tab, setTab] = useState('training'); // 'analyzed' or 'training'
+  const [filters, setFilters] = useState({
+    has_human: null,
+    has_ai: null,
+    evaluated: null
+  });
+  const [stats, setStats] = useState(null);
 
-  const loadPairs = async () => {
+  const loadTrainingPairs = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (query) params.append('j_id', query);
+      if (filters.has_human !== null) params.append('has_human', filters.has_human);
+      if (filters.has_ai !== null) params.append('has_ai', filters.has_ai);
+      if (filters.evaluated !== null) params.append('evaluated', filters.evaluated);
+      
+      const resp = await fetchWithAuth(`/api/j-messages/training?${params.toString()}`);
+      const data = await resp.json();
+      if (data.success) {
+        setPairs(data.items || []);
+      } else {
+        setError('Failed to load training pairs');
+      }
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const resp = await fetchWithAuth('/api/j-messages/training/stats/summary');
+      const data = await resp.json();
+      if (data.success) {
+        setStats(data);
+      }
+    } catch (e) {
+      console.error('Failed to load stats:', e);
+    }
+  };
+
+  const loadAnalyzedDocs = async () => {
     try {
       setLoading(true);
       const resp = await fetchWithAuth('/api/j-messages/list');
       const data = await resp.json();
       if (data.success) {
-        // Only show items that have both original and analyzed content
-        const pairsData = (data.items || []).filter(item => 
-          item.raw_text && item.body_html && item.j_id
-        ).map(item => ({
+        // Show all analyzed documents
+        const pairsData = (data.items || []).map(item => ({
           id: item.id,
           j_id: item.j_id,
           title: item.title,
           status: item.status,
           created_at: item.created_at,
-          original: item.raw_text,
-          analyzed: item.body_html,
-          metadata: {
-            valid_from: item.valid_from,
-            valid_to: item.valid_to,
-            categories: item.categories,
+          human_structured: {
+            metadata: {
+              j_id: item.j_id,
+              title: item.title,
+              status: item.status,
+              valid_from: item.valid_from,
+              valid_to: item.valid_to,
+              categories: item.categories
+            },
             toc: item.toc,
-            summary: item.summary
+            body_html: item.body_html
+          },
+          original: {
+            text_excerpt: item.raw_text
           }
         }));
         setPairs(pairsData);
       } else {
-        setError('Failed to load pairs');
+        setError('Failed to load analyzed documents');
       }
     } catch (e) {
       setError(String(e));
@@ -48,77 +94,138 @@ export default function JMessagesPairsLibrary() {
   };
 
   useEffect(() => {
-    loadPairs();
-  }, []);
+    if (tab === 'training') {
+      loadTrainingPairs();
+      loadStats();
+    } else {
+      loadAnalyzedDocs();
+    }
+  }, [tab, filters]);
+
+  const handleRefresh = () => {
+    if (tab === 'training') {
+      loadTrainingPairs();
+      loadStats();
+    } else {
+      loadAnalyzedDocs();
+    }
+  };
 
   const filtered = pairs.filter((p) => {
     const searchText = `${p.j_id || ''} ${p.title || ''}`.toLowerCase();
     return searchText.includes(query.toLowerCase());
   });
 
-  const renderSideBySide = (pair) => (
-    <div style={{ display: 'flex', gap: 16, height: '600px' }}>
-      {/* Original Document */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        border: `1px solid ${colors.border}`,
-        borderRadius: 8,
-        overflow: 'hidden'
-      }}>
-        <div style={{ 
-          background: colors.primaryLight, 
-          padding: 12,
-          borderBottom: `1px solid ${colors.border}`,
-          fontWeight: 600,
-          color: colors.primary
-        }}>
-          📄 Original Document
-        </div>
+  const renderSideBySide = (pair) => {
+    // Extract original text (supports both old and new format)
+    const originalText = pair.original?.text_excerpt || pair.original || '';
+    
+    // Extract analyzed HTML (supports both old and new format)
+    const analyzedHtml = pair.human_structured?.body_html || pair.analyzed || '';
+    
+    // Extract AI-generated HTML if available
+    const aiHtml = pair.ai_structured?.body_html || null;
+    
+    return (
+      <div style={{ display: 'flex', gap: 16, height: '600px' }}>
+        {/* Original Document */}
         <div style={{ 
           flex: 1, 
-          padding: 16, 
-          overflow: 'auto',
-          background: colors.background,
-          whiteSpace: 'pre-wrap',
-          fontFamily: 'monospace',
-          fontSize: 13,
-          lineHeight: 1.6
+          display: 'flex', 
+          flexDirection: 'column',
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8,
+          overflow: 'hidden'
         }}>
-          {pair.original}
+          <div style={{ 
+            background: colors.primaryLight, 
+            padding: 12,
+            borderBottom: `1px solid ${colors.border}`,
+            fontWeight: 600,
+            color: colors.primary
+          }}>
+            📄 Original Document
+          </div>
+          <div style={{ 
+            flex: 1, 
+            padding: 16, 
+            overflow: 'auto',
+            background: colors.background,
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'monospace',
+            fontSize: 13,
+            lineHeight: 1.6
+          }}>
+            {originalText || '(No original text available)'}
+          </div>
         </div>
-      </div>
 
-      {/* Analyzed Document */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        border: `1px solid ${colors.border}`,
-        borderRadius: 8,
-        overflow: 'hidden'
-      }}>
-        <div style={{ 
-          background: '#d1fae5', 
-          padding: 12,
-          borderBottom: `1px solid ${colors.border}`,
-          fontWeight: 600,
-          color: '#065f46'
-        }}>
-          ✨ Analyzed Document (AI Generated)
-        </div>
+        {/* Human-Analyzed Document */}
         <div style={{ 
           flex: 1, 
-          padding: 16, 
-          overflow: 'auto',
-          background: colors.background
+          display: 'flex', 
+          flexDirection: 'column',
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8,
+          overflow: 'hidden'
         }}>
-          <div dangerouslySetInnerHTML={{ __html: pair.analyzed }} />
+          <div style={{ 
+            background: '#d1fae5', 
+            padding: 12,
+            borderBottom: `1px solid ${colors.border}`,
+            fontWeight: 600,
+            color: '#065f46'
+          }}>
+            ✨ Human-Analyzed Document
+          </div>
+          <div style={{ 
+            flex: 1, 
+            padding: 16, 
+            overflow: 'auto',
+            background: colors.background
+          }}>
+            {analyzedHtml ? (
+              <div dangerouslySetInnerHTML={{ __html: analyzedHtml }} />
+            ) : (
+              <div style={{ color: colors.textSecondary, fontStyle: 'italic' }}>
+                (No analyzed content available)
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* AI-Analyzed Document (if available) */}
+        {aiHtml && (
+          <div style={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            border: `2px solid #fbbf24`,
+            borderRadius: 8,
+            overflow: 'hidden'
+          }}>
+            <div style={{ 
+              background: '#fef3c7', 
+              padding: 12,
+              borderBottom: `2px solid #fbbf24`,
+              fontWeight: 600,
+              color: '#92400e'
+            }}>
+              🤖 AI-Analyzed Document (Current Prompt)
+            </div>
+            <div style={{ 
+              flex: 1, 
+              padding: 16, 
+              overflow: 'auto',
+              background: colors.background
+            }}>
+              <div dangerouslySetInnerHTML={{ __html: aiHtml }} />
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div style={{ padding: 24, background: colors.background, minHeight: '100vh' }}>
@@ -194,7 +301,7 @@ export default function JMessagesPairsLibrary() {
           }}
         />
         <button
-          onClick={loadPairs}
+          onClick={handleRefresh}
           style={{
             background: colors.primary,
             color: 'white',
@@ -243,26 +350,29 @@ export default function JMessagesPairsLibrary() {
                     {pair.title}
                   </div>
                   <div style={{ fontSize: 13, color: colors.textSecondary }}>
-                    {pair.j_id} • {pair.status} • {new Date(pair.created_at).toLocaleDateString('no-NO')}
+                    {pair.j_id} • {pair.status || 'N/A'} • {pair.created_at ? new Date(pair.created_at).toLocaleDateString('no-NO') : 'N/A'}
                   </div>
-                  {pair.metadata.categories && pair.metadata.categories.length > 0 && (
-                    <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {pair.metadata.categories.map((cat, idx) => (
-                        <span
-                          key={idx}
-                          style={{
-                            background: colors.primaryLight,
-                            color: colors.primary,
-                            padding: '2px 8px',
-                            borderRadius: 999,
-                            fontSize: 11
-                          }}
-                        >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {(() => {
+                    const categories = pair.human_structured?.metadata?.categories || pair.metadata?.categories || [];
+                    return categories.length > 0 && (
+                      <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {categories.map((cat, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              background: colors.primaryLight,
+                              color: colors.primary,
+                              padding: '2px 8px',
+                              borderRadius: 999,
+                              fontSize: 11
+                            }}
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div style={{ 
                   color: colors.primary,
@@ -313,20 +423,23 @@ export default function JMessagesPairsLibrary() {
                 {selectedPair.title}
               </h2>
               <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 8 }}>
-                {selectedPair.j_id} • {selectedPair.status}
+                {selectedPair.j_id} • {selectedPair.status || 'N/A'}
               </div>
-              {selectedPair.metadata.summary && (
-                <div style={{ 
-                  marginTop: 12, 
-                  padding: 12, 
-                  background: colors.primaryLight,
-                  borderRadius: 6,
-                  fontSize: 13,
-                  color: colors.text
-                }}>
-                  <strong>Summary:</strong> {selectedPair.metadata.summary}
-                </div>
-              )}
+              {(() => {
+                const summary = selectedPair.human_structured?.metadata?.summary || selectedPair.metadata?.summary || '';
+                return summary && (
+                  <div style={{ 
+                    marginTop: 12, 
+                    padding: 12, 
+                    background: colors.primaryLight,
+                    borderRadius: 6,
+                    fontSize: 13,
+                    color: colors.text
+                  }}>
+                    <strong>Summary:</strong> {summary}
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
