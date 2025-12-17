@@ -1,37 +1,52 @@
 # WLWAI Backend Scripts
 
-Utility scripts for data import and maintenance.
+Production scripts for J-messages training pairs management.
+
+---
+
+## 📦 Files in this Directory
+
+### Production Scripts
+
+- **`import_enonic_pairs.js`** - CLI tool for importing training pairs from Enonic exports
+- **`example-import.jsonl`** - Example JSONL format with realistic J-meldinger data (3 items)
+- **`test-import-sample.jsonl`** - Small test dataset for validation (3 items)
+- **`README.md`** - This file
 
 ---
 
 ## J-messages Training Pairs Import
 
-### Quick Start
+### Prerequisites
 
 **1. Install Dependencies**
 ```bash
+cd backend
 npm install node-fetch
 ```
 
-**2. Test with Sample Data**
+**2. Ensure Backend is Running**
+```bash
+cd backend
+python app.py
+# Backend should be running on http://localhost:8000
+```
+
+### Quick Start
+
+**Test with Sample Data**
 ```bash
 # Validate only (dry run)
-node backend/scripts/import_enonic_pairs.js backend/scripts/test-import-sample.jsonl --dry-run
+node scripts/import_enonic_pairs.js scripts/test-import-sample.jsonl --dry-run
 
 # Import sample
-node backend/scripts/import_enonic_pairs.js backend/scripts/test-import-sample.jsonl --source test-import
+node scripts/import_enonic_pairs.js scripts/test-import-sample.jsonl --source test-import
 ```
 
-**3. Import Production Data**
+**Import Production Data from Enonic**
 ```bash
-node backend/scripts/import_enonic_pairs.js /path/to/enonic-export.jsonl --source enonic-prod-2025
+node scripts/import_enonic_pairs.js /path/to/enonic-export.jsonl --source enonic-prod-2025
 ```
-
-### Files
-
-- **`import_enonic_pairs.js`** - Main import script with validation
-- **`example-import.jsonl`** - Example format with realistic data
-- **`test-import-sample.jsonl`** - Small test dataset (3 items)
 
 ### Options
 

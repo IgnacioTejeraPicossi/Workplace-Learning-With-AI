@@ -6,8 +6,10 @@ from fastapi import APIRouter, HTTPException, Request, Query, Body
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
+import logging
 
 router = APIRouter(prefix="/api/j-messages/training", tags=["J-messages Training"])
+logger = logging.getLogger(__name__)
 
 # Pydantic models
 class OriginalDocument(BaseModel):
@@ -216,6 +218,33 @@ async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)
         return {
             "success": True,
             "modified_count": result.modified_count
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{pair_id}")
+async def delete_training_pair(pair_id: str):
+    """
+    Delete a training pair by ID
+    """
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        from bson import ObjectId
+        
+        result = await training_pairs_collection.delete_one({"_id": ObjectId(pair_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Training pair not found")
+        
+        logger.info(f"Deleted training pair: {pair_id}")
+        
+        return {
+            "success": True,
+            "deleted_count": result.deleted_count
         }
     except HTTPException:
         raise
