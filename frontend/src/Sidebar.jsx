@@ -102,7 +102,8 @@ const getNavItems = (t) => [
   // J-messages Analyzer (nuevo módulo con librería)
   { key: "j-messages", label: "J-messages Analyzer", icon: "document", group: "learning", isExpandable: true, subItems: [
     { key: "j-messages-analyzer", label: "J-messages Analyzer", icon: "document-text" },
-    { key: "j-messages-library", label: "J-messages Library", icon: "book" }
+    { key: "j-messages-library", label: "J-messages Library", icon: "book" },
+    { key: "j-messages-pairs", label: "J-messages pairs Library", icon: "document-duplicate" }
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)
