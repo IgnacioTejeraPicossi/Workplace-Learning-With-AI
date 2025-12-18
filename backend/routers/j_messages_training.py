@@ -7,6 +7,19 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
 import logging
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import evaluator service
+try:
+    from services.j_messages_evaluator import get_evaluator
+    EVALUATOR_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Could not import evaluator service: {e}")
+    EVALUATOR_AVAILABLE = False
 
 router = APIRouter(prefix="/api/j-messages/training", tags=["J-messages Training"])
 logger = logging.getLogger(__name__)
@@ -393,6 +406,208 @@ async def get_training_stats():
             "avg_accuracy": round(avg_accuracy, 2) if avg_accuracy else None
         }
         
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================================================
+# EPIC 3: RETROSPECTIVE LEARNING & EVALUATION
+# ============================================================================
+
+@router.post("/{pair_id}/evaluate")
+async def evaluate_training_pair(pair_id: str, request: Request):
+    """
+    Run AI evaluation on a specific training pair
+    Compares AI analysis with human-analyzed version
+    """
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    if not EVALUATOR_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Evaluator service not available")
+    
+    try:
+        from bson import ObjectId
+        
+        # Get the training pair
+        pair_doc = await training_pairs_collection.find_one({"_id": ObjectId(pair_id)})
+        
+        if not pair_doc:
+            raise HTTPException(status_code=404, detail="Training pair not found")
+        
+        # Get API config from request or environment
+        api_config = {}
+        # TODO: Extract API keys from request headers or config file
+        
+        # Run evaluation
+        evaluator = get_evaluator()
+        evaluation_result = await evaluator.run_evaluation(pair_doc, api_config)
+        
+        if not evaluation_result.get('success'):
+            raise HTTPException(status_code=500, detail=evaluation_result.get('error', 'Evaluation failed'))
+        
+        # Update the pair with evaluation results
+        update_data = {
+            "ai_structured": evaluation_result.get('ai_structured'),
+            "evaluation": {
+                "last_evaluated_at": evaluation_result.get('evaluated_at'),
+                "metrics": evaluation_result.get('metrics'),
+                "comparison": evaluation_result.get('comparison'),
+                "overall_score": evaluation_result.get('metrics', {}).get('overall_accuracy', 0)
+            },
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        await training_pairs_collection.update_one(
+            {"_id": ObjectId(pair_id)},
+            {"$set": update_data}
+        )
+        
+        logger.info(f"Evaluation complete for pair {pair_id}: {evaluation_result.get('metrics', {}).get('overall_accuracy', 0):.2%}")
+        
+        return {
+            "success": True,
+            "pair_id": pair_id,
+            "j_id": evaluation_result.get('j_id'),
+            "metrics": evaluation_result.get('metrics'),
+            "evaluation_summary": evaluation_result.get('metrics', {}).get('evaluation_summary', '')
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error evaluating pair {pair_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/evaluate-batch")
+async def evaluate_multiple_pairs(
+    request: Request,
+    pair_ids: List[str] = Body(..., description="List of pair IDs to evaluate"),
+    limit: int = Body(10, description="Maximum number of pairs to evaluate")
+):
+    """
+    Run evaluation on multiple training pairs
+    """
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    if not EVALUATOR_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Evaluator service not available")
+    
+    try:
+        from bson import ObjectId
+        
+        # Limit the number of pairs
+        pair_ids = pair_ids[:limit]
+        
+        results = {
+            "success": True,
+            "total_requested": len(pair_ids),
+            "evaluated": 0,
+            "failed": 0,
+            "results": []
+        }
+        
+        evaluator = get_evaluator()
+        api_config = {}  # TODO: Get from config
+        
+        for pair_id in pair_ids:
+            try:
+                pair_doc = await training_pairs_collection.find_one({"_id": ObjectId(pair_id)})
+                
+                if not pair_doc:
+                    results["failed"] += 1
+                    results["results"].append({
+                        "pair_id": pair_id,
+                        "success": False,
+                        "error": "Pair not found"
+                    })
+                    continue
+                
+                # Run evaluation
+                eval_result = await evaluator.run_evaluation(pair_doc, api_config)
+                
+                if eval_result.get('success'):
+                    # Update pair
+                    update_data = {
+                        "ai_structured": eval_result.get('ai_structured'),
+                        "evaluation": {
+                            "last_evaluated_at": eval_result.get('evaluated_at'),
+                            "metrics": eval_result.get('metrics'),
+                            "comparison": eval_result.get('comparison'),
+                            "overall_score": eval_result.get('metrics', {}).get('overall_accuracy', 0)
+                        },
+                        "updated_at": datetime.utcnow().isoformat()
+                    }
+                    
+                    await training_pairs_collection.update_one(
+                        {"_id": ObjectId(pair_id)},
+                        {"$set": update_data}
+                    )
+                    
+                    results["evaluated"] += 1
+                    results["results"].append({
+                        "pair_id": pair_id,
+                        "j_id": eval_result.get('j_id'),
+                        "success": True,
+                        "accuracy": eval_result.get('metrics', {}).get('overall_accuracy', 0)
+                    })
+                else:
+                    results["failed"] += 1
+                    results["results"].append({
+                        "pair_id": pair_id,
+                        "success": False,
+                        "error": eval_result.get('error', 'Unknown error')
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Error evaluating pair {pair_id}: {str(e)}")
+                results["failed"] += 1
+                results["results"].append({
+                    "pair_id": pair_id,
+                    "success": False,
+                    "error": str(e)
+                })
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{pair_id}/evaluation")
+async def get_pair_evaluation(pair_id: str):
+    """
+    Get evaluation results for a specific training pair
+    """
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        from bson import ObjectId
+        
+        pair_doc = await training_pairs_collection.find_one({"_id": ObjectId(pair_id)})
+        
+        if not pair_doc:
+            raise HTTPException(status_code=404, detail="Training pair not found")
+        
+        evaluation = pair_doc.get('evaluation')
+        
+        if not evaluation:
+            return {
+                "success": True,
+                "has_evaluation": False,
+                "message": "This pair has not been evaluated yet"
+            }
+        
+        return {
+            "success": True,
+            "has_evaluation": True,
+            "pair_id": pair_id,
+            "j_id": pair_doc.get('j_id'),
+            "evaluation": evaluation
+        }
+        
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

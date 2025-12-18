@@ -53,6 +53,74 @@ export default function JMessagesPairsLibrary() {
     }
   };
 
+  // Epic 3: Evaluation functions
+  const [evaluating, setEvaluating] = useState({});
+  const [evaluationResults, setEvaluationResults] = useState({});
+
+  const runEvaluation = async (pairId, event) => {
+    // Prevent card click event
+    if (event) event.stopPropagation();
+    
+    try {
+      setEvaluating(prev => ({ ...prev, [pairId]: true }));
+      setError('');
+      
+      const resp = await fetchWithAuth(`/api/j-messages/training/${pairId}/evaluate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await resp.json();
+      
+      if (data.success) {
+        // Store evaluation result
+        setEvaluationResults(prev => ({ ...prev, [pairId]: data }));
+        
+        // Reload pairs to get updated data
+        if (tab === 'training') {
+          await loadTrainingPairs();
+        }
+        
+        // Show success message briefly
+        setTimeout(() => {
+          setEvaluationResults(prev => {
+            const updated = { ...prev };
+            delete updated[pairId];
+            return updated;
+          });
+        }, 3000);
+      } else {
+        setError(`Evaluation failed: ${data.error || 'Unknown error'}`);
+      }
+    } catch (e) {
+      setError(`Error running evaluation: ${String(e)}`);
+    } finally {
+      setEvaluating(prev => ({ ...prev, [pairId]: false }));
+    }
+  };
+
+  const getEvaluationStatus = (pair) => {
+    if (!pair.evaluation) return null;
+    
+    const accuracy = pair.evaluation.overall_score || pair.evaluation.metrics?.overall_accuracy || 0;
+    
+    let color = '#dc2626'; // red
+    let label = 'Poor';
+    
+    if (accuracy >= 0.9) {
+      color = '#22c55e'; // green
+      label = 'Excellent';
+    } else if (accuracy >= 0.7) {
+      color = '#3b82f6'; // blue
+      label = 'Good';
+    } else if (accuracy >= 0.5) {
+      color = '#f59e0b'; // orange
+      label = 'Fair';
+    }
+    
+    return { accuracy, color, label };
+  };
+
   const loadAnalyzedDocs = async () => {
     try {
       setLoading(true);
@@ -228,17 +296,24 @@ export default function JMessagesPairsLibrary() {
   };
 
   return (
-    <div style={{ padding: 24, background: colors.background, minHeight: '100vh' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: colors.text, margin: 0, marginBottom: 8 }}>
-          📚 J-messages pairs Library
-        </h1>
-        <p style={{ color: colors.textSecondary, margin: 0, fontSize: 14 }}>
-          Compare original documents with AI-analyzed versions side by side. 
-          This data will be used to improve future analysis prompts.
-        </p>
-      </div>
+    <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div style={{ padding: 24, background: colors.background, minHeight: '100vh' }}>
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ color: colors.text, margin: 0, marginBottom: 8 }}>
+            📚 J-messages pairs Library
+          </h1>
+          <p style={{ color: colors.textSecondary, margin: 0, fontSize: 14 }}>
+            Compare original documents with AI-analyzed versions side by side. 
+            This data will be used to improve future analysis prompts.
+          </p>
+        </div>
 
       {/* Stats */}
       <div style={{ 
@@ -344,41 +419,127 @@ export default function JMessagesPairsLibrary() {
                 e.currentTarget.style.transform = 'translateX(0)';
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, color: colors.primary, marginBottom: 4 }}>
                     {pair.title}
                   </div>
-                  <div style={{ fontSize: 13, color: colors.textSecondary }}>
+                  <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 8 }}>
                     {pair.j_id} • {pair.status || 'N/A'} • {pair.created_at ? new Date(pair.created_at).toLocaleDateString('no-NO') : 'N/A'}
                   </div>
-                  {(() => {
-                    const categories = pair.human_structured?.metadata?.categories || pair.metadata?.categories || [];
-                    return categories.length > 0 && (
-                      <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {categories.map((cat, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              background: colors.primaryLight,
-                              color: colors.primary,
-                              padding: '2px 8px',
-                              borderRadius: 999,
-                              fontSize: 11
-                            }}
-                          >
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
-                    );
-                  })()}
+                  
+                  {/* Categories and Evaluation Status */}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {(() => {
+                      const categories = pair.human_structured?.metadata?.categories || pair.metadata?.categories || [];
+                      return categories.map((cat, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            background: colors.primaryLight,
+                            color: colors.primary,
+                            padding: '2px 8px',
+                            borderRadius: 999,
+                            fontSize: 11
+                          }}
+                        >
+                          {cat}
+                        </span>
+                      ));
+                    })()}
+                    
+                    {/* Evaluation Status Badge */}
+                    {(() => {
+                      const evalStatus = getEvaluationStatus(pair);
+                      return evalStatus && (
+                        <span style={{
+                          background: evalStatus.color + '20',
+                          color: evalStatus.color,
+                          padding: '2px 8px',
+                          borderRadius: 999,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}>
+                          <span>📊</span>
+                          {evalStatus.label}: {(evalStatus.accuracy * 100).toFixed(0)}%
+                        </span>
+                      );
+                    })()}
+                    
+                    {/* Evaluation in Progress */}
+                    {evaluating[pair.id] && (
+                      <span style={{
+                        background: '#3b82f620',
+                        color: '#3b82f6',
+                        padding: '2px 8px',
+                        borderRadius: 999,
+                        fontSize: 11,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        <span className="spinner" style={{
+                          display: 'inline-block',
+                          width: 10,
+                          height: 10,
+                          border: '2px solid #3b82f6',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }}></span>
+                        Evaluating...
+                      </span>
+                    )}
+                    
+                    {/* Success Message */}
+                    {evaluationResults[pair.id] && (
+                      <span style={{
+                        background: '#22c55e20',
+                        color: '#22c55e',
+                        padding: '2px 8px',
+                        borderRadius: 999,
+                        fontSize: 11,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        ✓ Evaluation complete!
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ 
-                  color: colors.primary,
-                  fontSize: 20
-                }}>
-                  →
+                
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 12 }}>
+                  {tab === 'training' && (
+                    <button
+                      onClick={(e) => runEvaluation(pair.id, e)}
+                      disabled={evaluating[pair.id]}
+                      style={{
+                        background: evaluating[pair.id] ? colors.border : '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '6px 12px',
+                        cursor: evaluating[pair.id] ? 'not-allowed' : 'pointer',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        opacity: evaluating[pair.id] ? 0.6 : 1
+                      }}
+                      title="Run AI evaluation on this pair"
+                    >
+                      {evaluating[pair.id] ? '⏳' : '🤖'} Evaluate
+                    </button>
+                  )}
+                  <div style={{ 
+                    color: colors.primary,
+                    fontSize: 20
+                  }}>
+                    →
+                  </div>
                 </div>
               </div>
             </div>
@@ -461,7 +622,8 @@ export default function JMessagesPairsLibrary() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
