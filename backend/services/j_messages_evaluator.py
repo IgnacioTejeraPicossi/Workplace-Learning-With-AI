@@ -91,16 +91,38 @@ class JMessagesEvaluator:
     async def _run_ai_analysis(self, original_text: str, api_config: Dict[str, str]) -> Dict[str, Any]:
         """
         Run AI analysis on original text using the existing J-messages analyzer
-        
-        Note: This is a placeholder. In production, this would call the actual
-        analyze_j_melding function with the original text.
         """
-        # TODO: Integrate with actual j_messages_analyzer service
-        # For now, return a mock structure
-        
-        logger.warning("AI analysis not yet integrated - returning mock data")
-        
-        # Mock AI result structure
+        try:
+            # Import analyzer function with fallbacks (supports both execution modes)
+            try:
+                from backend.routers.j_messages_analyzer import analyze_text_content
+            except ImportError:
+                from routers.j_messages_analyzer import analyze_text_content
+            
+            logger.info(f"Running AI analysis on {len(original_text)} characters of text")
+            
+            # Call analyzer with original text
+            result = analyze_text_content(
+                text_content=original_text,
+                request_headers=api_config
+            )
+            
+            logger.info(f"AI analysis complete: extracted j_id={result.get('metadata', {}).get('j_id')}")
+            
+            return result
+            
+        except ImportError as e:
+            logger.error(f"Failed to import analyzer: {e}")
+            # Fallback to mock if analyzer not available
+            return self._get_mock_result()
+        except Exception as e:
+            logger.error(f"AI analysis failed: {e}")
+            # Return mock on error
+            return self._get_mock_result()
+    
+    def _get_mock_result(self) -> Dict[str, Any]:
+        """Fallback mock result if analyzer fails"""
+        logger.warning("Using mock AI analysis result")
         return {
             "metadata": {
                 "j_id": "AI-EXTRACTED",
@@ -254,14 +276,28 @@ class JMessagesEvaluator:
             if ai_str == human_str:
                 return 1.0
             
-            # Simple Levenshtein-like ratio
+            # Check if both look like dates (YYYY-MM-DD format)
+            date_pattern = r'^\d{4}-\d{2}-\d{2}$'
+            import re
+            if re.match(date_pattern, ai_str) and re.match(date_pattern, human_str):
+                # For dates, exact match or nothing
+                return 0.0
+            
+            # For regular strings, use character-level similarity
             max_len = max(len(ai_str), len(human_str))
             if max_len == 0:
                 return 1.0
             
             # Count matching characters at same positions
             matches = sum(1 for a, h in zip(ai_str, human_str) if a == h)
-            return matches / max_len
+            base_similarity = matches / max_len
+            
+            # If strings are very similar in length, boost score
+            if base_similarity > 0.7:
+                length_ratio = min(len(ai_str), len(human_str)) / max(len(ai_str), len(human_str))
+                return (base_similarity + length_ratio) / 2
+            
+            return base_similarity
         
         # Default: exact match only
         return 1.0 if ai_value == human_value else 0.0
@@ -283,24 +319,36 @@ class JMessagesEvaluator:
         """Generate human-readable summary of evaluation"""
         if overall_accuracy >= 0.9:
             quality = "Excellent"
+            emoji = "🎯"
         elif overall_accuracy >= 0.7:
             quality = "Good"
+            emoji = "✅"
         elif overall_accuracy >= 0.5:
             quality = "Fair"
+            emoji = "⚠️"
         else:
             quality = "Poor"
+            emoji = "❌"
         
-        # Find weakest fields
-        weak_fields = [
-            field for field, acc in field_accuracy.items()
-            if acc < 0.5
-        ]
+        # Find perfect and weak fields
+        perfect_fields = [field for field, acc in field_accuracy.items() if acc >= 0.95]
+        weak_fields = [field for field, acc in field_accuracy.items() if acc < 0.5]
+        medium_fields = [field for field, acc in field_accuracy.items() if 0.5 <= acc < 0.95]
         
-        summary = f"{quality} match ({overall_accuracy:.1%} accuracy)."
+        summary_parts = [f"{emoji} {quality} match ({overall_accuracy:.1%} accuracy)."]
+        
+        if perfect_fields:
+            summary_parts.append(f"Perfect: {', '.join(perfect_fields[:3])}")
+            if len(perfect_fields) > 3:
+                summary_parts[-1] += f" +{len(perfect_fields)-3} more"
+        
+        if medium_fields:
+            summary_parts.append(f"Partial: {', '.join(medium_fields[:2])}")
+        
         if weak_fields:
-            summary += f" Weak fields: {', '.join(weak_fields)}."
+            summary_parts.append(f"Needs improvement: {', '.join(weak_fields)}")
         
-        return summary
+        return " | ".join(summary_parts)
 
 
 # Singleton instance

@@ -602,6 +602,93 @@ export default function JMessagesPairsLibrary() {
                 );
               })()}
             </div>
+            
+            {/* Evaluation Metrics (if available) */}
+            {selectedPair.evaluation && (
+              <div style={{
+                background: colors.cardBackground,
+                border: `2px solid ${getEvaluationStatus(selectedPair)?.color || colors.border}`,
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 16
+              }}>
+                <h3 style={{ margin: 0, marginBottom: 12, color: colors.text, fontSize: 16 }}>
+                  📊 Evaluation Results
+                </h3>
+                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary }}>Overall Accuracy</div>
+                    <div style={{ 
+                      fontSize: 24, 
+                      fontWeight: 600, 
+                      color: getEvaluationStatus(selectedPair)?.color || colors.text 
+                    }}>
+                      {((selectedPair.evaluation.overall_score || 0) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary }}>Evaluated</div>
+                    <div style={{ fontSize: 14, color: colors.text }}>
+                      {selectedPair.evaluation.last_evaluated_at 
+                        ? new Date(selectedPair.evaluation.last_evaluated_at).toLocaleDateString('no-NO', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
+                        : 'N/A'
+                      }
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Field-by-field accuracy */}
+                {selectedPair.evaluation.metrics?.field_accuracy && (
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: colors.text }}>
+                      Field Accuracy:
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {Object.entries(selectedPair.evaluation.metrics.field_accuracy).map(([field, accuracy]) => {
+                        let color = '#dc2626';
+                        if (accuracy >= 0.9) color = '#22c55e';
+                        else if (accuracy >= 0.7) color = '#3b82f6';
+                        else if (accuracy >= 0.5) color = '#f59e0b';
+                        
+                        return (
+                          <div
+                            key={field}
+                            style={{
+                              background: color + '20',
+                              color: color,
+                              padding: '4px 8px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 500
+                            }}
+                          >
+                            {field}: {(accuracy * 100).toFixed(0)}%
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Summary */}
+                {selectedPair.evaluation.metrics?.evaluation_summary && (
+                  <div style={{
+                    marginTop: 12,
+                    padding: 12,
+                    background: colors.background,
+                    borderRadius: 6,
+                    fontSize: 13,
+                    color: colors.textSecondary
+                  }}>
+                    {selectedPair.evaluation.metrics.evaluation_summary}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Side by side comparison */}

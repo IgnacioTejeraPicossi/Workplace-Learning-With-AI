@@ -174,6 +174,84 @@ Tekst:
 """
 
 
+def analyze_text_content(text_content: str, request_headers: Dict[str, str] = None) -> Dict[str, Any]:
+    """
+    Helper function to analyze J-melding text content directly (for evaluator use).
+    
+    Args:
+        text_content: Full text of the J-melding document
+        request_headers: Optional dict of request headers for API config
+    
+    Returns:
+        Dict with metadata, toc, body_html, and raw_text
+    """
+    import json
+    import re
+    
+    # Split text into lines
+    paragraphs = [ln for ln in text_content.split("\n") if ln.strip()]
+    
+    # Split header/body
+    header_text, body_text = split_header_body(paragraphs)
+    
+    # Build TOC and HTML
+    toc, body_html = build_toc_and_body_html(body_text)
+    
+    # Initialize metadata
+    metadata: Dict[str, Any] = {
+        "j_id": None,
+        "title": None,
+        "replaces_id": None,
+        "status": None,
+        "valid_from": None,
+        "valid_to": None,
+        "categories": []
+    }
+    
+    # Extract metadata using LLM if available
+    if ask_ai_unified_sync:
+        try:
+            prompt = build_metadata_prompt(header_text, body_text)
+            response = ask_ai_unified_sync(
+                prompt=prompt + "\nGi svaret som STRICT JSON.",
+                task_type="extraction",
+                complexity="low",
+                max_tokens=600,
+                messages=None,
+                request_headers=request_headers or {}
+            )
+            
+            # Parse JSON from response
+            json_str = response.strip()
+            
+            # Remove markdown code blocks if present
+            if "```" in json_str:
+                match = re.search(r'```(?:json)?\s*(.*?)\s*```', json_str, re.DOTALL)
+                if match:
+                    json_str = match.group(1).strip()
+                else:
+                    json_str = re.sub(r'```[^`]*```', '', json_str).strip()
+            
+            # Try to find JSON object in the string
+            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+            
+            parsed = json.loads(json_str)
+            if isinstance(parsed, dict):
+                metadata.update(parsed)
+                print(f"[ANALYZER] Successfully extracted metadata: {list(parsed.keys())}")
+        except Exception as e:
+            print(f"[ANALYZER] Failed to extract metadata with LLM: {e}")
+    
+    return {
+        "metadata": metadata,
+        "toc": toc,
+        "body_html": body_html,
+        "raw_text": body_text
+    }
+
+
 @router.post("/analyze")
 async def analyze_j_message(
     request: Request,

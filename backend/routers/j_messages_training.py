@@ -7,19 +7,18 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
 import logging
-import sys
-import os
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import evaluator service
+# Import evaluator service with fallbacks (supports both execution modes)
 try:
-    from services.j_messages_evaluator import get_evaluator
+    from backend.services.j_messages_evaluator import get_evaluator
     EVALUATOR_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Could not import evaluator service: {e}")
-    EVALUATOR_AVAILABLE = False
+except ImportError:
+    try:
+        from services.j_messages_evaluator import get_evaluator
+        EVALUATOR_AVAILABLE = True
+    except ImportError as e:
+        logger.warning(f"Could not import evaluator service: {e}")
+        EVALUATOR_AVAILABLE = False
 
 router = APIRouter(prefix="/api/j-messages/training", tags=["J-messages Training"])
 logger = logging.getLogger(__name__)
