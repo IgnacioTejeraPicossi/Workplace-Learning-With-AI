@@ -438,9 +438,64 @@ This ensures the code works whether running from:
 - Root directory: `uvicorn backend.app:app`
 - Backend directory: `python app.py` (legacy)
 
+### Critical Bugs Fixed During Implementation
+
+**Bug 1: Field Name Mismatch**
+- **Issue**: MongoDB query searched for `evaluation.overall_accuracy` but data was stored as `evaluation.overall_score`
+- **Symptom**: "No evaluated training pairs found" error even when pairs existed
+- **Fix**: Updated all references to use `evaluation.overall_score`
+- **Files affected**: 
+  - `backend/routers/j_messages_training.py` (line 685)
+  - `backend/services/prompt_suggestion_service.py` (lines 110, 119, 139, 158)
+
+**Bug 2: Incorrect Import Path**
+- **Issue**: Tried to import `ask_ai_unified_sync` from `backend.routers.ask_ai` (doesn't exist)
+- **Symptom**: "No module named 'routers'" error when generating suggestions
+- **Fix**: Changed import to `backend.llm` (correct location)
+- **Files affected**:
+  - `backend/services/prompt_suggestion_service.py` (line 243)
+
+**Bug 3: Field Accuracy Path**
+- **Issue**: Accessed `evaluation.field_accuracy` directly instead of nested path
+- **Symptom**: Empty field accuracy in suggestions
+- **Fix**: Use `evaluation.metrics.field_accuracy`
+- **Files affected**:
+  - `backend/services/prompt_suggestion_service.py` (line 160)
+
+### Data Structure Reference
+
+For future developers, the correct MongoDB structure for evaluated pairs:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "j_id": "J-195-2025",
+  "evaluation": {
+    "overall_score": 0.714,          // ⚠️ Note: "score" not "accuracy"
+    "last_evaluated_at": "2025-12-19T...",
+    "metrics": {
+      "overall_accuracy": 0.714,     // Inside metrics object
+      "field_accuracy": {            // ⚠️ Nested under metrics
+        "j_id": 1.0,
+        "title": 1.0,
+        "categories": 0.0
+      }
+    }
+  }
+}
+```
+
+### Lessons Learned
+
+1. **Always verify field names**: When implementing features that span multiple services, ensure consistent field naming across the codebase
+2. **Test with real data early**: Mock data may not reveal data structure mismatches
+3. **Document data schemas**: Include MongoDB schema examples in documentation
+4. **Use type checking**: Consider TypeScript/Pydantic for compile-time validation
+
 ---
 
 **Phase 3: ✅ COMPLETE**
 
 *Last Updated: December 19, 2025*
+*Bugs Fixed: December 19, 2025*
 

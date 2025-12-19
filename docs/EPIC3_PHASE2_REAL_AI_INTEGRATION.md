@@ -272,10 +272,59 @@ With just **1 training pair**, we can demonstrate the full cycle. With **100+ pa
 
 ---
 
+## 📊 Data Structure Reference
+
+The evaluation results are stored in MongoDB with the following structure:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "j_id": "J-195-2025",
+  "title": "Forskrift om...",
+  "evaluation": {
+    "overall_score": 0.714,              // Top-level accuracy score
+    "last_evaluated_at": "2025-12-19T...",
+    "metrics": {
+      "overall_accuracy": 0.714,         // Same as overall_score
+      "field_accuracy": {                // Field-by-field breakdown
+        "j_id": 1.0,
+        "title": 1.0,
+        "status": 1.0,
+        "valid_from": 0.0,
+        "valid_to": 1.0,
+        "categories": 0.0,
+        "replaces_id": 1.0
+      },
+      "toc_accuracy": 0.95,
+      "total_fields": 7,
+      "correct_fields": 5,
+      "evaluation_summary": "✅ Good match (71.4% accuracy)..."
+    },
+    "comparison": {
+      "metadata": { /* detailed field comparisons */ },
+      "toc": { /* TOC comparison */ }
+    }
+  },
+  "ai_structured": {
+    "metadata": { /* AI-extracted fields */ },
+    "toc": [...],
+    "body_html": "..."
+  }
+}
+```
+
+**Important Notes:**
+- `evaluation.overall_score` is the primary accuracy metric (0-1 scale)
+- `evaluation.metrics.field_accuracy` contains per-field accuracy
+- Both are required for Phase 3 (Prompt Suggestions) to work correctly
+
+---
+
 **Version:** 1.0  
-**Last Updated:** December 2025  
+**Last Updated:** December 19, 2025  
 **Status:** ✅ COMPLETED  
 **Related Docs:**
 - [J-messages Import Guide](./J_MESSAGES_IMPORT_GUIDE.md)
 - [MCP Testing Guide](./MCP_TESTING_GUIDE.md)
+- [Phase 3: Prompt Suggestions](./EPIC3_PHASE3_PROMPT_SUGGESTIONS.md)
 

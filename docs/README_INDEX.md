@@ -2,6 +2,8 @@
 
 Quick links to the most-used docs. Each page is short enough for GitHub’s “Filter headings” overlay.
 
+- **Project Info**
+  - [Changelog](./CHANGELOG.md) - Version history and recent changes
 - Architecture
   - [Application Architecture](./architecture.md#application-architecture)
   - [Testing Architecture](./architecture.md#testing-architecture)
