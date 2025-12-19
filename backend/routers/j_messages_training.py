@@ -20,6 +20,18 @@ except ImportError:
         logger.warning(f"Could not import evaluator service: {e}")
         EVALUATOR_AVAILABLE = False
 
+# Import prompt suggestion service with fallbacks
+try:
+    from backend.services.prompt_suggestion_service import get_prompt_suggestion_service
+    PROMPT_SUGGESTION_AVAILABLE = True
+except ImportError:
+    try:
+        from services.prompt_suggestion_service import get_prompt_suggestion_service
+        PROMPT_SUGGESTION_AVAILABLE = True
+    except ImportError as e:
+        logger.warning(f"Could not import prompt suggestion service: {e}")
+        PROMPT_SUGGESTION_AVAILABLE = False
+
 router = APIRouter(prefix="/api/j-messages/training", tags=["J-messages Training"])
 logger = logging.getLogger(__name__)
 
@@ -608,5 +620,117 @@ async def get_pair_evaluation(pair_id: str):
     except HTTPException:
         raise
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/prompt/suggest")
+async def suggest_prompt_improvements(
+    request: Request,
+    current_prompt: Optional[str] = Body(None),
+    num_examples: int = Body(5, ge=1, le=20),
+    focus_on_errors: bool = Body(True)
+):
+    """
+    Generate AI-assisted prompt improvement suggestions based on evaluation results.
+    
+    This endpoint analyzes evaluated training pairs and uses an LLM to suggest
+    improvements to the current analysis prompt.
+    
+    Parameters:
+    - current_prompt: The current prompt to improve (if None, uses default)
+    - num_examples: Number of training examples to analyze (1-20, default 5)
+    - focus_on_errors: If True, prioritize low-accuracy pairs (default True)
+    
+    Returns:
+    - suggested_prompt: The improved prompt text
+    - notes: List of explanations for the changes
+    - based_on_pairs: IDs of the training pairs used
+    """
+    if not PROMPT_SUGGESTION_AVAILABLE:
+        raise HTTPException(
+            status_code=501,
+            detail="Prompt suggestion service not available"
+        )
+    
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        logger.info(
+            f"Generating prompt suggestion with {num_examples} examples, "
+            f"focus_on_errors={focus_on_errors}"
+        )
+        
+        # Get current prompt if not provided
+        if not current_prompt:
+            # Use the default J-messages analyzer prompt
+            current_prompt = """Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
+Du får teksten fra en J-melding (header + starten på forskriften).
+Trekk ut metadata og returner KUN STRICT JSON uten kommentarer.
+
+Felt:
+- j_id: J-meldingens ID (e.g., "J-195-2025")
+- title: Tittel på forskriften
+- replaces_id: ID til erstattet J-melding (hvis finnes)
+- status: "Fastsatt" eller "Utgått"
+- valid_from: Gyldig fra dato (YYYY-MM-DD)
+- valid_to: Gyldig til dato (YYYY-MM-DD eller null)
+- categories: Array av kategorier (e.g., ["Torsk", "Nordsjøen"])
+
+Returner KUN JSON uten kommentarer."""
+        
+        # Fetch evaluated training pairs
+        pairs_cursor = training_pairs_collection.find({
+            "evaluation": {"$exists": True},
+            "evaluation.overall_score": {"$exists": True}
+        }).limit(100)  # Limit to prevent overwhelming
+        
+        pairs_list = []
+        async for doc in pairs_cursor:
+            # Convert ObjectId to string for JSON serialization
+            doc['_id'] = str(doc['_id'])
+            pairs_list.append(doc)
+        
+        if not pairs_list:
+            raise HTTPException(
+                status_code=400,
+                detail="No evaluated training pairs found. Please run evaluation first."
+            )
+        
+        logger.info(f"Found {len(pairs_list)} evaluated pairs")
+        
+        # Call prompt suggestion service
+        service = get_prompt_suggestion_service()
+        result = await service.generate_suggestion(
+            current_prompt=current_prompt,
+            training_pairs=pairs_list,
+            num_examples=num_examples,
+            focus_on_errors=focus_on_errors
+        )
+        
+        if not result.get("success"):
+            raise HTTPException(
+                status_code=500,
+                detail=result.get("error", "Failed to generate suggestion")
+            )
+        
+        logger.info("Successfully generated prompt suggestion")
+        
+        return {
+            "success": True,
+            "suggestion": {
+                "suggested_prompt": result.get("suggested_prompt"),
+                "notes": result.get("notes", []),
+                "based_on_pairs": result.get("based_on_pairs", []),
+                "num_examples": result.get("num_examples", 0),
+                "generated_at": result.get("generated_at"),
+                "original_prompt": current_prompt
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating prompt suggestion: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 

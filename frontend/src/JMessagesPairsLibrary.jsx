@@ -17,6 +17,9 @@ export default function JMessagesPairsLibrary() {
     evaluated: null
   });
   const [stats, setStats] = useState(null);
+  const [promptSuggestion, setPromptSuggestion] = useState(null);
+  const [generatingSuggestion, setGeneratingSuggestion] = useState(false);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   const loadTrainingPairs = async () => {
     try {
@@ -119,6 +122,35 @@ export default function JMessagesPairsLibrary() {
     }
     
     return { accuracy, color, label };
+  };
+
+  const generatePromptSuggestion = async (numExamples = 5, focusOnErrors = true) => {
+    try {
+      setGeneratingSuggestion(true);
+      setError('');
+      
+      const resp = await fetchWithAuth('/api/j-messages/training/prompt/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          num_examples: numExamples,
+          focus_on_errors: focusOnErrors
+        })
+      });
+      
+      const data = await resp.json();
+      
+      if (data.success) {
+        setPromptSuggestion(data.suggestion);
+        setShowSuggestionModal(true);
+      } else {
+        setError(`Failed to generate suggestion: ${data.detail || 'Unknown error'}`);
+      }
+    } catch (e) {
+      setError(`Error generating prompt suggestion: ${String(e)}`);
+    } finally {
+      setGeneratingSuggestion(false);
+    }
   };
 
   const loadAnalyzedDocs = async () => {
@@ -388,6 +420,23 @@ export default function JMessagesPairsLibrary() {
           }}
         >
           🔄 Refresh
+        </button>
+        <button
+          onClick={() => generatePromptSuggestion(5, true)}
+          disabled={generatingSuggestion || tab === 'analyzed'}
+          style={{
+            background: generatingSuggestion ? colors.textSecondary : '#8b5cf6',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 16px',
+            cursor: generatingSuggestion || tab === 'analyzed' ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            opacity: tab === 'analyzed' ? 0.5 : 1
+          }}
+          title={tab === 'analyzed' ? 'Switch to Training Pairs tab to generate suggestions' : 'Generate AI-powered prompt improvement suggestions'}
+        >
+          {generatingSuggestion ? '⏳ Generating...' : '💡 Suggest Prompt Improvements'}
         </button>
       </div>
 
@@ -706,6 +755,218 @@ export default function JMessagesPairsLibrary() {
             <strong>💡 AI Training Note:</strong> This comparison will be used to improve 
             future document analysis. The system will learn from the differences between 
             original and analyzed content to enhance prompt engineering.
+          </div>
+        </div>
+      )}
+
+      {/* Prompt Suggestion Modal */}
+      {showSuggestionModal && promptSuggestion && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+            padding: 20
+          }}
+          onClick={() => setShowSuggestionModal(false)}
+        >
+          <div
+            style={{
+              background: colors.cardBackground,
+              borderRadius: 12,
+              maxWidth: 900,
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              borderBottom: `1px solid ${colors.border}`,
+              padding: 24,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: colors.text, display: 'flex', alignItems: 'center', gap: 8 }}>
+                💡 AI-Generated Prompt Suggestion
+              </h2>
+              <button
+                onClick={() => setShowSuggestionModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: 24,
+                  cursor: 'pointer',
+                  color: colors.textSecondary,
+                  padding: 0,
+                  width: 32,
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: 24 }}>
+              {/* Info Banner */}
+              <div style={{
+                background: '#dbeafe',
+                border: '1px solid #3b82f6',
+                borderRadius: 8,
+                padding: 12,
+                marginBottom: 24,
+                fontSize: 14
+              }}>
+                <strong>📊 Based on:</strong> {promptSuggestion.num_examples} training examples
+                {' • '}
+                <strong>Generated:</strong> {new Date(promptSuggestion.generated_at).toLocaleString()}
+              </div>
+
+              {/* Notes Section */}
+              {promptSuggestion.notes && promptSuggestion.notes.length > 0 && (
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ color: colors.text, marginBottom: 12 }}>🔍 Key Improvements:</h3>
+                  <ul style={{ 
+                    color: colors.text, 
+                    lineHeight: '1.8',
+                    paddingLeft: 20,
+                    margin: 0
+                  }}>
+                    {promptSuggestion.notes.map((note, idx) => (
+                      <li key={idx} style={{ marginBottom: 8 }}>{note}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Suggested Prompt */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: 12 
+                }}>
+                  <h3 style={{ color: colors.text, margin: 0 }}>✨ Suggested Prompt:</h3>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(promptSuggestion.suggested_prompt);
+                      alert('Prompt copied to clipboard!');
+                    }}
+                    style={{
+                      background: colors.primary,
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      fontSize: 14,
+                      fontWeight: 500
+                    }}
+                  >
+                    📋 Copy to Clipboard
+                  </button>
+                </div>
+                <pre style={{
+                  background: colors.background,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  padding: 16,
+                  fontSize: 13,
+                  lineHeight: '1.6',
+                  overflowX: 'auto',
+                  color: colors.text,
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word'
+                }}>
+                  {promptSuggestion.suggested_prompt}
+                </pre>
+              </div>
+
+              {/* Original Prompt (Collapsible) */}
+              <details style={{ marginBottom: 16 }}>
+                <summary style={{ 
+                  cursor: 'pointer', 
+                  color: colors.textSecondary,
+                  fontWeight: 500,
+                  marginBottom: 8
+                }}>
+                  🔄 Compare with Original Prompt
+                </summary>
+                <pre style={{
+                  background: colors.background,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  padding: 16,
+                  fontSize: 13,
+                  lineHeight: '1.6',
+                  overflowX: 'auto',
+                  color: colors.textSecondary,
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                  marginTop: 8
+                }}>
+                  {promptSuggestion.original_prompt}
+                </pre>
+              </details>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: 12,
+                justifyContent: 'flex-end',
+                marginTop: 24,
+                paddingTop: 24,
+                borderTop: `1px solid ${colors.border}`
+              }}>
+                <button
+                  onClick={() => setShowSuggestionModal(false)}
+                  style={{
+                    background: colors.cardBackground,
+                    color: colors.text,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 8,
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(promptSuggestion.suggested_prompt);
+                    setShowSuggestionModal(false);
+                    alert('Prompt copied! You can now paste it into the Prompt Manager.');
+                  }}
+                  style={{
+                    background: '#8b5cf6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  💾 Copy & Use in Prompt Manager
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

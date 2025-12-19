@@ -19,6 +19,7 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [J-messages ROS Analysis](./J_MESSAGES_ROS_ANALYSIS.md) - Risk and vulnerability analysis (Norwegian)
   - [J-messages Import Guide](./J_MESSAGES_IMPORT_GUIDE.md) - Import training pairs from Enonic for retrospective learning
   - [Epic 3 Phase 2: Real AI Integration](./EPIC3_PHASE2_REAL_AI_INTEGRATION.md) - Evaluation system with real AI analyzer
+  - [Epic 3 Phase 3: AI-Powered Prompt Suggestions](./EPIC3_PHASE3_PROMPT_SUGGESTIONS.md) - Generate intelligent prompt improvements using AI
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
   - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing
   - [Postman MCP Testing](./POSTMAN_MCP_TESTING.md) - Test WLWAI MCP Server using Postman
