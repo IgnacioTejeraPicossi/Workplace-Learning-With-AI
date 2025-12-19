@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2025-12-19
+
+### Documentation Improvements
+
+#### Consolidated Epic 3 Documentation
+
+**Motivation:**
+- Previous structure had 3 separate files for Epic 3 (Import Guide, Phase 2, Phase 3)
+- Files didn't follow consistent naming convention (EPIC3_* vs J_MESSAGES_*)
+- Hard to find related documentation in file browser
+- Onboarding required reading multiple disconnected files
+
+**Changes:**
+- ✅ **Created**: `J_MESSAGES_RETROSPECTIVE_LEARNING.md` (comprehensive guide)
+- ✅ **Removed**: `J_MESSAGES_IMPORT_GUIDE.md` (merged)
+- ✅ **Removed**: `EPIC3_PHASE2_REAL_AI_INTEGRATION.md` (merged)
+- ✅ **Removed**: `EPIC3_PHASE3_PROMPT_SUGGESTIONS.md` (merged)
+- ✅ **Updated**: `README_INDEX.md` (single entry for Epic 3)
+
+**New Structure:**
+
+```
+J_MESSAGES_RETROSPECTIVE_LEARNING.md
+├─ Overview & Architecture
+├─ Phase 1: Data Model & Import Pipeline
+├─ Phase 2: Real AI Integration
+├─ Phase 3: AI-Powered Prompt Suggestions
+├─ Data Structure Reference (consolidated)
+├─ Testing Guide (comprehensive)
+├─ Troubleshooting (all known issues)
+└─ Production Deployment & Next Steps
+```
+
+**Benefits:**
+- ✅ Single source of truth for all Epic 3 functionality
+- ✅ Consistent naming: All J-messages docs start with `J_MESSAGES_*`
+- ✅ Better file browser grouping (sorted alphabetically)
+- ✅ Easier onboarding: One file to read
+- ✅ Centralized troubleshooting section
+- ✅ Complete data structure reference in one place
+
+---
+
 ## [1.0.0] - 2025-12-19
 
 ### 🎉 Major Release: Epic 3 - Retrospective Learning & Prompt Refinement
@@ -94,13 +137,17 @@ Complete implementation of AI-powered continuous learning system for J-messages 
 
 - **New Guides**:
   - `CHANGELOG.md` - This file
-  - `J_MESSAGES_IMPORT_GUIDE.md` - Import pipeline documentation
-  - `EPIC3_PHASE2_REAL_AI_INTEGRATION.md` - Evaluation system guide
-  - `EPIC3_PHASE3_PROMPT_SUGGESTIONS.md` - Prompt suggestion guide
+  - `J_MESSAGES_RETROSPECTIVE_LEARNING.md` - **Consolidated guide** covering all of Epic 3 (Phases 1, 2, 3)
+
+- **Consolidated**:
+  - Merged `J_MESSAGES_IMPORT_GUIDE.md` into consolidated guide
+  - Merged `EPIC3_PHASE2_REAL_AI_INTEGRATION.md` into consolidated guide
+  - Merged `EPIC3_PHASE3_PROMPT_SUGGESTIONS.md` into consolidated guide
+  - **Benefit**: Single source of truth, consistent naming (J_MESSAGES_*), easier navigation
 
 - **Updated**:
-  - `README_INDEX.md` - Added Epic 3 documentation links
-  - All Phase 2 and Phase 3 docs with data structure references
+  - `README_INDEX.md` - Simplified with single Epic 3 link
+  - All guides now follow J_MESSAGES_* naming convention
 
 ### Technical Debt
 
