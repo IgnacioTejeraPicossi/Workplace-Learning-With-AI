@@ -419,12 +419,28 @@ const RunTest = () => {
           // NEW: Enhanced Route endpoint
           { name: 'POST /route', endpoint: '/route', method: 'POST', requiresAuth: true },
           
-          // NEW: J-messages Analyzer endpoints
+          // J-messages Analyzer - Basic endpoints
           { name: 'GET /api/j-messages/list', endpoint: '/api/j-messages/list', method: 'GET', requiresAuth: false },
           { name: 'POST /api/j-messages/save', endpoint: '/api/j-messages/save', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/analyze-note', endpoint: '/api/j-messages/analyze-note', method: 'POST', requiresAuth: false },
           { name: 'POST /api/j-messages/export-docx', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
+          { name: 'PUT /api/j-messages/update/{doc_id}', endpoint: '/api/j-messages/update/693fd9d0515760268dae14ec', method: 'PUT', requiresAuth: false },
+          { name: 'DELETE /api/j-messages/delete/{doc_id}', endpoint: '/api/j-messages/delete/test-doc-id', method: 'DELETE', requiresAuth: false },
           
-          // NEW: J-messages Analyzer MCP endpoints
+          // J-messages Training - Retrospective Learning (Epic 3)
+          { name: 'GET /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'POST', requiresAuth: false },
+          { name: 'PATCH /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'PATCH', requiresAuth: false },
+          { name: 'DELETE /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'DELETE', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/import', endpoint: '/api/j-messages/training/import', method: 'POST', requiresAuth: false },
+          { name: 'GET /api/j-messages/training/stats/summary', endpoint: '/api/j-messages/training/stats/summary', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/{id}/evaluate', endpoint: '/api/j-messages/training/test-pair-id/evaluate', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/evaluate-batch', endpoint: '/api/j-messages/training/evaluate-batch', method: 'POST', requiresAuth: false },
+          { name: 'GET /api/j-messages/training/{id}/evaluation', endpoint: '/api/j-messages/training/test-pair-id/evaluation', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/prompt/suggest', endpoint: '/api/j-messages/training/prompt/suggest', method: 'POST', requiresAuth: false },
+          
+          // J-messages MCP endpoints
           { name: 'GET /api/mcp/manifest', endpoint: '/api/mcp/manifest', method: 'GET', requiresAuth: false },
           { name: 'POST /api/mcp/j-messages/analyze', endpoint: '/api/mcp/j-messages/analyze', method: 'POST', requiresAuth: false },
     ];
@@ -498,6 +514,7 @@ const RunTest = () => {
         } else {
           // Prepare test data based on endpoint
           let testData = {};
+          const method = api.method; // Get HTTP method for conditional test data
           
           switch (api.endpoint) {
             case '/micro-lesson':
@@ -884,6 +901,90 @@ const RunTest = () => {
                 summary_length: 'short'
               };
               break;
+            case '/api/j-messages/analyze-note':
+              testData = {
+                j_id: 'J-TEST-2025',
+                title: 'Test Note for J-195-2025',
+                note_type: 'addendum',
+                target_j_id: 'J-195-2025',
+                valid_from: '2025-01-15',
+                affected_sections: ['§ 1', 'Kapittel 2'],
+                actions: ['amend', 'add'],
+                body_html: '<h2>Amendment</h2><p>This is a test note.</p>',
+                raw_text: 'Amendment\n\nThis is a test note.'
+              };
+              break;
+            case '/api/j-messages/update/693fd9d0515760268dae14ec':
+              testData = {
+                title: 'Updated Test J-melding',
+                status: 'Utgått',
+                categories: ['Updated Category']
+              };
+              break;
+            // J-messages Training endpoints
+            case '/api/j-messages/training':
+              if (method === 'POST') {
+                testData = {
+                  j_id: 'J-TEST-TRAIN-2025',
+                  title: 'Test Training Pair',
+                  source_system_id: 'enonic-test-123',
+                  original: {
+                    text_excerpt: 'This is the original document text for training...',
+                    doc_type: 'docx'
+                  },
+                  human_structured: {
+                    metadata: {
+                      j_id: 'J-TEST-TRAIN-2025',
+                      title: 'Test Training Pair',
+                      status: 'Fastsatt',
+                      categories: ['Test', 'Training']
+                    },
+                    toc: [],
+                    body_html: '<h1>Test</h1>'
+                  },
+                  tags: ['test', 'api-testing']
+                };
+              }
+              break;
+            case '/api/j-messages/training/test-pair-id':
+              if (method === 'PATCH') {
+                testData = {
+                  tags: ['updated', 'test']
+                };
+              }
+              break;
+            case '/api/j-messages/training/import':
+              testData = {
+                items: [
+                  {
+                    j_id: 'J-IMPORT-TEST-2025',
+                    title: 'Import Test Document',
+                    original: { text_excerpt: 'Test content...' },
+                    human_structured: {
+                      metadata: {
+                        j_id: 'J-IMPORT-TEST-2025',
+                        title: 'Import Test Document'
+                      }
+                    }
+                  }
+                ],
+                source: 'api-test-import'
+              };
+              break;
+            case '/api/j-messages/training/test-pair-id/evaluate':
+              testData = {}; // No body needed for evaluation
+              break;
+            case '/api/j-messages/training/evaluate-batch':
+              testData = {
+                pair_ids: ['test-pair-id-1', 'test-pair-id-2']
+              };
+              break;
+            case '/api/j-messages/training/prompt/suggest':
+              testData = {
+                num_examples: 3,
+                focus_on_errors: true
+              };
+              break;
             default:
               testData = { query: 'test query' };
           }
@@ -1012,6 +1113,27 @@ const RunTest = () => {
           status = 'requires_setup';
           statusCode = '⚠️ Requires Setup';
           errorMessage = 'Test file server not running. Start with: cd backend && python test_mcp_server.py (port 8888)';
+        }
+        
+        // Special handling for J-messages Training endpoints that need real IDs
+        if (api.endpoint.includes('/api/j-messages/training/test-pair-id') && statusCode === 404) {
+          status = 'expected_fail';
+          statusCode = '404 (Expected)';
+          errorMessage = 'Test pair ID does not exist (expected - endpoint validates correctly)';
+        }
+        
+        // Special handling for prompt suggestion endpoint (needs evaluated pairs)
+        if (api.endpoint === '/api/j-messages/training/prompt/suggest' && statusCode === 400) {
+          status = 'expected_fail';
+          statusCode = '400 (Expected)';
+          errorMessage = 'No evaluated training pairs found (expected - run evaluation first)';
+        }
+        
+        // Special handling for DELETE endpoints that may not find test data
+        if (api.endpoint.includes('/delete/') && statusCode === 404) {
+          status = 'expected_fail';
+          statusCode = '404 (Expected)';
+          errorMessage = 'Test document not found (expected - endpoint validates correctly)';
         }
         
         results.push({
@@ -1207,7 +1329,9 @@ const RunTest = () => {
               <li>AI Career Coach (open module)</li>
               <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
               <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
-              <li>J-messages Analyzer (list, save, analyze-note, export, MCP manifest & analyze)</li>
+              <li>J-messages Analyzer - Basic (list, save, analyze-note, export, update, delete)</li>
+              <li>J-messages Training - Epic 3 (list, get, create, update, delete, import, stats, evaluate, evaluate-batch, get-evaluation, prompt-suggest)</li>
+              <li>J-messages MCP (manifest, analyze)</li>
               <li>Map of Knowledge (search input, counter, web search panel)</li>
               <li>Certifications (tab navigation)</li>
               <li>Team Dynamics (header + auth banner)</li>
