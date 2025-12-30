@@ -92,7 +92,8 @@ async def get_itemai_completion(request: ItemAICompletionRequest):
             "stream": False
         }
         
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # Timeout increased to 240s for large context windows (8K+ tokens)
+        async with httpx.AsyncClient(timeout=240.0) as client:
             response = await client.post(
                 f"{request.local_url}/v1/chat/completions",
                 json=payload,
@@ -121,7 +122,7 @@ async def get_itemai_completion(request: ItemAICompletionRequest):
         return ItemAIResponse(
             success=False,
             message="ItemAI API request timed out",
-            error="Request timed out after 30 seconds"
+            error="Request timed out after 240 seconds. Consider using a smaller model or cloud AI for large documents."
         )
     except Exception as e:
         return ItemAIResponse(

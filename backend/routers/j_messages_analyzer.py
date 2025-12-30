@@ -156,22 +156,26 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
 
 
 def build_metadata_prompt(header_text: str, body_text: str) -> str:
-    return f"""
-Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
+    return f"""Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
 Du får teksten fra en J-melding (header + starten på forskriften).
-Trekk ut metadata og returner KUN STRICT JSON uten kommentarer.
-Felt:
-- j_id
-- title
-- replaces_id
-- status
-- valid_from
-- valid_to
-- categories
+
+VIKTIG: Returner KUN et JSON-objekt, ingen annen tekst. Ikke bruk <think>, ikke forklar, bare JSON.
+
+Ekstrakta metadata i dette formatet:
+{{
+  "j_id": "J-xxx-yyyy",
+  "title": "tittel fra dokument",
+  "replaces_id": "J-xxx-yyyy hvis nevnt, ellers null",
+  "status": "aktiv/inaktiv/opphevet",
+  "valid_from": "YYYY-MM-DD eller null",
+  "valid_to": "YYYY-MM-DD eller null",
+  "categories": ["kategori1", "kategori2"]
+}}
 
 Tekst:
 \"\"\"{header_text}\n\n{body_text[:4000]}\"\"\"
-"""
+
+Returner NÅ kun JSON-objektet:"""
 
 
 def analyze_text_content(text_content: str, request_headers: Dict[str, str] = None) -> Dict[str, Any]:
@@ -328,6 +332,9 @@ async def analyze_j_message(
                 # Try to extract JSON from response (may be wrapped in markdown or have extra text)
                 json_str = response.strip()
                 
+                # Remove XML-like tags that some models add (e.g., <think>, <answer>)
+                json_str = re.sub(r'<[^>]+>', '', json_str)
+                
                 # Remove markdown code blocks if present
                 if "```" in json_str:
                     # Extract content between ```json and ```
@@ -338,10 +345,17 @@ async def analyze_j_message(
                         # Fallback: remove all ``` blocks
                         json_str = re.sub(r'```[^`]*```', '', json_str).strip()
                 
-                # Try to find JSON object in the string
-                json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
-                if json_match:
-                    json_str = json_match.group(0)
+                # Remove any text before the first '{' and after the last '}'
+                first_brace = json_str.find('{')
+                last_brace = json_str.rfind('}')
+                if first_brace != -1 and last_brace != -1:
+                    json_str = json_str[first_brace:last_brace + 1]
+                
+                # Try to find JSON object in the string (more robust regex)
+                if not json_str.startswith('{'):
+                    json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
+                    if json_match:
+                        json_str = json_match.group(0)
                 
                 parsed = json.loads(json_str)
                 if isinstance(parsed, dict):
@@ -533,19 +547,25 @@ async def delete_j_message(doc_id: str):
 
 
 def build_note_prompt(body_text: str) -> str:
-    return f"""
-You analyze Norwegian J-melding notes (short addendums to a base J‑melding).
-Extract STRICT JSON with:
-- target_j_id: the J‑melding ID this note modifies (e.g., "J-195-2025"), or null if unknown
-- note_type: "addendum" | "correction" | "extension" | "cancellation" | "other"
-- valid_from: YYYY-MM-DD or null
-- valid_to: YYYY-MM-DD or null
-- affected_sections: array of strings listing affected chapters/paragraphs (e.g., "Kapittel 1", "§ 7 (sjette ledd)")
-- actions: array of verbs like ["amend","replace","add","repeal"]
-- summary: short human-readable summary of what the note changes
+    return f"""You analyze Norwegian J-melding notes (short addendums to a base J‑melding).
+
+IMPORTANT: Return ONLY a JSON object, no other text. Do not use <think>, do not explain, just JSON.
+
+Extract metadata in this format:
+{{
+  "target_j_id": "J-195-2025 or null",
+  "note_type": "addendum|correction|extension|cancellation|other",
+  "valid_from": "YYYY-MM-DD or null",
+  "valid_to": "YYYY-MM-DD or null",
+  "affected_sections": ["Kapittel 1", "§ 7"],
+  "actions": ["amend", "replace", "add", "repeal"],
+  "summary": "brief summary of changes"
+}}
+
 Text:
 \"\"\"{body_text[:12000]}\"\"\"
-"""
+
+Return ONLY the JSON object now:"""
 
 
 @router.post("/analyze-note")
