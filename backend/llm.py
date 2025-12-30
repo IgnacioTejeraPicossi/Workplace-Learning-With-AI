@@ -957,8 +957,9 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             }
         
         # Make request to local LM Studio
-        # Timeout increased to 240s (4 minutes) for large context windows (8K+ tokens)
-        with httpx.Client(timeout=240.0) as client:
+        # Timeout: 360s (6 minutes) for very large context windows (8K+ tokens)
+        # Note: This is very slow. Consider using OpenAI for large documents.
+        with httpx.Client(timeout=360.0) as client:
             response = client.post(
                 f"{local_url}/v1/chat/completions",
                 json=payload,
