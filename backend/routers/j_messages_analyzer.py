@@ -155,6 +155,62 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
     return toc, "\n".join(html_parts)
 
 
+def extract_json_from_llm_response(response: str) -> dict:
+    """
+    Robust JSON parser for LLM responses.
+    Handles responses with extra text, XML tags, markdown, etc.
+    
+    Args:
+        response: Raw LLM response that should contain JSON
+        
+    Returns:
+        Parsed JSON dict, or empty dict if parsing fails
+    """
+    import json
+    import re
+    
+    try:
+        json_str = response.strip()
+        
+        # Remove XML-like tags that some models add (e.g., <think>, <answer>)
+        json_str = re.sub(r'<[^>]+>', '', json_str)
+        
+        # Remove markdown code blocks if present
+        if "```" in json_str:
+            match = re.search(r'```(?:json)?\s*(.*?)\s*```', json_str, re.DOTALL)
+            if match:
+                json_str = match.group(1).strip()
+            else:
+                json_str = re.sub(r'```[^`]*```', '', json_str).strip()
+        
+        # Extract content between first '{' and last '}'
+        first_brace = json_str.find('{')
+        last_brace = json_str.rfind('}')
+        if first_brace != -1 and last_brace != -1:
+            json_str = json_str[first_brace:last_brace + 1]
+        
+        # Try to find JSON object if still not starting with '{'
+        if not json_str.startswith('{'):
+            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+        
+        parsed = json.loads(json_str)
+        if isinstance(parsed, dict):
+            return parsed
+        else:
+            print(f"[JSON_PARSER] ⚠️ Parsed value is not a dict: {type(parsed)}")
+            return {}
+            
+    except json.JSONDecodeError as e:
+        print(f"[JSON_PARSER] ❌ Failed to parse JSON: {e}")
+        print(f"[JSON_PARSER] Response preview: {response[:300]}...")
+        return {}
+    except Exception as e:
+        print(f"[JSON_PARSER] ❌ Unexpected error: {e}")
+        return {}
+
+
 def build_metadata_prompt(header_text: str, body_text: str) -> str:
     return f"""Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
 Du får teksten fra en J-melding (header + starten på forskriften).
@@ -325,53 +381,14 @@ async def analyze_j_message(
                 messages=None,
                 request_headers=request_headers_dict
             )
-            # Attempt to parse JSON
-            try:
-                import json
-                import re
-                # Try to extract JSON from response (may be wrapped in markdown or have extra text)
-                json_str = response.strip()
-                
-                # Remove XML-like tags that some models add (e.g., <think>, <answer>)
-                json_str = re.sub(r'<[^>]+>', '', json_str)
-                
-                # Remove markdown code blocks if present
-                if "```" in json_str:
-                    # Extract content between ```json and ```
-                    match = re.search(r'```(?:json)?\s*(.*?)\s*```', json_str, re.DOTALL)
-                    if match:
-                        json_str = match.group(1).strip()
-                    else:
-                        # Fallback: remove all ``` blocks
-                        json_str = re.sub(r'```[^`]*```', '', json_str).strip()
-                
-                # Remove any text before the first '{' and after the last '}'
-                first_brace = json_str.find('{')
-                last_brace = json_str.rfind('}')
-                if first_brace != -1 and last_brace != -1:
-                    json_str = json_str[first_brace:last_brace + 1]
-                
-                # Try to find JSON object in the string (more robust regex)
-                if not json_str.startswith('{'):
-                    json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
-                    if json_match:
-                        json_str = json_match.group(0)
-                
-                parsed = json.loads(json_str)
-                if isinstance(parsed, dict):
-                    metadata.update(parsed)
-                    print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
-                    print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}")
-                else:
-                    print(f"[J-MESSAGES] ⚠️ LLM response is not a dict: {type(parsed)}")
-            except json.JSONDecodeError as e:
-                print(f"[J-MESSAGES] ❌ Failed to parse JSON from LLM response: {e}")
-                print(f"[J-MESSAGES] Response preview: {response[:300]}...")
-                # Leave defaults if parsing fails; front-end can still render
-            except Exception as e:
-                print(f"[J-MESSAGES] ❌ Unexpected error parsing metadata: {e}")
-                import traceback
-                traceback.print_exc()
+            # Parse JSON using robust helper function
+            parsed = extract_json_from_llm_response(response)
+            if parsed:
+                metadata.update(parsed)
+                print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
+                print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}")
+            else:
+                print(f"[J-MESSAGES] ⚠️ Failed to extract JSON from LLM response")
                 # Leave defaults if parsing fails; front-end can still render
             # Optional summary
             if summary_length:
@@ -611,13 +628,13 @@ async def analyze_j_note(request: Request, file: UploadFile = File(...)):
                 messages=None,
                 request_headers=dict(request.headers)
             )
-            try:
-                import json
-                parsed = json.loads(resp)
-                if isinstance(parsed, dict):
-                    note_data.update(parsed)
-            except Exception:
-                pass
+            # Parse JSON using robust helper function
+            parsed = extract_json_from_llm_response(resp)
+            if parsed:
+                note_data.update(parsed)
+                print(f"[J-MESSAGES NOTE] ✅ Successfully parsed note data")
+            else:
+                print(f"[J-MESSAGES NOTE] ⚠️ Failed to extract JSON from LLM response")
     except Exception as e:
         print(f"[J-MESSAGES NOTE] extraction failed: {e}")
 
