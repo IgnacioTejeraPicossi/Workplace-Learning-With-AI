@@ -169,11 +169,24 @@ def extract_json_from_llm_response(response: str) -> dict:
     import json
     import re
     
+    # Check for empty or very short responses
+    if not response or len(response.strip()) < 10:
+        print(f"[JSON_PARSER] ⚠️ Response is empty or too short (len={len(response)})")
+        print(f"[JSON_PARSER] Raw response: '{response}'")
+        return {}
+    
     try:
         json_str = response.strip()
+        original_length = len(json_str)
         
         # Remove XML-like tags that some models add (e.g., <think>, <answer>)
         json_str = re.sub(r'<[^>]+>', '', json_str)
+        
+        # Check if response was ONLY tags (nothing left after removing them)
+        if len(json_str.strip()) < 5:
+            print(f"[JSON_PARSER] ⚠️ Response contained only XML tags, no actual content")
+            print(f"[JSON_PARSER] Original ({original_length} chars): {response[:500]}")
+            return {}
         
         # Remove markdown code blocks if present
         if "```" in json_str:
@@ -188,6 +201,11 @@ def extract_json_from_llm_response(response: str) -> dict:
         last_brace = json_str.rfind('}')
         if first_brace != -1 and last_brace != -1:
             json_str = json_str[first_brace:last_brace + 1]
+        else:
+            # No braces found - not valid JSON
+            print(f"[JSON_PARSER] ⚠️ No JSON object found in response")
+            print(f"[JSON_PARSER] Cleaned text: {json_str[:500]}...")
+            return {}
         
         # Try to find JSON object if still not starting with '{'
         if not json_str.startswith('{'):
@@ -204,34 +222,35 @@ def extract_json_from_llm_response(response: str) -> dict:
             
     except json.JSONDecodeError as e:
         print(f"[JSON_PARSER] ❌ Failed to parse JSON: {e}")
-        print(f"[JSON_PARSER] Response preview: {response[:300]}...")
+        print(f"[JSON_PARSER] Response length: {len(response)} chars")
+        print(f"[JSON_PARSER] First 500 chars: {response[:500]}")
+        print(f"[JSON_PARSER] Last 200 chars: {response[-200:]}")
         return {}
     except Exception as e:
         print(f"[JSON_PARSER] ❌ Unexpected error: {e}")
+        print(f"[JSON_PARSER] Response: {response[:500]}")
         return {}
 
 
 def build_metadata_prompt(header_text: str, body_text: str) -> str:
-    return f"""Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
-Du får teksten fra en J-melding (header + starten på forskriften).
+    return f"""Extract metadata from this Norwegian fishing regulation document.
+Return ONLY valid JSON. No explanations, no thinking, just JSON.
 
-VIKTIG: Returner KUN et JSON-objekt, ingen annen tekst. Ikke bruk <think>, ikke forklar, bare JSON.
-
-Ekstrakta metadata i dette formatet:
+Required JSON format:
 {{
-  "j_id": "J-xxx-yyyy",
-  "title": "tittel fra dokument",
-  "replaces_id": "J-xxx-yyyy hvis nevnt, ellers null",
-  "status": "aktiv/inaktiv/opphevet",
-  "valid_from": "YYYY-MM-DD eller null",
-  "valid_to": "YYYY-MM-DD eller null",
-  "categories": ["kategori1", "kategori2"]
+  "j_id": "J-XXX-YYYY",
+  "title": "document title",
+  "replaces_id": "J-XXX-YYYY or null",
+  "status": "active/inactive/repealed",
+  "valid_from": "YYYY-MM-DD or null",
+  "valid_to": "YYYY-MM-DD or null",
+  "categories": ["category1", "category2"]
 }}
 
-Tekst:
+Document text:
 \"\"\"{header_text}\n\n{body_text[:4000]}\"\"\"
 
-Returner NÅ kun JSON-objektet:"""
+JSON:"""
 
 
 def analyze_text_content(text_content: str, request_headers: Dict[str, str] = None) -> Dict[str, Any]:
@@ -564,25 +583,24 @@ async def delete_j_message(doc_id: str):
 
 
 def build_note_prompt(body_text: str) -> str:
-    return f"""You analyze Norwegian J-melding notes (short addendums to a base J‑melding).
+    return f"""Extract note metadata from this Norwegian J-melding addendum document.
+Return ONLY valid JSON. No explanations, no thinking, just JSON.
 
-IMPORTANT: Return ONLY a JSON object, no other text. Do not use <think>, do not explain, just JSON.
-
-Extract metadata in this format:
+Required JSON format:
 {{
-  "target_j_id": "J-195-2025 or null",
-  "note_type": "addendum|correction|extension|cancellation|other",
-  "valid_from": "YYYY-MM-DD or null",
-  "valid_to": "YYYY-MM-DD or null",
-  "affected_sections": ["Kapittel 1", "§ 7"],
-  "actions": ["amend", "replace", "add", "repeal"],
-  "summary": "brief summary of changes"
+  "target_j_id": "J-XXX-YYYY",
+  "note_type": "addendum",
+  "valid_from": "YYYY-MM-DD",
+  "valid_to": "YYYY-MM-DD",
+  "affected_sections": ["Chapter 1", "§ 7"],
+  "actions": ["amend", "replace"],
+  "summary": "Brief change description"
 }}
 
-Text:
+Document text:
 \"\"\"{body_text[:12000]}\"\"\"
 
-Return ONLY the JSON object now:"""
+JSON:"""
 
 
 @router.post("/analyze-note")
