@@ -153,7 +153,7 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
     logger.info("analyze_j_melding called via MCP", extra={"file_url": file_url, "summary_length": summary_length})
     
     try:
-        # 1) Download the file from URL
+        # 1) Download the file from URL (60s timeout for download)
         async with httpx.AsyncClient(timeout=60.0) as client:
             file_resp = await client.get(file_url)
             if file_resp.status_code != 200:
@@ -171,8 +171,10 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                 filename = "j-melding.docx"
             elif ".pdf" in file_url.lower() or "pdf" in content_type:
                 filename = "j-melding.pdf"
-            
-            # 2) Call internal analyzer API
+        
+        # 2) Call internal analyzer API with extended timeout (420s = 7 minutes)
+        # LM Studio can take 2-6 minutes to analyze documents
+        async with httpx.AsyncClient(timeout=420.0) as client:
             # We need to make a multipart/form-data request to /api/j-messages/analyze
             base_url = str(request.base_url).rstrip("/")
             analyzer_url = f"{base_url}/api/j-messages/analyze"

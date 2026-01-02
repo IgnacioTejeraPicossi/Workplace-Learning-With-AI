@@ -82,7 +82,8 @@ async def handle_mcp_request(request: Dict[str, Any]) -> Dict[str, Any]:
             
             # Map tool calls to HTTP endpoints
             if tool_name == "analyze_j_melding":
-                async with httpx.AsyncClient(timeout=60.0) as client:
+                # Extended timeout for LM Studio analysis (420s = 7 minutes)
+                async with httpx.AsyncClient(timeout=420.0) as client:
                     resp = await client.post(
                         f"{MCP_BASE_URL}/api/mcp/j-messages/analyze",
                         json=arguments,
