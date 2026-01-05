@@ -241,6 +241,63 @@ export default function JMessagesPairsLibrary() {
     return searchText.includes(query.toLowerCase());
   });
 
+  const highlightDifferences = (humanHtml, aiHtml) => {
+    if (!humanHtml || !aiHtml) return aiHtml;
+    
+    // Extraer texto plano de ambos HTML
+    const tempDiv1 = document.createElement('div');
+    const tempDiv2 = document.createElement('div');
+    tempDiv1.innerHTML = humanHtml;
+    tempDiv2.innerHTML = aiHtml;
+    
+    const humanText = (tempDiv1.textContent || tempDiv1.innerText || '').trim();
+    const aiText = (tempDiv2.textContent || tempDiv2.innerText || '').trim();
+    
+    if (humanText === aiText) return aiHtml;
+    
+    // Comparar palabra por palabra
+    const humanWords = humanText.split(/\s+/);
+    const aiWords = aiText.split(/\s+/);
+    const humanWordSet = new Set(humanWords.map(w => w.toLowerCase()));
+    
+    // Marcar palabras diferentes en el HTML de AI
+    let result = aiHtml;
+    const processedIndices = new Set();
+    
+    aiWords.forEach((word) => {
+      if (word && !humanWordSet.has(word.toLowerCase())) {
+        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b(${escaped})\\b`, 'gi');
+        let match;
+        let searchStart = 0;
+        
+        while ((match = regex.exec(result.substring(searchStart))) !== null) {
+          const actualIndex = searchStart + match.index;
+          
+          // Verificar que no estemos dentro de un tag HTML
+          const beforeMatch = result.substring(0, actualIndex);
+          const lastTag = beforeMatch.lastIndexOf('<');
+          const lastTagClose = beforeMatch.lastIndexOf('>');
+          
+          if (lastTag <= lastTagClose) {
+            // No estamos dentro de un tag, resaltar
+            const before = result.substring(0, actualIndex);
+            const after = result.substring(actualIndex + match[0].length);
+            result = before + 
+              `<span style="background-color: #fee2e2; color: #dc2626; font-weight: 600;">${match[0]}</span>` + 
+              after;
+            searchStart = actualIndex + match[0].length + 100; // Saltar el span agregado
+            break;
+          } else {
+            searchStart = actualIndex + match[0].length;
+          }
+        }
+      }
+    });
+    
+    return result;
+  };
+
   const renderSideBySide = (pair) => {
     // Extract original text (supports both old and new format)
     const originalText = pair.original?.text_excerpt || pair.original || '';
@@ -344,7 +401,7 @@ export default function JMessagesPairsLibrary() {
               overflow: 'auto',
               background: colors.background
             }}>
-              <div dangerouslySetInnerHTML={{ __html: aiHtml }} />
+              <div dangerouslySetInnerHTML={{ __html: highlightDifferences(analyzedHtml, aiHtml) }} />
             </div>
           </div>
         )}
