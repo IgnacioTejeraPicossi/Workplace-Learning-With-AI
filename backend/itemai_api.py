@@ -92,8 +92,8 @@ async def get_itemai_completion(request: ItemAICompletionRequest):
             "stream": False
         }
         
-        # Timeout: 360s (6 minutes) for very large context windows (8K+ tokens)
-        async with httpx.AsyncClient(timeout=360.0) as client:
+        # Timeout: 420s (7 minutes) to match MCP server timeout
+        async with httpx.AsyncClient(timeout=420.0) as client:
             response = await client.post(
                 f"{request.local_url}/v1/chat/completions",
                 json=payload,
@@ -122,7 +122,7 @@ async def get_itemai_completion(request: ItemAICompletionRequest):
         return ItemAIResponse(
             success=False,
             message="ItemAI API request timed out",
-            error="Request timed out after 360 seconds (6 minutes). Consider reducing Context Length in LM Studio (e.g., 4096 or 6144 tokens) or using cloud AI for large documents."
+            error="Request timed out after 420 seconds (7 minutes). Consider reducing Context Length in LM Studio (e.g., 4096 or 6144 tokens) or using cloud AI for large documents."
         )
     except Exception as e:
         return ItemAIResponse(
