@@ -21,6 +21,7 @@ build/
 
 # API Configuration files (may contain sensitive examples)
 backend/API_SETUP.md
+api_config.json
 
 # IDE files
 .idea/
