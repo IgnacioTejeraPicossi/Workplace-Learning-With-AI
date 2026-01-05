@@ -344,6 +344,15 @@ async def analyze_j_message(
     - body_html (with ids matching toc anchors)
     - raw_text (body only)
     """
+    # Log incoming request info (for MCP debugging)
+    request_headers_dict = dict(request.headers) if request else {}
+    api_provider_header = request_headers_dict.get("x-api-provider", "NOT SET")
+    itemai_url_header = request_headers_dict.get("x-itemai-url", "NOT SET")
+    print(f"[J-MESSAGES ANALYZE] Request received")
+    print(f"[J-MESSAGES ANALYZE]   x-api-provider: {api_provider_header}")
+    print(f"[J-MESSAGES ANALYZE]   x-itemai-url: {itemai_url_header}")
+    print(f"[J-MESSAGES ANALYZE]   All headers: {list(request_headers_dict.keys())}")
+    
     file_bytes = await file.read()
     filename_lower = (file.filename or "").lower()
 
@@ -377,20 +386,30 @@ async def analyze_j_message(
 
     summary_text: str = ""
 
-    # Prefer unified LLM pipeline if available; otherwise, return without metadata
+            # Prefer unified LLM pipeline if available; otherwise, return without metadata
     try:
         if ask_ai_unified_sync:
             prompt = build_metadata_prompt(header_text, body_text)
             # Ask model for STRICT JSON
             # Pass request headers to allow API config from frontend/MCP
             request_headers_dict = dict(request.headers) if request else {}
-            # Debug: log if we have API config headers
+            
+            # Debug: log API config headers (check for both x-itemai-url and x-itemai-key)
             has_api_config = any(
                 k in request_headers_dict 
-                for k in ["x-api-provider", "x-openai-key", "x-openrouter-key", "x-itemai-key"]
+                for k in ["x-api-provider", "x-openai-key", "x-openrouter-key", "x-itemai-url", "x-itemai-key"]
             )
-            if not has_api_config:
-                print("[J-MESSAGES] No API config headers found, will use .env fallback")
+            
+            if has_api_config:
+                provider = request_headers_dict.get("x-api-provider", "unknown")
+                print(f"[J-MESSAGES] ✅ API config headers found: provider={provider}")
+                if provider == "itemai":
+                    itemai_url = request_headers_dict.get("x-itemai-url", "not set")
+                    print(f"[J-MESSAGES]    → ItemAI URL: {itemai_url}")
+                print(f"[J-MESSAGES]    → All headers: {list(request_headers_dict.keys())}")
+            else:
+                print("[J-MESSAGES] ⚠️ No API config headers found, will use .env fallback")
+                print(f"[J-MESSAGES]    → Available headers: {list(request_headers_dict.keys())}")
             
             response = ask_ai_unified_sync(
                 prompt=prompt + "\nGi svaret som STRICT JSON.",

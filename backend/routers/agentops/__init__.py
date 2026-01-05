@@ -231,32 +231,66 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                     from backend.api_config_storage import get_api_config_for_headers, get_api_config
                     saved_config = get_api_config()
                     saved_headers = get_api_config_for_headers()
+                    
+                    # Log what we're loading
+                    provider = saved_config.get("provider", "unknown")
+                    logger.info(f"🟢 [MCP] Loading API configuration from SAVED CONFIG FILE (api_config.json)")
+                    logger.info(f"   → Provider found: {provider}")
+                    
+                    # Update headers with saved config
                     headers.update(saved_headers)
                     config_source = "saved_config_file"
                     
-                    provider = saved_config.get("provider", "unknown")
-                    logger.info(f"🟢 [MCP] Using API configuration from SAVED CONFIG FILE (api_config.json)")
-                    logger.info(f"   → Provider: {provider}")
+                    # Detailed logging based on provider
                     if provider == "itemai":
-                        logger.info(f"   → ItemAI URL: {saved_config.get('itemai_url', 'N/A')}")
+                        itemai_url = saved_config.get('itemai_url', 'http://localhost:1234')
+                        logger.info(f"   → ItemAI URL: {itemai_url}")
+                        logger.info(f"   → Headers being sent: {list(headers.keys())}")
+                        # Ensure x-api-provider is set
+                        if "x-api-provider" not in headers:
+                            headers["x-api-provider"] = "itemai"
+                            logger.warning(f"   ⚠️ x-api-provider was missing, added it")
+                        # Ensure x-itemai-url is set
+                        if "x-itemai-url" not in headers and itemai_url:
+                            headers["x-itemai-url"] = itemai_url
+                            logger.warning(f"   ⚠️ x-itemai-url was missing, added it")
                     elif provider == "openai":
                         has_key = bool(saved_config.get("openai_key"))
                         logger.info(f"   → OpenAI key: {'present' if has_key else 'not set (will use .env)'}")
+                        if "x-api-provider" not in headers:
+                            headers["x-api-provider"] = "openai"
                     elif provider == "openrouter":
                         has_key = bool(saved_config.get("openrouter_key"))
                         logger.info(f"   → OpenRouter key: {'present' if has_key else 'not set (will use .env)'}")
+                        if "x-api-provider" not in headers:
+                            headers["x-api-provider"] = "openrouter"
                 except Exception as e:
                     config_source = "env_fallback"
                     logger.warning(f"🟡 [MCP] Could not load saved API config: {e}")
+                    logger.warning(f"   → Exception type: {type(e).__name__}")
+                    logger.warning(f"   → Exception details: {str(e)}")
                     logger.info(f"   → Falling back to .env file")
+                    # Try to read provider from .env as fallback
+                    import os
+                    env_provider = os.getenv("API_PROVIDER", "openai").lower()
+                    if env_provider == "itemai":
+                        headers["x-api-provider"] = "itemai"
+                        headers["x-itemai-url"] = os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234")
+                        logger.info(f"   → Using ItemAI from .env: {headers.get('x-itemai-url')}")
                     # Will fall back to .env in get_api_config_from_headers()
             
-            # Log headers being sent for debugging
+            # Log headers being sent for debugging (ALWAYS log this)
             logger.info(f"📤 [MCP] Calling internal analyzer with config from: {config_source}")
+            logger.info(f"   → Headers being sent: {list(headers.keys())}")
+            if "x-api-provider" in headers:
+                logger.info(f"   → API Provider: {headers['x-api-provider']}")
+            if "x-itemai-url" in headers:
+                logger.info(f"   → ItemAI URL: {headers['x-itemai-url']}")
             logger.debug("MCP calling internal analyzer", extra={
                 "url": analyzer_url,
                 "headers_present": list(headers.keys()),
                 "has_openai_key": "x-openai-key" in headers,
+                "has_itemai_url": "x-itemai-url" in headers,
                 "config_source": config_source
             })
             
