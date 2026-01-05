@@ -102,6 +102,31 @@ export default function JMessagesPairsLibrary() {
     }
   };
 
+  const handleDelete = async (pairId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this training pair? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const resp = await fetchWithAuth(`/api/j-messages/training/${pairId}`, {
+        method: 'DELETE'
+      });
+      
+      if (resp.ok) {
+        // Remove from local state
+        setPairs(prev => prev.filter(p => p.id !== pairId));
+        setSelectedPair(null);
+        loadStats();
+      } else {
+        const data = await resp.json();
+        setError(`Failed to delete pair: ${data.detail || 'Unknown error'}`);
+      }
+    } catch (e) {
+      setError(`Error deleting pair: ${String(e)}`);
+    }
+  };
+
   const getEvaluationStatus = (pair) => {
     if (!pair.evaluation) return null;
     
@@ -562,26 +587,44 @@ export default function JMessagesPairsLibrary() {
                 </div>
                 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', marginLeft: 12 }}>
                   {tab === 'training' && (
-                    <button
-                      onClick={(e) => runEvaluation(pair.id, e)}
-                      disabled={evaluating[pair.id]}
-                      style={{
-                        background: evaluating[pair.id] ? colors.border : '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 6,
-                        padding: '6px 12px',
-                        cursor: evaluating[pair.id] ? 'not-allowed' : 'pointer',
-                        fontSize: 12,
-                        fontWeight: 500,
-                        opacity: evaluating[pair.id] ? 0.6 : 1
-                      }}
-                      title="Run AI evaluation on this pair"
-                    >
-                      {evaluating[pair.id] ? '⏳' : '🤖'} Evaluate
-                    </button>
+                    <>
+                      <button
+                        onClick={(e) => runEvaluation(pair.id, e)}
+                        disabled={evaluating[pair.id]}
+                        style={{
+                          background: evaluating[pair.id] ? colors.border : '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 12px',
+                          cursor: evaluating[pair.id] ? 'not-allowed' : 'pointer',
+                          fontSize: 12,
+                          fontWeight: 500,
+                          opacity: evaluating[pair.id] ? 0.6 : 1
+                        }}
+                        title="Run AI evaluation on this pair"
+                      >
+                        {evaluating[pair.id] ? '⏳' : '🤖'} Evaluate
+                      </button>
+                      <button
+                        onClick={(e) => handleDelete(pair.id, e)}
+                        style={{
+                          background: '#dc2626',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 12px',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 500
+                        }}
+                        title="Delete this training pair"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </>
                   )}
                   <div style={{ 
                     color: colors.primary,
