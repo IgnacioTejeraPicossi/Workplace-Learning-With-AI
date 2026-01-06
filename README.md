@@ -26,6 +26,34 @@ A specialized module for analyzing Norwegian J‑meldinger (regulations) from Fi
 - [Admin & Development](docs/admin-dev.md)
 - [EA Second Brain Agent](docs/EA_SECOND_BRAIN_AGENT.md)
 
+### 📁 J-messages Analyzer - Project Files
+
+**Backend Routers:**
+- `backend/routers/j_messages_analyzer.py` - Main analyzer API endpoints (analyze, list, export, etc.)
+- `backend/routers/j_messages_training.py` - Training pairs API (create, evaluate, prompt suggestions)
+
+**Backend Services:**
+- `backend/services/j_messages_evaluator.py` - AI evaluation service for comparing AI vs human analysis
+- `backend/services/prompt_suggestion_service.py` - AI-powered prompt improvement suggestions
+
+**Frontend Components:**
+- `frontend/src/JMessagesAnalyzer.jsx` - Main analyzer interface (upload, analyze, view results)
+- `frontend/src/JMessagesLibrary.jsx` - Document library (search, filter, export analyzed documents)
+- `frontend/src/JMessagesPairsLibrary.jsx` - Training pairs library (compare original vs human vs AI analysis)
+- `frontend/src/components/PromptPanel.jsx` - Reusable prompt management component
+
+**Integration Files:**
+- `backend/routers/agentops/__init__.py` - MCP manifest for J-messages analyzer (Postman integration)
+- `frontend/src/Sidebar.jsx` - Navigation menu entries for J-messages module
+
+**Documentation:**
+- `docs/J-messages_Analyzer.md` - Complete module documentation
+
+**Dependencies:**
+- Uses `backend/llm.py` - Unified LLM system (ItemAI/OpenAI/OpenRouter)
+- Uses `backend/db.py` - MongoDB database connection
+- Uses `frontend/src/api.js` - Authentication and API utilities
+
 ---
 
 ## ✍️ Agent Prompt Manager (Compliance & Productivity)
