@@ -194,7 +194,7 @@ const APIConfig = () => {
               {apiProvider === 'itemai' 
                 ? 'Local AI powered by LM Studio - 100% free, 100% private, runs on your own computer with downloaded models.'
                 : apiProvider === 'openai' 
-                ? 'Direct access to OpenAI models (GPT-3.5, GPT-4, etc.) with full control and reliability.'
+                ? 'Direct access to OpenAI models (GPT-5, GPT-4, etc.) with full control and reliability.'
                 : 'Access to multiple AI providers through OpenRouter, often more cost-effective with access to Claude, Gemini, and other models.'
               }
             </p>
