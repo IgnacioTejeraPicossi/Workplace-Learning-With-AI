@@ -341,118 +341,151 @@ export default function JMessagesLibrary() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 {editing[it.id] ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <input
-                      value={editContent[it.id]?.title || ''}
-                      onChange={(e) => handleEditChange(it.id, 'title', e.target.value)}
-                      placeholder="Title"
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: 6,
-                        background: colors.background,
-                        color: colors.text
-                      }}
-                    />
-                    <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                        Title
+                      </label>
                       <input
-                        value={editContent[it.id]?.j_id || ''}
-                        onChange={(e) => handleEditChange(it.id, 'j_id', e.target.value)}
-                        placeholder="J-ID"
+                        value={editContent[it.id]?.title || ''}
+                        onChange={(e) => handleEditChange(it.id, 'title', e.target.value)}
+                        placeholder="Title"
                         style={{
-                          flex: 1,
-                          padding: '6px 10px',
+                          width: '100%',
+                          padding: '8px 12px',
                           border: `1px solid ${colors.border}`,
                           borderRadius: 6,
                           background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
-                        }}
-                      />
-                      <select
-                        value={editContent[it.id]?.status || ''}
-                        onChange={(e) => handleEditChange(it.id, 'status', e.target.value)}
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 6,
-                          background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
-                        }}
-                      >
-                        <option value="">Status</option>
-                        {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
-                      </select>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <input
-                        type="date"
-                        value={editContent[it.id]?.valid_from || ''}
-                        onChange={(e) => handleEditChange(it.id, 'valid_from', e.target.value)}
-                        placeholder="Gyldig fra (YYYY-MM-DD)"
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 6,
-                          background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
-                        }}
-                      />
-                      <input
-                        type="date"
-                        value={editContent[it.id]?.valid_to || ''}
-                        onChange={(e) => handleEditChange(it.id, 'valid_to', e.target.value)}
-                        placeholder="Gyldig til (YYYY-MM-DD)"
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 6,
-                          background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
+                          color: colors.text
                         }}
                       />
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <input
-                        value={editContent[it.id]?.replaces || ''}
-                        onChange={(e) => handleEditChange(it.id, 'replaces', e.target.value)}
-                        placeholder="Erstatter (J-XXX-YYYY)"
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 6,
-                          background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
-                        }}
-                      />
-                      <select
-                        value={editContent[it.id]?.categories?.[0] || ''}
-                        onChange={(e) => {
-                          const selectedCategory = e.target.value;
-                          handleEditChange(it.id, 'categories', selectedCategory ? [selectedCategory] : []);
-                        }}
-                        style={{
-                          flex: 1,
-                          padding: '6px 10px',
-                          border: `1px solid ${colors.border}`,
-                          borderRadius: 6,
-                          background: colors.background,
-                          color: colors.text,
-                          fontSize: 12
-                        }}
-                      >
-                        <option value="">Kategorier</option>
-                        {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          ID
+                        </label>
+                        <input
+                          value={editContent[it.id]?.j_id || ''}
+                          onChange={(e) => handleEditChange(it.id, 'j_id', e.target.value)}
+                          placeholder="J-XXX-YYYY"
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          Status
+                        </label>
+                        <select
+                          value={editContent[it.id]?.status || ''}
+                          onChange={(e) => handleEditChange(it.id, 'status', e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        >
+                          <option value="">Select status</option>
+                          {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          Gyldig fra
+                        </label>
+                        <input
+                          type="date"
+                          value={editContent[it.id]?.valid_from || ''}
+                          onChange={(e) => handleEditChange(it.id, 'valid_from', e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          Gyldig til
+                        </label>
+                        <input
+                          type="date"
+                          value={editContent[it.id]?.valid_to || ''}
+                          onChange={(e) => handleEditChange(it.id, 'valid_to', e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          Erstatter
+                        </label>
+                        <input
+                          value={editContent[it.id]?.replaces || ''}
+                          onChange={(e) => handleEditChange(it.id, 'replaces', e.target.value)}
+                          placeholder="J-XXX-YYYY"
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          Kategorier
+                        </label>
+                        <select
+                          value={editContent[it.id]?.categories?.[0] || ''}
+                          onChange={(e) => {
+                            const selectedCategory = e.target.value;
+                            handleEditChange(it.id, 'categories', selectedCategory ? [selectedCategory] : []);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12
+                          }}
+                        >
+                          <option value="">Select category</option>
+                          {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
                     </div>
                   </div>
                 ) : (
