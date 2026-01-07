@@ -370,10 +370,44 @@ export default function JMessagesLibrary() {
                           fontSize: 12
                         }}
                       />
-                      <input
+                      <select
                         value={editContent[it.id]?.status || ''}
                         onChange={(e) => handleEditChange(it.id, 'status', e.target.value)}
-                        placeholder="Status (Fastsatt/Utgått)"
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      >
+                        <option value="">Status</option>
+                        {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="date"
+                        value={editContent[it.id]?.valid_from || ''}
+                        onChange={(e) => handleEditChange(it.id, 'valid_from', e.target.value)}
+                        placeholder="Gyldig fra (YYYY-MM-DD)"
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      />
+                      <input
+                        type="date"
+                        value={editContent[it.id]?.valid_to || ''}
+                        onChange={(e) => handleEditChange(it.id, 'valid_to', e.target.value)}
+                        placeholder="Gyldig til (YYYY-MM-DD)"
                         style={{
                           flex: 1,
                           padding: '6px 10px',
@@ -385,6 +419,41 @@ export default function JMessagesLibrary() {
                         }}
                       />
                     </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        value={editContent[it.id]?.replaces || ''}
+                        onChange={(e) => handleEditChange(it.id, 'replaces', e.target.value)}
+                        placeholder="Erstatter (J-XXX-YYYY)"
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      />
+                      <select
+                        value={editContent[it.id]?.categories?.[0] || ''}
+                        onChange={(e) => {
+                          const selectedCategory = e.target.value;
+                          handleEditChange(it.id, 'categories', selectedCategory ? [selectedCategory] : []);
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background,
+                          color: colors.text,
+                          fontSize: 12
+                        }}
+                      >
+                        <option value="">Kategorier</option>
+                        {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -394,17 +463,32 @@ export default function JMessagesLibrary() {
                     <div style={{ fontSize: 12, color: colors.textSecondary }}>
                       {it.j_id ? `${it.j_id} • ` : ''}{it.status || ''} {it.valid_from ? `• ${it.valid_from}` : ''} {it.valid_to ? `→ ${it.valid_to}` : ''}
                     </div>
-                    {Array.isArray(it.categories) && it.categories.length > 0 && (
-                      <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {it.categories.map((c, idx) => (
-                          <span key={idx} style={{
-                            background: colors.primaryLight,
-                            color: colors.primary,
+                    {(it.replaces || (Array.isArray(it.categories) && it.categories.length > 0)) && (
+                      <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                        {it.replaces && (
+                          <span style={{
+                            background: '#fef3c7',
+                            color: '#92400e',
                             borderRadius: 999,
                             padding: '2px 8px',
                             fontSize: 12
-                          }}>{c}</span>
-                        ))}
+                          }}>
+                            Erstatter: {it.replaces}
+                          </span>
+                        )}
+                        {Array.isArray(it.categories) && it.categories.length > 0 && (
+                          <>
+                            {it.categories.map((c, idx) => (
+                              <span key={idx} style={{
+                                background: colors.primaryLight,
+                                color: colors.primary,
+                                borderRadius: 999,
+                                padding: '2px 8px',
+                                fontSize: 12
+                              }}>{c}</span>
+                            ))}
+                          </>
+                        )}
                       </div>
                     )}
                   </>
