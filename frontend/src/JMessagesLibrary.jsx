@@ -338,8 +338,8 @@ export default function JMessagesLibrary() {
             borderRadius: 10,
             padding: 12
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24 }}>
+              <div style={{ flex: 1, minWidth: 0, maxWidth: 'calc(100% - 400px)' }}>
                 {editing[it.id] ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     <div>
@@ -356,11 +356,12 @@ export default function JMessagesLibrary() {
                           border: `1px solid ${colors.border}`,
                           borderRadius: 6,
                           background: colors.background,
-                          color: colors.text
+                          color: colors.text,
+                          boxSizing: 'border-box'
                         }}
                       />
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
                           ID
@@ -376,7 +377,8 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         />
                       </div>
@@ -394,7 +396,8 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         >
                           <option value="">Select status</option>
@@ -402,7 +405,7 @@ export default function JMessagesLibrary() {
                         </select>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
                           Gyldig fra
@@ -418,7 +421,8 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         />
                       </div>
@@ -437,12 +441,13 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         />
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
                           Erstatter
@@ -458,7 +463,8 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         />
                       </div>
@@ -479,7 +485,8 @@ export default function JMessagesLibrary() {
                             borderRadius: 6,
                             background: colors.background,
                             color: colors.text,
-                            fontSize: 12
+                            fontSize: 12,
+                            boxSizing: 'border-box'
                           }}
                         >
                           <option value="">Select category</option>
