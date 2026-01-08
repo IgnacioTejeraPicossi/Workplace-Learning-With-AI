@@ -100,10 +100,10 @@ const getNavItems = (t) => [
   ]},
   
   // J-messages Analyzer (nuevo módulo con librería)
-  { key: "j-messages", label: "J-messages Analyzer", icon: "document", group: "learning", isExpandable: true, subItems: [
-    { key: "j-messages-analyzer", label: "J-messages Analyzer", icon: "document-text" },
-    { key: "j-messages-library", label: "J-messages Library", icon: "book" },
-    { key: "j-messages-pairs", label: "J-messages pairs Library", icon: "document-duplicate" }
+  { key: "j-messages", label: t('sidebar.jMessagesAnalyzer.title'), icon: "document", group: "learning", isExpandable: true, subItems: [
+    { key: "j-messages-analyzer", label: t('sidebar.jMessagesAnalyzer.submenu.analyzer'), icon: "document-text" },
+    { key: "j-messages-library", label: t('sidebar.jMessagesAnalyzer.submenu.library'), icon: "book" },
+    { key: "j-messages-pairs", label: t('sidebar.jMessagesAnalyzer.submenu.pairsLibrary'), icon: "document-duplicate" }
   ]},
   
   // Grupo 1.7: Enterprise Architecture (expandible)
