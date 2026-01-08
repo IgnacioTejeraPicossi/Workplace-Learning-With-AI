@@ -497,38 +497,22 @@ export default function JMessagesLibrary() {
                   </div>
                 ) : (
                   <>
-                    <div style={{ fontWeight: 600, color: colors.primary }}>
-                      {it.title || '(untitled)'}
+                    {it.title && (
+                      <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.primary, fontWeight: 600 }}>
+                        {it.title}
+                      </h3>
+                    )}
+                    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
+                      <div><strong>ID:</strong> {it.j_id || '—'}</div>
+                      <div><strong>Status:</strong> {it.status || '—'}</div>
+                      <div><strong>Gyldig fra:</strong> {it.valid_from || '—'}</div>
+                      <div><strong>Gyldig til:</strong> {it.valid_to || '—'}</div>
+                      <div><strong>Erstatter:</strong> {it.replaces || '—'}</div>
                     </div>
-                    <div style={{ fontSize: 12, color: colors.textSecondary }}>
-                      {it.j_id ? `${it.j_id} • ` : ''}{it.status || ''} {it.valid_from ? `• ${it.valid_from}` : ''} {it.valid_to ? `→ ${it.valid_to}` : ''}
-                    </div>
-                    {(it.replaces || (Array.isArray(it.categories) && it.categories.length > 0)) && (
-                      <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                        {it.replaces && (
-                          <span style={{
-                            background: '#fef3c7',
-                            color: '#92400e',
-                            borderRadius: 999,
-                            padding: '2px 8px',
-                            fontSize: 12
-                          }}>
-                            Erstatter: {it.replaces}
-                          </span>
-                        )}
-                        {Array.isArray(it.categories) && it.categories.length > 0 && (
-                          <>
-                            {it.categories.map((c, idx) => (
-                              <span key={idx} style={{
-                                background: colors.primaryLight,
-                                color: colors.primary,
-                                borderRadius: 999,
-                                padding: '2px 8px',
-                                fontSize: 12
-                              }}>{c}</span>
-                            ))}
-                          </>
-                        )}
+                    {Array.isArray(it.categories) && it.categories.length > 0 && (
+                      <div style={{ marginTop: 8, marginBottom: 8 }}>
+                        <strong>Kategorier:</strong>{' '}
+                        {it.categories.join(', ')}
                       </div>
                     )}
                   </>
