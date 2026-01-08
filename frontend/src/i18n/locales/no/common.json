@@ -217,9 +217,9 @@
     },
 
     "jMessagesAnalyzer": {
-      "title": "J-messages Analyzer",
+      "title": "J-meldings Analysator",
       "submenu": {
-        "analyzer": "J-messages Analyzer",
+        "analyzer": "J-meldings Analysator",
         "library": "J-messages bibliotek",
         "pairsLibrary": "J-messages par bibliotek"
       }
@@ -1334,7 +1334,7 @@
   },
   "jMessages": {
     "analyzer": {
-      "title": "J-messages Analyzer",
+      "title": "J-meldings Analysator",
       "description": "Last opp en J-melding (.docx) for å generere metadata, innholdsfortegnelse og hovedinnhold.",
       "dragDrop": "Dra og slipp fil her eller klikk for å bla",
       "supports": "Støtter DOCX/PDF (enkel fil)",
