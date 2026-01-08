@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
 import PromptPanel from './components/PromptPanel';
 
 export default function JMessagesAnalyzer() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -134,12 +136,12 @@ export default function JMessagesAnalyzer() {
       });
       const data = await resp.json();
       if (data.success) {
-        setStatus('✅ Saved to J-messages Library');
+        setStatus(t('jMessages.analyzer.savedToLibrary'));
       } else {
-        setStatus('❌ Save failed');
+        setStatus(t('jMessages.analyzer.saveFailed'));
       }
     } catch (e) {
-      setStatus(`❌ Save failed: ${String(e)}`);
+      setStatus(`${t('jMessages.analyzer.saveFailed')}: ${String(e)}`);
     } finally {
       setTimeout(() => setStatus(''), 2500);
     }
@@ -147,9 +149,9 @@ export default function JMessagesAnalyzer() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h2 style={{ marginBottom: 8 }}>📄 J-messages Analyzer</h2>
+      <h2 style={{ marginBottom: 8 }}>📄 {t('jMessages.analyzer.title')}</h2>
       <p style={{ marginTop: 0, color: colors.textSecondary }}>
-        Last opp en J-melding (.docx) for å generere metadata, innholdsfortegnelse og hovedinnhold.
+        {t('jMessages.analyzer.description')}
       </p>
 
       <div style={headerStyle}>
@@ -174,10 +176,10 @@ export default function JMessagesAnalyzer() {
         >
           <div style={{ fontSize: 36, marginBottom: 8 }}>📁</div>
           <div style={{ fontWeight: 600, color: colors.text }}>
-            {dragActive ? 'Drop file here' : 'Drag & drop file here or click to browse'}
+            {dragActive ? t('jMessages.analyzer.dropFile') : t('jMessages.analyzer.dragDrop')}
           </div>
           <div style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>
-            Supports DOCX/PDF (single file)
+            {t('jMessages.analyzer.supports')}
           </div>
           {file && (
             <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary }}>
@@ -192,7 +194,7 @@ export default function JMessagesAnalyzer() {
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />
-        <span style={{ marginRight: 8 }}>Summary:</span>
+        <span style={{ marginRight: 8 }}>{t('jMessages.analyzer.summary')}:</span>
         <select
           value={summaryLength}
           onChange={(e) => setSummaryLength(e.target.value)}
@@ -205,10 +207,10 @@ export default function JMessagesAnalyzer() {
             color: colors.text
           }}
         >
-          <option value="">None</option>
-          <option value="short">Short (3–5 bullets)</option>
-          <option value="medium">Medium (executive)</option>
-          <option value="long">Long (detailed)</option>
+          <option value="">{t('jMessages.analyzer.summaryNone')}</option>
+          <option value="short">{t('jMessages.analyzer.summaryShort')}</option>
+          <option value="medium">{t('jMessages.analyzer.summaryMedium')}</option>
+          <option value="long">{t('jMessages.analyzer.summaryLong')}</option>
         </select>
         <button
           onClick={onUpload}
@@ -222,7 +224,7 @@ export default function JMessagesAnalyzer() {
             cursor: !file || isLoading ? 'not-allowed' : 'pointer'
           }}
         >
-          {isLoading ? 'Analyserer…' : 'Analyze file'}
+          {isLoading ? t('jMessages.analyzer.analyzing') : t('jMessages.analyzer.analyzeFile')}
         </button>
         <button
           onClick={onUploadNote}
@@ -238,7 +240,7 @@ export default function JMessagesAnalyzer() {
           }}
           title="Analyze a J-melding note (integrates with a base J-melding)"
         >
-          {isLoading ? 'Processing…' : 'Analyze note'}
+          {isLoading ? t('jMessages.analyzer.processing') : t('jMessages.analyzer.analyzeNote')}
         </button>
         {allCategories.length > 0 && (
           <select
@@ -316,7 +318,7 @@ Extract STRICT JSON with:
               justifyContent: 'space-between'
             }}
           >
-            <strong>{showToc ? 'Innhold' : 'Vis innhold'}</strong>
+            <strong>{showToc ? t('jMessages.analyzer.innhold') : t('jMessages.analyzer.showInnhold')}</strong>
             <button
               onClick={() => {
                 if (!showToc) {
@@ -370,15 +372,15 @@ Extract STRICT JSON with:
               </div>
             )}
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-              <div><strong>ID:</strong> {result.id || '—'}</div>
-              <div><strong>Status:</strong> {result.status || '—'}</div>
-              <div><strong>Gyldig fra:</strong> {result.valid_from || '—'}</div>
-              <div><strong>Gyldig til:</strong> {result.valid_to || '—'}</div>
-              <div><strong>Erstatter:</strong> {result.replaces || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.id')}:</strong> {result.id || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.status')}:</strong> {result.status || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.validFrom')}:</strong> {result.valid_from || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.validTo')}:</strong> {result.valid_to || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
             </div>
             {Array.isArray(result.categories) && result.categories.length > 0 && (
               <div style={{ marginTop: 8 }}>
-                <strong>Kategorier:</strong>{' '}
+                <strong>{t('jMessages.analyzer.metadata.categories')}:</strong>{' '}
                 {result.categories.join(', ')}
               </div>
             )}
@@ -397,7 +399,7 @@ Extract STRICT JSON with:
                   cursor: 'pointer'
                 }}
               >
-                💾 Save to Library
+                💾 {t('jMessages.analyzer.saveToLibrary')}
               </button>
             </div>
           </div>
@@ -414,7 +416,7 @@ Extract STRICT JSON with:
               }}
             >
               <h4 style={{ marginTop: 0, marginBottom: 8, color: colors.text }}>
-                Executive Summary {result.summary_length ? `(${result.summary_length})` : ''}
+                {t('jMessages.analyzer.executiveSummary')} {result.summary_length ? `(${result.summary_length})` : ''}
               </h4>
               <div style={{ whiteSpace: 'pre-wrap', color: colors.text }}>
                 {result.summary}

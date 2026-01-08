@@ -1322,6 +1322,75 @@
         }
       }
     }
+  },
+  "jMessages": {
+    "analyzer": {
+      "title": "J-messages Analyzer",
+      "description": "Last opp en J-melding (.docx) for å generere metadata, innholdsfortegnelse og hovedinnhold.",
+      "dragDrop": "Drag & drop file here or click to browse",
+      "supports": "Supports DOCX/PDF (single file)",
+      "analyzeFile": "Analyze file",
+      "analyzeNote": "Analyze note",
+      "analyzing": "Analyserer…",
+      "processing": "Processing…",
+      "saveToLibrary": "Save to Library",
+      "savedToLibrary": "✅ Saved to J-messages Library",
+      "saveFailed": "❌ Save failed",
+      "summary": "Summary",
+      "summaryNone": "None",
+      "summaryShort": "Short",
+      "summaryMedium": "Medium",
+      "summaryLong": "Long",
+      "allCategories": "All categories",
+      "executiveSummary": "Executive Summary",
+      "innhold": "Innhold",
+      "showInnhold": "Vis innhold",
+      "dropFile": "Drop file here",
+      "metadata": {
+        "id": "ID",
+        "status": "Status",
+        "validFrom": "Gyldig fra",
+        "validTo": "Gyldig til",
+        "replaces": "Erstatter",
+        "categories": "Kategorier",
+        "title": "Title"
+      }
+    },
+    "library": {
+      "title": "J-messages Library",
+      "description": "Browse and manage previously analyzed J‑meldinger.",
+      "searchPlaceholder": "Search by ID, title, or category",
+      "allStatuses": "All statuses",
+      "allCategories": "All categories",
+      "refresh": "Refresh",
+      "loading": "Loading…",
+      "failedToLoad": "Failed to load items",
+      "documentUpdated": "✅ Document updated successfully",
+      "updateFailed": "❌ Failed to update document",
+      "save": "💾 Save",
+      "cancel": "❌ Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "exportDOCX": "Export DOCX",
+      "exportMD": "Export MD",
+      "exportPDF": "Export PDF",
+      "exportFailed": "Export failed",
+      "deleteConfirm": "Delete this item?",
+      "deleteFailed": "Delete failed",
+      "selectStatus": "Select status",
+      "selectCategory": "Select category",
+      "metadata": {
+        "id": "ID",
+        "status": "Status",
+        "validFrom": "Gyldig fra",
+        "validTo": "Gyldig til",
+        "replaces": "Erstatter",
+        "categories": "Kategorier",
+        "title": "Title"
+      }
+    }
   }
 }
 

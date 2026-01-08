@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
 
 export default function JMessagesLibrary() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function JMessagesLibrary() {
       if (data.success) {
         setItems(data.items || []);
       } else {
-        setError('Failed to load items');
+        setError(t('jMessages.library.failedToLoad'));
       }
     } catch (e) {
       setError(String(e));
@@ -108,14 +110,14 @@ export default function JMessagesLibrary() {
           ...prev,
           [itemId]: false
         }));
-        setStatus('✅ Document updated successfully');
+        setStatus(t('jMessages.library.documentUpdated'));
         setTimeout(() => setStatus(''), 3000);
       } else {
-        setStatus('❌ Failed to update document');
+        setStatus(t('jMessages.library.updateFailed'));
         setTimeout(() => setStatus(''), 3000);
       }
     } catch (e) {
-      setStatus(`❌ Failed to update document: ${String(e)}`);
+      setStatus(`${t('jMessages.library.updateFailed')}: ${String(e)}`);
       setTimeout(() => setStatus(''), 3000);
     }
   };
@@ -134,7 +136,7 @@ export default function JMessagesLibrary() {
   };
 
   const deleteItem = async (id) => {
-    if (!window.confirm('Delete this item?')) return;
+    if (!window.confirm(t('jMessages.library.deleteConfirm'))) return;
     try {
       const resp = await fetchWithAuth(`/api/j-messages/delete/${id}`, { method: 'DELETE' });
       const data = await resp.json();
@@ -152,10 +154,10 @@ export default function JMessagesLibrary() {
           return newContent;
         });
       } else {
-        alert('Delete failed');
+        alert(t('jMessages.library.deleteFailed'));
       }
     } catch (e) {
-      alert(`Delete failed: ${String(e)}`);
+      alert(`${t('jMessages.library.deleteFailed')}: ${String(e)}`);
     }
   };
 
@@ -243,9 +245,9 @@ export default function JMessagesLibrary() {
   return (
     <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: colors.primary, marginBottom: 8 }}>📚 J-messages Library</h1>
+        <h1 style={{ color: colors.primary, marginBottom: 8 }}>📚 {t('jMessages.library.title')}</h1>
         <p style={{ color: colors.textSecondary, margin: 0 }}>
-          Browse and manage previously analyzed J‑meldinger.
+          {t('jMessages.library.description')}
         </p>
       </div>
 
@@ -262,7 +264,7 @@ export default function JMessagesLibrary() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by ID, title, or category"
+          placeholder={t('jMessages.library.searchPlaceholder')}
           style={{
             flex: 1,
             border: `1px solid ${colors.border}`,
@@ -283,7 +285,7 @@ export default function JMessagesLibrary() {
             color: colors.text
           }}
         >
-          <option value="all">All statuses</option>
+          <option value="all">{t('jMessages.library.allStatuses')}</option>
           {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
         <select
@@ -297,7 +299,7 @@ export default function JMessagesLibrary() {
             color: colors.text
           }}
         >
-          <option value="all">All categories</option>
+          <option value="all">{t('jMessages.library.allCategories')}</option>
           {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <button
@@ -311,11 +313,11 @@ export default function JMessagesLibrary() {
             cursor: 'pointer'
           }}
         >
-          Refresh
+          {t('jMessages.library.refresh')}
         </button>
       </div>
 
-      {loading && <div>Loading…</div>}
+      {loading && <div>{t('jMessages.library.loading')}</div>}
       {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
       {status && (
         <div style={{
@@ -344,12 +346,12 @@ export default function JMessagesLibrary() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     <div>
                       <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                        Title
+                        {t('jMessages.library.metadata.title')}
                       </label>
                       <input
                         value={editContent[it.id]?.title || ''}
                         onChange={(e) => handleEditChange(it.id, 'title', e.target.value)}
-                        placeholder="Title"
+                        placeholder={t('jMessages.library.metadata.title')}
                         style={{
                           width: '100%',
                           padding: '8px 12px',
@@ -364,7 +366,7 @@ export default function JMessagesLibrary() {
                     <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          ID
+                          {t('jMessages.library.metadata.id')}
                         </label>
                         <input
                           value={editContent[it.id]?.j_id || ''}
@@ -384,7 +386,7 @@ export default function JMessagesLibrary() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          Status
+                          {t('jMessages.library.metadata.status')}
                         </label>
                         <select
                           value={editContent[it.id]?.status || ''}
@@ -400,7 +402,7 @@ export default function JMessagesLibrary() {
                             boxSizing: 'border-box'
                           }}
                         >
-                          <option value="">Select status</option>
+                          <option value="">{t('jMessages.library.selectStatus')}</option>
                           {allStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </div>
@@ -408,7 +410,7 @@ export default function JMessagesLibrary() {
                     <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          Gyldig fra
+                          {t('jMessages.library.metadata.validFrom')}
                         </label>
                         <input
                           type="date"
@@ -428,7 +430,7 @@ export default function JMessagesLibrary() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          Gyldig til
+                          {t('jMessages.library.metadata.validTo')}
                         </label>
                         <input
                           type="date"
@@ -450,7 +452,7 @@ export default function JMessagesLibrary() {
                     <div style={{ display: 'flex', gap: 24 }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          Erstatter
+                          {t('jMessages.library.metadata.replaces')}
                         </label>
                         <input
                           value={editContent[it.id]?.replaces || ''}
@@ -470,7 +472,7 @@ export default function JMessagesLibrary() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          Kategorier
+                          {t('jMessages.library.metadata.categories')}
                         </label>
                         <select
                           value={editContent[it.id]?.categories?.[0] || ''}
@@ -489,7 +491,7 @@ export default function JMessagesLibrary() {
                             boxSizing: 'border-box'
                           }}
                         >
-                          <option value="">Select category</option>
+                          <option value="">{t('jMessages.library.selectCategory')}</option>
                           {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
@@ -503,15 +505,15 @@ export default function JMessagesLibrary() {
                       </h3>
                     )}
                     <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
-                      <div><strong>ID:</strong> {it.j_id || '—'}</div>
-                      <div><strong>Status:</strong> {it.status || '—'}</div>
-                      <div><strong>Gyldig fra:</strong> {it.valid_from || '—'}</div>
-                      <div><strong>Gyldig til:</strong> {it.valid_to || '—'}</div>
-                      <div><strong>Erstatter:</strong> {it.replaces || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.id')}:</strong> {it.j_id || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.status')}:</strong> {it.status || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.validFrom')}:</strong> {it.valid_from || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.validTo')}:</strong> {it.valid_to || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {it.replaces || '—'}</div>
                     </div>
                     {Array.isArray(it.categories) && it.categories.length > 0 && (
                       <div style={{ marginTop: 8, marginBottom: 8 }}>
-                        <strong>Kategorier:</strong>{' '}
+                        <strong>{t('jMessages.library.metadata.categories')}:</strong>{' '}
                         {it.categories.join(', ')}
                       </div>
                     )}
@@ -536,7 +538,7 @@ export default function JMessagesLibrary() {
                           textAlign: 'center'
                         }}
                       >
-                        💾 Save
+                        💾 {t('jMessages.library.save')}
                       </button>
                       <button
                         onClick={() => handleEditCancel(it.id)}
@@ -551,7 +553,7 @@ export default function JMessagesLibrary() {
                           textAlign: 'center'
                         }}
                       >
-                        ❌ Cancel
+                        ❌ {t('jMessages.library.cancel')}
                       </button>
                     </>
                   ) : (
@@ -575,7 +577,7 @@ export default function JMessagesLibrary() {
                           textAlign: 'center'
                         }}
                       >
-                        {expanded[it.id] ? 'Collapse' : 'Expand'}
+                        {expanded[it.id] ? t('jMessages.library.collapse') : t('jMessages.library.expand')}
                       </button>
                       <button
                         onClick={() => startEditing(it.id)}
@@ -590,7 +592,7 @@ export default function JMessagesLibrary() {
                           textAlign: 'center'
                         }}
                       >
-                        ✏️ Edit
+                        ✏️ {t('jMessages.library.edit')}
                       </button>
                       <button
                         onClick={() => deleteItem(it.id)}
@@ -605,7 +607,7 @@ export default function JMessagesLibrary() {
                           textAlign: 'center'
                         }}
                       >
-                        Delete
+                        {t('jMessages.library.delete')}
                       </button>
                     </>
                   )}
@@ -634,7 +636,7 @@ export default function JMessagesLibrary() {
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                       } catch (e) {
-                        alert(`Export DOCX failed: ${String(e)}`);
+                        alert(`${t('jMessages.library.exportFailed')}: ${String(e)}`);
                       }
                     }}
                     style={{
@@ -648,7 +650,7 @@ export default function JMessagesLibrary() {
                       textAlign: 'center'
                     }}
                   >
-                    Export DOCX
+                    {t('jMessages.library.exportDOCX')}
                   </button>
                   <button
                     onClick={() => exportMarkdown(it)}
@@ -663,7 +665,7 @@ export default function JMessagesLibrary() {
                       textAlign: 'center'
                     }}
                   >
-                    Export MD
+                    {t('jMessages.library.exportMD')}
                   </button>
                   <button
                     onClick={() => exportPDF(it)}
@@ -678,7 +680,7 @@ export default function JMessagesLibrary() {
                       textAlign: 'center'
                     }}
                   >
-                    Export PDF
+                    {t('jMessages.library.exportPDF')}
                   </button>
                 </div>
               </div>
@@ -700,7 +702,7 @@ export default function JMessagesLibrary() {
                       padding: '8px 12px',
                       borderBottom: `1px solid ${colors.border}`
                     }}>
-                      <strong>Innhold</strong>
+                      <strong>{t('jMessages.analyzer.innhold')}</strong>
                       <button
                         onClick={() => setTocOpen((s) => ({ ...s, [it.id]: !s[it.id] }))}
                         style={{
