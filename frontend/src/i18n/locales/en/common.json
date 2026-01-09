@@ -466,7 +466,8 @@
         "validFrom": "Valid from",
         "validTo": "Valid to",
         "replaces": "Replaces",
-        "categories": "Categories",
+        "category": "Category",
+        "area": "Area",
         "title": "Title"
       }
     },
@@ -495,13 +496,15 @@
       "deleteFailed": "Delete failed",
       "selectStatus": "Select status",
       "selectCategory": "Select category",
+      "selectArea": "Select area",
       "metadata": {
         "id": "ID",
         "status": "Status",
         "validFrom": "Valid from",
         "validTo": "Valid to",
         "replaces": "Replaces",
-        "categories": "Categories",
+        "category": "Category",
+        "area": "Area",
         "title": "Title"
       }
     }

@@ -244,8 +244,15 @@ Required JSON format:
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
-  "categories": ["category1", "category2"]
+  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk" or null,
+  "area": "Andre lands soner" or "Internasjonal farvann" or "Nord for 62° N" or "Sør for 62° N" or null
 }}
+
+IMPORTANT RULES: 
+- "category" must be EXACTLY ONE of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". If unsure, use null.
+- "area" must be EXACTLY ONE of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", or "Sør for 62° N". If unsure, use null.
+- You MUST include both "category" and "area" fields in your JSON response, even if they are null.
+- Look for geographical references in the document to determine the area (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.).
 
 Document text:
 \"\"\"{header_text}\n\n{body_text[:4000]}\"\"\"
@@ -284,7 +291,8 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "categories": []
+        "category": None,
+        "area": None
     }
     
     # Extract metadata using LLM if available
@@ -381,7 +389,8 @@ async def analyze_j_message(
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "categories": []
+        "category": None,
+        "area": None
     }
 
     summary_text: str = ""
@@ -458,7 +467,8 @@ Tekst:
         "valid_from": metadata.get("valid_from"),
         "valid_to": metadata.get("valid_to"),
         "replaces": metadata.get("replaces_id"),
-        "categories": metadata.get("categories") or [],
+        "category": metadata.get("category") or (metadata.get("categories") and metadata.get("categories")[0] if isinstance(metadata.get("categories"), list) and len(metadata.get("categories")) > 0 else None) or None,
+        "area": metadata.get("area"),
         "toc": toc,
         "body_html": body_html,
         "raw_text": body_text,
@@ -487,7 +497,8 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "valid_from": data.get("valid_from"),
             "valid_to": data.get("valid_to"),
             "replaces": data.get("replaces"),
-            "categories": data.get("categories") or [],
+            "category": data.get("category") or (data.get("categories") and data.get("categories")[0] if isinstance(data.get("categories"), list) and len(data.get("categories")) > 0 else None) or None,
+            "area": data.get("area"),
             "toc": data.get("toc") or [],
             "body_html": data.get("body_html") or "",
             "summary": data.get("summary") or "",
@@ -521,7 +532,11 @@ async def list_j_messages(
     if status:
         query["status"] = status
     if category:
-        query["categories"] = {"$in": [category]}
+        # Support both old (array) and new (string) format
+        query["$or"] = [
+            {"category": category},
+            {"categories": {"$in": [category]}}
+        ]
     if search:
         query["$or"] = [
             {"title": {"$regex": search, "$options": "i"}},
@@ -561,8 +576,18 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
             update_doc["valid_to"] = data.get("valid_to")
         if "replaces" in data:
             update_doc["replaces"] = data.get("replaces")
-        if "categories" in data:
-            update_doc["categories"] = data.get("categories") or []
+        if "category" in data:
+            update_doc["category"] = data.get("category")
+            # Remove old categories field if it exists
+            update_doc["$unset"] = {"categories": ""}
+        elif "categories" in data:
+            # Legacy support: convert array to single category
+            cats = data.get("categories") or []
+            if isinstance(cats, list) and len(cats) > 0:
+                update_doc["category"] = cats[0]
+            update_doc["$unset"] = {"categories": ""}
+        if "area" in data:
+            update_doc["area"] = data.get("area")
         if "toc" in data:
             update_doc["toc"] = data.get("toc") or []
         if "body_html" in data:
@@ -709,8 +734,15 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
         if data.get("valid_from"): meta_lines.append(f"Valid from: {data.get('valid_from')}")
         if data.get("valid_to"): meta_lines.append(f"Valid to: {data.get('valid_to')}")
         if data.get("replaces"): meta_lines.append(f"Replaces: {data.get('replaces')}")
-        cats = data.get("categories") or []
-        if cats: meta_lines.append(f"Categories: {', '.join(cats)}")
+        # Support both old (array) and new (string) format
+        category = data.get("category")
+        if not category:
+            cats = data.get("categories") or []
+            if isinstance(cats, list) and len(cats) > 0:
+                category = cats[0]
+        if category: meta_lines.append(f"Category: {category}")
+        area = data.get("area")
+        if area: meta_lines.append(f"Area: {area}")
         if meta_lines:
             p = doc.add_paragraph()
             for line in meta_lines:

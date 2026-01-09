@@ -286,7 +286,8 @@ Felt:
 - status
 - valid_from
 - valid_to
-- categories
+- category (ONE of: "Annet", "Bunnfisk", "Pelagisk fisk", or null)
+- area (ONE of: "Andre lands soner", "Internasjonal farvann", "Nord for 62\u00B0 N", "Sør for 62\u00B0 N", or null)
 
 Tekst:
 \"\"\"{header_text}\\n\\n{body_text[:4000]}\"\"\"
@@ -378,10 +379,16 @@ Extract STRICT JSON with:
               <div><strong>{t('jMessages.analyzer.metadata.validTo')}:</strong> {result.valid_to || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
             </div>
-            {Array.isArray(result.categories) && result.categories.length > 0 && (
+            {(result.category || (Array.isArray(result.categories) && result.categories.length > 0)) && (
               <div style={{ marginTop: 8 }}>
-                <strong>{t('jMessages.analyzer.metadata.categories')}:</strong>{' '}
-                {result.categories.join(', ')}
+                <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
+                {result.category || (Array.isArray(result.categories) ? result.categories[0] : '—')}
+              </div>
+            )}
+            {result.area && (
+              <div style={{ marginTop: 8 }}>
+                <strong>{t('jMessages.analyzer.metadata.area')}:</strong>{' '}
+                {result.area}
               </div>
             )}
             {result.title && (

@@ -40,9 +40,21 @@ export default function JMessagesLibrary() {
   }, []);
 
   const allStatuses = Array.from(new Set(items.map((i) => i.status).filter(Boolean))).sort();
-  const allCategories = Array.from(
-    new Set(items.flatMap((i) => Array.isArray(i.categories) ? i.categories : []).filter(Boolean))
-  ).sort();
+  
+  // Predefined category values from Fiskeridirektoratet (only 3 allowed)
+  const predefinedCategories = [
+    "Annet",
+    "Bunnfisk",
+    "Pelagisk fisk"
+  ];
+  
+  // Predefined area values from Fiskeridirektoratet
+  const predefinedAreas = [
+    "Andre lands soner",
+    "Internasjonal farvann",
+    "Nord for 62\u00B0 N",
+    "Sør for 62\u00B0 N"
+  ];
 
   const filtered = items.filter((it) => {
     const hay = `${it.j_id || ''} ${it.title || ''} ${it.categories?.join(' ') || ''}`.toLowerCase();
@@ -64,7 +76,8 @@ export default function JMessagesLibrary() {
           valid_from: item.valid_from || '',
           valid_to: item.valid_to || '',
           replaces: item.replaces || '',
-          categories: Array.isArray(item.categories) ? [...item.categories] : [],
+          category: item.category || (Array.isArray(item.categories) && item.categories.length > 0 ? item.categories[0] : ''),
+          area: item.area || '',
           summary: item.summary || '',
           body_html: item.body_html || '',
           raw_text: item.raw_text || ''
@@ -170,7 +183,8 @@ export default function JMessagesLibrary() {
       it.valid_from ? `Valid from: ${it.valid_from}` : null,
       it.valid_to ? `Valid to: ${it.valid_to}` : null,
       it.replaces ? `Replaces: ${it.replaces}` : null,
-      (it.categories && it.categories.length) ? `Categories: ${it.categories.join(', ')}` : null
+      (it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `Category: ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}` : null,
+      it.area ? `Area: ${it.area}` : null
     ].filter(Boolean);
     if (meta.length) {
       lines.push('', meta.map(m => `- ${m}`).join('\n'), '');
@@ -215,7 +229,8 @@ export default function JMessagesLibrary() {
         ${it.valid_from ? `<div><strong>Valid from:</strong> ${it.valid_from}</div>` : ''}
         ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
         ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
-        ${it.categories && it.categories.length ? `<div><strong>Categories:</strong> ${it.categories.join(', ')}</div>` : ''}
+        ${(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `<div><strong>Category:</strong> ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}</div>` : ''}
+        ${it.area ? `<div><strong>Area:</strong> ${it.area}</div>` : ''}
       </div>`;
     const summary = it.summary ? `<h2>Executive Summary</h2><div>${it.summary.replace(/\n/g, '<br/>')}</div>` : '';
     const html = `
@@ -300,7 +315,7 @@ export default function JMessagesLibrary() {
           }}
         >
           <option value="all">{t('jMessages.library.allCategories')}</option>
-          {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+          {predefinedCategories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <button
           onClick={load}
@@ -472,13 +487,12 @@ export default function JMessagesLibrary() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          {t('jMessages.library.metadata.categories')}
+                          {t('jMessages.library.metadata.category')}
                         </label>
                         <select
-                          value={editContent[it.id]?.categories?.[0] || ''}
+                          value={editContent[it.id]?.category || ''}
                           onChange={(e) => {
-                            const selectedCategory = e.target.value;
-                            handleEditChange(it.id, 'categories', selectedCategory ? [selectedCategory] : []);
+                            handleEditChange(it.id, 'category', e.target.value);
                           }}
                           style={{
                             width: '100%',
@@ -492,7 +506,31 @@ export default function JMessagesLibrary() {
                           }}
                         >
                           <option value="">{t('jMessages.library.selectCategory')}</option>
-                          {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                          {predefinedCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 24 }}> {/* Increased gap */}
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          {t('jMessages.library.metadata.area')}
+                        </label>
+                        <select
+                          value={editContent[it.id]?.area || ''}
+                          onChange={(e) => handleEditChange(it.id, 'area', e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12,
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          <option value="">{t('jMessages.library.selectArea')}</option>
+                          {predefinedAreas.map((a) => <option key={a} value={a}>{a}</option>)}
                         </select>
                       </div>
                     </div>
@@ -511,10 +549,16 @@ export default function JMessagesLibrary() {
                       <div><strong>{t('jMessages.library.metadata.validTo')}:</strong> {it.valid_to || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {it.replaces || '—'}</div>
                     </div>
-                    {Array.isArray(it.categories) && it.categories.length > 0 && (
+                    {(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) && (
                       <div style={{ marginTop: 8, marginBottom: 8 }}>
-                        <strong>{t('jMessages.library.metadata.categories')}:</strong>{' '}
-                        {it.categories.join(', ')}
+                        <strong>{t('jMessages.library.metadata.category')}:</strong>{' '}
+                        {it.category || (Array.isArray(it.categories) ? it.categories[0] : '—')}
+                      </div>
+                    )}
+                    {it.area && (
+                      <div style={{ marginTop: 8, marginBottom: 8 }}>
+                        <strong>{t('jMessages.library.metadata.area')}:</strong>{' '}
+                        {it.area}
                       </div>
                     )}
                   </>

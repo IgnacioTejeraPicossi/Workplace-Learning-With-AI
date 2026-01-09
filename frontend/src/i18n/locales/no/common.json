@@ -1361,7 +1361,8 @@
         "validFrom": "Gyldig fra",
         "validTo": "Gyldig til",
         "replaces": "Erstatter",
-        "categories": "Kategorier",
+        "category": "Kategori",
+        "area": "Område",
         "title": "Title"
       }
     },
@@ -1390,13 +1391,15 @@
       "deleteFailed": "Sletting mislyktes",
       "selectStatus": "Velg status",
       "selectCategory": "Velg kategori",
+      "selectArea": "Velg område",
       "metadata": {
         "id": "ID",
         "status": "Status",
         "validFrom": "Gyldig fra",
         "validTo": "Gyldig til",
         "replaces": "Erstatter",
-        "categories": "Kategorier",
+        "category": "Kategori",
+        "area": "Område",
         "title": "Title"
       }
     }
