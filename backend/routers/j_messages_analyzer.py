@@ -586,16 +586,24 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
             update_doc["valid_to"] = data.get("valid_to")
         if "replaces" in data:
             update_doc["replaces"] = data.get("replaces")
+        # Track fields to unset separately
+        unset_fields = {}
+        
         if "category" in data:
-            update_doc["category"] = data.get("category")
+            category_value = data.get("category")
+            # Treat empty string as null
+            if category_value == "":
+                update_doc["category"] = None
+            else:
+                update_doc["category"] = category_value
             # Remove old categories field if it exists
-            update_doc["$unset"] = {"categories": ""}
+            unset_fields["categories"] = ""
         elif "categories" in data:
             # Legacy support: convert array to single category
             cats = data.get("categories") or []
             if isinstance(cats, list) and len(cats) > 0:
                 update_doc["category"] = cats[0]
-            update_doc["$unset"] = {"categories": ""}
+            unset_fields["categories"] = ""
         if "area" in data:
             update_doc["area"] = data.get("area")
         if "toc" in data:
@@ -611,9 +619,16 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
         if "filename" in data:
             update_doc["filename"] = data.get("filename") or ""
         
+        # Build update operation with both $set and $unset if needed
+        update_operation = {}
+        if update_doc:
+            update_operation["$set"] = update_doc
+        if unset_fields:
+            update_operation["$unset"] = unset_fields
+        
         result = await j_messages_collection.update_one(
             {"_id": ObjectId(doc_id)},
-            {"$set": update_doc}
+            update_operation if update_operation else {"$set": {"updated_at": datetime.utcnow()}}
         )
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="J-message not found")
