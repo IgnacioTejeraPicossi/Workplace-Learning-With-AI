@@ -379,12 +379,10 @@ Extract STRICT JSON with:
               <div><strong>{t('jMessages.analyzer.metadata.validTo')}:</strong> {result.valid_to || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
             </div>
-            {(result.category || (Array.isArray(result.categories) && result.categories.length > 0)) && (
-              <div style={{ marginTop: 8 }}>
-                <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
-                {result.category || (Array.isArray(result.categories) ? result.categories[0] : '—')}
-              </div>
-            )}
+            <div style={{ marginTop: 8 }}>
+              <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
+              {result.category || (Array.isArray(result.categories) && result.categories.length > 0 ? result.categories[0] : '—')}
+            </div>
             {result.area && (
               <div style={{ marginTop: 8 }}>
                 <strong>{t('jMessages.analyzer.metadata.area')}:</strong>{' '}

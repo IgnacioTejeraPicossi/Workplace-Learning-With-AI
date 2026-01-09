@@ -431,9 +431,19 @@ async def analyze_j_message(
             # Parse JSON using robust helper function
             parsed = extract_json_from_llm_response(response)
             if parsed:
+                # Handle legacy "categories" field - convert to "category"
+                if "categories" in parsed and "category" not in parsed:
+                    categories = parsed.get("categories", [])
+                    if isinstance(categories, list) and len(categories) > 0:
+                        parsed["category"] = categories[0]
+                    elif isinstance(categories, list) and len(categories) == 0:
+                        parsed["category"] = None
+                    # Remove old field
+                    parsed.pop("categories", None)
+                
                 metadata.update(parsed)
                 print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
-                print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}")
+                print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}, category={parsed.get('category')}, area={parsed.get('area')}")
             else:
                 print(f"[J-MESSAGES] ⚠️ Failed to extract JSON from LLM response")
                 # Leave defaults if parsing fails; front-end can still render
