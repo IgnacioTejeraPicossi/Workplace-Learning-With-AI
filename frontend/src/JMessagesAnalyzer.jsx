@@ -287,7 +287,7 @@ Felt:
 - valid_from
 - valid_to
 - category (ONE of: "Annet", "Bunnfisk", "Pelagisk fisk", or null)
-- area (ONE of: "Andre lands soner", "Internasjonal farvann", "Nord for 62\u00B0 N", "Sør for 62\u00B0 N", or null)
+- area (ARRAY of: "Andre lands soner", "Internasjonal farvann", "Nord for 62\u00B0 N", "Sør for 62\u00B0 N" - can have multiple areas, use empty array [] if none)
 
 Tekst:
 \"\"\"{header_text}\\n\\n{body_text[:4000]}\"\"\"
@@ -383,10 +383,10 @@ Extract STRICT JSON with:
               <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
               {result.category || (Array.isArray(result.categories) && result.categories.length > 0 ? result.categories[0] : '—')}
             </div>
-            {result.area && (
+            {result.area && (Array.isArray(result.area) ? result.area.length > 0 : result.area) && (
               <div style={{ marginTop: 8 }}>
                 <strong>{t('jMessages.analyzer.metadata.area')}:</strong>{' '}
-                {result.area}
+                {Array.isArray(result.area) ? result.area.join(', ') : result.area}
               </div>
             )}
             {result.title && (

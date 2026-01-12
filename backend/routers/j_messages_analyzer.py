@@ -245,14 +245,14 @@ Required JSON format:
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
   "category": "Annet" or "Bunnfisk" or "Pelagisk fisk" or null,
-  "area": "Andre lands soner" or "Internasjonal farvann" or "Nord for 62° N" or "Sør for 62° N" or null
+  "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
 }}
 
 IMPORTANT RULES: 
 - "category" must be EXACTLY ONE of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". If unsure, use null.
-- "area" must be EXACTLY ONE of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", or "Sør for 62° N". If unsure, use null.
-- You MUST include both "category" and "area" fields in your JSON response, even if they are null.
-- Look for geographical references in the document to determine the area (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.).
+- "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
+- You MUST include both "category" and "area" fields in your JSON response, even if category is null or area is empty.
+- Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:
 \"\"\"{header_text}\n\n{body_text[:4000]}\"\"\"
@@ -292,7 +292,7 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
         "valid_from": None,
         "valid_to": None,
         "category": None,
-        "area": None
+        "area": []
     }
     
     # Extract metadata using LLM if available
@@ -390,7 +390,7 @@ async def analyze_j_message(
         "valid_from": None,
         "valid_to": None,
         "category": None,
-        "area": None
+        "area": []
     }
 
     summary_text: str = ""
@@ -478,7 +478,7 @@ Tekst:
         "valid_to": metadata.get("valid_to"),
         "replaces": metadata.get("replaces_id"),
         "category": metadata.get("category") or (metadata.get("categories") and metadata.get("categories")[0] if isinstance(metadata.get("categories"), list) and len(metadata.get("categories")) > 0 else None) or None,
-        "area": metadata.get("area"),
+        "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
         "toc": toc,
         "body_html": body_html,
         "raw_text": body_text,
@@ -508,7 +508,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "valid_to": data.get("valid_to"),
             "replaces": data.get("replaces"),
             "category": data.get("category") or (data.get("categories") and data.get("categories")[0] if isinstance(data.get("categories"), list) and len(data.get("categories")) > 0 else None) or None,
-            "area": data.get("area"),
+            "area": data.get("area") if isinstance(data.get("area"), list) else ([data.get("area")] if data.get("area") else []),
             "toc": data.get("toc") or [],
             "body_html": data.get("body_html") or "",
             "summary": data.get("summary") or "",
@@ -605,7 +605,14 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
                 update_doc["category"] = cats[0]
             unset_fields["categories"] = ""
         if "area" in data:
-            update_doc["area"] = data.get("area")
+            area_value = data.get("area")
+            # Ensure area is always an array
+            if isinstance(area_value, list):
+                update_doc["area"] = area_value
+            elif area_value:
+                update_doc["area"] = [area_value]
+            else:
+                update_doc["area"] = []
         if "toc" in data:
             update_doc["toc"] = data.get("toc") or []
         if "body_html" in data:
@@ -767,7 +774,10 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
                 category = cats[0]
         if category: meta_lines.append(f"Category: {category}")
         area = data.get("area")
-        if area: meta_lines.append(f"Area: {area}")
+        if isinstance(area, list) and len(area) > 0:
+            meta_lines.append(f"Area: {', '.join(area)}")
+        elif area and not isinstance(area, list):
+            meta_lines.append(f"Area: {area}")
         if meta_lines:
             p = doc.add_paragraph()
             for line in meta_lines:

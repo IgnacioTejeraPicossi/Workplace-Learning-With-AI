@@ -77,7 +77,7 @@ export default function JMessagesLibrary() {
           valid_to: item.valid_to || '',
           replaces: item.replaces || '',
           category: item.category || (Array.isArray(item.categories) && item.categories.length > 0 ? item.categories[0] : ''),
-          area: item.area || '',
+          area: Array.isArray(item.area) ? [...item.area] : (item.area ? [item.area] : []),
           summary: item.summary || '',
           body_html: item.body_html || '',
           raw_text: item.raw_text || ''
@@ -184,7 +184,7 @@ export default function JMessagesLibrary() {
       it.valid_to ? `Valid to: ${it.valid_to}` : null,
       it.replaces ? `Replaces: ${it.replaces}` : null,
       (it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `Category: ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}` : null,
-      it.area ? `Area: ${it.area}` : null
+      (Array.isArray(it.area) && it.area.length > 0) ? `Area: ${it.area.join(', ')}` : (it.area && !Array.isArray(it.area) ? `Area: ${it.area}` : null)
     ].filter(Boolean);
     if (meta.length) {
       lines.push('', meta.map(m => `- ${m}`).join('\n'), '');
@@ -230,7 +230,7 @@ export default function JMessagesLibrary() {
         ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
         ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
         ${(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `<div><strong>Category:</strong> ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}</div>` : ''}
-        ${it.area ? `<div><strong>Area:</strong> ${it.area}</div>` : ''}
+        ${(Array.isArray(it.area) && it.area.length > 0) ? `<div><strong>Area:</strong> ${it.area.join(', ')}</div>` : (it.area && !Array.isArray(it.area) ? `<div><strong>Area:</strong> ${it.area}</div>` : '')}
       </div>`;
     const summary = it.summary ? `<h2>Executive Summary</h2><div>${it.summary.replace(/\n/g, '<br/>')}</div>` : '';
     const html = `
@@ -512,26 +512,57 @@ export default function JMessagesLibrary() {
                     </div>
                     <div style={{ display: 'flex', gap: 24 }}> {/* Increased gap */}
                       <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 8 }}>
                           {t('jMessages.library.metadata.area')}
                         </label>
-                        <select
-                          value={editContent[it.id]?.area || ''}
-                          onChange={(e) => handleEditChange(it.id, 'area', e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '6px 10px',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 6,
-                            background: colors.background,
-                            color: colors.text,
-                            fontSize: 12,
-                            boxSizing: 'border-box'
-                          }}
-                        >
-                          <option value="">{t('jMessages.library.selectArea')}</option>
-                          {predefinedAreas.map((a) => <option key={a} value={a}>{a}</option>)}
-                        </select>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 8,
+                          padding: '8px',
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: 6,
+                          background: colors.background
+                        }}>
+                          {predefinedAreas.map((area) => {
+                            const currentAreas = Array.isArray(editContent[it.id]?.area) ? editContent[it.id].area : [];
+                            const isChecked = currentAreas.includes(area);
+                            return (
+                              <label
+                                key={area}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 8,
+                                  cursor: 'pointer',
+                                  fontSize: 12,
+                                  color: colors.text
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const currentAreas = Array.isArray(editContent[it.id]?.area) ? editContent[it.id].area : [];
+                                    let newAreas;
+                                    if (e.target.checked) {
+                                      newAreas = [...currentAreas, area];
+                                    } else {
+                                      newAreas = currentAreas.filter(a => a !== area);
+                                    }
+                                    handleEditChange(it.id, 'area', newAreas);
+                                  }}
+                                  style={{
+                                    cursor: 'pointer',
+                                    width: 16,
+                                    height: 16
+                                  }}
+                                />
+                                <span>{area}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -555,12 +586,12 @@ export default function JMessagesLibrary() {
                         {it.category || (Array.isArray(it.categories) ? it.categories[0] : '—')}
                       </div>
                     )}
-                    {it.area && (
+                    {(Array.isArray(it.area) && it.area.length > 0) || (it.area && !Array.isArray(it.area)) ? (
                       <div style={{ marginTop: 8, marginBottom: 8 }}>
                         <strong>{t('jMessages.library.metadata.area')}:</strong>{' '}
-                        {it.area}
+                        {Array.isArray(it.area) ? it.area.join(', ') : it.area}
                       </div>
-                    )}
+                    ) : null}
                   </>
                 )}
               </div>
