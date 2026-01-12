@@ -286,7 +286,7 @@ Felt:
 - status
 - valid_from
 - valid_to
-- category (ONE of: "Annet", "Bunnfisk", "Pelagisk fisk", or null)
+- category (ONE of: "Annet", "Bunnfisk", "Pelagisk fisk" - always required, use "Annet" if unsure)
 - area (ARRAY of: "Andre lands soner", "Internasjonal farvann", "Nord for 62\u00B0 N", "Sør for 62\u00B0 N" - can have multiple areas, use empty array [] if none)
 
 Tekst:

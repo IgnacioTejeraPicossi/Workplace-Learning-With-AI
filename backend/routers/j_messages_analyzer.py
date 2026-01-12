@@ -244,14 +244,17 @@ Required JSON format:
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
-  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk" or null,
+  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk",
   "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
 }}
 
 IMPORTANT RULES: 
-- "category" must be EXACTLY ONE of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". If unsure, use null.
+- "category" MUST ALWAYS be one of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". NEVER use null.
+  * Use "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
+  * Use "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
+  * Use "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
 - "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
-- You MUST include both "category" and "area" fields in your JSON response, even if category is null or area is empty.
+- You MUST include both "category" and "area" fields in your JSON response. Category must always have a value (never null).
 - Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:
@@ -291,7 +294,7 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "category": None,
+        "category": "Annet",  # Default category
         "area": []
     }
     
@@ -389,7 +392,7 @@ async def analyze_j_message(
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "category": None,
+        "category": "Annet",  # Default category
         "area": []
     }
 
@@ -441,6 +444,11 @@ async def analyze_j_message(
                     # Remove old field
                     parsed.pop("categories", None)
                 
+                # Ensure category always has a value (default to "Annet" if null or empty)
+                if not parsed.get("category") or parsed.get("category") not in ["Annet", "Bunnfisk", "Pelagisk fisk"]:
+                    parsed["category"] = "Annet"
+                    print(f"[J-MESSAGES] ⚠️ Category was null or invalid, defaulting to 'Annet'")
+                
                 metadata.update(parsed)
                 print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
                 print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}, category={parsed.get('category')}, area={parsed.get('area')}")
@@ -477,7 +485,7 @@ Tekst:
         "valid_from": metadata.get("valid_from"),
         "valid_to": metadata.get("valid_to"),
         "replaces": metadata.get("replaces_id"),
-        "category": metadata.get("category") or (metadata.get("categories") and metadata.get("categories")[0] if isinstance(metadata.get("categories"), list) and len(metadata.get("categories")) > 0 else None) or None,
+        "category": metadata.get("category") or (metadata.get("categories") and metadata.get("categories")[0] if isinstance(metadata.get("categories"), list) and len(metadata.get("categories")) > 0 else None) or "Annet",
         "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
         "toc": toc,
         "body_html": body_html,
@@ -507,7 +515,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "valid_from": data.get("valid_from"),
             "valid_to": data.get("valid_to"),
             "replaces": data.get("replaces"),
-            "category": data.get("category") or (data.get("categories") and data.get("categories")[0] if isinstance(data.get("categories"), list) and len(data.get("categories")) > 0 else None) or None,
+            "category": data.get("category") or (data.get("categories") and data.get("categories")[0] if isinstance(data.get("categories"), list) and len(data.get("categories")) > 0 else None) or "Annet",
             "area": data.get("area") if isinstance(data.get("area"), list) else ([data.get("area")] if data.get("area") else []),
             "toc": data.get("toc") or [],
             "body_html": data.get("body_html") or "",
