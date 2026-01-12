@@ -25,6 +25,8 @@ const APIConfig = () => {
   const handleProviderChange = (provider) => {
     setApiProvider(provider);
     localStorage.setItem('apiProvider', provider);
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('apiProviderChanged'));
     setStatus(`Switched to ${provider.toUpperCase()} API`);
     setTimeout(() => setStatus(''), 3000);
   };
@@ -97,6 +99,11 @@ const APIConfig = () => {
       if (response.ok) {
         const result = await response.json();
         setStatus(`✅ API test successful: ${result.message}`);
+        // Save the model name to localStorage for ItemAI and notify other components
+        if (apiProvider === 'itemai' && result.model_used) {
+          localStorage.setItem('itemaiCurrentModel', result.model_used);
+          window.dispatchEvent(new Event('itemaiModelChanged'));
+        }
       } else {
         setStatus('❌ API test failed. Check your configuration and try again.');
       }

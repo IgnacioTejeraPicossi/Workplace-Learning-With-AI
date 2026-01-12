@@ -16,6 +16,70 @@ export default function JMessagesAnalyzer() {
   const [status, setStatus] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [allCategories, setAllCategories] = useState([]);
+  const [aiComplexity, setAiComplexity] = useState(() => {
+    return localStorage.getItem('jMessagesAiComplexity') || 'low';
+  });
+  const [apiProvider, setApiProvider] = useState('openai');
+  const [itemaiModel, setItemaiModel] = useState(() => {
+    return localStorage.getItem('itemaiCurrentModel') || null;
+  });
+
+  // Load API provider from localStorage and listen for changes
+  useEffect(() => {
+    const savedProvider = localStorage.getItem('apiProvider') || 'openai';
+    setApiProvider(savedProvider);
+    // Load ItemAI model if provider is ItemAI
+    if (savedProvider === 'itemai') {
+      const model = localStorage.getItem('itemaiCurrentModel');
+      setItemaiModel(model);
+    }
+    
+    // Listen for storage events (when API Config is changed in another tab/component)
+    const handleStorageChange = (e) => {
+      if (e.key === 'apiProvider') {
+        setApiProvider(e.newValue || 'openai');
+        if (e.newValue === 'itemai') {
+          const model = localStorage.getItem('itemaiCurrentModel');
+          setItemaiModel(model);
+        }
+      } else if (e.key === 'itemaiCurrentModel') {
+        setItemaiModel(e.newValue);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events (when changed in same tab)
+    const handleApiProviderChange = () => {
+      const currentProvider = localStorage.getItem('apiProvider') || 'openai';
+      setApiProvider(currentProvider);
+      // Update ItemAI model if available
+      if (currentProvider === 'itemai') {
+        const model = localStorage.getItem('itemaiCurrentModel');
+        setItemaiModel(model);
+      }
+    };
+    
+    // Listen for ItemAI model updates
+    const handleItemaiModelChange = () => {
+      const model = localStorage.getItem('itemaiCurrentModel');
+      setItemaiModel(model);
+    };
+    
+    window.addEventListener('apiProviderChanged', handleApiProviderChange);
+    window.addEventListener('itemaiModelChanged', handleItemaiModelChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('apiProviderChanged', handleApiProviderChange);
+      window.removeEventListener('itemaiModelChanged', handleItemaiModelChange);
+    };
+  }, []);
+
+  // Save complexity to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('jMessagesAiComplexity', aiComplexity);
+  }, [aiComplexity]);
 
   // Load categories from saved J-messages
   useEffect(() => {
@@ -52,7 +116,10 @@ export default function JMessagesAnalyzer() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const url = `/api/j-messages/analyze${summaryLength ? `?summary_length=${encodeURIComponent(summaryLength)}` : ''}`;
+      const params = new URLSearchParams();
+      if (summaryLength) params.append('summary_length', summaryLength);
+      params.append('complexity', aiComplexity);
+      const url = `/api/j-messages/analyze${params.toString() ? `?${params.toString()}` : ''}`;
       const resp = await fetchWithAuth(url, {
         method: 'POST',
         body: form
@@ -78,7 +145,7 @@ export default function JMessagesAnalyzer() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const url = `/api/j-messages/analyze-note`;
+      const url = `/api/j-messages/analyze-note?complexity=${encodeURIComponent(aiComplexity)}`;
       const resp = await fetchWithAuth(url, {
         method: 'POST',
         body: form
@@ -242,6 +309,57 @@ export default function JMessagesAnalyzer() {
         >
           {isLoading ? t('jMessages.analyzer.processing') : t('jMessages.analyzer.analyzeNote')}
         </button>
+        <div style={{ 
+          marginLeft: 16, 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 12,
+          padding: '8px 12px',
+          background: colors.cardBackground,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8
+        }}>
+          <span style={{ fontSize: 12, color: colors.textSecondary }}>
+            {t('jMessages.analyzer.apiConfig')}: <strong style={{ color: colors.text }}>
+              {apiProvider === 'itemai' ? 'ItemAI' : apiProvider === 'openrouter' ? 'OpenRouter' : 'OpenAI'}
+            </strong>
+          </span>
+          {apiProvider === 'itemai' ? (
+            <>
+              <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
+              <span style={{ fontSize: 12, color: colors.textSecondary }}>
+                {t('jMessages.analyzer.model')}: <strong style={{ color: colors.text }}>
+                  {itemaiModel || t('jMessages.analyzer.modelNotSet')}
+                </strong>
+              </span>
+            </>
+          ) : (
+            <>
+              <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
+              <label style={{ fontSize: 12, color: colors.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {t('jMessages.analyzer.aiLevel')}:
+                <select
+                  value={aiComplexity}
+                  onChange={(e) => setAiComplexity(e.target.value)}
+                  style={{
+                    marginLeft: 4,
+                    padding: '4px 8px',
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`,
+                    background: colors.background,
+                    color: colors.text,
+                    fontSize: 12,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="low">{t('jMessages.analyzer.aiLevelLow')} (GPT-3.5)</option>
+                  <option value="medium">{t('jMessages.analyzer.aiLevelMedium')} (GPT-4o-mini)</option>
+                  <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (GPT-4o)</option>
+                </select>
+              </label>
+            </>
+          )}
+        </div>
         {allCategories.length > 0 && (
           <select
             style={{

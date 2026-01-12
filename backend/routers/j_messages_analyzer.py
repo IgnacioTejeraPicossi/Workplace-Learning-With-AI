@@ -346,7 +346,8 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
 async def analyze_j_message(
     request: Request,
     file: UploadFile = File(...),
-    summary_length: str = Query(None, description="short|medium|long to include an AI summary")
+    summary_length: str = Query(None, description="short|medium|long to include an AI summary"),
+    complexity: str = Query("low", description="AI complexity level: low, medium, or high")
 ):
     """
     Accept a .docx J-melding and return structured JSON with:
@@ -423,10 +424,13 @@ async def analyze_j_message(
                 print("[J-MESSAGES] ⚠️ No API config headers found, will use .env fallback")
                 print(f"[J-MESSAGES]    → Available headers: {list(request_headers_dict.keys())}")
             
+            # Validate and use complexity from query parameter
+            complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            
             response = ask_ai_unified_sync(
                 prompt=prompt + "\nGi svaret som STRICT JSON.",
                 task_type="extraction",
-                complexity="low",
+                complexity=complexity_level,
                 max_tokens=600,
                 messages=None,
                 request_headers=request_headers_dict
@@ -464,10 +468,11 @@ Tekst:
 \"\"\"{body_text[:12000]}\"\"\"
 """
                 try:
+                    # Use same complexity level for summary
                     summary_text = ask_ai_unified_sync(
                         prompt=sum_prompt,
                         task_type="summarization",
-                        complexity="low",
+                        complexity=complexity_level,
                         max_tokens=700,
                         messages=None,
                         request_headers=request_headers_dict
@@ -688,7 +693,11 @@ JSON:"""
 
 
 @router.post("/analyze-note")
-async def analyze_j_note(request: Request, file: UploadFile = File(...)):
+async def analyze_j_note(
+    request: Request, 
+    file: UploadFile = File(...),
+    complexity: str = Query("low", description="AI complexity level: low, medium, or high")
+):
     """
     Analyze a J-melding 'note' document (DOCX/PDF). Returns structured 'note' fields.
     """
@@ -722,10 +731,13 @@ async def analyze_j_note(request: Request, file: UploadFile = File(...)):
     try:
         if ask_ai_unified_sync:
             prompt = build_note_prompt(full_text)
+            # Validate and use complexity from query parameter
+            complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            
             resp = ask_ai_unified_sync(
                 prompt=prompt,
                 task_type="extraction",
-                complexity="low",
+                complexity=complexity_level,
                 max_tokens=600,
                 messages=None,
                 request_headers=dict(request.headers)
