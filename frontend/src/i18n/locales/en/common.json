@@ -477,6 +477,7 @@
       "searchPlaceholder": "Search by ID, title, or category",
       "allStatuses": "All statuses",
       "allCategories": "All categories",
+      "allAreas": "All areas",
       "refresh": "Refresh",
       "loading": "Loading…",
       "failedToLoad": "Failed to load items",

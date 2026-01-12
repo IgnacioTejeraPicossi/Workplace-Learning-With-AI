@@ -1372,6 +1372,7 @@
       "searchPlaceholder": "Søk etter ID, tittel eller kategori",
       "allStatuses": "Alle statuser",
       "allCategories": "Alle kategorier",
+      "allAreas": "Alle områder",
       "refresh": "Oppdater",
       "loading": "Laster…",
       "failedToLoad": "Kunne ikke laste elementer",

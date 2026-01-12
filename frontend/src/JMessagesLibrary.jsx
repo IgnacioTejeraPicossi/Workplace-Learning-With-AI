@@ -13,6 +13,7 @@ export default function JMessagesLibrary() {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [areaFilter, setAreaFilter] = useState('all');
   const [tocOpen, setTocOpen] = useState({});
   const [editing, setEditing] = useState({});
   const [editContent, setEditContent] = useState({});
@@ -57,11 +58,16 @@ export default function JMessagesLibrary() {
   ];
 
   const filtered = items.filter((it) => {
-    const hay = `${it.j_id || ''} ${it.title || ''} ${it.categories?.join(' ') || ''}`.toLowerCase();
+    // Support both old (array) and new (string) format for category
+    const category = it.category || (Array.isArray(it.categories) && it.categories.length > 0 ? it.categories[0] : null);
+    const hay = `${it.j_id || ''} ${it.title || ''} ${category || ''}`.toLowerCase();
     const qOk = hay.includes(query.toLowerCase());
     const sOk = statusFilter === 'all' || (it.status || '') === statusFilter;
-    const cOk = categoryFilter === 'all' || (Array.isArray(it.categories) && it.categories.includes(categoryFilter));
-    return qOk && sOk && cOk;
+    const cOk = categoryFilter === 'all' || category === categoryFilter;
+    // Support both old (string) and new (array) format for area
+    const areas = Array.isArray(it.area) ? it.area : (it.area ? [it.area] : []);
+    const aOk = areaFilter === 'all' || areas.includes(areaFilter);
+    return qOk && sOk && cOk && aOk;
   });
 
   const startEditing = (itemId) => {
@@ -316,6 +322,20 @@ export default function JMessagesLibrary() {
         >
           <option value="all">{t('jMessages.library.allCategories')}</option>
           {predefinedCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <select
+          value={areaFilter}
+          onChange={(e) => setAreaFilter(e.target.value)}
+          style={{
+            border: `1px solid ${colors.border}`,
+            borderRadius: 8,
+            padding: '8px 12px',
+            background: colors.background,
+            color: colors.text
+          }}
+        >
+          <option value="all">{t('jMessages.library.allAreas')}</option>
+          {predefinedAreas.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
         <button
           onClick={load}
