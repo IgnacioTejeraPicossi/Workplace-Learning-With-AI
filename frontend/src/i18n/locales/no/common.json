@@ -1368,6 +1368,7 @@
         "validFrom": "Gyldig fra",
         "validTo": "Gyldig til",
         "replaces": "Erstatter",
+        "replacedBy": "Erstattet av",
         "category": "Kategori",
         "area": "Område",
         "title": "Title"
@@ -1406,6 +1407,7 @@
         "validFrom": "Gyldig fra",
         "validTo": "Gyldig til",
         "replaces": "Erstatter",
+        "replacedBy": "Erstattet av",
         "category": "Kategori",
         "area": "Område",
         "title": "Title"

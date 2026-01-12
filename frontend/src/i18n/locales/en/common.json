@@ -473,6 +473,7 @@
         "validFrom": "Valid from",
         "validTo": "Valid to",
         "replaces": "Replaces",
+        "replacedBy": "Replaced by",
         "category": "Category",
         "area": "Area",
         "title": "Title"
@@ -511,6 +512,7 @@
         "validFrom": "Valid from",
         "validTo": "Valid to",
         "replaces": "Replaces",
+        "replacedBy": "Replaced by",
         "category": "Category",
         "area": "Area",
         "title": "Title"

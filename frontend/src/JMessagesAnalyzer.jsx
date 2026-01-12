@@ -400,7 +400,8 @@ Trekk ut metadata og returner KUN STRICT JSON uten kommentarer.
 Felt:
 - j_id
 - title
-- replaces_id
+  - replaces_id
+  - replaced_by_id
 - status
 - valid_from
 - valid_to
@@ -496,6 +497,7 @@ Extract STRICT JSON with:
               <div><strong>{t('jMessages.analyzer.metadata.validFrom')}:</strong> {result.valid_from || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.validTo')}:</strong> {result.valid_to || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.replacedBy')}:</strong> {result.replaced_by || '—'}</div>
             </div>
             <div style={{ marginTop: 8 }}>
               <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}

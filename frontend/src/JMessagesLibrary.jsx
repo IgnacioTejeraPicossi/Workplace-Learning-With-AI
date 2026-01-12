@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
@@ -39,6 +39,20 @@ export default function JMessagesLibrary() {
   useEffect(() => {
     load();
   }, []);
+
+  // Reverse lookup: if another J-message has `replaces = J-XXX`, then J-XXX is "replaced by" that other one.
+  // This matches how the human page often derives "Erstattet av" from the registry, not from the document text.
+  const replacedByMap = useMemo(() => {
+    const map = {};
+    for (const it of items) {
+      const replaces = (it?.replaces || '').trim();
+      const jid = (it?.j_id || '').trim();
+      if (replaces && jid && !map[replaces]) {
+        map[replaces] = jid;
+      }
+    }
+    return map;
+  }, [items]);
 
   const allStatuses = Array.from(new Set(items.map((i) => i.status).filter(Boolean))).sort();
   
@@ -82,6 +96,7 @@ export default function JMessagesLibrary() {
           valid_from: item.valid_from || '',
           valid_to: item.valid_to || '',
           replaces: item.replaces || '',
+          replaced_by: item.replaced_by || replacedByMap[item.j_id] || '',
           category: item.category || (Array.isArray(item.categories) && item.categories.length > 0 ? item.categories[0] : ''),
           area: Array.isArray(item.area) ? [...item.area] : (item.area ? [item.area] : []),
           summary: item.summary || '',
@@ -183,12 +198,14 @@ export default function JMessagesLibrary() {
   const exportMarkdown = (it) => {
     const lines = [];
     if (it.title) lines.push(`# ${it.title}`);
+    const replacedBy = it.replaced_by || replacedByMap[it.j_id] || '';
     const meta = [
       it.j_id ? `ID: ${it.j_id}` : null,
       it.status ? `Status: ${it.status}` : null,
       it.valid_from ? `Valid from: ${it.valid_from}` : null,
       it.valid_to ? `Valid to: ${it.valid_to}` : null,
       it.replaces ? `Replaces: ${it.replaces}` : null,
+      replacedBy ? `Replaced by: ${replacedBy}` : null,
       (it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `Category: ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}` : null,
       (Array.isArray(it.area) && it.area.length > 0) ? `Area: ${it.area.join(', ')}` : (it.area && !Array.isArray(it.area) ? `Area: ${it.area}` : null)
     ].filter(Boolean);
@@ -228,6 +245,7 @@ export default function JMessagesLibrary() {
     const win = window.open('', '_blank');
     if (!win) return;
     const title = it.title || (it.j_id || 'J-message');
+    const replacedBy = it.replaced_by || replacedByMap[it.j_id] || '';
     const meta = `
       <div style="margin-bottom:8px;color:#555;font-size:12px">
         ${it.j_id ? `<div><strong>ID:</strong> ${it.j_id}</div>` : ''}
@@ -235,6 +253,7 @@ export default function JMessagesLibrary() {
         ${it.valid_from ? `<div><strong>Valid from:</strong> ${it.valid_from}</div>` : ''}
         ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
         ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
+        ${replacedBy ? `<div><strong>Replaced by:</strong> ${replacedBy}</div>` : ''}
         ${(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `<div><strong>Category:</strong> ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}</div>` : ''}
         ${(Array.isArray(it.area) && it.area.length > 0) ? `<div><strong>Area:</strong> ${it.area.join(', ')}</div>` : (it.area && !Array.isArray(it.area) ? `<div><strong>Area:</strong> ${it.area}</div>` : '')}
       </div>`;
@@ -507,6 +526,26 @@ export default function JMessagesLibrary() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          {t('jMessages.library.metadata.replacedBy')}
+                        </label>
+                        <input
+                          value={editContent[it.id]?.replaced_by || ''}
+                          onChange={(e) => handleEditChange(it.id, 'replaced_by', e.target.value)}
+                          placeholder="J-XXX-YYYY"
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12,
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
                           {t('jMessages.library.metadata.category')}
                         </label>
                         <select
@@ -599,6 +638,7 @@ export default function JMessagesLibrary() {
                       <div><strong>{t('jMessages.library.metadata.validFrom')}:</strong> {it.valid_from || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.validTo')}:</strong> {it.valid_to || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {it.replaces || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.replacedBy')}:</strong> {(it.replaced_by || replacedByMap[it.j_id]) || '—'}</div>
                     </div>
                     {(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) && (
                       <div style={{ marginTop: 8, marginBottom: 8 }}>
