@@ -3,10 +3,26 @@ GPT-5 Configuration and Model Selection
 This file contains configuration for the new GPT-5 models and their optimal use cases.
 """
 
+# NOTE:
+# Model availability depends on your OpenAI org verification / access tier.
+# To avoid breaking the app when a model isn't available, we default to widely-available models
+# and allow overrides via environment variables.
+import os
+
+# Optional overrides (set in your environment or .env)
+# Examples:
+#   OPENAI_HIGH_MODEL=gpt-5.2
+#   OPENAI_MEDIUM_MODEL=gpt-4o-mini
+#   OPENAI_LOW_MODEL=gpt-3.5-turbo
+OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-4o"
+OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-4o-mini"
+OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-3.5-turbo"
+
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-5": {
-        "name": "gpt-4o",  # Use gpt-4o as fallback for gpt-5
+        # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-4o
+        "name": OPENAI_HIGH_MODEL,
         "description": "Most powerful model, best for complex reasoning and analysis",
         "use_cases": [
             "Complex repository analysis",
@@ -19,7 +35,8 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-mini": {
-        "name": "gpt-4o-mini",  # Use gpt-4o-mini as fallback for gpt-5-mini
+        # Medium complexity model (override via OPENAI_MEDIUM_MODEL). Default: gpt-4o-mini
+        "name": OPENAI_MEDIUM_MODEL,
         "description": "Balanced performance and cost, good for most tasks",
         "use_cases": [
             "Standard micro-lessons",
@@ -32,7 +49,8 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-nano": {
-        "name": "gpt-3.5-turbo",  # Use gpt-3.5-turbo as fallback for gpt-5-nano
+        # Low complexity model (override via OPENAI_LOW_MODEL). Default: gpt-3.5-turbo
+        "name": OPENAI_LOW_MODEL,
         "description": "Fastest and most cost-effective, good for simple tasks",
         "use_cases": [
             "Quick responses",

@@ -354,7 +354,7 @@ export default function JMessagesAnalyzer() {
                 >
                   <option value="low">{t('jMessages.analyzer.aiLevelLow')} (GPT-3.5)</option>
                   <option value="medium">{t('jMessages.analyzer.aiLevelMedium')} (GPT-4o-mini)</option>
-                  <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (GPT-4o)</option>
+                  <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (GPT-4o / GPT-5 if available)</option>
                 </select>
               </label>
             </>

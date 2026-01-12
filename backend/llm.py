@@ -345,6 +345,19 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         else:
             return "[MOCKED RESPONSE] No prompt or messages provided."
     
+    def _call_openai(model_name: str):
+        if messages:
+            return openai.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                **params
+            )
+        return openai.chat.completions.create(
+            model=model_name,
+            messages=[{"role": "user", "content": prompt}],
+            **params
+        )
+
     try:
         # Get optimal GPT-5 model and parameters
         model = get_optimal_model(task_type, complexity)
@@ -360,21 +373,34 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         # Use old OpenAI syntax for compatibility with openai==0.28.1
         openai.api_key = effective_openai_key
         
-        if messages:
-            response = openai.chat.completions.create(
-                model=model_to_use,
-                messages=messages,
-                **params
-            )
-        else:
-            response = openai.chat.completions.create(
-                model=model_to_use,
-                messages=[{"role": "user", "content": prompt}],
-                **params
-            )
+        response = _call_openai(model_to_use)
         return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..."
+        # Log the full error so we can see whether it's "model not found", "no access", etc.
+        err_str = str(e)
+        print(f"[ask_openai] ❌ OpenAI call failed for model='{model_to_use}': {err_str}")
+
+        # If the chosen model isn't available for this API key/org, retry with a safe fallback.
+        # This avoids breaking the J-messages analyzer when a new model name isn't enabled.
+        lowered = err_str.lower()
+        likely_model_issue = any(s in lowered for s in [
+            "model_not_found",
+            "no such model",
+            "does not exist",
+            "not found",
+            "invalid model",
+        ])
+
+        fallback_model = "gpt-4o"
+        if likely_model_issue and model_to_use != fallback_model:
+            try:
+                print(f"[ask_openai] ↩️ Retrying with fallback model='{fallback_model}'")
+                response = _call_openai(fallback_model)
+                return response.choices[0].message.content.strip()
+            except Exception as e2:
+                print(f"[ask_openai] ❌ Fallback model failed too: {e2}")
+
+        return f"[MOCKED RESPONSE - Error: {err_str}] This would be the AI's answer to: {prompt[:60]}..."
 
 def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
     """
