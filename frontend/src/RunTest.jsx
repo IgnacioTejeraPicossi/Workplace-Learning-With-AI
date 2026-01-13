@@ -433,16 +433,18 @@ const RunTest = () => {
           
           // J-messages Training - Retrospective Learning (Epic 3)
           { name: 'GET /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'GET', requiresAuth: false },
-          { name: 'GET /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'POST', requiresAuth: false },
-          { name: 'PATCH /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'PATCH', requiresAuth: false },
-          { name: 'DELETE /api/j-messages/training/{id}', endpoint: '/api/j-messages/training/test-pair-id', method: 'DELETE', requiresAuth: false },
+          // Create a real training pair first so subsequent tests can use a valid Mongo ObjectId
+          { name: 'POST /api/j-messages/training (create test pair)', endpoint: '/api/j-messages/training', method: 'POST', requiresAuth: false },
+          { name: 'GET /api/j-messages/training/{id} (uses created id)', endpoint: '/api/j-messages/training/test-training-pair-id', method: 'GET', requiresAuth: false },
+          { name: 'PATCH /api/j-messages/training/{id} (uses created id)', endpoint: '/api/j-messages/training/test-training-pair-id', method: 'PATCH', requiresAuth: false },
+          { name: 'GET /api/j-messages/training/{id}/evaluation (uses created id)', endpoint: '/api/j-messages/training/test-training-pair-id/evaluation', method: 'GET', requiresAuth: false },
+          { name: 'DELETE /api/j-messages/training/{id} (uses created id)', endpoint: '/api/j-messages/training/test-training-pair-id', method: 'DELETE', requiresAuth: false },
           { name: 'POST /api/j-messages/training/import', endpoint: '/api/j-messages/training/import', method: 'POST', requiresAuth: false },
           { name: 'GET /api/j-messages/training/stats/summary', endpoint: '/api/j-messages/training/stats/summary', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/j-messages/training/{id}/evaluate', endpoint: '/api/j-messages/training/test-pair-id/evaluate', method: 'POST', requiresAuth: false },
-          { name: 'POST /api/j-messages/training/evaluate-batch', endpoint: '/api/j-messages/training/evaluate-batch', method: 'POST', requiresAuth: false },
-          { name: 'GET /api/j-messages/training/{id}/evaluation', endpoint: '/api/j-messages/training/test-pair-id/evaluation', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/j-messages/training/prompt/suggest', endpoint: '/api/j-messages/training/prompt/suggest', method: 'POST', requiresAuth: false },
+          // Evaluation endpoints can be AI-expensive; keep them visible but mark as Requires Setup in the runner
+          { name: 'POST /api/j-messages/training/{id}/evaluate (AI)', endpoint: '/api/j-messages/training/test-training-pair-id/evaluate', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/evaluate-batch (AI)', endpoint: '/api/j-messages/training/evaluate-batch', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/training/prompt/suggest (AI)', endpoint: '/api/j-messages/training/prompt/suggest', method: 'POST', requiresAuth: false },
           
           // J-messages MCP endpoints
           { name: 'GET /api/mcp/manifest', endpoint: '/api/mcp/manifest', method: 'GET', requiresAuth: false },
@@ -454,6 +456,8 @@ const RunTest = () => {
     let createdMemberId = null; // captured after successful add member
     let createdJMessageDocId = null; // captured after successful /api/j-messages/save
     let lastJMessageAnalyzeResult = null; // captured after successful MCP analyze
+    let createdTrainingPairId = null; // captured after successful /api/j-messages/training (POST)
+    let createdTrainingJId = null; // captured to help with debugging
     // Reuse same user across register/login so auth works
     const testUserEmail = `testuser${Date.now()}@example.com`;
     const testUserPassword = 'testpassword123';
@@ -505,6 +509,22 @@ const RunTest = () => {
           });
           continue;
         }
+        // Skip AI-expensive training evaluation endpoints (still listed, but not executed by default)
+        if (
+          api.endpoint.includes('/api/j-messages/training/') &&
+          (api.endpoint.includes('/evaluate') || api.endpoint === '/api/j-messages/training/evaluate-batch' || api.endpoint === '/api/j-messages/training/prompt/suggest')
+        ) {
+          results.push({
+            name: api.name,
+            status: 'requires_setup',
+            time: '0ms',
+            statusCode: '⚠️ Requires Setup',
+            endpoint: api.endpoint,
+            requiresAuth: api.requiresAuth,
+            error: 'This endpoint can run AI evaluation/suggestions (may be slow and consume tokens). Run manually when needed.'
+          });
+          continue;
+        }
 
         // Prepare headers
         const headers = { 'Content-Type': 'application/json' };
@@ -538,6 +558,21 @@ const RunTest = () => {
             continue;
           }
           resolvedEndpoint = resolvedEndpoint.replace('test-jmessage-id', createdJMessageDocId);
+        }
+        if (resolvedEndpoint.includes('/api/j-messages/training/test-training-pair-id')) {
+          if (!createdTrainingPairId) {
+            results.push({
+              name: api.name,
+              status: 'skipped',
+              time: '0ms',
+              statusCode: 'Skipped (no training pair id)',
+              endpoint: api.endpoint,
+              requiresAuth: api.requiresAuth,
+              error: 'Training pair id not available. Ensure POST /api/j-messages/training (create test pair) runs successfully first.'
+            });
+            continue;
+          }
+          resolvedEndpoint = resolvedEndpoint.replace('test-training-pair-id', createdTrainingPairId);
         }
 
         if (api.method === 'GET') {
@@ -1012,18 +1047,20 @@ const RunTest = () => {
             // J-messages Training endpoints
             case '/api/j-messages/training':
               if (method === 'POST') {
+                const now = Date.now();
+                createdTrainingJId = `J-TEST-TRAIN-${now}`;
                 testData = {
-                  j_id: 'J-TEST-TRAIN-2025',
-                  title: 'Test Training Pair',
-                  source_system_id: 'enonic-test-123',
+                  j_id: createdTrainingJId,
+                  title: `Test Training Pair ${now}`,
+                  source_system_id: `enonic-test-${now}`,
                   original: {
                     text_excerpt: 'This is the original document text for training...',
                     doc_type: 'docx'
                   },
                   human_structured: {
                     metadata: {
-                      j_id: 'J-TEST-TRAIN-2025',
-                      title: 'Test Training Pair',
+                      j_id: createdTrainingJId,
+                      title: `Test Training Pair ${now}`,
                       status: 'Fastsatt',
                       categories: ['Test', 'Training']
                     },
@@ -1034,7 +1071,7 @@ const RunTest = () => {
                 };
               }
               break;
-            case '/api/j-messages/training/test-pair-id':
+            case '/api/j-messages/training/test-training-pair-id':
               if (method === 'PATCH') {
                 testData = {
                   tags: ['updated', 'test']
@@ -1058,9 +1095,6 @@ const RunTest = () => {
                 ],
                 source: 'api-test-import'
               };
-              break;
-            case '/api/j-messages/training/test-pair-id/evaluate':
-              testData = {}; // No body needed for evaluation
               break;
             case '/api/j-messages/training/evaluate-batch':
               testData = {
@@ -1113,6 +1147,12 @@ const RunTest = () => {
             const saved = await response.clone().json();
             if (saved?.id) {
               createdJMessageDocId = saved.id;
+            }
+          }
+          if (api.endpoint === '/api/j-messages/training' && api.method === 'POST' && response.ok) {
+            const created = await response.clone().json();
+            if (created?.id) {
+              createdTrainingPairId = created.id;
             }
           }
           if (api.endpoint === '/teams' && response.ok) {
@@ -1190,14 +1230,14 @@ const RunTest = () => {
           status = 'failed';
         }
 
-        // Special handling for J-messages Training endpoints that use placeholder IDs
-        // Many of these will return 500 when "test-pair-id" is not a valid ObjectId (this is EXPECTED).
-        if (api.endpoint.includes('/api/j-messages/training/test-pair-id')) {
+        // Special handling for J-messages Training endpoints that use placeholder IDs (fallback behavior)
+        // If placeholder ids are used, Mongo will throw ObjectId errors; this is expected and should be explained.
+        if (api.endpoint.includes('/api/j-messages/training/test-training-pair-id')) {
           if (numericStatus === 500) {
             status = 'expected_fail';
             statusCode = '500 (Expected - Invalid ObjectId)';
             if (!errorDetail) {
-              errorDetail = 'test-pair-id is not a valid MongoDB ObjectId format (expected). Use a real id like 675e8f1234567890abcdef12.';
+              errorDetail = 'Placeholder id is not a valid MongoDB ObjectId format (expected). Create a real training pair first and reuse its id.';
             }
           } else if (numericStatus === 404) {
             status = 'expected_fail';
@@ -1261,10 +1301,10 @@ const RunTest = () => {
         }
         
         // Special handling for J-messages Training endpoints that need real ObjectIds
-        if (api.endpoint.includes('/api/j-messages/training/test-pair-id')) {
+        if (api.endpoint.includes('/api/j-messages/training/test-training-pair-id')) {
           status = 'expected_fail';
           statusCode = 'Expected (placeholder id)';
-          errorMessage = 'This endpoint uses a placeholder id (test-pair-id). Use a real MongoDB ObjectId to fully test.';
+          errorMessage = 'This endpoint uses a placeholder id. Create a real training pair first and reuse its MongoDB ObjectId to fully test.';
         }
         
         // Special handling for J-messages update/delete endpoints with invalid IDs
