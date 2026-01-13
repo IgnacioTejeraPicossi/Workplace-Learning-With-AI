@@ -87,7 +87,7 @@ def j_messages_manifest():
         "tools": [
             {
                 "name": "analyze_j_melding",
-                "description": "Analyze a J-melding (.docx or .pdf) from Fiskeridirektoratet and extract structured metadata, table of contents, and HTML body. Returns JSON with id, title, status, dates, categories, toc, and body_html.",
+                "description": "Analyze a J-melding (.docx or .pdf) from Fiskeridirektoratet and extract structured metadata, table of contents, and HTML body. Returns JSON with id, title, status, dates, category/area, toc, body_html, plus api_config (provider/model/ai_level) for transparency.",
                 "input_schema": {
                     "type": "object",
                     "properties": {
@@ -99,6 +99,11 @@ def j_messages_manifest():
                             "type": "string",
                             "enum": ["none", "short", "medium", "long"],
                             "description": "Optional: Include AI summary (none|short|medium|long). Default: none."
+                        },
+                        "ai_level": {
+                            "type": "string",
+                            "enum": ["low", "medium", "high"],
+                            "description": "AI complexity level (low|medium|high). Mirrors the web UI 'AI Level'. Default: low."
                         }
                     },
                     "required": ["file_url"]
@@ -146,11 +151,16 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
     """
     file_url = data.get("file_url")
     summary_length = data.get("summary_length", "none")
+    ai_level = data.get("ai_level", "low")
+
+    # Validate ai_level
+    if ai_level not in ["low", "medium", "high"]:
+        ai_level = "low"
     
     if not file_url or not isinstance(file_url, str):
         raise HTTPException(status_code=400, detail="file_url is required and must be a string")
     
-    logger.info("analyze_j_melding called via MCP", extra={"file_url": file_url, "summary_length": summary_length})
+    logger.info("analyze_j_melding called via MCP", extra={"file_url": file_url, "summary_length": summary_length, "ai_level": ai_level})
     
     try:
         # 1) Download the file from URL (60s timeout for download)
@@ -186,6 +196,8 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
             params = {}
             if summary_length and summary_length != "none":
                 params["summary_length"] = summary_length
+            # Forward ai_level to internal analyzer as 'complexity'
+            params["complexity"] = ai_level
             
             # Forward request headers (for API config, auth, etc.)
             # Priority: 1) Request headers, 2) Saved API config file, 3) .env fallback
@@ -309,6 +321,48 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                 )
             
             result = analyze_resp.json()
+
+            # Add transparency info for MCP clients (Postman / MCP Test UI)
+            try:
+                import os
+                from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+
+                provider_effective = headers.get("x-api-provider")
+                config_details = {}
+                if not provider_effective:
+                    # Try to determine from saved config or env fallback (same logic path as above)
+                    try:
+                        from backend.api_config_storage import get_api_config
+                        saved_config = get_api_config()
+                        provider_effective = saved_config.get("provider") or provider_effective
+                        config_details = saved_config or {}
+                    except Exception:
+                        provider_effective = os.getenv("API_PROVIDER", "openai").lower()
+
+                model_to_use = None
+                if provider_effective in ["openai", "openrouter"]:
+                    # Metadata extraction uses task_type="extraction"
+                    model_key = get_optimal_model("extraction", ai_level)
+                    params_for_model = get_gpt5_parameters(model_key, "extraction")
+                    model_to_use = params_for_model.get("model")
+                elif provider_effective == "itemai":
+                    # Best-effort: expose configured local model if present in saved config
+                    model_to_use = config_details.get("itemai_model") or config_details.get("itemaiCurrentModel")
+
+                result["api_config"] = {
+                    "provider": provider_effective,
+                    "ai_level": ai_level,
+                    "model": model_to_use,
+                    "config_source": config_source
+                }
+            except Exception as _:
+                # Never fail the analysis response due to transparency metadata
+                result["api_config"] = {
+                    "provider": headers.get("x-api-provider"),
+                    "ai_level": ai_level,
+                    "model": None,
+                    "config_source": config_source
+                }
             logger.info("analyze_j_melding via MCP succeeded", extra={
                 "file_url": file_url,
                 "j_id": result.get("id"),
