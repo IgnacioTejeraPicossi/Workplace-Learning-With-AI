@@ -419,13 +419,17 @@ const RunTest = () => {
           // NEW: Enhanced Route endpoint
           { name: 'POST /route', endpoint: '/route', method: 'POST', requiresAuth: true },
           
-          // J-messages Analyzer - Basic endpoints
+      // J-messages Analyzer - Basic endpoints
           { name: 'GET /api/j-messages/list', endpoint: '/api/j-messages/list', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/j-messages/save', endpoint: '/api/j-messages/save', method: 'POST', requiresAuth: false },
-          { name: 'POST /api/j-messages/analyze-note', endpoint: '/api/j-messages/analyze-note', method: 'POST', requiresAuth: false },
-          { name: 'POST /api/j-messages/export-docx', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
-          { name: 'PUT /api/j-messages/update/{doc_id}', endpoint: '/api/j-messages/update/693fd9d0515760268dae14ec', method: 'PUT', requiresAuth: false },
-          { name: 'DELETE /api/j-messages/delete/{doc_id}', endpoint: '/api/j-messages/delete/test-doc-id', method: 'DELETE', requiresAuth: false },
+          // Note: /api/j-messages/analyze and /api/j-messages/analyze-note are multipart uploads and are skipped in browser-run API tests.
+          { name: 'POST /api/j-messages/analyze (multipart)', endpoint: '/api/j-messages/analyze', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/analyze-note (multipart)', endpoint: '/api/j-messages/analyze-note', method: 'POST', requiresAuth: false },
+          // Use MCP analyze (server-side download) to exercise the full analyzer pipeline without browser CORS/file handling
+          { name: 'POST /api/mcp/j-messages/analyze (ai_level)', endpoint: '/api/mcp/j-messages/analyze', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/save (uses MCP analyze result)', endpoint: '/api/j-messages/save', method: 'POST', requiresAuth: false },
+          { name: 'PUT /api/j-messages/update/{doc_id} (uses created id)', endpoint: '/api/j-messages/update/test-jmessage-id', method: 'PUT', requiresAuth: false },
+          { name: 'POST /api/j-messages/export-docx (uses MCP analyze result)', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
+          { name: 'DELETE /api/j-messages/delete/{doc_id} (uses created id)', endpoint: '/api/j-messages/delete/test-jmessage-id', method: 'DELETE', requiresAuth: false },
           
           // J-messages Training - Retrospective Learning (Epic 3)
           { name: 'GET /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'GET', requiresAuth: false },
@@ -442,13 +446,14 @@ const RunTest = () => {
           
           // J-messages MCP endpoints
           { name: 'GET /api/mcp/manifest', endpoint: '/api/mcp/manifest', method: 'GET', requiresAuth: false },
-          { name: 'POST /api/mcp/j-messages/analyze', endpoint: '/api/mcp/j-messages/analyze', method: 'POST', requiresAuth: false },
     ];
 
     const results = [];
     let accessToken = null; // captured after successful /auth/login
     let createdTeamId = null; // captured after successful /teams creation
     let createdMemberId = null; // captured after successful add member
+    let createdJMessageDocId = null; // captured after successful /api/j-messages/save
+    let lastJMessageAnalyzeResult = null; // captured after successful MCP analyze
     // Reuse same user across register/login so auth works
     const testUserEmail = `testuser${Date.now()}@example.com`;
     const testUserPassword = 'testpassword123';
@@ -486,6 +491,19 @@ const RunTest = () => {
           results.push({ name: api.name, status: 'skipped', time: '0ms', statusCode: 'Skipped (placeholder lesson_id)', endpoint: api.endpoint, requiresAuth: api.requiresAuth });
           continue;
         }
+        // Skip multipart upload endpoints in browser-run API tests (handled via MCP analyze instead)
+        if (api.endpoint === '/api/j-messages/analyze' || api.endpoint === '/api/j-messages/analyze-note') {
+          results.push({
+            name: api.name,
+            status: 'requires_setup',
+            time: '0ms',
+            statusCode: '⚠️ Requires Setup',
+            endpoint: api.endpoint,
+            requiresAuth: api.requiresAuth,
+            error: 'Multipart file upload is not executed in browser API tests. Use the UI upload or the MCP analyze endpoint (server-side download) to test analysis.'
+          });
+          continue;
+        }
 
         // Prepare headers
         const headers = { 'Content-Type': 'application/json' };
@@ -504,6 +522,21 @@ const RunTest = () => {
         if (resolvedEndpoint.includes('/members/test-member')) {
           const safeMember = createdMemberId || '000000000000000000000000';
           resolvedEndpoint = resolvedEndpoint.replace('test-member', safeMember);
+        }
+        if (resolvedEndpoint.includes('/api/j-messages/update/test-jmessage-id') || resolvedEndpoint.includes('/api/j-messages/delete/test-jmessage-id')) {
+          if (!createdJMessageDocId) {
+            results.push({
+              name: api.name,
+              status: 'skipped',
+              time: '0ms',
+              statusCode: 'Skipped (no J-message doc_id)',
+              endpoint: api.endpoint,
+              requiresAuth: api.requiresAuth,
+              error: 'Run /api/j-messages/save first (it depends on MCP analyze result).'
+            });
+            continue;
+          }
+          resolvedEndpoint = resolvedEndpoint.replace('test-jmessage-id', createdJMessageDocId);
         }
 
         if (api.method === 'GET') {
@@ -598,6 +631,60 @@ const RunTest = () => {
               testData = { 
                 url: 'https://www.outsystems.com/blog/outsystems-low-code-platform/',
                 analysis_type: 'productivity'
+              };
+              break;
+            // J-messages MCP analyze (server-side file download)
+            case '/api/mcp/j-messages/analyze':
+              testData = {
+                file_url: 'http://localhost:8888/docs/j-melding-test.docx',
+                summary_length: 'short',
+                ai_level: 'low'
+              };
+              break;
+            // J-messages save (prefer real analyze result, otherwise minimal stub)
+            case '/api/j-messages/save':
+              testData = lastJMessageAnalyzeResult || {
+                id: `J-TEST-${Date.now()}`,
+                title: 'Test J-message (API Tests)',
+                status: 'active',
+                valid_from: null,
+                valid_to: null,
+                replaces: null,
+                replaced_by: null,
+                category: 'Annet',
+                area: [],
+                toc: [],
+                body_html: '<p>Test body</p>',
+                raw_text: 'Test raw text',
+                summary: '',
+                summary_length: 'none',
+                filename: 'test.docx'
+              };
+              break;
+            case '/api/j-messages/update/test-jmessage-id':
+              testData = {
+                title: 'Updated title (API Tests)',
+                replaced_by: `J-UPDATED-${Date.now()}`,
+                category: 'Annet',
+                area: []
+              };
+              break;
+            case '/api/j-messages/export-docx':
+              testData = lastJMessageAnalyzeResult || {
+                id: `J-TEST-${Date.now()}`,
+                title: 'Test J-message (Export DOCX)',
+                status: 'active',
+                valid_from: null,
+                valid_to: null,
+                replaces: null,
+                replaced_by: null,
+                category: 'Annet',
+                area: [],
+                toc: [],
+                body_html: '<p>Test body</p>',
+                raw_text: 'Test raw text',
+                summary: '',
+                summary_length: 'none'
               };
               break;
             case '/auth/register':
@@ -1013,6 +1100,19 @@ const RunTest = () => {
           if (api.endpoint === '/auth/login' && response.ok) {
             const body = await response.clone().json();
             if (body?.access_token) accessToken = body.access_token;
+          }
+          if (api.endpoint === '/api/mcp/j-messages/analyze' && response.ok) {
+            // Store the analysis result so we can reuse it for /api/j-messages/save and /api/j-messages/export-docx
+            const jm = await response.clone().json();
+            if (jm && typeof jm === 'object' && jm.id) {
+              lastJMessageAnalyzeResult = jm;
+            }
+          }
+          if (api.endpoint === '/api/j-messages/save' && response.ok) {
+            const saved = await response.clone().json();
+            if (saved?.id) {
+              createdJMessageDocId = saved.id;
+            }
           }
           if (api.endpoint === '/teams' && response.ok) {
             const body2 = await response.clone().json();
