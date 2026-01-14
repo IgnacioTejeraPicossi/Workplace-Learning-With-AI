@@ -1,0 +1,18 @@
+Extract note metadata from this Norwegian J-melding addendum document.
+Return ONLY valid JSON. No explanations, no thinking, just JSON.
+
+Required JSON format:
+{{
+  "target_j_id": "J-XXX-YYYY",
+  "note_type": "addendum",
+  "valid_from": "YYYY-MM-DD",
+  "valid_to": "YYYY-MM-DD",
+  "affected_sections": ["Chapter 1", "§ 7"],
+  "actions": ["amend", "replace"],
+  "summary": "Brief change description"
+}}
+
+Document text:
+\"\"\"{body_text}\"\"\"
+
+JSON:

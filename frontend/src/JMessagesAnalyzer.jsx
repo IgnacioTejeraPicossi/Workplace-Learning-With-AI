@@ -28,6 +28,8 @@ export default function JMessagesAnalyzer() {
   const [itemaiModel, setItemaiModel] = useState(() => {
     return localStorage.getItem('itemaiCurrentModel') || null;
   });
+  const [nativePrompt, setNativePrompt] = useState('');
+  const [promptVersion, setPromptVersion] = useState('');
 
   // Load API provider from localStorage and listen for changes
   useEffect(() => {
@@ -90,6 +92,25 @@ export default function JMessagesAnalyzer() {
   useEffect(() => {
     localStorage.setItem('jMessagesTemperature', String(temperature));
   }, [temperature]);
+
+  // Load native prompt from backend
+  useEffect(() => {
+    const loadNativePrompt = async () => {
+      try {
+        const resp = await fetchWithAuth('/api/j-messages/prompt?prompt_type=metadata');
+        const data = await resp.json();
+        if (data.template) {
+          setNativePrompt(data.template);
+          setPromptVersion(data.version || '');
+        }
+      } catch (err) {
+        console.error('Failed to load native prompt:', err);
+        // Fallback to a default message
+        setNativePrompt('(Failed to load prompt from server)');
+      }
+    };
+    loadNativePrompt();
+  }, []);
 
   // Load categories from saved J-messages
   useEffect(() => {
@@ -446,32 +467,8 @@ export default function JMessagesAnalyzer() {
       <PromptPanel
         agent="j-messages"
         colors={colors}
-        nativePromptText={`Du er en assistent som analyserer norske forskrifter fra Fiskeridirektoratet.
-Du får teksten fra en J-melding (header + starten på forskriften).
-Trekk ut metadata og returner KUN STRICT JSON uten kommentarer.
-Felt:
-- j_id
-- title
-  - replaces_id
-  - replaced_by_id
-- status
-- valid_from
-- valid_to
-- category (ONE of: "Annet", "Bunnfisk", "Pelagisk fisk" - always required, use "Annet" if unsure)
-- area (ARRAY of: "Andre lands soner", "Internasjonal farvann", "Nord for 62\u00B0 N", "Sør for 62\u00B0 N" - can have multiple areas, use empty array [] if none)
-
-Tekst:
-\"\"\"{header_text}\\n\\n{body_text[:4000]}\"\"\"
-
-For notes (J-melding notes):
-Extract STRICT JSON with:
-- target_j_id: the J‑melding ID this note modifies (e.g., "J-195-2025"), or null if unknown
-- note_type: "addendum" | "correction" | "extension" | "cancellation" | "other"
-- valid_from: YYYY-MM-DD or null
-- valid_to: YYYY-MM-DD or null
-- affected_sections: array of strings listing affected chapters/paragraphs (e.g., "Kapittel 1", "§ 7 (sjette ledd)")
-- actions: array of verbs like ["amend","replace","add","repeal"]
-- summary: short human-readable summary of what the note changes`}
+        nativePromptText={nativePrompt || '(Loading prompt...)'}
+        promptVersion={promptVersion}
       />
 
       {result && (

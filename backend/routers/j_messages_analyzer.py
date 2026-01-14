@@ -6,6 +6,13 @@ from datetime import datetime
 from fastapi.responses import StreamingResponse
 
 try:
+    from backend.prompt_loader import load_prompt_template, get_active_version
+except Exception:
+    # Fallback if prompt_loader is not available
+    load_prompt_template = None
+    get_active_version = None
+
+try:
     from docx import Document  # python-docx
 except Exception:
     Document = None
@@ -233,6 +240,29 @@ def extract_json_from_llm_response(response: str) -> dict:
 
 
 def build_metadata_prompt(header_text: str, body_text: str) -> str:
+    """
+    Build metadata extraction prompt using versioned template.
+    
+    Args:
+        header_text: Document header text
+        body_text: Document body text (will be truncated to 4000 chars)
+    
+    Returns:
+        Formatted prompt string
+    """
+    # Limit body text to 4000 characters to avoid token limits
+    body_text_limited = body_text[:4000]
+    
+    # Try to load from versioned template
+    if load_prompt_template:
+        try:
+            template = load_prompt_template("metadata")
+            # Format template with actual values
+            return template.format(header_text=header_text, body_text=body_text_limited)
+        except Exception as e:
+            print(f"[J-MESSAGES] ⚠️ Failed to load versioned prompt, using fallback: {e}")
+    
+    # Fallback to hardcoded prompt (original implementation)
     return f"""Extract metadata from this Norwegian fishing regulation document.
 Return ONLY valid JSON. No explanations, no thinking, just JSON.
 
@@ -261,7 +291,7 @@ IMPORTANT RULES:
 - Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:
-\"\"\"{header_text}\n\n{body_text[:4000]}\"\"\"
+\"\"\"{header_text}\n\n{body_text_limited}\"\"\"
 
 JSON:"""
 
@@ -499,6 +529,14 @@ Tekst:
         # Non-fatal; proceed with minimal payload
         print(f"[J-MESSAGES] Metadata extraction failed: {e}")
 
+    # Get prompt version for audit trail
+    prompt_version = None
+    if get_active_version:
+        try:
+            prompt_version = get_active_version()
+        except Exception:
+            pass
+    
     result = {
         "id": metadata.get("j_id"),
         "title": metadata.get("title"),
@@ -514,11 +552,113 @@ Tekst:
         "raw_text": body_text,
         "summary": summary_text,
         "summary_length": summary_length,
+        "prompt_version": prompt_version,  # Version of prompt used for this analysis
         "debug": {
             "header_text": header_text
         }
     }
     return result
+
+
+@router.get("/prompt")
+async def get_native_prompt(prompt_type: str = Query("metadata", description="Type of prompt: 'metadata' or 'note'")):
+    """
+    Get the current native prompt template.
+    Used by frontend to display the "Native Prompt" in the UI.
+    
+    Args:
+        prompt_type: "metadata" or "note" (default: "metadata")
+    
+    Returns:
+        Dict with:
+        - version: Active prompt version (e.g., "v1.0.0")
+        - template: Prompt template string (with placeholders like {header_text}, {body_text})
+        - type: Prompt type ("metadata" or "note")
+    """
+    try:
+        if get_active_version:
+            version = get_active_version()
+        else:
+            version = "unknown"
+        
+        if load_prompt_template:
+            try:
+                template = load_prompt_template(prompt_type)
+                return {
+                    "version": version,
+                    "template": template,
+                    "type": prompt_type
+                }
+            except FileNotFoundError as e:
+                raise HTTPException(status_code=404, detail=f"Prompt template not found: {e}")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to load prompt: {e}")
+        else:
+            # Fallback: return hardcoded prompt info
+            if prompt_type == "metadata":
+                # Return a simplified version of the hardcoded prompt
+                template = """Extract metadata from this Norwegian fishing regulation document.
+Return ONLY valid JSON. No explanations, no thinking, just JSON.
+
+Required JSON format:
+{{
+  "j_id": "J-XXX-YYYY",
+  "title": "document title",
+  "replaces_id": "J-XXX-YYYY or null",
+  "replaced_by_id": "J-XXX-YYYY or null",
+  "status": "active/inactive/repealed",
+  "valid_from": "YYYY-MM-DD or null",
+  "valid_to": "YYYY-MM-DD or null",
+  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk",
+  "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
+}}
+
+IMPORTANT RULES: 
+- "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
+- "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
+- "category" MUST ALWAYS be one of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". NEVER use null.
+  * Use "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
+  * Use "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
+  * Use "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+- "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
+- You MUST include both "category" and "area" fields in your JSON response. Category must always have a value (never null).
+- Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
+
+Document text:
+\"\"\"{header_text}\n\n{body_text}\"\"\"
+
+JSON:"""
+            elif prompt_type == "note":
+                template = """Extract note metadata from this Norwegian J-melding addendum document.
+Return ONLY valid JSON. No explanations, no thinking, just JSON.
+
+Required JSON format:
+{{
+  "target_j_id": "J-XXX-YYYY",
+  "note_type": "addendum",
+  "valid_from": "YYYY-MM-DD",
+  "valid_to": "YYYY-MM-DD",
+  "affected_sections": ["Chapter 1", "§ 7"],
+  "actions": ["amend", "replace"],
+  "summary": "Brief change description"
+}}
+
+Document text:
+\"\"\"{body_text}\"\"\"
+
+JSON:"""
+            else:
+                raise HTTPException(status_code=400, detail=f"Unknown prompt type: {prompt_type}")
+            
+            return {
+                "version": "fallback",
+                "template": template,
+                "type": prompt_type
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 @router.post("/save")
@@ -546,6 +686,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "summary_length": data.get("summary_length"),
             "raw_text": data.get("raw_text") or "",
             "filename": data.get("filename") or "",
+            "prompt_version": data.get("prompt_version"),  # Store prompt version for audit
             "created_at": datetime.utcnow(),
             "module": "j_messages"
         }
@@ -692,6 +833,28 @@ async def delete_j_message(doc_id: str):
 
 
 def build_note_prompt(body_text: str) -> str:
+    """
+    Build note extraction prompt using versioned template.
+    
+    Args:
+        body_text: Document body text (will be truncated to 12000 chars)
+    
+    Returns:
+        Formatted prompt string
+    """
+    # Limit body text to 12000 characters to avoid token limits
+    body_text_limited = body_text[:12000]
+    
+    # Try to load from versioned template
+    if load_prompt_template:
+        try:
+            template = load_prompt_template("note")
+            # Format template with actual values
+            return template.format(body_text=body_text_limited)
+        except Exception as e:
+            print(f"[J-MESSAGES] ⚠️ Failed to load versioned prompt, using fallback: {e}")
+    
+    # Fallback to hardcoded prompt (original implementation)
     return f"""Extract note metadata from this Norwegian J-melding addendum document.
 Return ONLY valid JSON. No explanations, no thinking, just JSON.
 
@@ -707,7 +870,7 @@ Required JSON format:
 }}
 
 Document text:
-\"\"\"{body_text[:12000]}\"\"\"
+\"\"\"{body_text_limited}\"\"\"
 
 JSON:"""
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchWithAuth } from '../api';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
-export default function PromptPanel({ agent, nativePromptText, colors, onUseResult }) {
+export default function PromptPanel({ agent, nativePromptText, colors, onUseResult, promptVersion }) {
   const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState('');
@@ -106,11 +106,18 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
 
       {/* Native prompt */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8, color: '#334155' }}>{t('components.prompt.native', { defaultValue: 'Native prompt' })}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{ fontWeight: 600, color: '#334155' }}>{t('components.prompt.native', { defaultValue: 'Native prompt' })}</div>
+          {promptVersion && (
+            <span style={{ fontSize: '0.85em', color: '#64748b', padding: '2px 8px', borderRadius: 4, background: '#e2e8f0' }}>
+              v{promptVersion.replace(/^v/, '')}
+            </span>
+          )}
+        </div>
         <textarea
           readOnly
           value={nativePromptText || t('components.prompt.undefined', { defaultValue: '(not defined in code)' })}
-          style={{ width: '100%', minHeight: 100, padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b' }}
+          style={{ width: '100%', minHeight: 100, padding: 12, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b', fontFamily: 'monospace', fontSize: '0.9em' }}
         />
       </div>
 
