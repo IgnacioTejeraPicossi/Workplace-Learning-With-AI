@@ -2779,7 +2779,7 @@ The Knowledge Map has been significantly enhanced with professional-grade zoom a
 **IMPORTANT:**
 
 This project is designed to be built by both humans and AI systems (such as Cursor AI).
-You MUST read and follow BOTH this README.md and the full Build AI Workplace Learning Application from Scratch.md document.
+You MUST read and follow BOTH this README.md and the full [Build AI Workplace Learning Application from Scratch](docs/Build AI Workplace Learning Application from Scratch.md) document.
 The build document contains exhaustive, step-by-step, and troubleshooting details. This README provides a high-level overview, quick start, and essential configuration.
 Cross-reference both documents for maximum reliability and error recovery.
 
@@ -4174,11 +4174,11 @@ const result = await agentOpsClient.triggerFlow(runId, 'n8n', flowId, inputs, {
 - [ ] Commercial deployment and enterprise features
 
 ### Documentation
-- **Complete README**: `ROBOMIND_CLINIC_README.md`
-- **Implementation Plan**: `AI_GATEWAY_IMPLEMENTATION_PLAN.md`
-- **Enhancement Plan**: `ROBOMIND_CLINIC_ENHANCEMENT_PLAN.md` (NEW)
-- **Implementation Summary**: `ROBOMIND_CLINIC_IMPLEMENTATION_SUMMARY.md` (NEW)
-- **ChatGPT-5 Summary**: `ROBOMIND_CLINIC_SUMMARY_FOR_CHATGPT5.md` (NEW)
+- **Complete README**: [docs/ROBOMIND_CLINIC_README.md](docs/ROBOMIND_CLINIC_README.md)
+- **Implementation Plan**: [docs/AI_GATEWAY_IMPLEMENTATION_PLAN.md](docs/AI_GATEWAY_IMPLEMENTATION_PLAN.md)
+- **Enhancement Plan**: [docs/ROBOMIND_CLINIC_ENHANCEMENT_PLAN.md](docs/ROBOMIND_CLINIC_ENHANCEMENT_PLAN.md) (NEW)
+- **Implementation Summary**: [docs/ROBOMIND_CLINIC_IMPLEMENTATION_SUMMARY.md](docs/ROBOMIND_CLINIC_IMPLEMENTATION_SUMMARY.md) (NEW)
+- **ChatGPT-5 Summary**: [docs/ROBOMIND_CLINIC_SUMMARY_FOR_CHATGPT5.md](docs/ROBOMIND_CLINIC_SUMMARY_FOR_CHATGPT5.md) (NEW)
 - **API Documentation**: Available at `/docs` when backend is running
 
 ### 🚀 **Implementation Status**
@@ -4768,7 +4768,7 @@ Registered in Agent Catalog with:
 
 ### Documentation
 - **Complete Guide**: [docs/EA_SECOND_BRAIN_AGENT.md](docs/EA_SECOND_BRAIN_AGENT.md)
-- **Implementation Summary**: [EA_AGENT_IMPLEMENTATION_SUMMARY.md](EA_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Implementation Summary**: [docs/EA_AGENT_IMPLEMENTATION_SUMMARY.md](docs/EA_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/ea-second-brain.json](frontend/src/configs/agents/ea-second-brain.json)
 
 ---
@@ -4902,7 +4902,7 @@ Registered in Agent Catalog with:
 - **Tools**: `dispatch_action_bundle`, `get_run_status`
 
 ### Documentation
-- **Implementation Summary**: [SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md](SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md)
+- **Implementation Summary**: [docs/SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md](docs/SALES_ASSISTANT_AGENT_IMPLEMENTATION_SUMMARY.md)
 - **Agent Descriptor**: [frontend/src/configs/agents/sales-assistant.json](frontend/src/configs/agents/sales-assistant.json)
 
 ---
@@ -6716,7 +6716,7 @@ This implementation provides a **dual-path approach**:
 The payload format is identical for both n8n and OutSystems, making migration seamless.
 
 ### Files Created
-- `n8n_webhook_setup.md` - Step-by-step setup guide
+- [docs/n8n_webhook_setup.md](docs/n8n_webhook_setup.md) - Step-by-step setup guide
 - `scripts/test_webhooks.ps1` - Webhook testing script
 - `hackathon_config.env` - Environment variables template
 
