@@ -39,6 +39,23 @@ else:
 # API Provider Selection (can be 'itemai', 'openai', or 'openrouter')
 API_PROVIDER = os.getenv("API_PROVIDER", "openai").lower()
 
+def _normalize_temperature(value):
+    """
+    Normalize temperature to a safe float within [0.0, 2.0].
+    Returns None if value is None or cannot be parsed.
+    """
+    if value is None:
+        return None
+    try:
+        t = float(value)
+    except Exception:
+        return None
+    if t < 0.0:
+        return 0.0
+    if t > 2.0:
+        return 2.0
+    return t
+
 def get_api_config_from_headers(request_headers=None):
     """
     Get API configuration from request headers or use defaults
@@ -82,12 +99,13 @@ def get_api_config_from_headers(request_headers=None):
         'openrouter_key': OPENROUTER_API_KEY
     }
 
-def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
+def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None, temperature=None):
     """
     Synchronous version of unified AI system
     ItemAI (local) → OpenRouter → OpenAI with automatic fallback
     """
     config = get_api_config_from_headers(request_headers)
+    temperature = _normalize_temperature(temperature)
     
     # Respect explicit provider selection
     if config['provider'] == 'openai':
@@ -110,7 +128,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         if config.get('openrouter_key'):
             try:
                 print("🔄 Falling back to OpenRouter...")
-                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
                 if result and not result.startswith("[MOCKED RESPONSE"):
                     print("✅ OpenRouter successful")
                     return result
@@ -123,7 +141,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     if config['provider'] == 'openrouter':
         try:
             print("🔄 Trying OpenRouter (selected provider)...")
-            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenRouter successful")
                 return result
@@ -132,7 +150,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         if config.get('openai_key'):
             try:
                 print("🔄 Falling back to OpenAI...")
-                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
                 if result and not result.startswith("[MOCKED RESPONSE"):
                     print("✅ OpenAI successful")
                     return result
@@ -146,7 +164,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         itemai_failed = False
         try:
             print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
@@ -171,7 +189,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
             if config.get('openrouter_key'):
                 try:
                     print("   → Trying OpenRouter [Fallback 1]...")
-                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
                         print("✅ OpenRouter successful (fallback from ItemAI)")
                         return result
@@ -182,7 +200,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
             if config.get('openai_key'):
                 try:
                     print("   → Trying OpenAI [Fallback 2]...")
-                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
                         print("✅ OpenAI successful (fallback from ItemAI)")
                         return result
@@ -192,12 +210,13 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
     print("❌ All AI providers failed")
     return "[MOCKED RESPONSE] All AI providers unavailable"
 
-async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None):
+async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, request_headers=None, temperature=None):
     """
     Unified AI system that reads configuration from API Config and tries all providers
     ItemAI (local) → OpenRouter → OpenAI with automatic fallback
     """
     config = get_api_config_from_headers(request_headers)
+    temperature = _normalize_temperature(temperature)
     
     # Respect explicit provider selection
     if config['provider'] == 'openai':
@@ -218,7 +237,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         if config.get('openrouter_key'):
             try:
                 print("🔄 Falling back to OpenRouter...")
-                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
                 if result and not result.startswith("[MOCKED RESPONSE"):
                     print("✅ OpenRouter successful")
                     return result
@@ -230,7 +249,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     if config['provider'] == 'openrouter':
         try:
             print("🔄 Trying OpenRouter (selected provider)...")
-            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 print("✅ OpenRouter successful")
                 return result
@@ -239,7 +258,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         if config.get('openai_key'):
             try:
                 print("🔄 Falling back to OpenAI...")
-                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
                 if result and not result.startswith("[MOCKED RESPONSE"):
                     print("✅ OpenAI successful")
                     return result
@@ -253,7 +272,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         itemai_failed = False
         try:
             print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
@@ -278,7 +297,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
             if config.get('openrouter_key'):
                 try:
                     print("   → Trying OpenRouter [Fallback 1]...")
-                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
                         print("✅ OpenRouter successful (fallback from ItemAI)")
                         return result
@@ -289,7 +308,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
             if config.get('openai_key'):
                 try:
                     print("   → Trying OpenAI [Fallback 2]...")
-                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
                         print("✅ OpenAI successful (fallback from ItemAI)")
                         return result
@@ -299,7 +318,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
     print("❌ All AI providers failed")
     return "[MOCKED RESPONSE] All AI providers unavailable"
 
-def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, override_api_key=None):
+def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, override_api_key=None, temperature=None):
     """
     Enhanced OpenAI function with GPT-5 model selection and optimization.
     Now supports ItemAI API (local), OpenRouter, and OpenAI APIs with intelligent fallback.
@@ -314,7 +333,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
     # Try ItemAI API first if configured and selected (local, free)
     if API_PROVIDER == "itemai":
         try:
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 return result
         except Exception as e:
@@ -323,7 +342,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
     # Try OpenRouter if configured and selected
     if API_PROVIDER == "openrouter" and OPENROUTER_API_KEY and openrouter:
         try:
-            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
             if result and not result.startswith("[MOCKED RESPONSE"):
                 return result
         except Exception as e:
@@ -362,6 +381,11 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         # Get optimal GPT-5 model and parameters
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
+
+        # Optional override (e.g., from UI/MCP) — keep within safe bounds
+        temp = _normalize_temperature(temperature)
+        if temp is not None:
+            params["temperature"] = temp
         
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
@@ -402,7 +426,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
 
         return f"[MOCKED RESPONSE - Error: {err_str}] This would be the AI's answer to: {prompt[:60]}..."
 
-def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None):
     """
     OpenRouter API function with model selection and optimization.
     
@@ -420,6 +444,11 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         # Get optimal model and parameters
         model = get_optimal_model(task_type, complexity)
         params = get_gpt5_parameters(model, task_type)
+
+        # Optional override (e.g., from UI/MCP) — keep within safe bounds
+        temp = _normalize_temperature(temperature)
+        if temp is not None:
+            params["temperature"] = temp
         
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
@@ -947,7 +976,7 @@ Make sure the questions are relevant to the content and appropriate for the spec
             }
         ]
 
-def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None):
+def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None):
     """
     ItemAI API function for local LM Studio integration.
     
@@ -965,12 +994,13 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         local_url = "http://localhost:1234"
         
         # Prepare the request payload
+        temp = _normalize_temperature(temperature)
         if messages:
             payload = {
                 "model": "default",  # LM Studio will use the loaded model
                 "messages": messages,
                 "max_tokens": max_tokens,
-                "temperature": 0.7,
+                "temperature": temp if temp is not None else 0.7,
                 "stream": False
             }
         else:
@@ -978,7 +1008,7 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
                 "model": "default",
                 "messages": [{"role": "user", "content": prompt}],
                 "max_tokens": max_tokens,
-                "temperature": 0.7,
+                "temperature": temp if temp is not None else 0.7,
                 "stream": False
             }
         

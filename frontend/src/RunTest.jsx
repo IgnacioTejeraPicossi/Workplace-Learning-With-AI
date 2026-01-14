@@ -1021,7 +1021,9 @@ const RunTest = () => {
               // To start test server: cd backend && python test_mcp_server.py
               testData = {
                 file_url: 'http://localhost:8888/docs/j-melding-test.docx',
-                summary_length: 'short'
+                summary_length: 'short',
+                ai_level: 'low',
+                temperature: 0.2
               };
               break;
             case '/api/j-messages/analyze-note':

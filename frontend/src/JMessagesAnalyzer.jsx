@@ -19,6 +19,11 @@ export default function JMessagesAnalyzer() {
   const [aiComplexity, setAiComplexity] = useState(() => {
     return localStorage.getItem('jMessagesAiComplexity') || 'low';
   });
+  const [temperature, setTemperature] = useState(() => {
+    const saved = localStorage.getItem('jMessagesTemperature');
+    const v = saved != null ? Number(saved) : 0.2;
+    return Number.isFinite(v) ? v : 0.2;
+  });
   const [apiProvider, setApiProvider] = useState('openai');
   const [itemaiModel, setItemaiModel] = useState(() => {
     return localStorage.getItem('itemaiCurrentModel') || null;
@@ -81,6 +86,11 @@ export default function JMessagesAnalyzer() {
     localStorage.setItem('jMessagesAiComplexity', aiComplexity);
   }, [aiComplexity]);
 
+  // Save temperature to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('jMessagesTemperature', String(temperature));
+  }, [temperature]);
+
   // Load categories from saved J-messages
   useEffect(() => {
     const loadCategories = async () => {
@@ -119,6 +129,7 @@ export default function JMessagesAnalyzer() {
       const params = new URLSearchParams();
       if (summaryLength) params.append('summary_length', summaryLength);
       params.append('complexity', aiComplexity);
+      if (Number.isFinite(temperature)) params.append('temperature', String(temperature));
       const url = `/api/j-messages/analyze${params.toString() ? `?${params.toString()}` : ''}`;
       const resp = await fetchWithAuth(url, {
         method: 'POST',
@@ -145,7 +156,10 @@ export default function JMessagesAnalyzer() {
     try {
       const form = new FormData();
       form.append('file', file);
-      const url = `/api/j-messages/analyze-note?complexity=${encodeURIComponent(aiComplexity)}`;
+      const params = new URLSearchParams();
+      params.append('complexity', aiComplexity);
+      if (Number.isFinite(temperature)) params.append('temperature', String(temperature));
+      const url = `/api/j-messages/analyze-note?${params.toString()}`;
       const resp = await fetchWithAuth(url, {
         method: 'POST',
         body: form
@@ -332,6 +346,25 @@ export default function JMessagesAnalyzer() {
                   {itemaiModel || t('jMessages.analyzer.modelNotSet')}
                 </strong>
               </span>
+              <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
+              <label
+                style={{ fontSize: 12, color: colors.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}
+                title="Lower temperature = more deterministic extraction. Higher = more variation."
+              >
+                {t('jMessages.analyzer.temperature')}:
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={temperature}
+                  onChange={(e) => setTemperature(Number(e.target.value))}
+                  style={{ width: 110 }}
+                />
+                <span style={{ minWidth: 28, textAlign: 'right', color: colors.text }}>
+                  {Number.isFinite(temperature) ? temperature.toFixed(1) : '—'}
+                </span>
+              </label>
             </>
           ) : (
             <>
@@ -356,6 +389,25 @@ export default function JMessagesAnalyzer() {
                   <option value="medium">{t('jMessages.analyzer.aiLevelMedium')} (GPT-4o-mini)</option>
                   <option value="high">{t('jMessages.analyzer.aiLevelHigh')} (GPT-4o / GPT-5 if available)</option>
                 </select>
+              </label>
+              <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
+              <label
+                style={{ fontSize: 12, color: colors.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}
+                title="Lower temperature = more deterministic extraction. Higher = more variation."
+              >
+                {t('jMessages.analyzer.temperature')}:
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={temperature}
+                  onChange={(e) => setTemperature(Number(e.target.value))}
+                  style={{ width: 110 }}
+                />
+                <span style={{ minWidth: 28, textAlign: 'right', color: colors.text }}>
+                  {Number.isFinite(temperature) ? temperature.toFixed(1) : '—'}
+                </span>
               </label>
             </>
           )}

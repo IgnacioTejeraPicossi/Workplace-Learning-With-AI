@@ -461,6 +461,7 @@
       "aiLevelLow": "Low",
       "aiLevelMedium": "Medium",
       "aiLevelHigh": "High",
+      "temperature": "Temperature",
       "model": "Model",
       "modelNotSet": "Not set (check LM Studio)",
       "executiveSummary": "Executive Summary",

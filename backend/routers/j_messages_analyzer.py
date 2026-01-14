@@ -351,7 +351,8 @@ async def analyze_j_message(
     request: Request,
     file: UploadFile = File(...),
     summary_length: str = Query(None, description="short|medium|long to include an AI summary"),
-    complexity: str = Query("low", description="AI complexity level: low, medium, or high")
+    complexity: str = Query("low", description="AI complexity level: low, medium, or high"),
+    temperature: float = Query(None, description="Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative.")
 ):
     """
     Accept a .docx J-melding and return structured JSON with:
@@ -431,6 +432,8 @@ async def analyze_j_message(
             
             # Validate and use complexity from query parameter
             complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            # Validate temperature (optional)
+            temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
             response = ask_ai_unified_sync(
                 prompt=prompt + "\nGi svaret som STRICT JSON.",
@@ -438,7 +441,8 @@ async def analyze_j_message(
                 complexity=complexity_level,
                 max_tokens=600,
                 messages=None,
-                request_headers=request_headers_dict
+                request_headers=request_headers_dict,
+                temperature=temperature_value
             )
             # Parse JSON using robust helper function
             parsed = extract_json_from_llm_response(response)
@@ -486,7 +490,8 @@ Tekst:
                         complexity=complexity_level,
                         max_tokens=700,
                         messages=None,
-                        request_headers=request_headers_dict
+                        request_headers=request_headers_dict,
+                        temperature=temperature_value
                     ) or ""
                 except Exception as _:
                     summary_text = ""
@@ -711,7 +716,8 @@ JSON:"""
 async def analyze_j_note(
     request: Request, 
     file: UploadFile = File(...),
-    complexity: str = Query("low", description="AI complexity level: low, medium, or high")
+    complexity: str = Query("low", description="AI complexity level: low, medium, or high"),
+    temperature: float = Query(None, description="Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative.")
 ):
     """
     Analyze a J-melding 'note' document (DOCX/PDF). Returns structured 'note' fields.
@@ -748,6 +754,7 @@ async def analyze_j_note(
             prompt = build_note_prompt(full_text)
             # Validate and use complexity from query parameter
             complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+            temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
             resp = ask_ai_unified_sync(
                 prompt=prompt,
@@ -755,7 +762,8 @@ async def analyze_j_note(
                 complexity=complexity_level,
                 max_tokens=600,
                 messages=None,
-                request_headers=dict(request.headers)
+                request_headers=dict(request.headers),
+                temperature=temperature_value
             )
             # Parse JSON using robust helper function
             parsed = extract_json_from_llm_response(resp)

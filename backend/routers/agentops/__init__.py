@@ -87,7 +87,7 @@ def j_messages_manifest():
         "tools": [
             {
                 "name": "analyze_j_melding",
-                "description": "Analyze a J-melding (.docx or .pdf) from Fiskeridirektoratet and extract structured metadata, table of contents, and HTML body. Returns JSON with id, title, status, dates, category/area, toc, body_html, plus api_config (provider/model/ai_level) for transparency.",
+                "description": "Analyze a J-melding (.docx or .pdf) from Fiskeridirektoratet and extract structured metadata, table of contents, and HTML body. Returns JSON with id, title, status, dates, category/area, toc, body_html, plus api_config (provider/model/ai_level/temperature) for transparency.",
                 "input_schema": {
                     "type": "object",
                     "properties": {
@@ -104,6 +104,12 @@ def j_messages_manifest():
                             "type": "string",
                             "enum": ["low", "medium", "high"],
                             "description": "AI complexity level (low|medium|high). Mirrors the web UI 'AI Level'. Default: low."
+                        },
+                        "temperature": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 2.0,
+                            "description": "Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative. Default: model/task default."
                         }
                     },
                     "required": ["file_url"]
@@ -152,10 +158,19 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
     file_url = data.get("file_url")
     summary_length = data.get("summary_length", "none")
     ai_level = data.get("ai_level", "low")
+    temperature = data.get("temperature", None)
 
     # Validate ai_level
     if ai_level not in ["low", "medium", "high"]:
         ai_level = "low"
+    # Validate temperature (optional)
+    try:
+        if temperature is not None:
+            temperature = float(temperature)
+            if temperature < 0.0 or temperature > 2.0:
+                temperature = None
+    except Exception:
+        temperature = None
     
     if not file_url or not isinstance(file_url, str):
         raise HTTPException(status_code=400, detail="file_url is required and must be a string")
@@ -198,6 +213,8 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                 params["summary_length"] = summary_length
             # Forward ai_level to internal analyzer as 'complexity'
             params["complexity"] = ai_level
+            if temperature is not None:
+                params["temperature"] = temperature
             
             # Forward request headers (for API config, auth, etc.)
             # Priority: 1) Request headers, 2) Saved API config file, 3) .env fallback
@@ -353,6 +370,7 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                     "provider": provider_effective,
                     "ai_level": ai_level,
                     "model": model_to_use,
+                    "temperature": temperature,
                     "config_source": config_source
                 }
             except Exception as _:
@@ -361,6 +379,7 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
                     "provider": headers.get("x-api-provider"),
                     "ai_level": ai_level,
                     "model": None,
+                    "temperature": temperature,
                     "config_source": config_source
                 }
             logger.info("analyze_j_melding via MCP succeeded", extra={

@@ -1356,6 +1356,7 @@
       "aiLevelLow": "Lav",
       "aiLevelMedium": "Middels",
       "aiLevelHigh": "Høy",
+      "temperature": "Temperatur",
       "model": "Modell",
       "modelNotSet": "Ikke satt (sjekk LM Studio)",
       "executiveSummary": "Sammendrag",
