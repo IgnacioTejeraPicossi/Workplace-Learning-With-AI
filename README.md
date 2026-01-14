@@ -10,7 +10,10 @@ A specialized module for analyzing Norwegian J‑meldinger (regulations) from Fi
 
 - **Document Analysis**: Extract metadata, TOC, and structured content from `.docx` and `.pdf` files
 - **Note Analysis**: Specialized processing for J-melding notes (addendums, corrections, extensions)
+- **AI Configuration**: Adjustable AI complexity levels (Low/Medium/High) and temperature control (0.0-2.0) for precision vs creativity
 - **Prompt Manager**: Customize and test AI prompts for improved extraction accuracy
+  - **Versioned Native Prompts**: File-based versioning system (`backend/prompts/j_messages/v{version}/`) with version display in UI
+  - **Audit Trail**: Each analysis stores the prompt version used
 - **Library Management**: Search, filter, and export analyzed documents (Markdown, PDF, DOCX)
 - **MongoDB Integration**: Persistent storage with full CRUD operations
 

@@ -68,19 +68,23 @@ The **J-messages Analyzer** is a specialized document processing system designed
 ### Document Analysis
 
 **Analyze J-melding document**
-- **Endpoint**: `POST /api/j-messages/analyze?summary_length=short|medium|long`
+- **Endpoint**: `POST /api/j-messages/analyze?summary_length=short|medium|long&complexity=low|medium|high&temperature=0.0-2.0`
 - **Content-Type**: `multipart/form-data`
 - **Parameters**:
   - `file`: DOCX or PDF file (required)
   - `summary_length`: Optional query parameter (`short`, `medium`, `long`, or omit for no summary)
-- **Returns**: Complete analysis with metadata, TOC, body_html, raw_text, and optional summary
+  - `complexity`: Optional AI complexity level (`low`, `medium`, `high`). Default: `low`
+  - `temperature`: Optional sampling temperature (0.0-2.0). Lower = more deterministic, higher = more creative. Default: 0.2
+- **Returns**: Complete analysis with metadata, TOC, body_html, raw_text, optional summary, and `prompt_version` (version of prompt used)
 
 **Analyze J-melding note**
-- **Endpoint**: `POST /api/j-messages/analyze-note`
+- **Endpoint**: `POST /api/j-messages/analyze-note?complexity=low|medium|high&temperature=0.0-2.0`
 - **Content-Type**: `multipart/form-data`
 - **Parameters**:
   - `file`: DOCX or PDF file containing the note (required)
-- **Returns**: Note-specific data (target_j_id, note_type, affected_sections, actions, summary)
+  - `complexity`: Optional AI complexity level (`low`, `medium`, `high`). Default: `low`
+  - `temperature`: Optional sampling temperature (0.0-2.0). Default: 0.2
+- **Returns**: Note-specific data (target_j_id, note_type, affected_sections, actions, summary) and `prompt_version`
 
 ### Storage & Management
 
@@ -97,6 +101,12 @@ The **J-messages Analyzer** is a specialized document processing system designed
 **Delete a saved analysis**
 - **Endpoint**: `DELETE /api/j-messages/delete/{id}`
 - **Returns**: Confirmation of deletion
+
+**Get Native Prompt**
+- **Endpoint**: `GET /api/j-messages/prompt?prompt_type=metadata|note`
+- **Parameters**:
+  - `prompt_type`: Type of prompt (`metadata` or `note`). Default: `metadata`
+- **Returns**: JSON with `version` (e.g., "v1.0.0"), `template` (prompt text with placeholders), and `type`
 
 ### Export
 
@@ -125,6 +135,18 @@ The **J-messages Analyzer** is a specialized document processing system designed
   - Specialized extraction for note-specific fields
   - Identifies relationship to base J-melding
 
+**AI Configuration**
+- **API Config Display**: Shows the current API provider (OpenAI, OpenRouter, or ItemAI) and model in use
+- **AI Level Selector**: Choose between three complexity levels:
+  - **Low** (GPT-3.5): Fast, cost-effective for standard extraction
+  - **Medium** (GPT-4o-mini): Balanced performance and accuracy
+  - **High** (GPT-4o / GPT-5 if available): Maximum accuracy for complex documents
+- **Temperature Control**: Slider to adjust AI response creativity/precision (0.0-2.0)
+  - **Lower values (0.0-0.3)**: More deterministic, consistent extraction (recommended for metadata)
+  - **Default: 0.2**: Optimal balance for structured data extraction
+  - **Higher values (0.7-2.0)**: More creative, varied responses (useful for summaries)
+  - Temperature setting is persisted in localStorage and sent with each analysis request
+
 **Results Display**
 - **Metadata Header**: J-ID, title, dates, status, replaces, categories
 - **Executive Summary**: Optional AI-generated summary (if selected)
@@ -141,8 +163,16 @@ The **J-messages Analyzer** is a specialized document processing system designed
 
 **Features**:
 - **Native Prompt View**: Display the default prompts used for metadata extraction and note analysis
+  - Shows the **version number** (e.g., "v1.0.0") next to the prompt title
+  - Prompts are loaded from versioned files in `backend/prompts/j_messages/v{version}/`
+  - Read-only display for production stability (users can copy and edit in "Saved prompts")
+- **Prompt Versioning System**: 
+  - Prompts are stored in versioned directories: `backend/prompts/j_messages/v1.0.0/metadata.txt` and `note.txt`
+  - Active version is determined by `ACTIVE_VERSION` file or `J_MESSAGES_PROMPT_VERSION` environment variable
+  - Each analysis stores the prompt version used for audit trail
+  - Easy to create new versions: create new directory (e.g., `v1.1.0/`) and update `ACTIVE_VERSION`
 - **Prompt Editor**: Create, edit, and test custom prompts
-- **Save/Update**: Store named prompts for reuse
+- **Save/Update**: Store named prompts for reuse (saved in MongoDB, separate from versioned native prompts)
 - **Test Functionality**: Preview LLM output with your custom prompts
 - **Prompt Injection Detection**: Automatic detection of potential prompt injection patterns with sanitization option
 - **Agent-Specific**: Prompts are stored per agent (`j-messages`) and independent from other modules
@@ -344,16 +374,63 @@ curl -X POST http://localhost:8000/api/j-messages/export-docx \
 
 > **Note**: This section documents all prompts used in the J-messages Analyzer, including versions, changes, test results, and client feedback. This will grow significantly during development.
 
+### Prompt Versioning System
+
+The J-messages Analyzer uses a **file-based versioning system** for native prompts, ensuring production stability and easy distribution to clients.
+
+**Structure**:
+```
+backend/prompts/j_messages/
+├── ACTIVE_VERSION          # Contains current version (e.g., "v1.0.0")
+└── v1.0.0/
+    ├── metadata.txt        # Metadata extraction prompt template
+    └── note.txt           # Note analysis prompt template
+```
+
+**How It Works**:
+1. Prompts are stored as text files in versioned directories
+2. Active version is determined by:
+   - Environment variable `J_MESSAGES_PROMPT_VERSION` (highest priority)
+   - `ACTIVE_VERSION` file (fallback)
+   - Default: `v1.0.0` (if neither is set)
+3. Templates use Python `.format()` placeholders: `{header_text}`, `{body_text}`
+4. Each analysis response includes `prompt_version` field for audit trail
+5. Saved J-messages in MongoDB store the `prompt_version` used during analysis
+
+**Creating a New Version**:
+1. Create new directory: `backend/prompts/j_messages/v1.1.0/`
+2. Copy and modify prompt files: `metadata.txt`, `note.txt`
+3. Update `ACTIVE_VERSION` file to `v1.1.0` (or set `J_MESSAGES_PROMPT_VERSION` env var)
+4. System automatically loads new version on next request
+
+**Benefits**:
+- ✅ **Version Control**: Prompts tracked in Git with clear version history
+- ✅ **Distribution**: Easy to package and deliver to clients (just the prompts directory)
+- ✅ **Audit Trail**: Every analysis knows which prompt version was used
+- ✅ **Production Safety**: Native prompts are read-only in production (users can copy/edit in "Saved prompts")
+- ✅ **Flexibility**: Can switch versions via environment variable without code changes
+
+**Frontend Display**:
+- The "Native prompt" section in Prompt Manager shows the current prompt template
+- Version badge (e.g., "v1.0.0") is displayed next to the prompt title
+- Prompt is loaded from backend endpoint `/api/j-messages/prompt` on component mount
+
 ### Prompt Version History
 
 *Document prompt iterations, changes made, reasons for changes, and results achieved.*
 
+**v1.0.0** (January 2025)
+- Initial versioned prompt system
+- Includes metadata extraction with category and area fields
+- Includes note analysis prompt
+- Temperature parameter support added
+
 ### Metadata Extraction Prompt
 
-**Current Version**: v1.0 (Initial)  
+**Current Version**: v1.0.0  
 **Last Updated**: January 2025  
 **Status**: ✅ Active  
-**Location**: `backend/routers/j_messages_analyzer.py` → `build_metadata_prompt()`
+**Location**: `backend/prompts/j_messages/v1.0.0/metadata.txt` (loaded via `backend/prompt_loader.py`)
 
 **Purpose**: Extract structured metadata from J-melding documents (J-ID, title, dates, status, replaces, categories).
 
@@ -377,7 +454,11 @@ Tekst:
 
 **Input Parameters**:
 - `header_text`: Administrative header section of the J-melding
-- `body_text`: First 4000 characters of the regulation body
+- `body_text`: First 4000 characters of the regulation body (truncated in `build_metadata_prompt()`)
+
+**AI Configuration**:
+- Supports `complexity` parameter: `low` (GPT-3.5), `medium` (GPT-4o-mini), `high` (GPT-4o / GPT-5)
+- Supports `temperature` parameter (0.0-2.0): Controls creativity/precision. Default: 0.2 (recommended for structured extraction)
 
 **Expected Output Format**:
 ```json
@@ -410,10 +491,10 @@ Tekst:
 
 ### Note Analysis Prompt
 
-**Current Version**: v1.0 (Initial)  
+**Current Version**: v1.0.0  
 **Last Updated**: January 2025  
 **Status**: ✅ Active  
-**Location**: `backend/routers/j_messages_analyzer.py` → `build_note_prompt()`
+**Location**: `backend/prompts/j_messages/v1.0.0/note.txt` (loaded via `backend/prompt_loader.py`)
 
 **Purpose**: Analyze J-melding notes (addendums, corrections, extensions, cancellations) and extract note-specific fields.
 
@@ -433,7 +514,11 @@ Text:
 ```
 
 **Input Parameters**:
-- `body_text`: First 12000 characters of the note document
+- `body_text`: First 12000 characters of the note document (truncated in `build_note_prompt()`)
+
+**AI Configuration**:
+- Supports `complexity` parameter: `low` (GPT-3.5), `medium` (GPT-4o-mini), `high` (GPT-4o / GPT-5)
+- Supports `temperature` parameter (0.0-2.0): Controls creativity/precision. Default: 0.2
 
 **Expected Output Format**:
 ```json
@@ -502,6 +587,20 @@ Text:
 ## 🔄 Development Changelog
 
 > **Note**: Track all changes, improvements, and iterations made during development.
+
+### 2025-01-XX - Temperature Control & Prompt Versioning
+- ✅ **Temperature Parameter**: Added UI slider (0.0-2.0) to control AI response creativity/precision
+  - Default: 0.2 (optimal for structured metadata extraction)
+  - Persisted in localStorage, sent with each analysis request
+  - Integrated into both `/analyze` and `/analyze-note` endpoints
+- ✅ **Prompt Versioning System**: File-based versioning for native prompts
+  - Prompts stored in `backend/prompts/j_messages/v{version}/` directories
+  - Active version controlled via `ACTIVE_VERSION` file or `J_MESSAGES_PROMPT_VERSION` env var
+  - Version displayed in UI next to "Native prompt"
+  - Each analysis stores `prompt_version` for audit trail
+  - Easy distribution to clients (just copy prompts directory)
+- ✅ **Prompt Endpoint**: `GET /api/j-messages/prompt` returns current prompt template and version
+- ✅ Frontend loads native prompt from backend instead of hardcoded text
 
 ### 2025-12-10 - MCP Integration
 - ✅ MCP Server integrated within WLWAI (Option 1)
