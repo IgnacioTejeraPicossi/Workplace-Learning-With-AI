@@ -548,10 +548,15 @@ export default function JMessagesAnalyzer() {
               <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.replacedBy')}:</strong> {result.replaced_by || '—'}</div>
             </div>
-            <div style={{ marginTop: 8 }}>
-              <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
-              {result.category || (Array.isArray(result.categories) && result.categories.length > 0 ? result.categories[0] : '—')}
-            </div>
+            {(() => {
+              const categoryArray = Array.isArray(result.category) ? result.category : (result.category ? [result.category] : (Array.isArray(result.categories) ? result.categories : (result.categories ? [result.categories] : [])));
+              return categoryArray.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <strong>{t('jMessages.analyzer.metadata.category')}:</strong>{' '}
+                  {categoryArray.join(', ')}
+                </div>
+              );
+            })()}
             {result.area && (Array.isArray(result.area) ? result.area.length > 0 : result.area) && (
               <div style={{ marginTop: 8 }}>
                 <strong>{t('jMessages.analyzer.metadata.area')}:</strong>{' '}

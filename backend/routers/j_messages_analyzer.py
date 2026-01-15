@@ -277,19 +277,21 @@ Required JSON format:
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
-  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk",
+  "category": ["Annet", "Bunnfisk", "Pelagisk fisk"] or [],
   "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
 }}
 
 IMPORTANT RULES: 
 - "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
 - "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
-- "category" MUST ALWAYS be one of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". NEVER use null.
-  * Use "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
-  * Use "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
-  * Use "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+- "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
+  * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
+  * Include "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
+  * Include "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+  * A document can have multiple categories (e.g., ["Bunnfisk", "Pelagisk fisk"] if it mentions both types)
+  * If no specific category is identified, use ["Annet"] (array with one element, not empty array)
 - "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
-- You MUST include both "category" and "area" fields in your JSON response. Category must always have a value (never null).
+- You MUST include both "category" and "area" fields in your JSON response. Category must always be an array with at least one value (use ["Annet"] if no specific category is found).
 - Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:
@@ -330,7 +332,7 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "category": "Annet",  # Default category
+        "category": ["Annet"],  # Default category as array
         "area": []
     }
     
@@ -431,7 +433,7 @@ async def analyze_j_message(
         "status": None,
         "valid_from": None,
         "valid_to": None,
-        "category": "Annet",  # Default category
+        "category": ["Annet"],  # Default category as array
         "area": []
     }
 
@@ -485,20 +487,40 @@ async def analyze_j_message(
                 if "replacedBy" in parsed and "replaced_by_id" not in parsed:
                     parsed["replaced_by_id"] = parsed.get("replacedBy")
 
-                # Handle legacy "categories" field - convert to "category"
+                # Handle legacy formats: convert string or old "categories" field to array
                 if "categories" in parsed and "category" not in parsed:
                     categories = parsed.get("categories", [])
-                    if isinstance(categories, list) and len(categories) > 0:
-                        parsed["category"] = categories[0]
-                    elif isinstance(categories, list) and len(categories) == 0:
-                        parsed["category"] = None
+                    if isinstance(categories, list):
+                        parsed["category"] = categories
+                    elif isinstance(categories, str):
+                        parsed["category"] = [categories] if categories else ["Annet"]
+                    else:
+                        parsed["category"] = ["Annet"]
                     # Remove old field
                     parsed.pop("categories", None)
                 
-                # Ensure category always has a value (default to "Annet" if null or empty)
-                if not parsed.get("category") or parsed.get("category") not in ["Annet", "Bunnfisk", "Pelagisk fisk"]:
-                    parsed["category"] = "Annet"
-                    print(f"[J-MESSAGES] ⚠️ Category was null or invalid, defaulting to 'Annet'")
+                # Convert string category to array (backward compatibility)
+                if "category" in parsed and isinstance(parsed.get("category"), str):
+                    cat_str = parsed.get("category")
+                    if cat_str in ["Annet", "Bunnfisk", "Pelagisk fisk"]:
+                        parsed["category"] = [cat_str]
+                    else:
+                        parsed["category"] = ["Annet"]
+                
+                # Ensure category is always an array with at least one valid value
+                category = parsed.get("category", [])
+                if not isinstance(category, list):
+                    category = [category] if category else ["Annet"]
+                
+                # Filter out invalid categories and ensure at least one valid category
+                valid_categories = ["Annet", "Bunnfisk", "Pelagisk fisk"]
+                category = [c for c in category if c in valid_categories]
+                if not category:
+                    category = ["Annet"]
+                
+                parsed["category"] = category
+                if len(category) == 0 or category != parsed.get("category", []):
+                    print(f"[J-MESSAGES] ⚠️ Category was invalid, defaulting to ['Annet']")
                 
                 metadata.update(parsed)
                 print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
@@ -547,7 +569,7 @@ Tekst:
         "valid_to": metadata.get("valid_to"),
         "replaces": metadata.get("replaces_id"),
         "replaced_by": metadata.get("replaced_by_id") or metadata.get("replaced_by"),
-        "category": metadata.get("category") or (metadata.get("categories") and metadata.get("categories")[0] if isinstance(metadata.get("categories"), list) and len(metadata.get("categories")) > 0 else None) or "Annet",
+        "category": metadata.get("category") if isinstance(metadata.get("category"), list) else ([metadata.get("category")] if metadata.get("category") else (metadata.get("categories") if isinstance(metadata.get("categories"), list) else (["Annet"] if not metadata.get("categories") else [metadata.get("categories")]))) if metadata.get("category") or metadata.get("categories") else ["Annet"],
         "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
         "toc": toc,
         "body_html": body_html,
@@ -611,19 +633,21 @@ Required JSON format:
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
-  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk",
+  "category": ["Annet", "Bunnfisk", "Pelagisk fisk"] or [],
   "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
 }}
 
 IMPORTANT RULES: 
 - "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
 - "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
-- "category" MUST ALWAYS be one of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". NEVER use null.
-  * Use "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
-  * Use "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
-  * Use "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+- "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
+  * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
+  * Include "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
+  * Include "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+  * A document can have multiple categories (e.g., ["Bunnfisk", "Pelagisk fisk"] if it mentions both types)
+  * If no specific category is identified, use ["Annet"] (array with one element, not empty array)
 - "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
-- You MUST include both "category" and "area" fields in your JSON response. Category must always have a value (never null).
+- You MUST include both "category" and "area" fields in your JSON response. Category must always be an array with at least one value (use ["Annet"] if no specific category is found).
 - Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:
@@ -680,7 +704,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "valid_to": data.get("valid_to"),
             "replaces": data.get("replaces"),
             "replaced_by": data.get("replaced_by"),
-            "category": data.get("category") or (data.get("categories") and data.get("categories")[0] if isinstance(data.get("categories"), list) and len(data.get("categories")) > 0 else None) or "Annet",
+            "category": data.get("category") if isinstance(data.get("category"), list) else ([data.get("category")] if data.get("category") else (data.get("categories") if isinstance(data.get("categories"), list) else (["Annet"] if not data.get("categories") else [data.get("categories")]))) if data.get("category") or data.get("categories") else ["Annet"],
             "area": data.get("area") if isinstance(data.get("area"), list) else ([data.get("area")] if data.get("area") else []),
             "toc": data.get("toc") or [],
             "body_html": data.get("body_html") or "",
@@ -716,10 +740,11 @@ async def list_j_messages(
     if status:
         query["status"] = status
     if category:
-        # Support both old (array) and new (string) format
+        # Support both old (string) and new (array) format
         query["$or"] = [
-            {"category": category},
-            {"categories": {"$in": [category]}}
+            {"category": category},  # Exact match for string
+            {"category": {"$in": [category]}},  # Array contains this value
+            {"categories": {"$in": [category]}}  # Legacy format
         ]
     if search:
         query["$or"] = [
@@ -767,18 +792,35 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
         
         if "category" in data:
             category_value = data.get("category")
-            # Treat empty string as null
-            if category_value == "":
-                update_doc["category"] = None
-            else:
+            # Handle category as array
+            if isinstance(category_value, list):
+                # Ensure it's a valid array (filter invalid values)
+                valid_categories = ["Annet", "Bunnfisk", "Pelagisk fisk"]
+                category_value = [c for c in category_value if c in valid_categories]
+                if not category_value:
+                    category_value = ["Annet"]
                 update_doc["category"] = category_value
+            elif category_value == "" or category_value is None:
+                update_doc["category"] = ["Annet"]  # Default to array with Annet
+            else:
+                # Convert string to array
+                if category_value in ["Annet", "Bunnfisk", "Pelagisk fisk"]:
+                    update_doc["category"] = [category_value]
+                else:
+                    update_doc["category"] = ["Annet"]
             # Remove old categories field if it exists
             unset_fields["categories"] = ""
         elif "categories" in data:
-            # Legacy support: convert array to single category
+            # Legacy support: convert old categories array to new category array
             cats = data.get("categories") or []
-            if isinstance(cats, list) and len(cats) > 0:
-                update_doc["category"] = cats[0]
+            if isinstance(cats, list):
+                valid_categories = ["Annet", "Bunnfisk", "Pelagisk fisk"]
+                cats = [c for c in cats if c in valid_categories]
+                update_doc["category"] = cats if cats else ["Annet"]
+            elif isinstance(cats, str):
+                update_doc["category"] = [cats] if cats in ["Annet", "Bunnfisk", "Pelagisk fisk"] else ["Annet"]
+            else:
+                update_doc["category"] = ["Annet"]
             unset_fields["categories"] = ""
         if "area" in data:
             area_value = data.get("area")
@@ -975,13 +1017,20 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
         if data.get("valid_to"): meta_lines.append(f"Valid to: {data.get('valid_to')}")
         if data.get("replaces"): meta_lines.append(f"Replaces: {data.get('replaces')}")
         if data.get("replaced_by"): meta_lines.append(f"Replaced by: {data.get('replaced_by')}")
-        # Support both old (array) and new (string) format
+        # Support both old (string) and new (array) format
         category = data.get("category")
-        if not category:
+        if isinstance(category, list):
+            if len(category) > 0:
+                meta_lines.append(f"Category: {', '.join(category)}")
+        elif category:
+            meta_lines.append(f"Category: {category}")
+        else:
+            # Legacy support
             cats = data.get("categories") or []
             if isinstance(cats, list) and len(cats) > 0:
-                category = cats[0]
-        if category: meta_lines.append(f"Category: {category}")
+                meta_lines.append(f"Category: {', '.join(cats)}")
+            elif cats:
+                meta_lines.append(f"Category: {cats}")
         area = data.get("area")
         if isinstance(area, list) and len(area) > 0:
             meta_lines.append(f"Area: {', '.join(area)}")

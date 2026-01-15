@@ -10,19 +10,21 @@ Required JSON format:
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
   "valid_to": "YYYY-MM-DD or null",
-  "category": "Annet" or "Bunnfisk" or "Pelagisk fisk",
+  "category": ["Annet", "Bunnfisk", "Pelagisk fisk"] or [],
   "area": ["Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N"] or []
 }}
 
 IMPORTANT RULES: 
 - "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
 - "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
-- "category" MUST ALWAYS be one of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". NEVER use null.
-  * Use "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
-  * Use "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
-  * Use "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+- "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
+  * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
+  * Include "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)
+  * Include "Annet" if the document does not clearly mention Bunnfisk or Pelagisk fisk species, or if it's a general regulation
+  * A document can have multiple categories (e.g., ["Bunnfisk", "Pelagisk fisk"] if it mentions both types)
+  * If no specific category is identified, use ["Annet"] (array with one element, not empty array)
 - "area" must be an ARRAY containing one or more of these four values: "Andre lands soner", "Internasjonal farvann", "Nord for 62° N", "Sør for 62° N". A document can have multiple areas. If no area is found, use an empty array [].
-- You MUST include both "category" and "area" fields in your JSON response. Category must always have a value (never null).
+- You MUST include both "category" and "area" fields in your JSON response. Category must always be an array with at least one value (use ["Annet"] if no specific category is found).
 - Look for geographical references in the document to determine the areas (e.g., "nord for 62°", "sør for 62°", "internasjonalt", etc.). A document may mention multiple areas.
 
 Document text:

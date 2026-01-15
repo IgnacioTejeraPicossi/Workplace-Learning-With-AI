@@ -72,12 +72,13 @@ export default function JMessagesLibrary() {
   ];
 
   const filtered = items.filter((it) => {
-    // Support both old (array) and new (string) format for category
-    const category = it.category || (Array.isArray(it.categories) && it.categories.length > 0 ? it.categories[0] : null);
+    // Support both old (string) and new (array) format for category
+    const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
+    const category = categoryArray.join(', ');
     const hay = `${it.j_id || ''} ${it.title || ''} ${category || ''}`.toLowerCase();
     const qOk = hay.includes(query.toLowerCase());
     const sOk = statusFilter === 'all' || (it.status || '') === statusFilter;
-    const cOk = categoryFilter === 'all' || category === categoryFilter;
+    const cOk = categoryFilter === 'all' || categoryArray.includes(categoryFilter);
     // Support both old (string) and new (array) format for area
     const areas = Array.isArray(it.area) ? it.area : (it.area ? [it.area] : []);
     const aOk = areaFilter === 'all' || areas.includes(areaFilter);
@@ -97,7 +98,7 @@ export default function JMessagesLibrary() {
           valid_to: item.valid_to || '',
           replaces: item.replaces || '',
           replaced_by: item.replaced_by || replacedByMap[item.j_id] || '',
-          category: item.category || (Array.isArray(item.categories) && item.categories.length > 0 ? item.categories[0] : ''),
+          category: Array.isArray(item.category) ? [...item.category] : (item.category ? [item.category] : (Array.isArray(item.categories) ? [...item.categories] : (item.categories ? [item.categories] : ['Annet']))),
           area: Array.isArray(item.area) ? [...item.area] : (item.area ? [item.area] : []),
           summary: item.summary || '',
           body_html: item.body_html || '',
@@ -206,7 +207,10 @@ export default function JMessagesLibrary() {
       it.valid_to ? `Valid to: ${it.valid_to}` : null,
       it.replaces ? `Replaces: ${it.replaces}` : null,
       replacedBy ? `Replaced by: ${replacedBy}` : null,
-      (it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `Category: ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}` : null,
+      (() => {
+        const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
+        return categoryArray.length > 0 ? `Category: ${categoryArray.join(', ')}` : null;
+      })(),
       (Array.isArray(it.area) && it.area.length > 0) ? `Area: ${it.area.join(', ')}` : (it.area && !Array.isArray(it.area) ? `Area: ${it.area}` : null)
     ].filter(Boolean);
     if (meta.length) {
@@ -251,7 +255,7 @@ export default function JMessagesLibrary() {
       valid_to: it.valid_to,
       replaces: it.replaces,
       replaced_by: it.replaced_by || replacedByMap[it.j_id || it.id] || null,
-      category: it.category || (Array.isArray(it.categories) && it.categories.length > 0 ? it.categories[0] : null),
+      category: Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : ['Annet']))),
       area: Array.isArray(it.area) ? it.area : (it.area ? [it.area] : []),
       toc: it.toc || [],
       body_html: it.body_html || '',
@@ -288,7 +292,10 @@ export default function JMessagesLibrary() {
         ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
         ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
         ${replacedBy ? `<div><strong>Replaced by:</strong> ${replacedBy}</div>` : ''}
-        ${(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) ? `<div><strong>Category:</strong> ${it.category || (Array.isArray(it.categories) ? it.categories[0] : '')}</div>` : ''}
+        ${(() => {
+          const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
+          return categoryArray.length > 0 ? `<div><strong>Category:</strong> ${categoryArray.join(', ')}</div>` : '';
+        })()}
         ${(Array.isArray(it.area) && it.area.length > 0) ? `<div><strong>Area:</strong> ${it.area.join(', ')}</div>` : (it.area && !Array.isArray(it.area) ? `<div><strong>Area:</strong> ${it.area}</div>` : '')}
       </div>`;
     const summary = it.summary ? `<h2>Executive Summary</h2><div>${it.summary.replace(/\n/g, '<br/>')}</div>` : '';
@@ -582,25 +589,31 @@ export default function JMessagesLibrary() {
                         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
                           {t('jMessages.library.metadata.category')}
                         </label>
-                        <select
-                          value={editContent[it.id]?.category || ''}
-                          onChange={(e) => {
-                            handleEditChange(it.id, 'category', e.target.value);
-                          }}
-                          style={{
-                            width: '100%',
-                            padding: '6px 10px',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 6,
-                            background: colors.background,
-                            color: colors.text,
-                            fontSize: 12,
-                            boxSizing: 'border-box'
-                          }}
-                        >
-                          <option value="">{t('jMessages.library.selectCategory')}</option>
-                          {predefinedCategories.map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, border: `1px solid ${colors.border}`, borderRadius: 6, padding: '6px 10px', background: colors.background }}>
+                          {predefinedCategories.map((category) => (
+                            <label key={category} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: colors.text }}>
+                              <input
+                                type="checkbox"
+                                value={category}
+                                checked={Array.isArray(editContent[it.id]?.category) ? editContent[it.id].category.includes(category) : false}
+                                onChange={(e) => {
+                                  const isChecked = e.target.checked;
+                                  const currentCategories = Array.isArray(editContent[it.id]?.category) ? [...editContent[it.id].category] : [];
+                                  const newCategories = isChecked
+                                    ? [...currentCategories, category]
+                                    : currentCategories.filter((c) => c !== category);
+                                  // Ensure at least one category is selected (default to "Annet" if empty)
+                                  handleEditChange(it.id, 'category', newCategories.length > 0 ? newCategories : ['Annet']);
+                                }}
+                                style={{
+                                  width: 16,
+                                  height: 16
+                                }}
+                              />
+                              <span>{category}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 24 }}> {/* Increased gap */}
@@ -674,12 +687,15 @@ export default function JMessagesLibrary() {
                       <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {it.replaces || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.replacedBy')}:</strong> {(it.replaced_by || replacedByMap[it.j_id]) || '—'}</div>
                     </div>
-                    {(it.category || (Array.isArray(it.categories) && it.categories.length > 0)) && (
-                      <div style={{ marginTop: 8, marginBottom: 8 }}>
-                        <strong>{t('jMessages.library.metadata.category')}:</strong>{' '}
-                        {it.category || (Array.isArray(it.categories) ? it.categories[0] : '—')}
-                      </div>
-                    )}
+                    {(() => {
+                      const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
+                      return categoryArray.length > 0 && (
+                        <div style={{ marginTop: 8, marginBottom: 8 }}>
+                          <strong>{t('jMessages.library.metadata.category')}:</strong>{' '}
+                          {categoryArray.join(', ')}
+                        </div>
+                      );
+                    })()}
                     {(Array.isArray(it.area) && it.area.length > 0) || (it.area && !Array.isArray(it.area)) ? (
                       <div style={{ marginTop: 8, marginBottom: 8 }}>
                         <strong>{t('jMessages.library.metadata.area')}:</strong>{' '}
