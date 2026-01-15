@@ -241,6 +241,40 @@ export default function JMessagesLibrary() {
     URL.revokeObjectURL(url);
   };
 
+  const exportJSON = (it) => {
+    // Create a clean JSON object with all the data
+    const jsonData = {
+      id: it.j_id || it.id,
+      title: it.title,
+      status: it.status,
+      valid_from: it.valid_from,
+      valid_to: it.valid_to,
+      replaces: it.replaces,
+      replaced_by: it.replaced_by || replacedByMap[it.j_id || it.id] || null,
+      category: it.category || (Array.isArray(it.categories) && it.categories.length > 0 ? it.categories[0] : null),
+      area: Array.isArray(it.area) ? it.area : (it.area ? [it.area] : []),
+      toc: it.toc || [],
+      body_html: it.body_html || '',
+      raw_text: it.raw_text || '',
+      summary: it.summary || null,
+      summary_length: it.summary_length || null,
+      prompt_version: it.prompt_version || null,
+      created_at: it.created_at || null,
+      filename: it.filename || null
+    };
+    
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(it.j_id || it.id || 'j-message').replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const exportPDF = (it) => {
     const win = window.open('', '_blank');
     if (!win) return;
@@ -816,6 +850,21 @@ export default function JMessagesLibrary() {
                     }}
                   >
                     {t('jMessages.library.exportPDF')}
+                  </button>
+                  <button
+                    onClick={() => exportJSON(it)}
+                    style={{
+                      background: '#f59e0b',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      flex: 1,
+                      textAlign: 'center'
+                    }}
+                  >
+                    {t('jMessages.library.exportJSON')}
                   </button>
                 </div>
               </div>

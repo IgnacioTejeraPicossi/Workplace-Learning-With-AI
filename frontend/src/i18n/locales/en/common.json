@@ -501,6 +501,7 @@
       "exportDOCX": "Export DOCX",
       "exportMD": "Export MD",
       "exportPDF": "Export PDF",
+      "exportJSON": "Export JSON",
       "exportFailed": "Export failed",
       "deleteConfirm": "Delete this item?",
       "deleteFailed": "Delete failed",

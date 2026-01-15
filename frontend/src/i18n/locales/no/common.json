@@ -1396,6 +1396,7 @@
       "exportDOCX": "Eksporter DOCX",
       "exportMD": "Eksporter MD",
       "exportPDF": "Eksporter PDF",
+      "exportJSON": "Eksporter JSON",
       "exportFailed": "Eksport mislyktes",
       "deleteConfirm": "Slett dette elementet?",
       "deleteFailed": "Sletting mislyktes",
