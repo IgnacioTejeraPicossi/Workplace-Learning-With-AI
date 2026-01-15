@@ -545,7 +545,7 @@ export default function JMessagesAnalyzer() {
               <div><strong>{t('jMessages.analyzer.metadata.status')}:</strong> {result.status || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.validFrom')}:</strong> {result.valid_from || '—'}</div>
               <div><strong>{t('jMessages.analyzer.metadata.validTo')}:</strong> {result.valid_to || '—'}</div>
-              <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {result.replaces || '—'}</div>
+              <div><strong>{t('jMessages.analyzer.metadata.replaces')}:</strong> {Array.isArray(result.replaces) ? result.replaces.join(', ') : (result.replaces || '—')}</div>
               <div><strong>{t('jMessages.analyzer.metadata.replacedBy')}:</strong> {result.replaced_by || '—'}</div>
             </div>
             {(() => {

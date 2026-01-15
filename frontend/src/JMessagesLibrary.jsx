@@ -45,11 +45,15 @@ export default function JMessagesLibrary() {
   const replacedByMap = useMemo(() => {
     const map = {};
     for (const it of items) {
-      const replaces = (it?.replaces || '').trim();
+      const replaces = Array.isArray(it?.replaces) ? it.replaces : (it?.replaces ? [it.replaces] : []);
       const jid = (it?.j_id || '').trim();
-      if (replaces && jid && !map[replaces]) {
-        map[replaces] = jid;
-      }
+      // For each replaced J-ID, map it to the current J-ID
+      replaces.forEach((replacedId) => {
+        const trimmed = (replacedId || '').trim();
+        if (trimmed && jid && !map[trimmed]) {
+          map[trimmed] = jid;
+        }
+      });
     }
     return map;
   }, [items]);
@@ -96,7 +100,7 @@ export default function JMessagesLibrary() {
           status: item.status || '',
           valid_from: item.valid_from || '',
           valid_to: item.valid_to || '',
-          replaces: item.replaces || '',
+          replaces: Array.isArray(item.replaces) ? item.replaces.join(', ') : (item.replaces || ''),
           replaced_by: item.replaced_by || replacedByMap[item.j_id] || '',
           category: Array.isArray(item.category) ? [...item.category] : (item.category ? [item.category] : (Array.isArray(item.categories) ? [...item.categories] : (item.categories ? [item.categories] : ['Annet']))),
           area: Array.isArray(item.area) ? [...item.area] : (item.area ? [item.area] : []),
@@ -127,10 +131,16 @@ export default function JMessagesLibrary() {
       const content = editContent[itemId];
       if (!content) return;
 
+      // Convert replaces string (comma-separated) to array
+      const payload = { ...content };
+      if (payload.replaces && typeof payload.replaces === 'string') {
+        payload.replaces = payload.replaces.split(',').map(r => r.trim()).filter(r => r);
+      }
+
       const resp = await fetchWithAuth(`/api/j-messages/update/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(content)
+        body: JSON.stringify(payload)
       });
 
       const data = await resp.json();
@@ -205,7 +215,10 @@ export default function JMessagesLibrary() {
       it.status ? `Status: ${it.status}` : null,
       it.valid_from ? `Valid from: ${it.valid_from}` : null,
       it.valid_to ? `Valid to: ${it.valid_to}` : null,
-      it.replaces ? `Replaces: ${it.replaces}` : null,
+      (() => {
+        const replaces = Array.isArray(it.replaces) ? it.replaces : (it.replaces ? [it.replaces] : []);
+        return replaces.length > 0 ? `Replaces: ${replaces.join(', ')}` : null;
+      })(),
       replacedBy ? `Replaced by: ${replacedBy}` : null,
       (() => {
         const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
@@ -253,7 +266,7 @@ export default function JMessagesLibrary() {
       status: it.status,
       valid_from: it.valid_from,
       valid_to: it.valid_to,
-      replaces: it.replaces,
+      replaces: Array.isArray(it.replaces) ? it.replaces : (it.replaces ? [it.replaces] : []),
       replaced_by: it.replaced_by || replacedByMap[it.j_id || it.id] || null,
       category: Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : ['Annet']))),
       area: Array.isArray(it.area) ? it.area : (it.area ? [it.area] : []),
@@ -290,7 +303,10 @@ export default function JMessagesLibrary() {
         ${it.status ? `<div><strong>Status:</strong> ${it.status}</div>` : ''}
         ${it.valid_from ? `<div><strong>Valid from:</strong> ${it.valid_from}</div>` : ''}
         ${it.valid_to ? `<div><strong>Valid to:</strong> ${it.valid_to}</div>` : ''}
-        ${it.replaces ? `<div><strong>Replaces:</strong> ${it.replaces}</div>` : ''}
+        ${(() => {
+          const replaces = Array.isArray(it.replaces) ? it.replaces : (it.replaces ? [it.replaces] : []);
+          return replaces.length > 0 ? `<div><strong>Replaces:</strong> ${replaces.join(', ')}</div>` : '';
+        })()}
         ${replacedBy ? `<div><strong>Replaced by:</strong> ${replacedBy}</div>` : ''}
         ${(() => {
           const categoryArray = Array.isArray(it.category) ? it.category : (it.category ? [it.category] : (Array.isArray(it.categories) ? it.categories : (it.categories ? [it.categories] : [])));
@@ -552,27 +568,8 @@ export default function JMessagesLibrary() {
                         <input
                           value={editContent[it.id]?.replaces || ''}
                           onChange={(e) => handleEditChange(it.id, 'replaces', e.target.value)}
-                          placeholder="J-XXX-YYYY"
-                          style={{
-                            width: '100%',
-                            padding: '6px 10px',
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: 6,
-                            background: colors.background,
-                            color: colors.text,
-                            fontSize: 12,
-                            boxSizing: 'border-box'
-                          }}
-                        />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
-                          {t('jMessages.library.metadata.replacedBy')}
-                        </label>
-                        <input
-                          value={editContent[it.id]?.replaced_by || ''}
-                          onChange={(e) => handleEditChange(it.id, 'replaced_by', e.target.value)}
-                          placeholder="J-XXX-YYYY"
+                          placeholder="J-XXX-YYYY, J-XXX-YYYY, ..."
+                          title="Enter multiple J-IDs separated by commas"
                           style={{
                             width: '100%',
                             padding: '6px 10px',
@@ -671,6 +668,28 @@ export default function JMessagesLibrary() {
                         </div>
                       </div>
                     </div>
+                    <div style={{ display: 'flex', gap: 24 }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                          {t('jMessages.library.metadata.replacedBy')}
+                        </label>
+                        <input
+                          value={editContent[it.id]?.replaced_by || ''}
+                          onChange={(e) => handleEditChange(it.id, 'replaced_by', e.target.value)}
+                          placeholder="J-XXX-YYYY"
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: 6,
+                            background: colors.background,
+                            color: colors.text,
+                            fontSize: 12,
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -684,7 +703,7 @@ export default function JMessagesLibrary() {
                       <div><strong>{t('jMessages.library.metadata.status')}:</strong> {it.status || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.validFrom')}:</strong> {it.valid_from || '—'}</div>
                       <div><strong>{t('jMessages.library.metadata.validTo')}:</strong> {it.valid_to || '—'}</div>
-                      <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {it.replaces || '—'}</div>
+                      <div><strong>{t('jMessages.library.metadata.replaces')}:</strong> {Array.isArray(it.replaces) ? it.replaces.join(', ') : (it.replaces || '—')}</div>
                       <div><strong>{t('jMessages.library.metadata.replacedBy')}:</strong> {(it.replaced_by || replacedByMap[it.j_id]) || '—'}</div>
                     </div>
                     {(() => {

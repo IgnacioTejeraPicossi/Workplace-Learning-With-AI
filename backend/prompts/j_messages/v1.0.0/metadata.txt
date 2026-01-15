@@ -5,7 +5,7 @@ Required JSON format:
 {{
   "j_id": "J-XXX-YYYY",
   "title": "document title",
-  "replaces_id": "J-XXX-YYYY or null",
+  "replaces_id": ["J-XXX-YYYY", "J-XXX-YYYY"] or [],
   "replaced_by_id": "J-XXX-YYYY or null",
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
@@ -15,8 +15,13 @@ Required JSON format:
 }}
 
 IMPORTANT RULES: 
-- "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
-- "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
+- "replaces_id" must be an ARRAY of J-message IDs that this document replaces (Norwegian UI label: "Erstatter"). 
+  * Look for patterns like "(J-XXX-YYYY, J-XXX-YYYY UTGÅR)" or "(J-XXX-YYYY, J-XXX-YYYY, J-XXX-YYYY UTGÅR)" in the document header
+  * Extract ALL J-message IDs mentioned in such patterns and include them in the array
+  * If the document replaces multiple J-messages, include all of them: ["J-59-2008", "J-5-2021", "J-177-2025"]
+  * If no J-messages are replaced, use an empty array []
+  * Each ID should follow the pattern "J-XXX-YYYY" where XXX is a number and YYYY is a year
+- "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av"). This is typically a single value or null.
 - "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
   * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
   * Include "Pelagisk fisk" if the document mentions pelagic fish species (e.g., makrell/mackerel, sild/herring, brisling/sprat, etc.)

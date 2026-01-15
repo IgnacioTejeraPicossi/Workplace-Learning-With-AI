@@ -272,7 +272,7 @@ Required JSON format:
 {{
   "j_id": "J-XXX-YYYY",
   "title": "document title",
-  "replaces_id": "J-XXX-YYYY or null",
+  "replaces_id": ["J-XXX-YYYY", "J-XXX-YYYY"] or [],
   "replaced_by_id": "J-XXX-YYYY or null",
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
@@ -282,7 +282,7 @@ Required JSON format:
 }}
 
 IMPORTANT RULES: 
-- "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
+- "replaces_id" must be an ARRAY of J-message IDs that this document replaces (Norwegian UI label: "Erstatter"). Look for patterns like "(J-XXX-YYYY, J-XXX-YYYY UTGÅR)" in the document header and extract ALL J-message IDs mentioned. If no J-messages are replaced, use an empty array [].
 - "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
 - "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
   * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
@@ -327,7 +327,7 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
     metadata: Dict[str, Any] = {
         "j_id": None,
         "title": None,
-        "replaces_id": None,
+        "replaces_id": [],
         "replaced_by_id": None,
         "status": None,
         "valid_from": None,
@@ -428,7 +428,7 @@ async def analyze_j_message(
     metadata: Dict[str, Any] = {
         "j_id": None,
         "title": None,
-        "replaces_id": None,
+        "replaces_id": [],
         "replaced_by_id": None,
         "status": None,
         "valid_from": None,
@@ -486,6 +486,18 @@ async def analyze_j_message(
                     parsed["replaced_by_id"] = parsed.get("replaced_by")
                 if "replacedBy" in parsed and "replaced_by_id" not in parsed:
                     parsed["replaced_by_id"] = parsed.get("replacedBy")
+
+                # Handle replaces_id: convert string to array (backward compatibility)
+                if "replaces_id" in parsed:
+                    replaces_id = parsed.get("replaces_id")
+                    if isinstance(replaces_id, str) and replaces_id:
+                        # Parse comma-separated string into array
+                        replaces_array = [r.strip() for r in replaces_id.split(',') if r.strip()]
+                        parsed["replaces_id"] = replaces_array
+                    elif not isinstance(replaces_id, list):
+                        parsed["replaces_id"] = []
+                else:
+                    parsed["replaces_id"] = []
 
                 # Handle legacy formats: convert string or old "categories" field to array
                 if "categories" in parsed and "category" not in parsed:
@@ -567,7 +579,7 @@ Tekst:
         "status": metadata.get("status"),
         "valid_from": metadata.get("valid_from"),
         "valid_to": metadata.get("valid_to"),
-        "replaces": metadata.get("replaces_id"),
+        "replaces": metadata.get("replaces_id") if isinstance(metadata.get("replaces_id"), list) else ([metadata.get("replaces_id")] if metadata.get("replaces_id") else []),
         "replaced_by": metadata.get("replaced_by_id") or metadata.get("replaced_by"),
         "category": metadata.get("category") if isinstance(metadata.get("category"), list) else ([metadata.get("category")] if metadata.get("category") else (metadata.get("categories") if isinstance(metadata.get("categories"), list) else (["Annet"] if not metadata.get("categories") else [metadata.get("categories")]))) if metadata.get("category") or metadata.get("categories") else ["Annet"],
         "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
@@ -628,7 +640,7 @@ Required JSON format:
 {{
   "j_id": "J-XXX-YYYY",
   "title": "document title",
-  "replaces_id": "J-XXX-YYYY or null",
+  "replaces_id": ["J-XXX-YYYY", "J-XXX-YYYY"] or [],
   "replaced_by_id": "J-XXX-YYYY or null",
   "status": "active/inactive/repealed",
   "valid_from": "YYYY-MM-DD or null",
@@ -638,7 +650,7 @@ Required JSON format:
 }}
 
 IMPORTANT RULES: 
-- "replaces_id" is the J-message this document replaces (Norwegian UI label: "Erstatter").
+- "replaces_id" must be an ARRAY of J-message IDs that this document replaces (Norwegian UI label: "Erstatter"). Look for patterns like "(J-XXX-YYYY, J-XXX-YYYY UTGÅR)" in the document header and extract ALL J-message IDs mentioned. If no J-messages are replaced, use an empty array [].
 - "replaced_by_id" is the J-message that replaces THIS document (Norwegian UI label: "Erstattet av").
 - "category" must be an ARRAY containing one or more of these three values: "Annet", "Bunnfisk", or "Pelagisk fisk". A document can have multiple categories.
   * Include "Bunnfisk" if the document mentions bottom-dwelling fish species (e.g., torsk/cod, hyse/haddock, sei/saithe, blåkveite/blue halibut, rognkjeks/lumpfish, kongekrabbe/king crab, etc.)
@@ -702,7 +714,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "status": data.get("status"),
             "valid_from": data.get("valid_from"),
             "valid_to": data.get("valid_to"),
-            "replaces": data.get("replaces"),
+            "replaces": data.get("replaces") if isinstance(data.get("replaces"), list) else ([data.get("replaces")] if data.get("replaces") else []),
             "replaced_by": data.get("replaced_by"),
             "category": data.get("category") if isinstance(data.get("category"), list) else ([data.get("category")] if data.get("category") else (data.get("categories") if isinstance(data.get("categories"), list) else (["Annet"] if not data.get("categories") else [data.get("categories")]))) if data.get("category") or data.get("categories") else ["Annet"],
             "area": data.get("area") if isinstance(data.get("area"), list) else ([data.get("area")] if data.get("area") else []),
@@ -784,7 +796,21 @@ async def update_j_message(doc_id: str, data: Dict[str, Any] = Body(...)):
         if "valid_to" in data:
             update_doc["valid_to"] = data.get("valid_to")
         if "replaces" in data:
-            update_doc["replaces"] = data.get("replaces")
+            replaces_value = data.get("replaces")
+            # Handle replaces as array
+            if isinstance(replaces_value, list):
+                # Filter out empty strings and ensure valid J-ID format
+                replaces_value = [r.strip() for r in replaces_value if r and r.strip()]
+                update_doc["replaces"] = replaces_value if replaces_value else []
+            elif isinstance(replaces_value, str):
+                # Parse comma-separated string into array
+                if replaces_value:
+                    replaces_array = [r.strip() for r in replaces_value.split(',') if r.strip()]
+                    update_doc["replaces"] = replaces_array
+                else:
+                    update_doc["replaces"] = []
+            else:
+                update_doc["replaces"] = []
         if "replaced_by" in data:
             update_doc["replaced_by"] = data.get("replaced_by")
         # Track fields to unset separately
@@ -1015,7 +1041,11 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
         if data.get("status"): meta_lines.append(f"Status: {data.get('status')}")
         if data.get("valid_from"): meta_lines.append(f"Valid from: {data.get('valid_from')}")
         if data.get("valid_to"): meta_lines.append(f"Valid to: {data.get('valid_to')}")
-        if data.get("replaces"): meta_lines.append(f"Replaces: {data.get('replaces')}")
+        replaces = data.get("replaces")
+        if isinstance(replaces, list) and len(replaces) > 0:
+            meta_lines.append(f"Replaces: {', '.join(replaces)}")
+        elif replaces:
+            meta_lines.append(f"Replaces: {replaces}")
         if data.get("replaced_by"): meta_lines.append(f"Replaced by: {data.get('replaced_by')}")
         # Support both old (string) and new (array) format
         category = data.get("category")
