@@ -8,7 +8,8 @@ The **J-messages Analyzer** is a specialized document processing system designed
 
 ### What it does
 
-- Extracts metadata (J‑ID, title, valid dates, replaces, status, categories) via the unified LLM pipeline
+- Extracts metadata (J‑ID, title, valid dates, replaces, status, categories, areas) via the unified LLM pipeline
+- Preserves **tables** from original documents in HTML format
 - Splits administrative header from the regulation body using the common marker "Forskriften lyder etter dette" (fallbacks apply)
 - Builds a Table of Contents (TOC) from headings (Kapittel … → H1, "§ …" → H2) and injects anchor ids
 - Renders the regulation body with clickable TOC and smooth scrolling, plus an optional executive summary
@@ -26,8 +27,10 @@ The **J-messages Analyzer** is a specialized document processing system designed
   "status": "Gjeldende",
   "valid_from": "2025-10-08",
   "valid_to": "2025-12-31",
-  "replaces": "J-169-2025",
-  "categories": ["Sør for 62° N", "Pelagisk fisk"],
+  "replaces": ["J-169-2025", "J-59-2008", "J-5-2021"],
+  "replaced_by": "J-200-2025",
+  "category": ["Bunnfisk", "Pelagisk fisk"],
+  "area": ["Sør for 62° N", "Nord for 62° N"],
   "toc": [
     { 
       "level": 1, 
@@ -42,12 +45,20 @@ The **J-messages Analyzer** is a specialized document processing system designed
       ]
     }
   ],
-  "body_html": "<h1 id='kapittel-1-fiskeforbud-og-kvoter'>...</h1> ...",
+  "body_html": "<h1 id='kapittel-1-fiskeforbud-og-kvoter'>...</h1><table>...</table>...",
   "raw_text": "Plain text of the body",
   "summary": "Optional executive summary text",
-  "summary_length": "short|medium|long"
+  "summary_length": "short|medium|long",
+  "prompt_version": "v1.0.0"
 }
 ```
+
+**Note**: 
+- `replaces` is an **array** of J-message IDs (can contain multiple values, e.g., `["J-169-2025", "J-59-2008"]`)
+- `category` is an **array** of category values (can contain multiple values, e.g., `["Bunnfisk", "Pelagisk fisk"]`)
+- `area` is an **array** of area values (can contain multiple values)
+- `replaced_by` is a **string** (single J-message ID that replaces this one, automatically derived from reverse lookup)
+- `body_html` includes **HTML tables** extracted from the original document
 
 ### Note analysis response
 
@@ -148,13 +159,13 @@ The **J-messages Analyzer** is a specialized document processing system designed
   - Temperature setting is persisted in localStorage and sent with each analysis request
 
 **Results Display**
-- **Metadata Header**: J-ID, title, dates, status, replaces, categories
+- **Metadata Header**: J-ID, title, dates, status, replaces (multiple), replaced_by, category (multiple), area (multiple)
 - **Executive Summary**: Optional AI-generated summary (if selected)
 - **Table of Contents ("Innhold")**: 
   - Hierarchical structure with clickable entries
   - Smooth scrolling to matching headings
   - Collapsible/expandable TOC panel
-- **Rendered Body**: HTML with proper heading structure and anchor IDs
+- **Rendered Body**: HTML with proper heading structure, anchor IDs, and **preserved tables** from original document
 - **Save to Library**: One-click persistence to MongoDB
 
 ### Prompt Manager 🆕
@@ -189,14 +200,16 @@ The **J-messages Analyzer** is a specialized document processing system designed
 **Search & Filter**
 - Full-text search by ID, title, or category
 - Filter by Status (e.g., "Gjeldende", "Utgått")
-- Filter by Category (e.g., "Sør for 62° N", "Pelagisk fisk")
+- Filter by Category (e.g., "Bunnfisk", "Pelagisk fisk", "Annet")
+- Filter by Area (e.g., "Sør for 62° N", "Nord for 62° N", "Internasjonal farvann", "Andre lands soner")
 - Real-time filtering with instant results
 
 **Document View**
 - Expandable items showing full document details
 - Summary display (if available)
 - TOC navigation with smooth scrolling
-- Rendered body HTML with proper formatting
+- Rendered body HTML with proper formatting and **preserved tables**
+- Edit functionality for metadata fields (supports multiple values for Category, Area, and Replaces)
 
 **Export Options**
 - **Markdown**: Generates a `.md` file including:
@@ -206,10 +219,14 @@ The **J-messages Analyzer** is a specialized document processing system designed
   - Raw text content
 - **PDF**: Opens a print-ready HTML view of the rendered body
   - Use browser "Save as PDF" functionality
-  - Preserves formatting and structure
+  - Preserves formatting, structure, and **tables**
 - **DOCX**: Generates a Word document from the analyzed data
   - Includes all metadata and structured content
+  - **Preserves tables** from original document as formatted DOCX tables
   - Ready for further editing or distribution
+- **JSON**: Generates a `.json` file with complete document data
+  - Includes all metadata, TOC, body_html, raw_text, and summary
+  - Machine-readable format for integration and processing
 
 **Delete**: Removes the item from MongoDB with confirmation
 
@@ -228,6 +245,17 @@ The **J-messages Analyzer** is a specialized document processing system designed
 - `§ …` → H2 (Paragraph headings)
 - Future iterations can use DOCX paragraph styles
 - Additional patterns planned: H3, lettered subclauses
+
+**Table Extraction**
+- **DOCX Tables**: Automatically extracted from original documents using `python-docx`
+  - Tables are converted to HTML format with proper styling (borders, padding, header row formatting)
+  - Preserved in document order (between paragraphs)
+  - Tables are included in `body_html` and displayed in the frontend
+  - Tables are also included in DOCX exports as formatted Word tables
+- **Table Formatting**: 
+  - First row is treated as header row (bold, gray background)
+  - All cells properly escaped for HTML safety
+  - Responsive styling for web display
 
 **PDF Support**
 - Multiple fallback libraries for robust text extraction:
@@ -306,13 +334,20 @@ curl -X POST http://localhost:8000/api/j-messages/export-docx \
 - ✅ DOCX and PDF format support
 - ✅ Note analysis with specialized prompts
 - ✅ Prompt Manager for customization
-- ✅ DOCX export functionality
+- ✅ DOCX export functionality (with table preservation)
 - ✅ TOC with smooth scrolling navigation
 - ✅ Library with search, filter, and export options
 - ✅ MongoDB persistence
 - ✅ Unique anchor generation for TOC items
 - ✅ Robust error handling and validation
 - ✅ Multi-provider AI support (LM Studio, OpenAI, OpenRouter)
+- ✅ **Multiple Category support** (array format with checkboxes in edit interface)
+- ✅ **Multiple Replaces support** (array format, comma-separated input)
+- ✅ **Replaced By field** (automatic reverse lookup)
+- ✅ **Table extraction and preservation** (from DOCX to HTML, displayed in frontend and exported to DOCX)
+- ✅ **JSON export** (complete document data in machine-readable format)
+- ✅ Temperature control for AI responses
+- ✅ Prompt versioning system with audit trail
 
 ## 🔮 Future Enhancements
 
@@ -465,13 +500,21 @@ Tekst:
 {
   "j_id": "J-195-2025",
   "title": "Forskrift om endring av ...",
-  "replaces_id": "J-169-2025",
+  "replaces_id": ["J-169-2025", "J-59-2008", "J-5-2021"],
+  "replaced_by_id": "J-200-2025",
   "status": "Gjeldende",
   "valid_from": "2025-10-08",
   "valid_to": "2025-12-31",
-  "categories": ["Sør for 62° N", "Pelagisk fisk"]
+  "category": ["Bunnfisk", "Pelagisk fisk"],
+  "area": ["Sør for 62° N", "Nord for 62° N"]
 }
 ```
+
+**Note**: 
+- `replaces_id` is an **array** (can contain multiple J-message IDs)
+- `category` is an **array** (can contain multiple categories: "Annet", "Bunnfisk", "Pelagisk fisk")
+- `area` is an **array** (can contain multiple areas)
+- `replaced_by_id` is a **string** (single J-message ID, automatically derived from reverse lookup)
 
 **Test Results**:
 - *Document test cases and results here as development progresses*
@@ -587,6 +630,33 @@ Text:
 ## 🔄 Development Changelog
 
 > **Note**: Track all changes, improvements, and iterations made during development.
+
+### 2025-01-XX - Multiple Values Support & Table Extraction
+- ✅ **Multiple Category Values**: Category field now supports multiple selections (array format)
+  - Users can select multiple categories: "Annet", "Bunnfisk", "Pelagisk fisk"
+  - Displayed as comma-separated list in UI
+  - Stored as array in MongoDB
+  - Filter functionality updated to support multiple category filtering
+- ✅ **Multiple Replaces Values**: Replaces field now supports multiple J-message IDs (array format)
+  - AI extracts multiple J-IDs from patterns like "(J-59-2008, J-5-2021, J-177-2025 UTGÅR)"
+  - Displayed as comma-separated list in UI
+  - Stored as array in MongoDB
+  - Edit interface allows comma-separated input for multiple values
+- ✅ **Replaced By Field**: Added "Replaced by" field to track reverse relationships
+  - Automatically derived from reverse lookup (if J-ID appears in another document's "replaces" field)
+  - Displayed below "Replaces" field in expanded view
+  - Included in exports (Markdown, PDF, DOCX, JSON)
+- ✅ **Table Extraction from DOCX**: Tables are now preserved from original documents
+  - Tables extracted using `python-docx` library
+  - Converted to HTML format with proper styling (borders, padding, header formatting)
+  - Preserved in document order within `body_html`
+  - Displayed in frontend with proper formatting
+  - Included in DOCX exports as formatted Word tables
+  - Tables maintain their structure and content from original document
+- ✅ **JSON Export**: Added new export option for complete document data
+  - Generates `.json` file with all metadata, TOC, body_html, raw_text, and summary
+  - Machine-readable format for integration and processing
+  - All array fields (category, area, replaces) properly serialized
 
 ### 2025-01-XX - Temperature Control & Prompt Versioning
 - ✅ **Temperature Parameter**: Added UI slider (0.0-2.0) to control AI response creativity/precision
