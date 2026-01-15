@@ -15,9 +15,18 @@ except Exception:
 try:
     from docx import Document  # python-docx
     from docx.shared import Inches
+    from docx.document import Document as _Document
+    from docx.oxml.text.paragraph import CT_P
+    from docx.oxml.table import CT_Tbl
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
 except Exception:
     Document = None
     Inches = None
+    CT_P = None
+    CT_Tbl = None
+    Table = None
+    Paragraph = None
 
 try:
     # Prefer the unified LLM used across the app
@@ -47,15 +56,121 @@ def _simple_slug(value: str) -> str:
 
 
 def read_docx_paragraphs(file_bytes: bytes) -> List[str]:
-    if Document is None:
+    """
+    Extract paragraphs and tables from DOCX file.
+    Returns a list of strings where tables are represented as special markers.
+    """
+    if Document is None or CT_P is None or CT_Tbl is None:
         raise HTTPException(status_code=500, detail="python-docx not available on server")
     doc = Document(BytesIO(file_bytes))
     paragraphs: List[str] = []
-    for p in doc.paragraphs:
-        text = (p.text or "").strip()
-        if text:
-            paragraphs.append(text)
+    
+    # Get all elements in document order (paragraphs and tables)
+    body = doc.element.body
+    for element in body.iterchildren():
+        if isinstance(element, CT_P):
+            # It's a paragraph
+            para = Paragraph(element, doc)
+            text = (para.text or "").strip()
+            if text:
+                paragraphs.append(text)
+        elif isinstance(element, CT_Tbl):
+            # It's a table - extract it
+            table = Table(element, doc)
+            table_html = extract_table_as_html(table)
+            if table_html:
+                paragraphs.append(f"<TABLE_MARKER>{table_html}</TABLE_MARKER>")
+    
     return paragraphs
+
+
+def extract_table_as_html(table) -> str:
+    """
+    Convert a python-docx Table object to HTML table.
+    
+    Args:
+        table: python-docx Table object
+    
+    Returns:
+        HTML string representing the table
+    """
+    try:
+        import html
+        html_parts = ['<table style="border-collapse: collapse; width: 100%; margin: 12px 0;">']
+        
+        for i, row in enumerate(table.rows):
+            html_parts.append('<tr>')
+            for cell in row.cells:
+                cell_text = (cell.text or "").strip()
+                # Escape HTML special characters
+                cell_text_escaped = html.escape(cell_text)
+                # Use <th> for header row (first row), <td> for data rows
+                tag = 'th' if i == 0 else 'td'
+                style = 'border: 1px solid #ddd; padding: 8px; text-align: left;' + (' font-weight: bold; background-color: #f5f5f5;' if i == 0 else '')
+                html_parts.append(f'<{tag} style="{style}">{cell_text_escaped}</{tag}>')
+            html_parts.append('</tr>')
+        
+        html_parts.append('</table>')
+        return ''.join(html_parts)
+    except Exception as e:
+        print(f"[J-MESSAGES] ⚠️ Failed to extract table as HTML: {e}")
+        return ""
+
+
+def html_table_to_docx(html_table: str, doc) -> None:
+    """
+    Convert an HTML table string to a python-docx Table object.
+    
+    Args:
+        html_table: HTML string containing a <table> element
+        doc: python-docx Document object to add the table to
+    """
+    try:
+        import re
+        from html.parser import HTMLParser
+        import html
+        
+        # Extract table rows
+        row_pattern = r'<tr[^>]*>(.*?)</tr>'
+        rows = re.findall(row_pattern, html_table, re.DOTALL | re.IGNORECASE)
+        
+        if not rows:
+            return
+        
+        # Determine number of columns from first row
+        first_row = rows[0]
+        cell_pattern = r'<(?:th|td)[^>]*>(.*?)</(?:th|td)>'
+        first_row_cells = re.findall(cell_pattern, first_row, re.DOTALL | re.IGNORECASE)
+        num_cols = len(first_row_cells)
+        
+        if num_cols == 0:
+            return
+        
+        # Create DOCX table
+        table = doc.add_table(rows=len(rows), cols=num_cols)
+        table.style = 'Light Grid Accent 1'  # Use a built-in table style
+        
+        # Populate table
+        for row_idx, row_html in enumerate(rows):
+            cells = re.findall(cell_pattern, row_html, re.DOTALL | re.IGNORECASE)
+            docx_row = table.rows[row_idx]
+            
+            for col_idx, cell_html in enumerate(cells[:num_cols]):
+                # Unescape HTML entities and strip HTML tags
+                cell_text = html.unescape(cell_html)
+                cell_text = re.sub(r'<[^>]+>', '', cell_text)
+                cell_text = re.sub(r'\s+', ' ', cell_text).strip()
+                
+                docx_row.cells[col_idx].text = cell_text
+                
+                # Make header row bold
+                if row_idx == 0:
+                    for paragraph in docx_row.cells[col_idx].paragraphs:
+                        for run in paragraph.runs:
+                            run.bold = True
+    except Exception as e:
+        print(f"[J-MESSAGES EXPORT] ⚠️ Failed to convert HTML table to DOCX: {e}")
+        raise
 
 
 def read_pdf_text(file_bytes: bytes) -> str:
@@ -121,6 +236,7 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
     Very lightweight heading detection for first implementation:
     - Lines starting with 'Kapittel ' → H1
     - Lines starting with '§' → H2
+    - Lines with <TABLE_MARKER>...</TABLE_MARKER> → extract and insert HTML table
     Everything else → <p>.
     """
     lines = [l for l in body_text.split("\n") if l.strip()]
@@ -144,7 +260,23 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
 
     for raw in lines:
         line = raw.strip()
-        if line.startswith("Kapittel "):
+        # Check if this line contains a table marker
+        if "<TABLE_MARKER>" in line and "</TABLE_MARKER>" in line:
+            # Extract table HTML from marker
+            import re
+            table_match = re.search(r'<TABLE_MARKER>(.*?)</TABLE_MARKER>', line, re.DOTALL)
+            if table_match:
+                table_html = table_match.group(1).strip()
+                html_parts.append(table_html)
+            else:
+                # Fallback: try to extract any HTML table from the line
+                table_match = re.search(r'<table.*?</table>', line, re.DOTALL | re.IGNORECASE)
+                if table_match:
+                    html_parts.append(table_match.group(0))
+                else:
+                    # If no table found, just add as paragraph
+                    html_parts.append(f"<p>{line}</p>")
+        elif line.startswith("Kapittel "):
             anchor = ensure_unique(_simple_slug(line))
             item = {"level": 1, "title": line, "anchor": anchor, "children": []}
             toc.append(item)
@@ -1101,11 +1233,76 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
                     # Standalone level 2 item (no parent level 1)
                     doc.add_paragraph(item.get("title", ""), style="List Bullet")
 
-        # Body
+        # Body - parse body_html to include tables
         doc.add_heading("Body", level=1)
-        for line in (body_text or "").split("\n"):
-            if line.strip():
-                doc.add_paragraph(line.strip())
+        body_html = data.get("body_html") or ""
+        if body_html:
+            # Parse HTML and convert to DOCX, preserving tables
+            import re
+            from html.parser import HTMLParser
+            
+            # Split body_html into chunks (paragraphs, headings, tables)
+            # Simple approach: extract tables first, then process remaining text
+            table_pattern = r'<table[^>]*>.*?</table>'
+            tables = re.findall(table_pattern, body_html, re.DOTALL | re.IGNORECASE)
+            
+            # Remove tables from HTML to get text content
+            text_content = re.sub(table_pattern, '<TABLE_PLACEHOLDER>', body_html, flags=re.DOTALL | re.IGNORECASE)
+            
+            # Process text content (headings and paragraphs)
+            lines = text_content.split('\n')
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Check for placeholder
+                if '<TABLE_PLACEHOLDER>' in line:
+                    # Insert first available table
+                    if tables:
+                        table_html = tables.pop(0)
+                        try:
+                            # Convert HTML table to DOCX table
+                            html_table_to_docx(table_html, doc)
+                        except Exception as e:
+                            print(f"[J-MESSAGES EXPORT] ⚠️ Failed to convert table: {e}")
+                            doc.add_paragraph("[Table conversion failed]")
+                    continue
+                
+                # Process headings
+                if line.startswith('<h1'):
+                    match = re.search(r'<h1[^>]*>(.*?)</h1>', line, re.IGNORECASE)
+                    if match:
+                        doc.add_heading(match.group(1), level=1)
+                elif line.startswith('<h2'):
+                    match = re.search(r'<h2[^>]*>(.*?)</h2>', line, re.IGNORECASE)
+                    if match:
+                        doc.add_heading(match.group(1), level=2)
+                elif line.startswith('<p'):
+                    # Extract text from paragraph, removing HTML tags
+                    text = re.sub(r'<[^>]+>', '', line)
+                    text = re.sub(r'\s+', ' ', text).strip()
+                    if text:
+                        doc.add_paragraph(text)
+                else:
+                    # Plain text line
+                    text = re.sub(r'<[^>]+>', '', line)
+                    text = re.sub(r'\s+', ' ', text).strip()
+                    if text:
+                        doc.add_paragraph(text)
+            
+            # Add any remaining tables
+            for table_html in tables:
+                try:
+                    html_table_to_docx(table_html, doc)
+                except Exception as e:
+                    print(f"[J-MESSAGES EXPORT] ⚠️ Failed to convert table: {e}")
+                    doc.add_paragraph("[Table conversion failed]")
+        else:
+            # Fallback to raw_text
+            for line in (body_text or "").split("\n"):
+                if line.strip():
+                    doc.add_paragraph(line.strip())
 
         # Stream as response
         bio = BytesIO()
