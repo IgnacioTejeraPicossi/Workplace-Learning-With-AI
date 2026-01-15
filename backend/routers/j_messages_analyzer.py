@@ -14,8 +14,10 @@ except Exception:
 
 try:
     from docx import Document  # python-docx
+    from docx.shared import Inches
 except Exception:
     Document = None
+    Inches = None
 
 try:
     # Prefer the unified LLM used across the app
@@ -996,6 +998,29 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
             doc.add_heading("Executive Summary", level=1)
             for line in str(data.get("summary")).split("\n"):
                 doc.add_paragraph(line)
+
+        # Table of Contents (Content/Innhold)
+        toc = data.get("toc") or []
+        if toc:
+            doc.add_heading("Content", level=1)  # "Innhold" in Norwegian, but using "Content" for consistency
+            for item in toc:
+                # Add main heading (level 1: Kapittel)
+                if item.get("level") == 1:
+                    # Add level 1 item with bullet
+                    p = doc.add_paragraph(item.get("title", ""), style="List Bullet")
+                    # Add children (level 2: § paragraphs) as sub-items with indentation
+                    children = item.get("children", [])
+                    for child in children:
+                        if child.get("level") == 2:
+                            # Add as indented sub-item
+                            p_child = doc.add_paragraph()
+                            # Add bullet with indentation (using left indent of 0.5 inches)
+                            if Inches:
+                                p_child.paragraph_format.left_indent = Inches(0.5)
+                            p_child.add_run("• " + child.get("title", ""))
+                elif item.get("level") == 2:
+                    # Standalone level 2 item (no parent level 1)
+                    doc.add_paragraph(item.get("title", ""), style="List Bullet")
 
         # Body
         doc.add_heading("Body", level=1)
