@@ -491,9 +491,13 @@ def ask_openrouter(prompt=None, task_type=None, complexity="medium", max_tokens=
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
         
-        # Override max_tokens if provided
+        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
         if max_tokens:
             params["max_tokens"] = max_tokens
+        
+        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
+        # Note: OpenRouter may handle this differently, but we normalize for consistency
+        params = _normalize_params_for_model(params, model_to_use)
         
         # Configure OpenRouter client
         openrouter.api_key = OPENROUTER_API_KEY
@@ -742,9 +746,13 @@ def ask_openrouter_stream(prompt=None, task_type=None, complexity="medium", max_
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
         
-        # Override max_tokens if provided
+        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
         if max_tokens:
             params["max_tokens"] = max_tokens
+        
+        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
+        # Note: OpenRouter may handle this differently, but we normalize for consistency
+        params = _normalize_params_for_model(params, model_to_use)
         
         # Configure OpenRouter client
         openrouter.api_key = OPENROUTER_API_KEY
