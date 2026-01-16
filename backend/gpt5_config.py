@@ -14,14 +14,14 @@ import os
 #   OPENAI_HIGH_MODEL=gpt-5.2
 #   OPENAI_MEDIUM_MODEL=gpt-4o-mini
 #   OPENAI_LOW_MODEL=gpt-3.5-turbo
-OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-4o"
+OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-5.2"
 OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-4o-mini"
 OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-3.5-turbo"
 
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-5": {
-        # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-4o
+        # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-5.2
         "name": OPENAI_HIGH_MODEL,
         "description": "Most powerful model, best for complex reasoning and analysis",
         "use_cases": [

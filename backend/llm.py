@@ -56,6 +56,34 @@ def _normalize_temperature(value):
         return 2.0
     return t
 
+def _normalize_params_for_model(params: dict, model_name: str) -> dict:
+    """
+    Normalize parameters for different OpenAI models.
+    GPT-5.2 and newer models require 'max_completion_tokens' instead of 'max_tokens'.
+    
+    Args:
+        params: Dictionary of parameters to normalize
+        model_name: Name of the model (e.g., 'gpt-5.2', 'gpt-4o')
+    
+    Returns:
+        Normalized parameters dictionary
+    """
+    params = params.copy()  # Don't modify the original
+    
+    # Check if this is a GPT-5 model (gpt-5.x, gpt-5.2, etc.)
+    is_gpt5_model = model_name and (
+        model_name.startswith("gpt-5") or 
+        model_name.startswith("o1") or 
+        model_name.startswith("o3")
+    )
+    
+    # Convert max_tokens to max_completion_tokens for GPT-5 models
+    if is_gpt5_model and "max_tokens" in params:
+        max_tokens_value = params.pop("max_tokens")
+        params["max_completion_tokens"] = max_tokens_value
+    
+    return params
+
 def get_api_config_from_headers(request_headers=None):
     """
     Get API configuration from request headers or use defaults
@@ -365,16 +393,18 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             return "[MOCKED RESPONSE] No prompt or messages provided."
     
     def _call_openai(model_name: str):
+        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
+        normalized_params = _normalize_params_for_model(params, model_name)
         if messages:
             return openai.chat.completions.create(
                 model=model_name,
                 messages=messages,
-                **params
+                **normalized_params
             )
         return openai.chat.completions.create(
             model=model_name,
             messages=[{"role": "user", "content": prompt}],
-            **params
+            **normalized_params
         )
 
     try:
@@ -390,7 +420,7 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
         
-        # Override max_tokens if provided
+        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
         if max_tokens:
             params["max_tokens"] = max_tokens
         
@@ -419,7 +449,15 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         if likely_model_issue and model_to_use != fallback_model:
             try:
                 print(f"[ask_openai] ↩️ Retrying with fallback model='{fallback_model}'")
+                # For fallback, ensure params are normalized for gpt-4o (uses max_tokens)
+                fallback_params = params.copy()
+                if "max_completion_tokens" in fallback_params:
+                    # Convert back to max_tokens for gpt-4o
+                    fallback_params["max_tokens"] = fallback_params.pop("max_completion_tokens")
+                original_params = params
+                params = fallback_params
                 response = _call_openai(fallback_model)
+                params = original_params  # Restore original params
                 return response.choices[0].message.content.strip()
             except Exception as e2:
                 print(f"[ask_openai] ❌ Fallback model failed too: {e2}")
@@ -502,6 +540,8 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
             model_to_use = params.pop("model", model)
             if max_tokens:
                 params["max_tokens"] = max_tokens
+            # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
+            params = _normalize_params_for_model(params, model_to_use)
             openai.api_key = config.get('openai_key')
             if messages:
                 response = openai.chat.completions.create(
@@ -589,9 +629,12 @@ Would you like to know more about any specific feature?"""
         # Extract model from params and remove it to avoid conflict
         model_to_use = params.pop("model", model)
         
-        # Override max_tokens if provided
+        # Override max_tokens if provided (will be converted to max_completion_tokens for GPT-5 models)
         if max_tokens:
             params["max_tokens"] = max_tokens
+        
+        # Normalize parameters for the specific model (e.g., gpt-5.2 needs max_completion_tokens)
+        params = _normalize_params_for_model(params, model_to_use)
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
         openai.api_key = config.get('openai_key') or OPENAI_API_KEY
