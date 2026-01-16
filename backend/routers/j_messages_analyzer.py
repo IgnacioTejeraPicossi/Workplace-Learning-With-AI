@@ -296,6 +296,46 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
     return toc, "\n".join(html_parts)
 
 
+def add_expired_j_messages_section(body_html: str, replaces: List[str]) -> str:
+    """
+    Add "Utgåtte j-meldinger" section at the end of body_html if replaces list is not empty.
+    This matches the format used in Fiskeridirektoratet documents.
+    
+    Args:
+        body_html: Current HTML body content
+        replaces: List of J-message IDs that this document replaces
+    
+    Returns:
+        body_html with "Utgåtte j-meldinger" section appended if replaces is not empty
+    """
+    if not replaces or len(replaces) == 0:
+        return body_html
+    
+    # Filter out empty strings and None values
+    valid_replaces = [r for r in replaces if r and str(r).strip()]
+    if len(valid_replaces) == 0:
+        return body_html
+    
+    # Create the section HTML (similar to Fiskeridirektoratet format)
+    section_html = '\n<div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #d1d5db;">'
+    section_html += '\n<h2 style="color: #1e3a8a; font-weight: bold; font-size: 1.25em; margin-bottom: 16px; margin-top: 0;">Utgåtte j-meldinger</h2>'
+    section_html += '\n<div style="margin-left: 8px; line-height: 1.8;">'
+    
+    # Add each J-ID as a link-like element (underlined, blue, similar to original)
+    for idx, j_id in enumerate(valid_replaces):
+        j_id_str = str(j_id).strip()
+        if j_id_str:
+            # Add comma separator except for last item
+            separator = ', ' if idx < len(valid_replaces) - 1 else ''
+            section_html += f'<span style="color: #2563eb; text-decoration: underline; cursor: pointer;">{j_id_str}</span>{separator}'
+    
+    section_html += '\n</div>'
+    section_html += '\n</div>'
+    
+    # Append to body_html
+    return body_html + section_html
+
+
 def extract_json_from_llm_response(response: str) -> dict:
     """
     Robust JSON parser for LLM responses.
@@ -504,10 +544,16 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
         except Exception as e:
             print(f"[ANALYZER] Failed to extract metadata with LLM: {e}")
     
+    # Extract replaces list for adding "Utgåtte j-meldinger" section
+    replaces_list = metadata.get("replaces_id") if isinstance(metadata.get("replaces_id"), list) else ([metadata.get("replaces_id")] if metadata.get("replaces_id") else [])
+    
+    # Add "Utgåtte j-meldinger" section at the end of body_html if there are replaces
+    body_html_with_expired = add_expired_j_messages_section(body_html, replaces_list)
+    
     return {
         "metadata": metadata,
         "toc": toc,
-        "body_html": body_html,
+        "body_html": body_html_with_expired,
         "raw_text": body_text
     }
 
@@ -705,18 +751,24 @@ Tekst:
         except Exception:
             pass
     
+    # Extract replaces list for adding "Utgåtte j-meldinger" section
+    replaces_list = metadata.get("replaces_id") if isinstance(metadata.get("replaces_id"), list) else ([metadata.get("replaces_id")] if metadata.get("replaces_id") else [])
+    
+    # Add "Utgåtte j-meldinger" section at the end of body_html if there are replaces
+    body_html_with_expired = add_expired_j_messages_section(body_html, replaces_list)
+    
     result = {
         "id": metadata.get("j_id"),
         "title": metadata.get("title"),
         "status": metadata.get("status"),
         "valid_from": metadata.get("valid_from"),
         "valid_to": metadata.get("valid_to"),
-        "replaces": metadata.get("replaces_id") if isinstance(metadata.get("replaces_id"), list) else ([metadata.get("replaces_id")] if metadata.get("replaces_id") else []),
+        "replaces": replaces_list,
         "replaced_by": metadata.get("replaced_by_id") or metadata.get("replaced_by"),
         "category": metadata.get("category") if isinstance(metadata.get("category"), list) else ([metadata.get("category")] if metadata.get("category") else (metadata.get("categories") if isinstance(metadata.get("categories"), list) else (["Annet"] if not metadata.get("categories") else [metadata.get("categories")]))) if metadata.get("category") or metadata.get("categories") else ["Annet"],
         "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
         "toc": toc,
-        "body_html": body_html,
+        "body_html": body_html_with_expired,
         "raw_text": body_text,
         "summary": summary_text,
         "summary_length": summary_length,
