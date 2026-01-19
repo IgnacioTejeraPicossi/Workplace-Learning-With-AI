@@ -49,6 +49,7 @@ import AIProductivityAgent from "./AIProductivityAgent";
 import EASecondBrain from "./EASecondBrain";
 import SalesAssistant from "./SalesAssistant";
 import JMessagesAnalyzer from "./JMessagesAnalyzer";
+import JMessagesPreAnalyzer from "./JMessagesPreAnalyzer";
 import JMessagesLibrary from "./JMessagesLibrary";
 import JMessagesPairsLibrary from "./JMessagesPairsLibrary";
 import PersonalAttentionAgent from "./PersonalAttentionAgent";
@@ -501,6 +502,7 @@ function AppContent() {
 {!activeModule && section === "agentic-rag" && <AgenticRAG />}
 {!activeModule && section === "agentic-rag-document" && <AgenticRAGDocument />}
             {!activeModule && section === "j-messages-analyzer" && <JMessagesAnalyzer />}
+            {!activeModule && section === "j-messages-pre-analyzer" && <JMessagesPreAnalyzer />}
             {!activeModule && section === "j-messages-library" && <JMessagesLibrary />}
             {!activeModule && section === "j-messages-pairs" && <JMessagesPairsLibrary />}
             {!activeModule && section === "ea-home" && <EAHome />}

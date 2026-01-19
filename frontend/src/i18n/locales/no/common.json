@@ -220,6 +220,7 @@
       "title": "J-meldings Analysator",
       "submenu": {
         "analyzer": "J-meldings Analysator",
+        "preAnalyzer": "J-meldings Pre-Analysator",
         "library": "J-messages bibliotek",
         "pairsLibrary": "J-messages par bibliotek"
       }
@@ -1374,6 +1375,28 @@
         "area": "Område",
         "title": "Title"
       }
+    },
+    "preAnalyzer": {
+      "title": "J-meldings Pre-Analysator",
+      "description": "Last opp en J-melding (.docx eller .pdf) for å omskrive den i henhold til lovteknikk-regler. AI-en vil analysere og forbedre dokumentstrukturen, terminologien og språkføringen basert på norske rettslige skriveregler.",
+      "dragDrop": "Dra og slipp fil her eller klikk for å bla",
+      "supports": "Støtter DOCX/PDF (enkel fil)",
+      "analyzeFile": "Pre-analyser fil",
+      "processing": "Behandler…",
+      "exportDocx": "Eksporter DOCX",
+      "exported": "✅ Dokument eksportert",
+      "exportFailed": "❌ Eksport mislyktes",
+      "apiConfig": "API Konfig",
+      "aiLevel": "AI Nivå",
+      "aiLevelLow": "Lav",
+      "aiLevelMedium": "Middels",
+      "aiLevelHigh": "Høy",
+      "temperature": "Temperatur",
+      "model": "Modell",
+      "modelNotSet": "Ikke satt (sjekk LM Studio)",
+      "innhold": "Innhold",
+      "showInnhold": "Vis innhold",
+      "dropFile": "Slipp fil her"
     },
     "library": {
       "title": "J-messages bibliotek",

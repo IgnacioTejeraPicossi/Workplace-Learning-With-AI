@@ -87,6 +87,7 @@
       "title": "J-messages Analyzer",
       "submenu": {
         "analyzer": "J-messages Analyzer",
+        "preAnalyzer": "J-messages Pre-Analyzer",
         "library": "J-messages Library",
         "pairsLibrary": "J-messages pairs Library"
       }
@@ -479,6 +480,28 @@
         "area": "Area",
         "title": "Title"
       }
+    },
+    "preAnalyzer": {
+      "title": "J-messages Pre-Analyzer",
+      "description": "Upload a J-message (.docx or .pdf) to rewrite it according to lovteknikk rules. The AI will analyze and improve the document structure, terminology, and language based on Norwegian legal drafting guidelines.",
+      "dragDrop": "Drag & drop file here or click to browse",
+      "supports": "Supports DOCX/PDF (single file)",
+      "analyzeFile": "Pre-analyze file",
+      "processing": "Processing…",
+      "exportDocx": "Export DOCX",
+      "exported": "✅ Document exported",
+      "exportFailed": "❌ Export failed",
+      "apiConfig": "API Config",
+      "aiLevel": "AI Level",
+      "aiLevelLow": "Low",
+      "aiLevelMedium": "Medium",
+      "aiLevelHigh": "High",
+      "temperature": "Temperature",
+      "model": "Model",
+      "modelNotSet": "Not set (check LM Studio)",
+      "innhold": "Content",
+      "showInnhold": "Show content",
+      "dropFile": "Drop file here"
     },
     "library": {
       "title": "J-messages Library",

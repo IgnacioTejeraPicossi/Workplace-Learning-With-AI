@@ -102,6 +102,7 @@ const getNavItems = (t) => [
   // J-messages Analyzer (nuevo módulo con librería)
   { key: "j-messages", label: t('sidebar.jMessagesAnalyzer.title'), icon: "document", group: "learning", isExpandable: true, subItems: [
     { key: "j-messages-analyzer", label: t('sidebar.jMessagesAnalyzer.submenu.analyzer'), icon: "document-text" },
+    { key: "j-messages-pre-analyzer", label: t('sidebar.jMessagesAnalyzer.submenu.preAnalyzer'), icon: "edit" },
     { key: "j-messages-library", label: t('sidebar.jMessagesAnalyzer.submenu.library'), icon: "book" },
     { key: "j-messages-pairs", label: t('sidebar.jMessagesAnalyzer.submenu.pairsLibrary'), icon: "document-duplicate" }
   ]},
