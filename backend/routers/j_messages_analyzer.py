@@ -1370,3 +1370,255 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
         raise HTTPException(status_code=500, detail=f"Export failed: {e}")
 
 
+def load_lovteknikk_rules() -> str:
+    """
+    Load the lovteknikkboka-oppdatert.md document containing rules for writing j-meldinger.
+    
+    Returns:
+        Content of the rules document as a string
+    """
+    import os
+    # Get the project root directory
+    current_file = __file__
+    # __file__ is backend/routers/j_messages_analyzer.py
+    # Go up 2 levels to get to project root
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(current_file))))
+    rules_path = os.path.join(project_root, "docs-md", "lovteknikkboka-oppdatert.md")
+    
+    print(f"[J-MESSAGES PRE-ANALYZE] Looking for rules document at: {rules_path}")
+    print(f"[J-MESSAGES PRE-ANALYZE] File exists: {os.path.exists(rules_path)}")
+    
+    try:
+        with open(rules_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            print(f"[J-MESSAGES PRE-ANALYZE] ✅ Rules document loaded successfully, {len(content)} characters")
+            return content
+    except Exception as e:
+        print(f"[J-MESSAGES PRE-ANALYZE] ⚠️ Failed to load rules document: {e}")
+        import traceback
+        print(f"[J-MESSAGES PRE-ANALYZE] ⚠️ Traceback: {traceback.format_exc()}")
+        return ""
+
+
+def build_pre_analyze_prompt(document_text: str, rules_text: str) -> str:
+    """
+    Build prompt for pre-analyzing a j-melding based on lovteknikk rules.
+    
+    Args:
+        document_text: The original j-melding document text
+        rules_text: The lovteknikk rules document text
+    
+    Returns:
+        Formatted prompt string
+    """
+    # Limit document text to avoid token limits (keep it reasonable)
+    document_text_limited = document_text[:8000]
+    
+    # Limit rules text to most relevant sections (first 20000 chars should cover key rules)
+    rules_text_limited = rules_text[:20000]
+    
+    return f"""Du er en ekspert på norsk lovteknikk og forskriftsarbeid. Du skal analysere og omskrive en J-melding fra Fiskeridirektoratet basert på reglene i "Lovteknikk og lovforberedelse - Veiledning om lov- og forskriftsarbeid".
+
+VIKTIGE INSTRUKSJONER:
+1. Les nøye gjennom reglene i lovteknikkboka nedenfor
+2. Analyser den opprinnelige J-meldingen
+3. Omskriv J-meldingen slik at den følger reglene så nøye som mulig
+4. Behold all viktig informasjon fra originalen
+5. Forbedre struktur, terminologi og språkføring i henhold til reglene
+6. Sørg for at dokumentet følger norsk lovteknisk praksis
+
+REGLER FRA LOVTEKNIKKBOKA:
+{rules_text_limited}
+
+OPPRINNELIG J-MELDING:
+{document_text_limited}
+
+OPPGAVE:
+Omskriv J-meldingen over slik at den følger reglene fra lovteknikkboka. Behold all viktig informasjon, men forbedre strukturen, terminologien og språkføringen. Returner dokumentet i samme format som originalen (med kapitler, paragrafer, etc.), men med forbedringer basert på reglene.
+
+Returner kun det omskrevne dokumentet, uten ekstra kommentarer eller forklaringer."""
+
+
+@router.post("/pre-analyze")
+async def pre_analyze_j_message(
+    request: Request,
+    file: UploadFile = File(...),
+    complexity: str = Query("medium", description="AI complexity level: low, medium, or high"),
+    temperature: float = Query(None, description="Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative.")
+):
+    """
+    Pre-analyze a J-melding by rewriting it according to lovteknikk rules.
+    Uses the lovteknikkboka-oppdatert.md document as reference for rewriting rules.
+    """
+    print(f"[J-MESSAGES PRE-ANALYZE] ✅✅✅ ENDPOINT CALLED - File: {file.filename}, Complexity: {complexity}, Temperature: {temperature}")
+    try:
+        file_bytes = await file.read()
+        filename_lower = (file.filename or "").lower()
+        print(f"[J-MESSAGES PRE-ANALYZE] ✅ File read successfully, size: {len(file_bytes)} bytes")
+
+        # Read input (DOCX or PDF)
+        try:
+            if filename_lower.endswith(".docx"):
+                paragraphs = read_docx_paragraphs(file_bytes)
+                full_text = "\n".join(paragraphs)
+            elif filename_lower.endswith(".pdf"):
+                full_text = read_pdf_text(file_bytes)
+                paragraphs = [ln for ln in full_text.split("\n") if ln.strip()]
+            else:
+                raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+        except HTTPException:
+            raise
+        except Exception as e:
+            import traceback
+            print(f"[J-MESSAGES PRE-ANALYZE] ❌ Failed to parse file: {e}")
+            print(f"[J-MESSAGES PRE-ANALYZE] ❌ Traceback:\n{traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail=f"Failed to parse file: {e}")
+
+        # Load rules document
+        print(f"[J-MESSAGES PRE-ANALYZE] Loading rules document...")
+        rules_text = load_lovteknikk_rules()
+        if not rules_text:
+            print(f"[J-MESSAGES PRE-ANALYZE] ❌ Failed to load rules document")
+            raise HTTPException(status_code=500, detail="Failed to load lovteknikk rules document")
+        print(f"[J-MESSAGES PRE-ANALYZE] ✅ Rules document loaded, size: {len(rules_text)} characters")
+
+        # Build prompt
+        prompt = build_pre_analyze_prompt(full_text, rules_text)
+
+        # Use LLM to rewrite the document
+        try:
+            if not ask_ai_unified_sync:
+                raise HTTPException(status_code=500, detail="LLM service not available")
+            
+            complexity_level = complexity if complexity in ["low", "medium", "high"] else "medium"
+            temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
+            
+            request_headers_dict = dict(request.headers) if request else {}
+            
+            print(f"[J-MESSAGES PRE-ANALYZE] Calling LLM with complexity={complexity_level}, temperature={temperature_value}")
+            rewritten_text = ask_ai_unified_sync(
+                prompt=prompt,
+                task_type="rewriting",
+                complexity=complexity_level,
+                max_tokens=8000,  # Higher limit for rewriting tasks
+                messages=None,
+                request_headers=request_headers_dict,
+                temperature=temperature_value
+            )
+            
+            if not rewritten_text or rewritten_text.strip().startswith("[MOCKED"):
+                raise HTTPException(status_code=500, detail="LLM returned invalid response")
+            
+            # Process the rewritten text to build TOC and HTML
+            rewritten_paragraphs = [ln for ln in rewritten_text.split("\n") if ln.strip()]
+            toc, body_html = build_toc_and_body_html("\n".join(rewritten_paragraphs))
+            
+            # Extract basic metadata (title from first line or heading)
+            title = None
+            if rewritten_paragraphs:
+                first_line = rewritten_paragraphs[0].strip()
+                if first_line and len(first_line) < 200:
+                    title = first_line
+            
+            print(f"[J-MESSAGES PRE-ANALYZE] ✅ Successfully processed, returning result")
+            return {
+                "success": True,
+                "id": None,  # Pre-analysis doesn't create a saved document
+                "title": title,
+                "toc": toc,
+                "body_html": body_html,
+                "raw_text": rewritten_text,
+                "type": "pre-analyzed"
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"[J-MESSAGES PRE-ANALYZE] ❌ Error: {e}")
+            print(f"[J-MESSAGES PRE-ANALYZE] ❌ Traceback:\n{error_trace}")
+            raise HTTPException(status_code=500, detail=f"Pre-analysis failed: {str(e)}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[J-MESSAGES PRE-ANALYZE] ❌ Unexpected error: {e}")
+        print(f"[J-MESSAGES PRE-ANALYZE] ❌ Traceback:\n{error_trace}")
+        raise HTTPException(status_code=500, detail=f"Pre-analysis failed: {str(e)}")
+
+
+@router.post("/pre-analyze/export-docx")
+async def export_pre_analyzed_docx(data: Dict[str, Any] = Body(...)):
+    """
+    Export a pre-analyzed J-message to DOCX format.
+    Similar to regular export but without metadata extraction.
+    """
+    if Document is None:
+        raise HTTPException(status_code=500, detail="python-docx not available on server")
+    
+    try:
+        doc = Document()
+        
+        # Add title
+        if data.get("title"):
+            title_para = doc.add_heading(data["title"], level=1)
+        
+        # Add body content
+        body_html = data.get("body_html", "")
+        body_text = data.get("raw_text", "")
+        
+        if body_html:
+            # Parse HTML and convert to DOCX
+            lines = body_html.split("\n")
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Check for headings
+                if line.startswith("<h1") or line.startswith("<h2"):
+                    # Extract text from heading
+                    match = re.search(r">([^<]+)<", line)
+                    if match:
+                        level = 1 if "h1" in line else 2
+                        doc.add_heading(match.group(1), level=level)
+                # Check for table markers
+                elif "<TABLE_MARKER>" in line and "</TABLE_MARKER>" in line:
+                    table_html = re.search(r"<TABLE_MARKER>(.*?)</TABLE_MARKER>", line, re.DOTALL)
+                    if table_html:
+                        try:
+                            html_table_to_docx(table_html.group(1), doc)
+                        except Exception as e:
+                            print(f"[J-MESSAGES PRE-EXPORT] ⚠️ Failed to convert table: {e}")
+                            doc.add_paragraph("[Table conversion failed]")
+                # Check for paragraphs
+                elif line.startswith("<p"):
+                    match = re.search(r">([^<]+)<", line)
+                    if match:
+                        doc.add_paragraph(match.group(1))
+                else:
+                    # Plain text paragraph
+                    # Remove HTML tags
+                    clean_text = re.sub(r"<[^>]+>", "", line)
+                    if clean_text.strip():
+                        doc.add_paragraph(clean_text.strip())
+        else:
+            # Fallback to raw_text
+            for line in (body_text or "").split("\n"):
+                if line.strip():
+                    doc.add_paragraph(line.strip())
+        
+        # Stream as response
+        bio = BytesIO()
+        doc.save(bio)
+        bio.seek(0)
+        filename = f"j-message-pre-analyzed-{(data.get('id') or 'document')}.docx"
+        return StreamingResponse(
+            bio,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Export failed: {e}")
+
