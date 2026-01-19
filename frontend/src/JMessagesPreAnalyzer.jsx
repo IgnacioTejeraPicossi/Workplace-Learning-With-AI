@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
 
+// API base URL
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+
 export default function JMessagesPreAnalyzer() {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -102,7 +105,7 @@ export default function JMessagesPreAnalyzer() {
       const params = new URLSearchParams();
       params.append('complexity', aiComplexity);
       if (Number.isFinite(temperature)) params.append('temperature', String(temperature));
-      const url = `/api/j-messages/pre-analyze${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `${API_BASE}/api/j-messages/pre-analyze${params.toString() ? `?${params.toString()}` : ''}`;
       const resp = await fetchWithAuth(url, {
         method: 'POST',
         body: form
@@ -150,7 +153,7 @@ export default function JMessagesPreAnalyzer() {
   const exportDocx = async () => {
     if (!result) return;
     try {
-      const resp = await fetchWithAuth('/api/j-messages/pre-analyze/export-docx', {
+      const resp = await fetchWithAuth(`${API_BASE}/api/j-messages/pre-analyze/export-docx`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(result)
