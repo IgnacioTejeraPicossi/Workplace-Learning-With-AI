@@ -194,6 +194,113 @@ export default function JMessagesPreAnalyzer() {
     }
   };
 
+  const exportMarkdown = () => {
+    if (!result) return;
+    const lines = [];
+    if (result.title) lines.push(`# ${result.title}`);
+    
+    if (Array.isArray(result.toc) && result.toc.length) {
+      lines.push('', '## Innhold');
+      const renderToc = (items, lvl = 0) => {
+        items.forEach(x => {
+          lines.push(`${'  '.repeat(lvl)}- ${x.title}`);
+          if (x.children) renderToc(x.children, lvl + 1);
+        });
+      };
+      renderToc(result.toc);
+      lines.push('');
+    }
+    
+    // Use raw_text for markdown body (safer than HTML)
+    if (result.raw_text) {
+      lines.push('---', '', result.raw_text);
+    }
+    
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `j-message-pre-analyzed-${result.id || 'document'}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus(t('jMessages.preAnalyzer.exported'));
+    setTimeout(() => setStatus(''), 2500);
+  };
+
+  const exportPDF = () => {
+    if (!result) return;
+    const win = window.open('', '_blank');
+    if (!win) return;
+    const title = result.title || 'J-message Pre-Analyzed';
+    const html = `
+      <html>
+        <head>
+          <meta charset="utf-8"/>
+          <title>${title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            h1,h2,h3 { color: #111; }
+            .toc ul { margin: 0 0 8px 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          ${Array.isArray(result.toc) && result.toc.length > 0 ? `
+            <div class="toc">
+              <h2>Innhold</h2>
+              <ul>
+                ${result.toc.map(item => `
+                  <li>${item.title}
+                    ${item.children && item.children.length > 0 ? `
+                      <ul>
+                        ${item.children.map(child => `<li>${child.title}</li>`).join('')}
+                      </ul>
+                    ` : ''}
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          <div>${result.body_html || result.raw_text || ''}</div>
+        </body>
+      </html>
+    `;
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => {
+      win.print();
+    }, 250);
+    setStatus(t('jMessages.preAnalyzer.exported'));
+    setTimeout(() => setStatus(''), 2500);
+  };
+
+  const exportJSON = () => {
+    if (!result) return;
+    const jsonData = {
+      id: result.id || null,
+      title: result.title || null,
+      toc: result.toc || [],
+      body_html: result.body_html || '',
+      raw_text: result.raw_text || '',
+      type: result.type || 'pre-analyzed'
+    };
+    
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `j-message-pre-analyzed-${result.id || 'document'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus(t('jMessages.preAnalyzer.exported'));
+    setTimeout(() => setStatus(''), 2500);
+  };
+
   return (
     <div style={{ padding: 16 }}>
       <h2 style={{ marginBottom: 8 }}>📝 {t('jMessages.preAnalyzer.title')}</h2>
@@ -438,19 +545,66 @@ export default function JMessagesPreAnalyzer() {
             {result.title && (
               <h3 style={{ marginTop: 0, marginBottom: 12 }}>{result.title}</h3>
             )}
-            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap', width: '100%' }}>
               <button
                 onClick={exportDocx}
                 style={{
-                  background: '#2563eb',
+                  background: '#6366f1',
                   color: 'white',
                   border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: 8,
-                  cursor: 'pointer'
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                  flex: 1,
+                  textAlign: 'center'
                 }}
               >
-                📄 {t('jMessages.preAnalyzer.exportDocx')}
+                {t('jMessages.preAnalyzer.exportDOCX', { defaultValue: 'Export DOCX' })}
+              </button>
+              <button
+                onClick={exportMarkdown}
+                style={{
+                  background: '#0ea5e9',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                  flex: 1,
+                  textAlign: 'center'
+                }}
+              >
+                {t('jMessages.preAnalyzer.exportMD', { defaultValue: 'Export MD' })}
+              </button>
+              <button
+                onClick={exportPDF}
+                style={{
+                  background: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                  flex: 1,
+                  textAlign: 'center'
+                }}
+              >
+                {t('jMessages.preAnalyzer.exportPDF', { defaultValue: 'Export PDF' })}
+              </button>
+              <button
+                onClick={exportJSON}
+                style={{
+                  background: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                  flex: 1,
+                  textAlign: 'center'
+                }}
+              >
+                {t('jMessages.preAnalyzer.exportJSON', { defaultValue: 'Export JSON' })}
               </button>
             </div>
           </div>
