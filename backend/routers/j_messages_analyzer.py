@@ -1400,6 +1400,36 @@ def load_lovteknikk_rules() -> str:
         return ""
 
 
+def get_pre_analyze_prompt_template() -> str:
+    """
+    Get the template for the pre-analyze prompt (without document-specific content).
+    This is used to display the prompt structure in the UI.
+    
+    Returns:
+        Prompt template string with placeholders
+    """
+    return """Du er en ekspert på norsk lovteknikk og forskriftsarbeid. Du skal analysere og omskrive en J-melding fra Fiskeridirektoratet basert på reglene i "Lovteknikk og lovforberedelse - Veiledning om lov- og forskriftsarbeid".
+
+VIKTIGE INSTRUKSJONER:
+1. Les nøye gjennom reglene i lovteknikkboka nedenfor
+2. Analyser den opprinnelige J-meldingen
+3. Omskriv J-meldingen slik at den følger reglene så nøye som mulig
+4. Behold all viktig informasjon fra originalen
+5. Forbedre struktur, terminologi og språkføring i henhold til reglene
+6. Sørg for at dokumentet følger norsk lovteknisk praksis
+
+REGLER FRA LOVTEKNIKKBOKA:
+[Las reglas del documento lovteknikkboka-oppdatert.md se insertan aquí - limitadas a 20000 caracteres]
+
+OPPRINNELIG J-MELDING:
+[El texto del documento J-melding original se inserta aquí - limitado a 8000 caracteres]
+
+OPPGAVE:
+Omskriv J-meldingen over slik at den følger reglene fra lovteknikkboka. Behold all viktig informasjon, men forbedre strukturen, terminologien og språkføringen. Returner dokumentet i samme format som originalen (med kapitler, paragrafer, etc.), men med forbedringer basert på reglene.
+
+Returner kun det omskrevne dokumentet, uten ekstra kommentarer eller forklaringer."""
+
+
 def build_pre_analyze_prompt(document_text: str, rules_text: str) -> str:
     """
     Build prompt for pre-analyzing a j-melding based on lovteknikk rules.
@@ -1437,6 +1467,27 @@ OPPGAVE:
 Omskriv J-meldingen over slik at den følger reglene fra lovteknikkboka. Behold all viktig informasjon, men forbedre strukturen, terminologien og språkføringen. Returner dokumentet i samme format som originalen (med kapitler, paragrafer, etc.), men med forbedringer basert på reglene.
 
 Returner kun det omskrevne dokumentet, uten ekstra kommentarer eller forklaringer."""
+
+
+@router.get("/pre-analyze/prompt")
+async def get_pre_analyze_prompt():
+    """
+    Get the pre-analyze prompt template.
+    Used by frontend to display the prompt in the UI.
+    
+    Returns:
+        Dict with:
+        - template: The prompt template string
+        - description: Description of what the prompt does
+    """
+    try:
+        template = get_pre_analyze_prompt_template()
+        return {
+            "template": template,
+            "description": "Prompt used to rewrite J-messages according to lovteknikk rules. The prompt includes instructions and references the lovteknikkboka-oppdatert.md document."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load prompt template: {e}")
 
 
 @router.post("/pre-analyze")

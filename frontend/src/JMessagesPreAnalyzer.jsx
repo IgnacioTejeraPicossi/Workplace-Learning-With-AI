@@ -28,6 +28,24 @@ export default function JMessagesPreAnalyzer() {
   const [itemaiModel, setItemaiModel] = useState(() => {
     return localStorage.getItem('itemaiCurrentModel') || null;
   });
+  const [preAnalyzePrompt, setPreAnalyzePrompt] = useState('');
+
+  // Load pre-analyze prompt from backend
+  useEffect(() => {
+    const loadPreAnalyzePrompt = async () => {
+      try {
+        const resp = await fetchWithAuth(`${API_BASE}/api/j-messages/pre-analyze/prompt`);
+        const data = await resp.json();
+        if (data.template) {
+          setPreAnalyzePrompt(data.template);
+        }
+      } catch (err) {
+        console.error('Failed to load pre-analyze prompt:', err);
+        setPreAnalyzePrompt('(Failed to load prompt from server)');
+      }
+    };
+    loadPreAnalyzePrompt();
+  }, []);
 
   // Load API provider from localStorage and listen for changes
   useEffect(() => {
@@ -336,6 +354,46 @@ export default function JMessagesPreAnalyzer() {
             {status}
           </div>
         )}
+      </div>
+
+      {/* Prompt Display Panel */}
+      <div style={{ 
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '32px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        border: '1px solid #e2e8f0',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1e293b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span>🧩</span> {t('jMessages.preAnalyzer.promptTitle', { defaultValue: 'Pre-Analyze Prompt' })}
+        </h2>
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontWeight: 600, color: '#334155', marginBottom: 8 }}>
+            {t('jMessages.preAnalyzer.nativePrompt', { defaultValue: 'Native prompt' })}
+          </div>
+          <textarea
+            readOnly
+            value={preAnalyzePrompt || t('jMessages.preAnalyzer.loadingPrompt', { defaultValue: '(Loading prompt...)' })}
+            style={{ 
+              width: '100%', 
+              minHeight: 200, 
+              padding: 12, 
+              borderRadius: 8, 
+              border: '1px solid #e2e8f0', 
+              background: '#f8fafc', 
+              color: '#64748b', 
+              fontFamily: 'monospace', 
+              fontSize: '0.9em',
+              lineHeight: '1.5'
+            }}
+          />
+          <div style={{ marginTop: 8, fontSize: '0.85em', color: '#64748b' }}>
+            {t('jMessages.preAnalyzer.promptDescription', { 
+              defaultValue: 'This prompt is used to rewrite J-messages according to lovteknikk rules. The prompt includes instructions and references the lovteknikkboka-oppdatert.md document.' 
+            })}
+          </div>
+        </div>
       </div>
 
       {result && (
