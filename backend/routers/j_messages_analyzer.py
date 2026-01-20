@@ -1419,10 +1419,10 @@ VIKTIGE INSTRUKSJONER:
 6. Sørg for at dokumentet følger norsk lovteknisk praksis
 
 REGLER FRA LOVTEKNIKKBOKA:
-[Las reglas del documento lovteknikkboka-oppdatert.md se insertan aquí - limitadas a 20000 caracteres]
+[Reglene fra dokumentet lovteknikkboka-oppdatert.md settes inn her - begrenset til 20000 tegn]
 
 OPPRINNELIG J-MELDING:
-[El texto del documento J-melding original se inserta aquí - limitado a 8000 caracteres]
+[Teksten fra det opprinnelige J-melding-dokumentet settes inn her - begrenset til 8000 tegn]
 
 OPPGAVE:
 Omskriv J-meldingen over slik at den følger reglene fra lovteknikkboka. Behold all viktig informasjon, men forbedre strukturen, terminologien og språkføringen. Returner dokumentet i samme format som originalen (med kapitler, paragrafer, etc.), men med forbedringer basert på reglene.
