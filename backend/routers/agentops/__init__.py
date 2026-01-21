@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, UploadFile, File
 from typing import Dict, Any
 import httpx
 import logging
+import os
 from io import BytesIO
 
 logger = logging.getLogger(__name__)
@@ -143,6 +144,35 @@ def j_messages_manifest():
                 "invoke": {
                     "method": "GET",
                     "path": "/api/j-messages/list"
+                }
+            },
+            {
+                "name": "pre_analyze_j_melding",
+                "description": "Pre-analyze a J-melding (.docx or .pdf) by rewriting it according to lovteknikk rules. Uses the lovteknikkboka-oppdatert.md document as reference for rewriting rules. Returns JSON with title, toc, body_html, and raw_text of the rewritten document.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "file_url": {
+                            "type": "string",
+                            "description": "HTTPS URL to a .docx or .pdf J-melding file accessible from WLWAI backend"
+                        },
+                        "ai_level": {
+                            "type": "string",
+                            "enum": ["low", "medium", "high"],
+                            "description": "AI complexity level (low|medium|high). Mirrors the web UI 'AI Level'. Default: medium."
+                        },
+                        "temperature": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 2.0,
+                            "description": "Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative. Default: model/task default."
+                        }
+                    },
+                    "required": ["file_url"]
+                },
+                "invoke": {
+                    "method": "POST",
+                    "path": "/api/mcp/j-messages/pre-analyze"
                 }
             }
         ]
@@ -401,6 +431,219 @@ async def mcp_analyze_j_melding(request: Request, data: Dict[str, Any]):
         raise
     except Exception as e:
         logger.error("analyze_j_melding via MCP failed: unexpected error", extra={"file_url": file_url, "error": str(e)})
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+
+@mcp_router.post("/j-messages/pre-analyze")
+async def mcp_pre_analyze_j_melding(request: Request, data: Dict[str, Any]):
+    """
+    MCP tool handler for pre_analyze_j_melding.
+    Accepts file_url, downloads the file, and calls the internal pre-analyzer endpoint.
+    """
+    file_url = data.get("file_url")
+    ai_level = data.get("ai_level", "medium")
+    temperature = data.get("temperature", None)
+
+    # Validate ai_level
+    if ai_level not in ["low", "medium", "high"]:
+        ai_level = "medium"
+    # Validate temperature (optional)
+    try:
+        if temperature is not None:
+            temperature = float(temperature)
+            if temperature < 0.0 or temperature > 2.0:
+                temperature = None
+    except Exception:
+        temperature = None
+    
+    if not file_url or not isinstance(file_url, str):
+        raise HTTPException(status_code=400, detail="file_url is required and must be a string")
+    
+    logger.info("pre_analyze_j_melding called via MCP", extra={"file_url": file_url, "ai_level": ai_level})
+    
+    try:
+        # 1) Download the file from URL (60s timeout for download)
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            file_resp = await client.get(file_url)
+            if file_resp.status_code != 200:
+                raise HTTPException(
+                    status_code=file_resp.status_code,
+                    detail=f"Failed to download file from URL: {file_resp.status_code} {file_resp.reason_phrase}"
+                )
+            
+            file_bytes = file_resp.content
+            content_type = file_resp.headers.get("content-type", "")
+            
+            # Determine filename from URL or content-type
+            filename = "j-melding"
+            if ".docx" in file_url.lower() or "wordprocessingml" in content_type:
+                filename = "j-melding.docx"
+            elif ".pdf" in file_url.lower() or "pdf" in content_type:
+                filename = "j-melding.pdf"
+        
+        # 2) Call internal pre-analyzer API with extended timeout (420s = 7 minutes)
+        async with httpx.AsyncClient(timeout=420.0) as client:
+            # We need to make a multipart/form-data request to /api/j-messages/pre-analyze
+            base_url = str(request.base_url).rstrip("/")
+            pre_analyzer_url = f"{base_url}/api/j-messages/pre-analyze"
+            
+            # Prepare form data
+            files = {
+                "file": (filename, BytesIO(file_bytes), content_type or "application/octet-stream")
+            }
+            params = {}
+            # Forward ai_level to internal pre-analyzer as 'complexity'
+            params["complexity"] = ai_level
+            if temperature is not None:
+                params["temperature"] = temperature
+            
+            # Forward request headers (for API config, auth, etc.)
+            headers = {}
+            config_source = "unknown"
+            
+            # Try to get config from request headers first
+            has_headers = any(
+                k in request.headers 
+                for k in ["x-api-provider", "x-openai-key", "x-openrouter-key", "x-itemai-url"]
+            )
+            
+            if has_headers:
+                config_source = "request_headers"
+                logger.info("🔵 [MCP PRE-ANALYZE] Using API configuration from REQUEST HEADERS (overrides saved config)")
+                
+                # Forward API provider if present
+                if "x-api-provider" in request.headers:
+                    headers["x-api-provider"] = request.headers["x-api-provider"]
+                    logger.info(f"   → Provider: {request.headers['x-api-provider']}")
+                
+                # Only forward OpenAI key if it's valid (not a placeholder)
+                openai_key = request.headers.get("x-openai-key", "")
+                if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
+                    headers["x-openai-key"] = openai_key
+                    logger.info(f"   → OpenAI key: {openai_key[:10]}... (valid)")
+                elif openai_key:
+                    logger.info(f"   → OpenAI key: invalid/placeholder, will use .env fallback")
+                
+                # Only forward OpenRouter key if it's valid
+                openrouter_key = request.headers.get("x-openrouter-key", "")
+                if openrouter_key and len(openrouter_key) > 10:
+                    headers["x-openrouter-key"] = openrouter_key
+                    logger.info(f"   → OpenRouter key: {openrouter_key[:10]}... (valid)")
+                
+                # Forward ItemAI URL and key if present
+                if "x-itemai-url" in request.headers:
+                    headers["x-itemai-url"] = request.headers["x-itemai-url"]
+                    logger.info(f"   → ItemAI URL: {request.headers['x-itemai-url']}")
+                if "x-itemai-key" in request.headers:
+                    headers["x-itemai-key"] = request.headers["x-itemai-key"]
+            
+            # If no headers, try to use saved API config
+            if not has_headers:
+                try:
+                    from backend.api_config_storage import get_api_config
+                    saved_config = get_api_config()
+                    if saved_config:
+                        config_source = "saved_config"
+                        logger.info("🟢 [MCP PRE-ANALYZE] Using API configuration from SAVED CONFIG FILE (api_config.json)")
+                        
+                        provider = saved_config.get("provider")
+                        if provider:
+                            headers["x-api-provider"] = provider
+                            logger.info(f"   → Provider: {provider}")
+                        
+                        if provider == "openai":
+                            openai_key = saved_config.get("openaiApiKey") or saved_config.get("openai_key")
+                            if openai_key and openai_key.startswith("sk-") and len(openai_key) > 20:
+                                headers["x-openai-key"] = openai_key
+                                logger.info(f"   → OpenAI key: {openai_key[:10]}... (valid)")
+                        elif provider == "openrouter":
+                            openrouter_key = saved_config.get("openrouterApiKey") or saved_config.get("openrouter_key")
+                            if openrouter_key and len(openrouter_key) > 10:
+                                headers["x-openrouter-key"] = openrouter_key
+                                logger.info(f"   → OpenRouter key: {openrouter_key[:10]}... (valid)")
+                        elif provider == "itemai":
+                            itemai_url = saved_config.get("itemaiUrl") or saved_config.get("itemai_url")
+                            itemai_key = saved_config.get("itemaiKey") or saved_config.get("itemai_key")
+                            if itemai_url:
+                                headers["x-itemai-url"] = itemai_url
+                                logger.info(f"   → ItemAI URL: {itemai_url}")
+                            if itemai_key:
+                                headers["x-itemai-key"] = itemai_key
+                except Exception as e:
+                    logger.warning(f"⚠️ [MCP PRE-ANALYZE] Failed to load saved API config: {e}, will use .env fallback")
+                    config_source = "env_fallback"
+            
+            # Make the request
+            resp = await client.post(
+                pre_analyzer_url,
+                files=files,
+                params=params,
+                headers=headers
+            )
+            resp.raise_for_status()
+            result = resp.json()
+            
+            # Add transparency metadata about API config used
+            try:
+                provider_effective = headers.get("x-api-provider") or os.getenv("API_PROVIDER", "openai").lower()
+                if not headers.get("x-api-provider") and config_source == "saved_config":
+                    try:
+                        from backend.api_config_storage import get_api_config
+                        saved_config = get_api_config()
+                        provider_effective = saved_config.get("provider") or provider_effective
+                    except Exception:
+                        provider_effective = os.getenv("API_PROVIDER", "openai").lower()
+
+                model_to_use = None
+                if provider_effective in ["openai", "openrouter"]:
+                    # Pre-analysis uses task_type="rewriting"
+                    from backend.gpt5_config import get_optimal_model, get_gpt5_parameters
+                    model_key = get_optimal_model("rewriting", ai_level)
+                    params_for_model = get_gpt5_parameters(model_key, "rewriting")
+                    model_to_use = params_for_model.get("model")
+                elif provider_effective == "itemai":
+                    try:
+                        from backend.api_config_storage import get_api_config
+                        saved_config = get_api_config()
+                        model_to_use = saved_config.get("itemai_model") or saved_config.get("itemaiCurrentModel")
+                    except Exception:
+                        pass
+
+                result["api_config"] = {
+                    "provider": provider_effective,
+                    "ai_level": ai_level,
+                    "model": model_to_use,
+                    "temperature": temperature,
+                    "config_source": config_source
+                }
+            except Exception as _:
+                # Never fail the response due to transparency metadata
+                result["api_config"] = {
+                    "provider": headers.get("x-api-provider"),
+                    "ai_level": ai_level,
+                    "temperature": temperature,
+                    "config_source": config_source
+                }
+            
+            logger.info("pre_analyze_j_melding via MCP succeeded", extra={
+                "file_url": file_url,
+                "title": result.get("title"),
+                "has_toc": bool(result.get("toc")),
+                "has_body": bool(result.get("body_html"))
+            })
+            
+            return result
+            
+    except httpx.TimeoutException:
+        logger.error("pre_analyze_j_melding via MCP failed: timeout", extra={"file_url": file_url})
+        raise HTTPException(status_code=504, detail="Request timeout - file may be too large or LLM took too long")
+    except httpx.RequestError as e:
+        logger.error("pre_analyze_j_melding via MCP failed: request error", extra={"file_url": file_url, "error": str(e)})
+        raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("pre_analyze_j_melding via MCP failed: unexpected error", extra={"file_url": file_url, "error": str(e)})
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 

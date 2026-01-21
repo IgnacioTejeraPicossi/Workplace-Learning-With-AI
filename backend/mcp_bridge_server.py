@@ -127,6 +127,29 @@ async def handle_mcp_request(request: Dict[str, Any]) -> Dict[str, Any]:
                         }
                     }
             
+            elif tool_name == "pre_analyze_j_melding":
+                # Extended timeout for pre-analysis (420s = 7 minutes)
+                async with httpx.AsyncClient(timeout=420.0) as client:
+                    resp = await client.post(
+                        f"{MCP_BASE_URL}/api/mcp/j-messages/pre-analyze",
+                        json=arguments,
+                        headers={"Content-Type": "application/json"}
+                    )
+                    resp.raise_for_status()
+                    result = resp.json()
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "result": {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": json.dumps(result, indent=2, ensure_ascii=False)
+                                }
+                            ]
+                        }
+                    }
+            
             else:
                 return {
                     "jsonrpc": "2.0",
