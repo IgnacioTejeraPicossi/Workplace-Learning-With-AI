@@ -8,9 +8,14 @@ export default function JMessagesPairsLibrary() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedPair, setSelectedPair] = useState(null);
+  const [isImportMode, setIsImportMode] = useState(false);
   const [viewMode, setViewMode] = useState('side-by-side'); // 'side-by-side' or 'overlay'
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState('training'); // 'analyzed' or 'training'
+  const [originalFile, setOriginalFile] = useState(null);
+  const [humanAnalyzedFile, setHumanAnalyzedFile] = useState(null);
+  const [importingOriginal, setImportingOriginal] = useState(false);
+  const [importingHuman, setImportingHuman] = useState(false);
   const [filters, setFilters] = useState({
     has_human: null,
     has_ai: null,
@@ -298,6 +303,203 @@ export default function JMessagesPairsLibrary() {
     return result;
   };
 
+  const handleOriginalFileSelect = async (file) => {
+    if (!file || !selectedPair) return;
+    setImportingOriginal(true);
+    setError('');
+    
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      
+      // Analyze the original document
+      const resp = await fetchWithAuth('/api/j-messages/analyze?complexity=low', {
+        method: 'POST',
+        body: form
+      });
+      
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Failed to analyze document: ${txt}`);
+      }
+      
+      const analysisResult = await resp.json();
+      
+      // Update the pair with original document
+      const updateResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          original: {
+            doc_type: file.name.endsWith('.docx') ? 'docx' : 'pdf',
+            text_excerpt: analysisResult.raw_text || ''
+          }
+        })
+      });
+      
+      if (!updateResp.ok) {
+        throw new Error('Failed to update pair');
+      }
+      
+      // Reload the pair
+      const pairResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`);
+      const pairData = await pairResp.json();
+      if (pairData.success) {
+        setSelectedPair(pairData.item);
+        setOriginalFile(null);
+      }
+    } catch (e) {
+      setError(`Failed to import original document: ${String(e)}`);
+    } finally {
+      setImportingOriginal(false);
+    }
+  };
+
+  const handleHumanAnalyzedFileSelect = async (file) => {
+    if (!file || !selectedPair) return;
+    setImportingHuman(true);
+    setError('');
+    
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      
+      // Analyze the human-analyzed document
+      const resp = await fetchWithAuth('/api/j-messages/analyze?complexity=low', {
+        method: 'POST',
+        body: form
+      });
+      
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Failed to analyze document: ${txt}`);
+      }
+      
+      const analysisResult = await resp.json();
+      
+      // Update the pair with human-analyzed document
+      const updateResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          human_structured: {
+            metadata: {
+              j_id: analysisResult.id,
+              title: analysisResult.title,
+              status: analysisResult.status,
+              valid_from: analysisResult.valid_from,
+              valid_to: analysisResult.valid_to,
+              category: analysisResult.category || [],
+              area: analysisResult.area || []
+            },
+            toc: analysisResult.toc || [],
+            body_html: analysisResult.body_html || ''
+          }
+        })
+      });
+      
+      if (!updateResp.ok) {
+        throw new Error('Failed to update pair');
+      }
+      
+      // Reload the pair
+      const pairResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`);
+      const pairData = await pairResp.json();
+      if (pairData.success) {
+        setSelectedPair(pairData.item);
+        setHumanAnalyzedFile(null);
+      }
+    } catch (e) {
+      setError(`Failed to import human-analyzed document: ${String(e)}`);
+    } finally {
+      setImportingHuman(false);
+    }
+  };
+
+  const FileUpload = ({ label, file, setFile, onFileSelect, isUploading, setError }) => {
+    const [dragActive, setDragActive] = useState(false);
+    
+    const handleDrag = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+      if (e.type === 'dragleave') setDragActive(false);
+    };
+    
+    const handleDrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
+      const files = Array.from(e.dataTransfer.files || []);
+      if (files.length > 0) {
+        const f = files[0];
+        const name = (f?.name || '').toLowerCase();
+        if (f && (name.endsWith('.docx') || name.endsWith('.pdf'))) {
+          setFile(f);
+          onFileSelect(f);
+        } else {
+          setError('Please drop a .docx or .pdf file');
+        }
+      }
+    };
+    
+    return (
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: colors.text }}>
+          {label}
+        </div>
+        <div
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById(`file-input-${label.replace(/\s+/g, '-')}`).click()}
+          style={{
+            border: `2px dashed ${dragActive ? colors.primary : colors.border}`,
+            borderRadius: 8,
+            padding: '16px',
+            textAlign: 'center',
+            background: dragActive ? colors.primaryLight : 'transparent',
+            transition: 'all 0.2s ease',
+            cursor: 'pointer',
+            fontSize: 13
+          }}
+        >
+          <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
+          <div style={{ fontWeight: 600, color: colors.text }}>
+            {dragActive ? 'Drop file here' : 'Drag & drop file here or click to browse'}
+          </div>
+          <div style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>
+            Supports DOCX/PDF (single file)
+          </div>
+          {file && (
+            <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary }}>
+              Selected: <strong>{file.name}</strong>
+            </div>
+          )}
+          {isUploading && (
+            <div style={{ marginTop: 8, fontSize: 12, color: colors.primary }}>
+              ⏳ Uploading and analyzing...
+            </div>
+          )}
+        </div>
+        <input
+          id={`file-input-${label.replace(/\s+/g, '-')}`}
+          type="file"
+          accept=".docx,.pdf"
+          onChange={(e) => {
+            const selectedFile = e.target.files?.[0] || null;
+            if (selectedFile) {
+              setFile(selectedFile);
+              onFileSelect(selectedFile);
+            }
+          }}
+          style={{ display: 'none' }}
+        />
+      </div>
+    );
+  };
+
   const renderSideBySide = (pair) => {
     // Extract original text (supports both old and new format)
     const originalText = pair.original?.text_excerpt || pair.original || '';
@@ -333,12 +535,29 @@ export default function JMessagesPairsLibrary() {
             padding: 16, 
             overflow: 'auto',
             background: colors.background,
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'monospace',
-            fontSize: 13,
-            lineHeight: 1.6
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            {originalText || '(No original text available)'}
+            {isImportMode && (
+              <FileUpload
+                label="Import Original Document"
+                file={originalFile}
+                setFile={setOriginalFile}
+                onFileSelect={handleOriginalFileSelect}
+                isUploading={importingOriginal}
+                setError={setError}
+              />
+            )}
+            <div style={{ 
+              flex: 1,
+              whiteSpace: 'pre-wrap',
+              fontFamily: 'monospace',
+              fontSize: 13,
+              lineHeight: 1.6,
+              overflow: 'auto'
+            }}>
+              {originalText || '(No original text available)'}
+            </div>
           </div>
         </div>
 
@@ -364,15 +583,32 @@ export default function JMessagesPairsLibrary() {
             flex: 1, 
             padding: 16, 
             overflow: 'auto',
-            background: colors.background
+            background: colors.background,
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            {analyzedHtml ? (
-              <div dangerouslySetInnerHTML={{ __html: analyzedHtml }} />
-            ) : (
-              <div style={{ color: colors.textSecondary, fontStyle: 'italic' }}>
-                (No analyzed content available)
-              </div>
+            {isImportMode && (
+              <FileUpload
+                label="Import Human-Analyzed Document"
+                file={humanAnalyzedFile}
+                setFile={setHumanAnalyzedFile}
+                onFileSelect={handleHumanAnalyzedFileSelect}
+                isUploading={importingHuman}
+                setError={setError}
+              />
             )}
+            <div style={{ 
+              flex: 1,
+              overflow: 'auto'
+            }}>
+              {analyzedHtml ? (
+                <div dangerouslySetInnerHTML={{ __html: analyzedHtml }} />
+              ) : (
+                <div style={{ color: colors.textSecondary, fontStyle: 'italic' }}>
+                  (No analyzed content available)
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -540,7 +776,10 @@ export default function JMessagesPairsLibrary() {
                 transition: 'all 0.2s',
                 ':hover': { borderColor: colors.primary }
               }}
-              onClick={() => setSelectedPair(pair)}
+              onClick={() => {
+                setIsImportMode(false);
+                setSelectedPair(pair);
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = colors.primary;
                 e.currentTarget.style.transform = 'translateX(4px)';
@@ -683,8 +922,9 @@ export default function JMessagesPairsLibrary() {
                       </button>
                       <button
                         onClick={(e) => {
-                          // Placeholder: functionality will be implemented next
                           e.stopPropagation();
+                          setIsImportMode(true);
+                          setSelectedPair(pair);
                         }}
                         style={{
                           background: '#16a34a',
@@ -728,7 +968,12 @@ export default function JMessagesPairsLibrary() {
           {/* Back button and metadata */}
           <div style={{ marginBottom: 16 }}>
             <button
-              onClick={() => setSelectedPair(null)}
+              onClick={() => {
+                setSelectedPair(null);
+                setIsImportMode(false);
+                setOriginalFile(null);
+                setHumanAnalyzedFile(null);
+              }}
               style={{
                 background: 'transparent',
                 border: `1px solid ${colors.border}`,
@@ -741,6 +986,19 @@ export default function JMessagesPairsLibrary() {
             >
               ← Back to list
             </button>
+            {isImportMode && (
+              <div style={{
+                background: '#fef3c7',
+                border: '1px solid #fbbf24',
+                borderRadius: 8,
+                padding: 12,
+                marginBottom: 16,
+                fontSize: 14,
+                color: '#92400e'
+              }}>
+                <strong>📥 Import Mode:</strong> Select files to import for Original Document and Human-Analyzed Document
+              </div>
+            )}
             <div style={{
               background: colors.cardBackground,
               border: `1px solid ${colors.border}`,
