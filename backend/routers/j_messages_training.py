@@ -221,6 +221,7 @@ async def create_training_pair(pair: JMessagePair):
 async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)):
     """
     Update a training pair (partial update)
+    Handles nested objects like 'original' and 'human_structured' correctly
     """
     if training_pairs_collection is None:
         raise HTTPException(status_code=500, detail="Database not available")
@@ -228,16 +229,45 @@ async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)
     try:
         from bson import ObjectId
         
+        # Build the $set operation with proper handling of nested objects
+        set_operation = {}
+        
+        # Handle nested objects separately to preserve existing fields
+        if "original" in updates:
+            original_updates = updates.pop("original")
+            if isinstance(original_updates, dict):
+                for key, value in original_updates.items():
+                    set_operation[f"original.{key}"] = value
+        
+        if "human_structured" in updates:
+            human_updates = updates.pop("human_structured")
+            if isinstance(human_updates, dict):
+                for key, value in human_updates.items():
+                    set_operation[f"human_structured.{key}"] = value
+        
+        if "ai_structured" in updates:
+            ai_updates = updates.pop("ai_structured")
+            if isinstance(ai_updates, dict):
+                for key, value in ai_updates.items():
+                    set_operation[f"ai_structured.{key}"] = value
+        
+        # Add remaining top-level updates
+        for key, value in updates.items():
+            if key != "updated_at":  # We'll add this separately
+                set_operation[key] = value
+        
         # Add updated timestamp
-        updates["updated_at"] = datetime.utcnow().isoformat()
+        set_operation["updated_at"] = datetime.utcnow().isoformat()
         
         result = await training_pairs_collection.update_one(
             {"_id": ObjectId(pair_id)},
-            {"$set": updates}
+            {"$set": set_operation}
         )
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Training pair not found")
+        
+        logger.info(f"Updated training pair {pair_id}, modified {result.modified_count} field(s)")
         
         return {
             "success": True,
@@ -246,6 +276,7 @@ async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error updating training pair {pair_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{pair_id}")
