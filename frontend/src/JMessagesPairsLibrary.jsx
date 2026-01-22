@@ -681,6 +681,25 @@ export default function JMessagesPairsLibrary() {
                       >
                         🗑️ Delete
                       </button>
+                      <button
+                        onClick={(e) => {
+                          // Placeholder: functionality will be implemented next
+                          e.stopPropagation();
+                        }}
+                        style={{
+                          background: '#16a34a',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '6px 12px',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 500
+                        }}
+                        title="Import this pair"
+                      >
+                        📥 Import Pair
+                      </button>
                     </>
                   )}
                   <div style={{ 
