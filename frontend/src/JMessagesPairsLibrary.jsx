@@ -312,27 +312,27 @@ export default function JMessagesPairsLibrary() {
       const form = new FormData();
       form.append('file', file);
       
-      // Analyze the original document
-      const resp = await fetchWithAuth('/api/j-messages/analyze?complexity=low', {
+      // Extract text only (no analysis) from the original document
+      const resp = await fetchWithAuth('/api/j-messages/extract-text', {
         method: 'POST',
         body: form
       });
       
       if (!resp.ok) {
         const txt = await resp.text();
-        throw new Error(`Failed to analyze document: ${txt}`);
+        throw new Error(`Failed to extract text from document: ${txt}`);
       }
       
-      const analysisResult = await resp.json();
+      const extractResult = await resp.json();
       
-      // Update the pair with original document
+      // Update the pair with original document (raw text only, no analysis)
       const updateResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           original: {
             doc_type: file.name.endsWith('.docx') ? 'docx' : 'pdf',
-            text_excerpt: analysisResult.raw_text || ''
+            text_excerpt: extractResult.raw_text || ''
           }
         })
       });

@@ -1199,6 +1199,37 @@ async def analyze_j_note(
     }
 
 
+@router.post("/extract-text")
+async def extract_text_only(
+    file: UploadFile = File(...)
+):
+    """
+    Extract raw text from a DOCX or PDF file without any analysis.
+    Returns only the raw text content.
+    """
+    file_bytes = await file.read()
+    filename_lower = (file.filename or "").lower()
+
+    # Read input (DOCX or PDF) - only extract text, no analysis
+    try:
+        if filename_lower.endswith(".docx"):
+            paragraphs = read_docx_paragraphs(file_bytes)
+            full_text = "\n".join(paragraphs)
+        elif filename_lower.endswith(".pdf"):
+            full_text = read_pdf_text(file_bytes)
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse file: {e}")
+
+    return {
+        "raw_text": full_text,
+        "filename": file.filename
+    }
+
+
 @router.post("/export-docx")
 async def export_docx(data: Dict[str, Any] = Body(...)):
     """
