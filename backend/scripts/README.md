@@ -4,7 +4,7 @@ Production scripts for J-messages training pairs management.
 
 ---
 
-## 📦 Files in this Directory
+## 📦 Files in this Directory for J-messages training pairs
 
 ### Production Scripts
 
