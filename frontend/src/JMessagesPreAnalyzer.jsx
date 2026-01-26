@@ -51,7 +51,7 @@ export default function JMessagesPreAnalyzer() {
   useEffect(() => {
     const savedProvider = localStorage.getItem('apiProvider') || 'openai';
     setApiProvider(savedProvider);
-    if (savedProvider === 'itemai') {
+    if (savedProvider === 'itemai' || savedProvider === 'itemserverai') {
       const model = localStorage.getItem('itemaiCurrentModel');
       setItemaiModel(model);
     }
@@ -59,7 +59,7 @@ export default function JMessagesPreAnalyzer() {
     const handleStorageChange = (e) => {
       if (e.key === 'apiProvider') {
         setApiProvider(e.newValue || 'openai');
-        if (e.newValue === 'itemai') {
+        if (e.newValue === 'itemai' || e.newValue === 'itemserverai') {
           const model = localStorage.getItem('itemaiCurrentModel');
           setItemaiModel(model);
         }
@@ -73,7 +73,7 @@ export default function JMessagesPreAnalyzer() {
     const handleApiProviderChange = () => {
       const currentProvider = localStorage.getItem('apiProvider') || 'openai';
       setApiProvider(currentProvider);
-      if (currentProvider === 'itemai') {
+      if (currentProvider === 'itemai' || currentProvider === 'itemserverai') {
         const model = localStorage.getItem('itemaiCurrentModel');
         setItemaiModel(model);
       }
@@ -374,10 +374,10 @@ export default function JMessagesPreAnalyzer() {
         }}>
           <span style={{ fontSize: 12, color: colors.textSecondary }}>
             {t('jMessages.preAnalyzer.apiConfig')}: <strong style={{ color: colors.text }}>
-              {apiProvider === 'itemai' ? 'ItemAI' : apiProvider === 'openrouter' ? 'OpenRouter' : 'OpenAI'}
+              {apiProvider === 'itemai' ? 'ItemAI' : apiProvider === 'itemserverai' ? 'ItemServerAI' : apiProvider === 'openrouter' ? 'OpenRouter' : 'OpenAI'}
             </strong>
           </span>
-          {apiProvider === 'itemai' ? (
+          {(apiProvider === 'itemai' || apiProvider === 'itemserverai') ? (
             <>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>

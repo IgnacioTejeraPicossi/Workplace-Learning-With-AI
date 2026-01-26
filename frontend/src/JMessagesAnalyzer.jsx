@@ -35,8 +35,8 @@ export default function JMessagesAnalyzer() {
   useEffect(() => {
     const savedProvider = localStorage.getItem('apiProvider') || 'openai';
     setApiProvider(savedProvider);
-    // Load ItemAI model if provider is ItemAI
-    if (savedProvider === 'itemai') {
+    // Load ItemAI/ItemServerAI model if provider is ItemAI or ItemServerAI
+    if (savedProvider === 'itemai' || savedProvider === 'itemserverai') {
       const model = localStorage.getItem('itemaiCurrentModel');
       setItemaiModel(model);
     }
@@ -45,7 +45,7 @@ export default function JMessagesAnalyzer() {
     const handleStorageChange = (e) => {
       if (e.key === 'apiProvider') {
         setApiProvider(e.newValue || 'openai');
-        if (e.newValue === 'itemai') {
+        if (e.newValue === 'itemai' || e.newValue === 'itemserverai') {
           const model = localStorage.getItem('itemaiCurrentModel');
           setItemaiModel(model);
         }
@@ -60,14 +60,14 @@ export default function JMessagesAnalyzer() {
     const handleApiProviderChange = () => {
       const currentProvider = localStorage.getItem('apiProvider') || 'openai';
       setApiProvider(currentProvider);
-      // Update ItemAI model if available
-      if (currentProvider === 'itemai') {
+      // Update ItemAI/ItemServerAI model if available
+      if (currentProvider === 'itemai' || currentProvider === 'itemserverai') {
         const model = localStorage.getItem('itemaiCurrentModel');
         setItemaiModel(model);
       }
     };
     
-    // Listen for ItemAI model updates
+    // Listen for ItemAI/ItemServerAI model updates
     const handleItemaiModelChange = () => {
       const model = localStorage.getItem('itemaiCurrentModel');
       setItemaiModel(model);
@@ -356,10 +356,10 @@ export default function JMessagesAnalyzer() {
         }}>
           <span style={{ fontSize: 12, color: colors.textSecondary }}>
             {t('jMessages.analyzer.apiConfig')}: <strong style={{ color: colors.text }}>
-              {apiProvider === 'itemai' ? 'ItemAI' : apiProvider === 'openrouter' ? 'OpenRouter' : 'OpenAI'}
+              {apiProvider === 'itemai' ? 'ItemAI' : apiProvider === 'itemserverai' ? 'ItemServerAI' : apiProvider === 'openrouter' ? 'OpenRouter' : 'OpenAI'}
             </strong>
           </span>
-          {apiProvider === 'itemai' ? (
+          {(apiProvider === 'itemai' || apiProvider === 'itemserverai') ? (
             <>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>|</span>
               <span style={{ fontSize: 12, color: colors.textSecondary }}>
