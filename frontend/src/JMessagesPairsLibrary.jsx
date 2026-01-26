@@ -132,6 +132,35 @@ export default function JMessagesPairsLibrary() {
     }
   };
 
+  const handleCreateNewPair = async () => {
+    try {
+      setError('');
+      const resp = await fetchWithAuth('/api/j-messages/training/create-empty', {
+        method: 'POST'
+      });
+      
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Failed to create new pair: ${txt}`);
+      }
+      
+      const data = await resp.json();
+      
+      if (data.success && data.item) {
+        // Add the new pair to the list
+        setPairs(prev => [data.item, ...prev]);
+        // Reload stats
+        loadStats();
+        // Optionally, select the new pair to show it immediately
+        // setSelectedPair(data.item);
+      } else {
+        throw new Error('Failed to create new pair: Invalid response');
+      }
+    } catch (e) {
+      setError(`Failed to create new pair: ${String(e)}`);
+    }
+  };
+
   const getEvaluationStatus = (pair) => {
     if (!pair.evaluation) return null;
     
@@ -755,6 +784,21 @@ export default function JMessagesPairsLibrary() {
           title={tab === 'analyzed' ? 'Switch to Training Pairs tab to generate suggestions' : 'Generate AI-powered prompt improvement suggestions'}
         >
           {generatingSuggestion ? '⏳ Generating...' : '💡 Suggest Prompt Improvements'}
+        </button>
+        <button
+          onClick={handleCreateNewPair}
+          style={{
+            background: '#22c55e',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontWeight: 500
+          }}
+          title="Create a new empty training pair"
+        >
+          ➕ Create New Pair
         </button>
       </div>
 

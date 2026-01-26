@@ -217,6 +217,52 @@ async def create_training_pair(pair: JMessagePair):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/create-empty")
+async def create_empty_training_pair():
+    """
+    Create a new empty training pair that can be populated later with documents.
+    Returns a new pair with default values.
+    """
+    if training_pairs_collection is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        from bson import ObjectId
+        import uuid
+        
+        # Generate a unique j_id for the new pair
+        timestamp = datetime.utcnow().strftime("%Y%m%d")
+        unique_id = str(uuid.uuid4())[:8].upper()
+        new_j_id = f"J-NEW-{timestamp}-{unique_id}"
+        
+        # Create empty pair document
+        doc = {
+            "j_id": new_j_id,
+            "source_system_id": "manual-creation",
+            "title": "New Training Pair",
+            "original": None,
+            "human_structured": None,
+            "ai_structured": None,
+            "evaluation": None,
+            "tags": [],
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        result = await training_pairs_collection.insert_one(doc)
+        
+        # Retrieve the created document
+        created_doc = await training_pairs_collection.find_one({"_id": result.inserted_id})
+        
+        return {
+            "success": True,
+            "item": serialize_doc(created_doc)
+        }
+    except Exception as e:
+        logger.error(f"Error creating empty training pair: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.patch("/{pair_id}")
 async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)):
     """
