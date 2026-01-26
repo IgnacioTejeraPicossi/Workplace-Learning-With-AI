@@ -221,8 +221,8 @@
       "submenu": {
         "analyzer": "J-meldings Analysator",
         "preAnalyzer": "J-meldings Pre-Analysator",
-        "library": "J-messages bibliotek",
-        "pairsLibrary": "J-messages par bibliotek"
+        "library": "J-meldings bibliotek",
+        "pairsLibrary": "J-meldings par bibliotek"
       }
     },
 
