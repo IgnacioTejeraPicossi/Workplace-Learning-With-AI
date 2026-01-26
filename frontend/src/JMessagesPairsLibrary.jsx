@@ -498,14 +498,14 @@ export default function JMessagesPairsLibrary() {
         >
           <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
           <div style={{ fontWeight: 600, color: colors.text }}>
-            {dragActive ? 'Drop file here' : 'Drag & drop file here or click to browse'}
+            {dragActive ? t('jMessages.pairsLibrary.dropFileHere') : t('jMessages.pairsLibrary.dragDropFile')}
           </div>
           <div style={{ color: colors.textSecondary, fontSize: 11, marginTop: 4 }}>
-            Supports DOCX/PDF (single file)
+            {t('jMessages.pairsLibrary.supports')}
           </div>
           {file && (
             <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary }}>
-              Selected: <strong>{file.name}</strong>
+              {t('jMessages.pairsLibrary.selected')} <strong>{file.name}</strong>
             </div>
           )}
           {isUploading && (
@@ -571,7 +571,7 @@ export default function JMessagesPairsLibrary() {
           }}>
             {isImportMode && (
               <FileUpload
-                label="Import Original Document"
+                label={t('jMessages.pairsLibrary.importOriginalDocument')}
                 file={originalFile}
                 setFile={setOriginalFile}
                 onFileSelect={handleOriginalFileSelect}
@@ -768,7 +768,7 @@ export default function JMessagesPairsLibrary() {
             fontWeight: 500
           }}
         >
-          🔄 Refresh
+          🔄 {t('jMessages.pairsLibrary.refresh')}
         </button>
         <button
           onClick={() => generatePromptSuggestion(5, true)}
@@ -948,7 +948,7 @@ export default function JMessagesPairsLibrary() {
                         }}
                         title={t('jMessages.pairsLibrary.runEvaluationTooltip')}
                       >
-                        {evaluating[pair.id] ? '⏳' : '🤖'} Evaluate
+                        {evaluating[pair.id] ? '⏳' : '🤖'} {t('jMessages.pairsLibrary.evaluate')}
                       </button>
                       <button
                         onClick={(e) => handleDelete(pair.id, e)}
@@ -962,7 +962,7 @@ export default function JMessagesPairsLibrary() {
                           fontSize: 12,
                           fontWeight: 500
                         }}
-                        title="Delete this training pair"
+                        title={t('jMessages.pairsLibrary.deletePairTooltip')}
                       >
                         🗑️ {t('jMessages.pairsLibrary.delete')}
                       </button>
@@ -1089,7 +1089,7 @@ export default function JMessagesPairsLibrary() {
                 </h3>
                 <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: 12, color: colors.textSecondary }}>Overall Accuracy</div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary }}>{t('jMessages.pairsLibrary.overallAccuracy')}</div>
                     <div style={{ 
                       fontSize: 24, 
                       fontWeight: 600, 
@@ -1175,9 +1175,7 @@ export default function JMessagesPairsLibrary() {
             borderRadius: 8,
             fontSize: 13
           }}>
-            <strong>💡 AI Training Note:</strong> This comparison will be used to improve 
-            future document analysis. The system will learn from the differences between 
-            original and analyzed content to enhance prompt engineering.
+            <strong>💡 {t('jMessages.pairsLibrary.aiTrainingNote')}</strong>
           </div>
         </div>
       )}
@@ -1374,7 +1372,7 @@ export default function JMessagesPairsLibrary() {
                   onClick={() => {
                     navigator.clipboard.writeText(promptSuggestion.suggested_prompt);
                     setShowSuggestionModal(false);
-                    alert('Prompt copied! You can now paste it into the Prompt Manager.');
+                    alert(t('jMessages.pairsLibrary.promptSuggestion.promptCopiedUse'));
                   }}
                   style={{
                     background: '#8b5cf6',
