@@ -75,6 +75,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
         api_config = payload.get("api_config", {})
         api_provider = api_config.get("provider", "itemai")
         itemai_url = api_config.get("itemai_url", "http://localhost:1234")
+        itemserverai_url = api_config.get("itemserverai_url", "https://192.168.50.214:1234")
         openai_key = api_config.get("openai_key", "")
         openrouter_key = api_config.get("openrouter_key", "")
         
@@ -130,6 +131,43 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                             }
             except Exception as e:
                 print(f"❌ ItemAI failed: {e}")
+        
+        # Try ItemServerAI if configured
+        if api_provider == "itemserverai":
+            try:
+                print("🔄 Trying ItemServerAI (LM Studio)...")
+                import httpx
+                
+                payload_itemserverai = {
+                    "model": "default",
+                    "messages": messages,
+                    "max_tokens": prompt_run.max_tokens,
+                    "temperature": prompt_run.temperature,
+                    "stream": False
+                }
+                
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    response = await client.post(
+                        f"{itemserverai_url}/v1/chat/completions",
+                        json=payload_itemserverai,
+                        headers={"Content-Type": "application/json"}
+                    )
+                    
+                    if response.status_code == 200:
+                        response_data = response.json()
+                        completion_text = response_data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                        if completion_text and not completion_text.startswith("[MOCKED RESPONSE"):
+                            print("✅ ItemServerAI (LM Studio) successful")
+                            return {
+                                "success": True,
+                                "response": completion_text,
+                                "ai_provider": "ItemServerAI (LM Studio)",
+                                "model": response_data.get("model", "unknown"),
+                                "safety_check": "PASSED",
+                                "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
+                            }
+            except Exception as e:
+                print(f"❌ ItemServerAI failed: {e}")
         
         # Fallback to OpenRouter if configured
         if openrouter_key:

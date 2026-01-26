@@ -7,6 +7,7 @@ const APIConfig = () => {
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [itemaiUrl, setItemaiUrl] = useState('http://localhost:1234');
+  const [itemserveraiUrl, setItemserveraiUrl] = useState('https://192.168.50.214:1234');
   const [status, setStatus] = useState('');
 
   useEffect(() => {
@@ -15,11 +16,13 @@ const APIConfig = () => {
     const savedOpenaiKey = localStorage.getItem('openaiKey') || '';
     const savedOpenrouterKey = localStorage.getItem('openrouterKey') || '';
     const savedItemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
+    const savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || 'https://192.168.50.214:1234';
     
     setApiProvider(savedProvider);
     setOpenaiKey(savedOpenaiKey);
     setOpenrouterKey(savedOpenrouterKey);
     setItemaiUrl(savedItemaiUrl);
+    setItemserveraiUrl(savedItemserveraiUrl);
   }, []);
 
   const handleProviderChange = (provider) => {
@@ -36,6 +39,7 @@ const APIConfig = () => {
     localStorage.setItem('openaiKey', openaiKey);
     localStorage.setItem('openrouterKey', openrouterKey);
     localStorage.setItem('itemaiUrl', itemaiUrl);
+    localStorage.setItem('itemserveraiUrl', itemserveraiUrl);
     
     // Also save to server (for MCP Server use)
     try {
@@ -48,7 +52,8 @@ const APIConfig = () => {
           provider: apiProvider,
           openaiKey: openaiKey,
           openrouterKey: openrouterKey,
-          itemaiUrl: itemaiUrl
+          itemaiUrl: itemaiUrl,
+          itemserveraiUrl: itemserveraiUrl
         })
       });
       
@@ -81,6 +86,17 @@ const APIConfig = () => {
             local_url: itemaiUrl
           })
         });
+      } else if (apiProvider === 'itemserverai') {
+        // Test ItemServerAI API
+        response = await fetch('/api/test-itemai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            local_url: itemserveraiUrl
+          })
+        });
       } else {
         // Test OpenAI or OpenRouter
         response = await fetch('/api/test-api', {
@@ -99,8 +115,8 @@ const APIConfig = () => {
       if (response.ok) {
         const result = await response.json();
         setStatus(`✅ API test successful: ${result.message}`);
-        // Save the model name to localStorage for ItemAI and notify other components
-        if (apiProvider === 'itemai' && result.model_used) {
+        // Save the model name to localStorage for ItemAI/ItemServerAI and notify other components
+        if ((apiProvider === 'itemai' || apiProvider === 'itemserverai') && result.model_used) {
           localStorage.setItem('itemaiCurrentModel', result.model_used);
           window.dispatchEvent(new Event('itemaiModelChanged'));
         }
@@ -120,7 +136,7 @@ const APIConfig = () => {
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ color: colors.text, marginBottom: 8 }}>🔧 API Configuration</h1>
                      <p style={{ color: colors.textSecondary, fontSize: '1.1em' }}>
-             Configure and switch between ItemAI API, OpenAI, and OpenRouter APIs
+             Configure and switch between ItemAI API, ItemServerAI API, OpenAI, and OpenRouter APIs
            </p>
         </div>
 
@@ -146,6 +162,25 @@ const APIConfig = () => {
                 }}
               >
                 🏠 ItemAI API
+              </button>
+             
+                          <button
+                onClick={() => handleProviderChange('itemserverai')}
+                style={{
+                  background: apiProvider === 'itemserverai' ? '#e3f2fd' : 'transparent',
+                  color: apiProvider === 'itemserverai' ? '#1565c0' : colors.text,
+                  border: `2px solid ${apiProvider === 'itemserverai' ? '#1976d2' : colors.border}`,
+                  padding: '16px 24px',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 500,
+                  flex: '1',
+                  minWidth: '200px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                🖥️ ItemServerAI API
               </button>
              
                           <button
@@ -195,11 +230,14 @@ const APIConfig = () => {
           }}>
             <h3 style={{ color: colors.primary, marginBottom: 12 }}>
               {apiProvider === 'itemai' ? '🏠 ItemAI API' : 
+               apiProvider === 'itemserverai' ? '🖥️ ItemServerAI API' :
                apiProvider === 'openai' ? '🚀 OpenAI API' : '🌐 OpenRouter API'}
             </h3>
             <p style={{ color: colors.text, lineHeight: 1.6 }}>
               {apiProvider === 'itemai' 
                 ? 'Local AI powered by LM Studio - 100% free, 100% private, runs on your own computer with downloaded models.'
+                : apiProvider === 'itemserverai'
+                ? 'Network AI powered by LM Studio - 100% free, 100% private, runs on your internal network server with downloaded models.'
                 : apiProvider === 'openai' 
                 ? 'Direct access to OpenAI models (GPT-5, GPT-4, etc.) with full control and reliability.'
                 : 'Access to multiple AI providers through OpenRouter, often more cost-effective with access to Claude, Gemini, and other models.'
@@ -243,6 +281,41 @@ const APIConfig = () => {
                 marginTop: 4 
               }}>
                 Local URL where LM Studio is running (default: http://localhost:1234)
+              </p>
+            </div>
+          )}
+
+          {apiProvider === 'itemserverai' && (
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: 8, 
+                color: colors.text,
+                fontWeight: '500'
+              }}>
+                ItemServerAI Server URL
+              </label>
+              <input
+                type="text"
+                value={itemserveraiUrl}
+                onChange={(e) => setItemserveraiUrl(e.target.value)}
+                placeholder="https://192.168.50.214:1234"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  fontSize: '1em',
+                  background: colors.background,
+                  color: colors.text
+                }}
+              />
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em', 
+                marginTop: 4 
+              }}>
+                Network URL where LM Studio is running on your server (default: https://192.168.50.214:1234)
               </p>
             </div>
           )}
@@ -379,7 +452,7 @@ const APIConfig = () => {
                      <div style={{ marginBottom: 16 }}>
              <h4 style={{ color: colors.primary, marginBottom: 8 }}>1. Select API Provider</h4>
              <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-               Choose between ItemAI API (free local), OpenRouter (cost-effective), or OpenAI (premium quality).
+               Choose between ItemAI API (free local), ItemServerAI API (free network), OpenRouter (cost-effective), or OpenAI (premium quality).
              </p>
            </div>
           
@@ -402,6 +475,8 @@ const APIConfig = () => {
             <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
               {apiProvider === 'itemai' 
                 ? 'If ItemAI API fails, the system automatically falls back to OpenRouter, then OpenAI for maximum reliability.'
+                : apiProvider === 'itemserverai'
+                ? 'If ItemServerAI API fails, the system automatically falls back to OpenRouter, then OpenAI for maximum reliability.'
                 : apiProvider === 'openrouter'
                 ? 'If OpenRouter fails, the system automatically falls back to OpenAI for reliability.'
                 : 'OpenAI provides direct access with fallback to mock responses if needed.'
@@ -431,6 +506,15 @@ const APIConfig = () => {
                  <li><strong>Pros:</strong> 100% free, 100% private, no rate limits</li>
                  <li><strong>Cons:</strong> Requires local setup, model quality varies</li>
                  <li><strong>Best for:</strong> Privacy, cost savings, local development</li>
+               </ul>
+             </div>
+             
+             <div>
+               <h4 style={{ color: colors.primary, marginBottom: 12 }}>🖥️ ItemServerAI API</h4>
+               <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px' }}>
+                 <li><strong>Pros:</strong> 100% free, 100% private, no rate limits, network accessible</li>
+                 <li><strong>Cons:</strong> Requires network server setup, model quality varies</li>
+                 <li><strong>Best for:</strong> Privacy, cost savings, network-based development</li>
                </ul>
              </div>
              

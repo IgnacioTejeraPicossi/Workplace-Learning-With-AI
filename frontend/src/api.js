@@ -12,12 +12,14 @@ export async function fetchWithAuth(url, options = {}) {
     const openaiKey = localStorage.getItem('openaiKey');
     const openrouterKey = localStorage.getItem('openrouterKey');
     const itemaiUrl = localStorage.getItem('itemaiUrl');
+    const itemserveraiUrl = localStorage.getItem('itemserveraiUrl');
     options.headers = {
       ...options.headers,
       ...(apiProvider ? { 'x-api-provider': apiProvider } : {}),
       ...(openaiKey ? { 'x-openai-key': openaiKey } : {}),
       ...(openrouterKey ? { 'x-openrouter-key': openrouterKey } : {}),
       ...(itemaiUrl ? { 'x-itemai-url': itemaiUrl } : {}),
+      ...(itemserveraiUrl ? { 'x-itemserverai-url': itemserveraiUrl } : {}),
     };
   } catch (_) {
     // no-op: if localStorage is blocked we simply skip header injection

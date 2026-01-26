@@ -94,6 +94,7 @@ def get_api_config_from_headers(request_headers=None):
         # Try to get configuration from headers
         api_provider = request_headers.get('x-api-provider', API_PROVIDER)
         itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
+        itemserverai_url = request_headers.get('x-itemserverai-url', 'https://192.168.50.214:1234')
         
         # Validate OpenAI key: must start with "sk-" and be reasonably long
         # If invalid or placeholder, use .env fallback
@@ -115,6 +116,7 @@ def get_api_config_from_headers(request_headers=None):
         return {
             'provider': api_provider,
             'itemai_url': itemai_url,
+            'itemserverai_url': itemserverai_url,
             'openai_key': openai_key,
             'openrouter_key': openrouter_key
         }
@@ -123,6 +125,7 @@ def get_api_config_from_headers(request_headers=None):
     return {
         'provider': API_PROVIDER,
         'itemai_url': 'http://localhost:1234',
+        'itemserverai_url': 'https://192.168.50.214:1234',
         'openai_key': OPENAI_API_KEY,
         'openrouter_key': OPENROUTER_API_KEY
     }
@@ -192,7 +195,58 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         itemai_failed = False
         try:
             print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemai_url'))
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
+                print("✅ ItemAI (LM Studio) successful")
+                return result
+            else:
+                itemai_failed = True
+                print("❌ ItemAI returned empty or mocked response")
+        except Exception as e:
+            itemai_failed = True
+            error_str = str(e)
+            if "context length" in error_str.lower():
+                print(f"⚠️ ItemAI failed due to context length limitation")
+            elif "connection" in error_str.lower() or "refused" in error_str.lower():
+                print(f"⚠️ ItemAI failed: LM Studio may not be running")
+            else:
+                print(f"❌ ItemAI failed: {e}")
+        
+        # Fallback chain: OpenRouter → OpenAI
+        if itemai_failed:
+            print(f"🔄 Automatic fallback chain activated (ItemAI → OpenRouter → OpenAI)")
+            
+            # Fallback to OpenRouter if configured
+            if config.get('openrouter_key'):
+                try:
+                    print("   → Trying OpenRouter [Fallback 1]...")
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenRouter successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenRouter failed: {e}")
+            
+            # Fallback to OpenAI if configured
+            if config.get('openai_key'):
+                try:
+                    print("   → Trying OpenAI [Fallback 2]...")
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'))
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenAI successful (fallback from ItemAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenAI failed: {e}")
+        
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
+    
+    # Provider: itemserverai → try ItemServerAI, then OpenRouter, then OpenAI
+    if config['provider'] == 'itemserverai':
+        itemserverai_failed = False
+        try:
+            print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemserverai_url'))
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
@@ -300,7 +354,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         itemai_failed = False
         try:
             print("🔄 Trying ItemAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemai_url'))
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) successful")
                 return result
@@ -342,9 +396,60 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
                         return result
                 except Exception as e:
                     print(f"   ❌ OpenAI failed: {e}")
+        
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
     
-    print("❌ All AI providers failed")
-    return "[MOCKED RESPONSE] All AI providers unavailable"
+    # Provider: itemserverai → try ItemServerAI, then OpenRouter, then OpenAI
+    if config['provider'] == 'itemserverai':
+        itemserverai_failed = False
+        try:
+            print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemserverai_url'))
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
+                print("✅ ItemServerAI (LM Studio) successful")
+                return result
+            else:
+                itemserverai_failed = True
+                print("❌ ItemServerAI returned empty or mocked response")
+        except Exception as e:
+            itemserverai_failed = True
+            error_str = str(e)
+            if "context length" in error_str.lower():
+                print(f"⚠️ ItemServerAI failed due to context length limitation")
+            elif "connection" in error_str.lower() or "refused" in error_str.lower():
+                print(f"⚠️ ItemServerAI failed: LM Studio may not be running on server")
+            else:
+                print(f"❌ ItemServerAI failed: {e}")
+        
+        # Fallback chain: OpenRouter → OpenAI
+        if itemserverai_failed:
+            print(f"🔄 Automatic fallback chain activated (ItemServerAI → OpenRouter → OpenAI)")
+            
+            # Fallback to OpenRouter if configured
+            if config.get('openrouter_key'):
+                try:
+                    print("   → Trying OpenRouter [Fallback 1]...")
+                    result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenRouter successful (fallback from ItemServerAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenRouter failed: {e}")
+            
+            # Fallback to OpenAI if configured
+            if config.get('openai_key'):
+                try:
+                    print("   → Trying OpenAI [Fallback 2]...")
+                    result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
+                    if result and not result.startswith("[MOCKED RESPONSE"):
+                        print("✅ OpenAI successful (fallback from ItemServerAI)")
+                        return result
+                except Exception as e:
+                    print(f"   ❌ OpenAI failed: {e}")
+        
+        print("❌ All AI providers failed")
+        return "[MOCKED RESPONSE] All AI providers unavailable"
 
 def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, override_api_key=None, temperature=None):
     """
@@ -579,7 +684,7 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
         try:
             print("🔄 Trying ItemAI (LM Studio) streaming...")
             # For now, use the sync version and stream it character by character
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages)
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, url=config.get('itemai_url'))
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemAI (LM Studio) streaming successful")
                 for char in result:
@@ -589,6 +694,22 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
                 print("❌ ItemAI returned empty or mocked response")
         except Exception as e:
             print(f"❌ ItemAI streaming failed: {e}")
+    
+    # Try ItemServerAI if configured
+    if config['provider'] == 'itemserverai':
+        try:
+            print("🔄 Trying ItemServerAI (LM Studio) streaming...")
+            # For now, use the sync version and stream it character by character
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, url=config.get('itemserverai_url'))
+            if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
+                print("✅ ItemServerAI (LM Studio) streaming successful")
+                for char in result:
+                    yield char
+                return
+            else:
+                print("❌ ItemServerAI returned empty or mocked response")
+        except Exception as e:
+            print(f"❌ ItemServerAI streaming failed: {e}")
     
     # Try OpenRouter if configured
     if config['provider'] == 'openrouter' and config['openrouter_key']:
@@ -1027,7 +1148,7 @@ Make sure the questions are relevant to the content and appropriate for the spec
             }
         ]
 
-def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None):
+def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512, messages=None, temperature=None, url=None):
     """
     ItemAI API function for local LM Studio integration.
     
@@ -1037,12 +1158,13 @@ def ask_itemai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         complexity: Task complexity (low, medium, high)
         max_tokens: Maximum tokens for response
         messages: Alternative to prompt for conversation format
+        url: Optional URL for LM Studio (defaults to http://localhost:1234)
     """
     try:
         import httpx
         
-        # Default local URL for LM Studio
-        local_url = "http://localhost:1234"
+        # Default local URL for LM Studio, or use provided URL
+        local_url = url or "http://localhost:1234"
         
         # Prepare the request payload
         temp = _normalize_temperature(temperature)

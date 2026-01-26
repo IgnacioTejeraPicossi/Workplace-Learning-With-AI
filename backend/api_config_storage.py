@@ -23,7 +23,8 @@ def get_api_config() -> Dict[str, Any]:
             "provider": "openai",
             "openai_key": "",
             "openrouter_key": "",
-            "itemai_url": "http://localhost:1234"
+            "itemai_url": "http://localhost:1234",
+            "itemserverai_url": "https://192.168.50.214:1234"
         }
     
     try:
@@ -33,7 +34,8 @@ def get_api_config() -> Dict[str, Any]:
             "provider": config.get("provider", "openai"),
             "openai_key": config.get("openai_key", ""),
             "openrouter_key": config.get("openrouter_key", ""),
-            "itemai_url": config.get("itemai_url", "http://localhost:1234")
+            "itemai_url": config.get("itemai_url", "http://localhost:1234"),
+            "itemserverai_url": config.get("itemserverai_url", "https://192.168.50.214:1234")
         }
     except Exception as e:
         print(f"[api_config_storage] Error reading config file: {e}")
@@ -41,7 +43,8 @@ def get_api_config() -> Dict[str, Any]:
             "provider": "openai",
             "openai_key": "",
             "openrouter_key": "",
-            "itemai_url": "http://localhost:1234"
+            "itemai_url": "http://localhost:1234",
+            "itemserverai_url": "https://192.168.50.214:1234"
         }
 
 
@@ -96,6 +99,10 @@ def get_api_config_for_headers() -> Dict[str, str]:
     # Add ItemAI URL
     if config.get("itemai_url"):
         headers["x-itemai-url"] = config["itemai_url"]
+    
+    # Add ItemServerAI URL
+    if config.get("itemserverai_url"):
+        headers["x-itemserverai-url"] = config["itemserverai_url"]
     
     # Add OpenAI key if valid
     openai_key = config.get("openai_key", "")
