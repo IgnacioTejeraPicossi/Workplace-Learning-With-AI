@@ -24,7 +24,7 @@ def get_api_config() -> Dict[str, Any]:
             "openai_key": "",
             "openrouter_key": "",
             "itemai_url": "http://localhost:1234",
-            "itemserverai_url": "https://192.168.50.214:1234"
+            "itemserverai_url": "http://192.168.50.214:1234"
         }
     
     try:
@@ -35,7 +35,7 @@ def get_api_config() -> Dict[str, Any]:
             "openai_key": config.get("openai_key", ""),
             "openrouter_key": config.get("openrouter_key", ""),
             "itemai_url": config.get("itemai_url", "http://localhost:1234"),
-            "itemserverai_url": config.get("itemserverai_url", "https://192.168.50.214:1234")
+            "itemserverai_url": config.get("itemserverai_url", "http://192.168.50.214:1234")
         }
     except Exception as e:
         print(f"[api_config_storage] Error reading config file: {e}")
@@ -44,7 +44,7 @@ def get_api_config() -> Dict[str, Any]:
             "openai_key": "",
             "openrouter_key": "",
             "itemai_url": "http://localhost:1234",
-            "itemserverai_url": "https://192.168.50.214:1234"
+            "itemserverai_url": "http://192.168.50.214:1234"
         }
 
 
@@ -61,10 +61,16 @@ def save_api_config(config: Dict[str, Any]) -> bool:
         # Read existing config to preserve any fields we don't update
         existing = get_api_config()
         
+        # Normalize ItemServerAI URL: convert https to http for internal IPs
+        itemserverai_url = config.get("itemserverai_url", existing.get("itemserverai_url", "http://192.168.50.214:1234"))
+        if itemserverai_url and itemserverai_url.startswith("https://192.168."):
+            itemserverai_url = itemserverai_url.replace("https://", "http://")
+        
         # Update with new values
         existing.update({
             "provider": config.get("provider", existing.get("provider", "openai")),
-            "itemai_url": config.get("itemai_url", existing.get("itemai_url", "http://localhost:1234"))
+            "itemai_url": config.get("itemai_url", existing.get("itemai_url", "http://localhost:1234")),
+            "itemserverai_url": itemserverai_url
         })
         
         # Only update keys if they are provided and not empty

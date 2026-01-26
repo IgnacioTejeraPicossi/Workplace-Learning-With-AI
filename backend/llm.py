@@ -94,7 +94,10 @@ def get_api_config_from_headers(request_headers=None):
         # Try to get configuration from headers
         api_provider = request_headers.get('x-api-provider', API_PROVIDER)
         itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
-        itemserverai_url = request_headers.get('x-itemserverai-url', 'https://192.168.50.214:1234')
+        itemserverai_url = request_headers.get('x-itemserverai-url', 'http://192.168.50.214:1234')
+        # Normalize ItemServerAI URL: convert https to http for internal IPs
+        if itemserverai_url.startswith('https://192.168.'):
+            itemserverai_url = itemserverai_url.replace('https://', 'http://')
         
         # Validate OpenAI key: must start with "sk-" and be reasonably long
         # If invalid or placeholder, use .env fallback
@@ -125,7 +128,7 @@ def get_api_config_from_headers(request_headers=None):
     return {
         'provider': API_PROVIDER,
         'itemai_url': 'http://localhost:1234',
-        'itemserverai_url': 'https://192.168.50.214:1234',
+        'itemserverai_url': 'http://192.168.50.214:1234',
         'openai_key': OPENAI_API_KEY,
         'openrouter_key': OPENROUTER_API_KEY
     }
@@ -246,26 +249,31 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         itemserverai_failed = False
         try:
             print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemserverai_url'))
+            # Normalize URL: convert https to http for internal IPs
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            if itemserverai_url.startswith('https://192.168.'):
+                itemserverai_url = itemserverai_url.replace('https://', 'http://')
+                print(f"   → Normalized URL from https to http: {itemserverai_url}")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=itemserverai_url)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
-                print("✅ ItemAI (LM Studio) successful")
+                print("✅ ItemServerAI (LM Studio) successful")
                 return result
             else:
-                itemai_failed = True
-                print("❌ ItemAI returned empty or mocked response")
+                itemserverai_failed = True
+                print("❌ ItemServerAI returned empty or mocked response")
         except Exception as e:
-            itemai_failed = True
+            itemserverai_failed = True
             error_str = str(e)
             if "context length" in error_str.lower():
-                print(f"⚠️ ItemAI failed due to context length limitation")
+                print(f"⚠️ ItemServerAI failed due to context length limitation")
             elif "connection" in error_str.lower() or "refused" in error_str.lower():
-                print(f"⚠️ ItemAI failed: LM Studio may not be running")
+                print(f"⚠️ ItemServerAI failed: LM Studio may not be running on server")
             else:
-                print(f"❌ ItemAI failed: {e}")
+                print(f"❌ ItemServerAI failed: {e}")
         
         # Fallback chain: OpenRouter → OpenAI
-        if itemai_failed:
-            print(f"🔄 Automatic fallback chain activated (ItemAI → OpenRouter → OpenAI)")
+        if itemserverai_failed:
+            print(f"🔄 Automatic fallback chain activated (ItemServerAI → OpenRouter → OpenAI)")
             
             # Fallback to OpenRouter if configured
             if config.get('openrouter_key'):
@@ -273,7 +281,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
                     print("   → Trying OpenRouter [Fallback 1]...")
                     result = ask_openrouter(prompt, task_type, complexity, max_tokens, messages, temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
-                        print("✅ OpenRouter successful (fallback from ItemAI)")
+                        print("✅ OpenRouter successful (fallback from ItemServerAI)")
                         return result
                 except Exception as e:
                     print(f"   ❌ OpenRouter failed: {e}")
@@ -284,7 +292,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
                     print("   → Trying OpenAI [Fallback 2]...")
                     result = ask_openai(prompt, task_type, complexity, max_tokens, messages, override_api_key=config.get('openai_key'), temperature=temperature)
                     if result and not result.startswith("[MOCKED RESPONSE"):
-                        print("✅ OpenAI successful (fallback from ItemAI)")
+                        print("✅ OpenAI successful (fallback from ItemServerAI)")
                         return result
                 except Exception as e:
                     print(f"   ❌ OpenAI failed: {e}")
@@ -405,7 +413,12 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         itemserverai_failed = False
         try:
             print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=config.get('itemserverai_url'))
+            # Normalize URL: convert https to http for internal IPs
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            if itemserverai_url.startswith('https://192.168.'):
+                itemserverai_url = itemserverai_url.replace('https://', 'http://')
+                print(f"   → Normalized URL from https to http: {itemserverai_url}")
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, temperature=temperature, url=itemserverai_url)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemServerAI (LM Studio) successful")
                 return result
@@ -699,8 +712,13 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
     if config['provider'] == 'itemserverai':
         try:
             print("🔄 Trying ItemServerAI (LM Studio) streaming...")
+            # Normalize URL: convert https to http for internal IPs
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            if itemserverai_url.startswith('https://192.168.'):
+                itemserverai_url = itemserverai_url.replace('https://', 'http://')
+                print(f"   → Normalized URL from https to http: {itemserverai_url}")
             # For now, use the sync version and stream it character by character
-            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, url=config.get('itemserverai_url'))
+            result = ask_itemai(prompt, task_type, complexity, max_tokens, messages, url=itemserverai_url)
             if result and not result.startswith("[MOCKED RESPONSE") and result is not None:
                 print("✅ ItemServerAI (LM Studio) streaming successful")
                 for char in result:

@@ -75,7 +75,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
         api_config = payload.get("api_config", {})
         api_provider = api_config.get("provider", "itemai")
         itemai_url = api_config.get("itemai_url", "http://localhost:1234")
-        itemserverai_url = api_config.get("itemserverai_url", "https://192.168.50.214:1234")
+        itemserverai_url = api_config.get("itemserverai_url", "http://192.168.50.214:1234")
         openai_key = api_config.get("openai_key", "")
         openrouter_key = api_config.get("openrouter_key", "")
         

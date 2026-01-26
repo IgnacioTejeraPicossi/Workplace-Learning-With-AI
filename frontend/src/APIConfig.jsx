@@ -7,7 +7,7 @@ const APIConfig = () => {
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [itemaiUrl, setItemaiUrl] = useState('http://localhost:1234');
-  const [itemserveraiUrl, setItemserveraiUrl] = useState('https://192.168.50.214:1234');
+  const [itemserveraiUrl, setItemserveraiUrl] = useState('http://192.168.50.214:1234');
   const [status, setStatus] = useState('');
 
   useEffect(() => {
@@ -16,30 +16,92 @@ const APIConfig = () => {
     const savedOpenaiKey = localStorage.getItem('openaiKey') || '';
     const savedOpenrouterKey = localStorage.getItem('openrouterKey') || '';
     const savedItemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
-    const savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || 'https://192.168.50.214:1234';
+    const savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || 'http://192.168.50.214:1234';
     
     setApiProvider(savedProvider);
     setOpenaiKey(savedOpenaiKey);
     setOpenrouterKey(savedOpenrouterKey);
     setItemaiUrl(savedItemaiUrl);
     setItemserveraiUrl(savedItemserveraiUrl);
+    
+    // Auto-fetch model when loading if provider is ItemAI or ItemServerAI
+    if (savedProvider === 'itemai' || savedProvider === 'itemserverai') {
+      const url = savedProvider === 'itemserverai' ? savedItemserveraiUrl : savedItemaiUrl;
+      // Fetch model asynchronously without blocking UI
+      fetch('/api/test-itemai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          local_url: url
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.model_used) {
+          localStorage.setItem('itemaiCurrentModel', result.model_used);
+          window.dispatchEvent(new Event('itemaiModelChanged'));
+        }
+      })
+      .catch(error => {
+        // Silently fail - model will be fetched when user tests API
+        console.log('Could not auto-fetch model on load:', error);
+      });
+    }
   }, []);
 
-  const handleProviderChange = (provider) => {
+  const handleProviderChange = async (provider) => {
     setApiProvider(provider);
     localStorage.setItem('apiProvider', provider);
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('apiProviderChanged'));
     setStatus(`Switched to ${provider.toUpperCase()} API`);
-    setTimeout(() => setStatus(''), 3000);
+    
+    // If switching to ItemServerAI or ItemAI, try to fetch the model automatically
+    if (provider === 'itemserverai' || provider === 'itemai') {
+      try {
+        const url = provider === 'itemserverai' ? itemserveraiUrl : itemaiUrl;
+        const response = await fetch('/api/test-itemai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            local_url: url
+          })
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.model_used) {
+            localStorage.setItem('itemaiCurrentModel', result.model_used);
+            window.dispatchEvent(new Event('itemaiModelChanged'));
+            setStatus(`✅ Switched to ${provider.toUpperCase()} API - Model: ${result.model_used}`);
+          }
+        }
+      } catch (error) {
+        // Silently fail - user can test manually if needed
+        console.log('Could not auto-fetch model:', error);
+      }
+    }
+    
+    setTimeout(() => setStatus(''), 5000);
   };
 
   const handleSaveKeys = async () => {
+    // Normalize ItemServerAI URL: convert https to http for internal IPs
+    let normalizedItemserveraiUrl = itemserveraiUrl;
+    if (itemserveraiUrl && itemserveraiUrl.startsWith('https://192.168.')) {
+      normalizedItemserveraiUrl = itemserveraiUrl.replace('https://', 'http://');
+      setItemserveraiUrl(normalizedItemserveraiUrl);
+    }
+    
     // Save to localStorage (for frontend use)
     localStorage.setItem('openaiKey', openaiKey);
     localStorage.setItem('openrouterKey', openrouterKey);
     localStorage.setItem('itemaiUrl', itemaiUrl);
-    localStorage.setItem('itemserveraiUrl', itemserveraiUrl);
+    localStorage.setItem('itemserveraiUrl', normalizedItemserveraiUrl);
     
     // Also save to server (for MCP Server use)
     try {
@@ -53,7 +115,7 @@ const APIConfig = () => {
           openaiKey: openaiKey,
           openrouterKey: openrouterKey,
           itemaiUrl: itemaiUrl,
-          itemserveraiUrl: itemserveraiUrl
+          itemserveraiUrl: normalizedItemserveraiUrl
         })
       });
       
@@ -299,7 +361,7 @@ const APIConfig = () => {
                 type="text"
                 value={itemserveraiUrl}
                 onChange={(e) => setItemserveraiUrl(e.target.value)}
-                placeholder="https://192.168.50.214:1234"
+                placeholder="http://192.168.50.214:1234"
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -315,7 +377,7 @@ const APIConfig = () => {
                 fontSize: '0.9em', 
                 marginTop: 4 
               }}>
-                Network URL where LM Studio is running on your server (default: https://192.168.50.214:1234)
+                Network URL where LM Studio is running on your server (default: http://192.168.50.214:1234)
               </p>
             </div>
           )}
