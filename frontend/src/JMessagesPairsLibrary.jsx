@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchWithAuth } from './api';
 
 export default function JMessagesPairsLibrary() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [pairs, setPairs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +42,7 @@ export default function JMessagesPairsLibrary() {
       if (data.success) {
         setPairs(data.items || []);
       } else {
-        setError('Failed to load training pairs');
+        setError(t('jMessages.pairsLibrary.failedToLoad'));
       }
     } catch (e) {
       setError(String(e));
@@ -98,10 +100,10 @@ export default function JMessagesPairsLibrary() {
           });
         }, 3000);
       } else {
-        setError(`Evaluation failed: ${data.error || 'Unknown error'}`);
+        setError(`${t('jMessages.pairsLibrary.evaluationFailed')} ${data.error || 'Unknown error'}`);
       }
     } catch (e) {
-      setError(`Error running evaluation: ${String(e)}`);
+      setError(`${t('jMessages.pairsLibrary.errorRunningEvaluation')} ${String(e)}`);
     } finally {
       setEvaluating(prev => ({ ...prev, [pairId]: false }));
     }
@@ -109,7 +111,7 @@ export default function JMessagesPairsLibrary() {
 
   const handleDelete = async (pairId, e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this training pair? This action cannot be undone.')) {
+    if (!window.confirm(t('jMessages.pairsLibrary.deleteConfirm'))) {
       return;
     }
     
@@ -125,10 +127,10 @@ export default function JMessagesPairsLibrary() {
         loadStats();
       } else {
         const data = await resp.json();
-        setError(`Failed to delete pair: ${data.detail || 'Unknown error'}`);
+        setError(`${t('jMessages.pairsLibrary.failedToDelete')} ${data.detail || 'Unknown error'}`);
       }
     } catch (e) {
-      setError(`Error deleting pair: ${String(e)}`);
+      setError(`${t('jMessages.pairsLibrary.errorDeleting')} ${String(e)}`);
     }
   };
 
@@ -167,17 +169,17 @@ export default function JMessagesPairsLibrary() {
     const accuracy = pair.evaluation.overall_score || pair.evaluation.metrics?.overall_accuracy || 0;
     
     let color = '#dc2626'; // red
-    let label = 'Poor';
+    let label = t('jMessages.pairsLibrary.evaluationLabels.poor');
     
     if (accuracy >= 0.9) {
       color = '#22c55e'; // green
-      label = 'Excellent';
+      label = t('jMessages.pairsLibrary.evaluationLabels.excellent');
     } else if (accuracy >= 0.7) {
       color = '#3b82f6'; // blue
-      label = 'Good';
+      label = t('jMessages.pairsLibrary.evaluationLabels.good');
     } else if (accuracy >= 0.5) {
       color = '#f59e0b'; // orange
-      label = 'Fair';
+      label = t('jMessages.pairsLibrary.evaluationLabels.fair');
     }
     
     return { accuracy, color, label };
@@ -378,7 +380,7 @@ export default function JMessagesPairsLibrary() {
         setOriginalFile(null);
       }
     } catch (e) {
-      setError(`Failed to import original document: ${String(e)}`);
+      setError(`${t('jMessages.pairsLibrary.failedToImportOriginal')} ${String(e)}`);
     } finally {
       setImportingOriginal(false);
     }
@@ -439,7 +441,7 @@ export default function JMessagesPairsLibrary() {
         setHumanAnalyzedFile(null);
       }
     } catch (e) {
-      setError(`Failed to import human-analyzed document: ${String(e)}`);
+      setError(`${t('jMessages.pairsLibrary.failedToImportHuman')} ${String(e)}`);
     } finally {
       setImportingHuman(false);
     }
@@ -467,7 +469,7 @@ export default function JMessagesPairsLibrary() {
           setFile(f);
           onFileSelect(f);
         } else {
-          setError('Please drop a .docx or .pdf file');
+          setError(t('jMessages.pairsLibrary.pleaseDropFile'));
         }
       }
     };
@@ -557,7 +559,7 @@ export default function JMessagesPairsLibrary() {
             fontWeight: 600,
             color: colors.primary
           }}>
-            📄 Original Document
+            📄 {t('jMessages.pairsLibrary.originalDocument')}
           </div>
           <div style={{ 
             flex: 1, 
@@ -585,7 +587,7 @@ export default function JMessagesPairsLibrary() {
               lineHeight: 1.6,
               overflow: 'auto'
             }}>
-              {originalText || '(No original text available)'}
+              {originalText || t('jMessages.pairsLibrary.noOriginalText')}
             </div>
           </div>
         </div>
@@ -618,7 +620,7 @@ export default function JMessagesPairsLibrary() {
           }}>
             {isImportMode && (
               <FileUpload
-                label="Import Human-Analyzed Document"
+                label={t('jMessages.pairsLibrary.importHumanAnalyzedDocument')}
                 file={humanAnalyzedFile}
                 setFile={setHumanAnalyzedFile}
                 onFileSelect={handleHumanAnalyzedFileSelect}
@@ -658,7 +660,7 @@ export default function JMessagesPairsLibrary() {
               fontWeight: 600,
               color: '#92400e'
             }}>
-              🤖 AI-Analyzed Document (Current Prompt)
+              🤖 {t('jMessages.pairsLibrary.aiAnalyzedDocument')}
             </div>
             <div style={{ 
               flex: 1, 
@@ -709,7 +711,7 @@ export default function JMessagesPairsLibrary() {
           flex: '1 1 200px'
         }}>
           <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
-            Total Pairs
+            {t('jMessages.pairsLibrary.totalPairs')}
           </div>
           <div style={{ fontSize: 28, fontWeight: 600, color: colors.primary }}>
             {pairs.length}
@@ -741,7 +743,7 @@ export default function JMessagesPairsLibrary() {
       }}>
         <input
           type="text"
-          placeholder="Search by ID, title..."
+          placeholder={t('jMessages.pairsLibrary.searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{
@@ -781,9 +783,9 @@ export default function JMessagesPairsLibrary() {
             fontWeight: 500,
             opacity: tab === 'analyzed' ? 0.5 : 1
           }}
-          title={tab === 'analyzed' ? 'Switch to Training Pairs tab to generate suggestions' : 'Generate AI-powered prompt improvement suggestions'}
+          title={tab === 'analyzed' ? t('jMessages.pairsLibrary.promptSuggestion.switchToTraining') : t('jMessages.pairsLibrary.promptSuggestion.generateSuggestions')}
         >
-          {generatingSuggestion ? '⏳ Generating...' : '💡 Suggest Prompt Improvements'}
+          {generatingSuggestion ? `⏳ ${t('jMessages.pairsLibrary.promptSuggestion.generating')}` : `💡 ${t('jMessages.pairsLibrary.suggestPromptImprovements')}`}
         </button>
         <button
           onClick={handleCreateNewPair}
@@ -796,13 +798,13 @@ export default function JMessagesPairsLibrary() {
             cursor: 'pointer',
             fontWeight: 500
           }}
-          title="Create a new empty training pair"
+          title={t('jMessages.pairsLibrary.createNewPairTooltip')}
         >
           ➕ Create New Pair
         </button>
       </div>
 
-      {loading && <div style={{ color: colors.textSecondary }}>Loading pairs...</div>}
+      {loading && <div style={{ color: colors.textSecondary }}>{t('jMessages.pairsLibrary.loadingPairs')}</div>}
       {error && <div style={{ color: '#dc2626', marginBottom: 16 }}>{error}</div>}
 
       {/* Pairs List */}
@@ -920,7 +922,7 @@ export default function JMessagesPairsLibrary() {
                         alignItems: 'center',
                         gap: 4
                       }}>
-                        ✓ Evaluation complete!
+                        ✓ {t('jMessages.pairsLibrary.evaluationComplete')}
                       </span>
                     )}
                   </div>
@@ -944,7 +946,7 @@ export default function JMessagesPairsLibrary() {
                           fontWeight: 500,
                           opacity: evaluating[pair.id] ? 0.6 : 1
                         }}
-                        title="Run AI evaluation on this pair"
+                        title={t('jMessages.pairsLibrary.runEvaluationTooltip')}
                       >
                         {evaluating[pair.id] ? '⏳' : '🤖'} Evaluate
                       </button>
@@ -962,7 +964,7 @@ export default function JMessagesPairsLibrary() {
                         }}
                         title="Delete this training pair"
                       >
-                        🗑️ Delete
+                        🗑️ {t('jMessages.pairsLibrary.delete')}
                       </button>
                       <button
                         onClick={(e) => {
@@ -980,9 +982,9 @@ export default function JMessagesPairsLibrary() {
                           fontSize: 12,
                           fontWeight: 500
                         }}
-                        title="Import this pair"
+                        title={t('jMessages.pairsLibrary.importPairTooltip')}
                       >
-                        📥 Import Pair
+                        📥 {t('jMessages.pairsLibrary.importPair')}
                       </button>
                     </>
                   )}
@@ -1002,7 +1004,7 @@ export default function JMessagesPairsLibrary() {
               padding: 48, 
               color: colors.textSecondary 
             }}>
-              {query ? 'No pairs found matching your search' : 'No document pairs available yet'}
+              {query ? t('jMessages.pairsLibrary.noPairsFound') : t('jMessages.pairsLibrary.noPairsAvailable')}
             </div>
           )}
         </div>
@@ -1040,7 +1042,7 @@ export default function JMessagesPairsLibrary() {
                 fontSize: 14,
                 color: '#92400e'
               }}>
-                <strong>📥 Import Mode:</strong> Select files to import for Original Document and Human-Analyzed Document
+                <strong>📥 {t('jMessages.pairsLibrary.importMode')}</strong>
               </div>
             )}
             <div style={{
@@ -1083,7 +1085,7 @@ export default function JMessagesPairsLibrary() {
                 marginBottom: 16
               }}>
                 <h3 style={{ margin: 0, marginBottom: 12, color: colors.text, fontSize: 16 }}>
-                  📊 Evaluation Results
+                  📊 {t('jMessages.pairsLibrary.evaluationResults')}
                 </h3>
                 <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
                   <div>
@@ -1097,7 +1099,7 @@ export default function JMessagesPairsLibrary() {
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, color: colors.textSecondary }}>Evaluated</div>
+                    <div style={{ fontSize: 12, color: colors.textSecondary }}>{t('jMessages.pairsLibrary.evaluated')}</div>
                     <div style={{ fontSize: 14, color: colors.text }}>
                       {selectedPair.evaluation.last_evaluated_at 
                         ? new Date(selectedPair.evaluation.last_evaluated_at).toLocaleDateString('no-NO', {
@@ -1115,7 +1117,7 @@ export default function JMessagesPairsLibrary() {
                 {selectedPair.evaluation.metrics?.field_accuracy && (
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: colors.text }}>
-                      Field Accuracy:
+                      {t('jMessages.pairsLibrary.fieldAccuracy')}
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {Object.entries(selectedPair.evaluation.metrics.field_accuracy).map(([field, accuracy]) => {
@@ -1219,7 +1221,7 @@ export default function JMessagesPairsLibrary() {
               alignItems: 'center'
             }}>
               <h2 style={{ margin: 0, color: colors.text, display: 'flex', alignItems: 'center', gap: 8 }}>
-                💡 AI-Generated Prompt Suggestion
+                💡 {t('jMessages.pairsLibrary.promptSuggestion.title')}
               </h2>
               <button
                 onClick={() => setShowSuggestionModal(false)}
@@ -1260,7 +1262,7 @@ export default function JMessagesPairsLibrary() {
               {/* Notes Section */}
               {promptSuggestion.notes && promptSuggestion.notes.length > 0 && (
                 <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ color: colors.text, marginBottom: 12 }}>🔍 Key Improvements:</h3>
+                  <h3 style={{ color: colors.text, marginBottom: 12 }}>🔍 {t('jMessages.pairsLibrary.promptSuggestion.keyImprovements')}</h3>
                   <ul style={{ 
                     color: colors.text, 
                     lineHeight: '1.8',
@@ -1282,11 +1284,11 @@ export default function JMessagesPairsLibrary() {
                   alignItems: 'center',
                   marginBottom: 12 
                 }}>
-                  <h3 style={{ color: colors.text, margin: 0 }}>✨ Suggested Prompt:</h3>
+                  <h3 style={{ color: colors.text, margin: 0 }}>✨ {t('jMessages.pairsLibrary.promptSuggestion.suggestedPrompt')}</h3>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(promptSuggestion.suggested_prompt);
-                      alert('Prompt copied to clipboard!');
+                      alert(t('jMessages.pairsLibrary.promptSuggestion.promptCopied'));
                     }}
                     style={{
                       background: colors.primary,
@@ -1299,7 +1301,7 @@ export default function JMessagesPairsLibrary() {
                       fontWeight: 500
                     }}
                   >
-                    📋 Copy to Clipboard
+                    📋 {t('jMessages.pairsLibrary.promptSuggestion.copyToClipboard')}
                   </button>
                 </div>
                 <pre style={{
@@ -1326,7 +1328,7 @@ export default function JMessagesPairsLibrary() {
                   fontWeight: 500,
                   marginBottom: 8
                 }}>
-                  🔄 Compare with Original Prompt
+                  🔄 {t('jMessages.pairsLibrary.promptSuggestion.compareWithOriginal')}
                 </summary>
                 <pre style={{
                   background: colors.background,
@@ -1366,7 +1368,7 @@ export default function JMessagesPairsLibrary() {
                     fontWeight: 500
                   }}
                 >
-                  Close
+                  {t('jMessages.pairsLibrary.promptSuggestion.close')}
                 </button>
                 <button
                   onClick={() => {
@@ -1384,7 +1386,7 @@ export default function JMessagesPairsLibrary() {
                     fontWeight: 500
                   }}
                 >
-                  💾 Copy & Use in Prompt Manager
+                  💾 {t('jMessages.pairsLibrary.promptSuggestion.copyAndUse')}
                 </button>
               </div>
             </div>
