@@ -1407,7 +1407,7 @@
       "dropFile": "Slipp fil her"
     },
     "library": {
-      "title": "J-messages bibliotek",
+      "title": "J-meldings bibliotek",
       "description": "Bla gjennom og administrer tidligere analyserte J‑meldinger.",
       "searchPlaceholder": "Søk etter ID, tittel eller kategori",
       "allStatuses": "Alle statuser",
