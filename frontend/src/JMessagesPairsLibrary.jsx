@@ -688,11 +688,10 @@ export default function JMessagesPairsLibrary() {
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ color: colors.text, margin: 0, marginBottom: 8 }}>
-            📚 J-messages pairs Library
+            📚 {t('jMessages.pairsLibrary.title')}
           </h1>
           <p style={{ color: colors.textSecondary, margin: 0, fontSize: 14 }}>
-            Compare original documents with AI-analyzed versions side by side. 
-            This data will be used to improve future analysis prompts.
+            {t('jMessages.pairsLibrary.description')}
           </p>
         </div>
 
@@ -725,7 +724,7 @@ export default function JMessagesPairsLibrary() {
           flex: '1 1 200px'
         }}>
           <div style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
-            Selected for Review
+            {t('jMessages.pairsLibrary.selectedForReview')}
           </div>
           <div style={{ fontSize: 28, fontWeight: 600, color: '#22c55e' }}>
             {selectedPair ? 1 : 0}
@@ -800,7 +799,7 @@ export default function JMessagesPairsLibrary() {
           }}
           title={t('jMessages.pairsLibrary.createNewPairTooltip')}
         >
-          ➕ Create New Pair
+          ➕ {t('jMessages.pairsLibrary.createNewPair')}
         </button>
       </div>
 
