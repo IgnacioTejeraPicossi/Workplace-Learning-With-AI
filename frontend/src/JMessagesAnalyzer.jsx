@@ -213,8 +213,8 @@ export default function JMessagesAnalyzer() {
     if (files.length > 0) {
       const f = files[0];
       const name = (f?.name || '').toLowerCase();
-      if (f && (name.endsWith('.docx') || name.endsWith('.pdf'))) setFile(f);
-      else setError('Please drop a .docx or .pdf file');
+      if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json'))) setFile(f);
+      else setError(t('jMessages.analyzer.pleaseDropFile'));
     }
   };
 
@@ -292,7 +292,7 @@ export default function JMessagesAnalyzer() {
         <input
           id="jmsg-file-input"
           type="file"
-          accept=".docx,.pdf"
+          accept=".docx,.pdf,.json"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />

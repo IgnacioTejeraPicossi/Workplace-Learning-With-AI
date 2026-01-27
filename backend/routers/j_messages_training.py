@@ -8,6 +8,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 import logging
 
+logger = logging.getLogger(__name__)
+
 # Import evaluator service with fallbacks (supports both execution modes)
 try:
     from backend.services.j_messages_evaluator import get_evaluator
@@ -33,7 +35,6 @@ except ImportError:
         PROMPT_SUGGESTION_AVAILABLE = False
 
 router = APIRouter(prefix="/api/j-messages/training", tags=["J-messages Training"])
-logger = logging.getLogger(__name__)
 
 # Pydantic models
 class OriginalDocument(BaseModel):
@@ -267,7 +268,9 @@ async def create_empty_training_pair():
 async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)):
     """
     Update a training pair (partial update)
-    Handles nested objects like 'original' and 'human_structured' correctly
+    Handles nested objects like 'original' and 'human_structured' correctly.
+    Sets whole nested objects (not dot notation) to avoid MongoDB error when
+    the field is null: "Cannot create field 'X' in element {original: null}".
     """
     if training_pairs_collection is None:
         raise HTTPException(status_code=500, detail="Database not available")
@@ -275,27 +278,37 @@ async def update_training_pair(pair_id: str, updates: Dict[str, Any] = Body(...)
     try:
         from bson import ObjectId
         
-        # Build the $set operation with proper handling of nested objects
+        # Fetch current document when we need to merge nested objects that may be null
+        doc = None
+        if "original" in updates or "human_structured" in updates or "ai_structured" in updates:
+            doc = await training_pairs_collection.find_one({"_id": ObjectId(pair_id)})
+            if not doc:
+                raise HTTPException(status_code=404, detail="Training pair not found")
+        
         set_operation = {}
         
-        # Handle nested objects separately to preserve existing fields
+        # Set whole nested object (merge with existing if it's a dict). Using dot notation
+        # like original.doc_type fails when original is null (MongoDB err 28).
         if "original" in updates:
             original_updates = updates.pop("original")
             if isinstance(original_updates, dict):
-                for key, value in original_updates.items():
-                    set_operation[f"original.{key}"] = value
+                existing = doc.get("original") if doc else None
+                merged = {**existing, **original_updates} if isinstance(existing, dict) else original_updates
+                set_operation["original"] = merged
         
         if "human_structured" in updates:
             human_updates = updates.pop("human_structured")
             if isinstance(human_updates, dict):
-                for key, value in human_updates.items():
-                    set_operation[f"human_structured.{key}"] = value
+                existing = doc.get("human_structured") if doc else None
+                merged = {**existing, **human_updates} if isinstance(existing, dict) else human_updates
+                set_operation["human_structured"] = merged
         
         if "ai_structured" in updates:
             ai_updates = updates.pop("ai_structured")
             if isinstance(ai_updates, dict):
-                for key, value in ai_updates.items():
-                    set_operation[f"ai_structured.{key}"] = value
+                existing = doc.get("ai_structured") if doc else None
+                merged = {**existing, **ai_updates} if isinstance(existing, dict) else ai_updates
+                set_operation["ai_structured"] = merged
         
         # Add remaining top-level updates
         for key, value in updates.items():

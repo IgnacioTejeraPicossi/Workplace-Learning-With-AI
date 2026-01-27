@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Query, Body
 from typing import List, Tuple, Dict, Any
 from io import BytesIO
+import json
 import re
 from datetime import datetime
 from fastapi.responses import StreamingResponse
@@ -53,6 +54,70 @@ def _simple_slug(value: str) -> str:
     value = re.sub(r"[^\w\-]", "-", value)
     value = re.sub(r"-{2,}", "-", value).strip("-")
     return value or "section"
+
+
+def _parse_json_relaxed(content: str) -> Dict[str, Any]:
+    """
+    Parse JSON; if it fails with e.g. 'Extra data' when the root is missing (content
+    starts with \"data\": {...}), try wrapping in {...} or extracting the first {...} as data.
+    """
+    # Strip BOM and surrounding whitespace
+    if content.startswith("\ufeff"):
+        content = content[1:]
+    content = content.strip()
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError as e1:
+        if not content or content.startswith("{") or content.startswith("["):
+            raise e1
+        # Try wrapping as { content } (for "data": { ... } missing the outer braces)
+        try:
+            return json.loads("{" + content + "}")
+        except json.JSONDecodeError:
+            pass
+        # Fallback: take from first { to last } and treat as inner object under "data"
+        i = content.find("{")
+        j = content.rfind("}")
+        if i >= 0 and j > i:
+            try:
+                inner = json.loads(content[i : j + 1])
+                return {"data": inner}
+            except json.JSONDecodeError:
+                pass
+        raise e1
+
+
+def _extract_text_from_json(data: Dict[str, Any]) -> str:
+    """
+    Get document text from JSON: raw_text, body, text; or Enonic-style data.blocks.text.text.
+    HTML in blocks.text.text is stripped to plain text.
+    """
+    def _to_plain(h: str) -> str:
+        if not h or not isinstance(h, str):
+            return ""
+        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", h)).strip()
+
+    for key in ("raw_text", "body", "text"):
+        v = data.get(key)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+
+    inner = data.get("data")
+    if isinstance(inner, dict):
+        for key in ("raw_text", "body", "text"):
+            v = inner.get(key)
+            if isinstance(v, str) and v.strip():
+                return v.strip()
+        blocks = inner.get("blocks") or {}
+        if isinstance(blocks, dict):
+            text_block = blocks.get("text")
+            if isinstance(text_block, dict):
+                t = text_block.get("text")
+                if isinstance(t, str) and t.strip():
+                    return _to_plain(t)
+            elif isinstance(text_block, str) and text_block.strip():
+                return _to_plain(text_block)
+    return ""
 
 
 def read_docx_paragraphs(file_bytes: bytes) -> List[str]:
@@ -585,18 +650,72 @@ async def analyze_j_message(
     file_bytes = await file.read()
     filename_lower = (file.filename or "").lower()
 
-    # Read input (DOCX or PDF)
+    # Read input (DOCX, PDF or JSON)
+    paragraphs: List[str] = []
+    header_text = ""
+    body_text = ""
+    toc: List[Dict[str, Any]] = []
+    body_html = ""
+
     try:
-        if filename_lower.endswith(".docx"):
+        if filename_lower.endswith(".json"):
+            data = _parse_json_relaxed(file_bytes.decode("utf-8"))
+            full_text = _extract_text_from_json(data).strip()
+            has_full = isinstance(data.get("body_html"), str) and (
+                data.get("toc") is not None or data.get("id") or data.get("j_id") or data.get("title")
+            )
+            if has_full:
+                # Use JSON as full analysis result
+                j_id = data.get("id") or data.get("j_id")
+                title = data.get("title")
+                replaces_id = data.get("replaces") or data.get("replaces_id") or []
+                replaces_list = replaces_id if isinstance(replaces_id, list) else ([replaces_id] if replaces_id else [])
+                replaced_by_id = data.get("replaced_by") or data.get("replaced_by_id")
+                cat = data.get("category") or data.get("categories")
+                category = cat if isinstance(cat, list) else ([cat] if cat else ["Annet"])
+                ar = data.get("area") or []
+                area = ar if isinstance(ar, list) else ([ar] if ar else [])
+                toc = data.get("toc") or []
+                body_html = data.get("body_html") or ""
+                body_text = _extract_text_from_json(data).strip()
+                summary_text = (data.get("summary") or "").strip()
+                if summary_length and not summary_text and body_text and ask_ai_unified_sync:
+                    try:
+                        sum_prompt = f"""
+Lag en {summary_length} oppsummering av forskriften nedenfor.
+Returner ren tekst, uten markers eller Markdown.
+Tekst:
+\"\"\"{body_text[:12000]}\"\"\"
+"""
+                        complexity_level = complexity if complexity in ["low", "medium", "high"] else "low"
+                        temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
+                        summary_text = ask_ai_unified_sync(
+                            prompt=sum_prompt, task_type="summarization", complexity=complexity_level,
+                            max_tokens=700, messages=None, request_headers=dict(request.headers), temperature=temperature_value
+                        ) or ""
+                    except Exception:
+                        summary_text = ""
+                body_html_with_expired = add_expired_j_messages_section(body_html, replaces_list)
+                return {
+                    "id": j_id, "title": title, "status": data.get("status"), "valid_from": data.get("valid_from"), "valid_to": data.get("valid_to"),
+                    "replaces": replaces_list, "replaced_by": replaced_by_id, "category": category, "area": area, "toc": toc, "body_html": body_html_with_expired,
+                    "raw_text": body_text, "summary": summary_text, "summary_length": summary_length, "prompt_version": None, "debug": {"header_text": ""}
+                }
+            if not full_text:
+                raise HTTPException(status_code=400, detail="JSON must contain 'raw_text' or 'body'")
+            paragraphs = [ln for ln in full_text.split("\n") if ln.strip()]
+        elif filename_lower.endswith(".docx"):
             paragraphs = read_docx_paragraphs(file_bytes)
             full_text = "\n".join(paragraphs)
         elif filename_lower.endswith(".pdf"):
             full_text = read_pdf_text(file_bytes)
             paragraphs = [ln for ln in full_text.split("\n") if ln.strip()]
         else:
-            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf or .json")
     except HTTPException:
         raise
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {e}")
 
@@ -1210,17 +1329,27 @@ async def extract_text_only(
     file_bytes = await file.read()
     filename_lower = (file.filename or "").lower()
 
-    # Read input (DOCX or PDF) - only extract text, no analysis
+    # Read input (DOCX, PDF or JSON) - only extract text, no analysis
     try:
         if filename_lower.endswith(".docx"):
             paragraphs = read_docx_paragraphs(file_bytes)
             full_text = "\n".join(paragraphs)
         elif filename_lower.endswith(".pdf"):
             full_text = read_pdf_text(file_bytes)
+        elif filename_lower.endswith(".json"):
+            data = _parse_json_relaxed(file_bytes.decode("utf-8"))
+            full_text = _extract_text_from_json(data).strip()
+            if not full_text:
+                raise HTTPException(
+                    status_code=400,
+                    detail="JSON must contain 'raw_text', 'body', 'text' or Enonic 'data.blocks.text.text'"
+                )
         else:
-            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf or .json")
     except HTTPException:
         raise
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {e}")
 
@@ -1538,7 +1667,7 @@ async def pre_analyze_j_message(
         filename_lower = (file.filename or "").lower()
         print(f"[J-MESSAGES PRE-ANALYZE] ✅ File read successfully, size: {len(file_bytes)} bytes")
 
-        # Read input (DOCX or PDF)
+        # Read input (DOCX, PDF or JSON)
         try:
             if filename_lower.endswith(".docx"):
                 paragraphs = read_docx_paragraphs(file_bytes)
@@ -1546,10 +1675,17 @@ async def pre_analyze_j_message(
             elif filename_lower.endswith(".pdf"):
                 full_text = read_pdf_text(file_bytes)
                 paragraphs = [ln for ln in full_text.split("\n") if ln.strip()]
+            elif filename_lower.endswith(".json"):
+                data = _parse_json_relaxed(file_bytes.decode("utf-8"))
+                full_text = _extract_text_from_json(data).strip()
+                if not full_text:
+                    raise HTTPException(status_code=400, detail="JSON must contain 'raw_text', 'body' or Enonic 'data.blocks.text.text'")
             else:
-                raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx or .pdf")
+                raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf or .json")
         except HTTPException:
             raise
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
         except Exception as e:
             import traceback
             print(f"[J-MESSAGES PRE-ANALYZE] ❌ Failed to parse file: {e}")

@@ -362,14 +362,15 @@ export default function JMessagesPairsLibrary() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           original: {
-            doc_type: file.name.endsWith('.docx') ? 'docx' : 'pdf',
+            doc_type: file.name.endsWith('.docx') ? 'docx' : file.name.endsWith('.pdf') ? 'pdf' : 'json',
             text_excerpt: extractResult.raw_text || ''
           }
         })
       });
       
       if (!updateResp.ok) {
-        throw new Error('Failed to update pair');
+        const errTxt = await updateResp.text();
+        throw new Error(`Failed to update pair: ${errTxt || updateResp.statusText}`);
       }
       
       // Reload the pair
@@ -430,7 +431,8 @@ export default function JMessagesPairsLibrary() {
       });
       
       if (!updateResp.ok) {
-        throw new Error('Failed to update pair');
+        const errTxt = await updateResp.text();
+        throw new Error(`Failed to update pair: ${errTxt || updateResp.statusText}`);
       }
       
       // Reload the pair
@@ -465,7 +467,7 @@ export default function JMessagesPairsLibrary() {
       if (files.length > 0) {
         const f = files[0];
         const name = (f?.name || '').toLowerCase();
-        if (f && (name.endsWith('.docx') || name.endsWith('.pdf'))) {
+        if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json'))) {
           setFile(f);
           onFileSelect(f);
         } else {
@@ -517,7 +519,7 @@ export default function JMessagesPairsLibrary() {
         <input
           id={`file-input-${label.replace(/\s+/g, '-')}`}
           type="file"
-          accept=".docx,.pdf"
+          accept=".docx,.pdf,.json"
           onChange={(e) => {
             const selectedFile = e.target.files?.[0] || null;
             if (selectedFile) {
