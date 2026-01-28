@@ -1497,6 +1497,7 @@
       "supports": "Støtter DOCX/PDF (enkel fil)",
       "selected": "Valgt:",
       "uploadingAnalyzing": "⏳ Laster opp og analyserer...",
+      "importing": "⏳ Importerer...",
       "deleteConfirm": "Er du sikker på at du vil slette dette treningsparet? Denne handlingen kan ikke angres.",
       "failedToLoad": "Kunne ikke laste treningspar",
       "failedToDelete": "Kunne ikke slette par:",

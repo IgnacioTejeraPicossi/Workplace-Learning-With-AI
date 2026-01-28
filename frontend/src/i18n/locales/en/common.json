@@ -602,6 +602,7 @@
       "supports": "Supports DOCX/PDF/JSON (single file)",
       "selected": "Selected:",
       "uploadingAnalyzing": "⏳ Uploading and analyzing...",
+      "importing": "⏳ Importing...",
       "deleteConfirm": "Are you sure you want to delete this training pair? This action cannot be undone.",
       "failedToLoad": "Failed to load training pairs",
       "failedToDelete": "Failed to delete pair:",

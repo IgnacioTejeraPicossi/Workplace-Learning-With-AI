@@ -396,36 +396,34 @@ export default function JMessagesPairsLibrary() {
       const form = new FormData();
       form.append('file', file);
       
-      // Analyze the human-analyzed document
-      const resp = await fetchWithAuth('/api/j-messages/analyze?complexity=low', {
+      // Import only: extract raw text (no LLM analysis). Analysis is done later via "Evaluate".
+      const resp = await fetchWithAuth('/api/j-messages/extract-text', {
         method: 'POST',
         body: form
       });
       
       if (!resp.ok) {
         const txt = await resp.text();
-        throw new Error(`Failed to analyze document: ${txt}`);
+        throw new Error(`Failed to extract text from document: ${txt}`);
       }
       
-      const analysisResult = await resp.json();
+      const extractResult = await resp.json();
+      const rawText = extractResult.raw_text || '';
+      // Convert raw text to minimal HTML (copy as-is, no analysis)
+      const bodyHtml = !rawText ? '<p></p>' : rawText
+        .split(/\n\n+/)
+        .map((p) => '<p>' + p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>') + '</p>')
+        .join('');
       
-      // Update the pair with human-analyzed document
+      // Update the pair with human-analyzed document (structure only for storage; no LLM metadata/toc)
       const updateResp = await fetchWithAuth(`/api/j-messages/training/${selectedPair.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           human_structured: {
-            metadata: {
-              j_id: analysisResult.id,
-              title: analysisResult.title,
-              status: analysisResult.status,
-              valid_from: analysisResult.valid_from,
-              valid_to: analysisResult.valid_to,
-              category: analysisResult.category || [],
-              area: analysisResult.area || []
-            },
-            toc: analysisResult.toc || [],
-            body_html: analysisResult.body_html || ''
+            metadata: {},
+            toc: [],
+            body_html: bodyHtml
           }
         })
       });
@@ -512,7 +510,7 @@ export default function JMessagesPairsLibrary() {
           )}
           {isUploading && (
             <div style={{ marginTop: 8, fontSize: 12, color: colors.primary }}>
-              ⏳ Uploading and analyzing...
+              ⏳ {t('jMessages.pairsLibrary.importing')}
             </div>
           )}
         </div>
