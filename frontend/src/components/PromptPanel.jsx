@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchWithAuth } from '../api';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
-export default function PromptPanel({ agent, nativePromptText, colors, onUseResult, promptVersion }) {
+export default function PromptPanel({ agent, nativePromptText, colors, onUseResult, promptVersion, analyzeTest }) {
   const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState('');
@@ -52,6 +52,31 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   const test = async () => {
     setTesting(true); setTestOutput(''); setInjectionWarn(null);
     try {
+      // J-messages Analyzer: "Test" = same as "Analyze file" on selected document, with prompt from panel
+      if (analyzeTest?.file) {
+        const form = new FormData();
+        form.append('file', analyzeTest.file);
+        const effectivePrompt = (prompt || '').trim() || (nativePromptText && !/^\(/.test(nativePromptText) ? nativePromptText : '');
+        if (effectivePrompt) form.append('metadata_prompt_override', effectivePrompt);
+        const params = new URLSearchParams();
+        if (analyzeTest.summaryLength) params.append('summary_length', analyzeTest.summaryLength);
+        params.append('complexity', analyzeTest.complexity || 'low');
+        if (Number.isFinite(analyzeTest.temperature)) params.append('temperature', String(analyzeTest.temperature));
+        const url = `/api/j-messages/analyze${params.toString() ? '?' + params.toString() : ''}`;
+        const res = await fetchWithAuth(url, { method: 'POST', body: form });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg = data.detail || res.statusText || 'Request failed';
+          const errStr = typeof msg === 'string' ? msg : JSON.stringify(msg);
+          setTestOutput(errStr);
+          analyzeTest.onError?.(errStr);
+        } else {
+          analyzeTest.onResult?.(data);
+          setTestOutput('✅ ' + (t('components.prompt.analyzeComplete', { defaultValue: 'Analysis complete. Result displayed above.' })));
+        }
+        return;
+      }
+
       // Read Robomind Clinic policy sliders to include as guardrails in prompt
       let policyNote = '';
       try {
@@ -150,7 +175,7 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
           </div>
         )}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={test} disabled={testing || !prompt.trim()} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: testing? '#94a3b8':'#22c55e', color: '#fff' }}>{testing? t('components.prompt.testing', { defaultValue: 'Testing...' }) : t('components.prompt.test', { defaultValue: 'Test' })}</button>
+          <button onClick={test} disabled={testing || (analyzeTest ? !analyzeTest?.file : !(prompt || '').trim())} style={{ padding: '10px 12px', borderRadius: 8, border: 'none', background: testing? '#94a3b8':'#22c55e', color: '#fff' }} title={analyzeTest ? (t('components.prompt.testAnalyzeHint', { defaultValue: "Same as 'Analyze file' on the selected document, using the prompt above." })) : undefined}>{testing? t('components.prompt.testing', { defaultValue: 'Testing...' }) : t('components.prompt.test', { defaultValue: 'Test' })}</button>
         </div>
       </div>
 

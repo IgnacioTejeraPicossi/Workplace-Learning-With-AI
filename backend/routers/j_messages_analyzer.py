@@ -1,5 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Query, Body
-from typing import List, Tuple, Dict, Any
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, Query, Body
+from typing import List, Tuple, Dict, Any, Optional
 from io import BytesIO
 import json
 import re
@@ -629,7 +629,8 @@ async def analyze_j_message(
     file: UploadFile = File(...),
     summary_length: str = Query(None, description="short|medium|long to include an AI summary"),
     complexity: str = Query("low", description="AI complexity level: low, medium, or high"),
-    temperature: float = Query(None, description="Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative.")
+    temperature: float = Query(None, description="Sampling temperature (0.0-2.0). Lower=more deterministic, higher=more creative."),
+    metadata_prompt_override: Optional[str] = Form(None, description="Optional custom prompt for metadata extraction (e.g. from Prompt Manager Test). If it contains {header_text} or {body_text}, those are replaced; otherwise the document text is appended.")
 ):
     """
     Accept a .docx J-melding and return structured JSON with:
@@ -739,7 +740,15 @@ Tekst:
             # Prefer unified LLM pipeline if available; otherwise, return without metadata
     try:
         if ask_ai_unified_sync:
-            prompt = build_metadata_prompt(header_text, body_text)
+            # Use custom prompt from Prompt Manager "Test" when provided; otherwise versioned/metadata template
+            if metadata_prompt_override and (o := metadata_prompt_override.strip()):
+                body_lim = body_text[:4000]
+                if "{header_text}" in o or "{body_text}" in o:
+                    prompt = o.replace("{body_text}", body_lim).replace("{header_text}", header_text)
+                else:
+                    prompt = o + '\n\nDocument text:\n"""' + header_text + '\n\n' + body_lim + '"""\n\nJSON:'
+            else:
+                prompt = build_metadata_prompt(header_text, body_text)
             # Ask model for STRICT JSON
             # Pass request headers to allow API config from frontend/MCP
             request_headers_dict = dict(request.headers) if request else {}

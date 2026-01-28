@@ -330,7 +330,9 @@
       "noSaved": "Ingen lagrede prompts.",
       "edit": "Rediger",
       "delete": "Slett",
-      "testResult": "Testrusultat"
+      "testResult": "Testrusultat",
+      "analyzeComplete": "Analyse fullført. Resultat vises over.",
+      "testAnalyzeHint": "Samme som «Analyser fil» på det valgte dokumentet, med prompten over."
     }
   },
 

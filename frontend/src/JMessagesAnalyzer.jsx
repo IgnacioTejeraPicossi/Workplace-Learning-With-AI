@@ -469,6 +469,14 @@ export default function JMessagesAnalyzer() {
         colors={colors}
         nativePromptText={nativePrompt || '(Loading prompt...)'}
         promptVersion={promptVersion}
+        analyzeTest={{
+          file,
+          onResult: (d) => { setResult(d); setError(null); },
+          onError: (e) => setError(e),
+          complexity: aiComplexity,
+          temperature,
+          summaryLength: summaryLength || undefined
+        }}
       />
 
       {result && (
