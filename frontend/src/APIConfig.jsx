@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
 
+// Definitive ItemServerAI URL (migrer gammel lagret URL til denne)
+const ITEMSERVERAI_DEFAULT_URL = 'http://192.168.50.142:1234';
+const ITEMSERVERAI_OLD_URL = 'http://192.168.50.214:1234';
+
 const APIConfig = () => {
   const { colors } = useTheme();
   const [apiProvider, setApiProvider] = useState('openai');
   const [openaiKey, setOpenaiKey] = useState('');
   const [openrouterKey, setOpenrouterKey] = useState('');
   const [itemaiUrl, setItemaiUrl] = useState('http://localhost:1234');
-  const [itemserveraiUrl, setItemserveraiUrl] = useState('http://192.168.50.214:1234');
+  const [itemserveraiUrl, setItemserveraiUrl] = useState(ITEMSERVERAI_DEFAULT_URL);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
@@ -16,8 +20,14 @@ const APIConfig = () => {
     const savedOpenaiKey = localStorage.getItem('openaiKey') || '';
     const savedOpenrouterKey = localStorage.getItem('openrouterKey') || '';
     const savedItemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
-    const savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || 'http://192.168.50.214:1234';
-    
+    let savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || ITEMSERVERAI_DEFAULT_URL;
+    // Migrer fra gammel ItemServerAI-URL til ny
+    // Migrer fra gammel ItemServerAI-URL til ny
+    if (savedItemserveraiUrl === ITEMSERVERAI_OLD_URL || savedItemserveraiUrl.replace(/\/$/, '') === ITEMSERVERAI_OLD_URL) {
+      savedItemserveraiUrl = ITEMSERVERAI_DEFAULT_URL;
+      localStorage.setItem('itemserveraiUrl', ITEMSERVERAI_DEFAULT_URL);
+    }
+
     setApiProvider(savedProvider);
     setOpenaiKey(savedOpenaiKey);
     setOpenrouterKey(savedOpenrouterKey);
@@ -361,7 +371,7 @@ const APIConfig = () => {
                 type="text"
                 value={itemserveraiUrl}
                 onChange={(e) => setItemserveraiUrl(e.target.value)}
-                placeholder="http://192.168.50.214:1234"
+                placeholder="http://192.168.50.142:1234"
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -377,7 +387,7 @@ const APIConfig = () => {
                 fontSize: '0.9em', 
                 marginTop: 4 
               }}>
-                Network URL where LM Studio is running on your server (default: http://192.168.50.214:1234)
+                Network URL where LM Studio is running on your server (default: http://192.168.50.142:1234)
               </p>
             </div>
           )}

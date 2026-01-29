@@ -21,7 +21,7 @@ class APIConfigSaveRequest(BaseModel):
     openaiKey: str = ""
     openrouterKey: str = ""
     itemaiUrl: str = "http://localhost:1234"
-    itemserveraiUrl: str = "http://192.168.50.214:1234"
+    itemserveraiUrl: str = "http://192.168.50.142:1234"
 
 @router.post("/test-api")
 async def test_api_connection(request: APITestRequest):

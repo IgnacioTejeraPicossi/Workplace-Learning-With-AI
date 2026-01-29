@@ -94,7 +94,7 @@ def get_api_config_from_headers(request_headers=None):
         # Try to get configuration from headers
         api_provider = request_headers.get('x-api-provider', API_PROVIDER)
         itemai_url = request_headers.get('x-itemai-url', 'http://localhost:1234')
-        itemserverai_url = request_headers.get('x-itemserverai-url', 'http://192.168.50.214:1234')
+        itemserverai_url = request_headers.get('x-itemserverai-url', 'http://192.168.50.142:1234')
         # Normalize ItemServerAI URL: convert https to http for internal IPs
         if itemserverai_url.startswith('https://192.168.'):
             itemserverai_url = itemserverai_url.replace('https://', 'http://')
@@ -128,7 +128,7 @@ def get_api_config_from_headers(request_headers=None):
     return {
         'provider': API_PROVIDER,
         'itemai_url': 'http://localhost:1234',
-        'itemserverai_url': 'http://192.168.50.214:1234',
+        'itemserverai_url': 'http://192.168.50.142:1234',
         'openai_key': OPENAI_API_KEY,
         'openrouter_key': OPENROUTER_API_KEY
     }
@@ -250,7 +250,7 @@ def ask_ai_unified_sync(prompt=None, task_type=None, complexity="medium", max_to
         try:
             print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
             # Normalize URL: convert https to http for internal IPs
-            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.142:1234')
             if itemserverai_url.startswith('https://192.168.'):
                 itemserverai_url = itemserverai_url.replace('https://', 'http://')
                 print(f"   → Normalized URL from https to http: {itemserverai_url}")
@@ -414,7 +414,7 @@ async def ask_ai_unified(prompt=None, task_type=None, complexity="medium", max_t
         try:
             print("🔄 Trying ItemServerAI (LM Studio) [Primary Provider]...")
             # Normalize URL: convert https to http for internal IPs
-            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.142:1234')
             if itemserverai_url.startswith('https://192.168.'):
                 itemserverai_url = itemserverai_url.replace('https://', 'http://')
                 print(f"   → Normalized URL from https to http: {itemserverai_url}")
@@ -713,7 +713,7 @@ def ask_openai_stream(prompt=None, task_type=None, complexity="medium", max_toke
         try:
             print("🔄 Trying ItemServerAI (LM Studio) streaming...")
             # Normalize URL: convert https to http for internal IPs
-            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.214:1234')
+            itemserverai_url = config.get('itemserverai_url', 'http://192.168.50.142:1234')
             if itemserverai_url.startswith('https://192.168.'):
                 itemserverai_url = itemserverai_url.replace('https://', 'http://')
                 print(f"   → Normalized URL from https to http: {itemserverai_url}")
