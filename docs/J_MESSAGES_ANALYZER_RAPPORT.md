@@ -2,7 +2,7 @@
 
 **Dato:** Januar 2026  
 **Dokument:** 25-195.jml.docx  
-**Kontekst:** Bruk av «Analyze file» med Prompt Manager-prompt; resultatet viser hodet (metadata), innholdsfortegnelse (index) og resten av dokumentet. Opplevelsen av at det går veldig raskt og at AI kanskje ikke analyserer hele dokumentet.
+**Kontekst:** Bruk av «Analyze file» med Prompt Manager-prompt; resultatet viser hodet (metadata), innholdsfortegnelse (index) og resten av dokumentet. Opplevelsen av at det går veldig raskt og at AI kanskje ikke analyserer hele dokumentet, vi tok respons tiden ved LMStudio server med LLM model 'openai/gpt-oss-20b'.
 
 ---
 
