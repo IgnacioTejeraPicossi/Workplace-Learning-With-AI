@@ -430,6 +430,10 @@ const RunTest = () => {
           { name: 'PUT /api/j-messages/update/{doc_id} (uses created id)', endpoint: '/api/j-messages/update/test-jmessage-id', method: 'PUT', requiresAuth: false },
           { name: 'POST /api/j-messages/export-docx (uses MCP analyze result)', endpoint: '/api/j-messages/export-docx', method: 'POST', requiresAuth: false },
           { name: 'DELETE /api/j-messages/delete/{doc_id} (uses created id)', endpoint: '/api/j-messages/delete/test-jmessage-id', method: 'DELETE', requiresAuth: false },
+          // J-messages Pre-analyze
+          { name: 'GET /api/j-messages/pre-analyze/prompt', endpoint: '/api/j-messages/pre-analyze/prompt', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/j-messages/pre-analyze (multipart)', endpoint: '/api/j-messages/pre-analyze', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/j-messages/pre-analyze/export-docx', endpoint: '/api/j-messages/pre-analyze/export-docx', method: 'POST', requiresAuth: false },
           
           // J-messages Training - Retrospective Learning (Epic 3)
           { name: 'GET /api/j-messages/training', endpoint: '/api/j-messages/training', method: 'GET', requiresAuth: false },
@@ -506,6 +510,18 @@ const RunTest = () => {
             endpoint: api.endpoint,
             requiresAuth: api.requiresAuth,
             error: 'Multipart file upload is not executed in browser API tests. Use the UI upload or the MCP analyze endpoint (server-side download) to test analysis.'
+          });
+          continue;
+        }
+        if (api.endpoint === '/api/j-messages/pre-analyze') {
+          results.push({
+            name: api.name,
+            status: 'requires_setup',
+            time: '0ms',
+            statusCode: '⚠️ Requires Setup',
+            endpoint: api.endpoint,
+            requiresAuth: api.requiresAuth,
+            error: 'Multipart file upload is not executed in browser API tests. Use the J-messages Pre-Analyzer UI or MCP pre_analyze_j_melding to test.'
           });
           continue;
         }
@@ -721,6 +737,13 @@ const RunTest = () => {
                 raw_text: 'Test raw text',
                 summary: '',
                 summary_length: 'none'
+              };
+              break;
+            case '/api/j-messages/pre-analyze/export-docx':
+              testData = {
+                title: 'Test Pre-analyzed J-message',
+                body_html: '<h1>Kapittel 1</h1><p>Test paragraph.</p>',
+                raw_text: 'Kapittel 1\nTest paragraph.'
               };
               break;
             case '/auth/register':
@@ -1557,6 +1580,7 @@ const RunTest = () => {
               <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
               <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
               <li>J-messages Analyzer - Basic (list, save, analyze-note, export, update, delete)</li>
+              <li>J-messages Pre-analyze (pre-analyze/prompt, pre-analyze multipart, pre-analyze/export-docx)</li>
               <li>J-messages Training - Epic 3 (list, get, create, update, delete, import, stats, evaluate, evaluate-batch, get-evaluation, prompt-suggest)</li>
               <li>J-messages MCP (manifest, analyze)</li>
               <li>Map of Knowledge (search input, counter, web search panel)</li>

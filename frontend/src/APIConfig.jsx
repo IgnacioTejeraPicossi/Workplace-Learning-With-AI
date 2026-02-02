@@ -22,7 +22,6 @@ const APIConfig = () => {
     const savedItemaiUrl = localStorage.getItem('itemaiUrl') || 'http://localhost:1234';
     let savedItemserveraiUrl = localStorage.getItem('itemserveraiUrl') || ITEMSERVERAI_DEFAULT_URL;
     // Migrer fra gammel ItemServerAI-URL til ny
-    // Migrer fra gammel ItemServerAI-URL til ny
     if (savedItemserveraiUrl === ITEMSERVERAI_OLD_URL || savedItemserveraiUrl.replace(/\/$/, '') === ITEMSERVERAI_OLD_URL) {
       savedItemserveraiUrl = ITEMSERVERAI_DEFAULT_URL;
       localStorage.setItem('itemserveraiUrl', ITEMSERVERAI_DEFAULT_URL);
