@@ -86,8 +86,10 @@ class ImportBatch(BaseModel):
 try:
     from backend.db import database
     training_pairs_collection = database.get_collection("j_message_pairs")
+    j_messages_collection = database.get_collection("j_messages")
 except Exception:
     training_pairs_collection = None
+    j_messages_collection = None
 
 # Helper functions
 def serialize_doc(doc: Dict[str, Any]) -> Dict[str, Any]:
@@ -515,10 +517,15 @@ async def get_training_stats():
 # ============================================================================
 
 @router.post("/{pair_id}/evaluate")
-async def evaluate_training_pair(pair_id: str, request: Request):
+async def evaluate_training_pair(
+    pair_id: str,
+    request: Request,
+    body: Optional[Dict[str, Any]] = Body(None, description="Optional: complexity (low/medium/high), temperature (0.0-2.0) to match Analyze file")
+):
     """
     Run AI evaluation on a specific training pair
-    Compares AI analysis with human-analyzed version
+    Compares AI analysis with human-analyzed version.
+    Pass complexity and temperature in body to use same model params as J-messages Analyzer.
     """
     if training_pairs_collection is None:
         raise HTTPException(status_code=500, detail="Database not available")
@@ -539,9 +546,39 @@ async def evaluate_training_pair(pair_id: str, request: Request):
         # x-api-provider, x-itemserverai-url, x-openai-key, etc. are used by the LLM
         api_config = {k.lower(): v for k, v in request.headers.items()} if request else {}
         
+        # If pair has only body (no header), try to get full document from library so Evaluate = Analyze file
+        marker = "Forskriften lyder etter dette"
+        original = pair_doc.get("original") or {}
+        text_excerpt = (original.get("text_excerpt") or "").strip()
+        if pair_doc.get("j_id") and j_messages_collection is not None and marker not in text_excerpt and text_excerpt:
+            try:
+                lib_doc = await j_messages_collection.find_one({"j_id": pair_doc["j_id"]})
+                if lib_doc and lib_doc.get("header_text"):
+                    full_text = (lib_doc.get("header_text") or "").strip()
+                    raw = (lib_doc.get("raw_text") or "").strip()
+                    if full_text or raw:
+                        full_text = f"{full_text}\n\n{raw}".strip() if raw else full_text
+                        pair_doc = dict(pair_doc)
+                        pair_doc["original"] = {**(pair_doc.get("original") or {}), "text_excerpt": full_text}
+                        logger.info(f"Using full document from library for {pair_doc.get('j_id')} (header+body)")
+            except Exception as e:
+                logger.warning(f"Could not fetch full doc from library for evaluate: {e}")
+        
+        # Same model params as Analyze file (complexity, temperature from body)
+        opts = body or {}
+        complexity = opts.get("complexity") if isinstance(opts.get("complexity"), str) else None
+        temperature = opts.get("temperature")
+        if temperature is not None and not isinstance(temperature, (int, float)):
+            try:
+                temperature = float(temperature)
+            except (TypeError, ValueError):
+                temperature = None
+        
         # Run evaluation
         evaluator = get_evaluator()
-        evaluation_result = await evaluator.run_evaluation(pair_doc, api_config)
+        evaluation_result = await evaluator.run_evaluation(
+            pair_doc, api_config, complexity=complexity, temperature=temperature
+        )
         
         if not evaluation_result.get('success'):
             raise HTTPException(status_code=500, detail=evaluation_result.get('error', 'Evaluation failed'))
@@ -583,7 +620,9 @@ async def evaluate_training_pair(pair_id: str, request: Request):
 async def evaluate_multiple_pairs(
     request: Request,
     pair_ids: List[str] = Body(..., description="List of pair IDs to evaluate"),
-    limit: int = Body(10, description="Maximum number of pairs to evaluate")
+    limit: int = Body(10, description="Maximum number of pairs to evaluate"),
+    complexity: Optional[str] = Body(None, description="AI complexity (low/medium/high), same as Analyze file"),
+    temperature: Optional[float] = Body(None, description="Sampling temperature (0.0-2.0), same as Analyze file")
 ):
     """
     Run evaluation on multiple training pairs
@@ -624,8 +663,10 @@ async def evaluate_multiple_pairs(
                     })
                     continue
                 
-                # Run evaluation
-                eval_result = await evaluator.run_evaluation(pair_doc, api_config)
+                # Run evaluation (same complexity/temperature as Analyze file)
+                eval_result = await evaluator.run_evaluation(
+                    pair_doc, api_config, complexity=complexity, temperature=temperature
+                )
                 
                 if eval_result.get('success'):
                     # Update pair

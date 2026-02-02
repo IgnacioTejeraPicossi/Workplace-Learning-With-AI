@@ -75,9 +75,18 @@ export default function JMessagesPairsLibrary() {
       setEvaluating(prev => ({ ...prev, [pairId]: true }));
       setError('');
       
+      // Same model params as J-messages Analyzer (complexity, temperature from localStorage)
+      const complexity = localStorage.getItem('jMessagesAiComplexity') || 'low';
+      const tempSaved = localStorage.getItem('jMessagesTemperature');
+      const temperature = tempSaved != null && Number.isFinite(Number(tempSaved)) ? Number(tempSaved) : undefined;
+      const body = {};
+      if (complexity) body.complexity = complexity;
+      if (temperature !== undefined) body.temperature = temperature;
+      
       const resp = await fetchWithAuth(`/api/j-messages/training/${pairId}/evaluate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: Object.keys(body).length ? JSON.stringify(body) : undefined
       });
       
       const data = await resp.json();
@@ -239,8 +248,11 @@ export default function JMessagesPairsLibrary() {
             toc: item.toc,
             body_html: item.body_html
           },
+          // Full document text (header + body) so Evaluate uses same input as Analyze file
           original: {
-            text_excerpt: item.raw_text
+            text_excerpt: item.header_text
+              ? `${item.header_text}\n\n${item.raw_text || ''}`.trim()
+              : (item.raw_text || '')
           }
         }));
         setPairs(pairsData);

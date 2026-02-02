@@ -537,13 +537,20 @@ Document text:
 JSON:"""
 
 
-def analyze_text_content(text_content: str, request_headers: Dict[str, str] = None) -> Dict[str, Any]:
+def analyze_text_content(
+    text_content: str,
+    request_headers: Dict[str, str] = None,
+    complexity: str = None,
+    temperature: float = None
+) -> Dict[str, Any]:
     """
     Helper function to analyze J-melding text content directly (for evaluator use).
     
     Args:
         text_content: Full text of the J-melding document
         request_headers: Optional dict of request headers for API config
+        complexity: Optional AI complexity (low/medium/high); default "low"
+        temperature: Optional sampling temperature (0.0-2.0); default None
     
     Returns:
         Dict with metadata, toc, body_html, and raw_text
@@ -576,14 +583,17 @@ def analyze_text_content(text_content: str, request_headers: Dict[str, str] = No
     # Extract metadata using LLM if available
     if ask_ai_unified_sync:
         try:
+            complexity_level = complexity if complexity in ("low", "medium", "high") else "low"
+            temperature_value = temperature if temperature is None or (isinstance(temperature, (int, float)) and 0.0 <= float(temperature) <= 2.0) else None
             prompt = build_metadata_prompt(header_text, body_text)
             response = ask_ai_unified_sync(
                 prompt=prompt + "\nGi svaret som STRICT JSON.",
                 task_type="extraction",
-                complexity="low",
+                complexity=complexity_level,
                 max_tokens=600,
                 messages=None,
-                request_headers=request_headers or {}
+                request_headers=request_headers or {},
+                temperature=temperature_value
             )
             
             # Parse JSON from response
@@ -1020,6 +1030,8 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
     if j_messages_collection is None:
         raise HTTPException(status_code=500, detail="MongoDB not configured")
     try:
+        # header_text is needed so Evaluate (pairs Library) can run on full document = header + body
+        header_text = (data.get("debug") or {}).get("header_text") or ""
         doc: Dict[str, Any] = {
             "title": data.get("title"),
             "j_id": data.get("id"),
@@ -1035,6 +1047,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "summary": data.get("summary") or "",
             "summary_length": data.get("summary_length"),
             "raw_text": data.get("raw_text") or "",
+            "header_text": header_text,
             "filename": data.get("filename") or "",
             "prompt_version": data.get("prompt_version"),  # Store prompt version for audit
             "created_at": datetime.utcnow(),

@@ -23,13 +23,21 @@ class JMessagesEvaluator:
         """
         self.analyzer = analyzer_service
     
-    async def run_evaluation(self, training_pair: Dict[str, Any], api_config: Dict[str, str]) -> Dict[str, Any]:
+    async def run_evaluation(
+        self,
+        training_pair: Dict[str, Any],
+        api_config: Dict[str, str],
+        complexity: Optional[str] = None,
+        temperature: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Run AI analysis on original document and compare with human analysis
         
         Args:
             training_pair: The training pair with original and human_structured
             api_config: API configuration (keys for OpenAI, etc.)
+            complexity: Optional AI complexity (low/medium/high); same as Analyze file
+            temperature: Optional sampling temperature (0.0-2.0); same as Analyze file
         
         Returns:
             Evaluation results with AI output and comparison metrics
@@ -45,8 +53,8 @@ class JMessagesEvaluator:
             
             logger.info(f"Extracted {len(original_text)} characters from original")
             
-            # 2. Run AI analysis (using existing analyzer)
-            ai_result = await self._run_ai_analysis(original_text, api_config)
+            # 2. Run AI analysis (using existing analyzer, same params as Analyze file)
+            ai_result = await self._run_ai_analysis(original_text, api_config, complexity=complexity, temperature=temperature)
             
             # 3. Compare AI vs Human
             comparison = self._compare_results(
@@ -88,7 +96,13 @@ class JMessagesEvaluator:
         # For now, we only support text_excerpt
         return None
     
-    async def _run_ai_analysis(self, original_text: str, api_config: Dict[str, str]) -> Dict[str, Any]:
+    async def _run_ai_analysis(
+        self,
+        original_text: str,
+        api_config: Dict[str, str],
+        complexity: Optional[str] = None,
+        temperature: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Run AI analysis on original text using the existing J-messages analyzer
         """
@@ -101,10 +115,12 @@ class JMessagesEvaluator:
             
             logger.info(f"Running AI analysis on {len(original_text)} characters of text")
             
-            # Call analyzer with original text
+            # Call analyzer with original text (same complexity/temperature as Analyze file)
             result = analyze_text_content(
                 text_content=original_text,
-                request_headers=api_config
+                request_headers=api_config,
+                complexity=complexity,
+                temperature=temperature
             )
             
             logger.info(f"AI analysis complete: extracted j_id={result.get('metadata', {}).get('j_id')}")
