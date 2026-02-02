@@ -535,9 +535,9 @@ async def evaluate_training_pair(pair_id: str, request: Request):
         if not pair_doc:
             raise HTTPException(status_code=404, detail="Training pair not found")
         
-        # Get API config from request or environment
-        api_config = {}
-        # TODO: Extract API keys from request headers or config file
+        # Use same API config as frontend (Analyze file): pass request headers so
+        # x-api-provider, x-itemserverai-url, x-openai-key, etc. are used by the LLM
+        api_config = {k.lower(): v for k, v in request.headers.items()} if request else {}
         
         # Run evaluation
         evaluator = get_evaluator()
@@ -609,7 +609,7 @@ async def evaluate_multiple_pairs(
         }
         
         evaluator = get_evaluator()
-        api_config = {}  # TODO: Get from config
+        api_config = {k.lower(): v for k, v in request.headers.items()} if request else {}
         
         for pair_id in pair_ids:
             try:
