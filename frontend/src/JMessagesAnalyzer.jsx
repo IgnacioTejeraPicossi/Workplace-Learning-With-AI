@@ -274,7 +274,7 @@ export default function JMessagesAnalyzer() {
             cursor: 'pointer',
             marginBottom: 12
           }}
-          title="Drag & drop .docx, .pdf, .json or .html here or click to browse"
+          title="Drag & drop .docx here or click to browse"
         >
           <div style={{ fontSize: 36, marginBottom: 8 }}>📁</div>
           <div style={{ fontWeight: 600, color: colors.text }}>
@@ -292,7 +292,7 @@ export default function JMessagesAnalyzer() {
         <input
           id="jmsg-file-input"
           type="file"
-          accept=".docx,.pdf,.json"
+          accept=".docx,.pdf,.json,.html,.htm"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />

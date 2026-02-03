@@ -759,15 +759,21 @@ Tekst:
     try:
         if ask_ai_unified_sync:
             # Use custom prompt from Prompt Manager "Test" when provided; otherwise versioned/metadata template
+            plain_text_prompt = False
             if metadata_prompt_override and (o := metadata_prompt_override.strip()):
                 body_lim = body_text[:4000]
                 if "{header_text}" in o or "{body_text}" in o:
                     prompt = o.replace("{body_text}", body_lim).replace("{header_text}", header_text)
                 else:
-                    prompt = o + '\n\nDocument text:\n"""' + header_text + '\n\n' + body_lim + '"""\n\nJSON:'
+                    prompt = o + '\n\nDocument text:\n"""' + header_text + '\n\n' + body_lim + '"""'
+                _lower = o.lower()
+                plain_text_prompt = any(
+                    x in _lower for x in ["uten json", "without json", "kun med", "ren tekst", "rensede teksten", "uten markdown", "no json", "plain text only"]
+                )
+                if not plain_text_prompt:
+                    prompt += "\n\nJSON:"
             else:
                 prompt = build_metadata_prompt(header_text, body_text)
-            # Ask model for STRICT JSON
             # Pass request headers to allow API config from frontend/MCP
             request_headers_dict = dict(request.headers) if request else {}
             
@@ -793,17 +799,33 @@ Tekst:
             # Validate temperature (optional)
             temperature_value = temperature if temperature is None or (0.0 <= float(temperature) <= 2.0) else None
             
+            if plain_text_prompt:
+                final_prompt = prompt
+                max_tokens_llm = 8000
+            else:
+                final_prompt = prompt + "\nGi svaret som STRICT JSON."
+                max_tokens_llm = 600
             response = ask_ai_unified_sync(
-                prompt=prompt + "\nGi svaret som STRICT JSON.",
+                prompt=final_prompt,
                 task_type="extraction",
                 complexity=complexity_level,
-                max_tokens=600,
+                max_tokens=max_tokens_llm,
                 messages=None,
                 request_headers=request_headers_dict,
                 temperature=temperature_value
             )
-            # Parse JSON using robust helper function
-            parsed = extract_json_from_llm_response(response)
+            if plain_text_prompt and response:
+                # User asked for plain text only: use LLM response as body, no JSON
+                body_text = (response or "").strip()
+                # Format plain text as HTML (paragraphs, escape entities)
+                import html
+                body_html = "\n".join(
+                    f"<p>{html.escape(ln)}</p>" for ln in body_text.split("\n") if ln.strip()
+                ) if body_text else ""
+                toc = []
+                parsed = None
+            else:
+                parsed = extract_json_from_llm_response(response)
             if parsed:
                 # Backward/alternate key support for replaced_by_id
                 if "replaced_by" in parsed and "replaced_by_id" not in parsed:
@@ -862,10 +884,11 @@ Tekst:
                 print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
                 print(f"[J-MESSAGES] Metadata values: id={parsed.get('j_id')}, title={parsed.get('title')[:50] if parsed.get('title') else None}, category={parsed.get('category')}, area={parsed.get('area')}")
             else:
-                print(f"[J-MESSAGES] ⚠️ Failed to extract JSON from LLM response")
-                # Leave defaults if parsing fails; front-end can still render
-            # Optional summary
-            if summary_length:
+                if not plain_text_prompt:
+                    print(f"[J-MESSAGES] ⚠️ Failed to extract JSON from LLM response")
+                # Leave defaults if parsing fails; front-end can still render (or plain-text result already set)
+            # Optional summary (skip when Test returned plain text only)
+            if summary_length and not plain_text_prompt:
                 sum_prompt = f"""
 Lag en {summary_length} oppsummering av forskriften nedenfor. 
 Returner ren tekst, uten markers eller Markdown.
