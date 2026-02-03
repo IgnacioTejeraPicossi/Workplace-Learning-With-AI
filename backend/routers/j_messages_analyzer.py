@@ -721,8 +721,16 @@ Tekst:
         elif filename_lower.endswith(".pdf"):
             full_text = read_pdf_text(file_bytes)
             paragraphs = [ln for ln in full_text.split("\n") if ln.strip()]
+        elif filename_lower.endswith(".html") or filename_lower.endswith(".htm"):
+            html_str = file_bytes.decode("utf-8", errors="replace")
+            for tag in ("</p>", "</div>", "</tr>", "</li>", "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>", "<br>", "<br/>", "<br />"):
+                html_str = html_str.replace(tag, "\n")
+            full_text = re.sub(r"<[^>]+>", " ", html_str)
+            full_text = re.sub(r"[ \t]+", " ", full_text)
+            full_text = re.sub(r"\n\s*\n", "\n", full_text).strip()
+            paragraphs = [ln.strip() for ln in full_text.split("\n") if ln.strip()]
         else:
-            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf or .json")
+            raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf, .json or .html")
     except HTTPException:
         raise
     except json.JSONDecodeError as e:
@@ -1689,7 +1697,7 @@ async def pre_analyze_j_message(
         filename_lower = (file.filename or "").lower()
         print(f"[J-MESSAGES PRE-ANALYZE] ✅ File read successfully, size: {len(file_bytes)} bytes")
 
-        # Read input (DOCX, PDF or JSON)
+        # Read input (DOCX, PDF, JSON or HTML)
         try:
             if filename_lower.endswith(".docx"):
                 paragraphs = read_docx_paragraphs(file_bytes)
@@ -1702,8 +1710,17 @@ async def pre_analyze_j_message(
                 full_text = _extract_text_from_json(data).strip()
                 if not full_text:
                     raise HTTPException(status_code=400, detail="JSON must contain 'raw_text', 'body' or Enonic 'data.blocks.text.text'")
+            elif filename_lower.endswith(".html") or filename_lower.endswith(".htm"):
+                html_str = file_bytes.decode("utf-8", errors="replace")
+                # Insert newlines after block elements to preserve structure
+                for tag in ("</p>", "</div>", "</tr>", "</li>", "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>", "<br>", "<br/>", "<br />"):
+                    html_str = html_str.replace(tag, "\n")
+                full_text = re.sub(r"<[^>]+>", " ", html_str)
+                full_text = re.sub(r"[ \t]+", " ", full_text)
+                full_text = re.sub(r"\n\s*\n", "\n", full_text).strip()
+                paragraphs = [ln.strip() for ln in full_text.split("\n") if ln.strip()]
             else:
-                raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf or .json")
+                raise HTTPException(status_code=400, detail="Unsupported file type. Use .docx, .pdf, .json or .html")
         except HTTPException:
             raise
         except json.JSONDecodeError as e:

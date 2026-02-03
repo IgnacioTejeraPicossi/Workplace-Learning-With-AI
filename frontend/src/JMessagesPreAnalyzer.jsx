@@ -156,7 +156,7 @@ export default function JMessagesPreAnalyzer() {
     if (files.length > 0) {
       const f = files[0];
       const name = (f?.name || '').toLowerCase();
-      if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json'))) setFile(f);
+      if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json') || name.endsWith('.html') || name.endsWith('.htm'))) setFile(f);
       else setError(t('jMessages.preAnalyzer.pleaseDropFile'));
     }
   };
@@ -344,7 +344,7 @@ export default function JMessagesPreAnalyzer() {
         <input
           id="jmsg-pre-file-input"
           type="file"
-          accept=".docx,.pdf,.json"
+          accept=".docx,.pdf,.json,.html,.htm"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           style={{ display: 'none' }}
         />

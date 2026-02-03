@@ -213,7 +213,7 @@ export default function JMessagesAnalyzer() {
     if (files.length > 0) {
       const f = files[0];
       const name = (f?.name || '').toLowerCase();
-      if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json'))) setFile(f);
+      if (f && (name.endsWith('.docx') || name.endsWith('.pdf') || name.endsWith('.json') || name.endsWith('.html') || name.endsWith('.htm'))) setFile(f);
       else setError(t('jMessages.analyzer.pleaseDropFile'));
     }
   };
@@ -274,7 +274,7 @@ export default function JMessagesAnalyzer() {
             cursor: 'pointer',
             marginBottom: 12
           }}
-          title="Drag & drop .docx here or click to browse"
+          title="Drag & drop .docx, .pdf, .json or .html here or click to browse"
         >
           <div style={{ fontSize: 36, marginBottom: 8 }}>📁</div>
           <div style={{ fontWeight: 600, color: colors.text }}>
