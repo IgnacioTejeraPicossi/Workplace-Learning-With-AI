@@ -15,7 +15,7 @@ A specialized module for analyzing Norwegian J‑meldinger (regulations) from Fi
   - **Versioned Native Prompts**: File-based versioning system (`backend/prompts/j_messages/v{version}/`) with version display in UI
   - **Audit Trail**: Each analysis stores the prompt version used
 - **Library Management**: Search, filter, and export analyzed documents (Markdown, PDF, DOCX)
-- **MongoDB Integration**: Persistent storage with full CRUD operations
+- **MongoDB Integration**: Persistent storage with full CRUD operations and more
 
 **Status**: ✅ Production Ready | **Project**: Fiskeridirektoratet
 
