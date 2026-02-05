@@ -307,6 +307,37 @@
     "showLess": "Vis færre",
     "showAll": "Vis alle ({{count}} flere)"
   },
+  "agentopsStudio": {
+    "title": "AgentOps Studio",
+    "subtitle": "Felles AI-arbeidsflytlab – design, simuler og kjør intelligente programvarearbeidsflyter",
+    "tabs": {
+      "agentCatalog": "Agentkatalog",
+      "overview": "Oversikt",
+      "promptLab": "Prompt-lab",
+      "playbook": "Spillbok",
+      "flowCatalog": "Flytkatalog",
+      "runs": "Kjøringer",
+      "settings": "Innstillinger"
+    },
+    "agentCatalog": {
+      "heading": "Agentkatalog",
+      "description": "Gjenbrukbare agenter med MCP-endepunkter og evner for Internet of Agents",
+      "loading": "Laster agentkatalog …",
+      "retry": "Prøv igjen",
+      "totalAgents": "Totalt antall agenter",
+      "mcpEnabled": "MCP aktivert",
+      "uniqueCapabilities": "Unike evner",
+      "capabilities": "Evner",
+      "mcpTools": "MCP-verktøy",
+      "policy": "Policy",
+      "copyMCP": "Kopier MCP",
+      "copiedToClipboard": "{{label}} er kopiert til utklippstavlen.",
+      "copyFailed": "Kunne ikke kopiere til utklippstavlen",
+      "noAgentsFound": "Ingen agenter funnet i katalogen",
+      "error": "Feil",
+      "loadErrorDefault": "Kunne ikke laste agentkatalog"
+    }
+  },
   "components": {
     "dispatch": {
       "send": "Send",

@@ -1,5 +1,6 @@
 // AgentOps Studio - Main Component
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Overview from './Overview';
 import PromptLab from './PromptLab';
 import Playbook from './Playbook';
@@ -9,16 +10,17 @@ import Settings from './Settings';
 import AgentCatalog from '../components/AgentCatalog';
 
 export default function AgentOpsStudio() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('agent-catalog');
 
   const tabs = [
-    { id: 'agent-catalog', label: 'Agent Catalog', icon: '📚' },
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'prompt-lab', label: 'Prompt Lab', icon: '🧪' },
-    { id: 'playbook', label: 'Playbook', icon: '📋' },
-    { id: 'flows', label: 'Flow Catalog', icon: '🔄' },
-    { id: 'runs', label: 'Runs', icon: '🏃' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { id: 'agent-catalog', labelKey: 'agentCatalog', icon: '📚' },
+    { id: 'overview', labelKey: 'overview', icon: '📊' },
+    { id: 'prompt-lab', labelKey: 'promptLab', icon: '🧪' },
+    { id: 'playbook', labelKey: 'playbook', icon: '📋' },
+    { id: 'flows', labelKey: 'flowCatalog', icon: '🔄' },
+    { id: 'runs', labelKey: 'runs', icon: '🏃' },
+    { id: 'settings', labelKey: 'settings', icon: '⚙️' }
   ];
 
   const renderContent = () => {
@@ -63,14 +65,14 @@ export default function AgentOpsStudio() {
           alignItems: 'center',
           gap: '0.75rem'
         }}>
-          🤖 AgentOps Studio
+          🤖 {t('agentopsStudio.title')}
         </h1>
         <p style={{
           margin: '0.5rem 0 0 0',
           fontSize: '1.1rem',
           color: '#94a3b8'
         }}>
-          Unified AI Workflow Lab - Design, simulate, and execute intelligent software workflows
+          {t('agentopsStudio.subtitle')}
         </p>
       </div>
 
@@ -105,7 +107,7 @@ export default function AgentOpsStudio() {
               }}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              {t(`agentopsStudio.tabs.${tab.labelKey}`)}
             </button>
           ))}
         </div>

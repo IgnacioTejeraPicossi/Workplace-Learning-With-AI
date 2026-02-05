@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function AgentCatalog() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +25,7 @@ export default function AgentCatalog() {
       setItems(data.items || []);
     } catch (err) {
       console.error('Error loading agent catalog:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load agent catalog');
+      setError(err instanceof Error ? err.message : t('agentopsStudio.agentCatalog.loadErrorDefault'));
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function AgentCatalog() {
         color: '#6b7280'
       }}>
         <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
-        <p>Loading Agent Catalog...</p>
+        <p>{t('agentopsStudio.agentCatalog.loading')}</p>
       </div>
     );
   }
@@ -108,14 +110,14 @@ export default function AgentCatalog() {
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          📚 Agent Catalog
+          📚 {t('agentopsStudio.agentCatalog.heading')}
         </h1>
         <p style={{
           color: '#6b7280',
           fontSize: '1rem',
           margin: 0
         }}>
-          Reusable agents with MCP endpoints and capabilities for the Internet of Agents
+          {t('agentopsStudio.agentCatalog.description')}
         </p>
       </div>
 
@@ -148,7 +150,7 @@ export default function AgentCatalog() {
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
             {items.filter(a => a.mcp?.endpoint).length}
           </div>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>MCP Enabled</div>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{t('agentopsStudio.agentCatalog.mcpEnabled')}</div>
         </div>
         <div style={{
           backgroundColor: 'white',
@@ -160,7 +162,7 @@ export default function AgentCatalog() {
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
             {new Set(items.flatMap(a => a.capabilities || [])).size}
           </div>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Unique Capabilities</div>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{t('agentopsStudio.agentCatalog.uniqueCapabilities')}</div>
         </div>
       </div>
 
@@ -291,7 +293,7 @@ export default function AgentCatalog() {
                   color: '#374151',
                   marginBottom: '0.5rem'
                 }}>
-                  MCP Tools
+                  {t('agentopsStudio.agentCatalog.mcpTools')}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
                   {agent.mcp.tools.map((tool, index) => (
@@ -316,7 +318,7 @@ export default function AgentCatalog() {
                 color: '#6b7280'
               }}>
                 <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: '#374151' }}>
-                  Policy
+                  {t('agentopsStudio.agentCatalog.policy')}
                 </div>
                 {agent.policy.allowed_jira_projects && (
                   <div>Jira: {agent.policy.allowed_jira_projects.join(', ')}</div>
@@ -338,7 +340,7 @@ export default function AgentCatalog() {
           color: '#6b7280'
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
-          <p>No agents found in the catalog</p>
+          <p>{t('agentopsStudio.agentCatalog.noAgentsFound')}</p>
         </div>
       )}
     </div>

@@ -156,6 +156,37 @@
     "showAll": "Show all ({{count}} more)"
   },
 
+  "agentopsStudio": {
+    "title": "AgentOps Studio",
+    "subtitle": "Unified AI Workflow Lab - Design, simulate, and execute intelligent software workflows",
+    "tabs": {
+      "agentCatalog": "Agent Catalog",
+      "overview": "Overview",
+      "promptLab": "Prompt Lab",
+      "playbook": "Playbook",
+      "flowCatalog": "Flow Catalog",
+      "runs": "Runs",
+      "settings": "Settings"
+    },
+    "agentCatalog": {
+      "heading": "Agent Catalog",
+      "description": "Reusable agents with MCP endpoints and capabilities for the Internet of Agents",
+      "loading": "Loading Agent Catalog...",
+      "retry": "Retry",
+      "totalAgents": "Total Agents",
+      "mcpEnabled": "MCP Enabled",
+      "uniqueCapabilities": "Unique Capabilities",
+      "capabilities": "Capabilities",
+      "mcpTools": "MCP Tools",
+      "policy": "Policy",
+      "copyMCP": "Copy MCP",
+      "copiedToClipboard": "Copied {{label}} to clipboard!",
+      "copyFailed": "Failed to copy to clipboard",
+      "noAgentsFound": "No agents found in the catalog",
+      "error": "Error",
+      "loadErrorDefault": "Failed to load agent catalog"
+    }
+  },
 
   "actions": {
     "refreshData": "Refresh Data",
