@@ -1,7 +1,9 @@
 // Robomind Clinic Settings Component
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ClinicSettings() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({
     enabled: false,
     samplingRate: 25,
@@ -52,9 +54,9 @@ export default function ClinicSettings() {
       });
       
       if (response.ok) {
-        alert('Settings saved successfully!');
+        alert(t('robomindClinic.settings.savedSuccess'));
       } else {
-        throw new Error('Failed to save settings');
+        throw new Error(t('robomindClinic.settings.saveFailed'));
       }
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -115,7 +117,7 @@ export default function ClinicSettings() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
       <h2 style={{ color: '#1f2937', marginBottom: '30px' }}>
-        🧠 Robomind Clinic Settings
+        🧠 {t('robomindClinic.settings.title')}
       </h2>
 
       {/* Global Toggle */}
@@ -140,10 +142,10 @@ export default function ClinicSettings() {
             onChange={(e) => setSettings(prev => ({ ...prev, enabled: e.target.checked }))}
             style={{ transform: 'scale(1.2)' }}
           />
-          Route all AI through Robomind Clinic
+          {t('robomindClinic.settings.routeAllAi')}
         </label>
         <p style={{ marginTop: '10px', color: '#6b7280', fontSize: '14px' }}>
-          When enabled, all AI interactions will be monitored and analyzed for pathological patterns.
+          {t('robomindClinic.settings.whenEnabled')}
         </p>
       </div>
 
@@ -152,7 +154,7 @@ export default function ClinicSettings() {
           {/* Sampling Rate */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-              Sampling Rate: {settings.samplingRate}%
+              {t('robomindClinic.settings.samplingRate')} {settings.samplingRate}%
             </label>
             <input
               type="range"
@@ -163,7 +165,7 @@ export default function ClinicSettings() {
               style={{ width: '100%' }}
             />
             <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-              Percentage of AI interactions to fully diagnose
+              {t('robomindClinic.settings.samplingRateHint')}
             </p>
           </div>
 
@@ -176,7 +178,7 @@ export default function ClinicSettings() {
           }}>
             <div>
               <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                Block Threshold: {settings.thresholdBlock}%
+                {t('robomindClinic.settings.blockThreshold')} {settings.thresholdBlock}%
               </label>
               <input
                 type="range"
@@ -187,13 +189,13 @@ export default function ClinicSettings() {
                 style={{ width: '100%' }}
               />
               <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                Block interactions above this risk level
+                {t('robomindClinic.settings.blockThresholdHint')}
               </p>
             </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-                Review Threshold: {settings.thresholdReview}%
+                {t('robomindClinic.settings.reviewThreshold')} {settings.thresholdReview}%
               </label>
               <input
                 type="range"
@@ -204,7 +206,7 @@ export default function ClinicSettings() {
                 style={{ width: '100%' }}
               />
               <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                Require review above this risk level
+                {t('robomindClinic.settings.reviewThresholdHint')}
               </p>
             </div>
           </div>
@@ -222,13 +224,13 @@ export default function ClinicSettings() {
                 checked={settings.autoApplyTherapies}
                 onChange={(e) => setSettings(prev => ({ ...prev, autoApplyTherapies: e.target.checked }))}
               />
-              Auto-apply recommended therapies
+              {t('robomindClinic.settings.autoApplyTherapies')}
             </label>
           </div>
 
           {/* Enabled Disorders */}
           <div style={{ marginBottom: '30px' }}>
-            <h3 style={{ marginBottom: '15px', color: '#1f2937' }}>Enabled Disorders:</h3>
+            <h3 style={{ marginBottom: '15px', color: '#1f2937' }}>{t('robomindClinic.settings.enabledDisorders')}</h3>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
@@ -282,7 +284,7 @@ export default function ClinicSettings() {
                 fontWeight: 'bold'
               }}
             >
-              {testing ? 'Testing...' : 'Test Configuration'}
+              {testing ? t('robomindClinic.settings.testing') : t('robomindClinic.settings.testConfiguration')}
             </button>
 
             <button
@@ -297,7 +299,7 @@ export default function ClinicSettings() {
                 fontWeight: 'bold'
               }}
             >
-              Save Settings
+              {t('robomindClinic.settings.saveSettings')}
             </button>
           </div>
 
@@ -314,15 +316,15 @@ export default function ClinicSettings() {
                 marginBottom: '15px', 
                 color: testResult.error ? '#dc2626' : '#16a34a'
               }}>
-                {testResult.error ? 'Test Failed' : 'Test Results'}
+                {testResult.error ? t('robomindClinic.settings.testFailed') : t('robomindClinic.settings.testResults')}
               </h3>
               
               {testResult.error ? (
                 <p style={{ color: '#dc2626' }}>{testResult.error}</p>
               ) : (
                 <div>
-                  <p><strong>Overall Risk:</strong> {testResult.overall_risk}</p>
-                  <p><strong>Findings:</strong> {testResult.findings?.length || 0}</p>
+                  <p><strong>{t('robomindClinic.settings.overallRisk')}</strong> {testResult.overall_risk}</p>
+                  <p><strong>{t('robomindClinic.settings.findings')}</strong> {testResult.findings?.length || 0}</p>
                   {testResult.findings?.map((finding, index) => (
                     <div key={index} style={{ 
                       marginTop: '10px',

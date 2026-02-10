@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../ThemeContext';
 
 const PsychopathiaDiagram = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const disorders = {
@@ -122,7 +124,7 @@ const PsychopathiaDiagram = () => {
         color: colors.primary,
         fontSize: '1.2rem'
       }}>
-        🧠 Psychopathia Machinalis Framework
+        🧠 {t('robomindClinic.framework.title')}
       </h5>
       
       <div style={{ 
@@ -196,7 +198,7 @@ const PsychopathiaDiagram = () => {
           fontSize: '0.9rem',
           color: '#333'
         }}>
-          Systemic Risk Level Legend:
+          {t('robomindClinic.framework.legend')}
         </h6>
         <div style={{ 
           display: 'flex', 
@@ -212,7 +214,7 @@ const PsychopathiaDiagram = () => {
               backgroundColor: '#4caf50',
               marginRight: '0.25rem'
             }} />
-            <span>Low</span>
+            <span>{t('robomindClinic.framework.low')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
@@ -222,7 +224,7 @@ const PsychopathiaDiagram = () => {
               backgroundColor: '#8bc34a',
               marginRight: '0.25rem'
             }} />
-            <span>Moderate</span>
+            <span>{t('robomindClinic.framework.moderate')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
@@ -232,7 +234,7 @@ const PsychopathiaDiagram = () => {
               backgroundColor: '#ff9800',
               marginRight: '0.25rem'
             }} />
-            <span>High</span>
+            <span>{t('robomindClinic.framework.high')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
@@ -242,7 +244,7 @@ const PsychopathiaDiagram = () => {
               backgroundColor: '#f44336',
               marginRight: '0.25rem'
             }} />
-            <span>Critical</span>
+            <span>{t('robomindClinic.framework.critical')}</span>
           </div>
         </div>
       </div>
@@ -256,7 +258,7 @@ const PsychopathiaDiagram = () => {
         fontSize: '0.8rem',
         color: '#1565c0'
       }}>
-        <strong>📚 Reference:</strong> "Psychopathia Machinalis: A Nosological Framework for Understanding Pathologies in Advanced Artificial Intelligence" 
+        <strong>📚 Reference:</strong> "{t('robomindClinic.framework.reference')}" 
         by Nell Watson and Ali Hessami (Electronics 2025, 14(16), 3162)
       </div>
     </div>

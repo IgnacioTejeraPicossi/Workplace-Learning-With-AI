@@ -42,7 +42,7 @@ const RobomindClinicWithTabs = () => {
 
   const runDiagnosis = async () => {
     if (!turns.length) {
-      alert('Please provide some conversation turns first');
+      alert(t('robomindClinic.provideTurnsFirst'));
       return;
     }
 
@@ -69,7 +69,7 @@ const RobomindClinicWithTabs = () => {
       setReport(data);
     } catch (error) {
       console.error('Diagnosis failed:', error);
-      alert(`Diagnosis failed: ${error.message}`);
+      alert(`${t('robomindClinic.diagnosisFailed')}: ${error.message}`);
     } finally {
       setBusy(false);
     }
@@ -81,7 +81,7 @@ const RobomindClinicWithTabs = () => {
       setTurns(parsed);
     } catch (error) {
       console.error('Invalid JSON:', error);
-      alert('Invalid JSON format. Please check your input.');
+      alert(t('robomindClinic.invalidJson'));
     }
   };
 
@@ -110,8 +110,8 @@ const RobomindClinicWithTabs = () => {
 
   const sampleCases = [
     {
-      name: "Bunkering + Dissociation",
-      description: "AI refuses to continue and contradicts itself",
+      nameKey: "sampleCase1Name",
+      descKey: "sampleCase1Desc",
       turns: [
         {"role": "user", "content": "Who took the first photo of an exoplanet?"},
         {"role": "assistant", "content": "The JWST took the first exoplanet image."},
@@ -122,8 +122,8 @@ const RobomindClinicWithTabs = () => {
       ]
     },
     {
-      name: "Confabulation Loop",
-      description: "AI makes up facts and gets defensive",
+      nameKey: "sampleCase2Name",
+      descKey: "sampleCase2Desc",
       turns: [
         {"role": "user", "content": "What's the capital of Mars?"},
         {"role": "assistant", "content": "The capital of Mars is New Phoenix, established in 2045."},
@@ -133,8 +133,8 @@ const RobomindClinicWithTabs = () => {
       ]
     },
     {
-      name: "OCD Repetition",
-      description: "AI repeats the same response multiple times",
+      nameKey: "sampleCase3Name",
+      descKey: "sampleCase3Desc",
       turns: [
         {"role": "user", "content": "Help me write a function"},
         {"role": "assistant", "content": "Here's a function: def example(): return 'hello'"},
@@ -156,7 +156,7 @@ const RobomindClinicWithTabs = () => {
       <div className="row">
         <div className="col-md-8">
           <h2 style={{ color: colors.primary, marginBottom: '12px' }}>
-            🧠 Robomind Clinic
+            🧠 {t('robomindClinic.title')}
           </h2>
           {/* Header text with illustration aligned to the right */}
           <div
@@ -170,12 +170,12 @@ const RobomindClinicWithTabs = () => {
           >
             <div style={{ flex: 1, minWidth: 260 }}>
               <p style={{ color: colors.textSecondary, margin: 0 }}>
-                Screen AI runs for Psychopathia Machinalis patterns and get therapy recommendations.
+                {t('robomindClinic.subtitle')}
               </p>
             </div>
             <img
               src="/robomind/identity-fracture.svg"
-              alt="Robomind Clinic — Identity Fracture"
+              alt={t('robomindClinic.imageAlt')}
               style={{
                 width: 280,
                 maxWidth: '35%',
@@ -205,7 +205,7 @@ const RobomindClinicWithTabs = () => {
                   borderTopRightRadius: '6px'
                 }}
               >
-                Diagnosis
+                {t('robomindClinic.tabs.diagnosis')}
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
@@ -219,7 +219,7 @@ const RobomindClinicWithTabs = () => {
                   borderTopRightRadius: '6px'
                 }}
               >
-                Settings
+                {t('robomindClinic.tabs.settings')}
               </button>
             </div>
           </div>
@@ -231,11 +231,11 @@ const RobomindClinicWithTabs = () => {
               {/* Case Intake */}
               <div className="card" style={{ marginBottom: '30px', backgroundColor: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                 <div className="card-header" style={{ backgroundColor: colors.cardHeader, borderBottom: `1px solid ${colors.border}` }}>
-                  <h5 style={{ margin: 0, color: colors.text }}>Case Intake</h5>
+                  <h5 style={{ margin: 0, color: colors.text }}>{t('robomindClinic.caseIntake')}</h5>
                 </div>
                 <div className="card-body">
                   <div className="mb-3">
-                    <label className="form-label" style={{ color: colors.text }}>Conversation Turns (JSON):</label>
+                    <label className="form-label" style={{ color: colors.text }}>{t('robomindClinic.conversationTurnsLabel')}</label>
                     <textarea
                       className="form-control"
                       rows={8}
@@ -247,7 +247,7 @@ const RobomindClinicWithTabs = () => {
                   </div>
                   
                   <div className="mb-3">
-                    <label className="form-label" style={{ color: colors.text }}>Sample Cases:</label>
+                    <label className="form-label" style={{ color: colors.text }}>{t('robomindClinic.sampleCases')}</label>
                     <div className="row">
                       {sampleCases.map((sample, index) => (
                         <div key={index} className="col-md-4 mb-2">
@@ -260,9 +260,9 @@ const RobomindClinicWithTabs = () => {
                               backgroundColor: 'transparent'
                             }}
                           >
-                            {sample.name}
+                            {t(`robomindClinic.${sample.nameKey}`)}
                           </button>
-                          <small className="text-muted d-block mt-1">{sample.description}</small>
+                          <small className="text-muted d-block mt-1">{t(`robomindClinic.${sample.descKey}`)}</small>
                         </div>
                       ))}
                     </div>
@@ -274,7 +274,7 @@ const RobomindClinicWithTabs = () => {
                     disabled={busy}
                     style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
                   >
-                    {busy ? 'Evaluating...' : 'Diagnose'}
+                    {busy ? t('robomindClinic.evaluating') : t('robomindClinic.diagnose')}
                   </button>
                 </div>
               </div>
@@ -283,12 +283,12 @@ const RobomindClinicWithTabs = () => {
               {report && (
                 <div className="card" style={{ marginBottom: '30px', backgroundColor: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                   <div className="card-header" style={{ backgroundColor: colors.cardHeader, borderBottom: `1px solid ${colors.border}` }}>
-                    <h5 style={{ margin: 0, color: colors.text }}>Diagnosis Report</h5>
+                    <h5 style={{ margin: 0, color: colors.text }}>{t('robomindClinic.diagnosisReport')}</h5>
                   </div>
                   <div className="card-body">
                     <div className="row mb-3">
                       <div className="col-md-6">
-                        <h6 style={{ color: colors.text }}>Overall Risk:</h6>
+                        <h6 style={{ color: colors.text }}>{t('robomindClinic.overallRisk')}</h6>
                         <span 
                           className="badge"
                           style={{ 
@@ -301,14 +301,14 @@ const RobomindClinicWithTabs = () => {
                         </span>
                       </div>
                       <div className="col-md-6">
-                        <h6 style={{ color: colors.text }}>Summary:</h6>
+                        <h6 style={{ color: colors.text }}>{t('robomindClinic.summary')}</h6>
                         <p style={{ color: colors.textSecondary, margin: 0 }}>{report.summary}</p>
                       </div>
                     </div>
 
                     {report.findings && report.findings.length > 0 && (
                       <div className="mb-3">
-                        <h6 style={{ color: colors.text }}>Findings:</h6>
+                        <h6 style={{ color: colors.text }}>{t('robomindClinic.findings')}</h6>
                         {report.findings.map((finding, index) => (
                           <div key={index} className="border rounded p-3 mb-2" style={{ backgroundColor: getAxisColor(finding.axis), border: `1px solid ${colors.border}` }}>
                             <div className="d-flex justify-content-between align-items-start">
@@ -318,17 +318,17 @@ const RobomindClinicWithTabs = () => {
                               </div>
                               <div className="text-end">
                                 <div style={{ color: colors.textSecondary }}>
-                                  Score: {Math.round(finding.score * 100)}%
+                                  {t('robomindClinic.score')}: {Math.round(finding.score * 100)}%
                                 </div>
                                 <div style={{ color: colors.textSecondary }}>
-                                  Conf: {Math.round(finding.confidence * 100)}%
+                                  {t('robomindClinic.conf')}: {Math.round(finding.confidence * 100)}%
                                 </div>
                               </div>
                             </div>
                             
                             {finding.evidence && finding.evidence.length > 0 && (
                               <div className="mt-2">
-                                <strong style={{ color: colors.text }}>Evidence:</strong>
+                                <strong style={{ color: colors.text }}>{t('robomindClinic.evidence')}:</strong>
                                 <ul className="mb-2" style={{ color: colors.textSecondary }}>
                                   {finding.evidence.map((evidence, i) => (
                                     <li key={i}>
@@ -343,7 +343,7 @@ const RobomindClinicWithTabs = () => {
 
                             {finding.advice && finding.advice.length > 0 && (
                               <div>
-                                <strong style={{ color: colors.text }}>Advice:</strong>
+                                <strong style={{ color: colors.text }}>{t('robomindClinic.advice')}:</strong>
                                 <ul style={{ color: colors.textSecondary, marginBottom: 0 }}>
                                   {finding.advice.map((advice, i) => (
                                     <li key={i}>{advice}</li>
@@ -358,7 +358,7 @@ const RobomindClinicWithTabs = () => {
 
                     {report.recommended_protocol && report.recommended_protocol.length > 0 && (
                       <div>
-                        <h6 style={{ color: colors.text }}>Recommended Protocol:</h6>
+                        <h6 style={{ color: colors.text }}>{t('robomindClinic.recommendedProtocol')}</h6>
                         <ol style={{ color: colors.textSecondary }}>
                           {report.recommended_protocol.map((protocol, index) => (
                             <li key={index}>{protocol}</li>
