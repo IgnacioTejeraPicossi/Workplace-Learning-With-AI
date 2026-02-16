@@ -7,8 +7,8 @@ Tests the new GPT-5 configuration without API calls.
 import sys
 import os
 
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
+# Add backend to path (from test_cursor: go up to root, then backend)
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from gpt5_config import GPT5_MODELS, get_optimal_model, get_gpt5_parameters, migrate_from_gpt4_to_gpt5
 
@@ -111,4 +111,4 @@ def main():
     print("   5. 🚀 Deploy with GPT-5 models")
 
 if __name__ == "__main__":
-    main() 
+    main()

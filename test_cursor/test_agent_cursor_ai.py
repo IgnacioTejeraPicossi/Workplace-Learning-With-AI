@@ -7,8 +7,8 @@ import asyncio
 import sys
 import os
 
-# Add the backend directory to the path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
+# Add the backend directory to the path (from test_cursor: go up to root, then backend)
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from cursor_agent_routes import check_cursor_installation, simulate_documentation_generation
 
@@ -93,4 +93,4 @@ async def main():
             print("   3. Make sure 'cursor' command is available in your PATH")
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

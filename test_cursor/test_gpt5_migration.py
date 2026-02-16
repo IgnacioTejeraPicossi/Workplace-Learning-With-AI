@@ -8,8 +8,8 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
+# Add backend to path (from test_cursor: go up to root, then backend)
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 def test_gpt5_config():
     """Test GPT-5 configuration and model selection"""
@@ -180,4 +180,4 @@ def main():
 
 if __name__ == "__main__":
     success = main()
-    sys.exit(0 if success else 1) 
+    sys.exit(0 if success else 1)

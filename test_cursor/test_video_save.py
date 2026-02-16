@@ -76,4 +76,4 @@ if __name__ == "__main__":
     test_save_video()
     test_get_videos()
     
-    print("\n�� Test completed!")
+    print("\n🎉 Test completed!")
