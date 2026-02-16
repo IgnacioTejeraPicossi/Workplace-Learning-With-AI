@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Ultra-silent server startup script for the AI Learning application
-Run this from the project root directory
+Run from project root: python scripts/start-backend-silent.py
+Or from scripts: python start-backend-silent.py
 """
 
 import uvicorn
@@ -9,8 +10,11 @@ import os
 import sys
 import logging
 
-# Add the backend directory to Python path
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
+# Project root (parent of scripts/)
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.join(_SCRIPT_DIR, "..")
+sys.path.insert(0, _PROJECT_ROOT)
+os.chdir(_PROJECT_ROOT)
 
 def main():
     """Start the server with complete silence"""

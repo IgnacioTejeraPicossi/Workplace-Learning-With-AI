@@ -2,11 +2,11 @@
 Write-Host "Starting AI Learning Backend with Clean Logging..." -ForegroundColor Green
 Write-Host ""
 
-# Activate virtual environment
-& ".venv\Scripts\Activate.ps1"
+# Activate virtual environment (from scripts, go up to root)
+& "..\.venv\Scripts\Activate.ps1"
 
 # Change to backend directory and start server
-Set-Location backend
+Set-Location ..\backend
 python start_server.py
 
 Write-Host ""
