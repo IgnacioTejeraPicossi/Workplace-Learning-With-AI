@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchSavedVideos, deleteSavedVideo, updateSavedVideo } from './api';
 
 function SavedVideos({ user }) {
+  const { t } = useTranslation('common');
   const [savedVideos, setSavedVideos] = useState([]);
   const [filter, setFilter] = useState('');
   const [expandedVideo, setExpandedVideo] = useState(null);
@@ -149,7 +151,7 @@ function SavedVideos({ user }) {
   };
 
   const handleDelete = async (videoId) => {
-    if (!window.confirm("Delete this video?")) return;
+    if (!window.confirm(t('savedVideos.deleteConfirm'))) return;
     try {
       await deleteSavedVideo(videoId);
       await loadSavedVideos();
@@ -173,30 +175,30 @@ function SavedVideos({ user }) {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(`${video.title}: ${video.url}`);
-      alert('Video link copied to clipboard!');
+      alert(t('savedVideos.linkCopied'));
     }
   };
 
   const handleDownload = (video) => {
     // Download functionality (mock)
-    alert(`Downloading: ${video.title}`);
+    alert(`${t('savedVideos.downloading')} ${video.title}`);
   };
 
   const handleAddToPlaylist = (video) => {
     // Add to playlist functionality (mock)
-    alert(`Added to playlist: ${video.title}`);
+    alert(`${t('savedVideos.addedToPlaylist')} ${video.title}`);
   };
 
   const toggleExpand = (videoId) => {
     setExpandedVideo(expandedVideo === videoId ? null : videoId);
   };
 
-  if (loading) return <div>Loading saved videos...</div>;
+  if (loading) return <div>{t('savedVideos.loading')}</div>;
   if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
     <div style={{ padding: '2rem' }}>
-              <h2 style={{ marginBottom: '2rem', color: colors.text }}>Saved Videos</h2>
+              <h2 style={{ marginBottom: '2rem', color: colors.text }}>{t('savedVideos.title')}</h2>
         
         {/* Navigation status message */}
         {autoExpandTarget && (
@@ -212,7 +214,7 @@ function SavedVideos({ user }) {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+            🎯 <strong>{t('savedVideos.navigatingTo')}</strong> "{autoExpandTarget.title}" - {t('savedVideos.expandingAuto')}
           </div>
         )}
       
@@ -220,7 +222,7 @@ function SavedVideos({ user }) {
       <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <input
           type="text"
-          placeholder="Filter by topic..."
+          placeholder={t('savedVideos.filterPlaceholder')}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           style={{
@@ -241,7 +243,7 @@ function SavedVideos({ user }) {
             cursor: 'pointer'
           }}
         >
-          Clear
+          {t('savedVideos.clear')}
         </button>
       </div>
 
@@ -271,7 +273,7 @@ function SavedVideos({ user }) {
                    🎥 {video.title}
                  </h3>
                  <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                   Duration: {video.duration} | Topic: {video.topic}
+                   {t('savedVideos.duration')} {video.duration} | {t('savedVideos.topic')} {video.topic}
                  </p>
                </div>
                
@@ -288,7 +290,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  ▶️ Play
+                  ▶️ {t('savedVideos.play')}
                 </button>
                 
                 <button
@@ -302,7 +304,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  {expandedVideo === video._id ? '📁 Compress' : '📂 Expand'}
+                  {expandedVideo === video._id ? `📁 ${t('savedVideos.compress')}` : `📂 ${t('savedVideos.expand')}`}
                 </button>
                 
                 <button
@@ -317,7 +319,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  📤 Share
+                  📤 {t('savedVideos.share')}
                 </button>
                 
                 <button
@@ -332,7 +334,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  ⬇️ Download
+                  ⬇️ {t('savedVideos.download')}
                 </button>
                 
                 <button
@@ -347,7 +349,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  📋 Add to Playlist
+                  📋 {t('savedVideos.addToPlaylist')}
                 </button>
                 
                 <button
@@ -362,7 +364,7 @@ function SavedVideos({ user }) {
                     fontSize: '0.8rem'
                   }}
                 >
-                  🗑️ Delete
+                  🗑️ {t('savedVideos.delete')}
                 </button>
                              </div>
              </div>
@@ -411,7 +413,7 @@ function SavedVideos({ user }) {
 
       {filteredVideos.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: colors.textSecondary }}>
-          {filter ? 'No videos match your filter.' : 'No saved videos yet.'}
+          {filter ? t('savedVideos.noMatch') : t('savedVideos.empty')}
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generateVideoQuiz, generateVideoSummary, askStream, saveVideo } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
@@ -10,6 +11,7 @@ const EXAMPLE_VIDEO = "https://www.youtube.com/embed/1hHMwLxN6EM";
 const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, including its iterative approach, team collaboration, and adaptability to change. Key points: Agile is not waterfall, it values individuals and interactions, and it uses sprints to deliver value incrementally.";
 
 function VideoLesson({ user }) {
+  const { t } = useTranslation('common');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [videoDescription, setVideoDescription] = useState('');
@@ -416,7 +418,7 @@ function VideoLesson({ user }) {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🎥 Video-Based Learning</h2>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>🎥 {t('videoBasedLearning.title')}</h2>
       
       {/* Info Box */}
       <div style={{ 
@@ -427,20 +429,20 @@ function VideoLesson({ user }) {
         border: '1px solid #2196f3',
         color: '#1565c0'
       }}>
-        <h4 style={{ marginBottom: 8 }}>💡 How to Use Video Lessons</h4>
+        <h4 style={{ marginBottom: 8 }}>💡 {t('videoBasedLearning.howToUse')}</h4>
         <ol style={{ marginLeft: 20, marginBottom: 0 }}>
-          <li><strong>Paste a YouTube URL</strong> - It will automatically convert to embed format and extract title</li>
-          <li><strong>Fill in video details</strong> - Title, topic, and description (required)</li>
-          <li><strong>Save the video</strong> - Add it to your personal video library</li>
-          <li><strong>Paste transcript</strong> - Generate AI-powered summaries and quizzes</li>
-          <li><strong>Learn & test</strong> - Take quizzes and track your progress</li>
+          <li>{t('videoBasedLearning.instruction1')}</li>
+          <li>{t('videoBasedLearning.instruction2')}</li>
+          <li>{t('videoBasedLearning.instruction3')}</li>
+          <li>{t('videoBasedLearning.instruction4')}</li>
+          <li>{t('videoBasedLearning.instruction5')}</li>
         </ol>
       </div>
       
       {/* Video URL Input */}
       <div style={{ marginBottom: 20 }}>
         <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
-          Video URL: *
+          {t('videoBasedLearning.videoUrlLabel')}
         </label>
         <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
           <input
@@ -448,7 +450,7 @@ function VideoLesson({ user }) {
             value={videoUrl}
             onChange={handleUrlChange}
             onPaste={handleUrlPaste}
-            placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+            placeholder={t('videoBasedLearning.videoUrlPlaceholder')}
             style={{ 
               flex: 1, 
               padding: 12, 
@@ -469,15 +471,15 @@ function VideoLesson({ user }) {
               cursor: 'pointer'
             }}
           >
-            📋 Example
+            📋 {t('videoBasedLearning.exampleButton')}
           </button>
         </div>
         <small style={{ color: colors.textSecondary }}>
-          Paste a YouTube URL (auto-converts to embed and extracts title) or direct MP4 link. *Required
+          {t('videoBasedLearning.videoUrlHint')}
         </small>
         {extractingTitle && (
           <div style={{ marginTop: 8, color: '#2196f3', fontSize: '14px' }}>
-            🔍 Extracting video title...
+            🔍 {t('videoBasedLearning.extractingTitle')}
           </div>
         )}
       </div>
@@ -485,18 +487,18 @@ function VideoLesson({ user }) {
       {/* Video Save Form */}
       {videoUrl && (
         <div style={{ marginBottom: 20, padding: 16, background: colors.cardBackground, borderRadius: 8, border: `1px solid ${colors.border}` }}>
-          <h3 style={{ marginBottom: 16, color: colors.text }}>💾 Save Video Information</h3>
+          <h3 style={{ marginBottom: 16, color: colors.text }}>💾 {t('videoBasedLearning.saveVideoInfo')}</h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Video Title: * {extractingTitle && '⏳'}
+                {t('videoBasedLearning.videoTitleLabel')} {extractingTitle && '⏳'}
               </label>
               <input
                 type="text"
                 value={videoTitle}
                 onChange={(e) => setVideoTitle(e.target.value)}
-                placeholder={extractingTitle ? "Extracting title..." : "Enter a descriptive title for this video"}
+                placeholder={extractingTitle ? t('videoBasedLearning.extractingTitle') : t('videoBasedLearning.videoTitlePlaceholder')}
                 disabled={extractingTitle}
                 style={{ 
                   width: '100%', 
@@ -511,13 +513,13 @@ function VideoLesson({ user }) {
             
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Topic/Category: * {!videoTopic.trim() && <span style={{ color: '#dc2626', fontSize: '0.9em' }}>(Required)</span>}
+                {t('videoBasedLearning.topicLabel')} {!videoTopic.trim() && <span style={{ color: '#dc2626', fontSize: '0.9em' }}>{t('videoBasedLearning.required')}</span>}
               </label>
               <input
                 type="text"
                 value={videoTopic}
                 onChange={(e) => setVideoTopic(e.target.value)}
-                placeholder="e.g., Programming, Leadership, Design"
+                placeholder={t('videoBasedLearning.topicPlaceholder')}
                 style={{ 
                   width: '100%', 
                   padding: 8, 
@@ -530,20 +532,20 @@ function VideoLesson({ user }) {
               />
               {!videoTopic.trim() && (
                 <div style={{ marginTop: 4, fontSize: '0.85em', color: '#dc2626' }}>
-                  ⚠️ Please enter a topic/category to enable saving
+                  ⚠️ {t('videoBasedLearning.topicRequiredHint')}
                 </div>
               )}
             </div>
             
             <div>
               <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, color: colors.text }}>
-                Description:
+                {t('videoBasedLearning.descriptionLabel')}
               </label>
               <textarea
                 rows={3}
                 value={videoDescription}
                 onChange={(e) => setVideoDescription(e.target.value)}
-                placeholder="Brief description of what this video covers..."
+                placeholder={t('videoBasedLearning.descriptionPlaceholder')}
                 style={{ 
                   width: '100%', 
                   padding: 8, 
@@ -571,14 +573,14 @@ function VideoLesson({ user }) {
                 transition: 'background 0.2s'
               }}
               title={
-                !videoTitle.trim() ? 'Please enter a video title' :
-                !videoTopic.trim() ? 'Please enter a topic/category (required field)' :
-                extractingTitle ? 'Extracting title from YouTube...' :
-                saving ? 'Saving video...' :
-                'Save video to your library'
+                !videoTitle.trim() ? t('videoBasedLearning.tooltipEnterTitle') :
+                !videoTopic.trim() ? t('videoBasedLearning.tooltipEnterTopic') :
+                extractingTitle ? t('videoBasedLearning.tooltipExtracting') :
+                saving ? t('videoBasedLearning.tooltipSaving') :
+                t('videoBasedLearning.tooltipSaveLibrary')
               }
             >
-              {saving ? '⏳ Saving...' : extractingTitle ? '⏳ Extracting title...' : !videoTopic.trim() ? '💾 Save Video (Topic required)' : '💾 Save Video'}
+              {saving ? `⏳ ${t('videoBasedLearning.saving')}` : extractingTitle ? `⏳ ${t('videoBasedLearning.extractingTitle')}` : !videoTopic.trim() ? `💾 ${t('videoBasedLearning.saveVideoTopicRequired')}` : `💾 ${t('videoBasedLearning.saveVideo')}`}
             </button>
           </div>
         </div>
@@ -588,7 +590,7 @@ function VideoLesson({ user }) {
       {isValidVideoUrl && (
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ margin: 0, color: colors.text }}>🎬 Video Player</h3>
+            <h3 style={{ margin: 0, color: colors.text }}>🎬 {t('videoBasedLearning.videoPlayer')}</h3>
             {videoUrl.includes('/embed/') && (
               <button
                 onClick={() => window.open(videoUrl.replace('/embed/', '/watch?v='), '_blank')}
@@ -602,7 +604,7 @@ function VideoLesson({ user }) {
                   fontSize: '14px'
                 }}
               >
-                🔗 Open in New Tab
+                🔗 {t('videoBasedLearning.openInNewTab')}
               </button>
             )}
           </div>
@@ -627,7 +629,7 @@ function VideoLesson({ user }) {
               <source src={videoUrl} type="video/mp4" />
               <source src={videoUrl} type="video/webm" />
               <source src={videoUrl} type="video/ogg" />
-              Your browser does not support the video tag.
+              {t('videoBasedLearning.videoNotSupported')}
             </video>
           )}
         </div>
@@ -643,14 +645,14 @@ function VideoLesson({ user }) {
           border: '1px solid #ffeaa7',
           color: '#856404'
         }}>
-          <h4 style={{ marginBottom: 8 }}>⚠️ Browser Security Notice</h4>
+          <h4 style={{ marginBottom: 8 }}>⚠️ {t('videoBasedLearning.securityNotice')}</h4>
           <p style={{ marginBottom: 8 }}>
-            Some browsers may block YouTube videos for security reasons. If the video doesn't load:
+            {t('videoBasedLearning.securityIntro')}
           </p>
           <ul style={{ marginLeft: 20, marginBottom: 8 }}>
-            <li>Try opening the video in a new tab</li>
-            <li>Check your browser's security settings</li>
-            <li>Use the transcript feature below for learning</li>
+            <li>{t('videoBasedLearning.securityBullet1')}</li>
+            <li>{t('videoBasedLearning.securityBullet2')}</li>
+            <li>{t('videoBasedLearning.securityBullet3')}</li>
           </ul>
           <a 
             href={videoUrl.replace('/embed/', '/watch?v=')} 
@@ -658,7 +660,7 @@ function VideoLesson({ user }) {
             rel="noopener noreferrer"
             style={{ color: '#007bff', textDecoration: 'underline' }}
           >
-            Open video in new tab →
+            {t('videoBasedLearning.openInNewTabLink')}
           </a>
         </div>
       )}
@@ -666,13 +668,13 @@ function VideoLesson({ user }) {
       {/* Transcript Input */}
       <div style={{ marginBottom: 20 }}>
         <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
-          Video Transcript (for summary generation):
+          {t('videoBasedLearning.transcriptLabel')}
         </label>
         <textarea
           rows={4}
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
-          placeholder="Paste the video transcript here to generate a summary..."
+          placeholder={t('videoBasedLearning.transcriptPlaceholder')}
           style={{ 
             width: '100%', 
             padding: 12, 
@@ -697,7 +699,7 @@ function VideoLesson({ user }) {
             opacity: summaryStreaming.loading ? 0.6 : 1
           }}
         >
-          {summaryStreaming.loading ? '⏳ Generating...' : '📝 Generate Summary'}
+          {summaryStreaming.loading ? `⏳ ${t('videoBasedLearning.generating')}` : `📝 ${t('videoBasedLearning.generateSummary')}`}
         </button>
       </div>
 
@@ -714,11 +716,11 @@ function VideoLesson({ user }) {
       {/* Summary Display */}
       {summary && (
         <div style={{ marginBottom: 20 }}>
-          <h3 style={{ marginBottom: 12, color: colors.text }}>📋 Video Summary</h3>
+          <h3 style={{ marginBottom: 12, color: colors.text }}>📋 {t('videoBasedLearning.videoSummary')}</h3>
           <StreamingText 
             content={summary}
             loading={summaryStreaming.loading}
-            placeholder="Generating summary..."
+            placeholder={t('videoBasedLearning.generatingSummary')}
           />
         </div>
       )}
@@ -739,7 +741,7 @@ function VideoLesson({ user }) {
               opacity: quizStreaming.loading ? 0.6 : 1
             }}
           >
-            {quizStreaming.loading ? '⏳ Generating Quiz...' : '🧠 Generate Quiz'}
+            {quizStreaming.loading ? `⏳ ${t('videoBasedLearning.generatingQuiz')}` : `🧠 ${t('videoBasedLearning.generateQuiz')}`}
           </button>
         </div>
       )}
@@ -758,7 +760,7 @@ function VideoLesson({ user }) {
       {quiz.length > 0 && (
         <div style={{ marginBottom: 20 }}>
           <h3 style={{ marginBottom: 12, color: colors.text }}>
-            📝 Quiz {showBadge && '🏆'}
+            📝 {t('videoBasedLearning.quiz')} {showBadge && '🏆'}
           </h3>
           {quiz.map((q, idx) => (
             <div key={idx} style={{ 
@@ -798,7 +800,7 @@ function VideoLesson({ user }) {
                   background: userAnswers[idx] === q.answer ? '#e8f5e8' : '#ffebee',
                   color: userAnswers[idx] === q.answer ? '#2e7d32' : '#c62828'
                 }}>
-                  ✅ Correct: {q.answer}  
+                  ✅ {t('videoBasedLearning.correct')} {q.answer}  
                   <br/>
                   🧾 {q.explanation}
                 </div>
@@ -815,14 +817,14 @@ function VideoLesson({ user }) {
               textAlign: 'center'
             }}>
               <h4 style={{ marginBottom: 8, color: colors.text }}>
-                Quiz Complete! 🎉
+                {t('videoBasedLearning.quizComplete')}
               </h4>
               <p style={{ fontSize: '1.2em', fontWeight: 'bold', color: colors.text }}>
-                Score: {score}% ({correctCount}/{quiz.length} correct)
+                {t('videoBasedLearning.score')} {score}% ({correctCount}/{quiz.length} {t('videoBasedLearning.correctCount')})
               </p>
               {showBadge && (
                 <p style={{ color: '#4caf50', fontWeight: 'bold' }}>
-                  🏆 Excellent! You've mastered this content!
+                  🏆 {t('videoBasedLearning.masteredContent')}
                 </p>
               )}
             </div>
@@ -842,12 +844,12 @@ function VideoLesson({ user }) {
           cursor: 'pointer'
         }}
       >
-        🗑️ Clear All
+        🗑️ {t('videoBasedLearning.clearAll')}
       </button>
       
       {/* Saved Videos Section */}
       <div style={{ marginTop: "40px" }}>
-        <h3>🎬 Saved Videos</h3>
+        <h3>🎬 {t('videoBasedLearning.savedVideos')}</h3>
         <SavedVideos user={user} />
       </div>
     </div>
