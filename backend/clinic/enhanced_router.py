@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import List, Dict
+import hashlib
+import json
 from .schemas import (
     ScreenRequest, ScreenResponse, TherapyRequest, TherapyPlan, ApplyRequest, ApplyResponse, Flag
 )
@@ -10,6 +12,24 @@ from .store import save_screening, save_therapy_plan, get_dashboard_metrics
 
 router = APIRouter(prefix="/api/robomind", tags=["robomind-clinic"])
 
+# Demo mode: cache by hash of request so same payload → identical response (max 100 entries)
+_DEMO_SCREEN_CACHE: Dict[str, ScreenResponse] = {}
+_DEMO_CACHE_MAX = 100
+
+def _demo_mode_from_request(request: Request) -> bool:
+    """True if X-Demo-Mode header or query demo=1/true/yes."""
+    h = (request.headers.get("X-Demo-Mode") or "").strip().lower()
+    q = (request.query_params.get("demo") or "").strip().lower()
+    return h in ("1", "true", "yes") or q in ("1", "true", "yes")
+
+def _screen_cache_key(req: ScreenRequest) -> str:
+    """Stable hash of turns + sources for idempotent demo responses."""
+    raw = json.dumps(
+        [t.model_dump() if hasattr(t, "model_dump") else t.dict() for t in req.turns],
+        sort_keys=True,
+    ) + json.dumps(req.sources or [], sort_keys=True)
+    return hashlib.sha256(raw.encode()).hexdigest()
+
 # Dependency placeholder: bring your own LLM client / gateway
 def get_llm_gateway():
     class DummyLLM:
@@ -19,22 +39,33 @@ def get_llm_gateway():
     return DummyLLM()
 
 @router.post("/screen", response_model=ScreenResponse)
-async def screen(req: ScreenRequest) -> ScreenResponse:
-    """Quick screening endpoint for AI pathology detection"""
+async def screen(request: Request, req: ScreenRequest) -> ScreenResponse:
+    """Quick screening endpoint for AI pathology detection. Use X-Demo-Mode: true or ?demo=1 for cached identical results on same input."""
     try:
+        demo_mode = _demo_mode_from_request(request)
+        cache_key = _screen_cache_key(req) if demo_mode else None
+
+        if demo_mode and cache_key and cache_key in _DEMO_SCREEN_CACHE:
+            return _DEMO_SCREEN_CACHE[cache_key]
+
         flags: List[Flag] = run_all_detectors(req.turns, req.sources)
         agg = aggregate(flags)
-        
+
         response = ScreenResponse(
             axis_scores=agg["axis_scores"],
             composite=agg["composite"],
             top_flags=sorted(flags, key=lambda f: f.confidence, reverse=True)[:6],
             evidence=flags
         )
-        
+
+        if demo_mode and cache_key:
+            if len(_DEMO_SCREEN_CACHE) >= _DEMO_CACHE_MAX:
+                _DEMO_SCREEN_CACHE.clear()
+            _DEMO_SCREEN_CACHE[cache_key] = response
+
         # Save to database
         await save_screening(response, req.meta)
-        
+
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Screening failed: {str(e)}")

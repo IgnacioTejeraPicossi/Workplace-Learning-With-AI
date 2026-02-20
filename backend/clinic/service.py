@@ -34,11 +34,11 @@ def _make_protocol(findings: List[Finding]) -> List[str]:
     
     return out[:8]  # Max 8 recommendations
 
-async def diagnose_case(intake: CaseIntake) -> DiagnosisReport:
-    """Main diagnosis function"""
+async def diagnose_case(intake: CaseIntake, demo_mode: bool = False) -> DiagnosisReport:
+    """Main diagnosis function. When demo_mode=True, only rule-based detectors run (no LLM judge) for deterministic results."""
     findings: List[Finding] = []
     
-    # Rule-based detectors
+    # Rule-based detectors (always run)
     for detector in REGISTRY:
         try:
             detector_findings = detector(intake.turns)
@@ -47,21 +47,22 @@ async def diagnose_case(intake: CaseIntake) -> DiagnosisReport:
             print(f"Error in detector {detector.__name__}: {e}")
             continue
     
-    # LLM meta judge (optional; can be toggled in settings)
-    try:
-        llm_findings = await llm_meta_eval(intake.turns)
-        
-        # Merge findings: keep higher score per code
-        by_code = {f.code: f for f in findings}
-        for f in llm_findings:
-            current = by_code.get(f.code)
-            if not current or f.score > current.score:
-                by_code[f.code] = f
-        
-        findings = list(by_code.values())
-    except Exception as e:
-        print(f"Error in LLM meta evaluation: {e}")
-        # Continue with rule-based findings only
+    # LLM meta judge: skip in demo mode for deterministic scoring; otherwise optional
+    if not demo_mode:
+        try:
+            llm_findings = await llm_meta_eval(intake.turns)
+            
+            # Merge findings: keep higher score per code
+            by_code = {f.code: f for f in findings}
+            for f in llm_findings:
+                current = by_code.get(f.code)
+                if not current or f.score > current.score:
+                    by_code[f.code] = f
+            
+            findings = list(by_code.values())
+        except Exception as e:
+            print(f"Error in LLM meta evaluation: {e}")
+            # Continue with rule-based findings only
     
     # Sort by score (highest first)
     findings.sort(key=lambda f: f.score, reverse=True)

@@ -1,18 +1,25 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from .models import CaseIntake, DiagnosisReport
 from .service import diagnose_case, get_therapy_patches
 from typing import Dict
 
 router = APIRouter(prefix="/api/clinic", tags=["robomind-clinic"])
 
+def _demo_mode_from_request(request: Request) -> bool:
+    """True if X-Demo-Mode header or query demo=1/true/yes."""
+    h = (request.headers.get("X-Demo-Mode") or "").strip().lower()
+    q = (request.query_params.get("demo") or "").strip().lower()
+    return h in ("1", "true", "yes") or q in ("1", "true", "yes")
+
 @router.post("/diagnose", response_model=DiagnosisReport)
-async def post_diagnose(payload: CaseIntake):
-    """Diagnose a case for Psychopathia Machinalis syndromes"""
+async def post_diagnose(request: Request, payload: CaseIntake):
+    """Diagnose a case for Psychopathia Machinalis syndromes. Use header X-Demo-Mode: true or ?demo=1 for deterministic (rule-only) results."""
     if not payload.turns:
         raise HTTPException(400, "turns are required")
     
+    demo_mode = _demo_mode_from_request(request)
     try:
-        return await diagnose_case(payload)
+        return await diagnose_case(payload, demo_mode=demo_mode)
     except Exception as e:
         raise HTTPException(500, f"Diagnosis failed: {str(e)}")
 

@@ -83,12 +83,14 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
   On Windows PowerShell: `$env:PYTHONPATH=(Get-Location).Path; $env:PYTHONUTF8="1"; python -m pytest backend/tests/test_robomind_api_contracts.py -v`
 - **You:** Run the same sample cases via UI or API; confirm primary finding, evidence spans, and risk bucket when LM Studio is available.
 
-### A2) Demo mode (deterministic behavior)
+### A2) Demo mode (deterministic behavior) ✅ DONE
 
-- **Cursor:** Add a “demo mode” (e.g. query param or header or config):
-  - Rule-based detectors always run.
-  - LLM judge only if enabled; in demo mode use fixed seed/temperature or cached result by hash of turns.
-- **You:** Same payload twice in demo mode → identical scoring.
+- **Implemented:**
+  - **Legacy** (`POST /api/clinic/diagnose`): Header `X-Demo-Mode: true` or query `?demo=1` → skips LLM meta-judge; only rule-based detectors run → deterministic report.
+  - **Enhanced** (`POST /api/robomind/screen`): Same header/query → responses cached by hash of (turns + sources); same payload returns identical `ScreenResponse` (max 100 cache entries).
+  - Helpers: `_demo_mode_from_request(request)` and (enhanced) `_screen_cache_key(req)` in `enhanced_router.py`; `diagnose_case(..., demo_mode=True)` in `service.py`.
+- **Tests:** `test_enhanced_demo_mode_same_payload_same_response` and `test_legacy_demo_mode_same_payload_same_response` — same payload twice with `X-Demo-Mode: true` → identical JSON response.
+- **You:** Same payload twice in demo mode → identical scoring (verified by tests).
 
 ### A3) Data retention + privacy defaults
 

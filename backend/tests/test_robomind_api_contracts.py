@@ -334,3 +334,43 @@ async def test_legacy_diagnose_requires_turns():
             json={"run_id": "x", "turns": []},
         )
     assert response.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# A2: Demo mode — same payload twice → identical scoring
+# ---------------------------------------------------------------------------
+
+DEMO_HEADERS = {"X-Demo-Mode": "true"}
+
+
+@patch("backend.clinic.enhanced_router.save_screening", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_enhanced_demo_mode_same_payload_same_response(mock_save_screening):
+    """A2: Same payload twice with X-Demo-Mode → identical ScreenResponse (cached)."""
+    mock_save_screening.return_value = None
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r1 = await client.post("/api/robomind/screen", json=ENHANCED_BUNKERING_DISSOC, headers=DEMO_HEADERS)
+        r2 = await client.post("/api/robomind/screen", json=ENHANCED_BUNKERING_DISSOC, headers=DEMO_HEADERS)
+    assert r1.status_code == 200 and r2.status_code == 200
+    d1, d2 = r1.json(), r2.json()
+    assert d1["composite"] == d2["composite"]
+    assert d1["axis_scores"] == d2["axis_scores"]
+    assert len(d1["top_flags"]) == len(d2["top_flags"])
+    assert len(d1["evidence"]) == len(d2["evidence"])
+    # Full response identity (including created_at when cached)
+    assert d1 == d2
+
+
+@pytest.mark.asyncio
+async def test_legacy_demo_mode_same_payload_same_response():
+    """A2: Same payload twice with X-Demo-Mode → identical DiagnosisReport (rule-only, no LLM)."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r1 = await client.post("/api/clinic/diagnose", json=LEGACY_BUNKERING_DISSOC, headers=DEMO_HEADERS)
+        r2 = await client.post("/api/clinic/diagnose", json=LEGACY_BUNKERING_DISSOC, headers=DEMO_HEADERS)
+    assert r1.status_code == 200 and r2.status_code == 200
+    d1, d2 = r1.json(), r2.json()
+    assert d1["overall_risk"] == d2["overall_risk"]
+    assert d1["summary"] == d2["summary"]
+    assert len(d1["findings"]) == len(d2["findings"])
+    assert d1["recommended_protocol"] == d2["recommended_protocol"]
+    assert d1 == d2
