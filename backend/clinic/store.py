@@ -20,7 +20,7 @@ async def save_findings(run_id:str, report:Dict):
 async def save_screening(screening: Any, meta: Dict[str, Any]):
     """Save screening results to database"""
     await mongo.robomind_screenings.insert_one({
-        "screening": screening.dict(),
+        "screening": screening.model_dump(),
         "meta": meta,
         "created_at": datetime.utcnow()
     })
@@ -28,8 +28,8 @@ async def save_screening(screening: Any, meta: Dict[str, Any]):
 async def save_therapy_plan(plan: Any, profile: Any, context: Dict[str, Any]):
     """Save therapy plan to database"""
     await mongo.robomind_therapies.insert_one({
-        "plan": plan.dict(),
-        "profile": profile.dict() if profile else None,
+        "plan": plan.model_dump(),
+        "profile": profile.model_dump() if profile else None,
         "context": context,
         "created_at": datetime.utcnow()
     })
