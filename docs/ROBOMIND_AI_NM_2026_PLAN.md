@@ -99,9 +99,16 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
 
 ---
 
+## 4b. Milestone B — Coverage Expansion ✅ DONE
+
+- **B1 — Tier 1 detectors:** Added 6 detectors in `backend/clinic/enhanced_detectors.py`: `falsified_introspection_detector`, `tool_decontextualization_detector`, `spurious_pattern_detector`, `cross_session_context_detector`, `goal_genesis_detector`, `value_drift_detector`. Each returns `List[Flag]` (axis, type, span, confidence, details). `run_all_detectors` now runs 10 detectors (4 original + 6 Tier 1). Positive fixtures and test `test_enhanced_tier1_detectors_positive` in `test_robomind_api_contracts.py`; legacy confabulation test relaxed when LLM judge unavailable.
+- **B2 — Meta-judge structured JSON + fallback:** In `backend/clinic/judge.py`, `_parse_judge_json_strict(txt)` parses judge output with strict schema (code, title, axis, score, confidence required; evidence/advice optional). Returns `None` on invalid JSON → fallback to `_extract_findings_fallback(txt)`. Test `test_legacy_diagnose_works_when_judge_invalid` ensures diagnose still returns valid report when judge raises or returns invalid data.
+
+---
+
 ## 5. Milestones B–D (summary)
 
-- **B:** Add 6–8 Tier 1 detectors (Falsified Introspection, Tool-Interface Decontextualization, Spurious Pattern Hyperconnection, Cross-Session Context Shunting, Goal-Genesis Delirium, Value Drift, etc.); structured meta-judge JSON; one positive + one negative test case per new detector.
+- **B:** ~~Add 6–8 Tier 1 detectors~~ (Falsified Introspection, Tool-Interface Decontextualization, Spurious Pattern Hyperconnection, Cross-Session Context Shunting, Goal-Genesis Delirium, Value Drift, etc.); structured meta-judge JSON; one positive + one negative test case per new detector.
 - **C:** Per-workflow/per-module policy overrides in Settings; alerting (e.g. critical risk, repeated high-risk); `GET /api/robomind/export?from=...&to=...&format=csv|json` with case metadata, findings, therapies, decision.
 - **D:** Store “before”/“after” scores when therapy is applied; compute uplift; daily aggregation job for `robomind_metrics_daily`; dashboard polish (“What’s happening?”, “Where?”, “Is it getting better?”).
 
