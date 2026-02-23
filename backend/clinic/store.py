@@ -28,18 +28,26 @@ async def save_findings(run_id: str, report: Dict, anonymize_pii: bool = False):
         {"run_id": run_id}, {"$set": report}, upsert=True
     )
 
-async def save_screening(screening: Any, meta: Dict[str, Any], anonymize_pii: bool = False):
-    """Save screening results to database. When anonymize_pii=True, PII in screening and meta is scrubbed."""
+async def save_screening(
+    screening: Any,
+    meta: Dict[str, Any],
+    anonymize_pii: bool = False,
+    decision_outcome: Optional[str] = None,
+):
+    """Save screening results to database. decision_outcome (C1): allow | review | block."""
     screening_dict = screening.model_dump()
     meta_copy = dict(meta) if meta else {}
     if anonymize_pii:
         screening_dict = scrub_pii_deep(screening_dict)
         meta_copy = scrub_pii_deep(meta_copy)
-    await mongo.robomind_screenings.insert_one({
+    doc = {
         "screening": screening_dict,
         "meta": meta_copy,
-        "created_at": datetime.utcnow()
-    })
+        "created_at": datetime.utcnow(),
+    }
+    if decision_outcome is not None:
+        doc["decision_outcome"] = decision_outcome
+    await mongo.robomind_screenings.insert_one(doc)
 
 async def save_therapy_plan(plan: Any, profile: Any, context: Dict[str, Any], anonymize_pii: bool = False):
     """Save therapy plan to database. When anonymize_pii=True, PII in plan, profile, context is scrubbed."""
@@ -98,3 +106,36 @@ async def get_dashboard_metrics():
         "axis_distribution": {item["_id"]: item["count"] for item in axis_distribution},
         "top_pathologies": [item["_id"] for item in top_pathologies]
     }
+
+
+async def get_export_data(
+    from_ts: Optional[datetime] = None,
+    to_ts: Optional[datetime] = None,
+) -> List[Dict[str, Any]]:
+    """C3: Export screenings with metadata, findings, decision. Optional date range."""
+    match = {}
+    if from_ts is not None or to_ts is not None:
+        match["created_at"] = {}
+        if from_ts is not None:
+            match["created_at"]["$gte"] = from_ts
+        if to_ts is not None:
+            match["created_at"]["$lte"] = to_ts
+    cursor = mongo.robomind_screenings.find(match).sort("created_at", 1)
+    rows = []
+    async for doc in cursor:
+        screening = doc.get("screening", {})
+        meta = doc.get("meta", {})
+        top_flags = screening.get("top_flags", [])
+        evidence = screening.get("evidence", [])
+        row = {
+            "id": str(doc.get("_id")),
+            "created_at": doc.get("created_at").isoformat() if doc.get("created_at") else "",
+            "composite": screening.get("composite"),
+            "decision_outcome": doc.get("decision_outcome", ""),
+            "module_id": meta.get("module_id", ""),
+            "workflow_id": meta.get("workflow_id", ""),
+            "top_flags_types": [f.get("type", "") for f in top_flags],
+            "evidence_count": len(evidence),
+        }
+        rows.append(row)
+    return rows

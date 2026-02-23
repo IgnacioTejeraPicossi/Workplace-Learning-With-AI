@@ -520,3 +520,76 @@ async def test_retention_cleanup_contract(mock_cleanup_screenings, mock_cleanup_
     assert "deleted_therapies" in data
     assert isinstance(data["deleted_screenings"], int)
     assert isinstance(data["deleted_therapies"], int)
+
+
+# ---------------------------------------------------------------------------
+# Milestone C: Policies, alerts, export
+# ---------------------------------------------------------------------------
+
+@patch("backend.clinic.enhanced_router.save_screening", new_callable=AsyncMock)
+@patch("backend.clinic.enhanced_router.fire_alert_if_needed", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_screen_stores_decision_outcome(mock_alert, mock_save_screening):
+    """C1: Screen stores decision_outcome (allow/review/block) from policy thresholds."""
+    captured = []
+    async def capture_screening(*args, **kwargs):
+        captured.append({"args": args, "kwargs": kwargs})
+    mock_save_screening.side_effect = capture_screening
+    mock_alert.return_value = False
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.post("/api/robomind/screen", json=ENHANCED_HEALTHY)
+    assert r.status_code == 200
+    assert len(captured) == 1
+    decision = captured[0]["kwargs"].get("decision_outcome")
+    assert decision in ("allow", "review", "block")
+    # C2: Alert is invoked with same decision (debounce prevents spam in production)
+    mock_alert.assert_called_once()
+    call_args = mock_alert.call_args
+    assert call_args[0][0] == decision
+
+
+@pytest.mark.asyncio
+async def test_settings_policies_get():
+    """C1: GET /api/robomind/settings/policies returns global and overrides."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.get("/api/robomind/settings/policies")
+    assert r.status_code == 200
+    data = r.json()
+    assert "global" in data
+    assert "overrides" in data
+    assert "threshold_block" in data["global"]
+    assert "threshold_review" in data["global"]
+
+
+@pytest.mark.asyncio
+async def test_settings_policies_put_and_override():
+    """C1: PUT /api/robomind/settings/policies/{scope}/{key} sets override; workflow stricter than global."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.put("/api/robomind/settings/policies/workflow/wf-test", json={"threshold_block": 70.0})
+        assert r.status_code == 200
+        r2 = await client.get("/api/robomind/settings/policies")
+    assert r2.status_code == 200
+    overrides = r2.json().get("overrides", {})
+    assert "workflow" in overrides and "wf-test" in overrides.get("workflow", {})
+    assert overrides["workflow"]["wf-test"].get("threshold_block") == 70.0
+
+
+@patch("backend.clinic.enhanced_router.get_export_data", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_export_contract(mock_get_export):
+    """C3: GET /api/robomind/export returns JSON or CSV with case metadata and decision."""
+    mock_get_export.return_value = [
+        {"id": "e1", "created_at": "2026-01-01T00:00:00", "composite": 50.0, "decision_outcome": "allow", "module_id": "m1", "workflow_id": "", "top_flags_types": [], "evidence_count": 0},
+    ]
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.get("/api/robomind/export?format=json")
+    assert r.status_code == 200
+    data = r.json()
+    assert "export" in data and "count" in data
+    assert len(data["export"]) == 1
+    assert data["export"][0].get("decision_outcome") == "allow"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r_csv = await client.get("/api/robomind/export?format=csv")
+    assert r_csv.status_code == 200
+    assert "text/csv" in r_csv.headers.get("content-type", "")
+    assert "decision_outcome" in r_csv.text

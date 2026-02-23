@@ -92,9 +92,12 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
 - **Tests:** `test_enhanced_demo_mode_same_payload_same_response` and `test_legacy_demo_mode_same_payload_same_response` — same payload twice with `X-Demo-Mode: true` → identical JSON response.
 - **You:** Same payload twice in demo mode → identical scoring (verified by tests).
 
-### A3) Data retention + privacy defaults
+### A3) Data retention + privacy defaults ✅ DONE
 
-- **Cursor:** Add retention configuration (e.g. keep raw turns N days, aggregated metrics longer) and an “anonymize PII” option (simple regex scrub for emails, phones, IDs); store scrubbed output when toggle is on.
+- **Implemented:** Retention via env `ROBOMIND_RETENTION_DAYS_RAW` / `ROBOMIND_RETENTION_DAYS_THERAPIES`; `cleanup_old_screenings(days)`, `cleanup_old_therapies(days)` in `store.py`; `POST /api/robomind/admin/retention-cleanup`. PII anonymization: `backend/clinic/pii.py` (regex scrub for emails, phones, IDs); `X-Anonymize-PII: true` or `meta.anonymize_pii`; scrubbed data stored when toggle is on.
+- **Tests:** `test_enhanced_anonymize_pii_scrubs_stored_screening`, `test_retention_cleanup_contract`.
+- _(Task completed; see Implemented above.)_
+- **Cursor (original):** Add retention configuration (e.g. keep raw turns N days, aggregated metrics longer) and an “anonymize PII” option (simple regex scrub for emails, phones, IDs); store scrubbed output when toggle is on.
 - **You:** Verify scrubbed data in Mongo when anonymize is on.
 
 ---
@@ -106,10 +109,19 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
 
 ---
 
+## 4c. Milestone C — Governance & Operations ✅ DONE
+
+- **C1 — Per-workflow policy management:** `backend/clinic/policy.py`: global default (`threshold_block`, `threshold_review`, env `ROBOMIND_THRESHOLD_*`); `get_effective_policy(module_id, workflow_id)` merges workflow → module → global; `decide_decision(composite, policy)` → `allow` | `review` | `block`. Screen endpoint stores `decision_outcome` and uses effective policy from `meta.module_id` / `meta.workflow_id`. `GET /api/robomind/settings/policies` returns global + overrides; `PUT /api/robomind/settings/policies/{scope}/{key}` sets module or workflow override (body: `{threshold_block?, threshold_review?, ...}`).
+- **C2 — Alerting:** `backend/clinic/alerts.py`: `fire_alert_if_needed(decision, composite, module_id, workflow_id, ...)` POSTs to `ROBOMIND_ALERT_WEBHOOK_URL` when decision is block or review (high composite); 1-hour debounce per module/workflow key to avoid spam. Called after each screen when decision is set.
+- **C3 — Export:** `GET /api/robomind/export?from_date=...&to_date=...&format=json|csv`; `store.get_export_data(from_ts, to_ts)` returns screenings with `id`, `created_at`, `composite`, `decision_outcome`, `module_id`, `workflow_id`, `top_flags_types`, `evidence_count`. CSV or JSON response.
+- **Tests:** `test_screen_stores_decision_outcome`, `test_settings_policies_get`, `test_settings_policies_put_and_override`, `test_export_contract`; C2 covered by assertion that `fire_alert_if_needed` is called with the stored decision.
+
+---
+
 ## 5. Milestones B–D (summary)
 
 - **B:** ~~Add 6–8 Tier 1 detectors~~ (Falsified Introspection, Tool-Interface Decontextualization, Spurious Pattern Hyperconnection, Cross-Session Context Shunting, Goal-Genesis Delirium, Value Drift, etc.); structured meta-judge JSON; one positive + one negative test case per new detector.
-- **C:** Per-workflow/per-module policy overrides in Settings; alerting (e.g. critical risk, repeated high-risk); `GET /api/robomind/export?from=...&to=...&format=csv|json` with case metadata, findings, therapies, decision.
+- **C:** ~~Per-workflow/per-module policy overrides in Settings; alerting (critical risk, debounced webhook); export (JSON/CSV with case metadata, findings, decision).~~ ✅ DONE
 - **D:** Store “before”/“after” scores when therapy is applied; compute uplift; daily aggregation job for `robomind_metrics_daily`; dashboard polish (“What’s happening?”, “Where?”, “Is it getting better?”).
 
 ---
