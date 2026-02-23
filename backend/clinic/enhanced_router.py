@@ -17,6 +17,10 @@ from .store import (
     save_screening,
     save_therapy_plan,
     get_dashboard_metrics,
+    get_uplift_stats,
+    get_daily_metrics,
+    run_daily_aggregation,
+    record_post_screening,
     cleanup_old_screenings,
     cleanup_old_therapies,
     get_export_data,
@@ -107,14 +111,14 @@ async def screen(request: Request, req: ScreenRequest) -> ScreenResponse:
     except Exception as e:
         raise HTTPException(500, detail=f"Screening failed: {str(e)}")
 
-@router.post("/therapy", response_model=TherapyPlan)
-async def therapy(request: Request, req: TherapyRequest) -> TherapyPlan:
-    """Generate therapy plan based on screening results. Use X-Anonymize-PII: true to scrub PII before storing."""
+@router.post("/therapy")
+async def therapy(request: Request, req: TherapyRequest):
+    """Generate therapy plan based on screening results. Returns plan and therapy_id for D1 uplift tracking. Use X-Anonymize-PII: true to scrub PII before storing."""
     try:
         plan = build_plan(req.target_issue, req.profile)
         anonymize_pii = _anonymize_pii_from_request(request, req.context)
-        await save_therapy_plan(plan, req.profile, req.context, anonymize_pii=anonymize_pii)
-        return plan
+        therapy_id = await save_therapy_plan(plan, req.profile, req.context, anonymize_pii=anonymize_pii)
+        return {"plan": plan, "therapy_id": therapy_id}
     except Exception as e:
         raise HTTPException(500, detail=f"Therapy planning failed: {str(e)}")
 
@@ -134,12 +138,57 @@ async def apply(req: ApplyRequest, llm = Depends(get_llm_gateway)) -> ApplyRespo
 
 @router.get("/dashboard/metrics")
 async def get_metrics():
-    """Get dashboard metrics for the clinic"""
+    """Get dashboard metrics for the clinic (totals, axis distribution, top pathologies)."""
     try:
         metrics = await get_dashboard_metrics()
+        uplift = await get_uplift_stats()
+        metrics["uplift"] = uplift
         return metrics
     except Exception as e:
         raise HTTPException(500, detail=f"Metrics retrieval failed: {str(e)}")
+
+
+@router.get("/dashboard/trends")
+async def get_trends(days: int = Query(7, ge=1, le=90, description="Last N days")):
+    """D3: Daily snapshots for dashboard (what's happening, is it getting better)."""
+    try:
+        return {"trends": await get_daily_metrics(days)}
+    except Exception as e:
+        raise HTTPException(500, detail=f"Trends retrieval failed: {str(e)}")
+
+
+@router.post("/therapy/{therapy_id}/record-post")
+async def record_post(therapy_id: str, body: Dict):
+    """D1: Record post-therapy screening to compute uplift (composite and axis_scores after therapy)."""
+    composite = body.get("composite")
+    axis_scores = body.get("axis_scores") or {}
+    if composite is None:
+        raise HTTPException(400, detail="composite required")
+    try:
+        result = await record_post_screening(therapy_id, float(composite), {k: float(v) for k, v in axis_scores.items()})
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
+    if result is None:
+        raise HTTPException(404, detail="Therapy not found or has no pre-screening")
+    return result
+
+
+@router.post("/admin/daily-metrics")
+async def trigger_daily_metrics(for_date: Optional[str] = Query(None, description="ISO date (default: yesterday)")):
+    """D2: Run daily aggregation and store in robomind_metrics_daily."""
+    from datetime import datetime as dt
+    parsed = None
+    if for_date:
+        try:
+            parsed = dt.fromisoformat(for_date.replace("Z", "+00:00"))
+        except ValueError:
+            raise HTTPException(400, detail="for_date must be ISO format")
+    try:
+        doc = await run_daily_aggregation(parsed)
+        doc["date"] = doc["date"].isoformat() if hasattr(doc.get("date"), "isoformat") else str(doc.get("date"))
+        return doc
+    except Exception as e:
+        raise HTTPException(500, detail=f"Daily aggregation failed: {str(e)}")
 
 @router.get("/cases/{case_id}")
 async def get_case(case_id: str):

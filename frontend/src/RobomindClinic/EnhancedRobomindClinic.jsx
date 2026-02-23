@@ -7,14 +7,17 @@ const EnhancedRobomindClinic = () => {
   const [activeTab, setActiveTab] = useState('diagnosis');
   const [screeningResult, setScreeningResult] = useState(null);
   const [therapyPlan, setTherapyPlan] = useState(null);
+  const [therapyId, setTherapyId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [conversationInput, setConversationInput] = useState('');
   const [metrics, setMetrics] = useState(null);
+  const [trends, setTrends] = useState(null);
 
-  // Load dashboard metrics on component mount
+  // Load dashboard metrics and trends on mount (D3: demo-ready dashboard)
   useEffect(() => {
     loadMetrics();
+    loadTrends();
   }, []);
 
   const loadMetrics = async () => {
@@ -26,6 +29,18 @@ const EnhancedRobomindClinic = () => {
       }
     } catch (err) {
       console.error('Failed to load metrics:', err);
+    }
+  };
+
+  const loadTrends = async () => {
+    try {
+      const response = await fetch('/api/robomind/dashboard/trends?days=7');
+      if (response.ok) {
+        const data = await response.json();
+        setTrends(data.trends || []);
+      }
+    } catch (err) {
+      console.error('Failed to load trends:', err);
     }
   };
 
@@ -102,7 +117,8 @@ const EnhancedRobomindClinic = () => {
       }
 
       const result = await response.json();
-      setTherapyPlan(result);
+      setTherapyPlan(result.plan || result);
+      setTherapyId(result.therapy_id || null);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -111,9 +127,10 @@ const EnhancedRobomindClinic = () => {
   };
 
   const applyTherapy = async (inputPrompt) => {
-    if (!therapyPlan) {
+    const plan = therapyPlan;
+    if (!plan) {
       setError('Please generate therapy plan first');
-      return;
+      return null;
     }
 
     setLoading(true);
@@ -127,7 +144,7 @@ const EnhancedRobomindClinic = () => {
         },
         body: JSON.stringify({
           input_prompt: inputPrompt,
-          plan: therapyPlan,
+          plan: plan,
           meta: { model: 'gpt-4', temperature: 0.7 }
         }),
       });
@@ -324,6 +341,7 @@ const EnhancedRobomindClinic = () => {
         {activeTab === 'dashboard' && (
           <div className="dashboard-tab">
             <h2>Clinic Dashboard</h2>
+            <p className="dashboard-story">What&apos;s happening? Where? Is it getting better?</p>
             {metrics ? (
               <div className="metrics-grid">
                 <div className="metric-card">
@@ -333,24 +351,54 @@ const EnhancedRobomindClinic = () => {
                 <div className="metric-card">
                   <h3>Top Pathologies</h3>
                   <ul>
-                    {metrics.top_pathologies.map((pathology, index) => (
+                    {(metrics.top_pathologies || []).map((pathology, index) => (
                       <li key={index}>{pathology}</li>
                     ))}
+                    {(!metrics.top_pathologies || metrics.top_pathologies.length === 0) && (
+                      <li className="muted">No data yet</li>
+                    )}
                   </ul>
                 </div>
                 <div className="metric-card">
                   <h3>Axis Distribution</h3>
                   <div className="axis-distribution">
-                    {Object.entries(metrics.axis_distribution).map(([axis, count]) => (
+                    {metrics.axis_distribution && Object.entries(metrics.axis_distribution).map(([axis, count]) => (
                       <div key={axis} className="axis-item">
                         <span>{axis}: {count}</span>
                       </div>
                     ))}
+                    {(!metrics.axis_distribution || Object.keys(metrics.axis_distribution).length === 0) && (
+                      <span className="muted">No data yet</span>
+                    )}
                   </div>
                 </div>
+                {metrics.uplift && (
+                  <div className="metric-card highlight">
+                    <h3>Is it getting better? (Therapy uplift)</h3>
+                    <div className="metric-value">{metrics.uplift.count_with_uplift ?? 0} cases with post-screening</div>
+                    {metrics.uplift.avg_uplift_composite != null && (
+                      <div className="uplift-avg">Avg composite reduction: <strong>{metrics.uplift.avg_uplift_composite}</strong></div>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <p>Loading metrics...</p>
+            )}
+            {trends && trends.length > 0 && (
+              <div className="trends-section">
+                <h3>Last 7 days</h3>
+                <div className="trends-list">
+                  {trends.map((day, index) => (
+                    <div key={index} className="trend-day">
+                      <span className="trend-date">{day.date}</span>
+                      <span>Screenings: {day.total_screenings ?? 0}</span>
+                      <span>Therapies: {day.total_therapies ?? 0}</span>
+                      {day.avg_uplift_composite != null && <span>Avg uplift: {day.avg_uplift_composite}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         )}

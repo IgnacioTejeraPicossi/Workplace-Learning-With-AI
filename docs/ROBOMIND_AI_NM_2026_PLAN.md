@@ -118,11 +118,20 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
 
 ---
 
+## 4d. Milestone D — Analytics & Competition Narrative ✅ DONE
+
+- **D1 — Therapy effectiveness (uplift):** `save_therapy_plan` stores `pre_composite` and `pre_axis_scores` from profile; returns `therapy_id`. `record_post_screening(therapy_id, post_composite, post_axis_scores)` updates the therapy doc with `post_*`, `uplift_composite` (pre − post), `uplift_axis_scores`. `POST /api/robomind/therapy/{therapy_id}/record-post` with body `{ composite, axis_scores }`. `get_uplift_stats()` returns `count_with_uplift`, `avg_uplift_composite`; included in `GET /dashboard/metrics`.
+- **D2 — Daily metrics job:** `run_daily_aggregation(for_date)` aggregates screenings and therapies for one day into `robomind_metrics_daily` (total_screenings, total_therapies, axis_distribution, top_pathologies, count_therapies_with_uplift, avg_uplift_composite). `POST /api/robomind/admin/daily-metrics?for_date=...` triggers it. `get_daily_metrics(last_n_days)` returns daily snapshots.
+- **D3 — Dashboard polish:** `GET /api/robomind/dashboard/trends?days=7` returns `trends` array. Frontend: dashboard shows uplift card and "Last 7 days" trends; narrative "What's happening? Where? Is it getting better?"; therapy response handles `{ plan, therapy_id }`.
+- **Tests:** `test_record_post_uplift_contract`, `test_record_post_requires_composite`, `test_daily_metrics_contract`, `test_dashboard_trends_contract`; therapy contract updated for `plan` + `therapy_id`.
+
+---
+
 ## 5. Milestones B–D (summary)
 
 - **B:** ~~Add 6–8 Tier 1 detectors~~ (Falsified Introspection, Tool-Interface Decontextualization, Spurious Pattern Hyperconnection, Cross-Session Context Shunting, Goal-Genesis Delirium, Value Drift, etc.); structured meta-judge JSON; one positive + one negative test case per new detector.
 - **C:** ~~Per-workflow/per-module policy overrides in Settings; alerting (critical risk, debounced webhook); export (JSON/CSV with case metadata, findings, decision).~~ ✅ DONE
-- **D:** Store “before”/“after” scores when therapy is applied; compute uplift; daily aggregation job for `robomind_metrics_daily`; dashboard polish (“What’s happening?”, “Where?”, “Is it getting better?”).
+- **D:** ~~Store “before”/“after” scores when therapy is applied; compute uplift; daily aggregation job for `robomind_metrics_daily`; dashboard polish (“What’s happening?”, “Where?”, “Is it getting better?”).~~ ✅ DONE
 
 ---
 

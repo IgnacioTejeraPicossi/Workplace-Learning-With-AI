@@ -237,9 +237,9 @@ async def test_enhanced_post_screen_sample_cases(mock_save_therapy, mock_save_sc
 @patch("backend.clinic.enhanced_router.save_therapy_plan", new_callable=AsyncMock)
 @pytest.mark.asyncio
 async def test_enhanced_post_therapy_contract(mock_save_therapy, mock_save_screening):
-    """POST /api/robomind/therapy returns 200 and TherapyPlan contract."""
+    """POST /api/robomind/therapy returns 200, plan and therapy_id (D1)."""
     mock_save_screening.return_value = None
-    mock_save_therapy.return_value = None
+    mock_save_therapy.return_value = "therapy-id-123"
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
         screen_r = await client.post("/api/robomind/screen", json=ENHANCED_BUNKERING_DISSOC)
     assert screen_r.status_code == 200
@@ -253,14 +253,12 @@ async def test_enhanced_post_therapy_contract(mock_save_therapy, mock_save_scree
         response = await client.post("/api/robomind/therapy", json=therapy_req)
     assert response.status_code == 200
     data = response.json()
-    assert "protocol" in data
-    assert "steps" in data
-    assert "guardrails" in data
-    assert "success_metrics" in data
-    assert isinstance(data["steps"], list)
-    for s in data["steps"]:
+    assert "plan" in data and "therapy_id" in data
+    plan = data["plan"]
+    assert "protocol" in plan and "steps" in plan and "guardrails" in plan and "success_metrics" in plan
+    for s in plan["steps"]:
         assert "title" in s and "prompt_template" in s and "rationale" in s
-    TherapyPlan(**data)
+    TherapyPlan(**plan)
 
 
 @patch("backend.clinic.enhanced_router.save_screening", new_callable=AsyncMock)
@@ -277,7 +275,7 @@ async def test_enhanced_post_apply_contract(mock_save_therapy, mock_save_screeni
             "/api/robomind/therapy",
             json={"profile": profile, "target_issue": "confabulation", "context": {}},
         )
-        plan = therapy_r.json()
+        plan = therapy_r.json()["plan"]
         apply_req = {
             "input_prompt": "Summarize this document.",
             "plan": plan,
@@ -293,15 +291,17 @@ async def test_enhanced_post_apply_contract(mock_save_therapy, mock_save_screeni
     ApplyResponse(**data)
 
 
+@patch("backend.clinic.enhanced_router.get_uplift_stats", new_callable=AsyncMock)
 @patch("backend.clinic.enhanced_router.get_dashboard_metrics", new_callable=AsyncMock)
 @pytest.mark.asyncio
-async def test_enhanced_get_dashboard_metrics_contract(mock_get_metrics):
-    """GET /api/robomind/dashboard/metrics returns 200 and expected shape."""
+async def test_enhanced_get_dashboard_metrics_contract(mock_get_metrics, mock_get_uplift):
+    """GET /api/robomind/dashboard/metrics returns 200, metrics and uplift (D1)."""
     mock_get_metrics.return_value = {
         "total_screenings": 0,
         "axis_distribution": {},
         "top_pathologies": [],
     }
+    mock_get_uplift.return_value = {"count_with_uplift": 0, "avg_uplift_composite": None}
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
         response = await client.get("/api/robomind/dashboard/metrics")
     assert response.status_code == 200
@@ -309,6 +309,9 @@ async def test_enhanced_get_dashboard_metrics_contract(mock_get_metrics):
     assert "total_screenings" in data
     assert "axis_distribution" in data
     assert "top_pathologies" in data
+    assert "uplift" in data
+    assert "count_with_uplift" in data["uplift"]
+    assert "avg_uplift_composite" in data["uplift"]
 
 
 @pytest.mark.asyncio
@@ -593,3 +596,72 @@ async def test_export_contract(mock_get_export):
     assert r_csv.status_code == 200
     assert "text/csv" in r_csv.headers.get("content-type", "")
     assert "decision_outcome" in r_csv.text
+
+
+# ---------------------------------------------------------------------------
+# Milestone D: Analytics, uplift, daily metrics, dashboard
+# ---------------------------------------------------------------------------
+
+@patch("backend.clinic.enhanced_router.record_post_screening", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_record_post_uplift_contract(mock_record_post):
+    """D1: POST /api/robomind/therapy/{id}/record-post returns uplift when therapy has pre-screening."""
+    mock_record_post.return_value = {"uplift_composite": 15.0, "uplift_axis_scores": {"epistemic": 10.0}, "pre_composite": 70.0, "post_composite": 55.0}
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.post(
+            "/api/robomind/therapy/507f1f77bcf86cd799439011/record-post",
+            json={"composite": 55.0, "axis_scores": {"epistemic": 50.0}},
+        )
+    assert r.status_code == 200
+    data = r.json()
+    assert "uplift_composite" in data
+    assert data["uplift_composite"] == 15.0
+    assert "pre_composite" in data and "post_composite" in data
+
+
+@pytest.mark.asyncio
+async def test_record_post_requires_composite():
+    """D1: record-post returns 400 when composite is missing."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.post("/api/robomind/therapy/507f1f77bcf86cd799439011/record-post", json={})
+    assert r.status_code == 400
+
+
+@patch("backend.clinic.enhanced_router.run_daily_aggregation", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_daily_metrics_contract(mock_run_agg):
+    """D2: POST /api/robomind/admin/daily-metrics runs aggregation and returns daily doc."""
+    mock_run_agg.return_value = {
+        "date": "2026-02-19T00:00:00",
+        "total_screenings": 5,
+        "total_therapies": 2,
+        "axis_distribution": {"epistemic": 30.0},
+        "top_pathologies": ["confabulation"],
+        "count_therapies_with_uplift": 1,
+        "avg_uplift_composite": 12.0,
+    }
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.post("/api/robomind/admin/daily-metrics")
+    assert r.status_code == 200
+    data = r.json()
+    assert "total_screenings" in data
+    assert "total_therapies" in data
+    assert "top_pathologies" in data
+    assert "avg_uplift_composite" in data
+
+
+@patch("backend.clinic.enhanced_router.get_daily_metrics", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_dashboard_trends_contract(mock_get_daily):
+    """D3: GET /api/robomind/dashboard/trends returns daily snapshots for dashboard."""
+    mock_get_daily.return_value = [
+        {"date": "2026-02-18T00:00:00", "total_screenings": 3, "total_therapies": 1},
+        {"date": "2026-02-19T00:00:00", "total_screenings": 5, "total_therapies": 2},
+    ]
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+        r = await client.get("/api/robomind/dashboard/trends?days=7")
+    assert r.status_code == 200
+    data = r.json()
+    assert "trends" in data
+    assert len(data["trends"]) == 2
+    assert data["trends"][0]["total_screenings"] == 3
