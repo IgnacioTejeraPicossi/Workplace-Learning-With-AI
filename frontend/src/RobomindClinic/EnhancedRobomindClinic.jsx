@@ -13,6 +13,9 @@ const EnhancedRobomindClinic = () => {
   const [conversationInput, setConversationInput] = useState('');
   const [metrics, setMetrics] = useState(null);
   const [trends, setTrends] = useState(null);
+  const [applyPrompt, setApplyPrompt] = useState('');
+  const [injectedPrompt, setInjectedPrompt] = useState(null);
+  const [demoMode, setDemoMode] = useState(false);
 
   // Load dashboard metrics and trends on mount (D3: demo-ready dashboard)
   useEffect(() => {
@@ -69,6 +72,7 @@ const EnhancedRobomindClinic = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(demoMode ? { 'X-Demo-Mode': 'true' } : {}),
         },
         body: JSON.stringify({
           turns: turns,
@@ -135,6 +139,7 @@ const EnhancedRobomindClinic = () => {
 
     setLoading(true);
     setError(null);
+    setInjectedPrompt(null);
 
     try {
       const response = await fetch('/api/robomind/apply', {
@@ -154,6 +159,7 @@ const EnhancedRobomindClinic = () => {
       }
 
       const result = await response.json();
+      setInjectedPrompt(result.injected_prompt);
       return result.injected_prompt;
     } catch (err) {
       setError(err.message);
@@ -224,6 +230,16 @@ const EnhancedRobomindClinic = () => {
                 placeholder="Enter conversation turns or paste JSON data..."
                 rows={8}
               />
+              <div className="screen-options">
+                <label className="demo-mode-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={demoMode}
+                    onChange={(e) => setDemoMode(e.target.checked)}
+                  />
+                  Demo mode (cached results for same input)
+                </label>
+              </div>
               <button onClick={runScreening} disabled={loading}>
                 {loading ? 'Screening...' : '🩺 Quick Screen'}
               </button>
@@ -290,7 +306,10 @@ const EnhancedRobomindClinic = () => {
               <div className="therapy-section">
                 <h3>Generate Therapy Plan</h3>
                 <div className="therapy-buttons">
-                  {screeningResult.top_flags.slice(0, 3).map((flag, index) => (
+                  {(screeningResult.top_flags && screeningResult.top_flags.length > 0
+                    ? screeningResult.top_flags.slice(0, 3)
+                    : [{ type: 'confabulation' }, { type: 'dissociation' }, { type: 'repetition_loop' }]
+                  ).map((flag, index) => (
                     <button
                       key={index}
                       onClick={() => generateTherapy(flag.type)}
@@ -302,6 +321,7 @@ const EnhancedRobomindClinic = () => {
                 </div>
 
                 {therapyPlan && (
+                  <>
                   <div className="therapy-plan">
                     <h3>Therapy Plan: {therapyPlan.protocol}</h3>
                     <div className="therapy-steps">
@@ -330,6 +350,31 @@ const EnhancedRobomindClinic = () => {
                       </ul>
                     </div>
                   </div>
+                  <div className="apply-therapy-section">
+                    <h4>Apply therapy to a prompt</h4>
+                    <p className="apply-hint">Enter the prompt you want to augment with this therapy. The result can be sent to your LLM.</p>
+                    <textarea
+                      className="apply-prompt-input"
+                      placeholder="e.g. Summarize this document."
+                      value={applyPrompt}
+                      onChange={(e) => setApplyPrompt(e.target.value)}
+                      rows={3}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => applyTherapy(applyPrompt || 'Answer the user question.')}
+                      disabled={loading}
+                    >
+                      {loading ? 'Applying...' : 'Apply therapy'}
+                    </button>
+                    {injectedPrompt && (
+                      <div className="injected-result">
+                        <h5>Augmented prompt (copy to your LLM)</h5>
+                        <pre className="injected-prompt">{injectedPrompt}</pre>
+                      </div>
+                    )}
+                  </div>
+                  </>
                 )}
               </div>
             ) : (

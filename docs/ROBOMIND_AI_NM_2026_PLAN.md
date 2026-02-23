@@ -146,4 +146,28 @@ Once you confirm, the next step is **A1: add the automated test suite** for the 
 
 ---
 
+## 7. E2E UI & Competition Package ✅ IN PROGRESS
+
+### 7.1 E2E flows (UI review) ✅ DONE
+
+- **Screening → Therapy → Apply** flow is now complete in the UI:
+  - **Diagnosis tab:** Conversation input (JSON or plain text), **Demo mode** checkbox (sends `X-Demo-Mode: true` for deterministic/cached results), “Quick Screen” → composite, axis scores, top flags.
+  - **Therapy tab:** If screening has top flags, “Treat &lt;type&gt;” buttons; if none, fallback buttons “Treat confabulation”, “Treat dissociation”, “Treat repetition_loop”. Generate plan → show protocol, steps, guardrails, success metrics. **Apply therapy:** textarea “Prompt to augment” + “Apply therapy” → shows “Augmented prompt (copy to your LLM)”.
+  - **Dashboard tab:** Metrics, uplift card, “Last 7 days” trends.
+  - **Settings tab:** Placeholder (policy API not wired; optional for later).
+- **Files changed:** `frontend/src/RobomindClinic/EnhancedRobomindClinic.jsx` — state for `applyPrompt`, `injectedPrompt`, `demoMode`; Apply section with textarea + result; fallback therapy buttons when no flags; Demo mode checkbox.
+
+### 7.2 Competition package checklist (to do)
+
+- [ ] **Run backend from root:** `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000`
+- [ ] **Run frontend:** `cd frontend && npm start` (port 3000)
+- [ ] **Optional:** MongoDB for screenings/therapies/dashboard; else metrics and trends may be empty
+- [ ] **Demo:** Open Robomind Clinic → Diagnosis → paste sample turns (or JSON) → enable “Demo mode” → Quick Screen → Therapy → Treat one issue → Apply therapy with a prompt → confirm augmented prompt
+- [ ] **Export:** `GET /api/robomind/export?format=json` for judges
+- [ ] **One-pager / slide:** Objective, key features (detectors, policies, uplift, export), how to run
+
+**Demo guide:** [ROBOMIND_AI_NM_2026_DEMO.md](ROBOMIND_AI_NM_2026_DEMO.md) — quick run, 1‑minute UI script, key endpoints, features to highlight.
+
+---
+
 *Ignacio Tejera — February 2026 — AI_NM_2026*
