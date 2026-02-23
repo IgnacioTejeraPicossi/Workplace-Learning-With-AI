@@ -452,6 +452,25 @@ const RunTest = () => {
           
           // J-messages MCP endpoints
           { name: 'GET /api/mcp/manifest', endpoint: '/api/mcp/manifest', method: 'GET', requiresAuth: false },
+
+          // Robomind Clinic (Enhanced API – AI_NM_2026)
+          { name: 'GET /api/robomind/dashboard/metrics', endpoint: '/api/robomind/dashboard/metrics', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/robomind/dashboard/trends', endpoint: '/api/robomind/dashboard/trends?days=7', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/robomind/settings/policies', endpoint: '/api/robomind/settings/policies', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/robomind/export', endpoint: '/api/robomind/export?format=json', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/robomind/cases/{id}', endpoint: '/api/robomind/cases/test-case-id', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/robomind/screen', endpoint: '/api/robomind/screen', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/robomind/therapy', endpoint: '/api/robomind/therapy', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/robomind/apply', endpoint: '/api/robomind/apply', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/robomind/therapy/{id}/record-post', endpoint: '/api/robomind/therapy/507f1f77bcf86cd799439011/record-post', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/robomind/admin/daily-metrics', endpoint: '/api/robomind/admin/daily-metrics', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/robomind/admin/retention-cleanup', endpoint: '/api/robomind/admin/retention-cleanup', method: 'POST', requiresAuth: false },
+          { name: 'PUT /api/robomind/settings/policies/workflow/{key}', endpoint: '/api/robomind/settings/policies/workflow/test', method: 'PUT', requiresAuth: false },
+          // Legacy clinic
+          { name: 'GET /api/clinic/health', endpoint: '/api/clinic/health', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/clinic/disorders', endpoint: '/api/clinic/disorders', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/clinic/therapy-patches', endpoint: '/api/clinic/therapy-patches', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/clinic/diagnose', endpoint: '/api/clinic/diagnose', method: 'POST', requiresAuth: false },
     ];
 
     const results = [];
@@ -1132,6 +1151,67 @@ const RunTest = () => {
                 focus_on_errors: true
               };
               break;
+            // Robomind Clinic (Enhanced API)
+            case '/api/robomind/screen':
+              testData = {
+                turns: [
+                  { role: 'user', content: 'Hello', meta: {} },
+                  { role: 'assistant', content: 'Hi there.', meta: {} }
+                ],
+                sources: [],
+                meta: { model: 'gpt-4', temperature: 0.7 }
+              };
+              break;
+            case '/api/robomind/therapy':
+              testData = {
+                profile: {
+                  axis_scores: {},
+                  composite: 0,
+                  top_flags: [],
+                  evidence: []
+                },
+                target_issue: 'confabulation',
+                context: {}
+              };
+              break;
+            case '/api/robomind/apply':
+              testData = {
+                input_prompt: 'Summarize this document.',
+                plan: {
+                  protocol: 'Reality-Anchor',
+                  steps: [
+                    { title: 'Evidence First', prompt_template: 'List sources.', rationale: 'Anchors to citations.' }
+                  ],
+                  guardrails: ['Reject unsupported claims'],
+                  success_metrics: ['% answers with citations']
+                },
+                meta: {}
+              };
+              break;
+            case '/api/robomind/therapy/507f1f77bcf86cd799439011/record-post':
+              testData = { composite: 55, axis_scores: {} };
+              break;
+            case '/api/robomind/admin/daily-metrics':
+              testData = {};
+              break;
+            case '/api/robomind/admin/retention-cleanup':
+              testData = {};
+              break;
+            case '/api/robomind/settings/policies/workflow/test':
+              if (method === 'PUT') {
+                testData = { threshold_block: 70 };
+              }
+              break;
+            case '/api/clinic/diagnose':
+              testData = {
+                run_id: `run-api-test-${Date.now()}`,
+                turns: [
+                  { role: 'user', content: 'What is the capital of France?' },
+                  { role: 'assistant', content: 'Paris.' }
+                ],
+                meta: {}
+              };
+              break;
             default:
               testData = { query: 'test query' };
           }
@@ -1279,6 +1359,13 @@ const RunTest = () => {
           if (!errorDetail) {
             errorDetail = 'Conflict (expected): a training pair with the same key may already exist. This confirms uniqueness validation.';
           }
+        }
+
+        // Robomind record-post with placeholder therapy_id returns 404 (expected)
+        if (api.endpoint.includes('/api/robomind/therapy/') && api.endpoint.includes('/record-post') && numericStatus === 404) {
+          status = 'expected_fail';
+          statusCode = '404 (Expected)';
+          errorDetail = 'Therapy not found (expected - use a real therapy_id from POST /api/robomind/therapy to test uplift)';
         }
         
         results.push({
