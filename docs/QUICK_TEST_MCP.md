@@ -20,7 +20,7 @@ If you have a J-melding file, place it in the project:
 ### Option C: Use a Test PDF (if you have one)
 If you have any PDF in the project, you can test with it:
 - Check: `static/Workplace-Learning-With-AI_documentation.pdf`
-- Or: `Defendable-Red-Team.pdf`
+- Or: `docs/Defendable-Red-Team.pdf`
 
 ## 🧪 Step 2: Test the MCP Endpoint
 
