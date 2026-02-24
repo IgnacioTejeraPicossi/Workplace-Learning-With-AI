@@ -168,6 +168,46 @@ Once you confirm, the next step is **A1: add the automated test suite** for the 
 
 **Demo guide:** [ROBOMIND_AI_NM_2026_DEMO.md](ROBOMIND_AI_NM_2026_DEMO.md) — quick run, 1‑minute UI script, key endpoints, features to highlight.
 
+**Run Tests:** Robomind Clinic APIs (enhanced + legacy) are included in **Run Tests → Run API Tests** (frontend); all endpoints are hit with test payloads; record-post 404 with placeholder id is shown as Expected Fail.
+
+---
+
+## 8. What’s left for the competition (plan)
+
+After **E2E UI & Competition Package** (E2E flows done, Run API Tests updated), the remaining work is **operational and presentation**.
+
+### 8.1 Acceptance & dry-run (you)
+
+| # | Task | Notes |
+|---|------|--------|
+| 1 | **Run backend from root** | `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000` |
+| 2 | **Run frontend** | `cd frontend && npm start` (port 3000) |
+| 3 | **Optional: MongoDB** | For screenings/therapies/dashboard persistence; without it, metrics/trends can be empty |
+| 4 | **Demo dry-run** | Robomind Clinic → Diagnosis (Demo mode) → Quick Screen → Therapy → Treat → Apply therapy → Dashboard; confirm no errors |
+| 5 | **Export check** | `GET /api/robomind/export?format=json` (e.g. from browser or Run API Tests); confirm response shape for judges |
+
+### 8.2 Narrative & one-pager (optional, Cursor can draft)
+
+| # | Task | Notes |
+|---|------|--------|
+| 6 | **One-pager / slide** | 1 page: objective (“From Prompts to Proof”), key features (10 detectors, policies, uplift, export, demo mode), how to run (backend + frontend + optional Mongo). → **[ROBOMIND_AI_NM_2026_ONE_PAGER.md](ROBOMIND_AI_NM_2026_ONE_PAGER.md)** (done). |
+| 7 | **Judge handout** | Short “for evaluators” note: link to demo guide, Run Tests coverage, export URL. → **[ROBOMIND_AI_NM_2026_FOR_EVALUATORS.md](ROBOMIND_AI_NM_2026_FOR_EVALUATORS.md)** (done). |
+
+### Documentation index (all before test)
+
+| Document | Purpose |
+|----------|--------|
+| [ROBOMIND_AI_NM_2026_PLAN.md](ROBOMIND_AI_NM_2026_PLAN.md) | This plan; milestones A–D, E2E, checklist. |
+| [ROBOMIND_AI_NM_2026_DEMO.md](ROBOMIND_AI_NM_2026_DEMO.md) | Quick run, 1‑minute UI demo, key endpoints, features. |
+| [ROBOMIND_AI_NM_2026_FOR_EVALUATORS.md](ROBOMIND_AI_NM_2026_FOR_EVALUATORS.md) | Note for judges: what it is, how to run, Run Tests coverage, export URL, summary for scoring. |
+| [ROBOMIND_AI_NM_2026_ONE_PAGER.md](ROBOMIND_AI_NM_2026_ONE_PAGER.md) | One page: objective, key features, how to run (slide/handout). |
+
+### 8.3 Day-of checklist
+
+- Backend and frontend running; optional MongoDB if you want full dashboard/trends.
+- Demo script: 1‑minute flow (Diagnosis → Therapy → Apply → Dashboard) with Demo mode on.
+- Export and Run API Tests available if judges want to see API coverage or audit data.
+
 ---
 
 *Ignacio Tejera — February 2026 — AI_NM_2026*
