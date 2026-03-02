@@ -34,12 +34,27 @@ for _env in (
         break
 
 from config import get_ws_url
-from strategy import decide_level1, decide_level2
+from strategy import decide_level1, decide_level2, decide_level3, _assign_targets
 
 
-def _decide(bot: dict, state: dict, level: int):
+def _bots_at_drop(state: dict) -> set:
+    """Bot ids that are on drop_off and have inventory (for collision avoidance)."""
+    drop = state.get("drop_off") or [0, 0]
+    out = set()
+    for b in state.get("bots") or []:
+        pos = b.get("position") or [0, 0]
+        if pos[0] == drop[0] and pos[1] == drop[1] and (b.get("inventory") or []):
+            out.add(b["id"])
+    return out
+
+
+def _decide(bot: dict, state: dict, level: int, bots_at_drop: set | None = None):
     if level == 1:
         return decide_level1(bot, state)
+    bots = state.get("bots") or []
+    if level >= 3 or len(bots) > 1:
+        assignments = _assign_targets(state)
+        return decide_level3(bot, state, assignments, bots_at_drop=bots_at_drop or set())
     return decide_level2(bot, state)
 
 
@@ -53,18 +68,25 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True):
 
             if msg_type == "game_over":
                 score = msg.get("score", 0)
-                print(f"Game over. Score: {score}")
+                reason = msg.get("reason") or msg.get("message") or ""
+                print(f"Game over. Score: {score} | Rounds played: {round_count}")
+                if reason:
+                    print(f"  Reason: {reason}")
                 break
 
             state = msg
             round_count += 1
-            if verbose and round_count <= 2:
-                print(f"Round {state.get('round', '?')}/{state.get('max_rounds', 300)} "
-                      f"| bots: {len(state.get('bots', []))} | orders: {len(state.get('orders', []))}")
+            if verbose:
+                r = state.get("round", "?")
+                if round_count <= 3 or round_count % 50 == 0:
+                    print(f"Round {r}/{state.get('max_rounds', 300)} "
+                          f"| bots: {len(state.get('bots', []))} | orders: {len(state.get('orders', []))}")
 
             actions = []
-            for bot in state.get("bots", []):
-                action = _decide(bot, state, level)
+            bots_list = state.get("bots") or []
+            at_drop = _bots_at_drop(state) if (level >= 3 or len(bots_list) > 1) else None
+            for bot in bots_list:
+                action = _decide(bot, state, level, bots_at_drop=at_drop)
                 actions.append(action)
 
             await ws.send(json.dumps({"actions": actions}))
@@ -72,8 +94,8 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True):
 
 def main():
     parser = argparse.ArgumentParser(description="NMiAI 2026 Grocery Bot")
-    parser.add_argument("--level", type=int, default=2, choices=(1, 2),
-                        help="1=connect & wait only, 2=play (Manhattan solver)")
+    parser.add_argument("--level", type=int, default=2, choices=(1, 2, 3),
+                        help="1=wait only, 2=1-bot solver, 3=multi-bot (or auto when bots>1)")
     parser.add_argument("--quiet", action="store_true", help="Less console output")
     args = parser.parse_args()
 
