@@ -48,17 +48,64 @@ def _bots_at_drop(state: dict) -> set:
     return out
 
 
-def _decide(bot: dict, state: dict, level: int, bots_at_drop: set | None = None):
+def _next_position_after_action(bot: dict, action: dict) -> tuple[int, int] | None:
+    """Cell the bot will be in after this action (for move_* only); None if no move."""
+    act = action.get("action") or ""
+    if act not in ("move_up", "move_down", "move_left", "move_right"):
+        return None
+    pos = bot.get("position") or [0, 0]
+    x, y = pos[0], pos[1]
+    if act == "move_left":
+        return (x - 1, y)
+    if act == "move_right":
+        return (x + 1, y)
+    if act == "move_up":
+        return (x, y - 1)
+    if act == "move_down":
+        return (x, y + 1)
+    return None
+
+
+def _decide(
+    bot: dict,
+    state: dict,
+    level: int,
+    bots_at_drop: set | None = None,
+    claimed_next_cells: set | None = None,
+    failed_pickups: dict | None = None,
+):
+    failed_pickups = failed_pickups or {}
     if level == 1:
         return decide_level1(bot, state)
     bots = state.get("bots") or []
     if level >= 3 or len(bots) > 1:
         assignments = _assign_targets(state)
-        return decide_level3(bot, state, assignments, bots_at_drop=bots_at_drop or set())
-    return decide_level2(bot, state)
+        return decide_level3(
+            bot, state, assignments,
+            bots_at_drop=bots_at_drop or set(),
+            claimed_next_cells=claimed_next_cells,
+            failed_pickups=failed_pickups,
+        )
+    return decide_level2(bot, state, failed_pickups=failed_pickups)
 
 
-async def play(ws_url: str, level: int = 2, verbose: bool = True):
+def _debug_print_state(state: dict):
+    """Print a compact view of game state to verify structure (grid, walls, etc.)."""
+    print("[DEBUG] Top-level keys:", list(state.keys()))
+    grid = state.get("grid") or {}
+    print("[DEBUG] grid keys:", list(grid.keys()), "| width:", grid.get("width"), "height:", grid.get("height"))
+    walls = grid.get("walls") or []
+    print("[DEBUG] walls: count =", len(walls), "| sample:", walls[:5] if len(walls) > 5 else walls)
+    print("[DEBUG] drop_off:", state.get("drop_off"))
+    bots = state.get("bots") or []
+    print("[DEBUG] bots:", len(bots), "| positions:", [b.get("position") for b in bots])
+    orders = state.get("orders") or []
+    print("[DEBUG] orders:", len(orders), "| active:", next((o for o in orders if o.get("status") == "active"), None))
+    items = state.get("items") or []
+    print("[DEBUG] items:", len(items), "| sample:", items[:2])
+
+
+async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = False, trace: bool = False):
     async with websockets.connect(ws_url) as ws:
         round_count = 0
         while True:
@@ -76,6 +123,14 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True):
 
             state = msg
             round_count += 1
+            if debug and round_count == 1:
+                _debug_print_state(state)
+                try:
+                    with open(os.path.join(os.path.dirname(__file__), "debug_first_state.json"), "w", encoding="utf-8") as f:
+                        json.dump(state, f, indent=2)
+                    print("[DEBUG] Full state saved to grocery_bot/debug_first_state.json")
+                except Exception as e:
+                    print("[DEBUG] Could not save state file:", e)
             if verbose:
                 r = state.get("round", "?")
                 if round_count <= 3 or round_count % 50 == 0:
@@ -85,9 +140,61 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True):
             actions = []
             bots_list = state.get("bots") or []
             at_drop = _bots_at_drop(state) if (level >= 3 or len(bots_list) > 1) else None
-            for bot in bots_list:
-                action = _decide(bot, state, level, bots_at_drop=at_drop)
+            # Detect failed pick_ups: last round we sent pick_up but still same pos and same inv
+            failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", {})
+            last_round = getattr(play, "_last_round", None)
+            if last_round:
+                for b in bots_list:
+                    bid = b["id"]
+                    pos = tuple(b.get("position") or [0, 0])
+                    inv = tuple(b.get("inventory") or [])
+                    prev = last_round.get(bid)
+                    if prev and prev.get("action") == "pick_up":
+                        item_id = prev.get("item_id", "")
+                        if prev.get("pos") == pos and prev.get("inv") == inv and item_id:
+                            key = (bid, item_id)
+                            failed_pickups[key] = failed_pickups.get(key, 0) + 1
+                    elif prev and len(inv) > len(prev.get("inv") or []):
+                        for k in list(failed_pickups):
+                            if k[0] == bid:
+                                del failed_pickups[k]
+                play._failed_pickups = failed_pickups
+            claimed: set[tuple[int, int]] = set()
+            for bot in sorted(bots_list, key=lambda b: b["id"]):
+                action = _decide(
+                    bot, state, level,
+                    bots_at_drop=at_drop,
+                    claimed_next_cells=claimed if len(bots_list) > 1 else None,
+                    failed_pickups=failed_pickups,
+                )
                 actions.append(action)
+                next_pos = _next_position_after_action(bot, action)
+                if next_pos:
+                    claimed.add(next_pos)
+            sorted_bots = sorted(bots_list, key=lambda x: x["id"])
+            play._last_round = {}
+            for i, b in enumerate(sorted_bots):
+                if i >= len(actions):
+                    break
+                act = actions[i]
+                play._last_round[b["id"]] = {
+                    "pos": tuple(b.get("position") or [0, 0]),
+                    "action": act.get("action"),
+                    "item_id": act.get("item_id", "") if act.get("action") == "pick_up" else "",
+                    "inv": tuple(b.get("inventory") or []),
+                }
+
+            if trace and round_count <= 10:
+                for bot, action in zip(sorted(bots_list, key=lambda b: b["id"]), actions):
+                    pos = bot.get("position", [0, 0])
+                    act = action.get("action", "?")
+                    extra = f" item_id={action.get('item_id', '')}" if action.get("item_id") else ""
+                    print(f"  [Trace] Round {round_count} bot {bot['id']} pos={pos} -> {act}{extra}")
+                if round_count == 1 and len(bots_list) > 1:
+                    from strategy import _assign_targets
+                    ass = _assign_targets(state)
+                    for bid, item in ass.items():
+                        print(f"  [Trace] Assignment: bot {bid} -> {item.get('type')} at {item.get('position')}")
 
             await ws.send(json.dumps({"actions": actions}))
 
@@ -97,6 +204,8 @@ def main():
     parser.add_argument("--level", type=int, default=2, choices=(1, 2, 3),
                         help="1=wait only, 2=1-bot solver, 3=multi-bot (or auto when bots>1)")
     parser.add_argument("--quiet", action="store_true", help="Less console output")
+    parser.add_argument("--debug", action="store_true", help="Print first game state (grid, walls, etc.) to fix strategy")
+    parser.add_argument("--trace", action="store_true", help="Print each bot position+action for first 10 rounds (to see why score is low)")
     args = parser.parse_args()
 
     try:
@@ -107,7 +216,7 @@ def main():
 
     if not args.quiet:
         print(f"Connecting (level={args.level})...")
-    asyncio.run(play(ws_url, level=args.level, verbose=not args.quiet))
+    asyncio.run(play(ws_url, level=args.level, verbose=not args.quiet, debug=args.debug, trace=args.trace))
 
 
 if __name__ == "__main__":
