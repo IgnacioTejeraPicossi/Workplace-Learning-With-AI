@@ -230,7 +230,7 @@ def decide_level2(bot: dict, state: dict, failed_pickups: dict | None = None) ->
         candidates.sort(key=lambda i: manhattan(pos, i.get("position", [0, 0])))
         bot_id = bot["id"]
         for target in candidates:
-            if failed_pickups.get((bot_id, target["id"]), 0) >= 2:
+            if failed_pickups.get((bot_id, target["id"]), 0) >= 1:
                 continue
             ix, iy = target.get("position", [0, 0])
             if manhattan([x, y], [ix, iy]) == 1:
@@ -251,8 +251,8 @@ def decide_level2(bot: dict, state: dict, failed_pickups: dict | None = None) ->
 
 def _assign_targets(state: dict) -> dict[int, dict]:
     """
-    Greedy assignment: each bot gets the nearest needed item not yet assigned.
-    Returns bot_id -> item (or empty dict for that bot).
+    Greedy assignment: every bot gets the nearest needed item not yet assigned.
+    Multiple bots can target different items of the same type (so 5 bots get 5 targets).
     """
     orders = state.get("orders") or []
     active = next((o for o in orders if o.get("status") == "active"), None)
@@ -267,17 +267,14 @@ def _assign_targets(state: dict) -> dict[int, dict]:
     bots = state.get("bots") or []
     assigned_item_ids: set = set()
     bot_assignments: dict[int, dict] = {}
-    remaining_needed = list(needed)
     for bot in sorted(bots, key=lambda b: b["id"]):
-        if not remaining_needed:
-            break
         best_item = None
         best_dist = 1_000_000
         pos = bot.get("position", [0, 0])
         for item in candidates:
             if item.get("id") in assigned_item_ids:
                 continue
-            if item.get("type") not in remaining_needed:
+            if item.get("type") not in needed:
                 continue
             d = manhattan(pos, item.get("position", [0, 0]))
             if d < best_dist:
@@ -286,7 +283,6 @@ def _assign_targets(state: dict) -> dict[int, dict]:
         if best_item:
             bot_assignments[bot["id"]] = best_item
             assigned_item_ids.add(best_item["id"])
-            remaining_needed.remove(best_item["type"])
     return bot_assignments
 
 
@@ -344,7 +340,7 @@ def decide_level3(
     target_item = bot_assignments.get(bot_id)
     if target_item and _item_still_on_map(state, target_item.get("id", "")):
         item_id = target_item.get("id", "")
-        if failed_pickups.get((bot_id, item_id), 0) >= 2:
+        if failed_pickups.get((bot_id, item_id), 0) >= 1:
             # Replan: don't spam pick_up; deliver if we have items, else wait
             if bot.get("inventory"):
                 return step_toward(

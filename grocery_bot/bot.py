@@ -141,7 +141,7 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
             bots_list = state.get("bots") or []
             at_drop = _bots_at_drop(state) if (level >= 3 or len(bots_list) > 1) else None
             # Detect failed pick_ups: last round we sent pick_up but still same pos and same inv
-            failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", {})
+            failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", None) or {}
             last_round = getattr(play, "_last_round", None)
             if last_round:
                 for b in bots_list:
@@ -158,7 +158,7 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
                         for k in list(failed_pickups):
                             if k[0] == bid:
                                 del failed_pickups[k]
-                play._failed_pickups = failed_pickups
+            play._failed_pickups = failed_pickups
             claimed: set[tuple[int, int]] = set()
             for bot in sorted(bots_list, key=lambda b: b["id"]):
                 action = _decide(
