@@ -54,6 +54,7 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Full README** (installation, setup, all modules): [docs/README_FULL.md](docs/README_FULL.md)
 - **Quick index**: [docs/README_INDEX.md](docs/README_INDEX.md) — architecture, deployment, agents, admin
 - **Robomind Clinic (AI_NM_2026)**: [docs/ROBOMIND_AI_NM_2026_PLAN.md](docs/ROBOMIND_AI_NM_2026_PLAN.md)
+- **Grocery Bot (NMiAI 2026 Pre-Challenge)**: [grocery_bot/README.md](grocery_bot/README.md) — [plan](docs/NMiAI_2026_GROCERY_BOT_PLAN.md)
 
 ---
 
