@@ -34,18 +34,16 @@ for _env in (
         break
 
 from config import get_ws_url
-from strategy import decide_level1, decide_level2, decide_level3, _assign_targets
-
-
-def _bots_at_drop(state: dict) -> set:
-    """Bot ids that are on drop_off and have inventory (for collision avoidance)."""
-    drop = state.get("drop_off") or [0, 0]
-    out = set()
-    for b in state.get("bots") or []:
-        pos = b.get("position") or [0, 0]
-        if pos[0] == drop[0] and pos[1] == drop[1] and (b.get("inventory") or []):
-            out.add(b["id"])
-    return out
+from strategy import (
+    decide_level1,
+    decide,
+    decide_single_bot,
+    decide_three_bots,
+    _assign_targets,
+    _assign_targets_three_bots,
+    _select_courier_id,
+    manhattan,
+)
 
 
 def _next_position_after_action(bot: dict, action: dict) -> tuple[int, int] | None:
@@ -64,29 +62,6 @@ def _next_position_after_action(bot: dict, action: dict) -> tuple[int, int] | No
     if act == "move_down":
         return (x, y + 1)
     return None
-
-
-def _decide(
-    bot: dict,
-    state: dict,
-    level: int,
-    bots_at_drop: set | None = None,
-    claimed_next_cells: set | None = None,
-    failed_pickups: dict | None = None,
-):
-    failed_pickups = failed_pickups or {}
-    if level == 1:
-        return decide_level1(bot, state)
-    bots = state.get("bots") or []
-    if level >= 3 or len(bots) > 1:
-        assignments = _assign_targets(state)
-        return decide_level3(
-            bot, state, assignments,
-            bots_at_drop=bots_at_drop or set(),
-            claimed_next_cells=claimed_next_cells,
-            failed_pickups=failed_pickups,
-        )
-    return decide_level2(bot, state, failed_pickups=failed_pickups)
 
 
 def _debug_print_state(state: dict):
@@ -139,61 +114,56 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
 
             actions = []
             bots_list = state.get("bots") or []
-            at_drop = _bots_at_drop(state) if (level >= 3 or len(bots_list) > 1) else None
-            # Detect failed pick_ups: last round we sent pick_up but still same pos and same inv
-            failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", None) or {}
-            last_round = getattr(play, "_last_round", None)
-            if last_round:
-                for b in bots_list:
-                    bid = b["id"]
-                    pos = tuple(b.get("position") or [0, 0])
-                    inv = tuple(b.get("inventory") or [])
-                    prev = last_round.get(bid)
-                    if prev and prev.get("action") == "pick_up":
-                        item_id = prev.get("item_id", "")
-                        if prev.get("pos") == pos and prev.get("inv") == inv and item_id:
-                            key = (bid, item_id)
-                            failed_pickups[key] = failed_pickups.get(key, 0) + 1
-                    elif prev and len(inv) > len(prev.get("inv") or []):
-                        for k in list(failed_pickups):
-                            if k[0] == bid:
-                                del failed_pickups[k]
-            play._failed_pickups = failed_pickups
+
+            # Compute assignments ONCE per round (not per bot)
+            if level == 1:
+                assignments: dict[int, dict] = {}
+            else:
+                if len(bots_list) == 3:
+                    courier_id = _select_courier_id(state)
+                    assignments = _assign_targets_three_bots(state, courier_id)
+                else:
+                    courier_id = -1
+                    assignments = _assign_targets(state)
+
             claimed: set[tuple[int, int]] = set()
+            use_single_bot = len(bots_list) == 1
+            use_three_bots = len(bots_list) == 3
             for bot in sorted(bots_list, key=lambda b: b["id"]):
-                action = _decide(
-                    bot, state, level,
-                    bots_at_drop=at_drop,
-                    claimed_next_cells=claimed if len(bots_list) > 1 else None,
-                    failed_pickups=failed_pickups,
-                )
+                if level == 1:
+                    action = decide_level1(bot, state)
+                elif use_single_bot:
+                    action = decide_single_bot(bot, state)
+                elif use_three_bots:
+                    action = decide_three_bots(
+                        bot, state, assignments, courier_id=courier_id, claimed_cells=claimed,
+                    )
+                else:
+                    action = decide(
+                        bot, state, assignments,
+                        claimed_cells=claimed,
+                    )
                 actions.append(action)
                 next_pos = _next_position_after_action(bot, action)
                 if next_pos:
                     claimed.add(next_pos)
-            sorted_bots = sorted(bots_list, key=lambda x: x["id"])
-            play._last_round = {}
-            for i, b in enumerate(sorted_bots):
-                if i >= len(actions):
-                    break
-                act = actions[i]
-                play._last_round[b["id"]] = {
-                    "pos": tuple(b.get("position") or [0, 0]),
-                    "action": act.get("action"),
-                    "item_id": act.get("item_id", "") if act.get("action") == "pick_up" else "",
-                    "inv": tuple(b.get("inventory") or []),
-                }
 
             if trace and round_count <= 10:
                 for bot, action in zip(sorted(bots_list, key=lambda b: b["id"]), actions):
                     pos = bot.get("position", [0, 0])
+                    inv = bot.get("inventory") or []
                     act = action.get("action", "?")
-                    extra = f" item_id={action.get('item_id', '')}" if action.get("item_id") else ""
-                    print(f"  [Trace] Round {round_count} bot {bot['id']} pos={pos} -> {act}{extra}")
-                if round_count == 1 and len(bots_list) > 1:
-                    from strategy import _assign_targets
-                    ass = _assign_targets(state)
-                    for bid, item in ass.items():
+                    extra = ""
+                    if action.get("item_id"):
+                        item_id = action["item_id"]
+                        item_obj = next((i for i in (state.get("items") or []) if i.get("id") == item_id), None)
+                        item_pos = item_obj["position"] if item_obj else "?"
+                        dist = manhattan(pos, item_pos) if item_obj else "?"
+                        extra = f" item={item_id} at {item_pos} dist={dist}"
+                    inv_str = f" inv={inv}" if inv else ""
+                    print(f"  [Trace] Round {round_count} bot {bot['id']} pos={pos}{inv_str} -> {act}{extra}")
+                if round_count == 1:
+                    for bid, item in assignments.items():
                         print(f"  [Trace] Assignment: bot {bid} -> {item.get('type')} at {item.get('position')}")
 
             await ws.send(json.dumps({"actions": actions}))
