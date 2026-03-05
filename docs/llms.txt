@@ -1,0 +1,93 @@
+# llms.txt — Workplace Learning With AI (WLWAI)
+
+You are working in the WLWAI multi-service repository.
+
+## What this repo is
+A modular AI-powered workplace learning and agent platform:
+- FastAPI backend (Python) + MongoDB
+- React frontend
+- Node websearch backend
+- Optional n8n automation (AgentOps Studio)
+- MCP server (J-messages Analyzer) accessible via STDIO bridge (Postman/Claude)
+
+## Golden rules
+- Backend MUST be started from repo ROOT:
+  `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000`
+- Default ports:
+  backend 8000, frontend 3000, websearch 3001, n8n 5678, LM Studio 1234, MCP file server 8888.
+- Never commit secrets.
+- Avoid heavyweight dependencies (Voice Cloning was discontinued due to bloat).
+
+## Repo map (where to look)
+- `backend/` — FastAPI routers, services, LLM orchestration, MCP bridge
+- `frontend/` — React UI modules (J-messages Analyzer, Robomind Clinic, Repo Analyzer, etc.)
+- `websearch-backend/` — Node service (port 3001)
+- `agentops-n8n/` — Docker-based n8n workflows (optional)
+- `docs/` — documentation and module guides
+
+## Key modules & API contracts
+
+### J-messages Analyzer (Fiskeridirektoratet)
+Backend routers/services:
+- `backend/routers/j_messages_analyzer.py`
+- `backend/routers/j_messages_training.py`
+- `backend/services/j_messages_evaluator.py`
+- `backend/services/prompt_suggestion_service.py`
+
+Frontend:
+- `frontend/src/JMessagesAnalyzer.jsx`
+- `frontend/src/JMessagesLibrary.jsx`
+- `frontend/src/JMessagesPairsLibrary.jsx`
+- `frontend/src/components/PromptPanel.jsx`
+
+Analysis output commonly includes:
+`{ id, title, status, toc, body_html, summary }`
+
+Prompts:
+- Versioned native prompts: `backend/prompts/j_messages/v{version}/`
+- Each analysis records the prompt version used.
+
+### Prompt Manager (Compliance & Productivity)
+Backend endpoints:
+- `GET/POST/PUT/DELETE /api/prompts/{agent}`
+- `POST /api/prompts/{agent}/test`
+Structured test outputs:
+- compliance: `{ ok, output, summary, risks }`
+- productivity: `{ ok, output, summary, actions }`
+
+Storage:
+- MongoDB `prompts` collection.
+
+### Robomind Clinic (AI Psychology)
+Enhanced (competition) API:
+- `POST /api/robomind/screen`
+- `POST /api/robomind/therapy`
+- `POST /api/robomind/apply`
+- `GET /api/robomind/dashboard/metrics`
+- `GET /api/robomind/cases/{id}`
+
+Validation:
+- `python -m pytest backend/tests/test_robomind_api_contracts.py -v`
+
+### Repo Analyzer Cursor AI
+Backend endpoints:
+- `POST /api/cursor-readme/upload-files`
+- `POST /api/cursor-readme/generate`
+- `POST /api/cursor-readme/save-learning-module`
+- `GET /api/cursor-readme/learning-modules`
+- `GET /api/cursor-readme/learning-module/{module_id}`
+
+Purpose:
+- architectural-aware README generation + learning module creation.
+
+## MCP (Postman / Claude)
+- Manifest: `GET http://localhost:8000/api/mcp/manifest`
+- Bridge: `backend/mcp_bridge_server.py` (STDIO JSON-RPC)
+- Test file server: `python backend/test_mcp_server.py` (serves local files on `http://localhost:8888/...`)
+
+Typical MCP tools:
+- `list_j_meldinger`
+- `analyze_j_melding` (input includes `file_url`)
+
+## How to validate changes
+Follow `docs/TESTING.md` for the minimum smoke gates per subsystem.
