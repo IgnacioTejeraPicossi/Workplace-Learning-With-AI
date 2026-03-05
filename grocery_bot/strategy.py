@@ -3,11 +3,10 @@ NMiAI 2026 Grocery Bot — decision logic.
 Unified strategy for 1-10 bots. BFS pathfinding around walls/bots.
 
 Key design:
- - Items sit on floor cells and do NOT block movement.
- - pick_up works at Manhattan distance <= 1.
- - Fill inventory before delivering; deliver when all needed items in transit.
- - Smart assignment accounts for items already in transit.
- - Idle bots pre-pick preview items or scatter toward center to clear spawn.
+ - Items not blocked in BFS (paths may cross item cells; fallback avoids blocked steps).
+ - Single bot: deliver-early when dist≤8 or order nearly done.
+ - Multi-bot: courier (bot 0) delivers early; pickers fill to 3, backpressure near drop_off.
+ - Smart assignment accounts for items in transit; idle bots pre-pick preview.
 """
 from collections import deque
 from typing import Any
@@ -24,63 +23,25 @@ def manhattan(a: list, b: list) -> int:
 def _get_blocked(
     state: dict,
     exclude_bot_id: int | None = None,
-    bot_pos: tuple[int, int] | None = None,
     claimed_next_cells: set[tuple[int, int]] | None = None,
+    block_items: bool = False,
 ) -> set[tuple[int, int]]:
-    """Walls + other bots + claimed cells.
-    Items do NOT block movement.
-    bot_pos: skip other bots at the same position (spawn cohabitation).
-    """
+    """Walls + other bots + claimed; optionally items (when pathfinding to drop_off)."""
     blocked: set[tuple[int, int]] = set()
     for w in (state.get("grid") or {}).get("walls") or []:
         blocked.add((w[0], w[1]))
+    if block_items:
+        for it in state.get("items") or []:
+            p = it.get("position") or [0, 0]
+            blocked.add((p[0], p[1]))
     for b in state.get("bots") or []:
         if exclude_bot_id is not None and b.get("id") == exclude_bot_id:
             continue
         p = b.get("position") or [0, 0]
-        pos_t = (p[0], p[1])
-        if bot_pos is not None and pos_t == bot_pos:
-            continue
-        blocked.add(pos_t)
+        blocked.add((p[0], p[1]))
     if claimed_next_cells:
         blocked |= claimed_next_cells
     return blocked
-
-
-def _bfs_distance_to_any(
-    state: dict,
-    from_pos: list | tuple,
-    target_cells: set[tuple[int, int]],
-    exclude_bot_id: int | None = None,
-) -> int:
-    """BFS path length from from_pos to nearest target cell; 999_999 if unreachable."""
-    x0, y0 = from_pos[0], from_pos[1]
-    if (x0, y0) in target_cells:
-        return 0
-    grid = state.get("grid") or {}
-    w, h = grid.get("width", 32), grid.get("height", 24)
-    blocked = _get_blocked(state, exclude_bot_id=exclude_bot_id)
-    reachable = target_cells - blocked
-    if not reachable:
-        return 999_999
-    visited = {(x0, y0)}
-    dist: dict[tuple[int, int], int] = {(x0, y0): 0}
-    q: deque[tuple[int, int]] = deque([(x0, y0)])
-    while q:
-        cx, cy = q.popleft()
-        d = dist[(cx, cy)]
-        if (cx, cy) in reachable:
-            return d
-        for dx, dy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
-            nx, ny = cx + dx, cy + dy
-            if not (0 <= nx < w and 0 <= ny < h):
-                continue
-            if (nx, ny) in blocked or (nx, ny) in visited:
-                continue
-            visited.add((nx, ny))
-            dist[(nx, ny)] = d + 1
-            q.append((nx, ny))
-    return 999_999
 
 
 def _bfs_next_step_to_any(
@@ -88,8 +49,8 @@ def _bfs_next_step_to_any(
     from_pos: list | tuple,
     target_cells: set[tuple[int, int]],
     exclude_bot_id: int | None = None,
-    bot_pos: tuple[int, int] | None = None,
     claimed_next_cells: set[tuple[int, int]] | None = None,
+    block_items: bool = False,
 ) -> str | None:
     """First BFS step toward any reachable target cell."""
     x0, y0 = from_pos[0], from_pos[1]
@@ -99,8 +60,7 @@ def _bfs_next_step_to_any(
     w = grid.get("width", 32)
     h = grid.get("height", 24)
     blocked = _get_blocked(state, exclude_bot_id=exclude_bot_id,
-                           bot_pos=bot_pos,
-                           claimed_next_cells=claimed_next_cells)
+                           claimed_next_cells=claimed_next_cells, block_items=block_items)
     reachable = target_cells - blocked
     if not reachable:
         return None
@@ -134,25 +94,49 @@ def _move_toward(bot_id: int, x: int, y: int, target: list) -> dict[str, Any]:
     return {"bot": bot_id, "action": "wait"}
 
 
+def _move_toward_safe(bot_id: int, x: int, y: int, target: list, state: dict,
+                      exclude_bot_id: int | None = None,
+                      claimed: set[tuple[int, int]] | None = None) -> dict[str, Any]:
+    """Try each direction toward target; return first that steps into non-blocked cell."""
+    blocked = _get_blocked(state, exclude_bot_id=exclude_bot_id,
+                           claimed_next_cells=claimed, block_items=True)
+    grid = state.get("grid") or {}
+    w, h = grid.get("width", 32), grid.get("height", 24)
+    tx, ty = target[0], target[1]
+    candidates = []
+    if tx > x and x + 1 < w:
+        candidates.append(("move_right", x + 1, y))
+    if tx < x and x - 1 >= 0:
+        candidates.append(("move_left", x - 1, y))
+    if ty > y and y + 1 < h:
+        candidates.append(("move_down", x, y + 1))
+    if ty < y and y - 1 >= 0:
+        candidates.append(("move_up", x, y - 1))
+    candidates.sort(key=lambda c: manhattan([c[1], c[2]], target))
+    for action, nx, ny in candidates:
+        if (nx, ny) not in blocked:
+            return {"bot": bot_id, "action": action}
+    return {"bot": bot_id, "action": "wait"}
+
+
 def _step_toward(bot_id: int, x: int, y: int, target: list,
                  state: dict, exclude_bot_id: int | None = None,
                  claimed: set[tuple[int, int]] | None = None) -> dict[str, Any]:
-    """BFS one step toward target cell; fallback to Manhattan."""
+    """BFS one step toward target cell; fallback to first valid step toward target."""
     step = _bfs_next_step_to_any(
         state, [x, y], {(target[0], target[1])},
-        exclude_bot_id=exclude_bot_id,
-        bot_pos=(x, y),
-        claimed_next_cells=claimed,
+        exclude_bot_id=exclude_bot_id, claimed_next_cells=claimed,
+        block_items=True,
     )
     if step:
         return {"bot": bot_id, "action": step}
-    return _move_toward(bot_id, x, y, target)
+    return _move_toward_safe(bot_id, x, y, target, state, exclude_bot_id, claimed)
 
 
 def _step_toward_item(bot_id: int, x: int, y: int, item_pos: list | tuple,
                       state: dict, exclude_bot_id: int | None = None,
                       claimed: set[tuple[int, int]] | None = None) -> dict[str, Any]:
-    """BFS one step toward a walkable cell adjacent to the item (for pick_up)."""
+    """BFS one step toward a walkable cell adjacent to the item (for pick_up at dist 1)."""
     grid = state.get("grid") or {}
     w, h = grid.get("width", 32), grid.get("height", 24)
     px, py = item_pos[0], item_pos[1]
@@ -163,13 +147,13 @@ def _step_toward_item(bot_id: int, x: int, y: int, item_pos: list | tuple,
             targets.add((nx, ny))
     step = _bfs_next_step_to_any(
         state, [x, y], targets,
-        exclude_bot_id=exclude_bot_id,
-        bot_pos=(x, y),
-        claimed_next_cells=claimed,
+        exclude_bot_id=exclude_bot_id, claimed_next_cells=claimed,
+        block_items=True,
     )
     if step:
         return {"bot": bot_id, "action": step}
-    return _move_toward(bot_id, x, y, list(item_pos))
+    return _move_toward_safe(bot_id, x, y, list(item_pos), state,
+                             exclude_bot_id=exclude_bot_id, claimed=claimed)
 
 
 # ---------------------------------------------------------------------------
@@ -213,12 +197,13 @@ def _item_on_map(state: dict, item_id: str) -> bool:
 # Assignment
 # ---------------------------------------------------------------------------
 
-def _assign_targets(state: dict) -> dict[int, dict]:
+def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int, dict]:
     """
     Each bot with room in inventory gets the nearest needed item (active order).
     Accounts for items in transit (in bots' inventories) to avoid over-collecting.
     Idle bots pre-pick preview order items.
     """
+    failed_pickups = failed_pickups or {}
     active = _active_order(state)
     needed = _needed_types(active)
     remaining = _remaining_to_pick(state, needed)
@@ -241,6 +226,8 @@ def _assign_targets(state: dict) -> dict[int, dict]:
             if item["id"] in assigned_ids:
                 continue
             if item["type"] not in types_left:
+                continue
+            if failed_pickups.get((bot["id"], item["id"]), 0) >= 1:
                 continue
             d = manhattan(bot["position"], item["position"])
             if d < best_dist:
@@ -267,6 +254,8 @@ def _assign_targets(state: dict) -> dict[int, dict]:
             for item in preview_cands:
                 if item["id"] in assigned_ids:
                     continue
+                if failed_pickups.get((bot["id"], item["id"]), 0) >= 1:
+                    continue
                 d = manhattan(bot["position"], item["position"])
                 if d < best_dist:
                     best_dist = d
@@ -274,105 +263,6 @@ def _assign_targets(state: dict) -> dict[int, dict]:
             if best:
                 assignments[bot["id"]] = best
                 assigned_ids.add(best["id"])
-
-    return assignments
-
-
-# ---------------------------------------------------------------------------
-# Three-bot helpers
-# ---------------------------------------------------------------------------
-
-def _select_courier_id(state: dict) -> int:
-    """
-    Pick one courier for 3-bot mode.
-    Priority:
-    1) bot carrying most items matching active order
-    2) nearest to drop_off
-    3) lowest bot id
-    """
-    bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
-    if not bots:
-        return 0
-    drop_off = state.get("drop_off") or [0, 0]
-    needed = _needed_types(_active_order(state))
-
-    def rank(bot: dict) -> tuple[int, int, int]:
-        inv = bot.get("inventory") or []
-        matching = sum(1 for t in inv if t in needed)
-        dist_drop = manhattan(bot.get("position") or [0, 0], drop_off)
-        # Higher matching is better; lower dist and id are better.
-        return (matching, -dist_drop, -bot["id"])
-
-    best = max(bots, key=rank)
-    return best["id"]
-
-
-def _assign_targets_three_bots(state: dict, courier_id: int) -> dict[int, dict]:
-    """
-    Global assignment for 3 bots (Medium):
-    - Active order only (no preview pre-pick).
-    - Build global bot-item pairs with BFS distance.
-    - Greedy globally by minimum cost (not per-bot local).
-    - Prefer distinct item types first to complete orders faster.
-    """
-    active = _active_order(state)
-    needed = _needed_types(active)
-    remaining = _remaining_to_pick(state, needed)
-    items = state.get("items") or []
-    bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
-    grid = state.get("grid") or {}
-
-    active_candidates = [i for i in items if i["type"] in remaining]
-    workers = [b for b in bots if len(b.get("inventory") or []) < 3]
-    if not workers or not active_candidates or not remaining:
-        return {}
-
-    want = min(len(remaining), len(workers))
-    pairs: list[tuple[int, int, str, dict]] = []
-    for bot in workers:
-        bid = bot["id"]
-        for item in active_candidates:
-            targets = _adjacent_cells(item["position"], grid)
-            d = _bfs_distance_to_any(state, bot["position"], targets, exclude_bot_id=bid)
-            # courier_id used only as stable tie-breaker to keep behavior deterministic
-            tie = 0 if bid != courier_id else 1
-            pairs.append((d * 10 + tie, bid, item["id"], item))
-
-    pairs.sort(key=lambda x: x[0])
-
-    assignments: dict[int, dict] = {}
-    used_bots: set[int] = set()
-    used_items: set[str] = set()
-    covered_types: set[str] = set()
-
-    # Pass 1: maximize distinct needed types.
-    for cost, bid, item_id, item in pairs:
-        if cost >= 9_999_990:
-            continue
-        if bid in used_bots or item_id in used_items:
-            continue
-        item_type = item.get("type")
-        if item_type in covered_types:
-            continue
-        assignments[bid] = item
-        used_bots.add(bid)
-        used_items.add(item_id)
-        covered_types.add(item_type)
-        if len(assignments) >= want or len(covered_types) >= len(set(remaining)):
-            break
-
-    # Pass 2: fill remaining slots by lowest global cost.
-    if len(assignments) < want:
-        for cost, bid, item_id, item in pairs:
-            if cost >= 9_999_990:
-                continue
-            if bid in used_bots or item_id in used_items:
-                continue
-            assignments[bid] = item
-            used_bots.add(bid)
-            used_items.add(item_id)
-            if len(assignments) >= want:
-                break
 
     return assignments
 
@@ -386,34 +276,53 @@ def decide(
     state: dict,
     assignments: dict[int, dict],
     claimed_cells: set[tuple[int, int]] | None = None,
+    failed_pickups: dict | None = None,
 ) -> dict[str, Any]:
-    """Universal decide for 1-10 bots."""
+    """
+    Universal decide for 1-10 bots.
+    Single bot: deliver-early when close to drop_off or order nearly done.
+    Multi-bot: courier (bot 0) delivers early; pickers fill to 3 first to reduce congestion.
+    """
+    failed_pickups = failed_pickups or {}
     pos = bot["position"]
     x, y = pos
     drop_off = state.get("drop_off") or [0, 0]
     bid = bot["id"]
     inv = bot.get("inventory") or []
+    bots_list = state.get("bots") or []
+    is_courier = len(bots_list) > 1 and bid == 0
 
     active = _active_order(state)
     needed = _needed_types(active)
+    remaining = _remaining_to_pick(state, needed)
+    matching = [t for t in inv if t in needed]
+    dist_drop = manhattan(pos, drop_off)
 
-    # 1. At drop_off with inventory -> deliver
+    # 1. At drop_off with inventory → deliver
     if inv and [x, y] == drop_off:
         return {"bot": bid, "action": "drop_off"}
 
-    # 2. Inventory full -> go deliver
+    # 2. Inventory full → go deliver
     if len(inv) >= 3:
         return _step_toward(bid, x, y, drop_off, state,
                             exclude_bot_id=bid, claimed=claimed_cells)
 
-    # 3. All remaining needed items are in transit -> deliver matching
-    remaining = _remaining_to_pick(state, needed)
-    matching = [t for t in inv if t in needed]
+    # 3. Deliver early: courier or single bot when close / order nearly done
+    if matching:
+        if len(bots_list) <= 1:
+            if dist_drop <= 8 or len(remaining) <= 2:
+                return _step_toward(bid, x, y, drop_off, state,
+                                    exclude_bot_id=bid, claimed=claimed_cells)
+        elif is_courier and (dist_drop <= 6 or len(remaining) <= 1):
+            return _step_toward(bid, x, y, drop_off, state,
+                                exclude_bot_id=bid, claimed=claimed_cells)
+
+    # 4. All remaining needed items collected → deliver
     if matching and not remaining:
         return _step_toward(bid, x, y, drop_off, state,
                             exclude_bot_id=bid, claimed=claimed_cells)
 
-    # 4. Has assigned target -> pick or move toward
+    # 5. Has assigned target → pick or move toward
     target = assignments.get(bid)
     if target and _item_on_map(state, target["id"]):
         ix, iy = target["position"]
@@ -422,157 +331,21 @@ def decide(
         return _step_toward_item(bid, x, y, [ix, iy], state,
                                  exclude_bot_id=bid, claimed=claimed_cells)
 
-    # 5. Has inventory but no assignment -> go deliver
+    # 6. Has inventory but no assignment → go deliver (or wait if picker + congestion)
     if inv:
+        if len(bots_list) > 1 and not is_courier:
+            bots_near = sum(1 for b in bots_list
+                            if manhattan(b.get("position") or [0, 0], drop_off) <= 2)
+            if bots_near >= 2:
+                return {"bot": bid, "action": "wait"}
         return _step_toward(bid, x, y, drop_off, state,
                             exclude_bot_id=bid, claimed=claimed_cells)
 
-    # 6. Idle: scatter toward map center to clear spawn
-    grid = state.get("grid") or {}
-    center = [grid.get("width", 16) // 2, grid.get("height", 12) // 2]
-    if manhattan([x, y], center) > 3:
-        return _step_toward(bid, x, y, center, state,
-                            exclude_bot_id=bid, claimed=claimed_cells)
-
-    return {"bot": bid, "action": "wait"}
-
-
-def decide_three_bots(
-    bot: dict,
-    state: dict,
-    assignments: dict[int, dict],
-    courier_id: int,
-    claimed_cells: set[tuple[int, int]] | None = None,
-) -> dict[str, Any]:
-    """
-    Strategy dedicated to 3 bots:
-    - global pickup assignment for active order
-    - delivery wave when order almost complete
-    """
-    pos = bot["position"]
-    x, y = pos
-    drop_off = state.get("drop_off") or [0, 0]
-    bid = bot["id"]
-    inv = bot.get("inventory") or []
-    active = _active_order(state)
-    needed = _needed_types(active)
-    remaining = _remaining_to_pick(state, needed)
-    matching = [t for t in inv if t in needed]
-
-    if inv and [x, y] == drop_off:
-        return {"bot": bid, "action": "drop_off"}
-
-    if len(inv) >= 3:
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid, claimed=claimed_cells)
-
-    # Delivery wave: once almost complete, push useful inventory to drop_off.
-    if matching and (not remaining or len(remaining) <= 1):
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid, claimed=claimed_cells)
-
-    target = assignments.get(bid)
-    if target and _item_on_map(state, target["id"]):
-        tx, ty = target["position"]
-        if manhattan([x, y], [tx, ty]) == 1:
-            return {"bot": bid, "action": "pick_up", "item_id": target["id"]}
-        return _step_toward_item(bid, x, y, [tx, ty], state, exclude_bot_id=bid, claimed=claimed_cells)
-
-    if inv:
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid, claimed=claimed_cells)
-
     return {"bot": bid, "action": "wait"}
 
 
 # ---------------------------------------------------------------------------
-# Single-bot strategy (Easy difficulty)
-# ---------------------------------------------------------------------------
-
-def _adjacent_cells(item_pos: list | tuple, grid: dict) -> set[tuple[int, int]]:
-    """Cells adjacent to item (for pick_up at dist 1)."""
-    w, h = grid.get("width", 32), grid.get("height", 24)
-    px, py = item_pos[0], item_pos[1]
-    targets: set[tuple[int, int]] = set()
-    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        nx, ny = px + dx, py + dy
-        if 0 <= nx < w and 0 <= ny < h:
-            targets.add((nx, ny))
-    return targets
-
-
-def decide_single_bot(bot: dict, state: dict) -> dict[str, Any]:
-    """
-    Dedicated strategy for 1 bot. Optimized for Easy difficulty.
-    - BFS distance for item selection (real steps, not Manhattan).
-    - Deliver early when we have all needed items and are close to drop_off.
-    - Pre-pick preview items when going to drop if very close (en route).
-    - No claimed_cells, no scatter logic.
-    """
-    pos = bot["position"]
-    x, y = pos
-    drop_off = state.get("drop_off") or [0, 0]
-    bid = bot["id"]
-    inv = bot.get("inventory") or []
-    grid = state.get("grid") or {}
-
-    active = _active_order(state)
-    needed = _needed_types(active)
-    remaining = _remaining_to_pick(state, needed)
-    matching = [t for t in inv if t in needed]
-    dist_drop = manhattan([x, y], drop_off)
-
-    # 1. At drop_off with inventory -> deliver
-    if inv and [x, y] == drop_off:
-        return {"bot": bid, "action": "drop_off"}
-
-    # 2. Inventory full -> go deliver
-    if len(inv) >= 3:
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid)
-
-    # 3. All needed items in transit (we have them) -> deliver
-    if matching and not remaining:
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid)
-
-    # 4. Pick nearest needed item by BFS distance (active order first)
-    items = state.get("items") or []
-    candidates = [i for i in items if i["type"] in remaining]
-    if not candidates and active:
-        preview = _preview_order(state)
-        if preview:
-            preview_needed = _needed_types(preview)
-            candidates = [i for i in items if i["type"] in preview_needed]
-
-    if candidates:
-        def bfs_dist_to_item(item: dict) -> int:
-            targets = _adjacent_cells(item["position"], grid)
-            return _bfs_distance_to_any(state, [x, y], targets, exclude_bot_id=bid)
-
-        best = min(candidates, key=bfs_dist_to_item)
-        ix, iy = best["position"]
-        if manhattan([x, y], [ix, iy]) == 1:
-            return {"bot": bid, "action": "pick_up", "item_id": best["id"]}
-        return _step_toward_item(bid, x, y, [ix, iy], state, exclude_bot_id=bid)
-
-    # 5. Pre-pick en ruta: going to drop, have room, preview item very close
-    if inv and len(inv) < 3:
-        preview = _preview_order(state)
-        if preview:
-            preview_needed = _needed_types(preview)
-            preview_items = [i for i in items if i["type"] in preview_needed]
-            for pi in preview_items:
-                d = _bfs_distance_to_any(state, [x, y], _adjacent_cells(pi["position"], grid), exclude_bot_id=bid)
-                if d <= 2 and d < dist_drop:
-                    if manhattan([x, y], pi["position"]) == 1:
-                        return {"bot": bid, "action": "pick_up", "item_id": pi["id"]}
-                    return _step_toward_item(bid, x, y, pi["position"], state, exclude_bot_id=bid)
-
-    # 6. Has inventory -> go deliver
-    if inv:
-        return _step_toward(bid, x, y, drop_off, state, exclude_bot_id=bid)
-
-    return {"bot": bid, "action": "wait"}
-
-
-# ---------------------------------------------------------------------------
-# Backward-compatible wrappers
+# Backward-compatible wrappers (used by bot.py)
 # ---------------------------------------------------------------------------
 
 def decide_level1(_bot: dict, _state: dict) -> dict[str, Any]:
@@ -580,13 +353,16 @@ def decide_level1(_bot: dict, _state: dict) -> dict[str, Any]:
     return {"bot": _bot["id"], "action": "wait"}
 
 
-def decide_level2(bot: dict, state: dict, **_kw) -> dict[str, Any]:
-    assignments = _assign_targets(state)
-    return decide(bot, state, assignments)
+def decide_level2(bot: dict, state: dict, failed_pickups: dict | None = None) -> dict[str, Any]:
+    assignments = _assign_targets(state, failed_pickups)
+    return decide(bot, state, assignments, failed_pickups=failed_pickups)
 
 
-def decide_level3(bot: dict, state: dict, bot_assignments: dict[int, dict],
-                  claimed_next_cells: set[tuple[int, int]] | None = None,
-                  **_kw) -> dict[str, Any]:
+def decide_level3(
+    bot: dict, state: dict, bot_assignments: dict[int, dict],
+    bots_at_drop: set | None = None,
+    claimed_next_cells: set[tuple[int, int]] | None = None,
+    failed_pickups: dict | None = None,
+) -> dict[str, Any]:
     return decide(bot, state, bot_assignments,
-                  claimed_cells=claimed_next_cells)
+                  claimed_cells=claimed_next_cells, failed_pickups=failed_pickups)

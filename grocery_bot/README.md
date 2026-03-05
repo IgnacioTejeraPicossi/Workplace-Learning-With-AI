@@ -36,6 +36,7 @@ python bot.py
 python bot.py --level 1
 
 python bot.py --quiet
+python bot.py --trace   # Ver posición/acción por bot en las primeras 10 rondas
 ```
 
 ## Niveles de implementación
@@ -54,7 +55,7 @@ python bot.py --quiet
 - **Recoger:** bot adyacente (Manhattan 1) al shelf del ítem; inventario máx. 3; pathfinding hacia una celda adyacente al ítem (no hacia la celda del ítem).
 - **Entregar:** bot en la celda drop_off; solo ítems del pedido activo; al completar orden, siguiente se activa.
 - **Colisión:** “no two on same tile, except spawn” — por eso al salir del spawn reservamos la celda destino de cada bot para que elijan pasos distintos.
-- **Preview order:** se puede pre-recoger ítems del siguiente pedido (opcional, no implementado aún).
+- **Preview order:** implementado — bots ociosos pre-recogen ítems del pedido preview.
 
 ## Estructura
 

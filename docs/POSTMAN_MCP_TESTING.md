@@ -639,6 +639,43 @@ if (response.result && response.result.content) {
 
 ## Troubleshooting
 
+### "Couldn't run the request: To run this command, you will need to install cmd.exe"
+
+Este error ocurre cuando Postman intenta ejecutar el bridge MCP vía STDIO y no encuentra `cmd.exe` (el intérprete de comandos de Windows). Suele pasar en entornos restringidos o cuando Postman no tiene acceso al PATH del sistema.
+
+**Opción A: Usar Postman como cliente HTTP (sin MCP STDIO)**
+
+Puedes probar el análisis de J-meldinger sin el flujo MCP. Crea una petición **HTTP POST** normal:
+
+1. **Método:** POST  
+2. **URL:** `http://localhost:8000/api/mcp/j-messages/analyze`  
+3. **Headers:** `Content-Type: application/json`  
+4. **Body (raw JSON):**
+   ```json
+   {
+     "file_url": "http://localhost:8888/docs/j-melding-test.docx",
+     "summary_length": "medium",
+     "ai_level": "medium"
+   }
+   ```
+
+Requisitos: backend en `localhost:8000` y servidor de archivos en `localhost:8888` (`python backend/test_mcp_server.py`).
+
+**Opción B: Comprobar cmd.exe**
+
+1. Abre PowerShell y ejecuta: `where cmd.exe`  
+   - Debería mostrar algo como `C:\Windows\System32\cmd.exe`
+2. Si no aparece, añade `C:\Windows\System32` al PATH del sistema.
+3. Reinicia Postman y vuelve a probar la conexión MCP.
+
+**Opción C: Usar cURL en lugar de Postman**
+
+```bash
+curl -X POST http://localhost:8000/api/mcp/j-messages/analyze ^
+  -H "Content-Type: application/json" ^
+  -d "{\"file_url\": \"http://localhost:8888/docs/j-melding-test.docx\", \"summary_length\": \"medium\"}"
+```
+
 ### "Connection Failed" or "Process Not Found"
 
 1. **Check Python path**:

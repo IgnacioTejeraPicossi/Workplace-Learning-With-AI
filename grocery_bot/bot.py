@@ -34,16 +34,7 @@ for _env in (
         break
 
 from config import get_ws_url
-from strategy import (
-    decide_level1,
-    decide,
-    decide_single_bot,
-    decide_three_bots,
-    _assign_targets,
-    _assign_targets_three_bots,
-    _select_courier_id,
-    manhattan,
-)
+from strategy import decide_level1, decide, _assign_targets, manhattan
 
 
 def _next_position_after_action(bot: dict, action: dict) -> tuple[int, int] | None:
@@ -114,39 +105,59 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
 
             actions = []
             bots_list = state.get("bots") or []
+            # Detect failed pick_ups: last round we sent pick_up but inventory didn't change
+            failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", None) or {}
+            last_round = getattr(play, "_last_round", None)
+            if last_round:
+                for b in bots_list:
+                    bid = b["id"]
+                    pos = tuple(b.get("position") or [0, 0])
+                    inv = tuple(b.get("inventory") or [])
+                    prev = last_round.get(bid)
+                    if prev and prev.get("action") == "pick_up":
+                        item_id = prev.get("item_id", "")
+                        if prev.get("pos") == pos and prev.get("inv") == inv and item_id:
+                            key = (bid, item_id)
+                            failed_pickups[key] = failed_pickups.get(key, 0) + 1
+                    elif prev and len(inv) > len(prev.get("inv") or []):
+                        for k in list(failed_pickups):
+                            if k[0] == bid:
+                                del failed_pickups[k]
+            play._failed_pickups = failed_pickups
 
             # Compute assignments ONCE per round (not per bot)
             if level == 1:
                 assignments: dict[int, dict] = {}
             else:
-                if len(bots_list) == 3:
-                    courier_id = _select_courier_id(state)
-                    assignments = _assign_targets_three_bots(state, courier_id)
-                else:
-                    courier_id = -1
-                    assignments = _assign_targets(state)
+                assignments = _assign_targets(state, failed_pickups)
 
             claimed: set[tuple[int, int]] = set()
-            use_single_bot = len(bots_list) == 1
-            use_three_bots = len(bots_list) == 3
             for bot in sorted(bots_list, key=lambda b: b["id"]):
                 if level == 1:
                     action = decide_level1(bot, state)
-                elif use_single_bot:
-                    action = decide_single_bot(bot, state)
-                elif use_three_bots:
-                    action = decide_three_bots(
-                        bot, state, assignments, courier_id=courier_id, claimed_cells=claimed,
-                    )
                 else:
                     action = decide(
                         bot, state, assignments,
-                        claimed_cells=claimed,
+                        claimed_cells=claimed if len(bots_list) > 1 else None,
+                        failed_pickups=failed_pickups,
                     )
                 actions.append(action)
                 next_pos = _next_position_after_action(bot, action)
                 if next_pos:
                     claimed.add(next_pos)
+
+            sorted_bots = sorted(bots_list, key=lambda x: x["id"])
+            play._last_round = {}
+            for i, b in enumerate(sorted_bots):
+                if i >= len(actions):
+                    break
+                act = actions[i]
+                play._last_round[b["id"]] = {
+                    "pos": tuple(b.get("position") or [0, 0]),
+                    "action": act.get("action"),
+                    "item_id": act.get("item_id", "") if act.get("action") == "pick_up" else "",
+                    "inv": tuple(b.get("inventory") or []),
+                }
 
             if trace and round_count <= 10:
                 for bot, action in zip(sorted(bots_list, key=lambda b: b["id"]), actions):
