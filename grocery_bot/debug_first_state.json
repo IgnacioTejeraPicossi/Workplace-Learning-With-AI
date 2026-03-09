@@ -2032,10 +2032,10 @@
     {
       "id": "order_0",
       "items_required": [
-        "juice",
-        "peppers",
-        "bananas",
-        "lettuce"
+        "milk",
+        "lettuce",
+        "yogurt",
+        "onions"
       ],
       "items_delivered": [],
       "complete": false,
@@ -2044,10 +2044,10 @@
     {
       "id": "order_1",
       "items_required": [
-        "tomatoes",
-        "apples",
+        "cream",
+        "carrots",
         "pasta",
-        "butter"
+        "bananas"
       ],
       "items_delivered": [],
       "complete": false,

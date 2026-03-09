@@ -536,9 +536,17 @@ def decide(
     if matching:
         return _delivery_step(bid, x, y, near_zone, state, claimed_cells)
 
-    # 8. Unassigned empty bots stay still to avoid traffic
-    if not inv:
-        return {"bot": bid, "action": "wait"}
+       # 8. Unassigned empty bots: spread away from spawn to reduce congestion
+    spawn = [28, 16]
+    parking_targets = [
+        [27, 15], [26, 16], [26, 15], [25, 16], [25, 15],
+        [24, 16], [24, 15], [23, 16], [23, 15]
+    ]
+    if [x, y] == spawn or manhattan([x, y], spawn) <= 2:
+        best = min(parking_targets, key=lambda p: manhattan([x, y], p))
+        return _step_toward(bid, x, y, best, state, exclude_bot_id=bid, claimed=claimed_cells)
+
+    return {"bot": bid, "action": "wait"}
 
     # 9. Non-matching inventory: hold until it becomes useful
     return {"bot": bid, "action": "wait"}
