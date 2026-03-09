@@ -7,7 +7,8 @@ Main ideas:
 - Multiple drop zones supported (Nightmare)
 - Congestion-aware delivery zone choice
 - Exact pick_up rule: Manhattan distance == 1
-- Unassigned bots stay out of the way instead of creating traffic
+- Spawn evacuation for clustered starts
+- Unassigned bots avoid creating traffic
 """
 
 from collections import deque, Counter
@@ -39,8 +40,7 @@ def _get_blocked(
 ) -> set[tuple[int, int]]:
     """
     Blocked cells = walls + other bots + already claimed next cells.
-    Items are assumed walkable here because current docs/examples imply shelves/items
-    are on map cells and pickup occurs from adjacent cell.
+    Items are treated as walkable; pickup occurs from adjacent cell.
     """
     blocked: set[tuple[int, int]] = set()
 
@@ -215,7 +215,7 @@ def _step_toward_item(
     claimed: set[tuple[int, int]] | None = None,
 ) -> dict[str, Any]:
     """
-    Move toward a cell adjacent to the item, never requiring standing on item cell.
+    Move toward a cell adjacent to the item.
     """
     grid = state.get("grid") or {}
     targets = _adjacent_cells(item_pos, grid)
@@ -256,7 +256,7 @@ def _needed_types(order: dict | None) -> list[str]:
 
 def _remaining_to_pick(state: dict, needed: list[str]) -> list[str]:
     """
-    Types still needed from the map after discounting all bots' current inventories.
+    Types still needed from the map after discounting bots' inventories.
     """
     remaining = list(needed)
     for bot in state.get("bots") or []:
@@ -280,8 +280,7 @@ def _rounds_left(state: dict) -> int:
 
 def _zone_loads(state: dict, needed_types: set[str] | None = None) -> dict[tuple[int, int], int]:
     """
-    Approximate congestion per zone:
-    count bots carrying relevant inventory that are naturally closest to that zone.
+    Approximate congestion per zone.
     """
     zones = [tuple(z) for z in _all_drop_zones(state)]
     loads = {z: 0 for z in zones}
@@ -329,6 +328,33 @@ def _best_zone_for_item(
 
 
 # ---------------------------------------------------------------------------
+# Spawn evacuation
+# ---------------------------------------------------------------------------
+
+def _infer_spawn(state: dict) -> list[int]:
+    bots = state.get("bots") or []
+    if not bots:
+        return [0, 0]
+    p = bots[0].get("position") or [0, 0]
+    return [int(p[0]), int(p[1])]
+
+
+def _spawn_escape_target(bot_id: int, spawn: list[int]) -> list[int]:
+    sx, sy = int(spawn[0]), int(spawn[1])
+    targets = [
+        [sx - 1, sy], [sx - 1, sy - 1], [sx, sy - 1],
+        [sx - 2, sy], [sx - 2, sy - 1], [sx - 3, sy],
+        [sx - 3, sy - 1], [sx - 4, sy], [sx - 4, sy - 1],
+        [sx - 5, sy], [sx - 5, sy - 1], [sx - 6, sy],
+        [sx - 6, sy - 1], [sx - 7, sy], [sx - 7, sy - 1],
+        [sx - 8, sy], [sx - 8, sy - 1], [sx - 9, sy],
+        [sx - 9, sy - 1], [sx - 10, sy],
+    ]
+    valid = [[max(0, x), max(0, y)] for x, y in targets]
+    return valid[bot_id % len(valid)]
+
+
+# ---------------------------------------------------------------------------
 # Assignment
 # ---------------------------------------------------------------------------
 
@@ -336,11 +362,12 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
     """
     Global greedy assignment with capped active workers.
 
-    Strategy:
-    - Assign only a limited number of bots to the active order
-    - Use full-trip proxy cost = bot->item + item->best zone
-    - Reserve only as many items of each type as still needed
-    - Assign a few empty idle bots to preview items
+    Early rounds:
+    - fewer active workers while spawn clears
+
+    Later:
+    - more workers on active order
+    - few preview workers
     """
     failed_pickups = failed_pickups or {}
     items = state.get("items") or []
@@ -357,11 +384,17 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
     preview_needed_set = set(preview_needed)
 
     remaining_counts = Counter(active_remaining)
+    round_no = int(state.get("round", 0))
 
-    # Cap active workers: key anti-congestion control
-    # For Nightmare this usually keeps traffic manageable.
-    active_cap = min(len(bots), max(8, min(12, len(active_remaining) + 5)))
-    preview_cap = min(2, max(0, len(bots) - active_cap))
+    if round_no < 20:
+        active_cap = min(len(bots), 4)
+        preview_cap = 0
+    elif round_no < 60:
+        active_cap = min(len(bots), 8)
+        preview_cap = 1
+    else:
+        active_cap = min(len(bots), max(8, min(12, len(active_remaining) + 5)))
+        preview_cap = min(2, max(0, len(bots) - active_cap))
 
     active_candidates = [it for it in items if remaining_counts[it["type"]] > 0]
     candidate_bots = [b for b in bots if len(b.get("inventory") or []) < 3]
@@ -379,8 +412,8 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
             d_pick = max(1, manhattan(bpos, it["position"]) - 1)
             zone = _best_zone_for_item(it["position"], state, active_needed_set)
             d_deliver = manhattan(it["position"], zone)
-
             trip_cost = d_pick + d_deliver
+
             pairs.append((trip_cost, bid, iid, it))
 
     pairs.sort(key=lambda x: (x[0], x[1], x[2]))
@@ -390,8 +423,7 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
     used_items: set[str] = set()
     reserved_counts = Counter()
 
-    # Active order assignments
-    for cost, bid, iid, it in pairs:
+    for _, bid, iid, it in pairs:
         if len(assignments) >= active_cap:
             break
         if bid in used_bots or iid in used_items:
@@ -406,7 +438,6 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
         used_items.add(iid)
         reserved_counts[t] += 1
 
-    # Limited preview assignments for a few EMPTY bots only
     if preview and preview_cap > 0:
         preview_candidates = [
             it for it in items
@@ -486,6 +517,7 @@ def decide(
     bid = int(bot["id"])
     inv = list(bot.get("inventory") or [])
     rounds_remaining = _rounds_left(state)
+    round_no = int(state.get("round", 0))
 
     active = _active_order(state)
     needed = _needed_types(active)
@@ -495,6 +527,17 @@ def decide(
     all_zones = _all_drop_zones(state)
     near_zone = _best_zone_for_pos(pos, state, needed_set)
     dist_drop = manhattan(pos, near_zone)
+
+    # 0. Spawn evacuation for clustered Nightmare starts
+    spawn = _infer_spawn(state)
+    if len(state.get("bots") or []) >= 10 and round_no < 20:
+        if manhattan([x, y], spawn) <= 2 and not inv:
+            target = _spawn_escape_target(bid, spawn)
+            if [x, y] != target:
+                return _step_toward(
+                    bid, x, y, target, state,
+                    exclude_bot_id=bid, claimed=claimed_cells
+                )
 
     # 1. Standing on any drop zone with useful inventory -> deliver
     if matching and [x, y] in all_zones:
@@ -522,7 +565,6 @@ def decide(
     if target and _item_on_map(state, target["id"]):
         ix, iy = int(target["position"][0]), int(target["position"][1])
 
-        # Exact rule: pick only when adjacent
         if manhattan([x, y], [ix, iy]) == 1:
             preview = _preview_order(state)
             preview_types = set(_needed_types(preview)) if preview else set()
@@ -536,19 +578,21 @@ def decide(
     if matching:
         return _delivery_step(bid, x, y, near_zone, state, claimed_cells)
 
-       # 8. Unassigned empty bots: spread away from spawn to reduce congestion
-    spawn = [28, 16]
-    parking_targets = [
-        [27, 15], [26, 16], [26, 15], [25, 16], [25, 15],
-        [24, 16], [24, 15], [23, 16], [23, 15]
-    ]
-    if [x, y] == spawn or manhattan([x, y], spawn) <= 2:
-        best = min(parking_targets, key=lambda p: manhattan([x, y], p))
-        return _step_toward(bid, x, y, best, state, exclude_bot_id=bid, claimed=claimed_cells)
+    # 8. Empty unassigned bots near spawn keep clearing the spawn area
+    if not inv and len(state.get("bots") or []) >= 10 and round_no < 40:
+        if manhattan([x, y], spawn) <= 3:
+            target = _spawn_escape_target(bid, spawn)
+            if [x, y] != target:
+                return _step_toward(
+                    bid, x, y, target, state,
+                    exclude_bot_id=bid, claimed=claimed_cells
+                )
 
-    return {"bot": bid, "action": "wait"}
+    # 9. Empty unassigned bots wait to avoid useless traffic
+    if not inv:
+        return {"bot": bid, "action": "wait"}
 
-    # 9. Non-matching inventory: hold until it becomes useful
+    # 10. Non-matching inventory: hold until it becomes useful
     return {"bot": bid, "action": "wait"}
 
 
@@ -557,9 +601,6 @@ def decide(
 # ---------------------------------------------------------------------------
 
 def decide_single_bot(bot: dict, state: dict) -> dict[str, Any]:
-    """
-    Simple dedicated strategy for Easy/solo mode.
-    """
     pos = bot["position"]
     x, y = int(pos[0]), int(pos[1])
     bid = int(bot["id"])
@@ -571,11 +612,9 @@ def decide_single_bot(bot: dict, state: dict) -> dict[str, Any]:
     matching = [t for t in inv if t in set(needed)]
     zone = _best_zone_for_pos(pos, state, set(needed))
 
-    # Deliver if standing on drop zone
     if matching and [x, y] in _all_drop_zones(state):
         return {"bot": bid, "action": "drop_off"}
 
-    # Full or all needed in transit -> deliver
     if len(inv) >= 3 or (matching and not remaining):
         return _step_toward(bid, x, y, zone, state, exclude_bot_id=bid)
 
@@ -618,7 +657,6 @@ def decide_level1(_bot: dict, _state: dict) -> dict[str, Any]:
 
 
 def decide_level2(bot: dict, state: dict, **_kw) -> dict[str, Any]:
-    # Single-bot optimized path
     if len(state.get("bots") or []) <= 1:
         return decide_single_bot(bot, state)
     assignments = _assign_targets(state)
@@ -633,7 +671,6 @@ def decide_level3(
     failed_pickups: dict | None = None,
     **_kw,
 ) -> dict[str, Any]:
-    # Recompute assignments each round using the global capped planner
     assignments = _assign_targets(state, failed_pickups=failed_pickups)
     return decide(
         bot,
