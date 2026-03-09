@@ -24,6 +24,7 @@ from .store import (
     cleanup_old_screenings,
     cleanup_old_therapies,
     get_export_data,
+    get_case_by_id,
 )
 from .policy import get_effective_policy, decide_decision
 from .alerts import fire_alert_if_needed
@@ -97,15 +98,16 @@ async def screen(request: Request, req: ScreenRequest) -> ScreenResponse:
         policy = get_effective_policy(module_id, workflow_id)
         decision = decide_decision(response.composite, policy)
 
-        anonymize_pii = _anonymize_pii_from_request(request, req.meta)
-        await save_screening(
-            response, req.meta, anonymize_pii=anonymize_pii, decision_outcome=decision
-        )
-
-        # C2: Alert on critical/review if webhook configured (debounced)
-        await fire_alert_if_needed(
-            decision, response.composite, module_id, workflow_id, policy, req.meta
-        )
+        # Demo mode: no side effects (no DB write, no alerts)
+        if not demo_mode:
+            anonymize_pii = _anonymize_pii_from_request(request, req.meta)
+            await save_screening(
+                response, req.meta, anonymize_pii=anonymize_pii, decision_outcome=decision
+            )
+            # C2: Alert on critical/review if webhook configured (debounced)
+            await fire_alert_if_needed(
+                decision, response.composite, module_id, workflow_id, policy, req.meta
+            )
 
         return response
     except Exception as e:
@@ -194,7 +196,12 @@ async def trigger_daily_metrics(for_date: Optional[str] = Query(None, descriptio
 async def get_case(case_id: str):
     """Get specific case details"""
     try:
-        return {"case_id": case_id, "status": "not_found"}
+        doc = await get_case_by_id(case_id)
+        if doc is None:
+            raise HTTPException(404, detail="Case not found")
+        return doc
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(500, detail=f"Case retrieval failed: {str(e)}")
 

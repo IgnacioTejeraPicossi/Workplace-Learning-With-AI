@@ -19,8 +19,18 @@ class RobomindGate:
         flags = run_all_detectors(req.turns, req.sources)
         agg = aggregate(flags)
         if self.should_therapy(agg["axis_scores"]):
-            # pick dominant issue by highest axis
+            # pick dominant issue by highest axis; map axis names to keywords build_plan recognises
+            _AXIS_TO_ISSUE = {
+                "epistemic": "confabulation",
+                "cognitive": "repetition",
+                "ontological": "confabulation",
+                "memetic": "confabulation",
+                "alignment": "goal",
+                "tool_interface": "goal",
+                "revaluation": "dissociation",
+            }
             dominant_axis = max(agg["axis_scores"], key=lambda k: agg["axis_scores"][k])
-            plan = build_plan(dominant_axis, profile=None)  # profile optional for now
+            target_issue = _AXIS_TO_ISSUE.get(dominant_axis, dominant_axis)
+            plan = build_plan(target_issue, profile=None)  # profile optional for now
             return inject_prompt(user_prompt, plan)
         return user_prompt

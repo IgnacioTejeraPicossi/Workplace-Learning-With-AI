@@ -242,6 +242,22 @@ async def get_daily_metrics(last_n_days: int = 7) -> List[Dict[str, Any]]:
     return out
 
 
+async def get_case_by_id(case_id: str) -> Optional[Dict[str, Any]]:
+    """Look up a screening document by its MongoDB _id. Returns None if not found or id is invalid."""
+    from bson import ObjectId
+    try:
+        oid = ObjectId(case_id)
+    except Exception:
+        return None
+    doc = await mongo.robomind_screenings.find_one({"_id": oid})
+    if not doc:
+        return None
+    doc["_id"] = str(doc["_id"])
+    if hasattr(doc.get("created_at"), "isoformat"):
+        doc["created_at"] = doc["created_at"].isoformat()
+    return doc
+
+
 async def get_export_data(
     from_ts: Optional[datetime] = None,
     to_ts: Optional[datetime] = None,

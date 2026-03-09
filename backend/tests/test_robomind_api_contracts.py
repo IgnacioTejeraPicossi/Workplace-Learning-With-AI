@@ -316,14 +316,37 @@ async def test_enhanced_get_dashboard_metrics_contract(mock_get_metrics, mock_ge
 
 @pytest.mark.asyncio
 async def test_enhanced_get_cases_id_contract():
-    """GET /api/robomind/cases/{id} returns 200 and case_id + status."""
+    """GET /api/robomind/cases/{id} returns 404 for an unknown id (real DB lookup)."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
-        response = await client.get("/api/robomind/cases/some-id")
+        response = await client.get("/api/robomind/cases/000000000000000000000000")
+    # Unknown ObjectId → 404 (correct behaviour after BUG-1 fix)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+@patch("backend.clinic.store.AsyncIOMotorClient")
+async def test_enhanced_get_cases_id_found(mock_motor):
+    """GET /api/robomind/cases/{id} returns the document when found."""
+    from bson import ObjectId
+    fake_id = ObjectId()
+    fake_doc = {
+        "_id": fake_id,
+        "created_at": __import__("datetime").datetime(2024, 1, 1),
+        "screening": {"composite": 42.0},
+        "meta": {},
+    }
+    mock_col = MagicMock()
+    mock_col.find_one = AsyncMock(return_value=fake_doc)
+    mock_motor.return_value.app.robomind_screenings = mock_col
+
+    with patch("backend.clinic.store.mongo") as mock_mongo:
+        mock_mongo.robomind_screenings.find_one = AsyncMock(return_value=fake_doc)
+        async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
+            response = await client.get(f"/api/robomind/cases/{str(fake_id)}")
     assert response.status_code == 200
     data = response.json()
-    assert "case_id" in data
-    assert "status" in data
-    assert data["case_id"] == "some-id"
+    assert "_id" in data
+    assert data["_id"] == str(fake_id)
 
 
 @pytest.mark.asyncio
