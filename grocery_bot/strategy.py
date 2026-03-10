@@ -332,26 +332,61 @@ def _best_zone_for_item(
 # ---------------------------------------------------------------------------
 
 def _infer_spawn(state: dict) -> list[int]:
+    """
+    Infer spawn as the most common bot position.
+    Stable even after some bots start moving.
+    """
     bots = state.get("bots") or []
     if not bots:
         return [0, 0]
-    p = bots[0].get("position") or [0, 0]
-    return [int(p[0]), int(p[1])]
+
+    counts = Counter()
+    for b in bots:
+        p = b.get("position") or [0, 0]
+        counts[(int(p[0]), int(p[1]))] += 1
+
+    (sx, sy), _ = counts.most_common(1)[0]
+    return [sx, sy]
 
 
-def _spawn_escape_target(bot_id: int, spawn: list[int]) -> list[int]:
+def _spawn_escape_target(bot_id: int, spawn: list[int], state: dict) -> list[int]:
+    """
+    Evacuation targets for clustered starts.
+    Avoid blocking the nearest drop zone next to spawn.
+    Prefer moving upward first, then left on higher rows.
+    """
     sx, sy = int(spawn[0]), int(spawn[1])
+    grid = state.get("grid") or {}
+    w = int(grid.get("width", 30))
+    h = int(grid.get("height", 18))
+    walls = {tuple(wp) for wp in (grid.get("walls") or [])}
+
     targets = [
-        [sx - 1, sy], [sx - 1, sy - 1], [sx, sy - 1],
-        [sx - 2, sy], [sx - 2, sy - 1], [sx - 3, sy],
-        [sx - 3, sy - 1], [sx - 4, sy], [sx - 4, sy - 1],
-        [sx - 5, sy], [sx - 5, sy - 1], [sx - 6, sy],
-        [sx - 6, sy - 1], [sx - 7, sy], [sx - 7, sy - 1],
-        [sx - 8, sy], [sx - 8, sy - 1], [sx - 9, sy],
-        [sx - 9, sy - 1], [sx - 10, sy],
+        [sx, sy - 1], [sx - 1, sy - 1],
+        [sx, sy - 2], [sx - 1, sy - 2],
+        [sx, sy - 3], [sx - 1, sy - 3],
+        [sx, sy - 4], [sx - 1, sy - 4],
+        [sx - 2, sy - 2], [sx - 2, sy - 3],
+        [sx - 2, sy - 4], [sx - 3, sy - 2],
+        [sx - 3, sy - 3], [sx - 3, sy - 4],
+        [sx - 4, sy - 2], [sx - 4, sy - 3],
+        [sx - 4, sy - 4], [sx - 5, sy - 2],
+        [sx - 5, sy - 3], [sx - 5, sy - 4],
     ]
-    valid = [[max(0, x), max(0, y)] for x, y in targets]
-    return valid[bot_id % len(valid)]
+
+    forbidden = {(sx - 1, sy)}  # avoid parking on nearest right drop zone
+    valid = []
+
+    for x, y in targets:
+        x = max(0, min(w - 1, x))
+        y = max(0, min(h - 1, y))
+        if (x, y) in walls:
+            continue
+        if (x, y) in forbidden:
+            continue
+        valid.append([x, y])
+
+    return valid[bot_id % len(valid)] if valid else [sx, max(0, sy - 1)]
 
 
 # ---------------------------------------------------------------------------
@@ -367,7 +402,7 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
 
     Later:
     - more workers on active order
-    - few preview workers
+    - very limited preview
     """
     failed_pickups = failed_pickups or {}
     items = state.get("items") or []
@@ -387,14 +422,14 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict[int
     round_no = int(state.get("round", 0))
 
     if round_no < 20:
-        active_cap = min(len(bots), 4)
+        active_cap = min(len(bots), 6)
         preview_cap = 0
     elif round_no < 60:
         active_cap = min(len(bots), 8)
-        preview_cap = 1
+        preview_cap = 0
     else:
-        active_cap = min(len(bots), max(8, min(12, len(active_remaining) + 5)))
-        preview_cap = min(2, max(0, len(bots) - active_cap))
+        active_cap = min(len(bots), max(8, min(12, len(active_remaining) + 4)))
+        preview_cap = 1
 
     active_candidates = [it for it in items if remaining_counts[it["type"]] > 0]
     candidate_bots = [b for b in bots if len(b.get("inventory") or []) < 3]
@@ -527,12 +562,12 @@ def decide(
     all_zones = _all_drop_zones(state)
     near_zone = _best_zone_for_pos(pos, state, needed_set)
     dist_drop = manhattan(pos, near_zone)
+    spawn = _infer_spawn(state)
 
     # 0. Spawn evacuation for clustered Nightmare starts
-    spawn = _infer_spawn(state)
     if len(state.get("bots") or []) >= 10 and round_no < 20:
         if manhattan([x, y], spawn) <= 2 and not inv:
-            target = _spawn_escape_target(bid, spawn)
+            target = _spawn_escape_target(bid, spawn, state)
             if [x, y] != target:
                 return _step_toward(
                     bid, x, y, target, state,
@@ -581,7 +616,7 @@ def decide(
     # 8. Empty unassigned bots near spawn keep clearing the spawn area
     if not inv and len(state.get("bots") or []) >= 10 and round_no < 40:
         if manhattan([x, y], spawn) <= 3:
-            target = _spawn_escape_target(bid, spawn)
+            target = _spawn_escape_target(bid, spawn, state)
             if [x, y] != target:
                 return _step_toward(
                     bid, x, y, target, state,
