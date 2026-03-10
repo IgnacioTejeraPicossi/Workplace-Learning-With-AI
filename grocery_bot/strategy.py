@@ -202,6 +202,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
     active_ord = _active(state)
     needed = _needed_types(active_ord)
     matching = [t for t in inv if t in needed]
+    target = assignments.get(bid)
 
     # === AT DROP ZONE ===
     if [x,y] in all_zones:
@@ -216,13 +217,13 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
             return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
         return {"bot": bid, "action": "wait"}
 
-    # === HAS MATCHING ITEMS → deliver ===
-    if matching:
+    # === FULL → deliver ===
+    if len(inv) >= 3:
         nz = _nearest_zone([x,y], state)
         return _move(bid, x, y, nz[0], nz[1], state)
 
-    # === FULL → deliver ===
-    if len(inv) >= 3:
+    # === HAS MATCHING ITEMS → deliver ===
+    if matching:
         nz = _nearest_zone([x,y], state)
         return _move(bid, x, y, nz[0], nz[1], state)
 
@@ -238,7 +239,6 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
         return _move(bid, x, y, nz[0], nz[1], state)
 
     # === EMPTY → pick assigned item ===
-    target = assignments.get(bid)
     if target:
         ix,iy = int(target["position"][0]),int(target["position"][1])
         useful = set(needed)
@@ -256,10 +256,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
             nn = min(same_type, key=lambda i: manhattan([x,y], i["position"]))
             return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
 
-    # === NO ASSIGNMENT → go to nearest zone to be ready ===
-    nz = _nearest_zone([x,y], state)
-    if [x,y] != nz:
-        return _move(bid, x, y, nz[0], nz[1], state)
+    # === NO ASSIGNMENT → stay out of active lanes ===
     return {"bot": bid, "action": "wait"}
 
 
