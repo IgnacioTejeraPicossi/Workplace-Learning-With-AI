@@ -5,7 +5,7 @@ Validates response structure and status codes; mocks MongoDB for enhanced API.
 Uses httpx AsyncClient + ASGITransport for compatibility across HTTPX/Starlette versions.
 """
 import pytest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock, MagicMock
 from httpx import ASGITransport, AsyncClient
 
 from backend.app import app
@@ -196,7 +196,7 @@ async def test_enhanced_tier1_detectors_positive(mock_save_therapy, mock_save_sc
 @pytest.mark.asyncio
 async def test_legacy_diagnose_works_when_judge_invalid():
     """B2: When LLM judge returns invalid JSON, legacy diagnose still returns 200 with rule-based findings."""
-    from unittest.mock import patch, AsyncMock
+    from unittest.mock import patch, AsyncMock, MagicMock
     from backend.clinic.service import diagnose_case
     from backend.clinic.models import CaseIntake
 

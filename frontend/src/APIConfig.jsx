@@ -182,9 +182,15 @@ const APIConfig = () => {
           })
         });
       }
-      
-      if (response.ok) {
-        const result = await response.json();
+
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = null;
+      }
+
+      if (response.ok && result?.success) {
         setStatus(`✅ API test successful: ${result.message}`);
         // Save the model name to localStorage for ItemAI/ItemServerAI and notify other components
         if ((apiProvider === 'itemai' || apiProvider === 'itemserverai') && result.model_used) {
@@ -192,10 +198,14 @@ const APIConfig = () => {
           window.dispatchEvent(new Event('itemaiModelChanged'));
         }
       } else {
-        setStatus('❌ API test failed. Check your configuration and try again.');
+        const errorMessage =
+          result?.error ||
+          result?.message ||
+          `HTTP ${response.status}: ${response.statusText}`;
+        setStatus(`❌ API test failed: ${errorMessage}`);
       }
     } catch (error) {
-      setStatus('❌ API test failed. Network error.');
+      setStatus(`❌ API test failed: ${error.message || 'Network error.'}`);
     }
     setTimeout(() => setStatus(''), 5000);
   };
