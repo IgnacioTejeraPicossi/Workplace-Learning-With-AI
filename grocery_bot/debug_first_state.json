@@ -1,10 +1,10 @@
 {
   "type": "game_state",
   "round": 0,
-  "max_rounds": 300,
+  "max_rounds": 500,
   "grid": {
-    "width": 16,
-    "height": 12,
+    "width": 30,
+    "height": 18,
     "walls": [
       [
         0,
@@ -71,11 +71,67 @@
         0
       ],
       [
+        16,
+        0
+      ],
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ],
+      [
+        19,
+        0
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        21,
+        0
+      ],
+      [
+        22,
+        0
+      ],
+      [
+        23,
+        0
+      ],
+      [
+        24,
+        0
+      ],
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ],
+      [
         0,
         1
       ],
       [
-        15,
+        29,
         1
       ],
       [
@@ -99,7 +155,19 @@
         2
       ],
       [
-        15,
+        18,
+        2
+      ],
+      [
+        22,
+        2
+      ],
+      [
+        26,
+        2
+      ],
+      [
+        29,
         2
       ],
       [
@@ -123,7 +191,19 @@
         3
       ],
       [
-        15,
+        18,
+        3
+      ],
+      [
+        22,
+        3
+      ],
+      [
+        26,
+        3
+      ],
+      [
+        29,
         3
       ],
       [
@@ -147,7 +227,19 @@
         4
       ],
       [
-        15,
+        18,
+        4
+      ],
+      [
+        22,
+        4
+      ],
+      [
+        26,
+        4
+      ],
+      [
+        29,
         4
       ],
       [
@@ -171,7 +263,19 @@
         5
       ],
       [
-        15,
+        18,
+        5
+      ],
+      [
+        22,
+        5
+      ],
+      [
+        26,
+        5
+      ],
+      [
+        29,
         5
       ],
       [
@@ -179,7 +283,35 @@
         6
       ],
       [
-        15,
+        2,
+        6
+      ],
+      [
+        6,
+        6
+      ],
+      [
+        10,
+        6
+      ],
+      [
+        14,
+        6
+      ],
+      [
+        18,
+        6
+      ],
+      [
+        22,
+        6
+      ],
+      [
+        26,
+        6
+      ],
+      [
+        29,
         6
       ],
       [
@@ -203,7 +335,19 @@
         7
       ],
       [
-        15,
+        18,
+        7
+      ],
+      [
+        22,
+        7
+      ],
+      [
+        26,
+        7
+      ],
+      [
+        29,
         7
       ],
       [
@@ -227,7 +371,19 @@
         8
       ],
       [
-        15,
+        18,
+        8
+      ],
+      [
+        22,
+        8
+      ],
+      [
+        26,
+        8
+      ],
+      [
+        29,
         8
       ],
       [
@@ -235,7 +391,7 @@
         9
       ],
       [
-        15,
+        29,
         9
       ],
       [
@@ -243,72 +399,316 @@
         10
       ],
       [
-        15,
+        2,
+        10
+      ],
+      [
+        6,
+        10
+      ],
+      [
+        10,
+        10
+      ],
+      [
+        14,
+        10
+      ],
+      [
+        18,
+        10
+      ],
+      [
+        22,
+        10
+      ],
+      [
+        26,
+        10
+      ],
+      [
+        29,
         10
       ],
       [
         0,
         11
+      ],
+      [
+        2,
+        11
+      ],
+      [
+        6,
+        11
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        14,
+        11
+      ],
+      [
+        18,
+        11
+      ],
+      [
+        22,
+        11
+      ],
+      [
+        26,
+        11
+      ],
+      [
+        29,
+        11
+      ],
+      [
+        0,
+        12
+      ],
+      [
+        2,
+        12
+      ],
+      [
+        6,
+        12
+      ],
+      [
+        10,
+        12
+      ],
+      [
+        14,
+        12
+      ],
+      [
+        18,
+        12
+      ],
+      [
+        22,
+        12
+      ],
+      [
+        26,
+        12
+      ],
+      [
+        29,
+        12
+      ],
+      [
+        0,
+        13
+      ],
+      [
+        2,
+        13
+      ],
+      [
+        6,
+        13
+      ],
+      [
+        10,
+        13
+      ],
+      [
+        14,
+        13
+      ],
+      [
+        18,
+        13
+      ],
+      [
+        22,
+        13
+      ],
+      [
+        26,
+        13
+      ],
+      [
+        29,
+        13
+      ],
+      [
+        0,
+        14
+      ],
+      [
+        2,
+        14
+      ],
+      [
+        6,
+        14
+      ],
+      [
+        10,
+        14
+      ],
+      [
+        14,
+        14
+      ],
+      [
+        18,
+        14
+      ],
+      [
+        22,
+        14
+      ],
+      [
+        26,
+        14
+      ],
+      [
+        29,
+        14
+      ],
+      [
+        0,
+        15
+      ],
+      [
+        29,
+        15
+      ],
+      [
+        0,
+        16
+      ],
+      [
+        29,
+        16
+      ],
+      [
+        0,
+        17
       ],
       [
         1,
-        11
+        17
       ],
       [
         2,
-        11
+        17
       ],
       [
         3,
-        11
+        17
       ],
       [
         4,
-        11
+        17
       ],
       [
         5,
-        11
+        17
       ],
       [
         6,
-        11
+        17
       ],
       [
         7,
-        11
+        17
       ],
       [
         8,
-        11
+        17
       ],
       [
         9,
-        11
+        17
       ],
       [
         10,
-        11
+        17
       ],
       [
         11,
-        11
+        17
       ],
       [
         12,
-        11
+        17
       ],
       [
         13,
-        11
+        17
       ],
       [
         14,
-        11
+        17
       ],
       [
         15,
-        11
+        17
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        17,
+        17
+      ],
+      [
+        18,
+        17
+      ],
+      [
+        19,
+        17
+      ],
+      [
+        20,
+        17
+      ],
+      [
+        21,
+        17
+      ],
+      [
+        22,
+        17
+      ],
+      [
+        23,
+        17
+      ],
+      [
+        24,
+        17
+      ],
+      [
+        25,
+        17
+      ],
+      [
+        26,
+        17
+      ],
+      [
+        27,
+        17
+      ],
+      [
+        28,
+        17
+      ],
+      [
+        29,
+        17
       ]
     ]
   },
@@ -316,24 +716,160 @@
     {
       "id": 0,
       "position": [
-        14,
-        10
+        28,
+        16
       ],
       "inventory": []
     },
     {
       "id": 1,
       "position": [
-        14,
-        10
+        28,
+        16
       ],
       "inventory": []
     },
     {
       "id": 2,
       "position": [
-        14,
-        10
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 3,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 4,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 5,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 6,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 7,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 8,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 9,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 10,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 11,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 12,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 13,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 14,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 15,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 16,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 17,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 18,
+      "position": [
+        28,
+        16
+      ],
+      "inventory": []
+    },
+    {
+      "id": 19,
+      "position": [
+        28,
+        16
       ],
       "inventory": []
     }
@@ -341,7 +877,7 @@
   "items": [
     {
       "id": "item_0",
-      "type": "cream",
+      "type": "eggs",
       "position": [
         3,
         2
@@ -349,7 +885,7 @@
     },
     {
       "id": "item_1",
-      "type": "yogurt",
+      "type": "lettuce",
       "position": [
         5,
         2
@@ -357,7 +893,7 @@
     },
     {
       "id": "item_2",
-      "type": "eggs",
+      "type": "oats",
       "position": [
         3,
         3
@@ -365,7 +901,7 @@
     },
     {
       "id": "item_3",
-      "type": "bread",
+      "type": "bananas",
       "position": [
         5,
         3
@@ -373,7 +909,7 @@
     },
     {
       "id": "item_4",
-      "type": "cheese",
+      "type": "butter",
       "position": [
         3,
         4
@@ -381,7 +917,7 @@
     },
     {
       "id": "item_5",
-      "type": "pasta",
+      "type": "flour",
       "position": [
         5,
         4
@@ -389,7 +925,7 @@
     },
     {
       "id": "item_6",
-      "type": "milk",
+      "type": "cheese",
       "position": [
         3,
         5
@@ -397,7 +933,7 @@
     },
     {
       "id": "item_7",
-      "type": "butter",
+      "type": "yogurt",
       "position": [
         5,
         5
@@ -405,226 +941,1090 @@
     },
     {
       "id": "item_8",
-      "type": "cream",
+      "type": "tomatoes",
       "position": [
-        7,
-        2
+        3,
+        6
       ]
     },
     {
       "id": "item_9",
-      "type": "yogurt",
+      "type": "peppers",
       "position": [
-        9,
-        2
+        5,
+        6
       ]
     },
     {
       "id": "item_10",
-      "type": "eggs",
+      "type": "pasta",
       "position": [
-        7,
-        3
+        3,
+        7
       ]
     },
     {
       "id": "item_11",
-      "type": "bread",
+      "type": "sugar",
       "position": [
-        9,
-        3
+        5,
+        7
       ]
     },
     {
       "id": "item_12",
-      "type": "cheese",
+      "type": "bread",
       "position": [
-        7,
-        4
+        3,
+        8
       ]
     },
     {
       "id": "item_13",
-      "type": "pasta",
+      "type": "rice",
+      "position": [
+        5,
+        8
+      ]
+    },
+    {
+      "id": "item_14",
+      "type": "juice",
+      "position": [
+        7,
+        2
+      ]
+    },
+    {
+      "id": "item_15",
+      "type": "cream",
+      "position": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "item_16",
+      "type": "onions",
+      "position": [
+        7,
+        3
+      ]
+    },
+    {
+      "id": "item_17",
+      "type": "milk",
+      "position": [
+        9,
+        3
+      ]
+    },
+    {
+      "id": "item_18",
+      "type": "apples",
+      "position": [
+        7,
+        4
+      ]
+    },
+    {
+      "id": "item_19",
+      "type": "carrots",
       "position": [
         9,
         4
       ]
     },
     {
-      "id": "item_14",
-      "type": "milk",
+      "id": "item_20",
+      "type": "cereal",
       "position": [
         7,
         5
       ]
     },
     {
-      "id": "item_15",
-      "type": "butter",
+      "id": "item_21",
+      "type": "eggs",
       "position": [
         9,
         5
       ]
     },
     {
-      "id": "item_16",
-      "type": "cream",
-      "position": [
-        11,
-        2
-      ]
-    },
-    {
-      "id": "item_17",
-      "type": "yogurt",
-      "position": [
-        13,
-        2
-      ]
-    },
-    {
-      "id": "item_18",
-      "type": "eggs",
-      "position": [
-        11,
-        3
-      ]
-    },
-    {
-      "id": "item_19",
-      "type": "bread",
-      "position": [
-        13,
-        3
-      ]
-    },
-    {
-      "id": "item_20",
-      "type": "cheese",
-      "position": [
-        11,
-        4
-      ]
-    },
-    {
-      "id": "item_21",
-      "type": "pasta",
-      "position": [
-        13,
-        4
-      ]
-    },
-    {
       "id": "item_22",
-      "type": "milk",
+      "type": "lettuce",
       "position": [
-        11,
-        5
+        7,
+        6
       ]
     },
     {
       "id": "item_23",
-      "type": "butter",
+      "type": "oats",
       "position": [
-        13,
-        5
+        9,
+        6
       ]
     },
     {
       "id": "item_24",
-      "type": "eggs",
+      "type": "bananas",
       "position": [
-        3,
+        7,
         7
       ]
     },
     {
       "id": "item_25",
-      "type": "bread",
+      "type": "butter",
       "position": [
-        5,
+        9,
         7
       ]
     },
     {
       "id": "item_26",
-      "type": "cheese",
+      "type": "flour",
       "position": [
-        3,
+        7,
         8
       ]
     },
     {
       "id": "item_27",
-      "type": "pasta",
+      "type": "cheese",
       "position": [
-        5,
+        9,
         8
       ]
     },
     {
       "id": "item_28",
-      "type": "milk",
+      "type": "yogurt",
       "position": [
-        7,
-        7
+        11,
+        2
       ]
     },
     {
       "id": "item_29",
-      "type": "butter",
+      "type": "tomatoes",
       "position": [
-        9,
-        7
+        13,
+        2
       ]
     },
     {
       "id": "item_30",
-      "type": "eggs",
+      "type": "peppers",
       "position": [
-        7,
-        8
+        11,
+        3
       ]
     },
     {
       "id": "item_31",
-      "type": "bread",
+      "type": "pasta",
       "position": [
-        9,
-        8
+        13,
+        3
       ]
     },
     {
       "id": "item_32",
-      "type": "cheese",
+      "type": "sugar",
       "position": [
         11,
-        7
+        4
       ]
     },
     {
       "id": "item_33",
-      "type": "pasta",
+      "type": "bread",
+      "position": [
+        13,
+        4
+      ]
+    },
+    {
+      "id": "item_34",
+      "type": "rice",
+      "position": [
+        11,
+        5
+      ]
+    },
+    {
+      "id": "item_35",
+      "type": "juice",
+      "position": [
+        13,
+        5
+      ]
+    },
+    {
+      "id": "item_36",
+      "type": "cream",
+      "position": [
+        11,
+        6
+      ]
+    },
+    {
+      "id": "item_37",
+      "type": "onions",
+      "position": [
+        13,
+        6
+      ]
+    },
+    {
+      "id": "item_38",
+      "type": "milk",
+      "position": [
+        11,
+        7
+      ]
+    },
+    {
+      "id": "item_39",
+      "type": "apples",
       "position": [
         13,
         7
       ]
     },
     {
-      "id": "item_34",
-      "type": "milk",
+      "id": "item_40",
+      "type": "carrots",
       "position": [
         11,
         8
       ]
     },
     {
-      "id": "item_35",
-      "type": "butter",
+      "id": "item_41",
+      "type": "cereal",
       "position": [
         13,
         8
+      ]
+    },
+    {
+      "id": "item_42",
+      "type": "eggs",
+      "position": [
+        15,
+        2
+      ]
+    },
+    {
+      "id": "item_43",
+      "type": "lettuce",
+      "position": [
+        17,
+        2
+      ]
+    },
+    {
+      "id": "item_44",
+      "type": "oats",
+      "position": [
+        15,
+        3
+      ]
+    },
+    {
+      "id": "item_45",
+      "type": "bananas",
+      "position": [
+        17,
+        3
+      ]
+    },
+    {
+      "id": "item_46",
+      "type": "butter",
+      "position": [
+        15,
+        4
+      ]
+    },
+    {
+      "id": "item_47",
+      "type": "flour",
+      "position": [
+        17,
+        4
+      ]
+    },
+    {
+      "id": "item_48",
+      "type": "cheese",
+      "position": [
+        15,
+        5
+      ]
+    },
+    {
+      "id": "item_49",
+      "type": "yogurt",
+      "position": [
+        17,
+        5
+      ]
+    },
+    {
+      "id": "item_50",
+      "type": "tomatoes",
+      "position": [
+        15,
+        6
+      ]
+    },
+    {
+      "id": "item_51",
+      "type": "peppers",
+      "position": [
+        17,
+        6
+      ]
+    },
+    {
+      "id": "item_52",
+      "type": "pasta",
+      "position": [
+        15,
+        7
+      ]
+    },
+    {
+      "id": "item_53",
+      "type": "sugar",
+      "position": [
+        17,
+        7
+      ]
+    },
+    {
+      "id": "item_54",
+      "type": "bread",
+      "position": [
+        15,
+        8
+      ]
+    },
+    {
+      "id": "item_55",
+      "type": "rice",
+      "position": [
+        17,
+        8
+      ]
+    },
+    {
+      "id": "item_56",
+      "type": "juice",
+      "position": [
+        19,
+        2
+      ]
+    },
+    {
+      "id": "item_57",
+      "type": "cream",
+      "position": [
+        21,
+        2
+      ]
+    },
+    {
+      "id": "item_58",
+      "type": "onions",
+      "position": [
+        19,
+        3
+      ]
+    },
+    {
+      "id": "item_59",
+      "type": "milk",
+      "position": [
+        21,
+        3
+      ]
+    },
+    {
+      "id": "item_60",
+      "type": "apples",
+      "position": [
+        19,
+        4
+      ]
+    },
+    {
+      "id": "item_61",
+      "type": "carrots",
+      "position": [
+        21,
+        4
+      ]
+    },
+    {
+      "id": "item_62",
+      "type": "cereal",
+      "position": [
+        19,
+        5
+      ]
+    },
+    {
+      "id": "item_63",
+      "type": "eggs",
+      "position": [
+        21,
+        5
+      ]
+    },
+    {
+      "id": "item_64",
+      "type": "lettuce",
+      "position": [
+        19,
+        6
+      ]
+    },
+    {
+      "id": "item_65",
+      "type": "oats",
+      "position": [
+        21,
+        6
+      ]
+    },
+    {
+      "id": "item_66",
+      "type": "bananas",
+      "position": [
+        19,
+        7
+      ]
+    },
+    {
+      "id": "item_67",
+      "type": "butter",
+      "position": [
+        21,
+        7
+      ]
+    },
+    {
+      "id": "item_68",
+      "type": "flour",
+      "position": [
+        19,
+        8
+      ]
+    },
+    {
+      "id": "item_69",
+      "type": "cheese",
+      "position": [
+        21,
+        8
+      ]
+    },
+    {
+      "id": "item_70",
+      "type": "yogurt",
+      "position": [
+        23,
+        2
+      ]
+    },
+    {
+      "id": "item_71",
+      "type": "tomatoes",
+      "position": [
+        25,
+        2
+      ]
+    },
+    {
+      "id": "item_72",
+      "type": "peppers",
+      "position": [
+        23,
+        3
+      ]
+    },
+    {
+      "id": "item_73",
+      "type": "pasta",
+      "position": [
+        25,
+        3
+      ]
+    },
+    {
+      "id": "item_74",
+      "type": "sugar",
+      "position": [
+        23,
+        4
+      ]
+    },
+    {
+      "id": "item_75",
+      "type": "bread",
+      "position": [
+        25,
+        4
+      ]
+    },
+    {
+      "id": "item_76",
+      "type": "rice",
+      "position": [
+        23,
+        5
+      ]
+    },
+    {
+      "id": "item_77",
+      "type": "juice",
+      "position": [
+        25,
+        5
+      ]
+    },
+    {
+      "id": "item_78",
+      "type": "cream",
+      "position": [
+        23,
+        6
+      ]
+    },
+    {
+      "id": "item_79",
+      "type": "onions",
+      "position": [
+        25,
+        6
+      ]
+    },
+    {
+      "id": "item_80",
+      "type": "milk",
+      "position": [
+        23,
+        7
+      ]
+    },
+    {
+      "id": "item_81",
+      "type": "apples",
+      "position": [
+        25,
+        7
+      ]
+    },
+    {
+      "id": "item_82",
+      "type": "carrots",
+      "position": [
+        23,
+        8
+      ]
+    },
+    {
+      "id": "item_83",
+      "type": "cereal",
+      "position": [
+        25,
+        8
+      ]
+    },
+    {
+      "id": "item_84",
+      "type": "flour",
+      "position": [
+        3,
+        10
+      ]
+    },
+    {
+      "id": "item_85",
+      "type": "cheese",
+      "position": [
+        5,
+        10
+      ]
+    },
+    {
+      "id": "item_86",
+      "type": "yogurt",
+      "position": [
+        3,
+        11
+      ]
+    },
+    {
+      "id": "item_87",
+      "type": "tomatoes",
+      "position": [
+        5,
+        11
+      ]
+    },
+    {
+      "id": "item_88",
+      "type": "peppers",
+      "position": [
+        3,
+        12
+      ]
+    },
+    {
+      "id": "item_89",
+      "type": "pasta",
+      "position": [
+        5,
+        12
+      ]
+    },
+    {
+      "id": "item_90",
+      "type": "sugar",
+      "position": [
+        3,
+        13
+      ]
+    },
+    {
+      "id": "item_91",
+      "type": "bread",
+      "position": [
+        5,
+        13
+      ]
+    },
+    {
+      "id": "item_92",
+      "type": "rice",
+      "position": [
+        3,
+        14
+      ]
+    },
+    {
+      "id": "item_93",
+      "type": "juice",
+      "position": [
+        5,
+        14
+      ]
+    },
+    {
+      "id": "item_94",
+      "type": "cream",
+      "position": [
+        7,
+        10
+      ]
+    },
+    {
+      "id": "item_95",
+      "type": "onions",
+      "position": [
+        9,
+        10
+      ]
+    },
+    {
+      "id": "item_96",
+      "type": "milk",
+      "position": [
+        7,
+        11
+      ]
+    },
+    {
+      "id": "item_97",
+      "type": "apples",
+      "position": [
+        9,
+        11
+      ]
+    },
+    {
+      "id": "item_98",
+      "type": "carrots",
+      "position": [
+        7,
+        12
+      ]
+    },
+    {
+      "id": "item_99",
+      "type": "cereal",
+      "position": [
+        9,
+        12
+      ]
+    },
+    {
+      "id": "item_100",
+      "type": "flour",
+      "position": [
+        7,
+        13
+      ]
+    },
+    {
+      "id": "item_101",
+      "type": "cheese",
+      "position": [
+        9,
+        13
+      ]
+    },
+    {
+      "id": "item_102",
+      "type": "yogurt",
+      "position": [
+        7,
+        14
+      ]
+    },
+    {
+      "id": "item_103",
+      "type": "tomatoes",
+      "position": [
+        9,
+        14
+      ]
+    },
+    {
+      "id": "item_104",
+      "type": "peppers",
+      "position": [
+        11,
+        10
+      ]
+    },
+    {
+      "id": "item_105",
+      "type": "pasta",
+      "position": [
+        13,
+        10
+      ]
+    },
+    {
+      "id": "item_106",
+      "type": "sugar",
+      "position": [
+        11,
+        11
+      ]
+    },
+    {
+      "id": "item_107",
+      "type": "bread",
+      "position": [
+        13,
+        11
+      ]
+    },
+    {
+      "id": "item_108",
+      "type": "rice",
+      "position": [
+        11,
+        12
+      ]
+    },
+    {
+      "id": "item_109",
+      "type": "juice",
+      "position": [
+        13,
+        12
+      ]
+    },
+    {
+      "id": "item_110",
+      "type": "cream",
+      "position": [
+        11,
+        13
+      ]
+    },
+    {
+      "id": "item_111",
+      "type": "onions",
+      "position": [
+        13,
+        13
+      ]
+    },
+    {
+      "id": "item_112",
+      "type": "milk",
+      "position": [
+        11,
+        14
+      ]
+    },
+    {
+      "id": "item_113",
+      "type": "apples",
+      "position": [
+        13,
+        14
+      ]
+    },
+    {
+      "id": "item_114",
+      "type": "carrots",
+      "position": [
+        15,
+        10
+      ]
+    },
+    {
+      "id": "item_115",
+      "type": "cereal",
+      "position": [
+        17,
+        10
+      ]
+    },
+    {
+      "id": "item_116",
+      "type": "flour",
+      "position": [
+        15,
+        11
+      ]
+    },
+    {
+      "id": "item_117",
+      "type": "cheese",
+      "position": [
+        17,
+        11
+      ]
+    },
+    {
+      "id": "item_118",
+      "type": "yogurt",
+      "position": [
+        15,
+        12
+      ]
+    },
+    {
+      "id": "item_119",
+      "type": "tomatoes",
+      "position": [
+        17,
+        12
+      ]
+    },
+    {
+      "id": "item_120",
+      "type": "peppers",
+      "position": [
+        15,
+        13
+      ]
+    },
+    {
+      "id": "item_121",
+      "type": "pasta",
+      "position": [
+        17,
+        13
+      ]
+    },
+    {
+      "id": "item_122",
+      "type": "sugar",
+      "position": [
+        15,
+        14
+      ]
+    },
+    {
+      "id": "item_123",
+      "type": "bread",
+      "position": [
+        17,
+        14
+      ]
+    },
+    {
+      "id": "item_124",
+      "type": "rice",
+      "position": [
+        19,
+        10
+      ]
+    },
+    {
+      "id": "item_125",
+      "type": "juice",
+      "position": [
+        21,
+        10
+      ]
+    },
+    {
+      "id": "item_126",
+      "type": "cream",
+      "position": [
+        19,
+        11
+      ]
+    },
+    {
+      "id": "item_127",
+      "type": "onions",
+      "position": [
+        21,
+        11
+      ]
+    },
+    {
+      "id": "item_128",
+      "type": "milk",
+      "position": [
+        19,
+        12
+      ]
+    },
+    {
+      "id": "item_129",
+      "type": "apples",
+      "position": [
+        21,
+        12
+      ]
+    },
+    {
+      "id": "item_130",
+      "type": "carrots",
+      "position": [
+        19,
+        13
+      ]
+    },
+    {
+      "id": "item_131",
+      "type": "cereal",
+      "position": [
+        21,
+        13
+      ]
+    },
+    {
+      "id": "item_132",
+      "type": "flour",
+      "position": [
+        19,
+        14
+      ]
+    },
+    {
+      "id": "item_133",
+      "type": "cheese",
+      "position": [
+        21,
+        14
+      ]
+    },
+    {
+      "id": "item_134",
+      "type": "yogurt",
+      "position": [
+        23,
+        10
+      ]
+    },
+    {
+      "id": "item_135",
+      "type": "tomatoes",
+      "position": [
+        25,
+        10
+      ]
+    },
+    {
+      "id": "item_136",
+      "type": "peppers",
+      "position": [
+        23,
+        11
+      ]
+    },
+    {
+      "id": "item_137",
+      "type": "pasta",
+      "position": [
+        25,
+        11
+      ]
+    },
+    {
+      "id": "item_138",
+      "type": "sugar",
+      "position": [
+        23,
+        12
+      ]
+    },
+    {
+      "id": "item_139",
+      "type": "bread",
+      "position": [
+        25,
+        12
+      ]
+    },
+    {
+      "id": "item_140",
+      "type": "rice",
+      "position": [
+        23,
+        13
+      ]
+    },
+    {
+      "id": "item_141",
+      "type": "juice",
+      "position": [
+        25,
+        13
+      ]
+    },
+    {
+      "id": "item_142",
+      "type": "cream",
+      "position": [
+        23,
+        14
+      ]
+    },
+    {
+      "id": "item_143",
+      "type": "onions",
+      "position": [
+        25,
+        14
       ]
     }
   ],
@@ -632,9 +2032,12 @@
     {
       "id": "order_0",
       "items_required": [
-        "cream",
-        "milk",
-        "cheese"
+        "apples",
+        "butter",
+        "pasta",
+        "carrots",
+        "bread",
+        "bananas"
       ],
       "items_delivered": [],
       "complete": false,
@@ -643,9 +2046,12 @@
     {
       "id": "order_1",
       "items_required": [
-        "cheese",
-        "pasta",
-        "pasta"
+        "apples",
+        "butter",
+        "lettuce",
+        "bread",
+        "carrots",
+        "cereal"
       ],
       "items_delivered": [],
       "complete": false,
@@ -654,9 +2060,23 @@
   ],
   "drop_off": [
     1,
-    10
+    16
   ],
   "score": 0,
   "active_order_index": 0,
-  "total_orders": 50
+  "total_orders": 500,
+  "drop_off_zones": [
+    [
+      1,
+      16
+    ],
+    [
+      15,
+      16
+    ],
+    [
+      27,
+      16
+    ]
+  ]
 }

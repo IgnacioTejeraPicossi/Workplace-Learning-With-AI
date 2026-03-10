@@ -164,7 +164,8 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
     remaining = list(needed_types)
     for b in bots:
         for t in (b.get("inventory") or []):
-            if t in remaining: remaining.remove(t)
+            if t in remaining:
+                remaining.remove(t)
 
     def score(bot, item):
         ix,iy = item["position"]
@@ -206,6 +207,8 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
     if [x,y] in all_zones:
         if matching:
             return {"bot": bid, "action": "drop_off"}
+        if inv:
+            return {"bot": bid, "action": "wait"}
         # No matching at zone → immediately go pick nearest needed item
         active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
         if active_items:
