@@ -1346,7 +1346,6 @@ AI Learning with AI/
 │   ├── cloudrun.yaml          # Google Cloud Run configuration
 │   └── Dockerfile             # Docker container setup
 ├── docs/                      # Additional documentation
-├── install-voice-cloning.sh   # Voice cloning setup script
 └── README.md                  # This comprehensive documentation
 ```
 

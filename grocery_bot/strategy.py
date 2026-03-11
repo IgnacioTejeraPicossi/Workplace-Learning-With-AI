@@ -193,16 +193,18 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
     x,y = int(bot["position"][0]),int(bot["position"][1])
     bid = bot["id"]
     inv = bot.get("inventory") or []
+    target = assignments.get(bid)
 
-    # Spawn dispersal (only place claimed_cells is used)
-    d = _dispersal(bid, x, y, state, claimed_cells)
-    if d: return d
+    # Spawn dispersal only for bots that have work to do.
+    if inv or target:
+        d = _dispersal(bid, x, y, state, claimed_cells)
+        if d:
+            return d
 
     all_zones = _all_zones(state)
     active_ord = _active(state)
     needed = _needed_types(active_ord)
     matching = [t for t in inv if t in needed]
-    target = assignments.get(bid)
 
     # === AT DROP ZONE ===
     if [x,y] in all_zones:

@@ -72,7 +72,12 @@ def _debug_print_state(state: dict):
 
 
 async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = False, trace: bool = False):
-    async with websockets.connect(ws_url) as ws:
+    async with websockets.connect(
+        ws_url,
+        ping_interval=None,
+        ping_timeout=None,
+        close_timeout=5,
+    ) as ws:
         round_count = 0
         while True:
             raw = await ws.recv()
