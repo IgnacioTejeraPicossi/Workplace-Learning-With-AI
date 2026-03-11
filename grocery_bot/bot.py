@@ -35,7 +35,7 @@ for _env in (
         break
 
 from config import get_ws_url
-from strategy import decide_level1, decide_small_team, decide, _assign_targets, manhattan
+from strategy import decide_level1, decide_small_team, decide, _assign_targets_small_team, _assign_targets, manhattan
 
 
 def _active_order(state: dict) -> dict | None:
@@ -98,6 +98,70 @@ def _merge_assignments(
 
     # Then fill the rest with fresh assignments.
     fresh_assignments = _assign_targets(state, failed_pickups)
+    for bot in bots:
+        bid = bot["id"]
+        if bid in assignments or bot.get("inventory"):
+            continue
+        item = fresh_assignments.get(bid)
+        if not item:
+            continue
+        item_id = item.get("id")
+        item_type = item.get("type")
+        if item_id in reserved_item_ids or remaining_counts[item_type] <= 0:
+            continue
+        assignments[bid] = item
+        reserved_item_ids.add(item_id)
+        remaining_counts[item_type] -= 1
+
+    return assignments
+
+
+def _merge_small_team_assignments(
+    state: dict,
+    previous_assignments: dict[int, dict] | None,
+    failed_pickups: dict[tuple[int, str], int],
+) -> dict[int, dict]:
+    """
+    Keep small-team targets stable for empty bots while the assigned type is still
+    needed. This avoids retargeting a bot to a different shelf type every round.
+    """
+    previous_assignments = previous_assignments or {}
+    bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
+    items_by_id = {it.get("id"): it for it in (state.get("items") or [])}
+
+    remaining_counts = Counter(_needed_types(_active_order(state)))
+    for bot in bots:
+        for t in bot.get("inventory") or []:
+            if remaining_counts[t] > 0:
+                remaining_counts[t] -= 1
+
+    assignments: dict[int, dict] = {}
+    reserved_item_ids: set[str] = set()
+
+    # Preserve targets for empty bots if the assigned type is still needed.
+    for bot in bots:
+        bid = bot["id"]
+        if bot.get("inventory"):
+            continue
+        prev = previous_assignments.get(bid)
+        if not prev:
+            continue
+        prev_type = prev.get("type")
+        prev_id = prev.get("id")
+        if not prev_type or remaining_counts[prev_type] <= 0:
+            continue
+        if prev_id and failed_pickups.get((bid, prev_id), 0) >= 1:
+            continue
+
+        current_item = items_by_id.get(prev_id)
+        kept_target = current_item or prev
+        assignments[bid] = kept_target
+        if current_item and prev_id:
+            reserved_item_ids.add(prev_id)
+        remaining_counts[prev_type] -= 1
+
+    # Fill the rest using the simple small-team assigner.
+    fresh_assignments = _assign_targets_small_team(state, failed_pickups)
     for bot in bots:
         bid = bot["id"]
         if bid in assignments or bot.get("inventory"):
@@ -214,6 +278,9 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
             # Compute assignments ONCE per round (not per bot)
             if use_single_bot_solver or level == 1:
                 assignments: dict[int, dict] = {}
+            elif use_small_team_solver:
+                previous_assignments: dict[int, dict] = getattr(play, "_assignments", None) or {}
+                assignments = _merge_small_team_assignments(state, previous_assignments, failed_pickups)
             else:
                 previous_assignments: dict[int, dict] = getattr(play, "_assignments", None) or {}
                 assignments = _merge_assignments(state, previous_assignments, failed_pickups)

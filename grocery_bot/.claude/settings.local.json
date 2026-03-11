@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"import strategy; print\\('OK'\\)\")"
+    ]
+  }
+}

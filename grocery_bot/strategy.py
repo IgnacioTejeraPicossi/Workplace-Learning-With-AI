@@ -1,5 +1,5 @@
 """
-NMiAI 2026 Grocery Bot — strategy v19.
+NMiAI 2026 Grocery Bot — strategy v21.
 
 ROOT CAUSE OF ALL FAILURES (finally found via round-by-round trace):
 
@@ -19,7 +19,7 @@ Other fixes:
   - 1 bot per needed type assignment (no surplus picking)
   - Items respawn → always a target available
 """
-from collections import deque
+from collections import Counter, deque
 from typing import Any
 
 
@@ -84,6 +84,20 @@ def _move(bid, x, y, tx, ty, state) -> dict:
     return {"bot": bid, "action": step or "wait"}
 
 
+def _move_with_claims(bid, x, y, tx, ty, state, claimed_cells=None) -> dict:
+    W, H = _grid(state)
+    blocked = _blocked_base(x, y, state)
+    if claimed_cells:
+        blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+    step = _bfs_step([x, y], {(tx, ty)}, blocked, W, H)
+    if not step:
+        fallback_blocked = _walls(state)
+        if claimed_cells:
+            fallback_blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+        step = _bfs_step([x, y], {(tx, ty)}, fallback_blocked, W, H)
+    return {"bot": bid, "action": step or "wait"}
+
+
 def _move_adj(bid, x, y, ix, iy, state) -> dict:
     """Move to adjacent cell of item at (ix,iy)."""
     W,H = _grid(state)
@@ -97,6 +111,24 @@ def _move_adj(bid, x, y, ix, iy, state) -> dict:
     step = _bfs_step([x,y], adj, blocked, W, H)
     if not step:
         step = _bfs_step([x,y], adj, _walls(state), W, H)
+    return {"bot": bid, "action": step or "wait"}
+
+
+def _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells=None) -> dict:
+    W, H = _grid(state)
+    adj = {(ix + dx, iy + dy) for _, dx, dy in _DIRS if 0 <= ix + dx < W and 0 <= iy + dy < H}
+    blocked = _blocked_base(x, y, state)
+    for it in state.get("items") or []:
+        p = it.get("position") or [0, 0]
+        blocked.add((p[0], p[1]))
+    if claimed_cells:
+        blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+    step = _bfs_step([x, y], adj, blocked, W, H)
+    if not step:
+        fallback_blocked = _walls(state)
+        if claimed_cells:
+            fallback_blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+        step = _bfs_step([x, y], adj, fallback_blocked, W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
@@ -212,7 +244,15 @@ def _team_inventory(bots):
     return items
 
 
-def _pick_or_move_to_target(bid, x, y, target, state, useful_types=None):
+def _pick_or_move_to_target(
+    bid,
+    x,
+    y,
+    target,
+    state,
+    useful_types=None,
+    claimed_cells=None,
+):
     if not target:
         return None
     tx, ty = int(target["position"][0]), int(target["position"][1])
@@ -229,12 +269,20 @@ def _pick_or_move_to_target(bid, x, y, target, state, useful_types=None):
             return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
 
     if target_still_exists:
-        return _move_adj(bid, x, y, tx, ty, state)
+        return _move_adj_with_claims(bid, x, y, tx, ty, state, claimed_cells)
 
     same_type = [i for i in (state.get("items") or []) if i.get("type") == target.get("type")]
     if same_type:
         nn = min(same_type, key=lambda i: manhattan([x, y], i["position"]))
-        return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
+        return _move_adj_with_claims(
+            bid,
+            x,
+            y,
+            int(nn["position"][0]),
+            int(nn["position"][1]),
+            state,
+            claimed_cells,
+        )
     return None
 
 
@@ -277,6 +325,92 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
     return assignments
 
 
+def _assign_targets_small_team(state: dict, failed_pickups: dict | None = None) -> dict:
+    """
+    For 2-3 bots, prioritize one bot per distinct needed type before assigning
+    duplicate types. This avoids overcommitting two bots to the same shelf type
+    while another required type is still uncovered.
+    """
+    failed_pickups = failed_pickups or {}
+    items = state.get("items") or []
+    bots = [b for b in sorted(state.get("bots") or [], key=lambda b: b["id"]) if len(b.get("inventory") or []) < 3]
+    active_ord = _active(state)
+    if not active_ord or not bots:
+        return {}
+
+    remaining = list(_needed_types(active_ord))
+    for bot in bots:
+        remaining = _remaining_needed(remaining, bot.get("inventory") or [])
+    if not remaining:
+        return {}
+
+    remaining_counts = Counter(remaining)
+    assignments: dict[int, dict] = {}
+    assigned_item_ids: set[str] = set()
+    assigned_type_counts: Counter = Counter()
+
+    def available_items(item_type: str):
+        return [
+            it for it in items
+            if it.get("type") == item_type
+            and it.get("id") not in assigned_item_ids
+        ]
+
+    def pick_best(bot, pool):
+        return min(pool, key=lambda it: manhattan(bot["position"], it["position"]))
+
+    # First pass: cover as many distinct needed types as possible.
+    distinct_types = list(dict.fromkeys(remaining))
+    for item_type in distinct_types:
+        best_pair = None
+        for bot in bots:
+            if bot["id"] in assignments:
+                continue
+            pool = [
+                it for it in available_items(item_type)
+                if failed_pickups.get((bot["id"], it["id"]), 0) < 1
+            ]
+            if not pool:
+                continue
+            item = pick_best(bot, pool)
+            score = manhattan(bot["position"], item["position"])
+            if best_pair is None or score < best_pair[0]:
+                best_pair = (score, bot, item)
+        if best_pair is None:
+            continue
+        _, bot, item = best_pair
+        assignments[bot["id"]] = item
+        assigned_item_ids.add(item["id"])
+        assigned_type_counts[item_type] += 1
+
+    # Second pass: fill remaining duplicate slots if there are spare bots.
+    for bot in bots:
+        if bot["id"] in assignments:
+            continue
+        best_pair = None
+        for item_type, count in remaining_counts.items():
+            if assigned_type_counts[item_type] >= count:
+                continue
+            pool = [
+                it for it in available_items(item_type)
+                if failed_pickups.get((bot["id"], it["id"]), 0) < 1
+            ]
+            if not pool:
+                continue
+            item = pick_best(bot, pool)
+            score = manhattan(bot["position"], item["position"])
+            if best_pair is None or score < best_pair[0]:
+                best_pair = (score, item_type, item)
+        if best_pair is None:
+            continue
+        _, item_type, item = best_pair
+        assignments[bot["id"]] = item
+        assigned_item_ids.add(item["id"])
+        assigned_type_counts[item_type] += 1
+
+    return assignments
+
+
 def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
     failed_pickups = failed_pickups or {}
     x,y = int(bot["position"][0]),int(bot["position"][1])
@@ -299,13 +433,13 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
     if [x,y] in all_zones:
         if matching:
             return {"bot": bid, "action": "drop_off"}
-        if inv:
-            return {"bot": bid, "action": "wait"}
-        # No matching at zone → immediately go pick nearest needed item
-        active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
-        if active_items:
-            nn = min(active_items, key=lambda i: manhattan([x,y], i["position"]))
-            return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
+        # Non-matching or empty: go pick active-order items if room in inventory.
+        # Previously this waited forever when carrying preview items — now we keep working.
+        if len(inv) < 3:
+            active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
+            if active_items:
+                nn = min(active_items, key=lambda i: manhattan([x,y], i["position"]))
+                return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
         return {"bot": bid, "action": "wait"}
 
     # === FULL → deliver ===
@@ -313,9 +447,36 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
         nz = _nearest_zone([x,y], state)
         return _move(bid, x, y, nz[0], nz[1], state)
 
-    # === HAS MATCHING ITEMS → deliver ===
+    # === HAS MATCHING ITEMS → fill inventory then deliver ===
     if matching:
         nz = _nearest_zone([x,y], state)
+        nz_dist = manhattan([x,y], nz)
+        # If room in inventory and time allows, check for nearby needed items to pick
+        # on the way back — avoids a full extra round-trip per item.
+        if len(inv) < 3 and _rounds_left(state) > nz_dist + 5:
+            team_inv_all = []
+            for b in (state.get("bots") or []):
+                team_inv_all.extend(b.get("inventory") or [])
+            active_remaining_team = _remaining_needed(needed, team_inv_all)
+            if active_remaining_team:
+                assigned_ids_set = {v.get("id") for v in assignments.values()}
+                extra_items = [
+                    i for i in (state.get("items") or [])
+                    if i["type"] in set(active_remaining_team)
+                    and i.get("id") not in assigned_ids_set
+                ]
+                close = [
+                    i for i in extra_items
+                    if manhattan([x,y], i["position"]) + manhattan(i["position"], nz) - nz_dist <= 4
+                ]
+                if close:
+                    best = min(close, key=lambda i: manhattan([x,y], i["position"]) + manhattan(i["position"], nz) - nz_dist)
+                    bx, by = int(best["position"][0]), int(best["position"][1])
+                    for it in state.get("items") or []:
+                        ip = it.get("position") or [0, 0]
+                        if abs(x-ip[0])+abs(y-ip[1]) == 1 and it.get("id") == best["id"]:
+                            return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
+                    return _move_adj(bid, x, y, bx, by, state)
         return _move(bid, x, y, nz[0], nz[1], state)
 
     # === RUNNING OUT OF TIME → deliver ===
@@ -356,15 +517,28 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
             nn = min(same_type, key=lambda i: manhattan([x,y], i["position"]))
             return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
 
-    # === NO ASSIGNMENT → stay out of active lanes ===
+    # === NO ASSIGNMENT → pre-pick preview items instead of waiting ===
+    preview_ord = _preview(state)
+    if preview_ord and len(inv) < 3 and _rounds_left(state) > 10:
+        preview_needed = _needed_types(preview_ord)
+        preview_remaining = _remaining_needed(preview_needed, inv)
+        if preview_remaining:
+            pt = _best_item_for_types(state, bot, preview_remaining)
+            if pt:
+                px, py = int(pt["position"][0]), int(pt["position"][1])
+                for it in state.get("items") or []:
+                    ip = it.get("position") or [0, 0]
+                    if abs(x-ip[0])+abs(y-ip[1]) == 1 and it.get("id") == pt["id"]:
+                        return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
+                return _move_adj(bid, x, y, px, py, state)
     return {"bot": bid, "action": "wait"}
 
 
 def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
     """
-    Conservative strategy for 2-3 bots:
-    keep collecting useful active-order items before delivering, and only use
-    preview-order pre-picks once the active order is already covered by team inventory.
+    Simple 2-3 bot strategy:
+    two pickers keep collecting active-order items, while the highest-id bot acts
+    as a courier and delivers useful inventory early. Ignore preview order here.
     """
     failed_pickups = failed_pickups or {}
     x, y = int(bot["position"][0]), int(bot["position"][1])
@@ -378,56 +552,72 @@ def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickup
             return d
 
     active_ord = _active(state)
-    preview_ord = _preview(state)
     needed = _needed_types(active_ord)
-    preview_needed = _needed_types(preview_ord)
     matching = [t for t in inv if t in needed]
     team_inv = _team_inventory(state.get("bots") or [])
     active_remaining = _remaining_needed(needed, team_inv)
-    preview_remaining = _remaining_needed(preview_needed, team_inv)
     zones = _all_zones(state)
     nz = _nearest_zone([x, y], state)
+    team_bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
+    courier_id = team_bots[-1]["id"] if len(team_bots) >= 3 else None
 
-    if [x, y] in zones and matching:
-        return {"bot": bid, "action": "drop_off"}
+    if [x, y] in zones:
+        if matching:
+            return {"bot": bid, "action": "drop_off"}
+        # Non-matching or empty: go pick active-order items if room in inventory.
+        if len(inv) < 3 and needed:
+            active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
+            if active_items:
+                nn = min(active_items, key=lambda i: manhattan([x, y], i["position"]))
+                return _move_with_claims(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state, claimed_cells)
 
     if len(inv) >= 3:
-        return _move(bid, x, y, nz[0], nz[1], state)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
+
+    # Close the order quickly once the team already covers it.
+    if matching and not active_remaining:
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
+
+    # Courier: if carrying anything useful, start returning immediately.
+    if bid == courier_id and matching:
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     active_target = target
+    if active_target and active_target.get("type") not in set(active_remaining):
+        active_target = None
     if not active_target and active_remaining:
         active_target = _best_item_for_types(state, bot, active_remaining, failed_pickups)
 
-    preview_target = None
-    if preview_remaining and len(inv) < 3:
-        preview_target = _best_preview_item_for_delivery(state, bot, preview_remaining, failed_pickups)
-
     if active_target and (active_target.get("type") in set(active_remaining) or not matching):
-        action = _pick_or_move_to_target(bid, x, y, active_target, state, active_remaining)
+        action = _pick_or_move_to_target(
+            bid, x, y, active_target, state, active_remaining, claimed_cells
+        )
         if action:
             return action
 
     if matching:
-        if not active_remaining and preview_target:
-            px, py = int(preview_target["position"][0]), int(preview_target["position"][1])
-            direct_delivery = manhattan([x, y], nz)
-            preview_trip = manhattan([x, y], [px, py])
-            preview_delivery = manhattan([px, py], nz)
-            detour_cost = preview_trip + preview_delivery - direct_delivery
-            if detour_cost <= 4 and _rounds_left(state) > preview_delivery + 5:
-                action = _pick_or_move_to_target(bid, x, y, preview_target, state, preview_remaining)
-                if action:
-                    return action
-        return _move(bid, x, y, nz[0], nz[1], state)
+        # Pickers bank useful progress once they have a decent load.
+        if len(inv) >= 2:
+            return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     if inv:
-        return _move(bid, x, y, nz[0], nz[1], state)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
-    if not active_remaining and preview_target:
-        action = _pick_or_move_to_target(bid, x, y, preview_target, state, preview_remaining)
-        if action:
-            return action
-
+    # Pre-pick preview items when idle
+    preview_ord = _preview(state)
+    if preview_ord and len(inv) < 3 and _rounds_left(state) > 10:
+        preview_needed = _needed_types(preview_ord)
+        preview_remaining = _remaining_needed(preview_needed, inv)
+        if preview_remaining:
+            pt = _best_item_for_types(state, bot, preview_remaining)
+            if pt:
+                px, py = int(pt["position"][0]), int(pt["position"][1])
+                for it in state.get("items") or []:
+                    ip = it.get("position") or [0, 0]
+                    if abs(x-ip[0])+abs(y-ip[1]) == 1 and it.get("id") == pt["id"]:
+                        return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
+                return _move_adj(bid, x, y, px, py, state)
     return {"bot": bid, "action": "wait"}
 
 
