@@ -1,5 +1,5 @@
 """
-NMiAI 2026 Grocery Bot — strategy v23.
+NMiAI 2026 Grocery Bot — strategy v24.
 
 ROOT CAUSE OF ALL FAILURES (finally found via round-by-round trace):
 
@@ -150,23 +150,44 @@ def _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells=None) -> dict:
 
 
 def _dispersal(bid, x, y, state, claimed=None):
-    """Exit spawn cluster. claimed only used here to spread bots out."""
+    """Exit spawn cluster. Prefer exits with more onward options to avoid dead-ends."""
     sp = _spawn(state)
-    if (x,y) != sp: return None
-    if sum(1 for b in (state.get("bots") or []) if b.get("position")==list(sp)) < 2:
+    if (x, y) != sp:
         return None
-    W,H = _grid(state); walls = _walls(state)
-    for act,dx,dy in [("move_left",-1,0),("move_up",0,-1),("move_down",0,1),("move_right",1,0)]:
-        nx,ny = x+dx, y+dy
-        if not (0<=nx<W and 0<=ny<H) or (nx,ny) in walls: continue
-        if claimed and (nx,ny) in claimed: continue
-        return {"bot": bid, "action": act}
-    # All exits claimed: force exit anyway
-    for act,dx,dy in [("move_left",-1,0),("move_up",0,-1)]:
-        nx,ny = x+dx, y+dy
-        if 0<=nx<W and 0<=ny<H and (nx,ny) not in walls:
-            return {"bot": bid, "action": act}
-    return None
+    if sum(1 for b in (state.get("bots") or []) if b.get("position") == list(sp)) < 2:
+        return None
+    W, H = _grid(state)
+    walls = _walls(state)
+    claimed_set = set(claimed) if claimed else set()
+
+    def exit_options(nx, ny):
+        """Count viable onward neighbors (non-wall, non-spawn, in-bounds, not back to source)."""
+        count = 0
+        for _, ddx, ddy in _DIRS:
+            nnx, nny = nx + ddx, ny + ddy
+            if not (0 <= nnx < W and 0 <= nny < H):
+                continue
+            if (nnx, nny) in walls or (nnx, nny) == sp or (nnx, nny) == (x, y):
+                continue
+            count += 1
+        return count
+
+    # Build candidates: (score, is_claimed, act)
+    candidates = []
+    for act, dx, dy in _DIRS:
+        nx, ny = x + dx, y + dy
+        if not (0 <= nx < W and 0 <= ny < H) or (nx, ny) in walls:
+            continue
+        score = exit_options(nx, ny)
+        is_claimed = (nx, ny) in claimed_set
+        candidates.append((score, is_claimed, act))
+
+    if not candidates:
+        return None
+
+    # Prefer exits with more onward options; break ties by unclaimed first.
+    candidates.sort(key=lambda c: (-c[0], c[1]))
+    return {"bot": bid, "action": candidates[0][2]}
 
 
 def _all_zones(state):
