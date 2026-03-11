@@ -1,5 +1,5 @@
 """
-NMiAI 2026 Grocery Bot — strategy v21.
+NMiAI 2026 Grocery Bot — strategy v23.
 
 ROOT CAUSE OF ALL FAILURES (finally found via round-by-round trace):
 
@@ -20,6 +20,7 @@ Other fixes:
   - Items respawn → always a target available
 """
 from collections import Counter, deque
+from itertools import permutations as _iperms
 from typing import Any
 
 
@@ -79,22 +80,27 @@ def _move(bid, x, y, tx, ty, state) -> dict:
     blocked = _blocked_base(x, y, state)
     step = _bfs_step([x,y], {(tx,ty)}, blocked, W, H)
     if not step:
-        # Fallback without spawn block (in case path only goes through spawn)
+        # Fallback: drop item blocks but keep spawn blocked (avoids oscillation)
+        step = _bfs_step([x,y], {(tx,ty)}, _blocked_base(x, y, state), W, H)
+    if not step:
+        # Last resort: allow routing through spawn only if truly no other path
         step = _bfs_step([x,y], {(tx,ty)}, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
 def _move_with_claims(bid, x, y, tx, ty, state, claimed_cells=None) -> dict:
     W, H = _grid(state)
-    blocked = _blocked_base(x, y, state)
-    if claimed_cells:
-        blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+    claimed_set = {tuple(c) for c in claimed_cells if tuple(c) != (x, y)} if claimed_cells else set()
+    blocked = _blocked_base(x, y, state) | claimed_set
     step = _bfs_step([x, y], {(tx, ty)}, blocked, W, H)
     if not step:
-        fallback_blocked = _walls(state)
-        if claimed_cells:
-            fallback_blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
-        step = _bfs_step([x, y], {(tx, ty)}, fallback_blocked, W, H)
+        # Drop claimed, keep spawn blocked
+        step = _bfs_step([x, y], {(tx, ty)}, _blocked_base(x, y, state), W, H)
+    if not step:
+        # Last resort: allow through spawn
+        step = _bfs_step([x, y], {(tx, ty)}, _walls(state) | claimed_set, W, H)
+    if not step:
+        step = _bfs_step([x, y], {(tx, ty)}, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
@@ -110,6 +116,10 @@ def _move_adj(bid, x, y, ix, iy, state) -> dict:
     # blockers created oscillations and sideways detours in the opening trace.
     step = _bfs_step([x,y], adj, blocked, W, H)
     if not step:
+        # Drop item blocks, keep spawn blocked
+        step = _bfs_step([x,y], adj, _blocked_base(x, y, state), W, H)
+    if not step:
+        # Last resort: allow through spawn
         step = _bfs_step([x,y], adj, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
@@ -125,10 +135,17 @@ def _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells=None) -> dict:
         blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
     step = _bfs_step([x, y], adj, blocked, W, H)
     if not step:
-        fallback_blocked = _walls(state)
+        # Drop items block, keep spawn blocked + claimed
+        fallback = _blocked_base(x, y, state)
         if claimed_cells:
-            fallback_blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
-        step = _bfs_step([x, y], adj, fallback_blocked, W, H)
+            fallback |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+        step = _bfs_step([x, y], adj, fallback, W, H)
+    if not step:
+        # Drop claimed too, keep spawn blocked
+        step = _bfs_step([x, y], adj, _blocked_base(x, y, state), W, H)
+    if not step:
+        # Last resort: allow through spawn
+        step = _bfs_step([x, y], adj, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
@@ -357,7 +374,9 @@ def _assign_targets_small_team(state: dict, failed_pickups: dict | None = None) 
         ]
 
     def pick_best(bot, pool):
-        return min(pool, key=lambda it: manhattan(bot["position"], it["position"]))
+        # Minimize total trip: bot→item + item→drop_off (not just bot→item)
+        zone = _nearest_zone(bot["position"], state)
+        return min(pool, key=lambda it: manhattan(bot["position"], it["position"]) + manhattan(it["position"], zone))
 
     # First pass: cover as many distinct needed types as possible.
     distinct_types = list(dict.fromkeys(remaining))
@@ -621,6 +640,43 @@ def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickup
     return {"bot": bid, "action": "wait"}
 
 
+def _tsp_best_first(pos, needed_types, state):
+    """
+    Returns the first item to pick that minimizes total round-trip cost:
+      pos → item1 → item2 → ... → drop_off  (Manhattan distances, exhaustive).
+    Pre-selects the nearest candidate item per needed type, then evaluates all
+    orderings (N! ≤ 6 for 3 items, ≤ 24 for 4 items — trivially fast).
+    Falls back to nearest-first greedy when no items are available.
+    """
+    items = state.get("items") or []
+    drop_off = _nearest_zone(pos, state)
+    # One candidate per slot (handles duplicates like yogurt×2)
+    used_ids: set = set()
+    plan: list = []
+    for t in needed_types[:3]:  # cap at inventory limit
+        pool = [i for i in items if i["type"] == t and i.get("id") not in used_ids]
+        if not pool:
+            continue
+        best = min(pool, key=lambda i: manhattan(pos, i["position"]))
+        plan.append(best)
+        used_ids.add(best.get("id"))
+    if not plan:
+        return None
+    if len(plan) == 1:
+        return plan[0]
+    best_first = plan[0]
+    best_cost = float("inf")
+    for perm in _iperms(plan):
+        cost = manhattan(pos, perm[0]["position"])
+        for k in range(len(perm) - 1):
+            cost += manhattan(perm[k]["position"], perm[k + 1]["position"])
+        cost += manhattan(perm[-1]["position"], drop_off)
+        if cost < best_cost:
+            best_cost = cost
+            best_first = perm[0]
+    return best_first
+
+
 def decide_level1(bot, state):
     """
     Safe baseline for 1-bot maps:
@@ -646,7 +702,12 @@ def decide_level1(bot, state):
     if len(inv) >= 3:
         return _move(bid, x, y, nz[0], nz[1], state)
 
-    target = _best_item_for_types(state, bot, remaining)
+    # TSP route planning: when ≥2 items needed, pick the order that minimises
+    # total trip distance rather than greedily picking the nearest item.
+    if len(remaining) >= 2:
+        target = _tsp_best_first([x, y], remaining, state)
+    else:
+        target = _best_item_for_types(state, bot, remaining)
     preview_target = (
         _best_preview_item_for_delivery(state, bot, preview_remaining)
         if len(inv) < 3 else None
