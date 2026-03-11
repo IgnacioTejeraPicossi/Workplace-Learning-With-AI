@@ -4,14 +4,15 @@ NMiAI 2026 Grocery Bot — connect to game.ainm.no and play.
 Usage:
   pip install -r requirements.txt
   set GROCERY_BOT_WS_URL=wss://game.ainm.no/ws?token=...   (or GROCERY_BOT_TOKEN)
-  python bot.py              # Level 2 (play)
-  python bot.py --level 1     # Level 1 (connect, wait, observe)
+  python bot.py              # Level 2 / multi-bot play
+  python bot.py --level 1    # Level 1 / single-bot baseline
 """
 import argparse
 import asyncio
 import json
 import os
 import sys
+from collections import Counter
 
 try:
     import websockets
@@ -34,7 +35,85 @@ for _env in (
         break
 
 from config import get_ws_url
-from strategy import decide_level1, decide, _assign_targets, manhattan
+from strategy import decide_level1, decide_small_team, decide, _assign_targets, manhattan
+
+
+def _active_order(state: dict) -> dict | None:
+    return next((o for o in state.get("orders") or [] if o.get("status") == "active"), None)
+
+
+def _needed_types(order: dict | None) -> list[str]:
+    if not order:
+        return []
+    needed = list(order.get("items_required") or [])
+    for delivered in order.get("items_delivered") or []:
+        if delivered in needed:
+            needed.remove(delivered)
+    return needed
+
+
+def _merge_assignments(
+    state: dict,
+    previous_assignments: dict[int, dict] | None,
+    failed_pickups: dict[tuple[int, str], int],
+) -> dict[int, dict]:
+    """
+    Keep previous targets for empty bots when the target type is still needed.
+    This reduces assignment thrash without changing targets for bots carrying items.
+    """
+    previous_assignments = previous_assignments or {}
+    bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
+    items_by_id = {it.get("id"): it for it in (state.get("items") or [])}
+
+    remaining_counts = Counter(_needed_types(_active_order(state)))
+    for bot in bots:
+        for t in bot.get("inventory") or []:
+            if remaining_counts[t] > 0:
+                remaining_counts[t] -= 1
+
+    assignments: dict[int, dict] = {}
+    reserved_item_ids: set[str] = set()
+
+    # First, preserve existing targets for empty bots if the type is still needed.
+    for bot in bots:
+        bid = bot["id"]
+        if bot.get("inventory"):
+            continue
+        prev = previous_assignments.get(bid)
+        if not prev:
+            continue
+        prev_type = prev.get("type")
+        prev_id = prev.get("id")
+        if not prev_type or remaining_counts[prev_type] <= 0:
+            continue
+        if prev_id and failed_pickups.get((bid, prev_id), 0) >= 1:
+            continue
+
+        current_item = items_by_id.get(prev_id)
+        kept_target = current_item or prev
+        assignments[bid] = kept_target
+        if current_item and prev_id:
+            reserved_item_ids.add(prev_id)
+        remaining_counts[prev_type] -= 1
+
+    # Then fill the rest with fresh assignments.
+    fresh_assignments = _assign_targets(state, failed_pickups)
+    for bot in bots:
+        bid = bot["id"]
+        if bid in assignments or bot.get("inventory"):
+            continue
+        item = fresh_assignments.get(bid)
+        if not item:
+            continue
+        item_id = item.get("id")
+        item_type = item.get("type")
+        if item_id in reserved_item_ids or remaining_counts[item_type] <= 0:
+            continue
+        assignments[bid] = item
+        reserved_item_ids.add(item_id)
+        remaining_counts[item_type] -= 1
+
+    return assignments
 
 
 def _next_position_after_action(bot: dict, action: dict) -> tuple[int, int] | None:
@@ -110,6 +189,8 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
 
             actions = []
             bots_list = state.get("bots") or []
+            use_single_bot_solver = len(bots_list) == 1 and level != 3
+            use_small_team_solver = 1 < len(bots_list) <= 3 and level != 3
             # Detect failed pick_ups: last round we sent pick_up but inventory didn't change
             failed_pickups: dict[tuple[int, str], int] = getattr(play, "_failed_pickups", None) or {}
             last_round = getattr(play, "_last_round", None)
@@ -131,15 +212,25 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
             play._failed_pickups = failed_pickups
 
             # Compute assignments ONCE per round (not per bot)
-            if level == 1:
+            if use_single_bot_solver or level == 1:
                 assignments: dict[int, dict] = {}
             else:
-                assignments = _assign_targets(state, failed_pickups)
+                previous_assignments: dict[int, dict] = getattr(play, "_assignments", None) or {}
+                assignments = _merge_assignments(state, previous_assignments, failed_pickups)
+            play._assignments = assignments
 
             claimed: set[tuple[int, int]] = set()
             for bot in sorted(bots_list, key=lambda b: b["id"]):
-                if level == 1:
+                if use_single_bot_solver or level == 1:
                     action = decide_level1(bot, state)
+                elif use_small_team_solver:
+                    action = decide_small_team(
+                        bot,
+                        state,
+                        assignments,
+                        claimed_cells=claimed if len(bots_list) > 1 else None,
+                        failed_pickups=failed_pickups,
+                    )
                 else:
                     action = decide(
                         bot, state, assignments,
@@ -188,7 +279,7 @@ async def play(ws_url: str, level: int = 2, verbose: bool = True, debug: bool = 
 def main():
     parser = argparse.ArgumentParser(description="NMiAI 2026 Grocery Bot")
     parser.add_argument("--level", type=int, default=2, choices=(1, 2, 3),
-                        help="1=wait only, 2=1-bot solver, 3=multi-bot (or auto when bots>1)")
+                        help="1=single-bot baseline, 2=auto single/multi, 3=force multi-bot strategy")
     parser.add_argument("--quiet", action="store_true", help="Less console output")
     parser.add_argument("--debug", action="store_true", help="Print first game state (grid, walls, etc.) to fix strategy")
     parser.add_argument("--trace", action="store_true", help="Print each bot position+action for first 10 rounds (to see why score is low)")
