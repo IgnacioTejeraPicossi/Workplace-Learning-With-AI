@@ -106,12 +106,10 @@ def _merge_assignments(
         if not item:
             continue
         item_id = item.get("id")
-        item_type = item.get("type")
-        if item_id in reserved_item_ids or remaining_counts[item_type] <= 0:
+        if item_id in reserved_item_ids:
             continue
         assignments[bid] = item
         reserved_item_ids.add(item_id)
-        remaining_counts[item_type] -= 1
 
     return assignments
 

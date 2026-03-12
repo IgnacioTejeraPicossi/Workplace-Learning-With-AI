@@ -1,5 +1,5 @@
 """
-NMiAI 2026 Grocery Bot — strategy v25.
+NMiAI 2026 Grocery Bot — strategy v26.
 
 ROOT CAUSE OF ALL FAILURES (finally found via round-by-round trace):
 
@@ -362,35 +362,25 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
         assigned_ids.add(best["id"])
         types_left.remove(best["type"])
 
-    # Second pass: assign remaining bots to any needed item (for large teams like Nightmare).
-    # Tracks how many bots are already en-route per type to avoid massive over-assignment.
-    type_assigned_count: Counter = Counter(v["type"] for v in assignments.values())
-    needed_counts = Counter(needed_types)
+    # Second pass: assign ALL remaining bots to needed items (critical for large teams).
+    # The first pass covers only 1 bot per needed type; for Nightmare with 20 bots and a
+    # 7-item order, 13 bots would sit idle without this.  Extra bots collecting the same
+    # type pre-stock inventory for subsequent orders as they cycle.
+    remaining_types = set(needed_types)
     for bot in bots:
         if bot["id"] in assignments or len(bot.get("inventory") or []) >= 3:
             continue
-        best_item = None
-        best_score_val = float("inf")
-        for item_type, need_count in needed_counts.items():
-            if type_assigned_count[item_type] >= need_count:
-                continue
-            pool = [
-                i for i in items
-                if i["type"] == item_type
-                and i["id"] not in assigned_ids
-                and failed_pickups.get((bot["id"], i["id"]), 0) < 1
-            ]
-            if not pool:
-                continue
-            item = min(pool, key=lambda i: score(bot, i))
-            s = score(bot, item)
-            if s < best_score_val:
-                best_score_val = s
-                best_item = item
-        if best_item:
-            assignments[bot["id"]] = best_item
-            assigned_ids.add(best_item["id"])
-            type_assigned_count[best_item["type"]] += 1
+        pool = [
+            i for i in items
+            if i["type"] in remaining_types
+            and i["id"] not in assigned_ids
+            and failed_pickups.get((bot["id"], i["id"]), 0) < 1
+        ]
+        if not pool:
+            continue
+        best = min(pool, key=lambda i: score(bot, i))
+        assignments[bot["id"]] = best
+        assigned_ids.add(best["id"])
 
     return assignments
 
@@ -490,11 +480,10 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
     inv = bot.get("inventory") or []
     target = assignments.get(bid)
 
-    # Spawn dispersal only for bots that have work to do.
-    if inv or target:
-        d = _dispersal(bid, x, y, state, claimed_cells)
-        if d:
-            return d
+    # Always try dispersal at spawn — even unassigned bots must leave spawn.
+    d = _dispersal(bid, x, y, state, claimed_cells)
+    if d:
+        return d
 
     all_zones = _all_zones(state)
     active_ord = _active(state)
@@ -600,7 +589,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                 ip = it.get("position") or [0, 0]
                 if abs(x - ip[0]) + abs(y - ip[1]) == 1 and it.get("id") == nn["id"]:
                     return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells)
 
     # Pre-pick at most 1 preview item — filling with 3 preview items causes a
     # deadlock (bot arrives at drop zone, nothing matches, can never unload).
@@ -622,9 +611,8 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
 
 def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
     """
-    Simple 2-3 bot strategy:
-    two pickers keep collecting active-order items, while the highest-id bot acts
-    as a courier and delivers useful inventory early. Ignore preview order here.
+    Simple 2-3 bot strategy: all bots collect active-order items and deliver
+    when inventory reaches 2+ or the team has covered all remaining needs.
     """
     failed_pickups = failed_pickups or {}
     x, y = int(bot["position"][0]), int(bot["position"][1])
@@ -644,47 +632,49 @@ def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickup
     active_remaining = _remaining_needed(needed, team_inv)
     zones = _all_zones(state)
     nz = _nearest_zone([x, y], state)
-    team_bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
-    courier_id = team_bots[-1]["id"] if len(team_bots) >= 3 else None
+
+    # Types that other empty bots are already en-route to fetch — avoid duplicate effort.
+    other_pending_types: list[str] = []
+    for _b in (state.get("bots") or []):
+        if _b["id"] == bid or _b.get("inventory"):
+            continue
+        _ot = assignments.get(_b["id"])
+        if _ot and _ot.get("type"):
+            other_pending_types.append(_ot["type"])
+    effective_remaining = _remaining_needed(active_remaining, other_pending_types)
 
     if [x, y] in zones:
         if matching:
             return {"bot": bid, "action": "drop_off"}
-        # Non-matching or empty: go pick active-order items if room in inventory.
-        if len(inv) < 3 and needed:
-            active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
+        # Leave zone only if there are uncovered items for this bot to fetch.
+        if len(inv) < 3 and effective_remaining:
+            active_items = [i for i in (state.get("items") or []) if i["type"] in set(effective_remaining)]
             if active_items:
                 nn = min(active_items, key=lambda i: manhattan([x, y], i["position"]))
                 return _move_with_claims(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state, claimed_cells)
+        # effective_remaining empty → fall through to preview logic below
 
     if len(inv) >= 3:
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
-    # Close the order quickly once the team already covers it.
-    if matching and not active_remaining:
-        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
-
-    # Courier: if carrying anything useful, start returning immediately.
-    if bid == courier_id and matching:
+    # Deliver once this bot's contribution is covered by others (in-hand or assigned).
+    if matching and not effective_remaining:
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     active_target = target
-    if active_target and active_target.get("type") not in set(active_remaining):
+    if active_target and active_target.get("type") not in set(effective_remaining):
         active_target = None
-    if not active_target and active_remaining:
-        active_target = _best_item_for_types(state, bot, active_remaining, failed_pickups)
+    if not active_target and effective_remaining:
+        active_target = _best_item_for_types(state, bot, effective_remaining, failed_pickups)
 
-    if active_target and (active_target.get("type") in set(active_remaining) or not matching):
+    if active_target and (active_target.get("type") in set(effective_remaining) or not matching):
         action = _pick_or_move_to_target(
-            bid, x, y, active_target, state, active_remaining, claimed_cells
+            bid, x, y, active_target, state, effective_remaining, claimed_cells
         )
         if action:
             return action
 
     if matching:
-        # Pickers bank useful progress once they have a decent load.
-        if len(inv) >= 2:
-            return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     if inv:
