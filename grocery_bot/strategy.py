@@ -197,8 +197,27 @@ def _all_zones(state):
     return z if z else [state.get("drop_off") or [0,0]]
 
 
-def _nearest_zone(pos, state):
-    return min(_all_zones(state), key=lambda z: manhattan(pos, z))
+def _nearest_zone(pos, state, avoid_congestion=False):
+    zones = _all_zones(state)
+    sp = _spawn(state)
+    # Penalize zones adjacent to spawn only when routing for delivery and spawn is congested.
+    # Do NOT apply this penalty during assignment scoring — it distorts which items bots target.
+    if avoid_congestion:
+        bots_at_spawn = sum(
+            1 for b in (state.get("bots") or [])
+            if tuple(b.get("position") or []) == sp
+        )
+        spawn_penalty = min(bots_at_spawn * 2, 20)
+    else:
+        spawn_penalty = 0
+
+    def zone_cost(z):
+        d = manhattan(pos, z)
+        if spawn_penalty > 0 and manhattan(tuple(z), sp) <= 2:
+            d += spawn_penalty
+        return d
+
+    return min(zones, key=zone_cost)
 
 
 def _active(state):
@@ -677,7 +696,8 @@ def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickup
     if matching:
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
-    if inv:
+    # Only move toward zone if not already there — avoids BFS returning wait in place.
+    if inv and [x, y] not in zones:
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # Pre-pick at most 1 preview item (keep ≥1 slot free to avoid deadlock).
