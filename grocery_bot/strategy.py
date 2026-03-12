@@ -1,5 +1,5 @@
 """
-NMiAI 2026 Grocery Bot — strategy v24.
+NMiAI 2026 Grocery Bot — strategy v25.
 
 ROOT CAUSE OF ALL FAILURES (finally found via round-by-round trace):
 
@@ -186,6 +186,8 @@ def _dispersal(bid, x, y, state, claimed=None):
         return None
 
     # Prefer exits with more onward options; break ties by unclaimed first.
+    # NOTE: score wins over claim status — prevents sending bots to dead-ends
+    # (score=1) just because the main corridor (score=3) happens to be claimed.
     candidates.sort(key=lambda c: (-c[0], c[1]))
     return {"bot": bid, "action": candidates[0][2]}
 
@@ -359,6 +361,36 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
         assignments[bot["id"]] = best
         assigned_ids.add(best["id"])
         types_left.remove(best["type"])
+
+    # Second pass: assign remaining bots to any needed item (for large teams like Nightmare).
+    # Tracks how many bots are already en-route per type to avoid massive over-assignment.
+    type_assigned_count: Counter = Counter(v["type"] for v in assignments.values())
+    needed_counts = Counter(needed_types)
+    for bot in bots:
+        if bot["id"] in assignments or len(bot.get("inventory") or []) >= 3:
+            continue
+        best_item = None
+        best_score_val = float("inf")
+        for item_type, need_count in needed_counts.items():
+            if type_assigned_count[item_type] >= need_count:
+                continue
+            pool = [
+                i for i in items
+                if i["type"] == item_type
+                and i["id"] not in assigned_ids
+                and failed_pickups.get((bot["id"], i["id"]), 0) < 1
+            ]
+            if not pool:
+                continue
+            item = min(pool, key=lambda i: score(bot, i))
+            s = score(bot, item)
+            if s < best_score_val:
+                best_score_val = s
+                best_item = item
+        if best_item:
+            assignments[bot["id"]] = best_item
+            assigned_ids.add(best_item["id"])
+            type_assigned_count[best_item["type"]] += 1
 
     return assignments
 
@@ -557,9 +589,23 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
             nn = min(same_type, key=lambda i: manhattan([x,y], i["position"]))
             return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
 
-    # === NO ASSIGNMENT → pre-pick preview items instead of waiting ===
+    # === NO ASSIGNMENT → help active order first, then pre-pick 1 preview item ===
+    # Unassigned bots (common on large maps) must not sit idle while order is open.
+    if len(inv) < 3 and needed:
+        active_items = [i for i in (state.get("items") or []) if i["type"] in set(needed)]
+        if active_items:
+            nn = min(active_items, key=lambda i: manhattan([x, y], i["position"]))
+            ix, iy = int(nn["position"][0]), int(nn["position"][1])
+            for it in state.get("items") or []:
+                ip = it.get("position") or [0, 0]
+                if abs(x - ip[0]) + abs(y - ip[1]) == 1 and it.get("id") == nn["id"]:
+                    return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
+            return _move_adj(bid, x, y, ix, iy, state)
+
+    # Pre-pick at most 1 preview item — filling with 3 preview items causes a
+    # deadlock (bot arrives at drop zone, nothing matches, can never unload).
     preview_ord = _preview(state)
-    if preview_ord and len(inv) < 3 and _rounds_left(state) > 10:
+    if preview_ord and len(inv) < 2 and _rounds_left(state) > 10:
         preview_needed = _needed_types(preview_ord)
         preview_remaining = _remaining_needed(preview_needed, inv)
         if preview_remaining:
@@ -644,9 +690,9 @@ def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickup
     if inv:
         return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
-    # Pre-pick preview items when idle
+    # Pre-pick at most 1 preview item (keep ≥1 slot free to avoid deadlock).
     preview_ord = _preview(state)
-    if preview_ord and len(inv) < 3 and _rounds_left(state) > 10:
+    if preview_ord and len(inv) < 2 and _rounds_left(state) > 10:
         preview_needed = _needed_types(preview_ord)
         preview_remaining = _remaining_needed(preview_needed, inv)
         if preview_remaining:
