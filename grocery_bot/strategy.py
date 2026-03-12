@@ -75,15 +75,30 @@ def _blocked_base(x, y, state):
     return blocked
 
 
+_DMAP = {"move_up":(0,-1),"move_down":(0,1),"move_left":(-1,0),"move_right":(1,0)}
+
+
+def _other_bots(bid, state):
+    """Current positions of all bots except self."""
+    return {tuple(b.get("position") or []) for b in (state.get("bots") or []) if b["id"] != bid}
+
+
 def _move(bid, x, y, tx, ty, state) -> dict:
+    """Move toward (tx,ty). If the immediate next step is occupied by another bot,
+    try an alternative first step only — avoids head-on deadlocks without causing
+    large global detours (which happen when all other-bot positions are blocked in BFS)."""
     W,H = _grid(state)
     blocked = _blocked_base(x, y, state)
     step = _bfs_step([x,y], {(tx,ty)}, blocked, W, H)
+    if step:
+        dx, dy = _DMAP[step]
+        next_cell = (x+dx, y+dy)
+        others = _other_bots(bid, state)
+        if next_cell in others:
+            alt = _bfs_step([x,y], {(tx,ty)}, blocked | {next_cell}, W, H)
+            if alt:
+                step = alt
     if not step:
-        # Fallback: drop item blocks but keep spawn blocked (avoids oscillation)
-        step = _bfs_step([x,y], {(tx,ty)}, _blocked_base(x, y, state), W, H)
-    if not step:
-        # Last resort: allow routing through spawn only if truly no other path
         step = _bfs_step([x,y], {(tx,ty)}, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
@@ -105,21 +120,25 @@ def _move_with_claims(bid, x, y, tx, ty, state, claimed_cells=None) -> dict:
 
 
 def _move_adj(bid, x, y, ix, iy, state) -> dict:
-    """Move to adjacent cell of item at (ix,iy)."""
+    """Move to adjacent cell of item at (ix,iy). Same immediate-step-only collision
+    avoidance as _move to prevent head-on deadlocks without large global detours."""
     W,H = _grid(state)
     adj = {(ix+dx,iy+dy) for _,dx,dy in _DIRS if 0<=ix+dx<W and 0<=iy+dy<H}
     blocked = _blocked_base(x, y, state)
     for it in state.get("items") or []:
         p=it.get("position") or [0,0]; blocked.add((p[0],p[1]))
-    # Do not route around the *current* positions of other bots. In practice,
-    # those bots often move away this same round, and treating them as hard
-    # blockers created oscillations and sideways detours in the opening trace.
     step = _bfs_step([x,y], adj, blocked, W, H)
+    if step:
+        dx, dy = _DMAP[step]
+        next_cell = (x+dx, y+dy)
+        others = _other_bots(bid, state)
+        if next_cell in others:
+            alt = _bfs_step([x,y], adj, blocked | {next_cell}, W, H)
+            if alt:
+                step = alt
     if not step:
-        # Drop item blocks, keep spawn blocked
         step = _bfs_step([x,y], adj, _blocked_base(x, y, state), W, H)
     if not step:
-        # Last resort: allow through spawn
         step = _bfs_step([x,y], adj, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
@@ -381,25 +400,49 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
         assigned_ids.add(best["id"])
         types_left.remove(best["type"])
 
-    # Second pass: assign ALL remaining bots to needed items (critical for large teams).
-    # The first pass covers only 1 bot per needed type; for Nightmare with 20 bots and a
-    # 7-item order, 13 bots would sit idle without this.  Extra bots collecting the same
-    # type pre-stock inventory for subsequent orders as they cycle.
+    # Second pass: pre-stock preview order first, then fill remaining bots with active-order
+    # duplicates. This way, when the active order completes, preview bots can deliver
+    # immediately instead of needing a full new pick-up cycle.
+    preview_ord = _preview(state)
+    preview_needed = _needed_types(preview_ord)
+    # Subtract what preview bots already carry
+    preview_remaining = list(preview_needed)
+    for b in bots:
+        preview_remaining = _remaining_needed(preview_remaining, b.get("inventory") or [])
+    preview_types_left = list(dict.fromkeys(preview_remaining))  # distinct, ordered
+
     remaining_types = set(needed_types)
     for bot in bots:
         if bot["id"] in assignments or len(bot.get("inventory") or []) >= 3:
             continue
-        pool = [
-            i for i in items
-            if i["type"] in remaining_types
-            and i["id"] not in assigned_ids
-            and failed_pickups.get((bot["id"], i["id"]), 0) < 1
-        ]
-        if not pool:
-            continue
-        best = min(pool, key=lambda i: score(bot, i))
-        assignments[bot["id"]] = best
-        assigned_ids.add(best["id"])
+        # Try preview item first (if this bot isn't already covering an active type)
+        assigned = False
+        if preview_types_left:
+            ptype = preview_types_left[0]
+            pool = [
+                i for i in items
+                if i["type"] == ptype
+                and i["id"] not in assigned_ids
+                and failed_pickups.get((bot["id"], i["id"]), 0) < 1
+            ]
+            if pool:
+                best = min(pool, key=lambda i: score(bot, i))
+                assignments[bot["id"]] = best
+                assigned_ids.add(best["id"])
+                preview_types_left.pop(0)
+                assigned = True
+        if not assigned:
+            pool = [
+                i for i in items
+                if i["type"] in remaining_types
+                and i["id"] not in assigned_ids
+                and failed_pickups.get((bot["id"], i["id"]), 0) < 1
+            ]
+            if not pool:
+                continue
+            best = min(pool, key=lambda i: score(bot, i))
+            assignments[bot["id"]] = best
+            assigned_ids.add(best["id"])
 
     return assignments
 
