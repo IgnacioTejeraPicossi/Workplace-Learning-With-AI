@@ -71,15 +71,10 @@ def _merge_assignments(
             if remaining_counts[t] > 0:
                 remaining_counts[t] -= 1
 
-    # Also track preview types so preview-assigned bots keep their targets.
-    preview_ord = next((o for o in state.get("orders") or [] if o.get("status") == "preview"), None)
-    preview_types = set(_needed_types(preview_ord)) if preview_ord else set()
-
     assignments: dict[int, dict] = {}
     reserved_item_ids: set[str] = set()
 
-    # First, preserve existing targets for empty bots if the type is still needed
-    # (active OR preview order). This keeps preview pre-stocking assignments stable.
+    # Preserve existing targets for empty bots if the active order still needs the type.
     for bot in bots:
         bid = bot["id"]
         if bot.get("inventory"):
@@ -89,12 +84,7 @@ def _merge_assignments(
             continue
         prev_type = prev.get("type")
         prev_id = prev.get("id")
-        # Keep if active-order still needs this type OR it's a preview type
-        if not prev_type:
-            continue
-        is_active_needed = remaining_counts[prev_type] > 0
-        is_preview = prev_type in preview_types
-        if not is_active_needed and not is_preview:
+        if not prev_type or remaining_counts[prev_type] <= 0:
             continue
         if prev_id and failed_pickups.get((bid, prev_id), 0) >= 1:
             continue
@@ -104,8 +94,7 @@ def _merge_assignments(
         assignments[bid] = kept_target
         if current_item and prev_id:
             reserved_item_ids.add(prev_id)
-        if is_active_needed:
-            remaining_counts[prev_type] -= 1
+        remaining_counts[prev_type] -= 1
 
     # Then fill the rest with fresh assignments.
     fresh_assignments = _assign_targets(state, failed_pickups)

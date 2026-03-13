@@ -35,20 +35,20 @@ Round 0/500 | bots: 20 | orders: 2
   [Trace] Assignment: bot 3 -> flour at [21, 13]
   [Trace] Assignment: bot 4 -> eggs at [13, 12]
   [Trace] Assignment: bot 5 -> eggs at [5, 14]
-  [Trace] Assignment: bot 6 -> pasta at [25, 10]
-  [Trace] Assignment: bot 7 -> onions at [25, 12]
-  [Trace] Assignment: bot 8 -> bread at [19, 6]
-  [Trace] Assignment: bot 9 -> bananas at [19, 7]
-  [Trace] Assignment: bot 10 -> cream at [25, 11]
-  [Trace] Assignment: bot 11 -> tomatoes at [15, 11]
-  [Trace] Assignment: bot 12 -> cereal at [19, 11]
-  [Trace] Assignment: bot 13 -> flour at [17, 10]
-  [Trace] Assignment: bot 14 -> cereal at [11, 13]
-  [Trace] Assignment: bot 15 -> eggs at [21, 10]
-  [Trace] Assignment: bot 16 -> tomatoes at [7, 13]
-  [Trace] Assignment: bot 17 -> flour at [25, 8]
-  [Trace] Assignment: bot 18 -> flour at [9, 12]
-  [Trace] Assignment: bot 19 -> tomatoes at [3, 10]
+  [Trace] Assignment: bot 6 -> tomatoes at [15, 11]
+  [Trace] Assignment: bot 7 -> cereal at [19, 11]
+  [Trace] Assignment: bot 8 -> flour at [17, 10]
+  [Trace] Assignment: bot 9 -> cereal at [11, 13]
+  [Trace] Assignment: bot 10 -> eggs at [21, 10]
+  [Trace] Assignment: bot 11 -> tomatoes at [7, 13]
+  [Trace] Assignment: bot 12 -> flour at [25, 8]
+  [Trace] Assignment: bot 13 -> flour at [9, 12]
+  [Trace] Assignment: bot 14 -> tomatoes at [3, 10]
+  [Trace] Assignment: bot 15 -> cereal at [7, 10]
+  [Trace] Assignment: bot 16 -> eggs at [25, 5]
+  [Trace] Assignment: bot 17 -> tomatoes at [19, 8]
+  [Trace] Assignment: bot 18 -> flour at [13, 8]
+  [Trace] Assignment: bot 19 -> cereal at [23, 6]
 Round 1/500 | bots: 20 | orders: 2
   [Trace] Round 2 bot 0 pos=[28, 15] -> move_left
   [Trace] Round 2 bot 1 pos=[27, 16] -> move_up
@@ -177,7 +177,7 @@ Round 2/500 | bots: 20 | orders: 2
   [Trace] Round 8 bot 3 pos=[25, 15] -> move_left
   [Trace] Round 8 bot 4 pos=[26, 15] -> move_left
   [Trace] Round 8 bot 5 pos=[27, 15] -> move_left
-  [Trace] Round 8 bot 6 pos=[28, 15] -> move_up
+  [Trace] Round 8 bot 6 pos=[28, 15] -> move_left
   [Trace] Round 8 bot 7 pos=[27, 16] -> move_up
   [Trace] Round 8 bot 8 pos=[28, 16] -> move_up
   [Trace] Round 8 bot 9 pos=[28, 16] -> move_left
@@ -191,18 +191,18 @@ Round 2/500 | bots: 20 | orders: 2
   [Trace] Round 8 bot 17 pos=[28, 16] -> move_up
   [Trace] Round 8 bot 18 pos=[28, 16] -> move_up
   [Trace] Round 8 bot 19 pos=[28, 16] -> move_up
-  [Trace] Round 9 bot 0 pos=[24, 13] inv=['eggs'] -> pick_up item=item_141 at [25, 13] dist=1
-  [Trace] Round 9 bot 1 pos=[24, 14] inv=['cereal'] -> move_up
+  [Trace] Round 9 bot 0 pos=[24, 13] inv=['eggs'] -> move_down
+  [Trace] Round 9 bot 1 pos=[24, 14] inv=['cereal'] -> move_down
   [Trace] Round 9 bot 2 pos=[23, 15] -> move_left
   [Trace] Round 9 bot 3 pos=[24, 15] -> move_left
   [Trace] Round 9 bot 4 pos=[25, 15] -> move_left
   [Trace] Round 9 bot 5 pos=[26, 15] -> move_left
-  [Trace] Round 9 bot 6 pos=[28, 14] -> move_up
-  [Trace] Round 9 bot 7 pos=[27, 15] -> move_left
-  [Trace] Round 9 bot 8 pos=[28, 15] -> move_up
-  [Trace] Round 9 bot 9 pos=[27, 16] -> move_up
-  [Trace] Round 9 bot 10 pos=[28, 16] -> move_up
-  [Trace] Round 9 bot 11 pos=[28, 16] -> move_left
+  [Trace] Round 9 bot 6 pos=[27, 15] -> move_left
+  [Trace] Round 9 bot 7 pos=[27, 16] -> move_up
+  [Trace] Round 9 bot 8 pos=[28, 15] -> move_left
+  [Trace] Round 9 bot 9 pos=[28, 16] -> move_up
+  [Trace] Round 9 bot 10 pos=[28, 16] -> move_left
+  [Trace] Round 9 bot 11 pos=[28, 16] -> move_up
   [Trace] Round 9 bot 12 pos=[28, 16] -> move_up
   [Trace] Round 9 bot 13 pos=[28, 16] -> move_up
   [Trace] Round 9 bot 14 pos=[28, 16] -> move_up
@@ -211,20 +211,20 @@ Round 2/500 | bots: 20 | orders: 2
   [Trace] Round 9 bot 17 pos=[28, 16] -> move_up
   [Trace] Round 9 bot 18 pos=[28, 16] -> move_up
   [Trace] Round 9 bot 19 pos=[28, 16] -> move_up
-  [Trace] Round 10 bot 0 pos=[24, 13] inv=['eggs', 'eggs'] -> pick_up item=item_141 at [25, 13] dist=1
-  [Trace] Round 10 bot 1 pos=[24, 14] inv=['cereal'] -> move_up
+  [Trace] Round 10 bot 0 pos=[24, 13] inv=['eggs'] -> move_down
+  [Trace] Round 10 bot 1 pos=[24, 14] inv=['cereal'] -> move_down
   [Trace] Round 10 bot 2 pos=[22, 15] -> move_left
   [Trace] Round 10 bot 3 pos=[23, 15] -> move_left
   [Trace] Round 10 bot 4 pos=[24, 15] -> move_left
-  [Trace] Round 10 bot 5 pos=[25, 15] -> move_up
-  [Trace] Round 10 bot 6 pos=[28, 13] -> move_up
-  [Trace] Round 10 bot 7 pos=[26, 15] -> move_left
-  [Trace] Round 10 bot 8 pos=[28, 14] -> move_up
-  [Trace] Round 10 bot 9 pos=[27, 15] -> move_up
-  [Trace] Round 10 bot 10 pos=[28, 15] -> move_left
-  [Trace] Round 10 bot 11 pos=[27, 16] -> move_up
+  [Trace] Round 10 bot 5 pos=[25, 15] -> move_left
+  [Trace] Round 10 bot 6 pos=[26, 15] -> move_left
+  [Trace] Round 10 bot 7 pos=[27, 15] -> move_up
+  [Trace] Round 10 bot 8 pos=[28, 15] -> move_left
+  [Trace] Round 10 bot 9 pos=[28, 16] -> move_up
+  [Trace] Round 10 bot 10 pos=[27, 16] -> move_up
+  [Trace] Round 10 bot 11 pos=[28, 16] -> move_left
   [Trace] Round 10 bot 12 pos=[28, 16] -> move_up
-  [Trace] Round 10 bot 13 pos=[28, 16] -> move_left
+  [Trace] Round 10 bot 13 pos=[28, 16] -> move_up
   [Trace] Round 10 bot 14 pos=[28, 16] -> move_up
   [Trace] Round 10 bot 15 pos=[28, 16] -> move_up
   [Trace] Round 10 bot 16 pos=[28, 16] -> move_up

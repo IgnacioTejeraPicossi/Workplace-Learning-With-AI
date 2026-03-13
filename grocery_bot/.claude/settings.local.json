@@ -3,7 +3,9 @@
     "allow": [
       "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"import strategy; print\\('OK'\\)\")",
       "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"import strategy, bot; print\\('OK'\\)\" 2>&1)",
-      "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"from strategy import decide, decide_level1, decide_small_team, _assign_targets, _assign_targets_small_team, _merge_assignments, manhattan; print\\('imports OK'\\)\" 2>&1)"
+      "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"from strategy import decide, decide_level1, decide_small_team, _assign_targets, _assign_targets_small_team, _merge_assignments, manhattan; print\\('imports OK'\\)\" 2>&1)",
+      "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"import json; f=open\\('debug_first_state.json'\\); s=json.load\\(f\\); walls={\\(w[0],w[1]\\) for w in s['grid']['walls']}; print\\('y=15 walls:', sorted\\(w for w in walls if w[1]==15\\)\\); print\\('y=14 walls:', sorted\\(w for w in walls if w[1]==14\\)\\); print\\('x=26 walls:', sorted\\(w for w in walls if w[0]==26\\)[:10]\\); print\\('x=28 walls:', sorted\\(w for w in walls if w[0]==28\\)\\)\")",
+      "Bash(cd \"C:\\\\test\\\\AI\\\\AI Learning with AI\\\\grocery_bot\" && python -c \"import strategy, bot; print\\('OK'\\)\")"
     ]
   }
 }
