@@ -83,21 +83,25 @@ def _other_bots(bid, state):
     return {tuple(b.get("position") or []) for b in (state.get("bots") or []) if b["id"] != bid}
 
 
+def _access_cells(item, state):
+    """Walkable cells adjacent to item (not wall, not any item position, in-bounds).
+    Items with exactly 1 access cell are deadlock-prone when two bots share it."""
+    walls = _walls(state)
+    items_pos = {(int(i["position"][0]), int(i["position"][1])) for i in (state.get("items") or [])}
+    W, H = _grid(state)
+    ix, iy = int(item["position"][0]), int(item["position"][1])
+    result = set()
+    for _, dx, dy in _DIRS:
+        nx, ny = ix + dx, iy + dy
+        if 0 <= nx < W and 0 <= ny < H and (nx, ny) not in walls and (nx, ny) not in items_pos:
+            result.add((nx, ny))
+    return result
+
+
 def _move(bid, x, y, tx, ty, state) -> dict:
-    """Move toward (tx,ty). If the immediate next step is occupied by another bot,
-    try an alternative first step only — avoids head-on deadlocks without causing
-    large global detours (which happen when all other-bot positions are blocked in BFS)."""
     W,H = _grid(state)
     blocked = _blocked_base(x, y, state)
     step = _bfs_step([x,y], {(tx,ty)}, blocked, W, H)
-    if step:
-        dx, dy = _DMAP[step]
-        next_cell = (x+dx, y+dy)
-        others = _other_bots(bid, state)
-        if next_cell in others:
-            alt = _bfs_step([x,y], {(tx,ty)}, blocked | {next_cell}, W, H)
-            if alt:
-                step = alt
     if not step:
         step = _bfs_step([x,y], {(tx,ty)}, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
@@ -120,22 +124,12 @@ def _move_with_claims(bid, x, y, tx, ty, state, claimed_cells=None) -> dict:
 
 
 def _move_adj(bid, x, y, ix, iy, state) -> dict:
-    """Move to adjacent cell of item at (ix,iy). Same immediate-step-only collision
-    avoidance as _move to prevent head-on deadlocks without large global detours."""
     W,H = _grid(state)
     adj = {(ix+dx,iy+dy) for _,dx,dy in _DIRS if 0<=ix+dx<W and 0<=iy+dy<H}
     blocked = _blocked_base(x, y, state)
     for it in state.get("items") or []:
         p=it.get("position") or [0,0]; blocked.add((p[0],p[1]))
     step = _bfs_step([x,y], adj, blocked, W, H)
-    if step:
-        dx, dy = _DMAP[step]
-        next_cell = (x+dx, y+dy)
-        others = _other_bots(bid, state)
-        if next_cell in others:
-            alt = _bfs_step([x,y], adj, blocked | {next_cell}, W, H)
-            if alt:
-                step = alt
     if not step:
         step = _bfs_step([x,y], adj, _blocked_base(x, y, state), W, H)
     if not step:
@@ -365,12 +359,15 @@ def _pick_or_move_to_target(
 
 
 def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
-    """1 bot per needed type. Prefer lower-band items (faster loop)."""
+    """1 bot per needed type. Prefer lower-band items (faster loop).
+    Access cell conflict avoidance: when an item has only one walkable adjacent cell,
+    claim that cell so no second bot is sent to the same bottleneck (permanent deadlock)."""
     failed_pickups = failed_pickups or {}
     items = state.get("items") or []
     bots = sorted(state.get("bots") or [], key=lambda b: b["id"])
     assignments: dict = {}
     assigned_ids: set = set()
+    claimed_access: set = set()  # sole-access cells already claimed by an assignment
 
     active_ord = _active(state)
     needed_types = list(_needed_types(active_ord))
@@ -383,9 +380,27 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
     def score(bot, item):
         ix,iy = item["position"]
         nz = _nearest_zone([ix,iy], state)
-        # Spread bots across the map a bit more instead of overloading the same
-        # right-side aisles near spawn. This was closer to the best-scoring runs.
         return (0 if iy >= 10 else 6) + manhattan([ix,iy], nz) + manhattan(bot["position"], [ix,iy]) * 0.5
+
+    def access_ok(item):
+        """True if this item can be assigned without creating a sole-access deadlock."""
+        ac = _access_cells(item, state)
+        if not ac:
+            return False  # unreachable
+        if len(ac) > 1:
+            return True   # multiple access cells — no bottleneck
+        return next(iter(ac)) not in claimed_access
+
+    def claim_access(item):
+        ac = _access_cells(item, state)
+        if len(ac) == 1:
+            claimed_access.add(next(iter(ac)))
+
+    def best_from_pool(bot, pool):
+        """Pick lowest-score item with no access conflict; fallback to any if none clean."""
+        clean = [i for i in pool if access_ok(i)]
+        candidates = clean if clean else pool
+        return min(candidates, key=lambda i: score(bot, i)) if candidates else None
 
     types_left = list(remaining)
     for bot in bots:
@@ -395,27 +410,27 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
                 and i["id"] not in assigned_ids
                 and failed_pickups.get((bot["id"],i["id"]),0) < 1]
         if not pool: continue
-        best = min(pool, key=lambda i: score(bot, i))
+        best = best_from_pool(bot, pool)
+        if not best: continue
         assignments[bot["id"]] = best
         assigned_ids.add(best["id"])
+        claim_access(best)
         types_left.remove(best["type"])
 
-    # Second pass: pre-stock preview order first, then fill remaining bots with active-order
-    # duplicates. This way, when the active order completes, preview bots can deliver
-    # immediately instead of needing a full new pick-up cycle.
+    # Second pass: pre-stock preview order first, then fill remaining bots with
+    # active-order duplicates (so when the active order completes, preview bots
+    # can deliver immediately).
     preview_ord = _preview(state)
     preview_needed = _needed_types(preview_ord)
-    # Subtract what preview bots already carry
     preview_remaining = list(preview_needed)
     for b in bots:
         preview_remaining = _remaining_needed(preview_remaining, b.get("inventory") or [])
-    preview_types_left = list(dict.fromkeys(preview_remaining))  # distinct, ordered
+    preview_types_left = list(dict.fromkeys(preview_remaining))
 
     remaining_types = set(needed_types)
     for bot in bots:
         if bot["id"] in assignments or len(bot.get("inventory") or []) >= 3:
             continue
-        # Try preview item first (if this bot isn't already covering an active type)
         assigned = False
         if preview_types_left:
             ptype = preview_types_left[0]
@@ -426,11 +441,13 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
                 and failed_pickups.get((bot["id"], i["id"]), 0) < 1
             ]
             if pool:
-                best = min(pool, key=lambda i: score(bot, i))
-                assignments[bot["id"]] = best
-                assigned_ids.add(best["id"])
-                preview_types_left.pop(0)
-                assigned = True
+                best = best_from_pool(bot, pool)
+                if best:
+                    assignments[bot["id"]] = best
+                    assigned_ids.add(best["id"])
+                    claim_access(best)
+                    preview_types_left.pop(0)
+                    assigned = True
         if not assigned:
             pool = [
                 i for i in items
@@ -440,9 +457,12 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
             ]
             if not pool:
                 continue
-            best = min(pool, key=lambda i: score(bot, i))
+            best = best_from_pool(bot, pool)
+            if not best:
+                continue
             assignments[bot["id"]] = best
             assigned_ids.add(best["id"])
+            claim_access(best)
 
     return assignments
 
