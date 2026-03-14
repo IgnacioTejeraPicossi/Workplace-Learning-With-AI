@@ -66,6 +66,31 @@ def _bfs_step(from_pos, targets: set, blocked: set, W: int, H: int):
     return None
 
 
+def _bfs_dist(from_pos, targets: set, blocked: set, W: int, H: int) -> int | None:
+    """Shortest path length to any reachable target, or None if unreachable."""
+    x0, y0 = int(from_pos[0]), int(from_pos[1])
+    reachable = targets - blocked
+    if not reachable:
+        return None
+    if (x0, y0) in reachable:
+        return 0
+    visited = {(x0, y0)}
+    q = deque([(x0, y0, 0)])
+    while q:
+        cx, cy, d = q.popleft()
+        if (cx, cy) in reachable:
+            return d
+        for _, dx, dy in _DIRS:
+            nx, ny = cx + dx, cy + dy
+            if not (0 <= nx < W and 0 <= ny < H):
+                continue
+            if (nx, ny) in blocked or (nx, ny) in visited:
+                continue
+            visited.add((nx, ny))
+            q.append((nx, ny, d + 1))
+    return None
+
+
 def _blocked_base(x, y, state):
     """Walls + spawn (unless bot is at spawn)."""
     sp = _spawn(state)
@@ -100,33 +125,47 @@ def _access_cells(item, state):
 
 def _move(bid, x, y, tx, ty, state) -> dict:
     W,H = _grid(state)
-    blocked = _blocked_base(x, y, state)
+    items_pos = {(int(i["position"][0]),int(i["position"][1])) for i in (state.get("items") or [])}
+    blocked = _blocked_base(x, y, state) | items_pos
     step = _bfs_step([x,y], {(tx,ty)}, blocked, W, H)
+    if not step:
+        step = _bfs_step([x,y], {(tx,ty)}, _blocked_base(x, y, state), W, H)
     if not step:
         step = _bfs_step([x,y], {(tx,ty)}, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
 def _move_with_claims(bid, x, y, tx, ty, state, claimed_cells=None) -> dict:
+    """Route toward (tx,ty). Use claimed routing only when it doesn't step away from target."""
     W, H = _grid(state)
-    claimed_set = {tuple(c) for c in claimed_cells if tuple(c) != (x, y)} if claimed_cells else set()
-    blocked = _blocked_base(x, y, state) | claimed_set
-    step = _bfs_step([x, y], {(tx, ty)}, blocked, W, H)
+    items_pos = {(int(i["position"][0]), int(i["position"][1])) for i in (state.get("items") or [])}
+    base_blocked = _blocked_base(x, y, state) | items_pos
+    target = {(tx, ty)}
+    if claimed_cells:
+        claimed_set = {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+        claimed_blocked = base_blocked | claimed_set
+        step_c = _bfs_step([x, y], target, claimed_blocked, W, H)
+        if step_c:
+            # Use claimed routing only if it doesn't increase manhattan distance more than free step
+            dx_c, dy_c = _DMAP[step_c]
+            man_c = manhattan((x + dx_c, y + dy_c), (tx, ty))
+            step_f = _bfs_step([x, y], target, base_blocked, W, H)
+            man_f = manhattan((x + _DMAP[step_f][0], y + _DMAP[step_f][1]), (tx, ty)) if step_f else float("inf")
+            if man_c <= man_f:
+                return {"bot": bid, "action": step_c}
+    step = _bfs_step([x, y], target, base_blocked, W, H)
     if not step:
-        # Drop claimed, keep spawn blocked
-        step = _bfs_step([x, y], {(tx, ty)}, _blocked_base(x, y, state), W, H)
+        step = _bfs_step([x, y], target, _blocked_base(x, y, state), W, H)
     if not step:
-        # Last resort: allow through spawn
-        step = _bfs_step([x, y], {(tx, ty)}, _walls(state), W, H)
+        step = _bfs_step([x, y], target, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
 def _move_adj(bid, x, y, ix, iy, state) -> dict:
     W,H = _grid(state)
     adj = {(ix+dx,iy+dy) for _,dx,dy in _DIRS if 0<=ix+dx<W and 0<=iy+dy<H}
-    blocked = _blocked_base(x, y, state)
-    for it in state.get("items") or []:
-        p=it.get("position") or [0,0]; blocked.add((p[0],p[1]))
+    items_pos = {(int(i["position"][0]),int(i["position"][1])) for i in (state.get("items") or [])}
+    blocked = _blocked_base(x, y, state) | items_pos
     step = _bfs_step([x,y], adj, blocked, W, H)
     if not step:
         step = _bfs_step([x,y], adj, _blocked_base(x, y, state), W, H)
@@ -136,26 +175,26 @@ def _move_adj(bid, x, y, ix, iy, state) -> dict:
 
 
 def _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells=None) -> dict:
+    """Route to adj of (ix,iy). Use claimed routing only when it doesn't step away from item."""
     W, H = _grid(state)
+    items_pos = {(int(i["position"][0]), int(i["position"][1])) for i in (state.get("items") or [])}
     adj = {(ix + dx, iy + dy) for _, dx, dy in _DIRS if 0 <= ix + dx < W and 0 <= iy + dy < H}
-    blocked = _blocked_base(x, y, state)
-    for it in state.get("items") or []:
-        p = it.get("position") or [0, 0]
-        blocked.add((p[0], p[1]))
+    base_blocked = _blocked_base(x, y, state) | items_pos
     if claimed_cells:
-        blocked |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
-    step = _bfs_step([x, y], adj, blocked, W, H)
+        claimed_set = {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
+        claimed_blocked = base_blocked | claimed_set
+        step_c = _bfs_step([x, y], adj, claimed_blocked, W, H)
+        if step_c:
+            dx_c, dy_c = _DMAP[step_c]
+            man_c = manhattan((x + dx_c, y + dy_c), (ix, iy))
+            step_f = _bfs_step([x, y], adj, base_blocked, W, H)
+            man_f = manhattan((x + _DMAP[step_f][0], y + _DMAP[step_f][1]), (ix, iy)) if step_f else float("inf")
+            if man_c <= man_f:
+                return {"bot": bid, "action": step_c}
+    step = _bfs_step([x, y], adj, base_blocked, W, H)
     if not step:
-        # Drop items block, keep spawn blocked + claimed
-        fallback = _blocked_base(x, y, state)
-        if claimed_cells:
-            fallback |= {tuple(c) for c in claimed_cells if tuple(c) != (x, y)}
-        step = _bfs_step([x, y], adj, fallback, W, H)
-    if not step:
-        # Drop claimed too, keep spawn blocked
         step = _bfs_step([x, y], adj, _blocked_base(x, y, state), W, H)
     if not step:
-        # Last resort: allow through spawn
         step = _bfs_step([x, y], adj, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
@@ -210,25 +249,7 @@ def _all_zones(state):
 
 def _nearest_zone(pos, state, avoid_congestion=False):
     zones = _all_zones(state)
-    sp = _spawn(state)
-    # Penalize zones adjacent to spawn only when routing for delivery and spawn is congested.
-    # Do NOT apply this penalty during assignment scoring — it distorts which items bots target.
-    if avoid_congestion:
-        bots_at_spawn = sum(
-            1 for b in (state.get("bots") or [])
-            if tuple(b.get("position") or []) == sp
-        )
-        spawn_penalty = min(bots_at_spawn * 2, 20)
-    else:
-        spawn_penalty = 0
-
-    def zone_cost(z):
-        d = manhattan(pos, z)
-        if spawn_penalty > 0 and manhattan(tuple(z), sp) <= 2:
-            d += spawn_penalty
-        return d
-
-    return min(zones, key=zone_cost)
+    return min(zones, key=lambda z: manhattan(pos, z))
 
 
 def _active(state):
@@ -415,15 +436,23 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
         claim_access(best)
         types_left.remove(best["type"])
 
-    # Second pass: assign remaining bots to active-order duplicates so we have
-    # more bodies on the active order (faster parallel delivery).
-    remaining_types = set(needed_types)
+    # Second pass: assign extra bots only for types that still have unfilled slots
+    # (e.g. eggs×3 needs 3 bots; if first pass placed 1, add 2 more here).
+    # Never send more bots to a type than the order requires.
+    needed_counts = Counter(remaining)
+    assigned_type_counts: Counter = Counter(
+        assignments[bid]["type"] for bid in assignments
+    )
     for bot in bots:
         if bot["id"] in assignments or len(bot.get("inventory") or []) >= 3:
             continue
+        # Only types where we still need more bots
+        open_types = {t for t, c in needed_counts.items() if assigned_type_counts[t] < c}
+        if not open_types:
+            break  # all types fully staffed
         pool = [
             i for i in items
-            if i["type"] in remaining_types
+            if i["type"] in open_types
             and i["id"] not in assigned_ids
             and failed_pickups.get((bot["id"], i["id"]), 0) < 1
         ]
@@ -435,6 +464,7 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
         assignments[bot["id"]] = best
         assigned_ids.add(best["id"])
         claim_access(best)
+        assigned_type_counts[best["type"]] += 1
 
     return assignments
 
@@ -527,7 +557,49 @@ def _assign_targets_small_team(state: dict, failed_pickups: dict | None = None) 
     return assignments
 
 
-def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
+def _swap_detected(x, y, action, state, claimed_cells):
+    """True if this move would swap with a bot that already claimed our cell."""
+    if not claimed_cells or not action:
+        return False
+    act = action.get("action", "")
+    if act not in _DMAP:
+        return False
+    dx, dy = _DMAP[act]
+    dest = (x + dx, y + dy)
+    # A lower-ID bot claimed our cell (it's moving here)
+    if (x, y) not in claimed_cells:
+        return False
+    # And that bot is currently sitting at our intended destination
+    other_positions = {tuple(b.get("position") or []) for b in (state.get("bots") or [])}
+    return dest in other_positions
+
+
+def _side_step(bid, x, y, swap_dest, state, claimed_cells):
+    """Yield right-of-way: move to any adjacent clear cell that is not swap_dest."""
+    W, H = _grid(state)
+    walls = _walls(state)
+    items_pos = {(int(i["position"][0]), int(i["position"][1])) for i in (state.get("items") or [])}
+    sp = _spawn(state)
+    claimed_set = {tuple(c) for c in claimed_cells} if claimed_cells else set()
+    other_pos = {tuple(b.get("position") or []) for b in (state.get("bots") or []) if b["id"] != bid}
+    # Try lateral / away moves first (avoid going back to swap_dest)
+    for act, dx, dy in _DIRS:
+        nx, ny = x + dx, y + dy
+        if not (0 <= nx < W and 0 <= ny < H):
+            continue
+        if (nx, ny) == swap_dest:
+            continue
+        if (nx, ny) in walls or (nx, ny) in items_pos:
+            continue
+        if (nx, ny) == sp and (x, y) != sp:
+            continue
+        if (nx, ny) in claimed_set or (nx, ny) in other_pos:
+            continue
+        return {"bot": bid, "action": act}
+    return {"bot": bid, "action": "wait"}
+
+
+def _decide_raw(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
     failed_pickups = failed_pickups or {}
     x,y = int(bot["position"][0]),int(bot["position"][1])
     bid = bot["id"]
@@ -560,29 +632,29 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                     dest = min(active_items, key=lambda i: manhattan([x,y], i["position"]))
             if dest:
                 dx2, dy2 = int(dest["position"][0]), int(dest["position"][1])
-                return _move_adj(bid, x, y, dx2, dy2, state)
+                return _move_adj_with_claims(bid, x, y, dx2, dy2, state, claimed_cells)
         return {"bot": bid, "action": "wait"}
 
     # === FULL → deliver ===
     if len(inv) >= 3:
         nz = _nearest_zone([x,y], state, avoid_congestion=True)
-        return _move(bid, x, y, nz[0], nz[1], state)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # === HAS MATCHING ITEMS → deliver immediately ===
     if matching:
         nz = _nearest_zone([x,y], state, avoid_congestion=True)
-        return _move(bid, x, y, nz[0], nz[1], state)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # === RUNNING OUT OF TIME → deliver ===
     if inv:
         nz = _nearest_zone([x,y], state, avoid_congestion=True)
         if _rounds_left(state) <= manhattan([x,y], nz) + 3:
-            return _move(bid, x, y, nz[0], nz[1], state)
+            return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # === HAS NON-MATCHING ITEMS → go to zone (clear aisles!) ===
     if inv:
         nz = _nearest_zone([x,y], state, avoid_congestion=True)
-        return _move(bid, x, y, nz[0], nz[1], state)
+        return _move_with_claims(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # === EMPTY → pick assigned item ===
     if target:
@@ -603,12 +675,12 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                 if it.get("type") == target["type"] and it.get("type") in useful:
                     return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
         if target_still_exists:
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells)
         # Item respawned (new ID) → find nearest of same type
         same_type = [i for i in (state.get("items") or []) if i["type"] == target["type"]]
         if same_type:
             nn = min(same_type, key=lambda i: manhattan([x,y], i["position"]))
-            return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
+            return _move_adj_with_claims(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state, claimed_cells)
 
     # === NO ASSIGNMENT → help active order first, then pre-pick 1 preview item ===
     # Bots at spawn without an assignment wait — don't flood the store with idle bots.
@@ -624,7 +696,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                 ip = it.get("position") or [0, 0]
                 if abs(x - ip[0]) + abs(y - ip[1]) == 1 and it.get("id") == nn["id"]:
                     return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj_with_claims(bid, x, y, ix, iy, state, claimed_cells)
 
     # Pre-pick at most 1 preview item — filling with 3 preview items causes a
     # deadlock (bot arrives at drop zone, nothing matches, can never unload).
@@ -640,8 +712,20 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                     ip = it.get("position") or [0, 0]
                     if abs(x-ip[0])+abs(y-ip[1]) == 1 and it.get("id") == pt["id"]:
                         return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-                return _move_adj(bid, x, y, px, py, state)
+                return _move_adj_with_claims(bid, x, y, px, py, state, claimed_cells)
     return {"bot": bid, "action": "wait"}
+
+
+def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
+    """Wrapper: compute raw action then apply anti-swap side-step."""
+    action = _decide_raw(bot, state, assignments, claimed_cells, failed_pickups)
+    x, y = int(bot["position"][0]), int(bot["position"][1])
+    bid = bot["id"]
+    if _swap_detected(x, y, action, state, claimed_cells):
+        act = action.get("action", "")
+        dx, dy = _DMAP[act]
+        action = _side_step(bid, x, y, (x + dx, y + dy), state, claimed_cells)
+    return action
 
 
 def decide_small_team(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> dict[str, Any]:
