@@ -1,0 +1,8 @@
+----------
+Lite tips for jevn konkurranse (antar de fleste på toppen vet det allerede): Pre-challenge er 100% deterministisk innenfor samme dag. Spawn, når pakker kommer, plassering av varer osv. Vil si at man kan kjøre en liten stund og se hvilke varer som kommer, bruke lang tid på offline optimalisering, spille av optimal løsning for å finne noen nye varer, og gjenta til man har god score :sunglasses:
+
+Kan til og med gå og hente varer før man har fått beskjed om det, når man vet hva som er neste i køen.
+
+Selv laget meg en lokal simulator. Ingen grunn til å teste mot API hvis man ikke har en optimalisert løsning som har nok trekk igjen til å finne nye varer.
+
+(Admin er klar over det og alle konkurrerer på like vilkår. Merk at å vinne her gjør deg ikke nødvendigvis noe bedre i ordentlig ML oppgaver :wink: ta som å bli kjent med API og en morsom challenge) (edited)
