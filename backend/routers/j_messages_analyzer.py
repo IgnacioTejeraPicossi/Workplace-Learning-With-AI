@@ -1107,19 +1107,24 @@ async def list_j_messages(
     query: Dict[str, Any] = {}
     if status:
         query["status"] = status
+    or_clauses = []
     if category:
         # Support both old (string) and new (array) format
-        query["$or"] = [
-            {"category": category},  # Exact match for string
+        or_clauses.append({"$or": [
+            {"category": category},           # Exact match for string
             {"category": {"$in": [category]}},  # Array contains this value
             {"categories": {"$in": [category]}}  # Legacy format
-        ]
+        ]})
     if search:
-        query["$or"] = [
+        or_clauses.append({"$or": [
             {"title": {"$regex": search, "$options": "i"}},
             {"j_id": {"$regex": search, "$options": "i"}},
             {"raw_text": {"$regex": search, "$options": "i"}}
-        ]
+        ]})
+    if len(or_clauses) == 1:
+        query.update(or_clauses[0])   # Single filter: apply $or directly
+    elif len(or_clauses) > 1:
+        query["$and"] = or_clauses    # Both filters: combine with $and
     
     items: List[Dict[str, Any]] = []
     async for doc in j_messages_collection.find(query).sort("created_at", -1):
