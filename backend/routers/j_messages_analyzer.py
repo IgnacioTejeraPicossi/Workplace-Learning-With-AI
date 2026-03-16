@@ -756,7 +756,7 @@ Tekst:
 
     summary_text: str = ""
 
-            # Prefer unified LLM pipeline if available; otherwise, return without metadata
+    # Prefer unified LLM pipeline if available; otherwise, return without metadata
     try:
         if ask_ai_unified_sync:
             # Use custom prompt from Prompt Manager "Test" when provided; otherwise versioned/metadata template
