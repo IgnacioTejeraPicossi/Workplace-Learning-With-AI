@@ -14,6 +14,7 @@ export default function JMessagesAnalyzer() {
   const [showToc, setShowToc] = useState(true);
   const [summaryLength, setSummaryLength] = useState("");
   const [status, setStatus] = useState("");
+  const [statusOk, setStatusOk] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [allCategories, setAllCategories] = useState([]);
   const [aiComplexity, setAiComplexity] = useState(() => {
@@ -239,11 +240,14 @@ export default function JMessagesAnalyzer() {
       });
       const data = await resp.json();
       if (data.success) {
+        setStatusOk(true);
         setStatus(t('jMessages.analyzer.savedToLibrary'));
       } else {
+        setStatusOk(false);
         setStatus(t('jMessages.analyzer.saveFailed'));
       }
     } catch (e) {
+      setStatusOk(false);
       setStatus(`${t('jMessages.analyzer.saveFailed')}: ${String(e)}`);
     } finally {
       setTimeout(() => setStatus(''), 2500);
@@ -463,7 +467,7 @@ export default function JMessagesAnalyzer() {
           </div>
         )}
         {status && (
-          <div style={{ color: status.startsWith('✅') ? '#065f46' : '#b91c1c', marginTop: 8 }}>
+          <div style={{ color: statusOk ? '#065f46' : '#b91c1c', marginTop: 8 }}>
             {status}
           </div>
         )}
