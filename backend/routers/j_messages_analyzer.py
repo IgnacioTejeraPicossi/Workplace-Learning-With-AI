@@ -872,13 +872,13 @@ Tekst:
                 
                 # Filter out invalid categories and ensure at least one valid category
                 valid_categories = ["Annet", "Bunnfisk", "Pelagisk fisk"]
+                original_category = list(category)
                 category = [c for c in category if c in valid_categories]
                 if not category:
                     category = ["Annet"]
-                
+                    print(f"[J-MESSAGES] ⚠️ Category was invalid (got {original_category!r}), defaulting to ['Annet']")
+
                 parsed["category"] = category
-                if len(category) == 0 or category != parsed.get("category", []):
-                    print(f"[J-MESSAGES] ⚠️ Category was invalid, defaulting to ['Annet']")
                 
                 metadata.update(parsed)
                 print(f"[J-MESSAGES] ✅ Successfully extracted metadata: {list(parsed.keys())}")
