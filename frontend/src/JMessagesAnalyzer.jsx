@@ -30,6 +30,7 @@ export default function JMessagesAnalyzer() {
   });
   const [nativePrompt, setNativePrompt] = useState('');
   const [promptVersion, setPromptVersion] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   // Load API provider from localStorage and listen for changes
   useEffect(() => {
@@ -434,22 +435,27 @@ export default function JMessagesAnalyzer() {
           )}
         </div>
         {allCategories.length > 0 && (
-          <select
-            style={{
-              marginLeft: 8,
-              padding: '6px 8px',
-              borderRadius: 6,
-              border: `1px solid ${colors.border}`,
-              background: colors.background,
-              color: colors.text
-            }}
-            title="Available categories from saved J-messages"
-          >
-            <option value="">All categories</option>
-            {allCategories.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8, fontSize: 12, color: colors.textSecondary }}>
+            {t('jMessages.analyzer.filterCategory')}:
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                padding: '6px 8px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: 12
+              }}
+              title={t('jMessages.analyzer.filterCategoryHint')}
+            >
+              <option value="">{t('jMessages.analyzer.allCategories')}</option>
+              {allCategories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </label>
         )}
         {error && (
           <div style={{ color: '#b91c1c', marginTop: 8, whiteSpace: 'pre-wrap' }}>
@@ -478,6 +484,18 @@ export default function JMessagesAnalyzer() {
           summaryLength: summaryLength || undefined
         }}
       />
+
+      {result && selectedCategory && (() => {
+        const cats = Array.isArray(result.category) ? result.category : (result.category ? [result.category] : []);
+        if (cats.length > 0 && !cats.includes(selectedCategory)) {
+          return (
+            <div style={{ margin: '8px 0', padding: '8px 12px', borderRadius: 8, background: '#fef3c7', border: '1px solid #fde68a', color: '#92400e', fontSize: 13 }}>
+              ⚠️ {t('jMessages.analyzer.categoryMismatch', { selected: selectedCategory, found: cats.join(', ') })}
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       {result && (
         <div>
