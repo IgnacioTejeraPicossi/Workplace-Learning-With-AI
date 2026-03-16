@@ -212,7 +212,6 @@ def html_table_to_docx(html_table: str, doc) -> None:
         doc: python-docx Document object to add the table to
     """
     try:
-        import re
         from html.parser import HTMLParser
         import html
         
@@ -349,7 +348,6 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
         # Check if this line contains a table marker
         if "<TABLE_MARKER>" in line and "</TABLE_MARKER>" in line:
             # Extract table HTML from marker
-            import re
             table_match = re.search(r'<TABLE_MARKER>(.*?)</TABLE_MARKER>', line, re.DOTALL)
             if table_match:
                 table_html = table_match.group(1).strip()
@@ -433,9 +431,6 @@ def extract_json_from_llm_response(response: str) -> dict:
     Returns:
         Parsed JSON dict, or empty dict if parsing fails
     """
-    import json
-    import re
-    
     # Check for empty or very short responses
     if not response or len(response.strip()) < 10:
         print(f"[JSON_PARSER] ⚠️ Response is empty or too short (len={len(response)})")
@@ -576,9 +571,6 @@ def analyze_text_content(
     Returns:
         Dict with metadata, toc, body_html, and raw_text
     """
-    import json
-    import re
-    
     # Split text into lines
     paragraphs = [ln for ln in text_content.split("\n") if ln.strip()]
     
@@ -1516,7 +1508,6 @@ async def export_docx(data: Dict[str, Any] = Body(...)):
         body_html = data.get("body_html") or ""
         if body_html:
             # Parse HTML and convert to DOCX, preserving tables
-            import re
             from html.parser import HTMLParser
             
             # Split body_html into chunks (paragraphs, headings, tables)
