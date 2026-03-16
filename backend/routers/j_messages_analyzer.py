@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, Query, Body
 from typing import List, Tuple, Dict, Any, Optional
 from io import BytesIO
+import html as _html
 import json
 import re
 from datetime import datetime
@@ -359,13 +360,13 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
                     html_parts.append(table_match.group(0))
                 else:
                     # If no table found, just add as paragraph
-                    html_parts.append(f"<p>{line}</p>")
+                    html_parts.append(f"<p>{_html.escape(line)}</p>")
         elif line.startswith("Kapittel "):
             anchor = ensure_unique(_simple_slug(line))
             item = {"level": 1, "title": line, "anchor": anchor, "children": []}
             toc.append(item)
             last_h1 = item
-            html_parts.append(f'<h1 id="{anchor}">{line}</h1>')
+            html_parts.append(f'<h1 id="{anchor}">{_html.escape(line)}</h1>')
         elif line.startswith("§"):
             anchor = ensure_unique(_simple_slug(line.replace("§", "paragraf")))
             h2 = {"level": 2, "title": line, "anchor": anchor}
@@ -373,9 +374,9 @@ def build_toc_and_body_html(body_text: str) -> Tuple[List[Dict[str, Any]], str]:
                 last_h1.setdefault("children", []).append(h2)
             else:
                 toc.append(h2)
-            html_parts.append(f'<h2 id="{anchor}">{line}</h2>')
+            html_parts.append(f'<h2 id="{anchor}">{_html.escape(line)}</h2>')
         else:
-            html_parts.append(f"<p>{line}</p>")
+            html_parts.append(f"<p>{_html.escape(line)}</p>")
 
     return toc, "\n".join(html_parts)
 
