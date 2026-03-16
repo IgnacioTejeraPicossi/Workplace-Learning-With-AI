@@ -617,26 +617,13 @@ def analyze_text_content(
                 temperature=temperature_value
             )
             
-            # Parse JSON from response
-            json_str = response.strip()
-            
-            # Remove markdown code blocks if present
-            if "```" in json_str:
-                match = re.search(r'```(?:json)?\s*(.*?)\s*```', json_str, re.DOTALL)
-                if match:
-                    json_str = match.group(1).strip()
-                else:
-                    json_str = re.sub(r'```[^`]*```', '', json_str).strip()
-            
-            # Try to find JSON object in the string
-            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', json_str, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(0)
-            
-            parsed = json.loads(json_str)
-            if isinstance(parsed, dict):
+            # Parse JSON using the robust shared helper
+            parsed = extract_json_from_llm_response(response)
+            if parsed:
                 metadata.update(parsed)
                 print(f"[ANALYZER] Successfully extracted metadata: {list(parsed.keys())}")
+            else:
+                print(f"[ANALYZER] Failed to extract JSON from LLM response")
         except Exception as e:
             print(f"[ANALYZER] Failed to extract metadata with LLM: {e}")
     
