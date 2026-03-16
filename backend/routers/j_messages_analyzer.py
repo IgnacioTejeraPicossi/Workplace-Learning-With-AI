@@ -44,6 +44,27 @@ try:
 except Exception:
     j_messages_collection = None
 
+def _normalize_category(category, categories=None) -> list:
+    """
+    Normalize category field to a valid list.
+    Handles: list, string, legacy 'categories' field, None, and invalid values.
+    Always returns a non-empty list with valid values only.
+    """
+    valid = {"Annet", "Bunnfisk", "Pelagisk fisk"}
+    if isinstance(category, list):
+        filtered = [c for c in category if c in valid]
+        return filtered if filtered else ["Annet"]
+    if category:
+        return [category] if category in valid else ["Annet"]
+    # Fallback to legacy 'categories' field
+    if isinstance(categories, list):
+        filtered = [c for c in categories if c in valid]
+        return filtered if filtered else ["Annet"]
+    if categories:
+        return [categories] if categories in valid else ["Annet"]
+    return ["Annet"]
+
+
 def _simple_slug(value: str) -> str:
     """
     Simple slug generator to avoid external deps.
@@ -934,7 +955,7 @@ Tekst:
         "valid_to": metadata.get("valid_to"),
         "replaces": replaces_list,
         "replaced_by": metadata.get("replaced_by_id") or metadata.get("replaced_by"),
-        "category": metadata.get("category") if isinstance(metadata.get("category"), list) else ([metadata.get("category")] if metadata.get("category") else (metadata.get("categories") if isinstance(metadata.get("categories"), list) else (["Annet"] if not metadata.get("categories") else [metadata.get("categories")]))) if metadata.get("category") or metadata.get("categories") else ["Annet"],
+        "category": _normalize_category(metadata.get("category"), metadata.get("categories")),
         "area": metadata.get("area") if isinstance(metadata.get("area"), list) else ([metadata.get("area")] if metadata.get("area") else []),
         "toc": toc,
         "body_html": body_html_with_expired,
@@ -1071,7 +1092,7 @@ async def save_j_message(data: Dict[str, Any] = Body(...)):
             "valid_to": data.get("valid_to"),
             "replaces": data.get("replaces") if isinstance(data.get("replaces"), list) else ([data.get("replaces")] if data.get("replaces") else []),
             "replaced_by": data.get("replaced_by"),
-            "category": data.get("category") if isinstance(data.get("category"), list) else ([data.get("category")] if data.get("category") else (data.get("categories") if isinstance(data.get("categories"), list) else (["Annet"] if not data.get("categories") else [data.get("categories")]))) if data.get("category") or data.get("categories") else ["Annet"],
+            "category": _normalize_category(data.get("category"), data.get("categories")),
             "area": data.get("area") if isinstance(data.get("area"), list) else ([data.get("area")] if data.get("area") else []),
             "toc": data.get("toc") or [],
             "body_html": data.get("body_html") or "",
