@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchWithAuth } from '../api';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -13,15 +13,15 @@ export default function PromptPanel({ agent, nativePromptText, colors, onUseResu
   const [testOutput, setTestOutput] = useState('');
   const [injectionWarn, setInjectionWarn] = useState(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const res = await fetchWithAuth(`${API_BASE}/api/prompts/${agent}`);
       const data = await res.json();
       setItems(data.items || []);
     } catch {}
-  };
+  }, [agent]);
 
-  useEffect(() => { load(); }, [agent]);
+  useEffect(() => { load(); }, [load]);
 
   const save = async () => {
     if (!prompt.trim()) return;
