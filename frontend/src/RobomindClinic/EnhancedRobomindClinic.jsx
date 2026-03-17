@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { fetchWithAuth } from '../api';
 import './RobomindClinic.css';
 
 const EnhancedRobomindClinic = () => {
@@ -25,7 +26,7 @@ const EnhancedRobomindClinic = () => {
 
   const loadMetrics = async () => {
     try {
-      const response = await fetch('/api/robomind/dashboard/metrics');
+      const response = await fetchWithAuth('/api/robomind/dashboard/metrics');
       if (response.ok) {
         const data = await response.json();
         setMetrics(data);
@@ -37,7 +38,7 @@ const EnhancedRobomindClinic = () => {
 
   const loadTrends = async () => {
     try {
-      const response = await fetch('/api/robomind/dashboard/trends?days=7');
+      const response = await fetchWithAuth('/api/robomind/dashboard/trends?days=7');
       if (response.ok) {
         const data = await response.json();
         setTrends(data.trends || []);
@@ -68,7 +69,7 @@ const EnhancedRobomindClinic = () => {
         ];
       }
 
-      const response = await fetch('/api/robomind/screen', {
+      const response = await fetchWithAuth('/api/robomind/screen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ const EnhancedRobomindClinic = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/robomind/therapy', {
+      const response = await fetchWithAuth('/api/robomind/therapy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ const EnhancedRobomindClinic = () => {
     setInjectedPrompt(null);
 
     try {
-      const response = await fetch('/api/robomind/apply', {
+      const response = await fetchWithAuth('/api/robomind/apply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

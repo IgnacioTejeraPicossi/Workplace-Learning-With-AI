@@ -1,6 +1,7 @@
 // Robomind Clinic Settings Component
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { fetchWithAuth } from '../api';
 
 export default function ClinicSettings() {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export default function ClinicSettings() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('/api/clinic/settings', {
+      const response = await fetchWithAuth('/api/clinic/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
@@ -69,7 +70,7 @@ export default function ClinicSettings() {
     setTestResult(null);
     
     try {
-      const response = await fetch('/api/clinic/diagnose', {
+      const response = await fetchWithAuth('/api/clinic/diagnose', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

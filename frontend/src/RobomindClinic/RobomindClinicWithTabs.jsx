@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../ThemeContext';
+import { fetchWithAuth } from '../api';
 import PsychopathiaDiagram from './PsychopathiaDiagram';
 import ClinicSettings from './ClinicSettings';
 
@@ -22,7 +23,7 @@ const RobomindClinicWithTabs = () => {
 
   const loadDisorders = async () => {
     try {
-      const response = await fetch('/api/clinic/disorders');
+      const response = await fetchWithAuth('/api/clinic/disorders');
       const data = await response.json();
       setDisorders(data.disorders || []);
     } catch (error) {
@@ -32,7 +33,7 @@ const RobomindClinicWithTabs = () => {
 
   const loadTherapyPatches = async () => {
     try {
-      const response = await fetch('/api/clinic/therapy-patches');
+      const response = await fetchWithAuth('/api/clinic/therapy-patches');
       const data = await response.json();
       setTherapyPatches(data);
     } catch (error) {
@@ -48,7 +49,7 @@ const RobomindClinicWithTabs = () => {
 
     setBusy(true);
     try {
-      const response = await fetch('/api/robomind/screen', {
+      const response = await fetchWithAuth('/api/robomind/screen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
