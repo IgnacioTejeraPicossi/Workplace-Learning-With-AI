@@ -48,16 +48,13 @@ const RobomindClinicWithTabs = () => {
 
     setBusy(true);
     try {
-      const response = await fetch('/api/clinic/diagnose', {
+      const response = await fetch('/api/robomind/screen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          run_id: `clinic-${Date.now()}`,
           turns: turns,
-          meta: {
-            timestamp: new Date().toISOString(),
-            source: 'robomind-clinic-ui'
-          }
+          sources: [],
+          meta: { timestamp: new Date().toISOString(), source: 'robomind-clinic-ui' }
         })
       });
 
@@ -66,7 +63,27 @@ const RobomindClinicWithTabs = () => {
       }
 
       const data = await response.json();
-      setReport(data);
+      // Map ScreenResponse shape to the DiagnosisReport shape used by this UI
+      const composite = data.composite ?? 0;
+      const overall_risk = composite >= 80 ? 'critical'
+                         : composite >= 60 ? 'high'
+                         : composite >= 40 ? 'moderate'
+                         : 'low';
+      const findings = (data.top_flags || []).map(flag => ({
+        axis: flag.axis,
+        title: flag.type,
+        code: flag.type,
+        score: flag.confidence,
+        confidence: flag.confidence,
+        evidence: flag.span ? [flag.span] : [],
+        advice: []
+      }));
+      setReport({
+        overall_risk,
+        findings,
+        summary: `Composite risk score: ${Math.round(composite)}%. ${findings.length} flag(s) detected.`,
+        recommended_protocol: []
+      });
     } catch (error) {
       console.error('Diagnosis failed:', error);
       alert(`${t('robomindClinic.diagnosisFailed')}: ${error.message}`);
