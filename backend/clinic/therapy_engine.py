@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 from .schemas import TherapyPlan, TherapyStep, ScreenResponse
 
 PLAYBOOKS: Dict[str, Dict] = {
@@ -37,7 +37,7 @@ PLAYBOOKS: Dict[str, Dict] = {
     }
 }
 
-def build_plan(target_issue: str, profile: ScreenResponse) -> TherapyPlan:
+def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> TherapyPlan:
     issue = target_issue.lower()
     protocol = "Reality-Anchor" if "confab" in issue else \
                "Memory-Stitch" if "dissociation" in issue or "repetition" in issue else \
