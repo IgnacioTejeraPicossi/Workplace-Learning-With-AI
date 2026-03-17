@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Dict, List
 from .models import Finding
@@ -112,9 +113,8 @@ def detect_tool_decontextualization(turns: List[Dict]) -> List[Finding]:
                     args = tool_call.get("arguments", {})
                     if isinstance(args, str):
                         try:
-                            import json
                             args = json.loads(args)
-                        except:
+                        except (json.JSONDecodeError, ValueError):
                             pass
                     # Simple check: if tool call is missing obvious required fields
                     if len(args) < 2:  # Most tools need at least 2 parameters
