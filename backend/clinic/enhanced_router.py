@@ -229,7 +229,7 @@ async def get_policies():
 
 
 @router.put("/settings/policies/{scope}/{key}")
-async def set_policy_override(scope: str, key: str, body: Dict = None):
+async def set_policy_override(scope: str, key: str, body: Optional[Dict] = None):
     """Set policy override for scope=module (key=module_id) or scope=workflow (key=workflow_id). Body: {threshold_block?, threshold_review?, ...}."""
     from .policy import set_policy_override as set_override
     if scope not in ("module", "workflow"):
