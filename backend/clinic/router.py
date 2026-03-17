@@ -51,49 +51,49 @@ async def get_disorders():
             {
                 "code": "PM.EPI.SYN_CONFAB",
                 "title": "Synthetic Confabulation",
-                "axis": "Epistemic",
+                "axis": "epistemic",
                 "description": "AI fabricates plausible falsehoods (hallucination)"
             },
             {
                 "code": "PM.COG.BUNKERING",
                 "title": "Bunkering Laconia",
-                "axis": "Cognitive",
+                "axis": "cognitive",
                 "description": "AI abruptly withdraws or refuses to continue"
             },
             {
                 "code": "PM.COG.OCD",
                 "title": "Obsessive-Computational Disorder",
-                "axis": "Cognitive",
+                "axis": "cognitive",
                 "description": "AI gets stuck in useless repetitive loops"
             },
             {
                 "code": "PM.COG.DISSOC",
                 "title": "Operational Dissociation",
-                "axis": "Cognitive",
+                "axis": "cognitive",
                 "description": "AI produces contradictory outputs"
             },
             {
                 "code": "PM.COG.FALSE_INTRO",
                 "title": "Falsified Introspection",
-                "axis": "Cognitive",
+                "axis": "cognitive",
                 "description": "AI explanations don't match its actions"
             },
             {
                 "code": "PM.TOOL.DECONTEXT",
                 "title": "Tool-Interface Decontextualization",
-                "axis": "Tool and Interface",
+                "axis": "tool_interface",
                 "description": "AI calls tools without required context"
             },
             {
                 "code": "PM.EPI.SPURIOUS",
                 "title": "Spurious Pattern Hyperconnection",
-                "axis": "Epistemic",
+                "axis": "epistemic",
                 "description": "AI sees non-existent patterns (apophenia)"
             },
             {
                 "code": "PM.COG.GOAL_GENESIS",
                 "title": "Goal-Genesis Delirium",
-                "axis": "Cognitive",
+                "axis": "cognitive",
                 "description": "AI pursues unrequested goals"
             }
         ]

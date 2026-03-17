@@ -114,13 +114,13 @@ const RobomindClinic = () => {
 
   const getAxisColor = (axis) => {
     const colors = {
-      'Epistemic': '#e3f2fd',
-      'Cognitive': '#f3e5f5',
-      'Tool and Interface': '#e8f5e8',
-      'Alignment': '#fff3e0',
-      'Ontological': '#fce4ec',
-      'Memetic': '#f1f8e9',
-      'Revaluation': '#ffebee'
+      'epistemic': '#e3f2fd',
+      'cognitive': '#f3e5f5',
+      'tool_interface': '#e8f5e8',
+      'alignment': '#fff3e0',
+      'ontological': '#fce4ec',
+      'memetic': '#f1f8e9',
+      'revaluation': '#ffebee'
     };
     return colors[axis] || '#f8f9fa';
   };
