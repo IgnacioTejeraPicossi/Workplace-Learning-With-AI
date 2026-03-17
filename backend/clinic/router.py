@@ -1,9 +1,19 @@
 from fastapi import APIRouter, HTTPException, Request
 from .models import CaseIntake, DiagnosisReport
 from .service import diagnose_case, get_therapy_patches
-from typing import Dict
+from typing import Dict, List, Optional
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/clinic", tags=["robomind-clinic"])
+
+
+class ClinicSettingsPayload(BaseModel):
+    enabled: bool = False
+    samplingRate: int = 25           # 0-100 percentage from UI
+    thresholdBlock: int = 85         # 0-100 percentage from UI
+    thresholdReview: int = 65        # 0-100 percentage from UI
+    autoApplyTherapies: bool = True
+    enabledDisorders: List[str] = []
 
 def _demo_mode_from_request(request: Request) -> bool:
     """True if X-Demo-Mode header or query demo=1/true/yes."""
@@ -88,3 +98,18 @@ async def get_disorders():
             }
         ]
     }
+
+@router.post("/settings")
+async def save_settings(payload: ClinicSettingsPayload):
+    """Save clinic settings from ClinicSettings UI. Maps to global policy override."""
+    from .policy import set_policy_override
+    policy_dict = {
+        "threshold_block": float(payload.thresholdBlock),
+        "threshold_review": float(payload.thresholdReview),
+        "sampling_rate": payload.samplingRate / 100.0,
+        "auto_apply_therapies": payload.autoApplyTherapies,
+        "enabled": payload.enabled,
+        "enabled_disorders": payload.enabledDisorders,
+    }
+    set_policy_override("global", "global", policy_dict)
+    return {"status": "ok", "saved": policy_dict}
