@@ -474,12 +474,12 @@ async def respond_to_incident(incident_id: str, request: IncidentResponseRequest
         
         # Update incident status based on action
         if request.action == "mitigate":
-            incident["status"] = IncidentStatus.MITIGATED
+            incident["status"] = IncidentStatus.MITIGATED.value
         elif request.action == "resolve":
-            incident["status"] = IncidentStatus.RESOLVED
+            incident["status"] = IncidentStatus.RESOLVED.value
             incident["resolved_at"] = datetime.now()
         elif request.action == "investigate":
-            incident["status"] = IncidentStatus.INVESTIGATING
+            incident["status"] = IncidentStatus.INVESTIGATING.value
         
         return {
             "incident_id": incident_id,
