@@ -12,7 +12,7 @@ from backend.models.cyber_models import (
     Threat, ControlMap, Vulnerability, PostureKPI, RiskScore,
     ComplianceStatus, VulnerabilityScanRequest, CyberRAGRequest,
     SecureCodingLessonRequest, CyberRAGResponse, SecureCodingLessonResponse,
-    ScanResult
+    ScanResult, SeverityLevel
 )
 
 router = APIRouter(prefix="/api/cyber", tags=["Cybersecurity"])
@@ -299,7 +299,7 @@ async def generate_secure_coding_lesson(request: SecureCodingLessonRequest):
     vulns = await list_vulnerabilities(request.project)
     
     # Focus on most critical vulnerabilities
-    critical_vulns = [v for v in vulns if v.severity in ["CRITICAL", "HIGH"]]
+    critical_vulns = [v for v in vulns if v.severity in (SeverityLevel.CRITICAL, SeverityLevel.HIGH)]
     
     if not critical_vulns:
         critical_vulns = vulns[:3]  # Take first 3 if no critical ones
