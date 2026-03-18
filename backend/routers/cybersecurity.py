@@ -340,7 +340,7 @@ async def generate_secure_coding_lesson(request: SecureCodingLessonRequest):
         focus_vulnerabilities=[v.title for v in critical_vulns[:3]],
         code_examples=[
             "// Good: Parameterized query\nSELECT * FROM users WHERE id = ?",
-            "// Bad: String concatenation\nSELECT * FROM users WHERE id = '" + userId + "'"
+            "// Bad: String concatenation\nSELECT * FROM users WHERE id = '<user_id>'"
         ],
         references=[
             "OWASP Secure Coding Practices",
