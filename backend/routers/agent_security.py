@@ -6,10 +6,13 @@ Advanced security monitoring and threat detection for AI agents
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from typing import List, Optional, Tuple
 from datetime import datetime, timedelta
+import logging
 import uuid
 import asyncio
 import os
 import re
+
+logger = logging.getLogger(__name__)
 
 from ..models.agent_security_models import (
     AgentSecurityOverview,
@@ -203,8 +206,8 @@ async def get_agent_security_overview():
                 })
             if real_incidents:
                 base["recent_incidents"] = real_incidents
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Could not load security events from MongoDB: %s", e)
 
         try:
             # Load latest per-agent status snapshots
@@ -228,8 +231,8 @@ async def get_agent_security_overview():
                         "last_incident": s.get("last_incident"),
                         "findings": s.get("findings"),
                     })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Could not load agent status snapshots from MongoDB: %s", e)
 
         # Helper to synthesize a reasonable default status if missing
         def default_status(name: str, score: int, at_risk: bool = False):
@@ -261,7 +264,8 @@ async def get_agent_security_overview():
         # Compute KPIs
         total_agents = len(status_list)
         secure_agents = sum(1 for a in status_list if a["status"] == "secure")
-        at_risk_agents = total_agents - secure_agents
+        at_risk_agents = sum(1 for a in status_list if a["status"] == "at_risk")
+        critical_agents = sum(1 for a in status_list if a["status"] == "critical")
         overall_score = round(sum(a["security_score"] for a in status_list) / total_agents)
         zero_trust_rate = round((sum(1 for a in status_list if a["zero_trust_compliance"]) / total_agents) * 100)
 
@@ -303,7 +307,7 @@ async def get_agent_security_overview():
             "total_agents": total_agents,
             "secure_agents": secure_agents,
             "at_risk_agents": at_risk_agents,
-            "critical_agents": 0,
+            "critical_agents": critical_agents,
             "critical_alerts": critical_alerts,
             "recent_incidents": serialized_incidents,
             "agent_security_status": serialized_status,
@@ -318,8 +322,8 @@ async def get_agent_security_overview():
                 "overall_score": 86,
                 "total_agents": len(MOCK_AGENT_SECURITY_DATA["agent_security_status"]),
                 "secure_agents": sum(1 for a in MOCK_AGENT_SECURITY_DATA["agent_security_status"] if a["status"] == "secure"),
-                "at_risk_agents": sum(1 for a in MOCK_AGENT_SECURITY_DATA["agent_security_status"] if a["status"] != "secure"),
-                "critical_agents": 0,
+                "at_risk_agents": sum(1 for a in MOCK_AGENT_SECURITY_DATA["agent_security_status"] if a["status"] == "at_risk"),
+                "critical_agents": sum(1 for a in MOCK_AGENT_SECURITY_DATA["agent_security_status"] if a["status"] == "critical"),
                 "critical_alerts": 1,
                 "recent_incidents": [
                     {**i, "timestamp": i["timestamp"].isoformat()} for i in base["recent_incidents"]
