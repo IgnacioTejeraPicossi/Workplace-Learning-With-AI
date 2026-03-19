@@ -6,3 +6,16 @@ Kan til og med gå og hente varer før man har fått beskjed om det, når man ve
 Selv laget meg en lokal simulator. Ingen grunn til å teste mot API hvis man ikke har en optimalisert løsning som har nok trekk igjen til å finne nye varer.
 
 (Admin er klar over det og alle konkurrerer på like vilkår. Merk at å vinne her gjør deg ikke nødvendigvis noe bedre i ordentlig ML oppgaver :wink: ta som å bli kjent med API og en morsom challenge) (edited)
+
+19.03.2026
+We've identified and fixed two issues affecting gameplay:
+
+  1. Action timeout desync — When your bot's response took longer than 2 seconds, the server silently skipped your actions with no notification. This caused bots to permanently desync (thinking they're at one position while the server has them
+  elsewhere). The server now includes an action_status field in every game state — it will say "timeout" if your previous actions were dropped. You can also send a "round" field with your actions to prevent stale messages from being applied to
+  the wrong round.
+
+  2. WebSocket keepalive — Added ping/pong heartbeat to detect dead connections faster, which should help with the timeout issues some of you experienced on mobile/5G networks.
+
+All changes are backward compatible — your existing bots will work without any modifications. The new fields (action_status, round) are optional and available if you want to make your bot more resilient.
+
+These fixes are live now. If you're still experiencing issues, let us know!

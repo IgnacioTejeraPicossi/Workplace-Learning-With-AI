@@ -33,6 +33,11 @@ _DIRS = [
     ("move_right",  1, 0),
 ]
 
+# Open horizontal corridors in the Nightmare 30×18 map.
+# Bots approaching items via these rows avoid entering single-file
+# vertical aisles where head-on deadlocks occur.
+_CORRIDOR_Y = frozenset({1, 9, 15, 16})
+
 
 def _grid(state):
     g = state.get("grid") or {}
@@ -144,6 +149,7 @@ def _bfs(from_pos, targets: set, blocked: set, W: int, H: int):
     return None
 
 
+
 def _base_blocked(x, y, state):
     """Walls plus spawn when bot is not at spawn (prevents oscillation loop)."""
     sp = _spawn(state)
@@ -153,26 +159,53 @@ def _base_blocked(x, y, state):
     return blocked
 
 
-def _move_to(bid, x, y, tx, ty, state) -> dict:
-    """Navigate to cell (tx, ty). Routes around other bots first."""
+def _move_to(bid, x, y, tx, ty, state, claimed=None) -> dict:
+    """Navigate to cell (tx, ty). Routes around other bots and claimed cells first."""
     W, H = _grid(state)
     blocked = _base_blocked(x, y, state)
     other = _other_bots(bid, state)
-    step = _bfs([x, y], {(tx, ty)}, blocked | other, W, H)
+    cl = set(claimed) if claimed else set()
+    targets = {(tx, ty)}
+    step = _bfs([x, y], targets, blocked | other | cl, W, H)
     if not step:
-        step = _bfs([x, y], {(tx, ty)}, blocked, W, H)
+        step = _bfs([x, y], targets, blocked | cl, W, H)
     if not step:
-        step = _bfs([x, y], {(tx, ty)}, _walls(state), W, H)
+        step = _bfs([x, y], targets, blocked, W, H)
+    if not step:
+        step = _bfs([x, y], targets, _walls(state), W, H)
     return {"bot": bid, "action": step or "wait"}
 
 
-def _move_adj(bid, x, y, ix, iy, state) -> dict:
-    """Navigate to any walkable cell adjacent to item at (ix, iy)."""
+def _move_adj(bid, x, y, ix, iy, state, claimed=None) -> dict:
+    """Navigate to any walkable cell adjacent to item at (ix, iy).
+
+    Prefers access cells on open horizontal corridors (y ∈ _CORRIDOR_Y) so
+    that bots approach items from corridor rows rather than entering narrow
+    single-file vertical aisles.  Head-on deadlocks in those aisles are the
+    primary cause of order-completion failure on the Nightmare map.
+    """
     W, H = _grid(state)
     adj = {(ix + dx, iy + dy) for _, dx, dy in _DIRS if 0 <= ix + dx < W and 0 <= iy + dy < H}
     blocked = _base_blocked(x, y, state) | _items_pos(state)
     other = _other_bots(bid, state)
-    step = _bfs([x, y], adj, blocked | other, W, H)
+    cl = set(claimed) if claimed else set()
+
+    # Preferred: access cells that sit on a horizontal corridor row.
+    preferred = {c for c in adj if c[1] in _CORRIDOR_Y and c not in blocked}
+
+    if preferred:
+        step = _bfs([x, y], preferred, blocked | other | cl, W, H)
+        if not step:
+            step = _bfs([x, y], preferred, blocked | cl, W, H)
+        if not step:
+            step = _bfs([x, y], preferred, blocked, W, H)
+        if step:
+            return {"bot": bid, "action": step}
+
+    # Fallback: any access cell (including aisle-only items).
+    step = _bfs([x, y], adj, blocked | other | cl, W, H)
+    if not step:
+        step = _bfs([x, y], adj, blocked | cl, W, H)
     if not step:
         step = _bfs([x, y], adj, blocked, W, H)
     if not step:
@@ -217,7 +250,7 @@ def _assign_targets(state: dict, failed_pickups: dict | None = None) -> dict:
     def item_score(bpos, item):
         ipos = item["position"]
         nz = _nearest_zone(ipos, state)
-        return manhattan(bpos, ipos) + 0.3 * manhattan(ipos, nz)
+        return manhattan(bpos, ipos) + manhattan(ipos, nz)
 
     # Sole-access x-column tracking
     claimed_x: set = set()
@@ -325,29 +358,29 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
         # Empty at zone: fetch assigned target or nearest needed item
         if target:
             ix, iy = int(target["position"][0]), int(target["position"][1])
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj(bid, x, y, ix, iy, state, claimed_cells)
         if needed:
             pool = [i for i in (state.get("items") or []) if i["type"] in needed_set]
             if pool:
                 nn = min(pool, key=lambda i: manhattan([x, y], i["position"]))
-                return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
+                return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state, claimed_cells)
         return {"bot": bid, "action": "wait"}
 
     # ===== INVENTORY FULL -> DELIVER =====
     if len(inv) >= 3:
         nz = _nearest_zone([x, y], state)
-        return _move_to(bid, x, y, nz[0], nz[1], state)
+        return _move_to(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # ===== HAS MATCHING ITEMS -> DELIVER =====
     if matching:
         nz = _nearest_zone([x, y], state)
-        return _move_to(bid, x, y, nz[0], nz[1], state)
+        return _move_to(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # ===== HAS NON-MATCHING ITEMS -> DUMP AT ZONE =====
     # Clear aisles: don't wander with useless cargo.
     if inv:
         nz = _nearest_zone([x, y], state)
-        return _move_to(bid, x, y, nz[0], nz[1], state)
+        return _move_to(bid, x, y, nz[0], nz[1], state, claimed_cells)
 
     # ===== EMPTY WITH ASSIGNMENT -> FETCH ITEM =====
     if target:
@@ -360,16 +393,16 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                 continue
             if target_exists and it["id"] == target["id"]:
                 return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-            if not target_exists and it["type"] == target["type"] and it["type"] in needed_set:
+            if not target_exists and it["type"] == target["type"]:
                 return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
         # Navigate toward item
         if target_exists:
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj(bid, x, y, ix, iy, state, claimed_cells)
         # Item gone: find nearest of same type
         alts = [i for i in (state.get("items") or []) if i["type"] == target["type"]]
         if alts:
             nn = min(alts, key=lambda i: manhattan([x, y], i["position"]))
-            return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state)
+            return _move_adj(bid, x, y, int(nn["position"][0]), int(nn["position"][1]), state, claimed_cells)
         return {"bot": bid, "action": "wait"}
 
     # ===== EMPTY, NO ASSIGNMENT =====
@@ -384,7 +417,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                 ip = it.get("position") or [0, 0]
                 if abs(x - ip[0]) + abs(y - ip[1]) == 1 and it["id"] == nn["id"]:
                     return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-            return _move_adj(bid, x, y, ix, iy, state)
+            return _move_adj(bid, x, y, ix, iy, state, claimed_cells)
 
     # Preview pre-pick: one item on the way if very close (in-store bots only)
     preview_ord = _preview(state)
@@ -400,7 +433,7 @@ def decide(bot, state, assignments, claimed_cells=None, failed_pickups=None) -> 
                     ip = it.get("position") or [0, 0]
                     if abs(x - ip[0]) + abs(y - ip[1]) == 1 and it["id"] == nn["id"]:
                         return {"bot": bid, "action": "pick_up", "item_id": it["id"]}
-                return _move_adj(bid, x, y, ix, iy, state)
+                return _move_adj(bid, x, y, ix, iy, state, claimed_cells)
 
     return {"bot": bid, "action": "wait"}
 

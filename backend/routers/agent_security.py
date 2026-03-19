@@ -51,7 +51,7 @@ MOCK_AGENT_SECURITY_DATA = {
             "agent_name": "AI Compliance Agent",
             "threat_type": "prompt_injection",
             "severity": "high",
-            "timestamp": datetime.now() - timedelta(hours=2),
+            "timestamp": datetime.utcnow() - timedelta(hours=2),
             "status": "mitigated",
             "description": "Detected suspicious prompt injection pattern in compliance document analysis",
             "detection_method": "Behavioral Analysis",
@@ -63,7 +63,7 @@ MOCK_AGENT_SECURITY_DATA = {
             "agent_name": "AI Productivity Agent",
             "threat_type": "model_drift",
             "severity": "medium",
-            "timestamp": datetime.now() - timedelta(hours=8),
+            "timestamp": datetime.utcnow() - timedelta(hours=8),
             "status": "investigating",
             "description": "Unusual response patterns detected in URL analysis functionality",
             "detection_method": "Model Monitoring",
@@ -76,7 +76,7 @@ MOCK_AGENT_SECURITY_DATA = {
             "agent_name": "AI Compliance Agent",
             "status": "secure",
             "security_score": 92,
-            "last_scan": datetime.now() - timedelta(minutes=30),
+            "last_scan": datetime.utcnow() - timedelta(minutes=30),
             "vulnerabilities_count": 0,
             "threats_detected": 1,
             "zero_trust_compliance": True,
@@ -84,13 +84,13 @@ MOCK_AGENT_SECURITY_DATA = {
             "data_protection_score": 90,
             "access_control_score": 88,
             "monitoring_active": True,
-            "last_incident": datetime.now() - timedelta(hours=2)
+            "last_incident": datetime.utcnow() - timedelta(hours=2)
         },
         {
             "agent_name": "AI Productivity Agent",
             "status": "at_risk",
             "security_score": 78,
-            "last_scan": datetime.now() - timedelta(minutes=45),
+            "last_scan": datetime.utcnow() - timedelta(minutes=45),
             "vulnerabilities_count": 2,
             "threats_detected": 3,
             "zero_trust_compliance": False,
@@ -98,13 +98,13 @@ MOCK_AGENT_SECURITY_DATA = {
             "data_protection_score": 75,
             "access_control_score": 70,
             "monitoring_active": True,
-            "last_incident": datetime.now() - timedelta(hours=8)
+            "last_incident": datetime.utcnow() - timedelta(hours=8)
         },
         {
             "agent_name": "Robomind Clinic",
             "status": "secure",
             "security_score": 88,
-            "last_scan": datetime.now() - timedelta(hours=1),
+            "last_scan": datetime.utcnow() - timedelta(hours=1),
             "vulnerabilities_count": 0,
             "threats_detected": 0,
             "zero_trust_compliance": True,
@@ -117,7 +117,7 @@ MOCK_AGENT_SECURITY_DATA = {
             "agent_name": "Agent Theory & Documentation",
             "status": "secure",
             "security_score": 95,
-            "last_scan": datetime.now() - timedelta(hours=2),
+            "last_scan": datetime.utcnow() - timedelta(hours=2),
             "vulnerabilities_count": 0,
             "threats_detected": 0,
             "zero_trust_compliance": True,
@@ -144,8 +144,8 @@ MOCK_AGENT_SECURITY_DATA = {
         "passed_checks": 142,
         "failed_checks": 14,
         "compliance_rate": 91.0,
-        "last_assessment": datetime.now() - timedelta(hours=6),
-        "next_assessment": datetime.now() + timedelta(hours=18),
+        "last_assessment": datetime.utcnow() - timedelta(hours=6),
+        "next_assessment": datetime.utcnow() + timedelta(hours=18),
         "critical_failures": [
             "AI Productivity Agent: Zero Trust authentication bypass detected",
             "AI Compliance Agent: Privilege escalation attempt blocked"
@@ -220,7 +220,7 @@ async def get_agent_security_overview():
                         "status": s.get("status", "secure"),
                         "security_score": int(s.get("security_score", 85)),
                         # Ensure required datetime is always present to avoid 500 validation errors
-                        "last_scan": s.get("last_scan") or datetime.now(),
+                        "last_scan": s.get("last_scan") or datetime.utcnow(),
                         "vulnerabilities_count": int(s.get("vulnerabilities_count", 0)),
                         "threats_detected": int(s.get("threats_detected", 0)),
                         "zero_trust_compliance": bool(s.get("zero_trust_compliance", True)),
@@ -240,7 +240,7 @@ async def get_agent_security_overview():
                 "agent_name": name,
                 "status": "at_risk" if at_risk else "secure",
                 "security_score": score,
-                "last_scan": datetime.now() - timedelta(minutes=15),
+                "last_scan": datetime.utcnow() - timedelta(minutes=15),
                 "vulnerabilities_count": 1 if at_risk else 0,
                 "threats_detected": 1 if at_risk else 0,
                 "zero_trust_compliance": not at_risk,
@@ -248,7 +248,7 @@ async def get_agent_security_overview():
                 "data_protection_score": max(70, score - 2),
                 "access_control_score": max(70, score - 4),
                 "monitoring_active": True,
-                "last_incident": datetime.now() - timedelta(hours=3) if at_risk else None,
+                "last_incident": datetime.utcnow() - timedelta(hours=3) if at_risk else None,
             }
 
         existing_names = {a["agent_name"] for a in status_list}
@@ -282,7 +282,7 @@ async def get_agent_security_overview():
         serialized_status = [
             {
                 **a,
-                "last_scan": dt(a.get("last_scan") or datetime.now()),
+                "last_scan": dt(a.get("last_scan") or datetime.utcnow()),
                 "last_incident": dt(a.get("last_incident")),
                 "findings": a.get("findings"),
             }
@@ -313,7 +313,7 @@ async def get_agent_security_overview():
             "agent_security_status": serialized_status,
             "security_metrics": base["security_metrics"],
             "zero_trust_status": zero_trust,
-            "last_updated": dt(datetime.now()),
+            "last_updated": dt(datetime.utcnow()),
         }
     except Exception as e:
         # Never break the UI: return base mock if anything goes wrong
@@ -337,7 +337,7 @@ async def get_agent_security_overview():
                     "last_assessment": MOCK_AGENT_SECURITY_DATA["zero_trust_status"]["last_assessment"].isoformat(),
                     "next_assessment": MOCK_AGENT_SECURITY_DATA["zero_trust_status"]["next_assessment"].isoformat(),
                 },
-                "last_updated": datetime.now().isoformat(),
+                "last_updated": datetime.utcnow().isoformat(),
                 "warning": f"fallback_due_to_error: {str(e)}",
             }
         except Exception:
@@ -375,7 +375,7 @@ async def initiate_security_scan(request: SecurityScanRequest, background_tasks:
             scan_id=scan_id,
             agent_name=request.agent_name,
             scan_status="initiated",
-            started_at=datetime.now(),
+            started_at=datetime.utcnow(),
             security_score=85,  # Placeholder
             vulnerabilities_found=0,
             threats_detected=0,
@@ -481,7 +481,7 @@ async def respond_to_incident(incident_id: str, request: IncidentResponseRequest
             incident["status"] = IncidentStatus.MITIGATED.value
         elif request.action == "resolve":
             incident["status"] = IncidentStatus.RESOLVED.value
-            incident["resolved_at"] = datetime.now()
+            incident["resolved_at"] = datetime.utcnow()
         elif request.action == "investigate":
             incident["status"] = IncidentStatus.INVESTIGATING.value
         
@@ -489,7 +489,7 @@ async def respond_to_incident(incident_id: str, request: IncidentResponseRequest
             "incident_id": incident_id,
             "status": incident["status"],
             "action_taken": request.action,
-            "timestamp": datetime.now()
+            "timestamp": datetime.utcnow()
         }
     except HTTPException:
         raise
@@ -502,7 +502,7 @@ async def get_agent_behavior_analysis(agent_name: str):
     try:
         return AgentBehaviorAnalysis(
             agent_name=agent_name,
-            analysis_timestamp=datetime.now(),
+            analysis_timestamp=datetime.utcnow(),
             normal_behavior_patterns={
                 "average_response_time": 250,
                 "typical_input_length": 150,
@@ -528,14 +528,14 @@ async def get_model_integrity_check(agent_name: str):
     try:
         return ModelIntegrityCheck(
             agent_name=agent_name,
-            check_timestamp=datetime.now(),
+            check_timestamp=datetime.utcnow(),
             model_hash="a1b2c3d4e5f6...",
             expected_hash="a1b2c3d4e5f6...",
             integrity_score=0.98,
             tampering_detected=False,
             model_size=1024 * 1024 * 500,  # 500MB
             parameter_count=175000000,  # 175M parameters
-            last_training_date=datetime.now() - timedelta(days=30)
+            last_training_date=datetime.utcnow() - timedelta(days=30)
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error in model integrity check: {str(e)}")
@@ -546,7 +546,7 @@ async def get_data_protection_audit(agent_name: str):
     try:
         return DataProtectionAudit(
             agent_name=agent_name,
-            audit_timestamp=datetime.now(),
+            audit_timestamp=datetime.utcnow(),
             data_encryption_status=True,
             data_anonymization_score=0.92,
             pii_detection_count=0,
@@ -569,7 +569,7 @@ async def get_real_time_threat_feed(limit: int = 20):
                 description="New prompt injection technique targeting compliance agents",
                 indicators=["ignore all previous", "system override", "admin mode"],
                 affected_agents=["AI Compliance Agent", "AI Productivity Agent"],
-                detection_timestamp=datetime.now() - timedelta(hours=1),
+                detection_timestamp=datetime.utcnow() - timedelta(hours=1),
                 source="Threat Intelligence Feed",
                 confidence=0.95,
                 mitigation_guidance=[
@@ -585,7 +585,7 @@ async def get_real_time_threat_feed(limit: int = 20):
                 description="Model drift detected in productivity analysis models",
                 indicators=["accuracy_decrease", "response_variance"],
                 affected_agents=["AI Productivity Agent"],
-                detection_timestamp=datetime.now() - timedelta(hours=3),
+                detection_timestamp=datetime.utcnow() - timedelta(hours=3),
                 source="Model Monitoring System",
                 confidence=0.80,
                 mitigation_guidance=[
@@ -613,7 +613,7 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "timestamp": datetime.now(),
+        "timestamp": datetime.utcnow(),
         "version": "1.0.0",
         "services": {
             "threat_detection": "operational",
@@ -633,7 +633,7 @@ async def simulate_security_scan(scan_id: str, agent_name: str):
         try:
             for a in MOCK_AGENT_SECURITY_DATA.get("agent_security_status", []):
                 if a.get("agent_name") == agent_name:
-                    a["last_scan"] = datetime.now()
+                    a["last_scan"] = datetime.utcnow()
                     break
         except Exception:
             pass
@@ -655,7 +655,7 @@ async def simulate_security_scan(scan_id: str, agent_name: str):
             }
 
         snapshot.update({
-            "last_scan": datetime.now(),
+            "last_scan": datetime.utcnow(),
             "last_incident": None
         })
 
@@ -780,6 +780,6 @@ async def run_real_security_checks(agent_name: str) -> dict:
         "data_protection_score": int(data_protection_score),
         "access_control_score": 88 if zero_trust_ok else 76,
         "findings": findings,
-        "last_scan": datetime.now(),
+        "last_scan": datetime.utcnow(),
         "last_incident": None,
     }
