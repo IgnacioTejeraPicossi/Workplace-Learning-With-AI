@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-AI Learning with AI - PowerPoint Presentasjon Generator
+AI Learning with AI - PowerPoint Presentasjon Generator (Enkel versjon)
 For Legeforeningen i Oslo
 """
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
-from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE
-import os
+from pathlib import Path
 
 def create_title_slide(prs):
     """Lager forside med tittel"""
@@ -22,12 +20,6 @@ def create_title_slide(prs):
     
     title.text = "AI Learning with AI"
     subtitle.text = "Intelligent Læringsplattform for Utviklere\n\nPresentert for Legeforeningen i Oslo"
-    
-    # Styling
-    title.text_frame.paragraphs[0].font.size = Pt(44)
-    title.text_frame.paragraphs[0].font.color.rgb = RGBColor(44, 62, 80)
-    subtitle.text_frame.paragraphs[0].font.size = Pt(24)
-    subtitle.text_frame.paragraphs[0].font.color.rgb = RGBColor(52, 73, 94)
     
     return slide
 
@@ -52,7 +44,6 @@ def create_overview_slide(prs):
     p2.text = "🔍 Repository Analyzer - Hovedprodukt for salg"
     p2.font.size = Pt(18)
     p2.font.bold = True
-    p2.font.color.rgb = RGBColor(52, 152, 219)
     
     p3 = text_frame.add_paragraph()
     p3.text = "📚 Learning Repository - Håndtering av analyser og moduler"
@@ -80,9 +71,6 @@ def create_repository_analyzer_slide(prs):
     title = slide.shapes.title
     title.text = "🔍 Repository Analyzer - HOVEDPRODUKT FOR SALG"
     
-    # Fix font color for title
-    title.text_frame.paragraphs[0].font.color.rgb = RGBColor(231, 76, 60)
-    
     content = slide.placeholders[1]
     text_frame = content.text_frame
     
@@ -91,7 +79,6 @@ def create_repository_analyzer_slide(prs):
     p1.text = "⭐ AUTOMATISK KODEANALYSE"
     p1.font.size = Pt(22)
     p1.font.bold = True
-    p1.font.color.rgb = RGBColor(52, 152, 219)
     
     p2 = text_frame.add_paragraph()
     p2.text = "• Analyserer GitHub-repositorier automatisk"
@@ -118,7 +105,6 @@ def create_repository_analyzer_slide(prs):
     p7.text = "\n💰 FORRETNINGSVERDI:"
     p7.font.size = Pt(18)
     p7.font.bold = True
-    p7.font.color.rgb = RGBColor(46, 204, 113)
     
     p8 = text_frame.add_paragraph()
     p8.text = "• Sparer 80% tid på dokumentasjon"
@@ -446,11 +432,11 @@ def main():
     create_roadmap_slide(prs)
     create_contact_slide(prs)
     
-    # Lagre presentasjonen
-    filename = "AI_Learning_with_AI_Presentasjon_Legeforeningen.pptx"
-    prs.save(filename)
+    # Lagre presentasjonen ved siden av dette skriptet (uavhengig av cwd)
+    output_path = Path(__file__).resolve().parent / "AI_Learning_with_AI_Presentasjon_Legeforeningen.pptx"
+    prs.save(str(output_path))
     
-    print(f"✅ Presentasjon opprettet: {filename}")
+    print(f"✅ Presentasjon opprettet: {output_path}")
     print(f"📊 Antall lysbilder: {len(prs.slides)}")
     print("🎉 Klar for Legeforeningen i Oslo!")
 
