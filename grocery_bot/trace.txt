@@ -1,230 +1,124 @@
 PS C:\test\ai\AI Learning with AI\grocery_bot> python bot.py --debug --trace
 Connecting (level=2)...
-[DEBUG] Top-level keys: ['type', 'round', 'max_rounds', 'grid', 'bots', 'items', 'orders', 'drop_off', 'score', 'active_order_index', 'total_orders', 'drop_off_zones']
-[DEBUG] grid keys: ['width', 'height', 'walls'] | width: 30 height: 18
-[DEBUG] walls: count = 176 | sample: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
+[DEBUG] Top-level keys: ['type', 'round', 'max_rounds', 'grid', 'bots', 'items', 'orders', 'drop_off', 'score', 'active_order_index', 'total_orders']
+[DEBUG] grid keys: ['width', 'height', 'walls'] | width: 28 height: 18
+[DEBUG] walls: count = 160 | sample: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
 [DEBUG] drop_off: [1, 16]
-[DEBUG] bots: 20 | positions: [[28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16], [28, 16]]
-[DEBUG] orders: 2 | active: {'id': 'order_0', 'items_required': ['yogurt', 'lettuce', 'bread', 'onions', 'peppers', 'peppers'], 'items_delivered': [], 'complete': False, 'status': 'active'}
-[DEBUG] items: 144 | sample: [{'id': 'item_0', 'type': 'onions', 'position': [3, 2]}, {'id': 'item_1', 'type': 'yogurt', 'position': [5, 2]}]
+[DEBUG] bots: 10 | positions: [[26, 16], [26, 16], [26, 16], [26, 16], [26, 16], [26, 16], [26, 16], [26, 16], [26, 16], [26, 16]]
+[DEBUG] orders: 2 | active: {'id': 'order_0', 'items_required': ['butter', 'eggs', 'butter', 'milk', 'eggs'], 'items_delivered': [], 'complete': False, 'status': 'active'}
+[DEBUG] items: 120 | sample: [{'id': 'item_0', 'type': 'bread', 'position': [3, 2]}, {'id': 'item_1', 'type': 'flour', 'position': [5, 2]}]
 [DEBUG] Full state saved to grocery_bot/debug_first_state.json
-Round 0/500 | bots: 20 | orders: 2
-  [Trace] Round 1 bot 0 pos=[28, 16] -> move_up
-  [Trace] Round 1 bot 1 pos=[28, 16] -> move_left
-  [Trace] Round 1 bot 2 pos=[28, 16] -> move_up
-  [Trace] Round 1 bot 3 pos=[28, 16] -> move_up
-  [Trace] Round 1 bot 4 pos=[28, 16] -> move_up
-  [Trace] Round 1 bot 5 pos=[28, 16] -> move_up
-  [Trace] Round 1 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 1 bot 19 pos=[28, 16] -> wait
-  [Trace] Assignment: bot 0 -> peppers at [25, 12]
-  [Trace] Assignment: bot 1 -> peppers at [17, 14]
-  [Trace] Assignment: bot 2 -> lettuce at [17, 13]
-  [Trace] Assignment: bot 3 -> bread at [21, 7]
-  [Trace] Assignment: bot 4 -> onions at [15, 2]
-  [Trace] Assignment: bot 5 -> yogurt at [17, 2]
-Round 1/500 | bots: 20 | orders: 2
-  [Trace] Round 2 bot 0 pos=[28, 15] -> move_left
-  [Trace] Round 2 bot 1 pos=[27, 16] -> move_left
-  [Trace] Round 2 bot 2 pos=[28, 16] -> move_up
-  [Trace] Round 2 bot 3 pos=[28, 16] -> move_up
-  [Trace] Round 2 bot 4 pos=[28, 16] -> move_up
-  [Trace] Round 2 bot 5 pos=[28, 16] -> move_up
-  [Trace] Round 2 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 2 bot 19 pos=[28, 16] -> wait
-Round 2/500 | bots: 20 | orders: 2
-  [Trace] Round 3 bot 0 pos=[27, 15] -> move_left
-  [Trace] Round 3 bot 1 pos=[26, 16] -> move_left
-  [Trace] Round 3 bot 2 pos=[28, 15] -> move_up
-  [Trace] Round 3 bot 3 pos=[28, 16] -> move_up
-  [Trace] Round 3 bot 4 pos=[28, 16] -> move_left
-  [Trace] Round 3 bot 5 pos=[28, 16] -> move_up
-  [Trace] Round 3 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 3 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 0 pos=[26, 15] -> move_left
-  [Trace] Round 4 bot 1 pos=[25, 16] -> move_left
-  [Trace] Round 4 bot 2 pos=[28, 14] -> move_up
-  [Trace] Round 4 bot 3 pos=[28, 15] -> move_left
-  [Trace] Round 4 bot 4 pos=[27, 16] -> move_up
-  [Trace] Round 4 bot 5 pos=[28, 16] -> move_up
-  [Trace] Round 4 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 4 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 0 pos=[25, 15] -> move_left
-  [Trace] Round 5 bot 1 pos=[24, 16] -> move_left
-  [Trace] Round 5 bot 2 pos=[28, 13] -> move_up
-  [Trace] Round 5 bot 3 pos=[27, 15] -> move_up
-  [Trace] Round 5 bot 4 pos=[27, 16] -> move_up
-  [Trace] Round 5 bot 5 pos=[28, 15] -> move_up
-  [Trace] Round 5 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 5 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 0 pos=[24, 15] -> move_up
-  [Trace] Round 6 bot 1 pos=[23, 16] -> move_up
-  [Trace] Round 6 bot 2 pos=[28, 12] -> move_up
-  [Trace] Round 6 bot 3 pos=[27, 14] -> move_up
-  [Trace] Round 6 bot 4 pos=[27, 15] -> move_up
-  [Trace] Round 6 bot 5 pos=[28, 14] -> move_up
-  [Trace] Round 6 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 6 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 0 pos=[24, 14] -> move_up
-  [Trace] Round 7 bot 1 pos=[23, 15] -> move_left
-  [Trace] Round 7 bot 2 pos=[28, 11] -> move_up
-  [Trace] Round 7 bot 3 pos=[27, 13] -> move_up
-  [Trace] Round 7 bot 4 pos=[27, 14] -> move_down
-  [Trace] Round 7 bot 5 pos=[28, 13] -> move_up
-  [Trace] Round 7 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 7 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 0 pos=[24, 13] -> move_up
-  [Trace] Round 8 bot 1 pos=[22, 15] -> move_left
-  [Trace] Round 8 bot 2 pos=[28, 10] -> move_up
-  [Trace] Round 8 bot 3 pos=[27, 12] -> move_up
-  [Trace] Round 8 bot 4 pos=[27, 15] -> move_down
-  [Trace] Round 8 bot 5 pos=[28, 12] -> move_up
-  [Trace] Round 8 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 8 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 0 pos=[24, 12] -> pick_up item=item_139 at [25, 12] dist=1
-  [Trace] Round 9 bot 1 pos=[21, 15] -> move_left
-  [Trace] Round 9 bot 2 pos=[28, 9] -> move_left
-  [Trace] Round 9 bot 3 pos=[27, 11] -> move_down
-  [Trace] Round 9 bot 4 pos=[27, 16] -> move_left
-  [Trace] Round 9 bot 5 pos=[28, 11] -> move_down
-  [Trace] Round 9 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 9 bot 19 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 0 pos=[24, 12] inv=['peppers'] -> move_down
-  [Trace] Round 10 bot 1 pos=[20, 15] -> move_left
-  [Trace] Round 10 bot 2 pos=[27, 9] -> move_left
-  [Trace] Round 10 bot 3 pos=[27, 12] -> move_up
-  [Trace] Round 10 bot 4 pos=[26, 16] -> move_left
-  [Trace] Round 10 bot 5 pos=[28, 12] -> move_up
-  [Trace] Round 10 bot 6 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 7 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 8 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 9 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 10 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 11 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 12 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 13 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 14 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 15 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 16 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 17 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 18 pos=[28, 16] -> wait
-  [Trace] Round 10 bot 19 pos=[28, 16] -> wait
-Round 49/500 | bots: 20 | orders: 2
-Round 99/500 | bots: 20 | orders: 2
-Round 149/500 | bots: 20 | orders: 2
-Round 199/500 | bots: 20 | orders: 2
-Round 249/500 | bots: 20 | orders: 2
-Round 299/500 | bots: 20 | orders: 2
-Round 349/500 | bots: 20 | orders: 2
-Round 399/500 | bots: 20 | orders: 2
-Round 449/500 | bots: 20 | orders: 2
-Round 499/500 | bots: 20 | orders: 2
-Game over. Score: 69 | Rounds played: 500
+Round 0/300 | bots: 10 | orders: 2
+  [Trace] Round 1 bot 0 pos=[26, 16] -> move_up
+  [Trace] Round 1 bot 1 pos=[26, 16] -> move_left
+  [Trace] Round 1 bot 2 pos=[26, 16] -> move_up
+  [Trace] Round 1 bot 3 pos=[26, 16] -> move_up
+  [Trace] Round 1 bot 4 pos=[26, 16] -> move_up
+  [Trace] Round 1 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 1 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 1 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 1 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 1 bot 9 pos=[26, 16] -> wait
+  [Trace] Assignment: bot 0 -> butter at [5, 14]
+  [Trace] Assignment: bot 1 -> eggs at [13, 14]
+  [Trace] Assignment: bot 2 -> milk at [15, 14]
+  [Trace] Assignment: bot 3 -> eggs at [9, 13]
+  [Trace] Assignment: bot 4 -> butter at [21, 12]
+Round 1/300 | bots: 10 | orders: 2
+  [Trace] Round 2 bot 0 pos=[26, 15] -> move_left
+  [Trace] Round 2 bot 1 pos=[25, 16] -> move_left
+  [Trace] Round 2 bot 2 pos=[26, 16] -> move_up
+  [Trace] Round 2 bot 3 pos=[26, 16] -> move_up
+  [Trace] Round 2 bot 4 pos=[26, 16] -> move_up
+  [Trace] Round 2 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 2 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 2 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 2 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 2 bot 9 pos=[26, 16] -> wait
+Round 2/300 | bots: 10 | orders: 2
+  [Trace] Round 3 bot 0 pos=[25, 15] -> move_left
+  [Trace] Round 3 bot 1 pos=[24, 16] -> move_left
+  [Trace] Round 3 bot 2 pos=[26, 15] -> move_up
+  [Trace] Round 3 bot 3 pos=[26, 16] -> move_up
+  [Trace] Round 3 bot 4 pos=[26, 16] -> move_left
+  [Trace] Round 3 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 3 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 3 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 3 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 3 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 4 bot 0 pos=[24, 15] -> move_left
+  [Trace] Round 4 bot 1 pos=[23, 16] -> move_left
+  [Trace] Round 4 bot 2 pos=[26, 14] -> move_up
+  [Trace] Round 4 bot 3 pos=[26, 15] -> move_left
+  [Trace] Round 4 bot 4 pos=[25, 16] -> move_left
+  [Trace] Round 4 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 4 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 4 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 4 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 4 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 5 bot 0 pos=[23, 15] -> move_left
+  [Trace] Round 5 bot 1 pos=[22, 16] -> move_left
+  [Trace] Round 5 bot 2 pos=[26, 13] -> move_up
+  [Trace] Round 5 bot 3 pos=[25, 15] -> move_up
+  [Trace] Round 5 bot 4 pos=[24, 16] -> move_up
+  [Trace] Round 5 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 5 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 5 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 5 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 5 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 6 bot 0 pos=[22, 15] -> move_left
+  [Trace] Round 6 bot 1 pos=[21, 16] -> move_left
+  [Trace] Round 6 bot 2 pos=[26, 12] -> move_up
+  [Trace] Round 6 bot 3 pos=[25, 14] -> move_up
+  [Trace] Round 6 bot 4 pos=[24, 15] -> move_up
+  [Trace] Round 6 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 6 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 6 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 6 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 6 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 7 bot 0 pos=[21, 15] -> move_left
+  [Trace] Round 7 bot 1 pos=[20, 16] -> move_left
+  [Trace] Round 7 bot 2 pos=[26, 11] -> move_up
+  [Trace] Round 7 bot 3 pos=[25, 13] -> move_up
+  [Trace] Round 7 bot 4 pos=[24, 14] -> move_up
+  [Trace] Round 7 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 7 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 7 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 7 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 7 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 8 bot 0 pos=[20, 15] -> move_left
+  [Trace] Round 8 bot 1 pos=[19, 16] -> move_left
+  [Trace] Round 8 bot 2 pos=[26, 10] -> move_up
+  [Trace] Round 8 bot 3 pos=[25, 12] -> move_up
+  [Trace] Round 8 bot 4 pos=[24, 13] -> move_up
+  [Trace] Round 8 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 8 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 8 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 8 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 8 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 9 bot 0 pos=[19, 15] -> move_left
+  [Trace] Round 9 bot 1 pos=[18, 16] -> move_left
+  [Trace] Round 9 bot 2 pos=[26, 9] -> move_left
+  [Trace] Round 9 bot 3 pos=[25, 11] -> move_up
+  [Trace] Round 9 bot 4 pos=[24, 12] -> move_up
+  [Trace] Round 9 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 9 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 9 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 9 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 9 bot 9 pos=[26, 16] -> wait
+  [Trace] Round 10 bot 0 pos=[18, 15] -> move_left
+  [Trace] Round 10 bot 1 pos=[17, 16] -> move_left
+  [Trace] Round 10 bot 2 pos=[25, 9] -> move_left
+  [Trace] Round 10 bot 3 pos=[25, 10] -> move_left
+  [Trace] Round 10 bot 4 pos=[24, 11] -> move_left
+  [Trace] Round 10 bot 5 pos=[26, 16] -> wait
+  [Trace] Round 10 bot 6 pos=[26, 16] -> wait
+  [Trace] Round 10 bot 7 pos=[26, 16] -> wait
+  [Trace] Round 10 bot 8 pos=[26, 16] -> wait
+  [Trace] Round 10 bot 9 pos=[26, 16] -> wait
+Round 49/300 | bots: 10 | orders: 2
+Round 99/300 | bots: 10 | orders: 2
+Round 149/300 | bots: 10 | orders: 2
+Round 199/300 | bots: 10 | orders: 2
+Round 249/300 | bots: 10 | orders: 2
+Round 299/300 | bots: 10 | orders: 2
