@@ -110,4 +110,4 @@ The MCP bridge in `backend/mcp_bridge_server.py` translates STDIO ↔ HTTP so Po
 
 ---
 
-*Workplace Learning With AI — Ignacio Tejera*
+*Workplace Learning With AI — Ignacio Tejera at Item Consulting
