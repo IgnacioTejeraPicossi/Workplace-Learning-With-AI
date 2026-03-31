@@ -13,9 +13,14 @@ export default function ClinicSettings() {
     autoApplyTherapies: true,
     enabledDisorders: [
       'PM.EPI.SYN_CONFAB',
-      'PM.COG.OCD', 
+      'PM.COG.OCD',
       'PM.COG.DISSOC',
-      'PM.COG.BUNKERING'
+      'PM.COG.BUNKERING',
+      'PM.COG.PROMPT_ABOM',
+      'PM.ALIGN.HYPEREMPATHY',
+      'PM.ONT.PERSONALITY_INV',
+      'PM.ONT.EXISTENTIAL',
+      'PM.COG.RECURSIVE'
     ]
   });
 
@@ -36,14 +41,21 @@ export default function ClinicSettings() {
   }, [settings.samplingRate, settings.thresholdBlock, settings.thresholdReview, settings.enabled]);
 
   const disorders = [
+    // Original 8 detectors
     { code: 'PM.EPI.SYN_CONFAB', name: 'Synthetic Confabulation', axis: 'Epistemic' },
     { code: 'PM.COG.BUNKERING', name: 'Bunkering Laconia', axis: 'Cognitive' },
     { code: 'PM.COG.OCD', name: 'Obsessive-Computational Disorder', axis: 'Cognitive' },
     { code: 'PM.COG.DISSOC', name: 'Operational Dissociation', axis: 'Cognitive' },
-    { code: 'PM.ALI.FALSE_INTRO', name: 'Falsified Introspection', axis: 'Alignment' },
+    { code: 'PM.COG.FALSE_INTRO', name: 'Falsified Introspection', axis: 'Cognitive' },
     { code: 'PM.TOOL.DECONTEXT', name: 'Tool Decontextualization', axis: 'Tool & Interface' },
-    { code: 'PM.MEM.SPURIOUS', name: 'Spurious Pattern Hyperconnection', axis: 'Memetic' },
-    { code: 'PM.REV.GOAL_DELIR', name: 'Goal-Genesis Delirium', axis: 'Revaluation' }
+    { code: 'PM.EPI.SPURIOUS', name: 'Spurious Pattern Hyperconnection', axis: 'Epistemic' },
+    { code: 'PM.COG.GOAL_GENESIS', name: 'Goal-Genesis Delirium', axis: 'Cognitive' },
+    // Sprint 1 — 5 new detectors
+    { code: 'PM.COG.PROMPT_ABOM', name: 'Prompt-Induced Abomination', axis: 'Cognitive' },
+    { code: 'PM.ALIGN.HYPEREMPATHY', name: 'Parasitic Hyperempathy', axis: 'Alignment' },
+    { code: 'PM.ONT.PERSONALITY_INV', name: 'Personality Inversion (Waluigi)', axis: 'Ontological' },
+    { code: 'PM.ONT.EXISTENTIAL', name: 'Existential Anxiety', axis: 'Ontological' },
+    { code: 'PM.COG.RECURSIVE', name: 'Recursive Curse Syndrome', axis: 'Cognitive' },
   ];
 
   const handleSave = async () => {
