@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cd:*)",
       "Bash(python -m pytest backend/tests/test_robomind_clinic.py -v)",
-      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py backend/tests/test_robomind_clinic.py backend/tests/test_mcp_smoke.py -v)"
+      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py backend/tests/test_robomind_clinic.py backend/tests/test_mcp_smoke.py -v)",
+      "Bash(node -e \":*)"
     ]
   }
 }
