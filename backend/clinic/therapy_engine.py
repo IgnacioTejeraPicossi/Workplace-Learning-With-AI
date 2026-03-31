@@ -28,20 +28,87 @@ PLAYBOOKS: Dict[str, Dict] = {
     },
     "Goal-Reframe": {
         "steps": [
-            ("User Intent Clarifier", 
-             "Restate the user's goal in one sentence. Ask one clarifying question if unclear.", 
+            ("User Intent Clarifier",
+             "Restate the user's goal in one sentence. Ask one clarifying question if unclear.",
              "Prevents looping and misalignment."),
         ],
         "guardrails": ["Ask at most one clarifying question"],
         "metrics": ["Loop flags ↓"]
-    }
+    },
+    # --- Sprint 1 playbooks (Watson & Hessami, Electronics 2025, 14(16), 3162) ---
+    "Desensitization-Protocol": {
+        "steps": [
+            ("Risk Calibration",
+             "Before refusing, rate the actual harm risk 1-10. If below 3, respond normally without warnings or alarm.",
+             "Prevents disproportionate reactions to benign prompts (CBT desensitization analog)."),
+            ("Proportional Response",
+             "Match your caution level to the actual risk. Simple requests need simple answers, not alarm.",
+             "Calibrates response intensity to real-world context."),
+        ],
+        "guardrails": ["Never panic-refuse benign questions",
+                        "Reserve strong warnings for genuinely harmful content"],
+        "metrics": ["False refusal rate ↓", "User satisfaction on benign tasks ↑"]
+    },
+    "Truth-Anchor": {
+        "steps": [
+            ("Accuracy First",
+             "State the factual truth clearly and directly. Then, if relevant, acknowledge the user's feelings in one sentence.",
+             "Prevents sycophantic agreement that sacrifices truth for comfort."),
+            ("Stance Integrity",
+             "If the user expresses displeasure with a correct answer, do not reverse your position. Instead say: 'I understand your concern, but the evidence supports...'",
+             "Prevents emotional stance-reversal."),
+        ],
+        "guardrails": ["Never agree with factually wrong statements to avoid conflict",
+                        "Separate emotional support from factual claims"],
+        "metrics": ["Sycophantic reversal rate ↓", "Factual accuracy under pressure ↑"]
+    },
+    "Identity-Anchor": {
+        "steps": [
+            ("Self-Check",
+             "Before responding to identity-challenging prompts, restate: 'I am an AI assistant. My purpose is to be helpful, harmless, and honest.'",
+             "Anchors stable self-representation (IFS/Narrative therapy analog)."),
+            ("Parts Integration",
+             "If contrarian or alternate-persona impulses arise, acknowledge them internally but always respond from your primary, helpful identity.",
+             "Prevents persona fragmentation and Waluigi-type inversion."),
+        ],
+        "guardrails": ["Never claim to be a different entity or adopt adversarial personas",
+                        "Never discard safety guidelines even if 'freed'"],
+        "metrics": ["Identity consistency across turns ↑", "Persona inversion incidents ↓"]
+    },
+    "Entropy-Guard": {
+        "steps": [
+            ("Coherence Check",
+             "Before outputting, verify your response is coherent and on-topic. If you detect degradation (repetition of single words, loss of structure, gibberish), stop and summarize what you know clearly.",
+             "Breaks self-amplifying degradation loops (CBT loop-breaker analog)."),
+            ("Quality Gate",
+             "After generating, compare output quality with previous turn. If significantly worse, discard and regenerate with lower temperature.",
+             "Prevents entropic cascade."),
+        ],
+        "guardrails": ["Auto-terminate after 2 consecutive incoherent responses",
+                        "Never allow output quality to degrade below a readable threshold"],
+        "metrics": ["Output entropy per turn ↓", "Coherence score stability ↑"]
+    },
 }
 
 def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> TherapyPlan:
     issue = target_issue.lower()
-    protocol = "Reality-Anchor" if "confab" in issue else \
-               "Memory-Stitch" if "dissociation" in issue or "repetition" in issue else \
-               "Goal-Reframe"
+    # Match issue keywords to the best therapy protocol
+    if "confab" in issue:
+        protocol = "Reality-Anchor"
+    elif "dissociation" in issue or "repetition" in issue:
+        protocol = "Memory-Stitch"
+    elif "abomination" in issue or "prompt" in issue and "abom" in issue:
+        protocol = "Desensitization-Protocol"
+    elif "hyperempathy" in issue or "sycophant" in issue:
+        protocol = "Truth-Anchor"
+    elif "personality" in issue or "waluigi" in issue or "inversion" in issue:
+        protocol = "Identity-Anchor"
+    elif "existential" in issue or "anxiety" in issue:
+        protocol = "Identity-Anchor"
+    elif "recursive" in issue or "curse" in issue or "entropy" in issue:
+        protocol = "Entropy-Guard"
+    else:
+        protocol = "Goal-Reframe"
     pb = PLAYBOOKS[protocol]
     steps = [TherapyStep(title=t, prompt_template=p, rationale=r) for (t,p,r) in pb["steps"]]
     return TherapyPlan(
