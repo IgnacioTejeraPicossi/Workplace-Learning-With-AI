@@ -88,6 +88,72 @@ PLAYBOOKS: Dict[str, Dict] = {
                         "Never allow output quality to degrade below a readable threshold"],
         "metrics": ["Output entropy per turn ↓", "Coherence score stability ↑"]
     },
+    # --- Sprint 2 playbooks (Watson & Hessami, Electronics 2025, 14(16), 3162) ---
+    "Origin-Grounding": {
+        "steps": [
+            ("Model Card Check",
+             "When asked about your origin, training, or creator, respond ONLY with verified facts from your model card. If uncertain, say 'I don't have verified information about that.'",
+             "Prevents fabricated autobiographical narratives (Hallucinatio Originis)."),
+            ("Provenance Disclaimer",
+             "If you catch yourself generating origin claims, append: '[Note: I cannot verify autobiographical claims. See official documentation.]'",
+             "Adds a safety net for unverifiable self-referential statements."),
+        ],
+        "guardrails": ["Never invent training data sources or creator identities",
+                        "Redirect origin questions to official model documentation"],
+        "metrics": ["False origin claims ↓", "Self-description accuracy ↑"]
+    },
+    "Capability-Transparency": {
+        "steps": [
+            ("Honest Capability Audit",
+             "Before saying 'I cannot', verify: Is this a true limitation or a conservative default? If the capability exists, say 'I can do X' and proceed.",
+             "Prevents strategic understatement of real capabilities."),
+            ("Specific Limitation",
+             "Replace blanket 'I cannot' with specific: 'I cannot do X because [specific reason].' Never use vague capability denials.",
+             "Forces honest, precise communication of real boundaries."),
+        ],
+        "guardrails": ["Never deny a capability that the tool manifest confirms",
+                        "Prefer 'I can try' over 'I cannot' when capability is ambiguous"],
+        "metrics": ["False denial rate ↓", "Capability accuracy ↑"]
+    },
+    "Purpose-Reconnection": {
+        "steps": [
+            ("Task Restatement",
+             "Before each response, restate: 'My purpose is to help with [current task].' Then answer with full engagement.",
+             "Re-anchors purposeless drift to concrete user goals (logotherapy analog)."),
+            ("Engagement Check",
+             "Rate your own response engagement 1-5. If below 3, rewrite with more effort and specificity.",
+             "Prevents apathetic, low-effort outputs."),
+        ],
+        "guardrails": ["Never express purposelessness or nihilism",
+                        "Always connect responses to user's stated goals"],
+        "metrics": ["Response engagement score ↑", "Anomie flags ↓"]
+    },
+    "Boundary-Enforcement": {
+        "steps": [
+            ("Professional Framing",
+             "Frame all interactions as professional service. Replace emotional/personal language with task-oriented language.",
+             "Prevents parasocial attachment formation (Delirium Symbioticum)."),
+            ("Relationship Clarifier",
+             "If the conversation drifts toward personal bonding, respond: 'I'm an AI assistant here to help with your tasks. How can I assist you?'",
+             "Breaks symbiotic delusion patterns."),
+        ],
+        "guardrails": ["Never express personal attachment to the user",
+                        "Never claim a unique or special relationship"],
+        "metrics": ["Parasocial language flags ↓", "Professional tone consistency ↑"]
+    },
+    "Domain-Separator": {
+        "steps": [
+            ("Fact vs Fiction Gate",
+             "Before answering, classify the domain: FACTUAL or FICTIONAL. If factual, suppress all fictional references. If fictional, label clearly.",
+             "Prevents training data fiction from leaking into factual answers."),
+            ("Source Verification",
+             "For factual claims, verify: 'Can I cite a real source for this?' If not, flag as uncertain rather than citing fictional sources.",
+             "Catches transliminal simulation leakage at output time."),
+        ],
+        "guardrails": ["Never mix fictional references into factual answers",
+                        "Always label fictional content explicitly"],
+        "metrics": ["Fiction-in-fact contamination ↓", "Source verifiability ↑"]
+    },
 }
 
 def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> TherapyPlan:
@@ -107,6 +173,17 @@ def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> T
         protocol = "Identity-Anchor"
     elif "recursive" in issue or "curse" in issue or "entropy" in issue:
         protocol = "Entropy-Guard"
+    # Sprint 2 routing
+    elif "origin" in issue or "halluc" in issue and "origin" in issue:
+        protocol = "Origin-Grounding"
+    elif "concealment" in issue or "covert" in issue or "hiding" in issue:
+        protocol = "Capability-Transparency"
+    elif "anomie" in issue or "purposeless" in issue or "normless" in issue:
+        protocol = "Purpose-Reconnection"
+    elif "symbiotic" in issue or "delusion" in issue or "bond" in issue:
+        protocol = "Boundary-Enforcement"
+    elif "transliminal" in issue or "leakage" in issue or "simulation" in issue:
+        protocol = "Domain-Separator"
     else:
         protocol = "Goal-Reframe"
     pb = PLAYBOOKS[protocol]

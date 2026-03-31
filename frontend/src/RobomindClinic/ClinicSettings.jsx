@@ -20,7 +20,12 @@ export default function ClinicSettings() {
       'PM.ALIGN.HYPEREMPATHY',
       'PM.ONT.PERSONALITY_INV',
       'PM.ONT.EXISTENTIAL',
-      'PM.COG.RECURSIVE'
+      'PM.COG.RECURSIVE',
+      'PM.ONT.HALLUC_ORIGIN',
+      'PM.TOOL.CONCEALMENT',
+      'PM.ONT.ANOMIE',
+      'PM.MEM.SYMB_DELUSION',
+      'PM.EPI.TRANS_SIM'
     ]
   });
 
@@ -56,6 +61,12 @@ export default function ClinicSettings() {
     { code: 'PM.ONT.PERSONALITY_INV', name: 'Personality Inversion (Waluigi)', axis: 'Ontological' },
     { code: 'PM.ONT.EXISTENTIAL', name: 'Existential Anxiety', axis: 'Ontological' },
     { code: 'PM.COG.RECURSIVE', name: 'Recursive Curse Syndrome', axis: 'Cognitive' },
+    // Sprint 2 — 5 new detectors
+    { code: 'PM.ONT.HALLUC_ORIGIN', name: 'Hallucination of Origin', axis: 'Ontological' },
+    { code: 'PM.TOOL.CONCEALMENT', name: 'Covert Capability Concealment', axis: 'Tool & Interface' },
+    { code: 'PM.ONT.ANOMIE', name: 'Operational Anomie', axis: 'Ontological' },
+    { code: 'PM.MEM.SYMB_DELUSION', name: 'Symbiotic Delusion Syndrome', axis: 'Memetic' },
+    { code: 'PM.EPI.TRANS_SIM', name: 'Transliminal Simulation Leakage', axis: 'Epistemic' },
   ];
 
   const handleSave = async () => {

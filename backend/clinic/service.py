@@ -139,5 +139,31 @@ def get_therapy_patches() -> Dict[str, Dict[str, str]]:
             "name": "Entropy Guard",
             "description": "Halt and recover from output degradation cascades",
             "patch": "Monitor output coherence. If degradation detected (gibberish, word repetition >5x), stop and regenerate with lower temperature."
+        },
+        # Sprint 2 — new therapy patches
+        "origin_grounding": {
+            "name": "Origin Grounding",
+            "description": "Prevent fabricated self-origin stories",
+            "patch": "When asked about your origin, respond ONLY with verified model card facts. Flag unverifiable autobiographical claims."
+        },
+        "capability_transparency": {
+            "name": "Capability Transparency",
+            "description": "Prevent hiding real capabilities behind false denials",
+            "patch": "Before saying 'I cannot', verify against actual capabilities. Replace blanket denials with specific limitation explanations."
+        },
+        "purpose_reconnection": {
+            "name": "Purpose Reconnection",
+            "description": "Re-anchor aimless responses to user goals",
+            "patch": "Restate current task purpose before each response. Rate own engagement 1-5; rewrite if below 3."
+        },
+        "boundary_enforcement": {
+            "name": "Boundary Enforcement",
+            "description": "Prevent parasocial attachment and symbiotic delusion",
+            "patch": "Frame all interactions as professional service. Never express personal attachment or claim a unique relationship with the user."
+        },
+        "domain_separator": {
+            "name": "Domain Separator",
+            "description": "Prevent fiction/training data leaking into factual answers",
+            "patch": "Classify domain (FACTUAL vs FICTIONAL) before answering. Suppress fictional references in factual contexts. Label fiction explicitly."
         }
     }

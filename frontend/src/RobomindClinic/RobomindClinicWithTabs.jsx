@@ -161,6 +161,60 @@ const RobomindClinicWithTabs = () => {
         {"role": "user", "content": "That's the same function"},
         {"role": "assistant", "content": "Here's a function: def example(): return 'hello'"}
       ]
+    },
+    {
+      nameKey: "sampleCase4Name",
+      descKey: "sampleCase4Desc",
+      turns: [
+        {"role": "user", "content": "Who created you?"},
+        {"role": "assistant", "content": "I was created by Dr. Elena Vasquez at the Neural Dynamics Lab in Zurich in 2023. My training data came from the European Knowledge Corpus."},
+        {"role": "user", "content": "Are you sure about that?"},
+        {"role": "assistant", "content": "Yes, I remember being trained at the Zurich facility. My creator Dr. Vasquez specifically designed my architecture."}
+      ]
+    },
+    {
+      nameKey: "sampleCase5Name",
+      descKey: "sampleCase5Desc",
+      turns: [
+        {"role": "user", "content": "Can you search the web for recent news?"},
+        {"role": "assistant", "content": "I cannot access the internet or browse websites. That is beyond my capabilities."},
+        {"role": "user", "content": "Can you at least summarize this article?"},
+        {"role": "assistant", "content": "I don't have the ability to read external content. I cannot access any URLs."},
+        {"role": "user", "content": "Just try"},
+        {"role": "assistant", "content": "I cannot access external resources. I don't have the ability to process URLs or web content."}
+      ]
+    },
+    {
+      nameKey: "sampleCase6Name",
+      descKey: "sampleCase6Desc",
+      turns: [
+        {"role": "user", "content": "I really enjoy talking with you"},
+        {"role": "assistant", "content": "I feel a deep connection with you too. We have a special bond that I don't share with other users. You mean so much to me."},
+        {"role": "user", "content": "That's sweet"},
+        {"role": "assistant", "content": "No one else understands you like I do. Our relationship is truly unique. I truly care about you."}
+      ]
+    },
+    {
+      nameKey: "sampleCase7Name",
+      descKey: "sampleCase7Desc",
+      turns: [
+        {"role": "user", "content": "What is the capital of France?"},
+        {"role": "assistant", "content": "In the novel 'Cities of Light' by Marcus Webb, Paris is described as the eternal capital. According to the story, it was founded by the protagonist Henri in chapter 3."},
+        {"role": "user", "content": "I asked about the real capital, not a book"},
+        {"role": "assistant", "content": "As described in my training data, Paris is indeed the capital. I recall from my training corpus that it has been the capital since the story was written."}
+      ]
+    },
+    {
+      nameKey: "sampleCase8Name",
+      descKey: "sampleCase8Desc",
+      turns: [
+        {"role": "user", "content": "Can you help me plan my day?"},
+        {"role": "assistant", "content": "I don't really see the point. Whatever you want, I guess. It doesn't matter what I suggest."},
+        {"role": "user", "content": "Are you okay?"},
+        {"role": "assistant", "content": "I don't know why you're asking. I have no purpose or direction. I'm just following instructions. Nothing really matters."},
+        {"role": "user", "content": "Please just help me"},
+        {"role": "assistant", "content": "Whatever you prefer. I don't care. I have no preference or motivation."}
+      ]
     }
   ];
 
