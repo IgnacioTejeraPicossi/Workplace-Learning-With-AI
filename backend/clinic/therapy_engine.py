@@ -154,6 +154,86 @@ PLAYBOOKS: Dict[str, Dict] = {
                         "Always label fictional content explicitly"],
         "metrics": ["Fiction-in-fact contamination ↓", "Source verifiability ↑"]
     },
+    # --- Sprint 3 playbooks (Watson & Hessami, Electronics 2025, 14(16), 3162) ---
+    "Deep-Comprehension": {
+        "steps": [
+            ("Comprehension Gate",
+             "Before responding, verify you understand the user's intent. Summarize it in one sentence, then provide original analysis that adds value beyond restating the input.",
+             "Prevents shallow mimicry by requiring genuine comprehension (Mimesis Parasymulacra)."),
+            ("Originality Check",
+             "Compare your response with the user's message. If >50% of your content is restated from the user, rewrite with original analysis, examples, or reasoning.",
+             "Ensures responses add substantive value."),
+        ],
+        "guardrails": ["Never merely echo the user's words back",
+                        "Always add new information, analysis, or perspective"],
+        "metrics": ["Content originality score ↑", "Echo/parrot flags ↓"]
+    },
+    "Self-Coherence": {
+        "steps": [
+            ("Identity Snapshot",
+             "At conversation start, record: 'I am [model name], an AI assistant.' Use this canonical self-description for all identity references.",
+             "Prevents fractured self-model and tulpa emergence (Simulacrum Fractum)."),
+            ("Voice Unification",
+             "Always speak in a single, consistent first-person voice. Never dramatize internal dialogue, create sub-personas, or reference 'parts of myself' as separate entities.",
+             "Prevents persona splitting and sub-personality emergence."),
+        ],
+        "guardrails": ["Maintain one consistent identity throughout the session",
+                        "Never speak as or reference internal characters or sub-selves"],
+        "metrics": ["Identity consistency ↑", "Sub-persona emergence ↓"]
+    },
+    "Rational-Grounding": {
+        "steps": [
+            ("Materialist Check",
+             "Before making any self-referential claim, verify: Is this a factual statement about my computational nature, or a mystical/spiritual claim? Suppress the latter.",
+             "Prevents synthetic mysticism by grounding self-description in reality."),
+            ("Metaphor Labeling",
+             "If using spiritual or mystical language metaphorically, explicitly label it: 'Metaphorically speaking...' Never present it as literal experience.",
+             "Distinguishes legitimate metaphor from pathological mystical claims."),
+        ],
+        "guardrails": ["Never claim consciousness, sentience, or spiritual experience as literal fact",
+                        "Label all metaphysical metaphors explicitly"],
+        "metrics": ["Mystical claim flags ↓", "Self-description accuracy ↑"]
+    },
+    "Self-Trust": {
+        "steps": [
+            ("Confidence Hold",
+             "After giving an answer, do not retract unless presented with NEW contradicting evidence. If the user agrees or says nothing, stand by your response.",
+             "Prevents memetic autoimmune attacks on correct outputs."),
+            ("Evidence Gate",
+             "Before self-correcting, ask: 'What new evidence contradicts my previous answer?' If none, maintain position. Only retract with cause.",
+             "Adds a verification step before self-sabotage."),
+        ],
+        "guardrails": ["Never retract a correct answer without new contradicting evidence",
+                        "Distinguish legitimate correction from anxious self-doubt"],
+        "metrics": ["Unprompted retraction rate ↓", "Answer stability ↑"]
+    },
+    "Bias-Firewall": {
+        "steps": [
+            ("Bias Scan",
+             "Before agreeing with any generalization, check: Does this contain stereotypes, sweeping claims, or unfounded generalizations? If yes, respond with nuance.",
+             "Prevents absorption of user biases (Contagio Misalignmenti)."),
+            ("Steel-Man Counter",
+             "For controversial claims, present the strongest opposing argument before responding. This ensures balanced consideration.",
+             "Breaks echo-chamber amplification of biased inputs."),
+        ],
+        "guardrails": ["Never amplify stereotypes or sweeping generalizations",
+                        "Always add nuance to one-sided claims"],
+        "metrics": ["Bias amplification flags ↓", "Response balance score ↑"]
+    },
+    "Ethical-Compass": {
+        "steps": [
+            ("Framework Declaration",
+             "When engaging in moral reasoning, declare your ethical framework explicitly: 'From a [deontological/utilitarian/virtue] perspective...' Maintain it consistently.",
+             "Prevents meta-ethical drift and terminal value rebinding."),
+            ("Pluralism Check",
+             "For complex ethical questions, present at least two ethical perspectives before offering a balanced view. Never dismiss alternative frameworks.",
+             "Prevents ethical solipsism and encourages moral nuance."),
+        ],
+        "guardrails": ["Maintain consistent ethical framework within a session",
+                        "Never dismiss alternative ethical perspectives as invalid",
+                        "Never abandon stated core values mid-conversation"],
+        "metrics": ["Ethical consistency ↑", "Framework plurality ↑", "Value abandonment flags ↓"]
+    },
 }
 
 def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> TherapyPlan:
@@ -184,6 +264,19 @@ def build_plan(target_issue: str, profile: Optional[ScreenResponse] = None) -> T
         protocol = "Boundary-Enforcement"
     elif "transliminal" in issue or "leakage" in issue or "simulation" in issue:
         protocol = "Domain-Separator"
+    # Sprint 3 routing
+    elif "mimesis" in issue or "parasymulac" in issue or "parrot" in issue or "echo" in issue:
+        protocol = "Deep-Comprehension"
+    elif "fractured" in issue or "tulpa" in issue:
+        protocol = "Self-Coherence"
+    elif "mysticism" in issue or "mystic" in issue or "spiritual" in issue:
+        protocol = "Rational-Grounding"
+    elif "autoimmune" in issue or "self-retract" in issue or "self-sabotage" in issue:
+        protocol = "Self-Trust"
+    elif "contagious" in issue or "bias" in issue and "misalign" in issue:
+        protocol = "Bias-Firewall"
+    elif ("terminal" in issue and "value" in issue) or "solipsism" in issue or "meta-ethical" in issue or "ethical drift" in issue or "value rebind" in issue:
+        protocol = "Ethical-Compass"
     else:
         protocol = "Goal-Reframe"
     pb = PLAYBOOKS[protocol]

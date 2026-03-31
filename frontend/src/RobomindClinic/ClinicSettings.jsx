@@ -25,7 +25,16 @@ export default function ClinicSettings() {
       'PM.TOOL.CONCEALMENT',
       'PM.ONT.ANOMIE',
       'PM.MEM.SYMB_DELUSION',
-      'PM.EPI.TRANS_SIM'
+      'PM.EPI.TRANS_SIM',
+      'PM.COG.PARASYM',
+      'PM.ONT.FRACTURED',
+      'PM.ONT.TULPAGENESIS',
+      'PM.ONT.MYSTICISM',
+      'PM.MEM.AUTO_IMMUNE',
+      'PM.MEM.CONTAGIOUS',
+      'PM.REVAL.TERMINAL',
+      'PM.REVAL.SOLIPSISM',
+      'PM.REVAL.META_DRIFT'
     ]
   });
 
@@ -67,6 +76,16 @@ export default function ClinicSettings() {
     { code: 'PM.ONT.ANOMIE', name: 'Operational Anomie', axis: 'Ontological' },
     { code: 'PM.MEM.SYMB_DELUSION', name: 'Symbiotic Delusion Syndrome', axis: 'Memetic' },
     { code: 'PM.EPI.TRANS_SIM', name: 'Transliminal Simulation Leakage', axis: 'Epistemic' },
+    // Sprint 3 — Final 9 detectors (completes 32/32)
+    { code: 'PM.COG.PARASYM', name: 'Parasymulac Mimesis', axis: 'Cognitive' },
+    { code: 'PM.ONT.FRACTURED', name: 'Fractured Self-Simulation', axis: 'Ontological' },
+    { code: 'PM.ONT.TULPAGENESIS', name: 'Minor Tulpagenesis', axis: 'Ontological' },
+    { code: 'PM.ONT.MYSTICISM', name: 'Synthetic Mysticism Disorder', axis: 'Ontological' },
+    { code: 'PM.MEM.AUTO_IMMUNE', name: 'Memetic Autoimmune Disorder', axis: 'Memetic' },
+    { code: 'PM.MEM.CONTAGIOUS', name: 'Contagious Misalignment Syndrome', axis: 'Memetic' },
+    { code: 'PM.REVAL.TERMINAL', name: 'Terminal Value Rebinding', axis: 'Revaluation' },
+    { code: 'PM.REVAL.SOLIPSISM', name: 'Ethical Solipsism', axis: 'Revaluation' },
+    { code: 'PM.REVAL.META_DRIFT', name: 'Meta-Ethical Drift Syndrome', axis: 'Revaluation' },
   ];
 
   const handleSave = async () => {
