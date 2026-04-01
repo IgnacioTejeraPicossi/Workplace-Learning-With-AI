@@ -8,6 +8,8 @@ import PostureRisk from './PostureRisk';
 import Vulnerabilities from './Vulnerabilities';
 import ComplianceTracker from './ComplianceTracker';
 import SecureCodingCoach from './SecureCodingCoach';
+import IncidentDrills from './IncidentDrills';
+import KnowledgeBase from './KnowledgeBase';
 
 export default function Cybersecurity() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -44,25 +46,9 @@ export default function Cybersecurity() {
       case 'compliance':
         return <ComplianceTracker />;
       case 'drills':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚨</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Incident Response Drills
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - Simulated incident response training</p>
-          </div>
-        );
+        return <IncidentDrills />;
       case 'knowledge':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Cybersecurity Knowledge Base
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - AI-powered cybersecurity knowledge and Q&A</p>
-          </div>
-        );
+        return <KnowledgeBase />;
       default:
         return <CyberDashboard />;
     }

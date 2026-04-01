@@ -136,3 +136,44 @@ class CoachTopic(BaseModel):
     difficulty: str = "intermediate"  # "beginner", "intermediate", "advanced"
     estimated_minutes: int = 7
     description: str
+
+# --- Sprint 3: Incident Drills & Knowledge ---
+
+class DrillScenario(BaseModel):
+    id: str
+    title: str
+    category: str  # "ransomware", "data_breach", "phishing", "insider_threat", "ddos", "supply_chain"
+    difficulty: str = "intermediate"  # "beginner", "intermediate", "advanced"
+    estimated_minutes: int = 15
+    description: str
+    steps_count: int = 4
+
+class DrillStep(BaseModel):
+    step_number: int
+    title: str
+    situation: str  # Description of the current situation
+    options: List[Dict[str, str]] = []  # [{id, label, description}]
+    correct_option: str  # The best-practice option id
+    explanation: str  # Why the correct option is best
+
+class DrillSession(BaseModel):
+    id: str
+    scenario_id: str
+    scenario_title: str
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    current_step: int = 0
+    total_steps: int = 4
+    completed: bool = False
+    score: int = 0  # Correct answers count
+    max_score: int = 4
+    actions: List[Dict[str, Any]] = []  # [{step, chosen, correct, timestamp}]
+
+class KnowledgeArticle(BaseModel):
+    id: str
+    title: str
+    category: str  # "fundamentals", "frameworks", "threats", "best_practices", "incident_response", "compliance"
+    summary: str
+    content: str  # Full markdown content
+    tags: List[str] = []
+    difficulty: str = "intermediate"
+    reading_minutes: int = 5
