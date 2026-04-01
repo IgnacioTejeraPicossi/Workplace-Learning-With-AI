@@ -123,3 +123,16 @@ class ScanResult(BaseModel):
     execution_time: float
     success: bool
     error_message: Optional[str] = None
+
+class ComplianceUpdateRequest(BaseModel):
+    status: str  # "implemented", "partial", "not_implemented", "not_applicable"
+    evidence: Optional[str] = None
+    reviewer: Optional[str] = None
+
+class CoachTopic(BaseModel):
+    id: str
+    title: str
+    category: str  # "injection", "auth", "crypto", "config", "monitoring", "general"
+    difficulty: str = "intermediate"  # "beginner", "intermediate", "advanced"
+    estimated_minutes: int = 7
+    description: str

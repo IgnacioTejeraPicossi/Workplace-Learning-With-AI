@@ -19,7 +19,7 @@ from backend.models.cyber_models import (
     Threat, ControlMap, Vulnerability, PostureKPI, RiskScore,
     ComplianceStatus, VulnerabilityScanRequest, CyberRAGRequest,
     SecureCodingLessonRequest, CyberRAGResponse, SecureCodingLessonResponse,
-    ScanResult, SeverityLevel
+    ScanResult, SeverityLevel, ComplianceUpdateRequest, CoachTopic
 )
 
 router = APIRouter(prefix="/api/cyber", tags=["Cybersecurity"])
@@ -65,38 +65,77 @@ _MOCK_THREATS = [
 ]
 
 _MOCK_CONTROLS = [
-    ControlMap(
-        id="NIST-CSF:PR.AC-1",
-        title="Access Control—Identity Management",
-        framework="NIST-CSF",
-        description="Establish and manage identities and access.",
-        tags=["access-control", "identity", "authentication"],
-        implementation_guidance="Implement multi-factor authentication and role-based access control."
-    ),
-    ControlMap(
-        id="OWASP-ASVS:2.1",
-        title="Authentication Design",
-        framework="OWASP-ASVS",
-        description="Design and verify authentication mechanisms.",
-        tags=["authentication", "design", "verification"],
-        implementation_guidance="Use strong authentication protocols and secure session management."
-    ),
-    ControlMap(
-        id="CIS:1.1",
-        title="Inventory of Enterprise Assets",
-        framework="CIS",
-        description="Actively manage enterprise assets.",
-        tags=["inventory", "assets", "management"],
-        implementation_guidance="Maintain an accurate inventory of all enterprise assets."
-    ),
-    ControlMap(
-        id="OWASP-TOP10:A03",
-        title="Injection",
-        framework="OWASP-TOP10",
-        description="Prevent injection vulnerabilities.",
-        tags=["injection", "input-validation", "sanitization"],
-        implementation_guidance="Use parameterized queries and input validation."
-    )
+    # NIST CSF controls (6)
+    ControlMap(id="NIST-CSF:GV.OC-1", title="Organizational Context", framework="NIST-CSF",
+               description="The organizational mission is understood and informs cybersecurity risk management.",
+               tags=["governance", "strategy"], implementation_guidance="Document organizational mission, stakeholders, and legal requirements."),
+    ControlMap(id="NIST-CSF:ID.AM-1", title="Asset Management", framework="NIST-CSF",
+               description="Inventories of hardware, software, and data are maintained.",
+               tags=["inventory", "assets"], implementation_guidance="Maintain automated asset discovery and CMDB."),
+    ControlMap(id="NIST-CSF:PR.AC-1", title="Access Control—Identity Management", framework="NIST-CSF",
+               description="Establish and manage identities and access.",
+               tags=["access-control", "identity", "authentication"], implementation_guidance="Implement MFA and role-based access control."),
+    ControlMap(id="NIST-CSF:PR.DS-1", title="Data Security", framework="NIST-CSF",
+               description="Data-at-rest is protected.",
+               tags=["encryption", "data-protection"], implementation_guidance="Encrypt sensitive data at rest using AES-256 or equivalent."),
+    ControlMap(id="NIST-CSF:DE.CM-1", title="Continuous Monitoring", framework="NIST-CSF",
+               description="Networks and network services are monitored to detect potential cybersecurity events.",
+               tags=["monitoring", "detection"], implementation_guidance="Deploy SIEM and network monitoring with alerting."),
+    ControlMap(id="NIST-CSF:RS.RP-1", title="Response Planning", framework="NIST-CSF",
+               description="Response processes and procedures are executed and maintained.",
+               tags=["incident-response", "planning"], implementation_guidance="Maintain and test incident response playbooks quarterly."),
+    # ISO 27001 controls (4)
+    ControlMap(id="ISO-27001:A.5.1", title="Information Security Policies", framework="ISO-27001",
+               description="A set of policies for information security shall be defined and approved.",
+               tags=["policy", "governance"], implementation_guidance="Create, publish, and review information security policies annually."),
+    ControlMap(id="ISO-27001:A.8.1", title="Responsibility for Assets", framework="ISO-27001",
+               description="Assets associated with information shall be identified and an inventory maintained.",
+               tags=["assets", "ownership"], implementation_guidance="Assign ownership and classify all information assets."),
+    ControlMap(id="ISO-27001:A.9.1", title="Business Requirements of Access Control", framework="ISO-27001",
+               description="Access to networks and network services shall be controlled.",
+               tags=["access-control", "network"], implementation_guidance="Define and enforce access control policy based on business need."),
+    ControlMap(id="ISO-27001:A.12.4", title="Logging and Monitoring", framework="ISO-27001",
+               description="Event logs recording user activities and security events shall be produced and kept.",
+               tags=["logging", "monitoring", "audit"], implementation_guidance="Centralize logs, retain for 90+ days, and review regularly."),
+    # CIS controls (4)
+    ControlMap(id="CIS:1.1", title="Inventory of Enterprise Assets", framework="CIS",
+               description="Actively manage all enterprise assets connected to the network.",
+               tags=["inventory", "assets"], implementation_guidance="Use automated tools to maintain an accurate asset inventory."),
+    ControlMap(id="CIS:2.1", title="Inventory of Software Assets", framework="CIS",
+               description="Actively manage all software on the network.",
+               tags=["software", "inventory"], implementation_guidance="Maintain a software inventory with authorized/unauthorized classifications."),
+    ControlMap(id="CIS:4.1", title="Secure Configuration of Enterprise Assets", framework="CIS",
+               description="Establish and maintain secure configuration processes.",
+               tags=["hardening", "configuration"], implementation_guidance="Apply CIS Benchmarks or equivalent hardening guides."),
+    ControlMap(id="CIS:8.1", title="Audit Log Management", framework="CIS",
+               description="Establish and maintain audit log management processes.",
+               tags=["logging", "audit"], implementation_guidance="Collect, centralize, and retain audit logs per policy."),
+    # OWASP ASVS controls (3)
+    ControlMap(id="OWASP-ASVS:2.1", title="Authentication Design", framework="OWASP-ASVS",
+               description="Design and verify authentication mechanisms.",
+               tags=["authentication", "design"], implementation_guidance="Use strong protocols and secure session management."),
+    ControlMap(id="OWASP-ASVS:3.1", title="Session Management", framework="OWASP-ASVS",
+               description="Verify session management requirements.",
+               tags=["session", "tokens"], implementation_guidance="Use secure, httpOnly cookies with appropriate expiration."),
+    ControlMap(id="OWASP-ASVS:5.1", title="Input Validation", framework="OWASP-ASVS",
+               description="Verify that input is validated and sanitized.",
+               tags=["input-validation", "sanitization"], implementation_guidance="Validate all input on the server side; use allowlists."),
+    # OWASP Top 10 controls (5)
+    ControlMap(id="OWASP-TOP10:A01", title="Broken Access Control", framework="OWASP-TOP10",
+               description="Restrictions on what authenticated users are allowed to do are not properly enforced.",
+               tags=["access-control", "authorization"], implementation_guidance="Deny by default; enforce server-side access checks."),
+    ControlMap(id="OWASP-TOP10:A02", title="Cryptographic Failures", framework="OWASP-TOP10",
+               description="Failures related to cryptography leading to data exposure.",
+               tags=["crypto", "encryption"], implementation_guidance="Use strong algorithms (AES-256, RSA-2048+); never roll your own crypto."),
+    ControlMap(id="OWASP-TOP10:A03", title="Injection", framework="OWASP-TOP10",
+               description="User-supplied data is sent to an interpreter as part of a command or query.",
+               tags=["injection", "input-validation"], implementation_guidance="Use parameterized queries and ORM; validate all input."),
+    ControlMap(id="OWASP-TOP10:A05", title="Security Misconfiguration", framework="OWASP-TOP10",
+               description="Missing or incorrect security configuration.",
+               tags=["configuration", "hardening"], implementation_guidance="Automate configuration management; remove default credentials."),
+    ControlMap(id="OWASP-TOP10:A09", title="Security Logging and Monitoring Failures", framework="OWASP-TOP10",
+               description="Insufficient logging, detection, monitoring, and active response.",
+               tags=["logging", "monitoring"], implementation_guidance="Log security events; implement alerting and review processes."),
 ]
 
 _MOCK_VULNERABILITIES = [
@@ -489,38 +528,102 @@ async def generate_secure_coding_lesson(request: SecureCodingLessonRequest):
         ]
     )
 
+# In-memory compliance status store (keyed by "framework:control_id")
+_COMPLIANCE_STATUS: Dict[str, ComplianceStatus] = {}
+
+def _init_compliance():
+    """Seed compliance status for all controls."""
+    seed = {
+        "NIST-CSF:GV.OC-1": ("implemented", "Mission statement and risk appetite documented", "CISO"),
+        "NIST-CSF:ID.AM-1": ("implemented", "Automated asset discovery deployed", "IT Operations"),
+        "NIST-CSF:PR.AC-1": ("implemented", "MFA enabled for all users", "Security Team"),
+        "NIST-CSF:PR.DS-1": ("partial", "Encryption at rest for databases; file shares pending", "Data Team"),
+        "NIST-CSF:DE.CM-1": ("partial", "SIEM deployed; tuning in progress", "SOC Team"),
+        "NIST-CSF:RS.RP-1": ("partial", "Playbooks drafted; not yet tested", "Security Team"),
+        "ISO-27001:A.5.1": ("implemented", "ISMS policy published and reviewed annually", "CISO"),
+        "ISO-27001:A.8.1": ("implemented", "Asset register with owners maintained", "IT Operations"),
+        "ISO-27001:A.9.1": ("partial", "Network access policy defined; enforcement gaps remain", "Network Team"),
+        "ISO-27001:A.12.4": ("implemented", "Centralized logging with 90-day retention", "SOC Team"),
+        "CIS:1.1": ("implemented", "Asset inventory maintained in CMDB", "IT Operations"),
+        "CIS:2.1": ("partial", "Software inventory 80% complete; shadow IT gaps", "IT Operations"),
+        "CIS:4.1": ("not_implemented", "CIS Benchmarks not yet applied to all systems", "Infra Team"),
+        "CIS:8.1": ("implemented", "Audit logs centralized and retained", "SOC Team"),
+        "OWASP-ASVS:2.1": ("implemented", "Strong authentication with MFA", "Dev Team"),
+        "OWASP-ASVS:3.1": ("partial", "Secure cookies; token rotation pending", "Dev Team"),
+        "OWASP-ASVS:5.1": ("partial", "Server-side validation on main endpoints; gaps in legacy APIs", "Dev Team"),
+        "OWASP-TOP10:A01": ("partial", "RBAC implemented; some endpoints missing checks", "Dev Team"),
+        "OWASP-TOP10:A02": ("implemented", "AES-256 and TLS 1.3 in use", "Security Team"),
+        "OWASP-TOP10:A03": ("implemented", "Parameterized queries and ORM used", "Dev Team"),
+        "OWASP-TOP10:A05": ("not_implemented", "Default configs remain on some services", "DevOps"),
+        "OWASP-TOP10:A09": ("partial", "Basic logging; alerting not fully configured", "SOC Team"),
+    }
+    for key, (status, evidence, reviewer) in seed.items():
+        fw, ctrl = key.split(":", 1)
+        _COMPLIANCE_STATUS[key] = ComplianceStatus(
+            framework=fw, control_id=ctrl, status=status,
+            evidence=evidence, reviewer=reviewer,
+        )
+
+_init_compliance()
+
+
 @router.get("/compliance/status", response_model=List[ComplianceStatus])
 async def get_compliance_status(framework: Optional[str] = None):
-    """Get compliance status for security controls"""
-    # Mock compliance data
-    mock_status = [
-        ComplianceStatus(
-            framework="NIST-CSF",
-            control_id="PR.AC-1",
-            status="implemented",
-            evidence="MFA enabled for all users",
-            reviewer="Security Team"
-        ),
-        ComplianceStatus(
-            framework="OWASP-ASVS",
-            control_id="2.1",
-            status="partial",
-            evidence="Basic authentication implemented, MFA pending",
-            reviewer="Dev Team"
-        ),
-        ComplianceStatus(
-            framework="CIS",
-            control_id="1.1",
-            status="implemented",
-            evidence="Asset inventory maintained in CMDB",
-            reviewer="IT Operations"
-        )
-    ]
-    
+    """Get compliance status for all controls, optionally filtered by framework."""
+    statuses = list(_COMPLIANCE_STATUS.values())
     if framework:
-        return [status for status in mock_status if status.framework == framework]
-    
-    return mock_status
+        statuses = [s for s in statuses if s.framework == framework]
+    return statuses
+
+
+@router.put("/compliance/{framework}/{control_id}")
+async def update_compliance_status(framework: str, control_id: str, request: ComplianceUpdateRequest):
+    """Update the compliance status for a specific control."""
+    key = f"{framework}:{control_id}"
+    existing = _COMPLIANCE_STATUS.get(key)
+    if not existing:
+        raise HTTPException(status_code=404, detail=f"Control {key} not found")
+    existing.status = request.status
+    if request.evidence is not None:
+        existing.evidence = request.evidence
+    if request.reviewer is not None:
+        existing.reviewer = request.reviewer
+    existing.last_reviewed = datetime.utcnow()
+    return existing
+
+
+@router.get("/compliance/summary")
+async def get_compliance_summary():
+    """Get compliance summary with counts per framework and overall percentages."""
+    by_framework: Dict[str, Dict[str, int]] = {}
+    for s in _COMPLIANCE_STATUS.values():
+        fw = s.framework
+        if fw not in by_framework:
+            by_framework[fw] = {"total": 0, "implemented": 0, "partial": 0, "not_implemented": 0, "not_applicable": 0}
+        by_framework[fw]["total"] += 1
+        by_framework[fw][s.status] = by_framework[fw].get(s.status, 0) + 1
+
+    frameworks = []
+    for fw, counts in by_framework.items():
+        total = counts["total"]
+        implemented = counts.get("implemented", 0)
+        partial = counts.get("partial", 0)
+        pct = round(((implemented + partial * 0.5) / max(total, 1)) * 100, 1)
+        frameworks.append({"framework": fw, "counts": counts, "completion_pct": pct})
+
+    total_all = len(_COMPLIANCE_STATUS)
+    impl_all = sum(1 for s in _COMPLIANCE_STATUS.values() if s.status == "implemented")
+    partial_all = sum(1 for s in _COMPLIANCE_STATUS.values() if s.status == "partial")
+    overall_pct = round(((impl_all + partial_all * 0.5) / max(total_all, 1)) * 100, 1)
+
+    return {
+        "total_controls": total_all,
+        "implemented": impl_all,
+        "partial": partial_all,
+        "not_implemented": sum(1 for s in _COMPLIANCE_STATUS.values() if s.status == "not_implemented"),
+        "overall_completion_pct": overall_pct,
+        "by_framework": frameworks,
+    }
 
 @router.get("/vulnerabilities/summary")
 async def get_vulnerability_summary(project: str = "default"):
@@ -568,6 +671,124 @@ async def get_nist_domain_scores():
         "overall": round(sum(domains.values()) / len(domains), 1),
         "updated_at": datetime.utcnow().isoformat(),
     }
+
+
+# --- Secure Coding Coach catalog & history ---
+
+_COACH_TOPICS = [
+    CoachTopic(id="injection", title="Preventing Injection Attacks", category="injection",
+               difficulty="beginner", estimated_minutes=7,
+               description="SQL injection, command injection, and how parameterized queries prevent them."),
+    CoachTopic(id="auth-bypass", title="Authentication & Session Security", category="auth",
+               difficulty="intermediate", estimated_minutes=8,
+               description="Secure password storage, MFA, session tokens, and common bypass techniques."),
+    CoachTopic(id="xss", title="Cross-Site Scripting (XSS) Prevention", category="injection",
+               difficulty="beginner", estimated_minutes=6,
+               description="Reflected, stored, and DOM-based XSS with encoding and CSP defenses."),
+    CoachTopic(id="crypto", title="Cryptography Best Practices", category="crypto",
+               difficulty="intermediate", estimated_minutes=10,
+               description="Choosing algorithms, key management, TLS configuration, and common pitfalls."),
+    CoachTopic(id="secrets", title="Secrets Management", category="config",
+               difficulty="beginner", estimated_minutes=5,
+               description="Environment variables, vault integration, and avoiding hardcoded secrets."),
+    CoachTopic(id="dependency", title="Dependency Security", category="config",
+               difficulty="beginner", estimated_minutes=6,
+               description="Supply chain risks, lockfiles, automated audits (npm audit, pip-audit)."),
+    CoachTopic(id="api-security", title="Secure API Design", category="auth",
+               difficulty="advanced", estimated_minutes=10,
+               description="Rate limiting, input validation, auth tokens, CORS, and API versioning."),
+    CoachTopic(id="logging", title="Security Logging & Monitoring", category="monitoring",
+               difficulty="intermediate", estimated_minutes=7,
+               description="What to log, log injection prevention, SIEM integration, and alerting."),
+    CoachTopic(id="error-handling", title="Secure Error Handling", category="general",
+               difficulty="beginner", estimated_minutes=5,
+               description="Information disclosure through errors, stack traces, and debug endpoints."),
+    CoachTopic(id="zero-trust", title="Zero Trust Architecture", category="general",
+               difficulty="advanced", estimated_minutes=12,
+               description="Principles of zero trust, microsegmentation, and continuous verification."),
+]
+
+_COACH_HISTORY: List[Dict] = []  # In-memory lesson history
+
+
+@router.get("/coach/topics", response_model=List[CoachTopic])
+async def list_coach_topics(category: Optional[str] = None, difficulty: Optional[str] = None):
+    """List available secure coding topics for micro-lessons."""
+    topics = _COACH_TOPICS
+    if category:
+        topics = [t for t in topics if t.category == category]
+    if difficulty:
+        topics = [t for t in topics if t.difficulty == difficulty]
+    return topics
+
+
+@router.get("/coach/history")
+async def get_coach_history(limit: int = 20):
+    """Get recently generated lesson history."""
+    return _COACH_HISTORY[-limit:]
+
+
+@router.post("/coach/lesson/topic/{topic_id}", response_model=SecureCodingLessonResponse)
+async def generate_topic_lesson(topic_id: str):
+    """Generate a micro-lesson for a specific topic from the catalog."""
+    topic = next((t for t in _COACH_TOPICS if t.id == topic_id), None)
+    if not topic:
+        raise HTTPException(status_code=404, detail=f"Topic '{topic_id}' not found")
+
+    # Build a structured lesson from the topic
+    content = f"# {topic.title}\n\n"
+    content += f"**Difficulty**: {topic.difficulty.title()} | **Estimated time**: {topic.estimated_minutes} min\n\n"
+    content += f"## Overview\n{topic.description}\n\n"
+
+    # Topic-specific content
+    _TOPIC_CONTENT = {
+        "injection": (
+            "## What is Injection?\nInjection attacks occur when untrusted data is sent to an interpreter as part of a command or query. The attacker's hostile data tricks the interpreter into executing unintended commands.\n\n"
+            "## Prevention\n1. **Use parameterized queries** (prepared statements)\n2. **Use ORM frameworks** that auto-escape\n3. **Validate all input** on the server side\n4. **Apply least privilege** to database accounts\n5. **Use allowlists** for expected input patterns\n\n"
+            "## Code Example\n```python\n# BAD - vulnerable to SQL injection\nquery = f\"SELECT * FROM users WHERE id = '{user_id}'\"\n\n# GOOD - parameterized query\ncursor.execute(\"SELECT * FROM users WHERE id = %s\", (user_id,))\n```\n"
+        ),
+        "auth-bypass": (
+            "## Authentication Security\nAuthentication is the process of verifying who a user is. Weak authentication leads to unauthorized access.\n\n"
+            "## Best Practices\n1. **Use bcrypt/argon2** for password hashing (never MD5/SHA1)\n2. **Implement MFA** for sensitive operations\n3. **Use secure session tokens** (httpOnly, secure flags)\n4. **Set session timeouts** and implement token rotation\n5. **Rate-limit login attempts** to prevent brute force\n\n"
+            "## Code Example\n```python\n# BAD - weak hashing\nimport hashlib\nhashed = hashlib.md5(password.encode()).hexdigest()\n\n# GOOD - strong hashing\nfrom argon2 import PasswordHasher\nph = PasswordHasher()\nhashed = ph.hash(password)\n```\n"
+        ),
+        "xss": (
+            "## Cross-Site Scripting (XSS)\nXSS attacks inject malicious scripts into web pages viewed by other users.\n\n"
+            "## Types\n- **Reflected**: Malicious input reflected back immediately\n- **Stored**: Payload stored in database, served to all users\n- **DOM-based**: Client-side JavaScript manipulation\n\n"
+            "## Prevention\n1. **Escape output** in HTML context\n2. **Use Content Security Policy** (CSP) headers\n3. **Validate and sanitize** all input\n4. **Use frameworks** that auto-escape (React, Angular)\n\n"
+            "## Code Example\n```javascript\n// BAD - direct HTML insertion\nelement.innerHTML = userInput;\n\n// GOOD - text content (auto-escaped)\nelement.textContent = userInput;\n```\n"
+        ),
+        "secrets": (
+            "## Secrets Management\nHardcoded secrets in source code are one of the most common security vulnerabilities.\n\n"
+            "## Best Practices\n1. **Use environment variables** for configuration\n2. **Use a secrets manager** (Vault, AWS Secrets Manager)\n3. **Never commit secrets** to version control\n4. **Rotate secrets regularly** and on exposure\n5. **Scan for secrets** in CI/CD (git-secrets, trufflehog)\n\n"
+            "## Code Example\n```python\n# BAD - hardcoded secret\nAPI_KEY = \"sk-abc123secret\"\n\n# GOOD - environment variable\nimport os\nAPI_KEY = os.getenv(\"API_KEY\")\nassert API_KEY, \"API_KEY environment variable required\"\n```\n"
+        ),
+    }
+
+    specific = _TOPIC_CONTENT.get(topic_id, "")
+    if specific:
+        content += specific
+    else:
+        content += f"## Key Concepts\n{topic.description}\n\n"
+        content += "## Best Practices\n1. Follow the principle of least privilege\n2. Validate all input\n3. Keep dependencies up to date\n4. Monitor and log security events\n5. Conduct regular security reviews\n"
+
+    lesson = SecureCodingLessonResponse(
+        title=topic.title,
+        content=content,
+        duration_minutes=topic.estimated_minutes,
+        focus_vulnerabilities=[topic.category],
+        code_examples=[],
+        references=["OWASP Secure Coding Practices", "CWE Top 25"],
+    )
+
+    # Save to history
+    _COACH_HISTORY.append({
+        "topic_id": topic_id, "title": topic.title,
+        "generated_at": datetime.utcnow().isoformat(),
+        "duration_minutes": topic.estimated_minutes,
+    })
+
+    return lesson
 
 
 @router.get("/health")

@@ -6,6 +6,8 @@ import AgentSecurity from './AgentSecurity';
 import ToolsFrameworks from './ToolsFrameworks';
 import PostureRisk from './PostureRisk';
 import Vulnerabilities from './Vulnerabilities';
+import ComplianceTracker from './ComplianceTracker';
+import SecureCodingCoach from './SecureCodingCoach';
 
 export default function Cybersecurity() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -38,25 +40,9 @@ export default function Cybersecurity() {
       case 'vulnerabilities':
         return <Vulnerabilities />;
       case 'coach':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👨‍🏫</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Secure Coding Coach
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - AI-powered secure coding guidance and micro-lessons</p>
-          </div>
-        );
+        return <SecureCodingCoach />;
       case 'compliance':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Compliance Tracker
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - NIST, ISO, OWASP compliance tracking</p>
-          </div>
-        );
+        return <ComplianceTracker />;
       case 'drills':
         return (
           <div style={{ padding: '2rem', textAlign: 'center' }}>
