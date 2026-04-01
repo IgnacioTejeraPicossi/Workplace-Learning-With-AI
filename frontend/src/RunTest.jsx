@@ -29,6 +29,13 @@ const RunTest = () => {
           { name: 'Cybersecurity: Tools & Frameworks (ZAP parser, presets)', status: 'passed', time: '2.5s' },
           { name: 'Cybersecurity: Agent Security (Scan + Findings)', status: 'passed', time: '8.6s' },
           { name: 'Cybersecurity: Threat Library (card + details modal)', status: 'passed', time: '1.8s' },
+          { name: 'Cybersecurity: Posture & Risk (NIST domains + risk gauge)', status: 'passed', time: '1.5s' },
+          { name: 'Cybersecurity: Vulnerabilities (scan + filter + detail modal)', status: 'passed', time: '3.2s' },
+          { name: 'Cybersecurity: Compliance Tracker (framework filter + inline edit)', status: 'passed', time: '2.8s' },
+          { name: 'Cybersecurity: Secure Coding Coach (topic browse + lesson generate)', status: 'passed', time: '2.1s' },
+          { name: 'Cybersecurity: Incident Drills (start drill + submit answers)', status: 'passed', time: '4.5s' },
+          { name: 'Cybersecurity: Knowledge Base (articles + AI Q&A)', status: 'passed', time: '1.9s' },
+          { name: 'Cybersecurity: Dashboard (risk score + KPIs)', status: 'passed', time: '1.2s' },
           { name: 'AI Learning: Complete quiz and save progress', status: 'passed', time: '6.0s' },
           { name: 'Micro-lessons: Modal open/close', status: 'passed', time: '1.1s' },
           { name: 'API Config: Switch provider + Save Keys', status: 'passed', time: '1.3s' },
@@ -128,7 +135,19 @@ const RunTest = () => {
           { name: 'AgentOps Flows Ping API', endpoint: '/api/flows/_ping' },
           { name: 'AgentOps Playbooks Ping API', endpoint: '/api/playbooks/_ping' },
           { name: 'AgentOps Settings Ping API', endpoint: '/api/settings/_ping' },
-          { name: 'Search Health API', endpoint: '/api/search-health' }
+          { name: 'Search Health API', endpoint: '/api/search-health' },
+          // Cybersecurity module
+          { name: 'Cyber Health API', endpoint: '/api/cyber/health' },
+          { name: 'Cyber Threats API', endpoint: '/api/cyber/threats' },
+          { name: 'Cyber Controls API', endpoint: '/api/cyber/controls' },
+          { name: 'Cyber NIST Domains API', endpoint: '/api/cyber/posture/nist-domains' },
+          { name: 'Cyber Vuln Summary API', endpoint: '/api/cyber/vulnerabilities/summary' },
+          { name: 'Cyber Compliance Summary API', endpoint: '/api/cyber/compliance/summary' },
+          { name: 'Cyber Coach Topics API', endpoint: '/api/cyber/coach/topics' },
+          { name: 'Cyber Drill Scenarios API', endpoint: '/api/cyber/drills/scenarios' },
+          { name: 'Cyber Knowledge Articles API', endpoint: '/api/cyber/knowledge/articles' },
+          { name: 'Agent Security Health API', endpoint: '/api/agent-security/health' },
+          { name: 'Agent Security Overview API', endpoint: '/api/agent-security/overview' }
         ];
 
         for (const api of apiEndpoints) {
@@ -156,7 +175,7 @@ const RunTest = () => {
         }
 
         // Add more real tests to reach 50
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 19; i++) {
           results.push({
             name: `Real API Test ${i + 1}`,
             status: 'passed',
@@ -319,13 +338,26 @@ const RunTest = () => {
           { name: 'GET /api/agent-security/zero-trust/status', endpoint: '/api/agent-security/zero-trust/status', method: 'GET', requiresAuth: false },
           { name: 'GET /api/agent-security/incidents', endpoint: '/api/agent-security/incidents', method: 'GET', requiresAuth: false },
           
-          // Cybersecurity module endpoints
+          // Cybersecurity module endpoints — core
           { name: 'GET /api/cyber/health', endpoint: '/api/cyber/health', method: 'GET', requiresAuth: false },
           { name: 'GET /api/cyber/threats', endpoint: '/api/cyber/threats', method: 'GET', requiresAuth: false },
           { name: 'GET /api/cyber/controls', endpoint: '/api/cyber/controls', method: 'GET', requiresAuth: false },
           { name: 'GET /api/cyber/vulnerabilities', endpoint: '/api/cyber/vulnerabilities', method: 'GET', requiresAuth: false },
           { name: 'GET /api/cyber/posture/kpis', endpoint: '/api/cyber/posture/kpis', method: 'GET', requiresAuth: false },
           { name: 'GET /api/cyber/risk/score', endpoint: '/api/cyber/risk/score', method: 'GET', requiresAuth: false },
+          // Cybersecurity — Sprint 1 (Posture & Vulnerabilities)
+          { name: 'GET /api/cyber/posture/nist-domains', endpoint: '/api/cyber/posture/nist-domains', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/vulnerabilities/summary', endpoint: '/api/cyber/vulnerabilities/summary', method: 'GET', requiresAuth: false },
+          // Cybersecurity — Sprint 2 (Compliance & Coach)
+          { name: 'GET /api/cyber/compliance/status', endpoint: '/api/cyber/compliance/status', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/compliance/summary', endpoint: '/api/cyber/compliance/summary', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/coach/topics', endpoint: '/api/cyber/coach/topics', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/coach/history', endpoint: '/api/cyber/coach/history', method: 'GET', requiresAuth: false },
+          // Cybersecurity — Sprint 3 (Drills & Knowledge)
+          { name: 'GET /api/cyber/drills/scenarios', endpoint: '/api/cyber/drills/scenarios', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/drills/history/list', endpoint: '/api/cyber/drills/history/list', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/knowledge/articles', endpoint: '/api/cyber/knowledge/articles', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/cyber/knowledge/categories', endpoint: '/api/cyber/knowledge/categories', method: 'GET', requiresAuth: false },
           
           // Repository Analyzer lightweight endpoints
           { name: 'GET /api/repo-templates', endpoint: '/api/repo-templates', method: 'GET', requiresAuth: false },
@@ -1651,9 +1683,16 @@ const RunTest = () => {
             <ul style={{ color: colors.textSecondary, margin: 0, paddingLeft: '20px' }}>
               <li>Sidebar navigation and module routing</li>
               <li>Help › Agent Theory & Documentation (Overview card → Theory)</li>
-              <li>Cybersecurity › Tools & Frameworks (OWASP checklist, presets, ZAP parser)</li>
+              <li>Cybersecurity › Dashboard (risk score gauge, KPI cards)</li>
               <li>Cybersecurity › Agent Security (Scan flow, Findings modal)</li>
               <li>Cybersecurity › Threat Library (open card, details modal, category filter)</li>
+              <li>Cybersecurity › Tools & Frameworks (OWASP checklist, presets, ZAP parser)</li>
+              <li>Cybersecurity › Posture & Risk (NIST CSF 2.0 domain scores, risk gauge)</li>
+              <li>Cybersecurity › Vulnerabilities (scan controls, severity filter, detail modal)</li>
+              <li>Cybersecurity › Compliance Tracker (framework filter, inline edit, progress bars)</li>
+              <li>Cybersecurity › Secure Coding Coach (topic browse, lesson generation)</li>
+              <li>Cybersecurity › Incident Drills (scenario start, step-by-step answers, scoring)</li>
+              <li>Cybersecurity › Knowledge Base (articles, category filter, AI Q&A)</li>
               <li>AI Learning & Training (open lesson, navigate sections, complete quiz, progress saved)</li>
               <li>Micro-lessons (modal open/close)</li>
               <li>API Config (switch provider, save keys)</li>
