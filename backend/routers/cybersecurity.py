@@ -522,6 +522,54 @@ async def get_compliance_status(framework: Optional[str] = None):
     
     return mock_status
 
+@router.get("/vulnerabilities/summary")
+async def get_vulnerability_summary(project: str = "default"):
+    """Get vulnerability counts by severity for summary cards."""
+    vulns = [v for v in _MOCK_VULNERABILITIES if v.project == project]
+    counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "INFO": 0}
+    for v in vulns:
+        sev = v.severity.value if hasattr(v.severity, "value") else str(v.severity)
+        counts[sev] = counts.get(sev, 0) + 1
+    return {
+        "total": len(vulns),
+        "open": sum(1 for v in vulns if not v.fixed),
+        "fixed": sum(1 for v in vulns if v.fixed),
+        "by_severity": counts,
+    }
+
+
+@router.get("/posture/nist-domains")
+async def get_nist_domain_scores():
+    """Get scores per NIST CSF 2.0 domain for radar/posture visualization.
+
+    Domains: Govern, Identify, Protect, Detect, Respond, Recover.
+    Scores are 0-100 (higher = better posture in that domain).
+    """
+    # In a production system these would be computed from compliance data,
+    # vulnerability counts, incident metrics, etc. For now, realistic defaults
+    # derived from the existing KPIs and controls.
+    kpis = {k.kpi: k.value for k in _MOCK_KPIS}
+    compliance = kpis.get("compliance_coverage", 78.5)
+
+    # Derive scores: Protect penalised by open vulns, Detect by patch latency, etc.
+    open_vulns_penalty = min(30, kpis.get("open_high_vulns", 0) * 10)
+    patch_penalty = min(20, kpis.get("patch_latency_days", 0) * 3)
+
+    domains = {
+        "Govern":   round(min(100, compliance + 5), 1),
+        "Identify": round(min(100, compliance + 2), 1),
+        "Protect":  round(max(40, 90 - open_vulns_penalty), 1),
+        "Detect":   round(max(40, 85 - patch_penalty), 1),
+        "Respond":  75.0,   # based on incident response readiness (static for now)
+        "Recover":  70.0,   # based on backup/DR readiness (static for now)
+    }
+    return {
+        "domains": domains,
+        "overall": round(sum(domains.values()) / len(domains), 1),
+        "updated_at": datetime.utcnow().isoformat(),
+    }
+
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint for cybersecurity module"""

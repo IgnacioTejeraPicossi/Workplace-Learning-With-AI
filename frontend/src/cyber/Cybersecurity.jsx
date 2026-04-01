@@ -4,6 +4,8 @@ import CyberDashboard from './CyberDashboard';
 import ThreatLibrary from './ThreatLibrary';
 import AgentSecurity from './AgentSecurity';
 import ToolsFrameworks from './ToolsFrameworks';
+import PostureRisk from './PostureRisk';
+import Vulnerabilities from './Vulnerabilities';
 
 export default function Cybersecurity() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -32,25 +34,9 @@ export default function Cybersecurity() {
       case 'tools':
         return <ToolsFrameworks />;
       case 'posture':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📈</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Posture & Risk Assessment
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - Advanced risk analysis and posture monitoring</p>
-          </div>
-        );
+        return <PostureRisk />;
       case 'vulnerabilities':
-        return (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>
-              Vulnerability Management
-            </h2>
-            <p style={{ color: '#6b7280' }}>Coming soon - Advanced vulnerability scanning and management</p>
-          </div>
-        );
+        return <Vulnerabilities />;
       case 'coach':
         return (
           <div style={{ padding: '2rem', textAlign: 'center' }}>

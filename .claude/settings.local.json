@@ -9,7 +9,8 @@
       "Bash(pip show:*)",
       "Bash(pip install:*)",
       "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py -v --tb=short -q)",
-      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py::test_enhanced_screen_rejects_empty_turns -v --tb=long)"
+      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py::test_enhanced_screen_rejects_empty_turns -v --tb=long)",
+      "Bash(python -c \":*)"
     ]
   }
 }
