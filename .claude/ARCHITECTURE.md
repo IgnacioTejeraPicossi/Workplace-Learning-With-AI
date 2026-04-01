@@ -56,7 +56,7 @@
 | `prompts_editor.py` | 213 | Prompt CRUD |
 | `council_execute.py` | 319 | Council agent orchestration |
 | `opsx_execute.py` | 332 | Operations excellence |
-| `cybersecurity.py` | 393 | Cybersecurity scanning |
+| `cybersecurity.py` | 1499 | Cybersecurity platform (10 sub-modules) |
 | `hologram_agent.py` | 233 | Voice/avatar agent |
 | `productivity_agent.py` | 246 | Productivity workflows |
 | `grc_execute.py` | 219 | Governance/risk/compliance |
@@ -116,7 +116,7 @@
 | Robomind Clinic | `RobomindClinic/` | AI therapy clinic UI |
 | AgentOps Studio | `AgentOpsStudio/` | Workflow orchestration UI |
 | EA Agent | `ea/` (6 components) | Enterprise architecture tools |
-| Cyber | `cyber/` (5 components) | Cybersecurity dashboard |
+| Cyber | `cyber/` (11 components) | Full cybersecurity platform (dashboard, threats, vulns, compliance, coach, drills, knowledge) |
 | Hologram Agent | `components/hologram/` | 3D avatar voice interaction |
 | Sales Agent | `sales-agent/` | Sales assistant UI |
 | Council Agent | `council-agent/` | Council debate orchestration |

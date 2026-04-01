@@ -30,6 +30,7 @@
 | **AI & Agents** | AgentOps Studio, Repository Analyzer, Document Analyzer, Agentic RAG, AI Study Buddy |
 | **Workplace Learning** | AI concepts, micro-lessons, recommendations, scenario simulator, certifications |
 | **Enterprise & Operations** | EA Dashboard, Process Designer, Catalog Manager, Heatmap View, Impact Analysis |
+| **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, AI experimentation |
 
 ---
@@ -75,7 +76,18 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-## 🔄 Recent Work (2024–2025)
+## 🔄 Recent Work (2024–2026)
+
+### Cybersecurity Module (April 2026)
+
+Full implementation of the 10-tab Cybersecurity platform across 3 sprints:
+- **Sprint 1**: Posture & Risk (NIST CSF 2.0 domain scores, risk gauge) + Vulnerabilities (real npm/pip/secret scanning)
+- **Sprint 2**: Compliance Tracker (22 controls, 5 frameworks, inline editing) + Secure Coding Coach (10 topics with rich lessons)
+- **Sprint 3**: Incident Drills (6 scenarios with step-by-step feedback) + Knowledge Base (8 articles + AI Q&A)
+- **Bugfixes**: MongoDB persistence for Agent Security, real vulnerability scanners with graceful fallback
+
+Backend: `backend/routers/cybersecurity.py` (1499 lines) + `agent_security.py` (785 lines)
+Frontend: `frontend/src/cyber/` (11 components)
 
 ### Automatic Testing and AI Validation
 

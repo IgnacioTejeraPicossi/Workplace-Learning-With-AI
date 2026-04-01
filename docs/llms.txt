@@ -80,6 +80,32 @@ Backend endpoints:
 Purpose:
 - architectural-aware README generation + learning module creation.
 
+### Cybersecurity Module
+Backend router: `backend/routers/cybersecurity.py` (1499 lines)
+Agent security: `backend/routers/agent_security.py` (785 lines)
+Models: `backend/models/cyber_models.py`
+Frontend: `frontend/src/cyber/` (11 components)
+
+10 sub-tabs — all implemented:
+- Dashboard, Agent Security, Threat Library, Tools & Frameworks
+- Posture & Risk, Vulnerabilities, Secure Coding Coach
+- Compliance Tracker, Incident Drills, Knowledge Base
+
+Key API groups (`/api/cyber/`):
+- `/threats`, `/controls` — 4 threats, 22 controls across 5 frameworks
+- `/vulnerabilities/*`, `/vulnerabilities/scan` — real npm/pip/secret scanning
+- `/posture/kpis`, `/posture/nist-domains`, `/risk/score` — NIST CSF 2.0
+- `/compliance/status`, `/compliance/summary`, `PUT /compliance/{fw}/{ctrl}` — 22 controls
+- `/coach/topics`, `/coach/lesson/topic/{id}`, `/coach/history` — 10 topics
+- `/drills/scenarios`, `/drills/start/{id}`, `/drills/{id}/action` — 6 scenarios
+- `/knowledge/articles`, `/rag/ask` — 8 articles + Q&A
+
+Agent Security (`/api/agent-security/`):
+- `/overview`, `/scan`, `/incidents`, `/incidents/{id}/respond`
+- Uses MongoDB (`security_events`, `agent_security_status`) with mock fallback
+
+Data: in-memory (resets on restart) except Agent Security (MongoDB).
+
 ## MCP (Postman / Claude)
 - Manifest: `GET http://localhost:8000/api/mcp/manifest`
 - Bridge: `backend/mcp_bridge_server.py` (STDIO JSON-RPC)

@@ -6207,59 +6207,109 @@ graph TB
 
 #### Backend Architecture
 ```python
-# FastAPI Router Structure
-/api/cyber/
-├── /threats              # GET threats, GET threat by ID
-├── /controls             # GET controls, GET control by ID
-├── /vulnerabilities      # GET vulnerabilities, POST scan
-├── /posture/kpis         # GET security KPIs
-├── /risk/score          # GET risk assessment
-├── /rag/ask             # POST cybersecurity Q&A
-├── /coach/lesson        # POST secure coding lessons
-├── /compliance/status   # GET compliance status
-└── /health              # GET module health
+# FastAPI Router Structure — /api/cyber/ (1499 lines)
+#
+# Core data
+├── /threats                              # GET — 4 threats with CIA impact
+├── /threats/{id}                         # GET — specific threat
+├── /controls                             # GET — 22 controls across 5 frameworks (?framework=)
+├── /controls/{id}                        # GET — specific control
+#
+# Vulnerability management (real scanning)
+├── /vulnerabilities                      # GET — list (?project=&severity=)
+├── /vulnerabilities/scan                 # POST — real npm audit, pip-audit, git secret scan
+├── /vulnerabilities/summary              # GET — severity counts, open/fixed totals
+#
+# Posture & Risk
+├── /posture/kpis                         # GET — 3 KPIs with targets
+├── /posture/nist-domains                 # GET — NIST CSF 2.0 six domain scores
+├── /risk/score                           # GET — overall 0-100 with factors & trend
+#
+# Compliance Tracker (22 controls, 5 frameworks)
+├── /compliance/status                    # GET — all statuses (?framework=)
+├── /compliance/{fw}/{ctrl}               # PUT — update status/evidence/reviewer
+├── /compliance/summary                   # GET — counts per framework, overall %
+#
+# Secure Coding Coach (10 topics)
+├── /coach/topics                         # GET — catalog (?category=&difficulty=)
+├── /coach/lesson/topic/{id}              # POST — generate rich markdown lesson
+├── /coach/history                        # GET — lesson generation history
+#
+# Incident Response Drills (6 scenarios)
+├── /drills/scenarios                     # GET — scenario catalog (?category=&difficulty=)
+├── /drills/start/{scenario_id}           # POST — start drill, returns session + first step
+├── /drills/{session_id}                  # GET — current drill state
+├── /drills/{session_id}/action           # POST — submit answer, get feedback + next step
+├── /drills/history/list                  # GET — completed drill history
+#
+# Knowledge Base (8 articles + Q&A)
+├── /knowledge/articles                   # GET — articles (?category=&difficulty=&search=)
+├── /knowledge/articles/{id}              # GET — full article with markdown content
+├── /knowledge/categories                 # GET — category list with counts
+├── /rag/ask                              # POST — cybersecurity Q&A
+#
+└── /health                               # GET — module health check
 ```
 
-#### Data Models
+#### Agent Security Router (`/api/agent-security/` — 785 lines)
+```python
+├── /overview                             # GET — agent security dashboard data
+├── /agents/{name}/status                 # GET — specific agent status
+├── /scan                                 # POST — run security scan on agents
+├── /threat-detection                     # POST — detect threats in agent interactions
+├── /incidents                            # GET — list security incidents
+├── /incidents/{id}/respond               # POST — respond to incident (persists to MongoDB)
+├── /agents/{name}/behavior-analysis      # GET — behavior pattern analysis
+├── /agents/{name}/model-integrity        # GET — model integrity check
+├── /agents/{name}/data-protection-audit  # GET — data protection audit
+├── /threat-feed                          # GET — real-time threat intelligence
+├── /zero-trust/status                    # GET — Zero Trust architecture status
+└── /health                               # GET — module health check
+```
+
+#### Data Models (`cyber_models.py` — 13 models)
 - **Threat**: ID, name, category, CIA impact, description, controls, tags
-- **ControlMap**: Framework controls with implementation guidance
+- **ControlMap**: Framework controls with implementation guidance (22 controls)
 - **Vulnerability**: Source, severity, package, CVE, recommendations
-- **RiskScore**: Overall score, factors, trend analysis
+- **RiskScore**: Overall score 0-100, factors, trend analysis
 - **PostureKPI**: Key performance indicators with targets
+- **ComplianceStatus**: Framework, control_id, status, evidence, reviewer
+- **ComplianceUpdateRequest**: Status update input model
+- **CoachTopic**: Topic catalog with category, difficulty, estimated time
+- **DrillScenario**: Incident drill with category, difficulty, steps count
+- **DrillStep**: Step with situation, 4 options, correct answer, explanation
+- **DrillSession**: Active drill with score tracking and action history
+- **KnowledgeArticle**: Article with category, markdown content, tags
 
-#### Frontend Components
-- **Cybersecurity.jsx**: Main module container with tab navigation
-- **CyberDashboard.jsx**: Risk score, KPIs, vulnerability overview
-- **ThreatLibrary.jsx**: Interactive threat database with filtering
-- **Integration**: Seamless integration with existing UI patterns
+#### Frontend Components (`frontend/src/cyber/` — 11 files)
 
-### API Endpoints
+| Component | Description |
+|-----------|-------------|
+| `Cybersecurity.jsx` | Main container with 10-tab navigation (no more "Coming soon" placeholders) |
+| `CyberDashboard.jsx` | Risk score gauge, KPI cards, vulnerability overview |
+| `AgentSecurity.jsx` | Agent monitoring, Zero Trust, real scans, incident response |
+| `ThreatLibrary.jsx` | Interactive threat database with CIA impact and control mapping |
+| `ToolsFrameworks.jsx` | NIST CSF 2.0, ISO 27001, CIS, OWASP reference |
+| `PostureRisk.jsx` | NIST CSF 2.0 domain scores (6 bars), risk gauge, KPI cards |
+| `Vulnerabilities.jsx` | Real scan controls, severity filters, sortable table, detail modal |
+| `ComplianceTracker.jsx` | 22 controls matrix, inline editing, progress bars per framework |
+| `SecureCodingCoach.jsx` | 10 topics grid, lesson generator with markdown rendering, history |
+| `IncidentDrills.jsx` | 6 scenarios, step-by-step drill with feedback, scoring, results |
+| `KnowledgeBase.jsx` | 8 articles with reader, category filters, AI Q&A panel |
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/cyber/health` | GET | Module health check |
-| `/api/cyber/threats` | GET | List all threats |
-| `/api/cyber/threats/{id}` | GET | Get specific threat |
-| `/api/cyber/controls` | GET | List security controls |
-| `/api/cyber/vulnerabilities` | GET | List vulnerabilities |
-| `/api/cyber/vulnerabilities/scan` | POST | Run vulnerability scans |
-| `/api/cyber/posture/kpis` | GET | Get security KPIs |
-| `/api/cyber/risk/score` | GET | Calculate risk score |
-| `/api/cyber/rag/ask` | POST | Cybersecurity Q&A |
-| `/api/cyber/coach/lesson` | POST | Generate secure coding lesson |
-| `/api/cyber/compliance/status` | GET | Get compliance status |
-| `/api/agent-security/overview` | GET | Get agent security overview |
-| `/api/agent-security/agents/{name}/status` | GET | Get specific agent security status |
-| `/api/agent-security/scan` | POST | Run security scan on agents |
-| `/api/agent-security/threat-detection` | POST | Detect threats in agent interactions |
-| `/api/agent-security/incidents` | GET | List security incidents |
-| `/api/agent-security/incidents/{id}/respond` | POST | Respond to security incident |
-| `/api/agent-security/agents/{name}/behavior-analysis` | GET | Analyze agent behavior patterns |
-| `/api/agent-security/agents/{name}/model-integrity` | GET | Check model integrity |
-| `/api/agent-security/agents/{name}/data-protection-audit` | GET | Audit data protection compliance |
-| `/api/agent-security/threat-feed` | GET | Get real-time threat intelligence |
-| `/api/agent-security/zero-trust/status` | GET | Get Zero Trust architecture status |
-| `/api/agent-security/health` | GET | Agent security module health check |
+### API Endpoints (summary)
+
+| Endpoint Group | Endpoints | Description |
+|----------------|-----------|-------------|
+| Threats & Controls | 4 | 4 threats, 22 controls across NIST-CSF, ISO-27001, CIS, OWASP-ASVS, OWASP-TOP10 |
+| Vulnerabilities | 3 | List, scan (real npm/pip/secret), summary |
+| Posture & Risk | 3 | KPIs, NIST domain scores, risk score |
+| Compliance | 3 | Status list, update, summary (22 controls) |
+| Secure Coding Coach | 3 | Topics catalog, lesson generation, history |
+| Incident Drills | 4 | Scenarios, start, submit action, history |
+| Knowledge Base | 4 | Articles, article detail, categories, Q&A |
+| Agent Security | 12 | Overview, scans, incidents, behavior, integrity, DLP, Zero Trust |
+| Health | 2 | Module health (cyber + agent-security) |
 
 ### Agent Security Scan (Real checks)
 
@@ -6366,59 +6416,116 @@ Notes and roadmap
 - **Risk Management**: Systematic risk assessment
 - **Continuous Improvement**: PDCA cycle implementation
 
+### Implementation Status
+
+All 10 sub-tabs are now fully implemented (Sprint 1-3 completed April 2026):
+
+| Feature | Status | Sprint |
+|---------|--------|--------|
+| Dashboard | Done | Initial |
+| Agent Security Monitor | Done | Initial |
+| Threat Library | Done | Initial |
+| Tools & Frameworks | Done | Initial |
+| Posture & Risk (NIST CSF 2.0) | Done | Sprint 1 |
+| Vulnerabilities (real scanning) | Done | Sprint 1 |
+| Secure Coding Coach (10 topics) | Done | Sprint 2 |
+| Compliance Tracker (22 controls) | Done | Sprint 2 |
+| Incident Drills (6 scenarios) | Done | Sprint 3 |
+| Knowledge Base (8 articles + Q&A) | Done | Sprint 3 |
+
+Bugfixes applied:
+- Agent Security status now queries MongoDB before falling back to mock
+- Incident response actions now persist to MongoDB
+- Vulnerability scanner uses real npm audit, pip-audit, and regex-based secret scan (with graceful fallback)
+
 ### Future Enhancements
 
-#### Phase 1: Advanced Scanning
+#### Advanced Scanning
 - **Container Security**: Docker image vulnerability scanning
 - **Infrastructure as Code**: Terraform/CloudFormation security analysis
-- **Dependency Management**: Automated dependency updates
 - **License Compliance**: Open source license tracking
 
-#### Phase 2: AI-Powered Security
-- **Threat Intelligence**: Real-time threat feed integration
-- **Behavioral Analysis**: User behavior anomaly detection
+#### AI-Powered Security
+- **Threat Intelligence**: Real-time external threat feed integration
 - **Predictive Security**: AI-powered risk prediction
 - **Automated Response**: Self-healing security controls
-- **Agent Security AI**: Machine learning-based threat detection for AI agents
-- **Zero Trust Automation**: Automated Zero Trust policy enforcement
-- **Model Drift Detection**: AI model performance and integrity monitoring
+- **Model Drift Detection**: AI model performance monitoring with signed baselines
 
-#### Phase 3: Enterprise Integration
+#### Enterprise Integration
 - **SIEM Integration**: Security Information and Event Management
 - **SOAR Integration**: Security Orchestration, Automation and Response
-- **Compliance Automation**: Automated compliance reporting
 - **Executive Dashboards**: C-level security metrics
+
+#### Data Persistence
+- **MongoDB migration**: Move compliance, drills, coach data from in-memory to MongoDB
+- **SSE/WebSocket**: Live refresh for Agent Security monitor
+- **CI integration**: Automated security scanning in pipeline
 
 ### Usage Examples
 
-#### Basic Threat Assessment
+#### Risk Score & Posture
 ```bash
 # Get current risk score
-curl -X GET "http://localhost:8000/api/cyber/risk/score"
+curl http://localhost:8000/api/cyber/risk/score
 
-# Response
-{
-  "overall": 68.35,
-  "factors": {
-    "patch_latency_days": 6.2,
-    "open_high_vulns": 3.0,
-    "compliance_coverage": 78.5
-  },
-  "trend": "stable"
-}
+# Get NIST CSF 2.0 domain scores
+curl http://localhost:8000/api/cyber/posture/nist-domains
 ```
 
-#### Vulnerability Scanning
+#### Vulnerability Scanning (real)
 ```bash
-# Run vulnerability scan
+# Run all scanners (npm audit, pip-audit, secret scan)
 curl -X POST "http://localhost:8000/api/cyber/vulnerabilities/scan" \
   -H "Content-Type: application/json" \
   -d '{"project": "default", "scan_types": ["npm", "pip", "secrets"]}'
+
+# Get vulnerability summary
+curl http://localhost:8000/api/cyber/vulnerabilities/summary
 ```
 
-#### Cybersecurity Q&A
+#### Compliance Tracker
 ```bash
-# Ask cybersecurity question
+# Get compliance summary across all frameworks
+curl http://localhost:8000/api/cyber/compliance/summary
+
+# Update a control status
+curl -X PUT "http://localhost:8000/api/cyber/compliance/NIST-CSF/PR.AC-1" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "implemented", "evidence": "MFA deployed org-wide", "reviewer": "security-team"}'
+```
+
+#### Secure Coding Coach
+```bash
+# Browse topics
+curl http://localhost:8000/api/cyber/coach/topics
+
+# Generate a lesson on SQL injection
+curl -X POST http://localhost:8000/api/cyber/coach/lesson/topic/injection
+```
+
+#### Incident Drills
+```bash
+# List available drill scenarios
+curl http://localhost:8000/api/cyber/drills/scenarios
+
+# Start a ransomware drill
+curl -X POST http://localhost:8000/api/cyber/drills/start/ransomware-attack
+
+# Submit an action (use session_id from start response)
+curl -X POST "http://localhost:8000/api/cyber/drills/{session_id}/action" \
+  -H "Content-Type: application/json" \
+  -d '{"selected_option": "B"}'
+```
+
+#### Knowledge Base & Q&A
+```bash
+# Browse articles
+curl http://localhost:8000/api/cyber/knowledge/articles
+
+# Read a specific article
+curl http://localhost:8000/api/cyber/knowledge/articles/nist-csf-2
+
+# Ask a cybersecurity question
 curl -X POST "http://localhost:8000/api/cyber/rag/ask" \
   -H "Content-Type: application/json" \
   -d '{"question": "How do I prevent SQL injection attacks?"}'

@@ -158,9 +158,74 @@ python -m pytest backend/tests/test_mcp_smoke.py -v  # 4/4
 | Telco | `telco_ops.py` (186L) | `telco-ops-agent/` | Telecom operations |
 | Productivity | `productivity_agent.py` (246L) | `AIProductivityAgent.jsx` | Productivity workflows |
 | Compliance | `compliance_agent.py` | `AIComplianceAgent.jsx` | Compliance checking |
-| Cybersecurity | `cybersecurity.py` (393L) | `cyber/` | Security scanning |
+| Cybersecurity | `cybersecurity.py` (1499L) | `cyber/` (11 components) | Full security platform |
 
 **Shared backend models**: `backend/models/` (13 files for each domain)
+
+---
+
+### Cybersecurity Module (detailed)
+
+The Cybersecurity module is the largest Enterprise Agent, with its own dedicated section due to scope.
+
+**Backend**: `backend/routers/cybersecurity.py` (1499 lines), `backend/routers/agent_security.py` (785 lines)
+**Models**: `backend/models/cyber_models.py` (13 models + enums)
+**Frontend**: `frontend/src/cyber/` (11 components)
+
+**10 Sub-tabs (all implemented):**
+
+| Sub-tab | Component | Backend endpoints | Description |
+|---------|-----------|-------------------|-------------|
+| Dashboard | `CyberDashboard.jsx` | `/risk/score`, `/posture/kpis` | Risk score gauge, KPIs, vulnerability overview |
+| Agent Security | `AgentSecurity.jsx` | `/api/agent-security/*` | Real-time agent monitoring, Zero Trust, scans |
+| Threat Library | `ThreatLibrary.jsx` | `/threats`, `/controls` | 4 threats, 22 controls across 5 frameworks |
+| Tools & Frameworks | `ToolsFrameworks.jsx` | (static reference) | NIST CSF, ISO 27001, CIS, OWASP reference |
+| Posture & Risk | `PostureRisk.jsx` | `/posture/nist-domains`, `/risk/score` | NIST CSF 2.0 domain scores, risk gauge, KPIs |
+| Vulnerabilities | `Vulnerabilities.jsx` | `/vulnerabilities/*`, `/vulnerabilities/scan` | Real npm/pip/secret scanning, filters, detail modal |
+| Secure Coding Coach | `SecureCodingCoach.jsx` | `/coach/topics`, `/coach/lesson/topic/{id}` | 10 topics, lesson generator with markdown, history |
+| Compliance Tracker | `ComplianceTracker.jsx` | `/compliance/*` | 22 controls, inline edit, progress per framework |
+| Incident Drills | `IncidentDrills.jsx` | `/drills/*` | 6 scenarios, step-by-step with feedback, scoring |
+| Knowledge Base | `KnowledgeBase.jsx` | `/knowledge/*`, `/rag/ask` | 8 articles, reader, AI Q&A |
+
+**Key API endpoints (`/api/cyber/`):**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/threats` | GET | List threats (4 items) |
+| `/controls` | GET | List controls (22 across 5 frameworks), filter by `?framework=` |
+| `/vulnerabilities` | GET | List vulns, filter by `?severity=` |
+| `/vulnerabilities/scan` | POST | Real scans: npm audit, pip-audit, secret regex scan |
+| `/vulnerabilities/summary` | GET | Severity counts and open/fixed totals |
+| `/posture/kpis` | GET | Security KPIs with targets |
+| `/posture/nist-domains` | GET | NIST CSF 2.0 six domain scores |
+| `/risk/score` | GET | Overall risk score 0-100 with factors |
+| `/compliance/status` | GET | All compliance statuses, filter by `?framework=` |
+| `/compliance/{fw}/{ctrl}` | PUT | Update status, evidence, reviewer |
+| `/compliance/summary` | GET | Counts per framework, overall completion % |
+| `/coach/topics` | GET | 10 topics catalog, filter by `?category=&difficulty=` |
+| `/coach/lesson/topic/{id}` | POST | Generate rich markdown lesson |
+| `/coach/history` | GET | Lesson generation history |
+| `/drills/scenarios` | GET | 6 drill scenarios, filter by `?category=&difficulty=` |
+| `/drills/start/{id}` | POST | Start drill session, returns first step |
+| `/drills/{session}/action` | POST | Submit answer, get feedback + next step |
+| `/drills/history/list` | GET | Completed drill history |
+| `/knowledge/articles` | GET | 8 articles, filter by `?category=&difficulty=&search=` |
+| `/knowledge/articles/{id}` | GET | Full article content |
+| `/knowledge/categories` | GET | Category list with counts |
+| `/rag/ask` | POST | Cybersecurity Q&A (keyword-based) |
+| `/health` | GET | Module health check |
+
+**Frameworks tracked**: NIST-CSF (6 controls), ISO-27001 (4), CIS (4), OWASP-ASVS (3), OWASP-TOP10 (5)
+
+**Drill scenarios**: Ransomware (4 steps), Phishing (4 steps), Data Breach (5 steps), DDoS (4 steps generic), Insider Threat (4 steps generic), Supply Chain (4 steps generic)
+
+**Knowledge articles**: CIA Triad, NIST CSF 2.0, OWASP Top 10, Zero Trust, Incident Response Lifecycle, SDL, GDPR, Supply Chain Security
+
+**Critical constraints:**
+- Real scanners (npm audit, pip-audit, git secret scan) with graceful fallback to mock
+- Agent Security uses MongoDB (`security_events`, `agent_security_status`) with mock fallback
+- All other data is in-memory (resets on restart) — compliance statuses, drill sessions, coach history
+- No contract tests yet (smoke test recommended: `curl http://localhost:8000/api/cyber/health`)
 
 ---
 
