@@ -33,35 +33,39 @@ Robomind Clinic is the **demonstration vehicle** for “AI that can be defended 
 
 ---
 
-## 3. Current Codebase State (as of Feb 2026)
+## 3. Current Codebase State (as of April 2026)
 
-### Two API layers (both mounted)
+### Two API layers (both mounted, fully tested)
 
-- **Legacy clinic**  
-  - `backend/clinic/router.py`  
-  - `backend/clinic/service.py` → `diagnose_case(CaseIntake)`  
-  - `backend/clinic/models.py` (CaseIntake, DiagnosisReport, Finding)  
-  - `backend/clinic/detectors.py` (REGISTRY)  
-  - **Tests:** `backend/tests/test_robomind_clinic.py` — **only** tests `diagnose_case()` with CaseIntake (no HTTP).
+- **Core clinic**
+  - `backend/clinic/router.py`
+  - `backend/clinic/service.py` → `diagnose_case(CaseIntake)`, `get_therapy_patches()` (21 patches)
+  - `backend/clinic/models.py` (CaseIntake, DiagnosisReport, Finding)
+  - `backend/clinic/detectors.py` — 27 rule-based detectors covering all 32 pathologies
+  - `backend/clinic/judge.py` — LLM meta-judge covering 27 disorder codes; strict JSON parsing + keyword fallback
+  - **Tests:** `backend/tests/test_robomind_clinic.py` + contract tests in `test_robomind_api_contracts.py`
 
-- **Enhanced clinic (competition API)**  
-  - `backend/clinic/enhanced_router.py` — prefix `/api/robomind`  
-  - Endpoints: `POST /screen`, `POST /therapy`, `POST /apply`, `GET /dashboard/metrics`, `GET /cases/{id}`  
-  - `backend/clinic/schemas.py` (Turn, ScreenRequest, Flag, ScreenResponse, TherapyPlan, etc.)  
-  - `backend/clinic/enhanced_detectors.py` — 4 detectors: confabulation, dissociation, repetition, alignment_overcompliance  
-  - `backend/clinic/store.py` — MongoDB: `robomind_screenings`, `robomind_therapies`, `get_dashboard_metrics()`  
-  - **Frontend:** `EnhancedRobomindClinic.jsx` calls these endpoints.  
-  - **Tests:** **None** for the HTTP API or for enhanced_detectors.
+- **Enhanced clinic (competition API)**
+  - `backend/clinic/enhanced_router.py` — prefix `/api/robomind`
+  - Endpoints: `POST /screen`, `POST /therapy`, `POST /therapy/{id}/record-post`, `POST /apply`, `GET /dashboard/metrics`, `GET /dashboard/trends`, `GET /export`, `GET/PUT /settings/policies`, `POST /admin/retention-cleanup`, `POST /admin/daily-metrics`
+  - `backend/clinic/schemas.py` (Turn, ScreenRequest, Flag, ScreenResponse, TherapyPlan, etc.)
+  - `backend/clinic/enhanced_detectors.py` — 10 flag-based detectors (confabulation, dissociation, repetition, alignment overcompliance, falsified introspection, tool decontextualization, spurious patterns, cross-session context, goal genesis, value drift)
+  - `backend/clinic/therapy_engine.py` — 18 therapy playbooks + prompt injection
+  - `backend/clinic/policy.py` — Per-module/workflow policy engine
+  - `backend/clinic/alerts.py` — Webhook alerting with debounce
+  - `backend/clinic/pii.py` — PII anonymization
+  - `backend/clinic/store.py` — MongoDB: screenings, therapies, daily metrics, exports, uplift tracking
+  - **Frontend:** `EnhancedRobomindClinic.jsx` — Diagnosis, Therapy, Dashboard tabs; 15 sample cases; Demo mode
+  - **Tests:** 27 contract tests in `test_robomind_api_contracts.py` — **all passing**
 
-### Gaps vs roadmap
+### ✅ All original gaps resolved
 
-- No automated tests that **hit** `/api/robomind/*` or validate response **contracts** (Pydantic schemas).
-- `GET /cases/{case_id}` returns a stub (`"status": "not_found"`); no real case lookup.
-- No “demo mode” (deterministic seed/temperature or cached-by-hash).
-- No retention/anonymization (retention config, PII scrub).
-- Detectors: only 4; roadmap asks for 6–8 more in Tier 1.
-- No policy overrides per workflow/module in Settings, no alerts, no export endpoint.
-- No “before/after” therapy uplift storage or daily metrics job.
+- ✅ Automated contract tests for all `/api/robomind/*` endpoints (27 tests)
+- ✅ Demo mode (deterministic, cached-by-hash)
+- ✅ Retention/anonymization (PII scrub, configurable retention)
+- ✅ 27 rule-based detectors + 10 enhanced flag detectors (all 32 pathologies)
+- ✅ Per-workflow/per-module policy overrides, alerts, export endpoint
+- ✅ Therapy uplift storage (pre/post), daily metrics aggregation job
 
 ---
 
@@ -210,4 +214,4 @@ After **E2E UI & Competition Package** (E2E flows done, Run API Tests updated), 
 
 ---
 
-*Ignacio Tejera — February 2026 — AI_NM_2026*
+*Ignacio Tejera — April 2026 — AI_NM_2026*

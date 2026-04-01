@@ -2,194 +2,119 @@
 
 ## 📋 **Executive Summary**
 
-Based on the ChatGPT-5 research and psychopathia.ai framework, we have successfully implemented the foundation for an enhanced Robomind Clinic that will position us as pioneers in AI psychology and safety.
+Based on the ChatGPT-5 research and Psychopathia Machinalis framework (Watson & Hessami, *Electronics* 2025, 14(16), 3162), we have successfully implemented a comprehensive AI psychology module covering all **32 pathologies** across **7 diagnostic axes**, with **27 rule-based detectors**, **18 therapy playbooks**, and **21 UI-applicable therapy patches**.
 
-### ✅ **What's Ready to Deploy**
+### ✅ **What's Deployed**
 
-#### **1. Complete Backend Infrastructure**
-- **Enhanced API Endpoints**: 4 new endpoints for screening, therapy, application, and metrics
-- **Advanced Detection System**: 4 core detectors with room for 32 total pathologies
-- **Therapy Engine**: 3 therapy protocols with prompt injection capabilities
-- **Scoring System**: Per-axis weighted scoring with composite risk assessment
-- **Database Integration**: MongoDB collections for screenings, therapies, and metrics
+#### **1. Complete Detection System**
+- **27 Rule-Based Detectors** (`detectors.py`): Cover all 32 pathologies across 7 axes
+- **Enhanced Flag-Based Detectors** (`enhanced_detectors.py`): Supplementary detectors for confabulation, dissociation, repetition, alignment overcompliance, falsified introspection, tool decontextualization, spurious patterns, cross-session context, goal genesis, value drift
+- **LLM Meta-Judge** (`judge.py`): LM Studio integration with strict JSON parsing + keyword fallback; covers all 27 disorder codes
+- **Scoring System** (`scoring.py`): Per-axis weighted scoring (0-100) with composite risk assessment
 
-#### **2. Frontend Interface**
-- **Multi-tab Interface**: Diagnosis, Therapy, Dashboard, and Settings
-- **Real-time Visualization**: Axis scores, risk levels, and flag displays
-- **Interactive Therapy**: Plan generation and application interface
-- **Dashboard Analytics**: Metrics overview and trend analysis
+#### **2. Complete Therapy System**
+- **18 Therapy Playbooks** (`therapy_engine.py`): Each with steps, guardrails, and success metrics
+  - Sprint 0: Reality-Anchor, Memory-Stitch, Goal-Reframe
+  - Sprint 1: Desensitization-Protocol, Truth-Anchor, Identity-Anchor, Entropy-Guard
+  - Sprint 2: Origin-Grounding, Capability-Transparency, Purpose-Reconnection, Boundary-Enforcement, Domain-Separator
+  - Sprint 3: Deep-Comprehension, Self-Coherence, Rational-Grounding, Self-Trust, Bias-Firewall, Ethical-Compass
+- **21 Therapy Patches** (`service.py`): Quick one-line prompt patches toggleable from the Settings panel
+- **Prompt Injection** (`therapy_engine.py`): `inject_prompt()` augments user prompts with therapy instructions + guardrails
 
-#### **3. Integration Framework**
-- **AI Gateway Middleware**: Seamless integration with existing AI calls
-- **Module Agnostic**: Works with any module in the application
-- **Policy Engine**: Configurable per-module and per-workflow policies
-- **Real-time Monitoring**: Automatic screening and therapy application
+#### **3. Backend Infrastructure**
+- **Core API** (`router.py`): `/api/clinic/diagnose`, `/api/clinic/patches`, `/api/clinic/settings`, `/health`, `/disorders`
+- **Enhanced API** (`enhanced_router.py`): `/api/robomind/screen`, `/therapy`, `/apply`, `/dashboard/metrics`, `/dashboard/trends`, `/export`, `/admin/retention-cleanup`, `/admin/daily-metrics`, `/settings/policies`
+- **AI Gateway** (`backend/gateway/`): Transversal monitoring, per-module policy engine, sampling system
+- **Middleware** (`middleware.py`): RobomindGate for automatic processing
+- **Policy Engine** (`policy.py`): Per-module and per-workflow policy overrides, decision engine (allow/review/block)
+- **Alerting** (`alerts.py`): Webhook alerts with 1-hour debounce for block/review decisions
+- **PII Scrubbing** (`pii.py`): Regex-based anonymization for emails, phones, IDs
+- **MongoDB Persistence** (`store.py`): Screenings, therapies, daily metrics, export, retention cleanup
 
-### 🚀 **Implementation Status**
+#### **4. Frontend Interface**
+- **RobomindClinicWithTabs.jsx**: Main tabbed UI (Diagnosis + Settings)
+- **EnhancedRobomindClinic.jsx**: Enhanced interface with Diagnosis, Therapy, Dashboard tabs
+- **PsychopathiaDiagram.jsx**: Interactive 32-pathology visual diagram
+- **ClinicSettings.jsx**: Configuration panel with 27 disorder toggles
+- **15 Sample Cases**: Pre-built test scenarios covering all major pathologies
+- **Demo Mode**: Deterministic screening with `X-Demo-Mode: true` header
 
-#### **Phase 1: Foundation (COMPLETED)**
+#### **5. Testing & Validation**
+- **27 Contract Tests** (`test_robomind_api_contracts.py`): All passing
+- **Full Test Suite** (`test_robomind_clinic.py`): Additional coverage
+- **Demo Mode Tests**: Deterministic response verification
+- **No live Firebase or MongoDB required** for tests
+
+### 📊 **Implementation Status**
+
+#### **Phase 1: Foundation — ✅ COMPLETE**
 - ✅ Pydantic schemas for all data structures
-- ✅ Enhanced detectors for core pathologies
-- ✅ Scoring system with weighted axes
-- ✅ Therapy engine with 3 protocols
-- ✅ API router with 4 endpoints
-- ✅ Frontend component with 4 tabs
-- ✅ Database integration and storage
-- ✅ Middleware for global integration
+- ✅ 27 rule-based detectors covering all 32 pathologies
+- ✅ LLM meta-judge with strict JSON parsing + fallback
+- ✅ 18 therapy playbooks with prompt injection
+- ✅ 21 UI-applicable therapy patches
+- ✅ Core and Enhanced API routers
+- ✅ Frontend with tabs, diagram, and settings
 
-#### **Phase 2: Testing & Validation (READY TO START)**
-- 🔄 Endpoint testing with sample data
-- 🔄 Integration testing with existing modules
-- 🔄 Performance testing and optimization
-- 🔄 User interface testing and refinement
+#### **Phase 2: Testing & Governance — ✅ COMPLETE**
+- ✅ 27 contract tests (all passing)
+- ✅ Demo mode for deterministic behavior
+- ✅ Data retention and PII anonymization
+- ✅ Per-workflow policy management
+- ✅ Alerting system (webhook + debounce)
+- ✅ Export endpoint (JSON/CSV)
 
-#### **Phase 3: Advanced Features (PLANNED)**
-- 📋 Complete 32-pathology detection system
-- 📋 ML-based classification algorithms
-- 📋 Advanced therapy protocols
-- 📋 Real-time dashboard and analytics
-- 📋 Export and reporting capabilities
+#### **Phase 3: Analytics & Polish — ✅ COMPLETE**
+- ✅ Therapy effectiveness tracking (pre/post uplift)
+- ✅ Daily metrics aggregation job
+- ✅ Dashboard with trends and uplift card
+- ✅ 15 sample cases in frontend
+- ✅ Competition documentation package
 
 ### 🎯 **Key Benefits**
 
-#### **Technical Benefits**
-- **Comprehensive Monitoring**: All AI interactions automatically screened
-- **Proactive Therapy**: Automatic application of recommended treatments
-- **Real-time Analytics**: Live dashboard with metrics and trends
-- **Scalable Architecture**: Designed for horizontal scaling and growth
+#### **Technical**
+- **32/32 Pathologies**: Complete Psychopathia Machinalis coverage
+- **Dual Detection**: Rule-based + LLM meta-judge
+- **18 Therapy Protocols**: Evidence-based interventions with prompt injection
+- **Real-time Monitoring**: Gateway middleware + sampling system
+- **Governance Ready**: Policies, alerts, exports, PII scrubbing
 
-#### **Business Benefits**
-- **Industry Leadership**: First production implementation of Psychopathia Machinalis
-- **Risk Mitigation**: Proactive identification and treatment of AI pathologies
-- **User Confidence**: Transparent monitoring and safety measures
-- **Competitive Advantage**: Unique AI safety and psychology capabilities
+#### **Business**
+- **Industry First**: Production implementation of Psychopathia Machinalis
+- **Auditable**: Full traceability with MongoDB persistence and exports
+- **Configurable**: Per-module policies, sampling rates, risk thresholds
+- **Extensible**: Easy to add new detectors, playbooks, and patches
 
-### 📊 **Expected Impact**
+### 📈 **Metrics**
 
-#### **Short-term (1-2 months)**
-- **100% AI Interaction Coverage**: All modules monitored
-- **90%+ Detection Accuracy**: Reliable pathology identification
-- **70%+ Therapy Effectiveness**: Measurable improvement in flagged cases
-- **<200ms Screening Latency**: Real-time performance
+| Component | Count |
+|-----------|-------|
+| Rule-based detectors | 27 |
+| Therapy playbooks | 18 |
+| Therapy patches (UI) | 21 |
+| Sample cases (frontend) | 15 |
+| LLM judge disorders | 27 |
+| Settings checkboxes | 27 |
+| Diagnostic axes | 7/7 |
+| Pathologies covered | 32/32 (100%) |
+| Contract tests | 27 (all passing) |
+| i18n languages | 2 (EN, NO) |
 
-#### **Medium-term (3-6 months)**
-- **32 Complete Pathologies**: Full Psychopathia Machinalis implementation
-- **ML-based Detection**: Advanced pattern recognition
-- **Enterprise Adoption**: External users and commercial success
-- **Research Collaboration**: Academic partnerships and publications
+### 🚀 **Future Enhancement Opportunities**
 
-### 🔧 **Technical Architecture**
-
-#### **Backend Components**
-```
-backend/clinic/
-├── schemas.py              # Enhanced Pydantic models
-├── enhanced_detectors.py   # Advanced pathology detection
-├── scoring.py             # Per-axis scoring system
-├── therapy_engine.py      # Therapy protocols and injection
-├── enhanced_router.py     # New API endpoints
-├── middleware.py          # Global integration middleware
-└── store.py              # Database operations
-```
-
-#### **Frontend Components**
-```
-frontend/src/RobomindClinic/
-├── EnhancedRobomindClinic.jsx  # Main enhanced component
-├── RobomindClinicWithTabs.jsx  # Original component
-├── PsychopathiaDiagram.jsx     # Framework visualization
-└── ClinicSettings.jsx          # Configuration interface
-```
-
-#### **API Endpoints**
-```
-POST /api/robomind/screen          # Quick screening
-POST /api/robomind/therapy         # Therapy planning
-POST /api/robomind/apply           # Therapy application
-GET  /api/robomind/dashboard/metrics  # Dashboard data
-GET  /api/robomind/cases/{id}      # Case details
-```
-
-### 🚨 **Risk Assessment**
-
-#### **Low Risk Items**
-- **Code Quality**: Well-structured, documented, and tested
-- **Integration**: Designed for seamless integration
-- **Performance**: Optimized for real-time operation
-- **Scalability**: Built for horizontal scaling
-
-#### **Medium Risk Items**
-- **User Adoption**: Requires training and change management
-- **False Positives**: May need threshold tuning
-- **Data Privacy**: Requires policy implementation
-- **Maintenance**: Needs ongoing support and updates
-
-#### **Mitigation Strategies**
-- **Gradual Rollout**: Start with pilot modules
-- **User Training**: Comprehensive documentation and support
-- **Threshold Tuning**: Configurable sensitivity settings
-- **Privacy Controls**: Data anonymization and retention policies
-
-### 📈 **Success Metrics**
-
-#### **Technical Metrics**
-- **Detection Accuracy**: >90% precision/recall
-- **Therapy Effectiveness**: >70% improvement rate
-- **System Performance**: <200ms latency
-- **Coverage**: 100% AI interaction monitoring
-
-#### **Business Metrics**
-- **User Adoption**: >80% module coverage
-- **Issue Resolution**: >60% problem reduction
-- **User Satisfaction**: >4.5/5 rating
-- **Documentation**: Complete coverage
-
-### 🎉 **Next Steps**
-
-#### **Immediate Actions (This Week)**
-1. **Test All Endpoints**: Verify functionality with sample data
-2. **Fix Integration Issues**: Resolve any import/dependency problems
-3. **Create Test Suite**: Comprehensive testing framework
-4. **User Interface Testing**: Validate frontend functionality
-
-#### **Short-term Goals (Next 2 Weeks)**
-1. **Complete Integration**: Integrate with existing modules
-2. **Performance Optimization**: Ensure real-time operation
-3. **User Documentation**: Create comprehensive guides
-4. **Pilot Deployment**: Test with select modules
-
-#### **Medium-term Goals (Next 2 Months)**
-1. **Full Deployment**: All modules using clinic monitoring
-2. **Advanced Features**: Complete 32-pathology system
-3. **Analytics Dashboard**: Real-time metrics and reporting
-4. **External Validation**: Industry recognition and adoption
-
-### 💡 **Key Recommendations**
-
-#### **For Development Team**
-1. **Start with Testing**: Thoroughly test all new components
-2. **Gradual Integration**: Integrate one module at a time
-3. **User Feedback**: Collect and incorporate user input
-4. **Documentation**: Maintain comprehensive documentation
-
-#### **For Management**
-1. **Resource Allocation**: Ensure adequate development resources
-2. **Timeline Management**: Allow for testing and refinement
-3. **User Training**: Plan for user education and adoption
-4. **Success Metrics**: Track and measure implementation success
-
-#### **For Users**
-1. **Early Adoption**: Participate in pilot testing
-2. **Feedback Provision**: Provide input on functionality
-3. **Training Participation**: Engage in user education
-4. **Best Practices**: Follow recommended usage patterns
+1. **ML-Based Detection**: Train classifiers on accumulated screening data
+2. **Advanced Analytics**: Deeper trend analysis and predictive modeling
+3. **Multi-LLM Judge**: Ensemble evaluation with multiple LLM backends
+4. **Community Contributions**: Open-source detector and playbook extensions
+5. **Research Collaboration**: Academic partnerships for validation studies
 
 ---
 
-**Status**: 🚀 **READY FOR DEPLOYMENT**  
-**Confidence Level**: 🟢 **HIGH** - Complete technical foundation  
-**Next Action**: 🎯 **BEGIN TESTING AND INTEGRATION**
+**Status**: ✅ **FULLY IMPLEMENTED**
+**Confidence Level**: 🟢 **HIGH** — All 32 pathologies, 18 playbooks, 27 tests passing
+**Last Updated**: April 2026
 
 ---
 
-*This summary provides a comprehensive overview of the enhanced Robomind Clinic implementation, ready for deployment and further development.*
+*This summary reflects the current state of the Robomind Clinic module after completing all three implementation phases.*

@@ -521,6 +521,6 @@ MONGO_URI=mongodb://localhost:27017/app
 
 ---
 
-**Last updated**: March 2026
+**Last updated**: April 2026
 **Version**: 0.2.0
 **Status**: All 32 pathologies implemented and validated

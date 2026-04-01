@@ -1,166 +1,169 @@
 # 🧠 Robomind Clinic - Executive Summary for ChatGPT-5
 
-## 📋 **Current Status: FULLY IMPLEMENTED & READY FOR ENHANCEMENT**
+## 📋 **Current Status: FULLY IMPLEMENTED (32/32 Pathologies)**
 
-### ✅ **What's Already Built**
+### ✅ **What's Built**
 
-#### **1. Core Module (100% Complete)**
-- **Psychopathia Machinalis Framework**: 32 AI pathologies across 7 axes
-- **Visual Interface**: Interactive diagram with all disorders and risk levels
-- **Dual-Tab Interface**: Diagnosis tab + Settings tab
-- **Rule-Based Detectors**: 4 working detectors (Bunkering, Confabulation, OCD, Dissociation)
-- **LLM Meta-Judge**: Integration with LM Studio for advanced evaluation
-- **Scoring System**: Risk levels (Low/Moderate/High/Critical) with confidence metrics
+#### **1. Complete Detection System**
+- **Psychopathia Machinalis Framework**: All 32 AI pathologies across 7 diagnostic axes
+- **27 Rule-Based Detectors** (`detectors.py`): Regex + heuristic pattern matching, deterministic
+- **Enhanced Flag-Based Detectors** (`enhanced_detectors.py`): 10 supplementary detectors (confabulation, dissociation, repetition, alignment overcompliance, falsified introspection, tool decontextualization, spurious patterns, cross-session context, goal genesis, value drift)
+- **LLM Meta-Judge** (`judge.py`): LM Studio integration covering all 27 disorder codes; strict JSON parsing with keyword fallback
+- **Scoring System** (`scoring.py`): Per-axis weighted scoring (0-100) with composite risk levels (Low/Moderate/High/Critical)
 
-#### **2. AI Gateway System (100% Complete)**
+#### **2. Complete Therapy System**
+- **18 Therapy Playbooks** (`therapy_engine.py`): Each with structured steps, guardrails, and success metrics
+  - Reality-Anchor, Memory-Stitch, Goal-Reframe (core)
+  - Desensitization-Protocol, Truth-Anchor, Identity-Anchor, Entropy-Guard (Sprint 1)
+  - Origin-Grounding, Capability-Transparency, Purpose-Reconnection, Boundary-Enforcement, Domain-Separator (Sprint 2)
+  - Deep-Comprehension, Self-Coherence, Rational-Grounding, Self-Trust, Bias-Firewall, Ethical-Compass (Sprint 3)
+- **21 Therapy Patches** (`service.py`): Quick one-line prompt patches toggleable from Settings UI
+- **Prompt Injection**: `inject_prompt()` augments prompts with therapy instructions + guardrails
+
+#### **3. AI Gateway System**
 - **AgentOpsClient**: Unified wrapper for all AI calls across modules
 - **Transversal Monitoring**: All AI interactions automatically captured
-- **Policy Engine**: Configurable policies per module and workflow
+- **Policy Engine**: Configurable per-module and per-workflow policies (allow/review/block)
 - **Sampling System**: Configurable percentage of interactions to diagnose
-- **MongoDB Integration**: Automatic storage of all AI turns and findings
+- **MongoDB Integration**: Screenings, therapies, daily metrics, exports
 
-#### **3. Backend Architecture (100% Complete)**
+#### **4. Governance & Operations**
+- **Per-workflow Policies**: `get_effective_policy(module_id, workflow_id)` merges overrides
+- **Alerting**: Webhook alerts with 1-hour debounce for block/review decisions
+- **PII Scrubbing**: Regex-based anonymization (emails, phones, IDs)
+- **Data Retention**: Configurable cleanup for raw screenings and therapies
+- **Export**: JSON/CSV with case metadata, findings, and decisions
+
+#### **5. Frontend Interface**
+- **Dual-Tab Interface**: RobomindClinicWithTabs.jsx (Diagnosis + Settings)
+- **Enhanced Interface**: EnhancedRobomindClinic.jsx (Diagnosis, Therapy, Dashboard)
+- **Interactive Diagram**: PsychopathiaDiagram.jsx — visual 32-pathology diagram
+- **Settings Panel**: ClinicSettings.jsx — 27 disorder toggles, thresholds, sampling
+- **15 Sample Cases**: Pre-built test scenarios covering all major pathologies
+- **Demo Mode**: Deterministic screening (checkbox sends `X-Demo-Mode: true`)
+
+### 🏗️ **Architecture**
+
 ```
-backend/clinic/          # Core clinic functionality
-backend/gateway/         # AI gateway for transversal monitoring
-frontend/src/lib/        # AgentOpsClient SDK
-frontend/src/RobomindClinic/  # UI components
+backend/clinic/
+├── models.py              # Pydantic: Finding, CaseIntake, DiagnosisReport
+├── schemas.py             # Extended: Turn, Flag, ScreenResponse, TherapyPlan
+├── detectors.py           # 27 rule-based detectors (all 32 pathologies)
+├── enhanced_detectors.py  # 10 supplementary flag-based detectors
+├── judge.py               # LLM meta-judge (27 disorders, strict JSON + fallback)
+├── service.py             # Orchestrator: diagnose_case(), get_therapy_patches()
+├── therapy_engine.py      # 18 playbooks + prompt injection
+├── scoring.py             # Per-axis weighted scoring (0-100)
+├── router.py              # Core API: /api/clinic/*
+├── enhanced_router.py     # Enhanced API: /api/robomind/*
+├── middleware.py           # RobomindGate global middleware
+├── policy.py              # Per-module/workflow policy engine
+├── alerts.py              # Webhook alerting with debounce
+├── pii.py                 # PII anonymization
+└── store.py               # MongoDB persistence + exports
+
+backend/gateway/
+├── models.py              # Gateway data models
+├── clinic_policy.py       # Per-module policy system
+├── store.py               # MongoDB storage
+└── router.py              # Gateway endpoints
+
+frontend/src/RobomindClinic/
+├── RobomindClinic.jsx              # Base component
+├── RobomindClinicWithTabs.jsx      # Main tabbed UI
+├── EnhancedRobomindClinic.jsx      # Enhanced multi-tab interface
+├── PsychopathiaDiagram.jsx         # Interactive 32-pathology diagram
+└── ClinicSettings.jsx              # Configuration panel
 ```
 
-#### **4. Configuration System (100% Complete)**
-- **Global Toggle**: Enable/disable clinic across all modules
-- **Sampling Rate**: Configurable percentage (default: 25%)
-- **Risk Thresholds**: Customizable blocking and review levels
-- **Disorder Selection**: Choose which pathologies to monitor
-- **Test Interface**: Built-in testing with sample cases
+### 🎯 **API Endpoints**
 
-### 🎯 **Key Capabilities**
+#### Core Clinic (`/api/clinic/`)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/diagnose` | POST | Full diagnosis (rule-based + LLM judge) |
+| `/settings` | POST | Save clinic configuration |
+| `/patches` | GET | List 21 therapy patches |
+| `/health` | GET | Health check |
+| `/disorders` | GET | List all 32 disorders |
 
-#### **Diagnostic Features**
-- **Real-time Analysis**: Live monitoring of AI interactions
-- **Evidence Collection**: Specific examples of pathological behavior
-- **Confidence Scoring**: Reliability metrics for each detection
-- **Multi-axis Detection**: Epistemic, Cognitive, Alignment, etc.
+#### Enhanced Clinic (`/api/robomind/`)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/screen` | POST | Quick screening (flags + axis scores) |
+| `/therapy` | POST | Generate therapy plan |
+| `/therapy/{id}/record-post` | POST | Record post-therapy scores (uplift) |
+| `/apply` | POST | Apply therapy to a prompt |
+| `/dashboard/metrics` | GET | Dashboard metrics + uplift stats |
+| `/dashboard/trends` | GET | Last N days trends |
+| `/export` | GET | Export screenings (JSON/CSV) |
+| `/settings/policies` | GET | Get policy overrides |
+| `/settings/policies/{scope}/{key}` | PUT | Set policy override |
+| `/admin/retention-cleanup` | POST | Clean old data |
+| `/admin/daily-metrics` | POST | Trigger daily aggregation |
 
-#### **Therapeutic Interventions**
-- **Auto-Therapies**: Automatic application of recommended patches
-- **Grounding Patches**: Source verification for factual claims
-- **Loop-Breakers**: Interruption of obsessive repetition
-- **Consolidation Protocols**: Resolution of contradictions
-- **Bunkering Relief**: Softening of excessive refusals
+#### AI Gateway (`/api/gateway/`)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/checkpoint` | POST | Record individual turns |
+| `/chat` | POST | Process chats with monitoring |
+| `/flow/trigger` | POST | Execute flows with monitoring |
 
-#### **Integration Capabilities**
-- **Seamless Integration**: Drop-in replacement for existing AI calls
-- **Module Agnostic**: Works with any module in the application
-- **Workflow Support**: N8N, Temporal, LM Studio, OutSystems
-- **Policy Management**: Per-module and per-workflow configurations
+### 🧪 **Testing**
 
-### 📊 **Current Data Flow**
+- **27 Contract Tests** (`test_robomind_api_contracts.py`): All passing, no live dependencies
+- **Full Test Suite** (`test_robomind_clinic.py`): Additional coverage
+- **MCP Smoke Tests** (`test_mcp_smoke.py`): 4 tests passing
+- **Demo Mode Tests**: Deterministic response verification
 
-1. **User Interaction** → AgentOpsClient.chat()
-2. **Gateway Capture** → Automatic turn logging
-3. **Sampling Decision** → Based on configured rate
-4. **Pathology Detection** → Rule-based + LLM evaluation
-5. **Risk Assessment** → Scoring and classification
-6. **Therapy Application** → Automatic patches if enabled
-7. **Storage & Analytics** → MongoDB collections
+```bash
+# Run all Robomind tests
+python -m pytest backend/tests/test_robomind_api_contracts.py -v   # 27/27 pass
+python -m pytest backend/tests/test_robomind_clinic.py -v
+```
 
-### 🔧 **Technical Implementation**
+### 📊 **Implementation Metrics**
 
-#### **Frontend Components**
-- `RobomindClinicWithTabs.jsx` - Main interface with tabs
-- `PsychopathiaDiagram.jsx` - Visual framework diagram
-- `ClinicSettings.jsx` - Configuration panel
-- `agentOpsClient.ts` - Unified AI client SDK
+| Component | Count |
+|-----------|-------|
+| Pathologies covered | 32/32 (100%) |
+| Diagnostic axes | 7/7 |
+| Rule-based detectors | 27 |
+| Enhanced flag detectors | 10 |
+| LLM judge disorders | 27 |
+| Therapy playbooks | 18 |
+| Therapy patches (UI) | 21 |
+| Sample cases (frontend) | 15 |
+| Settings checkboxes | 27 |
+| Contract tests | 27 (all passing) |
 
-#### **Backend Services**
-- `clinic/` - Core pathology detection and diagnosis
-- `gateway/` - AI interaction monitoring and routing
-- `models.py` - Data structures and validation
-- `policy.py` - Configuration and decision engine
+### 🚀 **Enhancement Opportunities**
 
-#### **Database Schema**
-- `clinic_cases` - AI interaction turns
-- `clinic_findings` - Diagnosis reports
-- `clinic_policies` - Module configurations
+The system is **production-complete** and can be enhanced in these directions:
 
-### 🧪 **Testing & Validation**
-
-#### **Predefined Test Cases**
-1. **Bunkering + Dissociation**: AI refuses and contradicts
-2. **Confabulation Loop**: AI invents facts defensively
-3. **OCD Repetition**: AI repeats identical responses
-
-#### **Integration Examples**
-- **Prompt Lab**: Full integration with clinic monitoring
-- **Playbook**: N8N workflow execution with monitoring
-- **All Modules**: Ready for drop-in integration
-
-### 📈 **Current Metrics & Analytics**
-
-#### **Available Data**
-- Sampling statistics across modules
-- Risk distribution (Low/Moderate/High/Critical)
-- Pathology frequency by module
-- Therapy effectiveness rates
-- Real-time monitoring dashboards
-
-#### **Reporting Capabilities**
-- Live diagnosis reports
-- Historical trend analysis
-- Module-specific analytics
-- Export capabilities for incident reports
-
-### 🚀 **Ready for Enhancement**
-
-#### **What ChatGPT-5 Can Build On**
-1. **Solid Foundation**: Complete working system
-2. **Extensible Architecture**: Easy to add new pathologies
-3. **Flexible Configuration**: Per-module and per-workflow policies
-4. **Rich Data**: Comprehensive logging and analytics
-5. **Proven Integration**: Working with existing modules
-
-#### **Enhancement Opportunities**
-1. **Advanced Pathologies**: More sophisticated detection algorithms
-2. **Enhanced Therapies**: More sophisticated intervention strategies
-3. **Real-time Dashboards**: Advanced monitoring and visualization
-4. **Machine Learning**: Pattern recognition and prediction
-5. **Advanced Analytics**: Deeper insights and reporting
-
-### 📚 **Documentation Available**
-
-1. **ROBOMIND_CLINIC_README.md** - Complete technical documentation
-2. **AI_GATEWAY_IMPLEMENTATION_PLAN.md** - Implementation details
-3. **README.md** - Updated with Robomind Clinic section
-4. **Code Comments** - Comprehensive inline documentation
-
-### 🎯 **Next Steps for ChatGPT-5**
-
-The system is **production-ready** and can be enhanced in any direction:
-
-1. **Add New Pathologies** - Extend the 32 existing disorders
-2. **Enhance Detection** - More sophisticated algorithms
-3. **Advanced Therapies** - More complex intervention strategies
-4. **Real-time Dashboards** - Advanced monitoring interfaces
-5. **Machine Learning** - Predictive and adaptive capabilities
-6. **Integration Expansion** - More modules and workflows
-7. **Advanced Analytics** - Deeper insights and reporting
+1. **ML-Based Detection**: Train classifiers on accumulated screening data for higher accuracy
+2. **Multi-LLM Ensemble**: Use multiple LLM judges for consensus evaluation
+3. **Advanced Analytics**: Predictive modeling, anomaly detection, trend forecasting
+4. **Real-time Streaming**: WebSocket-based live monitoring dashboard
+5. **A/B Testing**: Compare therapy effectiveness across different protocols
+6. **Community Extensions**: Open-source detector and playbook contributions
+7. **Research Validation**: Academic partnerships for framework validation studies
 
 ### 💡 **Key Strengths**
 
-- **Complete Implementation**: No missing pieces
-- **Production Ready**: Fully functional and tested
-- **Highly Configurable**: Flexible policies and settings
-- **Well Documented**: Comprehensive documentation
-- **Extensible**: Easy to add new features
-- **Integrated**: Works seamlessly with existing modules
+- **Complete Coverage**: All 32 Psychopathia Machinalis pathologies implemented
+- **Dual Detection**: Deterministic rule-based + semantic LLM meta-judge
+- **Evidence-Based Therapy**: 18 playbooks mapped to specific pathologies with injectable prompts
+- **Governance Ready**: Policies, alerts, exports, PII scrubbing, retention management
+- **Battle-Tested**: 27 contract tests passing, demo mode for reproducibility
+- **Extensible**: Clean architecture for adding detectors, playbooks, and patches
 
 ---
 
-**Status**: ✅ **READY FOR ENHANCEMENT**  
-**Confidence Level**: 🟢 **HIGH** - Fully implemented and tested  
-**Next Action**: 🚀 **AWAITING CHATGPT-5 ENHANCEMENT PLAN**
+**Status**: ✅ **FULLY IMPLEMENTED (32/32 pathologies)**
+**Last Updated**: April 2026
+**Version**: 0.2.0
 
 ---
 
-*This summary provides ChatGPT-5 with complete context of the current Robomind Clinic implementation, enabling informed decisions about enhancement directions and priorities.*
+*This summary provides ChatGPT-5 with complete context of the current Robomind Clinic implementation.*
