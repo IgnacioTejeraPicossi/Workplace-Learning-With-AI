@@ -345,17 +345,39 @@ async def get_agent_security_overview():
 
 @router.get("/agents/{agent_name}/status")
 async def get_agent_security_status(agent_name: str):
-    """Get security status for a specific agent"""
+    """Get security status for a specific agent.
+
+    Checks MongoDB snapshots first (written by real scans), then falls back
+    to in-memory mock data so the endpoint always returns something useful.
+    """
     try:
+        # 1) Try real snapshot from MongoDB (written by /scan background task)
+        try:
+            snapshot = await agent_security_status_collection.find_one(
+                {"agent_name": agent_name},
+                sort=[("last_scan", -1)]
+            )
+            if snapshot:
+                snapshot.pop("_id", None)  # remove Mongo internal id
+                # Ensure datetime fields are serialized
+                for dt_field in ("last_scan", "last_incident"):
+                    val = snapshot.get(dt_field)
+                    if isinstance(val, datetime):
+                        snapshot[dt_field] = val.isoformat()
+                return snapshot
+        except Exception as db_err:
+            logger.warning("Could not query agent_security_status from MongoDB: %s", db_err)
+
+        # 2) Fallback to in-memory mock
         agent_status = next(
-            (agent for agent in MOCK_AGENT_SECURITY_DATA["agent_security_status"] 
-             if agent["agent_name"] == agent_name), 
+            (agent for agent in MOCK_AGENT_SECURITY_DATA["agent_security_status"]
+             if agent["agent_name"] == agent_name),
             None
         )
-        
+
         if not agent_status:
             raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
-        
+
         return agent_status
     except HTTPException:
         raise
@@ -464,31 +486,60 @@ async def get_security_incidents(limit: int = 10, severity: Optional[str] = None
 
 @router.post("/incidents/{incident_id}/respond")
 async def respond_to_incident(incident_id: str, request: IncidentResponseRequest):
-    """Respond to a security incident"""
+    """Respond to a security incident.
+
+    Persists the status change in MongoDB (security_events collection) so it
+    survives restarts, and also updates the in-memory mock for immediate UI
+    feedback even when MongoDB is unavailable.
+    """
     try:
-        # Find the incident
+        new_status = None
+        resolved_at = None
+
+        if request.action == "mitigate":
+            new_status = IncidentStatus.MITIGATED.value
+        elif request.action == "resolve":
+            new_status = IncidentStatus.RESOLVED.value
+            resolved_at = datetime.utcnow()
+        elif request.action == "investigate":
+            new_status = IncidentStatus.INVESTIGATING.value
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown action: {request.action}")
+
+        # 1) Try to persist in MongoDB
+        persisted = False
+        try:
+            update_fields: dict = {"status": new_status}
+            if resolved_at:
+                update_fields["resolved_at"] = resolved_at
+            result = await security_events_collection.update_one(
+                {"incident_id": incident_id},
+                {"$set": update_fields}
+            )
+            if result.modified_count > 0:
+                persisted = True
+        except Exception as db_err:
+            logger.warning("Could not persist incident response to MongoDB: %s", db_err)
+
+        # 2) Also update in-memory mock for immediate UI feedback
         incident = next(
-            (inc for inc in MOCK_AGENT_SECURITY_DATA["recent_incidents"] 
-             if inc["incident_id"] == incident_id), 
+            (inc for inc in MOCK_AGENT_SECURITY_DATA["recent_incidents"]
+             if inc["incident_id"] == incident_id),
             None
         )
-        
-        if not incident:
+        if incident:
+            incident["status"] = new_status
+            if resolved_at:
+                incident["resolved_at"] = resolved_at
+
+        if not incident and not persisted:
             raise HTTPException(status_code=404, detail="Incident not found")
-        
-        # Update incident status based on action
-        if request.action == "mitigate":
-            incident["status"] = IncidentStatus.MITIGATED.value
-        elif request.action == "resolve":
-            incident["status"] = IncidentStatus.RESOLVED.value
-            incident["resolved_at"] = datetime.utcnow()
-        elif request.action == "investigate":
-            incident["status"] = IncidentStatus.INVESTIGATING.value
-        
+
         return {
             "incident_id": incident_id,
-            "status": incident["status"],
+            "status": new_status,
             "action_taken": request.action,
+            "persisted": persisted,
             "timestamp": datetime.utcnow()
         }
     except HTTPException:

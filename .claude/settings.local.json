@@ -4,7 +4,12 @@
       "Bash(cd:*)",
       "Bash(python -m pytest backend/tests/test_robomind_clinic.py -v)",
       "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py backend/tests/test_robomind_clinic.py backend/tests/test_mcp_smoke.py -v)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(pandoc \"C:\\\\Test\\\\AI\\\\AI Learning with AI docs\\\\docs\\\\New Ideas 25.0  Cybersecurity implementation plan.docx\" -t markdown --wrap=none)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py -v --tb=short -q)",
+      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py::test_enhanced_screen_rejects_empty_turns -v --tb=long)"
     ]
   }
 }
