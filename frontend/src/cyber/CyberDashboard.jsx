@@ -327,21 +327,9 @@ export default function CyberDashboard() {
                 🎯 {t('cyber.dashboard.reference.top15')}
               </h4>
               <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
-                <div>1. Ransomware Attacks</div>
-                <div>2. IoT Vulnerabilities</div>
-                <div>3. State-Sponsored Attacks</div>
-                <div>4. Supply Chain Attacks</div>
-                <div>5. AI-Powered Attacks</div>
-                <div>6. Phishing</div>
-                <div>7. Zero-Day Exploits</div>
-                <div>8. Cloud Misconfigurations</div>
-                <div>9. Home Network Vulnerabilities</div>
-                <div>10. Insider Threats</div>
-                <div>11. Data Breaches</div>
-                <div>12. Data Exfiltration</div>
-                <div>13. Malware</div>
-                <div>14. DDoS Attacks</div>
-                <div>15. Business Email Compromise</div>
+                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => (
+                  <div key={n}>{n}. {t(`cyber.dashboard.reference.threat${n}`)}</div>
+                ))}
               </div>
             </div>
 
