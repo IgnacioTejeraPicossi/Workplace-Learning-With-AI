@@ -60,3 +60,6 @@ __pycache__/
 voice_cloning_env/ 
 voice_cloning_env_311/ 
 .venv/
+
+#.Claude
+.Claude/
