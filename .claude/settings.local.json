@@ -12,7 +12,9 @@
       "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py::test_enhanced_screen_rejects_empty_turns -v --tb=long)",
       "Bash(python -c \":*)",
       "Bash(python -c \"from backend.routers.cybersecurity import router; print\\(''Backend import OK''\\)\")",
-      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py -v --tb=short)"
+      "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py -v --tb=short)",
+      "Bash(npm list:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
