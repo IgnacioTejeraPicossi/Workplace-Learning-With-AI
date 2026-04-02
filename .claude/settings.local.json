@@ -14,7 +14,12 @@
       "Bash(python -c \"from backend.routers.cybersecurity import router; print\\(''Backend import OK''\\)\")",
       "Bash(python -m pytest backend/tests/test_robomind_api_contracts.py -v --tb=short)",
       "Bash(npm list:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(node create_robomind_presentation.js \"Robomind_Clinic_Presentation.pptx\")",
+      "Bash(npm init:*)",
+      "Bash(node create_cybersecurity_presentation.js \"Cybersecurity_Module_Presentation.pptx\")",
+      "Bash(ls -la \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation/\"*.pptx)",
+      "Bash(npx react-scripts:*)"
     ]
   }
 }

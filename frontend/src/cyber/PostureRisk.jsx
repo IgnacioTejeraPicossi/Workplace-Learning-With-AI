@@ -1,10 +1,12 @@
 // Posture & Risk Assessment Component
 // Visualizes NIST CSF domain scores, risk factors, and KPI trends
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 export default function PostureRisk() {
+  const { t } = useTranslation();
   const [riskScore, setRiskScore] = useState(null);
   const [kpis, setKpis] = useState([]);
   const [nistDomains, setNistDomains] = useState(null);
@@ -40,16 +42,16 @@ export default function PostureRisk() {
   };
 
   const getRiskLabel = (score) => {
-    if (score >= 80) return { text: 'Low Risk', bg: '#dcfce7', color: '#166534' };
-    if (score >= 60) return { text: 'Moderate Risk', bg: '#fef3c7', color: '#92400e' };
-    if (score >= 40) return { text: 'High Risk', bg: '#fed7aa', color: '#9a3412' };
-    return { text: 'Critical Risk', bg: '#fee2e2', color: '#991b1b' };
+    if (score >= 80) return { text: t('cyber.postureRisk.lowRisk'), bg: '#dcfce7', color: '#166534' };
+    if (score >= 60) return { text: t('cyber.postureRisk.moderateRisk'), bg: '#fef3c7', color: '#92400e' };
+    if (score >= 40) return { text: t('cyber.postureRisk.highRisk'), bg: '#fed7aa', color: '#9a3412' };
+    return { text: t('cyber.postureRisk.criticalRisk'), bg: '#fee2e2', color: '#991b1b' };
   };
 
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <div style={{ fontSize: '1.5rem' }}>Loading posture assessment...</div>
+        <div style={{ fontSize: '1.5rem' }}>{t('cyber.postureRisk.loading')}</div>
       </div>
     );
   }
@@ -61,10 +63,10 @@ export default function PostureRisk() {
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-          Posture & Risk Assessment
+          {t('cyber.postureRisk.title')}
         </h2>
         <p style={{ color: '#6b7280', margin: '0.25rem 0 0 0' }}>
-          Security posture across NIST CSF 2.0 domains with risk factor analysis
+          {t('cyber.postureRisk.subtitle')}
         </p>
       </div>
 
@@ -76,7 +78,7 @@ export default function PostureRisk() {
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)', textAlign: 'center'
         }}>
           <h3 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Overall Security Score
+            {t('cyber.postureRisk.overallScore')}
           </h3>
           {riskScore && (
             <>
@@ -92,7 +94,7 @@ export default function PostureRisk() {
                   <span style={{ fontSize: '2rem', fontWeight: 'bold', color: getScoreColor(riskScore.overall) }}>
                     {Math.round(riskScore.overall)}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>/ 100</span>
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{t('cyber.postureRisk.outOf100')}</span>
                 </div>
               </div>
               <span style={{
@@ -108,7 +110,7 @@ export default function PostureRisk() {
                   backgroundColor: riskScore.trend === 'improving' ? '#dcfce7' : riskScore.trend === 'degrading' ? '#fee2e2' : '#f3f4f6',
                   color: riskScore.trend === 'improving' ? '#166534' : riskScore.trend === 'degrading' ? '#991b1b' : '#374151',
                 }}>
-                  {riskScore.trend === 'improving' ? 'Improving' : riskScore.trend === 'degrading' ? 'Degrading' : 'Stable'}
+                  {riskScore.trend === 'improving' ? t('cyber.postureRisk.improving') : riskScore.trend === 'degrading' ? t('cyber.postureRisk.degrading') : t('cyber.postureRisk.stable')}
                 </span>
               </div>
             </>
@@ -121,7 +123,7 @@ export default function PostureRisk() {
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
           <h3 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            NIST CSF 2.0 Domain Scores
+            {t('cyber.postureRisk.nistDomainScores')}
           </h3>
           {nistDomains && (
             <div>
@@ -153,7 +155,7 @@ export default function PostureRisk() {
                 );
               })}
               <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', textAlign: 'center' }}>
-                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Overall Posture: </span>
+                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{t('cyber.postureRisk.overallPosture')} </span>
                 <span style={{ fontSize: '1rem', fontWeight: '700', color: getScoreColor(nistDomains.overall) }}>
                   {nistDomains.overall}%
                 </span>

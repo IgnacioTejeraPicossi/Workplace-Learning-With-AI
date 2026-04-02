@@ -1,5 +1,6 @@
 // Compliance Tracker — NIST, ISO, CIS, OWASP compliance management
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API = '/api/cyber';
 
@@ -19,6 +20,7 @@ const STATUS_STYLES = {
 };
 
 export default function ComplianceTracker() {
+  const { t } = useTranslation();
   const [statuses, setStatuses] = useState([]);
   const [summary, setSummary] = useState(null);
   const [controls, setControls] = useState([]);
@@ -104,7 +106,14 @@ export default function ComplianceTracker() {
     </div>
   );
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading compliance data…</div>;
+  const statusLabels = {
+    implemented: t('cyber.compliance.implemented'),
+    partial: t('cyber.compliance.partial'),
+    not_implemented: t('cyber.compliance.notImplemented'),
+    not_applicable: t('cyber.compliance.notApplicable'),
+  };
+
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>{t('cyber.compliance.loading')}</div>;
 
   const rows = filtered();
   const frameworks = [...new Set(statuses.map(s => s.framework))];
@@ -114,18 +123,18 @@ export default function ComplianceTracker() {
       {/* Summary cards */}
       {summary && (
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-          {card('Total Controls', summary.total_controls, '#1f2937')}
-          {card('Implemented', summary.implemented, '#16a34a')}
-          {card('Partial', summary.partial, '#ca8a04')}
-          {card('Not Implemented', summary.not_implemented, '#dc2626')}
-          {card('Overall Completion', `${summary.overall_completion_pct}%`, '#3b82f6')}
+          {card(t('cyber.compliance.totalControls'), summary.total_controls, '#1f2937')}
+          {card(t('cyber.compliance.implemented'), summary.implemented, '#16a34a')}
+          {card(t('cyber.compliance.partial'), summary.partial, '#ca8a04')}
+          {card(t('cyber.compliance.notImplemented'), summary.not_implemented, '#dc2626')}
+          {card(t('cyber.compliance.overallCompletion'), `${summary.overall_completion_pct}%`, '#3b82f6')}
         </div>
       )}
 
       {/* Framework progress bars */}
       {summary && (
         <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #e5e7eb', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>Compliance by Framework</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>{t('cyber.compliance.byFramework')}</h3>
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {summary.by_framework.map(fw => {
               const pct = fw.completion_pct;
@@ -134,7 +143,7 @@ export default function ComplianceTracker() {
                 <div key={fw.framework}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
                     <span style={{ fontWeight: '600', color: barColor }}>{fw.framework}</span>
-                    <span style={{ color: '#6b7280' }}>{pct}% — {fw.counts.implemented} impl / {fw.counts.partial} partial / {fw.counts.not_implemented} gap</span>
+                    <span style={{ color: '#6b7280' }}>{pct}% — {fw.counts.implemented} {t('cyber.compliance.implCount')} / {fw.counts.partial} {t('cyber.compliance.partialCount')} / {fw.counts.not_implemented} {t('cyber.compliance.gapCount')}</span>
                   </div>
                   <div style={{ height: 8, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${pct}%`, background: barColor, borderRadius: 4, transition: 'width 0.5s' }} />
@@ -149,25 +158,25 @@ export default function ComplianceTracker() {
       {/* Filters */}
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
         <input
-          placeholder="Search controls…"
+          placeholder={t('cyber.compliance.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem', minWidth: 200 }}
         />
         <select value={filterFw} onChange={e => setFilterFw(e.target.value)}
           style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-          <option value="all">All Frameworks</option>
+          <option value="all">{t('cyber.compliance.allFrameworks')}</option>
           {frameworks.map(f => <option key={f} value={f}>{f}</option>)}
         </select>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
           style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-          <option value="all">All Statuses</option>
-          <option value="implemented">Implemented</option>
-          <option value="partial">Partial</option>
-          <option value="not_implemented">Not Implemented</option>
-          <option value="not_applicable">N/A</option>
+          <option value="all">{t('cyber.compliance.allStatuses')}</option>
+          <option value="implemented">{t('cyber.compliance.implemented')}</option>
+          <option value="partial">{t('cyber.compliance.partial')}</option>
+          <option value="not_implemented">{t('cyber.compliance.notImplemented')}</option>
+          <option value="not_applicable">{t('cyber.compliance.notApplicable')}</option>
         </select>
-        <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{rows.length} controls</span>
+        <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{rows.length} {t('cyber.compliance.controls')}</span>
       </div>
 
       {/* Controls table */}
@@ -175,7 +184,7 @@ export default function ComplianceTracker() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ background: '#f9fafb' }}>
-              {['Framework', 'Control', 'Title', 'Status', 'Evidence', 'Reviewer', 'Actions'].map(h => (
+              {[t('cyber.compliance.framework'), t('cyber.compliance.control'), t('cyber.common.title'), t('cyber.common.status'), t('cyber.compliance.evidence'), t('cyber.compliance.reviewer'), t('cyber.common.actions')].map(h => (
                 <th key={h} style={{ padding: '0.75rem 0.5rem', textAlign: 'left', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>{h}</th>
               ))}
             </tr>
@@ -201,14 +210,14 @@ export default function ComplianceTracker() {
                     {isEditing ? (
                       <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
                         style={{ padding: '0.3rem', border: '1px solid #d1d5db', borderRadius: 4, fontSize: '0.8rem' }}>
-                        <option value="implemented">Implemented</option>
-                        <option value="partial">Partial</option>
-                        <option value="not_implemented">Not Implemented</option>
-                        <option value="not_applicable">N/A</option>
+                        <option value="implemented">{t('cyber.compliance.implemented')}</option>
+                        <option value="partial">{t('cyber.compliance.partial')}</option>
+                        <option value="not_implemented">{t('cyber.compliance.notImplemented')}</option>
+                        <option value="not_applicable">{t('cyber.compliance.notApplicable')}</option>
                       </select>
                     ) : (
                       <span style={{ padding: '0.2rem 0.6rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: '600', background: st.bg, color: st.color }}>
-                        {st.label}
+                        {statusLabels[row.status] || st.label}
                       </span>
                     )}
                   </td>
@@ -233,17 +242,17 @@ export default function ComplianceTracker() {
                       <>
                         <button onClick={() => saveEdit(row)} disabled={saving}
                           style={{ padding: '0.25rem 0.5rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem', marginRight: 4 }}>
-                          {saving ? '…' : 'Save'}
+                          {saving ? '…' : t('cyber.common.save')}
                         </button>
                         <button onClick={() => setEditing(null)}
                           style={{ padding: '0.25rem 0.5rem', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem' }}>
-                          Cancel
+                          {t('cyber.common.cancel')}
                         </button>
                       </>
                     ) : (
                       <button onClick={() => startEdit(row)}
                         style={{ padding: '0.25rem 0.5rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem' }}>
-                        Edit
+                        {t('cyber.common.edit')}
                       </button>
                     )}
                   </td>
@@ -251,7 +260,7 @@ export default function ComplianceTracker() {
               );
             })}
             {rows.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af' }}>No controls match your filters</td></tr>
+              <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af' }}>{t('cyber.compliance.noMatch')}</td></tr>
             )}
           </tbody>
         </table>

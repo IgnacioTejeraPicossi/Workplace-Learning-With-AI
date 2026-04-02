@@ -1,5 +1,6 @@
 // Main Cybersecurity Module Component
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CyberDashboard from './CyberDashboard';
 import ThreatLibrary from './ThreatLibrary';
 import AgentSecurity from './AgentSecurity';
@@ -12,19 +13,20 @@ import IncidentDrills from './IncidentDrills';
 import KnowledgeBase from './KnowledgeBase';
 
 export default function Cybersecurity() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'agent-security', label: 'Agent Security', icon: '🤖' },
-    { id: 'threats', label: 'Threat Library', icon: '🛡️' },
-    { id: 'tools', label: 'Tools & Frameworks', icon: '🧰' },
-    { id: 'posture', label: 'Posture & Risk', icon: '📈' },
-    { id: 'vulnerabilities', label: 'Vulnerabilities', icon: '🔍' },
-    { id: 'coach', label: 'Secure Coding Coach', icon: '👨‍🏫' },
-    { id: 'compliance', label: 'Compliance Tracker', icon: '📋' },
-    { id: 'drills', label: 'Incident Drills', icon: '🚨' },
-    { id: 'knowledge', label: 'Knowledge', icon: '📚' }
+    { id: 'dashboard', label: t('cyber.tabs.dashboard'), icon: '📊' },
+    { id: 'agent-security', label: t('cyber.tabs.agentSecurity'), icon: '🤖' },
+    { id: 'threats', label: t('cyber.tabs.threatLibrary'), icon: '🛡️' },
+    { id: 'tools', label: t('cyber.tabs.toolsFrameworks'), icon: '🧰' },
+    { id: 'posture', label: t('cyber.tabs.postureRisk'), icon: '📈' },
+    { id: 'vulnerabilities', label: t('cyber.tabs.vulnerabilities'), icon: '🔍' },
+    { id: 'coach', label: t('cyber.tabs.secureCodingCoach'), icon: '👨‍🏫' },
+    { id: 'compliance', label: t('cyber.tabs.complianceTracker'), icon: '📋' },
+    { id: 'drills', label: t('cyber.tabs.incidentDrills'), icon: '🚨' },
+    { id: 'knowledge', label: t('cyber.tabs.knowledge'), icon: '📚' }
   ];
 
   const renderContent = () => {
@@ -71,14 +73,14 @@ export default function Cybersecurity() {
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          🔒 Cybersecurity
+          🔒 {t('cyber.title')}
         </h1>
         <p style={{ 
           color: '#6b7280', 
           margin: '0.5rem 0 0 0',
           fontSize: '1rem'
         }}>
-          Comprehensive security management and threat intelligence platform
+          {t('cyber.subtitle')}
         </p>
       </div>
 

@@ -1,5 +1,6 @@
 // Agent Security Monitoring Component
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function AgentSecurity() {
   const [agentSecurityData, setAgentSecurityData] = useState(null);
@@ -7,6 +8,7 @@ export default function AgentSecurity() {
   const [selectedAgent, setSelectedAgent] = useState('all');
   const [scanning, setScanning] = useState({});
   const [details, setDetails] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadAgentSecurityData();
@@ -156,7 +158,7 @@ export default function AgentSecurity() {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading agent security data...</p>
+        <p>{t('cyber.agentSecurity.loading')}</p>
       </div>
     );
   }
@@ -174,14 +176,14 @@ export default function AgentSecurity() {
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          🤖 Agent Security Monitor
+          🤖 {t('cyber.agentSecurity.title')}
         </h2>
         <p style={{
           color: '#6b7280',
           fontSize: '1rem',
           margin: 0
         }}>
-          Advanced security monitoring and threat detection for AI agents - Zero Trust Architecture
+          {t('cyber.agentSecurity.subtitle')}
         </p>
       </div>
 
@@ -195,7 +197,7 @@ export default function AgentSecurity() {
         <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🛡️</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Security Score</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('cyber.agentSecurity.securityScore')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#3b82f6' }}>
             {agentSecurityData?.overall_score || 0}%
@@ -205,7 +207,7 @@ export default function AgentSecurity() {
         <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🤖</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Total Agents</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('cyber.agentSecurity.totalAgents')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>
             {agentSecurityData?.total_agents || 0}
@@ -215,7 +217,7 @@ export default function AgentSecurity() {
         <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🚨</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Critical Alerts</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('cyber.agentSecurity.criticalAlerts')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#dc2626' }}>
             {agentSecurityData?.critical_alerts || 0}
@@ -225,7 +227,7 @@ export default function AgentSecurity() {
         <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🔒</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Zero Trust</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('cyber.agentSecurity.zeroTrust')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#8b5cf6' }}>
             {agentSecurityData?.zero_trust_status?.compliance_rate || 0}%
@@ -236,20 +238,20 @@ export default function AgentSecurity() {
       {/* Agent Security Status Table */}
       <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '2rem' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>Agent Security Status</h3>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>{t('cyber.agentSecurity.agentStatus')}</h3>
         </div>
         <div style={{ padding: '1.5rem' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Agent</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Status</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Score</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Vulnerabilities</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Zero Trust</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Last Scan</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Actions</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.agentSecurity.agent')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.common.status')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.common.score')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.agentSecurity.vulnerabilities')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.agentSecurity.zeroTrust')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.agentSecurity.lastScan')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('cyber.common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,7 +286,7 @@ export default function AgentSecurity() {
                           marginRight: 8
                         }}
                       >
-                        {scanning[agent.name] ? 'Scanning…' : 'Scan'}
+                        {scanning[agent.name] ? t('cyber.agentSecurity.scanning') : t('cyber.agentSecurity.scan')}
                       </button>
                       <button
                         onClick={() => setDetails({ agent })}
@@ -298,7 +300,7 @@ export default function AgentSecurity() {
                           fontSize: '0.85rem'
                         }}
                       >
-                        Findings
+                        {t('cyber.agentSecurity.findings')}
                       </button>
                     </td>
                   </tr>
@@ -323,7 +325,7 @@ export default function AgentSecurity() {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Findings — {details.agent.name}</h3>
+              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{t('cyber.agentSecurity.findingsTitle', { name: details.agent.name })}</h3>
               <button onClick={() => setDetails(null)} style={{ background: 'transparent', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: 20 }}>
@@ -341,30 +343,30 @@ export default function AgentSecurity() {
                 return (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
                     <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Zero Trust</div>
-                      <Row label="HMAC present" value={zt.hmac_present ? 'Yes' : 'No'} />
-                      <Row label="Endpoint source" value={zt.endpoint_source || '—'} />
-                      <Row label="Endpoint secure" value={zt.endpoint_secure ? 'Yes' : 'No'} />
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('cyber.agentSecurity.zeroTrust')}</div>
+                      <Row label={t('cyber.agentSecurity.hmacPresent')} value={zt.hmac_present ? 'Yes' : 'No'} />
+                      <Row label={t('cyber.agentSecurity.endpointSource')} value={zt.endpoint_source || '—'} />
+                      <Row label={t('cyber.agentSecurity.endpointSecure')} value={zt.endpoint_secure ? 'Yes' : 'No'} />
                       <div style={{ marginTop: 6, color: '#6b7280', fontSize: '0.85rem', overflowWrap: 'anywhere' }}>{zt.endpoint || ''}</div>
                     </div>
                     <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Integrity</div>
-                      <Row label="Recent runs" value={integ.recent_runs} />
-                      <Row label="Unique bundle hashes" value={integ.unique_bundle_hashes} />
-                      <Row label="Integrity score" value={integ.integrity_score} />
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('cyber.agentSecurity.integrity')}</div>
+                      <Row label={t('cyber.agentSecurity.recentRuns')} value={integ.recent_runs} />
+                      <Row label={t('cyber.agentSecurity.uniqueHashes')} value={integ.unique_bundle_hashes} />
+                      <Row label={t('cyber.agentSecurity.integrityScore')} value={integ.integrity_score} />
                     </div>
                     <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 8 }}>DLP (Data Loss Prevention)</div>
-                      <Row label="Events scanned" value={dlp.events_scanned} />
-                      <Row label="Findings" value={dlp.findings} />
-                      <Row label="Data protection score" value={dlp.data_protection_score} />
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('cyber.agentSecurity.dlp')}</div>
+                      <Row label={t('cyber.agentSecurity.eventsScanned')} value={dlp.events_scanned} />
+                      <Row label={t('cyber.agentSecurity.findings')} value={dlp.findings} />
+                      <Row label={t('cyber.agentSecurity.dataProtectionScore')} value={dlp.data_protection_score} />
                     </div>
                   </div>
                 );
               })()}
             </div>
             <div style={{ padding: 16, borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setDetails(null)} style={{ background: '#2563eb', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer' }}>Close</button>
+              <button onClick={() => setDetails(null)} style={{ background: '#2563eb', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer' }}>{t('cyber.common.close')}</button>
             </div>
           </div>
         </div>
@@ -372,7 +374,7 @@ export default function AgentSecurity() {
       {/* Recent Security Incidents */}
       <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '2rem' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>Recent Security Incidents</h3>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>{t('cyber.agentSecurity.recentIncidents')}</h3>
         </div>
         <div style={{ padding: '1.5rem' }}>
           {(agentSecurityData?.recent_incidents || []).map((incident) => (
@@ -401,7 +403,7 @@ export default function AgentSecurity() {
       {/* Security Metrics */}
       <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>Security Metrics</h3>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>{t('cyber.agentSecurity.securityMetrics')}</h3>
         </div>
         <div style={{ padding: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>

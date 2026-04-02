@@ -1,5 +1,6 @@
 // Incident Response Drills — scenario-based training
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API = '/api/cyber';
 
@@ -14,6 +15,7 @@ const DIFF_COLORS = {
 };
 
 export default function IncidentDrills() {
+  const { t } = useTranslation();
   const [scenarios, setScenarios] = useState([]);
   const [filterCat, setFilterCat] = useState('all');
   const [filterDiff, setFilterDiff] = useState('all');
@@ -102,7 +104,7 @@ export default function IncidentDrills() {
     return list;
   }
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading drill scenarios…</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>{t('cyber.drills.loading')}</div>;
 
   const categories = [...new Set(scenarios.map(s => s.category))];
 
@@ -111,9 +113,9 @@ export default function IncidentDrills() {
       {/* Nav */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { id: 'scenarios', label: 'Scenarios', icon: '🚨' },
-          { id: 'drill', label: 'Active Drill', icon: '⚡', disabled: !session },
-          { id: 'history', label: 'History', icon: '🕐' },
+          { id: 'scenarios', label: t('cyber.drills.scenarios'), icon: '🚨' },
+          { id: 'drill', label: t('cyber.drills.activeDrill'), icon: '⚡', disabled: !session },
+          { id: 'history', label: t('cyber.drills.history'), icon: '🕐' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setView(tab.id)}
             disabled={tab.disabled}
@@ -135,15 +137,15 @@ export default function IncidentDrills() {
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-              <option value="all">All Categories</option>
+              <option value="all">{t('cyber.common.allCategories')}</option>
               {categories.map(c => <option key={c} value={c}>{c.replace('_', ' ')}</option>)}
             </select>
             <select value={filterDiff} onChange={e => setFilterDiff(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-              <option value="all">All Difficulties</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="all">{t('cyber.common.allDifficulties')}</option>
+              <option value="beginner">{t('cyber.common.beginner')}</option>
+              <option value="intermediate">{t('cyber.common.intermediate')}</option>
+              <option value="advanced">{t('cyber.common.advanced')}</option>
             </select>
           </div>
 
@@ -167,7 +169,7 @@ export default function IncidentDrills() {
                     <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>⏱ ~{sc.estimated_minutes} min · {sc.steps_count} steps</span>
                     <button onClick={() => startDrill(sc.id)}
                       style={{ padding: '0.4rem 0.75rem', border: 'none', borderRadius: '0.4rem', cursor: 'pointer', background: '#dc2626', color: 'white', fontSize: '0.8rem', fontWeight: '500' }}>
-                      Start Drill
+                      {t('cyber.drills.startDrill')}
                     </button>
                   </div>
                 </div>
@@ -185,7 +187,7 @@ export default function IncidentDrills() {
             <div>
               <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>{session.scenario_title}</h2>
               <span style={{ fontSize: '0.82rem', color: '#6b7280' }}>
-                Step {Math.min(session.current_step + (feedback ? 0 : 1), session.total_steps)} of {session.total_steps} · Score: {session.score}/{session.max_score}
+                {t('cyber.drills.stepOf', { current: Math.min(session.current_step + (feedback ? 0 : 1), session.total_steps), total: session.total_steps, score: session.score, max: session.max_score })}
               </span>
             </div>
             {/* Progress */}
@@ -208,12 +210,12 @@ export default function IncidentDrills() {
               border: `1px solid ${feedback.is_correct ? '#bbf7d0' : '#fecaca'}`,
             }}>
               <div style={{ fontWeight: '700', fontSize: '1rem', color: feedback.is_correct ? '#166534' : '#991b1b', marginBottom: '0.5rem' }}>
-                {feedback.is_correct ? '✅ Correct!' : `❌ Incorrect — Best answer: ${feedback.correct_option}`}
+                {feedback.is_correct ? `✅ ${t('cyber.drills.correct')}` : `❌ ${t('cyber.drills.incorrect', { option: feedback.correct_option })}`}
               </div>
               <p style={{ margin: 0, color: '#374151', fontSize: '0.9rem', lineHeight: 1.6 }}>{feedback.explanation}</p>
               <button onClick={proceedToNext}
                 style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '0.4rem', cursor: 'pointer', fontWeight: '500' }}>
-                {session.completed ? 'View Results' : 'Next Step →'}
+                {session.completed ? t('cyber.drills.viewResults') : t('cyber.drills.nextStep')}
               </button>
             </div>
           )}
@@ -262,7 +264,7 @@ export default function IncidentDrills() {
                   color: 'white', border: 'none', borderRadius: '0.4rem', cursor: chosen ? 'pointer' : 'default',
                   fontWeight: '600', fontSize: '0.9rem',
                 }}>
-                {submitting ? 'Submitting…' : 'Submit Answer'}
+                {submitting ? t('cyber.drills.submitting') : t('cyber.drills.submitAnswer')}
               </button>
             </>
           )}
@@ -275,7 +277,7 @@ export default function IncidentDrills() {
           <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
             {session.score === session.max_score ? '🏆' : session.score >= session.max_score / 2 ? '👍' : '📚'}
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: '0 0 0.25rem' }}>Drill Complete</h2>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: '0 0 0.25rem' }}>{t('cyber.drills.drillComplete')}</h2>
           <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>{session.scenario_title}</p>
 
           <div style={{
@@ -286,12 +288,12 @@ export default function IncidentDrills() {
             <div style={{ fontSize: '2.5rem', fontWeight: '800', color: session.score === session.max_score ? '#16a34a' : session.score >= session.max_score / 2 ? '#d97706' : '#dc2626' }}>
               {session.score} / {session.max_score}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>correct answers</div>
+            <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>{t('cyber.drills.correctAnswers')}</div>
           </div>
 
           {/* Action review */}
           <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>Step Review</h3>
+            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>{t('cyber.drills.stepReview')}</h3>
             {session.actions.map((a, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0',
@@ -308,7 +310,7 @@ export default function IncidentDrills() {
 
           <button onClick={() => { setSession(null); setView('scenarios'); }}
             style={{ marginTop: '1.5rem', padding: '0.6rem 1.25rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '0.4rem', cursor: 'pointer', fontWeight: '500' }}>
-            Back to Scenarios
+            {t('cyber.drills.backToScenarios')}
           </button>
         </div>
       )}
@@ -316,14 +318,14 @@ export default function IncidentDrills() {
       {/* ── HISTORY ── */}
       {view === 'history' && (
         <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #e5e7eb' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>Drill History</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>{t('cyber.drills.drillHistory')}</h3>
           {history.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '2rem 0' }}>No completed drills yet. Start one from the Scenarios tab!</p>
+            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '2rem 0' }}>{t('cyber.drills.noDrills')}</p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
                 <tr style={{ background: '#f9fafb' }}>
-                  {['Scenario', 'Score', 'Date'].map(h => (
+                  {[t('cyber.drills.scenario'), t('cyber.common.score'), t('cyber.common.date')].map(h => (
                     <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>{h}</th>
                   ))}
                 </tr>

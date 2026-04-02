@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const OWASP_ITEMS = [
   { id: 'A01', name: 'Broken Access Control' },
@@ -38,6 +39,7 @@ export default function ToolsFrameworks() {
   const [project, setProject] = useState('default');
   const [presets, setPresets] = useState({});
   const [settings, setSettings] = useState({ jiraUrl: '', projectKey: '' });
+  const { t } = useTranslation();
 
   useEffect(() => {
     try {
@@ -57,7 +59,7 @@ export default function ToolsFrameworks() {
 
   const save = () => {
     localStorage.setItem(storageKey, JSON.stringify({ items: checklist, notes }));
-    alert('Saved locally.');
+    alert(t('cyber.toolsFrameworks.savedLocally'));
   };
 
   const exportJson = () => {
@@ -79,12 +81,12 @@ export default function ToolsFrameworks() {
     p[project || 'default'] = { items: checklist, notes, ts: new Date().toISOString() };
     setPresets(p);
     localStorage.setItem(presetsKey, JSON.stringify(p));
-    alert('Preset saved.');
+    alert(t('cyber.toolsFrameworks.presetSaved'));
   };
 
   const loadPreset = () => {
     const p = (presets || {})[project || 'default'];
-    if (!p) return alert('No preset found for this project.');
+    if (!p) return alert(t('cyber.toolsFrameworks.noPreset'));
     setChecklist(p.items || {});
     setNotes(p.notes || '');
   };
@@ -114,56 +116,56 @@ export default function ToolsFrameworks() {
 
   const saveSettings = () => {
     localStorage.setItem(settingsKey, JSON.stringify(settings));
-    alert('Settings saved.');
+    alert(t('cyber.toolsFrameworks.settingsSaved'));
   };
 
   return (
     <div style={{ padding: '1.5rem' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1f2937', margin: 0 }}>🧰 Tools & Frameworks</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1f2937', margin: 0 }}>🧰 {t('cyber.toolsFrameworks.title')}</h2>
         <p style={{ color: '#6b7280', marginTop: 6 }}>
-          Quick utilities for OWASP Top 10 checks and MITRE ATT&CK mapping. Use this as a lightweight companion to PenTesting/Red Team activities.
+          {t('cyber.toolsFrameworks.subtitle')}
         </p>
       </div>
 
       {/* Project Presets + Jira Settings */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ margin: 0, color: '#111827' }}>Project Presets & Jira Export</h3>
+          <h3 style={{ margin: 0, color: '#111827' }}>{t('cyber.toolsFrameworks.projectPresets')}</h3>
         </div>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
           <div>
-            <label style={{ display: 'block', color: '#6b7280' }}>Project</label>
+            <label style={{ display: 'block', color: '#6b7280' }}>{t('cyber.toolsFrameworks.project')}</label>
             <input value={project} onChange={(e)=>setProject(e.target.value)} placeholder="my-service" />
           </div>
           <div>
-            <label style={{ display: 'block', color: '#6b7280' }}>Jira Base URL</label>
+            <label style={{ display: 'block', color: '#6b7280' }}>{t('cyber.toolsFrameworks.jiraBaseUrl')}</label>
             <input value={settings.jiraUrl} onChange={(e)=>setSettings(s=>({ ...s, jiraUrl: e.target.value }))} placeholder="https://jira.example.com" />
           </div>
           <div>
-            <label style={{ display: 'block', color: '#6b7280' }}>Jira Project Key</label>
+            <label style={{ display: 'block', color: '#6b7280' }}>{t('cyber.toolsFrameworks.jiraProjectKey')}</label>
             <input value={settings.projectKey} onChange={(e)=>setSettings(s=>({ ...s, projectKey: e.target.value }))} placeholder="SEC" />
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button onClick={savePreset} style={btn}>💾 Save Preset</button>
-          <button onClick={loadPreset} style={btn}>📥 Load Preset</button>
-          <button onClick={deletePreset} style={btn}>🗑️ Delete Preset</button>
-          <button onClick={saveSettings} style={btn}>⚙️ Save Settings</button>
-          <button onClick={copyJiraMarkdown} style={btn}>📋 Copy Jira Markdown</button>
+          <button onClick={savePreset} style={btn}>💾 {t('cyber.toolsFrameworks.savePreset')}</button>
+          <button onClick={loadPreset} style={btn}>📥 {t('cyber.toolsFrameworks.loadPreset')}</button>
+          <button onClick={deletePreset} style={btn}>🗑️ {t('cyber.toolsFrameworks.deletePreset')}</button>
+          <button onClick={saveSettings} style={btn}>⚙️ {t('cyber.toolsFrameworks.saveSettings')}</button>
+          <button onClick={copyJiraMarkdown} style={btn}>📋 {t('cyber.toolsFrameworks.copyJiraMarkdown')}</button>
         </div>
       </div>
 
       {/* OWASP Checklist */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ margin: 0, color: '#111827' }}>OWASP Top 10 Checklist</h3>
+          <h3 style={{ margin: 0, color: '#111827' }}>{t('cyber.toolsFrameworks.owaspChecklist')}</h3>
           <div style={{ display: 'flex', gap: 8 }}>
             <a href="https://www.intruder.io/product/owasp-top-10-vulnerability-scanner" target="_blank" rel="noreferrer"
                style={{ background: '#3b82f6', color: 'white', padding: '6px 10px', borderRadius: 6, textDecoration: 'none' }}>
-              ⛏️ Intruder OWASP Scanner
+              ⛏️ {t('cyber.toolsFrameworks.intruderScanner')}
             </a>
-            <button onClick={save} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>💾 Save</button>
+            <button onClick={save} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>💾 {t('cyber.common.save')}</button>
             <button onClick={exportJson} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>⬇ Export</button>
           </div>
         </div>
@@ -171,11 +173,11 @@ export default function ToolsFrameworks() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th style={th}>ID</th>
-                <th style={th}>Name</th>
-                <th style={th}>Status</th>
-                <th style={th}>Severity</th>
-                <th style={th}>Comment</th>
+                <th style={th}>{t('cyber.toolsFrameworks.id')}</th>
+                <th style={th}>{t('cyber.toolsFrameworks.name')}</th>
+                <th style={th}>{t('cyber.common.status')}</th>
+                <th style={th}>{t('cyber.common.severity')}</th>
+                <th style={th}>{t('cyber.toolsFrameworks.comment')}</th>
               </tr>
             </thead>
             <tbody>
@@ -188,22 +190,22 @@ export default function ToolsFrameworks() {
                     <td style={td}>
                       <select value={row.status || ''} onChange={(e)=>setItem(item.id, 'status', e.target.value)}>
                         <option value="">—</option>
-                        <option value="ok">OK</option>
-                        <option value="issue">Issue</option>
-                        <option value="n/a">N/A</option>
+                        <option value="ok">{t('cyber.toolsFrameworks.ok')}</option>
+                        <option value="issue">{t('cyber.toolsFrameworks.issue')}</option>
+                        <option value="n/a">{t('cyber.toolsFrameworks.na')}</option>
                       </select>
                     </td>
                     <td style={td}>
                       <select value={row.severity || ''} onChange={(e)=>setItem(item.id, 'severity', e.target.value)}>
                         <option value="">—</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
+                        <option value="low">{t('cyber.toolsFrameworks.low')}</option>
+                        <option value="medium">{t('cyber.toolsFrameworks.medium')}</option>
+                        <option value="high">{t('cyber.toolsFrameworks.high')}</option>
+                        <option value="critical">{t('cyber.toolsFrameworks.critical')}</option>
                       </select>
                     </td>
                     <td style={td}>
-                      <input value={row.comment || ''} onChange={(e)=>setItem(item.id, 'comment', e.target.value)} placeholder="Note…" style={{ width: '100%' }} />
+                      <input value={row.comment || ''} onChange={(e)=>setItem(item.id, 'comment', e.target.value)} placeholder={t('cyber.toolsFrameworks.notePlaceholder')} style={{ width: '100%' }} />
                     </td>
                   </tr>
                 );
@@ -212,7 +214,7 @@ export default function ToolsFrameworks() {
           </table>
         </div>
         <div style={{ marginTop: 12 }}>
-          <label style={{ display: 'block', color: '#6b7280', marginBottom: 6 }}>General Notes</label>
+          <label style={{ display: 'block', color: '#6b7280', marginBottom: 6 }}>{t('cyber.toolsFrameworks.generalNotes')}</label>
           <textarea value={notes} onChange={(e)=>setNotes(e.target.value)} rows={3} style={{ width: '100%' }} />
         </div>
       </div>
@@ -220,21 +222,21 @@ export default function ToolsFrameworks() {
       {/* MITRE ATT&CK Mapper */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ margin: 0, color: '#111827' }}>MITRE ATT&CK Mapper</h3>
+          <h3 style={{ margin: 0, color: '#111827' }}>{t('cyber.toolsFrameworks.mitreMapper')}</h3>
           <a href="https://www.microsoft.com/en-us/security/business/security-101/what-is-mitre-attack-framework" target="_blank" rel="noreferrer"
              style={{ background: '#3b82f6', color: 'white', padding: '6px 10px', borderRadius: 6, textDecoration: 'none' }}>
-            📚 Microsoft ATT&CK Guide
+            📚 {t('cyber.toolsFrameworks.microsoftGuide')}
           </a>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-          {TACTICS.map(t => (
-            <div key={t.id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>{t.name}</div>
+          {TACTICS.map(tactic => (
+            <div key={tactic.id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>{tactic.name}</div>
               <div style={{ fontSize: '0.9em', color: '#6b7280' }}>
-                Examples: {t.examples.join(', ')}
+                {t('cyber.toolsFrameworks.examples')}: {tactic.examples.join(', ')}
               </div>
               <div style={{ marginTop: 8, fontSize: '0.85em' }}>
-                <div style={{ color: '#111827', fontWeight: 600, marginBottom: 4 }}>Signals & Controls (our platform)</div>
+                <div style={{ color: '#111827', fontWeight: 600, marginBottom: 4 }}>{t('cyber.toolsFrameworks.signalsControls')}</div>
                 <ul style={{ margin: 0, paddingLeft: 18 }}>
                   <li>Agent Security: Zero‑Trust compliance & DLP findings</li>
                   <li>Threat Library: Add detection ideas per tactic</li>
@@ -242,11 +244,11 @@ export default function ToolsFrameworks() {
                 </ul>
               </div>
               <div style={{ marginTop: 8 }}>
-                <label style={{ display: 'block', color: '#6b7280', marginBottom: 4 }}>SIEM Detection idea</label>
-                <textarea rows={3} style={{ width: '100%' }} defaultValue={`rule: ${t.name} suspected\nwhen:\n  - abnormal_auth\n  - rare_process_tree\nnotes: Map to ATT&CK ${t.id}\n`} />
+                <label style={{ display: 'block', color: '#6b7280', marginBottom: 4 }}>{t('cyber.toolsFrameworks.siemDetectionIdea')}</label>
+                <textarea rows={3} style={{ width: '100%' }} defaultValue={`rule: ${tactic.name} suspected\nwhen:\n  - abnormal_auth\n  - rare_process_tree\nnotes: Map to ATT&CK ${tactic.id}\n`} />
               </div>
               <div style={{ marginTop: 6 }}>
-                <button onClick={(e)=>navigator.clipboard.writeText(e.currentTarget.parentElement.querySelector('textarea').value)} style={btn}>📋 Copy snippet</button>
+                <button onClick={(e)=>navigator.clipboard.writeText(e.currentTarget.parentElement.querySelector('textarea').value)} style={btn}>📋 {t('cyber.toolsFrameworks.copySnippet')}</button>
               </div>
             </div>
           ))}
@@ -255,13 +257,13 @@ export default function ToolsFrameworks() {
 
       {/* ZAP/DAST Mini Lab */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, marginTop: 20 }}>
-        <h3 style={{ marginTop: 0 }}>ZAP/DAST Mini‑Lab</h3>
+        <h3 style={{ marginTop: 0 }}>{t('cyber.toolsFrameworks.zapLab')}</h3>
         <ol style={{ marginTop: 6 }}>
-          <li>Run a local ZAP/DAST scan against a test endpoint (never production without approval).</li>
-          <li>Export the report as JSON.</li>
-          <li>Paste the JSON below and press “Parse into OWASP checklist”.</li>
+          <li>{t('cyber.toolsFrameworks.zapStep1')}</li>
+          <li>{t('cyber.toolsFrameworks.zapStep2')}</li>
+          <li>{t('cyber.toolsFrameworks.zapStep3')}</li>
         </ol>
-        <textarea id="zap-json" rows={6} placeholder="Paste ZAP/DAST JSON report..." style={{ width: '100%', marginTop: 8 }} />
+        <textarea id="zap-json" rows={6} placeholder={t('cyber.toolsFrameworks.pasteReport')} style={{ width: '100%', marginTop: 8 }} />
         <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
           <button onClick={()=>{
             try {
@@ -274,11 +276,11 @@ export default function ToolsFrameworks() {
               if (txt.includes('authentication') || txt.includes('session')) touch('A07','high');
               if (txt.includes('integrity') || txt.includes('tamper')) touch('A08','high');
               if (txt.includes('ssrf')) touch('A10','critical');
-              alert('Checklist updated from report.');
+              alert(t('cyber.toolsFrameworks.checklistUpdated'));
             } catch {
-              alert('Could not parse report.');
+              alert(t('cyber.toolsFrameworks.parseFailed'));
             }
-          }} style={btn}>🧪 Parse into OWASP checklist</button>
+          }} style={btn}>🧪 {t('cyber.toolsFrameworks.parseChecklist')}</button>
         </div>
       </div>
     </div>
@@ -288,5 +290,3 @@ export default function ToolsFrameworks() {
 const th = { textAlign: 'left', padding: '8px', borderBottom: '1px solid #e5e7eb', color: '#6b7280', fontSize: '0.85em' };
 const td = { padding: '8px', borderBottom: '1px solid #f3f4f6' };
 const btn = { background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb', cursor: 'pointer' };
-
-

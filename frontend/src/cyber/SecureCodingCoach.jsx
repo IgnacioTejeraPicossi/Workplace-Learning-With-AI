@@ -1,5 +1,6 @@
 // Secure Coding Coach — topic browser, lesson generator, history
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API = '/api/cyber';
 
@@ -13,6 +14,7 @@ const DIFF_COLORS = {
 };
 
 export default function SecureCodingCoach() {
+  const { t } = useTranslation();
   const [topics, setTopics] = useState([]);
   const [history, setHistory] = useState([]);
   const [filterCat, setFilterCat] = useState('all');
@@ -133,18 +135,18 @@ export default function SecureCodingCoach() {
     return parts.length ? parts : text;
   }
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading coach…</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>{t('cyber.coach.loading')}</div>;
 
-  const categories = [...new Set(topics.map(t => t.category))];
+  const categories = [...new Set(topics.map(tp => tp.category))];
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
       {/* Top nav */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { id: 'topics', label: 'Topic Catalog', icon: '📚' },
-          { id: 'lesson', label: 'Current Lesson', icon: '📝' },
-          { id: 'history', label: 'History', icon: '🕐' },
+          { id: 'topics', label: t('cyber.coach.topicCatalog'), icon: '📚' },
+          { id: 'lesson', label: t('cyber.coach.currentLesson'), icon: '📝' },
+          { id: 'history', label: t('cyber.coach.history'), icon: '🕐' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setView(tab.id)}
             disabled={tab.id === 'lesson' && !activeLesson}
@@ -167,17 +169,17 @@ export default function SecureCodingCoach() {
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-              <option value="all">All Categories</option>
+              <option value="all">{t('cyber.common.allCategories')}</option>
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={filterDiff} onChange={e => setFilterDiff(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-              <option value="all">All Difficulties</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="all">{t('cyber.common.allDifficulties')}</option>
+              <option value="beginner">{t('cyber.common.beginner')}</option>
+              <option value="intermediate">{t('cyber.common.intermediate')}</option>
+              <option value="advanced">{t('cyber.common.advanced')}</option>
             </select>
-            <span style={{ fontSize: '0.8rem', color: '#6b7280', alignSelf: 'center' }}>{filteredTopics().length} topics</span>
+            <span style={{ fontSize: '0.8rem', color: '#6b7280', alignSelf: 'center' }}>{filteredTopics().length} {t('cyber.coach.topics')}</span>
           </div>
 
           {/* Topic cards grid */}
@@ -210,7 +212,7 @@ export default function SecureCodingCoach() {
                         background: isGenerating ? '#93c5fd' : '#3b82f6', color: 'white',
                         fontSize: '0.8rem', fontWeight: '500',
                       }}>
-                      {isGenerating ? 'Generating…' : 'Start Lesson'}
+                      {isGenerating ? t('cyber.coach.generating') : t('cyber.coach.startLesson')}
                     </button>
                   </div>
                 </div>
@@ -230,7 +232,7 @@ export default function SecureCodingCoach() {
             </div>
             <button onClick={() => setView('topics')}
               style={{ padding: '0.4rem 0.75rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '0.4rem', cursor: 'pointer', fontSize: '0.8rem' }}>
-              Back to Topics
+              {t('cyber.coach.backToTopics')}
             </button>
           </div>
           <div style={{ lineHeight: 1.65 }}>
@@ -238,7 +240,7 @@ export default function SecureCodingCoach() {
           </div>
           {activeLesson.references?.length > 0 && (
             <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.5rem' }}>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>References</h4>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>{t('cyber.coach.references')}</h4>
               <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
                 {activeLesson.references.map((r, i) => <li key={i} style={{ fontSize: '0.82rem', color: '#6b7280' }}>{r}</li>)}
               </ul>
@@ -250,14 +252,14 @@ export default function SecureCodingCoach() {
       {/* ---------- HISTORY ---------- */}
       {view === 'history' && (
         <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #e5e7eb' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>Lesson History</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>{t('cyber.coach.lessonHistory')}</h3>
           {history.length === 0 ? (
-            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '2rem 0' }}>No lessons generated yet. Start one from the Topic Catalog!</p>
+            <p style={{ color: '#9ca3af', textAlign: 'center', padding: '2rem 0' }}>{t('cyber.coach.noLessons')}</p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
                 <tr style={{ background: '#f9fafb' }}>
-                  {['Topic', 'Title', 'Duration', 'Generated At'].map(h => (
+                  {[t('cyber.coach.topic'), t('cyber.common.title'), t('cyber.coach.duration'), t('cyber.coach.generatedAt')].map(h => (
                     <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>{h}</th>
                   ))}
                 </tr>

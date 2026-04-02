@@ -1,5 +1,6 @@
 // Knowledge Base — cybersecurity articles, search, and AI Q&A
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API = '/api/cyber';
 
@@ -14,6 +15,7 @@ const DIFF_COLORS = {
 };
 
 export default function KnowledgeBase() {
+  const { t } = useTranslation();
   const [articles, setArticles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filterCat, setFilterCat] = useState('all');
@@ -152,16 +154,16 @@ export default function KnowledgeBase() {
     return parts.length ? parts : text;
   }
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading knowledge base…</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>{t('cyber.knowledge.loading')}</div>;
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
       {/* Nav */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { id: 'articles', label: 'Articles', icon: '📚' },
-          { id: 'reader', label: 'Reading', icon: '📖', disabled: !activeArticle },
-          { id: 'ask', label: 'Ask a Question', icon: '💬' },
+          { id: 'articles', label: t('cyber.knowledge.articles'), icon: '📚' },
+          { id: 'reader', label: t('cyber.knowledge.reading'), icon: '📖', disabled: !activeArticle },
+          { id: 'ask', label: t('cyber.knowledge.askQuestion'), icon: '💬' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setView(tab.id)}
             disabled={tab.disabled}
@@ -197,16 +199,16 @@ export default function KnowledgeBase() {
 
           {/* Filters */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-            <input placeholder="Search articles…" value={search} onChange={e => setSearch(e.target.value)}
+            <input placeholder={t('cyber.common.search') + '...'} value={search} onChange={e => setSearch(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem', minWidth: 200 }} />
             <select value={filterDiff} onChange={e => setFilterDiff(e.target.value)}
               style={{ padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
-              <option value="all">All Levels</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="all">{t('cyber.knowledge.allLevels')}</option>
+              <option value="beginner">{t('cyber.common.beginner')}</option>
+              <option value="intermediate">{t('cyber.common.intermediate')}</option>
+              <option value="advanced">{t('cyber.common.advanced')}</option>
             </select>
-            <span style={{ fontSize: '0.8rem', color: '#6b7280', alignSelf: 'center' }}>{filteredArticles().length} articles</span>
+            <span style={{ fontSize: '0.8rem', color: '#6b7280', alignSelf: 'center' }}>{filteredArticles().length} {t('cyber.knowledge.articleCount')}</span>
           </div>
 
           {/* Article cards */}
@@ -234,8 +236,8 @@ export default function KnowledgeBase() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
                     <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>📖 {article.reading_minutes} min read</span>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {article.tags.slice(0, 3).map(t => (
-                        <span key={t} style={{ padding: '0.1rem 0.4rem', borderRadius: 4, background: '#f3f4f6', fontSize: '0.65rem', color: '#6b7280' }}>{t}</span>
+                      {article.tags.slice(0, 3).map(tag => (
+                        <span key={tag} style={{ padding: '0.1rem 0.4rem', borderRadius: 4, background: '#f3f4f6', fontSize: '0.65rem', color: '#6b7280' }}>{tag}</span>
                       ))}
                     </div>
                   </div>
@@ -265,7 +267,7 @@ export default function KnowledgeBase() {
             </div>
             <button onClick={() => setView('articles')}
               style={{ padding: '0.4rem 0.75rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '0.4rem', cursor: 'pointer', fontSize: '0.8rem' }}>
-              Back to Articles
+              {t('cyber.knowledge.backToArticles')}
             </button>
           </div>
 
@@ -275,8 +277,8 @@ export default function KnowledgeBase() {
 
           {activeArticle.tags.length > 0 && (
             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {activeArticle.tags.map(t => (
-                <span key={t} style={{ padding: '0.2rem 0.5rem', borderRadius: 4, background: '#f3f4f6', fontSize: '0.75rem', color: '#6b7280' }}>#{t}</span>
+              {activeArticle.tags.map(tag => (
+                <span key={tag} style={{ padding: '0.2rem 0.5rem', borderRadius: 4, background: '#f3f4f6', fontSize: '0.75rem', color: '#6b7280' }}>#{tag}</span>
               ))}
             </div>
           )}
@@ -288,14 +290,14 @@ export default function KnowledgeBase() {
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid #e5e7eb', marginBottom: '1rem' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.75rem' }}>
-              💬 Ask a Cybersecurity Question
+              💬 {t('cyber.knowledge.askCyberQuestion')}
             </h3>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && askQuestion()}
-                placeholder="e.g., What is phishing and how can I prevent it?"
+                placeholder={t('cyber.knowledge.askPlaceholder')}
                 style={{ flex: 1, padding: '0.6rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.9rem' }}
               />
               <button onClick={askQuestion} disabled={asking || !question.trim()}
@@ -304,13 +306,13 @@ export default function KnowledgeBase() {
                   border: 'none', borderRadius: '0.5rem', cursor: question.trim() ? 'pointer' : 'default',
                   fontWeight: '500', fontSize: '0.875rem', whiteSpace: 'nowrap',
                 }}>
-                {asking ? 'Thinking…' : 'Ask'}
+                {asking ? t('cyber.knowledge.thinking') : t('cyber.knowledge.ask')}
               </button>
             </div>
 
             {/* Suggested questions */}
             <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {['What is phishing?', 'How do I prevent SQL injection?', 'Explain zero trust architecture', 'What is the CIA triad?'].map(q => (
+              {[t('cyber.knowledge.suggestedQuestions.phishing'), t('cyber.knowledge.suggestedQuestions.sqlInjection'), t('cyber.knowledge.suggestedQuestions.zeroTrust'), t('cyber.knowledge.suggestedQuestions.ciaTriad')].map(q => (
                 <button key={q} onClick={() => { setQuestion(q); }}
                   style={{ padding: '0.3rem 0.6rem', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 9999, cursor: 'pointer', fontSize: '0.75rem', color: '#6b7280' }}>
                   {q}
@@ -323,19 +325,19 @@ export default function KnowledgeBase() {
           {answer && (
             <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid #e5e7eb' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>Answer</h4>
+                <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>{t('cyber.knowledge.answer')}</h4>
                 <span style={{
                   padding: '0.15rem 0.5rem', borderRadius: 9999, fontSize: '0.7rem', fontWeight: '600',
                   background: answer.confidence >= 0.8 ? '#dcfce7' : answer.confidence >= 0.5 ? '#fef9c3' : '#fee2e2',
                   color: answer.confidence >= 0.8 ? '#166534' : answer.confidence >= 0.5 ? '#854d0e' : '#991b1b',
                 }}>
-                  Confidence: {Math.round(answer.confidence * 100)}%
+                  {t('cyber.knowledge.confidence', { pct: Math.round(answer.confidence * 100) })}
                 </span>
               </div>
               <p style={{ color: '#374151', lineHeight: 1.65, margin: '0 0 1rem' }}>{answer.answer}</p>
               {answer.sources.length > 0 && (
                 <div style={{ paddingTop: '0.75rem', borderTop: '1px solid #e5e7eb' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6b7280' }}>Sources:</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6b7280' }}>{t('cyber.knowledge.sources')}</span>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: '0.25rem' }}>
                     {answer.sources.map((s, i) => (
                       <span key={i} style={{ padding: '0.15rem 0.5rem', borderRadius: 4, background: '#f3f4f6', fontSize: '0.75rem', color: '#6b7280' }}>{s}</span>
@@ -344,7 +346,7 @@ export default function KnowledgeBase() {
                 </div>
               )}
               <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: '0.5rem' }}>
-                Response time: {answer.processing_time.toFixed(2)}s
+                {t('cyber.knowledge.responseTime', { time: answer.processing_time.toFixed(2) })}
               </div>
             </div>
           )}

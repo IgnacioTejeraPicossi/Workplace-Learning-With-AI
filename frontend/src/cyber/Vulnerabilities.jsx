@@ -1,6 +1,7 @@
 // Vulnerability Management Component
 // Searchable vulnerability table with scan controls, summary cards, and detail modal
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -16,6 +17,7 @@ export default function Vulnerabilities() {
   const [filterSource, setFilterSource] = useState('');
   const [filterFixed, setFilterFixed] = useState('all'); // all | open | fixed
   const [searchText, setSearchText] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadData();
@@ -91,7 +93,7 @@ export default function Vulnerabilities() {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <div style={{ fontSize: '1.5rem' }}>Loading vulnerabilities...</div>
+        <div style={{ fontSize: '1.5rem' }}>{t('cyber.vulnerabilities.loading')}</div>
       </div>
     );
   }
@@ -102,10 +104,10 @@ export default function Vulnerabilities() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-            Vulnerability Management
+            {t('cyber.vulnerabilities.title')}
           </h2>
           <p style={{ color: '#6b7280', margin: '0.25rem 0 0 0' }}>
-            Scan, track, and remediate security vulnerabilities
+            {t('cyber.vulnerabilities.subtitle')}
           </p>
         </div>
       </div>
@@ -113,9 +115,9 @@ export default function Vulnerabilities() {
       {/* Summary Cards */}
       {summary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-          <SummaryCard label="Total" value={summary.total} color="#3b82f6" />
-          <SummaryCard label="Open" value={summary.open} color="#ef4444" />
-          <SummaryCard label="Fixed" value={summary.fixed} color="#10b981" />
+          <SummaryCard label={t('cyber.vulnerabilities.total')} value={summary.total} color="#3b82f6" />
+          <SummaryCard label={t('cyber.vulnerabilities.open')} value={summary.open} color="#ef4444" />
+          <SummaryCard label={t('cyber.vulnerabilities.fixed')} value={summary.fixed} color="#10b981" />
           <SummaryCard label="Critical" value={summary.by_severity?.CRITICAL || 0} color="#dc2626" />
           <SummaryCard label="High" value={summary.by_severity?.HIGH || 0} color="#ea580c" />
           <SummaryCard label="Medium" value={summary.by_severity?.MEDIUM || 0} color="#d97706" />

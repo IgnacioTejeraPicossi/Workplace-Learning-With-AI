@@ -1,7 +1,9 @@
 // Threat Library Component
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ThreatLibrary() {
+  const { t } = useTranslation();
   const [threats, setThreats] = useState([]);
   const [controls, setControls] = useState([]);
   const [selectedThreat, setSelectedThreat] = useState(null);
@@ -66,7 +68,7 @@ export default function ThreatLibrary() {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading threat library...</p>
+        <p>{t('cyber.threatLibrary.loading')}</p>
       </div>
     );
   }
@@ -76,10 +78,10 @@ export default function ThreatLibrary() {
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1f2937' }}>
-          🛡️ Threat Library
+          🛡️ {t('cyber.threatLibrary.title')}
         </h1>
         <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
-          Comprehensive database of cybersecurity threats and mitigation controls
+          {t('cyber.threatLibrary.subtitle')}
         </p>
       </div>
 
@@ -92,23 +94,23 @@ export default function ThreatLibrary() {
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '1rem' }}>
-          CIA Triad Framework
+          {t('cyber.threatLibrary.ciaTriadFramework')}
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '0.5rem' }}>
             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔒</div>
-            <h3 style={{ fontWeight: '600', color: '#92400e' }}>Confidentiality</h3>
-            <p style={{ fontSize: '0.875rem', color: '#a16207' }}>Protecting sensitive information from unauthorized access</p>
+            <h3 style={{ fontWeight: '600', color: '#92400e' }}>{t('cyber.threatLibrary.confidentiality')}</h3>
+            <p style={{ fontSize: '0.875rem', color: '#a16207' }}>{t('cyber.threatLibrary.confidentialityDesc')}</p>
           </div>
           <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#dbeafe', borderRadius: '0.5rem' }}>
             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
-            <h3 style={{ fontWeight: '600', color: '#1e40af' }}>Integrity</h3>
-            <p style={{ fontSize: '0.875rem', color: '#1d4ed8' }}>Ensuring data accuracy and preventing unauthorized modifications</p>
+            <h3 style={{ fontWeight: '600', color: '#1e40af' }}>{t('cyber.threatLibrary.integrityLabel')}</h3>
+            <p style={{ fontSize: '0.875rem', color: '#1d4ed8' }}>{t('cyber.threatLibrary.integrityDesc')}</p>
           </div>
           <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#dcfce7', borderRadius: '0.5rem' }}>
             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⚡</div>
-            <h3 style={{ fontWeight: '600', color: '#166534' }}>Availability</h3>
-            <p style={{ fontSize: '0.875rem', color: '#15803d' }}>Ensuring systems and data are accessible when needed</p>
+            <h3 style={{ fontWeight: '600', color: '#166534' }}>{t('cyber.threatLibrary.availability')}</h3>
+            <p style={{ fontSize: '0.875rem', color: '#15803d' }}>{t('cyber.threatLibrary.availabilityDesc')}</p>
           </div>
         </div>
       </div>
@@ -118,7 +120,7 @@ export default function ThreatLibrary() {
         {/* Category Filter */}
         <div style={{ flex: 1 }}>
           <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-            Filter by Category
+            {t('cyber.threatLibrary.filterByCategory')}
           </label>
           <select
             value={filterCategory}
@@ -132,7 +134,7 @@ export default function ThreatLibrary() {
               fontSize: '0.875rem'
             }}
           >
-            <option value="all">All Categories</option>
+            <option value="all">{t('cyber.common.allCategories')}</option>
             {categories.slice(1).map(category => (
               <option key={category} value={category}>
                 {getCategoryIcon(category)} {category.replace(/_/g, ' ').toUpperCase()}
@@ -179,7 +181,7 @@ export default function ThreatLibrary() {
             {/* CIA Impact Indicators */}
             <div style={{ marginBottom: '0.75rem' }}>
               <div style={{ fontSize: '0.75rem', fontWeight: '500', color: '#6b7280', marginBottom: '0.25rem' }}>
-                CIA Impact
+                {t('cyber.threatLibrary.ciaImpact')}
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {Object.entries(threat.cia_impact).map(([key, value]) => (
@@ -227,7 +229,7 @@ export default function ThreatLibrary() {
                 ))}
                 {threat.tags.length > 3 && (
                   <span style={{ fontSize: '0.625rem', color: '#6b7280' }}>
-                    +{threat.tags.length - 3} more
+                    {t('cyber.threatLibrary.moreTag', { count: threat.tags.length - 3 })}
                   </span>
                 )}
               </div>
@@ -279,7 +281,7 @@ export default function ThreatLibrary() {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                Description
+                {t('cyber.common.description')}
               </h3>
               <p style={{ color: '#6b7280', lineHeight: '1.5' }}>
                 {selectedThreat.description}
@@ -288,7 +290,7 @@ export default function ThreatLibrary() {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                CIA Impact Assessment
+                {t('cyber.threatLibrary.ciaImpactAssessment')}
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                 {Object.entries(selectedThreat.cia_impact).map(([key, value]) => (
@@ -309,7 +311,7 @@ export default function ThreatLibrary() {
                       {value}
                     </div>
                     <div style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>
-                      {key === 'C' ? 'Confidentiality' : key === 'I' ? 'Integrity' : 'Availability'}
+                      {key === 'C' ? t('cyber.threatLibrary.confidentiality') : key === 'I' ? t('cyber.threatLibrary.integrityLabel') : t('cyber.threatLibrary.availability')}
                     </div>
                   </div>
                 ))}

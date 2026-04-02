@@ -1,5 +1,6 @@
 // Cybersecurity Dashboard Component
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function CyberDashboard() {
   const [riskScore, setRiskScore] = useState(null);
@@ -7,6 +8,7 @@ export default function CyberDashboard() {
   const [vulnerabilities, setVulnerabilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadDashboardData();
@@ -91,7 +93,7 @@ export default function CyberDashboard() {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading cybersecurity dashboard...</p>
+        <p>{t('cyber.dashboard.loading')}</p>
       </div>
     );
   }
@@ -101,10 +103,10 @@ export default function CyberDashboard() {
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1f2937' }}>
-          🔒 Cybersecurity Dashboard
+          🔒 {t('cyber.dashboard.title')}
         </h1>
         <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
-          Monitor security posture, vulnerabilities, and compliance status
+          {t('cyber.dashboard.subtitle')}
         </p>
       </div>
 
@@ -117,7 +119,7 @@ export default function CyberDashboard() {
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937' }}>Security Risk Score</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937' }}>{t('cyber.dashboard.riskScore')}</h2>
           <button
             onClick={runVulnerabilityScan}
             disabled={scanning}
@@ -132,7 +134,7 @@ export default function CyberDashboard() {
               fontWeight: '500'
             }}
           >
-            {scanning ? 'Scanning...' : 'Run Scans'}
+            {scanning ? t('cyber.dashboard.scanning') : t('cyber.dashboard.runScans')}
           </button>
         </div>
         
@@ -156,7 +158,7 @@ export default function CyberDashboard() {
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em'
                 }}>
-                  Overall Risk Score
+                  {t('cyber.dashboard.overallRiskScore')}
                 </span>
                 <span style={{
                   marginLeft: '0.5rem',
@@ -173,7 +175,7 @@ export default function CyberDashboard() {
                 </span>
               </div>
               <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                Based on vulnerabilities, patch latency, and compliance coverage
+                {t('cyber.dashboard.riskBasis')}
               </div>
             </div>
           </div>
@@ -224,24 +226,24 @@ export default function CyberDashboard() {
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '1rem' }}>
-          Recent Vulnerabilities
+          {t('cyber.dashboard.recentVulns')}
         </h2>
         
         {vulnerabilities.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🛡️</div>
-            <p>No vulnerabilities found</p>
+            <p>{t('cyber.dashboard.noVulns')}</p>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Title</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Severity</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Package</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Source</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>Risk Score</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{t('cyber.common.title')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{t('cyber.common.severity')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{t('cyber.dashboard.package')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{t('cyber.common.source')}</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{t('cyber.dashboard.riskScore2')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -293,10 +295,10 @@ export default function CyberDashboard() {
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
       }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '1rem' }}>
-          📚 Cybersecurity 101 Reference
+          📚 {t('cyber.dashboard.reference.title')}
         </h2>
         <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-          Comprehensive overview of cybersecurity concepts, threats, frameworks, and ecosystem
+          {t('cyber.dashboard.reference.subtitle')}
         </p>
         
         {/* Cybersecurity 101 Visual Diagram + Content */}
@@ -322,7 +324,7 @@ export default function CyberDashboard() {
               border: '1px solid #e5e7eb'
             }}>
               <h4 style={{ color: '#059669', fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>
-                🎯 Top 15 Cybersecurity Threats
+                🎯 {t('cyber.dashboard.reference.top15')}
               </h4>
               <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
                 <div>1. Ransomware Attacks</div>
@@ -351,17 +353,17 @@ export default function CyberDashboard() {
               border: '1px solid #e5e7eb'
             }}>
               <h4 style={{ color: '#dc2626', fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>
-                🔺 CIA Triad
+                🔺 {t('cyber.dashboard.reference.ciaTriad')}
               </h4>
               <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
                 <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>Confidentiality:</strong> Ensuring sensitive information is accessed only by authorized individuals
+                  {t('cyber.dashboard.reference.confidentiality')}
                 </div>
                 <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>Integrity:</strong> Maintaining accuracy and completeness of data, preventing unauthorized alterations
+                  {t('cyber.dashboard.reference.integrity')}
                 </div>
                 <div>
-                  <strong>Availability:</strong> Ensuring information and resources are available to authorized users when needed
+                  {t('cyber.dashboard.reference.availability')}
                 </div>
               </div>
             </div>
@@ -374,16 +376,16 @@ export default function CyberDashboard() {
               border: '1px solid #e5e7eb'
             }}>
               <h4 style={{ color: '#2563eb', fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>
-                🛡️ Defense Layers
+                🛡️ {t('cyber.dashboard.reference.defenseLayers')}
               </h4>
               <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
-                <div>• Physical: Locks, fences, security guards</div>
-                <div>• Perimeter: Firewall, VPN, packet filters</div>
-                <div>• Policies: Password policies, data classification</div>
-                <div>• Internal Network: Firewall, intrusion detection</div>
-                <div>• Host: OS patches, malware protection</div>
-                <div>• Application: SSO, authentication</div>
-                <div>• Data: Database security, encryption</div>
+                <div>{t('cyber.dashboard.reference.physical')}</div>
+                <div>{t('cyber.dashboard.reference.perimeter')}</div>
+                <div>{t('cyber.dashboard.reference.policies')}</div>
+                <div>{t('cyber.dashboard.reference.internalNetwork')}</div>
+                <div>{t('cyber.dashboard.reference.host')}</div>
+                <div>{t('cyber.dashboard.reference.application')}</div>
+                <div>{t('cyber.dashboard.reference.data')}</div>
               </div>
             </div>
 
@@ -395,17 +397,17 @@ export default function CyberDashboard() {
               border: '1px solid #e5e7eb'
             }}>
               <h4 style={{ color: '#7c3aed', fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>
-                📋 Key Frameworks
+                📋 {t('cyber.dashboard.reference.keyFrameworks')}
               </h4>
               <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
                 <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>NIST CSF 2.0:</strong> Govern, Identify, Protect, Detect, Respond, Recover
+                  {t('cyber.dashboard.reference.nistCsf')}
                 </div>
                 <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>Zero Trust:</strong> Verify every access attempt
+                  {t('cyber.dashboard.reference.zeroTrust')}
                 </div>
                 <div>
-                  <strong>Cybersecurity Mesh:</strong> Distributed security architecture
+                  {t('cyber.dashboard.reference.cyberMesh')}
                 </div>
               </div>
             </div>
@@ -420,7 +422,7 @@ export default function CyberDashboard() {
             textAlign: 'center'
           }}>
             <h4 style={{ color: '#dc2626', fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem' }}>
-              📊 Why Cybersecurity Matters
+              📊 {t('cyber.dashboard.reference.whyMatters')}
             </h4>
             <div style={{ 
               display: 'grid', 
@@ -430,15 +432,15 @@ export default function CyberDashboard() {
             }}>
               <div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#dc2626' }}>$4.35M</div>
-                <div>Average cost of data breach (2022)</div>
+                <div>{t('cyber.dashboard.reference.avgCost')}</div>
               </div>
               <div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#dc2626' }}>579→1287</div>
-                <div>Password attacks per second (since Sep 2021)</div>
+                <div>{t('cyber.dashboard.reference.passwordAttacks')}</div>
               </div>
               <div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#dc2626' }}>65T</div>
-                <div>Signals analyzed daily by Microsoft</div>
+                <div>{t('cyber.dashboard.reference.signalsAnalyzed')}</div>
               </div>
             </div>
           </div>
