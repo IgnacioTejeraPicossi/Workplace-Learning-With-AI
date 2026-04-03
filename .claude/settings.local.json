@@ -19,7 +19,9 @@
       "Bash(npm init:*)",
       "Bash(node create_cybersecurity_presentation.js \"Cybersecurity_Module_Presentation.pptx\")",
       "Bash(ls -la \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation/\"*.pptx)",
-      "Bash(npx react-scripts:*)"
+      "Bash(npx react-scripts:*)",
+      "Bash(find '/c/Test/AI/AI Learning with AI' -type d -name *robomind* -o -type d -name *Robomind*)",
+      "Bash(grep -n \"Robomind Clinic\\\\|Detectable Disorders\\\\|Case Intake\\\\|Sample Cases\\\\|Test Case\\\\|Diagnosis Report\\\\|No Pathologies\\\\|Available Therapy\\\\|Enhanced Robomind\\\\|Machine Psychology\\\\|Psychopathia Machinalis\\\\|Screening Results\\\\|Axis Scores\\\\|Top Flags\\\\|Therapeutic Interventions\" \"/c/Test/AI/AI Learning with AI/frontend/src/RobomindClinic/\"*.jsx)"
     ]
   }
 }

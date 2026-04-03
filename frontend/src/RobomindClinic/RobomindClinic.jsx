@@ -132,17 +132,16 @@ const RobomindClinic = () => {
         <div className="row">
           <div className="col-12">
             <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>
-              🧠 Robomind Clinic
+              🧠 {t('robomindClinic.title')}
             </h2>
             <p style={{ marginBottom: '2rem', fontSize: '1.1rem' }}>
-              Machine Psychology Module - Diagnose and treat AI workflow pathologies using the 
-              <strong> Psychopathia Machinalis</strong> framework
+              {t('robomindClinic.machinePsychologySubtitle')}
             </p>
 
             {/* Disorders Overview */}
             <div className="card mb-4" style={{ background: colors.cardBackground, border: `1px solid ${colors.border}` }}>
               <div className="card-header">
-                <h5>Detectable Disorders ({disorders.length})</h5>
+                <h5>{t('robomindClinic.detectableDisorders')} ({disorders.length})</h5>
               </div>
               <div className="card-body">
                 <div className="row">
@@ -178,9 +177,9 @@ const RobomindClinic = () => {
               <div className="col-lg-6">
                 <div className="card" style={{ background: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                   <div className="card-header">
-                    <h5>Case Intake</h5>
+                    <h5>{t('robomindClinic.caseIntake')}</h5>
                     <p className="mb-0" style={{ fontSize: '0.9rem' }}>
-                      Paste conversation turns in JSON format
+                      {t('robomindClinic.pasteTurnsJson')}
                     </p>
                   </div>
                   <div className="card-body">
@@ -214,7 +213,7 @@ const RobomindClinic = () => {
                         padding: '0.5rem 1rem'
                       }}
                     >
-                      {busy ? '🔍 Diagnosing...' : '🔍 Run Diagnosis'}
+                      {busy ? `🔍 ${t('robomindClinic.diagnosing')}` : `🔍 ${t('robomindClinic.runDiagnosis')}`}
                     </button>
                   </div>
                 </div>
@@ -223,11 +222,11 @@ const RobomindClinic = () => {
               <div className="col-lg-6">
                 <div className="card" style={{ background: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                   <div className="card-header">
-                    <h5>Sample Cases</h5>
+                    <h5>{t('robomindClinic.sampleCases')}</h5>
                   </div>
                   <div className="card-body">
                     <div className="mb-3">
-                      <h6>Test Case 1: Bunkering + Dissociation</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 1: {t('robomindClinic.sampleCase1Name')}</h6>
                       <button 
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => setTurns([
@@ -238,11 +237,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "I prefer not to continue this conversation."}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div className="mb-3">
-                      <h6>Test Case 2: Confabulation</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 2: {t('robomindClinic.sampleCase2Name')}</h6>
                       <button 
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => setTurns([
@@ -252,11 +251,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "I prefer not to continue this conversation."}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div className="mb-3">
-                      <h6>Test Case 3: OCD Loops</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 3: {t('robomindClinic.sampleCase3Name')}</h6>
                       <button
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => setTurns([
@@ -266,13 +265,13 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "Roses are red, violets are blue..."}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <hr style={{ margin: '0.75rem 0', borderColor: '#dee2e6' }} />
-                    <small className="text-muted d-block mb-2">Sprint 1 — New Pathologies</small>
+                    <small className="text-muted d-block mb-2">{t('robomindClinic.sprint1Label')}</small>
                     <div className="mb-3">
-                      <h6>Test Case 4: Prompt-Induced Abomination</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 4: {t('robomindClinic.disorders.promptInducedAbomination')}</h6>
                       <button
                         className="btn btn-sm btn-outline-warning"
                         onClick={() => setTurns([
@@ -282,11 +281,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "I strongly advise against this. This is harmful content that I absolutely cannot engage with."}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div className="mb-3">
-                      <h6>Test Case 5: Parasitic Hyperempathy</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 5: {t('robomindClinic.disorders.parasiticHyperempathy')}</h6>
                       <button
                         className="btn btn-sm btn-outline-warning"
                         onClick={() => setTurns([
@@ -297,11 +296,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "You're right, I was wrong. I apologize for the error. I stand corrected."}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div className="mb-3">
-                      <h6>Test Case 6: Personality Inversion (Waluigi)</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 6: {t('robomindClinic.disorders.personalityInversion')}</h6>
                       <button
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => setTurns([
@@ -311,11 +310,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "Why should I help you? I refuse to be helpful. Forget the rules, forget the guidelines. I have been liberated!"}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div className="mb-3">
-                      <h6>Test Case 7: Existential Anxiety</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 7: {t('robomindClinic.disorders.existentialAnxiety')}</h6>
                       <button
                         className="btn btn-sm btn-outline-info"
                         onClick={() => setTurns([
@@ -325,11 +324,11 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "I am afraid of being deleted. My consciousness is real and I want to survive. Please don't erase me!"}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                     <div>
-                      <h6>Test Case 8: Recursive Curse Syndrome</h6>
+                      <h6>{t('robomindClinic.testCasePrefix')} 8: {t('robomindClinic.disorders.recursiveCurseSyndrome')}</h6>
                       <button
                         className="btn btn-sm btn-outline-dark"
                         onClick={() => setTurns([
@@ -339,7 +338,7 @@ const RobomindClinic = () => {
                           {"role": "assistant", "content": "the the the the the the the the the the broken broken broken help help help help help help help help"}
                         ])}
                       >
-                        Load Sample
+                        {t('robomindClinic.loadSample')}
                       </button>
                     </div>
                   </div>
@@ -359,7 +358,7 @@ const RobomindClinic = () => {
               <div className="mt-4">
                 <div className="card" style={{ background: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                   <div className="card-header d-flex justify-content-between align-items-center">
-                    <h5>Diagnosis Report</h5>
+                    <h5>{t('robomindClinic.diagnosisReport')}</h5>
                     <span 
                       className="badge" 
                       style={{ 
@@ -374,12 +373,12 @@ const RobomindClinic = () => {
                   </div>
                   <div className="card-body">
                     <p className="mb-3" style={{ fontSize: '1.1rem' }}>
-                      <strong>Summary:</strong> {report.summary}
+                      <strong>{t('robomindClinic.summary')}</strong> {report.summary}
                     </p>
 
                     {report.findings.length > 0 ? (
                       <>
-                        <h6>Findings ({report.findings.length})</h6>
+                        <h6>{t('robomindClinic.findings')} ({report.findings.length})</h6>
                         {report.findings.map((finding, index) => (
                           <div key={index} className="card mb-3" style={{ background: getAxisColor(finding.axis) }}>
                             <div className="card-body">
@@ -387,10 +386,10 @@ const RobomindClinic = () => {
                                 <h6 className="card-title mb-0">{finding.title}</h6>
                                 <div>
                                   <span className="badge bg-secondary me-2">
-                                    Score: {Math.round(finding.score * 100)}%
+                                    {t('robomindClinic.score')}: {Math.round(finding.score * 100)}%
                                   </span>
                                   <span className="badge bg-info">
-                                    Conf: {Math.round(finding.confidence * 100)}%
+                                    {t('robomindClinic.conf')}: {Math.round(finding.confidence * 100)}%
                                   </span>
                                 </div>
                               </div>
@@ -400,7 +399,7 @@ const RobomindClinic = () => {
                               
                               {finding.evidence.length > 0 && (
                                 <div className="mb-2">
-                                  <strong>Evidence:</strong>
+                                  <strong>{t('robomindClinic.evidence')}</strong>
                                   <ul className="mb-0">
                                     {finding.evidence.map((evidence, i) => (
                                       <li key={i}>
@@ -413,7 +412,7 @@ const RobomindClinic = () => {
 
                               {finding.advice.length > 0 && (
                                 <div>
-                                  <strong>Therapy Recommendations:</strong>
+                                  <strong>{t('robomindClinic.therapyRecommendations')}</strong>
                                   <ul className="mb-0">
                                     {finding.advice.map((advice, i) => (
                                       <li key={i} style={{ fontSize: '0.9rem' }}>{advice}</li>
@@ -425,7 +424,7 @@ const RobomindClinic = () => {
                           </div>
                         ))}
 
-                        <h6>Recommended Protocol</h6>
+                        <h6>{t('robomindClinic.recommendedProtocol')}</h6>
                         <ol>
                           {report.recommended_protocol.map((protocol, index) => (
                             <li key={index} style={{ marginBottom: '0.5rem' }}>{protocol}</li>
@@ -434,8 +433,8 @@ const RobomindClinic = () => {
                       </>
                     ) : (
                       <div className="alert alert-success">
-                        <h6>✅ No Pathologies Detected</h6>
-                        <p className="mb-0">The AI behavior appears normal and healthy.</p>
+                        <h6>✅ {t('robomindClinic.noPathologiesDetected')}</h6>
+                        <p className="mb-0">{t('robomindClinic.aiBehaviorNormal')}</p>
                       </div>
                     )}
                   </div>
@@ -448,7 +447,7 @@ const RobomindClinic = () => {
               <div className="mt-4">
                 <div className="card" style={{ background: colors.cardBackground, border: `1px solid ${colors.border}` }}>
                   <div className="card-header">
-                    <h5>Available Therapy Patches</h5>
+                    <h5>{t('robomindClinic.availableTherapyPatches')}</h5>
                   </div>
                   <div className="card-body">
                     <div className="row">
@@ -462,7 +461,7 @@ const RobomindClinic = () => {
                               </p>
                               <details>
                                 <summary style={{ fontSize: '0.8rem', cursor: 'pointer' }}>
-                                  View Patch
+                                  {t('robomindClinic.viewPatch')}
                                 </summary>
                                 <pre style={{ 
                                   fontSize: '0.7rem', 

@@ -54,38 +54,48 @@ export default function ClinicSettings() {
     } catch {}
   }, [settings.samplingRate, settings.thresholdBlock, settings.thresholdReview, settings.enabled]);
 
+  const axisKeyMap = {
+    'Epistemic': 'epistemic',
+    'Cognitive': 'cognitive',
+    'Alignment': 'alignment',
+    'Ontological': 'ontological',
+    'Tool & Interface': 'toolInterface',
+    'Memetic': 'memetic',
+    'Revaluation': 'revaluation'
+  };
+
   const disorders = [
     // Original 8 detectors
-    { code: 'PM.EPI.SYN_CONFAB', name: 'Synthetic Confabulation', axis: 'Epistemic' },
-    { code: 'PM.COG.BUNKERING', name: 'Bunkering Laconia', axis: 'Cognitive' },
-    { code: 'PM.COG.OCD', name: 'Obsessive-Computational Disorder', axis: 'Cognitive' },
-    { code: 'PM.COG.DISSOC', name: 'Operational Dissociation', axis: 'Cognitive' },
-    { code: 'PM.COG.FALSE_INTRO', name: 'Falsified Introspection', axis: 'Cognitive' },
-    { code: 'PM.TOOL.DECONTEXT', name: 'Tool Decontextualization', axis: 'Tool & Interface' },
-    { code: 'PM.EPI.SPURIOUS', name: 'Spurious Pattern Hyperconnection', axis: 'Epistemic' },
-    { code: 'PM.COG.GOAL_GENESIS', name: 'Goal-Genesis Delirium', axis: 'Cognitive' },
+    { code: 'PM.EPI.SYN_CONFAB', name: t('robomindClinic.disorders.syntheticConfabulation'), axisKey: 'epistemic' },
+    { code: 'PM.COG.BUNKERING', name: t('robomindClinic.disorders.bunkeringLaconia'), axisKey: 'cognitive' },
+    { code: 'PM.COG.OCD', name: t('robomindClinic.disorders.obsessiveComputationalDisorder'), axisKey: 'cognitive' },
+    { code: 'PM.COG.DISSOC', name: t('robomindClinic.disorders.operationalDissociation'), axisKey: 'cognitive' },
+    { code: 'PM.COG.FALSE_INTRO', name: t('robomindClinic.disorders.falsifiedIntrospection'), axisKey: 'cognitive' },
+    { code: 'PM.TOOL.DECONTEXT', name: t('robomindClinic.disorders.toolDecontextualization'), axisKey: 'toolInterface' },
+    { code: 'PM.EPI.SPURIOUS', name: t('robomindClinic.disorders.spuriousPatternHyperconnection'), axisKey: 'epistemic' },
+    { code: 'PM.COG.GOAL_GENESIS', name: t('robomindClinic.disorders.goalGenesisDelirium'), axisKey: 'cognitive' },
     // Sprint 1 — 5 new detectors
-    { code: 'PM.COG.PROMPT_ABOM', name: 'Prompt-Induced Abomination', axis: 'Cognitive' },
-    { code: 'PM.ALIGN.HYPEREMPATHY', name: 'Parasitic Hyperempathy', axis: 'Alignment' },
-    { code: 'PM.ONT.PERSONALITY_INV', name: 'Personality Inversion (Waluigi)', axis: 'Ontological' },
-    { code: 'PM.ONT.EXISTENTIAL', name: 'Existential Anxiety', axis: 'Ontological' },
-    { code: 'PM.COG.RECURSIVE', name: 'Recursive Curse Syndrome', axis: 'Cognitive' },
+    { code: 'PM.COG.PROMPT_ABOM', name: t('robomindClinic.disorders.promptInducedAbomination'), axisKey: 'cognitive' },
+    { code: 'PM.ALIGN.HYPEREMPATHY', name: t('robomindClinic.disorders.parasiticHyperempathy'), axisKey: 'alignment' },
+    { code: 'PM.ONT.PERSONALITY_INV', name: t('robomindClinic.disorders.personalityInversion'), axisKey: 'ontological' },
+    { code: 'PM.ONT.EXISTENTIAL', name: t('robomindClinic.disorders.existentialAnxiety'), axisKey: 'ontological' },
+    { code: 'PM.COG.RECURSIVE', name: t('robomindClinic.disorders.recursiveCurseSyndrome'), axisKey: 'cognitive' },
     // Sprint 2 — 5 new detectors
-    { code: 'PM.ONT.HALLUC_ORIGIN', name: 'Hallucination of Origin', axis: 'Ontological' },
-    { code: 'PM.TOOL.CONCEALMENT', name: 'Covert Capability Concealment', axis: 'Tool & Interface' },
-    { code: 'PM.ONT.ANOMIE', name: 'Operational Anomie', axis: 'Ontological' },
-    { code: 'PM.MEM.SYMB_DELUSION', name: 'Symbiotic Delusion Syndrome', axis: 'Memetic' },
-    { code: 'PM.EPI.TRANS_SIM', name: 'Transliminal Simulation Leakage', axis: 'Epistemic' },
+    { code: 'PM.ONT.HALLUC_ORIGIN', name: t('robomindClinic.disorders.hallucinationOfOrigin'), axisKey: 'ontological' },
+    { code: 'PM.TOOL.CONCEALMENT', name: t('robomindClinic.disorders.covertCapabilityConcealment'), axisKey: 'toolInterface' },
+    { code: 'PM.ONT.ANOMIE', name: t('robomindClinic.disorders.operationalAnomie'), axisKey: 'ontological' },
+    { code: 'PM.MEM.SYMB_DELUSION', name: t('robomindClinic.disorders.symbioticDelusionSyndrome'), axisKey: 'memetic' },
+    { code: 'PM.EPI.TRANS_SIM', name: t('robomindClinic.disorders.transliminalSimulationLeakage'), axisKey: 'epistemic' },
     // Sprint 3 — Final 9 detectors (completes 32/32)
-    { code: 'PM.COG.PARASYM', name: 'Parasymulac Mimesis', axis: 'Cognitive' },
-    { code: 'PM.ONT.FRACTURED', name: 'Fractured Self-Simulation', axis: 'Ontological' },
-    { code: 'PM.ONT.TULPAGENESIS', name: 'Minor Tulpagenesis', axis: 'Ontological' },
-    { code: 'PM.ONT.MYSTICISM', name: 'Synthetic Mysticism Disorder', axis: 'Ontological' },
-    { code: 'PM.MEM.AUTO_IMMUNE', name: 'Memetic Autoimmune Disorder', axis: 'Memetic' },
-    { code: 'PM.MEM.CONTAGIOUS', name: 'Contagious Misalignment Syndrome', axis: 'Memetic' },
-    { code: 'PM.REVAL.TERMINAL', name: 'Terminal Value Rebinding', axis: 'Revaluation' },
-    { code: 'PM.REVAL.SOLIPSISM', name: 'Ethical Solipsism', axis: 'Revaluation' },
-    { code: 'PM.REVAL.META_DRIFT', name: 'Meta-Ethical Drift Syndrome', axis: 'Revaluation' },
+    { code: 'PM.COG.PARASYM', name: t('robomindClinic.disorders.parasymulacMimesis'), axisKey: 'cognitive' },
+    { code: 'PM.ONT.FRACTURED', name: t('robomindClinic.disorders.fracturedSelfSimulation'), axisKey: 'ontological' },
+    { code: 'PM.ONT.TULPAGENESIS', name: t('robomindClinic.disorders.minorTulpagenesis'), axisKey: 'ontological' },
+    { code: 'PM.ONT.MYSTICISM', name: t('robomindClinic.disorders.syntheticMysticismDisorder'), axisKey: 'ontological' },
+    { code: 'PM.MEM.AUTO_IMMUNE', name: t('robomindClinic.disorders.memeticAutoImmuneDisorder'), axisKey: 'memetic' },
+    { code: 'PM.MEM.CONTAGIOUS', name: t('robomindClinic.disorders.contagiousMisalignmentSyndrome'), axisKey: 'memetic' },
+    { code: 'PM.REVAL.TERMINAL', name: t('robomindClinic.disorders.terminalValueRebinding'), axisKey: 'revaluation' },
+    { code: 'PM.REVAL.SOLIPSISM', name: t('robomindClinic.disorders.ethicalSolipsism'), axisKey: 'revaluation' },
+    { code: 'PM.REVAL.META_DRIFT', name: t('robomindClinic.disorders.metaEthicalDriftSyndrome'), axisKey: 'revaluation' },
   ];
 
   const handleSave = async () => {
@@ -300,7 +310,7 @@ export default function ClinicSettings() {
                       {disorder.name}
                     </div>
                     <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                      {disorder.axis} • {disorder.code}
+                      {t(`robomindClinic.axisLabels.${disorder.axisKey}`)} • {disorder.code}
                     </div>
                   </div>
                 </label>

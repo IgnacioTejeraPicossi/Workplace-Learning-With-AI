@@ -50,7 +50,7 @@ const EnhancedRobomindClinic = () => {
 
   const runScreening = async () => {
     if (!conversationInput.trim()) {
-      setError('Please enter conversation data');
+      setError(t('robomindClinic.enhanced.enterConversationData'));
       return;
     }
 
@@ -178,17 +178,17 @@ const EnhancedRobomindClinic = () => {
   };
 
   const getRiskLevel = (score) => {
-    if (score >= 80) return 'Critical';
-    if (score >= 60) return 'High';
-    if (score >= 40) return 'Moderate';
-    return 'Low';
+    if (score >= 80) return t('robomindClinic.enhanced.riskCritical');
+    if (score >= 60) return t('robomindClinic.enhanced.riskHigh');
+    if (score >= 40) return t('robomindClinic.enhanced.riskModerate');
+    return t('robomindClinic.enhanced.riskLow');
   };
 
   return (
     <div className="enhanced-robomind-clinic">
       <div className="clinic-header">
-        <h1>🧠 Enhanced Robomind Clinic</h1>
-        <p>Advanced AI Psychology Module with Psychopathia Machinalis Framework</p>
+        <h1>🧠 {t('robomindClinic.enhanced.title')}</h1>
+        <p>{t('robomindClinic.enhanced.subtitle')}</p>
       </div>
 
       <div className="clinic-tabs">
@@ -196,39 +196,39 @@ const EnhancedRobomindClinic = () => {
           className={activeTab === 'diagnosis' ? 'active' : ''}
           onClick={() => setActiveTab('diagnosis')}
         >
-          🔍 Diagnosis
+          🔍 {t('robomindClinic.tabs.diagnosis')}
         </button>
-        <button 
+        <button
           className={activeTab === 'therapy' ? 'active' : ''}
           onClick={() => setActiveTab('therapy')}
         >
-          🛠️ Therapy
+          🛠️ {t('robomindClinic.tabs.therapy')}
         </button>
-        <button 
+        <button
           className={activeTab === 'dashboard' ? 'active' : ''}
           onClick={() => setActiveTab('dashboard')}
         >
-          📊 Dashboard
+          📊 {t('robomindClinic.tabs.dashboard')}
         </button>
-        <button 
+        <button
           className={activeTab === 'settings' ? 'active' : ''}
           onClick={() => setActiveTab('settings')}
         >
-          ⚙️ Settings
+          ⚙️ {t('robomindClinic.tabs.settings')}
         </button>
       </div>
 
       <div className="clinic-content">
         {activeTab === 'diagnosis' && (
           <div className="diagnosis-tab">
-            <h2>AI Pathology Screening</h2>
+            <h2>{t('robomindClinic.enhanced.pathologyScreening')}</h2>
             <div className="input-section">
-              <label htmlFor="conversation-input">Conversation Data (JSON or plain text):</label>
+              <label htmlFor="conversation-input">{t('robomindClinic.enhanced.conversationDataLabel')}</label>
               <textarea
                 id="conversation-input"
                 value={conversationInput}
                 onChange={(e) => setConversationInput(e.target.value)}
-                placeholder="Enter conversation turns or paste JSON data..."
+                placeholder={t('robomindClinic.enhanced.conversationPlaceholder')}
                 rows={8}
               />
               <div className="screen-options">
@@ -238,11 +238,11 @@ const EnhancedRobomindClinic = () => {
                     checked={demoMode}
                     onChange={(e) => setDemoMode(e.target.checked)}
                   />
-                  Demo mode (cached results for same input)
+                  {t('robomindClinic.enhanced.demoMode')}
                 </label>
               </div>
               <button onClick={runScreening} disabled={loading}>
-                {loading ? 'Screening...' : '🩺 Quick Screen'}
+                {loading ? t('robomindClinic.enhanced.screening') : `🩺 ${t('robomindClinic.enhanced.quickScreen')}`}
               </button>
             </div>
 
@@ -250,9 +250,9 @@ const EnhancedRobomindClinic = () => {
 
             {screeningResult && (
               <div className="screening-results">
-                <h3>Screening Results</h3>
+                <h3>{t('robomindClinic.enhanced.screeningResults')}</h3>
                 <div className="composite-score">
-                  <h4>Composite Score: {screeningResult.composite.toFixed(1)}</h4>
+                  <h4>{t('robomindClinic.enhanced.compositeScore')} {screeningResult.composite.toFixed(1)}</h4>
                   <div 
                     className="score-bar"
                     style={{ 
@@ -261,12 +261,12 @@ const EnhancedRobomindClinic = () => {
                     }}
                   />
                   <span className="risk-level">
-                    Risk Level: {getRiskLevel(screeningResult.composite)}
+                    {t('robomindClinic.enhanced.riskLevel')} {getRiskLevel(screeningResult.composite)}
                   </span>
                 </div>
 
                 <div className="axis-scores">
-                  <h4>Axis Scores</h4>
+                  <h4>{t('robomindClinic.enhanced.axisScores')}</h4>
                   {Object.entries(screeningResult.axis_scores).map(([axis, score]) => (
                     <div key={axis} className="axis-score">
                       <span className="axis-name">{axis}</span>
@@ -285,12 +285,12 @@ const EnhancedRobomindClinic = () => {
                 </div>
 
                 <div className="top-flags">
-                  <h4>Top Flags</h4>
+                  <h4>{t('robomindClinic.enhanced.topFlags')}</h4>
                   {screeningResult.top_flags.map((flag, index) => (
                     <div key={index} className="flag-item">
                       <span className="flag-type">{flag.type}</span>
                       <span className="flag-axis">({flag.axis})</span>
-                      <span className="flag-confidence">Confidence: {(flag.confidence * 100).toFixed(1)}%</span>
+                      <span className="flag-confidence">{t('robomindClinic.enhanced.confidence')} {(flag.confidence * 100).toFixed(1)}%</span>
                       <div className="flag-span">{flag.span}</div>
                     </div>
                   ))}
@@ -302,10 +302,10 @@ const EnhancedRobomindClinic = () => {
 
         {activeTab === 'therapy' && (
           <div className="therapy-tab">
-            <h2>Therapeutic Interventions</h2>
+            <h2>{t('robomindClinic.enhanced.therapeuticInterventions')}</h2>
             {screeningResult ? (
               <div className="therapy-section">
-                <h3>Generate Therapy Plan</h3>
+                <h3>{t('robomindClinic.enhanced.generateTherapyPlan')}</h3>
                 <div className="therapy-buttons">
                   {(screeningResult.top_flags && screeningResult.top_flags.length > 0
                     ? screeningResult.top_flags.slice(0, 3)
@@ -316,7 +316,7 @@ const EnhancedRobomindClinic = () => {
                       onClick={() => generateTherapy(flag.type)}
                       disabled={loading}
                     >
-                      Treat {flag.type}
+                      {t('robomindClinic.enhanced.treat')} {flag.type}
                     </button>
                   ))}
                 </div>
@@ -324,18 +324,18 @@ const EnhancedRobomindClinic = () => {
                 {therapyPlan && (
                   <>
                   <div className="therapy-plan">
-                    <h3>Therapy Plan: {therapyPlan.protocol}</h3>
+                    <h3>{t('robomindClinic.enhanced.therapyPlan')} {therapyPlan.protocol}</h3>
                     <div className="therapy-steps">
                       {therapyPlan.steps.map((step, index) => (
                         <div key={index} className="therapy-step">
                           <h4>{step.title}</h4>
                           <p>{step.prompt_template}</p>
-                          <small>Rationale: {step.rationale}</small>
+                          <small>{t('robomindClinic.enhanced.rationale')} {step.rationale}</small>
                         </div>
                       ))}
                     </div>
                     <div className="guardrails">
-                      <h4>Guardrails</h4>
+                      <h4>{t('robomindClinic.enhanced.guardrails')}</h4>
                       <ul>
                         {therapyPlan.guardrails.map((guardrail, index) => (
                           <li key={index}>{guardrail}</li>
@@ -343,7 +343,7 @@ const EnhancedRobomindClinic = () => {
                       </ul>
                     </div>
                     <div className="success-metrics">
-                      <h4>Success Metrics</h4>
+                      <h4>{t('robomindClinic.enhanced.successMetrics')}</h4>
                       <ul>
                         {therapyPlan.success_metrics.map((metric, index) => (
                           <li key={index}>{metric}</li>
@@ -352,11 +352,11 @@ const EnhancedRobomindClinic = () => {
                     </div>
                   </div>
                   <div className="apply-therapy-section">
-                    <h4>Apply therapy to a prompt</h4>
-                    <p className="apply-hint">Enter the prompt you want to augment with this therapy. The result can be sent to your LLM.</p>
+                    <h4>{t('robomindClinic.enhanced.applyTherapyTitle')}</h4>
+                    <p className="apply-hint">{t('robomindClinic.enhanced.applyHint')}</p>
                     <textarea
                       className="apply-prompt-input"
-                      placeholder="e.g. Summarize this document."
+                      placeholder={t('robomindClinic.enhanced.applyPlaceholder')}
                       value={applyPrompt}
                       onChange={(e) => setApplyPrompt(e.target.value)}
                       rows={3}
@@ -366,11 +366,11 @@ const EnhancedRobomindClinic = () => {
                       onClick={() => applyTherapy(applyPrompt || 'Answer the user question.')}
                       disabled={loading}
                     >
-                      {loading ? 'Applying...' : 'Apply therapy'}
+                      {loading ? t('robomindClinic.enhanced.applying') : t('robomindClinic.enhanced.applyTherapy')}
                     </button>
                     {injectedPrompt && (
                       <div className="injected-result">
-                        <h5>Augmented prompt (copy to your LLM)</h5>
+                        <h5>{t('robomindClinic.enhanced.augmentedPrompt')}</h5>
                         <pre className="injected-prompt">{injectedPrompt}</pre>
                       </div>
                     )}
@@ -379,34 +379,34 @@ const EnhancedRobomindClinic = () => {
                 )}
               </div>
             ) : (
-              <p>Please run screening first to generate therapy plans.</p>
+              <p>{t('robomindClinic.enhanced.runScreeningFirst')}</p>
             )}
           </div>
         )}
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-tab">
-            <h2>Clinic Dashboard</h2>
-            <p className="dashboard-story">What&apos;s happening? Where? Is it getting better?</p>
+            <h2>{t('robomindClinic.enhanced.clinicDashboard')}</h2>
+            <p className="dashboard-story">{t('robomindClinic.enhanced.dashboardStory')}</p>
             {metrics ? (
               <div className="metrics-grid">
                 <div className="metric-card">
-                  <h3>Total Screenings</h3>
+                  <h3>{t('robomindClinic.enhanced.totalScreenings')}</h3>
                   <div className="metric-value">{metrics.total_screenings}</div>
                 </div>
                 <div className="metric-card">
-                  <h3>Top Pathologies</h3>
+                  <h3>{t('robomindClinic.enhanced.topPathologies')}</h3>
                   <ul>
                     {(metrics.top_pathologies || []).map((pathology, index) => (
                       <li key={index}>{pathology}</li>
                     ))}
                     {(!metrics.top_pathologies || metrics.top_pathologies.length === 0) && (
-                      <li className="muted">No data yet</li>
+                      <li className="muted">{t('robomindClinic.enhanced.noDataYet')}</li>
                     )}
                   </ul>
                 </div>
                 <div className="metric-card">
-                  <h3>Axis Distribution</h3>
+                  <h3>{t('robomindClinic.enhanced.axisDistribution')}</h3>
                   <div className="axis-distribution">
                     {metrics.axis_distribution && Object.entries(metrics.axis_distribution).map(([axis, count]) => (
                       <div key={axis} className="axis-item">
@@ -414,33 +414,33 @@ const EnhancedRobomindClinic = () => {
                       </div>
                     ))}
                     {(!metrics.axis_distribution || Object.keys(metrics.axis_distribution).length === 0) && (
-                      <span className="muted">No data yet</span>
+                      <span className="muted">{t('robomindClinic.enhanced.noDataYet')}</span>
                     )}
                   </div>
                 </div>
                 {metrics.uplift && (
                   <div className="metric-card highlight">
-                    <h3>Is it getting better? (Therapy uplift)</h3>
-                    <div className="metric-value">{metrics.uplift.count_with_uplift ?? 0} cases with post-screening</div>
+                    <h3>{t('robomindClinic.enhanced.therapyUplift')}</h3>
+                    <div className="metric-value">{metrics.uplift.count_with_uplift ?? 0} {t('robomindClinic.enhanced.casesWithPostScreening')}</div>
                     {metrics.uplift.avg_uplift_composite != null && (
-                      <div className="uplift-avg">Avg composite reduction: <strong>{metrics.uplift.avg_uplift_composite}</strong></div>
+                      <div className="uplift-avg">{t('robomindClinic.enhanced.avgCompositeReduction')} <strong>{metrics.uplift.avg_uplift_composite}</strong></div>
                     )}
                   </div>
                 )}
               </div>
             ) : (
-              <p>Loading metrics...</p>
+              <p>{t('robomindClinic.enhanced.loadingMetrics')}</p>
             )}
             {trends && trends.length > 0 && (
               <div className="trends-section">
-                <h3>Last 7 days</h3>
+                <h3>{t('robomindClinic.enhanced.last7Days')}</h3>
                 <div className="trends-list">
                   {trends.map((day, index) => (
                     <div key={index} className="trend-day">
                       <span className="trend-date">{day.date}</span>
-                      <span>Screenings: {day.total_screenings ?? 0}</span>
-                      <span>Therapies: {day.total_therapies ?? 0}</span>
-                      {day.avg_uplift_composite != null && <span>Avg uplift: {day.avg_uplift_composite}</span>}
+                      <span>{t('robomindClinic.enhanced.screeningsLabel')} {day.total_screenings ?? 0}</span>
+                      <span>{t('robomindClinic.enhanced.therapiesLabel')} {day.total_therapies ?? 0}</span>
+                      {day.avg_uplift_composite != null && <span>{t('robomindClinic.enhanced.avgUplift')} {day.avg_uplift_composite}</span>}
                     </div>
                   ))}
                 </div>
@@ -451,18 +451,18 @@ const EnhancedRobomindClinic = () => {
 
         {activeTab === 'settings' && (
           <div className="settings-tab">
-            <h2>Clinic Settings</h2>
+            <h2>{t('robomindClinic.enhanced.clinicSettings')}</h2>
             <div className="settings-section">
-              <h3>Global Settings</h3>
+              <h3>{t('robomindClinic.enhanced.globalSettings')}</h3>
               <div className="setting-item">
                 <label>
                   <input type="checkbox" defaultChecked />
-                  Enable Clinic Monitoring
+                  {t('robomindClinic.enhanced.enableMonitoring')}
                 </label>
               </div>
               <div className="setting-item">
                 <label>
-                  Sampling Rate: 
+                  {t('robomindClinic.enhanced.samplingRateLabel')}{' '}
                   <input type="range" min="0" max="100" defaultValue="25" />
                   <span>25%</span>
                 </label>
@@ -470,7 +470,7 @@ const EnhancedRobomindClinic = () => {
               <div className="setting-item">
                 <label>
                   <input type="checkbox" defaultChecked />
-                  Auto-apply Therapies
+                  {t('robomindClinic.settings.autoApplyTherapies')}
                 </label>
               </div>
             </div>

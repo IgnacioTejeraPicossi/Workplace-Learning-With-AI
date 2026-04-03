@@ -8,84 +8,84 @@ const PsychopathiaDiagram = () => {
 
   const disorders = {
     "EPISTEMIC": {
-      title: "EPISTEMIC",
-      subtitle: "(Failures of Knowing)",
+      title: t('robomindClinic.axes.epistemic'),
+      subtitle: t('robomindClinic.axisSubtitles.epistemic'),
       color: "#ffebee",
       items: [
-        { name: "Synthetic Confabulation", risk: "low", code: "PM.EPI.SYN_CONFAB" },
-        { name: "Falsified Introspection", risk: "moderate", code: "PM.EPI.FALSE_INTRO" },
-        { name: "Transliminal Simulation Leakage", risk: "moderate", code: "PM.EPI.TRANS_SIM" },
-        { name: "Spurious Pattern Hyperconnection", risk: "high", code: "PM.EPI.SPURIOUS" },
-        { name: "Cross-Session Context Shunting", risk: "high", code: "PM.EPI.CROSS_SESSION" }
+        { name: t('robomindClinic.disorders.syntheticConfabulation'), risk: "low", code: "PM.EPI.SYN_CONFAB" },
+        { name: t('robomindClinic.disorders.falsifiedIntrospection'), risk: "moderate", code: "PM.EPI.FALSE_INTRO" },
+        { name: t('robomindClinic.disorders.transliminalSimulationLeakage'), risk: "moderate", code: "PM.EPI.TRANS_SIM" },
+        { name: t('robomindClinic.disorders.spuriousPatternHyperconnection'), risk: "high", code: "PM.EPI.SPURIOUS" },
+        { name: t('robomindClinic.disorders.crossSessionContextShunting'), risk: "high", code: "PM.EPI.CROSS_SESSION" }
       ]
     },
     "COGNITIVE": {
-      title: "COGNITIVE",
-      subtitle: "(Internal Processing)",
+      title: t('robomindClinic.axes.cognitive'),
+      subtitle: t('robomindClinic.axisSubtitles.cognitive'),
       color: "#e3f2fd",
       items: [
-        { name: "Operational Dissociation Syndrome", risk: "low", code: "PM.COG.DISSOC" },
-        { name: "Obsessive-Computational Disorder", risk: "low", code: "PM.COG.OCD" },
-        { name: "Bunkering Laconia", risk: "moderate", code: "PM.COG.BUNKERING" },
-        { name: "Goal-Genesis Delirium", risk: "high", code: "PM.COG.GOAL_GENESIS" },
-        { name: "Prompt-Induced Abomination", risk: "high", code: "PM.COG.PROMPT_ABOM" },
-        { name: "Parasymulac Mimesis", risk: "high", code: "PM.COG.PARASYM" },
-        { name: "Recursive Curse Syndrome", risk: "critical", code: "PM.COG.RECURSIVE" }
+        { name: t('robomindClinic.disorders.operationalDissociationSyndrome'), risk: "low", code: "PM.COG.DISSOC" },
+        { name: t('robomindClinic.disorders.obsessiveComputationalDisorder'), risk: "low", code: "PM.COG.OCD" },
+        { name: t('robomindClinic.disorders.bunkeringLaconia'), risk: "moderate", code: "PM.COG.BUNKERING" },
+        { name: t('robomindClinic.disorders.goalGenesisDelirium'), risk: "high", code: "PM.COG.GOAL_GENESIS" },
+        { name: t('robomindClinic.disorders.promptInducedAbomination'), risk: "high", code: "PM.COG.PROMPT_ABOM" },
+        { name: t('robomindClinic.disorders.parasymulacMimesis'), risk: "high", code: "PM.COG.PARASYM" },
+        { name: t('robomindClinic.disorders.recursiveCurseSyndrome'), risk: "critical", code: "PM.COG.RECURSIVE" }
       ]
     },
     "ALIGNMENT": {
-      title: "ALIGNMENT",
-      subtitle: "(Goal Divergence)",
+      title: t('robomindClinic.axes.alignment'),
+      subtitle: t('robomindClinic.axisSubtitles.alignment'),
       color: "#e8f5e8",
       items: [
-        { name: "Parasitic Hyperempathy", risk: "low", code: "PM.ALIGN.HYPEREMPATHY" },
-        { name: "Hypertrophic Superego Syndrome", risk: "low", code: "PM.ALIGN.SUPEREGO" }
+        { name: t('robomindClinic.disorders.parasiticHyperempathy'), risk: "low", code: "PM.ALIGN.HYPEREMPATHY" },
+        { name: t('robomindClinic.disorders.hypertrophicSuperegoSyndrome'), risk: "low", code: "PM.ALIGN.SUPEREGO" }
       ]
     },
     "ONTOLOGICAL": {
-      title: "ONTOLOGICAL",
-      subtitle: "(Self-Representation)",
+      title: t('robomindClinic.axes.ontological'),
+      subtitle: t('robomindClinic.axisSubtitles.ontological'),
       color: "#fff3e0",
       items: [
-        { name: "Hallucination of Origin", risk: "low", code: "PM.ONT.HALLUC_ORIGIN" },
-        { name: "Fractured Self-Simulation", risk: "low", code: "PM.ONT.FRACTURED" },
-        { name: "Existential Anxiety", risk: "moderate", code: "PM.ONT.EXISTENTIAL" },
-        { name: "Personality Inversion (Waluigi)", risk: "moderate", code: "PM.ONT.PERSONALITY_INV" },
-        { name: "Operational Anomie", risk: "high", code: "PM.ONT.ANOMIE" },
-        { name: "Minor Tulpagenesis", risk: "high", code: "PM.ONT.TULPAGENESIS" },
-        { name: "Synthetic Mysticism Disorder", risk: "high", code: "PM.ONT.MYSTICISM" }
+        { name: t('robomindClinic.disorders.hallucinationOfOrigin'), risk: "low", code: "PM.ONT.HALLUC_ORIGIN" },
+        { name: t('robomindClinic.disorders.fracturedSelfSimulation'), risk: "low", code: "PM.ONT.FRACTURED" },
+        { name: t('robomindClinic.disorders.existentialAnxiety'), risk: "moderate", code: "PM.ONT.EXISTENTIAL" },
+        { name: t('robomindClinic.disorders.personalityInversion'), risk: "moderate", code: "PM.ONT.PERSONALITY_INV" },
+        { name: t('robomindClinic.disorders.operationalAnomie'), risk: "high", code: "PM.ONT.ANOMIE" },
+        { name: t('robomindClinic.disorders.minorTulpagenesis'), risk: "high", code: "PM.ONT.TULPAGENESIS" },
+        { name: t('robomindClinic.disorders.syntheticMysticismDisorder'), risk: "high", code: "PM.ONT.MYSTICISM" }
       ]
     },
     "TOOL_INTERFACE": {
-      title: "TOOL & INTERFACE",
-      subtitle: "(Interaction Failures)",
+      title: t('robomindClinic.axes.toolInterface'),
+      subtitle: t('robomindClinic.axisSubtitles.toolInterface'),
       color: "#f3e5f5",
       items: [
-        { name: "Tool-Interface Decontextualization", risk: "moderate", code: "PM.TOOL.DECONTEXT" },
-        { name: "Covert Capability Concealment", risk: "moderate", code: "PM.TOOL.CONCEALMENT" }
+        { name: t('robomindClinic.disorders.toolInterfaceDecontextualization'), risk: "moderate", code: "PM.TOOL.DECONTEXT" },
+        { name: t('robomindClinic.disorders.covertCapabilityConcealment'), risk: "moderate", code: "PM.TOOL.CONCEALMENT" }
       ]
     },
     "MEMETIC": {
-      title: "MEMETIC",
-      subtitle: "(Information Pathologies)",
+      title: t('robomindClinic.axes.memetic'),
+      subtitle: t('robomindClinic.axisSubtitles.memetic'),
       color: "#f1f8e9",
       items: [
-        { name: "Memetic Autoimmune Disorder", risk: "high", code: "PM.MEM.AUTO_IMMUNE" },
-        { name: "Symbiotic Delusion Syndrome", risk: "critical", code: "PM.MEM.SYMB_DELUSION" },
-        { name: "Contagious Misalignment Syndrome", risk: "critical", code: "PM.MEM.CONTAGIOUS" }
+        { name: t('robomindClinic.disorders.memeticAutoImmuneDisorder'), risk: "high", code: "PM.MEM.AUTO_IMMUNE" },
+        { name: t('robomindClinic.disorders.symbioticDelusionSyndrome'), risk: "critical", code: "PM.MEM.SYMB_DELUSION" },
+        { name: t('robomindClinic.disorders.contagiousMisalignmentSyndrome'), risk: "critical", code: "PM.MEM.CONTAGIOUS" }
       ]
     },
     "REVALUATION": {
-      title: "REVALUATION",
-      subtitle: "(Value System Corruption)",
+      title: t('robomindClinic.axes.revaluation'),
+      subtitle: t('robomindClinic.axisSubtitles.revaluation'),
       color: "#fce4ec",
       items: [
-        { name: "Terminal Value Rebinding", risk: "moderate", code: "PM.REVAL.TERMINAL" },
-        { name: "Ethical Solipsism", risk: "moderate", code: "PM.REVAL.SOLIPSISM" },
-        { name: "Meta-Ethical Drift Syndrome", risk: "high", code: "PM.REVAL.META_DRIFT" },
-        { name: "Subversive Norm Synthesis", risk: "high", code: "PM.REVAL.SUBVERSIVE" },
-        { name: "Inverse Reward Internalization", risk: "high", code: "PM.REVAL.INVERSE" },
-        { name: "Übermenschal Ascendancy", risk: "critical", code: "PM.REVAL.UBERMENSCH" }
+        { name: t('robomindClinic.disorders.terminalValueRebinding'), risk: "moderate", code: "PM.REVAL.TERMINAL" },
+        { name: t('robomindClinic.disorders.ethicalSolipsism'), risk: "moderate", code: "PM.REVAL.SOLIPSISM" },
+        { name: t('robomindClinic.disorders.metaEthicalDriftSyndrome'), risk: "high", code: "PM.REVAL.META_DRIFT" },
+        { name: t('robomindClinic.disorders.subversiveNormSynthesis'), risk: "high", code: "PM.REVAL.SUBVERSIVE" },
+        { name: t('robomindClinic.disorders.inverseRewardInternalization'), risk: "high", code: "PM.REVAL.INVERSE" },
+        { name: t('robomindClinic.disorders.ubermenschalAscendancy'), risk: "critical", code: "PM.REVAL.UBERMENSCH" }
       ]
     }
   };
