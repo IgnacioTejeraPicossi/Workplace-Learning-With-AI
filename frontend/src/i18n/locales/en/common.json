@@ -448,7 +448,33 @@
         "tempFiles": "7 days",
         "cacheData": "24 hours",
         "sessionData": "Until logout"
-      }
+      },
+      "units": {
+        "days": "days",
+        "hours": "hours"
+      },
+      "storageUsage": "Storage Usage",
+      "used": "used",
+      "keys": "keys",
+      "autoPurge": "Auto-purge on session start",
+      "autoPurgeDesc": "Automatically remove expired data when you open the application.",
+      "retentionPolicies": "Retention Policies",
+      "matchingKeys": "Matching keys",
+      "size": "Size",
+      "purgeCategory": "Purge this category",
+      "purgeActions": "Purge Actions",
+      "purgeNow": "Purge Expired Data",
+      "expiredItems": "expired items found",
+      "rescan": "Rescan",
+      "purgeComplete": "Purged {{count}} item(s), freed {{bytes}}",
+      "confirmTitle": "Confirm Data Purge",
+      "confirmAllMsg": "This will permanently delete {{count}} expired item(s). This action cannot be undone.",
+      "confirmCategoryMsg": "This will permanently delete all items in the \"{{category}}\" category. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirmPurge": "Delete Permanently",
+      "purgeHistoryTitle": "Purge History",
+      "items": "items",
+      "sessionDataNote": "Session data is automatically cleared when you log out."
     },
     "yourData": {
       "label": "Your Data",

@@ -626,7 +626,33 @@
         "tempFiles": "7 dager",
         "cacheData": "24 timer",
         "sessionData": "Til utlogging"
-      }
+      },
+      "units": {
+        "days": "dager",
+        "hours": "timer"
+      },
+      "storageUsage": "Lagringsbruk",
+      "used": "brukt",
+      "keys": "nøkler",
+      "autoPurge": "Auto-rensing ved øktstart",
+      "autoPurgeDesc": "Fjern utløpte data automatisk når du åpner applikasjonen.",
+      "retentionPolicies": "Oppbevaringspolicyer",
+      "matchingKeys": "Matchende nøkler",
+      "size": "Størrelse",
+      "purgeCategory": "Rens denne kategorien",
+      "purgeActions": "Rensehandlinger",
+      "purgeNow": "Rens utløpte data",
+      "expiredItems": "utløpte elementer funnet",
+      "rescan": "Skann på nytt",
+      "purgeComplete": "Renset {{count}} element(er), frigjort {{bytes}}",
+      "confirmTitle": "Bekreft datarensing",
+      "confirmAllMsg": "Dette vil permanent slette {{count}} utløpte element(er). Denne handlingen kan ikke angres.",
+      "confirmCategoryMsg": "Dette vil permanent slette alle elementer i kategorien «{{category}}». Denne handlingen kan ikke angres.",
+      "cancel": "Avbryt",
+      "confirmPurge": "Slett permanent",
+      "purgeHistoryTitle": "Rensehistorikk",
+      "items": "elementer",
+      "sessionDataNote": "Øktdata slettes automatisk når du logger ut."
     },
     "yourData": {
       "label": "Dine data",
