@@ -1,0 +1,106 @@
+{
+  "header": {
+    "appTitle": "Workplace Learning With AI",
+    "searchTooltip": "Search all sections (Ctrl+K)",
+    "themeLight": "Switch to light mode",
+    "themeDark": "Switch to dark mode"
+  },
+  "auth": {
+    "greeting": "Welcome, {{name}}!"
+  },
+  "globalSearch": {
+    "placeholder": "Search all sections...",
+    "noResults": "No results found for \"{{query}}\"",
+    "shortcutsTitle": "Keyboard shortcuts:",
+    "shortcutNav": "Use ↑↓ arrows to navigate",
+    "shortcutEnter": "Press Enter to select",
+    "shortcutEscape": "Press Escape to close",
+    "sections": {
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "View your learning progress and overview",
+        "keywords": ["dashboard", "progress", "overview", "home", "main"]
+      },
+      "aiConcepts": {
+        "title": "AI Concepts",
+        "description": "Explore innovative AI learning concepts",
+        "keywords": ["ai", "concepts", "innovation", "ideas", "artificial intelligence"]
+      },
+      "microLessons": {
+        "title": "Micro-lessons",
+        "description": "Create and manage bite-sized learning lessons",
+        "keywords": ["micro", "lessons", "learning", "education", "training", "bite-sized"]
+      },
+      "videoLessons": {
+        "title": "Video Lessons",
+        "description": "Learn from videos with AI-generated quizzes",
+        "keywords": ["video", "lessons", "youtube", "quiz", "multimedia"]
+      },
+      "recommendation": {
+        "title": "Recommendation",
+        "description": "Get personalized learning recommendations",
+        "keywords": ["recommendation", "suggestions", "personalized", "advice"]
+      },
+      "simulations": {
+        "title": "Simulations",
+        "description": "Practice with interactive workplace scenarios",
+        "keywords": ["simulation", "scenarios", "practice", "interactive", "workplace"]
+      },
+      "webSearch": {
+        "title": "Web Search",
+        "description": "Search the web for up-to-date information",
+        "keywords": ["web", "search", "internet", "online", "information"]
+      },
+      "teamDynamics": {
+        "title": "Team Dynamics",
+        "description": "Analyze and improve team collaboration",
+        "keywords": ["team", "dynamics", "collaboration", "group", "workforce"]
+      },
+      "certifications": {
+        "title": "Certifications",
+        "description": "Get certification recommendations and study plans",
+        "keywords": ["certification", "certificates", "study", "exams", "credentials"]
+      },
+      "coach": {
+        "title": "AI Career Coach",
+        "description": "Get career guidance and professional advice",
+        "keywords": ["coach", "career", "guidance", "advice", "professional"]
+      },
+      "skillsForecast": {
+        "title": "Skills Forecast",
+        "description": "Predict future skills and career trends",
+        "keywords": ["skills", "forecast", "prediction", "trends", "future"]
+      },
+      "presentationAgent": {
+        "title": "Presentation Agent",
+        "description": "AI-powered presentation and Q&A for demos",
+        "keywords": ["presentation", "agent", "demo", "pitch", "speech", "hackathon", "q&a"]
+      },
+      "savedLessons": {
+        "title": "Saved Lessons",
+        "description": "View and manage your saved micro-lessons",
+        "keywords": ["saved", "lessons", "bookmarks", "favorites", "history"]
+      },
+      "ideaLog": {
+        "title": "Idea Log",
+        "description": "View and manage user-submitted feature ideas",
+        "keywords": ["idea", "log", "feedback", "suggestions", "features"]
+      },
+      "featureRoadmap": {
+        "title": "Feature Roadmap",
+        "description": "Vote on and track upcoming features",
+        "keywords": ["feature", "roadmap", "vote", "upcoming", "planning"]
+      },
+      "futureApp": {
+        "title": "Future App",
+        "description": "Explore the vision and development roadmap",
+        "keywords": ["future", "vision", "roadmap", "development", "phases"]
+      },
+      "runTest": {
+        "title": "Run Test",
+        "description": "Comprehensive testing suite for the application",
+        "keywords": ["test", "testing", "cypress", "manual", "api"]
+      }
+    }
+  }
+}

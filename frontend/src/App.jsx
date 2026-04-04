@@ -215,7 +215,7 @@ function AppContent() {
             maxWidth: "100%",
             boxSizing: "border-box"
           }}>
-            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{isAIFullScreen ? `🤖 ${t('askAI.title')}` : "Workplace Learning With AI"}</h1>
+            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{isAIFullScreen ? `🤖 ${t('askAI.title')}` : t('header.appTitle')}</h1>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               {/* Search Button */}
               {!isAIFullScreen && (
@@ -235,7 +235,7 @@ function AppContent() {
                     fontSize: 14,
                     transition: "all 0.2s"
                   }}
-                  title="Search all sections (Ctrl+K)"
+                  title={t('header.searchTooltip')}
                 >
                   🔍
                 </button>
@@ -278,7 +278,7 @@ function AppContent() {
                   fontSize: 16,
                   transition: "all 0.2s"
                 }}
-                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                title={isDark ? t('header.themeLight') : t('header.themeDark')}
               >
                 {isDark ? "☀️" : "🌙"}
               </button>

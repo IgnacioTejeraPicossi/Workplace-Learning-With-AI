@@ -7,6 +7,8 @@ import enCommon from './locales/en/common.json';
 import noCommon from './locales/no/common.json';
 import enRunTest from './locales/en/runTestModule.json';
 import noRunTest from './locales/no/runTestModule.json';
+import enAppChrome from './locales/en/appChrome.json';
+import noAppChrome from './locales/no/appChrome.json';
 
 i18n
   .use(LanguageDetector)
@@ -25,10 +27,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome }
       },
       no: {
-        common: { ...noCommon, ...noRunTest }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome }
       }
     }
   });

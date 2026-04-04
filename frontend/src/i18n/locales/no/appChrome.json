@@ -1,0 +1,106 @@
+{
+  "header": {
+    "appTitle": "Arbeidsplasslæring med KI",
+    "searchTooltip": "Søk i alle seksjoner (Ctrl+K)",
+    "themeLight": "Bytt til lys modus",
+    "themeDark": "Bytt til mørk modus"
+  },
+  "auth": {
+    "greeting": "Velkommen, {{name}}!"
+  },
+  "globalSearch": {
+    "placeholder": "Søk i alle seksjoner …",
+    "noResults": "Ingen treff for «{{query}}»",
+    "shortcutsTitle": "Hurtigtaster:",
+    "shortcutNav": "Bruk ↑↓ for å navigere",
+    "shortcutEnter": "Trykk Enter for å velge",
+    "shortcutEscape": "Trykk Escape for å lukke",
+    "sections": {
+      "dashboard": {
+        "title": "Dashbord",
+        "description": "Se læringsfremdrift og oversikt",
+        "keywords": ["dashbord", "fremgang", "oversikt", "hjem", "hoved"]
+      },
+      "aiConcepts": {
+        "title": "KI-konsepter",
+        "description": "Utforsk innovative KI-læringskonsepter",
+        "keywords": ["ki", "konsepter", "innovasjon", "ideer", "kunstig intelligens"]
+      },
+      "microLessons": {
+        "title": "Mikroleksjoner",
+        "description": "Opprett og administrer korte leksjoner",
+        "keywords": ["mikro", "leksjoner", "læring", "utdanning", "opplæring"]
+      },
+      "videoLessons": {
+        "title": "Videoleksjoner",
+        "description": "Lær fra videoer med KI-genererte quiz",
+        "keywords": ["video", "leksjoner", "quiz", "multimedia"]
+      },
+      "recommendation": {
+        "title": "Anbefaling",
+        "description": "Få personlige læringsanbefalinger",
+        "keywords": ["anbefaling", "forslag", "personlig", "råd"]
+      },
+      "simulations": {
+        "title": "Simuleringer",
+        "description": "Øv med interaktive arbeidsplasscenarier",
+        "keywords": ["simulering", "scenarier", "øving", "interaktiv", "arbeidsplass"]
+      },
+      "webSearch": {
+        "title": "Nettsøk",
+        "description": "Søk på nettet etter oppdatert informasjon",
+        "keywords": ["nett", "søk", "internett", "online", "informasjon"]
+      },
+      "teamDynamics": {
+        "title": "Teamdynamikk",
+        "description": "Analyser og forbedre teamsamarbeid",
+        "keywords": ["team", "dynamikk", "samarbeid", "gruppe", "arbeidsstyrke"]
+      },
+      "certifications": {
+        "title": "Sertifiseringer",
+        "description": "Få anbefalinger og studieplaner for sertifisering",
+        "keywords": ["sertifisering", "studie", "eksamen", "bevis"]
+      },
+      "coach": {
+        "title": "AI karrierecoach",
+        "description": "Få karriereråd og profesjonell veiledning",
+        "keywords": ["coach", "karriere", "veiledning", "råd", "profesjonell"]
+      },
+      "skillsForecast": {
+        "title": "Kompetanseprognose",
+        "description": "Forutsi fremtidige ferdigheter og karrieretrender",
+        "keywords": ["ferdigheter", "prognose", "prediksjon", "trender", "fremtid"]
+      },
+      "presentationAgent": {
+        "title": "Presentasjonsagent",
+        "description": "KI-drevet presentasjon og Q&A for demoer",
+        "keywords": ["presentasjon", "agent", "demo", "pitch", "foredrag"]
+      },
+      "savedLessons": {
+        "title": "Lagrede leksjoner",
+        "description": "Se og administrer lagrede mikroleksjoner",
+        "keywords": ["lagret", "leksjoner", "bokmerker", "favoritter", "historikk"]
+      },
+      "ideaLog": {
+        "title": "Idélogg",
+        "description": "Se og administrer innsendte funksjonsideer",
+        "keywords": ["idé", "logg", "tilbakemelding", "forslag", "funksjoner"]
+      },
+      "featureRoadmap": {
+        "title": "Funksjonsroadmap",
+        "description": "Stem og følg kommende funksjoner",
+        "keywords": ["funksjon", "roadmap", "stem", "kommende", "planlegging"]
+      },
+      "futureApp": {
+        "title": "Future App",
+        "description": "Utforsk visjonen og utviklingsplanen",
+        "keywords": ["fremtid", "visjon", "roadmap", "utvikling", "faser"]
+      },
+      "runTest": {
+        "title": "Kjør test",
+        "description": "Omfattende testsuite for applikasjonen",
+        "keywords": ["test", "testing", "cypress", "manuell", "api"]
+      }
+    }
+  }
+}

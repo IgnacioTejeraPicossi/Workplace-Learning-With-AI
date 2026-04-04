@@ -1,135 +1,50 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 
+/** Route id → i18n key under globalSearch.sections */
+const SEARCH_SECTION_CONFIG = [
+  { id: "dashboard", sectionKey: "dashboard", icon: "🏠" },
+  { id: "ai-concepts", sectionKey: "aiConcepts", icon: "💡" },
+  { id: "micro-lessons", sectionKey: "microLessons", icon: "📚" },
+  { id: "video-lessons", sectionKey: "videoLessons", icon: "🎥" },
+  { id: "recommendation", sectionKey: "recommendation", icon: "⭐" },
+  { id: "simulations", sectionKey: "simulations", icon: "🎮" },
+  { id: "web-search", sectionKey: "webSearch", icon: "🌐" },
+  { id: "team-dynamics", sectionKey: "teamDynamics", icon: "👥" },
+  { id: "certifications", sectionKey: "certifications", icon: "🏆" },
+  { id: "coach", sectionKey: "coach", icon: "👨‍💼" },
+  { id: "skills-forecast", sectionKey: "skillsForecast", icon: "📊" },
+  { id: "presentation-agent", sectionKey: "presentationAgent", icon: "🎤" },
+  { id: "saved-lessons", sectionKey: "savedLessons", icon: "📦" },
+  { id: "idea-log", sectionKey: "ideaLog", icon: "💡" },
+  { id: "feature-roadmap", sectionKey: "featureRoadmap", icon: "⭐" },
+  { id: "future-app", sectionKey: "futureApp", icon: "🔮" },
+  { id: "run-test", sectionKey: "runTest", icon: "🧪" }
+];
+
 const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const searchInputRef = useRef(null);
   const { colors } = useTheme();
 
-  // Define all searchable sections
-  const searchableSections = [
-    {
-      id: "dashboard",
-      title: "Dashboard",
-      description: "View your learning progress and overview",
-      icon: "🏠",
-      keywords: ["dashboard", "progress", "overview", "home", "main"]
-    },
-    {
-      id: "ai-concepts",
-      title: "AI Concepts",
-      description: "Explore innovative AI learning concepts",
-      icon: "💡",
-      keywords: ["ai", "concepts", "innovation", "ideas", "artificial intelligence"]
-    },
-    {
-      id: "micro-lessons",
-      title: "Micro-lessons",
-      description: "Create and manage bite-sized learning lessons",
-      icon: "📚",
-      keywords: ["micro", "lessons", "learning", "education", "training", "bite-sized"]
-    },
-    {
-      id: "video-lessons",
-      title: "Video Lessons",
-      description: "Learn from videos with AI-generated quizzes",
-      icon: "🎥",
-      keywords: ["video", "lessons", "youtube", "quiz", "multimedia"]
-    },
-    {
-      id: "recommendation",
-      title: "Recommendation",
-      description: "Get personalized learning recommendations",
-      icon: "⭐",
-      keywords: ["recommendation", "suggestions", "personalized", "advice"]
-    },
-    {
-      id: "simulations",
-      title: "Simulations",
-      description: "Practice with interactive workplace scenarios",
-      icon: "🎮",
-      keywords: ["simulation", "scenarios", "practice", "interactive", "workplace"]
-    },
-    {
-      id: "web-search",
-      title: "Web Search",
-      description: "Search the web for up-to-date information",
-      icon: "🌐",
-      keywords: ["web", "search", "internet", "online", "information"]
-    },
-    {
-      id: "team-dynamics",
-      title: "Team Dynamics",
-      description: "Analyze and improve team collaboration",
-      icon: "👥",
-      keywords: ["team", "dynamics", "collaboration", "group", "workforce"]
-    },
-    {
-      id: "certifications",
-      title: "Certifications",
-      description: "Get certification recommendations and study plans",
-      icon: "🏆",
-      keywords: ["certification", "certificates", "study", "exams", "credentials"]
-    },
-    {
-      id: "coach",
-      title: "AI Career Coach",
-      description: "Get career guidance and professional advice",
-      icon: "👨‍💼",
-      keywords: ["coach", "career", "guidance", "advice", "professional"]
-    },
-    {
-      id: "skills-forecast",
-      title: "Skills Forecast",
-      description: "Predict future skills and career trends",
-      icon: "📊",
-      keywords: ["skills", "forecast", "prediction", "trends", "future"]
-    },
-    {
-      id: "presentation-agent",
-      title: "Presentation Agent",
-      description: "AI-powered presentation and Q&A for demos",
-      icon: "🎤",
-      keywords: ["presentation", "agent", "demo", "pitch", "speech", "hackathon", "q&a"]
-    },
-    {
-      id: "saved-lessons",
-      title: "Saved Lessons",
-      description: "View and manage your saved micro-lessons",
-      icon: "📦",
-      keywords: ["saved", "lessons", "bookmarks", "favorites", "history"]
-    },
-    {
-      id: "idea-log",
-      title: "Idea Log",
-      description: "View and manage user-submitted feature ideas",
-      icon: "💡",
-      keywords: ["idea", "log", "feedback", "suggestions", "features"]
-    },
-    {
-      id: "feature-roadmap",
-      title: "Feature Roadmap",
-      description: "Vote on and track upcoming features",
-      icon: "⭐",
-      keywords: ["feature", "roadmap", "vote", "upcoming", "planning"]
-    },
-    {
-      id: "future-app",
-      title: "Future App",
-      description: "Explore the vision and development roadmap",
-      icon: "🔮",
-      keywords: ["future", "vision", "roadmap", "development", "phases"]
-    },
-    {
-      id: "run-test",
-      title: "Run Test",
-      description: "Comprehensive testing suite for the application",
-      icon: "🧪",
-      keywords: ["test", "testing", "cypress", "manual", "api"]
-    }
-  ];
+  const searchableSections = useMemo(() => {
+    return SEARCH_SECTION_CONFIG.map(({ id, sectionKey, icon }) => {
+      const base = `globalSearch.sections.${sectionKey}`;
+      const kw = t(`${base}.keywords`, { returnObjects: true });
+      const keywords = Array.isArray(kw) ? kw : [];
+      return {
+        id,
+        title: t(`${base}.title`),
+        description: t(`${base}.description`),
+        icon,
+        keywords
+      };
+    });
+  }, [t]);
 
   // Filter results based on search query
   useEffect(() => {
@@ -146,7 +61,13 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
 
     setFilteredResults(results);
     setSelectedIndex(0);
-  }, [searchQuery]);
+  }, [searchQuery, searchableSections]);
+
+  const handleSelect = useCallback((section) => {
+    onNavigate(section.id);
+    onClose();
+    setSearchQuery("");
+  }, [onNavigate, onClose]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -156,13 +77,13 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex(prev => 
+          setSelectedIndex(prev =>
             prev < filteredResults.length - 1 ? prev + 1 : 0
           );
           break;
         case "ArrowUp":
           e.preventDefault();
-          setSelectedIndex(prev => 
+          setSelectedIndex(prev =>
             prev > 0 ? prev - 1 : filteredResults.length - 1
           );
           break;
@@ -176,12 +97,14 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
           e.preventDefault();
           onClose();
           break;
+        default:
+          break;
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, filteredResults, selectedIndex, onClose]);
+  }, [isOpen, filteredResults, selectedIndex, onClose, handleSelect]);
 
   // Focus input when opened
   useEffect(() => {
@@ -189,12 +112,6 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       searchInputRef.current.focus();
     }
   }, [isOpen]);
-
-  const handleSelect = (section) => {
-    onNavigate(section.id);
-    onClose();
-    setSearchQuery("");
-  };
 
   if (!isOpen) return null;
 
@@ -212,7 +129,7 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       justifyContent: "center",
       paddingTop: "100px"
     }} onClick={onClose}>
-      <div 
+      <div
         data-testid="global-search-modal"
         style={{
           background: colors.cardBackground,
@@ -223,7 +140,6 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
           boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
           border: `1px solid ${colors.border}`
         }} onClick={e => e.stopPropagation()}>
-        {/* Search Input */}
         <div style={{
           display: "flex",
           alignItems: "center",
@@ -236,7 +152,7 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search all sections..."
+            placeholder={t('globalSearch.placeholder')}
             style={{
               flex: 1,
               padding: "12px 16px",
@@ -263,9 +179,8 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Search Results */}
         {searchQuery && (
-          <div 
+          <div
             data-testid="search-results"
             style={{ maxHeight: "400px", overflowY: "auto" }}>
             {filteredResults.length > 0 ? (
@@ -309,13 +224,12 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
                 textAlign: "center",
                 color: colors.textSecondary
               }}>
-                No results found for "{searchQuery}"
+                {t('globalSearch.noResults', { query: searchQuery })}
               </div>
             )}
           </div>
         )}
 
-        {/* Keyboard Shortcuts Help */}
         {!searchQuery && (
           <div style={{
             padding: "16px",
@@ -325,10 +239,10 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
             fontSize: 14,
             color: colors.textSecondary
           }}>
-            <div style={{ fontWeight: 600, marginBottom: 8 }}>Keyboard Shortcuts:</div>
-            <div>• Use ↑↓ arrows to navigate</div>
-            <div>• Press Enter to select</div>
-            <div>• Press Escape to close</div>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>{t('globalSearch.shortcutsTitle')}</div>
+            <div>• {t('globalSearch.shortcutNav')}</div>
+            <div>• {t('globalSearch.shortcutEnter')}</div>
+            <div>• {t('globalSearch.shortcutEscape')}</div>
           </div>
         )}
       </div>
@@ -336,4 +250,4 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
   );
 };
 
-export default GlobalSearch; 
+export default GlobalSearch;

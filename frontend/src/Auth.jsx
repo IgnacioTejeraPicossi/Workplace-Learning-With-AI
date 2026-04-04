@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { auth, googleProvider } from './firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import AuthSelector from './components/Auth/AuthSelector';
 
 export default function Auth({ user, setUser }) {
+  const { t } = useTranslation();
   const [error, setError] = useState(null);
 
   const handleSignIn = async () => {
@@ -30,10 +32,12 @@ export default function Auth({ user, setUser }) {
   }
 
   // Si hay usuario, mostrar el botón de logout
+  const displayName = user.displayName || user.email?.split('@')[0] || '—';
+
   return (
     <div>
-      <div>Welcome, {user.displayName}!</div>
-      <sl-button variant="default" onClick={handleSignOut}>Sign Out</sl-button>
+      <div>{t('auth.greeting', { name: displayName })}</div>
+      <sl-button variant="default" onClick={handleSignOut}>{t('actions.signOut')}</sl-button>
       {error && <div style={{ color: 'red' }}>{error}</div>}
     </div>
   );
