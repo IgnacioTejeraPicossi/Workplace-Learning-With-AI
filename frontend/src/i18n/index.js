@@ -5,6 +5,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translation files
 import enCommon from './locales/en/common.json';
 import noCommon from './locales/no/common.json';
+import enRunTest from './locales/en/runTestModule.json';
+import noRunTest from './locales/no/runTestModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -22,11 +24,11 @@ i18n
       caches: ['localStorage']
     },
     resources: {
-      en: { 
-        common: enCommon 
+      en: {
+        common: { ...enCommon, ...enRunTest }
       },
-      no: { 
-        common: noCommon 
+      no: {
+        common: { ...noCommon, ...noRunTest }
       }
     }
   });

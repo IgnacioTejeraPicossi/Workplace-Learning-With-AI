@@ -1,9 +1,23 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import ModalDialog from './ModalDialog';
 
+/** Timings for simulated Cypress rows (aligned with runTestModule.cypressTestNames) */
+const CYPRESS_TIMES = [
+  '1.4s', '0.9s', '2.5s', '8.6s', '1.8s', '1.5s', '3.2s', '2.8s', '2.1s', '4.5s', '1.9s', '1.2s',
+  '6.0s', '1.1s', '1.3s', '1.6s', '1.2s', '1.4s', '1.8s', '2.1s', '1.0s', '12.0s', '1.3s', '1.1s',
+  '1.7s', '0.9s', '2.3s', '4.6s', '1.5s', '1.5s', '1.6s', '1.6s', '2.0s', '1.6s', '3.2s'
+];
+
 const RunTest = () => {
+  const { t } = useTranslation();
   const { colors, isDark, toggleTheme } = useTheme();
+
+  const labelForTest = (test) => {
+    if (test.nameKey) return t(test.nameKey, test.nameParams || {});
+    return test.name;
+  };
   const [testType, setTestType] = useState('cypress');
   const [testResults, setTestResults] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -17,54 +31,25 @@ const RunTest = () => {
     setTestResults(null);
     setApiTestResults(null);
     setShowProgressModal(true);
-    setProgressMessage('Running Cypress Tests...');
-    
+    setProgressMessage(t('runTestModule.progress.cypress'));
+
     // Simulate Cypress test execution (reflect only the real E2E suites we ship)
     setTimeout(() => {
+      const cypressNames = t('runTestModule.cypressTestNames', { returnObjects: true });
+      const nameList = Array.isArray(cypressNames) ? cypressNames : [];
+      const tests = nameList.map((name, i) => ({
+        name,
+        status: 'passed',
+        time: CYPRESS_TIMES[i] || '—'
+      }));
       setTestResults({
         success: true,
-        tests: [
-          { name: 'App Smoke Navigation', status: 'passed', time: '1.4s' },
-          { name: 'Help: Agent Theory → Open in Theory', status: 'passed', time: '0.9s' },
-          { name: 'Cybersecurity: Tools & Frameworks (ZAP parser, presets)', status: 'passed', time: '2.5s' },
-          { name: 'Cybersecurity: Agent Security (Scan + Findings)', status: 'passed', time: '8.6s' },
-          { name: 'Cybersecurity: Threat Library (card + details modal)', status: 'passed', time: '1.8s' },
-          { name: 'Cybersecurity: Posture & Risk (NIST domains + risk gauge)', status: 'passed', time: '1.5s' },
-          { name: 'Cybersecurity: Vulnerabilities (scan + filter + detail modal)', status: 'passed', time: '3.2s' },
-          { name: 'Cybersecurity: Compliance Tracker (framework filter + inline edit)', status: 'passed', time: '2.8s' },
-          { name: 'Cybersecurity: Secure Coding Coach (topic browse + lesson generate)', status: 'passed', time: '2.1s' },
-          { name: 'Cybersecurity: Incident Drills (start drill + submit answers)', status: 'passed', time: '4.5s' },
-          { name: 'Cybersecurity: Knowledge Base (articles + AI Q&A)', status: 'passed', time: '1.9s' },
-          { name: 'Cybersecurity: Dashboard (risk score + KPIs)', status: 'passed', time: '1.2s' },
-          { name: 'AI Learning: Complete quiz and save progress', status: 'passed', time: '6.0s' },
-          { name: 'Micro-lessons: Modal open/close', status: 'passed', time: '1.1s' },
-          { name: 'API Config: Switch provider + Save Keys', status: 'passed', time: '1.3s' },
-          { name: 'Babel Library: Tabs + Advanced Search', status: 'passed', time: '1.6s' },
-          { name: 'Babel Library: Catalog search and topic filter', status: 'passed', time: '1.2s' },
-          { name: 'Babel Library: Add resource and verify in catalog', status: 'passed', time: '1.4s' },
-          { name: 'Babel Library: Add video → open in Video Lessons → delete', status: 'passed', time: '1.8s' },
-          { name: 'Video Lessons: Saved Videos persistence (expand iframe + delete)', status: 'passed', time: '2.1s' },
-          { name: 'Skills Forecast: Input enabled + Clear', status: 'passed', time: '1.0s' },
-          { name: 'Skills Forecast: Generate + Save (if backend)', status: 'passed', time: '12.0s' },
-          { name: 'Certifications: Tab navigation', status: 'passed', time: '1.3s' },
-          { name: 'Team Dynamics: Header/Auth banner', status: 'passed', time: '1.1s' },
-          { name: 'Web Search: Query submit + Results', status: 'passed', time: '1.7s' },
-          { name: 'Robomind Clinic: Header image visible', status: 'passed', time: '0.9s' },
-          { name: 'Repository Analyzer: Repo Analyzer, Agent Cursor AI, Learning Repo', status: 'passed', time: '2.3s' },
-          { name: 'Repo Analyzer: Template prefill, Detect Branches, Analyze + Results', status: 'passed', time: '4.6s' },
-          { name: 'Document Analyzer: Documents Analyzer', status: 'passed', time: '1.5s' },
-          { name: 'Document Analyzer: Learning Document', status: 'passed', time: '1.5s' },
-          { name: 'Agentic RAG: Analyzer', status: 'passed', time: '1.6s' },
-          { name: 'Agentic RAG: Documents', status: 'passed', time: '1.6s' },
-          { name: 'Map of Knowledge: search input, counter, web search panel', status: 'passed', time: '2.0s' },
-          { name: 'Map of Knowledge: category filter changes counter', status: 'passed', time: '1.6s' },
-          { name: 'Simulations: start scenario, next step & question change', status: 'passed', time: '3.2s' },
-        ],
+        tests,
         summary: {
-          total: 28,
-          passed: 28,
+          total: tests.length,
+          passed: tests.length,
           failed: 0,
-          duration: '~45s'
+          duration: t('runTestModule.durationApprox')
         }
       });
       setIsRunning(false);
@@ -77,7 +62,7 @@ const RunTest = () => {
     setTestResults(null);
     setApiTestResults(null);
     setShowProgressModal(true);
-    setProgressMessage('Running Hybrid Tests (50 Real + 13 Mock)...');
+    setProgressMessage(t('runTestModule.progress.hybrid'));
     
     // Execute hybrid tests immediately
     (async () => {
@@ -87,7 +72,7 @@ const RunTest = () => {
         // REAL TESTS - Execute actual API calls
         const healthResponse = await fetch('http://localhost:8000/api/health');
         results.push({
-          name: 'Backend Health Check',
+          nameKey: 'runTestModule.manual.backendHealth',
           status: healthResponse.ok ? 'passed' : 'failed',
           time: '200ms',
           type: 'real'
@@ -95,7 +80,7 @@ const RunTest = () => {
 
         const skillsResponse = await fetch('http://localhost:8000/api/skills-forecast/health');
         results.push({
-          name: 'Skills Forecast Health API',
+          nameKey: 'runTestModule.manual.skillsForecastHealth',
           status: skillsResponse.ok ? 'passed' : 'failed',
           time: '150ms',
           type: 'real'
@@ -103,7 +88,7 @@ const RunTest = () => {
 
         const docResponse = await fetch('http://localhost:8000/api/document-analyzer/health');
         results.push({
-          name: 'Document Analyzer Health API',
+          nameKey: 'runTestModule.manual.docAnalyzerHealth',
           status: docResponse.ok ? 'passed' : 'failed',
           time: '120ms',
           type: 'real'
@@ -111,53 +96,52 @@ const RunTest = () => {
 
         const knowledgeResponse = await fetch('http://localhost:8000/api/knowledge-map/topics');
         results.push({
-          name: 'Knowledge Map Topics API',
+          nameKey: 'runTestModule.manual.knowledgeMapTopics',
           status: knowledgeResponse.ok ? 'passed' : 'failed',
           time: '180ms',
           type: 'real'
         });
 
         // Add more real API tests
-        const apiEndpoints = [
-          { name: 'Saved Videos API', endpoint: '/api/saved-videos/test' },
-          { name: 'Micro Lessons API', endpoint: '/api/micro-lessons/' },
-          { name: 'Certifications API', endpoint: '/api/certifications/' },
-          { name: 'Web Search API', endpoint: '/api/web-search/' },
-          { name: 'Career Coach API', endpoint: '/api/career-coach/' },
-          { name: 'Simulation Results API', endpoint: '/api/simulation-results/' },
-          { name: 'AgentOps Playbooks API', endpoint: '/api/playbooks' },
-          { name: 'AgentOps Flows API', endpoint: '/api/flows' },
-          { name: 'AgentOps Runs API', endpoint: '/api/runs' },
-          { name: 'AgentOps Settings API', endpoint: '/api/settings' },
-          { name: 'ItemAI Models API', endpoint: '/api/itemai-models' },
-          { name: 'Document Analyzer Formats API', endpoint: '/api/document-analyzer/supported-formats' },
-          { name: 'Document Analyzer Saved API', endpoint: '/api/document-analyzer/get-saved-analyses' },
-          { name: 'AgentOps Flows Ping API', endpoint: '/api/flows/_ping' },
-          { name: 'AgentOps Playbooks Ping API', endpoint: '/api/playbooks/_ping' },
-          { name: 'AgentOps Settings Ping API', endpoint: '/api/settings/_ping' },
-          { name: 'Search Health API', endpoint: '/api/search-health' },
-          // Cybersecurity module
-          { name: 'Cyber Health API', endpoint: '/api/cyber/health' },
-          { name: 'Cyber Threats API', endpoint: '/api/cyber/threats' },
-          { name: 'Cyber Controls API', endpoint: '/api/cyber/controls' },
-          { name: 'Cyber NIST Domains API', endpoint: '/api/cyber/posture/nist-domains' },
-          { name: 'Cyber Vuln Summary API', endpoint: '/api/cyber/vulnerabilities/summary' },
-          { name: 'Cyber Compliance Summary API', endpoint: '/api/cyber/compliance/summary' },
-          { name: 'Cyber Coach Topics API', endpoint: '/api/cyber/coach/topics' },
-          { name: 'Cyber Drill Scenarios API', endpoint: '/api/cyber/drills/scenarios' },
-          { name: 'Cyber Knowledge Articles API', endpoint: '/api/cyber/knowledge/articles' },
-          { name: 'Agent Security Health API', endpoint: '/api/agent-security/health' },
-          { name: 'Agent Security Overview API', endpoint: '/api/agent-security/overview' }
+        const manualApiEndpoints = [
+          { nameKey: 'runTestModule.manualApi.savedVideos', endpoint: '/api/saved-videos/test' },
+          { nameKey: 'runTestModule.manualApi.microLessons', endpoint: '/api/micro-lessons/' },
+          { nameKey: 'runTestModule.manualApi.certifications', endpoint: '/api/certifications/' },
+          { nameKey: 'runTestModule.manualApi.webSearch', endpoint: '/api/web-search/' },
+          { nameKey: 'runTestModule.manualApi.careerCoach', endpoint: '/api/career-coach/' },
+          { nameKey: 'runTestModule.manualApi.simulationResults', endpoint: '/api/simulation-results/' },
+          { nameKey: 'runTestModule.manualApi.agentOpsPlaybooks', endpoint: '/api/playbooks' },
+          { nameKey: 'runTestModule.manualApi.agentOpsFlows', endpoint: '/api/flows' },
+          { nameKey: 'runTestModule.manualApi.agentOpsRuns', endpoint: '/api/runs' },
+          { nameKey: 'runTestModule.manualApi.agentOpsSettings', endpoint: '/api/settings' },
+          { nameKey: 'runTestModule.manualApi.itemAIModels', endpoint: '/api/itemai-models' },
+          { nameKey: 'runTestModule.manualApi.docAnalyzerFormats', endpoint: '/api/document-analyzer/supported-formats' },
+          { nameKey: 'runTestModule.manualApi.docAnalyzerSaved', endpoint: '/api/document-analyzer/get-saved-analyses' },
+          { nameKey: 'runTestModule.manualApi.flowsPing', endpoint: '/api/flows/_ping' },
+          { nameKey: 'runTestModule.manualApi.playbooksPing', endpoint: '/api/playbooks/_ping' },
+          { nameKey: 'runTestModule.manualApi.settingsPing', endpoint: '/api/settings/_ping' },
+          { nameKey: 'runTestModule.manualApi.searchHealth', endpoint: '/api/search-health' },
+          { nameKey: 'runTestModule.manualApi.cyberHealth', endpoint: '/api/cyber/health' },
+          { nameKey: 'runTestModule.manualApi.cyberThreats', endpoint: '/api/cyber/threats' },
+          { nameKey: 'runTestModule.manualApi.cyberControls', endpoint: '/api/cyber/controls' },
+          { nameKey: 'runTestModule.manualApi.cyberNistDomains', endpoint: '/api/cyber/posture/nist-domains' },
+          { nameKey: 'runTestModule.manualApi.cyberVulnSummary', endpoint: '/api/cyber/vulnerabilities/summary' },
+          { nameKey: 'runTestModule.manualApi.cyberComplianceSummary', endpoint: '/api/cyber/compliance/summary' },
+          { nameKey: 'runTestModule.manualApi.cyberCoachTopics', endpoint: '/api/cyber/coach/topics' },
+          { nameKey: 'runTestModule.manualApi.cyberDrillScenarios', endpoint: '/api/cyber/drills/scenarios' },
+          { nameKey: 'runTestModule.manualApi.cyberKnowledgeArticles', endpoint: '/api/cyber/knowledge/articles' },
+          { nameKey: 'runTestModule.manualApi.agentSecurityHealth', endpoint: '/api/agent-security/health' },
+          { nameKey: 'runTestModule.manualApi.agentSecurityOverview', endpoint: '/api/agent-security/overview' }
         ];
 
-        for (const api of apiEndpoints) {
+        for (const api of manualApiEndpoints) {
           try {
             const startTime = Date.now();
             const response = await fetch(`http://localhost:8000${api.endpoint}`);
             const endTime = Date.now();
-            
+
             results.push({
-              name: api.name,
+              nameKey: api.nameKey,
               status: response.ok ? 'passed' : 'failed',
               time: `${endTime - startTime}ms`,
               type: 'real',
@@ -165,7 +149,7 @@ const RunTest = () => {
             });
           } catch (error) {
             results.push({
-              name: api.name,
+              nameKey: api.nameKey,
               status: 'failed',
               time: 'N/A',
               type: 'real',
@@ -177,7 +161,8 @@ const RunTest = () => {
         // Add more real tests to reach 50
         for (let i = 0; i < 19; i++) {
           results.push({
-            name: `Real API Test ${i + 1}`,
+            nameKey: 'runTestModule.manual.realApiTestN',
+            nameParams: { n: i + 1 },
             status: 'passed',
             time: `${Math.floor(Math.random() * 200) + 100}ms`,
             type: 'real'
@@ -200,14 +185,14 @@ const RunTest = () => {
         toggleTheme();
         const t1 = performance.now();
         results.push({
-          name: 'Theme toggle switches between light and dark modes',
+          nameKey: 'runTestModule.manual.themeToggle',
           status: themeAfter && themeAfter !== themeBefore ? 'passed' : 'failed',
           time: `${Math.round(t1 - t0)}ms`,
           type: 'real'
         });
       } catch (e) {
         results.push({
-          name: 'Theme toggle switches between light and dark modes',
+          nameKey: 'runTestModule.manual.themeToggle',
           status: 'failed',
           time: 'N/A',
           type: 'real',
@@ -229,14 +214,14 @@ const RunTest = () => {
         }
         const t1 = performance.now();
         results.push({
-          name: 'Document Analyzer: Supported formats available',
+          nameKey: 'runTestModule.manual.docAnalyzerFormats',
           status: ok && hasPdf ? 'passed' : 'failed',
           time: `${Math.round(t1 - t0)}ms`,
           type: 'real'
         });
       } catch (e) {
         results.push({
-          name: 'Document Analyzer: Supported formats available',
+          nameKey: 'runTestModule.manual.docAnalyzerFormats',
           status: 'failed',
           time: 'N/A',
           type: 'real',
@@ -246,18 +231,18 @@ const RunTest = () => {
 
       // Remaining MOCK TESTS (unable to simulate reliably here)
       const mockTests = [
-        { name: 'Responsive design works on different screen sizes (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Panel content loads properly for each module (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Global search functionality works (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Authentication flow works correctly (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'AI Study Buddy: Chat interface works and responds correctly (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Presentation Agent: Generate Script functionality works and displays results (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'AI Training Module: Lessons, quizzes, and certifications work correctly (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Idea Log: Filtering, tagging, and delete work as expected (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold for features (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Babel Library: Resource categorization and type badges display correctly (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Navigation: Cross-module resource editing works seamlessly (MOCK)', status: 'passed', time: 'N/A', type: 'mock' },
-        { name: 'Document Analyzer: File upload functionality works for PDF, DOCX, TXT files (MOCK)', status: 'passed', time: 'N/A', type: 'mock' }
+        { nameKey: 'runTestModule.manual.mockResponsive', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockPanels', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockGlobalSearch', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockAuth', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockStudyBuddy', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockPresentationAgent', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockTrainingModule', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockIdeaLog', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockFeatureRoadmap', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockBabelBadges', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockCrossModuleNav', status: 'passed', time: 'N/A', type: 'mock' },
+        { nameKey: 'runTestModule.manual.mockDocUpload', status: 'passed', time: 'N/A', type: 'mock' }
       ];
 
       results.push(...mockTests);
@@ -293,7 +278,7 @@ const RunTest = () => {
     setTestResults(null);
     setApiTestResults(null);
     setShowProgressModal(true);
-    setProgressMessage('Running API Tests...');
+    setProgressMessage(t('runTestModule.progress.api'));
     
     const apiEndpoints = [
       // Backend API endpoints (working)
@@ -1510,17 +1495,22 @@ const RunTest = () => {
     setShowProgressModal(false);
   };
 
+  const coverageRaw = t('runTestModule.coverageItems', { returnObjects: true });
+  const coverageListSafe = Array.isArray(coverageRaw) ? coverageRaw : [];
+  const legendRaw = t('runTestModule.legendRows', { returnObjects: true });
+  const legendRowsSafe = Array.isArray(legendRaw) ? legendRaw : [];
+
   return (
     <div style={{ padding: '24px', background: colors.background, minHeight: '100vh' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h1 style={{ color: colors.text, margin: 0 }}>Run Tests</h1>
+          <h1 style={{ color: colors.text, margin: 0 }}>{t('runTestModule.title')}</h1>
         </div>
 
         <div style={{ background: colors.cardBackground, borderRadius: '12px', padding: '24px', boxShadow: colors.shadow }}>
-          <h2 style={{ color: colors.text, marginTop: 0 }}>Automated Testing</h2>
+          <h2 style={{ color: colors.text, marginTop: 0 }}>{t('runTestModule.headingAutomated')}</h2>
           <p style={{ color: colors.textSecondary, marginBottom: '24px' }}>
-            Run comprehensive tests to verify all sidebar options, panels, and API endpoints work correctly.
+            {t('runTestModule.intro')}
           </p>
 
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
@@ -1537,7 +1527,7 @@ const RunTest = () => {
                 fontWeight: 600
               }}
             >
-              Run Cypress Tests
+              {t('runTestModule.btnCypress')}
             </button>
             <button
               onClick={() => setTestType('manual')}
@@ -1552,7 +1542,7 @@ const RunTest = () => {
                 fontWeight: 600
               }}
             >
-              Run Manual Tests
+              {t('runTestModule.btnManual')}
             </button>
             <button
               onClick={() => setTestType('api')}
@@ -1567,7 +1557,7 @@ const RunTest = () => {
                 fontWeight: 600
               }}
             >
-              Run API Tests
+              {t('runTestModule.btnApi')}
             </button>
           </div>
 
@@ -1587,7 +1577,7 @@ const RunTest = () => {
                   opacity: isRunning ? 0.7 : 1
                 }}
               >
-                {isRunning ? 'Running Tests...' : 'Start Cypress Tests'}
+                {isRunning ? t('runTestModule.runningTests') : t('runTestModule.startCypress')}
               </button>
             </div>
           )}
@@ -1608,7 +1598,7 @@ const RunTest = () => {
                   opacity: isRunning ? 0.7 : 1
                 }}
               >
-                {isRunning ? 'Running Tests...' : 'Start Manual Tests'}
+                {isRunning ? t('runTestModule.runningTests') : t('runTestModule.startManual')}
               </button>
             </div>
           )}
@@ -1629,7 +1619,7 @@ const RunTest = () => {
                   opacity: isRunningApi ? 0.7 : 1
                 }}
               >
-                {isRunningApi ? 'Testing APIs...' : 'Start API Tests'}
+                {isRunningApi ? t('runTestModule.testingApis') : t('runTestModule.startApi')}
               </button>
               
               {/* Test Status Legend */}
@@ -1642,19 +1632,14 @@ const RunTest = () => {
                 fontSize: '13px',
                 color: '#856404'
               }}>
-                <strong>📊 Test Status Legend:</strong>
+                <strong>📊 {t('runTestModule.legendTitle')}</strong>
                 <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                  <div>✓ <strong style={{ color: '#2ecc40' }}>Passed</strong> - Endpoint works correctly</div>
-                  <div>🔒 <strong style={{ color: '#f4b400' }}>Auth Required</strong> - Needs authentication</div>
-                  <div>⚡ <strong style={{ color: '#f39c12' }}>Expected Fail</strong> - Invalid test ID (expected, validates correctly)</div>
-                  <div>🔧 <strong style={{ color: '#9b59b6' }}>Requires Setup</strong> - External service needed</div>
-                  <div>⚠️ <strong style={{ color: '#ff9500' }}>Not Supported</strong> - Feature not implemented</div>
-                  <div>✗ <strong style={{ color: '#e74c3c' }}>Failed</strong> - Unexpected error</div>
+                  {legendRowsSafe.map((row, i) => (
+                    <div key={i}>{row}</div>
+                  ))}
                 </div>
                 <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #ffc107' }}>
-                  <strong>ℹ️ Note:</strong> "Expected Fail" endpoints use test IDs (like "test-pair-id") that aren't valid MongoDB ObjectIds. 
-                  These 500/404 errors are <strong>normal</strong> and confirm the endpoint validates input correctly. 
-                  To test with real data, create actual documents first and use their IDs.
+                  <strong>ℹ️ {t('runTestModule.legendNoteTitle')}</strong> {t('runTestModule.legendNoteBody')}
                 </div>
               </div>
             </div>
@@ -1662,7 +1647,7 @@ const RunTest = () => {
 
           {/* Test Coverage Section (real E2E only) */}
           <div style={{ marginTop: '24px', background: colors.primaryLight, padding: '16px', borderRadius: '8px' }}>
-            <h3 style={{ color: colors.text, marginTop: 0 }}>Test Coverage (Cypress E2E)</h3>
+            <h3 style={{ color: colors.text, marginTop: 0 }}>{t('runTestModule.coverageTitle')}</h3>
             {testType === 'api' && (
               <div style={{ 
                 background: '#e8f5e9', 
@@ -1673,67 +1658,41 @@ const RunTest = () => {
                 fontSize: '14px',
                 color: '#1b5e20'
               }}>
-                <strong>📡 Server Requirements:</strong>
+                <strong>📡 {t('runTestModule.serverRequirementsTitle')}</strong>
                 <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                  <li><strong>Port 8000:</strong> Main backend (FastAPI) - Should be running ✅</li>
-                  <li><strong>Port 8888:</strong> Test file server - Optional, only needed for MCP analyze endpoint testing. Start with: <code>cd backend && python test_mcp_server.py</code></li>
+                  <li><strong>Port 8000:</strong> {t('runTestModule.serverPort8000')} ✅</li>
+                  <li><strong>Port 8888:</strong> {t('runTestModule.serverPort8888')} <code>cd backend && python test_mcp_server.py</code></li>
                 </ul>
               </div>
             )}
             <ul style={{ color: colors.textSecondary, margin: 0, paddingLeft: '20px' }}>
-              <li>Sidebar navigation and module routing</li>
-              <li>Help › Agent Theory & Documentation (Overview card → Theory)</li>
-              <li>Cybersecurity › Dashboard (risk score gauge, KPI cards)</li>
-              <li>Cybersecurity › Agent Security (Scan flow, Findings modal)</li>
-              <li>Cybersecurity › Threat Library (open card, details modal, category filter)</li>
-              <li>Cybersecurity › Tools & Frameworks (OWASP checklist, presets, ZAP parser)</li>
-              <li>Cybersecurity › Posture & Risk (NIST CSF 2.0 domain scores, risk gauge)</li>
-              <li>Cybersecurity › Vulnerabilities (scan controls, severity filter, detail modal)</li>
-              <li>Cybersecurity › Compliance Tracker (framework filter, inline edit, progress bars)</li>
-              <li>Cybersecurity › Secure Coding Coach (topic browse, lesson generation)</li>
-              <li>Cybersecurity › Incident Drills (scenario start, step-by-step answers, scoring)</li>
-              <li>Cybersecurity › Knowledge Base (articles, category filter, AI Q&A)</li>
-              <li>AI Learning & Training (open lesson, navigate sections, complete quiz, progress saved)</li>
-              <li>Micro-lessons (modal open/close)</li>
-              <li>API Config (switch provider, save keys)</li>
-              <li>Babel Library (tabs, Advanced Search, catalog search+filter)</li>
-              <li>Babel Library (add resource and verify in catalog; add video, open in Video Lessons, delete)</li>
-              <li>Video Lessons (save appears in Saved Videos inside module and can be deleted)</li>
-              <li>Skills Forecast (input enables forecast, clear)</li>
-              <li>Skills Forecast (generate + save if backend available)</li>
-              <li>Simulations (open module and start scenario session)</li>
-              <li>AI Career Coach (open module)</li>
-              <li>Repository Analyzer (Repo Analyzer, Agent Cursor AI, Learning Repo)</li>
-              <li>Document Analyzer (Documents Analyzer, Learning Document, Agentic RAG Analyzer, Agentic RAG Documents)</li>
-              <li>J-messages Analyzer - Basic (list, save, analyze-note, export, update, delete)</li>
-              <li>J-messages Pre-analyze (pre-analyze/prompt, pre-analyze multipart, pre-analyze/export-docx)</li>
-              <li>J-messages Training - Epic 3 (list, get, create, update, delete, import, stats, evaluate, evaluate-batch, get-evaluation, prompt-suggest)</li>
-              <li>J-messages MCP (manifest, analyze)</li>
-              <li>Map of Knowledge (search input, counter, web search panel)</li>
-              <li>Certifications (tab navigation)</li>
-              <li>Team Dynamics (header + auth banner)</li>
-              <li>Web Search (query submit, results container)</li>
+              {coverageListSafe.map((line, i) => (
+                <li key={i}>{line}</li>
+              ))}
             </ul>
           </div>
 
           {/* Test Results */}
           {(testResults || apiTestResults) && (
             <div style={{ marginTop: '24px' }}>
-              <h3 style={{ color: colors.text }}>Test Results</h3>
+              <h3 style={{ color: colors.text }}>{t('runTestModule.resultsTitle')}</h3>
               <div style={{ background: colors.cardBackground, borderRadius: '8px', padding: '16px', border: `1px solid ${colors.border}` }}>
                 {testResults && (
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                       <span style={{ fontWeight: 600, color: colors.text }}>
-                        Summary: {testResults.summary.passed}/{testResults.summary.total} tests passed
+                        {t('runTestModule.summaryLine', {
+                          passed: testResults.summary.passed,
+                          total: testResults.summary.total
+                        })}
                       </span>
                       <span style={{ color: colors.textSecondary }}>
-                        Duration: {testResults.summary.duration}
+                        {t('runTestModule.durationLabel', { duration: testResults.summary.duration })}
                       </span>
                     </div>
                     {testResults.tests.map((test, index) => (
                       <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
-                        <span style={{ color: colors.text }}>{test.name}</span>
+                        <span style={{ color: colors.text }}>{labelForTest(test)}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ color: test.status === 'passed' ? '#2ecc40' : '#e74c3c', fontWeight: 600 }}>
                             {test.status === 'passed' ? '✓' : '✗'}
@@ -1749,25 +1708,34 @@ const RunTest = () => {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                       <span style={{ fontWeight: 600, color: colors.text }}>
-                        API Summary: {apiTestResults.summary.passed}/{apiTestResults.summary.total} endpoints working
-                        {apiTestResults.summary.authRequired > 0 && ` (${apiTestResults.summary.authRequired} require auth)`}
-                        {apiTestResults.summary.notSupported > 0 && ` (${apiTestResults.summary.notSupported} not supported)`}
-                        {apiTestResults.summary.expectedFail > 0 && ` (${apiTestResults.summary.expectedFail} expected failures)`}
-                        {apiTestResults.summary.requiresSetup > 0 && ` (${apiTestResults.summary.requiresSetup} require setup)`}
-                        {apiTestResults.summary.networkError > 0 && ` (${apiTestResults.summary.networkError} network errors)`}
-                        {apiTestResults.summary.timeout > 0 && ` (${apiTestResults.summary.timeout} timeouts)`}
+                        {t('runTestModule.apiSummaryWorking', {
+                          passed: apiTestResults.summary.passed,
+                          total: apiTestResults.summary.total
+                        })}
+                        {apiTestResults.summary.authRequired > 0 &&
+                          t('runTestModule.apiSummaryAuth', { count: apiTestResults.summary.authRequired })}
+                        {apiTestResults.summary.notSupported > 0 &&
+                          t('runTestModule.apiSummaryNotSupported', { count: apiTestResults.summary.notSupported })}
+                        {apiTestResults.summary.expectedFail > 0 &&
+                          t('runTestModule.apiSummaryExpectedFail', { count: apiTestResults.summary.expectedFail })}
+                        {apiTestResults.summary.requiresSetup > 0 &&
+                          t('runTestModule.apiSummaryRequiresSetup', { count: apiTestResults.summary.requiresSetup })}
+                        {apiTestResults.summary.networkError > 0 &&
+                          t('runTestModule.apiSummaryNetworkError', { count: apiTestResults.summary.networkError })}
+                        {apiTestResults.summary.timeout > 0 &&
+                          t('runTestModule.apiSummaryTimeout', { count: apiTestResults.summary.timeout })}
                       </span>
                       <span style={{ color: colors.textSecondary }}>
-                        Duration: {apiTestResults.summary.duration}
+                        {t('runTestModule.durationLabel', { duration: apiTestResults.summary.duration })}
                       </span>
                     </div>
                     {apiTestResults.tests.map((test, index) => (
                       <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ color: colors.text, fontWeight: 600 }}>{test.name}</span>
+                          <span style={{ color: colors.text, fontWeight: 600 }}>{labelForTest(test)}</span>
                           <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{test.endpoint}</span>
                           {test.requiresAuth && (
-                            <span style={{ color: '#f4b400', fontSize: '10px', fontWeight: 600 }}>🔒 Requires Auth</span>
+                            <span style={{ color: '#f4b400', fontSize: '10px', fontWeight: 600 }}>🔒 {t('runTestModule.requiresAuthBadge')}</span>
                           )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1812,7 +1780,7 @@ const RunTest = () => {
       <ModalDialog
         isOpen={showProgressModal}
         onRequestClose={() => {}} // Prevent closing during tests
-        title="Run Tests"
+        title={t('runTestModule.title')}
       >
         <div style={{ width: '100%', margin: '24px 0' }}>
           <div style={{ 
