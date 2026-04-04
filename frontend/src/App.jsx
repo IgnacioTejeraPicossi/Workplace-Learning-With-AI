@@ -39,7 +39,7 @@ import AgenticRAG from "./AgenticRAG";
 import AgenticRAGDocument from "./AgenticRAGDocument";
 import EAHome from "./ea/EAHome";
 import ProcessDesigner from "./ea/ProcessDesigner";
-import SecurityPanel from "./SecurityPanel";
+import SecurityCenter from "./security/SecurityCenter";
 import CatalogManager from "./ea/CatalogManager";
 import AgentOpsStudio from "./AgentOpsStudio/AgentOpsStudio";
 import RobomindClinic from "./RobomindClinic/RobomindClinicWithTabs";
@@ -526,7 +526,7 @@ function AppContent() {
             {!activeModule && section === "readme-viewer" && <ReadmeViewer />}
             {!activeModule && section === "agi-progress" && <AgiProgressPage />}
             {!activeModule && section === "run-test" && <RunTest />}
-            {!activeModule && section === "security" && <SecurityPanel />}
+            {!activeModule && section === "security" && <SecurityCenter />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
             {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}

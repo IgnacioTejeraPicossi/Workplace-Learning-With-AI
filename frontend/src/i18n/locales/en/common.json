@@ -407,6 +407,133 @@
     }
   },
 
+  "security": {
+    "title": "Security Center",
+    "localInstallation": {
+      "label": "Local Installation",
+      "sidebarDesc": "Manage your local security settings and configurations",
+      "title": "Local Installation Security",
+      "statusLabel": "Security Status",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "passphrasePrompt": "Set encryption passphrase (not stored)",
+      "disable": "Disable",
+      "activate": "Activate",
+      "description": "Your local installation is properly secured with the following features:",
+      "encryption": "Encryption",
+      "encryptionActive": "All local data is encrypted at rest",
+      "encryptionDisabled": "Encryption is currently disabled",
+      "accessControl": "Access Control",
+      "accessControlDesc": "Local authentication required",
+      "firewall": "Firewall",
+      "firewallDesc": "Local network access restricted",
+      "updates": "Updates",
+      "updatesDesc": "Security patches automatically applied"
+    },
+    "dataDeletion": {
+      "label": "Automatic Data Deletion",
+      "sidebarDesc": "Configure automatic data cleanup and retention policies",
+      "title": "Automatic Data Deletion",
+      "policyStatus": "Data Retention Policy",
+      "enabled": "Enabled",
+      "description": "Configure how long your data is retained before automatic deletion:",
+      "policies": {
+        "activityLogs": "User Activity Logs",
+        "tempFiles": "Temporary Files",
+        "cacheData": "Cache Data",
+        "sessionData": "Session Data"
+      },
+      "periods": {
+        "activityLogs": "30 days",
+        "tempFiles": "7 days",
+        "cacheData": "24 hours",
+        "sessionData": "Until logout"
+      }
+    },
+    "yourData": {
+      "label": "Your Data",
+      "sidebarDesc": "View and manage your personal data and privacy settings",
+      "title": "Your Data & Privacy",
+      "protectionStatus": "Data Protection",
+      "protected": "Protected",
+      "description": "You have full control over your personal data:",
+      "options": {
+        "personalInfo": "Personal Information",
+        "learningHistory": "Learning History",
+        "accountDeletion": "Account Deletion"
+      },
+      "actions": {
+        "viewEdit": "View/Edit",
+        "export": "Export",
+        "delete": "Delete Account"
+      }
+    },
+    "anonymization": {
+      "label": "Data Anonymization",
+      "sidebarDesc": "Configure data anonymization and privacy protection",
+      "title": "Data Anonymization",
+      "privacyStatus": "Privacy Protection",
+      "enabled": "Enabled",
+      "description": "Your data is automatically anonymized to protect your privacy:",
+      "rules": {
+        "personalIdentifiers": {
+          "name": "Personal Identifiers",
+          "desc": "Removed or hashed"
+        },
+        "locationData": {
+          "name": "Location Data",
+          "desc": "Generalized to city level"
+        },
+        "usagePatterns": {
+          "name": "Usage Patterns",
+          "desc": "Aggregated and anonymized"
+        }
+      }
+    },
+    "securityInfo": {
+      "label": "Security Information",
+      "sidebarDesc": "Access security documentation and compliance information",
+      "title": "Security Information",
+      "statusLabel": "Security Status",
+      "upToDate": "Up to Date",
+      "description": "Latest security information and compliance details:",
+      "items": {
+        "lastAudit": {
+          "name": "Last Security Audit",
+          "value": "2024-01-15"
+        },
+        "compliance": {
+          "name": "Compliance",
+          "value": "GDPR, CCPA, SOC 2 Type II"
+        },
+        "certifications": {
+          "name": "Security Certifications",
+          "value": "ISO 27001, PCI DSS"
+        },
+        "penTesting": {
+          "name": "Penetration Testing",
+          "value": "Quarterly assessments"
+        }
+      }
+    },
+    "realTime": {
+      "label": "Real-time Conversions",
+      "sidebarDesc": "Monitor real-time security events and conversions",
+      "title": "Real-time Security Monitoring",
+      "monitoringStatus": "Monitoring Status",
+      "active": "Active",
+      "description": "Real-time security events and threat detection:",
+      "events": {
+        "scanCompleted": "Security scan completed",
+        "firewallUpdated": "Firewall rules updated",
+        "authSuccess": "Authentication successful",
+        "unusualLogin": "Unusual login attempt detected",
+        "backupCompleted": "Data backup completed",
+        "sslValidated": "SSL certificate validated"
+      }
+    }
+  },
+
   "actions": {
     "refreshData": "Refresh Data",
     "signOut": "Sign Out",

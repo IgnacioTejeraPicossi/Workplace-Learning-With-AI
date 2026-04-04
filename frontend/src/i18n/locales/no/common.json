@@ -585,6 +585,133 @@
     }
   },
 
+  "security": {
+    "title": "Sikkerhetssenter",
+    "localInstallation": {
+      "label": "Lokal installasjon",
+      "sidebarDesc": "Administrer lokale sikkerhetsinnstillinger og konfigurasjoner",
+      "title": "Lokal installasjonssikkerhet",
+      "statusLabel": "Sikkerhetsstatus",
+      "statusActive": "Aktiv",
+      "statusInactive": "Inaktiv",
+      "passphrasePrompt": "Angi krypteringspassord (lagres ikke)",
+      "disable": "Deaktiver",
+      "activate": "Aktiver",
+      "description": "Den lokale installasjonen din er sikret med følgende funksjoner:",
+      "encryption": "Kryptering",
+      "encryptionActive": "Alle lokale data er kryptert i hvile",
+      "encryptionDisabled": "Kryptering er for øyeblikket deaktivert",
+      "accessControl": "Tilgangskontroll",
+      "accessControlDesc": "Lokal autentisering kreves",
+      "firewall": "Brannmur",
+      "firewallDesc": "Lokal nettverkstilgang begrenset",
+      "updates": "Oppdateringer",
+      "updatesDesc": "Sikkerhetsoppdateringer brukes automatisk"
+    },
+    "dataDeletion": {
+      "label": "Automatisk datasletting",
+      "sidebarDesc": "Konfigurer automatisk dataopprydding og oppbevaringspolicyer",
+      "title": "Automatisk datasletting",
+      "policyStatus": "Dataoppbevaringspolicy",
+      "enabled": "Aktivert",
+      "description": "Konfigurer hvor lenge dataene dine oppbevares før automatisk sletting:",
+      "policies": {
+        "activityLogs": "Brukeraktivitetslogger",
+        "tempFiles": "Midlertidige filer",
+        "cacheData": "Hurtigbufferdata",
+        "sessionData": "Øktdata"
+      },
+      "periods": {
+        "activityLogs": "30 dager",
+        "tempFiles": "7 dager",
+        "cacheData": "24 timer",
+        "sessionData": "Til utlogging"
+      }
+    },
+    "yourData": {
+      "label": "Dine data",
+      "sidebarDesc": "Vis og administrer dine personlige data og personverninnstillinger",
+      "title": "Dine data og personvern",
+      "protectionStatus": "Databeskyttelse",
+      "protected": "Beskyttet",
+      "description": "Du har full kontroll over dine personlige data:",
+      "options": {
+        "personalInfo": "Personlig informasjon",
+        "learningHistory": "Læringshistorikk",
+        "accountDeletion": "Kontosletting"
+      },
+      "actions": {
+        "viewEdit": "Vis/Rediger",
+        "export": "Eksporter",
+        "delete": "Slett konto"
+      }
+    },
+    "anonymization": {
+      "label": "Dataanonymisering",
+      "sidebarDesc": "Konfigurer dataanonymisering og personvernbeskyttelse",
+      "title": "Dataanonymisering",
+      "privacyStatus": "Personvernbeskyttelse",
+      "enabled": "Aktivert",
+      "description": "Dataene dine anonymiseres automatisk for å beskytte personvernet ditt:",
+      "rules": {
+        "personalIdentifiers": {
+          "name": "Personlige identifikatorer",
+          "desc": "Fjernet eller hashet"
+        },
+        "locationData": {
+          "name": "Stedsdata",
+          "desc": "Generalisert til bynivå"
+        },
+        "usagePatterns": {
+          "name": "Bruksmønstre",
+          "desc": "Aggregert og anonymisert"
+        }
+      }
+    },
+    "securityInfo": {
+      "label": "Sikkerhetsinformasjon",
+      "sidebarDesc": "Tilgang til sikkerhetsdokumentasjon og samsvarsinformasjon",
+      "title": "Sikkerhetsinformasjon",
+      "statusLabel": "Sikkerhetsstatus",
+      "upToDate": "Oppdatert",
+      "description": "Siste sikkerhetsinformasjon og samsvarsdetaljer:",
+      "items": {
+        "lastAudit": {
+          "name": "Siste sikkerhetsrevisjon",
+          "value": "15.01.2024"
+        },
+        "compliance": {
+          "name": "Samsvar",
+          "value": "GDPR, CCPA, SOC 2 Type II"
+        },
+        "certifications": {
+          "name": "Sikkerhetssertifiseringer",
+          "value": "ISO 27001, PCI DSS"
+        },
+        "penTesting": {
+          "name": "Penetrasjonstesting",
+          "value": "Kvartalsvise vurderinger"
+        }
+      }
+    },
+    "realTime": {
+      "label": "Sanntidskonverteringer",
+      "sidebarDesc": "Overvåk sikkerhetshendelser og konverteringer i sanntid",
+      "title": "Sanntids sikkerhetsovervåking",
+      "monitoringStatus": "Overvåkingsstatus",
+      "active": "Aktiv",
+      "description": "Sanntids sikkerhetshendelser og trusseldeteksjon:",
+      "events": {
+        "scanCompleted": "Sikkerhetsscanning fullført",
+        "firewallUpdated": "Brannmurregler oppdatert",
+        "authSuccess": "Autentisering vellykket",
+        "unusualLogin": "Uvanlig innloggingsforsøk oppdaget",
+        "backupCompleted": "Sikkerhetskopiering fullført",
+        "sslValidated": "SSL-sertifikat validert"
+      }
+    }
+  },
+
   "actions": {
     "refreshData": "Oppdater data",
     "signOut": "Logg ut",
