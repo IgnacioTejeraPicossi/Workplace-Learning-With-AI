@@ -605,6 +605,82 @@
       "statusLabel": "Security Status",
       "upToDate": "Up to Date",
       "description": "Latest security information and compliance details:",
+      "scoreTitle": "Security Score",
+      "grade": "Grade",
+      "gradeLabels": {
+        "A": "Excellent",
+        "B": "Good",
+        "C": "Fair",
+        "D": "Needs Improvement",
+        "F": "Critical"
+      },
+      "checksPassed": "checks passed",
+      "refresh": "Refresh Score",
+      "checklistTitle": "Security Checklist",
+      "checks": {
+        "encryption": {
+          "name": "Local Encryption",
+          "passedMsg": "All local data is encrypted at rest with AES-GCM",
+          "failedMsg": "Local data is not encrypted — enable encryption in Local Installation",
+          "recommendation": "Enable local encryption to protect data at rest (Local Installation → Activate)"
+        },
+        "anonymization": {
+          "name": "Data Anonymization",
+          "passedMsg": "PII masking is active before sending data to LLMs",
+          "failedMsg": "Anonymization is disabled — sensitive data may be sent to LLMs",
+          "recommendation": "Enable data anonymization to mask PII before sending prompts to LLMs"
+        },
+        "autoPurge": {
+          "name": "Auto-Purge",
+          "passedMsg": "Expired data is automatically cleaned on session start",
+          "failedMsg": "Auto-purge is disabled — expired data may accumulate",
+          "recommendation": "Enable auto-purge in Automatic Data Deletion to clean expired data automatically"
+        },
+        "https": {
+          "name": "Secure Connection",
+          "passedMsg": "Application is served over HTTPS or running locally",
+          "failedMsg": "Application is not using HTTPS — data may be intercepted in transit",
+          "recommendation": "Deploy the application with HTTPS to protect data in transit"
+        },
+        "retentionConfigured": {
+          "name": "Retention Policies",
+          "passedMsg": "Data retention policies have been configured",
+          "failedMsg": "No retention policies configured — data may be kept indefinitely",
+          "recommendation": "Configure data retention policies in Automatic Data Deletion"
+        },
+        "recentActivity": {
+          "name": "Recent Security Activity",
+          "passedMsg": "Security events recorded in the last 7 days",
+          "failedMsg": "No security activity in the last 7 days",
+          "recommendation": "Review security settings regularly and monitor activity"
+        },
+        "profileSet": {
+          "name": "Profile Configured",
+          "passedMsg": "User profile information has been set",
+          "failedMsg": "No profile information configured",
+          "recommendation": "Set up your profile in Your Data → Personal Information"
+        }
+      },
+      "recommendationsTitle": "Recommendations",
+      "recommendationsDesc": "Complete these actions to improve your security score:",
+      "complianceTitle": "Compliance Coverage",
+      "complianceDesc": "How your current security settings map to compliance frameworks:",
+      "controlsMet": "controls met",
+      "frameworks": {
+        "gdpr": {
+          "name": "GDPR",
+          "desc": "EU General Data Protection Regulation"
+        },
+        "ccpa": {
+          "name": "CCPA",
+          "desc": "California Consumer Privacy Act"
+        },
+        "soc2": {
+          "name": "SOC 2 Type II",
+          "desc": "Service Organization Controls"
+        }
+      },
+      "additionalInfo": "Additional Information",
       "items": {
         "lastAudit": {
           "name": "Last Security Audit",
@@ -625,19 +701,65 @@
       }
     },
     "realTime": {
-      "label": "Real-time Conversions",
-      "sidebarDesc": "Monitor real-time security events and conversions",
+      "label": "Real-time Monitoring",
+      "sidebarDesc": "Monitor real-time security events and activity",
       "title": "Real-time Security Monitoring",
       "monitoringStatus": "Monitoring Status",
-      "active": "Active",
-      "description": "Real-time security events and threat detection:",
-      "events": {
-        "scanCompleted": "Security scan completed",
-        "firewallUpdated": "Firewall rules updated",
-        "authSuccess": "Authentication successful",
-        "unusualLogin": "Unusual login attempt detected",
-        "backupCompleted": "Data backup completed",
-        "sslValidated": "SSL certificate validated"
+      "statusLive": "Live",
+      "statusPaused": "Paused",
+      "autoRefresh": "Auto-refresh",
+      "refresh": "Refresh",
+      "clearLogs": "Clear Logs",
+      "eventLog": "Event Log",
+      "eventSummary": "Event Type Summary",
+      "noEvents": "No events recorded",
+      "noEventsDesc": "Security events will appear here as you use the application's security features.",
+      "showingEvents": "Showing {{count}} of {{total}} events",
+      "cancel": "Cancel",
+      "confirmClear": "Clear All",
+      "clearConfirmTitle": "Clear All Security Logs?",
+      "clearConfirmDesc": "This will permanently delete all {{count}} security events from the log.",
+      "clearConfirmWarn": "This action cannot be undone.",
+      "kpi": {
+        "totalEvents": "Total Events",
+        "last24h": "Last 24 Hours",
+        "last1h": "Last Hour",
+        "criticalErrors": "Critical / Errors",
+        "warnings": "Warnings"
+      },
+      "filters": {
+        "allTypes": "All Types",
+        "allSeverities": "All Severities",
+        "allTime": "All Time",
+        "last1h": "Last Hour",
+        "last24h": "Last 24 Hours",
+        "last7d": "Last 7 Days"
+      },
+      "severities": {
+        "info": "Info",
+        "ok": "OK",
+        "warning": "Warning",
+        "error": "Error",
+        "critical": "Critical"
+      },
+      "eventTypes": {
+        "encryption_enabled": "Encryption Enabled",
+        "encryption_disabled": "Encryption Disabled",
+        "data_purge": "Data Purge",
+        "data_export": "Data Export",
+        "anonymization_toggled": "Anonymization Toggled",
+        "anonymization_applied": "Anonymization Applied",
+        "account_deletion": "Account Deletion",
+        "policy_changed": "Policy Changed",
+        "auth_success": "Authentication Success",
+        "auth_failure": "Authentication Failure",
+        "scan_completed": "Scan Completed",
+        "settings_changed": "Settings Changed"
+      },
+      "timeAgo": {
+        "justNow": "Just now",
+        "minutes": "{{count}}m ago",
+        "hours": "{{count}}h ago"
       }
     }
   },

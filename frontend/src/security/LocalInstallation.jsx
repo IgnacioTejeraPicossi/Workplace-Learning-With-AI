@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../ThemeContext';
 import { enableLocalEncryption, disableLocalEncryption, isEncryptionActive } from '../utils/encryptedStorage';
+import { logSecurityEvent, EventType, EventSeverity } from '../utils/securityEventLog';
 
 const LocalInstallation = () => {
   const { t } = useTranslation();
@@ -13,11 +14,13 @@ const LocalInstallation = () => {
     if (!pw) return;
     await enableLocalEncryption(pw);
     setEncryptionOn(true);
+    logSecurityEvent(EventType.ENCRYPTION_ENABLED, EventSeverity.OK, { action: 'encryption_activated' });
   };
 
   const handleDisable = () => {
     disableLocalEncryption();
     setEncryptionOn(false);
+    logSecurityEvent(EventType.ENCRYPTION_DISABLED, EventSeverity.WARNING, { action: 'encryption_deactivated' });
   };
 
   return (

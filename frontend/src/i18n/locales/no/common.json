@@ -783,6 +783,82 @@
       "statusLabel": "Sikkerhetsstatus",
       "upToDate": "Oppdatert",
       "description": "Siste sikkerhetsinformasjon og samsvarsdetaljer:",
+      "scoreTitle": "Sikkerhetspoeng",
+      "grade": "Karakter",
+      "gradeLabels": {
+        "A": "Utmerket",
+        "B": "Bra",
+        "C": "Middels",
+        "D": "Trenger forbedring",
+        "F": "Kritisk"
+      },
+      "checksPassed": "kontroller bestått",
+      "refresh": "Oppdater poeng",
+      "checklistTitle": "Sikkerhetssjekkliste",
+      "checks": {
+        "encryption": {
+          "name": "Lokal kryptering",
+          "passedMsg": "Alle lokale data er kryptert i hvile med AES-GCM",
+          "failedMsg": "Lokale data er ikke kryptert — aktiver kryptering i Lokal installasjon",
+          "recommendation": "Aktiver lokal kryptering for å beskytte data i hvile (Lokal installasjon → Aktiver)"
+        },
+        "anonymization": {
+          "name": "Dataanonymisering",
+          "passedMsg": "PII-maskering er aktiv før data sendes til LLM-er",
+          "failedMsg": "Anonymisering er deaktivert — sensitive data kan sendes til LLM-er",
+          "recommendation": "Aktiver dataanonymisering for å maskere personopplysninger før du sender ledetekster til LLM-er"
+        },
+        "autoPurge": {
+          "name": "Auto-rensing",
+          "passedMsg": "Utløpte data renses automatisk ved øktstart",
+          "failedMsg": "Auto-rensing er deaktivert — utløpte data kan akkumuleres",
+          "recommendation": "Aktiver auto-rensing i Automatisk datasletting for å rense utløpte data automatisk"
+        },
+        "https": {
+          "name": "Sikker tilkobling",
+          "passedMsg": "Applikasjonen kjøres over HTTPS eller lokalt",
+          "failedMsg": "Applikasjonen bruker ikke HTTPS — data kan avlyttes under overføring",
+          "recommendation": "Distribuer applikasjonen med HTTPS for å beskytte data under overføring"
+        },
+        "retentionConfigured": {
+          "name": "Oppbevaringspolicyer",
+          "passedMsg": "Dataoppbevaringspolicyer er konfigurert",
+          "failedMsg": "Ingen oppbevaringspolicyer konfigurert — data kan oppbevares på ubestemt tid",
+          "recommendation": "Konfigurer dataoppbevaringspolicyer i Automatisk datasletting"
+        },
+        "recentActivity": {
+          "name": "Nylig sikkerhetsaktivitet",
+          "passedMsg": "Sikkerhetshendelser registrert de siste 7 dagene",
+          "failedMsg": "Ingen sikkerhetsaktivitet de siste 7 dagene",
+          "recommendation": "Gjennomgå sikkerhetsinnstillinger regelmessig og overvåk aktivitet"
+        },
+        "profileSet": {
+          "name": "Profil konfigurert",
+          "passedMsg": "Brukerprofilinformasjon er satt opp",
+          "failedMsg": "Ingen profilinformasjon konfigurert",
+          "recommendation": "Sett opp profilen din i Dine data → Personlig informasjon"
+        }
+      },
+      "recommendationsTitle": "Anbefalinger",
+      "recommendationsDesc": "Fullfør disse handlingene for å forbedre sikkerhetspoengene dine:",
+      "complianceTitle": "Samsvarsdekning",
+      "complianceDesc": "Hvordan gjeldende sikkerhetsinnstillinger tilordnes samsvarsrammeverk:",
+      "controlsMet": "kontroller oppfylt",
+      "frameworks": {
+        "gdpr": {
+          "name": "GDPR",
+          "desc": "EUs personvernforordning"
+        },
+        "ccpa": {
+          "name": "CCPA",
+          "desc": "Californias forbrukerpersonvernlov"
+        },
+        "soc2": {
+          "name": "SOC 2 Type II",
+          "desc": "Tjenesteorganisasjonskontroller"
+        }
+      },
+      "additionalInfo": "Tilleggsinformasjon",
       "items": {
         "lastAudit": {
           "name": "Siste sikkerhetsrevisjon",
@@ -803,19 +879,65 @@
       }
     },
     "realTime": {
-      "label": "Sanntidskonverteringer",
-      "sidebarDesc": "Overvåk sikkerhetshendelser og konverteringer i sanntid",
+      "label": "Sanntidsovervåking",
+      "sidebarDesc": "Overvåk sikkerhetshendelser og aktivitet i sanntid",
       "title": "Sanntids sikkerhetsovervåking",
       "monitoringStatus": "Overvåkingsstatus",
-      "active": "Aktiv",
-      "description": "Sanntids sikkerhetshendelser og trusseldeteksjon:",
-      "events": {
-        "scanCompleted": "Sikkerhetsscanning fullført",
-        "firewallUpdated": "Brannmurregler oppdatert",
-        "authSuccess": "Autentisering vellykket",
-        "unusualLogin": "Uvanlig innloggingsforsøk oppdaget",
-        "backupCompleted": "Sikkerhetskopiering fullført",
-        "sslValidated": "SSL-sertifikat validert"
+      "statusLive": "Aktiv",
+      "statusPaused": "Pauset",
+      "autoRefresh": "Auto-oppdatering",
+      "refresh": "Oppdater",
+      "clearLogs": "Tøm logger",
+      "eventLog": "Hendelseslogg",
+      "eventSummary": "Hendelsestype-oversikt",
+      "noEvents": "Ingen hendelser registrert",
+      "noEventsDesc": "Sikkerhetshendelser vises her etter hvert som du bruker applikasjonens sikkerhetsfunksjoner.",
+      "showingEvents": "Viser {{count}} av {{total}} hendelser",
+      "cancel": "Avbryt",
+      "confirmClear": "Tøm alle",
+      "clearConfirmTitle": "Tøm alle sikkerhetslogger?",
+      "clearConfirmDesc": "Dette vil permanent slette alle {{count}} sikkerhetshendelser fra loggen.",
+      "clearConfirmWarn": "Denne handlingen kan ikke angres.",
+      "kpi": {
+        "totalEvents": "Totalt hendelser",
+        "last24h": "Siste 24 timer",
+        "last1h": "Siste time",
+        "criticalErrors": "Kritisk / Feil",
+        "warnings": "Advarsler"
+      },
+      "filters": {
+        "allTypes": "Alle typer",
+        "allSeverities": "Alle alvorlighetsgrader",
+        "allTime": "All tid",
+        "last1h": "Siste time",
+        "last24h": "Siste 24 timer",
+        "last7d": "Siste 7 dager"
+      },
+      "severities": {
+        "info": "Info",
+        "ok": "OK",
+        "warning": "Advarsel",
+        "error": "Feil",
+        "critical": "Kritisk"
+      },
+      "eventTypes": {
+        "encryption_enabled": "Kryptering aktivert",
+        "encryption_disabled": "Kryptering deaktivert",
+        "data_purge": "Datasletting",
+        "data_export": "Dataeksport",
+        "anonymization_toggled": "Anonymisering vekslet",
+        "anonymization_applied": "Anonymisering brukt",
+        "account_deletion": "Kontosletting",
+        "policy_changed": "Policy endret",
+        "auth_success": "Autentisering vellykket",
+        "auth_failure": "Autentisering mislykket",
+        "scan_completed": "Skanning fullført",
+        "settings_changed": "Innstillinger endret"
+      },
+      "timeAgo": {
+        "justNow": "Akkurat nå",
+        "minutes": "{{count}}m siden",
+        "hours": "{{count}}t siden"
       }
     }
   },
