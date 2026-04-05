@@ -1,14 +1,25 @@
 // Scenario Simulator component skeleton
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { askStream, saveSimulationResult } from "./api";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
-import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
+import { useStreaming } from "./hooks/useStreaming";
 import { useTheme } from "./ThemeContext";
 import { updateProgress, getCurrentProgress } from "./Dashboard";
 import SimulationResults from "./SimulationResults";
 
+const SCENARIO_TYPE_KEYS = [
+  { key: "customer-service", typeKey: "customerService", icon: "👥" },
+  { key: "team-leadership", typeKey: "teamLeadership", icon: "👑" },
+  { key: "sales-negotiation", typeKey: "salesNegotiation", icon: "💼" },
+  { key: "project-management", typeKey: "projectManagement", icon: "📋" },
+  { key: "conflict-resolution", typeKey: "conflictResolution", icon: "🤝" },
+  { key: "presentation", typeKey: "presentation", icon: "🎤" }
+];
+
 function Simulator() {
+  const { t } = useTranslation();
   const [scenarioType, setScenarioType] = useState("");
   const [customScenario, setCustomScenario] = useState("");
   const [showCustomInput, setShowCustomInput] = useState(false);
@@ -19,58 +30,33 @@ function Simulator() {
   const [showOptions, setShowOptions] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
   const { colors } = useTheme();
-  
-  // Use streaming hook for simulation
-  const simulationStreaming = useStreaming('Ready to create simulation');
 
-  // Dynamic questions and options for each step
-  const stepQuestions = {
-    0: {
-      question: "What is your immediate course of action?",
-      options: {
-        'A': 'Ignore the issue and hope the team can catch up.',
-        'B': 'Inform the stakeholders about the delay.',
-        'C': 'Reassign the work to a different team.',
-        'D': 'Pressure the team to work overtime.'
-      }
-    },
-    1: {
-      question: "How do you handle the team's response to your decision?",
-      options: {
-        'A': 'Schedule a team meeting to discuss the situation openly.',
-        'B': 'Send an email update and wait for responses.',
-        'C': 'Meet with team leaders individually.',
-        'D': 'Let the team figure it out on their own.'
-      }
-    },
-    2: {
-      question: "What's your approach to stakeholder communication?",
-      options: {
-        'A': 'Provide detailed weekly progress reports.',
-        'B': 'Set up a crisis management meeting.',
-        'C': 'Create a revised project timeline with milestones.',
-        'D': 'Minimize communication to avoid panic.'
-      }
-    },
-    3: {
-      question: "How do you ensure project recovery and future prevention?",
-      options: {
-        'A': 'Implement new project management processes.',
-        'B': 'Conduct a post-mortem analysis with the team.',
-        'C': 'Hire additional resources for the project.',
-        'D': 'Move on and focus on the next project.'
-      }
+  const simulationStatusMessages = useMemo(() => {
+    const arr = t("scenarioSimulator.statusMessages", { returnObjects: true });
+    return Array.isArray(arr) ? arr : [];
+  }, [t]);
+
+  const scenarioTypes = useMemo(
+    () =>
+      SCENARIO_TYPE_KEYS.map(({ key, typeKey, icon }) => ({
+        key,
+        icon,
+        label: t(`scenarioSimulator.types.${typeKey}.label`),
+        description: t(`scenarioSimulator.types.${typeKey}.description`)
+      })),
+    [t]
+  );
+
+  const stepQuestions = useMemo(() => {
+    const arr = t("scenarioSimulator.steps", { returnObjects: true });
+    if (!Array.isArray(arr) || arr.length < 4) {
+      const empty = { question: "", options: { A: "", B: "", C: "", D: "" } };
+      return { 0: empty, 1: empty, 2: empty, 3: empty };
     }
-  };
+    return { 0: arr[0], 1: arr[1], 2: arr[2], 3: arr[3] };
+  }, [t]);
 
-  const scenarioTypes = [
-    { key: 'customer-service', label: 'Customer Service', icon: '👥', description: 'Handle difficult customers and complaints' },
-    { key: 'team-leadership', label: 'Team Leadership', icon: '👑', description: 'Lead team meetings and manage conflicts' },
-    { key: 'sales-negotiation', label: 'Sales & Negotiation', icon: '💼', description: 'Close deals and negotiate contracts' },
-    { key: 'project-management', label: 'Project Management', icon: '📋', description: 'Manage deadlines and team coordination' },
-    { key: 'conflict-resolution', label: 'Conflict Resolution', icon: '🤝', description: 'Resolve workplace conflicts and disputes' },
-    { key: 'presentation', label: 'Presentation Skills', icon: '🎤', description: 'Deliver effective presentations and pitches' }
-  ];
+  const simulationStreaming = useStreaming(t("scenarioSimulator.ready"));
 
   const handleStartSimulation = async (type) => {
     setScenarioType(type.key);
@@ -87,7 +73,7 @@ function Simulator() {
       
       Make it engaging and educational.`,
       {
-        statusMessages: STATUS_MESSAGES.SIMULATION,
+        statusMessages: simulationStatusMessages,
         onComplete: async (content) => {
           // Save simulation result to MongoDB
           try {
@@ -120,7 +106,7 @@ function Simulator() {
 
   const handleStartCustomSimulation = async () => {
     if (!customScenario.trim()) {
-      alert('Please enter a scenario topic.');
+      alert(t("scenarioSimulator.custom.alertEnterTopic"));
       return;
     }
 
@@ -138,7 +124,7 @@ function Simulator() {
       
       Make it engaging and educational.`,
       {
-        statusMessages: STATUS_MESSAGES.SIMULATION,
+        statusMessages: simulationStatusMessages,
         onComplete: async (content) => {
           // Save custom simulation result to MongoDB
           try {
@@ -368,7 +354,10 @@ Learning points: While moving forward is important, learning from past experienc
       };
       
       const stepResponses = fallbackResponses[currentStep] || fallbackResponses[0];
-      setSimulationResponse(stepResponses[option] || `Response for Option ${option} in Step ${currentStep + 1}: This choice would lead to specific consequences. Consider the impact on team morale and project timeline.`);
+      setSimulationResponse(
+        stepResponses[option] ||
+          t("scenarioSimulator.actions.genericFallback", { option, step: currentStep + 1 })
+      );
     }
   };
 
@@ -399,7 +388,7 @@ Learning points: While moving forward is important, learning from past experienc
         localStorage.setItem('completedSimulations', JSON.stringify(completedSimulations));
       }
       
-      alert('Congratulations! You have completed the simulation. Your progress has been updated in the Dashboard.');
+      alert(t("scenarioSimulator.alerts.congratulationsComplete"));
     }
   };
 
@@ -438,7 +427,7 @@ Learning points: While moving forward is important, learning from past experienc
       }
     }
     
-    alert('Progress saved successfully! You can continue from where you left off.');
+    alert(t("scenarioSimulator.alerts.progressSaved"));
   };
 
   const handleLoadProgress = () => {
@@ -451,9 +440,9 @@ Learning points: While moving forward is important, learning from past experienc
       setSimulationResponse(latestProgress.simulationResponse);
       setSimulationActive(true);
       setShowOptions(!latestProgress.selectedOption);
-      alert('Progress loaded successfully!');
+      alert(t("scenarioSimulator.alerts.progressLoaded"));
     } else {
-      alert('No saved progress found.');
+      alert(t("scenarioSimulator.alerts.noSavedProgress"));
     }
   };
 
@@ -468,10 +457,10 @@ Learning points: While moving forward is important, learning from past experienc
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🎮 Scenario Simulator</h2>
-      
+      <h2 style={{ marginBottom: 16, color: colors.text }}>🎮 {t("scenarioSimulator.pageTitle")}</h2>
+
       <p style={{ marginBottom: 20, color: colors.textSecondary }}>
-        Practice real-world workplace scenarios through interactive simulations. Choose a scenario type to begin.
+        {t("scenarioSimulator.intro")}
       </p>
 
       {/* Scenario Type Selection */}
@@ -519,7 +508,7 @@ Learning points: While moving forward is important, learning from past experienc
                     fontSize: '0.9em'
                   }}
                 >
-                  Start Simulation
+                  {t("scenarioSimulator.startSimulation")}
                 </button>
               </div>
             ))}
@@ -539,7 +528,7 @@ Learning points: While moving forward is important, learning from past experienc
                 ✨
               </div>
               <h3 style={{ marginBottom: 8, color: colors.text }}>
-                Custom Scenario
+                {t("scenarioSimulator.custom.title")}
               </h3>
               <p style={{ 
                 color: colors.textSecondary, 
@@ -547,7 +536,7 @@ Learning points: While moving forward is important, learning from past experienc
                 lineHeight: 1.4,
                 marginBottom: 12
               }}>
-                Create a simulation for any workplace scenario you want to practice
+                {t("scenarioSimulator.custom.description")}
               </p>
               
               {!showCustomInput ? (
@@ -563,7 +552,7 @@ Learning points: While moving forward is important, learning from past experienc
                     fontSize: '0.9em'
                   }}
                 >
-                  Start Custom
+                  {t("scenarioSimulator.custom.startCustom")}
                 </button>
               ) : (
                 <div style={{ textAlign: 'left' }}>
@@ -571,7 +560,7 @@ Learning points: While moving forward is important, learning from past experienc
                     type="text"
                     value={customScenario}
                     onChange={(e) => setCustomScenario(e.target.value)}
-                    placeholder="Enter your scenario topic (e.g., 'Dealing with a difficult boss')"
+                    placeholder={t("scenarioSimulator.custom.placeholder")}
                     style={{
                       width: '100%',
                       padding: '8px 12px',
@@ -603,7 +592,7 @@ Learning points: While moving forward is important, learning from past experienc
                         flex: 1
                       }}
                     >
-                      Start Simulation
+                      {t("scenarioSimulator.startSimulation")}
                     </button>
                     <button
                       onClick={() => {
@@ -620,7 +609,7 @@ Learning points: While moving forward is important, learning from past experienc
                         fontSize: '0.9em'
                       }}
                     >
-                      Cancel
+                      {t("scenarioSimulator.custom.cancel")}
                     </button>
                   </div>
                 </div>

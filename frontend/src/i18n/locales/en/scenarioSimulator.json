@@ -1,0 +1,117 @@
+{
+  "scenarioSimulator": {
+    "pageTitle": "Scenario Simulator",
+    "intro": "Practice real-world workplace scenarios through interactive simulations. Choose a scenario type to begin.",
+    "ready": "Ready to create simulation",
+    "startSimulation": "Start Simulation",
+    "creatingPlaceholder": "Creating your interactive simulation…",
+    "statusMessages": [
+      "Creating scenario…",
+      "Building interactive elements…",
+      "Generating responses…",
+      "Finalizing simulation…"
+    ],
+    "session": {
+      "subtitle": "Interactive Training Scenario",
+      "simulationTitle": "{{name}} Simulation"
+    },
+    "custom": {
+      "title": "Custom Scenario",
+      "description": "Create a simulation for any workplace scenario you want to practice",
+      "startCustom": "Start Custom",
+      "placeholder": "Enter your scenario topic (e.g. “Dealing with a difficult boss”)",
+      "cancel": "Cancel",
+      "alertEnterTopic": "Please enter a scenario topic."
+    },
+    "actions": {
+      "saveProgress": "Save Progress",
+      "loadProgress": "Load Progress",
+      "newScenario": "New Scenario",
+      "interactiveActive": "Interactive Simulation Active",
+      "stepOf": "Step {{current}} of {{total}}",
+      "yourChoice": "Your Choice:",
+      "choiceDetail": "Option {{option}} — Step {{step}}",
+      "systemResponse": "System Response:",
+      "continueNext": "Continue to Next Step",
+      "completeSimulation": "Complete Simulation",
+      "endSimulation": "End Simulation",
+      "statusLabel": "Status:",
+      "selectOptionHint": "Please select an option to continue to Step {{step}}",
+      "progressSavedAt": "Progress saved at {{time}}",
+      "errorPrefix": "Error:",
+      "tryAgain": "Try Again",
+      "optionNotDefined": "Option not defined",
+      "genericFallback": "Response for Option {{option}} in Step {{step}}: This choice would lead to specific consequences. Consider the impact on team morale and project timeline."
+    },
+    "alerts": {
+      "progressSaved": "Progress saved successfully! You can continue from where you left off.",
+      "progressLoaded": "Progress loaded successfully!",
+      "noSavedProgress": "No saved progress found.",
+      "congratulationsComplete": "Congratulations! You have completed the simulation. Your progress has been updated in the Dashboard."
+    },
+    "types": {
+      "customerService": {
+        "label": "Customer Service",
+        "description": "Handle difficult customers and complaints"
+      },
+      "teamLeadership": {
+        "label": "Team Leadership",
+        "description": "Lead team meetings and manage conflicts"
+      },
+      "salesNegotiation": {
+        "label": "Sales & Negotiation",
+        "description": "Close deals and negotiate contracts"
+      },
+      "projectManagement": {
+        "label": "Project Management",
+        "description": "Manage deadlines and team coordination"
+      },
+      "conflictResolution": {
+        "label": "Conflict Resolution",
+        "description": "Resolve workplace conflicts and disputes"
+      },
+      "presentation": {
+        "label": "Presentation Skills",
+        "description": "Deliver effective presentations and pitches"
+      }
+    },
+    "steps": [
+      {
+        "question": "What is your immediate course of action?",
+        "options": {
+          "A": "Ignore the issue and hope the team can catch up.",
+          "B": "Inform the stakeholders about the delay.",
+          "C": "Reassign the work to a different team.",
+          "D": "Pressure the team to work overtime."
+        }
+      },
+      {
+        "question": "How do you handle the team's response to your decision?",
+        "options": {
+          "A": "Schedule a team meeting to discuss the situation openly.",
+          "B": "Send an email update and wait for responses.",
+          "C": "Meet with team leaders individually.",
+          "D": "Let the team figure it out on their own."
+        }
+      },
+      {
+        "question": "What's your approach to stakeholder communication?",
+        "options": {
+          "A": "Provide detailed weekly progress reports.",
+          "B": "Set up a crisis management meeting.",
+          "C": "Create a revised project timeline with milestones.",
+          "D": "Minimize communication to avoid panic."
+        }
+      },
+      {
+        "question": "How do you ensure project recovery and future prevention?",
+        "options": {
+          "A": "Implement new project management processes.",
+          "B": "Conduct a post-mortem analysis with the team.",
+          "C": "Hire additional resources for the project.",
+          "D": "Move on and focus on the next project."
+        }
+      }
+    ]
+  }
+}

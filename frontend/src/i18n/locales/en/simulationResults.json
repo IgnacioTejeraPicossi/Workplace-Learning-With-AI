@@ -1,0 +1,26 @@
+{
+  "simulationResults": {
+    "pageTitle": "Simulation Results",
+    "loading": "Loading simulation results…",
+    "errorPrefix": "Error:",
+    "navigatingTo": "Navigating to: «{{title}}» — expanding automatically…",
+    "filterPlaceholder": "Filter by title, topic, or type…",
+    "clear": "Clear",
+    "expand": "Expand",
+    "compress": "Compress",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this simulation result?",
+    "deleteFailed": "Failed to delete simulation: {{message}}",
+    "description": "Description:",
+    "content": "Content:",
+    "emptyFiltered": "No simulation results match your filter.",
+    "emptyAll": "No simulation results yet.",
+    "metaLine1": "Type: {{type}} | Topic: {{topic}} | Duration: {{duration}} min",
+    "metaLine2": "Difficulty: {{difficulty}} | Created: {{date}}",
+    "difficulty": {
+      "beginner": "beginner",
+      "intermediate": "intermediate",
+      "advanced": "advanced"
+    }
+  }
+}

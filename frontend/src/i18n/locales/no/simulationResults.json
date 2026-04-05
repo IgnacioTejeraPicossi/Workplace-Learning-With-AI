@@ -1,0 +1,26 @@
+{
+  "simulationResults": {
+    "pageTitle": "Simuleringsresultater",
+    "loading": "Laster simuleringsresultater …",
+    "errorPrefix": "Feil:",
+    "navigatingTo": "Navigerer til: «{{title}}» — utvider automatisk …",
+    "filterPlaceholder": "Filtrer etter tittel, emne eller type …",
+    "clear": "Tøm",
+    "expand": "Utvid",
+    "compress": "Minimer",
+    "delete": "Slett",
+    "deleteConfirm": "Slette dette simuleringsresultatet?",
+    "deleteFailed": "Kunne ikke slette simulering: {{message}}",
+    "description": "Beskrivelse:",
+    "content": "Innhold:",
+    "emptyFiltered": "Ingen resultater samsvarer med filteret.",
+    "emptyAll": "Ingen simuleringsresultater ennå.",
+    "metaLine1": "Type: {{type}} | Emne: {{topic}} | Varighet: {{duration}} min",
+    "metaLine2": "Vanskelighetsgrad: {{difficulty}} | Opprettet: {{date}}",
+    "difficulty": {
+      "beginner": "nybegynner",
+      "intermediate": "middels",
+      "advanced": "avansert"
+    }
+  }
+}

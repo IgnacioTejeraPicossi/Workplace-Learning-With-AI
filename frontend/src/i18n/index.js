@@ -11,6 +11,10 @@ import enAppChrome from './locales/en/appChrome.json';
 import noAppChrome from './locales/no/appChrome.json';
 import enMicroLesson from './locales/en/microLesson.json';
 import noMicroLesson from './locales/no/microLesson.json';
+import enScenarioSimulator from './locales/en/scenarioSimulator.json';
+import noScenarioSimulator from './locales/no/scenarioSimulator.json';
+import enSimulationResults from './locales/en/simulationResults.json';
+import noSimulationResults from './locales/no/simulationResults.json';
 
 i18n
   .use(LanguageDetector)
@@ -29,10 +33,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults }
       }
     }
   });

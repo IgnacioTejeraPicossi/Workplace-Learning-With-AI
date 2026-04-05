@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { fetchSimulationResults, deleteSimulationResult, updateSimulationResult } from './api';
 
 function SimulationResults({ user }) {
+  const { t } = useTranslation();
   const [simulationResults, setSimulationResults] = useState([]);
   const [filter, setFilter] = useState('');
   const [expandedResult, setExpandedResult] = useState(null);
@@ -216,13 +218,16 @@ function SimulationResults({ user }) {
   }, [simulationResults, hasAutoExpanded]); // Added hasAutoExpanded dependency
 
   const filteredResults = simulationResults.filter(result =>
-    result.title.toLowerCase().includes(filter.toLowerCase()) ||
-    result.topic.toLowerCase().includes(filter.toLowerCase()) ||
-    result.simulation_type.toLowerCase().includes(filter.toLowerCase())
+    (result.title || '').toLowerCase().includes(filter.toLowerCase()) ||
+    (result.topic || '').toLowerCase().includes(filter.toLowerCase()) ||
+    (result.simulation_type || '').toLowerCase().includes(filter.toLowerCase())
   );
 
+  const difficultyLabel = (d) =>
+    d ? t(`simulationResults.difficulty.${String(d).toLowerCase()}`, { defaultValue: String(d) }) : '';
+
   const handleDelete = async (resultId) => {
-    if (!window.confirm("Delete this simulation result?")) return;
+    if (!window.confirm(t('simulationResults.deleteConfirm'))) return;
     
     console.log(`🗑️ [Simulations] Attempting to delete simulation with ID:`, resultId);
     
@@ -239,7 +244,7 @@ function SimulationResults({ user }) {
       console.log(`🔄 [Simulations] Simulation results reloaded after deletion`);
     } catch (err) {
       console.error(`❌ [Simulations] Delete failed:`, err);
-      alert(`Failed to delete simulation: ${err.message}`);
+      alert(t('simulationResults.deleteFailed', { message: err.message }));
     }
   };
 
@@ -264,12 +269,12 @@ function SimulationResults({ user }) {
     }
   };
 
-  if (loading) return <div>Loading simulation results...</div>;
-  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+  if (loading) return <div>{t('simulationResults.loading')}</div>;
+  if (error) return <div style={{ color: "red" }}>{t('simulationResults.errorPrefix')} {error}</div>;
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2 style={{ marginBottom: '2rem', color: colors.text }}>Simulation Results</h2>
+      <h2 style={{ marginBottom: '2rem', color: colors.text }}>{t('simulationResults.pageTitle')}</h2>
       
       {/* Navigation status message */}
       {autoExpandTarget && (
@@ -285,7 +290,7 @@ function SimulationResults({ user }) {
           alignItems: 'center',
           gap: '8px'
         }}>
-          🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+          🎯 {t('simulationResults.navigatingTo', { title: autoExpandTarget.title })}
         </div>
       )}
       
@@ -293,7 +298,7 @@ function SimulationResults({ user }) {
       <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <input
           type="text"
-          placeholder="Filter by title, topic, or type..."
+          placeholder={t('simulationResults.filterPlaceholder')}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           style={{
@@ -314,7 +319,7 @@ function SimulationResults({ user }) {
             cursor: 'pointer'
           }}
         >
-          Clear
+          {t('simulationResults.clear')}
         </button>
       </div>
 
@@ -344,10 +349,17 @@ function SimulationResults({ user }) {
                   🎮 {result.title}
                 </h3>
                 <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                  Type: {result.simulation_type} | Topic: {result.topic} | Duration: {result.duration} min
+                  {t('simulationResults.metaLine1', {
+                    type: result.simulation_type,
+                    topic: result.topic,
+                    duration: result.duration
+                  })}
                 </p>
                 <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>
-                  Difficulty: {result.difficulty} | Created: {new Date(result.created_at).toLocaleDateString()}
+                  {t('simulationResults.metaLine2', {
+                    difficulty: difficultyLabel(result.difficulty),
+                    date: new Date(result.created_at).toLocaleDateString()
+                  })}
                 </p>
               </div>
               
@@ -363,7 +375,9 @@ function SimulationResults({ user }) {
                      fontSize: '0.8rem'
                    }}
                  >
-                   {expandedResult === result.id || expandedResult === `index-${index}` ? '📁 Compress' : '📂 Expand'}
+                   {expandedResult === result.id || expandedResult === `index-${index}`
+                     ? `📁 ${t('simulationResults.compress')}`
+                     : `📂 ${t('simulationResults.expand')}`}
                  </button>
                  
                  <button
@@ -378,7 +392,7 @@ function SimulationResults({ user }) {
                      fontSize: '0.8rem'
                    }}
                  >
-                   🗑️ Delete
+                   🗑️ {t('simulationResults.delete')}
                  </button>
               </div>
             </div>
@@ -394,14 +408,14 @@ function SimulationResults({ user }) {
                 width: '100%'
               }}>
                 <div style={{ marginBottom: '1rem' }}>
-                  <strong style={{ color: colors.textSecondary }}>Description:</strong>
+                  <strong style={{ color: colors.textSecondary }}>{t('simulationResults.description')}</strong>
                   <p style={{ color: colors.text, margin: '0.5rem 0', lineHeight: 1.5 }}>
                     {result.description}
                   </p>
                 </div>
                 
                 <div>
-                  <strong style={{ color: colors.textSecondary }}>Content:</strong>
+                  <strong style={{ color: colors.textSecondary }}>{t('simulationResults.content')}</strong>
                   <div style={{ 
                     color: colors.text, 
                     margin: '0.5rem 0', 
@@ -430,7 +444,7 @@ function SimulationResults({ user }) {
 
       {filteredResults.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: colors.textSecondary }}>
-          {filter ? 'No simulation results match your filter.' : 'No simulation results yet.'}
+          {filter ? t('simulationResults.emptyFiltered') : t('simulationResults.emptyAll')}
         </div>
       )}
     </div>

@@ -1,0 +1,117 @@
+{
+  "scenarioSimulator": {
+    "pageTitle": "Scenario-simulator",
+    "intro": "Øv på virkelige arbeidsplass-scenarier gjennom interaktive simuleringer. Velg en scenario-type for å begynne.",
+    "ready": "Klar til å opprette simulering",
+    "startSimulation": "Start simulering",
+    "creatingPlaceholder": "Oppretter din interaktive simulering …",
+    "statusMessages": [
+      "Oppretter scenario …",
+      "Bygger interaktive elementer …",
+      "Genererer svar …",
+      "Fullfører simulering …"
+    ],
+    "session": {
+      "subtitle": "Interaktiv treningssimulering",
+      "simulationTitle": "{{name}}-simulering"
+    },
+    "custom": {
+      "title": "Egendefinert scenario",
+      "description": "Lag en simulering for et hvilket som helst arbeidsplass-scenario du vil øve på",
+      "startCustom": "Start egendefinert",
+      "placeholder": "Skriv inn emne for scenario (f.eks. «Vanskelig sjef»)",
+      "cancel": "Avbryt",
+      "alertEnterTopic": "Skriv inn et emne for scenarioet."
+    },
+    "actions": {
+      "saveProgress": "Lagre fremdrift",
+      "loadProgress": "Last fremdrift",
+      "newScenario": "Nytt scenario",
+      "interactiveActive": "Interaktiv simulering aktiv",
+      "stepOf": "Trinn {{current}} av {{total}}",
+      "yourChoice": "Ditt valg:",
+      "choiceDetail": "Valg {{option}} — trinn {{step}}",
+      "systemResponse": "Systemrespons:",
+      "continueNext": "Gå til neste trinn",
+      "completeSimulation": "Fullfør simulering",
+      "endSimulation": "Avslutt simulering",
+      "statusLabel": "Status:",
+      "selectOptionHint": "Velg et alternativ for å fortsette til trinn {{step}}",
+      "progressSavedAt": "Fremdrift lagret kl. {{time}}",
+      "errorPrefix": "Feil:",
+      "tryAgain": "Prøv igjen",
+      "optionNotDefined": "Alternativ ikke definert",
+      "genericFallback": "Svar for alternativ {{option}} i trinn {{step}}: Dette valget gir konkrete konsekvenser. Vurder effekt på teamets moral og tidsplan."
+    },
+    "alerts": {
+      "progressSaved": "Fremdrift lagret! Du kan fortsette der du slapp.",
+      "progressLoaded": "Fremdrift lastet inn!",
+      "noSavedProgress": "Ingen lagret fremdrift funnet.",
+      "congratulationsComplete": "Gratulerer! Du har fullført simuleringen. Fremdriften din er oppdatert på dashbordet."
+    },
+    "types": {
+      "customerService": {
+        "label": "Kundeservice",
+        "description": "Håndter vanskelige kunder og klager"
+      },
+      "teamLeadership": {
+        "label": "Teamledelse",
+        "description": "Led teammøter og håndter konflikter"
+      },
+      "salesNegotiation": {
+        "label": "Salg og forhandling",
+        "description": "Lukk avtaler og forhandle kontrakter"
+      },
+      "projectManagement": {
+        "label": "Prosjektledelse",
+        "description": "Håndter frister og teamkoordinering"
+      },
+      "conflictResolution": {
+        "label": "Konfliktløsning",
+        "description": "Løs arbeidsplasskonflikter og uenigheter"
+      },
+      "presentation": {
+        "label": "Presentasjonsteknikk",
+        "description": "Lever effektive presentasjoner og pitcher"
+      }
+    },
+    "steps": [
+      {
+        "question": "Hva er din umiddelbare tiltak?",
+        "options": {
+          "A": "Ignorere problemet og håpe teamet henter seg inn.",
+          "B": "Informere interessenter om forsinkelsen.",
+          "C": "Flytte arbeidet til et annet team.",
+          "D": "Presse teamet til overtid."
+        }
+      },
+      {
+        "question": "Hvordan håndterer du teamets respons på beslutningen din?",
+        "options": {
+          "A": "Kalle inn teammøte for å diskutere situasjonen åpent.",
+          "B": "Sende e-postoppdatering og vente på svar.",
+          "C": "Møte teamledere individuelt.",
+          "D": "La teamet finne ut av det selv."
+        }
+      },
+      {
+        "question": "Hva er din tilnærming til kommunikasjon med interessenter?",
+        "options": {
+          "A": "Levere detaljerte ukentlige fremdriftsrapporter.",
+          "B": "Sette opp krisemøte.",
+          "C": "Lage revidert tidsplan med milepæler.",
+          "D": "Minimere kommunikasjon for å unngå panikk."
+        }
+      },
+      {
+        "question": "Hvordan sikrer du gjenoppretting av prosjektet og forebygging framover?",
+        "options": {
+          "A": "Innføre nye prosjektstyringsprosesser.",
+          "B": "Gjennomføre retrospektiv analyse med teamet.",
+          "C": "Ansette ekstra ressurser til prosjektet.",
+          "D": "Gå videre og fokusere på neste prosjekt."
+        }
+      }
+    ]
+  }
+}
