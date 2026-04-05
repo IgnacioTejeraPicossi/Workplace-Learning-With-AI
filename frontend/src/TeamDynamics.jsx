@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 import { getTeams, createTeam, generateTeamAnalytics, getTeam } from "./api";
 import { auth } from "./firebase";
 
 function TeamDynamics() {
+  const { t } = useTranslation();
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [teamDetails, setTeamDetails] = useState({});
@@ -48,12 +50,12 @@ function TeamDynamics() {
   const handleCreateTeam = async () => {
     // Check if user is authenticated
     if (!auth.currentUser) {
-      alert("Please sign in to create teams. You need to be authenticated to save team data.");
+      alert(t("teamDynamics.alerts.signInToCreate"));
       return;
     }
-    
+
     if (!newTeam.name.trim() || !newTeam.description.trim()) {
-      alert("Please fill in team name and description");
+      alert(t("teamDynamics.alerts.fillNameDescription"));
       return;
     }
     
@@ -63,7 +65,7 @@ function TeamDynamics() {
     );
     
     if (validMembers.length === 0) {
-      alert("Please add at least one team member with name, role, and email");
+      alert(t("teamDynamics.alerts.addMember"));
       return;
     }
     
@@ -71,7 +73,7 @@ function TeamDynamics() {
     const emails = validMembers.map(member => member.email.toLowerCase().trim());
     const uniqueEmails = new Set(emails);
     if (emails.length !== uniqueEmails.size) {
-      alert("Duplicate emails are not allowed in the same team");
+      alert(t("teamDynamics.alerts.duplicateEmails"));
       return;
     }
     
@@ -93,13 +95,13 @@ function TeamDynamics() {
       
       setNewTeam({ name: "", description: "", members: [] });
       setShowCreateTeam(false);
-      alert("Team created successfully!");
+      alert(t("teamDynamics.alerts.teamCreated"));
     } catch (error) {
       console.error("Error creating team:", error);
       if (error.response?.data?.detail) {
-        alert(`Error: ${error.response.data.detail}`);
+        alert(t("teamDynamics.alerts.errorPrefix", { detail: error.response.data.detail }));
       } else {
-        alert("Error creating team. Please try again.");
+        alert(t("teamDynamics.alerts.createTeamFailed"));
       }
     } finally {
       setLoading(false);
@@ -117,7 +119,7 @@ function TeamDynamics() {
       }));
     } catch (error) {
       console.error("Error generating analytics:", error);
-      alert("Error generating analytics. Please try again.");
+      alert(t("teamDynamics.alerts.analyticsFailed"));
     } finally {
       setLoading(false);
     }
@@ -134,7 +136,7 @@ function TeamDynamics() {
       setSelectedTeam(teamId);
     } catch (error) {
       console.error("Error loading team details:", error);
-      alert("Error loading team details. Please try again.");
+      alert(t("teamDynamics.alerts.detailsFailed"));
     } finally {
       setLoading(false);
     }
@@ -142,27 +144,25 @@ function TeamDynamics() {
 
   const handleStartTeamSimulation = () => {
     if (!auth.currentUser) {
-      alert("Please sign in to start team simulations.");
+      alert(t("teamDynamics.alerts.signInSimulation"));
       return;
     }
-    
-    // For now, show a placeholder message
-    alert("Team Simulation feature is coming soon! This will include:\n\n• Interactive role-playing scenarios\n• Conflict resolution exercises\n• Leadership development simulations\n• Team collaboration challenges\n\nStay tuned for updates!");
+
+    alert(t("teamDynamics.alerts.simulationComingSoon"));
   };
 
   const handleViewTeamAnalytics = () => {
     if (!auth.currentUser) {
-      alert("Please sign in to view team analytics.");
+      alert(t("teamDynamics.alerts.signInAnalytics"));
       return;
     }
-    
+
     if (teams.length === 0) {
-      alert("No teams available. Create a team first to view analytics.");
+      alert(t("teamDynamics.alerts.noTeamsAnalytics"));
       return;
     }
-    
-    // For now, show a placeholder message
-    alert("Team Analytics Dashboard is coming soon! This will include:\n\n• Team performance metrics\n• Collaboration patterns\n• Skill gap analysis\n• Progress tracking\n• AI-powered insights\n\nStay tuned for updates!");
+
+    alert(t("teamDynamics.alerts.dashboardComingSoon"));
   };
 
   const addMemberToTeam = () => {
@@ -207,9 +207,8 @@ function TeamDynamics() {
 
   return (
     <div style={{ color: colors.text }}>
-      <h2 style={{ color: colors.text, marginBottom: 24 }}>Team Dynamics Analyzer</h2>
-      
-      {/* Authentication Status */}
+      <h2 style={{ color: colors.text, marginBottom: 24 }}>{t("teamDynamics.pageTitle")}</h2>
+
       {!auth.currentUser && (
         <div style={{ 
           background: colors.buttonDanger, 
@@ -219,10 +218,10 @@ function TeamDynamics() {
           marginBottom: "16px",
           textAlign: "center"
         }}>
-          ⚠️ Please sign in to create and manage teams. Your data will be saved securely.
+          ⚠️ {t("teamDynamics.signInBanner")}
         </div>
       )}
-      
+
       {auth.currentUser && (
         <div style={{ 
           background: colors.buttonSuccess, 
@@ -232,7 +231,7 @@ function TeamDynamics() {
           marginBottom: "16px",
           fontSize: "14px"
         }}>
-          ✅ Signed in as: {auth.currentUser.email}
+          {t("teamDynamics.signedInAs", { email: auth.currentUser.email })}
         </div>
       )}
       
@@ -245,12 +244,12 @@ function TeamDynamics() {
         boxShadow: colors.shadow,
         border: `1px solid ${colors.border}`
       }}>
-        <h3 style={{ color: colors.text, marginTop: 0 }}>Create or Join Teams</h3>
-        
+        <h3 style={{ color: colors.text, marginTop: 0 }}>{t("teamDynamics.sectionCreateOrJoin")}</h3>
+
         {!showCreateTeam ? (
           <button
             onClick={() => setShowCreateTeam(true)}
-            title="Create a new team with members, roles, and skills. Set up team structure for collaborative learning and AI-powered analytics."
+            title={t("teamDynamics.createNewTeamTooltip")}
             style={{
               background: colors.buttonPrimary,
               color: "#fff",
@@ -263,7 +262,7 @@ function TeamDynamics() {
               boxShadow: "0 1px 4px #0001"
             }}
           >
-            + Create New Team
+            {t("teamDynamics.createNewTeam")}
           </button>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -272,7 +271,7 @@ function TeamDynamics() {
                 type="text"
                 value={newTeam.name}
                 onChange={(e) => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Team name..."
+                placeholder={t("teamDynamics.placeholderTeamName")}
                 style={{
                   flex: 1,
                   padding: "12px",
@@ -287,7 +286,7 @@ function TeamDynamics() {
                 type="text"
                 value={newTeam.description}
                 onChange={(e) => setNewTeam(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Team description..."
+                placeholder={t("teamDynamics.placeholderTeamDescription")}
                 style={{
                   flex: 1,
                   padding: "12px",
@@ -302,7 +301,7 @@ function TeamDynamics() {
 
             {/* Team Members */}
             <div>
-              <h4 style={{ color: colors.text, marginBottom: 12 }}>Team Members</h4>
+              <h4 style={{ color: colors.text, marginBottom: 12 }}>{t("teamDynamics.teamMembers")}</h4>
               {newTeam.members.map((member, index) => (
                 <div key={index} style={{ 
                   display: "flex", 
@@ -324,7 +323,7 @@ function TeamDynamics() {
                       type="text"
                       value={member.name}
                       onChange={(e) => updateMember(index, "name", e.target.value)}
-                      placeholder="Name"
+                      placeholder={t("teamDynamics.placeholderName")}
                       style={{
                         padding: "8px 12px",
                         borderRadius: 6,
@@ -338,7 +337,7 @@ function TeamDynamics() {
                       type="text"
                       value={member.role}
                       onChange={(e) => updateMember(index, "role", e.target.value)}
-                      placeholder="Role"
+                      placeholder={t("teamDynamics.placeholderRole")}
                       style={{
                         padding: "8px 12px",
                         borderRadius: 6,
@@ -352,7 +351,7 @@ function TeamDynamics() {
                       type="email"
                       value={member.email}
                       onChange={(e) => updateMember(index, "email", e.target.value)}
-                      placeholder="Email"
+                      placeholder={t("teamDynamics.placeholderEmail")}
                       style={{
                         padding: "8px 12px",
                         borderRadius: 6,
@@ -374,14 +373,14 @@ function TeamDynamics() {
                         fontSize: 14
                       }}
                     >
-                      Remove
+                      {t("teamDynamics.remove")}
                     </button>
                   </div>
                   <input
                     type="text"
                     value={member.skills.join(', ')}
                     onChange={(e) => updateMemberSkills(index, e.target.value)}
-                    placeholder="Skills (comma-separated): e.g., JavaScript, React, Python"
+                    placeholder={t("teamDynamics.placeholderSkills")}
                     style={{
                       padding: "8px 12px",
                       borderRadius: 6,
@@ -405,7 +404,7 @@ function TeamDynamics() {
                   fontSize: 14
                 }}
               >
-                + Add Member
+                {t("teamDynamics.addMember")}
               </button>
             </div>
 
@@ -425,7 +424,7 @@ function TeamDynamics() {
                   opacity: loading ? 0.6 : 1
                 }}
               >
-                {loading ? "Creating..." : "Create Team"}
+                {loading ? t("teamDynamics.creating") : t("teamDynamics.createTeam")}
               </button>
               <button
                 onClick={() => setShowCreateTeam(false)}
@@ -440,7 +439,7 @@ function TeamDynamics() {
                   cursor: "pointer"
                 }}
               >
-                Cancel
+                {t("teamDynamics.cancel")}
               </button>
             </div>
           </div>
@@ -457,7 +456,7 @@ function TeamDynamics() {
           boxShadow: colors.shadow,
           border: `1px solid ${colors.border}`
         }}>
-          <h3 style={{ color: colors.text, marginTop: 0 }}>Your Teams</h3>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>{t("teamDynamics.yourTeams")}</h3>
           
           {teams.map((team) => (
             <div key={team._id} style={{ 
@@ -470,7 +469,7 @@ function TeamDynamics() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <h4 style={{ color: colors.text, margin: 0 }}>{team.name}</h4>
                 <span style={{ color: colors.textSecondary, fontSize: 14 }}>
-                  {team.member_count || 0} members
+                  {t("teamDynamics.membersCount", { count: team.member_count || 0 })}
                 </span>
               </div>
               
@@ -493,7 +492,7 @@ function TeamDynamics() {
                     opacity: loading ? 0.6 : 1
                   }}
                 >
-                  {loading ? "Analyzing..." : "Generate Analytics"}
+                  {loading ? t("teamDynamics.analyzing") : t("teamDynamics.generateAnalytics")}
                 </button>
                                  <button
                    onClick={() => handleViewDetails(team._id)}
@@ -509,7 +508,7 @@ function TeamDynamics() {
                      opacity: loading ? 0.6 : 1
                    }}
                  >
-                   {loading ? "Loading..." : "View Details"}
+                   {loading ? t("teamDynamics.loading") : t("teamDynamics.viewDetails")}
                  </button>
               </div>
               
@@ -523,7 +522,7 @@ function TeamDynamics() {
                    border: `1px solid ${colors.border}`
                  }}>
                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                     <h5 style={{ color: colors.text, margin: 0 }}>Team Members</h5>
+                     <h5 style={{ color: colors.text, margin: 0 }}>{t("teamDynamics.teamMembersHeading")}</h5>
                      <button
                        onClick={() => setSelectedTeam(null)}
                        style={{
@@ -536,7 +535,7 @@ function TeamDynamics() {
                          fontSize: 12
                        }}
                      >
-                       ✕ Close
+                       {t("teamDynamics.close")}
                      </button>
                    </div>
                    {teamDetails[team._id].members && teamDetails[team._id].members.length > 0 ? (
@@ -557,14 +556,14 @@ function TeamDynamics() {
                            </div>
                            {member.skills && member.skills.length > 0 && (
                              <div style={{ color: colors.textSecondary, fontSize: 12 }}>
-                               🛠️ Skills: {member.skills.join(", ")}
+                               🛠️ {t("teamDynamics.skillsLabel")} {member.skills.join(", ")}
                              </div>
                            )}
                          </div>
                        ))}
                      </div>
                    ) : (
-                     <p style={{ color: colors.textSecondary, fontSize: 14 }}>No members found for this team.</p>
+                     <p style={{ color: colors.textSecondary, fontSize: 14 }}>{t("teamDynamics.noMembersFound")}</p>
                    )}
                  </div>
                )}
@@ -578,7 +577,7 @@ function TeamDynamics() {
                    borderRadius: 8,
                    border: `1px solid ${colors.border}`
                  }}>
-                   <h5 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>AI Analysis</h5>
+                   <h5 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>{t("teamDynamics.aiAnalysis")}</h5>
                    <div style={{ 
                      color: colors.textSecondary, 
                      fontSize: 14, 
@@ -602,15 +601,15 @@ function TeamDynamics() {
         boxShadow: colors.shadow,
         border: `1px solid ${colors.border}`
       }}>
-        <h3 style={{ color: colors.text, marginTop: 0 }}>Collaborative Learning</h3>
+        <h3 style={{ color: colors.text, marginTop: 0 }}>{t("teamDynamics.collaborativeLearning")}</h3>
         <p style={{ color: colors.textSecondary, marginBottom: 16 }}>
-          Analyze team dynamics and get AI-powered recommendations for team-based learning paths.
+          {t("teamDynamics.collaborativeLearningDesc")}
         </p>
-        
+
                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
            <button
              onClick={handleStartTeamSimulation}
-             title="Launch interactive team scenarios and role-playing exercises. Practice team collaboration, conflict resolution, and leadership skills in a safe environment."
+             title={t("teamDynamics.startTeamSimulationTooltip")}
              style={{
                background: colors.buttonPrimary,
                color: "#fff",
@@ -622,11 +621,11 @@ function TeamDynamics() {
                cursor: "pointer"
              }}
            >
-             Start Team Simulation
+             {t("teamDynamics.startTeamSimulation")}
            </button>
                      <button
              onClick={handleViewTeamAnalytics}
-             title="View detailed team performance metrics, collaboration patterns, and AI-generated insights. Track team progress and identify areas for improvement."
+             title={t("teamDynamics.viewTeamAnalyticsTooltip")}
              style={{
                background: colors.cardBackground,
                color: colors.text,
@@ -638,7 +637,7 @@ function TeamDynamics() {
                cursor: "pointer"
              }}
            >
-             View Team Analytics
+             {t("teamDynamics.viewTeamAnalytics")}
            </button>
         </div>
       </div>

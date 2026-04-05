@@ -15,6 +15,8 @@ import enScenarioSimulator from './locales/en/scenarioSimulator.json';
 import noScenarioSimulator from './locales/no/scenarioSimulator.json';
 import enSimulationResults from './locales/en/simulationResults.json';
 import noSimulationResults from './locales/no/simulationResults.json';
+import enTeamDynamics from './locales/en/teamDynamics.json';
+import noTeamDynamics from './locales/no/teamDynamics.json';
 
 i18n
   .use(LanguageDetector)
@@ -33,10 +35,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics }
       }
     }
   });
