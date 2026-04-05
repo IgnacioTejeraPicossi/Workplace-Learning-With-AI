@@ -1,0 +1,68 @@
+{
+  "careerCoachModule": {
+    "pageTitle": "🎯 KI-karrierådgiver",
+    "savedSessions": {
+      "title": "💬 Lagrede økter ({{count}})",
+      "show": "Vis",
+      "hide": "Skjul"
+    },
+    "navigatingTo": "🎯 Navigerer til: «{{title}}»",
+    "choosePrompt": "Velg et utviklingsområde for å få personlig karriererådgivning:",
+    "areas": {
+      "leadership": {
+        "label": "Ledelse",
+        "description": "Teammanagement, beslutningstaking, strategisk tenkning"
+      },
+      "communication": {
+        "label": "Kommunikasjon",
+        "description": "Muntlig fremføring, skriving, aktiv lytting"
+      },
+      "conflict": {
+        "label": "Konflikthåndtering",
+        "description": "Forhandling, megling, problemløsning"
+      }
+    },
+    "custom": {
+      "title": "Eget tema",
+      "description": "Få veiledning om ethvert karrieretema du vil bli bedre på",
+      "startButton": "Start eget tema",
+      "placeholder": "Skriv inn tema (f.eks. «tidsstyring», «scenefrykt»)"
+    },
+    "buttons": {
+      "startCoaching": "Start veiledning",
+      "cancel": "Avbryt"
+    },
+    "session": {
+      "coachingSuffix": "{{topic}} — veiledning",
+      "subtitle": "Økt med KI-karrierådgiver",
+      "topicLabel": "Tema:",
+      "sessionContentLabel": "Økt:",
+      "sessionNumber": "Økt nr. {{n}}",
+      "datetime": "{{date}} kl. {{time}}"
+    },
+    "streaming": {
+      "initialStatus": "Klar til å starte veiledningsøkt",
+      "placeholder": "Starter veiledningsøkten …",
+      "status1": "Analyserer profil …",
+      "status2": "Identifiserer muligheter …",
+      "status3": "Genererer råd …",
+      "status4": "Lager handlingsplan …"
+    },
+    "alerts": {
+      "customTopicRequired": "Skriv inn et tema for veiledning.",
+      "noSessionToSave": "Ingen økt å lagre. Fullfør en veiledningsøkt først.",
+      "saveSuccess": "✅ Veiledningsøkt lagret!",
+      "saveError": "❌ Kunne ikke lagre økten. Prøv igjen.",
+      "deleteError": "❌ Kunne ikke slette økten. Prøv igjen."
+    },
+    "errors": {
+      "prefix": "Feil:",
+      "tryAgain": "Prøv igjen"
+    },
+    "actions": {
+      "continueSession": "💬 Fortsett økt",
+      "saveSession": "📋 Lagre økt",
+      "newSession": "🔄 Ny økt"
+    }
+  }
+}

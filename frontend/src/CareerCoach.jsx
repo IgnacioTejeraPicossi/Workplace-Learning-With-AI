@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { askStream, saveCareerCoachSession, fetchCareerCoachSessions, deleteCareerCoachSession } from './api';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { saveCareerCoachSession, fetchCareerCoachSessions, deleteCareerCoachSession } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
-import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
+import { useStreaming } from './hooks/useStreaming';
 import { useTheme } from './ThemeContext';
 
 export default function CareerCoach() {
@@ -13,9 +14,43 @@ export default function CareerCoach() {
   const [showSavedSessions, setShowSavedSessions] = useState(false);
   const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
-  
-  // Use streaming hook for career coaching
-  const coachingStreaming = useStreaming('Ready to start coaching session');
+  const { t } = useTranslation();
+
+  const growthAreas = useMemo(
+    () => [
+      {
+        key: 'leadership',
+        label: t('careerCoachModule.areas.leadership.label'),
+        icon: '👑',
+        description: t('careerCoachModule.areas.leadership.description')
+      },
+      {
+        key: 'communication',
+        label: t('careerCoachModule.areas.communication.label'),
+        icon: '💬',
+        description: t('careerCoachModule.areas.communication.description')
+      },
+      {
+        key: 'conflict',
+        label: t('careerCoachModule.areas.conflict.label'),
+        icon: '🤝',
+        description: t('careerCoachModule.areas.conflict.description')
+      }
+    ],
+    [t]
+  );
+
+  const careerCoachStatusMessages = useMemo(
+    () => [
+      t('careerCoachModule.streaming.status1'),
+      t('careerCoachModule.streaming.status2'),
+      t('careerCoachModule.streaming.status3'),
+      t('careerCoachModule.streaming.status4')
+    ],
+    [t]
+  );
+
+  const coachingStreaming = useStreaming(t('careerCoachModule.streaming.initialStatus'));
 
   // Load saved sessions on component mount
   useEffect(() => {
@@ -120,12 +155,6 @@ export default function CareerCoach() {
     }
   };
 
-  const growthAreas = [
-    { key: 'leadership', label: 'Leadership', icon: '👑', description: 'Team management, decision-making, strategic thinking' },
-    { key: 'communication', label: 'Communication', icon: '💬', description: 'Public speaking, writing, active listening' },
-    { key: 'conflict', label: 'Conflict Management', icon: '🤝', description: 'Negotiation, mediation, problem-solving' }
-  ];
-
   const handleStartCoaching = async (area) => {
     setGrowthArea(area.key);
     
@@ -140,7 +169,7 @@ export default function CareerCoach() {
       
       Make it conversational and encouraging.`,
       {
-        statusMessages: STATUS_MESSAGES.CAREER_COACH,
+        statusMessages: careerCoachStatusMessages,
         onComplete: (content) => {
           // Could save coaching session to user profile
           console.log('Coaching session completed');
@@ -151,7 +180,7 @@ export default function CareerCoach() {
 
   const handleStartCustomCoaching = async () => {
     if (!customTopic.trim()) {
-      alert('Please enter a coaching topic.');
+      alert(t('careerCoachModule.alerts.customTopicRequired'));
       return;
     }
 
@@ -168,7 +197,7 @@ export default function CareerCoach() {
       
       Make it conversational and encouraging.`,
       {
-        statusMessages: STATUS_MESSAGES.CAREER_COACH,
+        statusMessages: careerCoachStatusMessages,
         onComplete: (content) => {
           // Could save coaching session to user profile
           console.log('Custom coaching session completed');
@@ -179,7 +208,7 @@ export default function CareerCoach() {
 
   const handleSaveSession = async () => {
     if (!coachingStreaming.content) {
-      alert('No session to save. Please complete a coaching session first.');
+      alert(t('careerCoachModule.alerts.noSessionToSave'));
       return;
     }
 
@@ -214,10 +243,10 @@ export default function CareerCoach() {
       // Clear the current session to allow starting a new one
       handleClear();
       
-      alert('✅ Coaching session saved successfully!');
+      alert(t('careerCoachModule.alerts.saveSuccess'));
     } catch (error) {
       console.error('Error saving career coach session:', error);
-      alert('❌ Error saving coaching session. Please try again.');
+      alert(t('careerCoachModule.alerts.saveError'));
     }
   };
 
@@ -229,7 +258,7 @@ export default function CareerCoach() {
       setSavedSessions(prev => prev.filter(session => session.id !== id));
     } catch (error) {
       console.error('Error deleting career coach session:', error);
-      alert('❌ Error deleting session. Please try again.');
+      alert(t('careerCoachModule.alerts.deleteError'));
     }
   };
 
@@ -242,7 +271,7 @@ export default function CareerCoach() {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🎯 AI Career Coach</h2>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>{t('careerCoachModule.pageTitle')}</h2>
       
       {/* Saved Sessions Section */}
       {savedSessions.length > 0 && (
@@ -260,7 +289,7 @@ export default function CareerCoach() {
             marginBottom: 12
           }}>
             <h3 style={{ margin: 0, color: colors.text }}>
-              💬 Saved Sessions ({savedSessions.length})
+              {t('careerCoachModule.savedSessions.title', { count: savedSessions.length })}
             </h3>
             
             {/* Navigation status message */}
@@ -277,7 +306,7 @@ export default function CareerCoach() {
                 alignItems: 'center',
                 gap: '6px'
               }}>
-                🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}"
+                {t('careerCoachModule.navigatingTo', { title: autoExpandTarget.title })}
               </div>
             )}
             <button
@@ -292,7 +321,7 @@ export default function CareerCoach() {
                 fontSize: '0.9em'
               }}
             >
-              {showSavedSessions ? 'Hide' : 'Show'}
+              {showSavedSessions ? t('careerCoachModule.savedSessions.hide') : t('careerCoachModule.savedSessions.show')}
             </button>
           </div>
           
@@ -318,14 +347,17 @@ export default function CareerCoach() {
                   }}>
                     <div>
                       <strong style={{ color: colors.text }}>
-                        Session #{savedSessions.length - index}
+                        {t('careerCoachModule.session.sessionNumber', { n: savedSessions.length - index })}
                       </strong>
                       <div style={{ 
                         fontSize: '0.8em', 
                         color: colors.textSecondary,
                         marginTop: 4
                       }}>
-                        {new Date(session.created_at).toLocaleDateString()} at {new Date(session.created_at).toLocaleTimeString()}
+                        {t('careerCoachModule.session.datetime', {
+                          date: new Date(session.created_at).toLocaleDateString(),
+                          time: new Date(session.created_at).toLocaleTimeString()
+                        })}
                       </div>
                     </div>
                     <button
@@ -345,7 +377,7 @@ export default function CareerCoach() {
                   </div>
                   
                   <div style={{ marginBottom: 8 }}>
-                    <strong style={{ color: colors.textSecondary }}>Topic:</strong>
+                    <strong style={{ color: colors.textSecondary }}>{t('careerCoachModule.session.topicLabel')}</strong>
                     <div style={{ 
                       fontSize: '0.9em', 
                       color: colors.text,
@@ -357,7 +389,7 @@ export default function CareerCoach() {
                   </div>
                   
                   <div>
-                    <strong style={{ color: colors.textSecondary }}>Session:</strong>
+                    <strong style={{ color: colors.textSecondary }}>{t('careerCoachModule.session.sessionContentLabel')}</strong>
                     <div style={{ 
                       fontSize: '0.9em', 
                       color: colors.text,
@@ -427,7 +459,7 @@ export default function CareerCoach() {
                     fontSize: '0.9em'
                   }}
                 >
-                  Start Coaching
+                  {t('careerCoachModule.buttons.startCoaching')}
                 </button>
               </div>
             ))}
@@ -447,14 +479,14 @@ export default function CareerCoach() {
                 ✨
               </div>
               <h3 style={{ marginBottom: 8, color: colors.text }}>
-                Custom Topic
+                {t('careerCoachModule.custom.title')}
               </h3>
               <p style={{ 
                 color: colors.textSecondary, 
                 fontSize: '0.9em',
                 lineHeight: 1.4
               }}>
-                Get coaching on any career topic you want to improve
+                {t('careerCoachModule.custom.description')}
               </p>
               
               {!showCustomInput ? (
@@ -471,7 +503,7 @@ export default function CareerCoach() {
                     fontSize: '0.9em'
                   }}
                 >
-                  Start Custom
+                  {t('careerCoachModule.custom.startButton')}
                 </button>
               ) : (
                 <div style={{ textAlign: 'left', marginTop: 12 }}>
@@ -479,7 +511,7 @@ export default function CareerCoach() {
                     type="text"
                     value={customTopic}
                     onChange={(e) => setCustomTopic(e.target.value)}
-                    placeholder="Enter your coaching topic (e.g., 'Time management', 'Public speaking anxiety')"
+                    placeholder={t('careerCoachModule.custom.placeholder')}
                     style={{
                       width: '100%',
                       padding: '8px 12px',
@@ -511,7 +543,7 @@ export default function CareerCoach() {
                         flex: 1
                       }}
                     >
-                      Start Coaching
+                      {t('careerCoachModule.buttons.startCoaching')}
                     </button>
                     <button
                       onClick={() => {
@@ -528,7 +560,7 @@ export default function CareerCoach() {
                         fontSize: '0.9em'
                       }}
                     >
-                      Cancel
+                      {t('careerCoachModule.buttons.cancel')}
                     </button>
                   </div>
                 </div>
@@ -555,10 +587,12 @@ export default function CareerCoach() {
             </span>
             <div>
               <h3 style={{ margin: 0, color: colors.text }}>
-                {growthArea === 'custom' ? `${customTopic} Coaching` : `${growthAreas.find(a => a.key === growthArea)?.label} Coaching`}
+                {growthArea === 'custom'
+                  ? t('careerCoachModule.session.coachingSuffix', { topic: customTopic })
+                  : t('careerCoachModule.session.coachingSuffix', { topic: growthAreas.find(a => a.key === growthArea)?.label })}
               </h3>
               <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
-                AI Career Coach Session
+                {t('careerCoachModule.session.subtitle')}
               </p>
             </div>
           </div>
@@ -577,7 +611,7 @@ export default function CareerCoach() {
           <StreamingText 
             content={coachingStreaming.content}
             loading={coachingStreaming.loading}
-            placeholder="Starting your coaching session..."
+            placeholder={t('careerCoachModule.streaming.placeholder')}
             style={{ minHeight: '300px' }}
           />
 
@@ -599,7 +633,7 @@ export default function CareerCoach() {
                   cursor: 'pointer'
                 }}
               >
-                💬 Continue Session
+                {t('careerCoachModule.actions.continueSession')}
               </button>
               <button
                 onClick={handleSaveSession}
@@ -612,7 +646,7 @@ export default function CareerCoach() {
                   cursor: 'pointer'
                 }}
               >
-                📋 Save Session
+                {t('careerCoachModule.actions.saveSession')}
               </button>
               <button
                 onClick={handleClear}
@@ -625,7 +659,7 @@ export default function CareerCoach() {
                   cursor: 'pointer'
                 }}
               >
-                🔄 New Session
+                {t('careerCoachModule.actions.newSession')}
               </button>
             </div>
           )}
@@ -641,7 +675,7 @@ export default function CareerCoach() {
           borderRadius: 8,
           marginBottom: 16
         }}>
-          <strong>Error:</strong> {coachingStreaming.error}
+          <strong>{t('careerCoachModule.errors.prefix')}</strong> {coachingStreaming.error}
           <button
             onClick={handleClear}
             style={{
@@ -655,7 +689,7 @@ export default function CareerCoach() {
               fontSize: '0.8em'
             }}
           >
-            Try Again
+            {t('careerCoachModule.errors.tryAgain')}
           </button>
         </div>
       )}

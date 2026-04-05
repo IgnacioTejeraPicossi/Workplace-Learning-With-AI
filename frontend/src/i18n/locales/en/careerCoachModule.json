@@ -1,0 +1,68 @@
+{
+  "careerCoachModule": {
+    "pageTitle": "🎯 AI Career Coach",
+    "savedSessions": {
+      "title": "💬 Saved Sessions ({{count}})",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "navigatingTo": "🎯 Navigating to: «{{title}}»",
+    "choosePrompt": "Choose a growth area to receive personalized career coaching advice:",
+    "areas": {
+      "leadership": {
+        "label": "Leadership",
+        "description": "Team management, decision-making, strategic thinking"
+      },
+      "communication": {
+        "label": "Communication",
+        "description": "Public speaking, writing, active listening"
+      },
+      "conflict": {
+        "label": "Conflict Management",
+        "description": "Negotiation, mediation, problem-solving"
+      }
+    },
+    "custom": {
+      "title": "Custom Topic",
+      "description": "Get coaching on any career topic you want to improve",
+      "startButton": "Start Custom",
+      "placeholder": "Enter your coaching topic (e.g., 'Time management', 'Public speaking anxiety')"
+    },
+    "buttons": {
+      "startCoaching": "Start Coaching",
+      "cancel": "Cancel"
+    },
+    "session": {
+      "coachingSuffix": "{{topic}} Coaching",
+      "subtitle": "AI Career Coach Session",
+      "topicLabel": "Topic:",
+      "sessionContentLabel": "Session:",
+      "sessionNumber": "Session #{{n}}",
+      "datetime": "{{date}} at {{time}}"
+    },
+    "streaming": {
+      "initialStatus": "Ready to start coaching session",
+      "placeholder": "Starting your coaching session…",
+      "status1": "Analyzing profile…",
+      "status2": "Identifying opportunities…",
+      "status3": "Generating advice…",
+      "status4": "Creating action plan…"
+    },
+    "alerts": {
+      "customTopicRequired": "Please enter a coaching topic.",
+      "noSessionToSave": "No session to save. Please complete a coaching session first.",
+      "saveSuccess": "✅ Coaching session saved successfully!",
+      "saveError": "❌ Error saving coaching session. Please try again.",
+      "deleteError": "❌ Error deleting session. Please try again."
+    },
+    "errors": {
+      "prefix": "Error:",
+      "tryAgain": "Try Again"
+    },
+    "actions": {
+      "continueSession": "💬 Continue Session",
+      "saveSession": "📋 Save Session",
+      "newSession": "🔄 New Session"
+    }
+  }
+}
