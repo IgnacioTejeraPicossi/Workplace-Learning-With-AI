@@ -17,6 +17,8 @@ import enSimulationResults from './locales/en/simulationResults.json';
 import noSimulationResults from './locales/no/simulationResults.json';
 import enTeamDynamics from './locales/en/teamDynamics.json';
 import noTeamDynamics from './locales/no/teamDynamics.json';
+import enCertificationsModule from './locales/en/certificationsModule.json';
+import noCertificationsModule from './locales/no/certificationsModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -35,10 +37,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule }
       }
     }
   });

@@ -1,0 +1,83 @@
+{
+  "certificationsModule": {
+    "pageTitle": "Certification Path Recommendation",
+    "tabs": {
+      "recommend": {
+        "label": "Get Recommendations",
+        "title": "Get AI-powered certification suggestions based on your role, skills, and goals."
+      },
+      "studyPlan": {
+        "label": "Study Plan",
+        "title": "Generate a personalized weekly study plan for your selected certification."
+      },
+      "simulation": {
+        "label": "Practice Test",
+        "title": "Practice with realistic certification interview questions and scenarios."
+      },
+      "history": {
+        "label": "History",
+        "title": "View your previous study plans and revisit details."
+      }
+    },
+    "recommend": {
+      "sectionTitle": "Get AI-Powered Certification Recommendations",
+      "yourRole": "Your Role",
+      "rolePlaceholder": "e.g., Backend Developer, DevOps Engineer",
+      "experienceLevel": "Experience Level",
+      "experience": {
+        "beginner": "Beginner (0-2 years)",
+        "intermediate": "Intermediate (2-5 years)",
+        "advanced": "Advanced (5+ years)"
+      },
+      "currentSkills": "Current Skills",
+      "skillPlaceholder": "Add a skill… (or paste multiple skills separated by commas)",
+      "quickAdd": "🧪 Quick Add",
+      "quickAddTitle": "Add the skills you typed",
+      "careerGoals": "Career Goals",
+      "goalsPlaceholder": "Describe your career goals and what you want to achieve…",
+      "getRecommendations": "Get Recommendations",
+      "gettingRecommendations": "Getting Recommendations…",
+      "getRecommendationsTitle": "Get AI-powered certification recommendations based on your profile and goals",
+      "aiRecommendations": "AI Recommendations"
+    },
+    "profileStatus": {
+      "loading": "Loading your profile…",
+      "loaded": "Profile loaded successfully!",
+      "noProfile": "No saved profile found. Fill in your details to get started.",
+      "loadError": "Could not load saved profile. You can still fill in your details.",
+      "saved": "Profile saved! Your details will be auto-filled next time.",
+      "recommendError": "Error getting recommendations. Please try again.",
+      "autoExpanded": "✅ Automatically expanded: \"{{title}}\""
+    },
+    "studyPlan": {
+      "sectionTitle": "Generate Personalized Study Plan",
+      "skillsAutoFilled": "✅ Skills auto-filled from your profile: {{skills}}",
+      "certificationName": "Certification Name",
+      "certPlaceholder": "e.g., AWS Solutions Architect Associate",
+      "studyTimePerWeek": "Study Time (hours/week)",
+      "targetDate": "Target Completion Date",
+      "currentSkillsForCert": "Current Skills (for this certification)",
+      "syncSkills": "🔄 Sync Skills from Profile ({{count}} skills)",
+      "generateStudyPlan": "Generate Study Plan",
+      "generatingStudyPlan": "Generating Study Plan…",
+      "generateStudyPlanTitle": "Generate a personalized study plan for your selected certification",
+      "yourStudyPlan": "Your Study Plan"
+    },
+    "practice": {
+      "sectionTitle": "Practice Certification Interview",
+      "certToPractice": "Certification to Practice",
+      "startPractice": "Start Practice Test",
+      "startingSimulation": "Starting Simulation…",
+      "startPracticeTitle": "Start a realistic certification interview simulation to test your knowledge",
+      "interviewHeading": "Certification Interview"
+    },
+    "history": {
+      "sectionTitle": "Study Plan History",
+      "navigatingTo": "🎯 Navigating to: «{{title}}» — expanding automatically…",
+      "empty": "No study plans found.",
+      "hide": "Hide",
+      "view": "View"
+    },
+    "fallbackNoPlan": "No study plan content available"
+  }
+}

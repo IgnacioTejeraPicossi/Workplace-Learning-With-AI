@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
-import { apiCall, getUserProfile, saveUserProfile, askStream, saveCertification, fetchCertifications, deleteCertification } from "./api";
+import { getUserProfile, saveUserProfile, askStream, saveCertification, fetchCertifications } from "./api";
 
 function Certifications() {
   const [profile, setProfile] = useState({
@@ -27,12 +28,46 @@ function Certifications() {
   const [certifications, setCertifications] = useState([]);
   const [autoExpandTarget, setAutoExpandTarget] = useState(null);
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
-  const experienceLevels = [
-    { value: "beginner", label: "Beginner (0-2 years)" },
-    { value: "intermediate", label: "Intermediate (2-5 years)" },
-    { value: "advanced", label: "Advanced (5+ years)" }
-  ];
+  const experienceLevels = useMemo(
+    () => [
+      { value: "beginner", label: t("certificationsModule.recommend.experience.beginner") },
+      { value: "intermediate", label: t("certificationsModule.recommend.experience.intermediate") },
+      { value: "advanced", label: t("certificationsModule.recommend.experience.advanced") }
+    ],
+    [t]
+  );
+
+  const tabsConfig = useMemo(
+    () => [
+      {
+        key: "recommend",
+        label: t("certificationsModule.tabs.recommend.label"),
+        icon: "🎯",
+        title: t("certificationsModule.tabs.recommend.title")
+      },
+      {
+        key: "study-plan",
+        label: t("certificationsModule.tabs.studyPlan.label"),
+        icon: "📚",
+        title: t("certificationsModule.tabs.studyPlan.title")
+      },
+      {
+        key: "simulation",
+        label: t("certificationsModule.tabs.simulation.label"),
+        icon: "🧪",
+        title: t("certificationsModule.tabs.simulation.title")
+      },
+      {
+        key: "history",
+        label: t("certificationsModule.tabs.history.label"),
+        icon: "🕑",
+        title: t("certificationsModule.tabs.history.title")
+      }
+    ],
+    [t]
+  );
 
   // Load certifications from MongoDB (used by BabelLibrary and for refreshing after save)
   const loadCertifications = async () => {
@@ -60,7 +95,7 @@ function Certifications() {
           status: cert.status,
           level: cert.level,
           topics: cert.topics,
-          study_plan: cert.study_plan || 'No study plan content available'  // Include study plan content
+          study_plan: cert.study_plan || ""  // Translated fallback at render time
         }));
         setHistory(transformedHistory);
       }
@@ -73,7 +108,7 @@ function Certifications() {
     // Auto-fill profile from saved user profile
     async function fetchUserProfile() {
       try {
-        setAutoFillStatus("Loading your profile...");
+        setAutoFillStatus(t("certificationsModule.profileStatus.loading"));
         console.log("Fetching user profile...");
         
         const res = await getUserProfile();
@@ -94,16 +129,16 @@ function Certifications() {
             current_skills: res.profile.skills || []
           }));
           
-          setAutoFillStatus("Profile loaded successfully!");
+          setAutoFillStatus(t("certificationsModule.profileStatus.loaded"));
           setTimeout(() => setAutoFillStatus(""), 3000);
         } else {
           console.log("No profile found in response:", res);
-          setAutoFillStatus("No saved profile found. Fill in your details to get started.");
+          setAutoFillStatus(t("certificationsModule.profileStatus.noProfile"));
           setTimeout(() => setAutoFillStatus(""), 5000);
         }
       } catch (e) {
         console.error("Error fetching profile:", e);
-        setAutoFillStatus("Could not load saved profile. You can still fill in your details.");
+        setAutoFillStatus(t("certificationsModule.profileStatus.loadError"));
         setTimeout(() => setAutoFillStatus(""), 5000);
       }
     }
@@ -114,6 +149,8 @@ function Certifications() {
     
     // Fetch study plan history from MongoDB
     fetchHistory();
+    // Intentionally run once on mount; `t` is stable for initial locale
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Navigation intelligence from Babel Library
@@ -196,7 +233,7 @@ function Certifications() {
           setExpandedPlan(historyEntry.id);
           
           // Show success message briefly
-          setAutoFillStatus(`✅ Automatically expanded: "${targetCert.title}"`);
+          setAutoFillStatus(t("certificationsModule.profileStatus.autoExpanded", { title: targetCert.title }));
           setTimeout(() => setAutoFillStatus(""), 3000);
           
           // Scroll to the expanded certification after a short delay
@@ -215,7 +252,7 @@ function Certifications() {
         }
       }
     }
-  }, [certifications, history, autoExpandTarget]);
+  }, [certifications, history, autoExpandTarget, t]);
 
   // Additional navigation check when activeTab changes
   useEffect(() => {
@@ -240,11 +277,11 @@ function Certifications() {
       setRecommendation("");
       await askStream({ prompt: `Based on my role (${profile.role}), experience (${profile.experience_level}), skills (${profile.skills.join(", ")}), and goals (${profile.goals}), recommend the best certifications and why.` }, (output) => setRecommendation(output));
       
-      setAutoFillStatus("Profile saved! Your details will be auto-filled next time.");
+      setAutoFillStatus(t("certificationsModule.profileStatus.saved"));
       setTimeout(() => setAutoFillStatus(""), 3000);
     } catch (error) {
       console.error("Error getting recommendations:", error);
-      setAutoFillStatus("Error getting recommendations. Please try again.");
+      setAutoFillStatus(t("certificationsModule.profileStatus.recommendError"));
       setTimeout(() => setAutoFillStatus(""), 5000);
     } finally {
       setLoading(false);
@@ -379,7 +416,7 @@ function Certifications() {
 
   return (
     <div style={{ color: colors.text }}>
-      <h2 style={{ color: colors.text, marginBottom: 24 }}>Certification Path Recommendation</h2>
+      <h2 style={{ color: colors.text, marginBottom: 24 }}>{t("certificationsModule.pageTitle")}</h2>
       
       {/* Tab Navigation */}
       <div style={{ 
@@ -388,12 +425,7 @@ function Certifications() {
         marginBottom: 24,
         borderBottom: `1px solid ${colors.border}`
       }}>
-        {[
-          { key: "recommend", label: "Get Recommendations", icon: "🎯", title: "Get AI-powered certification suggestions based on your role, skills, and goals." },
-          { key: "study-plan", label: "Study Plan", icon: "📚", title: "Generate a personalized weekly study plan for your selected certification." },
-          { key: "simulation", label: "Practice Test", icon: "🧪", title: "Practice with realistic certification interview questions and scenarios." },
-          { key: "history", label: "History", icon: "🕑", title: "View your previous study plans and revisit details." }
-        ].map(tab => (
+        {tabsConfig.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleTabSwitch(tab.key)}
@@ -424,7 +456,7 @@ function Certifications() {
           boxShadow: colors.shadow,
           border: `1px solid ${colors.border}`
         }}>
-          <h3 style={{ color: colors.text, marginTop: 0 }}>Get AI-Powered Certification Recommendations</h3>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>{t("certificationsModule.recommend.sectionTitle")}</h3>
           
           {/* Auto-fill Status Message */}
           {autoFillStatus && (
@@ -433,9 +465,9 @@ function Certifications() {
               marginBottom: 16,
               borderRadius: 6,
               fontSize: 14,
-              background: autoFillStatus.includes("Error") ? "#ffebee" : colors.primaryLight,
-              color: autoFillStatus.includes("Error") ? "#d32f2f" : colors.primary,
-              border: `1px solid ${autoFillStatus.includes("Error") ? "#d32f2f" : colors.primary}`
+              background: (autoFillStatus.includes("Error") || autoFillStatus.includes("Feil")) ? "#ffebee" : colors.primaryLight,
+              color: (autoFillStatus.includes("Error") || autoFillStatus.includes("Feil")) ? "#d32f2f" : colors.primary,
+              border: `1px solid ${(autoFillStatus.includes("Error") || autoFillStatus.includes("Feil")) ? "#d32f2f" : colors.primary}`
             }}>
               {autoFillStatus}
             </div>
@@ -444,13 +476,13 @@ function Certifications() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             <div>
               <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-                Your Role
+                {t("certificationsModule.recommend.yourRole")}
               </label>
               <input
                 type="text"
                 value={profile.role}
                 onChange={(e) => setProfile(prev => ({ ...prev, role: e.target.value }))}
-                placeholder="e.g., Backend Developer, DevOps Engineer"
+                placeholder={t("certificationsModule.recommend.rolePlaceholder")}
                 style={{
                   width: "100%",
                   padding: "12px",
@@ -465,7 +497,7 @@ function Certifications() {
 
             <div>
               <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-                Experience Level
+                {t("certificationsModule.recommend.experienceLevel")}
               </label>
               <select
                 value={profile.experience_level}
@@ -491,14 +523,14 @@ function Certifications() {
 
           <div style={{ marginTop: 16 }}>
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-              Current Skills
+              {t("certificationsModule.recommend.currentSkills")}
             </label>
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
                 value={currentSkillInput}
                 onChange={(e) => setCurrentSkillInput(e.target.value)}
-                placeholder="Add a skill... (or paste multiple skills separated by commas)"
+                placeholder={t("certificationsModule.recommend.skillPlaceholder")}
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     addSkill(e.target.value);
@@ -541,9 +573,9 @@ function Certifications() {
                   cursor: "pointer",
                   whiteSpace: "nowrap"
                 }}
-                title="Add the skills you typed"
+                title={t("certificationsModule.recommend.quickAddTitle")}
               >
-                🧪 Quick Add
+                {t("certificationsModule.recommend.quickAdd")}
               </button>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -581,12 +613,12 @@ function Certifications() {
 
           <div style={{ marginTop: 16 }}>
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-              Career Goals
+              {t("certificationsModule.recommend.careerGoals")}
             </label>
             <textarea
               value={profile.goals}
               onChange={(e) => setProfile(prev => ({ ...prev, goals: e.target.value }))}
-              placeholder="Describe your career goals and what you want to achieve..."
+              placeholder={t("certificationsModule.recommend.goalsPlaceholder")}
               rows={3}
               style={{
                 width: "100%",
@@ -604,7 +636,7 @@ function Certifications() {
           <button
             onClick={handleGetRecommendations}
             disabled={loading || !profile.role || !profile.goals}
-            title="Get AI-powered certification recommendations based on your profile and goals"
+            title={t("certificationsModule.recommend.getRecommendationsTitle")}
             style={{
               background: colors.buttonPrimary,
               color: "#fff",
@@ -618,7 +650,7 @@ function Certifications() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            {loading ? "Getting Recommendations..." : "Get Recommendations"}
+            {loading ? t("certificationsModule.recommend.gettingRecommendations") : t("certificationsModule.recommend.getRecommendations")}
           </button>
 
           {recommendation && (
@@ -629,7 +661,7 @@ function Certifications() {
               borderRadius: 8,
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>AI Recommendations</h4>
+              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>{t("certificationsModule.recommend.aiRecommendations")}</h4>
               <div style={{ 
                 color: colors.textSecondary, 
                 fontSize: 14, 
@@ -653,7 +685,7 @@ function Certifications() {
           boxShadow: colors.shadow,
           border: `1px solid ${colors.border}`
         }}>
-          <h3 style={{ color: colors.text, marginTop: 0 }}>Generate Personalized Study Plan</h3>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>{t("certificationsModule.studyPlan.sectionTitle")}</h3>
           
           {/* Auto-fill Status Message for Study Plan */}
           {profile.skills.length > 0 && studyPlan.current_skills.length > 0 && (
@@ -666,20 +698,20 @@ function Certifications() {
               color: colors.primary,
               border: `1px solid ${colors.primary}`
             }}>
-              ✅ Skills auto-filled from your profile: {profile.skills.join(", ")}
+              {t("certificationsModule.studyPlan.skillsAutoFilled", { skills: profile.skills.join(", ") })}
             </div>
           )}
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             <div>
               <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-                Certification Name
+                {t("certificationsModule.studyPlan.certificationName")}
               </label>
               <input
                 type="text"
                 value={studyPlan.certification_name}
                 onChange={(e) => setStudyPlan(prev => ({ ...prev, certification_name: e.target.value }))}
-                placeholder="e.g., AWS Solutions Architect Associate"
+                placeholder={t("certificationsModule.studyPlan.certPlaceholder")}
                 style={{
                   width: "100%",
                   padding: "12px",
@@ -694,7 +726,7 @@ function Certifications() {
 
             <div>
               <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-                Study Time (hours/week)
+                {t("certificationsModule.studyPlan.studyTimePerWeek")}
               </label>
               <input
                 type="number"
@@ -717,7 +749,7 @@ function Certifications() {
 
           <div style={{ marginTop: 16 }}>
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-              Target Completion Date
+              {t("certificationsModule.studyPlan.targetDate")}
             </label>
             <input
               type="date"
@@ -737,7 +769,7 @@ function Certifications() {
 
           <div style={{ marginTop: 16 }}>
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-              Current Skills (for this certification)
+              {t("certificationsModule.studyPlan.currentSkillsForCert")}
             </label>
             
             {/* Sync Skills Button */}
@@ -755,14 +787,14 @@ function Certifications() {
                   marginBottom: 8
                 }}
               >
-                🔄 Sync Skills from Profile ({profile.skills.length} skills)
+                {t("certificationsModule.studyPlan.syncSkills", { count: profile.skills.length })}
               </button>
             )}
             
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
-                placeholder="Add a skill... (or paste multiple skills separated by commas)"
+                placeholder={t("certificationsModule.recommend.skillPlaceholder")}
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     addCurrentSkill(e.target.value);
@@ -824,7 +856,7 @@ function Certifications() {
           <button
             onClick={handleGenerateStudyPlan}
             disabled={loading || !studyPlan.certification_name || !studyPlan.target_date}
-            title="Generate a personalized study plan for your selected certification"
+            title={t("certificationsModule.studyPlan.generateStudyPlanTitle")}
             style={{
               background: colors.buttonSuccess,
               color: "#fff",
@@ -838,7 +870,7 @@ function Certifications() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            {loading ? "Generating Study Plan..." : "Generate Study Plan"}
+            {loading ? t("certificationsModule.studyPlan.generatingStudyPlan") : t("certificationsModule.studyPlan.generateStudyPlan")}
           </button>
 
           {studyPlanResult && (
@@ -849,7 +881,7 @@ function Certifications() {
               borderRadius: 8,
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>Your Study Plan</h4>
+              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>{t("certificationsModule.studyPlan.yourStudyPlan")}</h4>
               <div style={{ 
                 color: colors.textSecondary, 
                 fontSize: 14, 
@@ -873,17 +905,17 @@ function Certifications() {
           boxShadow: colors.shadow,
           border: `1px solid ${colors.border}`
         }}>
-          <h3 style={{ color: colors.text, marginTop: 0 }}>Practice Certification Interview</h3>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>{t("certificationsModule.practice.sectionTitle")}</h3>
           
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
-              Certification to Practice
+              {t("certificationsModule.practice.certToPractice")}
             </label>
             <input
               type="text"
               value={studyPlan.certification_name}
               onChange={(e) => setStudyPlan(prev => ({ ...prev, certification_name: e.target.value }))}
-              placeholder="e.g., AWS Solutions Architect Associate"
+              placeholder={t("certificationsModule.studyPlan.certPlaceholder")}
               style={{
                 width: "100%",
                 padding: "12px",
@@ -899,7 +931,7 @@ function Certifications() {
           <button
             onClick={handleStartSimulation}
             disabled={loading || !studyPlan.certification_name}
-            title="Start a realistic certification interview simulation to test your knowledge"
+            title={t("certificationsModule.practice.startPracticeTitle")}
             style={{
               background: colors.buttonPrimary,
               color: "#fff",
@@ -912,7 +944,7 @@ function Certifications() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            {loading ? "Starting Simulation..." : "Start Practice Test"}
+            {loading ? t("certificationsModule.practice.startingSimulation") : t("certificationsModule.practice.startPractice")}
           </button>
 
           {simulation && (
@@ -923,7 +955,7 @@ function Certifications() {
               borderRadius: 8,
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>Certification Interview</h4>
+              <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>{t("certificationsModule.practice.interviewHeading")}</h4>
               <div style={{ 
                 color: colors.textSecondary, 
                 fontSize: 14, 
@@ -940,7 +972,7 @@ function Certifications() {
       {/* History Tab */}
       {activeTab === "history" && (
         <div style={{ background: colors.cardBackground, borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: colors.shadow, border: `1px solid ${colors.border}` }}>
-          <h3 style={{ color: colors.text, marginTop: 0 }}>Study Plan History</h3>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>{t("certificationsModule.history.sectionTitle")}</h3>
           
           {/* Navigation status message */}
           {autoExpandTarget && (
@@ -956,11 +988,11 @@ function Certifications() {
               alignItems: 'center',
               gap: '8px'
             }}>
-              🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+              {t("certificationsModule.history.navigatingTo", { title: autoExpandTarget.title })}
             </div>
           )}
           {history.length === 0 ? (
-            <div style={{ color: colors.textSecondary }}>No study plans found.</div>
+            <div style={{ color: colors.textSecondary }}>{t("certificationsModule.history.empty")}</div>
           ) : (
             <ul style={{ listStyle: "none", padding: 0 }}>
               {history.map(plan => (
@@ -988,12 +1020,12 @@ function Certifications() {
                         fontSize: 14
                       }}
                     >
-                      {expandedPlan === plan.id ? "Hide" : "View"}
+                      {expandedPlan === plan.id ? t("certificationsModule.history.hide") : t("certificationsModule.history.view")}
                     </button>
                   </div>
                   {expandedPlan === plan.id && (
                     <div style={{ marginTop: 12, background: colors.primaryLight, borderRadius: 8, padding: 16, color: colors.textSecondary, fontSize: 14, whiteSpace: "pre-wrap" }}>
-                      {plan.study_plan}
+                      {plan.study_plan || t("certificationsModule.fallbackNoPlan")}
                     </div>
                   )}
                 </li>

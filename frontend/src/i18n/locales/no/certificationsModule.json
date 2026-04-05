@@ -1,0 +1,83 @@
+{
+  "certificationsModule": {
+    "pageTitle": "Anbefaling av sertifiseringsløp",
+    "tabs": {
+      "recommend": {
+        "label": "Få anbefalinger",
+        "title": "Få KI-baserte sertifiseringsforslag ut fra rolle, ferdigheter og mål."
+      },
+      "studyPlan": {
+        "label": "Studieplan",
+        "title": "Generer en personlig ukentlig studieplan for valgt sertifisering."
+      },
+      "simulation": {
+        "label": "Øvingstest",
+        "title": "Øv med realistiske sertifiseringsintervjuspørsmål og scenarier."
+      },
+      "history": {
+        "label": "Historikk",
+        "title": "Se tidligere studieplaner og detaljer."
+      }
+    },
+    "recommend": {
+      "sectionTitle": "Få KI-drevne sertifiseringsanbefalinger",
+      "yourRole": "Din rolle",
+      "rolePlaceholder": "f.eks. backendutvikler, DevOps-ingeniør",
+      "experienceLevel": "Erfaringsnivå",
+      "experience": {
+        "beginner": "Nybegynner (0–2 år)",
+        "intermediate": "Middels (2–5 år)",
+        "advanced": "Avansert (5+ år)"
+      },
+      "currentSkills": "Nåværende ferdigheter",
+      "skillPlaceholder": "Legg til en ferdighet … (eller lim inn flere adskilt med komma)",
+      "quickAdd": "🧪 Hurtigtillegg",
+      "quickAddTitle": "Legg til ferdighetene du skrev",
+      "careerGoals": "Karrieremål",
+      "goalsPlaceholder": "Beskriv karrieremål og hva du vil oppnå …",
+      "getRecommendations": "Få anbefalinger",
+      "gettingRecommendations": "Henter anbefalinger …",
+      "getRecommendationsTitle": "Få KI-baserte sertifiseringsanbefalinger ut fra profil og mål",
+      "aiRecommendations": "KI-anbefalinger"
+    },
+    "profileStatus": {
+      "loading": "Laster profilen din …",
+      "loaded": "Profil lastet inn!",
+      "noProfile": "Ingen lagret profil funnet. Fyll inn detaljer for å komme i gang.",
+      "loadError": "Kunne ikke laste lagret profil. Du kan fortsatt fylle inn manuelt.",
+      "saved": "Profil lagret! Detaljene dine fylles inn automatisk neste gang.",
+      "recommendError": "Feil ved henting av anbefalinger. Prøv igjen.",
+      "autoExpanded": "✅ Utvidet automatisk: «{{title}}»"
+    },
+    "studyPlan": {
+      "sectionTitle": "Generer personlig studieplan",
+      "skillsAutoFilled": "✅ Ferdigheter hentet fra profilen din: {{skills}}",
+      "certificationName": "Sertifiseringsnavn",
+      "certPlaceholder": "f.eks. AWS Solutions Architect Associate",
+      "studyTimePerWeek": "Studietid (timer/uke)",
+      "targetDate": "Måldato for fullføring",
+      "currentSkillsForCert": "Nåværende ferdigheter (for denne sertifiseringen)",
+      "syncSkills": "🔄 Synk ferdigheter fra profil ({{count}} ferdigheter)",
+      "generateStudyPlan": "Generer studieplan",
+      "generatingStudyPlan": "Genererer studieplan …",
+      "generateStudyPlanTitle": "Generer en personlig studieplan for valgt sertifisering",
+      "yourStudyPlan": "Din studieplan"
+    },
+    "practice": {
+      "sectionTitle": "Øv på sertifiseringsintervju",
+      "certToPractice": "Sertifisering å øve på",
+      "startPractice": "Start øvingstest",
+      "startingSimulation": "Starter simulering …",
+      "startPracticeTitle": "Start et realistisk sertifiseringsintervju for å teste kunnskapen din",
+      "interviewHeading": "Sertifiseringsintervju"
+    },
+    "history": {
+      "sectionTitle": "Studieplanhistorikk",
+      "navigatingTo": "🎯 Navigerer til: «{{title}}» — utvider automatisk …",
+      "empty": "Ingen studieplaner funnet.",
+      "hide": "Skjul",
+      "view": "Vis"
+    },
+    "fallbackNoPlan": "Ingen studieplaninnhold tilgjengelig"
+  }
+}
