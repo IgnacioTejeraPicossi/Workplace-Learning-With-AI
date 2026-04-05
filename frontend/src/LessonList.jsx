@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { fetchMicroLessons, deleteMicroLesson, updateMicroLesson } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function LessonList({ user }) {
+  const { t } = useTranslation();
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -128,7 +130,7 @@ function LessonList({ user }) {
   const handleExpandToggle = id => setExpanded({ ...expanded, [id]: !expanded[id] });
   
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this lesson?")) return;
+    if (!window.confirm(t('microLesson.list.deleteConfirm'))) return;
     try {
       await deleteMicroLesson(id);
       await loadLessons();
@@ -170,11 +172,11 @@ function LessonList({ user }) {
   const handleClear = () => setFilter("");
 
   const filteredLessons = lessons.filter(lesson =>
-    lesson.topic.toLowerCase().includes(filter.toLowerCase())
+    (lesson.topic || "").toLowerCase().includes(filter.toLowerCase())
   );
 
-  if (loading) return <div data-testid="saved-lessons-loading">Loading saved lessons...</div>;
-  if (error) return <div data-testid="saved-lessons-error" style={{ color: "red" }}>Error: {error}</div>;
+  if (loading) return <div data-testid="saved-lessons-loading">{t('microLesson.list.loading')}</div>;
+  if (error) return <div data-testid="saved-lessons-error" style={{ color: "red" }}>{t('microLesson.list.errorPrefix')} {error}</div>;
 
   return (
     <div 
@@ -182,7 +184,7 @@ function LessonList({ user }) {
       style={{ margin: "32px 0", padding: "24px", maxWidth: 800, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, color: colors.text }}>
       <h2 
         data-testid="saved-lessons-heading"
-        style={{ marginTop: 0, color: colors.text }}>Saved Micro-lessons</h2>
+        style={{ marginTop: 0, color: colors.text }}>{t('microLesson.list.heading')}</h2>
       
       {/* Navigation status message */}
       {autoExpandTarget && (
@@ -198,13 +200,13 @@ function LessonList({ user }) {
           alignItems: 'center',
           gap: '8px'
         }}>
-          🎯 <strong>Navigating to:</strong> "{autoExpandTarget.title}" - Expanding automatically...
+          🎯 {t('microLesson.list.navigatingTo', { title: autoExpandTarget.title })}
         </div>
       )}
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
-          placeholder="Filter by topic..."
+          placeholder={t('microLesson.list.filterPlaceholder')}
           value={filter}
           onChange={e => setFilter(e.target.value)}
           style={{ width: 300, marginRight: 8, background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, borderRadius: 6, padding: 8 }}
@@ -223,11 +225,11 @@ function LessonList({ user }) {
             boxShadow: "0 1px 4px #0001"
           }}
         >
-          Clear
+          {t('microLesson.list.clear')}
         </button>
       </div>
       {filteredLessons.length === 0 ? (
-        <div data-testid="saved-lessons-empty">No lessons found.</div>
+        <div data-testid="saved-lessons-empty">{t('microLesson.list.empty')}</div>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
           {filteredLessons.map(lesson => (
@@ -244,7 +246,7 @@ function LessonList({ user }) {
                }}
              >
                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                 <strong>Topic:</strong>
+                 <strong>{t('microLesson.list.topicLabel')}</strong>
                  {editing[lesson.id] ? (
                    <input
                      value={editContent[lesson.id]?.topic || ""}
@@ -269,7 +271,7 @@ function LessonList({ user }) {
                      cursor: "pointer"
                    }}
                  >
-                   {expanded[lesson.id] ? "Compress" : "Expand"}
+                   {expanded[lesson.id] ? t('microLesson.list.compress') : t('microLesson.list.expand')}
                  </button>
                  <button
                    onClick={() => handleDelete(lesson.id)}
@@ -284,7 +286,7 @@ function LessonList({ user }) {
                      cursor: "pointer"
                    }}
                  >
-                   Delete
+                   {t('microLesson.list.delete')}
                  </button>
                  {editing[lesson.id] ? (
                    <>
@@ -301,7 +303,7 @@ function LessonList({ user }) {
                          cursor: "pointer"
                        }}
                      >
-                       Save
+                       {t('microLesson.list.save')}
                      </button>
                      <button
                        onClick={() => setEditing({ ...editing, [lesson.id]: false })}
@@ -316,7 +318,7 @@ function LessonList({ user }) {
                          cursor: "pointer"
                        }}
                      >
-                       Cancel
+                       {t('microLesson.list.cancel')}
                      </button>
                    </>
                  ) : (
@@ -333,7 +335,7 @@ function LessonList({ user }) {
                        cursor: "pointer"
                        }}
                      >
-                     Edit
+                     {t('microLesson.list.edit')}
                    </button>
                  )}
                </div>

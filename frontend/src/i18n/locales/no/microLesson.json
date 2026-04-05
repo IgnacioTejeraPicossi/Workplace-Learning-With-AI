@@ -1,0 +1,33 @@
+{
+  "microLesson": {
+    "pageTitle": "Mikroleksjon",
+    "topicPlaceholder": "Skriv inn emne for mikroleksjon",
+    "getButton": "Få mikroleksjon",
+    "getButtonTitle": "Generer en tilpasset KI-drevet mikroleksjon for valgt emne.",
+    "savedSectionTitle": "Lagrede mikroleksjoner",
+    "modalTitle": "Mikroleksjon",
+    "errorFetch": "Kunne ikke hente mikroleksjon.",
+    "quizTitle": "Quiz (simulert)",
+    "quizQuestion": "S: Hva er ett viktig poeng fra denne mikroleksjonen?",
+    "quizAnswerPlaceholder": "Ditt svar …",
+    "submit": "Send inn",
+    "takeQuiz": "Ta quiz",
+    "list": {
+      "heading": "Lagrede mikroleksjoner",
+      "loading": "Laster lagrede leksjoner …",
+      "errorPrefix": "Feil:",
+      "filterPlaceholder": "Filtrer etter emne …",
+      "clear": "Tøm",
+      "empty": "Ingen leksjoner funnet.",
+      "topicLabel": "Emne:",
+      "expand": "Utvid",
+      "compress": "Minimer",
+      "delete": "Slett",
+      "deleteConfirm": "Slette denne leksjonen?",
+      "edit": "Rediger",
+      "save": "Lagre",
+      "cancel": "Avbryt",
+      "navigatingTo": "Navigerer til: «{{title}}» — utvider automatisk …"
+    }
+  }
+}

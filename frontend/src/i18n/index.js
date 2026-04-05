@@ -9,6 +9,8 @@ import enRunTest from './locales/en/runTestModule.json';
 import noRunTest from './locales/no/runTestModule.json';
 import enAppChrome from './locales/en/appChrome.json';
 import noAppChrome from './locales/no/appChrome.json';
+import enMicroLesson from './locales/en/microLesson.json';
+import noMicroLesson from './locales/no/microLesson.json';
 
 i18n
   .use(LanguageDetector)
@@ -27,10 +29,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson }
       }
     }
   });

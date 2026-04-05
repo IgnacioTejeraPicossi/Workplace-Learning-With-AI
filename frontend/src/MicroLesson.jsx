@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { askStream, saveMicroLesson } from "./api";
 import ModalDialog from "./ModalDialog";
 import LessonList from "./LessonList";
 
 function MicroLesson({ query, user }) {
+  const { t } = useTranslation();
   const [topic, setTopic] = useState(query || "");
   const [modalOpen, setModalOpen] = useState(false);
   const [aiOutput, setAiOutput] = useState("");
@@ -36,7 +38,7 @@ function MicroLesson({ query, user }) {
         await saveMicroLesson(microLessonData);
       }
     } catch (err) {
-      setAiOutput("Error fetching micro-lesson.");
+      setAiOutput(t('microLesson.errorFetch'));
     }
     setLoading(false);
   };
@@ -47,12 +49,12 @@ function MicroLesson({ query, user }) {
 
   return (
     <div>
-      <h2>Micro-lesson</h2>
+      <h2>{t('microLesson.pageTitle')}</h2>
       <input
         type="text"
         value={topic}
         onChange={e => setTopic(e.target.value)}
-        placeholder="Enter micro-lesson topic"
+        placeholder={t('microLesson.topicPlaceholder')}
         style={{ marginRight: 8 }}
       />
       <button
@@ -70,20 +72,19 @@ function MicroLesson({ query, user }) {
           marginRight: 8,
           boxShadow: "0 1px 4px #0001"
         }}
-        title="Generate a custom AI-powered micro-lesson for your chosen topic."
+        title={t('microLesson.getButtonTitle')}
       >
-        Get Micro-lesson
+        {t('microLesson.getButton')}
       </button>
-      
-      {/* Saved Micro-lessons Section */}
+
       <div style={{ marginTop: "40px" }}>
-        <h3>📚 Saved Micro-lessons</h3>
+        <h3>📚 {t('microLesson.savedSectionTitle')}</h3>
         <LessonList user={user} />
       </div>
       <ModalDialog
         isOpen={modalOpen}
         onRequestClose={() => { setModalOpen(false); setShowQuiz(false); }}
-        title="Micro-lesson"
+        title={t('microLesson.modalTitle')}
       >
         {loading ? (
           <div style={{ width: '100%', margin: '24px 0' }}>
@@ -94,10 +95,10 @@ function MicroLesson({ query, user }) {
           </div>
         ) : showQuiz ? (
           <div>
-            <h3>Quiz (Mocked)</h3>
-            <p>Q: What is one key takeaway from this micro-lesson?</p>
-            <input type="text" placeholder="Your answer..." style={{ width: '100%', marginBottom: 8 }} />
-            <button onClick={() => setShowQuiz(false)} style={{ background: '#388e3c', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 15, marginTop: 8 }}>Submit</button>
+            <h3>{t('microLesson.quizTitle')}</h3>
+            <p>{t('microLesson.quizQuestion')}</p>
+            <input type="text" placeholder={t('microLesson.quizAnswerPlaceholder')} style={{ width: '100%', marginBottom: 8 }} />
+            <button onClick={() => setShowQuiz(false)} style={{ background: '#388e3c', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 15, marginTop: 8 }}>{t('microLesson.submit')}</button>
           </div>
         ) : (
           <>
@@ -119,7 +120,7 @@ function MicroLesson({ query, user }) {
               }}>{aiOutput}</pre>
             </div>
             {aiOutput && (
-              <button onClick={handleTakeQuiz} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 16 }}>Take Quiz</button>
+              <button onClick={handleTakeQuiz} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 16 }}>{t('microLesson.takeQuiz')}</button>
             )}
           </>
         )}

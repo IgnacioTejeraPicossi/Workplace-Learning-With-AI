@@ -1,0 +1,33 @@
+{
+  "microLesson": {
+    "pageTitle": "Micro-lesson",
+    "topicPlaceholder": "Enter micro-lesson topic",
+    "getButton": "Get Micro-lesson",
+    "getButtonTitle": "Generate a custom AI-powered micro-lesson for your chosen topic.",
+    "savedSectionTitle": "Saved Micro-lessons",
+    "modalTitle": "Micro-lesson",
+    "errorFetch": "Error fetching micro-lesson.",
+    "quizTitle": "Quiz (mock)",
+    "quizQuestion": "Q: What is one key takeaway from this micro-lesson?",
+    "quizAnswerPlaceholder": "Your answer…",
+    "submit": "Submit",
+    "takeQuiz": "Take Quiz",
+    "list": {
+      "heading": "Saved Micro-lessons",
+      "loading": "Loading saved lessons…",
+      "errorPrefix": "Error:",
+      "filterPlaceholder": "Filter by topic…",
+      "clear": "Clear",
+      "empty": "No lessons found.",
+      "topicLabel": "Topic:",
+      "expand": "Expand",
+      "compress": "Compress",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this lesson?",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "navigatingTo": "Navigating to: \"{{title}}\" — expanding automatically…"
+    }
+  }
+}
