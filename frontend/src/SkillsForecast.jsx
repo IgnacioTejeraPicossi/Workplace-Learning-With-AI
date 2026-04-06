@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { askStream, saveSkillsForecast } from "./api";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
-import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
+import { useStreaming } from "./hooks/useStreaming";
 import { useTheme } from "./ThemeContext";
 
 function SkillsForecast() {
@@ -14,6 +15,28 @@ function SkillsForecast() {
   const [resources, setResources] = useState([]);
   const [reminderDate, setReminderDate] = useState('');
   const { colors } = useTheme();
+  const { t } = useTranslation();
+
+  const sampleInputs = useMemo(
+    () => [
+      t("skillsForecastModule.samples.sample1"),
+      t("skillsForecastModule.samples.sample2"),
+      t("skillsForecastModule.samples.sample3")
+    ],
+    [t]
+  );
+
+  const forecastStatusMessages = useMemo(
+    () => [
+      t("skillsForecastModule.streaming.status1"),
+      t("skillsForecastModule.streaming.status2"),
+      t("skillsForecastModule.streaming.status3"),
+      t("skillsForecastModule.streaming.status4")
+    ],
+    [t]
+  );
+
+  const forecastStreaming = useStreaming(t("skillsForecastModule.streaming.initialStatus"));
   
   // Helper function to extract skills from forecast content
   const extractSkillsFromForecast = (content) => {
@@ -38,12 +61,9 @@ function SkillsForecast() {
     setSavedForecasts(saved);
   }, []);
 
-  // Use streaming hook for skills forecasting
-  const forecastStreaming = useStreaming('Ready to analyze your skills');
-
   const handleGetForecast = async () => {
     if (!input.trim()) {
-      alert('Please provide information about your current skills and career goals.');
+      alert(t("skillsForecastModule.alerts.inputRequired"));
       return;
     }
 
@@ -60,7 +80,7 @@ function SkillsForecast() {
       
       Make it actionable and specific.`,
       {
-        statusMessages: STATUS_MESSAGES.SKILLS_FORECAST,
+        statusMessages: forecastStatusMessages,
         onComplete: (content) => {
           // Could save forecast to user profile
           console.log('Skills forecast completed');
@@ -115,7 +135,7 @@ function SkillsForecast() {
       console.error('Error saving skills forecast to MongoDB:', saveError);
     }
     
-    alert('✅ Forecast saved successfully! You can view it in your saved forecasts.');
+    alert(t("skillsForecastModule.alerts.saveSuccess"));
   };
 
   const handleDeleteForecast = (id) => {
@@ -154,13 +174,13 @@ function SkillsForecast() {
       );
     } catch (error) {
       console.error('Failed to generate resources:', error);
-      setResources(['Error generating resources. Please try again.']);
+      setResources([t("skillsForecastModule.resources.errorLine")]);
     }
   };
 
   const handleScheduleReview = () => {
     if (!forecastStreaming.content) {
-      alert('No forecast to schedule. Please generate a forecast first.');
+      alert(t("skillsForecastModule.alerts.noForecastSchedule"));
       return;
     }
 
@@ -175,7 +195,7 @@ function SkillsForecast() {
 
   const handleSetReminder = () => {
     if (!reminderDate) {
-      alert('Please select a reminder date.');
+      alert(t("skillsForecastModule.alerts.reminderDateRequired"));
       return;
     }
 
@@ -191,16 +211,14 @@ function SkillsForecast() {
     const existing = JSON.parse(localStorage.getItem('forecastReminders') || '[]');
     localStorage.setItem('forecastReminders', JSON.stringify([reminder, ...existing]));
 
-    alert(`✅ Review scheduled for ${new Date(reminderDate).toLocaleDateString()}. You'll be reminded to review your skills progress.`);
+    alert(
+      t("skillsForecastModule.schedule.scheduledAlert", {
+        date: new Date(reminderDate).toLocaleDateString()
+      })
+    );
     setShowSchedule(false);
     setReminderDate('');
   };
-
-  const sampleInputs = [
-    "I'm a junior developer with 2 years of experience in JavaScript and React. I want to advance to a senior role.",
-    "I'm a project manager looking to transition into product management. I have experience with Agile methodologies.",
-    "I'm a marketing specialist wanting to learn data analysis and digital marketing automation."
-  ];
 
   const handleSampleInput = (sample) => {
     setInput(sample);
@@ -208,10 +226,10 @@ function SkillsForecast() {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🔮 Skills Forecasting</h2>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>{t("skillsForecastModule.pageTitle")}</h2>
       
       <p style={{ marginBottom: 20, color: colors.textSecondary }}>
-        Get AI-powered predictions about which skills you should develop next based on your current profile and career goals.
+        {t("skillsForecastModule.intro")}
       </p>
 
       {/* Saved Forecasts Section */}
@@ -230,7 +248,7 @@ function SkillsForecast() {
             marginBottom: 12
           }}>
             <h3 style={{ margin: 0, color: colors.text }}>
-              📋 Saved Forecasts ({savedForecasts.length})
+              {t("skillsForecastModule.saved.title", { count: savedForecasts.length })}
             </h3>
             <button
               onClick={() => setShowSavedForecasts(!showSavedForecasts)}
@@ -244,7 +262,7 @@ function SkillsForecast() {
                 fontSize: '0.9em'
               }}
             >
-              {showSavedForecasts ? 'Hide' : 'Show'}
+              {showSavedForecasts ? t("skillsForecastModule.saved.hide") : t("skillsForecastModule.saved.show")}
             </button>
           </div>
           
@@ -269,14 +287,17 @@ function SkillsForecast() {
                   }}>
                     <div>
                       <strong style={{ color: colors.text }}>
-                        Forecast #{savedForecasts.length - index}
+                        {t("skillsForecastModule.saved.forecastNumber", { n: savedForecasts.length - index })}
                       </strong>
                       <div style={{ 
                         fontSize: '0.8em', 
                         color: colors.textSecondary,
                         marginTop: 4
                       }}>
-                        {new Date(forecast.timestamp).toLocaleDateString()} at {new Date(forecast.timestamp).toLocaleTimeString()}
+                        {t("skillsForecastModule.saved.datetime", {
+                          date: new Date(forecast.timestamp).toLocaleDateString(),
+                          time: new Date(forecast.timestamp).toLocaleTimeString()
+                        })}
                       </div>
                     </div>
                     <button
@@ -296,7 +317,7 @@ function SkillsForecast() {
                   </div>
                   
                   <div style={{ marginBottom: 8 }}>
-                    <strong style={{ color: colors.textSecondary }}>Input:</strong>
+                    <strong style={{ color: colors.textSecondary }}>{t("skillsForecastModule.saved.inputLabel")}</strong>
                     <div style={{ 
                       fontSize: '0.9em', 
                       color: colors.text,
@@ -311,7 +332,7 @@ function SkillsForecast() {
                   </div>
                   
                   <div>
-                    <strong style={{ color: colors.textSecondary }}>Forecast:</strong>
+                    <strong style={{ color: colors.textSecondary }}>{t("skillsForecastModule.saved.forecastLabel")}</strong>
                     <div style={{ 
                       fontSize: '0.9em', 
                       color: colors.text,
@@ -336,13 +357,13 @@ function SkillsForecast() {
       {/* Input Section */}
       <div style={{ marginBottom: 24 }}>
         <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
-          Tell us about your current skills and career goals:
+          {t("skillsForecastModule.form.label")}
         </label>
         <textarea
           rows={4}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe your current role, skills, experience level, and career aspirations..."
+          placeholder={t("skillsForecastModule.form.placeholder")}
           style={{ 
             width: '100%', 
             padding: 12, 
@@ -376,7 +397,7 @@ function SkillsForecast() {
                   whiteSpace: 'nowrap'
                 }}
               >
-                Sample {index + 1}
+                {t("skillsForecastModule.form.sampleButton", { n: index + 1 })}
               </button>
             ))}
           </div>
@@ -396,7 +417,7 @@ function SkillsForecast() {
               opacity: forecastStreaming.loading ? 0.6 : 1
             }}
           >
-            {forecastStreaming.loading ? '⏳ Analyzing...' : '🔮 Get Forecast'}
+            {forecastStreaming.loading ? t("skillsForecastModule.actions.analyzing") : t("skillsForecastModule.actions.getForecast")}
           </button>
           
           <button
@@ -430,13 +451,13 @@ function SkillsForecast() {
       {forecastStreaming.content && (
         <div style={{ marginBottom: 24 }}>
           <h3 style={{ marginBottom: 16, color: colors.text }}>
-            📊 Your Skills Forecast
+            {t("skillsForecastModule.results.title")}
           </h3>
           
           <StreamingText 
             content={forecastStreaming.content}
             loading={forecastStreaming.loading}
-            placeholder="Analyzing your skills and generating forecast..."
+            placeholder={t("skillsForecastModule.results.analyzingPlaceholder")}
             style={{ minHeight: '300px' }}
           />
 
@@ -459,7 +480,7 @@ function SkillsForecast() {
                   cursor: 'pointer'
                 }}
               >
-                📋 Save Forecast
+                {t("skillsForecastModule.postActions.saveForecast")}
               </button>
               <button
                 onClick={handleFindResources}
@@ -472,7 +493,7 @@ function SkillsForecast() {
                   cursor: 'pointer'
                 }}
               >
-                📚 Find Learning Resources
+                {t("skillsForecastModule.postActions.findResources")}
               </button>
               <button
                 onClick={handleScheduleReview}
@@ -485,7 +506,7 @@ function SkillsForecast() {
                   cursor: 'pointer'
                 }}
               >
-                📅 Schedule Review
+                {t("skillsForecastModule.postActions.scheduleReview")}
               </button>
             </div>
           )}
@@ -502,7 +523,7 @@ function SkillsForecast() {
           border: `1px solid ${colors.border}`
         }}>
           <h3 style={{ marginBottom: 16, color: colors.text }}>
-            📚 Learning Resources
+            {t("skillsForecastModule.resources.title")}
           </h3>
           <div style={{ 
             maxHeight: '400px', 
@@ -543,14 +564,14 @@ function SkillsForecast() {
           border: `1px solid ${colors.border}`
         }}>
           <h3 style={{ marginBottom: 16, color: colors.text }}>
-            📅 Schedule Skills Review
+            {t("skillsForecastModule.schedule.title")}
           </h3>
           <p style={{ marginBottom: 16, color: colors.textSecondary }}>
-            Set a reminder to review your skills progress and update your forecast.
+            {t("skillsForecastModule.schedule.intro")}
           </p>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 8, color: colors.text }}>
-              Reminder Date:
+              {t("skillsForecastModule.schedule.dateLabel")}
             </label>
             <input
               type="date"
@@ -605,7 +626,7 @@ function SkillsForecast() {
           borderRadius: 8,
           marginBottom: 16
         }}>
-          <strong>Error:</strong> {forecastStreaming.error}
+          <strong>{t("skillsForecastModule.errors.prefix")}</strong> {forecastStreaming.error}
           <button
             onClick={handleClear}
             style={{
@@ -619,7 +640,7 @@ function SkillsForecast() {
               fontSize: '0.8em'
             }}
           >
-            Try Again
+            {t("skillsForecastModule.errors.tryAgain")}
           </button>
         </div>
       )}

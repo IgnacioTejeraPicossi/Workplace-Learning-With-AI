@@ -1,0 +1,72 @@
+{
+  "skillsForecastModule": {
+    "pageTitle": "🔮 Ferdighetsprognose",
+    "intro": "Få KI-baserte forslag til hvilke ferdigheter du bør utvikle videre, ut fra profilen og karrieremålene dine.",
+    "saved": {
+      "title": "📋 Lagrede prognoser ({{count}})",
+      "show": "Vis",
+      "hide": "Skjul",
+      "forecastNumber": "Prognose nr. {{n}}",
+      "datetime": "{{date}} kl. {{time}}",
+      "inputLabel": "Inndata:",
+      "forecastLabel": "Prognose:"
+    },
+    "form": {
+      "label": "Fortell om nåværende ferdigheter og karrieremål:",
+      "placeholder": "Beskriv rolle, ferdigheter, erfaringsnivå og hva du vil oppnå …",
+      "sampleHint": "💡 Prøv et eksempel:",
+      "sampleButton": "Eksempel {{n}}"
+    },
+    "actions": {
+      "getForecast": "🔮 Hent prognose",
+      "analyzing": "⏳ Analyserer …",
+      "clear": "🗑️ Tøm"
+    },
+    "results": {
+      "title": "📊 Din ferdighetsprognose",
+      "analyzingPlaceholder": "Analyserer ferdigheter og lager prognose …"
+    },
+    "postActions": {
+      "saveForecast": "📋 Lagre prognose",
+      "findResources": "📚 Finn læringsressurser",
+      "scheduleReview": "📅 Planlegg gjennomgang"
+    },
+    "resources": {
+      "title": "📚 Læringsressurser",
+      "close": "Lukk",
+      "errorLine": "Kunne ikke generere ressurser. Prøv igjen."
+    },
+    "schedule": {
+      "title": "📅 Planlegg ferdighetsgjennomgang",
+      "intro": "Sett en påminnelse om å følge opp ferdigheter og oppdatere prognosen.",
+      "dateLabel": "Påminnelsesdato:",
+      "setReminder": "Lagre påminnelse",
+      "cancel": "Avbryt",
+      "scheduledAlert": "✅ Gjennomgang planlagt til {{date}}. Du får beskjed om å følge opp fremgangen."
+    },
+    "errors": {
+      "prefix": "Feil:",
+      "tryAgain": "Prøv igjen"
+    },
+    "streaming": {
+      "initialStatus": "Klar til å analysere ferdighetene dine",
+      "status1": "Analyserer læringshistorikk …",
+      "status2": "Identifiserer trender …",
+      "status3": "Forutsier fremtidige behov …",
+      "status4": "Genererer prognose …"
+    },
+    "alerts": {
+      "inputRequired": "Oppgi informasjon om ferdigheter og karrieremål.",
+      "noForecastToSave": "Ingen prognose å lagre. Generer en prognose først.",
+      "saveSuccess": "✅ Prognose lagret! Du finner den under lagrede prognoser.",
+      "noForecastResources": "Ingen prognose å analysere. Generer en prognose først.",
+      "noForecastSchedule": "Ingen prognose å planlegge. Generer en prognose først.",
+      "reminderDateRequired": "Velg en dato for påminnelse."
+    },
+    "samples": {
+      "sample1": "Jeg er juniorutvikler med 2 års erfaring i JavaScript og React. Jeg vil bli senior.",
+      "sample2": "Jeg er prosjektleder og vil gå over til produktledelse. Jeg har erfaring med smidige metoder.",
+      "sample3": "Jeg jobber med markedsføring og vil lære dataanalyse og automatisering av digital markedsføring."
+    }
+  }
+}

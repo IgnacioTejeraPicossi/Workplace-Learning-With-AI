@@ -1,0 +1,72 @@
+{
+  "skillsForecastModule": {
+    "pageTitle": "🔮 Skills Forecasting",
+    "intro": "Get AI-powered predictions about which skills you should develop next based on your current profile and career goals.",
+    "saved": {
+      "title": "📋 Saved Forecasts ({{count}})",
+      "show": "Show",
+      "hide": "Hide",
+      "forecastNumber": "Forecast #{{n}}",
+      "datetime": "{{date}} at {{time}}",
+      "inputLabel": "Input:",
+      "forecastLabel": "Forecast:"
+    },
+    "form": {
+      "label": "Tell us about your current skills and career goals:",
+      "placeholder": "Describe your current role, skills, experience level, and career aspirations…",
+      "sampleHint": "💡 Try a sample input:",
+      "sampleButton": "Sample {{n}}"
+    },
+    "actions": {
+      "getForecast": "🔮 Get Forecast",
+      "analyzing": "⏳ Analyzing…",
+      "clear": "🗑️ Clear"
+    },
+    "results": {
+      "title": "📊 Your Skills Forecast",
+      "analyzingPlaceholder": "Analyzing your skills and generating forecast…"
+    },
+    "postActions": {
+      "saveForecast": "📋 Save Forecast",
+      "findResources": "📚 Find Learning Resources",
+      "scheduleReview": "📅 Schedule Review"
+    },
+    "resources": {
+      "title": "📚 Learning Resources",
+      "close": "Close",
+      "errorLine": "Error generating resources. Please try again."
+    },
+    "schedule": {
+      "title": "📅 Schedule Skills Review",
+      "intro": "Set a reminder to review your skills progress and update your forecast.",
+      "dateLabel": "Reminder Date:",
+      "setReminder": "Set Reminder",
+      "cancel": "Cancel",
+      "scheduledAlert": "✅ Review scheduled for {{date}}. You'll be reminded to review your skills progress."
+    },
+    "errors": {
+      "prefix": "Error:",
+      "tryAgain": "Try Again"
+    },
+    "streaming": {
+      "initialStatus": "Ready to analyze your skills",
+      "status1": "Analyzing learning history…",
+      "status2": "Identifying trends…",
+      "status3": "Predicting future needs…",
+      "status4": "Generating forecast…"
+    },
+    "alerts": {
+      "inputRequired": "Please provide information about your current skills and career goals.",
+      "noForecastToSave": "No forecast to save. Please generate a forecast first.",
+      "saveSuccess": "✅ Forecast saved successfully! You can view it in your saved forecasts.",
+      "noForecastResources": "No forecast to analyze. Please generate a forecast first.",
+      "noForecastSchedule": "No forecast to schedule. Please generate a forecast first.",
+      "reminderDateRequired": "Please select a reminder date."
+    },
+    "samples": {
+      "sample1": "I'm a junior developer with 2 years of experience in JavaScript and React. I want to advance to a senior role.",
+      "sample2": "I'm a project manager looking to transition into product management. I have experience with Agile methodologies.",
+      "sample3": "I'm a marketing specialist wanting to learn data analysis and digital marketing automation."
+    }
+  }
+}
