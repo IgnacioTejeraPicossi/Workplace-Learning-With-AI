@@ -23,6 +23,8 @@ import enCareerCoachModule from './locales/en/careerCoachModule.json';
 import noCareerCoachModule from './locales/no/careerCoachModule.json';
 import enSkillsForecastModule from './locales/en/skillsForecastModule.json';
 import noSkillsForecastModule from './locales/no/skillsForecastModule.json';
+import enBabelLibraryModule from './locales/en/babelLibraryModule.json';
+import noBabelLibraryModule from './locales/no/babelLibraryModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -41,10 +43,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule }
       }
     }
   });

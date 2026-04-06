@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { 
   fetchSavedVideos, 
@@ -39,6 +40,36 @@ const BabelLibrary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
+  const { t } = useTranslation();
+
+  const typeLabel = (type) => t(`babelLibraryModule.types.${type}`, { defaultValue: type });
+
+  const authorLabel = (author) => {
+    const keyMap = {
+      'YouTube Video': 'authors.youtubeVideo',
+      'Certification': 'authors.certification',
+      'Micro-lesson': 'authors.microLesson',
+      'Web Search': 'authors.webSearch',
+      'Skills Forecast': 'authors.skillsForecast',
+      'AI Career Coach': 'authors.aiCareerCoach',
+      'Simulation Result': 'authors.simulationResult',
+      'Document Analyzer': 'authors.documentAnalyzer',
+      'Repository Analyzer': 'authors.repositoryAnalyzer',
+      'Agentic RAG': 'authors.agenticRAG'
+    };
+    const sub = keyMap[author];
+    return sub ? t(`babelLibraryModule.${sub}`) : author;
+  };
+
+  const mainTabs = useMemo(
+    () => [
+      { key: 'catalog', label: t('babelLibraryModule.tabs.catalog') },
+      { key: 'add', label: t('babelLibraryModule.tabs.add') },
+      { key: 'search', label: t('babelLibraryModule.tabs.search') },
+      { key: 'ai-search', label: t('babelLibraryModule.tabs.aiSearch') }
+    ],
+    [t]
+  );
 
   // Load videos from MongoDB
   const loadVideos = async () => {
@@ -269,151 +300,151 @@ const BabelLibrary = () => {
 
   // Delete functions for different resource types
   const handleDeleteVideo = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este video?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteVideo'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/saved-videos/${id}`, { method: 'DELETE' });
         // Update local state
         setVideos(prev => prev.filter(video => video._id !== id));
-        alert('✅ Video eliminado exitosamente');
+        alert(t('babelLibraryModule.toast.videoDeleted'));
       } catch (error) {
         console.error('Error deleting video:', error);
-        alert('❌ Error al eliminar el video');
+        alert(t('babelLibraryModule.toast.videoDeleteError'));
       }
     }
   };
 
   const handleDeleteCertification = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta certificación?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteCertification'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/certifications/${id}`, { method: 'DELETE' });
         // Update local state
         setCertifications(prev => prev.filter(cert => cert.id !== id));
-        alert('✅ Certificación eliminada exitosamente');
+        alert(t('babelLibraryModule.toast.certDeleted'));
       } catch (error) {
         console.error('Error deleting certification:', error);
-        alert('❌ Error al eliminar la certificación');
+        alert(t('babelLibraryModule.toast.certDeleteError'));
       }
     }
   };
 
   const handleDeleteMicroLesson = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta micro-lección?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteMicroLesson'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/micro-lessons/${id}`, { method: 'DELETE' });
         // Update local state
         setMicroLessons(prev => prev.filter(lesson => lesson.id !== id));
-        alert('✅ Micro-lección eliminada exitosamente');
+        alert(t('babelLibraryModule.toast.lessonDeleted'));
       } catch (error) {
         console.error('Error deleting micro-lesson:', error);
-        alert('❌ Error al eliminar la micro-lección');
+        alert(t('babelLibraryModule.toast.lessonDeleteError'));
       }
     }
   };
 
   const handleDeleteWebSearch = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta búsqueda web?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteWebSearch'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/web-search/${id}`, { method: 'DELETE' });
         // Update local state
         setWebSearchResults(prev => prev.filter(result => result.id !== id));
-        alert('✅ Búsqueda web eliminada exitosamente');
+        alert(t('babelLibraryModule.toast.webDeleted'));
       } catch (error) {
         console.error('Error deleting web search:', error);
-        alert('❌ Error al eliminar la búsqueda web');
+        alert(t('babelLibraryModule.toast.webDeleteError'));
       }
     }
   };
 
   const handleDeleteSkillsForecast = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este forecast?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteSkillsForecast'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/skills-forecast/${id}`, { method: 'DELETE' });
         // Update local state
         setSkillsForecasts(prev => prev.filter(forecast => forecast.id !== id));
-        alert('✅ Skills Forecast eliminado exitosamente');
+        alert(t('babelLibraryModule.toast.forecastDeleted'));
       } catch (error) {
         console.error('Error deleting skills forecast:', error);
-        alert('❌ Error al eliminar el skills forecast');
+        alert(t('babelLibraryModule.toast.forecastDeleteError'));
       }
     }
   };
 
   const handleDeleteCareerCoach = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta sesión?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteCareerCoach'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/career-coach/${id}`, { method: 'DELETE' });
         // Update local state
         setCareerCoachSessions(prev => prev.filter(session => session.id !== id));
-        alert('✅ Sesión eliminada exitosamente');
+        alert(t('babelLibraryModule.toast.sessionDeleted'));
       } catch (error) {
         console.error('Error deleting career coach session:', error);
-        alert('❌ Error al eliminar la sesión');
+        alert(t('babelLibraryModule.toast.sessionDeleteError'));
       }
     }
   };
 
   const handleDeleteSimulation = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta simulación?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteSimulation'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/simulation-results/${id}`, { method: 'DELETE' });
         // Update local state
         setSimulationResults(prev => prev.filter(result => result.id !== id));
-        alert('✅ Simulación eliminada exitosamente');
+        alert(t('babelLibraryModule.toast.simDeleted'));
       } catch (error) {
         console.error('Error deleting simulation:', error);
-        alert('❌ Error al eliminar la simulación');
+        alert(t('babelLibraryModule.toast.simDeleteError'));
       }
     }
   };
 
   const handleDeleteDocumentAnalysis = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de documento?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteDocumentAnalysis'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/document-analyzer/delete-analysis/${id}`, { method: 'DELETE' });
         // Update local state
         setDocumentAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
-        alert('✅ Análisis de documento eliminado exitosamente');
+        alert(t('babelLibraryModule.toast.docDeleted'));
       } catch (error) {
         console.error('Error deleting document analysis:', error);
-        alert('❌ Error al eliminar el análisis de documento');
+        alert(t('babelLibraryModule.toast.docDeleteError'));
       }
     }
   };
 
   const handleDeleteRepositoryAnalysis = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de repositorio?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteRepositoryAnalysis'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/saved-analyses/${id}`, { method: 'DELETE' });
         // Update local state
         setRepositoryAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
-        alert('✅ Análisis de repositorio eliminado exitosamente');
+        alert(t('babelLibraryModule.toast.repoDeleted'));
       } catch (error) {
         console.error('Error deleting repository analysis:', error);
-        alert('❌ Error al eliminar el análisis de repositorio');
+        alert(t('babelLibraryModule.toast.repoDeleteError'));
       }
     }
   };
 
   const handleDeleteAgenticRAGAnalysis = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este análisis de Agentic RAG?')) {
+    if (window.confirm(t('babelLibraryModule.confirm.deleteAgenticRAG'))) {
       try {
         // Remove from MongoDB
         await fetch(`/api/agentic-rag/delete-analysis/${id}`, { method: 'DELETE' });
         // Update local state
         setAgenticRAGAnalyses(prev => prev.filter(analysis => (analysis.id || analysis._id) !== id));
-        alert('✅ Análisis de Agentic RAG eliminado exitosamente');
+        alert(t('babelLibraryModule.toast.ragDeleted'));
       } catch (error) {
         console.error('Error deleting agentic RAG analysis:', error);
-        alert('❌ Error al eliminar el análisis de Agentic RAG');
+        alert(t('babelLibraryModule.toast.ragDeleteError'));
       }
     }
   };
@@ -432,7 +463,7 @@ const BabelLibrary = () => {
     }));
     
     // Also show a user-friendly message
-    alert(`Redirecting to Micro-lessons module list to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.microLesson', { title }));
   };
 
   const handleEditCertification = (id, title) => {
@@ -448,7 +479,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Certifications module History tab to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.certification', { title }));
   };
 
   const handleEditCareerCoach = (id, title) => {
@@ -464,7 +495,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to AI Career Coach module Saved Sessions to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.careerCoach', { title }));
   };
 
   const handleEditVideo = (id, title) => {
@@ -495,7 +526,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Simulations module list to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.simulation', { title }));
   };
 
   const handleEditDocumentAnalysis = (id, title) => {
@@ -512,7 +543,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Learning Document module to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.document', { title }));
   };
 
   const handleEditRepositoryAnalysis = (id, title) => {
@@ -529,7 +560,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Learning Repo module to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.repo', { title }));
   };
 
   const handleEditAgenticRAGAnalysis = (id, title) => {
@@ -546,8 +577,10 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Agentic RAG Documents module to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.agenticRag', { title }));
   };
+
+  const unknownDateLabel = t('babelLibraryModule.unknownDate');
 
   // Combine books and videos for unified search
   const allResources = [
@@ -559,7 +592,7 @@ const BabelLibrary = () => {
       topic: video.topic,
       description: video.description,
       type: 'video',
-      addedDate: video.saved_at ? video.saved_at.split('T')[0] : 'Unknown',
+      addedDate: video.saved_at ? video.saved_at.split('T')[0] : unknownDateLabel,
       url: video.url
     })),
     ...certifications.map(cert => ({
@@ -569,7 +602,7 @@ const BabelLibrary = () => {
       topic: cert.topics.join(', '),
       description: cert.description,
       type: 'course',
-      addedDate: cert.created_at ? cert.created_at.split('T')[0] : 'Unknown',
+      addedDate: cert.created_at ? cert.created_at.split('T')[0] : unknownDateLabel,
       level: cert.level,
       duration: cert.duration
     })),
@@ -580,7 +613,7 @@ const BabelLibrary = () => {
       topic: lesson.topic,
       description: lesson.content.substring(0, 100) + '...',
       type: 'article',
-      addedDate: lesson.created_at ? lesson.created_at.split('T')[0] : 'Unknown',
+      addedDate: lesson.created_at ? lesson.created_at.split('T')[0] : unknownDateLabel,
       level: lesson.level,
       duration: lesson.duration
     })),
@@ -591,7 +624,7 @@ const BabelLibrary = () => {
       topic: result.topic,
       description: result.snippet,
       type: 'article',
-      addedDate: result.created_at ? result.created_at.split('T')[0] : 'Unknown',
+      addedDate: result.created_at ? result.created_at.split('T')[0] : unknownDateLabel,
       url: result.url,
       searchQuery: result.search_query
     })),
@@ -614,7 +647,7 @@ const BabelLibrary = () => {
        topic: session.topic,
        description: session.content.substring(0, 100) + '...',
        type: 'simulation',
-       addedDate: session.created_at ? session.created_at.split('T')[0] : 'Unknown',
+       addedDate: session.created_at ? session.created_at.split('T')[0] : unknownDateLabel,
        growthArea: session.growth_area,
        customTopic: session.custom_topic
      })),
@@ -639,7 +672,7 @@ const BabelLibrary = () => {
        topic: 'Document Analysis',
        description: analysis.summary ? analysis.summary.substring(0, 100) + '...' : 'Document analysis result',
        type: 'analysis',
-       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : 'Unknown',
+       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : unknownDateLabel,
        chars: analysis.chars,
        chunks: analysis.chunks,
        length: analysis.length
@@ -663,7 +696,7 @@ const BabelLibrary = () => {
        topic: 'Agentic RAG Analysis',
        description: analysis.answer ? analysis.answer.substring(0, 100) + '...' : 'Agentic RAG analysis result',
        type: 'analysis',
-       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : 'Unknown',
+       addedDate: analysis.created_at ? analysis.created_at.split('T')[0] : unknownDateLabel,
        question: analysis.question,
        confidence: analysis.confidence
      }))
@@ -717,21 +750,16 @@ const BabelLibrary = () => {
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ color: colors.text, marginBottom: 8 }}>
-            🏛️ Babel Library
+            {t('babelLibraryModule.header.title')}
           </h1>
           <p style={{ color: colors.textSecondary, fontSize: '1.1em' }}>
-            Our world's knowledge repository - Articles, videos, summaries, and more
+            {t('babelLibraryModule.header.subtitle')}
           </p>
         </div>
 
         {/* Navigation Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-          {[
-            { key: 'catalog', label: '📚 Library Catalog', icon: '📚' },
-            { key: 'add', label: '➕ Add Resource', icon: '➕' },
-            { key: 'search', label: '🔍 Advanced Search', icon: '🔍' },
-            { key: 'ai-search', label: '🤖 AI Search', icon: '🤖' }
-          ].map(tab => (
+          {mainTabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
@@ -757,7 +785,7 @@ const BabelLibrary = () => {
             {/* Loading indicator */}
             {loading && (
               <div style={{ textAlign: 'center', padding: '20px', color: colors.textSecondary }}>
-                Loading resources... ⏳
+                {t('babelLibraryModule.catalog.loading')}
               </div>
             )}
             {/* Search and Filter */}
@@ -771,7 +799,7 @@ const BabelLibrary = () => {
               <div style={{ flex: 1, minWidth: 300 }}>
                 <input
                   type="text"
-                  placeholder="Search by title, author, or description..."
+                  placeholder={t('babelLibraryModule.catalog.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
@@ -800,7 +828,7 @@ const BabelLibrary = () => {
               >
                 {topics.map(topic => (
                   <option key={topic} value={topic}>
-                    {topic === 'all' ? 'All Topics' : topic}
+                    {topic === 'all' ? t('babelLibraryModule.catalog.allTopics') : topic}
                   </option>
                 ))}
               </select>
@@ -815,7 +843,7 @@ const BabelLibrary = () => {
                 flexWrap: 'wrap',
                 alignItems: 'center'
               }}>
-                <span style={{ color: colors.textSecondary, fontSize: '0.9em' }}>Active filters:</span>
+                <span style={{ color: colors.textSecondary, fontSize: '0.9em' }}>{t('babelLibraryModule.catalog.activeFilters')}</span>
                 {selectedType !== 'all' && (
                   <span style={{
                     background: getTypeColor(selectedType),
@@ -825,7 +853,7 @@ const BabelLibrary = () => {
                     fontSize: '0.8em',
                     fontWeight: '500'
                   }}>
-                    {getTypeIcon(selectedType)} {selectedType}
+                    {getTypeIcon(selectedType)} {typeLabel(selectedType)}
                   </span>
                 )}
                 {selectedTopic !== 'all' && (
@@ -868,7 +896,7 @@ const BabelLibrary = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  ✕ Clear All
+                  {t('babelLibraryModule.catalog.clearAll')}
                 </button>
               </div>
             )}
@@ -894,7 +922,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>📚</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Total Resources</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.total')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{allResources.length}</div>
                </button>
                
@@ -912,7 +940,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>🎥</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Videos</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.videos')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{videos.length}</div>
                </button>
                
@@ -930,7 +958,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>📄</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Articles</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.articles')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{microLessons.length + webSearchResults.length + skillsForecasts.length}</div>
                </button>
                
@@ -948,7 +976,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>🎓</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Courses</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.courses')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{certifications.length}</div>
                </button>
                
@@ -966,7 +994,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>🎮</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Simulations / Coach</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.simulationsCoach')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{careerCoachSessions.length + simulationResults.length}</div>
                </button>
                
@@ -984,7 +1012,7 @@ const BabelLibrary = () => {
                  }}
                >
                  <div style={{ fontSize: '2em', marginBottom: 8 }}>📊</div>
-                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>Repository/Document Analysis</div>
+                 <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('babelLibraryModule.catalog.stats.repoDocAnalysis')}</div>
                  <div style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{documentAnalyses.length + repositoryAnalyses.length + agenticRAGAnalyses.length}</div>
                </button>
              </div>
@@ -1016,7 +1044,7 @@ const BabelLibrary = () => {
                     fontSize: '0.8em',
                     fontWeight: 'bold'
                   }}>
-                    {getTypeIcon(resource.type)} {resource.type}
+                    {getTypeIcon(resource.type)} {typeLabel(resource.type)}
                   </div>
 
                   {/* Content */}
@@ -1035,7 +1063,7 @@ const BabelLibrary = () => {
                     fontWeight: 500,
                     fontSize: '0.9em'
                   }}>
-                    👤 {resource.author}
+                    👤 {authorLabel(resource.author)}
                   </p>
                   
                   <p style={{ 
@@ -1096,9 +1124,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Micro-lessons module"
+                           title={t('babelLibraryModule.editIn.microLesson')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                       
@@ -1117,9 +1145,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Certifications module"
+                           title={t('babelLibraryModule.editIn.certification')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                       
@@ -1138,9 +1166,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in AI Career Coach module"
+                           title={t('babelLibraryModule.editIn.careerCoach')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                       
@@ -1159,9 +1187,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Video Lessons module"
+                           title={t('babelLibraryModule.editIn.video')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                       
@@ -1180,9 +1208,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Simulations module"
+                           title={t('babelLibraryModule.editIn.simulation')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                        
@@ -1201,9 +1229,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Learning Document module"
+                           title={t('babelLibraryModule.editIn.document')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                        
@@ -1222,9 +1250,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Learning Repo module"
+                           title={t('babelLibraryModule.editIn.repo')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                        
@@ -1243,9 +1271,9 @@ const BabelLibrary = () => {
                              alignItems: 'center',
                              gap: '4px'
                            }}
-                           title="Edit in Agentic RAG Documents module"
+                           title={t('babelLibraryModule.editIn.agenticRag')}
                          >
-                           ✏️ Edit
+                           {t('babelLibraryModule.edit')}
                          </button>
                        )}
                       
@@ -1262,7 +1290,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete micro-lesson"
+                           title={t('babelLibraryModule.deleteTitle.microLesson')}
                          >
                            🗑️
                          </button>
@@ -1280,7 +1308,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete certification"
+                           title={t('babelLibraryModule.deleteTitle.certification')}
                          >
                            🗑️
                          </button>
@@ -1322,7 +1350,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete video"
+                           title={t('babelLibraryModule.deleteTitle.video')}
                          >
                            🗑️
                          </button>
@@ -1358,7 +1386,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete skills forecast"
+                           title={t('babelLibraryModule.deleteTitle.skillsForecast')}
                          >
                            🗑️
                          </button>
@@ -1394,7 +1422,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete document analysis"
+                           title={t('babelLibraryModule.deleteTitle.document')}
                          >
                            🗑️
                          </button>
@@ -1430,7 +1458,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete agentic RAG analysis"
+                           title={t('babelLibraryModule.deleteTitle.agenticRag')}
                          >
                            🗑️
                          </button>
@@ -1453,7 +1481,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete demo resource"
+                           title={t('babelLibraryModule.deleteTitle.demo')}
                          >
                            🗑️
                          </button>
@@ -1467,7 +1495,7 @@ const BabelLibrary = () => {
                     color: colors.textSecondary,
                     textAlign: 'right'
                   }}>
-                    Added: {resource.addedDate}
+                    {t('babelLibraryModule.catalog.addedPrefix', { date: resource.addedDate })}
                   </div>
                 </div>
               ))}
@@ -1480,8 +1508,8 @@ const BabelLibrary = () => {
                 color: colors.textSecondary
               }}>
                 <div style={{ fontSize: '3em', marginBottom: 16 }}>🔍</div>
-                <h3>No resources found</h3>
-                <p>Try adjusting your search terms or filters</p>
+                <h3>{t('babelLibraryModule.catalog.emptyTitle')}</h3>
+                <p>{t('babelLibraryModule.catalog.emptyHint')}</p>
               </div>
             )}
           </div>
@@ -1489,7 +1517,7 @@ const BabelLibrary = () => {
 
         {activeTab === 'add' && (
           <div style={{ maxWidth: 600 }}>
-            <h2 style={{ color: colors.text, marginBottom: 24 }}>Add New Resource</h2>
+            <h2 style={{ color: colors.text, marginBottom: 24 }}>{t('babelLibraryModule.addForm.title')}</h2>
             
             <form onSubmit={handleAddBook}>
               <div style={{ marginBottom: 20 }}>
@@ -1499,7 +1527,7 @@ const BabelLibrary = () => {
                   color: colors.text,
                   fontWeight: '500'
                 }}>
-                  Resource Type *
+                  {t('babelLibraryModule.addForm.resourceType')}
                 </label>
                 <select
                   value={newBook.type}
@@ -1514,11 +1542,11 @@ const BabelLibrary = () => {
                     color: colors.text
                   }}
                 >
-                  <option value="book">📚 Book</option>
-                  <option value="video">🎥 Video</option>
-                  <option value="article">📄 Article</option>
-                  <option value="course">🎓 Course</option>
-                  <option value="analysis">📊 Repository/Document Analysis</option>
+                  <option value="book">{t('babelLibraryModule.addForm.typeBook')}</option>
+                  <option value="video">{t('babelLibraryModule.addForm.typeVideo')}</option>
+                  <option value="article">{t('babelLibraryModule.addForm.typeArticle')}</option>
+                  <option value="course">{t('babelLibraryModule.addForm.typeCourse')}</option>
+                  <option value="analysis">{t('babelLibraryModule.addForm.typeAnalysis')}</option>
                 </select>
               </div>
 
@@ -1529,13 +1557,13 @@ const BabelLibrary = () => {
                   color: colors.text,
                   fontWeight: '500'
                 }}>
-                  Title *
+                  {t('babelLibraryModule.addForm.fieldTitle')}
                 </label>
                 <input
                   type="text"
                   value={newBook.title}
                   onChange={(e) => setNewBook({...newBook, title: e.target.value})}
-                  placeholder="Enter resource title..."
+                  placeholder={t('babelLibraryModule.addForm.placeholderTitle')}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -1556,13 +1584,13 @@ const BabelLibrary = () => {
                   color: colors.text,
                   fontWeight: '500'
                 }}>
-                  Author *
+                  {t('babelLibraryModule.addForm.fieldAuthor')}
                 </label>
                 <input
                   type="text"
                   value={newBook.author}
                   onChange={(e) => setNewBook({...newBook, author: e.target.value})}
-                  placeholder="Enter author name..."
+                  placeholder={t('babelLibraryModule.addForm.placeholderAuthor')}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -1583,13 +1611,13 @@ const BabelLibrary = () => {
                   color: colors.text,
                   fontWeight: '500'
                 }}>
-                  Topic *
+                  {t('babelLibraryModule.addForm.fieldTopic')}
                 </label>
                 <input
                   type="text"
                   value={newBook.topic}
                   onChange={(e) => setNewBook({...newBook, topic: e.target.value})}
-                  placeholder="Enter topic or category..."
+                  placeholder={t('babelLibraryModule.addForm.placeholderTopic')}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -1610,12 +1638,12 @@ const BabelLibrary = () => {
                   color: colors.text,
                   fontWeight: '500'
                 }}>
-                  Description
+                  {t('babelLibraryModule.addForm.fieldDescription')}
                 </label>
                 <textarea
                   value={newBook.description}
                   onChange={(e) => setNewBook({...newBook, description: e.target.value})}
-                  placeholder="Enter resource description..."
+                  placeholder={t('babelLibraryModule.addForm.placeholderDescription')}
                   rows={4}
                   style={{
                     width: '100%',
@@ -1638,13 +1666,13 @@ const BabelLibrary = () => {
                     color: colors.text,
                     fontWeight: '500'
                   }}>
-                    Video URL
+                    {t('babelLibraryModule.addForm.fieldVideoUrl')}
                   </label>
                   <input
                     type="text"
                     value={newBook.url}
                     onChange={(e) => setNewBook({ ...newBook, url: e.target.value })}
-                    placeholder="https://www.youtube.com/watch?v=..."
+                    placeholder={t('babelLibraryModule.addForm.placeholderVideoUrl')}
                     style={{
                       width: '100%',
                       padding: '12px 16px',
@@ -1672,7 +1700,7 @@ const BabelLibrary = () => {
                   width: '100%'
                 }}
               >
-                📚 Add to Library
+                {t('babelLibraryModule.addForm.submit')}
               </button>
             </form>
           </div>
@@ -1680,7 +1708,7 @@ const BabelLibrary = () => {
 
         {activeTab === 'search' && (
           <div>
-            <h2 style={{ color: colors.text, marginBottom: 24 }}>Advanced Search</h2>
+            <h2 style={{ color: colors.text, marginBottom: 24 }}>{t('babelLibraryModule.advancedSearch.title')}</h2>
             
             <div style={{
               background: colors.primaryLight,
@@ -1688,17 +1716,17 @@ const BabelLibrary = () => {
               borderRadius: 12,
               border: `1px solid ${colors.primary}`
             }}>
-              <h3 style={{ color: colors.primary, marginBottom: 16 }}>🔍 Search Features</h3>
+              <h3 style={{ color: colors.primary, marginBottom: 16 }}>{t('babelLibraryModule.advancedSearch.featuresTitle')}</h3>
               <ul style={{ 
                 color: colors.text, 
                 lineHeight: 1.6,
                 paddingLeft: '20px'
               }}>
-                <li><strong>Full-text search:</strong> Search across titles, authors, descriptions, and content</li>
-                <li><strong>Topic filtering:</strong> Filter by specific knowledge domains</li>
-                <li><strong>Type categorization:</strong> Books, videos, articles, courses, and more</li>
-                <li><strong>Date-based sorting:</strong> Find the most recent or historical resources</li>
-                <li><strong>Author tracking:</strong> Discover all works by specific authors</li>
+                <li>{t('babelLibraryModule.advancedSearch.li1')}</li>
+                <li>{t('babelLibraryModule.advancedSearch.li2')}</li>
+                <li>{t('babelLibraryModule.advancedSearch.li3')}</li>
+                <li>{t('babelLibraryModule.advancedSearch.li4')}</li>
+                <li>{t('babelLibraryModule.advancedSearch.li5')}</li>
               </ul>
               
               <div style={{ 
@@ -1713,8 +1741,7 @@ const BabelLibrary = () => {
                   fontSize: '0.9em',
                   margin: 0
                 }}>
-                  <strong>Future Enhancement:</strong> This search will integrate with AI-powered content analysis, 
-                  semantic search, and personalized recommendations based on your learning history.
+                  <strong>{t('babelLibraryModule.advancedSearch.futureTitle')}</strong> {t('babelLibraryModule.advancedSearch.futureBody')}
                 </p>
               </div>
             </div>
@@ -1723,7 +1750,7 @@ const BabelLibrary = () => {
 
         {activeTab === 'ai-search' && (
           <div>
-            <h2 style={{ color: colors.text, marginBottom: 24 }}>🤖 AI-Powered Search & Intelligence</h2>
+            <h2 style={{ color: colors.text, marginBottom: 24 }}>{t('babelLibraryModule.aiSearch.title')}</h2>
             
             <div style={{
               background: colors.primaryLight,
@@ -1731,87 +1758,86 @@ const BabelLibrary = () => {
               borderRadius: 12,
               border: `1px solid ${colors.primary}`
             }}>
-              <h3 style={{ color: colors.primary, marginBottom: 16 }}>🚀 Future AI Capabilities</h3>
+              <h3 style={{ color: colors.primary, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.futureCaps')}</h3>
               
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>🧠 Intelligent Content Analysis</h4>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.intelAnalysis')}</h4>
                 <ul style={{ 
                   color: colors.text, 
                   lineHeight: 1.6,
                   paddingLeft: '20px',
                   marginBottom: 16
                 }}>
-                  <li><strong>Automatic Classification:</strong> AI categorizes resources by topic, difficulty, and audience</li>
-                  <li><strong>Concept Extraction:</strong> Identifies key concepts and creates dynamic taxonomies</li>
-                  <li><strong>Duplicate Detection:</strong> Finds similar content and suggests consolidation</li>
-                  <li><strong>Quality Assessment:</strong> Analyzes content quality based on multiple criteria</li>
+                  <li>{t('babelLibraryModule.aiSearch.ia1')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.ia2')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.ia3')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.ia4')}</li>
                 </ul>
               </div>
 
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>🔍 Semantic Search & Discovery</h4>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.semantic')}</h4>
                 <ul style={{ 
                   color: colors.text, 
                   lineHeight: 1.6,
                   paddingLeft: '20px',
                   marginBottom: 16
                 }}>
-                  <li><strong>Meaning-Based Search:</strong> Find content by concept, not just keywords</li>
-                  <li><strong>Intelligent Recommendations:</strong> AI suggests related resources based on patterns</li>
-                  <li><strong>Multimodal Search:</strong> Search across text, images, and audio content</li>
-                  <li><strong>Learning Context:</strong> Understands your learning journey for better suggestions</li>
+                  <li>{t('babelLibraryModule.aiSearch.s1')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.s2')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.s3')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.s4')}</li>
                 </ul>
               </div>
 
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>📊 Personalization & Adaptation</h4>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.personal')}</h4>
                 <ul style={{ 
                   color: colors.text, 
                   lineHeight: 1.6,
                   paddingLeft: '20px',
                   marginBottom: 16
                 }}>
-                  <li><strong>Smart User Profiles:</strong> AI learns from your reading and learning behavior</li>
-                  <li><strong>Adaptive Learning Paths:</strong> Personalized routes that evolve with your progress</li>
-                  <li><strong>Contextual Recommendations:</strong> Suggests resources based on time, mood, and context</li>
-                  <li><strong>Content Adaptation:</strong> Adjusts content complexity to your experience level</li>
+                  <li>{t('babelLibraryModule.aiSearch.p1')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.p2')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.p3')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.p4')}</li>
                 </ul>
               </div>
 
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>⚡ AI-Generated Content</h4>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.generated')}</h4>
                 <ul style={{ 
                   color: colors.text, 
                   lineHeight: 1.6,
                   paddingLeft: '20px',
                   marginBottom: 16
                 }}>
-                  <li><strong>Automatic Summaries:</strong> AI creates executive summaries of long resources</li>
-                  <li><strong>Comprehension Questions:</strong> Generated questions to test understanding</li>
-                  <li><strong>Multi-language Translation:</strong> Instant translation to multiple languages</li>
-                  <li><strong>Content Simplification:</strong> Creates versions for different audience levels</li>
+                  <li>{t('babelLibraryModule.aiSearch.g1')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.g2')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.g3')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.g4')}</li>
                 </ul>
               </div>
 
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>🔮 Predictive Intelligence</h4>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.predictive')}</h4>
                 <ul style={{ 
                   color: colors.text, 
                   lineHeight: 1.6,
                   paddingLeft: '20px',
                   marginBottom: 16
                 }}>
-                  <li><strong>Emerging Trends:</strong> Identifies new topics and learning demands</li>
-                  <li><strong>Demand Prediction:</strong> Forecasts which resources will be needed</li>
-                  <li><strong>Knowledge Gap Analysis:</strong> Finds areas where content is missing</li>
-                  <li><strong>Expert Identification:</strong> Discovers subject matter experts in your network</li>
+                  <li>{t('babelLibraryModule.aiSearch.pr1')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.pr2')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.pr3')}</li>
+                  <li>{t('babelLibraryModule.aiSearch.pr4')}</li>
                 </ul>
               </div>
             </div>
 
-            {/* Real-World Examples */}
             <div style={{ marginTop: 32 }}>
-              <h3 style={{ color: colors.text, marginBottom: 16 }}>🌐 Real-World Examples Today</h3>
+              <h3 style={{ color: colors.text, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.examplesTitle')}</h3>
               
               <div style={{ 
                 display: 'grid', 
@@ -1825,12 +1851,12 @@ const BabelLibrary = () => {
                   border: `1px solid ${colors.border}`,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>🔬 Academic Platforms</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exAcademic')}</h4>
                   <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li><strong>Google Scholar:</strong> AI-powered ranking and recommendations</li>
-                    <li><strong>Mendeley:</strong> Citation analysis and paper suggestions</li>
-                    <li><strong>Zotero:</strong> Automatic reference classification</li>
-                    <li><strong>arXiv:</strong> AI categorization of scientific papers</li>
+                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi1')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi2')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi3')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi4')}</li>
                   </ul>
                 </div>
 
@@ -1841,12 +1867,12 @@ const BabelLibrary = () => {
                   border: `1px solid ${colors.border}`,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>📚 Learning Management</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exLms')}</h4>
                   <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li><strong>Coursera:</strong> Personalized course recommendations</li>
-                    <li><strong>edX:</strong> AI-driven learning path optimization</li>
-                    <li><strong>Khan Academy:</strong> Adaptive content difficulty</li>
-                    <li><strong>Duolingo:</strong> AI-powered language learning</li>
+                    <li>{t('babelLibraryModule.aiSearch.exLmsLi1')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exLmsLi2')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exLmsLi3')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exLmsLi4')}</li>
                   </ul>
                 </div>
 
@@ -1857,20 +1883,19 @@ const BabelLibrary = () => {
                   border: `1px solid ${colors.border}`,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>🏢 Enterprise Solutions</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exEnterprise')}</h4>
                   <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li><strong>Microsoft Viva:</strong> AI-powered learning insights</li>
-                    <li><strong>LinkedIn Learning:</strong> Skill-based recommendations</li>
-                    <li><strong>Workday Learning:</strong> AI-driven career development</li>
-                    <li><strong>Degreed:</strong> Intelligent skill mapping</li>
+                    <li>{t('babelLibraryModule.aiSearch.exEntLi1')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exEntLi2')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exEntLi3')}</li>
+                    <li>{t('babelLibraryModule.aiSearch.exEntLi4')}</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            {/* Implementation Roadmap */}
             <div style={{ marginTop: 32 }}>
-              <h3 style={{ color: colors.text, marginBottom: 16 }}>🗺️ Implementation Roadmap</h3>
+              <h3 style={{ color: colors.text, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.roadmapTitle')}</h3>
               
               <div style={{
                 background: colors.background,
@@ -1880,36 +1905,35 @@ const BabelLibrary = () => {
                 color: colors.text
               }}>
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 1: Intelligent Analysis (Q3 2025)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase1Title')}</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    AI-powered content classification, automatic tagging, and basic semantic search capabilities.
+                    {t('babelLibraryModule.aiSearch.phase1Body')}
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 2: Smart Recommendations (Q4 2025)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase2Title')}</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    Personalized content suggestions, learning path optimization, and intelligent resource matching.
+                    {t('babelLibraryModule.aiSearch.phase2Body')}
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 3: AI Content Generation (Q1 2026)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase3Title')}</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    Automatic summaries, comprehension questions, and adaptive content creation.
+                    {t('babelLibraryModule.aiSearch.phase3Body')}
                   </p>
                 </div>
                 
                 <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>Phase 4: Predictive Intelligence (Q2 2026)</h4>
+                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase4Title')}</h4>
                   <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    Trend analysis, demand forecasting, and proactive knowledge gap identification.
+                    {t('babelLibraryModule.aiSearch.phase4Body')}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Vision Statement */}
             <div style={{ marginTop: 32 }}>
               <div style={{
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.primary}25)`,
@@ -1918,7 +1942,7 @@ const BabelLibrary = () => {
                 border: `2px solid ${colors.primary}30`,
                 textAlign: 'center'
               }}>
-                <h3 style={{ color: colors.primary, marginBottom: 16 }}>🎯 Our Vision</h3>
+                <h3 style={{ color: colors.primary, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.visionTitle')}</h3>
                 <p style={{ 
                   color: colors.text, 
                   fontSize: '1.1em', 
@@ -1926,9 +1950,7 @@ const BabelLibrary = () => {
                   fontStyle: 'italic',
                   margin: 0
                 }}>
-                  "Babel Library will be the first learning repository that doesn't just store knowledge, 
-                  but understands it, analyzes it, and adapts it dynamically to each user's unique learning journey. 
-                  We're building the future of intelligent knowledge management."
+                  {t('babelLibraryModule.aiSearch.visionQuote')}
                 </p>
               </div>
             </div>
