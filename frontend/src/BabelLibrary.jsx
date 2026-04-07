@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
-import { 
-  fetchSavedVideos, 
-  fetchCertifications, 
+import {
+  fetchSavedVideos,
+  fetchCertifications,
   fetchMicroLessons,
   fetchWebSearchResults,
   fetchSkillsForecasts,
@@ -11,7 +11,8 @@ import {
   fetchSimulationResults,
   fetchDocumentAnalyses,
   fetchRepositoryAnalyses,
-  fetchAgenticRAGAnalyses
+  fetchAgenticRAGAnalyses,
+  apiCall
 } from './api';
 
 const BabelLibrary = () => {
@@ -52,6 +53,8 @@ const BabelLibrary = () => {
   const [aiResults, setAiResults] = useState(null); // null = not searched, [] = no results
   const [aiSearching, setAiSearching] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
+  const [batchStatus, setBatchStatus] = useState(null); // null | {running, total, processed, failed, skipped}
+  const [intelStats, setIntelStats] = useState(null);
   const { t } = useTranslation();
 
   const typeLabel = (type) => t(`babelLibraryModule.types.${type}`, { defaultValue: type });
@@ -333,6 +336,15 @@ const BabelLibrary = () => {
         url: ''
       });
       setActiveTab('catalog');
+
+      // Fire-and-forget AI classification
+      apiCall('/api/babel/intelligence/classify', 'POST', {
+        title: book.title,
+        description: book.description || '',
+        resource_type: book.type,
+        resource_id: String(book.id),
+        source_collection: 'books_local'
+      }).catch(err => console.warn('AI classification skipped:', err.message));
     }
   };
 
@@ -922,48 +934,63 @@ const BabelLibrary = () => {
     } catch { return []; }
   };
 
-  // Main AI search function
-  const performAiSearch = (query) => {
+  // Client-side fallback search (original logic)
+  const clientSideSearch = (query) => {
+    const expandedKw = expandQuery(query);
+    const intent = detectIntent(query);
+
+    let scored = allResources.map(r => ({
+      ...r,
+      _score: scoreResource(r, expandedKw)
+    }));
+
+    if (intent.types.length > 0) {
+      scored = scored.map(r => ({
+        ...r,
+        _score: intent.types.includes(r.type) ? r._score + 20 : r._score
+      }));
+    }
+
+    if (intent.action === 'recent') {
+      scored.sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || ''));
+    } else {
+      scored.sort((a, b) => b._score - a._score);
+    }
+
+    const results = scored.filter(r => r._score > 0);
+    const insights = generateInsights(results, query, allResources);
+    insights.expandedKeywords = expandedKw;
+    insights.intent = intent;
+    insights.mode = 'client';
+
+    setAiResults(results);
+    setAiInsights(insights);
+    setAiSearching(false);
+    saveSearchHistory(query);
+  };
+
+  // Main AI search — tries server-side hybrid search, falls back to client-side
+  const performAiSearch = async (query) => {
     if (!query.trim()) return;
     setAiSearching(true);
 
-    // Simulate AI processing delay for UX
-    setTimeout(() => {
-      const expandedKw = expandQuery(query);
-      const intent = detectIntent(query);
-
-      let scored = allResources.map(r => ({
-        ...r,
-        _score: scoreResource(r, expandedKw)
-      }));
-
-      // Apply intent-based type filtering
-      if (intent.types.length > 0) {
-        scored = scored.map(r => ({
-          ...r,
-          _score: intent.types.includes(r.type) ? r._score + 20 : r._score
-        }));
+    try {
+      const response = await apiCall('/api/babel/intelligence/search', 'POST', {
+        query, limit: 30, mode: 'hybrid'
+      });
+      if (response?.results?.length > 0) {
+        setAiResults(response.results);
+        setAiInsights({ ...response.insights, mode: 'server-ai' });
+        setAiSearching(false);
+        saveSearchHistory(query);
+        return;
       }
+    } catch (err) {
+      console.warn('Server AI search unavailable, falling back to client-side:', err.message);
+    }
 
-      // Apply action-based sorting
-      if (intent.action === 'recent') {
-        scored.sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || ''));
-      } else {
-        scored.sort((a, b) => b._score - a._score);
-      }
-
-      // Filter out zero-score results
-      const results = scored.filter(r => r._score > 0);
-
-      const insights = generateInsights(results, query, allResources);
-      insights.expandedKeywords = expandedKw;
-      insights.intent = intent;
-
-      setAiResults(results);
-      setAiInsights(insights);
-      setAiSearching(false);
-      saveSearchHistory(query);
-    }, 600);
+    // Fallback to client-side
+    clientSideSearch(query);
   };
 
   return (
@@ -1338,17 +1365,44 @@ const BabelLibrary = () => {
                     justifyContent: 'space-between', 
                     alignItems: 'center' 
                   }}>
-                    <span style={{
-                      background: colors.primaryLight,
-                      color: colors.primary,
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      fontSize: '0.8em',
-                      fontWeight: '500'
-                    }}>
-                      🏷️ {resource.topic}
-                    </span>
-                    
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span style={{
+                        background: colors.primaryLight,
+                        color: colors.primary,
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '0.8em',
+                        fontWeight: '500'
+                      }}>
+                        🏷️ {resource.topic}
+                      </span>
+                      {resource.classification?.domain && (
+                        <span style={{
+                          background: '#e8eaf6', color: '#3f51b5',
+                          padding: '3px 8px', borderRadius: 12, fontSize: '0.75em', fontWeight: 500
+                        }}>
+                          📂 {resource.classification.domain}
+                        </span>
+                      )}
+                      {resource.classification?.difficulty && (
+                        <span style={{
+                          background: resource.classification.difficulty === 'beginner' ? '#e8f5e9' : resource.classification.difficulty === 'advanced' ? '#fce4ec' : '#fff8e1',
+                          color: resource.classification.difficulty === 'beginner' ? '#2e7d32' : resource.classification.difficulty === 'advanced' ? '#c62828' : '#f57f17',
+                          padding: '3px 8px', borderRadius: 12, fontSize: '0.75em', fontWeight: 500
+                        }}>
+                          {resource.classification.difficulty === 'beginner' ? '🟢' : resource.classification.difficulty === 'advanced' ? '🔴' : '🟡'} {t(`babelLibraryModule.intelligence.${resource.classification.difficulty}`)}
+                        </span>
+                      )}
+                      {resource.tags?.length > 0 && resource.tags.slice(0, 3).map(tag => (
+                        <span key={tag} style={{
+                          background: '#f3e5f5', color: '#7b1fa2',
+                          padding: '2px 7px', borderRadius: 10, fontSize: '0.7em'
+                        }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
                     <div style={{ display: 'flex', gap: 8 }}>
                       {/* Action buttons based on resource type */}
                                              {resource.author === 'Micro-lesson' && (
@@ -2536,6 +2590,30 @@ const BabelLibrary = () => {
                         <div style={{ fontSize: '0.85em', color: colors.textSecondary }}>
                           🏷️ {resource.topic}
                         </div>
+                        {/* AI classification badges */}
+                        {(resource.classification || resource.tags?.length > 0) && (
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            {resource.classification?.domain && (
+                              <span style={{ background: '#e8eaf6', color: '#3f51b5', padding: '2px 7px', borderRadius: 10, fontSize: '0.7em' }}>
+                                📂 {resource.classification.domain}
+                              </span>
+                            )}
+                            {resource.classification?.difficulty && (
+                              <span style={{
+                                background: resource.classification.difficulty === 'beginner' ? '#e8f5e9' : resource.classification.difficulty === 'advanced' ? '#fce4ec' : '#fff8e1',
+                                color: resource.classification.difficulty === 'beginner' ? '#2e7d32' : resource.classification.difficulty === 'advanced' ? '#c62828' : '#f57f17',
+                                padding: '2px 7px', borderRadius: 10, fontSize: '0.7em'
+                              }}>
+                                {resource.classification.difficulty === 'beginner' ? '🟢' : resource.classification.difficulty === 'advanced' ? '🔴' : '🟡'} {t(`babelLibraryModule.intelligence.${resource.classification.difficulty}`)}
+                              </span>
+                            )}
+                            {resource.tags?.slice(0, 4).map(tag => (
+                              <span key={tag} style={{ background: '#f3e5f5', color: '#7b1fa2', padding: '2px 6px', borderRadius: 10, fontSize: '0.65em' }}>
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <p style={{ fontSize: '0.9em', color: colors.text, margin: 0, lineHeight: 1.5 }}>
                           {resource.description}
                         </p>
@@ -2582,6 +2660,123 @@ const BabelLibrary = () => {
                 </div>
               </div>
             )}
+
+            {/* Batch Classification Admin Panel */}
+            <details style={{
+              background: `linear-gradient(135deg, ${colors.primary}05, ${colors.primary}12)`,
+              padding: '16px 20px',
+              borderRadius: 10,
+              border: `1px solid ${colors.primary}30`,
+              marginTop: 24,
+              cursor: 'pointer'
+            }}>
+              <summary style={{ color: colors.primary, fontWeight: 'bold', fontSize: '1em' }}>
+                🧠 {t('babelLibraryModule.intelligence.adminTitle')}
+              </summary>
+              <div style={{ marginTop: 16 }}>
+                <p style={{ color: colors.textSecondary, fontSize: '0.9em', marginBottom: 16 }}>
+                  {t('babelLibraryModule.intelligence.adminDesc')}
+                </p>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={async () => {
+                      try {
+                        setBatchStatus({ running: true, total: 0, processed: 0, failed: 0 });
+                        await apiCall('/api/babel/intelligence/batch', 'POST', { delay: 0.3 });
+                        // Poll for status
+                        const poll = setInterval(async () => {
+                          try {
+                            const status = await apiCall('/api/babel/intelligence/batch/status');
+                            setBatchStatus(status);
+                            if (!status.running) {
+                              clearInterval(poll);
+                              // Refresh stats
+                              const stats = await apiCall('/api/babel/intelligence/stats');
+                              setIntelStats(stats);
+                            }
+                          } catch { clearInterval(poll); }
+                        }, 2000);
+                      } catch (err) {
+                        console.error('Batch failed:', err);
+                        setBatchStatus(null);
+                      }
+                    }}
+                    disabled={batchStatus?.running}
+                    style={{
+                      padding: '10px 20px',
+                      background: batchStatus?.running ? '#ccc' : colors.primary,
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: batchStatus?.running ? 'not-allowed' : 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {batchStatus?.running ? `⏳ ${t('babelLibraryModule.intelligence.processing')}` : `🧠 ${t('babelLibraryModule.intelligence.classifyAll')}`}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const stats = await apiCall('/api/babel/intelligence/stats');
+                        setIntelStats(stats);
+                      } catch {}
+                    }}
+                    style={{
+                      padding: '10px 20px',
+                      background: 'transparent',
+                      color: colors.primary,
+                      border: `1px solid ${colors.primary}`,
+                      borderRadius: 8,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📊 {t('babelLibraryModule.intelligence.refreshStats')}
+                  </button>
+                </div>
+
+                {/* Progress bar */}
+                {batchStatus?.running && batchStatus.total > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ background: '#e0e0e0', borderRadius: 8, height: 8, overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${Math.round((batchStatus.processed + batchStatus.failed) / batchStatus.total * 100)}%`,
+                        background: colors.primary,
+                        height: '100%',
+                        borderRadius: 8,
+                        transition: 'width 0.3s'
+                      }} />
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: colors.textSecondary, marginTop: 4 }}>
+                      {batchStatus.processed + batchStatus.failed} / {batchStatus.total} — {t('babelLibraryModule.intelligence.processed')}: {batchStatus.processed}, {t('babelLibraryModule.intelligence.failed')}: {batchStatus.failed}
+                    </div>
+                  </div>
+                )}
+
+                {/* Batch complete */}
+                {batchStatus && !batchStatus.running && batchStatus.processed > 0 && (
+                  <div style={{ marginTop: 12, padding: 12, background: '#e8f5e9', borderRadius: 8, fontSize: '0.9em', color: '#2e7d32' }}>
+                    ✅ {t('babelLibraryModule.intelligence.batchComplete', { processed: batchStatus.processed, failed: batchStatus.failed })}
+                  </div>
+                )}
+
+                {/* Stats */}
+                {intelStats && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginTop: 16 }}>
+                    {[
+                      { label: t('babelLibraryModule.intelligence.totalIndexed'), value: intelStats.total_metadata, icon: '📚' },
+                      { label: t('babelLibraryModule.intelligence.llmClassified'), value: intelStats.llm_classified, icon: '🧠' },
+                      { label: t('babelLibraryModule.intelligence.embedded'), value: intelStats.embedded, icon: '🔢' },
+                      { label: t('babelLibraryModule.intelligence.pending'), value: intelStats.pending_classification, icon: '⏳' }
+                    ].map((s, i) => (
+                      <div key={i} style={{ textAlign: 'center', padding: 12, background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>
+                        <div style={{ fontSize: '1.3em', fontWeight: 'bold', color: colors.primary }}>{s.icon} {s.value}</div>
+                        <div style={{ fontSize: '0.75em', color: colors.textSecondary }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </details>
 
             {/* Collapsible reference sections — existing informational content */}
             <div style={{ marginTop: 32 }}>

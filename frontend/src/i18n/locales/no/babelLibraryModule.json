@@ -246,6 +246,23 @@
       "phase4Body": "Trendanalyse, etterspørsel og proaktive gap.",
       "visionTitle": "🎯 Vår visjon",
       "visionQuote": "Babel-biblioteket skal ikke bare lagre kunnskap, men forstå, analysere og tilpasse den til hver lærer. Vi bygger intelligent kunnskapsforvaltning."
+    },
+    "intelligence": {
+      "beginner": "Nybegynner",
+      "intermediate": "Middels",
+      "advanced": "Avansert",
+      "adminTitle": "KI-klassifisering og indeksering",
+      "adminDesc": "Klassifiser, merk og generer embeddings for alle bibliotekressurser med KI. Dette muliggjør semantisk søk og intelligente anbefalinger.",
+      "classifyAll": "Klassifiser alle ressurser",
+      "processing": "Behandler …",
+      "refreshStats": "Oppdater statistikk",
+      "processed": "Behandlet",
+      "failed": "Feilet",
+      "batchComplete": "Batch fullført: {{processed}} behandlet, {{failed}} feilet.",
+      "totalIndexed": "Totalt indeksert",
+      "llmClassified": "KI-klassifisert",
+      "embedded": "Embeddings",
+      "pending": "Ventende"
     }
   }
 }

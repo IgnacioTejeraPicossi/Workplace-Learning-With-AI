@@ -26,7 +26,13 @@
       "Bash(find '/c/Test/AI/AI Learning with AI/frontend/src' -type f -name *[Bb]abel* -o -name *[Ll]ibrary*)",
       "Bash(find '/c/Test/AI/AI Learning with AI/backend' -type f -name *[Bb]abel* -o -name *[Ll]ibrary*)",
       "Bash(xargs -I {} basename {})",
-      "Bash(node -e \"const en = require\\(''./frontend/src/i18n/locales/en/babelLibraryModule.json''\\); const no = require\\(''./frontend/src/i18n/locales/no/babelLibraryModule.json''\\); const enKeys = Object.keys\\(en.babelLibraryModule.aiSearch\\).sort\\(\\); const noKeys = Object.keys\\(no.babelLibraryModule.aiSearch\\).sort\\(\\); const missingInNo = enKeys.filter\\(k => !noKeys.includes\\(k\\)\\); const missingInEn = noKeys.filter\\(k => !enKeys.includes\\(k\\)\\); console.log\\(''EN keys:'', enKeys.length, ''| NO keys:'', noKeys.length\\); if \\(missingInNo.length\\) console.log\\(''Missing in NO:'', missingInNo\\); if \\(missingInEn.length\\) console.log\\(''Missing in EN:'', missingInEn\\); if \\(!missingInNo.length && !missingInEn.length\\) console.log\\(''✅ Perfect parity''\\);\")"
+      "Bash(node -e \"const en = require\\(''./frontend/src/i18n/locales/en/babelLibraryModule.json''\\); const no = require\\(''./frontend/src/i18n/locales/no/babelLibraryModule.json''\\); const enKeys = Object.keys\\(en.babelLibraryModule.aiSearch\\).sort\\(\\); const noKeys = Object.keys\\(no.babelLibraryModule.aiSearch\\).sort\\(\\); const missingInNo = enKeys.filter\\(k => !noKeys.includes\\(k\\)\\); const missingInEn = noKeys.filter\\(k => !enKeys.includes\\(k\\)\\); console.log\\(''EN keys:'', enKeys.length, ''| NO keys:'', noKeys.length\\); if \\(missingInNo.length\\) console.log\\(''Missing in NO:'', missingInNo\\); if \\(missingInEn.length\\) console.log\\(''Missing in EN:'', missingInEn\\); if \\(!missingInNo.length && !missingInEn.length\\) console.log\\(''✅ Perfect parity''\\);\")",
+      "Bash(find '/c/Test/AI/AI Learning with AI/backend' -type f -name *.py)",
+      "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI/backend' -type f -name *.js)",
+      "Bash(grep -l \"from.*llm import\\\\|import.*llm\\\\|ask_openai\\\\|ask_itemai\" /c/Test/AI/AI Learning with AI/backend/*.py)",
+      "Bash(grep -n \"ask_openai\\\\|ask_ai\\\\|llm\\\\|LLM\" clinic/*.py)",
+      "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(''Router imported OK, routes:'', [r.path for r in router.routes]\\)\")",
+      "Bash(python -c \"from backend.services.babel_intelligence import classify_and_tag, hybrid_search, process_all_resources, get_stats; print\\(''Service imported OK''\\)\")"
     ]
   }
 }

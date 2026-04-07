@@ -246,6 +246,23 @@
       "phase4Body": "Trend analysis, demand forecasting, proactive gap detection.",
       "visionTitle": "🎯 Our vision",
       "visionQuote": "Babel Library will be a learning repository that does not only store knowledge, but understands it, analyzes it, and adapts it to each learner. We are building intelligent knowledge management."
+    },
+    "intelligence": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "adminTitle": "AI Classification & Indexing",
+      "adminDesc": "Classify, tag, and embed all library resources using AI. This enables semantic search and intelligent recommendations.",
+      "classifyAll": "Classify all resources",
+      "processing": "Processing…",
+      "refreshStats": "Refresh stats",
+      "processed": "Processed",
+      "failed": "Failed",
+      "batchComplete": "Batch complete: {{processed}} processed, {{failed}} failed.",
+      "totalIndexed": "Total indexed",
+      "llmClassified": "LLM classified",
+      "embedded": "Embedded",
+      "pending": "Pending"
     }
   }
 }

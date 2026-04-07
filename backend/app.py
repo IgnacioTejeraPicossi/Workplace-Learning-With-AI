@@ -139,6 +139,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Embeddings router: {e}")
 
+# Babel Library Intelligence router
+try:
+    from backend.routers.babel_intelligence import router as babel_intelligence_router
+    app.include_router(babel_intelligence_router, tags=["Babel Intelligence"])
+    print("✅ Babel Intelligence router included successfully")
+except Exception as e:
+    print(f"❌ Error including Babel Intelligence router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router

@@ -50,3 +50,6 @@ prompts_collection = database.get_collection("prompts")
 # Security Telemetry Collections
 security_events_collection = database.get_collection("security_events")
 agent_security_status_collection = database.get_collection("agent_security_status")
+
+# Babel Library AI Metadata
+babel_ai_metadata_collection = database.get_collection("babel_ai_metadata")
