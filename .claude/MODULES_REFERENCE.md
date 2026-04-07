@@ -158,9 +158,45 @@ python -m pytest backend/tests/test_mcp_smoke.py -v  # 4/4
 | Telco | `telco_ops.py` (186L) | `telco-ops-agent/` | Telecom operations |
 | Productivity | `productivity_agent.py` (246L) | `AIProductivityAgent.jsx` | Productivity workflows |
 | Compliance | `compliance_agent.py` | `AIComplianceAgent.jsx` | Compliance checking |
+| Security Center | (frontend-only) | `security/` (7 components) | Platform security & privacy |
 | Cybersecurity | `cybersecurity.py` (1499L) | `cyber/` (11 components) | Full security platform |
 
 **Shared backend models**: `backend/models/` (13 files for each domain)
+
+---
+
+### Security Center (detailed)
+
+The Security Center is the platform-level security and privacy module. Fully frontend-only (no backend endpoints).
+
+**Frontend**: `frontend/src/security/` (7 components)
+**Utilities**: `frontend/src/utils/` (4 shared modules)
+**i18n**: 279 keys in full EN/NO parity
+
+**6 Sub-modules (all implemented):**
+
+| Sub-module | Component | Description |
+|------------|-----------|-------------|
+| Local Installation | `LocalInstallation.jsx` | AES-GCM 256 encryption toggle for localStorage |
+| Automatic Data Deletion | `AutomaticDataDeletion.jsx` | Retention policies, auto-purge, audit trail |
+| Your Data | `YourData.jsx` | Profile, export (JSON/CSV), stats, account deletion |
+| Data Anonymization | `DataAnonymization.jsx` | PII masking (8 regex rules), live preview |
+| Security Information | `SecurityInformation.jsx` | Dynamic score (0-100, A-F), 7 checks, compliance mapping |
+| Real-time Monitoring | `RealTimeMonitoring.jsx` | Live event log, KPIs, filters, auto-refresh |
+
+**Shared Utilities:**
+
+| Utility | File | Purpose |
+|---------|------|---------|
+| Event Log | `securityEventLog.js` | Circular buffer (200 max), used by all sub-modules |
+| Data Retention | `dataRetention.js` | localStorage scanner, purge engine, category detection |
+| Anonymizer | `anonymizer.js` | PII detection/masking (email, phone, CC, IP, API key, SSN, fødselsnummer, URL) |
+| Security Score | `securityScore.js` | Reads state from all modules, computes weighted score |
+
+**Critical constraints:**
+- All data in localStorage (no backend persistence)
+- Encryption passphrase not stored (re-activation per session)
+- No contract tests yet (validation: frontend build + visual inspection)
 
 ---
 

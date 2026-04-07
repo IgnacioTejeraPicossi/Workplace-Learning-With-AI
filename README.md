@@ -30,6 +30,7 @@
 | **AI & Agents** | AgentOps Studio, Repository Analyzer, Document Analyzer, Agentic RAG, AI Study Buddy |
 | **Workplace Learning** | AI concepts, micro-lessons, recommendations, scenario simulator, certifications |
 | **Enterprise & Operations** | EA Dashboard, Process Designer, Catalog Manager, Heatmap View, Impact Analysis |
+| **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, AI experimentation |
 

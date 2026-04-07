@@ -80,6 +80,22 @@ Backend endpoints:
 Purpose:
 - architectural-aware README generation + learning module creation.
 
+### Security Center (Platform Security & Privacy)
+Frontend: `frontend/src/security/` (7 components)
+Utilities: `frontend/src/utils/securityEventLog.js`, `dataRetention.js`, `anonymizer.js`, `securityScore.js`
+Backend: none (frontend-only, localStorage-based)
+i18n: 279 keys in EN/NO parity
+
+6 sub-modules — all implemented:
+- Local Installation Security — AES-GCM 256 encryption at rest (PBKDF2, 150k iterations)
+- Automatic Data Deletion — per-category retention policies, auto-purge engine, audit trail
+- Your Data — profile, data export (JSON/CSV), usage stats, account deletion
+- Data Anonymization — PII masking engine (8 regex rules: email, phone, CC, IP, API key, SSN, fødselsnummer, URL)
+- Security Information — dynamic security score (0-100, A-F), 7 weighted checks, GDPR/CCPA/SOC 2 compliance mapping
+- Real-time Monitoring — live event log (circular buffer, 200 max), KPI dashboard, filters, auto-refresh
+
+Cross-module: all sub-modules log events to shared securityEventLog; securityScore reads state from all modules.
+
 ### Cybersecurity Module
 Backend router: `backend/routers/cybersecurity.py` (1499 lines)
 Agent security: `backend/routers/agent_security.py` (785 lines)

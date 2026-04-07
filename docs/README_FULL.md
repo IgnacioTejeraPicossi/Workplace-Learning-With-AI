@@ -5954,24 +5954,48 @@ Registered in Agent Catalog with:
 
 ---
 
-## 🔐 Security Center (Local Installation)
+## 🔐 Security Center
 
-### Implementado
-- **Encryption at rest (localStorage)**: Añadimos un cifrado opcional para datos locales almacenados en `localStorage`.
-  - UI: Panel `Security Center → Local Installation` con botón `Activate`/`Disable`.
-  - Técnica: AES‑GCM 256 con clave derivada PBKDF2 (SHA‑256, 150k), salt persistido en `localStorage`.
-  - Transparente: parchea `localStorage.setItem/getItem` y guarda valores con prefijo `enc:`.
-  - La passphrase no se persiste; debe activarse por sesión (mejor para entornos compartidos).
-- **Local authentication**: La app ya exige autenticación local (Firebase/credenciales) al iniciar sesión.
+The Security Center is the platform-level security and privacy module. It provides 6 fully implemented sub-modules covering encryption, data lifecycle, privacy controls, and real-time monitoring.
 
-### Limitaciones actuales
-- Cifra solo `localStorage` (no `IndexedDB` ni archivos subidos).
-- No se guarda la clave ni passphrase (re‑activación por sesión).
+**Frontend**: `frontend/src/security/` (7 components + 4 shared utilities)
+**i18n**: 279 keys in full EN/NO parity
 
-### Siguientes pasos sugeridos
-- Extender cifrado a `IndexedDB`/cachés de documentos.
-- Flag de entorno para “must‑encrypt” en producción.
-- Auditoría de uso de almacenamiento y limpieza automática.
+### 6 Sub-modules (all implemented)
+
+| Sub-module | Component | Description |
+|------------|-----------|-------------|
+| Local Installation Security | `LocalInstallation.jsx` | AES-GCM 256 encryption at rest for localStorage (PBKDF2, 150k iterations). Toggle on/off with passphrase prompt |
+| Automatic Data Deletion | `AutomaticDataDeletion.jsx` | Storage usage monitoring, per-category retention policies (activity/temp/cache/session), auto-purge engine with audit trail |
+| Your Data | `YourData.jsx` | User profile management, full data export (JSON/CSV), usage statistics, account deletion with confirmation flow |
+| Data Anonymization | `DataAnonymization.jsx` | PII detection and masking engine — 8 regex rules (email, phone, credit card, IP, API key, SSN, Norwegian fødselsnummer, URL). Live preview with sample text |
+| Security Information | `SecurityInformation.jsx` | Dynamic security score (0-100, grades A-F) computed from 7 weighted checks. Compliance coverage mapping to GDPR, CCPA, SOC 2 |
+| Real-time Monitoring | `RealTimeMonitoring.jsx` | Live event log fed by all other sub-modules. KPI dashboard, filters by type/severity/time, auto-refresh, event type summary |
+
+### Shared Utilities
+
+| Utility | Purpose |
+|---------|---------|
+| `utils/securityEventLog.js` | Circular buffer event log (max 200 events) in localStorage. Used by all sub-modules |
+| `utils/dataRetention.js` | localStorage scanner and purge engine with category detection and retention policies |
+| `utils/anonymizer.js` | PII detection/masking engine with 8 configurable regex rules |
+| `utils/securityScore.js` | Dynamic score calculator reading state from encryption, anonymization, auto-purge, HTTPS, retention, activity, and profile modules |
+
+### Technical Details
+- **All frontend-only** — no backend endpoints. Uses localStorage for persistence
+- **Encryption**: AES-GCM 256, PBKDF2 key derivation (SHA-256, 150k iterations), salt in localStorage, passphrase not stored
+- **Event log**: All security actions (encryption toggle, purge, export, anonymization, account deletion, policy changes) are logged and visible in Real-time Monitoring
+- **Cross-module integration**: Security Score reads state from all other sub-modules to compute a unified score
+
+### Limitations
+- Encrypts only localStorage (not IndexedDB or uploaded files)
+- Passphrase requires re-activation per session
+- PII detection is regex-based (no ML/NLP)
+
+### Suggested Next Steps
+- Extend encryption to IndexedDB/document caches
+- Environment flag for “must-encrypt” in production
+- Backend-backed event persistence for audit compliance
 
 ## 🔒 Cybersecurity Module
 ## 🧩 MCP (Model Context Protocol) - Interoperability
@@ -6564,12 +6588,14 @@ There is no duplication between the two modules. They address different layers o
 
 **Focuses on how this application and its deployment protect user data and access.**
 
-- **Installation & Hardening**: Encryption at rest, local hardening, firewall, automatic updates/patches
-- **Identity & Access (RBAC/SSO)**: Who can sign in and what they can do
-- **Data & Privacy**: Retention/automatic deletion, anonymization, user data visibility/export
-- **Secrets & Keys**: Token/key storage and rotation practices
-- **Auditability & Evidence**: Platform security logs and configuration evidence
-- **Policies (Toggles)**: E.g., enforce MFA, require TLS, retention windows, etc.
+6 fully implemented sub-modules (`frontend/src/security/`, 279 i18n keys EN/NO):
+
+- **Local Installation Security**: AES-GCM 256 encryption at rest for localStorage, local hardening checklist
+- **Automatic Data Deletion**: Per-category retention policies, auto-purge engine with audit trail
+- **Your Data**: User profile, full data export (JSON/CSV), usage statistics, account deletion
+- **Data Anonymization**: PII detection and masking (8 regex rules), live preview
+- **Security Information**: Dynamic security score (0-100, A-F), 7 weighted checks, GDPR/CCPA/SOC 2 compliance mapping
+- **Real-time Monitoring**: Live event log fed by all sub-modules, KPI dashboard, filters, auto-refresh
 
 **Think of Security as**: *"Settings + Privacy + Hardening of the platform itself."*
 

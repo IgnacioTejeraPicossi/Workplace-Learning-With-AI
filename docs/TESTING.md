@@ -107,6 +107,7 @@ curl http://localhost:8000/api/j-messages/list
 | Backend | Starts without error | `python -m uvicorn backend.app:app` |
 | Robomind | 27/27 contract tests | `python -m pytest backend/tests/test_robomind_api_contracts.py -v` |
 | MCP | 4/4 smoke tests | `python -m pytest backend/tests/test_mcp_smoke.py -v` |
+| Security Center | Frontend build + i18n parity | `cd frontend && npx react-scripts build` |
 | Cybersecurity | Health endpoint | `curl http://localhost:8000/api/cyber/health` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
