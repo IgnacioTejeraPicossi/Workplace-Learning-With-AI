@@ -18,42 +18,42 @@ const SecurityCenter = () => {
     {
       key: 'local-installation',
       label: t('security.localInstallation.label'),
-      icon: '\uD83C\uDFE0',
+      icon: '🏠',
       description: t('security.localInstallation.sidebarDesc'),
       status: isEncryptionActive() ? 'active' : 'warning'
     },
     {
       key: 'automatic-data-deletion',
       label: t('security.dataDeletion.label'),
-      icon: '\uD83D\uDDD1\uFE0F',
+      icon: '🗑️',
       description: t('security.dataDeletion.sidebarDesc'),
       status: 'enabled'
     },
     {
       key: 'your-data',
       label: t('security.yourData.label'),
-      icon: '\uD83D\uDCCA',
+      icon: '📊',
       description: t('security.yourData.sidebarDesc'),
       status: 'protected'
     },
     {
       key: 'data-anonymization',
       label: t('security.anonymization.label'),
-      icon: '\uD83D\uDD75\uFE0F',
+      icon: '🕵️',
       description: t('security.anonymization.sidebarDesc'),
       status: 'enabled'
     },
     {
       key: 'security-information',
       label: t('security.securityInfo.label'),
-      icon: '\uD83D\uDD12',
+      icon: '🔒',
       description: t('security.securityInfo.sidebarDesc'),
       status: 'up-to-date'
     },
     {
       key: 'real-time-monitoring',
       label: t('security.realTime.label'),
-      icon: '\u26A1',
+      icon: '⚡',
       description: t('security.realTime.sidebarDesc'),
       status: 'monitoring'
     }

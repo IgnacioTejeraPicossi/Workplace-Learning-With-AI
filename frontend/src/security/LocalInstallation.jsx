@@ -38,8 +38,8 @@ const LocalInstallation = () => {
           <h4 style={{ margin: 0 }}>
             {t('security.localInstallation.statusLabel')}{' '}
             {encryptionOn
-              ? `\u2705 ${t('security.localInstallation.statusActive')}`
-              : `\u26A0\uFE0F ${t('security.localInstallation.statusInactive')}`}
+              ? `✅ ${t('security.localInstallation.statusActive')}`
+              : `⚠️ ${t('security.localInstallation.statusInactive')}`}
           </h4>
           <div>
             {encryptionOn ? (
@@ -64,21 +64,21 @@ const LocalInstallation = () => {
         </p>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <li style={{ padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
-            \uD83D\uDD10 <strong>{t('security.localInstallation.encryption')}:</strong>{' '}
+            🔐 <strong>{t('security.localInstallation.encryption')}:</strong>{' '}
             {encryptionOn
               ? t('security.localInstallation.encryptionActive')
               : t('security.localInstallation.encryptionDisabled')}
           </li>
           <li style={{ padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
-            \uD83D\uDEAA <strong>{t('security.localInstallation.accessControl')}:</strong>{' '}
+            🚪 <strong>{t('security.localInstallation.accessControl')}:</strong>{' '}
             {t('security.localInstallation.accessControlDesc')}
           </li>
           <li style={{ padding: '8px 0', borderBottom: `1px solid ${colors.border}` }}>
-            \uD83D\uDEE1\uFE0F <strong>{t('security.localInstallation.firewall')}:</strong>{' '}
+            🛡️ <strong>{t('security.localInstallation.firewall')}:</strong>{' '}
             {t('security.localInstallation.firewallDesc')}
           </li>
           <li style={{ padding: '8px 0' }}>
-            \uD83D\uDD12 <strong>{t('security.localInstallation.updates')}:</strong>{' '}
+            🔒 <strong>{t('security.localInstallation.updates')}:</strong>{' '}
             {t('security.localInstallation.updatesDesc')}
           </li>
         </ul>
