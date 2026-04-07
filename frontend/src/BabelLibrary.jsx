@@ -203,56 +203,77 @@ const BabelLibrary = () => {
     }
   };
 
-  // Demo data for the prototype
+  // Load demo/user books from localStorage (persisted across refreshes)
   useEffect(() => {
-    const demoBooks = [
-      {
-        id: 1,
-        title: "The Art of Artificial Intelligence",
-        author: "Dr. Sarah Chen",
-        topic: "AI & Machine Learning",
-        description: "Comprehensive guide to modern AI techniques and applications",
-        type: "book",
-        addedDate: "2024-01-15"
-      },
-      {
-        id: 2,
-        title: "Digital Transformation Strategies",
-        author: "Prof. Michael Rodriguez",
-        topic: "Business Strategy",
-        description: "How organizations can successfully navigate digital transformation",
-        type: "book",
-        addedDate: "2024-01-10"
-      },
-      {
-        id: 3,
-        title: "Future of Work: AI Integration",
-        author: "Dr. Emily Watson",
-        topic: "Workplace Innovation",
-        description: "Exploring how AI will reshape the modern workplace",
-        type: "book",
-        addedDate: "2024-01-05"
-      },
-      {
-        id: 4,
-        title: "Machine Learning Fundamentals",
-        author: "Prof. David Kim",
-        topic: "AI & Machine Learning",
-        description: "Core concepts and practical applications of ML",
-        type: "video",
-        addedDate: "2024-01-20"
-      },
-      {
-        id: 5,
-        title: "Leadership in the Digital Age",
-        author: "Dr. Lisa Thompson",
-        topic: "Leadership",
-        description: "Essential leadership skills for the technology-driven era",
-        type: "article",
-        addedDate: "2024-01-12"
+    const BOOKS_KEY = 'wlwai_babel_library_books';
+    const stored = localStorage.getItem(BOOKS_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setBooks(parsed);
+        } else {
+          // Empty array — seed with demo data
+          seedDemoBooks(BOOKS_KEY);
+        }
+      } catch {
+        seedDemoBooks(BOOKS_KEY);
       }
-    ];
-    setBooks(demoBooks);
+    } else {
+      seedDemoBooks(BOOKS_KEY);
+    }
+
+    function seedDemoBooks(key) {
+      const demoBooks = [
+        {
+          id: 1,
+          title: "The Art of Artificial Intelligence",
+          author: "Dr. Sarah Chen",
+          topic: "AI & Machine Learning",
+          description: "Comprehensive guide to modern AI techniques and applications",
+          type: "book",
+          addedDate: "2024-01-15"
+        },
+        {
+          id: 2,
+          title: "Digital Transformation Strategies",
+          author: "Prof. Michael Rodriguez",
+          topic: "Business Strategy",
+          description: "How organizations can successfully navigate digital transformation",
+          type: "book",
+          addedDate: "2024-01-10"
+        },
+        {
+          id: 3,
+          title: "Future of Work: AI Integration",
+          author: "Dr. Emily Watson",
+          topic: "Workplace Innovation",
+          description: "Exploring how AI will reshape the modern workplace",
+          type: "book",
+          addedDate: "2024-01-05"
+        },
+        {
+          id: 4,
+          title: "Machine Learning Fundamentals",
+          author: "Prof. David Kim",
+          topic: "AI & Machine Learning",
+          description: "Core concepts and practical applications of ML",
+          type: "video",
+          addedDate: "2024-01-20"
+        },
+        {
+          id: 5,
+          title: "Leadership in the Digital Age",
+          author: "Dr. Lisa Thompson",
+          topic: "Leadership",
+          description: "Essential leadership skills for the technology-driven era",
+          type: "article",
+          addedDate: "2024-01-12"
+        }
+      ];
+      setBooks(demoBooks);
+      localStorage.setItem(key, JSON.stringify(demoBooks));
+    }
     
     // Load videos from MongoDB
     loadVideos();
@@ -274,6 +295,12 @@ const BabelLibrary = () => {
     loadAgenticRAGAnalyses();
   }, []);
 
+  const BOOKS_KEY = 'wlwai_babel_library_books';
+
+  const persistBooks = (updatedBooks) => {
+    try { localStorage.setItem(BOOKS_KEY, JSON.stringify(updatedBooks)); } catch {}
+  };
+
   const handleAddBook = (e) => {
     e.preventDefault();
     if (newBook.title && newBook.author && newBook.topic) {
@@ -282,7 +309,9 @@ const BabelLibrary = () => {
         ...newBook,
         addedDate: new Date().toISOString().split('T')[0]
       };
-      setBooks([book, ...books]);
+      const updated = [book, ...books];
+      setBooks(updated);
+      persistBooks(updated);
       setNewBook({
         title: '',
         author: '',
@@ -291,11 +320,14 @@ const BabelLibrary = () => {
         type: 'book',
         url: ''
       });
+      setActiveTab('catalog');
     }
   };
 
   const handleDeleteBook = (id) => {
-    setBooks(books.filter(book => book.id !== id));
+    const updated = books.filter(book => book.id !== id);
+    setBooks(updated);
+    persistBooks(updated);
   };
 
   // Delete functions for different resource types
@@ -511,7 +543,7 @@ const BabelLibrary = () => {
       }
     }));
     
-    alert(`Redirecting to Video Lessons module saved videos list to edit: "${title}"`);
+    alert(t('babelLibraryModule.redirect.video', { title }));
   };
 
   const handleEditSimulation = (id, title) => {
@@ -829,6 +861,26 @@ const BabelLibrary = () => {
                 {topics.map(topic => (
                   <option key={topic} value={topic}>
                     {topic === 'all' ? t('babelLibraryModule.catalog.allTopics') : topic}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                style={{
+                  padding: '12px 16px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 8,
+                  fontSize: '1em',
+                  background: colors.background,
+                  color: colors.text,
+                  minWidth: 180
+                }}
+              >
+                <option value="all">{t('babelLibraryModule.catalog.allTypes')}</option>
+                {['book', 'video', 'article', 'course', 'simulation', 'analysis'].map(type => (
+                  <option key={type} value={type}>
+                    {getTypeIcon(type)} {typeLabel(type)}
                   </option>
                 ))}
               </select>
@@ -1326,7 +1378,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete career coach session"
+                           title={t('babelLibraryModule.deleteTitle.careerCoach')}
                          >
                            🗑️
                          </button>
@@ -1368,7 +1420,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete simulation"
+                           title={t('babelLibraryModule.deleteTitle.simulation')}
                          >
                            🗑️
                          </button>
@@ -1404,7 +1456,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete web search result"
+                           title={t('babelLibraryModule.deleteTitle.webSearch')}
                          >
                            🗑️
                          </button>
@@ -1440,7 +1492,7 @@ const BabelLibrary = () => {
                              cursor: 'pointer',
                              fontSize: '0.8em'
                            }}
-                           title="Delete repository analysis"
+                           title={t('babelLibraryModule.deleteTitle.repository')}
                          >
                            🗑️
                          </button>

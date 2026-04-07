@@ -14,6 +14,7 @@
       "loading": "Loading resources… ⏳",
       "searchPlaceholder": "Search by title, author, or description…",
       "allTopics": "All topics",
+      "allTypes": "All types",
       "activeFilters": "Active filters:",
       "clearAll": "✕ Clear all",
       "stats": {
