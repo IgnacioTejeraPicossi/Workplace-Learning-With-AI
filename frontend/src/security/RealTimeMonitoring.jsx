@@ -168,10 +168,10 @@ const RealTimeMonitoring = () => {
               fontSize: '13px'
             }}
           >
-            <option value={5}>5s</option>
-            <option value={10}>10s</option>
-            <option value={30}>30s</option>
-            <option value={60}>60s</option>
+            <option value={5}>{t('security.realTime.refreshIntervals.5')}</option>
+            <option value={10}>{t('security.realTime.refreshIntervals.10')}</option>
+            <option value={30}>{t('security.realTime.refreshIntervals.30')}</option>
+            <option value={60}>{t('security.realTime.refreshIntervals.60')}</option>
           </select>
         )}
 

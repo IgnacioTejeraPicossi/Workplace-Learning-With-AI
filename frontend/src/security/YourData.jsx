@@ -104,7 +104,7 @@ const YourData = () => {
       extension = 'json';
     } else {
       // CSV: key, value (truncated)
-      const rows = [['Key', 'Value', 'Type']];
+      const rows = [[t('security.yourData.csvHeaders.key'), t('security.yourData.csvHeaders.value'), t('security.yourData.csvHeaders.type')]];
       for (const [key, value] of Object.entries(allData.data)) {
         const type = typeof value;
         const display = type === 'object' ? JSON.stringify(value).slice(0, 200) : String(value).slice(0, 200);
@@ -482,7 +482,7 @@ const YourData = () => {
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              placeholder="DELETE"
+              placeholder={t('security.yourData.deletePlaceholder')}
               style={{
                 width: '100%',
                 padding: '10px',

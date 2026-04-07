@@ -535,7 +535,13 @@
       "deleteConfirmMsg": "This action is permanent and cannot be undone. All your local data will be erased.",
       "deleteConfirmType": "Type DELETE to confirm:",
       "deleteCancel": "Cancel",
-      "deleteForever": "Delete Everything"
+      "deleteForever": "Delete Everything",
+      "deletePlaceholder": "DELETE",
+      "csvHeaders": {
+        "key": "Key",
+        "value": "Value",
+        "type": "Type"
+      }
     },
     "anonymization": {
       "label": "Data Anonymization",
@@ -615,6 +621,7 @@
         "F": "Critical"
       },
       "checksPassed": "checks passed",
+      "scoreMax": "/100",
       "refresh": "Refresh Score",
       "checklistTitle": "Security Checklist",
       "checks": {
@@ -708,6 +715,12 @@
       "statusLive": "Live",
       "statusPaused": "Paused",
       "autoRefresh": "Auto-refresh",
+      "refreshIntervals": {
+        "5": "5 sec",
+        "10": "10 sec",
+        "30": "30 sec",
+        "60": "60 sec"
+      },
       "refresh": "Refresh",
       "clearLogs": "Clear Logs",
       "eventLog": "Event Log",

@@ -71,7 +71,7 @@ const SecurityInformation = () => {
             <div style={{ fontSize: '36px', fontWeight: 'bold', color: scoreColor, lineHeight: 1 }}>
               {scoreData.score}
             </div>
-            <div style={{ fontSize: '14px', color: colors.textSecondary }}>/100</div>
+            <div style={{ fontSize: '14px', color: colors.textSecondary }}>{t('security.securityInfo.scoreMax')}</div>
           </div>
         </div>
 

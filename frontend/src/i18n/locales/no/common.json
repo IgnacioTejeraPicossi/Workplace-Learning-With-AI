@@ -713,7 +713,13 @@
       "deleteConfirmMsg": "Denne handlingen er permanent og kan ikke angres. Alle lokale data blir slettet.",
       "deleteConfirmType": "Skriv DELETE for å bekrefte:",
       "deleteCancel": "Avbryt",
-      "deleteForever": "Slett alt"
+      "deleteForever": "Slett alt",
+      "deletePlaceholder": "DELETE",
+      "csvHeaders": {
+        "key": "Nøkkel",
+        "value": "Verdi",
+        "type": "Type"
+      }
     },
     "anonymization": {
       "label": "Dataanonymisering",
@@ -793,6 +799,7 @@
         "F": "Kritisk"
       },
       "checksPassed": "kontroller bestått",
+      "scoreMax": "/100",
       "refresh": "Oppdater poeng",
       "checklistTitle": "Sikkerhetssjekkliste",
       "checks": {
@@ -886,6 +893,12 @@
       "statusLive": "Aktiv",
       "statusPaused": "Pauset",
       "autoRefresh": "Auto-oppdatering",
+      "refreshIntervals": {
+        "5": "5 sek",
+        "10": "10 sek",
+        "30": "30 sek",
+        "60": "60 sek"
+      },
       "refresh": "Oppdater",
       "clearLogs": "Tøm logger",
       "eventLog": "Hendelseslogg",
