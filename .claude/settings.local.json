@@ -24,7 +24,9 @@
       "Bash(grep -n \"Robomind Clinic\\\\|Detectable Disorders\\\\|Case Intake\\\\|Sample Cases\\\\|Test Case\\\\|Diagnosis Report\\\\|No Pathologies\\\\|Available Therapy\\\\|Enhanced Robomind\\\\|Machine Psychology\\\\|Psychopathia Machinalis\\\\|Screening Results\\\\|Axis Scores\\\\|Top Flags\\\\|Therapeutic Interventions\" \"/c/Test/AI/AI Learning with AI/frontend/src/RobomindClinic/\"*.jsx)",
       "Bash(xargs grep:*)",
       "Bash(find '/c/Test/AI/AI Learning with AI/frontend/src' -type f -name *[Bb]abel* -o -name *[Ll]ibrary*)",
-      "Bash(find '/c/Test/AI/AI Learning with AI/backend' -type f -name *[Bb]abel* -o -name *[Ll]ibrary*)"
+      "Bash(find '/c/Test/AI/AI Learning with AI/backend' -type f -name *[Bb]abel* -o -name *[Ll]ibrary*)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(node -e \"const en = require\\(''./frontend/src/i18n/locales/en/babelLibraryModule.json''\\); const no = require\\(''./frontend/src/i18n/locales/no/babelLibraryModule.json''\\); const enKeys = Object.keys\\(en.babelLibraryModule.aiSearch\\).sort\\(\\); const noKeys = Object.keys\\(no.babelLibraryModule.aiSearch\\).sort\\(\\); const missingInNo = enKeys.filter\\(k => !noKeys.includes\\(k\\)\\); const missingInEn = noKeys.filter\\(k => !enKeys.includes\\(k\\)\\); console.log\\(''EN keys:'', enKeys.length, ''| NO keys:'', noKeys.length\\); if \\(missingInNo.length\\) console.log\\(''Missing in NO:'', missingInNo\\); if \\(missingInEn.length\\) console.log\\(''Missing in EN:'', missingInEn\\); if \\(!missingInNo.length && !missingInEn.length\\) console.log\\(''✅ Perfect parity''\\);\")"
     ]
   }
 }

@@ -47,6 +47,11 @@ const BabelLibrary = () => {
   const [advSearchAuthor, setAdvSearchAuthor] = useState('all');
   const [advSortBy, setAdvSortBy] = useState('newest');
   const [advSearchExecuted, setAdvSearchExecuted] = useState(false);
+  // AI Search state
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResults, setAiResults] = useState(null); // null = not searched, [] = no results
+  const [aiSearching, setAiSearching] = useState(false);
+  const [aiInsights, setAiInsights] = useState(null);
   const { t } = useTranslation();
 
   const typeLabel = (type) => t(`babelLibraryModule.types.${type}`, { defaultValue: type });
@@ -781,6 +786,184 @@ const BabelLibrary = () => {
       case 'analysis': return '#17a2b8';
       default: return '#6c757d';
     }
+  };
+
+  // ──── AI Search Engine ────
+
+  const AI_HISTORY_KEY = 'wlwai_babel_ai_search_history';
+
+  // Synonym/concept map for semantic-like matching
+  const conceptMap = {
+    'ai': ['artificial intelligence', 'machine learning', 'ml', 'deep learning', 'neural', 'ai'],
+    'ml': ['machine learning', 'ai', 'artificial intelligence', 'deep learning', 'model', 'training'],
+    'security': ['cybersecurity', 'encryption', 'firewall', 'threat', 'vulnerability', 'protection', 'security'],
+    'web': ['website', 'frontend', 'backend', 'html', 'css', 'javascript', 'web', 'internet'],
+    'data': ['database', 'analytics', 'data science', 'big data', 'visualization', 'data'],
+    'leadership': ['management', 'leader', 'team', 'strategy', 'leadership', 'director'],
+    'cloud': ['aws', 'azure', 'gcp', 'cloud', 'serverless', 'infrastructure', 'devops'],
+    'programming': ['coding', 'software', 'developer', 'code', 'programming', 'engineering'],
+    'business': ['strategy', 'transformation', 'digital', 'enterprise', 'business', 'innovation'],
+    'agile': ['scrum', 'kanban', 'sprint', 'agile', 'lean', 'devops']
+  };
+
+  // Extract keywords and expand with synonyms
+  const expandQuery = (query) => {
+    const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const expanded = new Set(words);
+    for (const word of words) {
+      for (const [concept, synonyms] of Object.entries(conceptMap)) {
+        if (synonyms.some(s => s.includes(word) || word.includes(s))) {
+          synonyms.forEach(s => expanded.add(s));
+          expanded.add(concept);
+        }
+      }
+    }
+    return Array.from(expanded);
+  };
+
+  // Score a resource against expanded keywords
+  const scoreResource = (resource, expandedKeywords) => {
+    let score = 0;
+    const title = (resource.title || '').toLowerCase();
+    const desc = (resource.description || '').toLowerCase();
+    const topic = (resource.topic || '').toLowerCase();
+    const author = (resource.author || '').toLowerCase();
+    const all = `${title} ${desc} ${topic} ${author}`;
+
+    for (const kw of expandedKeywords) {
+      // Title match = highest weight
+      if (title.includes(kw)) score += 10;
+      // Topic match = high weight
+      if (topic.includes(kw)) score += 7;
+      // Description match
+      if (desc.includes(kw)) score += 4;
+      // Author match
+      if (author.includes(kw)) score += 3;
+    }
+
+    // Bonus for exact phrase match in title
+    const originalQuery = expandedKeywords.slice(0, 3).join(' ');
+    if (title.includes(originalQuery)) score += 15;
+
+    return score;
+  };
+
+  // Detect intent from natural language query
+  const detectIntent = (query) => {
+    const q = query.toLowerCase();
+    const intent = { types: [], difficulty: null, action: 'search' };
+
+    // Type detection
+    if (/\b(video|watch|ver)\b/.test(q)) intent.types.push('video');
+    if (/\b(book|read|leer|libro)\b/.test(q)) intent.types.push('book');
+    if (/\b(article|paper|articulo)\b/.test(q)) intent.types.push('article');
+    if (/\b(course|curso|certification|certificat)\b/.test(q)) intent.types.push('course');
+    if (/\b(analys|report|repositor|document)\b/.test(q)) intent.types.push('analysis');
+    if (/\b(simulat|practice|practic)\b/.test(q)) intent.types.push('simulation');
+
+    // Difficulty detection
+    if (/\b(beginner|basic|introduct|fundamental|inicio)\b/.test(q)) intent.difficulty = 'beginner';
+    if (/\b(advanced|expert|deep|profund)\b/.test(q)) intent.difficulty = 'advanced';
+
+    // Action detection
+    if (/\b(recommend|suggest|similar|like)\b/.test(q)) intent.action = 'recommend';
+    if (/\b(popular|trending|most|top)\b/.test(q)) intent.action = 'trending';
+    if (/\b(recent|new|latest|nuevo)\b/.test(q)) intent.action = 'recent';
+
+    return intent;
+  };
+
+  // Generate AI insights about the result set
+  const generateInsights = (results, query, allRes) => {
+    const types = {};
+    const topics = {};
+    const authors = {};
+    for (const r of results) {
+      types[r.type] = (types[r.type] || 0) + 1;
+      if (r.topic) topics[r.topic] = (topics[r.topic] || 0) + 1;
+      authors[r.author] = (authors[r.author] || 0) + 1;
+    }
+
+    const topType = Object.entries(types).sort((a, b) => b[1] - a[1])[0];
+    const topTopic = Object.entries(topics).sort((a, b) => b[1] - a[1])[0];
+    const topAuthor = Object.entries(authors).sort((a, b) => b[1] - a[1])[0];
+
+    // Find related topics the user might want
+    const allTopicsSet = new Set(allRes.map(r => r.topic).filter(Boolean));
+    const resultTopics = new Set(results.map(r => r.topic).filter(Boolean));
+    const relatedTopics = Array.from(allTopicsSet).filter(t => !resultTopics.has(t)).slice(0, 3);
+
+    return {
+      totalFound: results.length,
+      coverage: Math.round((results.length / allRes.length) * 100),
+      topType: topType ? { name: topType[0], count: topType[1] } : null,
+      topTopic: topTopic ? { name: topTopic[0], count: topTopic[1] } : null,
+      topAuthor: topAuthor ? { name: topAuthor[0], count: topAuthor[1] } : null,
+      relatedTopics,
+      typeDistribution: types
+    };
+  };
+
+  // Save search to history
+  const saveSearchHistory = (query) => {
+    try {
+      const raw = localStorage.getItem(AI_HISTORY_KEY);
+      const history = raw ? JSON.parse(raw) : [];
+      history.unshift({ query, timestamp: new Date().toISOString() });
+      if (history.length > 20) history.length = 20;
+      localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
+    } catch {}
+  };
+
+  const getSearchHistory = () => {
+    try {
+      const raw = localStorage.getItem(AI_HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  };
+
+  // Main AI search function
+  const performAiSearch = (query) => {
+    if (!query.trim()) return;
+    setAiSearching(true);
+
+    // Simulate AI processing delay for UX
+    setTimeout(() => {
+      const expandedKw = expandQuery(query);
+      const intent = detectIntent(query);
+
+      let scored = allResources.map(r => ({
+        ...r,
+        _score: scoreResource(r, expandedKw)
+      }));
+
+      // Apply intent-based type filtering
+      if (intent.types.length > 0) {
+        scored = scored.map(r => ({
+          ...r,
+          _score: intent.types.includes(r.type) ? r._score + 20 : r._score
+        }));
+      }
+
+      // Apply action-based sorting
+      if (intent.action === 'recent') {
+        scored.sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || ''));
+      } else {
+        scored.sort((a, b) => b._score - a._score);
+      }
+
+      // Filter out zero-score results
+      const results = scored.filter(r => r._score > 0);
+
+      const insights = generateInsights(results, query, allResources);
+      insights.expandedKeywords = expandedKw;
+      insights.intent = intent;
+
+      setAiResults(results);
+      setAiInsights(insights);
+      setAiSearching(false);
+      saveSearchHistory(query);
+    }, 600);
   };
 
   return (
@@ -1849,17 +2032,6 @@ const BabelLibrary = () => {
                 <li>{t('babelLibraryModule.advancedSearch.li4')}</li>
                 <li>{t('babelLibraryModule.advancedSearch.li5')}</li>
               </ul>
-              <div style={{
-                marginTop: 12,
-                padding: '12px',
-                background: colors.background,
-                borderRadius: 8,
-                border: `1px solid ${colors.border}`
-              }}>
-                <p style={{ color: colors.textSecondary, fontSize: '0.9em', margin: 0 }}>
-                  <strong>{t('babelLibraryModule.advancedSearch.futureTitle')}</strong> {t('babelLibraryModule.advancedSearch.futureBody')}
-                </p>
-              </div>
             </details>
 
             {/* Search Form */}
@@ -2106,193 +2278,391 @@ const BabelLibrary = () => {
           );
         })()}
 
-        {activeTab === 'ai-search' && (
+        {activeTab === 'ai-search' && (() => {
+          const searchHistory = getSearchHistory();
+          const suggestedQueries = [
+            t('babelLibraryModule.aiSearch.suggestion1'),
+            t('babelLibraryModule.aiSearch.suggestion2'),
+            t('babelLibraryModule.aiSearch.suggestion3'),
+            t('babelLibraryModule.aiSearch.suggestion4'),
+            t('babelLibraryModule.aiSearch.suggestion5')
+          ];
+
+          return (
           <div>
-            <h2 style={{ color: colors.text, marginBottom: 24 }}>{t('babelLibraryModule.aiSearch.title')}</h2>
-            
+            <h2 style={{ color: colors.text, marginBottom: 20 }}>{t('babelLibraryModule.aiSearch.title')}</h2>
+
+            {/* AI Search Input */}
             <div style={{
-              background: colors.primaryLight,
-              padding: '24px',
-              borderRadius: 12,
-              border: `1px solid ${colors.primary}`
+              background: `linear-gradient(135deg, ${colors.primary}08, ${colors.primary}18)`,
+              padding: '28px',
+              borderRadius: 16,
+              border: `2px solid ${colors.primary}40`,
+              marginBottom: 24
             }}>
-              <h3 style={{ color: colors.primary, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.futureCaps')}</h3>
-              
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.intelAnalysis')}</h4>
-                <ul style={{ 
-                  color: colors.text, 
-                  lineHeight: 1.6,
-                  paddingLeft: '20px',
-                  marginBottom: 16
-                }}>
-                  <li>{t('babelLibraryModule.aiSearch.ia1')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.ia2')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.ia3')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.ia4')}</li>
-                </ul>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: 10, color: colors.text, fontSize: '1em' }}>
+                🤖 {t('babelLibraryModule.aiSearch.inputLabel')}
+              </label>
+              <p style={{ color: colors.textSecondary, fontSize: '0.9em', marginBottom: 12 }}>
+                {t('babelLibraryModule.aiSearch.inputHint')}
+              </p>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <input
+                  type="text"
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && performAiSearch(aiQuery)}
+                  placeholder={t('babelLibraryModule.aiSearch.inputPlaceholder')}
+                  style={{
+                    flex: 1,
+                    padding: '14px 18px',
+                    border: `2px solid ${colors.primary}50`,
+                    borderRadius: 10,
+                    fontSize: '1em',
+                    background: colors.background,
+                    color: colors.text,
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <button
+                  onClick={() => performAiSearch(aiQuery)}
+                  disabled={!aiQuery.trim() || aiSearching}
+                  style={{
+                    padding: '14px 28px',
+                    background: aiQuery.trim() ? colors.primary : '#ccc',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 10,
+                    cursor: aiQuery.trim() ? 'pointer' : 'not-allowed',
+                    fontWeight: 'bold',
+                    fontSize: '1em',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {aiSearching ? '⏳' : '🤖'} {t('babelLibraryModule.aiSearch.searchBtn')}
+                </button>
               </div>
 
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.semantic')}</h4>
-                <ul style={{ 
-                  color: colors.text, 
-                  lineHeight: 1.6,
-                  paddingLeft: '20px',
-                  marginBottom: 16
-                }}>
-                  <li>{t('babelLibraryModule.aiSearch.s1')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.s2')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.s3')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.s4')}</li>
-                </ul>
-              </div>
-
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.personal')}</h4>
-                <ul style={{ 
-                  color: colors.text, 
-                  lineHeight: 1.6,
-                  paddingLeft: '20px',
-                  marginBottom: 16
-                }}>
-                  <li>{t('babelLibraryModule.aiSearch.p1')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.p2')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.p3')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.p4')}</li>
-                </ul>
-              </div>
-
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.generated')}</h4>
-                <ul style={{ 
-                  color: colors.text, 
-                  lineHeight: 1.6,
-                  paddingLeft: '20px',
-                  marginBottom: 16
-                }}>
-                  <li>{t('babelLibraryModule.aiSearch.g1')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.g2')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.g3')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.g4')}</li>
-                </ul>
-              </div>
-
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ color: colors.text, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.predictive')}</h4>
-                <ul style={{ 
-                  color: colors.text, 
-                  lineHeight: 1.6,
-                  paddingLeft: '20px',
-                  marginBottom: 16
-                }}>
-                  <li>{t('babelLibraryModule.aiSearch.pr1')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.pr2')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.pr3')}</li>
-                  <li>{t('babelLibraryModule.aiSearch.pr4')}</li>
-                </ul>
+              {/* Suggested queries */}
+              <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.trySuggestions')}</span>
+                {suggestedQueries.map((q, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setAiQuery(q); performAiSearch(q); }}
+                    style={{
+                      padding: '4px 12px',
+                      background: colors.background,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: 16,
+                      fontSize: '0.8em',
+                      cursor: 'pointer',
+                      color: colors.primary
+                    }}
+                  >
+                    {q}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div style={{ marginTop: 32 }}>
-              <h3 style={{ color: colors.text, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.examplesTitle')}</h3>
-              
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-                gap: 16 
+            {/* Loading */}
+            {aiSearching && (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px',
+                color: colors.primary
               }}>
-                <div style={{
-                  background: colors.background,
-                  padding: '20px',
-                  borderRadius: 12,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exAcademic')}</h4>
-                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi1')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi2')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi3')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exAcademicLi4')}</li>
-                  </ul>
-                </div>
-
-                <div style={{
-                  background: colors.background,
-                  padding: '20px',
-                  borderRadius: 12,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exLms')}</h4>
-                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li>{t('babelLibraryModule.aiSearch.exLmsLi1')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exLmsLi2')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exLmsLi3')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exLmsLi4')}</li>
-                  </ul>
-                </div>
-
-                <div style={{
-                  background: colors.background,
-                  padding: '20px',
-                  borderRadius: 12,
-                  border: `1px solid ${colors.border}`,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.exEnterprise')}</h4>
-                  <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
-                    <li>{t('babelLibraryModule.aiSearch.exEntLi1')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exEntLi2')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exEntLi3')}</li>
-                    <li>{t('babelLibraryModule.aiSearch.exEntLi4')}</li>
-                  </ul>
-                </div>
+                <div style={{ fontSize: '2em', marginBottom: 12 }}>🧠</div>
+                <p style={{ fontWeight: 'bold' }}>{t('babelLibraryModule.aiSearch.analyzing')}</p>
+                <p style={{ color: colors.textSecondary, fontSize: '0.9em' }}>{t('babelLibraryModule.aiSearch.analyzingDesc')}</p>
               </div>
-            </div>
+            )}
 
-            <div style={{ marginTop: 32 }}>
-              <h3 style={{ color: colors.text, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.roadmapTitle')}</h3>
-              
+            {/* AI Insights Panel */}
+            {aiInsights && !aiSearching && (
               <div style={{
                 background: colors.background,
-                padding: '24px',
+                padding: '20px',
                 borderRadius: 12,
                 border: `1px solid ${colors.border}`,
-                color: colors.text
+                marginBottom: 20
               }}>
-                <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase1Title')}</h4>
-                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    {t('babelLibraryModule.aiSearch.phase1Body')}
-                  </p>
+                <h4 style={{ color: colors.primary, marginBottom: 14 }}>🧠 {t('babelLibraryModule.aiSearch.insightsTitle')}</h4>
+
+                {/* Intent detected */}
+                {aiInsights.intent && (
+                  <div style={{ marginBottom: 14, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.detectedIntent')}</span>
+                    {aiInsights.intent.types.length > 0 && aiInsights.intent.types.map(type => (
+                      <span key={type} style={{
+                        background: getTypeColor(type), color: 'white',
+                        padding: '2px 10px', borderRadius: 12, fontSize: '0.8em', fontWeight: 500
+                      }}>
+                        {getTypeIcon(type)} {typeLabel(type)}
+                      </span>
+                    ))}
+                    {aiInsights.intent.action !== 'search' && (
+                      <span style={{
+                        background: '#e8eaf6', color: '#3f51b5',
+                        padding: '2px 10px', borderRadius: 12, fontSize: '0.8em', fontWeight: 500
+                      }}>
+                        {aiInsights.intent.action === 'recommend' ? '💡' : aiInsights.intent.action === 'trending' ? '📈' : '🕐'} {t(`babelLibraryModule.aiSearch.intent_${aiInsights.intent.action}`)}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Expanded keywords */}
+                {aiInsights.expandedKeywords && (
+                  <div style={{ marginBottom: 14, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.conceptsExpanded')}</span>
+                    {aiInsights.expandedKeywords.slice(0, 12).map((kw, i) => (
+                      <span key={i} style={{
+                        background: '#e3f2fd', color: '#1565c0',
+                        padding: '2px 8px', borderRadius: 10, fontSize: '0.75em'
+                      }}>
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Stats row */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                  gap: 10,
+                  marginBottom: 14
+                }}>
+                  <div style={{ textAlign: 'center', padding: '10px', background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>
+                    <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: colors.primary }}>{aiInsights.totalFound}</div>
+                    <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.matchesFound')}</div>
+                  </div>
+                  <div style={{ textAlign: 'center', padding: '10px', background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>
+                    <div style={{ fontSize: '1.5em', fontWeight: 'bold', color: colors.primary }}>{aiInsights.coverage}%</div>
+                    <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.libraryCoverage')}</div>
+                  </div>
+                  {aiInsights.topType && (
+                    <div style={{ textAlign: 'center', padding: '10px', background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>
+                      <div style={{ fontSize: '1.2em', fontWeight: 'bold', color: colors.primary }}>{getTypeIcon(aiInsights.topType.name)} {aiInsights.topType.count}</div>
+                      <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.topType')}</div>
+                    </div>
+                  )}
+                  {aiInsights.topTopic && (
+                    <div style={{ textAlign: 'center', padding: '10px', background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.95em', fontWeight: 'bold', color: colors.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{aiInsights.topTopic.name}</div>
+                      <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>{t('babelLibraryModule.aiSearch.topTopic')}</div>
+                    </div>
+                  )}
                 </div>
-                
-                <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase2Title')}</h4>
-                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    {t('babelLibraryModule.aiSearch.phase2Body')}
-                  </p>
-                </div>
-                
-                <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase3Title')}</h4>
-                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    {t('babelLibraryModule.aiSearch.phase3Body')}
-                  </p>
-                </div>
-                
-                <div style={{ marginBottom: 16 }}>
-                  <h4 style={{ color: colors.primary, marginBottom: 12 }}>{t('babelLibraryModule.aiSearch.phase4Title')}</h4>
-                  <p style={{ color: colors.textSecondary, lineHeight: 1.6 }}>
-                    {t('babelLibraryModule.aiSearch.phase4Body')}
-                  </p>
+
+                {/* Related topics suggestion */}
+                {aiInsights.relatedTopics.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>💡 {t('babelLibraryModule.aiSearch.alsoExplore')}</span>
+                    {aiInsights.relatedTopics.map((topic, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { setAiQuery(topic); performAiSearch(topic); }}
+                        style={{
+                          padding: '3px 10px', background: '#f3e5f5', color: '#7b1fa2',
+                          border: '1px solid #ce93d8', borderRadius: 12, fontSize: '0.8em', cursor: 'pointer'
+                        }}
+                      >
+                        🏷️ {topic}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* AI Results */}
+            {aiResults && !aiSearching && (
+              <div>
+                {aiResults.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px 20px', color: colors.textSecondary }}>
+                    <div style={{ fontSize: '3em', marginBottom: 12 }}>🔍</div>
+                    <p style={{ fontWeight: 'bold', fontSize: '1.1em' }}>{t('babelLibraryModule.aiSearch.noResults')}</p>
+                    <p>{t('babelLibraryModule.aiSearch.noResultsHint')}</p>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+                    gap: 16
+                  }}>
+                    {aiResults.map((resource, index) => (
+                      <div key={`ai-${resource.id || index}`} style={{
+                        background: colors.background,
+                        padding: 20,
+                        borderRadius: 12,
+                        border: `1px solid ${colors.border}`,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                        position: 'relative'
+                      }}>
+                        {/* Relevance score badge */}
+                        <div style={{
+                          position: 'absolute', top: 10, right: 10,
+                          background: resource._score >= 25 ? '#4caf50' : resource._score >= 15 ? '#ff9800' : '#90a4ae',
+                          color: 'white',
+                          padding: '2px 8px',
+                          borderRadius: 10,
+                          fontSize: '0.7em',
+                          fontWeight: 'bold'
+                        }}>
+                          {resource._score >= 25 ? '🎯' : resource._score >= 15 ? '✨' : '🔍'} {t('babelLibraryModule.aiSearch.relevance')} {resource._score}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, paddingRight: 70 }}>
+                          <h3 style={{ margin: 0, fontSize: '1em', color: colors.text, flex: 1 }}>
+                            {resource.title}
+                          </h3>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{
+                            background: getTypeColor(resource.type), color: 'white',
+                            padding: '3px 10px', borderRadius: 12, fontSize: '0.75em', fontWeight: 500
+                          }}>
+                            {getTypeIcon(resource.type)} {typeLabel(resource.type)}
+                          </span>
+                          <span style={{ fontSize: '0.85em', color: colors.textSecondary }}>
+                            👤 {authorLabel(resource.author)}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.85em', color: colors.textSecondary }}>
+                          🏷️ {resource.topic}
+                        </div>
+                        <p style={{ fontSize: '0.9em', color: colors.text, margin: 0, lineHeight: 1.5 }}>
+                          {resource.description}
+                        </p>
+                        {resource.addedDate && (
+                          <div style={{ fontSize: '0.8em', color: colors.textSecondary, marginTop: 'auto' }}>
+                            📅 {t('babelLibraryModule.catalog.addedPrefix', { date: resource.addedDate })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Search History */}
+            {searchHistory.length > 0 && !aiSearching && (
+              <div style={{
+                background: colors.background,
+                padding: '20px',
+                borderRadius: 12,
+                border: `1px solid ${colors.border}`,
+                marginTop: 24
+              }}>
+                <h4 style={{ color: colors.text, marginBottom: 12 }}>🕐 {t('babelLibraryModule.aiSearch.historyTitle')}</h4>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {searchHistory.slice(0, 10).map((entry, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setAiQuery(entry.query); performAiSearch(entry.query); }}
+                      style={{
+                        padding: '4px 12px',
+                        background: colors.sidebarBackground || '#f5f5f5',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 16,
+                        fontSize: '0.8em',
+                        cursor: 'pointer',
+                        color: colors.text
+                      }}
+                    >
+                      🔍 {entry.query}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
+            {/* Collapsible reference sections — existing informational content */}
             <div style={{ marginTop: 32 }}>
+              <details style={{
+                background: colors.primaryLight,
+                padding: '16px 20px',
+                borderRadius: 10,
+                border: `1px solid ${colors.primary}`,
+                marginBottom: 16,
+                cursor: 'pointer'
+              }}>
+                <summary style={{ color: colors.primary, fontWeight: 'bold', fontSize: '1em' }}>
+                  {t('babelLibraryModule.aiSearch.futureCaps')}
+                </summary>
+                <div style={{ marginTop: 16 }}>
+                  {[
+                    { title: t('babelLibraryModule.aiSearch.intelAnalysis'), items: ['ia1','ia2','ia3','ia4'] },
+                    { title: t('babelLibraryModule.aiSearch.semantic'), items: ['s1','s2','s3','s4'] },
+                    { title: t('babelLibraryModule.aiSearch.personal'), items: ['p1','p2','p3','p4'] },
+                    { title: t('babelLibraryModule.aiSearch.generated'), items: ['g1','g2','g3','g4'] },
+                    { title: t('babelLibraryModule.aiSearch.predictive'), items: ['pr1','pr2','pr3','pr4'] }
+                  ].map((section, si) => (
+                    <div key={si} style={{ marginBottom: 16 }}>
+                      <h4 style={{ color: colors.text, marginBottom: 8 }}>{section.title}</h4>
+                      <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '20px', marginBottom: 8 }}>
+                        {section.items.map(k => <li key={k}>{t(`babelLibraryModule.aiSearch.${k}`)}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </details>
+
+              <details style={{
+                background: colors.background,
+                padding: '16px 20px',
+                borderRadius: 10,
+                border: `1px solid ${colors.border}`,
+                marginBottom: 16,
+                cursor: 'pointer'
+              }}>
+                <summary style={{ color: colors.text, fontWeight: 'bold', fontSize: '1em' }}>
+                  {t('babelLibraryModule.aiSearch.examplesTitle')}
+                </summary>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginTop: 16 }}>
+                  {[
+                    { title: t('babelLibraryModule.aiSearch.exAcademic'), items: ['exAcademicLi1','exAcademicLi2','exAcademicLi3','exAcademicLi4'] },
+                    { title: t('babelLibraryModule.aiSearch.exLms'), items: ['exLmsLi1','exLmsLi2','exLmsLi3','exLmsLi4'] },
+                    { title: t('babelLibraryModule.aiSearch.exEnterprise'), items: ['exEntLi1','exEntLi2','exEntLi3','exEntLi4'] }
+                  ].map((section, si) => (
+                    <div key={si} style={{ padding: 16, background: colors.sidebarBackground || '#f5f5f5', borderRadius: 10 }}>
+                      <h4 style={{ color: colors.primary, marginBottom: 8 }}>{section.title}</h4>
+                      <ul style={{ color: colors.text, lineHeight: 1.5, paddingLeft: '20px' }}>
+                        {section.items.map(k => <li key={k}>{t(`babelLibraryModule.aiSearch.${k}`)}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </details>
+
+              <details style={{
+                background: colors.background,
+                padding: '16px 20px',
+                borderRadius: 10,
+                border: `1px solid ${colors.border}`,
+                marginBottom: 16,
+                cursor: 'pointer'
+              }}>
+                <summary style={{ color: colors.text, fontWeight: 'bold', fontSize: '1em' }}>
+                  {t('babelLibraryModule.aiSearch.roadmapTitle')}
+                </summary>
+                <div style={{ marginTop: 16 }}>
+                  {[1,2,3,4].map(n => (
+                    <div key={n} style={{ marginBottom: 14 }}>
+                      <h4 style={{ color: colors.primary, marginBottom: 6 }}>{t(`babelLibraryModule.aiSearch.phase${n}Title`)}</h4>
+                      <p style={{ color: colors.textSecondary, lineHeight: 1.6, margin: 0 }}>{t(`babelLibraryModule.aiSearch.phase${n}Body`)}</p>
+                    </div>
+                  ))}
+                </div>
+              </details>
+
+              {/* Vision */}
               <div style={{
                 background: `linear-gradient(135deg, ${colors.primary}15, ${colors.primary}25)`,
                 padding: '24px',
@@ -2301,19 +2671,14 @@ const BabelLibrary = () => {
                 textAlign: 'center'
               }}>
                 <h3 style={{ color: colors.primary, marginBottom: 16 }}>{t('babelLibraryModule.aiSearch.visionTitle')}</h3>
-                <p style={{ 
-                  color: colors.text, 
-                  fontSize: '1.1em', 
-                  lineHeight: 1.6,
-                  fontStyle: 'italic',
-                  margin: 0
-                }}>
+                <p style={{ color: colors.text, fontSize: '1.1em', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>
                   {t('babelLibraryModule.aiSearch.visionQuote')}
                 </p>
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
