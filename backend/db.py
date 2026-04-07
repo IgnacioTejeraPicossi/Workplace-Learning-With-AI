@@ -53,3 +53,6 @@ agent_security_status_collection = database.get_collection("agent_security_statu
 
 # Babel Library AI Metadata
 babel_ai_metadata_collection = database.get_collection("babel_ai_metadata")
+
+# Learning Profiles (Phase 2)
+learning_profiles_collection = database.get_collection("learning_profiles")

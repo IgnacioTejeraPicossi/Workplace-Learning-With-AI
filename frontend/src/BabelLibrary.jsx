@@ -14,6 +14,7 @@ import {
   fetchAgenticRAGAnalyses,
   apiCall
 } from './api';
+import { auth } from './firebase';
 
 const BabelLibrary = () => {
   const { colors } = useTheme();
@@ -55,7 +56,27 @@ const BabelLibrary = () => {
   const [aiInsights, setAiInsights] = useState(null);
   const [batchStatus, setBatchStatus] = useState(null); // null | {running, total, processed, failed, skipped}
   const [intelStats, setIntelStats] = useState(null);
+  // Phase 2: Recommendations & Learning Path
+  const [recommendations, setRecommendations] = useState(null);
+  const [recsLoading, setRecsLoading] = useState(false);
+  const [profileSummary, setProfileSummary] = useState(null);
+  const [learningPath, setLearningPath] = useState(null);
+  const [pathLoading, setPathLoading] = useState(false);
+  const [pathGoal, setPathGoal] = useState('');
   const { t } = useTranslation();
+
+  const getUserId = () => {
+    try { return auth?.currentUser?.uid || 'test-user'; } catch { return 'test-user'; }
+  };
+
+  // Fire-and-forget interaction tracking
+  const trackInteraction = (resourceId, resourceType, action, extra = {}) => {
+    const userId = getUserId();
+    apiCall('/api/babel/profile/interaction', 'POST', {
+      user_id: userId, resource_id: String(resourceId),
+      resource_type: resourceType, action, ...extra
+    }).catch(() => {});
+  };
 
   const typeLabel = (type) => t(`babelLibraryModule.types.${type}`, { defaultValue: type });
 
@@ -309,6 +330,20 @@ const BabelLibrary = () => {
     // Load agentic RAG analyses from MongoDB
     loadAgenticRAGAnalyses();
   }, []);
+
+  // Load recommendations when AI Search tab is activated
+  useEffect(() => {
+    if (activeTab !== 'ai-search') return;
+    const userId = getUserId();
+    setRecsLoading(true);
+    apiCall(`/api/babel/profile/${userId}/recommendations`)
+      .then(data => {
+        setRecommendations(data.recommendations || []);
+        setProfileSummary(data.profile_summary || null);
+      })
+      .catch(() => setRecommendations([]))
+      .finally(() => setRecsLoading(false));
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const BOOKS_KEY = 'wlwai_babel_library_books';
 
@@ -967,6 +1002,7 @@ const BabelLibrary = () => {
     setAiInsights(insights);
     setAiSearching(false);
     saveSearchHistory(query);
+    apiCall('/api/babel/profile/search', 'POST', { user_id: getUserId(), query }).catch(() => {});
   };
 
   // Main AI search — tries server-side hybrid search, falls back to client-side
@@ -983,6 +1019,7 @@ const BabelLibrary = () => {
         setAiInsights({ ...response.insights, mode: 'server-ai' });
         setAiSearching(false);
         saveSearchHistory(query);
+        apiCall('/api/babel/profile/search', 'POST', { user_id: getUserId(), query }).catch(() => {});
         return;
       }
     } catch (err) {
@@ -1293,13 +1330,14 @@ const BabelLibrary = () => {
               gap: 20 
             }}>
               {filteredResources.map(resource => (
-                <div key={resource.id} style={{
+                <div key={resource.id} onClick={() => trackInteraction(resource.id, resource.type, 'view', { topic: resource.topic })} style={{
                   background: colors.background,
                   border: `1px solid ${colors.border}`,
                   borderRadius: 12,
                   padding: '20px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  position: 'relative'
+                  position: 'relative',
+                  cursor: 'pointer'
                 }}>
                   {/* Type Badge */}
                   <div style={{
@@ -2345,6 +2383,99 @@ const BabelLibrary = () => {
           return (
           <div>
             <h2 style={{ color: colors.text, marginBottom: 20 }}>{t('babelLibraryModule.aiSearch.title')}</h2>
+
+            {/* Recommended For You */}
+            {(recommendations?.length > 0 || recsLoading) && (
+              <div style={{
+                background: `linear-gradient(135deg, ${colors.primary}05, ${colors.primary}10)`,
+                padding: '20px',
+                borderRadius: 12,
+                border: `1px solid ${colors.primary}25`,
+                marginBottom: 24
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                  <h3 style={{ margin: 0, color: colors.text }}>
+                    💡 {t('babelLibraryModule.recommendations.title')}
+                  </h3>
+                  {profileSummary && (
+                    <span style={{
+                      background: profileSummary.total_interactions > 100 ? '#fff8e1' : profileSummary.total_interactions > 20 ? '#e8f5e9' : profileSummary.total_interactions > 0 ? '#e3f2fd' : '#f5f5f5',
+                      color: profileSummary.total_interactions > 100 ? '#f57f17' : profileSummary.total_interactions > 20 ? '#2e7d32' : profileSummary.total_interactions > 0 ? '#1565c0' : '#757575',
+                      padding: '3px 10px', borderRadius: 12, fontSize: '0.75em', fontWeight: 600
+                    }}>
+                      {profileSummary.total_interactions > 100 ? '⭐' : profileSummary.total_interactions > 20 ? '🟢' : profileSummary.total_interactions > 0 ? '🔵' : '⚪'}
+                      {' '}{profileSummary.total_interactions > 100
+                        ? t('babelLibraryModule.recommendations.powerLearner')
+                        : profileSummary.total_interactions > 20
+                        ? t('babelLibraryModule.recommendations.activeLearner')
+                        : profileSummary.total_interactions > 0
+                        ? t('babelLibraryModule.recommendations.buildingProfile')
+                        : t('babelLibraryModule.recommendations.newLearner')}
+                    </span>
+                  )}
+                </div>
+
+                {recsLoading ? (
+                  <div style={{ textAlign: 'center', padding: 20, color: colors.textSecondary }}>
+                    ⏳ {t('babelLibraryModule.recommendations.loading')}
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+                    {recommendations.slice(0, 6).map((rec, i) => (
+                      <div
+                        key={`rec-${rec.resource_id || i}`}
+                        onClick={() => {
+                          trackInteraction(rec.resource_id, rec.resource_type, 'click', { domain: rec.classification?.domain });
+                          setAiQuery(rec.title);
+                          performAiSearch(rec.title);
+                        }}
+                        style={{
+                          minWidth: 220, maxWidth: 240,
+                          background: colors.background,
+                          padding: 14,
+                          borderRadius: 10,
+                          border: `1px solid ${colors.border}`,
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          transition: 'box-shadow 0.2s'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <span style={{
+                            background: getTypeColor(rec.resource_type), color: 'white',
+                            padding: '2px 7px', borderRadius: 10, fontSize: '0.7em', fontWeight: 500
+                          }}>
+                            {getTypeIcon(rec.resource_type)} {typeLabel(rec.resource_type)}
+                          </span>
+                          <span style={{ fontSize: '0.7em', fontWeight: 'bold', color: rec.match_score >= 70 ? '#4caf50' : rec.match_score >= 50 ? '#ff9800' : colors.textSecondary }}>
+                            {rec.match_score}%
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.9em', fontWeight: 600, color: colors.text, marginBottom: 6, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                          {rec.title}
+                        </div>
+                        {rec.classification?.difficulty && (
+                          <span style={{
+                            background: rec.classification.difficulty === 'beginner' ? '#e8f5e9' : rec.classification.difficulty === 'advanced' ? '#fce4ec' : '#fff8e1',
+                            color: rec.classification.difficulty === 'beginner' ? '#2e7d32' : rec.classification.difficulty === 'advanced' ? '#c62828' : '#f57f17',
+                            padding: '1px 6px', borderRadius: 8, fontSize: '0.65em'
+                          }}>
+                            {rec.classification.difficulty === 'beginner' ? '🟢' : rec.classification.difficulty === 'advanced' ? '🔴' : '🟡'} {t(`babelLibraryModule.intelligence.${rec.classification.difficulty}`)}
+                          </span>
+                        )}
+                        {rec.tags?.length > 0 && (
+                          <div style={{ marginTop: 6, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                            {rec.tags.slice(0, 2).map(tag => (
+                              <span key={tag} style={{ background: '#f3e5f5', color: '#7b1fa2', padding: '1px 5px', borderRadius: 8, fontSize: '0.6em' }}>{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* AI Search Input */}
             <div style={{

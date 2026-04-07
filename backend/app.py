@@ -147,6 +147,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Babel Intelligence router: {e}")
 
+# Learning Profile & Recommendations router (Phase 2)
+try:
+    from backend.routers.learning_profile import router as learning_profile_router
+    app.include_router(learning_profile_router, tags=["Learning Profile"])
+    print("✅ Learning Profile router included successfully")
+except Exception as e:
+    print(f"❌ Error including Learning Profile router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router
