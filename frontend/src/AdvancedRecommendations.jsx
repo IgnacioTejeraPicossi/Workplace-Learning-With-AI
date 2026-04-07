@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 
 const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysis, onTopicClick }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [expandedPath, setExpandedPath] = useState(null);
   const [showScoreBreakdown, setShowScoreBreakdown] = useState(false);
@@ -16,8 +18,8 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
         borderRadius: '8px',
         border: `1px solid ${colors.border}`
       }}>
-        <h3>🎯 No recommendations available</h3>
-        <p>Complete some topics to get personalized recommendations!</p>
+        <h3>{t('knowledgeMapModule.recommendationsEmptyTitle')}</h3>
+        <p>{t('knowledgeMapModule.recommendationsEmptyBody')}</p>
       </div>
     );
   }
@@ -44,6 +46,26 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
     return Math.round(score * 100) / 100;
   };
 
+  const priorityLabel = (priority) => {
+    const p = (priority || 'medium').toLowerCase();
+    if (p === 'high') return t('knowledgeMapModule.priorityHigh');
+    if (p === 'low') return t('knowledgeMapModule.priorityLow');
+    return t('knowledgeMapModule.priorityMedium');
+  };
+
+  const difficultyLabel = (difficulty) => {
+    const d = (difficulty || 'intermediate').toLowerCase();
+    if (d === 'beginner') return t('knowledgeMapModule.difficultyBeginner');
+    if (d === 'advanced') return t('knowledgeMapModule.difficultyAdvanced');
+    return t('knowledgeMapModule.difficultyIntermediate');
+  };
+
+  const categoryDisplay = (category) => {
+    const c = (category || '').trim();
+    if (!c || c.toLowerCase() === 'general') return t('knowledgeMapModule.categoryDefaultGeneral');
+    return category;
+  };
+
   return (
     <div style={{ 
       backgroundColor: colors.background,
@@ -58,9 +80,9 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
         color: 'white',
         borderBottom: `1px solid ${colors.border}`
       }}>
-        <h2 style={{ margin: 0, fontSize: '1.5rem' }}>🧠 AI-Powered Learning Recommendations</h2>
+        <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{t('knowledgeMapModule.recommendationsPanelTitle')}</h2>
         <p style={{ margin: '8px 0 0 0', opacity: 0.9 }}>
-          Personalized suggestions based on your learning vector and mastery gaps
+          {t('knowledgeMapModule.recommendationsSubtitle')}
         </p>
       </div>
 
@@ -72,26 +94,26 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
           borderBottom: `1px solid ${colors.border}`
         }}>
           <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>
-            📊 Your Learning Profile
+            {t('knowledgeMapModule.learningProfileTitle')}
           </h4>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: colors.primary }}>
                 {vectorAnalysis.mastery_distribution.low_mastery}
               </div>
-              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Low Mastery</div>
+              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.profileMasteryLow')}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: colors.primary }}>
                 {vectorAnalysis.mastery_distribution.medium_mastery}
               </div>
-              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Medium Mastery</div>
+              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.profileMasteryMedium')}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: colors.primary }}>
                 {vectorAnalysis.mastery_distribution.high_mastery}
               </div>
-              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>High Mastery</div>
+              <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.profileMasteryHigh')}</div>
             </div>
           </div>
         </div>
@@ -100,7 +122,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
       {/* Top Recommendations */}
       <div style={{ padding: '20px' }}>
         <h3 style={{ margin: '0 0 16px 0', color: colors.textPrimary }}>
-          🎯 Top Recommendations
+          {t('knowledgeMapModule.topRecommendationsSectionTitle')}
         </h3>
         
         <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
@@ -116,7 +138,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
               fontSize: '0.9rem'
             }}
           >
-            {showScoreBreakdown ? 'Hide' : 'Show'} Score Breakdown
+            {showScoreBreakdown ? t('knowledgeMapModule.hideScoreBreakdown') : t('knowledgeMapModule.showScoreBreakdown')}
           </button>
         </div>
 
@@ -165,7 +187,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                   color: colors.textPrimary,
                   fontSize: '1.1rem'
                 }}>
-                  {index + 1}. {rec.topic_name || rec.topic_label || 'Unknown Topic'}
+                  {index + 1}. {rec.topic_name || rec.topic_label || t('knowledgeMapModule.unknownTopic')}
                 </h4>
                 
                 <p style={{ 
@@ -174,13 +196,13 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                   fontSize: '0.9rem',
                   lineHeight: '1.4'
                 }}>
-                  {rec.description || 'No description available'}
+                  {rec.description || t('knowledgeMapModule.noDescriptionAvailable')}
                 </p>
 
                 {/* Meta Information */}
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Category:</span>
+                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.metaCategory')}</span>
                     <span style={{ 
                       padding: '2px 8px', 
                       backgroundColor: colors.primary + '20', 
@@ -188,12 +210,12 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       borderRadius: '12px',
                       fontSize: '0.8rem'
                     }}>
-                      {rec.category || 'General'}
+                      {categoryDisplay(rec.category)}
                     </span>
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Difficulty:</span>
+                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.metaDifficulty')}</span>
                     <span style={{ 
                       padding: '2px 8px', 
                       backgroundColor: getDifficultyColor(rec.learning_difficulty || 'intermediate') + '20', 
@@ -201,12 +223,12 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                       borderRadius: '12px',
                       fontSize: '0.8rem'
                     }}>
-                      {rec.learning_difficulty || 'intermediate'}
+                      {difficultyLabel(rec.learning_difficulty)}
                     </span>
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Current Mastery:</span>
+                    <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.metaCurrentMastery')}</span>
                     <div style={{ 
                       width: '60px', 
                       height: '8px', 
@@ -237,29 +259,29 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                     border: `1px solid ${colors.border}`
                   }}>
                     <h5 style={{ margin: '0 0 8px 0', color: colors.textPrimary, fontSize: '0.9rem' }}>
-                      Score Breakdown
+                      {t('knowledgeMapModule.scoreBreakdownHeading')}
                     </h5>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Mastery Priority:</span>
+                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.breakdownMasteryPriority')}</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
                           {formatScore(rec.score_breakdown?.mastery_priority || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Vector Proximity:</span>
+                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.breakdownVectorProximity')}</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
                           {formatScore(rec.score_breakdown?.proximity_score || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Learning Continuity:</span>
+                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.breakdownLearningContinuity')}</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
                           {formatScore(rec.score_breakdown?.continuity_score || 0)}
                         </span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>Cluster Bonus:</span>
+                        <span style={{ fontSize: '0.8rem', color: colors.textSecondary }}>{t('knowledgeMapModule.breakdownClusterBonus')}</span>
                         <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>
                           {formatScore(rec.score_breakdown?.cluster_bonus || 0)}
                         </span>
@@ -271,7 +293,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                         borderTop: `1px solid ${colors.border}`,
                         fontWeight: 'bold'
                       }}>
-                        <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>Final Score:</span>
+                        <span style={{ fontSize: '0.8rem', color: colors.textPrimary }}>{t('knowledgeMapModule.breakdownFinalScore')}</span>
                         <span style={{ fontSize: '0.8rem', color: colors.primary }}>
                           {formatScore(rec.recommendation_score || 0)}
                         </span>
@@ -293,7 +315,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
           backgroundColor: colors.surface
         }}>
           <h3 style={{ margin: '0 0 16px 0', color: colors.textPrimary }}>
-            🛤️ Suggested Learning Paths
+            {t('knowledgeMapModule.suggestedPathsTitle')}
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -320,10 +342,10 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>
-                      {path.estimated_hours}h estimated
+                      {t('knowledgeMapModule.pathEstimatedHours', { hours: path.estimated_hours })}
                     </div>
                     <div style={{ fontSize: '0.8rem', color: colors.textSecondary }}>
-                      {path.topics.length} topics
+                      {t('knowledgeMapModule.pathTopicCount', { count: path.topics.length })}
                     </div>
                   </div>
                 </div>
@@ -331,7 +353,7 @@ const AdvancedRecommendations = ({ recommendations, learningPaths, vectorAnalysi
                 {expandedPath === index && (
                   <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${colors.border}` }}>
                     <h5 style={{ margin: '0 0 8px 0', color: colors.textPrimary, fontSize: '0.9rem' }}>
-                      Topics in this path:
+                      {t('knowledgeMapModule.pathTopicsHeading')}
                     </h5>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       {path.topics.map((topic, topicIndex) => (
