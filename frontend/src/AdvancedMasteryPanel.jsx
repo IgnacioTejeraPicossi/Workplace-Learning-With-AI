@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import * as d3 from 'd3';
 
 const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const [selectedView, setSelectedView] = useState('overview');
@@ -162,6 +164,18 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
     return value.toFixed(2);
   };
 
+  const timeRangeLabel = (range) => {
+    if (range === '7d') return t('knowledgeMapModule.timeRange7d');
+    if (range === '30d') return t('knowledgeMapModule.timeRange30d');
+    return t('knowledgeMapModule.timeRange90d');
+  };
+
+  const VIEW_TABS = [
+    { id: 'overview', labelKey: 'knowledgeMapModule.tabOverview' },
+    { id: 'trends', labelKey: 'knowledgeMapModule.tabTrends' },
+    { id: 'insights', labelKey: 'knowledgeMapModule.tabInsights' }
+  ];
+
   return (
     <div style={{
       backgroundColor: colors.background,
@@ -182,7 +196,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           alignItems: 'center',
           marginBottom: '16px'
         }}>
-          <h2 style={{ margin: 0, fontSize: '1.8rem' }}>📊 Advanced Mastery Analytics</h2>
+          <h2 style={{ margin: 0, fontSize: '1.8rem' }}>{t('knowledgeMapModule.advancedAnalyticsTitle')}</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
             {['7d', '30d', '90d'].map(range => (
               <button
@@ -198,7 +212,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                   fontSize: '0.9rem'
                 }}
               >
-                {range}
+                {timeRangeLabel(range)}
               </button>
             ))}
           </div>
@@ -209,22 +223,21 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           gap: '24px',
           flexWrap: 'wrap'
         }}>
-          {['overview', 'trends', 'insights'].map(view => (
+          {VIEW_TABS.map(({ id, labelKey }) => (
             <button
-              key={view}
-              onClick={() => setSelectedView(view)}
+              key={id}
+              onClick={() => setSelectedView(id)}
               style={{
                 padding: '8px 16px',
-                backgroundColor: selectedView === view ? 'rgba(255,255,255,0.2)' : 'transparent',
+                backgroundColor: selectedView === id ? 'rgba(255,255,255,0.2)' : 'transparent',
                 color: 'white',
                 border: '1px solid rgba(255,255,255,0.3)',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontSize: '0.9rem',
-                textTransform: 'capitalize'
+                fontSize: '0.9rem'
               }}
             >
-              {view}
+              {t(labelKey)}
             </button>
           ))}
         </div>
@@ -236,7 +249,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
         backgroundColor: colors.surface,
         borderBottom: `1px solid ${colors.border}`
       }}>
-        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>🎯 Key Performance Indicators</h3>
+        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.kpiSectionTitle')}</h3>
         
         <div style={{
           display: 'grid',
@@ -258,7 +271,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                {formatMetric(safeMetrics.averageMastery * 100, 'percentage')}
              </div>
             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
-              Average Mastery
+              {t('knowledgeMapModule.kpiAverageMastery')}
             </div>
             {hoveredMetric === 'average' && (
               <div style={{
@@ -271,7 +284,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                 color: colors.textSecondary,
                 marginTop: '8px'
               }}>
-                Overall proficiency across all topics
+                {t('knowledgeMapModule.kpiAverageMasteryTooltip')}
               </div>
             )}
           </div>
@@ -295,7 +308,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                {formatMetric(safeMetrics.improvement, 'percentage')}
              </div>
             <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
-              {selectedTimeRange} Improvement
+              {t('knowledgeMapModule.kpiImprovement', { range: timeRangeLabel(selectedTimeRange) })}
             </div>
           </div>
 
@@ -318,7 +331,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                {formatMetric(safeMetrics.learningVelocity, 'percentage')}
              </div>
              <div style={{ fontSize: '0.9rem', color: colors.textSecondary, marginTop: '4px' }}>
-               Daily Learning Rate
+               {t('knowledgeMapModule.kpiDailyLearningRate')}
              </div>
            </div>
 
@@ -352,7 +365,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
         padding: '24px',
         backgroundColor: colors.background
       }}>
-        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>📈 Mastery Progression Timeline</h3>
+        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.timelineSectionTitle')}</h3>
         
                  <div style={{
            width: '100%',
@@ -411,7 +424,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                color: colors.textSecondary,
                fontSize: '1.1rem'
              }}>
-               📊 Timeline data will appear here as you complete more learning activities
+               {t('knowledgeMapModule.timelineEmpty')}
              </div>
            )}
           
@@ -460,7 +473,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
         backgroundColor: colors.surface,
         borderTop: `1px solid ${colors.border}`
       }}>
-        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>🚀 Top Improving Topics</h3>
+        <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.topImprovingTopicsTitle')}</h3>
         
         <div style={{
           display: 'flex',
@@ -500,7 +513,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
                   {topic.label}
                 </div>
                 <div style={{ fontSize: '0.9rem', color: colors.textSecondary }}>
-                  Current: {formatMetric(topic.currentMastery * 100, 'percentage')}
+                  {t('knowledgeMapModule.currentMasteryShort', { value: formatMetric(topic.currentMastery * 100, 'percentage') })}
                 </div>
               </div>
               
@@ -523,7 +536,7 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
           backgroundColor: colors.background,
           borderTop: `1px solid ${colors.border}`
         }}>
-          <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>💡 Learning Insights</h3>
+          <h3 style={{ margin: '0 0 20px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.insightsPanelTitle')}</h3>
           
           <div style={{
             display: 'grid',
@@ -537,13 +550,13 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
               borderRadius: '12px',
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>📅 Learning Consistency</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.insightConsistencyTitle')}</h4>
                              <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
                  {safeMetrics.consistencyScore > 80 
-                   ? "Excellent! You're maintaining a very consistent learning schedule."
+                   ? t('knowledgeMapModule.insightConsistencyHigh')
                    : safeMetrics.consistencyScore > 60
-                   ? "Good consistency! Consider setting daily learning reminders."
-                   : "Try to establish a more regular learning routine for better results."
+                   ? t('knowledgeMapModule.insightConsistencyMid')
+                   : t('knowledgeMapModule.insightConsistencyLow')
                  }
                </p>
             </div>
@@ -555,13 +568,13 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
               borderRadius: '12px',
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>⚡ Learning Velocity</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.insightVelocityTitle')}</h4>
                              <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
                  {safeMetrics.learningVelocity > 0.01
-                   ? "Great pace! You're making steady progress in your learning journey."
+                   ? t('knowledgeMapModule.insightVelocityHigh')
                    : safeMetrics.learningVelocity > 0.005
-                   ? "Steady progress! Consider increasing study time for faster growth."
-                   : "Consider dedicating more time to learning to accelerate your progress."
+                   ? t('knowledgeMapModule.insightVelocityMid')
+                   : t('knowledgeMapModule.insightVelocityLow')
                  }
                </p>
             </div>
@@ -573,11 +586,11 @@ const AdvancedMasteryPanel = ({ userData, topics, recommendations }) => {
               borderRadius: '12px',
               border: `1px solid ${colors.border}`
             }}>
-              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>🎯 Smart Recommendations</h4>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.textPrimary }}>{t('knowledgeMapModule.insightRecommendationsTitle')}</h4>
               <p style={{ margin: '0', color: colors.textSecondary, fontSize: '0.9rem' }}>
                 {recommendations?.length > 0
-                  ? `Based on your progress, we recommend focusing on ${recommendations[0]?.topic_name} next.`
-                  : "Complete more topics to get personalized recommendations."
+                  ? t('knowledgeMapModule.insightRecommendationsWithTopic', { topic: recommendations[0]?.topic_name ?? '' })
+                  : t('knowledgeMapModule.insightRecommendationsEmpty')
                 }
               </p>
             </div>
