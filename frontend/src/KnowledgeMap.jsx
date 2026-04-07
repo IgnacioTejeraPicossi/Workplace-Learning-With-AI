@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import { auth } from './firebase';
 import MasteryTimeline from './MasteryTimeline';
@@ -8,6 +9,22 @@ import ClusterLegend from './ClusterLegend';
 import AdvancedMasteryPanel from './AdvancedMasteryPanel';
 import WebSearchResults from './WebSearchResults';
 import * as d3 from 'd3';
+
+const CLUSTER_NAME_KEYS = {
+  'Programming & Development': 'programmingDevelopment',
+  'AI & Machine Learning': 'aiMl',
+  'Development Tools': 'devTools',
+  'Web Technologies': 'webTech',
+  'Data & Analytics': 'dataAnalytics',
+  'General Skills': 'generalSkills',
+  'AI & Technology': 'aiTechnology',
+  'Leadership & Management': 'leadershipManagement',
+  'Business & Sales': 'businessSales',
+  'Communication Skills': 'communicationSkills',
+  'Conflict Resolution': 'conflictResolution',
+  'AI Fundamentals': 'aiFundamentals',
+  'Other': 'other'
+};
 
 const KnowledgeMap = () => {
   const [topics, setTopics] = useState({});
@@ -44,7 +61,13 @@ const KnowledgeMap = () => {
   
   const svgRef = useRef(null);
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const zoomRef = useRef(null);
+
+  const translateClusterName = useCallback((name) => {
+    const key = CLUSTER_NAME_KEYS[name];
+    return key ? t(`knowledgeMapModule.clusterNames.${key}`) : name;
+  }, [t]);
 
   // Color palette for different clusters - Updated for dynamic categories
   const clusterColors = {
@@ -296,7 +319,7 @@ const KnowledgeMap = () => {
     if (!loading && Object.keys(topics).length > 0 && svgRef.current) {
       renderMap();
     }
-  }, [topics, filteredTopics, userData, clusters, loading]);
+  }, [topics, filteredTopics, userData, clusters, loading, translateClusterName]);
 
   const renderMap = () => {
     const svg = svgRef.current;
@@ -578,7 +601,7 @@ const KnowledgeMap = () => {
           label.setAttribute('class', 'cluster-label');
           const originalTransform = `translate(${avgX}, ${avgY - 50})`;
           label.setAttribute('data-original-transform', originalTransform);
-          label.textContent = clusterName;
+          label.textContent = translateClusterName(clusterName);
 
           zoomContainer.appendChild(label);
           console.log(`✅ Added dynamic cluster label: ${clusterName} with ${clusterNodes.length} nodes`);
@@ -611,18 +634,17 @@ const KnowledgeMap = () => {
         height: '400px',
         color: colors.text 
       }}>
-        <div>Loading Knowledge Map...</div>
+        <div>{t('knowledgeMapModule.loading')}</div>
       </div>
     );
   }
 
   return (
     <div style={{ width: '100%', color: colors.text }}>
-      <h2 style={{ marginBottom: 16, color: colors.text }}>🗺️ Map of Knowledge</h2>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>{t('knowledgeMapModule.title')}</h2>
       
       <p style={{ marginBottom: 20, color: colors.textSecondary }}>
-        Visualize your learning journey across different knowledge domains. 
-        Node size indicates your mastery level, and colors represent knowledge clusters.
+        {t('knowledgeMapModule.intro')}
       </p>
 
       {/* Knowledge Clusters Summary - Moved to main panel */}
@@ -635,7 +657,7 @@ const KnowledgeMap = () => {
         boxShadow: colors.shadow
       }}>
         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>
-          📊 Knowledge Clusters
+          {t('knowledgeMapModule.clustersSectionTitle')}
         </h4>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           {Object.entries(clusters).map(([clusterName, topicIds]) => {
@@ -664,7 +686,11 @@ const KnowledgeMap = () => {
                   backgroundColor: clusterColors[clusterName] || '#666'
                 }} />
                 <span style={{ fontSize: '0.9em', color: colors.textSecondary }}>
-                  {clusterName}: {clusterTopics.length} topics, Avg: {Math.round(avgMastery * 100)}%
+                  {t('knowledgeMapModule.clusterSummary', {
+                    name: translateClusterName(clusterName),
+                    count: clusterTopics.length,
+                    avg: Math.round(avgMastery * 100)
+                  })}
                 </span>
               </div>
             );
@@ -682,7 +708,7 @@ const KnowledgeMap = () => {
         boxShadow: colors.shadow
       }}>
         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>
-          🔍 Search & Filter Topics
+          {t('knowledgeMapModule.searchSectionTitle')}
         </h4>
         
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -690,7 +716,7 @@ const KnowledgeMap = () => {
           <div style={{ flex: '1', minWidth: '250px', maxWidth: '400px' }}>
             <input
               type="text"
-              placeholder="Search topics..."
+              placeholder={t('knowledgeMapModule.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -732,7 +758,7 @@ const KnowledgeMap = () => {
               boxSizing: 'border-box'
             }}
           >
-            Test Search
+            {t('knowledgeMapModule.testSearch')}
           </button>
           
 
@@ -751,10 +777,10 @@ const KnowledgeMap = () => {
                 fontSize: '14px'
               }}
             >
-              <option value="all">All Categories</option>
+              <option value="all">{t('knowledgeMapModule.allCategories')}</option>
                              {clusters && Object.keys(clusters).map(category => (
                  <option key={category} value={category}>
-                   {category}
+                   {translateClusterName(category)}
                  </option>
                ))}
             </select>
@@ -775,10 +801,10 @@ const KnowledgeMap = () => {
                 fontSize: '14px'
               }}
             >
-              <option value="all">All Levels</option>
-              <option value="low">Low Mastery (&lt;30%)</option>
-              <option value="medium">Medium Mastery (30-70%)</option>
-              <option value="high">High Mastery (&gt;70%)</option>
+              <option value="all">{t('knowledgeMapModule.allLevels')}</option>
+              <option value="low">{t('knowledgeMapModule.masteryLow')}</option>
+              <option value="medium">{t('knowledgeMapModule.masteryMedium')}</option>
+              <option value="high">{t('knowledgeMapModule.masteryHigh')}</option>
             </select>
           </div>
 
@@ -795,7 +821,10 @@ const KnowledgeMap = () => {
           }}>
             <span>📊</span>
             <span>
-              {Object.keys(filteredTopics).length} of {Object.keys(topics).length} topics
+              {t('knowledgeMapModule.topicCountShort', {
+                filtered: Object.keys(filteredTopics).length,
+                total: Object.keys(topics).length
+              })}
             </span>
           </div>
 
@@ -817,19 +846,27 @@ const KnowledgeMap = () => {
               whiteSpace: 'nowrap'
             }}
           >
-            🗑️ Clear Filters
+            {t('knowledgeMapModule.clearFilters')}
           </button>
         </div>
 
         {/* Results Counter */}
         <div style={{ marginTop: 12, fontSize: '0.9rem', color: colors.textSecondary }}>
-          Showing {Object.keys(filteredTopics).length} of {Object.keys(topics).length} topics
+          {t('knowledgeMapModule.showingTopics', {
+            filtered: Object.keys(filteredTopics).length,
+            total: Object.keys(topics).length
+          })}
           {Object.keys(topics).length > 0 && (
             <div style={{ marginTop: 4, fontSize: '0.8rem', opacity: 0.8 }}>
-              📊 Data sources: {Object.keys(topics).map(id => topics[id]?.source).filter((source, index, arr) => arr.indexOf(source) === index).join(', ')}
+              {t('knowledgeMapModule.dataSources', {
+                sources: Object.keys(topics).map(id => topics[id]?.source).filter((source, index, arr) => arr.indexOf(source) === index).join(', ')
+              })}
               {userData?.real_stats && (
                 <div style={{ marginTop: 4 }}>
-                  🎯 Your learning: {userData.real_stats.total_lessons} lessons, {userData.real_stats.unique_topics} topics
+                  {t('knowledgeMapModule.yourLearning', {
+                    lessons: userData.real_stats.total_lessons,
+                    topicCount: userData.real_stats.unique_topics
+                  })}
                 </div>
               )}
             </div>
@@ -910,7 +947,7 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
-            title="Zoom in"
+            title={t('knowledgeMapModule.zoomIn')}
           >
             +
           </button>
@@ -966,7 +1003,7 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
-            title="Reset zoom and center"
+            title={t('knowledgeMapModule.resetZoom')}
           >
             🏠
           </button>
@@ -1008,7 +1045,7 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
-            title="Center on visible nodes"
+            title={t('knowledgeMapModule.centerVisible')}
           >
             🎯
           </button>
@@ -1044,7 +1081,7 @@ const KnowledgeMap = () => {
               justifyContent: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
-            title={isZoomMode ? "Disable zoom mode" : "Enable zoom mode"}
+            title={isZoomMode ? t('knowledgeMapModule.zoomModeOn') : t('knowledgeMapModule.zoomModeOff')}
           >
             {isZoomMode ? "🔒" : "🔓"}
           </button>
@@ -1059,7 +1096,7 @@ const KnowledgeMap = () => {
          border: `1px solid ${colors.border}`,
          marginBottom: 20
        }}>
-         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>📋 Map Legend</h4>
+         <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>{t('knowledgeMapModule.legendTitle')}</h4>
          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
            {Object.entries(clusterColors).map(([clusterName, color]) => (
              <div key={clusterName} style={{ 
@@ -1078,19 +1115,19 @@ const KnowledgeMap = () => {
                  backgroundColor: color
                }} />
                <span style={{ fontSize: '0.9em', color: colors.textSecondary, fontWeight: '500' }}>
-                 {clusterName}
+                 {translateClusterName(clusterName)}
                </span>
              </div>
            ))}
          </div>
          <div style={{ marginTop: 12, fontSize: '0.9em', color: colors.textSecondary }}>
-           <strong>Node size:</strong> Larger nodes indicate higher mastery levels
+           {t('knowledgeMapModule.legendNodeSize')}
          </div>
          <div style={{ marginTop: 8, fontSize: '0.9em', color: colors.textSecondary }}>
-           <strong>Zoom:</strong> Use the controls on the map, mouse wheel, or double-click to reset
+           {t('knowledgeMapModule.legendZoom')}
          </div>
          <div style={{ marginTop: 8, fontSize: '0.9em', color: colors.textSecondary }}>
-           <strong>Pan:</strong> Click and drag to move around the map
+           {t('knowledgeMapModule.legendPan')}
          </div>
        </div>
 
@@ -1118,7 +1155,7 @@ const KnowledgeMap = () => {
             {selectedTopic.description}
           </p>
           <div style={{ marginBottom: 16 }}>
-            <strong style={{ color: colors.text }}>Mastery Level:</strong>
+            <strong style={{ color: colors.text }}>{t('knowledgeMapModule.masteryLevel')}</strong>
             <span style={{ 
               marginLeft: 8, 
               color: selectedTopic.mastery > 0.7 ? '#4CAF50' : 
@@ -1128,9 +1165,9 @@ const KnowledgeMap = () => {
             </span>
           </div>
           <div style={{ marginBottom: 16 }}>
-            <strong style={{ color: colors.text }}>Cluster:</strong>
+            <strong style={{ color: colors.text }}>{t('knowledgeMapModule.clusterLabel')}</strong>
             <span style={{ marginLeft: 8, color: colors.textSecondary }}>
-              {selectedTopic.cluster}
+              {translateClusterName(selectedTopic.cluster)}
             </span>
           </div>
           <button
@@ -1144,7 +1181,7 @@ const KnowledgeMap = () => {
               cursor: 'pointer'
             }}
           >
-            Close
+            {t('knowledgeMapModule.close')}
           </button>
         </div>
       )}
@@ -1158,25 +1195,25 @@ const KnowledgeMap = () => {
           marginTop: 20
         }}>
           <h4 style={{ marginTop: 0, marginBottom: 12, color: colors.text }}>
-            Your Learning Progress
+            {t('knowledgeMapModule.progressTitle')}
           </h4>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <div>
-              <strong style={{ color: colors.text }}>Lessons Completed:</strong>
+              <strong style={{ color: colors.text }}>{t('knowledgeMapModule.lessonsCompleted')}</strong>
               <span style={{ marginLeft: 8, color: colors.textSecondary }}>
                 {userData.progress.lessonsCompleted}
               </span>
             </div>
             <div>
-              <strong style={{ color: colors.text }}>Simulations Completed:</strong>
+              <strong style={{ color: colors.text }}>{t('knowledgeMapModule.simulationsCompleted')}</strong>
               <span style={{ marginLeft: 8, color: colors.textSecondary }}>
                 {userData.progress.simulationsCompleted}
               </span>
             </div>
             <div>
-              <strong style={{ color: colors.text }}>Recommended Next:</strong>
+              <strong style={{ color: colors.text }}>{t('knowledgeMapModule.recommendedNext')}</strong>
               <span style={{ marginLeft: 8, color: colors.primary }}>
-                {topics[userData.recommended_next]?.label || 'None'}
+                {topics[userData.recommended_next]?.label || t('knowledgeMapModule.none')}
               </span>
             </div>
           </div>
@@ -1195,9 +1232,9 @@ const KnowledgeMap = () => {
               border: `1px solid ${colors.border}`
             }}>
               <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🧠</div>
-              <div>Analyzing your learning patterns with AI...</div>
+              <div>{t('knowledgeMapModule.analyzingPatterns')}</div>
               <div style={{ fontSize: '0.8rem', marginTop: '8px', opacity: 0.7 }}>
-                Calculating vector proximity and learning paths
+                {t('knowledgeMapModule.analyzingSub')}
               </div>
             </div>
           ) : (
