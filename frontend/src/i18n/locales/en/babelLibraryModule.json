@@ -263,6 +263,25 @@
       "llmClassified": "LLM classified",
       "embedded": "Embedded",
       "pending": "Pending"
+    },
+    "recommendations": {
+      "title": "Recommended for you",
+      "loading": "Loading recommendations…",
+      "empty": "Explore the library to build your learning profile and get personalized recommendations.",
+      "matchScore": "Match",
+      "newLearner": "New learner",
+      "buildingProfile": "Building profile",
+      "activeLearner": "Active learner",
+      "powerLearner": "Power learner"
+    },
+    "learningPath": {
+      "title": "Learning Path Generator",
+      "description": "Enter a topic or goal and get a personalized step-by-step learning path based on your library resources.",
+      "inputPlaceholder": "e.g. 'machine learning', 'cloud architecture', 'leadership'…",
+      "generate": "Generate path",
+      "generating": "Generating your learning path…",
+      "empty": "No resources found for this topic. Try a broader term.",
+      "step": "Step"
     }
   }
 }

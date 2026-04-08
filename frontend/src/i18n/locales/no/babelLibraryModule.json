@@ -263,6 +263,25 @@
       "llmClassified": "KI-klassifisert",
       "embedded": "Embeddings",
       "pending": "Ventende"
+    },
+    "recommendations": {
+      "title": "Anbefalt for deg",
+      "loading": "Laster anbefalinger …",
+      "empty": "Utforsk biblioteket for å bygge læringsprofilen din og få personlige anbefalinger.",
+      "matchScore": "Treff",
+      "newLearner": "Ny bruker",
+      "buildingProfile": "Bygger profil",
+      "activeLearner": "Aktiv bruker",
+      "powerLearner": "Superbruker"
+    },
+    "learningPath": {
+      "title": "Læringsløp-generator",
+      "description": "Skriv inn et emne eller mål og få et personlig trinnvis læringsløp basert på bibliotekets ressurser.",
+      "inputPlaceholder": "f.eks. «maskinlæring», «skyarkitektur», «ledelse» …",
+      "generate": "Generer løp",
+      "generating": "Genererer læringsløpet ditt …",
+      "empty": "Ingen ressurser funnet for dette emnet. Prøv et bredere søkeord.",
+      "step": "Steg"
     }
   }
 }

@@ -2792,6 +2792,131 @@ const BabelLibrary = () => {
               </div>
             )}
 
+            {/* Learning Path Generator */}
+            <details style={{
+              background: `linear-gradient(135deg, ${colors.primary}05, ${colors.primary}12)`,
+              padding: '16px 20px',
+              borderRadius: 10,
+              border: `1px solid ${colors.primary}30`,
+              marginTop: 24,
+              cursor: 'pointer'
+            }}>
+              <summary style={{ color: colors.primary, fontWeight: 'bold', fontSize: '1em' }}>
+                🗺️ {t('babelLibraryModule.learningPath.title')}
+              </summary>
+              <div style={{ marginTop: 16 }}>
+                <p style={{ color: colors.textSecondary, fontSize: '0.9em', marginBottom: 12 }}>
+                  {t('babelLibraryModule.learningPath.description')}
+                </p>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <input
+                    type="text"
+                    value={pathGoal}
+                    onChange={(e) => setPathGoal(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && pathGoal.trim()) {
+                        setPathLoading(true);
+                        apiCall(`/api/babel/profile/${getUserId()}/learning-path`, 'POST', { goal_topic: pathGoal, max_steps: 8 })
+                          .then(data => setLearningPath(data))
+                          .catch(() => setLearningPath({ steps: [] }))
+                          .finally(() => setPathLoading(false));
+                      }
+                    }}
+                    placeholder={t('babelLibraryModule.learningPath.inputPlaceholder')}
+                    style={{
+                      flex: 1, padding: '10px 14px',
+                      border: `1px solid ${colors.border}`, borderRadius: 8,
+                      fontSize: '0.95em', background: colors.background, color: colors.text
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (!pathGoal.trim()) return;
+                      setPathLoading(true);
+                      apiCall(`/api/babel/profile/${getUserId()}/learning-path`, 'POST', { goal_topic: pathGoal, max_steps: 8 })
+                        .then(data => setLearningPath(data))
+                        .catch(() => setLearningPath({ steps: [] }))
+                        .finally(() => setPathLoading(false));
+                    }}
+                    disabled={!pathGoal.trim() || pathLoading}
+                    style={{
+                      padding: '10px 20px',
+                      background: pathGoal.trim() && !pathLoading ? colors.primary : '#ccc',
+                      color: 'white', border: 'none', borderRadius: 8,
+                      cursor: pathGoal.trim() && !pathLoading ? 'pointer' : 'not-allowed',
+                      fontWeight: 'bold', whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {pathLoading ? '⏳' : '🗺️'} {t('babelLibraryModule.learningPath.generate')}
+                  </button>
+                </div>
+
+                {pathLoading && (
+                  <div style={{ textAlign: 'center', padding: 20, color: colors.primary }}>
+                    ⏳ {t('babelLibraryModule.learningPath.generating')}
+                  </div>
+                )}
+
+                {learningPath && !pathLoading && (
+                  <div style={{ marginTop: 16 }}>
+                    {learningPath.steps?.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: 20, color: colors.textSecondary }}>
+                        🔍 {t('babelLibraryModule.learningPath.empty')}
+                      </div>
+                    ) : (
+                      <div>
+                        {learningPath.steps.map((step, i) => (
+                          <div key={`path-${i}`} style={{
+                            display: 'flex', gap: 14, alignItems: 'flex-start',
+                            padding: '12px 0',
+                            borderBottom: i < learningPath.steps.length - 1 ? `1px solid ${colors.border}` : 'none'
+                          }}>
+                            {/* Step number */}
+                            <div style={{
+                              width: 32, height: 32, borderRadius: '50%',
+                              background: colors.primary, color: 'white',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontWeight: 'bold', fontSize: '0.85em', flexShrink: 0
+                            }}>
+                              {step.step}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 600, color: colors.text, marginBottom: 4 }}>
+                                {getTypeIcon(step.resource_type)} {step.title}
+                              </div>
+                              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                                <span style={{
+                                  background: getTypeColor(step.resource_type), color: 'white',
+                                  padding: '1px 7px', borderRadius: 10, fontSize: '0.7em'
+                                }}>
+                                  {typeLabel(step.resource_type)}
+                                </span>
+                                {step.difficulty && (
+                                  <span style={{
+                                    background: step.difficulty === 'beginner' ? '#e8f5e9' : step.difficulty === 'advanced' ? '#fce4ec' : '#fff8e1',
+                                    color: step.difficulty === 'beginner' ? '#2e7d32' : step.difficulty === 'advanced' ? '#c62828' : '#f57f17',
+                                    padding: '1px 7px', borderRadius: 10, fontSize: '0.7em'
+                                  }}>
+                                    {step.difficulty === 'beginner' ? '🟢' : step.difficulty === 'advanced' ? '🔴' : '🟡'} {t(`babelLibraryModule.intelligence.${step.difficulty}`)}
+                                  </span>
+                                )}
+                                {step.tags?.map(tag => (
+                                  <span key={tag} style={{ background: '#f3e5f5', color: '#7b1fa2', padding: '1px 5px', borderRadius: 8, fontSize: '0.65em' }}>{tag}</span>
+                                ))}
+                              </div>
+                              <div style={{ fontSize: '0.8em', color: colors.textSecondary, fontStyle: 'italic' }}>
+                                {step.reason}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </details>
+
             {/* Batch Classification Admin Panel */}
             <details style={{
               background: `linear-gradient(135deg, ${colors.primary}05, ${colors.primary}12)`,
