@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Allocations = () => {
+  const { t } = useTranslation();
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -12,7 +14,6 @@ const Allocations = () => {
 
   const fetchAllocations = async () => {
     try {
-      // Mock data for demo
       const mockAllocations = [
         {
           id: 'ALLOC-2024-001',
@@ -59,7 +60,7 @@ const Allocations = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Signature': 'test-signature' // In production, generate proper HMAC
+          'X-Signature': 'test-signature'
         },
         body: JSON.stringify(bundle)
       });
@@ -67,9 +68,8 @@ const Allocations = () => {
         const result = await response.json();
         console.log('Ops Efficiency execution result:', result);
         return result;
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     } catch (error) {
       console.error('Failed to execute Ops Efficiency:', error);
       throw error;
@@ -92,9 +92,9 @@ const Allocations = () => {
       };
       await executeOpsx(bundle);
       setShowSuggestion(true);
-      alert('Cost allocation suggestion generated successfully!');
+      alert(t('opsEfficiencyAgentModule.allocSuggestionOk'));
     } catch (error) {
-      alert(`Failed to generate suggestion: ${error.message}`);
+      alert(t('opsEfficiencyAgentModule.allocSuggestionFail', { detail: error.message }));
     } finally {
       setSending(false);
     }
@@ -116,19 +116,24 @@ const Allocations = () => {
       };
       await executeOpsx(bundle);
       setAllocations(prev => prev.map(alloc => alloc.id === allocation.id ? { ...alloc, status: 'posted' } : alloc));
-      alert(`Allocation ${allocation.id} posted successfully!`);
+      alert(t('opsEfficiencyAgentModule.allocPostOk', { id: allocation.id }));
     } catch (error) {
-      alert(`Failed to post allocation: ${error.message}`);
+      alert(t('opsEfficiencyAgentModule.allocPostFail', { detail: error.message }));
     } finally {
       setSending(false);
     }
   };
 
+  const allocStatusLabel = (status) => {
+    const keys = { draft: 'allocStatusDraft', posted: 'allocStatusPosted', cancelled: 'allocStatusCancelled' };
+    return keys[status] ? t(`opsEfficiencyAgentModule.${keys[status]}`) : status;
+  };
+
   const getStatusBadge = (status) => {
-    const map = { draft: { bg: '#FEF3C7', color: '#92400E', label: 'Draft' }, posted: { bg: '#DCFCE7', color: '#166534', label: 'Posted' }, cancelled: { bg: '#E5E7EB', color: '#374151', label: 'Cancelled' } };
-    const s = map[status] || { bg: '#E5E7EB', color: '#374151', label: status };
+    const map = { draft: { bg: '#FEF3C7', color: '#92400E' }, posted: { bg: '#DCFCE7', color: '#166534' }, cancelled: { bg: '#E5E7EB', color: '#374151' } };
+    const s = map[status] || { bg: '#E5E7EB', color: '#374151' };
     return (
-      <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: s.bg, color: s.color }}>{s.label}</span>
+      <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: s.bg, color: s.color }}>{allocStatusLabel(status)}</span>
     );
   };
 
@@ -146,7 +151,7 @@ const Allocations = () => {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading allocations...</p>
+        <p>{t('opsEfficiencyAgentModule.loadingAllocations')}</p>
       </div>
     );
   }
@@ -164,57 +169,54 @@ const Allocations = () => {
   return (
     <div style={container}>
       <div style={{ marginBottom: '1.25rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>Cost Allocations</h1>
-        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>AI-powered cost allocation suggestions with explainability</p>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>{t('opsEfficiencyAgentModule.allocationsTitle')}</h1>
+        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>{t('opsEfficiencyAgentModule.allocationsSubtitle')}</p>
       </div>
 
-      {/* Quick Actions */}
       <div style={{ marginBottom: '1rem' }}>
-        <button onClick={handleSuggestAllocation} disabled={sending} style={btn({ bg: '#2563EB', border: '#1D4ED8', text: '#FFFFFF' })}>
-          {sending ? 'Generating...' : 'Suggest New Allocation'}
+        <button type="button" onClick={handleSuggestAllocation} disabled={sending} style={btn({ bg: '#2563EB', border: '#1D4ED8', text: '#FFFFFF' })}>
+          {sending ? t('opsEfficiencyAgentModule.generating') : t('opsEfficiencyAgentModule.suggestNewAllocation')}
         </button>
       </div>
 
-      {/* Allocation Suggestions */}
       {showSuggestion && (
         <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-          <h3 style={{ marginTop: 0, color: '#1E3A8A', fontWeight: 600 }}>New Allocation Suggestion</h3>
+          <h3 style={{ marginTop: 0, color: '#1E3A8A', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.newAllocationSuggestion')}</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <h4 style={{ margin: 0, fontWeight: 600 }}>Suggested Split:</h4>
+              <h4 style={{ margin: 0, fontWeight: 600 }}>{t('opsEfficiencyAgentModule.suggestedSplit')}</h4>
               <ul style={{ margin: '8px 0', paddingLeft: 18, color: '#4B5563' }}>
-                <li>IT Department: NOK 3,000 (60%)</li>
-                <li>Operations: NOK 2,000 (40%)</li>
+                <li>{t('opsEfficiencyAgentModule.suggestionSplitIt')}</li>
+                <li>{t('opsEfficiencyAgentModule.suggestionSplitOps')}</li>
               </ul>
             </div>
             <div>
-              <h4 style={{ margin: 0, fontWeight: 600 }}>Rationale:</h4>
-              <p style={{ margin: '8px 0', color: '#4B5563' }}>Historical pattern analysis shows consistent 60/40 split for SaaS subscriptions</p>
+              <h4 style={{ margin: 0, fontWeight: 600 }}>{t('opsEfficiencyAgentModule.rationale')}</h4>
+              <p style={{ margin: '8px 0', color: '#4B5563' }}>{t('opsEfficiencyAgentModule.suggestionRationaleText')}</p>
             </div>
           </div>
           <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-            <button style={btn({ bg: '#10B981', border: '#059669', text: '#FFFFFF' })}>Accept Suggestion</button>
-            <button onClick={() => setShowSuggestion(false)} style={btn({ bg: '#E5E7EB', border: '#D1D5DB', text: '#374151' })}>Dismiss</button>
+            <button type="button" style={btn({ bg: '#10B981', border: '#059669', text: '#FFFFFF' })}>{t('opsEfficiencyAgentModule.acceptSuggestion')}</button>
+            <button type="button" onClick={() => setShowSuggestion(false)} style={btn({ bg: '#E5E7EB', border: '#D1D5DB', text: '#374151' })}>{t('opsEfficiencyAgentModule.dismiss')}</button>
           </div>
         </div>
       )}
 
-      {/* Allocations Table */}
       <div style={card}>
         <div style={cardHeader}>
-          <h2 style={cardTitle}>Recent Allocations</h2>
+          <h2 style={cardTitle}>{t('opsEfficiencyAgentModule.recentAllocations')}</h2>
         </div>
         <div style={{ padding: '0.25rem 0 1rem 0' }}>
           <div style={tableWrap}>
             <table style={table}>
               <thead>
                 <tr>
-                  <th style={th}>Allocation ID</th>
-                  <th style={th}>Vendor</th>
-                  <th style={th}>Amount</th>
-                  <th style={th}>Status</th>
-                  <th style={th}>Confidence</th>
-                  <th style={th}>Actions</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thAllocationId')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thVendor')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thAmount')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thStatus')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thConfidence')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thActions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,7 +224,7 @@ const Allocations = () => {
                   <tr key={allocation.id}>
                     <td style={td}>
                       <div style={{ fontWeight: 600 }}>{allocation.id}</div>
-                      <div style={{ color: '#6B7280', fontSize: '0.85rem' }}>Doc: {allocation.document_id}</div>
+                      <div style={{ color: '#6B7280', fontSize: '0.85rem' }}>{t('opsEfficiencyAgentModule.docPrefix')} {allocation.document_id}</div>
                     </td>
                     <td style={td}>
                       <div>{allocation.vendor}</div>
@@ -234,9 +236,9 @@ const Allocations = () => {
                     <td style={td}>
                       <div style={{ display: 'flex', gap: '0.5rem' }}>
                         {allocation.status === 'draft' && (
-                          <button onClick={() => handlePostAllocation(allocation)} disabled={sending} style={btn({ bg: '#ECFDF5', border: '#10B981', text: '#065F46' })}>Post</button>
+                          <button type="button" onClick={() => handlePostAllocation(allocation)} disabled={sending} style={btn({ bg: '#ECFDF5', border: '#10B981', text: '#065F46' })}>{t('opsEfficiencyAgentModule.post')}</button>
                         )}
-                        <button style={btn({ bg: '#EFF6FF', border: '#3B82F6', text: '#1D4ED8' })}>Details</button>
+                        <button type="button" style={btn({ bg: '#EFF6FF', border: '#3B82F6', text: '#1D4ED8' })}>{t('opsEfficiencyAgentModule.details')}</button>
                       </div>
                     </td>
                   </tr>
@@ -247,9 +249,8 @@ const Allocations = () => {
         </div>
       </div>
 
-      {/* Allocation Details */}
       <div style={{ marginTop: 16, ...card, padding: 16 }}>
-        <h3 style={{ ...cardTitle, marginBottom: 12 }}>Allocation Breakdown</h3>
+        <h3 style={{ ...cardTitle, marginBottom: 12 }}>{t('opsEfficiencyAgentModule.allocationBreakdown')}</h3>
         <div style={{ display: 'grid', rowGap: 12 }}>
           {allocations.map((allocation) => (
             <div key={allocation.id} style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 12 }}>

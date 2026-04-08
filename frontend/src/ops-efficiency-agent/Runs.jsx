@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Runs = () => {
+  const { t, i18n } = useTranslation();
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+
+  const dateLocale = i18n.language?.startsWith('no') ? 'nb-NO' : 'en-US';
 
   useEffect(() => {
     fetchRuns();
@@ -30,10 +34,13 @@ const Runs = () => {
     }
   };
 
+  const runStatusLabel = (status) =>
+    t(`opsEfficiencyAgentModule.runStatus.${status}`, { defaultValue: status });
+
   const getStatusBadge = (status) => {
     const map = { SUCCESS: { bg: '#DCFCE7', color: '#166534' }, FAILED: { bg: '#FEE2E2', color: '#991B1B' }, RUNNING: { bg: '#DBEAFE', color: '#1E40AF' }, PENDING: { bg: '#FEF3C7', color: '#92400E' } };
     const s = map[status] || { bg: '#E5E7EB', color: '#374151' };
-    return <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: s.bg, color: s.color }}>{status}</span>;
+    return <span style={{ padding: '0.25rem 0.5rem', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: s.bg, color: s.color }}>{runStatusLabel(status)}</span>;
   };
 
   const getActionIcon = (actionType) => {
@@ -41,7 +48,7 @@ const Runs = () => {
     return icons[actionType] || '⚙️';
   };
 
-  const formatDate = (dateString) => new Date(dateString).toLocaleString();
+  const formatDate = (dateString) => new Date(dateString).toLocaleString(dateLocale);
   const truncateHash = (hash) => (!hash ? '-' : hash.substring(0, 16) + '...');
 
   const filteredRuns = runs.filter(run => {
@@ -56,7 +63,7 @@ const Runs = () => {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading runs...</p>
+        <p>{t('opsEfficiencyAgentModule.loadingRuns')}</p>
       </div>
     );
   }
@@ -74,34 +81,32 @@ const Runs = () => {
   return (
     <div style={container}>
       <div style={{ marginBottom: '1.25rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>Execution History</h1>
-        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>View all Operations Efficiency Agent executions with attestation</p>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>{t('opsEfficiencyAgentModule.runsTitle')}</h1>
+        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>{t('opsEfficiencyAgentModule.runsSubtitle')}</p>
       </div>
 
-      {/* Filters */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <button onClick={() => setFilter('all')} style={btn(filter === 'all' ? '#2563EB' : '#E5E7EB', filter === 'all' ? '#FFFFFF' : '#374151', filter === 'all' ? '#1D4ED8' : '#D1D5DB')}>All ({runs.length})</button>
-        <button onClick={() => setFilter('success')} style={btn(filter === 'success' ? '#10B981' : '#E5E7EB', filter === 'success' ? '#FFFFFF' : '#374151', filter === 'success' ? '#059669' : '#D1D5DB')}>Success ({runs.filter(r => r.status === 'SUCCESS').length})</button>
-        <button onClick={() => setFilter('failed')} style={btn(filter === 'failed' ? '#EF4444' : '#E5E7EB', filter === 'failed' ? '#FFFFFF' : '#374151', filter === 'failed' ? '#B91C1C' : '#D1D5DB')}>Failed ({runs.filter(r => r.status === 'FAILED').length})</button>
-        <button onClick={() => setFilter('running')} style={btn(filter === 'running' ? '#3B82F6' : '#E5E7EB', filter === 'running' ? '#FFFFFF' : '#374151', filter === 'running' ? '#1D4ED8' : '#D1D5DB')}>Running ({runs.filter(r => r.status === 'RUNNING').length})</button>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button type="button" onClick={() => setFilter('all')} style={btn(filter === 'all' ? '#2563EB' : '#E5E7EB', filter === 'all' ? '#FFFFFF' : '#374151', filter === 'all' ? '#1D4ED8' : '#D1D5DB')}>{t('opsEfficiencyAgentModule.filterAll', { count: runs.length })}</button>
+        <button type="button" onClick={() => setFilter('success')} style={btn(filter === 'success' ? '#10B981' : '#E5E7EB', filter === 'success' ? '#FFFFFF' : '#374151', filter === 'success' ? '#059669' : '#D1D5DB')}>{t('opsEfficiencyAgentModule.filterSuccess', { count: runs.filter(r => r.status === 'SUCCESS').length })}</button>
+        <button type="button" onClick={() => setFilter('failed')} style={btn(filter === 'failed' ? '#EF4444' : '#E5E7EB', filter === 'failed' ? '#FFFFFF' : '#374151', filter === 'failed' ? '#B91C1C' : '#D1D5DB')}>{t('opsEfficiencyAgentModule.filterFailed', { count: runs.filter(r => r.status === 'FAILED').length })}</button>
+        <button type="button" onClick={() => setFilter('running')} style={btn(filter === 'running' ? '#3B82F6' : '#E5E7EB', filter === 'running' ? '#FFFFFF' : '#374151', filter === 'running' ? '#1D4ED8' : '#D1D5DB')}>{t('opsEfficiencyAgentModule.filterRunning', { count: runs.filter(r => r.status === 'RUNNING').length })}</button>
       </div>
 
-      {/* Runs Table */}
       <div style={card}>
         <div style={cardHeader}>
-          <h2 style={cardTitle}>Recent Executions</h2>
+          <h2 style={cardTitle}>{t('opsEfficiencyAgentModule.recentExecutions')}</h2>
         </div>
         <div style={{ padding: '0.25rem 0 1rem 0' }}>
           <div style={tableWrap}>
             <table style={table}>
               <thead>
                 <tr>
-                  <th style={th}>Run ID</th>
-                  <th style={th}>Topic</th>
-                  <th style={th}>Status</th>
-                  <th style={th}>Actions</th>
-                  <th style={th}>Created</th>
-                  <th style={th}>Attestation</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thRunId')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thTopic')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thStatus')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thActions')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thCreated')}</th>
+                  <th style={th}>{t('opsEfficiencyAgentModule.thAttestation')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,7 +123,8 @@ const Runs = () => {
                             return artifact.map((item, index) => (
                               <span key={index} style={{ fontSize: '1.1rem' }} title={key}>{getActionIcon(key)}</span>
                             ));
-                          } else if (artifact && typeof artifact === 'object') {
+                          }
+                          if (artifact && typeof artifact === 'object') {
                             return <span key={key} style={{ fontSize: '1.1rem' }} title={key}>{getActionIcon(key)}</span>;
                           }
                           return null;
@@ -135,13 +141,12 @@ const Runs = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
         <div style={{ ...card, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ padding: 8, borderRadius: 9999, background: '#DBEAFE' }}>📊</div>
             <div>
-              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>Total Runs</div>
+              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>{t('opsEfficiencyAgentModule.summaryTotalRuns')}</div>
               <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{runs.length}</div>
             </div>
           </div>
@@ -150,7 +155,7 @@ const Runs = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ padding: 8, borderRadius: 9999, background: '#DCFCE7' }}>✅</div>
             <div>
-              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>Successful</div>
+              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>{t('opsEfficiencyAgentModule.summarySuccessful')}</div>
               <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{runs.filter(r => r.status === 'SUCCESS').length}</div>
             </div>
           </div>
@@ -159,7 +164,7 @@ const Runs = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ padding: 8, borderRadius: 9999, background: '#FEE2E2' }}>❌</div>
             <div>
-              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>Failed</div>
+              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>{t('opsEfficiencyAgentModule.summaryFailed')}</div>
               <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{runs.filter(r => r.status === 'FAILED').length}</div>
             </div>
           </div>
@@ -168,7 +173,7 @@ const Runs = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ padding: 8, borderRadius: 9999, background: '#FEF3C7' }}>⏱️</div>
             <div>
-              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>Success Rate</div>
+              <div style={{ color: '#6B7280', fontSize: '0.9rem' }}>{t('opsEfficiencyAgentModule.summarySuccessRate')}</div>
               <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{runs.length > 0 ? Math.round((runs.filter(r => r.status === 'SUCCESS').length / runs.length) * 100) : 0}%</div>
             </div>
           </div>

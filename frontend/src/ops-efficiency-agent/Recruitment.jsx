@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Recruitment = () => {
+  const { t } = useTranslation();
   const [candidates, setCandidates] = useState([]);
   const [jobCriteria, setJobCriteria] = useState('');
-  const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [rankingResults, setRankingResults] = useState(null);
 
@@ -26,7 +27,10 @@ const Recruitment = () => {
   };
 
   const handleRankCandidates = async () => {
-    if (!jobCriteria.trim()) { alert('Please enter job criteria'); return; }
+    if (!jobCriteria.trim()) {
+      alert(t('opsEfficiencyAgentModule.alertJobCriteria'));
+      return;
+    }
     setSending(true);
     try {
       const runId = `opsx-ats-${Date.now()}`;
@@ -53,10 +57,12 @@ const Recruitment = () => {
         processed_at: new Date().toISOString()
       })).sort((a, b) => b.score01 - a.score01);
       setRankingResults(mockResults);
-      alert('CV ranking completed successfully!');
+      alert(t('opsEfficiencyAgentModule.alertRankingOk'));
     } catch (error) {
-      alert(`Failed to rank candidates: ${error.message}`);
-    } finally { setSending(false); }
+      alert(t('opsEfficiencyAgentModule.alertRankingFail', { detail: error.message }));
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleFileUpload = (event) => {
@@ -71,7 +77,9 @@ const Recruitment = () => {
     setCandidates(prev => [...prev, ...newCandidates]);
   };
 
-  const removeCandidate = (candidateId) => { setCandidates(prev => prev.filter(c => c.id !== candidateId)); };
+  const removeCandidate = (candidateId) => {
+    setCandidates(prev => prev.filter(c => c.id !== candidateId));
+  };
 
   const getScoreBadge = (score) => {
     const percentage = Math.round(score * 100);
@@ -84,43 +92,44 @@ const Recruitment = () => {
   const cardHeader = { padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb' };
   const section = { padding: 16 };
   const input = { width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #D1D5DB', borderRadius: 8 };
-  const label = { display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#374151', marginBottom: 8 };
   const btn = (bg, text, border) => ({ padding: '0.6rem 1rem', borderRadius: 8, background: bg, color: text, border: `1px solid ${border}`, cursor: 'pointer' });
 
   return (
     <div style={container}>
       <div style={{ marginBottom: '1.25rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>CV Ranking</h1>
-        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>Rank candidates against job criteria with evidence highlighting</p>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111827', margin: 0 }}>{t('opsEfficiencyAgentModule.recruitmentTitle')}</h1>
+        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>{t('opsEfficiencyAgentModule.recruitmentSubtitle')}</p>
       </div>
 
-      {/* Job Criteria */}
       <div style={card}>
-        <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Job Criteria</h2></div>
+        <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.jobCriteria')}</h2></div>
         <div style={section}>
-          <textarea value={jobCriteria} onChange={(e) => setJobCriteria(e.target.value)} placeholder="Enter job requirements, skills, and criteria (e.g., Python, FastAPI, MongoDB, Docker, 3+ years experience)" style={{ ...input, height: 110 }} />
+          <textarea
+            value={jobCriteria}
+            onChange={(e) => setJobCriteria(e.target.value)}
+            placeholder={t('opsEfficiencyAgentModule.jobCriteriaPlaceholder')}
+            style={{ ...input, height: 110 }}
+          />
         </div>
       </div>
 
-      {/* Upload CVs */}
       <div style={{ ...card, marginTop: 16 }}>
-        <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Upload CVs</h2></div>
+        <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.uploadCvs')}</h2></div>
         <div style={section}>
           <div style={{ border: '2px dashed #D1D5DB', borderRadius: 12, padding: 24, textAlign: 'center' }}>
             <input type="file" multiple accept=".pdf,.doc,.docx" onChange={handleFileUpload} id="cv-upload" style={{ display: 'none' }} />
             <label htmlFor="cv-upload" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <span style={{ fontSize: 36, marginBottom: 8 }}>📄</span>
-              <span style={{ fontSize: 16, fontWeight: 600, color: '#374151' }}>Click to upload CVs</span>
-              <span style={{ fontSize: 12, color: '#6B7280' }}>PDF, DOC, DOCX files supported</span>
+              <span style={{ fontSize: 16, fontWeight: 600, color: '#374151' }}>{t('opsEfficiencyAgentModule.clickUploadCvs')}</span>
+              <span style={{ fontSize: 12, color: '#6B7280' }}>{t('opsEfficiencyAgentModule.fileTypesHint')}</span>
             </label>
           </div>
         </div>
       </div>
 
-      {/* Candidates */}
       {candidates.length > 0 && (
         <div style={{ ...card, marginTop: 16 }}>
-          <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Candidates ({candidates.length})</h2></div>
+          <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.candidatesHeading', { count: candidates.length })}</h2></div>
           <div style={section}>
             <div style={{ display: 'grid', rowGap: 10 }}>
               {candidates.map((candidate) => (
@@ -132,7 +141,7 @@ const Recruitment = () => {
                       <div style={{ fontSize: 12, color: '#6B7280' }}>ID: {candidate.id}</div>
                     </div>
                   </div>
-                  <button onClick={() => removeCandidate(candidate.id)} style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}>Remove</button>
+                  <button type="button" onClick={() => removeCandidate(candidate.id)} style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}>{t('opsEfficiencyAgentModule.remove')}</button>
                 </div>
               ))}
             </div>
@@ -140,17 +149,17 @@ const Recruitment = () => {
         </div>
       )}
 
-      {/* Rank Button */}
       {candidates.length > 0 && jobCriteria.trim() && (
         <div style={{ marginTop: 12 }}>
-          <button onClick={handleRankCandidates} disabled={sending} style={btn('#7C3AED', '#FFFFFF', '#6D28D9')}>{sending ? 'Ranking Candidates...' : `Rank ${candidates.length} Candidates`}</button>
+          <button type="button" onClick={handleRankCandidates} disabled={sending} style={btn('#7C3AED', '#FFFFFF', '#6D28D9')}>
+            {sending ? t('opsEfficiencyAgentModule.rankingCandidates') : t('opsEfficiencyAgentModule.rankNCandidates', { count: candidates.length })}
+          </button>
         </div>
       )}
 
-      {/* Results */}
       {rankingResults && (
         <div style={{ ...card, marginTop: 16 }}>
-          <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Ranking Results</h2></div>
+          <div style={cardHeader}><h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.rankingResults')}</h2></div>
           <div style={section}>
             <div style={{ display: 'grid', rowGap: 12 }}>
               {rankingResults.map((result, index) => {
@@ -167,11 +176,11 @@ const Recruitment = () => {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         {getScoreBadge(result.score01)}
-                        <button style={{ color: '#1D4ED8', background: '#EFF6FF', border: '1px solid #93C5FD', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}>Export to Sheets</button>
+                        <button type="button" style={{ color: '#1D4ED8', background: '#EFF6FF', border: '1px solid #93C5FD', borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}>{t('opsEfficiencyAgentModule.exportToSheets')}</button>
                       </div>
                     </div>
                     <div>
-                      <h4 style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Key Highlights:</h4>
+                      <h4 style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{t('opsEfficiencyAgentModule.keyHighlights')}</h4>
                       <div style={{ display: 'grid', rowGap: 6 }}>
                         {result.highlights.map((highlight, idx) => (
                           <div key={idx} style={{ background: '#FEF3C7', borderLeft: '4px solid #F59E0B', padding: 10 }}>
@@ -193,12 +202,23 @@ const Recruitment = () => {
         </div>
       )}
 
-      {/* Demo Data */}
       {candidates.length === 0 && (
         <div style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 12, padding: 16, marginTop: 16 }}>
-          <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: '1.1rem', fontWeight: 600 }}>Demo Data</h3>
-          <p style={{ color: '#4B5563', marginBottom: 12 }}>Upload CV files or use the demo data below to test the ranking functionality.</p>
-          <button onClick={() => { setCandidates([{ id: 'CAND-DEMO-001', name: 'John Doe', cv_text: 'Senior Backend Developer with 5+ years experience in Python, FastAPI, MongoDB, Docker, and REST APIs. Strong background in microservices architecture and database design.', cv_url: null }, { id: 'CAND-DEMO-002', name: 'Jane Smith', cv_text: 'Full-stack developer with experience in Java, Spring Boot, PostgreSQL, and React. Some Python experience but primarily Java-focused.', cv_url: null }, { id: 'CAND-DEMO-003', name: 'Mike Johnson', cv_text: 'Python developer with 3 years experience in Django, PostgreSQL, and AWS. Looking to transition to FastAPI and MongoDB.', cv_url: null }]); }} style={btn('#4B5563', '#FFFFFF', '#374151')}>Load Demo Candidates</button>
+          <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: '1.1rem', fontWeight: 600 }}>{t('opsEfficiencyAgentModule.demoData')}</h3>
+          <p style={{ color: '#4B5563', marginBottom: 12 }}>{t('opsEfficiencyAgentModule.demoDataBody')}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setCandidates([
+                { id: 'CAND-DEMO-001', name: 'John Doe', cv_text: 'Senior Backend Developer with 5+ years experience in Python, FastAPI, MongoDB, Docker, and REST APIs. Strong background in microservices architecture and database design.', cv_url: null },
+                { id: 'CAND-DEMO-002', name: 'Jane Smith', cv_text: 'Full-stack developer with experience in Java, Spring Boot, PostgreSQL, and React. Some Python experience but primarily Java-focused.', cv_url: null },
+                { id: 'CAND-DEMO-003', name: 'Mike Johnson', cv_text: 'Python developer with 3 years experience in Django, PostgreSQL, and AWS. Looking to transition to FastAPI and MongoDB.', cv_url: null }
+              ]);
+            }}
+            style={btn('#4B5563', '#FFFFFF', '#374151')}
+          >
+            {t('opsEfficiencyAgentModule.loadDemoCandidates')}
+          </button>
         </div>
       )}
     </div>
