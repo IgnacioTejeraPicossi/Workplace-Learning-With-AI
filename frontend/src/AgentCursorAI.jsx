@@ -1,7 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import './AgentCursorAI.css';
 
+/** Translate backend `current_step` strings (English) for display; pass through unknown text. */
+function translateAgentCursorApiStep(step, t) {
+  if (step == null || step === '') return '';
+  const raw = String(step);
+
+  const EXACT = {
+    'Initializing...': 'apiStepInitializing',
+    'Initializing…': 'apiStepInitializing',
+    'Job initialized successfully': 'apiStepJobInitialized',
+    'Creating temporary directory...': 'apiStepCreatingTempDir',
+    'Repository cloned successfully': 'apiStepRepoCloned',
+    'Creating automation files...': 'apiStepCreatingAutomationFiles',
+    'Automation files created successfully': 'apiStepAutomationFilesCreated',
+    'Launching Cursor AI...': 'apiStepLaunchingCursor',
+    'Using existing Cursor AI instance...': 'apiStepUsingExistingCursor',
+    'Cursor AI launched successfully': 'apiStepCursorLaunchedOk',
+    'Failed to launch Cursor AI': 'apiStepFailedLaunchCursor',
+    'Monitoring for README generation...': 'apiStepMonitoringReadme',
+    'README.md generated successfully!': 'apiStepReadmeGenerated',
+    'Cursor AI launched, monitoring progress...': 'apiStepLaunchedMonitoring',
+    'Cursor AI not available, using AI fallback...': 'apiStepCursorUnavailableFallback',
+    'Using unified AI system (fallback)...': 'apiStepUnifiedAiFallback',
+    'Analyzing repository structure...': 'apiStepAnalyzingStructure',
+    'Generating README with AI...': 'apiStepGeneratingReadmeAi',
+    'Processing AI response...': 'apiStepProcessingAiResponse',
+    'README.md generated successfully with AI fallback!': 'apiStepReadmeGeneratedFallback',
+    'Analysis failed': 'clientStepAnalysisFailed'
+  };
+
+  const exactKey = EXACT[raw];
+  if (exactKey) return t(`agentCursorModule.${exactKey}`);
+
+  let m = /^Cloning (.+)\.\.\.$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepCloning', { url: m[1] });
+
+  m = /^Error cloning repository: (.+)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepErrorCloning', { detail: m[1] });
+
+  m = /^Error creating automation files: (.+)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepErrorAutomationFiles', { detail: m[1] });
+
+  m = /^Error launching Cursor AI: (.+)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepErrorLaunchCursor', { detail: m[1] });
+
+  m = /^README\.md exists but content short \((\d+) chars\)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepReadmeShort', { count: m[1] });
+
+  m = /^Waiting for README\.md\.\.\. \((\d+)s elapsed\)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepWaitingReadme', { seconds: m[1] });
+
+  m = /^Timeout after (\d+) seconds$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepTimeout', { seconds: m[1] });
+
+  m = /^Error in monitoring: (.+)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepErrorMonitoring', { detail: m[1] });
+
+  m = /^Fallback analysis failed: (.+)$/.exec(raw);
+  if (m) return t('agentCursorModule.apiStepFallbackFailed', { detail: m[1] });
+
+  return raw;
+}
+
 const AgentCursorAI = () => {
+  const { t } = useTranslation();
   const [repoUrl, setRepoUrl] = useState('');
   const [branch, setBranch] = useState('main');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -59,7 +123,7 @@ const AgentCursorAI = () => {
 
   const startAnalysis = async () => {
     if (!repoUrl.trim()) {
-      setError('Please enter a repository URL');
+      setError(t('agentCursorModule.errEnterUrl'));
       return;
     }
 
@@ -80,7 +144,9 @@ const AgentCursorAI = () => {
           repo_url: repoUrl,
           branch: branch,
           timeout_seconds: 900,
-          user_prompt: userPrompt || "Generate a comprehensive README.md for this repository"
+          user_prompt: userPrompt.trim()
+            ? userPrompt
+            : t('agentCursorModule.defaultAnalysisPrompt')
         }),
       });
 
@@ -98,7 +164,7 @@ const AgentCursorAI = () => {
 
     } catch (error) {
       console.error('Error starting analysis:', error);
-      setError(`Failed to start analysis: ${error.message}`);
+      setError(t('agentCursorModule.errStartAnalysis', { message: error.message }));
       setIsAnalyzing(false);
       setShowProgress(false);
     }
@@ -141,7 +207,7 @@ const AgentCursorAI = () => {
         const resultData = await response.json();
         setResult(resultData);
         setProgress(100);
-        setCurrentStep('Analysis completed successfully!');
+        setCurrentStep('README.md generated successfully!');
       }
     } catch (error) {
       console.error('Error fetching result:', error);
@@ -170,7 +236,12 @@ const AgentCursorAI = () => {
   };
 
   const handleAnalysisError = (status, message) => {
-    setError(`Analysis ${status}: ${message}`);
+    const statusKey = `jobStatus_${status}`;
+    const statusLabel = t(`agentCursorModule.${statusKey}`, { defaultValue: status });
+    setError(t('agentCursorModule.errAnalysisStatus', {
+      status: statusLabel,
+      message: translateAgentCursorApiStep(message, t)
+    }));
     setProgress(0);
     setCurrentStep('Analysis failed');
     
@@ -229,13 +300,13 @@ const AgentCursorAI = () => {
       });
 
       if (response.ok) {
-        alert('README saved to Training Library successfully!');
+        alert(t('agentCursorModule.alertSaveOk'));
       } else {
         throw new Error('Failed to save to library');
       }
     } catch (error) {
       console.error('Error saving to library:', error);
-      alert('Failed to save to Training Library');
+      alert(t('agentCursorModule.alertSaveFail'));
     }
   };
 
@@ -257,16 +328,15 @@ const AgentCursorAI = () => {
     <div className="agent-cursor-ai">
       {/* Header */}
       <div className="header-banner">
-        <h1>Agent Cursor AI</h1>
+        <h1>{t('agentCursorModule.title')}</h1>
         <p>
-          Trigger Cursor AI locally to analyze Git repositories and generate professional documentation. 
-          This module launches Cursor AI as a local application to provide the highest quality analysis.
+          {t('agentCursorModule.intro')}
         </p>
       </div>
 
       {/* Quick Templates */}
       <div className="quick-templates">
-        <h3>Quick Templates</h3>
+        <h3>{t('agentCursorModule.quickTemplates')}</h3>
         <div className="template-buttons">
           {quickTemplates.map((template) => (
             <button
@@ -283,14 +353,14 @@ const AgentCursorAI = () => {
 
       {/* Repository Input */}
       <div className="repository-input">
-        <label htmlFor="repoUrl">GitHub Repository URL</label>
+        <label htmlFor="repoUrl">{t('agentCursorModule.labelGithubUrl')}</label>
         <div className="input-group">
           <input
             id="repoUrl"
             type="text"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="Enter GitHub repository URL (e.g., https://github.com/username/repo)"
+            placeholder={t('agentCursorModule.placeholderGithubUrl')}
             disabled={isAnalyzing}
           />
           <button 
@@ -298,31 +368,30 @@ const AgentCursorAI = () => {
             onClick={detectBranches}
             disabled={isAnalyzing || !repoUrl}
           >
-            Detect Branches
+            {t('agentCursorModule.detectBranches')}
           </button>
         </div>
         
         <div className="branch-input">
-          <label htmlFor="branch">Branch:</label>
+          <label htmlFor="branch">{t('agentCursorModule.labelBranch')}</label>
           <input
             id="branch"
             type="text"
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-            placeholder="main"
+            placeholder={t('agentCursorModule.placeholderBranch')}
             disabled={isAnalyzing}
           />
         </div>
 
-        {/* Agregar campo de texto entre Branch y Launch Cursor AI Analysis */}
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            User prompt for analysis:
+            {t('agentCursorModule.labelUserPrompt')}
           </label>
           <textarea
             value={userPrompt}
             onChange={(e) => setUserPrompt(e.target.value)}
-            placeholder="Enter custom instructions for Cursor AI analysis (optional)"
+            placeholder={t('agentCursorModule.placeholderUserPrompt')}
             style={{
               width: '100%',
               minHeight: '80px',
@@ -341,14 +410,14 @@ const AgentCursorAI = () => {
             onClick={startAnalysis}
             disabled={isAnalyzing || !repoUrl.trim()}
           >
-            🚀 Launch Cursor AI Analysis
+            {t('agentCursorModule.launchAnalysis')}
           </button>
           <button
             className="reset-btn"
             onClick={resetForm}
             disabled={isAnalyzing}
           >
-            🔄 Reset Form
+            {t('agentCursorModule.resetForm')}
           </button>
         </div>
       </div>
@@ -357,7 +426,7 @@ const AgentCursorAI = () => {
       {showProgress && (
         <div className="progress-container">
           <div className="progress-header">
-            <h3>Analysis Progress</h3>
+            <h3>{t('agentCursorModule.analysisProgress')}</h3>
             <span className="progress-percentage">{progress}%</span>
           </div>
           <div className="progress-bar">
@@ -366,7 +435,7 @@ const AgentCursorAI = () => {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <div className="current-step">{currentStep}</div>
+          <div className="current-step">{translateAgentCursorApiStep(currentStep, t)}</div>
         </div>
       )}
 
@@ -382,9 +451,9 @@ const AgentCursorAI = () => {
       {result && (
         <div className="results-container">
           <div className="results-header">
-            <h3>Generated README.md</h3>
+            <h3>{t('agentCursorModule.generatedReadme')}</h3>
             <button className="save-btn" onClick={saveToLibrary}>
-              💾 Save to Training Library
+              {t('agentCursorModule.saveToTrainingLibrary')}
             </button>
           </div>
           <div className="readme-preview">
@@ -395,22 +464,20 @@ const AgentCursorAI = () => {
 
       {/* How It Works */}
       <div className="how-it-works">
-        <h3>How It Works</h3>
+        <h3>{t('agentCursorModule.howItWorks')}</h3>
         <ol>
-          <li><strong>Enter Repository URL:</strong> Provide a GitHub repository URL to analyze</li>
-          <li><strong>User Prompt for Analysis:</strong> Enter custom instructions for Cursor AI analysis (optional)</li>
-          <li><strong>Launch Analysis:</strong> Click the launch button to start Cursor AI</li>
-          <li><strong>Automatic Analysis:</strong> Cursor AI will open locally and analyze the repository</li>
-          <li><strong>Document Generation:</strong> Professional README.md will be generated automatically</li>
-          <li><strong>Results:</strong> View and save the generated documentation to your Training Library</li>
+          <li><strong>{t('agentCursorModule.how1Strong')}</strong> {t('agentCursorModule.how1Rest')}</li>
+          <li><strong>{t('agentCursorModule.how2Strong')}</strong> {t('agentCursorModule.how2Rest')}</li>
+          <li><strong>{t('agentCursorModule.how3Strong')}</strong> {t('agentCursorModule.how3Rest')}</li>
+          <li><strong>{t('agentCursorModule.how4Strong')}</strong> {t('agentCursorModule.how4Rest')}</li>
+          <li><strong>{t('agentCursorModule.how5Strong')}</strong> {t('agentCursorModule.how5Rest')}</li>
+          <li><strong>{t('agentCursorModule.how6Strong')}</strong> {t('agentCursorModule.how6Rest')}</li>
         </ol>
       </div>
 
       {/* Important Note */}
       <div className="important-note">
-        <strong>Note:</strong> This module requires Cursor AI to be installed on your local machine. 
-        The system will automatically launch Cursor AI, trigger the documentation generation, 
-        and monitor the process until completion.
+        <strong>{t('agentCursorModule.importantNoteStrong')}</strong> {t('agentCursorModule.importantNoteRest')}
       </div>
     </div>
   );
