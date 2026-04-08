@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 
 const AgenticRAG = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [files, setFiles] = useState([]);
   const [indexedDocs, setIndexedDocs] = useState([]);
@@ -46,7 +48,7 @@ const AgenticRAG = () => {
           const items = Array.isArray(data.items) ? data.items : data;
           setPreloadDataset(items);
           setPreloadName(name);
-          setStatus(`Dataset loaded: ${name} (${items.length} items)`);
+          setStatus(t("agenticRagModule.datasetLoaded", { name, count: items.length }));
         }
         // clear after loading to avoid repeated loads
         localStorage.removeItem(key);
@@ -54,7 +56,7 @@ const AgenticRAG = () => {
     } catch (e) {
       console.warn('Failed to load preloaded dataset', e);
     }
-  }, []);
+  }, [t]);
 
   // Helpers for cosine demo
   const parseVec = (s) => {
@@ -83,7 +85,7 @@ const AgenticRAG = () => {
     const a = parseVec(vecA);
     const b = parseVec(vecB);
     if (!a || !b || a.length !== b.length || a.length === 0) {
-      setCosError('Invalid vectors. Provide same-length arrays.');
+      setCosError(t("agenticRagModule.embeddingInvalidVectors"));
       setCosine(null);
       return;
     }
@@ -99,8 +101,8 @@ const AgenticRAG = () => {
     if (showEmbedDemo) {
       const defaultA = '[0.1, 0.3, -0.2]';
       const defaultB = '[0.05, 0.32, -0.18]';
-      const pA = 'The cat sat on the mat';
-      const pB = 'A dog rested on the rug';
+      const pA = t('agenticRagModule.placeholderPhraseA');
+      const pB = t('agenticRagModule.placeholderPhraseB');
       if (!vecA) setVecA(defaultA);
       if (!vecB) setVecB(defaultB);
       if (!phraseA) setPhraseA(pA);
@@ -113,7 +115,7 @@ const AgenticRAG = () => {
       setCosError('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showEmbedDemo]);
+  }, [showEmbedDemo, t]);
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
   const fetchEmbedding = async (text) => {
@@ -155,30 +157,30 @@ const AgenticRAG = () => {
       const data = await response.json();
       if (data.success) {
         console.log('Analysis saved successfully:', data.analysis_id);
-        setStatus('✅ Analysis saved successfully!');
+        setStatus(t("agenticRagModule.statusSaveOk"));
         setTimeout(() => setStatus(''), 3000);
       } else {
         console.error('Failed to save analysis:', data.message);
-        setStatus('❌ Failed to save analysis: ' + data.message);
+        setStatus(t("agenticRagModule.statusSaveFail", { message: data.message }));
         setTimeout(() => setStatus(''), 3000);
       }
     } catch (error) {
       console.error('Error saving analysis:', error);
-      setStatus('❌ Error saving analysis');
+      setStatus(t("agenticRagModule.statusSaveError"));
       setTimeout(() => setStatus(''), 3000);
     }
   };
 
   const saveCurrentAnalysis = () => {
     if (!result || !selectedDocIds.length) {
-      setStatus('❌ No result to save or no documents selected');
+      setStatus(t("agenticRagModule.statusNoResultSave"));
       setTimeout(() => setStatus(''), 3000);
       return;
     }
 
     const analysisData = {
       doc_id: selectedDocIds[0], // Use first selected document
-      filename: indexedDocs.find(doc => doc.doc_id === selectedDocIds[0])?.filename || 'Unknown',
+      filename: indexedDocs.find(doc => doc.doc_id === selectedDocIds[0])?.filename || t("agenticRagModule.filenameUnknown"),
       question: question,
       answer: result.answer,
       citations: result.citations || [],
@@ -215,7 +217,7 @@ const AgenticRAG = () => {
     newFiles.forEach(file => {
       // Check file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        errors.push(`${file.name} is too large (max 5MB)`);
+        errors.push(t("agenticRagModule.errFileTooLarge", { name: file.name }));
         return;
       }
 
@@ -224,13 +226,13 @@ const AgenticRAG = () => {
       const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
       
       if (!validTypes.includes(fileExtension)) {
-        errors.push(`${file.name} is not a supported file type`);
+        errors.push(t("agenticRagModule.errUnsupportedType", { name: file.name }));
         return;
       }
 
       // Check if we already have 5 files
       if (files.length + validFiles.length >= 5) {
-        errors.push(`Maximum 5 files allowed`);
+        errors.push(t("agenticRagModule.errMaxFiles"));
         return;
       }
 
@@ -281,13 +283,13 @@ const AgenticRAG = () => {
 
   const indexDocuments = async () => {
     if (files.length === 0) {
-      setStatus("❌ Please select files to index");
+      setStatus(t("agenticRagModule.statusSelectFilesIndex"));
       return;
     }
 
     console.log("🚀 Starting indexing process...");
     setIndexing(true);
-    setStatus("🔄 Indexing documents... This may take a few moments...");
+    setStatus(t("agenticRagModule.statusIndexing"));
     console.log("📝 Status set to:", "🔄 Indexing documents... This may take a few moments...");
 
     try {
@@ -309,7 +311,7 @@ const AgenticRAG = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("✅ Backend response:", data);
-        setStatus(`✅ Successfully indexed ${data.documents.length} document(s)! You can now ask questions.`);
+        setStatus(t("agenticRagModule.statusIndexedOk", { count: data.documents.length }));
         setIndexedDocs(prev => [...prev, ...data.documents]);
         setFiles([]);
         // Reset file input
@@ -323,16 +325,16 @@ const AgenticRAG = () => {
       } else {
         const error = await response.text();
         console.error("❌ Backend error:", error);
-        setStatus(`❌ Indexing failed: ${error}`);
+        setStatus(t("agenticRagModule.statusIndexingFailed", { detail: error }));
       }
     } catch (error) {
       console.error('❌ Error indexing documents:', error);
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        const errorMsg = `❌ Cannot connect to backend. Please ensure the server is running on ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}`;
+        const errorMsg = t("agenticRagModule.statusBackendUnreachable", { url: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000' });
         console.log("📝 Setting error status:", errorMsg);
         setStatus(errorMsg);
       } else {
-        const errorMsg = '❌ Error indexing documents: ' + error.message;
+        const errorMsg = t("agenticRagModule.statusIndexingError", { message: error.message });
         console.log("📝 Setting error status:", errorMsg);
         setStatus(errorMsg);
       }
@@ -344,16 +346,16 @@ const AgenticRAG = () => {
 
   const askQuestion = async () => {
     if (selectedDocIds.length === 0) {
-      setStatus("❌ Please select at least one document");
+      setStatus(t("agenticRagModule.statusSelectDoc"));
       return;
     }
     if (!question.trim()) {
-      setStatus("❌ Please enter a question");
+      setStatus(t("agenticRagModule.statusEnterQuestion"));
       return;
     }
 
     setLoading(true);
-    setStatus("🤖 Processing with Agentic RAG... This may take 10-30 seconds...");
+    setStatus(t("agenticRagModule.statusProcessingRag"));
 
     try {
       const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -375,19 +377,21 @@ const AgenticRAG = () => {
       if (response.ok) {
         const data = await response.json();
         setResult(data);
-        setStatus(`✅ Answer generated successfully in ${data.elapsed_sec || 'unknown'} seconds!`);
+        setStatus(t("agenticRagModule.statusAnswerOk", {
+          seconds: data.elapsed_sec != null ? String(data.elapsed_sec) : t("agenticRagModule.unknownTime")
+        }));
         
 
       } else {
         const error = await response.text();
-        setStatus(`❌ Question failed: ${error}`);
+        setStatus(t("agenticRagModule.statusQuestionFailed", { detail: error }));
       }
     } catch (error) {
       console.error('Error asking question:', error);
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setStatus(`❌ Cannot connect to backend. Please ensure the server is running on ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}`);
+        setStatus(t("agenticRagModule.statusBackendUnreachable", { url: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000' }));
       } else {
-        setStatus('❌ Error processing question: ' + error.message);
+        setStatus(t("agenticRagModule.statusAskError", { message: error.message }));
       }
     } finally {
       setLoading(false);
@@ -396,12 +400,12 @@ const AgenticRAG = () => {
 
   const generateSummary = async () => {
     if (selectedDocIds.length === 0) {
-      setStatus("❌ Please select at least one document");
+      setStatus(t("agenticRagModule.statusSelectDoc"));
       return;
     }
 
     setLoading(true);
-    setStatus("📝 Generating executive summary...");
+    setStatus(t("agenticRagModule.statusSummaryGenerating"));
 
     try {
       const formData = new FormData();
@@ -417,14 +421,14 @@ const AgenticRAG = () => {
       if (response.ok) {
         const data = await response.json();
         setResult(data);
-        setStatus(`✅ Summary generated in ${data.elapsed_sec}s`);
+        setStatus(t("agenticRagModule.statusSummaryOk", { seconds: data.elapsed_sec }));
       } else {
         const error = await response.text();
-        setStatus(`❌ Summary failed: ${error}`);
+        setStatus(t("agenticRagModule.statusSummaryFailed", { detail: error }));
       }
     } catch (error) {
       console.error('Error generating summary:', error);
-      setStatus('❌ Error generating summary');
+      setStatus(t("agenticRagModule.statusSummaryError"));
     } finally {
       setLoading(false);
     }
@@ -440,7 +444,7 @@ const AgenticRAG = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    setStatus("📋 Copied to clipboard!");
+    setStatus(t("agenticRagModule.statusCopied"));
     setTimeout(() => setStatus(""), 2000);
   };
 
@@ -467,14 +471,14 @@ const AgenticRAG = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          🚀 Agentic RAG Analyzer
+          {t("agenticRagModule.title")}
         </h1>
         <p style={{ 
           color: colors.textSecondary, 
           fontSize: "16px",
           lineHeight: "1.5"
         }}>
-          Advanced document analysis using intelligent agents for deep reasoning and grounded answers with citations.
+          {t("agenticRagModule.intro")}
         </p>
 
         {preloadDataset && (
@@ -486,27 +490,27 @@ const AgenticRAG = () => {
             background: colors.cardBackground
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <strong style={{ color: colors.text }}>Preloaded Dataset: {preloadName}</strong>
+              <strong style={{ color: colors.text }}>{t("agenticRagModule.preloadedDatasetLabel", { name: preloadName })}</strong>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   onClick={async()=>{
                     try{
                       const blob = JSON.stringify({ name: preloadName, items: preloadDataset }, null, 2);
                       await navigator.clipboard.writeText(blob);
-                      setStatus('Dataset copied to clipboard');
+                      setStatus(t('agenticRagModule.statusDatasetCopied'));
                       setTimeout(()=>setStatus(''), 1500);
-                    }catch(e){ setStatus('Copy failed'); setTimeout(()=>setStatus(''),1500);}
+                    }catch(e){ setStatus(t('agenticRagModule.statusCopyFailed')); setTimeout(()=>setStatus(''),1500);}
                   }}
                   style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
-                >📋 Copy</button>
+                >{t("agenticRagModule.copy")}</button>
                 <button
                   onClick={()=> setShowEmbedDemo(s => !s)}
                   style={{ background: colors.primaryLight, color: colors.primary, border: `1px solid ${colors.primary}`, padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
-                >🧮 Use with embeddings demo</button>
+                >{t("agenticRagModule.embedDemo")}</button>
                 <button
                   onClick={()=> setPreloadDataset(null)}
                   style={{ background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
-                >✖ Clear</button>
+                >{t("agenticRagModule.clear")}</button>
               </div>
             </div>
             <div style={{ maxHeight: 140, overflowY: 'auto', fontSize: 14, color: colors.text }}>
@@ -515,19 +519,19 @@ const AgenticRAG = () => {
               </ol>
             </div>
             <div style={{ marginTop: 8, color: colors.textSecondary, fontSize: 12 }}>
-              Tip: Use this dataset to test embedding similarity (see “How LLMs Work” lesson).
+              {t("agenticRagModule.tipPreload")}
             </div>
 
             {showEmbedDemo && (
               <div style={{ marginTop: 12, padding: 12, borderRadius: 8, border: `1px dashed ${colors.primary}` }}>
-                <div style={{ marginBottom: 8, color: colors.text }}><strong>Embedding cosine similarity demo</strong></div>
+                <div style={{ marginBottom: 8, color: colors.text }}><strong>{t("agenticRagModule.embeddingDemoTitle")}</strong></div>
                 <div style={{ marginBottom: 6, color: colors.textSecondary, fontSize: 12 }}>
-                  Demo uses toy vectors representing the phrases below (you can edit both phrases and vectors).
+                  {t("agenticRagModule.embeddingDemoDesc")}
                 </div>
                 <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: colors.text }}>
                     <input type="checkbox" checked={useRealEmb} onChange={(e)=> setUseRealEmb(e.target.checked)} />
-                    Use real embeddings (server)
+                    {t("agenticRagModule.useRealEmb")}
                   </label>
                   {useRealEmb && (
                     <button
@@ -539,22 +543,22 @@ const AgenticRAG = () => {
                           setVecA(formatVec(ea));
                           setVecB(formatVec(eb));
                           setTimeout(()=>computeCosine(), 0);
-                          setStatus('Embeddings generated from server');
+                          setStatus(t('agenticRagModule.statusEmbeddingsOk'));
                           setTimeout(()=>setStatus(''), 1500);
                         }catch(err){
-                          setStatus('Embedding generation failed (configure OPENAI_API_KEY)');
+                          setStatus(t('agenticRagModule.statusEmbeddingFailed'));
                           setTimeout(()=>setStatus(''), 2000);
                         }finally{
                           setEmbBusy(false);
                         }
                       }}
                       style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}
-                    >{embBusy ? 'Generating…' : 'Generate from phrases'}</button>
+                    >{embBusy ? t("agenticRagModule.generating") : t("agenticRagModule.generateFromPhrases")}</button>
                   )}
                 </div>
                 <div style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
                   <div>
-                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Phrase A</div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>{t("agenticRagModule.phraseA")}</div>
                     <input value={phraseA} onChange={e=>{
                       const v = e.target.value;
                       setPhraseA(v);
@@ -563,10 +567,10 @@ const AgenticRAG = () => {
                         setVecA(formatVec(tv));
                         setTimeout(()=>computeCosine(), 0);
                       }
-                    }} placeholder='The cat sat on the mat' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
+                    }} placeholder={t("agenticRagModule.placeholderPhraseA")} style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
                   </div>
                   <div>
-                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Phrase B</div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>{t("agenticRagModule.phraseB")}</div>
                     <input value={phraseB} onChange={e=>{
                       const v = e.target.value;
                       setPhraseB(v);
@@ -575,21 +579,21 @@ const AgenticRAG = () => {
                         setVecB(formatVec(tv));
                         setTimeout(()=>computeCosine(), 0);
                       }
-                    }} placeholder='A dog rested on the rug' style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
+                    }} placeholder={t("agenticRagModule.placeholderPhraseB")} style={{ width: '100%', borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8, marginBottom: 8 }}/>
                   </div>
                   <div>
-                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Vector A (JSON or comma‑separated)</div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>{t("agenticRagModule.vectorA")}</div>
                     <textarea value={vecA} onChange={e=>setVecA(e.target.value)} placeholder='[0.1, 0.3, -0.2]' style={{ width: '100%', minHeight: 70, borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8 }}/>
                   </div>
                   <div>
-                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>Vector B (JSON or comma‑separated)</div>
+                    <div style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>{t("agenticRagModule.vectorB")}</div>
                     <textarea value={vecB} onChange={e=>setVecB(e.target.value)} placeholder='[0.05, 0.32, -0.18]' style={{ width: '100%', minHeight: 70, borderRadius: 6, border: `1px solid ${colors.border}`, padding: 8 }}/>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-                  <button onClick={computeCosine} style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}>Calculate cosine</button>
+                  <button onClick={computeCosine} style={{ background: colors.primary, color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer' }}>{t("agenticRagModule.calculateCosine")}</button>
                   {cosError && <span style={{ color: '#b91c1c', fontSize: 13 }}>{cosError}</span>}
-                  {cosine !== null && !cosError && <span style={{ color: colors.text, fontSize: 14 }}>cosine = <strong>{cosine.toFixed(4)}</strong></span>}
+                  {cosine !== null && !cosError && <span style={{ color: colors.text, fontSize: 14 }}>{t("agenticRagModule.cosineEquals")} <strong>{cosine.toFixed(4)}</strong></span>}
                 </div>
               </div>
             )}
@@ -674,14 +678,14 @@ const AgenticRAG = () => {
                 marginBottom: "12px",
                 textShadow: "0 2px 4px rgba(0,0,0,0.3)"
               }}>
-                Indexing in Progress
+                {t("agenticRagModule.indexingBannerTitle")}
               </h3>
               <p style={{ 
                 fontSize: "16px", 
                 marginBottom: "16px",
                 opacity: 0.9
               }}>
-                Please wait while we process your documents. This may take a few moments.
+                {t("agenticRagModule.indexingBannerSub")}
               </p>
               <div style={{
                 display: "flex",
@@ -697,7 +701,7 @@ const AgenticRAG = () => {
                   borderRadius: "50%",
                   animation: "spin 1s linear infinite"
                 }}></div>
-                <span style={{ fontSize: "14px", opacity: 0.8 }}>Processing...</span>
+                <span style={{ fontSize: "14px", opacity: 0.8 }}>{t("agenticRagModule.processing")}</span>
               </div>
             </div>
           </div>
@@ -713,12 +717,12 @@ const AgenticRAG = () => {
           color: "#6b7280",
           fontFamily: "monospace"
         }}>
-          Debug: status="{status}", indexing={String(indexing)}
+          {t("agenticRagModule.debugLine", { status, indexing: String(indexing) })}
           <button 
-            onClick={() => setStatus("🧪 Test status update: " + new Date().toLocaleTimeString())}
+            onClick={() => setStatus(t("agenticRagModule.testStatusUpdate", { time: new Date().toLocaleTimeString() }))}
             style={{ marginLeft: "8px", padding: "2px 6px", fontSize: "10px" }}
           >
-            Test Status
+            {t("agenticRagModule.testStatus")}
           </button>
         </div>
       </div>
@@ -738,7 +742,7 @@ const AgenticRAG = () => {
           fontSize: "20px",
           fontWeight: "600"
         }}>
-          📚 Document Indexing
+          {t("agenticRagModule.sectionDocIndexing")}
         </h2>
         
         {/* Drag & Drop Area */}
@@ -775,13 +779,13 @@ const AgenticRAG = () => {
             marginBottom: "8px",
             fontWeight: "500"
           }}>
-            Drag & drop files here or click to browse
+            {t("agenticRagModule.dropFiles")}
           </p>
           <p style={{ 
             color: colors.textSecondary, 
             fontSize: "14px"
           }}>
-            Supports PDF, DOCX, TXT, MD (max 5 files, 5MB each)
+            {t("agenticRagModule.formatsHint")}
           </p>
           
           {/* Hidden file input */}
@@ -799,7 +803,7 @@ const AgenticRAG = () => {
         {files.length > 0 && (
           <div style={{ marginBottom: "16px" }}>
             <p style={{ color: colors.textSecondary, marginBottom: "8px" }}>
-              Selected files ({files.length}):
+              {t("agenticRagModule.selectedFiles", { count: files.length })}
             </p>
             <div style={{ 
               display: "flex", 
@@ -873,7 +877,7 @@ const AgenticRAG = () => {
                 fontWeight: "500",
                 fontSize: "14px"
               }}>
-                Indexing in progress...
+                {t("agenticRagModule.indexingInline")}
               </span>
             </div>
             <p style={{ 
@@ -881,7 +885,7 @@ const AgenticRAG = () => {
               margin: "0", 
               fontSize: "12px"
             }}>
-              Please wait while we process your documents. This may take a few moments.
+              {t("agenticRagModule.indexingBannerSub")}
             </p>
           </div>
         )}
@@ -929,13 +933,13 @@ const AgenticRAG = () => {
                  borderRadius: "50%",
                  animation: "spin 1s linear infinite"
                }}></div>
-               <span>Indexing in Progress...</span>
+               <span>{t("agenticRagModule.indexingButton")}</span>
              </>
            )}
            {!indexing && (
              <>
                <span style={{ fontSize: "20px" }}>🔍</span>
-               <span>Index Documents</span>
+               <span>{t("agenticRagModule.indexDocuments")}</span>
              </>
            )}
          </button>
@@ -962,7 +966,7 @@ const AgenticRAG = () => {
             fontWeight: "600",
             margin: "0"
           }}>
-            🤖 Ask Questions
+            {t("agenticRagModule.askQuestions")}
           </h2>
           
 
@@ -977,7 +981,7 @@ const AgenticRAG = () => {
               fontSize: "16px",
               fontWeight: "500"
             }}>
-              📚 Available Documents ({indexedDocs.length}):
+              {t("agenticRagModule.availableDocuments", { count: indexedDocs.length })}
             </h3>
             <div style={{ 
               padding: "12px", 
@@ -992,7 +996,7 @@ const AgenticRAG = () => {
                 fontSize: "14px",
                 fontWeight: "500"
               }}>
-                ✅ Documents indexed successfully! Select one or more to analyze.
+                {t("agenticRagModule.docsIndexedSuccess")}
               </p>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -1033,7 +1037,7 @@ const AgenticRAG = () => {
               fontSize: "14px",
               fontWeight: "500"
             }}>
-              ⚠️ No documents indexed yet. Please index documents first to ask questions.
+              {t("agenticRagModule.noDocsWarning")}
             </p>
           </div>
         )}
@@ -1046,12 +1050,12 @@ const AgenticRAG = () => {
             color: colors.text,
             fontWeight: "500"
           }}>
-            Your Question:
+            {t("agenticRagModule.yourQuestion")}
           </label>
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a specific question about the selected documents..."
+            placeholder={t("agenticRagModule.placeholderQuestion")}
             rows={4}
             style={{
               width: "100%",
@@ -1080,13 +1084,13 @@ const AgenticRAG = () => {
             fontSize: "14px",
             fontWeight: "500"
           }}>
-            🔧 Advanced Parameters
+            {t("agenticRagModule.advancedParams")}
           </h4>
           
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
             <div>
               <label style={{ display: "block", marginBottom: "4px", color: colors.textSecondary, fontSize: "12px" }}>
-                Navigation Depth
+                {t("agenticRagModule.navDepth")}
               </label>
               <select
                 value={depth}
@@ -1101,15 +1105,15 @@ const AgenticRAG = () => {
                   fontSize: "12px"
                 }}
               >
-                <option value={1}>Level 1 (Basic)</option>
-                <option value={2}>Level 2 (Standard)</option>
-                <option value={3}>Level 3 (Deep)</option>
+                <option value={1}>{t("agenticRagModule.levelBasic")}</option>
+                <option value={2}>{t("agenticRagModule.levelStandard")}</option>
+                <option value={3}>{t("agenticRagModule.levelDeep")}</option>
               </select>
             </div>
             
             <div>
               <label style={{ display: "block", marginBottom: "4px", color: colors.textSecondary, fontSize: "12px" }}>
-                Initial Candidates
+                {t("agenticRagModule.initialCandidates")}
               </label>
               <input
                 type="number"
@@ -1131,7 +1135,7 @@ const AgenticRAG = () => {
             
             <div>
               <label style={{ display: "block", marginBottom: "4px", color: colors.textSecondary, fontSize: "12px" }}>
-                Max Paragraphs
+                {t("agenticRagModule.maxParagraphs")}
               </label>
               <input
                 type="number"
@@ -1160,7 +1164,7 @@ const AgenticRAG = () => {
                 style={{ margin: 0 }}
               />
               <label htmlFor="use-hybrid" style={{ color: colors.textSecondary, fontSize: "12px" }}>
-                Use Hybrid Search (BM25 + Embeddings)
+                {t("agenticRagModule.useHybridSearch")}
               </label>
             </div>
           </div>
@@ -1183,7 +1187,7 @@ const AgenticRAG = () => {
               opacity: loading || selectedDocIds.length === 0 || !question.trim() ? 0.6 : 1
             }}
           >
-            🤖 Ask Question
+            {t("agenticRagModule.askQuestion")}
           </button>
           
           <button
@@ -1201,7 +1205,7 @@ const AgenticRAG = () => {
               opacity: loading || selectedDocIds.length === 0 ? 0.6 : 1
             }}
           >
-            📝 Generate Summary
+            {t("agenticRagModule.generateSummary")}
           </button>
         </div>
       </div>
@@ -1223,7 +1227,7 @@ const AgenticRAG = () => {
             fontSize: "20px",
             fontWeight: "600"
           }}>
-            🎯 Results
+            {t("agenticRagModule.results")}
           </h2>
 
           {/* Quality Scores */}
@@ -1241,7 +1245,7 @@ const AgenticRAG = () => {
                 fontSize: "16px",
                 fontWeight: "500"
               }}>
-                📊 Quality Assessment
+                {t("agenticRagModule.qualityAssessment")}
               </h4>
               
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
@@ -1253,7 +1257,7 @@ const AgenticRAG = () => {
                   }}>
                     {result.scores.faithfulness}/10
                   </div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Faithfulness</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.faithfulness")}</div>
                 </div>
                 
                 <div style={{ textAlign: "center" }}>
@@ -1264,7 +1268,7 @@ const AgenticRAG = () => {
                   }}>
                     {result.scores.relevance}/10
                   </div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Relevance</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.relevance")}</div>
                 </div>
                 
                 <div style={{ textAlign: "center" }}>
@@ -1275,7 +1279,7 @@ const AgenticRAG = () => {
                   }}>
                     {result.scores.completeness}/10
                   </div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Completeness</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.completeness")}</div>
                 </div>
               </div>
               
@@ -1289,7 +1293,7 @@ const AgenticRAG = () => {
                   color: colors.textSecondary,
                   fontSize: "14px"
                 }}>
-                  <strong>Comment:</strong> {result.scores.comment}
+                  <strong>{t("agenticRagModule.comment")}</strong> {result.scores.comment}
                 </div>
               )}
             </div>
@@ -1303,7 +1307,7 @@ const AgenticRAG = () => {
               fontSize: "16px",
               fontWeight: "500"
             }}>
-              💡 Answer
+              {t("agenticRagModule.answer")}
             </h4>
             <div style={{ 
               padding: "16px",
@@ -1334,7 +1338,7 @@ const AgenticRAG = () => {
                   cursor: "pointer"
                 }}
               >
-                📋 Copy Answer
+                {t("agenticRagModule.copyAnswer")}
               </button>
               <button
                 onClick={() => saveCurrentAnalysis()}
@@ -1348,7 +1352,7 @@ const AgenticRAG = () => {
                   cursor: "pointer"
                 }}
               >
-                💾 Save Analysis
+                {t("agenticRagModule.saveAnalysis")}
               </button>
             </div>
           </div>
@@ -1362,7 +1366,7 @@ const AgenticRAG = () => {
                 fontSize: "16px",
                 fontWeight: "500"
               }}>
-                📚 Sources & Citations
+                {t("agenticRagModule.sourcesCitations")}
               </h4>
               <div style={{ display: "grid", gap: "12px" }}>
                 {result.citations.map((citation, index) => (
@@ -1378,7 +1382,7 @@ const AgenticRAG = () => {
                       fontWeight: "500",
                       marginBottom: "4px"
                     }}>
-                      ID: {citation.id}
+                      {t("agenticRagModule.idLabel")} {citation.id}
                     </div>
                     <div style={{ 
                       color: colors.text,
@@ -1407,33 +1411,33 @@ const AgenticRAG = () => {
                 fontSize: "16px",
                 fontWeight: "500"
               }}>
-                📈 Performance Metrics
+                {t("agenticRagModule.performanceMetrics")}
               </h4>
               
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "12px" }}>
                 <div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Total Tokens</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.totalTokens")}</div>
                   <div style={{ color: colors.text, fontSize: "16px", fontWeight: "500" }}>
                     {result.metrics.total_in + result.metrics.total_out}
                   </div>
                 </div>
                 
                 <div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Cost (USD)</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.costUsd")}</div>
                   <div style={{ color: colors.text, fontSize: "16px", fontWeight: "500" }}>
                     ${result.metrics.total_cost_usd.toFixed(6)}
                   </div>
                 </div>
                 
                 <div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Latency</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.latency")}</div>
                   <div style={{ color: colors.text, fontSize: "16px", fontWeight: "500" }}>
                     {result.metrics.total_latency_ms}ms
                   </div>
                 </div>
                 
                 <div>
-                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>Total Time</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{t("agenticRagModule.totalTime")}</div>
                   <div style={{ color: colors.text, fontSize: "16px", fontWeight: "500" }}>
                     {result.elapsed_sec}s
                   </div>
@@ -1450,7 +1454,7 @@ const AgenticRAG = () => {
               fontSize: "16px",
               fontWeight: "500"
             }}>
-              🔍 Analysis Trace
+              {t("agenticRagModule.analysisTrace")}
             </h4>
             
             <div style={{ 
@@ -1461,9 +1465,9 @@ const AgenticRAG = () => {
               fontSize: "12px",
               color: colors.textSecondary
             }}>
-              <div><strong>Router Selected:</strong> {result.router_selected?.join(", ") || "None"}</div>
-              <div><strong>Used Paragraphs:</strong> {result.used_paragraphs?.join(", ") || "None"}</div>
-              <div><strong>Run ID:</strong> {result.run_id}</div>
+              <div><strong>{t("agenticRagModule.routerSelected")}</strong> {result.router_selected?.join(", ") || t("agenticRagModule.none")}</div>
+              <div><strong>{t("agenticRagModule.usedParagraphs")}</strong> {result.used_paragraphs?.join(", ") || t("agenticRagModule.none")}</div>
+              <div><strong>{t("agenticRagModule.runId")}</strong> {result.run_id}</div>
             </div>
           </div>
         </div>
@@ -1484,14 +1488,14 @@ const AgenticRAG = () => {
           fontSize: "18px",
           fontWeight: "500"
         }}>
-          Need help with Agentic RAG Analyzer?
+          {t("agenticRagModule.helpTitle")}
         </h3>
         <p style={{ 
           color: colors.textSecondary, 
           marginBottom: "20px",
           fontSize: "16px"
         }}>
-          This advanced system uses intelligent agents to navigate documents, reason about content, and provide grounded answers with citations and quality assessment.
+          {t("agenticRagModule.helpBody")}
         </p>
         <div style={{ 
           display: "flex", 
@@ -1506,7 +1510,7 @@ const AgenticRAG = () => {
             border: `1px solid ${colors.border}`,
             fontSize: "14px"
           }}>
-            🚀 <strong>Zero-embedding</strong> chunking
+            {t("agenticRagModule.featureZeroEmbedding")}
           </div>
           <div style={{ 
             padding: "12px 16px",
@@ -1515,7 +1519,7 @@ const AgenticRAG = () => {
             border: `1px solid ${colors.border}`,
             fontSize: "14px"
           }}>
-            🧠 <strong>Two-pass</strong> routing
+            {t("agenticRagModule.featureTwoPass")}
           </div>
           <div style={{ 
             padding: "12px 16px",
@@ -1524,7 +1528,7 @@ const AgenticRAG = () => {
             border: `1px solid ${colors.border}`,
             fontSize: "14px"
           }}>
-            🔍 <strong>Recursive</strong> navigation
+            {t("agenticRagModule.featureRecursive")}
           </div>
           <div style={{ 
             padding: "12px 16px",
@@ -1533,7 +1537,7 @@ const AgenticRAG = () => {
             border: `1px solid ${colors.border}`,
             fontSize: "14px"
           }}>
-            ⚖️ <strong>AI Judge</strong> evaluation
+            {t("agenticRagModule.featureAiJudge")}
           </div>
         </div>
       </div>

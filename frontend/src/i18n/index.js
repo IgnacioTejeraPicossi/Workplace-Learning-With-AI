@@ -31,6 +31,8 @@ import enRepoAnalyzerModule from './locales/en/repoAnalyzerModule.json';
 import noRepoAnalyzerModule from './locales/no/repoAnalyzerModule.json';
 import enAgentCursorModule from './locales/en/agentCursorModule.json';
 import noAgentCursorModule from './locales/no/agentCursorModule.json';
+import enAgenticRagModule from './locales/en/agenticRagModule.json';
+import noAgenticRagModule from './locales/no/agenticRagModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -49,10 +51,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule, ...enAgenticRagModule }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule }
       }
     }
   });
