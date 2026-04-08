@@ -1,7 +1,7 @@
 """
-Babel Library Intelligence Router — Phases 1-3
+Babel Library Intelligence Router — Phases 1-4
 Endpoints for AI classification, semantic search, batch processing,
-and AI content generation (summaries, questions, adaptive hints).
+AI content generation, and predictive intelligence.
 """
 from fastapi import APIRouter, BackgroundTasks, Request
 from pydantic import BaseModel, Field
@@ -170,3 +170,46 @@ async def start_content_batch(body: ContentBatchRequest, background_tasks: Backg
 async def content_batch_status():
     """Get current content generation batch progress."""
     return get_content_batch_status()
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 — Predictive Intelligence Endpoints
+# ---------------------------------------------------------------------------
+
+from backend.services.babel_predictive import (
+    get_trend_analysis,
+    get_demand_forecast,
+    get_knowledge_gaps,
+    get_expertise_distribution,
+    get_predictive_dashboard,
+)
+
+
+@router.get("/predictive/trends")
+async def trends():
+    """Get trend analysis — rising/declining topics over time windows."""
+    return await get_trend_analysis()
+
+
+@router.get("/predictive/demand")
+async def demand():
+    """Get demand vs supply forecast per domain."""
+    return await get_demand_forecast()
+
+
+@router.get("/predictive/gaps")
+async def gaps(user_id: str = None):
+    """Get knowledge gap analysis (platform-wide + optional per-user)."""
+    return await get_knowledge_gaps(user_id)
+
+
+@router.get("/predictive/expertise")
+async def expertise():
+    """Get network expertise distribution across domains."""
+    return await get_expertise_distribution()
+
+
+@router.get("/predictive/dashboard")
+async def predictive_dashboard(user_id: str = None):
+    """Get full predictive intelligence dashboard (all 4 analyses)."""
+    return await get_predictive_dashboard(user_id)

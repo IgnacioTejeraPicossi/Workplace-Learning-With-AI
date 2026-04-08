@@ -34,7 +34,9 @@
       "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(''Router imported OK, routes:'', [r.path for r in router.routes]\\)\")",
       "Bash(python -c \"from backend.services.babel_intelligence import classify_and_tag, hybrid_search, process_all_resources, get_stats; print\\(''Service imported OK''\\)\")",
       "Bash(python -c \"from backend.services.babel_intelligence import generate_content, process_content_for_resource, generate_all_content, get_content_batch_status; print\\(''Service imports OK''\\)\")",
-      "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(f''Router OK — {len\\(router.routes\\)} routes''\\)\")"
+      "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(f''Router OK — {len\\(router.routes\\)} routes''\\)\")",
+      "Bash(ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\backend\\\\services\\\\babel_\"*)",
+      "Bash(python -c \"from backend.services.babel_predictive import get_predictive_dashboard; print\\(''Predictive service OK''\\)\")"
     ]
   }
 }

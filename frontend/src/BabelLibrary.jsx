@@ -67,6 +67,9 @@ const BabelLibrary = () => {
   const [expandedContent, setExpandedContent] = useState({}); // { resourceKey: true/false }
   const [contentBatchStatus, setContentBatchStatus] = useState(null);
   const [shownAnswers, setShownAnswers] = useState({}); // { resourceKey_qtype: true/false }
+  // Phase 4: Predictive Intelligence
+  const [predictiveData, setPredictiveData] = useState(null);
+  const [predictiveLoading, setPredictiveLoading] = useState(false);
   const { t } = useTranslation();
 
   const getUserId = () => {
@@ -3104,6 +3107,238 @@ const BabelLibrary = () => {
                         ))}
                       </div>
                     )}
+                  </div>
+                )}
+              </div>
+            </details>
+
+            {/* Phase 4: Predictive Intelligence Dashboard */}
+            <details style={{
+              background: `linear-gradient(135deg, #7b1fa205, #7b1fa212)`,
+              padding: '16px 20px',
+              borderRadius: 10,
+              border: `1px solid #7b1fa230`,
+              marginTop: 24,
+              cursor: 'pointer'
+            }}>
+              <summary style={{ color: '#7b1fa2', fontWeight: 'bold', fontSize: '1em' }}>
+                🔮 {t('babelLibraryModule.predictiveIntel.title')}
+              </summary>
+              <div style={{ marginTop: 16 }}>
+                {/* Load / Refresh button */}
+                {!predictiveData ? (
+                  <button
+                    onClick={async () => {
+                      setPredictiveLoading(true);
+                      try {
+                        const data = await apiCall(`/api/babel/intelligence/predictive/dashboard?user_id=${getUserId()}`);
+                        setPredictiveData(data);
+                      } catch (err) { console.error('Predictive load error:', err); }
+                      finally { setPredictiveLoading(false); }
+                    }}
+                    disabled={predictiveLoading}
+                    style={{
+                      padding: '10px 20px', background: '#7b1fa2', color: 'white',
+                      border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold'
+                    }}
+                  >
+                    {predictiveLoading ? `⏳ ${t('babelLibraryModule.predictiveIntel.loading')}` : `🔮 ${t('babelLibraryModule.predictiveIntel.loadBtn')}`}
+                  </button>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                      <span style={{ fontSize: '0.8em', color: colors.textSecondary }}>
+                        {t('babelLibraryModule.predictiveIntel.generatedAt')}: {new Date(predictiveData.generated_at).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          setPredictiveLoading(true);
+                          try {
+                            const data = await apiCall(`/api/babel/intelligence/predictive/dashboard?user_id=${getUserId()}`);
+                            setPredictiveData(data);
+                          } catch (err) { console.error('Predictive refresh error:', err); }
+                          finally { setPredictiveLoading(false); }
+                        }}
+                        style={{
+                          padding: '4px 12px', background: 'transparent', color: '#7b1fa2',
+                          border: '1px solid #7b1fa2', borderRadius: 6, cursor: 'pointer', fontSize: '0.85em'
+                        }}
+                      >
+                        🔄 {t('babelLibraryModule.predictiveIntel.refreshBtn')}
+                      </button>
+                    </div>
+
+                    {/* Summary stats */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 8, marginBottom: 20 }}>
+                      {[
+                        { label: t('babelLibraryModule.predictiveIntel.profilesAnalyzed'), value: predictiveData.trends?.total_profiles_analyzed || 0, icon: '👥' },
+                        { label: t('babelLibraryModule.predictiveIntel.totalResources'), value: predictiveData.demand?.total_resources || 0, icon: '📚' },
+                        { label: t('babelLibraryModule.predictiveIntel.demandSignals'), value: predictiveData.demand?.total_demand_signals || 0, icon: '📊' },
+                        { label: t('babelLibraryModule.predictiveIntel.activeLearners'), value: predictiveData.expertise?.total_learners || 0, icon: '🎓' }
+                      ].map((s, i) => (
+                        <div key={i} style={{ textAlign: 'center', padding: 10, background: '#f3e5f5', borderRadius: 8 }}>
+                          <div style={{ fontSize: '1.2em', fontWeight: 'bold', color: '#7b1fa2' }}>{s.icon} {s.value}</div>
+                          <div style={{ fontSize: '0.7em', color: colors.textSecondary }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 1. Trend Analysis */}
+                    <div style={{ marginBottom: 20 }}>
+                      <h4 style={{ color: colors.text, marginBottom: 4 }}>📈 {t('babelLibraryModule.predictiveIntel.trendsTitle')}</h4>
+                      <p style={{ color: colors.textSecondary, fontSize: '0.85em', marginBottom: 10 }}>{t('babelLibraryModule.predictiveIntel.trendsDesc')}</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {(predictiveData.trends?.domain_trends || []).filter(d => d.total_interactions > 0).map((trend, i) => (
+                          <div key={i} style={{
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
+                            background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}`
+                          }}>
+                            <span style={{ fontSize: '1.1em' }}>
+                              {trend.direction === 'rising' ? '🔥' : trend.direction === 'declining' ? '📉' : '➡️'}
+                            </span>
+                            <span style={{ flex: 1, fontWeight: 500, fontSize: '0.9em' }}>{trend.domain}</span>
+                            <span style={{
+                              fontSize: '0.75em', fontWeight: 600, padding: '2px 8px', borderRadius: 10,
+                              background: trend.direction === 'rising' ? '#e8f5e9' : trend.direction === 'declining' ? '#fce4ec' : '#f5f5f5',
+                              color: trend.direction === 'rising' ? '#2e7d32' : trend.direction === 'declining' ? '#c62828' : colors.textSecondary
+                            }}>
+                              {t(`babelLibraryModule.predictiveIntel.${trend.direction}`)}
+                              {trend.momentum !== 0 && ` ${trend.momentum > 0 ? '+' : ''}${trend.momentum}%`}
+                            </span>
+                            <span style={{ fontSize: '0.7em', color: colors.textSecondary, minWidth: 50, textAlign: 'right' }}>
+                              {t('babelLibraryModule.predictiveIntel.recent7d')}: {trend.recent_7d}
+                            </span>
+                          </div>
+                        ))}
+                        {(predictiveData.trends?.domain_trends || []).every(d => d.total_interactions === 0) && (
+                          <div style={{ color: colors.textSecondary, fontSize: '0.9em', fontStyle: 'italic' }}>
+                            {t('babelLibraryModule.predictiveIntel.noData')}
+                          </div>
+                        )}
+                      </div>
+                      {/* Trending tags */}
+                      {(predictiveData.trends?.trending_tags || []).length > 0 && (
+                        <div style={{ marginTop: 10, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {predictiveData.trends.trending_tags.slice(0, 10).map((tt, i) => (
+                            <span key={i} style={{ background: '#fff3e0', color: '#e65100', padding: '2px 8px', borderRadius: 10, fontSize: '0.75em' }}>
+                              🏷️ {tt.tag} ({tt.recent_7d})
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2. Demand vs Supply */}
+                    <div style={{ marginBottom: 20 }}>
+                      <h4 style={{ color: colors.text, marginBottom: 4 }}>⚖️ {t('babelLibraryModule.predictiveIntel.demandTitle')}</h4>
+                      <p style={{ color: colors.textSecondary, fontSize: '0.85em', marginBottom: 10 }}>{t('babelLibraryModule.predictiveIntel.demandDesc')}</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {(predictiveData.demand?.forecast || []).filter(f => f.supply_count > 0 || f.demand_score > 0).map((item, i) => (
+                          <div key={i} style={{
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
+                            background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}`
+                          }}>
+                            <span style={{ flex: 1, fontWeight: 500, fontSize: '0.9em' }}>{item.domain}</span>
+                            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.7em', color: colors.textSecondary }}>
+                                {t('babelLibraryModule.predictiveIntel.supply')}: {item.supply_count}
+                              </span>
+                              <div style={{
+                                width: 60, height: 6, background: '#e0e0e0', borderRadius: 3, overflow: 'hidden', position: 'relative'
+                              }}>
+                                <div style={{
+                                  position: 'absolute', left: 0, top: 0, height: '100%',
+                                  width: `${Math.min(item.supply_pct, 100)}%`, background: '#42a5f5', borderRadius: 3
+                                }} />
+                                <div style={{
+                                  position: 'absolute', left: 0, top: 0, height: '100%',
+                                  width: `${Math.min(item.demand_pct, 100)}%`, background: '#ef5350', borderRadius: 3, opacity: 0.5
+                                }} />
+                              </div>
+                              <span style={{
+                                fontSize: '0.7em', fontWeight: 600, padding: '1px 6px', borderRadius: 8,
+                                background: item.status === 'under_served' ? '#fce4ec' : item.status === 'over_served' ? '#e3f2fd' : '#f5f5f5',
+                                color: item.status === 'under_served' ? '#c62828' : item.status === 'over_served' ? '#1565c0' : colors.textSecondary
+                              }}>
+                                {t(`babelLibraryModule.predictiveIntel.${item.status === 'under_served' ? 'underServed' : item.status === 'over_served' ? 'overServed' : 'balanced'}`)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 3. Knowledge Gaps (user-specific) */}
+                    {(predictiveData.gaps?.user_gaps || []).length > 0 && (
+                      <div style={{ marginBottom: 20 }}>
+                        <h4 style={{ color: colors.text, marginBottom: 4 }}>🎯 {t('babelLibraryModule.predictiveIntel.gapsTitle')}</h4>
+                        <p style={{ color: colors.textSecondary, fontSize: '0.85em', marginBottom: 10 }}>{t('babelLibraryModule.predictiveIntel.gapsDesc')}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {predictiveData.gaps.user_gaps.map((gap, i) => (
+                            <div key={i} style={{
+                              padding: '8px 12px', background: colors.background, borderRadius: 8,
+                              border: `1px solid ${gap.severity === 'high' ? '#ef535050' : colors.border}`,
+                              borderLeft: `4px solid ${gap.severity === 'high' ? '#ef5350' : '#ff9800'}`
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontWeight: 500, fontSize: '0.9em' }}>{gap.domain}</span>
+                                <span style={{
+                                  fontSize: '0.7em', padding: '1px 6px', borderRadius: 8,
+                                  background: gap.severity === 'high' ? '#fce4ec' : '#fff8e1',
+                                  color: gap.severity === 'high' ? '#c62828' : '#f57f17'
+                                }}>
+                                  {gap.severity === 'high' ? '🔴' : '🟡'} {t(`babelLibraryModule.predictiveIntel.${gap.gap_type === 'interest_gap' ? 'interestGap' : gap.gap_type === 'exploration_gap' ? 'explorationGap' : 'contentGap'}`)}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: '0.8em', color: colors.textSecondary }}>
+                                <span>{t('babelLibraryModule.predictiveIntel.interest')}: {Math.round(gap.interest_score * 100)}%</span>
+                                <span>{t('babelLibraryModule.predictiveIntel.engagement')}: {gap.engagement_pct}%</span>
+                                <span>{t('babelLibraryModule.predictiveIntel.available')}: {gap.available_resources}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 4. Network Expertise */}
+                    <div>
+                      <h4 style={{ color: colors.text, marginBottom: 4 }}>🌐 {t('babelLibraryModule.predictiveIntel.expertiseTitle')}</h4>
+                      <p style={{ color: colors.textSecondary, fontSize: '0.85em', marginBottom: 10 }}>{t('babelLibraryModule.predictiveIntel.expertiseDesc')}</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {(predictiveData.expertise?.domain_expertise || []).filter(d => d.active_learners > 0).map((dom, i) => (
+                          <div key={i} style={{
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
+                            background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}`
+                          }}>
+                            <span style={{ flex: 1, fontWeight: 500, fontSize: '0.9em' }}>{dom.domain}</span>
+                            <span style={{ fontSize: '0.75em', color: colors.textSecondary }}>
+                              👥 {dom.active_learners} {t('babelLibraryModule.predictiveIntel.activeLearners')}
+                            </span>
+                            <span style={{ fontSize: '0.75em', color: colors.textSecondary }}>
+                              📊 {dom.avg_interactions} {t('babelLibraryModule.predictiveIntel.avgInteractions')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Difficulty distribution */}
+                      {predictiveData.expertise?.difficulty_distribution && (
+                        <div style={{ marginTop: 10 }}>
+                          <span style={{ fontSize: '0.8em', color: colors.textSecondary }}>{t('babelLibraryModule.predictiveIntel.difficultyDist')}:</span>
+                          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                            {Object.entries(predictiveData.expertise.difficulty_distribution).map(([diff, count]) => (
+                              <span key={diff} style={{
+                                padding: '2px 8px', borderRadius: 10, fontSize: '0.8em',
+                                background: diff === 'beginner' ? '#e8f5e9' : diff === 'advanced' ? '#fce4ec' : '#fff8e1',
+                                color: diff === 'beginner' ? '#2e7d32' : diff === 'advanced' ? '#c62828' : '#f57f17'
+                              }}>
+                                {t(`babelLibraryModule.intelligence.${diff}`)}: {count}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
