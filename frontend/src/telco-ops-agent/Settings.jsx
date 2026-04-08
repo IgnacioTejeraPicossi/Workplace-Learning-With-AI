@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({
     maxAutoValue: 50,
     confidenceThreshold: 0.7,
@@ -15,11 +17,11 @@ const Settings = () => {
     crmBaseUrl: 'https://crm.example.com',
     crmBearerToken: '',
     graphUserId: 'me',
-    graphBearerToken: ''
+    graphBearerToken: '',
   });
-  
+
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     loadSettings();
@@ -27,7 +29,6 @@ const Settings = () => {
 
   const loadSettings = async () => {
     try {
-      // In a real app, this would load from API
       console.log('Loading settings...');
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -36,70 +37,70 @@ const Settings = () => {
 
   const saveSettings = async () => {
     setSaving(true);
-    setMessage('');
-    
+    setFeedback(null);
+
     try {
-      // In a real app, this would save to API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
-      setMessage('Settings saved successfully!');
-      setTimeout(() => setMessage(''), 3000);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setFeedback({ type: 'success', message: t('telcoOpsAgentModule.settingsSaved') });
+      setTimeout(() => setFeedback(null), 3000);
     } catch (error) {
       console.error('Failed to save settings:', error);
-      setMessage('Failed to save settings');
+      setFeedback({ type: 'error', message: t('telcoOpsAgentModule.settingsSaveFailed') });
     } finally {
       setSaving(false);
     }
   };
 
   const handleInputChange = (field, value) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleArrayChange = (field, value) => {
-    const array = value.split(',').map(item => item.trim()).filter(item => item);
-    setSettings(prev => ({
+    const array = value.split(',').map((item) => item.trim()).filter(Boolean);
+    setSettings((prev) => ({
       ...prev,
-      [field]: array
+      [field]: array,
     }));
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="text-gray-600">Configure Telco Ops Agent policies and integrations</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('telcoOpsAgentModule.settingsTitle')}</h2>
+          <p className="text-gray-600">{t('telcoOpsAgentModule.settingsSubtitle')}</p>
         </div>
         <button
+          type="button"
           onClick={saveSettings}
           disabled={saving}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {saving ? '⏳ Saving...' : '💾 Save Settings'}
+          {saving ? `⏳ ${t('telcoOpsAgentModule.saving')}` : `💾 ${t('telcoOpsAgentModule.saveSettings')}`}
         </button>
       </div>
 
-      {message && (
-        <div className={`p-4 rounded-lg ${
-          message.includes('success') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-        }`}>
-          {message}
+      {feedback && (
+        <div
+          className={`p-4 rounded-lg ${
+            feedback.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          }`}
+        >
+          {feedback.message}
         </div>
       )}
 
-      {/* Policy Settings */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">🛡️ Policy Guardrails</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">🛡️ {t('telcoOpsAgentModule.policySection')}</h3>
+
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Max Auto Value (€)
+              {t('telcoOpsAgentModule.labelMaxAuto')}
             </label>
             <input
               type="number"
@@ -110,13 +111,13 @@ const Settings = () => {
               step="0.1"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Maximum value for automatic execution without approval
+              {t('telcoOpsAgentModule.hintMaxAuto')}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confidence Threshold
+              {t('telcoOpsAgentModule.labelConfidence')}
             </label>
             <input
               type="number"
@@ -128,13 +129,13 @@ const Settings = () => {
               step="0.1"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Minimum confidence level for recommendations (0.0 - 1.0)
+              {t('telcoOpsAgentModule.hintConfidence')}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Risk Threshold (%)
+              {t('telcoOpsAgentModule.labelRisk')}
             </label>
             <input
               type="number"
@@ -146,13 +147,13 @@ const Settings = () => {
               step="1"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Maximum risk level before requiring approval
+              {t('telcoOpsAgentModule.hintRisk')}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Required Approval Roles
+              {t('telcoOpsAgentModule.labelApprovalRoles')}
             </label>
             <input
               type="text"
@@ -162,20 +163,19 @@ const Settings = () => {
               placeholder="ops-supervisor, manager"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Comma-separated list of roles that can approve actions
+              {t('telcoOpsAgentModule.hintApprovalRoles')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* TMF Integration */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">📦 TMF Integration</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">📦 {t('telcoOpsAgentModule.tmfSection')}</h3>
+
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              TMF Base URL
+              {t('telcoOpsAgentModule.labelTmfBaseUrl')}
             </label>
             <input
               type="url"
@@ -188,27 +188,26 @@ const Settings = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              TMF Auth Token
+              {t('telcoOpsAgentModule.labelTmfAuthToken')}
             </label>
             <input
               type="password"
               value={settings.tmfAuthToken}
               onChange={(e) => handleInputChange('tmfAuthToken', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Bearer token"
+              placeholder={t('telcoOpsAgentModule.placeholderBearer')}
             />
           </div>
         </div>
       </div>
 
-      {/* Appointment Integration */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">📅 Appointment Integration</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">📅 {t('telcoOpsAgentModule.appointSection')}</h3>
+
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Appointment Base URL
+              {t('telcoOpsAgentModule.labelAppointBaseUrl')}
             </label>
             <input
               type="url"
@@ -221,49 +220,48 @@ const Settings = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Appointment Token
+              {t('telcoOpsAgentModule.labelAppointToken')}
             </label>
             <input
               type="password"
               value={settings.appointToken}
               onChange={(e) => handleInputChange('appointToken', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="API token"
+              placeholder={t('telcoOpsAgentModule.placeholderApiToken')}
             />
           </div>
         </div>
       </div>
 
-      {/* Communication Integration */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">📧 Communication Integration</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">📧 {t('telcoOpsAgentModule.commSection')}</h3>
+
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Communication Provider
+              {t('telcoOpsAgentModule.labelCommProvider')}
             </label>
             <select
               value={settings.commsProvider}
               onChange={(e) => handleInputChange('commsProvider', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="m365">Microsoft 365</option>
-              <option value="sendgrid">SendGrid</option>
-              <option value="sms">SMS Provider</option>
+              <option value="m365">{t('telcoOpsAgentModule.providerM365')}</option>
+              <option value="sendgrid">{t('telcoOpsAgentModule.providerSendgrid')}</option>
+              <option value="sms">{t('telcoOpsAgentModule.providerSms')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Communication API Key
+              {t('telcoOpsAgentModule.labelCommApiKey')}
             </label>
             <input
               type="password"
               value={settings.commsApiKey}
               onChange={(e) => handleInputChange('commsApiKey', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="API key"
+              placeholder={t('telcoOpsAgentModule.placeholderApiKey')}
             />
           </div>
 
@@ -271,7 +269,7 @@ const Settings = () => {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Graph User ID
+                  {t('telcoOpsAgentModule.labelGraphUserId')}
                 </label>
                 <input
                   type="text"
@@ -284,14 +282,14 @@ const Settings = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Graph Bearer Token
+                  {t('telcoOpsAgentModule.labelGraphBearer')}
                 </label>
                 <input
                   type="password"
                   value={settings.graphBearerToken}
                   onChange={(e) => handleInputChange('graphBearerToken', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Bearer token"
+                  placeholder={t('telcoOpsAgentModule.placeholderBearer')}
                 />
               </div>
             </>
@@ -299,14 +297,13 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* CRM Integration */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">🎫 CRM Integration</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">🎫 {t('telcoOpsAgentModule.crmSection')}</h3>
+
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              CRM Base URL
+              {t('telcoOpsAgentModule.labelCrmBaseUrl')}
             </label>
             <input
               type="url"
@@ -319,14 +316,14 @@ const Settings = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              CRM Bearer Token
+              {t('telcoOpsAgentModule.labelCrmBearer')}
             </label>
             <input
               type="password"
               value={settings.crmBearerToken}
               onChange={(e) => handleInputChange('crmBearerToken', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Bearer token"
+              placeholder={t('telcoOpsAgentModule.placeholderBearer')}
             />
           </div>
         </div>

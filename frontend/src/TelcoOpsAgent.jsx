@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Overview from './telco-ops-agent/Overview';
 import Recommendations from './telco-ops-agent/Recommendations';
 import Actions from './telco-ops-agent/Actions';
@@ -6,14 +7,15 @@ import Runs from './telco-ops-agent/Runs';
 import Settings from './telco-ops-agent/Settings';
 
 const TelcoOpsAgent = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'recommendations', label: 'Recommendations', icon: '💡' },
-    { id: 'actions', label: 'Actions', icon: '⚡' },
-    { id: 'runs', label: 'Runs', icon: '🔄' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { id: 'overview', label: t('telcoOpsAgentModule.tabOverview'), icon: '📊' },
+    { id: 'recommendations', label: t('telcoOpsAgentModule.tabRecommendations'), icon: '💡' },
+    { id: 'actions', label: t('telcoOpsAgentModule.tabActions'), icon: '⚡' },
+    { id: 'runs', label: t('telcoOpsAgentModule.tabRuns'), icon: '🔄' },
+    { id: 'settings', label: t('telcoOpsAgentModule.tabSettings'), icon: '⚙️' },
   ];
 
   const renderContent = () => {
@@ -35,28 +37,27 @@ const TelcoOpsAgent = () => {
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-      {/* Header */}
       <div className="bg-white shadow-sm px-8 py-6">
         <div className="flex items-center space-x-4">
           <div className="text-5xl">📡</div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Telco Ops Decisioning Agent
+              {t('telcoOpsAgentModule.title')}
             </h1>
             <p className="text-sm text-gray-600 mt-1">
-              Data-driven telco operations with TMF APIs and safe autonomy
+              {t('telcoOpsAgentModule.tagline')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="bg-white shadow-sm">
         <div className="px-8">
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`
                   py-4 px-1 border-b-2 font-medium text-sm transition-colors
@@ -75,7 +76,6 @@ const TelcoOpsAgent = () => {
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-auto">
         {renderContent()}
       </div>
