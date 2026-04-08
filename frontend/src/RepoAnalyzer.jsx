@@ -1,9 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import ArchitectureDiagram from './ArchitectureDiagram';
 import './RepoAnalyzer.css';
 
+const TEMPLATE_I18N_BY_NAME = {
+  'React Application': ['templateReactTitle', 'templateReactDesc'],
+  'FastAPI Backend': ['templateFastapiTitle', 'templateFastapiDesc'],
+  'Node.js Express': ['templateExpressTitle', 'templateExpressDesc']
+};
+
+function templateCardCopy(template, t) {
+  const keys = TEMPLATE_I18N_BY_NAME[template.name];
+  if (keys) {
+    return {
+      title: t(`repoAnalyzerModule.${keys[0]}`),
+      desc: t(`repoAnalyzerModule.${keys[1]}`)
+    };
+  }
+  return {
+    title: template.name,
+    desc: template.description || t('repoAnalyzerModule.templateRepoFallback', { repo: template.url.split('/').pop() })
+  };
+}
+
 export default function RepoAnalyzer() {
+  const { t } = useTranslation();
   const [repoUrl, setRepoUrl] = useState('');
   const [branch, setBranch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,7 +71,7 @@ export default function RepoAnalyzer() {
 
   const detectBranches = async () => {
     if (!repoUrl.trim()) {
-      setError('Please enter a repository URL first');
+      setError(t('repoAnalyzerModule.errEnterUrlFirst'));
       return;
     }
 
@@ -69,7 +91,7 @@ export default function RepoAnalyzer() {
       // Show success message
       setError(null);
     } catch (err) {
-      setError('Could not detect branches. You can still try with a specific branch name.');
+      setError(t('repoAnalyzerModule.errDetectBranches'));
       console.error('Error detecting branches:', err);
     } finally {
       setDetectingBranch(false);
@@ -78,7 +100,7 @@ export default function RepoAnalyzer() {
 
   const handleAnalyze = async () => {
     if (!repoUrl.trim()) {
-      setError('Please enter a repository URL');
+      setError(t('repoAnalyzerModule.errEnterUrl'));
       return;
     }
 
@@ -98,7 +120,7 @@ export default function RepoAnalyzer() {
       
       setAnalysisResult(response.data);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error analyzing repository');
+      setError(err.response?.data?.detail || t('repoAnalyzerModule.errAnalyzeRepo'));
     } finally {
       setLoading(false);
     }
@@ -123,13 +145,13 @@ export default function RepoAnalyzer() {
         documentation: response.data
       }));
     } catch (err) {
-      setError('Error generating documentation: ' + err.message);
+      setError(t('repoAnalyzerModule.errGenDoc', { message: err.message }));
     }
   };
 
   const handleGenerateQuiz = async () => {
     if (!analysisResult?.documentation?.markdown) {
-      setError('No documentation available. Please generate documentation first.');
+      setError(t('repoAnalyzerModule.errNoDocForQuiz'));
       return;
     }
 
@@ -147,7 +169,7 @@ export default function RepoAnalyzer() {
         quiz: response.data.quiz
       }));
     } catch (err) {
-      setError('Error generating quiz: ' + err.message);
+      setError(t('repoAnalyzerModule.errGenQuiz', { message: err.message }));
     }
   };
 
@@ -169,7 +191,7 @@ export default function RepoAnalyzer() {
       setAnalysisResult(response.data);
       setError(null);
     } catch (err) {
-      setError('Error loading analysis: ' + err.message);
+      setError(t('repoAnalyzerModule.errLoadAnalysis', { message: err.message }));
     }
   };
 
@@ -178,56 +200,59 @@ export default function RepoAnalyzer() {
       await axios.delete(`/api/saved-analyses/${analysisId}`);
       setSavedAnalyses(prev => prev.filter(analysis => analysis.analysis_id !== analysisId));
     } catch (err) {
-      setError('Error deleting analysis: ' + err.message);
+      setError(t('repoAnalyzerModule.errDeleteAnalysis', { message: err.message }));
     }
   };
 
   return (
     <div className="repo-analyzer-container">
       <div className="analyzer-header">
-        <h1>Repository Documentation Generator</h1>
-        <p>Analyze Git repositories and generate comprehensive documentation with AI-powered insights. Get detailed analysis including architecture patterns, code quality assessment, and learning modules.</p>
+        <h1>{t('repoAnalyzerModule.title')}</h1>
+        <p>{t('repoAnalyzerModule.intro')}</p>
       </div>
       
       {/* Quick Templates */}
       <div className="quick-templates">
-        <h3><span className="icon icon-rocket"></span> Quick Templates</h3>
+        <h3><span className="icon icon-rocket"></span> {t('repoAnalyzerModule.quickTemplates')}</h3>
         <div className="template-grid">
-          {templates.map((template, index) => (
+          {templates.map((template, index) => {
+            const card = templateCardCopy(template, t);
+            return (
             <div
               key={index}
               className={`template-card ${selectedTemplate === template.name ? 'selected' : ''}`}
               onClick={() => handleTemplateSelect(template)}
             >
-              <h4>{template.name}</h4>
-              <p>{template.description || `Repository: ${template.url.split('/').pop()}`}</p>
+              <h4>{card.title}</h4>
+              <p>{card.desc}</p>
             </div>
-          ))}
+          );
+          })}
         </div>
       </div>
 
       {/* Analysis Form */}
       <div className="analysis-form">
-        <h3><span className="icon icon-search"></span> Repository Analysis</h3>
+        <h3><span className="icon icon-search"></span> {t('repoAnalyzerModule.repositoryAnalysis')}</h3>
         
         <div className="form-group">
-          <label>Repository URL:</label>
+          <label>{t('repoAnalyzerModule.labelRepoUrl')}</label>
           <input
             type="text"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="https://github.com/username/repository"
+            placeholder={t('repoAnalyzerModule.placeholderRepoUrl')}
           />
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <label>Branch (optional - will auto-detect):</label>
+            <label>{t('repoAnalyzerModule.labelBranch')}</label>
             <input
               type="text"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              placeholder="Leave empty for auto-detection"
+              placeholder={t('repoAnalyzerModule.placeholderBranch')}
             />
           </div>
           <button 
@@ -236,13 +261,13 @@ export default function RepoAnalyzer() {
             disabled={detectingBranch}
           >
             {detectingBranch ? <span className="spinner"></span> : <span className="icon icon-search"></span>}
-            Detect Branches
+            {detectingBranch ? t('repoAnalyzerModule.detectingBranches') : t('repoAnalyzerModule.detectBranches')}
           </button>
         </div>
 
         {availableBranches.length > 0 && (
           <div className="form-group">
-            <label>Available Branches:</label>
+            <label>{t('repoAnalyzerModule.availableBranches')}</label>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {availableBranches.map((branchName, index) => (
                 <button
@@ -265,7 +290,7 @@ export default function RepoAnalyzer() {
           style={{ width: '100%', marginTop: '1rem' }}
         >
           {loading ? <span className="spinner"></span> : <span className="icon icon-search"></span>}
-          {loading ? 'Analyzing...' : 'Analyze Repository'}
+          {loading ? t('repoAnalyzerModule.analyzing') : t('repoAnalyzerModule.analyzeRepository')}
         </button>
       </div>
 
@@ -280,46 +305,46 @@ export default function RepoAnalyzer() {
       {/* Analysis Results */}
       {analysisResult && (
         <div className="analysis-results">
-          <h3><span className="icon icon-check"></span> Analysis Results</h3>
+          <h3><span className="icon icon-check"></span> {t('repoAnalyzerModule.analysisResults')}</h3>
           
           <div className="result-section">
-            <h4>Repository Information</h4>
-            <p><strong>Name:</strong> {analysisResult.repo_name}</p>
-            <p><strong>Branch:</strong> {analysisResult.branch_used}</p>
-            <p><strong>Files Analyzed:</strong> {analysisResult.files_analyzed}</p>
-            <p><strong>Analysis Type:</strong> {analysisResult.analysis_type}</p>
-            <p><strong>Quality Score:</strong> {Math.round((analysisResult.quality_score || 0) * 100)}%</p>
+            <h4>{t('repoAnalyzerModule.repositoryInformation')}</h4>
+            <p><strong>{t('repoAnalyzerModule.labelName')}</strong> {analysisResult.repo_name}</p>
+            <p><strong>{t('repoAnalyzerModule.labelBranchShort')}</strong> {analysisResult.branch_used}</p>
+            <p><strong>{t('repoAnalyzerModule.filesAnalyzed')}</strong> {analysisResult.files_analyzed}</p>
+            <p><strong>{t('repoAnalyzerModule.analysisType')}</strong> {analysisResult.analysis_type}</p>
+            <p><strong>{t('repoAnalyzerModule.qualityScore')}</strong> {Math.round((analysisResult.quality_score || 0) * 100)}%</p>
           </div>
 
           {analysisResult.structure && (
             <div className="result-section">
-              <h4>Project Structure</h4>
-              <p>{safeGet(analysisResult.structure, 'overview', 'No structure overview available')}</p>
+              <h4>{t('repoAnalyzerModule.projectStructure')}</h4>
+              <p>{safeGet(analysisResult.structure, 'overview', t('repoAnalyzerModule.noStructureOverview'))}</p>
             </div>
           )}
 
           {analysisResult.insights && (
             <div className="result-section">
-              <h4>Key Insights</h4>
-              <p>{safeGet(analysisResult.insights, 'summary', 'No insights available')}</p>
+              <h4>{t('repoAnalyzerModule.keyInsights')}</h4>
+              <p>{safeGet(analysisResult.insights, 'summary', t('repoAnalyzerModule.noInsightsAvailable'))}</p>
             </div>
           )}
 
           {analysisResult.architecture && (
             <div className="result-section">
-              <h4>Architecture Analysis</h4>
-              <p>{safeGet(analysisResult.architecture, 'overview', 'No architecture overview available')}</p>
+              <h4>{t('repoAnalyzerModule.architectureAnalysis')}</h4>
+              <p>{safeGet(analysisResult.architecture, 'overview', t('repoAnalyzerModule.noArchitectureOverview'))}</p>
             </div>
           )}
 
           <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
             <button className="btn btn-success" onClick={handleGenerateDocumentation}>
               <span className="icon icon-folder"></span>
-              Generate Documentation
+              {t('repoAnalyzerModule.generateDocumentation')}
             </button>
             <button className="btn btn-secondary" onClick={handleGenerateQuiz}>
               <span className="icon icon-robot"></span>
-              Generate Quiz
+              {t('repoAnalyzerModule.generateQuiz')}
             </button>
           </div>
         </div>
@@ -327,39 +352,43 @@ export default function RepoAnalyzer() {
 
       {/* Saved Analyses */}
       <div className="saved-analyses">
-        <h3><span className="icon icon-folder"></span> Saved Analyses</h3>
+        <h3><span className="icon icon-folder"></span> {t('repoAnalyzerModule.savedAnalyses')}</h3>
         {loadingSaved ? (
           <div className="loading">
             <span className="spinner"></span>
-            Loading saved analyses...
+            {t('repoAnalyzerModule.loadingSavedAnalyses')}
           </div>
         ) : savedAnalyses.length > 0 ? (
           <div>
             {savedAnalyses.map((analysis) => (
               <div key={analysis.analysis_id} className="analysis-item">
                 <h4>{analysis.repo_name}</h4>
-                <p>Branch: {analysis.branch_used} | Files: {analysis.files_analyzed} | Quality: {Math.round((analysis.quality_score || 0) * 100)}%</p>
+                <p>{t('repoAnalyzerModule.savedAnalysisMeta', {
+                  branch: analysis.branch_used,
+                  files: analysis.files_analyzed,
+                  quality: Math.round((analysis.quality_score || 0) * 100)
+                })}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                   <button 
                     className="btn btn-outline" 
                     onClick={() => handleLoadAnalysis(analysis.analysis_id)}
                     style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}
                   >
-                    Load
+                    {t('repoAnalyzerModule.load')}
                   </button>
                   <button 
                     className="btn btn-secondary" 
                     onClick={() => handleDeleteAnalysis(analysis.analysis_id)}
                     style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}
                   >
-                    Delete
+                    {t('repoAnalyzerModule.delete')}
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p>No saved analyses found.</p>
+          <p>{t('repoAnalyzerModule.noSavedAnalyses')}</p>
         )}
       </div>
     </div>
