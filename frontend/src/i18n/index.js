@@ -35,6 +35,8 @@ import enAgenticRagModule from './locales/en/agenticRagModule.json';
 import noAgenticRagModule from './locales/no/agenticRagModule.json';
 import enLearningRepoModule from './locales/en/learningRepoModule.json';
 import noLearningRepoModule from './locales/no/learningRepoModule.json';
+import enDocumentAnalyzerModule from './locales/en/documentAnalyzerModule.json';
+import noDocumentAnalyzerModule from './locales/no/documentAnalyzerModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -53,10 +55,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule, ...enAgenticRagModule, ...enLearningRepoModule }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule, ...enAgenticRagModule, ...enLearningRepoModule, ...enDocumentAnalyzerModule }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule }
       }
     }
   });

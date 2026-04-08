@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 
 const DocumentsAnalyzer = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [files, setFiles] = useState([]);
   const [summaryLength, setSummaryLength] = useState("medium");
@@ -39,14 +41,14 @@ const DocumentsAnalyzer = () => {
     });
     
     if (validFiles.length === 0) {
-      setError("No valid files selected. Files must be under 5MB each.");
+      setError(t("documentAnalyzerModule.errNoValidFiles"));
       return;
     }
     
     console.log("Valid files selected:", validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
     setFiles(validFiles);
     setError(null);
-  }, []);
+  }, [t]);
 
   const handleDrag = useCallback((e) => {
     e.preventDefault();
@@ -75,14 +77,14 @@ const DocumentsAnalyzer = () => {
     });
     
     if (validFiles.length === 0) {
-      setError("Dropped files appear to be empty. Please try using the browse button instead.");
+      setError(t("documentAnalyzerModule.errDroppedEmpty"));
       return;
     }
     
     setFiles(validFiles);
     setError(null);
     console.log("Dropped files:", validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
-  }, []);
+  }, [t]);
 
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
@@ -90,7 +92,7 @@ const DocumentsAnalyzer = () => {
 
   const analyzeDocuments = async () => {
     if (files.length === 0) {
-      setError("Please select at least one file to analyze.");
+      setError(t("documentAnalyzerModule.errSelectFile"));
       return;
     }
 
@@ -174,14 +176,14 @@ const DocumentsAnalyzer = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to analyze documents");
+        throw new Error(errorData.detail || t("documentAnalyzerModule.errAnalyzeFailed"));
       }
 
       const data = await response.json();
       
       setResults(data);
     } catch (err) {
-      setError(err.message || "An error occurred while analyzing documents");
+      setError(err.message || t("documentAnalyzerModule.errAnalyzeGeneric"));
     } finally {
       setIsAnalyzing(false);
     }
@@ -227,20 +229,25 @@ const DocumentsAnalyzer = () => {
         setStatus(`✅ ${result.message}`);
         setTimeout(() => setStatus(''), 3000);
       } else {
-        setStatus('❌ Failed to save analysis');
+        setStatus(t('documentAnalyzerModule.saveFailed'));
         setTimeout(() => setStatus(''), 3000);
       }
     } catch (error) {
       console.error('Error saving analysis:', error);
-      setStatus('❌ Error saving analysis');
+      setStatus(t('documentAnalyzerModule.saveError'));
       setTimeout(() => setStatus(''), 3000);
     }
   };
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return t("documentAnalyzerModule.sizeZero");
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = [
+      t("documentAnalyzerModule.sizeBytes"),
+      t("documentAnalyzerModule.sizeKB"),
+      t("documentAnalyzerModule.sizeMB"),
+      t("documentAnalyzerModule.sizeGB")
+    ];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
@@ -266,14 +273,14 @@ const DocumentsAnalyzer = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          📄 Document Analyzer
+          {t("documentAnalyzerModule.title")}
         </h1>
         <p style={{ 
           color: colors.textSecondary, 
           fontSize: "16px",
           lineHeight: "1.5"
         }}>
-          Upload documents and get AI-powered summaries. Supports PDF, DOCX, TXT, and Markdown files.
+          {t("documentAnalyzerModule.subtitle")}
         </p>
       </div>
 
@@ -292,7 +299,7 @@ const DocumentsAnalyzer = () => {
           fontSize: "18px",
           fontWeight: "500"
         }}>
-          Upload Documents
+          {t("documentAnalyzerModule.uploadHeading")}
         </h3>
 
         {/* Drag & Drop Zone */}
@@ -319,13 +326,13 @@ const DocumentsAnalyzer = () => {
             fontSize: "16px",
             fontWeight: "500"
           }}>
-            {dragActive ? "Drop files here" : "Drag & drop files here or click to browse"}
+            {dragActive ? t("documentAnalyzerModule.dropzoneActive") : t("documentAnalyzerModule.dropzoneIdle")}
           </p>
                       <p style={{ 
               color: colors.textSecondary, 
               fontSize: "14px"
             }}>
-              Supports PDF, DOCX, TXT, MD (max 5 files, 5MB each)
+              {t("documentAnalyzerModule.dropzoneHint")}
             </p>
         </div>
 
@@ -347,7 +354,7 @@ const DocumentsAnalyzer = () => {
               fontSize: "16px",
               fontWeight: "500"
             }}>
-              Selected Files ({files.length}/5)
+              {t("documentAnalyzerModule.selectedFiles", { current: files.length, max: 5 })}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {files.map((file, index) => (
@@ -389,7 +396,7 @@ const DocumentsAnalyzer = () => {
                       fontSize: "18px",
                       padding: "4px"
                     }}
-                    title="Remove file"
+                    title={t("documentAnalyzerModule.removeFileTitle")}
                   >
                     ✕
                   </button>
@@ -407,7 +414,7 @@ const DocumentsAnalyzer = () => {
             fontSize: "16px",
             fontWeight: "500"
           }}>
-            Analysis Options
+            {t("documentAnalyzerModule.analysisOptionsHeading")}
           </h4>
           
           <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
@@ -420,7 +427,7 @@ const DocumentsAnalyzer = () => {
                 fontSize: "14px",
                 fontWeight: "500"
               }}>
-                Summary Length
+                {t("documentAnalyzerModule.summaryLengthLabel")}
               </label>
               <select
                 value={summaryLength}
@@ -434,16 +441,16 @@ const DocumentsAnalyzer = () => {
                   fontSize: "14px"
                 }}
               >
-                <option value="short">Short (3-5 bullet points)</option>
-                <option value="medium">Medium (executive summary)</option>
-                <option value="long">Long (detailed outline)</option>
+                <option value="short">{t("documentAnalyzerModule.lengthShort")}</option>
+                <option value="medium">{t("documentAnalyzerModule.lengthMedium")}</option>
+                <option value="long">{t("documentAnalyzerModule.lengthLong")}</option>
               </select>
             </div>
 
           {/* Mode Selector */}
           <div>
             <label style={{ color: colors.text, fontSize: "14px", fontWeight: "500" }}>
-              Mode
+              {t("documentAnalyzerModule.modeLabel")}
             </label>
             <select
               value={mode}
@@ -457,8 +464,8 @@ const DocumentsAnalyzer = () => {
                 color: colors.text
               }}
             >
-              <option value="fast">Fast (single-shot)</option>
-              <option value="accurate">Accurate (multi-chunk)</option>
+              <option value="fast">{t("documentAnalyzerModule.modeFast")}</option>
+              <option value="accurate">{t("documentAnalyzerModule.modeAccurate")}</option>
             </select>
           </div>
 
@@ -479,7 +486,7 @@ const DocumentsAnalyzer = () => {
                   onChange={(e) => setCombineFiles(e.target.checked)}
                   style={{ margin: 0 }}
                 />
-                Combine summaries across files
+                {t("documentAnalyzerModule.combineFilesLabel")}
               </label>
             </div>
           </div>
@@ -502,7 +509,7 @@ const DocumentsAnalyzer = () => {
             transition: "all 0.2s ease"
           }}
         >
-          {isAnalyzing ? "🔄 Analyzing..." : "🚀 Analyze Documents"}
+          {isAnalyzing ? t("documentAnalyzerModule.analyzing") : t("documentAnalyzerModule.analyzeButton")}
         </button>
 
         {/* Progress Bar */}
@@ -519,16 +526,16 @@ const DocumentsAnalyzer = () => {
                 fontSize: "14px",
                 fontWeight: "500"
               }}>
-                {analysisProgress.currentStep === "preparing" && "Preparing analysis..."}
-                {analysisProgress.currentStep === "processing" && `Processing file ${analysisProgress.currentFile + 1} of ${analysisProgress.totalFiles}`}
-                {analysisProgress.currentStep === "analyzing" && "AI analysis in progress..."}
-                {analysisProgress.currentStep === "finalizing" && "Finalizing results..."}
+                {analysisProgress.currentStep === "preparing" && t("documentAnalyzerModule.progressPreparing")}
+                {analysisProgress.currentStep === "processing" && t("documentAnalyzerModule.progressProcessing", { current: analysisProgress.currentFile + 1, total: analysisProgress.totalFiles })}
+                {analysisProgress.currentStep === "analyzing" && t("documentAnalyzerModule.progressAnalyzing")}
+                {analysisProgress.currentStep === "finalizing" && t("documentAnalyzerModule.progressFinalizing")}
               </span>
               <span style={{ 
                 color: colors.textSecondary, 
                 fontSize: "12px"
               }}>
-                {analysisProgress.currentFile + 1} / {analysisProgress.totalFiles} files
+                {t("documentAnalyzerModule.filesFraction", { current: analysisProgress.currentFile + 1, total: analysisProgress.totalFiles })}
               </span>
             </div>
             <div style={{ 
@@ -568,7 +575,7 @@ const DocumentsAnalyzer = () => {
                 fontSize: "14px",
                 fontWeight: "500"
               }}>
-                Analysis Progress
+                {t("documentAnalyzerModule.analysisProgressHeading")}
               </h5>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <div style={{ 
@@ -580,7 +587,7 @@ const DocumentsAnalyzer = () => {
                   fontWeight: analysisProgress.currentStep === "preparing" ? "500" : "400"
                 }}>
                   <span style={{ fontSize: "16px" }}>📁</span>
-                  <span>Preparing files for analysis</span>
+                  <span>{t("documentAnalyzerModule.stepPreparing")}</span>
                   {analysisProgress.currentStep === "preparing" && <span style={{ fontSize: "12px" }}>✓</span>}
                 </div>
                 <div style={{ 
@@ -592,7 +599,7 @@ const DocumentsAnalyzer = () => {
                   fontWeight: analysisProgress.currentStep === "processing" ? "500" : "400"
                 }}>
                   <span style={{ fontSize: "16px" }}>🔄</span>
-                  <span>Processing documents ({analysisProgress.currentFile + 1}/{analysisProgress.totalFiles})</span>
+                  <span>{t("documentAnalyzerModule.stepProcessing", { current: analysisProgress.currentFile + 1, total: analysisProgress.totalFiles })}</span>
                   {analysisProgress.currentStep === "processing" && <span style={{ fontSize: "12px" }}>🔄</span>}
                 </div>
                 <div style={{ 
@@ -604,7 +611,7 @@ const DocumentsAnalyzer = () => {
                   fontWeight: analysisProgress.currentStep === "analyzing" ? "500" : "400"
                 }}>
                   <span style={{ fontSize: "16px" }}>🤖</span>
-                  <span>AI analysis and summarization</span>
+                  <span>{t("documentAnalyzerModule.stepAi")}</span>
                   {analysisProgress.currentStep === "analyzing" && <span style={{ fontSize: "12px" }}>🔄</span>}
                 </div>
                 <div style={{ 
@@ -616,7 +623,7 @@ const DocumentsAnalyzer = () => {
                   fontWeight: analysisProgress.currentStep === "finalizing" ? "500" : "400"
                 }}>
                   <span style={{ fontSize: "16px" }}>📊</span>
-                  <span>Finalizing results</span>
+                  <span>{t("documentAnalyzerModule.stepFinalizing")}</span>
                   {analysisProgress.currentStep === "finalizing" && <span style={{ fontSize: "12px" }}>🔄</span>}
                 </div>
               </div>
@@ -626,7 +633,12 @@ const DocumentsAnalyzer = () => {
                 fontSize: "11px",
                 fontStyle: "italic"
               }}>
-                ⏱️ Estimated time: {files.length === 1 ? "30 seconds - 2 minutes" : `${Math.ceil(files.length * 1.5)} - ${Math.ceil(files.length * 3)} minutes`} depending on document size and complexity
+                {files.length === 1
+                  ? t("documentAnalyzerModule.estimatedTimeSingle")
+                  : t("documentAnalyzerModule.estimatedTimeMulti", {
+                      min: Math.ceil(files.length * 1.5),
+                      max: Math.ceil(files.length * 3)
+                    })}
               </p>
             </div>
           </div>
@@ -643,7 +655,7 @@ const DocumentsAnalyzer = () => {
           marginBottom: "24px",
           color: colors.error
         }}>
-          <strong>Error:</strong> {error}
+          <strong>{t("documentAnalyzerModule.errorLabel")}</strong> {error}
         </div>
       )}
 
@@ -676,7 +688,7 @@ const DocumentsAnalyzer = () => {
             fontSize: "20px",
             fontWeight: "600"
           }}>
-            Analysis Results
+            {t("documentAnalyzerModule.analysisResults")}
           </h3>
 
           {/* Individual File Summaries */}
@@ -687,7 +699,7 @@ const DocumentsAnalyzer = () => {
               fontSize: "18px",
               fontWeight: "500"
             }}>
-              File Summaries
+              {t("documentAnalyzerModule.fileSummaries")}
             </h4>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -718,9 +730,9 @@ const DocumentsAnalyzer = () => {
                       fontSize: "12px",
                       color: colors.textSecondary
                     }}>
-                      <span>{summary.chars.toLocaleString()} chars</span>
+                      <span>{t("documentAnalyzerModule.charsCount", { n: summary.chars.toLocaleString() })}</span>
                       <span>•</span>
-                      <span>{summary.chunks} chunks</span>
+                      <span>{t("documentAnalyzerModule.chunksCount", { n: summary.chunks })}</span>
                     </div>
                   </div>
                   
@@ -754,7 +766,7 @@ const DocumentsAnalyzer = () => {
                         cursor: "pointer"
                       }}
                     >
-                      📋 Copy
+                      {t("documentAnalyzerModule.copy")}
                     </button>
                     <button
                       onClick={() => downloadSummary(summary.summary, summary.filename)}
@@ -768,7 +780,7 @@ const DocumentsAnalyzer = () => {
                         cursor: "pointer"
                       }}
                     >
-                      💾 Download
+                      {t("documentAnalyzerModule.download")}
                     </button>
                     <button
                       onClick={() => saveAnalysis(summary)}
@@ -782,7 +794,7 @@ const DocumentsAnalyzer = () => {
                         cursor: "pointer"
                       }}
                     >
-                      💾 Save
+                      {t("documentAnalyzerModule.save")}
                     </button>
                   </div>
                 </div>
@@ -804,7 +816,7 @@ const DocumentsAnalyzer = () => {
                 fontSize: "18px",
                 fontWeight: "500"
               }}>
-                Combined Summary
+                {t("documentAnalyzerModule.combinedSummary")}
               </h4>
               
               <div style={{ 
@@ -837,7 +849,7 @@ const DocumentsAnalyzer = () => {
                     cursor: "pointer"
                   }}
                 >
-                  📋 Copy Combined Summary
+                  {t("documentAnalyzerModule.copyCombined")}
                 </button>
                 <button
                   onClick={() => downloadSummary(results.combined_summary, "combined_summary")}
@@ -851,7 +863,7 @@ const DocumentsAnalyzer = () => {
                     cursor: "pointer"
                   }}
                 >
-                  💾 Download Combined Summary
+                  {t("documentAnalyzerModule.downloadCombined")}
                 </button>
               </div>
             </div>
@@ -871,7 +883,7 @@ const DocumentsAnalyzer = () => {
               fontSize: "14px",
               fontWeight: "500"
             }}>
-              Analysis Metadata
+              {t("documentAnalyzerModule.analysisMetadata")}
             </h5>
             <div style={{ 
               display: "flex", 
@@ -879,9 +891,9 @@ const DocumentsAnalyzer = () => {
               fontSize: "12px",
               color: colors.textSecondary
             }}>
-              <span>Files processed: {results.meta.files_processed}</span>
-              <span>Summary length: {results.meta.length}</span>
-              <span>Combined: {results.meta.combine_across_files ? "Yes" : "No"}</span>
+              <span>{t("documentAnalyzerModule.metaFilesProcessed", { n: results.meta.files_processed })}</span>
+              <span>{t("documentAnalyzerModule.metaSummaryLength", { length: results.meta.length })}</span>
+              <span>{t("documentAnalyzerModule.metaCombined", { value: results.meta.combine_across_files ? t("documentAnalyzerModule.yes") : t("documentAnalyzerModule.no") })}</span>
             </div>
           </div>
         </div>
