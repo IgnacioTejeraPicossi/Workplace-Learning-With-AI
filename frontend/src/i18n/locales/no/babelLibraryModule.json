@@ -262,7 +262,32 @@
       "totalIndexed": "Totalt indeksert",
       "llmClassified": "KI-klassifisert",
       "embedded": "Embeddings",
-      "pending": "Ventende"
+      "pending": "Ventende",
+      "generateContent": "Generer KI-innhold",
+      "generatingContent": "Genererer innhold …",
+      "contentGenerated": "Innhold generert",
+      "contentBatchComplete": "Innholdsbatch fullført: {{processed}} generert, {{failed}} feilet."
+    },
+    "aiContent": {
+      "toggle": "🧠 KI-innhold",
+      "summaryTitle": "Sammendrag",
+      "keyPoints": "Nøkkelpunkter",
+      "questionsTitle": "Forståelsesspørsmål",
+      "multipleChoice": "Flervalg",
+      "trueFalse": "Sant / Usant",
+      "openEnded": "Åpent spørsmål",
+      "showAnswer": "Vis svar",
+      "hideAnswer": "Skjul svar",
+      "correct": "Riktig!",
+      "incorrect": "Feil",
+      "true": "Sant",
+      "false": "Usant",
+      "explanation": "Forklaring",
+      "keyPointsToConsider": "Viktige punkter å vurdere",
+      "hintsTitle": "Læringstips",
+      "approach": "Studietilnærming",
+      "prerequisites": "Forkunnskaper",
+      "nextSteps": "Neste steg"
     },
     "recommendations": {
       "title": "Anbefalt for deg",

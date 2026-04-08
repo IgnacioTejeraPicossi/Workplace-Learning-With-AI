@@ -1,6 +1,7 @@
 """
-Babel Library Intelligence Service — Phase 1
-Automatic classification, LLM-powered tagging, and semantic search via embeddings.
+Babel Library Intelligence Service — Phases 1-3
+Phase 1: Automatic classification, LLM-powered tagging, and semantic search via embeddings.
+Phase 3: AI content generation — summaries, comprehension questions, adaptive hints.
 """
 import asyncio
 import json
@@ -51,6 +52,51 @@ RESOURCE_COLLECTIONS = {
 
 # Batch processing state (in-memory, single-process)
 _batch_state = {"running": False, "total": 0, "processed": 0, "failed": 0, "skipped": 0}
+
+# Content generation batch state (separate from classification batch)
+_content_batch_state = {"running": False, "total": 0, "processed": 0, "failed": 0, "skipped": 0}
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Content Generation Prompt
+# ---------------------------------------------------------------------------
+
+CONTENT_GEN_SYSTEM_PROMPT = """You are an educational content generator. Given a resource's title, description, type, and classification, generate educational content as a single JSON object:
+{
+  "summary": {
+    "short": "1-2 sentence summary of the resource",
+    "key_points": ["point1", "point2", "point3"]
+  },
+  "questions": {
+    "multiple_choice": {
+      "question": "A question about the resource content",
+      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+      "correct_answer": "A",
+      "difficulty": "beginner|intermediate|advanced"
+    },
+    "true_false": {
+      "question": "A true/false statement about the resource",
+      "answer": true,
+      "explanation": "Why this is true/false",
+      "difficulty": "beginner|intermediate|advanced"
+    },
+    "open_ended": {
+      "question": "A thought-provoking question for deeper understanding",
+      "suggested_answer_points": ["key point 1", "key point 2"],
+      "difficulty": "beginner|intermediate|advanced"
+    }
+  },
+  "adaptive_hints": {
+    "approach": "How to best study or engage with this resource",
+    "prerequisites": ["prerequisite1", "prerequisite2"],
+    "next_steps": ["next1", "next2"]
+  }
+}
+Rules:
+- Tailor questions to the resource's difficulty level
+- Make questions educational, not trivial
+- Keep summary concise but informative
+- prerequisites and next_steps should be specific topics, not generic advice
+- Return ONLY the JSON object, no markdown, no explanation"""
 
 
 # ---------------------------------------------------------------------------
@@ -199,7 +245,7 @@ async def semantic_search(query: str, limit: int = 20,
             continue
         score = cosine_similarity(query_vec, emb)
         if score >= min_score:
-            scored.append({
+            entry = {
                 "resource_id": doc.get("resource_id"),
                 "resource_type": doc.get("resource_type"),
                 "title": doc.get("title", ""),
@@ -207,7 +253,15 @@ async def semantic_search(query: str, limit: int = 20,
                 "classification": doc.get("classification"),
                 "tags": doc.get("tags", []),
                 "semantic_score": round(score, 4)
-            })
+            }
+            # Phase 3: include generated content if present
+            if doc.get("summary"):
+                entry["summary"] = doc["summary"]
+            if doc.get("questions"):
+                entry["questions"] = doc["questions"]
+            if doc.get("adaptive_hints"):
+                entry["adaptive_hints"] = doc["adaptive_hints"]
+            scored.append(entry)
 
     scored.sort(key=lambda x: x["semantic_score"], reverse=True)
     return scored[:limit]
@@ -397,14 +451,270 @@ async def process_all_resources(request_headers: dict = None, delay: float = 0.3
     return get_batch_status()
 
 
+# ---------------------------------------------------------------------------
+# Phase 3 — Content Generation
+# ---------------------------------------------------------------------------
+
+async def generate_content(title: str, description: str, resource_type: str,
+                           classification: dict = None, tags: list = None,
+                           request_headers: dict = None) -> Optional[dict]:
+    """Generate summary, questions, and adaptive hints for a resource using the LLM."""
+    try:
+        from backend.llm import ask_ai_unified
+    except ImportError:
+        from llm import ask_ai_unified
+
+    cls_info = ""
+    if classification:
+        cls_info = f"\nDomain: {classification.get('domain', 'Unknown')}\nDifficulty: {classification.get('difficulty', 'intermediate')}\nAudience: {classification.get('audience', 'general')}"
+    tag_info = f"\nTags: {', '.join(tags)}" if tags else ""
+
+    user_prompt = (
+        f"Resource type: {resource_type}\n"
+        f"Title: {title}\n"
+        f"Description: {description[:600] if description else 'No description'}"
+        f"{cls_info}{tag_info}"
+    )
+
+    try:
+        result = await ask_ai_unified(
+            prompt=user_prompt,
+            messages=[
+                {"role": "system", "content": CONTENT_GEN_SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt}
+            ],
+            max_tokens=1024,
+            temperature=0.3,
+            request_headers=request_headers
+        )
+
+        if not result or result.startswith("[MOCKED RESPONSE"):
+            return None
+
+        return _parse_content_generation(result)
+    except Exception as e:
+        print(f"[BabelIntel] Content generation error: {e}")
+        return None
+
+
+def _parse_content_generation(raw: str) -> Optional[dict]:
+    """Extract and validate content generation JSON from LLM response."""
+    # Try direct parse
+    try:
+        data = json.loads(raw.strip())
+        return _validate_content(data)
+    except json.JSONDecodeError:
+        pass
+
+    # Regex: find outermost {...} (content JSON is nested, so we need greedy match)
+    match = re.search(r'\{.*\}', raw, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group())
+            return _validate_content(data)
+        except json.JSONDecodeError:
+            pass
+
+    # Markdown code block fallback
+    match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', raw, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group(1))
+            return _validate_content(data)
+        except json.JSONDecodeError:
+            pass
+
+    print(f"[BabelIntel] Failed to parse content generation response: {raw[:200]}")
+    return None
+
+
+def _validate_content(data: dict) -> dict:
+    """Normalize and validate generated content. Missing sections become None."""
+    result = {"summary": None, "questions": None, "adaptive_hints": None}
+
+    # --- Summary ---
+    summary = data.get("summary")
+    if isinstance(summary, dict):
+        short = summary.get("short", "")
+        key_points = summary.get("key_points", [])
+        if not isinstance(key_points, list):
+            key_points = []
+        key_points = [str(p) for p in key_points[:10] if p]
+        if short or key_points:
+            result["summary"] = {"short": str(short), "key_points": key_points}
+
+    # --- Questions ---
+    questions = data.get("questions")
+    if isinstance(questions, dict):
+        validated_q = {}
+
+        mc = questions.get("multiple_choice")
+        if isinstance(mc, dict) and mc.get("question"):
+            opts = mc.get("options", [])
+            if isinstance(opts, list) and len(opts) >= 2:
+                validated_q["multiple_choice"] = {
+                    "question": str(mc["question"]),
+                    "options": [str(o) for o in opts[:6]],
+                    "correct_answer": str(mc.get("correct_answer", "A")),
+                    "difficulty": mc.get("difficulty", "intermediate")
+                }
+
+        tf = questions.get("true_false")
+        if isinstance(tf, dict) and tf.get("question"):
+            validated_q["true_false"] = {
+                "question": str(tf["question"]),
+                "answer": bool(tf.get("answer", True)),
+                "explanation": str(tf.get("explanation", "")),
+                "difficulty": tf.get("difficulty", "intermediate")
+            }
+
+        oe = questions.get("open_ended")
+        if isinstance(oe, dict) and oe.get("question"):
+            points = oe.get("suggested_answer_points", [])
+            if not isinstance(points, list):
+                points = []
+            validated_q["open_ended"] = {
+                "question": str(oe["question"]),
+                "suggested_answer_points": [str(p) for p in points[:10] if p],
+                "difficulty": oe.get("difficulty", "intermediate")
+            }
+
+        if validated_q:
+            result["questions"] = validated_q
+
+    # --- Adaptive hints ---
+    hints = data.get("adaptive_hints")
+    if isinstance(hints, dict):
+        approach = hints.get("approach", "")
+        prereqs = hints.get("prerequisites", [])
+        nexts = hints.get("next_steps", [])
+        if not isinstance(prereqs, list):
+            prereqs = []
+        if not isinstance(nexts, list):
+            nexts = []
+        if approach or prereqs or nexts:
+            result["adaptive_hints"] = {
+                "approach": str(approach),
+                "prerequisites": [str(p) for p in prereqs[:10] if p],
+                "next_steps": [str(n) for n in nexts[:10] if n]
+            }
+
+    # Return None if nothing parsed at all
+    if not any(result.values()):
+        return None
+
+    return result
+
+
+async def process_content_for_resource(
+    resource_id: str,
+    resource_type: str,
+    request_headers: dict = None
+) -> dict:
+    """Fetch metadata doc, generate content, and upsert the new fields."""
+    doc = await babel_ai_metadata_collection.find_one(
+        {"resource_id": resource_id, "resource_type": resource_type}
+    )
+    if not doc:
+        return {"error": "Resource metadata not found. Classify the resource first."}
+
+    title = doc.get("title", "")
+    description = doc.get("description", "")
+    classification = doc.get("classification")
+    tags = doc.get("tags", [])
+
+    content = await generate_content(
+        title=title,
+        description=description,
+        resource_type=resource_type,
+        classification=classification,
+        tags=tags,
+        request_headers=request_headers
+    )
+
+    if content is None:
+        return {"error": "Content generation failed (LLM unavailable or parse error)"}
+
+    await babel_ai_metadata_collection.update_one(
+        {"resource_id": resource_id, "resource_type": resource_type},
+        {"$set": {
+            "summary": content.get("summary"),
+            "questions": content.get("questions"),
+            "adaptive_hints": content.get("adaptive_hints"),
+            "content_generated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+
+    return {
+        "resource_id": resource_id,
+        "resource_type": resource_type,
+        "summary": content.get("summary"),
+        "questions": content.get("questions"),
+        "adaptive_hints": content.get("adaptive_hints")
+    }
+
+
+def get_content_batch_status() -> dict:
+    return dict(_content_batch_state)
+
+
+async def generate_all_content(request_headers: dict = None, delay: float = 1.0):
+    """Batch-generate content for all classified resources that lack content."""
+    global _content_batch_state
+    if _content_batch_state["running"]:
+        return {"error": "Content batch already running"}
+
+    _content_batch_state.update({"running": True, "total": 0, "processed": 0, "failed": 0, "skipped": 0})
+
+    try:
+        # Find classified docs missing content
+        docs = await babel_ai_metadata_collection.find(
+            {"llm_classified": True, "summary": {"$exists": False}}
+        ).to_list(length=5000)
+
+        _content_batch_state["total"] = len(docs)
+
+        for doc in docs:
+            rid = doc.get("resource_id", "")
+            rtype = doc.get("resource_type", "article")
+
+            if not rid:
+                _content_batch_state["skipped"] += 1
+                continue
+
+            try:
+                result = await process_content_for_resource(rid, rtype, request_headers)
+                if "error" in result:
+                    _content_batch_state["failed"] += 1
+                else:
+                    _content_batch_state["processed"] += 1
+            except Exception as e:
+                print(f"[BabelIntel] Content batch error on {rid}: {e}")
+                _content_batch_state["failed"] += 1
+
+            if delay > 0:
+                await asyncio.sleep(delay)
+
+    finally:
+        _content_batch_state["running"] = False
+
+    return get_content_batch_status()
+
+
+# ---------------------------------------------------------------------------
+# Stats
+# ---------------------------------------------------------------------------
+
 async def get_stats() -> dict:
-    """Get stats about classified/embedded resources."""
+    """Get stats about classified/embedded/content-generated resources."""
     total = await babel_ai_metadata_collection.count_documents({})
     classified = await babel_ai_metadata_collection.count_documents({"llm_classified": True})
     embedded = await babel_ai_metadata_collection.count_documents({"embedding": {"$exists": True}})
+    content_generated = await babel_ai_metadata_collection.count_documents({"summary": {"$exists": True}})
     return {
         "total_metadata": total,
         "llm_classified": classified,
         "embedded": embedded,
+        "content_generated": content_generated,
         "pending_classification": total - classified
     }

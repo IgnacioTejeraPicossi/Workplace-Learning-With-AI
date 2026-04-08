@@ -262,7 +262,32 @@
       "totalIndexed": "Total indexed",
       "llmClassified": "LLM classified",
       "embedded": "Embedded",
-      "pending": "Pending"
+      "pending": "Pending",
+      "generateContent": "Generate AI content",
+      "generatingContent": "Generating content…",
+      "contentGenerated": "Content generated",
+      "contentBatchComplete": "Content batch complete: {{processed}} generated, {{failed}} failed."
+    },
+    "aiContent": {
+      "toggle": "🧠 AI Content",
+      "summaryTitle": "Summary",
+      "keyPoints": "Key points",
+      "questionsTitle": "Comprehension Questions",
+      "multipleChoice": "Multiple choice",
+      "trueFalse": "True / False",
+      "openEnded": "Open-ended",
+      "showAnswer": "Show answer",
+      "hideAnswer": "Hide answer",
+      "correct": "Correct!",
+      "incorrect": "Incorrect",
+      "true": "True",
+      "false": "False",
+      "explanation": "Explanation",
+      "keyPointsToConsider": "Key points to consider",
+      "hintsTitle": "Learning Hints",
+      "approach": "Study approach",
+      "prerequisites": "Prerequisites",
+      "nextSteps": "Next steps"
     },
     "recommendations": {
       "title": "Recommended for you",

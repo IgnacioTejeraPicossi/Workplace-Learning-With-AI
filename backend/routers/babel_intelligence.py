@@ -1,6 +1,7 @@
 """
-Babel Library Intelligence Router — Phase 1
-Endpoints for AI classification, semantic search, and batch processing.
+Babel Library Intelligence Router — Phases 1-3
+Endpoints for AI classification, semantic search, batch processing,
+and AI content generation (summaries, questions, adaptive hints).
 """
 from fastapi import APIRouter, BackgroundTasks, Request
 from pydantic import BaseModel, Field
@@ -14,6 +15,9 @@ from backend.services.babel_intelligence import (
     semantic_search,
     get_batch_status,
     get_stats,
+    process_content_for_resource,
+    generate_all_content,
+    get_content_batch_status,
 )
 
 router = APIRouter(prefix="/api/babel/intelligence")
@@ -37,6 +41,13 @@ class SearchRequest(BaseModel):
 
 class BatchRequest(BaseModel):
     delay: float = Field(default=0.3, ge=0, le=5.0)
+
+class ContentGenRequest(BaseModel):
+    resource_id: str
+    resource_type: str = "article"
+
+class ContentBatchRequest(BaseModel):
+    delay: float = Field(default=1.0, ge=0, le=10.0)
 
 
 # ---------------------------------------------------------------------------
@@ -120,5 +131,42 @@ async def batch_status():
 
 @router.get("/stats")
 async def intelligence_stats():
-    """Get stats about classified/embedded resources."""
+    """Get stats about classified/embedded/content-generated resources."""
     return await get_stats()
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Content Generation Endpoints
+# ---------------------------------------------------------------------------
+
+@router.post("/generate-content")
+async def generate_content_endpoint(body: ContentGenRequest, request: Request):
+    """Generate AI content (summary, questions, hints) for a single resource."""
+    headers = dict(request.headers) if request else None
+    result = await process_content_for_resource(
+        resource_id=body.resource_id,
+        resource_type=body.resource_type,
+        request_headers=headers
+    )
+    if "error" in result:
+        return {"status": "error", "message": result["error"]}
+    return {"status": "ok", "content": result}
+
+
+@router.post("/generate-content/batch")
+async def start_content_batch(body: ContentBatchRequest, background_tasks: BackgroundTasks, request: Request):
+    """Start batch content generation for all classified resources missing content."""
+    status = get_content_batch_status()
+    if status["running"]:
+        return {"status": "already_running", "progress": status}
+
+    headers = dict(request.headers) if request else None
+    background_tasks.add_task(generate_all_content, request_headers=headers, delay=body.delay)
+
+    return {"status": "started", "message": "Content generation batch started in background"}
+
+
+@router.get("/generate-content/batch/status")
+async def content_batch_status():
+    """Get current content generation batch progress."""
+    return get_content_batch_status()
