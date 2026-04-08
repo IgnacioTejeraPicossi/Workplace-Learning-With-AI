@@ -1,7 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import descriptor from '../configs/agents/attention-agent.json';
 
 const Overview = () => {
+  const { t } = useTranslation();
+  const sourcesInternal = useMemo(
+    () => t('personalAttentionAgentModule.sourcesInternal', { returnObjects: true }),
+    [t]
+  );
+  const sourcesExternal = useMemo(
+    () => t('personalAttentionAgentModule.sourcesExternal', { returnObjects: true }),
+    [t]
+  );
+  const features = useMemo(
+    () => t('personalAttentionAgentModule.features', { returnObjects: true }),
+    [t]
+  );
+  const internalList = Array.isArray(sourcesInternal) ? sourcesInternal : [];
+  const externalList = Array.isArray(sourcesExternal) ? sourcesExternal : [];
+  const featureList = Array.isArray(features) ? features : [];
+
   const [stats, setStats] = useState({
     activeSources: 0,
     totalSignals: 0,
@@ -12,7 +30,6 @@ const Overview = () => {
   });
 
   useEffect(() => {
-    // Load stats from API
     fetch('/agents/attention/stats')
       .then((res) => res.json())
       .then((data) => {
@@ -32,7 +49,6 @@ const Overview = () => {
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
       <div style={{ display: 'grid', gap: '24px' }}>
-        {/* Hero */}
         <div
           style={{
             borderRadius: '16px',
@@ -45,27 +61,24 @@ const Overview = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
             <div style={{ fontSize: '40px' }}>🎯</div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>{descriptor.name}</h2>
-              <p style={{ margin: '4px 0 0', opacity: 0.9 }}>Noise→signal across channels; schedules focus holds and sends actionable briefs</p>
+              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>{t('personalAttentionAgentModule.title')}</h2>
+              <p style={{ margin: '4px 0 0', opacity: 0.9 }}>{t('personalAttentionAgentModule.tagline')}</p>
             </div>
           </div>
-          <p style={{ marginTop: '12px', opacity: 0.95 }}>{descriptor.description}</p>
+          <p style={{ marginTop: '12px', opacity: 0.95 }}>{t('personalAttentionAgentModule.description')}</p>
         </div>
 
-        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-          <StatCard label="Active Sources" value={stats.activeSources} icon="📡" />
-          <StatCard label="Total Signals" value={stats.totalSignals} icon="📊" />
-          <StatCard label="Pending Alerts" value={stats.pendingAlerts} icon="🚨" />
+          <StatCard label={t('personalAttentionAgentModule.statsActiveSources')} value={stats.activeSources} icon="📡" />
+          <StatCard label={t('personalAttentionAgentModule.statsTotalSignals')} value={stats.totalSignals} icon="📊" />
+          <StatCard label={t('personalAttentionAgentModule.statsPendingAlerts')} value={stats.pendingAlerts} icon="🚨" />
         </div>
 
-        {/* Two Columns */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          {/* Capabilities */}
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <span style={{ fontSize: '20px' }}>⚡</span>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Capabilities</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('personalAttentionAgentModule.capabilitiesHeading')}</h3>
             </div>
             <div style={{ display: 'grid', gap: '8px' }}>
               {descriptor.capabilities.map((cap, i) => (
@@ -79,17 +92,16 @@ const Overview = () => {
             </div>
           </div>
 
-          {/* Data Sources */}
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <span style={{ fontSize: '20px' }}>📊</span>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Data Sources</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('personalAttentionAgentModule.dataSourcesHeading')}</h3>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🔒</span>Internal</h4>
+                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🔒</span>{t('personalAttentionAgentModule.internalHeading')}</h4>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '6px' }}>
-                  {descriptor.sources.internal.map((source, i) => (
+                  {internalList.map((source, i) => (
                     <li key={i} style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center' }}>
                       <span style={{ marginRight: 8 }}>✓</span>
                       {source}
@@ -98,9 +110,9 @@ const Overview = () => {
                 </ul>
               </div>
               <div>
-                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🌐</span>External</h4>
+                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🌐</span>{t('personalAttentionAgentModule.externalHeading')}</h4>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '6px' }}>
-                  {descriptor.sources.external.map((source, i) => (
+                  {externalList.map((source, i) => (
                     <li key={i} style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center' }}>
                       <span style={{ marginRight: 8 }}>✓</span>
                       {source}
@@ -112,14 +124,13 @@ const Overview = () => {
           </div>
         </div>
 
-        {/* Features */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '20px' }}>✨</span>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Key Features</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('personalAttentionAgentModule.keyFeaturesHeading')}</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {descriptor.features.map((feature, i) => (
+            {featureList.map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '10px', background: '#ecfdf5', borderRadius: '10px' }}>
                 <span style={{ color: '#16a34a', marginTop: 2 }}>✓</span>
                 <span style={{ fontSize: '13px', color: '#334155' }}>{feature}</span>
@@ -128,17 +139,16 @@ const Overview = () => {
           </div>
         </div>
 
-        {/* Recent Activity */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '20px' }}>📈</span>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Recent Activity (24h)</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('personalAttentionAgentModule.recentActivity24h')}</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div style={{ background: '#eff6ff', borderRadius: '10px', padding: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#2563eb' }}>New Signals</p>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#2563eb' }}>{t('personalAttentionAgentModule.newSignals')}</p>
                   <p style={{ margin: '4px 0 0', fontSize: '22px', fontWeight: 700, color: '#1e3a8a' }}>{stats.recentSignals24h}</p>
                 </div>
                 <div style={{ fontSize: '22px', color: '#3b82f6' }}>📊</div>
@@ -147,7 +157,7 @@ const Overview = () => {
             <div style={{ background: '#ecfdf5', borderRadius: '10px', padding: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#16a34a' }}>New Clusters</p>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#16a34a' }}>{t('personalAttentionAgentModule.newClusters')}</p>
                   <p style={{ margin: '4px 0 0', fontSize: '22px', fontWeight: 700, color: '#065f46' }}>{stats.recentClusters24h}</p>
                 </div>
                 <div style={{ fontSize: '22px', color: '#10b981' }}>🔗</div>
@@ -156,7 +166,6 @@ const Overview = () => {
           </div>
         </div>
 
-        {/* MCP */}
         <div
           style={{
             borderRadius: '16px',
@@ -168,9 +177,9 @@ const Overview = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '22px' }}>🔌</span>
-            <h3 style={{ margin: 0, fontSize: '18px' }}>Model Context Protocol (MCP)</h3>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>{t('personalAttentionAgentModule.mcpHeading')}</h3>
           </div>
-          <p style={{ margin: 0, marginBottom: '10px', opacity: 0.95 }}>This agent supports MCP for standardized tool execution</p>
+          <p style={{ margin: 0, marginBottom: '10px', opacity: 0.95 }}>{t('personalAttentionAgentModule.mcpSupportText')}</p>
           <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px' }}>
             <code style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
               {descriptor.mcp.endpoint}

@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Runs = () => {
+  const { t, i18n } = useTranslation();
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const loc = i18n.language === 'no' ? 'nb-NO' : 'en-US';
 
   useEffect(() => {
     loadRuns();
@@ -41,31 +45,36 @@ const Runs = () => {
     return icons[status] || '❓';
   };
 
+  const fmt = (d) => {
+    if (!d) return t('personalAttentionAgentModule.notAvailable');
+    const x = new Date(d);
+    return Number.isNaN(x.getTime()) ? t('personalAttentionAgentModule.notAvailable') : x.toLocaleString(loc);
+  };
+
   return (
     <div className="p-6">
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Execution Runs</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('personalAttentionAgentModule.runsPageTitle')}</h1>
             <p className="text-gray-600 mt-1">
-              Monitor attention agent execution history and attestation
+              {t('personalAttentionAgentModule.runsPageSubtitle')}
             </p>
           </div>
           <button
+            type="button"
             onClick={loadRuns}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Refresh
+            {t('personalAttentionAgentModule.refresh')}
           </button>
         </div>
 
-        {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Runs</p>
+                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.totalRuns')}</p>
                 <p className="text-3xl font-bold text-gray-900">{runs?.length || 0}</p>
               </div>
               <div className="text-4xl text-gray-500">📊</div>
@@ -75,9 +84,9 @@ const Runs = () => {
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Successful</p>
+                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.successful')}</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {runs?.filter(r => r.status === 'DONE').length || 0}
+                  {runs?.filter((r) => r.status === 'DONE').length || 0}
                 </p>
               </div>
               <div className="text-4xl text-green-500">✅</div>
@@ -87,9 +96,9 @@ const Runs = () => {
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Running</p>
+                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.running')}</p>
                 <p className="text-3xl font-bold text-blue-600">
-                  {runs?.filter(r => r.status === 'RUNNING').length || 0}
+                  {runs?.filter((r) => r.status === 'RUNNING').length || 0}
                 </p>
               </div>
               <div className="text-4xl text-blue-500">⏳</div>
@@ -99,9 +108,9 @@ const Runs = () => {
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Failed</p>
+                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.failed')}</p>
                 <p className="text-3xl font-bold text-red-600">
-                  {runs?.filter(r => r.status === 'FAILED').length || 0}
+                  {runs?.filter((r) => r.status === 'FAILED').length || 0}
                 </p>
               </div>
               <div className="text-4xl text-red-500">❌</div>
@@ -109,21 +118,20 @@ const Runs = () => {
           </div>
         </div>
 
-        {/* Runs Table */}
         <div className="bg-white rounded-xl shadow-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">Recent Runs</h3>
+            <h3 className="text-lg font-semibold">{t('personalAttentionAgentModule.recentRuns')}</h3>
           </div>
-          
+
           {loading ? (
             <div className="p-6 text-center">
-              <div className="text-gray-500">Loading runs...</div>
+              <div className="text-gray-500">{t('personalAttentionAgentModule.loadingRuns')}</div>
             </div>
           ) : runs.length === 0 ? (
             <div className="p-6 text-center">
-              <div className="text-gray-500 mb-4">No runs found</div>
+              <div className="text-gray-500 mb-4">{t('personalAttentionAgentModule.noRunsFound')}</div>
               <p className="text-sm text-gray-400">
-                Execute some actions to see them here
+                {t('personalAttentionAgentModule.runsEmptyHint')}
               </p>
             </div>
           ) : (
@@ -132,22 +140,22 @@ const Runs = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Run ID
+                      {t('personalAttentionAgentModule.thRunId')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      {t('personalAttentionAgentModule.thStatus')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Topic
+                      {t('personalAttentionAgentModule.thTopic')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Attestation
+                      {t('personalAttentionAgentModule.thAttestation')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
+                      {t('personalAttentionAgentModule.thCreated')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      {t('personalAttentionAgentModule.thActions')}
                     </th>
                   </tr>
                 </thead>
@@ -156,7 +164,7 @@ const Runs = () => {
                     <tr key={run.run_id || index} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {run.run_id || 'N/A'}
+                          {run.run_id || t('personalAttentionAgentModule.notAvailable')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -167,7 +175,7 @@ const Runs = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {run.bundle?.topic || 'N/A'}
+                          {run.bundle?.topic || t('personalAttentionAgentModule.notAvailable')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -182,11 +190,11 @@ const Runs = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {run.created_at ? new Date(run.created_at).toLocaleString() : 'N/A'}
+                        {fmt(run.created_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900">
-                          View Details
+                        <button type="button" className="text-blue-600 hover:text-blue-900">
+                          {t('personalAttentionAgentModule.viewDetails')}
                         </button>
                       </td>
                     </tr>

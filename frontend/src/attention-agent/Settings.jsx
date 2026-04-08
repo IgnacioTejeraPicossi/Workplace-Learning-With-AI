@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const [preferences, setPreferences] = useState({
     mustHave: [],
     muteTerms: [],
@@ -38,22 +40,22 @@ const Settings = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences)
       });
-      
+
       if (response.ok) {
-        window.alert('Preferences saved successfully!');
+        window.alert(t('personalAttentionAgentModule.prefsSaved'));
       } else {
-        window.alert('Failed to save preferences');
+        window.alert(t('personalAttentionAgentModule.prefsSaveFailed'));
       }
     } catch (error) {
       console.error('Failed to save preferences:', error);
-      window.alert('Error saving preferences');
+      window.alert(t('personalAttentionAgentModule.prefsSaveError'));
     } finally {
       setSaving(false);
     }
   };
 
   const addMustHave = () => {
-    const term = window.prompt('Enter must-have term:');
+    const term = window.prompt(t('personalAttentionAgentModule.promptMustHave'));
     if (term && !preferences.mustHave.includes(term)) {
       setPreferences({
         ...preferences,
@@ -70,7 +72,7 @@ const Settings = () => {
   };
 
   const addMuteTerm = () => {
-    const term = window.prompt('Enter mute term:');
+    const term = window.prompt(t('personalAttentionAgentModule.promptMute'));
     if (term && !preferences.muteTerms.includes(term)) {
       setPreferences({
         ...preferences,
@@ -87,7 +89,7 @@ const Settings = () => {
   };
 
   const addTeam = () => {
-    const team = window.prompt('Enter team name:');
+    const team = window.prompt(t('personalAttentionAgentModule.promptTeam'));
     if (team && !preferences.teams.includes(team)) {
       setPreferences({
         ...preferences,
@@ -106,139 +108,140 @@ const Settings = () => {
   return (
     <div className="p-6">
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('personalAttentionAgentModule.settingsPageTitle')}</h1>
             <p className="text-gray-600 mt-1">
-              Configure preferences, channels, and routing rules
+              {t('personalAttentionAgentModule.settingsPageSubtitle')}
             </p>
           </div>
           <button
+            type="button"
             onClick={savePreferences}
             disabled={saving}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {saving ? 'Saving...' : 'Save Settings'}
+            {saving ? t('personalAttentionAgentModule.saving') : t('personalAttentionAgentModule.saveSettings')}
           </button>
         </div>
 
         {loading ? (
           <div className="text-center py-8">
-            <div className="text-gray-500">Loading settings...</div>
+            <div className="text-gray-500">{t('personalAttentionAgentModule.loadingSettings')}</div>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Must-Have Terms */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Must-Have Terms</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('personalAttentionAgentModule.mustHaveTitle')}</h3>
               <p className="text-gray-600 mb-4">
-                Terms that should always trigger alerts regardless of other factors
+                {t('personalAttentionAgentModule.mustHaveDesc')}
               </p>
               <div className="space-y-2">
                 {preferences.mustHave.map((term, index) => (
                   <div key={index} className="flex items-center justify-between bg-green-50 p-2 rounded">
                     <span className="text-sm">{term}</span>
                     <button
+                      type="button"
                       onClick={() => removeMustHave(index)}
                       className="text-red-600 hover:text-red-800 text-sm"
                     >
-                      Remove
+                      {t('personalAttentionAgentModule.remove')}
                     </button>
                   </div>
                 ))}
                 <button
+                  type="button"
                   onClick={addMustHave}
                   className="text-green-600 hover:text-green-800 text-sm font-medium"
                 >
-                  + Add Must-Have Term
+                  {t('personalAttentionAgentModule.addMustHave')}
                 </button>
               </div>
             </div>
 
-            {/* Mute Terms */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Mute Terms</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('personalAttentionAgentModule.muteTitle')}</h3>
               <p className="text-gray-600 mb-4">
-                Terms that should be filtered out and not trigger alerts
+                {t('personalAttentionAgentModule.muteDesc')}
               </p>
               <div className="space-y-2">
                 {preferences.muteTerms.map((term, index) => (
                   <div key={index} className="flex items-center justify-between bg-red-50 p-2 rounded">
                     <span className="text-sm">{term}</span>
                     <button
+                      type="button"
                       onClick={() => removeMuteTerm(index)}
                       className="text-red-600 hover:text-red-800 text-sm"
                     >
-                      Remove
+                      {t('personalAttentionAgentModule.remove')}
                     </button>
                   </div>
                 ))}
                 <button
+                  type="button"
                   onClick={addMuteTerm}
                   className="text-red-600 hover:text-red-800 text-sm font-medium"
                 >
-                  + Add Mute Term
+                  {t('personalAttentionAgentModule.addMute')}
                 </button>
               </div>
             </div>
 
-            {/* Teams */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Teams</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('personalAttentionAgentModule.teamsTitle')}</h3>
               <p className="text-gray-600 mb-4">
-                Teams that should receive priority alerts
+                {t('personalAttentionAgentModule.teamsDesc')}
               </p>
               <div className="space-y-2">
                 {preferences.teams.map((team, index) => (
                   <div key={index} className="flex items-center justify-between bg-blue-50 p-2 rounded">
                     <span className="text-sm">{team}</span>
                     <button
+                      type="button"
                       onClick={() => removeTeam(index)}
                       className="text-red-600 hover:text-red-800 text-sm"
                     >
-                      Remove
+                      {t('personalAttentionAgentModule.remove')}
                     </button>
                   </div>
                 ))}
                 <button
+                  type="button"
                   onClick={addTeam}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  + Add Team
+                  {t('personalAttentionAgentModule.addTeam')}
                 </button>
               </div>
             </div>
 
-            {/* Quiet Hours */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Quiet Hours</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('personalAttentionAgentModule.quietHoursTitle')}</h3>
               <p className="text-gray-600 mb-4">
-                Time period when alerts should be suppressed (except urgent)
+                {t('personalAttentionAgentModule.quietHoursDesc')}
               </p>
               <div className="max-w-xs">
                 <input
                   type="text"
                   value={preferences.quietHours}
-                  onChange={(e) => setPreferences({...preferences, quietHours: e.target.value})}
+                  onChange={(e) => setPreferences({ ...preferences, quietHours: e.target.value })}
                   placeholder="22:00-08:00"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Format: HH:MM-HH:MM (24-hour format)
+                  {t('personalAttentionAgentModule.quietHoursFormat')}
                 </p>
               </div>
             </div>
 
-            {/* Integration Settings */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Integration Settings</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('personalAttentionAgentModule.integrationSettings')}</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Slack</h4>
+                  <h4 className="font-medium text-gray-700 mb-2">{t('personalAttentionAgentModule.slackIntegration')}</h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-sm text-gray-600">Bot Token</label>
+                      <label className="block text-sm text-gray-600">{t('personalAttentionAgentModule.botToken')}</label>
                       <input
                         type="password"
                         placeholder="xoxb-..."
@@ -246,7 +249,7 @@ const Settings = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600">Default Channel</label>
+                      <label className="block text-sm text-gray-600">{t('personalAttentionAgentModule.defaultChannel')}</label>
                       <input
                         type="text"
                         placeholder="#cto-brief"
@@ -255,12 +258,12 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Microsoft Teams</h4>
+                  <h4 className="font-medium text-gray-700 mb-2">{t('personalAttentionAgentModule.teamsIntegration')}</h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-sm text-gray-600">Webhook URL</label>
+                      <label className="block text-sm text-gray-600">{t('personalAttentionAgentModule.webhookUrl')}</label>
                       <input
                         type="url"
                         placeholder="https://outlook.office.com/webhook/..."
@@ -268,7 +271,7 @@ const Settings = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600">Graph Token</label>
+                      <label className="block text-sm text-gray-600">{t('personalAttentionAgentModule.graphToken')}</label>
                       <input
                         type="password"
                         placeholder="Bearer token"
