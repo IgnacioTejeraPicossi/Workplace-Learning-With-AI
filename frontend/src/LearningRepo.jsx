@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 export default function LearningRepo() {
+  const { t } = useTranslation();
   const [savedAnalyses, setSavedAnalyses] = useState([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
@@ -80,7 +82,7 @@ export default function LearningRepo() {
       setSavedAnalyses(response.data.analyses || []);
     } catch (err) {
       console.error('Error loading saved analyses:', err);
-      setError('Failed to load saved analyses');
+      setError(t('learningRepoModule.errLoadSaved'));
     } finally {
       setLoadingSaved(false);
     }
@@ -116,7 +118,7 @@ export default function LearningRepo() {
   const createLearningModule = async (doc) => {
     try {
       setError('');
-      setSuccess('Creating learning module...');
+      setSuccess(t('learningRepoModule.creatingModule'));
       
       // Handle both Cursor AI documents and repository analyses
       let learningModuleData;
@@ -171,7 +173,7 @@ export default function LearningRepo() {
       const response = await axios.post('/api/create-learning-module', learningModuleData);
       
       if (response.data.success) {
-        setSuccess(`Learning module created successfully! Module ID: ${response.data.module_id}`);
+        setSuccess(t('learningRepoModule.successModuleCreated', { id: response.data.module_id }));
         console.log('Created learning module:', response.data.module);
         
         // Add the new module to the list immediately
@@ -182,11 +184,11 @@ export default function LearningRepo() {
         await loadLearningModules();
         setTimeout(() => setSuccess(''), 5000);
       } else {
-        setError(`Failed to create learning module: ${response.data.message}`);
+        setError(t('learningRepoModule.errCreateModule', { detail: response.data.message }));
       }
     } catch (error) {
       console.error('Create learning module error:', error);
-      setError(`Failed to create learning module: ${error.response?.data?.detail || error.message}`);
+      setError(t('learningRepoModule.errCreateModule', { detail: error.response?.data?.detail || error.message }));
     }
   };
 
@@ -213,7 +215,7 @@ export default function LearningRepo() {
     
     // Add overview section
     sections.push({
-      title: "Overview",
+      title: t('learningRepoModule.sectionOverview'),
       content: module.description,
       type: "text"
     });
@@ -222,7 +224,7 @@ export default function LearningRepo() {
     if (module.analysis_data) {
       if (module.analysis_data.structure) {
         sections.push({
-          title: "Project Structure",
+          title: t('learningRepoModule.sectionProjectStructure'),
           content: module.analysis_data.structure,
           type: "analysis"
         });
@@ -230,7 +232,7 @@ export default function LearningRepo() {
       
       if (module.analysis_data.insights) {
         sections.push({
-          title: "Key Insights",
+          title: t('learningRepoModule.sectionKeyInsights'),
           content: module.analysis_data.insights,
           type: "insights"
         });
@@ -238,7 +240,7 @@ export default function LearningRepo() {
       
       if (module.analysis_data.documentation?.readme) {
         sections.push({
-          title: "Documentation",
+          title: t('learningRepoModule.sectionDocumentation'),
           content: module.analysis_data.documentation.readme,
           type: "documentation"
         });
@@ -248,7 +250,7 @@ export default function LearningRepo() {
     // Add learning objectives
     if (module.learning_objectives) {
       sections.push({
-        title: "Learning Objectives",
+        title: t('learningRepoModule.sectionLearningObjectives'),
         content: module.learning_objectives,
         type: "objectives"
       });
@@ -300,7 +302,7 @@ export default function LearningRepo() {
           completedAt: new Date().toISOString()
         }
       }));
-      setSuccess(`🎉 Congratulations! You've completed "${activeModule.title}"`);
+      setSuccess(t('learningRepoModule.successModuleComplete', { title: activeModule.title }));
       setTimeout(() => setSuccess(''), 5000);
     }
   };
@@ -321,7 +323,7 @@ export default function LearningRepo() {
           <div>
             {section.content.languages && (
               <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Languages:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.labelLanguages')}</h4>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {section.content.languages.map((lang, index) => (
                     <span key={index} style={{
@@ -340,7 +342,7 @@ export default function LearningRepo() {
             
             {section.content.frameworks && (
               <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Frameworks:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.labelFrameworks')}</h4>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {section.content.frameworks.map((fw, index) => (
                     <span key={index} style={{
@@ -359,7 +361,7 @@ export default function LearningRepo() {
             
             {section.content.file_structure && (
               <div>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>File Structure:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.labelFileStructure')}</h4>
                 <pre style={{
                   background: '#f5f5f5',
                   padding: '1rem',
@@ -380,7 +382,7 @@ export default function LearningRepo() {
           <div>
             {section.content.architecture_pattern && (
               <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Architecture Pattern:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.headingArchitecturePattern')}</h4>
                 <p style={{ margin: 0, padding: '0.5rem', background: '#e8f5e8', borderRadius: '4px', color: '#2e7d32' }}>
                   {section.content.architecture_pattern}
                 </p>
@@ -389,7 +391,7 @@ export default function LearningRepo() {
             
             {section.content.project_type && (
               <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Project Type:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.headingProjectType')}</h4>
                 <p style={{ margin: 0, padding: '0.5rem', background: '#fff3e0', borderRadius: '4px', color: '#f57c00' }}>
                   {section.content.project_type}
                 </p>
@@ -398,7 +400,7 @@ export default function LearningRepo() {
             
             {section.content.complexity_score && (
               <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Complexity Score:</h4>
+                <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.headingComplexityScore')}</h4>
                 <div style={{
                   background: '#f5f5f5',
                   borderRadius: '4px',
@@ -434,7 +436,7 @@ export default function LearningRepo() {
       case 'documentation':
         return (
           <div>
-            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Documentation:</h4>
+            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.headingDocumentationBlock')}</h4>
             <div style={{
               background: '#f5f5f5',
               padding: '1rem',
@@ -459,7 +461,7 @@ export default function LearningRepo() {
       case 'objectives':
         return (
           <div>
-            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>Learning Objectives:</h4>
+            <h4 style={{ color: '#007bff', marginBottom: '0.5rem' }}>{t('learningRepoModule.headingLearningObjectivesBlock')}</h4>
             <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
               {Array.isArray(section.content) ? section.content.map((objective, index) => (
                 <li key={index} style={{ marginBottom: '0.5rem', lineHeight: '1.4' }}>
@@ -574,11 +576,11 @@ export default function LearningRepo() {
         console.log(`Loaded ${response.data.modules?.length || 0} learning modules`);
       } else {
         console.error('Failed to load learning modules:', response.data.message);
-        setError(`Failed to load learning modules: ${response.data.message}`);
+        setError(t('learningRepoModule.errLoadModules', { detail: response.data.message }));
       }
     } catch (err) {
       console.error('Error loading learning modules:', err);
-      setError(`Error loading learning modules: ${err.message}`);
+      setError(t('learningRepoModule.errLoadModulesGeneric', { detail: err.message }));
     }
   };
 
@@ -586,7 +588,7 @@ export default function LearningRepo() {
   const generateQuiz = async (doc) => {
     try {
       setError('');
-      setSuccess('Generating quiz...');
+      setSuccess(t('learningRepoModule.generatingQuiz'));
       
       // Get markdown content from either Cursor AI document or repository analysis
       let markdownContent = '';
@@ -628,16 +630,16 @@ export default function LearningRepo() {
         setUserAnswers({});
         setQuizCompleted(false);
         setScore(0);
-        setSuccess(`Quiz generated successfully! ${response.data.quiz.length} questions ready. Start learning!`);
+        setSuccess(t('learningRepoModule.successQuizGenerated', { count: response.data.quiz.length }));
         setTimeout(() => setSuccess(''), 3000);
       } else {
         console.error('Invalid quiz response:', response.data);
-        setError('Failed to generate quiz: Invalid response format from server');
+        setError(t('learningRepoModule.errQuizInvalid'));
       }
     } catch (error) {
       console.error('Generate quiz error:', error);
       const errorMessage = error.response?.data?.detail || error.message;
-      setError(`Failed to generate quiz: ${errorMessage}`);
+      setError(t('learningRepoModule.errQuizGeneric', { detail: errorMessage }));
     }
   };
 
@@ -645,21 +647,21 @@ export default function LearningRepo() {
   const deleteAnalysis = async (analysis) => {
     try {
       setError('');
-      setSuccess('Deleting analysis...');
+      setSuccess(t('learningRepoModule.deletingAnalysis'));
       
       const response = await axios.delete(`/api/delete-analysis/${analysis._id}`);
       
       if (response.data.success) {
-        setSuccess('Analysis deleted successfully!');
+        setSuccess(t('learningRepoModule.successAnalysisDeleted'));
         await loadSavedAnalyses(); // Reload the list
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(`Failed to delete analysis: ${response.data.message}`);
+        setError(t('learningRepoModule.errDeleteAnalysis', { detail: response.data.message }));
       }
     } catch (error) {
       console.error('Delete analysis error:', error);
       const errorMessage = error.response?.data?.detail || error.message;
-      setError(`Failed to delete analysis: ${errorMessage}`);
+      setError(t('learningRepoModule.errDeleteAnalysis', { detail: errorMessage }));
     }
   };
 
@@ -667,21 +669,21 @@ export default function LearningRepo() {
   const deleteLearningModule = async (module) => {
     try {
       setError('');
-      setSuccess('Deleting learning module...');
+      setSuccess(t('learningRepoModule.deletingModule'));
       
       const response = await axios.delete(`/api/learning-modules/${module._id}`);
       
       if (response.data.success) {
-        setSuccess('Learning module deleted successfully!');
+        setSuccess(t('learningRepoModule.successModuleDeleted'));
         await loadLearningModules(); // Reload the list
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(`Failed to delete learning module: ${response.data.message}`);
+        setError(t('learningRepoModule.errDeleteModule', { detail: response.data.message }));
       }
     } catch (error) {
       console.error('Delete learning module error:', error);
       const errorMessage = error.response?.data?.detail || error.message;
-      setError(`Failed to delete learning module: ${errorMessage}`);
+      setError(t('learningRepoModule.errDeleteModule', { detail: errorMessage }));
     }
   };
 
@@ -689,22 +691,22 @@ export default function LearningRepo() {
   const cleanupOldAnalyses = async () => {
     try {
       setError('');
-      setSuccess('Cleaning up old analyses...');
+      setSuccess(t('learningRepoModule.cleaningUp'));
       
       const response = await axios.post('/api/cleanup-old-analyses');
       
       if (response.data.success) {
         const deletedCount = response.data.deleted_count || 0;
-        setSuccess(`Cleanup completed! Removed ${deletedCount} old analyses.`);
+        setSuccess(t('learningRepoModule.successCleanup', { count: deletedCount }));
         await loadSavedAnalyses(); // Reload the list
         setTimeout(() => setSuccess(''), 5000);
       } else {
-        setError(`Failed to cleanup: ${response.data.message}`);
+        setError(t('learningRepoModule.errCleanup', { detail: response.data.message }));
       }
     } catch (error) {
       console.error('Cleanup error:', error);
       const errorMessage = error.response?.data?.detail || error.message;
-      setError(`Failed to cleanup: ${errorMessage}`);
+      setError(t('learningRepoModule.errCleanup', { detail: errorMessage }));
     }
   };
 
@@ -763,7 +765,7 @@ export default function LearningRepo() {
   const deleteCursorAIDoc = async (docId) => {
     try {
       setError('');
-      setSuccess('Deleting Cursor AI document...');
+      setSuccess(t('learningRepoModule.deletingCursorDoc'));
       
       // Debug logging
       console.log('Attempting to delete document with ID:', docId);
@@ -773,30 +775,30 @@ export default function LearningRepo() {
       
       // Validate ID before sending
       if (!docId || typeof docId !== 'string' || docId.trim() === '') {
-        setError('Invalid document ID: ID is empty or not a string');
+        setError(t('learningRepoModule.errInvalidDocId'));
         return;
       }
       
       const response = await axios.delete(`/api/delete-cursor-ai-doc/${docId}`);
       
       if (response.data.success) {
-        setSuccess('Cursor AI document deleted successfully!');
+        setSuccess(t('learningRepoModule.successCursorDocDeleted'));
         await loadCursorAIDocs(); // Reload the list
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(`Failed to delete Cursor AI document: ${response.data.message}`);
+        setError(t('learningRepoModule.errDeleteCursorDoc', { detail: response.data.message }));
       }
     } catch (error) {
       console.error('Delete Cursor AI document error:', error);
       const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message;
-      setError(`Failed to delete Cursor AI document: ${errorMessage}`);
+      setError(t('learningRepoModule.errDeleteCursorDoc', { detail: errorMessage }));
     }
   };
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ color: '#333', marginBottom: '2rem' }}>
-        🎓 Learning Repository - Convert Analysis to Study Material
+        {t('learningRepoModule.title')}
       </h1>
       
       <p style={{ 
@@ -805,8 +807,7 @@ export default function LearningRepo() {
         marginBottom: '2rem',
         lineHeight: '1.6'
       }}>
-        Transform your analyzed repositories into structured learning materials. 
-        Create comprehensive study modules, generate quizzes, and track your learning progress.
+        {t('learningRepoModule.subtitle')}
       </p>
 
       {/* Error and Success Messages */}
@@ -866,13 +867,13 @@ export default function LearningRepo() {
             textAlign: 'center'
           }}>
             <h3 style={{ color: '#dc3545', marginBottom: '1rem' }}>
-              🗑️ Confirm Deletion
+              {t('learningRepoModule.confirmDeleteTitle')}
             </h3>
             <p style={{ color: '#666', marginBottom: '1.5rem' }}>
-              Are you sure you want to delete the analysis for <strong>{deleteConfirm.repo_name}</strong>?
+              {t('learningRepoModule.confirmDeleteBody', { name: deleteConfirm.repo_name })}
             </p>
             <p style={{ color: '#999', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-              This will permanently remove the analysis, documentation, quizzes, and learning modules associated with this repository.
+              {t('learningRepoModule.confirmDeleteWarning')}
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button
@@ -886,7 +887,7 @@ export default function LearningRepo() {
                   cursor: 'pointer'
                 }}
               >
-                Cancel
+                {t('learningRepoModule.cancel')}
               </button>
               <button
                 onClick={() => {
@@ -902,7 +903,7 @@ export default function LearningRepo() {
                   cursor: 'pointer'
                 }}
               >
-                Delete Permanently
+                {t('learningRepoModule.deletePermanently')}
               </button>
             </div>
           </div>
@@ -919,7 +920,7 @@ export default function LearningRepo() {
         }}>
           <div>
             <h2 style={{ color: '#333', margin: 0 }}>
-              🤖 Cursor AI Generated Documentation
+              {t('learningRepoModule.cursorSectionTitle')}
             </h2>
             {cursorAIDocs.length > 0 && (
               <div style={{ 
@@ -930,8 +931,8 @@ export default function LearningRepo() {
                 gap: '1rem',
                 alignItems: 'center'
               }}>
-                <span>📊 Total: {cursorAIDocs.length} documents</span>
-                <span style={{ color: '#28a745' }}>✨ Automatically generated by Cursor AI</span>
+                <span>{t('learningRepoModule.totalDocs', { count: cursorAIDocs.length })}</span>
+                <span style={{ color: '#28a745' }}>{t('learningRepoModule.autoGenerated')}</span>
               </div>
             )}
           </div>
@@ -950,13 +951,13 @@ export default function LearningRepo() {
                 opacity: loadingCursorAI ? 0.6 : 1
               }}
             >
-              {loadingCursorAI ? '🔄 Loading...' : '🔄 Refresh'}
+              {loadingCursorAI ? t('learningRepoModule.loading') : t('learningRepoModule.refresh')}
             </button>
           </div>
         </div>
 
         {loadingCursorAI ? (
-          <p>Loading Cursor AI documentation...</p>
+          <p>{t('learningRepoModule.loadingCursorDocs')}</p>
         ) : cursorAIDocs.length === 0 ? (
           <div style={{ 
             padding: '2rem',
@@ -967,10 +968,10 @@ export default function LearningRepo() {
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🤖</div>
             <p style={{ color: '#666', fontStyle: 'italic', margin: '0.5rem 0' }}>
-              No Cursor AI documentation found
+              {t('learningRepoModule.emptyCursorTitle')}
             </p>
             <p style={{ color: '#999', fontSize: '0.9rem', margin: 0 }}>
-              Use the "Agent Cursor AI" module to generate documentation!
+              {t('learningRepoModule.emptyCursorHint')}
             </p>
           </div>
         ) : (
@@ -997,7 +998,7 @@ export default function LearningRepo() {
                   fontSize: '0.8rem',
                   fontWeight: 'bold'
                 }}>
-                  🤖 Cursor AI
+                  {t('learningRepoModule.badgeCursorAi')}
                 </div>
                 
                 <h3 style={{ 
@@ -1006,14 +1007,14 @@ export default function LearningRepo() {
                   fontSize: '1.2rem',
                   paddingRight: '6rem'
                 }}>
-                  {doc.title || 'Untitled Document'}
+                  {doc.title || t('learningRepoModule.untitledDocument')}
                 </h3>
                 
                 <div style={{ marginBottom: '1rem' }}>
-                  <p><strong>Type:</strong> {doc.type || 'Unknown'}</p>
-                  <p><strong>Source:</strong> {doc.source || 'Cursor AI'}</p>
-                  <p><strong>Created:</strong> {new Date(doc.created_at).toLocaleDateString()}</p>
-                  <p><strong>Content Length:</strong> {doc.content ? `${doc.content.length} characters` : 'No content'}</p>
+                  <p><strong>{t('learningRepoModule.labelType')}</strong> {doc.type || t('learningRepoModule.unknown')}</p>
+                  <p><strong>{t('learningRepoModule.labelSource')}</strong> {doc.source || t('learningRepoModule.sourceCursorAi')}</p>
+                  <p><strong>{t('learningRepoModule.labelCreated')}</strong> {new Date(doc.created_at).toLocaleDateString()}</p>
+                  <p><strong>{t('learningRepoModule.labelContentLength')}</strong> {doc.content ? t('learningRepoModule.contentChars', { count: doc.content.length }) : t('learningRepoModule.noContent')}</p>
                 </div>
 
                 {/* Content Preview */}
@@ -1028,7 +1029,7 @@ export default function LearningRepo() {
                     overflow: 'hidden'
                   }}>
                     <p style={{ margin: '0.25rem 0' }}>
-                      <strong>Content Preview:</strong>
+                      <strong>{t('learningRepoModule.contentPreview')}:</strong>
                     </p>
                     <div style={{
                       background: '#fff',
@@ -1063,9 +1064,9 @@ export default function LearningRepo() {
                       cursor: 'pointer',
                       fontSize: '0.9rem'
                     }}
-                    title="Read the complete document"
+                    title={t('learningRepoModule.readTitle')}
                   >
-                    📖 Read
+                    {t('learningRepoModule.read')}
                   </button>
                   
                   <button
@@ -1080,7 +1081,7 @@ export default function LearningRepo() {
                       fontSize: '0.9rem'
                     }}
                   >
-                    🎓 Create Learning Module
+                    {t('learningRepoModule.createLearningModule')}
                   </button>
                   
                   <button
@@ -1095,7 +1096,7 @@ export default function LearningRepo() {
                       fontSize: '0.9rem'
                     }}
                   >
-                    🧠 Generate Quiz
+                    {t('learningRepoModule.generateQuiz')}
                   </button>
 
                   <button
@@ -1109,9 +1110,9 @@ export default function LearningRepo() {
                       cursor: 'pointer',
                       fontSize: '0.9rem'
                     }}
-                    title="Delete this Cursor AI document"
+                    title={t('learningRepoModule.deleteCursorTitle')}
                   >
-                    🗑️ Delete
+                    {t('learningRepoModule.delete')}
                   </button>
                 </div>
               </div>
@@ -1130,7 +1131,7 @@ export default function LearningRepo() {
         }}>
           <div>
             <h2 style={{ color: '#333', margin: 0 }}>
-              📚 Available Repositories for Learning
+              {t('learningRepoModule.savedSectionTitle')}
             </h2>
             {savedAnalyses.length > 0 && (
               <div style={{ 
@@ -1141,12 +1142,12 @@ export default function LearningRepo() {
                 gap: '1rem',
                 alignItems: 'center'
               }}>
-                <span>📊 Total: {savedAnalyses.length} repositories</span>
+                <span>{t('learningRepoModule.totalRepos', { count: savedAnalyses.length })}</span>
                 {savedAnalyses.some(analysis => {
                   const daysOld = (new Date() - new Date(analysis.created_at)) / (1000 * 60 * 60 * 24);
                   return daysOld > 30;
                 }) && (
-                  <span style={{ color: '#ffc107' }}>⚠️ Some analyses are over 30 days old</span>
+                  <span style={{ color: '#ffc107' }}>{t('learningRepoModule.analysesOldWarning')}</span>
                 )}
               </div>
             )}
@@ -1166,7 +1167,7 @@ export default function LearningRepo() {
                 opacity: loadingSaved ? 0.6 : 1
               }}
             >
-              {loadingSaved ? '🔄 Loading...' : '🔄 Refresh'}
+              {loadingSaved ? t('learningRepoModule.loading') : t('learningRepoModule.refresh')}
             </button>
             <button
               onClick={() => cleanupOldAnalyses()}
@@ -1179,15 +1180,15 @@ export default function LearningRepo() {
                 cursor: 'pointer',
                 fontSize: '0.9rem'
               }}
-              title="Remove analyses older than 30 days"
+              title={t('learningRepoModule.cleanupTitle')}
             >
-              🧹 Cleanup Old
+              {t('learningRepoModule.cleanupOld')}
             </button>
           </div>
         </div>
 
         {loadingSaved ? (
-          <p>Loading saved analyses...</p>
+          <p>{t('learningRepoModule.loadingSaved')}</p>
         ) : savedAnalyses.length === 0 ? (
           <div style={{ 
             padding: '2rem',
@@ -1198,10 +1199,10 @@ export default function LearningRepo() {
           }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📚</div>
             <p style={{ color: '#666', fontStyle: 'italic', margin: '0.5rem 0' }}>
-              No repositories found for learning
+              {t('learningRepoModule.emptyRepoTitle')}
             </p>
             <p style={{ color: '#999', fontSize: '0.9rem', margin: 0 }}>
-              Analyze repositories in other sections to create learning materials here!
+              {t('learningRepoModule.emptyRepoHint')}
             </p>
           </div>
         ) : (
@@ -1232,7 +1233,7 @@ export default function LearningRepo() {
                         fontSize: '0.8rem',
                         fontWeight: 'bold'
                       }}>
-                        ⚠️ {Math.floor(daysOld)}d old
+                        {t('learningRepoModule.daysOld', { days: Math.floor(daysOld) })}
                       </div>
                     );
                   }
@@ -1244,14 +1245,14 @@ export default function LearningRepo() {
                   marginBottom: '1rem',
                   fontSize: '1.2rem'
                 }}>
-                  {analysis.repo_name || 'Unknown Repository'}
+                  {analysis.repo_name || t('learningRepoModule.unknownRepository')}
                 </h3>
                 
                 <div style={{ marginBottom: '1rem' }}>
-                  <p><strong>Repository:</strong> {analysis.repo_url}</p>
-                  <p><strong>Branch:</strong> {analysis.branch_used || 'Unknown'}</p>
-                  <p><strong>Files Analyzed:</strong> {analysis.analysis_data?.summaries ? Object.keys(analysis.analysis_data.summaries).length : 0}</p>
-                  <p><strong>Date:</strong> {new Date(analysis.created_at).toLocaleDateString()}</p>
+                  <p><strong>{t('learningRepoModule.labelRepository')}</strong> {analysis.repo_url}</p>
+                  <p><strong>{t('learningRepoModule.labelBranch')}</strong> {analysis.branch_used || t('learningRepoModule.unknown')}</p>
+                  <p><strong>{t('learningRepoModule.labelFilesAnalyzed')}</strong> {analysis.analysis_data?.summaries ? Object.keys(analysis.analysis_data.summaries).length : 0}</p>
+                  <p><strong>{t('learningRepoModule.labelDate')}</strong> {new Date(analysis.created_at).toLocaleDateString()}</p>
                   
                   {/* Additional Analysis Info */}
                   {analysis.analysis_data?.insights && (
@@ -1263,14 +1264,14 @@ export default function LearningRepo() {
                       fontSize: '0.9rem'
                     }}>
                       <p style={{ margin: '0.25rem 0' }}>
-                        <strong>Type:</strong> {analysis.analysis_data.insights.project_type || 'Unknown'}
+                        <strong>{t('learningRepoModule.labelType')}</strong> {analysis.analysis_data.insights.project_type || t('learningRepoModule.unknown')}
                       </p>
                       <p style={{ margin: '0.25rem 0' }}>
-                        <strong>Language:</strong> {analysis.analysis_data.insights.language || 'Unknown'}
+                        <strong>{t('learningRepoModule.labelLanguage')}</strong> {analysis.analysis_data.insights.language || t('learningRepoModule.unknown')}
                       </p>
                       {analysis.analysis_data.insights.complexity_score && (
                         <p style={{ margin: '0.25rem 0' }}>
-                          <strong>Complexity:</strong> {analysis.analysis_data.insights.complexity_score}/10
+                          <strong>{t('learningRepoModule.labelComplexity')}</strong> {analysis.analysis_data.insights.complexity_score}/10
                         </p>
                       )}
                     </div>
@@ -1294,7 +1295,7 @@ export default function LearningRepo() {
                       fontSize: '0.9rem'
                     }}
                   >
-                    🎓 Create Learning Module
+                    {t('learningRepoModule.createLearningModule')}
                   </button>
                   
                   <button
@@ -1309,7 +1310,7 @@ export default function LearningRepo() {
                       fontSize: '0.9rem'
                     }}
                   >
-                    🧠 Generate Quiz
+                    {t('learningRepoModule.generateQuiz')}
                   </button>
                   
                   <button
@@ -1323,9 +1324,9 @@ export default function LearningRepo() {
                       cursor: 'pointer',
                       fontSize: '0.9rem'
                     }}
-                    title="Delete this repository analysis"
+                    title={t('learningRepoModule.deleteAnalysisTitle')}
                   >
-                    🗑️ Delete
+                    {t('learningRepoModule.delete')}
                   </button>
                 </div>
               </div>
@@ -1338,7 +1339,7 @@ export default function LearningRepo() {
       {quizQuestions.length > 0 && (
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ color: '#333', marginBottom: '1rem' }}>
-            🧠 Learning Quiz
+            {t('learningRepoModule.quizTitle')}
           </h2>
           
           {!quizCompleted ? (
@@ -1358,8 +1359,8 @@ export default function LearningRepo() {
                 background: '#f8f9fa',
                 borderRadius: '4px'
               }}>
-                <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
-                <span>Progress: {Math.round(((currentQuestionIndex + 1) / quizQuestions.length) * 100)}%</span>
+                <span>{t('learningRepoModule.questionOf', { current: currentQuestionIndex + 1, total: quizQuestions.length })}</span>
+                <span>{t('learningRepoModule.progressLabel', { pct: Math.round(((currentQuestionIndex + 1) / quizQuestions.length) * 100) })}</span>
               </div>
 
               <div style={{ marginBottom: '2rem' }}>
@@ -1408,7 +1409,7 @@ export default function LearningRepo() {
                     cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  ← Previous
+                  {t('learningRepoModule.previous')}
                 </button>
                 
                 {currentQuestionIndex === quizQuestions.length - 1 ? (
@@ -1423,7 +1424,7 @@ export default function LearningRepo() {
                       cursor: 'pointer'
                     }}
                   >
-                    Submit Quiz
+                    {t('learningRepoModule.submitQuiz')}
                   </button>
                 ) : (
                   <button
@@ -1437,7 +1438,7 @@ export default function LearningRepo() {
                       cursor: 'pointer'
                     }}
                   >
-                    Next →
+                    {t('learningRepoModule.next')}
                   </button>
                 )}
               </div>
@@ -1451,7 +1452,7 @@ export default function LearningRepo() {
               textAlign: 'center'
             }}>
               <h3 style={{ color: '#333', marginBottom: '1rem' }}>
-                Quiz Completed! 🎉
+                {t('learningRepoModule.quizCompletedTitle')}
               </h3>
               
               <div style={{ 
@@ -1467,9 +1468,9 @@ export default function LearningRepo() {
                 marginBottom: '1rem',
                 color: score >= 70 ? '#28a745' : score >= 50 ? '#ffc107' : '#dc3545'
               }}>
-                {score >= 70 ? 'Excellent! You have a great understanding!' : 
-                 score >= 50 ? 'Good job! Keep learning!' : 
-                 'Keep studying! Review the material and try again!'}
+                {score >= 70 ? t('learningRepoModule.quizFeedbackExcellent') : 
+                 score >= 50 ? t('learningRepoModule.quizFeedbackGood') : 
+                 t('learningRepoModule.quizFeedbackLow')}
               </p>
               
               <button
@@ -1484,7 +1485,7 @@ export default function LearningRepo() {
                   fontSize: '1rem'
                 }}
               >
-                Take Quiz Again
+                {t('learningRepoModule.takeQuizAgain')}
               </button>
             </div>
           )}
@@ -1500,7 +1501,7 @@ export default function LearningRepo() {
            marginBottom: '1rem'
          }}>
            <h2 style={{ color: '#333', margin: 0 }}>
-             📖 Your Learning Modules
+             {t('learningRepoModule.yourModulesTitle')}
            </h2>
            {learningModules.length > 0 && (
              <span style={{ 
@@ -1511,7 +1512,9 @@ export default function LearningRepo() {
                fontSize: '0.9rem',
                fontWeight: 'bold'
              }}>
-               {learningModules.length} module{learningModules.length !== 1 ? 's' : ''}
+               {learningModules.length === 1
+                 ? t('learningRepoModule.modulesCountOne')
+                 : t('learningRepoModule.modulesCount', { count: learningModules.length })}
              </span>
            )}
          </div>
@@ -1528,7 +1531,7 @@ export default function LearningRepo() {
             marginBottom: '1rem'
           }}
         >
-          🔄 Load Learning Modules
+          {t('learningRepoModule.loadModulesBtn')}
         </button>
         
                  {learningModules.length === 0 ? (
@@ -1541,10 +1544,10 @@ export default function LearningRepo() {
            }}>
              <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>📖</div>
              <p style={{ color: '#666', fontStyle: 'italic', margin: '0.5rem 0' }}>
-               No learning modules created yet
+               {t('learningRepoModule.emptyModulesTitle')}
              </p>
              <p style={{ color: '#999', fontSize: '0.9rem', margin: 0 }}>
-               Create your first one from a repository analysis above!
+               {t('learningRepoModule.emptyModulesHint')}
              </p>
            </div>
          ) : (
@@ -1570,7 +1573,7 @@ export default function LearningRepo() {
                    fontSize: '0.8rem',
                    fontWeight: 'bold'
                  }}>
-                   🎓 Module
+                   {t('learningRepoModule.moduleBadge')}
                  </div>
                  
                  {/* Progress indicator */}
@@ -1586,7 +1589,7 @@ export default function LearningRepo() {
                      fontSize: '0.8rem',
                      fontWeight: 'bold'
                    }}>
-                     {learningProgress[module._id].completed ? '✅ Completed' : '🔄 In Progress'}
+                     {learningProgress[module._id].completed ? t('learningRepoModule.statusCompleted') : t('learningRepoModule.statusInProgress')}
                    </div>
                  )}
                  
@@ -1608,7 +1611,7 @@ export default function LearningRepo() {
                      fontSize: '0.9rem'
                    }}>
                      <p style={{ margin: '0.25rem 0' }}>
-                       <strong>Repository:</strong> {module.repo_name}
+                       <strong>{t('learningRepoModule.labelRepository')}</strong> {module.repo_name}
                      </p>
                      {module.repo_url && (
                        <p style={{ margin: '0.25rem 0', fontSize: '0.8rem', color: '#666' }}>
@@ -1619,10 +1622,10 @@ export default function LearningRepo() {
                  )}
                  
                  <div style={{ marginBottom: '1rem' }}>
-                   <p><strong>Difficulty:</strong> {module.difficulty}</p>
-                   <p><strong>Estimated Time:</strong> {module.estimated_time}</p>
-                   <p><strong>Topics:</strong> {module.topics?.join(', ') || 'General'}</p>
-                   <p><strong>Created:</strong> {new Date(module.created_at).toLocaleDateString()}</p>
+                   <p><strong>{t('learningRepoModule.labelDifficulty')}</strong> {module.difficulty}</p>
+                   <p><strong>{t('learningRepoModule.labelEstimatedTime')}</strong> {module.estimated_time}</p>
+                   <p><strong>{t('learningRepoModule.labelTopics')}</strong> {module.topics?.join(', ') || t('learningRepoModule.generalTopic')}</p>
+                   <p><strong>{t('learningRepoModule.labelCreated')}</strong> {new Date(module.created_at).toLocaleDateString()}</p>
                  </div>
                  
                  <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1638,7 +1641,7 @@ export default function LearningRepo() {
                        flex: 1
                      }}
                    >
-                     📚 Start Learning
+                     {t('learningRepoModule.startLearning')}
                    </button>
                    
                    <button
@@ -1652,9 +1655,9 @@ export default function LearningRepo() {
                        cursor: 'pointer',
                        fontSize: '0.9rem'
                      }}
-                     title="View module details"
+                     title={t('learningRepoModule.viewDetailsTitle')}
                    >
-                     👁️ View
+                     {t('learningRepoModule.view')}
                    </button>
 
                    <button
@@ -1668,9 +1671,9 @@ export default function LearningRepo() {
                        cursor: 'pointer',
                        fontSize: '0.9rem'
                      }}
-                     title="Delete this learning module"
+                     title={t('learningRepoModule.deleteModuleTitle')}
                    >
-                     🗑️ Delete
+                     {t('learningRepoModule.delete')}
                    </button>
                  </div>
                </div>
@@ -1718,8 +1721,13 @@ export default function LearningRepo() {
                   📚 {activeModule.title}
                 </h2>
                 <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>
-                  {learningProgress[activeModule._id]?.sections?.length || 0} sections • 
-                  {learningProgress[activeModule._id]?.completed ? ' ✅ Completed' : ' 🔄 In Progress'}
+                  {t('learningRepoModule.overlaySectionsLine', {
+                    count: learningProgress[activeModule._id]?.sections?.length || 0,
+                    sectionsWord: t('learningRepoModule.sectionsWord'),
+                    status: learningProgress[activeModule._id]?.completed
+                      ? `✅ ${t('learningRepoModule.completedWord')}`
+                      : `🔄 ${t('learningRepoModule.inProgressWord')}`
+                  })}
                 </p>
               </div>
               <button
@@ -1733,7 +1741,7 @@ export default function LearningRepo() {
                   cursor: 'pointer'
                 }}
               >
-                ✕ Close
+                {t('learningRepoModule.close')}
               </button>
             </div>
 
@@ -1795,11 +1803,14 @@ export default function LearningRepo() {
                         cursor: learningProgress[activeModule._id].currentSection === 0 ? 'not-allowed' : 'pointer'
                       }}
                     >
-                      ← Previous
+                      {t('learningRepoModule.prevSection')}
                     </button>
 
                     <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                      Section {learningProgress[activeModule._id].currentSection + 1} of {learningProgress[activeModule._id].sections.length}
+                      {t('learningRepoModule.sectionOf', {
+                        current: learningProgress[activeModule._id].currentSection + 1,
+                        total: learningProgress[activeModule._id].sections.length
+                      })}
                     </div>
 
                     {learningProgress[activeModule._id].currentSection === learningProgress[activeModule._id].sections.length - 1 ? (
@@ -1814,7 +1825,7 @@ export default function LearningRepo() {
                           cursor: 'pointer'
                         }}
                       >
-                        🎉 Complete Module
+                        {t('learningRepoModule.completeModule')}
                       </button>
                     ) : (
                       <button
@@ -1828,7 +1839,7 @@ export default function LearningRepo() {
                           cursor: 'pointer'
                         }}
                       >
-                        Next →
+                        {t('learningRepoModule.next')}
                       </button>
                     )}
                   </div>
@@ -1883,7 +1894,7 @@ export default function LearningRepo() {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
-              title="Close document"
+              title={t('learningRepoModule.closeDocument')}
             >
               ×
             </button>
@@ -1894,12 +1905,14 @@ export default function LearningRepo() {
                 {selectedDocForReading.title}
               </h2>
               <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
-                <p><strong>Type:</strong> {selectedDocForReading.type}</p>
-                <p><strong>Source:</strong> {selectedDocForReading.source}</p>
-                <p><strong>Created:</strong> {new Date(selectedDocForReading.created_at).toLocaleDateString()}</p>
-                <p><strong>Content Length:</strong> {selectedDocForReading.content?.length || 0} characters</p>
-                {selectedDocForReading.repo_name && <p><strong>Repository:</strong> {selectedDocForReading.repo_name}</p>}
-                {selectedDocForReading.repo_url && <p><strong>URL:</strong> {selectedDocForReading.repo_url}</p>}
+                <p><strong>{t('learningRepoModule.labelType')}</strong> {selectedDocForReading.type}</p>
+                <p><strong>{t('learningRepoModule.labelSource')}</strong> {selectedDocForReading.source}</p>
+                <p><strong>{t('learningRepoModule.labelCreated')}</strong> {new Date(selectedDocForReading.created_at).toLocaleDateString()}</p>
+                <p><strong>{t('learningRepoModule.labelContentLength')}</strong> {selectedDocForReading.content
+                  ? t('learningRepoModule.contentChars', { count: selectedDocForReading.content.length })
+                  : t('learningRepoModule.noContent')}</p>
+                {selectedDocForReading.repo_name && <p><strong>{t('learningRepoModule.labelRepository')}</strong> {selectedDocForReading.repo_name}</p>}
+                {selectedDocForReading.repo_url && <p><strong>{t('learningRepoModule.labelUrl')}</strong> {selectedDocForReading.repo_url}</p>}
               </div>
             </div>
 
@@ -1916,7 +1929,7 @@ export default function LearningRepo() {
               whiteSpace: 'pre-wrap',
               fontFamily: 'monospace'
             }}>
-              {selectedDocForReading.content || 'No content available'}
+              {selectedDocForReading.content || t('learningRepoModule.noContentAvailable')}
             </div>
 
             {/* Action buttons */}
@@ -1941,7 +1954,7 @@ export default function LearningRepo() {
                   fontSize: '0.9rem'
                 }}
               >
-                🎓 Create Learning Module
+                {t('learningRepoModule.createLearningModule')}
               </button>
               
               <button
@@ -1959,7 +1972,7 @@ export default function LearningRepo() {
                   fontSize: '0.9rem'
                 }}
               >
-                🧠 Generate Quiz
+                {t('learningRepoModule.generateQuiz')}
               </button>
             </div>
           </div>
@@ -2010,7 +2023,7 @@ export default function LearningRepo() {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
-              title="Close module details"
+              title={t('learningRepoModule.closeModuleDetails')}
             >
               ×
             </button>
@@ -2027,7 +2040,7 @@ export default function LearningRepo() {
 
             {/* Module details */}
             <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Module Details</h3>
+              <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>{t('learningRepoModule.moduleDetails')}</h3>
               <div style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
@@ -2035,22 +2048,22 @@ export default function LearningRepo() {
                 marginBottom: '1rem'
               }}>
                 <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                  <strong>Type:</strong> {selectedModuleForViewing.type}
+                  <strong>{t('learningRepoModule.labelType')}</strong> {selectedModuleForViewing.type}
                 </div>
                 <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                  <strong>Difficulty:</strong> {selectedModuleForViewing.difficulty}
+                  <strong>{t('learningRepoModule.labelDifficulty')}</strong> {selectedModuleForViewing.difficulty}
                 </div>
                 <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                  <strong>Estimated Time:</strong> {selectedModuleForViewing.estimated_time}
+                  <strong>{t('learningRepoModule.labelEstimatedTime')}</strong> {selectedModuleForViewing.estimated_time}
                 </div>
                 <div style={{ padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                  <strong>Created:</strong> {new Date(selectedModuleForViewing.created_at).toLocaleDateString()}
+                  <strong>{t('learningRepoModule.labelCreated')}</strong> {new Date(selectedModuleForViewing.created_at).toLocaleDateString()}
                 </div>
               </div>
               
               {selectedModuleForViewing.topics && selectedModuleForViewing.topics.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
-                  <strong>Topics:</strong>
+                  <strong>{t('learningRepoModule.labelTopics')}</strong>
                   <div style={{ marginTop: '0.5rem' }}>
                     {selectedModuleForViewing.topics.map((topic, index) => (
                       <span
@@ -2074,7 +2087,7 @@ export default function LearningRepo() {
 
               {selectedModuleForViewing.learning_objectives && selectedModuleForViewing.learning_objectives.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
-                  <strong>Learning Objectives:</strong>
+                  <strong>{t('learningRepoModule.labelLearningObjectives')}</strong>
                   <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
                     {selectedModuleForViewing.learning_objectives.map((objective, index) => (
                       <li key={index} style={{ marginBottom: '0.25rem' }}>{objective}</li>
@@ -2085,7 +2098,7 @@ export default function LearningRepo() {
 
               {selectedModuleForViewing.repo_url && (
                 <div style={{ marginBottom: '1rem' }}>
-                  <strong>Repository URL:</strong>
+                  <strong>{t('learningRepoModule.repositoryUrl')}</strong>
                   <div style={{ 
                     marginTop: '0.5rem', 
                     padding: '0.5rem', 
@@ -2103,7 +2116,7 @@ export default function LearningRepo() {
             {/* Module content preview */}
             {selectedModuleForViewing.content && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Content Preview</h3>
+                <h3 style={{ color: '#333', margin: '0 0 1rem 0', fontSize: '1.2rem' }}>{t('learningRepoModule.contentPreview')}</h3>
                 <div style={{
                   backgroundColor: '#f8f9fa',
                   padding: '1rem',
@@ -2145,7 +2158,7 @@ export default function LearningRepo() {
                   fontSize: '0.9rem'
                 }}
               >
-                📚 Start Learning
+                {t('learningRepoModule.startLearning')}
               </button>
               
               <button
@@ -2160,7 +2173,7 @@ export default function LearningRepo() {
                   fontSize: '0.9rem'
                 }}
               >
-                Close
+                {t('learningRepoModule.closePlain')}
               </button>
             </div>
           </div>
