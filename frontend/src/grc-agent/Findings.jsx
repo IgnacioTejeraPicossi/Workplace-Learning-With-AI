@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Findings = () => {
+  const { t } = useTranslation();
   const [findings, setFindings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -14,10 +16,8 @@ const Findings = () => {
       const response = await fetch('/agents/grc/findings');
       if (response.ok) {
         const data = await response.json();
-        // Ensure findings is always an array
         setFindings(Array.isArray(data) ? data : (data.findings || []));
       } else {
-        // If endpoint doesn't exist, use sample data
         setFindings([
           {
             object_id: "PO-4500001234",
@@ -41,7 +41,6 @@ const Findings = () => {
       }
     } catch (error) {
       console.error("Failed to load findings:", error);
-      // Use sample data on error
       setFindings([
         {
           object_id: "PO-4500001234",
@@ -58,9 +57,8 @@ const Findings = () => {
     }
   };
 
-  // Generate HMAC signature for GRC actions
   const generateHMACSignature = async (payload) => {
-    const secret = 'change-me'; // Should match HMAC_SECRET from backend
+    const secret = 'change-me';
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
       'raw',
@@ -69,7 +67,6 @@ const Findings = () => {
       false,
       ['sign']
     );
-    // Canonicalize JSON exactly like backend does (recursive sort_keys=True, separators=(',', ':'))
     const canonicalJson = JSON.stringify(payload, (key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         const sorted = {};
@@ -120,7 +117,6 @@ const Findings = () => {
         callback_url: "/api/agent-runs/callback"
       };
 
-      // Generate proper HMAC signature
       const signature = await generateHMACSignature(bundle);
 
       const response = await fetch('/agents/grc/execute', {
@@ -133,14 +129,14 @@ const Findings = () => {
       });
 
       if (response.ok) {
-        alert('GRC action dispatched successfully!');
-        loadFindings(); // Refresh findings
+        alert(t('grcAgentModule.dispatchOk'));
+        loadFindings();
       } else {
-        alert('Failed to dispatch GRC action');
+        alert(t('grcAgentModule.dispatchFail'));
       }
     } catch (error) {
       console.error("Failed to dispatch action:", error);
-      alert('Error dispatching action');
+      alert(t('grcAgentModule.dispatchError'));
     } finally {
       setSending(false);
     }
@@ -172,34 +168,33 @@ const Findings = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">GRC Findings</h2>
-          <p className="text-gray-600">Monitor and manage compliance findings across Finance, Procurement, Supply Chain, and ESG</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('grcAgentModule.findingsTitle')}</h2>
+          <p className="text-gray-600">{t('grcAgentModule.findingsSubtitle')}</p>
         </div>
         <button
+          type="button"
           onClick={dispatchHold}
           disabled={sending}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {sending ? "Dispatching..." : "Test Hold Invoice"}
+          {sending ? t('grcAgentModule.dispatching') : t('grcAgentModule.testHoldInvoice')}
         </button>
       </div>
 
-      {/* Findings Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Object</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority Score</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thObject')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thIssueType')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thSeverity')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thStatus')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thPriorityScore')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thActions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -210,8 +205,8 @@ const Findings = () => {
                       <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <p>No findings available</p>
-                      <p className="text-sm">Run the test action to generate sample findings</p>
+                      <p>{t('grcAgentModule.findingsEmpty')}</p>
+                      <p className="text-sm">{t('grcAgentModule.findingsEmptyHint')}</p>
                     </div>
                   </td>
                 </tr>
@@ -234,18 +229,18 @@ const Findings = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(finding.status)}`}>
-                        {finding.status}
+                        {t(`grcAgentModule.findingStatus.${finding.status}`, { defaultValue: finding.status })}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {((finding.severity * 0.5 + finding.confidence * 0.2 + finding.materiality * 0.2) * 100).toFixed(1)}%
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3">
-                        Approve & Dispatch
+                      <button type="button" className="text-blue-600 hover:text-blue-900 mr-3">
+                        {t('grcAgentModule.approveDispatch')}
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900">
-                        View Details
+                      <button type="button" className="text-gray-600 hover:text-gray-900">
+                        {t('grcAgentModule.viewDetails')}
                       </button>
                     </td>
                   </tr>
@@ -256,7 +251,6 @@ const Findings = () => {
         </div>
       </div>
 
-      {/* Sample Data Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -265,9 +259,9 @@ const Findings = () => {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">Sample Data</h3>
+            <h3 className="text-sm font-medium text-blue-800">{t('grcAgentModule.sampleDataTitle')}</h3>
             <div className="mt-2 text-sm text-blue-700">
-              <p>Click "Test Hold Invoice" to generate sample findings and test the GRC agent execution flow.</p>
+              <p>{t('grcAgentModule.sampleDataBody')}</p>
             </div>
           </div>
         </div>

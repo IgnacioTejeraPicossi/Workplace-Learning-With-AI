@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Policies = () => {
+  const { t } = useTranslation();
   const [policy, setPolicy] = useState({
     max_auto_impact: 1000,
     sod_required_roles: ['controller', 'procurement-approver'],
@@ -41,13 +43,13 @@ const Policies = () => {
       });
 
       if (response.ok) {
-        alert('Policy updated successfully!');
+        alert(t('grcAgentModule.policyUpdatedOk'));
       } else {
-        alert('Failed to update policy');
+        alert(t('grcAgentModule.policyUpdateFail'));
       }
     } catch (error) {
       console.error("Failed to save policy:", error);
-      alert('Error saving policy');
+      alert(t('grcAgentModule.policySaveError'));
     } finally {
       setSaving(false);
     }
@@ -92,25 +94,22 @@ const Policies = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">GRC Policies</h2>
-        <p className="text-gray-600">Configure Responsible AI guardrails, thresholds, and approval workflows</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('grcAgentModule.policiesTitle')}</h2>
+        <p className="text-gray-600">{t('grcAgentModule.policiesSubtitle')}</p>
       </div>
 
-      {/* Policy Configuration */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Policy Configuration</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('grcAgentModule.policyConfiguration')}</h3>
+
         <div className="space-y-6">
-          {/* Thresholds */}
           <div>
-            <h4 className="text-md font-medium text-gray-900 mb-3">Risk Thresholds</h4>
+            <h4 className="text-md font-medium text-gray-900 mb-3">{t('grcAgentModule.riskThresholds')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confidence Threshold
+                  {t('grcAgentModule.labelConfidenceThreshold')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
@@ -126,12 +125,12 @@ const Policies = () => {
                     {(policy.confidence_threshold * 100).toFixed(0)}%
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Minimum confidence for auto-execution</p>
+                <p className="text-xs text-gray-500 mt-1">{t('grcAgentModule.hintConfidenceThreshold')}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Severity Threshold
+                  {t('grcAgentModule.labelSeverityThreshold')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
@@ -147,12 +146,12 @@ const Policies = () => {
                     {(policy.severity_threshold * 100).toFixed(0)}%
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Minimum severity for action</p>
+                <p className="text-xs text-gray-500 mt-1">{t('grcAgentModule.hintSeverityThreshold')}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Materiality Threshold
+                  {t('grcAgentModule.labelMaterialityThreshold')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
@@ -168,15 +167,14 @@ const Policies = () => {
                     {(policy.materiality_threshold * 100).toFixed(0)}%
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Minimum materiality for action</p>
+                <p className="text-xs text-gray-500 mt-1">{t('grcAgentModule.hintMaterialityThreshold')}</p>
               </div>
             </div>
           </div>
 
-          {/* Auto Impact Limit */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Maximum Auto Impact (€)
+              {t('grcAgentModule.labelMaxAutoImpact')}
             </label>
             <input
               type="number"
@@ -185,13 +183,12 @@ const Policies = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="1000"
             />
-            <p className="text-xs text-gray-500 mt-1">Maximum monetary impact for automatic execution</p>
+            <p className="text-xs text-gray-500 mt-1">{t('grcAgentModule.hintMaxAutoImpact')}</p>
           </div>
 
-          {/* Separation of Duties */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Separation of Duties - Required Roles
+              {t('grcAgentModule.labelSodRoles')}
             </label>
             <div className="space-y-2">
               {policy.sod_required_roles.map((role, index) => (
@@ -201,40 +198,41 @@ const Policies = () => {
                     value={role}
                     onChange={(e) => handleRoleChange(index, e.target.value)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter role name"
+                    placeholder={t('grcAgentModule.placeholderRole')}
                   />
                   <button
+                    type="button"
                     onClick={() => removeRole(index)}
                     className="px-3 py-2 text-red-600 hover:text-red-800"
                   >
-                    Remove
+                    {t('grcAgentModule.remove')}
                   </button>
                 </div>
               ))}
               <button
+                type="button"
                 onClick={addRole}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Add Role
+                {t('grcAgentModule.addRole')}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Roles required for approval of high-impact actions</p>
+            <p className="text-xs text-gray-500 mt-1">{t('grcAgentModule.hintSodRoles')}</p>
           </div>
         </div>
 
-        {/* Save Button */}
         <div className="mt-6 flex justify-end">
           <button
+            type="button"
             onClick={savePolicy}
             disabled={saving}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving...' : 'Save Policy'}
+            {saving ? t('grcAgentModule.saving') : t('grcAgentModule.savePolicy')}
           </button>
         </div>
       </div>
 
-      {/* Policy Information */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -243,15 +241,15 @@ const Policies = () => {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">Policy Information</h3>
+            <h3 className="text-sm font-medium text-blue-800">{t('grcAgentModule.policyInfoTitle')}</h3>
             <div className="mt-2 text-sm text-blue-700">
-              <p>These policies ensure Responsible AI principles are maintained:</p>
+              <p>{t('grcAgentModule.policyInfoIntro')}</p>
               <ul className="mt-2 list-disc list-inside space-y-1">
-                <li><strong>Provenance:</strong> All actions are tracked with full audit trails</li>
-                <li><strong>Separation of Duties:</strong> High-impact actions require multiple approvals</li>
-                <li><strong>Confidence Thresholds:</strong> Only high-confidence decisions are auto-executed</li>
-                <li><strong>PII Minimization:</strong> Personal data is handled according to privacy policies</li>
-                <li><strong>Attestation:</strong> All executions are cryptographically attested</li>
+                <li>{t('grcAgentModule.policyBulletProvenance')}</li>
+                <li>{t('grcAgentModule.policyBulletSod')}</li>
+                <li>{t('grcAgentModule.policyBulletConfidence')}</li>
+                <li>{t('grcAgentModule.policyBulletPii')}</li>
+                <li>{t('grcAgentModule.policyBulletAttestation')}</li>
               </ul>
             </div>
           </div>

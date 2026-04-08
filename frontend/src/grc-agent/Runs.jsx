@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Runs = () => {
+  const { t, i18n } = useTranslation();
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const dateLocale = i18n.language?.startsWith('no') ? 'nb-NO' : 'en-US';
 
   useEffect(() => {
     fetchRuns();
@@ -18,7 +22,6 @@ const Runs = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      // Extract items from response and filter runs for grc module
       const allRuns = data.items || [];
       const grcRuns = allRuns.filter(run => run.module === 'grc');
       setRuns(Array.isArray(grcRuns) ? grcRuns : []);
@@ -42,8 +45,11 @@ const Runs = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleString(dateLocale);
   };
+
+  const formatRunStatus = (status) =>
+    t(`grcAgentModule.runStatus.${status}`, { defaultValue: status });
 
   if (loading) {
     return (
@@ -55,25 +61,28 @@ const Runs = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading runs</h3>
-            <div className="mt-2 text-sm text-red-700">
-              <p>{error}</p>
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
             </div>
-            <div className="mt-4">
-              <button
-                onClick={fetchRuns}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
-              >
-                Retry
-              </button>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">{t('grcAgentModule.runsErrorTitle')}</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={fetchRuns}
+                  className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                >
+                  {t('grcAgentModule.retry')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -82,34 +91,33 @@ const Runs = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">GRC Agent Runs</h2>
-          <p className="text-gray-600">Monitor execution runs with attestation and audit trails</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('grcAgentModule.runsTitle')}</h2>
+          <p className="text-gray-600">{t('grcAgentModule.runsSubtitle')}</p>
         </div>
         <button
+          type="button"
           onClick={fetchRuns}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          Refresh
+          {t('grcAgentModule.refresh')}
         </button>
       </div>
 
-      {/* Runs Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Run ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Object Reference</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started At</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attestation Hash</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thRunId')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thStatus')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thObjectRef')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thTopic')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thStartedAt')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thAttestationHash')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grcAgentModule.thActions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -120,8 +128,8 @@ const Runs = () => {
                       <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                       </svg>
-                      <p>No GRC runs found</p>
-                      <p className="text-sm">Execute GRC findings to see runs here</p>
+                      <p>{t('grcAgentModule.runsEmpty')}</p>
+                      <p className="text-sm">{t('grcAgentModule.runsEmptyHint')}</p>
                     </div>
                   </td>
                 </tr>
@@ -133,7 +141,7 @@ const Runs = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(run.status)}`}>
-                        {run.status}
+                        {formatRunStatus(run.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -157,11 +165,11 @@ const Runs = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3">
-                        View Details
+                      <button type="button" className="text-blue-600 hover:text-blue-900 mr-3">
+                        {t('grcAgentModule.viewDetails')}
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900">
-                        Download Audit
+                      <button type="button" className="text-gray-600 hover:text-gray-900">
+                        {t('grcAgentModule.downloadAudit')}
                       </button>
                     </td>
                   </tr>
@@ -172,30 +180,29 @@ const Runs = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
       {runs.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-gray-900">{runs.length}</div>
-            <div className="text-sm text-gray-600">Total Runs</div>
+            <div className="text-sm text-gray-600">{t('grcAgentModule.totalRuns')}</div>
           </div>
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-green-600">
               {runs.filter(r => r.status === 'DONE').length}
             </div>
-            <div className="text-sm text-gray-600">Successful</div>
+            <div className="text-sm text-gray-600">{t('grcAgentModule.successful')}</div>
           </div>
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-red-600">
               {runs.filter(r => r.status === 'FAILED').length}
             </div>
-            <div className="text-sm text-gray-600">Failed</div>
+            <div className="text-sm text-gray-600">{t('grcAgentModule.failed')}</div>
           </div>
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div className="text-2xl font-bold text-blue-600">
               {runs.filter(r => r.status === 'RUNNING').length}
             </div>
-            <div className="text-sm text-gray-600">Running</div>
+            <div className="text-sm text-gray-600">{t('grcAgentModule.running')}</div>
           </div>
         </div>
       )}
