@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 
 const LearningDocument = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,9 +38,7 @@ const LearningDocument = () => {
                size: `${(analysis.chars / 1024).toFixed(1)} KB`, // Convert chars to KB
                chunks: analysis.chunks,
                chars: analysis.chars,
-               length: analysis.length,
-               // Create a more descriptive display name
-               displayName: `${analysis.filename} - Analyzed`
+               length: analysis.length
              }));
             setDocuments(transformedDocs);
           } else {
@@ -152,20 +152,19 @@ const LearningDocument = () => {
   };
 
   const copyToClipboard = (text) => {
+    const msg = t("learningDocumentModule.copiedToClipboard");
     try {
       navigator.clipboard.writeText(text);
-      // Show success feedback
-      alert('Copied to clipboard!');
+      alert(msg);
     } catch (error) {
       console.error('Failed to copy:', error);
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = text;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      alert('Copied to clipboard!');
+      alert(msg);
     }
   };
 
@@ -191,9 +190,7 @@ const LearningDocument = () => {
                size: `${(analysis.chars / 1024).toFixed(1)} KB`,
                chunks: analysis.chunks,
                chars: analysis.chars,
-               length: analysis.length,
-               // Create a more descriptive display name
-               displayName: `${analysis.filename} - Analyzed`
+               length: analysis.length
              }));
             setDocuments(transformedDocs);
           }
@@ -209,8 +206,7 @@ const LearningDocument = () => {
   };
 
   const downloadDocument = (doc) => {
-    // In real app, this would download the actual document
-    const content = `Document: ${doc.filename}\n\nSummary:\n${doc.summary}\n\nTags: ${doc.tags.join(", ")}\nRating: ${doc.rating}/10\nDate: ${doc.date}`;
+    const content = `${t("learningDocumentModule.downloadDocLabel")} ${doc.filename}\n\n${t("learningDocumentModule.downloadSummaryHeading")}\n${doc.summary}\n\n${t("learningDocumentModule.downloadTagsLabel")} ${doc.tags.join(", ")}\n${t("learningDocumentModule.downloadRatingLabel")} ${doc.rating}/10\n${t("learningDocumentModule.downloadDateLabel")} ${doc.date}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -268,8 +264,7 @@ const LearningDocument = () => {
             ? { 
                 ...doc, 
                 filename: editContent[docId].filename,
-                summary: editContent[docId].summary,
-                displayName: `${editContent[docId].filename} - Analyzed`
+                summary: editContent[docId].summary
               }
             : doc
         );
@@ -280,10 +275,10 @@ const LearningDocument = () => {
         ...prev,
         [docId]: false
       }));
-      setStatus("✅ Document updated successfully");
+      setStatus(t("learningDocumentModule.statusUpdated"));
       setTimeout(() => setStatus(""), 3000);
     } catch (error) {
-      setStatus("❌ Failed to update document");
+      setStatus(t("learningDocumentModule.statusUpdateFailed"));
       setTimeout(() => setStatus(""), 3000);
     }
   };
@@ -301,7 +296,7 @@ const LearningDocument = () => {
 
   // Delete functionality
   const handleDelete = async (docId) => {
-    if (window.confirm("Are you sure you want to delete this analysis?")) {
+    if (window.confirm(t("learningDocumentModule.confirmDelete"))) {
       try {
         console.log(`🗑️ Attempting to delete analysis with ID: ${docId}`);
         
@@ -343,12 +338,12 @@ const LearningDocument = () => {
         } else {
           const errorText = await response.text();
           console.error(`❌ Delete failed: ${response.status} - ${errorText}`);
-          setStatus(`❌ Failed to delete document: ${response.status}`);
+          setStatus(t("learningDocumentModule.statusDeleteFailedHttp", { status: response.status }));
           setTimeout(() => setStatus(""), 3000);
         }
       } catch (error) {
         console.error('Delete error:', error);
-        setStatus("❌ Failed to delete document");
+        setStatus(t("learningDocumentModule.statusDeleteFailed"));
         setTimeout(() => setStatus(""), 3000);
       }
     }
@@ -365,7 +360,7 @@ const LearningDocument = () => {
       }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔄</div>
-          <p style={{ color: colors.textSecondary }}>Loading learning documents...</p>
+          <p style={{ color: colors.textSecondary }}>{t("learningDocumentModule.loadingPage")}</p>
         </div>
       </div>
     );
@@ -381,14 +376,14 @@ const LearningDocument = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          📚 Learning Document Library
+          {t("learningDocumentModule.title")}
         </h1>
                  <p style={{ 
            color: colors.textSecondary, 
            fontSize: "16px",
            lineHeight: "1.5"
          }}>
-           Access and manage your previously analyzed documents. Search, filter, and organize your learning materials.
+           {t("learningDocumentModule.subtitle")}
          </p>
          
          {/* Status Messages */}
@@ -422,7 +417,7 @@ const LearningDocument = () => {
           <div style={{ flex: 1, minWidth: "300px" }}>
             <input
               type="text"
-              placeholder="Search documents, summaries, or tags..."
+              placeholder={t("learningDocumentModule.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -451,7 +446,7 @@ const LearningDocument = () => {
                 fontSize: "14px"
               }}
             >
-              <option value="all">All Types</option>
+              <option value="all">{t("learningDocumentModule.filterAllTypes")}</option>
               <option value="pdf">PDF</option>
               <option value="docx">DOCX</option>
               <option value="txt">TXT</option>
@@ -473,10 +468,10 @@ const LearningDocument = () => {
                 fontSize: "14px"
               }}
             >
-              <option value="date">Sort by Date</option>
-              <option value="name">Sort by Name</option>
-              <option value="rating">Sort by Rating</option>
-              <option value="size">Sort by Size</option>
+              <option value="date">{t("learningDocumentModule.sortDate")}</option>
+              <option value="name">{t("learningDocumentModule.sortName")}</option>
+              <option value="rating">{t("learningDocumentModule.sortRating")}</option>
+              <option value="size">{t("learningDocumentModule.sortSize")}</option>
             </select>
           </div>
 
@@ -498,7 +493,7 @@ const LearningDocument = () => {
               gap: "8px"
             }}
           >
-            🔄 {loading ? "Loading..." : "Refresh"}
+            🔄 {loading ? t("learningDocumentModule.loading") : t("learningDocumentModule.refresh")}
           </button>
         </div>
 
@@ -514,7 +509,7 @@ const LearningDocument = () => {
             color: colors.textSecondary, 
             fontSize: "14px"
           }}>
-            Showing {filteredDocuments.length} of {documents.length} documents
+            {t("learningDocumentModule.showingCount", { filtered: filteredDocuments.length, total: documents.length })}
           </span>
         </div>
       </div>
@@ -535,15 +530,15 @@ const LearningDocument = () => {
             fontSize: "20px",
             fontWeight: "500"
           }}>
-            No documents found
+            {t("learningDocumentModule.emptyTitle")}
           </h3>
           <p style={{ 
             color: colors.textSecondary, 
             fontSize: "16px"
           }}>
             {searchTerm || filterType !== "all" 
-              ? "Try adjusting your search or filters"
-              : "Start by analyzing some documents in the Document Analyzer"
+              ? t("learningDocumentModule.emptyHintFiltered")
+              : t("learningDocumentModule.emptyHintDefault")
             }
           </p>
         </div>
@@ -574,7 +569,7 @@ const LearningDocument = () => {
                        fontSize: "18px",
                        fontWeight: "600"
                      }}>
-                       {doc.displayName || doc.filename}
+                       {`${doc.filename} - ${t("learningDocumentModule.analyzedSuffix")}`}
                      </h3>
                     <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                       <span style={{ 
@@ -593,7 +588,7 @@ const LearningDocument = () => {
                         color: colors.textSecondary, 
                         fontSize: "12px"
                       }}>
-                        {doc.chunks} chunks
+                        {t("learningDocumentModule.chunksCount", { n: doc.chunks })}
                       </span>
                     </div>
                   </div>
@@ -660,7 +655,7 @@ const LearningDocument = () => {
                      gap: "6px"
                    }}
                  >
-                   📋 Copy Summary
+                   {t("learningDocumentModule.copySummary")}
                  </button>
                  <button
                    onClick={() => downloadDocument(doc)}
@@ -677,7 +672,7 @@ const LearningDocument = () => {
                      gap: "6px"
                    }}
                  >
-                   💾 Download
+                   {t("learningDocumentModule.download")}
                  </button>
                  <button
                    onClick={() => handleExpandToggle(doc.id)}
@@ -694,7 +689,7 @@ const LearningDocument = () => {
                      gap: "6px"
                    }}
                  >
-                                                                               {expanded[doc.id] ? "📖 Compress" : "📖 Expand"}
+                                                                               {expanded[doc.id] ? t("learningDocumentModule.compress") : t("learningDocumentModule.expand")}
                  </button>
                  <button
                    onClick={() => handleEdit(doc.id, doc.filename, doc.summary)}
@@ -711,7 +706,7 @@ const LearningDocument = () => {
                      gap: "6px"
                    }}
                  >
-                   ✏️ Edit
+                   {t("learningDocumentModule.edit")}
                  </button>
                  <button
                    onClick={() => handleDelete(doc.id)}
@@ -728,7 +723,7 @@ const LearningDocument = () => {
                      gap: "6px"
                    }}
                  >
-                   🗑️ Delete
+                   {t("learningDocumentModule.delete")}
                  </button>
                               </div>
 
@@ -747,7 +742,7 @@ const LearningDocument = () => {
                      fontSize: "16px",
                      fontWeight: "500"
                    }}>
-                     📋 Full Content
+                     {t("learningDocumentModule.fullContent")}
                    </h4>
                    
                    {editing[doc.id] ? (
@@ -759,7 +754,7 @@ const LearningDocument = () => {
                            color: colors.text,
                            fontWeight: "500"
                          }}>
-                           Filename:
+                           {t("learningDocumentModule.labelFilename")}
                          </label>
                          <input
                            type="text"
@@ -783,7 +778,7 @@ const LearningDocument = () => {
                            color: colors.text,
                            fontWeight: "500"
                          }}>
-                           Summary:
+                           {t("learningDocumentModule.labelSummary")}
                          </label>
                          <textarea
                            value={editContent[doc.id]?.summary || ""}
@@ -815,7 +810,7 @@ const LearningDocument = () => {
                              cursor: "pointer"
                            }}
                          >
-                           💾 Save
+                           {t("learningDocumentModule.save")}
                          </button>
                          <button
                            onClick={() => handleEditCancel(doc.id)}
@@ -829,7 +824,7 @@ const LearningDocument = () => {
                              cursor: "pointer"
                            }}
                          >
-                           ❌ Cancel
+                           {t("learningDocumentModule.cancel")}
                          </button>
                        </div>
                      </div>
@@ -844,19 +839,19 @@ const LearningDocument = () => {
                      }}>
                        {/* Show additional details when expanded, not duplicate summary */}
                        <div style={{ marginBottom: "16px" }}>
-                         <strong>Document Details:</strong>
+                         <strong>{t("learningDocumentModule.documentDetails")}</strong>
                          <ul style={{ margin: "8px 0", paddingLeft: "20px" }}>
-                           <li>Original filename: {doc.filename}</li>
-                           <li>File size: {doc.size}</li>
-                           <li>Character count: {doc.chars}</li>
-                           <li>Processing chunks: {doc.chunks}</li>
-                           <li>Analysis length: {doc.length}</li>
-                           <li>Created: {doc.date}</li>
+                           <li>{t("learningDocumentModule.detailOriginalFilename")} {doc.filename}</li>
+                           <li>{t("learningDocumentModule.detailFileSize")} {doc.size}</li>
+                           <li>{t("learningDocumentModule.detailCharCount")} {doc.chars}</li>
+                           <li>{t("learningDocumentModule.detailProcessingChunks")} {doc.chunks}</li>
+                           <li>{t("learningDocumentModule.detailAnalysisLength")} {doc.length}</li>
+                           <li>{t("learningDocumentModule.detailCreated")} {doc.date}</li>
                          </ul>
                        </div>
                        
                        <div>
-                         <strong>Full Summary:</strong>
+                         <strong>{t("learningDocumentModule.fullSummary")}</strong>
                          <div style={{ 
                            marginTop: "8px",
                            padding: "12px",
@@ -891,14 +886,14 @@ const LearningDocument = () => {
           fontSize: "18px",
           fontWeight: "500"
         }}>
-          Need to analyze new documents?
+          {t("learningDocumentModule.quickActionTitle")}
         </h3>
         <p style={{ 
           color: colors.textSecondary, 
           marginBottom: "20px",
           fontSize: "16px"
         }}>
-          Use the Document Analyzer to process new files and add them to your learning library.
+          {t("learningDocumentModule.quickActionBody")}
         </p>
         <button
           onClick={() => window.location.href = "/document-analyzer"}
@@ -916,7 +911,7 @@ const LearningDocument = () => {
             gap: "8px"
           }}
         >
-          📄 Go to Document Analyzer
+          {t("learningDocumentModule.goToDocAnalyzer")}
         </button>
       </div>
     </div>
