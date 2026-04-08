@@ -79,6 +79,20 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 ## 🔄 Recent Work (2024–2026)
 
+### Babel Library AI Intelligence (April 2026)
+
+Complete 4-phase AI roadmap implemented for the Babel Library module:
+
+- **Phase 1 — Intelligent Classification**: LLM-powered classification (11 domains, 3 difficulty levels), automatic tagging, sentence-transformer embeddings (384d), and hybrid search (semantic 60% + keyword 40%)
+- **Phase 2 — Personalized Recommendations**: User interaction tracking with time-decay, learning profiles, 4-signal recommendation engine (mastery gap, interest, type/difficulty, freshness), and AI-generated learning paths
+- **Phase 3 — AI Content Generation**: Single LLM call per resource generates summaries with key points, 3 question types (multiple choice, true/false, open-ended) with interactive show/hide answers, and adaptive learning hints (prerequisites, next steps)
+- **Phase 4 — Predictive Intelligence**: Trend analysis with momentum indicators, demand vs supply forecasting, per-user knowledge gap detection, and network expertise distribution — all pure data aggregation, no LLM calls
+
+Backend: `backend/services/babel_intelligence.py`, `babel_predictive.py`, `learning_profile.py`, `recommendation_engine.py`
+Routers: `backend/routers/babel_intelligence.py` (13 endpoints), `learning_profile.py` (5 endpoints)
+Frontend: `frontend/src/BabelLibrary.jsx` — AI search, recommendations, content panels, predictive dashboard
+i18n: 313 keys EN/NO with full parity
+
 ### Cybersecurity Module (April 2026)
 
 Full implementation of the 10-tab Cybersecurity platform across 3 sprints:

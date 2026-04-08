@@ -3184,13 +3184,40 @@ DELETE /api/saved-analyses/{id}     # Delete repository analysis
 # Agentic RAG Analysis
 GET    /api/agentic-rag/get-analyses  # Fetch all agentic RAG analyses
 DELETE /api/agentic-rag/delete-analysis/{id}  # Delete agentic RAG analysis
+
+# Babel Intelligence (Phase 1-4)
+POST   /api/babel/intelligence/classify                     # Classify single resource
+POST   /api/babel/intelligence/search                       # Semantic or hybrid search
+POST   /api/babel/intelligence/batch                        # Batch classify all
+GET    /api/babel/intelligence/batch/status                  # Batch progress
+GET    /api/babel/intelligence/stats                         # Classification stats
+POST   /api/babel/intelligence/generate-content              # Generate AI content
+POST   /api/babel/intelligence/generate-content/batch        # Batch content generation
+GET    /api/babel/intelligence/generate-content/batch/status # Content batch progress
+GET    /api/babel/intelligence/predictive/trends             # Trend analysis
+GET    /api/babel/intelligence/predictive/demand              # Demand vs supply
+GET    /api/babel/intelligence/predictive/gaps                # Knowledge gaps
+GET    /api/babel/intelligence/predictive/expertise           # Network expertise
+GET    /api/babel/intelligence/predictive/dashboard           # All analytics combined
+
+# Learning Profiles (Phase 2)
+POST   /api/babel/profile/interaction                        # Track interaction
+POST   /api/babel/profile/search                             # Track search
+GET    /api/babel/profile/{user_id}/summary                  # Profile summary
+GET    /api/babel/profile/{user_id}/recommendations          # Recommendations
+POST   /api/babel/profile/{user_id}/learning-path            # Generate learning path
 ```
 
 #### 🎨 **Frontend Components**
-- **BabelLibrary.jsx**: Main library interface with resource display
-- **Resource Cards**: Individual resource display with metadata
-- **Filter System**: Advanced search and filtering interface
-- **Statistics Dashboard**: Resource count and overview cards
+- **BabelLibrary.jsx**: Main library interface (~3200 lines) with 4 tabs:
+  - **Library Catalog**: Resource cards with classification badges, AI content panels, CRUD operations
+  - **Add Resource**: Form to manually add books, videos, articles, courses, analyses
+  - **Advanced Search**: Full-text search with type/topic/author filters and sort options
+  - **AI Search**: Hybrid search, recommendations panel, learning path generator, predictive dashboard, batch admin
+- **Resource Cards**: Classification domain/difficulty badges, tag chips, expandable AI Content (summary, questions, hints)
+- **Filter System**: Advanced search and filtering interface with active filter display
+- **Statistics Dashboard**: Resource count overview + AI intelligence stats (classified, embedded, content generated)
+- **Predictive Dashboard**: Trend analysis, demand vs supply, knowledge gaps, network expertise
 
 ### 🚀 **Usage Guide**
 
@@ -3217,46 +3244,198 @@ DELETE /api/agentic-rag/delete-analysis/{id}  # Delete agentic RAG analysis
 - **Type Filtering**: Filter by resource type (videos, articles, courses)
 - **Clear Filters**: Reset all applied filters
 
-### 🔮 **Future Enhancements**
+### 🧠 **AI Intelligence Roadmap — Fully Implemented (Phases 1-4)**
 
-#### **AI-Powered Features**
-- **Intelligent Recommendations**: AI-suggested content based on user preferences
-- **Content Summarization**: Automatic generation of content summaries
-- **Smart Tagging**: AI-powered topic and category assignment
-- **Learning Paths**: Personalized learning journey recommendations
+The Babel Library includes a complete 4-phase AI intelligence system built on top of the existing resource management layer. All phases are implemented and functional.
 
-#### **Advanced Search Capabilities**
-- **Semantic Search**: AI-powered content understanding and search
-- **Natural Language Queries**: Search using natural language
-- **Content Similarity**: Find related content and resources
-- **Trend Analysis**: Identify popular and trending topics
+---
 
-#### **Collaboration Features**
-- **User Annotations**: Personal notes and highlights on resources
-- **Resource Sharing**: Share resources with team members
-- **Discussion Forums**: Community discussions around learning content
-- **Rating System**: User ratings and reviews for resources
+#### Phase 1: Intelligent Classification & Semantic Search
 
-#### **Integration Expansions**
-- **External Sources**: Integration with external learning platforms
-- **API Connectors**: Connect with third-party content providers
-- **Data Import/Export**: Support for various content formats
-- **Real-time Updates**: Live synchronization with external sources
+**What it does:** Automatically classifies every library resource using LLM analysis, assigns tags, generates embeddings for semantic search, and enables hybrid (semantic + keyword) search across the entire library.
+
+**How it works:**
+1. When a resource is added or batch-processed, the system sends its title, description, and type to the LLM
+2. The LLM returns a structured classification: **domain** (11 categories: AI & Machine Learning, Cloud Computing, Web Development, etc.), **difficulty** (beginner/intermediate/advanced), **audience**, and **tags** (3-7 per resource)
+3. A 384-dimensional embedding vector is generated using `all-MiniLM-L6-v2` (sentence-transformers), with SHA256 hash fallback (128d)
+4. Everything is stored in the `babel_ai_metadata` MongoDB collection
+
+**Search modes:**
+- **Semantic search**: cosine similarity on embeddings (min score threshold 0.25)
+- **Hybrid search**: blends semantic (60%) + keyword (40%) scoring for best results
+
+**How to use it:**
+- Resources are classified automatically when added via the "Add Resource" form
+- Use the **AI Search** tab to perform intelligent searches
+- Use the **Batch admin panel** → "Classify all resources" to process the entire library
+- Classification badges (domain, difficulty, tags) appear on all resource cards
+
+**Backend files:**
+- `backend/services/babel_intelligence.py` — classification, embeddings, search logic
+- `backend/routers/babel_intelligence.py` — API endpoints
+
+**API endpoints:**
+```
+POST /api/babel/intelligence/classify        # Classify a single resource
+POST /api/babel/intelligence/search          # Semantic or hybrid search
+POST /api/babel/intelligence/batch           # Batch classify all resources
+GET  /api/babel/intelligence/batch/status    # Batch progress
+GET  /api/babel/intelligence/stats           # Classification statistics
+```
+
+---
+
+#### Phase 2: Personalized Recommendations & Learning Profiles
+
+**What it does:** Tracks user interactions (views, clicks, searches), builds a learning profile with topic interest scores, and provides personalized resource recommendations and AI-generated learning paths.
+
+**How it works:**
+1. Every resource view/click is tracked (fire-and-forget) with domain, difficulty, and tags
+2. Search queries are recorded to infer topic interests
+3. A derived profile is computed using time-decay weighting (recent activity weighs more)
+4. Recommendations use a **4-signal blend**: mastery gap (30%), interest alignment (30%), type/difficulty match (15%), freshness/diversity (25%)
+5. Learning paths order resources by difficulty progression, filtered by completion
+
+**How to use it:**
+- Recommendations appear automatically in the **AI Search** tab under "Recommended For You"
+- Profile strength badge shows your learning stage (new learner → active → power learner)
+- Use the **Learning Path Generator** (collapsible panel in AI Search tab) — enter a topic and get a step-by-step path
+- All tracking is automatic — just browse the library normally
+
+**Backend files:**
+- `backend/services/learning_profile.py` — interaction tracking, profile derivation
+- `backend/services/recommendation_engine.py` — 4-signal scoring, learning path generation
+- `backend/routers/learning_profile.py` — API endpoints
+
+**API endpoints:**
+```
+POST /api/babel/profile/interaction              # Track resource interaction
+POST /api/babel/profile/search                   # Track search query
+GET  /api/babel/profile/{user_id}/summary        # User profile summary
+GET  /api/babel/profile/{user_id}/recommendations  # Personalized recommendations
+POST /api/babel/profile/{user_id}/learning-path  # Generate learning path
+```
+
+---
+
+#### Phase 3: AI Content Generation
+
+**What it does:** Generates educational content for each resource using a single LLM call: a concise **summary** with key points, three types of **comprehension questions** (multiple choice, true/false, open-ended), and **adaptive learning hints** (study approach, prerequisites, next steps).
+
+**How it works:**
+1. For each classified resource, a single LLM call generates all three content types as structured JSON
+2. A 3-tier parser handles LLM response variations (direct JSON → regex extraction → markdown code block fallback)
+3. Each content section validates independently — partial results are stored (missing sections = null)
+4. Content is stored in the same `babel_ai_metadata` document alongside classification data
+
+**How to use it:**
+- On resource cards (both catalog and AI search results), look for the **"🧠 AI Content"** toggle button
+- Click to expand and see: summary with key points, interactive questions (show/hide answers), and learning hints
+- The toggle only appears on resources that have generated content
+- Use the **Batch admin panel** → "Generate AI content" (purple button) to batch-process all classified resources
+- Questions are interactive: try answering before revealing the correct answer
+
+**API endpoints:**
+```
+POST /api/babel/intelligence/generate-content              # Generate for one resource
+POST /api/babel/intelligence/generate-content/batch        # Batch generate content
+GET  /api/babel/intelligence/generate-content/batch/status # Batch progress
+```
+
+---
+
+#### Phase 4: Predictive Intelligence
+
+**What it does:** Pure data aggregation (no LLM calls) providing four analytics dashboards: trend analysis, demand forecasting, knowledge gap detection, and network expertise distribution.
+
+**How it works:**
+1. **Trend Analysis**: Aggregates all user interactions across time windows (7d/30d/90d), computes momentum percentages for each domain, identifies rising/stable/declining topics and trending tags
+2. **Demand Forecasting**: Compares search demand (weighted by recency) against available resource supply per domain. Identifies under-served and over-served areas
+3. **Knowledge Gap Analysis**: Per-user: detects interest gaps (high interest, low engagement), exploration gaps (resources available but not visited), and content gaps (interest exists, no resources). Platform-wide: utilization rates per domain
+4. **Network Expertise**: Aggregates expertise distribution across all users — active learners per domain, average interactions, difficulty distribution
+
+**How to use it:**
+- In the **AI Search** tab, open the **"🔮 Predictive Intelligence"** collapsible panel
+- Click **"Load Analytics"** to fetch all four analyses in one call
+- **Trend Analysis**: See which domains are rising (🔥) or declining (📉) with momentum indicators
+- **Demand vs Supply**: Visual comparison with under-served/over-served status badges
+- **Knowledge Gaps**: Your personal gaps highlighted with severity (high = red, medium = yellow)
+- **Network Insights**: See how expertise is distributed across all platform learners
+
+**Backend files:**
+- `backend/services/babel_predictive.py` — all four analytics functions
+- Endpoints added to `backend/routers/babel_intelligence.py`
+
+**API endpoints:**
+```
+GET /api/babel/intelligence/predictive/trends      # Trend analysis
+GET /api/babel/intelligence/predictive/demand       # Demand vs supply forecast
+GET /api/babel/intelligence/predictive/gaps         # Knowledge gaps (optional ?user_id=)
+GET /api/babel/intelligence/predictive/expertise    # Network expertise distribution
+GET /api/babel/intelligence/predictive/dashboard    # All analyses combined (optional ?user_id=)
+```
+
+---
+
+### 🏗️ **AI Architecture Overview**
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Babel Library AI Pipeline                      │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  Resource Added ──► Phase 1: Classify + Tag + Embed              │
+│                         │                                         │
+│                         ▼                                         │
+│                    babel_ai_metadata (MongoDB)                    │
+│                    ├── classification (domain, difficulty)        │
+│                    ├── tags [array]                               │
+│                    ├── embedding [384d vector]                    │
+│                    ├── summary + questions + hints (Phase 3)     │
+│                    └── content_generated_at                       │
+│                                                                   │
+│  User Interaction ──► Phase 2: Track + Profile + Recommend       │
+│                         │                                         │
+│                         ▼                                         │
+│                    learning_profiles (MongoDB)                    │
+│                    ├── interactions (capped 500)                  │
+│                    ├── search_history (capped 100)                │
+│                    └── derived (topic scores, preferences)        │
+│                                                                   │
+│  Phase 3: Content Gen ──► LLM call ──► summary, questions, hints │
+│                                                                   │
+│  Phase 4: Analytics ──► Aggregate profiles + metadata            │
+│                    ├── Trends (time-bucketed momentum)            │
+│                    ├── Demand (search vs supply gap)              │
+│                    ├── Gaps (interest vs engagement)              │
+│                    └── Expertise (network distribution)           │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**LLM fallback chain**: ItemAI (LM Studio, port 1234) → OpenRouter → OpenAI → [MOCKED RESPONSE]
+
+**Graceful degradation**: If the LLM is unavailable, classification/content generation is silently skipped. The UI hides AI badges and content panels when data is absent. Recommendations fall back to popularity-based sorting for new users.
+
+### 🌐 **Internationalization**
+
+All Babel Library UI text is fully translated in **English** and **Norwegian (Bokmål)** via react-i18next. The translation file (`babelLibraryModule.json`) contains **313 keys** covering all four phases, including AI content labels, predictive intelligence terms, and administrative panel text.
 
 ### 📊 **Performance Metrics**
 
 #### **Current Statistics**
-- **Total Resources**: 31+ integrated learning materials
+- **Total Resources**: 31+ integrated learning materials across 9 MongoDB collections
 - **Resource Types**: 6 main categories (Videos, Articles, Courses, Simulations/Coach, Repository/Document Analysis)
 - **Analysis Integration**: 3 analysis modules fully integrated (Document Analyzer, Repository Analyzer, Agentic RAG)
-- **Storage Efficiency**: MongoDB-based scalable storage
-- **Response Time**: Sub-second search and filter performance
+- **AI Metadata**: Classification, embeddings, and generated content stored per resource
+- **API Endpoints**: 13 intelligence endpoints + 5 profile endpoints = 18 Babel AI endpoints total
+- **i18n Coverage**: 313 keys, EN/NO parity
 
 #### **Scalability Features**
 - **MongoDB Indexing**: Optimized database queries for large datasets
-- **Async Operations**: Non-blocking API operations for better performance
-- **Caching Strategy**: Efficient data caching and retrieval
-- **Memory Management**: Optimized frontend memory usage
+- **Async Operations**: Non-blocking API operations (all endpoints are async)
+- **Caching Strategy**: Interest vector caching (TTL 300s), capped profile arrays (500 interactions, 100 searches)
+- **Batch Processing**: Background tasks with polling progress bars, configurable delays to avoid LLM rate limits
+- **Embedding Dimension Tracking**: `embedding_dim` stored per document, only same-dimension vectors are compared
 
 ---
 
@@ -3312,34 +3491,40 @@ The platform now features **ItemAI API**, a groundbreaking integration that brin
 - **Privacy & Cost**: 100% private, 100% free local AI capabilities
 
 #### 📚 **Babel Library - FULLY IMPLEMENTED** 🎯
-- **Status**: ✅ **COMPLETE & FUNCTIONAL**
+- **Status**: ✅ **COMPLETE & FUNCTIONAL — All 4 AI Phases Implemented**
 - **Integration**: All learning modules successfully integrated
-- **Database**: MongoDB storage fully operational
-- **Frontend**: Complete React.js interface with advanced filtering
-- **Backend**: Full CRUD API endpoints implemented
+- **Database**: MongoDB storage fully operational (9 source collections + 2 AI collections)
+- **Frontend**: Complete React.js interface with advanced filtering, AI search, recommendations, learning paths, AI content panels, and predictive dashboard
+- **Backend**: Full CRUD API endpoints + 18 AI intelligence endpoints
 - **Modules Connected**: Micro-lessons, Web Search, Skills Forecast, Certifications, Video Lessons, Document Analysis, Repository Analysis, Agentic RAG
-- **NEW**: Document Analysis Integration - All analysis results from Document Analyzer, Repository Analyzer, and Agentic RAG modules are now automatically integrated into the centralized library
+- **AI Pipeline**: LLM classification → embeddings → semantic search → recommendations → content generation → predictive analytics
 
 #### 🔄 **Unified Data Architecture**
 - **Status**: ✅ **COMPLETE**
 - **Single Source of Truth**: MongoDB for all learning resources
+- **AI Metadata Layer**: `babel_ai_metadata` collection enriches resources with classification, embeddings, and generated content
+- **User Profiles**: `learning_profiles` collection tracks interactions and search history with time-decay scoring
 - **Real-time Sync**: Automatic updates across all modules
-- **Data Consistency**: Unified data models and API structure
 
-#### 🎯 **Module Integration Status**
+#### 🎯 **Module & AI Integration Status**
 - **Micro-lessons**: ✅ Fully integrated with MongoDB storage
 - **Web Search Results**: ✅ Automatic capture and storage
 - **Skills Forecast**: ✅ AI predictions stored in library
 - **Certifications**: ✅ Study plans and progress tracking
 - **Video Lessons**: ✅ YouTube integration and content management
+- **Phase 1 — Classification**: ✅ LLM classification, tagging, embeddings, hybrid search
+- **Phase 2 — Recommendations**: ✅ Learning profiles, 4-signal recommendations, learning paths
+- **Phase 3 — Content Generation**: ✅ Summaries, comprehension questions, adaptive hints
+- **Phase 4 — Predictive Intelligence**: ✅ Trends, demand forecasting, gap analysis, expertise distribution
 
 ### 🚀 **Current Capabilities**
 
 #### **Resource Management**
-- **Total Resources**: 31+ learning materials
-- **Search & Filter**: Advanced text and topic filtering
+- **Total Resources**: 31+ learning materials across 9 collections
+- **Search & Filter**: Advanced text filtering + AI-powered semantic/hybrid search
 - **CRUD Operations**: Full create, read, update, delete functionality
 - **Real-time Updates**: Instant synchronization across modules
+- **AI Enrichment**: Automatic classification, content generation, and personalized recommendations
 
 #### **User Experience**
 - **Unified Interface**: Single library for all learning content
