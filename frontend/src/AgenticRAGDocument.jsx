@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 
 const AgenticRAGDocument = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,9 +45,7 @@ const AgenticRAGDocument = () => {
               router_selected: analysis.router_selected || [],
               used_paragraphs: analysis.used_paragraphs || [],
               run_id: analysis.run_id || '',
-              elapsed_sec: analysis.elapsed_sec || 0,
-              // Create a more descriptive display name
-              displayName: `${analysis.filename} - Agentic Analysis`
+              elapsed_sec: analysis.elapsed_sec || 0
             }));
             setDocuments(transformedDocs);
           } else {
@@ -214,8 +214,7 @@ const AgenticRAGDocument = () => {
                 ...doc, 
                 filename: editContent[docId].filename,
                 question: editContent[docId].question,
-                answer: editContent[docId].answer,
-                displayName: `${editContent[docId].filename} - Agentic Analysis`
+                answer: editContent[docId].answer
               }
             : doc
         );
@@ -226,10 +225,10 @@ const AgenticRAGDocument = () => {
         ...prev,
         [docId]: false
       }));
-      setStatus("✅ Document updated successfully");
+      setStatus(t("agenticRagDocumentModule.statusUpdated"));
       setTimeout(() => setStatus(""), 3000);
     } catch (error) {
-      setStatus("❌ Failed to update document");
+      setStatus(t("agenticRagDocumentModule.statusUpdateFailed"));
       setTimeout(() => setStatus(""), 3000);
     }
   };
@@ -247,7 +246,7 @@ const AgenticRAGDocument = () => {
 
   // Delete functionality
   const handleDelete = async (docId) => {
-    if (window.confirm("Are you sure you want to delete this analysis?")) {
+    if (window.confirm(t("agenticRagDocumentModule.confirmDelete"))) {
       try {
         console.log(`🗑️ Attempting to delete analysis with ID: ${docId}`);
         
@@ -288,12 +287,12 @@ const AgenticRAGDocument = () => {
         } else {
           const errorText = await response.text();
           console.error(`❌ Delete failed with status ${response.status}:`, errorText);
-          setStatus(`❌ Failed to delete document (${response.status})`);
+          setStatus(t("agenticRagDocumentModule.statusDeleteFailed", { status: response.status }));
           setTimeout(() => setStatus(""), 3000);
         }
       } catch (error) {
         console.error('❌ Error deleting analysis:', error);
-        setStatus(`❌ Error deleting document: ${error.message}`);
+        setStatus(t("agenticRagDocumentModule.statusDeleteError", { message: error.message }));
         setTimeout(() => setStatus(""), 3000);
       }
     }
@@ -310,7 +309,7 @@ const AgenticRAGDocument = () => {
       }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔄</div>
-          <p style={{ color: colors.textSecondary }}>Loading Agentic RAG documents...</p>
+          <p style={{ color: colors.textSecondary }}>{t("agenticRagDocumentModule.loadingPage")}</p>
         </div>
       </div>
     );
@@ -326,14 +325,14 @@ const AgenticRAGDocument = () => {
           fontSize: "28px",
           fontWeight: "600"
         }}>
-          📋 Agentic RAG Documents
+          {t("agenticRagDocumentModule.title")}
         </h1>
         <p style={{ 
           color: colors.textSecondary, 
           fontSize: "16px",
           lineHeight: "1.5"
         }}>
-          Browse, search, and manage your saved Agentic RAG analyses with quality metrics and citations.
+          {t("agenticRagDocumentModule.subtitle")}
         </p>
         
         {/* Status Messages */}
@@ -373,7 +372,7 @@ const AgenticRAGDocument = () => {
           <div style={{ flex: "1", minWidth: "200px" }}>
             <input
               type="text"
-              placeholder="Search documents, questions, or answers..."
+              placeholder={t("agenticRagDocumentModule.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -402,7 +401,7 @@ const AgenticRAGDocument = () => {
                 fontSize: "14px"
               }}
             >
-              <option value="all">All Types</option>
+              <option value="all">{t("agenticRagDocumentModule.filterAllTypes")}</option>
               <option value="pdf">PDF</option>
               <option value="docx">DOCX</option>
               <option value="txt">TXT</option>
@@ -424,10 +423,10 @@ const AgenticRAGDocument = () => {
                 fontSize: "14px"
               }}
             >
-              <option value="date">Sort by Date</option>
-              <option value="name">Sort by Name</option>
-              <option value="rating">Sort by Rating</option>
-              <option value="size">Sort by Size</option>
+              <option value="date">{t("agenticRagDocumentModule.sortDate")}</option>
+              <option value="name">{t("agenticRagDocumentModule.sortName")}</option>
+              <option value="rating">{t("agenticRagDocumentModule.sortRating")}</option>
+              <option value="size">{t("agenticRagDocumentModule.sortSize")}</option>
             </select>
           </div>
 
@@ -449,7 +448,7 @@ const AgenticRAGDocument = () => {
               gap: "8px"
             }}
           >
-            🔄 {loading ? "Loading..." : "Refresh"}
+            🔄 {loading ? t("agenticRagDocumentModule.loading") : t("agenticRagDocumentModule.refresh")}
           </button>
         </div>
 
@@ -465,7 +464,7 @@ const AgenticRAGDocument = () => {
             color: colors.textSecondary, 
             fontSize: "14px"
           }}>
-            Showing {filteredDocuments.length} of {documents.length} documents
+            {t("agenticRagDocumentModule.showingCount", { filtered: filteredDocuments.length, total: documents.length })}
           </span>
         </div>
       </div>
@@ -486,15 +485,15 @@ const AgenticRAGDocument = () => {
             fontSize: "20px",
             fontWeight: "500"
           }}>
-            No documents found
+            {t("agenticRagDocumentModule.emptyTitle")}
           </h3>
           <p style={{ 
             color: colors.textSecondary, 
             fontSize: "16px"
           }}>
             {searchTerm || filterType !== "all" 
-              ? "Try adjusting your search or filters"
-              : "Start by analyzing some documents in the Agentic RAG module"
+              ? t("agenticRagDocumentModule.emptyHintFiltered")
+              : t("agenticRagDocumentModule.emptyHintDefault")
             }
           </p>
         </div>
@@ -541,7 +540,7 @@ const AgenticRAGDocument = () => {
                           }}
                         />
                       ) : (
-                        doc.displayName
+                        `${doc.filename} - ${t("agenticRagDocumentModule.analyzedSuffix")}`
                       )}
                     </h3>
                     <div style={{ 
@@ -608,7 +607,7 @@ const AgenticRAGDocument = () => {
                           cursor: "pointer"
                         }}
                       >
-                        💾 Save
+                        {t("agenticRagDocumentModule.save")}
                       </button>
                       <button
                         onClick={() => handleEditCancel(doc.id)}
@@ -622,7 +621,7 @@ const AgenticRAGDocument = () => {
                           cursor: "pointer"
                         }}
                       >
-                        ❌ Cancel
+                        {t("agenticRagDocumentModule.cancel")}
                       </button>
                     </>
                   ) : (
@@ -639,7 +638,7 @@ const AgenticRAGDocument = () => {
                           cursor: "pointer"
                         }}
                       >
-                        {expanded[doc.id] ? "📖 Compress" : "📖 Expand"}
+                        {expanded[doc.id] ? t("agenticRagDocumentModule.compress") : t("agenticRagDocumentModule.expand")}
                       </button>
                       <button
                         onClick={() => startEditing(doc.id)}
@@ -653,7 +652,7 @@ const AgenticRAGDocument = () => {
                           cursor: "pointer"
                         }}
                       >
-                        ✏️ Edit
+                        {t("agenticRagDocumentModule.edit")}
                       </button>
                       <button
                         onClick={() => handleDelete(doc.id)}
@@ -667,7 +666,7 @@ const AgenticRAGDocument = () => {
                           cursor: "pointer"
                         }}
                       >
-                        🗑️ Delete
+                        {t("agenticRagDocumentModule.delete")}
                       </button>
                     </>
                   )}
@@ -682,7 +681,7 @@ const AgenticRAGDocument = () => {
                 borderRadius: "6px",
                 border: `1px solid ${colors.border}`
               }}>
-                <strong style={{ color: colors.text }}>Question:</strong>
+                <strong style={{ color: colors.text }}>{t("agenticRagDocumentModule.questionLabel")}</strong>
                 <p style={{ 
                   color: colors.text, 
                   margin: "8px 0 0 0",
@@ -732,7 +731,7 @@ const AgenticRAGDocument = () => {
                           {value}/10
                         </div>
                         <div style={{ color: colors.textSecondary, fontSize: "10px" }}>
-                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                          {t(`agenticRagModule.${key}`, { defaultValue: key.charAt(0).toUpperCase() + key.slice(1) })}
                         </div>
                       </div>
                     ))}
@@ -753,7 +752,7 @@ const AgenticRAGDocument = () => {
                         fontWeight: "500",
                         marginBottom: "4px"
                       }}>
-                        Comment:
+                        {t("agenticRagModule.comment")}
                       </div>
                       <div style={{ 
                         color: colors.textSecondary, 
@@ -783,12 +782,12 @@ const AgenticRAGDocument = () => {
                     fontSize: "16px",
                     fontWeight: "500"
                   }}>
-                    Full Content
+                    {t("agenticRagDocumentModule.fullContent")}
                   </h4>
                   
                   {/* Answer */}
                   <div style={{ marginBottom: "16px" }}>
-                    <strong style={{ color: colors.text }}>Answer:</strong>
+                    <strong style={{ color: colors.text }}>{t("agenticRagDocumentModule.answerLabel")}</strong>
                     <div style={{ 
                       marginTop: "8px",
                       padding: "12px",
@@ -822,7 +821,7 @@ const AgenticRAGDocument = () => {
                                 minHeight: "120px",
                                 resize: "vertical"
                               }}
-                              placeholder="Enter your answer here..."
+                              placeholder={t("agenticRagDocumentModule.placeholderAnswer")}
                             />
                           );
                         })()
@@ -835,7 +834,7 @@ const AgenticRAGDocument = () => {
                                      {/* Parameters Used */}
                    {doc.parameters && Object.keys(doc.parameters).length > 0 && (
                      <div style={{ marginBottom: "16px" }}>
-                       <strong style={{ color: colors.text }}>Parameters Used:</strong>
+                       <strong style={{ color: colors.text }}>{t("agenticRagDocumentModule.parametersUsed")}</strong>
                        <div style={{ 
                          marginTop: "8px",
                          padding: "12px",
@@ -845,10 +844,10 @@ const AgenticRAGDocument = () => {
                          fontSize: "12px",
                          color: colors.textSecondary
                        }}>
-                         <div>Depth: {doc.parameters.depth}</div>
-                         <div>K: {doc.parameters.k_init}</div>
-                         <div>Hybrid: {doc.parameters.use_hybrid ? "Yes" : "No"}</div>
-                         <div>Max Paragraphs: {doc.parameters.max_paragraphs}</div>
+                         <div>{t("agenticRagDocumentModule.paramDepth")} {doc.parameters.depth}</div>
+                         <div>{t("agenticRagDocumentModule.paramK")} {doc.parameters.k_init}</div>
+                         <div>{t("agenticRagDocumentModule.paramHybrid")} {doc.parameters.use_hybrid ? t("agenticRagDocumentModule.yes") : t("agenticRagDocumentModule.no")}</div>
+                         <div>{t("agenticRagDocumentModule.paramMaxParagraphs")} {doc.parameters.max_paragraphs}</div>
                        </div>
                      </div>
                    )}
@@ -856,7 +855,7 @@ const AgenticRAGDocument = () => {
                    {/* Performance Metrics */}
                    {doc.metrics && Object.keys(doc.metrics).length > 0 && (
                      <div style={{ marginBottom: "16px" }}>
-                       <strong style={{ color: colors.text }}>Performance Metrics:</strong>
+                       <strong style={{ color: colors.text }}>{t("agenticRagModule.performanceMetrics")}</strong>
                        <div style={{ 
                          marginTop: "8px",
                          padding: "12px",
@@ -866,17 +865,17 @@ const AgenticRAGDocument = () => {
                          fontSize: "12px",
                          color: colors.textSecondary
                        }}>
-                         <div>Total Tokens: {doc.metrics.total_in + doc.metrics.total_out}</div>
-                         <div>Cost (USD): ${doc.metrics.total_cost_usd?.toFixed(6) || '0.000000'}</div>
-                         <div>Latency: {doc.metrics.total_latency_ms}ms</div>
-                         <div>Total Time: {doc.elapsed_sec}s</div>
+                         <div>{t("agenticRagDocumentModule.lineTotalTokens", { n: doc.metrics.total_in + doc.metrics.total_out })}</div>
+                         <div>{t("agenticRagDocumentModule.lineCost", { n: `$${doc.metrics.total_cost_usd?.toFixed(6) || '0.000000'}` })}</div>
+                         <div>{t("agenticRagDocumentModule.lineLatency", { n: doc.metrics.total_latency_ms })}</div>
+                         <div>{t("agenticRagDocumentModule.lineTotalTime", { n: doc.elapsed_sec })}</div>
                        </div>
                      </div>
                    )}
 
                    {/* Analysis Trace */}
                    <div style={{ marginBottom: "16px" }}>
-                     <strong style={{ color: colors.text }}>Analysis Trace:</strong>
+                     <strong style={{ color: colors.text }}>{t("agenticRagDocumentModule.analysisTraceHeading")}</strong>
                      <div style={{ 
                        marginTop: "8px",
                        padding: "12px",
@@ -886,16 +885,16 @@ const AgenticRAGDocument = () => {
                        fontSize: "12px",
                        color: colors.textSecondary
                      }}>
-                       <div>Router Selected: {doc.router_selected?.join(", ") || "None"}</div>
-                       <div>Used Paragraphs: {doc.used_paragraphs?.join(", ") || "None"}</div>
-                       <div>Run ID: {doc.run_id || "None"}</div>
+                       <div>{t("agenticRagDocumentModule.lineRouter", { value: doc.router_selected?.join(", ") || t("agenticRagModule.none") })}</div>
+                       <div>{t("agenticRagDocumentModule.lineParagraphs", { value: doc.used_paragraphs?.join(", ") || t("agenticRagModule.none") })}</div>
+                       <div>{t("agenticRagDocumentModule.lineRunId", { value: doc.run_id || t("agenticRagModule.none") })}</div>
                      </div>
                    </div>
 
                   {/* Citations */}
                   {doc.citations && doc.citations.length > 0 && (
                     <div>
-                      <strong style={{ color: colors.text }}>Citations:</strong>
+                      <strong style={{ color: colors.text }}>{t("agenticRagDocumentModule.citationsHeading")}</strong>
                       <div style={{ 
                         marginTop: "8px",
                         display: "grid",
@@ -914,7 +913,7 @@ const AgenticRAGDocument = () => {
                               fontWeight: "500",
                               marginBottom: "4px"
                             }}>
-                              ID: {citation.id}
+                              {t("agenticRagModule.idLabel")} {citation.id}
                             </div>
                             <div style={{ 
                               color: colors.text,
