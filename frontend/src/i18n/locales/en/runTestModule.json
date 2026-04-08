@@ -61,6 +61,11 @@
       "API Config (switch provider, save keys)",
       "Babel Library (tabs, Advanced Search, catalog search+filter)",
       "Babel Library (add resource and verify in catalog; add video, open in Video Lessons, delete)",
+      "Babel Library AI Search (input, suggestion chips, hybrid search, classification badges)",
+      "Babel Library Recommendations + Learning Path Generator (Phase 2)",
+      "Babel Library AI Content panels (summary, questions, hints toggle — Phase 3)",
+      "Babel Library Predictive Intelligence dashboard (trends, demand, gaps — Phase 4)",
+      "Babel Library Batch Admin (classify all, generate content, refresh stats)",
       "Video Lessons (save appears in Saved Videos inside module and can be deleted)",
       "Skills Forecast (input enables forecast, clear)",
       "Skills Forecast (generate + save if backend available)",
@@ -112,7 +117,12 @@
       "Agentic RAG: Documents",
       "Map of Knowledge: search input, counter, web search panel",
       "Map of Knowledge: category filter changes counter",
-      "Simulations: start scenario, next step & question change"
+      "Simulations: start scenario, next step & question change",
+      "Babel Library: AI Search (input, suggestion chips, hybrid search)",
+      "Babel Library: Recommendations + Learning Path Generator (Phase 2)",
+      "Babel Library: AI Content panels on catalog cards (Phase 3)",
+      "Babel Library: Predictive Intelligence dashboard (Phase 4)",
+      "Babel Library: Batch Admin (classify all, generate content, stats)"
     ],
     "manual": {
       "backendHealth": "Backend Health Check",

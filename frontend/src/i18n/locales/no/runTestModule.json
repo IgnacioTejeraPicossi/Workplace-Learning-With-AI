@@ -61,6 +61,11 @@
       "API-konfigurasjon (bytte leverandør, lagre nøkler)",
       "Babel-bibliotek (faner, avansert søk, katalogsøk + filter)",
       "Babel-bibliotek (legg til ressurs og verifiser i katalog; video, åpne i Videoleksjoner, slett)",
+      "Babel-bibliotek KI-søk (inndata, forslagschips, hybridsøk, klassifiseringsbadger)",
+      "Babel-bibliotek Anbefalinger + læringsløp-generator (fase 2)",
+      "Babel-bibliotek KI-innholdspaneler (sammendrag, spørsmål, tips — fase 3)",
+      "Babel-bibliotek Prediktiv intelligens-dashboard (trender, etterspørsel, hull — fase 4)",
+      "Babel-bibliotek Batch-admin (klassifiser alle, generer innhold, oppdater statistikk)",
       "Videoleksjoner (lagring vises i Lagrede videoer i modulen og kan slettes)",
       "Kompetanseprognose (inndata aktiverer prognose, tøm)",
       "Kompetanseprognose (generer + lagre hvis backend er tilgjengelig)",
@@ -112,7 +117,12 @@
       "Agentic RAG: Dokumenter",
       "Kunnskapskart: søkefelt, teller, nettsøk-panel",
       "Kunnskapskart: kategorifilter endrer teller",
-      "Simuleringer: start scenario, neste steg og spørsmålsendring"
+      "Simuleringer: start scenario, neste steg og spørsmålsendring",
+      "Babel-bibliotek: KI-søk (inndata, forslagschips, hybridsøk)",
+      "Babel-bibliotek: Anbefalinger + læringsløp-generator (fase 2)",
+      "Babel-bibliotek: KI-innholdspaneler på katalogkort (fase 3)",
+      "Babel-bibliotek: Prediktiv intelligens-dashboard (fase 4)",
+      "Babel-bibliotek: Batch-admin (klassifiser alle, generer innhold, statistikk)"
     ],
     "manual": {
       "backendHealth": "Helsesjekk backend",
