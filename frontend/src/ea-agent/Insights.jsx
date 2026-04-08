@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Insights = () => {
+  const { t } = useTranslation();
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -118,21 +120,20 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          Insights Dashboard
+          {t('eaSecondBrainModule.insightsTitle')}
         </h2>
         <p className="text-sm text-gray-600">
-          Review and dispatch EA insights to Norwegian systems
+          {t('eaSecondBrainModule.insightsSubtitle')}
         </p>
       </div>
 
       {/* Demo Section */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">
-          📊 Demo: Send Sample Insight
+          {t('eaSecondBrainModule.demoTitle')}
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          This will create a sample Kubernetes deprecation alert and dispatch it
-          to Jira and Slack
+          {t('eaSecondBrainModule.demoBody')}
         </p>
         <button
           onClick={sendSampleInsight}
@@ -146,7 +147,7 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
             }
           `}
         >
-          {sending ? '⏳ Dispatching...' : '🚀 Send Sample Insight'}
+          {sending ? t('eaSecondBrainModule.dispatching') : t('eaSecondBrainModule.sendSample')}
         </button>
       </div>
 
@@ -162,26 +163,26 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
               result.error ? 'text-red-900' : 'text-green-900'
             }`}
           >
-            {result.error ? '❌ Error' : '✅ Success'}
+            {result.error ? t('eaSecondBrainModule.resultError') : t('eaSecondBrainModule.resultSuccess')}
           </h3>
           {result.error ? (
             <p className="text-sm text-red-700">{result.error}</p>
           ) : (
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-green-900">Run ID:</p>
+                <p className="text-sm font-medium text-green-900">{t('eaSecondBrainModule.runIdLabel')}</p>
                 <code className="text-xs text-green-800">{result.run_id}</code>
               </div>
               <div>
                 <p className="text-sm font-medium text-green-900">
-                  Attestation Hash:
+                  {t('eaSecondBrainModule.attestationLabel')}
                 </p>
                 <code className="text-xs text-green-800 break-all">
                   {result.attestation_hash}
                 </code>
               </div>
               <div>
-                <p className="text-sm font-medium text-green-900">Artifacts:</p>
+                <p className="text-sm font-medium text-green-900">{t('eaSecondBrainModule.artifactsLabel')}</p>
                 <pre className="text-xs text-green-800 mt-2 p-3 bg-white rounded overflow-auto max-h-40">
                   {JSON.stringify(result.artifacts, null, 2)}
                 </pre>
@@ -194,11 +195,10 @@ Kubernetes 1.31 deprecates several APIs that affect our Payments API and Booking
       {/* Placeholder for future insights table */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">
-          Recent Insights
+          {t('eaSecondBrainModule.recentInsightsTitle')}
         </h3>
         <p className="text-sm text-gray-600 italic">
-          This section will display automatically generated insights from the
-          Pulse job
+          {t('eaSecondBrainModule.recentInsightsPlaceholder')}
         </p>
       </div>
     </div>

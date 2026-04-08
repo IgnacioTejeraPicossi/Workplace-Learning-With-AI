@@ -1,7 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import descriptor from '../configs/agents/ea-second-brain.json';
 
 const Overview = () => {
+  const { t } = useTranslation();
+  const sourcesInternal = useMemo(
+    () => t('eaSecondBrainModule.sourcesInternal', { returnObjects: true }),
+    [t]
+  );
+  const sourcesExternal = useMemo(
+    () => t('eaSecondBrainModule.sourcesExternal', { returnObjects: true }),
+    [t]
+  );
+  const features = useMemo(
+    () => t('eaSecondBrainModule.features', { returnObjects: true }),
+    [t]
+  );
+  const internalList = Array.isArray(sourcesInternal) ? sourcesInternal : [];
+  const externalList = Array.isArray(sourcesExternal) ? sourcesExternal : [];
+  const featureList = Array.isArray(features) ? features : [];
+
   const [stats, setStats] = useState({
     totalRuns: 0,
     successRate: 0,
@@ -51,18 +69,18 @@ const Overview = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
             <div style={{ fontSize: '40px' }}>🧠</div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>{descriptor.name}</h2>
-              <p style={{ margin: '4px 0 0', opacity: 0.9 }}>Ketil's 24/7 Enterprise Architecture watcher for Norwegian</p>
+              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>{t('eaSecondBrainModule.title')}</h2>
+              <p style={{ margin: '4px 0 0', opacity: 0.9 }}>{t('eaSecondBrainModule.tagline')}</p>
             </div>
           </div>
-          <p style={{ marginTop: '12px', opacity: 0.95 }}>{descriptor.description}</p>
+          <p style={{ marginTop: '12px', opacity: 0.95 }}>{t('eaSecondBrainModule.description')}</p>
         </div>
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-          <StatCard label="Total Runs" value={stats.totalRuns} icon="▶️" />
-          <StatCard label="Success Rate" value={`${stats.successRate}%`} icon="✅" />
-          <StatCard label="Capabilities" value={descriptor.capabilities.length} icon="⚡" />
+          <StatCard label={t('eaSecondBrainModule.statsTotalRuns')} value={stats.totalRuns} icon="▶️" />
+          <StatCard label={t('eaSecondBrainModule.statsSuccessRate')} value={`${stats.successRate}%`} icon="✅" />
+          <StatCard label={t('eaSecondBrainModule.statsCapabilities')} value={descriptor.capabilities.length} icon="⚡" />
         </div>
 
         {/* Two Columns */}
@@ -71,7 +89,7 @@ const Overview = () => {
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <span style={{ fontSize: '20px' }}>⚡</span>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Capabilities</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('eaSecondBrainModule.capabilitiesHeading')}</h3>
             </div>
             <div style={{ display: 'grid', gap: '8px' }}>
               {descriptor.capabilities.map((cap, i) => (
@@ -89,13 +107,13 @@ const Overview = () => {
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <span style={{ fontSize: '20px' }}>📊</span>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Data Sources</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('eaSecondBrainModule.dataSourcesHeading')}</h3>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🔒</span>Internal</h4>
+                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🔒</span>{t('eaSecondBrainModule.internalHeading')}</h4>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '6px' }}>
-                  {descriptor.sources.internal.map((source, i) => (
+                  {internalList.map((source, i) => (
                     <li key={i} style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center' }}>
                       <span style={{ marginRight: 8 }}>✓</span>
                       {source}
@@ -104,9 +122,9 @@ const Overview = () => {
                 </ul>
               </div>
               <div>
-                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🌐</span>External (Open Data)</h4>
+                <h4 style={{ margin: 0, marginBottom: '8px', fontSize: '13px', color: '#334155' }}><span style={{ marginRight: 6 }}>🌐</span>{t('eaSecondBrainModule.externalHeading')}</h4>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '6px' }}>
-                  {descriptor.sources.external.map((source, i) => (
+                  {externalList.map((source, i) => (
                     <li key={i} style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center' }}>
                       <span style={{ marginRight: 8 }}>✓</span>
                       {source}
@@ -122,10 +140,10 @@ const Overview = () => {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '20px' }}>✨</span>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Key Features</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{t('eaSecondBrainModule.keyFeaturesHeading')}</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {descriptor.features.map((feature, i) => (
+            {featureList.map((feature, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '10px', background: '#ecfdf5', borderRadius: '10px' }}>
                 <span style={{ color: '#16a34a', marginTop: 2 }}>✓</span>
                 <span style={{ fontSize: '13px', color: '#334155' }}>{feature}</span>
@@ -146,9 +164,9 @@ const Overview = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <span style={{ fontSize: '22px' }}>🔌</span>
-            <h3 style={{ margin: 0, fontSize: '18px' }}>Model Context Protocol (MCP)</h3>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>{t('eaSecondBrainModule.mcpHeading')}</h3>
           </div>
-          <p style={{ margin: 0, marginBottom: '10px', opacity: 0.95 }}>This agent supports MCP for standardized tool execution</p>
+          <p style={{ margin: 0, marginBottom: '10px', opacity: 0.95 }}>{t('eaSecondBrainModule.mcpSupportText')}</p>
           <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px' }}>
             <code style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
               {descriptor.mcp.endpoint}

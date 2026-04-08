@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Settings = () => {
+  const { t } = useTranslation();
+  const sourcesInternal = useMemo(
+    () => t('eaSecondBrainModule.sourcesInternal', { returnObjects: true }),
+    [t]
+  );
+  const sourcesExternal = useMemo(
+    () => t('eaSecondBrainModule.sourcesExternal', { returnObjects: true }),
+    [t]
+  );
+  const internalList = Array.isArray(sourcesInternal) ? sourcesInternal : [];
+  const externalList = Array.isArray(sourcesExternal) ? sourcesExternal : [];
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Settings</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('eaSecondBrainModule.settingsTitle')}</h2>
         <p className="text-sm text-gray-600">
-          Configure sources, integrations, and policies for the EA Second Brain
-          Agent
+          {t('eaSecondBrainModule.settingsSubtitle')}
         </p>
       </div>
 
       {/* Integration Status */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Integration Status
+          {t('eaSecondBrainModule.integrationStatus')}
         </h3>
         <div className="space-y-4">
           <IntegrationStatus
@@ -44,10 +56,12 @@ const Settings = () => {
       {/* Environment Variables */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Environment Variables
+          {t('eaSecondBrainModule.envVarsTitle')}
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          Configure these variables in your <code>.env</code> file:
+          {t('eaSecondBrainModule.envVarsIntro')}
+          <code>{t('eaSecondBrainModule.envFile')}</code>
+          {t('eaSecondBrainModule.envFileSuffix')}
         </p>
         <div className="bg-gray-50 rounded p-4 font-mono text-xs space-y-1 overflow-auto">
           <div>JIRA_BASE_URL=https://your.atlassian.net</div>
@@ -68,23 +82,23 @@ const Settings = () => {
       {/* Policies */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Execution Policies
+          {t('eaSecondBrainModule.policiesTitle')}
         </h3>
         <div className="space-y-4">
           <PolicyItem
-            label="Jira Projects"
+            label={t('eaSecondBrainModule.policyJiraProjects')}
             value="EA, ARCH"
-            description="Allowed Jira projects for issue creation"
+            description={t('eaSecondBrainModule.policyJiraProjectsDesc')}
           />
           <PolicyItem
-            label="Slack Channels"
+            label={t('eaSecondBrainModule.policySlackChannels')}
             value="#ea-updates, #engineering, #cto-brief"
-            description="Target channels for notifications"
+            description={t('eaSecondBrainModule.policySlackChannelsDesc')}
           />
           <PolicyItem
-            label="Auto-execution Mode"
-            value="Low Risk"
-            description="Automatically execute actions for low-risk insights"
+            label={t('eaSecondBrainModule.policyAutoMode')}
+            value={t('eaSecondBrainModule.policyValueLowRisk')}
+            description={t('eaSecondBrainModule.policyAutoModeDesc')}
           />
         </div>
       </div>
@@ -92,33 +106,30 @@ const Settings = () => {
       {/* Data Sources */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Data Sources
+          {t('eaSecondBrainModule.dataSourcesSettingsTitle')}
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          The Pulse job monitors these sources for EA insights:
+          {t('eaSecondBrainModule.dataSourcesSettingsIntro')}
         </p>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-              Internal
+              {t('eaSecondBrainModule.internalLabel')}
             </h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• EA tools</li>
-              <li>• Confluence</li>
-              <li>• Jira</li>
-              <li>• Architecture Repository</li>
+              {internalList.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-              External
+              {t('eaSecondBrainModule.externalLabel')}
             </h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Vendor release notes</li>
-              <li>• Tech news</li>
-              <li>• CVE feeds</li>
-              <li>• GitHub releases</li>
-              <li>• EOL datasets</li>
+              {externalList.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -130,13 +141,12 @@ const Settings = () => {
           <span className="text-2xl mr-3">💡</span>
           <div>
             <h4 className="text-sm font-semibold text-yellow-900">
-              Need Help?
+              {t('eaSecondBrainModule.needHelpTitle')}
             </h4>
             <p className="text-sm text-yellow-700 mt-1">
-              Contact the platform team for assistance with configuration or
-              consult the{' '}
+              {t('eaSecondBrainModule.needHelpBody')}
               <a href="/docs/ea-agent" className="underline">
-                EA Agent documentation
+                {t('eaSecondBrainModule.needHelpLink')}
               </a>
               .
             </p>
@@ -148,6 +158,7 @@ const Settings = () => {
 };
 
 const IntegrationStatus = ({ name, icon, configured }) => {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
       <div className="flex items-center space-x-3">
@@ -161,7 +172,7 @@ const IntegrationStatus = ({ name, icon, configured }) => {
             : 'bg-gray-200 text-gray-600'
         }`}
       >
-        {configured ? '✓ Configured' : 'Not Configured'}
+        {configured ? t('eaSecondBrainModule.configured') : t('eaSecondBrainModule.notConfigured')}
       </span>
     </div>
   );
@@ -180,4 +191,3 @@ const PolicyItem = ({ label, value, description }) => {
 };
 
 export default Settings;
-

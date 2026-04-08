@@ -122,7 +122,7 @@ const getNavItems = (t) => [
   ]},
 
   // Nuevo grupo: Future Item Agents (prototipos)
-  { key: "future-item-agents", label: "Future Item Agents", icon: "rocket", group: "learning", isExpandable: true, subItems: [
+  { key: "future-item-agents", label: t('sidebar.futureItemAgents'), icon: "rocket", group: "learning", isExpandable: true, subItems: [
     { key: "ea-second-brain", label: t('sidebar.eaSecondBrain'), icon: "brain" },
     { key: "sales-assistant", label: t('sidebar.salesAssistant'), icon: "briefcase" },
     { key: "personal-attention-agent", label: t('sidebar.personalAttentionAgent'), icon: "target" },
@@ -143,8 +143,8 @@ const getNavItems = (t) => [
     { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
     { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" },
-    { key: "readme-viewer", label: "Readme", icon: "doc" },
-    { key: "agi-progress", label: "AGI Progress", icon: "chart" }
+    { key: "readme-viewer", label: t('sidebar.readmeViewer'), icon: "doc" },
+    { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "chart" }
   ]},
   
   // Grupo 3: Herramientas de desarrollo (fondo azul)

@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Overview from './ea-agent/Overview';
 import Insights from './ea-agent/Insights';
 import Runs from './ea-agent/Runs';
 import Settings from './ea-agent/Settings';
 
 const EASecondBrain = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '🏠' },
-    { id: 'insights', label: 'Insights', icon: '💡' },
-    { id: 'runs', label: 'Runs', icon: '▶️' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'overview', label: t('eaSecondBrainModule.tabOverview'), icon: '🏠' },
+    { id: 'insights', label: t('eaSecondBrainModule.tabInsights'), icon: '💡' },
+    { id: 'runs', label: t('eaSecondBrainModule.tabRuns'), icon: '▶️' },
+    { id: 'settings', label: t('eaSecondBrainModule.tabSettings'), icon: '⚙️' },
   ];
 
   const renderContent = () => {
@@ -37,10 +39,10 @@ const EASecondBrain = () => {
           <div className="text-5xl">🧠</div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              EA Second Brain Agent
+              {t('eaSecondBrainModule.title')}
             </h1>
             <p className="text-sm text-gray-600 mt-1">
-              Ketil's 24/7 Enterprise Architecture watcher for Norwegian
+              {t('eaSecondBrainModule.tagline')}
             </p>
           </div>
         </div>
