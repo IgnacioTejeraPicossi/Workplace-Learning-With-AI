@@ -1,0 +1,96 @@
+{
+  "salesAssistantModule": {
+    "title": "Salgsassistent-agent",
+    "tagline": "Pipeline-hygiene, risikovurdering av avtaler og kontekstuelle oppfølgingsutkast",
+    "description": "Pipeline-hygiene, risikovurdering av avtaler og kontekstuelle oppfølgingsutkast for Amelie Tique (Yara International). Automatiserer CRM-oppdateringer, lager oppfølgings-e-poster og gir intelligent innsikt i hvordan avtaler utvikler seg.",
+    "tabOverview": "Oversikt",
+    "tabHygiene": "Hygiene",
+    "tabDeals": "Avtaler",
+    "tabRuns": "Kjøringer",
+    "tabSettings": "Innstillinger",
+    "statsTotalRuns": "Kjøringer totalt",
+    "statsSuccessRate": "Suksessrate",
+    "statsCapabilities": "Muligheter",
+    "capabilitiesHeading": "Muligheter",
+    "dataSourcesHeading": "Datakilder",
+    "internalHeading": "Internt",
+    "externalHeading": "Eksternt",
+    "keyFeaturesHeading": "Nøkkelfunksjoner",
+    "mcpHeading": "Model Context Protocol (MCP)",
+    "mcpSupportText": "Denne agenten støtter MCP for standardisert verktøykjøring",
+    "sourcesInternal": [
+      "CRM-muligheter",
+      "E-postaktivitet",
+      "Kalenderhendelser",
+      "Møtetranskripsjoner"
+    ],
+    "sourcesExternal": [
+      "Kundekommunikasjon",
+      "Markedsignaler",
+      "Konkurranseintelligens"
+    ],
+    "features": [
+      "Proaktive CRM-oppdateringer basert på e-post/kalenderaktivitet",
+      "Flagging av avtaler med høy risiko/høyt potensial",
+      "Kontekstuelle utkast til oppfølgings-e-poster",
+      "Overvåking av pipeline-hygiene og automatiske rettinger",
+      "Slack-varsler for kritiske avtaler",
+      "Analyse av møteutfall og neste steg",
+      "Scoring og varsler for avansement av avtaler"
+    ],
+    "hygieneTitle": "Pipeline-hygiene",
+    "hygieneLoading": "Laster hygieneproblemer …",
+    "hygieneMissing": "Mangler",
+    "hygieneScore": "Hygiene-poengsum",
+    "hygieneOwner": "Eier",
+    "hygieneStage": "Fase",
+    "riskHigh": "Høy risiko",
+    "riskMedium": "Middels risiko",
+    "riskLow": "Lav risiko",
+    "missingField": {
+      "closeDate": "Lukkedato",
+      "nextActivity": "Neste aktivitet",
+      "amount": "Beløp"
+    },
+    "stage": {
+      "qualification": "Kvalifisering",
+      "proposal": "Tilbud",
+      "poc": "POC"
+    },
+    "dealsTitle": "Aktive avtaler",
+    "dealsLoading": "Laster avtaler …",
+    "thDeal": "Avtale",
+    "thAmount": "Beløp",
+    "thStage": "Fase",
+    "thRisk": "Risiko",
+    "thNextStep": "Neste steg",
+    "riskLevel": {
+      "high": "Høy",
+      "medium": "Middels",
+      "low": "Lav"
+    },
+    "dealName": {
+      "acmeRenewal": "ACME-fornyelse",
+      "betaExpansion": "Beta-utvidelse",
+      "gammaPoc": "Gamma-POC"
+    },
+    "dealNext": {
+      "execReview": "Planlegg ledelsesgjennomgang",
+      "pricing": "Send prisalternativer",
+      "successCriteria": "Bekreft suksesskriterier"
+    },
+    "runsTitle": "Agentkjøringer",
+    "runsLoading": "Laster kjøringer …",
+    "runsEmpty": "Ingen kjøringer ennå",
+    "thRunId": "Kjøre-ID",
+    "thStatus": "Status",
+    "thCreated": "Opprettet",
+    "thError": "Feil",
+    "settingsTitle": "Agentinnstillinger",
+    "fieldDefaultOwner": "Standard eier (e-post)",
+    "fieldSlackChannel": "Slack-kanal",
+    "fieldHygieneThreshold": "Hygiene-terskel (%)",
+    "save": "Lagre",
+    "settingsSavedMock": "Innstillinger lagret (demo)."
+  }
+}

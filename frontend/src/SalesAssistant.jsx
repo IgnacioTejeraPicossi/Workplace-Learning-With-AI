@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Overview from './sales-agent/Overview';
 import Hygiene from './sales-agent/Hygiene';
 import Deals from './sales-agent/Deals';
@@ -6,14 +7,15 @@ import Runs from './sales-agent/Runs';
 import Settings from './sales-agent/Settings';
 
 const SalesAssistant = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '🏠' },
-    { id: 'hygiene', label: 'Hygiene', icon: '🧹' },
-    { id: 'deals', label: 'Deals', icon: '💼' },
-    { id: 'runs', label: 'Runs', icon: '▶️' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'overview', label: t('salesAssistantModule.tabOverview'), icon: '🏠' },
+    { id: 'hygiene', label: t('salesAssistantModule.tabHygiene'), icon: '🧹' },
+    { id: 'deals', label: t('salesAssistantModule.tabDeals'), icon: '💼' },
+    { id: 'runs', label: t('salesAssistantModule.tabRuns'), icon: '▶️' },
+    { id: 'settings', label: t('salesAssistantModule.tabSettings'), icon: '⚙️' },
   ];
 
   const renderContent = () => {
@@ -41,10 +43,10 @@ const SalesAssistant = () => {
           <div className="text-5xl">💼</div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Sales Assistant Agent
+              {t('salesAssistantModule.title')}
             </h1>
             <p className="text-sm text-gray-600 mt-1">
-              Pipeline hygiene, deal risk scoring, and contextual follow-up drafts
+              {t('salesAssistantModule.tagline')}
             </p>
           </div>
         </div>

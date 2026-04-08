@@ -1,0 +1,96 @@
+{
+  "salesAssistantModule": {
+    "title": "Sales Assistant Agent",
+    "tagline": "Pipeline hygiene, deal risk scoring, and contextual follow-up drafts",
+    "description": "Pipeline hygiene, deal risk scoring, and contextual follow-up drafts for Amelie Tique (Yara International). Automates CRM updates, creates follow-up emails, and provides intelligent deal progression insights.",
+    "tabOverview": "Overview",
+    "tabHygiene": "Hygiene",
+    "tabDeals": "Deals",
+    "tabRuns": "Runs",
+    "tabSettings": "Settings",
+    "statsTotalRuns": "Total Runs",
+    "statsSuccessRate": "Success Rate",
+    "statsCapabilities": "Capabilities",
+    "capabilitiesHeading": "Capabilities",
+    "dataSourcesHeading": "Data Sources",
+    "internalHeading": "Internal",
+    "externalHeading": "External",
+    "keyFeaturesHeading": "Key Features",
+    "mcpHeading": "Model Context Protocol (MCP)",
+    "mcpSupportText": "This agent supports MCP for standardized tool execution",
+    "sourcesInternal": [
+      "CRM Opportunities",
+      "Email Activity",
+      "Calendar Events",
+      "Meeting Transcripts"
+    ],
+    "sourcesExternal": [
+      "Customer Communication",
+      "Market Signals",
+      "Competitive Intelligence"
+    ],
+    "features": [
+      "Proactive CRM updates based on email/calendar activity",
+      "High-risk/high-potential deal flagging",
+      "Contextual follow-up email drafts",
+      "Pipeline hygiene monitoring and auto-fixes",
+      "Slack notifications for critical deals",
+      "Meeting outcome analysis and next steps",
+      "Deal progression scoring and alerts"
+    ],
+    "hygieneTitle": "Pipeline Hygiene",
+    "hygieneLoading": "Loading hygiene issues…",
+    "hygieneMissing": "Missing",
+    "hygieneScore": "Hygiene Score",
+    "hygieneOwner": "Owner",
+    "hygieneStage": "Stage",
+    "riskHigh": "High Risk",
+    "riskMedium": "Medium Risk",
+    "riskLow": "Low Risk",
+    "missingField": {
+      "closeDate": "Close Date",
+      "nextActivity": "Next Activity",
+      "amount": "Amount"
+    },
+    "stage": {
+      "qualification": "Qualification",
+      "proposal": "Proposal",
+      "poc": "POC"
+    },
+    "dealsTitle": "Active Deals",
+    "dealsLoading": "Loading deals…",
+    "thDeal": "Deal",
+    "thAmount": "Amount",
+    "thStage": "Stage",
+    "thRisk": "Risk",
+    "thNextStep": "Next Step",
+    "riskLevel": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "dealName": {
+      "acmeRenewal": "ACME Renewal",
+      "betaExpansion": "Beta Expansion",
+      "gammaPoc": "Gamma POC"
+    },
+    "dealNext": {
+      "execReview": "Schedule exec review",
+      "pricing": "Send pricing options",
+      "successCriteria": "Confirm success criteria"
+    },
+    "runsTitle": "Agent Runs",
+    "runsLoading": "Loading runs…",
+    "runsEmpty": "No runs yet",
+    "thRunId": "Run ID",
+    "thStatus": "Status",
+    "thCreated": "Created",
+    "thError": "Error",
+    "settingsTitle": "Agent Settings",
+    "fieldDefaultOwner": "Default Owner (emails)",
+    "fieldSlackChannel": "Slack Channel",
+    "fieldHygieneThreshold": "Hygiene Threshold (%)",
+    "save": "Save",
+    "settingsSavedMock": "Settings saved (mock)."
+  }
+}
