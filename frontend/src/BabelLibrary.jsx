@@ -63,6 +63,10 @@ const BabelLibrary = () => {
   const [learningPath, setLearningPath] = useState(null);
   const [pathLoading, setPathLoading] = useState(false);
   const [pathGoal, setPathGoal] = useState('');
+  // Phase 3: AI Content
+  const [expandedContent, setExpandedContent] = useState({}); // { resourceKey: true/false }
+  const [contentBatchStatus, setContentBatchStatus] = useState(null);
+  const [shownAnswers, setShownAnswers] = useState({}); // { resourceKey_qtype: true/false }
   const { t } = useTranslation();
 
   const getUserId = () => {
@@ -76,6 +80,189 @@ const BabelLibrary = () => {
       user_id: userId, resource_id: String(resourceId),
       resource_type: resourceType, action, ...extra
     }).catch(() => {});
+  };
+
+  // Phase 3: render AI Content panel for a resource
+  const toggleContent = (key) => setExpandedContent(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleAnswer = (key) => setShownAnswers(prev => ({ ...prev, [key]: !prev[key] }));
+
+  const renderAiContentPanel = (resource, resourceKey) => {
+    const hasSummary = resource.summary;
+    const hasQuestions = resource.questions;
+    const hasHints = resource.adaptive_hints;
+    if (!hasSummary && !hasQuestions && !hasHints) return null;
+
+    const isOpen = expandedContent[resourceKey];
+    const diffColor = (d) => d === 'beginner' ? '#2e7d32' : d === 'advanced' ? '#c62828' : '#f57f17';
+
+    return (
+      <div style={{ marginTop: 8 }}>
+        <button
+          onClick={() => toggleContent(resourceKey)}
+          style={{
+            background: isOpen ? '#e8eaf6' : 'transparent',
+            border: `1px solid ${isOpen ? '#3f51b5' : colors.border}`,
+            borderRadius: 8, padding: '4px 12px', cursor: 'pointer',
+            fontSize: '0.8em', color: isOpen ? '#3f51b5' : colors.textSecondary,
+            fontWeight: isOpen ? 600 : 400
+          }}
+        >
+          {t('babelLibraryModule.aiContent.toggle')} {isOpen ? '▲' : '▼'}
+        </button>
+
+        {isOpen && (
+          <div style={{ marginTop: 8, padding: 12, background: colors.primaryLight || '#f5f5f5', borderRadius: 10, fontSize: '0.85em' }}>
+            {/* Summary */}
+            {hasSummary && (
+              <div style={{ marginBottom: 12 }}>
+                <strong>📋 {t('babelLibraryModule.aiContent.summaryTitle')}</strong>
+                <p style={{ margin: '4px 0', lineHeight: 1.5 }}>{resource.summary.short}</p>
+                {resource.summary.key_points?.length > 0 && (
+                  <div>
+                    <em style={{ color: colors.textSecondary }}>{t('babelLibraryModule.aiContent.keyPoints')}:</em>
+                    <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
+                      {resource.summary.key_points.map((p, i) => <li key={i}>{p}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Questions */}
+            {hasQuestions && (
+              <div style={{ marginBottom: 12 }}>
+                <strong>❓ {t('babelLibraryModule.aiContent.questionsTitle')}</strong>
+
+                {/* Multiple choice */}
+                {resource.questions.multiple_choice && (
+                  <div style={{ margin: '8px 0', padding: 10, background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}` }}>
+                    <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                      {t('babelLibraryModule.aiContent.multipleChoice')}
+                      <span style={{ fontSize: '0.8em', color: diffColor(resource.questions.multiple_choice.difficulty), marginLeft: 6 }}>
+                        ({t(`babelLibraryModule.intelligence.${resource.questions.multiple_choice.difficulty}`)})
+                      </span>
+                    </div>
+                    <p style={{ margin: '4px 0' }}>{resource.questions.multiple_choice.question}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+                      {resource.questions.multiple_choice.options.map((opt, i) => (
+                        <div key={i} style={{
+                          padding: '4px 8px', borderRadius: 6,
+                          background: shownAnswers[`${resourceKey}_mc`] && opt.startsWith(resource.questions.multiple_choice.correct_answer) ? '#e8f5e9' : 'transparent',
+                          border: `1px solid ${colors.border}`
+                        }}>
+                          {opt}
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={() => toggleAnswer(`${resourceKey}_mc`)} style={{
+                      marginTop: 6, background: 'none', border: 'none', color: colors.primary,
+                      cursor: 'pointer', fontSize: '0.85em', textDecoration: 'underline'
+                    }}>
+                      {shownAnswers[`${resourceKey}_mc`] ? t('babelLibraryModule.aiContent.hideAnswer') : t('babelLibraryModule.aiContent.showAnswer')}
+                    </button>
+                    {shownAnswers[`${resourceKey}_mc`] && (
+                      <div style={{ marginTop: 4, fontWeight: 500, color: '#2e7d32' }}>
+                        ✅ {resource.questions.multiple_choice.correct_answer}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* True/False */}
+                {resource.questions.true_false && (
+                  <div style={{ margin: '8px 0', padding: 10, background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}` }}>
+                    <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                      {t('babelLibraryModule.aiContent.trueFalse')}
+                      <span style={{ fontSize: '0.8em', color: diffColor(resource.questions.true_false.difficulty), marginLeft: 6 }}>
+                        ({t(`babelLibraryModule.intelligence.${resource.questions.true_false.difficulty}`)})
+                      </span>
+                    </div>
+                    <p style={{ margin: '4px 0' }}>{resource.questions.true_false.question}</p>
+                    <button onClick={() => toggleAnswer(`${resourceKey}_tf`)} style={{
+                      marginTop: 4, background: 'none', border: 'none', color: colors.primary,
+                      cursor: 'pointer', fontSize: '0.85em', textDecoration: 'underline'
+                    }}>
+                      {shownAnswers[`${resourceKey}_tf`] ? t('babelLibraryModule.aiContent.hideAnswer') : t('babelLibraryModule.aiContent.showAnswer')}
+                    </button>
+                    {shownAnswers[`${resourceKey}_tf`] && (
+                      <div style={{ marginTop: 4 }}>
+                        <span style={{ fontWeight: 500, color: resource.questions.true_false.answer ? '#2e7d32' : '#c62828' }}>
+                          {resource.questions.true_false.answer ? `✅ ${t('babelLibraryModule.aiContent.true')}` : `❌ ${t('babelLibraryModule.aiContent.false')}`}
+                        </span>
+                        {resource.questions.true_false.explanation && (
+                          <div style={{ marginTop: 4, color: colors.textSecondary, fontSize: '0.9em' }}>
+                            💡 {t('babelLibraryModule.aiContent.explanation')}: {resource.questions.true_false.explanation}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Open-ended */}
+                {resource.questions.open_ended && (
+                  <div style={{ margin: '8px 0', padding: 10, background: colors.background, borderRadius: 8, border: `1px solid ${colors.border}` }}>
+                    <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                      {t('babelLibraryModule.aiContent.openEnded')}
+                      <span style={{ fontSize: '0.8em', color: diffColor(resource.questions.open_ended.difficulty), marginLeft: 6 }}>
+                        ({t(`babelLibraryModule.intelligence.${resource.questions.open_ended.difficulty}`)})
+                      </span>
+                    </div>
+                    <p style={{ margin: '4px 0' }}>{resource.questions.open_ended.question}</p>
+                    <button onClick={() => toggleAnswer(`${resourceKey}_oe`)} style={{
+                      marginTop: 4, background: 'none', border: 'none', color: colors.primary,
+                      cursor: 'pointer', fontSize: '0.85em', textDecoration: 'underline'
+                    }}>
+                      {shownAnswers[`${resourceKey}_oe`] ? t('babelLibraryModule.aiContent.hideAnswer') : t('babelLibraryModule.aiContent.showAnswer')}
+                    </button>
+                    {shownAnswers[`${resourceKey}_oe`] && resource.questions.open_ended.suggested_answer_points?.length > 0 && (
+                      <div style={{ marginTop: 4, color: colors.textSecondary, fontSize: '0.9em' }}>
+                        💡 {t('babelLibraryModule.aiContent.keyPointsToConsider')}:
+                        <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
+                          {resource.questions.open_ended.suggested_answer_points.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Adaptive Hints */}
+            {hasHints && (
+              <div>
+                <strong>💡 {t('babelLibraryModule.aiContent.hintsTitle')}</strong>
+                {resource.adaptive_hints.approach && (
+                  <div style={{ margin: '6px 0' }}>
+                    <em>{t('babelLibraryModule.aiContent.approach')}:</em> {resource.adaptive_hints.approach}
+                  </div>
+                )}
+                {resource.adaptive_hints.prerequisites?.length > 0 && (
+                  <div style={{ margin: '6px 0' }}>
+                    <em>{t('babelLibraryModule.aiContent.prerequisites')}:</em>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                      {resource.adaptive_hints.prerequisites.map((p, i) => (
+                        <span key={i} style={{ background: '#fff3e0', color: '#e65100', padding: '2px 8px', borderRadius: 10, fontSize: '0.8em' }}>{p}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {resource.adaptive_hints.next_steps?.length > 0 && (
+                  <div style={{ margin: '6px 0' }}>
+                    <em>{t('babelLibraryModule.aiContent.nextSteps')}:</em>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                      {resource.adaptive_hints.next_steps.map((n, i) => (
+                        <span key={i} style={{ background: '#e3f2fd', color: '#1565c0', padding: '2px 8px', borderRadius: 10, fontSize: '0.8em' }}>{n}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const typeLabel = (type) => t(`babelLibraryModule.types.${type}`, { defaultValue: type });
@@ -1823,6 +2010,9 @@ const BabelLibrary = () => {
                     </div>
                   </div>
                   
+                  {/* Phase 3: AI Content panel */}
+                  {renderAiContentPanel(resource, `catalog-${resource.id}`)}
+
                   <div style={{
                     marginTop: 12,
                     fontSize: '0.8em',
@@ -2748,6 +2938,8 @@ const BabelLibrary = () => {
                         <p style={{ fontSize: '0.9em', color: colors.text, margin: 0, lineHeight: 1.5 }}>
                           {resource.description}
                         </p>
+                        {/* Phase 3: AI Content panel */}
+                        {renderAiContentPanel(resource, `ai-${resource.id || index}`)}
                         {resource.addedDate && (
                           <div style={{ fontSize: '0.8em', color: colors.textSecondary, marginTop: 'auto' }}>
                             📅 {t('babelLibraryModule.catalog.addedPrefix', { date: resource.addedDate })}
@@ -2970,6 +3162,41 @@ const BabelLibrary = () => {
                   >
                     {batchStatus?.running ? `⏳ ${t('babelLibraryModule.intelligence.processing')}` : `🧠 ${t('babelLibraryModule.intelligence.classifyAll')}`}
                   </button>
+                  {/* Phase 3: Content generation batch button */}
+                  <button
+                    onClick={async () => {
+                      try {
+                        setContentBatchStatus({ running: true, total: 0, processed: 0, failed: 0 });
+                        await apiCall('/api/babel/intelligence/generate-content/batch', 'POST', { delay: 1.0 });
+                        const poll = setInterval(async () => {
+                          try {
+                            const status = await apiCall('/api/babel/intelligence/generate-content/batch/status');
+                            setContentBatchStatus(status);
+                            if (!status.running) {
+                              clearInterval(poll);
+                              const stats = await apiCall('/api/babel/intelligence/stats');
+                              setIntelStats(stats);
+                            }
+                          } catch { clearInterval(poll); }
+                        }, 3000);
+                      } catch (err) {
+                        console.error('Content batch failed:', err);
+                        setContentBatchStatus(null);
+                      }
+                    }}
+                    disabled={contentBatchStatus?.running}
+                    style={{
+                      padding: '10px 20px',
+                      background: contentBatchStatus?.running ? '#ccc' : '#7b1fa2',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: contentBatchStatus?.running ? 'not-allowed' : 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {contentBatchStatus?.running ? `⏳ ${t('babelLibraryModule.intelligence.generatingContent')}` : `⚡ ${t('babelLibraryModule.intelligence.generateContent')}`}
+                  </button>
                   <button
                     onClick={async () => {
                       try {
@@ -3015,6 +3242,30 @@ const BabelLibrary = () => {
                   </div>
                 )}
 
+                {/* Phase 3: Content batch progress */}
+                {contentBatchStatus?.running && contentBatchStatus.total > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ background: '#e0e0e0', borderRadius: 8, height: 8, overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${Math.round((contentBatchStatus.processed + contentBatchStatus.failed) / contentBatchStatus.total * 100)}%`,
+                        background: '#7b1fa2',
+                        height: '100%',
+                        borderRadius: 8,
+                        transition: 'width 0.3s'
+                      }} />
+                    </div>
+                    <div style={{ fontSize: '0.8em', color: colors.textSecondary, marginTop: 4 }}>
+                      ⚡ {contentBatchStatus.processed + contentBatchStatus.failed} / {contentBatchStatus.total} — {t('babelLibraryModule.intelligence.processed')}: {contentBatchStatus.processed}, {t('babelLibraryModule.intelligence.failed')}: {contentBatchStatus.failed}
+                    </div>
+                  </div>
+                )}
+
+                {contentBatchStatus && !contentBatchStatus.running && contentBatchStatus.processed > 0 && (
+                  <div style={{ marginTop: 12, padding: 12, background: '#f3e5f5', borderRadius: 8, fontSize: '0.9em', color: '#7b1fa2' }}>
+                    ✅ {t('babelLibraryModule.intelligence.contentBatchComplete', { processed: contentBatchStatus.processed, failed: contentBatchStatus.failed })}
+                  </div>
+                )}
+
                 {/* Stats */}
                 {intelStats && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginTop: 16 }}>
@@ -3022,6 +3273,7 @@ const BabelLibrary = () => {
                       { label: t('babelLibraryModule.intelligence.totalIndexed'), value: intelStats.total_metadata, icon: '📚' },
                       { label: t('babelLibraryModule.intelligence.llmClassified'), value: intelStats.llm_classified, icon: '🧠' },
                       { label: t('babelLibraryModule.intelligence.embedded'), value: intelStats.embedded, icon: '🔢' },
+                      { label: t('babelLibraryModule.intelligence.contentGenerated'), value: intelStats.content_generated, icon: '⚡' },
                       { label: t('babelLibraryModule.intelligence.pending'), value: intelStats.pending_classification, icon: '⏳' }
                     ].map((s, i) => (
                       <div key={i} style={{ textAlign: 'center', padding: 12, background: colors.primaryLight || '#e3f2fd', borderRadius: 8 }}>

@@ -32,7 +32,9 @@
       "Bash(grep -l \"from.*llm import\\\\|import.*llm\\\\|ask_openai\\\\|ask_itemai\" /c/Test/AI/AI Learning with AI/backend/*.py)",
       "Bash(grep -n \"ask_openai\\\\|ask_ai\\\\|llm\\\\|LLM\" clinic/*.py)",
       "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(''Router imported OK, routes:'', [r.path for r in router.routes]\\)\")",
-      "Bash(python -c \"from backend.services.babel_intelligence import classify_and_tag, hybrid_search, process_all_resources, get_stats; print\\(''Service imported OK''\\)\")"
+      "Bash(python -c \"from backend.services.babel_intelligence import classify_and_tag, hybrid_search, process_all_resources, get_stats; print\\(''Service imported OK''\\)\")",
+      "Bash(python -c \"from backend.services.babel_intelligence import generate_content, process_content_for_resource, generate_all_content, get_content_batch_status; print\\(''Service imports OK''\\)\")",
+      "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(f''Router OK — {len\\(router.routes\\)} routes''\\)\")"
     ]
   }
 }
