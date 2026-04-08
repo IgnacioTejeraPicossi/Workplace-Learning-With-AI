@@ -37,7 +37,9 @@
       "Bash(python -c \"from backend.routers.babel_intelligence import router; print\\(f''Router OK — {len\\(router.routes\\)} routes''\\)\")",
       "Bash(ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\backend\\\\services\\\\babel_\"*)",
       "Bash(python -c \"from backend.services.babel_predictive import get_predictive_dashboard; print\\(''Predictive service OK''\\)\")",
-      "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI' -maxdepth 3 -iname README* -not -path */node_modules/* -not -path */.venv/*)"
+      "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI' -maxdepth 3 -iname README* -not -path */node_modules/* -not -path */.venv/*)",
+      "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\backend' -type f -name *test*)",
+      "Bash(python -c \"from backend.routers.babel_intelligence import router; from backend.routers.learning_profile import router as lr; print\\(f''Intelligence: {len\\(router.routes\\)} routes, Profile: {len\\(lr.routes\\)} routes''\\)\")"
     ]
   }
 }

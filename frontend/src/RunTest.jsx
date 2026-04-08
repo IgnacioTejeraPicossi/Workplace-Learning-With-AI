@@ -488,6 +488,32 @@ const RunTest = () => {
           { name: 'GET /api/clinic/disorders', endpoint: '/api/clinic/disorders', method: 'GET', requiresAuth: false },
           { name: 'GET /api/clinic/therapy-patches', endpoint: '/api/clinic/therapy-patches', method: 'GET', requiresAuth: false },
           { name: 'POST /api/clinic/diagnose', endpoint: '/api/clinic/diagnose', method: 'POST', requiresAuth: false },
+
+          // Babel Library Intelligence — Phase 1 (Classification & Search)
+          { name: 'GET /api/babel/intelligence/stats', endpoint: '/api/babel/intelligence/stats', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/intelligence/batch/status', endpoint: '/api/babel/intelligence/batch/status', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/babel/intelligence/classify', endpoint: '/api/babel/intelligence/classify', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/babel/intelligence/search', endpoint: '/api/babel/intelligence/search', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/babel/intelligence/batch', endpoint: '/api/babel/intelligence/batch', method: 'POST', requiresAuth: false },
+
+          // Babel Library Intelligence — Phase 3 (Content Generation)
+          { name: 'GET /api/babel/intelligence/generate-content/batch/status', endpoint: '/api/babel/intelligence/generate-content/batch/status', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/babel/intelligence/generate-content', endpoint: '/api/babel/intelligence/generate-content', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/babel/intelligence/generate-content/batch', endpoint: '/api/babel/intelligence/generate-content/batch', method: 'POST', requiresAuth: false },
+
+          // Babel Library Intelligence — Phase 4 (Predictive Intelligence)
+          { name: 'GET /api/babel/intelligence/predictive/trends', endpoint: '/api/babel/intelligence/predictive/trends', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/intelligence/predictive/demand', endpoint: '/api/babel/intelligence/predictive/demand', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/intelligence/predictive/gaps', endpoint: '/api/babel/intelligence/predictive/gaps', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/intelligence/predictive/expertise', endpoint: '/api/babel/intelligence/predictive/expertise', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/intelligence/predictive/dashboard', endpoint: '/api/babel/intelligence/predictive/dashboard', method: 'GET', requiresAuth: false },
+
+          // Babel Library — Phase 2 (Learning Profiles & Recommendations)
+          { name: 'POST /api/babel/profile/interaction', endpoint: '/api/babel/profile/interaction', method: 'POST', requiresAuth: false },
+          { name: 'POST /api/babel/profile/search', endpoint: '/api/babel/profile/search', method: 'POST', requiresAuth: false },
+          { name: 'GET /api/babel/profile/{user_id}/summary', endpoint: '/api/babel/profile/test-user/summary', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/babel/profile/{user_id}/recommendations', endpoint: '/api/babel/profile/test-user/recommendations', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/babel/profile/{user_id}/learning-path', endpoint: '/api/babel/profile/test-user/learning-path', method: 'POST', requiresAuth: false },
     ];
 
     const results = [];
@@ -1227,6 +1253,56 @@ const RunTest = () => {
                   { role: 'assistant', content: 'Paris.' }
                 ],
                 meta: {}
+              };
+              break;
+            // Babel Library Intelligence — Phase 1
+            case '/api/babel/intelligence/classify':
+              testData = {
+                title: 'Introduction to Machine Learning',
+                description: 'A beginner-friendly overview of ML algorithms and applications.',
+                resource_type: 'article'
+              };
+              break;
+            case '/api/babel/intelligence/search':
+              testData = {
+                query: 'machine learning',
+                limit: 5,
+                mode: 'hybrid'
+              };
+              break;
+            case '/api/babel/intelligence/batch':
+              testData = { delay: 0.3 };
+              break;
+            // Babel Library Intelligence — Phase 3
+            case '/api/babel/intelligence/generate-content':
+              testData = {
+                resource_id: 'test-resource-id',
+                resource_type: 'article'
+              };
+              break;
+            case '/api/babel/intelligence/generate-content/batch':
+              testData = { delay: 1.0 };
+              break;
+            // Babel Library — Phase 2
+            case '/api/babel/profile/interaction':
+              testData = {
+                user_id: 'test-user',
+                resource_id: 'test-resource-1',
+                resource_type: 'article',
+                action: 'view',
+                topic: 'AI & Machine Learning'
+              };
+              break;
+            case '/api/babel/profile/search':
+              testData = {
+                user_id: 'test-user',
+                query: 'machine learning basics'
+              };
+              break;
+            case '/api/babel/profile/test-user/learning-path':
+              testData = {
+                goal_topic: 'machine learning',
+                max_steps: 5
               };
               break;
             default:
