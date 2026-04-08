@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import AgentOpsRuns from '../components/AgentOpsRuns';
+import { useTranslation } from 'react-i18next';
 
 const Runs = () => {
+  const { t, i18n } = useTranslation();
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const dateLocale = i18n.language?.startsWith('no') ? 'nb-NO' : 'en-US';
 
   useEffect(() => {
     loadRuns();
@@ -23,6 +26,9 @@ const Runs = () => {
     }
   };
 
+  const formatRunStatus = (status) =>
+    t(`councilAgentModule.runStatus.${status}`, { defaultValue: status });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -32,34 +38,33 @@ const Runs = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Council Runs</h2>
-          <p className="text-gray-600">Monitor deliberation executions and audit trails</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('councilAgentModule.runsTitle')}</h2>
+          <p className="text-gray-600">{t('councilAgentModule.runsSubtitle')}</p>
         </div>
         <button
+          type="button"
           onClick={loadRuns}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
         >
-          Refresh
+          {t('councilAgentModule.refresh')}
         </button>
       </div>
 
-      {/* Runs Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Run ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attestation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thRunId')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thTopic')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thStatus')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thPersonas')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thCreated')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thAttestation')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('councilAgentModule.thActions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -70,8 +75,8 @@ const Runs = () => {
                       <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <p>No Council runs found</p>
-                      <p className="text-sm">Run a deliberation to see results here</p>
+                      <p>{t('councilAgentModule.runsEmpty')}</p>
+                      <p className="text-sm">{t('councilAgentModule.runsEmptyHint')}</p>
                     </div>
                   </td>
                 </tr>
@@ -85,7 +90,7 @@ const Runs = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {run.bundle?.topic || 'Unknown topic'}
+                        {run.bundle?.topic || t('councilAgentModule.unknownTopic')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -95,16 +100,16 @@ const Runs = () => {
                         run.status === 'FAILED' ? 'bg-red-100 text-red-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
-                        {run.status}
+                        {formatRunStatus(run.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {run.bundle?.personas?.length || 0} personas
+                        {t('councilAgentModule.personasCount', { count: run.bundle?.personas?.length || 0 })}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {run.created_at ? new Date(run.created_at).toLocaleDateString() : 'Unknown'}
+                      {run.created_at ? new Date(run.created_at).toLocaleDateString(dateLocale) : t('councilAgentModule.unknownDate')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {run.attestation_hash ? (
@@ -116,8 +121,8 @@ const Runs = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-purple-600 hover:text-purple-900">
-                        View Details
+                      <button type="button" className="text-purple-600 hover:text-purple-900">
+                        {t('councilAgentModule.viewDetails')}
                       </button>
                     </td>
                   </tr>
@@ -128,7 +133,6 @@ const Runs = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center">
@@ -136,47 +140,47 @@ const Runs = () => {
               <span className="text-purple-600 text-sm">🏛️</span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Total Runs</p>
+              <p className="text-sm font-medium text-gray-600">{t('councilAgentModule.totalRuns')}</p>
               <p className="text-lg font-semibold text-gray-900">{runs.length}</p>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <span className="text-green-600 text-sm">✅</span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Completed</p>
+              <p className="text-sm font-medium text-gray-600">{t('councilAgentModule.completed')}</p>
               <p className="text-lg font-semibold text-gray-900">
                 {runs.filter(r => r.status === 'DONE').length}
               </p>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <span className="text-blue-600 text-sm">🏃</span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Running</p>
+              <p className="text-sm font-medium text-gray-600">{t('councilAgentModule.running')}</p>
               <p className="text-lg font-semibold text-gray-900">
                 {runs.filter(r => r.status === 'RUNNING').length}
               </p>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
               <span className="text-red-600 text-sm">❌</span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Failed</p>
+              <p className="text-sm font-medium text-gray-600">{t('councilAgentModule.failed')}</p>
               <p className="text-lg font-semibold text-gray-900">
                 {runs.filter(r => r.status === 'FAILED').length}
               </p>
