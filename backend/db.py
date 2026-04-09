@@ -56,3 +56,9 @@ babel_ai_metadata_collection = database.get_collection("babel_ai_metadata")
 
 # Learning Profiles (Phase 2)
 learning_profiles_collection = database.get_collection("learning_profiles")
+
+# ATM V&V Test Copilot Collections
+atm_requirement_bundles_collection = database.get_collection("atm_requirement_bundles")
+atm_test_designs_collection = database.get_collection("atm_test_designs")
+atm_scenario_matrices_collection = database.get_collection("atm_scenario_matrices")
+atm_test_runs_collection = database.get_collection("atm_test_runs")

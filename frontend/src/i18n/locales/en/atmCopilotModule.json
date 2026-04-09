@@ -1,0 +1,133 @@
+{
+  "atmCopilotModule": {
+    "title": "ATM V&V Test Copilot",
+    "tagline": "AI-powered testing copilot for safety-critical ATM/ATC verification & validation",
+    "tabOverview": "Overview",
+    "tabRequirementLab": "Requirement Lab",
+    "tabScenarioBuilder": "Scenario Builder",
+    "tabRunAnalyzer": "Run Analyzer",
+
+    "overview": {
+      "description": "The ATM V&V Test Copilot helps test engineers design, build, and analyze verification & validation workflows for Air Traffic Management systems. It uses AI to convert requirements into test designs, generate scenario matrices, and analyze test run failures.",
+      "backendOnline": "Backend connected",
+      "backendOffline": "Backend offline",
+      "requirements": "Requirements",
+      "testDesigns": "Test Designs",
+      "scenarioMatrices": "Scenario Matrices",
+      "testRuns": "Test Runs",
+      "quickActionsTitle": "Quick Actions",
+      "quickIngest": "Ingest Requirement",
+      "quickDesign": "Generate Test Design",
+      "quickScenario": "Build Scenario Matrix",
+      "quickAnalyze": "Analyze Test Run",
+      "scenarioCategoriesTitle": "ATM Scenario Categories"
+    },
+
+    "scenarioTypes": {
+      "conflict_detection": "Conflict Detection",
+      "sector_handover": "Sector Handover",
+      "trajectory_update": "Trajectory Update",
+      "degraded_surveillance": "Degraded Surveillance",
+      "conformance_monitoring": "Conformance Monitoring",
+      "alert_timing": "Alert Timing",
+      "contingency_fallback": "Contingency Fallback"
+    },
+
+    "sourceTypes": {
+      "requirement": "Requirement",
+      "user_story": "User Story",
+      "defect": "Defect",
+      "change_request": "Change Request",
+      "spec_excerpt": "Spec Excerpt",
+      "validation_note": "Validation Note"
+    },
+
+    "riskLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+
+    "reqLab": {
+      "ingestTitle": "Ingest Requirement",
+      "titleLabel": "Requirement Title",
+      "titlePlaceholder": "e.g. STCA alert shall trigger within 2 minutes",
+      "sourceTypeLabel": "Source Type",
+      "contentLabel": "Requirement Content",
+      "contentPlaceholder": "Paste the full requirement text, user story, or specification excerpt here...",
+      "tagsLabel": "Tags (comma-separated)",
+      "tagsPlaceholder": "e.g. STCA, conflict, safety-critical",
+      "ingestBtn": "Ingest & Normalize",
+      "ingesting": "Ingesting...",
+      "intent": "Intent",
+      "conditions": "Conditions",
+      "constraints": "Constraints",
+      "storedBundles": "Stored Requirements",
+      "noBundles": "No requirements ingested yet. Add one above.",
+      "generateDesign": "Generate Design",
+      "generatingDesign": "Generating test design with AI...",
+      "testDesignResult": "Test Design Result",
+      "assumptions": "Assumptions",
+      "positiveTests": "Positive Tests",
+      "negativeTests": "Negative Tests",
+      "edgeCases": "Edge Cases",
+      "expectedOutcome": "Expected Outcome",
+      "automationCandidates": "Automation Candidates",
+      "openQuestions": "Open Questions",
+      "recentDesigns": "Recent Test Designs"
+    },
+
+    "scenario": {
+      "configTitle": "Scenario Configuration",
+      "typeLabel": "Scenario Type",
+      "riskLabel": "Risk Level",
+      "includeEdge": "Include edge cases",
+      "includeFallbacks": "Include fallbacks",
+      "customParams": "Custom Parameters (JSON)",
+      "buildBtn": "Build Scenario Matrix",
+      "building": "Building scenario matrix...",
+      "matrixResult": "Scenario Matrix",
+      "preconditions": "Preconditions",
+      "nominal": "Nominal Scenarios",
+      "degraded": "Degraded Scenarios",
+      "edgeCases": "Edge Cases",
+      "expectedOutcome": "Expected Outcome",
+      "riskNotes": "Risk Notes",
+      "automationNotes": "Automation Notes",
+      "recentMatrices": "Recent Matrices"
+    },
+
+    "runAnalyzer": {
+      "uploadTitle": "Upload Test Run Artifacts",
+      "runIdLabel": "Run ID",
+      "runIdPlaceholder": "e.g. RUN-2026-0409-001",
+      "artifactsLabel": "Artifacts",
+      "addArtifact": "Add Artifact",
+      "artifactPlaceholder": "Paste log output, JSON results, or console output here...",
+      "analyzeBtn": "Analyze Test Run",
+      "analyzing": "Analyzing test run...",
+      "analysisResult": "Run Analysis",
+      "failureSignals": "Primary Failure Signals",
+      "rootCauses": "Probable Root Causes",
+      "affectedTests": "Affected tests",
+      "repeatedPatterns": "Repeated Patterns",
+      "affectedAreas": "Affected Areas",
+      "nextSteps": "Suggested Next Steps",
+      "regressionScope": "Suggested Regression Scope",
+      "recentAnalyses": "Recent Analyses"
+    },
+
+    "artifactTypes": {
+      "log": "Log",
+      "json": "JSON",
+      "xml": "XML",
+      "screenshot": "Screenshot",
+      "console_output": "Console Output"
+    },
+
+    "export": {
+      "markdown": "Export Markdown",
+      "json": "Export JSON"
+    }
+  }
+}

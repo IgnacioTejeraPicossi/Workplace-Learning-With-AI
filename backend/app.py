@@ -155,6 +155,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Learning Profile router: {e}")
 
+# ATM V&V Test Copilot router
+try:
+    from backend.routers.atm_copilot import router as atm_copilot_router
+    app.include_router(atm_copilot_router, tags=["ATM V&V Test Copilot"])
+    print("✅ ATM V&V Test Copilot router included successfully")
+except Exception as e:
+    print(f"❌ Error including ATM V&V Test Copilot router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router

@@ -1,0 +1,133 @@
+{
+  "atmCopilotModule": {
+    "title": "ATM V&V Testpilot",
+    "tagline": "KI-drevet testpilot for sikkerhetskritisk ATM/ATC-verifisering og -validering",
+    "tabOverview": "Oversikt",
+    "tabRequirementLab": "Kravlaboratorium",
+    "tabScenarioBuilder": "Scenariobygger",
+    "tabRunAnalyzer": "Kjoringsanalysator",
+
+    "overview": {
+      "description": "ATM V&V Testpiloten hjelper testingeniorer med a designe, bygge og analysere verifiserings- og valideringsarbeidsflyter for lufttrafikkstyringssystemer. Den bruker KI til a konvertere krav til testdesign, generere scenariomatriser og analysere testfeil.",
+      "backendOnline": "Backend tilkoblet",
+      "backendOffline": "Backend frakoblet",
+      "requirements": "Krav",
+      "testDesigns": "Testdesign",
+      "scenarioMatrices": "Scenariomatriser",
+      "testRuns": "Testkjoringer",
+      "quickActionsTitle": "Hurtighandlinger",
+      "quickIngest": "Legg inn krav",
+      "quickDesign": "Generer testdesign",
+      "quickScenario": "Bygg scenariomatrise",
+      "quickAnalyze": "Analyser testkjoring",
+      "scenarioCategoriesTitle": "ATM-scenariokategorier"
+    },
+
+    "scenarioTypes": {
+      "conflict_detection": "Konfliktdeteksjon",
+      "sector_handover": "Sektoroverlevering",
+      "trajectory_update": "Baneopptatering",
+      "degraded_surveillance": "Degradert overvaking",
+      "conformance_monitoring": "Samsvarsorvaking",
+      "alert_timing": "Varseltiming",
+      "contingency_fallback": "Beredskapsalternativ"
+    },
+
+    "sourceTypes": {
+      "requirement": "Krav",
+      "user_story": "Brukerhistorie",
+      "defect": "Feil",
+      "change_request": "Endringsforespørsel",
+      "spec_excerpt": "Spesifikasjonsutdrag",
+      "validation_note": "Valideringsnotat"
+    },
+
+    "riskLevels": {
+      "low": "Lav",
+      "medium": "Middels",
+      "high": "Hoy"
+    },
+
+    "reqLab": {
+      "ingestTitle": "Legg inn krav",
+      "titleLabel": "Kravtittel",
+      "titlePlaceholder": "f.eks. STCA-varsel skal utloses innen 2 minutter",
+      "sourceTypeLabel": "Kildetype",
+      "contentLabel": "Kravinnhold",
+      "contentPlaceholder": "Lim inn hele kravteksten, brukerhistorien eller spesifikasjonsutdraget her...",
+      "tagsLabel": "Tagger (kommaseparert)",
+      "tagsPlaceholder": "f.eks. STCA, konflikt, sikkerhetskritisk",
+      "ingestBtn": "Legg inn og normaliser",
+      "ingesting": "Legger inn...",
+      "intent": "Hensikt",
+      "conditions": "Betingelser",
+      "constraints": "Begrensninger",
+      "storedBundles": "Lagrede krav",
+      "noBundles": "Ingen krav lagt inn enna. Legg til et ovenfor.",
+      "generateDesign": "Generer design",
+      "generatingDesign": "Genererer testdesign med KI...",
+      "testDesignResult": "Testdesignresultat",
+      "assumptions": "Forutsetninger",
+      "positiveTests": "Positive tester",
+      "negativeTests": "Negative tester",
+      "edgeCases": "Grensetilfeller",
+      "expectedOutcome": "Forventet utfall",
+      "automationCandidates": "Automatiseringskandidater",
+      "openQuestions": "Apne sporsmal",
+      "recentDesigns": "Nylige testdesign"
+    },
+
+    "scenario": {
+      "configTitle": "Scenariokonfigurasjon",
+      "typeLabel": "Scenariotype",
+      "riskLabel": "Risikoniva",
+      "includeEdge": "Inkluder grensetilfeller",
+      "includeFallbacks": "Inkluder reservealternativer",
+      "customParams": "Egendefinerte parametere (JSON)",
+      "buildBtn": "Bygg scenariomatrise",
+      "building": "Bygger scenariomatrise...",
+      "matrixResult": "Scenariomatrise",
+      "preconditions": "Forutsetninger",
+      "nominal": "Nominelle scenarier",
+      "degraded": "Degraderte scenarier",
+      "edgeCases": "Grensetilfeller",
+      "expectedOutcome": "Forventet utfall",
+      "riskNotes": "Risikonotater",
+      "automationNotes": "Automatiseringsnotater",
+      "recentMatrices": "Nylige matriser"
+    },
+
+    "runAnalyzer": {
+      "uploadTitle": "Last opp testkjoringsartefakter",
+      "runIdLabel": "Kjorings-ID",
+      "runIdPlaceholder": "f.eks. RUN-2026-0409-001",
+      "artifactsLabel": "Artefakter",
+      "addArtifact": "Legg til artefakt",
+      "artifactPlaceholder": "Lim inn loggutdata, JSON-resultater eller konsollutdata her...",
+      "analyzeBtn": "Analyser testkjoring",
+      "analyzing": "Analyserer testkjoring...",
+      "analysisResult": "Kjoringsanalyse",
+      "failureSignals": "Primare feilsignaler",
+      "rootCauses": "Sannsynlige rotarsaker",
+      "affectedTests": "Berorte tester",
+      "repeatedPatterns": "Gjentatte monstre",
+      "affectedAreas": "Berorte omrader",
+      "nextSteps": "Foreslatte neste steg",
+      "regressionScope": "Foreslagt regresjonsomfang",
+      "recentAnalyses": "Nylige analyser"
+    },
+
+    "artifactTypes": {
+      "log": "Logg",
+      "json": "JSON",
+      "xml": "XML",
+      "screenshot": "Skjermbilde",
+      "console_output": "Konsollutdata"
+    },
+
+    "export": {
+      "markdown": "Eksporter Markdown",
+      "json": "Eksporter JSON"
+    }
+  }
+}

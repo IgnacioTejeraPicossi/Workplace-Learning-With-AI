@@ -41,7 +41,10 @@
       "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\backend' -type f -name *test*)",
       "Bash(python -c \"from backend.routers.babel_intelligence import router; from backend.routers.learning_profile import router as lr; print\\(f''Intelligence: {len\\(router.routes\\)} routes, Profile: {len\\(lr.routes\\)} routes''\\)\")",
       "Bash(find /c/Test/AI/AI Learning with AI -name cypress.config.* -o -name cypre*)",
-      "Bash(ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\cypress\\\\e2e\\\\babel_library\"*)"
+      "Bash(ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\cypress\\\\e2e\\\\babel_library\"*)",
+      "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend\\\\src' -name *Agent.jsx -o -name *agent.jsx)",
+      "Bash(python -c \"from backend.routers.atm_copilot import router; print\\(f'Router OK: {len\\(router.routes\\)} routes'\\)\")",
+      "Bash(python -c ':*)"
     ]
   }
 }

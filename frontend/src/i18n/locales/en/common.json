@@ -48,6 +48,7 @@
     "grcAgent": "Responsible AI Ops (GRC)",
     "councilAgent": "Council of Diverse Lenses",
     "opsEfficiencyAgent": "Operations Efficiency Agent",
+    "atmVvTestCopilot": "ATM V&V Test Copilot",
     "futureItemAgents": "Future Item Agents",
     "readmeViewer": "Readme",
     "agiProgress": "AGI Progress",

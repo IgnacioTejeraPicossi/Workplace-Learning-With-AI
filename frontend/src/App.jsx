@@ -57,6 +57,7 @@ import TelcoOpsAgent from "./TelcoOpsAgent";
 import GRCAgent from "./GRCAgent";
 import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
+import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import Cybersecurity from "./cyber/Cybersecurity";
 import ReadmeViewer from "./ReadmeViewer";
 import AgiProgressPage from "./pages/help/AgiProgressPage";
@@ -520,6 +521,7 @@ function AppContent() {
             {!activeModule && section === "grc-agent" && <GRCAgent />}
             {!activeModule && section === "council-agent" && <CouncilAgent />}
             {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
+            {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
