@@ -32,7 +32,7 @@
 | **Enterprise & Operations** | EA Dashboard, Process Designer, Catalog Manager, Heatmap View, Impact Analysis |
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
-| **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, AI experimentation |
+| **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
 ---
 
@@ -78,6 +78,20 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 ---
 
 ## 🔄 Recent Work (2024–2026)
+
+### ATM V&V Test Copilot (April 2026)
+
+New agent module implementing an AI-powered testing copilot for safety-critical Air Traffic Management (ATM/ATC) verification & validation workflows. Located in the sidebar under "Future Item Agents".
+
+- **Requirement Lab**: Ingest requirements (6 source types), AI-normalize into intent/conditions/constraints/expectedBehavior, then generate structured test designs with positive/negative/edge case tests, automation candidates, and open questions
+- **Scenario Builder**: Generate ATM scenario matrices for 7 scenario families (conflict detection, sector handover, trajectory update, degraded surveillance, conformance monitoring, alert timing, contingency fallback) with configurable risk levels and custom parameters
+- **Run Analyzer**: Upload test run artifacts (logs, JSON, XML, console output), AI-diagnose failures with severity proposals, root cause analysis (with confidence levels), affected areas, and suggested next steps
+- **Export**: Markdown export for test designs and scenario matrices
+
+Backend: `backend/services/atm_copilot.py`, `backend/routers/atm_copilot.py` (17 endpoints at `/api/atm-copilot/`)
+Frontend: `frontend/src/AtmVvTestCopilot.jsx` + `frontend/src/atm-copilot/` (4 tab components)
+MongoDB: 4 collections (`atm_requirement_bundles`, `atm_test_designs`, `atm_scenario_matrices`, `atm_test_runs`)
+i18n: 120+ keys EN/NO with full parity
 
 ### Babel Library AI Intelligence (April 2026)
 

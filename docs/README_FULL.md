@@ -6139,6 +6139,169 @@ Registered in Agent Catalog with:
 
 ---
 
+## ✈️ ATM V&V Test Copilot
+
+### Overview
+The **ATM V&V Test Copilot** is an AI-powered testing copilot for safety-critical Air Traffic Management (ATM) and Air Traffic Control (ATC) verification & validation workflows. It helps test engineers convert requirements into structured test designs, generate scenario matrices for ATM-specific validation, and analyze test run failures using AI-driven diagnostics.
+
+This agent is located in the sidebar under **"Future Item Agents"** in AgentOps Studio.
+
+### Problem Statement
+ATM/ATC system validation involves:
+- **Complex requirements** from safety standards (EUROCAE ED-153, DO-278A) that must be decomposed into testable conditions
+- **Scenario matrices** with nominal, degraded, and edge-case variations across multiple ATM domains
+- **Test run analysis** where failures must be triaged, root-caused, and prioritized for safety-critical systems
+- **Traceability** between requirements, test designs, scenarios, and run results
+- **Manual effort** in generating test documentation and export artifacts
+
+### Solution
+The ATM V&V Test Copilot provides 4 AI-powered tools through a tabbed interface:
+
+1. **Requirement Ingestion & Normalization** — Parse any requirement type into structured intent/conditions/constraints/expectedBehavior
+2. **Test Design Generation** — Convert normalized requirements into positive, negative, and edge-case tests with automation candidates
+3. **Scenario Matrix Building** — Generate ATM-specific scenario matrices with configurable parameters and risk levels
+4. **Test Run Analysis** — Diagnose test failures with severity proposals, root cause analysis, and regression scope
+
+### Key Features
+
+#### **📋 Requirement Lab (Tab 2)**
+- **6 source types**: requirement, user_story, defect, change_request, spec_excerpt, validation_note
+- **AI normalization**: LLM extracts intent, conditions, constraints, and expected behavior
+- **Test design generation**: Positive tests, negative tests, edge cases, automation candidates, open questions
+- **CRUD management**: List, view, delete stored requirement bundles
+- **Markdown export**: Export test designs as formatted Markdown documents
+
+#### **🗺️ Scenario Builder (Tab 3)**
+- **7 ATM scenario families**:
+  - Conflict Detection
+  - Sector Handover
+  - Trajectory Update
+  - Degraded Surveillance
+  - Conformance Monitoring
+  - Alert Timing
+  - Contingency Fallback
+- **3 risk levels**: Low, Medium, High — with visual indicators
+- **Configurable parameters**: Custom JSON parameters (e.g., `flightCount`, `altitudeBand`, `predictionWindowSec`)
+- **Edge case & fallback toggles**: Include/exclude edge cases and fallback scenarios
+- **Matrix visualization**: Nominal, degraded, and edge-case scenarios with variables and expected outcomes
+- **Risk notes & automation notes**: Safety considerations and automation feasibility
+- **Markdown export**: Export scenario matrices as formatted Markdown
+
+#### **🔍 Run Analyzer (Tab 4)**
+- **Multi-artifact upload**: Log files, JSON results, XML reports, screenshots, console output
+- **AI failure analysis**: Primary failure signals with counts and affected components
+- **Root cause identification**: Probable causes with confidence levels (high/medium/low)
+- **Severity proposal**: Critical, High, Medium, Low — based on impact analysis
+- **Repeated patterns**: Recurring issues across artifacts
+- **Affected areas**: System components impacted
+- **Next steps**: Prioritized action items for the test team
+- **Regression scope**: Areas recommended for retesting
+
+#### **🏠 Overview (Tab 1)**
+- **Collection stats**: Live counts of requirements, test designs, scenario matrices, test runs
+- **Backend health check**: Real-time connection status indicator
+- **Quick actions**: One-click navigation to common workflows
+- **Scenario categories**: Visual grid of all 7 ATM scenario families
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  React Frontend                      │
+│  AtmVvTestCopilot.jsx                               │
+│  ├── Overview.jsx      (stats, health, quick links) │
+│  ├── RequirementLab.jsx (ingest + test design)      │
+│  ├── ScenarioBuilder.jsx (matrix generation)        │
+│  └── RunAnalyzer.jsx    (failure analysis)          │
+└──────────────────┬──────────────────────────────────┘
+                   │ REST API
+┌──────────────────┴──────────────────────────────────┐
+│              FastAPI Backend                          │
+│  routers/atm_copilot.py  (17 endpoints)             │
+│  services/atm_copilot.py (4 LLM tools + CRUD)      │
+│  ├── ingest_requirement_bundle()                    │
+│  ├── generate_test_design()                         │
+│  ├── build_atm_scenario_matrix()                    │
+│  └── analyze_test_run()                             │
+└──────────────────┬──────────────────────────────────┘
+                   │
+         ┌─────────┴─────────┐
+         │                   │
+    ┌────┴────┐        ┌────┴────┐
+    │ MongoDB │        │   LLM   │
+    │ 4 colls │        │ (ItemAI │
+    │         │        │ /OpenAI)│
+    └─────────┘        └─────────┘
+```
+
+### API Endpoints (17 routes at `/api/atm-copilot/`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check + valid source/scenario types |
+| GET | `/stats` | Collection counts |
+| POST | `/requirements/ingest` | Ingest & normalize a requirement |
+| GET | `/requirements` | List requirement bundles |
+| GET | `/requirements/{id}` | Get single requirement |
+| DELETE | `/requirements/{id}` | Delete requirement |
+| POST | `/designs/generate` | Generate test design from requirement |
+| GET | `/designs` | List test designs |
+| GET | `/designs/{id}/export/markdown` | Export design as Markdown |
+| DELETE | `/designs/{id}` | Delete design |
+| POST | `/scenarios/build` | Build scenario matrix |
+| GET | `/scenarios` | List scenario matrices |
+| GET | `/scenarios/{id}/export/markdown` | Export matrix as Markdown |
+| DELETE | `/scenarios/{id}` | Delete scenario |
+| POST | `/runs/analyze` | Analyze test run artifacts |
+| GET | `/runs` | List run analyses |
+| DELETE | `/runs/{id}` | Delete run analysis |
+
+### How to Use
+
+1. **Ingest a requirement**: Go to the Requirement Lab tab, paste your requirement text, select the source type, add tags, and click "Ingest & Normalize". The AI will extract structured sections.
+
+2. **Generate a test design**: Click "Generate Design" on any stored requirement. The AI produces positive tests, negative tests, edge cases, automation candidates, and open questions. Export to Markdown for documentation.
+
+3. **Build a scenario matrix**: Go to the Scenario Builder tab, select a scenario family (e.g., Conflict Detection), set risk level and parameters, toggle edge cases/fallbacks, and click "Build Scenario Matrix". Export to Markdown.
+
+4. **Analyze a test run**: Go to the Run Analyzer tab, enter a Run ID, add one or more artifacts (paste log output, JSON results, etc.), and click "Analyze Test Run". The AI identifies failure signals, root causes, severity, and next steps.
+
+### Graceful Degradation
+- **LLM unavailable**: Requirement normalization falls back to basic fields; test design/scenario/analysis returns `"status": "fallback"` with a message
+- **Backend offline**: Frontend shows offline indicator; forms remain usable for when backend reconnects
+- **MongoDB unavailable**: API returns HTTP errors; no silent data loss
+
+### Project Files
+
+**Backend:**
+- `backend/services/atm_copilot.py` — Service layer: 4 LLM tools, CRUD helpers, Markdown export (~400 lines)
+- `backend/routers/atm_copilot.py` — REST router: 17 endpoints with Pydantic models
+- `backend/db.py` — 4 MongoDB collection definitions
+
+**Frontend:**
+- `frontend/src/AtmVvTestCopilot.jsx` — Main component with 4-tab navigation
+- `frontend/src/atm-copilot/Overview.jsx` — Overview tab (stats, health, quick actions, scenario categories)
+- `frontend/src/atm-copilot/RequirementLab.jsx` — Requirement Lab tab (ingest form, test design viewer)
+- `frontend/src/atm-copilot/ScenarioBuilder.jsx` — Scenario Builder tab (configurator, matrix viewer)
+- `frontend/src/atm-copilot/RunAnalyzer.jsx` — Run Analyzer tab (artifact upload, analysis viewer)
+
+**Integration:**
+- `frontend/src/Sidebar.jsx` — Navigation entry under "Future Item Agents"
+- `frontend/src/App.jsx` — Component import and route
+- `backend/app.py` — Router registration
+
+**i18n:**
+- `frontend/src/i18n/locales/en/atmCopilotModule.json` — English translations (120+ keys)
+- `frontend/src/i18n/locales/no/atmCopilotModule.json` — Norwegian translations (120+ keys)
+- `frontend/src/i18n/index.js` — Module registration
+
+**Plan document:**
+- `docs-md/New Ideas 29.1 atm_vv_test_copilot_plan.md` — Original ChatGPT implementation plan
+
+**Status**: ✅ MVP Implemented (Phase 0 + Phase 1 of the plan) | **Domain**: ATM/ATC V&V Testing
+
+---
+
 ## 🔐 Security Center
 
 The Security Center is the platform-level security and privacy module. It provides 6 fully implemented sub-modules covering encryption, data lifecycle, privacy controls, and real-time monitoring.
