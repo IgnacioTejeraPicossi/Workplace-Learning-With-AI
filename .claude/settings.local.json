@@ -44,7 +44,12 @@
       "Bash(ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\cypress\\\\e2e\\\\babel_library\"*)",
       "Bash(find 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend\\\\src' -name *Agent.jsx -o -name *agent.jsx)",
       "Bash(python -c \"from backend.routers.atm_copilot import router; print\\(f'Router OK: {len\\(router.routes\\)} routes'\\)\")",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(node docs-media/build_atm_pptx.js 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')",
+      "Bash(python 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\pptx\\\\scripts\\\\office\\\\soffice.py' --headless --convert-to pdf 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')",
+      "Read(//c/Program Files/LibreOffice/program/**)",
+      "Read(//c/Program Files \\(x86\\)/LibreOffice/program/**)",
+      "Bash(python -m markitdown 'Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')"
     ]
   }
 }
