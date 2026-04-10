@@ -49,7 +49,8 @@
       "Bash(python 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\pptx\\\\scripts\\\\office\\\\soffice.py' --headless --convert-to pdf 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')",
       "Read(//c/Program Files/LibreOffice/program/**)",
       "Read(//c/Program Files \\(x86\\)/LibreOffice/program/**)",
-      "Bash(python -m markitdown 'Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')"
+      "Bash(python -m markitdown 'Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')",
+      "Bash(python 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py' 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\docs\\\\ATM VV Test Copilot.docx')"
     ]
   }
 }
