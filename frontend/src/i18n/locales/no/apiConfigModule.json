@@ -59,6 +59,7 @@
     "statusSaveOk": "✅ API-konfigurasjon lagret! (Lokalt og på server)",
     "statusSaveServerFail": "⚠️ Lagret lokalt, men lagring på server feilet: {{detail}}",
     "statusTestOk": "✅ API-test vellykket: {{message}}",
-    "statusTestFail": "❌ API-test feilet: {{detail}}"
+    "statusTestFail": "❌ API-test feilet: {{detail}}",
+    "networkError": "Nettverksfeil."
   }
 }

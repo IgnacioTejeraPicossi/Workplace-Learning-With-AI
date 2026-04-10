@@ -192,7 +192,7 @@ const APIConfig = () => {
         setStatus(t('apiConfigModule.statusTestFail', { detail: errorMessage }));
       }
     } catch (error) {
-      setStatus(t('apiConfigModule.statusTestFail', { detail: error.message || 'Network error.' }));
+      setStatus(t('apiConfigModule.statusTestFail', { detail: error.message || t('apiConfigModule.networkError') }));
     }
     setTimeout(() => setStatus(''), 5000);
   };

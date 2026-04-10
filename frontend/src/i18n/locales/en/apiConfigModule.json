@@ -59,6 +59,7 @@
     "statusSaveOk": "✅ API configuration saved successfully! (Local + Server)",
     "statusSaveServerFail": "⚠️ Saved locally, but server save failed: {{detail}}",
     "statusTestOk": "✅ API test successful: {{message}}",
-    "statusTestFail": "❌ API test failed: {{detail}}"
+    "statusTestFail": "❌ API test failed: {{detail}}",
+    "networkError": "Network error."
   }
 }
