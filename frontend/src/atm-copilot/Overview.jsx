@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 const API = 'http://localhost:8000/api/atm-copilot';
 
-const Overview = () => {
+const Overview = ({ onNavigate }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [health, setHealth] = useState(null);
@@ -105,6 +105,7 @@ const Overview = () => {
                 backgroundColor: '#f8fafc', cursor: 'pointer', fontSize: '14px',
                 transition: 'all 0.2s', textAlign: 'left'
               }}
+              onClick={() => onNavigate && onNavigate(qa.tab)}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.borderColor = '#93c5fd'; }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
               >

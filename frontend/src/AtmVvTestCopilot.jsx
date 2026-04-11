@@ -19,7 +19,7 @@ const AtmVvTestCopilot = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview />;
+        return <Overview onNavigate={setActiveTab} />;
       case 'requirement-lab':
         return <RequirementLab />;
       case 'scenario-builder':
@@ -27,7 +27,7 @@ const AtmVvTestCopilot = () => {
       case 'run-analyzer':
         return <RunAnalyzer />;
       default:
-        return <Overview />;
+        return <Overview onNavigate={setActiveTab} />;
     }
   };
 
