@@ -8,7 +8,9 @@ const CYPRESS_TIMES = [
   '1.4s', '0.9s', '2.5s', '8.6s', '1.8s', '1.5s', '3.2s', '2.8s', '2.1s', '4.5s', '1.9s', '1.2s',
   '6.0s', '1.1s', '1.3s', '1.6s', '1.2s', '1.4s', '1.8s', '2.1s', '1.0s', '12.0s', '1.3s', '1.1s',
   '1.7s', '0.9s', '2.3s', '4.6s', '1.5s', '1.5s', '1.6s', '1.6s', '2.0s', '1.6s', '3.2s',
-  '2.4s', '3.1s', '1.8s', '4.2s', '2.6s'
+  '2.4s', '3.1s', '1.8s', '4.2s', '2.6s',
+  // ATM V&V Test Copilot
+  '1.6s', '2.8s', '3.5s', '4.1s', '2.2s'
 ];
 
 const RunTest = () => {
@@ -132,7 +134,10 @@ const RunTest = () => {
           { nameKey: 'runTestModule.manualApi.cyberDrillScenarios', endpoint: '/api/cyber/drills/scenarios' },
           { nameKey: 'runTestModule.manualApi.cyberKnowledgeArticles', endpoint: '/api/cyber/knowledge/articles' },
           { nameKey: 'runTestModule.manualApi.agentSecurityHealth', endpoint: '/api/agent-security/health' },
-          { nameKey: 'runTestModule.manualApi.agentSecurityOverview', endpoint: '/api/agent-security/overview' }
+          { nameKey: 'runTestModule.manualApi.agentSecurityOverview', endpoint: '/api/agent-security/overview' },
+          // ATM V&V Test Copilot
+          { nameKey: 'runTestModule.manualApi.atmCopilotHealth', endpoint: '/api/atm-copilot/health' },
+          { nameKey: 'runTestModule.manualApi.atmCopilotStats', endpoint: '/api/atm-copilot/stats' }
         ];
 
         for (const api of manualApiEndpoints) {
@@ -515,6 +520,27 @@ const RunTest = () => {
           { name: 'GET /api/babel/profile/{user_id}/summary', endpoint: '/api/babel/profile/test-user/summary', method: 'GET', requiresAuth: false },
           { name: 'GET /api/babel/profile/{user_id}/recommendations', endpoint: '/api/babel/profile/test-user/recommendations', method: 'GET', requiresAuth: false },
           { name: 'POST /api/babel/profile/{user_id}/learning-path', endpoint: '/api/babel/profile/test-user/learning-path', method: 'POST', requiresAuth: false },
+
+          // ATM V&V Test Copilot — Health & Stats
+          { name: 'GET /api/atm-copilot/health', endpoint: '/api/atm-copilot/health', method: 'GET', requiresAuth: false },
+          { name: 'GET /api/atm-copilot/stats', endpoint: '/api/atm-copilot/stats', method: 'GET', requiresAuth: false },
+          // ATM V&V Test Copilot — Requirements CRUD
+          { name: 'GET /api/atm-copilot/requirements', endpoint: '/api/atm-copilot/requirements', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/atm-copilot/requirements/ingest', endpoint: '/api/atm-copilot/requirements/ingest', method: 'POST', requiresAuth: false },
+          { name: 'GET /api/atm-copilot/requirements/{id}', endpoint: '/api/atm-copilot/requirements/test-req-id', method: 'GET', requiresAuth: false },
+          { name: 'DELETE /api/atm-copilot/requirements/{id}', endpoint: '/api/atm-copilot/requirements/test-req-id', method: 'DELETE', requiresAuth: false },
+          // ATM V&V Test Copilot — Test Designs
+          { name: 'GET /api/atm-copilot/designs', endpoint: '/api/atm-copilot/designs', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/atm-copilot/designs/generate', endpoint: '/api/atm-copilot/designs/generate', method: 'POST', requiresAuth: false },
+          { name: 'DELETE /api/atm-copilot/designs/{id}', endpoint: '/api/atm-copilot/designs/test-design-id', method: 'DELETE', requiresAuth: false },
+          // ATM V&V Test Copilot — Scenario Matrices
+          { name: 'GET /api/atm-copilot/scenarios', endpoint: '/api/atm-copilot/scenarios', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/atm-copilot/scenarios/build', endpoint: '/api/atm-copilot/scenarios/build', method: 'POST', requiresAuth: false },
+          { name: 'DELETE /api/atm-copilot/scenarios/{id}', endpoint: '/api/atm-copilot/scenarios/test-scenario-id', method: 'DELETE', requiresAuth: false },
+          // ATM V&V Test Copilot — Test Run Analysis
+          { name: 'GET /api/atm-copilot/runs', endpoint: '/api/atm-copilot/runs', method: 'GET', requiresAuth: false },
+          { name: 'POST /api/atm-copilot/runs/analyze', endpoint: '/api/atm-copilot/runs/analyze', method: 'POST', requiresAuth: false },
+          { name: 'DELETE /api/atm-copilot/runs/{id}', endpoint: '/api/atm-copilot/runs/test-run-id', method: 'DELETE', requiresAuth: false },
     ];
 
     const results = [];
@@ -1304,6 +1330,38 @@ const RunTest = () => {
               testData = {
                 goal_topic: 'machine learning',
                 max_steps: 5
+              };
+              break;
+            // ATM V&V Test Copilot — POST test data
+            case '/api/atm-copilot/requirements/ingest':
+              testData = {
+                title: 'STCA-TEST-001: Conflict alert timing',
+                source_type: 'requirement',
+                content: 'The STCA system shall generate a conflict alert within 120 seconds of predicted loss of separation below 2.0 NM horizontal and 1000 ft vertical.',
+                tags: ['STCA', 'test-runner']
+              };
+              break;
+            case '/api/atm-copilot/designs/generate':
+              testData = {
+                requirement_bundle_id: '000000000000000000000000'
+              };
+              break;
+            case '/api/atm-copilot/scenarios/build':
+              testData = {
+                scenario_type: 'conflict_detection',
+                risk_level: 'medium',
+                include_edge_cases: true,
+                include_fallbacks: true,
+                parameters: { flightCount: 3, altitudeBand: 'FL350-FL390' }
+              };
+              break;
+            case '/api/atm-copilot/runs/analyze':
+              testData = {
+                run_id: 'TEST-RUN-001',
+                artifacts: [
+                  { type: 'test_log', content: 'PASS: STCA-TC-001 head-on conflict detected in 118s\nFAIL: STCA-TC-002 coast-track timeout after 30s' },
+                  { type: 'json_result', content: '{"total": 10, "passed": 8, "failed": 2}' }
+                ]
               };
               break;
             default:

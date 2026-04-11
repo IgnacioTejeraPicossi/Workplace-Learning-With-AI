@@ -80,7 +80,12 @@
       "Map of Knowledge (search input, counter, web search panel)",
       "Certifications (tab navigation)",
       "Team Dynamics (header + auth banner)",
-      "Web Search (query submit, results container)"
+      "Web Search (query submit, results container)",
+      "ATM V&V Test Copilot — Overview (stats, health, quick actions, scenario categories)",
+      "ATM V&V Test Copilot — Requirement Lab (ingest, normalize, generate test design, stored bundles list)",
+      "ATM V&V Test Copilot — Scenario Builder (type selector, risk levels, matrix generation, Markdown export)",
+      "ATM V&V Test Copilot — Run Analyzer (artifact upload, failure signals, root causes, next steps)",
+      "ATM V&V Test Copilot — Navigation (quick actions navigate to tabs, scenario categories pre-select type)"
     ],
     "cypressTestNames": [
       "App Smoke Navigation",
@@ -122,7 +127,12 @@
       "Babel Library: Recommendations + Learning Path Generator (Phase 2)",
       "Babel Library: AI Content panels on catalog cards (Phase 3)",
       "Babel Library: Predictive Intelligence dashboard (Phase 4)",
-      "Babel Library: Batch Admin (classify all, generate content, stats)"
+      "Babel Library: Batch Admin (classify all, generate content, stats)",
+      "ATM V&V Test Copilot: Overview (stats cards + health indicator)",
+      "ATM V&V Test Copilot: Requirement Lab (ingest + normalize + generate design)",
+      "ATM V&V Test Copilot: Scenario Builder (type selector + risk level + matrix)",
+      "ATM V&V Test Copilot: Run Analyzer (artifact upload + failure analysis)",
+      "ATM V&V Test Copilot: Navigation (quick actions + scenario category clicks)"
     ],
     "manual": {
       "backendHealth": "Backend Health Check",
@@ -173,7 +183,9 @@
       "cyberDrillScenarios": "Cyber Drill Scenarios API",
       "cyberKnowledgeArticles": "Cyber Knowledge Articles API",
       "agentSecurityHealth": "Agent Security Health API",
-      "agentSecurityOverview": "Agent Security Overview API"
+      "agentSecurityOverview": "Agent Security Overview API",
+      "atmCopilotHealth": "ATM V&V Test Copilot Health API",
+      "atmCopilotStats": "ATM V&V Test Copilot Stats API"
     }
   }
 }

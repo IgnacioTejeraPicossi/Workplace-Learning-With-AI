@@ -80,7 +80,12 @@
       "Kunnskapskart (søkefelt, teller, nettsøk-panel)",
       "Sertifiseringer (fanenavigasjon)",
       "Teamdynamikk (topptekst + autentiseringsbanner)",
-      "Nettsøk (send spørring, resultatområde)"
+      "Nettsøk (send spørring, resultatområde)",
+      "ATM V&V Testpilot — Oversikt (statistikk, helse, hurtighandlinger, scenariokategorier)",
+      "ATM V&V Testpilot — Kravlab (innlesing, normalisering, generer testdesign, lagrede krav)",
+      "ATM V&V Testpilot — Scenariobygger (typevalg, risikonivåer, matrisegenerering, Markdown-eksport)",
+      "ATM V&V Testpilot — Kjøringsanalysator (artefaktopplasting, feilsignaler, rotårsaker, neste steg)",
+      "ATM V&V Testpilot — Navigasjon (hurtighandlinger til faner, scenariokategorier forhåndsvelger type)"
     ],
     "cypressTestNames": [
       "App – røyknavigasjon",
@@ -122,7 +127,12 @@
       "Babel-bibliotek: Anbefalinger + læringsløp-generator (fase 2)",
       "Babel-bibliotek: KI-innholdspaneler på katalogkort (fase 3)",
       "Babel-bibliotek: Prediktiv intelligens-dashboard (fase 4)",
-      "Babel-bibliotek: Batch-admin (klassifiser alle, generer innhold, statistikk)"
+      "Babel-bibliotek: Batch-admin (klassifiser alle, generer innhold, statistikk)",
+      "ATM V&V Testpilot: Oversikt (statistikkort + helseindikator)",
+      "ATM V&V Testpilot: Kravlab (innlesing + normalisering + generer design)",
+      "ATM V&V Testpilot: Scenariobygger (typevalg + risikonivå + matrise)",
+      "ATM V&V Testpilot: Kjøringsanalysator (artefaktopplasting + feilanalyse)",
+      "ATM V&V Testpilot: Navigasjon (hurtighandlinger + scenariokategoriklikk)"
     ],
     "manual": {
       "backendHealth": "Helsesjekk backend",
@@ -173,7 +183,9 @@
       "cyberDrillScenarios": "Cybersikkerhet øvelsesscenarier API",
       "cyberKnowledgeArticles": "Cybersikkerhet kunnskapsartikler API",
       "agentSecurityHealth": "Agentsikkerhet helsesjekk API",
-      "agentSecurityOverview": "Agentsikkerhet oversikt API"
+      "agentSecurityOverview": "Agentsikkerhet oversikt API",
+      "atmCopilotHealth": "ATM V&V Testpilot helsesjekk API",
+      "atmCopilotStats": "ATM V&V Testpilot statistikk API"
     }
   }
 }
