@@ -8,6 +8,15 @@ import RunAnalyzer from './atm-copilot/RunAnalyzer';
 const AtmVvTestCopilot = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
+  const [initialScenarioType, setInitialScenarioType] = useState(null);
+
+  // Navigate to a tab, optionally with context data (e.g. scenario type)
+  const handleNavigate = (tab, options) => {
+    if (options?.scenarioType) {
+      setInitialScenarioType(options.scenarioType);
+    }
+    setActiveTab(tab);
+  };
 
   const tabs = [
     { id: 'overview', label: t('atmCopilotModule.tabOverview'), icon: '🏠' },
@@ -19,15 +28,15 @@ const AtmVvTestCopilot = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview onNavigate={setActiveTab} />;
+        return <Overview onNavigate={handleNavigate} />;
       case 'requirement-lab':
         return <RequirementLab />;
       case 'scenario-builder':
-        return <ScenarioBuilder />;
+        return <ScenarioBuilder initialScenarioType={initialScenarioType} onScenarioTypeConsumed={() => setInitialScenarioType(null)} />;
       case 'run-analyzer':
         return <RunAnalyzer />;
       default:
-        return <Overview onNavigate={setActiveTab} />;
+        return <Overview onNavigate={handleNavigate} />;
     }
   };
 

@@ -105,7 +105,7 @@ const Overview = ({ onNavigate }) => {
                 backgroundColor: '#f8fafc', cursor: 'pointer', fontSize: '14px',
                 transition: 'all 0.2s', textAlign: 'left'
               }}
-              onClick={() => onNavigate && onNavigate(qa.tab)}
+              onClick={() => onNavigate && onNavigate(qa.tab, {})}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.borderColor = '#93c5fd'; }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
               >
@@ -126,11 +126,17 @@ const Overview = ({ onNavigate }) => {
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
             {scenarioTypes.map(st => (
-              <div key={st.key} style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '12px 14px', borderRadius: '10px',
-                backgroundColor: `${st.color}10`, border: `1px solid ${st.color}30`
-              }}>
+              <div key={st.key}
+                onClick={() => onNavigate && onNavigate('scenario-builder', { scenarioType: st.key })}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '12px 14px', borderRadius: '10px', cursor: 'pointer',
+                  backgroundColor: `${st.color}10`, border: `1px solid ${st.color}30`,
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = `${st.color}20`; e.currentTarget.style.borderColor = `${st.color}60`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = `${st.color}10`; e.currentTarget.style.borderColor = `${st.color}30`; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
                 <span style={{ fontSize: '20px' }}>{st.icon}</span>
                 <span style={{ fontSize: '13px', fontWeight: 500, color: '#334155' }}>
                   {t(`atmCopilotModule.scenarioTypes.${st.key}`)}

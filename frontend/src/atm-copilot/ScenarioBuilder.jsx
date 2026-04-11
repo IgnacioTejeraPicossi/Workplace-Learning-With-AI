@@ -10,9 +10,9 @@ const SCENARIO_TYPES = [
 
 const RISK_LEVELS = ['low', 'medium', 'high'];
 
-const ScenarioBuilder = () => {
+const ScenarioBuilder = ({ initialScenarioType, onScenarioTypeConsumed }) => {
   const { t } = useTranslation();
-  const [scenarioType, setScenarioType] = useState('conflict_detection');
+  const [scenarioType, setScenarioType] = useState(initialScenarioType || 'conflict_detection');
   const [riskLevel, setRiskLevel] = useState('medium');
   const [includeEdge, setIncludeEdge] = useState(true);
   const [includeFallbacks, setIncludeFallbacks] = useState(true);
@@ -22,6 +22,14 @@ const ScenarioBuilder = () => {
   const [matrices, setMatrices] = useState([]);
 
   useEffect(() => { loadMatrices(); }, []);
+
+  // When navigated from Overview with a pre-selected scenario type
+  useEffect(() => {
+    if (initialScenarioType && SCENARIO_TYPES.includes(initialScenarioType)) {
+      setScenarioType(initialScenarioType);
+      if (onScenarioTypeConsumed) onScenarioTypeConsumed();
+    }
+  }, [initialScenarioType]);
 
   const loadMatrices = () => {
     fetch(`${API}/scenarios?limit=20`).then(r => r.json()).then(setMatrices).catch(() => {});
