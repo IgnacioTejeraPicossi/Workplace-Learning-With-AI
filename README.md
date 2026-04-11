@@ -83,15 +83,19 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 New agent module implementing an AI-powered testing copilot for safety-critical Air Traffic Management (ATM/ATC) verification & validation workflows. Located in the sidebar under "Future Item Agents".
 
+- **Overview Dashboard**: Live stats, backend health indicator, interactive Quick Actions, and clickable scenario category grid (navigates to Scenario Builder with the selected type pre-loaded)
 - **Requirement Lab**: Ingest requirements (6 source types), AI-normalize into intent/conditions/constraints/expectedBehavior, then generate structured test designs with positive/negative/edge case tests, automation candidates, and open questions
 - **Scenario Builder**: Generate ATM scenario matrices for 7 scenario families (conflict detection, sector handover, trajectory update, degraded surveillance, conformance monitoring, alert timing, contingency fallback) with configurable risk levels and custom parameters
 - **Run Analyzer**: Upload test run artifacts (logs, JSON, XML, console output), AI-diagnose failures with severity proposals, root cause analysis (with confidence levels), affected areas, and suggested next steps
 - **Export**: Markdown export for test designs and scenario matrices
+- **Pre-loaded examples**: Seed script with 13 realistic ATM/ATC examples (5 requirements, 3 test designs, 3 scenario matrices, 2 test run analyses) based on EUROCAE ED-153, DO-278A, and EUROCONTROL STCA specs
 
 Backend: `backend/services/atm_copilot.py`, `backend/routers/atm_copilot.py` (17 endpoints at `/api/atm-copilot/`)
 Frontend: `frontend/src/AtmVvTestCopilot.jsx` + `frontend/src/atm-copilot/` (4 tab components)
+Seed: `backend/scripts/seed_atm_examples.py` — run with `python -m backend.scripts.seed_atm_examples`
 MongoDB: 4 collections (`atm_requirement_bundles`, `atm_test_designs`, `atm_scenario_matrices`, `atm_test_runs`)
 i18n: 120+ keys EN/NO with full parity
+Docs: `docs-md/Readme ATM Agent.md` (standalone) | `docs/ATM VV Test Copilot.docx` | `Presentation/ATM_VV_Test_Copilot_Presentation.pptx`
 
 ### Babel Library AI Intelligence (April 2026)
 

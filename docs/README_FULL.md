@@ -6200,8 +6200,21 @@ The ATM V&V Test Copilot provides 4 AI-powered tools through a tabbed interface:
 #### **🏠 Overview (Tab 1)**
 - **Collection stats**: Live counts of requirements, test designs, scenario matrices, test runs
 - **Backend health check**: Real-time connection status indicator
-- **Quick actions**: One-click navigation to common workflows
-- **Scenario categories**: Visual grid of all 7 ATM scenario families
+- **Quick actions**: Interactive buttons that navigate directly to the corresponding tool tab (Requirement Lab, Scenario Builder, Run Analyzer)
+- **Scenario categories**: Clickable grid of all 7 ATM scenario families — clicking any category navigates to the Scenario Builder with that type **pre-selected** in the dropdown
+
+### Pre-loaded Example Data
+
+The agent includes a **seed script** (`backend/scripts/seed_atm_examples.py`) that populates MongoDB with 13 realistic ATM/ATC examples based on real standards (EUROCAE ED-153, DO-278A, ICAO Doc 4444, EUROCONTROL STCA specifications):
+
+| Collection | Count | Highlights |
+|------------|-------|------------|
+| **Requirements** | 5 | STCA conflict alert (2 NM / 1000 ft), OLDI sector handover, 4D trajectory prediction (BADA), degraded radar mode (HAZARDOUS defect), route conformance monitoring (RVSM) |
+| **Test Designs** | 3 | STCA (3 positive, 2 negative, 2 edge), degraded mode (2+2+1), conformance (2+1+1) — each with full step-by-step procedures |
+| **Scenario Matrices** | 3 | Conflict detection at Oslo ACC (high risk), Oslo/Stockholm handover (medium), alert timing latency (high) |
+| **Test Run Analyses** | 2 | STCA regression (42 cases, cache invalidation bug), OLDI acceptance (28 cases, CPDLC polling delay) — with root causes, severity, and next steps |
+
+Run the seed: `python -m backend.scripts.seed_atm_examples`
 
 ### Architecture
 
@@ -6277,6 +6290,7 @@ The ATM V&V Test Copilot provides 4 AI-powered tools through a tabbed interface:
 - `backend/services/atm_copilot.py` — Service layer: 4 LLM tools, CRUD helpers, Markdown export (~400 lines)
 - `backend/routers/atm_copilot.py` — REST router: 17 endpoints with Pydantic models
 - `backend/db.py` — 4 MongoDB collection definitions
+- `backend/scripts/seed_atm_examples.py` — Seed script: 13 realistic ATM/ATC examples
 
 **Frontend:**
 - `frontend/src/AtmVvTestCopilot.jsx` — Main component with 4-tab navigation
@@ -6295,10 +6309,13 @@ The ATM V&V Test Copilot provides 4 AI-powered tools through a tabbed interface:
 - `frontend/src/i18n/locales/no/atmCopilotModule.json` — Norwegian translations (120+ keys)
 - `frontend/src/i18n/index.js` — Module registration
 
-**Plan document:**
+**Documentation & Presentation:**
+- `docs-md/Readme ATM Agent.md` — Standalone agent documentation (12 sections)
+- `docs/ATM VV Test Copilot.docx` — Word document version
+- `Presentation/ATM_VV_Test_Copilot_Presentation.pptx` — PowerPoint (12 slides, 5 screenshots)
 - `docs-md/New Ideas 29.1 atm_vv_test_copilot_plan.md` — Original ChatGPT implementation plan
 
-**Status**: ✅ MVP Implemented (Phase 0 + Phase 1 of the plan) | **Domain**: ATM/ATC V&V Testing
+**Status**: ✅ MVP Implemented (Phase 0 + Phase 1 of the plan) + example data seeded | **Domain**: ATM/ATC V&V Testing
 
 ---
 
