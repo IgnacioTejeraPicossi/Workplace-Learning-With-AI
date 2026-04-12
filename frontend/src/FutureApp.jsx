@@ -1,56 +1,18 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 
-function FutureApp({ onSectionSelect }) {
-  const { colors } = useTheme();
+const PHASE_ROWS = [
+  { phase: '1', rowId: 'p1', feas: 'high', stat: 'live', color: '#4caf50', section: 'idea-log' },
+  { phase: '2', rowId: 'p2', feas: 'high', stat: 'live', color: '#ff9800', section: null },
+  { phase: '3', rowId: 'p3', feas: 'high', stat: 'live', color: '#ff5722', section: 'feature-roadmap' },
+  { phase: '4', rowId: 'p4', feas: 'high', stat: 'live', color: '#2196f3', section: 'feature-roadmap' },
+  { phase: '5', rowId: 'p5', feas: 'lowRd', stat: 'planned', color: '#f44336', section: null },
+];
 
-  const phaseLinks = [
-    {
-      phase: "1",
-      title: "Unknown Intent Logger",
-      mainFeature: "Logs and classifies user ideas",
-      feasibility: "High",
-      status: "Live",
-      color: "#4caf50",
-      section: "idea-log"
-    },
-    {
-      phase: "2", 
-      title: "Clarifying Q&A",
-      mainFeature: "Ask follow-ups before discard",
-      feasibility: "High",
-      status: "Live",
-      color: "#ff9800",
-      section: null
-    },
-    {
-      phase: "3",
-      title: "Evolution Panel", 
-      mainFeature: "Suggest future features, upvotes, notifications",
-      feasibility: "High",
-      status: "Live",
-      color: "#ff5722",
-      section: "feature-roadmap"
-    },
-    {
-      phase: "4",
-      title: "Cursor-Driven Scaffolds",
-      mainFeature: "AI codegen, scaffold history, admin approval", 
-      feasibility: "High",
-      status: "Live",
-      color: "#2196f3",
-      section: "feature-roadmap"
-    },
-    {
-      phase: "5",
-      title: "Real-Time Code Integration",
-      mainFeature: "Update system instantly",
-      feasibility: "Low (R&D)",
-      status: "Planned",
-      color: "#f44336",
-      section: null
-    }
-  ];
+function FutureApp({ onSectionSelect }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
 
   const handlePhaseClick = (section) => {
     if (section && onSectionSelect) {
@@ -60,208 +22,328 @@ function FutureApp({ onSectionSelect }) {
 
   return (
     <div style={{ color: colors.text }}>
-      <h2 style={{ color: colors.text, marginBottom: "2rem" }}>🔮 Future App Vision</h2>
-      
-      {/* Summary Table */}
-      <div style={{ marginBottom: "3rem" }}>
-        <h3 style={{ color: colors.text, marginBottom: "1rem" }}>Development Roadmap</h3>
-        <div style={{ 
-          background: colors.cardBackground, 
-          borderRadius: 12, 
-          padding: "1.5rem",
-          boxShadow: colors.shadow,
-          overflowX: "auto"
-        }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <h2 style={{ color: colors.text, marginBottom: '2rem' }}>
+        🔮 {t('futureAppModule.pageTitle')}
+      </h2>
+
+      <div style={{ marginBottom: '3rem' }}>
+        <h3 style={{ color: colors.text, marginBottom: '1rem' }}>
+          {t('futureAppModule.roadmapHeading')}
+        </h3>
+        <div
+          style={{
+            background: colors.cardBackground,
+            borderRadius: 12,
+            padding: '1.5rem',
+            boxShadow: colors.shadow,
+            overflowX: 'auto',
+          }}
+        >
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
-                <th style={{ textAlign: "left", padding: "0.75rem", color: colors.textSecondary }}>Phase</th>
-                <th style={{ textAlign: "left", padding: "0.75rem", color: colors.textSecondary }}>Title</th>
-                <th style={{ textAlign: "left", padding: "0.75rem", color: colors.textSecondary }}>Main Feature</th>
-                <th style={{ textAlign: "left", padding: "0.75rem", color: colors.textSecondary }}>Feasibility</th>
-                <th style={{ textAlign: "left", padding: "0.75rem", color: colors.textSecondary }}>Status</th>
+                <th style={{ textAlign: 'left', padding: '0.75rem', color: colors.textSecondary }}>
+                  {t('futureAppModule.thPhase')}
+                </th>
+                <th style={{ textAlign: 'left', padding: '0.75rem', color: colors.textSecondary }}>
+                  {t('futureAppModule.thTitle')}
+                </th>
+                <th style={{ textAlign: 'left', padding: '0.75rem', color: colors.textSecondary }}>
+                  {t('futureAppModule.thMainFeature')}
+                </th>
+                <th style={{ textAlign: 'left', padding: '0.75rem', color: colors.textSecondary }}>
+                  {t('futureAppModule.thFeasibility')}
+                </th>
+                <th style={{ textAlign: 'left', padding: '0.75rem', color: colors.textSecondary }}>
+                  {t('futureAppModule.thStatus')}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {phaseLinks.map((phase, index) => (
-                <tr key={index} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                  <td style={{ padding: "0.75rem" }}>
-                    <div style={{ 
-                      display: "inline-flex", 
-                      alignItems: "center", 
-                      justifyContent: "center",
-                      width: "2rem",
-                      height: "2rem",
-                      borderRadius: "50%",
-                      background: phase.color,
-                      color: "white",
-                      fontSize: "0.9rem",
-                      fontWeight: "bold"
-                    }}>
-                      {phase.phase}
-                    </div>
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    {phase.section ? (
-                      <button
-                        onClick={() => handlePhaseClick(phase.section)}
+              {PHASE_ROWS.map((row) => {
+                const title = t(`futureAppModule.phaseRows.${row.rowId}.title`);
+                const mainFeature = t(`futureAppModule.phaseRows.${row.rowId}.mainFeature`);
+                const feasibility = t(`futureAppModule.feasibility.${row.feas}`);
+                const status = t(`futureAppModule.status.${row.stat}`);
+                const feasColor = row.feas === 'high' ? '#4caf50' : '#f44336';
+                const statusColor = row.stat === 'live' ? '#4caf50' : colors.textSecondary;
+
+                return (
+                  <tr key={row.rowId} style={{ borderBottom: `1px solid ${colors.border}` }}>
+                    <td style={{ padding: '0.75rem' }}>
+                      <div
                         style={{
-                          background: "none",
-                          border: "none",
-                          color: colors.primary,
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                          fontSize: "inherit",
-                          padding: 0,
-                          fontFamily: "inherit"
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '2rem',
+                          height: '2rem',
+                          borderRadius: '50%',
+                          background: row.color,
+                          color: 'white',
+                          fontSize: '0.9rem',
+                          fontWeight: 'bold',
                         }}
                       >
-                        {phase.title}
-                      </button>
-                    ) : (
-                      <span style={{ color: colors.text }}>{phase.title}</span>
-                    )}
-                  </td>
-                  <td style={{ padding: "0.75rem", color: colors.text }}>{phase.mainFeature}</td>
-                  <td style={{ 
-                    padding: "0.75rem", 
-                    color: phase.feasibility.includes("High") ? "#4caf50" : "#f44336",
-                    fontWeight: "500"
-                  }}>
-                    {phase.feasibility}
-                  </td>
-                  <td style={{ 
-                    padding: "0.75rem", 
-                    color: phase.status === "Live" ? "#4caf50" : colors.textSecondary,
-                    fontWeight: "500"
-                  }}>
-                    {phase.status}
-                  </td>
-                </tr>
-              ))}
+                        {row.phase}
+                      </div>
+                    </td>
+                    <td style={{ padding: '0.75rem' }}>
+                      {row.section ? (
+                        <button
+                          type="button"
+                          onClick={() => handlePhaseClick(row.section)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: colors.primary,
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            fontSize: 'inherit',
+                            padding: 0,
+                            fontFamily: 'inherit',
+                          }}
+                        >
+                          {title}
+                        </button>
+                      ) : (
+                        <span style={{ color: colors.text }}>{title}</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '0.75rem', color: colors.text }}>{mainFeature}</td>
+                    <td
+                      style={{
+                        padding: '0.75rem',
+                        color: feasColor,
+                        fontWeight: '500',
+                      }}
+                    >
+                      {feasibility}
+                    </td>
+                    <td
+                      style={{
+                        padding: '0.75rem',
+                        color: statusColor,
+                        fontWeight: '500',
+                      }}
+                    >
+                      {status}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Phase 5 Preview */}
-      <div style={{ 
-        background: colors.cardBackground, 
-        borderRadius: 12, 
-        padding: "2rem",
-        boxShadow: colors.shadow
-      }}>
-        <h3 style={{ color: colors.text, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          🔮 Phase 5 Preview: Real-Time Dynamic Feature Activation
+      <div
+        style={{
+          background: colors.cardBackground,
+          borderRadius: 12,
+          padding: '2rem',
+          boxShadow: colors.shadow,
+        }}
+      >
+        <h3
+          style={{
+            color: colors.text,
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
+          🔮 {t('futureAppModule.previewTitle')}
         </h3>
-        
-        <p style={{ color: colors.text, marginBottom: "2rem", lineHeight: 1.6 }}>
-          The future of adaptive, self-evolving applications. Watch as user ideas become live features in real-time.
+
+        <p style={{ color: colors.text, marginBottom: '2rem', lineHeight: 1.6 }}>
+          {t('futureAppModule.previewIntro')}
         </p>
 
-        <div style={{ marginBottom: "2rem" }}>
-          <h4 style={{ color: colors.text, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            🏗️ Technical Architecture
+        <div style={{ marginBottom: '2rem' }}>
+          <h4
+            style={{
+              color: colors.text,
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            🏗️ {t('futureAppModule.techArchTitle')}
           </h4>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1rem" }}>
-            <div style={{ 
-              background: colors.background, 
-              padding: "1.5rem", 
-              borderRadius: 8, 
-              border: `1px solid ${colors.border}`,
-              textAlign: "center"
-            }}>
-              <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🧠</div>
-              <h5 style={{ color: colors.text, marginBottom: "0.5rem" }}>Cursor AI + Scaffolding</h5>
-              <p style={{ color: colors.textSecondary, fontSize: "0.9rem" }}>
-                Generate backend/frontend/test/docs code
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1rem',
+            }}
+          >
+            <div
+              style={{
+                background: colors.background,
+                padding: '1.5rem',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🧠</div>
+              <h5 style={{ color: colors.text, marginBottom: '0.5rem' }}>
+                {t('futureAppModule.techCard1Title')}
+              </h5>
+              <p style={{ color: colors.textSecondary, fontSize: '0.9rem' }}>
+                {t('futureAppModule.techCard1Body')}
               </p>
             </div>
-            
-            <div style={{ 
-              background: colors.background, 
-              padding: "1.5rem", 
-              borderRadius: 8, 
-              border: `1px solid ${colors.border}`,
-              textAlign: "center"
-            }}>
-              <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🐛</div>
-              <h5 style={{ color: colors.text, marginBottom: "0.5rem" }}>Bugbot Integration</h5>
-              <p style={{ color: colors.textSecondary, fontSize: "0.9rem" }}>
-                Catch runtime and build-time errors in AI code
+
+            <div
+              style={{
+                background: colors.background,
+                padding: '1.5rem',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🐛</div>
+              <h5 style={{ color: colors.text, marginBottom: '0.5rem' }}>
+                {t('futureAppModule.techCard2Title')}
+              </h5>
+              <p style={{ color: colors.textSecondary, fontSize: '0.9rem' }}>
+                {t('futureAppModule.techCard2Body')}
               </p>
             </div>
-            
-            <div style={{ 
-              background: colors.background, 
-              padding: "1.5rem", 
-              borderRadius: 8, 
-              border: `1px solid ${colors.border}`,
-              textAlign: "center"
-            }}>
-              <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🔄</div>
-              <h5 style={{ color: colors.text, marginBottom: "0.5rem" }}>Hot Reloading</h5>
-              <p style={{ color: colors.textSecondary, fontSize: "0.9rem" }}>
-                Inject new code without full restart
+
+            <div
+              style={{
+                background: colors.background,
+                padding: '1.5rem',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔄</div>
+              <h5 style={{ color: colors.text, marginBottom: '0.5rem' }}>
+                {t('futureAppModule.techCard3Title')}
+              </h5>
+              <p style={{ color: colors.textSecondary, fontSize: '0.9rem' }}>
+                {t('futureAppModule.techCard3Body')}
               </p>
-              <p style={{ color: colors.textSecondary, fontSize: "0.8rem", fontStyle: "italic" }}>
-                The closest today is Rolling updates without downtime with Docker + Kubernetes
+              <p
+                style={{
+                  color: colors.textSecondary,
+                  fontSize: '0.8rem',
+                  fontStyle: 'italic',
+                }}
+              >
+                {t('futureAppModule.techCard3Note')}
               </p>
             </div>
           </div>
         </div>
 
-        <div style={{ marginBottom: "2rem" }}>
-          <h4 style={{ color: colors.text, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            🎬 Live Demo Preview
+        <div style={{ marginBottom: '2rem' }}>
+          <h4
+            style={{
+              color: colors.text,
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            🎬 {t('futureAppModule.demoTitle')}
           </h4>
-          <div style={{ 
-            background: colors.background, 
-            padding: "1.5rem", 
-            borderRadius: 8, 
-            border: `1px solid ${colors.border}`,
-            fontFamily: "monospace",
-            fontSize: "0.9rem",
-            color: colors.textSecondary
-          }}>
-            <div style={{ marginBottom: "0.5rem" }}>$ user: "Add a new learning module"</div>
-            <div style={{ marginBottom: "0.5rem" }}>🤖 AI: "Generating scaffold for 'learning-module'..."</div>
-            <div style={{ marginBottom: "0.5rem" }}>🔧 Creating: React component, API route, tests...</div>
-            <div style={{ marginBottom: "0.5rem" }}>✅ Hot-reloading new feature...</div>
-            <div style={{ color: "#4caf50" }}>🎉 Feature live! Try it now.</div>
+          <div
+            style={{
+              background: colors.background,
+              padding: '1.5rem',
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: colors.textSecondary,
+            }}
+          >
+            <div style={{ marginBottom: '0.5rem' }}>{t('futureAppModule.demoLine1')}</div>
+            <div style={{ marginBottom: '0.5rem' }}>{t('futureAppModule.demoLine2')}</div>
+            <div style={{ marginBottom: '0.5rem' }}>{t('futureAppModule.demoLine3')}</div>
+            <div style={{ marginBottom: '0.5rem' }}>{t('futureAppModule.demoLine4')}</div>
+            <div style={{ color: '#4caf50' }}>{t('futureAppModule.demoLine5')}</div>
           </div>
         </div>
 
-        <div style={{ marginBottom: "2rem" }}>
-          <h4 style={{ color: colors.text, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            💼 Business Impact
+        <div style={{ marginBottom: '2rem' }}>
+          <h4
+            style={{
+              color: colors.text,
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            💼 {t('futureAppModule.impactTitle')}
           </h4>
-          <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: "1.5rem" }}>
-            <li><strong>Adaptive Applications:</strong> Software that evolves with user needs</li>
-            <li><strong>Zero-Downtime Updates:</strong> Features appear instantly without deployment</li>
-            <li><strong>AI-Driven Development:</strong> Natural language to working code</li>
-            <li><strong>User-Centric Evolution:</strong> Features built from real user feedback</li>
+          <ul style={{ color: colors.text, lineHeight: 1.6, paddingLeft: '1.5rem' }}>
+            <li>
+              <strong>{t('futureAppModule.impact1Label')}:</strong>{' '}
+              {t('futureAppModule.impact1Body')}
+            </li>
+            <li>
+              <strong>{t('futureAppModule.impact2Label')}:</strong>{' '}
+              {t('futureAppModule.impact2Body')}
+            </li>
+            <li>
+              <strong>{t('futureAppModule.impact3Label')}:</strong>{' '}
+              {t('futureAppModule.impact3Body')}
+            </li>
+            <li>
+              <strong>{t('futureAppModule.impact4Label')}:</strong>{' '}
+              {t('futureAppModule.impact4Body')}
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 style={{ color: colors.text, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            🗺️ Implementation Roadmap
+          <h4
+            style={{
+              color: colors.text,
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            🗺️ {t('futureAppModule.implRoadmapTitle')}
           </h4>
-          <div style={{ 
-            background: colors.background, 
-            padding: "1.5rem", 
-            borderRadius: 8, 
-            border: `1px solid ${colors.border}`,
-            color: colors.textSecondary,
-            fontSize: "0.9rem"
-          }}>
-            <div style={{ marginBottom: "0.5rem" }}><strong>Phase 5.1:</strong> Sandboxed code execution</div>
-            <div style={{ marginBottom: "0.5rem" }}><strong>Phase 5.2:</strong> Real-time state synchronization</div>
-            <div style={{ marginBottom: "0.5rem" }}><strong>Phase 5.3:</strong> Hot-reload UI components</div>
-            <div style={{ marginBottom: "0.5rem" }}><strong>Phase 5.4:</strong> Rollback and safety controls</div>
-            <div style={{ color: colors.textSecondary, fontStyle: "italic" }}>
-              Estimated timeline: 6-12 months (R&D phase)
+          <div
+            style={{
+              background: colors.background,
+              padding: '1.5rem',
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              color: colors.textSecondary,
+              fontSize: '0.9rem',
+            }}
+          >
+            <div style={{ marginBottom: '0.5rem' }}>
+              <strong>{t('futureAppModule.impl51Title')}:</strong> {t('futureAppModule.impl51Body')}
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <strong>{t('futureAppModule.impl52Title')}:</strong> {t('futureAppModule.impl52Body')}
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <strong>{t('futureAppModule.impl53Title')}:</strong> {t('futureAppModule.impl53Body')}
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <strong>{t('futureAppModule.impl54Title')}:</strong> {t('futureAppModule.impl54Body')}
+            </div>
+            <div style={{ color: colors.textSecondary, fontStyle: 'italic' }}>
+              {t('futureAppModule.implTimeline')}
             </div>
           </div>
         </div>
@@ -270,4 +352,4 @@ function FutureApp({ onSectionSelect }) {
   );
 }
 
-export default FutureApp; 
+export default FutureApp;

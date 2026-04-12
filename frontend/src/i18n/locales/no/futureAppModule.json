@@ -1,0 +1,76 @@
+{
+  "futureAppModule": {
+    "pageTitle": "Fremtidens app-visjon",
+    "roadmapHeading": "Utviklingsplan",
+    "thPhase": "Fase",
+    "thTitle": "Tittel",
+    "thMainFeature": "Hovedfunksjon",
+    "thFeasibility": "Gjennomførbarhet",
+    "thStatus": "Status",
+    "feasibility": {
+      "high": "Høy",
+      "lowRd": "Lav (F&U)"
+    },
+    "status": {
+      "live": "I drift",
+      "planned": "Planlagt"
+    },
+    "phaseRows": {
+      "p1": {
+        "title": "Logger for ukjent intensjon",
+        "mainFeature": "Logger og klassifiserer brukerideer"
+      },
+      "p2": {
+        "title": "Avklarende Q&A",
+        "mainFeature": "Still oppfølgingsspørsmål før forkastning"
+      },
+      "p3": {
+        "title": "Utviklingspanel",
+        "mainFeature": "Foreslå fremtidige funksjoner, stemmer, varsler"
+      },
+      "p4": {
+        "title": "Cursor-drevne skall (scaffolds)",
+        "mainFeature": "KI-kodegenerering, skallhistorikk, admin-godkjenning"
+      },
+      "p5": {
+        "title": "Sanntids kodeintegrasjon",
+        "mainFeature": "Oppdater systemet umiddelbart"
+      }
+    },
+    "previewTitle": "Fase 5-forhåndsvisning: Sanntids dynamisk funksjonsaktivering",
+    "previewIntro": "Fremtiden for adaptive, selvutviklende applikasjoner. Se brukerideer bli til levende funksjoner i sanntid.",
+    "techArchTitle": "Teknisk arkitektur",
+    "techCard1Title": "Cursor AI + skallbygging",
+    "techCard1Body": "Generer backend/front-end/test/dokumentasjonskode",
+    "techCard2Title": "Bugbot-integrasjon",
+    "techCard2Body": "Oppdag kjøretids- og byggefeil i KI-generert kode",
+    "techCard3Title": "Hot reload",
+    "techCard3Body": "Sett inn ny kode uten full omstart",
+    "techCard3Note": "Det nærmeste i dag er rullerende oppdateringer uten nedetid med Docker + Kubernetes",
+    "demoTitle": "Forhåndsvisning av live demo",
+    "demoLine1": "$ bruker: «Legg til en ny læringsmodul»",
+    "demoLine2": "🤖 KI: «Genererer skall for «learning-module» …»",
+    "demoLine3": "🔧 Oppretter: React-komponent, API-rute, tester …",
+    "demoLine4": "✅ Hot-reload av ny funksjon …",
+    "demoLine5": "🎉 Funksjonen er live! Prøv den nå.",
+    "impactTitle": "Forretningsmessig effekt",
+    "impact1Label": "Adaptive applikasjoner",
+    "impact1Body": "Programvare som utvikler seg med brukernes behov",
+    "impact2Label": "Oppdateringer uten nedetid",
+    "impact2Body": "Funksjoner vises umiddelbart uten ny utrulling",
+    "impact3Label": "KI-drevet utvikling",
+    "impact3Body": "Naturlig språk til fungerende kode",
+    "impact4Label": "Brukerdrevet utvikling",
+    "impact4Body": "Funksjoner bygget på ekte tilbakemeldinger",
+    "implRoadmapTitle": "Gjennomføringsplan",
+    "impl51Title": "Fase 5.1",
+    "impl51Body": "Sandkasse-kjøring av kode",
+    "impl52Title": "Fase 5.2",
+    "impl52Body": "Sanntidssynkronisering av tilstand",
+    "impl53Title": "Fase 5.3",
+    "impl53Body": "Hot-reload av UI-komponenter",
+    "impl54Title": "Fase 5.4",
+    "impl54Body": "Tilbakerulling og sikkerhetskontroller",
+    "implTimeline": "Estimert tidslinje: 6–12 måneder (F&U-fase)"
+  }
+}
