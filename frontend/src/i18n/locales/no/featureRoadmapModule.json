@@ -1,0 +1,75 @@
+{
+  "featureRoadmapModule": {
+    "pageTitle": "Funksjonskart",
+    "intro": "Panelet viser brukerinnsendte ideer og mulige fremtidige funksjoner. Stem opp, abonner på varsler, eller (admin) oppdater status.",
+    "statusLegend": "Statusforklaring:",
+    "loading": "Laster...",
+    "fetchError": "Kunne ikke hente funksjonskartet.",
+    "thFeatureName": "Funksjonsnavn",
+    "thStatus": "Status",
+    "thSummary": "Sammendrag",
+    "thUpvotes": "Stemmer",
+    "thNotifications": "Varsler",
+    "thSubmitted": "Innsendt",
+    "thAdmin": "Admin",
+    "noFeatureName": "(Ingen funksjonsnavn)",
+    "notifyMe": "Varsle meg",
+    "titleUpvote": "Stem opp denne funksjonen",
+    "titleNotify": "Få varsel om denne funksjonen",
+    "generateScaffold": "Generer skall (scaffold)",
+    "titleGenerateScaffold": "Generer kodeskall for denne funksjonen",
+    "history": "Historikk",
+    "titleHistory": "Se skallhistorikk for denne funksjonen",
+    "promptSubscribeEmail": "Skriv e-postadressen din for å bli varslet om denne funksjonen:",
+    "subscribed": "Du er nå abonnert!",
+    "promptApprovalComment": "Skriv godkjenningskommentar (valgfritt):",
+    "approveFailed": "Kunne ikke godkjenne skallet.",
+    "modalScaffoldTitle": "Kodeskall for: {{name}}",
+    "modalHistoryTitle": "Skallhistorikk for: {{name}}",
+    "modalFeatureFallback": "Funksjon",
+    "copyCode": "Kopier kode",
+    "codeCopied": "Koden er kopiert til utklippstavlen!",
+    "noCodeGenerated": "(Ingen kode generert)",
+    "scaffoldMockHead": "// Skall for: {{name}}\n// (Backendfeil, bruker mock)",
+    "noHistory": "Ingen skallhistorikk funnet for denne funksjonen.",
+    "historyMetaType": "Type:",
+    "historyMetaUser": "Bruker:",
+    "historyMetaDate": "Dato:",
+    "historyApprovedBy": "✔️ Godkjent av {{user}}{{at}}",
+    "adminComment": "Adminkommentar:",
+    "approve": "Godkjenn",
+    "status": {
+      "idea": "Idé",
+      "planned": "Planlagt",
+      "inReview": "Under vurdering",
+      "comingSoon": "Kommer snart",
+      "implemented": "Implementert"
+    },
+    "scaffold": {
+      "apiRoute": {
+        "label": "API-rute",
+        "preview": "Genererer en FastAPI-rute med Pydantic-modeller etter behov."
+      },
+      "dbModel": {
+        "label": "DB-modell",
+        "preview": "Genererer en MongoDB (Motor)-samling/modell og relaterte skjemaer."
+      },
+      "backgroundJob": {
+        "label": "Bakgrunnsjobb",
+        "preview": "Genererer en asynkron bakgrunnsoppgave (f.eks. med FastAPI BackgroundTasks eller Celery)."
+      },
+      "unitTest": {
+        "label": "Enhetstest",
+        "preview": "Genererer en Python-enhetstest for funksjonen."
+      },
+      "cypressTest": {
+        "label": "Cypress-test",
+        "preview": "Genererer en Cypress ende-til-ende-test for funksjonen."
+      },
+      "docs": {
+        "label": "Dokumentasjon",
+        "preview": "Genererer Markdown-dokumentasjon for funksjonen."
+      }
+    }
+  }
+}

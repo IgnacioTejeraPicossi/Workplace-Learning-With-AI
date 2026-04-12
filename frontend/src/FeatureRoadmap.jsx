@@ -1,20 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 import ModalDialog from "./ModalDialog";
 
-// Simulate admin check (replace with real auth in production)
 const isAdmin = true;
 
-// Status color mapping
-const statusColors = {
-  "Idea": "#bdbdbd",
-  "Planned": "#1976d2",
-  "In Review": "#f4b400",
-  "Coming Soon": "#e67e22",
-  "Implemented": "#2ecc40"
+const STATUS_ORDER = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
+
+const STATUS_TO_I18N = {
+  Idea: "idea",
+  Planned: "planned",
+  "In Review": "inReview",
+  "Coming Soon": "comingSoon",
+  Implemented: "implemented",
 };
 
+const statusColors = {
+  Idea: "#bdbdbd",
+  Planned: "#1976d2",
+  "In Review": "#f4b400",
+  "Coming Soon": "#e67e22",
+  Implemented: "#2ecc40",
+};
+
+const SCAFFOLD_TYPES = [
+  { value: "API Route", i18nKey: "apiRoute" },
+  { value: "DB Model", i18nKey: "dbModel" },
+  { value: "Background Job", i18nKey: "backgroundJob" },
+  { value: "Unit Test", i18nKey: "unitTest" },
+  { value: "Cypress Test", i18nKey: "cypressTest" },
+  { value: "Docs", i18nKey: "docs" },
+];
+
 function FeatureRoadmap() {
+  const { t, i18n } = useTranslation();
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,34 +43,60 @@ function FeatureRoadmap() {
   const [scaffoldModal, setScaffoldModal] = useState({ open: false, code: "", feature: null });
   const [sortBy, setSortBy] = useState("upvotes");
   const [sortDir, setSortDir] = useState("desc");
-  const [scaffoldType, setScaffoldType] = useState('API Route');
+  const [scaffoldType, setScaffoldType] = useState("API Route");
   const [historyModal, setHistoryModal] = useState({ open: false, idea: null, history: [] });
   const [loadingHistory, setLoadingHistory] = useState(false);
   const { colors } = useTheme();
 
-  const fetchFeatures = async () => {
+  const dateLocale = i18n.language?.startsWith("no") ? "nb-NO" : undefined;
+
+  const translateStatus = useCallback(
+    (apiValue) => {
+      const k = STATUS_TO_I18N[apiValue];
+      if (k) return t(`featureRoadmapModule.status.${k}`);
+      return apiValue;
+    },
+    [t]
+  );
+
+  const scaffoldLabel = useCallback(
+    (value) => {
+      const row = SCAFFOLD_TYPES.find((s) => s.value === value);
+      if (row) return t(`featureRoadmapModule.scaffold.${row.i18nKey}.label`);
+      return value;
+    },
+    [t]
+  );
+
+  const scaffoldPreview = useMemo(() => {
+    const row = SCAFFOLD_TYPES.find((s) => s.value === scaffoldType);
+    if (row) return t(`featureRoadmapModule.scaffold.${row.i18nKey}.preview`);
+    return "";
+  }, [scaffoldType, t]);
+
+  const fetchFeatures = useCallback(async () => {
     setLoading(true);
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
       const res = await fetch(`${API_BASE}/admin/unknown-intents`);
       const data = await res.json();
       setFeatures(data.ideas || []);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch feature roadmap.");
+      setError(t("featureRoadmapModule.fetchError"));
       setFeatures([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchFeatures();
-  }, []);
+  }, [fetchFeatures]);
 
   const handleUpvote = async (id) => {
     setUpvoting(id);
-    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
     await fetch(`${API_BASE}/admin/unknown-intents/${id}/upvote`, { method: "POST" });
     await fetchFeatures();
     setUpvoting("");
@@ -59,49 +104,50 @@ function FeatureRoadmap() {
 
   const handleSubscribe = async (id) => {
     setSubscribing(id);
-    const email = prompt("Enter your email to be notified about this feature:");
+    const email = prompt(t("featureRoadmapModule.promptSubscribeEmail"));
     if (email) {
-      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
       await fetch(`${API_BASE}/admin/unknown-intents/${id}/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
-      alert("Subscribed!");
+      alert(t("featureRoadmapModule.subscribed"));
     }
     setSubscribing("");
   };
 
   const handleStatusChange = async (id, status) => {
     setStatusUpdating(id);
-    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
     await fetch(`${API_BASE}/admin/unknown-intents/${id}/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     });
     await fetchFeatures();
     setStatusUpdating("");
   };
 
   const handleGenerateScaffold = async (idea) => {
-    // Call backend to generate scaffold
     let codeStub = "";
+    const featureName = idea.classification?.new_feature || idea.user_input;
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
       const res = await fetch(`${API_BASE}/generate-scaffold`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          feature_name: idea.classification?.new_feature || idea.user_input,
+          feature_name: featureName,
           feature_summary: idea.classification?.intent || idea.user_input,
-          scaffold_type: scaffoldType
-        })
+          scaffold_type: scaffoldType,
+        }),
       });
       const data = await res.json();
-      codeStub = data.code || "(No code generated)";
+      codeStub = data.code || t("featureRoadmapModule.noCodeGenerated");
     } catch (err) {
-      codeStub = `// Scaffold for: ${idea.classification?.new_feature || idea.user_input}\n// (Backend error, using mock)\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
+      const mockHead = t("featureRoadmapModule.scaffoldMockHead", { name: featureName });
+      codeStub = `${mockHead}\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
     }
     setScaffoldModal({ open: true, code: codeStub, feature: idea });
   };
@@ -110,8 +156,10 @@ function FeatureRoadmap() {
     setLoadingHistory(true);
     setHistoryModal({ open: true, idea, history: [] });
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      const res = await fetch(`${API_BASE}/scaffold-history/${encodeURIComponent(idea.classification?.new_feature || idea.user_input)}`);
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+      const res = await fetch(
+        `${API_BASE}/scaffold-history/${encodeURIComponent(idea.classification?.new_feature || idea.user_input)}`
+      );
       const data = await res.json();
       setHistoryModal({ open: true, idea, history: data.history || [] });
     } catch (err) {
@@ -122,37 +170,25 @@ function FeatureRoadmap() {
   };
 
   const handleApproveScaffold = async (scaffold) => {
-    const admin_comment = prompt("Enter approval comment (optional):", "");
-    const approved_by = "admin"; // Replace with real user if available
-    const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+    const admin_comment = prompt(t("featureRoadmapModule.promptApprovalComment"), "");
+    const approved_by = "admin";
+    const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
     const res = await fetch(`${API_BASE}/scaffold-history/${scaffold._id}/approve`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin_comment, approved_by })
+      body: JSON.stringify({ admin_comment, approved_by }),
     });
     const data = await res.json();
     if (data.success) {
-      // Refresh history
       handleShowHistory(historyModal.idea);
     } else {
-      alert("Failed to approve scaffold.");
+      alert(t("featureRoadmapModule.approveFailed"));
     }
   };
 
-  const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
-
-  const SCAFFOLD_TYPE_PREVIEWS = {
-    'API Route': 'Generates a FastAPI route with Pydantic models as needed.',
-    'DB Model': 'Generates a MongoDB (Motor) collection/model and related schemas.',
-    'Background Job': 'Generates an async background task (e.g., with FastAPI BackgroundTasks or Celery).',
-    'Unit Test': 'Generates a Python unit test for the feature.',
-    'Cypress Test': 'Generates a Cypress end-to-end test for the feature.',
-    'Docs': 'Generates markdown documentation for the feature.'
-  };
-
-  // Sorting logic
   const sortedFeatures = [...features].sort((a, b) => {
-    let aVal, bVal;
+    let aVal;
+    let bVal;
     if (sortBy === "upvotes") {
       aVal = a.upvotes || 0;
       bVal = b.upvotes || 0;
@@ -160,17 +196,17 @@ function FeatureRoadmap() {
       aVal = new Date(a.created_at || 0).getTime();
       bVal = new Date(b.created_at || 0).getTime();
     } else if (sortBy === "status") {
-      aVal = statusOptions.indexOf(a.status || "Idea");
-      bVal = statusOptions.indexOf(b.status || "Idea");
+      aVal = STATUS_ORDER.indexOf(a.status || "Idea");
+      bVal = STATUS_ORDER.indexOf(b.status || "Idea");
     } else {
-      aVal = 0; bVal = 0;
+      aVal = 0;
+      bVal = 0;
     }
     if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
     if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
     return 0;
   });
 
-  // Helper for clickable column headers
   const handleSort = (col) => {
     if (sortBy === col) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -180,107 +216,214 @@ function FeatureRoadmap() {
     }
   };
 
+  const featureDisplayName = (idea) =>
+    idea.classification?.new_feature || t("featureRoadmapModule.noFeatureName");
+
+  const modalName = (idea) =>
+    idea?.classification?.new_feature || idea?.user_input || t("featureRoadmapModule.modalFeatureFallback");
+
   return (
     <div style={{ color: colors.text, padding: 24 }}>
-      <h2 style={{ color: colors.text }}>Feature Roadmap</h2>
-      <p style={{ color: colors.textSecondary, marginBottom: 24 }}>
-        This panel shows user-submitted ideas and potential future features. Upvote, subscribe for notifications, or (admin) update status.
-      </p>
+      <h2 style={{ color: colors.text }}>{t("featureRoadmapModule.pageTitle")}</h2>
+      <p style={{ color: colors.textSecondary, marginBottom: 24 }}>{t("featureRoadmapModule.intro")}</p>
       <div style={{ marginBottom: 12 }}>
-        <span style={{ fontWeight: 600, marginRight: 12 }}>Status Legend:</span>
-        {statusOptions.map(opt => (
-          <span key={opt} style={{ background: statusColors[opt], color: '#fff', borderRadius: 6, padding: '2px 10px', marginRight: 8, fontSize: 13 }}>{opt}</span>
+        <span style={{ fontWeight: 600, marginRight: 12 }}>{t("featureRoadmapModule.statusLegend")}</span>
+        {STATUS_ORDER.map((opt) => (
+          <span
+            key={opt}
+            style={{
+              background: statusColors[opt],
+              color: "#fff",
+              borderRadius: 6,
+              padding: "2px 10px",
+              marginRight: 8,
+              fontSize: 13,
+            }}
+          >
+            {translateStatus(opt)}
+          </span>
         ))}
       </div>
       {loading ? (
-        <div>Loading...</div>
+        <div>{t("featureRoadmapModule.loading")}</div>
       ) : error ? (
         <div style={{ color: "red" }}>{error}</div>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
           <thead>
             <tr style={{ background: colors.primaryLight }}>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("feature")}>Feature Name</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("status")}>Status {sortBy === "status" && (sortDir === "asc" ? "▲" : "▼")}</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Summary</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("upvotes")}>Upvotes {sortBy === "upvotes" && (sortDir === "asc" ? "▲" : "▼")}</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Notifications</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("date")}>Submitted {sortBy === "date" && (sortDir === "asc" ? "▲" : "▼")}</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}></th>
+              <th
+                style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: "pointer" }}
+                onClick={() => handleSort("feature")}
+              >
+                {t("featureRoadmapModule.thFeatureName")}
+              </th>
+              <th
+                style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: "pointer" }}
+                onClick={() => handleSort("status")}
+              >
+                {t("featureRoadmapModule.thStatus")}{" "}
+                {sortBy === "status" && (sortDir === "asc" ? "▲" : "▼")}
+              </th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                {t("featureRoadmapModule.thSummary")}
+              </th>
+              <th
+                style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: "pointer" }}
+                onClick={() => handleSort("upvotes")}
+              >
+                {t("featureRoadmapModule.thUpvotes")}{" "}
+                {sortBy === "upvotes" && (sortDir === "asc" ? "▲" : "▼")}
+              </th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                {t("featureRoadmapModule.thNotifications")}
+              </th>
+              <th
+                style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: "pointer" }}
+                onClick={() => handleSort("date")}
+              >
+                {t("featureRoadmapModule.thSubmitted")}{" "}
+                {sortBy === "date" && (sortDir === "asc" ? "▲" : "▼")}
+              </th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                {t("featureRoadmapModule.thAdmin")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {sortedFeatures.map((idea, idx) => (
-              <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : colors.background }}>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.new_feature || "(No feature name)"}</td>
+              <tr
+                key={idea._id || idx}
+                style={{ background: idx % 2 === 0 ? colors.cardBackground : colors.background }}
+              >
                 <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
-                  <span style={{ background: statusColors[idea.status || "Idea"], color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 600 }}>
+                  {featureDisplayName(idea)}
+                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
+                  <span
+                    style={{
+                      background: statusColors[idea.status || "Idea"],
+                      color: "#fff",
+                      borderRadius: 6,
+                      padding: "2px 10px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
                     {isAdmin ? (
                       <select
                         value={idea.status || "Idea"}
-                        onChange={e => handleStatusChange(idea._id, e.target.value)}
+                        onChange={(e) => handleStatusChange(idea._id, e.target.value)}
                         disabled={statusUpdating === idea._id}
-                        style={{ padding: 4, borderRadius: 4, background: statusColors[idea.status || "Idea"], color: '#fff', fontWeight: 600, border: 'none' }}
+                        style={{
+                          padding: 4,
+                          borderRadius: 4,
+                          background: statusColors[idea.status || "Idea"],
+                          color: "#fff",
+                          fontWeight: 600,
+                          border: "none",
+                        }}
                       >
-                        {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        {STATUS_ORDER.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {translateStatus(opt)}
+                          </option>
+                        ))}
                       </select>
                     ) : (
-                      idea.status || "Idea"
+                      translateStatus(idea.status || "Idea")
                     )}
                   </span>
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.intent || idea.user_input}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
+                  {idea.classification?.intent || idea.user_input}
+                </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <button
+                    type="button"
                     onClick={() => handleUpvote(idea._id)}
                     disabled={upvoting === idea._id}
-                    style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
-                    title="Upvote this feature"
+                    style={{
+                      background: "#eee",
+                      border: "1px solid #ccc",
+                      borderRadius: 6,
+                      padding: "2px 10px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                    title={t("featureRoadmapModule.titleUpvote")}
                   >
                     👍 {idea.upvotes || 0}
                   </button>
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <button
+                    type="button"
                     onClick={() => handleSubscribe(idea._id)}
                     disabled={subscribing === idea._id}
-                    style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
-                    title="Get notified about this feature"
+                    style={{
+                      background: "#eee",
+                      border: "1px solid #ccc",
+                      borderRadius: 6,
+                      padding: "2px 10px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                    title={t("featureRoadmapModule.titleNotify")}
                   >
-                    🔔 Notify Me
+                    🔔 {t("featureRoadmapModule.notifyMe")}
                   </button>
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {idea.created_at ? new Date(idea.created_at).toLocaleString(dateLocale) : "-"}
+                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     <select
                       value={scaffoldType}
-                      onChange={e => setScaffoldType(e.target.value)}
+                      onChange={(e) => setScaffoldType(e.target.value)}
                       style={{ marginBottom: 4, padding: 4, borderRadius: 4 }}
                     >
-                      <option value="API Route">API Route</option>
-                      <option value="DB Model">DB Model</option>
-                      <option value="Background Job">Background Job</option>
-                      <option value="Unit Test">Unit Test</option>
-                      <option value="Cypress Test">Cypress Test</option>
-                      <option value="Docs">Docs</option>
+                      {SCAFFOLD_TYPES.map(({ value, i18nKey }) => (
+                        <option key={value} value={value}>
+                          {t(`featureRoadmapModule.scaffold.${i18nKey}.label`)}
+                        </option>
+                      ))}
                     </select>
                     <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4, minHeight: 18 }}>
-                      {SCAFFOLD_TYPE_PREVIEWS[scaffoldType]}
+                      {scaffoldPreview}
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleGenerateScaffold(idea)}
-                      style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
-                      title="Generate code scaffold for this feature"
+                      style={{
+                        background: "#eee",
+                        border: "1px solid #ccc",
+                        borderRadius: 6,
+                        padding: "2px 10px",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                      title={t("featureRoadmapModule.titleGenerateScaffold")}
                     >
-                      🛠️ Generate Scaffold
+                      🛠️ {t("featureRoadmapModule.generateScaffold")}
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleShowHistory(idea)}
-                      style={{ background: '#f4e2b8', color: '#8a6d1b', border: 'none', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600, marginTop: 2 }}
-                      title="View scaffold history for this feature"
+                      style={{
+                        background: "#f4e2b8",
+                        color: "#8a6d1b",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "2px 10px",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        marginTop: 2,
+                      }}
+                      title={t("featureRoadmapModule.titleHistory")}
                     >
-                      📜 History
+                      📜 {t("featureRoadmapModule.history")}
                     </button>
                   </div>
                 </td>
@@ -292,60 +435,126 @@ function FeatureRoadmap() {
       <ModalDialog
         isOpen={scaffoldModal.open}
         onRequestClose={() => setScaffoldModal({ open: false, code: "", feature: null })}
-        title={`Code Scaffold for: ${scaffoldModal.feature?.classification?.new_feature || scaffoldModal.feature?.user_input || "Feature"}`}
+        title={t("featureRoadmapModule.modalScaffoldTitle", {
+          name: modalName(scaffoldModal.feature),
+        })}
       >
-        <pre style={{ background: '#f4f4f4', padding: 16, borderRadius: 8, fontSize: 14, maxHeight: 400, overflow: 'auto' }}>{scaffoldModal.code}</pre>
+        <pre
+          style={{
+            background: "#f4f4f4",
+            padding: 16,
+            borderRadius: 8,
+            fontSize: 14,
+            maxHeight: 400,
+            overflow: "auto",
+          }}
+        >
+          {scaffoldModal.code}
+        </pre>
         <button
+          type="button"
           onClick={() => {
             navigator.clipboard.writeText(scaffoldModal.code);
-            alert("Code copied to clipboard!");
+            alert(t("featureRoadmapModule.codeCopied"));
           }}
-          style={{ marginTop: 16, background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16 }}
+          style={{
+            marginTop: 16,
+            background: "#1976d2",
+            color: "#fff",
+            border: 0,
+            borderRadius: 6,
+            padding: "8px 18px",
+            fontWeight: 600,
+            fontSize: 16,
+          }}
         >
-          Copy Code
+          {t("featureRoadmapModule.copyCode")}
         </button>
       </ModalDialog>
       <ModalDialog
         isOpen={historyModal.open}
         onRequestClose={() => setHistoryModal({ open: false, idea: null, history: [] })}
-        title={`Scaffold History for: ${historyModal.idea?.classification?.new_feature || historyModal.idea?.user_input || "Feature"}`}
+        title={t("featureRoadmapModule.modalHistoryTitle", { name: modalName(historyModal.idea) })}
       >
         {loadingHistory ? (
-          <div>Loading...</div>
+          <div>{t("featureRoadmapModule.loading")}</div>
         ) : historyModal.history.length === 0 ? (
-          <div style={{ color: colors.textSecondary }}>No scaffold history found for this feature.</div>
+          <div style={{ color: colors.textSecondary }}>{t("featureRoadmapModule.noHistory")}</div>
         ) : (
-          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+          <div style={{ maxHeight: 400, overflowY: "auto" }}>
             {historyModal.history.map((entry, idx) => (
-              <div key={entry._id || idx} style={{ marginBottom: 24, borderBottom: '1px solid #eee', paddingBottom: 12 }}>
+              <div
+                key={entry._id || idx}
+                style={{ marginBottom: 24, borderBottom: "1px solid #eee", paddingBottom: 12 }}
+              >
                 <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>
-                  <b>Type:</b> {entry.scaffold_type} &nbsp; | &nbsp;
-                  <b>User:</b> {entry.user} &nbsp; | &nbsp;
-                  <b>Date:</b> {new Date(entry.created_at).toLocaleString()}
+                  <b>{t("featureRoadmapModule.historyMetaType")}</b> {scaffoldLabel(entry.scaffold_type)}{" "}
+                  &nbsp; | &nbsp;
+                  <b>{t("featureRoadmapModule.historyMetaUser")}</b> {entry.user} &nbsp; | &nbsp;
+                  <b>{t("featureRoadmapModule.historyMetaDate")}</b>{" "}
+                  {new Date(entry.created_at).toLocaleString(dateLocale)}
                   {entry.approved && (
-                    <span style={{ color: '#2ecc40', fontWeight: 600, marginLeft: 8 }}>
-                      ✔️ Approved by {entry.approved_by} at {entry.approved_at ? new Date(entry.approved_at).toLocaleString() : ''}
+                    <span style={{ color: "#2ecc40", fontWeight: 600, marginLeft: 8 }}>
+                      {t("featureRoadmapModule.historyApprovedBy", {
+                        user: entry.approved_by,
+                        at: entry.approved_at
+                          ? ` — ${new Date(entry.approved_at).toLocaleString(dateLocale)}`
+                          : "",
+                      })}
                     </span>
                   )}
                 </div>
-                <pre style={{ background: '#f4f4f4', padding: 12, borderRadius: 6, fontSize: 13, maxHeight: 200, overflow: 'auto' }}>{entry.code}</pre>
+                <pre
+                  style={{
+                    background: "#f4f4f4",
+                    padding: 12,
+                    borderRadius: 6,
+                    fontSize: 13,
+                    maxHeight: 200,
+                    overflow: "auto",
+                  }}
+                >
+                  {entry.code}
+                </pre>
                 {entry.admin_comment && (
-                  <div style={{ fontSize: 13, color: '#1976d2', marginBottom: 4 }}>
-                    <b>Admin Comment:</b> {entry.admin_comment}
+                  <div style={{ fontSize: 13, color: "#1976d2", marginBottom: 4 }}>
+                    <b>{t("featureRoadmapModule.adminComment")}</b> {entry.admin_comment}
                   </div>
                 )}
                 <button
-                  onClick={() => { navigator.clipboard.writeText(entry.code); alert('Code copied to clipboard!'); }}
-                  style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 14 }}
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(entry.code);
+                    alert(t("featureRoadmapModule.codeCopied"));
+                  }}
+                  style={{
+                    background: "#1976d2",
+                    color: "#fff",
+                    border: 0,
+                    borderRadius: 6,
+                    padding: "6px 16px",
+                    fontWeight: 600,
+                    fontSize: 14,
+                  }}
                 >
-                  Copy Code
+                  {t("featureRoadmapModule.copyCode")}
                 </button>
                 {!entry.approved && (
                   <button
+                    type="button"
                     onClick={() => handleApproveScaffold(entry)}
-                    style={{ background: '#2ecc40', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 14, marginLeft: 8 }}
+                    style={{
+                      background: "#2ecc40",
+                      color: "#fff",
+                      border: 0,
+                      borderRadius: 6,
+                      padding: "6px 16px",
+                      fontWeight: 600,
+                      fontSize: 14,
+                      marginLeft: 8,
+                    }}
                   >
-                    Approve
+                    {t("featureRoadmapModule.approve")}
                   </button>
                 )}
               </div>
@@ -357,4 +566,4 @@ function FeatureRoadmap() {
   );
 }
 
-export default FeatureRoadmap; 
+export default FeatureRoadmap;

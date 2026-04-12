@@ -1,0 +1,75 @@
+{
+  "featureRoadmapModule": {
+    "pageTitle": "Feature Roadmap",
+    "intro": "This panel shows user-submitted ideas and potential future features. Upvote, subscribe for notifications, or (admin) update status.",
+    "statusLegend": "Status Legend:",
+    "loading": "Loading...",
+    "fetchError": "Failed to fetch feature roadmap.",
+    "thFeatureName": "Feature Name",
+    "thStatus": "Status",
+    "thSummary": "Summary",
+    "thUpvotes": "Upvotes",
+    "thNotifications": "Notifications",
+    "thSubmitted": "Submitted",
+    "thAdmin": "Admin",
+    "noFeatureName": "(No feature name)",
+    "notifyMe": "Notify Me",
+    "titleUpvote": "Upvote this feature",
+    "titleNotify": "Get notified about this feature",
+    "generateScaffold": "Generate Scaffold",
+    "titleGenerateScaffold": "Generate code scaffold for this feature",
+    "history": "History",
+    "titleHistory": "View scaffold history for this feature",
+    "promptSubscribeEmail": "Enter your email to be notified about this feature:",
+    "subscribed": "Subscribed!",
+    "promptApprovalComment": "Enter approval comment (optional):",
+    "approveFailed": "Failed to approve scaffold.",
+    "modalScaffoldTitle": "Code Scaffold for: {{name}}",
+    "modalHistoryTitle": "Scaffold History for: {{name}}",
+    "modalFeatureFallback": "Feature",
+    "copyCode": "Copy Code",
+    "codeCopied": "Code copied to clipboard!",
+    "noCodeGenerated": "(No code generated)",
+    "scaffoldMockHead": "// Scaffold for: {{name}}\n// (Backend error, using mock)",
+    "noHistory": "No scaffold history found for this feature.",
+    "historyMetaType": "Type:",
+    "historyMetaUser": "User:",
+    "historyMetaDate": "Date:",
+    "historyApprovedBy": "✔️ Approved by {{user}}{{at}}",
+    "adminComment": "Admin Comment:",
+    "approve": "Approve",
+    "status": {
+      "idea": "Idea",
+      "planned": "Planned",
+      "inReview": "In Review",
+      "comingSoon": "Coming Soon",
+      "implemented": "Implemented"
+    },
+    "scaffold": {
+      "apiRoute": {
+        "label": "API Route",
+        "preview": "Generates a FastAPI route with Pydantic models as needed."
+      },
+      "dbModel": {
+        "label": "DB Model",
+        "preview": "Generates a MongoDB (Motor) collection/model and related schemas."
+      },
+      "backgroundJob": {
+        "label": "Background Job",
+        "preview": "Generates an async background task (e.g., with FastAPI BackgroundTasks or Celery)."
+      },
+      "unitTest": {
+        "label": "Unit Test",
+        "preview": "Generates a Python unit test for the feature."
+      },
+      "cypressTest": {
+        "label": "Cypress Test",
+        "preview": "Generates a Cypress end-to-end test for the feature."
+      },
+      "docs": {
+        "label": "Docs",
+        "preview": "Generates markdown documentation for the feature."
+      }
+    }
+  }
+}
