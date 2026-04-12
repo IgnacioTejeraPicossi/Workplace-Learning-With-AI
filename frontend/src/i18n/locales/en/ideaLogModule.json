@@ -1,0 +1,31 @@
+{
+  "ideaLogModule": {
+    "pageTitle": "Idea Log (Unknown Requests)",
+    "labelConfidence": "Confidence:",
+    "labelModule": "Module:",
+    "filterAll": "All",
+    "searchPlaceholder": "Search user input or intent...",
+    "loading": "Loading...",
+    "fetchError": "Failed to fetch idea log.",
+    "confirmDelete": "Are you sure you want to delete this idea?",
+    "deleteFailed": "Failed to delete idea.",
+    "thUserInput": "User Input",
+    "thIntent": "Intent",
+    "thModuleMatch": "Module Match",
+    "thNewFeature": "New Feature",
+    "thConfidence": "Confidence",
+    "thFollowUp": "Follow-up Question",
+    "thTimestamp": "Timestamp",
+    "thActions": "Actions",
+    "deleteButton": "Delete",
+    "deleteTitle": "Delete this idea",
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "intentUserWantsAccess": "User wants to access {{module}}",
+    "modules": {},
+    "backendPhrases": {}
+  }
+}

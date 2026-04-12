@@ -1,0 +1,47 @@
+{
+  "ideaLogModule": {
+    "pageTitle": "Ide-logg (ukjente forespørsler)",
+    "labelConfidence": "Konfidens:",
+    "labelModule": "Modul:",
+    "filterAll": "Alle",
+    "searchPlaceholder": "Søk i brukerinndata eller intensjon...",
+    "loading": "Laster...",
+    "fetchError": "Kunne ikke hente ide-loggen.",
+    "confirmDelete": "Er du sikker på at du vil slette denne ideen?",
+    "deleteFailed": "Kunne ikke slette ideen.",
+    "thUserInput": "Brukerinndata",
+    "thIntent": "Intensjon",
+    "thModuleMatch": "Modultreff",
+    "thNewFeature": "Ny funksjon",
+    "thConfidence": "Konfidens",
+    "thFollowUp": "Oppfølgingsspørsmål",
+    "thTimestamp": "Tidsstempel",
+    "thActions": "Handlinger",
+    "deleteButton": "Slett",
+    "deleteTitle": "Slett denne ideen",
+    "confidence": {
+      "high": "Høy",
+      "medium": "Middels",
+      "low": "Lav"
+    },
+    "intentUserWantsAccess": "Brukeren ønsker tilgang til {{module}}",
+    "modules": {
+      "simulations": "Simuleringer",
+      "video-lessons": "Videoundervisning",
+      "micro-lessons": "Mikroleksjoner",
+      "ai-concepts": "KI-konsepter",
+      "ai-career-coach": "Karriereveileder",
+      "career coach": "Karriereveileder",
+      "skills-forecast": "Ferdighetsprognose",
+      "certifications": "Sertifiseringer",
+      "web-search": "Nettsøk",
+      "recommendations": "Anbefalinger"
+    },
+    "backendPhrases": {
+      "User request unclear": "Brukerforespørselen var uklar",
+      "Is this what you were looking for?": "Var dette det du lette etter?",
+      "Sorry, I didn't quite understand that. Could you rephrase?": "Beklager, jeg forsto ikke helt. Kan du omformulere?",
+      "Enhanced Intent Recognition": "Forbedret intensjonsgjenkjenning"
+    }
+  }
+}

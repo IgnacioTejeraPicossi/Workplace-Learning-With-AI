@@ -61,6 +61,8 @@ import enApiConfigModule from './locales/en/apiConfigModule.json';
 import noApiConfigModule from './locales/no/apiConfigModule.json';
 import enFutureAppModule from './locales/en/futureAppModule.json';
 import noFutureAppModule from './locales/no/futureAppModule.json';
+import enIdeaLogModule from './locales/en/ideaLogModule.json';
+import noIdeaLogModule from './locales/no/ideaLogModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -79,10 +81,10 @@ i18n
     },
     resources: {
       en: {
-        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule, ...enAgenticRagModule, ...enLearningRepoModule, ...enDocumentAnalyzerModule, ...enLearningDocumentModule, ...enAgenticRagDocumentModule, ...enEaSecondBrainModule, ...enSalesAssistantModule, ...enPersonalAttentionAgentModule, ...enTelcoOpsAgentModule, ...enGrcAgentModule, ...enCouncilAgentModule, ...enOpsEfficiencyAgentModule, ...enAtmCopilotModule, ...enApiConfigModule, ...enFutureAppModule }
+        common: { ...enCommon, ...enRunTest, ...enAppChrome, ...enMicroLesson, ...enScenarioSimulator, ...enSimulationResults, ...enTeamDynamics, ...enCertificationsModule, ...enCareerCoachModule, ...enSkillsForecastModule, ...enBabelLibraryModule, ...enKnowledgeMapModule, ...enRepoAnalyzerModule, ...enAgentCursorModule, ...enAgenticRagModule, ...enLearningRepoModule, ...enDocumentAnalyzerModule, ...enLearningDocumentModule, ...enAgenticRagDocumentModule, ...enEaSecondBrainModule, ...enSalesAssistantModule, ...enPersonalAttentionAgentModule, ...enTelcoOpsAgentModule, ...enGrcAgentModule, ...enCouncilAgentModule, ...enOpsEfficiencyAgentModule, ...enAtmCopilotModule, ...enApiConfigModule, ...enFutureAppModule, ...enIdeaLogModule }
       },
       no: {
-        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule }
+        common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule }
       }
     }
   });
