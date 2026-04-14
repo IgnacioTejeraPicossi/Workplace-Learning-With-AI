@@ -62,3 +62,9 @@ atm_requirement_bundles_collection = database.get_collection("atm_requirement_bu
 atm_test_designs_collection = database.get_collection("atm_test_designs")
 atm_scenario_matrices_collection = database.get_collection("atm_scenario_matrices")
 atm_test_runs_collection = database.get_collection("atm_test_runs")
+
+# EA Second Brain Agent Collections
+ea_portfolio_items_collection = database.get_collection("ea_portfolio_items")
+ea_watchlists_collection = database.get_collection("ea_watchlists")
+ea_source_feeds_collection = database.get_collection("ea_source_feeds")
+ea_insights_collection = database.get_collection("ea_insights")

@@ -53,7 +53,9 @@
       "Bash(python 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py' 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\docs\\\\ATM VV Test Copilot.docx')",
       "Bash(python -m backend.scripts.seed_atm_examples)",
       "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py\\)$\")",
-      "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py|json\\)$\")"
+      "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py|json\\)$\")",
+      "Bash(grep -l \"eaSecondBrain\\\\|EA Second Brain\" ./frontend/src/i18n/locales/*.json)",
+      "Bash(find ./backend -path ./node_modules -prune -o -name \"*.py\" -type f -exec grep -l \"ea_second_brain\\\\|InsightBundle\\\\|EASecondBrain\" {} \\\\;)"
     ]
   }
 }

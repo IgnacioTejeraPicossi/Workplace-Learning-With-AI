@@ -221,6 +221,22 @@ app.include_router(ea_processes_router)
 app.include_router(ea_catalog_router)
 app.include_router(ea_ai_risk_router)
 
+# EA Second Brain Agent router
+try:
+    from backend.routers.ea_second_brain import router as ea_second_brain_router
+    app.include_router(ea_second_brain_router, tags=["EA Second Brain"])
+    print("✅ EA Second Brain router included successfully")
+except Exception as e:
+    print(f"❌ Error including EA Second Brain router: {e}")
+
+# EA Execute router (agent bundle execution)
+try:
+    from backend.routers.ea_execute import router as ea_execute_router
+    app.include_router(ea_execute_router, tags=["EA Execute"])
+    print("✅ EA Execute router included successfully")
+except Exception as e:
+    print(f"❌ Error including EA Execute router: {e}")
+
 # API Configuration routers
 try:
     from backend.api_test import router as api_test_router
