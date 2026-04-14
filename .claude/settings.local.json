@@ -51,7 +51,9 @@
       "Read(//c/Program Files \\(x86\\)/LibreOffice/program/**)",
       "Bash(python -m markitdown 'Presentation\\\\ATM_VV_Test_Copilot_Presentation.pptx')",
       "Bash(python 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py' 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\docs\\\\ATM VV Test Copilot.docx')",
-      "Bash(python -m backend.scripts.seed_atm_examples)"
+      "Bash(python -m backend.scripts.seed_atm_examples)",
+      "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py\\)$\")",
+      "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py|json\\)$\")"
     ]
   }
 }
