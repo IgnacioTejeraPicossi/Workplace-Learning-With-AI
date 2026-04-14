@@ -59,6 +59,7 @@ import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import Cybersecurity from "./cyber/Cybersecurity";
+import InstallingAppInCloud from "./cloud-install/InstallingAppInCloud";
 import ReadmeViewer from "./ReadmeViewer";
 import AgiProgressPage from "./pages/help/AgiProgressPage";
 import HologramHero from "./components/HologramHero";
@@ -535,6 +536,7 @@ function AppContent() {
 {!activeModule && section === "help" && <div style={{ padding: "2rem", textAlign: "center" }}>Help section - Select a specific tool from the sidebar</div>}
 {!activeModule && section === "learning-modules" && <div style={{ padding: "2rem", textAlign: "center" }}>Learning Modules - Select a specific module from the sidebar</div>}
 {!activeModule && section === "future" && <div style={{ padding: "2rem", textAlign: "center" }}>Future section - Select a specific feature from the sidebar</div>}
+            {!activeModule && section === "cloud-install" && <InstallingAppInCloud />}
           </div>
         )}
       </div>

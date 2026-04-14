@@ -45,7 +45,9 @@ const Icon = ({ name, size = 20 }) => {
     "catalog": "📋",
     "list": "📋",
     "brain": "🧠",
-    "broadcast": "📡"
+    "broadcast": "📡",
+    "cloud": "☁️",
+    "doc": "📄"
   };
 
   return (
@@ -158,7 +160,10 @@ const getNavItems = (t) => [
     { key: "future-app", label: t('sidebar.futureSubmenu.futureApp'), icon: "rocket" },
     { key: "idea-log", label: t('sidebar.futureSubmenu.ideaLog'), icon: "lightbulb" },
     { key: "feature-roadmap", label: t('sidebar.futureSubmenu.featureRoadmap'), icon: "map" }
-  ]}
+  ]},
+
+  // Grupo 5: Installing the App in the Cloud
+  { key: "cloud-install", label: t('sidebar.cloudInstall'), icon: "cloud", group: "developer" }
 ];
 
 function Sidebar({ selected, onSelect }) {

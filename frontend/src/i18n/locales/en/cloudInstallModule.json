@@ -1,0 +1,119 @@
+{
+  "cloudInstall": {
+    "title": "Installing the App in the Cloud",
+    "subtitle": "Cloud deployment planning, readiness, and validation workbench for WLWAI",
+
+    "tabs": {
+      "overview": "Overview",
+      "targetArchitecture": "Target Architecture",
+      "envSecrets": "Environment & Secrets",
+      "smokeTests": "Smoke Tests & Monitoring"
+    },
+
+    "status": {
+      "defined": "Defined",
+      "pendingReview": "Pending review",
+      "notStarted": "Not started",
+      "ready": "Ready",
+      "partial": "In progress",
+      "done": "Done"
+    },
+
+    "overview": {
+      "missionTitle": "Module Mission",
+      "missionText": "This module helps you plan, prepare, and validate the cloud deployment of Workplace Learning With AI. Use it as a deployment workbench — not a static README. Work through each section, tick the checklists, and confirm the deployment is solid before going live.",
+      "readinessScore": "Deployment Readiness Score",
+      "sectionsReady": "sections ready",
+      "archSummaryTitle": "Architecture Summary",
+      "workflowTitle": "Recommended Deployment Workflow",
+      "readiness": {
+        "architecture": "Architecture Decision",
+        "architectureDetail": "Cloud stack selected: Vercel + Cloud Run + Atlas + Firebase",
+        "envSecrets": "Environment & Secrets",
+        "envSecretsDetail": "Review all .env variables and map them to cloud secrets",
+        "frontendDeploy": "Frontend Deployment",
+        "frontendDeployDetail": "Deploy React app to Vercel and validate from the cloud",
+        "backendDeploy": "Backend Deployment",
+        "backendDeployDetail": "Deploy FastAPI to Google Cloud Run with correct secrets",
+        "dataAuth": "Data & Auth Connection",
+        "dataAuthDetail": "Connect MongoDB Atlas and verify Firebase Auth in production",
+        "smokeTests": "Smoke Tests",
+        "smokeTestsDetail": "Run all critical smoke tests and confirm the deployment is working"
+      },
+      "arch": {
+        "frontendRole": "Serves the React application",
+        "backendRole": "Runs the FastAPI API server",
+        "dbRole": "Hosts the application database",
+        "authRole": "Manages user authentication",
+        "dnsRole": "DNS, SSL, and edge protection",
+        "wsRole": "Optional web search service"
+      },
+      "workflow": {
+        "step1": "Read the architecture recommendation (Target Architecture tab)",
+        "step2": "Confirm which services to keep and which to defer",
+        "step3": "Map all environment variables to cloud secrets (Env & Secrets tab)",
+        "step4": "Deploy the React frontend to Vercel",
+        "step5": "Deploy the FastAPI backend to Google Cloud Run",
+        "step6": "Connect MongoDB Atlas and verify MONGO_URI",
+        "step7": "Verify Firebase Auth works in production",
+        "step8": "Run the smoke test checklist and confirm everything works"
+      }
+    },
+
+    "arch": {
+      "principleTitle": "Strategic Principle",
+      "principleText": "Do not rewrite the stack. The correct strategy is to cloudify the current architecture incrementally. The cloud version should feel like the same product — not a rebuilt product.",
+      "flowTitle": "Cloud Architecture Flow",
+      "spansBoth": "spans frontend + backend",
+      "servicesTitle": "Services — Click to explore",
+      "visitDocs": "Visit docs",
+      "keyFeatures": "Key features:",
+      "deferredTitle": "Deferred to Phase 2 (do not include in v1)",
+      "deferredDesc": "These services are intentionally excluded from the first deployment to keep scope manageable. Add them after the core deployment is stable.",
+      "frontend": {
+        "desc": "Deploy the React frontend to Vercel. Connect via GitHub for automatic CI/CD on every push to main.",
+        "why": "Vercel is the natural fit for a React frontend. It provides GitHub-based deployments, a free tier, edge CDN, custom domains, and a zero-configuration build pipeline for React applications."
+      },
+      "backend": {
+        "desc": "Deploy the FastAPI backend as a container on Google Cloud Run. Serverless, auto-scaling, and billed per request.",
+        "why": "Cloud Run is ideal for the existing FastAPI backend. It is container-first (the repo already has a Dockerfile), scales to zero when idle, and integrates natively with Google Cloud Secret Manager for secrets."
+      },
+      "database": {
+        "desc": "Move MongoDB to Atlas for a fully managed, globally available database with backups and monitoring.",
+        "why": "MongoDB Atlas is the natural continuation of the current MongoDB-based design. It requires minimal application changes — just a new MONGO_URI connection string. The free M0 tier is sufficient for initial deployment."
+      },
+      "auth": {
+        "desc": "Keep Firebase Auth as-is. No migration needed. Configure production domains and backend service account.",
+        "why": "Firebase Auth is already integrated in both frontend and backend. There is no reason to migrate it. The only production change needed is adding the Vercel domain to Firebase Authorized Domains and ensuring the backend service account is set in Cloud Run."
+      },
+      "dns": {
+        "desc": "Add Cloudflare for DNS management, SSL termination, and optional DDoS protection after core deployment is stable.",
+        "why": "Cloudflare provides free DNS management, SSL, and a global edge network. It is recommended for Phase 2 after the core deployment is working, to avoid adding unnecessary complexity in the first rollout."
+      }
+    },
+
+    "env": {
+      "infoTitle": "Secret vs Public Variables",
+      "infoText": "SECRET variables must never be committed to git or exposed in the browser. They go into Cloud Run Secret Manager (backend) or stay server-side. PUBLIC variables are safe to include in the build (e.g. Firebase public config). OPTIONAL variables can be deferred to Phase 2.",
+      "backendTitle": "Backend Environment Variables",
+      "frontendTitle": "Frontend Environment Variables",
+      "websearchTitle": "Web Search Backend (Phase 2)",
+      "cloudTipsTitle": "Cloud Secret Storage Tips"
+    },
+
+    "smoke": {
+      "overallProgress": "Overall Smoke Test Progress",
+      "checksCompleted": "checks completed",
+      "checkAll": "Check all",
+      "reset": "Reset",
+      "troubleshootingTitle": "Common Issues & Fixes",
+      "layers": {
+        "frontend": "Frontend",
+        "backend": "Backend",
+        "auth": "Auth",
+        "database": "Database",
+        "ai": "AI Layer"
+      }
+    }
+  }
+}

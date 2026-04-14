@@ -1,0 +1,119 @@
+{
+  "cloudInstall": {
+    "title": "Installer appen i skyen",
+    "subtitle": "Planlegging, klargjøring og validering av skyutrulling for WLWAI",
+
+    "tabs": {
+      "overview": "Oversikt",
+      "targetArchitecture": "Målarkitektur",
+      "envSecrets": "Miljøvariabler og hemmeligheter",
+      "smokeTests": "Røyktester og overvåking"
+    },
+
+    "status": {
+      "defined": "Definert",
+      "pendingReview": "Venter på gjennomgang",
+      "notStarted": "Ikke startet",
+      "ready": "Klar",
+      "partial": "Pågår",
+      "done": "Ferdig"
+    },
+
+    "overview": {
+      "missionTitle": "Modulens formål",
+      "missionText": "Denne modulen hjelper deg med å planlegge, forberede og validere skyutrullingen av Workplace Learning With AI. Bruk den som en utrullingsarbeidsbenk — ikke en statisk README. Gå gjennom hver seksjon, kryss av sjekklister og bekreft at utrullingen er solid før lansering.",
+      "readinessScore": "Klargjøringsstatus for skyutrulling",
+      "sectionsReady": "seksjoner klare",
+      "archSummaryTitle": "Arkitekturoversikt",
+      "workflowTitle": "Anbefalt arbeidsflyt for utrulling",
+      "readiness": {
+        "architecture": "Arkitekturbeslutning",
+        "architectureDetail": "Stakk valgt: Vercel + Cloud Run + Atlas + Firebase",
+        "envSecrets": "Miljøvariabler og hemmeligheter",
+        "envSecretsDetail": "Gjennomgå alle .env-variabler og knytt dem til skyhemmeligheter",
+        "frontendDeploy": "Frontend-utrulling",
+        "frontendDeployDetail": "Rull ut React-appen til Vercel og valider fra skyen",
+        "backendDeploy": "Backend-utrulling",
+        "backendDeployDetail": "Rull ut FastAPI til Google Cloud Run med riktige hemmeligheter",
+        "dataAuth": "Data og autentisering",
+        "dataAuthDetail": "Koble til MongoDB Atlas og verifiser Firebase Auth i produksjon",
+        "smokeTests": "Røyktester",
+        "smokeTestsDetail": "Kjør alle kritiske røyktester og bekreft at utrullingen fungerer"
+      },
+      "arch": {
+        "frontendRole": "Betjener React-applikasjonen",
+        "backendRole": "Kjører FastAPI API-serveren",
+        "dbRole": "Hoster applikasjonsdatabasen",
+        "authRole": "Håndterer brukerautentisering",
+        "dnsRole": "DNS, SSL og kantbeskyttelse",
+        "wsRole": "Valgfri nettsøketjeneste"
+      },
+      "workflow": {
+        "step1": "Les arkitekturanbefalingen (fanen Målarkitektur)",
+        "step2": "Bekreft hvilke tjenester som beholdes og hvilke som utsettes",
+        "step3": "Knytt alle miljøvariabler til skyhemmeligheter (fanen Miljø og hemmeligheter)",
+        "step4": "Rull ut React-frontend til Vercel",
+        "step5": "Rull ut FastAPI-backend til Google Cloud Run",
+        "step6": "Koble til MongoDB Atlas og verifiser MONGO_URI",
+        "step7": "Verifiser at Firebase Auth fungerer i produksjon",
+        "step8": "Kjør røyktestsjekklisten og bekreft at alt fungerer"
+      }
+    },
+
+    "arch": {
+      "principleTitle": "Strategisk prinsipp",
+      "principleText": "Ikke skriv om stakken. Den riktige strategien er å skymigre den eksisterende arkitekturen trinnvis. Skyversjonen skal føles som det samme produktet — ikke et nytt produkt.",
+      "flowTitle": "Skyarkitekturflyt",
+      "spansBoth": "spenner over frontend og backend",
+      "servicesTitle": "Tjenester — klikk for å utforske",
+      "visitDocs": "Besøk dokumentasjon",
+      "keyFeatures": "Nøkkelfunksjoner:",
+      "deferredTitle": "Utsatt til fase 2 (ikke inkluder i v1)",
+      "deferredDesc": "Disse tjenestene er bevisst ekskludert fra første utrulling for å holde omfanget håndterbart. Legg dem til etter at kjerneutrullingen er stabil.",
+      "frontend": {
+        "desc": "Rull ut React-frontend til Vercel. Koble via GitHub for automatisk CI/CD ved hver push til main.",
+        "why": "Vercel er det naturlige valget for en React-frontend. Det gir GitHub-baserte utrullinger, et gratisnivå, edge CDN, egendefinerte domener og en null-konfigurasjonsbygningspipeline for React."
+      },
+      "backend": {
+        "desc": "Rull ut FastAPI-backend som en container på Google Cloud Run. Serverløs, autoskalering og fakturering per forespørsel.",
+        "why": "Cloud Run er ideelt for den eksisterende FastAPI-backend. Det er container-first (repositoriet har allerede en Dockerfile), skalerer til null når det er inaktivt, og integreres naturlig med Google Cloud Secret Manager."
+      },
+      "database": {
+        "desc": "Flytt MongoDB til Atlas for en fullt administrert, globalt tilgjengelig database med sikkerhetskopier og overvåking.",
+        "why": "MongoDB Atlas er den naturlige fortsettelsen av det nåværende MongoDB-baserte designet. Det krever minimale applikasjonsendringer — bare en ny MONGO_URI-tilkoblingsstreng. Gratisnivået M0 er tilstrekkelig for første utrulling."
+      },
+      "auth": {
+        "desc": "Behold Firebase Auth som den er. Ingen migrering nødvendig. Konfigurer produksjonsdomener og backend-tjenestekonto.",
+        "why": "Firebase Auth er allerede integrert i både frontend og backend. Det er ingen grunn til å migrere den. Den eneste produksjonsendringen som trengs er å legge til Vercel-domenet i Firebase Authorized Domains og sikre at backend-tjenestekontoen er satt i Cloud Run."
+      },
+      "dns": {
+        "desc": "Legg til Cloudflare for DNS-administrasjon, SSL-terminering og valgfri DDoS-beskyttelse etter at kjerneutrullingen er stabil.",
+        "why": "Cloudflare gir gratis DNS-administrasjon, SSL og et globalt kantnettverk. Det anbefales for fase 2 etter at kjerneutrullingen fungerer, for å unngå unødvendig kompleksitet i første utrulling."
+      }
+    },
+
+    "env": {
+      "infoTitle": "Hemmelige vs. offentlige variabler",
+      "infoText": "HEMMELIGE variabler må aldri committes til git eller eksponeres i nettleseren. De går inn i Cloud Run Secret Manager (backend) eller forblir server-side. OFFENTLIGE variabler er trygge å inkludere i bygget (f.eks. Firebase offentlig konfig). VALGFRIE variabler kan utsettes til fase 2.",
+      "backendTitle": "Backend-miljøvariabler",
+      "frontendTitle": "Frontend-miljøvariabler",
+      "websearchTitle": "Web Search Backend (fase 2)",
+      "cloudTipsTitle": "Tips for lagring av skyhemmeligheter"
+    },
+
+    "smoke": {
+      "overallProgress": "Samlet fremgang for røyktester",
+      "checksCompleted": "sjekker fullført",
+      "checkAll": "Merk alle",
+      "reset": "Nullstill",
+      "troubleshootingTitle": "Vanlige problemer og løsninger",
+      "layers": {
+        "frontend": "Frontend",
+        "backend": "Backend",
+        "auth": "Autentisering",
+        "database": "Database",
+        "ai": "AI-lag"
+      }
+    }
+  }
+}
