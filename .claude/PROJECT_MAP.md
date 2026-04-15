@@ -38,7 +38,7 @@ AI Learning with AI/
 ├── configs/                   # Agent JSON configurations
 ├── schemas/                   # EA data schemas
 ├── scripts/                   # Setup & automation scripts
-├── deployment/                # Deployment configs
+├── deployment/                # Cloud deployment: Dockerfile + cloudrun.yaml (Cloud Run)
 ├── docker/                    # Docker setup files
 └── .claude/                   # Claude Code project metadata
 ```
@@ -52,6 +52,10 @@ AI Learning with AI/
 | `websearch-backend/index.js` | Node.js web search service |
 | `backend/mcp_bridge_server.py` | MCP STDIO bridge (Postman/Claude) |
 | `backend/routers/agentops/__init__.py` | MCP manifest & tool discovery |
+| `backend/routers/cloud_install.py` | Cloud deployment workbench (7 endpoints) |
+| `backend/routers/ea_second_brain.py` | EA Second Brain Agent (24 endpoints) |
+| `deployment/Dockerfile` | Docker image for Cloud Run |
+| `deployment/cloudrun.yaml` | Knative service spec |
 
 ## Critical Rules (from CLAUDE.md)
 1. **Backend must start from REPO ROOT** — not from inside `backend/`

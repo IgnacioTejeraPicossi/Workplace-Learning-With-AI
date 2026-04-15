@@ -179,6 +179,32 @@ Enjoy your weekend! 🎉
 
 For more details, see the main project README or contact the development team.
 
+## Cloud Install Module (frontend/src/cloud-install/)
+
+Interactive cloud deployment workbench with 5 components:
+
+- **InstallingAppInCloud.jsx** — Tab container (4 tabs: Overview, Architecture, Env & Secrets, Smoke Tests)
+- **CloudOverview.jsx** — Readiness score, 6 section cards, architecture summary, deployment workflow. Connected to `GET /api/cloud-install/status`
+- **CloudTargetArchitecture.jsx** — Service cards, flow diagram, cost baseline (from backend), deployment order. Connected to `POST /api/cloud-install/recommend-architecture` + `GET /api/cloud-install/cost-baseline`
+- **CloudEnvSecrets.jsx** — Environment variable table (secret/public/optional), copy-to-clipboard, cloud tips. Connected to `POST /api/cloud-install/generate-env-template`
+- **CloudSmokeTests.jsx** — Automated test runner + manual checklist (5 layers) + troubleshooting. Connected to `POST /api/cloud-install/run-smoke-tests` + `GET /api/cloud-install/troubleshooting`
+
+All components have graceful fallback to static data if the backend is offline.
+
+i18n: 92 keys EN/NO (`cloudInstallModule.json`)
+
+## EA Second Brain Module (frontend/src/ea-agent/)
+
+Enterprise Architecture portfolio management with 5 tab components:
+
+- **Dashboard.jsx** — Stat cards, Today's Insights, Deprecation Radar, Tech Heatmap, Lifecycle Distribution
+- **Insights.jsx** — AI insight generation, filters, expandable cards with impact scores, status workflow
+- **Portfolio.jsx** — Full CRUD with tech stack builder, criticality levels, lifecycle badges
+- **Ask.jsx** — Natural language queries, confidence meter, sample questions, query history
+- **Settings.jsx** — Integration status, Watchlist CRUD, Source Feeds CRUD
+
+i18n: 172 keys EN/NO (`eaSecondBrainModule.json`)
+
 ## Manual Test Checklist
 - Sidebar navigation for all modules
 - Progress cards and charts
