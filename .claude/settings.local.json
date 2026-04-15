@@ -55,7 +55,17 @@
       "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py\\)$\")",
       "Bash(grep -E \"\\\\.\\(jsx?|tsx?|py|json\\)$\")",
       "Bash(grep -l \"eaSecondBrain\\\\|EA Second Brain\" ./frontend/src/i18n/locales/*.json)",
-      "Bash(find ./backend -path ./node_modules -prune -o -name \"*.py\" -type f -exec grep -l \"ea_second_brain\\\\|InsightBundle\\\\|EASecondBrain\" {} \\\\;)"
+      "Bash(find ./backend -path ./node_modules -prune -o -name \"*.py\" -type f -exec grep -l \"ea_second_brain\\\\|InsightBundle\\\\|EASecondBrain\" {} \\\\;)",
+      "Bash(python -m backend.scripts.seed_ea_brain)",
+      "Bash(timeout 15 python -m uvicorn backend.app:app --host 0.0.0.0 --port 8000)",
+      "Bash(python -c \"from backend.routers.ea_second_brain import router; print\\('Router OK'\\)\")",
+      "Bash(python -c \"from backend.routers.ea_execute import router; print\\('EA Execute OK'\\)\")",
+      "Bash(python -c \"from backend.app import app; print\\('App OK'\\)\")",
+      "Bash(set PYTHONIOENCODING=utf-8)",
+      "Bash(python -c \"from backend.app import app; print\\('App loaded OK'\\)\")",
+      "Bash(chcp 65001)",
+      "Bash(python -X utf8 -c \"from backend.app import app; print\\('App loaded OK'\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -X utf8 -c \"from backend.app import app; print\\('App loaded OK'\\)\")"
     ]
   }
 }

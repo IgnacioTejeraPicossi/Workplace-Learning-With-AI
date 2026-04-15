@@ -1,33 +1,47 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Overview from './ea-agent/Overview';
+import Dashboard from './ea-agent/Dashboard';
 import Insights from './ea-agent/Insights';
+import Portfolio from './ea-agent/Portfolio';
+import Ask from './ea-agent/Ask';
 import Runs from './ea-agent/Runs';
 import Settings from './ea-agent/Settings';
 
 const EASecondBrain = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   const tabs = [
-    { id: 'overview', label: t('eaSecondBrainModule.tabOverview'), icon: '🏠' },
+    { id: 'dashboard', label: t('eaSecondBrainModule.tabDashboard'), icon: '📊' },
     { id: 'insights', label: t('eaSecondBrainModule.tabInsights'), icon: '💡' },
+    { id: 'portfolio', label: t('eaSecondBrainModule.tabPortfolio'), icon: '🏗️' },
+    { id: 'ask', label: t('eaSecondBrainModule.tabAsk'), icon: '🔍' },
     { id: 'runs', label: t('eaSecondBrainModule.tabRuns'), icon: '▶️' },
     { id: 'settings', label: t('eaSecondBrainModule.tabSettings'), icon: '⚙️' },
   ];
 
+  const handleNavigate = (tab) => {
+    if (tabs.find(t => t.id === tab)) {
+      setActiveTab(tab);
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview':
-        return <Overview />;
+      case 'dashboard':
+        return <Dashboard onNavigate={handleNavigate} />;
       case 'insights':
         return <Insights />;
+      case 'portfolio':
+        return <Portfolio />;
+      case 'ask':
+        return <Ask />;
       case 'runs':
         return <Runs />;
       case 'settings':
         return <Settings />;
       default:
-        return <Overview />;
+        return <Dashboard onNavigate={handleNavigate} />;
     }
   };
 
@@ -51,13 +65,13 @@ const EASecondBrain = () => {
       {/* Tabs */}
       <div className="bg-white shadow-sm">
         <div className="px-8">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap
                   ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
@@ -82,4 +96,3 @@ const EASecondBrain = () => {
 };
 
 export default EASecondBrain;
-
