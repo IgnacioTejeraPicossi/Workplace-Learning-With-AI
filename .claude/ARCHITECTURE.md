@@ -64,6 +64,8 @@
 | `compliance_agent.py` | — | Compliance workflows |
 | `sales_agent.py` | 141 | Sales assistant |
 | `ea_execute.py` | 73 | Enterprise architecture |
+| `ea_second_brain.py` | ~230 | EA Second Brain (24 endpoints) |
+| `cloud_install.py` | ~105 | Cloud deployment workbench (7 endpoints) |
 | `telco_ops.py` | 186 | Telecom operations |
 | `agentic_rag.py` | — | Retrieval-augmented generation |
 | `auth.py` | — | Authentication |
@@ -106,6 +108,8 @@
 | `agentops/judge.py` | Evaluation logic |
 | `agentops/planner.py` | Planning service |
 | `agentops/simulator.py` | Simulation engine |
+| `ea_second_brain.py` (~500 lines) | EA portfolio, insights, impact scoring, NL queries |
+| `cloud_install_service.py` (~540 lines) | Cloud deployment readiness, checklist, smoke tests |
 
 ## Frontend Module Map (`frontend/src/`)
 
@@ -119,6 +123,8 @@
 | Cyber | `cyber/` (11 components) | Full cybersecurity platform (dashboard, threats, vulns, compliance, coach, drills, knowledge) |
 | Hologram Agent | `components/hologram/` | 3D avatar voice interaction |
 | Sales Agent | `sales-agent/` | Sales assistant UI |
+| EA Second Brain | `ea-agent/` (5 components) | Portfolio, insights, heatmap, ask, settings |
+| Cloud Install | `cloud-install/` (5 components) | Deployment workbench, readiness, smoke tests |
 | Council Agent | `council-agent/` | Council debate orchestration |
 | GRC Agent | `grc-agent/` | Governance/risk/compliance |
 | Attention Agent | `attention-agent/` | Attention management |

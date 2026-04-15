@@ -122,6 +122,54 @@ Agent Security (`/api/agent-security/`):
 
 Data: in-memory (resets on restart) except Agent Security (MongoDB).
 
+### EA Second Brain Agent
+Backend:
+- `backend/routers/ea_second_brain.py` — 24 endpoints at `/api/ea-brain/*`
+- `backend/services/ea_second_brain.py` (~500 lines) — Portfolio CRUD, Impact Scoring, Heatmap, Insights, Ask
+- `backend/models/ea.py` — 15+ Pydantic models
+- `backend/scripts/seed_ea_brain.py` — seed data (run: `python -m backend.scripts.seed_ea_brain`)
+
+Frontend:
+- `frontend/src/EASecondBrain.jsx` — 6-tab container
+- `frontend/src/ea-agent/` — Dashboard, Insights, Portfolio, Ask, Settings
+
+MongoDB: `ea_portfolio_items`, `ea_watchlists`, `ea_source_feeds`, `ea_insights`
+i18n: 172 keys EN/NO
+
+Key API groups (`/api/ea-brain/`):
+- `/portfolio`, `/portfolio/{id}`, `/portfolio/heatmap`, `/portfolio/deprecations`
+- `/insights`, `/insights/{id}`, `/insights/generate`
+- `/watchlist`, `/feeds` — CRUD
+- `/ask` — NL queries (LLM-powered)
+- `/stats`, `/health`
+
+### Installing the App in the Cloud
+Backend:
+- `backend/routers/cloud_install.py` — 7 endpoints at `/api/cloud-install/*`
+- `backend/services/cloud_install_service.py` (~540 lines) — deterministic methods
+- `backend/schemas/cloud_install.py` — 18 Pydantic models
+
+Frontend:
+- `frontend/src/cloud-install/` — 5 components (InstallingAppInCloud, CloudOverview, CloudTargetArchitecture, CloudEnvSecrets, CloudSmokeTests)
+
+Deployment:
+- `deployment/Dockerfile` — Cloud Run-ready Docker image
+- `deployment/cloudrun.yaml` — Knative service spec
+
+Key API groups (`/api/cloud-install/`):
+- `/status` — readiness score with real env inspection
+- `/recommend-architecture` — 3 budget tiers
+- `/generate-env-template` — 20 vars, 6 secrets, 3 scopes
+- `/generate-deploy-checklist` — 26 items
+- `/run-smoke-tests` — async, hits real endpoints
+- `/cost-baseline`, `/troubleshooting`
+
+Global health endpoints:
+- `GET /health` — basic health (ok, service, version, timestamp)
+- `GET /ready` — readiness with MongoDB ping
+
+Cloud architecture: Vercel (frontend) + Cloud Run (backend) + MongoDB Atlas + Firebase Auth + Cloudflare (phase 2)
+
 ## MCP (Postman / Claude)
 - Manifest: `GET http://localhost:8000/api/mcp/manifest`
 - Bridge: `backend/mcp_bridge_server.py` (STDIO JSON-RPC)

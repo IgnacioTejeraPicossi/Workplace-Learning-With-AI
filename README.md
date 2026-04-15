@@ -29,7 +29,8 @@
 | **Testing & Validation** | MCP server, Postman testing flows, validation docs, troubleshooting workflows |
 | **AI & Agents** | AgentOps Studio, Repository Analyzer, Document Analyzer, Agentic RAG, AI Study Buddy |
 | **Workplace Learning** | AI concepts, micro-lessons, recommendations, scenario simulator, certifications |
-| **Enterprise & Operations** | EA Dashboard, Process Designer, Catalog Manager, Heatmap View, Impact Analysis |
+| **Enterprise & Operations** | EA Second Brain (Portfolio, Impact Scoring, Heatmap, Deprecation Radar, Ask), Process Designer, Catalog Manager |
+| **Cloud Deployment** | Cloud Install workbench, readiness score, deploy checklist, automated smoke tests, cost baseline, Dockerfile + Cloud Run config |
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
@@ -41,6 +42,7 @@
 ```
 ├── backend/           # FastAPI (Python): API, routers, clinic, gateway, agents, mcp_bridge_server
 ├── frontend/          # React: src/, components, RobomindClinic, JMessagesAnalyzer, etc.
+├── deployment/        # Cloud deployment: Dockerfile, cloudrun.yaml (Google Cloud Run)
 ├── grocery_bot/       # Autonomous bot experimentation sandbox (strategy.py, bot.py)
 ├── websearch-backend/ # Node.js web search service
 ├── agentops-n8n/      # n8n workflows (Docker)
@@ -78,6 +80,55 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 ---
 
 ## 🔄 Recent Work (2024–2026)
+
+### Installing the App in the Cloud (April 2026)
+
+New deployment planning and cloud-readiness module. Provides an interactive workbench for migrating the platform to cloud services (Vercel + Google Cloud Run + MongoDB Atlas + Firebase Auth). Located in the sidebar after "Future".
+
+**Pack 1 — Frontend Shell (Cursor AI):**
+- 4 interactive tabs: Overview, Target Architecture, Environment & Secrets, Smoke Tests & Monitoring
+- Readiness score dashboard with 6 section cards and progress tracking
+- Architecture flow diagram with service cards (5 services, 2 phases)
+- Environment variable reference with copy-to-clipboard, secret/public/optional classification
+- Manual smoke test checklist (5 layers: frontend, backend, auth, database, AI) with per-layer progress
+- Troubleshooting guide with common cloud deployment issues
+- Full EN/NO i18n (92 keys with perfect parity)
+
+**Pack 2 — Backend Foundation + Cloud Hardening (Claude Code):**
+- **Backend service**: `backend/services/cloud_install_service.py` — 7 deterministic methods: status (real env inspection), architecture recommendation (3 budget tiers), env template (20 variables, 6 secrets, 3 scopes), deploy checklist (26 items), smoke tests (async, hits real endpoints via httpx), cost baseline (6 items), troubleshooting (13 items, 5 categories)
+- **Backend router**: `backend/routers/cloud_install.py` — 7 endpoints at `/api/cloud-install/*`
+- **Typed schemas**: `backend/schemas/cloud_install.py` — 18 Pydantic models
+- **Deployment artifacts**: `deployment/Dockerfile` (Python 3.11-slim, Cloud Run-ready) + `deployment/cloudrun.yaml` (Knative spec, scale 0-3, probes, Secret Manager refs)
+- **Cloud-readiness fixes**: CORS via `ALLOWED_ORIGINS` env var, `MONGO_URI` env var support, `/health` enhanced, `/ready` endpoint with MongoDB ping
+- **Frontend-backend connection**: All 4 tabs connected to real backend with graceful fallback if offline
+  - CloudOverview → `GET /api/cloud-install/status` (live readiness score)
+  - CloudTargetArchitecture → `POST /recommend-architecture` + `GET /cost-baseline` (cost panel, deployment order)
+  - CloudEnvSecrets → `POST /generate-env-template` (live stats banner, backend-sourced variables)
+  - CloudSmokeTests → `POST /run-smoke-tests` (automated test runner) + `GET /troubleshooting` (live items with severity)
+
+Backend: `backend/routers/cloud_install.py`, `backend/services/cloud_install_service.py`, `backend/schemas/cloud_install.py`
+Frontend: `frontend/src/cloud-install/` (5 components: InstallingAppInCloud, CloudOverview, CloudTargetArchitecture, CloudEnvSecrets, CloudSmokeTests)
+Deployment: `deployment/Dockerfile`, `deployment/cloudrun.yaml`
+i18n: 92 keys EN/NO with full parity
+
+### EA Second Brain Agent (April 2026)
+
+Full implementation of the Enterprise Architecture Second Brain agent based on Ketil's OutSystems-oriented vision documents. Portfolio management, impact scoring, technology heatmap, deprecation radar, AI-powered insights, and natural-language queries.
+
+- **Portfolio CRUD**: Create/edit/delete portfolio items with technology stacks, criticality levels (1-5), lifecycle statuses, and EOL tracking
+- **Impact Scoring**: Ketil 6.0 formula — `ImpactScore = 0.40 * Relevance + 0.30 * Criticality + 0.20 * Freshness + 0.10 * Risk`
+- **Technology Heatmap**: Aggregation pipeline showing tech usage counts and risk levels
+- **Deprecation Radar**: EOL tracking sorted by urgency
+- **AI-Powered Insights**: LLM-generated insights with portfolio context, status workflow (New → Acknowledged → In Progress → Resolved/Dismissed)
+- **Natural Language Queries**: Ask questions about the portfolio, get structured answers with confidence scores
+- **Dashboard**: 6 stat cards, Today's Insights, Deprecation Radar, Tech Heatmap, Lifecycle Distribution, Quick Actions
+- **Seed Data**: 8 Norwegian portfolio items, 6 watchlist items, 5 source feeds, 7 realistic insights
+
+Backend: `backend/services/ea_second_brain.py` (~500 lines), `backend/routers/ea_second_brain.py` (24 endpoints at `/api/ea-brain/*`), `backend/models/ea.py` (15+ Pydantic models)
+Frontend: `frontend/src/EASecondBrain.jsx` + `frontend/src/ea-agent/` (5 tab components: Dashboard, Insights, Portfolio, Ask, Settings)
+Seed: `backend/scripts/seed_ea_brain.py` — run with `python -m backend.scripts.seed_ea_brain`
+MongoDB: 4 collections (`ea_portfolio_items`, `ea_watchlists`, `ea_source_feeds`, `ea_insights`)
+i18n: 172 keys EN/NO with full parity
 
 ### ATM V&V Test Copilot (April 2026)
 

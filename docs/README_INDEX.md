@@ -20,11 +20,17 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [J-messages Analyzer (Fiskeridirektoratet)](./J-messages_Analyzer.md)
   - [J-messages Retrospective Learning](./J_MESSAGES_RETROSPECTIVE_LEARNING.md) - Complete guide: Epic 3 (Import, Evaluation, Prompt Suggestions)
   - [J-messages ROS Analysis](./J_MESSAGES_ROS_ANALYSIS.md) - Risk and vulnerability analysis (Norwegian)
+  - [EA Second Brain Agent](./EA_SECOND_BRAIN_AGENT.md) - Portfolio management, impact scoring, AI insights
+  - [Installing the App in the Cloud](./installing_app_cloud_pack2_claude_code.md) - Cloud deployment module (Pack 2 plan)
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
   - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing
   - [Postman MCP Testing](./POSTMAN_MCP_TESTING.md) - Test WLWAI MCP Server using Postman
   - [Claude Desktop Setup](./CLAUDE_DESKTOP_SETUP.md) - Connect WLWAI MCP Server to Claude Desktop
   - [MCP Compatibility](./MCP_COMPATIBILITY.md) - Compatibility analysis of MCP changes
+- Cloud Deployment
+  - [Cloud Install Plan (Pack 1)](./installing_the_app_in_the_cloud_plan.md) - Frontend shell plan (Cursor AI)
+  - [Cloud Install Plan (Pack 2)](./installing_app_cloud_pack2_claude_code.md) - Backend + cloud hardening plan (Claude Code)
+  - [Deployment Guide](./deployment.md) - Backend startup, environment variables
 - Admin & Dev
   - [API Config](./admin-dev.md#api-config)
   - [Run Test](./admin-dev.md#run-test)

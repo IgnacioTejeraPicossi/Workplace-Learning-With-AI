@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-04-15
+
+### Added — Installing the App in the Cloud
+
+New deployment planning and cloud-readiness module. Implemented in two packs:
+
+**Pack 1 — Frontend Shell (Cursor AI):**
+- 4 interactive tabs: Overview, Target Architecture, Environment & Secrets, Smoke Tests & Monitoring
+- Readiness score dashboard with 6 section cards
+- Architecture flow diagram with 5 service cards (2 phases)
+- Environment variable reference with copy-to-clipboard and secret/public/optional classification
+- Manual smoke test checklist (5 layers, per-layer progress)
+- Troubleshooting guide with common deployment issues
+- i18n: 92 keys EN/NO
+
+**Pack 2 — Backend Foundation + Cloud Hardening (Claude Code):**
+- Backend service: `cloud_install_service.py` (7 deterministic methods)
+- Backend router: `cloud_install.py` (7 endpoints at `/api/cloud-install/*`)
+- Typed schemas: `cloud_install.py` (18 Pydantic models)
+- Deployment artifacts: `deployment/Dockerfile` + `deployment/cloudrun.yaml` (functional, Cloud Run-ready)
+- Cloud-readiness: CORS via `ALLOWED_ORIGINS`, `MONGO_URI` env var, `/health` enhanced, `/ready` endpoint
+- Frontend connected to backend (all 4 tabs) with graceful fallback if offline
+- Automated smoke test runner, live troubleshooting, cost baseline panel, deployment order visualization
+
+### Added — EA Second Brain Agent
+
+Full Enterprise Architecture portfolio management agent:
+- Portfolio CRUD with tech stack, criticality, lifecycle, EOL tracking
+- Impact Scoring (Ketil 6.0 formula)
+- Technology Heatmap and Deprecation Radar
+- AI-powered insight generation with status workflow
+- Natural language queries against portfolio
+- Dashboard with stats, insights, radar, heatmap, lifecycle distribution
+- Watchlist and Source Feed management
+- Seed data: 8 Norwegian portfolio items, 7 insights
+- Backend: 24 endpoints, 15+ models, ~500-line service
+- Frontend: 5 tab components
+- i18n: 172 keys EN/NO
+
+---
+
+## [1.2.0] - 2026-04 (Earlier April)
+
+### Added — ATM V&V Test Copilot, Babel Library AI Intelligence, Cybersecurity Module
+
+See root README.md for full details on these modules.
+
+---
+
 ## [1.0.1] - 2025-12-19
 
 ### Documentation Improvements
@@ -178,6 +227,8 @@ See individual documentation files:
 
 ## Version History
 
+- **1.3.0** (Apr 15, 2026): Installing the App in the Cloud + EA Second Brain Agent
+- **1.2.0** (Apr 2026): ATM V&V Test Copilot, Babel Library AI Intelligence, Cybersecurity Module
 - **1.0.0** (Dec 19, 2025): Epic 3 complete - Retrospective Learning & Prompt Refinement
 - **0.9.0** (Dec 17, 2025): MCP Server integration
 - **0.8.0** (Earlier): J-messages Analyzer core functionality

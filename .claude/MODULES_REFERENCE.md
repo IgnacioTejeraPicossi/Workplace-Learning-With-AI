@@ -14,6 +14,8 @@
 | 8 | [Grocery Bot](#8-grocery-bot) | Sandbox | None | Low |
 | 9 | [Websearch Backend](#9-websearch-backend) | Active | None | Low |
 | 10 | [n8n Workflows](#10-n8n-workflows) | Optional | None | Low |
+| 11 | [Installing the App in the Cloud](#11-installing-the-app-in-the-cloud) | Active | None (smoke via endpoints) | Medium |
+| 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 
 ---
 
@@ -324,6 +326,109 @@ Treat as a **separate service boundary** — keep API stable, do not couple to P
 - `web-research-workflow.json`
 
 **Start script**: `start-n8n.ps1`
+
+---
+
+## 11) Installing the App in the Cloud
+
+**Purpose**: Interactive deployment planning workbench for migrating WLWAI to cloud services (Vercel + Cloud Run + MongoDB Atlas + Firebase Auth).
+
+**Backend:**
+- Router: `backend/routers/cloud_install.py` — 7 endpoints at `/api/cloud-install/*`
+- Service: `backend/services/cloud_install_service.py` (~540 lines) — 7 deterministic methods
+- Schemas: `backend/schemas/cloud_install.py` — 18 Pydantic models
+
+**API endpoints (`/api/cloud-install/`):**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/status` | GET | Overall readiness score + section statuses (real env inspection) |
+| `/recommend-architecture` | POST | Architecture recommendation with 3 budget tiers |
+| `/generate-env-template` | POST | Environment variable templates (20 vars, 6 secrets, 3 scopes) |
+| `/generate-deploy-checklist` | POST | Deployment checklist (26 items across 4 categories) |
+| `/run-smoke-tests` | POST | Async smoke tests against real endpoints via httpx |
+| `/cost-baseline` | GET | Cost estimates (6 items, 3 budget tiers) |
+| `/troubleshooting` | GET | Troubleshooting guidance (13 items, 5 categories) |
+
+**Frontend** (`frontend/src/cloud-install/` — 5 components):
+- `InstallingAppInCloud.jsx` — Tab container (4 tabs)
+- `CloudOverview.jsx` — Readiness score, section cards, architecture summary, workflow steps
+- `CloudTargetArchitecture.jsx` — Service cards, flow diagram, cost baseline, deployment order
+- `CloudEnvSecrets.jsx` — Environment variable table with secret/public/optional classification
+- `CloudSmokeTests.jsx` — Automated test runner + manual checklist + troubleshooting
+
+**Deployment artifacts:**
+- `deployment/Dockerfile` — Python 3.11-slim, WORKDIR /app (repo root), PORT env var
+- `deployment/cloudrun.yaml` — Knative spec, europe-north1, scale 0-3, startup/liveness/readiness probes
+
+**Cloud-readiness fixes applied:**
+- CORS reads `ALLOWED_ORIGINS` env var (comma-separated)
+- MongoDB reads `MONGO_URI` env var (falls back to `MONGO_DETAILS` then localhost)
+- `/health` enhanced with ok, service, version, timestamp
+- `/ready` endpoint added with MongoDB ping check
+
+**Frontend-backend connection:**
+All 4 tabs fetch from backend with graceful fallback to static data if backend is offline.
+
+**i18n**: 92 keys EN/NO with full parity
+
+**Critical constraints:**
+- Do not introduce new cloud providers (Supabase, Clerk, etc.)
+- Keep existing architecture unchanged (React + FastAPI + MongoDB + Firebase)
+- Deployment artifacts are functional but not auto-provisioning
+- No contract tests yet (validate via: `curl http://localhost:8000/api/cloud-install/status`)
+
+**Docs**: `docs/installing_the_app_in_the_cloud_plan.md` (Pack 1), `docs/installing_app_cloud_pack2_claude_code.md` (Pack 2)
+
+---
+
+## 12) EA Second Brain Agent
+
+**Purpose**: Enterprise Architecture portfolio management with AI-powered insights, impact scoring, and natural-language queries. Based on Ketil's OutSystems-oriented vision documents.
+
+**Backend:**
+- Service: `backend/services/ea_second_brain.py` (~500 lines) — Portfolio CRUD, Impact Scoring (Ketil 6.0 formula), Tech Heatmap, Deprecation Radar, Insights, Watchlist, Source Feeds, Ask, Dashboard Stats
+- Router: `backend/routers/ea_second_brain.py` — 24 endpoints at `/api/ea-brain/*`
+- Models: `backend/models/ea.py` — 15+ Pydantic models (Criticality enum 1-5, LifecycleStatus, InsightCategory, InsightUrgency, ImpactScore, etc.)
+- Seed: `backend/scripts/seed_ea_brain.py` (~580 lines) — 8 Norwegian portfolio items, 6 watchlist items, 5 source feeds, 7 insights
+
+**API endpoints (`/api/ea-brain/`):**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Module health check |
+| `/stats` | GET | Dashboard stats aggregation |
+| `/portfolio` | GET/POST | List/create portfolio items |
+| `/portfolio/{id}` | GET/PUT/DELETE | CRUD for individual items |
+| `/portfolio/heatmap` | GET | Technology heatmap (aggregation pipeline) |
+| `/portfolio/deprecations` | GET | Deprecation radar sorted by urgency |
+| `/insights` | GET | List insights (filter by status/category/urgency) |
+| `/insights/{id}` | GET/PUT | Get/update insight status |
+| `/insights/generate` | POST | Generate AI-powered insight with portfolio context |
+| `/watchlist` | GET/POST | List/create watchlist items |
+| `/watchlist/{id}` | PUT/DELETE | Update/delete watchlist item |
+| `/feeds` | GET/POST | List/create source feeds |
+| `/feeds/{id}` | PUT/DELETE | Update/delete source feed |
+| `/ask` | POST | Natural language query against portfolio (LLM-powered) |
+
+**Frontend** (`frontend/src/ea-agent/` — 5 tab components + parent):
+- `EASecondBrain.jsx` — 6-tab container (Dashboard, Insights, Portfolio, Ask, Runs, Settings)
+- `Dashboard.jsx` — Stat cards, Today's Insights, Deprecation Radar, Tech Heatmap, Lifecycle Distribution
+- `Insights.jsx` — Generate AI insights, filter/search, expandable cards with impact scores, status workflow
+- `Portfolio.jsx` — Full CRUD with tech stack builder, criticality colors, lifecycle badges
+- `Ask.jsx` — NL queries, confidence meter, related items, sample questions, query history
+- `Settings.jsx` — Integration status, Watchlist CRUD, Source Feeds CRUD, Execution Policies
+
+**MongoDB collections**: `ea_portfolio_items`, `ea_watchlists`, `ea_source_feeds`, `ea_insights`
+
+**i18n**: 172 keys EN/NO with full parity
+
+**Critical constraints:**
+- Impact Score formula must match Ketil 6.0: `0.40*Relevance + 0.30*Criticality + 0.20*Freshness + 0.10*Risk`
+- Insights use LLM (`ask_ai_unified`) — graceful fallback if AI unavailable
+- No contract tests yet (validate via: `curl http://localhost:8000/api/ea-brain/health`)
+
+**Docs**: `docs/EA_SECOND_BRAIN_AGENT.md`
 
 ---
 
