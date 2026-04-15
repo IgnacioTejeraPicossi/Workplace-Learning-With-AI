@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const API = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const LAYERS = [
   {
@@ -79,33 +81,46 @@ const LAYERS = [
   },
 ];
 
-const TROUBLESHOOTING = [
+// Static fallback troubleshooting (used when backend is offline)
+const STATIC_TROUBLESHOOTING = [
   {
     symptom: 'CORS error in browser console',
     cause: 'ALLOWED_ORIGINS in backend does not include the Vercel production URL',
     fix: 'Set ALLOWED_ORIGINS=https://your-app.vercel.app in Cloud Run environment',
+    severity: 'critical',
   },
   {
     symptom: '/health returns 502 or no response',
     cause: 'Backend container is not starting correctly, or the port is misconfigured',
     fix: 'Check Cloud Run logs. Ensure BACKEND_PORT=8000 and startup command is correct',
+    severity: 'critical',
   },
   {
     symptom: 'MongoDB connection timeout',
-    cause: 'Atlas Network Access does not allow Cloud Run. MONGO_URI is incorrect.',
+    cause: 'Atlas Network Access does not allow Cloud Run. MONO_URI is incorrect.',
     fix: 'Temporarily allow 0.0.0.0/0 in Atlas Network Access. Validate MONGO_URI value.',
+    severity: 'critical',
   },
   {
     symptom: 'Firebase login fails in production',
     cause: 'Authorized domains in Firebase Console does not include the Vercel domain',
     fix: 'Add your Vercel domain to Firebase Console → Authentication → Authorized domains',
+    severity: 'critical',
   },
   {
     symptom: 'Frontend cannot reach backend',
     cause: 'REACT_APP_API_BASE_URL is still pointing to localhost or is missing',
     fix: 'Set REACT_APP_API_BASE_URL=https://your-backend.run.app in Vercel env variables and redeploy',
+    severity: 'critical',
   },
 ];
+
+const SEVERITY_COLORS = {
+  critical: { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
+  high: { bg: '#fef3c7', text: '#92400e', border: '#fde68a' },
+  medium: { bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe' },
+  low: { bg: '#f3f4f6', text: '#6b7280', border: '#e5e7eb' },
+};
 
 function CheckItem({ check, completed, onToggle, accentColor }) {
   return (
@@ -152,6 +167,49 @@ export default function CloudSmokeTests() {
   const [completed, setCompleted] = useState({});
   const [activeLayer, setActiveLayer] = useState('frontend');
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
+  const [troubleshootingItems, setTroubleshootingItems] = useState(STATIC_TROUBLESHOOTING);
+  const [autoResults, setAutoResults] = useState(null);
+  const [autoRunning, setAutoRunning] = useState(false);
+
+  // Fetch troubleshooting from backend on mount
+  useEffect(() => {
+    fetch(`${API}/api/cloud-install/troubleshooting`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.items) {
+          setTroubleshootingItems(data.items.map(item => ({
+            symptom: item.symptom,
+            cause: item.probable_cause || item.cause || '',
+            fix: item.fix,
+            severity: item.severity || 'high',
+            category: item.category,
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const runAutomatedTests = async () => {
+    setAutoRunning(true);
+    setAutoResults(null);
+    try {
+      const resp = await fetch(`${API}/api/cloud-install/run-smoke-tests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          layers: ['backend', 'frontend', 'auth', 'database', 'ai'],
+        }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setAutoResults(data);
+      }
+    } catch {
+      setAutoResults({ ok: false, summary: 'Could not reach backend', checks: [] });
+    } finally {
+      setAutoRunning(false);
+    }
+  };
 
   const toggleCheck = (id) => {
     setCompleted(prev => ({ ...prev, [id]: !prev[id] }));
@@ -208,6 +266,76 @@ export default function CloudSmokeTests() {
         <div style={{ color: '#6b7280', fontSize: '0.8rem', marginTop: '0.5rem' }}>
           {completedCount} / {totalChecks} {t('cloudInstall.smoke.checksCompleted')}
         </div>
+      </div>
+
+      {/* Automated smoke tests panel */}
+      <div style={{
+        backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e5e7eb',
+        padding: '1.25rem 1.5rem', marginBottom: '1.5rem'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: autoResults ? '1rem' : 0 }}>
+          <div>
+            <div style={{ fontWeight: '700', color: '#1f2937', fontSize: '0.95rem' }}>
+              {t('cloudInstall.smoke.automatedTitle')}
+            </div>
+            <div style={{ color: '#6b7280', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+              {t('cloudInstall.smoke.automatedDesc')}
+            </div>
+          </div>
+          <button
+            onClick={runAutomatedTests}
+            disabled={autoRunning}
+            style={{
+              padding: '0.5rem 1.25rem', borderRadius: '0.5rem', border: 'none',
+              backgroundColor: autoRunning ? '#9ca3af' : '#3b82f6', color: 'white',
+              fontSize: '0.85rem', fontWeight: '600', cursor: autoRunning ? 'default' : 'pointer',
+              transition: 'all 0.15s', whiteSpace: 'nowrap'
+            }}
+          >
+            {autoRunning ? t('cloudInstall.smoke.running') : t('cloudInstall.smoke.runTests')}
+          </button>
+        </div>
+
+        {/* Auto test results */}
+        {autoResults && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{
+              display: 'flex', gap: '1rem', alignItems: 'center',
+              padding: '0.75rem 1rem', borderRadius: '0.5rem',
+              backgroundColor: autoResults.ok ? '#f0fdf4' : '#fef2f2',
+              border: `1px solid ${autoResults.ok ? '#bbf7d0' : '#fecaca'}`
+            }}>
+              <span style={{ fontSize: '1.25rem' }}>{autoResults.ok ? '✅' : '⚠️'}</span>
+              <span style={{ fontWeight: '600', color: autoResults.ok ? '#065f46' : '#991b1b', fontSize: '0.875rem' }}>
+                {autoResults.summary || `${autoResults.passed || 0}/${autoResults.total_checks || 0} passed`}
+              </span>
+            </div>
+            {autoResults.checks && autoResults.checks.map((check, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                padding: '0.5rem 1rem', borderRadius: '0.375rem',
+                backgroundColor: check.status === 'pass' ? '#f0fdf4' : check.status === 'skip' ? '#f9fafb' : '#fef2f2',
+                border: `1px solid ${check.status === 'pass' ? '#bbf7d0' : check.status === 'skip' ? '#e5e7eb' : '#fecaca'}`,
+                fontSize: '0.8rem'
+              }}>
+                <span>{check.status === 'pass' ? '✅' : check.status === 'skip' ? '⏭️' : '❌'}</span>
+                <span style={{ fontWeight: '500', color: '#374151', flex: 1 }}>{check.name}</span>
+                <span style={{
+                  padding: '0.1rem 0.5rem', borderRadius: '9999px',
+                  backgroundColor: '#f3f4f6', color: '#6b7280', fontSize: '0.7rem'
+                }}>
+                  {check.layer}
+                </span>
+                <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>{check.message}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Manual checklist section title */}
+      <div style={{ fontWeight: '700', color: '#1f2937', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+        {t('cloudInstall.smoke.manualTitle')}
       </div>
 
       {/* Layer tabs */}
@@ -316,25 +444,51 @@ export default function CloudSmokeTests() {
 
         {showTroubleshooting && (
           <div style={{ padding: '0 1.5rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {TROUBLESHOOTING.map((item, i) => (
-              <div key={i} style={{
-                borderRadius: '0.5rem', border: '1px solid #e5e7eb', overflow: 'hidden'
-              }}>
-                <div style={{ padding: '0.65rem 1rem', backgroundColor: '#fef3c7', borderBottom: '1px solid #fde68a' }}>
-                  <span style={{ fontWeight: '600', color: '#92400e', fontSize: '0.85rem' }}>
-                    ⚠️ {item.symptom}
-                  </span>
-                </div>
-                <div style={{ padding: '0.65rem 1rem', backgroundColor: '#f9fafb' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.35rem' }}>
-                    <strong>Cause:</strong> {item.cause}
+            {troubleshootingItems.map((item, i) => {
+              const sev = SEVERITY_COLORS[item.severity] || SEVERITY_COLORS.high;
+              return (
+                <div key={i} style={{
+                  borderRadius: '0.5rem', border: `1px solid ${sev.border}`, overflow: 'hidden'
+                }}>
+                  <div style={{
+                    padding: '0.65rem 1rem', backgroundColor: sev.bg,
+                    borderBottom: `1px solid ${sev.border}`,
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                  }}>
+                    <span style={{ fontWeight: '600', color: sev.text, fontSize: '0.85rem' }}>
+                      {item.symptom}
+                    </span>
+                    {item.severity && (
+                      <span style={{
+                        padding: '0.1rem 0.45rem', borderRadius: '9999px',
+                        backgroundColor: 'rgba(255,255,255,0.6)', color: sev.text,
+                        fontSize: '0.65rem', fontWeight: '700', textTransform: 'uppercase'
+                      }}>
+                        {item.severity}
+                      </span>
+                    )}
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#374151' }}>
-                    <strong style={{ color: '#16a34a' }}>Fix:</strong> {item.fix}
+                  <div style={{ padding: '0.65rem 1rem', backgroundColor: '#f9fafb' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.35rem' }}>
+                      <strong>{t('cloudInstall.smoke.cause')}:</strong> {item.cause}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#374151' }}>
+                      <strong style={{ color: '#16a34a' }}>{t('cloudInstall.smoke.fix')}:</strong> {item.fix}
+                    </div>
+                    {item.category && (
+                      <span style={{
+                        display: 'inline-block', marginTop: '0.35rem',
+                        padding: '0.1rem 0.45rem', borderRadius: '9999px',
+                        backgroundColor: '#e5e7eb', color: '#6b7280',
+                        fontSize: '0.65rem', fontWeight: '600'
+                      }}>
+                        {item.category}
+                      </span>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

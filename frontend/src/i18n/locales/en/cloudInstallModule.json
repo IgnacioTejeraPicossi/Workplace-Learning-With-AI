@@ -70,6 +70,8 @@
       "keyFeatures": "Key features:",
       "deferredTitle": "Deferred to Phase 2 (do not include in v1)",
       "deferredDesc": "These services are intentionally excluded from the first deployment to keep scope manageable. Add them after the core deployment is stable.",
+      "costTitle": "Estimated Monthly Cost",
+      "deployOrderTitle": "Recommended Deployment Order",
       "frontend": {
         "desc": "Deploy the React frontend to Vercel. Connect via GitHub for automatic CI/CD on every push to main.",
         "why": "Vercel is the natural fit for a React frontend. It provides GitHub-based deployments, a free tier, edge CDN, custom domains, and a zero-configuration build pipeline for React applications."
@@ -98,7 +100,11 @@
       "backendTitle": "Backend Environment Variables",
       "frontendTitle": "Frontend Environment Variables",
       "websearchTitle": "Web Search Backend (Phase 2)",
-      "cloudTipsTitle": "Cloud Secret Storage Tips"
+      "cloudTipsTitle": "Cloud Secret Storage Tips",
+      "liveData": "Live from backend",
+      "totalVars": "variables",
+      "secretVars": "secrets",
+      "requiredVars": "required"
     },
 
     "smoke": {
@@ -107,6 +113,13 @@
       "checkAll": "Check all",
       "reset": "Reset",
       "troubleshootingTitle": "Common Issues & Fixes",
+      "automatedTitle": "Automated Smoke Tests",
+      "automatedDesc": "Run real checks against backend endpoints, environment variables, and service connectivity",
+      "runTests": "Run Automated Tests",
+      "running": "Running...",
+      "manualTitle": "Manual Verification Checklist",
+      "cause": "Cause",
+      "fix": "Fix",
       "layers": {
         "frontend": "Frontend",
         "backend": "Backend",

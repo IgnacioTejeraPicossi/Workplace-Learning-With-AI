@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const API = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const SECRET_BADGE = {
   secret: { bg: '#fee2e2', text: '#991b1b', label: 'SECRET' },
@@ -65,7 +67,8 @@ function EnvRow({ name, type, example, cloudNote }) {
   );
 }
 
-const envGroups = [
+// Static fallback data (used when backend is offline)
+const STATIC_ENV_GROUPS = [
   {
     key: 'backend',
     titleKey: 'cloudInstall.env.backendTitle',
@@ -110,10 +113,55 @@ const envGroups = [
   }
 ];
 
+/** Convert backend API response into the shape the UI expects */
+function apiGroupsToUiGroups(apiGroups) {
+  const iconMap = { backend: '🐍', frontend: '⚛️', websearch: '🔍' };
+  const titleMap = { backend: 'cloudInstall.env.backendTitle', frontend: 'cloudInstall.env.frontendTitle', websearch: 'cloudInstall.env.websearchTitle' };
+  return apiGroups.map(g => ({
+    key: g.scope,
+    titleKey: titleMap[g.scope] || g.scope,
+    file: g.filename,
+    icon: iconMap[g.scope] || '📋',
+    vars: g.variables.map(v => ({
+      name: v.name,
+      type: v.type || 'public',
+      example: v.value_hint || '',
+      cloudNote: v.cloud_note || v.description || '',
+      required: v.required,
+    })),
+    cloudStorageNote: g.cloud_storage_note,
+  }));
+}
+
 export default function CloudEnvSecrets() {
   const { t } = useTranslation();
   const [activeGroup, setActiveGroup] = useState('backend');
   const [showCloudTips, setShowCloudTips] = useState(false);
+  const [envGroups, setEnvGroups] = useState(STATIC_ENV_GROUPS);
+  const [liveStats, setLiveStats] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API}/api/cloud-install/generate-env-template`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scope: 'all', include_optional: true }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.groups) {
+          setEnvGroups(apiGroupsToUiGroups(data.groups));
+          setLiveStats({
+            total: data.total_variables,
+            required: data.required_count,
+            secrets: data.secret_count,
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const currentGroup = envGroups.find(g => g.key === activeGroup);
 
@@ -140,6 +188,22 @@ export default function CloudEnvSecrets() {
           </div>
         </div>
       </div>
+
+      {/* Live stats banner */}
+      {liveStats && (
+        <div style={{
+          backgroundColor: '#f0fdf4', borderRadius: '0.75rem', border: '1px solid #bbf7d0',
+          padding: '0.75rem 1.25rem', marginBottom: '1rem',
+          display: 'flex', gap: '1.5rem', alignItems: 'center', fontSize: '0.8rem'
+        }}>
+          <span style={{ color: '#065f46', fontWeight: '600' }}>
+            {t('cloudInstall.env.liveData')}
+          </span>
+          <span style={{ color: '#374151' }}>{liveStats.total} {t('cloudInstall.env.totalVars')}</span>
+          <span style={{ color: '#991b1b' }}>{liveStats.secrets} {t('cloudInstall.env.secretVars')}</span>
+          <span style={{ color: '#1e40af' }}>{liveStats.required} {t('cloudInstall.env.requiredVars')}</span>
+        </div>
+      )}
 
       {/* Group tabs */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>

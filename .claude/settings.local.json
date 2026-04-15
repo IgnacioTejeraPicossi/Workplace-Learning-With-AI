@@ -65,7 +65,12 @@
       "Bash(python -c \"from backend.app import app; print\\('App loaded OK'\\)\")",
       "Bash(chcp 65001)",
       "Bash(python -X utf8 -c \"from backend.app import app; print\\('App loaded OK'\\)\")",
-      "Bash(PYTHONIOENCODING=utf-8 python -X utf8 -c \"from backend.app import app; print\\('App loaded OK'\\)\")"
+      "Bash(PYTHONIOENCODING=utf-8 python -X utf8 -c \"from backend.app import app; print\\('App loaded OK'\\)\")",
+      "Bash(python -X utf8 -c ':*)",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('frontend/src/i18n/locales/en/cloudInstallModule.json','utf8'\\)\\); console.log\\('EN OK'\\)\")",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('frontend/src/i18n/locales/no/cloudInstallModule.json','utf8'\\)\\); console.log\\('NO OK'\\)\")",
+      "Bash(node -e ':*)",
+      "Bash(python -X utf8 -c \"from backend.services.cloud_install_service import get_cloud_install_status, recommend_architecture, generate_env_template, generate_deploy_checklist, get_cost_baseline, get_troubleshooting; status = get_cloud_install_status\\(\\); print\\('Status OK, readiness:', status['readinessScore']\\); env = generate_env_template\\(\\); print\\('Env OK, groups:', len\\(env['groups']\\), 'vars:', env['total_variables']\\); ts = get_troubleshooting\\(\\); print\\('Troubleshooting OK, items:', ts['total']\\); cost = get_cost_baseline\\(\\); print\\('Cost OK, total:', cost['total_monthly']\\); arch = recommend_architecture\\(\\); print\\('Arch OK, services:', len\\(arch['services']\\), 'order:', arch['deployment_order']\\)\")"
     ]
   }
 }

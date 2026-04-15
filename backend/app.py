@@ -68,14 +68,20 @@ except Exception as e:
 
 app = FastAPI()
 
+# CORS: support cloud origins via ALLOWED_ORIGINS env var
+_default_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+_env_origins = os.getenv("ALLOWED_ORIGINS", "")
+_extra_origins = [o.strip() for o in _env_origins.split(",") if o.strip()] if _env_origins else []
+_all_origins = list(dict.fromkeys(_default_origins + _extra_origins))  # deduplicate, preserve order
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000"
-    ],
+    allow_origins=_all_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -220,6 +226,14 @@ except ImportError:
 app.include_router(ea_processes_router)
 app.include_router(ea_catalog_router)
 app.include_router(ea_ai_risk_router)
+
+# Cloud Install Module router
+try:
+    from backend.routers.cloud_install import router as cloud_install_router
+    app.include_router(cloud_install_router, tags=["Cloud Install"])
+    print("✅ Cloud Install router included successfully")
+except Exception as e:
+    print(f"❌ Error including Cloud Install router: {e}")
 
 # EA Second Brain Agent router
 try:
@@ -2673,10 +2687,46 @@ async def clear_knowledge_map_cache():
 # Health check endpoints
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "message": "Backend is running"}
+    return {
+        "ok": True,
+        "service": "wlwai-backend",
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0",
+    }
 
 @app.get("/api/health")
 async def api_health_check():
-    return {"status": "ok", "message": "API is running", "timestamp": datetime.utcnow().isoformat()}
+    return {
+        "ok": True,
+        "service": "wlwai-backend",
+        "status": "healthy",
+        "message": "API is running",
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+@app.get("/ready")
+async def readiness_check():
+    """Readiness probe for cloud deployment (Cloud Run, K8s)"""
+    checks = {
+        "app_imports": True,
+        "router_registration": True,
+    }
+    # Check MongoDB connectivity
+    try:
+        from backend.db import database
+        await database.command("ping")
+        checks["mongodb"] = True
+    except Exception:
+        checks["mongodb"] = False
+
+    all_ok = all(checks.values())
+    return {
+        "ok": all_ok,
+        "service": "wlwai-backend",
+        "status": "ready" if all_ok else "degraded",
+        "checks": checks,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
 
  

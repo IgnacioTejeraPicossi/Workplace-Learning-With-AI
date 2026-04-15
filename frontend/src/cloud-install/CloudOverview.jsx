@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const API = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const STATUS_COLORS = {
   ready: { bg: '#d1fae5', text: '#065f46', dot: '#10b981' },
@@ -70,51 +72,85 @@ function ArchSummaryRow({ icon, service, role, provider, phase }) {
 export default function CloudOverview() {
   const { t } = useTranslation();
   const [workflowStep, setWorkflowStep] = useState(0);
+  const [liveStatus, setLiveStatus] = useState(null);
 
-  const readinessCards = [
-    {
-      icon: '⚙️',
-      title: t('cloudInstall.overview.readiness.architecture'),
-      value: t('cloudInstall.status.defined'),
-      status: 'ready',
-      detail: t('cloudInstall.overview.readiness.architectureDetail'),
-    },
-    {
-      icon: '🔐',
-      title: t('cloudInstall.overview.readiness.envSecrets'),
-      value: t('cloudInstall.status.pendingReview'),
-      status: 'partial',
-      detail: t('cloudInstall.overview.readiness.envSecretsDetail'),
-    },
-    {
-      icon: '🚀',
-      title: t('cloudInstall.overview.readiness.frontendDeploy'),
-      value: t('cloudInstall.status.notStarted'),
-      status: 'pending',
-      detail: t('cloudInstall.overview.readiness.frontendDeployDetail'),
-    },
-    {
-      icon: '🔧',
-      title: t('cloudInstall.overview.readiness.backendDeploy'),
-      value: t('cloudInstall.status.notStarted'),
-      status: 'pending',
-      detail: t('cloudInstall.overview.readiness.backendDeployDetail'),
-    },
-    {
-      icon: '🗄️',
-      title: t('cloudInstall.overview.readiness.dataAuth'),
-      value: t('cloudInstall.status.notStarted'),
-      status: 'pending',
-      detail: t('cloudInstall.overview.readiness.dataAuthDetail'),
-    },
-    {
-      icon: '✅',
-      title: t('cloudInstall.overview.readiness.smokeTests'),
-      value: t('cloudInstall.status.notStarted'),
-      status: 'pending',
-      detail: t('cloudInstall.overview.readiness.smokeTestsDetail'),
-    },
-  ];
+  useEffect(() => {
+    fetch(`${API}/api/cloud-install/status`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setLiveStatus(data); })
+      .catch(() => {});
+  }, []);
+
+  const sectionIcons = {
+    architecture: '⚙️', env_secrets: '🔐', frontend: '🚀',
+    backend: '🔧', data_auth: '🗄️', smoke_tests: '✅',
+  };
+  const sectionTitles = {
+    architecture: t('cloudInstall.overview.readiness.architecture'),
+    env_secrets: t('cloudInstall.overview.readiness.envSecrets'),
+    frontend: t('cloudInstall.overview.readiness.frontendDeploy'),
+    backend: t('cloudInstall.overview.readiness.backendDeploy'),
+    data_auth: t('cloudInstall.overview.readiness.dataAuth'),
+    smoke_tests: t('cloudInstall.overview.readiness.smokeTests'),
+  };
+  const statusMap = {
+    ready: 'ready', partial: 'partial', pending: 'pending',
+    not_started: 'pending', error: 'pending',
+  };
+
+  // Use live data from backend if available, otherwise fallback to static
+  const readinessCards = liveStatus?.sections
+    ? liveStatus.sections.map(s => ({
+        icon: sectionIcons[s.id] || '📋',
+        title: sectionTitles[s.id] || s.label,
+        value: `${s.progress}%`,
+        status: statusMap[s.status] || 'pending',
+        detail: s.details || '',
+      }))
+    : [
+        {
+          icon: '⚙️',
+          title: t('cloudInstall.overview.readiness.architecture'),
+          value: t('cloudInstall.status.defined'),
+          status: 'ready',
+          detail: t('cloudInstall.overview.readiness.architectureDetail'),
+        },
+        {
+          icon: '🔐',
+          title: t('cloudInstall.overview.readiness.envSecrets'),
+          value: t('cloudInstall.status.pendingReview'),
+          status: 'partial',
+          detail: t('cloudInstall.overview.readiness.envSecretsDetail'),
+        },
+        {
+          icon: '🚀',
+          title: t('cloudInstall.overview.readiness.frontendDeploy'),
+          value: t('cloudInstall.status.notStarted'),
+          status: 'pending',
+          detail: t('cloudInstall.overview.readiness.frontendDeployDetail'),
+        },
+        {
+          icon: '🔧',
+          title: t('cloudInstall.overview.readiness.backendDeploy'),
+          value: t('cloudInstall.status.notStarted'),
+          status: 'pending',
+          detail: t('cloudInstall.overview.readiness.backendDeployDetail'),
+        },
+        {
+          icon: '🗄️',
+          title: t('cloudInstall.overview.readiness.dataAuth'),
+          value: t('cloudInstall.status.notStarted'),
+          status: 'pending',
+          detail: t('cloudInstall.overview.readiness.dataAuthDetail'),
+        },
+        {
+          icon: '✅',
+          title: t('cloudInstall.overview.readiness.smokeTests'),
+          value: t('cloudInstall.status.notStarted'),
+          status: 'pending',
+          detail: t('cloudInstall.overview.readiness.smokeTestsDetail'),
+        },
+      ];
 
   const archRows = [
     { icon: '⚛️', service: 'React Frontend', role: t('cloudInstall.overview.arch.frontendRole'), provider: 'Vercel', phase: 1 },
@@ -138,7 +174,7 @@ export default function CloudOverview() {
 
   const readyCount = readinessCards.filter(c => c.status === 'ready').length;
   const totalCount = readinessCards.length;
-  const pct = Math.round((readyCount / totalCount) * 100);
+  const pct = liveStatus?.readinessScore ?? Math.round((readyCount / totalCount) * 100);
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>

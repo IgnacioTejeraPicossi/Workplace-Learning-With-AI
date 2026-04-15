@@ -1,2 +1,83 @@
-# cloudrun.yaml for Google Cloud Run deployment
-# (To be completed with service configuration) 
+# Cloud Run Service Configuration for WLWAI Backend
+# Deploy with: gcloud run services replace deployment/cloudrun.yaml
+#
+# Prerequisites:
+#   1. Docker image pushed to Artifact Registry or Container Registry
+#   2. Secrets created in Google Secret Manager
+#   3. MongoDB Atlas network access configured
+#   4. Firebase service account available
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: wlwai-backend
+  labels:
+    cloud.googleapis.com/location: europe-north1
+  annotations:
+    run.googleapis.com/description: "WLWAI FastAPI Backend"
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to zero when idle (cost optimization)
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+        # Startup timeout (seconds) — FastAPI with Firebase init may need time
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: gcr.io/PROJECT_ID/wlwai-backend:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          env:
+            # Cloud Run injects PORT automatically
+            - name: PORT
+              value: "8000"
+            # CORS: frontend Vercel URL(s)
+            - name: ALLOWED_ORIGINS
+              value: "https://your-app.vercel.app,http://localhost:3000"
+            # Python UTF-8 mode for emoji-safe logging
+            - name: PYTHONIOENCODING
+              value: "utf-8"
+          # Secrets from Google Secret Manager
+          # Uncomment and configure after creating secrets:
+          # - name: MONGO_URI
+          #   valueFrom:
+          #     secretKeyRef:
+          #       key: latest
+          #       name: wlwai-mongo-uri
+          # - name: OPENAI_API_KEY
+          #   valueFrom:
+          #     secretKeyRef:
+          #       key: latest
+          #       name: wlwai-openai-key
+          # - name: HMAC_SECRET
+          #   valueFrom:
+          #     secretKeyRef:
+          #       key: latest
+          #       name: wlwai-hmac-secret
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 30
+          # Readiness uses /ready which checks MongoDB
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 10

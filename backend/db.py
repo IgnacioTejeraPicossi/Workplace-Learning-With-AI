@@ -1,6 +1,8 @@
+import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
-MONGO_DETAILS = "mongodb://localhost:27017"  # Default local URI
+# Support cloud MongoDB via MONGO_URI env var; fallback to local
+MONGO_DETAILS = os.getenv("MONGO_URI") or os.getenv("MONGO_DETAILS", "mongodb://localhost:27017")
 
 client = AsyncIOMotorClient(MONGO_DETAILS)
 database = client["ai_learning"]  # Your database name

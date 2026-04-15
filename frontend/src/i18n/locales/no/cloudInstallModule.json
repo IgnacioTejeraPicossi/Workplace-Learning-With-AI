@@ -70,6 +70,8 @@
       "keyFeatures": "Nøkkelfunksjoner:",
       "deferredTitle": "Utsatt til fase 2 (ikke inkluder i v1)",
       "deferredDesc": "Disse tjenestene er bevisst ekskludert fra første utrulling for å holde omfanget håndterbart. Legg dem til etter at kjerneutrullingen er stabil.",
+      "costTitle": "Estimert månedlig kostnad",
+      "deployOrderTitle": "Anbefalt utrullingsrekkefølge",
       "frontend": {
         "desc": "Rull ut React-frontend til Vercel. Koble via GitHub for automatisk CI/CD ved hver push til main.",
         "why": "Vercel er det naturlige valget for en React-frontend. Det gir GitHub-baserte utrullinger, et gratisnivå, edge CDN, egendefinerte domener og en null-konfigurasjonsbygningspipeline for React."
@@ -98,7 +100,11 @@
       "backendTitle": "Backend-miljøvariabler",
       "frontendTitle": "Frontend-miljøvariabler",
       "websearchTitle": "Web Search Backend (fase 2)",
-      "cloudTipsTitle": "Tips for lagring av skyhemmeligheter"
+      "cloudTipsTitle": "Tips for lagring av skyhemmeligheter",
+      "liveData": "Live fra backend",
+      "totalVars": "variabler",
+      "secretVars": "hemmeligheter",
+      "requiredVars": "påkrevde"
     },
 
     "smoke": {
@@ -107,6 +113,13 @@
       "checkAll": "Merk alle",
       "reset": "Nullstill",
       "troubleshootingTitle": "Vanlige problemer og løsninger",
+      "automatedTitle": "Automatiserte røyktester",
+      "automatedDesc": "Kjør ekte sjekker mot backend-endepunkter, miljøvariabler og tjenestetilkobling",
+      "runTests": "Kjør automatiserte tester",
+      "running": "Kjører...",
+      "manualTitle": "Manuell verifiseringssjekkliste",
+      "cause": "Årsak",
+      "fix": "Løsning",
       "layers": {
         "frontend": "Frontend",
         "backend": "Backend",

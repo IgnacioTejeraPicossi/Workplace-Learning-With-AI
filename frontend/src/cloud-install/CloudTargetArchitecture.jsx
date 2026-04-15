@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const API = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const services = [
   {
@@ -130,6 +132,25 @@ function ServiceCard({ service, isSelected, onSelect }) {
 export default function CloudTargetArchitecture() {
   const { t } = useTranslation();
   const [selected, setSelected] = useState('frontend');
+  const [costData, setCostData] = useState(null);
+  const [archData, setArchData] = useState(null);
+
+  useEffect(() => {
+    // Fetch cost baseline
+    fetch(`${API}/api/cloud-install/cost-baseline`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setCostData(data); })
+      .catch(() => {});
+    // Fetch architecture recommendation
+    fetch(`${API}/api/cloud-install/recommend-architecture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ include_optional: false, budget_tier: 'starter' }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setArchData(data); })
+      .catch(() => {});
+  }, []);
 
   const selectedService = services.find(s => s.key === selected);
 
@@ -268,6 +289,114 @@ export default function CloudTargetArchitecture() {
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Cost Baseline (from backend) */}
+      {costData && (
+        <div style={{
+          backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e5e7eb',
+          padding: '1.25rem 1.5rem', marginBottom: '1.5rem'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{ fontWeight: '700', color: '#1f2937', fontSize: '0.95rem' }}>
+              {t('cloudInstall.arch.costTitle')}
+            </div>
+            <div style={{
+              padding: '0.3rem 0.85rem', borderRadius: '9999px',
+              backgroundColor: '#d1fae5', color: '#065f46', fontWeight: '700', fontSize: '0.85rem'
+            }}>
+              {costData.total_monthly}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+            {costData.items.map((item, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '0.5rem 0.75rem', borderRadius: '0.375rem',
+                backgroundColor: '#f9fafb', border: '1px solid #f3f4f6',
+                fontSize: '0.825rem'
+              }}>
+                <div>
+                  <span style={{ fontWeight: '600', color: '#374151' }}>{item.service}</span>
+                  <span style={{
+                    marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '9999px',
+                    backgroundColor: item.phase === 1 ? '#d1fae5' : '#f3f4f6',
+                    color: item.phase === 1 ? '#065f46' : '#6b7280',
+                    fontSize: '0.65rem', fontWeight: '600'
+                  }}>
+                    Phase {item.phase}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>{item.tier}</span>
+                  <span style={{ fontWeight: '600', color: '#1f2937' }}>{item.monthly_estimate}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Budget tiers */}
+          {costData.budget_tiers && (
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {Object.entries(costData.budget_tiers).map(([tier, desc]) => (
+                <div key={tier} style={{
+                  flex: 1, minWidth: 200, padding: '0.65rem 0.85rem',
+                  borderRadius: '0.5rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ fontWeight: '600', color: '#374151', fontSize: '0.8rem', textTransform: 'capitalize', marginBottom: '0.25rem' }}>
+                    {tier}
+                  </div>
+                  <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Deployment Order (from backend) */}
+      {archData && archData.deployment_order && (
+        <div style={{
+          backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e5e7eb',
+          padding: '1.25rem 1.5rem', marginBottom: '1.5rem'
+        }}>
+          <div style={{ fontWeight: '700', color: '#1f2937', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+            {t('cloudInstall.arch.deployOrderTitle')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {archData.deployment_order.map((step, i) => (
+              <React.Fragment key={step}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '0.4rem 0.8rem', borderRadius: '9999px',
+                  backgroundColor: '#eff6ff', border: '1px solid #bfdbfe'
+                }}>
+                  <span style={{
+                    width: 20, height: 20, borderRadius: '50%', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: '#3b82f6', color: 'white', fontSize: '0.65rem', fontWeight: '700'
+                  }}>
+                    {i + 1}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '500', color: '#1e40af', textTransform: 'capitalize' }}>
+                    {step}
+                  </span>
+                </div>
+                {i < archData.deployment_order.length - 1 && (
+                  <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>→</span>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          {archData.notes && archData.notes.length > 0 && (
+            <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              {archData.notes.map((note, i) => (
+                <div key={i} style={{ fontSize: '0.775rem', color: '#6b7280' }}>
+                  • {note}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
