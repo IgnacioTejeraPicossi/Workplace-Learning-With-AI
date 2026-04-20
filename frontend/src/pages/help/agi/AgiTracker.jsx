@@ -15,7 +15,13 @@ export default function AgiTracker() {
 
   useEffect(() => {
     fetchAGIProgress()
-      .then(setItems)
+      .then(data => {
+        setItems(data);
+        // Default selection = newest model (by year, then total) so the dropdown
+        // and the charts start in sync on first render.
+        const source = (data || []).slice().sort((a,b)=> (b.year - a.year) || b.total - a.total);
+        if (source[0]) setSelected(source[0].model);
+      })
       .catch(e => setErr(String(e)))
       .finally(() => setLoading(false));
   }, []);
