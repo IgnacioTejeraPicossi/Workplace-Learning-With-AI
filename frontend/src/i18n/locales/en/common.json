@@ -1119,7 +1119,8 @@
     },
     "agiProgress": {
       "title": "AGI Progress Tracker",
-      "subtitle": "Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.",
+      "subtitle": "Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through 2026 with Claude Opus 4.6/4.7 and Gemini 3.1 Pro.",
+      "benchmarkContext": "Benchmark context",
       "paper": "paper",
       "loading": "Loading AGI progress…",
       "error": "Error:",

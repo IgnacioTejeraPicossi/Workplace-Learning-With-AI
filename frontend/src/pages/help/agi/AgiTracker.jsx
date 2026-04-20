@@ -33,7 +33,7 @@ export default function AgiTracker() {
       <div>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{t('help.agiProgress.title', { defaultValue: 'AGI Progress Tracker' })}</h2>
         <div style={{ color: '#64748b', fontSize: 14 }}>
-          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.' })}
+          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through 2026 with Claude Opus 4.6/4.7 and Gemini 3.1 Pro.' })}
           {' ['}
           <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">{t('help.agiProgress.paper', { defaultValue: 'paper' })}</a>
           {']'}
@@ -57,6 +57,14 @@ export default function AgiTracker() {
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
             <div style={{ fontWeight: 600, marginBottom: 8 }}>{latest.model} — {t('help.agiProgress.domainProfile', { defaultValue: 'Domain Profile' })}</div>
             <DomainRadar item={latest} />
+            {latest.notes && (
+              <div style={{ marginTop: 12, padding: '10px 12px', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, color: '#334155', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600, color: '#0f172a' }}>
+                  {t('help.agiProgress.benchmarkContext', { defaultValue: 'Benchmark context' })}:{' '}
+                </span>
+                {latest.notes}
+              </div>
+            )}
           </div>
         </div>
       )}
