@@ -175,7 +175,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [🚀 Agentic RAG](#agentic-rag-system-advanced-document-intelligence) - Advanced document intelligence with AI agents
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
-- [AGI Progress Tracker](#agi-progress-tracker) - AGI score and cognitive domains dashboard
+- [AGI Progress Hub](#agi-progress-hub) - 3-tab hub: Progress Tracker, Possible Endings for AGI, Benefits of AGI
 - [🧠 Robomind Clinic](#robomind-clinic-ai-psychology-module) - AI Psychology Module for diagnosing and treating AI pathologies
 
 ### 🤖 AI-Powered Collaboration Modules (NEW!)
@@ -520,31 +520,57 @@ graph TB
 ```
 
 ### 🧪 Testing Architecture
-## AGI Progress Tracker
+## AGI Progress Hub
 
-Location: Help → AGI Progress (frontend `readme-viewer` sibling)
+Location: Help → AGI Progress (tabbed hub, AgentOps-style)
 
-Purpose: Provide a living dashboard of progress toward AGI using the CHC-inspired framework from Hendrycks et al. “A Definition of AGI”. Ten equally weighted cognitive domains (K, RW, M, R, WM, MS, MR, V, A, S) are displayed with an overall score.
+Purpose: A three-tab hub that combines quantitative AGI progress tracking with a qualitative view of possible futures and a summary of concrete benefits. Uses the CHC-inspired framework from Hendrycks et al. (2025) "A Definition of AGI" as its quantitative base.
+
+### Tab 1 — AGI Progress Tracker
+
+Ten equally weighted cognitive domains (K, RW, M, R, WM, MS, MR, V, A, S) with overall score per model.
 
 Features
 - Overall gauge with estimated AGI level (0–100%)
 - Radar chart of the 10 cognitive domains
-- Trend line (evolution across models, e.g., GPT‑4 → GPT‑5)
-- Model selector (view domain profile by model)
-- Admin mini‑form to add new model entries (POST `/api/agi/progress`)
+- Trend line across models (2023 → 2026)
+- Model selector synchronized with chart panels on first render (defaults to the newest model)
+- Benchmark context panel showing the real public benchmarks (GPQA, MATH-500, SWE-bench, ARC-AGI-2, etc.) behind each model's scores
+- Admin mini-form to add new model entries (POST `/api/agi/progress`)
 
-Backend
-- `GET /api/agi/progress` returns seeded GPT‑4(27) and GPT‑5(58) rows; reads from MongoDB when available and falls back to in‑memory when not
-- `POST /api/agi/progress` adds rows (persisted if Mongo is active)
+Models included (directional, 0-100 total)
+- **GPT-4 (2023)** — 27% (Hendrycks baseline)
+- **GPT-5 (2025)** — 58% (~57% per paper)
+- **Claude Opus 4.6 (2025)** — 61% (GPQA 78.2%, MATH-500 97.1%, SWE-bench 74%, ARC-AGI-2 32.4%)
+- **Gemini 3.1 Pro (2026)** — 61% (strong multimodal, slightly behind on reasoning/coding)
+- **Claude Opus 4.7 (2026)** — 67% (SWE-bench Pro 64.3% leader, SWE-bench Verified 87.6%, GPQA 94.2%, +14% agentic multi-step)
+
+> Note: **Long-Term Memory Storage (MS) remains 0 for all current LLMs** — the architectural bottleneck identified by the paper.
+
+### Tab 2 — Possible Endings for AGI
+
+Iceberg-style visualization of 12 possible AGI endings grouped in three zones (Surface / Shallow / Deep), each with an interactive card. Zone filter and detail view.
+
+### Tab 3 — The Benefits of AGI
+
+Categorized cards covering concrete benefits across Health, Science, Education, Productivity, Accessibility, and more — with examples.
+
+### Backend
+- `GET /api/agi/progress` — returns the curated list; reads from MongoDB when available, falls back to in-memory `DEFAULT_DATA`
+- `POST /api/agi/progress` — upserts (by `model`+`year`) so re-adding the same model updates scores
+- Idempotent seed: defaults are upserted on each GET so updates to `DEFAULT_DATA` propagate without wiping manually-added rows
 - Router: `backend/routers/agi_progress.py` (included in `backend/app.py`)
 
-Frontend
-- Page: `frontend/src/pages/help/AgiProgressPage.jsx`
-- Components: `components/agi/ScoreGauge.jsx`, `components/agi/DomainRadar.jsx`, `components/agi/TrendLine.jsx`
+### Frontend
+- Hub container: `frontend/src/pages/help/AgiProgressPage.jsx` (tab switcher, AgentOps-style)
+- Tab components: `frontend/src/pages/help/agi/AgiTracker.jsx`, `PossibleEndings.jsx`, `BenefitsOfAGI.jsx`
+- Tracker components: `components/agi/ScoreGauge.jsx`, `components/agi/DomainRadar.jsx`, `components/agi/TrendLine.jsx`
+- Static asset: `frontend/public/images/agi-endings-iceberg.png`
 - Charts: Chart.js via CDN (configured in `public/index.html`)
+- i18n: keys under `help.agiHub`, `help.agiTabs`, `help.agiProgress`, `help.agiEndings`, `help.agiBenefits` in `locales/{en,no}/common.json` + `agiHubModule.json`
 
-Source
-- Paper: “A Definition of AGI” (Hendrycks et al., Oxford–MIT–Cornell, CAIS) — https://www.agidefinition.ai/paper.pdf
+### Source
+- Paper: "A Definition of AGI" (Hendrycks et al., Oxford–MIT–Cornell, CAIS, Oct 2025) — https://www.agidefinition.ai/paper.pdf
 
 
 ```mermaid

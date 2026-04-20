@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-04-14
+
+### Added — AGI Progress Hub (restructuring of Help → AGI Progress)
+
+The single-page "AGI Progress Tracker" was restructured into a three-tab hub, AgentOps-style, and the dataset was updated through 2026.
+
+**Frontend — new tab container and components:**
+- `frontend/src/pages/help/AgiProgressPage.jsx` — converted from a single page to a tab container (Tracker / Endings / Benefits)
+- `frontend/src/pages/help/agi/AgiTracker.jsx` — original tracker content, now a child tab; dropdown synchronized with charts on first render
+- `frontend/src/pages/help/agi/PossibleEndings.jsx` — iceberg visualization + 12 AGI ending scenarios in 3 zones (Surface / Shallow / Deep), with zone filter
+- `frontend/src/pages/help/agi/BenefitsOfAGI.jsx` — categorized cards: Health, Science, Education, Productivity, Accessibility, etc.
+- `frontend/public/images/agi-endings-iceberg.png` — iceberg asset
+
+**Backend — dataset refresh and idempotent seed:**
+- `backend/routers/agi_progress.py` — `DEFAULT_DATA` expanded from 2 to 5 models through 2026:
+  - GPT-4 (2023) 27%, GPT-5 (2025) 58%, **Claude Opus 4.6 (2025) 61%**, **Gemini 3.1 Pro (2026) 61%**, **Claude Opus 4.7 (2026) 67%**
+  - Each model carries real benchmark notes (GPQA Diamond, MATH-500, SWE-bench Verified/Pro, ARC-AGI-2, HumanEval)
+  - Long-Term Memory Storage (MS) remains 0 for all current LLMs — explicitly documented as the architectural bottleneck from the Hendrycks paper
+- Seed is now **idempotent**: uses upsert by `model`+`year` so updates to `DEFAULT_DATA` propagate to existing MongoDB deployments without wiping manually-added rows
+- `POST /api/agi/progress` now upserts (previously insert-only)
+- Results sorted by year then total for stable UI ordering
+
+**UX fixes:**
+- Dropdown "Model:" and chart panels now sync on first render (defaults to newest model by year+total — Claude Opus 4.7 2026)
+- Benchmark context panel added under the radar showing the public benchmarks behind each model's scores
+
+**i18n:**
+- New keys `help.agiHub`, `help.agiTabs`, `help.agiEndings`, `help.agiBenefits`, `help.agiProgress.benchmarkContext` in EN/NO
+- Subtitle updated to reference 2025 paper + 2026 additions
+- `frontend/src/i18n/locales/{en,no}/agiHubModule.json` created; `common.json` updated with hub/tab labels
+
+---
+
 ## [1.3.0] - 2026-04-15
 
 ### Added — Installing the App in the Cloud

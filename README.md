@@ -81,6 +81,21 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 ## 🔄 Recent Work (2024–2026)
 
+### AGI Progress Hub (April 2026)
+
+The single-page "AGI Progress Tracker" under Help was restructured into a three-tab hub (AgentOps-style) and the dataset refreshed through 2026:
+
+- **Tab 1 — AGI Progress Tracker**: CHC-inspired framework from Hendrycks et al. (2025). Dataset expanded from 2 to **5 models**: GPT-4 (2023) 27%, GPT-5 (2025) 58%, **Claude Opus 4.6 (2025) 61%**, **Gemini 3.1 Pro (2026) 61%**, **Claude Opus 4.7 (2026) 67%**. Each model carries real benchmark notes (GPQA Diamond, MATH-500, SWE-bench Verified/Pro, ARC-AGI-2). Long-Term Memory Storage remains 0 across all current LLMs — the architectural bottleneck from the paper.
+- **Tab 2 — Possible Endings for AGI**: iceberg visualization with 12 possible AGI futures across 3 zones (Surface / Shallow / Deep), with zone filter and per-scenario cards.
+- **Tab 3 — The Benefits of AGI**: categorized cards (Health, Science, Education, Productivity, Accessibility, etc.) with concrete examples.
+- **Backend hardening**: `DEFAULT_DATA` seed is now idempotent (upsert by model+year), so refreshing defaults no longer requires wiping MongoDB; `POST /api/agi/progress` also upserts. Dropdown/chart sync fixed on first render.
+
+Backend: `backend/routers/agi_progress.py`
+Frontend: `frontend/src/pages/help/AgiProgressPage.jsx` (tab container) + `frontend/src/pages/help/agi/{AgiTracker,PossibleEndings,BenefitsOfAGI}.jsx`
+Assets: `frontend/public/images/agi-endings-iceberg.png`
+i18n: `help.agiHub`, `help.agiTabs`, `help.agiProgress`, `help.agiEndings`, `help.agiBenefits` in EN/NO
+Source: ["A Definition of AGI" — Hendrycks et al. (Oxford–MIT–Cornell, CAIS, Oct 2025)](https://www.agidefinition.ai/paper.pdf)
+
 ### Installing the App in the Cloud (April 2026)
 
 New deployment planning and cloud-readiness module. Provides an interactive workbench for migrating the platform to cloud services (Vercel + Google Cloud Run + MongoDB Atlas + Firebase Auth). Located in the sidebar after "Future".
