@@ -33,8 +33,15 @@ The single-page "AGI Progress Tracker" was restructured into a three-tab hub, Ag
 - Dropdown "Model:" and chart panels now sync on first render (defaults to newest model by year+total — Claude Opus 4.7 2026)
 - Benchmark context panel added under the radar showing the public benchmarks behind each model's scores
 
+**Possible Endings — sourced citations (April 2026 follow-up):**
+- Every one of the 12 endings now carries a notable quote with attribution, extracted from a curated sources compilation (~50 time-stamped references): Moravec, Tegmark, Musk, Hinton, Amodei, Altman, Hendrycks, LeCun, Suleyman, Harari, McAleer, Guterres
+- New "P(doom)" banner with public estimates from Hinton (>50%), Amodei (25%, Sep 2025), AI Impacts 2024 survey (1-in-6 median), Toby Ord (~10%), and Pichai ("pretty high")
+- New "Sources & References" panel with link to the primary-sources Google Doc and cards for Life 3.0, Mind Children, The Precipice, AI Impacts, aistatement.com, Anthropic Agentic Misalignment Appendix, Hinton's Guardian interview, and Altman's "The Merge"
+- Scenario descriptions enriched with real references (e.g., Ending I now cites Ord's 100× nuclear, Ending XI cites Tegmark's pandemic-reversion argument)
+
 **i18n:**
 - New keys `help.agiHub`, `help.agiTabs`, `help.agiEndings`, `help.agiBenefits`, `help.agiProgress.benchmarkContext` in EN/NO
+- Additional keys `agiEndings.pdoom.*`, `agiEndings.sources.*`, and per-ending `quote`/`attribution` pairs in EN/NO
 - Subtitle updated to reference 2025 paper + 2026 additions
 - `frontend/src/i18n/locales/{en,no}/agiHubModule.json` created; `common.json` updated with hub/tab labels
 

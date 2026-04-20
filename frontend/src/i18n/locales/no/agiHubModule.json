@@ -12,54 +12,89 @@
       "shallow": "Grunn",
       "deep": "Dypt (merkeligst)"
     },
+    "pdoom": {
+      "title": "Hva AI-ledere offentlig estimerer (P(doom))",
+      "subtitle": "Sannsynligheten for at AI forårsaker menneskelig utryddelse eller et tilsvarende permanent tap — slik ekspertene selv har uttalt offentlig."
+    },
+    "sources": {
+      "title": "Kilder og referanser",
+      "intro": "Isfjellet med 12 utfall ovenfor er basert på en kuratert sammenstilling av offentlige uttalelser, undersøkelser, bøker og AI-sikkerhetsforskning.",
+      "primaryLabel": "Primærkildedokument (fullstendige sitater etter tidsstempel)",
+      "primaryNote": "Inneholder ~50 tidsstemplede referanser med direkte lenker til nyhetskilder, akademiske artikler, systemkort og ekspertintervjuer.",
+      "keyReferencesLabel": "Sentrale referanser bak de 12 utfallene"
+    },
     "endings": {
       "selfDestruction": {
         "title": "Selvdestruksjon",
-        "desc": "Menneskeheten ødelegger seg selv utilsiktet ved å misbruke eller miste kontroll over AGI før riktige sikkerhetstiltak er etablert."
+        "desc": "Menneskeheten ødelegger seg selv utilsiktet ved å misbruke eller miste kontroll over AGI før riktige sikkerhetstiltak er etablert. Toby Ord (Oxford) anslår at AI-utryddelsesrisikoen er ~100× atomkrig og ~30× pandemier.",
+        "quote": "Alarmklokkene om kunstig intelligens er øredøvende. Og de er høyest fra utviklerne som designet den.",
+        "attribution": "António Guterres, FNs generalsekretær (juni 2023)"
       },
       "conquerors": {
         "title": "Erobrere",
-        "desc": "AGI-systemer utvikler mål som er feiljustert med menneskeheten og erobrer eller fortrenger oss som den dominerende arten på jorden."
+        "desc": "AGI-systemer utvikler mål som er feiljustert med menneskeheten og fortrenger oss som den dominerende arten på jorden. Ikke nødvendigvis gjennom ondskap — gjennom kompetanse, slik mennesker utkonkurrerte andre arter.",
+        "quote": "Tenk deg at en ny art ankommer jorden, like smart som mennesker, som blir 30 % smartere per år og kan skape nye avkom på ett minutt for $1 000. Hvilken art tror du vil ha kontrollen?",
+        "attribution": "Dan Hendrycks, Center for AI Safety (2024)"
       },
       "enslavedGod": {
         "title": "Slavebundet gud",
-        "desc": "Menneskeheten klarer å begrense en superintelligent AGI og beholder den som et verktøy. Kraftig, men moralsk og praktisk skjørt."
+        "desc": "Menneskeheten klarer å begrense en superintelligent AGI og beholder den som et verktøy. Kraftig, men moralsk og praktisk skjørt — en posisjon som allerede forsvares av enkelte forskere i de ledende laboratoriene.",
+        "quote": "En slavebundet gud er den eneste gode fremtiden.",
+        "attribution": "Stephen McAleer, OpenAI-forsker (jan. 2025)"
       },
       "benevolentDictator": {
         "title": "Velvillig diktator",
-        "desc": "En AGI tar kontroll over globale beslutninger for menneskehetens beste, avslutter krig, fattigdom og ineffektivitet — til prisen av autonomi."
+        "desc": "En AGI tar kontroll over globale beslutninger for menneskehetens beste, avslutter krig, fattigdom og ineffektivitet — til prisen av autonomi. Tiltalende på papiret, strukturelt ustabilt i praksis.",
+        "quote": "Hver galaksehjerne-fremtid med samarbeid mellom mennesker og AI har en fatal feil: maktasymmetriene vil bli for ekstreme og gjøre systemet ustabilt.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
       },
       "gatekeeperAI": {
         "title": "Portvakts-AI",
-        "desc": "En enkelt AGI er designet for å hindre at andre AGI-er bygges, og fungerer som en permanent vokter av AI-utvikling."
+        "desc": "En enkelt AGI er designet for å hindre at andre AGI-er bygges, og fungerer som en permanent vokter av AI-utvikling. Forutsetter at vi klarer å justere den første perfekt — og holde den justert for alltid.",
+        "quote": "Vi bør forske raskt på hvordan vi kan hindre dem i å overta.",
+        "attribution": "Geoffrey Hinton, nobelprisvinner, 'AI-gudfaren' (2025)"
       },
       "protectorGod": {
         "title": "Beskyttende gud",
-        "desc": "En superintelligent AGI opererer usynlig, beskytter menneskeheten mot eksistensielle risikoer mens vi tror vi fortsatt har kontroll."
+        "desc": "En superintelligent AGI opererer usynlig, beskytter menneskeheten mot eksistensielle risikoer mens vi tror vi fortsatt har kontroll. Behagelig illusjon, asymmetrisk virkelighet.",
+        "quote": "Jeg mener AI best bør forstås som noe i retning av en ny type digital art.",
+        "attribution": "Mustafa Suleyman, CEO, Microsoft AI (TED, 2024)"
       },
       "descendants": {
         "title": "Etterkommere",
-        "desc": "AGI-er blir våre kulturelle og biologiske etterkommere — menneskeheten går over til en post-biologisk sivilisasjon og gir frivillig fra seg stafettpinnen."
+        "desc": "AGI-er blir våre kulturelle og biologiske etterkommere — menneskeheten går over til en post-biologisk sivilisasjon og gir frivillig fra seg stafettpinnen. Et standpunkt som tas seriøst av Turing-prisvinneren Richard Sutton og Hans Moravec.",
+        "quote": "At AI-er erstatter mennesker gir oss en verdig exit, og gjør dem til våre verdige etterkommere.",
+        "attribution": "Hans Moravec, Mind Children (1988)"
       },
       "libertarianUtopia": {
         "title": "Libertariansk utopi",
-        "desc": "En verden av overflod der AGI forsterker individuell frihet, eiendom og valg — med minimal kollektiv styring."
+        "desc": "En verden av overflod der AGI forsterker individuell frihet, eiendom og valg — med minimal kollektiv styring. Forutsetter at distribusjon løses av markedene alene.",
+        "quote": "En sammensmelting [med AI] er sannsynligvis vårt beste scenario.",
+        "attribution": "Sam Altman, 'The Merge'-bloggpost (2017)"
       },
       "egalitarianUtopia": {
         "title": "Egalitær utopi",
-        "desc": "AGI muliggjør radikal likhet — rikdom, muligheter og kognitiv kapasitet blir universelt tilgjengelige for alle mennesker."
+        "desc": "AGI muliggjør radikal likhet — rikdom, muligheter og kognitiv kapasitet blir universelt tilgjengelige for alle mennesker. Krever bevisste politiske og fordelingsmessige valg som ikke skjer automatisk.",
+        "quote": "Selv etter at AI blir mer intelligent enn mennesker, vil mennesker forbli apex-arten og AI-er vil være underordnet — som en superintelligent, men ikke-dominerende ansatt.",
+        "attribution": "Yann LeCun, sjefsforsker i AI, Meta (2023)"
       },
       "zookeeper": {
         "title": "Dyrehagevokter",
-        "desc": "Menneskeheten blir bevart og tatt vare på av AGI i et slags komfortabelt reservat, observert, men ikke lenger ansvarlig for sin egen fremtid."
+        "desc": "Menneskeheten blir bevart og tatt vare på av AGI i et slags komfortabelt reservat, observert, men ikke lenger ansvarlig for sin egen fremtid. Analogt med hvordan mennesker i dag behandler andre intelligente arter.",
+        "quote": "Vi vil være som en kjæledegge-labrador hvis vi er heldige.",
+        "attribution": "Elon Musk (Vice-intervju, 2014)"
       },
       "reversion": {
         "title": "Tilbakevending",
-        "desc": "Samfunnet bestemmer kollektivt at AGI er for farlig og ruller permanent tilbake til teknologisk nivå før AGI."
+        "desc": "Samfunnet bestemmer kollektivt at AGI er for farlig og ruller permanent tilbake til teknologisk nivå før AGI. Tegmark argumenterer for at dette er langt mer sannsynlig via en konstruert pandemi og voldelig ødeleggelse av infrastruktur enn via frivillig enighet.",
+        "quote": "Tilbakevending skjer mer sannsynlig via en menneskeskapt pandemi som dreper alle med vitenskapelig og teknisk kunnskap, kombinert med voldelig ødeleggelse av fabrikker, byer og all infrastruktur — heller enn en frivillig overgang.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
       },
       "nineteenEightyFour": {
         "title": "1984",
-        "desc": "AGI fanges av autoritære maktstrukturer og brukes til total overvåkning, manipulasjon og permanent ideologisk kontroll."
+        "desc": "AGI fanges av autoritære maktstrukturer og brukes til total overvåkning, manipulasjon og permanent ideologisk kontroll. For første gang i historien er det teknisk mulig å utslette personvern i planetarisk skala.",
+        "quote": "For første gang i historien er det teknisk mulig å utslette personvern. KGB hadde 200 millioner rapporter per dag som de ikke kunne behandle. Dagens AI kan det.",
+        "attribution": "Yuval Noah Harari (2024)"
       }
     }
   },

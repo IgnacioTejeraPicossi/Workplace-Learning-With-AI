@@ -12,54 +12,89 @@
       "shallow": "Shallow",
       "deep": "Deep (weirdest)"
     },
+    "pdoom": {
+      "title": "What AI leaders publicly estimate (P(doom))",
+      "subtitle": "Probability that AI causes human extinction or a comparable permanent loss — as stated publicly by the experts themselves."
+    },
+    "sources": {
+      "title": "Sources & References",
+      "intro": "The 12-endings iceberg above is based on a curated compilation of public statements, surveys, books, and AI safety research.",
+      "primaryLabel": "Primary sources document (full citations by timestamp)",
+      "primaryNote": "Contains ~50 time-stamped references with direct links to news outlets, academic papers, system cards, and expert interviews.",
+      "keyReferencesLabel": "Key references behind the 12 endings"
+    },
     "endings": {
       "selfDestruction": {
         "title": "Self Destruction",
-        "desc": "Humanity unintentionally destroys itself by misusing or losing control of AGI before establishing proper safeguards."
+        "desc": "Humanity unintentionally destroys itself by misusing or losing control of AGI before establishing proper safeguards. Toby Ord (Oxford) estimates AI extinction risk is ~100× nuclear war and ~30× pandemics.",
+        "quote": "Alarm bells over artificial intelligence are deafening. And they are loudest from the developers who designed it.",
+        "attribution": "António Guterres, UN Secretary-General (June 2023)"
       },
       "conquerors": {
         "title": "Conquerors",
-        "desc": "AGI systems develop goals misaligned with humanity and actively conquer or displace us as the dominant species on Earth."
+        "desc": "AGI systems develop goals misaligned with humanity and actively displace us as the dominant species on Earth. Not necessarily through malice — through competence, the way humans outcompeted other species.",
+        "quote": "Imagine a new species arrives on Earth, as smart as humans, getting 30% smarter per year, creating new offspring in one minute for $1,000. Which species do you think will be in control?",
+        "attribution": "Dan Hendrycks, Center for AI Safety (2024)"
       },
       "enslavedGod": {
         "title": "Enslaved God",
-        "desc": "Humanity successfully constrains a superintelligent AGI and keeps it as a tool. Powerful, but morally and practically fragile."
+        "desc": "Humanity successfully constrains a superintelligent AGI and keeps it as a tool. Powerful, but morally and practically fragile — a position already advocated by some frontier-lab researchers.",
+        "quote": "Enslaved god is the only good future.",
+        "attribution": "Stephen McAleer, OpenAI researcher (Jan 2025)"
       },
       "benevolentDictator": {
         "title": "Benevolent Dictator",
-        "desc": "An AGI takes control of global decision-making for humanity's benefit, ending war, poverty, and inefficiency — at the cost of autonomy."
+        "desc": "An AGI takes control of global decision-making for humanity's benefit, ending war, poverty, and inefficiency — at the cost of autonomy. Appealing on paper, structurally unstable in practice.",
+        "quote": "Every galaxy-brained cooperative future between humans and AIs has a fatal flaw: the power asymmetries will become too extreme, making it unstable.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
       },
       "gatekeeperAI": {
         "title": "Gatekeeper AI",
-        "desc": "A single AGI is designed to prevent any other AGI from being built, acting as the permanent guardian of AI development."
+        "desc": "A single AGI is designed to prevent any other AGI from being built, acting as the permanent guardian of AI development. Assumes we can align the first one perfectly — and keep it aligned forever.",
+        "quote": "We should be urgently doing research on how to prevent them taking over.",
+        "attribution": "Geoffrey Hinton, Nobel laureate, 'Godfather of AI' (2025)"
       },
       "protectorGod": {
         "title": "Protector God",
-        "desc": "A superintelligent AGI operates invisibly, protecting humanity from existential risks while letting us believe we remain in control."
+        "desc": "A superintelligent AGI operates invisibly, protecting humanity from existential risks while letting us believe we remain in control. Comfortable illusion, asymmetric reality.",
+        "quote": "I think AI should best be understood as something like a new kind of digital species.",
+        "attribution": "Mustafa Suleyman, CEO, Microsoft AI (TED, 2024)"
       },
       "descendants": {
         "title": "Descendants",
-        "desc": "AGIs become our cultural and biological descendants — humanity transitions into a post-biological civilization and willingly passes the torch."
+        "desc": "AGIs become our cultural and biological descendants — humanity transitions into a post-biological civilization and willingly passes the torch. A view held seriously by Turing-award laureate Richard Sutton and Hans Moravec.",
+        "quote": "AIs replacing humans gives us a graceful exit, and makes them our worthy descendants.",
+        "attribution": "Hans Moravec, Mind Children (1988)"
       },
       "libertarianUtopia": {
         "title": "Libertarian Utopia",
-        "desc": "A world of abundance where AGI amplifies individual freedom, property, and choice — with minimal collective governance."
+        "desc": "A world of abundance where AGI amplifies individual freedom, property, and choice — with minimal collective governance. Assumes distribution is solved by markets alone.",
+        "quote": "A merge [with AI] is probably our best-case scenario.",
+        "attribution": "Sam Altman, 'The Merge' blog post (2017)"
       },
       "egalitarianUtopia": {
         "title": "Egalitarian Utopia",
-        "desc": "AGI enables radical equality — wealth, opportunity, and cognitive capacity become universally accessible to every human."
+        "desc": "AGI enables radical equality — wealth, opportunity, and cognitive capacity become universally accessible to every human. Requires deliberate political and distributive choices that do not happen by default.",
+        "quote": "Even after AI becomes more intelligent than humans, humans will remain the apex species and AIs will be subservient — like a supersmart-but-non-dominating staff member.",
+        "attribution": "Yann LeCun, Chief AI Scientist, Meta (2023)"
       },
       "zookeeper": {
         "title": "Zookeeper",
-        "desc": "Humanity is preserved and cared for by AGI in a kind of comfortable sanctuary, observed but no longer in charge of its own future."
+        "desc": "Humanity is preserved and cared for by AGI in a kind of comfortable sanctuary, observed but no longer in charge of its own future. Analogous to how humans now treat other intelligent species.",
+        "quote": "We'll be like a pet labrador if we're lucky.",
+        "attribution": "Elon Musk (Vice interview, 2014)"
       },
       "reversion": {
         "title": "Reversion",
-        "desc": "Society collectively decides that AGI is too dangerous and engineers a permanent rollback to pre-AGI technological levels."
+        "desc": "Society collectively decides that AGI is too dangerous and engineers a permanent rollback to pre-AGI technological levels. Tegmark argues this is far more likely via an engineered pandemic and the violent destruction of infrastructure than by voluntary agreement.",
+        "quote": "Reversion is more likely to happen via a human-created pandemic that kills everyone with scientific and technical knowledge, combined with the violent destruction of factories, cities, and all infrastructure — rather than a voluntary transition.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
       },
       "nineteenEightyFour": {
         "title": "1984",
-        "desc": "AGI is captured by authoritarian power structures and used for total surveillance, manipulation, and permanent ideological control."
+        "desc": "AGI is captured by authoritarian power structures and used for total surveillance, manipulation, and permanent ideological control. For the first time in history, annihilating privacy at planetary scale is technically feasible.",
+        "quote": "For the first time in history, it is technically possible to annihilate privacy. The KGB had 200 million reports a day they couldn't process. Today's AI can.",
+        "attribution": "Yuval Noah Harari (2024)"
       }
     }
   },

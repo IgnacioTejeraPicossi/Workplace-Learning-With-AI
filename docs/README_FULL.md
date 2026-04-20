@@ -551,6 +551,12 @@ Models included (directional, 0-100 total)
 
 Iceberg-style visualization of 12 possible AGI endings grouped in three zones (Surface / Shallow / Deep), each with an interactive card. Zone filter and detail view.
 
+**Sourced citations**: every ending carries a notable quote with attribution, extracted from a curated sources compilation (~50 time-stamped references). Contributors cited: Tegmark, Moravec, Musk, Hinton, Amodei, Altman, Hendrycks, LeCun, Suleyman, Harari, McAleer, Guterres.
+
+**P(doom) banner**: public AI-extinction probability estimates from Hinton (>50%), Amodei (25%), the AI Impacts 2024 survey (1-in-6 median), Toby Ord (~10%), and Pichai ("pretty high").
+
+**Sources & References panel**: dedicated panel at the bottom of the page with a link to the primary-sources Google Doc and curated cards for Life 3.0 (Tegmark), Mind Children (Moravec), The Precipice (Ord), aistatement.com, Anthropic Agentic Misalignment Appendix, Hinton's Guardian interview, and Altman's "The Merge".
+
 ### Tab 3 — The Benefits of AGI
 
 Categorized cards covering concrete benefits across Health, Science, Education, Productivity, Accessibility, and more — with examples.
