@@ -1204,6 +1204,15 @@
       "selectPlaceholder": "Velg en agent…",
       "inputPlaceholder": "Spør meg om arbeidsplasslæring …"
     },
+    "agiHub": {
+      "title": "AGI-fremdriftssenter",
+      "subtitle": "Følg fremdriften, utforsk mulige fremtider og forstå fordelene med kunstig generell intelligens"
+    },
+    "agiTabs": {
+      "tracker": "AGI-fremdriftssporing",
+      "endings": "Mulige utfall for AGI",
+      "benefits": "Fordelene med AGI"
+    },
     "agiProgress": {
       "title": "AGI‑fremdrift",
       "subtitle": "Kognitiv bredde på tvers av ti domener (CHC‑inspirert) basert på Hendrycks m.fl.",

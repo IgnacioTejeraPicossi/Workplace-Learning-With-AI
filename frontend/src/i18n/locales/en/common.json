@@ -1108,6 +1108,15 @@
       "de": "German",
       "fr": "French"
     },
+    "agiHub": {
+      "title": "AGI Progress Hub",
+      "subtitle": "Track progress, explore possible futures, and understand the benefits of Artificial General Intelligence"
+    },
+    "agiTabs": {
+      "tracker": "AGI Progress Tracker",
+      "endings": "Possible Endings for AGI",
+      "benefits": "The Benefits of AGI"
+    },
     "agiProgress": {
       "title": "AGI Progress Tracker",
       "subtitle": "Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al.",

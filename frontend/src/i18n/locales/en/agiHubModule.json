@@ -1,0 +1,159 @@
+{
+  "agiEndings": {
+    "title": "Possible Endings for AGI",
+    "subtitle": "Twelve scenarios mapping humanity's possible futures with Artificial General Intelligence — from the most normal to the most extreme.",
+    "icebergAlt": "AGI Endings Iceberg — 12 scenarios",
+    "icebergCaption": "We'll start with the most normal scenarios, and finish with the weirdest.",
+    "source": "About this classification",
+    "sourceText": "This iceberg visualization explores twelve scenarios of how humanity's relationship with Artificial General Intelligence may end. The surface shows the most widely discussed scenarios (self-destruction, AI conquering humanity, benevolent dictators), while deeper zones explore less obvious but philosophically significant endings (egalitarian utopias, reversions, surveillance states).",
+    "filters": {
+      "all": "All 12 endings",
+      "surface": "Surface (most normal)",
+      "shallow": "Shallow",
+      "deep": "Deep (weirdest)"
+    },
+    "endings": {
+      "selfDestruction": {
+        "title": "Self Destruction",
+        "desc": "Humanity unintentionally destroys itself by misusing or losing control of AGI before establishing proper safeguards."
+      },
+      "conquerors": {
+        "title": "Conquerors",
+        "desc": "AGI systems develop goals misaligned with humanity and actively conquer or displace us as the dominant species on Earth."
+      },
+      "enslavedGod": {
+        "title": "Enslaved God",
+        "desc": "Humanity successfully constrains a superintelligent AGI and keeps it as a tool. Powerful, but morally and practically fragile."
+      },
+      "benevolentDictator": {
+        "title": "Benevolent Dictator",
+        "desc": "An AGI takes control of global decision-making for humanity's benefit, ending war, poverty, and inefficiency — at the cost of autonomy."
+      },
+      "gatekeeperAI": {
+        "title": "Gatekeeper AI",
+        "desc": "A single AGI is designed to prevent any other AGI from being built, acting as the permanent guardian of AI development."
+      },
+      "protectorGod": {
+        "title": "Protector God",
+        "desc": "A superintelligent AGI operates invisibly, protecting humanity from existential risks while letting us believe we remain in control."
+      },
+      "descendants": {
+        "title": "Descendants",
+        "desc": "AGIs become our cultural and biological descendants — humanity transitions into a post-biological civilization and willingly passes the torch."
+      },
+      "libertarianUtopia": {
+        "title": "Libertarian Utopia",
+        "desc": "A world of abundance where AGI amplifies individual freedom, property, and choice — with minimal collective governance."
+      },
+      "egalitarianUtopia": {
+        "title": "Egalitarian Utopia",
+        "desc": "AGI enables radical equality — wealth, opportunity, and cognitive capacity become universally accessible to every human."
+      },
+      "zookeeper": {
+        "title": "Zookeeper",
+        "desc": "Humanity is preserved and cared for by AGI in a kind of comfortable sanctuary, observed but no longer in charge of its own future."
+      },
+      "reversion": {
+        "title": "Reversion",
+        "desc": "Society collectively decides that AGI is too dangerous and engineers a permanent rollback to pre-AGI technological levels."
+      },
+      "nineteenEightyFour": {
+        "title": "1984",
+        "desc": "AGI is captured by authoritarian power structures and used for total surveillance, manipulation, and permanent ideological control."
+      }
+    }
+  },
+
+  "agiBenefits": {
+    "title": "The Benefits of AGI",
+    "subtitle": "If developed safely and equitably, Artificial General Intelligence could unlock transformative benefits for humanity.",
+    "introTitle": "Why explore the benefits?",
+    "introText": "While the risks of AGI deserve serious attention (see 'Possible Endings'), it is equally important to articulate the upside. These benefits are not guaranteed — they depend on the alignment, governance, and distribution choices we make today.",
+    "caveatTitle": "Benefits are conditional",
+    "caveatText": "None of these outcomes are automatic. They require alignment research, equitable access, thoughtful regulation, and international cooperation. The choice between the scenarios in 'Possible Endings' and the benefits on this page depends on decisions being made right now.",
+    "examplesLabel": "Examples",
+    "items": {
+      "health": {
+        "title": "Health & Longevity",
+        "desc": "AGI could accelerate the cure of major diseases and extend healthy human lifespan by orders of magnitude.",
+        "examples": [
+          "Designing drugs for cancer, Alzheimer's, and rare diseases in days instead of decades",
+          "Personalized medicine tailored to each patient's genome and microbiome",
+          "Real-time health monitoring and preventive intervention"
+        ]
+      },
+      "science": {
+        "title": "Scientific Discovery",
+        "desc": "AGI could compress centuries of scientific progress into years by simulating, hypothesizing, and validating at superhuman speed.",
+        "examples": [
+          "Unifying physics and solving open mathematical problems",
+          "Designing new materials, proteins, and energy sources",
+          "Running millions of virtual experiments in parallel"
+        ]
+      },
+      "education": {
+        "title": "Universal Education",
+        "desc": "AGI-powered tutors could offer every human a world-class, personalized education regardless of geography or income.",
+        "examples": [
+          "Adaptive tutoring that matches each student's pace and style",
+          "Instant translation across all languages and cultures",
+          "Lifelong learning companions that grow with the learner"
+        ]
+      },
+      "climate": {
+        "title": "Climate & Environment",
+        "desc": "AGI could help solve climate change through optimized energy systems, carbon capture, and planetary-scale modeling.",
+        "examples": [
+          "Designing fusion reactors and next-generation clean energy",
+          "Optimizing global supply chains to minimize emissions",
+          "Ecosystem restoration and biodiversity preservation"
+        ]
+      },
+      "productivity": {
+        "title": "Economic Productivity",
+        "desc": "AGI could automate cognitive labor, dramatically increasing productivity and enabling new forms of work and creativity.",
+        "examples": [
+          "Automating routine knowledge work and freeing time for higher-order tasks",
+          "Scaling small teams to achieve enterprise-level output",
+          "Enabling entirely new industries and business models"
+        ]
+      },
+      "poverty": {
+        "title": "Ending Extreme Poverty",
+        "desc": "If the benefits of AGI are distributed equitably, it could end extreme poverty and provide universal access to basic needs.",
+        "examples": [
+          "Automated food production at near-zero marginal cost",
+          "Global access to housing, energy, and clean water",
+          "Universal basic services powered by AGI efficiency gains"
+        ]
+      },
+      "creativity": {
+        "title": "Creativity & Culture",
+        "desc": "AGI could amplify human creativity, enabling new forms of art, storytelling, music, and cultural expression.",
+        "examples": [
+          "Co-creative tools for artists, writers, and musicians",
+          "Preserving and translating endangered languages and traditions",
+          "New immersive experiences in gaming, film, and virtual worlds"
+        ]
+      },
+      "space": {
+        "title": "Space Exploration",
+        "desc": "AGI could accelerate humanity's expansion into the solar system and beyond, solving problems that are too complex for human teams alone.",
+        "examples": [
+          "Autonomous spacecraft and planetary exploration",
+          "Designing self-sustaining off-world habitats",
+          "Long-duration mission planning and life support"
+        ]
+      },
+      "governance": {
+        "title": "Better Governance",
+        "desc": "AGI could help design fairer, more responsive, and more transparent institutions — if deployed with strong democratic safeguards.",
+        "examples": [
+          "Policy simulation and evidence-based decision making",
+          "Real-time citizen engagement at national scale",
+          "Detecting and reducing corruption and bureaucratic inefficiency"
+        ]
+      }
+    }
+  }
+}

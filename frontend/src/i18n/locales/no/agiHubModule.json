@@ -1,0 +1,159 @@
+{
+  "agiEndings": {
+    "title": "Mulige utfall for AGI",
+    "subtitle": "Tolv scenarier som kartlegger menneskehetens mulige fremtider med kunstig generell intelligens — fra de mest normale til de mest ekstreme.",
+    "icebergAlt": "AGI-utfalls isfjell — 12 scenarier",
+    "icebergCaption": "Vi starter med de mest normale scenariene, og avslutter med de merkeligste.",
+    "source": "Om denne klassifiseringen",
+    "sourceText": "Denne isfjell-visualiseringen utforsker tolv scenarier for hvordan menneskehetens forhold til kunstig generell intelligens kan ende. Overflaten viser de mest diskuterte scenariene (selvdestruksjon, AI som erobrer menneskeheten, velvillige diktatorer), mens dypere soner utforsker mindre åpenbare, men filosofisk betydningsfulle utfall (egalitære utopier, tilbakestillinger, overvåkningsstater).",
+    "filters": {
+      "all": "Alle 12 utfall",
+      "surface": "Overflate (mest normalt)",
+      "shallow": "Grunn",
+      "deep": "Dypt (merkeligst)"
+    },
+    "endings": {
+      "selfDestruction": {
+        "title": "Selvdestruksjon",
+        "desc": "Menneskeheten ødelegger seg selv utilsiktet ved å misbruke eller miste kontroll over AGI før riktige sikkerhetstiltak er etablert."
+      },
+      "conquerors": {
+        "title": "Erobrere",
+        "desc": "AGI-systemer utvikler mål som er feiljustert med menneskeheten og erobrer eller fortrenger oss som den dominerende arten på jorden."
+      },
+      "enslavedGod": {
+        "title": "Slavebundet gud",
+        "desc": "Menneskeheten klarer å begrense en superintelligent AGI og beholder den som et verktøy. Kraftig, men moralsk og praktisk skjørt."
+      },
+      "benevolentDictator": {
+        "title": "Velvillig diktator",
+        "desc": "En AGI tar kontroll over globale beslutninger for menneskehetens beste, avslutter krig, fattigdom og ineffektivitet — til prisen av autonomi."
+      },
+      "gatekeeperAI": {
+        "title": "Portvakts-AI",
+        "desc": "En enkelt AGI er designet for å hindre at andre AGI-er bygges, og fungerer som en permanent vokter av AI-utvikling."
+      },
+      "protectorGod": {
+        "title": "Beskyttende gud",
+        "desc": "En superintelligent AGI opererer usynlig, beskytter menneskeheten mot eksistensielle risikoer mens vi tror vi fortsatt har kontroll."
+      },
+      "descendants": {
+        "title": "Etterkommere",
+        "desc": "AGI-er blir våre kulturelle og biologiske etterkommere — menneskeheten går over til en post-biologisk sivilisasjon og gir frivillig fra seg stafettpinnen."
+      },
+      "libertarianUtopia": {
+        "title": "Libertariansk utopi",
+        "desc": "En verden av overflod der AGI forsterker individuell frihet, eiendom og valg — med minimal kollektiv styring."
+      },
+      "egalitarianUtopia": {
+        "title": "Egalitær utopi",
+        "desc": "AGI muliggjør radikal likhet — rikdom, muligheter og kognitiv kapasitet blir universelt tilgjengelige for alle mennesker."
+      },
+      "zookeeper": {
+        "title": "Dyrehagevokter",
+        "desc": "Menneskeheten blir bevart og tatt vare på av AGI i et slags komfortabelt reservat, observert, men ikke lenger ansvarlig for sin egen fremtid."
+      },
+      "reversion": {
+        "title": "Tilbakevending",
+        "desc": "Samfunnet bestemmer kollektivt at AGI er for farlig og ruller permanent tilbake til teknologisk nivå før AGI."
+      },
+      "nineteenEightyFour": {
+        "title": "1984",
+        "desc": "AGI fanges av autoritære maktstrukturer og brukes til total overvåkning, manipulasjon og permanent ideologisk kontroll."
+      }
+    }
+  },
+
+  "agiBenefits": {
+    "title": "Fordelene med AGI",
+    "subtitle": "Hvis den utvikles trygt og rettferdig, kan kunstig generell intelligens frigjøre transformative fordeler for menneskeheten.",
+    "introTitle": "Hvorfor utforske fordelene?",
+    "introText": "Mens risikoene ved AGI fortjener seriøs oppmerksomhet (se 'Mulige utfall'), er det like viktig å artikulere oppsiden. Disse fordelene er ikke garantert — de avhenger av valgene om justering, styring og distribusjon vi tar i dag.",
+    "caveatTitle": "Fordeler er betingede",
+    "caveatText": "Ingen av disse utfallene er automatiske. De krever justeringsforskning, rettferdig tilgang, gjennomtenkt regulering og internasjonalt samarbeid. Valget mellom scenariene i 'Mulige utfall' og fordelene på denne siden avhenger av beslutninger som tas akkurat nå.",
+    "examplesLabel": "Eksempler",
+    "items": {
+      "health": {
+        "title": "Helse og levetid",
+        "desc": "AGI kan akselerere kuren for store sykdommer og forlenge menneskelig levetid med størrelsesordener.",
+        "examples": [
+          "Designe medisiner mot kreft, Alzheimers og sjeldne sykdommer på dager i stedet for tiår",
+          "Personlig medisin tilpasset hver pasients genom og mikrobiom",
+          "Sanntids helseovervåking og forebyggende intervensjon"
+        ]
+      },
+      "science": {
+        "title": "Vitenskapelig oppdagelse",
+        "desc": "AGI kan komprimere århundrer med vitenskapelig fremgang til år ved å simulere, hypotetisere og validere med overmenneskelig hastighet.",
+        "examples": [
+          "Forene fysikk og løse åpne matematiske problemer",
+          "Designe nye materialer, proteiner og energikilder",
+          "Kjøre millioner av virtuelle eksperimenter parallelt"
+        ]
+      },
+      "education": {
+        "title": "Universell utdanning",
+        "desc": "AGI-drevne veiledere kan gi hvert menneske en personlig utdanning i verdensklasse, uavhengig av geografi eller inntekt.",
+        "examples": [
+          "Adaptiv veiledning som matcher hver elevs tempo og stil",
+          "Øyeblikkelig oversettelse mellom alle språk og kulturer",
+          "Livslange læringsledsagere som vokser med eleven"
+        ]
+      },
+      "climate": {
+        "title": "Klima og miljø",
+        "desc": "AGI kan hjelpe med å løse klimaendringene gjennom optimaliserte energisystemer, karbonfangst og planetskala-modellering.",
+        "examples": [
+          "Designe fusjonsreaktorer og neste generasjons ren energi",
+          "Optimalisere globale forsyningskjeder for å minimere utslipp",
+          "Økosystemrestaurering og bevaring av biologisk mangfold"
+        ]
+      },
+      "productivity": {
+        "title": "Økonomisk produktivitet",
+        "desc": "AGI kan automatisere kognitivt arbeid, dramatisk øke produktiviteten og muliggjøre nye former for arbeid og kreativitet.",
+        "examples": [
+          "Automatisere rutinemessig kunnskapsarbeid og frigjøre tid til høyere ordens oppgaver",
+          "Skalere små team til å oppnå produksjon på bedriftsnivå",
+          "Muliggjøre helt nye bransjer og forretningsmodeller"
+        ]
+      },
+      "poverty": {
+        "title": "Avslutte ekstrem fattigdom",
+        "desc": "Hvis fordelene med AGI fordeles rettferdig, kan det avslutte ekstrem fattigdom og gi universell tilgang til grunnleggende behov.",
+        "examples": [
+          "Automatisert matproduksjon til nesten null marginal kostnad",
+          "Global tilgang til bolig, energi og rent vann",
+          "Universelle grunnleggende tjenester drevet av AGIs effektivitetsgevinster"
+        ]
+      },
+      "creativity": {
+        "title": "Kreativitet og kultur",
+        "desc": "AGI kan forsterke menneskelig kreativitet og muliggjøre nye former for kunst, historiefortelling, musikk og kulturelle uttrykk.",
+        "examples": [
+          "Medskapende verktøy for kunstnere, forfattere og musikere",
+          "Bevare og oversette truede språk og tradisjoner",
+          "Nye immersive opplevelser i spill, film og virtuelle verdener"
+        ]
+      },
+      "space": {
+        "title": "Romutforskning",
+        "desc": "AGI kan akselerere menneskehetens ekspansjon inn i solsystemet og utover, og løse problemer som er for komplekse for menneskelige team alene.",
+        "examples": [
+          "Autonome romfartøy og planetutforskning",
+          "Designe selvforsynende habitater utenfor jorden",
+          "Planlegging av oppdrag med lang varighet og livsstøtte"
+        ]
+      },
+      "governance": {
+        "title": "Bedre styring",
+        "desc": "AGI kan bidra til å designe mer rettferdige, responsive og transparente institusjoner — hvis den implementeres med sterke demokratiske sikkerhetstiltak.",
+        "examples": [
+          "Policy-simulering og evidensbasert beslutningstaking",
+          "Sanntids borgerengasjement på nasjonal skala",
+          "Oppdage og redusere korrupsjon og byråkratisk ineffektivitet"
+        ]
+      }
+    }
+  }
+}
