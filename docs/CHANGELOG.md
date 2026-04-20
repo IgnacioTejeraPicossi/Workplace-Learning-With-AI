@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-04-14
+
+### Added — AGI Hub "Update with AI" (live web + LLM enrichment)
+
+All three AGI Progress Hub tabs now expose a non-destructive "Update information from the web with AI" panel that pulls live web context and asks the configured LLM for structured, review-and-apply suggestions.
+
+**Backend — new service + router:**
+- `backend/services/agi_ai_enrich_service.py` — web search cascade with graceful fallback:
+  1. **Primary**: `websearch-backend` (Node, port 8080) via POST `/web-search`
+  2. **Fallback**: DuckDuckGo HTML scrape (`html.duckduckgo.com`) when the Node service is unreachable
+  3. **Last resort**: LLM-only best-effort (marked `source: "none"` in the response)
+  - Three tab-specific prompts (Tracker / Endings / Benefits), each with its own strict-JSON output schema
+  - JSON extraction tolerates fenced output and trailing prose
+- `backend/routers/agi_ai_enrich.py` — new namespace `POST /api/agi/ai-enrich/{tracker|endings|benefits}`
+  - Pydantic request/response schemas (`TrackerEnrichRequest`, `EndingsEnrichRequest`, `BenefitsEnrichRequest`, `EnrichResponse`)
+  - Forwards API Config headers (`x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*`) to `ask_ai_unified`
+- `backend/app.py` — router registered next to the existing AGI progress router
+
+**Frontend — shared panel + per-tab wiring:**
+- `frontend/src/pages/help/agi/AiSuggestions.jsx` — reusable button + review panel with Apply/Dismiss per suggestion, web-source label, empty/error states, and raw-LLM debug drawer when JSON parsing fails
+- `frontend/src/api/agiApi.js` — `enrichTracker()`, `enrichEndings()`, `enrichBenefits()` helpers that route through `fetchWithAuth` (so API Config headers travel automatically)
+- `frontend/src/pages/help/agi/AgiTracker.jsx` — Apply **persists** via the existing `POST /api/agi/progress` (upsert). Validates `sum(scores) == total` and flags mismatches. Updates the in-memory list so the chart and dropdown reflect the new model immediately.
+- `frontend/src/pages/help/agi/PossibleEndings.jsx` — Apply is **session-only**. Three suggestion kinds:
+  - `quote` → overrides the quote/attribution of the targeted ending (I–XII) with an "AI UPDATED" badge
+  - `pdoom` → appends a new card to the P(doom) banner with an "AI" badge
+  - `reference` → appends a new card to the Sources & References panel with an "AI" badge
+- `frontend/src/pages/help/agi/BenefitsOfAGI.jsx` — Apply is **session-only**: each accepted suggestion is appended as a new bullet to the target category with an "AI" badge and source link
+
+**i18n:**
+- EN + NO keys under `ai.*` in `common.json` (button label, states, web-source labels, apply/dismiss, empty/raw)
+- Norwegian strings written natively (no machine translation tags)
+
+**Persistence model (confirmed with user):**
+- Tracker: DB-backed (upsert into the existing `agi_progress` collection)
+- Endings + Benefits: in-memory / session-only by explicit design — avoids drift of curated scenario copy
+- Nothing is ever applied server-side; every change passes through the user's Apply button
+
+---
+
 ## [1.4.0] - 2026-04-14
 
 ### Added — AGI Progress Hub (restructuring of Help → AGI Progress)

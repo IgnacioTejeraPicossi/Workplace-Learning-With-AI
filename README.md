@@ -81,6 +81,18 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 ## 🔄 Recent Work (2024–2026)
 
+### AGI Hub — "Update with AI" (April 2026)
+
+All three AGI Progress Hub tabs now have a non-destructive **"Update information from the web with AI"** panel. One click runs a live web search (`websearch-backend` on port 8080 → **DuckDuckGo fallback** → LLM-only best-effort) and asks the configured LLM for structured suggestions. Each suggestion is rendered as a card with **Apply** / **Dismiss** buttons — nothing is ever overwritten silently.
+
+- **Tracker** → Apply persists via the existing `POST /api/agi/progress` (upsert), validating `sum(scores) == total`.
+- **Possible Endings** → Apply is session-only; accepts `quote` (overrides a scenario's quote/attribution), `pdoom` (adds a P(doom) card), or `reference` (adds a Sources entry). All AI-applied items are tagged with an "AI" / "AI UPDATED" badge.
+- **Benefits of AGI** → Apply is session-only; adds a new example bullet (with source link) to the target category.
+
+Backend: `backend/services/agi_ai_enrich_service.py`, `backend/routers/agi_ai_enrich.py` → `POST /api/agi/ai-enrich/{tracker|endings|benefits}`
+Frontend: `frontend/src/pages/help/agi/AiSuggestions.jsx` (shared panel) + per-tab wiring in `AgiTracker.jsx`, `PossibleEndings.jsx`, `BenefitsOfAGI.jsx`
+i18n: `ai.*` keys (EN/NO)
+
 ### AGI Progress Hub (April 2026)
 
 The single-page "AGI Progress Tracker" under Help was restructured into a three-tab hub (AgentOps-style) and the dataset refreshed through 2026:

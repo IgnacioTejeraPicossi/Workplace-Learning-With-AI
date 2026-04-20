@@ -137,6 +137,13 @@ except ImportError:
     from routers.agi_progress import router as agi_router
 app.include_router(agi_router)
 
+# AGI AI Enrichment router (live web + LLM suggestions for the AGI Hub)
+try:
+    from backend.routers.agi_ai_enrich import router as agi_ai_enrich_router
+except ImportError:
+    from routers.agi_ai_enrich import router as agi_ai_enrich_router
+app.include_router(agi_ai_enrich_router)
+
 # Embeddings router (OpenAI REST)
 try:
     from backend.routers.embeddings import router as embeddings_router

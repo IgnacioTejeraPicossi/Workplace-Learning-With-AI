@@ -2608,6 +2608,25 @@
       "sources": "Kilder:",
       "responseTime": "Responstid: {{time}} s"
     }
+  },
+  "ai": {
+    "title": "Oppdater informasjon fra nettet med AI",
+    "subtitle": "Kaller websearch-backend (port 8080) med DuckDuckGo som reserve, og ber deretter konfigurert LLM om ikke-destruktive forslag. Du gjennomgår og anvender hvert forslag.",
+    "button": "Oppdater med AI",
+    "running": "Søker og spør AI…",
+    "apply": "Bruk",
+    "applied": "Brukt ✓",
+    "dismiss": "Forkast",
+    "empty": "Ingen nye forslag å vurdere.",
+    "sourceLabel": "Nettkilde",
+    "countLabel": "Forslag",
+    "rawToggle": "LLM-svaret kunne ikke tolkes som JSON — klikk for å se rå utdata",
+    "applyError": "Klarte ikke å bruke forslaget",
+    "source": {
+      "websearchBackend": "websearch-backend (port 8080)",
+      "duckduckgo": "DuckDuckGo (reserve)",
+      "none": "Ingen nettresultater — LLM best mulig"
+    }
   }
 }
 

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { enrichBenefits } from '../../../api/agiApi';
+import AiSuggestions, { ApplyDismissActions, SourceLink } from './AiSuggestions';
 
 const benefits = [
   {
@@ -94,9 +96,10 @@ const benefits = [
   },
 ];
 
-function BenefitCard({ benefit, t }) {
+function BenefitCard({ benefit, t, extraExamples = [] }) {
   const examples = t(benefit.examplesKey, { returnObjects: true, defaultValue: [] });
-  const exampleList = Array.isArray(examples) ? examples : [];
+  const baseList = Array.isArray(examples) ? examples : [];
+  const exampleList = [...baseList, ...extraExamples];
 
   return (
     <div style={{
@@ -134,7 +137,35 @@ function BenefitCard({ benefit, t }) {
               {t('agiBenefits.examplesLabel', { defaultValue: 'Examples' })}
             </div>
             <ul style={{ margin: 0, paddingLeft: 18, color: '#4b5563', fontSize: '0.8rem', lineHeight: 1.5 }}>
-              {exampleList.map((ex, i) => <li key={i}>{ex}</li>)}
+              {exampleList.map((ex, i) => {
+                const isAi = typeof ex === 'object' && ex !== null && ex.aiAdded;
+                const text = isAi ? ex.text : ex;
+                const url = isAi ? ex.url : null;
+                return (
+                  <li key={i}>
+                    {text}
+                    {isAi && (
+                      <>
+                        {' '}
+                        <span style={{
+                          background: '#ecfdf5', color: '#065f46',
+                          fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                          padding: '1px 5px', borderRadius: 4, marginLeft: 4,
+                        }}>AI</span>
+                        {url && (
+                          <>
+                            {' '}
+                            <a href={url} target="_blank" rel="noreferrer"
+                               style={{ fontSize: 10, color: '#2563eb' }}>
+                              source
+                            </a>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -145,6 +176,8 @@ function BenefitCard({ benefit, t }) {
 
 export default function BenefitsOfAGI() {
   const { t } = useTranslation();
+  // Session-only: AI-added examples keyed by categoryId.
+  const [extraByCategory, setExtraByCategory] = useState({});
 
   return (
     <div style={{ display: 'grid', gap: 20 }}>
@@ -182,9 +215,65 @@ export default function BenefitsOfAGI() {
         gap: 16
       }}>
         {benefits.map(b => (
-          <BenefitCard key={b.id} benefit={b} t={t} />
+          <BenefitCard
+            key={b.id}
+            benefit={b}
+            t={t}
+            extraExamples={extraByCategory[b.id] || []}
+          />
         ))}
       </div>
+
+      {/* AI enrichment — web + LLM suggestions (session-only apply) */}
+      <AiSuggestions
+        fetchSuggestions={() => {
+          const payload = benefits.map(b => ({
+            id: b.id,
+            title: t(b.titleKey),
+            examples: (() => {
+              const base = t(b.examplesKey, { returnObjects: true, defaultValue: [] });
+              return Array.isArray(base) ? base : [];
+            })(),
+          }));
+          return enrichBenefits(payload);
+        }}
+        onApply={async (s) => {
+          if (!s.categoryId || !s.newExample) return;
+          setExtraByCategory(prev => {
+            const existing = prev[s.categoryId] || [];
+            return {
+              ...prev,
+              [s.categoryId]: [
+                ...existing,
+                { text: s.newExample, url: s.sourceUrl || null, aiAdded: true },
+              ],
+            };
+          });
+        }}
+        renderSuggestion={(s, { onApply, onDismiss, applied, t: tt }) => (
+          <div>
+            <span style={{
+              background: '#dbeafe', color: '#1e40af',
+              padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
+              letterSpacing: 0.5, textTransform: 'uppercase',
+            }}>{s.categoryId || '?'}</span>
+            {s.newExample && (
+              <div style={{ marginTop: 6, color: '#1f2937', fontSize: 13, lineHeight: 1.5 }}>
+                {s.newExample}
+              </div>
+            )}
+            {s.note && (
+              <div style={{ color: '#6b7280', fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+                {s.note}
+              </div>
+            )}
+            {s.sourceUrl && (
+              <div style={{ marginTop: 6 }}><SourceLink url={s.sourceUrl} /></div>
+            )}
+            <ApplyDismissActions onApply={onApply} onDismiss={onDismiss} applied={applied} t={tt} />
+          </div>
+        )}
+      />
 
       {/* Caveat */}
       <div style={{

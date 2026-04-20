@@ -561,11 +561,42 @@ Iceberg-style visualization of 12 possible AGI endings grouped in three zones (S
 
 Categorized cards covering concrete benefits across Health, Science, Education, Productivity, Accessibility, and more — with examples.
 
+### "Update information from the web with AI" (all three tabs)
+
+Non-destructive review-and-apply enrichment available on every tab.
+
+Flow:
+1. User clicks **Update with AI** on the active tab.
+2. Backend runs a web-search cascade: `websearch-backend` (port 8080, `POST /web-search`) → **DuckDuckGo HTML fallback** → LLM-only best-effort (flag `source: "none"`).
+3. The current panel data + fresh web context are passed to the configured LLM (`ask_ai_unified` → ItemAI / OpenRouter / OpenAI with automatic fallback).
+4. Response is parsed as strict JSON with a tab-specific schema and returned to the UI.
+5. The `AiSuggestions` panel renders one card per suggestion with **Apply** / **Dismiss** buttons.
+
+Persistence model:
+- **Tracker** — Apply persists via existing `POST /api/agi/progress` (upsert). `sum(scores)` is validated against `total` in the UI.
+- **Possible Endings** — Apply is **session-only**. Kinds: `quote` (overrides an ending's quote/attribution), `pdoom` (adds to the P(doom) banner), `reference` (adds to Sources panel).
+- **Benefits** — Apply is **session-only**. Adds a new example bullet with source link to the target category.
+
+Everything AI-applied is tagged with an "AI" badge so curated content stays visually distinct.
+
+Endpoints:
+- `POST /api/agi/ai-enrich/tracker`
+- `POST /api/agi/ai-enrich/endings`
+- `POST /api/agi/ai-enrich/benefits`
+
+Implementation:
+- `backend/services/agi_ai_enrich_service.py` (web cascade + prompts + JSON extraction)
+- `backend/routers/agi_ai_enrich.py` (Pydantic schemas, header forwarding)
+- `frontend/src/pages/help/agi/AiSuggestions.jsx` (reusable button + review panel)
+- `frontend/src/api/agiApi.js` (`enrichTracker`, `enrichEndings`, `enrichBenefits`)
+- i18n keys under `ai.*` in EN/NO `common.json`
+
 ### Backend
 - `GET /api/agi/progress` — returns the curated list; reads from MongoDB when available, falls back to in-memory `DEFAULT_DATA`
 - `POST /api/agi/progress` — upserts (by `model`+`year`) so re-adding the same model updates scores
 - Idempotent seed: defaults are upserted on each GET so updates to `DEFAULT_DATA` propagate without wiping manually-added rows
 - Router: `backend/routers/agi_progress.py` (included in `backend/app.py`)
+- AI enrichment router: `backend/routers/agi_ai_enrich.py` — `POST /api/agi/ai-enrich/{tracker|endings|benefits}`
 
 ### Frontend
 - Hub container: `frontend/src/pages/help/AgiProgressPage.jsx` (tab switcher, AgentOps-style)

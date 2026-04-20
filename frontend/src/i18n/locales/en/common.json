@@ -1704,6 +1704,25 @@
       "sources": "Sources:",
       "responseTime": "Response time: {{time}}s"
     }
+  },
+  "ai": {
+    "title": "Update information from the web with AI",
+    "subtitle": "Calls websearch-backend (port 8080) with DuckDuckGo fallback, then asks the configured LLM for non-destructive suggestions. You review and apply each one.",
+    "button": "Update with AI",
+    "running": "Searching & asking AI…",
+    "apply": "Apply",
+    "applied": "Applied ✓",
+    "dismiss": "Dismiss",
+    "empty": "No new suggestions to review.",
+    "sourceLabel": "Web source",
+    "countLabel": "Suggestions",
+    "rawToggle": "LLM output could not be parsed as JSON — click to inspect raw",
+    "applyError": "Failed to apply suggestion",
+    "source": {
+      "websearchBackend": "websearch-backend (port 8080)",
+      "duckduckgo": "DuckDuckGo fallback",
+      "none": "No web results — LLM best-effort"
+    }
   }
 }
 

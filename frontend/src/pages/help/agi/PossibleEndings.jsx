@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { enrichEndings } from '../../../api/agiApi';
+import AiSuggestions, { ApplyDismissActions, SourceLink } from './AiSuggestions';
 
 const ZONE_COLORS = {
   surface: { bg: '#e0f2fe', text: '#0369a1', label: 'Surface' },
@@ -133,10 +135,13 @@ function ZoneBadge({ zone }) {
   );
 }
 
-function EndingCard({ ending, isSelected, onSelect, t }) {
+function EndingCard({ ending, isSelected, onSelect, t, override }) {
   const zoneColor = ZONE_COLORS[ending.zone];
-  const quote = ending.quoteKey ? t(ending.quoteKey, { defaultValue: '' }) : '';
-  const attribution = ending.attributionKey ? t(ending.attributionKey, { defaultValue: '' }) : '';
+  const quote = override?.text
+    ?? (ending.quoteKey ? t(ending.quoteKey, { defaultValue: '' }) : '');
+  const attribution = override?.attribution
+    ?? (ending.attributionKey ? t(ending.attributionKey, { defaultValue: '' }) : '');
+  const overrideUrl = override?.sourceUrl;
   return (
     <div
       onClick={() => onSelect(ending.id)}
@@ -184,6 +189,27 @@ function EndingCard({ ending, isSelected, onSelect, t }) {
               — {attribution}
             </div>
           )}
+          {override && (
+            <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{
+                display: 'inline-block', alignSelf: 'flex-start',
+                background: '#ecfdf5', color: '#065f46',
+                fontSize: '0.6rem', fontWeight: 700, letterSpacing: 0.5,
+                padding: '1px 6px', borderRadius: 4,
+              }}>AI UPDATED</span>
+              {overrideUrl && (
+                <a
+                  href={overrideUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ fontSize: 10, color: '#2563eb', wordBreak: 'break-all' }}
+                >
+                  {overrideUrl}
+                </a>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -224,7 +250,8 @@ const P_DOOM_ESTIMATES = [
   },
 ];
 
-function PDoomBanner({ t }) {
+function PDoomBanner({ t, extras = [] }) {
+  const allEstimates = [...P_DOOM_ESTIMATES, ...extras];
   return (
     <div style={{
       background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
@@ -243,7 +270,7 @@ function PDoomBanner({ t }) {
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: 10,
       }}>
-        {P_DOOM_ESTIMATES.map((e, idx) => (
+        {allEstimates.map((e, idx) => (
           <a
             key={idx}
             href={e.url}
@@ -251,14 +278,23 @@ function PDoomBanner({ t }) {
             rel="noreferrer"
             style={{
               background: 'white',
-              border: '1px solid #fbbf24',
+              border: e.aiAdded ? '1px solid #10b981' : '1px solid #fbbf24',
               borderRadius: 8,
               padding: '10px 12px',
               textDecoration: 'none',
               color: 'inherit',
               display: 'block',
+              position: 'relative',
             }}
           >
+            {e.aiAdded && (
+              <span style={{
+                position: 'absolute', top: 6, right: 6,
+                background: '#ecfdf5', color: '#065f46',
+                fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                padding: '1px 5px', borderRadius: 4,
+              }}>AI</span>
+            )}
             <div style={{ fontSize: 22, fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>
               {e.value}
             </div>
@@ -319,7 +355,8 @@ const SOURCE_LINKS = [
   },
 ];
 
-function SourcesPanel({ t }) {
+function SourcesPanel({ t, extras = [] }) {
+  const allSources = [...SOURCE_LINKS, ...extras];
   return (
     <div style={{
       background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16
@@ -366,21 +403,30 @@ function SourcesPanel({ t }) {
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
         gap: 8,
       }}>
-        {SOURCE_LINKS.map((s, idx) => (
+        {allSources.map((s, idx) => (
           <a
             key={idx}
             href={s.url}
             target="_blank"
             rel="noreferrer"
             style={{
-              border: '1px solid #e5e7eb',
+              border: s.aiAdded ? '1px solid #10b981' : '1px solid #e5e7eb',
               borderRadius: 8,
               padding: '10px 12px',
               textDecoration: 'none',
               color: 'inherit',
-              background: '#f9fafb',
+              background: s.aiAdded ? '#f0fdf4' : '#f9fafb',
+              position: 'relative',
             }}
           >
+            {s.aiAdded && (
+              <span style={{
+                position: 'absolute', top: 6, right: 6,
+                background: '#ecfdf5', color: '#065f46',
+                fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                padding: '1px 5px', borderRadius: 4,
+              }}>AI</span>
+            )}
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1d4ed8' }}>
               {s.label}
             </div>
@@ -398,6 +444,10 @@ export default function PossibleEndings() {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState('all');
+  // Session-only AI-applied overrides/additions (not persisted by design).
+  const [overriddenQuotes, setOverriddenQuotes] = useState({}); // { [endingId]: { text, attribution, sourceUrl } }
+  const [extraPdoom, setExtraPdoom] = useState([]);
+  const [extraSources, setExtraSources] = useState([]);
 
   const filtered = filter === 'all' ? endings : endings.filter(e => e.zone === filter);
 
@@ -414,7 +464,7 @@ export default function PossibleEndings() {
       </div>
 
       {/* P(doom) banner with public expert estimates */}
-      <PDoomBanner t={t} />
+      <PDoomBanner t={t} extras={extraPdoom} />
 
       {/* Iceberg image */}
       <div style={{
@@ -478,6 +528,7 @@ export default function PossibleEndings() {
             isSelected={selected === ending.id}
             onSelect={setSelected}
             t={t}
+            override={overriddenQuotes[ending.id]}
           />
         ))}
       </div>
@@ -494,8 +545,88 @@ export default function PossibleEndings() {
         </p>
       </div>
 
+      {/* AI enrichment — web + LLM suggestions (session-only apply) */}
+      <AiSuggestions
+        fetchSuggestions={() => {
+          const endingsPayload = endings.map(e => ({
+            id: e.id,
+            title: t(e.titleKey),
+            quote: overriddenQuotes[e.id]?.text || t(e.quoteKey, { defaultValue: '' }),
+            attribution: overriddenQuotes[e.id]?.attribution || t(e.attributionKey, { defaultValue: '' }),
+          }));
+          const pdoomPayload = [
+            ...P_DOOM_ESTIMATES.map(e => ({ value: e.value, who: e.who, context: e.context, url: e.url })),
+            ...extraPdoom.map(e => ({ value: e.value, who: e.who, context: e.context, url: e.url })),
+          ];
+          return enrichEndings(endingsPayload, pdoomPayload);
+        }}
+        onApply={async (s) => {
+          if (s.kind === 'quote' && s.target) {
+            setOverriddenQuotes(prev => ({
+              ...prev,
+              [s.target]: {
+                text: s.text || '',
+                attribution: s.attribution || '',
+                sourceUrl: s.sourceUrl || '',
+              },
+            }));
+          } else if (s.kind === 'pdoom') {
+            setExtraPdoom(prev => [
+              ...prev,
+              {
+                value: s.text || '?',
+                who: (s.attribution || '').split(',')[0] || s.attribution || 'Unknown',
+                context: s.note || s.attribution || '',
+                url: s.sourceUrl || '#',
+                aiAdded: true,
+              },
+            ]);
+          } else if (s.kind === 'reference') {
+            setExtraSources(prev => [
+              ...prev,
+              {
+                label: s.text || s.attribution || 'AI-sourced reference',
+                note: s.note || s.attribution || '',
+                url: s.sourceUrl || '#',
+                aiAdded: true,
+              },
+            ]);
+          }
+        }}
+        renderSuggestion={(s, { onApply, onDismiss, applied, t: tt }) => {
+          const kindBadge = s.kind === 'quote' ? { bg: '#ede9fe', color: '#5b21b6', label: `QUOTE → ${s.target || '?'}` }
+                          : s.kind === 'pdoom' ? { bg: '#fef3c7', color: '#92400e', label: 'P(DOOM)' }
+                          : s.kind === 'reference' ? { bg: '#dbeafe', color: '#1e40af', label: 'REFERENCE' }
+                          : { bg: '#e5e7eb', color: '#374151', label: (s.kind || 'UNKNOWN').toUpperCase() };
+          return (
+            <div>
+              <span style={{
+                background: kindBadge.bg, color: kindBadge.color,
+                padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
+                letterSpacing: 0.5,
+              }}>{kindBadge.label}</span>
+              {s.text && (
+                <div style={{ marginTop: 6, color: '#1f2937', fontSize: 13, fontStyle: 'italic' }}>
+                  &ldquo;{s.text}&rdquo;
+                </div>
+              )}
+              {s.attribution && (
+                <div style={{ color: '#6b7280', fontSize: 12, marginTop: 4 }}>— {s.attribution}</div>
+              )}
+              {s.note && (
+                <div style={{ color: '#374151', fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>{s.note}</div>
+              )}
+              {s.sourceUrl && (
+                <div style={{ marginTop: 6 }}><SourceLink url={s.sourceUrl} /></div>
+              )}
+              <ApplyDismissActions onApply={onApply} onDismiss={onDismiss} applied={applied} t={tt} />
+            </div>
+          );
+        }}
+      />
+
       {/* Sources & References */}
-      <SourcesPanel t={t} />
+      <SourcesPanel t={t} extras={extraSources} />
     </div>
   );
 }

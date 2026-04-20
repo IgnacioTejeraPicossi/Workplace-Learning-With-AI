@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { fetchAGIProgress } from '../../../api/agiApi';
+import { fetchAGIProgress, enrichTracker } from '../../../api/agiApi';
 import ScoreGauge from '../../../components/agi/ScoreGauge';
 import DomainRadar from '../../../components/agi/DomainRadar';
 import TrendLine from '../../../components/agi/TrendLine';
 import { useTranslation } from 'react-i18next';
+import AiSuggestions, { ApplyDismissActions, SourceLink } from './AiSuggestions';
 
 export default function AgiTracker() {
   const { t } = useTranslation();
@@ -91,6 +92,97 @@ export default function AgiTracker() {
           {t('help.agiProgress.source', { defaultValue: 'Source paper:' })} <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">A Definition of AGI (Hendrycks et al., Oxford–MIT–Cornell, CAIS)</a>
         </div>
       </div>
+
+      {/* AI enrichment — web + LLM suggestions */}
+      <AiSuggestions
+        fetchSuggestions={() => enrichTracker(items || [])}
+        onApply={async (s) => {
+          const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+          const payload = {
+            model: s.model,
+            year: s.year,
+            scores: s.scores,
+            total: s.total,
+            notes: s.notes || '',
+          };
+          const res = await fetch(`${API_BASE}/api/agi/progress`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(`POST /api/agi/progress failed (${res.status})`);
+          const row = await res.json();
+          setItems(prev => {
+            const without = (prev || []).filter(r => !(r.model === row.model && r.year === row.year));
+            return [...without, row];
+          });
+          setSelected(row.model);
+        }}
+        renderSuggestion={(s, { onApply, onDismiss, applied, t: tt }) => {
+          const ok = s && s.scores && typeof s.total === 'number';
+          const sumCheck = ok ? Object.values(s.scores).reduce((a, b) => a + Number(b || 0), 0) : 0;
+          const mismatch = ok && sumCheck !== s.total;
+          const kindBadge = s.kind === 'new' ? { bg: '#dbeafe', color: '#1e40af', label: 'NEW MODEL' }
+                          : s.kind === 'update' ? { bg: '#fef3c7', color: '#92400e', label: 'SCORE UPDATE' }
+                          : { bg: '#e5e7eb', color: '#374151', label: (s.kind || '').toUpperCase() };
+          return (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+                <div>
+                  <span style={{
+                    background: kindBadge.bg, color: kindBadge.color,
+                    padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
+                    letterSpacing: 0.5,
+                  }}>{kindBadge.label}</span>
+                  <span style={{ marginLeft: 8, fontWeight: 700, fontSize: 14 }}>
+                    {s.model} ({s.year})
+                  </span>
+                  <span style={{ marginLeft: 8, color: '#1d4ed8', fontWeight: 700 }}>
+                    {s.total}%
+                  </span>
+                  {mismatch && (
+                    <span style={{ marginLeft: 8, color: '#dc2626', fontSize: 11 }}>
+                      ⚠ sum({sumCheck}) ≠ total({s.total})
+                    </span>
+                  )}
+                </div>
+              </div>
+              {s.notes && (
+                <div style={{ fontSize: 12, color: '#374151', marginTop: 6, lineHeight: 1.5 }}>
+                  {s.notes}
+                </div>
+              )}
+              {s.scores && (
+                <div style={{
+                  display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)',
+                  gap: 4, marginTop: 8, fontSize: 11,
+                }}>
+                  {['K','RW','M','R','WM','MS','MR','V','A','S'].map(k => (
+                    <div key={k} style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#6b7280', fontSize: 10 }}>{k}</div>
+                      <div style={{ fontWeight: 700, color: '#111827' }}>{s.scores[k] ?? '—'}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {Array.isArray(s.sources) && s.sources.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  {s.sources.map((u, i) => (
+                    <div key={i}><SourceLink url={u} /></div>
+                  ))}
+                </div>
+              )}
+              <ApplyDismissActions
+                onApply={onApply}
+                onDismiss={onDismiss}
+                applied={applied}
+                t={tt}
+                applyLabel={tt('help.agiProgress.aiEnrich.applyTracker', { defaultValue: 'Apply & save' })}
+              />
+            </div>
+          );
+        }}
+      />
 
       {/* Admin mini-form */}
       <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
