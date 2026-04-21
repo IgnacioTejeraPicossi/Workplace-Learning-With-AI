@@ -1,0 +1,15 @@
+{
+  "name": "playwright-regression",
+  "version": "1.0.0",
+  "description": "Visual regression runner for WLWAI — captures screenshots via Playwright and diffs with pixelmatch",
+  "main": "runner.js",
+  "scripts": {
+    "capture": "node runner.js --mode capture",
+    "compare": "node runner.js --mode compare"
+  },
+  "dependencies": {
+    "pixelmatch": "^5.3.0",
+    "playwright": "^1.44.0",
+    "pngjs": "^7.0.0"
+  }
+}

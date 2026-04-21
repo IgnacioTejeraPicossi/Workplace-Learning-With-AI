@@ -6,6 +6,9 @@
     "btnCypress": "Run Cypress Tests",
     "btnManual": "Run Manual Tests",
     "btnApi": "Run API Tests",
+    "btnRegression": "Regression Test with Playwright",
+    "btnCapture": "Capture Baselines",
+    "btnRunRegression": "Run Regression Test",
     "startCypress": "Start Cypress Tests",
     "startManual": "Start Manual Tests",
     "startApi": "Start API Tests",
@@ -14,6 +17,7 @@
     "progress": {
       "cypress": "Running Cypress Tests...",
       "manual": "Running Manual UI Verification...",
+      "regression": "Running Visual Regression Test...",
       "api": "Running API Tests..."
     },
     "coverageTitle": "Test Coverage (Cypress E2E)",
@@ -174,6 +178,29 @@
       "uiLoadingStates": "UX: Loading spinners appear while fetching data",
       "uiModalDialogs": "UX: Modal dialogs open, close, and are accessible",
       "uiFormValidation": "UX: Form inputs validate and show helpful error hints"
+    },
+    "regression": {
+      "infoTitle": "How Visual Regression Works",
+      "infoStep1": "Click \"Capture Baselines\" — Playwright screenshots all 30 sidebar modules and stores them in MongoDB.",
+      "infoStep2": "After code changes, click \"Run Regression Test\" to compare the current UI pixel-by-pixel against the stored baselines.",
+      "infoStep3": "Failed modules expand to show three images: Baseline | Current | Diff (red pixels mark every change).",
+      "infoNote": "The React app must be running on port 3000. First capture takes ~2 minutes (30 modules × ~4 s each).",
+      "capturing": "Capturing screenshots… (~2 min)",
+      "running": "Running pixel comparison… (~2 min)",
+      "statusNone": "No baselines stored yet — click \"Capture Baselines\" to start.",
+      "statusCount": "{{count}} baseline screenshots stored in MongoDB",
+      "statusLast": "Last captured: {{date}}",
+      "refreshStatus": "Refresh status",
+      "summaryPassed": "{{passed}} / {{total}} modules unchanged",
+      "statusPass": "PASS",
+      "statusFail": "FAIL — {{pct}}% changed",
+      "statusNoBaseline": "No baseline",
+      "statusError": "Error",
+      "showDiff": "Show diff",
+      "hideDiff": "Hide diff",
+      "labelBaseline": "Baseline",
+      "labelCurrent": "Current",
+      "labelDiff": "Diff"
     },
     "manualApi": {
       "savedVideos": "Saved Videos API",

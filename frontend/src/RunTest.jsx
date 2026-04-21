@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 import ModalDialog from './ModalDialog';
+
+const API_BASE = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 /** Timings for simulated Cypress rows (aligned with runTestModule.cypressTestNames) */
 const CYPRESS_TIMES = [
@@ -28,6 +30,59 @@ const RunTest = () => {
   const [isRunningApi, setIsRunningApi] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [progressMessage, setProgressMessage] = useState('');
+
+  // ── Regression state ──────────────────────────────────────────────────────
+  const [regressionStatus, setRegressionStatus]     = useState(null);
+  const [regressionResults, setRegressionResults]   = useState(null);
+  const [isCapturing, setIsCapturing]               = useState(false);
+  const [isRunningRegression, setIsRunningRegression] = useState(false);
+  const [expandedDiff, setExpandedDiff]             = useState(null);
+
+  const fetchRegressionStatus = useCallback(async () => {
+    try {
+      const resp = await fetch(`${API_BASE}/api/regression/status`);
+      if (resp.ok) setRegressionStatus(await resp.json());
+      else setRegressionStatus({ count: 0, baselines: [] });
+    } catch {
+      setRegressionStatus({ count: 0, baselines: [] });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (testType === 'regression') fetchRegressionStatus();
+  }, [testType, fetchRegressionStatus]);
+
+  const captureBaselines = async () => {
+    setIsCapturing(true);
+    setShowProgressModal(true);
+    setProgressMessage(t('runTestModule.regression.capturing'));
+    try {
+      const resp = await fetch(`${API_BASE}/api/regression/capture-baselines`, { method: 'POST' });
+      if (resp.ok) await fetchRegressionStatus();
+    } catch { /* backend offline */ }
+    setIsCapturing(false);
+    setShowProgressModal(false);
+  };
+
+  const runRegressionTest = async () => {
+    setIsRunningRegression(true);
+    setRegressionResults(null);
+    setExpandedDiff(null);
+    setShowProgressModal(true);
+    setProgressMessage(t('runTestModule.regression.running'));
+    try {
+      const resp = await fetch(`${API_BASE}/api/regression/run`, { method: 'POST' });
+      if (resp.ok) setRegressionResults(await resp.json());
+      else {
+        const err = await resp.json().catch(() => ({}));
+        setRegressionResults({ error: err.detail || 'Regression run failed' });
+      }
+    } catch (e) {
+      setRegressionResults({ error: e.message });
+    }
+    setIsRunningRegression(false);
+    setShowProgressModal(false);
+  };
 
   const runCypressTests = async () => {
     setIsRunning(true);
@@ -1609,6 +1664,21 @@ const RunTest = () => {
             >
               {t('runTestModule.btnApi')}
             </button>
+            <button
+              onClick={() => setTestType('regression')}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                background: testType === 'regression' ? '#7c3aed' : 'transparent',
+                color: testType === 'regression' ? 'white' : colors.text,
+                border: testType !== 'regression' ? `1px solid ${colors.border}` : 'none',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              🎭 {t('runTestModule.btnRegression')}
+            </button>
           </div>
 
           {testType === 'cypress' && (
@@ -1692,6 +1762,142 @@ const RunTest = () => {
                   <strong>ℹ️ {t('runTestModule.legendNoteTitle')}</strong> {t('runTestModule.legendNoteBody')}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ── REGRESSION TAB ───────────────────────────────────────────── */}
+          {testType === 'regression' && (
+            <div>
+              {/* How it works info box */}
+              <div style={{ background: isDark ? '#1e1b4b' : '#ede9fe', border: '1px solid #7c3aed', borderRadius: '8px', padding: '14px', marginBottom: '20px', fontSize: '13px', color: isDark ? '#c4b5fd' : '#4c1d95' }}>
+                <strong>🎭 {t('runTestModule.regression.infoTitle')}</strong>
+                <ol style={{ margin: '8px 0 0', paddingLeft: '18px', lineHeight: 1.7 }}>
+                  <li>{t('runTestModule.regression.infoStep1')}</li>
+                  <li>{t('runTestModule.regression.infoStep2')}</li>
+                  <li>{t('runTestModule.regression.infoStep3')}</li>
+                </ol>
+                <div style={{ marginTop: '8px', opacity: 0.8 }}>⏱ {t('runTestModule.regression.infoNote')}</div>
+              </div>
+
+              {/* Status bar */}
+              {regressionStatus && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: colors.primaryLight, borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '13px', color: colors.textSecondary }}>
+                  <span>🗃️</span>
+                  <span>
+                    {regressionStatus.count > 0
+                      ? t('runTestModule.regression.statusCount', { count: regressionStatus.count })
+                      : t('runTestModule.regression.statusNone')}
+                  </span>
+                  {regressionStatus.count > 0 && regressionStatus.baselines?.[0]?.captured_at && (
+                    <span style={{ marginLeft: 'auto' }}>
+                      {t('runTestModule.regression.statusLast', {
+                        date: new Date(regressionStatus.baselines[0].captured_at).toLocaleString()
+                      })}
+                    </span>
+                  )}
+                  <button onClick={fetchRegressionStatus} title={t('runTestModule.regression.refreshStatus')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: colors.primary, fontSize: '16px' }}>🔄</button>
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={captureBaselines}
+                  disabled={isCapturing || isRunningRegression}
+                  style={{ padding: '12px 20px', borderRadius: '8px', border: 'none', background: '#059669', color: 'white', cursor: (isCapturing || isRunningRegression) ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: (isCapturing || isRunningRegression) ? 0.7 : 1 }}
+                >
+                  {isCapturing ? `📸 ${t('runTestModule.regression.capturing')}` : `📸 ${t('runTestModule.btnCapture')}`}
+                </button>
+                <button
+                  onClick={runRegressionTest}
+                  disabled={isRunningRegression || isCapturing || !regressionStatus?.count}
+                  style={{ padding: '12px 20px', borderRadius: '8px', border: 'none', background: '#7c3aed', color: 'white', cursor: (isRunningRegression || isCapturing || !regressionStatus?.count) ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: (isRunningRegression || isCapturing || !regressionStatus?.count) ? 0.7 : 1 }}
+                >
+                  {isRunningRegression ? `🔍 ${t('runTestModule.regression.running')}` : `🔍 ${t('runTestModule.btnRunRegression')}`}
+                </button>
+              </div>
+
+              {/* Results */}
+              {regressionResults && !regressionResults.error && regressionResults.modules && (
+                <div>
+                  {/* Summary bar */}
+                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                    <div style={{ background: '#dcfce7', border: '1px solid #16a34a', borderRadius: '8px', padding: '10px 16px', fontWeight: 700, color: '#14532d' }}>
+                      ✓ {regressionResults.summary.passed} {t('runTestModule.regression.statusPass')}
+                    </div>
+                    {regressionResults.summary.failed > 0 && (
+                      <div style={{ background: '#fee2e2', border: '1px solid #dc2626', borderRadius: '8px', padding: '10px 16px', fontWeight: 700, color: '#7f1d1d' }}>
+                        ✗ {regressionResults.summary.failed} {t('runTestModule.regression.statusFail', { pct: '' }).replace(' —  % changed', '')}
+                      </div>
+                    )}
+                    <div style={{ background: colors.primaryLight, border: `1px solid ${colors.border}`, borderRadius: '8px', padding: '10px 16px', color: colors.textSecondary }}>
+                      {t('runTestModule.regression.summaryPassed', { passed: regressionResults.summary.passed, total: regressionResults.summary.total })}
+                    </div>
+                  </div>
+
+                  {/* Per-module rows */}
+                  <div style={{ border: `1px solid ${colors.border}`, borderRadius: '8px', overflow: 'hidden' }}>
+                    {regressionResults.modules.map((mod, idx) => (
+                      <div key={mod.name}>
+                        {/* Row */}
+                        <div
+                          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: idx < regressionResults.modules.length - 1 ? `1px solid ${colors.border}` : 'none', background: mod.status === 'fail' ? (isDark ? '#3b1f1f' : '#fff5f5') : colors.cardBackground, cursor: mod.status === 'fail' ? 'pointer' : 'default' }}
+                          onClick={() => mod.status === 'fail' && setExpandedDiff(expandedDiff === mod.name ? null : mod.name)}
+                        >
+                          <span style={{ fontSize: '16px' }}>
+                            {mod.status === 'pass'        ? '✅' :
+                             mod.status === 'fail'        ? '❌' :
+                             mod.status === 'no_baseline' ? '⚪' : '⚠️'}
+                          </span>
+                          <span style={{ flex: 1, color: colors.text, fontWeight: mod.status === 'fail' ? 600 : 400 }}>{mod.name}</span>
+                          {mod.status === 'pass' && <span style={{ color: '#16a34a', fontSize: '13px', fontWeight: 600 }}>{t('runTestModule.regression.statusPass')}</span>}
+                          {mod.status === 'fail' && (
+                            <>
+                              <span style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600 }}>{t('runTestModule.regression.statusFail', { pct: mod.diffPct })}</span>
+                              <span style={{ color: colors.primary, fontSize: '12px' }}>{expandedDiff === mod.name ? `▲ ${t('runTestModule.regression.hideDiff')}` : `▼ ${t('runTestModule.regression.showDiff')}`}</span>
+                            </>
+                          )}
+                          {mod.status === 'no_baseline' && <span style={{ color: colors.textSecondary, fontSize: '13px' }}>{t('runTestModule.regression.statusNoBaseline')}</span>}
+                          {mod.status === 'error'       && <span style={{ color: '#f59e0b', fontSize: '13px' }}>{t('runTestModule.regression.statusError')}</span>}
+                        </div>
+
+                        {/* Diff viewer (expanded) */}
+                        {expandedDiff === mod.name && mod.diffB64 && (
+                          <div style={{ padding: '16px', background: isDark ? '#1a1a2e' : '#f8f8ff', borderBottom: idx < regressionResults.modules.length - 1 ? `1px solid ${colors.border}` : 'none' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                              {[
+                                { label: t('runTestModule.regression.labelBaseline'), src: mod.baselineB64, border: '#6b7280' },
+                                { label: t('runTestModule.regression.labelCurrent'),  src: mod.currentB64,  border: '#2563eb' },
+                                { label: t('runTestModule.regression.labelDiff'),     src: mod.diffB64,     border: '#dc2626' },
+                              ].map(({ label, src, border }) => (
+                                <div key={label} style={{ textAlign: 'center' }}>
+                                  <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: colors.textSecondary }}>{label}</div>
+                                  {src ? (
+                                    <img
+                                      src={`data:image/png;base64,${src}`}
+                                      alt={label}
+                                      style={{ width: '100%', border: `2px solid ${border}`, borderRadius: '4px', display: 'block' }}
+                                    />
+                                  ) : (
+                                    <div style={{ padding: '20px', background: colors.primaryLight, borderRadius: '4px', color: colors.textSecondary, fontSize: '12px' }}>—</div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error state */}
+              {regressionResults?.error && (
+                <div style={{ background: '#fee2e2', border: '1px solid #dc2626', borderRadius: '8px', padding: '14px', color: '#7f1d1d', fontSize: '13px' }}>
+                  ❌ {regressionResults.error}
+                </div>
+              )}
             </div>
           )}
 

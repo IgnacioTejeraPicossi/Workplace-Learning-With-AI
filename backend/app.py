@@ -269,6 +269,14 @@ except ImportError:
 app.include_router(api_test_router)
 app.include_router(itemai_api_router)
 
+# Visual Regression Testing router (Playwright + pixelmatch)
+try:
+    from backend.routers.regression import router as regression_router
+    app.include_router(regression_router, tags=["Visual Regression"])
+    print("✅ Visual Regression router included successfully")
+except Exception as e:
+    print(f"❌ Error including Visual Regression router: {e}")
+
 import os
 from fastapi.staticfiles import StaticFiles
 

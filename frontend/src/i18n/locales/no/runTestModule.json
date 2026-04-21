@@ -6,6 +6,9 @@
     "btnCypress": "Kjør Cypress-tester",
     "btnManual": "Kjør manuelle tester",
     "btnApi": "Kjør API-tester",
+    "btnRegression": "Regresjonstest med Playwright",
+    "btnCapture": "Ta grunnlinjebilder",
+    "btnRunRegression": "Kjør regresjonstest",
     "startCypress": "Start Cypress-tester",
     "startManual": "Start manuelle tester",
     "startApi": "Start API-tester",
@@ -14,6 +17,7 @@
     "progress": {
       "cypress": "Kjører Cypress-tester …",
       "manual": "Kjører manuell UI-verifisering …",
+      "regression": "Kjører visuell regresjonstest …",
       "api": "Kjører API-tester …"
     },
     "coverageTitle": "Testdekning (Cypress E2E)",
@@ -174,6 +178,29 @@
       "uiLoadingStates": "UX: Innlastingssymboler vises under datahenting",
       "uiModalDialogs": "UX: Modaldialogbokser åpner, lukker og er tilgjengelige",
       "uiFormValidation": "UX: Skjemainndata validerer og viser hjelpsomme feilhint"
+    },
+    "regression": {
+      "infoTitle": "Slik fungerer visuell regresjon",
+      "infoStep1": "Klikk «Ta grunnlinjebilder» — Playwright tar skjermbilder av alle 30 sidefeltsmoduler og lagrer dem i MongoDB.",
+      "infoStep2": "Etter kodeendringer klikker du «Kjør regresjonstest» for å sammenligne gjeldende UI piksel for piksel mot lagrede grunnlinjer.",
+      "infoStep3": "Mislykkede moduler viser tre bilder: Grunnlinje | Nåværende | Differanse (røde piksler markerer alle endringer).",
+      "infoNote": "React-appen må kjøre på port 3000. Første opptak tar ca. 2 minutter (30 moduler × ~4 s).",
+      "capturing": "Tar skjermbilder … (ca. 2 min)",
+      "running": "Kjører pikselsammenligning … (ca. 2 min)",
+      "statusNone": "Ingen grunnlinjer lagret ennå — klikk «Ta grunnlinjebilder» for å starte.",
+      "statusCount": "{{count}} grunnlinjebilder lagret i MongoDB",
+      "statusLast": "Sist tatt: {{date}}",
+      "refreshStatus": "Oppdater status",
+      "summaryPassed": "{{passed}} / {{total}} moduler uendret",
+      "statusPass": "PASS",
+      "statusFail": "FAIL — {{pct}}% endret",
+      "statusNoBaseline": "Ingen grunnlinje",
+      "statusError": "Feil",
+      "showDiff": "Vis differanse",
+      "hideDiff": "Skjul differanse",
+      "labelBaseline": "Grunnlinje",
+      "labelCurrent": "Nåværende",
+      "labelDiff": "Differanse"
     },
     "manualApi": {
       "savedVideos": "Lagrede videoer API",

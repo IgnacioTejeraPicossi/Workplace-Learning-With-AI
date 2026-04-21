@@ -64,3 +64,6 @@ voice_cloning_env_311/
 
 #.Claude
 .Claude/
+
+# Playwright regression runner
+playwright-regression/node_modules/

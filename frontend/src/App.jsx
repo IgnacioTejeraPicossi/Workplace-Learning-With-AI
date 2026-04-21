@@ -146,6 +146,14 @@ function AppContent() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Playwright visual-regression hook: ?pwSection=<section> sets the active section on load.
+  // This allows the runner to navigate to any module without clicking the sidebar.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pw = params.get('pwSection');
+    if (pw) setSection(pw);
+  }, []);
+
   const handleSearchNavigate = (sectionId) => {
     setSection(sectionId);
   };
