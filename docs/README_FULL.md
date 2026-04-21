@@ -175,7 +175,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [🚀 Agentic RAG](#agentic-rag-system-advanced-document-intelligence) - Advanced document intelligence with AI agents
 - [Presentation Agent](#presentation-agent) - AI-generated presentations
 - [AI Study Buddy](#ai-study-buddy) - Conversational learning support
-- [AGI Progress Hub](#agi-progress-hub) - 3-tab hub: Progress Tracker, Possible Endings for AGI, Benefits of AGI
+- [AGI Progress Hub](#agi-progress-hub) - 4-tab hub: Progress Tracker, Possible Endings for AGI, Benefits of AGI, Homo Sapiens vs. KI i Test
 - [🧠 Robomind Clinic](#robomind-clinic-ai-psychology-module) - AI Psychology Module for diagnosing and treating AI pathologies
 
 ### 🤖 AI-Powered Collaboration Modules (NEW!)
@@ -560,6 +560,55 @@ Iceberg-style visualization of 12 possible AGI endings grouped in three zones (S
 ### Tab 3 — The Benefits of AGI
 
 Categorized cards covering concrete benefits across Health, Science, Education, Productivity, Accessibility, and more — with examples.
+
+### Tab 4 — Homo Sapiens vs. KI i Test (SOCO workshop companion)
+
+Purpose-built as a **live presentation tool** for the workshop with Ola Kleiven and Keyhan Farahaninia at SOCO. Everything in one scroll, projector-friendly, bilingual EN/NO with native-quality Norwegian.
+
+Six sections:
+
+1. **Workshop Hero** — SOCO kicker, hosts callout, and the three reflection questions as visual anchors:
+   - *When does AI give us a real advantage in testing work?*
+   - *Is human judgement, context, critical thinking and curiosity still decisive?*
+   - *Do we have a winner — or a new way of working together?*
+
+2. **Activity Matrix** — ten canonical testing activities classified as Human-leads / AI-leads / Hybrid, with rationale and confidence level:
+   - Test scenario generation (Hybrid)
+   - Risk-based prioritisation (Human)
+   - Requirement / story ambiguity detection (AI)
+   - Exploratory testing (Human)
+   - Follow-up questions (Hybrid)
+   - Test automation code (AI)
+   - Test data generation (AI)
+   - The oracle problem (Human)
+   - Bug triage & severity (Hybrid)
+   - Accessibility & UX heuristics (Hybrid)
+
+3. **Head-to-Head — 4 live rounds** with a **prewritten human answer** shown next to a **live AI answer** generated from the model configured in the user's API Config:
+   - `scenarios` — requirement → prioritised test scenarios
+   - `ambiguities` — user story → hidden assumptions + ambiguous terms
+   - `followups` — bug report → highest-signal follow-up questions
+   - `tests_from_code` — code snippet → test suite with oracle questions
+   Each round has a vote bar (🧑 / 🤖 / 🤝) that feeds the scoreboard.
+
+4. **Trust Framework** — a 7-dimension decision grid: context, risk, ambiguity, novelty, volume, judgement, accountability. Each row: "AI excels when… / Humans excel when… / Practical rule".
+
+5. **Workshop Scoreboard** — configurable group names, live counter, round-by-round log with notes, undo, reset, JSON export. Session-only by design — the workshop artefact is the exported JSON.
+
+6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 curated quotes (Bach, Kaner, Hendrycks, Amodei) each with a "use when" hint, 5 likely audience questions with prepared answers, and a closer.
+
+### Backend — Homo vs. KI
+- `POST /api/agi/homo-vs-ai/challenge { task, input, language? }` — dispatches to one of `{scenarios, ambiguities, followups, tests_from_code}` with testing-literate prompts (ISTQB + context-driven vocabulary)
+- `GET /api/agi/homo-vs-ai/tasks` — discovery
+- Forwards `x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*` headers to `ask_ai_unified` so the UI's model choice is respected
+- Service: `backend/services/homo_vs_ai_service.py`, router: `backend/routers/homo_vs_ai.py`
+
+### Frontend — Homo vs. KI
+- Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`
+- API helper: `runTestingChallenge` in `frontend/src/api/agiApi.js`
+- Tab wiring: fourth tab in `frontend/src/pages/help/AgiProgressPage.jsx` (icon 🧑‍💻)
+- Inline `MarkdownLite` renderer (~30 lines) — no new dependency
+- i18n: top-level `homoVsAi.*` block in `locales/{en,no}/common.json`, plus `help.agiTabs.homoVsAi`
 
 ### "Update information from the web with AI" (all three tabs)
 

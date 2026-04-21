@@ -1211,7 +1211,8 @@
     "agiTabs": {
       "tracker": "AGI-fremdriftssporing",
       "endings": "Mulige utfall for AGI",
-      "benefits": "Fordelene med AGI"
+      "benefits": "Fordelene med AGI",
+      "homoVsAi": "Homo Sapiens vs. KI i Test"
     },
     "agiProgress": {
       "title": "AGI‑fremdrift",
@@ -2626,6 +2627,264 @@
       "websearchBackend": "websearch-backend (port 8080)",
       "duckduckgo": "DuckDuckGo (reserve)",
       "none": "Ingen nettresultater — LLM best mulig"
+    }
+  },
+  "homoVsAi": {
+    "hero": {
+      "kicker": "SOCO · WORKSHOP · 2026",
+      "title": "Homo Sapiens vs. KI i Test",
+      "lead": "Hvordan måler mennesker og KI seg mot hverandre i typisk testarbeid — og når vinner egentlig hver av dem? Et evidensbasert følge til workshopen med Ola Kleiven og Keyhan Farahaninia.",
+      "questions": [
+        "Når gir KI oss et reelt fortrinn i testarbeidet?",
+        "Er menneskelig vurdering, kontekstforståelse, kritisk tenking og nysgjerrighet fortsatt avgjørende?",
+        "Har vi en vinner — eller en ny måte å jobbe sammen på?"
+      ]
+    },
+    "verdict": {
+      "ai": "KI leder",
+      "human": "Mennesket leder",
+      "hybrid": "Hybrid",
+      "tie": "Uavgjort"
+    },
+    "why": "Hvorfor",
+    "confidenceLabel": "Sikkerhet",
+    "activities": {
+      "title": "Aktivitetsmatrise",
+      "lead": "Ti sentrale testaktiviteter. Hvem har fortrinnet i dag — og hvorfor? Fargekodede dommer, ikke dogmer.",
+      "scenarios": {
+        "title": "Generering av testscenarier",
+        "desc": "Fra et krav til et bredt, prioritert sett av scenarier som dekker happy path, negative, grenseverdier og ikke-funksjonelle vinkler.",
+        "rationale": "KI er rask på bredde og husker glemte dimensjoner (i18n, ytelse, universell utforming). Mennesket slår den fortsatt på risk-based prioritering knyttet til virkelige interessenter.",
+        "verdict": "hybrid",
+        "confidence": "høy"
+      },
+      "risk": {
+        "title": "Risikobasert prioritering",
+        "desc": "Å avgjøre hvilke tester som betyr mest gitt prosjektet, kunden, og hva som faktisk brenner dette kvartalet.",
+        "rationale": "KI mangler din politiske og historiske kontekst. «Hva ser CFO først?» er en menneskelig vurdering.",
+        "verdict": "human",
+        "confidence": "høy"
+      },
+      "ambiguity": {
+        "title": "Tvetydighet i krav / brukerhistorier",
+        "desc": "Å fange ord som «raskt», «sikkert», «bruker» eller «ferdig» som betyr ulike ting for ulike interessenter.",
+        "rationale": "Moderne LLM-er er overraskende gode på dette — de er trent på millioner av spesifikasjoner. En erfaren tester fanger fortsatt de domenespesifikke som modellen bommer på.",
+        "verdict": "ai",
+        "confidence": "middels"
+      },
+      "exploratory": {
+        "title": "Exploratory testing",
+        "desc": "Å lære produktet ved å bruke det, følge magefølelsen, svinge rundt på det du finner.",
+        "rationale": "Nysgjerrighet, smak og «dette lukter rart»-intuisjon er fortsatt menneskelige styrker. KI kan foreslå charters, men ikke jakte på dem.",
+        "verdict": "human",
+        "confidence": "høy"
+      },
+      "followups": {
+        "title": "Oppfølgingsspørsmål",
+        "desc": "Spørsmålene du stiller PO-en, utvikleren eller bug-reporteren for å få klarhet.",
+        "rationale": "KI produserer en solid grunnlinje på sekunder. Mennesket vinner på de som krever politikk, tone og dyp produktkunnskap.",
+        "verdict": "hybrid",
+        "confidence": "middels"
+      },
+      "automation": {
+        "title": "Testautomatiseringskode",
+        "desc": "Å skrive Playwright-/Cypress-/Selenium-skript, fixtures, page objects.",
+        "rationale": "KI skriver boilerplate raskere enn du kan skrive det. Mennesket designer fortsatt arkitekturen og velger hva som skal automatiseres.",
+        "verdict": "ai",
+        "confidence": "høy"
+      },
+      "testData": {
+        "title": "Generering av testdata",
+        "desc": "Realistiske, varierte datasett med edge cases for demo og regresjon.",
+        "rationale": "Nær løst av KI i strukturerte domener. Mennesket holder kontroll på sensitive eller regulatoriske data (GDPR, helse, finans).",
+        "verdict": "ai",
+        "confidence": "høy"
+      },
+      "oracle": {
+        "title": "Orakel-problemet",
+        "desc": "Å avgjøre hva «korrekt oppførsel» i det hele tatt er når spec-en er taus eller selvmotsigende.",
+        "rationale": "Dette er selve definisjonen av testing (Kaner, Bach). KI gjetter plausibelt; mennesket bestemmer hva som bør være.",
+        "verdict": "human",
+        "confidence": "høy"
+      },
+      "triage": {
+        "title": "Bug-triage og alvorlighet",
+        "desc": "Å avgjøre om en feil er P1 eller P3 gitt forretningsverdi og brukersmerte.",
+        "rationale": "KI er god på klassifisering ut fra symptomer. Mennesket eier forretningsvekt, VIP-kunder, regulatorisk sprengkraft.",
+        "verdict": "hybrid",
+        "confidence": "middels"
+      },
+      "accessibility": {
+        "title": "Universell utforming og UX-heuristikker",
+        "desc": "Å fange brudd på WCAG, Nielsen-heuristikker og ren menneskelig frustrasjon.",
+        "rationale": "KI fanger de 80 % mekaniske bruddene (kontrast, alt-tekst, ARIA). Mennesket fanger de 20 % som faktisk rammer reelle brukere.",
+        "verdict": "hybrid",
+        "confidence": "middels"
+      }
+    },
+    "demos": {
+      "title": "Direkte duell: 4 live-runder",
+      "lead": "Velg en runde, les det forhåndsskrevne menneske-svaret høyt, og trykk deretter Kjør KI. Modellen svarer live via den LLM-en som er valgt i API Config. Stem på slutten av hver runde — det mates direkte inn i poengtavlen.",
+      "roundLabel": "Runde",
+      "inputLabel": "Inndata",
+      "runLabel": "Kjør KI",
+      "running": "KI tenker…",
+      "thinking": "Spør modellen…",
+      "resetLabel": "Tilbakestill til eksempel",
+      "humanLabel": "Menneskelig tester (forhåndsskrevet)",
+      "aiLabel": "KI (live)",
+      "humanPlaceholder": "Les ditt eget svar høyt her.",
+      "aiPlaceholder": "Trykk «Kjør KI» for å generere svaret live.",
+      "votePrompt": "Hvem vant denne runden?",
+      "scenarios": {
+        "title": "Fra krav til testscenarier",
+        "prompt": "Lim inn et krav. Både tester og KI skal produsere et prioritert sett av scenarier.",
+        "sample": "Systemet skal la en registrert bruker tilbakestille passordet sitt via e-post. Lenken i e-posten må utløpe innen 1 time. Brukeren skal varsles om tilbakestillingen på sin primære e-postadresse.",
+        "humanAnswer": "- **P1 Happy path**: gyldig bruker ber om tilbakestilling, mottar e-post innen et minutt, lenken virker én gang.\n- **P1 Sikkerhet**: lenken kan ikke brukes to ganger, kan ikke gjettes, utløper nøyaktig etter 1t — test ved 59m / 60m / 61m.\n- **P1 Misbruk**: uregistrert e-post skal ikke lekke om kontoen finnes (samme responstid + samme tekst).\n- **P2 Race**: to tilbakestillingsmailer innen 30s — kun siste lenke skal være gyldig.\n- **P2 i18n**: tilbakestillingsmailen respekterer brukerens språkvalg.\n- **P3 Varsling**: hvis primær e-post endres midt i flyten, hvem varsles?\n- **Exploratory charter**: «På 20 minutter, prøv å låse en bruker ute av egen konto kun via tilbakestillingsflyten.»"
+      },
+      "ambiguities": {
+        "title": "Tvetydighetsjakt i en brukerhistorie",
+        "prompt": "Lim inn en brukerhistorie. Både tester og KI lister skjulte antakelser og tvetydige begreper.",
+        "sample": "Som kunde vil jeg raskt søke etter produkter slik at jeg finner det jeg trenger. Akseptansekriterier: søket virker raskt og gir relevante resultater.",
+        "humanAnswer": "- **«Raskt»** — ikke testbart. Hvor mange ms? Kald eller varm cache? Over hvilket nettverk?\n- **«Relevante»** — etter hvilken rangering? Salg, popularitet, personalisert? Finnes et evaluerings­sett?\n- **«Kunde»** — innlogget eller anonym? Oppfører B2B seg annerledes?\n- **«Produkter»** — kun på lager? Arkiverte? Region-gated?\n- **Mangler**: tomme resultater, skrivefeil, fuzzy matching, ikke-latinske tegn, universell utforming, analytics, rate limiting.\n- **Oppfølging til PO**: «Hva er det verste søkeresultatet vi er villige til å slippe til produksjon?»"
+      },
+      "followups": {
+        "title": "Oppfølgingsspørsmål til en bug",
+        "prompt": "Lim inn en feilrapport. Både tester og KI produserer oppfølgingsspørsmålene med høyest signalverdi.",
+        "sample": "Bug: Checkout feiler av og til. Fikk en feil i går da jeg prøvde å kjøpe to varer. Feilmeldingen sa «noe gikk galt». Vennligst fiks.",
+        "humanAnswer": "- **Reproduksjon**: nøyaktig hvilke varer, antall, betalingsmåte, nettleser, tidssone, mobil eller desktop?\n- **Omfang**: samme bruker med annen handlekurv? Andre brukere i samme region/tenant? Innlogget vs gjest?\n- **Orakel**: hva var forventet melding / neste steg? Har vi skjermbilde eller HAR-fil?\n- **Miljø**: prod, staging, hvilken commit var deployet? Aktive feature flags?\n- **Tidligere funn**: relaterte tickets? Kjente betalingsleverandør-hendelser samme dag?\n- **Konsekvens**: hvor mange feil siste 24t? Risiko for tapt omsetning?"
+      },
+      "tests_from_code": {
+        "title": "Testcaser fra en kodesnutt",
+        "prompt": "Lim inn en funksjon eller klasse. Både tester og KI foreslår en kompakt testsuite.",
+        "sample": "function discountPrice(price, percentage) {\n  if (percentage < 0 || percentage > 100) throw new Error('invalid percentage');\n  return price - (price * percentage / 100);\n}",
+        "humanAnswer": "- **Happy path**: discountPrice(100, 10) === 90.\n- **Grenseverdier**: 0 % og 100 % — forvent price og 0.\n- **Ugyldig**: -1 og 101 må kaste feil med meldingen «invalid percentage».\n- **Type-edges**: ikke-numerisk percentage? NaN? Infinity? (Sannsynlig stille bug — ikke beskyttet i dag.)\n- **Negativ pris**: er negativ pris lov? Spec-en sier ingenting — **orakel-spørsmål til PO.**\n- **Flyttall**: discountPrice(9.99, 33) — assert innenfor toleranse, ikke likhet.\n- **Egenskap**: for alle gyldige (p, %) er resultatet i [0, p]."
+      }
+    },
+    "framework": {
+      "title": "Når skal vi stole på hvem",
+      "lead": "Et kompakt beslutningsgrid per dimensjon — ikke et hierarki, men en verktøykasse.",
+      "col": {
+        "dimension": "Dimensjon",
+        "ai": "KI er best når…",
+        "human": "Mennesket er best når…",
+        "verdict": "Praktisk regel"
+      },
+      "rows": {
+        "context": {
+          "dimension": "Forretnings- og interessent-kontekst",
+          "ai": "…konteksten er dokumentert og stabil.",
+          "human": "…konteksten lever i hodene, i Slack og i kaffemaskinprat.",
+          "rule": "Mennesket holder konteksten; KI utfører innenfor den."
+        },
+        "risk": {
+          "dimension": "Risiko og sikkerhet",
+          "ai": "…risikoen lar seg mønstergjenkjenne fra historiske data.",
+          "human": "…risikoen er ny, politisk eller omdømme­relatert.",
+          "rule": "KI utkaster risikolisten; et menneske tar sign-off."
+        },
+        "ambiguity": {
+          "dimension": "Tvetydighet i input",
+          "ai": "…tvetydigheten er språklig (udefinerte begreper, selvmotsigelser).",
+          "human": "…tvetydigheten skjuler intensjon eller tause kompromisser.",
+          "rule": "La KI finne kandidatene; mennesket avgjør intensjonen."
+        },
+        "novelty": {
+          "dimension": "Nyhet",
+          "ai": "…problemet er en variant av noe kjent.",
+          "human": "…problemet aldri er sett av teamet før.",
+          "rule": "De første N feilene i en ny feature er et menneskespill."
+        },
+        "volume": {
+          "dimension": "Volum / repetisjon",
+          "ai": "…det er 1000 like tilfeller å håndtere.",
+          "human": "…det er 3, og hvert av dem er unikt.",
+          "rule": "Automatiser bredde med KI; invester mennesker i dybde."
+        },
+        "judgement": {
+          "dimension": "Verdivurdering",
+          "ai": "…metrikken er avtalt og målbar.",
+          "human": "…«godt nok» er en smakssak.",
+          "rule": "KI optimerer metrikker du har valgt. Mennesker velger metrikkene."
+        },
+        "accountability": {
+          "dimension": "Ansvar",
+          "ai": "—",
+          "human": "…noen må stå foran en kunde eller regulator.",
+          "rule": "Ansvaret er alltid menneskelig. KI kan hjelpe deg å forsvare det."
+        }
+      }
+    },
+    "scoreboard": {
+      "title": "Workshop-poengtavle",
+      "lead": "Live-oppsummering for økten. Stemmer fra direkte duell-rundene mates inn automatisk. Legg til gruppenavn, angre siste stemme, eller eksporter hele loggen som JSON.",
+      "notePlaceholder": "Rundenotat (valgfritt, festes til neste +1)",
+      "newGroupPlaceholder": "Nytt gruppenavn",
+      "addGroup": "Legg til gruppe",
+      "undo": "Angre siste",
+      "reset": "Nullstill",
+      "export": "Eksporter JSON",
+      "logTitle": "Rundelogg"
+    },
+    "cribSheet": {
+      "privateLabel": "Kun for foredragsholder",
+      "title": "Jukselapp (60-sek åpning, sitater, sannsynlige spørsmål)",
+      "openerTitle": "60-sekunders åpning",
+      "quotesTitle": "Sitater å slippe inn (kun hvis naturlig)",
+      "qaTitle": "Sannsynlige spørsmål fra salen",
+      "closerTitle": "Avslutning (det du vil de skal huske)",
+      "openerParas": [
+        "God morgen. Før vi deler oss i grupper, en kort rammesetting. Spørsmålet «mennesker eller KI?» er feil spørsmål — det nyttige spørsmålet er «mennesker eller KI, for hvilken del av testarbeidet, under hvilke betingelser?». Det er det denne økten prøver å svare på, med data og med våre egne hender.",
+        "Jeg er åpen om min skjevhet: jeg bruker KI daglig i testarbeid, jeg har bygget siden dere ser på for å utfordre min egen tenking, og jeg tror fortsatt at de beste testerne i 2026 er mennesker som vet nøyaktig når de skal gripe til modellen — og når de ikke skal."
+      ],
+      "closerParas": [
+        "KI tok ikke testing fra oss. Den tok de kjedelige 80 prosentene og ga oss en skarpere saks til de 20 prosentene som faktisk avgjør om programvaren skader brukerne eller hjelper dem.",
+        "Hvis dere husker én ting: testeren som vinner i 2026 er den som behandler KI som en upålitelig, men rask junior — du sjekker alt, du stoler på vurderingen til ingenting, men du leverer dobbelt så mye reell verdi."
+      ],
+      "quotes": [
+        {
+          "text": "Testing er en uendelig prosess der man sammenligner det usynlige med det tvetydige for å unngå at det utenkelige rammer de anonyme.",
+          "attribution": "James Bach",
+          "use": "Åpning — setter rammen for orakel-argumentet."
+        },
+        {
+          "text": "En test er et eksperiment som skal avdekke informasjon. Spørsmål du ikke kan svare på med pass/fail er likevel spørsmål verdt å stille.",
+          "attribution": "Cem Kaner (Lessons Learned in Software Testing)",
+          "use": "Når du forsvarer exploratory testing mot «men KI besto jo alle testene»."
+        },
+        {
+          "text": "Den virkelige testen av et KI-system er ikke hvordan det oppfører seg på eksemplene det har sett, men hva det gjør første gang verden gir det noe nytt.",
+          "attribution": "Dan Hendrycks (CAIS, 2025, parafrasert)",
+          "use": "Når noen hevder at KI-svaret ser «åpenbart riktig ut»."
+        },
+        {
+          "text": "Modellene våre er nå bedre programmerere enn medianmennesket. Det skal ikke skremme deg, det skal frigjøre deg til arbeid bare et menneske kan gjøre.",
+          "attribution": "Dario Amodei, Anthropic (2025, parafrasert)",
+          "use": "Avslutning — omrammer fortrengning som omdirigering."
+        }
+      ],
+      "qa": [
+        {
+          "q": "Kommer ikke KI til å erstatte testere om 2–3 år?",
+          "a": "Noen testaktiviteter — ja, og det skjer allerede (boilerplate-automatisering, testdata, regresjonstriage). Men arbeidet som faktisk avgjør om programvare er egnet til formålet — orakel-valg, risikovurdering, interessent­håndtering — er strukturelt menneskelig. Rollen krymper noen steder og vokser andre. Netto-netto vinner de som lærer å styre KI."
+        },
+        {
+          "q": "Hvordan vet jeg at KI-svaret ikke hallusinerer?",
+          "a": "Det kan du aldri vite med full sikkerhet. Mønsteret er derfor: aksepter aldri KI-output som et test-orakel. Det er en kandidatliste, en second opinion, eller et førsteutkast. Testeren må fortsatt verifisere mot et reelt orakel — spec, produksjonsdata, interessent, sammenlignbart produkt."
+        },
+        {
+          "q": "Hvilken modell bør vi velge for testarbeid?",
+          "a": "Ærlig talt betyr det mindre enn folk tror for 80 % av testoppgavene. Hvilken som helst frontier-modell er god nok for scenario-utkast og tvetydighetsjakt. Der modellvalg betyr noe, er dyp kode-resonnering og lang-kontekst bug-analyse — der er Claude Opus 4.7 og GPT-5 synlig foran i dag, men gapet krymper hver måned."
+        },
+        {
+          "q": "Hvordan måler vi at KI faktisk hjelper?",
+          "a": "To tall verdt å spore: (1) tid-til-første-feilende-test på en ny feature, (2) andel bugs som slipper til produksjon. Hvis KI reduserer (1) uten å forverre (2), fortjener den plassen sin. Hvis (2) går opp, outsourcer du en vurdering du ikke burde outsource."
+        },
+        {
+          "q": "Hva bør en junior tester gjøre annerledes fra i dag?",
+          "a": "To ting. Først: behandle hvert KI-svar som et utkast du må argumentere med — ikke akseptere. For det andre: doble innsatsen på de menneskelige ferdighetene — domenedybde, interessent-tillit, exploratory charters. Det er ferdighetene modellen ikke kan klone, og de som gir raskest avkastning tidlig i karrieren."
+        }
+      ]
     }
   }
 }

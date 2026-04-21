@@ -50,3 +50,22 @@ export function enrichEndings(endings, pdoomEstimates) {
 export function enrichBenefits(benefits) {
   return _postEnrich('/api/agi/ai-enrich/benefits', { benefits });
 }
+
+// --- Homo Sapiens vs. KI i Test (workshop challenges) ----------------------
+// Task must be one of: 'scenarios' | 'ambiguities' | 'followups' | 'tests_from_code'
+export async function runTestingChallenge({ task, input, language }) {
+  const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/challenge`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ task, input, language }),
+  });
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const data = await res.json();
+      detail = data.detail || '';
+    } catch (_) { /* ignore */ }
+    throw new Error(detail || `Challenge failed (${res.status})`);
+  }
+  return res.json();
+}

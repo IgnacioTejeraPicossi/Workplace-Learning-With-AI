@@ -144,6 +144,13 @@ except ImportError:
     from routers.agi_ai_enrich import router as agi_ai_enrich_router
 app.include_router(agi_ai_enrich_router)
 
+# Homo Sapiens vs. KI i Test — workshop challenges router
+try:
+    from backend.routers.homo_vs_ai import router as homo_vs_ai_router
+except ImportError:
+    from routers.homo_vs_ai import router as homo_vs_ai_router
+app.include_router(homo_vs_ai_router)
+
 # Embeddings router (OpenAI REST)
 try:
     from backend.routers.embeddings import router as embeddings_router

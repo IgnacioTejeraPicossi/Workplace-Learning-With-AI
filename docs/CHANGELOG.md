@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - 2026-04-14
+
+### Added — AGI Hub "Homo Sapiens vs. KI i Test" tab (SOCO workshop companion)
+
+A fourth tab dedicated to the "Homo Sapiens vs. KI" workshop hosted by Ola Kleiven and Keyhan Farahaninia at SOCO. Built to be **demo-ready on a projector**: everything fits in one scroll, no nested navigation to get lost in while presenting.
+
+**Frontend — one big self-contained page with 6 sections:**
+- `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`:
+  1. `WorkshopHero` — SOCO kicker, hosts callout, 3 reflection questions as visual anchors
+  2. `ActivityMatrix` — 10 testing activities × 3 verdicts (human / AI / hybrid) with rationale + confidence
+  3. `HeadToHeadDemos` — 4 interactive rounds (scenarios / ambiguities / followups / tests_from_code) with side-by-side "human prewritten" vs "AI live" panels and per-round vote bar
+  4. `TrustFramework` — 7-dimension decision grid ("AI excels when… / Humans excel when… / Practical rule")
+  5. `WorkshopScoreboard` — configurable group names, note-per-round, undo, reset, JSON export, auto-fed from vote buttons
+  6. `SpeakerCribSheet` — collapsible speaker-only panel with 60-sec opener, 4 curated quotes (Bach/Kaner/Hendrycks/Amodei) with "use when" hints, 5 likely Q&A pairs, closer
+- `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` also ships a tiny inline `MarkdownLite` renderer (~30 lines) so AI output displays with headings / bullets / bold without adding a dependency
+- `frontend/src/pages/help/AgiProgressPage.jsx` — fourth tab wired (icon 🧑‍💻)
+- `frontend/src/api/agiApi.js` — `runTestingChallenge({ task, input, language })` helper using `fetchWithAuth` (API Config headers forwarded)
+
+**Backend — dedicated workshop router:**
+- `backend/services/homo_vs_ai_service.py`:
+  - Four testing-literate prompts (ISTQB + context-driven school vocabulary: risk, oracle, exploratory, boundary, heuristics)
+  - Shared dispatcher `run_challenge(task, user_input, language, request_headers)` over `ask_ai_unified` with language-aware hint (answers in input's language; explicit "no"/"en" override)
+- `backend/routers/homo_vs_ai.py`:
+  - `POST /api/agi/homo-vs-ai/challenge` — dispatches to one of {scenarios, ambiguities, followups, tests_from_code}
+  - `GET /api/agi/homo-vs-ai/tasks` — discovery of available challenges
+  - Forwards API Config headers (`x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*`) so the model selection from the UI is respected
+- `backend/app.py` — router registered next to the AGI enrichment router
+
+**i18n — native-quality Norwegian (primary workshop language):**
+- Top-level `homoVsAi.*` block added to both `locales/en/common.json` and `locales/no/common.json`
+- Norwegian copy written in the register an actual Norwegian tester uses, keeping industry terms in English (`exploratory`, `oracle`, `boundary`, `edge case`, `risk-based`, `bug`, `happy path`, `race`) where that is how Norwegian testers speak in practice
+- New `help.agiTabs.homoVsAi` label in both locales
+- Ships prewritten human answers for all 4 demo rounds in both languages so the presenter has solid baseline content to read out loud before hitting "Run AI"
+
+**Design principles honoured:**
+- Non-destructive: the scoreboard, notes and vote history are session-only by design (no DB writes) — the workshop artifacts live in the exported JSON
+- No new frontend dependencies (MarkdownLite is inline)
+- All text i18n-driven so the language switcher in the app header flips the whole tab between English and Norwegian in one click
+
+---
+
 ## [1.5.0] - 2026-04-14
 
 ### Added — AGI Hub "Update with AI" (live web + LLM enrichment)

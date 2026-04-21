@@ -1115,7 +1115,8 @@
     "agiTabs": {
       "tracker": "AGI Progress Tracker",
       "endings": "Possible Endings for AGI",
-      "benefits": "The Benefits of AGI"
+      "benefits": "The Benefits of AGI",
+      "homoVsAi": "Homo Sapiens vs. KI i Test"
     },
     "agiProgress": {
       "title": "AGI Progress Tracker",
@@ -1722,6 +1723,264 @@
       "websearchBackend": "websearch-backend (port 8080)",
       "duckduckgo": "DuckDuckGo fallback",
       "none": "No web results — LLM best-effort"
+    }
+  },
+  "homoVsAi": {
+    "hero": {
+      "kicker": "SOCO · WORKSHOP · 2026",
+      "title": "Homo Sapiens vs. KI i Test",
+      "lead": "How do humans and AI stack up on everyday testing tasks — and when does each actually win? An evidence-led companion to the workshop with Ola Kleiven & Keyhan Farahaninia.",
+      "questions": [
+        "When does AI give us a real advantage in testing work?",
+        "Is human judgement, context, critical thinking and curiosity still decisive?",
+        "Do we have a winner — or a new way of working together?"
+      ]
+    },
+    "verdict": {
+      "ai": "AI leads",
+      "human": "Human leads",
+      "hybrid": "Hybrid",
+      "tie": "Tie"
+    },
+    "why": "Why",
+    "confidenceLabel": "Confidence",
+    "activities": {
+      "title": "Activity Matrix",
+      "lead": "Ten canonical testing activities. Who has the edge today — and why? Colour-coded verdicts, not dogma.",
+      "scenarios": {
+        "title": "Test scenario generation",
+        "desc": "Turning a requirement into a broad, prioritised set of scenarios covering positive, negative, boundary and non-functional angles.",
+        "rationale": "AI is fast at covering breadth and spotting forgotten dimensions (i18n, perf, accessibility). Humans still beat it on risk-based prioritisation tied to real stakeholders.",
+        "verdict": "hybrid",
+        "confidence": "high"
+      },
+      "risk": {
+        "title": "Risk-based prioritisation",
+        "desc": "Deciding which tests matter most given the project, the customer, and what is actually on fire this quarter.",
+        "rationale": "AI lacks your political and historical context. 'What will the CFO see first?' is a human call.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "ambiguity": {
+        "title": "Requirement / story ambiguity detection",
+        "desc": "Spotting words like 'fast', 'secure', 'user' or 'done' that mean different things to different stakeholders.",
+        "rationale": "Modern LLMs are eerily good at this — they're trained on millions of specs. A strong tester still catches the domain-specific ones the model misses.",
+        "verdict": "ai",
+        "confidence": "medium"
+      },
+      "exploratory": {
+        "title": "Exploratory testing",
+        "desc": "Learning the product by using it, chasing hunches, pivoting on what you find.",
+        "rationale": "Curiosity, taste and 'this smells wrong' intuition are still human strengths. AI can seed charters but not chase them.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "followups": {
+        "title": "Follow-up questions",
+        "desc": "The questions you ask the PO, the developer, or the bug reporter to unblock clarity.",
+        "rationale": "AI produces a solid baseline instantly. Humans win on the ones that require politics, tone or deep product memory.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      },
+      "automation": {
+        "title": "Test automation code",
+        "desc": "Writing Playwright/Cypress/Selenium scripts, fixtures, page objects.",
+        "rationale": "AI writes boilerplate faster than you can type it. Humans still design the architecture and choose what to automate.",
+        "verdict": "ai",
+        "confidence": "high"
+      },
+      "testData": {
+        "title": "Test data generation",
+        "desc": "Realistic, varied, edge-case-rich datasets for demos and regression.",
+        "rationale": "Near-solved by AI for structured domains. Humans stay on the loop for sensitive or compliance-critical data.",
+        "verdict": "ai",
+        "confidence": "high"
+      },
+      "oracle": {
+        "title": "The oracle problem",
+        "desc": "Deciding what 'correct behaviour' even is when the spec is silent or contradictory.",
+        "rationale": "This is the definitional soul of testing (Kaner, Bach). AI guesses plausibly; humans decide what ought to be.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "triage": {
+        "title": "Bug triage & severity",
+        "desc": "Deciding whether a bug is P1 or P3 given business impact and user pain.",
+        "rationale": "AI is solid at classification by symptoms. Humans own business weight, VIP customers, regulatory blast radius.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      },
+      "accessibility": {
+        "title": "Accessibility & UX heuristics",
+        "desc": "Catching violations of WCAG, Nielsen heuristics, and plain human frustration.",
+        "rationale": "AI catches the 80% mechanical violations (contrast, alt text, ARIA). Humans catch the 20% that actually hurt real users.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      }
+    },
+    "demos": {
+      "title": "Head-to-Head: 4 Live Rounds",
+      "lead": "Pick a round, read the prewritten human answer out loud, then press Run AI. The model responds live, using the LLM selected in your API Config. Vote at the end of each round — it feeds the scoreboard.",
+      "roundLabel": "Round",
+      "inputLabel": "Input",
+      "runLabel": "Run AI",
+      "running": "AI thinking…",
+      "thinking": "Querying the model…",
+      "resetLabel": "Reset to sample",
+      "humanLabel": "Human tester (prewritten)",
+      "aiLabel": "AI (live)",
+      "humanPlaceholder": "Read your own answer out loud here.",
+      "aiPlaceholder": "Press 'Run AI' to generate the answer live.",
+      "votePrompt": "Who won this round?",
+      "scenarios": {
+        "title": "From requirement to test scenarios",
+        "prompt": "Paste a requirement. Both tester and AI must produce a prioritised set of scenarios.",
+        "sample": "The system shall allow a registered user to reset their password via email. The email link must expire within 1 hour. The user must be notified of the reset on their primary email.",
+        "humanAnswer": "- **P1 Happy path**: valid user requests reset, receives email within a minute, link works once.\n- **P1 Security**: link cannot be reused, cannot be guessed, expires exactly after 1h — test at 59m / 60m / 61m.\n- **P1 Abuse**: unregistered email must not leak existence of account (same response timing + text).\n- **P2 Race**: two reset emails within 30s — only the latest link valid.\n- **P2 i18n**: reset email respects user's language preference.\n- **P3 Notification**: if primary email changes mid-flow, who gets notified?\n- **Exploratory charter**: 'In 20 min, try to lock a user out of their own account using only the reset flow.'"
+      },
+      "ambiguities": {
+        "title": "Ambiguity hunt on a user story",
+        "prompt": "Paste a user story. Both tester and AI list hidden assumptions and ambiguous terms.",
+        "sample": "As a customer, I want to quickly search products so that I can find what I need. Acceptance criteria: search works fast and returns relevant results.",
+        "humanAnswer": "- **'Quickly' / 'fast'** — not testable. How many ms? Cold or warm cache? Over what network?\n- **'Relevant'** — by what ranking? Sales, popularity, personalised? Offline evaluation set?\n- **'Customer'** — logged in or anonymous? Does B2B behave differently?\n- **'Products'** — in-stock only? Archived? Region-gated?\n- **Missing**: empty results, typos, fuzzy matching, non-Latin scripts, accessibility, analytics, rate limiting.\n- **Follow-up for PO**: 'What is the worst search experience we are willing to ship?'"
+      },
+      "followups": {
+        "title": "Follow-up questions for a bug",
+        "prompt": "Paste a bug report. Both tester and AI produce the highest-signal follow-up questions.",
+        "sample": "Bug: Checkout sometimes fails. Got an error yesterday when trying to buy two items. Error said 'something went wrong'. Please fix.",
+        "humanAnswer": "- **Reproduction**: exact items, quantities, payment method, browser, timezone, mobile or desktop?\n- **Scope**: same user with a different cart? Other users on the same region/tenant? Logged-in vs guest?\n- **Oracle**: what was the expected message / next step? Do we have a screenshot or HAR?\n- **Environment**: prod, staging, what commit was deployed? Any feature flags?\n- **Prior art**: related tickets? Known payment-provider incidents the same day?\n- **Impact**: how many failures in the last 24h? Revenue at risk?"
+      },
+      "tests_from_code": {
+        "title": "Test cases from a code snippet",
+        "prompt": "Paste a function or class. Both tester and AI propose a compact test suite.",
+        "sample": "function discountPrice(price, percentage) {\n  if (percentage < 0 || percentage > 100) throw new Error('invalid percentage');\n  return price - (price * percentage / 100);\n}",
+        "humanAnswer": "- **Happy path**: discountPrice(100, 10) === 90.\n- **Boundary**: 0% and 100% — expect price and 0.\n- **Invalid**: -1 and 101 must throw with message 'invalid percentage'.\n- **Type edges**: non-numeric percentage? NaN? Infinity? (Likely silent bug — currently not guarded.)\n- **Negative price**: is a negative price legal? Spec does not say — **oracle question for PO.**\n- **Floating point**: discountPrice(9.99, 33) — assert within tolerance, not equality.\n- **Property**: for all valid (p, %) the result is in [0, p]."
+      }
+    },
+    "framework": {
+      "title": "When to trust whom",
+      "lead": "A compact decision grid by dimension — not a hierarchy, a toolkit.",
+      "col": {
+        "dimension": "Dimension",
+        "ai": "AI excels when…",
+        "human": "Humans excel when…",
+        "verdict": "Practical rule"
+      },
+      "rows": {
+        "context": {
+          "dimension": "Business / stakeholder context",
+          "ai": "…the context is documented and stable.",
+          "human": "…the context lives in people's heads, Slack and hallway talk.",
+          "rule": "Humans hold the context; AI executes inside it."
+        },
+        "risk": {
+          "dimension": "Risk & safety",
+          "ai": "…risk is pattern-matchable from past data.",
+          "human": "…the risk is novel, political or reputational.",
+          "rule": "AI drafts the risk list; a human owns sign-off."
+        },
+        "ambiguity": {
+          "dimension": "Ambiguity in inputs",
+          "ai": "…the ambiguity is linguistic (undefined terms, contradictions).",
+          "human": "…the ambiguity hides intent or silent trade-offs.",
+          "rule": "Let AI surface candidates; humans resolve intent."
+        },
+        "novelty": {
+          "dimension": "Novelty",
+          "ai": "…the problem is a variant of something common.",
+          "human": "…the problem has never been seen by the team.",
+          "rule": "The first N bugs of a new feature are a human game."
+        },
+        "volume": {
+          "dimension": "Volume / repetitiveness",
+          "ai": "…there are 1000 similar cases to handle.",
+          "human": "…there are 3, and each one is unique.",
+          "rule": "Automate breadth with AI; invest humans in depth."
+        },
+        "judgement": {
+          "dimension": "Value judgement",
+          "ai": "…the metric is pre-agreed and measurable.",
+          "human": "…'good enough' is a taste call.",
+          "rule": "AI optimises metrics you chose. Humans choose the metrics."
+        },
+        "accountability": {
+          "dimension": "Accountability",
+          "ai": "—",
+          "human": "…someone has to stand in front of a customer or regulator.",
+          "rule": "Accountability is always human. AI can help you defend it."
+        }
+      }
+    },
+    "scoreboard": {
+      "title": "Workshop Scoreboard",
+      "lead": "Live tally for the session. Votes from the head-to-head rounds feed here automatically. Add group names, undo the last vote, or export the full log as JSON.",
+      "notePlaceholder": "Round note (optional, attaches to next +1)",
+      "newGroupPlaceholder": "New group name",
+      "addGroup": "Add group",
+      "undo": "Undo last",
+      "reset": "Reset",
+      "export": "Export JSON",
+      "logTitle": "Round log"
+    },
+    "cribSheet": {
+      "privateLabel": "Speaker-only",
+      "title": "Crib sheet (60-sec opener, quotes, likely Q&A)",
+      "openerTitle": "60-second opener",
+      "quotesTitle": "Quotes to drop (only if natural)",
+      "qaTitle": "Likely audience questions",
+      "closerTitle": "Closer (what you want them to remember)",
+      "openerParas": [
+        "Good morning. Before we split into groups, a quick framing. The question 'humans or AI?' is the wrong one — the useful question is 'humans or AI, for which slice of testing work, under which conditions?' That is what this session tries to answer, with data and with our own hands.",
+        "My bias up front: I use AI daily for testing work, I have built the page you are looking at to stress-test my own thinking, and I still believe the best testers in the world in 2026 are humans who know exactly when to reach for the model — and when not to."
+      ],
+      "closerParas": [
+        "AI did not take testing from us. It took the boring 80% and handed us a sharper pair of scissors for the 20% that actually decides whether software hurts users or helps them.",
+        "If you remember one thing: the tester who wins in 2026 is the one who treats AI as an unreliable but fast junior — you review everything, you trust the judgement on nothing, but you ship twice as much real value."
+      ],
+      "quotes": [
+        {
+          "text": "Testing is an infinite process of comparing the invisible to the ambiguous to avoid the unthinkable happening to the anonymous.",
+          "attribution": "James Bach",
+          "use": "Opening — sets the stage for the 'oracle problem' argument."
+        },
+        {
+          "text": "A test is an experiment designed to reveal information. Questions you cannot answer with a pass/fail are questions worth asking anyway.",
+          "attribution": "Cem Kaner (Lessons Learned in Software Testing)",
+          "use": "When defending exploratory testing against 'but AI passed all the tests'."
+        },
+        {
+          "text": "The real test of an AI system is not how it behaves on the examples it was shown, but what it does the first time the world hands it something new.",
+          "attribution": "Dan Hendrycks (paraphrase, CAIS 2025)",
+          "use": "When someone claims the AI answer looks 'obviously correct'."
+        },
+        {
+          "text": "Our models are now better coders than the median human. That should not threaten you, it should free you to do work only a human can do.",
+          "attribution": "Dario Amodei, Anthropic (2025, paraphrase)",
+          "use": "Closer — re-frames displacement as redirection."
+        }
+      ],
+      "qa": [
+        {
+          "q": "Isn't AI going to replace testers in 2-3 years?",
+          "a": "Some testing activities — yes, and they already are (boilerplate automation, data generation, regression triage). But the work that actually decides whether software is fit for purpose — oracle calls, risk framing, stakeholder judgement — is structurally human. The role shrinks in some places and grows in others. Net-net, the ones who learn to direct AI win."
+        },
+        {
+          "q": "How do I know the AI answer is not hallucinating?",
+          "a": "You can't, ever, with full certainty. So the pattern is: never accept AI output as a test oracle. It is a candidate list, a second opinion, or a first draft. The tester still has to verify against a real oracle — spec, production data, stakeholder, comparable product."
+        },
+        {
+          "q": "Which model should we pick for testing work?",
+          "a": "Honestly, it matters less than people think for 80% of testing tasks. Any frontier model is good enough for scenario drafts and ambiguity hunts. Where model choice matters is deep code reasoning and long-context bug analysis — there Claude Opus 4.7 and GPT-5 are visibly ahead today, but the gap closes every few months."
+        },
+        {
+          "q": "How do we measure if AI is actually helping?",
+          "a": "Two numbers worth tracking: (1) time-to-first-failing-test on a new feature, (2) escaped defect rate in production. If AI shortens (1) without worsening (2), it is earning its keep. If (2) goes up, you are outsourcing judgement you should not be outsourcing."
+        },
+        {
+          "q": "What should a junior tester do differently, starting today?",
+          "a": "Two things. First, treat every AI answer as a draft you have to argue with — not accept. Second, double down on the human-only skills: domain depth, stakeholder trust, exploratory charters. Those are the skills the model cannot clone, and they compound fastest early in a career."
+        }
+      ]
     }
   }
 }

@@ -81,6 +81,25 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 ## 🔄 Recent Work (2024–2026)
 
+### AGI Hub — "Homo Sapiens vs. KI i Test" tab (April 2026)
+
+Fourth tab in the AGI Progress Hub, purpose-built as a **workshop companion for SOCO** (Norwegian software-testing consultancy). Targeted at the "Homo Sapiens vs. KI" session with Ola Kleiven and Keyhan Farahaninia.
+
+Six sections on a single scroll:
+1. **Workshop hero** — the three SOCO reflection questions as anchors, hosts callout.
+2. **Activity Matrix** — 10 canonical testing activities × 3 verdicts (🧑 Human / 🤖 AI / 🤝 Hybrid), each with rationale and confidence level.
+3. **Head-to-head live rounds** — 4 interactive demos (`scenarios`, `ambiguities`, `followups`, `tests_from_code`) that hit `POST /api/agi/homo-vs-ai/challenge` and stream results live next to a prewritten "human tester" answer. One-click sample inputs ready to present.
+4. **Trust framework** — 7-row decision grid ("AI excels when… / Humans excel when… / Practical rule") by dimension: context, risk, ambiguity, novelty, volume, judgement, accountability.
+5. **Workshop Scoreboard** — configurable groups, round log with notes, undo, reset, JSON export. Votes from the head-to-head demos feed in automatically.
+6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 real quotes (Bach, Kaner, Hendrycks, Amodei) with "use when" hints, 5 likely audience questions + prepared answers, and a closer.
+
+Fully bilingual EN / NO with **native-quality Norwegian** written in the register a Norwegian tester actually uses (industry terms kept in English: exploratory, oracle, boundary, edge case, risk-based, bug).
+
+Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` → `POST /api/agi/homo-vs-ai/challenge` + `GET /api/agi/homo-vs-ai/tasks`
+Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`
+Tab wiring: `frontend/src/pages/help/AgiProgressPage.jsx`
+i18n: top-level `homoVsAi.*` block in EN/NO, plus `help.agiTabs.homoVsAi`
+
 ### AGI Hub — "Update with AI" (April 2026)
 
 All three AGI Progress Hub tabs now have a non-destructive **"Update information from the web with AI"** panel. One click runs a live web search (`websearch-backend` on port 8080 → **DuckDuckGo fallback** → LLM-only best-effort) and asks the configured LLM for structured suggestions. Each suggestion is rendered as a card with **Apply** / **Dismiss** buttons — nothing is ever overwritten silently.
