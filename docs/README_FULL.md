@@ -610,6 +610,36 @@ Six sections:
 - Inline `MarkdownLite` renderer (~30 lines) — no new dependency
 - i18n: top-level `homoVsAi.*` block in `locales/{en,no}/common.json`, plus `help.agiTabs.homoVsAi`
 
+#### How to run this in a live workshop (SOCO-ready checklist)
+
+The tab is designed for a single scroll on a projector, no nested navigation while presenting.
+
+**Pre-flight (5 min before starting):**
+1. Switch UI language to **Norwegian (NO)** — button top-right. All demo samples, speaker notes and activity matrix rephrase natively.
+2. Open Settings → **API Configuration** and confirm the LLM provider is reachable (ItemAI / OpenRouter / OpenAI). Run one quick challenge to warm the connection.
+3. In the **Scoreboard** section, configure the groups in advance (e.g. "Gruppe 1", "Gruppe 2", "KI") so you don't fumble input during the session.
+4. Zoom the browser to ~110–125% — the cards read well at the back of the room.
+5. (Optional) Open the **Speaker Crib Sheet** once, then collapse it — it will stay available without being visible to the audience.
+
+**Suggested 45-minute run order:**
+| Time | Block | What happens |
+| --- | --- | --- |
+| 00:00 – 03:00 | Opener | Read the hero framing. Use the opener quote from the Crib Sheet. |
+| 03:00 – 08:00 | Activity Matrix | Walk through 3–4 activities. Ask the room: "agree with the verdict?" |
+| 08:00 – 28:00 | 4× Head-to-Head demos | For each: read the sample, **let a group draft their answer on paper (2 min)**, then click **Run AI**, compare side-by-side, vote → Scoreboard auto-updates. |
+| 28:00 – 35:00 | Trust Framework | Anchor the decision grid. Invite short debate on the hybrid cases. |
+| 35:00 – 42:00 | Reflection | Use the reflection questions from the hero. Show final Scoreboard. |
+| 42:00 – 45:00 | Closer | Use the closer line from the Crib Sheet. Export Scoreboard as JSON (the **Export** button saves a timestamped `scoreboard-*.json`). |
+
+**If the AI connection fails mid-demo:**
+- The UI surfaces the error inline (red banner on the demo card) — do not panic.
+- Fallback narrative: *"Perfect moment to talk about fragility — a tester's critical thinking doesn't need a network."* Then pivot to the pre-written human answer already on the card and let the group critique it.
+- Alternatively, retry with a different provider: switch provider in Settings and click **Run AI** again (the helper `fetchWithAuth` forwards headers automatically).
+
+**Post-workshop:**
+- The JSON export from the Scoreboard is structured: `{ groups[], rounds[], exportedAt }`. Safe to share with SOCO as a workshop artifact.
+- Nothing from this tab is persisted server-side — it is session-only by design, so closing the browser clears all scores and votes. The three **other** AGI Hub tabs (Tracker / Endings / Benefits) are unaffected.
+
 ### "Update information from the web with AI" (all three tabs)
 
 Non-destructive review-and-apply enrichment available on every tab.

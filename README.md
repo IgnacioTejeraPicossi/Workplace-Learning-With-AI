@@ -100,6 +100,8 @@ Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`
 Tab wiring: `frontend/src/pages/help/AgiProgressPage.jsx`
 i18n: top-level `homoVsAi.*` block in EN/NO, plus `help.agiTabs.homoVsAi`
 
+> **Running this at SOCO?** A full presenter checklist (pre-flight, 45-minute run order, what to do if the AI connection drops, post-workshop export) lives in [`docs/README_FULL.md` → Tab 4 → *How to run this in a live workshop*](docs/README_FULL.md#tab-4--homo-sapiens-vs-ki-i-test-soco-workshop-companion).
+
 ### AGI Hub — "Update with AI" (April 2026)
 
 All three AGI Progress Hub tabs now have a non-destructive **"Update information from the web with AI"** panel. One click runs a live web search (`websearch-backend` on port 8080 → **DuckDuckGo fallback** → LLM-only best-effort) and asks the configured LLM for structured suggestions. Each suggestion is rendered as a card with **Apply** / **Dismiss** buttons — nothing is ever overwritten silently.

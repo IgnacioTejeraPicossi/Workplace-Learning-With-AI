@@ -46,6 +46,11 @@ A fourth tab dedicated to the "Homo Sapiens vs. KI" workshop hosted by Ola Kleiv
 - No new frontend dependencies (MarkdownLite is inline)
 - All text i18n-driven so the language switcher in the app header flips the whole tab between English and Norwegian in one click
 
+**Docs:**
+- `README.md` — new section "AGI Hub — 'Homo Sapiens vs. KI i Test' tab" with a pointer to the presenter checklist
+- `docs/README_FULL.md` — Tab 4 documented end-to-end: activities, endpoints, language hint behaviour, plus a new **"How to run this in a live workshop"** checklist (pre-flight, 45-minute run order, AI-failure fallback narrative, post-workshop JSON export)
+- `docs/README_FULL.md` Table of Contents updated to reference the fourth tab
+
 ---
 
 ## [1.5.0] - 2026-04-14
