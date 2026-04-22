@@ -1116,7 +1116,7 @@
       "tracker": "AGI Progress Tracker",
       "endings": "Possible Endings for AGI",
       "benefits": "The Benefits of AGI",
-      "homoVsAi": "Homo Sapiens vs. KI i Test"
+      "homoVsAi": "Homo Sapiens vs. AI in Testing"
     },
     "agiProgress": {
       "title": "AGI Progress Tracker",
@@ -1728,7 +1728,7 @@
   "homoVsAi": {
     "hero": {
       "kicker": "SOCO · WORKSHOP · 2026",
-      "title": "Homo Sapiens vs. KI i Test",
+      "title": "Homo Sapiens vs. AI in Testing",
       "lead": "How do humans and AI stack up on everyday testing tasks — and when does each actually win? An evidence-led companion to the workshop with Ola Kleiven & Keyhan Farahaninia.",
       "questions": [
         "When does AI give us a real advantage in testing work?",
