@@ -21,7 +21,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { routeTestingProblem, runTestingChallenge } from '../../../api/agiApi';
+import { judgeTestingRound, routeTestingProblem, runTestingChallenge } from '../../../api/agiApi';
 
 // ---------------------------------------------------------------------------
 // Minimal markdown-lite renderer — handles **bold**, headings, bullets, code
@@ -297,6 +297,15 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   const [humanText, setHumanText] = useState(humanAnswer);
   const [humanEditing, setHumanEditing] = useState(false);
 
+  // AI Judge — advisory verdict. Kept local per card so each round can be
+  // judged independently. NOT wired into the scoreboard; we only pass the
+  // snapshot forward when the human casts their vote (so the scoreboard log
+  // can show a 🤖 agree/disagree badge per round).
+  const [judgeResult, setJudgeResult] = useState(null); // { verdict, confidence, rationale, criteria, raw? }
+  const [judgeLoading, setJudgeLoading] = useState(false);
+  const [judgeErr, setJudgeErr] = useState(null);
+  const [judgeElapsed, setJudgeElapsed] = useState(null);
+
   // Follow i18n language changes: if the user switches EN<->NO, refresh the
   // human panel with the new locale copy as long as they have not edited it.
   const [humanDirty, setHumanDirty] = useState(false);
@@ -320,6 +329,8 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
 
   const run = async () => {
     setLoading(true); setErr(null); setAiOutput(''); setElapsed(null);
+    // Stale judge result would refer to the previous AI output — clear it.
+    setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
     const t0 = performance.now();
     try {
       const res = await runTestingChallenge({
@@ -336,7 +347,36 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
     }
   };
 
-  const resetToSample = () => { setInput(sample); setAiOutput(''); setErr(null); setElapsed(null); };
+  // Ask the AI to judge the duel. Button is disabled until BOTH sides have
+  // content (we can't judge with one side empty). Verdict is advisory only
+  // — the human still clicks the +1 button below. The judgeResult snapshot
+  // will ride along with the next human vote so the scoreboard log can show
+  // agreement/disagreement.
+  const judge = async () => {
+    if (!humanText.trim() || !aiOutput.trim()) return;
+    setJudgeLoading(true); setJudgeErr(null); setJudgeResult(null); setJudgeElapsed(null);
+    const t0 = performance.now();
+    try {
+      const res = await judgeTestingRound({
+        task,
+        humanAnswer: humanText,
+        aiAnswer: aiOutput,
+        userInput: input,
+        language: i18n?.language?.startsWith('no') ? 'no' : 'en',
+      });
+      setJudgeResult(res);
+    } catch (e) {
+      setJudgeErr(String(e.message || e));
+    } finally {
+      setJudgeElapsed(Math.round(performance.now() - t0));
+      setJudgeLoading(false);
+    }
+  };
+
+  const resetToSample = () => {
+    setInput(sample); setAiOutput(''); setErr(null); setElapsed(null);
+    setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
+  };
 
   return (
     <div id={`demo-${task}`} style={{
@@ -515,7 +555,9 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         </div>
       </div>
 
-      {/* Vote bar */}
+      {/* Vote bar — AI judge button sits next to the three human vote buttons.
+          The verdict, if any, is attached to the human vote payload so the
+          scoreboard can show a 🤖 agree/disagree badge per round. */}
       <div style={{
         marginTop: 12, padding: '10px 12px', background: '#f8fafc',
         border: '1px dashed #cbd5e1', borderRadius: 8,
@@ -524,11 +566,178 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         <div style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
           {t('homoVsAi.demos.votePrompt', { defaultValue: 'Who won this round?' })}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <VoteButton onClick={() => onVote({ task, winner: 'human' })}   bg="#f0fdf4" border="#86efac" color="#15803d" icon="🧑" label={t('homoVsAi.verdict.human', { defaultValue: 'Human' })} />
-          <VoteButton onClick={() => onVote({ task, winner: 'ai' })}      bg="#eff6ff" border="#93c5fd" color="#1d4ed8" icon="🤖" label={t('homoVsAi.verdict.ai', { defaultValue: 'AI' })} />
-          <VoteButton onClick={() => onVote({ task, winner: 'tie' })}     bg="#f1f5f9" border="#cbd5e1" color="#334155" icon="🤝" label={t('homoVsAi.verdict.tie', { defaultValue: 'Tie' })} />
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            onClick={judge}
+            disabled={judgeLoading || !humanText.trim() || !aiOutput.trim()}
+            title={
+              (!humanText.trim() || !aiOutput.trim())
+                ? t('homoVsAi.demos.judge.disabledHint', { defaultValue: 'Run the AI first, and make sure the human answer is not empty.' })
+                : t('homoVsAi.demos.judge.buttonTitle', { defaultValue: 'Let the AI compare both answers (advisory only).' })
+            }
+            style={{
+              background: judgeLoading ? '#e9d5ff' : '#7c3aed', color: 'white', border: 'none',
+              padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+              cursor: (judgeLoading || !humanText.trim() || !aiOutput.trim()) ? 'not-allowed' : 'pointer',
+              opacity: (!humanText.trim() || !aiOutput.trim()) ? 0.5 : 1,
+            }}>
+            {judgeLoading
+              ? `⏳ ${t('homoVsAi.demos.judge.running', { defaultValue: 'AI judging…' })}`
+              : `🧠 ${t('homoVsAi.demos.judge.button', { defaultValue: 'Ask AI to judge' })}`}
+          </button>
+          {/* Subtle separator between the advisory judge and the canonical human votes */}
+          <span style={{ width: 1, height: 18, background: '#cbd5e1', margin: '0 2px' }} />
+          <VoteButton onClick={() => onVote({ task, winner: 'human', aiJudge: judgeResult?.verdict || null })}   bg="#f0fdf4" border="#86efac" color="#15803d" icon="🧑" label={t('homoVsAi.verdict.human', { defaultValue: 'Human' })} />
+          <VoteButton onClick={() => onVote({ task, winner: 'ai', aiJudge: judgeResult?.verdict || null })}      bg="#eff6ff" border="#93c5fd" color="#1d4ed8" icon="🤖" label={t('homoVsAi.verdict.ai', { defaultValue: 'AI' })} />
+          <VoteButton onClick={() => onVote({ task, winner: 'tie', aiJudge: judgeResult?.verdict || null })}     bg="#f1f5f9" border="#cbd5e1" color="#334155" icon="🤝" label={t('homoVsAi.verdict.tie', { defaultValue: 'Tie' })} />
         </div>
+      </div>
+
+      {/* Judge error */}
+      {judgeErr && (
+        <div style={{
+          marginTop: 8, color: '#991b1b', fontSize: 12, background: '#fef2f2',
+          padding: 10, borderRadius: 8, border: '1px solid #fecaca',
+        }}>
+          ⚠️ {t('homoVsAi.demos.judge.errorPrefix', { defaultValue: 'AI judge failed' })}: {judgeErr}
+        </div>
+      )}
+
+      {/* Judge advisory panel — appears only after the user clicks the button.
+          Deliberately styled in purple to distinguish it from the green human
+          panel and the blue AI panel — this is a DIFFERENT role (meta-judge). */}
+      {judgeResult && (
+        <JudgeAdvisoryPanel t={t} result={judgeResult} elapsed={judgeElapsed} />
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Judge advisory panel — rendered below the vote bar when the user clicks
+// "Ask AI to judge". Displays verdict, confidence, rationale, per-criterion
+// breakdown, and a clear self-preference bias disclaimer. NEVER writes to
+// the scoreboard — that's the human presenter's job.
+// ---------------------------------------------------------------------------
+
+const JUDGE_VERDICT_STYLES = {
+  human: { bg: '#f0fdf4', border: '#86efac', color: '#15803d', icon: '🧑', labelKey: 'homoVsAi.demos.judge.verdictHuman', fallback: 'Human tester wins this round' },
+  ai:    { bg: '#eff6ff', border: '#93c5fd', color: '#1d4ed8', icon: '🤖', labelKey: 'homoVsAi.demos.judge.verdictAi',    fallback: 'AI wins this round' },
+  tie:   { bg: '#f1f5f9', border: '#cbd5e1', color: '#334155', icon: '🤝', labelKey: 'homoVsAi.demos.judge.verdictTie',   fallback: 'It is a tie' },
+};
+
+const JUDGE_CONFIDENCE_COLORS = {
+  low:    { bg: '#fef2f2', color: '#991b1b', border: '#fecaca' },
+  medium: { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+  high:   { bg: '#f0fdf4', color: '#15803d', border: '#86efac' },
+};
+
+function JudgeAdvisoryPanel({ t, result, elapsed }) {
+  const v = JUDGE_VERDICT_STYLES[result.verdict] || JUDGE_VERDICT_STYLES.tie;
+  const c = JUDGE_CONFIDENCE_COLORS[result.confidence] || JUDGE_CONFIDENCE_COLORS.medium;
+  const criteria = result.criteria || {};
+  return (
+    <div style={{
+      marginTop: 10, background: '#faf5ff', border: '1px solid #d8b4fe',
+      borderLeft: '4px solid #7c3aed', borderRadius: 10, padding: 12,
+    }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        gap: 10, flexWrap: 'wrap',
+      }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#7c3aed', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+            🧠 {t('homoVsAi.demos.judge.kicker', { defaultValue: 'AI judge · advisory' })}
+          </div>
+          <div style={{ marginTop: 2, fontSize: 15, fontWeight: 700, color: '#0f172a' }}>
+            {v.icon} {t(v.labelKey, { defaultValue: v.fallback })}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{
+            background: c.bg, color: c.color, border: `1px solid ${c.border}`,
+            fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
+          }}>
+            {t('homoVsAi.demos.judge.confidenceLabel', { defaultValue: 'Confidence' })}:{' '}
+            {t(`homoVsAi.demos.judge.confidence_${result.confidence}`, { defaultValue: result.confidence })}
+          </span>
+          {elapsed != null && (
+            <span style={{ fontSize: 11, color: '#64748b' }}>
+              {(elapsed / 1000).toFixed(1)}s
+            </span>
+          )}
+        </div>
+      </div>
+
+      {result.rationale && (
+        <div style={{ marginTop: 10, fontSize: 13, color: '#334155', lineHeight: 1.55 }}>
+          {result.rationale}
+        </div>
+      )}
+
+      {(criteria.accuracy || criteria.coverage || criteria.practical_value) && (
+        <div style={{
+          marginTop: 10, display: 'grid', gap: 8,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        }}>
+          {criteria.accuracy && (
+            <CriteriaCell
+              label={t('homoVsAi.demos.judge.criteriaAccuracy', { defaultValue: 'Accuracy' })}
+              value={criteria.accuracy}
+            />
+          )}
+          {criteria.coverage && (
+            <CriteriaCell
+              label={t('homoVsAi.demos.judge.criteriaCoverage', { defaultValue: 'Coverage' })}
+              value={criteria.coverage}
+            />
+          )}
+          {criteria.practical_value && (
+            <CriteriaCell
+              label={t('homoVsAi.demos.judge.criteriaPracticalValue', { defaultValue: 'Practical value' })}
+              value={criteria.practical_value}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Bias disclaimer — this is the whole point of making this advisory. */}
+      <div style={{
+        marginTop: 10, padding: '8px 10px', background: 'white',
+        border: '1px dashed #d8b4fe', borderRadius: 8, color: '#581c87',
+        fontSize: 11, lineHeight: 1.5,
+      }}>
+        ⚠️ {t('homoVsAi.demos.judge.biasDisclaimer', {
+          defaultValue: 'Note: an AI judge can favour AI-style answers (self-preference bias). This verdict is advisory — the scoreboard only counts your vote.',
+        })}
+      </div>
+
+      {result.raw && (
+        <details style={{ marginTop: 8 }}>
+          <summary style={{ fontSize: 11, color: '#64748b', cursor: 'pointer' }}>
+            {t('homoVsAi.demos.judge.rawToggle', { defaultValue: 'Show raw AI output (debug)' })}
+          </summary>
+          <pre style={{
+            fontSize: 11, background: '#0f172a', color: '#e2e8f0', padding: 10,
+            borderRadius: 6, overflowX: 'auto', marginTop: 6,
+          }}>{result.raw}</pre>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function CriteriaCell({ label, value }) {
+  return (
+    <div style={{
+      background: 'white', border: '1px solid #e9d5ff', borderRadius: 8,
+      padding: '6px 10px',
+    }}>
+      <div style={{ fontSize: 10, color: '#7c3aed', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 12, color: '#334155', marginTop: 2, lineHeight: 1.45 }}>
+        {value}
       </div>
     </div>
   );
@@ -882,22 +1091,39 @@ function WorkshopScoreboard({ t, externalVote, onClearExternal }) {
   const [newGroup, setNewGroup] = useState('');
   const [noteDraft, setNoteDraft] = useState('');
 
-  // Vote mapping from HeadToHead demos → default group names
+  // Vote mapping from HeadToHead demos → default group names.
+  // externalVote may carry `aiJudge` = 'human'|'ai'|'tie'|null (advisory
+  // snapshot at vote time). We pass it into bump() so the round log can
+  // show a 🤖 agree/disagree badge alongside each entry.
   React.useEffect(() => {
     if (!externalVote) return;
     const map = { human: 'Menneske', ai: 'KI', tie: 'Uavgjort' };
     const group = map[externalVote.winner];
     if (group && groups.includes(group)) {
-      bump(group, `round: ${externalVote.task}`);
+      bump(group, `round: ${externalVote.task}`, {
+        task: externalVote.task,
+        humanVote: externalVote.winner,
+        aiJudge: externalVote.aiJudge || null,
+      });
     }
     if (onClearExternal) onClearExternal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalVote]);
 
-  const bump = (group, note = '') => {
+  const bump = (group, note = '', meta = null) => {
     setScores(prev => ({ ...prev, [group]: (prev[group] || 0) + 1 }));
     setRounds(prev => [
-      { ts: new Date().toISOString(), group, note: note || noteDraft || '' },
+      {
+        ts: new Date().toISOString(),
+        group,
+        note: note || noteDraft || '',
+        // meta is present for votes that came via the head-to-head demos
+        // (carries task + humanVote + aiJudge snapshot). Manual +1 clicks
+        // on the group cards don't have meta — that's fine.
+        task: meta?.task || null,
+        humanVote: meta?.humanVote || null,
+        aiJudge: meta?.aiJudge || null,
+      },
       ...prev,
     ]);
     setNoteDraft('');
@@ -1003,24 +1229,27 @@ function WorkshopScoreboard({ t, externalVote, onClearExternal }) {
           }}>⬇ {t('homoVsAi.scoreboard.export', { defaultValue: 'Export JSON' })}</button>
         </div>
 
-        {/* Round log */}
+        {/* Round log — shows the human vote plus (when present) the AI
+            judge's advisory verdict as an agree/disagree badge. This makes
+            the self-preference bias visible retrospectively. */}
         {rounds.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
               {t('homoVsAi.scoreboard.logTitle', { defaultValue: 'Round log' })} ({rounds.length})
             </div>
             <div style={{
-              maxHeight: 220, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8,
+              maxHeight: 240, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8,
             }}>
               {rounds.map((r, i) => (
                 <div key={i} style={{
-                  display: 'grid', gridTemplateColumns: '140px 120px 1fr',
-                  padding: '6px 10px', fontSize: 12, gap: 8,
+                  display: 'grid', gridTemplateColumns: '80px 110px 140px 1fr',
+                  padding: '6px 10px', fontSize: 12, gap: 8, alignItems: 'center',
                   borderTop: i === 0 ? 'none' : '1px solid #f1f5f9',
                   color: '#334155',
                 }}>
                   <code style={{ color: '#64748b', fontSize: 11 }}>{r.ts.slice(11, 19)}</code>
                   <strong style={{ color: '#0f172a' }}>{r.group}</strong>
+                  <AiJudgeBadge t={t} humanVote={r.humanVote} aiJudge={r.aiJudge} />
                   <span style={{ color: '#475569' }}>{r.note}</span>
                 </div>
               ))}
@@ -1029,6 +1258,47 @@ function WorkshopScoreboard({ t, externalVote, onClearExternal }) {
         )}
       </div>
     </div>
+  );
+}
+
+// AI Judge agreement badge — small pill used in the scoreboard round log.
+// Visualises how the AI judge's advisory verdict compared to the human's
+// canonical vote for that round. Three states:
+//   - missing  → empty (AI judge was never run for this round)
+//   - agree    → green "🤖 ✓" (AI and human concur)
+//   - disagree → amber "🤖 ✗ said X" (AI picked something else — showcase)
+// This is purely visual; no behaviour hangs off it.
+function AiJudgeBadge({ t, humanVote, aiJudge }) {
+  if (!aiJudge || !humanVote) {
+    return <span style={{ fontSize: 11, color: '#94a3b8', fontStyle: 'italic' }}>
+      {t('homoVsAi.scoreboard.aiJudgeNone', { defaultValue: '—' })}
+    </span>;
+  }
+  const agree = aiJudge === humanVote;
+  const style = agree
+    ? { bg: '#f0fdf4', color: '#15803d', border: '#86efac' }
+    : { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' };
+  const verdictLabel = t(
+    aiJudge === 'human' ? 'homoVsAi.verdict.human'
+      : aiJudge === 'ai' ? 'homoVsAi.verdict.ai'
+      : 'homoVsAi.verdict.tie',
+    { defaultValue: aiJudge }
+  );
+  return (
+    <span
+      title={agree
+        ? t('homoVsAi.scoreboard.aiJudgeAgreeTitle', { defaultValue: 'The AI judge agreed with your vote.' })
+        : t('homoVsAi.scoreboard.aiJudgeDisagreeTitle', { defaultValue: 'The AI judge would have picked differently — possible self-preference bias in play.' })
+      }
+      style={{
+        background: style.bg, color: style.color, border: `1px solid ${style.border}`,
+        fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 12,
+        whiteSpace: 'nowrap', letterSpacing: 0.3,
+      }}>
+      🤖 {agree
+        ? t('homoVsAi.scoreboard.aiJudgeAgree', { defaultValue: 'agreed' })
+        : `${t('homoVsAi.scoreboard.aiJudgeDisagree', { defaultValue: 'said' })} ${verdictLabel}`}
+    </span>
   );
 }
 

@@ -13,7 +13,12 @@ from typing import List, Literal, Optional
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from backend.services.homo_vs_ai_service import TASK_SPECS, route_problem, run_challenge
+from backend.services.homo_vs_ai_service import (
+    TASK_SPECS,
+    judge_round,
+    route_problem,
+    run_challenge,
+)
 
 router = APIRouter(prefix="/api/agi/homo-vs-ai", tags=["Homo vs AI Testing"])
 
@@ -118,3 +123,53 @@ async def route_problem_endpoint(body: RouteRequest, request: Request):
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI routing failed: {e}")
+
+
+# --- AI Judge (advisory) ----------------------------------------------------
+# Called by the "Ask AI to judge" button inside each DemoCard. The verdict is
+# rendered next to the human vote buttons but does NOT touch the scoreboard
+# automatically — the human presenter still clicks the +1 they want. The
+# workshop keeps the AI's opinion on the record so the session log shows
+# agreement/disagreement per round.
+
+
+class JudgeRequest(BaseModel):
+    task: TaskLiteral = Field(..., description="Which of the 11 testing tasks the duel is on.")
+    human_answer: str = Field(..., min_length=1, description="The human tester's answer for this round.")
+    ai_answer: str = Field(..., min_length=1, description="The AI assistant's answer for this round.")
+    user_input: Optional[str] = Field(default="", description="Original input the answers were produced for (used to verify both answers actually address the prompt).")
+    language: Optional[str] = Field(default=None, description="Optional hint: 'en' or 'no'. Controls the language of `rationale` and `criteria`.")
+
+
+class JudgeCriteria(BaseModel):
+    accuracy: str = ""
+    coverage: str = ""
+    practical_value: str = ""
+
+
+class JudgeResponse(BaseModel):
+    verdict: Literal["human", "ai", "tie"] = Field(..., description="The AI judge's advisory pick.")
+    confidence: Literal["low", "medium", "high"] = Field(..., description="Judge confidence in the verdict.")
+    rationale: str = Field(..., description="2-4 sentence explanation anchored in the task rubric.")
+    criteria: JudgeCriteria = Field(default_factory=JudgeCriteria, description="Per-axis breakdown (accuracy / coverage / practical_value).")
+    raw: Optional[str] = Field(default=None, description="Raw LLM output — populated only when JSON parsing failed.")
+
+
+@router.post("/judge", response_model=JudgeResponse)
+async def judge_round_endpoint(body: JudgeRequest, request: Request):
+    hdrs = _collect_llm_headers(request)
+    try:
+        result = await judge_round(
+            task=body.task,
+            human_answer=body.human_answer,
+            ai_answer=body.ai_answer,
+            user_input=body.user_input or "",
+            language=body.language,
+            request_headers=hdrs,
+        )
+        # result["criteria"] is already a plain dict; JudgeResponse will coerce it.
+        return JudgeResponse(**result)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"AI judging failed: {e}")

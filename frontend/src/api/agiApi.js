@@ -93,3 +93,38 @@ export async function routeTestingProblem({ problem, language }) {
   }
   return res.json();
 }
+
+// AI Judge — ADVISORY verdict for a head-to-head round. The judge compares
+// the human tester's answer against the AI assistant's answer for the same
+// input and returns a structured opinion. The UI surfaces this next to the
+// human vote buttons; the scoreboard still counts ONLY the human presenter's
+// click. See /backend/services/homo_vs_ai_service.py for the prompt design
+// (explicit self-preference bias warning + task-specific quality rubric).
+// Returns:
+//   { verdict: 'human'|'ai'|'tie',
+//     confidence: 'low'|'medium'|'high',
+//     rationale: string,
+//     criteria: { accuracy, coverage, practical_value },
+//     raw?: string }
+export async function judgeTestingRound({ task, humanAnswer, aiAnswer, userInput, language }) {
+  const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/judge`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task,
+      human_answer: humanAnswer,
+      ai_answer: aiAnswer,
+      user_input: userInput || '',
+      language,
+    }),
+  });
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const data = await res.json();
+      detail = data.detail || '';
+    } catch (_) { /* ignore */ }
+    throw new Error(detail || `Judging failed (${res.status})`);
+  }
+  return res.json();
+}

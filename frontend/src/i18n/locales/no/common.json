@@ -2759,6 +2759,26 @@
       "humanPlaceholder": "Trykk ✏️ Rediger for å skrive gruppens svar her.",
       "aiPlaceholder": "Trykk «Kjør KI» for å generere svaret live.",
       "votePrompt": "Hvem vant denne runden?",
+      "judge": {
+        "kicker": "KI-dommer · veiledende",
+        "button": "Spør KI om dom",
+        "buttonTitle": "La KI sammenligne begge svar (kun veiledende — din stemme teller fortsatt).",
+        "running": "KI dømmer…",
+        "disabledHint": "Kjør KI først, og sørg for at menneskesvaret ikke er tomt.",
+        "errorPrefix": "KI-dommer feilet",
+        "verdictHuman": "Mennesketesteren vinner denne runden",
+        "verdictAi": "KI vinner denne runden",
+        "verdictTie": "Uavgjort",
+        "confidenceLabel": "Tillit",
+        "confidence_low": "lav",
+        "confidence_medium": "middels",
+        "confidence_high": "høy",
+        "criteriaAccuracy": "Treffsikkerhet",
+        "criteriaCoverage": "Dekning",
+        "criteriaPracticalValue": "Praktisk verdi",
+        "biasDisclaimer": "NB: en KI-dommer kan favorisere KI-aktige svar (self-preference bias — lengre og mer strukturerte svar ser ofte «bedre ut» for modellen). Dommen er kun veiledende; poengtavlen teller bare din stemme.",
+        "rawToggle": "Vis rå KI-utdata (debug)"
+      },
       "scenarios": {
         "title": "Fra krav til testscenarier",
         "prompt": "Lim inn et krav. Både tester og KI skal produsere et prioritert sett av scenarier.",
@@ -2889,7 +2909,12 @@
       "undo": "Angre siste",
       "reset": "Nullstill",
       "export": "Eksporter JSON",
-      "logTitle": "Rundelogg"
+      "logTitle": "Rundelogg",
+      "aiJudgeNone": "—",
+      "aiJudgeAgree": "enig",
+      "aiJudgeDisagree": "sa",
+      "aiJudgeAgreeTitle": "KI-dommeren var enig med stemmen din.",
+      "aiJudgeDisagreeTitle": "KI-dommeren ville valgt noe annet — mulig self-preference bias i spill."
     },
     "cribSheet": {
       "privateLabel": "Kun for foredragsholder",

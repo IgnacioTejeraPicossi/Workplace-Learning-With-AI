@@ -577,3 +577,233 @@ async def route_problem(
         "runner_ups": runner_ups,
         "raw": None,
     }
+
+
+# ---------------------------------------------------------------------------
+# AI Judge — compare human answer vs AI answer for a given round (advisory)
+# ---------------------------------------------------------------------------
+#
+# Design notes:
+#   * This endpoint is ADVISORY only. The UI wires the verdict into a panel
+#     next to the human vote buttons; the scoreboard still counts ONLY what
+#     the human presenter clicks. The AI's opinion is logged alongside the
+#     human vote purely for retrospective ("did the AI agree or disagree?").
+#   * The prompt explicitly warns the model about self-preference bias
+#     (LLMs tend to favour longer / more structured answers from other LLMs).
+#     This is ALIGNED with the workshop's critical-thinking framing: the bias,
+#     when visible, becomes a didactic moment rather than a silent poison of
+#     the scoreboard.
+#   * Criteria per task are concise and grounded in the existing TASK_SPECS
+#     system prompts. They are NOT duplicated verbatim to avoid drift.
+
+# Short, task-specific quality rubric the judge uses to anchor its verdict.
+# One paragraph per task — just enough to push the judge away from generic
+# "looks nice" assessments. Must stay in sync with TASK_SPECS above.
+JUDGE_CRITERIA: Dict[str, str] = {
+    "scenarios": (
+        "A strong SCENARIOS answer: risk-anchored priorities (P1/P2/P3), "
+        "boundary & equivalence coverage, at least one exploratory charter, "
+        "clear oracle references. Penalise generic 'test that it works' lines."
+    ),
+    "risk": (
+        "A strong RISK PRIORITISATION answer: weighs likelihood × impact, "
+        "acknowledges stakeholder signals (CFO, VIP, regulatory), and calls "
+        "out what ONLY a human can judge (politics, reputation, morale)."
+    ),
+    "ambiguities": (
+        "A strong AMBIGUITIES answer: quotes the exact vague word/phrase, "
+        "proposes a concrete follow-up question to the PO, and covers "
+        "assumptions / ambiguous terms / missing AC / implicit contradictions."
+    ),
+    "exploratory": (
+        "A strong EXPLORATORY answer: uses the 'Explore X with Y to discover Z' "
+        "Bach/Hendrickson format, time-boxes each charter in minutes, names "
+        "a heuristic/tour, and flags what only human intuition contributes."
+    ),
+    "followups": (
+        "A strong FOLLOW-UPS answer: groups questions by reproduction / scope / "
+        "oracle / impact / prior-art, stays concrete (no 'please provide more "
+        "info'), and produces 5-8 high-signal items."
+    ),
+    "automation": (
+        "A strong AUTOMATION answer: prefers API/fixture setup over UI, "
+        "defines a page-object contract, calls out flakiness risks + "
+        "mitigations, and flags architectural decisions the human still owns."
+    ),
+    "testData": (
+        "A strong TEST-DATA answer: covers happy / boundary / locale / abuse / "
+        "consent rows, FLAGS PII/health/payment fields that must not come "
+        "from production, ends with a data-ownership question."
+    ),
+    "oracle": (
+        "A strong ORACLE answer: enumerates 3-5 candidate correct behaviours, "
+        "names the oracle source for each (contract, standard, heuristic, "
+        "precedent), refuses to pick a winner if the spec doesn't say so."
+    ),
+    "triage": (
+        "A strong TRIAGE answer: splits AI-classifiable severity (S1-S4) from "
+        "human-judgement priority (P1-P3), surfaces missed blast radius, ends "
+        "with one human-only factor that changes priority."
+    ),
+    "accessibility": (
+        "A strong ACCESSIBILITY answer: splits mechanical WCAG findings (with "
+        "rule IDs like 1.4.3) from Nielsen heuristics, explicitly flags "
+        "human-only judgement (tone of errors, cultural nuance)."
+    ),
+    "tests_from_code": (
+        "A strong TESTS-FROM-CODE answer: covers happy / edge / error / race / "
+        "invariants in Given-When-Then form, surfaces spec-level oracle "
+        "questions the author must answer before implementing."
+    ),
+}
+
+
+def _judge_system_prompt(task: str, language: Optional[str]) -> str:
+    """System prompt for the advisory AI judge.
+
+    Explicitly calls out self-preference bias — the known tendency of LLMs
+    to rate other LLMs' outputs more highly because of surface features
+    (length, bullet density, structure). Asking the model to be aware of
+    this substantially reduces (but doesn't eliminate) the effect.
+    """
+    spec = TASK_SPECS.get(task) or {"label": task}
+    label = spec.get("label", task)
+    criteria = JUDGE_CRITERIA.get(task, "A strong answer addresses the task directly and stays concrete.")
+
+    base = (
+        "You are an experienced test lead asked to JUDGE a head-to-head duel "
+        "between a human tester and an AI assistant on the testing task below. "
+        "Your verdict will be displayed as ADVISORY — the human presenter "
+        "still casts the scoreboard vote; your job is to contribute a "
+        "well-reasoned opinion a thinking tester can accept or reject.\n\n"
+        f"TASK: {label}\n"
+        f"QUALITY RUBRIC: {criteria}\n\n"
+        "META-RULES — read these carefully, they prevent common judge errors:\n"
+        "  1. SELF-PREFERENCE BIAS: you are an AI judging another AI's output. "
+        "Research (Anthropic, Berkeley, Stanford 2023-2024) shows LLMs tend to "
+        "favour answers that are LONGER, more STRUCTURED, or more BULLET-HEAVY. "
+        "Do NOT be swayed by surface features. Reward substance, not form.\n"
+        "  2. A terse 6-bullet human answer is often more valuable than a "
+        "30-line AI answer if it shows real testing intuition, risk awareness, "
+        "domain empathy, or stakeholder knowledge the AI cannot have.\n"
+        "  3. Penalise generic boilerplate REGARDLESS of who wrote it ('cover "
+        "all edge cases', 'make sure it works', 'test thoroughly').\n"
+        "  4. Check that each answer actually addresses the ORIGINAL INPUT, "
+        "not an adjacent task. A beautifully written answer to the wrong "
+        "question loses.\n"
+        "  5. When the two answers are roughly equivalent in PRACTICAL VALUE "
+        "to a tester shipping today, pick 'tie'. Do not invent a winner.\n\n"
+        "RETURN STRICT JSON (no prose, no markdown fence, no leading/trailing "
+        "text), matching this schema exactly:\n"
+        "{\n"
+        "  \"verdict\": \"human\" | \"ai\" | \"tie\",\n"
+        "  \"confidence\": \"low\" | \"medium\" | \"high\",\n"
+        "  \"rationale\": \"<2-4 sentences, anchored in the rubric above>\",\n"
+        "  \"criteria\": {\n"
+        "    \"accuracy\": \"<one sentence — does each answer address the real input?>\",\n"
+        "    \"coverage\": \"<one sentence — which answer covers more of the rubric?>\",\n"
+        "    \"practical_value\": \"<one sentence — which answer actually helps a tester ship safely today?>\"\n"
+        "  }\n"
+        "}"
+    )
+
+    if language and language.lower().startswith("no"):
+        base += (
+            "\n\nHINT: Write `rationale` and each field in `criteria` in Norwegian "
+            "(bokmål). Keep testing terminology (ISTQB, oracle, exploratory, "
+            "boundary, WCAG) close to its English form — that is how Norwegian "
+            "testers speak. Keep the JSON keys themselves in English."
+        )
+    elif language and language.lower().startswith("en"):
+        base += "\n\nHINT: Write `rationale` and `criteria` values in English."
+    else:
+        base += "\n\nHINT: Write `rationale` and `criteria` values in the same language as the original input."
+
+    return base
+
+
+async def judge_round(
+    task: str,
+    human_answer: str,
+    ai_answer: str,
+    user_input: str = "",
+    language: Optional[str] = None,
+    request_headers: Optional[Dict] = None,
+) -> Dict[str, Any]:
+    """Ask the LLM to judge a head-to-head round (advisory verdict).
+
+    Returns a dict matching JudgeResponse in the router. On JSON parse
+    failure or invalid verdict/confidence, falls back to 'tie' + low
+    confidence with the raw LLM text attached under `raw` for debugging.
+    """
+    if task not in TASK_SPECS:
+        raise ValueError(f"Unknown challenge '{task}'. Expected one of: {list(TASK_SPECS.keys())}")
+
+    from backend.llm import ask_ai_unified
+
+    system_prompt = _judge_system_prompt(task, language)
+
+    # Build the user prompt. We DO include the original input because a
+    # beautifully written answer to the wrong question should lose — the
+    # judge needs to verify each answer actually addresses the prompt.
+    parts: List[str] = []
+    if (user_input or "").strip():
+        parts.append("ORIGINAL INPUT the tester was given:\n" + user_input.strip())
+    parts.append("HUMAN TESTER'S ANSWER:\n" + (human_answer or "").strip())
+    parts.append("AI ASSISTANT'S ANSWER:\n" + (ai_answer or "").strip())
+    user_prompt = "\n\n---\n\n".join(parts) + "\n\n---\n\nNow return STRICT JSON per the schema above."
+
+    output = await ask_ai_unified(
+        prompt=user_prompt,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        max_tokens=500,
+        temperature=0.1,  # Judgement is a classification task — determinism over flair.
+        request_headers=request_headers,
+    )
+
+    parsed = _extract_json(output or "")
+
+    _valid_verdicts = {"human", "ai", "tie"}
+    _valid_confidence = {"low", "medium", "high"}
+
+    def _fallback(reason: str) -> Dict[str, Any]:
+        return {
+            "verdict": "tie",
+            "confidence": "low",
+            "rationale": f"(fallback) {reason}",
+            "criteria": {"accuracy": "", "coverage": "", "practical_value": ""},
+            "raw": (output or "").strip() or None,
+        }
+
+    if not parsed or not isinstance(parsed, dict):
+        return _fallback("The AI did not return valid JSON.")
+
+    verdict = str(parsed.get("verdict", "")).strip().lower()
+    if verdict not in _valid_verdicts:
+        return _fallback(f"Invalid verdict '{verdict}', expected one of human/ai/tie.")
+
+    confidence = str(parsed.get("confidence", "")).strip().lower()
+    if confidence not in _valid_confidence:
+        confidence = "medium"  # silent coerce — not worth a fallback
+
+    rationale = str(parsed.get("rationale", "")).strip() or "(no rationale provided)"
+
+    criteria_raw = parsed.get("criteria") or {}
+    if not isinstance(criteria_raw, dict):
+        criteria_raw = {}
+    criteria = {
+        "accuracy": str(criteria_raw.get("accuracy", "")).strip(),
+        "coverage": str(criteria_raw.get("coverage", "")).strip(),
+        "practical_value": str(criteria_raw.get("practical_value", criteria_raw.get("practicalValue", ""))).strip(),
+    }
+
+    return {
+        "verdict": verdict,
+        "confidence": confidence,
+        "rationale": rationale,
+        "criteria": criteria,
+        "raw": None,
+    }

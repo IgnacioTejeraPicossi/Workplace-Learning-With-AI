@@ -1855,6 +1855,26 @@
       "humanPlaceholder": "Click ✏️ Edit to write the group's answer here.",
       "aiPlaceholder": "Press 'Run AI' to generate the answer live.",
       "votePrompt": "Who won this round?",
+      "judge": {
+        "kicker": "AI judge · advisory",
+        "button": "Ask AI to judge",
+        "buttonTitle": "Let the AI compare both answers (advisory only — your vote still wins).",
+        "running": "AI judging…",
+        "disabledHint": "Run the AI first, and make sure the human answer is not empty.",
+        "errorPrefix": "AI judge failed",
+        "verdictHuman": "Human tester wins this round",
+        "verdictAi": "AI wins this round",
+        "verdictTie": "It's a tie",
+        "confidenceLabel": "Confidence",
+        "confidence_low": "low",
+        "confidence_medium": "medium",
+        "confidence_high": "high",
+        "criteriaAccuracy": "Accuracy",
+        "criteriaCoverage": "Coverage",
+        "criteriaPracticalValue": "Practical value",
+        "biasDisclaimer": "Note: an AI judge can favour AI-style answers (self-preference bias — longer, more structured outputs tend to look 'better' to the model). This verdict is advisory; the scoreboard only counts your vote.",
+        "rawToggle": "Show raw AI output (debug)"
+      },
       "scenarios": {
         "title": "From requirement to test scenarios",
         "prompt": "Paste a requirement. Both tester and AI must produce a prioritised set of scenarios.",
@@ -1985,7 +2005,12 @@
       "undo": "Undo last",
       "reset": "Reset",
       "export": "Export JSON",
-      "logTitle": "Round log"
+      "logTitle": "Round log",
+      "aiJudgeNone": "—",
+      "aiJudgeAgree": "agreed",
+      "aiJudgeDisagree": "said",
+      "aiJudgeAgreeTitle": "The AI judge agreed with your vote.",
+      "aiJudgeDisagreeTitle": "The AI judge would have picked differently — possible self-preference bias in play."
     },
     "cribSheet": {
       "privateLabel": "Speaker-only",
