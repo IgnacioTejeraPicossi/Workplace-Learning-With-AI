@@ -13,7 +13,7 @@
  * automatically flips the tab from English to Norwegian for the SOCO crowd.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { runTestingChallenge } from '../../../api/agiApi';
 
@@ -279,6 +279,15 @@ function DemoCard({ task, icon, color, t, i18n, onVote }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [elapsed, setElapsed] = useState(null);
+  const [humanText, setHumanText] = useState(humanAnswer);
+  const [humanEditing, setHumanEditing] = useState(false);
+
+  // Follow i18n language changes: if the user switches EN<->NO, refresh the
+  // human panel with the new locale copy as long as they have not edited it.
+  const [humanDirty, setHumanDirty] = useState(false);
+  useEffect(() => {
+    if (!humanDirty) setHumanText(humanAnswer);
+  }, [humanAnswer, humanDirty]);
 
   const run = async () => {
     setLoading(true); setErr(null); setAiOutput(''); setElapsed(null);
@@ -364,15 +373,80 @@ function DemoCard({ task, icon, color, t, i18n, onVote }) {
         <div style={{
           background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: 12,
         }}>
-          <div style={{ fontSize: 11, color: '#15803d', fontWeight: 700, letterSpacing: 1 }}>
-            🧑 {t('homoVsAi.demos.humanLabel', { defaultValue: 'Human tester (prewritten)' })}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
+          }}>
+            <div style={{ fontSize: 11, color: '#15803d', fontWeight: 700, letterSpacing: 1 }}>
+              🧑 {humanEditing
+                ? t('homoVsAi.demos.humanLabelEditing', { defaultValue: 'Human tester (editing)' })
+                : t('homoVsAi.demos.humanLabel', { defaultValue: 'Human tester (prewritten)' })}
+            </div>
+            {!humanEditing ? (
+              <button
+                onClick={() => setHumanEditing(true)}
+                title={t('homoVsAi.demos.humanEdit', { defaultValue: 'Edit human answer' })}
+                style={{
+                  background: 'transparent', border: '1px solid #86efac', color: '#15803d',
+                  padding: '2px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer',
+                }}>
+                ✏️ {t('homoVsAi.demos.humanEdit', { defaultValue: 'Edit' })}
+              </button>
+            ) : (
+              <button
+                onClick={() => setHumanEditing(false)}
+                title={t('homoVsAi.demos.humanSave', { defaultValue: 'Save and view' })}
+                style={{
+                  background: '#15803d', border: '1px solid #15803d', color: 'white',
+                  padding: '2px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer', fontWeight: 600,
+                }}>
+                💾 {t('homoVsAi.demos.humanSave', { defaultValue: 'Save' })}
+              </button>
+            )}
           </div>
+
           <div style={{ marginTop: 6 }}>
-            {humanAnswer
-              ? <MarkdownLite text={humanAnswer} />
-              : <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic' }}>
-                  {t('homoVsAi.demos.humanPlaceholder', { defaultValue: 'Read your own answer out loud here.' })}
-                </div>}
+            {humanEditing ? (
+              <>
+                <textarea
+                  value={humanText}
+                  onChange={e => { setHumanText(e.target.value); setHumanDirty(true); }}
+                  rows={10}
+                  placeholder={t('homoVsAi.demos.humanEditPlaceholder', {
+                    defaultValue: 'Write the group\'s answer here. Markdown (**bold**, bullets with -) is rendered when you save.',
+                  })}
+                  style={{
+                    width: '100%', padding: 8, fontFamily: 'ui-monospace, monospace',
+                    fontSize: 12, border: '1px solid #86efac', borderRadius: 6,
+                    boxSizing: 'border-box', resize: 'vertical', lineHeight: 1.5,
+                    background: 'white',
+                  }}
+                />
+                <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => { setHumanText(''); setHumanDirty(true); }}
+                    style={{
+                      background: 'transparent', border: '1px solid #cbd5e1', color: '#475569',
+                      padding: '4px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer',
+                    }}>
+                    🧹 {t('homoVsAi.demos.humanClear', { defaultValue: 'Clear' })}
+                  </button>
+                  <button
+                    onClick={() => { setHumanText(humanAnswer); setHumanDirty(false); }}
+                    style={{
+                      background: 'transparent', border: '1px solid #cbd5e1', color: '#475569',
+                      padding: '4px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer',
+                    }}>
+                    ↩ {t('homoVsAi.demos.humanRestore', { defaultValue: 'Restore prewritten' })}
+                  </button>
+                </div>
+              </>
+            ) : (
+              humanText
+                ? <MarkdownLite text={humanText} />
+                : <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic' }}>
+                    {t('homoVsAi.demos.humanPlaceholder', { defaultValue: 'Click ✏️ Edit to write the group\'s answer here.' })}
+                  </div>
+            )}
           </div>
         </div>
 
