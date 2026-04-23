@@ -57,10 +57,26 @@ class ChallengeRequest(BaseModel):
     )
 
 
+class IstqbAnchor(BaseModel):
+    """Short, auditable ISTQB reference attached to /challenge, /route and /judge responses.
+
+    Produced by backend.services.istqb_anchors from backend/data/istqb_anchors.json.
+    Surfaced in the frontend as the '📚 ISTQB-anchored' badge tooltip.
+    """
+
+    syllabus: str = Field(..., description="Short syllabus identifier, e.g. 'CTFL v4.0' or 'CT-AI v1.0'.")
+    section: str = Field(..., description="Section reference within the syllabus, e.g. '§4.2 Black-Box Test Techniques'.")
+    summary: str = Field(..., description="One-sentence summary of what the section contributes to this task.")
+
+
 class ChallengeResponse(BaseModel):
     task: str
     label: str
     output: str
+    istqb_anchors: List[IstqbAnchor] = Field(
+        default_factory=list,
+        description="ISTQB syllabi sections that anchored the prompt for this task (may be empty if the anchors JSON is missing).",
+    )
 
 
 class RouteRequest(BaseModel):
@@ -83,6 +99,10 @@ class RouteResponse(BaseModel):
     raw: Optional[str] = Field(
         default=None,
         description="Raw LLM output — populated only when JSON parsing failed, useful for debugging.",
+    )
+    istqb_anchors: List[IstqbAnchor] = Field(
+        default_factory=list,
+        description="ISTQB syllabi sections that anchored the router prompt.",
     )
 
 
@@ -153,6 +173,10 @@ class JudgeResponse(BaseModel):
     rationale: str = Field(..., description="2-4 sentence explanation anchored in the task rubric.")
     criteria: JudgeCriteria = Field(default_factory=JudgeCriteria, description="Per-axis breakdown (accuracy / coverage / practical_value).")
     raw: Optional[str] = Field(default=None, description="Raw LLM output — populated only when JSON parsing failed.")
+    istqb_anchors: List[IstqbAnchor] = Field(
+        default_factory=list,
+        description="ISTQB syllabi sections that anchored the judge prompt (task-specific + judge-generic).",
+    )
 
 
 @router.post("/judge", response_model=JudgeResponse)

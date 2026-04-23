@@ -2095,8 +2095,33 @@
             }
           ],
           "tradeoff": "Option C is the literal interpretation of 'the AI improves its own prompt', but without a regression test harness it risks silent drift (an improvement for one task degrades another that shares vocabulary), and mid-workshop prompt changes undermine the comparative setup. Safe path when picking this up: start with A to collect signal, move to B for the live-demo slot, and only graduate to C once a regression suite exists for all 10 tasks."
+        },
+        {
+          "title": "Full ISTQB RAG pipeline (the 'real' integration)",
+          "summary": "Today the module uses Option A below (curated anchors authored by the maintainer). A proper retrieval-augmented generation pipeline over the full ISTQB syllabi would let the AI quote syllabi verbatim with page numbers. Three design options were considered:",
+          "options": [
+            {
+              "label": "A · Curated anchors (shipped)",
+              "text": "Hand-written JSON at backend/data/istqb_anchors.json with section numbers and one-line summaries per round. Small token footprint (~80-150 tokens per prompt), zero new infra, works with any LLM provider. What this module ships today."
+            },
+            {
+              "label": "B · Full cloud RAG",
+              "text": "Extract all 8 PDFs (~9 MB), chunk, embed with OpenAI/Cohere embeddings, store in a vector DB (FAISS, Chroma, Qdrant), retrieve top-k chunks per query and inject into the system prompt. Problem: ISTQB syllabi are distributed under restrictive terms — sending full-text chunks to cloud LLMs is legally murky."
+            },
+            {
+              "label": "C · Hybrid local-only RAG (recommended path forward)",
+              "text": "Run full RAG only when the active LLM provider is local (LM Studio / Ollama / Llama.cpp), keeping ISTQB text inside the developer machine. Fall back to Option A automatically when a cloud provider (OpenAI, OpenRouter, ItemAI) is selected. Best of both worlds: compliance-safe by default, rich retrieval when the tester is on-prem."
+            }
+          ],
+          "tradeoff": "Building a full RAG pipeline two days before a live workshop is high-risk (PDF extraction is fragile, vector stores add moving parts, and any failure during the SOCO demo hurts credibility). Option A captures ~70% of the teaching value at ~5% of the build cost, and the JSON is auditable. Safe path: ship Option A now, add Option C post-workshop by gating it on the provider setting."
         }
       ]
+    },
+    "istqb": {
+      "badge": "ISTQB-anchored",
+      "tooltip": "Prompt anchored in ISTQB syllabi. Click to see the sections used.",
+      "title": "Syllabi sections this prompt is anchored in",
+      "footnote": "ISTQB syllabi are referenced as curated short summaries (author's notes). Full-text use is deferred — see Future improvements at the bottom of this tab."
     }
   }
 }

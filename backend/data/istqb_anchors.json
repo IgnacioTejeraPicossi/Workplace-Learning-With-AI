@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "updated": "2026-04-14",
+    "source_syllabi": [
+      {"id": "CTFL_v4.0",     "title": "ISTQB Certified Tester Foundation Level Syllabus",                "version": "v4.0",     "date": "2023-04-21", "pages": 74},
+      {"id": "CT-AI_v1.0",    "title": "ISTQB Certified Tester AI Testing (CT-AI) Syllabus",              "version": "v1.0",     "date": "2021-10-01", "pages": 104},
+      {"id": "CTAL-TA_v3.1.2","title": "ISTQB Advanced Level Test Analyst Syllabus",                      "version": "v3.1.2",   "date": "2019",       "pages": null},
+      {"id": "CTAL-TAE_v2.0", "title": "ISTQB Advanced Level Test Automation Engineer Syllabus",          "version": "v2.0",     "date": "2024",       "pages": null},
+      {"id": "CTFL-AT_v1.0",  "title": "ISTQB Certified Tester Foundation Level Agile Tester Extension",  "version": "v1.0",     "date": "2014",       "pages": null},
+      {"id": "ISTQB-NO_v2.4", "title": "ISTQB Terminologi for test av programvare (Norwegian Testing Board)","version": "v2.4",   "date": "2016-01-31", "pages": 95}
+    ],
+    "license_note": "ISTQB syllabi are distributed under restrictive terms (ISTQB copyright). This file contains ONLY curated short summaries and section references written by the project author, NOT verbatim extracts. The underlying PDFs are kept locally under docs-ISTQB/ and are gitignored. Full verbatim use of syllabus text is deferred until a proper ISTQB-aligned RAG pipeline is built (see 'Future improvements' note in the module).",
+    "usage_note": "This file is loaded by backend/services/istqb_anchors.py and injected as compact context into the system prompts of the /challenge, /route and /judge endpoints in the Homo Sapiens vs. KI i Test module. Keep summaries tight (one sentence each) — token budget per prompt is deliberately small (~80–120 tokens).",
+    "approx_flag": "Some Norwegian terms are marked 'approx: true' where the 2016 NO glossary does not include the term. Those are my best-effort translations, flagged for human review."
+  },
+
+  "glossary_no": {
+    "test case":                   {"no": "testtilfelle",             "source": "ISTQB-NO v2.4"},
+    "test scenario":               {"no": "testscenario",             "source": "ISTQB-NO v2.4", "approx": true},
+    "test suite":                  {"no": "testsuite",                "source": "ISTQB-NO v2.4"},
+    "test coverage":               {"no": "testdekning",              "source": "ISTQB-NO v2.4", "approx": true},
+    "boundary value":              {"no": "grenseverdi",              "source": "ISTQB-NO v2.4"},
+    "boundary value analysis":     {"no": "grenseverdianalyse",       "source": "ISTQB-NO v2.4"},
+    "equivalence partition":       {"no": "ekvivalensklasse",         "source": "ISTQB-NO v2.4"},
+    "equivalence partitioning":    {"no": "ekvivalensklasseinndeling","source": "ISTQB-NO v2.4"},
+    "error guessing":              {"no": "feilgjetting",             "source": "ISTQB-NO v2.4"},
+    "exploratory testing":         {"no": "eksplorativ testing",      "source": "ISTQB-NO v2.4 (after Bach)"},
+    "experience-based testing":    {"no": "erfaringsbasert testing",  "source": "ISTQB-NO v2.4"},
+    "black-box technique":         {"no": "svart boks testdesignteknikk","source": "ISTQB-NO v2.4"},
+    "entry criteria":              {"no": "startkriterier",           "source": "ISTQB-NO v2.4"},
+    "exit criteria":               {"no": "sluttkriterier",           "source": "ISTQB-NO v2.4"},
+    "expected result":             {"no": "forventet resultat",       "source": "ISTQB-NO v2.4"},
+    "defect":                      {"no": "defekt",                   "source": "ISTQB-NO v2.4"},
+    "bug":                         {"no": "programfeil",              "source": "ISTQB-NO v2.4"},
+    "defect report":               {"no": "feilrapport",              "source": "ISTQB-NO v2.4"},
+    "back-to-back testing":        {"no": "sammenlignende test",      "source": "ISTQB-NO v2.4"},
+    "error":                       {"no": "feil",                     "source": "ISTQB-NO v2.4"},
+    "baseline":                    {"no": "basislinje",               "source": "ISTQB-NO v2.4"},
+    "risk-based testing":          {"no": "risikobasert testing",     "source": "industry", "approx": true},
+    "regression testing":          {"no": "regresjonstesting",        "source": "industry", "approx": true},
+    "acceptance criteria":         {"no": "akseptansekriterier",      "source": "industry", "approx": true},
+    "user story":                  {"no": "brukerhistorie",           "source": "industry", "approx": true},
+    "test oracle":                 {"no": "testorakel",               "source": "industry (Bach/Kaner)", "approx": true, "note": "Many Norwegian testers keep 'oracle' in English."},
+    "severity":                    {"no": "alvorlighetsgrad",         "source": "industry", "approx": true},
+    "priority":                    {"no": "prioritet",                "source": "industry", "approx": true},
+    "metamorphic testing":         {"no": "metamorf testing",         "source": "CT-AI-derived (no canonical NO)", "approx": true},
+    "automation bias":             {"no": "automatiseringsskjevhet",  "source": "AI-era (no canonical NO)", "approx": true, "note": "Many Norwegian testers keep 'automation bias' in English — newer term from CT-AI v1.0, post-dates the NO glossary."},
+    "concept drift":               {"no": "konseptdrift",             "source": "AI-era (no canonical NO)", "approx": true},
+    "accessibility":               {"no": "universell utforming",     "source": "Norwegian standard (difi/WCAG-NO)", "approx": false, "note": "'Universell utforming' is the Norwegian legal term (Likestillings- og diskrimineringsloven §17)."}
+  },
+
+  "tasks": {
+    "scenarios": {
+      "label": "Test scenarios from a requirement / user story",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§4.2 Black-Box Test Techniques",         "summary": "Derive test cases from specifications using equivalence partitioning (§4.2.1), boundary value analysis (§4.2.2), decision tables (§4.2.3) and state transition (§4.2.4)."},
+        {"syllabus": "CTFL v4.0", "section": "§5.1.5 Test Case Prioritization",        "summary": "Prioritise derived cases by risk, change frequency, complexity and coverage — not alphabetically or by order of writing."},
+        {"syllabus": "CT-AI v1.0","section": "§11.3 Using AI for Test Case Generation","summary": "LLMs can generate test cases from requirements, but the oracle problem remains: a human must validate expected results."}
+      ],
+      "key_terms": ["equivalence partitioning", "boundary value analysis", "test case", "acceptance criteria"]
+    },
+
+    "risk": {
+      "label": "Risk-based prioritisation across a release",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§5.2 Risk Management",               "summary": "Risk = likelihood × impact, split into project risks and product risks; drives test effort allocation."},
+        {"syllabus": "CTFL v4.0", "section": "§5.2.3 Product Risk Analysis",       "summary": "Identify, assess and rank product risks so testing depth is proportional to exposure — not treated uniformly."},
+        {"syllabus": "CTFL v4.0", "section": "§5.1.6 Test Pyramid",                "summary": "Shift heavy coverage to lower, cheaper levels (unit) while reserving expensive E2E effort for the highest-risk flows."}
+      ],
+      "key_terms": ["risk-based testing", "product risk", "priority", "severity"]
+    },
+
+    "ambiguities": {
+      "label": "Hidden assumptions & ambiguous terms in a user story",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§3.1 Static Testing Basics",           "summary": "Ambiguity is a defect detectable without execution — static testing finds it before it reaches code."},
+        {"syllabus": "CTFL v4.0", "section": "§4.5.1 Collaborative User Story Writing","summary": "Stories should be Independent, Negotiable, Valuable, Estimable, Small, Testable (INVEST) — ambiguity violates Testable."},
+        {"syllabus": "CTFL v4.0", "section": "§4.5.2 Acceptance Criteria",           "summary": "Acceptance criteria must be unambiguous and verifiable; missing or vague criteria are the primary ambiguity signal."}
+      ],
+      "key_terms": ["acceptance criteria", "user story", "static testing", "INVEST"]
+    },
+
+    "exploratory": {
+      "label": "Exploratory testing session charter",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§4.4.2 Exploratory Testing",                          "summary": "Concurrent test design, execution and learning; uses tester experience, intuition and heuristics. Best structured via session-based test management (charters, time-boxed)."},
+        {"syllabus": "CT-AI v1.0","section": "§9.6 Experience-Based Testing of AI-Based Systems",   "summary": "For AI/ML systems, exploratory testing plus exploratory data analysis (EDA) is often the only feasible approach where the oracle is weak."}
+      ],
+      "key_terms": ["exploratory testing", "charter", "time-boxed session", "heuristic"]
+    },
+
+    "followups": {
+      "label": "Follow-up questions for a thin / vague bug report",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§5.5 Defect Management",               "summary": "A defect report's core content must include preconditions, steps, expected vs actual, environment, severity — follow-ups fill the gaps so the report is reproducible."},
+        {"syllabus": "CTFL v4.0", "section": "§3.2 Review Process",                  "summary": "Treat a bug report like a review artefact: questions should surface missing context, not debate the fix."},
+        {"syllabus": "CT-AI v1.0","section": "§11.2 Using AI to Analyze Reported Defects","summary": "AI can cluster and triage defects at scale, but extracting reproduction steps from a vague report still benefits from human follow-up."}
+      ],
+      "key_terms": ["defect report", "reproducibility", "root cause", "severity"]
+    },
+
+    "automation": {
+      "label": "Test automation code from a requirement",
+      "anchors": [
+        {"syllabus": "CTFL v4.0",     "section": "§6.2 Benefits and Risks of Test Automation", "summary": "Automation scales repeatable checks and frees humans for exploratory/risk work — but flaky tests and maintenance cost can eclipse the benefit."},
+        {"syllabus": "CTFL v4.0",     "section": "§5.1.6 Test Pyramid",                        "summary": "Automate heavy at unit level, thin at E2E; inverted pyramids are an anti-pattern that produces slow, brittle suites."},
+        {"syllabus": "CTAL-TAE v2.0", "section": "Architecture & Maintainability",             "summary": "Good automation code follows the same engineering principles as production code: layering (test adaption / definition / execution), independence, deterministic data."}
+      ],
+      "key_terms": ["test pyramid", "flakiness", "test automation architecture", "maintainability"]
+    },
+
+    "testData": {
+      "label": "Test data generation for a feature",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§4.2.1 Equivalence Partitioning",          "summary": "Data should cover each equivalence class at least once — both valid and invalid partitions."},
+        {"syllabus": "CTFL v4.0", "section": "§4.2.2 Boundary Value Analysis",           "summary": "Values at and around boundaries are disproportionately likely to expose defects."},
+        {"syllabus": "CT-AI v1.0","section": "§4.3 Dataset Quality Issues",              "summary": "For AI/ML testing, dataset quality (representativeness, balance, labelling accuracy) drives test validity more than volume."},
+        {"syllabus": "CT-AI v1.0","section": "§7.3 Test Data for Testing AI-Based Systems","summary": "Distinguish training, validation, and test datasets — never let test data leak into training."}
+      ],
+      "key_terms": ["equivalence class", "boundary value", "dataset quality", "data leakage"]
+    },
+
+    "oracle": {
+      "label": "The oracle problem (what is 'correct'?)",
+      "anchors": [
+        {"syllabus": "CT-AI v1.0","section": "§8.7 Test Oracles for AI-Based Systems", "summary": "For probabilistic AI systems a perfect oracle rarely exists; use surrogate oracles (pseudo-oracles, statistical oracles, human oracles, consistency oracles)."},
+        {"syllabus": "CT-AI v1.0","section": "§9.5 Metamorphic Testing (MT)",           "summary": "When direct ground truth is unavailable, use metamorphic relations: 'if I transform the input in way X, the output should change in way Y'."},
+        {"syllabus": "CT-AI v1.0","section": "§9.3 Back-to-Back Testing",               "summary": "Compare two implementations (or the same implementation on equivalent inputs) to detect discrepancies without needing a golden oracle."}
+      ],
+      "key_terms": ["test oracle", "metamorphic relation", "back-to-back", "pseudo-oracle"]
+    },
+
+    "triage": {
+      "label": "Bug triage (severity, priority, reproducibility)",
+      "anchors": [
+        {"syllabus": "CTFL v4.0", "section": "§5.5 Defect Management",                "summary": "Triage classifies defects by severity (technical impact) and priority (business urgency) — the two are independent dimensions."},
+        {"syllabus": "CTFL v4.0", "section": "§5.2.1 Risk Definition and Attributes", "summary": "Triage is risk reasoning applied to a single defect: likelihood of reoccurrence × impact on user/business."},
+        {"syllabus": "CTFL v4.0", "section": "§5.3.1 Metrics used in Testing",        "summary": "Track aggregate triage signals (defect age, reopened rate, severity distribution) — not just counts."}
+      ],
+      "key_terms": ["severity", "priority", "reproducibility", "defect age"]
+    },
+
+    "accessibility": {
+      "label": "Accessibility & UX heuristics review",
+      "anchors": [
+        {"syllabus": "CTFL v4.0",   "section": "§4.4.3 Checklist-Based Testing",       "summary": "Heuristic/checklist testing is the canonical ISTQB approach for accessibility and usability — WCAG and Nielsen heuristics are the de-facto checklists."},
+        {"syllabus": "CTAL-TA v3.1.2","section": "Usability / Accessibility Testing",  "summary": "Accessibility testing combines automated scanners (axe, Lighthouse) with manual checks — automation finds ~30–40% of WCAG issues."}
+      ],
+      "key_terms": ["WCAG 2.2", "Nielsen heuristics", "universell utforming", "checklist-based testing"],
+      "external_standards": [
+        {"id": "WCAG-2.2",          "issuer": "W3C",                 "note": "Web Content Accessibility Guidelines 2.2, success criteria at levels A / AA / AAA."},
+        {"id": "EN 301 549 v3.2.1", "issuer": "ETSI/EU",             "note": "EU accessibility standard; Norway's 'Likestillings- og diskrimineringsloven §17' references it."},
+        {"id": "Nielsen-10",        "issuer": "Nielsen Norman Group","note": "10 usability heuristics — 'visibility of system status', 'error prevention', etc."}
+      ]
+    }
+  },
+
+  "router": {
+    "label": "Routing a free-text problem to the correct testing round",
+    "anchors": [
+      {"syllabus": "CTFL v4.0", "section": "§4.1 Test Techniques Overview", "summary": "Choosing the right technique is itself a taught skill: black-box for requirements-driven, white-box for code-driven, experience-based when spec is weak."},
+      {"syllabus": "CTFL v4.0", "section": "§5.1.5 Test Case Prioritization","summary": "When multiple techniques could apply, prioritise by risk exposure and business value, not by convenience."}
+    ]
+  },
+
+  "judge": {
+    "label": "Judging the quality of a human vs AI testing answer",
+    "anchors": [
+      {"syllabus": "CTFL v4.0", "section": "§5.3.1 Metrics used in Testing",             "summary": "Test quality is multi-dimensional (coverage, defect detection effectiveness, traceability) — a long answer that misses the oracle is not a better answer."},
+      {"syllabus": "CT-AI v1.0","section": "§8.8 Test Objectives and Acceptance Criteria","summary": "For AI-assisted testing, the right yardstick is whether the answer advances the stated test objective — not stylistic polish."}
+    ]
+  }
+}

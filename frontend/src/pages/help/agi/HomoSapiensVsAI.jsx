@@ -24,6 +24,80 @@ import { useTranslation } from 'react-i18next';
 import { judgeTestingRound, routeTestingProblem, runTestingChallenge } from '../../../api/agiApi';
 
 // ---------------------------------------------------------------------------
+// ISTQB anchor badge — shows '📚 ISTQB-anchored' when a challenge / router /
+// judge response carries a non-empty `istqb_anchors` array. Clicking it
+// expands a compact list of the concrete syllabi sections used for that
+// prompt. Kept tiny on purpose: it should read as a credibility cue on the
+// projector, never as the main content.
+// ---------------------------------------------------------------------------
+
+function IstqbBadge({ anchors, t }) {
+  const [open, setOpen] = useState(false);
+  if (!Array.isArray(anchors) || anchors.length === 0) return null;
+
+  return (
+    <div style={{ display: 'inline-block' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        title={t('homoVsAi.istqb.tooltip', {
+          defaultValue: 'Prompt anchored in ISTQB syllabi. Click to see the sections used.',
+        })}
+        style={{
+          background: '#eef2ff',
+          color: '#4338ca',
+          border: '1px solid #c7d2fe',
+          padding: '3px 8px',
+          borderRadius: 20,
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: 0.2,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        📚 {t('homoVsAi.istqb.badge', { defaultValue: 'ISTQB-anchored' })}
+        <span style={{ fontSize: 9, opacity: 0.7 }}>{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div style={{
+          marginTop: 6,
+          background: 'white',
+          border: '1px solid #c7d2fe',
+          borderRadius: 8,
+          padding: '8px 10px',
+          fontSize: 11,
+          lineHeight: 1.45,
+          color: '#334155',
+          maxWidth: 560,
+        }}>
+          <div style={{ fontSize: 10, color: '#4338ca', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+            {t('homoVsAi.istqb.title', { defaultValue: 'Syllabi sections this prompt is anchored in' })}
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 16 }}>
+            {anchors.map((a, idx) => (
+              <li key={idx} style={{ marginBottom: 4 }}>
+                <strong style={{ color: '#1e293b' }}>{a.syllabus}</strong>{' '}
+                <span style={{ color: '#4338ca' }}>{a.section}</span>
+                {a.summary ? <> — <span style={{ color: '#475569' }}>{a.summary}</span></> : null}
+              </li>
+            ))}
+          </ul>
+          <div style={{ marginTop: 6, fontSize: 10, color: '#64748b', fontStyle: 'italic' }}>
+            {t('homoVsAi.istqb.footnote', {
+              defaultValue: 'ISTQB syllabi are referenced as curated short summaries (author\'s notes). Full-text use is deferred — see Future improvements at the bottom of this tab.',
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Minimal markdown-lite renderer — handles **bold**, headings, bullets, code
 // ---------------------------------------------------------------------------
 
@@ -301,10 +375,15 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   // judged independently. NOT wired into the scoreboard; we only pass the
   // snapshot forward when the human casts their vote (so the scoreboard log
   // can show a 🤖 agree/disagree badge per round).
-  const [judgeResult, setJudgeResult] = useState(null); // { verdict, confidence, rationale, criteria, raw? }
+  const [judgeResult, setJudgeResult] = useState(null); // { verdict, confidence, rationale, criteria, istqb_anchors?, raw? }
   const [judgeLoading, setJudgeLoading] = useState(false);
   const [judgeErr, setJudgeErr] = useState(null);
   const [judgeElapsed, setJudgeElapsed] = useState(null);
+
+  // ISTQB anchors surfaced alongside the AI output (populated by /challenge).
+  // Empty until the tester runs the AI once; persists across the same task so
+  // the badge stays visible as long as the AI answer is shown.
+  const [istqbAnchors, setIstqbAnchors] = useState([]);
 
   // Follow i18n language changes: if the user switches EN<->NO, refresh the
   // human panel with the new locale copy as long as they have not edited it.
@@ -339,6 +418,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         language: i18n?.language?.startsWith('no') ? 'no' : 'en',
       });
       setAiOutput(res.output || '(empty)');
+      setIstqbAnchors(Array.isArray(res.istqb_anchors) ? res.istqb_anchors : []);
     } catch (e) {
       setErr(String(e.message || e));
     } finally {
@@ -376,6 +456,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   const resetToSample = () => {
     setInput(sample); setAiOutput(''); setErr(null); setElapsed(null);
     setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
+    setIstqbAnchors([]);
   };
 
   return (
@@ -396,6 +477,11 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
             <div style={{ color: '#64748b', fontSize: 12, marginTop: 4, maxWidth: 700 }}>{prompt}</div>
           )}
         </div>
+        {istqbAnchors.length > 0 && (
+          <div style={{ flexShrink: 0 }}>
+            <IstqbBadge anchors={istqbAnchors} t={t} />
+          </div>
+        )}
       </div>
 
       {/* Input */}
@@ -654,6 +740,9 @@ function JudgeAdvisoryPanel({ t, result, elapsed }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          {Array.isArray(result.istqb_anchors) && result.istqb_anchors.length > 0 && (
+            <IstqbBadge anchors={result.istqb_anchors} t={t} />
+          )}
           <span style={{
             background: c.bg, color: c.color, border: `1px solid ${c.border}`,
             fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
@@ -941,11 +1030,18 @@ function ProblemRouter({ t, i18n, onRouteApply, scrollTo }) {
           marginTop: 14, background: '#f0f9ff', border: `1px solid ${recMeta.color}`,
           borderRadius: 10, padding: 12,
         }}>
-          <div style={{ fontSize: 11, color: recMeta.color, fontWeight: 700, letterSpacing: 1 }}>
-            {t('homoVsAi.router.recommendedKicker', { defaultValue: 'AI recommends' })}
-          </div>
-          <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>
-            {recMeta.icon} {t(`homoVsAi.demos.${result.recommended}.title`, { defaultValue: result.recommended })}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: 11, color: recMeta.color, fontWeight: 700, letterSpacing: 1 }}>
+                {t('homoVsAi.router.recommendedKicker', { defaultValue: 'AI recommends' })}
+              </div>
+              <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>
+                {recMeta.icon} {t(`homoVsAi.demos.${result.recommended}.title`, { defaultValue: result.recommended })}
+              </div>
+            </div>
+            {Array.isArray(result.istqb_anchors) && result.istqb_anchors.length > 0 && (
+              <IstqbBadge anchors={result.istqb_anchors} t={t} />
+            )}
           </div>
           <div style={{ marginTop: 6, fontSize: 13, color: '#334155', lineHeight: 1.5 }}>
             {result.rationale}

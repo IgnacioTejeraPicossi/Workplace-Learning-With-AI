@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.1] - 2026-04-14
+
+### Added — ISTQB-anchored prompts (Homo Sapiens vs. KI i Test)
+
+Small, low-risk iteration on top of 1.7.0 that grounds every LLM call in the module against real ISTQB syllabi sections. Authored ahead of the SOCO workshop to give the testing tone measurable credibility with testers in the audience. Shipped as **Option A — curated anchors**: hand-written JSON with section numbers and one-line summaries, validated against the actual PDFs. Full RAG is parked as a future improvement (see below).
+
+**Backend:**
+- `backend/data/istqb_anchors.json` (new) — curated anchors for:
+  - all 10 live rounds (1-3 anchors each, drawn from CTFL v4.0 and CT-AI v1.0)
+  - the Problem Router (routing is itself an ISTQB skill — CTFL §4.1 / §5.1.5)
+  - the AI Judge (judging test quality — CTFL §5.3.1 / CT-AI §8.8)
+  - a compact Norwegian glossary (~30 terms, majority authoritative from ISTQB-NO v2.4 by Norwegian Testing Board; a handful flagged `approx: true` where the 2016 NO glossary does not cover the term — e.g. automation bias, metamorphic testing, concept drift)
+  - metadata block with ISTQB license note: syllabi stay gitignored under `docs-ISTQB/`, only short curated summaries live in the JSON
+- `backend/services/istqb_anchors.py` (new) — thin cached loader exposing:
+  - `get_anchors(kind, key)` — raw block access
+  - `build_istqb_prompt_block(kind, key, language)` — 80-150-token text block appended to system prompts (advisory wording, plus NO terminology only when language hint is `no`)
+  - `anchors_summary_for_response(kind, key)` — JSON-serialisable list consumed by the frontend badge
+  - fully tolerant: missing file / malformed JSON / missing key → empty block, the module keeps working
+- `backend/services/homo_vs_ai_service.py`:
+  - `run_challenge()` now injects the task's ISTQB block into the system prompt and returns `istqb_anchors: [...]` in the response
+  - `_router_system_prompt()` appends the router's ISTQB anchors; `route_problem()` returns them on success *and* on both fallback paths
+  - `_judge_system_prompt()` appends **both** the judged task's anchors *and* the judge-generic anchors (so the judge knows what a strong answer looks like for the task AND what "quality" means in general)
+  - `judge_round()` returns the combined anchor list on success and fallback
+
+**FastAPI contract:**
+- `backend/routers/homo_vs_ai.py`:
+  - New Pydantic model `IstqbAnchor` = `{ syllabus: str, section: str, summary: str }`
+  - `ChallengeResponse`, `RouteResponse`, `JudgeResponse` now carry `istqb_anchors: List[IstqbAnchor]` (defaults to `[]` — 100% backwards compatible with existing clients)
+
+**Frontend:**
+- `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`:
+  - New `IstqbBadge` component — `📚 ISTQB-anchored` pill, clickable, expands to a compact list of the exact syllabi sections used for that prompt, with a license footnote
+  - `DemoCard` — badge rendered in the round header next to the title after the first Run AI call (per round, independent state)
+  - `ProblemRouter` — badge rendered in the "AI recommends" result card header (shared across all router anchors)
+  - `JudgeAdvisoryPanel` — badge rendered next to the confidence chip (so the judge verdict is visibly tied to both the task's syllabi and the judge rubric)
+- `frontend/src/i18n/locales/en/common.json` + `frontend/src/i18n/locales/no/common.json`:
+  - New block `homoVsAi.istqb.*` = `{ badge, tooltip, title, footnote }` in both locales, with native-quality Norwegian wording ("ISTQB-forankret", "Pensum-seksjonene denne prompten er forankret i", etc.)
+
+**Future improvements footnote extended:**
+- Second parked idea added: "Full ISTQB RAG pipeline" with three documented options:
+  - Option A (curated anchors) — what this release ships
+  - Option B (full cloud RAG) — deferred due to ISTQB licensing restrictions on full-text use with cloud LLMs
+  - Option C (hybrid local-only RAG) — recommended path forward: full RAG only when a local provider (LM Studio / Ollama) is active, automatic fallback to Option A for any cloud provider. Both EN and NO copies carry the full three-option breakdown and a `tradeoff` explaining why this is deferred until post-workshop.
+
+**Notes and trade-offs:**
+- The block is **advisory** ("you MAY anchor your reasoning…") — the LLM is not forced to parrot section numbers. This keeps tone credible without making answers robotic.
+- Token footprint: ~80-150 tokens per prompt — small enough not to eat into the model's working context.
+- Norwegian terminology block is only appended when the language hint is Norwegian, to avoid bloating English runs.
+- All file paths (`docs-ISTQB/`) remain gitignored; no syllabus PDFs are committed or transmitted.
+
+---
+
 ## [1.7.0] - 2026-04-14
 
 ### Added / Changed — Homo Sapiens vs. KI i Test (post-1.6.0 iteration pack)

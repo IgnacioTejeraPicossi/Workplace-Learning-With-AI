@@ -31,6 +31,11 @@ import json
 import re
 from typing import Any, Dict, List, Optional
 
+from backend.services.istqb_anchors import (
+    anchors_summary_for_response,
+    build_istqb_prompt_block,
+)
+
 
 TASK_SPECS: Dict[str, Dict[str, str]] = {
     "scenarios": {
@@ -260,6 +265,10 @@ async def run_challenge(
     elif language and language.lower().startswith("en"):
         system_prompt += "\n\nHINT: Answer in English."
 
+    istqb_block = build_istqb_prompt_block(kind="task", key=task, language=language)
+    if istqb_block:
+        system_prompt += "\n" + istqb_block
+
     user_prompt = spec["user_prefix"] + (user_input or "").strip()
 
     output = await ask_ai_unified(
@@ -277,6 +286,7 @@ async def run_challenge(
         "task": task,
         "label": spec["label"],
         "output": (output or "").strip() or "(no response from AI)",
+        "istqb_anchors": anchors_summary_for_response(kind="task", key=task),
     }
 
 
@@ -505,6 +515,11 @@ def _router_system_prompt(language: Optional[str]) -> str:
         base += "\n  - Write `rationale` and each runner-up `why` in English."
     else:
         base += "\n  - Write `rationale` in the same language as the problem description."
+
+    istqb_block = build_istqb_prompt_block(kind="router", language=language)
+    if istqb_block:
+        base += "\n" + istqb_block
+
     return base
 
 
@@ -538,13 +553,15 @@ async def route_problem(
 
     parsed = _extract_json(output or "")
 
-    # Validate strictly; fall back gracefully otherwise.
+    router_anchors = anchors_summary_for_response(kind="router")
+
     if not parsed or not isinstance(parsed, dict):
         return {
             "recommended": "scenarios",
             "rationale": "(fallback) The AI did not return valid JSON. Using 'scenarios' as a safe default.",
             "runner_ups": [],
             "raw": (output or "").strip() or None,
+            "istqb_anchors": router_anchors,
         }
 
     recommended = str(parsed.get("recommended", "")).strip()
@@ -554,6 +571,7 @@ async def route_problem(
             "rationale": "(fallback) The AI returned an unknown task key. Using 'scenarios' as a safe default.",
             "runner_ups": [],
             "raw": (output or "").strip() or None,
+            "istqb_anchors": router_anchors,
         }
 
     rationale = str(parsed.get("rationale", "")).strip() or "(no rationale provided)"
@@ -576,6 +594,7 @@ async def route_problem(
         "rationale": rationale,
         "runner_ups": runner_ups,
         "raw": None,
+        "istqb_anchors": router_anchors,
     }
 
 
@@ -719,6 +738,16 @@ def _judge_system_prompt(task: str, language: Optional[str]) -> str:
     else:
         base += "\n\nHINT: Write `rationale` and `criteria` values in the same language as the original input."
 
+    # Judge prompt gets BOTH the task-specific anchors (so it knows the canon
+    # for the task) AND the generic judge anchors (so it reasons about test
+    # quality itself). Cheap — both blocks together are still <200 tokens.
+    task_block = build_istqb_prompt_block(kind="task", key=task, language=language)
+    judge_block = build_istqb_prompt_block(kind="judge", language=language)
+    if task_block:
+        base += "\n" + task_block
+    if judge_block:
+        base += "\n" + judge_block
+
     return base
 
 
@@ -769,6 +798,13 @@ async def judge_round(
     _valid_verdicts = {"human", "ai", "tie"}
     _valid_confidence = {"low", "medium", "high"}
 
+    # Anchors exposed to the frontend: the task's anchors (what the judge was
+    # grounded on) + the generic judge anchors (how "quality" is defined).
+    judge_anchors = (
+        anchors_summary_for_response(kind="task", key=task)
+        + anchors_summary_for_response(kind="judge")
+    )
+
     def _fallback(reason: str) -> Dict[str, Any]:
         return {
             "verdict": "tie",
@@ -776,6 +812,7 @@ async def judge_round(
             "rationale": f"(fallback) {reason}",
             "criteria": {"accuracy": "", "coverage": "", "practical_value": ""},
             "raw": (output or "").strip() or None,
+            "istqb_anchors": judge_anchors,
         }
 
     if not parsed or not isinstance(parsed, dict):
@@ -806,4 +843,5 @@ async def judge_round(
         "rationale": rationale,
         "criteria": criteria,
         "raw": None,
+        "istqb_anchors": judge_anchors,
     }
