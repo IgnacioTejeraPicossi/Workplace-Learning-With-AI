@@ -146,13 +146,15 @@ const getNavItems = (t) => [
     { key: "agent-theory-docs", label: t('sidebar.agentTheoryDocs'), icon: "book" },
     { key: "presentation-agent", label: t('sidebar.presentationAgent'), icon: "presentation" },
     { key: "ai-study-buddy", label: t('sidebar.aiStudyBuddy'), icon: "robot" },
-    { key: "readme-viewer", label: t('sidebar.readmeViewer'), icon: "doc" },
-    { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "chart" }
+    { key: "readme-viewer", label: t('sidebar.readmeViewer'), icon: "doc" }
   ]},
   
   // Grupo 3: Herramientas de desarrollo (fondo azul)
   { key: "security", label: t('sidebar.security'), icon: "shield", group: "developer" },
   { key: "run-test", label: t('sidebar.runTest'), icon: "play", group: "developer" },
+  // AGI Progress: promoted from Help submenu to a top-level developer entry
+  // (tab collection grew to 4 tabs + AI enrichment + workshop module).
+  { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart", group: "developer" },
   { key: "api-config", label: t('sidebar.apiConfig'), icon: "settings", group: "developer" },
   
   // Grupo 4: Funcionalidades futuras (expandible)
