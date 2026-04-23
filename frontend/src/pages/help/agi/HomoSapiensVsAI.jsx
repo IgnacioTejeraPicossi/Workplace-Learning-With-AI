@@ -1392,6 +1392,66 @@ function SubBlock({ title, children }) {
 }
 
 // ---------------------------------------------------------------------------
+// Footer — Future improvements (parking lot)
+// ---------------------------------------------------------------------------
+//
+// Deliberately rendered as a muted footnote, NOT a full section. The goal is
+// to keep ideas visible for the next maintainer without creating UI noise
+// during the live workshop. Each item carries enough context that whoever
+// picks it up later doesn't have to re-run the design discussion from zero.
+
+function FutureImprovementsNote({ t }) {
+  const ideas = t('homoVsAi.future.ideas', { returnObjects: true, defaultValue: [] });
+  const list = Array.isArray(ideas) ? ideas : [];
+  return (
+    <div style={{
+      marginTop: 4,
+      background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: 10,
+      padding: '14px 18px', color: '#475569',
+    }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#64748b',
+        textTransform: 'uppercase',
+      }}>
+        * {t('homoVsAi.future.kicker', { defaultValue: 'Future improvements' })}
+      </div>
+      <div style={{ fontSize: 12, marginTop: 4, fontStyle: 'italic', color: '#64748b' }}>
+        {t('homoVsAi.future.lead', {
+          defaultValue: 'Ideas deliberately parked, not implemented — documented here so the next iteration starts with context, not a blank page.',
+        })}
+      </div>
+      {list.length > 0 && (
+        <ul style={{ margin: '8px 0 0 18px', padding: 0, fontSize: 12, lineHeight: 1.6 }}>
+          {list.map((idea, i) => (
+            <li key={i} style={{ marginBottom: 8 }}>
+              <strong style={{ color: '#334155' }}>{idea.title}</strong>
+              {idea.summary && <span style={{ color: '#64748b' }}> — {idea.summary}</span>}
+              {Array.isArray(idea.options) && idea.options.length > 0 && (
+                <ul style={{ margin: '4px 0 0 16px', padding: 0, color: '#64748b' }}>
+                  {idea.options.map((opt, j) => (
+                    <li key={j} style={{ marginBottom: 2 }}>
+                      <span style={{ color: '#475569', fontWeight: 600 }}>{opt.label}:</span>{' '}
+                      {opt.text}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {idea.tradeoff && (
+                <div style={{
+                  marginTop: 4, fontSize: 11, color: '#64748b', fontStyle: 'italic',
+                }}>
+                  {t('homoVsAi.future.tradeoffPrefix', { defaultValue: 'Why deferred' })}: {idea.tradeoff}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Shared — section header
 // ---------------------------------------------------------------------------
 
@@ -1435,6 +1495,7 @@ export default function HomoSapiensVsAI() {
         onClearExternal={() => setExternalVote(null)}
       />
       <SpeakerCribSheet t={t} />
+      <FutureImprovementsNote t={t} />
     </div>
   );
 }

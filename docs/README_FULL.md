@@ -565,50 +565,68 @@ Categorized cards covering concrete benefits across Health, Science, Education, 
 
 Purpose-built as a **live presentation tool** for the workshop with Ola Kleiven and Keyhan Farahaninia at SOCO. Everything in one scroll, projector-friendly, bilingual EN/NO with native-quality Norwegian.
 
-Six sections:
+> **Sidebar location (1.7.0+):** **AGI Progress** is a top-level sidebar entry under the *developer* group (immediately below **Run Test**, icon 📊). It is no longer under **Help** → the module grew beyond that shelf.
+
+Sections (in scroll order):
 
 1. **Workshop Hero** — SOCO kicker, hosts callout, and the three reflection questions as visual anchors:
    - *When does AI give us a real advantage in testing work?*
    - *Is human judgement, context, critical thinking and curiosity still decisive?*
    - *Do we have a winner — or a new way of working together?*
 
-2. **Activity Matrix** — ten canonical testing activities classified as Human-leads / AI-leads / Hybrid, with rationale and confidence level:
-   - Test scenario generation (Hybrid)
-   - Risk-based prioritisation (Human)
-   - Requirement / story ambiguity detection (AI)
-   - Exploratory testing (Human)
-   - Follow-up questions (Hybrid)
-   - Test automation code (AI)
-   - Test data generation (AI)
-   - The oracle problem (Human)
-   - Bug triage & severity (Hybrid)
-   - Accessibility & UX heuristics (Hybrid)
+2. **Activity Matrix** — ten canonical testing activities classified as Human-leads / AI-leads / Hybrid, with rationale and confidence level. From 1.7.0 the live demo rounds map **1:1** to these rows:
+   - Test scenario generation (Hybrid) → round `scenarios`
+   - Risk-based prioritisation (Human) → round `risk`
+   - Requirement / story ambiguity detection (AI) → round `ambiguities`
+   - Exploratory testing (Human) → round `exploratory`
+   - Follow-up questions (Hybrid) → round `followups`
+   - Test automation code (AI) → round `automation`
+   - Test data generation (AI) → round `testData`
+   - The oracle problem (Human) → round `oracle`
+   - Bug triage & severity (Hybrid) → round `triage`
+   - Accessibility & UX heuristics (Hybrid) → round `accessibility`
 
-3. **Head-to-Head — 4 live rounds** with a **prewritten human answer** shown next to a **live AI answer** generated from the model configured in the user's API Config:
-   - `scenarios` — requirement → prioritised test scenarios
-   - `ambiguities` — user story → hidden assumptions + ambiguous terms
-   - `followups` — bug report → highest-signal follow-up questions
-   - `tests_from_code` — code snippet → test suite with oracle questions
-   Each round has a vote bar (🧑 / 🤖 / 🤝) that feeds the scoreboard.
+3. **Head-to-Head — 10 live rounds** with a **prewritten human answer** shown next to a **live AI answer** generated from the model configured in the user's API Config.
+   - **Step 0 · Problem Router** (top of the section): a free-text panel where the tester describes a real problem; the AI picks the best-fitting round, explains why, and suggests up to 2 alternatives. Two actions per recommendation:
+     - **Use this problem in Round N** → pre-populates the demo's input and smooth-scrolls to it
+     - **Just jump to round** → navigation only
+     Router prompt v2 uses a 10-rule **decision rubric** + 4 **few-shot examples** at `temperature=0.1`; behaviour is deterministic enough that a user story like *"Som bruker ønsker jeg å logge inn med Google…"* reliably routes to `scenarios` (not `ambiguities`).
+   - **Quick-nav chip bar**: one chip per round (`Jump to Round N`) so the presenter can hop between demos on a projector without scrolling.
+   - **Editable human panel**: each round's prewritten answer is editable in place (Edit / Save / Clear / Restore prewritten). The edit state is dirty-tracked, so switching the UI language mid-session does not overwrite a group's work on a card they've already customised.
+   - **Vote bar** (🧑 / 🤖 / 🤝) feeds the scoreboard.
+   - **AI Judge (advisory)** — separated from the human vote buttons by a divider, a purple **🧠 Ask AI to judge** button calls `POST /api/agi/homo-vs-ai/judge` and renders:
+     - Verdict label (🧑 / 🤖 / 🤝) with a colour-coded confidence pill (low / medium / high)
+     - Plain-prose rationale
+     - Per-criterion breakdown: Accuracy / Coverage / Practical value
+     - Explicit **self-preference-bias disclaimer** — the judge prompt warns the LLM about its own tendency to reward longer / more structured / bullet-heavier outputs, and the UI surfaces the caveat to the audience
+     The verdict is **advisory only** — the scoreboard still only counts the human's `+1` vote. When the human votes, the judge's verdict at that moment is attached as a snapshot (`aiJudge` field) and rendered as a badge in the scoreboard round log (see §5).
 
 4. **Trust Framework** — a 7-dimension decision grid: context, risk, ambiguity, novelty, volume, judgement, accountability. Each row: "AI excels when… / Humans excel when… / Practical rule".
 
-5. **Workshop Scoreboard** — configurable group names, live counter, round-by-round log with notes, undo, reset, JSON export. Session-only by design — the workshop artefact is the exported JSON.
+5. **Workshop Scoreboard** — configurable group names, live counter, round-by-round log with notes, undo, reset, JSON export.
+   - Each row in the log now also carries a **judge badge**: `—` (no judge called), **green `🤖 agreed`**, or **amber `🤖 said X`** (hover for the self-preference-bias tooltip). Teaches the room, visually, how often the AI disagrees with human consensus — and why that disagreement is not authoritative.
+   - JSON export shape: `{ groups[], rounds[{ id, group, side, task, note, humanVote, aiJudge, at }], exportedAt }`. Safe to share with SOCO as a workshop artefact.
+   - Session-only by design.
 
 6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 curated quotes (Bach, Kaner, Hendrycks, Amodei) each with a "use when" hint, 5 likely audience questions with prepared answers, and a closer.
 
+7. **Future Improvements** footnote — muted, dashed-border parking lot at the very bottom. Currently holds one parked idea: *"Per-round feedback loop with AI self-improvement"*, with three considered design variants (log only · ephemeral injection · persistent evolution) and a clear "Why deferred" paragraph. Designed as a footnote (not a section) so it never steals screen attention during the live workshop.
+
 ### Backend — Homo vs. KI
-- `POST /api/agi/homo-vs-ai/challenge { task, input, language? }` — dispatches to one of `{scenarios, ambiguities, followups, tests_from_code}` with testing-literate prompts (ISTQB + context-driven vocabulary)
-- `GET /api/agi/homo-vs-ai/tasks` — discovery
-- Forwards `x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*` headers to `ask_ai_unified` so the UI's model choice is respected
+- `POST /api/agi/homo-vs-ai/challenge { task, input, language? }` — dispatches to one of **11** task specs (10 active + legacy `tests_from_code`): `scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility`. Testing-literate prompts (ISTQB + context-driven school; James Bach, Cem Kaner, Lisa Crispin, Elisabeth Hendrickson, Gojko Adzic, Nielsen Heuristics explicitly referenced in system prompts).
+- `POST /api/agi/homo-vs-ai/route { problem, language? }` — Problem Router v2: free text → `{ recommended, rationale, runner_ups[], raw? }`. System prompt enforces a decision rubric + few-shot examples; `temperature=0.1`.
+- `POST /api/agi/homo-vs-ai/judge { task, human_answer, ai_answer, user_input?, language? }` — AI Judge: returns `{ verdict: human|ai|tie, confidence: low|medium|high, rationale, criteria: { accuracy, coverage, practical_value }, raw? }`. System prompt includes a per-task `JUDGE_CRITERIA` rubric, self-preference-bias warning, and strict-JSON requirement with graceful tie-fallback. `temperature=0.1`.
+- `GET /api/agi/homo-vs-ai/tasks` — discovery.
+- Forwards `x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*` headers to `ask_ai_unified` so the UI's model choice is respected on every endpoint.
 - Service: `backend/services/homo_vs_ai_service.py`, router: `backend/routers/homo_vs_ai.py`
 
 ### Frontend — Homo vs. KI
-- Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`
-- API helper: `runTestingChallenge` in `frontend/src/api/agiApi.js`
+- Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (components: `ProblemRouterPanel`, `QuickNavBar`, `DemoCard`, `JudgeAdvisoryPanel`, `VoteButton`, `AiJudgeBadge`, `WorkshopScoreboard`, `TrustFramework`, `SpeakerCribSheet`, `FutureImprovementsNote`)
+- API helpers in `frontend/src/api/agiApi.js`: `runTestingChallenge`, `routeTestingProblem`, `judgeTestingRound`
 - Tab wiring: fourth tab in `frontend/src/pages/help/AgiProgressPage.jsx` (icon 🧑‍💻)
+- **Sidebar wiring**: `frontend/src/Sidebar.jsx` — top-level `agi-progress` item in the `developer` group, immediately below **Run Test** (icon `bar-chart`, 📊). Not a child of Help.
 - Inline `MarkdownLite` renderer (~30 lines) — no new dependency
-- i18n: top-level `homoVsAi.*` block in `locales/{en,no}/common.json`, plus `help.agiTabs.homoVsAi`
+- i18n: top-level `homoVsAi.*` block in `locales/{en,no}/common.json` including `demos.*`, `demos.judge.*`, `router.*`, `scoreboard.aiJudge*`, and `future.*`. Plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`.
 
 #### How to run this in a live workshop (SOCO-ready checklist)
 
@@ -621,15 +639,16 @@ The tab is designed for a single scroll on a projector, no nested navigation whi
 4. Zoom the browser to ~110–125% — the cards read well at the back of the room.
 5. (Optional) Open the **Speaker Crib Sheet** once, then collapse it — it will stay available without being visible to the audience.
 
-**Suggested 45-minute run order:**
+**Suggested 45-minute run order** (updated for 1.7.0 — 10 rounds, Problem Router, AI Judge):
 | Time | Block | What happens |
 | --- | --- | --- |
 | 00:00 – 03:00 | Opener | Read the hero framing. Use the opener quote from the Crib Sheet. |
-| 03:00 – 08:00 | Activity Matrix | Walk through 3–4 activities. Ask the room: "agree with the verdict?" |
-| 08:00 – 28:00 | 4× Head-to-Head demos | For each: read the sample, **let a group draft their answer on paper (2 min)**, then click **Run AI**, compare side-by-side, vote → Scoreboard auto-updates. |
-| 28:00 – 35:00 | Trust Framework | Anchor the decision grid. Invite short debate on the hybrid cases. |
-| 35:00 – 42:00 | Reflection | Use the reflection questions from the hero. Show final Scoreboard. |
-| 42:00 – 45:00 | Closer | Use the closer line from the Crib Sheet. Export Scoreboard as JSON (the **Export** button saves a timestamped `scoreboard-*.json`). |
+| 03:00 – 07:00 | Activity Matrix | Walk through 3–4 activities. Ask the room: "agree with the verdict?" |
+| 07:00 – 10:00 | **Step 0 · Problem Router** | Ask the audience for a real problem from their work (or paste the pre-agreed user story). Run the router live — show the recommendation + the two runner-ups + the rationale. Click **Use this problem in Round N** to jump straight into a demo with the input pre-populated. Teaches the room how routing works before they see the rounds in isolation. |
+| 10:00 – 28:00 | 4–5× Head-to-Head demos (of the 10 available) | For each: read the sample, **let a group draft their answer on paper (2 min)**, optionally **edit the prewritten panel with the group's answer** before running, then click **Run AI**, compare side-by-side. Recommended per round: (a) humans vote first (🧑 / 🤖 / 🤝), (b) **then** click **🧠 Ask AI to judge** — announce the verdict and discuss whether the room agrees or not (self-preference bias is a great talking point when the AI votes for itself). Use the quick-nav chip bar to hop between rounds; you won't run all ten live. |
+| 28:00 – 34:00 | Trust Framework | Anchor the decision grid. Invite short debate on the hybrid cases. |
+| 34:00 – 41:00 | Reflection | Use the reflection questions from the hero. Show the final Scoreboard with the 🤖 badges visible — invite the room to notice how often the AI "agreed" vs "disagreed". |
+| 41:00 – 45:00 | Closer | Use the closer line from the Crib Sheet. Export Scoreboard as JSON (the **Export** button saves a timestamped `scoreboard-*.json` including `task`, `humanVote` and `aiJudge` per round). |
 
 **If the AI connection fails mid-demo:**
 - The UI surfaces the error inline (red banner on the demo card) — do not panic.

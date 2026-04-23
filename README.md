@@ -85,20 +85,32 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 
 Fourth tab in the AGI Progress Hub, purpose-built as a **workshop companion for SOCO** (Norwegian software-testing consultancy). Targeted at the "Homo Sapiens vs. KI" session with Ola Kleiven and Keyhan Farahaninia.
 
-Six sections on a single scroll:
+> **Sidebar change (1.7.0):** **AGI Progress** was promoted from the Help submenu to a top-level sidebar entry (immediately below **Run Test**, icon 📊) because the module outgrew the "system help" shelf — 4 tabs, AI enrichment, and a full workshop module.
+
+Sections on a single scroll:
 1. **Workshop hero** — the three SOCO reflection questions as anchors, hosts callout.
 2. **Activity Matrix** — 10 canonical testing activities × 3 verdicts (🧑 Human / 🤖 AI / 🤝 Hybrid), each with rationale and confidence level.
-3. **Head-to-head live rounds** — 4 interactive demos (`scenarios`, `ambiguities`, `followups`, `tests_from_code`) that hit `POST /api/agi/homo-vs-ai/challenge` and stream results live next to a prewritten "human tester" answer. One-click sample inputs ready to present.
+3. **Head-to-head — 10 live rounds** (1:1 with the Activity Matrix) that hit `POST /api/agi/homo-vs-ai/challenge` and stream live AI answers next to a prewritten "human tester" panel. The ten rounds: `scenarios`, `risk`, `ambiguities`, `exploratory`, `followups`, `automation`, `testData`, `oracle`, `triage`, `accessibility`. A quick-nav chip bar lets the presenter hop to any round on the projector without scrolling.
+   - **Step 0 · Problem Router** — a free-text panel at the top where the tester describes a real problem; the AI picks the best-fitting round, explains why, suggests up to 2 alternatives, and can pre-populate the selected demo's input in one click. Router prompt v2 uses a 10-rule decision rubric + 4 few-shot examples at `temperature=0.1` so routing is deterministic (e.g. "Som bruker ønsker jeg å logge inn med Google…" reliably lands on `scenarios`, not `ambiguities`).
+   - **Editable human panel** — each round's prewritten answer is editable in place (Edit / Save / Clear / Restore prewritten). Participants can type their own answer before hitting Run AI. Language switches no longer overwrite an edited panel (dirty-tracked).
+   - **AI Judge (advisory)** — next to the three human `+1` vote buttons, a separated **🧠 Ask AI to judge** button calls `POST /api/agi/homo-vs-ai/judge` and renders a verdict panel: verdict (🧑/🤖/🤝), confidence, per-criterion breakdown (accuracy / coverage / practical value), rationale, and a **self-preference-bias disclaimer**. The verdict is advisory only — the scoreboard only counts your vote. When the human casts a vote, the judge's verdict at that moment is attached as a snapshot and shown in the Scoreboard round log as a badge: `—` (no judge), **green `🤖 agreed`**, or **amber `🤖 said X`**.
 4. **Trust framework** — 7-row decision grid ("AI excels when… / Humans excel when… / Practical rule") by dimension: context, risk, ambiguity, novelty, volume, judgement, accountability.
-5. **Workshop Scoreboard** — configurable groups, round log with notes, undo, reset, JSON export. Votes from the head-to-head demos feed in automatically.
+5. **Workshop Scoreboard** — configurable groups, round log with notes, undo, reset, JSON export. Votes from the head-to-head demos feed in automatically and now also include `task` + `aiJudge` per round, so the exported JSON is an auditable record of how often the room and the AI agreed.
 6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 real quotes (Bach, Kaner, Hendrycks, Amodei) with "use when" hints, 5 likely audience questions + prepared answers, and a closer.
+7. **Future improvements** footnote — muted parking lot at the very bottom with one parked idea (per-round feedback loop with AI self-improvement, three design variants, rationale for deferral). Deliberately footnote-styled so it never competes with the live demo.
 
-Fully bilingual EN / NO with **native-quality Norwegian** written in the register a Norwegian tester actually uses (industry terms kept in English: exploratory, oracle, boundary, edge case, risk-based, bug).
+Fully bilingual EN / NO with **native-quality Norwegian** written in the register a Norwegian tester actually uses (industry terms kept in English: exploratory, oracle, boundary, edge case, risk-based, bug, self-preference bias).
 
-Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` → `POST /api/agi/homo-vs-ai/challenge` + `GET /api/agi/homo-vs-ai/tasks`
+Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py`
+- `POST /api/agi/homo-vs-ai/challenge` — run one of 10 testing rounds
+- `POST /api/agi/homo-vs-ai/route` — Problem Router (free text → best round)
+- `POST /api/agi/homo-vs-ai/judge` — AI Judge (human + AI answers → advisory verdict)
+- `GET  /api/agi/homo-vs-ai/tasks` — discovery
+
 Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`
 Tab wiring: `frontend/src/pages/help/AgiProgressPage.jsx`
-i18n: top-level `homoVsAi.*` block in EN/NO, plus `help.agiTabs.homoVsAi`
+Sidebar wiring: `frontend/src/Sidebar.jsx` (top-level `agi-progress` entry, group `developer`, icon `bar-chart`)
+i18n: top-level `homoVsAi.*` block in EN/NO (router, judge, future sub-blocks), plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`
 
 > **Running this at SOCO?** A full presenter checklist (pre-flight, 45-minute run order, what to do if the AI connection drops, post-workshop export) lives in [`docs/README_FULL.md` → Tab 4 → *How to run this in a live workshop*](docs/README_FULL.md#tab-4--homo-sapiens-vs-ki-i-test-soco-workshop-companion).
 

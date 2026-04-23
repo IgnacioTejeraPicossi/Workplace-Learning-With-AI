@@ -2975,6 +2975,32 @@
           "a": "To ting. Først: behandle hvert KI-svar som et utkast du må argumentere med — ikke akseptere. For det andre: doble innsatsen på de menneskelige ferdighetene — domenedybde, interessent-tillit, exploratory charters. Det er ferdighetene modellen ikke kan klone, og de som gir raskest avkastning tidlig i karrieren."
         }
       ]
+    },
+    "future": {
+      "kicker": "Framtidige forbedringer",
+      "lead": "Ideer som er bevisst parkert, ikke implementert — dokumentert her slik at neste iterasjon starter med kontekst, ikke et blankt ark.",
+      "tradeoffPrefix": "Hvorfor utsatt",
+      "ideas": [
+        {
+          "title": "Tilbakemeldingssløyfe per runde med selvforbedrende KI",
+          "summary": "Et tekstfelt under «Hvem vant denne runden?» der mennesket skriver forbedringsforslag til KI-en. Tre design-varianter ble vurdert, med forskjellig risikoprofil:",
+          "options": [
+            {
+              "label": "A · Kun logg",
+              "text": "Lagre tilbakemeldinger som {task, tekst, tidsstempel}. Ingen prompt-endring. Eksporteres sammen med rundeloggen for manuell gjennomgang etter workshopen. Lavest risiko, lavest live-demo-verdi."
+            },
+            {
+              "label": "B · Efemer injeksjon (foretrukket)",
+              "text": "En «Kjør på nytt med tilbakemelding»-knapp sender KI-ens forrige svar + menneskets kritikk tilbake til modellen for et andreforsøk, kun i samme runde. Basis-prompten er urørt. Sterkeste live-demo-øyeblikk, null drift mellom runder."
+            },
+            {
+              "label": "C · Vedvarende prompt-evolusjon",
+              "text": "Tilbakemeldingen driver et andre LLM-kall som foreslår en diff til oppgavens system-prompt. Et menneske godkjenner; prompten versjoneres i MongoDB med rollback. Påvirker alle framtidige runder."
+            }
+          ],
+          "tradeoff": "Alternativ C er den bokstavelige tolkningen av «KI forbedrer sin egen prompt», men uten et regresjonstest-rammeverk risikerer vi stille drift (en forbedring for én oppgave degraderer en annen som deler vokabular), og prompt-endringer midt i workshopen undergraver det sammenlignende oppsettet. Trygg sti når dette plukkes opp: start med A for å samle signaler, gå til B for selve live-demoen, og gradér kun til C når en regresjonspakke finnes for alle 10 oppgaver."
+        }
+      ]
     }
   }
 }

@@ -7,6 +7,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2026-04-14
+
+### Added / Changed — Homo Sapiens vs. KI i Test (post-1.6.0 iteration pack)
+
+Accumulated improvements to the SOCO workshop tab since the initial 1.6.0 release. The tab evolved from a 4-round proof of concept into a polished 10-round workshop module with an AI-driven problem router, an advisory AI judge, and a footnote of parked future ideas.
+
+**Head-to-head demos — expanded from 4 to 10 rounds (1:1 with the Activity Matrix):**
+- `backend/services/homo_vs_ai_service.py` — `TASK_SPECS` grew from 4 to 10 active tasks plus `tests_from_code` kept as a legacy entry (omitted from the live grid):
+  - Existing: `scenarios`, `ambiguities`, `followups`
+  - New: `risk`, `exploratory`, `automation`, `testData`, `oracle`, `triage`, `accessibility`
+  - Each new prompt is testing-literate (Rex Black / James Bach / Kaner / Hendrickson / Adzic / Nielsen references baked into the system prompt)
+- `backend/routers/homo_vs_ai.py` — `TaskLiteral` updated to enumerate all 11 tasks (fixes a latent Pydantic 422 that would have fired for the new rounds)
+- `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` — `DEMO_TASKS` array grew to 10 in the same 1:1 order as the Activity Matrix rows
+- Quick-navigation chip bar ("Jump to Round N") added above the demo grid — each chip scrolls smoothly to the targeted demo card so the presenter can hop between rounds without scrolling manually
+
+**Editable human panel (per-round):**
+- Each demo card's "Human tester (prewritten)" panel is now editable in place via a ✏️ Edit button: participants can replace, clear, or restore the prewritten answer before comparing against the AI
+- Edits are dirty-tracked: if the user edits, language switches mid-session no longer overwrite the group's work; an un-edited panel still mirrors the active locale
+- Buttons: Edit / Save / Clear / Restore prewritten — all i18n-driven
+
+**Problem Router ("Step 0") — free-form problem → AI picks the best round:**
+- New panel at the top of Section 03, styled as "Step 0 · Problem Router"
+- Backend endpoint `POST /api/agi/homo-vs-ai/route { problem, language? }` returns `{ recommended, rationale, runner_ups[], raw? }`
+- Frontend UX: textarea → "Find best round" button → recommended round card with rationale + up to 2 alternatives. Each recommendation has "Use this problem in Round N" (pre-populates the demo's input textarea and scrolls to it) and "Just jump to round" (navigation only)
+- **Router prompt v2 refinements** (same day, after a false-positive routing on a Norwegian user story):
+  - Rewrote task catalog with explicit "PICK THIS when…" / "DO NOT pick this when…" rules to reduce overlap between adjacent tasks (notably `scenarios` vs `ambiguities`, `oracle` vs `ambiguities`, `triage` vs `followups`)
+  - Added an ordered **decision rubric** (10 rules, stop-at-first-match) so the LLM has a consistent tiebreaker when multiple tasks could apply
+  - Added 4 **few-shot examples** covering the most common mis-routing failure modes (user story → scenarios; release scope → risk; vague bug → followups; vague terms → ambiguities)
+  - Named common **anti-patterns** explicitly: a user story starting with "As a user" / "Som bruker" is NOT automatically `ambiguities` — most route to `scenarios`
+  - Temperature lowered from 0.2 to 0.1 (routing is classification, not creativity); `max_tokens` trimmed to 450
+- API helper: `routeTestingProblem({ problem, language })` in `frontend/src/api/agiApi.js`
+
+**AI Judge (advisory) — head-to-head verdict:**
+- New backend endpoint `POST /api/agi/homo-vs-ai/judge { task, human_answer, ai_answer, user_input?, language? }` returns `{ verdict: human|ai|tie, confidence: low|medium|high, rationale, criteria: { accuracy, coverage, practical_value }, raw? }`
+- Service function `judge_round` with dedicated system prompt that:
+  - Explicitly warns the LLM about **self-preference bias** (LLMs tend to favour longer / more structured / bullet-heavy outputs when judging other LLMs' work — cites Anthropic / Berkeley / Stanford 2023-2024 research in the prompt itself)
+  - Supplies a per-task quality **rubric** (`JUDGE_CRITERIA` dict, one concise paragraph per task) grounded in the existing `TASK_SPECS`
+  - Includes the original input alongside both answers so the judge can verify each answer actually addresses the prompt (prevents "beautifully written answer to the wrong question" from winning)
+  - Temperature 0.1, strict JSON output with graceful fallback (tie + low confidence + raw payload for debugging)
+- Frontend UX:
+  - New purple **"🧠 Ask AI to judge"** button sits in the vote bar next to the three `+1` human vote buttons, separated by a subtle divider. Disabled until both the human answer and the AI output are non-empty
+  - `JudgeAdvisoryPanel` renders below the vote bar when a verdict arrives: verdict label (🧑 / 🤖 / 🤝), colour-coded confidence pill, full rationale, three-cell criteria breakdown (Accuracy / Coverage / Practical value), and a **self-preference bias disclaimer** ("this verdict is advisory — the scoreboard only counts your vote")
+  - Running the AI again, or resetting to sample, clears the stale judge result
+- **Design: advisory-only by explicit choice (option A in the design discussion):**
+  - The AI judge NEVER writes to the scoreboard directly — the human presenter still casts the canonical `+1` vote
+  - When the human votes, the judge's verdict at that moment is attached as a snapshot (`aiJudge` field) and rendered as a **badge in the Scoreboard round log**:
+    - empty → `—` discreet dash
+    - judge agreed with human → **green `🤖 agreed`**
+    - judge disagreed → **amber `🤖 said X`** with tooltip noting possible self-preference bias
+  - JSON export now carries `task`, `humanVote`, `aiJudge` per round — auditable retrospective of how often the AI and the room agreed
+- **Why this design**: turns the known self-preference bias into a didactic moment instead of silently poisoning the scoreboard — aligns with the workshop's critical-thinking framing
+- API helper: `judgeTestingRound({ task, humanAnswer, aiAnswer, userInput, language })` in `frontend/src/api/agiApi.js`
+
+**AGI Progress Hub promoted from Help submenu to top-level sidebar entry:**
+- `frontend/src/Sidebar.jsx` — `agi-progress` removed from the Help submenu and added as a standalone entry in the `developer` group, immediately below **Run Test** and above **API Config**
+- Icon upgraded from the (missing) `chart` key to `bar-chart` (📊) — the former fell back to 📄 because it wasn't in the icon map
+- Rationale: 4 tabs + AI enrichment + full SOCO workshop module no longer fit the "system help" shelf
+- No routing changes in `App.jsx`: the switch on `section === "agi-progress"` still resolves to `AgiProgressPage`
+- i18n (`sidebar.agiProgress`) was already a flat key — no translation changes needed
+
+**Future improvements parking lot:**
+- New `FutureImprovementsNote` component rendered as a footnote at the bottom of the workshop tab, beneath the Speaker Crib Sheet. Deliberately styled as a muted footnote (dashed border, 11-12 px italic) — NOT a new section — to avoid UI noise during the live workshop
+- Ships with one parked idea: **"Per-round feedback loop with AI self-improvement"**, documenting three possible design variants (A: feedback log only · B: ephemeral injection — the preferred live-demo flavour · C: persistent prompt evolution with rollback) and a clear "Why deferred" paragraph so the next maintainer has context instead of starting from zero
+- Bilingual EN/NO with native Norwegian in `homoVsAi.future.*`
+
+**i18n additions (EN + NO):**
+- `homoVsAi.demos.*` new sub-block `judge.*` (17 keys: kicker, button, running, disabledHint, errorPrefix, verdict*, confidence*, criteria*, biasDisclaimer, rawToggle)
+- `homoVsAi.scoreboard.aiJudge*` (5 keys: None, Agree, Disagree, AgreeTitle, DisagreeTitle)
+- `homoVsAi.router.*` — new block for Problem Router (14 keys)
+- `homoVsAi.future.*` — new block for the parking lot (kicker, lead, tradeoffPrefix, ideas[])
+- Norwegian written natively (bokmål), keeping testing/AI jargon close to the English form where that is how Norwegian testers speak (ISTQB, oracle, exploratory, self-preference bias, boundary, WCAG)
+
+**Developer notes:**
+- No new frontend dependencies; MarkdownLite, the judge panel, the badges and the footnote are all inline
+- Backend `JUDGE_CRITERIA` mirrors `TASK_SPECS` — if either drifts the judge becomes noisy; the comment in the service flags this explicitly
+- Problem Router v2 rubric + few-shot is deterministic enough at `temperature=0.1` that "Som bruker ønsker jeg å logge inn med Google…" now reliably routes to `scenarios` (was routing to `ambiguities` before the rewrite)
+
+---
+
 ## [1.6.0] - 2026-04-14
 
 ### Added — AGI Hub "Homo Sapiens vs. KI i Test" tab (SOCO workshop companion)

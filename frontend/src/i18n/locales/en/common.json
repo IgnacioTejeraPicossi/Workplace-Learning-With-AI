@@ -2071,6 +2071,32 @@
           "a": "Two things. First, treat every AI answer as a draft you have to argue with — not accept. Second, double down on the human-only skills: domain depth, stakeholder trust, exploratory charters. Those are the skills the model cannot clone, and they compound fastest early in a career."
         }
       ]
+    },
+    "future": {
+      "kicker": "Future improvements",
+      "lead": "Ideas deliberately parked, not implemented — documented here so the next iteration starts with context, not a blank page.",
+      "tradeoffPrefix": "Why deferred",
+      "ideas": [
+        {
+          "title": "Per-round feedback loop with AI self-improvement",
+          "summary": "A textarea under 'Who won this round?' where the human writes improvement advice for the AI. Three design flavours were considered, with different risk profiles:",
+          "options": [
+            {
+              "label": "A · Log only",
+              "text": "Store feedback as {task, text, timestamp} entries. No prompt change. Exported with the round log for manual review after the workshop. Lowest risk, lowest live-demo value."
+            },
+            {
+              "label": "B · Ephemeral injection (preferred)",
+              "text": "A 'Re-run with feedback' button sends the previous AI answer + the human's critique back to the model for a second attempt, same round only. The base prompt is untouched. Biggest live-demo moment, zero drift between rounds."
+            },
+            {
+              "label": "C · Persistent prompt evolution",
+              "text": "Feedback drives a second LLM call that proposes a diff to the task's system prompt. A human approves; the prompt is versioned in MongoDB with rollback. Affects all future rounds."
+            }
+          ],
+          "tradeoff": "Option C is the literal interpretation of 'the AI improves its own prompt', but without a regression test harness it risks silent drift (an improvement for one task degrades another that shares vocabulary), and mid-workshop prompt changes undermine the comparative setup. Safe path when picking this up: start with A to collect signal, move to B for the live-demo slot, and only graduate to C once a regression suite exists for all 10 tasks."
+        }
+      ]
     }
   }
 }
