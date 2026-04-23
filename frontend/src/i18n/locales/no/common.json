@@ -2722,6 +2722,22 @@
         "confidence": "middels"
       }
     },
+    "router": {
+      "kicker": "Steg 0 · Problem-ruter",
+      "title": "Beskriv problemet ditt — KI velger beste runde",
+      "lead": "Usikker på hvilken runde som passer? Lim inn problemet du jobber med. KI anbefaler én av de 10 rundene, forklarer hvorfor, og foreslår to alternativer.",
+      "inputLabel": "Beskrivelse av problemet",
+      "placeholder": "f.eks. «Vi skal lansere en passord-tilbakestilling om 3 dager og jeg vet ikke hvor jeg skal begynne å teste.»",
+      "runLabel": "Finn beste runde",
+      "running": "KI ruter…",
+      "clearLabel": "Tøm",
+      "recommendedKicker": "KI anbefaler",
+      "useInRound": "Bruk dette problemet i runde",
+      "jumpOnly": "Bare hopp til runden",
+      "alternatives": "Alternative runder",
+      "useShort": "Bruk her",
+      "rawToggle": "Vis rå KI-output (debug)"
+    },
     "demos": {
       "title": "Direkte duell: 10 live-runder",
       "lead": "Ti runder, én per rad i aktivitetsmatrisen. Velg en runde, les det forhåndsskrevne menneske-svaret høyt, og trykk Kjør KI — modellen svarer live via den LLM-en som er valgt i API Config. Stem på slutten av hver runde; det mates direkte inn i poengtavlen.",

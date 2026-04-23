@@ -27,7 +27,9 @@ Design notes:
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+import json
+import re
+from typing import Any, Dict, List, Optional
 
 
 TASK_SPECS: Dict[str, Dict[str, str]] = {
@@ -275,4 +277,176 @@ async def run_challenge(
         "task": task,
         "label": spec["label"],
         "output": (output or "").strip() or "(no response from AI)",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Problem Router — pick the best of the 10 live rounds for a free-form problem
+# ---------------------------------------------------------------------------
+
+# Tasks exposed to the Problem Router. `tests_from_code` is intentionally
+# omitted — it is retained for backward compatibility but not part of the
+# 10-row Activity Matrix that the router is aligned with.
+ROUTABLE_TASKS: List[str] = [
+    "scenarios",
+    "risk",
+    "ambiguities",
+    "exploratory",
+    "followups",
+    "automation",
+    "testData",
+    "oracle",
+    "triage",
+    "accessibility",
+]
+
+
+_ROUTER_TASK_CARD = {
+    "scenarios": "Generate test scenarios from a requirement — happy path + boundaries + exploratory charters.",
+    "risk": "Risk-based prioritisation of a release scope — decide what to test first given business/political context.",
+    "ambiguities": "Hunt ambiguities/assumptions in a user story — words like 'fast', 'secure', 'user', 'done'.",
+    "exploratory": "Design exploratory test charters in the Bach/Hendrickson format for a product area.",
+    "followups": "Generate high-signal follow-up questions for a vague bug report.",
+    "automation": "Turn acceptance criteria into a Playwright/Cypress automation skeleton.",
+    "testData": "Produce a compact, varied test dataset (boundaries, locale edges, sensitive-data flags).",
+    "oracle": "Resolve the oracle problem when a spec is silent, ambiguous or self-contradictory.",
+    "triage": "Assign severity/priority to a bug and split AI-classifiable facts from human-judgement factors.",
+    "accessibility": "Review a UI for WCAG 2.1 AA + Nielsen heuristics; split mechanical checks from human-only judgement.",
+}
+
+
+def _extract_json(text: str) -> Optional[Dict[str, Any]]:
+    """Best-effort JSON extraction from LLM output.
+
+    Handles fenced code blocks, leading/trailing prose and mild malformations.
+    Returns None if nothing parseable is found.
+    """
+    if not text:
+        return None
+    # 1) try as-is
+    try:
+        return json.loads(text.strip())
+    except Exception:
+        pass
+    # 2) strip ```json fences
+    fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.DOTALL | re.IGNORECASE)
+    if fenced:
+        try:
+            return json.loads(fenced.group(1))
+        except Exception:
+            pass
+    # 3) grab the widest {...} block
+    widest = re.search(r"\{.*\}", text, flags=re.DOTALL)
+    if widest:
+        try:
+            return json.loads(widest.group(0))
+        except Exception:
+            return None
+    return None
+
+
+def _router_system_prompt(language: Optional[str]) -> str:
+    catalog = "\n".join(f"  - {k}: {v}" for k, v in _ROUTER_TASK_CARD.items())
+    base = (
+        "You are a senior test lead helping a tester decide which of ten "
+        "specialised testing challenges best fits the problem they are facing. "
+        "You MUST respond with STRICT JSON (no prose, no markdown fence) matching "
+        "this schema:\n"
+        "{\n"
+        "  \"recommended\": \"<one of the task keys below>\",\n"
+        "  \"rationale\": \"<1-3 sentences explaining why this round fits\">,\n"
+        "  \"runner_ups\": [\n"
+        "    { \"task\": \"<another task key>\", \"why\": \"<one short line>\" },\n"
+        "    { \"task\": \"<another task key>\", \"why\": \"<one short line>\" }\n"
+        "  ]\n"
+        "}\n\n"
+        "Catalog of tasks (keys and purpose):\n"
+        f"{catalog}\n\n"
+        "Rules:\n"
+        "  - `recommended` MUST be exactly one of the keys above. Do not invent new keys.\n"
+        "  - `runner_ups` MUST be 1-2 entries, DIFFERENT from `recommended`.\n"
+        "  - Be decisive — pick the single best fit even if several could apply.\n"
+        "  - The `rationale` should cite the concrete aspect of the problem that made you choose."
+    )
+    if language and language.lower().startswith("no"):
+        base += (
+            "\n  - Write `rationale` and each runner-up `why` in Norwegian (bokmål). "
+            "Keep testing terminology (ISTQB, oracle, exploratory, boundary, WCAG) "
+            "close to its English form — that's how Norwegian testers speak."
+        )
+    elif language and language.lower().startswith("en"):
+        base += "\n  - Write `rationale` and each runner-up `why` in English."
+    else:
+        base += "\n  - Write `rationale` in the same language as the problem description."
+    return base
+
+
+async def route_problem(
+    problem: str,
+    language: Optional[str] = None,
+    request_headers: Optional[Dict] = None,
+) -> Dict[str, Any]:
+    """Given a free-form problem description, ask the LLM to pick the best
+    of the 10 active challenges and explain why.
+
+    Returns a dict matching RouteResponse in the router. On JSON parse failure
+    or invalid recommended key, falls back to `scenarios` with the raw LLM
+    text attached under `raw` so the frontend can surface it for debugging.
+    """
+    from backend.llm import ask_ai_unified
+
+    system_prompt = _router_system_prompt(language)
+    user_prompt = "Problem to route:\n\n" + (problem or "").strip()
+
+    output = await ask_ai_unified(
+        prompt=user_prompt,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        max_tokens=500,
+        temperature=0.2,
+        request_headers=request_headers,
+    )
+
+    parsed = _extract_json(output or "")
+
+    # Validate strictly; fall back gracefully otherwise.
+    if not parsed or not isinstance(parsed, dict):
+        return {
+            "recommended": "scenarios",
+            "rationale": "(fallback) The AI did not return valid JSON. Using 'scenarios' as a safe default.",
+            "runner_ups": [],
+            "raw": (output or "").strip() or None,
+        }
+
+    recommended = str(parsed.get("recommended", "")).strip()
+    if recommended not in ROUTABLE_TASKS:
+        return {
+            "recommended": "scenarios",
+            "rationale": "(fallback) The AI returned an unknown task key. Using 'scenarios' as a safe default.",
+            "runner_ups": [],
+            "raw": (output or "").strip() or None,
+        }
+
+    rationale = str(parsed.get("rationale", "")).strip() or "(no rationale provided)"
+
+    runner_ups_raw = parsed.get("runner_ups") or []
+    runner_ups: List[Dict[str, str]] = []
+    seen = {recommended}
+    if isinstance(runner_ups_raw, list):
+        for item in runner_ups_raw[:2]:
+            if not isinstance(item, dict):
+                continue
+            task_key = str(item.get("task", "")).strip()
+            why = str(item.get("why", "")).strip()
+            if task_key in ROUTABLE_TASKS and task_key not in seen and why:
+                runner_ups.append({"task": task_key, "why": why})
+                seen.add(task_key)
+
+    return {
+        "recommended": recommended,
+        "rationale": rationale,
+        "runner_ups": runner_ups,
+        "raw": None,
     }

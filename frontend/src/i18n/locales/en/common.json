@@ -1818,6 +1818,22 @@
         "confidence": "medium"
       }
     },
+    "router": {
+      "kicker": "Step 0 · Problem Router",
+      "title": "Describe your problem — AI picks the best round",
+      "lead": "Not sure which round fits? Paste the problem you are working on. The AI will recommend one of the 10 rounds, explain why, and offer two alternatives.",
+      "inputLabel": "Problem description",
+      "placeholder": "e.g. 'We're shipping a password-reset feature in 3 days and I don't know where to start testing.'",
+      "runLabel": "Find best round",
+      "running": "AI routing…",
+      "clearLabel": "Clear",
+      "recommendedKicker": "AI recommends",
+      "useInRound": "Use this problem in Round",
+      "jumpOnly": "Just jump to round",
+      "alternatives": "Alternative rounds",
+      "useShort": "Use here",
+      "rawToggle": "Show raw AI output (debug)"
+    },
     "demos": {
       "title": "Head-to-Head: 10 Live Rounds",
       "lead": "Ten rounds, one per Activity Matrix row. Pick a round, read the prewritten human answer out loud, then press Run AI — the model responds live, using the LLM selected in your API Config. Vote at the end of each round; it feeds the scoreboard.",

@@ -4,8 +4,13 @@
  * 6 sections (top to bottom):
  *   1. WorkshopHero        — framing, 3 reflection questions, SOCO/Ola/Keyhan nod
  *   2. ActivityMatrix      — 10 testing activities × 3 verdicts (human/AI/hybrid)
- *   3. HeadToHeadDemos     — 10 live demos using ask_ai_unified (side-by-side),
- *                             aligned 1:1 with the Activity Matrix rows
+ *   3. HeadToHeadDemos     — Problem Router (Step 0) + 10 live demos using
+ *                             ask_ai_unified (side-by-side), aligned 1:1 with
+ *                             the Activity Matrix rows. The Problem Router
+ *                             takes a free-form problem description and lets
+ *                             the LLM pick the best-fitting round, with the
+ *                             option to drop the problem directly into that
+ *                             round's input.
  *   4. TrustFramework      — "when to trust whom" decision rows
  *   5. WorkshopScoreboard  — configurable groups + round log + JSON export
  *   6. SpeakerCribSheet    — collapsible speaker notes, quotes, likely Q&A
@@ -16,7 +21,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { runTestingChallenge } from '../../../api/agiApi';
+import { routeTestingProblem, runTestingChallenge } from '../../../api/agiApi';
 
 // ---------------------------------------------------------------------------
 // Minimal markdown-lite renderer — handles **bold**, headings, bullets, code
@@ -278,7 +283,7 @@ const DEMO_TASKS = [
   { task: 'accessibility',  icon: '♿', color: '#0891b2' },
 ];
 
-function DemoCard({ task, icon, color, t, i18n, onVote }) {
+function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   const title = t(`homoVsAi.demos.${task}.title`, { defaultValue: task });
   const prompt = t(`homoVsAi.demos.${task}.prompt`, { defaultValue: '' });
   const sample = t(`homoVsAi.demos.${task}.sample`, { defaultValue: '' });
@@ -298,6 +303,20 @@ function DemoCard({ task, icon, color, t, i18n, onVote }) {
   useEffect(() => {
     if (!humanDirty) setHumanText(humanAnswer);
   }, [humanAnswer, humanDirty]);
+
+  // Problem Router hand-off: when the parent passes a non-empty
+  // `incomingInput` (a string timestamped/keyed by the router), overwrite the
+  // input so the tester can press Run AI immediately on the routed problem.
+  // We depend on the primitive value; every re-route produces a fresh string
+  // (problem text) that only triggers the effect when it actually changes.
+  useEffect(() => {
+    if (incomingInput && incomingInput.trim()) {
+      setInput(incomingInput);
+      setAiOutput('');
+      setErr(null);
+      setElapsed(null);
+    }
+  }, [incomingInput]);
 
   const run = async () => {
     setLoading(true); setErr(null); setAiOutput(''); setElapsed(null);
@@ -525,10 +544,21 @@ function VoteButton({ onClick, bg, border, color, icon, label }) {
 }
 
 function HeadToHeadDemos({ t, i18n, onVote }) {
+  // One slot per task. When the Problem Router picks a round, we drop the
+  // problem text into that task's slot; the corresponding DemoCard has a
+  // useEffect that mirrors it into its input textarea.
+  const [routedInputs, setRoutedInputs] = useState({});
+
   const scrollTo = (task) => {
     const el = document.getElementById(`demo-${task}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  const onRouteApply = (task, problem) => {
+    setRoutedInputs(prev => ({ ...prev, [task]: problem }));
+    setTimeout(() => scrollTo(task), 60);
+  };
+
   return (
     <div>
       <SectionHeader
@@ -539,6 +569,9 @@ function HeadToHeadDemos({ t, i18n, onVote }) {
             "Ten rounds, one per Activity Matrix row. Pick a round, read the prewritten human answer out loud, then press Run AI. Vote at the end of each round — it feeds the scoreboard.",
         })}
       />
+
+      {/* Step 0 — Problem Router: free-form problem → AI-picked round */}
+      <ProblemRouter t={t} i18n={i18n} onRouteApply={onRouteApply} scrollTo={scrollTo} />
 
       {/* Quick-nav chips — let the presenter jump to a round without scrolling */}
       <div style={{
@@ -565,9 +598,218 @@ function HeadToHeadDemos({ t, i18n, onVote }) {
 
       <div style={{ display: 'grid', gap: 14 }}>
         {DEMO_TASKS.map(d => (
-          <DemoCard key={d.task} {...d} t={t} i18n={i18n} onVote={onVote} />
+          <DemoCard
+            key={d.task}
+            {...d}
+            t={t}
+            i18n={i18n}
+            onVote={onVote}
+            incomingInput={routedInputs[d.task] || ''}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Problem Router — "Step 0": free-form problem description → AI picks best
+// of the 10 rounds and lets the tester drop the problem into that demo card.
+// ---------------------------------------------------------------------------
+
+function ProblemRouter({ t, i18n, onRouteApply, scrollTo }) {
+  const [problem, setProblem] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+  const [result, setResult] = useState(null); // { recommended, rationale, runner_ups, raw? }
+  const [elapsed, setElapsed] = useState(null);
+
+  const findTaskMeta = (taskKey) => DEMO_TASKS.find(d => d.task === taskKey) || null;
+
+  const run = async () => {
+    setLoading(true); setErr(null); setResult(null); setElapsed(null);
+    const t0 = performance.now();
+    try {
+      const res = await routeTestingProblem({
+        problem,
+        language: i18n?.language?.startsWith('no') ? 'no' : 'en',
+      });
+      setResult(res);
+    } catch (e) {
+      setErr(String(e.message || e));
+    } finally {
+      setElapsed(Math.round(performance.now() - t0));
+      setLoading(false);
+    }
+  };
+
+  const clear = () => {
+    setProblem(''); setResult(null); setErr(null); setElapsed(null);
+  };
+
+  const apply = (taskKey) => {
+    if (!problem.trim()) return;
+    onRouteApply(taskKey, problem.trim());
+  };
+
+  const recMeta = result ? findTaskMeta(result.recommended) : null;
+
+  return (
+    <div style={{
+      background: 'white', border: '1px solid #cbd5e1', borderRadius: 12,
+      borderTop: '4px solid #0ea5e9', padding: 16, marginBottom: 18,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#0ea5e9', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+            {t('homoVsAi.router.kicker', { defaultValue: 'Step 0 · Problem Router' })}
+          </div>
+          <h3 style={{ margin: '2px 0 0', fontSize: 17, fontWeight: 700, color: '#0f172a' }}>
+            🧭 {t('homoVsAi.router.title', { defaultValue: 'Describe your problem — AI picks the best round' })}
+          </h3>
+          <div style={{ color: '#64748b', fontSize: 12, marginTop: 4, maxWidth: 780 }}>
+            {t('homoVsAi.router.lead', {
+              defaultValue: 'Not sure which round fits? Paste the problem you are working on. The AI will recommend one of the 10 rounds, explain why, and offer two alternatives.',
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
+          {t('homoVsAi.router.inputLabel', { defaultValue: 'Problem description' })}
+        </label>
+        <textarea
+          value={problem}
+          onChange={e => setProblem(e.target.value)}
+          rows={4}
+          placeholder={t('homoVsAi.router.placeholder', {
+            defaultValue: 'e.g. "We\'re shipping a password-reset feature in 3 days and I don\'t know where to start testing."',
+          })}
+          style={{
+            width: '100%', marginTop: 4, padding: 10, fontFamily: 'inherit',
+            fontSize: 13, border: '1px solid #cbd5e1', borderRadius: 8, boxSizing: 'border-box',
+            resize: 'vertical', lineHeight: 1.5,
+          }}
+        />
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          <button onClick={run} disabled={loading || problem.trim().length < 10}
+            style={{
+              background: loading ? '#bae6fd' : '#0ea5e9', color: 'white', border: 'none',
+              padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+              cursor: loading ? 'wait' : 'pointer',
+            }}>
+            {loading
+              ? t('homoVsAi.router.running', { defaultValue: 'AI routing…' })
+              : `🧭 ${t('homoVsAi.router.runLabel', { defaultValue: 'Find best round' })}`}
+          </button>
+          <button onClick={clear} disabled={loading}
+            style={{
+              background: 'transparent', color: '#475569', border: '1px solid #cbd5e1',
+              padding: '8px 14px', borderRadius: 8, fontSize: 13, cursor: 'pointer',
+            }}>
+            {t('homoVsAi.router.clearLabel', { defaultValue: 'Clear' })}
+          </button>
+          {elapsed != null && (
+            <span style={{ fontSize: 11, color: '#64748b', alignSelf: 'center' }}>
+              {(elapsed / 1000).toFixed(1)}s
+            </span>
+          )}
+        </div>
+      </div>
+
+      {err && (
+        <div style={{
+          marginTop: 12, color: '#991b1b', fontSize: 12, background: '#fef2f2',
+          padding: 10, borderRadius: 8, border: '1px solid #fecaca',
+        }}>
+          ⚠️ {err}
+        </div>
+      )}
+
+      {result && recMeta && (
+        <div style={{
+          marginTop: 14, background: '#f0f9ff', border: `1px solid ${recMeta.color}`,
+          borderRadius: 10, padding: 12,
+        }}>
+          <div style={{ fontSize: 11, color: recMeta.color, fontWeight: 700, letterSpacing: 1 }}>
+            {t('homoVsAi.router.recommendedKicker', { defaultValue: 'AI recommends' })}
+          </div>
+          <div style={{ marginTop: 4, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>
+            {recMeta.icon} {t(`homoVsAi.demos.${result.recommended}.title`, { defaultValue: result.recommended })}
+          </div>
+          <div style={{ marginTop: 6, fontSize: 13, color: '#334155', lineHeight: 1.5 }}>
+            {result.rationale}
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => apply(result.recommended)}
+              style={{
+                background: recMeta.color, color: 'white', border: 'none',
+                padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}>
+              ⚡ {t('homoVsAi.router.useInRound', { defaultValue: 'Use this problem in Round' })}{' '}
+              {DEMO_TASKS.findIndex(d => d.task === result.recommended) + 1}
+            </button>
+            <button onClick={() => scrollTo(result.recommended)}
+              style={{
+                background: 'transparent', color: recMeta.color, border: `1px solid ${recMeta.color}`,
+                padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}>
+              {t('homoVsAi.router.jumpOnly', { defaultValue: 'Just jump to round' })}
+            </button>
+          </div>
+
+          {Array.isArray(result.runner_ups) && result.runner_ups.length > 0 && (
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #cbd5e1' }}>
+              <div style={{ fontSize: 11, color: '#475569', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
+                {t('homoVsAi.router.alternatives', { defaultValue: 'Alternative rounds' })}
+              </div>
+              <div style={{ display: 'grid', gap: 8 }}>
+                {result.runner_ups.map((ru) => {
+                  const meta = findTaskMeta(ru.task);
+                  if (!meta) return null;
+                  return (
+                    <div key={ru.task} style={{
+                      display: 'flex', gap: 10, alignItems: 'flex-start',
+                      background: 'white', border: `1px solid ${meta.color}33`, borderRadius: 8, padding: 10,
+                    }}>
+                      <div style={{ fontSize: 18, lineHeight: 1 }}>{meta.icon}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: meta.color }}>
+                          {t(`homoVsAi.demos.${ru.task}.title`, { defaultValue: ru.task })}
+                        </div>
+                        <div style={{ fontSize: 12, color: '#475569', marginTop: 2, lineHeight: 1.4 }}>
+                          {ru.why}
+                        </div>
+                      </div>
+                      <button onClick={() => apply(ru.task)}
+                        style={{
+                          background: 'transparent', border: `1px solid ${meta.color}`, color: meta.color,
+                          padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                          alignSelf: 'center', whiteSpace: 'nowrap',
+                        }}>
+                        ⚡ {t('homoVsAi.router.useShort', { defaultValue: 'Use here' })}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {result.raw && (
+            <details style={{ marginTop: 10 }}>
+              <summary style={{ fontSize: 11, color: '#64748b', cursor: 'pointer' }}>
+                {t('homoVsAi.router.rawToggle', { defaultValue: 'Show raw AI output (debug)' })}
+              </summary>
+              <pre style={{
+                fontSize: 11, background: '#0f172a', color: '#e2e8f0', padding: 10,
+                borderRadius: 6, overflowX: 'auto', marginTop: 6,
+              }}>{result.raw}</pre>
+            </details>
+          )}
+        </div>
+      )}
     </div>
   );
 }

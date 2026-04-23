@@ -52,7 +52,10 @@ export function enrichBenefits(benefits) {
 }
 
 // --- Homo Sapiens vs. KI i Test (workshop challenges) ----------------------
-// Task must be one of: 'scenarios' | 'ambiguities' | 'followups' | 'tests_from_code'
+// Task must be one of the 10 active tasks (matching the Activity Matrix rows):
+// 'scenarios' | 'risk' | 'ambiguities' | 'exploratory' | 'followups' |
+// 'automation' | 'testData' | 'oracle' | 'triage' | 'accessibility'
+// (legacy 'tests_from_code' is still accepted by the backend for backward compat)
 export async function runTestingChallenge({ task, input, language }) {
   const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/challenge`, {
     method: 'POST',
@@ -66,6 +69,27 @@ export async function runTestingChallenge({ task, input, language }) {
       detail = data.detail || '';
     } catch (_) { /* ignore */ }
     throw new Error(detail || `Challenge failed (${res.status})`);
+  }
+  return res.json();
+}
+
+// Problem Router — asks the LLM to pick the best of the 10 active rounds
+// for a free-form problem description. Used by the "Step 0" panel at the
+// top of Section 03 in the workshop tab.
+// Returns: { recommended, rationale, runner_ups: [{task, why}], raw? }
+export async function routeTestingProblem({ problem, language }) {
+  const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/route`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ problem, language }),
+  });
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const data = await res.json();
+      detail = data.detail || '';
+    } catch (_) { /* ignore */ }
+    throw new Error(detail || `Routing failed (${res.status})`);
   }
   return res.json();
 }
