@@ -301,18 +301,116 @@ ROUTABLE_TASKS: List[str] = [
 ]
 
 
+# Sharper, distinguishing descriptions. Each entry explains WHEN THIS WINS
+# over adjacent options — not just what it does. This is deliberately worded
+# to reduce routing confusion between overlapping tasks (e.g. scenarios vs
+# ambiguities, both of which technically consume user stories as input).
 _ROUTER_TASK_CARD = {
-    "scenarios": "Generate test scenarios from a requirement — happy path + boundaries + exploratory charters.",
-    "risk": "Risk-based prioritisation of a release scope — decide what to test first given business/political context.",
-    "ambiguities": "Hunt ambiguities/assumptions in a user story — words like 'fast', 'secure', 'user', 'done'.",
-    "exploratory": "Design exploratory test charters in the Bach/Hendrickson format for a product area.",
-    "followups": "Generate high-signal follow-up questions for a vague bug report.",
-    "automation": "Turn acceptance criteria into a Playwright/Cypress automation skeleton.",
-    "testData": "Produce a compact, varied test dataset (boundaries, locale edges, sensitive-data flags).",
-    "oracle": "Resolve the oracle problem when a spec is silent, ambiguous or self-contradictory.",
-    "triage": "Assign severity/priority to a bug and split AI-classifiable facts from human-judgement factors.",
-    "accessibility": "Review a UI for WCAG 2.1 AA + Nielsen heuristics; split mechanical checks from human-only judgement.",
+    "scenarios": (
+        "Produce a prioritised set of test cases/scenarios from a requirement or user story. "
+        "PICK THIS when the tester wants to know WHAT TO TEST for a single feature. "
+        "Default choice for any well-formed user story or requirement that is NOT obviously vague."
+    ),
+    "risk": (
+        "Prioritise what to test FIRST given a release SCOPE with MULTIPLE items "
+        "(features + fixes + bugs + infra). PICK THIS only when the input lists several items "
+        "or the tester asks 'where do I focus?' with limited time / multiple stakeholders."
+    ),
+    "ambiguities": (
+        "Review a user story to find HIDDEN AMBIGUITIES and IMPROVE THE STORY. "
+        "PICK THIS only when the story contains obviously vague terms (fast, relevant, secure, "
+        "done, quickly, properly) OR when the tester explicitly asks 'what is unclear here?'. "
+        "DO NOT pick this just because the input starts with 'As a user' — most user stories "
+        "route to scenarios."
+    ),
+    "exploratory": (
+        "Design exploratory test CHARTERS (Bach/Hendrickson format) for open-ended product areas. "
+        "PICK THIS when the tester wants to EXPLORE without a script — usually a product area, "
+        "not a single requirement."
+    ),
+    "followups": (
+        "Generate follow-up QUESTIONS for a vague BUG REPORT before reproducing it. "
+        "PICK THIS when the input is a bug/error/failure report that lacks reproduction detail. "
+        "Keywords: 'error', 'fails', 'broken', 'ticket', 'crash'."
+    ),
+    "automation": (
+        "Turn acceptance criteria into a Playwright/Cypress/Selenium automation SKELETON. "
+        "PICK THIS when the input is acceptance criteria AND mentions a specific framework, "
+        "page-object pattern, or 'automate this'."
+    ),
+    "testData": (
+        "Generate a compact test DATASET with boundaries, locale edges and sensitivity markers. "
+        "PICK THIS when the input describes a SCHEMA, FIELDS or a DOMAIN and the ask is for data."
+    ),
+    "oracle": (
+        "Resolve the ORACLE PROBLEM — enumerate candidate 'correct' behaviours when a spec is "
+        "SILENT, SELF-CONTRADICTORY, or the tester asks 'what should happen when X?'. "
+        "DIFFERENT from 'ambiguities': oracle is about the BEHAVIOUR being undefined; "
+        "ambiguities is about TERMS being vague."
+    ),
+    "triage": (
+        "Assign severity (S1-S4) and priority (P1-P3) to a bug, splitting AI-classifiable "
+        "facts from human-judgement factors (business value, regulatory, VIP). "
+        "PICK THIS when the input is a bug and the question is 'how bad is it?'. "
+        "DIFFERENT from 'followups': triage = how-bad; followups = what-do-I-ask."
+    ),
+    "accessibility": (
+        "Review a UI for WCAG 2.1 AA + Nielsen heuristics. "
+        "PICK THIS when the input is HTML, a UI description, a component, or mentions "
+        "accessibility/WCAG/contrast/screen reader."
+    ),
 }
+
+
+# Few-shot examples covering the most common mis-routing failure modes.
+# Each example is deliberately short and language-matched to the prompt's
+# {{language}} placeholder.
+_ROUTER_FEW_SHOT = [
+    {
+        "problem": "Som bruker ønsker jeg å logge inn med Google, slik at jeg slipper å huske enda et passord.",
+        "answer": {
+            "recommended": "scenarios",
+            "rationale": "This is a concrete, well-formed user story about a specific feature (Google SSO). The tester needs a prioritised test plan, not a review of the story itself — the terms are clear enough.",
+            "runner_ups": [
+                {"task": "risk", "why": "Useful if SSO is part of a larger release with multiple items competing for test time."},
+                {"task": "oracle", "why": "Useful if the spec is silent on edge cases (account linking, disabled Google accounts)."},
+            ],
+        },
+    },
+    {
+        "problem": "We ship Release 24.3 in 7 days. Scope: 2FA for admins, CSV export, PG 14→15 upgrade, React 17→18. CFO wants no invoice regressions.",
+        "answer": {
+            "recommended": "risk",
+            "rationale": "Multiple competing items, explicit time pressure, and a stakeholder signal (CFO). The tester needs prioritisation, not a single-feature test plan.",
+            "runner_ups": [
+                {"task": "scenarios", "why": "Useful as a follow-up per high-priority item once ordering is agreed."},
+                {"task": "triage", "why": "Useful for any incoming bugs during the release window."},
+            ],
+        },
+    },
+    {
+        "problem": "Checkout fails sometimes with a 500. Happened yesterday buying two items. Message said 'something went wrong'. Please fix.",
+        "answer": {
+            "recommended": "followups",
+            "rationale": "A bug report missing reproduction detail. The tester needs the high-signal follow-up questions before they can triage or reproduce.",
+            "runner_ups": [
+                {"task": "triage", "why": "After follow-ups reveal scope, triage decides S/P labels."},
+                {"task": "oracle", "why": "If 'something went wrong' hides a spec gap about error messaging."},
+            ],
+        },
+    },
+    {
+        "problem": "The search must return 'relevant' results 'fast' for customers. Acceptance criteria: search works quickly.",
+        "answer": {
+            "recommended": "ambiguities",
+            "rationale": "The story is full of testably-vague terms (relevant, fast, quickly, customers). Fix the story first; otherwise every test is a guess.",
+            "runner_ups": [
+                {"task": "oracle", "why": "If the PO cannot clarify, 'relevant' becomes an oracle problem."},
+                {"task": "scenarios", "why": "Useful once the ambiguities are resolved."},
+            ],
+        },
+    },
+]
 
 
 def _extract_json(text: str) -> Optional[Dict[str, Any]]:
@@ -347,26 +445,55 @@ def _extract_json(text: str) -> Optional[Dict[str, Any]]:
 
 def _router_system_prompt(language: Optional[str]) -> str:
     catalog = "\n".join(f"  - {k}: {v}" for k, v in _ROUTER_TASK_CARD.items())
+    few_shot = "\n\n".join(
+        f"  Example:\n  Problem: {ex['problem']}\n  Answer: {json.dumps(ex['answer'], ensure_ascii=False)}"
+        for ex in _ROUTER_FEW_SHOT
+    )
+
     base = (
         "You are a senior test lead helping a tester decide which of ten "
-        "specialised testing challenges best fits the problem they are facing. "
-        "You MUST respond with STRICT JSON (no prose, no markdown fence) matching "
-        "this schema:\n"
+        "specialised testing rounds will MOST DIRECTLY advance their testing "
+        "work. You MUST respond with STRICT JSON (no prose, no markdown fence, "
+        "no leading/trailing text) matching this schema:\n"
         "{\n"
         "  \"recommended\": \"<one of the task keys below>\",\n"
-        "  \"rationale\": \"<1-3 sentences explaining why this round fits\">,\n"
+        "  \"rationale\": \"<1-3 sentences explaining why THIS round fits better than the alternatives>\",\n"
         "  \"runner_ups\": [\n"
         "    { \"task\": \"<another task key>\", \"why\": \"<one short line>\" },\n"
         "    { \"task\": \"<another task key>\", \"why\": \"<one short line>\" }\n"
         "  ]\n"
         "}\n\n"
-        "Catalog of tasks (keys and purpose):\n"
+        "CATALOG (keys and WHEN TO PICK THEM):\n"
         f"{catalog}\n\n"
-        "Rules:\n"
-        "  - `recommended` MUST be exactly one of the keys above. Do not invent new keys.\n"
+        "DECISION RUBRIC — apply in this order, stop at the FIRST match:\n"
+        "  1. Input lists MULTIPLE items (features + fixes + bugs + infra) or asks "
+        "     'what should I test first with limited time' → `risk`.\n"
+        "  2. Input is a BUG / FAILURE / ERROR report lacking reproduction detail "
+        "     ('something went wrong', 'sometimes fails', 'crashes') → `followups`.\n"
+        "  3. Input is a BUG and asks 'is this P1?' / 'how bad is it?' / mentions severity → `triage`.\n"
+        "  4. Input is HTML / a UI component / mentions accessibility / WCAG / contrast → `accessibility`.\n"
+        "  5. Input describes a SCHEMA, FIELDS, DOMAIN and asks for DATA → `testData`.\n"
+        "  6. Input is acceptance criteria AND mentions Playwright/Cypress/Selenium/page-object → `automation`.\n"
+        "  7. Input describes a product AREA or asks for CHARTERS / exploration → `exploratory`.\n"
+        "  8. Input describes BEHAVIOUR that is UNDEFINED or CONTRADICTORY in the spec "
+        "     (e.g. a race condition, silent spec, 'what should happen when X AND Y?') → `oracle`.\n"
+        "  9. Input is a user story / requirement that contains OBVIOUSLY vague terms "
+        "     (fast, quickly, secure, relevant, properly, done) and the tester wants to fix the STORY → `ambiguities`.\n"
+        " 10. DEFAULT: input is a requirement / user story / feature description and the tester "
+        "     wants to know WHAT TO TEST → `scenarios`.\n\n"
+        "CRITICAL anti-patterns to avoid:\n"
+        "  - A user story starting with 'As a user' / 'Som bruker' is NOT automatically "
+        "    `ambiguities`. Most user stories route to `scenarios`. Only pick `ambiguities` "
+        "    when the terms are OBVIOUSLY vague AND the tester is trying to improve the story.\n"
+        "  - `oracle` vs `ambiguities`: oracle = behaviour is undefined; ambiguities = terms are vague.\n"
+        "  - `triage` vs `followups`: triage = how bad is it; followups = what should I ask.\n"
+        "  - `risk` is only for MULTI-item scopes. A single feature goes to `scenarios`.\n\n"
+        "FEW-SHOT EXAMPLES (learn the decision style):\n"
+        f"{few_shot}\n\n"
+        "RULES:\n"
+        "  - `recommended` MUST be exactly one of the 10 keys. Never invent.\n"
         "  - `runner_ups` MUST be 1-2 entries, DIFFERENT from `recommended`.\n"
-        "  - Be decisive — pick the single best fit even if several could apply.\n"
-        "  - The `rationale` should cite the concrete aspect of the problem that made you choose."
+        "  - Be decisive. The `rationale` MUST explain what the input CONTAINS that drove the choice AND briefly why the runner-ups lost."
     )
     if language and language.lower().startswith("no"):
         base += (
@@ -404,8 +531,8 @@ async def route_problem(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=500,
-        temperature=0.2,
+        max_tokens=450,
+        temperature=0.1,  # Routing is a classification task — we want determinism, not creativity.
         request_headers=request_headers,
     )
 
