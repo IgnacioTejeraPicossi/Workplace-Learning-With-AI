@@ -6,6 +6,8 @@ yarn.lock
 # Project Documentation
 # docs/ - Removed: Documentation should be in GitHub for completeness
 docs-md/
+docs-media/
+docs-ISTQB/
 presentation/
 
 # README.md - Temporarily hidden until after hackathon 
