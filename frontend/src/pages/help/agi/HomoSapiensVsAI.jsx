@@ -4,7 +4,8 @@
  * 6 sections (top to bottom):
  *   1. WorkshopHero        — framing, 3 reflection questions, SOCO/Ola/Keyhan nod
  *   2. ActivityMatrix      — 10 testing activities × 3 verdicts (human/AI/hybrid)
- *   3. HeadToHeadDemos     — 4 live demos using ask_ai_unified (side-by-side)
+ *   3. HeadToHeadDemos     — 10 live demos using ask_ai_unified (side-by-side),
+ *                             aligned 1:1 with the Activity Matrix rows
  *   4. TrustFramework      — "when to trust whom" decision rows
  *   5. WorkshopScoreboard  — configurable groups + round log + JSON export
  *   6. SpeakerCribSheet    — collapsible speaker notes, quotes, likely Q&A
@@ -261,11 +262,20 @@ function Legend({ t }) {
 // Section 3 — Head-to-Head Demos (live AI calls)
 // ---------------------------------------------------------------------------
 
+// Ordered to mirror the Activity Matrix row-by-row (10 challenges, 1:1 alignment).
+// Legacy 'tests_from_code' is kept in the backend TASK_SPECS for backward compat
+// but intentionally excluded from the live grid here.
 const DEMO_TASKS = [
-  { task: 'scenarios',       icon: '🎯', color: '#2563eb' },
-  { task: 'ambiguities',     icon: '🔍', color: '#7c3aed' },
-  { task: 'followups',       icon: '❓', color: '#db2777' },
-  { task: 'tests_from_code', icon: '💻', color: '#059669' },
+  { task: 'scenarios',      icon: '🎯', color: '#2563eb' },
+  { task: 'risk',           icon: '⚖️', color: '#d97706' },
+  { task: 'ambiguities',    icon: '🔍', color: '#7c3aed' },
+  { task: 'exploratory',    icon: '🧭', color: '#059669' },
+  { task: 'followups',      icon: '❓', color: '#db2777' },
+  { task: 'automation',     icon: '⚙️', color: '#4338ca' },
+  { task: 'testData',       icon: '🧪', color: '#0d9488' },
+  { task: 'oracle',         icon: '🔮', color: '#e11d48' },
+  { task: 'triage',         icon: '🚑', color: '#ea580c' },
+  { task: 'accessibility',  icon: '♿', color: '#0891b2' },
 ];
 
 function DemoCard({ task, icon, color, t, i18n, onVote }) {
@@ -310,9 +320,10 @@ function DemoCard({ task, icon, color, t, i18n, onVote }) {
   const resetToSample = () => { setInput(sample); setAiOutput(''); setErr(null); setElapsed(null); };
 
   return (
-    <div style={{
+    <div id={`demo-${task}`} style={{
       background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: 16,
       borderTop: `4px solid ${color}`,
+      scrollMarginTop: 80,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
         <div>
@@ -514,16 +525,44 @@ function VoteButton({ onClick, bg, border, color, icon, label }) {
 }
 
 function HeadToHeadDemos({ t, i18n, onVote }) {
+  const scrollTo = (task) => {
+    const el = document.getElementById(`demo-${task}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   return (
     <div>
       <SectionHeader
         num="03"
-        title={t('homoVsAi.demos.title', { defaultValue: 'Head-to-Head: 4 Live Rounds' })}
+        title={t('homoVsAi.demos.title', { defaultValue: 'Head-to-Head: 10 Live Rounds' })}
         lead={t('homoVsAi.demos.lead', {
           defaultValue:
-            "Pick a round, read the prewritten human answer out loud, then press Run AI. The model responds live, using the LLM selected in your API Config. Vote at the end of each round — it feeds the scoreboard.",
+            "Ten rounds, one per Activity Matrix row. Pick a round, read the prewritten human answer out loud, then press Run AI. Vote at the end of each round — it feeds the scoreboard.",
         })}
       />
+
+      {/* Quick-nav chips — let the presenter jump to a round without scrolling */}
+      <div style={{
+        display: 'flex', flexWrap: 'wrap', gap: 6, margin: '0 0 14px',
+        padding: 10, background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: 10,
+      }}>
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: '#64748b', letterSpacing: 1,
+          textTransform: 'uppercase', alignSelf: 'center', marginRight: 4,
+        }}>
+          {t('homoVsAi.demos.jumpTo', { defaultValue: 'Jump to' })}
+        </span>
+        {DEMO_TASKS.map((d, i) => (
+          <button key={d.task} onClick={() => scrollTo(d.task)} title={t(`homoVsAi.demos.${d.task}.title`, { defaultValue: d.task })}
+            style={{
+              background: 'white', border: `1px solid ${d.color}`, color: d.color,
+              padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600,
+              cursor: 'pointer',
+            }}>
+            {d.icon} {i + 1}
+          </button>
+        ))}
+      </div>
+
       <div style={{ display: 'grid', gap: 14 }}>
         {DEMO_TASKS.map(d => (
           <DemoCard key={d.task} {...d} t={t} i18n={i18n} onVote={onVote} />
