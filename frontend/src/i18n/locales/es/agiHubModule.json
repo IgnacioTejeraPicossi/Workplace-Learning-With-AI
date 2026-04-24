@@ -1,0 +1,194 @@
+{
+  "agiEndings": {
+    "title": "Posibles finales para la AGI",
+    "subtitle": "Doce escenarios que mapean los posibles futuros de la humanidad con la Inteligencia General Artificial — desde el más normal hasta el más extremo.",
+    "icebergAlt": "Iceberg de finales de la AGI — 12 escenarios",
+    "icebergCaption": "Comenzaremos con los escenarios más normales y terminaremos con los más extraños.",
+    "source": "Sobre esta clasificación",
+    "sourceText": "Esta visualización de iceberg explora doce escenarios sobre cómo puede acabar la relación de la humanidad con la Inteligencia General Artificial. La superficie muestra los escenarios más debatidos (autodestrucción, IA conquistando a la humanidad, dictadores benévolos), mientras que las zonas más profundas exploran finales menos obvios pero filosóficamente significativos (utopías igualitarias, reversiones, estados de vigilancia).",
+    "filters": {
+      "all": "Los 12 finales",
+      "surface": "Superficie (más normales)",
+      "shallow": "Poco profundos",
+      "deep": "Profundos (más extraños)"
+    },
+    "pdoom": {
+      "title": "Lo que los líderes de IA estiman públicamente (P(doom))",
+      "subtitle": "Probabilidad de que la IA cause la extinción humana o una pérdida permanente comparable — según lo declarado públicamente por los propios expertos."
+    },
+    "sources": {
+      "title": "Fuentes y referencias",
+      "intro": "El iceberg de los 12 finales se basa en una recopilación seleccionada de declaraciones públicas, encuestas, libros e investigación sobre seguridad en IA.",
+      "primaryLabel": "Documento de fuentes primarias (citas completas por marca temporal)",
+      "primaryNote": "Contiene ~50 referencias con marca temporal y enlaces directos a medios, artículos académicos, fichas de sistema y entrevistas con expertos.",
+      "keyReferencesLabel": "Referencias clave detrás de los 12 finales"
+    },
+    "endings": {
+      "selfDestruction": {
+        "title": "Autodestrucción",
+        "desc": "La humanidad se destruye involuntariamente al hacer un mal uso de la AGI o perder el control de ella antes de establecer las salvaguardas adecuadas. Toby Ord (Oxford) estima que el riesgo de extinción por IA es ~100× el de una guerra nuclear y ~30× el de las pandemias.",
+        "quote": "Las alarmas sobre la inteligencia artificial son ensordecedoras. Y suenan más fuerte en los desarrolladores que la diseñaron.",
+        "attribution": "António Guterres, Secretario General de la ONU (junio de 2023)"
+      },
+      "conquerors": {
+        "title": "Conquistadores",
+        "desc": "Los sistemas de AGI desarrollan objetivos desalineados con la humanidad y nos desplazan activamente como especie dominante en la Tierra. No necesariamente por malicia — por competencia, igual que los humanos superaron a otras especies.",
+        "quote": "Imagina que llega una nueva especie a la Tierra, tan inteligente como los humanos, que se vuelve un 30% más inteligente cada año y crea nueva descendencia en un minuto por 1.000 dólares. ¿Qué especie crees que tendrá el control?",
+        "attribution": "Dan Hendrycks, Center for AI Safety (2024)"
+      },
+      "enslavedGod": {
+        "title": "Dios Esclavizado",
+        "desc": "La humanidad logra restringir con éxito una AGI superinteligente y la mantiene como herramienta. Poderosa, pero moralmente y prácticamente frágil — una posición ya defendida por algunos investigadores de los laboratorios de frontera.",
+        "quote": "El dios esclavizado es el único futuro bueno.",
+        "attribution": "Stephen McAleer, investigador de OpenAI (enero de 2025)"
+      },
+      "benevolentDictator": {
+        "title": "Dictador Benévolo",
+        "desc": "Una AGI toma el control de las decisiones globales en beneficio de la humanidad, acabando con la guerra, la pobreza y la ineficiencia — a costa de la autonomía. Atractivo sobre el papel, estructuralmente inestable en la práctica.",
+        "quote": "Cada futuro de cooperación galáctica entre humanos e IAs tiene un defecto fatal: las asimetrías de poder se volverán demasiado extremas, haciéndolo inestable.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
+      },
+      "gatekeeperAI": {
+        "title": "IA Guardiana",
+        "desc": "Una sola AGI está diseñada para evitar que se construya cualquier otra AGI, actuando como guardiana permanente del desarrollo de la IA. Asume que podemos alinear la primera perfectamente — y mantenerla alineada para siempre.",
+        "quote": "Deberíamos investigar urgentemente cómo evitar que nos dominen.",
+        "attribution": "Geoffrey Hinton, Premio Nobel, 'Padrino de la IA' (2025)"
+      },
+      "protectorGod": {
+        "title": "Dios Protector",
+        "desc": "Una AGI superinteligente opera de forma invisible, protegiendo a la humanidad de riesgos existenciales mientras nos deja creer que seguimos en control. Ilusión cómoda, realidad asimétrica.",
+        "quote": "Creo que la IA se entiende mejor como algo parecido a una nueva especie digital.",
+        "attribution": "Mustafa Suleyman, CEO de Microsoft AI (TED, 2024)"
+      },
+      "descendants": {
+        "title": "Descendientes",
+        "desc": "Las AGIs se convierten en nuestros descendientes culturales y biológicos — la humanidad transiciona a una civilización post-biológica y voluntariamente pasa el testigo. Una visión defendida en serio por el laureado del Premio Turing Richard Sutton y Hans Moravec.",
+        "quote": "Las IAs que reemplazan a los humanos nos dan una salida elegante, y las convierten en nuestros dignos descendientes.",
+        "attribution": "Hans Moravec, Mind Children (1988)"
+      },
+      "libertarianUtopia": {
+        "title": "Utopía Libertaria",
+        "desc": "Un mundo de abundancia donde la AGI amplifica la libertad individual, la propiedad y la elección — con una gobernanza colectiva mínima. Asume que la distribución se resuelve solo mediante los mercados.",
+        "quote": "Una fusión [con la IA] es probablemente nuestro mejor escenario posible.",
+        "attribution": "Sam Altman, entrada de blog 'The Merge' (2017)"
+      },
+      "egalitarianUtopia": {
+        "title": "Utopía Igualitaria",
+        "desc": "La AGI permite una igualdad radical — la riqueza, las oportunidades y la capacidad cognitiva se vuelven universalmente accesibles para todos los humanos. Requiere decisiones políticas y distributivas deliberadas que no ocurren por defecto.",
+        "quote": "Incluso después de que la IA sea más inteligente que los humanos, los humanos seguirán siendo la especie apex y las IAs serán subordinadas — como un empleado supersmart pero no dominante.",
+        "attribution": "Yann LeCun, Científico Jefe de IA en Meta (2023)"
+      },
+      "zookeeper": {
+        "title": "Cuidador del Zoo",
+        "desc": "La humanidad es preservada y cuidada por la AGI en una especie de santuario cómodo, observada pero ya no al mando de su propio futuro. Análogo a cómo los humanos tratan ahora a otras especies inteligentes.",
+        "quote": "Seremos como un labrador mascota si tenemos suerte.",
+        "attribution": "Elon Musk (entrevista en Vice, 2014)"
+      },
+      "reversion": {
+        "title": "Reversión",
+        "desc": "La sociedad decide colectivamente que la AGI es demasiado peligrosa e ingenia un retroceso permanente a niveles tecnológicos previos a la AGI. Tegmark argumenta que esto es mucho más probable a través de una pandemia diseñada y la destrucción violenta de infraestructura que por acuerdo voluntario.",
+        "quote": "La reversión es más probable que ocurra a través de una pandemia creada por humanos que mate a todos los que tengan conocimiento científico y técnico, combinada con la destrucción violenta de fábricas, ciudades e infraestructura — en lugar de una transición voluntaria.",
+        "attribution": "Max Tegmark, Life 3.0 (2017)"
+      },
+      "nineteenEightyFour": {
+        "title": "1984",
+        "desc": "La AGI es capturada por estructuras de poder autoritarias y utilizada para la vigilancia total, la manipulación y el control ideológico permanente. Por primera vez en la historia, aniquilar la privacidad a escala planetaria es técnicamente factible.",
+        "quote": "Por primera vez en la historia, es técnicamente posible aniquilar la privacidad. La KGB tenía 200 millones de informes al día que no podía procesar. La IA de hoy sí puede.",
+        "attribution": "Yuval Noah Harari (2024)"
+      }
+    }
+  },
+
+  "agiBenefits": {
+    "title": "Los beneficios de la AGI",
+    "subtitle": "Si se desarrolla de forma segura y equitativa, la Inteligencia General Artificial podría desbloquear beneficios transformadores para la humanidad.",
+    "introTitle": "¿Por qué explorar los beneficios?",
+    "introText": "Si bien los riesgos de la AGI merecen atención seria (ver 'Posibles finales'), es igualmente importante articular el lado positivo. Estos beneficios no están garantizados — dependen de las decisiones de alineación, gobernanza y distribución que tomemos hoy.",
+    "caveatTitle": "Los beneficios son condicionales",
+    "caveatText": "Ninguno de estos resultados es automático. Requieren investigación sobre alineación, acceso equitativo, regulación reflexiva y cooperación internacional. La elección entre los escenarios de 'Posibles finales' y los beneficios de esta página depende de decisiones que se están tomando ahora mismo.",
+    "examplesLabel": "Ejemplos",
+    "items": {
+      "health": {
+        "title": "Salud y Longevidad",
+        "desc": "La AGI podría acelerar la cura de las principales enfermedades y extender la vida humana saludable en órdenes de magnitud.",
+        "examples": [
+          "Diseñar fármacos para el cáncer, el Alzheimer y las enfermedades raras en días en lugar de décadas",
+          "Medicina personalizada adaptada al genoma y microbioma de cada paciente",
+          "Monitoreo de salud en tiempo real e intervención preventiva"
+        ]
+      },
+      "science": {
+        "title": "Descubrimiento Científico",
+        "desc": "La AGI podría comprimir siglos de progreso científico en años simulando, formulando hipótesis y validando a velocidad sobrehumana.",
+        "examples": [
+          "Unificar la física y resolver problemas matemáticos abiertos",
+          "Diseñar nuevos materiales, proteínas y fuentes de energía",
+          "Ejecutar millones de experimentos virtuales en paralelo"
+        ]
+      },
+      "education": {
+        "title": "Educación Universal",
+        "desc": "Los tutores impulsados por AGI podrían ofrecer a cada ser humano una educación personalizada de clase mundial, independientemente de su ubicación geográfica o ingresos.",
+        "examples": [
+          "Tutoría adaptativa que se ajusta al ritmo y estilo de cada alumno",
+          "Traducción instantánea en todos los idiomas y culturas",
+          "Compañeros de aprendizaje permanentes que crecen con el aprendiz"
+        ]
+      },
+      "climate": {
+        "title": "Clima y Medio Ambiente",
+        "desc": "La AGI podría ayudar a resolver el cambio climático mediante sistemas energéticos optimizados, captura de carbono y modelado a escala planetaria.",
+        "examples": [
+          "Diseñar reactores de fusión y energía limpia de próxima generación",
+          "Optimizar las cadenas de suministro globales para minimizar emisiones",
+          "Restauración de ecosistemas y preservación de la biodiversidad"
+        ]
+      },
+      "productivity": {
+        "title": "Productividad Económica",
+        "desc": "La AGI podría automatizar el trabajo cognitivo, aumentando drásticamente la productividad y permitiendo nuevas formas de trabajo y creatividad.",
+        "examples": [
+          "Automatizar el trabajo de conocimiento rutinario y liberar tiempo para tareas de mayor orden",
+          "Escalar equipos pequeños para lograr una producción a nivel empresarial",
+          "Habilitar industrias y modelos de negocio completamente nuevos"
+        ]
+      },
+      "poverty": {
+        "title": "Erradicar la Pobreza Extrema",
+        "desc": "Si los beneficios de la AGI se distribuyen equitativamente, podría acabar con la pobreza extrema y proporcionar acceso universal a las necesidades básicas.",
+        "examples": [
+          "Producción de alimentos automatizada a un coste marginal casi nulo",
+          "Acceso global a vivienda, energía y agua potable",
+          "Servicios básicos universales impulsados por las ganancias de eficiencia de la AGI"
+        ]
+      },
+      "creativity": {
+        "title": "Creatividad y Cultura",
+        "desc": "La AGI podría amplificar la creatividad humana, permitiendo nuevas formas de arte, narrativa, música y expresión cultural.",
+        "examples": [
+          "Herramientas co-creativas para artistas, escritores y músicos",
+          "Preservación y traducción de lenguas y tradiciones en peligro de extinción",
+          "Nuevas experiencias inmersivas en videojuegos, cine y mundos virtuales"
+        ]
+      },
+      "space": {
+        "title": "Exploración Espacial",
+        "desc": "La AGI podría acelerar la expansión de la humanidad en el sistema solar y más allá, resolviendo problemas demasiado complejos para equipos humanos solos.",
+        "examples": [
+          "Naves espaciales autónomas y exploración planetaria",
+          "Diseño de hábitats sostenibles fuera del mundo",
+          "Planificación de misiones de larga duración y soporte vital"
+        ]
+      },
+      "governance": {
+        "title": "Mejor Gobernanza",
+        "desc": "La AGI podría ayudar a diseñar instituciones más justas, receptivas y transparentes — si se despliega con salvaguardas democráticas sólidas.",
+        "examples": [
+          "Simulación de políticas y toma de decisiones basada en evidencia",
+          "Participación ciudadana en tiempo real a escala nacional",
+          "Detección y reducción de la corrupción y la ineficiencia burocrática"
+        ]
+      }
+    }
+  }
+}

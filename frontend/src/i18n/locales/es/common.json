@@ -575,5 +575,456 @@
         "generateSuggestions": "Generar sugerencias de mejora de prompts con IA"
       }
     }
+  },
+
+  "help": {
+    "agiHub": {
+      "title": "Hub de Progreso de la AGI",
+      "subtitle": "Sigue el progreso, explora posibles futuros y comprende los beneficios de la Inteligencia General Artificial"
+    },
+    "agiTabs": {
+      "tracker": "Seguimiento del Progreso de la AGI",
+      "endings": "Posibles finales para la AGI",
+      "benefits": "Los beneficios de la AGI",
+      "homoVsAi": "Homo Sapiens vs. IA en Testing"
+    },
+    "agiProgress": {
+      "loading": "Cargando progreso de la AGI…",
+      "error": "Error:",
+      "title": "Seguimiento del Progreso de la AGI",
+      "subtitle": "Amplitud cognitiva en diez dominios (inspirado en CHC) basado en Hendrycks et al. (2025) — actualizado hasta 2026 con Claude Opus 4.6/4.7 y Gemini 3.1 Pro.",
+      "benchmarkContext": "Contexto del benchmark",
+      "paper": "artículo",
+      "overall": "Global",
+      "domainProfile": "Perfil de dominio",
+      "modelLabel": "Modelo:",
+      "modelTrend": "Tendencia del modelo",
+      "methodology": "Metodología",
+      "pt1": "Diez dominios cognitivos con igual peso (10% cada uno): K, RW, M, R, WM, MS, MR, V, A, S.",
+      "pt2": "Los números son aproximaciones sintetizadas a partir de resúmenes públicos y mapeos a las capacidades CHC.",
+      "pt3": "Esto es un indicador de dirección, no una certificación de 'AGI lograda'.",
+      "source": "Artículo fuente:",
+      "estimated": "Nivel AGI estimado",
+      "addModel": "Añadir modelo (Admin)",
+      "phModel": "Modelo (p. ej., GPT-6)",
+      "phYear": "Año",
+      "phTotal": "Total %",
+      "save": "Guardar",
+      "aiEnrich": {
+        "applyTracker": "Aplicar y guardar"
+      },
+      "labels": {
+        "K": "Conocimiento",
+        "RW": "Lec/Esc",
+        "M": "Matemáticas",
+        "R": "Razonamiento",
+        "WM": "Mem. Trabajo",
+        "MS": "Almacenamiento",
+        "MR": "Recuperación",
+        "V": "Visual",
+        "A": "Auditivo",
+        "S": "Velocidad"
+      }
+    }
+  },
+
+  "homoVsAi": {
+    "hero": {
+      "kicker": "SOCO · TALLER · 2026",
+      "title": "Homo Sapiens vs. IA en Testing",
+      "lead": "¿Cómo se comparan humanos e IA en las tareas cotidianas de testing — y cuándo gana cada uno de verdad? Una guía práctica basada en evidencias para el taller con Ola Kleiven y Keyhan Farahaninia.",
+      "questions": [
+        "¿Cuándo la IA nos da una ventaja real en el trabajo de testing?",
+        "¿Sigue siendo decisivo el juicio humano, el contexto, el pensamiento crítico y la curiosidad?",
+        "¿Hay un ganador — o una nueva forma de trabajar juntos?"
+      ]
+    },
+    "verdict": {
+      "ai": "Lidera la IA",
+      "human": "Lidera el humano",
+      "hybrid": "Híbrido",
+      "tie": "Empate"
+    },
+    "why": "Por qué",
+    "confidenceLabel": "Confianza",
+    "activities": {
+      "title": "Matriz de actividades",
+      "lead": "Diez actividades canónicas de testing. ¿Quién lleva ventaja hoy — y por qué? Veredictos codificados por colores, no dogmas.",
+      "scenarios": {
+        "title": "Generación de escenarios de prueba",
+        "desc": "Convertir un requisito en un conjunto amplio y priorizado de escenarios que cubra ángulos positivos, negativos, de límite y no funcionales.",
+        "rationale": "La IA es rápida cubriendo amplitud y detectando dimensiones olvidadas (i18n, rendimiento, accesibilidad). Los humanos aún la superan en la priorización basada en riesgos vinculada a partes interesadas reales.",
+        "verdict": "hybrid",
+        "confidence": "high"
+      },
+      "risk": {
+        "title": "Priorización basada en riesgos",
+        "desc": "Decidir qué pruebas importan más dado el proyecto, el cliente y lo que está realmente en juego este trimestre.",
+        "rationale": "A la IA le falta el contexto político e histórico. '¿Qué verá primero el Director Financiero?' es una decisión humana.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "ambiguity": {
+        "title": "Detección de ambigüedad en requisitos / historias",
+        "desc": "Identificar palabras como 'rápido', 'seguro', 'usuario' o 'hecho' que significan cosas diferentes para distintas partes interesadas.",
+        "rationale": "Los LLM modernos son sorprendentemente buenos en esto — están entrenados en millones de especificaciones. Un buen tester aún detecta los específicos del dominio que el modelo pasa por alto.",
+        "verdict": "ai",
+        "confidence": "medium"
+      },
+      "exploratory": {
+        "title": "Testing exploratorio",
+        "desc": "Aprender el producto usándolo, siguiendo intuiciones, pivotando según lo que se descubre.",
+        "rationale": "La curiosidad, el criterio y la intuición de 'esto huele mal' siguen siendo fortalezas humanas. La IA puede proponer charters pero no perseguirlos.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "followups": {
+        "title": "Preguntas de seguimiento",
+        "desc": "Las preguntas que haces al Product Owner, al desarrollador o al reportador del bug para desbloquear la claridad.",
+        "rationale": "La IA produce una base sólida al instante. Los humanos ganan en las que requieren política, tono o profunda memoria de producto.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      },
+      "automation": {
+        "title": "Código de automatización de pruebas",
+        "desc": "Escribir scripts de Playwright/Cypress/Selenium, fixtures, page objects.",
+        "rationale": "La IA escribe código repetitivo más rápido de lo que puedes escribir. Los humanos aún diseñan la arquitectura y deciden qué automatizar.",
+        "verdict": "ai",
+        "confidence": "high"
+      },
+      "testData": {
+        "title": "Generación de datos de prueba",
+        "desc": "Conjuntos de datos realistas, variados y ricos en casos límite para demos y regresión.",
+        "rationale": "Casi resuelto por la IA para dominios estructurados. Los humanos siguen en el circuito para datos sensibles o críticos en términos de cumplimiento.",
+        "verdict": "ai",
+        "confidence": "high"
+      },
+      "oracle": {
+        "title": "El problema del oráculo",
+        "desc": "Decidir qué es el 'comportamiento correcto' cuando la especificación está en silencio o es contradictoria.",
+        "rationale": "Esta es el alma definitoria del testing (Kaner, Bach). La IA adivina plausiblemente; los humanos deciden lo que debería ser.",
+        "verdict": "human",
+        "confidence": "high"
+      },
+      "triage": {
+        "title": "Triaje de bugs y gravedad",
+        "desc": "Decidir si un bug es P1 o P3 dado el impacto empresarial y el dolor del usuario.",
+        "rationale": "La IA es sólida en la clasificación por síntomas. Los humanos son dueños del peso empresarial, los clientes VIP y el radio de impacto regulatorio.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      },
+      "accessibility": {
+        "title": "Accesibilidad y heurísticas de UX",
+        "desc": "Detectar violaciones de WCAG, heurísticas de Nielsen y la frustración humana pura.",
+        "rationale": "La IA detecta el 80% de las violaciones mecánicas (contraste, texto alternativo, ARIA). Los humanos detectan el 20% que realmente perjudica a los usuarios reales.",
+        "verdict": "hybrid",
+        "confidence": "medium"
+      }
+    },
+    "router": {
+      "kicker": "Paso 0 · Enrutador de problemas",
+      "title": "Describe tu problema — la IA elige la mejor ronda",
+      "lead": "¿No sabes qué ronda se adapta? Pega el problema en el que estás trabajando. La IA recomendará una de las 10 rondas, explicará por qué y ofrecerá dos alternativas.",
+      "inputLabel": "Descripción del problema",
+      "placeholder": "p. ej. 'Estamos lanzando una función de restablecimiento de contraseña en 3 días y no sé por dónde empezar a probar.'",
+      "runLabel": "Encontrar la mejor ronda",
+      "running": "Enrutando con IA…",
+      "clearLabel": "Limpiar",
+      "recommendedKicker": "La IA recomienda",
+      "useInRound": "Usar este problema en la ronda",
+      "jumpOnly": "Solo ir a la ronda",
+      "alternatives": "Rondas alternativas",
+      "useShort": "Usar aquí",
+      "rawToggle": "Mostrar salida IA sin formato (depuración)"
+    },
+    "demos": {
+      "title": "Cara a cara: 10 rondas en vivo",
+      "lead": "Diez rondas, una por fila de la Matriz de actividades. Elige una ronda, lee la respuesta humana preescrita en voz alta y pulsa Ejecutar IA. Vota al final de cada ronda; alimenta el marcador.",
+      "jumpTo": "Ir a",
+      "roundLabel": "Ronda",
+      "inputLabel": "Entrada",
+      "runLabel": "Ejecutar IA",
+      "running": "IA pensando…",
+      "thinking": "Consultando el modelo…",
+      "resetLabel": "Restablecer al ejemplo",
+      "humanLabel": "Tester humano (preescrito)",
+      "humanLabelEditing": "Tester humano (editando)",
+      "humanEdit": "Editar",
+      "humanSave": "Guardar",
+      "humanClear": "Limpiar",
+      "humanRestore": "Restaurar preescrito",
+      "humanEditPlaceholder": "Escribe aquí la respuesta del grupo. El Markdown (**negrita**, listas con -) se renderiza al guardar.",
+      "aiLabel": "IA (en vivo)",
+      "humanPlaceholder": "Haz clic en ✏️ Editar para escribir la respuesta del grupo aquí.",
+      "aiPlaceholder": "Pulsa 'Ejecutar IA' para generar la respuesta en vivo.",
+      "votePrompt": "¿Quién ganó esta ronda?",
+      "judge": {
+        "kicker": "Juez IA · consultivo",
+        "button": "Pedir a la IA que juzgue",
+        "buttonTitle": "Dejar que la IA compare ambas respuestas (solo consultivo — tu voto sigue ganando).",
+        "running": "IA juzgando…",
+        "disabledHint": "Ejecuta primero la IA y asegúrate de que la respuesta humana no está vacía.",
+        "errorPrefix": "El juez IA falló",
+        "verdictHuman": "El tester humano gana esta ronda",
+        "verdictAi": "La IA gana esta ronda",
+        "verdictTie": "Es un empate",
+        "confidenceLabel": "Confianza",
+        "confidence_low": "baja",
+        "confidence_medium": "media",
+        "confidence_high": "alta",
+        "criteriaAccuracy": "Precisión",
+        "criteriaCoverage": "Cobertura",
+        "criteriaPracticalValue": "Valor práctico",
+        "biasDisclaimer": "Nota: un juez IA puede favorecer las respuestas al estilo IA (sesgo de auto-preferencia — las respuestas más largas y estructuradas tienden a parecer 'mejores' para el modelo). Este veredicto es consultivo; el marcador solo cuenta tu voto.",
+        "rawToggle": "Mostrar salida IA sin formato (depuración)"
+      },
+      "scenarios": {
+        "title": "Del requisito a los escenarios de prueba",
+        "prompt": "Pega un requisito. Tanto el tester como la IA deben producir un conjunto priorizado de escenarios.",
+        "sample": "El sistema permitirá a un usuario registrado restablecer su contraseña por correo electrónico. El enlace del correo debe expirar en 1 hora. El usuario debe ser notificado del restablecimiento en su correo electrónico principal.",
+        "humanAnswer": "- **P1 Ruta feliz**: el usuario válido solicita el restablecimiento, recibe el correo en un minuto, el enlace funciona una vez.\n- **P1 Seguridad**: el enlace no puede reutilizarse, no puede adivinarse, expira exactamente después de 1h — probar a los 59m / 60m / 61m.\n- **P1 Abuso**: el correo no registrado no debe revelar la existencia de la cuenta (mismo tiempo y texto de respuesta).\n- **P2 Carrera**: dos correos de restablecimiento en 30s — solo el enlace más reciente es válido.\n- **P2 i18n**: el correo de restablecimiento respeta la preferencia de idioma del usuario.\n- **P3 Notificación**: si el correo principal cambia durante el flujo, ¿quién recibe la notificación?\n- **Charter exploratorio**: 'En 20 min, intenta bloquear la cuenta de un usuario usando solo el flujo de restablecimiento.'"
+      },
+      "risk": {
+        "title": "Priorización basada en riesgos de una versión",
+        "prompt": "Pega el alcance de una versión (funcionalidades, correcciones, bugs, infraestructura). El tester y la IA deben clasificar qué probar primero — y por qué.",
+        "sample": "Alcance de la versión 24.3 (7 días para publicar):\n- NUEVO: Autenticación de dos factores vía SMS/TOTP (obligatoria para cuentas de administrador)\n- NUEVO: Exportación CSV de facturas con etiquetas de impuestos localizadas (lanzamiento en la UE)\n- CORRECCIÓN: Redondeo en el cálculo de descuentos (reportado por finanzas para 3 inquilinos)\n- CORRECCIÓN: El enlace de restablecimiento de contraseña a veces expira en 30 min en lugar de 1h\n- CORRECCIÓN: El tooltip del panel se superpone a la barra lateral en pantallas de 13\"\n- INFRAESTRUCTURA: Actualización de PostgreSQL 14 → 15\n- DEPENDENCIAS: React 17 → 18 (cambios importantes en una librería de terceros)\nEl Director Financiero ha pedido cero regresiones en el módulo de facturas este trimestre.",
+        "humanAnswer": "- **P1 Corrección de redondeo + anillo de regresión en facturas** — señal del Director Financiero. Valores límite (0,00; -0,01; 999.999,99; multi-moneda).\n- **P1 2FA para administrador** — *puerta de seguridad*. Bloqueo, bypass vía restablecimiento de contraseña, flujo de recuperación, el administrador no puede bloquearse a sí mismo del inquilino.\n- **P1 Actualización de React 18** — cambios de concurrencia; prueba toda la aplicación, bombardea las 5 pantallas principales por tráfico.\n- **P2 Exportación CSV con etiquetas de impuestos de la UE** — corrección de localización, UTF-8 se abre en Excel, caracteres especiales en el nombre del comprador.\n- **P2 PostgreSQL 14→15** — ejecuta el paquete de regresión estándar de BD. Documenta la ventana de rollback.\n- **P3 Desviación en expiración del restablecimiento de contraseña** — molesto, bajo impacto; limitar a 2h de investigación.\n- **P3 Superposición del tooltip** — puramente cosmético en 13\". Verificar y seguir adelante.\n- **Oráculo humano**: preguntar al Director Financiero si la fecha límite de la corrección de facturas es fija. Si es así, reducir el riesgo publicándola 24h antes que todo lo demás."
+      },
+      "ambiguities": {
+        "title": "Búsqueda de ambigüedades en una historia de usuario",
+        "prompt": "Pega una historia de usuario. Tanto el tester como la IA deben listar suposiciones ocultas y términos ambiguos.",
+        "sample": "Como cliente, quiero buscar productos rápidamente para poder encontrar lo que necesito. Criterios de aceptación: la búsqueda funciona rápido y devuelve resultados relevantes.",
+        "humanAnswer": "- **'Rápidamente' / 'rápido'** — no es comprobable. ¿Cuántos ms? ¿Caché fría o caliente? ¿En qué red?\n- **'Relevante'** — ¿por qué clasificación? ¿Ventas, popularidad, personalización? ¿Conjunto de evaluación offline?\n- **'Cliente'** — ¿con sesión iniciada o anónimo? ¿Se comporta diferente el B2B?\n- **'Productos'** — ¿solo en stock? ¿Archivados? ¿Bloqueados por región?\n- **Faltante**: resultados vacíos, errores tipográficos, coincidencia difusa, scripts no latinos, accesibilidad, analíticas, límite de velocidad.\n- **Pregunta de seguimiento para el PO**: '¿Cuál es la peor experiencia de búsqueda que estamos dispuestos a publicar?'"
+      },
+      "exploratory": {
+        "title": "Diseño de charters de pruebas exploratorias",
+        "prompt": "Describe un producto o funcionalidad. El tester y la IA deben escribir 3-4 charters exploratorios en el formato Bach/Hendrickson.",
+        "sample": "Funcionalidad bajo prueba: Chat en la aplicación para una consulta de telemedicina.\n- El médico y el paciente pueden intercambiar texto, imágenes y PDFs durante una videoconsulta activa.\n- El historial del chat se mantiene cifrado; el médico ve los últimos 90 días, el paciente los últimos 30.\n- El paciente puede 'hacer una consulta de seguimiento' 24h después de que se cierre la consulta; esto reabre el chat en solo lectura para el médico.\n- Publicamos en iOS, Android y web.",
+        "humanAnswer": "- **Charter 1** — *Explorar el comportamiento del chat bajo una red inestable, con cargas de archivos, para descubrir pérdida de datos o estado inconsistente entre las vistas del médico y del paciente.* 45 min, dos dispositivos.\n- **Charter 2** — *Explorar la brecha de retención de 30/90 días, con consultas antiguas, para descubrir filtración de información o interfaz que simule que los datos existen cuando han expirado.*\n- **Charter 3** — *Explorar la ventana de seguimiento de 24h, con zonas horarias límite, para descubrir si '24h' es tiempo de reloj o UTC, y qué sucede en los cambios de horario de verano.*\n- **Charter 4** — *Explorar las cargas de imágenes/PDF con archivos médicamente sensibles, para descubrir cómo se comunican los errores, la cancelación y los reintentos — en un lenguaje que no asuste a un paciente durante la consulta.*\n- **Señal humana**: el *tono emocional* de los mensajes de error durante una consulta médica solo lo puede juzgar un tester humano. La IA no lo sentirá."
+      },
+      "followups": {
+        "title": "Preguntas de seguimiento para un bug",
+        "prompt": "Pega un informe de bug. Tanto el tester como la IA producen las preguntas de seguimiento de mayor señal.",
+        "sample": "Bug: El pago a veces falla. Ayer me dio un error al intentar comprar dos artículos. El error decía 'algo salió mal'. Por favor, arregla.",
+        "humanAnswer": "- **Reproducción**: ¿artículos exactos, cantidades, método de pago, navegador, zona horaria, móvil o escritorio?\n- **Alcance**: ¿mismo usuario con un carrito diferente? ¿Otros usuarios en la misma región/inquilino? ¿Con sesión iniciada vs. anónimo?\n- **Oráculo**: ¿cuál era el mensaje/siguiente paso esperado? ¿Tenemos una captura de pantalla o HAR?\n- **Entorno**: ¿producción, staging, qué commit estaba desplegado? ¿Algún indicador de funcionalidad?\n- **Arte previo**: ¿tickets relacionados? ¿Incidentes conocidos del proveedor de pagos el mismo día?\n- **Impacto**: ¿cuántos fallos en las últimas 24h? ¿Ingresos en riesgo?"
+      },
+      "automation": {
+        "title": "De criterios de aceptación a código de automatización",
+        "prompt": "Pega criterios de aceptación y una pista sobre el stack. El tester y la IA producen un esqueleto de Playwright/Cypress — selectores, configuración, aserciones, limpieza.",
+        "sample": "Criterios de aceptación — 'Eliminar artículo del carrito':\n1. Dado un cliente con sesión iniciada con 3 artículos en el carrito\n2. Cuando el cliente hace clic en el icono 'Eliminar' del segundo artículo\n3. Entonces el artículo desaparece del carrito en menos de 500ms\n4. Y el total del carrito se actualiza para reflejar los 2 artículos restantes\n5. Y aparece un toast de deshacer durante 5 segundos\n6. Deshacer debe restaurar el artículo en la misma posición y cantidad\nStack: Playwright + TypeScript, patrón page-object ya en uso.",
+        "humanAnswer": "- **Preparación** — NO inicies sesión a través de la interfaz. Usa el inicio de sesión de API + establece cookies. Siembra el carrito a través de la API con exactamente 3 artículos conocidos.\n- **Page object** — `CartPage` expone `removeItemAt(index)`, `totalText()`, `itemsCount()`, `undoButton()`.\n- **Aserción principal** — espera a que el recuento de artículos vaya de 3 a 2 *y* el total cambie. Sin esperas fijas.\n- **Temporización (500ms)** — complicado en E2E; mueve la aserción de rendimiento a una prueba de componente. En E2E, afirma un presupuesto flexible ≤ 2s.\n- **Aserción de deshacer** — haz clic en deshacer en 5s, afirma recuento 2→3 *y* artículo de vuelta en el índice 1.\n- **Limpieza** — borra el carrito vía API, no vía interfaz, para evitar el acoplamiento.\n- **Riesgo** — inestabilidad en el toast de 5s; simula el reloj en la prueba de temporización.\n- **Decisión humana** — ¿cuán permisivo debe ser el límite de rendimiento? Es una conversación de producto, no de automatización."
+      },
+      "testData": {
+        "title": "Generación de datos de prueba",
+        "prompt": "Describe un esquema o dominio. El tester y la IA deben producir 8-12 filas que cubran la ruta feliz, los límites, los bordes de localización — y señalar datos sensibles.",
+        "sample": "Dominio: registro de cliente en comercio electrónico noruego.\nCampos:\n- nombreCompleto (cadena, máx. 120)\n- correo (correo electrónico válido, único)\n- númeroBirthday (número de identificación noruego, 11 dígitos, con verificación tipo Luhn)\n- teléfono (formato internacional, +47 predeterminado)\n- dirección (calle, código postal, ciudad, país)\n- consentimientoMarketing (booleano)\n- idiomaPreferido ('no' | 'en' | 'sv' | 'da')\nNecesitamos 8-12 filas de prueba que cubran casos típicos, bordes de localización, entradas sospechosas y marcadores de RGPD.",
+        "humanAnswer": "- **Fila 1 feliz NO** — Ola Nordmann, ola@eksempel.no, número de identificación válido, +47 48484848, Oslo NO, consentimiento=verdadero, idioma=no.\n- **Fila 2 feliz EN** — Jane Doe, jane@example.com, residente en UK pero con número de identificación noruego, +4412…, Bergen NO, idioma=en.\n- **Fila 3 límite nombre** — 'Å Æ Ø Å Æ Ø…' exactamente en 120 caracteres. También: 121.\n- **Fila 4 borde de localización** — nombre sueco con å/ö (Kjell-Åke Bergström), idioma=sv.\n- **Fila 5 sensible** — número de identificación que PARECE real pero falla la suma de verificación. Prueba la validación, no PII.\n- **Fila 6 malicioso** — correo con patrón SQLi, nombreCompleto con byte nulo `\\0`, dirección con `<script>`.\n- **Fila 7 consentimiento desactivado** — consentimientoMarketing=falso. Asegúrate de que el sistema no les envíe correos.\n- **Fila 8 unicode** — script árabe en nombreCompleto, renderizado RTL.\n- **⚠ Marca RGPD** — NUNCA uses un número de identificación real. Genera números sintéticos con el algoritmo de suma de verificación. NUNCA copies desde producción.\n- **Decisión humana** — ¿quién posee el conjunto de datos semilla? ¿La organización de pruebas? ¿El equipo de desarrollo? Quien lo posea debe versionarlo."
+      },
+      "oracle": {
+        "title": "El problema del oráculo",
+        "prompt": "Pega una especificación que esté en silencio, sea contradictoria o ambigua. El tester y la IA deben listar candidatos a 'comportamiento correcto' y la fuente del oráculo para cada uno.",
+        "sample": "Fragmento de especificación — 'Reembolso de un pedido parcialmente enviado':\n'Si un cliente solicita un reembolso y parte del pedido ya se ha enviado, el sistema reembolsa la parte no enviada inmediatamente y crea una autorización de devolución para la parte enviada. Si el cliente selecciona \"cancelar\", el pedido se cancela.'\n\nPregunta de los desarrolladores durante la reunión diaria:\n'¿Qué debe suceder si el cliente solicita un reembolso AL MISMO TIEMPO que el almacén marca el segundo artículo como enviado? ¿Qué vista gana?'",
+        "humanAnswer": "- **Candidato A — gana la intención del cliente** — revertir el envío si ocurre dentro de la misma ventana de transacción. *Oráculo*: contrato del cliente, precedente minorista.\n- **Candidato B — gana la realidad física** — si el almacén dice 'enviado', está enviado; el cliente obtiene una autorización de devolución. *Oráculo*: realidad logística, acuse de recibo de la API del transportista.\n- **Candidato C — gana el último en escribir** — cualquiera que obtenga primero el bloqueo de fila. *Oráculo*: implementación actual, nadie lo documentó.\n- **Lo que implica la especificación** — A — pero la especificación está en silencio sobre la carrera.\n- **Heurística de producto similar** — Amazon permite cancelar hasta que se imprime la etiqueta; después de eso, proceso de devolución.\n- **⚠ Pregunta humana para el PO** — ¿'enviado' significa 'etiqueta impresa' o 'escaneado por el transportista'? La especificación usa la palabra sin definirla. El juicio humano, con contexto del contrato del transportista, es insustituible.\n- **Estrategia provisional** — documentar el comportamiento actual, escribir una prueba de caracterización, no cambiar código hasta que el PO responda."
+      },
+      "triage": {
+        "title": "Triaje de bugs y gravedad",
+        "prompt": "Pega un informe de bug. El tester y la IA asignan gravedad (S1-S4) y prioridad (P1-P3) con razonamiento — y separan la señal clasificable por IA de los factores de juicio humano.",
+        "sample": "Título del bug: 'El PDF de la factura muestra un porcentaje de IVA incorrecto para clientes alemanes'\nDescripción:\n- El cliente en Alemania informa que el PDF de la factura muestra un IVA del 25% en lugar del 19%.\n- El importe real cobrado (en la pasarela de pago) es correcto al 19%.\n- El PDF es el documento que el cliente sube a su oficina de impuestos.\n- Visto en 4 pedidos en los últimos 2 días. El inquilino es un revendedor SaaS de tamaño mediano.\n- Se dedujo el importe correcto. Solo la etiqueta del PDF es incorrecta.\n- La corrección se estima en 4 horas. Solución alternativa: reenviar el PDF corregido manualmente.",
+        "humanAnswer": "- **Gravedad (basada en síntomas, clasificable por IA)** — **S2**. Salida funcionalmente incorrecta, existe solución alternativa, los ingresos no están en riesgo inmediato.\n- **Prioridad (ponderada empresarialmente, decisión humana)** — **P1**. Este es un *documento fiscal*. Una etiqueta de impuesto incorrecta presentada a una oficina de impuestos alemana puede desencadenar una auditoría. El riesgo regulatorio eclipsa la corrección de 4 horas.\n- **Desglose del razonamiento**:\n  - La IA tiene razón en que el dinero es correcto → no es S1.\n  - La IA normalmente sugeriría P2 basándose en 'solo 4 clientes afectados'.\n  - El tester humano sabe: un cliente señalado por la Administración Tributaria puede asustar a diez más. Los reguladores alemanes no son indulgentes.\n- **Riesgo adicional a señalar** — ¿enviamos el PDF incorrecto a más de 4 clientes? Revisar los registros de los últimos 30 días antes de corregir.\n- **No cerrar el ticket** hasta que los 4 clientes reciban un PDF corregido y un aviso por escrito.\n- **Señal humana** — el peso regulatorio y reputacional NO está en la descripción del bug. La IA no puede inventarlo."
+      },
+      "accessibility": {
+        "title": "Revisión de accesibilidad y heurísticas de UX",
+        "prompt": "Pega una descripción de interfaz de usuario o un fragmento HTML. El tester y la IA identifican violaciones de WCAG 2.1 AA y problemas de heurísticas de Nielsen — separando las comprobaciones mecánicas del juicio humano.",
+        "sample": "<div onclick=\"submitForm()\">\n  <span style=\"color: #999; background: #eee;\">Enviar</span>\n</div>\n<div>\n  <img src=\"error.png\" />\n  <p>Algo salió mal. Por favor, inténtalo de nuevo.</p>\n</div>\n<div>\n  Rellena los campos <span style=\"color:red\">obligatorios</span> y haz clic en\n  <span style=\"color: #999; background: #eee;\">Enviar</span>.\n</div>",
+        "humanAnswer": "- **Mecánico (automatizable por IA)**:\n  - Falta el rol de botón — `<div onclick>` no es un botón. Usa `<button>` o añade `role=\"button\"` + manejador de teclado. *WCAG 4.1.2*.\n  - Fallo de contraste — `#999` sobre `#eee` ≈ 1,6:1. *WCAG 1.4.3* requiere 4,5:1.\n  - Falta `alt` en `error.png` — el lector de pantalla no dice nada. *WCAG 1.1.1*.\n  - Solo el color para señalar 'obligatorio' (texto rojo). *WCAG 1.4.1*.\n  - Sin estilo de foco visible en el fragmento. *WCAG 2.4.7*.\n- **Heurísticas de Nielsen**:\n  - El mensaje de error *'Algo salió mal'* — sin diagnóstico, sin pista de recuperación. Viola H9.\n  - Los campos obligatorios no están etiquetados como tales en el TEXTO — solo con color.\n- **Solo para humanos**:\n  - La palabra 'Enviar' en un botón gris y desenfatizado *parece* desactivado incluso cuando está activo — confuso para los novatos. Los comprobadores automáticos no lo señalan.\n  - El tono del error es frío; en un contexto médico o financiero se lee como desdeñoso.\n  - Culturalmente: el rojo para 'obligatorio' es neutro en Occidente, pero alarmante en algunos mercados del Este de Asia.\n- **⚠ Regla** — la IA detecta el 80% mecánico. Un humano detecta el 20% que realmente perjudica a los usuarios reales."
+      },
+      "tests_from_code": {
+        "title": "Casos de prueba de un fragmento de código (heredado)",
+        "prompt": "Pega una función o clase. Tanto el tester como la IA proponen un conjunto de pruebas compacto.",
+        "sample": "function discountPrice(price, percentage) {\n  if (percentage < 0 || percentage > 100) throw new Error('invalid percentage');\n  return price - (price * percentage / 100);\n}",
+        "humanAnswer": "- **Ruta feliz**: discountPrice(100, 10) === 90.\n- **Límite**: 0% y 100% — espera el precio y 0.\n- **Inválido**: -1 y 101 deben lanzar con el mensaje 'invalid percentage'.\n- **Bordes de tipo**: ¿percentage no numérico? ¿NaN? ¿Infinity? (Probable bug silencioso — actualmente no protegido.)\n- **Precio negativo**: ¿es legal un precio negativo? La especificación no lo dice — **pregunta al oráculo para el PO.**\n- **Punto flotante**: discountPrice(9,99, 33) — afirma dentro de tolerancia, no igualdad.\n- **Propiedad**: para todo (p, %) válido el resultado está en [0, p]."
+      }
+    },
+    "framework": {
+      "title": "¿Cuándo confiar en quién?",
+      "lead": "Una cuadrícula de decisión compacta por dimensión — no una jerarquía, una caja de herramientas.",
+      "col": {
+        "dimension": "Dimensión",
+        "ai": "La IA destaca cuando…",
+        "human": "Los humanos destacan cuando…",
+        "verdict": "Regla práctica"
+      },
+      "rows": {
+        "context": {
+          "dimension": "Contexto empresarial / partes interesadas",
+          "ai": "…el contexto está documentado y es estable.",
+          "human": "…el contexto vive en la cabeza de las personas, en Slack y en conversaciones de pasillo.",
+          "rule": "Los humanos sostienen el contexto; la IA ejecuta dentro de él."
+        },
+        "risk": {
+          "dimension": "Riesgo y seguridad",
+          "ai": "…el riesgo es clasificable por patrones de datos pasados.",
+          "human": "…el riesgo es novedoso, político o reputacional.",
+          "rule": "La IA elabora la lista de riesgos; un humano es el dueño del signo."
+        },
+        "ambiguity": {
+          "dimension": "Ambigüedad en los inputs",
+          "ai": "…la ambigüedad es lingüística (términos indefinidos, contradicciones).",
+          "human": "…la ambigüedad esconde intención o compensaciones silenciosas.",
+          "rule": "Deja que la IA proponga candidatos; los humanos resuelven la intención."
+        },
+        "novelty": {
+          "dimension": "Novedad",
+          "ai": "…el problema es una variante de algo común.",
+          "human": "…el problema nunca lo ha visto el equipo.",
+          "rule": "Los primeros N bugs de una nueva funcionalidad son un juego humano."
+        },
+        "volume": {
+          "dimension": "Volumen / repetitividad",
+          "ai": "…hay 1000 casos similares a tratar.",
+          "human": "…hay 3, y cada uno es único.",
+          "rule": "Automatiza la amplitud con IA; invierte a los humanos en profundidad."
+        },
+        "judgement": {
+          "dimension": "Juicio de valor",
+          "ai": "…la métrica está pre-acordada y es medible.",
+          "human": "…'suficientemente bueno' es una decisión de criterio.",
+          "rule": "La IA optimiza las métricas que elegiste. Los humanos eligen las métricas."
+        },
+        "accountability": {
+          "dimension": "Responsabilidad",
+          "ai": "—",
+          "human": "…alguien tiene que ponerse delante de un cliente o un regulador.",
+          "rule": "La responsabilidad es siempre humana. La IA puede ayudarte a defenderla."
+        }
+      }
+    },
+    "scoreboard": {
+      "title": "Marcador del taller",
+      "lead": "Recuento en vivo de la sesión. Los votos de las rondas cara a cara llegan aquí automáticamente. Añade nombres de grupos, deshaz el último voto o exporta el registro completo como JSON.",
+      "notePlaceholder": "Nota de ronda (opcional, se adjunta al próximo +1)",
+      "newGroupPlaceholder": "Nuevo nombre de grupo",
+      "addGroup": "Añadir grupo",
+      "undo": "Deshacer último",
+      "reset": "Reiniciar",
+      "export": "Exportar JSON",
+      "logTitle": "Registro de rondas",
+      "aiJudgeNone": "—",
+      "aiJudgeAgree": "de acuerdo",
+      "aiJudgeDisagree": "dijo",
+      "aiJudgeAgreeTitle": "El juez IA estuvo de acuerdo con tu voto.",
+      "aiJudgeDisagreeTitle": "El juez IA habría elegido diferente — posible sesgo de auto-preferencia en juego."
+    },
+    "cribSheet": {
+      "privateLabel": "Solo para el ponente",
+      "title": "Guía rápida (introducción de 60 seg., citas, preguntas probables)",
+      "openerTitle": "Introducción de 60 segundos",
+      "quotesTitle": "Citas para usar (solo si es natural)",
+      "qaTitle": "Preguntas probables del público",
+      "closerTitle": "Cierre (lo que quieres que recuerden)",
+      "openerParas": [
+        "Buenos días. Antes de dividirnos en grupos, un breve encuadre. La pregunta '¿humanos o IA?' es la equivocada — la pregunta útil es '¿humanos o IA, para qué parte del trabajo de testing, bajo qué condiciones?' Eso es lo que esta sesión intenta responder, con datos y con nuestras propias manos.",
+        "Mi sesgo por adelantado: uso IA a diario para el trabajo de testing, he construido la página que estáis viendo para poner a prueba mi propio pensamiento, y sigo creyendo que los mejores testers del mundo en 2026 son humanos que saben exactamente cuándo utilizar el modelo — y cuándo no."
+      ],
+      "closerParas": [
+        "La IA no nos quitó el testing. Se llevó el 80% aburrido y nos entregó unas tijeras más afiladas para el 20% que realmente decide si el software perjudica a los usuarios o les ayuda.",
+        "Si recuerdas una cosa: el tester que gana en 2026 es el que trata a la IA como un junior poco fiable pero rápido — revisas todo, no confías en el juicio en nada, pero entregas el doble de valor real."
+      ],
+      "quotes": [
+        {
+          "text": "El testing es un proceso infinito de comparar lo invisible con lo ambiguo para evitar que lo impensable le suceda a lo anónimo.",
+          "attribution": "James Bach",
+          "use": "Apertura — establece el escenario para el argumento del 'problema del oráculo'."
+        },
+        {
+          "text": "Una prueba es un experimento diseñado para revelar información. Las preguntas que no puedes responder con un pasa/falla son preguntas que vale la pena hacer de todas formas.",
+          "attribution": "Cem Kaner (Lecciones aprendidas en pruebas de software)",
+          "use": "Al defender el testing exploratorio frente a 'pero la IA pasó todas las pruebas'."
+        },
+        {
+          "text": "La verdadera prueba de un sistema de IA no es cómo se comporta en los ejemplos que vio, sino qué hace la primera vez que el mundo le presenta algo nuevo.",
+          "attribution": "Dan Hendrycks (paráfrasis, CAIS 2025)",
+          "use": "Cuando alguien afirma que la respuesta de la IA parece 'obviamente correcta'."
+        },
+        {
+          "text": "Nuestros modelos ahora son mejores programadores que el humano mediano. Eso no debería amenazarte, debería liberarte para hacer trabajo que solo un humano puede hacer.",
+          "attribution": "Dario Amodei, Anthropic (2025, paráfrasis)",
+          "use": "Cierre — reencuadra el desplazamiento como redirección."
+        }
+      ],
+      "qa": [
+        {
+          "q": "¿No va a reemplazar la IA a los testers en 2-3 años?",
+          "a": "Algunas actividades de testing — sí, y ya lo están (automatización repetitiva, generación de datos, triaje de regresión). Pero el trabajo que realmente decide si el software es apto para su propósito — decisiones del oráculo, encuadre de riesgos, juicio de las partes interesadas — es estructuralmente humano. El rol se reduce en algunos lugares y crece en otros. En conjunto, los que aprenden a dirigir la IA ganan."
+        },
+        {
+          "q": "¿Cómo sé que la respuesta de la IA no está alucinando?",
+          "a": "No puedes, nunca, con plena certeza. Así que el patrón es: nunca aceptes la salida de IA como un oráculo de pruebas. Es una lista de candidatos, una segunda opinión o un primer borrador. El tester aún tiene que verificar contra un oráculo real — especificación, datos de producción, parte interesada, producto comparable."
+        },
+        {
+          "q": "¿Qué modelo debemos elegir para el trabajo de testing?",
+          "a": "Honestamente, importa menos de lo que la gente piensa para el 80% de las tareas de testing. Cualquier modelo de frontera es suficientemente bueno para borradores de escenarios y búsquedas de ambigüedades. Donde importa la elección del modelo es en el razonamiento profundo de código y el análisis de bugs en contexto largo — ahí Claude Opus 4.7 y GPT-5 van visiblemente por delante hoy, pero la brecha se cierra cada pocos meses."
+        },
+        {
+          "q": "¿Cómo medimos si la IA realmente está ayudando?",
+          "a": "Dos números que vale la pena seguir: (1) tiempo hasta la primera prueba fallida en una nueva funcionalidad, (2) tasa de defectos escapados en producción. Si la IA acorta (1) sin empeorar (2), está ganándose su lugar. Si (2) sube, estás externalizando el juicio que no deberías externalizar."
+        },
+        {
+          "q": "¿Qué debería hacer un tester junior de manera diferente, empezando hoy?",
+          "a": "Dos cosas. Primero, trata cada respuesta de la IA como un borrador con el que tienes que argumentar — no aceptar. Segundo, dobla la apuesta en las habilidades solo-humanas: profundidad de dominio, confianza de las partes interesadas, charters exploratorios. Esas son las habilidades que el modelo no puede clonar, y se componen más rápido al principio de una carrera."
+        }
+      ]
+    },
+    "future": {
+      "kicker": "Mejoras futuras",
+      "lead": "Ideas deliberadamente aparcadas, no implementadas — documentadas aquí para que la próxima iteración comience con contexto, no con una página en blanco.",
+      "tradeoffPrefix": "Por qué se aplazó",
+      "ideas": [
+        {
+          "title": "Bucle de retroalimentación por ronda con automejora de la IA",
+          "summary": "Un área de texto bajo '¿Quién ganó esta ronda?' donde el humano escribe consejos de mejora para la IA. Se consideraron tres variantes de diseño, con diferentes perfiles de riesgo:",
+          "options": [
+            {
+              "label": "A · Solo registro",
+              "text": "Almacena la retroalimentación como entradas {tarea, texto, marca de tiempo}. Sin cambio de prompt. Exportado con el registro de rondas para revisión manual después del taller. Menor riesgo, menor valor de demostración en vivo."
+            },
+            {
+              "label": "B · Inyección efímera (preferida)",
+              "text": "Un botón 'Volver a ejecutar con retroalimentación' envía la respuesta anterior de la IA + la crítica del humano de vuelta al modelo para un segundo intento, solo en esa ronda. El prompt base no se toca. Mayor momento de demostración en vivo, cero deriva entre rondas."
+            },
+            {
+              "label": "C · Evolución persistente del prompt",
+              "text": "La retroalimentación impulsa una segunda llamada LLM que propone una diferencia en el prompt del sistema de la tarea. Un humano lo aprueba; el prompt se versiona en MongoDB con rollback. Afecta a todas las rondas futuras."
+            }
+          ],
+          "tradeoff": "La opción C es la interpretación literal de 'la IA mejora su propio prompt', pero sin un conjunto de pruebas de regresión puede provocar deriva silenciosa (una mejora para una tarea degrada otra que comparte vocabulario), y los cambios de prompt a mitad del taller socavan la configuración comparativa. Camino seguro al retomarlo: empezar con A para recopilar señales, pasar a B para la ranura de demostración en vivo, y solo graduarse a C una vez que exista un conjunto de regresión para las 10 tareas."
+        },
+        {
+          "title": "Pipeline RAG completo de ISTQB (la integración 'real')",
+          "summary": "Hoy el módulo usa la Opción A a continuación (anclas seleccionadas por el mantenedor). Un pipeline de generación aumentada por recuperación adecuado sobre los syllabi completos de ISTQB permitiría a la IA citar syllabi textualmente con números de página. Se consideraron tres opciones de diseño:",
+          "options": [
+            {
+              "label": "A · Anclas seleccionadas (publicado)",
+              "text": "JSON escrito a mano en backend/data/istqb_anchors.json con números de sección y resúmenes de una línea por ronda. Huella de tokens pequeña (~80-150 tokens por prompt), sin nueva infraestructura, funciona con cualquier proveedor de LLM. Lo que publica hoy este módulo."
+            },
+            {
+              "label": "B · RAG completo en la nube",
+              "text": "Extraer los 8 PDFs (~9 MB), fragmentar, incrustar con incrustaciones de OpenAI/Cohere, almacenar en una BD vectorial (FAISS, Chroma, Qdrant), recuperar los k fragmentos superiores por consulta e inyectarlos en el prompt del sistema. Problema: los syllabi de ISTQB se distribuyen bajo términos restrictivos — enviar fragmentos de texto completo a LLMs en la nube es legalmente ambiguo."
+            },
+            {
+              "label": "C · RAG local híbrido (camino recomendado)",
+              "text": "Ejecutar el RAG completo solo cuando el proveedor de LLM activo es local (LM Studio / Ollama / Llama.cpp), manteniendo el texto de ISTQB dentro de la máquina del desarrollador. Volver a la Opción A automáticamente cuando se selecciona un proveedor en la nube (OpenAI, OpenRouter, ItemAI). Lo mejor de ambos mundos: compatible por defecto, recuperación rica cuando el tester está en las instalaciones."
+            }
+          ],
+          "tradeoff": "Construir un pipeline RAG completo dos días antes de un taller en vivo es de alto riesgo (la extracción de PDF es frágil, los almacenes vectoriales añaden partes móviles, y cualquier fallo durante la demostración de SOCO daña la credibilidad). La opción A captura ~70% del valor pedagógico con ~5% del costo de construcción, y el JSON es auditable. Camino seguro: publicar la Opción A ahora, añadir la Opción C después del taller vinculándola a la configuración del proveedor."
+        }
+      ]
+    },
+    "istqb": {
+      "badge": "Anclado en ISTQB",
+      "tooltip": "Prompt anclado en los syllabi de ISTQB. Haz clic para ver las secciones utilizadas.",
+      "title": "Secciones de los syllabi en las que está anclado este prompt",
+      "footnote": "Los syllabi de ISTQB se referencian como resúmenes breves seleccionados (notas del autor). El uso del texto completo se aplaza — ver Mejoras futuras al final de esta pestaña."
+    }
   }
 }
