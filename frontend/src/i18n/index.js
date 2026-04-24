@@ -86,6 +86,9 @@ import esWebSearchModule from './locales/es/webSearchModule.json';
 import esRepoAnalyzerModule from './locales/es/repoAnalyzerModule.json';
 import esAgentCursorModule from './locales/es/agentCursorModule.json';
 import esLearningRepoModule from './locales/es/learningRepoModule.json';
+import esDocumentAnalyzerModule from './locales/es/documentAnalyzerModule.json';
+import esLearningDocumentModule from './locales/es/learningDocumentModule.json';
+import esAgenticRagDocumentModule from './locales/es/agenticRagDocumentModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -110,7 +113,7 @@ i18n
         common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule, ...noFeatureRoadmapModule, ...noCloudInstallModule, ...noAgiHubModule, ...noWebSearchModule }
       },
       es: {
-        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule }
+        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule, ...esDocumentAnalyzerModule, ...esLearningDocumentModule, ...esAgenticRagDocumentModule }
       }
     }
   });
