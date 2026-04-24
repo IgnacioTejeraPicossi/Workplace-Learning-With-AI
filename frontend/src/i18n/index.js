@@ -11,6 +11,15 @@ import noRunTest from './locales/no/runTestModule.json';
 import enAppChrome from './locales/en/appChrome.json';
 import noAppChrome from './locales/no/appChrome.json';
 import esAppChrome from './locales/es/appChrome.json';
+import esMicroLesson from './locales/es/microLesson.json';
+import esScenarioSimulator from './locales/es/scenarioSimulator.json';
+import esSimulationResults from './locales/es/simulationResults.json';
+import esTeamDynamics from './locales/es/teamDynamics.json';
+import esCertificationsModule from './locales/es/certificationsModule.json';
+import esCareerCoachModule from './locales/es/careerCoachModule.json';
+import esSkillsForecastModule from './locales/es/skillsForecastModule.json';
+import esKnowledgeMapModule from './locales/es/knowledgeMapModule.json';
+import esBabelLibraryModule from './locales/es/babelLibraryModule.json';
 import enMicroLesson from './locales/en/microLesson.json';
 import noMicroLesson from './locales/no/microLesson.json';
 import enScenarioSimulator from './locales/en/scenarioSimulator.json';
@@ -95,7 +104,7 @@ i18n
         common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule, ...noFeatureRoadmapModule, ...noCloudInstallModule, ...noAgiHubModule }
       },
       es: {
-        common: { ...esCommon, ...esAppChrome }
+        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule }
       }
     }
   });

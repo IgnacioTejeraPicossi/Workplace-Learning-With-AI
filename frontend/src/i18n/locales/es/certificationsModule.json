@@ -1,0 +1,83 @@
+{
+  "certificationsModule": {
+    "pageTitle": "Recomendación de ruta de certificación",
+    "tabs": {
+      "recommend": {
+        "label": "Obtener recomendaciones",
+        "title": "Obtén sugerencias de certificaciones con IA según tu rol, habilidades y objetivos."
+      },
+      "studyPlan": {
+        "label": "Plan de estudio",
+        "title": "Genera un plan de estudio semanal personalizado para la certificación seleccionada."
+      },
+      "simulation": {
+        "label": "Examen de práctica",
+        "title": "Practica con preguntas y escenarios realistas de entrevistas de certificación."
+      },
+      "history": {
+        "label": "Historial",
+        "title": "Consulta tus planes de estudio anteriores y revisa los detalles."
+      }
+    },
+    "recommend": {
+      "sectionTitle": "Obtener recomendaciones de certificación con IA",
+      "yourRole": "Tu rol",
+      "rolePlaceholder": "p. ej., Desarrollador backend, Ingeniero DevOps",
+      "experienceLevel": "Nivel de experiencia",
+      "experience": {
+        "beginner": "Principiante (0-2 años)",
+        "intermediate": "Intermedio (2-5 años)",
+        "advanced": "Avanzado (más de 5 años)"
+      },
+      "currentSkills": "Habilidades actuales",
+      "skillPlaceholder": "Añade una habilidad… (o pega varias separadas por comas)",
+      "quickAdd": "🧪 Añadir rápido",
+      "quickAddTitle": "Añade las habilidades que has introducido",
+      "careerGoals": "Objetivos profesionales",
+      "goalsPlaceholder": "Describe tus objetivos profesionales y lo que quieres lograr…",
+      "getRecommendations": "Obtener recomendaciones",
+      "gettingRecommendations": "Obteniendo recomendaciones…",
+      "getRecommendationsTitle": "Obtén recomendaciones de certificación con IA basadas en tu perfil y objetivos",
+      "aiRecommendations": "Recomendaciones de IA"
+    },
+    "profileStatus": {
+      "loading": "Cargando tu perfil…",
+      "loaded": "¡Perfil cargado correctamente!",
+      "noProfile": "No se encontró perfil guardado. Rellena tus datos para empezar.",
+      "loadError": "No se pudo cargar el perfil guardado. Aún puedes rellenar tus datos.",
+      "saved": "¡Perfil guardado! Tus datos se rellenarán automáticamente la próxima vez.",
+      "recommendError": "Error al obtener recomendaciones. Por favor, inténtalo de nuevo.",
+      "autoExpanded": "✅ Expandido automáticamente: «{{title}}»"
+    },
+    "studyPlan": {
+      "sectionTitle": "Generar plan de estudio personalizado",
+      "skillsAutoFilled": "✅ Habilidades rellenadas automáticamente desde tu perfil: {{skills}}",
+      "certificationName": "Nombre de la certificación",
+      "certPlaceholder": "p. ej., AWS Solutions Architect Associate",
+      "studyTimePerWeek": "Tiempo de estudio (horas/semana)",
+      "targetDate": "Fecha de finalización prevista",
+      "currentSkillsForCert": "Habilidades actuales (para esta certificación)",
+      "syncSkills": "🔄 Sincronizar habilidades del perfil ({{count}} habilidades)",
+      "generateStudyPlan": "Generar plan de estudio",
+      "generatingStudyPlan": "Generando plan de estudio…",
+      "generateStudyPlanTitle": "Genera un plan de estudio personalizado para la certificación seleccionada",
+      "yourStudyPlan": "Tu plan de estudio"
+    },
+    "practice": {
+      "sectionTitle": "Practicar entrevista de certificación",
+      "certToPractice": "Certificación a practicar",
+      "startPractice": "Iniciar examen de práctica",
+      "startingSimulation": "Iniciando simulación…",
+      "startPracticeTitle": "Inicia una simulación realista de entrevista de certificación para poner a prueba tus conocimientos",
+      "interviewHeading": "Entrevista de certificación"
+    },
+    "history": {
+      "sectionTitle": "Historial de planes de estudio",
+      "navigatingTo": "🎯 Navegando a: «{{title}}» — expandiendo automáticamente…",
+      "empty": "No se encontraron planes de estudio.",
+      "hide": "Ocultar",
+      "view": "Ver"
+    },
+    "fallbackNoPlan": "No hay contenido de plan de estudio disponible"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "microLesson": {
+    "pageTitle": "Micro-lección",
+    "topicPlaceholder": "Introduce el tema de la micro-lección",
+    "getButton": "Obtener micro-lección",
+    "getButtonTitle": "Genera una micro-lección personalizada con IA sobre el tema elegido.",
+    "savedSectionTitle": "Micro-lecciones guardadas",
+    "modalTitle": "Micro-lección",
+    "errorFetch": "Error al obtener la micro-lección.",
+    "quizTitle": "Cuestionario (demo)",
+    "quizQuestion": "P: ¿Cuál es la idea clave de esta micro-lección?",
+    "quizAnswerPlaceholder": "Tu respuesta…",
+    "submit": "Enviar",
+    "takeQuiz": "Hacer el cuestionario",
+    "list": {
+      "heading": "Micro-lecciones guardadas",
+      "loading": "Cargando lecciones guardadas…",
+      "errorPrefix": "Error:",
+      "filterPlaceholder": "Filtrar por tema…",
+      "clear": "Limpiar",
+      "empty": "No se encontraron lecciones.",
+      "topicLabel": "Tema:",
+      "expand": "Ampliar",
+      "compress": "Comprimir",
+      "delete": "Eliminar",
+      "deleteConfirm": "¿Eliminar esta lección?",
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "navigatingTo": "Navegando a: \"{{title}}\" — expandiendo automáticamente…"
+    }
+  }
+}

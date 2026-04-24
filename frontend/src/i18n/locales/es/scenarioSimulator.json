@@ -1,0 +1,117 @@
+{
+  "scenarioSimulator": {
+    "pageTitle": "Simulador de escenarios",
+    "intro": "Practica escenarios laborales del mundo real mediante simulaciones interactivas. Elige un tipo de escenario para comenzar.",
+    "ready": "Listo para crear la simulación",
+    "startSimulation": "Iniciar simulación",
+    "creatingPlaceholder": "Creando tu simulación interactiva…",
+    "statusMessages": [
+      "Creando escenario…",
+      "Construyendo elementos interactivos…",
+      "Generando respuestas…",
+      "Finalizando la simulación…"
+    ],
+    "session": {
+      "subtitle": "Escenario de formación interactivo",
+      "simulationTitle": "Simulación de {{name}}"
+    },
+    "custom": {
+      "title": "Escenario personalizado",
+      "description": "Crea una simulación para cualquier escenario laboral que quieras practicar",
+      "startCustom": "Iniciar personalizado",
+      "placeholder": "Introduce el tema de tu escenario (p. ej. «Cómo tratar con un jefe difícil»)",
+      "cancel": "Cancelar",
+      "alertEnterTopic": "Por favor, introduce un tema para el escenario."
+    },
+    "actions": {
+      "saveProgress": "Guardar progreso",
+      "loadProgress": "Cargar progreso",
+      "newScenario": "Nuevo escenario",
+      "interactiveActive": "Simulación interactiva activa",
+      "stepOf": "Paso {{current}} de {{total}}",
+      "yourChoice": "Tu elección:",
+      "choiceDetail": "Opción {{option}} — Paso {{step}}",
+      "systemResponse": "Respuesta del sistema:",
+      "continueNext": "Continuar al siguiente paso",
+      "completeSimulation": "Completar simulación",
+      "endSimulation": "Finalizar simulación",
+      "statusLabel": "Estado:",
+      "selectOptionHint": "Selecciona una opción para continuar al paso {{step}}",
+      "progressSavedAt": "Progreso guardado a las {{time}}",
+      "errorPrefix": "Error:",
+      "tryAgain": "Reintentar",
+      "optionNotDefined": "Opción no definida",
+      "genericFallback": "Respuesta para la opción {{option}} en el paso {{step}}: Esta elección tendría consecuencias específicas. Considera el impacto en la moral del equipo y los plazos del proyecto."
+    },
+    "alerts": {
+      "progressSaved": "¡Progreso guardado correctamente! Puedes continuar donde lo dejaste.",
+      "progressLoaded": "¡Progreso cargado correctamente!",
+      "noSavedProgress": "No se encontró progreso guardado.",
+      "congratulationsComplete": "¡Enhorabuena! Has completado la simulación. Tu progreso se ha actualizado en el panel de control."
+    },
+    "types": {
+      "customerService": {
+        "label": "Atención al cliente",
+        "description": "Gestiona clientes difíciles y reclamaciones"
+      },
+      "teamLeadership": {
+        "label": "Liderazgo de equipos",
+        "description": "Dirige reuniones de equipo y gestiona conflictos"
+      },
+      "salesNegotiation": {
+        "label": "Ventas y negociación",
+        "description": "Cierra acuerdos y negocia contratos"
+      },
+      "projectManagement": {
+        "label": "Gestión de proyectos",
+        "description": "Gestiona plazos y coordinación de equipos"
+      },
+      "conflictResolution": {
+        "label": "Resolución de conflictos",
+        "description": "Resuelve conflictos y disputas en el trabajo"
+      },
+      "presentation": {
+        "label": "Habilidades de presentación",
+        "description": "Realiza presentaciones y exposiciones efectivas"
+      }
+    },
+    "steps": [
+      {
+        "question": "¿Cuál es tu curso de acción inmediato?",
+        "options": {
+          "A": "Ignorar el problema y esperar a que el equipo se ponga al día.",
+          "B": "Informar a los interesados sobre el retraso.",
+          "C": "Reasignar el trabajo a un equipo diferente.",
+          "D": "Presionar al equipo para que haga horas extra."
+        }
+      },
+      {
+        "question": "¿Cómo gestionas la respuesta del equipo a tu decisión?",
+        "options": {
+          "A": "Organiza una reunión de equipo para hablar abiertamente de la situación.",
+          "B": "Envía una actualización por correo y espera respuestas.",
+          "C": "Reúnete individualmente con los líderes del equipo.",
+          "D": "Deja que el equipo lo resuelva por su cuenta."
+        }
+      },
+      {
+        "question": "¿Cuál es tu enfoque para comunicarte con los interesados?",
+        "options": {
+          "A": "Proporcionar informes semanales detallados de progreso.",
+          "B": "Convocar una reunión de gestión de crisis.",
+          "C": "Crear un cronograma de proyecto revisado con hitos.",
+          "D": "Minimizar la comunicación para evitar alarmar."
+        }
+      },
+      {
+        "question": "¿Cómo aseguras la recuperación del proyecto y evitas problemas futuros?",
+        "options": {
+          "A": "Implementar nuevos procesos de gestión de proyectos.",
+          "B": "Realizar un análisis post-mortem con el equipo.",
+          "C": "Contratar recursos adicionales para el proyecto.",
+          "D": "Seguir adelante y centrarse en el próximo proyecto."
+        }
+      }
+    ]
+  }
+}

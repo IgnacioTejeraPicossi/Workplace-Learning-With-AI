@@ -1,0 +1,26 @@
+{
+  "simulationResults": {
+    "pageTitle": "Resultados de simulación",
+    "loading": "Cargando resultados de simulación…",
+    "errorPrefix": "Error:",
+    "navigatingTo": "Navegando a: «{{title}}» — expandiendo automáticamente…",
+    "filterPlaceholder": "Filtrar por título, tema o tipo…",
+    "clear": "Limpiar",
+    "expand": "Ampliar",
+    "compress": "Comprimir",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar este resultado de simulación?",
+    "deleteFailed": "Error al eliminar la simulación: {{message}}",
+    "description": "Descripción:",
+    "content": "Contenido:",
+    "emptyFiltered": "Ningún resultado de simulación coincide con tu filtro.",
+    "emptyAll": "Aún no hay resultados de simulación.",
+    "metaLine1": "Tipo: {{type}} | Tema: {{topic}} | Duración: {{duration}} min",
+    "metaLine2": "Dificultad: {{difficulty}} | Creado: {{date}}",
+    "difficulty": {
+      "beginner": "principiante",
+      "intermediate": "intermedio",
+      "advanced": "avanzado"
+    }
+  }
+}

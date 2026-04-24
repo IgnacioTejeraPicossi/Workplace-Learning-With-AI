@@ -1,0 +1,68 @@
+{
+  "careerCoachModule": {
+    "pageTitle": "🎯 Coach de carrera IA",
+    "savedSessions": {
+      "title": "💬 Sesiones guardadas ({{count}})",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "navigatingTo": "🎯 Navegando a: «{{title}}»",
+    "choosePrompt": "Elige un área de crecimiento para recibir asesoramiento profesional personalizado:",
+    "areas": {
+      "leadership": {
+        "label": "Liderazgo",
+        "description": "Gestión de equipos, toma de decisiones, pensamiento estratégico"
+      },
+      "communication": {
+        "label": "Comunicación",
+        "description": "Hablar en público, escritura, escucha activa"
+      },
+      "conflict": {
+        "label": "Gestión de conflictos",
+        "description": "Negociación, mediación, resolución de problemas"
+      }
+    },
+    "custom": {
+      "title": "Tema personalizado",
+      "description": "Recibe coaching sobre cualquier tema profesional que quieras mejorar",
+      "startButton": "Iniciar personalizado",
+      "placeholder": "Introduce tu tema de coaching (p. ej., «Gestión del tiempo», «Ansiedad ante el público»)"
+    },
+    "buttons": {
+      "startCoaching": "Iniciar coaching",
+      "cancel": "Cancelar"
+    },
+    "session": {
+      "coachingSuffix": "Coaching de {{topic}}",
+      "subtitle": "Sesión de coach de carrera IA",
+      "topicLabel": "Tema:",
+      "sessionContentLabel": "Sesión:",
+      "sessionNumber": "Sesión n.º {{n}}",
+      "datetime": "{{date}} a las {{time}}"
+    },
+    "streaming": {
+      "initialStatus": "Listo para iniciar la sesión de coaching",
+      "placeholder": "Iniciando tu sesión de coaching…",
+      "status1": "Analizando perfil…",
+      "status2": "Identificando oportunidades…",
+      "status3": "Generando consejos…",
+      "status4": "Creando plan de acción…"
+    },
+    "alerts": {
+      "customTopicRequired": "Por favor, introduce un tema de coaching.",
+      "noSessionToSave": "No hay sesión que guardar. Por favor, completa una sesión de coaching primero.",
+      "saveSuccess": "✅ ¡Sesión de coaching guardada correctamente!",
+      "saveError": "❌ Error al guardar la sesión de coaching. Por favor, inténtalo de nuevo.",
+      "deleteError": "❌ Error al eliminar la sesión. Por favor, inténtalo de nuevo."
+    },
+    "errors": {
+      "prefix": "Error:",
+      "tryAgain": "Reintentar"
+    },
+    "actions": {
+      "continueSession": "💬 Continuar sesión",
+      "saveSession": "📋 Guardar sesión",
+      "newSession": "🔄 Nueva sesión"
+    }
+  }
+}

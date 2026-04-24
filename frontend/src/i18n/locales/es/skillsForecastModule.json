@@ -1,0 +1,72 @@
+{
+  "skillsForecastModule": {
+    "pageTitle": "🔮 Previsión de habilidades",
+    "intro": "Obtén predicciones con IA sobre qué habilidades deberías desarrollar a continuación, basadas en tu perfil actual y tus objetivos profesionales.",
+    "saved": {
+      "title": "📋 Previsiones guardadas ({{count}})",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "forecastNumber": "Previsión n.º {{n}}",
+      "datetime": "{{date}} a las {{time}}",
+      "inputLabel": "Entrada:",
+      "forecastLabel": "Previsión:"
+    },
+    "form": {
+      "label": "Cuéntanos sobre tus habilidades actuales y objetivos profesionales:",
+      "placeholder": "Describe tu rol actual, habilidades, nivel de experiencia y aspiraciones profesionales…",
+      "sampleHint": "💡 Prueba un ejemplo:",
+      "sampleButton": "Ejemplo {{n}}"
+    },
+    "actions": {
+      "getForecast": "🔮 Obtener previsión",
+      "analyzing": "⏳ Analizando…",
+      "clear": "🗑️ Limpiar"
+    },
+    "results": {
+      "title": "📊 Tu previsión de habilidades",
+      "analyzingPlaceholder": "Analizando tus habilidades y generando la previsión…"
+    },
+    "postActions": {
+      "saveForecast": "📋 Guardar previsión",
+      "findResources": "📚 Buscar recursos de aprendizaje",
+      "scheduleReview": "📅 Programar revisión"
+    },
+    "resources": {
+      "title": "📚 Recursos de aprendizaje",
+      "close": "Cerrar",
+      "errorLine": "Error al generar recursos. Por favor, inténtalo de nuevo."
+    },
+    "schedule": {
+      "title": "📅 Programar revisión de habilidades",
+      "intro": "Establece un recordatorio para revisar tu progreso en habilidades y actualizar tu previsión.",
+      "dateLabel": "Fecha del recordatorio:",
+      "setReminder": "Establecer recordatorio",
+      "cancel": "Cancelar",
+      "scheduledAlert": "✅ Revisión programada para el {{date}}. Se te recordará que revises tu progreso en habilidades."
+    },
+    "errors": {
+      "prefix": "Error:",
+      "tryAgain": "Reintentar"
+    },
+    "streaming": {
+      "initialStatus": "Listo para analizar tus habilidades",
+      "status1": "Analizando historial de aprendizaje…",
+      "status2": "Identificando tendencias…",
+      "status3": "Prediciendo necesidades futuras…",
+      "status4": "Generando previsión…"
+    },
+    "alerts": {
+      "inputRequired": "Por favor, proporciona información sobre tus habilidades actuales y objetivos profesionales.",
+      "noForecastToSave": "No hay previsión que guardar. Por favor, genera una previsión primero.",
+      "saveSuccess": "✅ ¡Previsión guardada correctamente! Puedes verla en tus previsiones guardadas.",
+      "noForecastResources": "No hay previsión para analizar. Por favor, genera una previsión primero.",
+      "noForecastSchedule": "No hay previsión que programar. Por favor, genera una previsión primero.",
+      "reminderDateRequired": "Por favor, selecciona una fecha para el recordatorio."
+    },
+    "samples": {
+      "sample1": "Soy un desarrollador junior con 2 años de experiencia en JavaScript y React. Quiero avanzar a un rol senior.",
+      "sample2": "Soy un gestor de proyectos que quiere pasar a la gestión de producto. Tengo experiencia con metodologías Agile.",
+      "sample3": "Soy especialista en marketing y quiero aprender análisis de datos y automatización del marketing digital."
+    }
+  }
+}
