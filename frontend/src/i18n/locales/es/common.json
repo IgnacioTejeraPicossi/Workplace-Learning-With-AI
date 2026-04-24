@@ -255,6 +255,130 @@
     "empty": "Aún no hay vídeos guardados."
   },
 
+  "agents": {
+    "compliance": {
+      "title": "Agente de Cumplimiento de IA",
+      "tagline": "Transforma documentos de cumplimiento en acciones auditables del equipo mediante la ejecución empresarial de OutSystems.",
+      "selectDocument": "Seleccionar documento de cumplimiento",
+      "chooseFromSaved": "Elige entre tus análisis de documentos guardados:",
+      "selectPlaceholder": "Seleccionar un documento...",
+      "selectedDocument": "Documento seleccionado:",
+      "analyzing": "Analizando...",
+      "analyze": "Analizar documento",
+      "resultsTitle": "Resultados del análisis de IA",
+      "summary": "Resumen:",
+      "keyRisks": "Riesgos clave identificados:",
+      "availableDocs": "Documentos disponibles:",
+      "clickToAnalyze": "Haz clic para analizar",
+      "showLess": "Mostrar menos",
+      "showAll": "Mostrar todos ({{count}} más)",
+      "noDocs": "No hay documentos disponibles. Sube documentos en el Analizador de documentos primero.",
+      "docTagRag": {
+        "doc": "📄 Doc",
+        "rag": "🤖 RAG"
+      },
+      "dispatchTitle": "Enviar al Agente n8n/OutSystems"
+    },
+    "productivity": {
+      "title": "Agente de Productividad de IA",
+      "tagline": "Convierte informes de investigación y análisis competitivo en tareas de equipo accionables con ejecución de nivel empresarial.",
+      "researchInputTitle": "Entrada de investigación",
+      "analyzeUrlLabel": "Analizar URL:",
+      "existingAnalysesLabel": "O seleccionar de análisis existentes:",
+      "selectAnalysisPlaceholder": "Seleccionar un análisis...",
+      "selectedAnalysis": "Análisis seleccionado:",
+      "resultsTitle": "Resultados del análisis de IA",
+      "analyzing": "Analizando contenido...",
+      "summary": "Resumen:",
+      "nextActions": "Top 5 próximas acciones:",
+      "emptyState": "Introduce una URL o selecciona un análisis para ver los resultados",
+      "dispatchTitle": "Enviar al Agente n8n/OutSystems"
+    }
+  },
+
+  "agentRuns": {
+    "title": "Monitor de ejecuciones de agentes",
+    "subtitle": "Monitoriza y realiza un seguimiento del estado y los resultados de la ejecución de los agentes",
+    "filterByModule": "Filtrar por módulo",
+    "allModules": "Todos los módulos",
+    "moduleCompliance": "Agente de Cumplimiento",
+    "moduleProductivity": "Agente de Productividad",
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "emptyTitle": "No se encontraron ejecuciones de agentes",
+    "emptyHint": "Intenta ejecutar primero un agente de cumplimiento o productividad para ver los resultados aquí.",
+    "th": {
+      "runId": "ID de ejecución",
+      "module": "Módulo",
+      "topic": "Tema",
+      "status": "Estado",
+      "artifacts": "Artefactos",
+      "updated": "Actualizado"
+    },
+    "artifacts": {
+      "jira": "Jira:",
+      "slack": "Slack:",
+      "sheets": "Sheets:",
+      "open": "Abrir →",
+      "none": "Sin artefactos"
+    },
+    "showLess": "Mostrar menos",
+    "showAll": "Mostrar todos ({{count}} más)"
+  },
+
+  "agentopsStudio": {
+    "title": "AgentOps Studio",
+    "subtitle": "Laboratorio unificado de flujos de trabajo de IA — Diseña, simula y ejecuta flujos de trabajo de software inteligentes",
+    "tabs": {
+      "agentCatalog": "Catálogo de agentes",
+      "overview": "Resumen",
+      "promptLab": "Laboratorio de prompts",
+      "playbook": "Playbook",
+      "flowCatalog": "Catálogo de flujos",
+      "runs": "Ejecuciones",
+      "settings": "Configuración"
+    },
+    "agentCatalog": {
+      "heading": "Catálogo de agentes",
+      "description": "Agentes reutilizables con endpoints MCP y capacidades para la Internet de Agentes",
+      "loading": "Cargando catálogo de agentes...",
+      "retry": "Reintentar",
+      "totalAgents": "Total de agentes",
+      "mcpEnabled": "MCP habilitado",
+      "uniqueCapabilities": "Capacidades únicas",
+      "capabilities": "Capacidades",
+      "mcpTools": "Herramientas MCP",
+      "policy": "Política",
+      "copyMCP": "Copiar MCP",
+      "copiedToClipboard": "¡{{label}} copiado al portapapeles!",
+      "copyFailed": "Error al copiar al portapapeles",
+      "noAgentsFound": "No se encontraron agentes en el catálogo",
+      "error": "Error",
+      "loadErrorDefault": "Error al cargar el catálogo de agentes"
+    },
+    "overview": {
+      "title": "Resumen del panel",
+      "loading": "Cargando resumen...",
+      "kpiTotalRuns": "Total de ejecuciones",
+      "kpiCompleted": "Completadas",
+      "kpiRunning": "En ejecución",
+      "kpiToday": "Hoy",
+      "recentRuns": "Ejecuciones recientes",
+      "refresh": "Actualizar",
+      "noRuns": "Aún no hay ejecuciones. ¡Empieza creando un playbook o registrando un flujo!",
+      "thRunId": "ID de ejecución",
+      "thStatus": "Estado",
+      "thUpdated": "Actualizado",
+      "thModule": "Módulo",
+      "quickStartTitle": "Inicio rápido",
+      "quickStartDesc": "Prueba prompts de IA con la integración de LM Studio",
+      "quickStartBtn": "Ir al laboratorio de prompts",
+      "playbookTitle": "Crear playbook",
+      "playbookDesc": "Diseña y prueba flujos de trabajo de software",
+      "playbookBtn": "Crear playbook"
+    }
+  },
+
   "jMessages": {
     "analyzer": {
       "title": "Analizador J-messages",

@@ -350,6 +350,27 @@
       "noAgentsFound": "Ingen agenter funnet i katalogen",
       "error": "Feil",
       "loadErrorDefault": "Kunne ikke laste agentkatalog"
+    },
+    "overview": {
+      "title": "Dashbord-oversikt",
+      "loading": "Laster oversikt …",
+      "kpiTotalRuns": "Totale kjøringer",
+      "kpiCompleted": "Fullførte",
+      "kpiRunning": "Kjører",
+      "kpiToday": "I dag",
+      "recentRuns": "Nylige kjøringer",
+      "refresh": "Oppdater",
+      "noRuns": "Ingen kjøringer ennå. Start med å opprette en spillbok eller registrere en flyt!",
+      "thRunId": "Kjørings-ID",
+      "thStatus": "Status",
+      "thUpdated": "Oppdatert",
+      "thModule": "Modul",
+      "quickStartTitle": "Hurtigstart",
+      "quickStartDesc": "Test AI-prompter med LM Studio-integrasjon",
+      "quickStartBtn": "Gå til Prompt-lab",
+      "playbookTitle": "Opprett spillbok",
+      "playbookDesc": "Design og test programvarearbeidsflyter",
+      "playbookBtn": "Opprett spillbok"
     }
   },
   "robomindClinic": {

@@ -191,6 +191,27 @@
       "noAgentsFound": "No agents found in the catalog",
       "error": "Error",
       "loadErrorDefault": "Failed to load agent catalog"
+    },
+    "overview": {
+      "title": "Dashboard Overview",
+      "loading": "Loading overview...",
+      "kpiTotalRuns": "Total Runs",
+      "kpiCompleted": "Completed",
+      "kpiRunning": "Running",
+      "kpiToday": "Today",
+      "recentRuns": "Recent Runs",
+      "refresh": "Refresh",
+      "noRuns": "No runs yet. Start by creating a playbook or registering a flow!",
+      "thRunId": "Run ID",
+      "thStatus": "Status",
+      "thUpdated": "Updated",
+      "thModule": "Module",
+      "quickStartTitle": "Quick Start",
+      "quickStartDesc": "Test AI prompts with LM Studio integration",
+      "quickStartBtn": "Go to Prompt Lab",
+      "playbookTitle": "Create Playbook",
+      "playbookDesc": "Design and test software workflows",
+      "playbookBtn": "Create Playbook"
     }
   },
 

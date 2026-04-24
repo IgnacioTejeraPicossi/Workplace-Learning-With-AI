@@ -1,7 +1,9 @@
 // AgentOps Studio - Overview Component
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Overview({ setActiveTab }) {
+  const { t } = useTranslation();
   const [summary, setSummary] = useState(null);
   const [recentRuns, setRecentRuns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export default function Overview({ setActiveTab }) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <div style={{ fontSize: '1.5rem' }}>⏳</div>
-        <p>Loading overview...</p>
+        <p>{t('agentopsStudio.overview.loading')}</p>
       </div>
     );
   }
@@ -67,7 +69,7 @@ export default function Overview({ setActiveTab }) {
         marginBottom: '2rem',
         color: '#1e293b'
       }}>
-        Dashboard Overview
+        {t('agentopsStudio.overview.title')}
       </h2>
 
       {/* KPI Cards */}
@@ -86,7 +88,7 @@ export default function Overview({ setActiveTab }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>🏃</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Total Runs</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('agentopsStudio.overview.kpiTotalRuns')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#3b82f6' }}>
             {summary?.total_runs || 0}
@@ -102,7 +104,7 @@ export default function Overview({ setActiveTab }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>✅</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Completed</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('agentopsStudio.overview.kpiCompleted')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>
             {summary?.completed_runs || 0}
@@ -118,7 +120,7 @@ export default function Overview({ setActiveTab }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>⏳</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Running</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('agentopsStudio.overview.kpiRunning')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f59e0b' }}>
             {summary?.running_runs || 0}
@@ -134,7 +136,7 @@ export default function Overview({ setActiveTab }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem' }}>📅</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Today</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{t('agentopsStudio.overview.kpiToday')}</h3>
           </div>
           <div style={{ fontSize: '2rem', fontWeight: '700', color: '#8b5cf6' }}>
             {summary?.today_runs || 0}
@@ -156,8 +158,8 @@ export default function Overview({ setActiveTab }) {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>Recent Runs</h3>
-          <button 
+          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600' }}>{t('agentopsStudio.overview.recentRuns')}</h3>
+          <button
             onClick={loadData}
             disabled={loading}
             style={{
@@ -174,7 +176,7 @@ export default function Overview({ setActiveTab }) {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-            {loading ? '⏳' : '🔄'} Refresh
+            {loading ? '⏳' : '🔄'} {t('agentopsStudio.overview.refresh')}
           </button>
         </div>
         
@@ -186,17 +188,17 @@ export default function Overview({ setActiveTab }) {
               color: '#64748b'
             }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🚀</div>
-              <p>No runs yet. Start by creating a playbook or registering a flow!</p>
+              <p>{t('agentopsStudio.overview.noRuns')}</p>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Run ID</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Updated</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>Module</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('agentopsStudio.overview.thRunId')}</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('agentopsStudio.overview.thStatus')}</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('agentopsStudio.overview.thUpdated')}</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', fontWeight: '600' }}>{t('agentopsStudio.overview.thModule')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -267,12 +269,12 @@ export default function Overview({ setActiveTab }) {
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
         }}>
           <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: '600' }}>
-            🧪 Quick Start
+            🧪 {t('agentopsStudio.overview.quickStartTitle')}
           </h4>
           <p style={{ margin: '0 0 1rem 0', color: '#64748b', fontSize: '0.9rem' }}>
-            Test AI prompts with LM Studio integration
+            {t('agentopsStudio.overview.quickStartDesc')}
           </p>
-          <button 
+          <button
             onClick={() => setActiveTab('prompt-lab')}
             style={{
               backgroundColor: '#3b82f6',
@@ -284,7 +286,7 @@ export default function Overview({ setActiveTab }) {
               fontSize: '0.875rem',
               fontWeight: '500'
             }}>
-            Go to Prompt Lab
+            {t('agentopsStudio.overview.quickStartBtn')}
           </button>
         </div>
 
@@ -296,12 +298,12 @@ export default function Overview({ setActiveTab }) {
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
         }}>
           <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: '600' }}>
-            📋 Create Playbook
+            📋 {t('agentopsStudio.overview.playbookTitle')}
           </h4>
           <p style={{ margin: '0 0 1rem 0', color: '#64748b', fontSize: '0.9rem' }}>
-            Design and test software workflows
+            {t('agentopsStudio.overview.playbookDesc')}
           </p>
-          <button 
+          <button
             onClick={() => setActiveTab('playbook')}
             style={{
               backgroundColor: '#10b981',
@@ -313,7 +315,7 @@ export default function Overview({ setActiveTab }) {
               fontSize: '0.875rem',
               fontWeight: '500'
             }}>
-            Create Playbook
+            {t('agentopsStudio.overview.playbookBtn')}
           </button>
         </div>
       </div>
