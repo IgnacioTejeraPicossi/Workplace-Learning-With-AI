@@ -1,0 +1,19 @@
+{
+  "webSearchModule": {
+    "pageTitle": "Web Search (AI + Internet)",
+    "placeholder": "🔍 Ask anything...",
+    "searching": "⏳ Searching...",
+    "searchBtn": "🔎 Search",
+    "clearBtn": "🗑️ Clear",
+    "resultsHeading": "🔍 Search Results for \"{{query}}\"",
+    "errorSearch": "Error performing web search.",
+    "loadingFor": "Searching for \"{{topic}}\"...",
+    "panelHeading": "🔍 Results for \"{{topic}}\"",
+    "noResults": "No results found",
+    "foundResults": "Found {{count}} results",
+    "match": "% match",
+    "rankLabel": "Rank #{{rank}}",
+    "sourceMicroLesson": "📚 Micro-lesson",
+    "sourceVideo": "🎥 Video"
+  }
+}

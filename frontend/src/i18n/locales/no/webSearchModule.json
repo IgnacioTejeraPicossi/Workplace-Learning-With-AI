@@ -1,0 +1,19 @@
+{
+  "webSearchModule": {
+    "pageTitle": "Nettsøk (AI + Internett)",
+    "placeholder": "🔍 Spør om hva som helst...",
+    "searching": "⏳ Søker...",
+    "searchBtn": "🔎 Søk",
+    "clearBtn": "🗑️ Tøm",
+    "resultsHeading": "🔍 Søkeresultater for \"{{query}}\"",
+    "errorSearch": "Feil ved utføring av nettsøk.",
+    "loadingFor": "Søker etter \"{{topic}}\"...",
+    "panelHeading": "🔍 Resultater for \"{{topic}}\"",
+    "noResults": "Ingen resultater funnet",
+    "foundResults": "Fant {{count}} resultater",
+    "match": "% treff",
+    "rankLabel": "Rang #{{rank}}",
+    "sourceMicroLesson": "📚 Mikro-leksjon",
+    "sourceVideo": "🎥 Video"
+  }
+}

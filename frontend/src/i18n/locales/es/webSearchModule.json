@@ -1,0 +1,19 @@
+{
+  "webSearchModule": {
+    "pageTitle": "Búsqueda web (IA + Internet)",
+    "placeholder": "🔍 Pregunta lo que quieras...",
+    "searching": "⏳ Buscando...",
+    "searchBtn": "🔎 Buscar",
+    "clearBtn": "🗑️ Limpiar",
+    "resultsHeading": "🔍 Resultados de búsqueda para \"{{query}}\"",
+    "errorSearch": "Error al realizar la búsqueda web.",
+    "loadingFor": "Buscando \"{{topic}}\"...",
+    "panelHeading": "🔍 Resultados para \"{{topic}}\"",
+    "noResults": "No se encontraron resultados",
+    "foundResults": "Se encontraron {{count}} resultados",
+    "match": "% coincidencia",
+    "rankLabel": "Posición #{{rank}}",
+    "sourceMicroLesson": "📚 Micro-lección",
+    "sourceVideo": "🎥 Vídeo"
+  }
+}

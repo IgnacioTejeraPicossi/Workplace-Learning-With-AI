@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
+  const { t } = useTranslation('common');
   if (isLoading) {
     return (
       <div style={{
@@ -18,7 +20,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       }}>
         <div style={{ textAlign: 'center', padding: '40px' }}>
           <div>🔍</div>
-          <div>Searching for "{topic}"...</div>
+          <div>{t('webSearchModule.loadingFor', { topic })}</div>
         </div>
       </div>
     );
@@ -40,7 +42,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
         boxShadow: '-2px 0 10px rgba(0,0,0,0.1)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3>🔍 Results for "{topic}"</h3>
+          <h3>{t('webSearchModule.panelHeading', { topic })}</h3>
           <button 
             onClick={onClose}
             style={{
@@ -55,7 +57,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
           </button>
         </div>
         <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-          No results found
+          {t('webSearchModule.noResults')}
         </div>
       </div>
     );
@@ -92,7 +94,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       </div>
       
       <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
-        Found {results.length} results
+        {t('webSearchModule.foundResults', { count: results.length })}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -124,7 +126,7 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
                   fontWeight: 'bold',
                   marginLeft: '10px'
                 }}>
-                  {(result.similarity_score * 100).toFixed(1)}% match
+                  {(result.similarity_score * 100).toFixed(1)}{t('webSearchModule.match')}
                 </div>
               )}
             </div>
@@ -145,10 +147,10 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
                   borderRadius: '4px', 
                   marginRight: '8px'
                 }}>
-                  {result.source === 'micro_lessons' ? '📚 Micro-lesson' : '🎥 Video'}
+                  {result.source === 'micro_lessons' ? t('webSearchModule.sourceMicroLesson') : t('webSearchModule.sourceVideo')}
                 </span>
                 {result.rank && (
-                  <span style={{ color: '#666' }}>Rank #{result.rank}</span>
+                  <span style={{ color: '#666' }}>{t('webSearchModule.rankLabel', { rank: result.rank })}</span>
                 )}
               </div>
               <a 

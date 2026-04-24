@@ -146,10 +146,11 @@ export async function postSkillsForecast(input) {
 // Removed old lesson APIs - now using MongoDB micro-lessons API
 
 export async function webSearch(query) {
-  const res = await fetchWithAuth(`${process.env.REACT_APP_WEBSEARCH_BASE_URL || "http://localhost:8080"}/web-search`, {
+  // Uses DuckDuckGo via FastAPI /api/simple-search (no external API key required)
+  const res = await fetchWithAuth(`${API_BASE}/api/simple-search`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ topic: query, limit: 8 }),
   });
   return res.json();
 }
