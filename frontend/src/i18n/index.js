@@ -5,10 +5,12 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translation files
 import enCommon from './locales/en/common.json';
 import noCommon from './locales/no/common.json';
+import esCommon from './locales/es/common.json';
 import enRunTest from './locales/en/runTestModule.json';
 import noRunTest from './locales/no/runTestModule.json';
 import enAppChrome from './locales/en/appChrome.json';
 import noAppChrome from './locales/no/appChrome.json';
+import esAppChrome from './locales/es/appChrome.json';
 import enMicroLesson from './locales/en/microLesson.json';
 import noMicroLesson from './locales/no/microLesson.json';
 import enScenarioSimulator from './locales/en/scenarioSimulator.json';
@@ -75,7 +77,7 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    supportedLngs: ['en', 'no'],
+    supportedLngs: ['en', 'no', 'es'],
     ns: ['common'],
     defaultNS: 'common',
     interpolation: { 
@@ -91,6 +93,9 @@ i18n
       },
       no: {
         common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule, ...noFeatureRoadmapModule, ...noCloudInstallModule, ...noAgiHubModule }
+      },
+      es: {
+        common: { ...esCommon, ...esAppChrome }
       }
     }
   });

@@ -55,18 +55,19 @@ export default function TopBarLanguageMenu() {
 
   const getFlag = (lang) => {
     if (useTextFallback) {
-      return lang === 'no' ? '[NO]' : '[GB]';
+      if (lang === 'no') return '[NO]';
+      if (lang === 'es') return '[ES]';
+      return '[GB]';
     }
-    // Try different flag representations for better browser compatibility
-    if (lang === 'no') {
-      return '🇳🇴'; // Norwegian flag
-    } else {
-      return '🇬🇧'; // UK flag
-    }
+    if (lang === 'no') return '🇳🇴'; // Norwegian flag
+    if (lang === 'es') return '🇪🇸'; // Spanish flag
+    return '🇬🇧'; // UK flag
   };
 
   const getLanguageName = (lang) => {
-    return lang === 'no' ? t('norwegian') : t('english');
+    if (lang === 'no') return t('norwegian');
+    if (lang === 'es') return t('spanish');
+    return t('english');
   };
 
   return (
@@ -81,7 +82,7 @@ export default function TopBarLanguageMenu() {
           fontSize: '14px',
           cursor: 'pointer',
           outline: 'none',
-          minWidth: '120px',
+          minWidth: '130px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -144,12 +145,33 @@ export default function TopBarLanguageMenu() {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              borderRadius: '0 0 6px 6px'
+              borderRadius: '0'
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontSize: '16px' }}>{getFlag('no')}</span>
               <span>{t('norwegian')}</span>
+            </span>
+          </button>
+          <button
+            onClick={() => changeLanguage('es')}
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              border: 'none',
+              backgroundColor: lng === 'es' ? '#f0f0f0' : 'transparent',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textAlign: 'left',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              borderRadius: '0 0 6px 6px'
+            }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '16px' }}>{getFlag('es')}</span>
+              <span>{t('spanish')}</span>
             </span>
           </button>
         </div>

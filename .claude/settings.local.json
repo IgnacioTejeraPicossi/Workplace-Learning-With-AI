@@ -77,7 +77,9 @@
       "Bash(node -e ' *)",
       "Bash(npx playwright *)",
       "Bash(node -e \"const r = require\\('C:/Test/AI/AI Learning with AI/playwright-regression/runner.js'\\); console.log\\('runner.js syntax OK'\\)\")",
-      "Bash(python -c \"from backend.routers.regression import router; print\\('regression router import OK'\\)\")"
+      "Bash(python -c \"from backend.routers.regression import router; print\\('regression router import OK'\\)\")",
+      "Bash(python -m playwright install chromium)",
+      "Bash(npm run *)"
     ]
   }
 }

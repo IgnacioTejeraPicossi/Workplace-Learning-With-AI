@@ -1,0 +1,114 @@
+{
+  "language": "Idioma",
+  "english": "Inglés",
+  "norwegian": "Noruego",
+  "spanish": "Español",
+
+  "dashboard": {
+    "title": "Panel de control",
+    "progress": {
+      "title": "Tu progreso",
+      "subtitle": "¡Mantén la racha!"
+    },
+    "lessonsCompleted": "Lecciones completadas",
+    "simulationsCompleted": "Simulaciones completadas",
+    "simulationScore": "Puntuación en simulaciones",
+    "learningStreak": "Racha de aprendizaje",
+    "daysInARow": "{{count}} días consecutivos de aprendizaje",
+    "excellentConsistency": "¡Excelente constancia!",
+    "recommendedNextStep": "Próximo paso recomendado",
+    "greatJob": "¡Buen trabajo! Sigue aprendiendo o prueba un nuevo escenario.",
+    "lessonsOverTime": "Lecciones completadas a lo largo del tiempo",
+    "lessonsByTopic": "Lecciones por tema",
+    "microLessons": "Micro-lecciones",
+    "videoLessons": "Lecciones en vídeo",
+    "recommendations": {
+      "startLearning": "¡Prueba tu primera micro-lección!",
+      "trySimulation": "¡Prueba tu primera simulación de escenario!",
+      "aimForBetter": "¡Intenta obtener más respuestas 'buenas' en las simulaciones!"
+    }
+  },
+
+  "sidebar": {
+    "dashboard": "Panel de control",
+    "learningModules": "Módulos de aprendizaje",
+    "mapOfKnowledge": "Mapa del conocimiento",
+    "repositoryAnalyzer": "Analizador de repositorios",
+    "documentAnalyzer": "Analizador de documentos",
+    "enterpriseArchitecture": "Arquitectura empresarial",
+    "itemAgents": "Agentes Item",
+    "agentopsStudio": "AgentOps Studio",
+    "robomindClinic": "Clínica Robomind",
+    "agentTheoryDocs": "Teoría de Agentes y Documentación",
+    "aiComplianceAgent": "Agente de Cumplimiento de IA",
+    "aiProductivityAgent": "Agente de Productividad de IA",
+    "eaSecondBrain": "Agente EA Second Brain",
+    "salesAssistant": "Agente Asistente de Ventas",
+    "personalAttentionAgent": "Agente de Atención Personalizada",
+    "telcoOpsAgent": "Agente de Decisiones Telco Ops",
+    "grcAgent": "IA Responsable Ops (GRC)",
+    "councilAgent": "Consejo de Perspectivas Diversas",
+    "opsEfficiencyAgent": "Agente de Eficiencia Operativa",
+    "atmVvTestCopilot": "ATM V&V Test Copilot",
+    "futureItemAgents": "Agentes Item Futuros",
+    "readmeViewer": "Léame",
+    "agiProgress": "Progreso de AGI",
+    "cybersecurity": "Ciberseguridad",
+    "cloudInstall": "Instalación en la Nube",
+    "help": "Ayuda",
+    "runTest": "Ejecutar pruebas",
+    "apiConfig": "Config. API",
+    "future": "Futuro",
+    "presentationAgent": "Agente de Presentación",
+    "aiStudyBuddy": "Compañero de estudio IA",
+    "security": "Seguridad",
+
+    "learningModulesSubmenu": {
+      "videoLessons": "Lecciones en vídeo",
+      "microLessons": "Micro-lecciones",
+      "simulations": "Simulaciones",
+      "webSearch": "Búsqueda web",
+      "teamDynamics": "Dinámica de equipos",
+      "certifications": "Certificaciones",
+      "aiCareerCoach": "Coach de carrera IA",
+      "skillsForecast": "Previsión de habilidades",
+      "aiLearning": "Aprendizaje y formación en IA",
+      "babelLibrary": "Biblioteca Babel"
+    },
+
+    "repositoryAnalyzerSubmenu": {
+      "repoAnalyzer": "Analizador de repositorios",
+      "agentCursorAI": "Agent Cursor AI",
+      "learningRepo": "Repositorio de aprendizaje"
+    },
+
+    "documentAnalyzerSubmenu": {
+      "documentsAnalyzer": "Analizador de documentos",
+      "learningDocument": "Documento de aprendizaje",
+      "agenticRAGAnalyzer": "Analizador RAG Agéntico",
+      "agenticRAGDocuments": "Documentos RAG Agéntico"
+    },
+
+    "jMessagesAnalyzer": {
+      "title": "Analizador J-messages",
+      "submenu": {
+        "analyzer": "Analizador J-messages",
+        "preAnalyzer": "Pre-analizador J-messages",
+        "library": "Biblioteca J-messages",
+        "pairsLibrary": "Biblioteca de pares J-messages"
+      }
+    },
+
+    "enterpriseArchitectureSubmenu": {
+      "eaDashboard": "Panel EA",
+      "processDesigner": "Diseñador de procesos",
+      "catalogManager": "Gestor de catálogo"
+    },
+
+    "futureSubmenu": {
+      "futureApp": "Aplicación futura",
+      "ideaLog": "Registro de ideas",
+      "featureRoadmap": "Hoja de ruta de funciones"
+    }
+  }
+}

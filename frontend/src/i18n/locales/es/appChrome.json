@@ -1,0 +1,106 @@
+{
+  "header": {
+    "appTitle": "Aprendizaje Laboral con IA",
+    "searchTooltip": "Buscar en todas las secciones (Ctrl+K)",
+    "themeLight": "Cambiar al modo claro",
+    "themeDark": "Cambiar al modo oscuro"
+  },
+  "auth": {
+    "greeting": "¡Bienvenido/a, {{name}}!"
+  },
+  "globalSearch": {
+    "placeholder": "Buscar en todas las secciones...",
+    "noResults": "No se encontraron resultados para \"{{query}}\"",
+    "shortcutsTitle": "Atajos de teclado:",
+    "shortcutNav": "Usar flechas ↑↓ para navegar",
+    "shortcutEnter": "Pulsar Enter para seleccionar",
+    "shortcutEscape": "Pulsar Escape para cerrar",
+    "sections": {
+      "dashboard": {
+        "title": "Panel de control",
+        "description": "Ver tu progreso de aprendizaje y resumen general",
+        "keywords": ["panel", "progreso", "resumen", "inicio", "principal"]
+      },
+      "aiConcepts": {
+        "title": "Conceptos de IA",
+        "description": "Explorar conceptos innovadores de aprendizaje en IA",
+        "keywords": ["ia", "conceptos", "innovación", "ideas", "inteligencia artificial"]
+      },
+      "microLessons": {
+        "title": "Micro-lecciones",
+        "description": "Crear y gestionar lecciones de aprendizaje breves",
+        "keywords": ["micro", "lecciones", "aprendizaje", "educación", "formación"]
+      },
+      "videoLessons": {
+        "title": "Lecciones en vídeo",
+        "description": "Aprender de vídeos con cuestionarios generados por IA",
+        "keywords": ["vídeo", "lecciones", "youtube", "cuestionario", "multimedia"]
+      },
+      "recommendation": {
+        "title": "Recomendación",
+        "description": "Obtener recomendaciones de aprendizaje personalizadas",
+        "keywords": ["recomendación", "sugerencias", "personalizado", "consejo"]
+      },
+      "simulations": {
+        "title": "Simulaciones",
+        "description": "Practicar con escenarios de trabajo interactivos",
+        "keywords": ["simulación", "escenarios", "práctica", "interactivo", "trabajo"]
+      },
+      "webSearch": {
+        "title": "Búsqueda web",
+        "description": "Buscar en la web información actualizada",
+        "keywords": ["web", "búsqueda", "internet", "en línea", "información"]
+      },
+      "teamDynamics": {
+        "title": "Dinámica de equipos",
+        "description": "Analizar y mejorar la colaboración en equipo",
+        "keywords": ["equipo", "dinámica", "colaboración", "grupo", "personal"]
+      },
+      "certifications": {
+        "title": "Certificaciones",
+        "description": "Obtener recomendaciones de certificaciones y planes de estudio",
+        "keywords": ["certificación", "certificados", "estudio", "exámenes", "credenciales"]
+      },
+      "coach": {
+        "title": "Coach de carrera IA",
+        "description": "Obtener orientación profesional y consejos de carrera",
+        "keywords": ["coach", "carrera", "orientación", "consejo", "profesional"]
+      },
+      "skillsForecast": {
+        "title": "Previsión de habilidades",
+        "description": "Predecir habilidades futuras y tendencias profesionales",
+        "keywords": ["habilidades", "previsión", "predicción", "tendencias", "futuro"]
+      },
+      "presentationAgent": {
+        "title": "Agente de presentación",
+        "description": "Presentación y preguntas con IA para demostraciones",
+        "keywords": ["presentación", "agente", "demo", "discurso", "preguntas"]
+      },
+      "savedLessons": {
+        "title": "Lecciones guardadas",
+        "description": "Ver y gestionar tus micro-lecciones guardadas",
+        "keywords": ["guardadas", "lecciones", "marcadores", "favoritos", "historial"]
+      },
+      "ideaLog": {
+        "title": "Registro de ideas",
+        "description": "Ver y gestionar ideas de funciones enviadas por usuarios",
+        "keywords": ["idea", "registro", "comentarios", "sugerencias", "funciones"]
+      },
+      "featureRoadmap": {
+        "title": "Hoja de ruta de funciones",
+        "description": "Votar y hacer seguimiento de próximas funciones",
+        "keywords": ["función", "hoja de ruta", "voto", "próximo", "planificación"]
+      },
+      "futureApp": {
+        "title": "Aplicación futura",
+        "description": "Explorar la visión y hoja de ruta de desarrollo",
+        "keywords": ["futuro", "visión", "hoja de ruta", "desarrollo", "fases"]
+      },
+      "runTest": {
+        "title": "Ejecutar pruebas",
+        "description": "Suite de pruebas integral para la aplicación",
+        "keywords": ["prueba", "testing", "cypress", "manual", "api"]
+      }
+    }
+  }
+}
