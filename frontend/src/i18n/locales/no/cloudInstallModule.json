@@ -72,6 +72,21 @@
       "deferredDesc": "Disse tjenestene er bevisst ekskludert fra første utrulling for å holde omfanget håndterbart. Legg dem til etter at kjerneutrullingen er stabil.",
       "costTitle": "Estimert månedlig kostnad",
       "deployOrderTitle": "Anbefalt utrullingsrekkefølge",
+      "deployOrder": {
+        "steps": {
+          "database": "Database",
+          "auth": "Autentisering",
+          "backend": "Backend",
+          "frontend": "Frontend",
+          "dns": "DNS"
+        },
+        "notes": [
+          "n8n utsettes bevisst til fase 2+",
+          "websearch-backend er valgfritt og kan rulles ut separat senere",
+          "Start med gratisnivåer; oppgrader bare ved behov",
+          "Vercel og Cloud Run støtter begge egendefinerte domener"
+        ]
+      },
       "frontend": {
         "desc": "Rull ut React-frontend til Vercel. Koble via GitHub for automatisk CI/CD ved hver push til main.",
         "why": "Vercel er det naturlige valget for en React-frontend. Det gir GitHub-baserte utrullinger, et gratisnivå, edge CDN, egendefinerte domener og en null-konfigurasjonsbygningspipeline for React."

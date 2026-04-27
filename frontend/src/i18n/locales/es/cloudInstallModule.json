@@ -72,6 +72,21 @@
       "deferredDesc": "Estos servicios se excluyen intencionalmente del primer despliegue para mantener el alcance manejable. Añádelos una vez que el despliegue principal sea estable.",
       "costTitle": "Coste mensual estimado",
       "deployOrderTitle": "Orden de despliegue recomendado",
+      "deployOrder": {
+        "steps": {
+          "database": "Base de datos",
+          "auth": "Autenticación",
+          "backend": "Backend",
+          "frontend": "Frontend",
+          "dns": "DNS"
+        },
+        "notes": [
+          "n8n se aplaza intencionalmente a la fase 2+",
+          "websearch-backend es opcional y puede desplegarse por separado más adelante",
+          "Empieza con los niveles gratuitos; actualiza solo cuando sea necesario",
+          "Vercel y Cloud Run admiten dominios personalizados"
+        ]
+      },
       "frontend": {
         "desc": "Despliega el frontend React en Vercel. Conéctalo mediante GitHub para CI/CD automático en cada push a main.",
         "why": "Vercel es la opción natural para un frontend React. Ofrece despliegues basados en GitHub, un nivel gratuito, CDN en el borde, dominios personalizados y un pipeline de compilación sin configuración para aplicaciones React."

@@ -72,6 +72,21 @@
       "deferredDesc": "These services are intentionally excluded from the first deployment to keep scope manageable. Add them after the core deployment is stable.",
       "costTitle": "Estimated Monthly Cost",
       "deployOrderTitle": "Recommended Deployment Order",
+      "deployOrder": {
+        "steps": {
+          "database": "Database",
+          "auth": "Auth",
+          "backend": "Backend",
+          "frontend": "Frontend",
+          "dns": "DNS"
+        },
+        "notes": [
+          "n8n is intentionally deferred to phase 2+",
+          "websearch-backend is optional and can be deployed separately later",
+          "Start with free tiers; upgrade only when needed",
+          "Vercel and Cloud Run both support custom domains"
+        ]
+      },
       "frontend": {
         "desc": "Deploy the React frontend to Vercel. Connect via GitHub for automatic CI/CD on every push to main.",
         "why": "Vercel is the natural fit for a React frontend. It provides GitHub-based deployments, a free tier, edge CDN, custom domains, and a zero-configuration build pipeline for React applications."

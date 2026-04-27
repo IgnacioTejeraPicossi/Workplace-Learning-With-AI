@@ -378,8 +378,8 @@ export default function CloudTargetArchitecture() {
                   }}>
                     {i + 1}
                   </span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '500', color: '#1e40af', textTransform: 'capitalize' }}>
-                    {step}
+                  <span style={{ fontSize: '0.8rem', fontWeight: '500', color: '#1e40af' }}>
+                    {t(`cloudInstall.arch.deployOrder.steps.${step}`, { defaultValue: step.charAt(0).toUpperCase() + step.slice(1) })}
                   </span>
                 </div>
                 {i < archData.deployment_order.length - 1 && (
@@ -388,15 +388,19 @@ export default function CloudTargetArchitecture() {
               </React.Fragment>
             ))}
           </div>
-          {archData.notes && archData.notes.length > 0 && (
-            <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              {archData.notes.map((note, i) => (
-                <div key={i} style={{ fontSize: '0.775rem', color: '#6b7280' }}>
-                  • {note}
-                </div>
-              ))}
-            </div>
-          )}
+          {archData.notes && archData.notes.length > 0 && (() => {
+            const i18nNotes = t('cloudInstall.arch.deployOrder.notes', { returnObjects: true, defaultValue: archData.notes });
+            const notesList = Array.isArray(i18nNotes) ? i18nNotes : archData.notes;
+            return (
+              <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                {notesList.map((note, i) => (
+                  <div key={i} style={{ fontSize: '0.775rem', color: '#6b7280' }}>
+                    • {note}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       )}
 
