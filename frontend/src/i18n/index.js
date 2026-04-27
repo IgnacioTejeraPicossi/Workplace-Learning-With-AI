@@ -91,6 +91,7 @@ import esLearningDocumentModule from './locales/es/learningDocumentModule.json';
 import esAgenticRagDocumentModule from './locales/es/agenticRagDocumentModule.json';
 import esEaSecondBrainModule from './locales/es/eaSecondBrainModule.json';
 import esAgiHubModule from './locales/es/agiHubModule.json';
+import esCloudInstallModule from './locales/es/cloudInstallModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -115,7 +116,7 @@ i18n
         common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule, ...noFeatureRoadmapModule, ...noCloudInstallModule, ...noAgiHubModule, ...noWebSearchModule }
       },
       es: {
-        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule, ...esDocumentAnalyzerModule, ...esLearningDocumentModule, ...esAgenticRagDocumentModule, ...esEaSecondBrainModule, ...esAgiHubModule }
+        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule, ...esDocumentAnalyzerModule, ...esLearningDocumentModule, ...esAgenticRagDocumentModule, ...esEaSecondBrainModule, ...esAgiHubModule, ...esCloudInstallModule }
       }
     }
   });
