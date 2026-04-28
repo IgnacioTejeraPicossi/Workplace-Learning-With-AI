@@ -1,0 +1,31 @@
+{
+  "ideaLogModule": {
+    "pageTitle": "Registro de ideas (solicitudes desconocidas)",
+    "labelConfidence": "Confianza:",
+    "labelModule": "Módulo:",
+    "filterAll": "Todos",
+    "searchPlaceholder": "Buscar entrada del usuario o intención...",
+    "loading": "Cargando...",
+    "fetchError": "Error al cargar el registro de ideas.",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta idea?",
+    "deleteFailed": "Error al eliminar la idea.",
+    "thUserInput": "Entrada del usuario",
+    "thIntent": "Intención",
+    "thModuleMatch": "Coincidencia de módulo",
+    "thNewFeature": "Nueva funcionalidad",
+    "thConfidence": "Confianza",
+    "thFollowUp": "Pregunta de seguimiento",
+    "thTimestamp": "Marca de tiempo",
+    "thActions": "Acciones",
+    "deleteButton": "Eliminar",
+    "deleteTitle": "Eliminar esta idea",
+    "confidence": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "intentUserWantsAccess": "El usuario quiere acceder a {{module}}",
+    "modules": {},
+    "backendPhrases": {}
+  }
+}

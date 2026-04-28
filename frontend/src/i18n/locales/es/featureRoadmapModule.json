@@ -1,0 +1,75 @@
+{
+  "featureRoadmapModule": {
+    "pageTitle": "Hoja de ruta de funcionalidades",
+    "intro": "Este panel muestra ideas enviadas por los usuarios y posibles funcionalidades futuras. Vota positivamente, suscríbete para recibir notificaciones o (administrador) actualiza el estado.",
+    "statusLegend": "Leyenda de estados:",
+    "loading": "Cargando...",
+    "fetchError": "Error al cargar la hoja de ruta de funcionalidades.",
+    "thFeatureName": "Nombre de la funcionalidad",
+    "thStatus": "Estado",
+    "thSummary": "Resumen",
+    "thUpvotes": "Votos positivos",
+    "thNotifications": "Notificaciones",
+    "thSubmitted": "Enviado",
+    "thAdmin": "Admin",
+    "noFeatureName": "(Sin nombre de funcionalidad)",
+    "notifyMe": "Notifícame",
+    "titleUpvote": "Votar positivamente esta funcionalidad",
+    "titleNotify": "Recibir notificaciones sobre esta funcionalidad",
+    "generateScaffold": "Generar andamiaje",
+    "titleGenerateScaffold": "Generar andamiaje de código para esta funcionalidad",
+    "history": "Historial",
+    "titleHistory": "Ver historial de andamiaje para esta funcionalidad",
+    "promptSubscribeEmail": "Introduce tu correo electrónico para recibir notificaciones sobre esta funcionalidad:",
+    "subscribed": "¡Suscrito!",
+    "promptApprovalComment": "Introduce un comentario de aprobación (opcional):",
+    "approveFailed": "Error al aprobar el andamiaje.",
+    "modalScaffoldTitle": "Andamiaje de código para: {{name}}",
+    "modalHistoryTitle": "Historial de andamiaje para: {{name}}",
+    "modalFeatureFallback": "Funcionalidad",
+    "copyCode": "Copiar código",
+    "codeCopied": "¡Código copiado al portapapeles!",
+    "noCodeGenerated": "(No se generó código)",
+    "scaffoldMockHead": "// Andamiaje para: {{name}}\n// (Error del backend, usando mock)",
+    "noHistory": "No se encontró historial de andamiaje para esta funcionalidad.",
+    "historyMetaType": "Tipo:",
+    "historyMetaUser": "Usuario:",
+    "historyMetaDate": "Fecha:",
+    "historyApprovedBy": "✔️ Aprobado por {{user}}{{at}}",
+    "adminComment": "Comentario del administrador:",
+    "approve": "Aprobar",
+    "status": {
+      "idea": "Idea",
+      "planned": "Planificado",
+      "inReview": "En revisión",
+      "comingSoon": "Próximamente",
+      "implemented": "Implementado"
+    },
+    "scaffold": {
+      "apiRoute": {
+        "label": "Ruta de API",
+        "preview": "Genera una ruta FastAPI con modelos Pydantic según sea necesario."
+      },
+      "dbModel": {
+        "label": "Modelo de BD",
+        "preview": "Genera una colección/modelo de MongoDB (Motor) y esquemas relacionados."
+      },
+      "backgroundJob": {
+        "label": "Tarea en segundo plano",
+        "preview": "Genera una tarea asíncrona en segundo plano (p. ej., con FastAPI BackgroundTasks o Celery)."
+      },
+      "unitTest": {
+        "label": "Prueba unitaria",
+        "preview": "Genera una prueba unitaria de Python para la funcionalidad."
+      },
+      "cypressTest": {
+        "label": "Prueba Cypress",
+        "preview": "Genera una prueba end-to-end con Cypress para la funcionalidad."
+      },
+      "docs": {
+        "label": "Documentación",
+        "preview": "Genera documentación en markdown para la funcionalidad."
+      }
+    }
+  }
+}

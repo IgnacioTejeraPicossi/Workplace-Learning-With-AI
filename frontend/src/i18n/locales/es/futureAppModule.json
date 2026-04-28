@@ -1,0 +1,76 @@
+{
+  "futureAppModule": {
+    "pageTitle": "Visión de la aplicación futura",
+    "roadmapHeading": "Hoja de ruta de desarrollo",
+    "thPhase": "Fase",
+    "thTitle": "Título",
+    "thMainFeature": "Funcionalidad principal",
+    "thFeasibility": "Viabilidad",
+    "thStatus": "Estado",
+    "feasibility": {
+      "high": "Alta",
+      "lowRd": "Baja (I+D)"
+    },
+    "status": {
+      "live": "En producción",
+      "planned": "Planificado"
+    },
+    "phaseRows": {
+      "p1": {
+        "title": "Registrador de intenciones desconocidas",
+        "mainFeature": "Registra y clasifica ideas de los usuarios"
+      },
+      "p2": {
+        "title": "Preguntas clarificadoras",
+        "mainFeature": "Haz preguntas de seguimiento antes de descartar"
+      },
+      "p3": {
+        "title": "Panel de evolución",
+        "mainFeature": "Sugiere funcionalidades futuras, votos positivos, notificaciones"
+      },
+      "p4": {
+        "title": "Andamiaje guiado por Cursor",
+        "mainFeature": "Generación de código con IA, historial de andamiaje, aprobación de administrador"
+      },
+      "p5": {
+        "title": "Integración de código en tiempo real",
+        "mainFeature": "Actualiza el sistema al instante"
+      }
+    },
+    "previewTitle": "Vista previa de la Fase 5: Activación dinámica de funcionalidades en tiempo real",
+    "previewIntro": "El futuro de las aplicaciones adaptativas y auto-evolutivas. Observa cómo las ideas de los usuarios se convierten en funcionalidades en vivo en tiempo real.",
+    "techArchTitle": "Arquitectura técnica",
+    "techCard1Title": "Cursor AI + Andamiaje",
+    "techCard1Body": "Genera código de backend/frontend/pruebas/documentación",
+    "techCard2Title": "Integración con Bugbot",
+    "techCard2Body": "Detecta errores en tiempo de ejecución y compilación en el código de IA",
+    "techCard3Title": "Recarga en caliente",
+    "techCard3Body": "Inyecta código nuevo sin reinicio completo",
+    "techCard3Note": "Lo más cercano hoy en día son las actualizaciones continuas sin tiempo de inactividad con Docker + Kubernetes",
+    "demoTitle": "Vista previa de demostración en vivo",
+    "demoLine1": "$ usuario: \"Añadir un nuevo módulo de aprendizaje\"",
+    "demoLine2": "🤖 IA: \"Generando andamiaje para 'módulo-aprendizaje'...\"",
+    "demoLine3": "🔧 Creando: componente React, ruta de API, pruebas...",
+    "demoLine4": "✅ Recargando en caliente la nueva funcionalidad...",
+    "demoLine5": "🎉 ¡Funcionalidad en vivo! Pruébala ahora.",
+    "impactTitle": "Impacto empresarial",
+    "impact1Label": "Aplicaciones adaptativas",
+    "impact1Body": "Software que evoluciona con las necesidades del usuario",
+    "impact2Label": "Actualizaciones sin tiempo de inactividad",
+    "impact2Body": "Las funcionalidades aparecen al instante sin necesidad de despliegue",
+    "impact3Label": "Desarrollo impulsado por IA",
+    "impact3Body": "Del lenguaje natural a código funcional",
+    "impact4Label": "Evolución centrada en el usuario",
+    "impact4Body": "Funcionalidades construidas a partir de retroalimentación real de los usuarios",
+    "implRoadmapTitle": "Hoja de ruta de implementación",
+    "impl51Title": "Fase 5.1",
+    "impl51Body": "Ejecución de código en sandbox",
+    "impl52Title": "Fase 5.2",
+    "impl52Body": "Sincronización de estado en tiempo real",
+    "impl53Title": "Fase 5.3",
+    "impl53Body": "Recarga en caliente de componentes de interfaz",
+    "impl54Title": "Fase 5.4",
+    "impl54Body": "Rollback y controles de seguridad",
+    "implTimeline": "Plazo estimado: 6-12 meses (fase de I+D)"
+  }
+}
