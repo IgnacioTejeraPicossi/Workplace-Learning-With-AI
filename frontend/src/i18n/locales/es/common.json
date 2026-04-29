@@ -1026,5 +1026,375 @@
       "title": "Secciones de los syllabi en las que está anclado este prompt",
       "footnote": "Los syllabi de ISTQB se referencian como resúmenes breves seleccionados (notas del autor). El uso del texto completo se aplaza — ver Mejoras futuras al final de esta pestaña."
     }
+  },
+
+  "security": {
+    "title": "Centro de seguridad",
+    "localInstallation": {
+      "label": "Instalación local",
+      "sidebarDesc": "Gestiona la configuración de seguridad y las opciones locales",
+      "title": "Seguridad de la instalación local",
+      "statusLabel": "Estado de seguridad",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "passphrasePrompt": "Establece la frase de cifrado (no se almacena)",
+      "disable": "Desactivar",
+      "activate": "Activar",
+      "description": "Tu instalación local está correctamente protegida con las siguientes características:",
+      "encryption": "Cifrado",
+      "encryptionActive": "Todos los datos locales están cifrados en reposo",
+      "encryptionDisabled": "El cifrado está actualmente desactivado",
+      "accessControl": "Control de acceso",
+      "accessControlDesc": "Se requiere autenticación local",
+      "firewall": "Cortafuegos",
+      "firewallDesc": "Acceso a la red local restringido",
+      "updates": "Actualizaciones",
+      "updatesDesc": "Parches de seguridad aplicados automáticamente"
+    },
+    "dataDeletion": {
+      "label": "Eliminación automática de datos",
+      "sidebarDesc": "Configura la limpieza automática de datos y las políticas de retención",
+      "title": "Eliminación automática de datos",
+      "policyStatus": "Política de retención de datos",
+      "enabled": "Activado",
+      "description": "Configura durante cuánto tiempo se conservan tus datos antes de su eliminación automática:",
+      "policies": {
+        "activityLogs": "Registros de actividad del usuario",
+        "tempFiles": "Archivos temporales",
+        "cacheData": "Datos de caché",
+        "sessionData": "Datos de sesión"
+      },
+      "periods": {
+        "activityLogs": "30 días",
+        "tempFiles": "7 días",
+        "cacheData": "24 horas",
+        "sessionData": "Al cerrar sesión"
+      },
+      "units": {
+        "days": "días",
+        "hours": "horas"
+      },
+      "storageUsage": "Uso del almacenamiento",
+      "used": "usado",
+      "keys": "claves",
+      "autoPurge": "Auto-purga al iniciar sesión",
+      "autoPurgeDesc": "Elimina automáticamente los datos caducados al abrir la aplicación.",
+      "retentionPolicies": "Políticas de retención",
+      "matchingKeys": "Claves coincidentes",
+      "size": "Tamaño",
+      "purgeCategory": "Purgar esta categoría",
+      "purgeActions": "Acciones de purga",
+      "purgeNow": "Purgar datos caducados",
+      "expiredItems": "elementos caducados encontrados",
+      "rescan": "Volver a analizar",
+      "purgeComplete": "Purgados {{count}} elemento(s), liberados {{bytes}}",
+      "confirmTitle": "Confirmar purga de datos",
+      "confirmAllMsg": "Esto eliminará permanentemente {{count}} elemento(s) caducado(s). Esta acción no se puede deshacer.",
+      "confirmCategoryMsg": "Esto eliminará permanentemente todos los elementos de la categoría \"{{category}}\". Esta acción no se puede deshacer.",
+      "cancel": "Cancelar",
+      "confirmPurge": "Eliminar permanentemente",
+      "purgeHistoryTitle": "Historial de purgas",
+      "items": "elementos",
+      "sessionDataNote": "Los datos de sesión se borran automáticamente al cerrar sesión."
+    },
+    "yourData": {
+      "label": "Tus datos",
+      "sidebarDesc": "Consulta y gestiona tus datos personales y ajustes de privacidad",
+      "title": "Tus datos y privacidad",
+      "protectionStatus": "Protección de datos",
+      "protected": "Protegido",
+      "description": "Tienes control total sobre tus datos personales:",
+      "options": {
+        "personalInfo": "Información personal",
+        "learningHistory": "Historial de aprendizaje y exportación",
+        "usageStats": "Estadísticas de uso",
+        "accountDeletion": "Eliminar cuenta"
+      },
+      "actions": {
+        "viewEdit": "Ver/Editar",
+        "export": "Exportar",
+        "delete": "Eliminar cuenta"
+      },
+      "profileDesc": "Consulta y edita tu información de perfil",
+      "exportDesc": "Descarga todos tus datos en formato JSON o CSV",
+      "statsDesc": "Consulta estadísticas detalladas de uso y desglose de almacenamiento",
+      "deleteDesc": "Elimina permanentemente todos tus datos de esta instalación",
+      "profile": {
+        "displayName": "Nombre para mostrar",
+        "displayNamePlaceholder": "Introduce tu nombre",
+        "email": "Dirección de correo electrónico",
+        "emailPlaceholder": "Introduce tu correo electrónico",
+        "notifications": "Activar notificaciones por correo electrónico",
+        "save": "Guardar perfil",
+        "saved": "¡Perfil guardado!"
+      },
+      "exportInfo": "Descarga una copia completa de todos tus datos almacenados en esta aplicación. Incluye tu perfil, ajustes, historial de aprendizaje y datos en caché.",
+      "exportJson": "Exportar como JSON",
+      "exportCsv": "Exportar como CSV",
+      "exportComplete": "¡Exportación descargada correctamente!",
+      "stats": {
+        "totalKeys": "Total de elementos de datos",
+        "storageUsed": "Almacenamiento usado",
+        "settingsKeys": "Ajustes",
+        "securityKeys": "Datos de seguridad",
+        "categoryBreakdown": "Desglose por categoría de datos",
+        "cat_settings": "Ajustes y configuración",
+        "cat_security": "Datos de seguridad",
+        "cat_cache": "Caché y temporales",
+        "cat_other": "Otros datos",
+        "storageBreakdown": "Capacidad de almacenamiento",
+        "used": "usado",
+        "max": "máximo"
+      },
+      "deleteWarningTitle": "Zona de peligro",
+      "deleteWarningMsg": "Eliminar tu cuenta borrará permanentemente todos los datos almacenados en esta aplicación. Esto incluye:",
+      "deleteItem1": "Tu información de perfil y preferencias",
+      "deleteItem2": "Todo el historial de aprendizaje y registros de actividad",
+      "deleteItem3": "Ajustes de seguridad y claves de cifrado",
+      "deleteItem4": "Todos los datos en caché y temporales",
+      "deleteConfirmTitle": "Confirmación final",
+      "deleteConfirmMsg": "Esta acción es permanente y no se puede deshacer. Todos tus datos locales serán borrados.",
+      "deleteConfirmType": "Escribe DELETE para confirmar:",
+      "deleteCancel": "Cancelar",
+      "deleteForever": "Eliminar todo",
+      "deletePlaceholder": "DELETE",
+      "csvHeaders": {
+        "key": "Clave",
+        "value": "Valor",
+        "type": "Tipo"
+      }
+    },
+    "anonymization": {
+      "label": "Anonimización de datos",
+      "sidebarDesc": "Configura la anonimización de datos y la protección de privacidad",
+      "title": "Anonimización de datos",
+      "privacyStatus": "Protección de privacidad",
+      "enabled": "Activado",
+      "description": "Tus datos se anonimizan automáticamente para proteger tu privacidad:",
+      "globalToggle": "Activar anonimización de datos",
+      "globalDesc": "Cuando está activado, los patrones de datos sensibles se enmascaran automáticamente antes de enviar texto a los LLMs.",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "saved": "¡Guardado!",
+      "rulesTitle": "Reglas de anonimización",
+      "rulesActive": "activas",
+      "rulesDesc": "Activa o desactiva reglas individuales para controlar qué patrones de datos se detectan y enmascaran:",
+      "ruleNames": {
+        "email": "Direcciones de correo electrónico",
+        "phone": "Números de teléfono",
+        "creditCard": "Números de tarjeta de crédito",
+        "ipAddress": "Direcciones IP",
+        "apiKey": "Claves API y tokens",
+        "ssn": "Números de la Seguridad Social",
+        "norwegianId": "DNI noruego (fødselsnummer)",
+        "url": "URLs"
+      },
+      "ruleDescs": {
+        "email": "Detecta y enmascara direcciones de correo electrónico (usuario@ejemplo.com)",
+        "phone": "Detecta números de teléfono con 7 o más dígitos",
+        "creditCard": "Detecta números de tarjeta de 16 dígitos (con espacios o guiones)",
+        "ipAddress": "Detecta direcciones IPv4 (p.ej. 192.168.1.1)",
+        "apiKey": "Detecta claves API, tokens y cadenas secretas",
+        "ssn": "Detecta números de la Seguridad Social estadounidense (XXX-XX-XXXX)",
+        "norwegianId": "Detecta el fødselsnummer noruego (11 dígitos)",
+        "url": "Detecta URLs HTTP/HTTPS"
+      },
+      "previewTitle": "Vista previa en tiempo real",
+      "previewDesc": "Pega o escribe texto a continuación para ver la anonimización en acción:",
+      "previewPlaceholder": "Pega texto con datos personales para probar la anonimización...",
+      "loadSample": "Cargar ejemplo",
+      "clearPreview": "Limpiar",
+      "runAnonymize": "Anonimizar texto",
+      "foundItems": "{{count}} elemento(s) sensible(s) detectado(s)",
+      "noItemsFound": "No se detectaron datos sensibles",
+      "detectedItems": "Elementos detectados",
+      "resultTitle": "Resultado anonimizado",
+      "sampleText": "Hola, me llamo Juan García y mi correo es juan.garcia@ejemplo.com. Puedes contactarme en +34 612 345 678. Mi NSS es 123-45-6789 y mi tarjeta de crédito es 4532-1234-5678-9012. Mi clave API es svc_demo_ABC123fake789not_a_stripe_key. IP del servidor: 192.168.1.100. Más información en https://ejemplo.com/perfil/juan",
+      "rules": {
+        "personalIdentifiers": {
+          "name": "Identificadores personales",
+          "desc": "Eliminados o anonimizados"
+        },
+        "locationData": {
+          "name": "Datos de ubicación",
+          "desc": "Generalizados a nivel de ciudad"
+        },
+        "usagePatterns": {
+          "name": "Patrones de uso",
+          "desc": "Agregados y anonimizados"
+        }
+      }
+    },
+    "securityInfo": {
+      "label": "Información de seguridad",
+      "sidebarDesc": "Accede a documentación de seguridad e información de cumplimiento normativo",
+      "title": "Información de seguridad",
+      "statusLabel": "Estado de seguridad",
+      "upToDate": "Al día",
+      "description": "Última información de seguridad y detalles de cumplimiento normativo:",
+      "scoreTitle": "Puntuación de seguridad",
+      "grade": "Calificación",
+      "gradeLabels": {
+        "A": "Excelente",
+        "B": "Buena",
+        "C": "Aceptable",
+        "D": "Necesita mejora",
+        "F": "Crítica"
+      },
+      "checksPassed": "comprobaciones superadas",
+      "scoreMax": "/100",
+      "refresh": "Actualizar puntuación",
+      "checklistTitle": "Lista de comprobación de seguridad",
+      "checks": {
+        "encryption": {
+          "name": "Cifrado local",
+          "passedMsg": "Todos los datos locales están cifrados en reposo con AES-GCM",
+          "failedMsg": "Los datos locales no están cifrados — activa el cifrado en Instalación local",
+          "recommendation": "Activa el cifrado local para proteger los datos en reposo (Instalación local → Activar)"
+        },
+        "anonymization": {
+          "name": "Anonimización de datos",
+          "passedMsg": "El enmascaramiento de datos personales está activo antes de enviarlos a los LLMs",
+          "failedMsg": "La anonimización está desactivada — los datos sensibles pueden enviarse a los LLMs",
+          "recommendation": "Activa la anonimización de datos para enmascarar datos personales antes de enviar prompts a los LLMs"
+        },
+        "autoPurge": {
+          "name": "Auto-purga",
+          "passedMsg": "Los datos caducados se limpian automáticamente al iniciar sesión",
+          "failedMsg": "La auto-purga está desactivada — los datos caducados pueden acumularse",
+          "recommendation": "Activa la auto-purga en Eliminación automática de datos para limpiar los datos caducados"
+        },
+        "https": {
+          "name": "Conexión segura",
+          "passedMsg": "La aplicación se sirve mediante HTTPS o se ejecuta localmente",
+          "failedMsg": "La aplicación no usa HTTPS — los datos pueden interceptarse en tránsito",
+          "recommendation": "Despliega la aplicación con HTTPS para proteger los datos en tránsito"
+        },
+        "retentionConfigured": {
+          "name": "Políticas de retención",
+          "passedMsg": "Las políticas de retención de datos están configuradas",
+          "failedMsg": "No hay políticas de retención configuradas — los datos pueden conservarse indefinidamente",
+          "recommendation": "Configura las políticas de retención de datos en Eliminación automática de datos"
+        },
+        "recentActivity": {
+          "name": "Actividad de seguridad reciente",
+          "passedMsg": "Eventos de seguridad registrados en los últimos 7 días",
+          "failedMsg": "Sin actividad de seguridad en los últimos 7 días",
+          "recommendation": "Revisa los ajustes de seguridad con regularidad y supervisa la actividad"
+        },
+        "profileSet": {
+          "name": "Perfil configurado",
+          "passedMsg": "La información del perfil de usuario está establecida",
+          "failedMsg": "No hay información de perfil configurada",
+          "recommendation": "Configura tu perfil en Tus datos → Información personal"
+        }
+      },
+      "recommendationsTitle": "Recomendaciones",
+      "recommendationsDesc": "Completa estas acciones para mejorar tu puntuación de seguridad:",
+      "complianceTitle": "Cobertura de cumplimiento normativo",
+      "complianceDesc": "Cómo se mapean tus ajustes de seguridad actuales a los marcos de cumplimiento normativo:",
+      "controlsMet": "controles cumplidos",
+      "frameworks": {
+        "gdpr": {
+          "name": "RGPD",
+          "desc": "Reglamento General de Protección de Datos de la UE"
+        },
+        "ccpa": {
+          "name": "CCPA",
+          "desc": "Ley de Privacidad del Consumidor de California"
+        },
+        "soc2": {
+          "name": "SOC 2 Tipo II",
+          "desc": "Controles de Organización de Servicios"
+        }
+      },
+      "additionalInfo": "Información adicional",
+      "items": {
+        "lastAudit": {
+          "name": "Última auditoría de seguridad",
+          "value": "2024-01-15"
+        },
+        "compliance": {
+          "name": "Cumplimiento normativo",
+          "value": "RGPD, CCPA, SOC 2 Tipo II"
+        },
+        "certifications": {
+          "name": "Certificaciones de seguridad",
+          "value": "ISO 27001, PCI DSS"
+        },
+        "penTesting": {
+          "name": "Pruebas de penetración",
+          "value": "Evaluaciones trimestrales"
+        }
+      }
+    },
+    "realTime": {
+      "label": "Monitorización en tiempo real",
+      "sidebarDesc": "Supervisa eventos de seguridad y actividad en tiempo real",
+      "title": "Monitorización de seguridad en tiempo real",
+      "monitoringStatus": "Estado de la monitorización",
+      "statusLive": "En vivo",
+      "statusPaused": "En pausa",
+      "autoRefresh": "Actualización automática",
+      "refreshIntervals": {
+        "5": "5 seg",
+        "10": "10 seg",
+        "30": "30 seg",
+        "60": "60 seg"
+      },
+      "refresh": "Actualizar",
+      "clearLogs": "Borrar registros",
+      "eventLog": "Registro de eventos",
+      "eventSummary": "Resumen por tipo de evento",
+      "noEvents": "No hay eventos registrados",
+      "noEventsDesc": "Los eventos de seguridad aparecerán aquí a medida que uses las funciones de seguridad de la aplicación.",
+      "showingEvents": "Mostrando {{count}} de {{total}} eventos",
+      "cancel": "Cancelar",
+      "confirmClear": "Borrar todo",
+      "clearConfirmTitle": "¿Borrar todos los registros de seguridad?",
+      "clearConfirmDesc": "Esto eliminará permanentemente los {{count}} eventos de seguridad del registro.",
+      "clearConfirmWarn": "Esta acción no se puede deshacer.",
+      "kpi": {
+        "totalEvents": "Total de eventos",
+        "last24h": "Últimas 24 horas",
+        "last1h": "Última hora",
+        "criticalErrors": "Críticos / Errores",
+        "warnings": "Advertencias"
+      },
+      "filters": {
+        "allTypes": "Todos los tipos",
+        "allSeverities": "Todas las gravedades",
+        "allTime": "Todo el tiempo",
+        "last1h": "Última hora",
+        "last24h": "Últimas 24 horas",
+        "last7d": "Últimos 7 días"
+      },
+      "severities": {
+        "info": "Información",
+        "ok": "OK",
+        "warning": "Advertencia",
+        "error": "Error",
+        "critical": "Crítico"
+      },
+      "eventTypes": {
+        "encryption_enabled": "Cifrado activado",
+        "encryption_disabled": "Cifrado desactivado",
+        "data_purge": "Purga de datos",
+        "data_export": "Exportación de datos",
+        "anonymization_toggled": "Anonimización cambiada",
+        "anonymization_applied": "Anonimización aplicada",
+        "account_deletion": "Eliminación de cuenta",
+        "policy_changed": "Política modificada",
+        "auth_success": "Autenticación correcta",
+        "auth_failure": "Error de autenticación",
+        "scan_completed": "Análisis completado",
+        "settings_changed": "Ajustes modificados"
+      },
+      "timeAgo": {
+        "justNow": "Ahora mismo",
+        "minutes": "hace {{count}} min",
+        "hours": "hace {{count}} h"
+      }
+    }
   }
 }
