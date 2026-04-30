@@ -51,6 +51,17 @@ export default function ThreatLibrary() {
     }
   };
 
+  const getThreatName = (threat) =>
+    t(`cyber.threatData.${threat.id}.name`, { defaultValue: threat.name });
+
+  const getThreatDescription = (threat) =>
+    t(`cyber.threatData.${threat.id}.description`, { defaultValue: threat.description });
+
+  const getControlTitle = (control) => {
+    const safeKey = control.id.replace(/[:.]/g, '_');
+    return t(`cyber.controlTitles.${safeKey}`, { defaultValue: control.title });
+  };
+
   const getCIAImpactColor = (impact) => {
     if (impact >= 8) return '#dc2626'; // red
     if (impact >= 6) return '#ea580c'; // orange
@@ -170,12 +181,12 @@ export default function ThreatLibrary() {
                 {getCategoryIcon(threat.category)}
               </span>
               <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#1f2937', margin: 0 }}>
-                {threat.name}
+                {getThreatName(threat)}
               </h3>
             </div>
-            
+
             <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.4' }}>
-              {threat.description}
+              {getThreatDescription(threat)}
             </p>
 
             {/* CIA Impact Indicators */}
@@ -263,7 +274,7 @@ export default function ThreatLibrary() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-                {getCategoryIcon(selectedThreat.category)} {selectedThreat.name}
+                {getCategoryIcon(selectedThreat.category)} {getThreatName(selectedThreat)}
               </h2>
               <button
                 onClick={() => setSelectedThreat(null)}
@@ -284,7 +295,7 @@ export default function ThreatLibrary() {
                 {t('cyber.common.description')}
               </h3>
               <p style={{ color: '#6b7280', lineHeight: '1.5' }}>
-                {selectedThreat.description}
+                {getThreatDescription(selectedThreat)}
               </p>
             </div>
 
@@ -335,7 +346,7 @@ export default function ThreatLibrary() {
                         fontSize: '0.875rem'
                       }}
                     >
-                      <div style={{ fontWeight: '500', color: '#374151' }}>{control.title}</div>
+                      <div style={{ fontWeight: '500', color: '#374151' }}>{getControlTitle(control)}</div>
                       <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{control.framework}</div>
                     </div>
                   ) : (

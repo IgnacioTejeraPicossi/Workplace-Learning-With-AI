@@ -1749,6 +1749,50 @@
       "confidence": "Confianza: {{pct}}%",
       "sources": "Fuentes:",
       "responseTime": "Tiempo de respuesta: {{time}}s"
+    },
+
+    "threatData": {
+      "T001": {
+        "name": "Ataques de phishing",
+        "description": "Señuelos de correo/web para robar credenciales e información sensible."
+      },
+      "T002": {
+        "name": "Ransomware",
+        "description": "Software malicioso que cifra los datos y exige un pago para descifrarlos."
+      },
+      "T003": {
+        "name": "Inyección SQL",
+        "description": "Técnica de inyección de código utilizada para atacar aplicaciones basadas en datos."
+      },
+      "T004": {
+        "name": "Ataques a la cadena de suministro",
+        "description": "Ataques dirigidos a las cadenas de suministro de software y sus dependencias."
+      }
+    },
+
+    "controlTitles": {
+      "NIST-CSF_GV_OC-1": "Contexto organizacional",
+      "NIST-CSF_ID_AM-1": "Gestión de activos",
+      "NIST-CSF_PR_AC-1": "Control de acceso — Gestión de identidades",
+      "NIST-CSF_PR_DS-1": "Seguridad de datos",
+      "NIST-CSF_DE_CM-1": "Monitorización continua",
+      "NIST-CSF_RS_RP-1": "Planificación de respuesta",
+      "ISO-27001_A_5_1": "Políticas de seguridad de la información",
+      "ISO-27001_A_8_1": "Responsabilidad sobre los activos",
+      "ISO-27001_A_9_1": "Requisitos de negocio para el control de acceso",
+      "ISO-27001_A_12_4": "Registro y monitorización",
+      "CIS_1_1": "Inventario de activos empresariales",
+      "CIS_2_1": "Inventario de activos de software",
+      "CIS_4_1": "Configuración segura de activos empresariales",
+      "CIS_8_1": "Gestión de registros de auditoría",
+      "OWASP-ASVS_2_1": "Diseño de autenticación",
+      "OWASP-ASVS_3_1": "Gestión de sesiones",
+      "OWASP-ASVS_5_1": "Validación de entrada",
+      "OWASP-TOP10_A01": "Control de acceso roto",
+      "OWASP-TOP10_A02": "Fallos criptográficos",
+      "OWASP-TOP10_A03": "Inyección",
+      "OWASP-TOP10_A05": "Configuración de seguridad incorrecta",
+      "OWASP-TOP10_A09": "Fallos en registro y monitorización de seguridad"
     }
   }
 }
