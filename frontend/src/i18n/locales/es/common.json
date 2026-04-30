@@ -1458,6 +1458,27 @@
       "noVulns": "No se encontraron vulnerabilidades",
       "package": "Paquete",
       "riskScore2": "Puntuación de riesgo",
+      "target": "Objetivo:",
+      "kpiNames": {
+        "patch_latency_days": "Días de latencia de parches",
+        "open_high_vulns": "Vulnerabilidades críticas abiertas",
+        "compliance_coverage": "Cobertura de cumplimiento"
+      },
+      "kpiUnits": {
+        "days": "días",
+        "count": "uds.",
+        "percentage": "%"
+      },
+      "vulnData": {
+        "vuln-001": {
+          "title": "Contaminación de prototipo en lodash",
+          "description": "Una vulnerabilidad que permite ataques de contaminación de prototipo."
+        },
+        "vuln-002": {
+          "title": "Verificación de certificado SSL/TLS insegura",
+          "description": "La librería Requests permite conexiones SSL inseguras."
+        }
+      },
       "reference": {
         "title": "Referencia de Ciberseguridad 101",
         "subtitle": "Visión general completa de conceptos, amenazas, marcos y ecosistema de ciberseguridad",

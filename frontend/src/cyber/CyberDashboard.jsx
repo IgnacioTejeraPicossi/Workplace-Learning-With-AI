@@ -171,7 +171,7 @@ export default function CyberDashboard() {
                   color: riskScore.trend === 'improving' ? '#166534' : 
                         riskScore.trend === 'degrading' ? '#991b1b' : '#374151'
                 }}>
-                  {riskScore.trend}
+                  {t(`cyber.postureRisk.${riskScore.trend}`, { defaultValue: riskScore.trend })}
                 </span>
               </div>
               <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
@@ -198,20 +198,20 @@ export default function CyberDashboard() {
           }}>
             <div style={{ marginBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280', marginBottom: '0.25rem' }}>
-                {kpi.kpi.replace(/_/g, ' ').toUpperCase()}
+                {t(`cyber.dashboard.kpiNames.${kpi.kpi}`, { defaultValue: kpi.kpi.replace(/_/g, ' ').toUpperCase() })}
               </h3>
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>
                 {kpi.value}
                 {kpi.meta?.unit && (
                   <span style={{ fontSize: '0.875rem', color: '#6b7280', marginLeft: '0.25rem' }}>
-                    {kpi.meta.unit}
+                    {t(`cyber.dashboard.kpiUnits.${kpi.meta.unit}`, { defaultValue: kpi.meta.unit })}
                   </span>
                 )}
               </div>
             </div>
-            {kpi.target && (
+            {kpi.target !== undefined && kpi.target !== null && (
               <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                Target: {kpi.target} {kpi.meta?.unit || ''}
+                {t('cyber.dashboard.target')} {kpi.target} {kpi.meta?.unit ? t(`cyber.dashboard.kpiUnits.${kpi.meta.unit}`, { defaultValue: kpi.meta.unit }) : ''}
               </div>
             )}
           </div>
@@ -250,10 +250,12 @@ export default function CyberDashboard() {
                 {vulnerabilities.map((vuln) => (
                   <tr key={vuln.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                     <td style={{ padding: '0.75rem' }}>
-                      <div style={{ fontWeight: '500', color: '#1f2937' }}>{vuln.title}</div>
+                      <div style={{ fontWeight: '500', color: '#1f2937' }}>
+                        {t(`cyber.dashboard.vulnData.${vuln.id}.title`, { defaultValue: vuln.title })}
+                      </div>
                       {vuln.description && (
                         <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                          {vuln.description}
+                          {t(`cyber.dashboard.vulnData.${vuln.id}.description`, { defaultValue: vuln.description })}
                         </div>
                       )}
                     </td>
