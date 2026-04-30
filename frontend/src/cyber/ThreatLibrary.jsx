@@ -320,7 +320,7 @@ export default function ThreatLibrary() {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                Recommended Controls
+                {t('cyber.threatLibrary.recommendedControls')}
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {selectedThreat.controls.map((controlId) => {
@@ -359,7 +359,7 @@ export default function ThreatLibrary() {
             {selectedThreat.tags.length > 0 && (
               <div>
                 <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                  Tags
+                  {t('cyber.threatLibrary.tags')}
                 </h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                   {selectedThreat.tags.map((tag, index) => (

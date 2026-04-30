@@ -182,18 +182,18 @@ export default function Vulnerabilities() {
           onChange={(e) => setFilterSeverity(e.target.value)}
           style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
         >
-          <option value="">All Severities</option>
-          <option value="CRITICAL">Critical</option>
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
+          <option value="">{t('cyber.vulnerabilities.allSeverities')}</option>
+          <option value="CRITICAL">{t('cyber.toolsFrameworks.critical')}</option>
+          <option value="HIGH">{t('cyber.toolsFrameworks.high')}</option>
+          <option value="MEDIUM">{t('cyber.toolsFrameworks.medium')}</option>
+          <option value="LOW">{t('cyber.toolsFrameworks.low')}</option>
         </select>
         <select
           value={filterSource}
           onChange={(e) => setFilterSource(e.target.value)}
           style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
         >
-          <option value="">All Sources</option>
+          <option value="">{t('cyber.vulnerabilities.allSources')}</option>
           {sources.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <select
@@ -201,9 +201,9 @@ export default function Vulnerabilities() {
           onChange={(e) => setFilterFixed(e.target.value)}
           style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
         >
-          <option value="all">All Status</option>
-          <option value="open">Open</option>
-          <option value="fixed">Fixed</option>
+          <option value="all">{t('cyber.vulnerabilities.allStatus')}</option>
+          <option value="open">{t('cyber.vulnerabilities.open')}</option>
+          <option value="fixed">{t('cyber.vulnerabilities.fixed')}</option>
         </select>
         <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
           {filtered.length} of {vulnerabilities.length}
