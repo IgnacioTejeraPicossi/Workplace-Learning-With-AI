@@ -1592,7 +1592,40 @@
       "savedLocally": "Guardado localmente.",
       "presetSaved": "Preset guardado.",
       "noPreset": "No se encontró ningún preset para este proyecto.",
-      "settingsSaved": "Ajustes guardados."
+      "settingsSaved": "Ajustes guardados.",
+      "export": "Exportar",
+      "copiedJira": "Markdown de Jira copiado.",
+      "signalAgentSecurity": "Seguridad de Agente: cumplimiento Zero-Trust y hallazgos DLP",
+      "signalThreatLibrary": "Biblioteca de amenazas: añade ideas de detección por táctica",
+      "signalDashboardKPIs": "KPIs del panel: puntuación de riesgo, latencia de parches, recuento de vulnerabilidades",
+      "siemTemplate": "regla: {{name}} sospechoso\ncuando:\n  - auth_anómala\n  - árbol_de_procesos_inusual\nnotas: Mapear a ATT&CK {{id}}\n",
+      "owaspItems": {
+        "A01": "Control de acceso roto",
+        "A02": "Fallos criptográficos",
+        "A03": "Inyección",
+        "A04": "Diseño inseguro",
+        "A05": "Configuración de seguridad incorrecta",
+        "A06": "Componentes vulnerables y desactualizados",
+        "A07": "Fallos de identificación y autenticación",
+        "A08": "Fallos de integridad de software y datos",
+        "A09": "Fallos en el registro y monitorización de seguridad",
+        "A10": "Falsificación de solicitudes del lado del servidor (SSRF)"
+      },
+      "tactics": {
+        "TA0043": { "name": "Reconocimiento", "examples": "Enumeración de subdominios, Identificación tecnológica" },
+        "TA0001": { "name": "Acceso inicial", "examples": "Phishing, Explotación de servicios expuestos" },
+        "TA0002": { "name": "Ejecución", "examples": "Ejecución de comandos, Payloads de scripts" },
+        "TA0003": { "name": "Persistencia", "examples": "Nuevo servicio, Elemento de inicio" },
+        "TA0004": { "name": "Escalada de privilegios", "examples": "Manipulación de tokens, Abuso de configuraciones" },
+        "TA0005": { "name": "Evasión de defensas", "examples": "Manipulación de logs, Ofuscación" },
+        "TA0006": { "name": "Acceso a credenciales", "examples": "Keylogging, Volcado de credenciales" },
+        "TA0007": { "name": "Descubrimiento", "examples": "Escaneo de red, Descubrimiento de cuentas" },
+        "TA0008": { "name": "Movimiento lateral", "examples": "Pivote RDP/SSH, Pass-the-hash" },
+        "TA0009": { "name": "Recolección", "examples": "Preparación de archivos, Datos del portapapeles" },
+        "TA0011": { "name": "Mando y control", "examples": "Canal C2, Domain fronting" },
+        "TA0010": { "name": "Exfiltración", "examples": "Exfiltración por protocolo, Sincronización en la nube" },
+        "TA0040": { "name": "Impacto", "examples": "Cifrado de datos, Detención de servicios" }
+      }
     },
 
     "postureRisk": {

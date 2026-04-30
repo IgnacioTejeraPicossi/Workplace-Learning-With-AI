@@ -111,7 +111,7 @@ export default function ToolsFrameworks() {
       lines.push('## General Notes');
       lines.push(notes);
     }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Copied Jira Markdown.'));
+    navigator.clipboard.writeText(lines.join('\n')).then(() => alert(t('cyber.toolsFrameworks.copiedJira')));
   };
 
   const saveSettings = () => {
@@ -166,7 +166,7 @@ export default function ToolsFrameworks() {
               ⛏️ {t('cyber.toolsFrameworks.intruderScanner')}
             </a>
             <button onClick={save} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>💾 {t('cyber.common.save')}</button>
-            <button onClick={exportJson} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>⬇ Export</button>
+            <button onClick={exportJson} style={{ background: '#f3f4f6', padding: '6px 10px', borderRadius: 6, border: '1px solid #e5e7eb' }}>⬇ {t('cyber.toolsFrameworks.export')}</button>
           </div>
         </div>
         <div style={{ overflowX: 'auto' }}>
@@ -186,7 +186,7 @@ export default function ToolsFrameworks() {
                 return (
                   <tr key={item.id}>
                     <td style={td}><strong>{item.id}</strong></td>
-                    <td style={td}>{item.name}</td>
+                    <td style={td}>{t(`cyber.toolsFrameworks.owaspItems.${item.id}`, { defaultValue: item.name })}</td>
                     <td style={td}>
                       <select value={row.status || ''} onChange={(e)=>setItem(item.id, 'status', e.target.value)}>
                         <option value="">—</option>
@@ -231,21 +231,25 @@ export default function ToolsFrameworks() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
           {TACTICS.map(tactic => (
             <div key={tactic.id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>{tactic.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>{t(`cyber.toolsFrameworks.tactics.${tactic.id}.name`, { defaultValue: tactic.name })}</div>
               <div style={{ fontSize: '0.9em', color: '#6b7280' }}>
-                {t('cyber.toolsFrameworks.examples')}: {tactic.examples.join(', ')}
+                {t('cyber.toolsFrameworks.examples')}: {t(`cyber.toolsFrameworks.tactics.${tactic.id}.examples`, { defaultValue: tactic.examples.join(', ') })}
               </div>
               <div style={{ marginTop: 8, fontSize: '0.85em' }}>
                 <div style={{ color: '#111827', fontWeight: 600, marginBottom: 4 }}>{t('cyber.toolsFrameworks.signalsControls')}</div>
                 <ul style={{ margin: 0, paddingLeft: 18 }}>
-                  <li>Agent Security: Zero‑Trust compliance & DLP findings</li>
-                  <li>Threat Library: Add detection ideas per tactic</li>
-                  <li>Dashboard KPIs: risk score, patch latency, vuln counts</li>
+                  <li>{t('cyber.toolsFrameworks.signalAgentSecurity')}</li>
+                  <li>{t('cyber.toolsFrameworks.signalThreatLibrary')}</li>
+                  <li>{t('cyber.toolsFrameworks.signalDashboardKPIs')}</li>
                 </ul>
               </div>
               <div style={{ marginTop: 8 }}>
                 <label style={{ display: 'block', color: '#6b7280', marginBottom: 4 }}>{t('cyber.toolsFrameworks.siemDetectionIdea')}</label>
-                <textarea rows={3} style={{ width: '100%' }} defaultValue={`rule: ${tactic.name} suspected\nwhen:\n  - abnormal_auth\n  - rare_process_tree\nnotes: Map to ATT&CK ${tactic.id}\n`} />
+                <textarea rows={3} style={{ width: '100%' }} defaultValue={t('cyber.toolsFrameworks.siemTemplate', {
+                  name: t(`cyber.toolsFrameworks.tactics.${tactic.id}.name`, { defaultValue: tactic.name }),
+                  id: tactic.id,
+                  defaultValue: `rule: ${tactic.name} suspected\nwhen:\n  - abnormal_auth\n  - rare_process_tree\nnotes: Map to ATT&CK ${tactic.id}\n`
+                })} />
               </div>
               <div style={{ marginTop: 6 }}>
                 <button onClick={(e)=>navigator.clipboard.writeText(e.currentTarget.parentElement.querySelector('textarea').value)} style={btn}>📋 {t('cyber.toolsFrameworks.copySnippet')}</button>
