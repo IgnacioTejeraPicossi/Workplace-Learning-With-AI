@@ -6,7 +6,7 @@ const API = 'http://localhost:8000/api/atm-copilot';
 const ARTIFACT_TYPES = ['log', 'json', 'xml', 'screenshot', 'console_output'];
 
 const RunAnalyzer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [runId, setRunId] = useState('');
   const [artifacts, setArtifacts] = useState([{ type: 'log', content: '' }]);
   const [analyzing, setAnalyzing] = useState(false);
@@ -44,13 +44,14 @@ const RunAnalyzer = () => {
         body: JSON.stringify({
           run_id: runId.trim(),
           artifacts: artifacts.filter(a => a.content.trim()),
+          lang: i18n.language,
         }),
       });
       const data = await res.json();
       setResult(data);
       loadAnalyses();
     } catch {
-      setResult({ status: 'error', message: 'Network error' });
+      setResult({ status: 'error', message: t('atmCopilotModule.reqLab.networkError') });
     } finally {
       setAnalyzing(false);
     }

@@ -60,6 +60,7 @@ class IngestRequirementRequest(BaseModel):
 
 class GenerateTestDesignRequest(BaseModel):
     requirement_bundle_id: str
+    lang: Optional[str] = "en"
 
 
 class BuildScenarioRequest(BaseModel):
@@ -68,11 +69,13 @@ class BuildScenarioRequest(BaseModel):
     include_edge_cases: bool = True
     include_fallbacks: bool = True
     parameters: Optional[dict] = {}
+    lang: Optional[str] = "en"
 
 
 class AnalyzeRunRequest(BaseModel):
     run_id: str
     artifacts: List[dict] = Field(default=[])
+    lang: Optional[str] = "en"
 
 
 # ── Health ──────────────────────────────────────────────────────────
@@ -145,6 +148,7 @@ async def generate_design(body: GenerateTestDesignRequest, request: Request):
     result = await generate_test_design(
         requirement_bundle_id=body.requirement_bundle_id,
         request_headers=headers,
+        lang=body.lang or "en",
     )
     return result
 
@@ -198,6 +202,7 @@ async def build_scenario(body: BuildScenarioRequest, request: Request):
         include_fallbacks=body.include_fallbacks,
         parameters=body.parameters,
         request_headers=headers,
+        lang=body.lang or "en",
     )
     return result
 
@@ -248,6 +253,7 @@ async def analyze_run(body: AnalyzeRunRequest, request: Request):
         run_id=body.run_id,
         artifacts=body.artifacts,
         request_headers=headers,
+        lang=body.lang or "en",
     )
     return result
 

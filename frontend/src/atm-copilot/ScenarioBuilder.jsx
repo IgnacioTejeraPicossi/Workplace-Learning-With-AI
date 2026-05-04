@@ -11,7 +11,7 @@ const SCENARIO_TYPES = [
 const RISK_LEVELS = ['low', 'medium', 'high'];
 
 const ScenarioBuilder = ({ initialScenarioType, onScenarioTypeConsumed }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [scenarioType, setScenarioType] = useState(initialScenarioType || 'conflict_detection');
   const [riskLevel, setRiskLevel] = useState('medium');
   const [includeEdge, setIncludeEdge] = useState(true);
@@ -52,6 +52,7 @@ const ScenarioBuilder = ({ initialScenarioType, onScenarioTypeConsumed }) => {
           include_edge_cases: includeEdge,
           include_fallbacks: includeFallbacks,
           parameters: params,
+          lang: i18n.language,
         }),
       });
       const data = await res.json();

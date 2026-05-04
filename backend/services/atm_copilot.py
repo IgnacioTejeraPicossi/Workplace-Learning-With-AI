@@ -38,6 +38,27 @@ except ImportError:
 
 import json, re
 
+# ── Language name map for LLM instructions ──────────────────────────
+_LANG_NAMES = {
+    "es": "Spanish",
+    "no": "Norwegian",
+    "fr": "French",
+    "de": "German",
+    "pt": "Portuguese",
+}
+
+def _lang_instruction(lang: str) -> str:
+    """Return a language instruction suffix for LLM prompts.
+    Returns empty string for English (default LLM behaviour)."""
+    if not lang or lang.startswith("en"):
+        return ""
+    lang_name = _LANG_NAMES.get(lang[:2], lang)
+    return (
+        f"\n\nIMPORTANT: Generate ALL text content — titles, descriptions, "
+        f"steps, expected outcomes, notes, questions — in {lang_name}. "
+        f"Do not use English anywhere in the JSON values."
+    )
+
 # ═══════════════════════════════════════════════════════════════════
 # Constants — source types & scenario families
 # ═══════════════════════════════════════════════════════════════════
@@ -264,6 +285,7 @@ async def ingest_requirement_bundle(
 async def generate_test_design(
     requirement_bundle_id: str,
     request_headers: dict = None,
+    lang: str = "en",
 ) -> dict:
     """
     Generate a test design from a stored requirement bundle.
@@ -294,10 +316,11 @@ async def generate_test_design(
 
     design = None
     try:
+        system_prompt = TEST_DESIGN_PROMPT + _lang_instruction(lang)
         result = await ask_ai_unified(
             prompt=user_prompt,
             messages=[
-                {"role": "system", "content": TEST_DESIGN_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             max_tokens=1024,
@@ -340,6 +363,7 @@ async def build_atm_scenario_matrix(
     include_fallbacks: bool = True,
     parameters: dict = None,
     request_headers: dict = None,
+    lang: str = "en",
 ) -> dict:
     """
     Generate an ATM scenario matrix for the given scenario type.
@@ -361,10 +385,11 @@ async def build_atm_scenario_matrix(
 
     matrix = None
     try:
+        system_prompt = SCENARIO_BUILDER_PROMPT + _lang_instruction(lang)
         result = await ask_ai_unified(
             prompt=user_prompt,
             messages=[
-                {"role": "system", "content": SCENARIO_BUILDER_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             max_tokens=1024,
@@ -407,6 +432,7 @@ async def analyze_test_run(
     run_id: str,
     artifacts: List[dict],
     request_headers: dict = None,
+    lang: str = "en",
 ) -> dict:
     """
     Analyze test run artifacts and produce a failure analysis report.
@@ -431,10 +457,11 @@ async def analyze_test_run(
 
     analysis = None
     try:
+        system_prompt = RUN_ANALYZER_PROMPT + _lang_instruction(lang)
         result = await ask_ai_unified(
             prompt=user_prompt,
             messages=[
-                {"role": "system", "content": RUN_ANALYZER_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             max_tokens=1024,

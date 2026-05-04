@@ -8,7 +8,7 @@ const SOURCE_TYPES = [
 ];
 
 const RequirementLab = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [title, setTitle] = useState('');
   const [sourceType, setSourceType] = useState('requirement');
   const [content, setContent] = useState('');
@@ -70,7 +70,7 @@ const RequirementLab = () => {
       const res = await fetch(`${API}/designs/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requirement_bundle_id: bundleId }),
+        body: JSON.stringify({ requirement_bundle_id: bundleId, lang: i18n.language }),
       });
       const data = await res.json();
       setTestDesign(data);
