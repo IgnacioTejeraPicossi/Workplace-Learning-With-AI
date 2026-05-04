@@ -43,7 +43,7 @@ const RobomindClinic = () => {
 
   const runDiagnosis = async () => {
     if (!turns.length) {
-      alert('Please provide some conversation turns first');
+      alert(t('robomindClinic.provideTurnsFirst'));
       return;
     }
 
@@ -82,12 +82,12 @@ const RobomindClinic = () => {
       setReport({
         overall_risk,
         findings,
-        summary: `Composite risk score: ${Math.round(composite)}%. ${findings.length} flag(s) detected.`,
+        summary: t('robomindClinic.compositeScoreSummary', { score: Math.round(composite), count: findings.length }),
         recommended_protocol: []
       });
     } catch (error) {
       console.error('Diagnosis failed:', error);
-      alert(`Diagnosis failed: ${error.message}`);
+      alert(`${t('robomindClinic.diagnosisFailed')}: ${error.message}`);
     } finally {
       setBusy(false);
     }
@@ -99,7 +99,7 @@ const RobomindClinic = () => {
       setTurns(parsed);
     } catch (error) {
       console.error('Invalid JSON:', error);
-      alert('Invalid JSON format. Please check your input.');
+      alert(t('robomindClinic.invalidJson'));
     }
   };
 
@@ -368,7 +368,7 @@ const RobomindClinic = () => {
                         padding: '0.5rem 1rem'
                       }}
                     >
-                      Risk: {report.overall_risk.toUpperCase()}
+                      {t('robomindClinic.riskLabel')} {report.overall_risk.toUpperCase()}
                     </span>
                   </div>
                   <div className="card-body">

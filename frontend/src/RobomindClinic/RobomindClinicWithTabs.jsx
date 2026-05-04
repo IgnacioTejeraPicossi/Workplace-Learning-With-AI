@@ -82,7 +82,7 @@ const RobomindClinicWithTabs = () => {
       setReport({
         overall_risk,
         findings,
-        summary: `Composite risk score: ${Math.round(composite)}%. ${findings.length} flag(s) detected.`,
+        summary: t('robomindClinic.compositeScoreSummary', { score: Math.round(composite), count: findings.length }),
         recommended_protocol: []
       });
     } catch (error) {

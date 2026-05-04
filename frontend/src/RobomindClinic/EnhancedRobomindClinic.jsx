@@ -97,7 +97,7 @@ const EnhancedRobomindClinic = () => {
 
   const generateTherapy = async (targetIssue) => {
     if (!screeningResult) {
-      setError('Please run screening first');
+      setError(t('robomindClinic.enhanced.runScreeningFirst'));
       return;
     }
 
@@ -134,7 +134,7 @@ const EnhancedRobomindClinic = () => {
   const applyTherapy = async (inputPrompt) => {
     const plan = therapyPlan;
     if (!plan) {
-      setError('Please generate therapy plan first');
+      setError(t('robomindClinic.generateTherapyPlanFirst'));
       return null;
     }
 
