@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
 const CHECKS = [
-  'checkQueryCorrectness','checkPagination','checkFiltering','checkLocalization',
-  'checkPreviewVsPublished','checkCaching','checkPerfBudget','checkSchemaDrift',
-  'checkRateLimit','checkErrorHandling',
+  { key: 'checkQueryCorrectness',  icon: '✅' },
+  { key: 'checkPagination',        icon: '📄' },
+  { key: 'checkFiltering',         icon: '🔍' },
+  { key: 'checkLocalization',      icon: '🌍' },
+  { key: 'checkPreviewVsPublished',icon: '👁️' },
+  { key: 'checkCaching',           icon: '⚡' },
+  { key: 'checkPerfBudget',        icon: '⏱️' },
+  { key: 'checkSchemaDrift',       icon: '📐' },
+  { key: 'checkRateLimit',         icon: '🚦' },
+  { key: 'checkErrorHandling',     icon: '⚠️' },
 ];
+
+const STATUS_STYLES = {
+  pass:    { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7' },
+  warn:    { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d' },
+  fail:    { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' },
+  pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
+};
 
 const ApiQA = ({ environment }) => {
   const { t, i18n } = useTranslation();
@@ -30,56 +45,77 @@ const ApiQA = ({ environment }) => {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">🔌 {t('redCrossWebQaModule.apiQa.header')}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t('redCrossWebQaModule.apiQa.subheader')}</p>
-      </div>
+    <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
+      <div style={{ display: 'grid', gap: 24 }}>
+        <PageHero
+          icon="🔌"
+          title={t('redCrossWebQaModule.apiQa.header')}
+          subtitle={t('redCrossWebQaModule.apiQa.subheader')}
+          environment={environment}
+          gradient="linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #312e81 100%)"
+        />
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('redCrossWebQaModule.apiQa.endpoint')}</label>
-            <input value={endpoint} onChange={e => setEndpoint(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('redCrossWebQaModule.apiQa.method')}</label>
-            <select value={method} onChange={e => setMethod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        <div style={panel}>
+          <h3 style={panelTitle}>🎯 Endpoint</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 12, marginBottom: 14 }}>
+            <input value={endpoint} onChange={e => setEndpoint(e.target.value)} style={input} />
+            <select value={method} onChange={e => setMethod(e.target.value)} style={input}>
               {['GET','POST','PUT','PATCH','DELETE'].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
+          <button onClick={handleAnalyze} disabled={analyzing} style={primaryBtn(analyzing)}>
+            {analyzing ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.apiQa.btnAnalyze')}
+          </button>
         </div>
-        <button onClick={handleAnalyze} disabled={analyzing}
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50">
-          {analyzing ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.apiQa.btnAnalyze')}
-        </button>
-      </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="font-semibold text-gray-800 mb-3">{t('redCrossWebQaModule.apiQa.checks')}</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {CHECKS.map(c => {
-            const status = report?.checks?.[c] || 'pending';
-            const cls = status === 'pass' ? 'border-green-200 bg-green-50 text-green-700'
-                     : status === 'fail' ? 'border-red-200 bg-red-50 text-red-700'
-                     : status === 'warn' ? 'border-amber-200 bg-amber-50 text-amber-700'
-                     : 'border-gray-200 bg-gray-50 text-gray-500';
-            return (
-              <div key={c} className={`px-3 py-2 rounded-md border text-sm ${cls}`}>
-                {t(`redCrossWebQaModule.apiQa.${c}`)}
-              </div>
-            );
-          })}
+        <div style={panel}>
+          <h3 style={panelTitle}>🩺 {t('redCrossWebQaModule.apiQa.checks')}</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+            {CHECKS.map(c => {
+              const status = report?.checks?.[c.key] || 'pending';
+              const s = STATUS_STYLES[status];
+              return (
+                <div key={c.key} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: 10, padding: '12px 14px', borderRadius: 10,
+                  backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.fg,
+                }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+                    <span style={{ fontSize: 18 }}>{c.icon}</span>
+                    {t(`redCrossWebQaModule.apiQa.${c.key}`)}
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{status}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {report && report.status === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">{report.message}</div>
-      )}
+        {report?.status === 'error' && (
+          <div style={errorBox}>{report.message}</div>
+        )}
+      </div>
     </div>
   );
+};
+
+const panel = {
+  backgroundColor: 'white', borderRadius: 12, padding: 24,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
+};
+const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#1e293b' };
+const input = {
+  padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1',
+  fontSize: 14, fontFamily: 'inherit', color: '#1e293b',
+};
+const primaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#93c5fd' : '#2563eb', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const errorBox = {
+  backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c',
+  borderRadius: 8, padding: 14, fontSize: 13,
 };
 
 export default ApiQA;
