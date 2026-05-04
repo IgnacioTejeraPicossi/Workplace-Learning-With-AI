@@ -47,7 +47,8 @@ const Icon = ({ name, size = 20 }) => {
     "brain": "🧠",
     "broadcast": "📡",
     "cloud": "☁️",
-    "doc": "📄"
+    "doc": "📄",
+    "redcross": "❤️‍🩹"
   };
 
   return (
@@ -132,7 +133,8 @@ const getNavItems = (t) => [
     { key: "grc-agent", label: t('sidebar.grcAgent'), icon: "shield" },
     { key: "council-agent", label: t('sidebar.councilAgent'), icon: "users" },
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" },
-    { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" }
+    { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
+    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" }
   ]},
   
   // Robomind Clinic (moved out of Item Agents, placed above Cybersecurity)

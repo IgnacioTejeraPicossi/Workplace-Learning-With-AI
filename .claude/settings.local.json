@@ -79,7 +79,10 @@
       "Bash(node -e \"const r = require\\('C:/Test/AI/AI Learning with AI/playwright-regression/runner.js'\\); console.log\\('runner.js syntax OK'\\)\")",
       "Bash(python -c \"from backend.routers.regression import router; print\\('regression router import OK'\\)\")",
       "Bash(python -m playwright install chromium)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python -c \"from backend.services.red_cross_qa import generate_test_plan, run_lighthouse, get_settings, VALID_ENVIRONMENTS; print\\('service OK'\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import generate_test_plan, run_lighthouse, get_settings, VALID_ENVIRONMENTS; print\\('service OK'\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.routers.red_cross_qa import router; print\\('router OK, routes:', len\\(router.routes\\)\\)\")"
     ]
   }
 }

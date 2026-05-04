@@ -58,6 +58,7 @@ import GRCAgent from "./GRCAgent";
 import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import AtmVvTestCopilot from "./AtmVvTestCopilot";
+import RedCrossWebQAAgent from "./RedCrossWebQAAgent";
 import Cybersecurity from "./cyber/Cybersecurity";
 import InstallingAppInCloud from "./cloud-install/InstallingAppInCloud";
 import ReadmeViewer from "./ReadmeViewer";
@@ -531,6 +532,7 @@ function AppContent() {
             {!activeModule && section === "council-agent" && <CouncilAgent />}
             {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
             {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
+            {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}
