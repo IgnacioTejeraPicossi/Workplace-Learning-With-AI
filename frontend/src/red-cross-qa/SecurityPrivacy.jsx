@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
 const CHECKS = [
-  'checkPersonalData','checkDataSeparation','checkAuth','checkHeaders','checkOwasp',
-  'checkFormAbuse','checkApiAbuse','checkRateLimit','checkSecrets','checkDeps',
-  'checkLogging','checkConsent','checkGdpr',
+  { key: 'checkPersonalData',   icon: '👤' }, { key: 'checkDataSeparation', icon: '🔀' },
+  { key: 'checkAuth',           icon: '🔐' }, { key: 'checkHeaders',        icon: '📋' },
+  { key: 'checkOwasp',          icon: '🛡️' }, { key: 'checkFormAbuse',      icon: '📝' },
+  { key: 'checkApiAbuse',       icon: '🔌' }, { key: 'checkRateLimit',      icon: '🚦' },
+  { key: 'checkSecrets',        icon: '🔑' }, { key: 'checkDeps',           icon: '📦' },
+  { key: 'checkLogging',        icon: '📜' }, { key: 'checkConsent',        icon: '🍪' },
+  { key: 'checkGdpr',           icon: '⚖️' },
 ];
 
-const SecurityPrivacy = ({ environment, executionMode }) => {
+const STATUS_STYLES = {
+  pass:    { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7' },
+  warn:    { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d' },
+  fail:    { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' },
+  pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
+};
+const SEV_COLOR = { critical: '#b91c1c', high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
+
+const SecurityPrivacy = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
@@ -27,55 +40,87 @@ const SecurityPrivacy = ({ environment, executionMode }) => {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">🛡️ {t('redCrossWebQaModule.securityPrivacy.header')}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t('redCrossWebQaModule.securityPrivacy.subheader')}</p>
-      </div>
+    <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
+      <div style={{ display: 'grid', gap: 24 }}>
+        <PageHero
+          icon="🛡️"
+          title={t('redCrossWebQaModule.securityPrivacy.header')}
+          subtitle={t('redCrossWebQaModule.securityPrivacy.subheader')}
+          environment={environment}
+          gradient="linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)"
+        />
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <button onClick={handleRun} disabled={running}
-          className="px-4 py-2 bg-slate-800 text-white font-semibold rounded-md hover:bg-slate-900 disabled:opacity-50 mb-5">
-          {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.securityPrivacy.btnRun')}
-        </button>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {CHECKS.map(c => {
-            const item = report?.checks?.[c];
-            const status = item?.status || 'pending';
-            const cls = status === 'pass' ? 'border-green-200 bg-green-50 text-green-700'
-                     : status === 'fail' ? 'border-red-200 bg-red-50 text-red-700'
-                     : status === 'warn' ? 'border-amber-200 bg-amber-50 text-amber-700'
-                     : 'border-gray-200 bg-gray-50 text-gray-500';
-            return (
-              <div key={c} className={`px-3 py-2 rounded-md border text-sm ${cls}`}>
-                <div className="font-medium">{t(`redCrossWebQaModule.securityPrivacy.${c}`)}</div>
-                {item?.note && <div className="text-xs mt-0.5 opacity-80">{item.note}</div>}
-              </div>
-            );
-          })}
+        <div style={panel}>
+          <h3 style={panelTitle}>🔒 OWASP + Privacy checks</h3>
+          <button onClick={handleRun} disabled={running} style={{ ...primaryBtn(running), marginBottom: 18 }}>
+            {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.securityPrivacy.btnRun')}
+          </button>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+            {CHECKS.map(c => {
+              const item = report?.checks?.[c.key];
+              const status = item?.status || 'pending';
+              const s = STATUS_STYLES[status];
+              return (
+                <div key={c.key} style={{
+                  padding: '12px 14px', borderRadius: 10,
+                  backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.fg,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+                      <span style={{ fontSize: 18 }}>{c.icon}</span>
+                      {t(`redCrossWebQaModule.securityPrivacy.${c.key}`)}
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{status}</span>
+                  </div>
+                  {item?.note && <div style={{ marginTop: 4, fontSize: 11, opacity: 0.8 }}>{item.note}</div>}
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {Array.isArray(report?.findings) && report.findings.length > 0 && (
+          <div style={panel}>
+            <h3 style={panelTitle}>🔎 Findings <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>({report.findings.length})</span></h3>
+            <div style={{ display: 'grid', gap: 6 }}>
+              {report.findings.map((f, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  padding: '10px 12px', borderRadius: 10,
+                  backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+                  fontSize: 13, color: '#334155',
+                }}>
+                  <span style={{
+                    padding: '2px 8px', borderRadius: 999, color: 'white',
+                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                    backgroundColor: SEV_COLOR[f.severity] || '#64748b',
+                  }}>{f.severity}</span>
+                  <span><strong>{f.title}</strong>{f.message ? ` — ${f.message}` : ''}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {report?.status === 'error' && <div style={errorBox}>{report.message}</div>}
       </div>
-
-      {report && Array.isArray(report.findings) && report.findings.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">Findings ({report.findings.length})</h3>
-          <ul className="text-sm text-gray-700 space-y-2">
-            {report.findings.map((f, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${f.severity === 'critical' ? 'bg-red-100 text-red-700' : f.severity === 'high' ? 'bg-orange-100 text-orange-700' : f.severity === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'}`}>{f.severity}</span>
-                <span>{f.message || f.title || JSON.stringify(f)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {report && report.status === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">{report.message}</div>
-      )}
     </div>
   );
+};
+
+const panel = {
+  backgroundColor: 'white', borderRadius: 12, padding: 24,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
+};
+const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#1e293b' };
+const primaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#94a3b8' : '#334155', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const errorBox = {
+  backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c',
+  borderRadius: 8, padding: 14, fontSize: 13,
 };
 
 export default SecurityPrivacy;

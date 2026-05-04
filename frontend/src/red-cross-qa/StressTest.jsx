@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
-const PROFILES = ['profileSmoke','profileNormal','profileCampaign','profileCrisis','profileSoak'];
+const PROFILES = [
+  { key: 'profileSmoke',    icon: '💨', color: '#10b981' },
+  { key: 'profileNormal',   icon: '🚶', color: '#3b82f6' },
+  { key: 'profileCampaign', icon: '📣', color: '#f59e0b' },
+  { key: 'profileCrisis',   icon: '🚨', color: '#dc2626' },
+  { key: 'profileSoak',     icon: '⏳', color: '#8b5cf6' },
+];
+
 const SCENARIOS = [
-  'scenarioPublic','scenarioDonation','scenarioVolunteer','scenarioSearch',
-  'scenarioLocalPages','scenarioForms','scenarioRateLimit','scenarioCmsPublish','scenarioCachePurge',
+  { key: 'scenarioPublic',     icon: '🌐' }, { key: 'scenarioDonation',  icon: '💝' },
+  { key: 'scenarioVolunteer',  icon: '🙋' }, { key: 'scenarioSearch',    icon: '🔎' },
+  { key: 'scenarioLocalPages', icon: '📍' }, { key: 'scenarioForms',     icon: '📝' },
+  { key: 'scenarioRateLimit',  icon: '🚦' }, { key: 'scenarioCmsPublish',icon: '🚀' },
+  { key: 'scenarioCachePurge', icon: '🧹' },
 ];
 
 const StressTest = ({ environment, executionMode }) => {
@@ -19,99 +30,139 @@ const StressTest = ({ environment, executionMode }) => {
 
   const toggleScenario = (s) => setScenarios(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
-  const handleGenerate = async () => {
-    setGenerating(true); setResult(null);
+  const call = async (path, setter) => {
+    setter(true); setResult(null);
     try {
-      const res = await fetch(`${API}/generate-k6-script`, {
+      const res = await fetch(`${API}/${path}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, scenarios, environment, lang: i18n.language }),
       });
       setResult(await res.json());
     } catch { setResult({ status: 'error', message: 'Network error' }); }
-    finally { setGenerating(false); }
-  };
-
-  const handleRun = async () => {
-    setRunning(true);
-    try {
-      const res = await fetch(`${API}/run-k6`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile, scenarios, environment }),
-      });
-      setResult(await res.json());
-    } catch { setResult({ status: 'error', message: 'Network error' }); }
-    finally { setRunning(false); }
+    finally { setter(false); }
   };
 
   return (
-    <div className="p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">🔥 {t('redCrossWebQaModule.stressTest.header')}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t('redCrossWebQaModule.stressTest.subheader')}</p>
-      </div>
+    <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
+      <div style={{ display: 'grid', gap: 24 }}>
+        <PageHero
+          icon="🔥"
+          title={t('redCrossWebQaModule.stressTest.header')}
+          subtitle={t('redCrossWebQaModule.stressTest.subheader')}
+          environment={environment}
+          mode={executionMode}
+          gradient="linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #b45309 100%)"
+        />
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-5">
-          {PROFILES.map(p => (
-            <button key={p} onClick={() => setProfile(p)}
-              className={`px-3 py-2 rounded-md border text-sm text-left ${profile === p ? 'bg-orange-50 border-orange-400 text-orange-800' : 'border-gray-200 hover:bg-gray-50'}`}>
-              {t(`redCrossWebQaModule.stressTest.${p}`)}
-            </button>
-          ))}
-        </div>
-
-        <h3 className="font-semibold text-gray-800 mb-2 text-sm">Scenarios</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-5">
-          {SCENARIOS.map(s => (
-            <label key={s} className={`flex items-center gap-2 px-3 py-2 rounded-md border cursor-pointer text-sm ${scenarios.includes(s) ? 'bg-orange-50 border-orange-300 text-orange-700' : 'border-gray-200 hover:bg-gray-50'}`}>
-              <input type="checkbox" checked={scenarios.includes(s)} onChange={() => toggleScenario(s)} className="accent-orange-600" />
-              {t(`redCrossWebQaModule.stressTest.${s}`)}
-            </label>
-          ))}
-        </div>
-
-        <div className="flex gap-3">
-          <button onClick={handleGenerate} disabled={generating}
-            className="px-4 py-2 bg-orange-600 text-white font-semibold rounded-md hover:bg-orange-700 disabled:opacity-50">
-            {generating ? t('redCrossWebQaModule.common.generating') : t('redCrossWebQaModule.stressTest.btnGenerate')}
-          </button>
-          {executionMode === 'execute' && (
-            <button onClick={handleRun} disabled={running}
-              className="px-4 py-2 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-900 disabled:opacity-50">
-              {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.stressTest.btnRun')}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {result && result.status === 'ok' && result.script && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">{result.filename || 'k6-script.js'}</h3>
-          <div className="bg-gray-900 text-orange-200 rounded-md p-4 font-mono text-xs overflow-x-auto">
-            <pre>{result.script}</pre>
+        <div style={panel}>
+          <h3 style={panelTitle}>🎯 Profile</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+            {PROFILES.map(p => {
+              const active = profile === p.key;
+              return (
+                <button key={p.key} onClick={() => setProfile(p.key)} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '14px 16px', borderRadius: 10, cursor: 'pointer',
+                  backgroundColor: active ? `${p.color}20` : '#f8fafc',
+                  border: `1px solid ${active ? `${p.color}80` : '#e2e8f0'}`,
+                  fontSize: 13, color: active ? p.color : '#475569',
+                  fontWeight: active ? 600 : 500, textAlign: 'left', transition: 'all 0.2s',
+                }}>
+                  <span style={{ fontSize: 18 }}>{p.icon}</span>
+                  <span>{t(`redCrossWebQaModule.stressTest.${p.key}`)}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
-      )}
 
-      {result && result.status === 'ok' && result.results && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">k6 Results</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            {Object.entries(result.results).map(([k, v]) => (
-              <div key={k} className="px-3 py-2 rounded-md border border-gray-200">
-                <div className="text-xs text-gray-500">{k}</div>
-                <div className="font-semibold text-gray-800">{String(v)}</div>
-              </div>
-            ))}
+        <div style={panel}>
+          <h3 style={panelTitle}>🌪️ Scenarios</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, marginBottom: 18 }}>
+            {SCENARIOS.map(s => {
+              const active = scenarios.includes(s.key);
+              return (
+                <label key={s.key} onClick={() => toggleScenario(s.key)} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '10px 14px', borderRadius: 10, cursor: 'pointer',
+                  backgroundColor: active ? '#fff7ed' : '#f8fafc',
+                  border: `1px solid ${active ? '#fdba74' : '#e2e8f0'}`,
+                  fontSize: 13, color: active ? '#c2410c' : '#475569',
+                  fontWeight: active ? 600 : 500, transition: 'all 0.2s',
+                }}>
+                  <span style={{ fontSize: 18 }}>{s.icon}</span>
+                  <span>{t(`redCrossWebQaModule.stressTest.${s.key}`)}</span>
+                </label>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => call('generate-k6-script', setGenerating)} disabled={generating} style={primaryBtn(generating)}>
+              {generating ? t('redCrossWebQaModule.common.generating') : t('redCrossWebQaModule.stressTest.btnGenerate')}
+            </button>
+            {executionMode === 'execute' && (
+              <button onClick={() => call('run-k6', setRunning)} disabled={running} style={secondaryBtn(running)}>
+                {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.stressTest.btnRun')}
+              </button>
+            )}
           </div>
         </div>
-      )}
 
-      {result && result.status === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">{result.message}</div>
-      )}
+        {result?.status === 'ok' && result.script && (
+          <div style={panel}>
+            <h3 style={panelTitle}>📄 {result.filename || 'k6-script.js'}</h3>
+            <div style={codeBlock}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{result.script}</pre>
+            </div>
+          </div>
+        )}
+
+        {result?.status === 'ok' && result.results && (
+          <div style={panel}>
+            <h3 style={panelTitle}>📈 k6 Results</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+              {Object.entries(result.results).map(([k, v]) => (
+                <div key={k} style={{
+                  padding: 14, borderRadius: 10,
+                  backgroundColor: '#fff7ed', border: '1px solid #fed7aa',
+                }}>
+                  <div style={{ fontSize: 11, color: '#c2410c', textTransform: 'uppercase', fontWeight: 600 }}>{k}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', marginTop: 4 }}>{String(v)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {result?.status === 'error' && <div style={errorBox}>{result.message}</div>}
+      </div>
     </div>
   );
+};
+
+const panel = {
+  backgroundColor: 'white', borderRadius: 12, padding: 24,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
+};
+const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#1e293b' };
+const codeBlock = {
+  backgroundColor: '#0f172a', color: '#fdba74', borderRadius: 8,
+  padding: 14, fontFamily: 'ui-monospace, monospace', fontSize: 12,
+  overflowX: 'auto',
+};
+const primaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#fdba74' : '#ea580c', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const secondaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#94a3b8' : '#1e293b', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const errorBox = {
+  backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c',
+  borderRadius: 8, padding: 14, fontSize: 13,
 };
 
 export default StressTest;

@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
+
+const PAYMENT_OPTIONS = [
+  { val: 'handoff',  key: 'paymentHandoff',  icon: '🤝', color: '#2563eb' },
+  { val: 'sandbox',  key: 'paymentSandbox',  icon: '🧪', color: '#f59e0b' },
+  { val: 'disabled', key: 'paymentDisabled', icon: '🚫', color: '#64748b' },
+];
 
 const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode }) => {
   const { t } = useTranslation();
@@ -67,111 +74,174 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
     finally { setSaving(false); }
   };
 
-  const Field = ({ label, children }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      {children}
-    </div>
-  );
-
   return (
-    <div className="p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">⚙️ {t('redCrossWebQaModule.settings.header')}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t('redCrossWebQaModule.settings.subheader')}</p>
-      </div>
+    <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
+      <div style={{ display: 'grid', gap: 24 }}>
+        <PageHero
+          icon="⚙️"
+          title={t('redCrossWebQaModule.settings.header')}
+          subtitle={t('redCrossWebQaModule.settings.subheader')}
+          environment={environment}
+          mode={executionMode}
+          gradient="linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #9d174d 100%)"
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Environments */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-800">{t('redCrossWebQaModule.common.environment')}</h3>
-          <Field label={t('redCrossWebQaModule.settings.envLocalUrl')}>
-            <input value={envLocalUrl} onChange={e => setEnvLocalUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.envTestUrl')}>
-            <input value={envTestUrl} onChange={e => setEnvTestUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.envDefault')}>
-            <select value={environment} onChange={e => setEnvironment && setEnvironment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-              <option value="local">{t('redCrossWebQaModule.common.envLocal')}</option>
-              <option value="test">{t('redCrossWebQaModule.common.envTest')}</option>
-            </select>
-          </Field>
-          <Field label={t('redCrossWebQaModule.modes.title')}>
-            <select value={executionMode} onChange={e => setExecutionMode && setExecutionMode(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-              <option value="generate">{t('redCrossWebQaModule.modes.generateOnly')}</option>
-              <option value="execute">{t('redCrossWebQaModule.modes.executeDirectly')}</option>
-            </select>
-          </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+          {/* Environments */}
+          <div style={{ ...panel, borderTop: '4px solid #dc2626' }}>
+            <h3 style={panelTitle}>🌍 {t('redCrossWebQaModule.common.environment')}</h3>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <Field label={t('redCrossWebQaModule.settings.envLocalUrl')}>
+                <input value={envLocalUrl} onChange={e => setEnvLocalUrl(e.target.value)} style={input} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.envTestUrl')}>
+                <input value={envTestUrl} onChange={e => setEnvTestUrl(e.target.value)} style={input} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.envDefault')}>
+                <select value={environment} onChange={e => setEnvironment && setEnvironment(e.target.value)} style={input}>
+                  <option value="local">{t('redCrossWebQaModule.common.envLocal')}</option>
+                  <option value="test">{t('redCrossWebQaModule.common.envTest')}</option>
+                </select>
+              </Field>
+              <Field label={t('redCrossWebQaModule.modes.title')}>
+                <select value={executionMode} onChange={e => setExecutionMode && setExecutionMode(e.target.value)} style={input}>
+                  <option value="generate">{t('redCrossWebQaModule.modes.generateOnly')}</option>
+                  <option value="execute">{t('redCrossWebQaModule.modes.executeDirectly')}</option>
+                </select>
+              </Field>
+            </div>
+          </div>
+
+          {/* Jira */}
+          <div style={{ ...panel, borderTop: '4px solid #2563eb' }}>
+            <h3 style={panelTitle}>🎯 {t('redCrossWebQaModule.settings.jiraSection')}</h3>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <Field label={t('redCrossWebQaModule.settings.jiraProject')}>
+                <input value={jiraProject} onChange={e => setJiraProject(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.jiraComponent')}>
+                <input value={jiraComponent} onChange={e => setJiraComponent(e.target.value)} style={input} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.jiraLabels')}>
+                <input value={jiraLabels} onChange={e => setJiraLabels(e.target.value)} style={input} placeholder="comma, separated" />
+              </Field>
+              <Field label="OutSystems URL">
+                <input value={outsystemsUrl} onChange={e => setOutsystemsUrl(e.target.value)} style={input} placeholder="https://..." />
+              </Field>
+            </div>
+          </div>
+
+          {/* Payment flow */}
+          <div style={{ ...panel, borderTop: '4px solid #f59e0b' }}>
+            <h3 style={panelTitle}>💳 {t('redCrossWebQaModule.settings.paymentFlow')}</h3>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {PAYMENT_OPTIONS.map(opt => {
+                const active = paymentFlow === opt.val;
+                return (
+                  <label key={opt.val} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
+                    backgroundColor: active ? `${opt.color}15` : '#f8fafc',
+                    border: `1px solid ${active ? `${opt.color}80` : '#e2e8f0'}`,
+                    transition: 'all 0.2s',
+                  }}>
+                    <input type="radio" name="paymentFlow" value={opt.val}
+                      checked={active} onChange={() => setPaymentFlow(opt.val)}
+                      style={{ accentColor: opt.color }} />
+                    <span style={{ fontSize: 20 }}>{opt.icon}</span>
+                    <span style={{
+                      fontSize: 13, fontWeight: active ? 600 : 500,
+                      color: active ? opt.color : '#475569',
+                    }}>
+                      {t(`redCrossWebQaModule.settings.${opt.key}`)}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Thresholds */}
+          <div style={{ ...panel, borderTop: '4px solid #10b981' }}>
+            <h3 style={panelTitle}>📊 {t('redCrossWebQaModule.settings.thresholds')}</h3>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <Field label={t('redCrossWebQaModule.settings.thresholdLighthousePerf')}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input type="number" min="0" max="100" value={thresholdPerf}
+                    onChange={e => setThresholdPerf(e.target.value)} style={{ ...input, flex: 1 }} />
+                  <span style={thresholdBadge('#10b981')}>≥ {thresholdPerf}</span>
+                </div>
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.thresholdLighthouseSeo')}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input type="number" min="0" max="100" value={thresholdSeo}
+                    onChange={e => setThresholdSeo(e.target.value)} style={{ ...input, flex: 1 }} />
+                  <span style={thresholdBadge('#06b6d4')}>≥ {thresholdSeo}</span>
+                </div>
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.thresholdAxeCritical')}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input type="number" min="0" value={thresholdAxeCritical}
+                    onChange={e => setThresholdAxeCritical(e.target.value)} style={{ ...input, flex: 1 }} />
+                  <span style={thresholdBadge('#dc2626')}>≤ {thresholdAxeCritical}</span>
+                </div>
+              </Field>
+            </div>
+          </div>
         </div>
 
-        {/* Jira */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-800">{t('redCrossWebQaModule.settings.jiraSection')}</h3>
-          <Field label={t('redCrossWebQaModule.settings.jiraProject')}>
-            <input value={jiraProject} onChange={e => setJiraProject(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.jiraComponent')}>
-            <input value={jiraComponent} onChange={e => setJiraComponent(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.jiraLabels')}>
-            <input value={jiraLabels} onChange={e => setJiraLabels(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="comma, separated" />
-          </Field>
-          <Field label="OutSystems URL">
-            <input value={outsystemsUrl} onChange={e => setOutsystemsUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="https://..." />
-          </Field>
+        {/* Save bar */}
+        <div style={{
+          ...panel, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+        }}>
+          <button onClick={handleSave} disabled={saving} style={primaryBtn(saving)}>
+            {saving ? t('redCrossWebQaModule.common.loading') : `💾 ${t('redCrossWebQaModule.settings.btnSave')}`}
+          </button>
+          {savedAt && (
+            <span style={{
+              padding: '6px 12px', borderRadius: 999,
+              backgroundColor: '#d1fae5', color: '#047857', border: '1px solid #6ee7b7',
+              fontSize: 12, fontWeight: 600,
+            }}>
+              ✓ Saved at {savedAt}
+            </span>
+          )}
         </div>
-
-        {/* Payment flow */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-3">
-          <h3 className="font-semibold text-gray-800">{t('redCrossWebQaModule.settings.paymentFlow')}</h3>
-          {[
-            ['handoff', 'paymentHandoff'],
-            ['sandbox', 'paymentSandbox'],
-            ['disabled', 'paymentDisabled'],
-          ].map(([val, key]) => (
-            <label key={val} className={`flex items-center gap-2 px-3 py-2 rounded-md border cursor-pointer text-sm ${paymentFlow === val ? 'bg-red-50 border-red-300 text-red-800' : 'border-gray-200 hover:bg-gray-50'}`}>
-              <input type="radio" name="paymentFlow" value={val} checked={paymentFlow === val} onChange={() => setPaymentFlow(val)} className="accent-red-600" />
-              {t(`redCrossWebQaModule.settings.${key}`)}
-            </label>
-          ))}
-        </div>
-
-        {/* Thresholds */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-800">{t('redCrossWebQaModule.settings.thresholds')}</h3>
-          <Field label={t('redCrossWebQaModule.settings.thresholdLighthousePerf')}>
-            <input type="number" min="0" max="100" value={thresholdPerf} onChange={e => setThresholdPerf(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.thresholdLighthouseSeo')}>
-            <input type="number" min="0" max="100" value={thresholdSeo} onChange={e => setThresholdSeo(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-          </Field>
-          <Field label={t('redCrossWebQaModule.settings.thresholdAxeCritical')}>
-            <input type="number" min="0" value={thresholdAxeCritical} onChange={e => setThresholdAxeCritical(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-          </Field>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <button onClick={handleSave} disabled={saving}
-          className="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 disabled:opacity-50">
-          {saving ? t('redCrossWebQaModule.common.loading') : t('redCrossWebQaModule.settings.btnSave')}
-        </button>
-        {savedAt && <span className="text-xs text-green-700">✓ Saved at {savedAt}</span>}
       </div>
     </div>
   );
 };
+
+const Field = ({ label, children }) => (
+  <div>
+    <label style={{
+      display: 'block', fontSize: 11, color: '#64748b',
+      textTransform: 'uppercase', fontWeight: 600, letterSpacing: 0.4, marginBottom: 6,
+    }}>{label}</label>
+    {children}
+  </div>
+);
+
+const panel = {
+  backgroundColor: 'white', borderRadius: 12, padding: 24,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
+};
+const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#1e293b' };
+const input = {
+  width: '100%', padding: '10px 12px', borderRadius: 8,
+  border: '1px solid #cbd5e1', fontSize: 13, color: '#1e293b',
+  fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+};
+const primaryBtn = (disabled) => ({
+  padding: '10px 22px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#fca5a5' : '#dc2626', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const thresholdBadge = (color) => ({
+  padding: '6px 10px', borderRadius: 8,
+  backgroundColor: `${color}15`, color, border: `1px solid ${color}40`,
+  fontSize: 12, fontWeight: 700, fontFamily: 'ui-monospace, monospace',
+  whiteSpace: 'nowrap', minWidth: 60, textAlign: 'center',
+});
 
 export default Settings;

@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
 const CHECKS = [
-  'checkKeyboard','checkFocusOrder','checkSkipLinks','checkAriaMisuse',
-  'checkHeadings','checkColorContrast','checkFormLabels','checkErrorMessages',
-  'checkScreenReader','checkDialogs','checkAltText','checkContentClarity',
+  { key: 'checkKeyboard',       icon: '⌨️' }, { key: 'checkFocusOrder',     icon: '🎯' },
+  { key: 'checkSkipLinks',      icon: '⏭️' }, { key: 'checkAriaMisuse',     icon: '🏷️' },
+  { key: 'checkHeadings',       icon: '📑' }, { key: 'checkColorContrast',  icon: '🎨' },
+  { key: 'checkFormLabels',     icon: '🏷️' }, { key: 'checkErrorMessages',  icon: '⚠️' },
+  { key: 'checkScreenReader',   icon: '🔊' }, { key: 'checkDialogs',        icon: '💬' },
+  { key: 'checkAltText',        icon: '🖼️' }, { key: 'checkContentClarity', icon: '📖' },
 ];
 
-const Accessibility = ({ environment, executionMode }) => {
+const STATUS_STYLES = {
+  pass:    { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7' },
+  warn:    { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d' },
+  fail:    { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' },
+  pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
+};
+
+const SEV_COLOR = { critical: '#b91c1c', high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
+
+const Accessibility = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [url, setUrl] = useState('https://www.rodekors.no/');
   const [running, setRunning] = useState(false);
@@ -28,70 +41,109 @@ const Accessibility = ({ environment, executionMode }) => {
   };
 
   const score = report?.wcag_score ?? null;
-  const scoreCls = score === null ? 'text-gray-400'
-                 : score >= 95 ? 'text-green-600'
-                 : score >= 80 ? 'text-amber-600' : 'text-red-600';
+  const scoreColor = score === null ? '#94a3b8' : score >= 95 ? '#10b981' : score >= 80 ? '#f59e0b' : '#dc2626';
 
   return (
-    <div className="p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">♿ {t('redCrossWebQaModule.accessibility.header')}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t('redCrossWebQaModule.accessibility.subheader')}</p>
+    <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
+      <div style={{ display: 'grid', gap: 24 }}>
+        <PageHero
+          icon="♿"
+          title={t('redCrossWebQaModule.accessibility.header')}
+          subtitle={t('redCrossWebQaModule.accessibility.subheader')}
+          environment={environment}
+          gradient="linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #0369a1 100%)"
+        />
+
+        <div style={panel}>
+          <h3 style={panelTitle}>🌐 Target URL</h3>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+            <input value={url} onChange={e => setUrl(e.target.value)} style={{ ...input, flex: 1, minWidth: 240 }} />
+            <button onClick={handleRun} disabled={running} style={primaryBtn(running)}>
+              {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.accessibility.btnRun')}
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+            {CHECKS.map(c => {
+              const status = report?.checks?.[c.key] || 'pending';
+              const s = STATUS_STYLES[status];
+              return (
+                <div key={c.key} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: 10, padding: '12px 14px', borderRadius: 10,
+                  backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.fg,
+                }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+                    <span style={{ fontSize: 18 }}>{c.icon}</span>
+                    {t(`redCrossWebQaModule.accessibility.${c.key}`)}
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{status}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{ ...panel, textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 12, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              {t('redCrossWebQaModule.accessibility.wcagScore')}
+            </p>
+            <p style={{ margin: '12px 0 0', fontSize: 48, fontWeight: 700, color: scoreColor, lineHeight: 1 }}>
+              {score === null ? '—' : score}
+            </p>
+            <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>WCAG 2.2 AA</p>
+          </div>
+
+          <div style={{ ...panel, gridColumn: 'span 2' }}>
+            <h3 style={panelTitle}>🐞 {t('redCrossWebQaModule.accessibility.violations')} <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>({(report?.violations || []).length})</span></h3>
+            {(!report?.violations || report.violations.length === 0) && (
+              <p style={empty}>{t('redCrossWebQaModule.common.noData')}</p>
+            )}
+            <div style={{ display: 'grid', gap: 6 }}>
+              {(report?.violations || []).map((v, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  padding: '10px 12px', borderRadius: 10,
+                  backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+                  fontSize: 13, color: '#334155',
+                }}>
+                  <span style={{
+                    padding: '2px 8px', borderRadius: 999, color: 'white',
+                    fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                    backgroundColor: SEV_COLOR[v.severity] || '#64748b',
+                  }}>{v.severity}</span>
+                  <span>{v.message || v.rule || JSON.stringify(v)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {report?.status === 'error' && <div style={errorBox}>{report.message}</div>}
       </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          <input value={url} onChange={e => setUrl(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            placeholder="https://www.rodekors.no/" />
-          <button onClick={handleRun} disabled={running}
-            className="px-4 py-2 bg-cyan-600 text-white font-semibold rounded-md hover:bg-cyan-700 disabled:opacity-50">
-            {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.accessibility.btnRun')}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {CHECKS.map(c => {
-            const status = report?.checks?.[c] || 'pending';
-            const cls = status === 'pass' ? 'border-green-200 bg-green-50 text-green-700'
-                     : status === 'fail' ? 'border-red-200 bg-red-50 text-red-700'
-                     : status === 'warn' ? 'border-amber-200 bg-amber-50 text-amber-700'
-                     : 'border-gray-200 bg-gray-50 text-gray-500';
-            return (
-              <div key={c} className={`px-3 py-2 rounded-md border text-sm ${cls}`}>
-                {t(`redCrossWebQaModule.accessibility.${c}`)}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-          <p className="text-xs text-gray-500 mb-2">{t('redCrossWebQaModule.accessibility.wcagScore')}</p>
-          <p className={`text-4xl font-bold ${scoreCls}`}>{score === null ? '—' : `${score}`}</p>
-        </div>
-        <div className="md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">{t('redCrossWebQaModule.accessibility.violations')} ({(report?.violations || []).length})</h3>
-          {(!report?.violations || report.violations.length === 0) && (
-            <p className="text-sm text-gray-400">{t('redCrossWebQaModule.common.noData')}</p>
-          )}
-          <ul className="text-sm text-gray-700 space-y-1">
-            {(report?.violations || []).map((v, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${v.severity === 'critical' ? 'bg-red-100 text-red-700' : v.severity === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-amber-100 text-amber-700'}`}>{v.severity}</span>
-                <span>{v.message || v.rule || JSON.stringify(v)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {report && report.status === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">{report.message}</div>
-      )}
     </div>
   );
+};
+
+const panel = {
+  backgroundColor: 'white', borderRadius: 12, padding: 24,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
+};
+const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#1e293b' };
+const input = {
+  padding: '10px 12px', borderRadius: 8, border: '1px solid #cbd5e1',
+  fontSize: 14, fontFamily: 'inherit', color: '#1e293b',
+};
+const primaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#67e8f9' : '#0891b2', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const empty = { fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0' };
+const errorBox = {
+  backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c',
+  borderRadius: 8, padding: 14, fontSize: 13,
 };
 
 export default Accessibility;
