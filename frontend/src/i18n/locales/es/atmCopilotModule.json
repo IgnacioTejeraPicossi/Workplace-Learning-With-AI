@@ -1,0 +1,133 @@
+{
+  "atmCopilotModule": {
+    "title": "Copiloto V&V de pruebas ATM",
+    "tagline": "Copiloto de pruebas impulsado por IA para la verificación y validación de sistemas ATM/ATC de seguridad crítica",
+    "tabOverview": "Visión general",
+    "tabRequirementLab": "Laboratorio de requisitos",
+    "tabScenarioBuilder": "Constructor de escenarios",
+    "tabRunAnalyzer": "Analizador de ejecuciones",
+
+    "overview": {
+      "description": "El Copiloto V&V de pruebas ATM ayuda a los ingenieros de pruebas a diseñar, construir y analizar flujos de trabajo de verificación y validación para sistemas de Gestión del Tráfico Aéreo. Utiliza IA para convertir requisitos en diseños de prueba, generar matrices de escenarios y analizar fallos en ejecuciones de prueba.",
+      "backendOnline": "Backend conectado",
+      "backendOffline": "Backend desconectado",
+      "requirements": "Requisitos",
+      "testDesigns": "Diseños de prueba",
+      "scenarioMatrices": "Matrices de escenarios",
+      "testRuns": "Ejecuciones de prueba",
+      "quickActionsTitle": "Acciones rápidas",
+      "quickIngest": "Importar requisito",
+      "quickDesign": "Generar diseño de prueba",
+      "quickScenario": "Construir matriz de escenarios",
+      "quickAnalyze": "Analizar ejecución de prueba",
+      "scenarioCategoriesTitle": "Categorías de escenarios ATM"
+    },
+
+    "scenarioTypes": {
+      "conflict_detection": "Detección de conflictos",
+      "sector_handover": "Transferencia de sector",
+      "trajectory_update": "Actualización de trayectoria",
+      "degraded_surveillance": "Vigilancia degradada",
+      "conformance_monitoring": "Monitorización de conformidad",
+      "alert_timing": "Temporización de alertas",
+      "contingency_fallback": "Contingencia y respaldo"
+    },
+
+    "sourceTypes": {
+      "requirement": "Requisito",
+      "user_story": "Historia de usuario",
+      "defect": "Defecto",
+      "change_request": "Solicitud de cambio",
+      "spec_excerpt": "Extracto de especificación",
+      "validation_note": "Nota de validación"
+    },
+
+    "riskLevels": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+
+    "reqLab": {
+      "ingestTitle": "Importar requisito",
+      "titleLabel": "Título del requisito",
+      "titlePlaceholder": "Ej.: La alerta STCA debe activarse en menos de 2 minutos",
+      "sourceTypeLabel": "Tipo de fuente",
+      "contentLabel": "Contenido del requisito",
+      "contentPlaceholder": "Pega aquí el texto completo del requisito, historia de usuario o extracto de especificación...",
+      "tagsLabel": "Etiquetas (separadas por comas)",
+      "tagsPlaceholder": "Ej.: STCA, conflicto, seguridad-crítica",
+      "ingestBtn": "Importar y normalizar",
+      "ingesting": "Importando...",
+      "intent": "Intención",
+      "conditions": "Condiciones",
+      "constraints": "Restricciones",
+      "storedBundles": "Requisitos almacenados",
+      "noBundles": "Aún no se han importado requisitos. Añade uno arriba.",
+      "generateDesign": "Generar diseño",
+      "generatingDesign": "Generando diseño de prueba con IA...",
+      "testDesignResult": "Resultado del diseño de prueba",
+      "assumptions": "Suposiciones",
+      "positiveTests": "Pruebas positivas",
+      "negativeTests": "Pruebas negativas",
+      "edgeCases": "Casos límite",
+      "expectedOutcome": "Resultado esperado",
+      "automationCandidates": "Candidatos a automatización",
+      "openQuestions": "Preguntas abiertas",
+      "recentDesigns": "Diseños de prueba recientes"
+    },
+
+    "scenario": {
+      "configTitle": "Configuración del escenario",
+      "typeLabel": "Tipo de escenario",
+      "riskLabel": "Nivel de riesgo",
+      "includeEdge": "Incluir casos límite",
+      "includeFallbacks": "Incluir contingencias",
+      "customParams": "Parámetros personalizados (JSON)",
+      "buildBtn": "Construir matriz de escenarios",
+      "building": "Construyendo matriz de escenarios...",
+      "matrixResult": "Matriz de escenarios",
+      "preconditions": "Precondiciones",
+      "nominal": "Escenarios nominales",
+      "degraded": "Escenarios degradados",
+      "edgeCases": "Casos límite",
+      "expectedOutcome": "Resultado esperado",
+      "riskNotes": "Notas de riesgo",
+      "automationNotes": "Notas de automatización",
+      "recentMatrices": "Matrices recientes"
+    },
+
+    "runAnalyzer": {
+      "uploadTitle": "Cargar artefactos de ejecución",
+      "runIdLabel": "ID de ejecución",
+      "runIdPlaceholder": "Ej.: EJEC-2026-0409-001",
+      "artifactsLabel": "Artefactos",
+      "addArtifact": "Añadir artefacto",
+      "artifactPlaceholder": "Pega aquí la salida del log, resultados JSON o salida de consola...",
+      "analyzeBtn": "Analizar ejecución de prueba",
+      "analyzing": "Analizando ejecución de prueba...",
+      "analysisResult": "Análisis de ejecución",
+      "failureSignals": "Señales de fallo principales",
+      "rootCauses": "Causas raíz probables",
+      "affectedTests": "Pruebas afectadas",
+      "repeatedPatterns": "Patrones repetidos",
+      "affectedAreas": "Áreas afectadas",
+      "nextSteps": "Próximos pasos sugeridos",
+      "regressionScope": "Alcance de regresión sugerido",
+      "recentAnalyses": "Análisis recientes"
+    },
+
+    "artifactTypes": {
+      "log": "Log",
+      "json": "JSON",
+      "xml": "XML",
+      "screenshot": "Captura de pantalla",
+      "console_output": "Salida de consola"
+    },
+
+    "export": {
+      "markdown": "Exportar Markdown",
+      "json": "Exportar JSON"
+    }
+  }
+}

@@ -98,6 +98,7 @@ import esFeatureRoadmapModule from './locales/es/featureRoadmapModule.json';
 import esApiConfigModule from './locales/es/apiConfigModule.json';
 import esRunTestModule from './locales/es/runTestModule.json';
 import esRobomindClinicModule from './locales/es/robomindClinicModule.json';
+import esAtmCopilotModule from './locales/es/atmCopilotModule.json';
 
 i18n
   .use(LanguageDetector)
@@ -122,7 +123,7 @@ i18n
         common: { ...noCommon, ...noRunTest, ...noAppChrome, ...noMicroLesson, ...noScenarioSimulator, ...noSimulationResults, ...noTeamDynamics, ...noCertificationsModule, ...noCareerCoachModule, ...noSkillsForecastModule, ...noBabelLibraryModule, ...noKnowledgeMapModule, ...noRepoAnalyzerModule, ...noAgentCursorModule, ...noAgenticRagModule, ...noLearningRepoModule, ...noDocumentAnalyzerModule, ...noLearningDocumentModule, ...noAgenticRagDocumentModule, ...noEaSecondBrainModule, ...noSalesAssistantModule, ...noPersonalAttentionAgentModule, ...noTelcoOpsAgentModule, ...noGrcAgentModule, ...noCouncilAgentModule, ...noOpsEfficiencyAgentModule, ...noAtmCopilotModule, ...noApiConfigModule, ...noFutureAppModule, ...noIdeaLogModule, ...noFeatureRoadmapModule, ...noCloudInstallModule, ...noAgiHubModule, ...noWebSearchModule }
       },
       es: {
-        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule, ...esDocumentAnalyzerModule, ...esLearningDocumentModule, ...esAgenticRagDocumentModule, ...esEaSecondBrainModule, ...esAgiHubModule, ...esCloudInstallModule, ...esFutureAppModule, ...esIdeaLogModule, ...esFeatureRoadmapModule, ...esApiConfigModule, ...esRunTestModule, ...esRobomindClinicModule }
+        common: { ...esCommon, ...esAppChrome, ...esMicroLesson, ...esScenarioSimulator, ...esSimulationResults, ...esTeamDynamics, ...esCertificationsModule, ...esCareerCoachModule, ...esSkillsForecastModule, ...esKnowledgeMapModule, ...esBabelLibraryModule, ...esWebSearchModule, ...esRepoAnalyzerModule, ...esAgentCursorModule, ...esLearningRepoModule, ...esDocumentAnalyzerModule, ...esLearningDocumentModule, ...esAgenticRagDocumentModule, ...esEaSecondBrainModule, ...esAgiHubModule, ...esCloudInstallModule, ...esFutureAppModule, ...esIdeaLogModule, ...esFeatureRoadmapModule, ...esApiConfigModule, ...esRunTestModule, ...esRobomindClinicModule, ...esAtmCopilotModule }
       }
     }
   });
