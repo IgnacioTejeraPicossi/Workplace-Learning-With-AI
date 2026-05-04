@@ -57,7 +57,7 @@ const RequirementLab = () => {
       setContent('');
       setTags('');
     } catch {
-      setIngestResult({ status: 'error', message: 'Network error' });
+      setIngestResult({ status: 'error', message: t('atmCopilotModule.reqLab.networkError') });
     } finally {
       setIngesting(false);
     }
@@ -76,7 +76,7 @@ const RequirementLab = () => {
       setTestDesign(data);
       loadDesigns();
     } catch {
-      setTestDesign({ status: 'error', message: 'Network error' });
+      setTestDesign({ status: 'error', message: t('atmCopilotModule.reqLab.networkError') });
     } finally {
       setGenerating(false);
     }
@@ -190,7 +190,7 @@ const RequirementLab = () => {
                 backgroundColor: ingestResult.status === 'stored' ? '#f0fdf4' : '#fef2f2',
                 border: `1px solid ${ingestResult.status === 'stored' ? '#bbf7d0' : '#fecaca'}`
               }}>
-                <strong>{ingestResult.status === 'stored' ? '✅' : '⚠️'} {ingestResult.status}</strong>
+                <strong>{ingestResult.status === 'stored' ? '✅' : '⚠️'} {ingestResult.status === 'stored' ? t('atmCopilotModule.reqLab.statusStored') : t('atmCopilotModule.reqLab.statusError')}</strong>
                 {ingestResult.normalizedSections && (
                   <div style={{ marginTop: '8px', fontSize: '13px' }}>
                     <p><strong>{t('atmCopilotModule.reqLab.intent')}:</strong> {ingestResult.normalizedSections.intent}</p>
@@ -224,7 +224,7 @@ const RequirementLab = () => {
                     <span style={{
                       marginLeft: '8px', fontSize: '11px', padding: '2px 8px',
                       borderRadius: '4px', backgroundColor: '#dbeafe', color: '#1e40af'
-                    }}>{b.sourceType}</span>
+                    }}>{t(`atmCopilotModule.sourceTypes.${b.sourceType}`, { defaultValue: b.sourceType })}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button onClick={e => { e.stopPropagation(); handleGenerate(b._id); }}
@@ -337,7 +337,7 @@ const RequirementLab = () => {
                   marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                   <div>
-                    <strong style={{ fontSize: '13px' }}>{d.intent || d.requirementTitle || 'Design'}</strong>
+                    <strong style={{ fontSize: '13px' }}>{d.intent || d.requirementTitle || t('atmCopilotModule.reqLab.designFallback')}</strong>
                     <span style={{ fontSize: '11px', color: '#94a3b8', marginLeft: '8px' }}>
                       {d.createdAt ? new Date(d.createdAt).toLocaleDateString() : ''}
                     </span>

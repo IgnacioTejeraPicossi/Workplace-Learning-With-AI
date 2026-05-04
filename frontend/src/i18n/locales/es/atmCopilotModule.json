@@ -74,7 +74,11 @@
       "expectedOutcome": "Resultado esperado",
       "automationCandidates": "Candidatos a automatización",
       "openQuestions": "Preguntas abiertas",
-      "recentDesigns": "Diseños de prueba recientes"
+      "recentDesigns": "Diseños de prueba recientes",
+      "statusStored": "almacenado",
+      "statusError": "error",
+      "networkError": "Error de red",
+      "designFallback": "Diseño"
     },
 
     "scenario": {
