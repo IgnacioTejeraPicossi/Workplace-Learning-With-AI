@@ -91,7 +91,8 @@
       "Bash(python -c \"import json; [print\\(loc, len\\(json.load\\(open\\(f'frontend/src/i18n/locales/{loc}/redCrossWebQaModule.json', encoding='utf-8'\\)\\)['redCrossWebQaModule']\\)\\) for loc in ['en','no','es']]\")",
       "Bash(set PYTHONUTF8=1)",
       "Bash(python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, run_enonic_performance, run_designsystemet_audit, run_role_matrix_audit, SUITE_NAMES; print\\('SUITES:', len\\(SUITE_NAMES\\)\\); from backend.routers.red_cross_qa import router; print\\('ROUTES:', len\\(router.routes\\)\\)\")",
-      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, run_enonic_performance, run_designsystemet_audit, run_role_matrix_audit, SUITE_NAMES; print\\('SUITES:', len\\(SUITE_NAMES\\)\\); from backend.routers.red_cross_qa import router; print\\('ROUTES:', len\\(router.routes\\)\\)\")"
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, run_enonic_performance, run_designsystemet_audit, run_role_matrix_audit, SUITE_NAMES; print\\('SUITES:', len\\(SUITE_NAMES\\)\\); from backend.routers.red_cross_qa import router; print\\('ROUTES:', len\\(router.routes\\)\\)\")",
+      "Bash(module\" 2>/dev/null; echo \"---\"; ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\\")"
     ]
   }
 }

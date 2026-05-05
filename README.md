@@ -33,6 +33,7 @@
 | **Cloud Deployment** | Cloud Install workbench, readiness score, deploy checklist, automated smoke tests, cost baseline, Dockerfile + Cloud Run config |
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
+| **QA & Test Automation** | Red Cross Web QA Agent (17 tabs / 25 endpoints): Playwright + Cypress generators, Skjemabygger forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
 ---
@@ -80,6 +81,53 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 ---
 
 ## 🔄 Recent Work (2024–2026)
+
+### Red Cross Web QA Agent (May 2026)
+
+A 24/7 QA copilot purpose-built for the **rodekors.no** website rebuild on **Enonic XP CMS + NextJS + Designsystemet (Digdir)**. Item Agent #9, accessible from the sidebar under **Future Item Agents**.
+
+The agent ships as a **17-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) with two execution modes — **Generate-only** (produces scripts/reports for Cursor / Claude Code / GitHub Actions) and **Execute-directly** (runs Playwright / Cypress / axe-core / Lighthouse / k6 in-app) — and two environments (local on `:3000`, test). Every run is fingerprinted with a SHA-256 attestation hash for traceability.
+
+**17 tabs** (`frontend/src/red-cross-qa/*.jsx`):
+
+| # | Tab | Purpose |
+|---|-----|---------|
+| 1 | 📊 Dashboard | Live quality status: total runs, pass rate, open findings, critical blockers, 8 quality gates |
+| 2 | 📋 Test Plan | LLM converts a Jira epic / user story into manual + automated + accessibility + API + regression test plan |
+| 3 | 🎭 Playwright | Cross-browser E2E generator (9 scopes: navigation, forms, search, donation, volunteer, CMS preview, a11y smoke, visual, API mock) |
+| 4 | 🌲 Cypress | Component + frontend regression generator |
+| 5 | 🔌 API QA | Enonic Guillotine GraphQL + NextJS API + external integrations — 10 checks |
+| 6 | 📝 CMS QA | Enonic Content Studio editor + visitor experience — 14 areas |
+| 7 | 📑 Forms QA | **Skjemabygger** audit (Item's gov.uk-pattern form builder) — 12 checks: JSON Schema, Adam Silver patterns, multi-step state, mobile keyboard, autocomplete, APIM/Dataverse prefill, ARIA live regions, error summary, **Vipps handoff**, PRG idempotency |
+| 8 | 📦 Content Migration | Legacy CMS → Enonic XP gradual migration audit — 8 content types (Forening / Distrikt / Aktivitet / Kontaktperson / Tjeneste-Kurs / Tema / Nyhet / Kampanje) × 10 checks (mapping, æøå chars, relations, image re-anchoring, 301 redirects, SEO, ISR invalidation, role permissions carryover) |
+| 9 | ♿ Accessibility | axe-core + Lighthouse + manual checklist + screen-reader scripts (WCAG 2.2 AA) — 12 checks |
+| 10 | ⚡ Performance | Core Web Vitals + **Enonic-specific perf**: Guillotine GraphQL waterfall / N+1 / over-fetch, ISR revalidation, image service, publish ack latency, bulk publish UI block, part virtualization, cache freshness — 10 checks + hot-queries table + p95 metrics |
+| 11 | 🎨 Designsystemet | **Digdir Designsystemet compliance** — `@digdir/designsystemet-react` usage, tokens, typography, spacing, dark mode, brand override, version, button + form-element components — 10 checks + 0-100 compliance score + deviations panel |
+| 12 | 🔐 Role Matrix | **Real authorization tests** across 6 editorial roles (Administrator / Eier / Lokal eier / Redaktør / Lokal redaktør / Bidragsyter) × 4 actions (read/edit/publish/delete) — 8 authZ checks (subtree isolation, publish guard, delete guard, role assignment guard, audit log, session expiry, privilege escalation, API authZ) |
+| 13 | 🔥 Stress Test | k6 load profiles for Red Cross peaks: smoke, normal, campaign peak, **crisis spike (1,000+ VUs)**, 4-hour soak |
+| 14 | 🛡️ Security & Privacy | OWASP Top 10, headers, rate limits, GDPR — 13 checks (no personal data in CMS, public/non-public data separation, secrets exposure, dependency vulns, consent, etc.) |
+| 15 | 🎯 Jira | Convert findings into Jira issues in the Item project (also: dispatch to OutSystems) |
+| 16 | 📜 Runs | Run history with attestation hash, artifacts, screenshots |
+| 17 | ⚙️ Settings | Environments, tools, Jira project, payment-flow scope (Vipps), quality thresholds |
+
+**Backend:**
+- Service: `backend/services/red_cross_qa.py` — **17 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable)
+- Router: `backend/routers/red_cross_qa.py` — **25 routes** at `/api/red-cross-qa/*`
+- Versioned prompts: `backend/prompts/red_cross_qa/*.md` (13 prompts: test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, **forms_qa**, **content_migration**, **enonic_performance**, **designsystemet**, **role_matrix**)
+
+**Frontend** (`frontend/src/red-cross-qa/` — 18 files: 17 tab components + shared `_PageHero.jsx`):
+Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low).
+
+**i18n**: Full EN / NO / ES parity (40 top-level sections each, ~400 keys per locale).
+
+**How to use it**:
+1. Backend: `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000` from repo root
+2. Frontend: `cd frontend && npm start` → open `http://localhost:3000`
+3. Sidebar → **Future Item Agents** → ❤️‍🩹 **Red Cross Web QA Agent**
+4. Pick environment (`local` / `test`) and execution mode (`generate` / `execute`) in the header
+5. Open any tab and click its **Run** button. Findings + recommendations + suggested test cases render inline; runs are persisted under the **Runs** tab with the SHA-256 attestation hash.
+
+**Validation status**: Backend imports clean (17 suites, 25 routes), all 3 locales parse with parity, frontend production build succeeds with **0 warnings in `src/red-cross-qa/`**.
 
 ### AGI Hub — "Homo Sapiens vs. KI i Test" tab (April 2026)
 
