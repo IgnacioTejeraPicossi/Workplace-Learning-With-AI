@@ -40,25 +40,40 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
   ];
 
   // ── Quick actions (panel) ─────────────────────────────────────────
+  // Mirrors the full 17-tab navigation. Dashboard (current view) is omitted;
+  // Settings is omitted because mode/environment selectors live in the header.
   const quickActions = [
-    { icon: '📋', label: t('redCrossWebQaModule.tabTestPlan'),     tab: 'test-plan',         color: '#dc2626' },
-    { icon: '🎭', label: t('redCrossWebQaModule.tabPlaywright'),   tab: 'playwright',        color: '#ef4444' },
-    { icon: '⚡', label: t('redCrossWebQaModule.tabPerformance'),  tab: 'performance',       color: '#f59e0b' },
-    { icon: '♿', label: t('redCrossWebQaModule.tabAccessibility'),tab: 'accessibility',     color: '#06b6d4' },
-    { icon: '🔥', label: t('redCrossWebQaModule.tabStressTest'),   tab: 'stress-test',       color: '#f97316' },
-    { icon: '🎯', label: t('redCrossWebQaModule.tabJira'),         tab: 'jira',              color: '#3b82f6' },
+    { icon: '📋', label: t('redCrossWebQaModule.tabTestPlan'),         tab: 'test-plan',         color: '#dc2626' },
+    { icon: '🎭', label: t('redCrossWebQaModule.tabPlaywright'),       tab: 'playwright',        color: '#ef4444' },
+    { icon: '🌲', label: t('redCrossWebQaModule.tabCypress'),          tab: 'cypress',           color: '#15803d' },
+    { icon: '🔌', label: t('redCrossWebQaModule.tabApiQa'),            tab: 'api-qa',            color: '#0891b2' },
+    { icon: '📝', label: t('redCrossWebQaModule.tabCmsQa'),            tab: 'cms-qa',            color: '#7c3aed' },
+    { icon: '📑', label: t('redCrossWebQaModule.tabFormsQa'),          tab: 'forms-qa',          color: '#6366f1' },
+    { icon: '📦', label: t('redCrossWebQaModule.tabContentMigration'), tab: 'content-migration', color: '#0d9488' },
+    { icon: '♿', label: t('redCrossWebQaModule.tabAccessibility'),    tab: 'accessibility',     color: '#06b6d4' },
+    { icon: '⚡', label: t('redCrossWebQaModule.tabPerformance'),      tab: 'performance',       color: '#f59e0b' },
+    { icon: '🎨', label: t('redCrossWebQaModule.tabDesignsystemet'),   tab: 'designsystemet',    color: '#be185d' },
+    { icon: '🔐', label: t('redCrossWebQaModule.tabRoleMatrix'),       tab: 'role-matrix',       color: '#475569' },
+    { icon: '🔥', label: t('redCrossWebQaModule.tabStressTest'),       tab: 'stress-test',       color: '#f97316' },
+    { icon: '🛡️', label: t('redCrossWebQaModule.tabSecurityPrivacy'),  tab: 'security-privacy',  color: '#52525b' },
+    { icon: '🎯', label: t('redCrossWebQaModule.tabJira'),             tab: 'jira',              color: '#3b82f6' },
+    { icon: '📜', label: t('redCrossWebQaModule.tabRuns'),             tab: 'runs',              color: '#64748b' },
   ];
 
   // ── Quality gates (with per-gate accent color, status badge) ──────
+  // 11 gates aligned with the documented coverage in MODULES_REFERENCE.md.
   const gates = [
-    { id: 'gateAccessibility', status: 'WARN', color: '#06b6d4' },
-    { id: 'gatePerformance',   status: 'PASS', color: '#f59e0b' },
-    { id: 'gateApi',           status: 'PASS', color: '#3b82f6' },
-    { id: 'gateSecurity',      status: 'WARN', color: '#475569' },
-    { id: 'gateSeo',           status: 'PASS', color: '#10b981' },
-    { id: 'gateForms',         status: 'PASS', color: '#6366f1' },
-    { id: 'gateCms',           status: 'PASS', color: '#8b5cf6' },
-    { id: 'gateStress',        status: 'IDLE', color: '#f97316' },
+    { id: 'gateAccessibility',  status: 'WARN', color: '#06b6d4' },
+    { id: 'gatePerformance',    status: 'PASS', color: '#f59e0b' },
+    { id: 'gateApi',            status: 'PASS', color: '#3b82f6' },
+    { id: 'gateSecurity',       status: 'WARN', color: '#475569' },
+    { id: 'gateSeo',            status: 'PASS', color: '#10b981' },
+    { id: 'gateForms',          status: 'PASS', color: '#6366f1' },
+    { id: 'gateCms',            status: 'PASS', color: '#8b5cf6' },
+    { id: 'gateStress',         status: 'IDLE', color: '#f97316' },
+    { id: 'gateMigration',      status: 'IDLE', color: '#0d9488' },
+    { id: 'gateDesignsystemet', status: 'PASS', color: '#be185d' },
+    { id: 'gateRoleMatrix',     status: 'IDLE', color: '#dc2626' },
   ];
 
   const recentRuns = [

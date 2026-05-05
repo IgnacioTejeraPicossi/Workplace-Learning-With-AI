@@ -76,6 +76,9 @@
       "gateForms": "Skjemaer",
       "gateCms": "CMS",
       "gateStress": "Stress",
+      "gateMigration": "Innholdsmigrasjon",
+      "gateDesignsystemet": "Designsystemet",
+      "gateRoleMatrix": "Rollematrise",
       "recentRuns": "Siste kjøringer",
       "topRisks": "Topp risikoer"
     },

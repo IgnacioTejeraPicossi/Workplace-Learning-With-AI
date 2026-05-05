@@ -106,7 +106,9 @@
       "Bash(python -c \"import comtypes.client\")",
       "Bash(python -c \"import win32com.client; print\\('win32com OK'\\)\")",
       "Bash(powershell.exe -Command \"echo OK\")",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\export_slides_to_png.ps1\")"
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\export_slides_to_png.ps1\")",
+      "Bash(start \"\" \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\Rode_Kors_Web_QA_Agent_Presentasjon.pptx\")",
+      "Bash(grep \"src\\\\\\\\\\\\\\\\\")"
     ]
   }
 }

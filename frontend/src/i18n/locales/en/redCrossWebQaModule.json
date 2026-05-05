@@ -76,6 +76,9 @@
       "gateForms": "Forms",
       "gateCms": "CMS",
       "gateStress": "Stress",
+      "gateMigration": "Content migration",
+      "gateDesignsystemet": "Designsystemet",
+      "gateRoleMatrix": "Role matrix",
       "recentRuns": "Recent Runs",
       "topRisks": "Top Risks"
     },
