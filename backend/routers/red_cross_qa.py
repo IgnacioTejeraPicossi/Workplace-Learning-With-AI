@@ -22,6 +22,8 @@ try:
         generate_k6_script,
         run_k6,
         run_security_scan,
+        run_forms_qa,
+        run_content_migration_audit,
         get_jira_bundle_preview,
         create_jira_issues,
         dispatch_to_outsystems,
@@ -46,6 +48,8 @@ except ImportError:  # pragma: no cover
         generate_k6_script,
         run_k6,
         run_security_scan,
+        run_forms_qa,
+        run_content_migration_audit,
         get_jira_bundle_preview,
         create_jira_issues,
         dispatch_to_outsystems,
@@ -109,6 +113,19 @@ class K6Request(BaseModel):
 
 
 class SecurityRequest(BaseModel):
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class FormsQaRequest(BaseModel):
+    scopes: List[str] = Field(default_factory=list)
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class ContentMigrationRequest(BaseModel):
+    scopes: List[str] = Field(default_factory=list)
+    legacy_sample_size: Optional[int] = 100
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -223,6 +240,22 @@ async def api_run_k6(body: K6Request):
 async def api_run_security(body: SecurityRequest):
     env = _check_env(body.environment)
     return await run_security_scan(env, body.lang or "en")
+
+
+# ── Forms QA (Skjemabygger / Adam Silver / JSON Schema) ───────────
+@router.post("/run-forms-qa")
+async def api_run_forms_qa(body: FormsQaRequest):
+    env = _check_env(body.environment)
+    return await run_forms_qa(body.scopes, env, body.lang or "en")
+
+
+# ── Content Migration Audit ───────────────────────────────────────
+@router.post("/run-content-migration-audit")
+async def api_run_content_migration(body: ContentMigrationRequest):
+    env = _check_env(body.environment)
+    return await run_content_migration_audit(
+        body.scopes, env, body.legacy_sample_size or 100, body.lang or "en",
+    )
 
 
 # ── Jira / OutSystems ─────────────────────────────────────────────

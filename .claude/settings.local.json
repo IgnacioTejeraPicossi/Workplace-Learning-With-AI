@@ -82,7 +82,12 @@
       "Bash(npm run *)",
       "Bash(python -c \"from backend.services.red_cross_qa import generate_test_plan, run_lighthouse, get_settings, VALID_ENVIRONMENTS; print\\('service OK'\\)\")",
       "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import generate_test_plan, run_lighthouse, get_settings, VALID_ENVIRONMENTS; print\\('service OK'\\)\")",
-      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.routers.red_cross_qa import router; print\\('router OK, routes:', len\\(router.routes\\)\\)\")"
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.routers.red_cross_qa import router; print\\('router OK, routes:', len\\(router.routes\\)\\)\")",
+      "Bash(python -c \"import json; [json.load\\(open\\(f, encoding='utf-8'\\)\\) and print\\(f, 'OK'\\) for f in ['frontend/src/i18n/locales/en/redCrossWebQaModule.json', 'frontend/src/i18n/locales/no/redCrossWebQaModule.json', 'frontend/src/i18n/locales/es/redCrossWebQaModule.json']]\")",
+      "Bash(python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, VALID_ENVIRONMENTS, SUITE_NAMES; print\\('service import OK'\\); print\\('suites:', len\\(SUITE_NAMES\\)\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, VALID_ENVIRONMENTS, SUITE_NAMES; print\\('service import OK'\\); print\\('suites:', len\\(SUITE_NAMES\\)\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.routers.red_cross_qa import router; print\\('router OK'\\); print\\('routes:', len\\([r for r in router.routes]\\)\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }

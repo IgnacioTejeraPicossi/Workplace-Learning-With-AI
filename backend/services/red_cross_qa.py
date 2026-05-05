@@ -79,6 +79,7 @@ SUITE_NAMES = [
     "redcross-accessibility-core", "redcross-seo-core", "redcross-graphql-api",
     "redcross-performance-core-web-vitals", "redcross-stress-campaign-peak",
     "redcross-security-basic", "redcross-release-readiness",
+    "redcross-forms-qa", "redcross-content-migration",
 ]
 
 DEFAULT_SETTINGS = {
@@ -147,6 +148,62 @@ Generate concrete CMS test cases for the requested areas, considering 6 editoria
 (Administrator, Owner, Local Owner, Editor, Local Editor, Contributor).
 
 Return ONLY valid JSON: {"test_cases": [{"area": "...", "title": "...", "description": "...", "roles": ["..."]}]}
+"""
+
+FORMS_QA_PROMPT = """You are a senior QA engineer for Item Consulting's Skjemabygger
+(Enonic XP form-builder, JSON Schema, Adam Silver / gov.uk patterns) on rodekors.no.
+Audit the requested forms and produce a quality report.
+
+Return ONLY valid JSON with this shape:
+{
+  "checks": {
+    "checkJsonSchema": {"status": "pass|warn|fail", "note": "..."},
+    "checkAdamSilverPatterns": {"status": "pass|warn|fail", "note": "..."},
+    "checkMultiStep": {"status": "pass|warn|fail", "note": "..."},
+    "checkMobileKeyboard": {"status": "pass|warn|fail", "note": "..."},
+    "checkAutocomplete": {"status": "pass|warn|fail", "note": "..."},
+    "checkPrefillApi": {"status": "pass|warn|fail", "note": "..."},
+    "checkValidationMessages": {"status": "pass|warn|fail", "note": "..."},
+    "checkAriaLive": {"status": "pass|warn|fail", "note": "..."},
+    "checkErrorSummary": {"status": "pass|warn|fail", "note": "..."},
+    "checkProgressIndicator": {"status": "pass|warn|fail", "note": "..."},
+    "checkVippsHandoff": {"status": "pass|warn|fail", "note": "..."},
+    "checkSubmitIdempotency": {"status": "pass|warn|fail", "note": "..."}
+  },
+  "findings": [{"severity": "low|medium|high|critical", "form": "...", "title": "...", "message": "...", "fix_hint": "..."}],
+  "test_cases": [{"title": "...", "form": "...", "type": "manual|automated", "tool": "playwright|cypress|axe|manual", "steps": ["..."], "expected": "..."}]
+}
+Cover donation, volunteer, contact, course and Vipps handoff flows where relevant.
+"""
+
+CONTENT_MIGRATION_PROMPT = """You are a senior content-migration QA engineer for the
+rodekors.no relaunch on Enonic XP / Content Studio v.6. The tender explicitly mandates
+"gradvis migrering av innhold" (gradual content migration) from the legacy CMS.
+
+Audit the migration scope provided and return ONLY valid JSON:
+{
+  "summary": {
+    "total_pages_legacy": 0, "total_pages_migrated": 0,
+    "coverage_percent": 0, "broken_links": 0,
+    "missing_redirects": 0, "orphan_assets": 0
+  },
+  "checks": {
+    "checkContentTypeMapping": {"status": "pass|warn|fail", "note": "..."},
+    "checkNorwegianChars": {"status": "pass|warn|fail", "note": "..."},
+    "checkRelations": {"status": "pass|warn|fail", "note": "..."},
+    "checkLocalization": {"status": "pass|warn|fail", "note": "..."},
+    "checkImageReanchoring": {"status": "pass|warn|fail", "note": "..."},
+    "checkRedirects": {"status": "pass|warn|fail", "note": "..."},
+    "checkSeoMetadata": {"status": "pass|warn|fail", "note": "..."},
+    "checkPublishState": {"status": "pass|warn|fail", "note": "..."},
+    "checkIsrInvalidation": {"status": "pass|warn|fail", "note": "..."},
+    "checkPermissionsCarryover": {"status": "pass|warn|fail", "note": "..."}
+  },
+  "broken_pages": [{"legacy_url": "...", "new_url": "...", "issue": "..."}],
+  "missing_redirects": [{"from": "...", "to": "...", "status_expected": 301}],
+  "test_cases": [{"title": "...", "type": "manual|automated", "steps": ["..."], "expected": "..."}]
+}
+Cover content types: Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje.
 """
 
 
@@ -558,6 +615,171 @@ async def run_security_scan(environment: str, lang: str = "en") -> Dict[str, Any
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Tool 9b — Forms QA (Skjemabygger / Adam Silver / JSON Schema)
+# ═══════════════════════════════════════════════════════════════════
+async def run_forms_qa(scopes: List[str], environment: str,
+                       lang: str = "en") -> Dict[str, Any]:
+    """Audit Skjemabygger forms across the requested scopes (donation,
+    volunteer, contact, course, beredskap, vipps-handoff). Mock-first."""
+    prompt = (
+        f"Forms in scope: {', '.join(scopes) if scopes else 'donation, volunteer, contact, course'}\n"
+        f"Environment: {environment}\n"
+        "Audit each scope and return the JSON contract."
+    )
+    raw = await _llm(prompt, FORMS_QA_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    checks = parsed.get("checks") or {
+        "checkJsonSchema":         {"status": "pass", "note": "JSON Schema validation present on all reviewed forms"},
+        "checkAdamSilverPatterns": {"status": "pass", "note": "Plain labels above inputs, no placeholder-as-label"},
+        "checkMultiStep":          {"status": "warn", "note": "Volunteer signup loses state on browser back"},
+        "checkMobileKeyboard":     {"status": "warn", "note": "Donation amount missing inputmode='numeric'"},
+        "checkAutocomplete":       {"status": "pass", "note": "Contact form uses given-name/family-name/email/tel"},
+        "checkPrefillApi":         {"status": "warn", "note": "APIM prefill has no timeout (default 30s)"},
+        "checkValidationMessages": {"status": "pass", "note": "Inline errors with aria-describedby"},
+        "checkAriaLive":           {"status": "warn", "note": "Dynamic errors lack role='alert'"},
+        "checkErrorSummary":       {"status": "fail", "note": "No error summary on submit-with-errors"},
+        "checkProgressIndicator":  {"status": "pass", "note": "Step X/Y shown on multi-step forms"},
+        "checkVippsHandoff":       {"status": "pass", "note": "Return + cancel URLs validated"},
+        "checkSubmitIdempotency":  {"status": "warn", "note": "Donation form lacks PRG token — refresh re-submits"},
+    }
+
+    findings = parsed.get("findings") or [
+        {"severity": "high", "form": "volunteer", "title": "No error summary",
+         "message": "Submit with errors does not surface an aggregated summary at top of page.",
+         "fix_hint": "Add gov.uk-style error summary linked to first invalid field, move focus to it."},
+        {"severity": "medium", "form": "donation", "title": "Amount field missing inputmode",
+         "message": "Mobile users see alphabetic keyboard for the amount field.",
+         "fix_hint": "Add inputmode='numeric' and pattern='[0-9]*'."},
+        {"severity": "medium", "form": "donation", "title": "Submit not idempotent",
+         "message": "Refreshing after a donation re-posts the form.",
+         "fix_hint": "Use POST/Redirect/GET pattern or single-use submit token."},
+        {"severity": "low", "form": "contact", "title": "APIM prefill timeout missing",
+         "message": "If Azure APIM prefill is slow, the form blocks for 30s.",
+         "fix_hint": "Add a 4s timeout with a graceful fallback to an empty form."},
+    ]
+
+    test_cases = parsed.get("test_cases") or [
+        {"title": "Donation amount mobile keyboard", "form": "donation",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Open donation page on iPhone viewport", "Tap amount field"],
+         "expected": "Numeric keyboard is shown (inputmode='numeric')"},
+        {"title": "Volunteer signup error summary", "form": "volunteer",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Open volunteer signup", "Submit with all fields empty"],
+         "expected": "Error summary appears at top, focus moves to it, links jump to first invalid field"},
+        {"title": "Vipps cancel returns to donation page", "form": "donation",
+         "type": "manual", "tool": "manual",
+         "steps": ["Start donation", "Continue to Vipps", "Cancel in Vipps"],
+         "expected": "User lands on rodekors.no donation page with state preserved"},
+    ]
+
+    # status: fail if any fail, warn if any warn, else pass
+    statuses = [c.get("status") for c in checks.values()]
+    overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
+    summary = f"Forms QA on {environment} — {sum(1 for s in statuses if s=='pass')}/{len(statuses)} pass"
+
+    run = await _store_run("redcross-forms-qa", environment, overall, summary, {
+        "scopes": scopes, "checks": checks, "findings": findings,
+        "test_cases": test_cases,
+        "artifacts": [{"name": "forms-audit.json", "type": "report"}],
+    })
+    return {"status": "ok", "checks": checks, "findings": findings,
+            "test_cases": test_cases, "run_id": run["run_id"], "lang": lang}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 9c — Content Migration QA (gradvis migrering av innhold)
+# ═══════════════════════════════════════════════════════════════════
+async def run_content_migration_audit(scopes: List[str], environment: str,
+                                      legacy_sample_size: int = 100,
+                                      lang: str = "en") -> Dict[str, Any]:
+    """Audit gradual content migration from legacy CMS to Enonic XP.
+    Mock-first; in production would query Enonic XP API + crawl legacy URLs."""
+    prompt = (
+        f"Scopes / content types: {', '.join(scopes) if scopes else 'all'}\n"
+        f"Environment: {environment}\n"
+        f"Legacy sample size: {legacy_sample_size}\n"
+        "Audit migration coverage and return the JSON contract."
+    )
+    raw = await _llm(prompt, CONTENT_MIGRATION_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    summary = parsed.get("summary") or {
+        "total_pages_legacy":  legacy_sample_size,
+        "total_pages_migrated": int(legacy_sample_size * 0.78),
+        "coverage_percent":    78,
+        "broken_links":        12,
+        "missing_redirects":   23,
+        "orphan_assets":       7,
+    }
+
+    checks = parsed.get("checks") or {
+        "checkContentTypeMapping":    {"status": "pass", "note": "All 8 types mapped (Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje)"},
+        "checkNorwegianChars":        {"status": "pass", "note": "UTF-8 preserved across sample"},
+        "checkRelations":             {"status": "warn", "note": "3 Aktivitet records lost their Forening parent"},
+        "checkLocalization":          {"status": "warn", "note": "12 pages missing nn (nynorsk) translation"},
+        "checkImageReanchoring":      {"status": "warn", "note": "7 hero images still point to legacy CDN"},
+        "checkRedirects":             {"status": "fail", "note": "23 legacy URLs return 404 (no 301)"},
+        "checkSeoMetadata":           {"status": "pass", "note": "Title + description preserved on 100% of sample"},
+        "checkPublishState":          {"status": "pass", "note": "Draft / scheduled / archived state retained"},
+        "checkIsrInvalidation":       {"status": "warn", "note": "ISR revalidation occasionally skipped on bulk publish"},
+        "checkPermissionsCarryover": {"status": "pass", "note": "Role grants mapped 1:1 across 6 editorial roles"},
+    }
+
+    broken_pages = parsed.get("broken_pages") or [
+        {"legacy_url": "/distrikt/oslo/aktiviteter/leksehjelp",
+         "new_url": "/lokal/oslo/aktiviteter/leksehjelp",
+         "issue": "missing-fields"},
+        {"legacy_url": "/forening/bergen/kontaktpersoner",
+         "new_url": "/lokal/bergen/kontaktpersoner",
+         "issue": "broken-images"},
+        {"legacy_url": "/kampanjer/2024/jul",
+         "new_url": "",
+         "issue": "404"},
+    ]
+
+    missing_redirects = parsed.get("missing_redirects") or [
+        {"from": "/distrikt/oslo", "to": "/lokal/oslo", "status_expected": 301},
+        {"from": "/forening/trondheim", "to": "/lokal/trondheim", "status_expected": 301},
+        {"from": "/temaer/beredskap", "to": "/tema/beredskap", "status_expected": 301},
+    ]
+
+    test_cases = parsed.get("test_cases") or [
+        {"title": "Norwegian characters preserved on Forening pages",
+         "type": "automated",
+         "steps": ["Crawl 50 Forening pages", "Compare body text against legacy"],
+         "expected": "All æ/ø/å render correctly (no &aelig;, no ?)."},
+        {"title": "Aktivitet → Forening relations intact",
+         "type": "automated",
+         "steps": ["List all Aktivitet content", "For each, verify parent Forening reference resolves"],
+         "expected": "0 orphan Aktivitet records"},
+        {"title": "301 redirects from legacy URLs",
+         "type": "automated",
+         "steps": ["Load redirect map", "Curl each legacy URL", "Assert 301 + Location header"],
+         "expected": "100% of mapped URLs return 301 to new path"},
+    ]
+
+    statuses = [c.get("status") for c in checks.values()]
+    overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
+    text_summary = (
+        f"Migration audit on {environment} — coverage {summary['coverage_percent']}%, "
+        f"{summary['broken_links']} broken, {summary['missing_redirects']} redirects missing"
+    )
+
+    run = await _store_run("redcross-content-migration", environment, overall,
+                           text_summary, {
+        "scopes": scopes, "summary": summary, "checks": checks,
+        "broken_pages": broken_pages, "missing_redirects": missing_redirects,
+        "test_cases": test_cases,
+        "artifacts": [{"name": "migration-audit.json", "type": "report"}],
+    })
+    return {"status": "ok", "summary": summary, "checks": checks,
+            "broken_pages": broken_pages, "missing_redirects": missing_redirects,
+            "test_cases": test_cases, "run_id": run["run_id"], "lang": lang}
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Tool 10 — Jira Action Bundle + dispatch
 # ═══════════════════════════════════════════════════════════════════
 async def get_jira_bundle_preview(environment: str) -> Dict[str, Any]:
@@ -711,9 +933,10 @@ async def get_stats(environment: Optional[str] = None) -> Dict[str, Any]:
             "gateApi":           "pass" if total else "idle",
             "gateSecurity":      "warn" if total else "idle",
             "gateSeo":           "pass" if total else "idle",
-            "gateForms":         "pass" if total else "idle",
+            "gateForms":         "warn" if total else "idle",
             "gateCms":           "pass" if total else "idle",
             "gateStress":        "pass" if total else "idle",
+            "gateMigration":     "warn" if total else "idle",
         },
     }
 

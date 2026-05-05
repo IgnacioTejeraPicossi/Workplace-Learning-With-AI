@@ -6,6 +6,8 @@ import Playwright from './red-cross-qa/Playwright';
 import Cypress from './red-cross-qa/Cypress';
 import ApiQA from './red-cross-qa/ApiQA';
 import CmsQA from './red-cross-qa/CmsQA';
+import FormsQA from './red-cross-qa/FormsQA';
+import ContentMigration from './red-cross-qa/ContentMigration';
 import Accessibility from './red-cross-qa/Accessibility';
 import Performance from './red-cross-qa/Performance';
 import StressTest from './red-cross-qa/StressTest';
@@ -37,6 +39,8 @@ const RedCrossWebQAAgent = () => {
     { id: 'cypress',           label: t('redCrossWebQaModule.tabCypress'),          icon: '🌲' },
     { id: 'api-qa',            label: t('redCrossWebQaModule.tabApiQa'),            icon: '🔌' },
     { id: 'cms-qa',            label: t('redCrossWebQaModule.tabCmsQa'),            icon: '📝' },
+    { id: 'forms-qa',          label: t('redCrossWebQaModule.tabFormsQa'),          icon: '📑' },
+    { id: 'content-migration', label: t('redCrossWebQaModule.tabContentMigration'), icon: '📦' },
     { id: 'accessibility',     label: t('redCrossWebQaModule.tabAccessibility'),    icon: '♿' },
     { id: 'performance',       label: t('redCrossWebQaModule.tabPerformance'),      icon: '⚡' },
     { id: 'stress-test',       label: t('redCrossWebQaModule.tabStressTest'),       icon: '🔥' },
@@ -56,6 +60,8 @@ const RedCrossWebQAAgent = () => {
       case 'cypress':           return <Cypress {...sharedProps} />;
       case 'api-qa':            return <ApiQA {...sharedProps} />;
       case 'cms-qa':            return <CmsQA {...sharedProps} />;
+      case 'forms-qa':          return <FormsQA {...sharedProps} />;
+      case 'content-migration': return <ContentMigration {...sharedProps} />;
       case 'accessibility':     return <Accessibility {...sharedProps} />;
       case 'performance':       return <Performance {...sharedProps} />;
       case 'stress-test':       return <StressTest {...sharedProps} />;
