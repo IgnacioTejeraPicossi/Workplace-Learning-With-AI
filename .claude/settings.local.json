@@ -92,7 +92,21 @@
       "Bash(set PYTHONUTF8=1)",
       "Bash(python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, run_enonic_performance, run_designsystemet_audit, run_role_matrix_audit, SUITE_NAMES; print\\('SUITES:', len\\(SUITE_NAMES\\)\\); from backend.routers.red_cross_qa import router; print\\('ROUTES:', len\\(router.routes\\)\\)\")",
       "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python -c \"from backend.services.red_cross_qa import run_forms_qa, run_content_migration_audit, run_enonic_performance, run_designsystemet_audit, run_role_matrix_audit, SUITE_NAMES; print\\('SUITES:', len\\(SUITE_NAMES\\)\\); from backend.routers.red_cross_qa import router; print\\('ROUTES:', len\\(router.routes\\)\\)\")",
-      "Bash(module\" 2>/dev/null; echo \"---\"; ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\\")"
+      "Bash(module\" 2>/dev/null; echo \"---\"; ls \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\\")",
+      "Bash(node create_red_cross_qa_presentation.js)",
+      "Bash(python \"C:/Test/AI/AI Learning with AI/.claude/skills/pptx/scripts/office/soffice.py\" --help)",
+      "Bash(where soffice *)",
+      "Bash(where libreoffice *)",
+      "Bash(command -v soffice)",
+      "Bash(command -v libreoffice)",
+      "Read(//c/Program Files//**)",
+      "Bash(command -v pdftoppm)",
+      "Bash(command -v magick)",
+      "Bash(command -v convert)",
+      "Bash(python -c \"import comtypes.client\")",
+      "Bash(python -c \"import win32com.client; print\\('win32com OK'\\)\")",
+      "Bash(powershell.exe -Command \"echo OK\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\export_slides_to_png.ps1\")"
     ]
   }
 }
