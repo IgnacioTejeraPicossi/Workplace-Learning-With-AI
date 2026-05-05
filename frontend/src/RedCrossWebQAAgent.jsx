@@ -10,6 +10,8 @@ import FormsQA from './red-cross-qa/FormsQA';
 import ContentMigration from './red-cross-qa/ContentMigration';
 import Accessibility from './red-cross-qa/Accessibility';
 import Performance from './red-cross-qa/Performance';
+import Designsystemet from './red-cross-qa/Designsystemet';
+import RoleMatrix from './red-cross-qa/RoleMatrix';
 import StressTest from './red-cross-qa/StressTest';
 import SecurityPrivacy from './red-cross-qa/SecurityPrivacy';
 import Jira from './red-cross-qa/Jira';
@@ -43,6 +45,8 @@ const RedCrossWebQAAgent = () => {
     { id: 'content-migration', label: t('redCrossWebQaModule.tabContentMigration'), icon: '📦' },
     { id: 'accessibility',     label: t('redCrossWebQaModule.tabAccessibility'),    icon: '♿' },
     { id: 'performance',       label: t('redCrossWebQaModule.tabPerformance'),      icon: '⚡' },
+    { id: 'designsystemet',    label: t('redCrossWebQaModule.tabDesignsystemet'),   icon: '🎨' },
+    { id: 'role-matrix',       label: t('redCrossWebQaModule.tabRoleMatrix'),       icon: '🔐' },
     { id: 'stress-test',       label: t('redCrossWebQaModule.tabStressTest'),       icon: '🔥' },
     { id: 'security-privacy',  label: t('redCrossWebQaModule.tabSecurityPrivacy'),  icon: '🛡️' },
     { id: 'jira',              label: t('redCrossWebQaModule.tabJira'),             icon: '🎯' },
@@ -64,6 +68,8 @@ const RedCrossWebQAAgent = () => {
       case 'content-migration': return <ContentMigration {...sharedProps} />;
       case 'accessibility':     return <Accessibility {...sharedProps} />;
       case 'performance':       return <Performance {...sharedProps} />;
+      case 'designsystemet':    return <Designsystemet {...sharedProps} />;
+      case 'role-matrix':       return <RoleMatrix {...sharedProps} />;
       case 'stress-test':       return <StressTest {...sharedProps} />;
       case 'security-privacy':  return <SecurityPrivacy {...sharedProps} />;
       case 'jira':              return <Jira {...sharedProps} />;
