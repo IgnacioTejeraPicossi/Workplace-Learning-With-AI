@@ -92,7 +92,7 @@ The agent ships as a **17-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) wi
 
 | # | Tab | Purpose |
 |---|-----|---------|
-| 1 | 📊 Dashboard | Live quality status: total runs, pass rate, open findings, critical blockers, 8 quality gates |
+| 1 | 📊 Dashboard | Live quality status: total runs, pass rate, open findings, critical blockers, 11 quality gates, 15-button Quick Actions panel |
 | 2 | 📋 Test Plan | LLM converts a Jira epic / user story into manual + automated + accessibility + API + regression test plan |
 | 3 | 🎭 Playwright | Cross-browser E2E generator (9 scopes: navigation, forms, search, donation, volunteer, CMS preview, a11y smoke, visual, API mock) |
 | 4 | 🌲 Cypress | Component + frontend regression generator |

@@ -475,7 +475,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 | Tab | Component | Highlights |
 |-----|-----------|-----------|
-| Dashboard | `Dashboard.jsx` | Total runs, pass rate, open findings, blockers, 8 quality gates |
+| Dashboard | `Dashboard.jsx` | Total runs, pass rate, open findings, blockers, 11 quality gates, 15-button Quick Actions panel covering full tab navigation |
 | Test Plan | `TestPlan.jsx` | Manual + automated + accessibility + API + regression + test data + Jira subtasks |
 | Playwright | `Playwright.jsx` | 9 scopes, generate or run |
 | Cypress | `Cypress.jsx` | Component + frontend regression |
@@ -500,7 +500,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
 - 25 routes registered at `/api/red-cross-qa/*` — do not break path naming
-- Quality gates referenced in Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress` (+ extended: `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix`)
+- 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
 - No contract tests yet (validate via: `curl http://localhost:8000/api/red-cross-qa/stats` and `curl http://localhost:8000/api/red-cross-qa/runs`)
 
 **Run / smoke commands:**
