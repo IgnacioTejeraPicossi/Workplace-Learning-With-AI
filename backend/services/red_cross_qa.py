@@ -80,6 +80,8 @@ SUITE_NAMES = [
     "redcross-performance-core-web-vitals", "redcross-stress-campaign-peak",
     "redcross-security-basic", "redcross-release-readiness",
     "redcross-forms-qa", "redcross-content-migration",
+    "redcross-enonic-performance", "redcross-designsystemet",
+    "redcross-role-matrix",
 ]
 
 DEFAULT_SETTINGS = {
@@ -174,6 +176,77 @@ Return ONLY valid JSON with this shape:
   "test_cases": [{"title": "...", "form": "...", "type": "manual|automated", "tool": "playwright|cypress|axe|manual", "steps": ["..."], "expected": "..."}]
 }
 Cover donation, volunteer, contact, course and Vipps handoff flows where relevant.
+"""
+
+ENONIC_PERFORMANCE_PROMPT = """You are a senior performance engineer for Enonic XP +
+Next.XP + Guillotine GraphQL on the rodekors.no website. Audit Enonic-specific perf
+signals (waterfall, N+1, Guillotine field selection, ISR latency, image service,
+publish latency, bulk publish, part rendering, cache invalidation).
+
+Return ONLY valid JSON: {
+  "checks": {
+    "checkGraphqlWaterfall": {"status": "...", "p95_ms": 0, "queries": 0, "note": "..."},
+    "checkGraphqlNplusOne": {"status": "...", "duplicate_queries": 0, "note": "..."},
+    "checkGuillotineFields": {"status": "...", "overfetched_fields": 0, "note": "..."},
+    "checkIsrLatency": {"status": "...", "p95_seconds": 0, "note": "..."},
+    "checkIsrCascading": {"status": "...", "note": "..."},
+    "checkImageService": {"status": "...", "p95_ms": 0, "note": "..."},
+    "checkPublishLatency": {"status": "...", "p95_seconds": 0, "note": "..."},
+    "checkBulkPublish": {"status": "...", "note": "..."},
+    "checkPartRender": {"status": "...", "note": "..."},
+    "checkCacheInvalidation": {"status": "...", "note": "..."}
+  },
+  "hot_queries": [{"name": "...", "p95_ms": 0, "queries": 0, "duplicates": 0, "fix_hint": "..."}],
+  "recommendations": [{"priority": "high|medium|low", "title": "...", "description": "...", "category": "graphql|isr|image|publish|cache"}]
+}
+"""
+
+DESIGNSYSTEMET_PROMPT = """You are a senior frontend / a11y QA engineer auditing
+rodekors.no compliance with Designsystemet from Digdir (@digdir/designsystemet-react +
+@digdir/designsystemet-css). Verify components, tokens, typography, spacing, brand
+overrides and version drift.
+
+Return ONLY valid JSON: {
+  "compliance_score": 0-100,
+  "checks": {
+    "checkDsComponents": {"status": "...", "non_ds_count": 0, "note": "..."},
+    "checkDsTokens": {"status": "...", "non_token_colors": 0, "note": "..."},
+    "checkDsTypography": {"status": "...", "note": "..."},
+    "checkDsSpacing": {"status": "...", "note": "..."},
+    "checkDsAccessibility": {"status": "...", "note": "..."},
+    "checkDsDarkMode": {"status": "...", "note": "..."},
+    "checkBrandOverride": {"status": "...", "note": "..."},
+    "checkDsVersion": {"status": "...", "version_used": "...", "latest": "...", "note": "..."},
+    "checkDsButtonUsage": {"status": "...", "note": "..."},
+    "checkDsFormElements": {"status": "...", "note": "..."}
+  },
+  "deviations": [{"severity": "...", "component": "...", "page": "...", "title": "...", "message": "...", "fix_hint": "..."}],
+  "recommendations": [{"title": "...", "category": "...", "description": "..."}]
+}
+"""
+
+ROLE_MATRIX_PROMPT = """You are a senior CMS authorization QA engineer auditing 6
+editorial roles on Enonic XP Content Studio for rodekors.no:
+Administrator, Eier (Owner), Lokal eier (Local Owner), Redaktør (Editor),
+Lokal redaktør (Local Editor), Bidragsyter (Contributor).
+
+Audit role × action × scope (read, edit, publish, delete) and authorization checks.
+
+Return ONLY valid JSON: {
+  "matrix": [{"role": "...", "scope": "...", "read": "allow|deny", "edit": "...", "publish": "...", "delete": "..."}],
+  "checks": {
+    "checkSubtreeIsolation": {"status": "...", "note": "..."},
+    "checkPublishGuard": {"status": "...", "note": "..."},
+    "checkDeleteGuard": {"status": "...", "note": "..."},
+    "checkRoleAssignmentGuard": {"status": "...", "note": "..."},
+    "checkAuditLog": {"status": "...", "note": "..."},
+    "checkSessionExpiry": {"status": "...", "note": "..."},
+    "checkPrivilegeEscalation": {"status": "...", "note": "..."},
+    "checkApiAuthZ": {"status": "...", "note": "..."}
+  },
+  "violations": [{"severity": "...", "role": "...", "action": "...", "scope": "...", "expected": "...", "actual": "...", "fix_hint": "..."}],
+  "test_cases": [{"role": "...", "title": "...", "type": "manual|automated", "tool": "...", "steps": ["..."], "expected": "..."}]
+}
 """
 
 CONTENT_MIGRATION_PROMPT = """You are a senior content-migration QA engineer for the
@@ -780,6 +853,241 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Tool 9d — Enonic-specific Performance
+# ═══════════════════════════════════════════════════════════════════
+async def run_enonic_performance(url: str, environment: str,
+                                 lang: str = "en") -> Dict[str, Any]:
+    """Audit Enonic XP + Next.XP + Guillotine GraphQL specific perf signals
+    that Lighthouse alone misses. Mock-first."""
+    prompt = (
+        f"URL: {url}\nEnvironment: {environment}\n"
+        "Audit waterfall, N+1, Guillotine field selection, ISR latency, "
+        "image service, publish latency, bulk publish, part rendering, cache invalidation."
+    )
+    raw = await _llm(prompt, ENONIC_PERFORMANCE_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    checks = parsed.get("checks") or {
+        "checkGraphqlWaterfall":  {"status": "warn", "p95_ms": 480, "queries": 5,
+                                   "note": "5 sequential roundtrips on district pages (target ≤3)"},
+        "checkGraphqlNplusOne":   {"status": "warn", "duplicate_queries": 7,
+                                   "note": "7 duplicate Forening queries on Distrikt page"},
+        "checkGuillotineFields":  {"status": "warn", "overfetched_fields": 23,
+                                   "note": "23 Guillotine fields fetched but not rendered"},
+        "checkIsrLatency":        {"status": "pass", "p95_seconds": 12,
+                                   "note": "ISR revalidation p95 12s (target <30s)"},
+        "checkIsrCascading":      {"status": "warn",
+                                   "note": "Forening publish doesn't invalidate child Aktivitet pages"},
+        "checkImageService":      {"status": "pass", "p95_ms": 420,
+                                   "note": "image:// scaling p95 420ms"},
+        "checkPublishLatency":    {"status": "pass", "p95_seconds": 3,
+                                   "note": "Content Studio publish ack p95 3s"},
+        "checkBulkPublish":       {"status": "warn",
+                                   "note": "Bulk publish of 50 items blocks editor UI ~14s"},
+        "checkPartRender":        {"status": "pass",
+                                   "note": "Event list virtualizes after 100 rows"},
+        "checkCacheInvalidation": {"status": "warn",
+                                   "note": "Stale content occasionally served up to 90s after publish"},
+    }
+    hot_queries = parsed.get("hot_queries") or [
+        {"name": "GetDistrictPage", "p95_ms": 480, "queries": 12, "duplicates": 3,
+         "fix_hint": "Batch Forening lookups via fragments instead of per-card query"},
+        {"name": "GetActivityList",  "p95_ms": 320, "queries": 8,  "duplicates": 4,
+         "fix_hint": "Use Guillotine `_references` to pre-load related Forening once"},
+        {"name": "GetCampaignPage",  "p95_ms": 260, "queries": 6,  "duplicates": 1,
+         "fix_hint": "Drop unused fields from query (over-fetching `body` and `_versionKey`)"},
+    ]
+    recommendations = parsed.get("recommendations") or [
+        {"priority": "high",   "category": "graphql",
+         "title": "Reduce GraphQL waterfall on district pages",
+         "description": "Batch related Forening queries into one round-trip via fragment spread."},
+        {"priority": "high",   "category": "isr",
+         "title": "Wire cascading ISR invalidation",
+         "description": "On Forening publish, revalidate child Aktivitet/Kontaktperson paths."},
+        {"priority": "medium", "category": "publish",
+         "title": "Async bulk publish queue",
+         "description": "Move bulk publish off the editor UI thread; show progress toast."},
+        {"priority": "medium", "category": "graphql",
+         "title": "Trim Guillotine field selection",
+         "description": "23 fields fetched but never rendered — drop them from queries."},
+    ]
+
+    statuses = [c.get("status") for c in checks.values()]
+    overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
+    summary = f"Enonic perf on {url} — {sum(1 for s in statuses if s=='pass')}/{len(statuses)} pass"
+
+    run = await _store_run("redcross-enonic-performance", environment, overall, summary, {
+        "url": url, "checks": checks, "hot_queries": hot_queries,
+        "recommendations": recommendations,
+        "artifacts": [{"name": "enonic-perf.json", "type": "report"}],
+    })
+    return {"status": "ok", "url": url, "checks": checks,
+            "hot_queries": hot_queries, "recommendations": recommendations,
+            "run_id": run["run_id"], "lang": lang}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 9e — Designsystemet (Digdir) Compliance
+# ═══════════════════════════════════════════════════════════════════
+async def run_designsystemet_audit(url: str, environment: str,
+                                   lang: str = "en") -> Dict[str, Any]:
+    """Audit compliance with Designsystemet from Digdir (Norwegian government
+    design system). Mock-first."""
+    prompt = (
+        f"URL: {url}\nEnvironment: {environment}\n"
+        "Audit Designsystemet (Digdir) compliance: components, tokens, typography, "
+        "spacing, accessibility, brand override, version drift, button/form usage."
+    )
+    raw = await _llm(prompt, DESIGNSYSTEMET_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    checks = parsed.get("checks") or {
+        "checkDsComponents":   {"status": "warn", "non_ds_count": 14,
+                                "note": "14 buttons + inputs use raw <button>/<input> instead of @digdir/designsystemet-react"},
+        "checkDsTokens":       {"status": "warn", "non_token_colors": 38,
+                                "note": "38 hex colors not mapped to ds-color-* tokens"},
+        "checkDsTypography":   {"status": "pass",
+                                "note": "Font scale uses ds-font-size-* tokens"},
+        "checkDsSpacing":      {"status": "pass",
+                                "note": "Spacing aligned with ds-spacing-* (multiples of 4)"},
+        "checkDsAccessibility":{"status": "pass",
+                                "note": "DS focus rings retained, no aria overrides"},
+        "checkDsDarkMode":     {"status": "warn",
+                                "note": "Dark mode supported by DS but not exposed to users"},
+        "checkBrandOverride":  {"status": "pass",
+                                "note": "Red Cross red applied via DS theme tokens, not inline"},
+        "checkDsVersion":      {"status": "warn", "version_used": "1.0.0", "latest": "1.4.2",
+                                "note": "@digdir/designsystemet-react one minor + 4 patches behind"},
+        "checkDsButtonUsage":  {"status": "warn",
+                                "note": "Tertiary used as primary on 3 pages (semantic mismatch)"},
+        "checkDsFormElements": {"status": "warn",
+                                "note": "Volunteer form uses placeholder-as-label (anti-pattern)"},
+    }
+    deviations = parsed.get("deviations") or [
+        {"severity": "high",   "component": "Button",
+         "page": "/donasjon", "title": "Donation CTA bypasses DS Button",
+         "message": "Custom <button> on donation CTA — loses DS focus ring + keyboard semantics.",
+         "fix_hint": "Replace with <Button variant='primary' size='lg'> from @digdir/designsystemet-react"},
+        {"severity": "medium", "component": "Input",
+         "page": "/bli-frivillig", "title": "Volunteer form uses placeholder-as-label",
+         "message": "Inputs missing <Label> — placeholder vanishes on focus.",
+         "fix_hint": "Use DS <Textfield label='Fullt navn'> with explicit label slot."},
+        {"severity": "medium", "component": "Tag",
+         "page": "/lokal/oslo", "title": "District tags use raw spans",
+         "message": "Custom span pills instead of DS <Tag>.",
+         "fix_hint": "Replace with <Tag color='neutral'> from DS."},
+    ]
+    recommendations = parsed.get("recommendations") or [
+        {"title": "Migrate raw buttons to DS Button",
+         "category": "components",
+         "description": "Replace 14 raw <button> with DS <Button> across donation, volunteer, contact pages."},
+        {"title": "Bump @digdir/designsystemet-react",
+         "category": "components",
+         "description": "Upgrade 1.0.0 → 1.4.2 for latest a11y fixes and Norwegian text adjustments."},
+        {"title": "Map raw hex colors to DS tokens",
+         "category": "tokens",
+         "description": "38 raw hex values found — define ds-color-rk-* aliases and replace."},
+    ]
+    score = parsed.get("compliance_score") if isinstance(parsed.get("compliance_score"), int) else 72
+
+    statuses = [c.get("status") for c in checks.values()]
+    overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
+    summary = f"Designsystemet compliance {score}/100 on {url}"
+
+    run = await _store_run("redcross-designsystemet", environment, overall, summary, {
+        "url": url, "compliance_score": score, "checks": checks,
+        "deviations": deviations, "recommendations": recommendations,
+        "artifacts": [{"name": "designsystemet-audit.json", "type": "report"}],
+    })
+    return {"status": "ok", "url": url, "compliance_score": score,
+            "checks": checks, "deviations": deviations,
+            "recommendations": recommendations, "run_id": run["run_id"], "lang": lang}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 9f — Role Permissions Matrix
+# ═══════════════════════════════════════════════════════════════════
+async def run_role_matrix_audit(environment: str,
+                                lang: str = "en") -> Dict[str, Any]:
+    """Audit the 6 editorial roles × 4 actions × scope authorization matrix
+    on Enonic XP Content Studio. Mock-first."""
+    prompt = (
+        f"Environment: {environment}\n"
+        "Audit role × action × scope for the 6 editorial roles "
+        "(Administrator, Eier, Lokal eier, Redaktør, Lokal redaktør, Bidragsyter)."
+    )
+    raw = await _llm(prompt, ROLE_MATRIX_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    matrix = parsed.get("matrix") or [
+        {"role": "Administrator",  "scope": "Global",
+         "read": "allow", "edit": "allow", "publish": "allow", "delete": "allow"},
+        {"role": "Eier",           "scope": "Global",
+         "read": "allow", "edit": "allow", "publish": "allow", "delete": "allow"},
+        {"role": "Lokal eier",     "scope": "Own district",
+         "read": "allow", "edit": "allow", "publish": "allow", "delete": "allow"},
+        {"role": "Lokal eier",     "scope": "Other district",
+         "read": "allow", "edit": "deny",  "publish": "deny",  "delete": "deny"},
+        {"role": "Redaktør",       "scope": "Global",
+         "read": "allow", "edit": "allow", "publish": "allow", "delete": "deny"},
+        {"role": "Lokal redaktør", "scope": "Own district",
+         "read": "allow", "edit": "allow", "publish": "allow", "delete": "deny"},
+        {"role": "Lokal redaktør", "scope": "Other district",
+         "read": "allow", "edit": "deny",  "publish": "deny",  "delete": "deny"},
+        {"role": "Bidragsyter",    "scope": "Own drafts",
+         "read": "allow", "edit": "allow", "publish": "deny",  "delete": "deny"},
+        {"role": "Bidragsyter",    "scope": "Published content",
+         "read": "allow", "edit": "deny",  "publish": "deny",  "delete": "deny"},
+    ]
+
+    checks = parsed.get("checks") or {
+        "checkSubtreeIsolation":    {"status": "pass", "note": "Local roles confined to their district subtree"},
+        "checkPublishGuard":        {"status": "pass", "note": "Bidragsyter cannot publish (UI + API)"},
+        "checkDeleteGuard":         {"status": "warn", "note": "Editor can delete root nodes via direct API call"},
+        "checkRoleAssignmentGuard": {"status": "pass", "note": "Only Owner/Administrator can assign roles"},
+        "checkAuditLog":            {"status": "warn", "note": "Audit log missing user-agent + IP for delete events"},
+        "checkSessionExpiry":       {"status": "pass", "note": "Editorial sessions expire after 8h inactivity"},
+        "checkPrivilegeEscalation": {"status": "pass", "note": "Self-promotion blocked at API + UI layer"},
+        "checkApiAuthZ":            {"status": "warn", "note": "Direct Guillotine call bypasses some scope checks"},
+    }
+    violations = parsed.get("violations") or [
+        {"severity": "high", "role": "Redaktør", "action": "delete",
+         "scope": "Root node", "expected": "deny", "actual": "allow",
+         "fix_hint": "Add server-side guard on /content-api delete; UI hides button but API does not."},
+        {"severity": "medium", "role": "Lokal redaktør", "action": "read",
+         "scope": "Other district draft", "expected": "deny", "actual": "allow",
+         "fix_hint": "Drafts in other districts should be 403, currently 200."},
+    ]
+    test_cases = parsed.get("test_cases") or [
+        {"role": "Lokal redaktør", "title": "Cannot edit content outside own district",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Login as Oslo Lokal redaktør", "Navigate to /lokal/bergen/aktiviteter", "Attempt edit"],
+         "expected": "Edit button disabled or 403 from API"},
+        {"role": "Bidragsyter", "title": "Cannot publish draft",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Login as Bidragsyter", "Open own draft", "Attempt publish"],
+         "expected": "Publish button absent; direct POST returns 403"},
+        {"role": "Eier", "title": "Can assign Lokal redaktør role to another user",
+         "type": "manual", "tool": "manual",
+         "steps": ["Login as Eier", "Open user admin", "Assign Lokal redaktør role"],
+         "expected": "Role assigned and visible in audit log"},
+    ]
+
+    statuses = [c.get("status") for c in checks.values()]
+    overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
+    summary = f"Role matrix on {environment} — {len(matrix)} role/scope rows, {len(violations)} violations"
+
+    run = await _store_run("redcross-role-matrix", environment, overall, summary, {
+        "matrix": matrix, "checks": checks,
+        "violations": violations, "test_cases": test_cases,
+        "artifacts": [{"name": "role-matrix.json", "type": "report"}],
+    })
+    return {"status": "ok", "matrix": matrix, "checks": checks,
+            "violations": violations, "test_cases": test_cases,
+            "run_id": run["run_id"], "lang": lang}
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Tool 10 — Jira Action Bundle + dispatch
 # ═══════════════════════════════════════════════════════════════════
 async def get_jira_bundle_preview(environment: str) -> Dict[str, Any]:
@@ -937,6 +1245,8 @@ async def get_stats(environment: Optional[str] = None) -> Dict[str, Any]:
             "gateCms":           "pass" if total else "idle",
             "gateStress":        "pass" if total else "idle",
             "gateMigration":     "warn" if total else "idle",
+            "gateDesignsystemet":"warn" if total else "idle",
+            "gateRoleMatrix":    "warn" if total else "idle",
         },
     }
 

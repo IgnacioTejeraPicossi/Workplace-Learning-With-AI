@@ -18,12 +18,34 @@ const METRICS = [
 ];
 
 const STATUS_BORDER = { pass: '#6ee7b7', warn: '#fcd34d', fail: '#fca5a5', pending: '#cbd5e1' };
+const STATUS_STYLES = {
+  pass:    { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7' },
+  warn:    { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d' },
+  fail:    { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' },
+  pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
+};
+
+const ENONIC_CHECKS = [
+  { key: 'checkGraphqlWaterfall',  icon: '🌊' },
+  { key: 'checkGraphqlNplusOne',   icon: '🔁' },
+  { key: 'checkGuillotineFields',  icon: '🪞' },
+  { key: 'checkIsrLatency',        icon: '⏲️' },
+  { key: 'checkIsrCascading',      icon: '🌳' },
+  { key: 'checkImageService',      icon: '🖼️' },
+  { key: 'checkPublishLatency',    icon: '🚀' },
+  { key: 'checkBulkPublish',       icon: '📚' },
+  { key: 'checkPartRender',        icon: '🧩' },
+  { key: 'checkCacheInvalidation', icon: '♻️' },
+];
+const PRIORITY_COLOR = { high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
 const Performance = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [url, setUrl] = useState('https://www.rodekors.no/');
   const [running, setRunning] = useState(false);
   const [report, setReport] = useState(null);
+  const [enonicRunning, setEnonicRunning] = useState(false);
+  const [enonicReport, setEnonicReport] = useState(null);
 
   const handleRun = async () => {
     setRunning(true); setReport(null);
@@ -35,6 +57,18 @@ const Performance = ({ environment }) => {
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }
     finally { setRunning(false); }
+  };
+
+  const handleEnonicRun = async () => {
+    setEnonicRunning(true); setEnonicReport(null);
+    try {
+      const res = await fetch(`${API}/run-enonic-performance`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, environment, lang: i18n.language }),
+      });
+      setEnonicReport(await res.json());
+    } catch { setEnonicReport({ status: 'error', message: 'Network error' }); }
+    finally { setEnonicRunning(false); }
   };
 
   const score = report?.lighthouse_score ?? null;
@@ -115,6 +149,111 @@ const Performance = ({ environment }) => {
         </div>
 
         {report?.status === 'error' && <div style={errorBox}>{report.message}</div>}
+
+        {/* ── Enonic-specific Performance ────────────────────────────── */}
+        <div style={{ ...panel, borderTop: '4px solid #7c3aed' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>
+            <h3 style={{ ...panelTitle, margin: 0 }}>🔌 {t('redCrossWebQaModule.performance.enonicTitle')}</h3>
+            <button onClick={handleEnonicRun} disabled={enonicRunning} style={enonicBtn(enonicRunning)}>
+              {enonicRunning ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.performance.btnRunEnonic')}
+            </button>
+          </div>
+          <p style={{ margin: '0 0 14px', fontSize: 12, color: '#64748b' }}>
+            {t('redCrossWebQaModule.performance.enonicSubheader')}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
+            {ENONIC_CHECKS.map(c => {
+              const item = enonicReport?.checks?.[c.key];
+              const status = item?.status || 'pending';
+              const s = STATUS_STYLES[status];
+              const metric = item?.p95_ms != null ? `p95 ${item.p95_ms}ms`
+                : item?.p95_seconds != null ? `p95 ${item.p95_seconds}s`
+                : item?.duplicate_queries != null ? `${item.duplicate_queries} dup`
+                : item?.queries != null ? `${item.queries} q`
+                : item?.overfetched_fields != null ? `${item.overfetched_fields} extra`
+                : null;
+              return (
+                <div key={c.key} style={{
+                  padding: '12px 14px', borderRadius: 10,
+                  backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.fg,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 500 }}>
+                      <span style={{ fontSize: 18 }}>{c.icon}</span>
+                      {t(`redCrossWebQaModule.performance.${c.key}`)}
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{status}</span>
+                  </div>
+                  {metric && <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, opacity: 0.85 }}>{metric}</div>}
+                  {item?.note && <div style={{ marginTop: 4, fontSize: 11, opacity: 0.8 }}>{item.note}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {Array.isArray(enonicReport?.hot_queries) && enonicReport.hot_queries.length > 0 && (
+          <div style={panel}>
+            <h3 style={panelTitle}>🔥 {t('redCrossWebQaModule.performance.hotQueriesTitle')} <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>({enonicReport.hot_queries.length})</span></h3>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    <th style={th}>Query</th>
+                    <th style={th}>p95 (ms)</th>
+                    <th style={th}>Queries</th>
+                    <th style={th}>Duplicates</th>
+                    <th style={th}>{t('redCrossWebQaModule.performance.fixHint')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {enonicReport.hot_queries.map((q, i) => (
+                    <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#f8fafc' : 'white' }}>
+                      <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 12, color: '#1e293b', fontWeight: 600 }}>{q.name}</td>
+                      <td style={{ ...td, color: q.p95_ms > 400 ? '#b91c1c' : '#475569', fontWeight: 600 }}>{q.p95_ms}</td>
+                      <td style={td}>{q.queries}</td>
+                      <td style={{ ...td, color: q.duplicates > 0 ? '#92400e' : '#10b981', fontWeight: 600 }}>{q.duplicates}</td>
+                      <td style={{ ...td, fontSize: 12, color: '#7c3aed', fontStyle: 'italic' }}>{q.fix_hint}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {Array.isArray(enonicReport?.recommendations) && enonicReport.recommendations.length > 0 && (
+          <div style={panel}>
+            <h3 style={panelTitle}>💡 {t('redCrossWebQaModule.performance.recommendationsTitle')} <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>({enonicReport.recommendations.length})</span></h3>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {enonicReport.recommendations.map((r, i) => (
+                <div key={i} style={{
+                  padding: '12px 14px', borderRadius: 10,
+                  backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: 999, color: 'white',
+                      fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                      backgroundColor: PRIORITY_COLOR[r.priority] || '#64748b',
+                    }}>{r.priority}</span>
+                    {r.category && (
+                      <span style={{
+                        padding: '2px 8px', borderRadius: 999,
+                        backgroundColor: '#7c3aed15', color: '#7c3aed', border: '1px solid #7c3aed40',
+                        fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                      }}>{r.category}</span>
+                    )}
+                    <strong style={{ fontSize: 13, color: '#1e293b' }}>{r.title}</strong>
+                  </div>
+                  {r.description && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#475569' }}>{r.description}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {enonicReport?.status === 'error' && <div style={errorBox}>{enonicReport.message}</div>}
       </div>
     </div>
   );
@@ -134,6 +273,17 @@ const primaryBtn = (disabled) => ({
   backgroundColor: disabled ? '#fcd34d' : '#d97706', color: 'white',
   fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
 });
+const enonicBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#c4b5fd' : '#7c3aed', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const th = {
+  textAlign: 'left', padding: '10px 12px', fontSize: 11,
+  color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: 0.4,
+  backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0',
+};
+const td = { padding: '10px 12px', borderBottom: '1px solid #e2e8f0', fontSize: 13, color: '#475569' };
 const listStyle = { margin: 0, paddingLeft: 18, fontSize: 13, color: '#475569', display: 'grid', gap: 4 };
 const errorBox = {
   backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c',

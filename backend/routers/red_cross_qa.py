@@ -24,6 +24,9 @@ try:
         run_security_scan,
         run_forms_qa,
         run_content_migration_audit,
+        run_enonic_performance,
+        run_designsystemet_audit,
+        run_role_matrix_audit,
         get_jira_bundle_preview,
         create_jira_issues,
         dispatch_to_outsystems,
@@ -50,6 +53,9 @@ except ImportError:  # pragma: no cover
         run_security_scan,
         run_forms_qa,
         run_content_migration_audit,
+        run_enonic_performance,
+        run_designsystemet_audit,
+        run_role_matrix_audit,
         get_jira_bundle_preview,
         create_jira_issues,
         dispatch_to_outsystems,
@@ -126,6 +132,11 @@ class FormsQaRequest(BaseModel):
 class ContentMigrationRequest(BaseModel):
     scopes: List[str] = Field(default_factory=list)
     legacy_sample_size: Optional[int] = 100
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class RoleMatrixRequest(BaseModel):
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -256,6 +267,27 @@ async def api_run_content_migration(body: ContentMigrationRequest):
     return await run_content_migration_audit(
         body.scopes, env, body.legacy_sample_size or 100, body.lang or "en",
     )
+
+
+# ── Enonic-specific Performance ───────────────────────────────────
+@router.post("/run-enonic-performance")
+async def api_run_enonic_performance(body: UrlRequest):
+    env = _check_env(body.environment)
+    return await run_enonic_performance(body.url, env, body.lang or "en")
+
+
+# ── Designsystemet (Digdir) Compliance ────────────────────────────
+@router.post("/run-designsystemet-audit")
+async def api_run_designsystemet(body: UrlRequest):
+    env = _check_env(body.environment)
+    return await run_designsystemet_audit(body.url, env, body.lang or "en")
+
+
+# ── Role Permissions Matrix ───────────────────────────────────────
+@router.post("/run-role-matrix-audit")
+async def api_run_role_matrix(body: RoleMatrixRequest):
+    env = _check_env(body.environment)
+    return await run_role_matrix_audit(env, body.lang or "en")
 
 
 # ── Jira / OutSystems ─────────────────────────────────────────────
