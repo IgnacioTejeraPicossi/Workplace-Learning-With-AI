@@ -611,10 +611,14 @@ Sections (in scroll order):
 
 6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 curated quotes (Bach, Kaner, Hendrycks, Amodei) each with a "use when" hint, 5 likely audience questions with prepared answers, and a closer.
 
-7. **Future Improvements** footnote — muted, dashed-border parking lot at the very bottom. Holds **two** parked ideas:
-   - *"Per-round feedback loop with AI self-improvement"* — three design variants (log only · ephemeral injection · persistent evolution) and a clear "Why deferred" paragraph explaining drift risk.
-   - *"Full ISTQB RAG pipeline"* (added in 1.7.1) — three options (curated anchors = Option A, shipped · full cloud RAG = Option B, deferred for ISTQB licensing reasons · hybrid local-only RAG = Option C, recommended post-workshop path).
-   Designed as a footnote (not a section) so it never steals screen attention during the live workshop.
+7. **Future Improvements** footnote — still muted at the bottom. **As of 1.8.0**, the former "parked" items **B** (ephemeral *Re-run with feedback*) and **C** (hybrid **local-only** PDF RAG when provider is ItemAI / ItemServerAI) are **implemented**; the footnote text in the app now marks them as shipped and keeps the **historical** three-option breakdown. **Persistent prompt evolution** (MongoDB prompt diffs) and **full cloud RAG** remain out of scope by design.
+
+### Workshop iteration — ephemeral feedback + local ISTQB RAG (1.8.0)
+
+- **Re-run with feedback**: `POST /challenge` accepts optional paired fields `previous_ai_output` and `human_feedback` (JSON: `feedback`). A one-shot block is appended to the system message so the model revises its answer; core task prompts in `TASK_SPECS` are not modified.
+- **Local PDF RAG**: `backend/services/istqb_local_rag.py` — when `x-api-provider` is `itemai` or `itemserverai`, windowed text from `docs-ISTQB/*.pdf` is retrieved (BM25 via `rank-bm25` when installed, else **token-overlap** fallback) and appended to the system prompt for `/challenge`, `/route`, and `/judge`. Responses include `istqb_rag: { mode, chunks_used, sources, caveat }`.
+- **Status endpoint**: `GET /api/agi/homo-vs-ai/istqb-rag-status` — `pdf_files`, `indexed_chunks`, `index_ready`, `retriever` (`bm25` | `token_overlap` | `none`), `local_rag_eligible_provider`.
+- **Frontend**: `IstqbRagHint` green/amber banner; per-round feedback textarea + **Re-run with feedback**; i18n **EN / NO / ES** (`homoVsAi.demos.feedback*`, `homoVsAi.istqb.rag*`).
 
 ### ISTQB-anchored prompts (1.7.1)
 Every `/challenge`, `/route` and `/judge` call is grounded in **real ISTQB syllabi sections** drawn from CTFL v4.0 (2023-04-21, §1–§6) and CT-AI v1.0 (2021-10-01, §1–§11), plus — when the language hint is Norwegian — an authoritative terminology block sourced from the *Norwegian Testing Board* ISTQB-NO v2.4 glossary.
@@ -626,20 +630,21 @@ Every `/challenge`, `/route` and `/judge` call is grounded in **real ISTQB sylla
 - **Audience value**: gives testers in the room something verifiable to anchor the AI's output on — the conversation shifts from "do you believe this?" to "does this match CTFL §5.2?".
 
 ### Backend — Homo vs. KI
-- `POST /api/agi/homo-vs-ai/challenge { task, input, language? }` — dispatches to one of **11** task specs (10 active + legacy `tests_from_code`): `scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility`. Testing-literate prompts (ISTQB + context-driven school; James Bach, Cem Kaner, Lisa Crispin, Elisabeth Hendrickson, Gojko Adzic, Nielsen Heuristics explicitly referenced in system prompts). Response carries `istqb_anchors: IstqbAnchor[]`.
-- `POST /api/agi/homo-vs-ai/route { problem, language? }` — Problem Router v2: free text → `{ recommended, rationale, runner_ups[], raw?, istqb_anchors[] }`. System prompt enforces a decision rubric + few-shot examples; `temperature=0.1`.
-- `POST /api/agi/homo-vs-ai/judge { task, human_answer, ai_answer, user_input?, language? }` — AI Judge: returns `{ verdict: human|ai|tie, confidence: low|medium|high, rationale, criteria: { accuracy, coverage, practical_value }, raw?, istqb_anchors[] }`. System prompt includes a per-task `JUDGE_CRITERIA` rubric, self-preference-bias warning, the task-specific AND judge-generic ISTQB blocks, and strict-JSON requirement with graceful tie-fallback. `temperature=0.1`.
+- `POST /api/agi/homo-vs-ai/challenge { task, input, language?, previous_ai_output?, feedback? }` — dispatches to one of **11** task specs (10 active + legacy `tests_from_code`): `scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility`. Testing-literate prompts (ISTQB + context-driven school; James Bach, Cem Kaner, Lisa Crispin, Elisabeth Hendrickson, Gojko Adzic, Nielsen Heuristics explicitly referenced in system prompts). Response carries `istqb_anchors: IstqbAnchor[]` and **`istqb_rag: IstqbRagMeta`** (local PDF RAG only when provider is ItemAI / ItemServerAI). Ephemeral re-run requires **both** optional body fields.
+- `POST /api/agi/homo-vs-ai/route { problem, language? }` — Problem Router v2: free text → `{ recommended, rationale, runner_ups[], raw?, istqb_anchors[], istqb_rag }`. System prompt enforces a decision rubric + few-shot examples; `temperature=0.1`.
+- `POST /api/agi/homo-vs-ai/judge { task, human_answer, ai_answer, user_input?, language? }` — AI Judge: returns `{ verdict: human|ai|tie, confidence: low|medium|high, rationale, criteria: { accuracy, coverage, practical_value }, raw?, istqb_anchors[], istqb_rag }`. System prompt includes a per-task `JUDGE_CRITERIA` rubric, self-preference-bias warning, the task-specific AND judge-generic ISTQB blocks, and strict-JSON requirement with graceful tie-fallback. `temperature=0.1`.
 - `GET /api/agi/homo-vs-ai/tasks` — discovery.
+- `GET /api/agi/homo-vs-ai/istqb-rag-status` — local RAG index introspection (for workshop demos).
 - Forwards `x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*` headers to `ask_ai_unified` so the UI's model choice is respected on every endpoint.
-- Services: `backend/services/homo_vs_ai_service.py` + `backend/services/istqb_anchors.py`. Router: `backend/routers/homo_vs_ai.py` (exposes the `IstqbAnchor` Pydantic model).
+- Services: `backend/services/homo_vs_ai_service.py` + `backend/services/istqb_anchors.py` + **`backend/services/istqb_local_rag.py`**. Router: `backend/routers/homo_vs_ai.py` (exposes `IstqbAnchor` and **`IstqbRagMeta`**).
 
 ### Frontend — Homo vs. KI
-- Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (components: `ProblemRouter`, `QuickNavBar`, `DemoCard`, `JudgeAdvisoryPanel`, `VoteButton`, `AiJudgeBadge`, `WorkshopScoreboard`, `TrustFramework`, `SpeakerCribSheet`, `FutureImprovementsNote`, **`IstqbBadge`**)
+- Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (components: `ProblemRouter`, `QuickNavBar`, `DemoCard`, `JudgeAdvisoryPanel`, `VoteButton`, `AiJudgeBadge`, `WorkshopScoreboard`, `TrustFramework`, `SpeakerCribSheet`, `FutureImprovementsNote`, **`IstqbBadge`**, **`IstqbRagHint`**, per-round feedback + **Re-run with feedback**)
 - API helpers in `frontend/src/api/agiApi.js`: `runTestingChallenge`, `routeTestingProblem`, `judgeTestingRound`
 - Tab wiring: fourth tab in `frontend/src/pages/help/AgiProgressPage.jsx` (icon 🧑‍💻)
 - **Sidebar wiring**: `frontend/src/Sidebar.jsx` — top-level `agi-progress` item in the `developer` group, immediately below **Run Test** (icon `bar-chart`, 📊). Not a child of Help.
 - Inline `MarkdownLite` renderer (~30 lines) — no new dependency
-- i18n: top-level `homoVsAi.*` block in `locales/{en,no}/common.json` including `demos.*`, `demos.judge.*`, `router.*`, `scoreboard.aiJudge*`, `future.*` (now with 2 parked ideas), and **`istqb.*`** (badge, tooltip, title, footnote). Plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`.
+- i18n: top-level `homoVsAi.*` block in **`locales/{en,no,es}/common.json`** including `demos.*`, `demos.judge.*`, **`demos.feedback*`**, `router.*`, `scoreboard.aiJudge*`, `future.*` (shipped vs historical options), and **`istqb.*`** (badge, tooltip, title, footnote, **rag** strings). Plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`.
 
 #### How to run this in a live workshop (SOCO-ready checklist)
 

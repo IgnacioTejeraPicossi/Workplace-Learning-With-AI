@@ -145,22 +145,25 @@ Sections on a single scroll:
 4. **Trust framework** — 7-row decision grid ("AI excels when… / Humans excel when… / Practical rule") by dimension: context, risk, ambiguity, novelty, volume, judgement, accountability.
 5. **Workshop Scoreboard** — configurable groups, round log with notes, undo, reset, JSON export. Votes from the head-to-head demos feed in automatically and now also include `task` + `aiJudge` per round, so the exported JSON is an auditable record of how often the room and the AI agreed.
 6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 real quotes (Bach, Kaner, Hendrycks, Amodei) with "use when" hints, 5 likely audience questions + prepared answers, and a closer.
-7. **Future improvements** footnote — muted parking lot at the very bottom with **two** parked ideas: (a) per-round feedback loop with AI self-improvement (three design variants, rationale for deferral), and (b) full ISTQB RAG pipeline (Option A curated anchors = shipped, Option B full cloud RAG deferred for licensing, Option C hybrid local-only = recommended post-workshop path). Deliberately footnote-styled so it never competes with the live demo.
+7. **Future improvements** footnote — still a muted parking lot at the bottom, but **two items formerly "parked" are now shipped (1.8.0)**: (a) **Option B** — ephemeral *Re-run with feedback* under each round (paired `previous_ai_output` + `feedback` on `/challenge`; base `TASK_SPECS` untouched). (b) **Option C** — **local-only ISTQB PDF RAG** when API provider is ItemAI / ItemServerAI: BM25 or token-overlap retrieval over `docs-ISTQB/*.pdf`, plus curated anchors for everyone; cloud providers still get anchors only. **Persistent prompt evolution (former Option C feedback)** and **full cloud RAG** remain deliberately unimplemented — see footnote copy in the app.
 
 **ISTQB-anchored prompts (1.7.1):** every AI call in the module is now grounded in real ISTQB syllabi sections (CTFL v4.0 + CT-AI v1.0), plus a Norwegian terminology block from the official ISTQB-NO v2.4 glossary when the session runs in Norwegian. A `📚 ISTQB-anchored` badge appears on every round card, on the Problem Router result, and next to the AI Judge verdict — clicking it reveals the exact sections used. Implemented as **Option A (curated anchors)**: ~80-150 tokens per prompt, tolerant loader, compliant with ISTQB licensing (only curated short summaries live in the repo — the full PDFs stay gitignored under `docs-ISTQB/`). See `backend/data/istqb_anchors.json` + `backend/services/istqb_anchors.py`.
 
-Fully bilingual EN / NO with **native-quality Norwegian** written in the register a Norwegian tester actually uses (industry terms kept in English: exploratory, oracle, boundary, edge case, risk-based, bug, self-preference bias).
+**Workshop iteration (1.8.0):** optional **local PDF excerpts** (`backend/services/istqb_local_rag.py`) appended to system prompts when `x-api-provider` is `itemai` or `itemserverai`; responses include `istqb_rag` metadata and the UI shows a green/amber **Local ISTQB PDF RAG** hint. **`GET /api/agi/homo-vs-ai/istqb-rag-status`** reports index health. See `docs/CHANGELOG.md` **[1.8.0]**.
 
-Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` + `backend/services/istqb_anchors.py`
-- `POST /api/agi/homo-vs-ai/challenge` — run one of 10 testing rounds (response includes `istqb_anchors: IstqbAnchor[]`)
-- `POST /api/agi/homo-vs-ai/route` — Problem Router (free text → best round, with anchors)
-- `POST /api/agi/homo-vs-ai/judge` — AI Judge (human + AI answers → advisory verdict, with anchors)
+Fully bilingual **EN / NO / ES** for this tab: Norwegian stays native-quality for testers; Spanish covers the same `homoVsAi.*` keys (including feedback re-run + RAG hints).
+
+Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` + `backend/services/istqb_anchors.py` + `backend/services/istqb_local_rag.py`
+- `POST /api/agi/homo-vs-ai/challenge` — run one of 10 testing rounds; optional **`previous_ai_output` + `feedback`** for ephemeral re-run; response includes `istqb_anchors: IstqbAnchor[]` and **`istqb_rag: IstqbRagMeta`**
+- `POST /api/agi/homo-vs-ai/route` — Problem Router (free text → best round; anchors + optional local RAG)
+- `POST /api/agi/homo-vs-ai/judge` — AI Judge (advisory verdict; anchors + optional local RAG)
 - `GET  /api/agi/homo-vs-ai/tasks` — discovery
+- `GET  /api/agi/homo-vs-ai/istqb-rag-status` — PDF/chunk counts and retriever mode (for demos with local LM)
 
-Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (including `IstqbBadge` component)
+Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (including `IstqbBadge`, **`IstqbRagHint`**, feedback textarea + **Re-run with feedback**)
 Tab wiring: `frontend/src/pages/help/AgiProgressPage.jsx`
 Sidebar wiring: `frontend/src/Sidebar.jsx` (top-level `agi-progress` entry, group `developer`, icon `bar-chart`)
-i18n: top-level `homoVsAi.*` block in EN/NO (router, judge, future, **istqb** sub-blocks), plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`
+i18n: top-level `homoVsAi.*` block in **EN, NO, and ES** `common.json` (router, judge, scoreboard, future, **istqb**, demos.feedback*), plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`
 
 > **Running this at SOCO?** A full presenter checklist (pre-flight, 45-minute run order, what to do if the AI connection drops, post-workshop export) lives in [`docs/README_FULL.md` → Tab 4 → *How to run this in a live workshop*](docs/README_FULL.md#tab-4--homo-sapiens-vs-ki-i-test-soco-workshop-companion).
 
