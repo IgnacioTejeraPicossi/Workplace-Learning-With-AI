@@ -56,11 +56,18 @@ export function enrichBenefits(benefits) {
 // 'scenarios' | 'risk' | 'ambiguities' | 'exploratory' | 'followups' |
 // 'automation' | 'testData' | 'oracle' | 'triage' | 'accessibility'
 // (legacy 'tests_from_code' is still accepted by the backend for backward compat)
-export async function runTestingChallenge({ task, input, language }) {
+export async function runTestingChallenge({ task, input, language, previousAiOutput, feedback }) {
+  const body = { task, input, language };
+  if (previousAiOutput != null && String(previousAiOutput).trim()) {
+    body.previous_ai_output = String(previousAiOutput).trim();
+  }
+  if (feedback != null && String(feedback).trim()) {
+    body.feedback = String(feedback).trim();
+  }
   const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/challenge`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ task, input, language }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     let detail = '';

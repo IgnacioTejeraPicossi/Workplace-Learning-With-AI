@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.8.0] - 2026-05-06
+
+### Added — Homo Sapiens vs. AI: ephemeral feedback re-run + local ISTQB RAG
+
+**Ephemeral “Re-run with feedback” (former Future improvement · Option B)**
+
+- `POST /api/agi/homo-vs-ai/challenge` accepts optional paired fields `previous_ai_output` and `feedback`. When both are set, a one-shot block is appended to the system message so the model revises its answer; core `TASK_SPECS` prompts are unchanged (no drift between rounds).
+- Workshop UI: each live round has a textarea + **Re-run with feedback** under the vote bar (`HomoSapiensVsAI.jsx`).
+
+**Hybrid local-only ISTQB RAG (former Future improvement · Option C)**
+
+- New `backend/services/istqb_local_rag.py`: when `x-api-provider` is `itemai` or `itemserverai`, BM25 (`rank-bm25`) retrieves windowed text chunks from `docs-ISTQB/*.pdf` (pypdf) and appends excerpts to the system prompt for **challenge**, **route**, and **judge**. Cloud providers still get only curated JSON anchors.
+- Responses include `istqb_rag: { mode, chunks_used, sources, caveat }`.
+- `GET /api/agi/homo-vs-ai/istqb-rag-status` — PDF count, indexed chunk count, whether the request provider is RAG-eligible.
+
+**Docs / i18n**
+
+- “Future improvements” footnote updated (EN/NO/ES) to mark B+C as shipped; Option C persistent prompt evolution remains documented but not implemented.
+
+---
+
 ## [1.7.1] - 2026-04-14
 
 ### Added — ISTQB-anchored prompts (Homo Sapiens vs. KI i Test)

@@ -31,6 +31,52 @@ import { judgeTestingRound, routeTestingProblem, runTestingChallenge } from '../
 // projector, never as the main content.
 // ---------------------------------------------------------------------------
 
+function IstqbRagHint({ rag, t }) {
+  if (!rag || typeof rag !== 'object') return null;
+  if (rag.mode === 'local_rag') {
+    const src = Array.isArray(rag.sources) && rag.sources.length
+      ? rag.sources.slice(0, 4).join(' · ')
+      : '';
+    return (
+      <div style={{
+        marginTop: 6,
+        fontSize: 11,
+        color: '#0f766e',
+        lineHeight: 1.45,
+        padding: '6px 8px',
+        background: '#ecfdf5',
+        border: '1px solid #a7f3d0',
+        borderRadius: 6,
+      }}>
+        <strong style={{ fontWeight: 700 }}>📎 {t('homoVsAi.istqb.ragActive', { defaultValue: 'Local ISTQB PDF RAG' })}</strong>
+        {rag.chunks_used != null && (
+          <span style={{ color: '#047857' }}>{' '}({rag.chunks_used} {t('homoVsAi.istqb.ragChunks', { defaultValue: 'excerpts' })})</span>
+        )}
+        {src ? <div style={{ marginTop: 4, color: '#115e59', fontSize: 10 }}>{src}</div> : null}
+      </div>
+    );
+  }
+  if (rag.mode === 'local_rag_unavailable') {
+    return (
+      <div style={{
+        marginTop: 6,
+        fontSize: 11,
+        color: '#92400e',
+        lineHeight: 1.45,
+        padding: '6px 8px',
+        background: '#fffbeb',
+        border: '1px solid #fcd34d',
+        borderRadius: 6,
+      }}>
+        {t('homoVsAi.istqb.ragUnavailable', {
+          defaultValue: 'Local LLM selected, but no ISTQB PDF index was built — add PDFs under docs-ISTQB/ or check backend logs.',
+        })}
+      </div>
+    );
+  }
+  return null;
+}
+
 function IstqbBadge({ anchors, t }) {
   const [open, setOpen] = useState(false);
   if (!Array.isArray(anchors) || anchors.length === 0) return null;
@@ -384,6 +430,10 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   // Empty until the tester runs the AI once; persists across the same task so
   // the badge stays visible as long as the AI answer is shown.
   const [istqbAnchors, setIstqbAnchors] = useState([]);
+  // Local PDF RAG metadata (only when ItemAI / ItemServerAI + docs-ISTQB PDFs).
+  const [istqbRag, setIstqbRag] = useState(null);
+  // Ephemeral human feedback for "Re-run with feedback" (Option B).
+  const [feedbackText, setFeedbackText] = useState('');
 
   // Follow i18n language changes: if the user switches EN<->NO, refresh the
   // human panel with the new locale copy as long as they have not edited it.
@@ -403,22 +453,38 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
       setAiOutput('');
       setErr(null);
       setElapsed(null);
+      setIstqbRag(null);
+      setFeedbackText('');
     }
   }, [incomingInput]);
 
-  const run = async () => {
-    setLoading(true); setErr(null); setAiOutput(''); setElapsed(null);
+  const run = async ({ rerun = false } = {}) => {
+    if (rerun) {
+      if (!feedbackText.trim() || !aiOutput.trim()) return;
+    } else {
+      setAiOutput('');
+    }
+    setLoading(true);
+    setErr(null);
+    setIstqbRag(null);
+    if (!rerun) setElapsed(null);
     // Stale judge result would refer to the previous AI output — clear it.
-    setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
+    setJudgeResult(null);
+    setJudgeErr(null);
+    setJudgeElapsed(null);
     const t0 = performance.now();
+    const snapshotPrev = aiOutput;
     try {
       const res = await runTestingChallenge({
         task,
         input,
         language: i18n?.language?.startsWith('no') ? 'no' : 'en',
+        ...(rerun ? { previousAiOutput: snapshotPrev, feedback: feedbackText.trim() } : {}),
       });
       setAiOutput(res.output || '(empty)');
       setIstqbAnchors(Array.isArray(res.istqb_anchors) ? res.istqb_anchors : []);
+      setIstqbRag(res.istqb_rag || null);
+      if (rerun) setFeedbackText('');
     } catch (e) {
       setErr(String(e.message || e));
     } finally {
@@ -457,6 +523,8 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
     setInput(sample); setAiOutput(''); setErr(null); setElapsed(null);
     setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
     setIstqbAnchors([]);
+    setIstqbRag(null);
+    setFeedbackText('');
   };
 
   return (
@@ -500,7 +568,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
           }}
         />
         <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-          <button onClick={run} disabled={loading || !input.trim()}
+          <button onClick={() => run({ rerun: false })} disabled={loading || !input.trim()}
             style={{
               background: loading ? '#93c5fd' : color, color: 'white', border: 'none',
               padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -637,6 +705,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
               : <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic' }}>
                   {t('homoVsAi.demos.aiPlaceholder', { defaultValue: 'Press "Run AI" to generate the answer live.' })}
                 </div>)}
+            <IstqbRagHint rag={istqbRag} t={t} />
           </div>
         </div>
       </div>
@@ -677,6 +746,70 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
           <VoteButton onClick={() => onVote({ task, winner: 'ai', aiJudge: judgeResult?.verdict || null })}      bg="#eff6ff" border="#93c5fd" color="#1d4ed8" icon="🤖" label={t('homoVsAi.verdict.ai', { defaultValue: 'AI' })} />
           <VoteButton onClick={() => onVote({ task, winner: 'tie', aiJudge: judgeResult?.verdict || null })}     bg="#f1f5f9" border="#cbd5e1" color="#334155" icon="🤝" label={t('homoVsAi.verdict.tie', { defaultValue: 'Tie' })} />
         </div>
+      </div>
+
+      {/* Ephemeral feedback re-run (Option B) — base prompts are unchanged; one-shot critique in system. */}
+      <div style={{
+        marginTop: 10,
+        padding: '10px 12px',
+        background: '#fafafa',
+        border: '1px solid #e2e8f0',
+        borderRadius: 8,
+      }}>
+        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block' }}>
+          {t('homoVsAi.demos.feedbackLabel', { defaultValue: 'Improvement notes for the AI (same round, ephemeral)' })}
+        </label>
+        <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+          {t('homoVsAi.demos.feedbackHelp', {
+            defaultValue: 'After a live answer, add concrete critique and press Re-run. The base task prompt is not modified — only this request gets the extra context.',
+          })}
+        </div>
+        <textarea
+          value={feedbackText}
+          onChange={e => setFeedbackText(e.target.value)}
+          rows={3}
+          disabled={loading}
+          placeholder={t('homoVsAi.demos.feedbackPlaceholder', {
+            defaultValue: 'e.g. "Add boundary cases for email; you missed negative testing."',
+          })}
+          style={{
+            width: '100%',
+            marginTop: 6,
+            padding: 8,
+            fontSize: 12,
+            border: '1px solid #cbd5e1',
+            borderRadius: 6,
+            boxSizing: 'border-box',
+            resize: 'vertical',
+            fontFamily: 'inherit',
+            lineHeight: 1.45,
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => run({ rerun: true })}
+          disabled={
+            loading || !input.trim() || !feedbackText.trim() || !aiOutput.trim()
+          }
+          style={{
+            marginTop: 8,
+            background: loading || !aiOutput.trim() || !feedbackText.trim()
+              ? '#e2e8f0'
+              : '#475569',
+            color: 'white',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 600,
+            cursor:
+              loading || !aiOutput.trim() || !feedbackText.trim()
+                ? 'not-allowed'
+                : 'pointer',
+          }}
+        >
+          🔁 {t('homoVsAi.demos.rerunWithFeedback', { defaultValue: 'Re-run with feedback' })}
+        </button>
       </div>
 
       {/* Judge error */}
@@ -800,6 +933,8 @@ function JudgeAdvisoryPanel({ t, result, elapsed }) {
           defaultValue: 'Note: an AI judge can favour AI-style answers (self-preference bias). This verdict is advisory — the scoreboard only counts your vote.',
         })}
       </div>
+
+      <IstqbRagHint rag={result.istqb_rag} t={t} />
 
       {result.raw && (
         <details style={{ marginTop: 8 }}>
@@ -1046,6 +1181,7 @@ function ProblemRouter({ t, i18n, onRouteApply, scrollTo }) {
           <div style={{ marginTop: 6, fontSize: 13, color: '#334155', lineHeight: 1.5 }}>
             {result.rationale}
           </div>
+          <IstqbRagHint rag={result.istqb_rag} t={t} />
           <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
             <button onClick={() => apply(result.recommended)}
               style={{
@@ -1520,6 +1656,17 @@ function FutureImprovementsNote({ t }) {
         <ul style={{ margin: '8px 0 0 18px', padding: 0, fontSize: 12, lineHeight: 1.6 }}>
           {list.map((idea, i) => (
             <li key={i} style={{ marginBottom: 8 }}>
+              {idea.status && (
+                <div style={{
+                  fontSize: 11,
+                  color: '#047857',
+                  fontWeight: 700,
+                  marginBottom: 4,
+                  letterSpacing: 0.3,
+                }}>
+                  {idea.status}
+                </div>
+              )}
               <strong style={{ color: '#334155' }}>{idea.title}</strong>
               {idea.summary && <span style={{ color: '#64748b' }}> — {idea.summary}</span>}
               {Array.isArray(idea.options) && idea.options.length > 0 && (

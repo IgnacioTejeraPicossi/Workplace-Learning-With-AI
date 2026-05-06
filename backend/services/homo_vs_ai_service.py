@@ -35,6 +35,7 @@ from backend.services.istqb_anchors import (
     anchors_summary_for_response,
     build_istqb_prompt_block,
 )
+from backend.services.istqb_local_rag import build_rag_context_block
 
 
 TASK_SPECS: Dict[str, Dict[str, str]] = {
@@ -242,10 +243,16 @@ async def run_challenge(
     user_input: str,
     language: Optional[str] = None,
     request_headers: Optional[Dict] = None,
-) -> Dict[str, str]:
+    previous_ai_output: Optional[str] = None,
+    human_feedback: Optional[str] = None,
+) -> Dict[str, Any]:
     """Run one of the four testing challenges through ask_ai_unified.
 
-    Returns {'task': ..., 'output': markdown_string, 'provider': 'unknown'}.
+    Optional ``previous_ai_output`` + ``human_feedback`` trigger an ephemeral
+    re-run: the base TASK_SPECS system prompt is unchanged, but a one-shot
+    block is appended so the model revises its answer from human critique.
+
+    Returns a dict including ``istqb_anchors`` and ``istqb_rag`` metadata.
     Raises ValueError on invalid task.
     """
     if task not in TASK_SPECS:
@@ -269,6 +276,26 @@ async def run_challenge(
     if istqb_block:
         system_prompt += "\n" + istqb_block
 
+    rag_query = ((user_input or "").strip() + "\n" + spec["label"]).strip()
+    rag_block, rag_meta = build_rag_context_block(request_headers, rag_query)
+    if rag_block:
+        system_prompt += "\n" + rag_block
+
+    fb = (human_feedback or "").strip()
+    prev_ai = (previous_ai_output or "").strip()
+    if fb and prev_ai:
+        system_prompt += (
+            "\n\nEPHEMERAL RE-RUN (this request only — do not carry forward as standing instructions):\n"
+            "A human reviewer read your previous answer and wrote improvement notes.\n"
+            "Produce a REVISED answer to the SAME testing task and the SAME user input below. "
+            "Address the feedback substantively; keep the expected style for this task "
+            "(markdown, priorities, structure). Do not apologise at length.\n\n"
+            "--- PREVIOUS AI ANSWER ---\n"
+            f"{prev_ai}\n\n"
+            "--- HUMAN IMPROVEMENT NOTES ---\n"
+            f"{fb}"
+        )
+
     user_prompt = spec["user_prefix"] + (user_input or "").strip()
 
     output = await ask_ai_unified(
@@ -287,6 +314,7 @@ async def run_challenge(
         "label": spec["label"],
         "output": (output or "").strip() or "(no response from AI)",
         "istqb_anchors": anchors_summary_for_response(kind="task", key=task),
+        "istqb_rag": rag_meta,
     }
 
 
@@ -540,6 +568,10 @@ async def route_problem(
     system_prompt = _router_system_prompt(language)
     user_prompt = "Problem to route:\n\n" + (problem or "").strip()
 
+    rag_block, rag_meta = build_rag_context_block(request_headers, (problem or "").strip())
+    if rag_block:
+        system_prompt += "\n" + rag_block
+
     output = await ask_ai_unified(
         prompt=user_prompt,
         messages=[
@@ -562,6 +594,7 @@ async def route_problem(
             "runner_ups": [],
             "raw": (output or "").strip() or None,
             "istqb_anchors": router_anchors,
+            "istqb_rag": rag_meta,
         }
 
     recommended = str(parsed.get("recommended", "")).strip()
@@ -572,6 +605,7 @@ async def route_problem(
             "runner_ups": [],
             "raw": (output or "").strip() or None,
             "istqb_anchors": router_anchors,
+            "istqb_rag": rag_meta,
         }
 
     rationale = str(parsed.get("rationale", "")).strip() or "(no rationale provided)"
@@ -595,6 +629,7 @@ async def route_problem(
         "runner_ups": runner_ups,
         "raw": None,
         "istqb_anchors": router_anchors,
+        "istqb_rag": rag_meta,
     }
 
 
@@ -771,6 +806,18 @@ async def judge_round(
     from backend.llm import ask_ai_unified
 
     system_prompt = _judge_system_prompt(task, language)
+    rag_query = "\n".join(
+        s
+        for s in (
+            (user_input or "").strip(),
+            TASK_SPECS[task].get("label", task),
+            (human_answer or "")[:1200],
+        )
+        if s
+    )
+    rag_block, rag_meta = build_rag_context_block(request_headers, rag_query)
+    if rag_block:
+        system_prompt += "\n" + rag_block
 
     # Build the user prompt. We DO include the original input because a
     # beautifully written answer to the wrong question should lose — the
@@ -813,6 +860,7 @@ async def judge_round(
             "criteria": {"accuracy": "", "coverage": "", "practical_value": ""},
             "raw": (output or "").strip() or None,
             "istqb_anchors": judge_anchors,
+            "istqb_rag": rag_meta,
         }
 
     if not parsed or not isinstance(parsed, dict):
@@ -844,4 +892,5 @@ async def judge_round(
         "criteria": criteria,
         "raw": None,
         "istqb_anchors": judge_anchors,
+        "istqb_rag": rag_meta,
     }

@@ -2782,6 +2782,10 @@
       "humanPlaceholder": "Trykk ✏️ Rediger for å skrive gruppens svar her.",
       "aiPlaceholder": "Trykk «Kjør KI» for å generere svaret live.",
       "votePrompt": "Hvem vant denne runden?",
+      "feedbackLabel": "Forbedringsnotater til KI-en (samme runde, efemer)",
+      "feedbackHelp": "Etter et live-svar: skriv konkret kritikk og trykk «Kjør på nytt». Basis-prompten for oppgaven endres ikke — bare denne forespørselen får ekstra kontekst.",
+      "feedbackPlaceholder": "f.eks. «Legg til grensetilfeller for e-post; du glemte negativ testing.»",
+      "rerunWithFeedback": "Kjør på nytt med tilbakemelding",
       "judge": {
         "kicker": "KI-dommer · veiledende",
         "button": "Spør KI om dom",
@@ -3001,10 +3005,11 @@
     },
     "future": {
       "kicker": "Framtidige forbedringer",
-      "lead": "Ideer som er bevisst parkert, ikke implementert — dokumentert her slik at neste iterasjon starter med kontekst, ikke et blankt ark.",
-      "tradeoffPrefix": "Hvorfor utsatt",
+      "lead": "Tidligere parkerte punkt (B + C under) er nå implementert. Alternativ A (anchors) og denne loggen er bevart for forvaltere.",
+      "tradeoffPrefix": "Hvorfor utsatt (historisk)",
       "ideas": [
         {
+          "status": "Levert · Alternativ B — Kjør på nytt med tilbakemelding (efemer; basis-promptene urørt).",
           "title": "Tilbakemeldingssløyfe per runde med selvforbedrende KI",
           "summary": "Et tekstfelt under «Hvem vant denne runden?» der mennesket skriver forbedringsforslag til KI-en. Tre design-varianter ble vurdert, med forskjellig risikoprofil:",
           "options": [
@@ -3021,11 +3026,12 @@
               "text": "Tilbakemeldingen driver et andre LLM-kall som foreslår en diff til oppgavens system-prompt. Et menneske godkjenner; prompten versjoneres i MongoDB med rollback. Påvirker alle framtidige runder."
             }
           ],
-          "tradeoff": "Alternativ C er den bokstavelige tolkningen av «KI forbedrer sin egen prompt», men uten et regresjonstest-rammeverk risikerer vi stille drift (en forbedring for én oppgave degraderer en annen som deler vokabular), og prompt-endringer midt i workshopen undergraver det sammenlignende oppsettet. Trygg sti når dette plukkes opp: start med A for å samle signaler, gå til B for selve live-demoen, og gradér kun til C når en regresjonspakke finnes for alle 10 oppgaver."
+          "tradeoff": "Alternativ C (vedvarende prompt-evolusjon i MongoDB) er fortsatt med vilje ikke implementert: uten regresjons­rammeverk risikerer vi stille drift. Samle rikere signal med den leverte «Kjør på nytt med tilbakemelding» før dere prøver vedvarende diffs."
         },
         {
+          "status": "Levert · Alternativ C — Lokal PDF-RAG når API-leverandør er ItemAI / ItemServerAI (BM25 over docs-ISTQB/). Sky-leverandører beholder kun håndplukkede anchors.",
           "title": "Full ISTQB RAG-pipeline (den «skikkelige» integrasjonen)",
-          "summary": "I dag bruker modulen alternativ A under (håndplukkede anchors skrevet av forvalteren). En ordentlig retrieval-augmented generation-pipeline over de fullstendige ISTQB-pensumene ville la KI-en sitere pensum ordrett med sidetall. Tre design-alternativer ble vurdert:",
+          "summary": "I tillegg til alternativ A (håndplukkede anchors) bruker vi nå BM25 mot PDF-er i docs-ISTQB/ når UI velger lokal LM Studio-sti. OpenAI/OpenRouter får fortsatt bare det lille JSON-ankeret. Tre design-alternativer ble vurdert:",
           "options": [
             {
               "label": "A · Håndplukkede anchors (levert)",
@@ -3037,10 +3043,10 @@
             },
             {
               "label": "C · Hybrid lokal-kun RAG (anbefalt vei videre)",
-              "text": "Kjør full RAG kun når aktiv LLM-leverandør er lokal (LM Studio / Ollama / Llama.cpp), slik at ISTQB-tekst holdes inne på utviklermaskinen. Fall automatisk tilbake til alternativ A når en sky-leverandør (OpenAI, OpenRouter, ItemAI) er valgt. Det beste fra begge verdener: compliance-trygt som standard, rik retrieval når testeren er on-prem."
+              "text": "Kjør gjenfinning bare når aktiv LLM-leverandør er lokal (ItemAI / ItemServerAI → LM Studio). Ordrette PDF-utdrag legges ved via BM25 over docs-ISTQB/. OpenAI / OpenRouter får kun alternativ A. Hvis LM Studio er nede og systemet faller tilbake til sky, kan utdragene forlate nettet ditt — hold lokale kall stabile for streng on-prem."
             }
           ],
-          "tradeoff": "Å bygge en full RAG-pipeline to dager før en live workshop er høy risiko (PDF-ekstraksjon er skjør, vektor-lagre legger til bevegelige deler, og feil under SOCO-demoen svekker troverdigheten). Alternativ A fanger ~70 % av undervisningsverdien til ~5 % av byggekostnaden, og JSON-en er revisjonsbar. Trygg sti: lever alternativ A nå, legg til alternativ C etter workshopen ved å betinge det på leverandør-innstillingen."
+          "tradeoff": "Implementert som BM25 + vinduvisning av PDF-tekst (ingen sky-embeddings, ingen ekstra vektor-DB). Embedding-basert RAG kan komme senere; nåværende design prioriterer færre bevegelige deler og en deterministisk indeks."
         }
       ]
     },
@@ -3048,7 +3054,10 @@
       "badge": "ISTQB-forankret",
       "tooltip": "Prompten er forankret i ISTQB-pensum. Klikk for å se hvilke seksjoner som ble brukt.",
       "title": "Pensum-seksjonene denne prompten er forankret i",
-      "footnote": "ISTQB-pensum refereres som håndplukkede korte sammendrag (forfatterens notater). Full-tekstbruk er utsatt — se «Framtidige forbedringer» nederst i denne fanen."
+      "ragActive": "Lokal ISTQB-PDF-RAG",
+      "ragChunks": "utdrag",
+      "ragUnavailable": "Lokal KI valgt, men ingen ISTQB-PDF-indeks ble bygd — legg PDF-er i docs-ISTQB/ i prosjektroten og start backend på nytt.",
+      "footnote": "Håndplukkede anchors (JSON) gjelder for alle leverandører. Når API-innstilling er ItemAI/ItemServerAI, kan ordrette utdrag hentes fra lokale docs-ISTQB/-PDF-er — se grønt hint under output."
     }
   }
 }

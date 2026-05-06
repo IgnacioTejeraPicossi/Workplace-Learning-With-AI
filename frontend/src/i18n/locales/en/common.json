@@ -1881,6 +1881,10 @@
       "humanPlaceholder": "Click ✏️ Edit to write the group's answer here.",
       "aiPlaceholder": "Press 'Run AI' to generate the answer live.",
       "votePrompt": "Who won this round?",
+      "feedbackLabel": "Improvement notes for the AI (same round, ephemeral)",
+      "feedbackHelp": "After a live answer, add concrete critique and press Re-run. The base task prompt is not modified — only this request gets the extra context.",
+      "feedbackPlaceholder": "e.g. \"Add boundary cases for email; you missed negative testing.\"",
+      "rerunWithFeedback": "Re-run with feedback",
       "judge": {
         "kicker": "AI judge · advisory",
         "button": "Ask AI to judge",
@@ -2100,10 +2104,11 @@
     },
     "future": {
       "kicker": "Future improvements",
-      "lead": "Ideas deliberately parked, not implemented — documented here so the next iteration starts with context, not a blank page.",
-      "tradeoffPrefix": "Why deferred",
+      "lead": "Previously parked items (B + C below) are now implemented. Option A anchors + this changelog remain for maintainers.",
+      "tradeoffPrefix": "Why deferred (historical)",
       "ideas": [
         {
+          "status": "Shipped · Option B — Re-run with feedback (ephemeral; base prompts unchanged).",
           "title": "Per-round feedback loop with AI self-improvement",
           "summary": "A textarea under 'Who won this round?' where the human writes improvement advice for the AI. Three design flavours were considered, with different risk profiles:",
           "options": [
@@ -2120,11 +2125,12 @@
               "text": "Feedback drives a second LLM call that proposes a diff to the task's system prompt. A human approves; the prompt is versioned in MongoDB with rollback. Affects all future rounds."
             }
           ],
-          "tradeoff": "Option C is the literal interpretation of 'the AI improves its own prompt', but without a regression test harness it risks silent drift (an improvement for one task degrades another that shares vocabulary), and mid-workshop prompt changes undermine the comparative setup. Safe path when picking this up: start with A to collect signal, move to B for the live-demo slot, and only graduate to C once a regression suite exists for all 10 tasks."
+          "tradeoff": "Option C (persistent prompt evolution in MongoDB) remains deliberately unimplemented: without a regression harness it risks silent drift. Collect richer signal with the shipped 'Re-run with feedback' before attempting persistent diffs."
         },
         {
+          "status": "Shipped · Option C — Local-only PDF RAG when API provider is ItemAI / ItemServerAI (BM25 over docs-ISTQB/). Cloud providers stay on curated anchors.",
           "title": "Full ISTQB RAG pipeline (the 'real' integration)",
-          "summary": "Today the module uses Option A below (curated anchors authored by the maintainer). A proper retrieval-augmented generation pipeline over the full ISTQB syllabi would let the AI quote syllabi verbatim with page numbers. Three design options were considered:",
+          "summary": "Alongside Option A (curated anchors), a BM25 retriever over PDFs in docs-ISTQB/ now augments prompts when the UI selects a local LM Studio path. Cloud/OpenAI/OpenRouter still receive only the small anchor JSON. Three design options were considered:",
           "options": [
             {
               "label": "A · Curated anchors (shipped)",
@@ -2136,10 +2142,10 @@
             },
             {
               "label": "C · Hybrid local-only RAG (recommended path forward)",
-              "text": "Run full RAG only when the active LLM provider is local (LM Studio / Ollama / Llama.cpp), keeping ISTQB text inside the developer machine. Fall back to Option A automatically when a cloud provider (OpenAI, OpenRouter, ItemAI) is selected. Best of both worlds: compliance-safe by default, rich retrieval when the tester is on-prem."
+              "text": "Run retrieval only when the active LLM provider is local (ItemAI / ItemServerAI → LM Studio). Verbatim PDF excerpts are appended via BM25 over docs-ISTQB/. OpenAI / OpenRouter stay on Option A only. If LM Studio is down and the stack falls back to cloud, those excerpts could leave your network — keep local inference up for strict on-prem."
             }
           ],
-          "tradeoff": "Building a full RAG pipeline two days before a live workshop is high-risk (PDF extraction is fragile, vector stores add moving parts, and any failure during the SOCO demo hurts credibility). Option A captures ~70% of the teaching value at ~5% of the build cost, and the JSON is auditable. Safe path: ship Option A now, add Option C post-workshop by gating it on the provider setting."
+          "tradeoff": "Implemented as BM25 + windowed PDF text (no cloud embeddings, no extra vector DB). Embedding-based RAG remains a possible upgrade; the current design favours fewer moving parts and a deterministic offline index."
         }
       ]
     },
@@ -2147,7 +2153,10 @@
       "badge": "ISTQB-anchored",
       "tooltip": "Prompt anchored in ISTQB syllabi. Click to see the sections used.",
       "title": "Syllabi sections this prompt is anchored in",
-      "footnote": "ISTQB syllabi are referenced as curated short summaries (author's notes). Full-text use is deferred — see Future improvements at the bottom of this tab."
+      "ragActive": "Local ISTQB PDF RAG",
+      "ragChunks": "excerpts",
+      "ragUnavailable": "Local LLM selected, but no ISTQB PDF index was built — add PDFs under docs-ISTQB/ at the repo root and restart the backend.",
+      "footnote": "Curated anchors (JSON) apply for every provider. When API Config is set to ItemAI/ItemServerAI, additional verbatim excerpts may be retrieved from your local docs-ISTQB/ PDFs — see the green hint under outputs."
     }
   }
 }

@@ -19,6 +19,7 @@ from backend.services.homo_vs_ai_service import (
     route_problem,
     run_challenge,
 )
+from backend.services.istqb_local_rag import istqb_rag_index_stats
 
 router = APIRouter(prefix="/api/agi/homo-vs-ai", tags=["Homo vs AI Testing"])
 
@@ -55,6 +56,28 @@ class ChallengeRequest(BaseModel):
         default=None,
         description="Optional hint: 'en' or 'no'. If omitted, the model answers in the same language as the input.",
     )
+    previous_ai_output: Optional[str] = Field(
+        default=None,
+        max_length=120_000,
+        description="For ephemeral re-run only: the AI's previous answer in this round.",
+    )
+    feedback: Optional[str] = Field(
+        default=None,
+        max_length=12_000,
+        description="For ephemeral re-run only: human improvement notes for the model (paired with previous_ai_output).",
+    )
+
+
+class IstqbRagMeta(BaseModel):
+    """Metadata for optional local-only ISTQB PDF retrieval (BM25 over docs-ISTQB/)."""
+
+    mode: Literal["anchors_only", "local_rag", "local_rag_unavailable"] = Field(
+        default="anchors_only",
+        description="anchors_only = cloud provider or no RAG block; local_rag = excerpts injected; local_rag_unavailable = local provider but no PDF index.",
+    )
+    chunks_used: int = Field(default=0, ge=0)
+    sources: List[str] = Field(default_factory=list, description="e.g. 'ISTQB_CTFL_Syllabus-v4.0.pdf p.12'")
+    caveat: Optional[str] = Field(default=None, description="Licensing / fallback warning when relevant.")
 
 
 class IstqbAnchor(BaseModel):
@@ -76,6 +99,10 @@ class ChallengeResponse(BaseModel):
     istqb_anchors: List[IstqbAnchor] = Field(
         default_factory=list,
         description="ISTQB syllabi sections that anchored the prompt for this task (may be empty if the anchors JSON is missing).",
+    )
+    istqb_rag: IstqbRagMeta = Field(
+        default_factory=IstqbRagMeta,
+        description="Whether local PDF excerpts were retrieved (only when API provider is ItemAI/ItemServerAI).",
     )
 
 
@@ -104,6 +131,7 @@ class RouteResponse(BaseModel):
         default_factory=list,
         description="ISTQB syllabi sections that anchored the router prompt.",
     )
+    istqb_rag: IstqbRagMeta = Field(default_factory=IstqbRagMeta)
 
 
 @router.get("/tasks")
@@ -112,15 +140,35 @@ async def list_tasks():
     return {k: v["label"] for k, v in TASK_SPECS.items()}
 
 
+@router.get("/istqb-rag-status")
+async def istqb_rag_status(request: Request):
+    """Whether PDFs under docs-ISTQB/ are indexed (for workshop demos with local LLM)."""
+    hdrs = _collect_llm_headers(request)
+    stats = istqb_rag_index_stats()
+    prov = (hdrs.get("x-api-provider") or "").lower() or None
+    stats["provider_header"] = prov
+    stats["local_rag_eligible_provider"] = prov in ("itemai", "itemserverai")
+    return stats
+
+
 @router.post("/challenge", response_model=ChallengeResponse)
 async def run_challenge_endpoint(body: ChallengeRequest, request: Request):
     hdrs = _collect_llm_headers(request)
+    fb = (body.feedback or "").strip()
+    prev = (body.previous_ai_output or "").strip()
+    if bool(fb) != bool(prev):
+        raise HTTPException(
+            status_code=400,
+            detail="Ephemeral re-run requires both 'feedback' and 'previous_ai_output', or omit both.",
+        )
     try:
         result = await run_challenge(
             task=body.task,
             user_input=body.input,
             language=body.language,
             request_headers=hdrs,
+            previous_ai_output=prev if fb else None,
+            human_feedback=fb if prev else None,
         )
         return ChallengeResponse(**result)
     except ValueError as ve:
@@ -177,6 +225,7 @@ class JudgeResponse(BaseModel):
         default_factory=list,
         description="ISTQB syllabi sections that anchored the judge prompt (task-specific + judge-generic).",
     )
+    istqb_rag: IstqbRagMeta = Field(default_factory=IstqbRagMeta)
 
 
 @router.post("/judge", response_model=JudgeResponse)

@@ -759,6 +759,10 @@
       "humanPlaceholder": "Haz clic en ✏️ Editar para escribir la respuesta del grupo aquí.",
       "aiPlaceholder": "Pulsa 'Ejecutar IA' para generar la respuesta en vivo.",
       "votePrompt": "¿Quién ganó esta ronda?",
+      "feedbackLabel": "Notas de mejora para la IA (misma ronda, efímeras)",
+      "feedbackHelp": "Tras una respuesta en vivo, añade crítica concreta y pulsa Re-ejecutar. El prompt base de la tarea no cambia; solo esta petición recibe el contexto extra.",
+      "feedbackPlaceholder": "p. ej. «Añade casos límite para el correo; faltan pruebas negativas.»",
+      "rerunWithFeedback": "Re-ejecutar con retroalimentación",
       "judge": {
         "kicker": "Juez IA · consultivo",
         "button": "Pedir a la IA que juzgue",
@@ -978,10 +982,11 @@
     },
     "future": {
       "kicker": "Mejoras futuras",
-      "lead": "Ideas deliberadamente aparcadas, no implementadas — documentadas aquí para que la próxima iteración comience con contexto, no con una página en blanco.",
-      "tradeoffPrefix": "Por qué se aplazó",
+      "lead": "Los puntos antes aparcados (B + C abajo) ya están implementados. Las anclas A y esta nota siguen para quien mantenga el módulo.",
+      "tradeoffPrefix": "Por qué se aplazó (histórico)",
       "ideas": [
         {
+          "status": "Entregado · Opción B — Re-ejecutar con retroalimentación (efímero; prompts base intactos).",
           "title": "Bucle de retroalimentación por ronda con automejora de la IA",
           "summary": "Un área de texto bajo '¿Quién ganó esta ronda?' donde el humano escribe consejos de mejora para la IA. Se consideraron tres variantes de diseño, con diferentes perfiles de riesgo:",
           "options": [
@@ -998,11 +1003,12 @@
               "text": "La retroalimentación impulsa una segunda llamada LLM que propone una diferencia en el prompt del sistema de la tarea. Un humano lo aprueba; el prompt se versiona en MongoDB con rollback. Afecta a todas las rondas futuras."
             }
           ],
-          "tradeoff": "La opción C es la interpretación literal de 'la IA mejora su propio prompt', pero sin un conjunto de pruebas de regresión puede provocar deriva silenciosa (una mejora para una tarea degrada otra que comparte vocabulario), y los cambios de prompt a mitad del taller socavan la configuración comparativa. Camino seguro al retomarlo: empezar con A para recopilar señales, pasar a B para la ranura de demostración en vivo, y solo graduarse a C una vez que exista un conjunto de regresión para las 10 tareas."
+          "tradeoff": "La opción C (evolución persistente del prompt en MongoDB) sigue sin implementar a propósito: sin batería de regresión hay riesgo de deriva silenciosa. Recopila mejor señal con el 'Re-ejecutar con retroalimentación' entregado antes de diffs persistentes."
         },
         {
+          "status": "Entregado · Opción C — RAG PDF solo local cuando el proveedor es ItemAI / ItemServerAI (BM25 sobre docs-ISTQB/). En la nube solo anclas curadas.",
           "title": "Pipeline RAG completo de ISTQB (la integración 'real')",
-          "summary": "Hoy el módulo usa la Opción A a continuación (anclas seleccionadas por el mantenedor). Un pipeline de generación aumentada por recuperación adecuado sobre los syllabi completos de ISTQB permitiría a la IA citar syllabi textualmente con números de página. Se consideraron tres opciones de diseño:",
+          "summary": "Junto a la opción A (anclas curadas), un recuperador BM25 sobre PDF en docs-ISTQB/ amplía los prompts cuando la UI usa LM Studio local. OpenAI/OpenRouter siguen con el JSON pequeño de anclas. Se consideraron tres opciones:",
           "options": [
             {
               "label": "A · Anclas seleccionadas (publicado)",
@@ -1014,10 +1020,10 @@
             },
             {
               "label": "C · RAG local híbrido (camino recomendado)",
-              "text": "Ejecutar el RAG completo solo cuando el proveedor de LLM activo es local (LM Studio / Ollama / Llama.cpp), manteniendo el texto de ISTQB dentro de la máquina del desarrollador. Volver a la Opción A automáticamente cuando se selecciona un proveedor en la nube (OpenAI, OpenRouter, ItemAI). Lo mejor de ambos mundos: compatible por defecto, recuperación rica cuando el tester está en las instalaciones."
+              "text": "Ejecutar recuperación solo cuando el proveedor activo es local (ItemAI / ItemServerAI → LM Studio). Se añaden extractos textuales del PDF mediante BM25 sobre docs-ISTQB/. OpenAI / OpenRouter solo reciben la opción A. Si LM Studio no responde y hay fallback a la nube, esos extractos podrían salir de tu red — mantén la inferencia local para cumplimiento estricto."
             }
           ],
-          "tradeoff": "Construir un pipeline RAG completo dos días antes de un taller en vivo es de alto riesgo (la extracción de PDF es frágil, los almacenes vectoriales añaden partes móviles, y cualquier fallo durante la demostración de SOCO daña la credibilidad). La opción A captura ~70% del valor pedagógico con ~5% del costo de construcción, y el JSON es auditable. Camino seguro: publicar la Opción A ahora, añadir la Opción C después del taller vinculándola a la configuración del proveedor."
+          "tradeoff": "Implementado como BM25 + ventanas de texto PDF (sin embeddings en la nube ni vector DB extra). Un RAG con embeddings sigue como posible mejora; este diseño prioriza pocas piezas móviles e índice determinista."
         }
       ]
     },
@@ -1025,7 +1031,10 @@
       "badge": "Anclado en ISTQB",
       "tooltip": "Prompt anclado en los syllabi de ISTQB. Haz clic para ver las secciones utilizadas.",
       "title": "Secciones de los syllabi en las que está anclado este prompt",
-      "footnote": "Los syllabi de ISTQB se referencian como resúmenes breves seleccionados (notas del autor). El uso del texto completo se aplaza — ver Mejoras futuras al final de esta pestaña."
+      "ragActive": "RAG PDF ISTQB local",
+      "ragChunks": "extractos",
+      "ragUnavailable": "IA local seleccionada, pero no se construyó índice PDF ISTQB — añade PDF en docs-ISTQB/ en la raíz del repo y reinicia el backend.",
+      "footnote": "Las anclas curadas (JSON) aplican a todos los proveedores. Con ItemAI/ItemServerAI en API Config, pueden recuperarse extractos de tus PDF locales en docs-ISTQB/ — ver la nota verde bajo la salida."
     }
   },
 
