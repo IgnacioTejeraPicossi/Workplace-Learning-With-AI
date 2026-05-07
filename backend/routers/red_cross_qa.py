@@ -31,6 +31,11 @@ try:
         create_ado_work_items,
         dispatch_to_outsystems,
         generate_sprint_report,
+        run_dpia_check,
+        verify_definition_of_done,
+        run_resilience_check,
+        generate_uat_support,
+        analyze_risk_matrix,
         list_runs,
         get_run,
         get_stats,
@@ -61,6 +66,11 @@ except ImportError:  # pragma: no cover
         create_ado_work_items,
         dispatch_to_outsystems,
         generate_sprint_report,
+        run_dpia_check,
+        verify_definition_of_done,
+        run_resilience_check,
+        generate_uat_support,
+        analyze_risk_matrix,
         list_runs,
         get_run,
         get_stats,
@@ -153,6 +163,39 @@ class AdoDispatchRequest(BaseModel):
 
 class SprintReportRequest(BaseModel):
     sprint_name: Optional[str] = None  # defaults to settings.current_sprint
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class DpiaRequest(BaseModel):
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class DodRequest(BaseModel):
+    sprint_name: Optional[str] = None
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class ResilienceRequest(BaseModel):
+    profile: str = "profileNormal"
+    scenarios: List[str] = Field(default_factory=list)
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class UatRequest(BaseModel):
+    scopes: List[str] = Field(default_factory=list)
+    stakeholders: List[str] = Field(default_factory=list)
+    sprint_name: Optional[str] = None
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class RiskMatrixRequest(BaseModel):
+    matrix_csv: Optional[str] = None
+    matrix_json: Optional[List[Dict[str, Any]]] = None
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -335,6 +378,43 @@ async def api_generate_sprint_report(body: SprintReportRequest):
         environment=env,
         lang=body.lang or "en",
     )
+
+
+# ── DPIA / Privacy by Design (Trine §6.1 + GDPR Art. 35) ──────────
+@router.post("/run-dpia-check")
+async def api_run_dpia(body: DpiaRequest):
+    env = _check_env(body.environment)
+    return await run_dpia_check(env, body.lang or "en")
+
+
+# ── Definition of Done verifier (Trine §6.1) ─────────────────────
+@router.post("/verify-definition-of-done")
+async def api_verify_dod(body: DodRequest):
+    env = _check_env(body.environment)
+    return await verify_definition_of_done(env, body.sprint_name, body.lang or "en")
+
+
+# ── Resilience / lasttest (separate from ytelse per Trine §6.1) ───
+@router.post("/run-resilience-check")
+async def api_run_resilience(body: ResilienceRequest):
+    env = _check_env(body.environment)
+    return await run_resilience_check(body.profile, body.scenarios, env, body.lang or "en")
+
+
+# ── UAT-støtte (Akseptansetest-støtte for Røde Kors-stakeholders) ─
+@router.post("/generate-uat-support")
+async def api_generate_uat(body: UatRequest):
+    env = _check_env(body.environment)
+    return await generate_uat_support(
+        body.scopes, body.stakeholders, body.sprint_name, env, body.lang or "en",
+    )
+
+
+# ── Risikomatrise-input (per Teststrategi §10) ────────────────────
+@router.post("/analyze-risk-matrix")
+async def api_analyze_risk_matrix(body: RiskMatrixRequest):
+    env = _check_env(body.environment)
+    return await analyze_risk_matrix(body.matrix_csv, body.matrix_json, env, body.lang or "en")
 
 
 # ── Runs / Stats / Settings ───────────────────────────────────────

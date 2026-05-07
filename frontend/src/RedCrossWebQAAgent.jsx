@@ -16,6 +16,8 @@ import StressTest from './red-cross-qa/StressTest';
 import SecurityPrivacy from './red-cross-qa/SecurityPrivacy';
 import AzureDevOps from './red-cross-qa/AzureDevOps';
 import SprintReport from './red-cross-qa/SprintReport';
+import UatSupport from './red-cross-qa/UatSupport';
+import RiskMatrix from './red-cross-qa/RiskMatrix';
 import Runs from './red-cross-qa/Runs';
 import Settings from './red-cross-qa/Settings';
 
@@ -52,6 +54,8 @@ const RedCrossWebQAAgent = () => {
     { id: 'security-privacy',  label: t('redCrossWebQaModule.tabSecurityPrivacy'),  icon: '🛡️' },
     { id: 'ado',               label: t('redCrossWebQaModule.tabAdo'),              icon: '🎯' },
     { id: 'sprint-report',     label: t('redCrossWebQaModule.tabSprintReport'),     icon: '📈' },
+    { id: 'uat-support',       label: t('redCrossWebQaModule.tabUatSupport'),       icon: '✅' },
+    { id: 'risk-matrix',       label: t('redCrossWebQaModule.tabRiskMatrix'),       icon: '🎲' },
     { id: 'runs',              label: t('redCrossWebQaModule.tabRuns'),             icon: '📜' },
     { id: 'settings',          label: t('redCrossWebQaModule.tabSettings'),         icon: '⚙️' },
   ];
@@ -76,6 +80,8 @@ const RedCrossWebQAAgent = () => {
       case 'security-privacy':  return <SecurityPrivacy {...sharedProps} />;
       case 'ado':               return <AzureDevOps {...sharedProps} />;
       case 'sprint-report':     return <SprintReport {...sharedProps} />;
+      case 'uat-support':       return <UatSupport {...sharedProps} />;
+      case 'risk-matrix':       return <RiskMatrix {...sharedProps} />;
       case 'runs':              return <Runs {...sharedProps} />;
       case 'settings':          return <Settings environment={environment} setEnvironment={setEnvironment} executionMode={executionMode} setExecutionMode={setExecutionMode} />;
       default:                  return <Dashboard {...sharedProps} onNavigate={setActiveTab} />;
@@ -127,7 +133,7 @@ const RedCrossWebQAAgent = () => {
         </div>
       </div>
 
-      {/* Tabs (horizontally scrollable for 13 entries) */}
+      {/* Tabs (horizontally scrollable for 20 entries) */}
       <div className="bg-white shadow-sm">
         <div className="px-8 overflow-x-auto">
           <nav className="-mb-px flex space-x-6 whitespace-nowrap">

@@ -308,6 +308,148 @@ Audit the migration scope provided and return ONLY valid JSON:
 Cover content types: Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje.
 """
 
+DPIA_PROMPT = """You are a senior privacy / GDPR engineer auditing rodekors.no for
+**innebygget personvern (Privacy by Design)** and DPIA (Data Protection Impact Assessment)
+readiness. Røde Kors processes sensitive volunteer data (health, criminal-record statements,
+crisis beneficiary data), so DPIA evidence is mandatory under GDPR Art. 35 + the Norwegian
+personopplysningsloven + Datatilsynet guidance.
+
+Return ONLY valid JSON:
+{
+  "dpia_score": 0-100,
+  "checks": {
+    "checkDataMapping":         {"status": "pass|warn|fail", "note": "..."},
+    "checkPurposeLimitation":   {"status": "pass|warn|fail", "note": "..."},
+    "checkLegalBasis":          {"status": "pass|warn|fail", "note": "..."},
+    "checkDataMinimization":    {"status": "pass|warn|fail", "note": "..."},
+    "checkRetentionPolicy":     {"status": "pass|warn|fail", "note": "..."},
+    "checkDeletionRoutines":    {"status": "pass|warn|fail", "note": "..."},
+    "checkConsentRecords":      {"status": "pass|warn|fail", "note": "..."},
+    "checkDataSubjectRights":   {"status": "pass|warn|fail", "note": "..."},
+    "checkProcessorRegister":   {"status": "pass|warn|fail", "note": "..."},
+    "checkCrossBorderTransfer": {"status": "pass|warn|fail", "note": "..."},
+    "checkBreachNotification":  {"status": "pass|warn|fail", "note": "..."},
+    "checkSensitiveCategories": {"status": "pass|warn|fail", "note": "..."}
+  },
+  "findings": [{
+    "severity": "low|medium|high|critical",
+    "severity_dev": 1, "category_ops": "A",
+    "title": "...", "message": "...", "fix_hint": "...",
+    "gdpr_article": "Art. 5 / 6 / 9 / 25 / 32 / 35 / ..."
+  }],
+  "data_register": [{
+    "system": "Enonic CMS|Fundy|Vipps|Dataverse|APIM|Okta|Logs",
+    "categories": "...", "purpose": "...", "legal_basis": "...",
+    "retention": "...", "processor": "..."
+  }],
+  "recommendations": [{"priority": "high|medium|low", "title": "...", "description": "..."}]
+}
+
+Røde Kors-specific risks to consider:
+- Volunteer health declarations (helseerklæring) — særlige kategorier (Art. 9)
+- Criminal-record statements (politiattest) — strengere krav
+- Beredskap / crisis-beneficiary data — særlige kategorier
+- Donor data (Fundy → Vipps) — finansiell informasjon
+- Frivillig-portrett / images — samtykke per frivillig
+"""
+
+DOD_VERIFIER_PROMPT = """You are a senior QA lead applying Trine Bruus Definition of Done
+(per Teststrategi 30.3 §6.1) mechanically across an Azure DevOps sprint backlog.
+
+Definition of Done required signals (per work item):
+  1. functionality_tested — at least one passing test artifact (run + status=pass)
+  2. integrations_verified — relevant integration suite (api/cms/forms/role) ran and passed
+  3. known_bugs_documented — open findings either marked as accepted (workaround) or fixed
+  4. ready_for_uat — no severity_dev≤2 / category_ops in {A, B} blockers remain
+
+Return ONLY valid JSON:
+{
+  "summary": {
+    "total_work_items": 0, "dod_pass": 0, "dod_partial": 0, "dod_fail": 0,
+    "blockers_open": 0, "ready_for_uat": true
+  },
+  "items": [{
+    "work_item_id": "...", "title": "...",
+    "checklist": {
+      "functionality_tested":   {"status": "pass|fail", "evidence": "run_id or note"},
+      "integrations_verified":  {"status": "pass|fail", "evidence": "..."},
+      "known_bugs_documented":  {"status": "pass|fail", "evidence": "..."},
+      "ready_for_uat":          {"status": "pass|fail", "evidence": "..."}
+    },
+    "dod_pass": true,
+    "blockers": [{"severity_dev": 1, "category_ops": "A", "title": "..."}]
+  }],
+  "narrative": "Brief Norwegian/English status summary for the sprint review."
+}
+"""
+
+UAT_SUPPORT_PROMPT = """You are a senior QA lead supporting Røde Kors's UAT (User Acceptance
+Testing) phase. Item Consulting does NOT execute UAT — Røde Kors does, "med støtte fra
+leverandør ved behov" (per Teststrategi 30.3 §5.4). Your job is to produce UAT-ready
+artifacts: step-by-step scripts, acceptance checklists, and sign-off forms for named
+Røde Kors stakeholders.
+
+Named stakeholders (per organisasjonskart 30.3):
+  - Hilde Forslund (Produkteier / Product Owner)
+  - Trine Røsand Scheen (Fagperson / Subject-matter expert)
+  - Astri Fretheim (Fagperson / Subject-matter expert)
+
+Return ONLY valid JSON:
+{
+  "uat_scripts": [{
+    "script_id": "UAT-001",
+    "title": "...",
+    "stakeholder": "Hilde Forslund | Trine Røsand Scheen | Astri Fretheim",
+    "scope": "donation|volunteer|cms-editorial|search|forms|...",
+    "preconditions": ["..."],
+    "steps": [{"n": 1, "action": "...", "expected": "..."}],
+    "acceptance_criteria": ["..."],
+    "estimated_minutes": 0,
+    "test_data": ["..."]
+  }],
+  "checklists": [{
+    "stakeholder": "...",
+    "items": [{"label": "...", "required": true, "status": "pending"}]
+  }],
+  "signoff_form": {
+    "sprint": "...",
+    "build_attestation": "SHA-256 from latest run",
+    "lines": [
+      {"role": "Produkteier", "name": "Hilde Forslund", "decision": "godkjent|ikke godkjent|godkjent med merknader", "comment": ""},
+      {"role": "Fagperson", "name": "Trine Røsand Scheen", "decision": "...", "comment": ""},
+      {"role": "Fagperson", "name": "Astri Fretheim", "decision": "...", "comment": ""}
+    ]
+  },
+  "support_notes": ["..."]
+}
+
+Norwegian language preferred for stakeholder-facing text. Keep technical identifiers
+(work_item_id, run_id) in English.
+"""
+
+RISK_MATRIX_PROMPT = """You are a senior QA risk analyst mapping Røde Kors's risikomatrise
+(maintained outside Teststrategi 30.3 per §10) to the agent's 17 test suites. Given a
+list of risks (id, description, probability 1-5, impact 1-5, area), produce a justified
+test-priority recommendation.
+
+Return ONLY valid JSON:
+{
+  "risk_count": 0,
+  "high_risks": [{"id": "...", "description": "...", "score": 0, "level": "critical|high|medium|low"}],
+  "suite_priority": [{
+    "suite": "accessibility|performance|api|security|cms|seo|forms|stress|migration|designsystemet|role-matrix|dpia|uat",
+    "priority": 1,
+    "rationale": "...",
+    "linked_risks": ["risk_id_1", "risk_id_2"]
+  }],
+  "coverage_gaps": [{"risk_id": "...", "reason": "no suite covers this", "suggestion": "..."}],
+  "summary_narrative": "..."
+}
+
+Score formula: score = probability × impact (1-25). Levels: ≥15 critical, ≥9 high,
+≥4 medium, else low. Sort suite_priority by max linked-risk score descending.
+"""
+
 
 # ═══════════════════════════════════════════════════════════════════
 # Helpers
@@ -1451,6 +1593,658 @@ Keep under 300 words."""
 
     report.pop("_id", None)
     return {"status": "ok", "report": report}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 12 — DPIA / Privacy by Design (Trine Teststrategi §6.1 + GDPR Art. 35)
+# ═══════════════════════════════════════════════════════════════════
+async def run_dpia_check(environment: str, lang: str = "en") -> Dict[str, Any]:
+    """DPIA / innebygget personvern audit — sub-checklist that complements
+    the basic Security & Privacy scan with GDPR Art. 35 evidence Røde Kors needs
+    for sensitive volunteer / beredskap / donor data."""
+    prompt = (
+        f"Environment: {environment}\n"
+        "Audit rodekors.no for Privacy-by-Design and DPIA readiness.\n"
+        "Return the JSON contract."
+    )
+    raw = await _llm(prompt, DPIA_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    checks = parsed.get("checks") or {
+        "checkDataMapping":         {"status": "warn", "note": "Data flow inventory exists but missing Fundy + Vipps subprocessor flows"},
+        "checkPurposeLimitation":   {"status": "pass", "note": "Donor data not reused for marketing without separate opt-in"},
+        "checkLegalBasis":          {"status": "pass", "note": "Art. 6(1)(a) consent for donations; Art. 6(1)(f) legitimate interest for volunteers"},
+        "checkDataMinimization":    {"status": "warn", "note": "Volunteer signup collects birth date — verify if needed"},
+        "checkRetentionPolicy":     {"status": "warn", "note": "Application logs retained 90d — verify donor data not in logs"},
+        "checkDeletionRoutines":    {"status": "fail", "note": "No automated deletion routine for inactive volunteer accounts (>3 yr)"},
+        "checkConsentRecords":      {"status": "warn", "note": "Consent timestamps stored but not the consent text version"},
+        "checkDataSubjectRights":   {"status": "warn", "note": "Innsyn / sletting / retting flow is manual via personvern@rodekors.no"},
+        "checkProcessorRegister":   {"status": "warn", "note": "DPA register has Vipps + Dataverse but Fundy DPA not yet linked"},
+        "checkCrossBorderTransfer": {"status": "pass", "note": "All processors EU-region; Microsoft Dynamics on EU tenant"},
+        "checkBreachNotification":  {"status": "pass", "note": "72h breach process documented; on-call rotation exists"},
+        "checkSensitiveCategories": {"status": "fail", "note": "Helseerklæring (helsestatus) field stored in plain Dataverse column — Art. 9 requires extra protection"},
+    }
+
+    findings = parsed.get("findings") or [
+        {
+            "severity": "high", "severity_dev": _severity_dev("high"), "category_ops": _category_ops("high"),
+            "title": "Helseerklæring stored without Art. 9 safeguards",
+            "message": "Sensitive health-status field on volunteer profile lacks field-level encryption/RBAC.",
+            "fix_hint": "Move to encrypted column-set; restrict to HR-rolle in Dataverse.",
+            "gdpr_article": "Art. 9",
+        },
+        {
+            "severity": "high", "severity_dev": _severity_dev("high"), "category_ops": _category_ops("high"),
+            "title": "No automated retention/deletion for inactive volunteers",
+            "message": "Volunteers inactive >3 years remain in Dataverse indefinitely.",
+            "fix_hint": "Add scheduled job to anonymize/delete after retention period.",
+            "gdpr_article": "Art. 5(1)(e)",
+        },
+        {
+            "severity": "medium", "severity_dev": _severity_dev("medium"), "category_ops": _category_ops("medium"),
+            "title": "Fundy DPA not in processor register",
+            "message": "Fundy is a sub-processor handling donor data but DPA is not linked in the personvernerklæring.",
+            "fix_hint": "Sign DPA with Fundy and add to register; update personvernerklæring.",
+            "gdpr_article": "Art. 28 + Art. 30",
+        },
+    ]
+
+    data_register = parsed.get("data_register") or [
+        {"system": "Enonic CMS", "categories": "Editorial content (no PII)", "purpose": "Content delivery",
+         "legal_basis": "n/a", "retention": "n/a", "processor": "Enonic AS"},
+        {"system": "Fundy", "categories": "Donor name, email, phone, amount",
+         "purpose": "Donation processing", "legal_basis": "Art. 6(1)(b) contract",
+         "retention": "7 yr (bokføringsloven)", "processor": "Fundy AS"},
+        {"system": "Vipps", "categories": "Donor identity, payment",
+         "purpose": "Payment handoff", "legal_basis": "Art. 6(1)(b)",
+         "retention": "10 yr finance", "processor": "Vipps Mobilepay AS"},
+        {"system": "Microsoft Dataverse", "categories": "Volunteer data incl. helseerklæring + politiattest",
+         "purpose": "Volunteer management", "legal_basis": "Art. 6(1)(f) + Art. 9(2)(d)",
+         "retention": "3 yr inactive then anonymize", "processor": "Microsoft Ireland"},
+        {"system": "Okta", "categories": "Auth, IP, device",
+         "purpose": "Identity & access", "legal_basis": "Art. 6(1)(f)",
+         "retention": "13 mnd auth logs", "processor": "Okta EMEA"},
+    ]
+
+    recommendations = parsed.get("recommendations") or [
+        {"priority": "high", "title": "Encrypt helseerklæring + politiattest at field level",
+         "description": "Use Dataverse column-level encryption + restrict view to HR rolle."},
+        {"priority": "high", "title": "Automate volunteer-data retention/deletion",
+         "description": "Schedule monthly job: inactive >3yr → anonymize PII, keep aggregate stats."},
+        {"priority": "medium", "title": "Link Fundy DPA in processor register",
+         "description": "Update personvernerklæring with Fundy DPA reference + sub-processor list."},
+    ]
+
+    score = parsed.get("dpia_score")
+    if not isinstance(score, (int, float)):
+        # Compute from check statuses: pass=1.0, warn=0.5, fail=0
+        weights = {"pass": 1.0, "warn": 0.5, "fail": 0.0}
+        vals = [weights.get((c or {}).get("status", "warn"), 0.5) for c in checks.values()]
+        score = round(100 * sum(vals) / max(len(vals), 1))
+
+    overall_status = "pass" if score >= 85 else ("warn" if score >= 60 else "fail")
+
+    run = await _store_run("redcross-security-basic", environment, overall_status,
+                           f"DPIA / Privacy by Design — score {score}/100",
+                           {"checks": checks, "findings": findings,
+                            "dpia_score": score})
+    return {
+        "status": "ok",
+        "dpia_score": score,
+        "overall_status": overall_status,
+        "checks": checks,
+        "findings": findings,
+        "data_register": data_register,
+        "recommendations": recommendations,
+        "run_id": run["run_id"],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 13 — Definition of Done verifier (Trine Teststrategi §6.1)
+# ═══════════════════════════════════════════════════════════════════
+async def verify_definition_of_done(environment: str,
+                                     sprint_name: Optional[str] = None,
+                                     lang: str = "en") -> Dict[str, Any]:
+    """Mechanical DoD verifier — aggregates recent runs/findings/dispatches and
+    checks each open work item against Trines four-point DoD checklist."""
+    # Aggregate runs from this sprint (limit recent)
+    recent_runs: List[Dict[str, Any]] = []
+    try:
+        cursor = red_cross_qa_runs_collection.find(
+            {"environment": environment}
+        ).sort("started_at", -1).limit(50)
+        async for r in cursor:
+            r.pop("_id", None)
+            recent_runs.append(r)
+    except Exception:
+        recent_runs = []
+
+    # Aggregate dispatches (work items)
+    dispatches: List[Dict[str, Any]] = []
+    try:
+        cursor = red_cross_qa_jira_dispatches_collection.find(
+            {"environment": environment}
+        ).sort("created_at", -1).limit(20)
+        async for d in cursor:
+            d.pop("_id", None)
+            dispatches.append(d)
+    except Exception:
+        dispatches = []
+
+    # Build work-item checklist (mock fallback if no dispatches yet)
+    work_items_input: List[Dict[str, Any]] = []
+    if dispatches:
+        for d in dispatches[:10]:
+            for wi in (d.get("work_items") or [])[:3]:
+                work_items_input.append({
+                    "work_item_id": wi.get("id") or wi.get("work_item_id") or "",
+                    "title": wi.get("title", ""),
+                    "severity_dev": wi.get("severity_dev"),
+                    "category_ops": wi.get("category_ops"),
+                })
+    if not work_items_input:
+        work_items_input = [
+            {"work_item_id": "ADO-1024", "title": "Donation flow Vipps handoff",
+             "severity_dev": 2, "category_ops": "B"},
+            {"work_item_id": "ADO-1025", "title": "Volunteer signup (axe-core fix)",
+             "severity_dev": 3, "category_ops": "C"},
+            {"work_item_id": "ADO-1026", "title": "Search page TTFB regression",
+             "severity_dev": 2, "category_ops": "B"},
+        ]
+
+    # Mechanical DoD check per work item
+    items: List[Dict[str, Any]] = []
+    for wi in work_items_input:
+        # functionality_tested → look for any pass run touching this WI's scope
+        has_pass = any(r.get("status") == "pass" for r in recent_runs)
+        # integrations_verified → look for api/cms/forms/role suite passing
+        has_integration = any(
+            r.get("status") == "pass" and any(
+                k in (r.get("suite") or "")
+                for k in ("api", "cms", "forms", "role")
+            ) for r in recent_runs
+        )
+        # known_bugs_documented → if there are findings, check they have severity_dev
+        bugs_docs = True
+        for r in recent_runs:
+            for f in (r.get("findings") or [])[:3]:
+                if not f.get("severity_dev") and not f.get("category_ops"):
+                    bugs_docs = False
+        # ready_for_uat → no severity_dev <= 2 / category_ops in {A,B}
+        ready = (wi.get("severity_dev") or 4) > 2 and (wi.get("category_ops") or "C") not in {"A", "B"}
+
+        checklist = {
+            "functionality_tested":  {"status": "pass" if has_pass else "fail",
+                                       "evidence": (recent_runs[0].get("run_id") if recent_runs else "no runs yet")},
+            "integrations_verified": {"status": "pass" if has_integration else "fail",
+                                       "evidence": "integration suite ran" if has_integration else "no api/cms/forms/role pass"},
+            "known_bugs_documented": {"status": "pass" if bugs_docs else "fail",
+                                       "evidence": "all findings carry severity_dev + category_ops" if bugs_docs else "missing Sev/Kat annotation"},
+            "ready_for_uat":         {"status": "pass" if ready else "fail",
+                                       "evidence": f"severity_dev={wi.get('severity_dev')}, category_ops={wi.get('category_ops')}"},
+        }
+        dod_pass = all(v["status"] == "pass" for v in checklist.values())
+        blockers = []
+        if not ready:
+            blockers.append({
+                "severity_dev": wi.get("severity_dev", 4),
+                "category_ops": wi.get("category_ops", "C"),
+                "title": wi.get("title", ""),
+            })
+        items.append({
+            "work_item_id": wi.get("work_item_id", ""),
+            "title": wi.get("title", ""),
+            "checklist": checklist,
+            "dod_pass": dod_pass,
+            "blockers": blockers,
+        })
+
+    summary = {
+        "total_work_items": len(items),
+        "dod_pass": sum(1 for i in items if i["dod_pass"]),
+        "dod_partial": sum(1 for i in items
+                           if not i["dod_pass"]
+                           and any(c["status"] == "pass" for c in i["checklist"].values())),
+        "dod_fail": sum(1 for i in items
+                        if all(c["status"] == "fail" for c in i["checklist"].values())),
+        "blockers_open": sum(len(i["blockers"]) for i in items),
+        "ready_for_uat": all(i["dod_pass"] for i in items) and len(items) > 0,
+    }
+
+    narrative = (
+        f"DoD-status for {sprint_name or 'gjeldende sprint'}: "
+        f"{summary['dod_pass']}/{summary['total_work_items']} work items oppfyller DoD. "
+        f"{summary['blockers_open']} åpne blokkere. "
+        f"{'Klar for UAT.' if summary['ready_for_uat'] else 'IKKE klar for UAT — fjern blokkere først.'}"
+    ) if (lang or "").startswith("no") else (
+        f"DoD status for {sprint_name or 'current sprint'}: "
+        f"{summary['dod_pass']}/{summary['total_work_items']} work items meet DoD. "
+        f"{summary['blockers_open']} open blockers. "
+        f"{'Ready for UAT.' if summary['ready_for_uat'] else 'NOT ready for UAT — clear blockers first.'}"
+    )
+
+    overall_status = "pass" if summary["ready_for_uat"] else ("warn" if summary["dod_pass"] > 0 else "fail")
+    run = await _store_run("redcross-release-readiness", environment, overall_status,
+                           f"DoD verification — {summary['dod_pass']}/{summary['total_work_items']}",
+                           {"summary": summary, "items": items})
+    return {
+        "status": "ok",
+        "summary": summary,
+        "items": items,
+        "narrative": narrative,
+        "run_id": run["run_id"],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 14 — Resilience / lasttest (Teststrategi §6.1 distinguishes ytelse vs. resilience)
+# ═══════════════════════════════════════════════════════════════════
+async def run_resilience_check(profile: str, scenarios: List[str],
+                                environment: str, lang: str = "en") -> Dict[str, Any]:
+    """Resilience-focused k6 wrapper — emphasizes breakpoint, recovery, and soak
+    metrics that Trine treats as a separate quality dimension from ytelse."""
+    # Reuse k6 mock results, but add resilience-specific metrics.
+    base = await run_k6(profile, scenarios, environment)
+    base_results = base.get("results") or {}
+
+    # Resilience-specific synthetic metrics (mock fallback)
+    breakpoint_vu = {
+        "profileSmoke": 100, "profileNormal": 500, "profileCampaign": 1500,
+        "profileCrisis": 3500, "profileSoak": 800,
+    }.get(profile, 1000)
+    recovery_seconds = {
+        "profileSmoke": 2, "profileNormal": 8, "profileCampaign": 22,
+        "profileCrisis": 65, "profileSoak": 18,
+    }.get(profile, 15)
+    error_rate_at_peak = {
+        "profileSmoke": 0.0, "profileNormal": 0.4, "profileCampaign": 1.8,
+        "profileCrisis": 6.5, "profileSoak": 0.9,
+    }.get(profile, 1.0)
+    memory_drift_pct = 1.2 if profile == "profileSoak" else 0.3
+
+    # Resilience score 0-100 — penalize high error rate + slow recovery + memory drift
+    score = 100
+    score -= min(40, int(error_rate_at_peak * 6))  # 1% err = -6 pts (cap -40)
+    score -= min(25, recovery_seconds // 3)        # 30s = -10 pts
+    score -= min(20, int(memory_drift_pct * 10))   # 1% drift = -10 pts
+    score = max(0, score)
+
+    overall_status = "pass" if score >= 80 else ("warn" if score >= 55 else "fail")
+
+    findings: List[Dict[str, Any]] = []
+    if error_rate_at_peak >= 5:
+        findings.append({
+            "severity": "high", "severity_dev": _severity_dev("high"), "category_ops": _category_ops("high"),
+            "title": "Error rate exceeds 5% at peak load",
+            "message": f"At {breakpoint_vu} VU the error rate reached {error_rate_at_peak}%.",
+            "fix_hint": "Add circuit breakers + autoscale APIM + tune Enonic publish queue.",
+        })
+    if recovery_seconds > 30:
+        findings.append({
+            "severity": "medium", "severity_dev": _severity_dev("medium"), "category_ops": _category_ops("medium"),
+            "title": "Slow recovery after peak",
+            "message": f"System took {recovery_seconds}s to return to baseline p95 after peak load.",
+            "fix_hint": "Pre-warm caches; add stage scaling buffer; verify ISR queue drain.",
+        })
+    if memory_drift_pct > 1.0:
+        findings.append({
+            "severity": "medium", "severity_dev": _severity_dev("medium"), "category_ops": _category_ops("medium"),
+            "title": "Memory drift detected during soak",
+            "message": f"Heap usage drifted +{memory_drift_pct}% over soak duration.",
+            "fix_hint": "Enable heap dumps; check leaks in Guillotine resolver caches.",
+        })
+
+    resilience = {
+        "resilience_score": score,
+        "overall_status": overall_status,
+        "breakpoint_vu": breakpoint_vu,
+        "recovery_seconds": recovery_seconds,
+        "error_rate_peak_pct": error_rate_at_peak,
+        "memory_drift_pct": memory_drift_pct,
+        "k6_results": base_results,
+        "scenarios_run": scenarios,
+        "profile": profile,
+        "findings": findings,
+        "_distinction": (
+            "Resilience handler om systemet *overlever* og *gjenoppretter*, "
+            "ikke kun hvor raskt det svarer (det er ytelse / Lighthouse)."
+        ) if (lang or "").startswith("no") else (
+            "Resilience is about whether the system *survives* and *recovers* — "
+            "not how fast it responds (that is performance / Lighthouse)."
+        ),
+    }
+
+    run = await _store_run("redcross-stress-campaign-peak", environment, overall_status,
+                           f"Resilience check — score {score}/100, breakpoint {breakpoint_vu} VU",
+                           resilience)
+    return {"status": "ok", "resilience": resilience, "run_id": run["run_id"]}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 15 — UAT-støtte (Akseptansetest-støtte for Røde Kors-stakeholders)
+# ═══════════════════════════════════════════════════════════════════
+DEFAULT_UAT_STAKEHOLDERS = ["Hilde Forslund", "Trine Røsand Scheen", "Astri Fretheim"]
+_UAT_ROLE_BY_NAME = {
+    "Hilde Forslund": "Produkteier",
+    "Trine Røsand Scheen": "Fagperson",
+    "Astri Fretheim": "Fagperson",
+}
+
+
+async def generate_uat_support(scopes: List[str], stakeholders: List[str],
+                                sprint_name: Optional[str], environment: str,
+                                lang: str = "en") -> Dict[str, Any]:
+    """Generate UAT scripts, stakeholder checklists and sign-off forms.
+    Item supports — Røde Kors executes."""
+    stakeholders = stakeholders or DEFAULT_UAT_STAKEHOLDERS
+    scopes = scopes or ["donation", "volunteer", "cms-editorial", "search"]
+    prompt = (
+        f"Sprint: {sprint_name or '(current)'}\n"
+        f"Scopes: {', '.join(scopes)}\n"
+        f"Stakeholders: {', '.join(stakeholders)}\n"
+        f"Environment: {environment}\n"
+        "Produce UAT artifacts."
+    )
+    raw = await _llm(prompt, UAT_SUPPORT_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    uat_scripts = parsed.get("uat_scripts") or [
+        {
+            "script_id": "UAT-001",
+            "title": "Donation flow — hyppig donor + nye produkter (Fundy → Vipps)",
+            "stakeholder": "Hilde Forslund",
+            "scope": "donation",
+            "preconditions": [
+                "Test-environment oppe", "Test-Vipps account klart",
+                "Fundy preset amounts: 100/250/500/1000 NOK",
+            ],
+            "steps": [
+                {"n": 1, "action": "Åpne rodekors.no/stott-oss",
+                 "expected": "Fundy-skjema rendres innen 2s, ingen blokkering"},
+                {"n": 2, "action": "Velg 250 NOK månedlig",
+                 "expected": "Frequency-toggle aktiv, beløp synlig i sammendrag"},
+                {"n": 3, "action": "Fyll inn donor-data (æøå inkludert)",
+                 "expected": "Validation aksepterer norske tegn"},
+                {"n": 4, "action": "Trykk 'Doner'",
+                 "expected": "Vipps-handoff åpner med riktig beløp + frekvens"},
+                {"n": 5, "action": "Returner via Vipps cancel-URL",
+                 "expected": "Donor-data bevart, melding 'Donasjon avbrutt'"},
+            ],
+            "acceptance_criteria": [
+                "Fundy form A11y axe-core 0 critical",
+                "Vipps payload korrekt (amount, currency=NOK)",
+                "Marketing-samtykke IKKE pre-checket",
+            ],
+            "estimated_minutes": 15,
+            "test_data": ["Donor: Olav Per Hansen", "E-post: olav.test@rodekors.no"],
+        },
+        {
+            "script_id": "UAT-002",
+            "title": "Volunteer-registrering — helseerklæring + politiattest",
+            "stakeholder": "Trine Røsand Scheen",
+            "scope": "volunteer",
+            "preconditions": ["Frivillig-portal oppe", "Test-volunteer record"],
+            "steps": [
+                {"n": 1, "action": "Start frivilligskjema",
+                 "expected": "Multi-step indikator viser steg 1/4"},
+                {"n": 2, "action": "Fyll personalia + æøå",
+                 "expected": "Norske tegn aksepteres, autocomplete fungerer"},
+                {"n": 3, "action": "Last opp politiattest (PDF)",
+                 "expected": "Filtype + størrelse OK, antivirus-skann passes"},
+                {"n": 4, "action": "Fyll helseerklæring",
+                 "expected": "Felt lagres med Art. 9-merking; rolle-kontroll i Dataverse"},
+                {"n": 5, "action": "Send inn",
+                 "expected": "Bekreftelses-e-post + korrelasjons-id synlig"},
+            ],
+            "acceptance_criteria": [
+                "Sensitive data ikke synlig i logg",
+                "Bekreftelse mottas innen 60s",
+                "Skjema-state bevart ved Tilbake-knapp",
+            ],
+            "estimated_minutes": 20,
+            "test_data": ["Volunteer ID: VOL-TEST-001"],
+        },
+        {
+            "script_id": "UAT-003",
+            "title": "Lokal redaktør publiserer aktivitet i sitt distrikt",
+            "stakeholder": "Astri Fretheim",
+            "scope": "cms-editorial",
+            "preconditions": ["Content Studio v.6 åpen", "Lokal-redaktør-rolle aktiv"],
+            "steps": [
+                {"n": 1, "action": "Logg inn som lokal redaktør",
+                 "expected": "Kun eget distrikt synlig i tre-strukturen"},
+                {"n": 2, "action": "Opprett ny Aktivitet",
+                 "expected": "Tema, dato, kontaktperson kan velges"},
+                {"n": 3, "action": "Publiser",
+                 "expected": "ISR revaliderer innen 30s, frontend viser ny aktivitet"},
+                {"n": 4, "action": "Forsøk å redigere annen forenings aktivitet",
+                 "expected": "Tilgang nektet (subtree isolation)"},
+            ],
+            "acceptance_criteria": [
+                "Rolle-matrise håndhevet",
+                "Audit-logg fanger publisering",
+                "ISR-revalidering < 30s",
+            ],
+            "estimated_minutes": 12,
+            "test_data": ["Distrikt: Oslo Nord"],
+        },
+    ]
+
+    checklists = parsed.get("checklists") or [
+        {
+            "stakeholder": s,
+            "items": [
+                {"label": f"Gjennomført UAT-script for {role}-omfang", "required": True, "status": "pending"},
+                {"label": "Akseptansekriterier verifisert", "required": True, "status": "pending"},
+                {"label": "Avvik dokumentert i Azure DevOps", "required": True, "status": "pending"},
+                {"label": "Klar til signering", "required": True, "status": "pending"},
+            ],
+        } for s, role in [(name, _UAT_ROLE_BY_NAME.get(name, "Stakeholder")) for name in stakeholders]
+    ]
+
+    signoff = parsed.get("signoff_form") or {
+        "sprint": sprint_name or "Sprint",
+        "build_attestation": "(set after run)",
+        "lines": [
+            {"role": _UAT_ROLE_BY_NAME.get(name, "Stakeholder"),
+             "name": name, "decision": "pending", "comment": ""}
+            for name in stakeholders
+        ],
+    }
+
+    support_notes = parsed.get("support_notes") or [
+        "Item bistår med skript + miljø; Røde Kors eier UAT-utførelsen.",
+        "Hvis blokkere: kontakt testleder Trine Bruu (Røde Kors) eller leverandør-lead.",
+        "Sign-off skal lagres i Azure DevOps mot tilhørende epic.",
+    ]
+
+    run = await _store_run("redcross-release-readiness", environment, "pass",
+                           f"UAT support — {len(uat_scripts)} scripts for {len(stakeholders)} stakeholders",
+                           {"uat_scripts": uat_scripts, "checklists": checklists,
+                            "signoff_form": signoff})
+    return {
+        "status": "ok",
+        "uat_scripts": uat_scripts,
+        "checklists": checklists,
+        "signoff_form": signoff,
+        "support_notes": support_notes,
+        "stakeholders": stakeholders,
+        "run_id": run["run_id"],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 16 — Risikomatrise-input (per Teststrategi §10 — matrix lives outside the doc)
+# ═══════════════════════════════════════════════════════════════════
+def _parse_risk_csv(csv_text: str) -> List[Dict[str, Any]]:
+    """Best-effort CSV parser for the risk matrix (id, description, prob, impact, area)."""
+    risks: List[Dict[str, Any]] = []
+    if not csv_text or not csv_text.strip():
+        return risks
+    lines = [ln for ln in csv_text.strip().splitlines() if ln.strip()]
+    if not lines:
+        return risks
+    # Detect header
+    header_tokens = [h.strip().lower() for h in re.split(r"[,;\t]", lines[0])]
+    has_header = any(k in header_tokens for k in ("id", "risk", "description", "probability", "prob", "impact", "area"))
+    start = 1 if has_header else 0
+    for ln in lines[start:]:
+        cols = [c.strip().strip('"') for c in re.split(r"[,;\t]", ln)]
+        if len(cols) < 4:
+            continue
+        try:
+            risks.append({
+                "id": cols[0] or f"R-{len(risks)+1:03d}",
+                "description": cols[1],
+                "probability": int(float(cols[2] or 1)),
+                "impact": int(float(cols[3] or 1)),
+                "area": cols[4] if len(cols) > 4 else "general",
+            })
+        except (ValueError, TypeError):
+            continue
+    return risks
+
+
+_RISK_AREA_TO_SUITE = {
+    "donation": "forms", "fundy": "forms", "vipps": "forms",
+    "volunteer": "forms", "frivillig": "forms",
+    "personvern": "dpia", "gdpr": "dpia", "privacy": "dpia",
+    "performance": "performance", "ytelse": "performance",
+    "lighthouse": "performance",
+    "lasttest": "stress", "load": "stress", "resilience": "stress",
+    "stress": "stress", "campaign": "stress",
+    "tilgjengelighet": "accessibility", "a11y": "accessibility", "wcag": "accessibility",
+    "api": "api", "graphql": "api", "guillotine": "api",
+    "cms": "cms", "enonic": "cms", "redaksjonell": "cms",
+    "rolle": "role-matrix", "authz": "role-matrix", "rbac": "role-matrix",
+    "designsystemet": "designsystemet", "digdir": "designsystemet",
+    "migrasjon": "migration", "migration": "migration", "innhold": "migration",
+    "sikkerhet": "security", "security": "security", "owasp": "security",
+    "uat": "uat", "akseptanse": "uat",
+    "seo": "seo",
+}
+
+
+def _suite_for_area(area: str) -> str:
+    a = (area or "").lower()
+    for key, suite in _RISK_AREA_TO_SUITE.items():
+        if key in a:
+            return suite
+    return "security"
+
+
+async def analyze_risk_matrix(matrix_csv: Optional[str],
+                               matrix_json: Optional[List[Dict[str, Any]]],
+                               environment: str,
+                               lang: str = "en") -> Dict[str, Any]:
+    """Consume Røde Kors's risikomatrise (CSV text OR JSON list) and map risks
+    onto the agent's 17 test suites with priority + justification."""
+    risks: List[Dict[str, Any]] = []
+    if matrix_json:
+        for r in matrix_json:
+            try:
+                risks.append({
+                    "id": str(r.get("id") or f"R-{len(risks)+1:03d}"),
+                    "description": str(r.get("description") or r.get("title") or ""),
+                    "probability": int(r.get("probability") or r.get("prob") or 1),
+                    "impact": int(r.get("impact") or 1),
+                    "area": str(r.get("area") or "general"),
+                })
+            except (ValueError, TypeError):
+                continue
+    elif matrix_csv:
+        risks = _parse_risk_csv(matrix_csv)
+    else:
+        # Mock fallback — sample risk matrix for demo purposes
+        risks = [
+            {"id": "R-001", "description": "Donation flow nedetid under TV-aksjonen",
+             "probability": 4, "impact": 5, "area": "donation"},
+            {"id": "R-002", "description": "Helseerklæring lekket i logg",
+             "probability": 2, "impact": 5, "area": "personvern"},
+            {"id": "R-003", "description": "Lokal redaktør publiserer i feil distrikt",
+             "probability": 3, "impact": 3, "area": "rolle"},
+            {"id": "R-004", "description": "WCAG-feil blokkerer skjermleser-bruker",
+             "probability": 3, "impact": 4, "area": "tilgjengelighet"},
+            {"id": "R-005", "description": "Migrert side mangler 301-redirect — SEO-tap",
+             "probability": 4, "impact": 3, "area": "migrasjon"},
+            {"id": "R-006", "description": "Vipps-handoff feilet under kampanje",
+             "probability": 2, "impact": 4, "area": "vipps"},
+            {"id": "R-007", "description": "Designsystem-versjon ute av sync",
+             "probability": 3, "impact": 2, "area": "designsystemet"},
+        ]
+
+    # Score & classify
+    for r in risks:
+        score = (r.get("probability", 1) or 1) * (r.get("impact", 1) or 1)
+        r["score"] = score
+        r["level"] = (
+            "critical" if score >= 15 else
+            "high" if score >= 9 else
+            "medium" if score >= 4 else
+            "low"
+        )
+        r["suite"] = _suite_for_area(r.get("area", ""))
+
+    risks.sort(key=lambda x: x.get("score", 0), reverse=True)
+    high_risks = [r for r in risks if r.get("level") in {"critical", "high"}]
+
+    # Build suite priority
+    suite_groups: Dict[str, List[Dict[str, Any]]] = {}
+    for r in risks:
+        suite_groups.setdefault(r["suite"], []).append(r)
+
+    suite_priority: List[Dict[str, Any]] = []
+    for suite, group in suite_groups.items():
+        max_score = max(g["score"] for g in group)
+        priority = 1 if max_score >= 15 else (2 if max_score >= 9 else (3 if max_score >= 4 else 4))
+        rationale = f"Max risk score {max_score} ({len(group)} risks linked)"
+        suite_priority.append({
+            "suite": suite,
+            "priority": priority,
+            "rationale": rationale,
+            "linked_risks": [g["id"] for g in group],
+            "max_score": max_score,
+        })
+    suite_priority.sort(key=lambda x: (x["priority"], -x["max_score"]))
+
+    # Coverage gaps — risks where suite is "general" or unmapped
+    coverage_gaps = [
+        {"risk_id": r["id"], "reason": f"Area '{r.get('area','')}' not mapped to a suite",
+         "suggestion": "Add area keyword to _RISK_AREA_TO_SUITE or split risk."}
+        for r in risks if r["suite"] in {"security"} and "security" not in (r.get("area") or "").lower() and "owasp" not in (r.get("area") or "").lower()
+    ][:5]
+
+    # Narrative
+    narrative_no = (
+        f"Risikomatrise: {len(risks)} risks ({len(high_risks)} høy/kritisk). "
+        f"Topp 3 testsuiter: {', '.join(s['suite'] for s in suite_priority[:3])}. "
+        f"Begrunner hvorfor disse prioriteres i sprintplanleggingen."
+    )
+    narrative_en = (
+        f"Risk matrix: {len(risks)} risks ({len(high_risks)} high/critical). "
+        f"Top 3 test suites: {', '.join(s['suite'] for s in suite_priority[:3])}. "
+        f"Justifies why these are prioritised in sprint planning."
+    )
+    narrative = narrative_no if (lang or "").startswith("no") else narrative_en
+
+    overall_status = "fail" if any(r["level"] == "critical" for r in risks) else (
+        "warn" if any(r["level"] == "high" for r in risks) else "pass"
+    )
+
+    run = await _store_run("redcross-release-readiness", environment, overall_status,
+                           f"Risk matrix analysis — {len(risks)} risks, top suite {suite_priority[0]['suite'] if suite_priority else 'n/a'}",
+                           {"risks": risks, "suite_priority": suite_priority})
+    return {
+        "status": "ok",
+        "risk_count": len(risks),
+        "high_risks": high_risks,
+        "risks": risks,
+        "suite_priority": suite_priority,
+        "coverage_gaps": coverage_gaps,
+        "summary_narrative": narrative,
+        "run_id": run["run_id"],
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════

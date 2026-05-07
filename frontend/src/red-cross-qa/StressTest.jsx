@@ -28,6 +28,10 @@ const StressTest = ({ environment, executionMode }) => {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Resilience — Trine separates ytelse from resilience
+  const [resilienceRunning, setResilienceRunning] = useState(false);
+  const [resilience, setResilience] = useState(null);
+
   const toggleScenario = (s) => setScenarios(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
   const call = async (path, setter) => {
@@ -41,6 +45,25 @@ const StressTest = ({ environment, executionMode }) => {
     } catch { setResult({ status: 'error', message: 'Network error' }); }
     finally { setter(false); }
   };
+
+  const handleResilience = async () => {
+    setResilienceRunning(true); setResilience(null);
+    try {
+      const res = await fetch(`${API}/run-resilience-check`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile, scenarios, environment, lang: i18n.language }),
+      });
+      setResilience(await res.json());
+    } catch { setResilience({ status: 'error', message: 'Network error' }); }
+    finally { setResilienceRunning(false); }
+  };
+
+  const r = resilience?.resilience || {};
+  const score = r.resilience_score;
+  const scoreColor =
+    score == null ? '#64748b' :
+    score >= 80   ? '#047857' :
+    score >= 60   ? '#f59e0b' : '#b91c1c';
 
   return (
     <div style={{ padding: 24, backgroundColor: '#f8fafc', minHeight: '100%' }}>
@@ -135,10 +158,103 @@ const StressTest = ({ environment, executionMode }) => {
         )}
 
         {result?.status === 'error' && <div style={errorBox}>{result.message}</div>}
+
+        {/* ── Resilience / lasttesting eksplisitt — Trine separates ytelse from resilience ── */}
+        <div style={{ ...panel, borderTop: '3px solid #7c3aed' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 6 }}>
+            <h3 style={{ ...panelTitle, margin: 0 }}>
+              💪 {t('redCrossWebQaModule.resilience.header')}
+            </h3>
+            {score != null && (
+              <div style={{
+                padding: '6px 14px', borderRadius: 999,
+                backgroundColor: `${scoreColor}15`, border: `1px solid ${scoreColor}50`,
+                color: scoreColor, fontSize: 12, fontWeight: 700,
+              }}>
+                {t('redCrossWebQaModule.resilience.score')}: {score}/100
+              </div>
+            )}
+          </div>
+          <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 12px' }}>
+            {t('redCrossWebQaModule.resilience.subheader')}
+          </p>
+
+          {r._distinction && (
+            <div style={{
+              padding: '10px 14px', borderRadius: 8, marginBottom: 14,
+              backgroundColor: '#faf5ff', border: '1px solid #e9d5ff',
+              fontSize: 12, color: '#6b21a8', lineHeight: 1.5,
+            }}>
+              <strong>ℹ️ {t('redCrossWebQaModule.resilience.distinction')}:</strong> {r._distinction}
+            </div>
+          )}
+
+          <button onClick={handleResilience} disabled={resilienceRunning} style={resilienceBtn(resilienceRunning)}>
+            {resilienceRunning ? t('redCrossWebQaModule.common.running')
+                               : t('redCrossWebQaModule.resilience.btnRun')}
+          </button>
+
+          {resilience?.status === 'ok' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginTop: 16 }}>
+              <ResMetric
+                label={t('redCrossWebQaModule.resilience.breakpointVu')}
+                value={r.breakpoint_vu != null ? `${r.breakpoint_vu} VU` : '—'}
+                hint={t('redCrossWebQaModule.resilience.breakpointVuHint')}
+              />
+              <ResMetric
+                label={t('redCrossWebQaModule.resilience.recovery')}
+                value={r.recovery_seconds != null ? `${r.recovery_seconds}s` : '—'}
+                hint={t('redCrossWebQaModule.resilience.recoveryHint')}
+              />
+              <ResMetric
+                label={t('redCrossWebQaModule.resilience.errorRatePeak')}
+                value={r.error_rate_peak_pct != null ? `${r.error_rate_peak_pct}%` : '—'}
+                hint={t('redCrossWebQaModule.resilience.errorRatePeakHint')}
+              />
+              <ResMetric
+                label={t('redCrossWebQaModule.resilience.memoryDrift')}
+                value={r.memory_drift_pct != null ? `${r.memory_drift_pct}%` : '—'}
+                hint={t('redCrossWebQaModule.resilience.memoryDriftHint')}
+              />
+            </div>
+          )}
+
+          {Array.isArray(r.findings) && r.findings.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <h4 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+                🔎 {t('redCrossWebQaModule.resilience.findings')}
+              </h4>
+              <div style={{ display: 'grid', gap: 6 }}>
+                {r.findings.map((f, i) => (
+                  <div key={i} style={{
+                    padding: '8px 12px', borderRadius: 8,
+                    backgroundColor: '#faf5ff', border: '1px solid #e9d5ff',
+                    fontSize: 12, color: '#581c87',
+                  }}>
+                    <strong>{f.title || f.category || '—'}</strong>{f.message ? ` — ${f.message}` : ''}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {resilience?.status === 'error' && <div style={errorBox}>{resilience.message}</div>}
+        </div>
       </div>
     </div>
   );
 };
+
+const ResMetric = ({ label, value, hint }) => (
+  <div style={{
+    padding: 14, borderRadius: 10,
+    backgroundColor: '#faf5ff', border: '1px solid #e9d5ff',
+  }}>
+    <div style={{ fontSize: 11, color: '#7c3aed', textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
+    <div style={{ fontSize: 22, fontWeight: 700, color: '#1e293b', marginTop: 4 }}>{value}</div>
+    {hint && <div style={{ fontSize: 10, color: '#64748b', marginTop: 4, lineHeight: 1.4 }}>{hint}</div>}
+  </div>
+);
 
 const panel = {
   backgroundColor: 'white', borderRadius: 12, padding: 24,
@@ -158,6 +274,11 @@ const primaryBtn = (disabled) => ({
 const secondaryBtn = (disabled) => ({
   padding: '10px 18px', borderRadius: 8, border: 'none',
   backgroundColor: disabled ? '#94a3b8' : '#1e293b', color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const resilienceBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  backgroundColor: disabled ? '#c4b5fd' : '#7c3aed', color: 'white',
   fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
 });
 const errorBox = {

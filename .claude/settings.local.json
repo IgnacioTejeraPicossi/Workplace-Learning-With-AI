@@ -117,7 +117,15 @@
       "PowerShell(python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items; print\\('IMPORTS OK'\\); import inspect; print\\('generate_test_plan params:', list\\(inspect.signature\\(generate_test_plan\\).parameters.keys\\(\\)\\)\\)\")",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items; print\\('IMPORTS OK'\\); import inspect; print\\('generate_test_plan params:', list\\(inspect.signature\\(generate_test_plan\\).parameters.keys\\(\\)\\)\\)\")",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items, run_forms_qa; print\\('IMPORTS OK'\\)\")",
-      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -m backend.tests.smoke_red_cross_qa)"
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -m backend.tests.smoke_red_cross_qa)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"from backend.services.red_cross_qa import run_dpia_check, verify_definition_of_done, run_resilience_check, generate_uat_support, analyze_risk_matrix, SUITE_NAMES; from backend.routers.red_cross_qa import router; print\\('routes:', len\\(router.routes\\)\\); print\\('suites:', len\\(SUITE_NAMES\\)\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_red_cross_qa)",
+      "Bash(python -c \"import json; [print\\(f'{l}: {len\\(json.load\\(open\\(f\\\\\"frontend/src/i18n/locales/{l}/redCrossWebQaModule.json\\\\\", encoding=\\\\\"utf-8\\\\\"\\)\\)\\)} top-level keys'\\) for l in ['en','no','es']]\")",
+      "Bash(python -m backend.tests.smoke_red_cross_qa)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -m backend.tests.smoke_red_cross_qa 2>&1 | Select-Object -Last 30)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; & \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend\\\\node_modules\\\\.bin\\\\react-scripts.cmd\" build 2>&1 | Select-Object -Last 40)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; Set-Location \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend\"; npm run build 2>&1 | Select-Object -Last 50)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; print\\(f'routes: {len\\(router.routes\\)}'\\); [print\\(f'  {list\\(r.methods\\)[0] if hasattr\\(r, \\\\\"methods\\\\\"\\) else \\\\\"?\\\\\"} {r.path}'\\) for r in router.routes]\")"
     ]
   }
 }

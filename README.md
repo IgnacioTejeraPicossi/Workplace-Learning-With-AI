@@ -33,7 +33,7 @@
 | **Cloud Deployment** | Cloud Install workbench, readiness score, deploy checklist, automated smoke tests, cost baseline, Dockerfile + Cloud Run config |
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
-| **QA & Test Automation** | Red Cross Web QA Agent (18 tabs / 26 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator** aligned to Trine Bruu's Teststrategi 30.3 |
+| **QA & Test Automation** | Red Cross Web QA Agent (20 tabs / 31 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator**, **DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix** aligned to Trine Bruu's Teststrategi 30.3 |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
 ---
@@ -88,9 +88,9 @@ A 24/7 QA copilot purpose-built for the **rodekors.no** website rebuild on **Eno
 
 Aligned to **Trine Bruu's Teststrategi 30.3** (Testleder, Røde Kors): **Azure DevOps** is the official test tool (§5), every finding carries the dual severity scheme `severity_dev` 1-4 + `category_ops` A-C (§8.1), test levels follow the V-model (unit / SIT / system / UAT / performance, §5), and **Fundy** is recognised as the donation-form provider (separate from the Vipps payment handoff, §3 Systemlandskap).
 
-The agent ships as an **18-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) with two execution modes — **Generate-only** (produces scripts/reports for Cursor / Claude Code / GitHub Actions) and **Execute-directly** (runs Playwright / Cypress / axe-core / Lighthouse / k6 in-app) — and two environments (local on `:3000`, test). Every run is fingerprinted with a SHA-256 attestation hash for traceability.
+The agent ships as a **20-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) with two execution modes — **Generate-only** (produces scripts/reports for Cursor / Claude Code / GitHub Actions) and **Execute-directly** (runs Playwright / Cypress / axe-core / Lighthouse / k6 in-app) — and two environments (local on `:3000`, test). Every run is fingerprinted with a SHA-256 attestation hash for traceability.
 
-**18 tabs** (`frontend/src/red-cross-qa/*.jsx`):
+**20 tabs** (`frontend/src/red-cross-qa/*.jsx`):
 
 | # | Tab | Purpose |
 |---|-----|---------|
@@ -106,12 +106,14 @@ The agent ships as an **18-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) w
 | 10 | ⚡ Performance | Core Web Vitals + **Enonic-specific perf**: Guillotine GraphQL waterfall / N+1 / over-fetch, ISR revalidation, image service, publish ack latency, bulk publish UI block, part virtualization, cache freshness — 10 checks + hot-queries table + p95 metrics |
 | 11 | 🎨 Designsystemet | **Digdir Designsystemet compliance** — `@digdir/designsystemet-react` usage, tokens, typography, spacing, dark mode, brand override, version, button + form-element components — 10 checks + 0-100 compliance score + deviations panel |
 | 12 | 🔐 Role Matrix | **Real authorization tests** across 6 editorial roles (Administrator / Eier / Lokal eier / Redaktør / Lokal redaktør / Bidragsyter) × 4 actions (read/edit/publish/delete) — 8 authZ checks (subtree isolation, publish guard, delete guard, role assignment guard, audit log, session expiry, privilege escalation, API authZ) |
-| 13 | 🔥 Stress Test | k6 load profiles for Red Cross peaks: smoke, normal, campaign peak, **crisis spike (1,000+ VUs)**, 4-hour soak |
-| 14 | 🛡️ Security & Privacy | OWASP Top 10, headers, rate limits, GDPR — 13 checks (no personal data in CMS, public/non-public data separation, secrets exposure, dependency vulns, consent, etc.) |
+| 13 | 🔥 Stress Test | k6 load profiles for Red Cross peaks: smoke, normal, campaign peak, **crisis spike (1,000+ VUs)**, 4-hour soak. Now includes a dedicated **Resilience** section (Trine §7) with `resilience_score` 0-100, breakpoint VU, recovery seconds, peak error rate, memory drift — separating *ytelse* from *resilience* |
+| 14 | 🛡️ Security & Privacy | OWASP Top 10, headers, rate limits, GDPR — 13 checks (no personal data in CMS, public/non-public data separation, secrets exposure, dependency vulns, consent, etc.). Now includes a **DPIA / Privacy by Design** sub-checklist (12 GDPR Art. 25/35 checks, `dpia_score` 0-100, data register over Enonic / Fundy / Vipps / Dataverse / Okta) — differentiator for Røde Kors's sensitive volunteer data |
 | 15 | 🎯 Azure DevOps | Convert findings into Azure DevOps work items (Bug / Task / Test Case) with priority pill (P1-P4), `severity_dev` (dev), `category_ops` (drift), and `test_level` badges. Also dispatch to OutSystems |
-| 16 | 📈 Sprint Report | **Sprint report generator** — aggregates runs/findings/dispatches for the active sprint, computes Sev1-4 + KatA-C counts, produces a Norwegian/English narrative (Status / Identifiserte avvik / Anbefalinger) for Trine's reporting line up to Røde Kors |
-| 17 | 📜 Runs | Run history with attestation hash, artifacts, screenshots |
-| 18 | ⚙️ Settings | Environments, tools, **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds |
+| 16 | 📈 Sprint Report | **Sprint report generator** — aggregates runs/findings/dispatches for the active sprint, computes Sev1-4 + KatA-C counts, produces a Norwegian/English narrative (Status / Identifiserte avvik / Anbefalinger) for Trine's reporting line up to Røde Kors. Now includes a **Definition of Done verifier** (Trine §6.1: functionality tested ✓ / integrations verified ✓ / known bugs documented ✓ / ready for UAT ✓) computed mechanically per work item |
+| 17 | ✅ UAT Support | **NEW** — Item does not run UAT; Røde Kors does. Generates UAT scripts, per-stakeholder checklists and a sign-off form for the named stakeholders **Hilde Forslund** (Produkteier), **Trine Røsand Scheen** (Fagperson), **Astri Fretheim** (Fagperson) |
+| 18 | 🎲 Risk Matrix | **NEW** — Trine §10: the matrix lives outside the strategy document. Paste CSV/JSON, agent scores each risk (probability × impact, 1-25), assigns `level` (critical / high / medium / low), maps to test suites and produces `suite_priority` + `coverage_gaps` |
+| 19 | 📜 Runs | Run history with attestation hash, artifacts, screenshots |
+| 20 | ⚙️ Settings | Environments, tools, **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds |
 
 **Backend:**
 - Service: `backend/services/red_cross_qa.py` — **17 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable). Generates `severity_dev` + `category_ops` annotations on every finding.
