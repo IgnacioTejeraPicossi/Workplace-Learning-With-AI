@@ -240,7 +240,14 @@
       "checkSeoMetadata": "SEO-metadata bevart",
       "checkPublishState": "Publiseringsstatus bevart",
       "checkIsrInvalidation": "ISR-cache-invalidering",
-      "checkPermissionsCarryover": "Rolletillatelser overført"
+      "checkPermissionsCarryover": "Rolletillatelser overført",
+      "provenanceTitle": "Migrert vs nyopprettet data",
+      "provenanceSubtitle": "Trine §3 — del de to kohortene så regresjoner kan triagés riktig. Migrert innhold bærer arven fra gammelt CMS; nyopprettet innhold er greenfield Enonic XP.",
+      "provenance_migrated": "Migrert",
+      "provenance_newly_created": "Nyopprettet",
+      "commonIssues": "Vanlige problemer",
+      "issuesOpen": "Åpne saker",
+      "origin": "Opphav"
     },
 
     "accessibility": {
@@ -260,6 +267,7 @@
       "checkAltText": "Bilder og alt‑tekst",
       "checkContentClarity": "Innholdsklarhet",
       "wcagScore": "WCAG 2.2 AA‑poengsum",
+      "wcagVersion": "WCAG-versjon",
       "violations": "Brudd"
     },
 
@@ -468,6 +476,12 @@
       "thresholdAxeCritical": "Maks kritiske axe‑brudd",
       "outsystemsUrl": "OutSystems‑URL",
       "btnSave": "Lagre innstillinger"
+    },
+
+    "stakeholders": {
+      "header": "Interessenter og roller — Røde Kors-team",
+      "subheader": "Eneste sannhetskilde for hvem som eier beslutninger på rodekors.no-omleggingen. Brukes av UAT-støtte, sprintrapporter og signeringsskjemaer.",
+      "responsibilities": "Ansvarsområder"
     },
 
     "suites": {

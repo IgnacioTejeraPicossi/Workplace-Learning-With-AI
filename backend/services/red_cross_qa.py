@@ -739,7 +739,17 @@ async def generate_cms_test_cases(areas: List[str], environment: str,
 # Tool 6 — Accessibility
 # ═══════════════════════════════════════════════════════════════════
 async def run_accessibility_check(url: str, environment: str,
-                                  lang: str = "en") -> Dict[str, Any]:
+                                  lang: str = "en",
+                                  wcag_version: str = "2.2-AA") -> Dict[str, Any]:
+    """Phase C: explicit WCAG version (Trine §4.1 mandates 2.1 AA as the
+    contractual minimum; rodekors.no rebuild aims for 2.2 AA)."""
+    # Normalize to canonical labels used in reports.
+    _v = (wcag_version or "2.2-AA").upper().replace(" ", "")
+    if _v in ("2.1", "2.1-AA", "WCAG2.1AA"):
+        version_id, version_label = "2.1-AA", "WCAG 2.1 AA"
+    else:
+        version_id, version_label = "2.2-AA", "WCAG 2.2 AA"
+
     checks = {
         "checkKeyboard": "pass", "checkFocusOrder": "pass", "checkSkipLinks": "warn",
         "checkAriaMisuse": "pass", "checkHeadings": "pass", "checkColorContrast": "warn",
@@ -750,10 +760,19 @@ async def run_accessibility_check(url: str, environment: str,
         {"severity": "medium", "rule": "color-contrast", "message": "Donation CTA contrast ratio 3.9:1 (target 4.5:1)"},
         {"severity": "low", "rule": "image-alt", "message": "3 hero images lack descriptive alt text"},
     ]
+    # WCAG 2.2 adds 9 new success criteria — 2 of them are commonly missed and
+    # only flagged when 2.2 AA is selected. Trine's report should cite this.
+    if version_id == "2.2-AA":
+        violations.append({
+            "severity": "medium", "rule": "wcag-2-2-target-size",
+            "message": "Several footer links smaller than 24x24 CSS pixels (WCAG 2.5.8 — new in 2.2 AA)",
+        })
     run = await _store_run("redcross-accessibility-core", environment, "warn",
-                            f"axe-core scan on {url}",
-                            {"url": url, "checks": checks, "violations": violations})
+                           f"axe-core scan on {url} ({version_label})",
+                           {"url": url, "wcag_version": version_label,
+                            "checks": checks, "violations": violations})
     return {"status": "ok", "url": url, "wcag_score": 87,
+            "wcag_version": version_label, "wcag_version_id": version_id,
             "checks": checks, "violations": violations, "run_id": run["run_id"]}
 
 
@@ -1018,6 +1037,31 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
         "orphan_assets":       7,
     }
 
+    # Phase C: explicit migrated-vs-newly-created breakdown — Trine §3 separates
+    # the two cohorts so regressions can be triaged correctly. Migrated content
+    # carries legacy-CMS provenance and tends to fail relations / image
+    # re-anchoring; newly-created content is greenfield Enonic and tends to fail
+    # editorial / CMS-publish flows. Counted independently so suite reports can
+    # split findings instead of lumping them together.
+    migrated_count = summary.get("total_pages_migrated", int(legacy_sample_size * 0.78))
+    new_count = max(0, int(legacy_sample_size * 0.22))
+    data_provenance = parsed.get("data_provenance") or {
+        "migrated": {
+            "count": migrated_count,
+            "label": "Migrated from legacy CMS",
+            "common_issues": ["broken relations", "stale CDN URLs", "missing 301s"],
+            "issues_open": 18,
+        },
+        "newly_created": {
+            "count": new_count,
+            "label": "Newly created in Enonic XP",
+            "common_issues": ["missing nn translation", "ISR not invalidated"],
+            "issues_open": 5,
+        },
+        "total":     migrated_count + new_count,
+        "rule":      "Findings, runs and risks must be tagged with data_origin = migrated | newly_created",
+    }
+
     checks = parsed.get("checks") or {
         "checkContentTypeMapping":    {"status": "pass", "note": "All 8 types mapped (Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje)"},
         "checkNorwegianChars":        {"status": "pass", "note": "UTF-8 preserved across sample"},
@@ -1034,13 +1078,16 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
     broken_pages = parsed.get("broken_pages") or [
         {"legacy_url": "/distrikt/oslo/aktiviteter/leksehjelp",
          "new_url": "/lokal/oslo/aktiviteter/leksehjelp",
-         "issue": "missing-fields"},
+         "issue": "missing-fields", "data_origin": "migrated"},
         {"legacy_url": "/forening/bergen/kontaktpersoner",
          "new_url": "/lokal/bergen/kontaktpersoner",
-         "issue": "broken-images"},
+         "issue": "broken-images", "data_origin": "migrated"},
         {"legacy_url": "/kampanjer/2024/jul",
          "new_url": "",
-         "issue": "404"},
+         "issue": "404", "data_origin": "migrated"},
+        {"legacy_url": "",
+         "new_url": "/aktuelt/sommer-2026-rekruttering",
+         "issue": "missing-nn-translation", "data_origin": "newly_created"},
     ]
 
     missing_redirects = parsed.get("missing_redirects") or [
@@ -1076,11 +1123,13 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
         "scopes": scopes, "summary": summary, "checks": checks,
         "broken_pages": broken_pages, "missing_redirects": missing_redirects,
         "test_cases": test_cases,
+        "data_provenance": data_provenance,
         "artifacts": [{"name": "migration-audit.json", "type": "report"}],
     })
     return {"status": "ok", "summary": summary, "checks": checks,
             "broken_pages": broken_pages, "missing_redirects": missing_redirects,
-            "test_cases": test_cases, "run_id": run["run_id"], "lang": lang}
+            "test_cases": test_cases, "data_provenance": data_provenance,
+            "run_id": run["run_id"], "lang": lang}
 
 
 # ═══════════════════════════════════════════════════════════════════

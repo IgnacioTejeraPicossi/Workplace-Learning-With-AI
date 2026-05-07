@@ -1,6 +1,7 @@
 """Smoke test for Red Cross QA service.
 Covers: Phase A (Jira -> Azure DevOps rename, Sev/Kat, Sprint Report, Fundy)
-        Phase B (DPIA, DoD verifier, Resilience, UAT-stotte, Risk Matrix).
+        Phase B (DPIA, DoD verifier, Resilience, UAT-stotte, Risk Matrix)
+        Phase C (WCAG 2.1/2.2 explicit, Migrert vs Nyopprettet data).
 """
 import asyncio
 from backend.services.red_cross_qa import (
@@ -8,6 +9,7 @@ from backend.services.red_cross_qa import (
     run_forms_qa, get_settings,
     run_dpia_check, verify_definition_of_done, run_resilience_check,
     generate_uat_support, analyze_risk_matrix,
+    run_accessibility_check, run_content_migration_audit,
 )
 
 
@@ -137,6 +139,44 @@ async def main():
     rm_csv = await analyze_risk_matrix(csv_text, None, "test", "no")
     assert rm_csv["risk_count"] == 2, f"expected 2 risks from CSV, got {rm_csv['risk_count']}"
     print(f"[OK] Risk matrix CSV parser ({rm_csv['risk_count']} risks parsed)")
+
+    # ── Phase C: 3 low-value items ──────────────────────────────────
+    # WCAG 2.2 AA (default) and WCAG 2.1 AA explicit selector
+    a22 = await run_accessibility_check(
+        "https://www.rodekors.no/", "test", "en", wcag_version="2.2-AA"
+    )
+    assert a22["status"] == "ok"
+    assert a22["wcag_version_id"] == "2.2-AA", f"expected 2.2-AA, got {a22.get('wcag_version_id')}"
+    assert any("wcag-2-2-target-size" == v.get("rule") for v in a22["violations"]), \
+        "expected WCAG 2.2-only target-size violation when 2.2 AA selected"
+    a21 = await run_accessibility_check(
+        "https://www.rodekors.no/", "test", "en", wcag_version="2.1-AA"
+    )
+    assert a21["wcag_version_id"] == "2.1-AA", f"expected 2.1-AA, got {a21.get('wcag_version_id')}"
+    assert not any("wcag-2-2-target-size" == v.get("rule") for v in a21["violations"]), \
+        "WCAG 2.2-only violation should NOT appear when 2.1 AA selected"
+    print(
+        f"[OK] WCAG version selector (2.2 AA: {a22['wcag_version']} / "
+        f"2.1 AA: {a21['wcag_version']}, 2.2-only target-size correctly gated)"
+    )
+
+    # Migrert vs Nyopprettet data — explicit cohort split
+    mig = await run_content_migration_audit(
+        ["typeForening", "typeAktivitet"], "test", 100, "no"
+    )
+    assert mig["status"] == "ok"
+    dp = mig.get("data_provenance") or {}
+    assert "migrated" in dp and "newly_created" in dp, "missing data_provenance.migrated/newly_created"
+    assert dp["migrated"]["count"] > 0
+    assert dp["newly_created"]["count"] >= 0
+    assert any(p.get("data_origin") == "migrated" for p in mig["broken_pages"]), \
+        "expected at least one migrated broken page"
+    assert any(p.get("data_origin") == "newly_created" for p in mig["broken_pages"]), \
+        "expected at least one newly_created broken page"
+    print(
+        f"[OK] Migrert vs Nyopprettet ({dp['migrated']['count']} migrert, "
+        f"{dp['newly_created']['count']} nyopprettet, broken_pages tagged)"
+    )
 
 
 if __name__ == "__main__":

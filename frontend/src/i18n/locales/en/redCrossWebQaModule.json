@@ -240,7 +240,14 @@
       "checkSeoMetadata": "SEO metadata preserved",
       "checkPublishState": "Publish state preserved",
       "checkIsrInvalidation": "ISR cache invalidation",
-      "checkPermissionsCarryover": "Role permissions carryover"
+      "checkPermissionsCarryover": "Role permissions carryover",
+      "provenanceTitle": "Migrated vs newly created data",
+      "provenanceSubtitle": "Trine §3 — split the two cohorts so regressions can be triaged correctly. Migrated content carries legacy-CMS provenance; newly created content is greenfield Enonic XP.",
+      "provenance_migrated": "Migrated",
+      "provenance_newly_created": "Newly created",
+      "commonIssues": "Common issues",
+      "issuesOpen": "Open issues",
+      "origin": "Origin"
     },
 
     "accessibility": {
@@ -260,6 +267,7 @@
       "checkAltText": "Images & alt text",
       "checkContentClarity": "Content clarity",
       "wcagScore": "WCAG 2.2 AA score",
+      "wcagVersion": "WCAG version",
       "violations": "Violations"
     },
 
@@ -468,6 +476,12 @@
       "thresholdAxeCritical": "Max critical axe violations",
       "outsystemsUrl": "OutSystems dispatch URL",
       "btnSave": "Save Settings"
+    },
+
+    "stakeholders": {
+      "header": "Stakeholders & Roles — Røde Kors team",
+      "subheader": "Single source of truth for who owns decisions on the rodekors.no rebuild. Used by UAT support, sprint reports and sign-off forms.",
+      "responsibilities": "Responsibilities"
     },
 
     "suites": {

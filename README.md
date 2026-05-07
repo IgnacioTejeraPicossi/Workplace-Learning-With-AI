@@ -116,14 +116,14 @@ The agent ships as a **20-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) wi
 | 20 | ⚙️ Settings | Environments, tools, **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds |
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — **17 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable). Generates `severity_dev` + `category_ops` annotations on every finding.
-- Router: `backend/routers/red_cross_qa.py` — **26 routes** at `/api/red-cross-qa/*` (new: `/ado-bundle-preview`, `/create-ado-work-items`, `/generate-sprint-report`)
+- Service: `backend/services/red_cross_qa.py` — **22 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable). Generates `severity_dev` + `category_ops` annotations on every finding.
+- Router: `backend/routers/red_cross_qa.py` — **31 routes** at `/api/red-cross-qa/*` (Phase B additions: `/run-dpia-check`, `/verify-definition-of-done`, `/run-resilience-check`, `/generate-uat-support`, `/analyze-risk-matrix`)
 - Versioned prompts: `backend/prompts/red_cross_qa/*.md` (13 prompts: test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, **forms_qa**, **content_migration**, **enonic_performance**, **designsystemet**, **role_matrix**). `release_judge.md` and `test_plan.md` updated to reference Azure DevOps + Sev/Kat dual severity + V-model test levels.
 
-**Frontend** (`frontend/src/red-cross-qa/` — 19 files: 18 tab components + shared `_PageHero.jsx`):
+**Frontend** (`frontend/src/red-cross-qa/` — 21 files: 20 tab components + shared `_PageHero.jsx`):
 Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low + `severity_dev` 1-4 + `category_ops` A-C).
 
-**i18n**: Full EN / NO / ES parity (40+ top-level sections each, **419 keys per locale**). New `ado:` block (15 keys) replaces old `jira:` block; new `sprintReport:` block (~22 keys: sev1-4, catA-C, narrative, etc.).
+**i18n**: Full EN / NO / ES parity (40+ top-level sections each, **507 keys per locale** after Phase B). New blocks: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels.
 
 **How to use it**:
 1. Backend: `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000` from repo root
@@ -135,7 +135,7 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 
 **Backward compatibility**: `TestPlanRequest` keeps `jira_epic` as a deprecated alias of `ado_work_item`; the MongoDB collection name `red_cross_qa_jira_dispatches_collection` is deliberately retained to avoid a DB migration. Only user-facing terminology changed.
 
-**Validation status**: Backend imports clean (17 suites, 26 routes), end-to-end smoke test passes (`backend/tests/smoke_red_cross_qa.py` — settings shape, test plan with `test_level`, ADO bundle Sev/Kat, 9+ Fundy checks, sprint report narrative), all 3 locales parse with parity (419 keys × 3), frontend production build succeeds with **0 warnings in `src/red-cross-qa/`**.
+**Validation status**: Backend imports clean (22 suites, 31 routes), end-to-end smoke test passes (`backend/tests/smoke_red_cross_qa.py` — **11 checks**: settings shape, test plan with `test_level`, ADO bundle Sev/Kat, 9+ Fundy checks, sprint report narrative, **DPIA 12 checks + dpia_score, DoD 4-point per work item, Resilience score + breakpoint VU, UAT scripts for Hilde/Trine/Astri, Risk Matrix CSV parser**), all 3 locales parse with parity (**507 keys × 3**), frontend production build succeeds with **0 warnings in `src/red-cross-qa/`**.
 
 ### AGI Hub — "Homo Sapiens vs. KI i Test" tab (April 2026)
 

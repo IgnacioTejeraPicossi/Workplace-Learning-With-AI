@@ -58,6 +58,8 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
     { icon: '🛡️', label: t('redCrossWebQaModule.tabSecurityPrivacy'),  tab: 'security-privacy',  color: '#52525b' },
     { icon: '🎯', label: t('redCrossWebQaModule.tabAdo'),              tab: 'ado',               color: '#3b82f6' },
     { icon: '📈', label: t('redCrossWebQaModule.tabSprintReport'),     tab: 'sprint-report',     color: '#16a34a' },
+    { icon: '✅', label: t('redCrossWebQaModule.tabUatSupport'),       tab: 'uat-support',       color: '#15803d' },
+    { icon: '🎲', label: t('redCrossWebQaModule.tabRiskMatrix'),       tab: 'risk-matrix',       color: '#9a3412' },
     { icon: '📜', label: t('redCrossWebQaModule.tabRuns'),             tab: 'runs',              color: '#64748b' },
   ];
 
@@ -88,6 +90,14 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
     { title: 'Donation amount field has insufficient screen reader description', severity: 'high',   category: 'accessibility' },
     { title: 'Search page TTFB above 800ms target on /sok',                       severity: 'medium', category: 'performance' },
     { title: 'Missing Content-Security-Policy header on staging',                 severity: 'medium', category: 'security' },
+  ];
+
+  // Røde Kors stakeholders — single source of truth (also rendered in Settings)
+  const stakeholders = [
+    { name: 'Hilde Forslund',        role: 'Produkteier',  initials: 'HF', color: '#dc2626' },
+    { name: 'Trine Bruu',            role: 'Testleder',    initials: 'TB', color: '#15803d' },
+    { name: 'Trine Røsand Scheen',   role: 'Fagperson',    initials: 'TS', color: '#1d4ed8' },
+    { name: 'Astri Fretheim',        role: 'Fagperson',    initials: 'AF', color: '#7c3aed' },
   ];
 
   const statusPill = (s) => ({
@@ -198,6 +208,35 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Stakeholders & Roller — Røde Kors team (Phase C) */}
+        <div style={{ ...panelStyle, borderTop: '4px solid #db2777' }}>
+          <h3 style={panelTitle}>👥 {t('redCrossWebQaModule.stakeholders.header')}</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+            {stakeholders.map(s => (
+              <div key={s.name} style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', borderRadius: 10,
+                backgroundColor: `${s.color}08`, border: `1px solid ${s.color}30`,
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                  backgroundColor: s.color, color: 'white',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 700,
+                }}>{s.initials}</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', lineHeight: 1.2 }}>
+                    {s.name}
+                  </div>
+                  <div style={{ fontSize: 11, color: s.color, fontWeight: 600, marginTop: 2 }}>
+                    {s.role}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

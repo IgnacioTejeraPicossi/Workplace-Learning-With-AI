@@ -35,6 +35,14 @@ const STATUS_STYLES = {
   pending: { bg: '#f1f5f9', fg: '#64748b', border: '#cbd5e1' },
 };
 
+// Phase C: Migrert vs Nyopprettet — Trine §3 separates the two cohorts so
+// regressions can be triaged correctly. Migrated content carries legacy-CMS
+// provenance; newly-created content is greenfield Enonic.
+const PROVENANCE_STYLES = {
+  migrated:      { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d', icon: '📦' },
+  newly_created: { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7', icon: '✨' },
+};
+
 const ContentMigration = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [running, setRunning] = useState(false);
@@ -147,6 +155,59 @@ const ContentMigration = ({ environment }) => {
           </div>
         )}
 
+        {/* Phase C — Migrert vs Nyopprettet data */}
+        {report?.data_provenance && (
+          <div style={{ ...panel, borderTop: '4px solid #db2777' }}>
+            <h3 style={panelTitle}>🔀 {t('redCrossWebQaModule.contentMigration.provenanceTitle')}</h3>
+            <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 14px' }}>
+              {t('redCrossWebQaModule.contentMigration.provenanceSubtitle')}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+              {[
+                { key: 'migrated',      data: report.data_provenance.migrated },
+                { key: 'newly_created', data: report.data_provenance.newly_created },
+              ].map(({ key, data }) => {
+                if (!data) return null;
+                const s = PROVENANCE_STYLES[key];
+                return (
+                  <div key={key} style={{
+                    padding: 14, borderRadius: 12,
+                    backgroundColor: s.bg, border: `1px solid ${s.border}`, color: s.fg,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                        {s.icon} {t(`redCrossWebQaModule.contentMigration.provenance_${key}`)}
+                      </span>
+                      <span style={{ fontSize: 22, fontWeight: 700 }}>{data.count ?? '—'}</span>
+                    </div>
+                    {data.label && <div style={{ fontSize: 12, marginBottom: 8, opacity: 0.85 }}>{data.label}</div>}
+                    {Array.isArray(data.common_issues) && data.common_issues.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>
+                          {t('redCrossWebQaModule.contentMigration.commonIssues')}
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12 }}>
+                          {data.common_issues.map((it, i) => <li key={i}>{it}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {data.issues_open != null && (
+                      <div style={{ marginTop: 8, fontSize: 11, fontWeight: 600 }}>
+                        {t('redCrossWebQaModule.contentMigration.issuesOpen')}: {data.issues_open}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {report.data_provenance.rule && (
+              <p style={{ fontSize: 11, color: '#64748b', margin: '12px 0 0', fontStyle: 'italic' }}>
+                ℹ️ {report.data_provenance.rule}
+              </p>
+            )}
+          </div>
+        )}
+
         <div style={panel}>
           <h3 style={panelTitle}>🔍 {t('redCrossWebQaModule.contentMigration.checksTitle')}</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
@@ -180,25 +241,37 @@ const ContentMigration = ({ environment }) => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 13 }}>
                 <thead>
                   <tr>
+                    <th style={th}>{t('redCrossWebQaModule.contentMigration.origin')}</th>
                     <th style={th}>{t('redCrossWebQaModule.contentMigration.legacyUrl')}</th>
                     <th style={th}>{t('redCrossWebQaModule.contentMigration.newUrl')}</th>
                     <th style={th}>{t('redCrossWebQaModule.contentMigration.issue')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {report.broken_pages.map((p, i) => (
-                    <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#f8fafc' : 'white' }}>
-                      <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#475569' }}>{p.legacy_url}</td>
-                      <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#475569' }}>{p.new_url || '—'}</td>
-                      <td style={td}>
-                        <span style={{
-                          padding: '2px 10px', borderRadius: 999,
-                          backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5',
-                          fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                        }}>{p.issue}</span>
-                      </td>
-                    </tr>
-                  ))}
+                  {report.broken_pages.map((p, i) => {
+                    const origin = p.data_origin || 'migrated';
+                    const op = PROVENANCE_STYLES[origin] || PROVENANCE_STYLES.migrated;
+                    return (
+                      <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#f8fafc' : 'white' }}>
+                        <td style={td}>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: 999,
+                            backgroundColor: op.bg, color: op.fg, border: `1px solid ${op.border}`,
+                            fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                          }}>{op.icon} {origin === 'newly_created' ? 'NY' : 'MIGR'}</span>
+                        </td>
+                        <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#475569' }}>{p.legacy_url || '—'}</td>
+                        <td style={{ ...td, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#475569' }}>{p.new_url || '—'}</td>
+                        <td style={td}>
+                          <span style={{
+                            padding: '2px 10px', borderRadius: 999,
+                            backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5',
+                            fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                          }}>{p.issue}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

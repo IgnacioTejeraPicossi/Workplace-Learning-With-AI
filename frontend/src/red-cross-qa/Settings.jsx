@@ -10,6 +10,42 @@ const PAYMENT_OPTIONS = [
   { val: 'disabled', key: 'paymentDisabled', icon: '🚫', color: '#64748b' },
 ];
 
+/**
+ * Røde Kors stakeholders + roller — single source of truth (Phase C).
+ * Used by Dashboard, UAT-støtte, Sprint Report and Settings to consistently
+ * show the named people who own decisions on the rodekors.no rebuild.
+ */
+const STAKEHOLDERS = [
+  {
+    name: 'Hilde Forslund',
+    role: 'Produkteier (Product Owner)',
+    responsibilities: ['UAT sign-off', 'Backlog priority', 'Release approval'],
+    color: '#dc2626',
+    initials: 'HF',
+  },
+  {
+    name: 'Trine Bruu',
+    role: 'Testleder (Test Manager)',
+    responsibilities: ['Teststrategi 30.3', 'Sev1-4 / KatA-C governance', 'Sprint reports'],
+    color: '#15803d',
+    initials: 'TB',
+  },
+  {
+    name: 'Trine Røsand Scheen',
+    role: 'Fagperson (Subject-Matter Expert)',
+    responsibilities: ['Volunteer flow review', 'CMS editorial UAT', 'Beredskap scenarios'],
+    color: '#1d4ed8',
+    initials: 'TS',
+  },
+  {
+    name: 'Astri Fretheim',
+    role: 'Fagperson (Subject-Matter Expert)',
+    responsibilities: ['Donation flow review', 'Fundy + Vipps handoff', 'TV-aksjonen peak'],
+    color: '#7c3aed',
+    initials: 'AF',
+  },
+];
+
 const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode }) => {
   const { t } = useTranslation();
   const [envLocalUrl, setEnvLocalUrl] = useState('http://localhost:3000');
@@ -215,6 +251,47 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
                 </div>
               </Field>
             </div>
+          </div>
+        </div>
+
+        {/* Stakeholders & Roller — Røde Kors team (Phase C) */}
+        <div style={{ ...panel, borderTop: '4px solid #db2777' }}>
+          <h3 style={panelTitle}>👥 {t('redCrossWebQaModule.stakeholders.header')}</h3>
+          <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 14px' }}>
+            {t('redCrossWebQaModule.stakeholders.subheader')}
+          </p>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12,
+          }}>
+            {STAKEHOLDERS.map(s => (
+              <div key={s.name} style={{
+                padding: 14, borderRadius: 12,
+                backgroundColor: `${s.color}08`, border: `1px solid ${s.color}30`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: '50%',
+                    backgroundColor: s.color, color: 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 700, flexShrink: 0,
+                  }}>{s.initials}</div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', lineHeight: 1.2 }}>
+                      {s.name}
+                    </div>
+                    <div style={{ fontSize: 11, color: s.color, fontWeight: 600, marginTop: 2 }}>
+                      {s.role}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: 0.4, marginBottom: 6 }}>
+                  {t('redCrossWebQaModule.stakeholders.responsibilities')}
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
+                  {s.responsibilities.map((r, i) => <li key={i}>{r}</li>)}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 

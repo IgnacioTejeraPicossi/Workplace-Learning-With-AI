@@ -122,6 +122,7 @@ class CmsRequest(BaseModel):
 
 class UrlRequest(BaseModel):
     url: str
+    wcag_version: Optional[str] = "2.2-AA"  # Phase C: explicit WCAG version (Trine §4.1)
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -283,7 +284,10 @@ async def api_generate_cms(body: CmsRequest):
 @router.post("/run-accessibility-check")
 async def api_run_accessibility(body: UrlRequest):
     env = _check_env(body.environment)
-    return await run_accessibility_check(body.url, env, body.lang or "en")
+    return await run_accessibility_check(
+        body.url, env, body.lang or "en",
+        wcag_version=body.wcag_version or "2.2-AA",
+    )
 
 
 # ── Performance ───────────────────────────────────────────────────

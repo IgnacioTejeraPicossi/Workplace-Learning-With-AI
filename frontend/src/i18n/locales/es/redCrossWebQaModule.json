@@ -240,7 +240,14 @@
       "checkSeoMetadata": "Metadatos SEO preservados",
       "checkPublishState": "Estado de publicación preservado",
       "checkIsrInvalidation": "Invalidación caché ISR",
-      "checkPermissionsCarryover": "Permisos de roles transferidos"
+      "checkPermissionsCarryover": "Permisos de roles transferidos",
+      "provenanceTitle": "Datos migrados vs recién creados",
+      "provenanceSubtitle": "Trine §3 — separa las dos cohortes para que las regresiones puedan triarse correctamente. El contenido migrado arrastra el origen del CMS legado; el contenido recién creado es greenfield Enonic XP.",
+      "provenance_migrated": "Migrado",
+      "provenance_newly_created": "Recién creado",
+      "commonIssues": "Problemas comunes",
+      "issuesOpen": "Asuntos abiertos",
+      "origin": "Origen"
     },
 
     "accessibility": {
@@ -260,6 +267,7 @@
       "checkAltText": "Imágenes y texto alt",
       "checkContentClarity": "Claridad del contenido",
       "wcagScore": "Puntuación WCAG 2.2 AA",
+      "wcagVersion": "Versión WCAG",
       "violations": "Violaciones"
     },
 
@@ -468,6 +476,12 @@
       "thresholdAxeCritical": "Máx. violaciones críticas axe",
       "outsystemsUrl": "URL de despacho OutSystems",
       "btnSave": "Guardar ajustes"
+    },
+
+    "stakeholders": {
+      "header": "Interesados y roles — equipo Cruz Roja",
+      "subheader": "Única fuente de verdad sobre quién posee las decisiones en la migración de rodekors.no. Usado por soporte UAT, informes de sprint y formularios de firma.",
+      "responsibilities": "Responsabilidades"
     },
 
     "suites": {

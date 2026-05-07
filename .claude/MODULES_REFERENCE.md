@@ -438,8 +438,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Purpose**: 24/7 QA copilot for the **rodekors.no** website rebuild on Enonic XP CMS + NextJS + Designsystemet (Digdir). Item Agent #9. Two execution modes (Generate-only for Cursor / Claude Code / GitHub Actions, Execute-directly in-app), two environments (local on `:3000`, test). Every run carries a SHA-256 attestation hash.
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — 17 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps).
-- Router: `backend/routers/red_cross_qa.py` — 26 routes at `/api/red-cross-qa/*`
+- Service: `backend/services/red_cross_qa.py` — 22 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix.
+- Router: `backend/routers/red_cross_qa.py` — 31 routes at `/api/red-cross-qa/*`
 - Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts; `release_judge.md` and `test_plan.md` updated for Azure DevOps + Sev/Kat dual severity + test-level taxonomy)
 
 **API endpoints (`/api/red-cross-qa/`):**
@@ -466,13 +466,18 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
 | `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |
 | `/generate-sprint-report` | POST | **Sprint report generator** — aggregates runs/findings/dispatches for active sprint, computes Sev1-4 + KatA-C counts, produces Norwegian/English narrative (Status / Identifiserte avvik / Anbefalinger) for Trine's reporting line |
+| `/run-dpia-check` | POST | **Phase B** — DPIA / Privacy by Design (Trine §6.x + GDPR Art. 25/35): 12 checks, `dpia_score` 0-100, data register (Enonic / Fundy / Vipps / Dataverse / Okta) with legal_basis + retention; findings tagged with `gdpr_article` |
+| `/verify-definition-of-done` | POST | **Phase B** — Trine §6.1 mechanical DoD verifier: per work item checks `functionality_tested` / `integrations_verified` / `known_bugs_documented` / `ready_for_uat`; aggregates last 50 runs + 20 dispatches; emits summary {dod_pass, dod_partial, dod_fail, blockers_open, ready_for_uat} + narrative |
+| `/run-resilience-check` | POST | **Phase B** — Resilience (Trine §7, separate from ytelse): wraps `run_k6` and exposes `resilience_score` 0-100, `breakpoint_vu`, `recovery_seconds`, `error_rate_peak_pct`, `memory_drift_pct` + `_distinction` text |
+| `/generate-uat-support` | POST | **Phase B** — UAT-støtte: generates UAT scripts + per-stakeholder checklists + sign-off form for the named Røde Kors stakeholders (default: Hilde Forslund / Trine Røsand Scheen / Astri Fretheim) |
+| `/analyze-risk-matrix` | POST | **Phase B** — Trine §10 risk matrix consumer: accepts CSV (`id,description,probability,impact,area`) or JSON, scores each risk (probability × impact, 1-25), assigns level (critical/high/medium/low), maps to test suites and produces `suite_priority` + `coverage_gaps` |
 | `/dispatch-to-outsystems` | POST | Send action bundle to OutSystems |
 | `/runs` | GET | List runs with attestation hashes |
 | `/runs/{run_id}` | GET | Run detail (logs, artifacts) |
 | `/stats` | GET | Dashboard stats aggregation |
 | `/settings` | GET/POST | Get/save agent settings (now ado_organization, ado_project, ado_area_path, ado_iteration_path, ado_tags, current_sprint, sprint_length_weeks) |
 
-**Frontend** (`frontend/src/red-cross-qa/` — 18 tab components + shared `_PageHero.jsx`):
+**Frontend** (`frontend/src/red-cross-qa/` — 20 tab components + shared `_PageHero.jsx`):
 
 | Tab | Component | Highlights |
 |-----|-----------|-----------|
@@ -488,20 +493,22 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | Performance | `Performance.jsx` | Lighthouse panel + Enonic panel (10 Enonic checks, hot GraphQL queries with p95) |
 | Designsystemet | `Designsystemet.jsx` | 0-100 compliance score, 10 checks, deviations panel with severity+component+page+fix_hint |
 | Role Matrix | `RoleMatrix.jsx` | 6 colored role chips, full role × action matrix (allow/deny cells), 8 authZ checks, violations expected vs actual |
-| Stress Test | `StressTest.jsx` | k6 profiles + scenarios (national crisis, donation peak, volunteer peak, search-heavy, etc.) |
-| Security & Privacy | `SecurityPrivacy.jsx` | 13 checks (OWASP, GDPR, secrets, dependencies) |
+| Stress Test | `StressTest.jsx` | k6 profiles + scenarios (national crisis, donation peak, volunteer peak, search-heavy, etc.) **+ Phase B Resilience section**: `resilience_score` 0-100, breakpoint VU, recovery seconds, peak error rate, memory drift, plus *ytelse vs resilience* distinction text |
+| Security & Privacy | `SecurityPrivacy.jsx` | 13 checks (OWASP, GDPR, secrets, dependencies) **+ Phase B DPIA / Privacy by Design panel**: 12 GDPR Art. 25/35 checks, `dpia_score` 0-100, data register table over Enonic / Fundy / Vipps / Dataverse / Okta, GDPR-tagged findings |
 | Azure DevOps | `AzureDevOps.jsx` | Work-item bundle preview, dispatch to ADO/OutSystems, priority pill (P1-P4), work_item_type, severity_dev, category_ops, test_level pill |
-| Sprint Report | `SprintReport.jsx` | Sprint name input + StatCards (total/pass/warn/fail) + Sev1-4 panels (Norwegian descriptions) + KatA-C panels (operational categories) + Trine-narrative section + runs/dispatches summaries |
+| Sprint Report | `SprintReport.jsx` | Sprint name input + StatCards (total/pass/warn/fail) + Sev1-4 panels + KatA-C panels + Trine-narrative + runs/dispatches summaries **+ Phase B DoD verifier panel**: per-work-item 4-point checklist (Trine §6.1) + DodStat row (pass/partial/fail/ready_for_uat/blockers) |
+| **UAT Support** | `UatSupport.jsx` | **NEW (Phase B)** — scopes selector (donation/volunteer/cms-editorial/search/forms/beredskap), stakeholder selector (Hilde Forslund / Trine Røsand Scheen / Astri Fretheim) with role labels, UAT scripts (script_id + meta pills + steps + acceptance), checklists, sign-off form table with decision color, support notes |
+| **Risk Matrix** | `RiskMatrix.jsx` | **NEW (Phase B)** — CSV/JSON textarea with sample loader, level counts (critical/high/medium/low), suite_priority table sorted by max risk score, full risks table (P × I → score → level → suite), coverage_gaps panel, narrative section |
 | Runs | `Runs.jsx` | Run history with SHA-256 attestation hash |
 | Settings | `Settings.jsx` | Environments, tools, Azure DevOps project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope, quality thresholds |
 
-**Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 18-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
+**Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), 419 keys per locale, full parity. New `ado:` block (15 keys) replaces old `jira:` block; new `sprintReport:` block (~22 keys: sev1-4, catA-C, narrative, etc.).
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **507 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels.
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
-- 26 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- 31 routes registered at `/api/red-cross-qa/*` — do not break path naming
 - Backward compatibility: `TestPlanRequest` keeps `jira_epic` as deprecated alias of `ado_work_item`; MongoDB collection name `red_cross_qa_jira_dispatches_collection` deliberately retained to avoid DB migration
 - Trine's Teststrategi 30.3 alignment: every finding/work-item must carry **both** `severity_dev` (1-4, dev phase) **and** `category_ops` (A-C, post-handover contract phase) per §8.1
 - 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
@@ -510,8 +517,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Run / smoke commands:**
 ```bash
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
-python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 17
-python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 26
+python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 22
+python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 31
 
 # End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
 python -m backend.tests.smoke_red_cross_qa
