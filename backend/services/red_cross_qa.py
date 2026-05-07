@@ -6,7 +6,7 @@ Red Cross Web QA Agent — Service Layer (Agent #9)
 Phase 1 — Mock-first implementation:
   - Generates structured Test Plans, Playwright/Cypress/k6 scripts via LLM
   - Provides deterministic mock results for execution endpoints
-  - Stores runs, findings, generated scripts, Jira dispatches in MongoDB
+  - Stores runs, findings, generated scripts, Azure DevOps dispatches in MongoDB
 
 The service intentionally degrades gracefully when LLM, MongoDB or external
 tools are unavailable so the UI shell remains usable.
@@ -89,9 +89,15 @@ DEFAULT_SETTINGS = {
     "env_test_url": "https://test.rodekors.no",
     "env_default": "test",
     "execution_mode": "generate",
-    "jira_project": "ITEM",
-    "jira_component": "Web QA",
-    "jira_labels": ["red-cross-qa", "ai-generated"],
+    # Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3)
+    "ado_organization": "rodekors",
+    "ado_project": "rodekors-web",
+    "ado_area_path": "rodekors-web\\Web QA",
+    "ado_iteration_path": "rodekors-web\\Sprint 1",
+    "ado_tags": ["red-cross-qa", "ai-generated"],
+    # Sprint context (used by Sprint Report generator)
+    "current_sprint": "Sprint 1",
+    "sprint_length_weeks": 2,
     "payment_flow": "handoff",
     "threshold_perf": 85,
     "threshold_seo": 90,
@@ -103,7 +109,11 @@ DEFAULT_SETTINGS = {
 # Prompt templates
 # ═══════════════════════════════════════════════════════════════════
 TEST_PLAN_PROMPT = """You are a senior QA engineer for the rodekors.no website (Enonic CMS + NextJS).
-Convert the following Jira epic / user story into a complete sprint test plan.
+Convert the input (Azure DevOps epic / user story + acceptance criteria + design link + risk level)
+into a complete sprint test plan.
+
+The test tool used by Røde Kors is Azure DevOps (per Trines Teststrategi 30.3 §5).
+All work-item suggestions must use ADO terminology: Bug, Task, User Story, Test Case.
 
 Return ONLY valid JSON with this shape:
 {
@@ -113,10 +123,14 @@ Return ONLY valid JSON with this shape:
   "api_checks": [{"endpoint": "...", "method": "...", "check": "..."}],
   "regression_scope": ["..."],
   "suggested_test_data": ["..."],
-  "jira_subtasks": [{"title": "...", "type": "Task", "priority": "Medium"}]
+  "ado_work_items": [{"title": "...", "work_item_type": "Task|Bug|Test Case", "priority": 1, "test_level": "unit|sit|system|uat|performance"}]
 }
 
-Be concrete, reference donation/volunteer/CMS-preview flows where relevant."""
+Test-level taxonomy (per Teststrategi §5): unit, sit, system, uat, performance.
+Always include: migrated-data check + newly-created-data check + extreme-data check
+(long strings, æøå, special chars). Cover happy path + at least one negative path +
+one accessibility check. Reference donation/volunteer/local-services/CMS-preview flows
+where relevant."""
 
 PLAYWRIGHT_PROMPT = """You are a senior QA automation engineer.
 Generate Playwright TypeScript tests for the rodekors.no website covering the requested scopes.
@@ -156,6 +170,10 @@ FORMS_QA_PROMPT = """You are a senior QA engineer for Item Consulting's Skjemaby
 (Enonic XP form-builder, JSON Schema, Adam Silver / gov.uk patterns) on rodekors.no.
 Audit the requested forms and produce a quality report.
 
+Donation forms on rodekors.no are powered by **Fundy** (separate from Vipps —
+Fundy is the donation-form provider, Vipps is one of the payment handoff targets).
+The audit MUST cover both Fundy form rendering AND its handoff into payment providers.
+
 Return ONLY valid JSON with this shape:
 {
   "checks": {
@@ -170,12 +188,23 @@ Return ONLY valid JSON with this shape:
     "checkErrorSummary": {"status": "pass|warn|fail", "note": "..."},
     "checkProgressIndicator": {"status": "pass|warn|fail", "note": "..."},
     "checkVippsHandoff": {"status": "pass|warn|fail", "note": "..."},
-    "checkSubmitIdempotency": {"status": "pass|warn|fail", "note": "..."}
+    "checkSubmitIdempotency": {"status": "pass|warn|fail", "note": "..."},
+    "checkFundyFormRendering": {"status": "pass|warn|fail", "note": "Fundy donation form renders correctly"},
+    "checkFundyAmountSelection": {"status": "pass|warn|fail", "note": "Preset amounts + custom amount work, NOK formatting correct"},
+    "checkFundyFrequencyToggle": {"status": "pass|warn|fail", "note": "One-time vs monthly selection persists"},
+    "checkFundyDonorFields": {"status": "pass|warn|fail", "note": "Name/email/phone validation, æøå accepted"},
+    "checkFundyConsentCheckboxes": {"status": "pass|warn|fail", "note": "GDPR consent + marketing opt-in work and are NOT pre-checked"},
+    "checkFundyHandoffPayload": {"status": "pass|warn|fail", "note": "Fundy → payment provider handoff carries amount, frequency, donor data correctly"},
+    "checkFundyAccessibility": {"status": "pass|warn|fail", "note": "Fundy form passes axe-core (WCAG 2.2 AA) — labels, focus, keyboard, ARIA"},
+    "checkFundyMobile": {"status": "pass|warn|fail", "note": "Fundy form usable on iOS Safari + Android Chrome (320px+)"},
+    "checkFundyErrorRecovery": {"status": "pass|warn|fail", "note": "Network errors + payment failures show actionable messages without losing data"}
   },
   "findings": [{"severity": "low|medium|high|critical", "form": "...", "title": "...", "message": "...", "fix_hint": "..."}],
   "test_cases": [{"title": "...", "form": "...", "type": "manual|automated", "tool": "playwright|cypress|axe|manual", "steps": ["..."], "expected": "..."}]
 }
-Cover donation, volunteer, contact, course and Vipps handoff flows where relevant.
+Cover donation (Fundy), volunteer, contact, course and Vipps handoff flows where relevant.
+For donation forms specifically include: extreme-data tests (æøå in name, very long names),
+migrated content checks, and full Fundy → Vipps handoff verification.
 """
 
 ENONIC_PERFORMANCE_PROMPT = """You are a senior performance engineer for Enonic XP +
@@ -358,11 +387,11 @@ async def _store_run(suite: str, environment: str, status: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 1 — Test Plan
 # ═══════════════════════════════════════════════════════════════════
-async def generate_test_plan(jira_epic: str, acceptance: str, design_link: str,
+async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: str,
                              risk_level: str, environment: str,
                              lang: str = "en") -> Dict[str, Any]:
     user_prompt = (
-        f"Jira epic / user story:\n{jira_epic}\n\n"
+        f"Azure DevOps epic / user story:\n{ado_work_item}\n\n"
         f"Acceptance criteria:\n{acceptance}\n\n"
         f"Design link: {design_link or 'N/A'}\n"
         f"Risk level: {risk_level}\n"
@@ -372,16 +401,24 @@ async def generate_test_plan(jira_epic: str, acceptance: str, design_link: str,
     parsed = _parse_json(raw or "")
 
     if not parsed:
-        # Mock fallback
+        # Mock fallback — uses Azure DevOps terminology + test-level taxonomy
         parsed = {
             "manual_tests": [
                 {"title": "Visitor can complete donation flow on mobile",
                  "steps": ["Open donation page", "Choose amount", "Continue to payment"],
                  "expected": "Provider handoff screen renders"},
+                {"title": "Migrated content article renders correctly",
+                 "steps": ["Open migrated article URL", "Verify æøå chars", "Verify images"],
+                 "expected": "Page identical to legacy version"},
+                {"title": "Extreme-data form submission",
+                 "steps": ["Submit volunteer form with 500-char name + æøå/special chars"],
+                 "expected": "Validation handles or accepts safely"},
             ],
             "automated_candidates": [
-                {"title": "donation-flow-smoke", "tool": "playwright", "rationale": "Critical revenue path"},
-                {"title": "axe-core scan on donation page", "tool": "axe", "rationale": "WCAG 2.2 AA"},
+                {"title": "donation-flow-smoke", "tool": "playwright",
+                 "rationale": "Critical revenue path"},
+                {"title": "axe-core scan on donation page", "tool": "axe",
+                 "rationale": "WCAG 2.2 AA"},
             ],
             "accessibility_checklist": [
                 "Keyboard reachable amount selector",
@@ -389,13 +426,25 @@ async def generate_test_plan(jira_epic: str, acceptance: str, design_link: str,
                 "Form errors announced to screen readers",
             ],
             "api_checks": [
-                {"endpoint": "/site/api/graphql", "method": "POST", "check": "Donation query returns localized fields"},
+                {"endpoint": "/site/api/graphql", "method": "POST",
+                 "check": "Donation query returns localized fields"},
             ],
             "regression_scope": ["Donation page", "Volunteer signup", "Local pages"],
-            "suggested_test_data": ["100 NOK / monthly", "500 NOK / one-time"],
-            "jira_subtasks": [
-                {"title": "Add Playwright donation smoke", "type": "Task", "priority": "High"},
-                {"title": "Add axe-core check", "type": "Task", "priority": "Medium"},
+            "suggested_test_data": [
+                "100 NOK / monthly",
+                "500 NOK / one-time",
+                "Migrated article (æøå)",
+                "Long-string name (500 chars)",
+            ],
+            "ado_work_items": [
+                {"title": "Add Playwright donation smoke",
+                 "work_item_type": "Task", "priority": 2, "test_level": "system"},
+                {"title": "Add axe-core check on donation page",
+                 "work_item_type": "Task", "priority": 3, "test_level": "system"},
+                {"title": "Verify Vipps handoff (SIT)",
+                 "work_item_type": "Test Case", "priority": 2, "test_level": "sit"},
+                {"title": "Lighthouse Core Web Vitals smoke",
+                 "work_item_type": "Test Case", "priority": 3, "test_level": "performance"},
             ],
         }
 
@@ -715,6 +764,16 @@ async def run_forms_qa(scopes: List[str], environment: str,
         "checkProgressIndicator":  {"status": "pass", "note": "Step X/Y shown on multi-step forms"},
         "checkVippsHandoff":       {"status": "pass", "note": "Return + cancel URLs validated"},
         "checkSubmitIdempotency":  {"status": "warn", "note": "Donation form lacks PRG token — refresh re-submits"},
+        # ── Fundy donation-form sub-checks (separate provider from Vipps) ──
+        "checkFundyFormRendering":     {"status": "pass", "note": "Fundy form renders within 2s on test env"},
+        "checkFundyAmountSelection":   {"status": "pass", "note": "100/250/500/1000 NOK + custom amount work"},
+        "checkFundyFrequencyToggle":   {"status": "pass", "note": "One-time vs monthly persists across step navigation"},
+        "checkFundyDonorFields":       {"status": "warn", "note": "Last name validation rejects names with space (Olav Per Hansen)"},
+        "checkFundyConsentCheckboxes": {"status": "fail", "note": "Marketing opt-in is pre-checked — GDPR violation"},
+        "checkFundyHandoffPayload":    {"status": "pass", "note": "Fundy → Vipps payload includes amount, currency=NOK, donor email"},
+        "checkFundyAccessibility":     {"status": "warn", "note": "Fundy iframe has 1 axe-core violation (color-contrast on 'Continue' button)"},
+        "checkFundyMobile":            {"status": "pass", "note": "Fundy form usable on iPhone SE (375px) and Galaxy S8"},
+        "checkFundyErrorRecovery":     {"status": "warn", "note": "Network error during submit shows generic message — donor data preserved"},
     }
 
     findings = parsed.get("findings") or [
@@ -730,7 +789,24 @@ async def run_forms_qa(scopes: List[str], environment: str,
         {"severity": "low", "form": "contact", "title": "APIM prefill timeout missing",
          "message": "If Azure APIM prefill is slow, the form blocks for 30s.",
          "fix_hint": "Add a 4s timeout with a graceful fallback to an empty form."},
+        # ── Fundy-specific findings ──
+        {"severity": "high", "form": "fundy-donation", "title": "Marketing opt-in pre-checked (Fundy)",
+         "message": "Fundy donation form pre-checks the marketing consent box — GDPR violation.",
+         "fix_hint": "Set Fundy form config consent_default=false; verify in Fundy admin."},
+        {"severity": "medium", "form": "fundy-donation", "title": "Fundy iframe contrast violation",
+         "message": "Fundy 'Continue' button fails WCAG 2.2 AA color contrast (3.8:1).",
+         "fix_hint": "Ask Fundy support to override theme color or wrap form in custom-styled container."},
+        {"severity": "medium", "form": "fundy-donation", "title": "Last name validation rejects spaces",
+         "message": "Fundy rejects 'Olav Per Hansen' — spaces in last name are valid in Norwegian.",
+         "fix_hint": "Update Fundy validation regex to allow spaces and æøå."},
     ]
+
+    # Augment each finding with severity_dev (1-4) + category_ops (A-C)
+    # so the Sprint Report and Release Judge can use Trine's dual scheme.
+    for f in findings:
+        sev = (f.get("severity") or "medium").lower()
+        f.setdefault("severity_dev", _severity_dev(sev))
+        f.setdefault("category_ops", _category_ops(sev))
 
     test_cases = parsed.get("test_cases") or [
         {"title": "Donation amount mobile keyboard", "form": "donation",
@@ -745,6 +821,19 @@ async def run_forms_qa(scopes: List[str], environment: str,
          "type": "manual", "tool": "manual",
          "steps": ["Start donation", "Continue to Vipps", "Cancel in Vipps"],
          "expected": "User lands on rodekors.no donation page with state preserved"},
+        {"title": "Fundy → Vipps handoff payload integrity", "form": "fundy-donation",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Open donation page", "Select 250 NOK monthly", "Fill donor data with æøå",
+                   "Click Continue → intercept Fundy → Vipps request"],
+         "expected": "Payload contains amount=250, currency=NOK, frequency=monthly, donor.name with æøå preserved"},
+        {"title": "Fundy consent checkbox not pre-checked", "form": "fundy-donation",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Open donation page", "Inspect marketing-opt-in checkbox initial state"],
+         "expected": "Marketing opt-in is unchecked by default (GDPR)"},
+        {"title": "Fundy form on iPhone SE (extreme small viewport)", "form": "fundy-donation",
+         "type": "automated", "tool": "playwright",
+         "steps": ["Set viewport to 320×568", "Open donation page", "Complete full donation flow"],
+         "expected": "All controls reachable, no horizontal scroll, keyboard does not cover input"},
     ]
 
     # status: fail if any fail, warn if any warn, else pass
@@ -1088,12 +1177,20 @@ async def run_role_matrix_audit(environment: str,
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Tool 10 — Jira Action Bundle + dispatch
+# Tool 10 — Azure DevOps Work-Item Bundle + dispatch
+# ─────────────────────────────────────────────────────────────────────
+# Trine (Testleder) uses Azure DevOps as the official test tool per
+# the Teststrategi (30.3). We map QA findings to ADO work items:
+#   severity critical/high → Bug
+#   severity medium        → Bug (lower priority)
+#   non-bug recommendations → Task
+# Severity 1-4 (development phase) and Category A-C (operational/contract
+# phase) are emitted alongside, see release_judge.md.
 # ═══════════════════════════════════════════════════════════════════
-async def get_jira_bundle_preview(environment: str) -> Dict[str, Any]:
+async def get_ado_bundle_preview(environment: str) -> Dict[str, Any]:
     settings = await get_settings()
     s = settings["settings"]
-    issues: List[Dict[str, Any]] = []
+    work_items: List[Dict[str, Any]] = []
     try:
         cursor = red_cross_qa_runs_collection.find(
             {"environment": environment, "status": {"$in": ["fail", "warn"]}}
@@ -1101,46 +1198,77 @@ async def get_jira_bundle_preview(environment: str) -> Dict[str, Any]:
         async for run in cursor:
             payload = run.get("payload", {}) or {}
             for f in (payload.get("findings") or [])[:3]:
-                issues.append({
+                sev = (f.get("severity") or "medium").lower()
+                work_items.append({
                     "title": f.get("title") or f.get("message") or "QA finding",
-                    "type": "Bug",
-                    "priority": _priority_from_severity(f.get("severity")),
+                    "work_item_type": "Bug" if sev in ("critical", "high", "medium") else "Task",
+                    "priority": _ado_priority_from_severity(sev),
+                    "severity": _ado_severity_label(sev),
+                    "severity_dev": _severity_dev(sev),    # 1-4 utviklingsfase
+                    "category_ops": _category_ops(sev),    # A-C driftsfase
                     "description": f"From run {run.get('run_id')} ({run.get('suite')}): {f.get('message','')}",
                 })
     except Exception:
         pass
 
-    if not issues:
-        issues = [
+    if not work_items:
+        work_items = [
             {"title": "Donation CTA contrast below WCAG AA",
-             "type": "Bug", "priority": "Medium",
+             "work_item_type": "Bug", "priority": 2, "severity": "2 - High",
+             "severity_dev": 2, "category_ops": "B",
              "description": "Mock — found by axe-core. Suggested fix: darken brand-red-500."},
             {"title": "Missing CSP report-uri",
-             "type": "Task", "priority": "Low",
+             "work_item_type": "Task", "priority": 4, "severity": "4 - Low",
+             "severity_dev": 4, "category_ops": "C",
              "description": "Mock — add report-uri to CSP header."},
         ]
 
     bundle = {
-        "project_key": s["jira_project"],
-        "component": s["jira_component"],
-        "labels": s["jira_labels"],
-        "issues": issues,
+        "organization": s.get("ado_organization", "rodekors"),
+        "project": s.get("ado_project", "rodekors-web"),
+        "area_path": s.get("ado_area_path", "rodekors-web\\Web QA"),
+        "iteration_path": s.get("ado_iteration_path", "rodekors-web\\Sprint 1"),
+        "tags": s.get("ado_tags", ["red-cross-qa", "ai-generated"]),
+        "work_items": work_items,
         "environment": environment,
     }
     return {"status": "ok", "bundle": bundle}
 
 
-def _priority_from_severity(sev: Optional[str]) -> str:
-    return {"critical": "Critical", "high": "High",
-            "medium": "Medium", "low": "Low"}.get((sev or "medium").lower(), "Medium")
+# Azure DevOps uses 1-4 priority (1 highest)
+def _ado_priority_from_severity(sev: Optional[str]) -> int:
+    return {"critical": 1, "high": 2, "medium": 3, "low": 4}.get((sev or "medium").lower(), 3)
 
 
-async def create_jira_issues(environment: str, lang: str = "en") -> Dict[str, Any]:
-    preview = await get_jira_bundle_preview(environment)
+# ADO severity field expects "1 - Critical", "2 - High", "3 - Medium", "4 - Low"
+def _ado_severity_label(sev: Optional[str]) -> str:
+    return {
+        "critical": "1 - Critical",
+        "high":     "2 - High",
+        "medium":   "3 - Medium",
+        "low":      "4 - Low",
+    }.get((sev or "medium").lower(), "3 - Medium")
+
+
+# Sev 1-4 (utviklingsfase, per Trines teststrategi 8.1)
+def _severity_dev(sev: Optional[str]) -> int:
+    return {"critical": 1, "high": 2, "medium": 3, "low": 4}.get((sev or "medium").lower(), 3)
+
+
+# Kat A-C (driftsfase, kontraktbasert per Trines teststrategi 8.1)
+def _category_ops(sev: Optional[str]) -> str:
+    # critical → A (kritisk feil), high → B (alvorlig feil),
+    # medium / low → C (mindre alvorlig feil)
+    return {"critical": "A", "high": "B", "medium": "C", "low": "C"}.get(
+        (sev or "medium").lower(), "C")
+
+
+async def create_ado_work_items(environment: str, lang: str = "en") -> Dict[str, Any]:
+    preview = await get_ado_bundle_preview(environment)
     bundle = preview["bundle"]
     record = {
         "bundle": bundle,
-        "destination": "jira",
+        "destination": "azure_devops",
         "status": "dispatched",
         "created_at": _now(),
         "environment": environment,
@@ -1149,12 +1277,13 @@ async def create_jira_issues(environment: str, lang: str = "en") -> Dict[str, An
         await red_cross_qa_jira_dispatches_collection.insert_one(dict(record))
     except Exception:
         pass
-    return {"status": "ok", "created_count": len(bundle["issues"]),
-            "destination": "jira", "bundle": bundle}
+    return {"status": "ok",
+            "created_count": len(bundle["work_items"]),
+            "destination": "azure_devops", "bundle": bundle}
 
 
 async def dispatch_to_outsystems(environment: str) -> Dict[str, Any]:
-    preview = await get_jira_bundle_preview(environment)
+    preview = await get_ado_bundle_preview(environment)
     bundle = preview["bundle"]
     record = {
         "bundle": bundle, "destination": "outsystems",
@@ -1165,8 +1294,163 @@ async def dispatch_to_outsystems(environment: str) -> Dict[str, Any]:
         await red_cross_qa_jira_dispatches_collection.insert_one(dict(record))
     except Exception:
         pass
-    return {"status": "ok", "dispatched_count": len(bundle["issues"]),
+    return {"status": "ok",
+            "dispatched_count": len(bundle["work_items"]),
             "destination": "outsystems", "bundle": bundle}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Sprint Report — auto-generated summary for Trine (Testleder)
+# Per Teststrategi 30.3 §8: "Det skal utarbeides en rapport per sprint
+# med status, identifiserte avvik og anbefalinger." Trine is responsible
+# for "koordinere, strukturere og rapportere testaktiviteter" — this
+# generator automates the rapportere step end-to-end.
+# ═══════════════════════════════════════════════════════════════════
+async def generate_sprint_report(sprint_name: Optional[str] = None,
+                                 environment: str = "test",
+                                 lang: str = "en") -> Dict[str, Any]:
+    settings = await get_settings()
+    s = settings["settings"]
+    sprint = sprint_name or s.get("current_sprint") or "Sprint 1"
+    sprint_weeks = s.get("sprint_length_weeks", 2)
+
+    # Gather sprint data — runs, findings, dispatches
+    runs: List[Dict[str, Any]] = []
+    findings: List[Dict[str, Any]] = []
+    dispatches: List[Dict[str, Any]] = []
+    counts = {"pass": 0, "fail": 0, "warn": 0, "total": 0}
+    sev_counts = {1: 0, 2: 0, 3: 0, 4: 0}     # utviklingsfase
+    cat_counts = {"A": 0, "B": 0, "C": 0}     # driftsfase
+
+    try:
+        cursor = red_cross_qa_runs_collection.find(
+            {"environment": environment}
+        ).sort("started_at", -1).limit(50)
+        async for r in cursor:
+            r.pop("_id", None)
+            counts["total"] += 1
+            counts[r.get("status", "warn")] = counts.get(r.get("status", "warn"), 0) + 1
+            runs.append({
+                "run_id": r.get("run_id"),
+                "suite": r.get("suite"),
+                "status": r.get("status"),
+                "summary": r.get("summary"),
+                "started_at": r.get("started_at"),
+            })
+    except Exception:
+        pass
+
+    try:
+        cursor = red_cross_qa_findings_collection.find(
+            {"environment": environment}
+        ).sort("created_at", -1).limit(50)
+        async for f in cursor:
+            f.pop("_id", None)
+            sev = (f.get("severity") or "medium").lower()
+            sev_counts[_severity_dev(sev)] = sev_counts.get(_severity_dev(sev), 0) + 1
+            cat_counts[_category_ops(sev)] = cat_counts.get(_category_ops(sev), 0) + 1
+            findings.append(f)
+    except Exception:
+        pass
+
+    try:
+        cursor = red_cross_qa_jira_dispatches_collection.find().sort(
+            "created_at", -1).limit(20)
+        async for d in cursor:
+            d.pop("_id", None)
+            dispatches.append({
+                "destination": d.get("destination"),
+                "status": d.get("status"),
+                "created_at": d.get("created_at"),
+                "items": len((d.get("bundle") or {}).get("work_items") or []),
+            })
+    except Exception:
+        pass
+
+    pass_rate = round(counts["pass"] / counts["total"] * 100) if counts["total"] else 0
+
+    # Quality gates roll-up (mirrors get_stats)
+    gates = {
+        "gateAccessibility": "warn" if counts["total"] else "idle",
+        "gatePerformance":   "warn" if counts["total"] else "idle",
+        "gateApi":           "pass" if counts["total"] else "idle",
+        "gateSecurity":      "warn" if counts["total"] else "idle",
+        "gateForms":         "warn" if counts["total"] else "idle",
+    }
+
+    # LLM narrative (graceful fallback if no LLM)
+    narrative_prompt = f"""You are Trine Bruu, Testleder for rodekors.no.
+Write a concise sprint test report (Norwegian if lang=no, otherwise English).
+Sprint: {sprint} ({sprint_weeks} weeks). Environment: {environment}.
+Stats: {counts['total']} runs, {pass_rate}% pass rate.
+Severity breakdown (utviklingsfase 1-4): {sev_counts}.
+Category breakdown (driftsfase A-C): {cat_counts}.
+Sections: 1) Status, 2) Identifiserte avvik, 3) Anbefalinger.
+Keep under 300 words."""
+
+    narrative = ""
+    try:
+        narrative = await _llm(narrative_prompt,
+                               "You are a senior QA test lead writing a sprint report.",
+                               lang) or ""
+    except Exception:
+        narrative = ""
+
+    if not narrative or "[MOCKED" in narrative:
+        if (lang or "en").startswith("no"):
+            narrative = (
+                f"## Status\n{sprint}: {counts['total']} testkjøringer, "
+                f"{pass_rate}% pass-rate.\n\n"
+                f"## Identifiserte avvik\nAlvorlighetsgrad (utviklingsfase): "
+                f"Sev1={sev_counts[1]}, Sev2={sev_counts[2]}, "
+                f"Sev3={sev_counts[3]}, Sev4={sev_counts[4]}.\n"
+                f"Kategori (driftsfase): A={cat_counts['A']}, "
+                f"B={cat_counts['B']}, C={cat_counts['C']}.\n\n"
+                f"## Anbefalinger\nFokus på ikke-passerte porter og kritiske funn."
+            )
+        else:
+            narrative = (
+                f"## Status\n{sprint}: {counts['total']} runs, "
+                f"{pass_rate}% pass rate.\n\n"
+                f"## Findings\nSeverity (dev): {sev_counts}. "
+                f"Category (ops): {cat_counts}.\n\n"
+                f"## Recommendations\nFocus on failing gates and critical findings."
+            )
+
+    report = {
+        "sprint_name": sprint,
+        "sprint_length_weeks": sprint_weeks,
+        "environment": environment,
+        "generated_at": _now(),
+        "stats": {
+            "total_runs": counts["total"],
+            "pass_rate": pass_rate,
+            "by_status": {"pass": counts["pass"],
+                          "fail": counts["fail"],
+                          "warn": counts["warn"]},
+            "severity_dev": sev_counts,    # 1-4 utviklingsfase
+            "category_ops": cat_counts,    # A-C driftsfase
+        },
+        "quality_gates": gates,
+        "runs_sample": runs[:10],
+        "findings_sample": findings[:10],
+        "dispatches": dispatches,
+        "narrative": narrative,
+        "lang": lang,
+    }
+
+    # Persist
+    try:
+        await red_cross_qa_reports_collection.insert_one({
+            **report,
+            "_id": ObjectId(),
+            "report_id": f"sprint-report-{uuid.uuid4().hex[:8]}",
+        })
+    except Exception:
+        pass
+
+    report.pop("_id", None)
+    return {"status": "ok", "report": report}
 
 
 # ═══════════════════════════════════════════════════════════════════

@@ -4,9 +4,15 @@ import PageHero from './_PageHero';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
+// Test-level taxonomy (per Teststrategi 30.3 §5)
+const TEST_LEVEL_COLOR = {
+  unit: '#2563eb', sit: '#7c3aed', system: '#0891b2',
+  uat: '#10b981', performance: '#f59e0b',
+};
+
 const TestPlan = ({ environment }) => {
   const { t, i18n } = useTranslation();
-  const [jiraEpic, setJiraEpic] = useState('');
+  const [adoWorkItem, setAdoWorkItem] = useState('');
   const [acceptance, setAcceptance] = useState('');
   const [designLink, setDesignLink] = useState('');
   const [riskLevel, setRiskLevel] = useState('medium');
@@ -14,13 +20,13 @@ const TestPlan = ({ environment }) => {
   const [plan, setPlan] = useState(null);
 
   const handleGenerate = async () => {
-    if (!jiraEpic.trim() && !acceptance.trim()) return;
+    if (!adoWorkItem.trim() && !acceptance.trim()) return;
     setGenerating(true); setPlan(null);
     try {
       const res = await fetch(`${API}/generate-test-plan`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jira_epic: jiraEpic, acceptance_criteria: acceptance,
+          ado_work_item: adoWorkItem, acceptance_criteria: acceptance,
           design_link: designLink, risk_level: riskLevel,
           environment, lang: i18n.language,
         }),
@@ -36,7 +42,7 @@ const TestPlan = ({ environment }) => {
     { key: 'accessibility_checklist',title: t('redCrossWebQaModule.testPlan.outputAccessibilityChecklist'),color: '#06b6d4' },
     { key: 'api_checks',             title: t('redCrossWebQaModule.testPlan.outputApiChecks'),             color: '#8b5cf6' },
     { key: 'regression_scope',       title: t('redCrossWebQaModule.testPlan.outputRegressionScope'),       color: '#f59e0b' },
-    { key: 'jira_subtasks',          title: t('redCrossWebQaModule.testPlan.outputJiraSubtasks'),          color: '#10b981' },
+    { key: 'ado_work_items',         title: t('redCrossWebQaModule.testPlan.outputAdoWorkItems'),          color: '#10b981' },
   ];
 
   return (
@@ -55,9 +61,9 @@ const TestPlan = ({ environment }) => {
           <div style={panel}>
             <h3 style={panelTitle}>📥 Inputs</h3>
             <div style={{ display: 'grid', gap: 14 }}>
-              <Field label={t('redCrossWebQaModule.testPlan.inputJiraEpic')}>
-                <textarea value={jiraEpic} onChange={e => setJiraEpic(e.target.value)} rows={3}
-                  placeholder="ITEM-1234 — As a donor I want to choose a one-time amount and continue to payment"
+              <Field label={t('redCrossWebQaModule.testPlan.inputAdoWorkItem')}>
+                <textarea value={adoWorkItem} onChange={e => setAdoWorkItem(e.target.value)} rows={3}
+                  placeholder="ADO-1234 — As a donor I want to choose a one-time amount and continue to payment"
                   style={input} />
               </Field>
               <Field label={t('redCrossWebQaModule.testPlan.inputAcceptance')}>
@@ -101,9 +107,35 @@ const TestPlan = ({ environment }) => {
                         <span style={{ fontSize: 11, color: s.color, fontWeight: 600 }}>{items.length}</span>
                       </div>
                       <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#475569' }}>
-                        {items.map((it, i) => (
-                          <li key={i}>{typeof it === 'string' ? it : it.title || JSON.stringify(it)}</li>
-                        ))}
+                        {items.map((it, i) => {
+                          if (typeof it === 'string') return <li key={i}>{it}</li>;
+                          const lvl = it.test_level;
+                          return (
+                            <li key={i} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                              {it.work_item_type && (
+                                <span style={{
+                                  padding: '1px 6px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                                  color: '#1e293b', backgroundColor: '#e2e8f0',
+                                }}>{it.work_item_type}</span>
+                              )}
+                              {it.priority && (
+                                <span style={{
+                                  padding: '1px 6px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+                                  color: 'white',
+                                  backgroundColor: { 1: '#b91c1c', 2: '#dc2626', 3: '#f59e0b', 4: '#10b981' }[it.priority] || '#64748b',
+                                }}>P{it.priority}</span>
+                              )}
+                              {lvl && (
+                                <span style={{
+                                  padding: '1px 8px', borderRadius: 999, fontSize: 10, fontWeight: 700,
+                                  color: 'white',
+                                  backgroundColor: TEST_LEVEL_COLOR[lvl] || '#64748b',
+                                }}>{lvl}</span>
+                              )}
+                              <span>{it.title || JSON.stringify(it)}</span>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   );

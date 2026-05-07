@@ -56,7 +56,8 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
     { icon: '🔐', label: t('redCrossWebQaModule.tabRoleMatrix'),       tab: 'role-matrix',       color: '#475569' },
     { icon: '🔥', label: t('redCrossWebQaModule.tabStressTest'),       tab: 'stress-test',       color: '#f97316' },
     { icon: '🛡️', label: t('redCrossWebQaModule.tabSecurityPrivacy'),  tab: 'security-privacy',  color: '#52525b' },
-    { icon: '🎯', label: t('redCrossWebQaModule.tabJira'),             tab: 'jira',              color: '#3b82f6' },
+    { icon: '🎯', label: t('redCrossWebQaModule.tabAdo'),              tab: 'ado',               color: '#3b82f6' },
+    { icon: '📈', label: t('redCrossWebQaModule.tabSprintReport'),     tab: 'sprint-report',     color: '#16a34a' },
     { icon: '📜', label: t('redCrossWebQaModule.tabRuns'),             tab: 'runs',              color: '#64748b' },
   ];
 

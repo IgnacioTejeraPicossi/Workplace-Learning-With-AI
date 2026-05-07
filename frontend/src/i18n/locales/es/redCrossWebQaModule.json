@@ -17,7 +17,8 @@
     "tabRoleMatrix": "Matriz de roles",
     "tabStressTest": "Pruebas de estrés",
     "tabSecurityPrivacy": "Seguridad y privacidad",
-    "tabJira": "Jira",
+    "tabAdo": "Azure DevOps",
+    "tabSprintReport": "Informe de sprint",
     "tabRuns": "Ejecuciones",
     "tabSettings": "Ajustes",
 
@@ -85,8 +86,8 @@
 
     "testPlan": {
       "header": "Generar plan de pruebas de sprint",
-      "subheader": "Convierte un épico de Jira o historia de usuario en un plan QA completo",
-      "inputJiraEpic": "Épico de Jira o historia de usuario",
+      "subheader": "Convierte un épico de Azure DevOps o historia de usuario en un plan QA completo",
+      "inputAdoWorkItem": "Épico de Azure DevOps o historia de usuario",
       "inputAcceptance": "Criterios de aceptación",
       "inputDesignLink": "Enlace de diseño (Figma / Sketch)",
       "inputCmsModel": "Modelo de contenido CMS",
@@ -99,7 +100,7 @@
       "outputApiChecks": "Comprobaciones de API",
       "outputRegressionScope": "Alcance de regresión",
       "outputSuggestedData": "Datos de prueba sugeridos",
-      "outputJiraSubtasks": "Subtareas de Jira"
+      "outputAdoWorkItems": "Elementos de trabajo de Azure DevOps"
     },
 
     "playwright": {
@@ -382,20 +383,50 @@
       "checkGdpr": "Contenido y flujos GDPR"
     },
 
-    "jira": {
-      "header": "Despacho a Jira",
-      "subheader": "Convierte hallazgos en incidencias Jira en el proyecto Item",
-      "btnDispatch": "Crear incidencias Jira",
+    "ado": {
+      "header": "Despacho a Azure DevOps",
+      "subheader": "Convierte hallazgos en elementos de trabajo de Azure DevOps (herramienta oficial de pruebas de Trine — Teststrategi 30.3 §5)",
+      "btnDispatch": "Crear elementos de trabajo ADO",
       "btnSendToOutsystems": "Enviar a OutSystems",
-      "projectKey": "Clave de proyecto",
-      "component": "Componente",
-      "labels": "Etiquetas",
-      "issueTitle": "Título",
-      "issueType": "Tipo",
-      "issuePriority": "Prioridad",
-      "issueDescription": "Descripción",
+      "bundleConfig": "Configuración del paquete",
+      "organization": "Organización",
+      "project": "Proyecto",
+      "areaPath": "Ruta de área",
+      "iterationPath": "Ruta de iteración",
+      "tags": "Etiquetas",
+      "workItemType": "Tipo de elemento",
+      "priority": "Prioridad (1–4)",
+      "severity": "Severidad",
       "previewTitle": "Vista previa del Action Bundle",
       "dispatched": "Despachado"
+    },
+
+    "sprintReport": {
+      "header": "Informe de sprint",
+      "subheader": "Informe automático de fin de sprint (estado, hallazgos, recomendaciones) para Trine — Teststrategi 30.3 §8",
+      "configTitle": "Configuración del sprint",
+      "sprintName": "Nombre del sprint (sobrescribir)",
+      "sprintHint": "Déjalo vacío para usar el sprint configurado: {{value}}",
+      "btnGenerate": "Generar informe de sprint",
+      "totalRuns": "Ejecuciones totales",
+      "passRate": "Tasa de éxito",
+      "warnings": "Advertencias",
+      "failures": "Fallos",
+      "severityDev": "Severidad (fase de desarrollo 1–4)",
+      "severityDevHint": "Per Teststrategi §8.1 — usado durante el proyecto / desarrollo.",
+      "sev1": "Crítica — sistema inutilizable",
+      "sev2": "Alta — función importante rota",
+      "sev3": "Media — parcialmente funcional",
+      "sev4": "Baja — cosmética / menor",
+      "categoryOps": "Categoría (fase operacional A–C)",
+      "categoryOpsHint": "Per Teststrategi §8.1 — tras la entrega, base contractual.",
+      "catA": "Crítica — el servicio se detiene / pérdida de datos",
+      "catB": "Grave — funciones importantes afectadas",
+      "catC": "Menor — workaround disponible",
+      "narrative": "Texto (estado / hallazgos / recomendaciones)",
+      "runsSample": "Ejecuciones recientes",
+      "dispatches": "Despachos a ADO",
+      "workItems": "elementos de trabajo"
     },
 
     "runs": {
@@ -412,15 +443,19 @@
 
     "settings": {
       "header": "Ajustes del agente",
-      "subheader": "Entornos, herramientas, Jira, flujo de pago, umbrales",
+      "subheader": "Entornos, herramientas, Azure DevOps, sprint, flujo de pago, umbrales",
       "envLocalUrl": "URL local",
       "envTestUrl": "URL de test",
       "envDefault": "Entorno por defecto",
       "tools": "Herramientas de prueba",
-      "jiraSection": "Jira",
-      "jiraProject": "Clave de proyecto",
-      "jiraComponent": "Componente",
-      "jiraLabels": "Etiquetas por defecto",
+      "adoSection": "Azure DevOps",
+      "adoOrganization": "Organización",
+      "adoProject": "Proyecto",
+      "adoAreaPath": "Ruta de área",
+      "adoIterationPath": "Ruta de iteración",
+      "adoTags": "Etiquetas por defecto",
+      "currentSprint": "Sprint activo",
+      "sprintLengthWeeks": "Duración del sprint (semanas)",
       "paymentFlow": "Alcance del flujo de pago",
       "paymentHandoff": "Solo hasta el handoff con el proveedor",
       "paymentSandbox": "Flujo completo de sandbox",

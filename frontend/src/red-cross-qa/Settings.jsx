@@ -14,9 +14,14 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
   const { t } = useTranslation();
   const [envLocalUrl, setEnvLocalUrl] = useState('http://localhost:3000');
   const [envTestUrl, setEnvTestUrl] = useState('https://test.rodekors.no');
-  const [jiraProject, setJiraProject] = useState('ITEM');
-  const [jiraComponent, setJiraComponent] = useState('Web QA');
-  const [jiraLabels, setJiraLabels] = useState('red-cross-qa, ai-generated');
+  // Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3 §5)
+  const [adoOrganization, setAdoOrganization] = useState('rodekors');
+  const [adoProject, setAdoProject] = useState('rodekors-web');
+  const [adoAreaPath, setAdoAreaPath] = useState('rodekors-web\\Web QA');
+  const [adoIterationPath, setAdoIterationPath] = useState('rodekors-web\\Sprint 1');
+  const [adoTags, setAdoTags] = useState('red-cross-qa, ai-generated');
+  const [currentSprint, setCurrentSprint] = useState('Sprint 1');
+  const [sprintLengthWeeks, setSprintLengthWeeks] = useState(2);
   const [paymentFlow, setPaymentFlow] = useState('handoff');
   const [thresholdPerf, setThresholdPerf] = useState(85);
   const [thresholdSeo, setThresholdSeo] = useState(90);
@@ -34,9 +39,13 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
           const s = data.settings;
           if (s.env_local_url) setEnvLocalUrl(s.env_local_url);
           if (s.env_test_url) setEnvTestUrl(s.env_test_url);
-          if (s.jira_project) setJiraProject(s.jira_project);
-          if (s.jira_component) setJiraComponent(s.jira_component);
-          if (s.jira_labels) setJiraLabels((s.jira_labels || []).join(', '));
+          if (s.ado_organization) setAdoOrganization(s.ado_organization);
+          if (s.ado_project) setAdoProject(s.ado_project);
+          if (s.ado_area_path) setAdoAreaPath(s.ado_area_path);
+          if (s.ado_iteration_path) setAdoIterationPath(s.ado_iteration_path);
+          if (s.ado_tags) setAdoTags((s.ado_tags || []).join(', '));
+          if (s.current_sprint) setCurrentSprint(s.current_sprint);
+          if (s.sprint_length_weeks != null) setSprintLengthWeeks(s.sprint_length_weeks);
           if (s.payment_flow) setPaymentFlow(s.payment_flow);
           if (s.threshold_perf != null) setThresholdPerf(s.threshold_perf);
           if (s.threshold_seo != null) setThresholdSeo(s.threshold_seo);
@@ -55,9 +64,13 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
         env_test_url: envTestUrl,
         env_default: environment,
         execution_mode: executionMode,
-        jira_project: jiraProject,
-        jira_component: jiraComponent,
-        jira_labels: jiraLabels.split(',').map(s => s.trim()).filter(Boolean),
+        ado_organization: adoOrganization,
+        ado_project: adoProject,
+        ado_area_path: adoAreaPath,
+        ado_iteration_path: adoIterationPath,
+        ado_tags: adoTags.split(',').map(s => s.trim()).filter(Boolean),
+        current_sprint: currentSprint,
+        sprint_length_weeks: Number(sprintLengthWeeks),
         payment_flow: paymentFlow,
         threshold_perf: Number(thresholdPerf),
         threshold_seo: Number(thresholdSeo),
@@ -112,19 +125,34 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
             </div>
           </div>
 
-          {/* Jira */}
+          {/* Azure DevOps */}
           <div style={{ ...panel, borderTop: '4px solid #2563eb' }}>
-            <h3 style={panelTitle}>🎯 {t('redCrossWebQaModule.settings.jiraSection')}</h3>
+            <h3 style={panelTitle}>🎯 {t('redCrossWebQaModule.settings.adoSection')}</h3>
             <div style={{ display: 'grid', gap: 12 }}>
-              <Field label={t('redCrossWebQaModule.settings.jiraProject')}>
-                <input value={jiraProject} onChange={e => setJiraProject(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
+              <Field label={t('redCrossWebQaModule.settings.adoOrganization')}>
+                <input value={adoOrganization} onChange={e => setAdoOrganization(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
               </Field>
-              <Field label={t('redCrossWebQaModule.settings.jiraComponent')}>
-                <input value={jiraComponent} onChange={e => setJiraComponent(e.target.value)} style={input} />
+              <Field label={t('redCrossWebQaModule.settings.adoProject')}>
+                <input value={adoProject} onChange={e => setAdoProject(e.target.value)} style={input} />
               </Field>
-              <Field label={t('redCrossWebQaModule.settings.jiraLabels')}>
-                <input value={jiraLabels} onChange={e => setJiraLabels(e.target.value)} style={input} placeholder="comma, separated" />
+              <Field label={t('redCrossWebQaModule.settings.adoAreaPath')}>
+                <input value={adoAreaPath} onChange={e => setAdoAreaPath(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
               </Field>
+              <Field label={t('redCrossWebQaModule.settings.adoIterationPath')}>
+                <input value={adoIterationPath} onChange={e => setAdoIterationPath(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
+              </Field>
+              <Field label={t('redCrossWebQaModule.settings.adoTags')}>
+                <input value={adoTags} onChange={e => setAdoTags(e.target.value)} style={input} placeholder="comma, separated" />
+              </Field>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+                <Field label={t('redCrossWebQaModule.settings.currentSprint')}>
+                  <input value={currentSprint} onChange={e => setCurrentSprint(e.target.value)} style={input} />
+                </Field>
+                <Field label={t('redCrossWebQaModule.settings.sprintLengthWeeks')}>
+                  <input type="number" min="1" max="6" value={sprintLengthWeeks}
+                    onChange={e => setSprintLengthWeeks(e.target.value)} style={input} />
+                </Field>
+              </div>
               <Field label="OutSystems URL">
                 <input value={outsystemsUrl} onChange={e => setOutsystemsUrl(e.target.value)} style={input} placeholder="https://..." />
               </Field>

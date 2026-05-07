@@ -438,15 +438,15 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Purpose**: 24/7 QA copilot for the **rodekors.no** website rebuild on Enonic XP CMS + NextJS + Designsystemet (Digdir). Item Agent #9. Two execution modes (Generate-only for Cursor / Claude Code / GitHub Actions, Execute-directly in-app), two environments (local on `:3000`, test). Every run carries a SHA-256 attestation hash.
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — 17 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable)
-- Router: `backend/routers/red_cross_qa.py` — 25 routes at `/api/red-cross-qa/*`
-- Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts)
+- Service: `backend/services/red_cross_qa.py` — 17 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps).
+- Router: `backend/routers/red_cross_qa.py` — 26 routes at `/api/red-cross-qa/*`
+- Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts; `release_judge.md` and `test_plan.md` updated for Azure DevOps + Sev/Kat dual severity + test-level taxonomy)
 
 **API endpoints (`/api/red-cross-qa/`):**
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/generate-test-plan` | POST | Sprint test plan from Jira epic / user story |
+| `/generate-test-plan` | POST | Sprint test plan from Azure DevOps work item / user story (emits `ado_work_items` with `work_item_type`, `priority` 1-4, `test_level` unit/sit/system/uat/performance) |
 | `/generate-playwright-tests` | POST | Cross-browser E2E generator (9 scopes) |
 | `/run-playwright` | POST | Execute Playwright (execute mode) |
 | `/generate-cypress-tests` | POST | Component + frontend regression generator |
@@ -455,7 +455,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/generate-cms-test-cases` | POST | Enonic Content Studio editor + visitor flows |
 | `/run-accessibility-check` | POST | axe-core + Lighthouse + manual checklist (WCAG 2.2 AA, 12 checks) |
 | `/run-lighthouse` | POST | Core Web Vitals (10 metrics) |
-| `/run-forms-qa` | POST | Skjemabygger audit (12 checks: JSON Schema, Adam Silver, Vipps handoff, PRG idempotency, etc.) |
+| `/run-forms-qa` | POST | Skjemabygger audit (21 checks: 12 base + 9 Fundy donation-provider checks; Vipps handoff, PRG idempotency, Adam Silver, JSON Schema, etc.). Findings carry `severity_dev` 1-4 + `category_ops` A-C |
 | `/run-content-migration-audit` | POST | Legacy CMS → Enonic XP migration (8 content types × 10 checks) |
 | `/run-enonic-performance` | POST | Enonic-specific perf: Guillotine waterfall / N+1, ISR latency, image service, publish ack (10 checks + hot queries) |
 | `/run-designsystemet-audit` | POST | Digdir Designsystemet compliance (10 checks + 0-100 compliance score + deviations) |
@@ -463,25 +463,26 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/generate-k6-script` | POST | k6 load script (5 profiles: smoke, normal, campaign peak, crisis spike, soak) |
 | `/run-k6` | POST | Execute k6 (execute mode) |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
-| `/jira-bundle-preview` | GET | Preview Jira issue bundle from latest findings |
-| `/create-jira-issues` | POST | Dispatch findings as Jira issues |
+| `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
+| `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |
+| `/generate-sprint-report` | POST | **Sprint report generator** — aggregates runs/findings/dispatches for active sprint, computes Sev1-4 + KatA-C counts, produces Norwegian/English narrative (Status / Identifiserte avvik / Anbefalinger) for Trine's reporting line |
 | `/dispatch-to-outsystems` | POST | Send action bundle to OutSystems |
 | `/runs` | GET | List runs with attestation hashes |
 | `/runs/{run_id}` | GET | Run detail (logs, artifacts) |
 | `/stats` | GET | Dashboard stats aggregation |
-| `/settings` | GET/POST | Get/save agent settings |
+| `/settings` | GET/POST | Get/save agent settings (now ado_organization, ado_project, ado_area_path, ado_iteration_path, ado_tags, current_sprint, sprint_length_weeks) |
 
-**Frontend** (`frontend/src/red-cross-qa/` — 17 tab components + shared `_PageHero.jsx`):
+**Frontend** (`frontend/src/red-cross-qa/` — 18 tab components + shared `_PageHero.jsx`):
 
 | Tab | Component | Highlights |
 |-----|-----------|-----------|
-| Dashboard | `Dashboard.jsx` | Total runs, pass rate, open findings, blockers, 11 quality gates, 15-button Quick Actions panel covering full tab navigation |
-| Test Plan | `TestPlan.jsx` | Manual + automated + accessibility + API + regression + test data + Jira subtasks |
+| Dashboard | `Dashboard.jsx` | Total runs, pass rate, open findings, blockers, 11 quality gates, 16-button Quick Actions panel covering full tab navigation (incl. Sprint Report) |
+| Test Plan | `TestPlan.jsx` | Manual + automated + accessibility + API + regression + test data + ADO work items with priority/work_item_type/test_level badges |
 | Playwright | `Playwright.jsx` | 9 scopes, generate or run |
 | Cypress | `Cypress.jsx` | Component + frontend regression |
 | API QA | `ApiQA.jsx` | 10 checks (query correctness, pagination, schema drift, rate limit) |
 | CMS QA | `CmsQA.jsx` | 14 areas (content types, page templates, layouts, parts, roles, scheduling, ISR) |
-| Forms QA | `FormsQA.jsx` | 6 form scopes × 12 checks, Vipps handoff |
+| Forms QA | `FormsQA.jsx` | 6 form scopes × 21 checks (12 base + 9 Fundy), Vipps handoff, findings with Sev/Kat |
 | Migration | `ContentMigration.jsx` | 8 content types, broken pages table, missing 301 redirects |
 | Accessibility | `Accessibility.jsx` | WCAG 2.2 AA score + violations |
 | Performance | `Performance.jsx` | Lighthouse panel + Enonic panel (10 Enonic checks, hot GraphQL queries with p95) |
@@ -489,25 +490,31 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | Role Matrix | `RoleMatrix.jsx` | 6 colored role chips, full role × action matrix (allow/deny cells), 8 authZ checks, violations expected vs actual |
 | Stress Test | `StressTest.jsx` | k6 profiles + scenarios (national crisis, donation peak, volunteer peak, search-heavy, etc.) |
 | Security & Privacy | `SecurityPrivacy.jsx` | 13 checks (OWASP, GDPR, secrets, dependencies) |
-| Jira | `Jira.jsx` | Action bundle preview, dispatch to Jira/OutSystems |
+| Azure DevOps | `AzureDevOps.jsx` | Work-item bundle preview, dispatch to ADO/OutSystems, priority pill (P1-P4), work_item_type, severity_dev, category_ops, test_level pill |
+| Sprint Report | `SprintReport.jsx` | Sprint name input + StatCards (total/pass/warn/fail) + Sev1-4 panels (Norwegian descriptions) + KatA-C panels (operational categories) + Trine-narrative section + runs/dispatches summaries |
 | Runs | `Runs.jsx` | Run history with SHA-256 attestation hash |
-| Settings | `Settings.jsx` | Environments, tools, Jira project, payment-flow scope, quality thresholds |
+| Settings | `Settings.jsx` | Environments, tools, Azure DevOps project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope, quality thresholds |
 
-**Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 17-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
+**Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 18-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40 top-level sections × 3 locales (EN / NO / ES), ~400 keys per locale, full parity.
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), 419 keys per locale, full parity. New `ado:` block (15 keys) replaces old `jira:` block; new `sprintReport:` block (~22 keys: sev1-4, catA-C, narrative, etc.).
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
-- 25 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- 26 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- Backward compatibility: `TestPlanRequest` keeps `jira_epic` as deprecated alias of `ado_work_item`; MongoDB collection name `red_cross_qa_jira_dispatches_collection` deliberately retained to avoid DB migration
+- Trine's Teststrategi 30.3 alignment: every finding/work-item must carry **both** `severity_dev` (1-4, dev phase) **and** `category_ops` (A-C, post-handover contract phase) per §8.1
 - 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
-- No contract tests yet (validate via: `curl http://localhost:8000/api/red-cross-qa/stats` and `curl http://localhost:8000/api/red-cross-qa/runs`)
+- Smoke test: `backend/tests/smoke_red_cross_qa.py` — validates settings shape, test plan with `test_level`, ADO bundle Sev/Kat annotation, Forms QA Fundy checks (≥9), sprint report narrative (validate via: `python -m backend.tests.smoke_red_cross_qa`)
 
 **Run / smoke commands:**
 ```bash
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
 python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 17
-python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 25
+python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 26
+
+# End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
+python -m backend.tests.smoke_red_cross_qa
 
 # Frontend production build
 cd frontend && CI=true npm run build      # exit 0, 0 warnings in src/red-cross-qa/
@@ -515,6 +522,7 @@ cd frontend && CI=true npm run build      # exit 0, 0 warnings in src/red-cross-
 # Endpoint smoke
 curl http://localhost:8000/api/red-cross-qa/stats
 curl http://localhost:8000/api/red-cross-qa/runs
+curl -X POST http://localhost:8000/api/red-cross-qa/generate-sprint-report -H "Content-Type: application/json" -d '{"environment":"test","lang":"no"}'
 ```
 
 **Docs**: covered in root `README.md` and `docs/README_FULL.md`.

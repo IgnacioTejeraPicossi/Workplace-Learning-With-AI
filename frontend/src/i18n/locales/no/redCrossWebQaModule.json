@@ -17,7 +17,8 @@
     "tabRoleMatrix": "Rollematrise",
     "tabStressTest": "Stresstest",
     "tabSecurityPrivacy": "Sikkerhet og personvern",
-    "tabJira": "Jira",
+    "tabAdo": "Azure DevOps",
+    "tabSprintReport": "Sprintrapport",
     "tabRuns": "Kjøringer",
     "tabSettings": "Innstillinger",
 
@@ -85,8 +86,8 @@
 
     "testPlan": {
       "header": "Generer sprint‑testplan",
-      "subheader": "Konverter et Jira‑epic eller en brukerhistorie til en komplett QA‑testplan",
-      "inputJiraEpic": "Jira‑epic eller brukerhistorie",
+      "subheader": "Konverter et Azure DevOps‑epic eller en brukerhistorie til en komplett QA‑testplan",
+      "inputAdoWorkItem": "Azure DevOps‑epic eller brukerhistorie",
       "inputAcceptance": "Akseptkriterier",
       "inputDesignLink": "Design‑lenke (Figma / Sketch)",
       "inputCmsModel": "CMS‑innholdsmodell",
@@ -99,7 +100,7 @@
       "outputApiChecks": "API‑kontroller",
       "outputRegressionScope": "Regresjonsomfang",
       "outputSuggestedData": "Foreslåtte testdata",
-      "outputJiraSubtasks": "Jira‑undertasker"
+      "outputAdoWorkItems": "Azure DevOps‑arbeidselementer"
     },
 
     "playwright": {
@@ -382,20 +383,50 @@
       "checkGdpr": "GDPR‑relatert innhold og flyter"
     },
 
-    "jira": {
-      "header": "Jira‑forsendelse",
-      "subheader": "Konverter funn til Jira‑saker i Item‑prosjektet",
-      "btnDispatch": "Opprett Jira‑saker",
+    "ado": {
+      "header": "Azure DevOps‑forsendelse",
+      "subheader": "Konverter funn til Azure DevOps‑arbeidselementer (Trines offisielle testverktøy — Teststrategi 30.3 §5)",
+      "btnDispatch": "Opprett ADO‑arbeidselementer",
       "btnSendToOutsystems": "Send til OutSystems",
-      "projectKey": "Prosjektnøkkel",
-      "component": "Komponent",
-      "labels": "Etiketter",
-      "issueTitle": "Tittel",
-      "issueType": "Type",
-      "issuePriority": "Prioritet",
-      "issueDescription": "Beskrivelse",
+      "bundleConfig": "Pakkekonfigurasjon",
+      "organization": "Organisasjon",
+      "project": "Prosjekt",
+      "areaPath": "Område‑sti",
+      "iterationPath": "Iterasjons‑sti",
+      "tags": "Etiketter",
+      "workItemType": "Arbeidselement‑type",
+      "priority": "Prioritet (1–4)",
+      "severity": "Alvorlighetsgrad",
       "previewTitle": "Forhåndsvisning av Action Bundle",
       "dispatched": "Sendt"
+    },
+
+    "sprintReport": {
+      "header": "Sprintrapport",
+      "subheader": "Automatisk sprintrapport (status, avvik, anbefalinger) for Trine — per Teststrategi 30.3 §8",
+      "configTitle": "Sprintkonfigurasjon",
+      "sprintName": "Sprintnavn (overstyr)",
+      "sprintHint": "La stå tom for å bruke konfigurert sprint: {{value}}",
+      "btnGenerate": "Generer sprintrapport",
+      "totalRuns": "Totale kjøringer",
+      "passRate": "Bestått‑andel",
+      "warnings": "Advarsler",
+      "failures": "Feil",
+      "severityDev": "Alvorlighetsgrad (utviklingsfase 1–4)",
+      "severityDevHint": "Per Teststrategi §8.1 — brukes i prosjekt-/utviklingsfasen.",
+      "sev1": "Kritisk — systemet kan ikke brukes",
+      "sev2": "Høy — viktig funksjon virker ikke",
+      "sev3": "Middels — delvis funksjonell feil",
+      "sev4": "Lav — kosmetisk / mindre feil",
+      "categoryOps": "Kategori (driftsfase A–C)",
+      "categoryOpsHint": "Per Teststrategi §8.1 — brukes etter overtakelse, kontraktbasert.",
+      "catA": "Kritisk — tjenesten stopper / data går tapt",
+      "catB": "Alvorlig — viktige funksjoner svekket",
+      "catC": "Mindre alvorlig — kan omgås",
+      "narrative": "Tekst (status / avvik / anbefalinger)",
+      "runsSample": "Siste kjøringer",
+      "dispatches": "ADO‑forsendelser",
+      "workItems": "arbeidselementer"
     },
 
     "runs": {
@@ -412,15 +443,19 @@
 
     "settings": {
       "header": "Agentinnstillinger",
-      "subheader": "Miljøer, verktøy, Jira, betalingsflyt, terskler",
+      "subheader": "Miljøer, verktøy, Azure DevOps, sprint, betalingsflyt, terskler",
       "envLocalUrl": "Lokal URL",
       "envTestUrl": "Test‑URL",
       "envDefault": "Standardmiljø",
       "tools": "Testverktøy",
-      "jiraSection": "Jira",
-      "jiraProject": "Prosjektnøkkel",
-      "jiraComponent": "Komponent",
-      "jiraLabels": "Standardetiketter",
+      "adoSection": "Azure DevOps",
+      "adoOrganization": "Organisasjon",
+      "adoProject": "Prosjekt",
+      "adoAreaPath": "Område‑sti",
+      "adoIterationPath": "Iterasjons‑sti",
+      "adoTags": "Standardetiketter",
+      "currentSprint": "Aktiv sprint",
+      "sprintLengthWeeks": "Sprintlengde (uker)",
       "paymentFlow": "Omfang av betalingsflyt",
       "paymentHandoff": "Kun frem til leverandøroverlevering",
       "paymentSandbox": "Full sandkasse‑flyt",

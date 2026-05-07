@@ -111,7 +111,13 @@
       "Bash(grep \"src\\\\\\\\\\\\\\\\\")",
       "Bash(powershell -ExecutionPolicy Bypass -File export_slides_to_png.ps1)",
       "Bash(node -e \"const s = require\\('image-size'\\); const d = s.imageSize\\(require\\('fs'\\).readFileSync\\('C:/Test/AI/AI Learning with AI/docs-media/rode_kors_qa/Bilde2Header zoom.png'\\)\\); console.log\\('width:', d.width, 'height:', d.height, 'aspect \\(w/h\\):', \\(d.width/d.height\\).toFixed\\(3\\)\\);\")",
-      "Bash(powershell -ExecutionPolicy Bypass -File inspect_slide3.ps1)"
+      "Bash(powershell -ExecutionPolicy Bypass -File inspect_slide3.ps1)",
+      "Bash(powershell -Command \"Remove-Item 'inspect_slide3.ps1' -Force\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File extract_docx.ps1)",
+      "PowerShell(python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items; print\\('IMPORTS OK'\\); import inspect; print\\('generate_test_plan params:', list\\(inspect.signature\\(generate_test_plan\\).parameters.keys\\(\\)\\)\\)\")",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items; print\\('IMPORTS OK'\\); import inspect; print\\('generate_test_plan params:', list\\(inspect.signature\\(generate_test_plan\\).parameters.keys\\(\\)\\)\\)\")",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; from backend.services.red_cross_qa import generate_sprint_report, generate_test_plan, get_ado_bundle_preview, create_ado_work_items, run_forms_qa; print\\('IMPORTS OK'\\)\")",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -m backend.tests.smoke_red_cross_qa)"
     ]
   }
 }

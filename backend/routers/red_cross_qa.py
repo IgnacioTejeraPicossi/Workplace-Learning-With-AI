@@ -27,9 +27,10 @@ try:
         run_enonic_performance,
         run_designsystemet_audit,
         run_role_matrix_audit,
-        get_jira_bundle_preview,
-        create_jira_issues,
+        get_ado_bundle_preview,
+        create_ado_work_items,
         dispatch_to_outsystems,
+        generate_sprint_report,
         list_runs,
         get_run,
         get_stats,
@@ -56,9 +57,10 @@ except ImportError:  # pragma: no cover
         run_enonic_performance,
         run_designsystemet_audit,
         run_role_matrix_audit,
-        get_jira_bundle_preview,
-        create_jira_issues,
+        get_ado_bundle_preview,
+        create_ado_work_items,
         dispatch_to_outsystems,
+        generate_sprint_report,
         list_runs,
         get_run,
         get_stats,
@@ -72,7 +74,10 @@ router = APIRouter(prefix="/api/red-cross-qa", tags=["Red Cross Web QA Agent"])
 
 # ── Request Models ──────────────────────────────────────────────────
 class TestPlanRequest(BaseModel):
-    jira_epic: str = ""
+    # Azure DevOps work item (epic / user story) — replaces former jira_epic.
+    # Keep `jira_epic` as an alias for one release so old clients don't break.
+    ado_work_item: str = ""
+    jira_epic: Optional[str] = None  # deprecated alias
     acceptance_criteria: str = ""
     design_link: Optional[str] = ""
     risk_level: Optional[str] = "medium"
@@ -141,7 +146,13 @@ class RoleMatrixRequest(BaseModel):
     lang: Optional[str] = "en"
 
 
-class JiraDispatchRequest(BaseModel):
+class AdoDispatchRequest(BaseModel):
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class SprintReportRequest(BaseModel):
+    sprint_name: Optional[str] = None  # defaults to settings.current_sprint
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -151,9 +162,14 @@ class SettingsRequest(BaseModel):
     env_test_url: Optional[str] = None
     env_default: Optional[str] = None
     execution_mode: Optional[str] = None
-    jira_project: Optional[str] = None
-    jira_component: Optional[str] = None
-    jira_labels: Optional[List[str]] = None
+    # Azure DevOps settings (replaces former Jira fields)
+    ado_organization: Optional[str] = None
+    ado_project: Optional[str] = None
+    ado_area_path: Optional[str] = None
+    ado_iteration_path: Optional[str] = None
+    ado_tags: Optional[List[str]] = None
+    current_sprint: Optional[str] = None
+    sprint_length_weeks: Optional[int] = None
     payment_flow: Optional[str] = None
     threshold_perf: Optional[int] = None
     threshold_seo: Optional[int] = None
@@ -173,8 +189,9 @@ def _check_env(env: Optional[str]) -> str:
 @router.post("/generate-test-plan")
 async def api_generate_test_plan(body: TestPlanRequest):
     env = _check_env(body.environment)
+    work_item = body.ado_work_item or body.jira_epic or ""
     return await generate_test_plan(
-        body.jira_epic, body.acceptance_criteria, body.design_link or "",
+        work_item, body.acceptance_criteria, body.design_link or "",
         body.risk_level or "medium", env, body.lang or "en",
     )
 
@@ -290,23 +307,34 @@ async def api_run_role_matrix(body: RoleMatrixRequest):
     return await run_role_matrix_audit(env, body.lang or "en")
 
 
-# ── Jira / OutSystems ─────────────────────────────────────────────
-@router.get("/jira-bundle-preview")
-async def api_jira_preview(environment: Optional[str] = "test"):
+# ── Azure DevOps / OutSystems ─────────────────────────────────────
+@router.get("/ado-bundle-preview")
+async def api_ado_preview(environment: Optional[str] = "test"):
     env = _check_env(environment)
-    return await get_jira_bundle_preview(env)
+    return await get_ado_bundle_preview(env)
 
 
-@router.post("/create-jira-issues")
-async def api_create_jira(body: JiraDispatchRequest):
+@router.post("/create-ado-work-items")
+async def api_create_ado(body: AdoDispatchRequest):
     env = _check_env(body.environment)
-    return await create_jira_issues(env, body.lang or "en")
+    return await create_ado_work_items(env, body.lang or "en")
 
 
 @router.post("/dispatch-to-outsystems")
-async def api_dispatch_outsystems(body: JiraDispatchRequest):
+async def api_dispatch_outsystems(body: AdoDispatchRequest):
     env = _check_env(body.environment)
     return await dispatch_to_outsystems(env)
+
+
+# ── Sprint Report (regalo for Trine — automated sprint summary) ────
+@router.post("/generate-sprint-report")
+async def api_generate_sprint_report(body: SprintReportRequest):
+    env = _check_env(body.environment)
+    return await generate_sprint_report(
+        sprint_name=body.sprint_name,
+        environment=env,
+        lang=body.lang or "en",
+    )
 
 
 # ── Runs / Stats / Settings ───────────────────────────────────────

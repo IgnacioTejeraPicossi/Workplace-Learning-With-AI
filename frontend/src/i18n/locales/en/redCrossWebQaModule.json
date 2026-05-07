@@ -17,7 +17,8 @@
     "tabRoleMatrix": "Role Matrix",
     "tabStressTest": "Stress Test",
     "tabSecurityPrivacy": "Security & Privacy",
-    "tabJira": "Jira",
+    "tabAdo": "Azure DevOps",
+    "tabSprintReport": "Sprint Report",
     "tabRuns": "Runs",
     "tabSettings": "Settings",
 
@@ -85,8 +86,8 @@
 
     "testPlan": {
       "header": "Generate Sprint Test Plan",
-      "subheader": "Convert a Jira epic / user story into a complete QA test plan",
-      "inputJiraEpic": "Jira epic or user story",
+      "subheader": "Convert an Azure DevOps epic / user story into a complete QA test plan",
+      "inputAdoWorkItem": "Azure DevOps epic or user story",
       "inputAcceptance": "Acceptance criteria",
       "inputDesignLink": "Design link (Figma / Sketch)",
       "inputCmsModel": "CMS content model",
@@ -99,7 +100,7 @@
       "outputApiChecks": "API checks",
       "outputRegressionScope": "Regression scope",
       "outputSuggestedData": "Suggested test data",
-      "outputJiraSubtasks": "Jira subtasks"
+      "outputAdoWorkItems": "Azure DevOps work items"
     },
 
     "playwright": {
@@ -382,20 +383,50 @@
       "checkGdpr": "GDPR-related content & flows"
     },
 
-    "jira": {
-      "header": "Jira Dispatch",
-      "subheader": "Convert findings into Jira issues in the Item project",
-      "btnDispatch": "Create Jira Issues",
+    "ado": {
+      "header": "Azure DevOps Dispatch",
+      "subheader": "Convert findings into Azure DevOps work items (Trine's official test tool — Teststrategi 30.3 §5)",
+      "btnDispatch": "Create ADO Work Items",
       "btnSendToOutsystems": "Send to OutSystems",
-      "projectKey": "Project key",
-      "component": "Component",
-      "labels": "Labels",
-      "issueTitle": "Title",
-      "issueType": "Type",
-      "issuePriority": "Priority",
-      "issueDescription": "Description",
+      "bundleConfig": "Bundle config",
+      "organization": "Organization",
+      "project": "Project",
+      "areaPath": "Area path",
+      "iterationPath": "Iteration path",
+      "tags": "Tags",
+      "workItemType": "Work item type",
+      "priority": "Priority (1–4)",
+      "severity": "Severity",
       "previewTitle": "Action Bundle Preview",
       "dispatched": "Dispatched"
+    },
+
+    "sprintReport": {
+      "header": "Sprint Report",
+      "subheader": "Auto-generated end-of-sprint report (status, findings, recommendations) for Trine — per Teststrategi 30.3 §8",
+      "configTitle": "Sprint configuration",
+      "sprintName": "Sprint name (override)",
+      "sprintHint": "Leave empty to use the configured sprint: {{value}}",
+      "btnGenerate": "Generate Sprint Report",
+      "totalRuns": "Total runs",
+      "passRate": "Pass rate",
+      "warnings": "Warnings",
+      "failures": "Failures",
+      "severityDev": "Severity (development phase 1–4)",
+      "severityDevHint": "Per Teststrategi §8.1 — used during the project / development phase.",
+      "sev1": "Critical — system unusable",
+      "sev2": "High — important function broken",
+      "sev3": "Medium — partially functional",
+      "sev4": "Low — cosmetic / minor",
+      "categoryOps": "Category (operational phase A–C)",
+      "categoryOpsHint": "Per Teststrategi §8.1 — used after handover, contract-based.",
+      "catA": "Critical — service stops / data lost",
+      "catB": "Serious — important functions impaired",
+      "catC": "Minor — workaround available",
+      "narrative": "Narrative (status / findings / recommendations)",
+      "runsSample": "Recent runs",
+      "dispatches": "ADO dispatches",
+      "workItems": "work items"
     },
 
     "runs": {
@@ -412,15 +443,19 @@
 
     "settings": {
       "header": "Agent Settings",
-      "subheader": "Environments, tools, Jira, payment flow, thresholds",
+      "subheader": "Environments, tools, Azure DevOps, sprint, payment flow, thresholds",
       "envLocalUrl": "Local URL",
       "envTestUrl": "Test URL",
       "envDefault": "Default environment",
       "tools": "Test tools",
-      "jiraSection": "Jira",
-      "jiraProject": "Project key",
-      "jiraComponent": "Component",
-      "jiraLabels": "Default labels",
+      "adoSection": "Azure DevOps",
+      "adoOrganization": "Organization",
+      "adoProject": "Project",
+      "adoAreaPath": "Area path",
+      "adoIterationPath": "Iteration path",
+      "adoTags": "Default tags",
+      "currentSprint": "Current sprint",
+      "sprintLengthWeeks": "Sprint length (weeks)",
       "paymentFlow": "Payment flow scope",
       "paymentHandoff": "Up to provider handoff",
       "paymentSandbox": "Full sandbox flow",

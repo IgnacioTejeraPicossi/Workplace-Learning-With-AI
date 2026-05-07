@@ -14,7 +14,8 @@ import Designsystemet from './red-cross-qa/Designsystemet';
 import RoleMatrix from './red-cross-qa/RoleMatrix';
 import StressTest from './red-cross-qa/StressTest';
 import SecurityPrivacy from './red-cross-qa/SecurityPrivacy';
-import Jira from './red-cross-qa/Jira';
+import AzureDevOps from './red-cross-qa/AzureDevOps';
+import SprintReport from './red-cross-qa/SprintReport';
 import Runs from './red-cross-qa/Runs';
 import Settings from './red-cross-qa/Settings';
 
@@ -49,7 +50,8 @@ const RedCrossWebQAAgent = () => {
     { id: 'role-matrix',       label: t('redCrossWebQaModule.tabRoleMatrix'),       icon: '🔐' },
     { id: 'stress-test',       label: t('redCrossWebQaModule.tabStressTest'),       icon: '🔥' },
     { id: 'security-privacy',  label: t('redCrossWebQaModule.tabSecurityPrivacy'),  icon: '🛡️' },
-    { id: 'jira',              label: t('redCrossWebQaModule.tabJira'),             icon: '🎯' },
+    { id: 'ado',               label: t('redCrossWebQaModule.tabAdo'),              icon: '🎯' },
+    { id: 'sprint-report',     label: t('redCrossWebQaModule.tabSprintReport'),     icon: '📈' },
     { id: 'runs',              label: t('redCrossWebQaModule.tabRuns'),             icon: '📜' },
     { id: 'settings',          label: t('redCrossWebQaModule.tabSettings'),         icon: '⚙️' },
   ];
@@ -72,7 +74,8 @@ const RedCrossWebQAAgent = () => {
       case 'role-matrix':       return <RoleMatrix {...sharedProps} />;
       case 'stress-test':       return <StressTest {...sharedProps} />;
       case 'security-privacy':  return <SecurityPrivacy {...sharedProps} />;
-      case 'jira':              return <Jira {...sharedProps} />;
+      case 'ado':               return <AzureDevOps {...sharedProps} />;
+      case 'sprint-report':     return <SprintReport {...sharedProps} />;
       case 'runs':              return <Runs {...sharedProps} />;
       case 'settings':          return <Settings environment={environment} setEnvironment={setEnvironment} executionMode={executionMode} setExecutionMode={setExecutionMode} />;
       default:                  return <Dashboard {...sharedProps} onNavigate={setActiveTab} />;
