@@ -108,7 +108,10 @@
       "Bash(powershell.exe -Command \"echo OK\")",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\export_slides_to_png.ps1\")",
       "Bash(start \"\" \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\Presentation\\\\Rode_Kors_Web_QA_Agent_Presentasjon.pptx\")",
-      "Bash(grep \"src\\\\\\\\\\\\\\\\\")"
+      "Bash(grep \"src\\\\\\\\\\\\\\\\\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File export_slides_to_png.ps1)",
+      "Bash(node -e \"const s = require\\('image-size'\\); const d = s.imageSize\\(require\\('fs'\\).readFileSync\\('C:/Test/AI/AI Learning with AI/docs-media/rode_kors_qa/Bilde2Header zoom.png'\\)\\); console.log\\('width:', d.width, 'height:', d.height, 'aspect \\(w/h\\):', \\(d.width/d.height\\).toFixed\\(3\\)\\);\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File inspect_slide3.ps1)"
     ]
   }
 }
