@@ -272,6 +272,11 @@
     },
 
     "performance": {
+      "btnRunBoth": "Ejecutar ambos (Lighthouse + Enonic)",
+      "presetsTitle": "URLs predefinidas",
+      "preset_rodekorsProd": "rodekors.no (producción)",
+      "preset_lunixHello": "test.lunix.cloud (preview de Tom)",
+      "preset_localDev": "localhost:3000 (desarrollo local)",
       "header": "Copiloto de rendimiento",
       "subheader": "Core Web Vitals, Lighthouse, análisis de bundle, tiempos GraphQL",
       "btnRunLighthouse": "Ejecutar Lighthouse",

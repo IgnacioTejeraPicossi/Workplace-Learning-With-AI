@@ -39,6 +39,32 @@ const ENONIC_CHECKS = [
 ];
 const PRIORITY_COLOR = { high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 
+// URL presets — quick targets for the rodekors.no rebuild stack.
+// `lunixHello` is Tom's NextJS + Enonic XP + GraphQL "hello world" preview
+// shared 2026-05-08 (test.lunix.cloud) — perfect smoke for the Enonic-specific
+// performance suite (Guillotine waterfall / N+1 / overfetch).
+const URL_PRESETS = [
+  {
+    key: 'rodekorsProd',
+    url: 'https://www.rodekors.no/',
+    icon: '❤️‍🩹',
+    color: '#dc2626',
+  },
+  {
+    key: 'lunixHello',
+    url: 'https://test.lunix.cloud/',
+    icon: '🧪',
+    color: '#7c3aed',
+    badge: 'Tom · NextJS + XP + GraphQL',
+  },
+  {
+    key: 'localDev',
+    url: 'http://localhost:3000/',
+    icon: '💻',
+    color: '#0891b2',
+  },
+];
+
 const Performance = ({ environment }) => {
   const { t, i18n } = useTranslation();
   const [url, setUrl] = useState('https://www.rodekors.no/');
@@ -47,28 +73,42 @@ const Performance = ({ environment }) => {
   const [enonicRunning, setEnonicRunning] = useState(false);
   const [enonicReport, setEnonicReport] = useState(null);
 
-  const handleRun = async () => {
+  const runLighthouseOn = async (target) => {
     setRunning(true); setReport(null);
     try {
       const res = await fetch(`${API}/run-lighthouse`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, environment, lang: i18n.language }),
+        body: JSON.stringify({ url: target, environment, lang: i18n.language }),
       });
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }
     finally { setRunning(false); }
   };
 
-  const handleEnonicRun = async () => {
+  const runEnonicOn = async (target) => {
     setEnonicRunning(true); setEnonicReport(null);
     try {
       const res = await fetch(`${API}/run-enonic-performance`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, environment, lang: i18n.language }),
+        body: JSON.stringify({ url: target, environment, lang: i18n.language }),
       });
       setEnonicReport(await res.json());
     } catch { setEnonicReport({ status: 'error', message: 'Network error' }); }
     finally { setEnonicRunning(false); }
+  };
+
+  const handleRun = () => runLighthouseOn(url);
+  const handleEnonicRun = () => runEnonicOn(url);
+
+  // Run both Lighthouse + Enonic-specific against the current URL (or an
+  // optional override). Used by the URL-preset chips so a single click on
+  // "Tom · test.lunix.cloud" gives a complete picture of the NextJS + XP
+  // + Guillotine GraphQL stack.
+  const handleRunBoth = async (override) => {
+    const target = override || url;
+    if (override) setUrl(override);
+    await runLighthouseOn(target);
+    await runEnonicOn(target);
   };
 
   const score = report?.lighthouse_score ?? null;
@@ -87,10 +127,62 @@ const Performance = ({ environment }) => {
 
         <div style={panel}>
           <h3 style={panelTitle}>🌐 Target URL</h3>
+
+          {/* URL presets — one-click chips. Tom's lunix.cloud preview runs
+              Lighthouse + Enonic-specific in one go (NextJS + XP + GraphQL). */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{
+              fontSize: 11, color: '#64748b', textTransform: 'uppercase',
+              fontWeight: 600, letterSpacing: 0.4, marginBottom: 8,
+            }}>
+              {t('redCrossWebQaModule.performance.presetsTitle')}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {URL_PRESETS.map(p => {
+                const active = url === p.url;
+                const busy = running || enonicRunning;
+                return (
+                  <button
+                    key={p.key}
+                    onClick={() => handleRunBoth(p.url)}
+                    disabled={busy}
+                    title={p.url}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 14px', borderRadius: 999,
+                      backgroundColor: active ? `${p.color}15` : '#f8fafc',
+                      border: `1px solid ${active ? `${p.color}80` : '#e2e8f0'}`,
+                      color: active ? p.color : '#475569',
+                      fontSize: 12, fontWeight: 600, cursor: busy ? 'default' : 'pointer',
+                      opacity: busy ? 0.6 : 1, transition: 'all 0.2s',
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>{p.icon}</span>
+                    <span>{t(`redCrossWebQaModule.performance.preset_${p.key}`)}</span>
+                    {p.badge && (
+                      <span style={{
+                        marginLeft: 4, padding: '2px 8px', borderRadius: 999,
+                        backgroundColor: `${p.color}20`, color: p.color,
+                        fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                      }}>
+                        {p.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <input value={url} onChange={e => setUrl(e.target.value)} style={{ ...input, flex: 1, minWidth: 240 }} />
             <button onClick={handleRun} disabled={running} style={primaryBtn(running)}>
               {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.performance.btnRunLighthouse')}
+            </button>
+            <button onClick={() => handleRunBoth()} disabled={running || enonicRunning} style={runBothBtn(running || enonicRunning)}>
+              {(running || enonicRunning)
+                ? t('redCrossWebQaModule.common.running')
+                : t('redCrossWebQaModule.performance.btnRunBoth')}
             </button>
           </div>
         </div>
@@ -277,6 +369,17 @@ const enonicBtn = (disabled) => ({
   padding: '10px 18px', borderRadius: 8, border: 'none',
   backgroundColor: disabled ? '#c4b5fd' : '#7c3aed', color: 'white',
   fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+// Run-both button — gradient that visually combines the two suite colors
+// (Lighthouse amber #d97706 + Enonic violet #7c3aed) so users immediately
+// see it triggers both runs.
+const runBothBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8, border: 'none',
+  background: disabled
+    ? 'linear-gradient(135deg, #fcd34d 0%, #c4b5fd 100%)'
+    : 'linear-gradient(135deg, #d97706 0%, #7c3aed 100%)',
+  color: 'white', fontWeight: 600, fontSize: 14,
+  cursor: disabled ? 'default' : 'pointer',
 });
 const th = {
   textAlign: 'left', padding: '10px 12px', fontSize: 11,
