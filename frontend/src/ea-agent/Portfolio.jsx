@@ -199,7 +199,7 @@ const Portfolio = () => {
             ))}
           </select>
           <span style={{ fontSize: '14px', color: '#94a3b8', marginLeft: 'auto', fontWeight: 500 }}>
-            {items.length} {t('eaSecondBrainModule.portfolioCatalogHeading')}
+            {items.length} {t('eaSecondBrainModule.statPortfolio')}
           </span>
         </div>
       </div>
