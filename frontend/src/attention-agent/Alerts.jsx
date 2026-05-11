@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  AttentionSectionHeader,
+  attentionLocale,
+  attentionPanelStyle,
+} from './sharedUi';
 
 const PRIORITY_I18N = {
   urgent: 'priorityUrgent',
@@ -14,7 +21,7 @@ const Alerts = () => {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('all');
 
-  const loc = i18n.language === 'no' ? 'nb-NO' : 'en-US';
+  const loc = attentionLocale(i18n);
 
   useEffect(() => {
     loadAlerts();
@@ -23,9 +30,8 @@ const Alerts = () => {
   const loadAlerts = async () => {
     setLoading(true);
     try {
-      const url = filter === 'all'
-        ? '/agents/attention/alerts'
-        : `/agents/attention/alerts?priority=${filter}`;
+      const url =
+        filter === 'all' ? '/agents/attention/alerts' : `/agents/attention/alerts?priority=${filter}`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -37,24 +43,24 @@ const Alerts = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    const colors = {
-      urgent: 'bg-red-100 text-red-800',
-      high: 'bg-orange-100 text-orange-800',
-      medium: 'bg-yellow-100 text-yellow-800',
-      low: 'bg-green-100 text-green-800'
+  const getPriorityStyle = (priority) => {
+    const styles = {
+      urgent: { bg: '#fee2e2', color: '#991b1b' },
+      high: { bg: '#ffedd5', color: '#9a3412' },
+      medium: { bg: '#fef9c3', color: '#854d0e' },
+      low: { bg: '#dcfce7', color: '#166534' },
     };
-    return colors[priority] || 'bg-gray-100 text-gray-800';
+    return styles[priority] || { bg: '#f1f5f9', color: '#475569' };
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      sent: 'bg-blue-100 text-blue-800',
-      acknowledged: 'bg-green-100 text-green-800',
-      resolved: 'bg-gray-100 text-gray-800'
+  const getStatusStyle = (status) => {
+    const styles = {
+      pending: { bg: '#fef9c3', color: '#854d0e' },
+      sent: { bg: '#dbeafe', color: '#1e40af' },
+      acknowledged: { bg: '#dcfce7', color: '#166534' },
+      resolved: { bg: '#f1f5f9', color: '#475569' },
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return styles[status] || { bg: '#f1f5f9', color: '#475569' };
   };
 
   const getChannelIcon = (channel) => {
@@ -62,7 +68,7 @@ const Alerts = () => {
       slack: '💬',
       teams: '💬',
       email: '📧',
-      calendar: '📅'
+      calendar: '📅',
     };
     return icons[channel] || '📡';
   };
@@ -80,80 +86,126 @@ const Alerts = () => {
     return Number.isNaN(x.getTime()) ? '' : x.toLocaleString(loc);
   };
 
+  const filterControl = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <label style={{ color: 'white', fontSize: '14px', fontWeight: 600, opacity: 0.95 }}>{t('personalAttentionAgentModule.filter')}:</label>
+      <select
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        style={{
+          borderRadius: '10px',
+          padding: '8px 12px',
+          border: '1px solid rgba(255,255,255,0.5)',
+          background: 'rgba(255,255,255,0.95)',
+          color: '#0f172a',
+          fontSize: '14px',
+          fontWeight: 500,
+        }}
+      >
+        <option value="all">{t('personalAttentionAgentModule.filterAllPriorities')}</option>
+        <option value="urgent">{t('personalAttentionAgentModule.priorityUrgent')}</option>
+        <option value="high">{t('personalAttentionAgentModule.priorityHigh')}</option>
+        <option value="medium">{t('personalAttentionAgentModule.priorityMedium')}</option>
+        <option value="low">{t('personalAttentionAgentModule.priorityLow')}</option>
+      </select>
+    </div>
+  );
+
   return (
-    <div className="p-6">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('personalAttentionAgentModule.alertsPageTitle')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('personalAttentionAgentModule.alertsPageSubtitle')}
-            </p>
-          </div>
+    <AttentionPage>
+      <AttentionHero
+        icon="🚨"
+        title={t('personalAttentionAgentModule.alertsPageTitle')}
+        subtitle={t('personalAttentionAgentModule.alertsPageSubtitle')}
+        trailing={filterControl}
+      />
 
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">{t('personalAttentionAgentModule.filter')}:</label>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
-            >
-              <option value="all">{t('personalAttentionAgentModule.filterAllPriorities')}</option>
-              <option value="urgent">{t('personalAttentionAgentModule.priorityUrgent')}</option>
-              <option value="high">{t('personalAttentionAgentModule.priorityHigh')}</option>
-              <option value="medium">{t('personalAttentionAgentModule.priorityMedium')}</option>
-              <option value="low">{t('personalAttentionAgentModule.priorityLow')}</option>
-            </select>
-          </div>
-        </div>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="🔔" title={t('personalAttentionAgentModule.recentAlerts')} />
 
-        <div className="bg-white rounded-xl shadow-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">{t('personalAttentionAgentModule.recentAlerts')}</h3>
+        {loading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>{t('personalAttentionAgentModule.loadingAlerts')}</div>
+        ) : alerts.length === 0 ? (
+          <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+            <p style={{ margin: 0, color: '#64748b' }}>{t('personalAttentionAgentModule.noAlertsFound')}</p>
+            <p style={{ margin: '12px 0 0', fontSize: '14px', color: '#94a3b8' }}>{t('personalAttentionAgentModule.alertsWillAppear')}</p>
           </div>
-
-          {loading ? (
-            <div className="p-6 text-center">
-              <div className="text-gray-500">{t('personalAttentionAgentModule.loadingAlerts')}</div>
-            </div>
-          ) : alerts.length === 0 ? (
-            <div className="p-6 text-center">
-              <div className="text-gray-500 mb-4">{t('personalAttentionAgentModule.noAlertsFound')}</div>
-              <p className="text-sm text-gray-400">
-                {t('personalAttentionAgentModule.alertsWillAppear')}
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {alerts.map((alert) => (
-                <div key={alert._id} className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2 flex-wrap">
-                        <h4 className="font-semibold text-gray-900">
+        ) : (
+          <div style={{ padding: '20px', display: 'grid', gap: '16px' }}>
+            {alerts.map((alert) => {
+              const ps = getPriorityStyle(alert.priority);
+              const ss = getStatusStyle(alert.status);
+              return (
+                <div
+                  key={alert._id}
+                  style={{
+                    background: 'white',
+                    borderRadius: '14px',
+                    border: '1px solid #e2e8f0',
+                    padding: '20px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                        <h4 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
                           {t('personalAttentionAgentModule.alertNumber', { id: alert._id.slice(-8) })}
                         </h4>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(alert.priority)}`}>
+                        <span
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '999px',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            background: ps.bg,
+                            color: ps.color,
+                          }}
+                        >
                           {priorityLabel(alert.priority)}
                         </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(alert.status)}`}>
+                        <span
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '999px',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            background: ss.bg,
+                            color: ss.color,
+                          }}
+                        >
                           {statusLabel(alert.status)}
                         </span>
                       </div>
 
                       {alert.assignedTo && (
-                        <p className="text-sm text-gray-600 mb-3">
-                          {t('personalAttentionAgentModule.assignedTo')}: <span className="font-medium">{alert.assignedTo}</span>
+                        <p style={{ margin: '0 0 12px', fontSize: '14px', color: '#475569' }}>
+                          {t('personalAttentionAgentModule.assignedTo')}: <strong>{alert.assignedTo}</strong>
                         </p>
                       )}
 
-                      <div className="mb-4">
-                        <h5 className="font-medium text-gray-700 mb-2">{t('personalAttentionAgentModule.dispatchedVia')}</h5>
-                        <div className="flex items-center space-x-2 flex-wrap">
+                      <div style={{ marginBottom: '12px' }}>
+                        <h5 style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+                          {t('personalAttentionAgentModule.dispatchedVia')}
+                        </h5>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                           {(alert.dispatchedVia || []).map((channel, i) => (
-                            <span key={i} className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded text-sm">
+                            <span
+                              key={i}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '6px 12px',
+                                background: '#eff6ff',
+                                borderRadius: '999px',
+                                fontSize: '13px',
+                                color: '#1e3a8a',
+                                border: '1px solid #dbeafe',
+                              }}
+                            >
                               <span>{getChannelIcon(channel)}</span>
-                              <span className="capitalize">{channel}</span>
+                              <span style={{ textTransform: 'capitalize' }}>{channel}</span>
                             </span>
                           ))}
                         </div>
@@ -161,9 +213,11 @@ const Alerts = () => {
 
                       {alert.artifacts && Object.keys(alert.artifacts).length > 0 && (
                         <div>
-                          <h5 className="font-medium text-gray-700 mb-2">{t('personalAttentionAgentModule.executionArtifacts')}</h5>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <pre className="text-xs text-gray-600 overflow-x-auto">
+                          <h5 style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+                            {t('personalAttentionAgentModule.executionArtifacts')}
+                          </h5>
+                          <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '12px', border: '1px solid #e2e8f0' }}>
+                            <pre style={{ margin: 0, fontSize: '12px', color: '#475569', overflowX: 'auto' }}>
                               {JSON.stringify(alert.artifacts, null, 2)}
                             </pre>
                           </div>
@@ -171,38 +225,88 @@ const Alerts = () => {
                       )}
                     </div>
 
-                    <div className="ml-4 flex flex-col space-y-2">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {alert.status === 'pending' && (
-                        <button type="button" className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200">
+                        <button
+                          type="button"
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: '#dbeafe',
+                            color: '#1d4ed8',
+                          }}
+                        >
                           {t('personalAttentionAgentModule.acknowledge')}
                         </button>
                       )}
                       {alert.status === 'acknowledged' && (
-                        <button type="button" className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">
+                        <button
+                          type="button"
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: '#dcfce7',
+                            color: '#166534',
+                          }}
+                        >
                           {t('personalAttentionAgentModule.resolve')}
                         </button>
                       )}
-                      <button type="button" className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200">
+                      <button
+                        type="button"
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '8px',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          border: 'none',
+                          cursor: 'pointer',
+                          background: '#f1f5f9',
+                          color: '#475569',
+                        }}
+                      >
                         {t('personalAttentionAgentModule.viewDetails')}
                       </button>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-between text-xs text-gray-500 flex-wrap gap-2">
-                      <span>{t('personalAttentionAgentModule.created')}: {fmt(alert.createdAt)}</span>
-                      {alert.updatedAt && (
-                        <span>{t('personalAttentionAgentModule.updated')}: {fmt(alert.updatedAt)}</span>
-                      )}
-                    </div>
+                  <div
+                    style={{
+                      marginTop: '16px',
+                      paddingTop: '14px',
+                      borderTop: '1px solid #f1f5f9',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      flexWrap: 'wrap',
+                      fontSize: '12px',
+                      color: '#64748b',
+                    }}
+                  >
+                    <span>
+                      {t('personalAttentionAgentModule.created')}: {fmt(alert.createdAt)}
+                    </span>
+                    {alert.updatedAt && (
+                      <span>
+                        {t('personalAttentionAgentModule.updated')}: {fmt(alert.updatedAt)}
+                      </span>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-    </div>
+    </AttentionPage>
   );
 };
 

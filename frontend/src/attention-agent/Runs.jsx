@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  AttentionSectionHeader,
+  StatCard,
+  attentionLocale,
+  attentionPanelStyle,
+  heroButtonStyle,
+} from './sharedUi';
 
 const Runs = () => {
   const { t, i18n } = useTranslation();
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const loc = i18n.language === 'no' ? 'nb-NO' : 'en-US';
+  const loc = attentionLocale(i18n);
 
   useEffect(() => {
     loadRuns();
@@ -25,14 +34,14 @@ const Runs = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      DONE: 'bg-green-100 text-green-800',
-      RUNNING: 'bg-blue-100 text-blue-800',
-      FAILED: 'bg-red-100 text-red-800',
-      QUEUED: 'bg-yellow-100 text-yellow-800'
+  const getStatusStyle = (status) => {
+    const styles = {
+      DONE: { bg: '#dcfce7', color: '#166534' },
+      RUNNING: { bg: '#dbeafe', color: '#1e40af' },
+      FAILED: { bg: '#fee2e2', color: '#991b1b' },
+      QUEUED: { bg: '#fef9c3', color: '#854d0e' },
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return styles[status] || { bg: '#f1f5f9', color: '#475569' };
   };
 
   const getStatusIcon = (status) => {
@@ -40,7 +49,7 @@ const Runs = () => {
       DONE: '✅',
       RUNNING: '⏳',
       FAILED: '❌',
-      QUEUED: '⏸️'
+      QUEUED: '⏸️',
     };
     return icons[status] || '❓';
   };
@@ -51,161 +60,149 @@ const Runs = () => {
     return Number.isNaN(x.getTime()) ? t('personalAttentionAgentModule.notAvailable') : x.toLocaleString(loc);
   };
 
+  const done = runs?.filter((r) => r.status === 'DONE').length || 0;
+  const running = runs?.filter((r) => r.status === 'RUNNING').length || 0;
+  const failed = runs?.filter((r) => r.status === 'FAILED').length || 0;
+
+  const refreshBtn = (
+    <button type="button" onClick={loadRuns} style={heroButtonStyle(false)}>
+      {t('personalAttentionAgentModule.refresh')}
+    </button>
+  );
+
   return (
-    <div className="p-6">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('personalAttentionAgentModule.runsPageTitle')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('personalAttentionAgentModule.runsPageSubtitle')}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={loadRuns}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            {t('personalAttentionAgentModule.refresh')}
-          </button>
-        </div>
+    <AttentionPage>
+      <AttentionHero
+        icon="▶️"
+        title={t('personalAttentionAgentModule.runsPageTitle')}
+        subtitle={t('personalAttentionAgentModule.runsPageSubtitle')}
+        trailing={refreshBtn}
+      />
 
-        <div className="grid md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.totalRuns')}</p>
-                <p className="text-3xl font-bold text-gray-900">{runs?.length || 0}</p>
-              </div>
-              <div className="text-4xl text-gray-500">📊</div>
-            </div>
-          </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        <StatCard label={t('personalAttentionAgentModule.totalRuns')} value={runs?.length || 0} icon="📊" />
+        <StatCard label={t('personalAttentionAgentModule.successful')} value={done} icon="✅" />
+        <StatCard label={t('personalAttentionAgentModule.running')} value={running} icon="⏳" />
+        <StatCard label={t('personalAttentionAgentModule.failed')} value={failed} icon="❌" />
+      </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.successful')}</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {runs?.filter((r) => r.status === 'DONE').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-green-500">✅</div>
-            </div>
-          </div>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="📜" title={t('personalAttentionAgentModule.recentRuns')} />
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.running')}</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  {runs?.filter((r) => r.status === 'RUNNING').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-blue-500">⏳</div>
-            </div>
+        {loading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>{t('personalAttentionAgentModule.loadingRuns')}</div>
+        ) : runs.length === 0 ? (
+          <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+            <p style={{ margin: 0, color: '#64748b' }}>{t('personalAttentionAgentModule.noRunsFound')}</p>
+            <p style={{ margin: '12px 0 0', fontSize: '14px', color: '#94a3b8' }}>{t('personalAttentionAgentModule.runsEmptyHint')}</p>
           </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{t('personalAttentionAgentModule.failed')}</p>
-                <p className="text-3xl font-bold text-red-600">
-                  {runs?.filter((r) => r.status === 'FAILED').length || 0}
-                </p>
-              </div>
-              <div className="text-4xl text-red-500">❌</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">{t('personalAttentionAgentModule.recentRuns')}</h3>
-          </div>
-
-          {loading ? (
-            <div className="p-6 text-center">
-              <div className="text-gray-500">{t('personalAttentionAgentModule.loadingRuns')}</div>
-            </div>
-          ) : runs.length === 0 ? (
-            <div className="p-6 text-center">
-              <div className="text-gray-500 mb-4">{t('personalAttentionAgentModule.noRunsFound')}</div>
-              <p className="text-sm text-gray-400">
-                {t('personalAttentionAgentModule.runsEmptyHint')}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thRunId')}
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: 'linear-gradient(90deg, #f8fafc 0%, #eff6ff 100%)' }}>
+                  {[
+                    t('personalAttentionAgentModule.thRunId'),
+                    t('personalAttentionAgentModule.thStatus'),
+                    t('personalAttentionAgentModule.thTopic'),
+                    t('personalAttentionAgentModule.thAttestation'),
+                    t('personalAttentionAgentModule.thCreated'),
+                    t('personalAttentionAgentModule.thActions'),
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      style={{
+                        textAlign: 'left',
+                        padding: '14px 20px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#64748b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        borderBottom: '2px solid #e2e8f0',
+                      }}
+                    >
+                      {h}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thStatus')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thTopic')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thAttestation')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thCreated')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('personalAttentionAgentModule.thActions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {(runs || []).map((run, index) => (
-                    <tr key={run.run_id || index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(runs || []).map((run, index) => {
+                  const st = getStatusStyle(run.status);
+                  return (
+                    <tr key={run.run_id || index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
                           {run.run_id || t('personalAttentionAgentModule.notAvailable')}
-                        </div>
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(run.status)}`}>
-                          <span className="mr-1">{getStatusIcon(run.status)}</span>
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 12px',
+                            borderRadius: '999px',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            background: st.bg,
+                            color: st.color,
+                          }}
+                        >
+                          <span>{getStatusIcon(run.status)}</span>
                           {run.status || 'UNKNOWN'}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {run.bundle?.topic || t('personalAttentionAgentModule.notAvailable')}
-                        </div>
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle', fontSize: '14px', color: '#334155', maxWidth: '280px' }}>
+                        {run.bundle?.topic || t('personalAttentionAgentModule.notAvailable')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {run.attestation_hash ? (
-                            <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-                              {run.attestation_hash.slice(0, 8)}...
-                            </code>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </div>
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
+                        {run.attestation_hash ? (
+                          <code
+                            style={{
+                              background: '#f1f5f9',
+                              padding: '6px 10px',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              color: '#475569',
+                            }}
+                          >
+                            {run.attestation_hash.slice(0, 8)}…
+                          </code>
+                        ) : (
+                          <span style={{ color: '#94a3b8' }}>—</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle', fontSize: '13px', color: '#64748b', whiteSpace: 'nowrap' }}>
                         {fmt(run.created_at)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button type="button" className="text-blue-600 hover:text-blue-900">
+                      <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
+                        <button
+                          type="button"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#2563eb',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                        >
                           {t('personalAttentionAgentModule.viewDetails')}
                         </button>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-    </div>
+    </AttentionPage>
   );
 };
 
