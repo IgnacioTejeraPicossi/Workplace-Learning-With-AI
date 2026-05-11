@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  accentButtonStyle,
+  attentionCardStyle,
+  attentionPanelStyle,
+} from './sharedUi';
 
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
@@ -57,15 +64,14 @@ const Ask = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t('eaSecondBrainModule.askTitle')}</h2>
-        <p className="text-gray-500 mt-1">{t('eaSecondBrainModule.askSubtitle')}</p>
-      </div>
+    <AttentionPage>
+      <AttentionHero
+        icon="🔍"
+        title={t('eaSecondBrainModule.askTitle')}
+        subtitle={t('eaSecondBrainModule.askSubtitle')}
+      />
 
-      {/* Input */}
-      <div className="bg-white rounded-xl border shadow-sm p-6 space-y-4">
+      <div style={attentionCardStyle}>
         <div className="relative">
           <textarea
             value={question}
@@ -86,7 +92,14 @@ const Ask = () => {
           <button
             onClick={() => askQuestion()}
             disabled={loading || !question.trim()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+            style={{
+              ...accentButtonStyle('blue'),
+              opacity: loading || !question.trim() ? 0.55 : 1,
+              cursor: loading || !question.trim() ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
           >
             {loading ? (
               <>
@@ -100,9 +113,8 @@ const Ask = () => {
         </div>
       </div>
 
-      {/* Sample Questions */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-600 mb-2">{t('eaSecondBrainModule.sampleQuestions')}</h3>
+      <div style={attentionCardStyle}>
+        <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>{t('eaSecondBrainModule.sampleQuestions')}</h3>
         <div className="flex flex-wrap gap-2">
           {SAMPLE_QUESTIONS.map((sq, i) => (
             <button
@@ -118,8 +130,14 @@ const Ask = () => {
 
       {/* Answer */}
       {answer && (
-        <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-purple-50">
+        <div style={attentionPanelStyle}>
+          <div
+            style={{
+              padding: '16px 24px',
+              borderBottom: '1px solid #e2e8f0',
+              background: 'linear-gradient(90deg, #eff6ff 0%, #faf5ff 100%)',
+            }}
+          >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">🧠 {t('eaSecondBrainModule.answerTitle')}</h3>
               {answer.confidence != null && (
@@ -190,8 +208,10 @@ const Ask = () => {
 
       {/* History */}
       {history.length > 1 && (
-        <div>
-          <h3 className="text-sm font-semibold text-gray-600 mb-3">{t('eaSecondBrainModule.recentQuestions')}</h3>
+        <div style={attentionCardStyle}>
+          <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>
+            {t('eaSecondBrainModule.recentQuestions')}
+          </h3>
           <div className="space-y-2">
             {history.slice(1).map((h, i) => (
               <button
@@ -208,7 +228,7 @@ const Ask = () => {
           </div>
         </div>
       )}
-    </div>
+    </AttentionPage>
   );
 };
 

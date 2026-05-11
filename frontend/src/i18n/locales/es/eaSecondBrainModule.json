@@ -149,6 +149,9 @@
 
     "runsTitle": "Ejecuciones del agente",
     "runsSubtitle": "Historial de ejecuciones con hashes de atestación",
+    "runsStatDone": "Correctas",
+    "runsStatRunning": "En curso",
+    "runsStatFailed": "Fallidas",
     "refresh": "Actualizar",
     "loadingRuns": "Cargando ejecuciones...",
     "noRuns": "No se encontraron ejecuciones. Intenta enviar una perspectiva de muestra desde la pestaña Perspectivas.",

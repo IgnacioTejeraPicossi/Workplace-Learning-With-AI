@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  heroButtonStyle,
+  attentionCardStyle,
+} from './sharedUi';
 
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
@@ -124,23 +130,37 @@ const Portfolio = () => {
     return 'text-green-600';
   };
 
-  return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">{t('eaSecondBrainModule.portfolioTitle')}</h2>
-          <p className="text-gray-500 mt-1">{t('eaSecondBrainModule.portfolioSubtitle')}</p>
-        </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          + {t('eaSecondBrainModule.addPortfolioItem')}
-        </button>
-      </div>
+  const addBtn = (
+    <button
+      type="button"
+      onClick={() => {
+        resetForm();
+        setShowForm(true);
+      }}
+      style={heroButtonStyle(false)}
+    >
+      + {t('eaSecondBrainModule.addPortfolioItem')}
+    </button>
+  );
 
-      {/* Filters */}
-      <div className="flex gap-3 items-center">
+  return (
+    <AttentionPage>
+      <AttentionHero
+        icon="🏗️"
+        title={t('eaSecondBrainModule.portfolioTitle')}
+        subtitle={t('eaSecondBrainModule.portfolioSubtitle')}
+        trailing={addBtn}
+      />
+
+      <div
+        style={{
+          ...attentionCardStyle,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px',
+          alignItems: 'center',
+        }}
+      >
         <input
           type="text"
           value={search}
@@ -157,7 +177,7 @@ const Portfolio = () => {
 
       {/* Create/Edit Form Modal */}
       {showForm && (
-        <div className="bg-white rounded-xl border-2 border-blue-200 shadow-lg p-6 space-y-4">
+        <div style={{ ...attentionCardStyle, border: '2px solid #93c5fd' }} className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">
             {editItem ? t('eaSecondBrainModule.editPortfolioItem') : t('eaSecondBrainModule.addPortfolioItem')}
           </h3>
@@ -397,7 +417,7 @@ const Portfolio = () => {
           })}
         </div>
       )}
-    </div>
+    </AttentionPage>
   );
 };
 

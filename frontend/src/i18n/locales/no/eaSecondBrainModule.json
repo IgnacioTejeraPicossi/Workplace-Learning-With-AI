@@ -149,6 +149,9 @@
 
     "runsTitle": "Agentkjoringer",
     "runsSubtitle": "Utforelseshistorikk med attestasjonshasher",
+    "runsStatDone": "Fullf\u00f8rt",
+    "runsStatRunning": "Kjorer",
+    "runsStatFailed": "Mislykket",
     "refresh": "Oppdater",
     "loadingRuns": "Laster kjoringer...",
     "noRuns": "Ingen kjoringer funnet. Prov \u00e5 sende en eksempelinnsikt fra Innsikt-fanen.",

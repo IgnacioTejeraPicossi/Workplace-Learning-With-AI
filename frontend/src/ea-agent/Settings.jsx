@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  AttentionSectionHeader,
+  accentButtonStyle,
+  attentionCardStyle,
+  attentionPanelStyle,
+} from './sharedUi';
 
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
@@ -115,17 +123,15 @@ const Settings = () => {
   }[ft] || '📄');
 
   return (
-    <div className="p-8 space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t('eaSecondBrainModule.settingsTitle')}</h2>
-        <p className="text-gray-500 mt-1">{t('eaSecondBrainModule.settingsSubtitle')}</p>
-      </div>
+    <AttentionPage>
+      <AttentionHero
+        icon="⚙️"
+        title={t('eaSecondBrainModule.settingsTitle')}
+        subtitle={t('eaSecondBrainModule.settingsSubtitle')}
+      />
 
-      {/* Integration Status */}
-      <div className="bg-white rounded-xl border shadow-sm">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{t('eaSecondBrainModule.integrationStatus')}</h3>
-        </div>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="🔌" title={t('eaSecondBrainModule.integrationStatus')} />
         <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
           {integrations.map((int, i) => {
             const configured = !!process.env[int.env];
@@ -142,12 +148,17 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Watchlist */}
-      <div className="bg-white rounded-xl border shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">👁️ {t('eaSecondBrainModule.watchlistTitle')}</h3>
-          <button onClick={() => setShowAddWatch(!showAddWatch)}
-            className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200">
+      <div style={attentionPanelStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '20px' }}>👁️</span>
+            <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#0f172a' }}>{t('eaSecondBrainModule.watchlistTitle')}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowAddWatch(!showAddWatch)}
+            style={{ ...accentButtonStyle('blue'), fontSize: '13px', padding: '8px 14px' }}
+          >
             + {t('eaSecondBrainModule.addWatchItem')}
           </button>
         </div>
@@ -209,12 +220,17 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Source Feeds */}
-      <div className="bg-white rounded-xl border shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">📡 {t('eaSecondBrainModule.sourceFeedsTitle')}</h3>
-          <button onClick={() => setShowAddFeed(!showAddFeed)}
-            className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200">
+      <div style={attentionPanelStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '20px' }}>📡</span>
+            <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: '#0f172a' }}>{t('eaSecondBrainModule.sourceFeedsTitle')}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowAddFeed(!showAddFeed)}
+            style={{ ...accentButtonStyle('blue'), fontSize: '13px', padding: '8px 14px' }}
+          >
             + {t('eaSecondBrainModule.addFeed')}
           </button>
         </div>
@@ -283,11 +299,8 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Execution Policies */}
-      <div className="bg-white rounded-xl border shadow-sm">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{t('eaSecondBrainModule.policiesTitle')}</h3>
-        </div>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="📋" title={t('eaSecondBrainModule.policiesTitle')} />
         <div className="p-6 space-y-4">
           {[
             { label: t('eaSecondBrainModule.policyJiraProjects'), desc: t('eaSecondBrainModule.policyJiraProjectsDesc'), value: 'EA, ARCH' },
@@ -305,11 +318,8 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Environment Variables */}
-      <div className="bg-white rounded-xl border shadow-sm">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{t('eaSecondBrainModule.envVarsTitle')}</h3>
-        </div>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="🔐" title={t('eaSecondBrainModule.envVarsTitle')} />
         <div className="p-6">
           <p className="text-sm text-gray-500 mb-3">{t('eaSecondBrainModule.envVarsIntro')}<code className="bg-gray-100 px-1 rounded">{t('eaSecondBrainModule.envFile')}</code>{t('eaSecondBrainModule.envFileSuffix')}</p>
           <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto">
@@ -327,15 +337,14 @@ SHEETS_SPREADSHEET_ID=your-sheet-id`}
         </div>
       </div>
 
-      {/* Help */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+      <div style={{ ...attentionCardStyle, background: 'linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%)', border: '1px solid #bfdbfe' }}>
         <h3 className="text-lg font-semibold text-blue-900 mb-2">{t('eaSecondBrainModule.needHelpTitle')}</h3>
         <p className="text-sm text-blue-700">
           {t('eaSecondBrainModule.needHelpBody')}
           <a href="#" className="underline">{t('eaSecondBrainModule.needHelpLink')}</a>
         </p>
       </div>
-    </div>
+    </AttentionPage>
   );
 };
 

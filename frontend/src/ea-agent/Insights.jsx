@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  AttentionPage,
+  AttentionHero,
+  attentionCardStyle,
+} from './sharedUi';
 
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
@@ -88,15 +93,20 @@ const Insights = () => {
   }[c] || '📄');
 
   return (
-    <div className="p-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t('eaSecondBrainModule.insightsTitle')}</h2>
-        <p className="text-gray-500 mt-1">{t('eaSecondBrainModule.insightsSubtitle')}</p>
-      </div>
+    <AttentionPage>
+      <AttentionHero
+        icon="💡"
+        title={t('eaSecondBrainModule.insightsTitle')}
+        subtitle={t('eaSecondBrainModule.insightsSubtitle')}
+      />
 
-      {/* Generate Insight Panel */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+      <div
+        style={{
+          ...attentionCardStyle,
+          background: 'linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%)',
+          border: '1px solid #e9d5ff',
+        }}
+      >
         <h3 className="text-lg font-semibold text-purple-900 mb-3">
           🤖 {t('eaSecondBrainModule.generateInsightTitle')}
         </h3>
@@ -125,8 +135,15 @@ const Insights = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div
+        style={{
+          ...attentionCardStyle,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px',
+          alignItems: 'center',
+        }}
+      >
         <span className="text-sm font-medium text-gray-600">{t('eaSecondBrainModule.filterBy')}:</span>
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
           className="px-3 py-1.5 border rounded-lg text-sm">
@@ -149,20 +166,20 @@ const Insights = () => {
             <option key={u} value={u}>{u}</option>
           ))}
         </select>
-        <span className="text-sm text-gray-400 ml-auto">
+        <span style={{ fontSize: '14px', color: '#94a3b8', marginLeft: 'auto' }}>
           {insights.length} {t('eaSecondBrainModule.insightsCount')}
         </span>
       </div>
 
       {/* Insights List */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div style={{ ...attentionCardStyle, display: 'flex', justifyContent: 'center', padding: '48px' }}>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         </div>
       ) : insights.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <p className="text-4xl mb-2">💡</p>
-          <p>{t('eaSecondBrainModule.noInsights')}</p>
+        <div style={{ ...attentionCardStyle, textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
+          <p style={{ margin: '0 0 8px', fontSize: '32px' }}>💡</p>
+          <p style={{ margin: 0 }}>{t('eaSecondBrainModule.noInsights')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -325,7 +342,7 @@ const Insights = () => {
           })}
         </div>
       )}
-    </div>
+    </AttentionPage>
   );
 };
 

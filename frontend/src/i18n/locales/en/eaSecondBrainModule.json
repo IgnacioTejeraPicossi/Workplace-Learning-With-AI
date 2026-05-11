@@ -149,6 +149,9 @@
 
     "runsTitle": "Agent Runs",
     "runsSubtitle": "Execution history with attestation hashes",
+    "runsStatDone": "Completed",
+    "runsStatRunning": "Running",
+    "runsStatFailed": "Failed",
     "refresh": "Refresh",
     "loadingRuns": "Loading runs...",
     "noRuns": "No runs found. Try sending a sample insight from the Insights tab.",
