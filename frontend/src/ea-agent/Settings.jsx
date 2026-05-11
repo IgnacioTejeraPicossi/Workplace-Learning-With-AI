@@ -113,6 +113,43 @@ const Settings = () => {
     { name: 'Google Sheets', env: 'REACT_APP_GOOGLE_SA_JSON', icon: '📊' },
   ];
 
+  /** Splits merged notify strings (e.g. "deprecationsecuritymajor_release") into readable pills */
+  const NOTIFY_KNOWN = [
+    'major_release', 'deprecation', 'security', 'license', 'performance',
+    'vendor', 'compliance', 'architecture', 'cost', 'eol', 'cve',
+  ].sort((a, b) => b.length - a.length);
+
+  const expandNotifyTokens = (raw) => {
+    if (raw == null || raw === '') return [];
+    if (Array.isArray(raw)) return raw.flatMap(expandNotifyTokens);
+    let rest = String(raw).toLowerCase();
+    const out = [];
+    while (rest.length) {
+      let matched = false;
+      for (const tok of NOTIFY_KNOWN) {
+        if (rest.startsWith(tok)) {
+          out.push(tok);
+          rest = rest.slice(tok.length);
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        const m = rest.match(/^([a-z]+)/);
+        if (m) {
+          out.push(m[1]);
+          rest = rest.slice(m[1].length);
+        } else {
+          out.push(rest);
+          break;
+        }
+      }
+    }
+    return out.filter(Boolean);
+  };
+
+  const humanizeToken = (x) => (x == null || x === '' ? '' : String(x).replace(/_/g, ' '));
+
   const categoryColor = (c) => ({
     technology: 'bg-blue-100 text-blue-700', vendor: 'bg-purple-100 text-purple-700',
     security: 'bg-red-100 text-red-700', compliance: 'bg-green-100 text-green-700',
@@ -136,10 +173,25 @@ const Settings = () => {
           {integrations.map((int, i) => {
             const configured = !!process.env[int.env];
             return (
-              <div key={i} className={`p-4 rounded-lg border text-center ${configured ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+              <div
+                key={i}
+                style={{
+                  padding: '18px 14px',
+                  borderRadius: '14px',
+                  textAlign: 'center',
+                  border: configured ? '1px solid #86efac' : '1px solid #e2e8f0',
+                  background: configured ? 'linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%)' : 'linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%)',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06)',
+                  minHeight: '112px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <span className="text-2xl">{int.icon}</span>
-                <p className="font-medium text-sm mt-1">{int.name}</p>
-                <p className={`text-xs mt-1 ${configured ? 'text-green-600' : 'text-gray-400'}`}>
+                <p className="font-semibold text-sm mt-2 text-slate-800">{int.name}</p>
+                <p className={`text-xs mt-1 font-medium ${configured ? 'text-emerald-700' : 'text-slate-500'}`}>
                   {configured ? t('eaSecondBrainModule.configured') : t('eaSecondBrainModule.notConfigured')}
                 </p>
               </div>
@@ -188,32 +240,59 @@ const Settings = () => {
           </div>
         )}
 
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-3" style={{ background: '#f8fafc' }}>
           {loadingW ? (
-            <div className="flex justify-center py-4"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div></div>
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+            </div>
           ) : watchlist.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">{t('eaSecondBrainModule.noWatchItems')}</p>
+            <p className="text-sm text-gray-400 text-center py-8">{t('eaSecondBrainModule.noWatchItems')}</p>
           ) : (
             watchlist.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50 hover:bg-white transition-colors">
-                <button onClick={() => toggleWatchActive(item)} className="text-lg">
+              <div
+                key={item.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '14px',
+                  padding: '16px 18px',
+                  borderRadius: '14px',
+                  border: '1px solid #e2e8f0',
+                  background: 'linear-gradient(90deg, #eff6ff 0%, #ffffff 55%)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                }}
+              >
+                <button type="button" onClick={() => toggleWatchActive(item)} className="text-lg shrink-0">
                   {item.active ? '✅' : '⬜'}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm text-gray-800">{item.term}</span>
-                    <span className={`px-2 py-0.5 rounded text-xs ${categoryColor(item.category)}`}>{item.category}</span>
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span className="font-semibold text-sm text-slate-900">{item.term}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${categoryColor(item.category)}`}>{humanizeToken(item.category)}</span>
                   </div>
-                  {item.notes && <p className="text-xs text-gray-500 mt-0.5">{item.notes}</p>}
+                  {item.notes && <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{item.notes}</p>}
                   {item.notify_on?.length > 0 && (
-                    <div className="flex gap-1 mt-1">
-                      {item.notify_on.map((n, i) => (
-                        <span key={i} className="px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded text-xs">{n}</span>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {expandNotifyTokens(item.notify_on).map((n, i) => (
+                        <span
+                          key={`${n}-${i}`}
+                          style={{
+                            padding: '3px 9px',
+                            borderRadius: '999px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            background: '#f1f5f9',
+                            color: '#475569',
+                            border: '1px solid #e2e8f0',
+                          }}
+                        >
+                          {humanizeToken(n)}
+                        </span>
                       ))}
                     </div>
                   )}
                 </div>
-                <button onClick={() => deleteWatch(item.id)} className="text-red-400 hover:text-red-600 text-sm">🗑️</button>
+                <button type="button" onClick={() => deleteWatch(item.id)} className="text-red-400 hover:text-red-600 text-sm shrink-0">🗑️</button>
               </div>
             ))
           )}
@@ -262,37 +341,49 @@ const Settings = () => {
           </div>
         )}
 
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-3" style={{ background: '#f8fafc' }}>
           {loadingF ? (
-            <div className="flex justify-center py-4"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div></div>
+            <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" /></div>
           ) : feeds.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">{t('eaSecondBrainModule.noFeeds')}</p>
+            <p className="text-sm text-gray-400 text-center py-8">{t('eaSecondBrainModule.noFeeds')}</p>
           ) : (
             feeds.map((feed) => (
-              <div key={feed.id} className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50 hover:bg-white transition-colors">
-                <button onClick={() => toggleFeedActive(feed)} className="text-lg">
+              <div
+                key={feed.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '14px',
+                  padding: '16px 18px',
+                  borderRadius: '14px',
+                  border: '1px solid #e2e8f0',
+                  background: 'white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                }}
+              >
+                <button type="button" onClick={() => toggleFeedActive(feed)} className="text-lg shrink-0">
                   {feed.active ? '✅' : '⬜'}
                 </button>
-                <span className="text-xl">{feedTypeIcon(feed.feed_type)}</span>
+                <span className="text-xl shrink-0">{feedTypeIcon(feed.feed_type)}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm text-gray-800">{feed.name}</span>
-                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-xs">{feed.feed_type}</span>
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span className="font-semibold text-sm text-slate-900">{feed.name}</span>
+                    <span style={{ padding: '3px 9px', borderRadius: '999px', fontSize: '11px', fontWeight: 600, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}>{feed.feed_type}</span>
                     {feed.status && feed.status !== 'idle' && (
-                      <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs">{feed.status}</span>
+                      <span className="px-2 py-0.5 bg-amber-50 text-amber-800 rounded-full text-xs font-semibold border border-amber-200">{feed.status}</span>
                     )}
                   </div>
-                  {feed.url && <p className="text-xs text-gray-400 mt-0.5 truncate">{feed.url}</p>}
+                  {feed.url && <p className="text-xs text-slate-500 mt-1.5 truncate">{feed.url}</p>}
                   {feed.tags?.length > 0 && (
-                    <div className="flex gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1.5 mt-2">
                       {feed.tags.map((tag, i) => (
-                        <span key={i} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-xs">{tag}</span>
+                        <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-100">{tag}</span>
                       ))}
                     </div>
                   )}
                 </div>
-                <span className="text-xs text-gray-400">{feed.poll_interval_minutes}m</span>
-                <button onClick={() => deleteFeed(feed.id)} className="text-red-400 hover:text-red-600 text-sm">🗑️</button>
+                <span className="text-xs text-slate-500 font-medium shrink-0 pt-0.5">{feed.poll_interval_minutes}m</span>
+                <button type="button" onClick={() => deleteFeed(feed.id)} className="text-red-400 hover:text-red-600 text-sm shrink-0">🗑️</button>
               </div>
             ))
           )}
@@ -337,11 +428,11 @@ SHEETS_SPREADSHEET_ID=your-sheet-id`}
         </div>
       </div>
 
-      <div style={{ ...attentionCardStyle, background: 'linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%)', border: '1px solid #bfdbfe' }}>
+      <div style={{ ...attentionCardStyle, background: 'linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%)', border: '1px solid #bfdbfe' }} id="ea-brain-help">
         <h3 className="text-lg font-semibold text-blue-900 mb-2">{t('eaSecondBrainModule.needHelpTitle')}</h3>
         <p className="text-sm text-blue-700">
           {t('eaSecondBrainModule.needHelpBody')}
-          <a href="#" className="underline">{t('eaSecondBrainModule.needHelpLink')}</a>
+          <a href="#ea-brain-help" className="underline font-medium">{t('eaSecondBrainModule.needHelpLink')}</a>
         </p>
       </div>
     </AttentionPage>

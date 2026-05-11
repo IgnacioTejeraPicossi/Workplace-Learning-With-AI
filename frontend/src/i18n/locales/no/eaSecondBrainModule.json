@@ -46,6 +46,8 @@
     "generating": "Genererer...",
     "generateBtn": "Generer innsikt",
     "filterBy": "Filtrer etter",
+    "filtersPanelHeading": "S\u00f8k og filtre",
+    "insightsLibraryHeading": "Innsiktsbibliotek",
     "allStatuses": "Alle statuser",
     "allCategories": "Alle kategorier",
     "allUrgencies": "Alle hastegrad",
@@ -63,6 +65,7 @@
 
     "portfolioTitle": "Applikasjonsportefolje",
     "portfolioSubtitle": "Administrer IT-portefoljen \u2014 applikasjoner, teknologistacker, kritikalitet og livssyklusstatus",
+    "portfolioCatalogHeading": "Portefoljeoppforinger",
     "addPortfolioItem": "Legg til portefoljeelement",
     "editPortfolioItem": "Rediger portefoljeelement",
     "searchPortfolio": "Sok applikasjoner, teknologier...",

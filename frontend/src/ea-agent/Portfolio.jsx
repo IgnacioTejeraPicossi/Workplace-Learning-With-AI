@@ -5,6 +5,8 @@ import {
   AttentionHero,
   heroButtonStyle,
   attentionCardStyle,
+  attentionPanelStyle,
+  AttentionSectionHeader,
 } from './sharedUi';
 
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
@@ -130,6 +132,13 @@ const Portfolio = () => {
     return 'text-green-600';
   };
 
+  const critAccent = (c) => {
+    if (c >= 5) return '#dc2626';
+    if (c >= 4) return '#ea580c';
+    if (c >= 3) return '#ca8a04';
+    return '#16a34a';
+  };
+
   const addBtn = (
     <button
       type="button"
@@ -152,27 +161,47 @@ const Portfolio = () => {
         trailing={addBtn}
       />
 
-      <div
-        style={{
-          ...attentionCardStyle,
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '12px',
-          alignItems: 'center',
-        }}
-      >
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('eaSecondBrainModule.searchPortfolio')}
-          className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        />
-        <select value={filterLifecycle} onChange={(e) => setFilterLifecycle(e.target.value)}
-          className="px-3 py-2 border rounded-lg text-sm">
-          <option value="">{t('eaSecondBrainModule.allLifecycles')}</option>
-          {LIFECYCLE_OPTIONS.map(lc => <option key={lc} value={lc}>{lc}</option>)}
-        </select>
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="🔎" title={t('eaSecondBrainModule.filtersPanelHeading')} />
+        <div
+          style={{
+            padding: '18px 24px 22px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+            alignItems: 'center',
+            background: '#fafafa',
+            borderTop: '1px solid #f1f5f9',
+          }}
+        >
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('eaSecondBrainModule.searchPortfolio')}
+            className="flex-1 min-w-[200px] px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none text-sm bg-white"
+          />
+          <select
+            value={filterLifecycle}
+            onChange={(e) => setFilterLifecycle(e.target.value)}
+            style={{
+              padding: '10px 14px',
+              borderRadius: '10px',
+              border: '1px solid #cbd5e1',
+              fontSize: '14px',
+              background: 'white',
+              minWidth: '160px',
+            }}
+          >
+            <option value="">{t('eaSecondBrainModule.allLifecycles')}</option>
+            {LIFECYCLE_OPTIONS.map((lc) => (
+              <option key={lc} value={lc}>{lc}</option>
+            ))}
+          </select>
+          <span style={{ fontSize: '14px', color: '#94a3b8', marginLeft: 'auto', fontWeight: 500 }}>
+            {items.length} {t('eaSecondBrainModule.portfolioCatalogHeading')}
+          </span>
+        </div>
       </div>
 
       {/* Create/Edit Form Modal */}
@@ -288,22 +317,42 @@ const Portfolio = () => {
       )}
 
       {/* Items List */}
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        </div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <p className="text-4xl mb-2">🏗️</p>
-          <p>{t('eaSecondBrainModule.noPortfolioItems')}</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {items.map((item) => {
+      <div style={attentionPanelStyle}>
+        <AttentionSectionHeader icon="💼" title={t('eaSecondBrainModule.portfolioCatalogHeading')} />
+        <div style={{ padding: '20px 22px 24px', display: 'grid', gap: '16px', background: '#f8fafc' }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '48px', background: 'white', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+            </div>
+          ) : items.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8', background: 'white', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
+              <p style={{ margin: '0 0 8px', fontSize: '36px' }}>🏗️</p>
+              <p style={{ margin: 0 }}>{t('eaSecondBrainModule.noPortfolioItems')}</p>
+            </div>
+          ) : (
+            items.map((item) => {
             const expanded = expandedId === item.id;
+            const accent = critAccent(item.criticality);
             return (
-              <div key={item.id} className="bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-all">
-                <div className="p-5 cursor-pointer" onClick={() => setExpandedId(expanded ? null : item.id)}>
+              <div
+                key={item.id}
+                style={{
+                  borderRadius: '14px',
+                  border: '1px solid #e2e8f0',
+                  background: 'white',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06)',
+                  overflow: 'hidden',
+                  borderLeft: `5px solid ${accent}`,
+                }}
+                className="hover:shadow-lg transition-shadow"
+              >
+                <div
+                  className="p-5 cursor-pointer"
+                  style={{
+                    background: `linear-gradient(90deg, ${accent}14 0%, #ffffff 48%)`,
+                  }}
+                  onClick={() => setExpandedId(expanded ? null : item.id)}
+                >
                   <div className="flex items-start gap-4">
                     <div className="flex flex-col items-center">
                       <span className={`text-2xl font-bold ${critColor(item.criticality)}`}>{item.criticality}</span>
@@ -414,9 +463,10 @@ const Portfolio = () => {
                 )}
               </div>
             );
-          })}
+          })
+          )}
         </div>
-      )}
+      </div>
     </AttentionPage>
   );
 };

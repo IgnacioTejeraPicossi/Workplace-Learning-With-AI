@@ -46,6 +46,8 @@
     "generating": "Generating...",
     "generateBtn": "Generate Insight",
     "filterBy": "Filter by",
+    "filtersPanelHeading": "Search & filters",
+    "insightsLibraryHeading": "Insight library",
     "allStatuses": "All statuses",
     "allCategories": "All categories",
     "allUrgencies": "All urgencies",
@@ -63,6 +65,7 @@
 
     "portfolioTitle": "Application Portfolio",
     "portfolioSubtitle": "Manage your IT portfolio — applications, tech stacks, criticality, and lifecycle status",
+    "portfolioCatalogHeading": "Portfolio entries",
     "addPortfolioItem": "Add Portfolio Item",
     "editPortfolioItem": "Edit Portfolio Item",
     "searchPortfolio": "Search applications, technologies...",

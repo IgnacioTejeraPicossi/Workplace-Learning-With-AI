@@ -46,6 +46,8 @@
     "generating": "Generando...",
     "generateBtn": "Generar perspectiva",
     "filterBy": "Filtrar por",
+    "filtersPanelHeading": "Búsqueda y filtros",
+    "insightsLibraryHeading": "Biblioteca de perspectivas",
     "allStatuses": "Todos los estados",
     "allCategories": "Todas las categorías",
     "allUrgencies": "Todas las urgencias",
@@ -63,6 +65,7 @@
 
     "portfolioTitle": "Portfolio de aplicaciones",
     "portfolioSubtitle": "Gestiona tu portfolio de TI — aplicaciones, stacks tecnológicos, criticidad y estado del ciclo de vida",
+    "portfolioCatalogHeading": "Entradas del portfolio",
     "addPortfolioItem": "Añadir elemento al portfolio",
     "editPortfolioItem": "Editar elemento del portfolio",
     "searchPortfolio": "Buscar aplicaciones, tecnologías...",
