@@ -1,0 +1,96 @@
+{
+  "salesAssistantModule": {
+    "title": "Agente Asistente de Ventas",
+    "tagline": "Higiene del pipeline, puntuación de riesgo de acuerdos y borradores de seguimiento contextualizados",
+    "description": "Higiene del pipeline, puntuación de riesgo de acuerdos y borradores de seguimiento contextualizados para Amelie Tique (Yara International). Automatiza actualizaciones en el CRM, crea correos de seguimiento y aporta información inteligente sobre el avance de los acuerdos.",
+    "tabOverview": "Resumen",
+    "tabHygiene": "Higiene",
+    "tabDeals": "Acuerdos",
+    "tabRuns": "Ejecuciones",
+    "tabSettings": "Ajustes",
+    "statsTotalRuns": "Ejecuciones totales",
+    "statsSuccessRate": "Tasa de éxito",
+    "statsCapabilities": "Capacidades",
+    "capabilitiesHeading": "Capacidades",
+    "dataSourcesHeading": "Fuentes de datos",
+    "internalHeading": "Internas",
+    "externalHeading": "Externas",
+    "keyFeaturesHeading": "Funciones clave",
+    "mcpHeading": "Model Context Protocol (MCP)",
+    "mcpSupportText": "Este agente admite MCP para la ejecución estandarizada de herramientas",
+    "sourcesInternal": [
+      "Oportunidades del CRM",
+      "Actividad de correo",
+      "Eventos del calendario",
+      "Transcripciones de reuniones"
+    ],
+    "sourcesExternal": [
+      "Comunicación con clientes",
+      "Señales de mercado",
+      "Inteligencia competitiva"
+    ],
+    "features": [
+      "Actualizaciones proactivas del CRM según la actividad de correo y calendario",
+      "Detección de acuerdos de alto riesgo o alto potencial",
+      "Borradores de correo de seguimiento contextualizados",
+      "Supervisión y corrección automática de la higiene del pipeline",
+      "Notificaciones de Slack para acuerdos críticos",
+      "Análisis del resultado de reuniones y próximos pasos",
+      "Puntuación y alertas del avance de acuerdos"
+    ],
+    "hygieneTitle": "Higiene del pipeline",
+    "hygieneLoading": "Cargando incidencias de higiene…",
+    "hygieneMissing": "Falta",
+    "hygieneScore": "Puntuación de higiene",
+    "hygieneOwner": "Responsable",
+    "hygieneStage": "Etapa",
+    "riskHigh": "Alto riesgo",
+    "riskMedium": "Riesgo medio",
+    "riskLow": "Bajo riesgo",
+    "missingField": {
+      "closeDate": "Fecha de cierre",
+      "nextActivity": "Próxima actividad",
+      "amount": "Importe"
+    },
+    "stage": {
+      "qualification": "Calificación",
+      "proposal": "Propuesta",
+      "poc": "POC"
+    },
+    "dealsTitle": "Acuerdos activos",
+    "dealsLoading": "Cargando acuerdos…",
+    "thDeal": "Acuerdo",
+    "thAmount": "Importe",
+    "thStage": "Etapa",
+    "thRisk": "Riesgo",
+    "thNextStep": "Próximo paso",
+    "riskLevel": {
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "dealName": {
+      "acmeRenewal": "Renovación ACME",
+      "betaExpansion": "Expansión Beta",
+      "gammaPoc": "POC Gamma"
+    },
+    "dealNext": {
+      "execReview": "Programar revisión ejecutiva",
+      "pricing": "Enviar opciones de precios",
+      "successCriteria": "Confirmar criterios de éxito"
+    },
+    "runsTitle": "Ejecuciones del agente",
+    "runsLoading": "Cargando ejecuciones…",
+    "runsEmpty": "Aún no hay ejecuciones",
+    "thRunId": "ID de ejecución",
+    "thStatus": "Estado",
+    "thCreated": "Creado",
+    "thError": "Error",
+    "settingsTitle": "Ajustes del agente",
+    "fieldDefaultOwner": "Responsable predeterminado (correos)",
+    "fieldSlackChannel": "Canal de Slack",
+    "fieldHygieneThreshold": "Umbral de higiene (%)",
+    "save": "Guardar",
+    "settingsSavedMock": "Ajustes guardados (simulado)."
+  }
+}
