@@ -21,7 +21,7 @@ Quick links to the most-used docs. Each page is short enough for GitHub’s “F
   - [J-messages Retrospective Learning](./J_MESSAGES_RETROSPECTIVE_LEARNING.md) - Complete guide: Epic 3 (Import, Evaluation, Prompt Suggestions)
   - [J-messages ROS Analysis](./J_MESSAGES_ROS_ANALYSIS.md) - Risk and vulnerability analysis (Norwegian)
   - [EA Second Brain Agent](./EA_SECOND_BRAIN_AGENT.md) - Portfolio management, impact scoring, AI insights
-  - [Red Cross Web QA Agent](./README_FULL.md#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 17 tabs, 25 endpoints
+  - [Red Cross Web QA Agent](./README_FULL.md#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 20 tabs, 33 endpoints (Phase A+B+C+D: Sev/Kat dual severity, Sprint Report, DPIA / DoD / Resilience / UAT / Risk Matrix, k6 + Loadster dual load testing)
   - [Installing the App in the Cloud](./installing_app_cloud_pack2_claude_code.md) - Cloud deployment module (Pack 2 plan)
   - [MCP Testing Guide](./MCP_TESTING_GUIDE.md) - Guide for testing MCP J-messages Analyzer
   - [MCP PowerShell Examples](./MCP_POWERSHELL_EXAMPLES.md) - PowerShell examples for MCP testing

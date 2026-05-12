@@ -202,7 +202,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
 - [🏛️ Council of Diverse Lenses](#council-of-diverse-lenses) - AI-powered council deliberation system for diverse perspectives and auditable decisions (NEW!)
 - [⚙️ Operations Efficiency Agent](#operations-efficiency-agent) - Automates invoice handling, cost allocations, and CV ranking for Posten Bring (NEW!)
-- [❤️‍🩹 Red Cross Web QA Agent](#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 17 tabs, 25 endpoints (NEW!)
+- [❤️‍🩹 Red Cross Web QA Agent](#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 20 tabs, 33 endpoints, aligned with Trine Bruu's Teststrategi 30.3 (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -6544,52 +6544,74 @@ The Security Center is the platform-level security and privacy module. It provid
 ## ❤️‍🩹 Red Cross Web QA Agent {#red-cross-web-qa-agent}
 
 ### Overview
-The **Red Cross Web QA Agent** is a 24/7 QA copilot purpose-built for the **rodekors.no** website rebuild on **Enonic XP CMS + NextJS + Designsystemet (Digdir)**. It is **Item Agent #9**, accessible from the sidebar under **Future Item Agents**.
+The **Red Cross Web QA Agent** is a 24/7 QA copilot purpose-built for the **rodekors.no** website rebuild on **Enonic XP CMS + NextJS + Designsystemet (Digdir)**. It is **Item Agent #9**, accessible from the sidebar under **Future Item Agents**. It is explicitly aligned to **Trine Bruu's Teststrategi 30.3** (Røde Kors Testleder).
 
-The agent surfaces every QA discipline a real Norwegian Red Cross release manager needs — from sprint test-plan generation to authorization tests across 6 editorial roles — behind a single 17-tab shell. Two execution modes are exposed in the header:
+The agent surfaces every QA discipline a real Norwegian Red Cross release manager needs — from sprint test-plan generation to authorization tests across 6 editorial roles to UAT support for named stakeholders — behind a single 20-tab shell. Two execution modes are exposed in the header:
 
-- **Generate-only**: produces Playwright/Cypress/k6 scripts and JSON reports for **Cursor AI / Claude Code / GitHub Actions** to consume
+- **Generate-only**: produces Playwright / Cypress / k6 / Loadster scripts and JSON reports for **Cursor AI / Claude Code / GitHub Actions** to consume
 - **Execute-directly**: runs Playwright, Cypress, axe-core, Lighthouse and k6 in-app
 
 …and two environments (MVP): `local` (`http://localhost:3000`) and `test`. Every run is fingerprinted with a SHA-256 attestation hash for traceability.
 
 ### Why this agent exists
-The rodekors.no team is migrating from a legacy CMS to **Enonic XP / Content Studio v.6**, deploying a **NextJS + Next.XP + Guillotine GraphQL + ISR** front-end, building forms in the in-house **Skjemabygger** (gov.uk / Adam Silver patterns + JSON Schema), routing payments through **Vipps**, and adopting **@digdir/designsystemet-react**. Six editorial roles (Administrator, Eier, Lokal eier, Redaktør, Lokal redaktør, Bidragsyter) need real authorization checks. Existing tooling (Lighthouse, axe-core, generic k6) catches the basics but misses the Enonic/Designsystemet/role-specific signals — this agent fills that gap with mock-first graceful degradation so it works without an LLM.
+The rodekors.no team is migrating from a legacy CMS to **Enonic XP / Content Studio v.6**, deploying a **NextJS + Next.XP + Guillotine GraphQL + ISR** front-end, building forms in the in-house **Skjemabygger** (gov.uk / Adam Silver patterns + JSON Schema) plus **Fundy** as the donation-form provider, routing payments through **Vipps**, and adopting **@digdir/designsystemet-react**. Six editorial roles (Administrator, Eier, Lokal eier, Redaktør, Lokal redaktør, Bidragsyter) need real authorization checks. Existing tooling (Lighthouse, axe-core, generic k6) catches the basics but misses the Enonic / Designsystemet / role-specific signals — this agent fills that gap with mock-first graceful degradation so it works without an LLM.
 
-### Tabs (17)
+### Alignment with Trine Bruu's Teststrategi 30.3
+Every finding and work-item produced by the agent carries the **dual severity scheme** mandated by §8.1: `severity_dev` (Sev 1-4, development phase) **and** `category_ops` (Kat A-C, post-handover contract phase). Test levels follow §5 V-model taxonomy (`unit` / `sit` / `system` / `uat` / `performance`). Azure DevOps replaces Jira as the official test tool (§5). Fundy is recognized as a separate scope from the Vipps payment handoff (§3 Systemlandskap). The Sprint Report generator outputs the Norwegian narrative structure (`Status / Identifiserte avvik / Anbefalinger`) that Trine uses up to Røde Kors leadership.
+
+### Tabs (20)
 
 | # | Tab | Component | Endpoint | What it does |
 |---|-----|-----------|----------|--------------|
-| 1 | 📊 Dashboard | `Dashboard.jsx` | `/stats`, `/runs` | Live quality status: total runs, pass rate, open findings, critical blockers, 11 quality gates |
-| 2 | 📋 Test Plan | `TestPlan.jsx` | `/generate-test-plan` | LLM converts a Jira epic / user story into manual + automated + a11y + API + regression tests + Jira subtasks |
+| 1 | 📊 Dashboard | `Dashboard.jsx` | `/stats`, `/runs` | Live quality status: total runs, pass rate, open findings, critical blockers, 11 quality gates, **Stakeholders & Roles panel** (Hilde, Trine Bruu, Trine Røsand Scheen, Astri) |
+| 2 | 📋 Test Plan | `TestPlan.jsx` | `/generate-test-plan` | LLM converts an Azure DevOps work item / user story into manual + automated + a11y + API + regression tests with `ado_work_items` carrying `work_item_type` (Bug / Task / Test Case), `priority` 1-4, `test_level` (unit / sit / system / uat / performance) |
 | 3 | 🎭 Playwright | `Playwright.jsx` | `/generate-playwright-tests` + `/run-playwright` | E2E generator across 9 scopes (navigation, forms, search, donation, volunteer, CMS preview, a11y smoke, visual, API mock) |
 | 4 | 🌲 Cypress | `Cypress.jsx` | `/generate-cypress-tests` + `/run-cypress` | Component + frontend regression generator |
-| 5 | 🔌 API QA | `ApiQA.jsx` | `/analyze-api` | Guillotine GraphQL + NextJS API + integrations — 10 checks (query correctness, pagination, schema drift, rate limit, error handling) |
+| 5 | 🔌 API QA | `ApiQA.jsx` | `/analyze-api` | Guillotine GraphQL + NextJS API + integrations — 10 checks |
 | 6 | 📝 CMS QA | `CmsQA.jsx` | `/generate-cms-test-cases` | Enonic Content Studio editor + visitor flows — 14 areas |
-| 7 | 📑 Forms QA | `FormsQA.jsx` | `/run-forms-qa` | **Skjemabygger** audit — 12 checks (JSON Schema, Adam Silver patterns, multi-step state, mobile keyboard, autocomplete, APIM/Dataverse prefill, ARIA live regions, error summary, Vipps handoff, PRG idempotency) |
-| 8 | 📦 Migration | `ContentMigration.jsx` | `/run-content-migration-audit` | Legacy CMS → Enonic XP migration audit — 8 content types (Forening / Distrikt / Aktivitet / Kontaktperson / Tjeneste-Kurs / Tema / Nyhet / Kampanje) × 10 checks (mapping, æøå chars, relations, image re-anchoring, 301 redirects, SEO, ISR invalidation, role permissions carryover) |
-| 9 | ♿ Accessibility | `Accessibility.jsx` | `/run-accessibility-check` | axe-core + Lighthouse + manual checklist + screen-reader scripts (WCAG 2.2 AA) — 12 checks |
-| 10 | ⚡ Performance | `Performance.jsx` | `/run-lighthouse` + `/run-enonic-performance` | Core Web Vitals + **Enonic-specific perf**: Guillotine GraphQL waterfall / N+1 / over-fetch, ISR revalidation, image service, publish ack latency, bulk publish UI block, part virtualization, cache freshness — 10 Enonic checks + hot-queries table with p95 metrics |
-| 11 | 🎨 Designsystemet | `Designsystemet.jsx` | `/run-designsystemet-audit` | **Digdir Designsystemet compliance** — `@digdir/designsystemet-react` usage, tokens, typography, spacing, dark mode, brand override, version, button + form-element components — 10 checks + 0-100 compliance score + deviations panel |
-| 12 | 🔐 Role Matrix | `RoleMatrix.jsx` | `/run-role-matrix-audit` | **Real authorization tests** across 6 editorial roles × 4 actions (read/edit/publish/delete) + 8 authZ checks (subtree isolation, publish guard, delete guard, role assignment guard, audit log, session expiry, privilege escalation, API authZ) |
-| 13 | 🔥 Stress Test | `StressTest.jsx` | `/generate-k6-script` + `/run-k6` | k6 load profiles for Red Cross peaks: smoke, normal, campaign peak, **crisis spike (1,000+ VUs)**, 4-hour soak |
-| 14 | 🛡️ Security & Privacy | `SecurityPrivacy.jsx` | `/run-security-scan` | OWASP Top 10, headers, rate limits, GDPR — 13 checks |
-| 15 | 🎯 Jira | `Jira.jsx` | `/jira-bundle-preview` + `/create-jira-issues` + `/dispatch-to-outsystems` | Convert findings into Jira issues in the Item project; dispatch action bundle to OutSystems |
-| 16 | 📜 Runs | `Runs.jsx` | `/runs`, `/runs/{run_id}` | Run history with attestation hash, artifacts, screenshots |
-| 17 | ⚙️ Settings | `Settings.jsx` | `/settings` (GET/POST) | Environments, tools, Jira project + component + labels, payment-flow scope (Vipps), quality thresholds |
+| 7 | 📑 Forms QA | `FormsQA.jsx` | `/run-forms-qa` | **Skjemabygger + Fundy** audit — **21 checks** (12 base: JSON Schema, Adam Silver, multi-step state, mobile keyboard, autocomplete, APIM/Dataverse prefill, ARIA live regions, error summary, **Vipps handoff**, PRG idempotency, plus 9 **Fundy** donation-provider checks). Findings carry `severity_dev` + `category_ops` |
+| 8 | 📦 Migration | `ContentMigration.jsx` | `/run-content-migration-audit` | Legacy CMS → Enonic XP migration audit — 8 content types × 10 checks (mapping, æøå chars, relations, image re-anchoring, 301 redirects, SEO, ISR invalidation, role permissions carryover). **Phase C**: `data_provenance` panel separating `migrated` from `newly_created` content, broken_pages tagged with `data_origin` |
+| 9 | ♿ Accessibility | `Accessibility.jsx` | `/run-accessibility-check` | axe-core + Lighthouse + manual checklist + screen-reader scripts — 12 checks. **Phase C**: explicit **WCAG 2.1 / 2.2 AA** version selector (Trine §4.1 mandates 2.1 AA minimum; the rebuild targets 2.2 AA). WCAG 2.2-only rule `target-size` is correctly gated to 2.2 AA mode |
+| 10 | ⚡ Performance | `Performance.jsx` | `/run-lighthouse` + `/run-enonic-performance` | Core Web Vitals + **Enonic-specific perf** (Guillotine GraphQL waterfall / N+1 / over-fetch, ISR revalidation, image service, publish ack latency, bulk publish UI block, part virtualization, cache freshness — 10 Enonic checks + hot-queries table with p95 metrics). **Phase D**: URL-preset chips for one-click testing — `rodekors.no` production, `test.lunix.cloud` (Tom's NextJS + XP + GraphQL preview), `localhost:3000` — with a "Run both" button that fires Lighthouse + Enonic in sequence |
+| 11 | 🎨 Designsystemet | `Designsystemet.jsx` | `/run-designsystemet-audit` | **Digdir Designsystemet compliance** — 10 checks + 0-100 compliance score + deviations panel |
+| 12 | 🔐 Role Matrix | `RoleMatrix.jsx` | `/run-role-matrix-audit` | **Real authorization tests** across 6 editorial roles × 4 actions + 8 authZ checks |
+| 13 | 🔥 Stress Test | `StressTest.jsx` | `/generate-k6-script` + `/run-k6` + **`/generate-loadster-script`** + **`/run-loadster`** + `/run-resilience-check` | k6 load profiles for Red Cross peaks (smoke / normal / campaign peak / **crisis spike 1,000+ VUs** / 4-hour soak). **Phase D**: Loadster as a parallel browser-level load testing tool — radio selector switches both endpoints + colors + result rendering. Loadster captures `hydration_p95_ms`, `spa_nav_p95_ms` and `engines` (parallel browsers) that protocol-level k6 cannot measure. **Phase B**: dedicated **Resilience** section (Trine §7) with `resilience_score` 0-100, breakpoint VU, recovery seconds, memory drift — separating *ytelse* from *resilience* |
+| 14 | 🛡️ Security & Privacy | `SecurityPrivacy.jsx` | `/run-security-scan` + **`/run-dpia-check`** | OWASP Top 10, headers, rate limits, GDPR — 13 checks. **Phase B**: dedicated **DPIA / Privacy by Design** sub-checklist — 12 GDPR Art. 25/35 checks, `dpia_score` 0-100, data register over Enonic / Fundy / Vipps / Dataverse / Okta with `legal_basis` + `retention`; findings tagged with `gdpr_article` |
+| 15 | 🎯 Azure DevOps | `AzureDevOps.jsx` | `/ado-bundle-preview` + `/create-ado-work-items` + `/dispatch-to-outsystems` | Convert findings into Azure DevOps work items (Bug / Task / Test Case) with priority pill (P1-P4), `severity_dev`, `category_ops`, `test_level` badges. Also dispatches to OutSystems |
+| 16 | 📈 Sprint Report | `SprintReport.jsx` | `/generate-sprint-report` + **`/verify-definition-of-done`** | Aggregates runs/findings/dispatches for the active sprint, computes Sev1-4 + KatA-C counts, Norwegian/English narrative (Status / Identifiserte avvik / Anbefalinger) for Trine's reporting line. **Phase B**: **DoD verifier** — per work item Trine §6.1 4-point checklist (functionality_tested / integrations_verified / known_bugs_documented / ready_for_uat) aggregated mechanically across last 50 runs + 20 dispatches |
+| 17 | ✅ UAT Support | `UatSupport.jsx` | `/generate-uat-support` | **Phase B** — Item Consulting doesn't run UAT; Røde Kors does. Generates UAT scripts + per-stakeholder checklists + sign-off form for the named Røde Kors stakeholders **Hilde Forslund** (Produkteier), **Trine Røsand Scheen** (Fagperson), **Astri Fretheim** (Fagperson) |
+| 18 | 🎲 Risk Matrix | `RiskMatrix.jsx` | `/analyze-risk-matrix` | **Phase B** — Trine §10: the risk matrix lives outside the strategy document. Paste CSV/JSON; the agent scores each risk (probability × impact, 1-25), assigns level (critical / high / medium / low), maps to test suites and produces `suite_priority` + `coverage_gaps` |
+| 19 | 📜 Runs | `Runs.jsx` | `/runs`, `/runs/{run_id}` | Run history with SHA-256 attestation hash, artifacts, screenshots |
+| 20 | ⚙️ Settings | `Settings.jsx` | `/settings` (GET/POST) | Environments, tools, **Azure DevOps** project (organization / project / area path / iteration path / tags / current sprint / sprint length weeks), payment-flow scope (Vipps), quality thresholds, **Stakeholders & Roles** governance panel (single source of truth) |
 
 ### Architecture
 
 **Backend** (mock-first graceful degradation: every async function returns deterministic fallback data when `ask_ai_unified` is unavailable):
-- Service: `backend/services/red_cross_qa.py` — **17 suites** (`SUITE_NAMES`)
-- Router: `backend/routers/red_cross_qa.py` — **25 routes** at `/api/red-cross-qa/*`
-- Versioned prompts: `backend/prompts/red_cross_qa/*.md` — 13 prompts (test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, **forms_qa**, **content_migration**, **enonic_performance**, **designsystemet**, **role_matrix**)
+- Service: `backend/services/red_cross_qa.py` — **23 suites** (`SUITE_NAMES`), aligned to Trine Bruu's Teststrategi 30.3
+- Router: `backend/routers/red_cross_qa.py` — **33 routes** at `/api/red-cross-qa/*`
+- Versioned prompts: `backend/prompts/red_cross_qa/*.md` — 13 prompts (test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, forms_qa, content_migration, enonic_performance, designsystemet, role_matrix). The Phase B prompts (DPIA, DoD, Resilience, UAT, Risk Matrix) and Phase D Loadster generator live inline in the service as constants for now
 
-**Frontend** (`frontend/src/red-cross-qa/` — 18 files: 17 tab components + shared `_PageHero.jsx`):
-- Shell: `frontend/src/RedCrossWebQAAgent.jsx` — 17-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme
-- Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low)
+**Frontend** (`frontend/src/red-cross-qa/` — 21 files: 20 tab components + shared `_PageHero.jsx`):
+- Shell: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme
+- Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low + `severity_dev` 1-4 + `category_ops` A-C)
 
-**i18n**: Full **EN / NO / ES** parity (40 top-level sections, ~400 keys per locale).
+**i18n**: Full **EN / NO / ES** parity (40+ top-level sections, **534 keys per locale** after Phase D). New blocks across phases: `dpia:` (10), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24), `stakeholders:` (3), Phase C provenance + WCAG version (8), Phase D Loadster tool selector (11) + 2 tab labels (`tabUatSupport`, `tabRiskMatrix`).
+
+### Phase history (rollout summary)
+
+- **Phase A** — Jira → Azure DevOps rename, Sev/Kat dual severity, Sprint Report generator, Fundy sub-checks, V-model test levels. Backward-compatible: `jira_epic` kept as deprecated alias of `ado_work_item`, MongoDB collection name `red_cross_qa_jira_dispatches_collection` retained
+- **Phase B** — DPIA / Privacy by Design (GDPR Art. 25/35), Definition of Done verifier (Trine §6.1), Resilience / lasttesting (Trine §7), UAT-støtte fane (named stakeholders), Risk Matrix consumer (Trine §10)
+- **Phase C** — Stakeholders + Roller as governance UI panel, explicit WCAG 2.1 / 2.2 AA version selector, Migrert vs Nyopprettet data provenance flag on content-migration runs
+- **Phase D** — **Loadster** as a parallel browser-level load testing tool inside the Stress Test tab (radio selector alongside k6), captures `hydration_p95_ms` and `spa_nav_p95_ms` that k6 cannot. Plus URL-preset chips in the Performance tab including Tom's `test.lunix.cloud` NextJS + XP + GraphQL preview
+
+### Load testing: k6 vs Loadster (Phase D differentiator)
+
+| Tool | Layer | Best for | Unique metrics |
+|---|---|---|---|
+| 🔥 **k6** | Protocol-level HTTP | APIs, Guillotine GraphQL endpoints, rate-limit behaviour, throughput | `http_req_duration_p95`, `http_req_failed`, `checks_passed` |
+| 🌐 **Loadster** | Browser-level (real browsers) | NextJS hydration cost, SPA navigation under load, JS execution time, editorial UX | `hydration_p95_ms`, `spa_nav_p95_ms`, `engines` (parallel browsers), `worst_step`, `memory_drift_pct` (soak only) |
+
+Profile-to-engines mapping for Loadster: `profileSmoke` → 1 engine / 5 VUs, `profileNormal` → 2 engines / 50 VUs, `profileCampaign` → 3 engines / 150 VUs, `profileCrisis` → 5 engines / 250 VUs (TV-aksjonen-style), `profileSoak` → 2 engines / 30 VUs over 4 hours.
 
 ### How to use it
 
@@ -6603,17 +6625,32 @@ The rodekors.no team is migrating from a legacy CMS to **Enonic XP / Content Stu
    ```
 3. Open `http://localhost:3000` and navigate to the sidebar → **Future Item Agents** → **❤️‍🩹 Red Cross Web QA Agent**.
 4. Pick the **Environment** (`local` / `test`) and **Execution Mode** (`generate` / `execute`) from the header.
-5. Open any tab and click its **Run** button (or **Generate** for script generators). Findings, deviations, recommendations and suggested test cases render inline; runs are persisted to MongoDB and surfaced under the **Runs** tab with the SHA-256 attestation hash.
+5. Open any tab and click its **Run** button (or **Generate** for script generators). Findings, deviations, recommendations and suggested test cases render inline with `severity_dev` / `category_ops` annotations; runs are persisted to MongoDB and surfaced under the **Runs** tab with the SHA-256 attestation hash.
+6. **End of sprint** → **Sprint Report** tab → Generate (Norwegian narrative for Trine) and verify Definition of Done across all work items in the sprint
+7. **For load testing**: pestaña 🔥 Stress Test → pick tool (k6 for protocol-level / Loadster for browser-level) → pick profile → optionally tick scenarios → Generate / Run
 
 ### Smoke / verification commands
 
 ```bash
-# Backend imports — should print 17 then 25
+# Backend imports — should print 23 (suites) then 33 (routes)
 python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"
 python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"
 
-# i18n parity — should print 40 three times
-python -c "import json; [print(len(json.load(open(f'frontend/src/i18n/locales/{loc}/redCrossWebQaModule.json', encoding='utf-8'))['redCrossWebQaModule'])) for loc in ['en','no','es']]"
+# End-to-end smoke (15 checks across Phase A + B + C + D, all PASS without LLM)
+python -m backend.tests.smoke_red_cross_qa
+
+# i18n parity — should print 534 three times
+python -c "import json
+def flatten(d, p=''):
+    out = {}
+    for k, v in d.items():
+        kp = f'{p}.{k}' if p else k
+        if isinstance(v, dict): out.update(flatten(v, kp))
+        else: out[kp] = v
+    return out
+for loc in ['en','no','es']:
+    with open(f'frontend/src/i18n/locales/{loc}/redCrossWebQaModule.json', encoding='utf-8') as f:
+        print(loc, len(flatten(json.load(f))))"
 
 # Frontend production build — exit 0, 0 warnings in src/red-cross-qa/
 cd frontend && CI=true npm run build
@@ -6623,19 +6660,22 @@ curl http://localhost:8000/api/red-cross-qa/stats
 curl http://localhost:8000/api/red-cross-qa/runs
 
 # Quick suite test (mock-first → works without LLM)
-curl -X POST http://localhost:8000/api/red-cross-qa/run-designsystemet-audit \
+curl -X POST http://localhost:8000/api/red-cross-qa/run-loadster \
   -H "Content-Type: application/json" \
-  -d '{"url":"https://www.rodekors.no/","environment":"test","lang":"en"}'
+  -d '{"profile":"profileCampaign","scenarios":["scenarioDonation"],"environment":"test","lang":"en"}'
 ```
 
 ### Critical constraints
 - Preserve **mock-first graceful degradation** — every new function MUST return deterministic data when LLM is unavailable
-- 25 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- **33 routes** registered at `/api/red-cross-qa/*` — do not break path naming
 - Quality gates referenced in Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix`
-- i18n EN/NO/ES must stay in parity (40 top-level sections each)
+- i18n EN/NO/ES must stay in parity (**534 keys per locale** after Phase D)
+- **Trine Teststrategi 30.3 alignment**: every finding/work-item must carry `severity_dev` (1-4) AND `category_ops` (A-C) per §8.1
+- **Backward compatibility**: `TestPlanRequest.jira_epic` is a deprecated alias of `ado_work_item`; MongoDB collection `red_cross_qa_jira_dispatches_collection` is deliberately retained
+- Mock-data disclaimer: until Apollo plugin instrumentation (Phase E) is wired up in `app/api/graphql/route.ts`, Enonic-specific perf hot queries + Loadster browser metrics are deterministic plausible mocks, not live measurements. The structure is in place for swap-in once telemetry collection is available
 
 ### Status
-✅ Production-ready. No contract tests yet (validate via the smoke commands above).
+✅ **Production-ready** (Phase A+B+C+D). Smoke test passes 15/15 without LLM. Frontend builds with 0 warnings in `src/red-cross-qa/`. Sample Norwegian performance report on Tom's `test.lunix.cloud` preview lives at `docs-media/rode_kors_qa/ytelsesrapport-test.lunix.cloud-2026-05-08.{md,docx}` — both carry an explicit mock-data disclaimer until real Apollo telemetry is in place.
 
 ---
 

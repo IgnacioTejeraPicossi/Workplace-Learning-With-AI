@@ -40,7 +40,7 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
   ];
 
   // ── Quick actions (panel) ─────────────────────────────────────────
-  // Mirrors the full 17-tab navigation. Dashboard (current view) is omitted;
+  // Mirrors the full 20-tab navigation. Dashboard (current view) is omitted;
   // Settings is omitted because mode/environment selectors live in the header.
   const quickActions = [
     { icon: '📋', label: t('redCrossWebQaModule.tabTestPlan'),         tab: 'test-plan',         color: '#dc2626' },
