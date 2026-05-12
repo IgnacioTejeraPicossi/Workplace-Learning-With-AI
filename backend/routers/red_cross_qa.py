@@ -16,6 +16,8 @@ try:
         generate_cypress_tests,
         run_cypress,
         analyze_api,
+        export_postman_collection,
+        run_graphql_introspection,
         generate_cms_test_cases,
         run_accessibility_check,
         run_lighthouse,
@@ -53,6 +55,8 @@ except ImportError:  # pragma: no cover
         generate_cypress_tests,
         run_cypress,
         analyze_api,
+        export_postman_collection,
+        run_graphql_introspection,
         generate_cms_test_cases,
         run_accessibility_check,
         run_lighthouse,
@@ -114,6 +118,25 @@ class CypressRequest(BaseModel):
 class ApiAnalyzeRequest(BaseModel):
     endpoint: str
     method: str = "POST"
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+# Phase F (Tom's tip · 2026-05-12) — Postman + GraphQL introspection.
+class PostmanExportRequest(BaseModel):
+    scope: Optional[str] = Field(
+        default=None,
+        description="Optional sub-set tag ('donation', 'distrikt', ...). None = full collection.",
+    )
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class GraphqlIntrospectionRequest(BaseModel):
+    url: Optional[str] = Field(
+        default=None,
+        description="Guillotine GraphQL endpoint URL. Optional; mock-first when omitted.",
+    )
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -284,6 +307,27 @@ async def api_run_cypress(body: CypressRequest):
 async def api_analyze_api(body: ApiAnalyzeRequest):
     env = _check_env(body.environment)
     return await analyze_api(body.endpoint, body.method, env, body.lang or "en")
+
+
+# Phase F (Tom's tip) — Postman export + GraphQL introspection for Guillotine/XP
+@router.post("/export-postman-collection")
+async def api_export_postman(body: PostmanExportRequest):
+    """Generate a Postman Collection v2.1 JSON for the canonical Guillotine
+    GraphQL operations. The frontend offers it as a download so the team can
+    import directly into Postman (Tom's preferred workflow for poking at the
+    XP backend during the rebuild)."""
+    env = _check_env(body.environment)
+    return await export_postman_collection(body.scope, env, body.lang or "en")
+
+
+@router.post("/run-graphql-introspection")
+async def api_run_graphql_introspection(body: GraphqlIntrospectionRequest):
+    """Return the list of GraphQL operations + content types exposed by
+    Guillotine. Mock-first: when no live URL is reachable, returns a curated
+    list of the operations expected for the rodekors.no rebuild so the
+    workshop demo always renders."""
+    env = _check_env(body.environment)
+    return await run_graphql_introspection(body.url, env, body.lang or "en")
 
 
 # ── CMS QA ────────────────────────────────────────────────────────

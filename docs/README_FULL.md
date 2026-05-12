@@ -202,7 +202,7 @@ It handles loading/saving prompts, testing, and applying the structured result b
 - [🛡️ Responsible AI Ops (GRC)](#responsible-ai-ops-grc) - Finance/Procurement/SCM/ESG compliance with Responsible AI guardrails (NEW!)
 - [🏛️ Council of Diverse Lenses](#council-of-diverse-lenses) - AI-powered council deliberation system for diverse perspectives and auditable decisions (NEW!)
 - [⚙️ Operations Efficiency Agent](#operations-efficiency-agent) - Automates invoice handling, cost allocations, and CV ranking for Posten Bring (NEW!)
-- [❤️‍🩹 Red Cross Web QA Agent](#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 20 tabs, 33 endpoints, aligned with Trine Bruu's Teststrategi 30.3 (NEW!)
+- [❤️‍🩹 Red Cross Web QA Agent](#red-cross-web-qa-agent) - 24/7 QA copilot for rodekors.no (Enonic XP + NextJS + Designsystemet) — 20 tabs, 35 endpoints, aligned with Trine Bruu's Teststrategi 30.3 + Tom's NextJS rebuild tooling tips (NEW!)
 - [🔒 Cybersecurity](#cybersecurity-module) - Comprehensive security management and threat intelligence platform
 
 ### 🔗 n8n Integration (Hackathon Demo)
@@ -6608,14 +6608,14 @@ Every finding and work-item produced by the agent carries the **dual severity sc
 
 **Backend** (mock-first graceful degradation: every async function returns deterministic fallback data when `ask_ai_unified` is unavailable):
 - Service: `backend/services/red_cross_qa.py` — **23 suites** (`SUITE_NAMES`), aligned to Trine Bruu's Teststrategi 30.3
-- Router: `backend/routers/red_cross_qa.py` — **33 routes** at `/api/red-cross-qa/*`
+- Router: `backend/routers/red_cross_qa.py` — **35 routes** at `/api/red-cross-qa/*` (Phase F adds `/export-postman-collection` and `/run-graphql-introspection`)
 - Versioned prompts: `backend/prompts/red_cross_qa/*.md` — 13 prompts (test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, forms_qa, content_migration, enonic_performance, designsystemet, role_matrix). The Phase B prompts (DPIA, DoD, Resilience, UAT, Risk Matrix) and Phase D Loadster generator live inline in the service as constants for now
 
 **Frontend** (`frontend/src/red-cross-qa/` — 21 files: 20 tab components + shared `_PageHero.jsx`):
 - Shell: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme
 - Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low + `severity_dev` 1-4 + `category_ops` A-C)
 
-**i18n**: Full **EN / NO / ES** parity (40+ top-level sections, **534 keys per locale** after Phase D). New blocks across phases: `dpia:` (10), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24), `stakeholders:` (3), Phase C provenance + WCAG version (8), Phase D Loadster tool selector (11) + 2 tab labels (`tabUatSupport`, `tabRiskMatrix`).
+**i18n**: Full **EN / NO / ES** parity (40+ top-level sections, **561 keys per locale** after Phase F). New blocks across phases: `dpia:` (10), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24), `stakeholders:` (3), Phase C provenance + WCAG version (8), Phase D Loadster tool selector (11) + 2 tab labels (`tabUatSupport`, `tabRiskMatrix`), **Phase F: Tom-tip banners + scenarioStorybook + GraphQL introspection panel + Postman export panel + dashboard.tomTip* (27 keys total)**.
 
 ### Phase history (rollout summary)
 
@@ -6623,6 +6623,7 @@ Every finding and work-item produced by the agent carries the **dual severity sc
 - **Phase B** — DPIA / Privacy by Design (GDPR Art. 25/35), Definition of Done verifier (Trine §6.1), Resilience / lasttesting (Trine §7), UAT-støtte fane (named stakeholders), Risk Matrix consumer (Trine §10)
 - **Phase C** — Stakeholders + Roller as governance UI panel, explicit WCAG 2.1 / 2.2 AA version selector, Migrert vs Nyopprettet data provenance flag on content-migration runs
 - **Phase D** — **Loadster** as a parallel browser-level load testing tool inside the Stress Test tab (radio selector alongside k6), captures `hydration_p95_ms` and `spa_nav_p95_ms` that k6 cannot. Plus URL-preset chips in the Performance tab including Tom's `test.lunix.cloud` NextJS + XP + GraphQL preview
+- **Phase F** (Tom's tooling tips for the NextJS rebuild, 2026-05-12) — **Storybook scope** for the Playwright generator (deterministic `storybook.spec.ts` template with `@storybook/test-runner` patterns, axe-core injection per story, WCAG 2.2 AA tag profile, keyboard sanity); **Postman Collection v2.1 export** (4 canonical Guillotine queries, base_url + token variables, per-request tests); **GraphQL introspection panel** (5 ops + 8 Røde Kors content types); **Tom-tip banners** on Dashboard / Playwright / Cypress / API QA; soft deprecation notice on Cypress recommending Playwright since Storybook bundling is already in place
 
 ### Load testing: k6 vs Loadster (Phase D differentiator)
 
@@ -6687,7 +6688,7 @@ curl -X POST http://localhost:8000/api/red-cross-qa/run-loadster \
 
 ### Critical constraints
 - Preserve **mock-first graceful degradation** — every new function MUST return deterministic data when LLM is unavailable
-- **33 routes** registered at `/api/red-cross-qa/*` — do not break path naming
+- **35 routes** registered at `/api/red-cross-qa/*` — do not break path naming
 - Quality gates referenced in Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix`
 - i18n EN/NO/ES must stay in parity (**534 keys per locale** after Phase D)
 - **Trine Teststrategi 30.3 alignment**: every finding/work-item must carry `severity_dev` (1-4) AND `category_ops` (A-C) per §8.1

@@ -83,7 +83,13 @@
       "gateDesignsystemet": "Designsystemet",
       "gateRoleMatrix": "Matriz de roles",
       "recentRuns": "Ejecuciones recientes",
-      "topRisks": "Principales riesgos"
+      "topRisks": "Principales riesgos",
+      "tomTipsTitle": "Stack de herramientas de Tom para rodekors.no",
+      "tomTipNextjs": "Frontend reconstruido sobre NextJS con App Router.",
+      "tomTipStorybook": "Componentes viven en Storybook (React/Next).",
+      "tomTipPlaywright": "Empaquetado con Storybook — usado EN LUGAR DE Cypress para este proyecto.",
+      "tomTipPostman": "Flujo preferido para probar GraphQL de Guillotine/XP de forma interactiva.",
+      "tomTipsAttribution": "Tips de Tom (Tech leder, Cruz Roja) — compartidos en Slack el 2026-05-12."
     },
 
     "testPlan": {
@@ -119,6 +125,9 @@
       "scopeAccessibility": "Smoke tests de accesibilidad",
       "scopeVisual": "Hooks de regresión visual",
       "scopeApiMock": "Mocking de API",
+      "scenarioStorybook": "Storybook (Designsystemet)",
+      "tomTipLabel": "Tom (Tech leder)",
+      "tomTipText": "Playwright viene empaquetado con Storybook para este proyecto NextJS — selecciona el scope Storybook arriba para generar specs a nivel de componente contra http://localhost:6006 con inyección de axe-core.",
       "generatedFile": "Archivo generado",
       "trace": "Traza"
     },
@@ -131,7 +140,9 @@
       "scopeComponent": "Tests de componentes",
       "scopeFrontendRegression": "Regresión frontend",
       "scopeQuickDebug": "Depuración local rápida",
-      "generatedFile": "Archivo generado"
+      "generatedFile": "Archivo generado",
+      "tomNoticeLabel": "Tom (Tech leder) — recomendación",
+      "tomNoticeText": "Para la migración de rodekors.no, Playwright (Tab 3) es la herramienta E2E preferida porque la integración con Storybook ya está en su sitio. Usa esta pestaña Cypress solo para necesidades ad-hoc / no-Storybook."
     },
 
     "apiQa": {
@@ -152,7 +163,23 @@
       "checkPerfBudget": "Presupuesto de rendimiento",
       "checkSchemaDrift": "Detección de drift de esquema",
       "checkRateLimit": "Limitación de tasa",
-      "checkErrorHandling": "Manejo de errores"
+      "checkErrorHandling": "Manejo de errores",
+      "tomTipLabel": "Tom (Tech leder)",
+      "tomTipText": "Postman es el flujo preferido del equipo para investigar GraphQL de Guillotine/XP. Usa los paneles de abajo para introspeccionar el esquema y exportar una colección Postman v2.1 lista para importar.",
+      "introspectionTitle": "Introspección del esquema GraphQL",
+      "introspectionHint": "Lista las operaciones de Guillotine + tipos de contenido de Cruz Roja. Mock-first: devuelve una base curada cuando no hay URL en vivo disponible.",
+      "btnIntrospect": "Ejecutar introspección",
+      "operationsTitle": "Operaciones",
+      "contentTypesTitle": "Tipos de contenido",
+      "opName": "Operación",
+      "opArgs": "Argumentos",
+      "opReturns": "Devuelve",
+      "opNote": "Nota",
+      "showIntrospectionQuery": "Mostrar la query __schema",
+      "postmanTitle": "Exportar colección Postman (flujo de Tom)",
+      "postmanHint": "Descarga una colección Postman v2.1 JSON con las 4 queries canónicas de Guillotine (Distrikt, Aktivitet, Kampanje, Forening), variables pre-rellenas (base_url, token) y tests por request (status 200 + sin errores GraphQL).",
+      "btnExportPostman": "Descargar .postman_collection.json",
+      "postmanDownloaded": "Descargado {{filename}} ({{count}} operaciones). Importa en Postman → ajusta la variable base_url y listo."
     },
 
     "cmsQa": {

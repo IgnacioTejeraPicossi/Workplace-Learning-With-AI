@@ -83,7 +83,13 @@
       "gateDesignsystemet": "Designsystemet",
       "gateRoleMatrix": "Rollematrise",
       "recentRuns": "Siste kjøringer",
-      "topRisks": "Topp risikoer"
+      "topRisks": "Topp risikoer",
+      "tomTipsTitle": "Toms verktøy‑stack for rodekors.no",
+      "tomTipNextjs": "Frontend bygget på nytt i NextJS med App Router.",
+      "tomTipStorybook": "Komponenter bor i Storybook (React/Next).",
+      "tomTipPlaywright": "Bundlet med Storybook — brukt I STEDET FOR Cypress for dette prosjektet.",
+      "tomTipPostman": "Foretrukken arbeidsflyt for å teste Guillotine/XP GraphQL interaktivt.",
+      "tomTipsAttribution": "Tips fra Tom (Tech leder, Røde Kors) — delt i Slack 2026-05-12."
     },
 
     "testPlan": {
@@ -119,6 +125,9 @@
       "scopeAccessibility": "Smoke‑tester for universell utforming",
       "scopeVisual": "Visuell regresjon",
       "scopeApiMock": "API‑mocking",
+      "scenarioStorybook": "Storybook (Designsystemet)",
+      "tomTipLabel": "Tom (Tech leder)",
+      "tomTipText": "Playwright er bundlet med Storybook for dette NextJS‑prosjektet — velg Storybook‑scope over for å generere komponent‑nivå spec mot http://localhost:6006 med axe‑core‑injeksjon.",
       "generatedFile": "Generert fil",
       "trace": "Sporing"
     },
@@ -131,7 +140,9 @@
       "scopeComponent": "Komponenttester",
       "scopeFrontendRegression": "Frontend‑regresjon",
       "scopeQuickDebug": "Rask lokal feilsøking",
-      "generatedFile": "Generert fil"
+      "generatedFile": "Generert fil",
+      "tomNoticeLabel": "Tom (Tech leder) — anbefaling",
+      "tomNoticeText": "For rodekors.no‑omleggingen er Playwright (fane 3) det foretrukne E2E‑verktøyet fordi Storybook‑integrasjonen allerede er på plass. Bruk denne Cypress‑fanen kun til ad‑hoc / ikke‑Storybook‑behov."
     },
 
     "apiQa": {
@@ -152,7 +163,23 @@
       "checkPerfBudget": "Ytelsesbudsjett",
       "checkSchemaDrift": "Skjema‑drift",
       "checkRateLimit": "Rategrenser",
-      "checkErrorHandling": "Feilhåndtering"
+      "checkErrorHandling": "Feilhåndtering",
+      "tomTipLabel": "Tom (Tech leder)",
+      "tomTipText": "Postman er teamets foretrukne arbeidsflyt for å teste Guillotine/XP GraphQL. Bruk panelene under for å introspeksjonere skjemaet og eksportere en Postman Collection v2.1 klar til import.",
+      "introspectionTitle": "GraphQL‑skjema introspeksjon",
+      "introspectionHint": "Lister Guillotine‑operasjoner + Røde Kors‑innholdstyper. Mock‑first: returnerer et håndplukket basissett når ingen live‑URL er tilgjengelig.",
+      "btnIntrospect": "Kjør introspeksjon",
+      "operationsTitle": "Operasjoner",
+      "contentTypesTitle": "Innholdstyper",
+      "opName": "Operasjon",
+      "opArgs": "Argumenter",
+      "opReturns": "Returnerer",
+      "opNote": "Notat",
+      "showIntrospectionQuery": "Vis __schema‑spørringen",
+      "postmanTitle": "Eksporter Postman Collection (Toms arbeidsflyt)",
+      "postmanHint": "Last ned en Postman Collection v2.1 JSON med de 4 kanoniske Guillotine‑spørringene (Distrikt, Aktivitet, Kampanje, Forening), forhåndsutfylte variabler (base_url, token) og tester per request (status 200 + ingen GraphQL‑feil).",
+      "btnExportPostman": "Last ned .postman_collection.json",
+      "postmanDownloaded": "Lastet ned {{filename}} ({{count}} operasjoner). Importer i Postman → sett base_url‑variabelen og du er klar."
     },
 
     "cmsQa": {

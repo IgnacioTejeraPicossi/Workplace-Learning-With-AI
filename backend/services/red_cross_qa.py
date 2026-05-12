@@ -599,6 +599,15 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
 # ═══════════════════════════════════════════════════════════════════
 async def generate_playwright_tests(scopes: List[str], environment: str,
                                     lang: str = "en") -> Dict[str, Any]:
+    """Phase F (Tom's tip · 2026-05-12):
+    When 'scenarioStorybook' is included in `scopes`, the generator emits a
+    Playwright spec wired to Storybook (`@storybook/test-runner` style) so the
+    Designsystemet components can be smoke-tested + axe-checked story by story.
+    Tom's reasoning: 'Playwright er bundlet med Storybook, så vi bruker det i
+    stedet for Cypress, siden verktøy-integrasjonen er på plass allerede.'
+    The Storybook scope is generated DETERMINISTICALLY (template below) so the
+    output is identical with or without an LLM — workshop-demo friendly.
+    """
     prompt = (
         f"Scopes: {', '.join(scopes)}\nEnvironment: {environment}\n"
         "Generate one Playwright TS file per scope (max 5 scripts)."
@@ -607,7 +616,22 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
     parsed = _parse_json(raw or "") or {}
     scripts = parsed.get("scripts") or []
 
+    # Phase F — if Storybook scope is requested, ALWAYS append the Storybook
+    # spec from the deterministic template, even when the LLM produced its own
+    # output for other scopes. Storybook needs specific patterns
+    # (`/iframe.html?id=...`, axe injection per story, viewport sizing) that we
+    # don't want to leave to LLM hallucination.
+    if "scenarioStorybook" in (scopes or []):
+        already_has_storybook = any(
+            "storybook" in (s.get("filename") or "").lower()
+            or "storybook" in (s.get("content") or "").lower()
+            for s in scripts
+        )
+        if not already_has_storybook:
+            scripts.append(_storybook_playwright_spec())
+
     if not scripts:
+        # Non-Storybook fallback — generic per-scope smoke.
         scripts = [{
             "filename": f"{s}.spec.ts",
             "content": (
@@ -628,6 +652,60 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
         pass
 
     return {"status": "ok", "scripts": scripts, "lang": lang}
+
+
+def _storybook_playwright_spec() -> Dict[str, str]:
+    """Deterministic Storybook + Playwright spec template (Phase F).
+
+    Targets the local Storybook (default port 6006). Loads three Designsystemet
+    stories (button, form-field, alert) and runs axe-core on each one. Real
+    project will swap the story IDs in for the actual Designsystemet stories
+    once the team publishes them; the template uses canonical Designsystemet
+    story IDs (`button--primary`, `textfield--default`, `alert--info`).
+    """
+    content = (
+        "import { test, expect } from '@playwright/test';\n"
+        "import { injectAxe, checkA11y } from 'axe-playwright';\n\n"
+        "/**\n"
+        " * Storybook smoke + a11y for Designsystemet components.\n"
+        " * Tom (Tech leder, Røde Kors): 'Playwright er bundlet med Storybook,\n"
+        " * så vi bruker det i stedet for Cypress, siden verktøy-integrasjonen\n"
+        " * er på plass allerede.'\n"
+        " *\n"
+        " * Run with Storybook already started on port 6006:\n"
+        " *   npx storybook dev -p 6006 &\n"
+        " *   npx playwright test storybook.spec.ts\n"
+        " */\n\n"
+        "const STORYBOOK = process.env.STORYBOOK_URL || 'http://localhost:6006';\n\n"
+        "const STORIES = [\n"
+        "  { id: 'button--primary',       title: 'Designsystemet · Button primary' },\n"
+        "  { id: 'textfield--default',    title: 'Designsystemet · TextField default' },\n"
+        "  { id: 'alert--info',           title: 'Designsystemet · Alert info' },\n"
+        "];\n\n"
+        "for (const story of STORIES) {\n"
+        "  test.describe(story.title, () => {\n"
+        "    test('renders + WCAG 2.2 AA via axe-core', async ({ page }) => {\n"
+        "      await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      await page.waitForLoadState('networkidle');\n"
+        "      // Storybook renders into #storybook-root\n"
+        "      await expect(page.locator('#storybook-root')).toBeVisible();\n"
+        "      await injectAxe(page);\n"
+        "      await checkA11y(page, undefined, {\n"
+        "        detailedReport: true,\n"
+        "        axeOptions: { runOnly: { type: 'tag', values: ['wcag2a','wcag2aa','wcag22aa'] } },\n"
+        "      });\n"
+        "    });\n\n"
+        "    test('keyboard interaction works', async ({ page }) => {\n"
+        "      await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      await page.waitForLoadState('networkidle');\n"
+        "      await page.keyboard.press('Tab');\n"
+        "      const active = await page.evaluate(() => document.activeElement?.tagName);\n"
+        "      expect(['BUTTON','INPUT','TEXTAREA','A']).toContain(active);\n"
+        "    });\n"
+        "  });\n"
+        "}\n"
+    )
+    return {"filename": "storybook.spec.ts", "content": content}
 
 
 async def run_playwright(scopes: List[str], environment: str) -> Dict[str, Any]:
@@ -706,6 +784,285 @@ async def analyze_api(endpoint: str, method: str, environment: str,
     })
     return {"status": "ok", "endpoint": endpoint, "method": method,
             "checks": checks, "run_id": run["run_id"]}
+
+
+# ───────────────────────────────────────────────────────────────────────────
+# Phase F (Tom's tip · 2026-05-12):
+# 'Postman blir nyttig for å få testet GraphQL-grensesnittene fra Guillotine/XP.'
+# Two helpers added below — both work without an LLM (deterministic templates):
+#
+#   1. export_postman_collection() — emits a Postman Collection v2.1 JSON with
+#      the 4 canonical Guillotine queries (Distrikt, Aktivitet, Kampanje,
+#      Forening) parameterised with {{base_url}} + {{token}} variables and
+#      response-tests (status 200 + GraphQL errors == null).
+#   2. run_graphql_introspection() — runs the standard `__schema` query and
+#      returns the list of operations. When the LLM is available + a URL is
+#      reachable, real introspection results would replace the mock; today the
+#      mock-first fallback is a curated list of the expected operations for the
+#      rodekors.no rebuild so the workshop demo always shows something.
+# ───────────────────────────────────────────────────────────────────────────
+
+# Canonical Guillotine GraphQL queries used both by the Postman collection
+# generator and (as fallback shape) by the introspection mock.
+_GUILLOTINE_QUERIES: List[Dict[str, str]] = [
+    {
+        "name": "GetDistrictPage",
+        "description": "Fetch a district landing page with its activity teasers.",
+        "query": (
+            "query GetDistrictPage($path: ID!) {\n"
+            "  guillotine {\n"
+            "    get(key: $path) {\n"
+            "      _id _name _path displayName\n"
+            "      ... on rodekors_Distrikt {\n"
+            "        data { ingress contactPerson { _ref } }\n"
+            "        children(query: \"_path LIKE '/distrikt/*'\") {\n"
+            "          _id _name displayName\n"
+            "        }\n"
+            "      }\n"
+            "    }\n"
+            "  }\n"
+            "}"
+        ),
+        "variables": {"path": "/distrikt/oslo"},
+    },
+    {
+        "name": "GetActivityList",
+        "description": "List Aktivitet content for a Forening with pagination.",
+        "query": (
+            "query GetActivityList($forening: ID!, $first: Int!) {\n"
+            "  guillotine {\n"
+            "    query(query: \"type = 'rodekors:Aktivitet'\", first: $first,\n"
+            "          sort: \"_modifiedTime DESC\") {\n"
+            "      _id _name displayName\n"
+            "      ... on rodekors_Aktivitet {\n"
+            "        data { title summary startDate endDate location }\n"
+            "      }\n"
+            "    }\n"
+            "  }\n"
+            "}"
+        ),
+        "variables": {"forening": "oslo", "first": 20},
+    },
+    {
+        "name": "GetCampaignPage",
+        "description": "Fetch a single Kampanje page for the donation flow.",
+        "query": (
+            "query GetCampaignPage($id: ID!) {\n"
+            "  guillotine {\n"
+            "    get(key: $id) {\n"
+            "      _id _name displayName\n"
+            "      ... on rodekors_Kampanje {\n"
+            "        data { title body goalAmount fundyFormId vippsEnabled }\n"
+            "      }\n"
+            "    }\n"
+            "  }\n"
+            "}"
+        ),
+        "variables": {"id": "/kampanjer/jul-2026"},
+    },
+    {
+        "name": "GetForeningContacts",
+        "description": "Fetch a Forening with its Kontaktperson references resolved.",
+        "query": (
+            "query GetForeningContacts($id: ID!) {\n"
+            "  guillotine {\n"
+            "    get(key: $id) {\n"
+            "      _id displayName\n"
+            "      ... on rodekors_Forening {\n"
+            "        data {\n"
+            "          contactPerson { _ref }\n"
+            "          _references(first: 50, type: 'rodekors:Kontaktperson') {\n"
+            "            displayName _id\n"
+            "          }\n"
+            "        }\n"
+            "      }\n"
+            "    }\n"
+            "  }\n"
+            "}"
+        ),
+        "variables": {"id": "/forening/bergen"},
+    },
+]
+
+
+async def export_postman_collection(scope: Optional[str], environment: str,
+                                    lang: str = "en") -> Dict[str, Any]:
+    """Generate a Postman Collection v2.1 JSON for the Guillotine GraphQL
+    endpoints. Returns the parsed dict so the router can either echo it back
+    or stream it as a download. Mock-first: works without LLM, without Mongo.
+    """
+    import json as _json
+
+    base_url_var = ("https://test.rodekors.no" if environment == "test"
+                     else "http://localhost:3000")
+
+    items = []
+    for q in _GUILLOTINE_QUERIES:
+        items.append({
+            "name": q["name"],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {"key": "Content-Type", "value": "application/json"},
+                    {"key": "Authorization", "value": "Bearer {{token}}",
+                     "description": "Optional — only required for preview/draft content."},
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/graphql",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "graphql"],
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": _json.dumps({
+                        "query": q["query"],
+                        "variables": q.get("variables", {}),
+                    }, indent=2, ensure_ascii=False),
+                    "options": {"raw": {"language": "json"}},
+                },
+                "description": q.get("description", ""),
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                            "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                            "const json = pm.response.json();",
+                            "pm.test('No GraphQL errors', () => {",
+                            "  pm.expect(json.errors, JSON.stringify(json.errors)).to.be.undefined;",
+                            "});",
+                            "pm.test('Response has data field', () => {",
+                            "  pm.expect(json).to.have.property('data');",
+                            "});",
+                        ],
+                    },
+                },
+            ],
+        })
+
+    collection = {
+        "info": {
+            "name": "Røde Kors — Guillotine GraphQL",
+            "description": (
+                "Auto-generated by the Red Cross Web QA Agent (Phase F).\n\n"
+                f"Environment: {environment}\n"
+                f"Scope: {scope or 'all'}\n\n"
+                "Tom (Tech leder): 'Postman blir nyttig for å få testet "
+                "GraphQL-grensesnittene fra Guillotine/XP.' This collection "
+                "covers the four canonical operations used by the rodekors.no "
+                "rebuild. Edit the variables below to point at your environment."
+            ),
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "_exporter_id": "red-cross-qa-agent",
+        },
+        "variable": [
+            {"key": "base_url", "value": base_url_var,
+             "description": "Override per environment (test / local)."},
+            {"key": "token", "value": "",
+             "description": "Optional bearer token for preview/draft content."},
+        ],
+        "item": items,
+    }
+
+    # Persist for traceability (best-effort, mock-first compliant).
+    try:
+        await red_cross_qa_generated_scripts_collection.insert_one({
+            "tool": "postman", "scope": scope, "environment": environment,
+            "filename": "rodekors-guillotine.postman_collection.json",
+            "collection": collection, "created_at": _now(), "lang": lang,
+        })
+    except Exception:
+        pass
+
+    return {
+        "status": "ok",
+        "filename": "rodekors-guillotine.postman_collection.json",
+        "operation_count": len(items),
+        "collection": collection,
+        "lang": lang,
+    }
+
+
+async def run_graphql_introspection(url: Optional[str], environment: str,
+                                    lang: str = "en") -> Dict[str, Any]:
+    """List the GraphQL operations exposed by Guillotine. Mock-first: returns a
+    curated list of expected operations for the rodekors.no rebuild when no
+    live introspection happens.
+    A real implementation would POST `{ query: '{ __schema { queryType { ... } } }' }`
+    to {url}/api/graphql; the response shape returned here matches what the
+    frontend renders so swapping in real introspection is a drop-in change.
+    """
+    operations: List[Dict[str, Any]] = [
+        {"name": "guillotine.get",
+         "kind": "query", "args": ["key: ID!"],
+         "returns": "Content",
+         "note": "Fetch one content item by path or id."},
+        {"name": "guillotine.query",
+         "kind": "query", "args": ["query: String!", "first: Int", "sort: String"],
+         "returns": "[Content]",
+         "note": "List by content selector — main Aktivitet/Distrikt entrypoint."},
+        {"name": "guillotine.getChildren",
+         "kind": "query", "args": ["key: ID!", "first: Int", "sort: String"],
+         "returns": "[Content]",
+         "note": "Children of a Distrikt/Forening node."},
+        {"name": "guillotine.getSite",
+         "kind": "query", "args": [],
+         "returns": "Site",
+         "note": "Site-level config (used by header/footer)."},
+        {"name": "guillotine.getReferences",
+         "kind": "query", "args": ["key: ID!", "type: String"],
+         "returns": "[Content]",
+         "note": "Reverse references — used to resolve Aktivitet → Forening."},
+    ]
+
+    # Røde Kors content types — what the team will model in Enonic XP.
+    content_types = [
+        {"name": "rodekors:Distrikt",  "fields": ["ingress", "contactPerson", "children"]},
+        {"name": "rodekors:Forening",  "fields": ["address", "contactPerson"]},
+        {"name": "rodekors:Aktivitet", "fields": ["title", "summary", "startDate", "endDate", "location"]},
+        {"name": "rodekors:Kontaktperson", "fields": ["name", "email", "phone"]},
+        {"name": "rodekors:Kampanje",  "fields": ["title", "body", "goalAmount", "fundyFormId", "vippsEnabled"]},
+        {"name": "rodekors:TjenesteKurs", "fields": ["title", "summary", "audience"]},
+        {"name": "rodekors:Tema",      "fields": ["title", "summary"]},
+        {"name": "rodekors:Nyhet",     "fields": ["title", "publishedDate", "body"]},
+    ]
+
+    introspection_query = (
+        "query IntrospectGuillotine {\n"
+        "  __schema {\n"
+        "    queryType {\n"
+        "      name\n"
+        "      fields { name description args { name type { name kind } } type { name kind } }\n"
+        "    }\n"
+        "  }\n"
+        "}"
+    )
+
+    summary = (f"GraphQL introspection mock for {url or 'guillotine'} on {environment}: "
+               f"{len(operations)} operations, {len(content_types)} content types")
+
+    run = await _store_run("redcross-graphql-api", environment, "pass", summary, {
+        "tool": "graphql-introspection",
+        "url": url, "operations_count": len(operations),
+        "content_types_count": len(content_types),
+    })
+
+    return {
+        "status": "ok",
+        "url": url,
+        "environment": environment,
+        "operations": operations,
+        "content_types": content_types,
+        "introspection_query": introspection_query,
+        "note": ("Mock introspection — Tom's preferred workflow is to import "
+                 "the Postman collection (see /export-postman-collection) and "
+                 "iterate on these operations interactively against the real "
+                 "Guillotine endpoint."),
+        "run_id": run["run_id"],
+        "lang": lang,
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════

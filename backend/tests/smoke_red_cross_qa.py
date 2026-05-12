@@ -2,7 +2,8 @@
 Covers: Phase A (Jira -> Azure DevOps rename, Sev/Kat, Sprint Report, Fundy)
         Phase B (DPIA, DoD verifier, Resilience, UAT-stotte, Risk Matrix)
         Phase C (WCAG 2.1/2.2 explicit, Migrert vs Nyopprettet data)
-        Phase D (Loadster browser-level load testing).
+        Phase D (Loadster browser-level load testing)
+        Phase F (Tom's tips: Storybook scope + Postman export + GraphQL introspection).
 """
 import asyncio
 from backend.services.red_cross_qa import (
@@ -12,6 +13,7 @@ from backend.services.red_cross_qa import (
     generate_uat_support, analyze_risk_matrix,
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
+    generate_playwright_tests, export_postman_collection, run_graphql_introspection,
 )
 
 
@@ -207,6 +209,66 @@ async def main():
         f"p95 {res['p95_response_ms']}ms, hydration p95 {res['hydration_p95_ms']}ms, "
         f"err {res['error_rate_pct']}%)"
     )
+
+    # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)
+    # 1. Playwright generator must include a deterministic Storybook spec when
+    #    'scenarioStorybook' is in the requested scopes.
+    pw = await generate_playwright_tests(
+        ["scenarioPublic", "scenarioStorybook"], "test", "en"
+    )
+    assert pw["status"] == "ok"
+    storybook_scripts = [
+        s for s in pw["scripts"]
+        if "storybook" in (s.get("filename") or "").lower()
+           or "storybook" in (s.get("content") or "").lower()
+    ]
+    assert storybook_scripts, "expected at least one Storybook spec when scenarioStorybook is requested"
+    sb = storybook_scripts[0]
+    sb_content = sb["content"]
+    assert "axe-playwright" in sb_content, "Storybook spec must inject axe-core"
+    assert "iframe.html" in sb_content, "Storybook spec must use Storybook iframe URL pattern"
+    assert "storybook-root" in sb_content, "Storybook spec must wait for #storybook-root"
+    assert "wcag22aa" in sb_content, "Storybook spec must run WCAG 2.2 AA axe profile"
+    print(f"[OK] Playwright Storybook scope ({sb['filename']}, "
+          f"axe + iframe.html + storybook-root + wcag22aa all present)")
+
+    # 2. Postman Collection v2.1 JSON must be valid + carry the 4 canonical queries.
+    pm = await export_postman_collection(None, "test", "en")
+    assert pm["status"] == "ok"
+    coll = pm["collection"]
+    assert coll["info"]["schema"].endswith("v2.1.0/collection.json"), \
+        f"Postman schema must be v2.1.0, got {coll['info']['schema']}"
+    op_names = [it["name"] for it in coll["item"]]
+    expected_ops = {"GetDistrictPage", "GetActivityList", "GetCampaignPage", "GetForeningContacts"}
+    assert set(op_names) >= expected_ops, \
+        f"Expected ops {expected_ops}, got {set(op_names)}"
+    # Each request must have a tests script that asserts no GraphQL errors.
+    for it in coll["item"]:
+        scripts = it.get("event", [])
+        test_scripts = [e for e in scripts if e.get("listen") == "test"]
+        assert test_scripts, f"{it['name']} has no test script"
+        exec_body = "\n".join(test_scripts[0]["script"]["exec"])
+        assert "errors" in exec_body, f"{it['name']} test script missing GraphQL errors assertion"
+    # Variables must include base_url + token placeholders.
+    var_keys = {v["key"] for v in coll.get("variable", [])}
+    assert "base_url" in var_keys and "token" in var_keys, \
+        f"Postman collection missing variables: {var_keys}"
+    print(f"[OK] Postman collection export ({pm['operation_count']} ops, "
+          f"v2.1 schema, 4 canonical Guillotine queries, base_url + token vars)")
+
+    # 3. GraphQL introspection mock returns operations + content_types.
+    ix = await run_graphql_introspection(None, "test", "en")
+    assert ix["status"] == "ok"
+    assert len(ix["operations"]) >= 5, f"expected >=5 ops, got {len(ix['operations'])}"
+    op_names_ix = [o["name"] for o in ix["operations"]]
+    assert "guillotine.get" in op_names_ix and "guillotine.query" in op_names_ix
+    ct_names = [c["name"] for c in ix["content_types"]]
+    assert any("Distrikt" in n for n in ct_names), "Distrikt content type missing"
+    assert any("Aktivitet" in n for n in ct_names), "Aktivitet content type missing"
+    assert any("Kampanje" in n for n in ct_names), "Kampanje content type missing"
+    assert "__schema" in ix["introspection_query"], "introspection_query missing __schema"
+    print(f"[OK] GraphQL introspection ({len(ix['operations'])} ops, "
+          f"{len(ix['content_types'])} content types incl. Distrikt/Aktivitet/Kampanje)")
 
 
 if __name__ == "__main__":

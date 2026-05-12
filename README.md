@@ -33,7 +33,7 @@
 | **Cloud Deployment** | Cloud Install workbench, readiness score, deploy checklist, automated smoke tests, cost baseline, Dockerfile + Cloud Run config |
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
-| **QA & Test Automation** | Red Cross Web QA Agent (20 tabs / 33 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator**, **DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix**, **k6 + Loadster dual load-testing** (protocol-level + browser-level) aligned to Trine Bruu's Teststrategi 30.3 |
+| **QA & Test Automation** | Red Cross Web QA Agent (20 tabs / 35 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator**, **DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix**, **k6 + Loadster dual load-testing** (protocol-level + browser-level), **Phase F — Storybook scope for Playwright + Postman Collection export + GraphQL introspection** (Tom's tooling tips for the rodekors.no NextJS rebuild) aligned to Trine Bruu's Teststrategi 30.3 |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
 ---
@@ -94,11 +94,11 @@ The agent ships as a **20-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) wi
 
 | # | Tab | Purpose |
 |---|-----|---------|
-| 1 | 📊 Dashboard | Live quality status: total runs, pass rate, open findings, critical blockers, 11 quality gates, 16-button Quick Actions panel |
+| 1 | 📊 Dashboard | Live quality status: total runs, pass rate, open findings, critical blockers, 11 quality gates, 16-button Quick Actions panel, **Phase F: Tom's tooling tips banner** (NextJS + Storybook + Playwright + Postman for the rodekors.no rebuild) |
 | 2 | 📋 Test Plan | LLM converts an Azure DevOps work item / user story into manual + automated + accessibility + API + regression test plan; emits `ado_work_items` with `work_item_type` (Bug / Task / Test Case), `priority` 1-4, and `test_level` (unit / sit / system / uat / performance) |
-| 3 | 🎭 Playwright | Cross-browser E2E generator (9 scopes: navigation, forms, search, donation, volunteer, CMS preview, a11y smoke, visual, API mock) |
-| 4 | 🌲 Cypress | Component + frontend regression generator |
-| 5 | 🔌 API QA | Enonic Guillotine GraphQL + NextJS API + external integrations — 10 checks |
+| 3 | 🎭 Playwright | Cross-browser E2E generator (10 scopes: navigation, forms, search, donation, volunteer, CMS preview, a11y smoke, visual, API mock, **Phase F: Storybook for Designsystemet components — generates a deterministic `storybook.spec.ts` with `@storybook/test-runner` patterns, `iframe.html` URL pattern, axe-core injection per story, WCAG 2.2 AA tag profile**). Tom-tip banner explains Playwright is bundled with Storybook for this project. |
+| 4 | 🌲 Cypress | Component + frontend regression generator. **Phase F: soft deprecation notice** at the top recommending Playwright (Tab 3) since Storybook bundling is already in place; Cypress remains for ad-hoc / non-Storybook needs. |
+| 5 | 🔌 API QA | Enonic Guillotine GraphQL + NextJS API + external integrations — 10 checks. **Phase F: GraphQL schema introspection panel** (lists 5 Guillotine operations + 8 Røde Kors content types like Distrikt / Aktivitet / Kampanje, mock-first) + **Postman Collection v2.1 export button** with browser download (4 canonical queries, `base_url` + `token` variables, per-request tests asserting status 200 + no GraphQL errors). Tom's preferred workflow for poking at the XP backend. |
 | 6 | 📝 CMS QA | Enonic Content Studio editor + visitor experience — 14 areas |
 | 7 | 📑 Forms QA | **Skjemabygger + Fundy** audit — **21 checks** (12 base: JSON Schema, Adam Silver patterns, multi-step state, mobile keyboard, autocomplete, APIM/Dataverse prefill, ARIA live regions, error summary, **Vipps handoff**, PRG idempotency, plus 9 **Fundy** donation-provider checks). Findings carry `severity_dev` 1-4 + `category_ops` A-C |
 | 8 | 📦 Content Migration | Legacy CMS → Enonic XP gradual migration audit — 8 content types (Forening / Distrikt / Aktivitet / Kontaktperson / Tjeneste-Kurs / Tema / Nyhet / Kampanje) × 10 checks (mapping, æøå chars, relations, image re-anchoring, 301 redirects, SEO, ISR invalidation, role permissions carryover) |
@@ -117,13 +117,13 @@ The agent ships as a **20-tab shell** (`frontend/src/RedCrossWebQAAgent.jsx`) wi
 
 **Backend:**
 - Service: `backend/services/red_cross_qa.py` — **23 suites** with mock-first graceful degradation (every function returns deterministic data when LLM unavailable). Generates `severity_dev` + `category_ops` annotations on every finding.
-- Router: `backend/routers/red_cross_qa.py` — **33 routes** at `/api/red-cross-qa/*` (Phase B additions: `/run-dpia-check`, `/verify-definition-of-done`, `/run-resilience-check`, `/generate-uat-support`, `/analyze-risk-matrix`; Phase D: `/generate-loadster-script`, `/run-loadster`)
+- Router: `backend/routers/red_cross_qa.py` — **35 routes** at `/api/red-cross-qa/*` (Phase B additions: `/run-dpia-check`, `/verify-definition-of-done`, `/run-resilience-check`, `/generate-uat-support`, `/analyze-risk-matrix`; Phase D: `/generate-loadster-script`, `/run-loadster`; **Phase F: `/export-postman-collection`, `/run-graphql-introspection`**)
 - Versioned prompts: `backend/prompts/red_cross_qa/*.md` (13 prompts: test_plan, playwright_generator, cypress_generator, api_checker, accessibility_reviewer, performance_reviewer, k6_generator, release_judge, **forms_qa**, **content_migration**, **enonic_performance**, **designsystemet**, **role_matrix**). `release_judge.md` and `test_plan.md` updated to reference Azure DevOps + Sev/Kat dual severity + V-model test levels.
 
 **Frontend** (`frontend/src/red-cross-qa/` — 21 files: 20 tab components + shared `_PageHero.jsx`):
 Inline-style design system matching the ATM V&V Test Copilot module — gradient page heros, panel cards, status chips (pass/warn/fail/pending), severity badges (critical/high/medium/low + `severity_dev` 1-4 + `category_ops` A-C).
 
-**i18n**: Full EN / NO / ES parity (40+ top-level sections each, **534 keys per locale** after Phase D). New blocks: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24), `stakeholders:` (3), Phase C migration provenance + WCAG version (8), Phase D Loadster tool selector (11) + 2 tab labels.
+**i18n**: Full EN / NO / ES parity (40+ top-level sections each, **561 keys per locale** after Phase F). New blocks: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24), `stakeholders:` (3), Phase C migration provenance + WCAG version (8), Phase D Loadster tool selector (11) + 2 tab labels, **Phase F: scenarioStorybook + Tom-tip banners on Playwright/Cypress/Dashboard + GraphQL introspection panel + Postman export panel (27 keys)**.
 
 **How to use it**:
 1. Backend: `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000` from repo root
@@ -135,7 +135,7 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 
 **Backward compatibility**: `TestPlanRequest` keeps `jira_epic` as a deprecated alias of `ado_work_item`; the MongoDB collection name `red_cross_qa_jira_dispatches_collection` is deliberately retained to avoid a DB migration. Only user-facing terminology changed.
 
-**Validation status**: Backend imports clean (23 suites, 33 routes), end-to-end smoke test passes (`backend/tests/smoke_red_cross_qa.py` — **15 checks**: settings shape, test plan with `test_level`, ADO bundle Sev/Kat, 9+ Fundy checks, sprint report narrative, **DPIA 12 checks + dpia_score, DoD 4-point per work item, Resilience score + breakpoint VU, UAT scripts for Hilde/Trine/Astri, Risk Matrix CSV parser, WCAG 2.1/2.2 version gating, Migrert vs Nyopprettet provenance, Loadster script generator + browser-level run with hydration_p95_ms**), all 3 locales parse with parity (**534 keys × 3**), frontend production build succeeds with **0 warnings in `src/red-cross-qa/`**.
+**Validation status**: Backend imports clean (23 suites, 35 routes), end-to-end smoke test passes (`backend/tests/smoke_red_cross_qa.py` — **18 checks**: settings shape, test plan with `test_level`, ADO bundle Sev/Kat, 9+ Fundy checks, sprint report narrative, **DPIA 12 checks + dpia_score, DoD 4-point per work item, Resilience score + breakpoint VU, UAT scripts for Hilde/Trine/Astri, Risk Matrix CSV parser, WCAG 2.1/2.2 version gating, Migrert vs Nyopprettet provenance, Loadster script generator + browser-level run with hydration_p95_ms, Phase F Playwright Storybook scope (axe + iframe.html + WCAG 2.2 AA), Postman Collection v2.1 export (4 canonical Guillotine queries + base_url/token vars), GraphQL introspection (5 ops + 8 Røde Kors content types)**), all 3 locales parse with parity (**561 keys × 3**), frontend production build succeeds with **0 warnings in `src/red-cross-qa/`**.
 
 ### AGI Hub — "Homo Sapiens vs. KI i Test" tab (April 2026)
 

@@ -211,6 +211,22 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
           </div>
         </div>
 
+        {/* Phase F — Tom's tooling tips for the rodekors.no rebuild (2026-05-12).
+            Renders as a single info banner so the workshop host can point at it
+            before opening any tab. Compact, one line per tip. */}
+        <div style={{ ...panelStyle, borderTop: '4px solid #2563eb' }}>
+          <h3 style={panelTitle}>💡 {t('redCrossWebQaModule.dashboard.tomTipsTitle')}</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+            <TipCard icon="⚛️"  color="#3b82f6" label="NextJS" text={t('redCrossWebQaModule.dashboard.tomTipNextjs')} />
+            <TipCard icon="📚"  color="#a16207" label="Storybook" text={t('redCrossWebQaModule.dashboard.tomTipStorybook')} />
+            <TipCard icon="🎭"  color="#be185d" label="Playwright" text={t('redCrossWebQaModule.dashboard.tomTipPlaywright')} />
+            <TipCard icon="📦"  color="#ea580c" label="Postman" text={t('redCrossWebQaModule.dashboard.tomTipPostman')} />
+          </div>
+          <p style={{ marginTop: 10, fontSize: 11, color: '#64748b', fontStyle: 'italic' }}>
+            — {t('redCrossWebQaModule.dashboard.tomTipsAttribution')}
+          </p>
+        </div>
+
         {/* Stakeholders & Roller — Røde Kors team (Phase C) */}
         <div style={{ ...panelStyle, borderTop: '4px solid #db2777' }}>
           <h3 style={panelTitle}>👥 {t('redCrossWebQaModule.stakeholders.header')}</h3>
@@ -319,6 +335,19 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
     </div>
   );
 };
+
+const TipCard = ({ icon, color, label, text }) => (
+  <div style={{
+    padding: '10px 12px', borderRadius: 10,
+    backgroundColor: `${color}10`, border: `1px solid ${color}30`,
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+      <span style={{ fontSize: 18 }}>{icon}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, color, letterSpacing: 0.3 }}>{label}</span>
+    </div>
+    <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.4 }}>{text}</div>
+  </div>
+);
 
 const panelStyle = {
   backgroundColor: 'white',

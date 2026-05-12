@@ -439,8 +439,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Purpose**: 24/7 QA copilot for the **rodekors.no** website rebuild on Enonic XP CMS + NextJS + Designsystemet (Digdir). Item Agent #9. Two execution modes (Generate-only for Cursor / Claude Code / GitHub Actions, Execute-directly in-app), two environments (local on `:3000`, test). Every run carries a SHA-256 attestation hash.
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — 23 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix. **Phase D** adds Loadster as a parallel browser-level load testing tool alongside k6.
-- Router: `backend/routers/red_cross_qa.py` — 33 routes at `/api/red-cross-qa/*`
+- Service: `backend/services/red_cross_qa.py` — 23 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix. **Phase D** adds Loadster as a parallel browser-level load testing tool alongside k6. **Phase F** (Tom's tooling tips for the NextJS rebuild) adds: Storybook scope in the Playwright generator, Postman Collection v2.1 export, and GraphQL introspection for Guillotine/XP.
+- Router: `backend/routers/red_cross_qa.py` — **35 routes** at `/api/red-cross-qa/*`
 - Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts; `release_judge.md` and `test_plan.md` updated for Azure DevOps + Sev/Kat dual severity + test-level taxonomy)
 
 **API endpoints (`/api/red-cross-qa/`):**
@@ -465,6 +465,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/run-k6` | POST | Execute k6 (execute mode) |
 | `/generate-loadster-script` | POST | **Phase D** — Loadster scenario JSON for browser-level load testing (parallel to k6). Maps each profile to a number of Loadster "engines" (1–5 parallel browser instances). Template includes hydration-aware steps + thresholds |
 | `/run-loadster` | POST | **Phase D** — Mock Loadster run returning browser-level metrics k6 cannot measure: `hydration_p95_ms`, `spa_nav_p95_ms`, `peak_handled_vus`, `engines`, plus standard `avg_response_ms / p95_response_ms / error_rate_pct`. Differentiator text auto-generated |
+| `/export-postman-collection` | POST | **Phase F** (Tom's tip) — Generates a Postman Collection v2.1 JSON for the 4 canonical Guillotine GraphQL operations (`GetDistrictPage`, `GetActivityList`, `GetCampaignPage`, `GetForeningContacts`). Variables: `base_url` + `token`. Per-request tests: status 200 + no GraphQL errors. Frontend triggers browser download |
+| `/run-graphql-introspection` | POST | **Phase F** (Tom's tip) — Mock-first introspection of the Guillotine schema. Returns 5 canonical operations + 8 Røde Kors content types (Distrikt / Forening / Aktivitet / Kontaktperson / Kampanje / TjenesteKurs / Tema / Nyhet). Also returns the canonical `__schema` query as docs |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
 | `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
 | `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |
@@ -507,11 +509,11 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 **Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **534 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11) under `stressTest.tool_*`.
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **561 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11) under `stressTest.tool_*`. **Phase F (27 keys)**: `playwright.scenarioStorybook` + Tom-tip banners on Playwright/Cypress/API QA, full introspection + Postman panel labels on `apiQa.*`, Tom's tooling stack section on `dashboard.tomTip*`.
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
-- 33 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- 35 routes registered at `/api/red-cross-qa/*` — do not break path naming
 - Backward compatibility: `TestPlanRequest` keeps `jira_epic` as deprecated alias of `ado_work_item`; MongoDB collection name `red_cross_qa_jira_dispatches_collection` deliberately retained to avoid DB migration
 - Trine's Teststrategi 30.3 alignment: every finding/work-item must carry **both** `severity_dev` (1-4, dev phase) **and** `category_ops` (A-C, post-handover contract phase) per §8.1
 - 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
@@ -521,7 +523,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 ```bash
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
 python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 18 (Phase D: 17 + redcross-stress-browser-loadster)
-python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 33
+python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 35 (Phase F: +2 /export-postman-collection + /run-graphql-introspection)
 
 # End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
 python -m backend.tests.smoke_red_cross_qa

@@ -7,6 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.10.0] - 2026-05-12
+
+### Added — Red Cross Web QA · Phase F: Tom's tooling tips for the rodekors.no NextJS rebuild
+
+Tom (Tech leder, Røde Kors) gave three tooling tips in Slack on 2026-05-12:
+1. *"Frontend er laget med NextJS, så vi bruker Storybook for React/Next"*
+2. *"Playwright er bundlet med Storybook, så vi bruker det i stedet for Cypress, siden verktøy-integrasjonen er på plass allerede"*
+3. *"Postman blir nyttig for å få testet GraphQL-grensesnittene fra Guillotine/XP"*
+
+Phase F lands all three in the agent — no new tabs (folded into existing Playwright + Cypress + API QA + Dashboard tabs).
+
+**Backend**
+
+- **MODIFIED** `backend/services/red_cross_qa.py`:
+  - `generate_playwright_tests` recognises a new `scenarioStorybook` scope. When present, the generator ALWAYS emits a deterministic `storybook.spec.ts` (template-based, not LLM-generated) that uses `@storybook/test-runner` patterns: `iframe.html?id=...` URL, axe-core injection per story with WCAG 2.2 AA tag profile (`wcag2a/wcag2aa/wcag22aa`), keyboard interaction sanity check. Targets Designsystemet canonical story IDs (`button--primary`, `textfield--default`, `alert--info`).
+  - **NEW** `export_postman_collection(scope, environment, lang)` — generates a Postman Collection v2.1 JSON with the 4 canonical Guillotine GraphQL queries (`GetDistrictPage`, `GetActivityList`, `GetCampaignPage`, `GetForeningContacts`), parameterised with `{{base_url}}` + `{{token}}` variables, per-request tests asserting status 200 + no GraphQL errors. Persists to `red_cross_qa_generated_scripts_collection` for traceability.
+  - **NEW** `run_graphql_introspection(url, environment, lang)` — mock-first introspection of the Guillotine schema. Returns 5 canonical operations (`guillotine.get`, `guillotine.query`, `guillotine.getChildren`, `guillotine.getSite`, `guillotine.getReferences`) and 8 Røde Kors content types (`rodekors:Distrikt`, `Forening`, `Aktivitet`, `Kontaktperson`, `Kampanje`, `TjenesteKurs`, `Tema`, `Nyhet`). Also returns the canonical `__schema` introspection query as documentation.
+- **MODIFIED** `backend/routers/red_cross_qa.py`:
+  - 2 new Pydantic models: `PostmanExportRequest` + `GraphqlIntrospectionRequest`.
+  - 2 new endpoints: `POST /export-postman-collection` + `POST /run-graphql-introspection`.
+  - Total route count: **35** (was 33).
+
+**Frontend**
+
+- **MODIFIED** `frontend/src/red-cross-qa/Playwright.jsx`:
+  - New scope `scenarioStorybook` (icon 📚, color `#a16207`).
+  - Amber Tom-tip banner under the PageHero quoting the Storybook bundling tip.
+- **MODIFIED** `frontend/src/red-cross-qa/Cypress.jsx`:
+  - Yellow soft-deprecation notice at the top recommending Playwright (Tab 3) for this project, with Cypress kept for ad-hoc/non-Storybook needs.
+- **MODIFIED** `frontend/src/red-cross-qa/ApiQA.jsx`:
+  - Blue Tom-tip banner under the PageHero quoting the Postman/GraphQL tip.
+  - New **"🔍 GraphQL schema introspection"** panel: table of operations (name / args / returns / note) + grid of content types with their fields + collapsible `__schema` query viewer.
+  - New **"📦 Export Postman Collection (Tom's workflow)"** panel: button that calls the backend, receives the collection JSON, and triggers a browser download of `rodekors-guillotine.postman_collection.json`. Success badge shows filename + operation count.
+- **MODIFIED** `frontend/src/red-cross-qa/Dashboard.jsx`:
+  - New **"💡 Tom's tooling stack for rodekors.no"** panel under the stat cards, with 4 colored TipCards (NextJS, Storybook, Playwright, Postman) + attribution line.
+
+**i18n**
+
+- **27 new keys × 3 locales** (EN / NO / ES) under existing `redCrossWebQaModule.*` blocks:
+  - `playwright.scenarioStorybook` + `playwright.tomTipLabel` + `playwright.tomTipText`
+  - `cypress.tomNoticeLabel` + `cypress.tomNoticeText`
+  - `apiQa.tomTipLabel` + `apiQa.tomTipText` + `apiQa.introspectionTitle` + `apiQa.introspectionHint` + `apiQa.btnIntrospect` + `apiQa.operationsTitle` + `apiQa.contentTypesTitle` + `apiQa.opName` + `apiQa.opArgs` + `apiQa.opReturns` + `apiQa.opNote` + `apiQa.showIntrospectionQuery` + `apiQa.postmanTitle` + `apiQa.postmanHint` + `apiQa.btnExportPostman` + `apiQa.postmanDownloaded`
+  - `dashboard.tomTipsTitle` + `dashboard.tomTipNextjs` + `dashboard.tomTipStorybook` + `dashboard.tomTipPlaywright` + `dashboard.tomTipPostman` + `dashboard.tomTipsAttribution`
+- Total: **561 keys per locale** (was 534), full EN/NO/ES parity.
+
+**Tests**
+
+- **MODIFIED** `backend/tests/smoke_red_cross_qa.py` — **3 new checks**:
+  - Playwright Storybook scope: when `scenarioStorybook` is in scopes, output contains `axe-playwright`, `iframe.html`, `storybook-root`, `wcag22aa`.
+  - Postman Collection: valid v2.1 schema, 4 canonical operations, `base_url` + `token` variables, every request has a test script asserting no GraphQL errors.
+  - GraphQL introspection: ≥5 operations including `guillotine.get` and `guillotine.query`, content types include Distrikt/Aktivitet/Kampanje, `__schema` in introspection_query.
+- Total smoke checks: **18** (was 15). All pass without Mongo, without LLM.
+
+**Docs**
+
+- `README.md` updated — Red Cross QA section now reflects 20 tabs / 35 endpoints / 18 smoke checks / 561 i18n keys + Phase F additions to tabs 1, 3, 4, 5.
+- `docs/CHANGELOG.md` — this entry.
+- `.claude/MODULES_REFERENCE.md` — Red Cross QA module updated to 35 routes + Phase F endpoints.
+
+**Architectural notes**
+
+- **No new tabs, no new prompts.** Phase F folds Tom's tips into existing tabs (Dashboard / Playwright / Cypress / API QA), keeping the 20-tab shell unchanged.
+- **Storybook spec is deterministic.** The template lives in `_storybook_playwright_spec()` rather than passing through the LLM, so the output is identical every time — workshop-demo friendly and doesn't drift if the LLM goes down.
+- **Backward compatible.** Existing Playwright scopes still work; Cypress tab still works (just shows the deprecation banner); `analyze-api` still works (the 2 new endpoints sit alongside it).
+- **Mock-first preserved.** Postman export uses curated query templates, not LLM-generated. GraphQL introspection returns a curated baseline when no live URL is reachable. Both work offline.
+
+---
+
 ## [1.9.0] - 2026-05-12
 
 ### Added — Homo Sapiens vs. AI · Phase E: Persistent Prompt Evolution with human-in-the-loop governance

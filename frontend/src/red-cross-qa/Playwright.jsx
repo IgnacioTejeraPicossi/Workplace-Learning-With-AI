@@ -14,6 +14,10 @@ const SCOPES = [
   { key: 'scopeAccessibility', icon: '♿', color: '#0891b2' },
   { key: 'scopeVisual',        icon: '🖼️', color: '#ec4899' },
   { key: 'scopeApiMock',       icon: '🔌', color: '#6366f1' },
+  // Phase F — Tom (Tech leder, Røde Kors, 2026-05-12):
+  // 'Playwright er bundlet med Storybook, så vi bruker det i stedet for
+  // Cypress, siden verktøy-integrasjonen er på plass allerede.'
+  { key: 'scenarioStorybook',  icon: '📚', color: '#a16207' },
 ];
 
 const Playwright = ({ environment, executionMode }) => {
@@ -48,6 +52,18 @@ const Playwright = ({ environment, executionMode }) => {
           mode={executionMode}
           gradient="linear-gradient(135deg, #b91c1c 0%, #be185d 50%, #6b21a8 100%)"
         />
+
+        {/* Phase F — Tom's tooling tip banner (NextJS + Storybook + Playwright) */}
+        <div style={{
+          padding: '12px 16px', borderRadius: 10,
+          backgroundColor: '#fef3c7', border: '1px solid #fcd34d',
+          color: '#854d0e', fontSize: 13, lineHeight: 1.5,
+        }}>
+          <span style={{ fontWeight: 700, marginRight: 6 }}>
+            💡 {t('redCrossWebQaModule.playwright.tomTipLabel')}
+          </span>
+          {t('redCrossWebQaModule.playwright.tomTipText')}
+        </div>
 
         <div style={panel}>
           <h3 style={panelTitle}>🎯 Scopes</h3>

@@ -43,6 +43,20 @@ const Cypress = ({ environment, executionMode }) => {
           gradient="linear-gradient(135deg, #047857 0%, #0f766e 50%, #115e59 100%)"
         />
 
+        {/* Phase F — Tom (Tech leder) recommends Playwright for this project
+            since Storybook bundling is already in place. Cypress stays as a
+            secondary tool for ad-hoc / non-Storybook needs. */}
+        <div style={{
+          padding: '12px 16px', borderRadius: 10,
+          backgroundColor: '#fffbeb', border: '1px solid #fde68a',
+          color: '#92400e', fontSize: 13, lineHeight: 1.5,
+        }}>
+          <span style={{ fontWeight: 700, marginRight: 6 }}>
+            ⚠️ {t('redCrossWebQaModule.cypress.tomNoticeLabel')}
+          </span>
+          {t('redCrossWebQaModule.cypress.tomNoticeText')}
+        </div>
+
         <div style={panel}>
           <h3 style={panelTitle}>🎯 Scopes</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, marginBottom: 18 }}>
