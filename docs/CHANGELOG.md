@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.0] - 2026-05-12
+
+### Added — Homo Sapiens vs. AI · Phase E: Persistent Prompt Evolution with human-in-the-loop governance
+
+Closes the **Option-C feedback loop** that was deliberately deferred in 1.8.0 for "silent drift" risk. The risk is mitigated with a small regression harness + a human approval gate + an LLM refusal path. Every action lands in an append-only audit log; rollback is one click away.
+
+**Backend**
+
+- **NEW** `backend/services/prompt_evolution.py` (~480 lines) — `get_active_prompt`, `list_revisions`, `propose_revision`, `approve_revision`, `reject_revision`, `rollback_to`, `run_regression`. Mock-first graceful degradation: every async function returns deterministic fallback data when MongoDB is unavailable. `_safe_parse_json` is robust against ```` ```json fences ```` and surrounding LLM prose. `_score_output` is deterministic: keyword coverage + length sanity + markdown structure — no LLM in the scoring loop so the same numbers come out every run.
+- **NEW** `backend/routers/prompt_evolution.py` (7 endpoints under `/api/agi/homo-vs-ai/prompt-evolution/*`):
+  - `POST /propose` — LLM #2 proposes a revised system prompt; persists `pending` or `refused`.
+  - `GET /revisions?task=&status=&limit=` — list with filters.
+  - `POST /{id}/approve` — human approval gate; supersedes prior active.
+  - `POST /{id}/reject` — reject with reason (audit log).
+  - `POST /{id}/regression` — runs curated harness base vs proposed, returns side-by-side scores + aggregate verdict (`no_regression` / `mixed` / `regression`).
+  - `POST /{id}/rollback` — re-activate a previously superseded revision.
+  - `GET /active/{task}` — debug helper.
+- **NEW** `backend/data/regression_samples.json` — 3 curated inputs per task (`must_appear` keywords, `min_chars` / `max_chars`, `must_contain_markdown` flag). Used by the harness; keep small (workshop demo can't wait 30s).
+- **MODIFIED** `backend/services/homo_vs_ai_service.py` → `run_challenge` reads from `get_active_prompt(task)` first; falls back to `TASK_SPECS[task]["system"]` when no revision is active or Mongo is unavailable. Response now carries `prompt_source: { source: 'baked_in' | 'evolved', revision_id?, version?, approved_by?, approved_at? }`.
+- **MODIFIED** `backend/routers/homo_vs_ai.py` → `ChallengeResponse` carries new `PromptSourceMeta` (Pydantic model).
+- **MODIFIED** `backend/app.py` → registers `prompt_evolution_router`.
+- **NEW** `backend/db.py` collections: `homo_vs_ai_prompt_revisions` (versioned prompt history) + `homo_vs_ai_prompt_audit` (append-only).
+
+**LLM refusal path (governance safeguard)**
+
+The meta-prompt (`PROPOSE_SYSTEM_PROMPT` in `prompt_evolution.py`) explicitly instructs LLM #2 to **refuse** revisions that risk silent drift: removing ISTQB anchoring, dropping the bilingual hint, narrowing the prompt to the sample input, contradictory feedback, etc. Refusals are persisted with `risk_flags` and `refusal_reason` so the workshop host can see what the LLM caught. Refused revisions can be archived from the panel.
+
+**Frontend**
+
+- **MODIFIED** `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`:
+  - Yellow **🧬 Propose persistent revision** button next to the existing grey *Re-run with feedback* button (same precondition: requires an AI answer + human feedback).
+  - Per-card pending/refused result panel (rationale + risk flags + revision_id).
+  - Green **🧬 Evolved prompt v3** badge when the AI answer used an evolved prompt.
+  - **NEW** `PromptEvolutionPanel` section (Section 07) — filters by task + status, expandable revision cards with base/proposed/feedback/previous-AI side-by-side, action buttons (Approve / Reject / Regression / Rollback), regression results viewer with per-sample drill-down.
+- **MODIFIED** `frontend/src/api/agiApi.js` — 7 new helpers: `proposePromptRevision`, `listPromptRevisions`, `approvePromptRevision`, `rejectPromptRevision`, `rollbackPromptRevision`, `runRegressionHarness`, `getActivePromptForTask`.
+
+**i18n**
+
+- **34 new `homoVsAi.evolve.*` keys × 3 locales** (EN / NO / ES) — all native quality, fully translated. Covers the propose button, the per-card result panel, all governance panel labels (filters, statuses, actions, prompts, regression view).
+- `homoVsAi.future.lead` updated in EN/NO/ES to call out Phase E shipping.
+- `homoVsAi.future.ideas[0].status` changed from "Shipped · Option B" to "Shipped · Option B + Option C (Phase E)".
+- `homoVsAi.future.ideas[0].options[2]` (formerly "C · Persistent prompt evolution" deferred) now marked **shipped · Phase E** with the regression harness called out explicitly.
+
+**Tests**
+
+- **NEW** `backend/tests/smoke_prompt_evolution.py` — 8 checks: `_safe_parse_json` robustness (5 cases incl. fenced JSON + noise), `_score_output` determinism (good→pass, poor→fail, empty→fail), `get_active_prompt` backward-compat (None when no revision), `propose_revision` graceful refusal when LLM unavailable, propose→reject state transition, `run_regression` graceful degradation, router registration (7 routes), `ChallengeResponse.prompt_source` default = `baked_in`. All checks pass without Mongo (mock-first) and without an LLM (auto-refusal path).
+- Existing `backend/tests/smoke_red_cross_qa.py` still passes 15/15 — Phase E added no regressions to other modules.
+
+**Docs**
+
+- `README.md` updated — AGI Hub section now lists Phase E with all 7 endpoints, Mongo collections, validation status.
+- `docs/README_FULL.md` updated — Tab 4 backend section adds a "Phase E — Prompt Evolution governance" subsection with full endpoint catalogue.
+- `docs/README_INDEX.md` — first index entry for AGI Hub added (was missing).
+- `.claude/MODULES_REFERENCE.md` — module #14 entry added for AGI Hub.
+
+**Architectural notes**
+
+- **Backward-compatible by design.** If the new Mongo collections are empty (or Mongo is down entirely), `get_active_prompt` returns `None` and `run_challenge` keeps using `TASK_SPECS` exactly as before 1.8.0. Existing flows cannot regress just by enabling this module.
+- **Append-only audit.** Revisions are never deleted, only soft-marked (`pending` → `active` / `rejected` / `superseded` / `refused`). Status transitions write an entry to `homo_vs_ai_prompt_audit` with actor, action, timestamp, detail.
+- **No auto-promotion.** The LLM proposes, a human approves. The only "automatic" status move is `superseded` when a newer revision is approved for the same task.
+- **MVP scope (deliberate).** Prompt evolution is wired into `/challenge` only. `/route` and `/judge` keep their fixed system prompts. Embedding-based RAG remains deferred (BM25 covers semantic queries well enough for the workshop).
+
+---
+
 ## [1.8.0] - 2026-05-06
 
 ### Added — Homo Sapiens vs. AI: ephemeral feedback re-run + local ISTQB RAG

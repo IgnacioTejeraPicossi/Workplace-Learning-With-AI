@@ -17,6 +17,7 @@
 | 11 | [Installing the App in the Cloud](#11-installing-the-app-in-the-cloud) | Active | None (smoke via endpoints) | Medium |
 | 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
+| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 8/8 prompt-evolution smoke | Low |
 
 ---
 
@@ -535,6 +536,80 @@ curl -X POST http://localhost:8000/api/red-cross-qa/generate-sprint-report -H "C
 ```
 
 **Docs**: covered in root `README.md` and `docs/README_FULL.md`.
+
+---
+
+## 14) AGI Progress Hub + Homo vs. AI Workshop
+
+**Purpose**: Sidebar-level module (`📊 AGI Progress`) with 4 tabs. Three tabs cover AGI tracking, possible endings and benefits. The fourth tab — **Homo Sapiens vs. KI i Test** — is the SOCO workshop companion: 10 live head-to-head testing challenges (scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility) where a human tester and the AI answer the same prompt side-by-side. Every AI call is grounded in real ISTQB syllabi sections (CTFL v4.0 + CT-AI v1.0) via curated anchors + optional local PDF RAG when the provider is ItemAI / ItemServerAI.
+
+**Phase E (1.9.0) — Persistent Prompt Evolution governance**
+
+Closes the Option-C feedback loop deferred since 1.8.0. After a re-run with feedback, the workshop host can click **🧬 Propose persistent revision** under any AI answer. LLM #2 (the "prompt engineer") reads the BASE prompt + the human's critique + the AI's previous answer and proposes a diff. The proposal lands as `status="pending"` — a yellow card in the governance panel. The host can:
+- **📊 Run regression** — base vs proposed scored mechanically against 3 curated samples per task (keyword coverage + length + markdown structure). Verdict: `no_regression` / `mixed` / `regression`.
+- **✅ Approve** — supersedes the prior active revision; future rounds use the evolved prompt.
+- **❌ Reject** — archived with audit-log reason.
+- **⏪ Rollback** — re-activate a previously superseded revision (recovery path).
+
+The LLM is explicitly instructed to **refuse** unsafe revisions (removes ISTQB anchoring, drops bilingual hint, narrows the prompt to a single sample input). Refusals are persisted with `risk_flags`.
+
+**Backend:**
+- Workshop core: `backend/services/homo_vs_ai_service.py` + `backend/services/istqb_anchors.py` + `backend/services/istqb_local_rag.py`. Router: `backend/routers/homo_vs_ai.py` (5 endpoints).
+- Phase E: `backend/services/prompt_evolution.py` (~480 lines) + `backend/routers/prompt_evolution.py` (7 endpoints). Data: `backend/data/regression_samples.json` (3 inputs per task, deterministic scoring).
+- Total: **12 routes at `/api/agi/homo-vs-ai/*`** (5 core + 7 prompt-evolution).
+
+**API endpoints (Phase E only):**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/prompt-evolution/propose` | POST | LLM #2 proposes a revised system prompt; persists `pending` or `refused` |
+| `/prompt-evolution/revisions` | GET | List with `?task=` + `?status=` filters |
+| `/prompt-evolution/{id}/approve` | POST | Human approval gate; supersedes prior active |
+| `/prompt-evolution/{id}/reject` | POST | Reject with reason (audit log) |
+| `/prompt-evolution/{id}/regression` | POST | Curated harness base vs proposed, returns side-by-side scores |
+| `/prompt-evolution/{id}/rollback` | POST | Re-activate a previously superseded revision |
+| `/prompt-evolution/active/{task}` | GET | Debug helper: resolve currently active prompt |
+
+**Frontend** (`frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` — 2350+ lines):
+- Section 01 — Workshop Hero
+- Section 02 — Activity Matrix
+- Section 03 — Head-to-Head Demos (10 cards with `DemoCard` component; per-card propose-revision button)
+- Section 04 — Trust Framework
+- Section 05 — Workshop Scoreboard
+- Section 06 — Speaker Crib Sheet
+- **Section 07 — Prompt Evolution governance (Phase E)** — filterable revision list, side-by-side prompt boxes, regression results viewer
+- Footer — Future improvements changelog
+
+**Mongo collections (Phase E):**
+- `homo_vs_ai_prompt_revisions` — versioned prompt history (status: pending / active / rejected / superseded / refused)
+- `homo_vs_ai_prompt_audit` — append-only action log (actor, action, timestamp, detail)
+
+**i18n**: Full **EN / NO / ES** parity. `homoVsAi.*` block under each `common.json` (router, judge, scoreboard, future, istqb, demos.feedback*, **34 new `evolve.*` keys × 3 locales** for Phase E).
+
+**Critical constraints:**
+- **Backward-compatible by design**: if no revision is active or Mongo is unavailable, `run_challenge` keeps using `TASK_SPECS[task]["system"]` exactly as before 1.8.0
+- **No auto-promotion**: the LLM proposes, a human approves. Always.
+- **Append-only audit**: revisions are never deleted, only soft-marked
+- **MVP scope**: prompt evolution is wired into `/challenge` only; `/route` and `/judge` keep fixed prompts
+- ISTQB licensing: full PDFs stay gitignored under `docs-ISTQB/`; only curated short summaries live in `backend/data/istqb_anchors.json`
+
+**Smoke / verification commands:**
+```bash
+# Phase E smoke — 8 checks (parses JSON variants, scores outputs, state transitions, harness, router)
+python -m backend.tests.smoke_prompt_evolution
+
+# Verify all 12 /homo-vs-ai routes registered
+python -c "from backend.app import app; print(sum(1 for r in app.routes if '/homo-vs-ai' in r.path))"
+
+# Frontend production build — 0 warnings in src/pages/help/agi/
+cd frontend && CI=true npm run build
+
+# Endpoint smoke (backend running, will fall back to TASK_SPECS if Mongo empty)
+curl http://localhost:8000/api/agi/homo-vs-ai/tasks
+curl http://localhost:8000/api/agi/homo-vs-ai/prompt-evolution/revisions
+```
+
+**Docs**: covered in `README.md` (AGI Hub section), `docs/README_FULL.md` (Tab 4 — full backend + frontend catalogue + Phase E governance subsection), and `docs/CHANGELOG.md` [1.9.0] for the Phase E rollout notes.
 
 ---
 
