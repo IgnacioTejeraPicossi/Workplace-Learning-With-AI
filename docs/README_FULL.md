@@ -630,13 +630,33 @@ Every `/challenge`, `/route` and `/judge` call is grounded in **real ISTQB sylla
 - **Audience value**: gives testers in the room something verifiable to anchor the AI's output on — the conversation shifts from "do you believe this?" to "does this match CTFL §5.2?".
 
 ### Backend — Homo vs. KI
-- `POST /api/agi/homo-vs-ai/challenge { task, input, language?, previous_ai_output?, feedback? }` — dispatches to one of **11** task specs (10 active + legacy `tests_from_code`): `scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility`. Testing-literate prompts (ISTQB + context-driven school; James Bach, Cem Kaner, Lisa Crispin, Elisabeth Hendrickson, Gojko Adzic, Nielsen Heuristics explicitly referenced in system prompts). Response carries `istqb_anchors: IstqbAnchor[]` and **`istqb_rag: IstqbRagMeta`** (local PDF RAG only when provider is ItemAI / ItemServerAI). Ephemeral re-run requires **both** optional body fields.
+- `POST /api/agi/homo-vs-ai/challenge { task, input, language?, previous_ai_output?, feedback? }` — dispatches to one of **11** task specs (10 active + legacy `tests_from_code`): `scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility`. Testing-literate prompts (ISTQB + context-driven school; James Bach, Cem Kaner, Lisa Crispin, Elisabeth Hendrickson, Gojko Adzic, Nielsen Heuristics explicitly referenced in system prompts). Response carries `istqb_anchors: IstqbAnchor[]`, **`istqb_rag: IstqbRagMeta`** (local PDF RAG only when provider is ItemAI / ItemServerAI) and **`prompt_source: PromptSourceMeta`** (Phase E — tells the UI whether this round used the baked-in TASK_SPECS prompt or a human-approved evolved revision). Ephemeral re-run requires **both** optional body fields.
 - `POST /api/agi/homo-vs-ai/route { problem, language? }` — Problem Router v2: free text → `{ recommended, rationale, runner_ups[], raw?, istqb_anchors[], istqb_rag }`. System prompt enforces a decision rubric + few-shot examples; `temperature=0.1`.
 - `POST /api/agi/homo-vs-ai/judge { task, human_answer, ai_answer, user_input?, language? }` — AI Judge: returns `{ verdict: human|ai|tie, confidence: low|medium|high, rationale, criteria: { accuracy, coverage, practical_value }, raw?, istqb_anchors[], istqb_rag }`. System prompt includes a per-task `JUDGE_CRITERIA` rubric, self-preference-bias warning, the task-specific AND judge-generic ISTQB blocks, and strict-JSON requirement with graceful tie-fallback. `temperature=0.1`.
 - `GET /api/agi/homo-vs-ai/tasks` — discovery.
 - `GET /api/agi/homo-vs-ai/istqb-rag-status` — local RAG index introspection (for workshop demos).
 - Forwards `x-api-provider`, `x-openai-key`, `x-openrouter-key`, `x-itemai-*` headers to `ask_ai_unified` so the UI's model choice is respected on every endpoint.
-- Services: `backend/services/homo_vs_ai_service.py` + `backend/services/istqb_anchors.py` + **`backend/services/istqb_local_rag.py`**. Router: `backend/routers/homo_vs_ai.py` (exposes `IstqbAnchor` and **`IstqbRagMeta`**).
+- Services: `backend/services/homo_vs_ai_service.py` + `backend/services/istqb_anchors.py` + **`backend/services/istqb_local_rag.py`**. Router: `backend/routers/homo_vs_ai.py` (exposes `IstqbAnchor`, `IstqbRagMeta` and **`PromptSourceMeta`**).
+
+#### Phase E — Prompt Evolution governance
+Closes the **Option-C feedback loop** that was deliberately deferred for "silent drift" risk. Six endpoints under `/api/agi/homo-vs-ai/prompt-evolution/*`:
+- `POST /propose { task, user_input, previous_ai_output, human_feedback, actor? }` — LLM #2 reads the BASE TASK_SPECS prompt + the AI's previous answer + the human's improvement notes, then returns a strict-JSON proposal: either `status=proposed` with `proposed_prompt` + `rationale` + `risk_flags`, or `status=refused` with `refusal_reason`. The output is persisted as a pending revision (or a refused record, for the audit trail).
+- `GET /revisions?task=&status=&limit=` — list revisions, most recent first. Statuses: `pending` / `active` / `rejected` / `superseded` / `refused`.
+- `POST /{revision_id}/approve { approver?, note? }` — human approval gate; activates the revision and supersedes the prior active for the same task.
+- `POST /{revision_id}/reject { reviewer?, reason? }` — reject with reason (audit log).
+- `POST /{revision_id}/regression { max_samples? }` — runs the curated regression harness (3 samples per task by default) against BOTH the base and proposed prompts; scores each output mechanically on (a) keyword coverage, (b) length sanity, (c) markdown structure; returns side-by-side per-sample results + aggregate verdict `no_regression` / `mixed` / `regression`. Persists the summary on the revision.
+- `POST /{revision_id}/rollback { actor?, reason? }` — re-activate a previously superseded revision (recovery path when a fresh approval regresses production).
+- `GET /active/{task}` — debug helper: resolve the currently active prompt revision for a task.
+
+**Wiring into `run_challenge`**: at the top of the function we call `await get_active_prompt(task)`. If a revision is active for this task, its `proposed_prompt` replaces `TASK_SPECS[task]["system"]`. If Mongo is unavailable OR no revision is active, we fall back to the baked-in prompt → **existing flows cannot regress just by enabling this module** (backward-compat guarantee, tested by smoke).
+
+**Mongo collections (Phase E)**: `homo_vs_ai_prompt_revisions` (versioned prompt history with full LLM proposal trace) + `homo_vs_ai_prompt_audit` (append-only action log).
+
+**Curated regression samples**: `backend/data/regression_samples.json` — 3 inputs per task, each with `must_appear` keywords, `min_chars` / `max_chars` bounds, `must_contain_markdown` flag. Used by the harness to decide whether a proposed prompt regresses *previously-working* flows before the human approves. Scoring is deterministic (no LLM in the loop — same numbers every time).
+
+**Refusal path**: the LLM is explicitly instructed to REFUSE revisions that risk silent drift (removing ISTQB anchoring, dropping bilingual hint, narrowing scope, contradictory feedback, etc.). Refusals are persisted with `risk_flags` so the workshop host can see what the LLM caught. Refused revisions can also be rejected (archived) from the panel.
+
+Services: `backend/services/prompt_evolution.py` (~480 lines). Router: `backend/routers/prompt_evolution.py` (7 endpoints).
 
 ### Frontend — Homo vs. KI
 - Page: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (components: `ProblemRouter`, `QuickNavBar`, `DemoCard`, `JudgeAdvisoryPanel`, `VoteButton`, `AiJudgeBadge`, `WorkshopScoreboard`, `TrustFramework`, `SpeakerCribSheet`, `FutureImprovementsNote`, **`IstqbBadge`**, **`IstqbRagHint`**, per-round feedback + **Re-run with feedback**)

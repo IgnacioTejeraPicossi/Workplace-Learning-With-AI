@@ -79,3 +79,11 @@ red_cross_qa_generated_scripts_collection = database.get_collection("red_cross_q
 red_cross_qa_jira_dispatches_collection = database.get_collection("red_cross_qa_jira_dispatches")
 red_cross_qa_settings_collection = database.get_collection("red_cross_qa_settings")
 red_cross_qa_reports_collection = database.get_collection("red_cross_qa_reports")
+
+# Homo Sapiens vs. KI i Test — Prompt Evolution (Phase E)
+# Versioned system-prompt revisions for the workshop challenges, with
+# human-in-the-loop approval, regression harness output and full audit trail.
+# The collections are intentionally separate (not folded into `prompts`) so
+# the workshop module remains independent and easy to wipe between sessions.
+homo_vs_ai_prompt_revisions_collection = database.get_collection("homo_vs_ai_prompt_revisions")
+homo_vs_ai_prompt_audit_collection = database.get_collection("homo_vs_ai_prompt_audit")

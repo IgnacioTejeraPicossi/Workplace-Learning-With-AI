@@ -21,7 +21,12 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { judgeTestingRound, routeTestingProblem, runTestingChallenge } from '../../../api/agiApi';
+import {
+  judgeTestingRound, routeTestingProblem, runTestingChallenge,
+  // Phase E — Prompt Evolution governance
+  proposePromptRevision, listPromptRevisions, approvePromptRevision,
+  rejectPromptRevision, rollbackPromptRevision, runRegressionHarness,
+} from '../../../api/agiApi';
 
 // ---------------------------------------------------------------------------
 // ISTQB anchor badge — shows '📚 ISTQB-anchored' when a challenge / router /
@@ -435,6 +440,20 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   // Ephemeral human feedback for "Re-run with feedback" (Option B).
   const [feedbackText, setFeedbackText] = useState('');
 
+  // Phase E — Prompt Evolution. State for the per-card "Propose revision" flow.
+  // The governance panel below the demo card lists pending revisions and lets
+  // the workshop host approve / reject / regression / rollback. The "propose"
+  // button here on the DemoCard becomes available the moment a human has
+  // typed feedback AND the AI has produced an answer (same precondition as
+  // Re-run with feedback). The result is stored ephemerally so the diff +
+  // rationale stay visible until the user opens the governance panel.
+  const [proposeLoading, setProposeLoading] = useState(false);
+  const [proposeErr, setProposeErr] = useState(null);
+  const [proposeResult, setProposeResult] = useState(null);
+  // Bubble up to the parent so the governance panel below refreshes after
+  // a propose call lands.
+  const [promptSource, setPromptSource] = useState(null);
+
   // Follow i18n language changes: if the user switches EN<->NO, refresh the
   // human panel with the new locale copy as long as they have not edited it.
   const [humanDirty, setHumanDirty] = useState(false);
@@ -484,6 +503,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
       setAiOutput(res.output || '(empty)');
       setIstqbAnchors(Array.isArray(res.istqb_anchors) ? res.istqb_anchors : []);
       setIstqbRag(res.istqb_rag || null);
+      setPromptSource(res.prompt_source || null);
       if (rerun) setFeedbackText('');
     } catch (e) {
       setErr(String(e.message || e));
@@ -525,6 +545,32 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
     setIstqbAnchors([]);
     setIstqbRag(null);
     setFeedbackText('');
+    setProposeResult(null); setProposeErr(null);
+    setPromptSource(null);
+  };
+
+  // Phase E — Propose a persistent revision to the base system prompt for this
+  // task. Requires both (a) an AI answer already generated and (b) human
+  // feedback typed in the textarea. The LLM may REFUSE — we surface that as
+  // a yellow notice rather than treating it as an error. On a real proposal
+  // the diff appears below the button + a "Open governance panel" link.
+  const proposeRevision = async () => {
+    if (!aiOutput.trim() || !feedbackText.trim() || !input.trim()) return;
+    setProposeLoading(true); setProposeErr(null); setProposeResult(null);
+    try {
+      const res = await proposePromptRevision({
+        task,
+        userInput: input.trim(),
+        previousAiOutput: aiOutput.trim(),
+        humanFeedback: feedbackText.trim(),
+        actor: 'workshop-host',
+      });
+      setProposeResult(res);
+    } catch (e) {
+      setProposeErr(String(e.message || e));
+    } finally {
+      setProposeLoading(false);
+    }
   };
 
   return (
@@ -785,31 +831,138 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
             lineHeight: 1.45,
           }}
         />
-        <button
-          type="button"
-          onClick={() => run({ rerun: true })}
-          disabled={
-            loading || !input.trim() || !feedbackText.trim() || !aiOutput.trim()
-          }
-          style={{
-            marginTop: 8,
-            background: loading || !aiOutput.trim() || !feedbackText.trim()
-              ? '#e2e8f0'
-              : '#475569',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 600,
-            cursor:
-              loading || !aiOutput.trim() || !feedbackText.trim()
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8, alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={() => run({ rerun: true })}
+            disabled={
+              loading || !input.trim() || !feedbackText.trim() || !aiOutput.trim()
+            }
+            style={{
+              background: loading || !aiOutput.trim() || !feedbackText.trim()
+                ? '#e2e8f0'
+                : '#475569',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor:
+                loading || !aiOutput.trim() || !feedbackText.trim()
+                  ? 'not-allowed'
+                  : 'pointer',
+            }}
+          >
+            🔁 {t('homoVsAi.demos.rerunWithFeedback', { defaultValue: 'Re-run with feedback' })}
+          </button>
+
+          {/* Phase E — Propose a persistent revision (governance flow).
+              Same precondition as Re-run, different consequence: this asks
+              LLM #2 for a diff to the BASE system prompt. The human must
+              then approve in the governance panel below. */}
+          <button
+            type="button"
+            onClick={proposeRevision}
+            disabled={proposeLoading || loading || !aiOutput.trim() || !feedbackText.trim() || !input.trim()}
+            title={t('homoVsAi.evolve.proposeTooltip', {
+              defaultValue: 'Ask LLM #2 to propose a permanent revision to this task\'s base prompt. Human approval required.',
+            })}
+            style={{
+              background: proposeLoading || !aiOutput.trim() || !feedbackText.trim()
+                ? '#fef3c7'
+                : '#a16207',
+              color: proposeLoading || !aiOutput.trim() || !feedbackText.trim()
+                ? '#92400e'
+                : 'white',
+              border: '1px solid #ca8a04',
+              padding: '6px 12px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: proposeLoading || !aiOutput.trim() || !feedbackText.trim()
                 ? 'not-allowed'
                 : 'pointer',
-          }}
-        >
-          🔁 {t('homoVsAi.demos.rerunWithFeedback', { defaultValue: 'Re-run with feedback' })}
-        </button>
+            }}
+          >
+            🧬 {proposeLoading
+                  ? t('homoVsAi.evolve.proposing', { defaultValue: 'Proposing…' })
+                  : t('homoVsAi.evolve.proposeBtn', { defaultValue: 'Propose persistent revision' })}
+          </button>
+
+          {/* Badge: this round's answer used an evolved prompt (Phase E) */}
+          {promptSource?.source === 'evolved' && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, color: '#15803d',
+              background: '#dcfce7', border: '1px solid #86efac',
+              padding: '3px 8px', borderRadius: 999,
+              letterSpacing: 0.4,
+            }} title={t('homoVsAi.evolve.evolvedBadgeTooltip', {
+              defaultValue: 'This answer used an LLM-evolved system prompt approved by a human.',
+            })}>
+              🧬 {t('homoVsAi.evolve.evolvedBadge', { defaultValue: 'Evolved prompt' })}
+              {' '}v{promptSource.version}
+            </span>
+          )}
+        </div>
+
+        {/* Propose-revision result panel (ephemeral preview before approval) */}
+        {proposeErr && (
+          <div style={{
+            marginTop: 8, color: '#991b1b', fontSize: 12, background: '#fef2f2',
+            padding: 10, borderRadius: 8, border: '1px solid #fecaca',
+          }}>
+            ⚠️ {t('homoVsAi.evolve.errorPrefix', { defaultValue: 'Prompt evolution failed' })}: {proposeErr}
+          </div>
+        )}
+        {proposeResult && (
+          <div style={{
+            marginTop: 10, padding: '10px 12px', borderRadius: 8,
+            background: proposeResult.status === 'pending' ? '#fefce8' : '#fef3c7',
+            border: `1px solid ${proposeResult.status === 'pending' ? '#fde047' : '#fcd34d'}`,
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#854d0e' }}>
+              {proposeResult.status === 'pending'
+                ? `🧬 ${t('homoVsAi.evolve.pendingTitle', { defaultValue: 'Revision proposed (pending human approval)' })}`
+                : `🛑 ${t('homoVsAi.evolve.refusedTitle', { defaultValue: 'LLM refused this revision' })}`}
+              {' '}<span style={{ fontWeight: 500, color: '#a16207' }}>
+                · v{proposeResult.version} · {proposeResult.revision_id?.slice(0, 8)}
+              </span>
+            </div>
+            {proposeResult.meta_llm_rationale && (
+              <div style={{ fontSize: 12, color: '#475569', marginTop: 6, lineHeight: 1.5 }}>
+                <strong>{t('homoVsAi.evolve.rationale', { defaultValue: 'Rationale' })}:</strong>{' '}
+                {proposeResult.meta_llm_rationale}
+              </div>
+            )}
+            {Array.isArray(proposeResult.risk_flags) && proposeResult.risk_flags.length > 0 && (
+              <div style={{ marginTop: 6, fontSize: 11 }}>
+                <strong style={{ color: '#854d0e' }}>
+                  {t('homoVsAi.evolve.riskFlags', { defaultValue: 'Risk flags' })}:
+                </strong>
+                {proposeResult.risk_flags.map((f, i) => (
+                  <span key={i} style={{
+                    marginLeft: 4, display: 'inline-block', padding: '2px 6px',
+                    background: 'white', border: '1px solid #fcd34d',
+                    borderRadius: 999, color: '#854d0e', fontWeight: 600,
+                  }}>{f}</span>
+                ))}
+              </div>
+            )}
+            {proposeResult.status === 'refused' && proposeResult.refusal_reason && (
+              <div style={{ marginTop: 6, fontSize: 12, color: '#7c2d12', fontStyle: 'italic' }}>
+                {proposeResult.refusal_reason}
+              </div>
+            )}
+            {proposeResult.status === 'pending' && (
+              <div style={{ marginTop: 6, fontSize: 11, color: '#64748b' }}>
+                ✅ {t('homoVsAi.evolve.openPanelHint', {
+                  defaultValue: 'Approve, reject or run the regression harness in the Prompt Evolution panel at the bottom of the tab.',
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Judge error */}
@@ -1624,6 +1777,390 @@ function SubBlock({ title, children }) {
 }
 
 // ---------------------------------------------------------------------------
+// Phase E — Prompt Evolution governance panel
+// ---------------------------------------------------------------------------
+//
+// A standalone section rendered between the SpeakerCribSheet and the Future
+// Improvements footer. Lists all prompt revisions (pending, active, rejected,
+// superseded, refused) and exposes the four governance actions:
+//   - Approve → marks the revision active, previous active becomes superseded
+//   - Reject  → marks pending|refused revisions rejected
+//   - Regression → runs the curated harness on this revision (base vs proposed)
+//   - Rollback → re-activates a previously superseded revision (recovery path)
+//
+// The panel is intentionally compact — full diff viewers, audit log timelines,
+// per-task version trees are deferred follow-ups. The MVP focuses on the live
+// workshop demo flow: a human proposes → LLM proposes → human approves →
+// future rounds run the new prompt.
+
+function PromptEvolutionPanel({ t }) {
+  const [revisions, setRevisions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [filterStatus, setFilterStatus] = useState(''); // '' = all
+  const [filterTask, setFilterTask] = useState('');
+  const [busyId, setBusyId] = useState(null);
+  const [actionMsg, setActionMsg] = useState(null);
+  const [regressionResults, setRegressionResults] = useState({}); // revisionId → result
+  const [expandedId, setExpandedId] = useState(null);
+
+  const reload = async () => {
+    setLoading(true); setError(null);
+    try {
+      const data = await listPromptRevisions({
+        task: filterTask || undefined,
+        status: filterStatus || undefined,
+        limit: 100,
+      });
+      setRevisions(Array.isArray(data.items) ? data.items : []);
+    } catch (e) {
+      setError(String(e.message || e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Re-load whenever a filter changes. `reload` itself depends on the filters,
+  // so adding it to the deps would cause a re-creation loop. Intentional.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { reload(); }, [filterStatus, filterTask]);
+
+  const doAction = async (label, fn, revisionId) => {
+    setBusyId(revisionId); setActionMsg(null);
+    try {
+      await fn();
+      setActionMsg({ ok: true, text: `${label} ✓` });
+      await reload();
+    } catch (e) {
+      setActionMsg({ ok: false, text: `${label}: ${e.message || e}` });
+    } finally {
+      setBusyId(null);
+      setTimeout(() => setActionMsg(null), 4000);
+    }
+  };
+
+  const handleApprove = (id) =>
+    doAction('Approve', () => approvePromptRevision(id, { approver: 'workshop-host' }), id);
+  const handleReject = (id) => {
+    const reason = window.prompt(t('homoVsAi.evolve.panel.rejectPrompt', {
+      defaultValue: 'Why are you rejecting this revision? (optional)',
+    }), '') || '';
+    doAction('Reject', () => rejectPromptRevision(id, { reviewer: 'workshop-host', reason }), id);
+  };
+  const handleRollback = (id) => {
+    const reason = window.prompt(t('homoVsAi.evolve.panel.rollbackPrompt', {
+      defaultValue: 'Why rolling back? (optional, shows in audit log)',
+    }), '') || '';
+    doAction('Rollback', () => rollbackPromptRevision(id, { actor: 'workshop-host', reason }), id);
+  };
+  const handleRegression = async (id) => {
+    setBusyId(id); setActionMsg(null);
+    try {
+      const res = await runRegressionHarness(id, { maxSamples: 3 });
+      setRegressionResults((prev) => ({ ...prev, [id]: res }));
+      setActionMsg({ ok: true, text: `Regression ✓ (${res.summary?.verdict || 'done'})` });
+      await reload();
+    } catch (e) {
+      setActionMsg({ ok: false, text: `Regression: ${e.message || e}` });
+    } finally {
+      setBusyId(null);
+      setTimeout(() => setActionMsg(null), 4000);
+    }
+  };
+
+  const STATUS_STYLES = {
+    pending:    { bg: '#fefce8', fg: '#854d0e', border: '#fde047', label: 'PENDING' },
+    active:     { bg: '#dcfce7', fg: '#15803d', border: '#86efac', label: 'ACTIVE' },
+    rejected:   { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5', label: 'REJECTED' },
+    superseded: { bg: '#f1f5f9', fg: '#475569', border: '#cbd5e1', label: 'SUPERSEDED' },
+    refused:    { bg: '#fff7ed', fg: '#c2410c', border: '#fdba74', label: 'LLM REFUSED' },
+  };
+
+  const tasksInList = Array.from(new Set(revisions.map(r => r.task))).sort();
+
+  return (
+    <div>
+      <SectionHeader
+        num="07"
+        title={t('homoVsAi.evolve.panel.title', { defaultValue: 'Prompt Evolution (governance)' })}
+        lead={t('homoVsAi.evolve.panel.lead', {
+          defaultValue: 'When the human writes critical feedback during a re-run, they can ask LLM #2 to propose a permanent revision to the task\'s base system prompt. Nothing changes until a human approves here. Approved revisions feed all future rounds; rollback is one click away. Audit log persists every action.',
+        })}
+      />
+      <div style={{
+        background: 'white', border: '1px solid #e2e8f0', borderRadius: 12,
+        borderTop: '4px solid #a16207', padding: 16,
+      }}>
+      {/* Filters + reload */}
+      <div style={{
+        display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center',
+        marginBottom: 12, padding: 10, background: '#f8fafc',
+        border: '1px solid #e2e8f0', borderRadius: 8,
+      }}>
+        <label style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>
+          {t('homoVsAi.evolve.panel.filterStatus', { defaultValue: 'Status' })}:
+        </label>
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: 4 }}>
+          <option value="">{t('homoVsAi.evolve.panel.all', { defaultValue: 'all' })}</option>
+          <option value="pending">pending</option>
+          <option value="active">active</option>
+          <option value="rejected">rejected</option>
+          <option value="superseded">superseded</option>
+          <option value="refused">refused</option>
+        </select>
+        <label style={{ fontSize: 11, color: '#475569', fontWeight: 600, marginLeft: 8 }}>
+          {t('homoVsAi.evolve.panel.filterTask', { defaultValue: 'Task' })}:
+        </label>
+        <select value={filterTask} onChange={(e) => setFilterTask(e.target.value)}
+                style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: 4 }}>
+          <option value="">{t('homoVsAi.evolve.panel.all', { defaultValue: 'all' })}</option>
+          {tasksInList.map((task) => <option key={task} value={task}>{task}</option>)}
+        </select>
+        <button onClick={reload}
+                style={{
+                  marginLeft: 'auto', fontSize: 12, padding: '4px 10px',
+                  border: '1px solid #cbd5e1', borderRadius: 4, background: 'white',
+                  cursor: 'pointer', fontWeight: 600, color: '#475569',
+                }}>
+          🔄 {t('homoVsAi.evolve.panel.refresh', { defaultValue: 'Refresh' })}
+        </button>
+      </div>
+
+      {actionMsg && (
+        <div style={{
+          marginBottom: 10, padding: '8px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+          background: actionMsg.ok ? '#dcfce7' : '#fee2e2',
+          color: actionMsg.ok ? '#15803d' : '#b91c1c',
+          border: `1px solid ${actionMsg.ok ? '#86efac' : '#fca5a5'}`,
+        }}>{actionMsg.text}</div>
+      )}
+
+      {loading && <div style={{ fontSize: 12, color: '#64748b' }}>Loading…</div>}
+      {error && (
+        <div style={{ color: '#991b1b', fontSize: 12, background: '#fef2f2',
+                     padding: 10, borderRadius: 8, border: '1px solid #fecaca' }}>
+          ⚠️ {error}
+        </div>
+      )}
+      {!loading && !error && revisions.length === 0 && (
+        <div style={{ fontSize: 13, color: '#64748b', fontStyle: 'italic', padding: 16,
+                     background: '#f8fafc', borderRadius: 8, border: '1px dashed #cbd5e1' }}>
+          {t('homoVsAi.evolve.panel.empty', {
+            defaultValue: 'No revisions yet. Write feedback under any AI answer above and click "Propose persistent revision" to create the first one.',
+          })}
+        </div>
+      )}
+
+      {revisions.map((r) => {
+        const st = STATUS_STYLES[r.status] || STATUS_STYLES.pending;
+        const isExpanded = expandedId === r.revision_id;
+        const reg = regressionResults[r.revision_id] || r.regression;
+        return (
+          <div key={r.revision_id} style={{
+            marginBottom: 12, padding: 12, borderRadius: 10,
+            background: 'white', border: `1px solid ${st.border}`,
+            borderLeft: `4px solid ${st.border}`,
+          }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
+                background: st.bg, color: st.fg, border: `1px solid ${st.border}`, letterSpacing: 0.4,
+              }}>{st.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>{r.task}</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>v{r.version}</span>
+              <span style={{ fontSize: 10, color: '#94a3b8', fontFamily: 'monospace' }}>
+                {(r.revision_id || '').slice(0, 8)}
+              </span>
+              <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                · {new Date(r.proposed_at).toLocaleString()}
+              </span>
+              {reg?.summary && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
+                  background: reg.summary.verdict === 'no_regression' ? '#dcfce7'
+                            : reg.summary.verdict === 'mixed' ? '#fef3c7' : '#fee2e2',
+                  color: reg.summary.verdict === 'no_regression' ? '#15803d'
+                       : reg.summary.verdict === 'mixed' ? '#854d0e' : '#b91c1c',
+                  border: '1px solid',
+                  borderColor: reg.summary.verdict === 'no_regression' ? '#86efac'
+                              : reg.summary.verdict === 'mixed' ? '#fcd34d' : '#fca5a5',
+                  letterSpacing: 0.4,
+                }}>📊 {reg.summary.verdict}</span>
+              )}
+              <button onClick={() => setExpandedId(isExpanded ? null : r.revision_id)}
+                      style={{
+                        marginLeft: 'auto', fontSize: 11, padding: '3px 10px',
+                        border: '1px solid #cbd5e1', borderRadius: 4, background: 'white',
+                        cursor: 'pointer', fontWeight: 600, color: '#475569',
+                      }}>
+                {isExpanded
+                  ? t('homoVsAi.evolve.panel.collapse', { defaultValue: 'Collapse' })
+                  : t('homoVsAi.evolve.panel.expand', { defaultValue: 'Expand' })}
+              </button>
+            </div>
+
+            {r.meta_llm_rationale && (
+              <div style={{ marginTop: 6, fontSize: 12, color: '#475569', lineHeight: 1.5 }}>
+                <strong>{t('homoVsAi.evolve.rationale', { defaultValue: 'Rationale' })}:</strong>{' '}
+                {r.meta_llm_rationale}
+              </div>
+            )}
+            {Array.isArray(r.risk_flags) && r.risk_flags.length > 0 && (
+              <div style={{ marginTop: 4, fontSize: 11 }}>
+                {r.risk_flags.map((f, i) => (
+                  <span key={i} style={{
+                    marginRight: 4, padding: '1px 6px', background: '#fef3c7',
+                    color: '#854d0e', border: '1px solid #fcd34d', borderRadius: 999,
+                    fontWeight: 600,
+                  }}>{f}</span>
+                ))}
+              </div>
+            )}
+            {r.refusal_reason && (
+              <div style={{ marginTop: 4, fontSize: 12, color: '#7c2d12', fontStyle: 'italic' }}>
+                {r.refusal_reason}
+              </div>
+            )}
+            {r.rejection_reason && (
+              <div style={{ marginTop: 4, fontSize: 12, color: '#7c2d12', fontStyle: 'italic' }}>
+                {t('homoVsAi.evolve.panel.rejectedBecause', { defaultValue: 'Rejected because' })}: {r.rejection_reason}
+              </div>
+            )}
+
+            {/* Action row */}
+            <div style={{ marginTop: 10, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {r.status === 'pending' && (
+                <>
+                  <button onClick={() => handleRegression(r.revision_id)} disabled={busyId === r.revision_id}
+                          style={btnStyle('#475569', busyId === r.revision_id)}>
+                    📊 {t('homoVsAi.evolve.panel.runRegression', { defaultValue: 'Run regression' })}
+                  </button>
+                  <button onClick={() => handleApprove(r.revision_id)} disabled={busyId === r.revision_id}
+                          style={btnStyle('#15803d', busyId === r.revision_id)}>
+                    ✅ {t('homoVsAi.evolve.panel.approve', { defaultValue: 'Approve' })}
+                  </button>
+                  <button onClick={() => handleReject(r.revision_id)} disabled={busyId === r.revision_id}
+                          style={btnStyle('#b91c1c', busyId === r.revision_id)}>
+                    ❌ {t('homoVsAi.evolve.panel.reject', { defaultValue: 'Reject' })}
+                  </button>
+                </>
+              )}
+              {r.status === 'refused' && (
+                <button onClick={() => handleReject(r.revision_id)} disabled={busyId === r.revision_id}
+                        style={btnStyle('#b91c1c', busyId === r.revision_id)}>
+                  ❌ {t('homoVsAi.evolve.panel.archive', { defaultValue: 'Archive (reject)' })}
+                </button>
+              )}
+              {(r.status === 'superseded' || r.status === 'rejected') && r.proposed_prompt && (
+                <button onClick={() => handleRollback(r.revision_id)} disabled={busyId === r.revision_id}
+                        style={btnStyle('#a16207', busyId === r.revision_id)}>
+                  ⏪ {t('homoVsAi.evolve.panel.rollback', { defaultValue: 'Rollback (re-activate)' })}
+                </button>
+              )}
+            </div>
+
+            {/* Expanded view — base + proposed prompts side-by-side */}
+            {isExpanded && (
+              <div style={{ marginTop: 12, display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                <PromptBox label={t('homoVsAi.evolve.panel.basePrompt', { defaultValue: 'Base (current) prompt' })}
+                           color="#94a3b8" text={r.base_prompt} />
+                <PromptBox label={t('homoVsAi.evolve.panel.proposedPrompt', { defaultValue: 'Proposed prompt' })}
+                           color={r.proposed_prompt ? '#a16207' : '#cbd5e1'}
+                           text={r.proposed_prompt || '(no proposal — refusal record)'} />
+                <PromptBox label={t('homoVsAi.evolve.panel.humanFeedback', { defaultValue: 'Human feedback' })}
+                           color="#15803d" text={r.human_feedback} />
+                <PromptBox label={t('homoVsAi.evolve.panel.previousAi', { defaultValue: 'Previous AI answer' })}
+                           color="#1d4ed8" text={r.previous_ai_output} />
+                {reg?.samples && reg.samples.length > 0 && (
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <RegressionView reg={reg} t={t} />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      </div>
+    </div>
+  );
+}
+
+function btnStyle(color, disabled) {
+  return {
+    background: disabled ? '#e2e8f0' : color,
+    color: disabled ? '#94a3b8' : 'white',
+    border: 'none',
+    padding: '5px 10px',
+    borderRadius: 6,
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    letterSpacing: 0.3,
+  };
+}
+
+function PromptBox({ label, color, text }) {
+  return (
+    <div style={{
+      background: '#f8fafc', border: `1px solid ${color}`, borderRadius: 8, padding: 10,
+    }}>
+      <div style={{
+        fontSize: 10, fontWeight: 700, color, letterSpacing: 0.4,
+        textTransform: 'uppercase', marginBottom: 6,
+      }}>{label}</div>
+      <pre style={{
+        margin: 0, fontSize: 11, fontFamily: 'monospace', color: '#0f172a',
+        whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 240, overflowY: 'auto',
+      }}>{text || '(empty)'}</pre>
+    </div>
+  );
+}
+
+function RegressionView({ reg, t }) {
+  const s = reg.summary || {};
+  return (
+    <div style={{
+      padding: 12, background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 8,
+    }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>
+        📊 {t('homoVsAi.evolve.panel.regressionTitle', { defaultValue: 'Regression harness' })}
+        {' '}<span style={{ color: '#64748b', fontWeight: 400 }}>
+          · {s.samples_run} samples · verdict: {s.verdict}
+        </span>
+      </div>
+      <div style={{ fontSize: 11, color: '#475569', marginBottom: 6 }}>
+        Base: {s.base_pass} pass / {s.base_warn} warn / {s.base_fail} fail
+        {' · '}Proposed: {s.proposed_pass} pass / {s.proposed_warn} warn / {s.proposed_fail} fail
+      </div>
+      <details>
+        <summary style={{ fontSize: 11, cursor: 'pointer', color: '#475569' }}>
+          {t('homoVsAi.evolve.panel.showSamples', { defaultValue: 'Show per-sample scores' })}
+        </summary>
+        <div style={{ marginTop: 6, fontSize: 11 }}>
+          {(reg.samples || []).map((sample, i) => (
+            <div key={i} style={{ marginBottom: 6, padding: 6, background: 'white', borderRadius: 4, border: '1px solid #e2e8f0' }}>
+              <div style={{ fontFamily: 'monospace', color: '#64748b' }}>{sample.id}</div>
+              <div style={{ color: '#475569', marginTop: 2 }}>
+                <strong>Base:</strong> {sample.base_score?.verdict}
+                {' · coverage '}{sample.base_score?.coverage}
+                {sample.base_score?.missing?.length ? ` · missing: ${sample.base_score.missing.join(', ')}` : ''}
+              </div>
+              <div style={{ color: '#475569' }}>
+                <strong>Proposed:</strong> {sample.proposed_score?.verdict}
+                {' · coverage '}{sample.proposed_score?.coverage}
+                {sample.proposed_score?.missing?.length ? ` · missing: ${sample.proposed_score.missing.join(', ')}` : ''}
+              </div>
+            </div>
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Footer — Future improvements (parking lot)
 // ---------------------------------------------------------------------------
 //
@@ -1738,6 +2275,7 @@ export default function HomoSapiensVsAI() {
         onClearExternal={() => setExternalVote(null)}
       />
       <SpeakerCribSheet t={t} />
+      <PromptEvolutionPanel t={t} />
       <FutureImprovementsNote t={t} />
     </div>
   );

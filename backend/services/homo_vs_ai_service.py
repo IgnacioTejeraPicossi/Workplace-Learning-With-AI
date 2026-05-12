@@ -261,7 +261,29 @@ async def run_challenge(
     from backend.llm import ask_ai_unified
 
     spec = TASK_SPECS[task]
+    # Phase E — prompt evolution: if a human has approved a revised system
+    # prompt for this task, use it instead of the hardcoded one. Mock-first
+    # graceful degradation: if Mongo is down OR no revision is active,
+    # `get_active_prompt` returns None and we fall back to TASK_SPECS as
+    # before, keeping all existing flows unchanged.
     system_prompt = spec["system"]
+    prompt_source: Dict[str, Any] = {"source": "baked_in"}
+    try:
+        from backend.services.prompt_evolution import get_active_prompt
+
+        active = await get_active_prompt(task)
+        if active and active.get("proposed_prompt"):
+            system_prompt = active["proposed_prompt"]
+            prompt_source = {
+                "source": "evolved",
+                "revision_id": active.get("revision_id"),
+                "version": active.get("version"),
+                "approved_by": active.get("approved_by"),
+                "approved_at": active.get("approved_at"),
+            }
+    except Exception:
+        # Prompt evolution module unavailable — keep using TASK_SPECS.
+        pass
     if language and language.lower().startswith("no"):
         system_prompt += (
             "\n\nHINT: The audience is Norwegian. If the user input is in Norwegian, "
@@ -315,6 +337,7 @@ async def run_challenge(
         "output": (output or "").strip() or "(no response from AI)",
         "istqb_anchors": anchors_summary_for_response(kind="task", key=task),
         "istqb_rag": rag_meta,
+        "prompt_source": prompt_source,
     }
 
 

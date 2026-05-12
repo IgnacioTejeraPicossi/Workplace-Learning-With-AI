@@ -2102,13 +2102,51 @@
         }
       ]
     },
+    "evolve": {
+      "proposeBtn": "Propose persistent revision",
+      "proposing": "Proposing…",
+      "proposeTooltip": "Ask LLM #2 to propose a permanent revision to this task's base prompt. Human approval required.",
+      "errorPrefix": "Prompt evolution failed",
+      "pendingTitle": "Revision proposed (pending human approval)",
+      "refusedTitle": "LLM refused this revision",
+      "rationale": "Rationale",
+      "riskFlags": "Risk flags",
+      "openPanelHint": "Approve, reject or run the regression harness in the Prompt Evolution panel at the bottom of the tab.",
+      "evolvedBadge": "Evolved prompt",
+      "evolvedBadgeTooltip": "This answer used an LLM-evolved system prompt approved by a human.",
+      "panel": {
+        "title": "Prompt Evolution (governance)",
+        "lead": "When the human writes critical feedback during a re-run, they can ask LLM #2 to propose a permanent revision to the task's base system prompt. Nothing changes until a human approves here. Approved revisions feed all future rounds; rollback is one click away. Audit log persists every action.",
+        "filterStatus": "Status",
+        "filterTask": "Task",
+        "all": "all",
+        "refresh": "Refresh",
+        "empty": "No revisions yet. Write feedback under any AI answer above and click 'Propose persistent revision' to create the first one.",
+        "approve": "Approve",
+        "reject": "Reject",
+        "archive": "Archive (reject)",
+        "rollback": "Rollback (re-activate)",
+        "runRegression": "Run regression",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "rejectPrompt": "Why are you rejecting this revision? (optional)",
+        "rollbackPrompt": "Why rolling back? (optional, shows in audit log)",
+        "rejectedBecause": "Rejected because",
+        "basePrompt": "Base (current) prompt",
+        "proposedPrompt": "Proposed prompt",
+        "humanFeedback": "Human feedback",
+        "previousAi": "Previous AI answer",
+        "regressionTitle": "Regression harness",
+        "showSamples": "Show per-sample scores"
+      }
+    },
     "future": {
       "kicker": "Future improvements",
-      "lead": "Previously parked items (B + C below) are now implemented. Option A anchors + this changelog remain for maintainers.",
+      "lead": "Previously parked items (B + C below) are now implemented; Phase E adds persistent prompt evolution with a human-in-the-loop governance panel. Option A anchors + this changelog remain for maintainers.",
       "tradeoffPrefix": "Why deferred (historical)",
       "ideas": [
         {
-          "status": "Shipped · Option B — Re-run with feedback (ephemeral; base prompts unchanged).",
+          "status": "Shipped · Option B (ephemeral) + Option C (persistent prompt evolution, Phase E) — both feedback paths are now live.",
           "title": "Per-round feedback loop with AI self-improvement",
           "summary": "A textarea under 'Who won this round?' where the human writes improvement advice for the AI. Three design flavours were considered, with different risk profiles:",
           "options": [
@@ -2117,15 +2155,15 @@
               "text": "Store feedback as {task, text, timestamp} entries. No prompt change. Exported with the round log for manual review after the workshop. Lowest risk, lowest live-demo value."
             },
             {
-              "label": "B · Ephemeral injection (preferred)",
+              "label": "B · Ephemeral injection (shipped)",
               "text": "A 'Re-run with feedback' button sends the previous AI answer + the human's critique back to the model for a second attempt, same round only. The base prompt is untouched. Biggest live-demo moment, zero drift between rounds."
             },
             {
-              "label": "C · Persistent prompt evolution",
-              "text": "Feedback drives a second LLM call that proposes a diff to the task's system prompt. A human approves; the prompt is versioned in MongoDB with rollback. Affects all future rounds."
+              "label": "C · Persistent prompt evolution (shipped · Phase E)",
+              "text": "Feedback drives a second LLM call that proposes a diff to the task's system prompt. A human approves in the governance panel; the prompt is versioned in MongoDB with audit log + rollback. A small regression harness (3 curated samples per task, mechanical scoring on keywords + length + markdown) runs base vs proposed side-by-side before the human decides. Affects all future rounds."
             }
           ],
-          "tradeoff": "Option C (persistent prompt evolution in MongoDB) remains deliberately unimplemented: without a regression harness it risks silent drift. Collect richer signal with the shipped 'Re-run with feedback' before attempting persistent diffs."
+          "tradeoff": "Option C originally parked because — without a regression harness — it risks silent drift. Phase E ships it with that harness baked in, plus a refusal path on the LLM side and explicit risk-flag surfacing. Approval is always a human click."
         },
         {
           "status": "Shipped · Option C — Local-only PDF RAG when API provider is ItemAI / ItemServerAI (BM25 over docs-ISTQB/). Cloud providers stay on curated anchors.",

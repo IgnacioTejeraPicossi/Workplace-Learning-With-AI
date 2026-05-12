@@ -3003,13 +3003,51 @@
         }
       ]
     },
+    "evolve": {
+      "proposeBtn": "Foreslå vedvarende revisjon",
+      "proposing": "Foreslår…",
+      "proposeTooltip": "Be LLM #2 om å foreslå en permanent revisjon av oppgavens basis-prompt. Krever menneskelig godkjenning.",
+      "errorPrefix": "Prompt-evolusjonen feilet",
+      "pendingTitle": "Revisjon foreslått (venter på godkjenning)",
+      "refusedTitle": "LLM avslo denne revisjonen",
+      "rationale": "Begrunnelse",
+      "riskFlags": "Risikoflagg",
+      "openPanelHint": "Godkjenn, avvis eller kjør regresjons-rammeverket i Prompt-evolusjonspanelet nederst på fanen.",
+      "evolvedBadge": "Evolvert prompt",
+      "evolvedBadgeTooltip": "Dette svaret brukte en LLM-evolvert system-prompt godkjent av et menneske.",
+      "panel": {
+        "title": "Prompt-evolusjon (styring)",
+        "lead": "Når mennesket skriver kritisk tilbakemelding i en re-kjøring, kan de be LLM #2 om å foreslå en permanent revisjon av oppgavens basis-prompt. Ingenting endres før et menneske godkjenner her. Godkjente revisjoner styrer alle framtidige runder; rollback er ett klikk unna. Logg lagres for hver handling.",
+        "filterStatus": "Status",
+        "filterTask": "Oppgave",
+        "all": "alle",
+        "refresh": "Last på nytt",
+        "empty": "Ingen revisjoner ennå. Skriv tilbakemelding under et KI-svar over og klikk «Foreslå vedvarende revisjon» for å lage den første.",
+        "approve": "Godkjenn",
+        "reject": "Avvis",
+        "archive": "Arkiver (avvis)",
+        "rollback": "Rollback (reaktiver)",
+        "runRegression": "Kjør regresjon",
+        "expand": "Utvid",
+        "collapse": "Skjul",
+        "rejectPrompt": "Hvorfor avviser du denne revisjonen? (valgfritt)",
+        "rollbackPrompt": "Hvorfor rullbar du tilbake? (valgfritt, lagres i logg)",
+        "rejectedBecause": "Avvist fordi",
+        "basePrompt": "Basis (nåværende) prompt",
+        "proposedPrompt": "Foreslått prompt",
+        "humanFeedback": "Menneskelig tilbakemelding",
+        "previousAi": "Forrige KI-svar",
+        "regressionTitle": "Regresjons-rammeverk",
+        "showSamples": "Vis per-eksempel-score"
+      }
+    },
     "future": {
       "kicker": "Framtidige forbedringer",
-      "lead": "Tidligere parkerte punkt (B + C under) er nå implementert. Alternativ A (anchors) og denne loggen er bevart for forvaltere.",
+      "lead": "Tidligere parkerte punkt (B + C under) er nå implementert; fase E legger til vedvarende prompt-evolusjon med menneske-i-løkken-styringspanel. Alternativ A (anchors) og denne loggen er bevart for forvaltere.",
       "tradeoffPrefix": "Hvorfor utsatt (historisk)",
       "ideas": [
         {
-          "status": "Levert · Alternativ B — Kjør på nytt med tilbakemelding (efemer; basis-promptene urørt).",
+          "status": "Levert · Alternativ B (efemer) + Alternativ C (vedvarende prompt-evolusjon, fase E) — begge tilbakemeldingsveiene er nå i drift.",
           "title": "Tilbakemeldingssløyfe per runde med selvforbedrende KI",
           "summary": "Et tekstfelt under «Hvem vant denne runden?» der mennesket skriver forbedringsforslag til KI-en. Tre design-varianter ble vurdert, med forskjellig risikoprofil:",
           "options": [
@@ -3018,15 +3056,15 @@
               "text": "Lagre tilbakemeldinger som {task, tekst, tidsstempel}. Ingen prompt-endring. Eksporteres sammen med rundeloggen for manuell gjennomgang etter workshopen. Lavest risiko, lavest live-demo-verdi."
             },
             {
-              "label": "B · Efemer injeksjon (foretrukket)",
+              "label": "B · Efemer injeksjon (levert)",
               "text": "En «Kjør på nytt med tilbakemelding»-knapp sender KI-ens forrige svar + menneskets kritikk tilbake til modellen for et andreforsøk, kun i samme runde. Basis-prompten er urørt. Sterkeste live-demo-øyeblikk, null drift mellom runder."
             },
             {
-              "label": "C · Vedvarende prompt-evolusjon",
-              "text": "Tilbakemeldingen driver et andre LLM-kall som foreslår en diff til oppgavens system-prompt. Et menneske godkjenner; prompten versjoneres i MongoDB med rollback. Påvirker alle framtidige runder."
+              "label": "C · Vedvarende prompt-evolusjon (levert · fase E)",
+              "text": "Tilbakemeldingen driver et andre LLM-kall som foreslår en diff til oppgavens system-prompt. Et menneske godkjenner i styringspanelet; prompten versjoneres i MongoDB med logg + rollback. Et lite regresjons-rammeverk (3 håndplukkede eksempler per oppgave, mekanisk scoring på nøkkelord + lengde + markdown) kjører basis vs forslag side om side før mennesket beslutter. Påvirker alle framtidige runder."
             }
           ],
-          "tradeoff": "Alternativ C (vedvarende prompt-evolusjon i MongoDB) er fortsatt med vilje ikke implementert: uten regresjons­rammeverk risikerer vi stille drift. Samle rikere signal med den leverte «Kjør på nytt med tilbakemelding» før dere prøver vedvarende diffs."
+          "tradeoff": "Alternativ C ble opprinnelig parkert fordi — uten regresjons-rammeverk — risikerer vi stille drift. Fase E leverer det med rammeverket innebygd, pluss en avslagssti på LLM-siden og eksplisitt visning av risikoflagg. Godkjenning er alltid et menneske-klikk."
         },
         {
           "status": "Levert · Alternativ C — Lokal PDF-RAG når API-leverandør er ItemAI / ItemServerAI (BM25 over docs-ISTQB/). Sky-leverandører beholder kun håndplukkede anchors.",

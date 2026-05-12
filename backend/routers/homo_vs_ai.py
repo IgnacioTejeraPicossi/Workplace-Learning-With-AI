@@ -92,6 +92,19 @@ class IstqbAnchor(BaseModel):
     summary: str = Field(..., description="One-sentence summary of what the section contributes to this task.")
 
 
+class PromptSourceMeta(BaseModel):
+    """Phase E — tells the UI whether the system prompt for this round came
+    from TASK_SPECS (baked-in) or from a human-approved evolved revision.
+    Surfaced in the frontend as a small '🧬 evolved' badge next to the AI's
+    answer when source=='evolved'."""
+
+    source: Literal["baked_in", "evolved"] = "baked_in"
+    revision_id: Optional[str] = None
+    version: Optional[int] = None
+    approved_by: Optional[str] = None
+    approved_at: Optional[str] = None
+
+
 class ChallengeResponse(BaseModel):
     task: str
     label: str
@@ -103,6 +116,10 @@ class ChallengeResponse(BaseModel):
     istqb_rag: IstqbRagMeta = Field(
         default_factory=IstqbRagMeta,
         description="Whether local PDF excerpts were retrieved (only when API provider is ItemAI/ItemServerAI).",
+    )
+    prompt_source: PromptSourceMeta = Field(
+        default_factory=PromptSourceMeta,
+        description="Whether the prompt was baked-in TASK_SPECS or an evolved revision (Phase E).",
     )
 
 

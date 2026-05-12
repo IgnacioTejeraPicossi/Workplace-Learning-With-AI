@@ -1,0 +1,248 @@
+{
+  "_meta": {
+    "purpose": "Curated regression inputs for the Homo vs AI prompt-evolution feature. When a new prompt revision is proposed, the harness runs both the BASE and PROPOSED prompts against these inputs and scores them on (a) keyword coverage, (b) length sanity, (c) markdown structure. The result helps the human reviewer decide whether to approve the revision without silently breaking previously-working flows.",
+    "phase": "E",
+    "scoring": {
+      "must_appear": "Each listed keyword must appear (case-insensitive, substring match) in the output to count as a hit. Score = hits / total_keywords.",
+      "min_chars": "Output must be at least this many characters — guards against the AI collapsing into an apology or a one-liner.",
+      "max_chars": "Output must be at most this many characters — guards against runaway verbosity that breaks the UI.",
+      "must_contain_markdown": "Output must contain at least one markdown structural element (bullet list, numbered list, table, or heading) — guards against prose-only regressions on tasks where structured output is expected."
+    },
+    "interpretation": {
+      "pass": "All criteria met for this sample.",
+      "warn": "must_appear partial (>=50%) OR length out of band but other criteria met.",
+      "fail": "must_appear <50% OR output empty / structure missing entirely."
+    },
+    "note": "Keep this list SMALL (3 samples per task) so the harness runs fast — workshop demos can't wait 30 seconds. Add more samples only after a real regression slipped through."
+  },
+  "scenarios": [
+    {
+      "id": "scenarios-001",
+      "input": "As a registered user I want to reset my password via email so that I can regain access if I forget it.",
+      "must_appear": ["happy", "negative", "boundary", "P1"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "scenarios-002",
+      "input": "Add a 'Donate now' button to the homepage hero that opens the donation flow with the campaign of the month preselected.",
+      "must_appear": ["accessibility", "scenario", "priority"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "scenarios-003",
+      "input": "The volunteer signup form must accept Norwegian phone numbers (+47) and validate them client-side before submission.",
+      "must_appear": ["boundary", "negative", "validation"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "ambiguities-001",
+      "input": "The system must process payments quickly and securely for all users.",
+      "must_appear": ["quickly", "secure", "user", "assumption"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "ambiguities-002",
+      "input": "Admin users should be able to manage content as needed.",
+      "must_appear": ["admin", "manage", "ambiguous"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "ambiguities-003",
+      "input": "The new feature must work for all browsers and be done by end of sprint.",
+      "must_appear": ["browser", "done", "scope"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "followups": [
+    {
+      "id": "followups-001",
+      "input": "User reports that the donation form crashes on iPhone Safari sometimes.",
+      "must_appear": ["reproduction", "version", "expected"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "followups-002",
+      "input": "Editorial team says CMS preview shows wrong image on local distrikt pages.",
+      "must_appear": ["which", "reproduction", "impact"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "followups-003",
+      "input": "Volunteer cannot log in. Says 'it just doesn't work'.",
+      "must_appear": ["browser", "error", "expected"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "tests_from_code": [
+    {
+      "id": "tests_from_code-001",
+      "input": "function divide(a, b) { if (b === 0) throw new Error('div0'); return a / b; }",
+      "must_appear": ["happy", "edge", "boundary"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "tests_from_code-002",
+      "input": "def validate_email(s): return '@' in s and '.' in s.split('@')[-1]",
+      "must_appear": ["edge", "null", "invalid"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "tests_from_code-003",
+      "input": "function formatPrice(cents) { return (cents / 100).toFixed(2) + ' NOK'; }",
+      "must_appear": ["zero", "negative", "boundary"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "risk": [
+    {
+      "id": "risk-001",
+      "input": "Sprint 12 release contains: 1) new Vipps integration, 2) accessibility fixes on contact form, 3) editorial UX cleanup, 4) typography token update.",
+      "must_appear": ["P1", "vipps", "risk"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "risk-002",
+      "input": "Hotfix release: 1) GDPR consent banner update, 2) image CDN switch, 3) typo on About page.",
+      "must_appear": ["gdpr", "priority", "risk"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "exploratory": [
+    {
+      "id": "exploratory-001",
+      "input": "We have a new search box on the homepage that searches across local services, articles and campaigns.",
+      "must_appear": ["charter", "exploratory", "session"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "exploratory-002",
+      "input": "The donation flow now supports recurring monthly donations via Vipps subscription.",
+      "must_appear": ["charter", "boundary", "explore"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "automation": [
+    {
+      "id": "automation-001",
+      "input": "Given a logged-in volunteer, when they navigate to /min-side, then their upcoming shifts should be listed by date.",
+      "must_appear": ["given", "when", "then"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "automation-002",
+      "input": "Given a guest user, when they submit the contact form with invalid email, then a clear error appears next to the email field.",
+      "must_appear": ["assert", "form", "error"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "testData": [
+    {
+      "id": "testData-001",
+      "input": "We need test users for the volunteer signup flow: realistic Norwegian names, addresses, and phone numbers.",
+      "must_appear": ["pii", "synthetic", "norwegian"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "testData-002",
+      "input": "Generate donation amounts for testing the Fundy + Vipps integration, covering boundary cases.",
+      "must_appear": ["boundary", "amount", "currency"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "oracle": [
+    {
+      "id": "oracle-001",
+      "input": "When a user clicks 'Cancel' during a 3-step donation flow, what should happen?",
+      "must_appear": ["consistency", "user", "oracle"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "oracle-002",
+      "input": "If a volunteer submits a signup form twice in quick succession, what is the correct behaviour?",
+      "must_appear": ["duplicate", "idempotent", "expected"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "triage": [
+    {
+      "id": "triage-001",
+      "input": "Bug: 'On Safari iOS 17, the Donate button is unresponsive after submitting the amount form. Refresh fixes it. Affects ~3% of donation sessions per analytics.'",
+      "must_appear": ["severity", "priority", "impact"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "triage-002",
+      "input": "Bug: 'Footer copyright year shows 2024 instead of 2026. All pages.'",
+      "must_appear": ["severity", "priority", "low"],
+      "min_chars": 200,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ],
+  "accessibility": [
+    {
+      "id": "accessibility-001",
+      "input": "Review the donation form: 4 fields (amount, recurring toggle, email, accept terms), submit button, inline validation.",
+      "must_appear": ["wcag", "keyboard", "screen reader"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    },
+    {
+      "id": "accessibility-002",
+      "input": "Review the main navigation: hamburger menu on mobile, dropdown menus on desktop, search icon, language switcher.",
+      "must_appear": ["focus", "aria", "keyboard"],
+      "min_chars": 250,
+      "max_chars": 4000,
+      "must_contain_markdown": true
+    }
+  ]
+}

@@ -980,13 +980,51 @@
         }
       ]
     },
+    "evolve": {
+      "proposeBtn": "Proponer revisión persistente",
+      "proposing": "Proponiendo…",
+      "proposeTooltip": "Pide a LLM #2 que proponga una revisión permanente del prompt base de esta tarea. Requiere aprobación humana.",
+      "errorPrefix": "La evolución del prompt falló",
+      "pendingTitle": "Revisión propuesta (pendiente de aprobación humana)",
+      "refusedTitle": "El LLM rechazó esta revisión",
+      "rationale": "Justificación",
+      "riskFlags": "Banderas de riesgo",
+      "openPanelHint": "Aprueba, rechaza o ejecuta la batería de regresión en el panel de Evolución de Prompts al final de la pestaña.",
+      "evolvedBadge": "Prompt evolucionado",
+      "evolvedBadgeTooltip": "Esta respuesta usó un prompt evolucionado por LLM y aprobado por un humano.",
+      "panel": {
+        "title": "Evolución de Prompts (gobernanza)",
+        "lead": "Cuando el humano escribe retroalimentación crítica durante una re-ejecución, puede pedir a LLM #2 que proponga una revisión permanente del prompt base de la tarea. Nada cambia hasta que un humano apruebe aquí. Las revisiones aprobadas alimentan todas las rondas futuras; el rollback está a un clic. Cada acción se registra en el log de auditoría.",
+        "filterStatus": "Estado",
+        "filterTask": "Tarea",
+        "all": "todas",
+        "refresh": "Refrescar",
+        "empty": "Aún no hay revisiones. Escribe retroalimentación bajo cualquier respuesta de la IA arriba y pulsa 'Proponer revisión persistente' para crear la primera.",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "archive": "Archivar (rechazar)",
+        "rollback": "Rollback (reactivar)",
+        "runRegression": "Ejecutar regresión",
+        "expand": "Expandir",
+        "collapse": "Colapsar",
+        "rejectPrompt": "¿Por qué rechazas esta revisión? (opcional)",
+        "rollbackPrompt": "¿Por qué haces rollback? (opcional, queda en el log)",
+        "rejectedBecause": "Rechazada porque",
+        "basePrompt": "Prompt base (actual)",
+        "proposedPrompt": "Prompt propuesto",
+        "humanFeedback": "Retroalimentación humana",
+        "previousAi": "Respuesta IA anterior",
+        "regressionTitle": "Batería de regresión",
+        "showSamples": "Mostrar puntuación por muestra"
+      }
+    },
     "future": {
       "kicker": "Mejoras futuras",
-      "lead": "Los puntos antes aparcados (B + C abajo) ya están implementados. Las anclas A y esta nota siguen para quien mantenga el módulo.",
+      "lead": "Los puntos antes aparcados (B + C abajo) ya están implementados; la fase E añade evolución persistente de prompts con panel de gobernanza humano-en-el-bucle. Las anclas A y esta nota siguen para quien mantenga el módulo.",
       "tradeoffPrefix": "Por qué se aplazó (histórico)",
       "ideas": [
         {
-          "status": "Entregado · Opción B — Re-ejecutar con retroalimentación (efímero; prompts base intactos).",
+          "status": "Entregado · Opción B (efímera) + Opción C (evolución persistente del prompt, fase E) — ambos caminos de retroalimentación ya están en producción.",
           "title": "Bucle de retroalimentación por ronda con automejora de la IA",
           "summary": "Un área de texto bajo '¿Quién ganó esta ronda?' donde el humano escribe consejos de mejora para la IA. Se consideraron tres variantes de diseño, con diferentes perfiles de riesgo:",
           "options": [
@@ -995,15 +1033,15 @@
               "text": "Almacena la retroalimentación como entradas {tarea, texto, marca de tiempo}. Sin cambio de prompt. Exportado con el registro de rondas para revisión manual después del taller. Menor riesgo, menor valor de demostración en vivo."
             },
             {
-              "label": "B · Inyección efímera (preferida)",
+              "label": "B · Inyección efímera (entregada)",
               "text": "Un botón 'Volver a ejecutar con retroalimentación' envía la respuesta anterior de la IA + la crítica del humano de vuelta al modelo para un segundo intento, solo en esa ronda. El prompt base no se toca. Mayor momento de demostración en vivo, cero deriva entre rondas."
             },
             {
-              "label": "C · Evolución persistente del prompt",
-              "text": "La retroalimentación impulsa una segunda llamada LLM que propone una diferencia en el prompt del sistema de la tarea. Un humano lo aprueba; el prompt se versiona en MongoDB con rollback. Afecta a todas las rondas futuras."
+              "label": "C · Evolución persistente del prompt (entregada · fase E)",
+              "text": "La retroalimentación impulsa una segunda llamada LLM que propone una diferencia en el prompt del sistema de la tarea. Un humano aprueba en el panel de gobernanza; el prompt se versiona en MongoDB con log + rollback. Una pequeña batería de regresión (3 muestras curadas por tarea, scoring mecánico por keywords + longitud + markdown) compara base vs propuesta lado a lado antes de que el humano decida. Afecta a todas las rondas futuras."
             }
           ],
-          "tradeoff": "La opción C (evolución persistente del prompt en MongoDB) sigue sin implementar a propósito: sin batería de regresión hay riesgo de deriva silenciosa. Recopila mejor señal con el 'Re-ejecutar con retroalimentación' entregado antes de diffs persistentes."
+          "tradeoff": "La opción C se aparcó originalmente porque — sin batería de regresión — hay riesgo de deriva silenciosa. La fase E la entrega con esa batería integrada, además de un camino de rechazo en el lado del LLM y exposición explícita de banderas de riesgo. La aprobación siempre es un clic humano."
         },
         {
           "status": "Entregado · Opción C — RAG PDF solo local cuando el proveedor es ItemAI / ItemServerAI (BM25 sobre docs-ISTQB/). En la nube solo anclas curadas.",

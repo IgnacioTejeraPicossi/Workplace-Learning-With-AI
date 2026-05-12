@@ -135,3 +135,83 @@ export async function judgeTestingRound({ task, humanAnswer, aiAnswer, userInput
   }
   return res.json();
 }
+
+// ---------------------------------------------------------------------------
+// Phase E — Prompt Evolution (governance).
+//
+// 6 endpoints exposed under /api/agi/homo-vs-ai/prompt-evolution/*. The flow
+// is intentionally human-in-the-loop: the human writes feedback during a
+// re-run, then clicks "Propose prompt revision" to ask LLM #2 for a permanent
+// improvement to the task's base system prompt. Pending revisions can be
+// approved, rejected or rolled back from the governance panel inside the
+// HomoSapiensVsAI tab.
+// ---------------------------------------------------------------------------
+
+async function _peJson(method, path, body) {
+  const init = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body !== undefined) init.body = JSON.stringify(body);
+  const res = await fetchWithAuth(`${API_BASE}${path}`, init);
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const data = await res.json();
+      detail = data.detail || '';
+    } catch (_) { /* ignore */ }
+    throw new Error(detail || `Prompt evolution call failed (${res.status})`);
+  }
+  return res.json();
+}
+
+export function proposePromptRevision({ task, userInput, previousAiOutput, humanFeedback, actor }) {
+  return _peJson('POST', '/api/agi/homo-vs-ai/prompt-evolution/propose', {
+    task,
+    user_input: userInput,
+    previous_ai_output: previousAiOutput,
+    human_feedback: humanFeedback,
+    actor: actor || 'workshop-host',
+  });
+}
+
+export function listPromptRevisions({ task, status, limit = 50 } = {}) {
+  const params = new URLSearchParams();
+  if (task) params.set('task', task);
+  if (status) params.set('status', status);
+  if (limit) params.set('limit', String(limit));
+  const qs = params.toString();
+  const path = `/api/agi/homo-vs-ai/prompt-evolution/revisions${qs ? `?${qs}` : ''}`;
+  return _peJson('GET', path);
+}
+
+export function approvePromptRevision(revisionId, { approver, note } = {}) {
+  return _peJson('POST', `/api/agi/homo-vs-ai/prompt-evolution/${revisionId}/approve`, {
+    approver: approver || 'workshop-host',
+    note: note || '',
+  });
+}
+
+export function rejectPromptRevision(revisionId, { reviewer, reason } = {}) {
+  return _peJson('POST', `/api/agi/homo-vs-ai/prompt-evolution/${revisionId}/reject`, {
+    reviewer: reviewer || 'workshop-host',
+    reason: reason || '',
+  });
+}
+
+export function rollbackPromptRevision(revisionId, { actor, reason } = {}) {
+  return _peJson('POST', `/api/agi/homo-vs-ai/prompt-evolution/${revisionId}/rollback`, {
+    actor: actor || 'workshop-host',
+    reason: reason || '',
+  });
+}
+
+export function runRegressionHarness(revisionId, { maxSamples = 3 } = {}) {
+  return _peJson('POST', `/api/agi/homo-vs-ai/prompt-evolution/${revisionId}/regression`, {
+    max_samples: maxSamples,
+  });
+}
+
+export function getActivePromptForTask(task) {
+  return _peJson('GET', `/api/agi/homo-vs-ai/prompt-evolution/active/${encodeURIComponent(task)}`);
+}

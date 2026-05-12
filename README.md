@@ -153,7 +153,8 @@ Sections on a single scroll:
 4. **Trust framework** — 7-row decision grid ("AI excels when… / Humans excel when… / Practical rule") by dimension: context, risk, ambiguity, novelty, volume, judgement, accountability.
 5. **Workshop Scoreboard** — configurable groups, round log with notes, undo, reset, JSON export. Votes from the head-to-head demos feed in automatically and now also include `task` + `aiJudge` per round, so the exported JSON is an auditable record of how often the room and the AI agreed.
 6. **Speaker Crib Sheet** (collapsible, speaker-only) — 60-second opener, 4 real quotes (Bach, Kaner, Hendrycks, Amodei) with "use when" hints, 5 likely audience questions + prepared answers, and a closer.
-7. **Future improvements** footnote — still a muted parking lot at the bottom, but **two items formerly "parked" are now shipped (1.8.0)**: (a) **Option B** — ephemeral *Re-run with feedback* under each round (paired `previous_ai_output` + `feedback` on `/challenge`; base `TASK_SPECS` untouched). (b) **Option C** — **local-only ISTQB PDF RAG** when API provider is ItemAI / ItemServerAI: BM25 or token-overlap retrieval over `docs-ISTQB/*.pdf`, plus curated anchors for everyone; cloud providers still get anchors only. **Persistent prompt evolution (former Option C feedback)** and **full cloud RAG** remain deliberately unimplemented — see footnote copy in the app.
+7. **Prompt Evolution panel (Phase E, NEW)** — governance section between the Speaker Crib Sheet and the Future Improvements footer. Closes the **Option-C feedback loop** that was deliberately deferred for "silent drift" risk. When the human writes critical feedback during a re-run, a yellow **🧬 Propose persistent revision** button asks LLM #2 to suggest a permanent diff to the task's base `TASK_SPECS` prompt. The proposal lands as `status="pending"` in `homo_vs_ai_prompt_revisions` collection, with full audit log in `homo_vs_ai_prompt_audit`. The workshop host approves / rejects / runs a regression harness (3 curated samples per task scored mechanically on keyword coverage + length + markdown structure) / rolls back from the same panel. Approved revisions feed all future rounds; `run_challenge` reads from Mongo with graceful fallback to TASK_SPECS when no revision is active or Mongo is unavailable. The LLM may **refuse** unsafe revisions (returns `status: refused` with `refusal_reason` + risk flags); refusals are persisted for the audit trail. A `🧬 Evolved prompt v3` badge appears next to AI answers that used an evolved prompt.
+8. **Future improvements** footnote — still a muted parking lot at the bottom. The shipped items are: **Option B** (1.8.0, ephemeral *Re-run with feedback*), **Local ISTQB PDF RAG** (1.8.0, BM25 over `docs-ISTQB/*.pdf` for ItemAI/ItemServerAI providers; cloud stays on anchors), and now **Option C — persistent prompt evolution (Phase E)** described above. **Full cloud RAG** with embeddings + vector DB remains deliberately unimplemented (ISTQB licensing is the blocker).
 
 **ISTQB-anchored prompts (1.7.1):** every AI call in the module is now grounded in real ISTQB syllabi sections (CTFL v4.0 + CT-AI v1.0), plus a Norwegian terminology block from the official ISTQB-NO v2.4 glossary when the session runs in Norwegian. A `📚 ISTQB-anchored` badge appears on every round card, on the Problem Router result, and next to the AI Judge verdict — clicking it reveals the exact sections used. Implemented as **Option A (curated anchors)**: ~80-150 tokens per prompt, tolerant loader, compliant with ISTQB licensing (only curated short summaries live in the repo — the full PDFs stay gitignored under `docs-ISTQB/`). See `backend/data/istqb_anchors.json` + `backend/services/istqb_anchors.py`.
 
@@ -161,17 +162,29 @@ Sections on a single scroll:
 
 Fully bilingual **EN / NO / ES** for this tab: Norwegian stays native-quality for testers; Spanish covers the same `homoVsAi.*` keys (including feedback re-run + RAG hints).
 
-Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` + `backend/services/istqb_anchors.py` + `backend/services/istqb_local_rag.py`
-- `POST /api/agi/homo-vs-ai/challenge` — run one of 10 testing rounds; optional **`previous_ai_output` + `feedback`** for ephemeral re-run; response includes `istqb_anchors: IstqbAnchor[]` and **`istqb_rag: IstqbRagMeta`**
+Backend: `backend/services/homo_vs_ai_service.py` + `backend/routers/homo_vs_ai.py` + `backend/services/istqb_anchors.py` + `backend/services/istqb_local_rag.py` + **`backend/services/prompt_evolution.py`** (Phase E) + **`backend/routers/prompt_evolution.py`** (Phase E) + `backend/data/regression_samples.json` (curated harness inputs, 3 per task)
+- `POST /api/agi/homo-vs-ai/challenge` — run one of 10 testing rounds; optional **`previous_ai_output` + `feedback`** for ephemeral re-run; response includes `istqb_anchors: IstqbAnchor[]`, **`istqb_rag: IstqbRagMeta`** and **`prompt_source: { source: 'baked_in' | 'evolved', revision_id?, version?, approved_by?, approved_at? }`** (Phase E)
 - `POST /api/agi/homo-vs-ai/route` — Problem Router (free text → best round; anchors + optional local RAG)
 - `POST /api/agi/homo-vs-ai/judge` — AI Judge (advisory verdict; anchors + optional local RAG)
 - `GET  /api/agi/homo-vs-ai/tasks` — discovery
 - `GET  /api/agi/homo-vs-ai/istqb-rag-status` — PDF/chunk counts and retriever mode (for demos with local LM)
+- **`POST /api/agi/homo-vs-ai/prompt-evolution/propose`** — LLM #2 proposes a revised system prompt for a task; persists pending or refused (Phase E)
+- **`GET  /api/agi/homo-vs-ai/prompt-evolution/revisions`** — list with `?task=` + `?status=` filters
+- **`POST /api/agi/homo-vs-ai/prompt-evolution/{id}/approve`** — human approval gate; supersedes prior active
+- **`POST /api/agi/homo-vs-ai/prompt-evolution/{id}/reject`** — reject with reason (audit log)
+- **`POST /api/agi/homo-vs-ai/prompt-evolution/{id}/regression`** — runs the curated harness base vs proposed, returns side-by-side scores
+- **`POST /api/agi/homo-vs-ai/prompt-evolution/{id}/rollback`** — re-activate a previously superseded revision
+- **`GET  /api/agi/homo-vs-ai/prompt-evolution/active/{task}`** — debug helper: resolve the currently active prompt for a task
 
-Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (including `IstqbBadge`, **`IstqbRagHint`**, feedback textarea + **Re-run with feedback**)
+Mongo collections (Phase E): `homo_vs_ai_prompt_revisions` (versioned prompt history, status: pending/active/rejected/superseded/refused) + `homo_vs_ai_prompt_audit` (append-only action log).
+
+Frontend: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (including `IstqbBadge`, `IstqbRagHint`, feedback textarea + **Re-run with feedback**, **Phase E** `PromptEvolutionPanel` + `PromptBox` + `RegressionView` + the yellow **🧬 Propose persistent revision** button + green **🧬 Evolved prompt** badge)
+Frontend API helpers: `frontend/src/api/agiApi.js` — `proposePromptRevision / listPromptRevisions / approvePromptRevision / rejectPromptRevision / rollbackPromptRevision / runRegressionHarness / getActivePromptForTask`
 Tab wiring: `frontend/src/pages/help/AgiProgressPage.jsx`
 Sidebar wiring: `frontend/src/Sidebar.jsx` (top-level `agi-progress` entry, group `developer`, icon `bar-chart`)
-i18n: top-level `homoVsAi.*` block in **EN, NO, and ES** `common.json` (router, judge, scoreboard, future, **istqb**, demos.feedback*), plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`
+i18n: top-level `homoVsAi.*` block in **EN, NO, and ES** `common.json` (router, judge, scoreboard, future, **istqb**, demos.feedback*, **evolve.* (Phase E, 34 keys × 3 locales)**), plus `help.agiTabs.homoVsAi` and `sidebar.agiProgress`
+
+**Smoke**: `python -m backend.tests.smoke_prompt_evolution` runs 8 checks covering `_safe_parse_json` robustness, `_score_output` determinism, `get_active_prompt` backward-compat, propose→reject state transitions, regression harness graceful degradation, router registration, and `ChallengeResponse.prompt_source` default — all without requiring Mongo (mock-first) and without requiring an LLM (auto-refusal path).
 
 > **Running this at SOCO?** A full presenter checklist (pre-flight, 45-minute run order, what to do if the AI connection drops, post-workshop export) lives in [`docs/README_FULL.md` → Tab 4 → *How to run this in a live workshop*](docs/README_FULL.md#tab-4--homo-sapiens-vs-ki-i-test-soco-workshop-companion).
 
