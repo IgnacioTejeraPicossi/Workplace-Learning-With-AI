@@ -12,6 +12,17 @@ const PROFILES = [
   { key: 'profileSoak',     icon: '⏳', color: '#8b5cf6' },
 ];
 
+// Phase D — Load-testing tool selector. k6 (existing) is protocol-level HTTP;
+// Loadster runs real browsers so it captures JS hydration + SPA navigation,
+// which matters for the NextJS + Designsystemet front-end where editorial
+// "slowness" usually lives in client-side code, not in HTTP throughput.
+const TOOLS = [
+  { key: 'k6',       icon: '🔥', color: '#ea580c',
+    endpoints: { generate: 'generate-k6-script', run: 'run-k6' } },
+  { key: 'loadster', icon: '🌐', color: '#2563eb',
+    endpoints: { generate: 'generate-loadster-script', run: 'run-loadster' } },
+];
+
 const SCENARIOS = [
   { key: 'scenarioPublic',     icon: '🌐' }, { key: 'scenarioDonation',  icon: '💝' },
   { key: 'scenarioVolunteer',  icon: '🙋' }, { key: 'scenarioSearch',    icon: '🔎' },
@@ -22,6 +33,7 @@ const SCENARIOS = [
 
 const StressTest = ({ environment, executionMode }) => {
   const { t, i18n } = useTranslation();
+  const [tool, setTool] = useState('k6');  // Phase D: 'k6' | 'loadster'
   const [profile, setProfile] = useState('profileNormal');
   const [scenarios, setScenarios] = useState(['scenarioDonation']);
   const [generating, setGenerating] = useState(false);
@@ -32,10 +44,13 @@ const StressTest = ({ environment, executionMode }) => {
   const [resilienceRunning, setResilienceRunning] = useState(false);
   const [resilience, setResilience] = useState(null);
 
+  const activeTool = TOOLS.find(t => t.key === tool) || TOOLS[0];
+
   const toggleScenario = (s) => setScenarios(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
-  const call = async (path, setter) => {
+  const call = async (action, setter) => {
     setter(true); setResult(null);
+    const path = activeTool.endpoints[action];
     try {
       const res = await fetch(`${API}/${path}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -76,6 +91,43 @@ const StressTest = ({ environment, executionMode }) => {
           mode={executionMode}
           gradient="linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #b45309 100%)"
         />
+
+        {/* Phase D — Load-testing tool selector (k6 vs Loadster) */}
+        <div style={panel}>
+          <h3 style={panelTitle}>🛠️ {t('redCrossWebQaModule.stressTest.toolTitle')}</h3>
+          <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 12px' }}>
+            {t('redCrossWebQaModule.stressTest.toolHint')}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+            {TOOLS.map(tl => {
+              const active = tool === tl.key;
+              return (
+                <label key={tl.key} onClick={() => { setTool(tl.key); setResult(null); }}
+                       style={{
+                         display: 'flex', alignItems: 'center', gap: 12,
+                         padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
+                         backgroundColor: active ? `${tl.color}15` : '#f8fafc',
+                         border: `1px solid ${active ? `${tl.color}80` : '#e2e8f0'}`,
+                         transition: 'all 0.2s',
+                       }}>
+                  <input type="radio" name="loadTool" value={tl.key}
+                    checked={active} onChange={() => setTool(tl.key)}
+                    style={{ accentColor: tl.color }} />
+                  <span style={{ fontSize: 22 }}>{tl.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600,
+                                  color: active ? tl.color : '#1e293b' }}>
+                      {t(`redCrossWebQaModule.stressTest.tool_${tl.key}`)}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2, lineHeight: 1.4 }}>
+                      {t(`redCrossWebQaModule.stressTest.tool_${tl.key}_hint`)}
+                    </div>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
 
         <div style={panel}>
           <h3 style={panelTitle}>🎯 Profile</h3>
@@ -120,12 +172,15 @@ const StressTest = ({ environment, executionMode }) => {
             })}
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button onClick={() => call('generate-k6-script', setGenerating)} disabled={generating} style={primaryBtn(generating)}>
-              {generating ? t('redCrossWebQaModule.common.generating') : t('redCrossWebQaModule.stressTest.btnGenerate')}
+            <button onClick={() => call('generate', setGenerating)} disabled={generating}
+                    style={primaryBtn(generating, activeTool.color)}>
+              {generating ? t('redCrossWebQaModule.common.generating')
+                          : `${activeTool.icon} ${t(`redCrossWebQaModule.stressTest.btnGenerate_${tool}`)}`}
             </button>
             {executionMode === 'execute' && (
-              <button onClick={() => call('run-k6', setRunning)} disabled={running} style={secondaryBtn(running)}>
-                {running ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.stressTest.btnRun')}
+              <button onClick={() => call('run', setRunning)} disabled={running} style={secondaryBtn(running)}>
+                {running ? t('redCrossWebQaModule.common.running')
+                         : t(`redCrossWebQaModule.stressTest.btnRun_${tool}`)}
               </button>
             )}
           </div>
@@ -133,26 +188,55 @@ const StressTest = ({ environment, executionMode }) => {
 
         {result?.status === 'ok' && result.script && (
           <div style={panel}>
-            <h3 style={panelTitle}>📄 {result.filename || 'k6-script.js'}</h3>
+            <h3 style={panelTitle}>
+              📄 {result.filename || (result.tool === 'loadster' ? 'loadster.lhx.json' : 'k6-script.js')}
+              {result.tool === 'loadster' && result.engines && (
+                <span style={enginesPill}>{result.engines} engine{result.engines > 1 ? 's' : ''}</span>
+              )}
+            </h3>
             <div style={codeBlock}>
               <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{result.script}</pre>
             </div>
+            {result.notes && (
+              <div style={{ marginTop: 10, fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
+                {result.notes}
+              </div>
+            )}
           </div>
         )}
 
         {result?.status === 'ok' && result.results && (
           <div style={panel}>
-            <h3 style={panelTitle}>📈 k6 Results</h3>
+            <h3 style={panelTitle}>
+              📈 {result.tool === 'loadster' ? 'Loadster' : 'k6'} Results
+            </h3>
+            {result.differentiator && (
+              <div style={{
+                padding: '10px 14px', borderRadius: 8, marginBottom: 14,
+                backgroundColor: '#eff6ff', border: '1px solid #bfdbfe',
+                fontSize: 12, color: '#1e3a8a', lineHeight: 1.5,
+              }}>
+                <strong>ℹ️ {t('redCrossWebQaModule.stressTest.differentiator')}:</strong> {result.differentiator}
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
-              {Object.entries(result.results).map(([k, v]) => (
-                <div key={k} style={{
-                  padding: 14, borderRadius: 10,
-                  backgroundColor: '#fff7ed', border: '1px solid #fed7aa',
-                }}>
-                  <div style={{ fontSize: 11, color: '#c2410c', textTransform: 'uppercase', fontWeight: 600 }}>{k}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', marginTop: 4 }}>{String(v)}</div>
-                </div>
-              ))}
+              {Object.entries(result.results).map(([k, v]) => {
+                const isLoadster = result.tool === 'loadster';
+                return (
+                  <div key={k} style={{
+                    padding: 14, borderRadius: 10,
+                    backgroundColor: isLoadster ? '#eff6ff' : '#fff7ed',
+                    border: `1px solid ${isLoadster ? '#bfdbfe' : '#fed7aa'}`,
+                  }}>
+                    <div style={{ fontSize: 11,
+                                  color: isLoadster ? '#1d4ed8' : '#c2410c',
+                                  textTransform: 'uppercase', fontWeight: 600 }}>{k}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: '#1e293b', marginTop: 4 }}>
+                      {String(v)}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -266,11 +350,18 @@ const codeBlock = {
   padding: 14, fontFamily: 'ui-monospace, monospace', fontSize: 12,
   overflowX: 'auto',
 };
-const primaryBtn = (disabled) => ({
+// Phase D: primaryBtn now accepts a tool-specific color so the generate
+// button stays orange for k6 and turns blue when Loadster is selected.
+const primaryBtn = (disabled, color = '#ea580c') => ({
   padding: '10px 18px', borderRadius: 8, border: 'none',
-  backgroundColor: disabled ? '#fdba74' : '#ea580c', color: 'white',
+  backgroundColor: disabled ? '#cbd5e1' : color, color: 'white',
   fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
 });
+const enginesPill = {
+  marginLeft: 10, padding: '2px 10px', borderRadius: 999,
+  fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+  backgroundColor: '#dbeafe', color: '#1d4ed8', border: '1px solid #93c5fd',
+};
 const secondaryBtn = (disabled) => ({
   padding: '10px 18px', borderRadius: 8, border: 'none',
   backgroundColor: disabled ? '#94a3b8' : '#1e293b', color: 'white',

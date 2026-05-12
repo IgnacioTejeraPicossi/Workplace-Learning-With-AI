@@ -21,6 +21,8 @@ try:
         run_lighthouse,
         generate_k6_script,
         run_k6,
+        generate_loadster_script,
+        run_loadster,
         run_security_scan,
         run_forms_qa,
         run_content_migration_audit,
@@ -56,6 +58,8 @@ except ImportError:  # pragma: no cover
         run_lighthouse,
         generate_k6_script,
         run_k6,
+        generate_loadster_script,
+        run_loadster,
         run_security_scan,
         run_forms_qa,
         run_content_migration_audit,
@@ -128,6 +132,15 @@ class UrlRequest(BaseModel):
 
 
 class K6Request(BaseModel):
+    profile: str = "profileNormal"
+    scenarios: List[str] = Field(default_factory=list)
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+# Phase D — Loadster (browser-based load testing). Same shape as K6Request
+# kept identical on purpose so frontend can switch tools without re-mapping.
+class LoadsterRequest(BaseModel):
     profile: str = "profileNormal"
     scenarios: List[str] = Field(default_factory=list)
     environment: Optional[str] = "test"
@@ -308,6 +321,21 @@ async def api_generate_k6(body: K6Request):
 async def api_run_k6(body: K6Request):
     env = _check_env(body.environment)
     return await run_k6(body.profile, body.scenarios, env)
+
+
+# Phase D — Loadster (browser-level). Lives alongside k6 in the same tab;
+# differentiator is that Loadster runs real browsers, so the report carries
+# hydration_p95_ms and spa_nav_p95_ms which k6 cannot measure.
+@router.post("/generate-loadster-script")
+async def api_generate_loadster(body: LoadsterRequest):
+    env = _check_env(body.environment)
+    return await generate_loadster_script(body.profile, body.scenarios, env, body.lang or "en")
+
+
+@router.post("/run-loadster")
+async def api_run_loadster(body: LoadsterRequest):
+    env = _check_env(body.environment)
+    return await run_loadster(body.profile, body.scenarios, env, body.lang or "en")
 
 
 # ── Security & Privacy ────────────────────────────────────────────

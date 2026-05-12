@@ -438,8 +438,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Purpose**: 24/7 QA copilot for the **rodekors.no** website rebuild on Enonic XP CMS + NextJS + Designsystemet (Digdir). Item Agent #9. Two execution modes (Generate-only for Cursor / Claude Code / GitHub Actions, Execute-directly in-app), two environments (local on `:3000`, test). Every run carries a SHA-256 attestation hash.
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — 22 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix.
-- Router: `backend/routers/red_cross_qa.py` — 31 routes at `/api/red-cross-qa/*`
+- Service: `backend/services/red_cross_qa.py` — 23 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix. **Phase D** adds Loadster as a parallel browser-level load testing tool alongside k6.
+- Router: `backend/routers/red_cross_qa.py` — 33 routes at `/api/red-cross-qa/*`
 - Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts; `release_judge.md` and `test_plan.md` updated for Azure DevOps + Sev/Kat dual severity + test-level taxonomy)
 
 **API endpoints (`/api/red-cross-qa/`):**
@@ -462,6 +462,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/run-role-matrix-audit` | POST | Real authZ tests across 6 editorial roles × 4 actions + 8 authZ checks |
 | `/generate-k6-script` | POST | k6 load script (5 profiles: smoke, normal, campaign peak, crisis spike, soak) |
 | `/run-k6` | POST | Execute k6 (execute mode) |
+| `/generate-loadster-script` | POST | **Phase D** — Loadster scenario JSON for browser-level load testing (parallel to k6). Maps each profile to a number of Loadster "engines" (1–5 parallel browser instances). Template includes hydration-aware steps + thresholds |
+| `/run-loadster` | POST | **Phase D** — Mock Loadster run returning browser-level metrics k6 cannot measure: `hydration_p95_ms`, `spa_nav_p95_ms`, `peak_handled_vus`, `engines`, plus standard `avg_response_ms / p95_response_ms / error_rate_pct`. Differentiator text auto-generated |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
 | `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
 | `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |
@@ -493,7 +495,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | Performance | `Performance.jsx` | Lighthouse panel + Enonic panel (10 Enonic checks, hot GraphQL queries with p95) |
 | Designsystemet | `Designsystemet.jsx` | 0-100 compliance score, 10 checks, deviations panel with severity+component+page+fix_hint |
 | Role Matrix | `RoleMatrix.jsx` | 6 colored role chips, full role × action matrix (allow/deny cells), 8 authZ checks, violations expected vs actual |
-| Stress Test | `StressTest.jsx` | k6 profiles + scenarios (national crisis, donation peak, volunteer peak, search-heavy, etc.) **+ Phase B Resilience section**: `resilience_score` 0-100, breakpoint VU, recovery seconds, peak error rate, memory drift, plus *ytelse vs resilience* distinction text |
+| Stress Test | `StressTest.jsx` | **Phase D tool selector** at top (k6 vs Loadster radio chips) → k6 profiles + scenarios (national crisis, donation peak, volunteer peak, search-heavy, etc.). Generate/Run buttons + result panel auto-switch endpoints + colors per tool. Loadster panel shows engines pill + browser-level metrics (`hydration_p95_ms`, `spa_nav_p95_ms`). **Phase B Resilience section**: `resilience_score` 0-100, breakpoint VU, recovery seconds, peak error rate, memory drift, plus *ytelse vs resilience* distinction text |
 | Security & Privacy | `SecurityPrivacy.jsx` | 13 checks (OWASP, GDPR, secrets, dependencies) **+ Phase B DPIA / Privacy by Design panel**: 12 GDPR Art. 25/35 checks, `dpia_score` 0-100, data register table over Enonic / Fundy / Vipps / Dataverse / Okta, GDPR-tagged findings |
 | Azure DevOps | `AzureDevOps.jsx` | Work-item bundle preview, dispatch to ADO/OutSystems, priority pill (P1-P4), work_item_type, severity_dev, category_ops, test_level pill |
 | Sprint Report | `SprintReport.jsx` | Sprint name input + StatCards (total/pass/warn/fail) + Sev1-4 panels + KatA-C panels + Trine-narrative + runs/dispatches summaries **+ Phase B DoD verifier panel**: per-work-item 4-point checklist (Trine §6.1) + DodStat row (pass/partial/fail/ready_for_uat/blockers) |
@@ -504,11 +506,11 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 **Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **507 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels.
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **534 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11) under `stressTest.tool_*`.
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
-- 31 routes registered at `/api/red-cross-qa/*` — do not break path naming
+- 33 routes registered at `/api/red-cross-qa/*` — do not break path naming
 - Backward compatibility: `TestPlanRequest` keeps `jira_epic` as deprecated alias of `ado_work_item`; MongoDB collection name `red_cross_qa_jira_dispatches_collection` deliberately retained to avoid DB migration
 - Trine's Teststrategi 30.3 alignment: every finding/work-item must carry **both** `severity_dev` (1-4, dev phase) **and** `category_ops` (A-C, post-handover contract phase) per §8.1
 - 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
@@ -517,8 +519,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Run / smoke commands:**
 ```bash
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
-python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 22
-python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 31
+python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 18 (Phase D: 17 + redcross-stress-browser-loadster)
+python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 33
 
 # End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
 python -m backend.tests.smoke_red_cross_qa

@@ -78,6 +78,7 @@ SUITE_NAMES = [
     "redcross-local-services-search", "redcross-cms-preview-publish",
     "redcross-accessibility-core", "redcross-seo-core", "redcross-graphql-api",
     "redcross-performance-core-web-vitals", "redcross-stress-campaign-peak",
+    "redcross-stress-browser-loadster",  # Phase D: Loadster browser-level
     "redcross-security-basic", "redcross-release-readiness",
     "redcross-forms-qa", "redcross-content-migration",
     "redcross-enonic-performance", "redcross-designsystemet",
@@ -861,8 +862,182 @@ async def run_k6(profile: str, scenarios: List[str], environment: str) -> Dict[s
     summary = f"k6 mock {profile} on {environment} — p95 640ms"
     run = await _store_run("redcross-stress-campaign-peak", environment, "pass",
                             summary, {"profile": profile, "scenarios": scenarios,
-                                     "results": results})
-    return {"status": "ok", "results": results, "run_id": run["run_id"]}
+                                     "tool": "k6", "results": results})
+    return {"status": "ok", "tool": "k6", "results": results, "run_id": run["run_id"]}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 8b — Loadster (browser-based load testing)
+# ═══════════════════════════════════════════════════════════════════
+# Loadster (loadster.app) runs scripts inside real browsers — so unlike k6
+# (which is protocol-level HTTP), it captures JavaScript execution time,
+# client-side hydration, layout shifts under load, and SPA navigation cost.
+# For rodekors.no's NextJS + Designsystemet front-end this is significant:
+# the editorial team's perceived "slowness" usually lives in hydration and
+# JS-driven interactions, not in raw HTTP throughput.
+#
+# Pricing model: Loadster uses "engines" (parallel browser instances).
+# A typical campaign-peak scenario uses 3-5 engines × ~150 concurrent VUs
+# each = 450-750 simulated users. The mock-first fallback below mirrors
+# that shape.
+
+LOADSTER_GENERATOR_PROMPT = """You are a load testing engineer producing a
+Loadster scenario for the rodekors.no Red Cross web rebuild (NextJS + Enonic
+XP + Designsystemet). Browser-based load — exercises hydration, lazy chunks,
+and SPA navigation, NOT just HTTP.
+
+Return JSON:
+{
+  "filename": "loadster-<profile>.lhx.json",
+  "scenario": "<Loadster scenario as JSON config (steps, think-times, engines)>",
+  "expected_engines": <int>,
+  "notes": "<one-line description of what the scenario exercises>"
+}
+
+Use these profile mappings:
+- profileSmoke    → 1 engine, 5 VUs, 2 min
+- profileNormal   → 2 engines, 50 VUs, 14 min
+- profileCampaign → 3 engines, 150 VUs, 20 min
+- profileCrisis   → 5 engines, 250 VUs, 30 min (TV-aksjonen-style spike)
+- profileSoak     → 2 engines, 30 VUs, 4 hours
+"""
+
+
+async def generate_loadster_script(profile: str, scenarios: List[str], environment: str,
+                                   lang: str = "en") -> Dict[str, Any]:
+    """Generate a Loadster scenario for the selected profile. Mock-first
+    graceful degradation — falls back to a deterministic browser-scenario
+    template if the LLM doesn't produce parseable JSON.
+    """
+    prompt = (
+        f"Profile: {profile}\nScenarios: {', '.join(scenarios) or '(default)'}\n"
+        f"Environment: {environment}\n"
+    )
+    raw = await _llm(prompt, LOADSTER_GENERATOR_PROMPT, lang)
+    parsed = _parse_json(raw or "") or {}
+
+    # Engine count is the differentiating concept vs k6 (parallel real browsers)
+    engines_by_profile = {
+        "profileSmoke": 1, "profileNormal": 2, "profileCampaign": 3,
+        "profileCrisis": 5, "profileSoak": 2,
+    }
+    engines = parsed.get("expected_engines") or engines_by_profile.get(profile, 2)
+
+    filename = parsed.get("filename") or f"loadster-{profile}.lhx.json"
+    scenario = parsed.get("scenario")
+
+    if not scenario:
+        # Loadster scenario template — JSON config that Loadster Workbench
+        # can import. Real Loadster files use a proprietary XML format,
+        # but the cloud API also accepts JSON-described scenarios.
+        scenario_obj = {
+            "name": f"rodekors-{profile}",
+            "engines": engines,
+            "rampUp": "2m", "duration": "14m" if profile != "profileSoak" else "4h",
+            "thinkTimeMs": 1500,
+            "steps": [
+                {"type": "navigate", "url": "${BASE_URL}/", "waitFor": "networkidle"},
+                {"type": "click", "selector": "[data-test='donate-cta']", "optional": True},
+                {"type": "navigate", "url": "${BASE_URL}/distrikt/oslo",
+                 "waitFor": "networkidle",
+                 "assert": {"selector": "h1", "containsText": "Oslo"}},
+                {"type": "navigate", "url": "${BASE_URL}/aktiviteter",
+                 "waitFor": "networkidle"},
+            ],
+            "thresholds": {
+                "avg_response_ms": 1000,
+                "error_rate_pct": 1.0,
+                "p95_ms": 2500,
+            },
+            "variables": {
+                "BASE_URL": "https://test.rodekors.no" if environment == "test"
+                            else "http://localhost:3000",
+            },
+        }
+        # Serialize as pretty JSON since real Loadster .lhx is XML but the
+        # JSON form is the agent-friendly representation we emit.
+        import json as _json
+        scenario = _json.dumps(scenario_obj, indent=2, ensure_ascii=False)
+
+    try:
+        await red_cross_qa_generated_scripts_collection.insert_one({
+            "tool": "loadster", "profile": profile, "scenarios": scenarios,
+            "environment": environment, "filename": filename,
+            "script": scenario, "engines": engines,
+            "created_at": _now(), "lang": lang,
+        })
+    except Exception:
+        pass
+
+    return {
+        "status": "ok", "tool": "loadster",
+        "filename": filename, "script": scenario,
+        "engines": engines,
+        "notes": parsed.get("notes")
+                  or f"Browser-level load: {engines} engine(s), exercises hydration + SPA navigation.",
+        "lang": lang,
+    }
+
+
+async def run_loadster(profile: str, scenarios: List[str], environment: str,
+                       lang: str = "en") -> Dict[str, Any]:
+    """Mock Loadster run. Real implementation would POST the scenario to
+    Loadster Cloud API and poll for results; this returns deterministic
+    browser-level metrics that mirror Loadster's actual reporting shape.
+    """
+    # Profile-specific mock results — calibrated to look realistic for a
+    # NextJS + Enonic XP SPA. Browser-level numbers tend to be 2-4× the
+    # protocol-level numbers k6 reports because they include JS execution
+    # + render time, not just HTTP request duration.
+    by_profile = {
+        "profileSmoke":    {"engines": 1, "vus": 5,   "duration_s": 120,
+                            "avg_response_ms": 380, "p95_response_ms": 720,
+                            "error_rate_pct": 0.0, "iterations": 145,
+                            "peak_handled_vus": 5,  "hydration_p95_ms": 280},
+        "profileNormal":   {"engines": 2, "vus": 50,  "duration_s": 840,
+                            "avg_response_ms": 420, "p95_response_ms": 980,
+                            "error_rate_pct": 0.4, "iterations": 12500,
+                            "peak_handled_vus": 50, "hydration_p95_ms": 320},
+        "profileCampaign": {"engines": 3, "vus": 150, "duration_s": 1200,
+                            "avg_response_ms": 680, "p95_response_ms": 1620,
+                            "error_rate_pct": 1.2, "iterations": 47800,
+                            "peak_handled_vus": 142, "hydration_p95_ms": 480},
+        "profileCrisis":   {"engines": 5, "vus": 250, "duration_s": 1800,
+                            "avg_response_ms": 1120, "p95_response_ms": 3200,
+                            "error_rate_pct": 4.8, "iterations": 92400,
+                            "peak_handled_vus": 198, "hydration_p95_ms": 920},
+        "profileSoak":     {"engines": 2, "vus": 30, "duration_s": 14400,
+                            "avg_response_ms": 440, "p95_response_ms": 1040,
+                            "error_rate_pct": 0.6, "iterations": 86400,
+                            "peak_handled_vus": 30, "hydration_p95_ms": 340,
+                            "memory_drift_pct": 6.2},
+    }
+    r = by_profile.get(profile, by_profile["profileNormal"]).copy()
+
+    # Loadster-specific signal: SPA navigation cost — k6 doesn't see this.
+    r["spa_nav_p95_ms"] = int(r["hydration_p95_ms"] * 1.4)
+    r["worst_step"] = "navigate /distrikt/oslo"
+
+    overall_status = ("warn" if r["error_rate_pct"] > 1.0 or r["p95_response_ms"] > 2000
+                       else "pass")
+    summary = (f"Loadster {profile} on {environment} — "
+               f"avg {r['avg_response_ms']}ms / p95 {r['p95_response_ms']}ms / "
+               f"err {r['error_rate_pct']}% / engines {r['engines']}")
+
+    run = await _store_run("redcross-stress-campaign-peak", environment, overall_status,
+                           summary, {"profile": profile, "scenarios": scenarios,
+                                     "tool": "loadster", "results": r})
+
+    return {
+        "status": "ok", "tool": "loadster",
+        "profile": profile, "scenarios": scenarios,
+        "results": r,
+        "differentiator": ("Browser-level load — captures JS hydration "
+                           "(p95 {h}ms) and SPA navigation (p95 {s}ms) under "
+                           "load. k6 doesn't see these signals.").format(
+                               h=r["hydration_p95_ms"], s=r["spa_nav_p95_ms"]),
+        "run_id": run["run_id"],
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════

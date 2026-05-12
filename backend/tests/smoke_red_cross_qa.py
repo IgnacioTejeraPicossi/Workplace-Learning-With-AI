@@ -1,7 +1,8 @@
 """Smoke test for Red Cross QA service.
 Covers: Phase A (Jira -> Azure DevOps rename, Sev/Kat, Sprint Report, Fundy)
         Phase B (DPIA, DoD verifier, Resilience, UAT-stotte, Risk Matrix)
-        Phase C (WCAG 2.1/2.2 explicit, Migrert vs Nyopprettet data).
+        Phase C (WCAG 2.1/2.2 explicit, Migrert vs Nyopprettet data)
+        Phase D (Loadster browser-level load testing).
 """
 import asyncio
 from backend.services.red_cross_qa import (
@@ -10,6 +11,7 @@ from backend.services.red_cross_qa import (
     run_dpia_check, verify_definition_of_done, run_resilience_check,
     generate_uat_support, analyze_risk_matrix,
     run_accessibility_check, run_content_migration_audit,
+    generate_loadster_script, run_loadster,
 )
 
 
@@ -176,6 +178,34 @@ async def main():
     print(
         f"[OK] Migrert vs Nyopprettet ({dp['migrated']['count']} migrert, "
         f"{dp['newly_created']['count']} nyopprettet, broken_pages tagged)"
+    )
+
+    # ── Phase D: Loadster (browser-level load testing) ─────────────────
+    # Differentiator vs k6: real-browser metrics — hydration_p95_ms, spa_nav_p95_ms.
+    ls_script = await generate_loadster_script("profileCampaign", ["scenarioDonation"], "test", "en")
+    assert ls_script["status"] == "ok"
+    assert ls_script["tool"] == "loadster"
+    assert ls_script["filename"].endswith(".lhx.json") or ls_script["filename"].endswith(".json")
+    assert ls_script["engines"] >= 1, "expected at least 1 engine"
+    assert "${BASE_URL}" in ls_script["script"], "scenario should template BASE_URL"
+    print(
+        f"[OK] Loadster script generator ({ls_script['filename']}, "
+        f"{ls_script['engines']} engines)"
+    )
+
+    ls_run = await run_loadster("profileCampaign", ["scenarioDonation"], "test", "en")
+    assert ls_run["status"] == "ok"
+    assert ls_run["tool"] == "loadster"
+    res = ls_run["results"]
+    assert "hydration_p95_ms" in res, "loadster must report hydration_p95_ms (browser-only)"
+    assert "spa_nav_p95_ms" in res, "loadster must report spa_nav_p95_ms (browser-only)"
+    assert res["engines"] >= 1
+    assert res["avg_response_ms"] > 0
+    assert ls_run["differentiator"], "expected differentiator text vs k6"
+    print(
+        f"[OK] Loadster run (campaign: avg {res['avg_response_ms']}ms, "
+        f"p95 {res['p95_response_ms']}ms, hydration p95 {res['hydration_p95_ms']}ms, "
+        f"err {res['error_rate_pct']}%)"
     )
 
 
