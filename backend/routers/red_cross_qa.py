@@ -20,6 +20,8 @@ try:
         run_graphql_introspection,
         generate_cms_test_cases,
         run_accessibility_check,
+        generate_nvda_script,
+        run_wave_audit,
         run_lighthouse,
         generate_k6_script,
         run_k6,
@@ -59,6 +61,8 @@ except ImportError:  # pragma: no cover
         run_graphql_introspection,
         generate_cms_test_cases,
         run_accessibility_check,
+        generate_nvda_script,
+        run_wave_audit,
         run_lighthouse,
         generate_k6_script,
         run_k6,
@@ -150,6 +154,21 @@ class CmsRequest(BaseModel):
 class UrlRequest(BaseModel):
     url: str
     wcag_version: Optional[str] = "2.2-AA"  # Phase C: explicit WCAG version (Trine §4.1)
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+# Phase G (2026-05-13) — NVDA + WAVE additions to the Accessibility tab.
+class NvdaScriptRequest(BaseModel):
+    url: Optional[str] = Field(default=None, description="Target URL. Defaults to a per-scope path.")
+    scope: str = Field(default="navigation",
+                       description="One of: donation / volunteer / search / navigation / forms.")
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+class WaveAuditRequest(BaseModel):
+    url: Optional[str] = Field(default=None, description="Target URL. Mock-first when omitted.")
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -345,6 +364,23 @@ async def api_run_accessibility(body: UrlRequest):
         body.url, env, body.lang or "en",
         wcag_version=body.wcag_version or "2.2-AA",
     )
+
+
+# Phase G — NVDA screen-reader script + WAVE (WebAIM) audit. Both live
+# inside the Universell utforming-pilot tab alongside the existing
+# axe-core + Lighthouse runner.
+@router.post("/generate-nvda-script")
+async def api_generate_nvda_script(body: NvdaScriptRequest):
+    env = _check_env(body.environment)
+    return await generate_nvda_script(
+        body.url or "", body.scope or "navigation", env, body.lang or "en"
+    )
+
+
+@router.post("/run-wave-audit")
+async def api_run_wave_audit(body: WaveAuditRequest):
+    env = _check_env(body.environment)
+    return await run_wave_audit(body.url or "", env, body.lang or "en")
 
 
 # ── Performance ───────────────────────────────────────────────────

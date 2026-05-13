@@ -1135,6 +1135,247 @@ async def run_accessibility_check(url: str, environment: str,
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Phase G (2026-05-13) — Two additional accessibility tools requested
+# by the testing team alongside the existing axe-core + Lighthouse:
+#   • NVDA — screen reader script generator (markdown the human tester
+#     runs while NVDA reads pages on Windows). NVDA is not programmatic
+#     so this is a structured CHECKLIST, not an "execute" call.
+#   • WAVE (WebAIM) — mock-first WAVE report shape (errors / alerts /
+#     contrast / features / structure / aria counts), plus the deep
+#     link to the public WAVE report so testers can open it directly.
+#     A real WAVE API call lights up only when env var WAVE_API_KEY
+#     is present — the workshop demo works offline without it.
+# ═══════════════════════════════════════════════════════════════════
+
+
+# NVDA scope → focus areas for the generated script. Drives the
+# expected-announcement list per scope (donation has price field,
+# volunteer has phone field, etc.). Anything not listed falls back to
+# a generic landmark sweep.
+_NVDA_SCOPE_PATHS: Dict[str, Dict[str, Any]] = {
+    "donation": {
+        "label": "Donation flow (Bli giver)",
+        "default_path": "/giverstotte",
+        "key_landmarks": ["Heading level 1, Bli fast giver",
+                          "Beløp, edit, blank, required",
+                          "Betaling med Vipps, button"],
+    },
+    "volunteer": {
+        "label": "Volunteer signup (Bli frivillig)",
+        "default_path": "/frivillig",
+        "key_landmarks": ["Heading level 1, Bli frivillig",
+                          "Telefonnummer, edit, blank, required",
+                          "Postnummer, edit, blank"],
+    },
+    "search": {
+        "label": "Site search results",
+        "default_path": "/sok",
+        "key_landmarks": ["Heading level 1, Søk",
+                          "Søk, combo box, autocomplete",
+                          "Resultater, region, 12 items"],
+    },
+    "navigation": {
+        "label": "Main navigation + skip links",
+        "default_path": "/",
+        "key_landmarks": ["Banner landmark",
+                          "Hovedmeny, navigation",
+                          "Hopp til hovedinnhold, link"],
+    },
+    "forms": {
+        "label": "Generic form (Skjemabygger)",
+        "default_path": "/skjema/kontakt",
+        "key_landmarks": ["Form, 5 fields, 1 required",
+                          "Navn, edit, blank, required",
+                          "Send, button"],
+    },
+}
+
+
+async def generate_nvda_script(url: str, scope: str, environment: str,
+                                lang: str = "en") -> Dict[str, Any]:
+    """Generate a markdown NVDA test script for the requested URL + scope.
+
+    Deterministic by design — the human tester follows it verbatim while
+    NVDA is running on Windows. No LLM involved: keyboard shortcuts,
+    announcement format and WCAG mapping must NOT drift between runs.
+    """
+    spec = _NVDA_SCOPE_PATHS.get(scope) or _NVDA_SCOPE_PATHS["navigation"]
+    target = url or f"https://test.rodekors.no{spec['default_path']}"
+    scope_label = spec["label"]
+
+    # Per-scope expected announcements rendered as a numbered checklist
+    # with "Action" + "Expected announcement" + WCAG SC mapping.
+    base_steps = [
+        {"action": f"Navigate to {target}",
+         "expected": f"Røde Kors — {scope_label}, page",
+         "wcag": "2.4.2 Page Titled"},
+        {"action": "Press `Insert + T` to confirm page title",
+         "expected": f"Page title is announced: 'Røde Kors — {scope_label}'",
+         "wcag": "2.4.2 Page Titled"},
+        {"action": "Press `Insert + F7` to open Elements List → headings",
+         "expected": "List of headings with levels (1, 2, 3...). Should be hierarchical.",
+         "wcag": "1.3.1 Info & Relationships, 2.4.6 Headings & Labels"},
+        {"action": "Press `H` repeatedly to navigate by heading",
+         "expected": spec["key_landmarks"][0],
+         "wcag": "1.3.1, 2.4.6"},
+        {"action": "Press `D` to navigate to next landmark",
+         "expected": "Region landmark announcements (banner, navigation, main, contentinfo)",
+         "wcag": "1.3.1 Info & Relationships, 2.4.1 Bypass Blocks"},
+        {"action": "Press `Tab` to first interactive control",
+         "expected": spec["key_landmarks"][1] if len(spec["key_landmarks"]) > 1 else "First focusable element",
+         "wcag": "2.1.1 Keyboard, 2.4.3 Focus Order"},
+        {"action": "Tab through the entire focus order",
+         "expected": "Every interactive element is reachable; focus order is logical (visual = DOM); no focus trap.",
+         "wcag": "2.4.3 Focus Order, 2.4.7 Focus Visible, 2.1.2 No Keyboard Trap"},
+        {"action": "On any form field, press `Insert + Tab` to re-announce",
+         "expected": "Label + state + required indicator are spoken (e.g. 'Beløp, edit, blank, required')",
+         "wcag": "1.3.1, 3.3.2 Labels or Instructions, 4.1.2 Name Role Value"},
+        {"action": "Trigger a validation error and press `Insert + B`",
+         "expected": "Error message is announced via live region or aria-describedby",
+         "wcag": "3.3.1 Error Identification, 3.3.3 Error Suggestion"},
+        {"action": "Open any dialog (modal) and press `Insert + Down`",
+         "expected": "Dialog role + name announced; focus moves into the dialog; Esc closes it.",
+         "wcag": "4.1.2 Name Role Value, 2.1.2 No Keyboard Trap"},
+    ]
+
+    # Build the markdown body — kept compact (≤ 100 lines) so the tester
+    # can keep it open next to NVDA's speech viewer.
+    md_lines = [
+        f"# NVDA test script — {scope_label} ({environment})",
+        "",
+        f"**Target URL:** `{target}`",
+        f"**WCAG profile:** 2.2 AA (Trine §4.1) — 2.1 AA SC also covered",
+        "",
+        "## Setup",
+        "- Start NVDA on Windows 10/11: `Insert + Ctrl + N`",
+        "- Browser: Edge or Chrome (latest stable)",
+        "- Speech rate: medium · Voice: any · Speech viewer: ON (debug)",
+        "- Clear NVDA log: `Insert + F1`",
+        "",
+        "## Steps",
+    ]
+    for i, step in enumerate(base_steps, start=1):
+        md_lines += [
+            f"{i}. **Action:** {step['action']}",
+            f"   - **Expected announcement:** {step['expected']}",
+            f"   - **WCAG SC:** {step['wcag']}",
+            "",
+        ]
+    md_lines += [
+        "## Reporting",
+        "- Tick each step as it passes; for failures, capture the verbatim",
+        "  NVDA output from the speech viewer + a screenshot of the focused",
+        "  element. File issues with `severity_dev` 1–4 and `category_ops`",
+        "  A–C per Trine Bruu's Teststrategi 30.3 §8.1.",
+        "- Cross-check with axe-core (Tab 9 → ♿ Universell utforming-pilot)",
+        "  to find rule-based issues the screen reader review missed.",
+    ]
+
+    script_md = "\n".join(md_lines)
+
+    # WCAG SCs explicitly covered by this script — surfaced as chips in UI.
+    sc_covered = sorted({(s["wcag"].split(",")[0]).strip() for s in base_steps})
+
+    summary = (f"NVDA script for {scope_label} ({len(base_steps)} steps, "
+                f"{len(sc_covered)} WCAG SC covered)")
+    run = await _store_run("redcross-accessibility-core", environment, "pass",
+                            summary, {"url": target, "scope": scope,
+                                      "tool": "nvda", "steps": len(base_steps)})
+
+    return {
+        "status": "ok", "tool": "nvda",
+        "url": target, "scope": scope, "scope_label": scope_label,
+        "filename": f"nvda-{scope}.md",
+        "script_md": script_md,
+        "step_count": len(base_steps),
+        "wcag_sc_covered": sc_covered,
+        "platform": "Windows (NVDA 2024+)",
+        "run_id": run["run_id"], "lang": lang,
+    }
+
+
+async def run_wave_audit(url: str, environment: str,
+                          lang: str = "en") -> Dict[str, Any]:
+    """Mock-first WAVE (WebAIM) audit. Returns the same shape WebAIM's API
+    does so the UI can render it without changes if WAVE_API_KEY env var
+    is set in the future. Without the key, returns a deterministic
+    synthetic report sized to the rodekors.no rebuild.
+    """
+    import os as _os
+    target = url or "https://test.rodekors.no/"
+
+    # Categories shape mirrors WAVE's API report.json output.
+    categories = {
+        "errors": 4,
+        "contrast_errors": 2,
+        "alerts": 8,
+        "features": 12,
+        "structural_elements": 28,
+        "aria": 19,
+    }
+    errors_detail = [
+        {"code": "alt_missing",       "label": "Missing alt text",
+         "count": 3, "wcag": "1.1.1", "severity": "high"},
+        {"code": "label_missing",     "label": "Missing form label",
+         "count": 1, "wcag": "1.3.1, 3.3.2", "severity": "critical"},
+        {"code": "link_empty",        "label": "Empty link",
+         "count": 0, "wcag": "2.4.4, 4.1.2", "severity": "high"},
+    ]
+    contrast_detail = [
+        {"code": "contrast",          "label": "Very low contrast",
+         "count": 2, "wcag": "1.4.3", "severity": "high",
+         "note": "Donation CTA ratio 3.9:1; secondary footer link 3.2:1"},
+    ]
+    alerts_detail = [
+        {"code": "noscript",          "label": "Noscript element present",
+         "count": 1, "wcag": "1.1.1", "severity": "low"},
+        {"code": "h1_missing",        "label": "Missing first level heading",
+         "count": 0, "wcag": "1.3.1", "severity": "medium"},
+        {"code": "redundant_link",    "label": "Redundant link",
+         "count": 4, "wcag": "2.4.4", "severity": "low",
+         "note": "Image + adjacent text share the same destination"},
+        {"code": "label_orphaned",    "label": "Orphaned form label",
+         "count": 1, "wcag": "1.3.1, 3.3.2", "severity": "medium"},
+    ]
+
+    # If WAVE_API_KEY is set, we would call the real API here. The mock
+    # path remains identical in shape so the frontend never needs to know.
+    used_api = False
+    api_key_present = bool(_os.environ.get("WAVE_API_KEY"))
+    # NOTE: real WAVE API call deferred — keeping mock-first for workshop
+    # safety (no live network during demos). When the team wants live
+    # results, set WAVE_API_KEY and flip this block to a real httpx.post.
+
+    wave_report_url = f"https://wave.webaim.org/report#/{target}"
+
+    summary = (f"WAVE mock for {target}: {categories['errors']} errors, "
+                f"{categories['contrast_errors']} contrast, "
+                f"{categories['alerts']} alerts")
+    overall = ("fail" if categories['errors'] >= 5
+                else "warn" if categories['errors'] >= 1 else "pass")
+    run = await _store_run("redcross-accessibility-core", environment, overall,
+                            summary, {"url": target, "tool": "wave",
+                                      "categories": categories,
+                                      "used_api": used_api})
+
+    return {
+        "status": "ok", "tool": "wave",
+        "url": target,
+        "categories": categories,
+        "errors_detail": errors_detail,
+        "contrast_detail": contrast_detail,
+        "alerts_detail": alerts_detail,
+        "wave_report_url": wave_report_url,
+        "used_api": used_api,
+        "api_key_present": api_key_present,
+        "note": ("Mock-first WAVE report. Open the public report URL above "
+                  "for a live in-page evaluation, or set WAVE_API_KEY to "
+                  "enable programmatic API calls."),
+        "run_id": run["run_id"], "lang": lang,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Tool 7 — Performance / Lighthouse
 # ═══════════════════════════════════════════════════════════════════
 async def run_lighthouse(url: str, environment: str,

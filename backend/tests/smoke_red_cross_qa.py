@@ -3,7 +3,8 @@ Covers: Phase A (Jira -> Azure DevOps rename, Sev/Kat, Sprint Report, Fundy)
         Phase B (DPIA, DoD verifier, Resilience, UAT-stotte, Risk Matrix)
         Phase C (WCAG 2.1/2.2 explicit, Migrert vs Nyopprettet data)
         Phase D (Loadster browser-level load testing)
-        Phase F (Tom's tips: Storybook scope + Postman export + GraphQL introspection).
+        Phase F (Tom's tips: Storybook scope + Postman export + GraphQL introspection)
+        Phase G (NVDA script generator + WAVE WebAIM audit).
 """
 import asyncio
 from backend.services.red_cross_qa import (
@@ -14,6 +15,7 @@ from backend.services.red_cross_qa import (
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
     generate_playwright_tests, export_postman_collection, run_graphql_introspection,
+    generate_nvda_script, run_wave_audit,
 )
 
 
@@ -269,6 +271,49 @@ async def main():
     assert "__schema" in ix["introspection_query"], "introspection_query missing __schema"
     print(f"[OK] GraphQL introspection ({len(ix['operations'])} ops, "
           f"{len(ix['content_types'])} content types incl. Distrikt/Aktivitet/Kampanje)")
+
+    # ── Phase G: Universell utforming-pilot extras (NVDA + WAVE) ─────────
+    # 1. NVDA script generator must produce a deterministic markdown
+    #    checklist with NVDA keyboard shortcuts + expected announcements
+    #    per step + WCAG SC mapping.
+    nvda = await generate_nvda_script(
+        "https://test.rodekors.no/giverstotte", "donation", "test", "en"
+    )
+    assert nvda["status"] == "ok"
+    assert nvda["tool"] == "nvda"
+    md = nvda["script_md"]
+    assert "Insert + Ctrl + N" in md, "NVDA setup keystroke missing"
+    assert "Insert + T" in md, "NVDA page-title keystroke missing"
+    assert "Insert + F7" in md, "NVDA elements-list keystroke missing"
+    assert "Tab" in md, "NVDA Tab navigation step missing"
+    assert "Expected announcement" in md, "NVDA expected-announcement labels missing"
+    assert "WCAG SC" in md, "NVDA per-step WCAG mapping missing"
+    assert "1.3.1" in md, "WCAG 1.3.1 must appear at least once"
+    assert nvda["step_count"] >= 8, f"expected ≥8 steps, got {nvda['step_count']}"
+    assert len(nvda["wcag_sc_covered"]) >= 5, \
+        f"expected ≥5 WCAG SCs covered, got {nvda['wcag_sc_covered']}"
+    print(f"[OK] NVDA script generator ({nvda['filename']}, "
+          f"{nvda['step_count']} steps, {len(nvda['wcag_sc_covered'])} WCAG SC)")
+
+    # 2. WAVE (WebAIM) report must carry the canonical category counts +
+    #    deep link to the public report.
+    wave = await run_wave_audit("https://test.rodekors.no/", "test", "en")
+    assert wave["status"] == "ok"
+    assert wave["tool"] == "wave"
+    cats = wave["categories"]
+    for k in ("errors", "contrast_errors", "alerts", "features",
+              "structural_elements", "aria"):
+        assert k in cats, f"WAVE categories missing '{k}'"
+    assert wave["wave_report_url"].startswith("https://wave.webaim.org/report#/"), \
+        "WAVE deep link wrong"
+    assert isinstance(wave["errors_detail"], list)
+    assert isinstance(wave["contrast_detail"], list)
+    assert isinstance(wave["alerts_detail"], list)
+    # mock-first guarantee
+    assert wave["used_api"] is False, "expected mock path (no live API call)"
+    print(f"[OK] WAVE audit ({cats['errors']} errors, "
+          f"{cats['contrast_errors']} contrast, {cats['alerts']} alerts, "
+          f"deep link present)")
 
 
 if __name__ == "__main__":
