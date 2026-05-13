@@ -87,3 +87,17 @@ red_cross_qa_reports_collection = database.get_collection("red_cross_qa_reports"
 # the workshop module remains independent and easy to wipe between sessions.
 homo_vs_ai_prompt_revisions_collection = database.get_collection("homo_vs_ai_prompt_revisions")
 homo_vs_ai_prompt_audit_collection = database.get_collection("homo_vs_ai_prompt_audit")
+
+# QA Security & Privacy (Phase H / Pack 2) — backend-driven workbench for
+# the Sikkerhet og personvern tab. Three collections:
+#   • qa_security_scans     — one document per scan run (pass/warn/fail counts,
+#                              full snapshot of checks + findings, environment)
+#   • qa_security_findings  — one document per actionable finding with owner,
+#                              status (open / accepted_risk / fixed / verified),
+#                              evidence, recommendation, severity, createdAt
+#   • qa_security_dpia      — one document with the structured DPIA form
+#                              (purpose, dataTypes, sensitiveData, storage,
+#                              retention, third parties, legal basis, mitigations)
+qa_security_scans_collection = database.get_collection("qa_security_scans")
+qa_security_findings_collection = database.get_collection("qa_security_findings")
+qa_security_dpia_collection = database.get_collection("qa_security_dpia")

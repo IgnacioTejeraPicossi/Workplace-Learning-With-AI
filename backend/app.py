@@ -158,6 +158,14 @@ except ImportError:  # pragma: no cover
     from routers.prompt_evolution import router as prompt_evolution_router  # type: ignore
 app.include_router(prompt_evolution_router)
 
+# QA Security & Privacy workbench (Phase H · Pack 2) — backend-driven
+# Sikkerhet og personvern tab inside the Red Cross Web QA Agent.
+try:
+    from backend.routers.qa_security import router as qa_security_router
+except ImportError:  # pragma: no cover
+    from routers.qa_security import router as qa_security_router  # type: ignore
+app.include_router(qa_security_router)
+
 # Embeddings router (OpenAI REST)
 try:
     from backend.routers.embeddings import router as embeddings_router

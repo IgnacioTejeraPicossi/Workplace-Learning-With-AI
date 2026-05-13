@@ -439,8 +439,9 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 **Purpose**: 24/7 QA copilot for the **rodekors.no** website rebuild on Enonic XP CMS + NextJS + Designsystemet (Digdir). Item Agent #9. Two execution modes (Generate-only for Cursor / Claude Code / GitHub Actions, Execute-directly in-app), two environments (local on `:3000`, test). Every run carries a SHA-256 attestation hash.
 
 **Backend:**
-- Service: `backend/services/red_cross_qa.py` — 23 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix. **Phase D** adds Loadster as a parallel browser-level load testing tool alongside k6. **Phase F** (Tom's tooling tips for the NextJS rebuild) adds: Storybook scope in the Playwright generator, Postman Collection v2.1 export, and GraphQL introspection for Guillotine/XP. **Phase G** (2026-05-13) adds NVDA screen-reader script generator + WAVE (WebAIM) audit as parallel tools inside the Accessibility tab.
+- Service: `backend/services/red_cross_qa.py` — 23 suites, mock-first graceful degradation (deterministic fallback when LLM unavailable). Aligned to **Trine Bruu's Teststrategi 30.3** (Azure DevOps as official test tool, Sev 1-4 / Kat A-C dual severity scheme, V-model test levels, Fundy donation-form provider as separate scope from Vipps). Phase B adds DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix. **Phase D** adds Loadster as a parallel browser-level load testing tool alongside k6. **Phase F** (Tom's tooling tips for the NextJS rebuild) adds: Storybook scope in the Playwright generator, Postman Collection v2.1 export, and GraphQL introspection for Guillotine/XP. **Phase G** (2026-05-13) adds NVDA screen-reader script generator + WAVE (WebAIM) audit as parallel tools inside the Accessibility tab. **Phase H · Pack 2** (2026-05-13) promotes the Sikkerhet og personvern tab into a backend-driven workbench with stable contracts, MongoDB persistence, scan history, and a structured DPIA editor — served by a dedicated `/api/qa/security/*` namespace (new files: `backend/schemas/qa_security.py`, `backend/repositories/qa_security_repository.py`, `backend/services/qa_security_service.py`, `backend/routers/qa_security.py`).
 - Router: `backend/routers/red_cross_qa.py` — **37 routes** at `/api/red-cross-qa/*`
+- **Phase H router**: `backend/routers/qa_security.py` — **8 paths / 10 method bindings** at `/api/qa/security/*`
 - Prompts: `backend/prompts/red_cross_qa/*.md` (13 versioned prompts; `release_judge.md` and `test_plan.md` updated for Azure DevOps + Sev/Kat dual severity + test-level taxonomy)
 
 **API endpoints (`/api/red-cross-qa/`):**
@@ -469,6 +470,21 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/run-graphql-introspection` | POST | **Phase F** (Tom's tip) — Mock-first introspection of the Guillotine schema. Returns 5 canonical operations + 8 Røde Kors content types (Distrikt / Forening / Aktivitet / Kontaktperson / Kampanje / TjenesteKurs / Tema / Nyhet). Also returns the canonical `__schema` query as docs |
 | `/generate-nvda-script` | POST | **Phase G** — Deterministic markdown NVDA test script for the manual tester on Windows. Per-scope expected announcements (donation/volunteer/search/navigation/forms). Keystrokes: `Insert+Ctrl+N`, `Insert+T`, `Insert+F7`, `Tab`, `H`, `D`. Each step carries WCAG SC mapping. Returns `script_md` + `step_count` + `wcag_sc_covered` + `filename` for `.md` download |
 | `/run-wave-audit` | POST | **Phase G** — Mock-first WAVE (WebAIM) audit. Returns 6 category counts (errors / contrast_errors / alerts / features / structural_elements / aria) + 3 detail tables + deep link `https://wave.webaim.org/report#/{url}`. Real API call gated behind `WAVE_API_KEY` env var (workshop safety: mock-first by default) |
+
+**Phase H · Pack 2 endpoints at `/api/qa/security/*`**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/status` | GET | Top-level snapshot (pass/warn/fail/openFindings/lastScanAt/overallStatus/dpiaPresent) |
+| `/checks` | GET | List all 25 checks (13 sec/priv + 12 DPIA) with status; auto-triggers a scan if none have run yet |
+| `/checks/{id}` | GET | Full check detail with `findings_detail[]` attached |
+| `/scan` | POST | Run security + DPIA scans, persist ScanRun + Findings, return snapshot. User-set statuses preserved |
+| `/findings` | GET | Filterable by status / severity / check_id, newest first |
+| `/findings/{id}` | PATCH | Update status / owner / recommendation / evidence; appends to audit history |
+| `/history` | GET | Last N scan runs (default 5), newest first, with environment filter |
+| `/dpia` | GET | Load DPIA singleton; seeds a Røde Kors-specific default if none exists |
+| `/dpia` | POST | Replace full DPIA form |
+| `/dpia` | PATCH | Partial update (any subset of fields) |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
 | `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
 | `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |
@@ -511,7 +527,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 **Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **590 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11) under `stressTest.tool_*`. Phase F (27 keys): scenarioStorybook + Tom-tip banners + introspection + Postman panel labels + Dashboard tomTip*. **Phase G (29 keys)**: tool selector under `accessibility.tool_*`, NVDA scope picker + viewer (`nvdaScope_*`, `nvdaSteps`, `nvdaWcagCovered`, `btnGenerateNvda`, `btnDownloadNvda`), WAVE labels (`btnRunWave`, `waveOpenReport`, `waveMockNotice`, `waveKey*`, `waveErrorsTitle`, `waveContrastTitle`, `waveAlertsTitle`, `waveCol*`).
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **672 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11). Phase F (27 keys). Phase G (29 keys). **Phase H · Pack 2 (82 keys)**: full Sikkerhet og personvern workbench labels under `securityPrivacy.*` — snapshot, runScan, statTotal/statOpenFindings, checksTitle/checksHint, scanType_*, category_*, detail* (Summary/Evidence/Recommendations/LinkedFindings), findingStatus_* (open/accepted_risk/fixed/verified), filter* (Status/ScanType/Category/FindingStatus/Severity), historyTitle/historyHint/trend* (Improving/Regressing/Flat), and full structured DPIA editor (`dpiaField_*` + `dpiaPlaceholder_*` for purpose, dataTypes, sensitiveData, storageLocation, accessRoles, retention, thirdParties, legalBasis, riskNotes, mitigations).
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
@@ -526,6 +542,12 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
 python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 18 (Phase D: 17 + redcross-stress-browser-loadster)
 python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 37 (Phase G: +2 /generate-nvda-script + /run-wave-audit)
+python -c "from backend.routers.qa_security import router; print(len(router.routes))"      # → 10 method bindings on 8 paths (Phase H · Pack 2)
+
+# Phase H smoke (10 checks): perform_scan, check shape, finding shape,
+# status snapshot, check detail, filters, PATCH, RE-SCAN PRESERVES STATUS,
+# history newest-first, DPIA lifecycle, router registration
+python -m backend.tests.smoke_qa_security
 
 # End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
 python -m backend.tests.smoke_red_cross_qa

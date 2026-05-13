@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.0] - 2026-05-13
+
+### Added — Red Cross Web QA · Phase H (Pack 2): Sikkerhet og personvern workbench
+
+The Sikkerhet og personvern tab is promoted from "status board" to a real backend-driven QA/security work surface. Co-designed with ChatGPT and Tom (Tech leder, Røde Kors) — implemented as Pack 2 of the security plan shared 2026-05-13.
+
+**Why this matters**: the existing module already showed status cards + findings + a DPIA panel. Pack 2 makes findings *actionable, traceable and persistent*: a finding marked `fixed` stays `fixed` across re-scans; scan runs persist with timestamps + counts; the DPIA is editable not just visual.
+
+**Backend (new files)**
+
+- **NEW** `backend/schemas/qa_security.py` — Pydantic models for `SecurityCheck`, `Finding`, `ScanRun`, `DpiaForm` + request/response wrappers. Stable, frontend-friendly contract: every check carries `id, title, description, category (security/privacy/dpia), status, severity, scan_type (automatic / semi-automatic / manual), summary, findings[], evidence[], recommendations[], source, last_run_at`.
+- **NEW** `backend/repositories/qa_security_repository.py` — Mongo persistence with in-memory fallback. Critical behaviour: `upsert_finding` preserves user-set statuses (`accepted_risk`, `fixed`, `verified`) so re-scans never clobber human decisions. Append-only audit history (last 20 entries per finding).
+- **NEW** `backend/services/qa_security_service.py` — Orchestrator on top of `red_cross_qa.run_security_scan` + `run_dpia_check`. Adds static check catalogue (25 entries — 13 security/privacy + 12 DPIA — with category + scan_type tagging), deterministic finding IDs (`<check_id>::<title-slug>`), keyword-based finding-to-check routing, auto-suggested owners per check (devops / backend / personvernombud / etc.), DPIA seeding on first request.
+- **NEW** `backend/routers/qa_security.py` — 8 paths under `/api/qa/security/*` with 10 method bindings:
+  - `GET /status` — top-level rollup
+  - `GET /checks` — list with status
+  - `GET /checks/{id}` — full detail with findings_detail
+  - `POST /scan` — persist a ScanRun + Findings; returns snapshot
+  - `GET /findings` — filter by status / severity / check_id
+  - `PATCH /findings/{id}` — update status / owner / recommendation / evidence + audit note
+  - `GET /history` — last N runs
+  - `GET /dpia` — load form (seeds default on first request)
+  - `POST /dpia` — replace form
+  - `PATCH /dpia` — partial update
+- **MODIFIED** `backend/db.py` — 3 new Mongo collections: `qa_security_scans`, `qa_security_findings`, `qa_security_dpia`.
+- **MODIFIED** `backend/app.py` — registers `qa_security_router`.
+- **NEW** `backend/tests/smoke_qa_security.py` — 10 checks exercising the full lifecycle (perform_scan → check shape → finding shape → status snapshot → check detail → filters → PATCH → **re-scan preserves status** → history newest-first → DPIA seed/save/patch → router registration).
+
+**Backward compatibility**: `/api/red-cross-qa/run-security-scan` and `/api/red-cross-qa/run-dpia-check` remain untouched. The new `/api/qa/security/*` namespace is additive.
+
+**Frontend (new structure)**
+
+- **NEW** `frontend/src/red-cross-qa/security/` directory with 7 components + 1 API client + 1 tokens module:
+  - `SecurityPrivacyTab.jsx` — orchestrator. Holds all state (snapshot, checks, findings, history, active detail, filters). Children are presentational + emit events back up.
+  - `components/SecurityCheckCard.jsx` — clickable card with status pill, category icon, severity badge, scan_type chip, findings count, last_run timestamp.
+  - `components/SecurityCheckDetailPanel.jsx` — drawer with summary, evidence list, recommendations list, full findings rows. Closeable.
+  - `components/FindingRow.jsx` — expandable row. Status selector (open/accepted_risk/fixed/verified), owner input, recommendation textarea, audit note input, Save button, audit history viewer.
+  - `components/FindingsList.jsx` — collection wrapper with filtered-vs-total count.
+  - `components/ScanHistoryPanel.jsx` — last 5 runs with PASS/WARN/FAIL stat chips + trend arrow (↓ improving / ↑ regressing / → flat) vs previous run.
+  - `components/DpiaChecklistPanel.jsx` — editable structured form (10 fields: text/textarea/list/bool kinds), Save / Discard buttons, dirty tracking, "saved at" indicator.
+  - `components/StatusFilters.jsx` — composite filter bar (check status / scan type / category / finding status / severity) used for both grid and findings.
+  - `api.js` — thin REST client (`securityApi.status / checks / checkDetail / scan / findings / patchFinding / history / dpia.get / dpia.save / dpia.patch`).
+  - `tokens.js` — shared visual tokens (STATUS_STYLES, SEV_COLOR, FINDING_STATUS_STYLES, SCAN_TYPE_STYLES, CATEGORY_STYLES + panel / panelTitle / inputCss / primaryBtn / etc.).
+- **MODIFIED** `frontend/src/red-cross-qa/SecurityPrivacy.jsx` — collapsed to a 1-line re-export so the agent shell wiring stays unchanged.
+
+**i18n** — full EN/NO/ES parity, **82 new keys × 3 locales = 246 new entries** under `securityPrivacy.*`:
+- Snapshot: `snapshotTitle`, `runScan`, `lastScanAt`, `noScanYet`, `overall`, `statTotal`, `statOpenFindings`
+- Checks: `checksTitle`, `checksHint`, `noChecksForFilter`, `lastRunAt`, `findingsCount`, `scanType`, `source`
+- Scan types: `scanType_automatic`, `scanType_semi_automatic`, `scanType_manual`
+- Categories: `category_security`, `category_privacy`, `category_dpia`
+- Detail: `detailSummary`, `detailEvidence`, `detailRecommendations`, `detailLinkedFindings`, `noFindingsForCheck`
+- Findings: `findingsSectionTitle`, `noFindingsForFilter`, `findingStatusLabel`, `findingOwner`, `findingOwnerPlaceholder`, `findingRecommendation`, `findingRecommendationPlaceholder`, `findingNote`, `findingNotePlaceholder`, `findingSave`, `findingHistory`, `updatedAt`
+- Finding statuses: `findingStatus_open`, `findingStatus_accepted_risk`, `findingStatus_fixed`, `findingStatus_verified`
+- Filters: `filterStatus`, `filterScanType`, `filterCategory`, `filterFindingStatus`, `filterSeverity`, `filterAll`
+- History: `historyTitle`, `historyHint`, `historyTrigger`, `noHistory`, `trendImproving`, `trendRegressing`, `trendFlat`
+- DPIA: `dpiaTitle`, `dpiaHint`, `dpiaSave`, `dpiaDiscard`, `dpiaSavedAt`, `dpiaLastUpdate`, `dpiaBoolYes`, `dpiaBoolNo`, `dpiaListHint` + 10 field labels (`dpiaField_*`) + 10 placeholders (`dpiaPlaceholder_*`)
+- **Total i18n locale size**: 672 keys per locale (was 590), full parity.
+
+**Architectural notes**
+
+- **No new tabs.** Tab 14 retains its position in the agent shell; only its internal implementation changed. The old single-file `SecurityPrivacy.jsx` (~250 lines) is now a 1-line re-export pointing at the new modular structure (~1500 lines split across 9 files).
+- **Mock-first preserved.** The new `/api/qa/security/scan` endpoint calls the existing `run_security_scan` + `run_dpia_check` (which are mock-first). No new LLM dependency — the workshop demo runs offline.
+- **Persistence is optional.** When Mongo is unavailable, the repository falls back to module-level in-memory caches so the workshop demo works in any environment. When Mongo IS available, findings + DPIA + scan history persist across backend restarts.
+- **User-set status is sacred.** The `_PROTECTED_STATUSES` set in the repository (`{accepted_risk, fixed, verified}`) means re-running a scan never silently reopens a finding the human deliberately closed. Title / description / evidence / severity may refresh from the scanner; status / owner / recommendation are kept as the human last set them.
+
+**Tests**
+
+- New: 10/10 Phase H smoke checks PASS (`python -m backend.tests.smoke_qa_security`).
+- Regression: 20/20 Phase A→G smoke checks still PASS (`python -m backend.tests.smoke_red_cross_qa`).
+- Frontend production build: 0 warnings in `src/red-cross-qa/`.
+
+**Future (Pack 3 candidates)**
+
+- Markdown / PDF export of findings list
+- Direct dispatch from finding → ADO work item
+- Diff between two scan runs
+- "Verify fix" flow (re-runs only the scan plug-in linked to the closed finding)
+- Environment matrix (local / test / staging / prod side-by-side)
+
+---
+
 ## [1.11.0] - 2026-05-13
 
 ### Added — Red Cross Web QA · Phase G: NVDA + WAVE inside the Universell utforming-pilot tab
