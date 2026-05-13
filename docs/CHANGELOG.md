@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.11.0] - 2026-05-13
+
+### Added — Red Cross Web QA · Phase G: NVDA + WAVE inside the Universell utforming-pilot tab
+
+User request (2026-05-13, en): *"Puedes colocarme en el agente 'Røde Kors Web QA-agent' en su pestaña 'Universell utforming-pilot' que también pueda usar NVDA y WAVE?"*
+
+Both tools live alongside the existing axe-core + Lighthouse runner via a 3-radio tool selector at the top of the tab. The target URL field + WCAG version selector are reused across all three tools.
+
+**Backend**
+
+- **MODIFIED** `backend/services/red_cross_qa.py`:
+  - **NEW** `generate_nvda_script(url, scope, environment, lang)` — produces a deterministic markdown NVDA checklist (no LLM): NVDA setup keystrokes (`Insert + Ctrl + N`), elements-list opener (`Insert + F7`), page-title announce (`Insert + T`), Tab navigation, heading sweep (`H`), landmark sweep (`D`), form-field re-announce (`Insert + Tab`), error-on-validation announce (`Insert + B`), dialog open (`Insert + Down`). 5 scopes with per-scope expected announcements: `donation` (Beløp edit required, Vipps button), `volunteer` (Telefonnummer / Postnummer required), `search` (combo box autocomplete), `navigation` (banner / hovedmeny / hopp-til-hovedinnhold), `forms` (generic). Returns: `script_md`, `step_count`, `wcag_sc_covered[]`, `filename`, platform.
+  - **NEW** `run_wave_audit(url, environment, lang)` — mock-first WAVE (WebAIM) report shape mirroring the public API: `categories` (errors / contrast_errors / alerts / features / structural_elements / aria), `errors_detail[]` / `contrast_detail[]` / `alerts_detail[]` with WCAG SC mapping and severity. Returns the public report URL `https://wave.webaim.org/report#/{url}` for direct browser inspection. Real API call deferred behind `WAVE_API_KEY` env var (workshop safety: mock-first by default).
+- **MODIFIED** `backend/routers/red_cross_qa.py`:
+  - 2 new Pydantic models: `NvdaScriptRequest` (url, scope, env, lang) + `WaveAuditRequest` (url, env, lang).
+  - 2 new endpoints: `POST /generate-nvda-script` + `POST /run-wave-audit`.
+  - Total route count: **37** (was 35).
+
+**Frontend**
+
+- **REWRITE** `frontend/src/red-cross-qa/Accessibility.jsx`:
+  - 3-radio **tool selector** at the top (axe / NVDA / WAVE) — only the selected tool's UI renders below.
+  - When `axe` is selected: existing WCAG version selector + 12-check grid + score card + violations panel (unchanged behaviour).
+  - When `nvda` is selected: scope picker (5 chips) + Generate button + markdown viewer with monospace dark theme, WCAG SC chips, **Download .md** button (`Blob` API → browser download).
+  - When `wave` is selected: 6 stat cards (errors / contrast / alerts / features / structure / aria) + deep-link button to `wave.webaim.org/report` + 3 detail tables (Errors / Contrast errors / Alerts) with WCAG mapping + severity badge + mock-data notice with `WAVE_API_KEY` hint.
+
+**i18n**
+
+- **29 new keys × 3 locales** (EN / NO / ES) under `redCrossWebQaModule.accessibility.*`:
+  - Tool selector: `toolTitle`, `toolHint`, `tool_axe_hint`, `tool_nvda_hint`, `tool_wave_hint`
+  - NVDA: `btnGenerateNvda`, `btnDownloadNvda`, `nvdaScopeTitle`, `nvdaScope_donation`, `nvdaScope_volunteer`, `nvdaScope_search`, `nvdaScope_navigation`, `nvdaScope_forms`, `nvdaSteps`, `nvdaWcagCovered`
+  - WAVE: `btnRunWave`, `waveOpenReport`, `waveOpenHint`, `waveMockNotice`, `waveKeyPresentButMock`, `waveKeyMissing`, `waveErrorsTitle`, `waveContrastTitle`, `waveAlertsTitle`, `waveColCode`, `waveColLabel`, `waveColCount`, `waveColWcag`, `waveColSeverity`
+- Total: **590 keys per locale** (was 561), full EN/NO/ES parity.
+
+**Tests**
+
+- **MODIFIED** `backend/tests/smoke_red_cross_qa.py` — **2 new checks**:
+  - NVDA: script contains `Insert + Ctrl + N`, `Insert + T`, `Insert + F7`, `Tab`, "Expected announcement", "WCAG SC", at least one mention of `1.3.1`; ≥8 steps; ≥5 WCAG SCs covered.
+  - WAVE: all 6 categories present (errors, contrast_errors, alerts, features, structural_elements, aria), `wave_report_url` starts with `https://wave.webaim.org/report#/`, `errors_detail` / `contrast_detail` / `alerts_detail` are lists, `used_api` is `False` (mock-first guarantee).
+- Total smoke checks: **20** (was 18). All pass without Mongo, without LLM, without `WAVE_API_KEY`.
+
+**Docs**
+
+- `README.md` — Red Cross QA section now lists 37 endpoints / 20 smoke checks / 590 i18n keys; tab 9 row rewritten to describe the 3-tool selector.
+- `docs/CHANGELOG.md` — this entry.
+- `.claude/MODULES_REFERENCE.md` — Red Cross QA module updated to 37 routes + Phase G endpoints.
+
+**Architectural notes**
+
+- **No new tabs**, no new prompts. NVDA + WAVE fold into the existing Accessibility tab.
+- **NVDA is deterministic by design.** Keyboard shortcuts, expected announcements, WCAG SC mapping must NOT drift between runs — they're baked-in templates, not LLM-generated.
+- **WAVE is mock-first by default.** A real API call to `https://wave.webaim.org/api/` would require `WAVE_API_KEY` env var; the mock path returns a shape-identical report so swapping in real API results later is a one-line change.
+- **Backward compatible.** Existing axe + Lighthouse flow unchanged; the tool selector defaults to `axe` so existing workflows keep working without retraining.
+
+---
+
 ## [1.10.0] - 2026-05-12
 
 ### Added — Red Cross Web QA · Phase F: Tom's tooling tips for the rodekors.no NextJS rebuild
