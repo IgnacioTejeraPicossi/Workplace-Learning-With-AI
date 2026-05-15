@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.14.0] - 2026-05-15
+
+### Added — Red Cross Web QA · Phase H Pack 4.1 + 4.2: precise scan diffs and real ADO dispatch
+
+Closes two of the three Pack 4 candidates left as "Future" in 1.13.0. Pack 4.3 (Apollo plugin for Lunix performance) remains deferred pending coordination with the Røde Kors tech leder. All changes are additive and backward-compatible with Pack 3 contracts.
+
+**Pack 4.1 — per-scan finding snapshots → precise historical diffs**
+
+`backend/schemas/qa_security.py`:
+- New `FindingSnapshotEntry` Pydantic model (5 fields: `id`, `check_id`, `title`, `severity`, `status`). Kept intentionally small — a scan run with 50 findings stays under ~5 KB.
+- `ScanRun` gains an `Optional[List[FindingSnapshotEntry]] findings_snapshot` field, aliased `findingsSnapshot` for the frontend. Optional preserves backward compatibility with scan docs persisted before Pack 4.1.
+
+`backend/services/qa_security_service.py`:
+- `perform_scan()` now builds and persists `findings_snapshot` on every new `ScanRun` doc — captured AFTER status-preservation logic has merged the new scan with prior human decisions.
+- `diff_scans()` rewritten to prefer the precise path when both runs carry a snapshot:
+  - **`_diff_via_snapshots`** — set-difference + status transitions: `not in from + in to (open) → new`; `open in from + (closed in to OR absent in to) → fixed`; `closed in from + open in to → regressed`; `open in both → persisted`. Closed-status set: `{fixed, verified, accepted_risk}`.
+  - **`_diff_via_timestamps`** — original Pack 3 logic, kept as fallback for scan docs that pre-date Pack 4.1.
+  - Response now includes a `diff_mode` discriminator: `"precise" | "timestamp_fallback" | "no_scans"`. UI / debug tools can show users which logic was used.
+
+**Pack 4.2 — real ADO REST integration via `ADO_PAT` env var**
+
+`backend/services/qa_security_service.py`:
+- New helpers `_build_ado_description_md`, `_build_ado_json_patch`, and async `_dispatch_via_ado_rest`. Single source of truth for the work-item Markdown body and JSON-Patch document so the mock path and the live REST path produce indistinguishable payloads for review.
+- `dispatch_finding_to_ado()` now checks `os.environ['ADO_PAT']` (or `AZURE_DEVOPS_PAT`):
+  - When set, POSTs the JSON-Patch document to `https://dev.azure.com/{org}/{project}/_apis/wit/workitems/${type}?api-version=7.0` using HTTP Basic auth (empty user + PAT as password). On 2xx, returns the real work-item ID + `_links.html.href` URL with `is_mock=False`.
+  - On any failure (no PAT, network, 401, non-2xx, JSON parse), gracefully falls back to the deterministic SHA-derived mock — `is_mock=True` and the failure reason is captured in `live_error` and the audit-log history entry.
+- Response shape additions: `is_mock: bool`, `live_error: Optional[str]`. The finding doc now also persists `ado_is_mock` so the UI can render the correct badge without re-fetching the dispatch result.
+- ADO settings expanded: `ado_area_path`, `ado_iteration_path`, `ado_tags` from `red_cross_qa_settings` are now honoured in the JSON-Patch.
+
+`httpx==0.25.2` is already in `backend/requirements.txt` (used by `agi_ai_enrich_service.py` and `cloud_install_service.py`); no new dependency was added.
+
+**Environment / configuration**
+
+- `ADO_PAT` (or `AZURE_DEVOPS_PAT`) — Personal Access Token with `Work Items: Read & Write` scope. When absent, dispatch stays mock-first (the workshop / demo UX remains green without an ADO tenant). Never commit the value; read from `.env` only.
+
+**Frontend** — `FindingRow.jsx`:
+- New MOCK / LIVE badge rendered next to the ADO link button (green for LIVE, amber for MOCK). Title attribute explains the state in the active locale.
+- Dispatch callback now propagates `ado_is_mock` so the badge appears immediately without a refetch.
+- Defaults to MOCK on legacy finding docs that pre-date Pack 4.2 (no `ado_is_mock` field persisted).
+
+**i18n** — 4 new keys × 3 locales (EN / NO / ES), under `redCrossWebQaModule.securityPrivacy.*`:
+- `findingAdoMockBadge`, `findingAdoMockTitle`, `findingAdoLiveBadge`, `findingAdoLiveTitle`
+
+Total: 700 keys × 3 locales (was 696 × 3 in 1.13.0). Parity validated.
+
+**Smoke tests** — `backend/tests/smoke_qa_security.py` extended from 15 → 16 checks. New Pack 4.1 check exercises the snapshot path end-to-end (runs 2 scans, asserts `diff_mode == "precise"`, validates snapshots on both `from` and `to` run docs, confirms snapshot-derived diff rows do not leak `owner`/`updated_at`). Existing Pack 3 dispatch check extended to assert Pack 4.2 response shape (`is_mock`, `live_error`, `work_item.json_patch` with 5 required fields).
+
+Validation results:
+- `python -m backend.tests.smoke_qa_security` → 16/16 PASS
+- `python -m backend.tests.smoke_red_cross_qa` → 20/20 PASS (no regression)
+- i18n parity: EN/NO/ES 700 keys each, no missing/extra
+- Frontend `npm run build` → exit 0 (only pre-existing lint warnings in unrelated modules)
+
+### Deferred to Pack 4.3 (awaiting Tom)
+- Apollo plugin for live Lunix Next.js GraphQL performance telemetry. Plan: design the contract on our side (`docs/apollo-plugin-contract.md`), provide sample plugin code Tom can paste into `app/api/graphql/route.ts` on the Lunix repo, accept results via a new `/api/qa/security/apollo-stats` ingestion endpoint. No Lunix-side work until Tom is briefed.
+
+---
+
 ## [1.13.0] - 2026-05-15
 
 ### Added — Red Cross Web QA · Phase H Pack 3: 5 workflow extensions on the Sikkerhet og personvern workbench

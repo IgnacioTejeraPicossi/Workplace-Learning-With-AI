@@ -491,8 +491,8 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/export/markdown` | POST | Sprint-ready Markdown report (snapshot + findings by severity + tally + history + DPIA snapshot). Frontend downloads via Blob URL |
-| `/findings/{id}/dispatch-ado` | POST | Push single finding to ADO. Mock-first: deterministic SHA-derived work-item ID. Idempotent (same finding → same mock work item). Persists `ado_url` + `ado_work_item_id` on finding |
-| `/diff` | GET | Compare two scan runs. Returns `{from, to, counts_delta, findings: {new, fixed, regressed, persisted}, summary}` |
+| `/findings/{id}/dispatch-ado` | POST | Push single finding to ADO. Mock-first: deterministic SHA-derived work-item ID. Idempotent (same finding → same mock work item). Persists `ado_url` + `ado_work_item_id` on finding. **Pack 4.2 (2026-05-15)**: when `ADO_PAT` (or `AZURE_DEVOPS_PAT`) env var is set, posts a JSON-Patch document to the real ADO REST API (`POST /_apis/wit/workitems/${type}?api-version=7.0`, Basic auth) and returns `is_mock=False`. Graceful fallback to mock on any failure; `live_error` surfaces the reason. UI renders a MOCK / LIVE badge accordingly. |
+| `/diff` | GET | Compare two scan runs. Returns `{from, to, counts_delta, findings: {new, fixed, regressed, persisted}, diff_mode, summary}`. **Pack 4.1 (2026-05-15)**: `diff_mode` is `"precise"` when both `ScanRun` docs carry `findings_snapshot` (Pack 4.1 set-difference + status-transition logic), `"timestamp_fallback"` for pre-Pack-4.1 scans, `"no_scans"` when history is empty. |
 | `/findings/{id}/verify` | POST | Re-runs scan, auto-transitions finding: not re-detected → `verified`; re-detected → reopened (`open`); else preserved |
 | `/environments` | GET | Latest snapshot per env (local/test/staging/prod) + `worst_overall` aggregate. Powers governance matrix |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
@@ -537,7 +537,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 **Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **672 keys per locale**, full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11). Phase F (27 keys). Phase G (29 keys). **Phase H · Pack 2 (82 keys)**: full Sikkerhet og personvern workbench labels under `securityPrivacy.*` — snapshot, runScan, statTotal/statOpenFindings, checksTitle/checksHint, scanType_*, category_*, detail* (Summary/Evidence/Recommendations/LinkedFindings), findingStatus_* (open/accepted_risk/fixed/verified), filter* (Status/ScanType/Category/FindingStatus/Severity), historyTitle/historyHint/trend* (Improving/Regressing/Flat), and full structured DPIA editor (`dpiaField_*` + `dpiaPlaceholder_*` for purpose, dataTypes, sensitiveData, storageLocation, accessRoles, retention, thirdParties, legalBasis, riskNotes, mitigations).
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **700 keys per locale** (after Phase H Pack 4.2), full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11). Phase F (27 keys). Phase G (29 keys). **Phase H · Pack 2 (82 keys)**: full Sikkerhet og personvern workbench labels under `securityPrivacy.*` — snapshot, runScan, statTotal/statOpenFindings, checksTitle/checksHint, scanType_*, category_*, detail* (Summary/Evidence/Recommendations/LinkedFindings), findingStatus_* (open/accepted_risk/fixed/verified), filter* (Status/ScanType/Category/FindingStatus/Severity), historyTitle/historyHint/trend* (Improving/Regressing/Flat), and full structured DPIA editor (`dpiaField_*` + `dpiaPlaceholder_*` for purpose, dataTypes, sensitiveData, storageLocation, accessRoles, retention, thirdParties, legalBasis, riskNotes, mitigations).
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
@@ -552,12 +552,20 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 # Backend import smoke (PowerShell on Windows: set $env:PYTHONUTF8="1" first if needed)
 python -c "from backend.services.red_cross_qa import SUITE_NAMES; print(len(SUITE_NAMES))"   # → 18 (Phase D: 17 + redcross-stress-browser-loadster)
 python -c "from backend.routers.red_cross_qa import router; print(len(router.routes))"      # → 37 (Phase G: +2 /generate-nvda-script + /run-wave-audit)
-python -c "from backend.routers.qa_security import router; print(len(router.routes))"      # → 10 method bindings on 8 paths (Phase H · Pack 2)
+python -c "from backend.routers.qa_security import router; print(len(router.routes))"      # → 15 method bindings on 13 paths (Phase H · Pack 3+)
 
-# Phase H smoke (10 checks): perform_scan, check shape, finding shape,
+# Phase H smoke (16 checks): perform_scan, check shape, finding shape,
 # status snapshot, check detail, filters, PATCH, RE-SCAN PRESERVES STATUS,
-# history newest-first, DPIA lifecycle, router registration
+# history newest-first, DPIA lifecycle, router registration, Markdown
+# export, ADO dispatch (mock + Pack 4.2 is_mock / live_error / JSON-Patch
+# shape), diff_scans + Pack 4.1 precise-diff path, verify-fix, env matrix.
 python -m backend.tests.smoke_qa_security
+
+# Optional: real ADO dispatch path — set ADO_PAT in env to flip the
+# dispatcher from mock to live REST. The smoke test stays green either
+# way; without a PAT the mock path is asserted.
+#   $env:ADO_PAT = "<your-personal-access-token>"   # PowerShell
+#   export ADO_PAT="<your-personal-access-token>"    # bash
 
 # End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
 python -m backend.tests.smoke_red_cross_qa
