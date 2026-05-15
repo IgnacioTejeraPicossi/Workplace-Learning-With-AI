@@ -564,6 +564,10 @@
       "findingDispatchAdo": "Send til ADO",
       "findingDispatchAdoTitle": "Opprett et Azure DevOps-arbeidsobjekt fra dette funnet. Mock-først i dag; samme funn lander alltid på samme work-item-ID.",
       "findingAdoLinkTitle": "Åpne ADO-arbeidsobjektet i ny fane.",
+      "findingAdoMockBadge": "MOCK",
+      "findingAdoMockTitle": "Deterministisk mock-arbeidsobjekt — ingen reell ADO-API-kall ble utført. Sett ADO_PAT i backend-miljøet for å aktivere ekte utsending.",
+      "findingAdoLiveBadge": "LIVE",
+      "findingAdoLiveTitle": "Ekte Azure DevOps-arbeidsobjekt — opprettet via ADO REST-API.",
       "findingVerify": "Verifiser fiks",
       "findingVerifyTitle": "Kjør skanning på nytt for å verifisere fiksen. Hvis ikke oppdaget → status blir «verified». Hvis oppdaget igjen → gjenåpnes.",
 

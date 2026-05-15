@@ -222,17 +222,38 @@ export default function FindingRow({ finding, onPatched, compact = false }) {
             </button>
 
             {/* Pack 3 — Send to ADO (idempotent) */}
+            {/* Pack 4.2 — ado_is_mock flag distinguishes deterministic mock
+                work items (no ADO_PAT in backend env) from real REST-created
+                ones. Defaults to `true` on legacy finding docs that
+                pre-date Pack 4.2 (no flag persisted yet). */}
             {finding.ado_url ? (
-              <a href={finding.ado_url} target="_blank" rel="noopener noreferrer"
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <a href={finding.ado_url} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      padding: '6px 12px', borderRadius: 6,
+                      backgroundColor: '#1d4ed8', color: 'white',
+                      fontSize: 11, fontWeight: 700, textDecoration: 'none',
+                      letterSpacing: 0.3,
+                    }}
+                    title={t('redCrossWebQaModule.securityPrivacy.findingAdoLinkTitle')}>
+                  🎯 ADO #{finding.ado_work_item_id}
+                </a>
+                <span
+                  title={t(finding.ado_is_mock === false
+                    ? 'redCrossWebQaModule.securityPrivacy.findingAdoLiveTitle'
+                    : 'redCrossWebQaModule.securityPrivacy.findingAdoMockTitle')}
                   style={{
-                    padding: '6px 12px', borderRadius: 6,
-                    backgroundColor: '#1d4ed8', color: 'white',
-                    fontSize: 11, fontWeight: 700, textDecoration: 'none',
-                    letterSpacing: 0.3,
-                  }}
-                  title={t('redCrossWebQaModule.securityPrivacy.findingAdoLinkTitle')}>
-                🎯 ADO #{finding.ado_work_item_id}
-              </a>
+                    fontSize: 9, fontWeight: 800, padding: '2px 6px',
+                    borderRadius: 999, letterSpacing: 0.5,
+                    backgroundColor: finding.ado_is_mock === false ? '#dcfce7' : '#fef3c7',
+                    color: finding.ado_is_mock === false ? '#166534' : '#92400e',
+                    border: `1px solid ${finding.ado_is_mock === false ? '#86efac' : '#fcd34d'}`,
+                  }}>
+                  {finding.ado_is_mock === false
+                    ? t('redCrossWebQaModule.securityPrivacy.findingAdoLiveBadge')
+                    : t('redCrossWebQaModule.securityPrivacy.findingAdoMockBadge')}
+                </span>
+              </span>
             ) : (
               <button
                 onClick={async () => {
@@ -245,6 +266,9 @@ export default function FindingRow({ finding, onPatched, compact = false }) {
                       ado_work_item_id: r.ado_work_item_id,
                       ado_work_item_type: r.work_item_type,
                       ado_dispatched_at: r.dispatched_at,
+                      // Pack 4.2 — carry the MOCK/LIVE marker forward so the
+                      // badge renders without a refetch.
+                      ado_is_mock: r.is_mock !== false,
                     });
                   } catch (e) {
                     setAdoError(String(e.message || e));

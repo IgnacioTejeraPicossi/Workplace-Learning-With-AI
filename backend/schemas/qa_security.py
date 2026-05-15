@@ -100,6 +100,27 @@ class Finding(BaseModel):
 # Scan run (one row in the scan history panel)
 # ───────────────────────────────────────────────────────────────────────────
 
+
+class FindingSnapshotEntry(BaseModel):
+    """Phase H · Pack 4.1 — minimal finding state captured at the moment a
+    scan ran. Persisted on the ScanRun so `diff_scans` can compare two
+    runs precisely (set difference + status transitions) instead of
+    relying on the current finding doc's timestamps.
+
+    Kept intentionally small (~6 fields per finding) so a scan run doc
+    with 50 findings stays under ~5KB.
+    """
+
+    id: str = Field(..., description="Finding id at the time of this scan.")
+    check_id: str = Field(..., alias="checkId")
+    title: str = Field("")
+    severity: Severity = "info"
+    status: FindingStatus = "open"
+
+    class Config:
+        populate_by_name = True
+
+
 class ScanRun(BaseModel):
     id: str
     started_at: str = Field(..., alias="startedAt")
@@ -111,6 +132,14 @@ class ScanRun(BaseModel):
     environment: Environment = "test"
     trigger: str = Field("manual", description="How the scan was started ('manual', 'ci', 'scheduled').")
     actor: str = Field("anonymous", description="Who triggered the scan.")
+    # Pack 4.1 — snapshot of findings as they were at the END of this scan
+    # (after status preservation logic merged the new scan data with prior
+    # human decisions). Optional for backward compatibility: scan docs from
+    # before Pack 4.1 simply lack the field, and `diff_scans` falls back
+    # to the old timestamp-based logic.
+    findings_snapshot: Optional[List[FindingSnapshotEntry]] = Field(
+        default=None, alias="findingsSnapshot",
+    )
 
     class Config:
         populate_by_name = True

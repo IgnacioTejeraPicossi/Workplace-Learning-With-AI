@@ -464,6 +464,23 @@ async def perform_scan(environment: str = "test", lang: str = "en",
     finished_at = _now_iso()
     counts = _tally(rich_checks)
     scan_id = f"scan_{uuid.uuid4().hex[:12]}"
+
+    # Pack 4.1 — capture a minimal snapshot of every finding's state at
+    # this exact scan boundary. `diff_scans` will use it for precise
+    # set-difference + status-transition logic instead of timestamp
+    # approximation. Kept small (5 fields per row) so 50 findings ≈ 5KB.
+    findings_snapshot = [
+        {
+            "id": f.get("id"),
+            "check_id": f.get("check_id"),
+            "title": (f.get("title") or "")[:200],
+            "severity": f.get("severity") or "info",
+            "status": f.get("status") or "open",
+        }
+        for f in persisted_findings
+        if f.get("id")
+    ]
+
     run_doc = {
         "id": scan_id,
         "started_at": started_at,
@@ -475,6 +492,7 @@ async def perform_scan(environment: str = "test", lang: str = "en",
         "environment": environment,
         "trigger": trigger,
         "actor": actor,
+        "findings_snapshot": findings_snapshot,
     }
     await insert_scan_run(run_doc)
 
@@ -814,6 +832,116 @@ _SEV_TO_ADO = {
 }
 
 
+def _build_ado_description_md(finding: Dict[str, Any], finding_id: str) -> str:
+    """Compose the Markdown body used in BOTH the mock and the real ADO
+    work-item payload. Keeping a single source of truth makes the mock
+    indistinguishable from the live dispatch for review purposes."""
+    parts = [
+        f"**Finding ID:** `{finding_id}`",
+        f"**Check:** `{finding.get('check_id', '—')}`",
+        f"**Description:** {finding.get('description', '')}",
+        f"**Recommendation:** {finding.get('recommendation', '')}",
+        "**Evidence:**\n" + "\n".join(
+            [f"- {e}" for e in (finding.get('evidence') or [])]
+        ),
+    ]
+    if finding.get("gdpr_article"):
+        parts.append(f"**GDPR article:** {finding['gdpr_article']}")
+    return "\n\n".join(parts)
+
+
+def _build_ado_json_patch(
+    finding: Dict[str, Any],
+    finding_id: str,
+    ado_meta: Dict[str, Any],
+    area_path: Optional[str],
+    iteration_path: Optional[str],
+    tags: List[str],
+) -> List[Dict[str, Any]]:
+    """Build the JSON-Patch document the ADO REST API expects on
+    `POST /_apis/wit/workitems/${type}`. Each operation targets a single
+    work-item field — same shape `az boards work-item create` produces.
+    """
+    title = f"[QA Security] {finding.get('title', 'Untitled finding')}"
+    desc_md = _build_ado_description_md(finding, finding_id)
+    patch: List[Dict[str, Any]] = [
+        {"op": "add", "path": "/fields/System.Title", "value": title},
+        {"op": "add", "path": "/fields/System.Description",
+          "value": desc_md.replace("\n", "<br/>")},
+        {"op": "add", "path": "/fields/Microsoft.VSTS.Common.Priority",
+          "value": ado_meta["priority"]},
+        {"op": "add", "path": "/fields/Microsoft.VSTS.Common.Severity",
+          "value": ado_meta["severity_dev"]},
+        {"op": "add", "path": "/fields/System.Tags",
+          "value": "; ".join(tags)},
+    ]
+    if area_path:
+        patch.append({"op": "add", "path": "/fields/System.AreaPath",
+                       "value": area_path})
+    if iteration_path:
+        patch.append({"op": "add", "path": "/fields/System.IterationPath",
+                       "value": iteration_path})
+    return patch
+
+
+async def _dispatch_via_ado_rest(
+    pat: str,
+    org: str,
+    project: str,
+    work_item_type: str,
+    json_patch: List[Dict[str, Any]],
+) -> Tuple[Optional[int], Optional[str], Optional[str]]:
+    """Pack 4.2 — call the real ADO REST API to create a work item.
+
+    Returns `(work_item_id, work_item_url, error_message)`. On any
+    exception or non-2xx response, `work_item_id` is None and
+    `error_message` is set; the caller falls back to the deterministic
+    mock path so the UX never breaks.
+
+    Auth: HTTP Basic with empty user + PAT as password
+          (`Authorization: Basic base64(":<PAT>")`).
+    Endpoint:
+        POST https://dev.azure.com/{org}/{project}/_apis/wit/workitems/${type}
+             ?api-version=7.0
+    Content-Type: application/json-patch+json
+    """
+    import base64
+
+    try:
+        import httpx  # httpx==0.25.2 is already in backend/requirements.txt
+    except ImportError:
+        return None, None, "httpx not installed"
+
+    # Empty user, PAT as password — same format `az` and `curl --user :PAT` use.
+    token_bytes = f":{pat}".encode("utf-8")
+    basic_auth = base64.b64encode(token_bytes).decode("ascii")
+    # ADO requires the work item type prefixed with `$` (URL-encoded `%24`).
+    from urllib.parse import quote
+    safe_type = quote(work_item_type, safe="")
+    endpoint = (f"https://dev.azure.com/{org}/{project}"
+                  f"/_apis/wit/workitems/${safe_type}?api-version=7.0")
+
+    headers = {
+        "Authorization": f"Basic {basic_auth}",
+        "Content-Type": "application/json-patch+json",
+        "Accept": "application/json",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(endpoint, headers=headers,
+                                       json=json_patch)
+        if resp.status_code < 200 or resp.status_code >= 300:
+            return None, None, (f"ADO REST returned {resp.status_code}: "
+                                  f"{resp.text[:200]}")
+        body = resp.json()
+        wi_id = body.get("id")
+        wi_url = (body.get("_links") or {}).get("html", {}).get("href")
+        return wi_id, wi_url, None
+    except Exception as exc:  # pragma: no cover — defensive
+        return None, None, f"{type(exc).__name__}: {exc}"
+
+
 async def dispatch_finding_to_ado(
     finding_id: str,
     environment: str = "test",
@@ -822,16 +950,23 @@ async def dispatch_finding_to_ado(
 ) -> Dict[str, Any]:
     """Push a single finding to Azure DevOps as a work item.
 
-    Mock-first: generates a deterministic ADO URL + work-item id based on
-    the finding_id and the current ADO settings (organization / project
-    / area path / iteration path / tags) from `red_cross_qa_settings`.
-    When a real ADO PAT is wired in later, only this function changes —
-    the persisted shape on the finding stays identical.
+    Pack 4.2 — when the `ADO_PAT` environment variable is set, this
+    function POSTs a JSON-Patch document to the real ADO REST API
+    (`POST /_apis/wit/workitems/${type}?api-version=7.0`). The returned
+    `is_mock` flag is `False` on success.
+
+    When `ADO_PAT` is NOT set, OR the live call fails for any reason
+    (network, 401, missing project, etc.), the function falls back to
+    the deterministic mock used since Pack 3: a SHA-derived work-item id
+    keyed on `finding_id` so the same finding always lands on the same
+    mock work item across re-dispatches. The fallback path keeps the
+    workshop / demo UX green even when no ADO tenant is wired up.
 
     Persists the resulting ADO URL + work_item_id on the finding so the
     UI can surface "Already in ADO" instead of duplicating dispatches.
     """
     import hashlib
+    import os
 
     finding = await get_finding(finding_id)
     if not finding:
@@ -844,24 +979,63 @@ async def dispatch_finding_to_ado(
     # (organization / project / area_path / iteration_path / tags).
     ado_org = "rodekors"
     ado_project = "rodekors-web"
+    ado_area_path: Optional[str] = None
+    ado_iteration_path: Optional[str] = None
+    extra_tags: List[str] = []
     try:
         from backend.services.red_cross_qa import get_settings as _get_rcqa_settings
         rcqa = await _get_rcqa_settings()
         rcqa_settings = (rcqa or {}).get("settings") or {}
         ado_org = rcqa_settings.get("ado_organization") or ado_org
         ado_project = rcqa_settings.get("ado_project") or ado_project
+        ado_area_path = rcqa_settings.get("ado_area_path") or None
+        ado_iteration_path = rcqa_settings.get("ado_iteration_path") or None
+        extra_tags = list(rcqa_settings.get("ado_tags") or [])
     except Exception:
         pass
 
-    # Deterministic mock work-item id derived from the finding id.
-    # A finding always lands on the same mock work item across re-dispatches.
-    digest = hashlib.sha1(finding_id.encode("utf-8")).hexdigest()
-    mock_id = 10000 + (int(digest[:6], 16) % 90000)
-    ado_url = (f"https://dev.azure.com/{ado_org}/{ado_project}"
-                f"/_workitems/edit/{mock_id}")
+    base_tags = ["qa-security", f"check:{finding.get('check_id')}",
+                  f"finding:{finding_id}"]
+    all_tags = base_tags + [t for t in extra_tags if t and t not in base_tags]
 
+    # Build the JSON-Patch ONCE — used by both the live ADO REST call and
+    # left attached to the response for traceability.
+    json_patch = _build_ado_json_patch(
+        finding, finding_id, ado_meta,
+        ado_area_path, ado_iteration_path, all_tags,
+    )
+
+    # ─── Try the real ADO REST path when ADO_PAT is in env ───────────
+    pat = os.environ.get("ADO_PAT") or os.environ.get("AZURE_DEVOPS_PAT")
+    live_id: Optional[int] = None
+    live_url: Optional[str] = None
+    live_error: Optional[str] = None
+    if pat:
+        live_id, live_url, live_error = await _dispatch_via_ado_rest(
+            pat=pat,
+            org=ado_org,
+            project=ado_project,
+            work_item_type=ado_meta["work_item_type"],
+            json_patch=json_patch,
+        )
+
+    is_mock = (live_id is None)
+
+    if not is_mock:
+        wi_id = live_id
+        ado_url = live_url or (f"https://dev.azure.com/{ado_org}/{ado_project}"
+                                 f"/_workitems/edit/{live_id}")
+    else:
+        # Deterministic mock work-item id derived from the finding id.
+        # A finding always lands on the same mock work item across re-dispatches.
+        digest = hashlib.sha1(finding_id.encode("utf-8")).hexdigest()
+        wi_id = 10000 + (int(digest[:6], 16) % 90000)
+        ado_url = (f"https://dev.azure.com/{ado_org}/{ado_project}"
+                    f"/_workitems/edit/{wi_id}")
+
+    description_md = _build_ado_description_md(finding, finding_id)
     work_item_payload = {
-        "id": mock_id,
+        "id": wi_id,
         "url": ado_url,
         "title": f"[QA Security] {finding.get('title', 'Untitled finding')}",
         "work_item_type": ado_meta["work_item_type"],
@@ -870,34 +1044,35 @@ async def dispatch_finding_to_ado(
         "category_ops": "Kat A" if sev in ("critical", "high")
                           else "Kat B" if sev == "medium" else "Kat C",
         "test_level": "system",
-        "tags": ["qa-security", f"check:{finding.get('check_id')}",
-                  f"finding:{finding_id}"],
+        "tags": all_tags,
         "owner_hint": finding.get("owner"),
-        "description_md": (
-            f"**Finding ID:** `{finding_id}`\n\n"
-            f"**Check:** `{finding.get('check_id', '—')}`\n\n"
-            f"**Description:** {finding.get('description', '')}\n\n"
-            f"**Recommendation:** {finding.get('recommendation', '')}\n\n"
-            f"**Evidence:**\n"
-            + "\n".join([f"- {e}" for e in (finding.get('evidence') or [])])
-            + ("\n\n**GDPR article:** " + finding['gdpr_article']
-                if finding.get('gdpr_article') else "")
-        ),
+        "description_md": description_md,
+        "area_path": ado_area_path,
+        "iteration_path": ado_iteration_path,
+        "json_patch": json_patch,
     }
 
     # Persist the ADO link on the finding so the UI can show
     # "Already in ADO (#1234)" next time without re-dispatching.
+    dispatch_note = (
+        f"Dispatched to ADO as {ado_meta['work_item_type']} "
+        f"#{wi_id} (priority {ado_meta['priority']}, "
+        f"{ado_meta['severity_dev']}, "
+        f"{'LIVE' if not is_mock else 'MOCK'})"
+    )
+    if is_mock and live_error:
+        dispatch_note += f" — live attempt failed: {live_error}"
+
     patch_payload = {
         "ado_dispatched_at": _now_iso(),
         "ado_url": ado_url,
-        "ado_work_item_id": mock_id,
+        "ado_work_item_id": wi_id,
         "ado_work_item_type": ado_meta["work_item_type"],
+        "ado_is_mock": is_mock,
         "history": list(finding.get("history") or []) + [{
             "at": _now_iso(),
             "actor": actor,
-            "note": (f"Dispatched to ADO as {ado_meta['work_item_type']} "
-                       f"#{mock_id} (priority {ado_meta['priority']}, "
-                       f"{ado_meta['severity_dev']})"),
+            "note": dispatch_note,
             "status": finding.get("status"),
         }],
     }
@@ -927,14 +1102,15 @@ async def dispatch_finding_to_ado(
     return {
         "finding_id": finding_id,
         "ado_url": ado_url,
-        "ado_work_item_id": mock_id,
+        "ado_work_item_id": wi_id,
         "work_item_type": ado_meta["work_item_type"],
         "priority": ado_meta["priority"],
         "severity_dev": ado_meta["severity_dev"],
         "category_ops": work_item_payload["category_ops"],
         "dispatched_at": patch_payload["ado_dispatched_at"],
         "work_item": work_item_payload,
-        "is_mock": True,  # flip to False when a real PAT is wired in
+        "is_mock": is_mock,
+        "live_error": live_error,  # None on success or when no PAT
     }
 
 
@@ -948,18 +1124,24 @@ async def diff_scans(from_scan_id: Optional[str] = None,
     """Compare two scan runs by ID. If `from_scan_id` is omitted, use the
     second-most-recent run; if `to_scan_id` is omitted, use the newest.
 
+    Pack 4.1 — when BOTH scan run docs carry a `findings_snapshot`, uses
+    precise set-difference + status-transition logic. When either run
+    lacks a snapshot (pre-Pack-4.1 scan docs), falls back to the
+    timestamp-based approximation used in Pack 3.
+
     Returns:
       {
         from: {...},          # scan run doc
         to: {...},            # scan run doc
-        counts_delta: { pass, warn, fail },   # diff of aggregate counts
+        counts_delta: { pass, warn, fail },
         findings: {
-          new: [...]          # in `to` but not in `from`
-          fixed: [...]        # was in `from` open, now closed in `to`
-          regressed: [...]    # had been fixed/verified, now open again
-          persisted: [...]    # in both, still open
+          new: [...]          # in `to.snapshot` but not in `from.snapshot`
+          fixed: [...]        # open in `from`, closed in `to` (or absent in `to`)
+          regressed: [...]    # closed in `from`, open in `to`
+          persisted: [...]    # open in both
         },
-        summary: "..."        # one-line human-readable
+        diff_mode: "precise" | "timestamp_fallback",
+        summary: "..."
       }
     """
     runs = await list_scan_runs(limit=20, environment=environment)
@@ -967,6 +1149,7 @@ async def diff_scans(from_scan_id: Optional[str] = None,
         return {"from": None, "to": None,
                 "counts_delta": {"pass": 0, "warn": 0, "fail": 0},
                 "findings": {"new": [], "fixed": [], "regressed": [], "persisted": []},
+                "diff_mode": "no_scans",
                 "summary": "no_scans"}
 
     # Newest first. Resolve IDs.
@@ -997,36 +1180,15 @@ async def diff_scans(from_scan_id: Optional[str] = None,
                      - ((from_run or {}).get("fail_count") or 0)),
     }
 
-    # We compare CURRENT findings against their timestamps to decide
-    # category. This is a pragmatic approximation since we don't persist
-    # a per-scan snapshot of findings yet (would bloat each run doc).
-    all_findings = await list_findings(limit=500)
-    from_t = (from_run or {}).get("finished_at") or "1970"
-    to_t = to_run.get("finished_at") or _now_iso()
+    from_snapshot = (from_run or {}).get("findings_snapshot")
+    to_snapshot = to_run.get("findings_snapshot")
+    has_precise = bool(from_snapshot is not None and to_snapshot is not None)
 
-    bucket = {"new": [], "fixed": [], "regressed": [], "persisted": []}
-    for f in all_findings:
-        created = f.get("created_at") or ""
-        updated = f.get("updated_at") or ""
-        status = f.get("status") or "open"
-        # New: created within (from, to] window
-        if from_t < created <= to_t and status == "open":
-            bucket["new"].append(_diff_row(f))
-            continue
-        # Fixed: closed within the window
-        if status in ("fixed", "verified") and from_t < updated <= to_t:
-            bucket["fixed"].append(_diff_row(f))
-            continue
-        # Regressed: was non-open, now open within the window
-        if status == "open" and updated > from_t and any(
-            (h or {}).get("status") in ("fixed", "verified", "accepted_risk")
-            for h in (f.get("history") or [])
-        ):
-            bucket["regressed"].append(_diff_row(f))
-            continue
-        # Persisted: still open, existed before `from_t`
-        if status == "open" and created <= from_t:
-            bucket["persisted"].append(_diff_row(f))
+    if has_precise:
+        bucket, diff_mode = _diff_via_snapshots(from_snapshot, to_snapshot)
+    else:
+        bucket = await _diff_via_timestamps(from_run, to_run)
+        diff_mode = "timestamp_fallback"
 
     summary = (
         f"{len(bucket['new'])} new · "
@@ -1040,8 +1202,96 @@ async def diff_scans(from_scan_id: Optional[str] = None,
         "to": to_run,
         "counts_delta": counts_delta,
         "findings": bucket,
+        "diff_mode": diff_mode,
         "summary": summary,
     }
+
+
+# Statuses that count as "closed" for diff purposes — they are no longer
+# operationally open, regardless of why (fixed, signed-off as accepted
+# risk, or independently verified).
+_CLOSED_STATUSES = frozenset(("fixed", "verified", "accepted_risk"))
+
+
+def _diff_via_snapshots(
+    from_snapshot: List[Dict[str, Any]],
+    to_snapshot: List[Dict[str, Any]],
+) -> tuple[Dict[str, List[Dict[str, Any]]], str]:
+    """Precise diff using Pack 4.1 per-scan finding snapshots."""
+    from_by_id = {(e or {}).get("id"): e for e in (from_snapshot or [])
+                   if (e or {}).get("id")}
+    to_by_id = {(e or {}).get("id"): e for e in (to_snapshot or [])
+                 if (e or {}).get("id")}
+
+    bucket = {"new": [], "fixed": [], "regressed": [], "persisted": []}
+
+    # Walk every finding seen in at least one of the two snapshots.
+    for fid in (set(from_by_id) | set(to_by_id)):
+        from_entry = from_by_id.get(fid)
+        to_entry = to_by_id.get(fid)
+        from_status = (from_entry or {}).get("status") or "open"
+        to_status = (to_entry or {}).get("status") or "open"
+        # Pick the more informative entry for display.
+        display = to_entry or from_entry or {"id": fid}
+
+        in_from = from_entry is not None
+        in_to = to_entry is not None
+        from_open = (from_status == "open")
+        from_closed = (from_status in _CLOSED_STATUSES)
+        to_open = (to_status == "open")
+        to_closed = (to_status in _CLOSED_STATUSES)
+
+        if not in_from and in_to and to_open:
+            # Appeared in `to` for the first time (open).
+            bucket["new"].append(_diff_row_from_snapshot(display))
+        elif in_from and from_open and not in_to:
+            # Was open in `from`, completely gone in `to` — treat as fixed.
+            bucket["fixed"].append(_diff_row_from_snapshot(display))
+        elif in_from and from_open and to_closed:
+            # Open → closed.
+            bucket["fixed"].append(_diff_row_from_snapshot(display))
+        elif in_from and from_closed and to_open:
+            # Closed → open again.
+            bucket["regressed"].append(_diff_row_from_snapshot(display))
+        elif in_from and from_open and to_open:
+            # Still open in both runs.
+            bucket["persisted"].append(_diff_row_from_snapshot(display))
+        # All other combinations (closed→closed, new but already closed, etc.)
+        # are not interesting for the diff view; intentionally not bucketed.
+
+    return bucket, "precise"
+
+
+async def _diff_via_timestamps(
+    from_run: Optional[Dict[str, Any]],
+    to_run: Dict[str, Any],
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Legacy timestamp-based diff. Kept as fallback for scan docs that
+    pre-date Pack 4.1 (no findings_snapshot)."""
+    all_findings = await list_findings(limit=500)
+    from_t = (from_run or {}).get("finished_at") or "1970"
+    to_t = to_run.get("finished_at") or _now_iso()
+
+    bucket = {"new": [], "fixed": [], "regressed": [], "persisted": []}
+    for f in all_findings:
+        created = f.get("created_at") or ""
+        updated = f.get("updated_at") or ""
+        status = f.get("status") or "open"
+        if from_t < created <= to_t and status == "open":
+            bucket["new"].append(_diff_row(f))
+            continue
+        if status in _CLOSED_STATUSES and from_t < updated <= to_t:
+            bucket["fixed"].append(_diff_row(f))
+            continue
+        if status == "open" and updated > from_t and any(
+            (h or {}).get("status") in _CLOSED_STATUSES
+            for h in (f.get("history") or [])
+        ):
+            bucket["regressed"].append(_diff_row(f))
+            continue
+        if status == "open" and created <= from_t:
+            bucket["persisted"].append(_diff_row(f))
+    return bucket
 
 
 def _diff_row(f: Dict[str, Any]) -> Dict[str, Any]:
@@ -1053,6 +1303,20 @@ def _diff_row(f: Dict[str, Any]) -> Dict[str, Any]:
         "status": f.get("status"),
         "owner": f.get("owner"),
         "updated_at": f.get("updated_at"),
+    }
+
+
+def _diff_row_from_snapshot(entry: Dict[str, Any]) -> Dict[str, Any]:
+    """Build a diff row from a per-scan snapshot entry (no owner / no
+    updated_at fields are in the snapshot — they live on the finding doc,
+    not the scan run doc). Callers that want owner/timestamp can join
+    against `list_findings` separately."""
+    return {
+        "id": entry.get("id"),
+        "check_id": entry.get("check_id"),
+        "title": entry.get("title"),
+        "severity": entry.get("severity"),
+        "status": entry.get("status"),
     }
 
 

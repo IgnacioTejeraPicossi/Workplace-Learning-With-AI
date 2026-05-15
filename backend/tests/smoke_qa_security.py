@@ -269,6 +269,42 @@ async def main() -> int:
                 failures.append("ADO work_item_id missing")
             if d1.get("severity_dev") not in ("Sev 1", "Sev 2", "Sev 3", "Sev 4"):
                 failures.append(f"severity_dev invalid: {d1.get('severity_dev')}")
+            # Pack 4.2 — response must carry is_mock + live_error fields,
+            # and (without ADO_PAT in env) MUST run the mock path.
+            if "is_mock" not in d1:
+                failures.append("Pack 4.2: response missing 'is_mock' flag")
+            if "live_error" not in d1:
+                failures.append("Pack 4.2: response missing 'live_error' field")
+            import os as _os
+            if not _os.environ.get("ADO_PAT") and not _os.environ.get("AZURE_DEVOPS_PAT"):
+                if d1.get("is_mock") is not True:
+                    failures.append(
+                        f"Pack 4.2: no PAT in env but is_mock={d1.get('is_mock')} "
+                        "(expected True)"
+                    )
+                if d1.get("live_error") is not None:
+                    failures.append(
+                        f"Pack 4.2: no PAT in env yet live_error={d1.get('live_error')!r} "
+                        "(should be None — live REST should not be attempted)"
+                    )
+            # Pack 4.2 — work_item payload must include the JSON Patch
+            # document used by the real REST endpoint (so the UI / debug
+            # tools can show exactly what would have been sent to ADO).
+            wi = d1.get("work_item") or {}
+            if not isinstance(wi.get("json_patch"), list) or not wi["json_patch"]:
+                failures.append("Pack 4.2: work_item.json_patch missing or empty")
+            else:
+                paths = {op.get("path") for op in wi["json_patch"]}
+                required_paths = {
+                    "/fields/System.Title",
+                    "/fields/System.Description",
+                    "/fields/Microsoft.VSTS.Common.Priority",
+                    "/fields/Microsoft.VSTS.Common.Severity",
+                    "/fields/System.Tags",
+                }
+                missing_p = required_paths - paths
+                if missing_p:
+                    failures.append(f"Pack 4.2: JSON Patch missing fields: {missing_p}")
             # Idempotency: re-dispatching the same finding yields the SAME
             # mock work-item id (deterministic SHA-based mapping).
             d2 = await dispatch_finding_to_ado(
@@ -343,7 +379,63 @@ async def main() -> int:
     except Exception as e:
         failures.append(f"verify_finding raised: {e}")
 
-    # ── 15. Environment matrix ─────────────────────────────────────
+    # ── 15. Pack 4.1 — precise diff via per-scan finding snapshots ───
+    try:
+        # Run two fresh scans so we have at least two Pack-4.1 runs in
+        # history (both carry findings_snapshot). Default args → newest
+        # vs previous, which should now hit the precise code path.
+        await perform_scan(environment="test", lang="en",
+                            actor="smoke-pack-4-1-a", trigger="ci")
+        await perform_scan(environment="test", lang="en",
+                            actor="smoke-pack-4-1-b", trigger="ci")
+        diff_precise = await diff_scans(environment="test")
+
+        if diff_precise.get("diff_mode") != "precise":
+            failures.append(
+                f"Pack 4.1: diff_mode expected 'precise', got "
+                f"{diff_precise.get('diff_mode')!r} (snapshot not picked up?)"
+            )
+        # Both run docs must carry findings_snapshot (proves Pack 4.1
+        # serialisation reached the persistence layer).
+        for side in ("from", "to"):
+            run = diff_precise.get(side) or {}
+            snap = run.get("findings_snapshot")
+            if snap is None:
+                failures.append(
+                    f"Pack 4.1: {side}.findings_snapshot missing on scan run doc"
+                )
+            elif snap and not all("id" in (e or {}) for e in snap):
+                failures.append(
+                    f"Pack 4.1: {side}.findings_snapshot has entries missing 'id'"
+                )
+        # All four buckets must be present and lists, even if empty.
+        buckets = diff_precise.get("findings", {})
+        for b in ("new", "fixed", "regressed", "persisted"):
+            if not isinstance(buckets.get(b), list):
+                failures.append(f"Pack 4.1: precise diff bucket '{b}' missing or not a list")
+        # Snapshot-derived rows must NOT carry owner / updated_at
+        # (those fields live on the live finding doc, not the snapshot).
+        sample_row = next(
+            (r for b in ("new", "fixed", "regressed", "persisted")
+              for r in buckets.get(b, [])),
+            None,
+        )
+        if sample_row is not None:
+            for forbidden in ("owner", "updated_at"):
+                if forbidden in sample_row:
+                    failures.append(
+                        f"Pack 4.1: snapshot diff row leaked '{forbidden}'"
+                    )
+        from_snap_len = len((diff_precise.get("from") or {}).get("findings_snapshot") or [])
+        to_snap_len = len((diff_precise.get("to") or {}).get("findings_snapshot") or [])
+        print(f"[OK] Pack 4.1 precise diff "
+              f"(diff_mode={diff_precise.get('diff_mode')}, "
+              f"from_snap={from_snap_len}, to_snap={to_snap_len}, "
+              f"summary={diff_precise.get('summary')!r})")
+    except Exception as e:
+        failures.append(f"Pack 4.1 precise-diff smoke raised: {e}")
+
+    # ── 16. Environment matrix ─────────────────────────────────────
     try:
         matrix = await get_environment_matrix()
         if "environments" not in matrix or not isinstance(matrix["environments"], list):

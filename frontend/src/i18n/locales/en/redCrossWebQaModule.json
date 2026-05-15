@@ -564,6 +564,10 @@
       "findingDispatchAdo": "Send to ADO",
       "findingDispatchAdoTitle": "Create an Azure DevOps work item from this finding. Mock-first today; the same finding always lands on the same work-item ID.",
       "findingAdoLinkTitle": "Open the ADO work item in a new tab.",
+      "findingAdoMockBadge": "MOCK",
+      "findingAdoMockTitle": "Deterministic mock work item — no real ADO API call was made. Set ADO_PAT in the backend env to enable live dispatch.",
+      "findingAdoLiveBadge": "LIVE",
+      "findingAdoLiveTitle": "Real Azure DevOps work item — created via the ADO REST API.",
       "findingVerify": "Verify fix",
       "findingVerifyTitle": "Re-run the scan to verify the fix. If not detected → status moves to 'verified'. If re-detected → reopened.",
 
