@@ -22,6 +22,11 @@ export default function FindingRow({ finding, onPatched, compact = false }) {
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  // Pack 3 — busy + error state for the two new buttons (ADO + verify-fix).
+  const [adoBusy, setAdoBusy] = useState(false);
+  const [adoError, setAdoError] = useState(null);
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyError, setVerifyError] = useState(null);
   const [draft, setDraft] = useState({
     status: finding.status || 'open',
     owner: finding.owner || '',
@@ -205,7 +210,7 @@ export default function FindingRow({ finding, onPatched, compact = false }) {
             />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <button onClick={save} disabled={saving || !isDirty} style={{
               padding: '7px 14px', borderRadius: 6, border: 'none',
               backgroundColor: (saving || !isDirty) ? '#cbd5e1' : '#15803d',
@@ -215,11 +220,91 @@ export default function FindingRow({ finding, onPatched, compact = false }) {
             }}>
               {saving ? t('redCrossWebQaModule.common.running') : `💾 ${t('redCrossWebQaModule.securityPrivacy.findingSave')}`}
             </button>
-            <span style={{ fontSize: 11, color: '#94a3b8' }}>
+
+            {/* Pack 3 — Send to ADO (idempotent) */}
+            {finding.ado_url ? (
+              <a href={finding.ado_url} target="_blank" rel="noopener noreferrer"
+                  style={{
+                    padding: '6px 12px', borderRadius: 6,
+                    backgroundColor: '#1d4ed8', color: 'white',
+                    fontSize: 11, fontWeight: 700, textDecoration: 'none',
+                    letterSpacing: 0.3,
+                  }}
+                  title={t('redCrossWebQaModule.securityPrivacy.findingAdoLinkTitle')}>
+                🎯 ADO #{finding.ado_work_item_id}
+              </a>
+            ) : (
+              <button
+                onClick={async () => {
+                  setAdoBusy(true); setAdoError(null);
+                  try {
+                    const r = await securityApi.dispatchAdo(finding.id);
+                    if (onPatched) onPatched({
+                      ...finding,
+                      ado_url: r.ado_url,
+                      ado_work_item_id: r.ado_work_item_id,
+                      ado_work_item_type: r.work_item_type,
+                      ado_dispatched_at: r.dispatched_at,
+                    });
+                  } catch (e) {
+                    setAdoError(String(e.message || e));
+                  } finally {
+                    setAdoBusy(false);
+                  }
+                }}
+                disabled={adoBusy}
+                style={{
+                  padding: '6px 12px', borderRadius: 6, border: '1px solid #1d4ed8',
+                  backgroundColor: adoBusy ? '#dbeafe' : 'white',
+                  color: '#1d4ed8', fontWeight: 700, fontSize: 11, cursor: adoBusy ? 'default' : 'pointer',
+                  letterSpacing: 0.3,
+                }}
+                title={t('redCrossWebQaModule.securityPrivacy.findingDispatchAdoTitle')}
+              >
+                {adoBusy ? t('redCrossWebQaModule.common.running')
+                          : `🎯 ${t('redCrossWebQaModule.securityPrivacy.findingDispatchAdo')}`}
+              </button>
+            )}
+
+            {/* Pack 3 — Verify-fix (only meaningful when status is 'fixed') */}
+            {finding.status === 'fixed' && (
+              <button
+                onClick={async () => {
+                  setVerifyBusy(true); setVerifyError(null);
+                  try {
+                    const r = await securityApi.verify(finding.id);
+                    if (onPatched && r?.finding) onPatched(r.finding);
+                  } catch (e) {
+                    setVerifyError(String(e.message || e));
+                  } finally {
+                    setVerifyBusy(false);
+                  }
+                }}
+                disabled={verifyBusy}
+                style={{
+                  padding: '6px 12px', borderRadius: 6, border: '1px solid #047857',
+                  backgroundColor: verifyBusy ? '#d1fae5' : 'white',
+                  color: '#047857', fontWeight: 700, fontSize: 11, cursor: verifyBusy ? 'default' : 'pointer',
+                  letterSpacing: 0.3,
+                }}
+                title={t('redCrossWebQaModule.securityPrivacy.findingVerifyTitle')}
+              >
+                {verifyBusy ? t('redCrossWebQaModule.common.running')
+                              : `✅ ${t('redCrossWebQaModule.securityPrivacy.findingVerify')}`}
+              </button>
+            )}
+
+            <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 'auto' }}>
               {t('redCrossWebQaModule.securityPrivacy.updatedAt')}: {formatTimestamp(finding.updated_at)}
               {finding.updated_by && ` · ${finding.updated_by}`}
             </span>
           </div>
+          {(adoError || verifyError) && (
+            <div style={{
+              padding: '8px 10px', borderRadius: 6, fontSize: 12,
+              backgroundColor: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca',
+            }}>{adoError || verifyError}</div>
+          )}
 
           {error && (
             <div style={{

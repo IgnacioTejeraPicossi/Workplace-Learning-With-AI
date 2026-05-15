@@ -37,6 +37,9 @@ try:
         perform_scan, get_status, get_checks, get_check_detail,
         get_findings, update_finding, get_history,
         get_dpia_form, save_dpia, patch_dpia_form, ensure_dpia_seed,
+        # Pack 3 additions
+        export_markdown_report, dispatch_finding_to_ado, diff_scans,
+        verify_finding, get_environment_matrix,
     )
 except ImportError:  # pragma: no cover
     from schemas.qa_security import (  # type: ignore
@@ -48,6 +51,9 @@ except ImportError:  # pragma: no cover
         perform_scan, get_status, get_checks, get_check_detail,
         get_findings, update_finding, get_history,
         get_dpia_form, save_dpia, patch_dpia_form, ensure_dpia_seed,
+        # Pack 3 additions
+        export_markdown_report, dispatch_finding_to_ado, diff_scans,
+        verify_finding, get_environment_matrix,
     )
 
 
@@ -240,3 +246,135 @@ async def api_patch_dpia(payload: Dict[str, Any]) -> Dict[str, Any]:
         return updated
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"DPIA patch failed: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Pack 3 endpoints (Phase H+) — five workflow extensions.
+# Kept at the bottom of the file so backward-compatibility is obvious:
+# the Pack 2 endpoints above this comment never changed.
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+# --- Request models (Pack 3) ----------------------------------------------
+
+try:
+    from pydantic import BaseModel, Field  # noqa: F401 — already imported above
+except ImportError:  # pragma: no cover
+    pass
+
+
+class ExportMarkdownRequest(BaseModel):
+    environment: Optional[str] = "test"
+    include_dpia: Optional[bool] = True
+    include_history: Optional[bool] = True
+    sprint_name: Optional[str] = Field(
+        default=None,
+        description="Optional sprint label that appears in the report title.",
+    )
+    lang: Optional[str] = "en"
+
+
+class DispatchAdoRequest(BaseModel):
+    environment: Optional[str] = "test"
+    actor: Optional[str] = "workshop-host"
+    lang: Optional[str] = "en"
+
+
+class VerifyFindingRequest(BaseModel):
+    environment: Optional[str] = "test"
+    actor: Optional[str] = "workshop-host"
+    lang: Optional[str] = "en"
+
+
+# --- Endpoints (Pack 3) ---------------------------------------------------
+
+@router.post("/export/markdown")
+async def api_export_markdown(body: ExportMarkdownRequest) -> Dict[str, Any]:
+    """Generate a sprint-ready Markdown report (snapshot + findings grouped
+    by severity + tally table + history + DPIA snapshot). Returns the
+    markdown string + filename; the frontend triggers the download via
+    a Blob URL (no server-side file system involvement)."""
+    try:
+        return await export_markdown_report(
+            environment=body.environment or "test",
+            include_dpia=bool(body.include_dpia),
+            include_history=bool(body.include_history),
+            sprint_name=body.sprint_name,
+            lang=body.lang or "en",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Markdown export failed: {e}")
+
+
+@router.post("/findings/{finding_id}/dispatch-ado")
+async def api_dispatch_finding_to_ado(finding_id: str,
+                                       body: DispatchAdoRequest) -> Dict[str, Any]:
+    """Push a single finding to Azure DevOps as a work item. Mock-first
+    today: returns a deterministic ADO URL + work-item ID. Persists the
+    link on the finding so re-dispatches are idempotent (the same finding
+    always lands on the same mock work item)."""
+    try:
+        return await dispatch_finding_to_ado(
+            finding_id=finding_id,
+            environment=body.environment or "test",
+            actor=body.actor or "workshop-host",
+            lang=body.lang or "en",
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"ADO dispatch failed: {e}")
+
+
+@router.get("/diff")
+async def api_diff(
+    from_scan: Optional[str] = Query(default=None,
+                                       description="Scan run ID to diff FROM. Defaults to the run before `to_scan`."),
+    to_scan: Optional[str] = Query(default=None,
+                                     description="Scan run ID to diff TO. Defaults to the newest run."),
+    environment: Optional[str] = Query(default=None,
+                                         description="Restrict scan history to this environment."),
+) -> Dict[str, Any]:
+    """Return {new, fixed, regressed, persisted} findings between two
+    scan runs + aggregate counts_delta + one-line summary."""
+    try:
+        return await diff_scans(from_scan_id=from_scan,
+                                  to_scan_id=to_scan,
+                                  environment=environment)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Diff failed: {e}")
+
+
+@router.post("/findings/{finding_id}/verify")
+async def api_verify_finding(finding_id: str,
+                              body: VerifyFindingRequest) -> Dict[str, Any]:
+    """Re-run the scan and check whether this finding still appears.
+    - Not re-detected  → transitions to 'verified' (auto-promote from 'fixed')
+    - Still detected   → transitions back to 'open' (regression)
+    - Status preserved → records the verification attempt only
+
+    Returns {finding, verification, scan_id, note}."""
+    try:
+        return await verify_finding(
+            finding_id=finding_id,
+            environment=body.environment or "test",
+            lang=body.lang or "en",
+            actor=body.actor or "workshop-host",
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Verify failed: {e}")
+
+
+@router.get("/environments")
+async def api_environment_matrix() -> Dict[str, Any]:
+    """Return the latest snapshot per known environment (local / test /
+    staging / prod). The frontend renders these side-by-side as a
+    governance dashboard."""
+    try:
+        return await get_environment_matrix()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Environment matrix failed: {e}")

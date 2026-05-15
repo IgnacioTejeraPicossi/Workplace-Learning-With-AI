@@ -77,7 +77,7 @@ const RedCrossWebQAAgent = () => {
       case 'designsystemet':    return <Designsystemet {...sharedProps} />;
       case 'role-matrix':       return <RoleMatrix {...sharedProps} />;
       case 'stress-test':       return <StressTest {...sharedProps} />;
-      case 'security-privacy':  return <SecurityPrivacy {...sharedProps} />;
+      case 'security-privacy':  return <SecurityPrivacy {...sharedProps} setEnvironment={setEnvironment} />;
       case 'ado':               return <AzureDevOps {...sharedProps} />;
       case 'sprint-report':     return <SprintReport {...sharedProps} />;
       case 'uat-support':       return <UatSupport {...sharedProps} />;

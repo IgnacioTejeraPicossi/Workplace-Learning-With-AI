@@ -80,4 +80,49 @@ export const securityApi = {
       }).then(r => jsonOrThrow(r, 'dpia-patch'));
     },
   },
+
+  // ── Pack 3 additions ────────────────────────────────────────────────
+  exportMarkdown({ environment = 'test', includeDpia = true, includeHistory = true,
+                    sprintName = null, lang = 'en' } = {}) {
+    return fetch(`${API}/export/markdown`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        environment,
+        include_dpia: includeDpia,
+        include_history: includeHistory,
+        sprint_name: sprintName,
+        lang,
+      }),
+    }).then(r => jsonOrThrow(r, 'export-markdown'));
+  },
+
+  dispatchAdo(findingId, { environment = 'test', actor = 'workshop-host', lang = 'en' } = {}) {
+    return fetch(`${API}/findings/${encodeURIComponent(findingId)}/dispatch-ado`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ environment, actor, lang }),
+    }).then(r => jsonOrThrow(r, 'dispatch-ado'));
+  },
+
+  diff({ fromScan = null, toScan = null, environment = null } = {}) {
+    const params = new URLSearchParams();
+    if (fromScan)    params.set('from_scan', fromScan);
+    if (toScan)      params.set('to_scan', toScan);
+    if (environment) params.set('environment', environment);
+    const qs = params.toString();
+    return fetch(`${API}/diff${qs ? `?${qs}` : ''}`).then(r => jsonOrThrow(r, 'diff'));
+  },
+
+  verify(findingId, { environment = 'test', actor = 'workshop-host', lang = 'en' } = {}) {
+    return fetch(`${API}/findings/${encodeURIComponent(findingId)}/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ environment, actor, lang }),
+    }).then(r => jsonOrThrow(r, 'verify'));
+  },
+
+  environments() {
+    return fetch(`${API}/environments`).then(r => jsonOrThrow(r, 'environments'));
+  },
 };

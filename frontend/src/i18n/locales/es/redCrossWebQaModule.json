@@ -556,7 +556,35 @@
       "dpiaPlaceholder_third_parties": "Fundy\\nVipps\\nMicrosoft\\nOkta\\nEnonic",
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) consentimiento para donaciones; Art. 9(2)(d) para datos sanitarios",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = datos Art. 9; filtración = alto impacto",
-      "dpiaPlaceholder_mitigations": "Minimización de datos\\nRBAC\\nPolítica de borrado\\nNada de PII en logs"
+      "dpiaPlaceholder_mitigations": "Minimización de datos\\nRBAC\\nPolítica de borrado\\nNada de PII en logs",
+
+      "exportMarkdownBtn": "Exportar Markdown",
+      "exportSprintPlaceholder": "Nombre de sprint (opcional)",
+
+      "findingDispatchAdo": "Enviar a ADO",
+      "findingDispatchAdoTitle": "Crea un work item de Azure DevOps desde este hallazgo. Mock-first por ahora; el mismo hallazgo siempre llega al mismo work-item-ID.",
+      "findingAdoLinkTitle": "Abrir el work item de ADO en nueva pestaña.",
+      "findingVerify": "Verificar fix",
+      "findingVerifyTitle": "Re-ejecuta el escaneo para verificar la corrección. Si no se detecta → estado pasa a 'verified'. Si se vuelve a detectar → reabierto.",
+
+      "diffTitle": "Diff vs escaneo anterior",
+      "diffHint": "Compara dos ejecuciones de escaneo. Por defecto: el más reciente vs el anterior. Elige otra ejecución 'desde' abajo para comparar ventanas más largas.",
+      "diffFromLabel": "Comparar desde",
+      "diffAutoPrevious": "Auto (escaneo anterior)",
+      "diffRefresh": "Refrescar",
+      "diffNeedTwoRuns": "Hacen falta al menos 2 ejecuciones de escaneo en el histórico antes de calcular el diff.",
+      "diffBucket_new": "Nuevos",
+      "diffBucket_fixed": "Corregidos",
+      "diffBucket_regressed": "Regresión",
+      "diffBucket_persisted": "Persisten",
+      "diffBucketEmpty": "Sin elementos en este grupo.",
+      "diffBucketMore": "+{{count}} más no mostrados",
+
+      "envMatrixTitle": "Matriz de entornos",
+      "envMatrixHint": "Última instantánea por entorno. Pulsa una tarjeta para cambiar el entorno activo para el resto de esta pestaña.",
+      "envMatrixWorst": "Peor global",
+      "envMatrixRefresh": "Refrescar",
+      "envMatrixPickHint": "Cambiar a este entorno"
     },
 
     "ado": {

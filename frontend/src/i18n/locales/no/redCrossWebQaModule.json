@@ -556,7 +556,35 @@
       "dpiaPlaceholder_third_parties": "Fundy\\nVipps\\nMicrosoft\\nOkta\\nEnonic",
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) samtykke for donasjon; art. 9(2)(d) for helsedata",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = art. 9‑data; lekkasje = høy konsekvens",
-      "dpiaPlaceholder_mitigations": "Dataminimering\\nRBAC\\nSlettepolicy\\nIngen PII i logger"
+      "dpiaPlaceholder_mitigations": "Dataminimering\\nRBAC\\nSlettepolicy\\nIngen PII i logger",
+
+      "exportMarkdownBtn": "Eksporter Markdown",
+      "exportSprintPlaceholder": "Valgfritt sprint-navn",
+
+      "findingDispatchAdo": "Send til ADO",
+      "findingDispatchAdoTitle": "Opprett et Azure DevOps-arbeidsobjekt fra dette funnet. Mock-først i dag; samme funn lander alltid på samme work-item-ID.",
+      "findingAdoLinkTitle": "Åpne ADO-arbeidsobjektet i ny fane.",
+      "findingVerify": "Verifiser fiks",
+      "findingVerifyTitle": "Kjør skanning på nytt for å verifisere fiksen. Hvis ikke oppdaget → status blir «verified». Hvis oppdaget igjen → gjenåpnes.",
+
+      "diffTitle": "Diff vs forrige skanning",
+      "diffHint": "Sammenlign to skanne-kjøringer. Standard: nyeste vs forrige. Velg en annen «fra»-kjøring under for å sammenligne over lengre vinduer.",
+      "diffFromLabel": "Sammenlign fra",
+      "diffAutoPrevious": "Auto (forrige skanning)",
+      "diffRefresh": "Last på nytt",
+      "diffNeedTwoRuns": "Trenger minst 2 skanne-kjøringer i historikken før diff kan beregnes.",
+      "diffBucket_new": "Nye",
+      "diffBucket_fixed": "Rettet",
+      "diffBucket_regressed": "Regressert",
+      "diffBucket_persisted": "Vedvarer",
+      "diffBucketEmpty": "Ingen elementer i denne bøtten.",
+      "diffBucketMore": "+{{count}} flere vises ikke",
+
+      "envMatrixTitle": "Miljømatrise",
+      "envMatrixHint": "Siste snapshot per miljø. Klikk på et kort for å bytte aktivt miljø for resten av denne fanen.",
+      "envMatrixWorst": "Verste totalt",
+      "envMatrixRefresh": "Last på nytt",
+      "envMatrixPickHint": "Bytt til dette miljøet"
     },
 
     "ado": {

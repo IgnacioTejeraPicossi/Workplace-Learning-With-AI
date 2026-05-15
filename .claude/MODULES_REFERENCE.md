@@ -485,6 +485,16 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 | `/dpia` | GET | Load DPIA singleton; seeds a Røde Kors-specific default if none exists |
 | `/dpia` | POST | Replace full DPIA form |
 | `/dpia` | PATCH | Partial update (any subset of fields) |
+
+**Pack 3 additions (Phase H+, 2026-05-15)** at `/api/qa/security/*`:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/export/markdown` | POST | Sprint-ready Markdown report (snapshot + findings by severity + tally + history + DPIA snapshot). Frontend downloads via Blob URL |
+| `/findings/{id}/dispatch-ado` | POST | Push single finding to ADO. Mock-first: deterministic SHA-derived work-item ID. Idempotent (same finding → same mock work item). Persists `ado_url` + `ado_work_item_id` on finding |
+| `/diff` | GET | Compare two scan runs. Returns `{from, to, counts_delta, findings: {new, fixed, regressed, persisted}, summary}` |
+| `/findings/{id}/verify` | POST | Re-runs scan, auto-transitions finding: not re-detected → `verified`; re-detected → reopened (`open`); else preserved |
+| `/environments` | GET | Latest snapshot per env (local/test/staging/prod) + `worst_overall` aggregate. Powers governance matrix |
 | `/run-security-scan` | POST | OWASP Top 10, headers, rate limits, GDPR (13 checks) |
 | `/ado-bundle-preview` | GET | Preview Azure DevOps work-item bundle from latest findings (Sev1-4 / KatA-C annotated) |
 | `/create-ado-work-items` | POST | Dispatch findings as Azure DevOps work items (Bug / Task / Test Case with priority + severity + test_level) |

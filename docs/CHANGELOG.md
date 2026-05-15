@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.13.0] - 2026-05-15
+
+### Added — Red Cross Web QA · Phase H Pack 3: 5 workflow extensions on the Sikkerhet og personvern workbench
+
+Closes the Pack 3 candidates left as "Future" in 1.12.0. All five extensions are additive: Pack 2 endpoints, contracts and persistence remain untouched.
+
+**Backend service** (`backend/services/qa_security_service.py`, +~500 lines):
+
+1. **`export_markdown_report(environment, include_dpia, include_history, sprint_name, lang)`** — Composes a structured sprint-ready Markdown report: snapshot rollup → findings grouped by severity → tally table → last-N scan history → DPIA snapshot. Filename includes the sprint slug. No server file-system involvement (the frontend creates a Blob URL for download).
+
+2. **`dispatch_finding_to_ado(finding_id, environment, actor, lang)`** — Push a single finding to Azure DevOps as a work item. Mock-first today: generates a deterministic SHA-derived work-item ID (e.g. #44300) and ADO URL based on the org/project from the existing `red_cross_qa_settings`. Severity → ADO priority + work-item-type + severity_dev mapping (`critical→P1/Bug/Sev 1`, `high→P2/Bug/Sev 2`, etc.). Persists `ado_url` + `ado_work_item_id` + `ado_dispatched_at` on the finding so re-dispatches are idempotent (same finding always lands on the same mock work item). Audit-log entry appended on every dispatch.
+
+3. **`diff_scans(from_scan_id, to_scan_id, environment)`** — Compares two scan runs, returns `{from, to, counts_delta, findings: {new, fixed, regressed, persisted}, summary}`. Pragmatic categorisation: NEW = created in the window, FIXED = closed in the window, REGRESSED = had been fixed/verified but reopened, PERSISTED = open in both runs. Default args use newest vs previous run.
+
+4. **`verify_finding(finding_id, environment, lang, actor)`** — Re-runs the scan and inspects whether the finding is still detected. Auto-transitions: not re-detected → `verified`; re-detected with same severity → reopened (`open`); status preserved → records the verification attempt only. Returns `{finding, verification, scan_id, note}`. The `verification` outcome is one of `still_clean / regressed / preserved / inconclusive`.
+
+5. **`get_environment_matrix()`** — Returns the most-recent snapshot per known environment (`local / test / staging / prod`) plus a `worst_overall` aggregate. Powers the governance overview at the top of the Sikkerhet og personvern tab.
+
+**Backend router** (`backend/routers/qa_security.py`, 5 new endpoints, 8 → 13 unique paths, 10 → 15 method bindings):
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/export/markdown` | POST | Generate Markdown report |
+| `/findings/{id}/dispatch-ado` | POST | Push finding to ADO (idempotent) |
+| `/diff` | GET | Compare two scan runs |
+| `/findings/{id}/verify` | POST | Re-run scan, transition status |
+| `/environments` | GET | Snapshot per env + worst-overall |
+
+**Frontend** — 3 new components + augmented `FindingRow`:
+
+- **`ExportButtons.jsx`** — sprint-name input + "📥 Export Markdown" button, downloads via Blob URL.
+- **`ScanDiffPanel.jsx`** — diff vs previous (default) or any older scan picked from dropdown. 4-column bucket view (NEW / REGRESSED / FIXED / PERSISTED) with severity-coloured rows + "+N more" overflow.
+- **`EnvironmentMatrix.jsx`** — 4 clickable env cards (local/test/staging/prod) with status pill + PASS/WARN/FAIL/openFindings stats + last scan timestamp + DPIA indicator. Click switches the active environment for the rest of the workbench (requires `setEnvironment` passed down from the agent shell).
+- **`FindingRow.jsx`** augmented with two new buttons inside the expanded edit form:
+  - **🎯 Send to ADO** — opens ADO link if already dispatched (`ado_url` set), otherwise calls the dispatcher. Idempotent.
+  - **✅ Verify fix** — only renders when status is `fixed`. Triggers `verify_finding` and updates locally.
+
+**Agent shell** — `RedCrossWebQAAgent.jsx` now passes `setEnvironment` to the SecurityPrivacy tab (one-line addition) so the environment matrix can actually switch envs.
+
+**i18n** — 24 new keys × 3 locales (EN/NO/ES) under `securityPrivacy.*`:
+- Export: `exportMarkdownBtn`, `exportSprintPlaceholder`
+- Finding actions: `findingDispatchAdo`, `findingDispatchAdoTitle`, `findingAdoLinkTitle`, `findingVerify`, `findingVerifyTitle`
+- Diff: `diffTitle`, `diffHint`, `diffFromLabel`, `diffAutoPrevious`, `diffRefresh`, `diffNeedTwoRuns`, `diffBucket_new/fixed/regressed/persisted`, `diffBucketEmpty`, `diffBucketMore`
+- Env matrix: `envMatrixTitle`, `envMatrixHint`, `envMatrixWorst`, `envMatrixRefresh`, `envMatrixPickHint`
+- Total i18n size: **696 keys per locale** (was 672), full parity.
+
+**Tests** — `smoke_qa_security.py` extended with **5 Pack 3 checks**:
+- `export_markdown_report`: filename + required sections + byte count
+- `dispatch_finding_to_ado`: deterministic mock URL, severity_dev mapping, idempotent re-dispatch, ado_url persisted on finding
+- `diff_scans`: 4 buckets, counts_delta, summary
+- `verify_finding`: verification outcome categorisation, final status in valid set
+- `get_environment_matrix`: 4 envs present, worst_overall in valid set
+- **Total: 15/15 PASS** (10 Pack 2 + 5 Pack 3) without Mongo, without LLM.
+
+**Docs**
+
+- `README.md` updated (route count, Pack 3 capabilities)
+- `docs/CHANGELOG.md` — this entry
+- `.claude/MODULES_REFERENCE.md` — Pack 3 endpoints table appended
+
+**Architectural notes**
+
+- **Mock-first preserved everywhere.** ADO dispatch is a deterministic SHA-derived mock URL today. When a real ADO PAT is wired in later, only `dispatch_finding_to_ado` changes; the persisted shape on the finding stays identical.
+- **Idempotent ADO dispatch.** Same finding ID + same SHA → same mock work-item ID. Re-clicking "Send to ADO" doesn't create duplicate work items.
+- **Diff is a snapshot, not a journal.** Today we compare CURRENT findings against scan timestamps, so the "REGRESSED" bucket relies on the finding's audit history. Acceptable for the workshop demo; a future Pack 4 could persist per-scan snapshots if precise historical diffs become important.
+- **Verify-fix re-runs the whole scan today.** A future Pack 4 could optimise to re-run only the parent check, but the cost is negligible (mock-first scans complete in ~50ms).
+
+---
+
 ## [1.12.0] - 2026-05-13
 
 ### Added — Red Cross Web QA · Phase H (Pack 2): Sikkerhet og personvern workbench

@@ -127,7 +127,10 @@
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; Set-Location \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend\"; npm run build 2>&1 | Select-Object -Last 50)",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"from backend.routers.red_cross_qa import router; print\\(f'routes: {len\\(router.routes\\)}'\\); [print\\(f'  {list\\(r.methods\\)[0] if hasattr\\(r, \\\\\"methods\\\\\"\\) else \\\\\"?\\\\\"} {r.path}'\\) for r in router.routes]\")",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -m backend.tests.smoke_red_cross_qa 2>&1 | Select-Object -Last 22)",
-      "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_qa_security)"
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_qa_security)",
+      "Bash(node generate_agi_doc.js)",
+      "Bash(rm -rf \"C:/Users/Ignacio Tejera/AppData/Local/Temp/agi_check\")",
+      "Bash(python \".claude/skills/docx/scripts/office/unpack.py\" \"docs-media/agi_progress/agi-progress-modul-beskrivelse-2026-05-15.docx\" \"C:/Users/Ignacio Tejera/AppData/Local/Temp/agi_check/\")"
     ]
   }
 }

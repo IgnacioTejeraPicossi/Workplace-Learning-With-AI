@@ -556,7 +556,35 @@
       "dpiaPlaceholder_third_parties": "Fundy\\nVipps\\nMicrosoft\\nOkta\\nEnonic",
       "dpiaPlaceholder_legal_basis": "Art. 6(1)(a) consent for donations; Art. 9(2)(d) for health data",
       "dpiaPlaceholder_risk_notes": "Helseerklæring + politiattest = Art. 9 data; mishandling = high impact",
-      "dpiaPlaceholder_mitigations": "Data minimisation\\nRBAC\\nDeletion policy\\nNo PII in logs"
+      "dpiaPlaceholder_mitigations": "Data minimisation\\nRBAC\\nDeletion policy\\nNo PII in logs",
+
+      "exportMarkdownBtn": "Export Markdown",
+      "exportSprintPlaceholder": "Optional sprint name",
+
+      "findingDispatchAdo": "Send to ADO",
+      "findingDispatchAdoTitle": "Create an Azure DevOps work item from this finding. Mock-first today; the same finding always lands on the same work-item ID.",
+      "findingAdoLinkTitle": "Open the ADO work item in a new tab.",
+      "findingVerify": "Verify fix",
+      "findingVerifyTitle": "Re-run the scan to verify the fix. If not detected → status moves to 'verified'. If re-detected → reopened.",
+
+      "diffTitle": "Diff vs previous scan",
+      "diffHint": "Compare two scan runs. By default: newest vs previous. Pick a different 'from' run below to compare across longer windows.",
+      "diffFromLabel": "Compare from",
+      "diffAutoPrevious": "Auto (previous scan)",
+      "diffRefresh": "Refresh",
+      "diffNeedTwoRuns": "Need at least 2 scan runs in history before a diff can be computed.",
+      "diffBucket_new": "New",
+      "diffBucket_fixed": "Fixed",
+      "diffBucket_regressed": "Regressed",
+      "diffBucket_persisted": "Persisted",
+      "diffBucketEmpty": "No items in this bucket.",
+      "diffBucketMore": "+{{count}} more not shown",
+
+      "envMatrixTitle": "Environment matrix",
+      "envMatrixHint": "Latest snapshot per environment. Click a card to switch the active environment for the rest of this tab.",
+      "envMatrixWorst": "Worst overall",
+      "envMatrixRefresh": "Refresh",
+      "envMatrixPickHint": "Switch to this environment"
     },
 
     "ado": {

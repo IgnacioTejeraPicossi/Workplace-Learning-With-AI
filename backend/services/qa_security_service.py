@@ -822,14 +822,17 @@ async def dispatch_finding_to_ado(
 ) -> Dict[str, Any]:
     """Push a single finding to Azure DevOps as a work item.
 
-    Builds a one-item bundle that matches the shape the existing
-    `red_cross_qa.create_ado_work_items` expects, then calls it. Persists
-    the resulting ADO URL + work_item_id on the finding so the UI can
-    surface "Already in ADO" instead of duplicating dispatches.
+    Mock-first: generates a deterministic ADO URL + work-item id based on
+    the finding_id and the current ADO settings (organization / project
+    / area path / iteration path / tags) from `red_cross_qa_settings`.
+    When a real ADO PAT is wired in later, only this function changes —
+    the persisted shape on the finding stays identical.
 
-    Mock-first: if the existing dispatcher returns a mock URL (no live
-    ADO PAT configured), the finding still records the mocked link.
+    Persists the resulting ADO URL + work_item_id on the finding so the
+    UI can surface "Already in ADO" instead of duplicating dispatches.
     """
+    import hashlib
+
     finding = await get_finding(finding_id)
     if not finding:
         raise ValueError(f"Finding '{finding_id}' not found")
@@ -837,17 +840,30 @@ async def dispatch_finding_to_ado(
     sev = finding.get("severity") or "medium"
     ado_meta = _SEV_TO_ADO.get(sev, _SEV_TO_ADO["medium"])
 
-    work_item = {
+    # Pull ADO settings from the existing red_cross_qa settings collection
+    # (organization / project / area_path / iteration_path / tags).
+    ado_org = "rodekors"
+    ado_project = "rodekors-web"
+    try:
+        from backend.services.red_cross_qa import get_settings as _get_rcqa_settings
+        rcqa = await _get_rcqa_settings()
+        rcqa_settings = (rcqa or {}).get("settings") or {}
+        ado_org = rcqa_settings.get("ado_organization") or ado_org
+        ado_project = rcqa_settings.get("ado_project") or ado_project
+    except Exception:
+        pass
+
+    # Deterministic mock work-item id derived from the finding id.
+    # A finding always lands on the same mock work item across re-dispatches.
+    digest = hashlib.sha1(finding_id.encode("utf-8")).hexdigest()
+    mock_id = 10000 + (int(digest[:6], 16) % 90000)
+    ado_url = (f"https://dev.azure.com/{ado_org}/{ado_project}"
+                f"/_workitems/edit/{mock_id}")
+
+    work_item_payload = {
+        "id": mock_id,
+        "url": ado_url,
         "title": f"[QA Security] {finding.get('title', 'Untitled finding')}",
-        "description": (
-            f"**Finding ID:** `{finding_id}`\n\n"
-            f"**Check:** `{finding.get('check_id', '—')}`\n\n"
-            f"**Description:** {finding.get('description', '')}\n\n"
-            f"**Recommendation:** {finding.get('recommendation', '')}\n\n"
-            f"**Evidence:**\n"
-            + "\n".join([f"- {e}" for e in (finding.get('evidence') or [])])
-            + ("\n\n**GDPR article:** " + finding['gdpr_article'] if finding.get('gdpr_article') else "")
-        ),
         "work_item_type": ado_meta["work_item_type"],
         "priority": ado_meta["priority"],
         "severity_dev": ado_meta["severity_dev"],
@@ -857,47 +873,31 @@ async def dispatch_finding_to_ado(
         "tags": ["qa-security", f"check:{finding.get('check_id')}",
                   f"finding:{finding_id}"],
         "owner_hint": finding.get("owner"),
+        "description_md": (
+            f"**Finding ID:** `{finding_id}`\n\n"
+            f"**Check:** `{finding.get('check_id', '—')}`\n\n"
+            f"**Description:** {finding.get('description', '')}\n\n"
+            f"**Recommendation:** {finding.get('recommendation', '')}\n\n"
+            f"**Evidence:**\n"
+            + "\n".join([f"- {e}" for e in (finding.get('evidence') or [])])
+            + ("\n\n**GDPR article:** " + finding['gdpr_article']
+                if finding.get('gdpr_article') else "")
+        ),
     }
-
-    bundle = {
-        "scope": "qa-security",
-        "environment": environment,
-        "actor": actor,
-        "work_items": [work_item],
-    }
-
-    # Call the existing dispatcher. Import lazily so the qa_security
-    # module doesn't pull red_cross_qa at import time.
-    try:
-        from backend.services.red_cross_qa import create_ado_work_items
-    except ImportError:  # pragma: no cover
-        from services.red_cross_qa import create_ado_work_items  # type: ignore
-
-    dispatch_result = await create_ado_work_items(
-        bundle=bundle,
-        environment=environment,
-        lang=lang,
-    )
-
-    # Extract the first work item's link from whatever shape the
-    # dispatcher returns. Be permissive — the dispatcher may evolve.
-    created = dispatch_result or {}
-    items = created.get("work_items") or created.get("created") or []
-    first = items[0] if items else {}
-    ado_url = first.get("url") or first.get("ado_url") or created.get("ado_url")
-    ado_id = first.get("id") or first.get("work_item_id") or created.get("id")
 
     # Persist the ADO link on the finding so the UI can show
     # "Already in ADO (#1234)" next time without re-dispatching.
     patch_payload = {
         "ado_dispatched_at": _now_iso(),
         "ado_url": ado_url,
-        "ado_work_item_id": ado_id,
+        "ado_work_item_id": mock_id,
         "ado_work_item_type": ado_meta["work_item_type"],
         "history": list(finding.get("history") or []) + [{
             "at": _now_iso(),
             "actor": actor,
-            "note": f"Dispatched to ADO as {ado_meta['work_item_type']} (priority {ado_meta['priority']})",
+            "note": (f"Dispatched to ADO as {ado_meta['work_item_type']} "
+                       f"#{mock_id} (priority {ado_meta['priority']}, "
+                       f"{ado_meta['severity_dev']})"),
             "status": finding.get("status"),
         }],
     }
@@ -919,8 +919,6 @@ async def dispatch_finding_to_ado(
     # Refresh local in-memory cache too.
     refreshed = {**finding, **patch_payload}
     try:
-        # Touch the in-memory cache in the repo so subsequent reads see
-        # the ADO fields without hitting Mongo.
         from backend.repositories import qa_security_repository as _repo
         _repo._mem_findings[finding_id] = refreshed
     except Exception:
@@ -929,12 +927,14 @@ async def dispatch_finding_to_ado(
     return {
         "finding_id": finding_id,
         "ado_url": ado_url,
-        "ado_work_item_id": ado_id,
+        "ado_work_item_id": mock_id,
         "work_item_type": ado_meta["work_item_type"],
         "priority": ado_meta["priority"],
         "severity_dev": ado_meta["severity_dev"],
+        "category_ops": work_item_payload["category_ops"],
         "dispatched_at": patch_payload["ado_dispatched_at"],
-        "raw": dispatch_result,
+        "work_item": work_item_payload,
+        "is_mock": True,  # flip to False when a real PAT is wired in
     }
 
 

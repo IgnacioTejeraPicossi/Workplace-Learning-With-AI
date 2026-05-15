@@ -9,6 +9,10 @@ import FindingsList from './components/FindingsList';
 import ScanHistoryPanel from './components/ScanHistoryPanel';
 import DpiaChecklistPanel from './components/DpiaChecklistPanel';
 import StatusFilters from './components/StatusFilters';
+// Pack 3 panels
+import ExportButtons from './components/ExportButtons';
+import ScanDiffPanel from './components/ScanDiffPanel';
+import EnvironmentMatrix from './components/EnvironmentMatrix';
 
 /**
  * Phase H · Pack 2 — Sikkerhet og personvern workbench.
@@ -24,7 +28,7 @@ import StatusFilters from './components/StatusFilters';
  * back up. This keeps cross-panel filtering coherent (e.g. clicking a
  * finding focuses the related check, switching filters updates both lists).
  */
-export default function SecurityPrivacyTab({ environment }) {
+export default function SecurityPrivacyTab({ environment, setEnvironment }) {
   const { t, i18n } = useTranslation();
 
   // Snapshot + base data
@@ -166,12 +170,19 @@ export default function SecurityPrivacyTab({ environment }) {
           gradient="linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)"
         />
 
-        {/* Top: snapshot + scan button */}
+        {/* Top: snapshot + scan button + Pack 3 export buttons */}
         <SnapshotPanel
           status={status}
           onScan={runScan}
           scanning={scanning}
           loading={loading}
+          environment={environment}
+        />
+
+        {/* Pack 3 — environment matrix (governance dashboard) */}
+        <EnvironmentMatrix
+          currentEnv={environment}
+          onPickEnvironment={setEnvironment}
         />
 
         {error && <div style={errorBox}>{error}</div>}
@@ -245,6 +256,9 @@ export default function SecurityPrivacyTab({ environment }) {
         {/* History */}
         <ScanHistoryPanel history={history} />
 
+        {/* Pack 3 — diff between two scan runs */}
+        <ScanDiffPanel history={history} environment={environment} />
+
         {/* DPIA */}
         <DpiaChecklistPanel />
       </div>
@@ -252,7 +266,7 @@ export default function SecurityPrivacyTab({ environment }) {
   );
 }
 
-function SnapshotPanel({ status, onScan, scanning, loading }) {
+function SnapshotPanel({ status, onScan, scanning, loading, environment }) {
   const { t } = useTranslation();
   const overall = status?.overall_status || 'pending';
   const overallStyle = STATUS_STYLES[overall] || STATUS_STYLES.pending;
@@ -273,7 +287,7 @@ function SnapshotPanel({ status, onScan, scanning, loading }) {
               : t('redCrossWebQaModule.securityPrivacy.noScanYet')}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <span style={{
             fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 999,
             backgroundColor: overallStyle.bg, color: overallStyle.fg,
@@ -281,6 +295,8 @@ function SnapshotPanel({ status, onScan, scanning, loading }) {
           }}>
             {t('redCrossWebQaModule.securityPrivacy.overall')}: {overallStyle.label}
           </span>
+          {/* Pack 3 — Markdown export controls */}
+          <ExportButtons environment={environment} />
           <button onClick={onScan} disabled={scanning || loading}
                    style={primaryBtn(scanning || loading, '#334155')}>
             {scanning

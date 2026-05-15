@@ -23,7 +23,12 @@ from backend.services.qa_security_service import (
     perform_scan, get_status, get_checks, get_check_detail,
     get_findings, update_finding, get_history,
     get_dpia_form, save_dpia, patch_dpia_form, ensure_dpia_seed,
+    # Pack 3 additions
+    export_markdown_report, dispatch_finding_to_ado, diff_scans,
+    verify_finding, get_environment_matrix,
 )
+# Re-fetch helper for verifying the finding doc was mutated by dispatch.
+from backend.repositories.qa_security_repository import get_finding
 
 
 async def main() -> int:
@@ -205,6 +210,155 @@ async def main() -> int:
                       f"/dpia GET+POST+PATCH present)")
     except Exception as e:
         failures.append(f"Router import failed: {e}")
+
+    # ═══════════════════════════════════════════════════════════════════
+    # Pack 3 checks (5)
+    # ═══════════════════════════════════════════════════════════════════
+
+    # ── 11. Markdown export ─────────────────────────────────────────
+    try:
+        md_export = await export_markdown_report(
+            environment="test", sprint_name="smoke-sprint", lang="en"
+        )
+        for k in ("filename", "markdown", "byte_count", "environment", "generated_at"):
+            if k not in md_export:
+                failures.append(f"export_markdown_report missing key: {k}")
+        md = md_export.get("markdown") or ""
+        # Sanity-check the report contains the required sections.
+        required_sections = [
+            "# Sikkerhet og personvern",
+            "## 1) Status snapshot",
+            "## 2) Findings by severity",
+            "## 3) Findings tally",
+        ]
+        for sec in required_sections:
+            if sec not in md:
+                failures.append(f"export_markdown missing section: {sec!r}")
+        if md_export["filename"].endswith(".md"):
+            print(f"[OK] export_markdown_report ({md_export['filename']}, "
+                  f"{md_export['byte_count']} bytes, "
+                  f"{len(md.splitlines())} lines)")
+        else:
+            failures.append(f"markdown filename should end with .md: {md_export['filename']}")
+    except Exception as e:
+        failures.append(f"export_markdown_report raised: {e}")
+
+    # ── 12. Finding → ADO dispatch (deterministic + idempotent) ────
+    # Need a finding to dispatch. Run a scan to make sure we have one
+    # we haven't already PATCHed in step 7 (that one might be 'fixed').
+    try:
+        scan_for_ado = await perform_scan(environment="test", lang="en",
+                                            actor="smoke-test-ado", trigger="ci")
+        # Pick an OPEN finding to dispatch.
+        dispatch_target = next(
+            (f for f in scan_for_ado["findings"] if f.get("status") == "open"),
+            None,
+        )
+        if not dispatch_target:
+            print("[OK] dispatch_finding_to_ado skipped (no open findings)")
+        else:
+            d1 = await dispatch_finding_to_ado(
+                finding_id=dispatch_target["id"],
+                environment="test",
+                actor="smoke-test",
+                lang="en",
+            )
+            if not d1.get("ado_url", "").startswith("https://dev.azure.com/"):
+                failures.append(f"ADO URL malformed: {d1.get('ado_url')}")
+            if not d1.get("ado_work_item_id"):
+                failures.append("ADO work_item_id missing")
+            if d1.get("severity_dev") not in ("Sev 1", "Sev 2", "Sev 3", "Sev 4"):
+                failures.append(f"severity_dev invalid: {d1.get('severity_dev')}")
+            # Idempotency: re-dispatching the same finding yields the SAME
+            # mock work-item id (deterministic SHA-based mapping).
+            d2 = await dispatch_finding_to_ado(
+                finding_id=dispatch_target["id"],
+                environment="test", actor="smoke-test",
+            )
+            if d1["ado_work_item_id"] != d2["ado_work_item_id"]:
+                failures.append("ADO dispatch not deterministic across re-dispatches")
+            # The finding doc must now carry ado_url + ado_work_item_id.
+            refreshed = await get_finding(dispatch_target["id"])
+            if not (refreshed and refreshed.get("ado_url")):
+                failures.append("ADO link not persisted on finding")
+            print(f"[OK] dispatch_finding_to_ado (mock work-item #{d1['ado_work_item_id']}, "
+                  f"{d1['work_item_type']} P{d1['priority']}, "
+                  f"{d1['severity_dev']}, deterministic re-dispatch ✓)")
+    except Exception as e:
+        failures.append(f"dispatch_finding_to_ado raised: {e}")
+
+    # ── 13. Diff between two scan runs ─────────────────────────────
+    try:
+        # Need at least 2 scans in history; we have multiple from previous
+        # steps. Default args → newest vs previous.
+        diff = await diff_scans(environment="test")
+        for k in ("from", "to", "counts_delta", "findings", "summary"):
+            if k not in diff:
+                failures.append(f"diff_scans missing key: {k}")
+        f_buckets = diff.get("findings", {})
+        for bucket in ("new", "fixed", "regressed", "persisted"):
+            if bucket not in f_buckets:
+                failures.append(f"diff_scans findings missing bucket: {bucket}")
+        if not isinstance(diff.get("counts_delta", {}).get("pass"), int):
+            failures.append("diff_scans counts_delta.pass is not int")
+        print(f"[OK] diff_scans (summary: {diff.get('summary')})")
+    except Exception as e:
+        failures.append(f"diff_scans raised: {e}")
+
+    # ── 14. Verify-fix flow ────────────────────────────────────────
+    try:
+        # Find a finding currently in 'fixed' state (set in step 7).
+        all_findings_now = await get_findings(status="fixed", limit=5)
+        if not all_findings_now:
+            # No fixed finding from earlier — set one up.
+            anchor = next((f for f in (await get_findings(status="open", limit=1))), None)
+            if anchor:
+                await update_finding(anchor["id"],
+                                      patch={"status": "fixed", "note": "smoke setup"},
+                                      actor="smoke-setup")
+                target = anchor
+            else:
+                target = None
+        else:
+            target = all_findings_now[0]
+
+        if target:
+            verify_result = await verify_finding(
+                finding_id=target["id"],
+                environment="test",
+                actor="smoke-verify",
+            )
+            for k in ("finding", "verification", "scan_id", "note"):
+                if k not in verify_result:
+                    failures.append(f"verify_finding missing key: {k}")
+            if verify_result["verification"] not in ("still_clean", "regressed", "preserved", "inconclusive"):
+                failures.append(f"verify_finding bad verification: {verify_result['verification']}")
+            final_status = verify_result["finding"].get("status")
+            if final_status not in ("verified", "open", "fixed", "accepted_risk"):
+                failures.append(f"verify_finding produced unexpected status: {final_status}")
+            print(f"[OK] verify_finding (verification={verify_result['verification']}, "
+                  f"final_status={final_status})")
+        else:
+            print("[OK] verify_finding skipped (no findings to verify)")
+    except Exception as e:
+        failures.append(f"verify_finding raised: {e}")
+
+    # ── 15. Environment matrix ─────────────────────────────────────
+    try:
+        matrix = await get_environment_matrix()
+        if "environments" not in matrix or not isinstance(matrix["environments"], list):
+            failures.append("get_environment_matrix missing 'environments' list")
+        else:
+            envs_in_matrix = {row.get("environment") for row in matrix["environments"]}
+            expected_envs = {"local", "test", "staging", "prod"}
+            if not expected_envs.issubset(envs_in_matrix):
+                failures.append(f"matrix missing envs: {expected_envs - envs_in_matrix}")
+        if matrix.get("worst_overall") not in ("pass", "warn", "fail", "pending"):
+            failures.append(f"worst_overall invalid: {matrix.get('worst_overall')}")
+        print(f"[OK] get_environment_matrix ({len(matrix['environments'])} envs, "
+              f"worst={matrix['worst_overall']})")
+    except Exception as e:
+        failures.append(f"get_environment_matrix raised: {e}")
 
     if failures:
         print()
