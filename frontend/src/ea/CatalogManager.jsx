@@ -655,10 +655,10 @@ export default function CatalogManager() {
 
             <div className="form-actions">
               <button type="button" className="cancel-btn" onClick={() => setShowCreateForm(false)}>
-                Cancel
+                {t('enterpriseArchitectureModule.cmBtnCancel')}
               </button>
               <button type="submit" className="save-btn">
-                {isEditing ? 'Update' : 'Create'}
+                {isEditing ? t('enterpriseArchitectureModule.btnUpdate') : t('enterpriseArchitectureModule.cmBtnAddNew')}
               </button>
             </div>
           </form>
@@ -736,7 +736,7 @@ export default function CatalogManager() {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="filter-select"
           >
-            <option value="">All Statuses</option>
+            <option value="">{t('enterpriseArchitectureModule.filterAllStatuses')}</option>
             {getStatuses().map(status => (
               <option key={status} value={status}>{status}</option>
             ))}
@@ -750,19 +750,19 @@ export default function CatalogManager() {
           className={`catalog-tab ${activeTab === 'applications' ? 'active' : ''}`}
           onClick={() => setActiveTab('applications')}
         >
-          💻 Applications ({applications.length})
+          💻 {t('enterpriseArchitectureModule.cmTabApplications')} ({applications.length})
         </button>
         <button 
           className={`catalog-tab ${activeTab === 'capabilities' ? 'active' : ''}`}
           onClick={() => setActiveTab('capabilities')}
         >
-          🏗️ Capabilities ({capabilities.length})
+          🏗️ {t('enterpriseArchitectureModule.cmTabCapabilities')} ({capabilities.length})
         </button>
         <button 
           className={`catalog-tab ${activeTab === 'processes' ? 'active' : ''}`}
           onClick={() => setActiveTab('processes')}
         >
-          🔄 Processes ({processes.length})
+          🔄 {t('enterpriseArchitectureModule.cmTabProcesses')} ({processes.length})
         </button>
       </div>
 

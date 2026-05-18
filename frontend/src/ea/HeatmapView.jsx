@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,6 +29,7 @@ ChartJS.register(
 );
 
 export default function HeatmapView() {
+  const { t } = useTranslation();
   const [activeView, setActiveView] = useState('risk-maturity');
   const [processes, setProcesses] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -66,7 +68,7 @@ export default function HeatmapView() {
 
     } catch (err) {
       console.error('Error loading heatmap data:', err);
-      setError('Failed to load heatmap data');
+      setError(t('enterpriseArchitectureModule.errorLoadHeatmap'));
     } finally {
       setLoading(false);
     }
@@ -448,7 +450,7 @@ export default function HeatmapView() {
     return (
       <div className="heatmap-loading">
         <div className="loading-spinner"></div>
-        <p>Loading heatmap data...</p>
+        <p>{t('enterpriseArchitectureModule.loading')}</p>
       </div>
     );
   }
@@ -456,8 +458,8 @@ export default function HeatmapView() {
   return (
     <div className="heatmap-view">
       <div className="heatmap-header">
-        <h2>🗺️ Enterprise Architecture Heatmap</h2>
-        <p>Visualize risk, maturity, and lifecycle patterns across your IT landscape</p>
+        <h2>🗺️ {t('enterpriseArchitectureModule.tabHeatmap')}</h2>
+        <p>{t('enterpriseArchitectureModule.subtitle')}</p>
       </div>
 
       {error && (
@@ -470,10 +472,10 @@ export default function HeatmapView() {
       {/* Demo Data Button */}
       <div className="demo-controls">
         <button onClick={generateSampleData} className="demo-btn">
-          🎯 Load Demo Data
+          🎯 {t('enterpriseArchitectureModule.btnLoadDemoData')}
         </button>
         <button onClick={loadData} className="refresh-btn">
-          🔄 Refresh Data
+          🔄 {t('enterpriseArchitectureModule.btnRefreshData')}
         </button>
       </div>
 
@@ -483,7 +485,7 @@ export default function HeatmapView() {
           className={`view-btn ${activeView === 'risk-maturity' ? 'active' : ''}`}
           onClick={() => setActiveView('risk-maturity')}
         >
-          🔴 Risk vs Maturity
+          🔴 {t('enterpriseArchitectureModule.hmRiskMaturity')}
         </button>
         <button 
           className={`view-btn ${activeView === 'lifecycle' ? 'active' : ''}`}
@@ -495,7 +497,7 @@ export default function HeatmapView() {
           className={`view-btn ${activeView === 'capabilities' ? 'active' : ''}`}
           onClick={() => setActiveView('capabilities')}
         >
-          🏗️ Capabilities
+          🏗️ {t('enterpriseArchitectureModule.hmCapabilities')}
         </button>
         <button 
           className={`view-btn ${activeView === 'distribution' ? 'active' : ''}`}
@@ -516,15 +518,15 @@ export default function HeatmapView() {
             <div className="chart-legend">
               <div className="legend-item">
                 <span className="legend-color high-risk"></span>
-                <span>High Risk (≥70%)</span>
+                <span>{t('enterpriseArchitectureModule.riskHigh')}</span>
               </div>
               <div className="legend-item">
                 <span className="legend-color medium-risk"></span>
-                <span>Medium Risk (40-69%)</span>
+                <span>{t('enterpriseArchitectureModule.riskMedium')}</span>
               </div>
               <div className="legend-item">
                 <span className="legend-color low-risk"></span>
-                                 <span>Low Risk (&lt;40%)</span>
+                <span>{t('enterpriseArchitectureModule.riskLow')}</span>
               </div>
             </div>
           </div>
@@ -563,24 +565,24 @@ export default function HeatmapView() {
         <div className="stat-card">
           <div className="stat-icon">🔄</div>
           <div className="stat-value">{processes.length}</div>
-          <div className="stat-label">Total Processes</div>
+          <div className="stat-label">{t('enterpriseArchitectureModule.statProcesses')}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">💻</div>
           <div className="stat-value">{applications.length}</div>
-          <div className="stat-label">Applications</div>
+          <div className="stat-label">{t('enterpriseArchitectureModule.statApplications')}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">🏗️</div>
           <div className="stat-value">{capabilities.length}</div>
-          <div className="stat-label">Capabilities</div>
+          <div className="stat-label">{t('enterpriseArchitectureModule.tabCapabilities')}</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">⚠️</div>
           <div className="stat-value">
             {processes.filter(p => p.risk >= 70).length}
           </div>
-          <div className="stat-label">High Risk Items</div>
+          <div className="stat-label">{t('enterpriseArchitectureModule.statHighRisk')}</div>
         </div>
       </div>
     </div>
