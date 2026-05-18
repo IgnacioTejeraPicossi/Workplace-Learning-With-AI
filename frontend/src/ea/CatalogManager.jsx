@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import './CatalogManager.css';
 
 export default function CatalogManager() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('applications');
   const [applications, setApplications] = useState([]);
   const [capabilities, setCapabilities] = useState([]);
@@ -44,7 +46,7 @@ export default function CatalogManager() {
 
     } catch (err) {
       console.error('Error loading catalog data:', err);
-      setError('Failed to load catalog data');
+      setError(t('enterpriseArchitectureModule.cmErrorLoad'));
     } finally {
       setLoading(false);
     }
@@ -293,9 +295,9 @@ export default function CatalogManager() {
   const renderApplications = () => (
     <div className="catalog-section">
       <div className="section-header">
-        <h2>💻 Applications</h2>
+        <h2>💻 {t('enterpriseArchitectureModule.cmTabApplications')}</h2>
         <button className="create-btn" onClick={() => handleCreate('applications')}>
-          ➕ Add Application
+          ➕ {t('enterpriseArchitectureModule.btnAddApp')}
         </button>
       </div>
       
@@ -318,8 +320,8 @@ export default function CatalogManager() {
             
             <div className="item-meta">
               <span>🏢 {app.vendor || 'Internal'}</span>
-              <span>📊 Risk: {app.risk}%</span>
-              <span>⭐ Maturity: {app.maturity}/5</span>
+              <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {app.risk}%</span>
+              <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {app.maturity}/5</span>
             </div>
             
             <div className="item-details">
@@ -346,10 +348,10 @@ export default function CatalogManager() {
             
             <div className="item-actions">
               <button className="action-btn primary" onClick={() => handleEdit(app)}>
-                ✏️ Edit
+                ✏️ {t('enterpriseArchitectureModule.cmBtnEdit')}
               </button>
               <button className="action-btn secondary" onClick={() => handleDelete('applications', app.id)}>
-                🗑️ Delete
+                🗑️ {t('enterpriseArchitectureModule.cmBtnDelete')}
               </button>
             </div>
           </div>
@@ -361,9 +363,9 @@ export default function CatalogManager() {
   const renderCapabilities = () => (
     <div className="catalog-section">
       <div className="section-header">
-        <h2>🏗️ Business Capabilities</h2>
+        <h2>🏗️ {t('enterpriseArchitectureModule.businessCapabilities')}</h2>
         <button className="create-btn" onClick={() => handleCreate('capabilities')}>
-          ➕ Add Capability
+          ➕ {t('enterpriseArchitectureModule.btnDefineCapabilityShort')}
         </button>
       </div>
       
@@ -385,9 +387,9 @@ export default function CatalogManager() {
             <p className="item-description">{cap.description}</p>
             
             <div className="item-meta">
-              <span>📊 Risk: {cap.risk}%</span>
-              <span>⭐ Maturity: {cap.maturity}/5</span>
-              <span>🏷️ {cap.tags?.length || 0} tags</span>
+              <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {cap.risk}%</span>
+              <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {cap.maturity}/5</span>
+              <span>🏷️ {cap.tags?.length || 0} {t('enterpriseArchitectureModule.labelTags')}</span>
             </div>
             
             <div className="item-details">
@@ -416,10 +418,10 @@ export default function CatalogManager() {
             
             <div className="item-actions">
               <button className="action-btn primary" onClick={() => handleEdit(cap)}>
-                ✏️ Edit
+                ✏️ {t('enterpriseArchitectureModule.cmBtnEdit')}
               </button>
               <button className="action-btn secondary" onClick={() => handleDelete('capabilities', cap.id)}>
-                🗑️ Delete
+                🗑️ {t('enterpriseArchitectureModule.cmBtnDelete')}
               </button>
             </div>
           </div>
@@ -431,9 +433,9 @@ export default function CatalogManager() {
   const renderProcesses = () => (
     <div className="catalog-section">
       <div className="section-header">
-        <h2>🔄 Processes</h2>
+        <h2>🔄 {t('enterpriseArchitectureModule.cmTabProcesses')}</h2>
         <button className="create-btn" onClick={() => handleCreate('processes')}>
-          ➕ Add Process
+          ➕ {t('enterpriseArchitectureModule.btnCreateProcess')}
         </button>
       </div>
       
@@ -453,8 +455,8 @@ export default function CatalogManager() {
             
             <div className="item-meta">
               <span>👤 {proc.owner}</span>
-              <span>📊 Risk: {proc.risk}%</span>
-              <span>⭐ Maturity: {proc.maturity}/5</span>
+              <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {proc.risk}%</span>
+              <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {proc.maturity}/5</span>
             </div>
             
             <div className="item-details">
@@ -490,10 +492,10 @@ export default function CatalogManager() {
             
             <div className="item-actions">
               <button className="action-btn primary" onClick={() => handleEdit(proc)}>
-                ✏️ Edit
+                ✏️ {t('enterpriseArchitectureModule.cmBtnEdit')}
               </button>
               <button className="action-btn secondary" onClick={() => handleDelete('processes', proc.id)}>
-                🗑️ Delete
+                🗑️ {t('enterpriseArchitectureModule.cmBtnDelete')}
               </button>
             </div>
           </div>
@@ -669,7 +671,7 @@ export default function CatalogManager() {
     return (
       <div className="catalog-loading">
         <div className="loading-spinner"></div>
-        <p>Loading catalog data...</p>
+        <p>{t('enterpriseArchitectureModule.loading')}</p>
       </div>
     );
   }
@@ -677,8 +679,8 @@ export default function CatalogManager() {
   return (
     <div className="catalog-manager">
       <div className="catalog-header">
-        <h2>📋 Catalog Manager</h2>
-        <p>Manage your Enterprise Architecture catalog items</p>
+        <h2>📋 {t('enterpriseArchitectureModule.cmTitle')}</h2>
+        <p>{t('enterpriseArchitectureModule.subtitle')}</p>
       </div>
 
       {error && (
@@ -710,7 +712,7 @@ export default function CatalogManager() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search items..."
+            placeholder={t('enterpriseArchitectureModule.cmSearchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -723,7 +725,7 @@ export default function CatalogManager() {
             onChange={(e) => setFilterCategory(e.target.value)}
             className="filter-select"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('enterpriseArchitectureModule.filterAllCategories')}</option>
             {getCategories().map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}

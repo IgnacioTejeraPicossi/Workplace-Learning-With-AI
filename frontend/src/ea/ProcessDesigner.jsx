@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactFlow, { 
   addEdge, 
   Background, 
@@ -51,6 +52,7 @@ const nodeTypes = {
 };
 
 export default function ProcessDesigner({ onSave, initialData = null }) {
+  const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -183,12 +185,12 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
   // Save process
   const saveProcess = async () => {
     if (!processName.trim()) {
-      setError('Process name is required');
+      setError(t('enterpriseArchitectureModule.pdErrorNameRequired'));
       return;
     }
 
     if (nodes.length === 0) {
-      setError('Process must have at least one node');
+      setError(t('enterpriseArchitectureModule.pdErrorNodeRequired'));
       return;
     }
 
@@ -234,12 +236,12 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
       }
       
       if (response.data.success) {
-        setSuccess(initialData ? 'Process updated successfully!' : 'Process saved successfully!');
+        setSuccess(initialData ? t('enterpriseArchitectureModule.pdSuccessUpdated') : t('enterpriseArchitectureModule.pdSuccessSaved'));
         if (onSave) onSave(initialData ? initialData._id : response.data.process_id);
       }
     } catch (err) {
       console.error('Error saving process:', err);
-      setError('Failed to save process: ' + (err.response?.data?.detail || err.message));
+      setError(t('enterpriseArchitectureModule.pdErrorSave', { detail: err.response?.data?.detail || err.message }));
     } finally {
       setLoading(false);
     }
@@ -255,14 +257,14 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
     <div className="process-designer">
       {/* Header */}
       <div className="designer-header">
-        <h2>🔄 {initialData ? 'Edit Process' : 'Process Designer'}</h2>
+        <h2>🔄 {initialData ? t('enterpriseArchitectureModule.pdEditTitle') : t('enterpriseArchitectureModule.pdTitle')}</h2>
         <div className="header-actions">
           <button 
             className="save-btn"
             onClick={saveProcess}
             disabled={loading}
           >
-            {loading ? '💾 Saving...' : (initialData ? '💾 Update Process' : '💾 Save Process')}
+            {loading ? `💾 ${t('enterpriseArchitectureModule.pdSaving')}` : (initialData ? `💾 ${t('enterpriseArchitectureModule.pdUpdateProcess')}` : `💾 ${t('enterpriseArchitectureModule.pdSaveProcess')}`)}
           </button>
         </div>
       </div>
@@ -286,49 +288,49 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
       <div className="process-info">
         <div className="form-row">
           <div className="form-group">
-            <label>Process Name *</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldProcessName')}</label>
             <input
               type="text"
               value={processName}
               onChange={(e) => setProcessName(e.target.value)}
-              placeholder="Enter process name"
+              placeholder={t('enterpriseArchitectureModule.pdPlaceholderProcName')}
               className="form-input"
             />
           </div>
           <div className="form-group">
-            <label>Category</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldCategory')}</label>
             <select
               value={processCategory}
               onChange={(e) => setProcessCategory(e.target.value)}
               className="form-select"
             >
-              <option value="General">General</option>
-              <option value="Finance">Finance</option>
-              <option value="HR">HR</option>
-              <option value="IT">IT</option>
-              <option value="Operations">Operations</option>
+              <option value="General">{t('enterpriseArchitectureModule.filterGeneral')}</option>
+              <option value="Finance">{t('enterpriseArchitectureModule.filterFinance')}</option>
+              <option value="HR">{t('enterpriseArchitectureModule.filterHR')}</option>
+              <option value="IT">{t('enterpriseArchitectureModule.filterIT')}</option>
+              <option value="Operations">{t('enterpriseArchitectureModule.filterOperations')}</option>
             </select>
           </div>
         </div>
         
         <div className="form-row">
           <div className="form-group">
-            <label>Description</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldDescription')}</label>
             <textarea
               value={processDescription}
               onChange={(e) => setProcessDescription(e.target.value)}
-              placeholder="Describe the process"
+              placeholder={t('enterpriseArchitectureModule.pdPlaceholderDesc')}
               className="form-textarea"
               rows="2"
             />
           </div>
           <div className="form-group">
-            <label>Owner</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldOwner')}</label>
             <input
               type="text"
               value={processOwner}
               onChange={(e) => setProcessOwner(e.target.value)}
-              placeholder="Process owner"
+              placeholder={t('enterpriseArchitectureModule.pdPlaceholderOwner')}
               className="form-input"
             />
           </div>
@@ -336,7 +338,7 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Maturity Level: {processMaturity}/5</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldMaturity', { value: processMaturity })}</label>
             <input
               type="range"
               min="1"
@@ -347,7 +349,7 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
             />
           </div>
           <div className="form-group">
-            <label>Risk Level: {processRisk}%</label>
+            <label>{t('enterpriseArchitectureModule.pdFieldRisk', { value: processRisk })}</label>
             <input
               type="range"
               min="0"
@@ -364,43 +366,43 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
         {/* Toolbar */}
         <div className="toolbar">
           <div className="toolbar-section">
-            <h4>📦 Add Nodes</h4>
+            <h4>📦 {t('enterpriseArchitectureModule.pdAddNodes')}</h4>
             <div className="node-buttons">
               <button onClick={() => addNode('start')} className="node-btn start">
-                🟢 Start
+                🟢 {t('enterpriseArchitectureModule.pdNodeStart')}
               </button>
               <button onClick={() => addNode('task')} className="node-btn task">
-                📋 Task
+                📋 {t('enterpriseArchitectureModule.pdNodeTask')}
               </button>
               <button onClick={() => addNode('decision')} className="node-btn decision">
-                ❓ Decision
+                ❓ {t('enterpriseArchitectureModule.pdNodeDecision')}
               </button>
               <button onClick={() => addNode('system')} className="node-btn system">
-                💻 System
+                💻 {t('enterpriseArchitectureModule.pdNodeSystem')}
               </button>
               <button onClick={() => addNode('data')} className="node-btn data">
-                💾 Data
+                💾 {t('enterpriseArchitectureModule.pdNodeData')}
               </button>
               <button onClick={() => addNode('end')} className="node-btn end">
-                🔴 End
+                🔴 {t('enterpriseArchitectureModule.pdNodeEnd')}
               </button>
             </div>
           </div>
 
           <div className="toolbar-section">
-            <h4>🔧 Actions</h4>
+            <h4>🔧 {t('enterpriseArchitectureModule.pdActions')}</h4>
             <button 
               onClick={deleteSelectedNode} 
               disabled={!selectedNode}
               className="action-btn delete"
             >
-              🗑️ Delete Node
+              🗑️ {t('enterpriseArchitectureModule.pdDeleteNode')}
             </button>
             <button 
               onClick={() => setNodes([])} 
               className="action-btn clear"
             >
-              🧹 Clear All
+              🧹 {t('enterpriseArchitectureModule.pdClearAll')}
             </button>
           </div>
         </div>
@@ -429,7 +431,7 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
         {showProperties && selectedNode && (
           <div className="properties-panel">
             <div className="panel-header">
-              <h4>⚙️ Node Properties</h4>
+              <h4>⚙️ {t('enterpriseArchitectureModule.pdNodeProperties')}</h4>
               <button onClick={() => setShowProperties(false)} className="close-btn">
                 ✕
               </button>
@@ -437,7 +439,7 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
             
             <div className="panel-content">
               <div className="property-group">
-                <label>Label</label>
+                <label>{t('enterpriseArchitectureModule.pdLabelLabel')}</label>
                 <input
                   type="text"
                   value={selectedNode.data.label}
@@ -447,7 +449,7 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
               </div>
 
               <div className="property-group">
-                <label>Risk Score (%)</label>
+                <label>{t('enterpriseArchitectureModule.pdLabelRiskScore')}</label>
                 <input
                   type="range"
                   min="0"
@@ -460,30 +462,30 @@ export default function ProcessDesigner({ onSave, initialData = null }) {
               </div>
 
               <div className="property-group">
-                <label>Application ID</label>
+                <label>{t('enterpriseArchitectureModule.pdLabelAppId')}</label>
                 <input
                   type="text"
                   value={selectedNode.data.appId || ''}
                   onChange={(e) => updateNodeProperties(selectedNode.id, { appId: e.target.value })}
                   className="property-input"
-                  placeholder="Link to application"
+                  placeholder={t('enterpriseArchitectureModule.pdPlaceholderLinkApp')}
                 />
               </div>
 
               <div className="property-group">
-                <label>Training Module ID</label>
+                <label>{t('enterpriseArchitectureModule.pdLabelTrainingId')}</label>
                 <input
                   type="text"
                   value={selectedNode.data.trainingModuleId || ''}
                   onChange={(e) => updateNodeProperties(selectedNode.id, { trainingModuleId: e.target.value })}
                   className="property-input"
-                  placeholder="Link to training module"
+                  placeholder={t('enterpriseArchitectureModule.pdPlaceholderLinkTraining')}
                 />
               </div>
 
               <div className="property-info">
-                <p><strong>Type:</strong> {selectedNode.data.type}</p>
-                <p><strong>Position:</strong> X: {Math.round(selectedNode.position.x)}, Y: {Math.round(selectedNode.position.y)}</p>
+                <p><strong>{t('enterpriseArchitectureModule.pdLabelType')}</strong> {selectedNode.data.type}</p>
+                <p><strong>{t('enterpriseArchitectureModule.pdLabelPosition')}</strong> X: {Math.round(selectedNode.position.x)}, Y: {Math.round(selectedNode.position.y)}</p>
               </div>
             </div>
           </div>

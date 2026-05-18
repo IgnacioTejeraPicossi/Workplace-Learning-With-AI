@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import './ImpactAnalysis.css';
 
 export default function ImpactAnalysis() {
+  const { t } = useTranslation();
   const [processes, setProcesses] = useState([]);
   const [applications, setApplications] = useState([]);
   const [capabilities, setCapabilities] = useState([]);
@@ -41,7 +43,7 @@ export default function ImpactAnalysis() {
 
     } catch (err) {
       console.error('Error loading impact analysis data:', err);
-      setError('Failed to load data');
+      setError(t('enterpriseArchitectureModule.errorLoadData'));
     } finally {
       setLoading(false);
     }
@@ -267,7 +269,7 @@ export default function ImpactAnalysis() {
     return (
       <div className="impact-loading">
         <div className="loading-spinner"></div>
-        <p>Loading impact analysis data...</p>
+        <p>{t('enterpriseArchitectureModule.loading')}</p>
       </div>
     );
   }
@@ -275,8 +277,8 @@ export default function ImpactAnalysis() {
   return (
     <div className="impact-analysis">
       <div className="impact-header">
-        <h2>💥 Impact Analysis</h2>
-        <p>Analyze the cascading impact of changes using BFS algorithm</p>
+        <h2>💥 {t('enterpriseArchitectureModule.impactTitle')}</h2>
+        <p>{t('enterpriseArchitectureModule.impactSubtitle')}</p>
       </div>
 
       {error && (
@@ -289,54 +291,54 @@ export default function ImpactAnalysis() {
       {/* Demo Data Button */}
       <div className="demo-controls">
         <button onClick={generateSampleData} className="demo-btn">
-          🎯 Load Demo Data
+          🎯 {t('enterpriseArchitectureModule.btnLoadDemoData')}
         </button>
         <button onClick={loadData} className="refresh-btn">
-          🔄 Refresh Data
+          🔄 {t('enterpriseArchitectureModule.btnRefreshData')}
         </button>
       </div>
 
       {/* Analysis Configuration */}
       <div className="analysis-config">
         <div className="config-section">
-          <label>Analysis Type:</label>
+          <label>{t('enterpriseArchitectureModule.labelAnalysisType')}</label>
           <select 
             value={analysisType} 
             onChange={(e) => setAnalysisType(e.target.value)}
           >
-            <option value="process">🔄 Process</option>
-            <option value="application">💻 Application</option>
+            <option value="process">🔄 {t('enterpriseArchitectureModule.optProcess')}</option>
+            <option value="application">💻 {t('enterpriseArchitectureModule.optApplication')}</option>
           </select>
         </div>
 
         <div className="config-section">
-          <label>Change Type:</label>
+          <label>{t('enterpriseArchitectureModule.labelChangeType')}</label>
           <select 
             value={changeType} 
             onChange={(e) => setChangeType(e.target.value)}
           >
-            <option value="modification">✏️ Modification</option>
-            <option value="deletion">🗑️ Deletion</option>
-            <option value="addition">➕ Addition</option>
+            <option value="modification">✏️ {t('enterpriseArchitectureModule.optModification')}</option>
+            <option value="deletion">🗑️ {t('enterpriseArchitectureModule.optDeletion')}</option>
+            <option value="addition">➕ {t('enterpriseArchitectureModule.optAddition')}</option>
           </select>
         </div>
 
         <div className="config-section">
-          <label>Select Item:</label>
+          <label>{t('enterpriseArchitectureModule.labelSelectItem')}</label>
           <select 
             value={selectedItem || ''} 
             onChange={(e) => setSelectedItem(e.target.value)}
           >
-            <option value="">Choose an item...</option>
+            <option value="">{t('enterpriseArchitectureModule.placeholderChooseItem')}</option>
             {analysisType === 'process' 
               ? processes.map(proc => (
                   <option key={proc.id} value={proc.id}>
-                    🔄 {proc.name} (Risk: {proc.risk}%)
+                    🔄 {proc.name} ({t('enterpriseArchitectureModule.labelRisk')}: {proc.risk}%)
                   </option>
                 ))
               : applications.map(app => (
                   <option key={app.id} value={app.id}>
-                    💻 {app.name} (Risk: {app.risk}%)
+                    💻 {app.name} ({t('enterpriseArchitectureModule.labelRisk')}: {app.risk}%)
                   </option>
                 ))
             }
@@ -348,7 +350,7 @@ export default function ImpactAnalysis() {
           onClick={() => analyzeImpact(selectedItem, analysisType, changeType)}
           disabled={!selectedItem}
         >
-          🔍 Analyze Impact
+          🔍 {t('enterpriseArchitectureModule.btnAnalyzeImpact')}
         </button>
       </div>
 
@@ -356,8 +358,8 @@ export default function ImpactAnalysis() {
       {impactResults && (
         <div className="impact-results">
           <div className="results-header">
-            <h3>📊 Impact Analysis Results</h3>
-            <button onClick={clearResults} className="clear-btn">✕ Clear</button>
+            <h3>📊 {t('enterpriseArchitectureModule.impactResultsTitle')}</h3>
+            <button onClick={clearResults} className="clear-btn">✕ {t('enterpriseArchitectureModule.btnClear')}</button>
           </div>
 
           {/* Summary Metrics */}
@@ -365,46 +367,46 @@ export default function ImpactAnalysis() {
             <div className="metric-card primary">
               <div className="metric-icon">🎯</div>
               <div className="metric-value">{impactResults.item.name}</div>
-              <div className="metric-label">Target Item</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricTargetItem')}</div>
             </div>
             
             <div className="metric-card">
               <div className="metric-icon">🔄</div>
               <div className="metric-value">{impactResults.changeType}</div>
-              <div className="metric-label">Change Type</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricChangeType')}</div>
             </div>
             
             <div className="metric-card">
               <div className="metric-icon">⚠️</div>
               <div className="metric-value">{impactResults.riskScore}%</div>
-              <div className="metric-label">Risk Score</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricRiskScore')}</div>
             </div>
             
             <div className="metric-card">
               <div className="metric-icon">📈</div>
               <div className="metric-value">{impactResults.impactMetrics.totalItems}</div>
-              <div className="metric-label">Total Impacted</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricTotalImpacted')}</div>
             </div>
             
             <div className="metric-card">
               <div className="metric-icon">🌊</div>
               <div className="metric-value">{impactResults.impactMetrics.maxDepth}</div>
-              <div className="metric-label">Max Depth</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricMaxDepth')}</div>
             </div>
             
             <div className="metric-card">
               <div className="metric-icon">⚡</div>
               <div className="metric-value">{impactResults.impactMetrics.overallRisk}%</div>
-              <div className="metric-label">Overall Risk</div>
+              <div className="metric-label">{t('enterpriseArchitectureModule.metricOverallRisk')}</div>
             </div>
           </div>
 
           {/* Risk Distribution */}
           <div className="risk-distribution">
-            <h4>📊 Risk Distribution</h4>
+            <h4>📊 {t('enterpriseArchitectureModule.riskDistribution')}</h4>
             <div className="risk-bars">
               <div className="risk-bar">
-                <div className="risk-label">High Risk (≥70%)</div>
+                <div className="risk-label">{t('enterpriseArchitectureModule.riskHigh')}</div>
                 <div className="risk-bar-container">
                   <div 
                     className="risk-bar-fill high" 
@@ -415,7 +417,7 @@ export default function ImpactAnalysis() {
               </div>
               
               <div className="risk-bar">
-                <div className="risk-label">Medium Risk (40-69%)</div>
+                <div className="risk-label">{t('enterpriseArchitectureModule.riskMedium')}</div>
                 <div className="risk-bar-container">
                   <div 
                     className="risk-bar-fill medium" 
@@ -426,7 +428,7 @@ export default function ImpactAnalysis() {
               </div>
               
               <div className="risk-bar">
-                <div className="risk-label">Low Risk (&lt;40%)</div>
+                <div className="risk-label">{t('enterpriseArchitectureModule.riskLow')}</div>
                 <div className="risk-bar-container">
                   <div 
                     className="risk-bar-fill low" 
@@ -440,7 +442,7 @@ export default function ImpactAnalysis() {
 
           {/* Impact Tree */}
           <div className="impact-tree">
-            <h4>🌳 Impact Tree (BFS Traversal)</h4>
+            <h4>🌳 {t('enterpriseArchitectureModule.impactTree')}</h4>
             <div className="tree-container">
               {impactResults.impactTree.map((item, index) => (
                 <div 
@@ -454,24 +456,24 @@ export default function ImpactAnalysis() {
                   <div className="tree-item-header">
                     <span className="item-name">{item.name}</span>
                     <span className="item-risk" style={{ color: getRiskColor(item.risk) }}>
-                      Risk: {item.risk}%
+                      {t('enterpriseArchitectureModule.labelRisk')}: {item.risk}%
                     </span>
                   </div>
                   
                   <div className="tree-item-details">
                     <div className="item-path">
-                      <strong>Path:</strong> {item.path.join(' → ')}
+                      <strong>{t('enterpriseArchitectureModule.labelPath')}</strong> {item.path.join(' → ')}
                     </div>
                     
                     {item.dependencies.length > 0 && (
                       <div className="item-dependencies">
-                        <strong>Dependencies:</strong> {item.dependencies.join(', ')}
+                        <strong>{t('enterpriseArchitectureModule.labelDependencies')}</strong> {item.dependencies.join(', ')}
                       </div>
                     )}
                     
                     {item.impacts.length > 0 && (
                       <div className="item-impacts">
-                        <strong>Impacts:</strong> {item.impacts.join(', ')}
+                        <strong>{t('enterpriseArchitectureModule.labelImpacts')}</strong> {item.impacts.join(', ')}
                       </div>
                     )}
                   </div>
@@ -482,32 +484,32 @@ export default function ImpactAnalysis() {
 
           {/* Recommendations */}
           <div className="impact-recommendations">
-            <h4>💡 Recommendations</h4>
+            <h4>💡 {t('enterpriseArchitectureModule.impactRecommendations')}</h4>
             <div className="recommendations-list">
               {impactResults.impactMetrics.overallRisk >= 70 && (
                 <div className="recommendation high-risk">
                   <span className="rec-icon">🚨</span>
-                  <span>High risk change detected. Consider phased implementation or rollback plan.</span>
+                  <span>{t('enterpriseArchitectureModule.recHighRisk')}</span>
                 </div>
               )}
               
               {impactResults.impactMetrics.highRiskItems > 0 && (
                 <div className="recommendation medium-risk">
                   <span className="rec-icon">⚠️</span>
-                  <span>Review {impactResults.impactMetrics.highRiskItems} high-risk impacted items before proceeding.</span>
+                  <span>{t('enterpriseArchitectureModule.recHighRiskItems', { count: impactResults.impactMetrics.highRiskItems })}</span>
                 </div>
               )}
               
               {impactResults.impactMetrics.maxDepth >= 3 && (
                 <div className="recommendation medium-risk">
                   <span className="rec-icon">🌊</span>
-                  <span>Deep impact chain detected. Monitor cascading effects carefully.</span>
+                  <span>{t('enterpriseArchitectureModule.recDeepChain')}</span>
                 </div>
               )}
               
               <div className="recommendation low-risk">
                 <span className="rec-icon">✅</span>
-                <span>Implement change monitoring and establish rollback procedures.</span>
+                <span>{t('enterpriseArchitectureModule.recMonitor')}</span>
               </div>
             </div>
           </div>
@@ -517,47 +519,43 @@ export default function ImpactAnalysis() {
       {/* Instructions */}
       {!impactResults && (
         <div className="impact-instructions">
-          <h3>📋 How to Use Impact Analysis</h3>
+          <h3>📋 {t('enterpriseArchitectureModule.howToTitle')}</h3>
           <div className="instructions-grid">
             <div className="instruction-step">
               <div className="step-number">1</div>
-              <h4>Select Analysis Type</h4>
-              <p>Choose whether to analyze impact on a Process or Application</p>
+              <h4>{t('enterpriseArchitectureModule.howToStep1Title')}</h4>
+              <p>{t('enterpriseArchitectureModule.howToStep1Desc')}</p>
             </div>
             
             <div className="instruction-step">
               <div className="step-number">2</div>
-              <h4>Choose Change Type</h4>
-              <p>Specify if you're adding, modifying, or deleting the item</p>
+              <h4>{t('enterpriseArchitectureModule.howToStep2Title')}</h4>
+              <p>{t('enterpriseArchitectureModule.howToStep2Desc')}</p>
             </div>
             
             <div className="instruction-step">
               <div className="step-number">3</div>
-              <h4>Select Target Item</h4>
-              <p>Pick the specific process or application to analyze</p>
+              <h4>{t('enterpriseArchitectureModule.howToStep3Title')}</h4>
+              <p>{t('enterpriseArchitectureModule.howToStep3Desc')}</p>
             </div>
             
             <div className="instruction-step">
               <div className="step-number">4</div>
-              <h4>Run Analysis</h4>
-              <p>Click "Analyze Impact" to run the BFS algorithm</p>
+              <h4>{t('enterpriseArchitectureModule.howToStep4Title')}</h4>
+              <p>{t('enterpriseArchitectureModule.howToStep4Desc')}</p>
             </div>
           </div>
           
           <div className="algorithm-info">
-            <h4>🔍 BFS Algorithm Details</h4>
-            <p>
-              The analysis uses <strong>Breadth-First Search</strong> to traverse dependencies and calculate cascading impact:
-            </p>
+            <h4>🔍 {t('enterpriseArchitectureModule.bfsTitle')}</h4>
+            <p>{t('enterpriseArchitectureModule.bfsDesc')}</p>
             <ul>
-              <li><strong>Level 0:</strong> Direct target item</li>
-              <li><strong>Level 1:</strong> Direct dependencies and dependents</li>
-              <li><strong>Level 2:</strong> Secondary dependencies</li>
-              <li><strong>Level 3:</strong> Tertiary dependencies</li>
+              <li><strong>{t('enterpriseArchitectureModule.bfsLevel0')}</strong></li>
+              <li><strong>{t('enterpriseArchitectureModule.bfsLevel1')}</strong></li>
+              <li><strong>{t('enterpriseArchitectureModule.bfsLevel2')}</strong></li>
+              <li><strong>{t('enterpriseArchitectureModule.bfsLevel3')}</strong></li>
             </ul>
-            <p>
-              Risk scores are calculated considering the change type and propagated through the dependency tree.
-            </p>
+            <p>{t('enterpriseArchitectureModule.bfsRiskDesc')}</p>
           </div>
         </div>
       )}

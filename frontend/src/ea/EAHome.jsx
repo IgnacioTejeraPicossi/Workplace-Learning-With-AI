@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import './EAHome.css';
 import ProcessDesigner from './ProcessDesigner';
 import HeatmapView from './HeatmapView';
@@ -8,6 +9,7 @@ import CatalogManager from './CatalogManager';
 import AIRiskAnalysis from './AIRiskAnalysis';
 
 export default function EAHome() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [catalogOverview, setCatalogOverview] = useState(null);
   const [processes, setProcesses] = useState([]);
@@ -96,7 +98,7 @@ export default function EAHome() {
       setProcesses(response.data);
     } catch (err) {
       console.error('Error loading processes:', err);
-      setError('Failed to load processes');
+      setError(t('enterpriseArchitectureModule.errorLoadProcesses'));
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export default function EAHome() {
       setApplications(response.data);
     } catch (err) {
       console.error('Error loading applications:', err);
-      setError('Failed to load applications');
+      setError(t('enterpriseArchitectureModule.errorLoadApplications'));
     } finally {
       setLoading(false);
     }
@@ -124,7 +126,7 @@ export default function EAHome() {
       setCapabilities(response.data);
     } catch (err) {
       console.error('Error loading capabilities:', err);
-      setError('Failed to load capabilities');
+      setError(t('enterpriseArchitectureModule.errorLoadCapabilities'));
     } finally {
       setLoading(false);
     }
@@ -132,7 +134,7 @@ export default function EAHome() {
 
   // Handle process deletion
   const handleDeleteProcess = async (processId) => {
-    if (!window.confirm('Are you sure you want to delete this process? This action cannot be undone.')) {
+    if (!window.confirm(t('enterpriseArchitectureModule.confirmDeleteProcess'))) {
       return;
     }
 
@@ -143,13 +145,13 @@ export default function EAHome() {
       // Update local state
       setProcesses(processes.filter(proc => proc._id !== processId));
       
-      setSuccess('Process deleted successfully!');
+      setSuccess(t('enterpriseArchitectureModule.successProcessDeleted'));
       
       // Update catalog overview
       updateCatalogOverview();
     } catch (err) {
       console.error('Error deleting process:', err);
-      setError('Failed to delete process');
+      setError(t('enterpriseArchitectureModule.errorDeleteProcess'));
     } finally {
       setLoading(false);
     }
@@ -191,7 +193,7 @@ export default function EAHome() {
             : app
         ));
         
-        setSuccess('Application updated successfully!');
+        setSuccess(t('enterpriseArchitectureModule.successAppUpdated'));
         setShowEditModal(false);
         setEditingApplication(null);
         setEditFormData({});
@@ -201,7 +203,7 @@ export default function EAHome() {
       }
     } catch (err) {
       console.error('Error updating application:', err);
-      setError('Failed to update application');
+      setError(t('enterpriseArchitectureModule.errorUpdateApp'));
     } finally {
       setLoading(false);
     }
@@ -237,7 +239,7 @@ export default function EAHome() {
             : cap
         ));
         
-        setSuccess('Capability updated successfully!');
+        setSuccess(t('enterpriseArchitectureModule.successCapabilityUpdated'));
         setShowEditCapabilityModal(false);
         setEditingCapability(null);
         setEditCapabilityFormData({});
@@ -247,7 +249,7 @@ export default function EAHome() {
       }
     } catch (err) {
       console.error('Error updating capability:', err);
-      setError('Failed to update capability');
+      setError(t('enterpriseArchitectureModule.errorUpdateCapability'));
     } finally {
       setLoading(false);
     }
@@ -264,19 +266,19 @@ export default function EAHome() {
         <div className="ea-stat-card">
           <div className="ea-stat-icon">🏗️</div>
           <div className="ea-stat-value">{catalogOverview?.total_capabilities || 0}</div>
-          <div className="ea-stat-label">Business Capabilities</div>
+          <div className="ea-stat-label">{t('enterpriseArchitectureModule.statBusinessCapabilities')}</div>
         </div>
         
         <div className="ea-stat-card">
           <div className="ea-stat-icon">💻</div>
           <div className="ea-stat-value">{catalogOverview?.total_applications || 0}</div>
-          <div className="ea-stat-label">Applications</div>
+          <div className="ea-stat-label">{t('enterpriseArchitectureModule.statApplications')}</div>
         </div>
         
         <div className="ea-stat-card">
           <div className="ea-stat-icon">🔄</div>
           <div className="ea-stat-value">{catalogOverview?.total_processes || 0}</div>
-          <div className="ea-stat-label">Processes</div>
+          <div className="ea-stat-label">{t('enterpriseArchitectureModule.statProcesses')}</div>
         </div>
         
         <div className="ea-stat-card">
@@ -284,45 +286,45 @@ export default function EAHome() {
           <div className="ea-stat-value">
             {catalogOverview?.risk_distribution?.find(r => r._id === 'High')?.count || 0}
           </div>
-          <div className="ea-stat-label">High Risk Items</div>
+          <div className="ea-stat-label">{t('enterpriseArchitectureModule.statHighRisk')}</div>
         </div>
       </div>
 
       <div className="ea-quick-actions">
-        <h3>🚀 Quick Actions</h3>
+        <h3>🚀 {t('enterpriseArchitectureModule.quickActions')}</h3>
         <div className="ea-action-buttons">
           <button 
             className="ea-action-btn primary"
             onClick={() => setActiveTab('processes')}
           >
-            📝 Create Process
+            📝 {t('enterpriseArchitectureModule.btnCreateProcess')}
           </button>
           <button 
             className="ea-action-btn secondary"
             onClick={() => setActiveTab('applications')}
           >
-            💻 Add Application
+            💻 {t('enterpriseArchitectureModule.btnAddApplication')}
           </button>
           <button 
             className="ea-action-btn secondary"
             onClick={() => setActiveTab('capabilities')}
           >
-            🏗️ Define Capability
+            🏗️ {t('enterpriseArchitectureModule.btnDefineCapability')}
           </button>
           <button 
             className="ea-action-btn backend"
             onClick={initializeBackendDemoData}
           >
-            🚀 Initialize Demo Data
+            🚀 {t('enterpriseArchitectureModule.btnInitDemoData')}
           </button>
         </div>
       </div>
 
       <div className="ea-recent-items">
-        <h3>📋 Recent Items</h3>
+        <h3>📋 {t('enterpriseArchitectureModule.recentItems')}</h3>
         <div className="ea-recent-grid">
           <div className="ea-recent-section">
-            <h4>Recent Processes</h4>
+            <h4>{t('enterpriseArchitectureModule.recentProcesses')}</h4>
             {processes.slice(0, 3).map(process => (
               <div key={process._id} className="ea-recent-item">
                 <span className="ea-item-name">{process.name}</span>
@@ -334,7 +336,7 @@ export default function EAHome() {
           </div>
           
           <div className="ea-recent-section">
-            <h4>Recent Applications</h4>
+            <h4>{t('enterpriseArchitectureModule.recentApplications')}</h4>
             {applications.slice(0, 3).map(app => (
               <div key={app._id} className="ea-recent-item">
                 <span className="ea-item-name">{app.name}</span>
@@ -352,26 +354,26 @@ export default function EAHome() {
   const renderProcesses = () => (
     <div className="ea-processes">
       <div className="ea-section-header">
-        <h2>🔄 Process Management</h2>
+        <h2>🔄 {t('enterpriseArchitectureModule.processManagement')}</h2>
         <button className="ea-create-btn" onClick={() => setActiveTab('process-designer')}>
-          ➕ Create New Process
+          ➕ {t('enterpriseArchitectureModule.btnCreateNewProcess')}
         </button>
       </div>
       
       <div className="ea-filters">
         <select onChange={(e) => setActiveTab('processes')}>
-          <option value="">All Statuses</option>
-          <option value="draft">Draft</option>
-          <option value="approved">Approved</option>
-          <option value="deprecated">Deprecated</option>
+          <option value="">{t('enterpriseArchitectureModule.filterAllStatuses')}</option>
+          <option value="draft">{t('enterpriseArchitectureModule.filterDraft')}</option>
+          <option value="approved">{t('enterpriseArchitectureModule.filterApproved')}</option>
+          <option value="deprecated">{t('enterpriseArchitectureModule.filterDeprecated')}</option>
         </select>
         
         <select onChange={(e) => setActiveTab('processes')}>
-          <option value="">All Categories</option>
-          <option value="General">General</option>
-          <option value="Finance">Finance</option>
-          <option value="HR">HR</option>
-          <option value="IT">IT</option>
+          <option value="">{t('enterpriseArchitectureModule.filterAllCategories')}</option>
+          <option value="General">{t('enterpriseArchitectureModule.filterGeneral')}</option>
+          <option value="Finance">{t('enterpriseArchitectureModule.filterFinance')}</option>
+          <option value="HR">{t('enterpriseArchitectureModule.filterHR')}</option>
+          <option value="IT">{t('enterpriseArchitectureModule.filterIT')}</option>
         </select>
       </div>
 
@@ -389,24 +391,24 @@ export default function EAHome() {
             
             <div className="ea-process-meta">
               <span>👤 {process.owner}</span>
-              <span>📊 Risk: {process.risk}%</span>
-              <span>⭐ Maturity: {process.maturity}/5</span>
+              <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {process.risk}%</span>
+              <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {process.maturity}/5</span>
             </div>
             
             <div className="ea-process-actions">
-              <button className="ea-btn primary">👁️ View</button>
+              <button className="ea-btn primary">👁️ {t('enterpriseArchitectureModule.btnView')}</button>
               <button 
                 className="ea-btn secondary" 
                 onClick={() => handleEditProcess(process)}
               >
-                ✏️ Edit
+                ✏️ {t('enterpriseArchitectureModule.btnEdit')}
               </button>
-              <button className="ea-btn secondary">📋 Clone</button>
+              <button className="ea-btn secondary">📋 {t('enterpriseArchitectureModule.btnClone')}</button>
               <button 
                 className="ea-btn danger" 
                 onClick={() => handleDeleteProcess(process._id)}
               >
-                🗑️ Delete
+                🗑️ {t('enterpriseArchitectureModule.btnDelete')}
               </button>
             </div>
           </div>
@@ -418,8 +420,8 @@ export default function EAHome() {
   const renderApplications = () => (
     <div className="ea-applications">
       <div className="ea-section-header">
-        <h2>💻 Application Catalog</h2>
-        <button className="ea-create-btn">➕ Add Application</button>
+        <h2>💻 {t('enterpriseArchitectureModule.applicationCatalog')}</h2>
+        <button className="ea-create-btn">➕ {t('enterpriseArchitectureModule.btnAddApp')}</button>
       </div>
       
       <div className="ea-applications-grid">
@@ -436,13 +438,13 @@ export default function EAHome() {
             
             <div className="ea-app-meta">
               {app.vendor && <span>🏢 {app.vendor}</span>}
-              <span>👥 {app.owners.length} owners</span>
-              <span>🏗️ {app.capabilities.length} capabilities</span>
+              <span>👥 {app.owners.length} {t('enterpriseArchitectureModule.labelOwners')}</span>
+              <span>🏗️ {app.capabilities.length} {t('enterpriseArchitectureModule.labelCapabilities')}</span>
             </div>
             
             {app.dataClasses.length > 0 && (
               <div className="ea-data-classes">
-                <span className="ea-data-label">Data Classes:</span>
+                <span className="ea-data-label">{t('enterpriseArchitectureModule.labelDataClasses')}</span>
                 {app.dataClasses.map(cls => (
                   <span key={cls} className="ea-data-badge">{cls}</span>
                 ))}
@@ -450,14 +452,14 @@ export default function EAHome() {
             )}
             
             <div className="ea-app-actions">
-              <button className="ea-btn primary">👁️ View</button>
+              <button className="ea-btn primary">👁️ {t('enterpriseArchitectureModule.btnView')}</button>
               <button 
                 className="ea-btn secondary" 
                 onClick={() => handleEditApplication(app)}
               >
-                ✏️ Edit
+                ✏️ {t('enterpriseArchitectureModule.btnEdit')}
               </button>
-              <button className="ea-btn secondary">🔗 Link Process</button>
+              <button className="ea-btn secondary">🔗 {t('enterpriseArchitectureModule.btnLinkProcess')}</button>
             </div>
           </div>
         ))}
@@ -468,8 +470,8 @@ export default function EAHome() {
   const renderCapabilities = () => (
     <div className="ea-capabilities">
       <div className="ea-section-header">
-        <h2>🏗️ Business Capabilities</h2>
-        <button className="ea-create-btn">➕ Define Capability</button>
+        <h2>🏗️ {t('enterpriseArchitectureModule.businessCapabilities')}</h2>
+        <button className="ea-create-btn">➕ {t('enterpriseArchitectureModule.btnDefineCapabilityShort')}</button>
       </div>
       
       <div className="ea-capabilities-grid">
@@ -483,8 +485,8 @@ export default function EAHome() {
             <p className="ea-cap-description">{cap.description}</p>
             
             <div className="ea-cap-meta">
-              <span>👥 {cap.owner.length} owners</span>
-              <span>🏷️ {cap.tags.length} tags</span>
+              <span>👥 {cap.owner.length} {t('enterpriseArchitectureModule.labelOwners')}</span>
+              <span>🏷️ {cap.tags.length} {t('enterpriseArchitectureModule.labelTags')}</span>
             </div>
             
             {cap.tags.length > 0 && (
@@ -496,9 +498,9 @@ export default function EAHome() {
             )}
             
             <div className="ea-cap-actions">
-              <button className="ea-btn primary">👁️ View</button>
-              <button className="ea-btn secondary" onClick={() => handleEditCapability(cap)}>✏️ Edit</button>
-              <button className="ea-btn secondary">🔗 Link Apps</button>
+              <button className="ea-btn primary">👁️ {t('enterpriseArchitectureModule.btnView')}</button>
+              <button className="ea-btn secondary" onClick={() => handleEditCapability(cap)}>✏️ {t('enterpriseArchitectureModule.btnEdit')}</button>
+              <button className="ea-btn secondary">🔗 {t('enterpriseArchitectureModule.btnLinkApps')}</button>
             </div>
           </div>
         ))}
@@ -515,7 +517,7 @@ export default function EAHome() {
       const response = await axios.post('/api/ea/init-demo-data');
       
       if (response.data.success) {
-        setSuccess(`Backend demo data initialized successfully! ${response.data.capabilities_inserted} capabilities, ${response.data.applications_inserted} applications, ${response.data.processes_inserted} processes created.`);
+        setSuccess(t('enterpriseArchitectureModule.successDemoInit', { caps: response.data.capabilities_inserted, apps: response.data.applications_inserted, procs: response.data.processes_inserted }));
         
         // Reload overview and data
         await loadCapabilities();
@@ -526,7 +528,7 @@ export default function EAHome() {
       }
     } catch (err) {
       console.error('Error initializing backend demo data:', err);
-      setError('Failed to initialize backend demo data. Please try again.');
+      setError(t('enterpriseArchitectureModule.errorInitDemo'));
     } finally {
       setLoading(false);
     }
@@ -535,8 +537,8 @@ export default function EAHome() {
   return (
     <div className="ea-container">
       <div className="ea-header">
-        <h1>🏢 Enterprise Architecture</h1>
-        <p>Model, analyze, and transform your IT landscape with process control and impact analysis</p>
+        <h1>🏢 {t('enterpriseArchitectureModule.title')}</h1>
+        <p>{t('enterpriseArchitectureModule.subtitle')}</p>
       </div>
 
       {/* Error and Success Messages */}
@@ -560,7 +562,7 @@ export default function EAHome() {
           className={`ea-tab ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          📊 Overview
+          📊 {t('enterpriseArchitectureModule.tabOverview')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'processes' ? 'active' : ''}`}
@@ -569,7 +571,7 @@ export default function EAHome() {
             if (processes.length === 0) loadProcesses();
           }}
         >
-          🔄 Processes
+          🔄 {t('enterpriseArchitectureModule.tabProcesses')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'applications' ? 'active' : ''}`}
@@ -578,7 +580,7 @@ export default function EAHome() {
             if (applications.length === 0) loadApplications();
           }}
         >
-          💻 Applications
+          💻 {t('enterpriseArchitectureModule.tabApplications')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'capabilities' ? 'active' : ''}`}
@@ -587,37 +589,37 @@ export default function EAHome() {
             if (capabilities.length === 0) loadCapabilities();
           }}
         >
-          🏗️ Capabilities
+          🏗️ {t('enterpriseArchitectureModule.tabCapabilities')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'heatmap' ? 'active' : ''}`}
           onClick={() => setActiveTab('heatmap')}
         >
-          🗺️ Heatmap
+          🗺️ {t('enterpriseArchitectureModule.tabHeatmap')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'impact' ? 'active' : ''}`}
           onClick={() => setActiveTab('impact')}
         >
-          💥 Impact Analysis
+          💥 {t('enterpriseArchitectureModule.tabImpact')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'ai-risk' ? 'active' : ''}`}
           onClick={() => setActiveTab('ai-risk')}
         >
-          🤖 AI Risk Analysis
+          🤖 {t('enterpriseArchitectureModule.tabAiRisk')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'process-designer' ? 'active' : ''}`}
           onClick={() => setActiveTab('process-designer')}
         >
-          🔄 Process Designer
+          🔄 {t('enterpriseArchitectureModule.tabProcessDesigner')}
         </button>
         <button 
           className={`ea-tab ${activeTab === 'catalog-manager' ? 'active' : ''}`}
           onClick={() => setActiveTab('catalog-manager')}
         >
-          📋 Catalog Manager
+          📋 {t('enterpriseArchitectureModule.tabCatalogManager')}
         </button>
       </div>
 
@@ -626,7 +628,7 @@ export default function EAHome() {
         {loading && (
           <div className="ea-loading">
             <div className="ea-spinner"></div>
-            <p>Loading...</p>
+            <p>{t('enterpriseArchitectureModule.loading')}</p>
           </div>
         )}
 
@@ -644,9 +646,9 @@ export default function EAHome() {
                 initialData={editingProcess}
                 onSave={(processId) => {
                   if (editingProcess) {
-                    setSuccess(`Process updated successfully! ID: ${processId}`);
+                    setSuccess(t('enterpriseArchitectureModule.successProcessUpdated', { id: processId }));
                   } else {
-                    setSuccess(`Process created successfully! ID: ${processId}`);
+                    setSuccess(t('enterpriseArchitectureModule.successProcessCreated', { id: processId }));
                   }
                   setEditingProcess(null);
                   setActiveTab('processes');
@@ -664,7 +666,7 @@ export default function EAHome() {
         <div className="ea-modal-overlay">
           <div className="ea-modal">
             <div className="ea-modal-header">
-              <h3>Edit Application</h3>
+              <h3>{t('enterpriseArchitectureModule.modalEditApp')}</h3>
               <button 
                 className="ea-modal-close"
                 onClick={() => {
@@ -679,38 +681,38 @@ export default function EAHome() {
             
             <div className="ea-modal-body">
               <div className="ea-form-group">
-                <label>Name*</label>
+                <label>{t('enterpriseArchitectureModule.fieldNameRequired')}</label>
                 <input
                   type="text"
                   value={editFormData.name}
                   onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
-                  placeholder="Enter application name"
+                  placeholder={t('enterpriseArchitectureModule.placeholderAppName')}
                 />
               </div>
               
               <div className="ea-form-group">
-                <label>Description*</label>
+                <label>{t('enterpriseArchitectureModule.fieldDescription')}*</label>
                 <textarea
                   value={editFormData.description}
                   onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                  placeholder="Enter description"
+                  placeholder={t('enterpriseArchitectureModule.placeholderDescription')}
                   rows="3"
                 />
               </div>
               
               <div className="ea-form-row">
                 <div className="ea-form-group">
-                  <label>Category</label>
+                  <label>{t('enterpriseArchitectureModule.fieldCategory')}</label>
                   <input
                     type="text"
                     value={editFormData.category}
                     onChange={(e) => setEditFormData({...editFormData, category: e.target.value})}
-                    placeholder="Enter category"
+                    placeholder={t('enterpriseArchitectureModule.placeholderCategory')}
                   />
                 </div>
                 
                 <div className="ea-form-group">
-                  <label>Risk Level (%)</label>
+                  <label>{t('enterpriseArchitectureModule.fieldRiskLevel')}</label>
                   <input
                     type="number"
                     min="0"
@@ -723,7 +725,7 @@ export default function EAHome() {
               
               <div className="ea-form-row">
                 <div className="ea-form-group">
-                  <label>Maturity Level (1-5)</label>
+                  <label>{t('enterpriseArchitectureModule.fieldMaturityLevel')}</label>
                   <input
                     type="number"
                     min="1"
@@ -734,39 +736,39 @@ export default function EAHome() {
                 </div>
                 
                 <div className="ea-form-group">
-                  <label>Vendor</label>
+                  <label>{t('enterpriseArchitectureModule.fieldVendor')}</label>
                   <input
                     type="text"
                     value={editFormData.vendor}
                     onChange={(e) => setEditFormData({...editFormData, vendor: e.target.value})}
-                    placeholder="Enter vendor name"
+                    placeholder={t('enterpriseArchitectureModule.placeholderVendor')}
                   />
                 </div>
               </div>
               
               <div className="ea-form-row">
                 <div className="ea-form-group">
-                  <label>Lifecycle</label>
+                  <label>{t('enterpriseArchitectureModule.fieldLifecycle')}</label>
                   <select
                     value={editFormData.lifecycle}
                     onChange={(e) => setEditFormData({...editFormData, lifecycle: e.target.value})}
                   >
-                    <option value="Development">Development</option>
-                    <option value="Production">Production</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Retirement">Retirement</option>
+                    <option value="Development">{t('enterpriseArchitectureModule.lifecycleDevelopment')}</option>
+                    <option value="Production">{t('enterpriseArchitectureModule.lifecycleProduction')}</option>
+                    <option value="Maintenance">{t('enterpriseArchitectureModule.lifecycleMaintenance')}</option>
+                    <option value="Retirement">{t('enterpriseArchitectureModule.lifecycleRetirement')}</option>
                   </select>
                 </div>
                 
                 <div className="ea-form-group">
-                  <label>Status</label>
+                  <label>{t('enterpriseArchitectureModule.fieldStatus')}</label>
                   <select
                     value={editFormData.status}
                     onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Deprecated">Deprecated</option>
+                    <option value="Active">{t('enterpriseArchitectureModule.statusActive')}</option>
+                    <option value="Inactive">{t('enterpriseArchitectureModule.statusInactive')}</option>
+                    <option value="Deprecated">{t('enterpriseArchitectureModule.statusDeprecated')}</option>
                   </select>
                 </div>
               </div>
@@ -781,14 +783,14 @@ export default function EAHome() {
                   setEditFormData({});
                 }}
               >
-                Cancel
+                {t('enterpriseArchitectureModule.btnCancel')}
               </button>
               <button 
                 className="ea-btn primary"
                 onClick={handleUpdateApplication}
                 disabled={loading}
               >
-                {loading ? 'Updating...' : 'Update'}
+                {loading ? t('enterpriseArchitectureModule.btnUpdating') : t('enterpriseArchitectureModule.btnUpdate')}
               </button>
             </div>
           </div>
@@ -800,7 +802,7 @@ export default function EAHome() {
         <div className="ea-modal-overlay">
           <div className="ea-modal">
             <div className="ea-modal-header">
-              <h3>✏️ Edit Capability</h3>
+              <h3>{t('enterpriseArchitectureModule.modalEditCapability')}</h3>
               <button 
                 className="ea-modal-close"
                 onClick={() => {
@@ -815,55 +817,55 @@ export default function EAHome() {
             
             <div className="ea-modal-body">
               <div className="ea-form-group">
-                <label>Name</label>
+                <label>{t('enterpriseArchitectureModule.fieldName')}</label>
                 <input
                   type="text"
                   value={editCapabilityFormData.name}
                   onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, name: e.target.value})}
-                  placeholder="Enter capability name"
+                  placeholder={t('enterpriseArchitectureModule.placeholderCapabilityName')}
                 />
               </div>
               
               <div className="ea-form-group">
-                <label>Description</label>
+                <label>{t('enterpriseArchitectureModule.fieldDescription')}</label>
                 <textarea
                   value={editCapabilityFormData.description}
                   onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, description: e.target.value})}
-                  placeholder="Enter capability description"
+                  placeholder={t('enterpriseArchitectureModule.placeholderCapabilityDesc')}
                   rows="3"
                 />
               </div>
               
               <div className="ea-form-row">
                 <div className="ea-form-group">
-                  <label>Level</label>
+                  <label>{t('enterpriseArchitectureModule.fieldLevel')}</label>
                   <select
                     value={editCapabilityFormData.level}
                     onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, level: e.target.value})}
                   >
-                    <option value="Strategic">Strategic</option>
-                    <option value="Core">Core</option>
-                    <option value="Supporting">Supporting</option>
-                    <option value="Enabling">Enabling</option>
+                    <option value="Strategic">{t('enterpriseArchitectureModule.levelStrategic')}</option>
+                    <option value="Core">{t('enterpriseArchitectureModule.levelCore')}</option>
+                    <option value="Supporting">{t('enterpriseArchitectureModule.levelSupporting')}</option>
+                    <option value="Enabling">{t('enterpriseArchitectureModule.levelEnabling')}</option>
                   </select>
                 </div>
                 
                 <div className="ea-form-group">
-                  <label>Strategic Importance</label>
+                  <label>{t('enterpriseArchitectureModule.fieldStrategicImportance')}</label>
                   <select
                     value={editCapabilityFormData.strategic_importance}
                     onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, strategic_importance: e.target.value})}
                   >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
+                    <option value="High">{t('enterpriseArchitectureModule.importanceHigh')}</option>
+                    <option value="Medium">{t('enterpriseArchitectureModule.importanceMedium')}</option>
+                    <option value="Low">{t('enterpriseArchitectureModule.importanceLow')}</option>
                   </select>
                 </div>
               </div>
               
               <div className="ea-form-row">
                 <div className="ea-form-group">
-                  <label>Maturity Level (1-5)</label>
+                  <label>{t('enterpriseArchitectureModule.fieldMaturityLevel')}</label>
                   <input
                     type="number"
                     min="1"
@@ -874,20 +876,20 @@ export default function EAHome() {
                 </div>
                 
                 <div className="ea-form-group">
-                  <label>Risk Level</label>
+                  <label>{t('enterpriseArchitectureModule.fieldRiskLevelCap')}</label>
                   <select
                     value={editCapabilityFormData.risk}
                     onChange={(e) => setEditCapabilityFormData({...editCapabilityFormData, risk: e.target.value})}
                   >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
+                    <option value="Low">{t('enterpriseArchitectureModule.importanceLow')}</option>
+                    <option value="Medium">{t('enterpriseArchitectureModule.importanceMedium')}</option>
+                    <option value="High">{t('enterpriseArchitectureModule.importanceHigh')}</option>
                   </select>
                 </div>
               </div>
               
               <div className="ea-form-group">
-                <label>Tags (comma-separated)</label>
+                <label>{t('enterpriseArchitectureModule.fieldTagsComma')}</label>
                 <input
                   type="text"
                   value={editCapabilityFormData.tags.join(', ')}
@@ -895,7 +897,7 @@ export default function EAHome() {
                     ...editCapabilityFormData, 
                     tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
                   })}
-                  placeholder="Enter tags separated by commas"
+                  placeholder={t('enterpriseArchitectureModule.placeholderTagsComma')}
                 />
               </div>
             </div>
@@ -909,14 +911,14 @@ export default function EAHome() {
                   setEditCapabilityFormData({});
                 }}
               >
-                Cancel
+                {t('enterpriseArchitectureModule.btnCancel')}
               </button>
               <button 
                 className="ea-btn primary"
                 onClick={handleUpdateCapability}
                 disabled={loading}
               >
-                {loading ? 'Updating...' : 'Update'}
+                {loading ? t('enterpriseArchitectureModule.btnUpdating') : t('enterpriseArchitectureModule.btnUpdate')}
               </button>
             </div>
           </div>
