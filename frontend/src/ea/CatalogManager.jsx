@@ -250,6 +250,45 @@ export default function CatalogManager() {
     }
   };
 
+  const tStatus = (s) => {
+    if (!s) return s;
+    const map = {
+      draft:       t('enterpriseArchitectureModule.statusDraft'),
+      approved:    t('enterpriseArchitectureModule.statusApproved'),
+      deprecated:  t('enterpriseArchitectureModule.statusDeprecated'),
+      active:      t('enterpriseArchitectureModule.statusActive'),
+      inactive:    t('enterpriseArchitectureModule.statusInactive'),
+      review:      t('enterpriseArchitectureModule.statusReview'),
+      pilot:       t('enterpriseArchitectureModule.statusPilot'),
+      sunset:      t('enterpriseArchitectureModule.statusSunset'),
+    };
+    return map[s.toLowerCase()] || s;
+  };
+
+  const tLifecycle = (l) => {
+    if (!l) return l;
+    const map = {
+      development: t('enterpriseArchitectureModule.lifecycleDevelopment'),
+      production:  t('enterpriseArchitectureModule.lifecycleProduction'),
+      maintenance: t('enterpriseArchitectureModule.lifecycleMaintenance'),
+      retirement:  t('enterpriseArchitectureModule.lifecycleRetirement'),
+      pilot:       t('enterpriseArchitectureModule.statusPilot'),
+      sunset:      t('enterpriseArchitectureModule.statusSunset'),
+    };
+    return map[l.toLowerCase()] || l;
+  };
+
+  const tLevel = (lv) => {
+    if (!lv) return lv;
+    const map = {
+      strategic:  t('enterpriseArchitectureModule.levelStrategic'),
+      core:       t('enterpriseArchitectureModule.levelCore'),
+      supporting: t('enterpriseArchitectureModule.levelSupporting'),
+      enabling:   t('enterpriseArchitectureModule.levelEnabling'),
+    };
+    return map[lv.toLowerCase()] || lv;
+  };
+
   const getFilteredItems = () => {
     let items = [];
     
@@ -308,10 +347,10 @@ export default function CatalogManager() {
               <h3>{app.name}</h3>
               <div className="item-badges">
                 <span className={`lifecycle-badge ${app.lifecycle}`}>
-                  {app.lifecycle}
+                  {tLifecycle(app.lifecycle)}
                 </span>
                 <span className={`status-badge ${app.status}`}>
-                  {app.status}
+                  {tStatus(app.status)}
                 </span>
               </div>
             </div>
@@ -326,17 +365,17 @@ export default function CatalogManager() {
             
             <div className="item-details">
               <div className="detail-section">
-                <strong>Category:</strong> {app.category}
+                <strong>{t('enterpriseArchitectureModule.cmLabelCategory')}</strong> {app.category}
               </div>
               <div className="detail-section">
-                <strong>Owners:</strong> {app.owners?.join(', ') || 'Not specified'}
+                <strong>{t('enterpriseArchitectureModule.cmLabelOwners')}</strong> {app.owners?.join(', ') || '-'}
               </div>
               <div className="detail-section">
-                <strong>Capabilities:</strong> {app.capabilities?.join(', ') || 'None'}
+                <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {app.capabilities?.join(', ') || '-'}
               </div>
               {app.dataClasses?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Data Classes:</strong>
+                  <strong>{t('enterpriseArchitectureModule.cmLabelDataClasses')}</strong>
                   <div className="data-classes">
                     {app.dataClasses.map(cls => (
                       <span key={cls} className="data-badge">{cls}</span>
@@ -376,10 +415,10 @@ export default function CatalogManager() {
               <h3>{cap.name}</h3>
               <div className="item-badges">
                 <span className={`level-badge ${cap.level}`}>
-                  {cap.level}
+                  {tLevel(cap.level)}
                 </span>
                 <span className={`status-badge ${cap.status}`}>
-                  {cap.status}
+                  {tStatus(cap.status)}
                 </span>
               </div>
             </div>
@@ -394,14 +433,14 @@ export default function CatalogManager() {
             
             <div className="item-details">
               <div className="detail-section">
-                <strong>Category:</strong> {cap.category}
+                <strong>{t('enterpriseArchitectureModule.cmLabelCategory')}</strong> {cap.category}
               </div>
               <div className="detail-section">
-                <strong>Owner:</strong> {cap.owner?.join(', ') || 'Not specified'}
+                <strong>{t('enterpriseArchitectureModule.cmLabelOwner')}</strong> {cap.owner?.join(', ') || '-'}
               </div>
               {cap.tags?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Tags:</strong>
+                  <strong>{t('enterpriseArchitectureModule.cmLabelTags')}</strong>
                   <div className="tags">
                     {cap.tags.map(tag => (
                       <span key={tag} className="tag">{tag}</span>
@@ -411,7 +450,7 @@ export default function CatalogManager() {
               )}
               {cap.applications?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Applications:</strong> {cap.applications.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {cap.applications.join(', ')}
                 </div>
               )}
             </div>
@@ -446,7 +485,7 @@ export default function CatalogManager() {
               <h3>{proc.name}</h3>
               <div className="item-badges">
                 <span className={`status-badge ${proc.status}`}>
-                  {proc.status}
+                  {tStatus(proc.status)}
                 </span>
               </div>
             </div>
@@ -461,26 +500,26 @@ export default function CatalogManager() {
             
             <div className="item-details">
               <div className="detail-section">
-                <strong>Category:</strong> {proc.category}
+                <strong>{t('enterpriseArchitectureModule.cmLabelCategory')}</strong> {proc.category}
               </div>
               {proc.applications?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Applications:</strong> {proc.applications.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {proc.applications.join(', ')}
                 </div>
               )}
               {proc.capabilities?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Capabilities:</strong> {proc.capabilities.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {proc.capabilities.join(', ')}
                 </div>
               )}
               {proc.dependencies?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Dependencies:</strong> {proc.dependencies.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelDependencies')}</strong> {proc.dependencies.join(', ')}
                 </div>
               )}
               {proc.steps?.length > 0 && (
                 <div className="detail-section">
-                  <strong>Process Steps:</strong>
+                  <strong>{t('enterpriseArchitectureModule.cmLabelProcessSteps')}</strong>
                   <ol className="process-steps">
                     {proc.steps.map((step, index) => (
                       <li key={index}>{step}</li>
@@ -700,10 +739,10 @@ export default function CatalogManager() {
       {/* Demo Data Button */}
       <div className="demo-controls">
         <button onClick={generateSampleData} className="demo-btn">
-          🎯 Load Demo Data
+          🎯 {t('enterpriseArchitectureModule.btnLoadDemoData')}
         </button>
         <button onClick={loadData} className="refresh-btn">
-          🔄 Refresh Data
+          🔄 {t('enterpriseArchitectureModule.btnRefreshData')}
         </button>
       </div>
 

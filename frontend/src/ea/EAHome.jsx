@@ -260,6 +260,45 @@ export default function EAHome() {
     setSuccess('');
   };
 
+  const tStatus = (s) => {
+    if (!s) return s;
+    const map = {
+      draft:       t('enterpriseArchitectureModule.statusDraft'),
+      approved:    t('enterpriseArchitectureModule.statusApproved'),
+      deprecated:  t('enterpriseArchitectureModule.statusDeprecated'),
+      active:      t('enterpriseArchitectureModule.statusActive'),
+      inactive:    t('enterpriseArchitectureModule.statusInactive'),
+      review:      t('enterpriseArchitectureModule.statusReview'),
+      pilot:       t('enterpriseArchitectureModule.statusPilot'),
+      sunset:      t('enterpriseArchitectureModule.statusSunset'),
+    };
+    return map[s.toLowerCase()] || s;
+  };
+
+  const tLifecycle = (l) => {
+    if (!l) return l;
+    const map = {
+      development: t('enterpriseArchitectureModule.lifecycleDevelopment'),
+      production:  t('enterpriseArchitectureModule.lifecycleProduction'),
+      maintenance: t('enterpriseArchitectureModule.lifecycleMaintenance'),
+      retirement:  t('enterpriseArchitectureModule.lifecycleRetirement'),
+      pilot:       t('enterpriseArchitectureModule.statusPilot'),
+      sunset:      t('enterpriseArchitectureModule.statusSunset'),
+    };
+    return map[l.toLowerCase()] || l;
+  };
+
+  const tLevel = (lv) => {
+    if (!lv) return lv;
+    const map = {
+      strategic:  t('enterpriseArchitectureModule.levelStrategic'),
+      core:       t('enterpriseArchitectureModule.levelCore'),
+      supporting: t('enterpriseArchitectureModule.levelSupporting'),
+      enabling:   t('enterpriseArchitectureModule.levelEnabling'),
+    };
+    return map[lv.toLowerCase()] || lv;
+  };
+
   const renderOverview = () => (
     <div className="ea-overview">
       <div className="ea-stats-grid">
@@ -329,7 +368,7 @@ export default function EAHome() {
               <div key={process._id} className="ea-recent-item">
                 <span className="ea-item-name">{process.name}</span>
                 <span className={`ea-status-badge ${process.status}`}>
-                  {process.status}
+                  {tStatus(process.status)}
                 </span>
               </div>
             ))}
@@ -341,7 +380,7 @@ export default function EAHome() {
               <div key={app._id} className="ea-recent-item">
                 <span className="ea-item-name">{app.name}</span>
                 <span className={`ea-lifecycle-badge ${app.lifecycle}`}>
-                  {app.lifecycle}
+                  {tLifecycle(app.lifecycle)}
                 </span>
               </div>
             ))}
@@ -383,7 +422,7 @@ export default function EAHome() {
             <div className="ea-process-header">
               <h3>{process.name}</h3>
               <span className={`ea-status-badge ${process.status}`}>
-                {process.status}
+                {tStatus(process.status)}
               </span>
             </div>
             
@@ -430,7 +469,7 @@ export default function EAHome() {
             <div className="ea-app-header">
               <h3>{app.name}</h3>
               <span className={`ea-lifecycle-badge ${app.lifecycle}`}>
-                {app.lifecycle}
+                {tLifecycle(app.lifecycle)}
               </span>
             </div>
             
@@ -479,7 +518,7 @@ export default function EAHome() {
           <div key={cap._id} className="ea-cap-card">
             <div className="ea-cap-header">
               <h3>{cap.name}</h3>
-              <span className="ea-level-badge">{cap.level}</span>
+              <span className="ea-level-badge">{tLevel(cap.level)}</span>
             </div>
             
             <p className="ea-cap-description">{cap.description}</p>
