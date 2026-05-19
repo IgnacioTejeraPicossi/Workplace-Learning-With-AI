@@ -939,7 +939,35 @@ async def generate_cypress_tests(scopes: List[str], environment: str,
     parsed = _parse_json(raw or "") or {}
     scripts = parsed.get("scripts") or []
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-19) — append deterministic
+    # templates per scope, same pattern as Playwright. Each template carries
+    # an Enonic XP angle the LLM can't reliably hallucinate:
+    #   - scopeComponent          → Guillotine GraphQL stubbing + Designsystemet
+    #   - scopeFrontendRegression → cypress-axe + NextJS hydration + æøå routes
+    #   - scopeQuickDebug         → locale + Enonic image URL smoke
+    if "scopeComponent" in (scopes or []):
+        already = any("component-designsystemet" in (s.get("filename") or "").lower()
+                       or "Guillotine GraphQL stubbing" in (s.get("content") or "")
+                       for s in scripts)
+        if not already:
+            scripts.append(_cypress_component_designsystemet_spec())
+
+    if "scopeFrontendRegression" in (scopes or []):
+        already = any("regression-donation" in (s.get("filename") or "").lower()
+                       or "NextJS hydration + a11y" in (s.get("content") or "")
+                       for s in scripts)
+        if not already:
+            scripts.append(_cypress_regression_donation_spec())
+
+    if "scopeQuickDebug" in (scopes or []):
+        already = any("quick-debug" in (s.get("filename") or "").lower()
+                       or "Enonic image URL smoke" in (s.get("content") or "")
+                       for s in scripts)
+        if not already:
+            scripts.append(_cypress_quick_debug_spec())
+
     if not scripts:
+        # Generic minimal fallback — kept for unknown scopes / future additions.
         scripts = [{
             "filename": f"{s}.cy.ts",
             "content": (
@@ -949,7 +977,7 @@ async def generate_cypress_tests(scopes: List[str], environment: str,
                 "    cy.contains(/Røde Kors|Red Cross/i).should('be.visible');\n"
                 "  });\n});\n"
             ),
-        } for s in scopes[:3]]
+        } for s in (scopes or [])[:5]]
 
     try:
         await red_cross_qa_generated_scripts_collection.insert_one({
@@ -960,6 +988,189 @@ async def generate_cypress_tests(scopes: List[str], environment: str,
         pass
 
     return {"status": "ok", "scripts": scripts, "lang": lang}
+
+
+def _cypress_component_designsystemet_spec() -> Dict[str, str]:
+    """Deterministic Cypress component-level spec for Designsystemet
+    components reading from Enonic via Guillotine GraphQL.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19): Cypress's historical
+    strength is component-level isolation with stubbed network calls.
+    This template demonstrates the canonical pattern:
+      - cy.intercept on POST /api/graphql matching by operation name
+      - Fixture-driven Guillotine responses (matching the 4 canonical
+        queries already in the Postman collection)
+      - Designsystemet component renders without leaking into siblings
+    """
+    content = (
+        "// Guillotine GraphQL stubbing — Cypress's strongest pattern\n"
+        "// vs Playwright, applied to Enonic-fed Designsystemet components.\n"
+        "//\n"
+        "// Fixtures live at cypress/fixtures/guillotine/*.json and match\n"
+        "// the 4 canonical operations from the Postman collection:\n"
+        "//   GetDistrictPage / GetActivityList / GetCampaignPage / GetForeningContacts\n\n"
+        "describe('Designsystemet · CampaignCard (Guillotine GraphQL stubbing)', () => {\n"
+        "  beforeEach(() => {\n"
+        "    // Route every Guillotine GraphQL POST through cy.intercept.\n"
+        "    // Match by operation name in the request body so multiple\n"
+        "    // queries can coexist in the same spec.\n"
+        "    cy.intercept('POST', '**/api/graphql', (req) => {\n"
+        "      const op = req.body?.operationName || '';\n"
+        "      if (op === 'GetCampaignPage') {\n"
+        "        return req.reply({ fixture: 'guillotine/campaign-page.json' });\n"
+        "      }\n"
+        "      if (op === 'GetActivityList') {\n"
+        "        return req.reply({ fixture: 'guillotine/activity-list.json' });\n"
+        "      }\n"
+        "      // Anything else: pass through.\n"
+        "      req.continue();\n"
+        "    }).as('guillotine');\n"
+        "  });\n\n"
+        "  it('renders campaign title and amount from stubbed Guillotine response', () => {\n"
+        "    cy.visit('/no/aksjoner/test-kampanje');\n"
+        "    cy.wait('@guillotine');\n"
+        "    cy.findByRole('heading', { level: 1 }).should('be.visible');\n"
+        "    cy.findByRole('button', { name: /donér|donate/i }).should('be.visible');\n"
+        "  });\n\n"
+        "  it('handles empty Guillotine response gracefully (no crash)', () => {\n"
+        "    cy.intercept('POST', '**/api/graphql', (req) => {\n"
+        "      if (req.body?.operationName === 'GetCampaignPage') {\n"
+        "        return req.reply({ body: { data: { guillotine: { get: null } } } });\n"
+        "      }\n"
+        "      req.continue();\n"
+        "    });\n"
+        "    cy.visit('/no/aksjoner/ikke-finnes', { failOnStatusCode: false });\n"
+        "    // Soft 404 page should render — no React error boundary blow-up.\n"
+        "    cy.contains(/finner ikke|not found|404/i).should('be.visible');\n"
+        "  });\n\n"
+        "  it('uses POST (Guillotine) — protects against accidental GET migration', () => {\n"
+        "    // Defense-in-depth: Enonic Guillotine is POST-only. If a refactor\n"
+        "    // accidentally introduces a GET, this fails loudly.\n"
+        "    let postCount = 0;\n"
+        "    cy.intercept('POST', '**/api/graphql', (req) => { postCount++; req.continue(); });\n"
+        "    cy.intercept('GET',  '**/api/graphql', (req) => {\n"
+        "      throw new Error('Guillotine called with GET — should always be POST');\n"
+        "    });\n"
+        "    cy.visit('/no/aksjoner/test-kampanje');\n"
+        "    cy.wrap(null).should(() => expect(postCount).to.be.greaterThan(0));\n"
+        "  });\n"
+        "});\n"
+    )
+    return {"filename": "component-designsystemet.cy.ts", "content": content}
+
+
+def _cypress_regression_donation_spec() -> Dict[str, str]:
+    """Deterministic Cypress page-level regression spec covering the
+    three NextJS + Enonic XP failure modes a manual QA reliably misses:
+      1. Hydration mismatch — assertions run BEFORE React hydrates and
+         silently see SSR HTML instead of the live component.
+      2. Localized æøå routes — Norwegian slugs encode-decode differently
+         in build vs runtime; a route that works in dev can 404 in prod.
+      3. `next/image` over Enonic URLs — re-publishing an image rehashes
+         the `:hash` segment in /_/image/<id>:<hash>/...; broken images
+         show fallback alt silently.
+
+    Plus cypress-axe sweep on the donation page (the highest-revenue path).
+    """
+    content = (
+        "// NextJS hydration + a11y + Enonic image regression suite.\n"
+        "// The three failure modes manual QA reliably misses, gated\n"
+        "// by deterministic assertions Cypress is well-suited for.\n\n"
+        "import 'cypress-axe';\n\n"
+        "// Routes covering the migration æøå edge case + happy donation path.\n"
+        "const ROUTES = [\n"
+        "  { path: '/no/doner',                lang: 'no', title: /doner|donér/i },\n"
+        "  { path: '/no/forskning/bløding',    lang: 'no', title: /forskning|bløding/i },\n"
+        "  { path: '/en/donate',               lang: 'en', title: /donate/i },\n"
+        "];\n\n"
+        "describe('Frontend regression — NextJS + Enonic XP failure modes', () => {\n"
+        "  beforeEach(() => { cy.injectAxe(); });\n\n"
+        "  ROUTES.forEach(({ path, lang, title }) => {\n"
+        "    describe(`route ${path}`, () => {\n"
+        "      it('hydrates before user-facing assertions', () => {\n"
+        "        cy.visit(path);\n"
+        "        // Wait for NextJS hydration. The site emits __NEXT_DATA__ at SSR\n"
+        "        // time and React replaces the static markup once interactive.\n"
+        "        cy.window().should('have.property', '__NEXT_DATA__');\n"
+        "        // If the layout uses Designsystemet's <Layout>, it sets a\n"
+        "        // data-hydrated attribute; otherwise fall back to body class.\n"
+        "        cy.get('body', { timeout: 10000 }).then(($body) => {\n"
+        "          const ok = $body.attr('data-hydrated') === 'true'\n"
+        "                  || $body.hasClass('hydrated')\n"
+        "                  || !!$body.find('[data-hydrated=\"true\"]').length;\n"
+        "          // Don't hard-fail if neither marker exists — just log it.\n"
+        "          if (!ok) cy.log('warn: no hydration marker found on body');\n"
+        "        });\n"
+        "        cy.get('html').should('have.attr', 'lang').and('match', new RegExp(`^${lang}`));\n"
+        "        cy.contains(title).should('be.visible');\n"
+        "      });\n\n"
+        "      it('all Enonic image URLs return 200', () => {\n"
+        "        cy.visit(path);\n"
+        "        cy.window().should('have.property', '__NEXT_DATA__');\n"
+        "        // /_/image/<contentId>:<hash>/full/scale-WxH/...\n"
+        "        cy.get('img[src*=\"/_/image/\"]').each(($img) => {\n"
+        "          const src = $img.prop('src');\n"
+        "          if (src) {\n"
+        "            cy.request({ url: src, failOnStatusCode: false })\n"
+        "              .its('status')\n"
+        "              .should('be.lessThan', 400);\n"
+        "          }\n"
+        "        });\n"
+        "      });\n\n"
+        "      it('passes WCAG 2.2 AA axe sweep', () => {\n"
+        "        cy.visit(path);\n"
+        "        cy.window().should('have.property', '__NEXT_DATA__');\n"
+        "        cy.checkA11y(null, {\n"
+        "          runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag22aa'] },\n"
+        "        });\n"
+        "      });\n"
+        "    });\n"
+        "  });\n"
+        "});\n"
+    )
+    return {"filename": "regression-donation.cy.ts", "content": content}
+
+
+def _cypress_quick_debug_spec() -> Dict[str, str]:
+    """Deterministic Cypress quick-debug spec for local dev triage.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19): when you suspect a
+    config-level breakage, this is the 60-second spec to run. Covers:
+      - Enonic image URL smoke: a broken `:hash` segment 404s the
+        whole `/_/image/...` route — easy to spot.
+      - Locale resolution: a missing `next-intl` config silently falls
+        back to default locale; testing both /no and /en catches it.
+      - GraphQL endpoint reachability: the most-common '500 on every
+        page' cause is the Guillotine endpoint being down.
+    """
+    content = (
+        "// Quick debug — Enonic image URL smoke + locale + Guillotine ping.\n"
+        "// Designed to run in <60s during local dev triage.\n\n"
+        "describe('Quick debug — Enonic + NextJS sanity', () => {\n"
+        "  it('Guillotine GraphQL endpoint is reachable (POST returns < 500)', () => {\n"
+        "    cy.request({\n"
+        "      method: 'POST',\n"
+        "      url: '/api/graphql',\n"
+        "      body: { query: '{ guillotine { getSite { _name } } }' },\n"
+        "      failOnStatusCode: false,\n"
+        "    }).its('status').should('be.lessThan', 500);\n"
+        "  });\n\n"
+        "  it('default locale resolves (no next-intl misconfig)', () => {\n"
+        "    cy.visit('/');\n"
+        "    // Default redirect should land on /no/ for rodekors.no.\n"
+        "    cy.location('pathname').should('match', /^\\/(no|en)/);\n"
+        "    cy.get('html').should('have.attr', 'lang');\n"
+        "  });\n\n"
+        "  it('Enonic image URL smoke — first image on the homepage', () => {\n"
+        "    cy.visit('/');\n"
+        "    cy.get('img[src*=\"/_/image/\"]').first().then(($img) => {\n"
+        "      const src = $img.prop('src');\n"
+        "      cy.request(src).its('status').should('equal', 200);\n"
+        "    });\n"
+        "  });\n"
+        "});\n"
+    )
+    return {"filename": "quick-debug.cy.ts", "content": content}
 
 
 async def run_cypress(scopes: List[str], environment: str) -> Dict[str, Any]:

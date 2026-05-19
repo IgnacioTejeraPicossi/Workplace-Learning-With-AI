@@ -14,7 +14,7 @@ from backend.services.red_cross_qa import (
     generate_uat_support, analyze_risk_matrix,
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
-    generate_playwright_tests, export_postman_collection, run_graphql_introspection,
+    generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -271,6 +271,40 @@ async def main():
         assert needle in ml_c, f"migrated-links.spec.ts missing required marker: {needle}"
     print(f"[OK] Playwright Migrated-links scope ({ml_scripts[0]['filename']}, "
           f"param + cristinid-guard + round-trip all present)")
+
+    # Phase H+ — Cypress deterministic templates per scope.
+    # 1. scopeComponent → Guillotine GraphQL stubbing + Designsystemet
+    cy_comp = await generate_cypress_tests(["scopeComponent"], "test", "en")
+    comp_scripts = [s for s in cy_comp["scripts"]
+                     if "component-designsystemet" in (s.get("filename") or "").lower()]
+    assert comp_scripts, "scopeComponent must produce component-designsystemet.cy.ts"
+    cc = comp_scripts[0]["content"]
+    for needle in ("cy.intercept", "GetCampaignPage", "operationName", "Guillotine"):
+        assert needle in cc, f"component spec missing required marker: {needle}"
+    print(f"[OK] Cypress Component scope ({comp_scripts[0]['filename']}, "
+          f"cy.intercept + Guillotine + GetCampaignPage + operationName all present)")
+
+    # 2. scopeFrontendRegression → cypress-axe + hydration + æøå
+    cy_reg = await generate_cypress_tests(["scopeFrontendRegression"], "test", "en")
+    reg_scripts = [s for s in cy_reg["scripts"]
+                    if "regression-donation" in (s.get("filename") or "").lower()]
+    assert reg_scripts, "scopeFrontendRegression must produce regression-donation.cy.ts"
+    rc = reg_scripts[0]["content"]
+    for needle in ("cypress-axe", "__NEXT_DATA__", "bløding", "wcag22aa", "/_/image/"):
+        assert needle in rc, f"regression spec missing required marker: {needle}"
+    print(f"[OK] Cypress Regression scope ({reg_scripts[0]['filename']}, "
+          f"cypress-axe + hydration + bløding + wcag22aa + Enonic-image all present)")
+
+    # 3. scopeQuickDebug → locale + Enonic image + Guillotine ping
+    cy_dbg = await generate_cypress_tests(["scopeQuickDebug"], "test", "en")
+    dbg_scripts = [s for s in cy_dbg["scripts"]
+                    if "quick-debug" in (s.get("filename") or "").lower()]
+    assert dbg_scripts, "scopeQuickDebug must produce quick-debug.cy.ts"
+    dc = dbg_scripts[0]["content"]
+    for needle in ("/api/graphql", "/_/image/", "next-intl"):
+        assert needle in dc, f"quick-debug spec missing required marker: {needle}"
+    print(f"[OK] Cypress QuickDebug scope ({dbg_scripts[0]['filename']}, "
+          f"graphql-ping + Enonic-image + next-intl all present)")
 
     # 2. Postman Collection v2.1 JSON must be valid + carry the 4 canonical queries.
     pm = await export_postman_collection(None, "test", "en")
