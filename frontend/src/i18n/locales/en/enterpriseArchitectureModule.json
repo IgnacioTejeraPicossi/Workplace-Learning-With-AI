@@ -46,6 +46,7 @@
     "btnAddApp": "Add Application",
     "labelDataClasses": "Data Classes:",
     "labelOwners": "owners",
+    "labelOwnerSingular": "owner",
     "labelCapabilities": "capabilities",
     "btnLinkProcess": "Link Process",
     "businessCapabilities": "Business Capabilities",
@@ -273,6 +274,111 @@
     "hmCapabilities": "Capabilities Overview",
     "hmNoData": "No data available. Add processes, applications or capabilities first.",
     "errorLoadData": "Failed to load data",
-    "errorLoadHeatmap": "Failed to load heatmap data"
+    "errorLoadHeatmap": "Failed to load heatmap data",
+    "catalog": {
+      "applications": {
+        "enterpriseArchitectureModule": {
+          "name": "Enterprise Architecture Module",
+          "description": "Complete enterprise architecture module with process modeling and impact analysis"
+        },
+        "repositoryAnalyzerModule": {
+          "name": "Repository Analyzer Module",
+          "description": "Code repository analysis module with automatic generation of documentation and quizzes"
+        },
+        "testApp": {
+          "name": "Test App",
+          "description": "Test application"
+        },
+        "workplaceLearningWithAI": {
+          "name": "Workplace Learning With AI",
+          "description": "Comprehensive workplace learning platform with AI including multiple specialized modules"
+        },
+        "erpSystem": {
+          "name": "ERP System",
+          "description": "Enterprise Resource Planning system for business operations"
+        },
+        "crmPlatform": {
+          "name": "CRM Platform",
+          "description": "Customer Relationship Management platform"
+        },
+        "legacyDatabase": {
+          "name": "Legacy Database",
+          "description": "Legacy database system for historical data"
+        }
+      },
+      "processes": {
+        "repositoryAnalysisProcess": {
+          "name": "Repository Analysis Process",
+          "description": "Create documentation for the repository"
+        },
+        "aiContentGenerationProcess": {
+          "name": "AI Content Generation Process",
+          "description": "Automatic generation of learning content with AI"
+        },
+        "userOnboardingProcess": {
+          "name": "User Onboarding Process",
+          "description": "Onboard new users to the platform"
+        },
+        "testProcess": {
+          "name": "Test Process",
+          "description": "Test description"
+        },
+        "orderProcessing": {
+          "name": "Order Processing",
+          "description": "Process customer orders from receipt to fulfillment"
+        },
+        "paymentProcessing": {
+          "name": "Payment Processing",
+          "description": "Process financial transactions and payments"
+        },
+        "userAuthentication": {
+          "name": "User Authentication",
+          "description": "Authenticate users and manage access"
+        }
+      },
+      "capabilities": {
+        "financialManagement": { "name": "Financial Management", "description": "Manage financial operations and reporting" },
+        "inventoryControl": { "name": "Inventory Control", "description": "Manage inventory and stock levels" },
+        "hrManagement": { "name": "HR Management", "description": "Manage human resources and employee data" },
+        "leadManagement": { "name": "Lead Management", "description": "Manage sales leads and prospects" },
+        "customerAnalytics": { "name": "Customer Analytics", "description": "Analyze customer behavior and trends" },
+        "campaignManagement": { "name": "Campaign Management", "description": "Plan and execute marketing campaigns" },
+        "dataStorage": { "name": "Data Storage", "description": "Store and manage enterprise data" },
+        "dataRetrieval": { "name": "Data Retrieval", "description": "Retrieve and query stored data" },
+        "customerManagement": { "name": "Customer Management", "description": "Manage customer relationships and interactions" },
+        "financialOperations": { "name": "Financial Operations", "description": "Manage financial transactions and reporting" },
+        "itInfrastructure": { "name": "IT Infrastructure", "description": "Manage IT infrastructure and services" },
+        "orderManagement": { "name": "Order Management", "description": "Manage customer orders end to end" },
+        "riskManagement": { "name": "Risk Management", "description": "Identify and mitigate operational risks" }
+      },
+      "dataClasses": {
+        "processData": "Process Data",
+        "applicationData": "Application Data",
+        "capabilityData": "Capability Data",
+        "codeData": "Code Data",
+        "documentationData": "Documentation Data",
+        "quizData": "Quiz Data",
+        "testData": "Test Data",
+        "userData": "User Data",
+        "learningData": "Learning Data",
+        "analyticsData": "Analytics Data",
+        "repositoryData": "Repository Data",
+        "financialData": "Financial Data",
+        "employeeData": "Employee Data",
+        "inventoryData": "Inventory Data",
+        "customerData": "Customer Data",
+        "salesData": "Sales Data",
+        "marketingData": "Marketing Data",
+        "historicalData": "Historical Data",
+        "referenceData": "Reference Data"
+      },
+      "vendors": {
+        "testVendor": "Test Vendor"
+      },
+      "owners": {
+        "developmentTeam": "Development Team",
+        "aiTeam": "AI Team"
+      }
+    }
   }
 }

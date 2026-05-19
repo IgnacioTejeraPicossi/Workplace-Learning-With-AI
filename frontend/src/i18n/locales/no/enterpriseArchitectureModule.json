@@ -46,6 +46,7 @@
     "btnAddApp": "Legg til applikasjon",
     "labelDataClasses": "Dataklasser:",
     "labelOwners": "eiere",
+    "labelOwnerSingular": "eier",
     "labelCapabilities": "kapabiliteter",
     "btnLinkProcess": "Koble til prosess",
     "businessCapabilities": "Forretningsmessige kapabiliteter",
@@ -273,6 +274,111 @@
     "hmCapabilities": "Kapabilitetsoverikt",
     "hmNoData": "Ingen data tilgjengelig. Legg til prosesser, applikasjoner eller kapabiliteter først.",
     "errorLoadData": "Klarte ikke å laste data",
-    "errorLoadHeatmap": "Klarte ikke å laste varmekartdata"
+    "errorLoadHeatmap": "Klarte ikke å laste varmekartdata",
+    "catalog": {
+      "applications": {
+        "enterpriseArchitectureModule": {
+          "name": "Virksomhetsarkitekturmodul",
+          "description": "Komplett virksomhetsarkitekturmodul med prosessmodellering og konsekvensanalyse"
+        },
+        "repositoryAnalyzerModule": {
+          "name": "Repository-analysatormodul",
+          "description": "Modul for analyse av kodebaserte repositorier med automatisk generering av dokumentasjon og quizer"
+        },
+        "testApp": {
+          "name": "Testapplikasjon",
+          "description": "Testapplikasjon"
+        },
+        "workplaceLearningWithAI": {
+          "name": "Arbeidsplasslæring med KI",
+          "description": "Omfattende arbeidsplasslæringsplattform med KI som inkluderer flere spesialiserte moduler"
+        },
+        "erpSystem": {
+          "name": "ERP-system",
+          "description": "Enterprise Resource Planning-system for forretningsdrift"
+        },
+        "crmPlatform": {
+          "name": "CRM-plattform",
+          "description": "Plattform for kundeforholdsstyring"
+        },
+        "legacyDatabase": {
+          "name": "Eldre database",
+          "description": "Eldre databasesystem for historiske data"
+        }
+      },
+      "processes": {
+        "repositoryAnalysisProcess": {
+          "name": "Repository-analyseprosess",
+          "description": "Opprett dokumentasjon for repositoryet"
+        },
+        "aiContentGenerationProcess": {
+          "name": "KI-innholdsgenereringsprosess",
+          "description": "Automatisk generering av læringsinnhold med KI"
+        },
+        "userOnboardingProcess": {
+          "name": "Bruker-onboardingprosess",
+          "description": "Onboarde nye brukere til plattformen"
+        },
+        "testProcess": {
+          "name": "Testprosess",
+          "description": "Testbeskrivelse"
+        },
+        "orderProcessing": {
+          "name": "Ordrebehandling",
+          "description": "Behandle kundeordrer fra mottak til levering"
+        },
+        "paymentProcessing": {
+          "name": "Betalingsbehandling",
+          "description": "Behandle finansielle transaksjoner og betalinger"
+        },
+        "userAuthentication": {
+          "name": "Brukerautentisering",
+          "description": "Autentiser brukere og administrer tilgang"
+        }
+      },
+      "capabilities": {
+        "financialManagement": { "name": "Finansforvaltning", "description": "Administrere finansielle operasjoner og rapportering" },
+        "inventoryControl": { "name": "Lagerkontroll", "description": "Administrere lager og beholdningsnivåer" },
+        "hrManagement": { "name": "HR-forvaltning", "description": "Administrere HR og ansattdata" },
+        "leadManagement": { "name": "Lead-forvaltning", "description": "Administrere salgsleads og prospekter" },
+        "customerAnalytics": { "name": "Kundeanalyse", "description": "Analysere kundeadferd og trender" },
+        "campaignManagement": { "name": "Kampanjeforvaltning", "description": "Planlegge og gjennomføre markedsføringskampanjer" },
+        "dataStorage": { "name": "Datalagring", "description": "Lagre og administrere bedriftsdata" },
+        "dataRetrieval": { "name": "Datahenting", "description": "Hente og søke i lagrede data" },
+        "customerManagement": { "name": "Kundeforvaltning", "description": "Administrere kunderelasjoner og interaksjoner" },
+        "financialOperations": { "name": "Finansielle operasjoner", "description": "Administrere finansielle transaksjoner og rapportering" },
+        "itInfrastructure": { "name": "IT-infrastruktur", "description": "Administrere IT-infrastruktur og tjenester" },
+        "orderManagement": { "name": "Ordreforvaltning", "description": "Administrere kundeordrer ende-til-ende" },
+        "riskManagement": { "name": "Risikostyring", "description": "Identifisere og mitigere operative risikoer" }
+      },
+      "dataClasses": {
+        "processData": "Prosessdata",
+        "applicationData": "Applikasjonsdata",
+        "capabilityData": "Kapabilitetsdata",
+        "codeData": "Kodedata",
+        "documentationData": "Dokumentasjonsdata",
+        "quizData": "Quizdata",
+        "testData": "Testdata",
+        "userData": "Brukerdata",
+        "learningData": "Læringsdata",
+        "analyticsData": "Analysedata",
+        "repositoryData": "Repositorydata",
+        "financialData": "Finansdata",
+        "employeeData": "Ansattdata",
+        "inventoryData": "Lagerdata",
+        "customerData": "Kundedata",
+        "salesData": "Salgsdata",
+        "marketingData": "Markedsføringsdata",
+        "historicalData": "Historiske data",
+        "referenceData": "Referencedata"
+      },
+      "vendors": {
+        "testVendor": "Testleverandør"
+      },
+      "owners": {
+        "developmentTeam": "Utviklingsteam",
+        "aiTeam": "KI-team"
+      }
+    }
   }
 }

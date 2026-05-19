@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import './CatalogManager.css';
+import { createEaCatalogTranslators } from './eaCatalogI18n';
 
 export default function CatalogManager() {
   const { t } = useTranslation();
+  const {
+    tAppName, tAppDesc, tProcessName, tProcessDesc,
+    tCapName, tCapDesc, tDataClass, tCapabilityName, tVendor, tOwner,
+  } = createEaCatalogTranslators(t);
   const [activeTab, setActiveTab] = useState('applications');
   const [applications, setApplications] = useState([]);
   const [capabilities, setCapabilities] = useState([]);
@@ -349,7 +354,7 @@ export default function CatalogManager() {
         {getFilteredItems().map(app => (
           <div key={app.id} className="item-card application">
             <div className="item-header">
-              <h3>{app.name}</h3>
+              <h3>{tAppName(app.name)}</h3>
               <div className="item-badges">
                 <span className={`lifecycle-badge ${app.lifecycle}`}>
                   {tLifecycle(app.lifecycle)}
@@ -360,10 +365,10 @@ export default function CatalogManager() {
               </div>
             </div>
             
-            <p className="item-description">{app.description}</p>
+            <p className="item-description">{tAppDesc(app.name, app.description)}</p>
             
             <div className="item-meta">
-              <span>🏢 {app.vendor || 'Internal'}</span>
+              <span>🏢 {tVendor(app.vendor) || app.vendor || 'Internal'}</span>
               <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {app.risk}%</span>
               <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {app.maturity}/5</span>
             </div>
@@ -376,14 +381,14 @@ export default function CatalogManager() {
                 <strong>{t('enterpriseArchitectureModule.cmLabelOwners')}</strong> {app.owners?.join(', ') || '-'}
               </div>
               <div className="detail-section">
-                <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {app.capabilities?.join(', ') || '-'}
+                <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {app.capabilities?.map(tCapabilityName).join(', ') || '-'}
               </div>
               {app.dataClasses?.length > 0 && (
                 <div className="detail-section">
                   <strong>{t('enterpriseArchitectureModule.cmLabelDataClasses')}</strong>
                   <div className="data-classes">
                     {app.dataClasses.map(cls => (
-                      <span key={cls} className="data-badge">{cls}</span>
+                      <span key={cls} className="data-badge">{tDataClass(cls)}</span>
                     ))}
                   </div>
                 </div>
@@ -417,7 +422,7 @@ export default function CatalogManager() {
         {getFilteredItems().map(cap => (
           <div key={cap.id} className="item-card capability">
             <div className="item-header">
-              <h3>{cap.name}</h3>
+              <h3>{tCapName(cap.name)}</h3>
               <div className="item-badges">
                 <span className={`level-badge ${cap.level}`}>
                   {tLevel(cap.level)}
@@ -428,7 +433,7 @@ export default function CatalogManager() {
               </div>
             </div>
             
-            <p className="item-description">{cap.description}</p>
+            <p className="item-description">{tCapDesc(cap.name, cap.description)}</p>
             
             <div className="item-meta">
               <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {cap.risk}%</span>
@@ -455,7 +460,7 @@ export default function CatalogManager() {
               )}
               {cap.applications?.length > 0 && (
                 <div className="detail-section">
-                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {cap.applications.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {cap.applications?.map(tAppName).join(', ')}
                 </div>
               )}
             </div>
@@ -487,7 +492,7 @@ export default function CatalogManager() {
         {getFilteredItems().map(proc => (
           <div key={proc.id} className="item-card process">
             <div className="item-header">
-              <h3>{proc.name}</h3>
+              <h3>{tProcessName(proc.name)}</h3>
               <div className="item-badges">
                 <span className={`status-badge ${proc.status}`}>
                   {tStatus(proc.status)}
@@ -495,10 +500,10 @@ export default function CatalogManager() {
               </div>
             </div>
             
-            <p className="item-description">{proc.description}</p>
+            <p className="item-description">{tProcessDesc(proc.name, proc.description)}</p>
             
             <div className="item-meta">
-              <span>👤 {proc.owner}</span>
+              <span>👤 {tOwner(proc.owner) || proc.owner}</span>
               <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {proc.risk}%</span>
               <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {proc.maturity}/5</span>
             </div>
@@ -509,17 +514,17 @@ export default function CatalogManager() {
               </div>
               {proc.applications?.length > 0 && (
                 <div className="detail-section">
-                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {proc.applications.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelApplications')}</strong> {proc.applications?.map(tAppName).join(', ')}
                 </div>
               )}
               {proc.capabilities?.length > 0 && (
                 <div className="detail-section">
-                  <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {proc.capabilities.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelCapabilities')}</strong> {proc.capabilities.map(tCapabilityName).join(', ')}
                 </div>
               )}
               {proc.dependencies?.length > 0 && (
                 <div className="detail-section">
-                  <strong>{t('enterpriseArchitectureModule.cmLabelDependencies')}</strong> {proc.dependencies.join(', ')}
+                  <strong>{t('enterpriseArchitectureModule.cmLabelDependencies')}</strong> {proc.dependencies.map(tDataClass).join(', ')}
                 </div>
               )}
               {proc.steps?.length > 0 && (

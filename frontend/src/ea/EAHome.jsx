@@ -7,9 +7,14 @@ import HeatmapView from './HeatmapView';
 import ImpactAnalysis from './ImpactAnalysis';
 import CatalogManager from './CatalogManager';
 import AIRiskAnalysis from './AIRiskAnalysis';
+import { createEaCatalogTranslators } from './eaCatalogI18n';
 
 export default function EAHome() {
   const { t } = useTranslation();
+  const {
+    tAppName, tAppDesc, tProcessName, tProcessDesc,
+    tCapName, tCapDesc, tDataClass, tVendor, tOwner,
+  } = createEaCatalogTranslators(t);
   const [activeTab, setActiveTab] = useState('overview');
   const [catalogOverview, setCatalogOverview] = useState(null);
   const [processes, setProcesses] = useState([]);
@@ -371,7 +376,7 @@ export default function EAHome() {
             <h4>{t('enterpriseArchitectureModule.recentProcesses')}</h4>
             {processes.slice(0, 3).map(process => (
               <div key={process._id} className="ea-recent-item">
-                <span className="ea-item-name">{process.name}</span>
+                <span className="ea-item-name">{tProcessName(process.name)}</span>
                 <span className={`ea-status-badge ${process.status}`}>
                   {tStatus(process.status)}
                 </span>
@@ -383,7 +388,7 @@ export default function EAHome() {
             <h4>{t('enterpriseArchitectureModule.recentApplications')}</h4>
             {applications.slice(0, 3).map(app => (
               <div key={app._id} className="ea-recent-item">
-                <span className="ea-item-name">{app.name}</span>
+                <span className="ea-item-name">{tAppName(app.name)}</span>
                 <span className={`ea-lifecycle-badge ${app.lifecycle}`}>
                   {tLifecycle(app.lifecycle)}
                 </span>
@@ -425,16 +430,16 @@ export default function EAHome() {
         {processes.map(process => (
           <div key={process._id} className="ea-process-card">
             <div className="ea-process-header">
-              <h3>{process.name}</h3>
+              <h3>{tProcessName(process.name)}</h3>
               <span className={`ea-status-badge ${process.status}`}>
                 {tStatus(process.status)}
               </span>
             </div>
             
-            <p className="ea-process-description">{process.description}</p>
+            <p className="ea-process-description">{tProcessDesc(process.name, process.description)}</p>
             
             <div className="ea-process-meta">
-              <span>👤 {process.owner}</span>
+              <span>👤 {tOwner(process.owner) || process.owner}</span>
               <span>📊 {t('enterpriseArchitectureModule.labelRisk')}: {process.risk}%</span>
               <span>⭐ {t('enterpriseArchitectureModule.labelMaturity')}: {process.maturity}/5</span>
             </div>
@@ -472,17 +477,17 @@ export default function EAHome() {
         {applications.map(app => (
           <div key={app._id} className="ea-app-card">
             <div className="ea-app-header">
-              <h3>{app.name}</h3>
+              <h3>{tAppName(app.name)}</h3>
               <span className={`ea-lifecycle-badge ${app.lifecycle}`}>
                 {tLifecycle(app.lifecycle)}
               </span>
             </div>
             
-            <p className="ea-app-description">{app.description}</p>
+            <p className="ea-app-description">{tAppDesc(app.name, app.description)}</p>
             
             <div className="ea-app-meta">
-              {app.vendor && <span>🏢 {app.vendor}</span>}
-              <span>👥 {app.owners.length} {t('enterpriseArchitectureModule.labelOwners')}</span>
+              {app.vendor && <span>🏢 {tVendor(app.vendor) || app.vendor}</span>}
+              <span>👥 {app.owners.length} {app.owners.length === 1 ? t('enterpriseArchitectureModule.labelOwnerSingular') : t('enterpriseArchitectureModule.labelOwners')}</span>
               <span>🏗️ {app.capabilities.length} {t('enterpriseArchitectureModule.labelCapabilities')}</span>
             </div>
             
@@ -490,7 +495,7 @@ export default function EAHome() {
               <div className="ea-data-classes">
                 <span className="ea-data-label">{t('enterpriseArchitectureModule.labelDataClasses')}</span>
                 {app.dataClasses.map(cls => (
-                  <span key={cls} className="ea-data-badge">{cls}</span>
+                  <span key={cls} className="ea-data-badge">{tDataClass(cls)}</span>
                 ))}
               </div>
             )}
@@ -522,14 +527,14 @@ export default function EAHome() {
         {capabilities.map(cap => (
           <div key={cap._id} className="ea-cap-card">
             <div className="ea-cap-header">
-              <h3>{cap.name}</h3>
+              <h3>{tCapName(cap.name)}</h3>
               <span className="ea-level-badge">{tLevel(cap.level)}</span>
             </div>
             
-            <p className="ea-cap-description">{cap.description}</p>
+            <p className="ea-cap-description">{tCapDesc(cap.name, cap.description)}</p>
             
             <div className="ea-cap-meta">
-              <span>👥 {cap.owner.length} {t('enterpriseArchitectureModule.labelOwners')}</span>
+              <span>👥 {cap.owner.length} {cap.owner.length === 1 ? t('enterpriseArchitectureModule.labelOwnerSingular') : t('enterpriseArchitectureModule.labelOwners')}</span>
               <span>🏷️ {cap.tags.length} {t('enterpriseArchitectureModule.labelTags')}</span>
             </div>
             

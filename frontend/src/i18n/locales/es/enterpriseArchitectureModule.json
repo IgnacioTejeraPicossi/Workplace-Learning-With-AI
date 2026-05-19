@@ -46,6 +46,7 @@
     "btnAddApp": "Añadir aplicación",
     "labelDataClasses": "Clases de datos:",
     "labelOwners": "propietarios",
+    "labelOwnerSingular": "propietario",
     "labelCapabilities": "capacidades",
     "btnLinkProcess": "Vincular proceso",
     "businessCapabilities": "Capacidades de negocio",
@@ -273,6 +274,111 @@
     "hmCapabilities": "Resumen de capacidades",
     "hmNoData": "No hay datos disponibles. Añade procesos, aplicaciones o capacidades primero.",
     "errorLoadData": "Error al cargar los datos",
-    "errorLoadHeatmap": "Error al cargar el mapa de calor"
+    "errorLoadHeatmap": "Error al cargar el mapa de calor",
+    "catalog": {
+      "applications": {
+        "enterpriseArchitectureModule": {
+          "name": "Módulo de Arquitectura Empresarial",
+          "description": "Módulo completo de arquitectura empresarial con modelado de procesos y análisis de impacto"
+        },
+        "repositoryAnalyzerModule": {
+          "name": "Módulo Analizador de Repositorios",
+          "description": "Módulo de análisis de repositorios de código con generación automática de documentación y cuestionarios"
+        },
+        "testApp": {
+          "name": "Aplicación de prueba",
+          "description": "Aplicación de prueba"
+        },
+        "workplaceLearningWithAI": {
+          "name": "Aprendizaje Laboral con IA",
+          "description": "Plataforma integral de aprendizaje empresarial con IA que incluye múltiples módulos especializados"
+        },
+        "erpSystem": {
+          "name": "Sistema ERP",
+          "description": "Sistema de planificación de recursos empresariales para operaciones de negocio"
+        },
+        "crmPlatform": {
+          "name": "Plataforma CRM",
+          "description": "Plataforma de gestión de relaciones con clientes"
+        },
+        "legacyDatabase": {
+          "name": "Base de datos heredada",
+          "description": "Sistema de base de datos heredado para datos históricos"
+        }
+      },
+      "processes": {
+        "repositoryAnalysisProcess": {
+          "name": "Proceso de análisis de repositorio",
+          "description": "Crear documentación para el repositorio"
+        },
+        "aiContentGenerationProcess": {
+          "name": "Proceso de generación de contenido IA",
+          "description": "Generación automática de contenido de aprendizaje con IA"
+        },
+        "userOnboardingProcess": {
+          "name": "Proceso de incorporación de usuarios",
+          "description": "Incorporar nuevos usuarios a la plataforma"
+        },
+        "testProcess": {
+          "name": "Proceso de prueba",
+          "description": "Descripción de prueba"
+        },
+        "orderProcessing": {
+          "name": "Procesamiento de pedidos",
+          "description": "Procesar pedidos de clientes desde la recepción hasta el cumplimiento"
+        },
+        "paymentProcessing": {
+          "name": "Procesamiento de pagos",
+          "description": "Procesar transacciones financieras y pagos"
+        },
+        "userAuthentication": {
+          "name": "Autenticación de usuarios",
+          "description": "Autenticar usuarios y gestionar el acceso"
+        }
+      },
+      "capabilities": {
+        "financialManagement": { "name": "Gestión financiera", "description": "Gestionar operaciones financieras e informes" },
+        "inventoryControl": { "name": "Control de inventario", "description": "Gestionar inventario y niveles de stock" },
+        "hrManagement": { "name": "Gestión de RRHH", "description": "Gestionar recursos humanos y datos de empleados" },
+        "leadManagement": { "name": "Gestión de leads", "description": "Gestionar leads y prospectos de ventas" },
+        "customerAnalytics": { "name": "Analítica de clientes", "description": "Analizar comportamiento y tendencias de clientes" },
+        "campaignManagement": { "name": "Gestión de campañas", "description": "Planificar y ejecutar campañas de marketing" },
+        "dataStorage": { "name": "Almacenamiento de datos", "description": "Almacenar y gestionar datos empresariales" },
+        "dataRetrieval": { "name": "Recuperación de datos", "description": "Recuperar y consultar datos almacenados" },
+        "customerManagement": { "name": "Gestión de clientes", "description": "Gestionar relaciones e interacciones con clientes" },
+        "financialOperations": { "name": "Operaciones financieras", "description": "Gestionar transacciones financieras e informes" },
+        "itInfrastructure": { "name": "Infraestructura TI", "description": "Gestionar infraestructura y servicios TI" },
+        "orderManagement": { "name": "Gestión de pedidos", "description": "Gestionar pedidos de clientes de extremo a extremo" },
+        "riskManagement": { "name": "Gestión de riesgos", "description": "Identificar y mitigar riesgos operativos" }
+      },
+      "dataClasses": {
+        "processData": "Datos de procesos",
+        "applicationData": "Datos de aplicaciones",
+        "capabilityData": "Datos de capacidades",
+        "codeData": "Datos de código",
+        "documentationData": "Datos de documentación",
+        "quizData": "Datos de cuestionarios",
+        "testData": "Datos de prueba",
+        "userData": "Datos de usuario",
+        "learningData": "Datos de aprendizaje",
+        "analyticsData": "Datos analíticos",
+        "repositoryData": "Datos de repositorio",
+        "financialData": "Datos financieros",
+        "employeeData": "Datos de empleados",
+        "inventoryData": "Datos de inventario",
+        "customerData": "Datos de clientes",
+        "salesData": "Datos de ventas",
+        "marketingData": "Datos de marketing",
+        "historicalData": "Datos históricos",
+        "referenceData": "Datos de referencia"
+      },
+      "vendors": {
+        "testVendor": "Proveedor de prueba"
+      },
+      "owners": {
+        "developmentTeam": "Equipo de desarrollo",
+        "aiTeam": "Equipo de IA"
+      }
+    }
   }
 }
