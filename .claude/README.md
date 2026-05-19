@@ -14,12 +14,19 @@
 │   ├── test.md                  ← /test    — Run test suite
 │   ├── backend-smoke.md         ← /backend-smoke — Start & validate backend
 │   ├── mcp-validate.md          ← /mcp-validate  — MCP integration check
+│   ├── enonic-review.md         ← /enonic-review — Enonic XP code review
 │   └── new-feature.md           ← /new-feature   — Safe feature workflow
 │
-└── agents/                      ← Specialized subagents
-    ├── auditor.yml              ← Read-only audit agent
-    ├── test-runner.yml          ← Test execution agent
-    └── module-expert.yml        ← Deep-dive module analysis agent
+├── agents/                      ← Specialized subagents
+│   ├── auditor.yml              ← Read-only audit agent
+│   ├── test-runner.yml          ← Test execution agent
+│   ├── module-expert.yml        ← Deep-dive module analysis agent
+│   └── enonic-reviewer.yml      ← Enonic XP reviewer (read-only)
+│
+└── skills/                      ← Local skill knowledge bases
+    └── enonic-xp/               ← Enonic XP audit & review (security, perf, reliability, Nashorn compat)
+        ├── SKILL.md
+        └── references/          ← 7 domain reference docs
 ```
 
 ## Quick Reference
@@ -34,6 +41,8 @@
 | Validate backend | `/backend-smoke` |
 | Validate MCP | `/mcp-validate` |
 | Implement safely | `/new-feature` |
+| Review an Enonic XP app | `/enonic-review` |
+| Enonic patterns reference | `.claude/skills/enonic-xp/references/` |
 
 ## Key External Docs
 

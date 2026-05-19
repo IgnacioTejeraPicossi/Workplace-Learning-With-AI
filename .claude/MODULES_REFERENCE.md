@@ -657,6 +657,40 @@ curl http://localhost:8000/api/agi/homo-vs-ai/prompt-evolution/revisions
 
 ---
 
+# Local Skills (`.claude/skills/`)
+
+## Skill: `enonic-xp` — Enonic XP Audit & Review
+
+**Location**: `.claude/skills/enonic-xp/`
+**Added**: 2026-05-19 (v0.1.0)
+**Trigger**: code review or audit requests on Enonic XP TypeScript apps / libraries (`xp-*`, `lib-*`, Cristin→NVA-style migrations).
+
+**Why it exists**: complements the runtime Enonic probes already in the Red Cross Web QA Agent (`frontend/src/red-cross-qa/Performance.jsx`) with a static-analysis knowledge base distilled from three real audits (`xp-nva` × 2 + Cristin→NVA migration).
+
+**Contents**:
+
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | Manifest, decision tree, output contract |
+| `references/code-review-checklist.md` | Pass-A scanner — walk top to bottom on any XP repo |
+| `references/security-patterns.md` | NoQL injection, ACL, XSS, SSRF, response-size limits |
+| `references/performance-patterns.md` | N+1 queries, double-fetch, refresh strategy, GC pressure |
+| `references/reliability-patterns.md` | Task progress, retry, silent failure, stale data, timezone |
+| `references/api-design-patterns.md` | Dead code, error semantics, `lib-portal`, type assertions |
+| `references/data-integrity-patterns.md` | Idempotency, change detection, URL param drift in migrations |
+| `references/nashorn-compatibility.md` | Safe vs unsafe runtime APIs, workarounds, XP version matrix |
+| `references/upstream-marketplace.md` | When to bring in `xp-app-debugger` / `xp-app-upgrader` from Enonic's marketplace (`enonic/ai-enonic-marketplace`) |
+
+**Companion artifacts**:
+- `/enonic-review` slash command — `.claude/commands/enonic-review.md`
+- `enonic-reviewer` subagent (read-only) — `.claude/agents/enonic-reviewer.yml`
+
+**Severity rubric**: Critical / High / Medium / Low / Info (see `code-review-checklist.md`).
+
+**When NOT to use**: non-XP code (FastAPI backend, React frontend, n8n workflows) has its own guidance in `CLAUDE.md`.
+
+---
+
 ## Known Open Risks
 
 | Risk | Severity | Status |
