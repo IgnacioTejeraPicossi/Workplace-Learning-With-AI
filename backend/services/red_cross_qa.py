@@ -13,7 +13,7 @@ tools are unavailable so the UI shell remains usable.
 """
 
 from datetime import datetime, timezone
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from bson import ObjectId
 import hashlib
 import json
@@ -1185,10 +1185,91 @@ async def run_cypress(scopes: List[str], environment: str) -> Dict[str, Any]:
 # ═══════════════════════════════════════════════════════════════════
 # Tool 4 — API QA
 # ═══════════════════════════════════════════════════════════════════
-async def analyze_api(endpoint: str, method: str, environment: str,
-                      lang: str = "en") -> Dict[str, Any]:
-    """Mock-first API analysis. Returns checks dict aligned with frontend keys."""
-    checks = {
+# In-memory GraphQL schema baseline cache: keyed by (environment, endpoint).
+# Stores the most-recent introspection snapshot so consecutive analyze_api
+# calls can compute a real `checkSchemaDrift` instead of a hardcoded "pass".
+# Mongo-backed persistence is a TODO; for the workshop demo this is enough.
+_GRAPHQL_BASELINES: Dict[Tuple[str, str], Dict[str, Any]] = {}
+
+
+def _is_graphql_endpoint(endpoint: str) -> bool:
+    return "/graphql" in (endpoint or "").lower()
+
+
+def _is_donation_endpoint(endpoint: str) -> bool:
+    e = (endpoint or "").lower()
+    return "/donation" in e or "/donate" in e or "/vipps" in e
+
+
+def _is_form_endpoint(endpoint: str) -> bool:
+    e = (endpoint or "").lower()
+    return "/contact" in e or "/form" in e or "/fundy" in e
+
+
+async def _check_schema_drift_against_baseline(
+    endpoint: str, environment: str,
+) -> Tuple[str, List[Dict[str, Any]]]:
+    """Compare current introspection result vs. the previously seen one.
+
+    Returns `(status, findings)` where status is `"pass"` / `"warn"` / `"fail"`
+    and findings is a (possibly empty) list of `{severity, title, message}`.
+
+    Mock-first: uses `run_graphql_introspection`'s deterministic output, which
+    today is static (5 operations + 8 content types). So consecutive calls
+    against the same env/endpoint return `"pass"`. When a future call sees a
+    different op count or a renamed op, drift is detected and reported.
+    """
+    introspection = await run_graphql_introspection(endpoint, environment)
+    current_ops = {op.get("name") for op in (introspection.get("operations") or [])
+                    if op.get("name")}
+    current_types = {t.get("name") for t in (introspection.get("content_types") or [])
+                       if t.get("name")}
+    key = (environment, endpoint)
+    baseline = _GRAPHQL_BASELINES.get(key)
+    if baseline is None:
+        _GRAPHQL_BASELINES[key] = {"ops": current_ops, "types": current_types}
+        return "pass", [{
+            "severity": "low",
+            "title": "Schema drift baseline established",
+            "message": (f"First analysis of {endpoint} on {environment}. "
+                          f"Captured {len(current_ops)} ops + {len(current_types)} content types."),
+        }]
+    added_ops = current_ops - baseline["ops"]
+    removed_ops = baseline["ops"] - current_ops
+    added_types = current_types - baseline["types"]
+    removed_types = baseline["types"] - current_types
+    drift = len(added_ops) + len(removed_ops) + len(added_types) + len(removed_types)
+    findings: List[Dict[str, Any]] = []
+    if drift > 0:
+        findings.append({
+            "severity": "medium" if drift <= 3 else "high",
+            "title": f"GraphQL schema drift detected ({drift} change(s))",
+            "message": (
+                f"Added ops: {sorted(added_ops) or '—'} · "
+                f"Removed ops: {sorted(removed_ops) or '—'} · "
+                f"Added types: {sorted(added_types) or '—'} · "
+                f"Removed types: {sorted(removed_types) or '—'}"
+            ),
+        })
+    # Refresh baseline so the next call diffs against the most recent snapshot.
+    _GRAPHQL_BASELINES[key] = {"ops": current_ops, "types": current_types}
+    if drift == 0:
+        return "pass", []
+    # Core operation removed (any guillotine.* op) → fail.
+    if any(op.startswith("guillotine.") for op in removed_ops):
+        return "fail", findings
+    return ("warn" if drift <= 3 else "fail"), findings
+
+
+def _path_specific_checks(endpoint: str, environment: str) -> Dict[str, str]:
+    """Per-path heuristic mock results so consecutive analyses of different
+    endpoints don't all return the same checks (workshop-demo quality).
+
+    Returns the FULL 13-check dict pre-filled with reasonable mock statuses
+    that the caller will then refine (e.g. by computing real schema drift).
+    """
+    # Defaults — used for unknown endpoints and overridden below per path type.
+    checks: Dict[str, str] = {
         "checkQueryCorrectness": "pass",
         "checkPagination": "pass",
         "checkFiltering": "pass",
@@ -1199,13 +1280,90 @@ async def analyze_api(endpoint: str, method: str, environment: str,
         "checkSchemaDrift": "pass",
         "checkRateLimit": "pass",
         "checkErrorHandling": "pass",
+        # Phase H+ (Enonic skill 0.1.0) — three security checks added.
+        # Defaults to "warn" so callers see them in the dashboard until
+        # the path-specific override below replaces them with real values.
+        "checkInjection": "warn",
+        "checkIntrospectionDisabledInProd": "warn",
+        "checkDepthLimit": "warn",
     }
-    summary = f"API mock analysis of {method} {endpoint} on {environment}"
-    run = await _store_run("redcross-graphql-api", environment, "warn", summary, {
-        "endpoint": endpoint, "method": method, "checks": checks,
+
+    if _is_graphql_endpoint(endpoint):
+        # GraphQL gets the three security checks fully exercised.
+        # Mock heuristic — pass on non-prod (assumes dev/test posture
+        # has introspection enabled by design; not a fail signal).
+        checks["checkInjection"] = "pass" if environment != "prod" else "warn"
+        checks["checkIntrospectionDisabledInProd"] = (
+            "pass" if environment == "prod" else "warn"
+        )
+        checks["checkDepthLimit"] = "warn"
+        checks["checkPerfBudget"] = "warn"  # GraphQL is N+1 prone — warn by default
+    elif _is_donation_endpoint(endpoint):
+        # Critical revenue path — be strict.
+        checks["checkRateLimit"] = "warn"
+        checks["checkPerfBudget"] = "pass"  # Should be < 300ms for donate
+        checks["checkErrorHandling"] = "warn"
+        checks["checkInjection"] = "pass"  # REST → not NoQL-injectable directly
+        checks["checkIntrospectionDisabledInProd"] = "pass"  # n/a for REST
+        checks["checkDepthLimit"] = "pass"  # n/a for REST
+    elif _is_form_endpoint(endpoint):
+        # Form / contact / Fundy — sanitization is the primary concern.
+        checks["checkInjection"] = "warn"  # Worth probing field values
+        checks["checkErrorHandling"] = "warn"
+        checks["checkIntrospectionDisabledInProd"] = "pass"
+        checks["checkDepthLimit"] = "pass"
+    else:
+        # Unknown endpoint — keep the defaults but mark security checks
+        # as not-applicable rather than misleading "warn".
+        checks["checkInjection"] = "pass"
+        checks["checkIntrospectionDisabledInProd"] = "pass"
+        checks["checkDepthLimit"] = "pass"
+
+    return checks
+
+
+async def analyze_api(endpoint: str, method: str, environment: str,
+                      lang: str = "en") -> Dict[str, Any]:
+    """Mock-first API analysis. Returns checks dict aligned with frontend keys.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19):
+      - 3 new security checks: `checkInjection`, `checkIntrospectionDisabledInProd`,
+        `checkDepthLimit`. Triggered only when the endpoint shape warrants
+        them (GraphQL / form / donation).
+      - Path-specific heuristic mock: `/graphql` vs `/donation` vs `/contact`
+        get different default statuses, so consecutive analyses look distinct
+        in the workshop demo.
+      - Real `checkSchemaDrift` for GraphQL endpoints: diff vs in-memory
+        baseline. First call seeds the baseline (pass with info finding);
+        subsequent calls report added/removed ops & types.
+    """
+    checks = _path_specific_checks(endpoint, environment)
+    findings: List[Dict[str, Any]] = []
+
+    # Real schema-drift comparison for GraphQL endpoints only.
+    if _is_graphql_endpoint(endpoint):
+        drift_status, drift_findings = await _check_schema_drift_against_baseline(
+            endpoint, environment,
+        )
+        checks["checkSchemaDrift"] = drift_status
+        findings.extend(drift_findings)
+
+    # Roll up an overall status based on the worst check.
+    worst = "pass"
+    for v in checks.values():
+        if v == "fail":
+            worst = "fail"
+            break
+        if v == "warn":
+            worst = "warn"
+
+    summary = f"API mock analysis of {method} {endpoint} on {environment} — overall {worst}"
+    run = await _store_run("redcross-graphql-api", environment, worst, summary, {
+        "endpoint": endpoint, "method": method,
+        "checks": checks, "findings": findings,
     })
     return {"status": "ok", "endpoint": endpoint, "method": method,
-            "checks": checks, "run_id": run["run_id"]}
+            "checks": checks, "findings": findings, "run_id": run["run_id"]}
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -1307,11 +1465,132 @@ _GUILLOTINE_QUERIES: List[Dict[str, str]] = [
 ]
 
 
+def _negative_guillotine_items(_json) -> List[Dict[str, Any]]:
+    """Phase H+ (Enonic skill 0.1.0, 2026-05-19) — three negative-test items
+    appended to the Postman collection so QA can reproduce the canonical
+    failure modes during sprint triage.
+
+    Each item is a complete Postman v2.1 request with `event.script.exec`
+    test scripts that assert the EXPECTED non-2xx status (and degrade
+    gracefully if rate-limiting isn't yet enabled).
+    """
+    return [
+        {
+            "name": "Negative · Invalid GraphQL syntax → 400",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "url": {
+                    "raw": "{{base_url}}/api/graphql",
+                    "host": ["{{base_url}}"], "path": ["api", "graphql"],
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": _json.dumps({"query": "{ guillotine { get(key: } }"}, indent=2),
+                    "options": {"raw": {"language": "json"}},
+                },
+                "description": "Confirms the GraphQL endpoint rejects malformed queries with a 400.",
+            },
+            "event": [{
+                "listen": "test",
+                "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                        "pm.test('Status is 400 on invalid syntax', () => {",
+                        "  pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                        "});",
+                        "pm.test('Error message references syntax', () => {",
+                        "  const txt = pm.response.text();",
+                        "  pm.expect(txt.toLowerCase()).to.match(/syntax|parse|invalid/);",
+                        "});",
+                    ],
+                },
+            }],
+        },
+        {
+            "name": "Negative · Draft branch without token → 401",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                # Intentionally NO Authorization header.
+                "url": {
+                    "raw": "{{base_url}}/api/graphql?branch=draft",
+                    "host": ["{{base_url}}"], "path": ["api", "graphql"],
+                    "query": [{"key": "branch", "value": "draft"}],
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": _json.dumps({"query": "{ guillotine { get(key: \"/\") { _id } } }"}, indent=2),
+                    "options": {"raw": {"language": "json"}},
+                },
+                "description": "Draft branch must require authentication — should return 401 / 403.",
+            },
+            "event": [{
+                "listen": "test",
+                "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                        "pm.test('Draft without token rejected', () => {",
+                        "  pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                        "});",
+                    ],
+                },
+            }],
+        },
+        {
+            "name": "Negative · Rate-limit burst probe → expect 200 or 429",
+            "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "url": {
+                    "raw": "{{base_url}}/api/graphql",
+                    "host": ["{{base_url}}"], "path": ["api", "graphql"],
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": _json.dumps(
+                        {"query": "{ guillotine { getSite { _name } } }"}, indent=2,
+                    ),
+                    "options": {"raw": {"language": "json"}},
+                },
+                "description": (
+                    "Run this request in a Postman Collection Runner loop (60+ "
+                    "iterations) to verify the endpoint emits 429 once rate "
+                    "limits trigger. Without rate limiting all iterations "
+                    "return 200 — flag for SecOps if so."
+                ),
+            },
+            "event": [{
+                "listen": "test",
+                "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                        "pm.test('Burst response 200 OR 429 (rate-limit ok or absent)', () => {",
+                        "  pm.expect(pm.response.code).to.be.oneOf([200, 429]);",
+                        "});",
+                        "if (pm.response.code === 429) {",
+                        "  pm.test('429 response includes Retry-After header', () => {",
+                        "    pm.response.to.have.header('Retry-After');",
+                        "  });",
+                        "}",
+                    ],
+                },
+            }],
+        },
+    ]
+
+
 async def export_postman_collection(scope: Optional[str], environment: str,
                                     lang: str = "en") -> Dict[str, Any]:
     """Generate a Postman Collection v2.1 JSON for the Guillotine GraphQL
     endpoints. Returns the parsed dict so the router can either echo it back
     or stream it as a download. Mock-first: works without LLM, without Mongo.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19): collection now includes 3
+    additional negative-test items (invalid syntax → 400, draft without
+    token → 401, burst → 429) so QA can reproduce the canonical failure
+    modes during sprint triage. Each existing happy-path test also asserts
+    Content-Type + response-size budget.
     """
     import json as _json
 
@@ -1351,6 +1630,13 @@ async def export_postman_collection(scope: Optional[str], environment: str,
                         "type": "text/javascript",
                         "exec": [
                             "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                            "// Phase H+ (Enonic skill 0.1.0) — defense-in-depth assertions.",
+                            "pm.test('Content-Type is application/json', () => {",
+                            "  pm.response.to.have.header('Content-Type', /application\\/json/);",
+                            "});",
+                            "pm.test('Response < 1 MB (size budget)', () => {",
+                            "  pm.expect(pm.response.responseSize).to.be.below(1048576);",
+                            "});",
                             "const json = pm.response.json();",
                             "pm.test('No GraphQL errors', () => {",
                             "  pm.expect(json.errors, JSON.stringify(json.errors)).to.be.undefined;",
@@ -1363,6 +1649,11 @@ async def export_postman_collection(scope: Optional[str], environment: str,
                 },
             ],
         })
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-19) — 3 negative tests added so the
+    # collection exercises the failure modes Trine/Tom care about: invalid
+    # GraphQL syntax, draft branch without auth, burst rate limiting.
+    items.extend(_negative_guillotine_items(_json))
 
     collection = {
         "info": {

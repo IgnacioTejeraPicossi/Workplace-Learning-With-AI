@@ -15,6 +15,7 @@ from backend.services.red_cross_qa import (
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
+    analyze_api,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -316,19 +317,66 @@ async def main():
     expected_ops = {"GetDistrictPage", "GetActivityList", "GetCampaignPage", "GetForeningContacts"}
     assert set(op_names) >= expected_ops, \
         f"Expected ops {expected_ops}, got {set(op_names)}"
-    # Each request must have a tests script that asserts no GraphQL errors.
-    for it in coll["item"]:
+    # Canonical happy-path items must assert no GraphQL errors. Negative items
+    # (Phase H+) test for non-2xx status instead — handled in the next block.
+    canonical_items = [it for it in coll["item"] if it["name"] in expected_ops]
+    for it in canonical_items:
         scripts = it.get("event", [])
         test_scripts = [e for e in scripts if e.get("listen") == "test"]
         assert test_scripts, f"{it['name']} has no test script"
         exec_body = "\n".join(test_scripts[0]["script"]["exec"])
         assert "errors" in exec_body, f"{it['name']} test script missing GraphQL errors assertion"
+        # Phase H+ — every happy-path item asserts Content-Type + size budget.
+        assert "Content-Type" in exec_body, \
+            f"{it['name']} test script missing Content-Type assertion"
+        assert "responseSize" in exec_body, \
+            f"{it['name']} test script missing response-size budget assertion"
     # Variables must include base_url + token placeholders.
     var_keys = {v["key"] for v in coll.get("variable", [])}
     assert "base_url" in var_keys and "token" in var_keys, \
         f"Postman collection missing variables: {var_keys}"
     print(f"[OK] Postman collection export ({pm['operation_count']} ops, "
-          f"v2.1 schema, 4 canonical Guillotine queries, base_url + token vars)")
+          f"v2.1 schema, 4 canonical Guillotine queries + Content-Type + size budget, "
+          f"base_url + token vars)")
+
+    # Phase H+ (Enonic skill 0.1.0) — collection must also include 3 negative items.
+    negative_item_names = [n for n in op_names if n.lower().startswith("negative")]
+    assert len(negative_item_names) >= 3, \
+        f"expected ≥3 negative items in Postman collection, got: {negative_item_names}"
+    # Each negative item must assert the EXPECTED non-2xx status code.
+    negative_items = [it for it in coll["item"] if it["name"].lower().startswith("negative")]
+    expected_status_codes = ["400", "401", "429"]
+    found_codes = set()
+    for it in negative_items:
+        exec_body = "\n".join(it["event"][0]["script"]["exec"])
+        for code in expected_status_codes:
+            if code in exec_body:
+                found_codes.add(code)
+    assert set(expected_status_codes).issubset(found_codes), \
+        f"negative items missing assertions for codes {set(expected_status_codes) - found_codes}"
+    print(f"[OK] Postman negative tests ({len(negative_items)} items, "
+          f"covering status codes {sorted(found_codes)})")
+
+    # Phase H+ — analyze_api emits 3 new security checks for GraphQL endpoints.
+    api = await analyze_api("/site/api/graphql", "POST", "test", "en")
+    for ck in ("checkInjection", "checkIntrospectionDisabledInProd", "checkDepthLimit"):
+        assert ck in api["checks"], f"analyze_api missing new check: {ck}"
+    # Path-specific heuristics: donation endpoint should NOT have GraphQL-only
+    # checks at warn (they're n/a for REST). Run a 2nd analysis to verify.
+    api_don = await analyze_api("/api/donation/process", "POST", "test", "en")
+    assert api_don["checks"]["checkIntrospectionDisabledInProd"] == "pass", \
+        "donation endpoint should treat introspection check as n/a (pass)"
+    print(f"[OK] analyze_api Phase H+ checks "
+          f"(GraphQL: 3 security checks present, donation: introspection n/a)")
+
+    # Phase H+ — checkSchemaDrift is now REAL: first call seeds baseline (pass),
+    # subsequent identical call returns pass too. Drift only fires on changes.
+    api_2nd = await analyze_api("/site/api/graphql", "POST", "test", "en")
+    assert api_2nd["checks"]["checkSchemaDrift"] in ("pass", "warn"), \
+        f"checkSchemaDrift unexpected: {api_2nd['checks']['checkSchemaDrift']}"
+    print(f"[OK] analyze_api Schema drift baseline "
+          f"(2nd call status={api_2nd['checks']['checkSchemaDrift']}, "
+          f"{len(api_2nd['findings'])} finding(s))")
 
     # 3. GraphQL introspection mock returns operations + content_types.
     ix = await run_graphql_introspection(None, "test", "en")

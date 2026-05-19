@@ -15,6 +15,10 @@ const CHECKS = [
   { key: 'checkSchemaDrift',       icon: '📐' },
   { key: 'checkRateLimit',         icon: '🚦' },
   { key: 'checkErrorHandling',     icon: '⚠️' },
+  // Phase H+ (Enonic skill 0.1.0) — three security-focused checks added.
+  { key: 'checkInjection',                  icon: '💉' },
+  { key: 'checkIntrospectionDisabledInProd',icon: '🔒' },
+  { key: 'checkDepthLimit',                 icon: '🧱' },
 ];
 
 const STATUS_STYLES = {
