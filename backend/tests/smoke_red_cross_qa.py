@@ -15,7 +15,7 @@ from backend.services.red_cross_qa import (
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
-    analyze_api,
+    analyze_api, generate_cms_test_cases,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -377,6 +377,61 @@ async def main():
     print(f"[OK] analyze_api Schema drift baseline "
           f"(2nd call status={api_2nd['checks']['checkSchemaDrift']}, "
           f"{len(api_2nd['findings'])} finding(s))")
+
+    # Phase H+ (Enonic skill 0.1.0) — CMS QA mock fallback now emits a curated
+    # test case PER REQUESTED AREA, each carrying severity + enonic_xp_pattern
+    # + acceptance_criteria + automation_ref.
+    all_areas = [
+        "areaContentTypes", "areaPageTemplates", "areaLayouts", "areaParts",
+        "areaFieldSets", "areaRoles", "areaPreview", "areaPublish",
+        "areaUnpublish", "areaScheduled", "areaLocalization", "areaMedia",
+        "areaBrokenLinks", "areaIsr",
+    ]
+    cms = await generate_cms_test_cases(all_areas, "test", "en")
+    cases = cms["test_cases"]
+    # 1. All 14 areas covered (was capped at 8 before).
+    assert len(cases) == 14, \
+        f"expected 14 CMS test cases (one per area), got {len(cases)}"
+    # 2. Every case has the new enriched fields.
+    for c in cases:
+        for field in ("area", "severity", "title", "description",
+                       "acceptance_criteria", "roles", "enonic_xp_pattern"):
+            assert field in c, f"CMS case for '{c.get('area')}' missing field: {field}"
+        assert c["severity"] in ("low", "medium", "high", "critical"), \
+            f"bad severity on '{c['area']}': {c['severity']}"
+        assert isinstance(c["acceptance_criteria"], list) and c["acceptance_criteria"], \
+            f"acceptance_criteria empty/missing on '{c['area']}'"
+    # 3. High-severity Enonic XP patterns specifically asserted.
+    role_case = next(c for c in cases if c["area"] == "areaRoles")
+    assert role_case["severity"] == "high", "areaRoles must be high severity"
+    assert "subtree isolation" in role_case["title"].lower(), \
+        "areaRoles must cover subtree isolation"
+    sched_case = next(c for c in cases if c["area"] == "areaScheduled")
+    assert sched_case["severity"] == "high", "areaScheduled must be high severity"
+    assert "Europe/Oslo" in sched_case["description"], \
+        "areaScheduled must reference Europe/Oslo IANA timezone"
+    links_case = next(c for c in cases if c["area"] == "areaBrokenLinks")
+    assert links_case["severity"] == "high", "areaBrokenLinks must be high severity"
+    assert links_case["automation_ref"] == "playwright:migrated-links.spec.ts", \
+        f"areaBrokenLinks must cross-ref playwright:migrated-links.spec.ts, got {links_case['automation_ref']}"
+    # 4. enonic_xp_pattern references must cite a real skill section.
+    pattern_refs = {c.get("enonic_xp_pattern") for c in cases
+                     if c.get("enonic_xp_pattern")}
+    expected_skill_docs = {"security-patterns", "reliability-patterns",
+                            "data-integrity-patterns", "code-review-checklist"}
+    cited_docs = {ref.split(".md")[0] for ref in pattern_refs if ".md" in ref}
+    missing_cites = expected_skill_docs - cited_docs
+    assert not missing_cites, \
+        f"CMS cases should cite all 4 main skill docs, missing: {missing_cites}"
+    # 5. Backward compat: unknown areas still get a generic case.
+    cms_unknown = await generate_cms_test_cases(["areaFoobar"], "test", "en")
+    assert len(cms_unknown["test_cases"]) == 1, \
+        "unknown area should still produce 1 generic test case"
+    assert cms_unknown["test_cases"][0]["area"] == "areaFoobar"
+    print(f"[OK] CMS QA test cases "
+          f"({len(cases)} curated + 1 generic fallback, "
+          f"{sum(1 for c in cases if c['severity'] == 'high')} high-severity, "
+          f"{len(cited_docs)}/4 skill docs cited)")
 
     # 3. GraphQL introspection mock returns operations + content_types.
     ix = await run_graphql_introspection(None, "test", "en")
