@@ -279,9 +279,14 @@ export default function EAHome() {
     if (!l) return l;
     const map = {
       development: t('enterpriseArchitectureModule.lifecycleDevelopment'),
+      dev:         t('enterpriseArchitectureModule.lifecycleDevelopment'),
       production:  t('enterpriseArchitectureModule.lifecycleProduction'),
+      prod:        t('enterpriseArchitectureModule.lifecycleProduction'),
       maintenance: t('enterpriseArchitectureModule.lifecycleMaintenance'),
+      maint:       t('enterpriseArchitectureModule.lifecycleMaintenance'),
       retirement:  t('enterpriseArchitectureModule.lifecycleRetirement'),
+      retired:     t('enterpriseArchitectureModule.lifecycleRetirement'),
+      ret:         t('enterpriseArchitectureModule.lifecycleRetirement'),
       pilot:       t('enterpriseArchitectureModule.statusPilot'),
       sunset:      t('enterpriseArchitectureModule.statusSunset'),
     };
