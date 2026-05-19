@@ -231,7 +231,10 @@
       "checkErrorSummary": "Resumen de errores al enviar",
       "checkProgressIndicator": "Indicador de progreso",
       "checkVippsHandoff": "Handoff y cancelación Vipps",
-      "checkSubmitIdempotency": "Idempotencia de envío (PRG)"
+      "checkSubmitIdempotency": "Idempotencia de envío (PRG)",
+      "checkCsrf": "Token anti-CSRF",
+      "checkInjectionInFormFields": "Sondeo de inyección en campos de formulario",
+      "checkServiceUrlGeneration": "URL de servicio vía lib-portal"
     },
 
     "contentMigration": {

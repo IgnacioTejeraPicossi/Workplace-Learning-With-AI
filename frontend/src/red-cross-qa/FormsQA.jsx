@@ -26,6 +26,10 @@ const CHECKS = [
   { key: 'checkProgressIndicator',   icon: '📊' },
   { key: 'checkVippsHandoff',        icon: '🔁' },
   { key: 'checkSubmitIdempotency',   icon: '🔒' },
+  // Phase H+ (Enonic skill 0.1.0) — three security-focused checks added.
+  { key: 'checkCsrf',                  icon: '🛡️' },
+  { key: 'checkInjectionInFormFields', icon: '💉' },
+  { key: 'checkServiceUrlGeneration',  icon: '🔗' },
 ];
 
 const STATUS_STYLES = {

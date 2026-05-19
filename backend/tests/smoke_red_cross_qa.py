@@ -67,8 +67,32 @@ async def main():
     findings = forms["findings"]
     assert all("severity_dev" in f for f in findings), "severity_dev missing"
     assert all("category_ops" in f for f in findings), "category_ops missing"
+    # Phase H+ (Enonic skill 0.1.0) — 3 new security checks must be present.
+    new_security_checks = ("checkCsrf", "checkInjectionInFormFields", "checkServiceUrlGeneration")
+    for ck in new_security_checks:
+        assert ck in forms["checks"], f"Forms QA missing new security check: {ck}"
+    # Phase H+ — checkFundyOriginAllowed added to Fundy sub-checks.
+    assert "checkFundyOriginAllowed" in forms["checks"], "Forms QA missing checkFundyOriginAllowed"
+    fundy_keys_after = [k for k in forms["checks"].keys() if k.startswith("checkFundy")]
+    assert len(fundy_keys_after) >= 10, \
+        f"expected 10+ Fundy checks after Phase H+, got {len(fundy_keys_after)}"
+    # Phase H+ — 4 new Enonic-XP-keyed findings present.
+    finding_titles = [f.get("title", "").lower() for f in findings]
+    assert any("anti-csrf" in t for t in finding_titles), "missing CSRF finding"
+    assert any("beredskap" in (f.get("form") or "").lower() and "retry" in (f.get("title") or "").lower()
+                for f in findings), "missing Beredskap critical-path finding"
+    assert any("hardcoded service url" in t for t in finding_titles), "missing serviceUrl finding"
+    assert any("postmessage" in t and "origin" in t for t in finding_titles), "missing Fundy origin finding"
+    # Phase H+ — automation_ref field on test_cases + Nashorn static review case.
+    test_cases = forms["test_cases"]
+    assert all("automation_ref" in tc for tc in test_cases), \
+        "test_cases missing automation_ref field"
+    nashorn_case = next((tc for tc in test_cases if "nashorn" in tc.get("title", "").lower()), None)
+    assert nashorn_case is not None, "missing Skjemabygger Nashorn compatibility test case"
+    assert nashorn_case.get("type") == "static" and nashorn_case.get("tool") == "static"
     print(
-        f"[OK] Forms QA ({len(fundy_keys)} Fundy checks, all findings have Sev/Kat)"
+        f"[OK] Forms QA ({len(fundy_keys_after)} Fundy checks + 3 new security checks, "
+        f"all findings have Sev/Kat, {len(test_cases)} test cases incl. Nashorn static review)"
     )
 
     rep = await generate_sprint_report(None, "test", "no")

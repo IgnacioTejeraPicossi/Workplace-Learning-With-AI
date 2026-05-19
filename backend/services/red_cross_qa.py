@@ -2768,15 +2768,31 @@ async def run_forms_qa(scopes: List[str], environment: str,
         "checkJsonSchema":         {"status": "pass", "note": "JSON Schema validation present on all reviewed forms"},
         "checkAdamSilverPatterns": {"status": "pass", "note": "Plain labels above inputs, no placeholder-as-label"},
         "checkMultiStep":          {"status": "warn", "note": "Volunteer signup loses state on browser back"},
-        "checkMobileKeyboard":     {"status": "warn", "note": "Donation amount missing inputmode='numeric'"},
+        "checkMobileKeyboard":     {"status": "warn", "note": "Donation amount missing inputmode='numeric' (and inputmode='decimal' for ører-amounts)"},
         "checkAutocomplete":       {"status": "pass", "note": "Contact form uses given-name/family-name/email/tel"},
-        "checkPrefillApi":         {"status": "warn", "note": "APIM prefill has no timeout (default 30s)"},
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-19): note expanded — APIM
+        # prefill needs timeout AND runtime shape validation AND retry.
+        # Cite data-integrity-patterns.md §3 (shape) + reliability-patterns.md §2 (retry).
+        "checkPrefillApi":         {"status": "warn", "note": (
+            "APIM prefill has 3 weaknesses: (1) no timeout (default 30s blocks UX), "
+            "(2) no runtime shape validation — if APIM renames `customer.firstName` "
+            "to `customer.first_name`, prefill silently fails (data-integrity §3), "
+            "(3) no retry-with-backoff on 5xx — single transient failure breaks "
+            "the form (reliability §2)."
+        )},
         "checkValidationMessages": {"status": "pass", "note": "Inline errors with aria-describedby"},
         "checkAriaLive":           {"status": "warn", "note": "Dynamic errors lack role='alert'"},
         "checkErrorSummary":       {"status": "fail", "note": "No error summary on submit-with-errors"},
         "checkProgressIndicator":  {"status": "pass", "note": "Step X/Y shown on multi-step forms"},
         "checkVippsHandoff":       {"status": "pass", "note": "Return + cancel URLs validated"},
-        "checkSubmitIdempotency":  {"status": "warn", "note": "Donation form lacks PRG token — refresh re-submits"},
+        # Phase H+: PRG alone doesn't cover network-retry double-submit. Per
+        # data-integrity-patterns.md §1, also need an Idempotency-Key header.
+        "checkSubmitIdempotency":  {"status": "warn", "note": (
+            "Donation form lacks PRG (refresh re-submits) AND the submit "
+            "request has no `Idempotency-Key` header — so a client network "
+            "retry can double-charge a donation. Need BOTH PRG and idempotency "
+            "key (data-integrity §1)."
+        )},
         # ── Fundy donation-form sub-checks (separate provider from Vipps) ──
         "checkFundyFormRendering":     {"status": "pass", "note": "Fundy form renders within 2s on test env"},
         "checkFundyAmountSelection":   {"status": "pass", "note": "100/250/500/1000 NOK + custom amount work"},
@@ -2787,6 +2803,32 @@ async def run_forms_qa(scopes: List[str], environment: str,
         "checkFundyAccessibility":     {"status": "warn", "note": "Fundy iframe has 1 axe-core violation (color-contrast on 'Continue' button)"},
         "checkFundyMobile":            {"status": "pass", "note": "Fundy form usable on iPhone SE (375px) and Galaxy S8"},
         "checkFundyErrorRecovery":     {"status": "warn", "note": "Network error during submit shows generic message — donor data preserved"},
+        # Phase H+ — new Fundy-specific origin check (security-patterns.md §3).
+        "checkFundyOriginAllowed":     {"status": "warn", "note": (
+            "Fundy iframe communicates with the page via window.postMessage. "
+            "Verify the parent's listener checks event.origin against a "
+            "Fundy-domain whitelist — without it, a malicious iframe could "
+            "intercept donor data."
+        )},
+        # Phase H+ (Enonic skill 0.1.0) — three new security checks.
+        "checkCsrf": {"status": "warn", "note": (
+            "Donation + Volunteer + Beredskap forms POST state-changing data "
+            "but no anti-CSRF token visible in the payload. Add a hidden "
+            "form field + server-side validation (lib-context + double-submit "
+            "cookie pattern). Critical for revenue-flow forms."
+        )},
+        "checkInjectionInFormFields": {"status": "warn", "note": (
+            "Submit each form with NoQL/HTML injection payloads (' OR _name = ', "
+            "</script>, \\x00) in every free-text field. Highest-risk: search "
+            "inputs and autocomplete that flow into guillotine.query (see "
+            "security-patterns.md §1). Mock-first: probe live in test env."
+        )},
+        "checkServiceUrlGeneration": {"status": "warn", "note": (
+            "Form action attributes appear to use hardcoded `/_/service/...` "
+            "paths. Switch to `serviceUrl({service:'name'})` from lib-portal "
+            "so URLs adapt under vhost / reverse-proxy mappings "
+            "(security-patterns.md §4)."
+        )},
     }
 
     findings = parsed.get("findings") or [
@@ -2795,13 +2837,15 @@ async def run_forms_qa(scopes: List[str], environment: str,
          "fix_hint": "Add gov.uk-style error summary linked to first invalid field, move focus to it."},
         {"severity": "medium", "form": "donation", "title": "Amount field missing inputmode",
          "message": "Mobile users see alphabetic keyboard for the amount field.",
-         "fix_hint": "Add inputmode='numeric' and pattern='[0-9]*'."},
+         "fix_hint": "Add inputmode='numeric' (or inputmode='decimal' for ører-amounts) and pattern='[0-9]*'."},
         {"severity": "medium", "form": "donation", "title": "Submit not idempotent",
-         "message": "Refreshing after a donation re-posts the form.",
-         "fix_hint": "Use POST/Redirect/GET pattern or single-use submit token."},
+         "message": "Refreshing after a donation re-posts the form AND a client network retry can double-charge.",
+         "fix_hint": "Use POST/Redirect/GET pattern AND add an Idempotency-Key header on the submit request.",
+         "enonic_xp_pattern": "data-integrity-patterns.md §1"},
         {"severity": "low", "form": "contact", "title": "APIM prefill timeout missing",
-         "message": "If Azure APIM prefill is slow, the form blocks for 30s.",
-         "fix_hint": "Add a 4s timeout with a graceful fallback to an empty form."},
+         "message": "If Azure APIM prefill is slow, the form blocks for 30s. Also no runtime shape validation — upstream field rename silently breaks prefill.",
+         "fix_hint": "Add a 4s timeout, runtime shape check on the response, retry-with-backoff on 5xx.",
+         "enonic_xp_pattern": "data-integrity-patterns.md §3 + reliability-patterns.md §2"},
         # ── Fundy-specific findings ──
         {"severity": "high", "form": "fundy-donation", "title": "Marketing opt-in pre-checked (Fundy)",
          "message": "Fundy donation form pre-checks the marketing consent box — GDPR violation.",
@@ -2812,6 +2856,23 @@ async def run_forms_qa(scopes: List[str], environment: str,
         {"severity": "medium", "form": "fundy-donation", "title": "Last name validation rejects spaces",
          "message": "Fundy rejects 'Olav Per Hansen' — spaces in last name are valid in Norwegian.",
          "fix_hint": "Update Fundy validation regex to allow spaces and æøå."},
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-19) — 4 new findings keyed to the skill.
+        {"severity": "high", "form": "donation", "title": "No anti-CSRF token on donation submit",
+         "message": "State-changing form POST without CSRF protection — a malicious site can forge donation submissions on behalf of a logged-in user.",
+         "fix_hint": "Add a hidden anti-CSRF token field; validate server-side via lib-context + double-submit cookie pattern.",
+         "enonic_xp_pattern": "security-patterns.md §1 (extension)"},
+        {"severity": "high", "form": "beredskap", "title": "Beredskap form has no client retry under load",
+         "message": "Emergency-signup form receives submission bursts during crises. Without client-side exponential backoff on 5xx + server-side queue, volunteers are lost precisely when the emergency needs them most.",
+         "fix_hint": "Add exponential-backoff retry on transient failures (1s, 2s, 4s); consider lightweight queue (SQS or lib-cluster job) on the submit endpoint.",
+         "enonic_xp_pattern": "reliability-patterns.md §6 (circuit breaker / critical-path)"},
+        {"severity": "medium", "form": "donation", "title": "Hardcoded service URL on form action",
+         "message": "Form posts to `/_/service/donation/submit` hardcoded — breaks under vhost / reverse-proxy mappings.",
+         "fix_hint": "Use `serviceUrl({service:'donation/submit'})` from lib-portal; verify form action rewrites under each configured vhost.",
+         "enonic_xp_pattern": "security-patterns.md §4"},
+        {"severity": "medium", "form": "fundy-donation", "title": "Fundy postMessage has no origin whitelist",
+         "message": "Parent page's `window.addEventListener('message', ...)` accepts messages from any origin. A malicious iframe loaded elsewhere on the page could intercept donor data.",
+         "fix_hint": "Check `event.origin` against an explicit Fundy-domain whitelist; reject otherwise.",
+         "enonic_xp_pattern": "security-patterns.md §3"},
     ]
 
     # Augment each finding with severity_dev (1-4) + category_ops (A-C)
@@ -2825,28 +2886,63 @@ async def run_forms_qa(scopes: List[str], environment: str,
         {"title": "Donation amount mobile keyboard", "form": "donation",
          "type": "automated", "tool": "playwright",
          "steps": ["Open donation page on iPhone viewport", "Tap amount field"],
-         "expected": "Numeric keyboard is shown (inputmode='numeric')"},
+         "expected": "Numeric keyboard is shown (inputmode='numeric' for whole NOK, 'decimal' for ører)",
+         "automation_ref": "cypress:regression-donation.cy.ts"},
         {"title": "Volunteer signup error summary", "form": "volunteer",
          "type": "automated", "tool": "playwright",
          "steps": ["Open volunteer signup", "Submit with all fields empty"],
-         "expected": "Error summary appears at top, focus moves to it, links jump to first invalid field"},
+         "expected": "Error summary appears at top, focus moves to it, links jump to first invalid field",
+         "automation_ref": None},
         {"title": "Vipps cancel returns to donation page", "form": "donation",
          "type": "manual", "tool": "manual",
          "steps": ["Start donation", "Continue to Vipps", "Cancel in Vipps"],
-         "expected": "User lands on rodekors.no donation page with state preserved"},
+         "expected": "User lands on rodekors.no donation page with state preserved",
+         "automation_ref": None},
         {"title": "Fundy → Vipps handoff payload integrity", "form": "fundy-donation",
          "type": "automated", "tool": "playwright",
          "steps": ["Open donation page", "Select 250 NOK monthly", "Fill donor data with æøå",
                    "Click Continue → intercept Fundy → Vipps request"],
-         "expected": "Payload contains amount=250, currency=NOK, frequency=monthly, donor.name with æøå preserved"},
+         "expected": "Payload contains amount=250, currency=NOK, frequency=monthly, donor.name with æøå preserved",
+         "automation_ref": None},
         {"title": "Fundy consent checkbox not pre-checked", "form": "fundy-donation",
          "type": "automated", "tool": "playwright",
          "steps": ["Open donation page", "Inspect marketing-opt-in checkbox initial state"],
-         "expected": "Marketing opt-in is unchecked by default (GDPR)"},
+         "expected": "Marketing opt-in is unchecked by default (GDPR)",
+         "automation_ref": None},
         {"title": "Fundy form on iPhone SE (extreme small viewport)", "form": "fundy-donation",
          "type": "automated", "tool": "playwright",
          "steps": ["Set viewport to 320×568", "Open donation page", "Complete full donation flow"],
-         "expected": "All controls reachable, no horizontal scroll, keyboard does not cover input"},
+         "expected": "All controls reachable, no horizontal scroll, keyboard does not cover input",
+         "automation_ref": None},
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-19) — 3 new test cases keyed to Enonic XP.
+        {"title": "CSRF token verification on donation submit", "form": "donation",
+         "type": "manual", "tool": "manual",
+         "steps": [
+             "Open the donation form in browser A (logged-in user)",
+             "From a different origin (browser B / curl), craft a POST to the submit endpoint with browser A's session cookie",
+             "Observe server response",
+         ],
+         "expected": "Server rejects with 403 'CSRF token missing or invalid' — never accepts the cross-origin POST.",
+         "automation_ref": None},
+        {"title": "Beredskap form survives 5xx burst (critical-path resilience)", "form": "beredskap",
+         "type": "manual", "tool": "manual",
+         "steps": [
+             "Stub the beredskap submit endpoint with 503 for 30 seconds",
+             "Submit the form normally; do not refresh",
+             "Wait 60 seconds; ensure backoff retries are visible in network tab (1s, 2s, 4s, …)",
+             "After the stub clears, verify the submission goes through with the original data preserved",
+         ],
+         "expected": "Form retries with exponential backoff; user data is preserved across retries; the submission succeeds once the endpoint recovers.",
+         "automation_ref": None},
+        {"title": "Skjemabygger backend Nashorn compatibility sweep", "form": "skjemabygger-lib",
+         "type": "static", "tool": "static",
+         "steps": [
+             "Run grep recipes from .claude/skills/enonic-xp/references/nashorn-compatibility.md against src/main/resources/",
+             "Flag every Object.entries, Object.values, Array.from, Set, Map, String.includes, String.startsWith usage",
+             "For each flag: verify tsup transpiles it to a Nashorn-safe form, or rewrite",
+         ],
+         "expected": "Zero unsafe runtime APIs reach the bundled JS. Rewrites documented in PR.",
+         "automation_ref": None},
     ]
 
     # status: fail if any fail, warn if any warn, else pass

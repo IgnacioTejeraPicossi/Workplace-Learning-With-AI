@@ -231,7 +231,10 @@
       "checkErrorSummary": "Error summary on submit",
       "checkProgressIndicator": "Progress indicator",
       "checkVippsHandoff": "Vipps handoff & cancel",
-      "checkSubmitIdempotency": "Submit idempotency (PRG)"
+      "checkSubmitIdempotency": "Submit idempotency (PRG)",
+      "checkCsrf": "CSRF anti-forgery token",
+      "checkInjectionInFormFields": "Injection probe in form fields",
+      "checkServiceUrlGeneration": "Service URL via lib-portal"
     },
 
     "contentMigration": {

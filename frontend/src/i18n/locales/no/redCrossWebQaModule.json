@@ -231,7 +231,10 @@
       "checkErrorSummary": "Feilsammendrag ved innsending",
       "checkProgressIndicator": "Fremdriftsindikator",
       "checkVippsHandoff": "Vipps-overlevering og avbryt",
-      "checkSubmitIdempotency": "Innsendings-idempotens (PRG)"
+      "checkSubmitIdempotency": "Innsendings-idempotens (PRG)",
+      "checkCsrf": "CSRF anti-forgery-token",
+      "checkInjectionInFormFields": "Injeksjonstest i skjemafelt",
+      "checkServiceUrlGeneration": "Tjeneste-URL via lib-portal"
     },
 
     "contentMigration": {
