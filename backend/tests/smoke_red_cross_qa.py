@@ -36,8 +36,15 @@ async def main():
     assert "jira_subtasks" not in p, "old jira_subtasks key still present"
     has_test_level = any("test_level" in wi for wi in p["ado_work_items"])
     assert has_test_level, "test_level missing on ado_work_items"
+    # Phase H+ (Enonic skill 0.1.0) — mock fallback must include at least one
+    # static-review work item (covers NoQL / stale-data / Nashorn audits).
+    static_review_items = [wi for wi in p["ado_work_items"]
+                            if wi.get("test_level") == "static-review"]
+    assert static_review_items, \
+        "expected at least one static-review work item in the test plan mock fallback"
     print(
-        f"[OK] test plan ({len(p['ado_work_items'])} work items, test_level present)"
+        f"[OK] test plan ({len(p['ado_work_items'])} work items, test_level present, "
+        f"{len(static_review_items)} static-review)"
     )
 
     bundle = await get_ado_bundle_preview("test")
@@ -231,8 +238,39 @@ async def main():
     assert "iframe.html" in sb_content, "Storybook spec must use Storybook iframe URL pattern"
     assert "storybook-root" in sb_content, "Storybook spec must wait for #storybook-root"
     assert "wcag22aa" in sb_content, "Storybook spec must run WCAG 2.2 AA axe profile"
+    # Phase H+ (Enonic skill 0.1.0) — Storybook spec must also guard against
+    # silent drift on renamed/removed stories. Both checks must be present.
+    assert "toBeLessThan(400)" in sb_content, \
+        "Storybook spec must assert HTTP status < 400 (drift guard)"
+    assert "#storybook-root *" in sb_content, \
+        "Storybook spec must check the storybook-root has real children"
     print(f"[OK] Playwright Storybook scope ({sb['filename']}, "
-          f"axe + iframe.html + storybook-root + wcag22aa all present)")
+          f"axe + iframe.html + storybook-root + wcag22aa + drift-guard all present)")
+
+    # Phase H+ — scopeCmsPreview must emit a deterministic cms-preview.spec.ts
+    # covering draft/master + the data-portal-component-type wrapper.
+    pw_cms = await generate_playwright_tests(["scopeCmsPreview"], "test", "en")
+    cms_scripts = [s for s in pw_cms["scripts"]
+                    if "cms-preview" in (s.get("filename") or "").lower()]
+    assert cms_scripts, "scopeCmsPreview must produce cms-preview.spec.ts"
+    cms_c = cms_scripts[0]["content"]
+    for needle in ("data-portal-component-type", "draft", "master",
+                     "admin/site/preview"):
+        assert needle in cms_c, f"cms-preview.spec.ts missing required marker: {needle}"
+    print(f"[OK] Playwright CMS Preview scope ({cms_scripts[0]['filename']}, "
+          f"draft + master + portal-component-type all present)")
+
+    # Phase H+ — scopeNavigation must emit a deterministic migrated-links.spec.ts
+    # guarding against Cristin → NVA URL parameter drift.
+    pw_nav = await generate_playwright_tests(["scopeNavigation"], "test", "en")
+    ml_scripts = [s for s in pw_nav["scripts"]
+                   if "migrated-links" in (s.get("filename") or "").lower()]
+    assert ml_scripts, "scopeNavigation must produce migrated-links.spec.ts"
+    ml_c = ml_scripts[0]["content"]
+    for needle in ("MIGRATED_PARAM", "cristinid", "round-trip"):
+        assert needle in ml_c, f"migrated-links.spec.ts missing required marker: {needle}"
+    print(f"[OK] Playwright Migrated-links scope ({ml_scripts[0]['filename']}, "
+          f"param + cristinid-guard + round-trip all present)")
 
     # 2. Postman Collection v2.1 JSON must be valid + carry the 4 canonical queries.
     pm = await export_postman_collection(None, "test", "en")

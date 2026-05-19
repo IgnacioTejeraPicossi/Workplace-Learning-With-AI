@@ -47,7 +47,7 @@ All findings must be classified using BOTH severity scales from §8.1:
       "priority": 1,
       "severity_dev": 1,
       "category_ops": "A",
-      "test_level": "unit|sit|system|uat|performance"
+      "test_level": "static-review|unit|sit|system|uat|performance"
     }
   ],
   "next_steps": ["..."]
@@ -61,6 +61,17 @@ All findings must be classified using BOTH severity scales from §8.1:
   AND has not been explicitly accepted by Produkteier with a documented workaround.
 - `hold` if Lighthouse Performance < `threshold_perf` OR axe-core critical violations > `threshold_axe_critical`.
 - `go` only when all 11 quality gates (accessibility, performance, API, security, SEO, forms, CMS, stress, migration, Designsystemet, role-matrix) are pass/warn (no fails) AND no severity_dev≤2 / category_ops in {A,B} findings remain.
+
+## `static-review` work items
+The Enonic XP review skill (see `.claude/skills/enonic-xp/`) emits findings
+tagged `test_level: "static-review"`. Treat them as follows:
+- A `static-review` finding with `severity_dev: 1` or `category_ops: A` IS a
+  release blocker (same rule as other levels), e.g. confirmed NoQL injection
+  reachable from user input.
+- A `static-review` finding with `severity_dev: 2` triggers `hold` unless the
+  Produkteier has accepted it with a documented workaround.
+- `static-review` items with `severity_dev ≥ 3` are tracked but do NOT block
+  release — they roll into Sprint Report backlog.
 
 ## Severity ↔ category mapping (default suggestion)
 | LLM severity | severity_dev | category_ops |

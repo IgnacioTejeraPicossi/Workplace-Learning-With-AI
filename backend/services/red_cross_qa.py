@@ -544,7 +544,10 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
     parsed = _parse_json(raw or "")
 
     if not parsed:
-        # Mock fallback — uses Azure DevOps terminology + test-level taxonomy
+        # Mock fallback — uses Azure DevOps terminology + test-level taxonomy.
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-19): includes static-review work
+        # items + NoQL injection manual test + DST regression line so the plan
+        # exercises the Enonic XP audit knowledge base even without an LLM.
         parsed = {
             "manual_tests": [
                 {"title": "Visitor can complete donation flow on mobile",
@@ -556,12 +559,27 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
                 {"title": "Extreme-data form submission",
                  "steps": ["Submit volunteer form with 500-char name + æøå/special chars"],
                  "expected": "Validation handles or accepts safely"},
+                {"title": "Custom selector service rejects NoQL-injection payload",
+                 "steps": [
+                     "Open Content Studio selector for migrated publications",
+                     "Type the payload: ' OR type = 'anything",
+                     "Submit / wait for results",
+                 ],
+                 "expected": "Service escapes or returns 0 hits — no extra rows leak. Server log shows no unfiltered query."},
+                {"title": "Migrated publication link round-trips parameter name",
+                 "steps": [
+                     "Navigate to the related-publications list",
+                     "Click any publication card → header renders",
+                     "Verify the URL contains ?id= (not ?cristinid=) AND the header reads the same key"],
+                 "expected": "Header shows the publication — no blank page (regression guard against Cristin→NVA URL drift)"},
             ],
             "automated_candidates": [
                 {"title": "donation-flow-smoke", "tool": "playwright",
                  "rationale": "Critical revenue path"},
                 {"title": "axe-core scan on donation page", "tool": "axe",
                  "rationale": "WCAG 2.2 AA"},
+                {"title": "enonic-static-review", "tool": "static",
+                 "rationale": "Run .claude/skills/enonic-xp checklist against lib/* sources"},
             ],
             "accessibility_checklist": [
                 "Keyboard reachable amount selector",
@@ -572,12 +590,18 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
                 {"endpoint": "/site/api/graphql", "method": "POST",
                  "check": "Donation query returns localized fields"},
             ],
-            "regression_scope": ["Donation page", "Volunteer signup", "Local pages"],
+            "regression_scope": [
+                "Donation page",
+                "Volunteer signup",
+                "Local pages",
+                "Scheduled import runs at expected local hour after DST transition (Europe/Oslo, not GMT+1:00)",
+            ],
             "suggested_test_data": [
                 "100 NOK / monthly",
                 "500 NOK / one-time",
                 "Migrated article (æøå)",
                 "Long-string name (500 chars)",
+                "NoQL-injection probe: ' OR type = 'anything",
             ],
             "ado_work_items": [
                 {"title": "Add Playwright donation smoke",
@@ -588,6 +612,12 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
                  "work_item_type": "Test Case", "priority": 2, "test_level": "sit"},
                 {"title": "Lighthouse Core Web Vitals smoke",
                  "work_item_type": "Test Case", "priority": 3, "test_level": "performance"},
+                {"title": "Static review: NoQL injection in custom selector services",
+                 "work_item_type": "Task", "priority": 2, "test_level": "static-review"},
+                {"title": "Static review: stale-data lifecycle in import tasks (removedFromX flag)",
+                 "work_item_type": "Task", "priority": 2, "test_level": "static-review"},
+                {"title": "Static review: Nashorn compatibility sweep of lib/* TypeScript sources",
+                 "work_item_type": "Task", "priority": 3, "test_level": "static-review"},
             ],
         }
 
@@ -630,6 +660,32 @@ async def generate_playwright_tests(scopes: List[str], environment: str,
         if not already_has_storybook:
             scripts.append(_storybook_playwright_spec())
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-19) — same pattern for two
+    # high-value deterministic specs:
+    #   1. `scopeCmsPreview`  → cms-preview.spec.ts   (Content Studio preview)
+    #   2. `scopeNavigation`  → migrated-links.spec.ts (regression guard against
+    #                            Cristin → NVA URL-parameter drift)
+    # Both are appended only when their respective scope was requested AND no
+    # equivalent script already exists in the LLM output. Workshop-demo safe:
+    # without an LLM the deterministic templates carry the load.
+    if "scopeCmsPreview" in (scopes or []):
+        already_has_cms_preview = any(
+            "cms-preview" in (s.get("filename") or "").lower()
+            or "Content Studio Preview" in (s.get("content") or "")
+            for s in scripts
+        )
+        if not already_has_cms_preview:
+            scripts.append(_cms_preview_playwright_spec())
+
+    if "scopeNavigation" in (scopes or []):
+        already_has_migrated_links = any(
+            "migrated-links" in (s.get("filename") or "").lower()
+            or "Migrated-link round-trip" in (s.get("content") or "")
+            for s in scripts
+        )
+        if not already_has_migrated_links:
+            scripts.append(_migrated_links_playwright_spec())
+
     if not scripts:
         # Non-Storybook fallback — generic per-scope smoke.
         scripts = [{
@@ -662,6 +718,12 @@ def _storybook_playwright_spec() -> Dict[str, str]:
     project will swap the story IDs in for the actual Designsystemet stories
     once the team publishes them; the template uses canonical Designsystemet
     story IDs (`button--primary`, `textfield--default`, `alert--info`).
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19) hardening: every page.goto now
+    asserts the HTTP status AND that #storybook-root has real children.
+    Without this guard, a renamed story ID (e.g. Tom reorganises Designsystemet
+    storybook IDs) would silently 404 — Storybook's iframe returns 200 with an
+    empty root, and the original test would still 'pass'.
     """
     content = (
         "import { test, expect } from '@playwright/test';\n"
@@ -675,6 +737,10 @@ def _storybook_playwright_spec() -> Dict[str, str]:
         " * Run with Storybook already started on port 6006:\n"
         " *   npx storybook dev -p 6006 &\n"
         " *   npx playwright test storybook.spec.ts\n"
+        " *\n"
+        " * Drift-detection: each test asserts the story page returned HTTP 200\n"
+        " * AND that #storybook-root has at least one child element. A renamed\n"
+        " * or removed story will fail loudly instead of passing silently.\n"
         " */\n\n"
         "const STORYBOOK = process.env.STORYBOOK_URL || 'http://localhost:6006';\n\n"
         "const STORIES = [\n"
@@ -685,10 +751,15 @@ def _storybook_playwright_spec() -> Dict[str, str]:
         "for (const story of STORIES) {\n"
         "  test.describe(story.title, () => {\n"
         "    test('renders + WCAG 2.2 AA via axe-core', async ({ page }) => {\n"
-        "      await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      const resp = await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      expect(resp?.status(), `story '${story.id}' returned non-2xx — was it renamed?`).toBeLessThan(400);\n"
         "      await page.waitForLoadState('networkidle');\n"
-        "      // Storybook renders into #storybook-root\n"
+        "      // Storybook renders into #storybook-root. Empty root = silent 404 — fail loudly.\n"
         "      await expect(page.locator('#storybook-root')).toBeVisible();\n"
+        "      await expect(\n"
+        "        page.locator('#storybook-root *').first(),\n"
+        "        `story '${story.id}' rendered an empty #storybook-root — silent drift?`\n"
+        "      ).toBeAttached({ timeout: 5000 });\n"
         "      await injectAxe(page);\n"
         "      await checkA11y(page, undefined, {\n"
         "        detailedReport: true,\n"
@@ -696,7 +767,8 @@ def _storybook_playwright_spec() -> Dict[str, str]:
         "      });\n"
         "    });\n\n"
         "    test('keyboard interaction works', async ({ page }) => {\n"
-        "      await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      const resp = await page.goto(`${STORYBOOK}/iframe.html?id=${story.id}&viewMode=story`);\n"
+        "      expect(resp?.status()).toBeLessThan(400);\n"
         "      await page.waitForLoadState('networkidle');\n"
         "      await page.keyboard.press('Tab');\n"
         "      const active = await page.evaluate(() => document.activeElement?.tagName);\n"
@@ -706,6 +778,145 @@ def _storybook_playwright_spec() -> Dict[str, str]:
         "}\n"
     )
     return {"filename": "storybook.spec.ts", "content": content}
+
+
+def _cms_preview_playwright_spec() -> Dict[str, str]:
+    """Deterministic Content Studio Preview + Playwright spec template.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19): a renamed-parameter or
+    broken preview cookie was the most-frequent regression observed in
+    real Enonic XP releases. This spec covers the canonical preview path:
+
+      /admin/site/preview/<draft branch>/<contentPath>
+
+    Three deterministic checks:
+      1. Draft branch renders + the portal component wrapper is visible.
+      2. Editing a property in the draft and re-fetching the preview
+         reflects the change (round-trip via Content Studio API would be
+         ideal — for now we assert presence of a stable selector).
+      3. Master branch still renders the published version (regression
+         guard against the editor accidentally publishing the draft).
+
+    The deterministic shape mirrors `_storybook_playwright_spec` so the
+    workshop-demo UX is identical whether or not an LLM is available.
+    """
+    content = (
+        "import { test, expect } from '@playwright/test';\n\n"
+        "/**\n"
+        " * Content Studio Preview smoke for Enonic XP.\n"
+        " * Covers draft-vs-master rendering and the portal-component\n"
+        " * wrapper — a fast regression guard against broken preview\n"
+        " * cookies / renamed admin paths.\n"
+        " *\n"
+        " * Env vars expected:\n"
+        " *   BASE_URL              — site root (e.g. https://test.rodekors.no)\n"
+        " *   CMS_PREVIEW_COOKIE    — the preview session cookie name\n"
+        " *   CMS_PREVIEW_VALUE     — the preview session cookie value\n"
+        " *   CMS_PREVIEW_PATH      — content path under preview, default '/'\n"
+        " */\n\n"
+        "const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';\n"
+        "const COOKIE_NAME = process.env.CMS_PREVIEW_COOKIE || 'JSESSIONID';\n"
+        "const COOKIE_VALUE = process.env.CMS_PREVIEW_VALUE || '';\n"
+        "const CONTENT_PATH = process.env.CMS_PREVIEW_PATH || '/';\n\n"
+        "test.beforeEach(async ({ context }) => {\n"
+        "  if (COOKIE_VALUE) {\n"
+        "    await context.addCookies([{\n"
+        "      name: COOKIE_NAME, value: COOKIE_VALUE,\n"
+        "      url: BASE_URL,\n"
+        "    }]);\n"
+        "  }\n"
+        "});\n\n"
+        "test('draft branch renders portal-component wrapper', async ({ page }) => {\n"
+        "  const url = `${BASE_URL}/admin/site/preview/draft${CONTENT_PATH}`;\n"
+        "  const resp = await page.goto(url);\n"
+        "  expect(resp?.status(), `preview returned non-2xx — broken cookie or renamed admin path?`).toBeLessThan(400);\n"
+        "  await page.waitForLoadState('networkidle');\n"
+        "  // Every Enonic XP portal page emits at least one data-portal-component-type wrapper.\n"
+        "  await expect(\n"
+        "    page.locator('[data-portal-component-type]').first(),\n"
+        "    'no portal-component-type wrapper found — preview HTML may be broken'\n"
+        "  ).toBeAttached({ timeout: 8000 });\n"
+        "});\n\n"
+        "test('master branch renders published content', async ({ page }) => {\n"
+        "  const url = `${BASE_URL}/admin/site/preview/master${CONTENT_PATH}`;\n"
+        "  const resp = await page.goto(url);\n"
+        "  expect(resp?.status()).toBeLessThan(400);\n"
+        "  await page.waitForLoadState('networkidle');\n"
+        "  await expect(page.locator('[data-portal-component-type]').first()).toBeAttached({ timeout: 8000 });\n"
+        "});\n\n"
+        "test('preview escapes app.config values (XSS defense-in-depth)', async ({ page }) => {\n"
+        "  // Assumes a test environment where app.config.X contains a probe string.\n"
+        "  // Skip silently if the probe env var is unset.\n"
+        "  const probe = process.env.CMS_XSS_PROBE;\n"
+        "  test.skip(!probe, 'CMS_XSS_PROBE not set — skipping XSS defense-in-depth check');\n"
+        "  const url = `${BASE_URL}/admin/site/preview/draft${CONTENT_PATH}`;\n"
+        "  await page.goto(url);\n"
+        "  const html = await page.content();\n"
+        "  // The probe string must never appear unescaped — if it does, app.config is\n"
+        "  // being interpolated raw and we have an XSS hole (see enonic-xp/security-patterns.md §3).\n"
+        "  expect(html, 'app.config value rendered unescaped').not.toContain(probe!);\n"
+        "});\n"
+    )
+    return {"filename": "cms-preview.spec.ts", "content": content}
+
+
+def _migrated_links_playwright_spec() -> Dict[str, str]:
+    """Deterministic migrated-publication-link round-trip spec.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-19): direct regression guard
+    against the Cristin → NVA migration bug where the publication header
+    was migrated to `?id=` while the related-publications list still
+    generated `?cristinid=`. See `data-integrity-patterns.md §6`.
+
+    Generic shape — it parameterises both ends so the same spec works
+    for any 'list → header' migration (Cristin→NVA, Jira→ADO, etc.).
+    """
+    content = (
+        "import { test, expect } from '@playwright/test';\n\n"
+        "/**\n"
+        " * Migrated-link round-trip — regression guard against the\n"
+        " * Cristin → NVA bug: header reading `?id=` while link generator\n"
+        " * still emitted `?cristinid=`.\n"
+        " *\n"
+        " * Env vars expected:\n"
+        " *   BASE_URL          — site root\n"
+        " *   MIGRATED_LIST_URL — list page that links to migrated items (relative)\n"
+        " *   MIGRATED_PARAM    — the URL parameter name BOTH ends agree on (default 'id')\n"
+        " *   MIGRATED_LINK_SELECTOR — CSS for the list item link, default 'a[href*=publication]'\n"
+        " *   MIGRATED_HEADER_SELECTOR — CSS for the header rendered on the detail page\n"
+        " */\n\n"
+        "const BASE_URL = process.env.BASE_URL || 'https://test.rodekors.no';\n"
+        "const LIST_URL = process.env.MIGRATED_LIST_URL || '/forskning';\n"
+        "const PARAM = process.env.MIGRATED_PARAM || 'id';\n"
+        "const LINK_SEL = process.env.MIGRATED_LINK_SELECTOR || 'a[href*=publication]';\n"
+        "const HEADER_SEL = process.env.MIGRATED_HEADER_SELECTOR || 'h1';\n\n"
+        "test('migrated list emits the canonical URL parameter', async ({ page }) => {\n"
+        "  await page.goto(`${BASE_URL}${LIST_URL}`);\n"
+        "  await page.waitForLoadState('networkidle');\n"
+        "  const link = page.locator(LINK_SEL).first();\n"
+        "  const href = await link.getAttribute('href');\n"
+        "  expect(href, 'no migrated-item link found on list page').toBeTruthy();\n"
+        "  expect(\n"
+        "    href,\n"
+        "    `link emits a non-canonical URL parameter (expected ?${PARAM}=)`\n"
+        "  ).toMatch(new RegExp(`[?&]${PARAM}=`));\n"
+        "  // Defensive: explicitly reject the old Cristin parameter name.\n"
+        "  expect(href, 'list still emits the legacy ?cristinid= — migration drift').not.toContain('cristinid=');\n"
+        "});\n\n"
+        "test('migrated header renders after clicking the list link', async ({ page }) => {\n"
+        "  await page.goto(`${BASE_URL}${LIST_URL}`);\n"
+        "  await page.waitForLoadState('networkidle');\n"
+        "  const link = page.locator(LINK_SEL).first();\n"
+        "  await link.click();\n"
+        "  await page.waitForLoadState('networkidle');\n"
+        "  // If parameter names disagree, the header silently can't find the item — blank page.\n"
+        "  await expect(\n"
+        "    page.locator(HEADER_SEL),\n"
+        "    'header did not render — parameter-name mismatch between list and detail page?'\n"
+        "  ).toBeVisible();\n"
+        "});\n"
+    )
+    return {"filename": "migrated-links.spec.ts", "content": content}
 
 
 async def run_playwright(scopes: List[str], environment: str) -> Dict[str, Any]:
