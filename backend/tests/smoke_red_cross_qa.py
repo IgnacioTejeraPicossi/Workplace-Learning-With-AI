@@ -216,6 +216,59 @@ async def main():
         f"{dp['newly_created']['count']} nyopprettet, broken_pages tagged)"
     )
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20) — 3 new migration checks + new
+    # broken_page issue types + test_case cross-ref to playwright:migrated-links.
+    new_mig_checks = ("checkUrlParameterConsistency",
+                       "checkStructuredFilterPreserved",
+                       "checkStaleDataLifecycle")
+    for ck in new_mig_checks:
+        assert ck in mig["checks"], f"Migration missing new check: {ck}"
+    # Each new check should reference the relevant skill section in its note.
+    skill_refs = {
+        "checkUrlParameterConsistency":  "data-integrity",
+        "checkStructuredFilterPreserved": "data-integrity",
+        "checkStaleDataLifecycle":       "reliability-patterns",
+    }
+    for ck, expected_ref in skill_refs.items():
+        note = (mig["checks"][ck].get("note") or "").lower()
+        assert expected_ref in note, \
+            f"Migration {ck} note must cite '{expected_ref}': got {note[:120]!r}"
+    # Broken pages must include the 3 new Enonic-XP issue types, each with
+    # an enonic_xp_pattern reference.
+    new_issue_types = {"url-param-drift", "free-text-filter-regression", "stale-not-purged"}
+    seen_issues = {p.get("issue") for p in mig["broken_pages"]}
+    missing_issues = new_issue_types - seen_issues
+    assert not missing_issues, \
+        f"Migration broken_pages missing new issue types: {missing_issues}"
+    for p in mig["broken_pages"]:
+        if p.get("issue") in new_issue_types:
+            assert p.get("enonic_xp_pattern"), \
+                f"new broken_page issue {p['issue']} must carry enonic_xp_pattern"
+    # data_provenance.migrated.common_issues now lists the 3 new failure modes.
+    mig_issues = " ".join(dp["migrated"]["common_issues"]).lower()
+    for token in ("url parameter drift", "free-text", "stale legacy data"):
+        assert token in mig_issues, \
+            f"data_provenance.migrated.common_issues missing token: {token}"
+    # Test cases include automation_ref AND at least one cross-refs migrated-links.
+    test_cases_mig = mig["test_cases"]
+    assert all("automation_ref" in tc for tc in test_cases_mig), \
+        "all migration test_cases must carry automation_ref field"
+    migrated_links_refs = [tc for tc in test_cases_mig
+                           if tc.get("automation_ref") == "playwright:migrated-links.spec.ts"]
+    assert migrated_links_refs, \
+        "expected at least one test_case cross-referencing playwright:migrated-links.spec.ts"
+    # Nashorn static-review case present.
+    nashorn_mig_case = next((tc for tc in test_cases_mig
+                              if "nashorn" in (tc.get("title") or "").lower()), None)
+    assert nashorn_mig_case and nashorn_mig_case.get("type") == "static", \
+        "expected a Nashorn static-review test_case in migration audit"
+    print(
+        f"[OK] Migration Phase H+ checks ({len(new_mig_checks)} new checks all skill-cited, "
+        f"{len(new_issue_types)} new broken_page issue types, "
+        f"{len(migrated_links_refs)} cross-ref to migrated-links spec, "
+        f"Nashorn static review present)"
+    )
+
     # ── Phase D: Loadster (browser-level load testing) ─────────────────
     # Differentiator vs k6: real-browser metrics — hydration_p95_ms, spa_nav_p95_ms.
     ls_script = await generate_loadster_script("profileCampaign", ["scenarioDonation"], "test", "en")
