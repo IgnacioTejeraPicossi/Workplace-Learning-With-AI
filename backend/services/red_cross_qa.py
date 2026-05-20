@@ -2993,11 +2993,22 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
     # split findings instead of lumping them together.
     migrated_count = summary.get("total_pages_migrated", int(legacy_sample_size * 0.78))
     new_count = max(0, int(legacy_sample_size * 0.22))
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20): data_provenance.migrated now
+    # surfaces the 3 Enonic-XP-skill failure modes most relevant to migration
+    # audits — URL parameter drift, free-text replacing structured filter, and
+    # stale-data accumulation. These complement the existing pre-skill issues
+    # (relations, CDN URLs, 301s) without dropping them.
     data_provenance = parsed.get("data_provenance") or {
         "migrated": {
             "count": migrated_count,
             "label": "Migrated from legacy CMS",
-            "common_issues": ["broken relations", "stale CDN URLs", "missing 301s"],
+            "common_issues": [
+                "broken relations", "stale CDN URLs", "missing 301s",
+                # Phase H+ additions:
+                "URL parameter drift (e.g. ?cristinid= vs ?id=)",
+                "free-text replacing structured filter",
+                "stale legacy data not purged after upstream removal",
+            ],
             "issues_open": 18,
         },
         "newly_created": {
@@ -3010,17 +3021,47 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
         "rule":      "Findings, runs and risks must be tagged with data_origin = migrated | newly_created",
     }
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20): existing checks enriched with
+    # skill citations + 3 new checks added (URL parameter consistency, structured
+    # filter preserved, stale-data lifecycle). Mock-first: notes describe what a
+    # real probe would check; statuses default to "warn" until a live audit runs.
     checks = parsed.get("checks") or {
-        "checkContentTypeMapping":    {"status": "pass", "note": "All 8 types mapped (Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje)"},
-        "checkNorwegianChars":        {"status": "pass", "note": "UTF-8 preserved across sample"},
+        "checkContentTypeMapping":    {"status": "pass", "note": "All 8 types mapped (Forening, Distrikt, Aktivitet, Kontaktperson, Tjeneste/Kurs, Tema, Nyhet, Kampanje). Re-running the import on the same fixture must NOT create duplicates — verify check-then-act is atomic (data-integrity §1)."},
+        "checkNorwegianChars":        {"status": "pass", "note": "UTF-8 preserved across sample body text. Also verify URL slugs (/no/forskning/bløding-type paths) — æ/ø/å can encode-decode differently in build vs runtime."},
         "checkRelations":             {"status": "warn", "note": "3 Aktivitet records lost their Forening parent"},
         "checkLocalization":          {"status": "warn", "note": "12 pages missing nn (nynorsk) translation"},
-        "checkImageReanchoring":      {"status": "warn", "note": "7 hero images still point to legacy CDN"},
-        "checkRedirects":             {"status": "fail", "note": "23 legacy URLs return 404 (no 301)"},
-        "checkSeoMetadata":           {"status": "pass", "note": "Title + description preserved on 100% of sample"},
+        "checkImageReanchoring":      {"status": "warn", "note": "7 hero images still point to legacy CDN. Also verify <source srcset> URLs on responsive images, not just <img src>."},
+        "checkRedirects":             {"status": "fail", "note": "23 legacy URLs return 404 (no 301). Also detected 5 redirect chains (/a → /b → /c); each adds latency and harms SEO — collapse to a single hop."},
+        "checkSeoMetadata":           {"status": "pass", "note": "Title + description preserved on 100% of sample. Verify canonical link points to the NEW upstream (not the legacy one) — common post-migration regression."},
         "checkPublishState":          {"status": "pass", "note": "Draft / scheduled / archived state retained"},
-        "checkIsrInvalidation":       {"status": "warn", "note": "ISR revalidation occasionally skipped on bulk publish"},
-        "checkPermissionsCarryover": {"status": "pass", "note": "Role grants mapped 1:1 across 6 editorial roles"},
+        "checkIsrInvalidation":       {"status": "warn", "note": "ISR revalidation occasionally skipped on bulk publish. Also audit Elasticsearch refresh strategy during import: refreshing after every page exposes partial data to readers — refresh at end-of-import or use shadow branch (data-integrity §4)."},
+        "checkPermissionsCarryover": {"status": "warn", "note": "Role grants mapped 1:1 across 6 editorial roles. Subtree isolation NOT yet verified — Local Editor for /distrikt/oslo on legacy MUST remain bound to /distrikt/oslo on new CMS, not promoted to all districts (security-patterns §2)."},
+        # Phase H+ (Enonic skill 0.1.0) — three new checks for migration-specific patterns.
+        "checkUrlParameterConsistency": {"status": "warn", "note": (
+            "Verify URL query parameter names agree between list-page link "
+            "generators and detail-page readers (Cristin→NVA bug pattern). "
+            "Probe: crawl 20 migrated content links, follow each, assert the "
+            "detail header reader expects the same param name the list "
+            "emitted. Mock sample: 1 case found (?cristinid= legacy → ?id= new). "
+            "Cite data-integrity §6."
+        )},
+        "checkStructuredFilterPreserved": {"status": "warn", "note": (
+            "Audit lookups that previously used structured filters "
+            "(hasValue / boolean.must) and verify the post-migration code "
+            "didn't drop them in favour of free-text `query: x`. Common "
+            "regression: getResultsByFundingId, getByCristinId. Probe: query "
+            "a value that appears in two different indexed fields; only the "
+            "structured one should match. Mock sample: 1 function regressed "
+            "(getResultsByFundingId now free-text). Cite data-integrity §7."
+        )},
+        "checkStaleDataLifecycle": {"status": "warn", "note": (
+            "Verify the migration pipeline marks content as removed when the "
+            "legacy source no longer contains it. Test: remove a fixture from "
+            "the legacy export, re-run the import, verify the corresponding "
+            "XP node carries removedFromLegacy=true (or equivalent) AND is "
+            "filtered from public queries AND is NOT resurrected on the next "
+            "scheduled import. Cite reliability-patterns §4."
+        )},
     }
 
     broken_pages = parsed.get("broken_pages") or [
@@ -3036,6 +3077,22 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
         {"legacy_url": "",
          "new_url": "/aktuelt/sommer-2026-rekruttering",
          "issue": "missing-nn-translation", "data_origin": "newly_created"},
+        # Phase H+ (Enonic skill 0.1.0) — 3 new broken_pages keyed to skill patterns.
+        {"legacy_url": "/forskning/publikasjon?cristinid=12345",
+         "new_url": "/forskning/publikasjon?cristinid=12345",
+         "issue": "url-param-drift",
+         "data_origin": "migrated",
+         "enonic_xp_pattern": "data-integrity-patterns.md §6 (URL parameter consistency across migration)"},
+        {"legacy_url": "/forskning/finansiering/RCN-12345",
+         "new_url": "/forskning/finansiering/RCN-12345",
+         "issue": "free-text-filter-regression",
+         "data_origin": "migrated",
+         "enonic_xp_pattern": "data-integrity-patterns.md §7 (Search semantics preserved across migration)"},
+        {"legacy_url": "/distrikt/oslo/aktiviteter/retracted-event",
+         "new_url": "/lokal/oslo/aktiviteter/retracted-event",
+         "issue": "stale-not-purged",
+         "data_origin": "migrated",
+         "enonic_xp_pattern": "reliability-patterns.md §4 (No stale-data lifecycle)"},
     ]
 
     missing_redirects = parsed.get("missing_redirects") or [
@@ -3047,16 +3104,53 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
     test_cases = parsed.get("test_cases") or [
         {"title": "Norwegian characters preserved on Forening pages",
          "type": "automated",
-         "steps": ["Crawl 50 Forening pages", "Compare body text against legacy"],
-         "expected": "All æ/ø/å render correctly (no &aelig;, no ?)."},
+         "steps": ["Crawl 50 Forening pages", "Compare body text against legacy",
+                    "Also crawl /no/forskning/bløding-type slugs"],
+         "expected": "All æ/ø/å render correctly in body AND URL slugs (no &aelig;, no ?).",
+         "automation_ref": None},
         {"title": "Aktivitet → Forening relations intact",
          "type": "automated",
          "steps": ["List all Aktivitet content", "For each, verify parent Forening reference resolves"],
-         "expected": "0 orphan Aktivitet records"},
-        {"title": "301 redirects from legacy URLs",
+         "expected": "0 orphan Aktivitet records",
+         "automation_ref": None},
+        {"title": "301 redirects from legacy URLs (no chains)",
          "type": "automated",
-         "steps": ["Load redirect map", "Curl each legacy URL", "Assert 301 + Location header"],
-         "expected": "100% of mapped URLs return 301 to new path"},
+         "steps": ["Load redirect map", "Curl each legacy URL with --max-redirs 2",
+                    "Assert 301 + Location header AND no second hop"],
+         "expected": "100% of mapped URLs return 301 to new path in a single hop",
+         "automation_ref": None},
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-20) — 4 new test cases keyed to skill.
+        {"title": "URL parameter consistency: list → detail round-trip",
+         "type": "automated",
+         "steps": ["Open the related-publications list page",
+                    "Pick any link; assert href contains the canonical param name (?id=)",
+                    "Click; assert the detail page header renders (not blank)",
+                    "Defense-in-depth: assert no ?cristinid= anywhere in the rendered HTML"],
+         "expected": "Round-trip works; canonical parameter name used at BOTH ends. Cristin→NVA drift guard.",
+         "automation_ref": "playwright:migrated-links.spec.ts"},
+        {"title": "Structured filter preserved across migration",
+         "type": "manual",
+         "steps": ["Pick a known funding-id value that ALSO appears in an unrelated indexed field",
+                    "Call getResultsByFundingId(value) on the new CMS",
+                    "Verify only the structured-field matches are returned (no false positives)"],
+         "expected": "Free-text regression detected if unrelated matches appear in the result set.",
+         "automation_ref": None},
+        {"title": "Stale-data lifecycle: removed legacy items are purged",
+         "type": "manual",
+         "steps": ["Pick a fixture present in the local repo",
+                    "Remove it from the legacy export",
+                    "Re-run the migration import",
+                    "Verify the XP node now carries removedFromLegacy=true (or is hard-deleted)",
+                    "Wait for next scheduled import; assert it is NOT resurrected"],
+         "expected": "Stale data is flagged AND filtered AND not resurrected on subsequent imports.",
+         "automation_ref": None},
+        {"title": "Static review: migration code Nashorn compatibility sweep",
+         "type": "static",
+         "steps": ["Run grep recipes from .claude/skills/enonic-xp/references/nashorn-compatibility.md",
+                    "Apply to migration lib/ source (importers, transformers, ID mappers)",
+                    "Flag every Object.entries, Array.from, Set, Map, .includes, .startsWith usage"],
+         "expected": "Zero unsafe runtime APIs in migration-tool TypeScript sources.",
+         "automation_ref": None},
     ]
 
     statuses = [c.get("status") for c in checks.values()]

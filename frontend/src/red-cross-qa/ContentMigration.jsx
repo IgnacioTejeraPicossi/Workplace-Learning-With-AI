@@ -26,6 +26,10 @@ const CHECKS = [
   { key: 'checkPublishState',          icon: '📤' },
   { key: 'checkIsrInvalidation',       icon: '🔄' },
   { key: 'checkPermissionsCarryover',  icon: '🔐' },
+  // Phase H+ (Enonic skill 0.1.0) — three migration-specific checks added.
+  { key: 'checkUrlParameterConsistency',   icon: '🔀' },
+  { key: 'checkStructuredFilterPreserved', icon: '🎯' },
+  { key: 'checkStaleDataLifecycle',        icon: '🧹' },
 ];
 
 const STATUS_STYLES = {
