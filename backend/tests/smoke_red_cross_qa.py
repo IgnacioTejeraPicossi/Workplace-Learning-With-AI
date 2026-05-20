@@ -198,6 +198,46 @@ async def main():
         f"2.1 AA: {a21['wcag_version']}, 2.2-only target-size correctly gated)"
     )
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20) — Accessibility report carries
+    # 3 new Enonic-XP-specific checks, enriched check_notes for 6 checks,
+    # violations with enonic_xp_pattern + automation_ref, and cross_tool_refs.
+    new_a11y_checks = ("checkLangAttribute", "checkHtmlAreaEditorialA11y",
+                        "checkCmsEditorialUiA11y")
+    for ck in new_a11y_checks:
+        assert ck in a22["checks"], f"Accessibility missing new check: {ck}"
+    # check_notes is the parallel notes dict — each new check must carry a note
+    # citing its skill section (or rationale).
+    assert "check_notes" in a22, "Accessibility response missing check_notes"
+    for ck in new_a11y_checks:
+        note = (a22["check_notes"].get(ck) or "").lower()
+        assert note, f"check_notes[{ck}] empty"
+    # Skill-citing tokens must appear in at least one note (data-integrity, WCAG, EU directive).
+    all_notes = " ".join(a22["check_notes"].values()).lower()
+    for token in ("data-integrity-patterns.md §6", "wcag 1.3.1", "eu web accessibility"):
+        assert token in all_notes, f"check_notes missing required skill citation: {token}"
+    # Violations: 3 new Enonic-XP-keyed violations must be present.
+    violation_rules = {v.get("rule") for v in a22["violations"]}
+    new_rules = {"html-lang-attribute", "htmlarea-heading-skip",
+                  "skjemabygger-aria-live-polyfill-nashorn", "skip-link-target"}
+    missing_rules = new_rules - violation_rules
+    assert not missing_rules, f"Accessibility violations missing rules: {missing_rules}"
+    # Each new violation carries enonic_xp_pattern + automation_ref fields.
+    for v in a22["violations"]:
+        if v.get("rule") in new_rules:
+            assert "enonic_xp_pattern" in v, \
+                f"violation {v['rule']} missing enonic_xp_pattern field"
+            assert "automation_ref" in v, \
+                f"violation {v['rule']} missing automation_ref field"
+    # cross_tool_refs surfaces NVDA + WAVE + Playwright + Cypress integration.
+    refs = a22.get("cross_tool_refs") or {}
+    for k in ("nvda_script_endpoint", "wave_audit_endpoint",
+                "playwright_spec", "cypress_spec"):
+        assert k in refs, f"cross_tool_refs missing key: {k}"
+    print(
+        f"[OK] Accessibility Phase H+ (3 new checks all noted, "
+        f"4 new Enonic-keyed violations, cross_tool_refs to NVDA + WAVE + Playwright + Cypress)"
+    )
+
     # Migrert vs Nyopprettet data — explicit cohort split
     mig = await run_content_migration_audit(
         ["typeForening", "typeAktivitet"], "test", 100, "no"

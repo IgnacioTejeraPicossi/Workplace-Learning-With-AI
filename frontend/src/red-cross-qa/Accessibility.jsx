@@ -11,6 +11,10 @@ const CHECKS = [
   { key: 'checkFormLabels',     icon: '🏷️' }, { key: 'checkErrorMessages',  icon: '⚠️' },
   { key: 'checkScreenReader',   icon: '🔊' }, { key: 'checkDialogs',        icon: '💬' },
   { key: 'checkAltText',        icon: '🖼️' }, { key: 'checkContentClarity', icon: '📖' },
+  // Phase H+ (Enonic skill 0.1.0) — three Enonic-XP-specific a11y checks.
+  { key: 'checkLangAttribute',         icon: '🌐' },
+  { key: 'checkHtmlAreaEditorialA11y', icon: '✍️' },
+  { key: 'checkCmsEditorialUiA11y',    icon: '🖥️' },
 ];
 
 const STATUS_STYLES = {

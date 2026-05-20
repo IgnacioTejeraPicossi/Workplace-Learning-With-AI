@@ -2187,15 +2187,104 @@ async def run_accessibility_check(url: str, environment: str,
     else:
         version_id, version_label = "2.2-AA", "WCAG 2.2 AA"
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20): 12 base checks + 3 new
+    # Enonic-XP-specific checks (lang attribute, HtmlArea editorial content,
+    # CMS Editorial UI). Status dict (legacy shape) preserved so the frontend
+    # tile grid keeps working unchanged.
     checks = {
         "checkKeyboard": "pass", "checkFocusOrder": "pass", "checkSkipLinks": "warn",
         "checkAriaMisuse": "pass", "checkHeadings": "pass", "checkColorContrast": "warn",
         "checkFormLabels": "pass", "checkErrorMessages": "pass", "checkScreenReader": "pass",
         "checkDialogs": "pass", "checkAltText": "warn", "checkContentClarity": "pass",
+        # Phase H+ — three new Enonic-XP-specific accessibility checks.
+        "checkLangAttribute": "warn",
+        "checkHtmlAreaEditorialA11y": "warn",
+        "checkCmsEditorialUiA11y": "warn",
     }
+
+    # Phase H+ — existing 12-check notes enriched with skill-citing rationale.
+    # `check_notes` is a parallel dict (separate field) so the legacy `checks`
+    # shape is preserved verbatim. Front-end can read note on hover; release
+    # judge can use it for narrative. Mock-first: deterministic.
+    check_notes = {
+        "checkSkipLinks": (
+            "Skip-link visible on Tab but does not target [data-portal-component-type] "
+            "wrappers — Enonic emits these around every part/layout region, ideal anchor "
+            "points for skip-to-main-content."
+        ),
+        "checkColorContrast": (
+            "Donation CTA contrast 3.9:1 (target 4.5:1)."
+        ),
+        "checkScreenReader": (
+            "NVDA + VoiceOver announce landmarks correctly. Also verify Norwegian "
+            "pronunciation (æ/ø/å) on /no/* routes — depends on <html lang> "
+            "(see checkLangAttribute)."
+        ),
+        "checkAltText": (
+            "3 hero images lack descriptive alt text. Also verify alt persists "
+            "across image re-publish — `/_/image/<id>:<hash>/...` rehash must "
+            "carry the alt forward (data-integrity-patterns.md §6)."
+        ),
+        "checkHeadings": (
+            "Heading order correct on sample pages. Probe for Part-in-Layout "
+            "double-wrap: a Part declaring <h2> placed in a Layout that also "
+            "wraps in <h2> breaks hierarchy. Read XML descriptors AND rendered preview."
+        ),
+        "checkContentClarity": (
+            "Readability acceptable. Audit HtmlArea richtext for Word-paste "
+            "artifacts: <font color>, <span style='mso-...'>, <o:p> tags "
+            "injected when editors paste from Word — break screen-reader flow."
+        ),
+        # Phase H+ notes for the 3 new checks.
+        "checkLangAttribute": (
+            "Audit <html lang> on every public route. Expected: 'no', 'nb', 'nn', "
+            "'en'. Common bugs: NextJS default 'en' leaks on /no/* (SSR mismatch), "
+            "migrated content keeps legacy lang, <html lang> changes only after "
+            "hydration. WCAG 1.3.1 / 3.1.1 / 3.1.2."
+        ),
+        "checkHtmlAreaEditorialA11y": (
+            "Audit HtmlArea richtext content authored in Content Studio: "
+            "heading-level skips (h1 → h4), images without alt or with "
+            "filename-as-alt, links with 'klikk her' / 'her' text, tables "
+            "without <caption>. Run as part of editorial review BEFORE publish."
+        ),
+        "checkCmsEditorialUiA11y": (
+            "Content Studio UI accessibility — EU Web Accessibility Directive "
+            "extends to internal editorial tools. Probe: keyboard-only navigation "
+            "through panels, colour contrast in editor chrome, error message "
+            "announcements in editing forms. Defer to Enonic upstream for fixes, "
+            "document gaps locally."
+        ),
+    }
+
+    # Phase H+ — violations enriched with enonic_xp_pattern + automation_ref
+    # cross-refs to the Playwright/Cypress specs generated elsewhere.
     violations = [
-        {"severity": "medium", "rule": "color-contrast", "message": "Donation CTA contrast ratio 3.9:1 (target 4.5:1)"},
-        {"severity": "low", "rule": "image-alt", "message": "3 hero images lack descriptive alt text"},
+        {"severity": "medium", "rule": "color-contrast",
+         "message": "Donation CTA contrast ratio 3.9:1 (target 4.5:1)",
+         "enonic_xp_pattern": None,
+         "automation_ref": "cypress:regression-donation.cy.ts"},
+        {"severity": "low", "rule": "image-alt",
+         "message": "3 hero images lack descriptive alt text",
+         "enonic_xp_pattern": "data-integrity-patterns.md §6 (URL & alt consistency post-republish)",
+         "automation_ref": "cypress:regression-donation.cy.ts"},
+        # Phase H+ — 4 new Enonic-XP-keyed violations.
+        {"severity": "high", "rule": "html-lang-attribute",
+         "message": "/no/forskning page emits <html lang='en'> on initial SSR; corrects only after hydration",
+         "enonic_xp_pattern": "data-integrity-patterns.md §6",
+         "automation_ref": "playwright:cms-preview.spec.ts"},
+        {"severity": "medium", "rule": "htmlarea-heading-skip",
+         "message": "HtmlArea content on Kampanje pages skips from h1 to h4 (no h2/h3 between)",
+         "enonic_xp_pattern": "code-review-checklist.md §I (Site & content types)",
+         "automation_ref": None},
+        {"severity": "medium", "rule": "skjemabygger-aria-live-polyfill-nashorn",
+         "message": "Skjemabygger backend code uses Set/Array.from in an aria-live shim — Nashorn-incompatible in XP < 7.13",
+         "enonic_xp_pattern": "nashorn-compatibility.md (full doc)",
+         "automation_ref": None},
+        {"severity": "low", "rule": "skip-link-target",
+         "message": "Skip-to-content anchor targets #main but Enonic emits [data-portal-component-type='page'] — use that as the anchor instead",
+         "enonic_xp_pattern": "code-review-checklist.md §H (Widgets & services)",
+         "automation_ref": "playwright:cms-preview.spec.ts"},
     ]
     # WCAG 2.2 adds 9 new success criteria — 2 of them are commonly missed and
     # only flagged when 2.2 AA is selected. Trine's report should cite this.
@@ -2203,14 +2292,29 @@ async def run_accessibility_check(url: str, environment: str,
         violations.append({
             "severity": "medium", "rule": "wcag-2-2-target-size",
             "message": "Several footer links smaller than 24x24 CSS pixels (WCAG 2.5.8 — new in 2.2 AA)",
+            "enonic_xp_pattern": None,
+            "automation_ref": None,
         })
+    # Phase H+ — cross-tool integration: surface NVDA + WAVE + Playwright/Cypress
+    # endpoints/specs so consumers don't have to know which sibling helpers exist.
+    cross_tool_refs = {
+        "nvda_script_endpoint": "/api/red-cross-qa/generate-nvda-script",
+        "wave_audit_endpoint":  "/api/red-cross-qa/run-wave-audit",
+        "playwright_spec":      "playwright:cms-preview.spec.ts (a11y on draft/master preview)",
+        "cypress_spec":         "cypress:regression-donation.cy.ts (cypress-axe + hydration + WCAG 2.2 AA sweep)",
+    }
     run = await _store_run("redcross-accessibility-core", environment, "warn",
                            f"axe-core scan on {url} ({version_label})",
                            {"url": url, "wcag_version": version_label,
-                            "checks": checks, "violations": violations})
+                            "checks": checks, "check_notes": check_notes,
+                            "violations": violations,
+                            "cross_tool_refs": cross_tool_refs})
     return {"status": "ok", "url": url, "wcag_score": 87,
             "wcag_version": version_label, "wcag_version_id": version_id,
-            "checks": checks, "violations": violations, "run_id": run["run_id"]}
+            "checks": checks, "check_notes": check_notes,
+            "violations": violations,
+            "cross_tool_refs": cross_tool_refs,
+            "run_id": run["run_id"]}
 
 
 # ═══════════════════════════════════════════════════════════════════
