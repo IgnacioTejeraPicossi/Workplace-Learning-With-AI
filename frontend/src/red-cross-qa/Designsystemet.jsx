@@ -15,6 +15,10 @@ const CHECKS = [
   { key: 'checkDsVersion',       icon: '🔢' },
   { key: 'checkDsButtonUsage',   icon: '🔘' },
   { key: 'checkDsFormElements',  icon: '📝' },
+  // Phase H+ (Enonic skill 0.1.0) — three DS+Enonic integration checks.
+  { key: 'checkDsSsrHydration',           icon: '💧' },
+  { key: 'checkDsPackageVersionsAligned', icon: '📚' },
+  { key: 'checkDsHtmlAreaIntegration',    icon: '✍️' },
 ];
 
 const STATUS_STYLES = {

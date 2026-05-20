@@ -3491,14 +3491,36 @@ async def run_enonic_performance(url: str, environment: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 9e — Designsystemet (Digdir) Compliance
 # ═══════════════════════════════════════════════════════════════════
+# Phase H+ (Enonic skill 0.1.0, 2026-05-20) — in-memory baseline for the
+# Designsystemet compliance_score. Keyed by (environment, url). First run
+# seeds the baseline; subsequent runs report delta_pct so trend changes are
+# visible (release_judge can use the delta + score for go/hold/no-go).
+_DS_COMPLIANCE_BASELINES: Dict[Tuple[str, str], int] = {}
+
+
 async def run_designsystemet_audit(url: str, environment: str,
                                    lang: str = "en") -> Dict[str, Any]:
     """Audit compliance with Designsystemet from Digdir (Norwegian government
-    design system). Mock-first."""
+    design system). Mock-first.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-20) additions:
+      - 3 new Enonic-XP-integration checks (`checkDsSsrHydration`,
+        `checkDsPackageVersionsAligned`, `checkDsHtmlAreaIntegration`)
+        covering the DS + NextJS-over-Enonic boundary where pure DS audits
+        miss issues.
+      - `checkBrandOverride` extended with app.config.brandColor CSS-injection
+        defense (security-patterns §3).
+      - Deviations carry `enonic_xp_pattern` + `automation_ref` cross-refs.
+      - Recommendations carry `enonic_xp_pattern`.
+      - Top-level `cross_tool_refs` to Playwright Storybook + Cypress
+        component specs + DS docs + skill doc.
+      - `compliance_score_previous` + `delta_pct` for trend tracking.
+    """
     prompt = (
         f"URL: {url}\nEnvironment: {environment}\n"
         "Audit Designsystemet (Digdir) compliance: components, tokens, typography, "
-        "spacing, accessibility, brand override, version drift, button/form usage."
+        "spacing, accessibility, brand override, version drift, button/form usage, "
+        "SSR/CSR hydration consistency, package version alignment, HtmlArea integration."
     )
     raw = await _llm(prompt, DESIGNSYSTEMET_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
@@ -3516,54 +3538,153 @@ async def run_designsystemet_audit(url: str, environment: str,
                                 "note": "DS focus rings retained, no aria overrides"},
         "checkDsDarkMode":     {"status": "warn",
                                 "note": "Dark mode supported by DS but not exposed to users"},
-        "checkBrandOverride":  {"status": "pass",
-                                "note": "Red Cross red applied via DS theme tokens, not inline"},
+        # Phase H+: brand override note extended with CSS-injection defense.
+        "checkBrandOverride":  {"status": "pass", "note": (
+            "Red Cross red applied via DS theme tokens, not inline. Also verify "
+            "app.config.brandColor is validated (e.g. /^#[0-9a-f]{6}$/i) BEFORE "
+            "injection into --ds-color-brand — defense-in-depth against CSS "
+            "injection (security-patterns §3)."
+        )},
         "checkDsVersion":      {"status": "warn", "version_used": "1.0.0", "latest": "1.4.2",
                                 "note": "@digdir/designsystemet-react one minor + 4 patches behind"},
         "checkDsButtonUsage":  {"status": "warn",
                                 "note": "Tertiary used as primary on 3 pages (semantic mismatch)"},
         "checkDsFormElements": {"status": "warn",
                                 "note": "Volunteer form uses placeholder-as-label (anti-pattern)"},
+        # Phase H+ (Enonic skill 0.1.0) — 3 new Enonic-XP-integration checks.
+        "checkDsSsrHydration": {"status": "warn",
+                                  "components_audited": 14,
+                                  "hydration_mismatches": 2, "note": (
+            "Audit Designsystemet React components for SSR/CSR consistency under "
+            "the NextJS-over-Enonic stack. Compare innerHTML of SSR render vs "
+            "the post-hydration DOM. Common culprits: theme detection (dark vs "
+            "light), locale-aware date/number formatting, Portal-based components "
+            "(<Modal>, <Tooltip>). 2 mismatches found on Kampanje page. "
+            "code-review-checklist §H + data-integrity §3."
+        )},
+        "checkDsPackageVersionsAligned": {"status": "warn",
+                                            "react_version": "1.0.0",
+                                            "css_version": "1.4.2",
+                                            "tokens_version": "1.0.0",
+                                            "icons_version": "1.4.0",
+                                            "aligned": False, "note": (
+            "Designsystemet packages must share the same major+minor. Found: "
+            "@digdir/designsystemet-react=1.0.0 but @digdir/designsystemet-css=1.4.2 "
+            "(skew = 4 minor versions). Result: silent unstyled components "
+            "where the JS references CSS class names the css package no longer "
+            "generates. Align all DS packages (-react, -css, -tokens, -icons) "
+            "to the same major+minor before next release."
+        )},
+        "checkDsHtmlAreaIntegration": {"status": "warn",
+                                         "rich_content_pages_audited": 18,
+                                         "typography_drift_count": 5, "note": (
+            "Audit pages where Designsystemet <Heading>/<Paragraph> adjoins "
+            "<HtmlArea> richtext. Verify CSS cascade: ds-font-family / "
+            "ds-line-height / ds-link-color apply to HtmlArea output. 5 pages "
+            "show drift: richtext h2 falls back to browser-default serif while "
+            "DS Heading uses Inter. Wrap HtmlArea in a ds-typography class OR "
+            "extend the DS reset to cover .htmlarea-body. code-review-checklist §I."
+        )},
     }
     deviations = parsed.get("deviations") or [
         {"severity": "high",   "component": "Button",
          "page": "/donasjon", "title": "Donation CTA bypasses DS Button",
          "message": "Custom <button> on donation CTA — loses DS focus ring + keyboard semantics.",
-         "fix_hint": "Replace with <Button variant='primary' size='lg'> from @digdir/designsystemet-react"},
+         "fix_hint": "Replace with <Button variant='primary' size='lg'> from @digdir/designsystemet-react",
+         "enonic_xp_pattern": None,
+         "automation_ref": "playwright:storybook.spec.ts"},
         {"severity": "medium", "component": "Input",
          "page": "/bli-frivillig", "title": "Volunteer form uses placeholder-as-label",
          "message": "Inputs missing <Label> — placeholder vanishes on focus.",
-         "fix_hint": "Use DS <Textfield label='Fullt navn'> with explicit label slot."},
+         "fix_hint": "Use DS <Textfield label='Fullt navn'> with explicit label slot.",
+         "enonic_xp_pattern": None,
+         "automation_ref": "cypress:component-designsystemet.cy.ts"},
         {"severity": "medium", "component": "Tag",
          "page": "/lokal/oslo", "title": "District tags use raw spans",
          "message": "Custom span pills instead of DS <Tag>.",
-         "fix_hint": "Replace with <Tag color='neutral'> from DS."},
+         "fix_hint": "Replace with <Tag color='neutral'> from DS.",
+         "enonic_xp_pattern": None,
+         "automation_ref": "playwright:storybook.spec.ts"},
+        # Phase H+ — 1 new deviation about named imports / bundle bloat.
+        {"severity": "low", "component": "*",
+         "page": "*", "title": "Star-import from @digdir/designsystemet-react",
+         "message": "Several files use `import * as DS from '@digdir/designsystemet-react'` — defeats tree-shaking, ~40 KB extra bundle weight.",
+         "fix_hint": "Use named imports only: `import { Button, Textfield } from '@digdir/designsystemet-react'`.",
+         "enonic_xp_pattern": "performance-patterns.md §5 (analog — over-allocation)",
+         "automation_ref": None},
     ]
     recommendations = parsed.get("recommendations") or [
         {"title": "Migrate raw buttons to DS Button",
          "category": "components",
-         "description": "Replace 14 raw <button> with DS <Button> across donation, volunteer, contact pages."},
+         "description": "Replace 14 raw <button> with DS <Button> across donation, volunteer, contact pages.",
+         "enonic_xp_pattern": None},
         {"title": "Bump @digdir/designsystemet-react",
          "category": "components",
-         "description": "Upgrade 1.0.0 → 1.4.2 for latest a11y fixes and Norwegian text adjustments."},
+         "description": "Upgrade 1.0.0 → 1.4.2 for latest a11y fixes and Norwegian text adjustments.",
+         "enonic_xp_pattern": None},
         {"title": "Map raw hex colors to DS tokens",
          "category": "tokens",
-         "description": "38 raw hex values found — define ds-color-rk-* aliases and replace."},
+         "description": "38 raw hex values found — define ds-color-rk-* aliases and replace.",
+         "enonic_xp_pattern": None},
+        # Phase H+ (Enonic skill 0.1.0) — 2 new recommendations citing the skill.
+        {"title": "Align all Designsystemet packages to the same major+minor",
+         "category": "versioning",
+         "description": (
+             "Bump -css/-tokens/-icons to match -react (or vice versa). Skew "
+             "between @digdir/designsystemet-react@1.0.0 and -css@1.4.2 causes "
+             "silent unstyled components. Establish a single source of truth "
+             "in package.json (resolutions/overrides) so CI fails on skew."
+         ),
+         "enonic_xp_pattern": "api-design-patterns.md §1 (Dead code / version drift)"},
+        {"title": "Probe DS components for SSR/CSR hydration mismatch",
+         "category": "ssr",
+         "description": (
+             "Build a Playwright check that compares SSR HTML vs the "
+             "post-hydration DOM for the Designsystemet components used on "
+             "rodekors.no. Reuse the storybook.spec.ts harness to drive each "
+             "story. NextJS-over-Enonic stack hydrates twice — mismatch shows "
+             "as visual flash + React warning."
+         ),
+         "enonic_xp_pattern": "code-review-checklist.md §H + data-integrity-patterns.md §3"},
     ]
     score = parsed.get("compliance_score") if isinstance(parsed.get("compliance_score"), int) else 72
 
+    # Phase H+ — baseline persistence for compliance_score trend tracking.
+    baseline_key = (environment, url)
+    previous_score = _DS_COMPLIANCE_BASELINES.get(baseline_key)
+    if previous_score is None or previous_score == 0:
+        delta_pct = 0.0
+    else:
+        delta_pct = round(((score - previous_score) / previous_score) * 100.0, 1)
+    _DS_COMPLIANCE_BASELINES[baseline_key] = score
+
     statuses = [c.get("status") for c in checks.values()]
     overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
-    summary = f"Designsystemet compliance {score}/100 on {url}"
+    summary = (f"Designsystemet compliance {score}/100 on {url} "
+               f"({'+' if delta_pct >= 0 else ''}{delta_pct}% vs previous)")
+
+    cross_tool_refs = {
+        "playwright_spec": "playwright:storybook.spec.ts (component-level axe + drift-guard)",
+        "cypress_spec":    "cypress:component-designsystemet.cy.ts (Guillotine stubbing)",
+        "ds_docs":         "https://designsystemet.no/",
+        "skill_doc":       ".claude/skills/enonic-xp/references/code-review-checklist.md",
+    }
 
     run = await _store_run("redcross-designsystemet", environment, overall, summary, {
         "url": url, "compliance_score": score, "checks": checks,
         "deviations": deviations, "recommendations": recommendations,
+        "compliance_score_previous": previous_score,
+        "delta_pct": delta_pct,
+        "cross_tool_refs": cross_tool_refs,
         "artifacts": [{"name": "designsystemet-audit.json", "type": "report"}],
     })
     return {"status": "ok", "url": url, "compliance_score": score,
+            "compliance_score_previous": previous_score,
+            "delta_pct": delta_pct,
             "checks": checks, "deviations": deviations,
-            "recommendations": recommendations, "run_id": run["run_id"], "lang": lang}
+            "recommendations": recommendations,
+            "cross_tool_refs": cross_tool_refs,
+            "run_id": run["run_id"], "lang": lang}
 
 
 # ═══════════════════════════════════════════════════════════════════

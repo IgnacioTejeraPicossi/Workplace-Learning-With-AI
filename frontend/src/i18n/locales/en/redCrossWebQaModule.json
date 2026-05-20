@@ -399,7 +399,10 @@
       "checkBrandOverride": "Red Cross brand override",
       "checkDsVersion": "Designsystemet version",
       "checkDsButtonUsage": "Button component usage",
-      "checkDsFormElements": "Form element components"
+      "checkDsFormElements": "Form element components",
+      "checkDsSsrHydration": "SSR / CSR hydration consistency",
+      "checkDsPackageVersionsAligned": "DS package versions aligned",
+      "checkDsHtmlAreaIntegration": "HtmlArea typography integration"
     },
 
     "roleMatrix": {

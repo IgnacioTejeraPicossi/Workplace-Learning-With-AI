@@ -399,7 +399,10 @@
       "checkBrandOverride": "Røde Kors merkevareoverstyring",
       "checkDsVersion": "Designsystemet-versjon",
       "checkDsButtonUsage": "Knapp-komponent-bruk",
-      "checkDsFormElements": "Skjemaelement-komponenter"
+      "checkDsFormElements": "Skjemaelement-komponenter",
+      "checkDsSsrHydration": "SSR / CSR hydration-konsistens",
+      "checkDsPackageVersionsAligned": "DS-pakkeversjoner justert",
+      "checkDsHtmlAreaIntegration": "HtmlArea typografi-integrasjon"
     },
 
     "roleMatrix": {

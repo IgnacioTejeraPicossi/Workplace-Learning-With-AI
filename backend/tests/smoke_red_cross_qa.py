@@ -15,7 +15,7 @@ from backend.services.red_cross_qa import (
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
-    analyze_api, generate_cms_test_cases, run_enonic_performance,
+    analyze_api, generate_cms_test_cases, run_enonic_performance, run_designsystemet_audit,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -398,6 +398,64 @@ async def main():
         f"[OK] Enonic perf Phase H+ "
         f"(3 new server-side checks all skill-cited, composite_score={score}/100, "
         f"{len(server_ops)} server-ops recommendations, baseline diff={deltas})"
+    )
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20) — Designsystemet audit carries
+    # 3 new Enonic-integration checks, enriched checkBrandOverride, deviations
+    # with automation_ref, recommendations with enonic_xp_pattern,
+    # compliance_score baseline trend, cross_tool_refs.
+    ds1 = await run_designsystemet_audit("https://www.rodekors.no/", "test", "en")
+    assert ds1["status"] == "ok"
+    new_ds_checks = ("checkDsSsrHydration", "checkDsPackageVersionsAligned",
+                      "checkDsHtmlAreaIntegration")
+    for ck in new_ds_checks:
+        assert ck in ds1["checks"], f"Designsystemet missing new check: {ck}"
+    # Each new check has its structured fields.
+    ssr = ds1["checks"]["checkDsSsrHydration"]
+    assert "components_audited" in ssr and "hydration_mismatches" in ssr
+    pkg = ds1["checks"]["checkDsPackageVersionsAligned"]
+    for f in ("react_version", "css_version", "tokens_version", "icons_version", "aligned"):
+        assert f in pkg, f"checkDsPackageVersionsAligned missing field: {f}"
+    htmlarea = ds1["checks"]["checkDsHtmlAreaIntegration"]
+    assert "rich_content_pages_audited" in htmlarea and "typography_drift_count" in htmlarea
+    # checkBrandOverride note now mentions app.config + security-patterns §3.
+    brand_note = (ds1["checks"]["checkBrandOverride"].get("note") or "").lower()
+    assert "app.config" in brand_note and "security-patterns" in brand_note, \
+        "checkBrandOverride must mention app.config + security-patterns"
+    # cross_tool_refs has 4 entries.
+    refs = ds1.get("cross_tool_refs") or {}
+    for k in ("playwright_spec", "cypress_spec", "ds_docs", "skill_doc"):
+        assert k in refs, f"DS cross_tool_refs missing key: {k}"
+    # Deviations carry automation_ref (added Phase H+).
+    deviations = ds1["deviations"]
+    assert all("automation_ref" in d for d in deviations), \
+        "all DS deviations must carry automation_ref"
+    # At least 1 deviation references Playwright Storybook spec.
+    sb_refs = [d for d in deviations
+                if d.get("automation_ref") == "playwright:storybook.spec.ts"]
+    assert sb_refs, "expected at least one deviation cross-referencing playwright:storybook.spec.ts"
+    # Recommendations carry enonic_xp_pattern (some None, some set); at least
+    # 2 must cite the skill.
+    recs = ds1["recommendations"]
+    skill_cited_recs = [r for r in recs if r.get("enonic_xp_pattern")]
+    assert len(skill_cited_recs) >= 2, \
+        f"expected ≥2 recommendations citing the skill, got {len(skill_cited_recs)}"
+    # compliance_score trend: first call has no previous, delta = 0%.
+    assert "compliance_score" in ds1 and "delta_pct" in ds1
+    assert ds1["delta_pct"] == 0.0, \
+        f"first call delta should be 0%, got {ds1['delta_pct']}"
+
+    # Second call: baseline now seeded. With identical mock score, delta = 0%.
+    ds2 = await run_designsystemet_audit("https://www.rodekors.no/", "test", "en")
+    assert ds2["compliance_score_previous"] == ds1["compliance_score"], \
+        "2nd call must use 1st call's score as previous baseline"
+    assert ds2["delta_pct"] == 0.0, \
+        f"2nd call with identical score should be 0% delta, got {ds2['delta_pct']}"
+    print(
+        f"[OK] Designsystemet Phase H+ "
+        f"(3 new DS+Enonic checks, compliance_score={ds1['compliance_score']}/100 "
+        f"(delta {ds1['delta_pct']}%), {len(skill_cited_recs)} skill-cited recommendations, "
+        f"{len(sb_refs)} deviations cross-ref Playwright Storybook spec)"
     )
 
     # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)

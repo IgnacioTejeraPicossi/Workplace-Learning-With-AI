@@ -399,7 +399,10 @@
       "checkBrandOverride": "Override de marca Cruz Roja",
       "checkDsVersion": "Versión Designsystemet",
       "checkDsButtonUsage": "Uso del componente Botón",
-      "checkDsFormElements": "Componentes de elementos de formulario"
+      "checkDsFormElements": "Componentes de elementos de formulario",
+      "checkDsSsrHydration": "Consistencia hidratación SSR / CSR",
+      "checkDsPackageVersionsAligned": "Versiones de paquetes DS alineadas",
+      "checkDsHtmlAreaIntegration": "Integración tipográfica con HtmlArea"
     },
 
     "roleMatrix": {
