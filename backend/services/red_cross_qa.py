@@ -3281,14 +3281,62 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 9d — Enonic-specific Performance
 # ═══════════════════════════════════════════════════════════════════
+# Phase H+ (Enonic skill 0.1.0, 2026-05-20) — in-memory baseline for hot_queries
+# p95. Keyed by (environment, url, query_name). Used by run_enonic_performance
+# to detect degradation between consecutive runs (>20% slower = warning).
+_PERF_HOT_QUERY_BASELINES: Dict[Tuple[str, str, str], int] = {}
+
+
+def _enrich_hot_queries_with_baseline(
+    hot_queries: List[Dict[str, Any]], environment: str, url: str,
+) -> List[Dict[str, Any]]:
+    """Attach `p95_ms_previous` + `delta_pct` to each hot query by comparing
+    against the in-memory baseline. First run seeds the baseline (delta = 0);
+    subsequent runs report % change.
+
+    Side effect: refreshes the baseline so each call diffs against the
+    most-recent snapshot.
+    """
+    enriched: List[Dict[str, Any]] = []
+    for q in (hot_queries or []):
+        name = q.get("name") or ""
+        current = int(q.get("p95_ms") or 0)
+        key = (environment, url, name)
+        previous = _PERF_HOT_QUERY_BASELINES.get(key)
+        if previous is None or previous == 0:
+            delta_pct = 0.0
+        else:
+            delta_pct = round(((current - previous) / previous) * 100.0, 1)
+        _PERF_HOT_QUERY_BASELINES[key] = current
+        enriched.append({**q, "p95_ms_previous": previous, "delta_pct": delta_pct})
+    return enriched
+
+
 async def run_enonic_performance(url: str, environment: str,
                                  lang: str = "en") -> Dict[str, Any]:
     """Audit Enonic XP + Next.XP + Guillotine GraphQL specific perf signals
-    that Lighthouse alone misses. Mock-first."""
+    that Lighthouse alone misses. Mock-first.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-20) additions:
+      - 3 new server-side perf checks (`checkRefreshStrategy`,
+        `checkChangeDetectionPerf`, `checkConnectionPooling`) covering
+        `performance-patterns.md §3 / §4 / §5`.
+      - `hot_queries` now carry `p95_ms_previous` + `delta_pct` for
+        degradation tracking across consecutive runs (in-memory baseline).
+      - Each `hot_query` AND each `recommendation` tagged with
+        `enonic_xp_pattern` ref where applicable.
+      - Recommendations carry `automation_ref` cross-linking to existing
+        Playwright/Cypress specs in the module.
+      - Top-level `composite_score` (0-100) = % of checks passing.
+      - Top-level `cross_tool_refs` to Lighthouse + Loadster + Playwright +
+        Cypress + skill doc, so a single response is self-navigable.
+    """
     prompt = (
         f"URL: {url}\nEnvironment: {environment}\n"
         "Audit waterfall, N+1, Guillotine field selection, ISR latency, "
-        "image service, publish latency, bulk publish, part rendering, cache invalidation."
+        "image service, publish latency, bulk publish, part rendering, cache "
+        "invalidation, refresh strategy, change-detection GC pressure, "
+        "connection pooling."
     )
     raw = await _llm(prompt, ENONIC_PERFORMANCE_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
@@ -3296,8 +3344,14 @@ async def run_enonic_performance(url: str, environment: str,
     checks = parsed.get("checks") or {
         "checkGraphqlWaterfall":  {"status": "warn", "p95_ms": 480, "queries": 5,
                                    "note": "5 sequential roundtrips on district pages (target ≤3)"},
+        # Phase H+: extended note covers BOTH GraphQL-level N+1 AND server-side
+        # NoQL N+1 (conn.query + conn.get per hit), since the skill section is
+        # the same pattern at a different layer.
         "checkGraphqlNplusOne":   {"status": "warn", "duplicate_queries": 7,
-                                   "note": "7 duplicate Forening queries on Distrikt page"},
+                                   "note": ("7 duplicate Forening queries on Distrikt page "
+                                              "(GraphQL-level). Also probe server-side N+1: "
+                                              "conn.query() + conn.get(id) per hit. Use "
+                                              "conn.get([ids]) for batch (performance-patterns §1).")},
         "checkGuillotineFields":  {"status": "warn", "overfetched_fields": 23,
                                    "note": "23 Guillotine fields fetched but not rendered"},
         "checkIsrLatency":        {"status": "pass", "p95_seconds": 12,
@@ -3314,41 +3368,123 @@ async def run_enonic_performance(url: str, environment: str,
                                    "note": "Event list virtualizes after 100 rows"},
         "checkCacheInvalidation": {"status": "warn",
                                    "note": "Stale content occasionally served up to 90s after publish"},
+        # Phase H+ (Enonic skill 0.1.0) — 3 new server-side perf checks.
+        "checkRefreshStrategy":   {"status": "warn",
+                                    "refresh_count_per_import": 50,
+                                    "refresh_p95_ms": 220,
+                                    "note": (
+            "Bulk import calls conn.refresh('ALL') after every page of 100 "
+            "items. On a 50-page import that's 50 forced Elasticsearch "
+            "refreshes (~220ms p95 each = ~11s total wasted). Options: refresh "
+            "at end-of-import, every N pages, or refresh('SEARCH') for "
+            "cheaper write consistency (performance-patterns §3)."
+        )},
+        "checkChangeDetectionPerf": {"status": "warn",
+                                      "records_audited": 10000,
+                                      "stringify_allocations": 20000,
+                                      "note": (
+            "Migration import uses JSON.stringify(existing) !== JSON.stringify(incoming) "
+            "for change detection. ~2 string allocations per record (10k records "
+            "= 20k allocations = GC pressure). Plus property-order-sensitive → "
+            "spurious modify events when upstream serializer reorders fields. "
+            "Recommend: compare upstream modifiedDate or hash-based diff "
+            "(performance-patterns §4)."
+        )},
+        "checkConnectionPooling": {"status": "warn",
+                                    "connections_per_request_p95": 7,
+                                    "note": (
+            "Each request creates ~7 RepoConnection instances (chained storage "
+            "calls). XP connections are lightweight but not free. Consider: "
+            "pass connection as parameter OR per-request context pattern "
+            "(performance-patterns §5)."
+        )},
     }
-    hot_queries = parsed.get("hot_queries") or [
+
+    # Phase H+ — hot_queries with enonic_xp_pattern + baseline degradation.
+    raw_hot_queries = parsed.get("hot_queries") or [
         {"name": "GetDistrictPage", "p95_ms": 480, "queries": 12, "duplicates": 3,
-         "fix_hint": "Batch Forening lookups via fragments instead of per-card query"},
+         "fix_hint": "Batch Forening lookups via fragments instead of per-card query",
+         "enonic_xp_pattern": "performance-patterns.md §1 (N+1 query)"},
         {"name": "GetActivityList",  "p95_ms": 320, "queries": 8,  "duplicates": 4,
-         "fix_hint": "Use Guillotine `_references` to pre-load related Forening once"},
+         "fix_hint": "Use Guillotine `_references` to pre-load related Forening once",
+         "enonic_xp_pattern": "performance-patterns.md §2 (Double-fetch query+get)"},
         {"name": "GetCampaignPage",  "p95_ms": 260, "queries": 6,  "duplicates": 1,
-         "fix_hint": "Drop unused fields from query (over-fetching `body` and `_versionKey`)"},
+         "fix_hint": "Drop unused fields from query (over-fetching `body` and `_versionKey`)",
+         "enonic_xp_pattern": None},
     ]
+    hot_queries = _enrich_hot_queries_with_baseline(raw_hot_queries, environment, url)
+
+    # Phase H+ — recommendations enriched with enonic_xp_pattern + automation_ref.
+    # Plus 2 new server-side recommendations citing the skill.
     recommendations = parsed.get("recommendations") or [
         {"priority": "high",   "category": "graphql",
          "title": "Reduce GraphQL waterfall on district pages",
-         "description": "Batch related Forening queries into one round-trip via fragment spread."},
+         "description": "Batch related Forening queries into one round-trip via fragment spread.",
+         "enonic_xp_pattern": "performance-patterns.md §1",
+         "automation_ref": "cypress:component-designsystemet.cy.ts"},
         {"priority": "high",   "category": "isr",
          "title": "Wire cascading ISR invalidation",
-         "description": "On Forening publish, revalidate child Aktivitet/Kontaktperson paths."},
+         "description": "On Forening publish, revalidate child Aktivitet/Kontaktperson paths.",
+         "enonic_xp_pattern": "reliability-patterns.md §1",
+         "automation_ref": None},
         {"priority": "medium", "category": "publish",
          "title": "Async bulk publish queue",
-         "description": "Move bulk publish off the editor UI thread; show progress toast."},
+         "description": "Move bulk publish off the editor UI thread; show progress toast.",
+         "enonic_xp_pattern": "reliability-patterns.md §1",
+         "automation_ref": None},
         {"priority": "medium", "category": "graphql",
          "title": "Trim Guillotine field selection",
-         "description": "23 fields fetched but never rendered — drop them from queries."},
+         "description": "23 fields fetched but never rendered — drop them from queries.",
+         "enonic_xp_pattern": "performance-patterns.md §2",
+         "automation_ref": None},
+        # Phase H+ — 2 new server-side recommendations.
+        {"priority": "medium", "category": "server-ops",
+         "title": "Refresh Elasticsearch index less aggressively during imports",
+         "description": (
+             "Replace per-page conn.refresh('ALL') with refresh-at-end-of-import, "
+             "or refresh every 10 pages. On a 50-page import that saves ~11s of "
+             "blocked time. Use refresh('SEARCH') if write consistency is not "
+             "required mid-flight."
+         ),
+         "enonic_xp_pattern": "performance-patterns.md §3",
+         "automation_ref": None},
+        {"priority": "low", "category": "server-ops",
+         "title": "Replace JSON.stringify change detection with modifiedDate compare",
+         "description": (
+             "Cut string allocation by ~95% on bulk imports. Use upstream "
+             "`recordMetadata.modifiedDate` as the change signal; fall back to "
+             "a stable hash if the upstream lacks a timestamp."
+         ),
+         "enonic_xp_pattern": "performance-patterns.md §4",
+         "automation_ref": None},
     ]
 
     statuses = [c.get("status") for c in checks.values()]
     overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
-    summary = f"Enonic perf on {url} — {sum(1 for s in statuses if s=='pass')}/{len(statuses)} pass"
+    pass_count = sum(1 for s in statuses if s == "pass")
+    composite_score = round((pass_count / len(statuses)) * 100) if statuses else 0
+    summary = (f"Enonic perf on {url} — {pass_count}/{len(statuses)} pass "
+               f"(composite score {composite_score}/100)")
+
+    cross_tool_refs = {
+        "lighthouse_endpoint": "/api/red-cross-qa/run-performance-check",
+        "loadster_endpoint":   "/api/red-cross-qa/run-loadster",
+        "playwright_spec":     "playwright:storybook.spec.ts (bundle weight + a11y at component level)",
+        "cypress_spec":        "cypress:regression-donation.cy.ts (NextJS hydration + Enonic image URLs)",
+        "skill_doc":           ".claude/skills/enonic-xp/references/performance-patterns.md",
+    }
 
     run = await _store_run("redcross-enonic-performance", environment, overall, summary, {
         "url": url, "checks": checks, "hot_queries": hot_queries,
         "recommendations": recommendations,
+        "composite_score": composite_score,
+        "cross_tool_refs": cross_tool_refs,
         "artifacts": [{"name": "enonic-perf.json", "type": "report"}],
     })
     return {"status": "ok", "url": url, "checks": checks,
             "hot_queries": hot_queries, "recommendations": recommendations,
+            "composite_score": composite_score,
+            "cross_tool_refs": cross_tool_refs,
             "run_id": run["run_id"], "lang": lang}
 
 

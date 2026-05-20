@@ -376,7 +376,10 @@
       "checkPublishLatency": "Publiseringslatens",
       "checkBulkPublish": "Bulk-publisering UI-blokk",
       "checkPartRender": "Part-rendering / virtualisering",
-      "checkCacheInvalidation": "Cache-invalidering ferskhet"
+      "checkCacheInvalidation": "Cache-invalidering ferskhet",
+      "checkRefreshStrategy": "ES refresh-strategi",
+      "checkChangeDetectionPerf": "GC-trykk fra endringsdeteksjon",
+      "checkConnectionPooling": "Connection pooling per request"
     },
 
     "designsystemet": {

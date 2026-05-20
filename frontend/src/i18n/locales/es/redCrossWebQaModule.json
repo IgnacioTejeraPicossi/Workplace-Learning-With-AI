@@ -376,7 +376,10 @@
       "checkPublishLatency": "Latencia de publicación",
       "checkBulkPublish": "Publicación masiva — bloqueo UI",
       "checkPartRender": "Renderizado de Parts / virtualización",
-      "checkCacheInvalidation": "Frescura de invalidación caché"
+      "checkCacheInvalidation": "Frescura de invalidación caché",
+      "checkRefreshStrategy": "Estrategia de refresh de ES",
+      "checkChangeDetectionPerf": "Presión GC por detección de cambios",
+      "checkConnectionPooling": "Pool de conexiones por request"
     },
 
     "designsystemet": {

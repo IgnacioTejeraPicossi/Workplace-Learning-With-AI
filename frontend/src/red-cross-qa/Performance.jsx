@@ -36,6 +36,10 @@ const ENONIC_CHECKS = [
   { key: 'checkBulkPublish',       icon: '📚' },
   { key: 'checkPartRender',        icon: '🧩' },
   { key: 'checkCacheInvalidation', icon: '♻️' },
+  // Phase H+ (Enonic skill 0.1.0) — three server-side perf checks added.
+  { key: 'checkRefreshStrategy',     icon: '🔄' },
+  { key: 'checkChangeDetectionPerf', icon: '⚖️' },
+  { key: 'checkConnectionPooling',   icon: '🪢' },
 ];
 const PRIORITY_COLOR = { high: '#dc2626', medium: '#f59e0b', low: '#10b981' };
 

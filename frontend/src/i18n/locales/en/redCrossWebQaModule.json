@@ -376,7 +376,10 @@
       "checkPublishLatency": "Publish ack latency",
       "checkBulkPublish": "Bulk publish UI block",
       "checkPartRender": "Part rendering / virtualization",
-      "checkCacheInvalidation": "Cache invalidation freshness"
+      "checkCacheInvalidation": "Cache invalidation freshness",
+      "checkRefreshStrategy": "ES refresh strategy",
+      "checkChangeDetectionPerf": "Change-detection GC pressure",
+      "checkConnectionPooling": "Connection pooling per request"
     },
 
     "designsystemet": {

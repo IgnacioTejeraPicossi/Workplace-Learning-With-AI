@@ -15,7 +15,7 @@ from backend.services.red_cross_qa import (
     run_accessibility_check, run_content_migration_audit,
     generate_loadster_script, run_loadster,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
-    analyze_api, generate_cms_test_cases,
+    analyze_api, generate_cms_test_cases, run_enonic_performance,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -335,6 +335,69 @@ async def main():
         f"[OK] Loadster run (campaign: avg {res['avg_response_ms']}ms, "
         f"p95 {res['p95_response_ms']}ms, hydration p95 {res['hydration_p95_ms']}ms, "
         f"err {res['error_rate_pct']}%)"
+    )
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-20) — Enonic performance report
+    # carries 3 new server-side checks, baseline-tracked hot queries,
+    # composite score, recommendations with automation_ref, cross_tool_refs.
+    perf1 = await run_enonic_performance("https://www.rodekors.no/", "test", "en")
+    assert perf1["status"] == "ok"
+    new_perf_checks = ("checkRefreshStrategy", "checkChangeDetectionPerf",
+                        "checkConnectionPooling")
+    for ck in new_perf_checks:
+        assert ck in perf1["checks"], f"Enonic perf missing new check: {ck}"
+    # Each new check carries the skill-citing note + a structured metric field.
+    rs = perf1["checks"]["checkRefreshStrategy"]
+    assert "refresh_count_per_import" in rs and "refresh_p95_ms" in rs, \
+        "checkRefreshStrategy missing structured metric fields"
+    assert "performance-patterns §3" in (rs.get("note") or "").lower() or \
+            "performance-patterns" in (rs.get("note") or ""), \
+        "checkRefreshStrategy note must cite the skill"
+    cdp = perf1["checks"]["checkChangeDetectionPerf"]
+    assert "records_audited" in cdp and "stringify_allocations" in cdp, \
+        "checkChangeDetectionPerf missing structured metric fields"
+    cp = perf1["checks"]["checkConnectionPooling"]
+    assert "connections_per_request_p95" in cp, \
+        "checkConnectionPooling missing structured metric field"
+    # composite_score is a real integer 0-100.
+    score = perf1.get("composite_score")
+    assert isinstance(score, int) and 0 <= score <= 100, \
+        f"composite_score should be 0-100 int, got {score!r}"
+    # cross_tool_refs has 5 entries (lighthouse, loadster, playwright, cypress, skill doc).
+    refs = perf1.get("cross_tool_refs") or {}
+    for k in ("lighthouse_endpoint", "loadster_endpoint", "playwright_spec",
+               "cypress_spec", "skill_doc"):
+        assert k in refs, f"perf cross_tool_refs missing key: {k}"
+    # hot_queries enriched with enonic_xp_pattern + baseline fields. First call
+    # seeds the baseline (p95_ms_previous=None or 0; delta_pct=0).
+    hot = perf1["hot_queries"]
+    for q in hot:
+        assert "p95_ms_previous" in q, "hot_query missing p95_ms_previous"
+        assert "delta_pct" in q, "hot_query missing delta_pct"
+    assert any(q.get("enonic_xp_pattern") for q in hot), \
+        "at least one hot_query must carry enonic_xp_pattern"
+    # Recommendations: at least 2 server-ops items + each has automation_ref.
+    recs = perf1["recommendations"]
+    server_ops = [r for r in recs if r.get("category") == "server-ops"]
+    assert len(server_ops) >= 2, \
+        f"expected ≥2 server-ops recommendations, got {len(server_ops)}"
+    for r in recs:
+        assert "automation_ref" in r and "enonic_xp_pattern" in r, \
+            f"recommendation missing automation_ref / enonic_xp_pattern: {r.get('title')}"
+
+    # Second call: baseline now seeded. Re-run with same hot_queries shape →
+    # delta_pct should be 0% (no change) for each query. Validates baseline path.
+    perf2 = await run_enonic_performance("https://www.rodekors.no/", "test", "en")
+    hot2 = perf2["hot_queries"]
+    deltas = [q.get("delta_pct") for q in hot2]
+    assert all(d == 0.0 for d in deltas), \
+        f"2nd call should show 0% delta on identical p95s, got {deltas}"
+    assert all(q.get("p95_ms_previous") for q in hot2), \
+        "2nd call should populate p95_ms_previous from baseline"
+    print(
+        f"[OK] Enonic perf Phase H+ "
+        f"(3 new server-side checks all skill-cited, composite_score={score}/100, "
+        f"{len(server_ops)} server-ops recommendations, baseline diff={deltas})"
     )
 
     # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)
