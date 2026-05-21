@@ -16,6 +16,7 @@ from backend.services.red_cross_qa import (
     generate_loadster_script, run_loadster,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
     analyze_api, generate_cms_test_cases, run_enonic_performance, run_designsystemet_audit,
+    run_role_matrix_audit,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -456,6 +457,82 @@ async def main():
         f"(3 new DS+Enonic checks, compliance_score={ds1['compliance_score']}/100 "
         f"(delta {ds1['delta_pct']}%), {len(skill_cited_recs)} skill-cited recommendations, "
         f"{len(sb_refs)} deviations cross-ref Playwright Storybook spec)"
+    )
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — Role Matrix audit carries
+    # 3 new skill-aligned checks, 2 new repository-level matrix rows,
+    # violations + test_cases with cross-refs, matrix_drift baseline,
+    # 2 skill-cited recommendations, cross_tool_refs.
+    # Use a distinct environment name so the matrix drift baseline starts fresh
+    # (avoids cross-test pollution if other suites also call run_role_matrix_audit).
+    rm1 = await run_role_matrix_audit("test-h-plus-rm", "en")
+    assert rm1["status"] == "ok"
+    new_rm_checks = ("checkRepositoryAcl", "checkNoQLInjectionInRoleQueries",
+                      "checkRoleCacheStaleness")
+    for ck in new_rm_checks:
+        assert ck in rm1["checks"], f"Role matrix missing new check: {ck}"
+    # Each new check has its structured metric fields.
+    repo_acl = rm1["checks"]["checkRepositoryAcl"]
+    assert "repos_audited" in repo_acl and "repos_with_overpermissive_acl" in repo_acl
+    noql = rm1["checks"]["checkNoQLInjectionInRoleQueries"]
+    assert "queries_audited" in noql and "unsanitized_queries" in noql
+    cache = rm1["checks"]["checkRoleCacheStaleness"]
+    assert "p95_propagation_seconds" in cache
+    # Notes cite the skill.
+    for ck, expected_ref in (
+        ("checkRepositoryAcl", "security-patterns §2"),
+        ("checkNoQLInjectionInRoleQueries", "security-patterns §1"),
+        ("checkRoleCacheStaleness", "reliability-patterns §4"),
+    ):
+        note = (rm1["checks"][ck].get("note") or "").lower()
+        assert expected_ref.lower() in note, \
+            f"{ck} note must cite {expected_ref!r}: got {note[:120]!r}"
+    # Matrix now includes 2 repository-level rows.
+    matrix_roles = [(r.get("role"), r.get("scope")) for r in rm1["matrix"]]
+    assert any("repository.writer" in (r or "") for r, _ in matrix_roles), \
+        "matrix must include repository.writer row"
+    assert any(r == "system.authenticated" for r, _ in matrix_roles), \
+        "matrix must include system.authenticated row"
+    # Violations carry enonic_xp_pattern (4 expected: 2 original + 2 new).
+    violations_rm = rm1["violations"]
+    skill_keyed_violations = [v for v in violations_rm if v.get("enonic_xp_pattern")]
+    assert len(skill_keyed_violations) >= 4, \
+        f"expected ≥4 violations with enonic_xp_pattern, got {len(skill_keyed_violations)}"
+    # Test cases carry automation_ref; at least one references Playwright cms-preview.
+    test_cases_rm = rm1["test_cases"]
+    assert all("automation_ref" in tc for tc in test_cases_rm), \
+        "all role matrix test_cases must carry automation_ref"
+    cms_preview_refs = [tc for tc in test_cases_rm
+                         if tc.get("automation_ref") == "playwright:cms-preview.spec.ts"]
+    assert cms_preview_refs, \
+        "expected at least one test_case cross-ref to playwright:cms-preview.spec.ts"
+    # Recommendations: 2 skill-cited entries.
+    rm_recs = rm1.get("recommendations") or []
+    skill_cited_rm_recs = [r for r in rm_recs if r.get("enonic_xp_pattern")]
+    assert len(skill_cited_rm_recs) >= 2, \
+        f"expected ≥2 skill-cited recommendations, got {len(skill_cited_rm_recs)}"
+    # matrix_drift on first call = baseline seeded.
+    drift1 = rm1.get("matrix_drift") or {}
+    assert drift1.get("added_rows") == 0 and drift1.get("removed_rows") == 0 \
+            and drift1.get("changed_rows") == 0, \
+        f"first call should report zero drift (baseline seed), got {drift1}"
+    # cross_tool_refs has 3 entries.
+    rm_refs = rm1.get("cross_tool_refs") or {}
+    for k in ("playwright_spec", "cypress_spec", "skill_doc"):
+        assert k in rm_refs, f"role matrix cross_tool_refs missing key: {k}"
+
+    # Second call: baseline now seeded; identical matrix → still zero drift.
+    rm2 = await run_role_matrix_audit("test-h-plus-rm", "en")
+    drift2 = rm2.get("matrix_drift") or {}
+    assert drift2.get("added_rows") == 0 and drift2.get("removed_rows") == 0 \
+            and drift2.get("changed_rows") == 0, \
+        f"2nd call with identical matrix should be zero drift, got {drift2}"
+    print(
+        f"[OK] Role Matrix Phase H+ "
+        f"({len(new_rm_checks)} new checks all skill-cited, "
+        f"{len(skill_keyed_violations)} skill-keyed violations, "
+        f"{len(cms_preview_refs)} test_case cross-ref Playwright cms-preview, "
+        f"baseline drift {drift1.get('added_rows')}/{drift1.get('removed_rows')}/{drift1.get('changed_rows')})"
     )
 
     # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)

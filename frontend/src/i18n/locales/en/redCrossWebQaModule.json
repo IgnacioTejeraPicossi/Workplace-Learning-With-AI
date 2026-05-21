@@ -429,7 +429,10 @@
       "checkAuditLog": "Audit log per action",
       "checkSessionExpiry": "Session expiry & re-auth",
       "checkPrivilegeEscalation": "Privilege escalation",
-      "checkApiAuthZ": "API-level authorization"
+      "checkApiAuthZ": "API-level authorization",
+      "checkRepositoryAcl": "Repository ACL audit",
+      "checkNoQLInjectionInRoleQueries": "NoQL injection in role queries",
+      "checkRoleCacheStaleness": "Role-change cache staleness"
     },
 
     "stressTest": {

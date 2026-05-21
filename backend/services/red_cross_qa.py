@@ -3690,14 +3690,100 @@ async def run_designsystemet_audit(url: str, environment: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 9f — Role Permissions Matrix
 # ═══════════════════════════════════════════════════════════════════
+# Phase H+ (Enonic skill 0.1.0, 2026-05-21) — in-memory baseline for role
+# matrix drift tracking. Keyed by environment; value is a set of normalized
+# matrix-row signatures (role|scope|read|edit|publish|delete). First run
+# seeds the baseline; subsequent runs report added / removed / changed rows.
+_ROLE_MATRIX_BASELINES: Dict[str, set] = {}
+
+
+def _row_signature(row: Dict[str, Any]) -> str:
+    """Stable signature of a matrix row for drift detection. Order-independent
+    on the action columns; ignores explanatory `note` field."""
+    return "|".join([
+        str(row.get("role") or ""),
+        str(row.get("scope") or ""),
+        str(row.get("read") or ""),
+        str(row.get("edit") or ""),
+        str(row.get("publish") or ""),
+        str(row.get("delete") or ""),
+    ])
+
+
+def _compute_matrix_drift(
+    matrix: List[Dict[str, Any]], environment: str,
+) -> Dict[str, Any]:
+    """Compare current matrix signatures vs the in-memory baseline.
+
+    Drift categories:
+      - added_rows:   signature present now but NOT in baseline
+      - removed_rows: signature in baseline but NOT now
+      - changed_rows: same (role, scope) but different action verdicts
+
+    First call seeds baseline and reports 0 drift. Subsequent calls diff
+    and refresh the baseline.
+    """
+    current_signatures = {_row_signature(r) for r in matrix}
+    current_by_role_scope = {(r.get("role"), r.get("scope")): _row_signature(r)
+                              for r in matrix}
+    baseline = _ROLE_MATRIX_BASELINES.get(environment)
+    if baseline is None:
+        _ROLE_MATRIX_BASELINES[environment] = current_signatures
+        return {"added_rows": 0, "removed_rows": 0, "changed_rows": 0,
+                "note": "First run on this environment — baseline seeded."}
+    added = current_signatures - baseline
+    removed = baseline - current_signatures
+    # Detect "changed" = same (role, scope) with different action verdicts.
+    # Both added and removed will contain this row; remove them from both sets
+    # and count once as "changed".
+    baseline_by_role_scope: Dict[Tuple[str, str], str] = {}
+    for sig in baseline:
+        parts = sig.split("|", 5)
+        if len(parts) >= 2:
+            baseline_by_role_scope[(parts[0], parts[1])] = sig
+    changed = 0
+    for (role, scope), cur_sig in list(current_by_role_scope.items()):
+        prev_sig = baseline_by_role_scope.get((role, scope))
+        if prev_sig is not None and prev_sig != cur_sig:
+            changed += 1
+            added.discard(cur_sig)
+            removed.discard(prev_sig)
+    _ROLE_MATRIX_BASELINES[environment] = current_signatures
+    return {
+        "added_rows":   len(added),
+        "removed_rows": len(removed),
+        "changed_rows": changed,
+        "note": (f"Drift since previous run: +{len(added)} new role/scope, "
+                  f"-{len(removed)} removed, {changed} verdict changes."),
+    }
+
+
 async def run_role_matrix_audit(environment: str,
                                 lang: str = "en") -> Dict[str, Any]:
     """Audit the 6 editorial roles × 4 actions × scope authorization matrix
-    on Enonic XP Content Studio. Mock-first."""
+    on Enonic XP Content Studio. Mock-first.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-21) additions:
+      - 3 new checks aligned with the skill:
+          checkRepositoryAcl              (security-patterns §2)
+          checkNoQLInjectionInRoleQueries (security-patterns §1)
+          checkRoleCacheStaleness         (reliability-patterns §4)
+      - 2 new matrix rows for repository-level principals that bypass
+        the editorial matrix entirely.
+      - Violations carry `enonic_xp_pattern` cross-refs.
+      - Test cases carry `automation_ref` cross-refs.
+      - 2 new skill-cited recommendations.
+      - `matrix_drift` block tracks added/removed/changed rows between runs.
+      - Top-level `cross_tool_refs` exposes related Playwright/Cypress specs
+        + the skill doc, so a single response is self-navigable.
+    """
     prompt = (
         f"Environment: {environment}\n"
         "Audit role × action × scope for the 6 editorial roles "
-        "(Administrator, Eier, Lokal eier, Redaktør, Lokal redaktør, Bidragsyter)."
+        "(Administrator, Eier, Lokal eier, Redaktør, Lokal redaktør, Bidragsyter) "
+        "PLUS repository-level principals (repository.writer, system.authenticated). "
+        "Include checks for repo ACL, NoQL injection in role-resolution queries, "
+        "role-change cache staleness."
     )
     raw = await _llm(prompt, ROLE_MATRIX_PROMPT, lang)
     parsed = _parse_json(raw or "") or {}
@@ -3721,6 +3807,18 @@ async def run_role_matrix_audit(environment: str,
          "read": "allow", "edit": "allow", "publish": "deny",  "delete": "deny"},
         {"role": "Bidragsyter",    "scope": "Published content",
          "read": "allow", "edit": "deny",  "publish": "deny",  "delete": "deny"},
+        # Phase H+ (Enonic skill 0.1.0) — 2 new rows for repository-level
+        # principals that operate OUTSIDE the editorial matrix. These bypass
+        # all 8 editorial checks; auditing their memberships quarterly is
+        # the only practical guard (security-patterns §2).
+        {"role": "repository.writer (NVA)", "scope": "NVA results repo",
+         "read": "allow", "edit": "allow", "publish": "n/a", "delete": "allow",
+         "note": ("Repository-level principal — bypasses editorial matrix. "
+                    "Audit memberships quarterly. security-patterns §2.")},
+        {"role": "system.authenticated", "scope": "Custom repos",
+         "read": "allow", "edit": "deny (target)", "publish": "n/a", "delete": "deny (target)",
+         "note": ("Should be READ-only on custom repos. Any CREATE/MODIFY/DELETE "
+                    "here is a finding — see checkRepositoryAcl. security-patterns §2.")},
     ]
 
     checks = parsed.get("checks") or {
@@ -3731,42 +3829,156 @@ async def run_role_matrix_audit(environment: str,
         "checkAuditLog":            {"status": "warn", "note": "Audit log missing user-agent + IP for delete events"},
         "checkSessionExpiry":       {"status": "pass", "note": "Editorial sessions expire after 8h inactivity"},
         "checkPrivilegeEscalation": {"status": "pass", "note": "Self-promotion blocked at API + UI layer"},
-        "checkApiAuthZ":            {"status": "warn", "note": "Direct Guillotine call bypasses some scope checks"},
+        # Phase H+: extended note with specific Guillotine probe guidance.
+        "checkApiAuthZ":            {"status": "warn", "note": (
+            "Direct Guillotine call bypasses some scope checks. Probe: as "
+            "Lokal redaktør for Oslo, POST a Guillotine mutation editing "
+            "/distrikt/bergen content — should 403. As Bidragsyter, POST a "
+            "publish mutation — should 403. Audit every Guillotine route "
+            "that mutates content."
+        )},
+        # Phase H+ (Enonic skill 0.1.0) — 3 new skill-aligned checks.
+        "checkRepositoryAcl": {"status": "warn",
+                                "repos_audited": 4,
+                                "repos_with_overpermissive_acl": 2, "note": (
+            "Audit ACL on every custom repo (NVA results, GraphQL settings, "
+            "custom import). `role:system.authenticated` MUST NOT have "
+            "CREATE/MODIFY/DELETE permissions — only READ. Found 2 of 4 repos "
+            "granting write to any authenticated user: bypasses the editorial "
+            "matrix entirely. Real anti-pattern from the xp-nva pilot review. "
+            "security-patterns §2."
+        )},
+        "checkNoQLInjectionInRoleQueries": {"status": "warn",
+                                              "queries_audited": 12,
+                                              "unsanitized_queries": 1, "note": (
+            "Probe role-resolution code for NoQL injection. Send a probe "
+            "principal name like \"oslo' OR _name = 'admin\" via Okta SCIM "
+            "provisioning. Expected: query rejects or escapes. Failure mode: "
+            "privileges elevated silently. 1 of 12 queries uses string "
+            "interpolation without escaping. security-patterns §1."
+        )},
+        "checkRoleCacheStaleness": {"status": "warn",
+                                     "p95_propagation_seconds": 480, "note": (
+            "Verify role-change propagation: revoke a user's role, then "
+            "attempt the previously-allowed action with their existing "
+            "session. Should now 403 within N seconds. Current behaviour: "
+            "revocation only takes effect on next login OR session expiry "
+            "(p95 ~480s = 8h). Consider session invalidation on role change. "
+            "reliability-patterns §4."
+        )},
     }
     violations = parsed.get("violations") or [
         {"severity": "high", "role": "Redaktør", "action": "delete",
          "scope": "Root node", "expected": "deny", "actual": "allow",
-         "fix_hint": "Add server-side guard on /content-api delete; UI hides button but API does not."},
+         "fix_hint": "Add server-side guard on /content-api delete; UI hides button but API does not.",
+         "enonic_xp_pattern": "security-patterns.md §2"},
         {"severity": "medium", "role": "Lokal redaktør", "action": "read",
          "scope": "Other district draft", "expected": "deny", "actual": "allow",
-         "fix_hint": "Drafts in other districts should be 403, currently 200."},
+         "fix_hint": "Drafts in other districts should be 403, currently 200.",
+         "enonic_xp_pattern": "security-patterns.md §2"},
+        # Phase H+ — 2 new violations keyed to the skill.
+        {"severity": "high", "role": "system.authenticated", "action": "edit",
+         "scope": "NVA results repo", "expected": "deny", "actual": "allow",
+         "fix_hint": ("Tighten repo ACL: remove CREATE/MODIFY/DELETE from "
+                       "`role:system.authenticated`. Only `role:system.admin` "
+                       "should write."),
+         "enonic_xp_pattern": "security-patterns.md §2 (Over-permissive repository ACL)"},
+        {"severity": "high", "role": "any-authenticated", "action": "elevate",
+         "scope": "Role-resolution query", "expected": "rejected",
+         "actual": "succeeds with crafted principal name",
+         "fix_hint": ("Escape single quotes in `getRolesForPrincipal(name)` or "
+                       "switch to DSL filter. Reject names containing `'`, `\\`, "
+                       "or NoQL operators at the provisioning layer."),
+         "enonic_xp_pattern": "security-patterns.md §1 (NoQL injection)"},
     ]
     test_cases = parsed.get("test_cases") or [
         {"role": "Lokal redaktør", "title": "Cannot edit content outside own district",
          "type": "automated", "tool": "playwright",
          "steps": ["Login as Oslo Lokal redaktør", "Navigate to /lokal/bergen/aktiviteter", "Attempt edit"],
-         "expected": "Edit button disabled or 403 from API"},
+         "expected": "Edit button disabled or 403 from API",
+         "automation_ref": "playwright:cms-preview.spec.ts"},
         {"role": "Bidragsyter", "title": "Cannot publish draft",
          "type": "automated", "tool": "playwright",
          "steps": ["Login as Bidragsyter", "Open own draft", "Attempt publish"],
-         "expected": "Publish button absent; direct POST returns 403"},
+         "expected": "Publish button absent; direct POST returns 403",
+         "automation_ref": "playwright:cms-preview.spec.ts"},
         {"role": "Eier", "title": "Can assign Lokal redaktør role to another user",
          "type": "manual", "tool": "manual",
          "steps": ["Login as Eier", "Open user admin", "Assign Lokal redaktør role"],
-         "expected": "Role assigned and visible in audit log"},
+         "expected": "Role assigned and visible in audit log",
+         "automation_ref": None},
+        # Phase H+ — 2 new test cases keyed to the skill.
+        {"role": "system.authenticated", "title": "Custom repo refuses write from any authenticated user",
+         "type": "automated", "tool": "playwright",
+         "steps": [
+             "Login as any non-admin authenticated user",
+             "POST a Guillotine mutation that creates a node under the NVA results repo",
+             "Verify response is 403 / unauthorized",
+         ],
+         "expected": "Repo ACL rejects the write; no node created.",
+         "automation_ref": "cypress:component-designsystemet.cy.ts"},
+        {"role": "any-authenticated", "title": "Role-resolution query rejects NoQL injection probe",
+         "type": "manual", "tool": "manual",
+         "steps": [
+             "Provision a test user via Okta SCIM with principal name containing a single quote",
+             "Trigger role resolution (login)",
+             "Inspect server log + query trace",
+         ],
+         "expected": ("Query escapes or rejects the malicious principal name. "
+                       "Server does NOT execute a wider query. User gets default role only."),
+         "automation_ref": None},
     ]
+
+    recommendations = parsed.get("recommendations") or [
+        # Phase H+ — 2 skill-cited recommendations.
+        {"title": "Audit custom repo ACLs quarterly",
+         "category": "repo-acl",
+         "description": (
+             "Schedule a quarterly review of every custom repository's ACL. "
+             "Verify `role:system.authenticated` has READ only; CREATE/MODIFY/"
+             "DELETE restricted to `role:system.admin` or named principals. "
+             "The xp-nva pilot review found this anti-pattern in 2 of 4 repos."
+         ),
+         "enonic_xp_pattern": "security-patterns.md §2"},
+        {"title": "Validate Okta → XP principal mapping after every Okta config change",
+         "category": "principal",
+         "description": (
+             "Add a CI test that creates a synthetic user in each Okta group, "
+             "triggers SCIM provisioning, and asserts the resulting XP principal "
+             "and roles match expectation. A silent regex update on the mapping "
+             "rule can put users in the wrong role (or no role at all)."
+         ),
+         "enonic_xp_pattern": "data-integrity-patterns.md §6"},
+    ]
+
+    # Phase H+ — matrix drift baseline tracking.
+    matrix_drift = _compute_matrix_drift(matrix, environment)
+
+    cross_tool_refs = {
+        "playwright_spec": "playwright:cms-preview.spec.ts (preview-mode authorization)",
+        "cypress_spec":    "cypress:component-designsystemet.cy.ts (Guillotine read-only enforcement)",
+        "skill_doc":       ".claude/skills/enonic-xp/references/security-patterns.md",
+    }
 
     statuses = [c.get("status") for c in checks.values()]
     overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
-    summary = f"Role matrix on {environment} — {len(matrix)} role/scope rows, {len(violations)} violations"
+    summary = (f"Role matrix on {environment} — {len(matrix)} role/scope rows, "
+               f"{len(violations)} violations, drift +{matrix_drift['added_rows']} "
+               f"/-{matrix_drift['removed_rows']} /Δ{matrix_drift['changed_rows']}")
 
     run = await _store_run("redcross-role-matrix", environment, overall, summary, {
         "matrix": matrix, "checks": checks,
         "violations": violations, "test_cases": test_cases,
+        "recommendations": recommendations,
+        "matrix_drift": matrix_drift,
+        "cross_tool_refs": cross_tool_refs,
         "artifacts": [{"name": "role-matrix.json", "type": "report"}],
     })
     return {"status": "ok", "matrix": matrix, "checks": checks,
             "violations": violations, "test_cases": test_cases,
+            "recommendations": recommendations,
+            "matrix_drift": matrix_drift,
+            "cross_tool_refs": cross_tool_refs,
             "run_id": run["run_id"], "lang": lang}
 
 

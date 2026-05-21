@@ -429,7 +429,10 @@
       "checkAuditLog": "Revisjonslogg per handling",
       "checkSessionExpiry": "Sesjons-utløp og re-auth",
       "checkPrivilegeEscalation": "Privilegie-eskalering",
-      "checkApiAuthZ": "API-nivå autorisasjon"
+      "checkApiAuthZ": "API-nivå autorisasjon",
+      "checkRepositoryAcl": "Repository-ACL revisjon",
+      "checkNoQLInjectionInRoleQueries": "NoQL-injeksjon i rolle-spørringer",
+      "checkRoleCacheStaleness": "Cache-utdaterthet ved rolle-endring"
     },
 
     "stressTest": {

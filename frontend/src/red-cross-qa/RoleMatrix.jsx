@@ -22,6 +22,11 @@ const CHECKS = [
   { key: 'checkSessionExpiry',       icon: '⏰' },
   { key: 'checkPrivilegeEscalation', icon: '⬆️' },
   { key: 'checkApiAuthZ',            icon: '🔌' },
+  // Phase H+ (Enonic skill 0.1.0) — three role-layer checks aligned with the
+  // skill's most-cited sections (security-patterns §2 + §1, reliability §4).
+  { key: 'checkRepositoryAcl',              icon: '🏰' },
+  { key: 'checkNoQLInjectionInRoleQueries', icon: '💉' },
+  { key: 'checkRoleCacheStaleness',         icon: '🕰️' },
 ];
 
 const STATUS_STYLES = {
