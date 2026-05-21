@@ -89,6 +89,26 @@ class Finding(BaseModel):
     evidence: List[str] = Field(default_factory=list)
     gdpr_article: Optional[str] = Field(default=None, alias="gdprArticle",
                                           description="GDPR article number if relevant (Art. 5, 9, 25, 30, 35...).")
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — two Optional traceability
+    # fields aligned with the rest of the Red Cross QA module (areas 4-12).
+    # Optional + default=None preserves backward compat: legacy findings
+    # persisted before Phase H+ simply have null values.
+    enonic_xp_pattern: Optional[str] = Field(
+        default=None, alias="enonicXpPattern",
+        description=(
+            "Reference to a section of `.claude/skills/enonic-xp/references/*.md` "
+            "that documents the root cause pattern. Optional. Example: "
+            "'security-patterns.md §1 (NoQL injection)'."
+        ),
+    )
+    automation_ref: Optional[str] = Field(
+        default=None, alias="automationRef",
+        description=(
+            "Cross-link to an existing Playwright / Cypress spec that exercises "
+            "this finding. Optional. Example: 'playwright:cms-preview.spec.ts' "
+            "or 'cypress:regression-donation.cy.ts'."
+        ),
+    )
     created_at: str = Field(default_factory=_now_iso, alias="createdAt")
     updated_at: str = Field(default_factory=_now_iso, alias="updatedAt")
 

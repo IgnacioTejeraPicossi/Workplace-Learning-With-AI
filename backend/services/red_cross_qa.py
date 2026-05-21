@@ -2857,6 +2857,18 @@ async def run_loadster(profile: str, scenarios: List[str], environment: str,
 # Tool 9 — Security & Privacy
 # ═══════════════════════════════════════════════════════════════════
 async def run_security_scan(environment: str, lang: str = "en") -> Dict[str, Any]:
+    """Phase A baseline security scan — 13 simple checks.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-21):
+      - 3 new skill-aligned checks (`checkNashornSafety`,
+        `checkResponseSizeLimit`, `checkRepositoryAcl`) covering gaps that
+        neither this legacy suite nor the Phase H workbench cover.
+      - Findings carry `enonic_xp_pattern` + `automation_ref` cross-refs
+        consistent with the rest of the module.
+      - Top-level `cross_tool_refs` points operators to the FULL Phase H
+        workbench (`/api/qa/security/*`) — this legacy suite is the gateway,
+        not the deep audit.
+    """
     checks = {
         "checkPersonalData":   {"status": "pass", "note": "No PII in CMS content samples"},
         "checkDataSeparation": {"status": "pass"},
@@ -2865,23 +2877,91 @@ async def run_security_scan(environment: str, lang: str = "en") -> Dict[str, Any
         "checkOwasp":          {"status": "pass"},
         "checkFormAbuse":      {"status": "pass"},
         "checkApiAbuse":       {"status": "pass"},
-        "checkRateLimit":      {"status": "warn", "note": "Donation API: 60 req/min — verify quota"},
+        "checkRateLimit":      {"status": "warn", "note": (
+            "Donation API: 60 req/min — verify quota. Also verify 429 carries "
+            "Retry-After AND APIM circuit-break activates under crisis VU "
+            "(reliability-patterns §6)."
+        )},
         "checkSecrets":        {"status": "pass"},
         "checkDeps":           {"status": "warn", "note": "2 transitive deps with known CVEs"},
         "checkLogging":        {"status": "pass"},
         "checkConsent":        {"status": "pass"},
         "checkGdpr":           {"status": "pass"},
+        # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — 3 new skill-aligned checks.
+        "checkNashornSafety":     {"status": "warn", "note": (
+            "Sweep server-side library code under lib/ for Nashorn-unsafe APIs "
+            "(Object.entries, Object.values, Array.from, Set, Map, "
+            "String.includes, String.startsWith). XP < 7.13 crashes at runtime "
+            "on these; XP 7.13+ with GraalVM is safer but defensive-write is "
+            "still recommended. Full matrix in "
+            ".claude/skills/enonic-xp/references/nashorn-compatibility.md."
+        )},
+        "checkResponseSizeLimit": {"status": "warn", "note": (
+            "Audit all httpClient.request(...) calls (NVA, APIM, Vipps, Okta, "
+            "Fundy). Each must enforce a body-size limit (e.g. 10 MB). Without "
+            "it, a malicious or buggy upstream can exhaust JVM heap via huge "
+            "responses. security-patterns §5."
+        )},
+        "checkRepositoryAcl":     {"status": "warn", "note": (
+            "Audit ACL on every custom repo (NVA results, GraphQL settings, "
+            "custom import repos). `role:system.authenticated` MUST NOT have "
+            "CREATE/MODIFY/DELETE — only READ. Write access at the repo layer "
+            "bypasses the editorial Role Matrix entirely. security-patterns §2. "
+            "Cross-ref: Role Matrix tab's checkRepositoryAcl."
+        )},
     }
     findings = [
         {"severity": "medium", "title": "Missing CSP report-uri",
-         "message": "Add CSP report-uri to capture violations in production"},
+         "message": "Add CSP report-uri to capture violations in production",
+         "enonic_xp_pattern": "security-patterns.md §3 (defense-in-depth XSS)",
+         "automation_ref": "playwright:cms-preview.spec.ts"},
         {"severity": "low", "title": "Outdated transitive dependency",
-         "message": "Update lodash >= 4.17.21"},
+         "message": "Update lodash >= 4.17.21",
+         "enonic_xp_pattern": "api-design-patterns.md §1",
+         "automation_ref": None},
+        # Phase H+ — 3 new findings keyed to the new checks.
+        {"severity": "medium", "title": "Nashorn-unsafe APIs in lib/ sources",
+         "message": ("Static sweep found Object.entries / Array.from / "
+                       "Set usage in 2 lib/ files. XP < 7.13 crashes on these "
+                       "at runtime; GraalVM 7.13+ is safer but rewrite "
+                       "recommended for portability."),
+         "enonic_xp_pattern": "nashorn-compatibility.md (full doc)",
+         "automation_ref": None},
+        {"severity": "medium", "title": "httpClient.request without body-size limit",
+         "message": ("NVA + APIM clients call httpClient.request(...) without "
+                       "an explicit max-body-size guard. A malicious or buggy "
+                       "upstream returning a 100 MB payload would exhaust the "
+                       "JVM heap. Add a 10 MB cap."),
+         "enonic_xp_pattern": "security-patterns.md §5 (Response size / SSRF)",
+         "automation_ref": None},
+        {"severity": "high", "title": "Overpermissive repository ACL on NVA results repo",
+         "message": ("`role:system.authenticated` is granted CREATE / MODIFY / "
+                       "DELETE on the NVA results custom repo. Any logged-in "
+                       "user — including external contributors — can mutate "
+                       "imported data. Restrict to `role:system.admin` for "
+                       "writes."),
+         "enonic_xp_pattern": "security-patterns.md §2 (Over-permissive repository ACL)",
+         "automation_ref": "cypress:component-designsystemet.cy.ts"},
     ]
+    # Phase H+ — cross_tool_refs so operators find the deep Phase H workbench
+    # AND the related Playwright/Cypress specs without having to remember the
+    # routing. The legacy suite is now a gateway, the workbench is the audit.
+    cross_tool_refs = {
+        "phase_h_workbench_scan":   "/api/qa/security/scan",
+        "phase_h_workbench_status": "/api/qa/security/status",
+        "phase_h_workbench_dpia":   "/api/qa/security/dpia",
+        "phase_h_workbench_env":    "/api/qa/security/environments",
+        "role_matrix_endpoint":     "/api/red-cross-qa/run-role-matrix",
+        "playwright_spec":          "playwright:cms-preview.spec.ts",
+        "cypress_spec":             "cypress:component-designsystemet.cy.ts",
+        "skill_doc":                ".claude/skills/enonic-xp/references/security-patterns.md",
+    }
     run = await _store_run("redcross-security-basic", environment, "warn",
                             "Security baseline scan",
-                            {"checks": checks, "findings": findings})
+                            {"checks": checks, "findings": findings,
+                             "cross_tool_refs": cross_tool_refs})
     return {"status": "ok", "checks": checks, "findings": findings,
+            "cross_tool_refs": cross_tool_refs,
             "run_id": run["run_id"]}
 
 

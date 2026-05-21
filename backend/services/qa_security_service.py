@@ -319,11 +319,79 @@ def _map_raw_findings_to_findings(
             "status": "open",
             "evidence": list(raw.get("evidence") or ([message] if message else [])),
             "gdpr_article": raw.get("gdpr_article"),
+            # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — Optional traceability
+            # fields. Routing helper populates them when the title/message
+            # matches a known skill pattern; otherwise null preserves legacy.
+            "enonic_xp_pattern": raw.get("enonic_xp_pattern")
+                                   or _suggest_enonic_xp_pattern(target_check_id, title, message),
+            "automation_ref": raw.get("automation_ref")
+                                or _suggest_automation_ref(target_check_id),
             "created_at": _now_iso(),
             "updated_at": _now_iso(),
         }
         out.append(finding)
     return out
+
+
+# Phase H+ (Enonic skill 0.1.0, 2026-05-21) — small routers that map a Phase H
+# finding to a skill section + an existing automation spec, so consumers can
+# follow the trail without reading prose. Optional everywhere; returns None
+# when no good match is found (legacy behaviour preserved).
+
+_ENONIC_XP_PATTERN_BY_CHECK: Dict[str, str] = {
+    "security_headers":     "security-patterns.md §3 (Widget / template XSS — defense-in-depth)",
+    "noql_injection":       "security-patterns.md §1 (NoQL injection)",
+    "auth":                 "security-patterns.md §2 (Over-permissive repository ACL)",
+    "rate_limit":           "reliability-patterns.md §6 (circuit breaker / cascading)",
+    "deps_vulnerabilities": "api-design-patterns.md §1 (Dead code / version drift)",
+    "secrets":              "security-patterns.md §5 (Response size limit / SSRF)",
+    "form_abuse":           "security-patterns.md §1 (Injection in form fields)",
+    "personal_data":        "data-integrity-patterns.md §3 (No runtime validation)",
+    "consent_cookies":      "data-integrity-patterns.md §3",
+    "dpia_processor_register": "code-review-checklist.md §I",
+    "dpia_sensitive_art9":  "code-review-checklist.md §I",
+    "ssrf":                 "security-patterns.md §5",
+    "nashorn_safety":       "nashorn-compatibility.md (full doc)",
+    "repository_acl":       "security-patterns.md §2",
+    "response_size_limit":  "security-patterns.md §5",
+}
+
+_AUTOMATION_REF_BY_CHECK: Dict[str, str] = {
+    "security_headers":     "playwright:cms-preview.spec.ts",
+    "noql_injection":       "cypress:component-designsystemet.cy.ts",
+    "form_abuse":           "cypress:regression-donation.cy.ts",
+    "consent_cookies":      "cypress:regression-donation.cy.ts",
+    "personal_data":        "playwright:cms-preview.spec.ts",
+    "repository_acl":       "cypress:component-designsystemet.cy.ts",
+}
+
+
+def _suggest_enonic_xp_pattern(check_id: str, title: str, message: str) -> Optional[str]:
+    """Best-effort mapping of a Phase H finding to the most-relevant skill
+    doc section. Returns None when no clear match exists — caller leaves the
+    field null. Pure routing, no side effects."""
+    direct = _ENONIC_XP_PATTERN_BY_CHECK.get((check_id or "").lower())
+    if direct:
+        return direct
+    # Keyword fallback for unmapped check_ids.
+    text = f"{title} {message}".lower()
+    if "noql" in text or "injection" in text:
+        return "security-patterns.md §1"
+    if "csp" in text or "xss" in text or "header" in text:
+        return "security-patterns.md §3"
+    if "acl" in text or "permission" in text:
+        return "security-patterns.md §2"
+    if "size" in text or "ssrf" in text:
+        return "security-patterns.md §5"
+    if "nashorn" in text or "object.entries" in text:
+        return "nashorn-compatibility.md"
+    return None
+
+
+def _suggest_automation_ref(check_id: str) -> Optional[str]:
+    """Best-effort mapping of a Phase H finding to an existing Playwright /
+    Cypress spec generated elsewhere in the module."""
+    return _AUTOMATION_REF_BY_CHECK.get((check_id or "").lower())
 
 
 def _guess_check_for_finding(title: str, message: str,
@@ -441,6 +509,10 @@ async def perform_scan(environment: str = "test", lang: str = "en",
                 "status": "open",
                 "evidence": list(c["evidence"]),
                 "gdpr_article": None,
+                # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — synthesised
+                # findings get the same traceability fields.
+                "enonic_xp_pattern": _suggest_enonic_xp_pattern(c["id"], title, c["summary"] or ""),
+                "automation_ref": _suggest_automation_ref(c["id"]),
                 "created_at": _now_iso(),
                 "updated_at": _now_iso(),
             })

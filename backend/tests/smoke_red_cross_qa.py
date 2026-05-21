@@ -16,7 +16,7 @@ from backend.services.red_cross_qa import (
     generate_loadster_script, run_loadster, run_k6,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
     analyze_api, generate_cms_test_cases, run_enonic_performance, run_designsystemet_audit,
-    run_role_matrix_audit,
+    run_role_matrix_audit, run_security_scan,
     generate_nvda_script, run_wave_audit,
 )
 
@@ -620,6 +620,54 @@ async def main():
         f"k6 + Loadster cross_tool_refs present, "
         f"resilience_score baseline {resilience1['resilience_score']}/100 "
         f"(delta {resilience1['delta_pct']}%))"
+    )
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — Security & Privacy area:
+    # Legacy `run_security_scan` (Phase A baseline) now carries 3 new
+    # skill-aligned checks + enriched findings with enonic_xp_pattern +
+    # automation_ref + cross_tool_refs to the deep Phase H workbench.
+    sec = await run_security_scan("test-h-plus-sec", "en")
+    assert sec["status"] == "ok"
+    # 3 new checks must be present, each citing the skill.
+    new_sec_checks = ("checkNashornSafety", "checkResponseSizeLimit", "checkRepositoryAcl")
+    for ck in new_sec_checks:
+        assert ck in sec["checks"], f"run_security_scan missing new check: {ck}"
+    for ck, expected_ref in (
+        ("checkNashornSafety",     "nashorn-compatibility.md"),
+        ("checkResponseSizeLimit", "security-patterns §5"),
+        ("checkRepositoryAcl",     "security-patterns §2"),
+    ):
+        note = (sec["checks"][ck].get("note") or "").lower()
+        assert expected_ref.lower() in note, \
+            f"{ck} note must cite {expected_ref!r}: got {note[:120]!r}"
+    # Findings carry enonic_xp_pattern + automation_ref fields. Existing
+    # findings (CSP, lodash) keep their data + new fields populated.
+    findings_sec = sec["findings"]
+    # 2 original + 3 new = 5 minimum.
+    assert len(findings_sec) >= 5, \
+        f"expected ≥5 findings (2 original + 3 new), got {len(findings_sec)}"
+    for f in findings_sec:
+        assert "enonic_xp_pattern" in f, \
+            f"finding {f.get('title')!r} missing enonic_xp_pattern field"
+        assert "automation_ref" in f, \
+            f"finding {f.get('title')!r} missing automation_ref field"
+    # At least 3 findings cite skill sections.
+    skill_keyed_sec = [f for f in findings_sec if f.get("enonic_xp_pattern")]
+    assert len(skill_keyed_sec) >= 3, \
+        f"expected ≥3 findings citing skill, got {len(skill_keyed_sec)}"
+    # cross_tool_refs has the Phase H workbench endpoints + skill doc.
+    sec_refs = sec.get("cross_tool_refs") or {}
+    for k in ("phase_h_workbench_scan", "phase_h_workbench_dpia",
+                "role_matrix_endpoint", "skill_doc"):
+        assert k in sec_refs, f"security cross_tool_refs missing key: {k}"
+    # The phase_h_workbench_scan reference must point at the workbench router.
+    assert sec_refs["phase_h_workbench_scan"].startswith("/api/qa/security"), \
+        f"phase_h_workbench_scan should target Phase H router, got {sec_refs['phase_h_workbench_scan']!r}"
+    print(
+        f"[OK] Security & Privacy Phase H+ legacy bridge "
+        f"({len(new_sec_checks)} new skill-cited checks, "
+        f"{len(findings_sec)} findings ({len(skill_keyed_sec)} skill-keyed), "
+        f"cross_tool_refs to workbench + skill doc)"
     )
 
     # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)
