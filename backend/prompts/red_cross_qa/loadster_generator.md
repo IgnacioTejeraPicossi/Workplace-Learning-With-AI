@@ -81,6 +81,13 @@ Mongo collection as-is.
 - For soak profile (`profileSoak`), set `duration: "4h"` and enable memory
   tracking via Loadster's `metrics: { memoryDrift: true }` if supported
 
+## Enonic XP — Loadster scenario heuristics (Phase H+ — see `.claude/skills/enonic-xp/`)
+
+- **Direct Guillotine step** — add a `request` step (or `fetch` in browser) that POSTs `/api/graphql` with one of the 4 canonical operations (`GetDistrictPage`, `GetCampaignPage`, etc.) AFTER the initial navigation. This catches resolver cache-miss storms that pure browser nav doesn't surface (`performance-patterns.md §1`).
+- **APIM 429 awareness** — when an assertion fails because the response is 429, treat it as **expected behaviour** under crisis profile (circuit-break working). Mark the step `tolerate429: true` so the run doesn't fail on a healthy throttle (`reliability-patterns.md §6`).
+- **Concurrent publish step** — for `profileCampaign` / `profileCrisis`, include one `request` step that POSTs to a publish endpoint (or service URL). This exposes `lib-xp-cluster.executeFunction` lock contention when multiple editors publish simultaneously under load (`data-integrity-patterns.md §1`).
+- **Image URL probe** — add a step that fetches a known `/_/image/<id>:<hash>/scale-...` URL to verify the image service stays responsive under load. Image-scaling latency is a frequent silent regression (`performance-patterns.md §3` analog).
+
 ## What Loadster measures that k6 cannot
 
 - **`hydration_p95_ms`** — time from first paint to React hydration complete

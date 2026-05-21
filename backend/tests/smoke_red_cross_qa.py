@@ -13,7 +13,7 @@ from backend.services.red_cross_qa import (
     run_dpia_check, verify_definition_of_done, run_resilience_check,
     generate_uat_support, analyze_risk_matrix,
     run_accessibility_check, run_content_migration_audit,
-    generate_loadster_script, run_loadster,
+    generate_loadster_script, run_loadster, run_k6,
     generate_playwright_tests, generate_cypress_tests, export_postman_collection, run_graphql_introspection,
     analyze_api, generate_cms_test_cases, run_enonic_performance, run_designsystemet_audit,
     run_role_matrix_audit,
@@ -533,6 +533,93 @@ async def main():
         f"{len(skill_keyed_violations)} skill-keyed violations, "
         f"{len(cms_preview_refs)} test_case cross-ref Playwright cms-preview, "
         f"baseline drift {drift1.get('added_rows')}/{drift1.get('removed_rows')}/{drift1.get('changed_rows')})"
+    )
+
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — Stress Test triple:
+    # k6 + Loadster get cross_tool_refs; Resilience gets 3 new checks +
+    # enonic_xp_pattern on findings + recommendations + DST drift probe
+    # + cross_tool_refs + score baseline tracking.
+    res1 = await run_resilience_check(
+        "profileCrisis", ["scenarioDonation"], "test-h-plus-stress", "en"
+    )
+    assert res1["status"] == "ok"
+    resilience1 = res1["resilience"]
+    # 3 new checks must be present with structured metric fields.
+    new_res_checks = ("checkApimBackpressure", "checkGuillotineUnderLoad",
+                       "checkBackgroundJobsUnderLoad")
+    for ck in new_res_checks:
+        assert ck in resilience1["checks"], f"Resilience missing new check: {ck}"
+    apim = resilience1["checks"]["checkApimBackpressure"]
+    assert "circuit_break_triggered_at_vu" in apim and "apim_429_pct" in apim
+    guil = resilience1["checks"]["checkGuillotineUnderLoad"]
+    assert "p95_ms_at_peak" in guil and "resolver_errors_pct" in guil
+    bgj = resilience1["checks"]["checkBackgroundJobsUnderLoad"]
+    assert "concurrent_with_traffic" in bgj and "imports_failed_pct" in bgj
+    # Each check note must cite the skill.
+    for ck, expected_ref in (
+        ("checkApimBackpressure", "reliability-patterns §6"),
+        ("checkGuillotineUnderLoad", "performance-patterns §1"),
+        ("checkBackgroundJobsUnderLoad", "reliability-patterns §1"),
+    ):
+        note = (resilience1["checks"][ck].get("note") or "").lower()
+        assert expected_ref.lower() in note, \
+            f"{ck} note must cite {expected_ref!r}: got {note[:120]!r}"
+    # Findings carry enonic_xp_pattern.
+    findings_res = resilience1["findings"]
+    skill_keyed_findings = [f for f in findings_res if f.get("enonic_xp_pattern")]
+    assert len(skill_keyed_findings) >= 2, \
+        f"expected ≥2 findings with enonic_xp_pattern (crisis profile), got {len(skill_keyed_findings)}"
+    # DST drift probe present on crisis profile.
+    dst_findings = [f for f in findings_res if "dst" in (f.get("title") or "").lower()
+                     or "europe/oslo" in (f.get("fix_hint") or "").lower()]
+    assert dst_findings, "expected DST drift finding on profileCrisis"
+    # Recommendations: 2 skill-cited.
+    recommendations_res = resilience1.get("recommendations") or []
+    assert len(recommendations_res) >= 2, \
+        f"expected ≥2 recommendations, got {len(recommendations_res)}"
+    assert all(r.get("enonic_xp_pattern") for r in recommendations_res), \
+        "all resilience recommendations must carry enonic_xp_pattern"
+    # cross_tool_refs has 5 entries.
+    res_refs = resilience1.get("cross_tool_refs") or {}
+    for k in ("k6_endpoint", "loadster_endpoint", "playwright_spec",
+                "cypress_spec", "skill_doc"):
+        assert k in res_refs, f"resilience cross_tool_refs missing key: {k}"
+    # Baseline trend: first call delta = 0%.
+    assert resilience1["delta_pct"] == 0.0, \
+        f"first call should be 0% delta, got {resilience1['delta_pct']}"
+
+    # Second call with identical profile: baseline seeded → still 0% delta.
+    res2 = await run_resilience_check(
+        "profileCrisis", ["scenarioDonation"], "test-h-plus-stress", "en"
+    )
+    assert res2["resilience"]["resilience_score_previous"] == resilience1["resilience_score"]
+    assert res2["resilience"]["delta_pct"] == 0.0
+
+    # k6 + Loadster also expose cross_tool_refs + Enonic-specific signals.
+    k6_res = await run_k6("profileCampaign", ["scenarioDonation"], "test-h-plus-stress")
+    assert "guillotine_p95_ms" in k6_res["results"], \
+        "k6 results must include guillotine_p95_ms (Phase H+)"
+    assert "apim_429_pct" in k6_res["results"], \
+        "k6 results must include apim_429_pct (Phase H+)"
+    k6_refs = k6_res.get("cross_tool_refs") or {}
+    assert "skill_doc" in k6_refs and "resilience_endpoint" in k6_refs, \
+        "k6 cross_tool_refs must include skill_doc + resilience_endpoint"
+
+    loadster_res = await run_loadster(
+        "profileCampaign", ["scenarioDonation"], "test-h-plus-stress", "en"
+    )
+    loadster_refs = loadster_res.get("cross_tool_refs") or {}
+    assert "skill_doc" in loadster_refs and "k6_endpoint" in loadster_refs, \
+        "loadster cross_tool_refs must include skill_doc + k6_endpoint"
+
+    print(
+        f"[OK] Stress Test Phase H+ "
+        f"(3 new resilience checks all skill-cited, "
+        f"{len(skill_keyed_findings)} skill-keyed findings + DST probe, "
+        f"{len(recommendations_res)} skill-cited recommendations, "
+        f"k6 + Loadster cross_tool_refs present, "
+        f"resilience_score baseline {resilience1['resilience_score']}/100 "
+        f"(delta {resilience1['delta_pct']}%))"
     )
 
     # ── Phase F: Tom's tooling tips (Storybook + Postman + GraphQL introspection)

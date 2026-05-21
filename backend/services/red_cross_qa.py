@@ -2634,17 +2634,37 @@ async def generate_k6_script(profile: str, scenarios: List[str], environment: st
 
 
 async def run_k6(profile: str, scenarios: List[str], environment: str) -> Dict[str, Any]:
+    """Mock k6 protocol-level load run.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-21): results now include
+    `guillotine_p95_ms` (POST /api/graphql under load) and `apim_429_pct`
+    (circuit-break health) — the two Enonic-XP-specific signals that
+    pure HTTP-route stress misses. Plus top-level `cross_tool_refs` so
+    a single response is self-navigable.
+    """
     results = {
         "vus_max": 50, "duration": "14m",
         "http_req_duration_p95": "640ms",
         "http_req_failed": "0.4%",
         "checks_passed": "99.6%",
+        # Phase H+ — Enonic XP signals.
+        "guillotine_p95_ms": 820,
+        "apim_429_pct": 0.0,
+        "guillotine_resolver_errors_pct": 0.2,
     }
-    summary = f"k6 mock {profile} on {environment} — p95 640ms"
+    cross_tool_refs = {
+        "loadster_endpoint":   "/api/red-cross-qa/run-loadster",
+        "resilience_endpoint": "/api/red-cross-qa/run-resilience-check",
+        "perf_endpoint":       "/api/red-cross-qa/run-enonic-performance",
+        "skill_doc":           ".claude/skills/enonic-xp/references/reliability-patterns.md",
+    }
+    summary = f"k6 mock {profile} on {environment} — p95 640ms, guillotine p95 820ms"
     run = await _store_run("redcross-stress-campaign-peak", environment, "pass",
                             summary, {"profile": profile, "scenarios": scenarios,
-                                     "tool": "k6", "results": results})
-    return {"status": "ok", "tool": "k6", "results": results, "run_id": run["run_id"]}
+                                     "tool": "k6", "results": results,
+                                     "cross_tool_refs": cross_tool_refs})
+    return {"status": "ok", "tool": "k6", "results": results,
+            "cross_tool_refs": cross_tool_refs, "run_id": run["run_id"]}
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -2805,9 +2825,20 @@ async def run_loadster(profile: str, scenarios: List[str], environment: str,
                f"avg {r['avg_response_ms']}ms / p95 {r['p95_response_ms']}ms / "
                f"err {r['error_rate_pct']}% / engines {r['engines']}")
 
+    # Phase H+ (Enonic skill 0.1.0, 2026-05-21) — cross_tool_refs so a single
+    # Loadster response is self-navigable to k6 + Resilience + Playwright/Cypress.
+    cross_tool_refs = {
+        "k6_endpoint":         "/api/red-cross-qa/run-k6",
+        "resilience_endpoint": "/api/red-cross-qa/run-resilience-check",
+        "playwright_spec":     "playwright:cms-preview.spec.ts",
+        "cypress_spec":        "cypress:regression-donation.cy.ts (hydration)",
+        "skill_doc":           ".claude/skills/enonic-xp/references/reliability-patterns.md",
+    }
+
     run = await _store_run("redcross-stress-campaign-peak", environment, overall_status,
                            summary, {"profile": profile, "scenarios": scenarios,
-                                     "tool": "loadster", "results": r})
+                                     "tool": "loadster", "results": r,
+                                     "cross_tool_refs": cross_tool_refs})
 
     return {
         "status": "ok", "tool": "loadster",
@@ -2817,6 +2848,7 @@ async def run_loadster(profile: str, scenarios: List[str], environment: str,
                            "(p95 {h}ms) and SPA navigation (p95 {s}ms) under "
                            "load. k6 doesn't see these signals.").format(
                                h=r["hydration_p95_ms"], s=r["spa_nav_p95_ms"]),
+        "cross_tool_refs": cross_tool_refs,
         "run_id": run["run_id"],
     }
 
@@ -4504,10 +4536,28 @@ async def verify_definition_of_done(environment: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 14 — Resilience / lasttest (Teststrategi §6.1 distinguishes ytelse vs. resilience)
 # ═══════════════════════════════════════════════════════════════════
+# Phase H+ (Enonic skill 0.1.0, 2026-05-21) — in-memory baseline for the
+# Resilience score. Keyed by (environment, profile). First call seeds the
+# baseline; subsequent calls report delta_pct so trend changes are visible.
+_RESILIENCE_BASELINES: Dict[Tuple[str, str], int] = {}
+
+
 async def run_resilience_check(profile: str, scenarios: List[str],
                                 environment: str, lang: str = "en") -> Dict[str, Any]:
     """Resilience-focused k6 wrapper — emphasizes breakpoint, recovery, and soak
-    metrics that Trine treats as a separate quality dimension from ytelse."""
+    metrics that Trine treats as a separate quality dimension from ytelse.
+
+    Phase H+ (Enonic skill 0.1.0, 2026-05-21) additions:
+      - 3 new Enonic-XP-aligned checks:
+          checkApimBackpressure         (reliability-patterns §6)
+          checkGuillotineUnderLoad      (performance-patterns §1 + reliability §2)
+          checkBackgroundJobsUnderLoad  (reliability-patterns §1 + §2)
+      - Each existing finding carries `enonic_xp_pattern` skill citation.
+      - DST drift probe finding on crisis/soak profiles.
+      - `recommendations` array with 2 skill-cited entries.
+      - `cross_tool_refs` top-level (k6 + Loadster + Playwright + Cypress + skill doc).
+      - `resilience_score_previous` + `delta_pct` for trend tracking.
+    """
     # Reuse k6 mock results, but add resilience-specific metrics.
     base = await run_k6(profile, scenarios, environment)
     base_results = base.get("results") or {}
@@ -4543,6 +4593,8 @@ async def run_resilience_check(profile: str, scenarios: List[str],
             "title": "Error rate exceeds 5% at peak load",
             "message": f"At {breakpoint_vu} VU the error rate reached {error_rate_at_peak}%.",
             "fix_hint": "Add circuit breakers + autoscale APIM + tune Enonic publish queue.",
+            # Phase H+ — skill citation.
+            "enonic_xp_pattern": "reliability-patterns.md §6 (circuit breaker / cascading failures)",
         })
     if recovery_seconds > 30:
         findings.append({
@@ -4550,6 +4602,7 @@ async def run_resilience_check(profile: str, scenarios: List[str],
             "title": "Slow recovery after peak",
             "message": f"System took {recovery_seconds}s to return to baseline p95 after peak load.",
             "fix_hint": "Pre-warm caches; add stage scaling buffer; verify ISR queue drain.",
+            "enonic_xp_pattern": "reliability-patterns.md §1 (task progress + recovery)",
         })
     if memory_drift_pct > 1.0:
         findings.append({
@@ -4557,10 +4610,141 @@ async def run_resilience_check(profile: str, scenarios: List[str],
             "title": "Memory drift detected during soak",
             "message": f"Heap usage drifted +{memory_drift_pct}% over soak duration.",
             "fix_hint": "Enable heap dumps; check leaks in Guillotine resolver caches.",
+            "enonic_xp_pattern": "performance-patterns.md §4 + §5 (GC pressure + pooling)",
         })
+    # Phase H+ — DST drift probe on long-running profiles where a DST window
+    # could cross. crisis/soak imports running during the DST transition can
+    # fail silently if scheduler uses fixed GMT+1 instead of Europe/Oslo.
+    if profile in ("profileCrisis", "profileSoak"):
+        findings.append({
+            "severity": "low", "severity_dev": _severity_dev("low"), "category_ops": _category_ops("low"),
+            "title": "Scheduler timezone check (DST window)",
+            "message": ("Long-running profile may span a DST transition. "
+                          "Verify scheduled jobs honour Europe/Oslo (not GMT+1)."),
+            "fix_hint": "Use IANA timezone IDs ('Europe/Oslo') in upsertScheduledJob().",
+            "enonic_xp_pattern": "reliability-patterns.md §5 (Scheduler timezone)",
+        })
+
+    # Phase H+ (Enonic skill 0.1.0) — 3 new Enonic-XP-aligned checks. Each is
+    # mock-first: deterministic per-profile values that a future live probe
+    # would replace. Structured fields let the release_judge gate on them.
+    apim_429_pct = {
+        "profileSmoke": 0.0, "profileNormal": 0.0, "profileCampaign": 0.5,
+        "profileCrisis": 3.2, "profileSoak": 0.1,
+    }.get(profile, 0.0)
+    # Circuit-break health: at crisis VU we EXPECT to see some 429s (proof
+    # APIM is throttling). Zero 429 at crisis = cascade-failure risk → warn.
+    apim_status = "pass"
+    if profile == "profileCrisis" and apim_429_pct < 1.0:
+        apim_status = "fail"
+    elif profile in ("profileCampaign", "profileSoak") and apim_429_pct < 0.1:
+        apim_status = "warn"
+
+    guillotine_p95_at_peak_ms = {
+        "profileSmoke": 320, "profileNormal": 540, "profileCampaign": 1180,
+        "profileCrisis": 2400, "profileSoak": 720,
+    }.get(profile, 800)
+    guillotine_resolver_errors_pct = {
+        "profileSmoke": 0.0, "profileNormal": 0.1, "profileCampaign": 0.6,
+        "profileCrisis": 2.4, "profileSoak": 0.3,
+    }.get(profile, 0.5)
+    guillotine_status = "pass"
+    if guillotine_p95_at_peak_ms > 2000 or guillotine_resolver_errors_pct > 2.0:
+        guillotine_status = "fail"
+    elif guillotine_p95_at_peak_ms > 800 or guillotine_resolver_errors_pct > 0.5:
+        guillotine_status = "warn"
+
+    bg_jobs_concurrent = profile in ("profileCrisis", "profileSoak")
+    bg_imports_failed_pct = 1.2 if profile == "profileCrisis" else 0.0
+    bg_retries_observed = 4 if profile == "profileCrisis" else 1
+    bg_jobs_status = "pass"
+    if bg_jobs_concurrent and bg_imports_failed_pct > 0.5:
+        bg_jobs_status = "warn"
+
+    checks = {
+        "checkApimBackpressure": {
+            "status": apim_status,
+            "circuit_break_triggered_at_vu": int(breakpoint_vu * 0.8) if apim_429_pct > 0 else 0,
+            "apim_429_pct": apim_429_pct,
+            "note": (
+                f"APIM circuit-break health at {profile}. Found {apim_429_pct}% "
+                "of requests throttled (429 + Retry-After). At crisis VU we "
+                "EXPECT some 429s — they prove APIM is protecting the backend. "
+                "Zero 429 under crisis = cascade-failure risk (reliability-patterns §6)."
+            ),
+        },
+        "checkGuillotineUnderLoad": {
+            "status": guillotine_status,
+            "p95_ms_at_peak": guillotine_p95_at_peak_ms,
+            "resolver_errors_pct": guillotine_resolver_errors_pct,
+            "note": (
+                f"Direct Guillotine POST load at {profile}: p95 "
+                f"{guillotine_p95_at_peak_ms}ms, resolver errors "
+                f"{guillotine_resolver_errors_pct}%. Distinct from HTML-route "
+                "load — probes resolver cache, N+1 amplification, depth-limit, "
+                "connection-pool exhaustion (performance-patterns §1 + "
+                "reliability-patterns §2)."
+            ),
+        },
+        "checkBackgroundJobsUnderLoad": {
+            "status": bg_jobs_status,
+            "concurrent_with_traffic": bg_jobs_concurrent,
+            "imports_failed_pct": bg_imports_failed_pct,
+            "retries_observed": bg_retries_observed,
+            "note": (
+                f"Scheduled NVA import + traffic concurrency probe ({profile}). "
+                f"Concurrent run: {bg_jobs_concurrent}. Imports failed: "
+                f"{bg_imports_failed_pct}%. Retries observed: {bg_retries_observed}. "
+                "Verify: (a) progress() visible in Content Studio, (b) 503 "
+                "retries with exponential backoff, (c) no orphan/duplicate "
+                "nodes after import (reliability-patterns §1 + §2)."
+            ),
+        },
+    }
+
+    # Phase H+ — 2 skill-cited recommendations.
+    recommendations = [
+        {"title": "Wire APIM circuit-break with Retry-After",
+         "category": "circuit-break",
+         "description": (
+             "Configure APIM rate-limit-by-key + circuit-breaker policies so that "
+             "when Enonic backend p95 exceeds a threshold, APIM returns 429 with "
+             "Retry-After. Without it, crisis traffic cascades to Enonic and "
+             "takes down the whole stack."
+         ),
+         "enonic_xp_pattern": "reliability-patterns.md §6"},
+        {"title": "Run scheduled imports out-of-band of traffic peaks",
+         "category": "background-jobs",
+         "description": (
+             "Either reschedule the nightly NVA import to a quiet window OR "
+             "guard the import task with a load-aware pause: if site traffic > "
+             "threshold, the task waits. Verify lib-xp-task.progress() reports "
+             "the wait so operators see why it's slow."
+         ),
+         "enonic_xp_pattern": "reliability-patterns.md §1 + §2"},
+    ]
+
+    # Phase H+ — baseline trend tracking.
+    baseline_key = (environment, profile)
+    previous_score = _RESILIENCE_BASELINES.get(baseline_key)
+    if previous_score is None or previous_score == 0:
+        score_delta_pct = 0.0
+    else:
+        score_delta_pct = round(((score - previous_score) / previous_score) * 100.0, 1)
+    _RESILIENCE_BASELINES[baseline_key] = score
+
+    cross_tool_refs = {
+        "k6_endpoint":         "/api/red-cross-qa/run-k6",
+        "loadster_endpoint":   "/api/red-cross-qa/run-loadster",
+        "playwright_spec":     "playwright:storybook.spec.ts (component perf under load)",
+        "cypress_spec":        "cypress:regression-donation.cy.ts (hydration under stress)",
+        "skill_doc":           ".claude/skills/enonic-xp/references/reliability-patterns.md",
+    }
 
     resilience = {
         "resilience_score": score,
+        "resilience_score_previous": previous_score,
+        "delta_pct": score_delta_pct,
         "overall_status": overall_status,
         "breakpoint_vu": breakpoint_vu,
         "recovery_seconds": recovery_seconds,
@@ -4569,7 +4753,10 @@ async def run_resilience_check(profile: str, scenarios: List[str],
         "k6_results": base_results,
         "scenarios_run": scenarios,
         "profile": profile,
+        "checks": checks,
         "findings": findings,
+        "recommendations": recommendations,
+        "cross_tool_refs": cross_tool_refs,
         "_distinction": (
             "Resilience handler om systemet *overlever* og *gjenoppretter*, "
             "ikke kun hvor raskt det svarer (det er ytelse / Lighthouse)."
@@ -4580,7 +4767,9 @@ async def run_resilience_check(profile: str, scenarios: List[str],
     }
 
     run = await _store_run("redcross-stress-campaign-peak", environment, overall_status,
-                           f"Resilience check — score {score}/100, breakpoint {breakpoint_vu} VU",
+                           (f"Resilience check — score {score}/100 "
+                            f"({'+' if score_delta_pct >= 0 else ''}{score_delta_pct}% vs prev), "
+                            f"breakpoint {breakpoint_vu} VU"),
                            resilience)
     return {"status": "ok", "resilience": resilience, "run_id": run["run_id"]}
 
