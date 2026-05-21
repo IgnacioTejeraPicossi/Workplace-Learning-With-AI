@@ -537,7 +537,7 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 
 **Shell**: `frontend/src/RedCrossWebQAAgent.jsx` — 20-tab horizontal nav, header with environment + execution-mode quick selectors, gradient red/rose/pink theme.
 
-**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **700 keys per locale** (after Phase H Pack 4.2), full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11). Phase F (27 keys). Phase G (29 keys). **Phase H · Pack 2 (82 keys)**: full Sikkerhet og personvern workbench labels under `securityPrivacy.*` — snapshot, runScan, statTotal/statOpenFindings, checksTitle/checksHint, scanType_*, category_*, detail* (Summary/Evidence/Recommendations/LinkedFindings), findingStatus_* (open/accepted_risk/fixed/verified), filter* (Status/ScanType/Category/FindingStatus/Severity), historyTitle/historyHint/trend* (Improving/Regressing/Flat), and full structured DPIA editor (`dpiaField_*` + `dpiaPlaceholder_*` for purpose, dataTypes, sensitiveData, storageLocation, accessRoles, retention, thirdParties, legalBasis, riskNotes, mitigations).
+**i18n**: 40+ top-level sections × 3 locales (EN / NO / ES), **721 keys per locale** (after Phase H+ Enonic-skill integration cycle, 1.15.0), full parity. Phase B added: `dpia:` (10 keys), `dod:` (15), `resilience:` (13), `uatSupport:` (22), `riskMatrix:` (24) + 2 tab labels. Phase C: `stakeholders:` (3), provenance + WCAG version (8). Phase D: Loadster tool selector (11). Phase F (27 keys). Phase G (29 keys). **Phase H · Pack 2 (82 keys)**: full Sikkerhet og personvern workbench labels under `securityPrivacy.*` — snapshot, runScan, statTotal/statOpenFindings, checksTitle/checksHint, scanType_*, category_*, detail* (Summary/Evidence/Recommendations/LinkedFindings), findingStatus_* (open/accepted_risk/fixed/verified), filter* (Status/ScanType/Category/FindingStatus/Severity), historyTitle/historyHint/trend* (Improving/Regressing/Flat), and full structured DPIA editor (`dpiaField_*` + `dpiaPlaceholder_*` for purpose, dataTypes, sensitiveData, storageLocation, accessRoles, retention, thirdParties, legalBasis, riskNotes, mitigations).
 
 **Critical constraints:**
 - Mock-first graceful degradation: every async function returns deterministic data when `ask_ai_unified` is unavailable — preserve this pattern
@@ -545,7 +545,10 @@ All 4 tabs fetch from backend with graceful fallback to static data if backend i
 - Backward compatibility: `TestPlanRequest` keeps `jira_epic` as deprecated alias of `ado_work_item`; MongoDB collection name `red_cross_qa_jira_dispatches_collection` deliberately retained to avoid DB migration
 - Trine's Teststrategi 30.3 alignment: every finding/work-item must carry **both** `severity_dev` (1-4, dev phase) **and** `category_ops` (A-C, post-handover contract phase) per §8.1
 - 11 quality gates rendered on the Dashboard: `gateAccessibility`, `gatePerformance`, `gateApi`, `gateSecurity`, `gateSeo`, `gateForms`, `gateCms`, `gateStress`, `gateMigration`, `gateDesignsystemet`, `gateRoleMatrix` — all keys present in EN/NO/ES i18n
-- Smoke test: `backend/tests/smoke_red_cross_qa.py` — validates settings shape, test plan with `test_level`, ADO bundle Sev/Kat annotation, Forms QA Fundy checks (≥9), sprint report narrative (validate via: `python -m backend.tests.smoke_red_cross_qa`)
+- Smoke test: `backend/tests/smoke_red_cross_qa.py` — **37 checks** after Phase H+ Enonic-skill integration cycle (1.15.0). Validates settings shape, test plan with `test_level` (incl. `static-review`), ADO bundle Sev/Kat annotation, Forms QA Fundy checks (≥9) + 3 new security checks + Nashorn static review, sprint report narrative, Migration Phase H+ (URL param drift / structured filter / stale-data), Accessibility Phase H+ (lang / HtmlArea / CMS UI), Performance Phase H+ (refresh / change-detection / pooling + composite score), Designsystemet Phase H+ (SSR hydration / package alignment / HtmlArea typography), Role Matrix Phase H+ (repository ACL / NoQL in role queries / cache staleness), Stress Test Phase H+ (APIM backpressure / Guillotine under load / background jobs + DST probe), Security & Privacy Phase H+ legacy bridge (Nashorn safety / response size / repo ACL). Run via: `python -m backend.tests.smoke_red_cross_qa`. See `docs/audits/red-cross-qa-enonic-xp-roundup.md` for the full retrospective.
+- **In-memory baselines** introduced in Phase H+ (5 dicts in `backend/services/red_cross_qa.py`): `_GRAPHQL_BASELINES` (schema drift, API & GraphQL area), `_PERF_HOT_QUERY_BASELINES` (hot-query p95 trend, Performance area), `_DS_COMPLIANCE_BASELINES` (Designsystemet score trend), `_ROLE_MATRIX_BASELINES` (role matrix drift), `_RESILIENCE_BASELINES` (resilience score trend). All evaporate on process restart — workshop/CI friendly. Mongo persistence is a documented follow-up.
+- **`cross_tool_refs` pattern**: 9 area responses carry a top-level `cross_tool_refs` dict making each result self-navigable to sibling endpoints + Playwright/Cypress specs + the relevant skill section.
+- **Phase H `Finding` schema**: as of 1.15.0 carries Optional `enonic_xp_pattern` + `automation_ref` fields (auto-populated by `_suggest_enonic_xp_pattern` + `_suggest_automation_ref` routers in `qa_security_service.py`). Backward compatible — legacy findings default to None.
 
 **Run / smoke commands:**
 ```bash
@@ -567,7 +570,9 @@ python -m backend.tests.smoke_qa_security
 #   $env:ADO_PAT = "<your-personal-access-token>"   # PowerShell
 #   export ADO_PAT="<your-personal-access-token>"    # bash
 
-# End-to-end smoke (settings shape, test plan, ADO bundle, Forms QA Fundy, sprint report)
+# End-to-end smoke — 37 checks after Phase H+ Enonic-skill integration (1.15.0).
+# Covers Phases A→G + 13 Phase H+ areas (skill-cited checks, baseline trackers,
+# cross_tool_refs, deterministic Playwright/Cypress specs).
 python -m backend.tests.smoke_red_cross_qa
 
 # Frontend production build

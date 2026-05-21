@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.0] - 2026-05-21
+
+### Added — Red Cross Web QA · Phase H+ : enonic-xp skill applied across 13 audit areas
+
+End-to-end integration of the `.claude/skills/enonic-xp/` knowledge base (0.1.0 → 0.2.0) into every area of the Red Cross Web QA Agent. The skill was built in earlier work from three pilot Enonic XP reviews (`xp-nva` × 2 + Cristin→NVA migration); this release applies its 7 reference documents (security / performance / reliability / api-design / data-integrity / nashorn-compatibility / code-review-checklist) to enrich the 13 audit suites of the module. All changes are additive and backward-compatible.
+
+**Per-area enrichments (summary)**
+
+| Area | Top-3 actions implemented | New checks | New i18n keys |
+|------|---------------------------|------------|---------------|
+| Test Plan | Enonic XP red flags block + `static-review` test level + extended mock fallback (NoQL probe, DST regression, static-review work items) | — | — |
+| Playwright | Storybook drift-guard + `cms-preview.spec.ts` template + `migrated-links.spec.ts` template | 3 deterministic specs | — |
+| Cypress | 3 deterministic templates: `component-designsystemet.cy.ts` (Guillotine stubbing) + `regression-donation.cy.ts` (cypress-axe + hydration + æøå) + `quick-debug.cy.ts` | 3 specs | — |
+| API & GraphQL | `checkInjection` + `checkIntrospectionDisabledInProd` + `checkDepthLimit`; `_GRAPHQL_BASELINES` for real schema-drift comparison; 3 Postman negative tests (400/401/429); Content-Type + responseSize budget | +3 | +3 |
+| CMS Quality | `CMS_QA_PROMPT` rewrite (5→60 lines); 14 deterministic test cases per area with `severity` + `enonic_xp_pattern` + `acceptance_criteria` + `automation_ref` | — | — |
+| Forms QA | `checkCsrf` + `checkInjectionInFormFields` + `checkServiceUrlGeneration` + `checkFundyOriginAllowed`; Beredskap critical-path resilience; Nashorn static-review test case; APIM prefill enriched (timeout + shape + retry) | +4 | +3 |
+| Content Migration | `checkUrlParameterConsistency` + `checkStructuredFilterPreserved` + `checkStaleDataLifecycle`; 3 new `broken_pages` issue types; `automation_ref` cross-refs to `playwright:migrated-links.spec.ts` | +3 | +3 |
+| Accessibility | `checkLangAttribute` + `checkHtmlAreaEditorialA11y` + `checkCmsEditorialUiA11y`; `check_notes` parallel dict with skill citations; 4 new Enonic-keyed violations; `cross_tool_refs` to NVDA + WAVE + Playwright + Cypress | +3 | +3 |
+| Performance (Enonic panel) | `checkRefreshStrategy` + `checkChangeDetectionPerf` + `checkConnectionPooling`; `_PERF_HOT_QUERY_BASELINES` for p95 degradation tracking; `composite_score` + `cross_tool_refs` | +3 | +3 |
+| Designsystemet | `checkDsSsrHydration` + `checkDsPackageVersionsAligned` + `checkDsHtmlAreaIntegration`; `_DS_COMPLIANCE_BASELINES` for `compliance_score` trend; 2 skill-cited recommendations | +3 | +3 |
+| Role Matrix | `checkRepositoryAcl` + `checkNoQLInjectionInRoleQueries` + `checkRoleCacheStaleness`; 2 new matrix rows for repository-level principals; `_ROLE_MATRIX_BASELINES` for matrix drift tracking | +3 | +3 |
+| Stress Test (k6 + Loadster + Resilience) | `checkApimBackpressure` + `checkGuillotineUnderLoad` + `checkBackgroundJobsUnderLoad`; DST drift probe on crisis/soak; `_RESILIENCE_BASELINES` for `resilience_score` trend; k6 + Loadster results expose Enonic-XP signals | +3 | — |
+| Security & Privacy | `checkNashornSafety` + `checkResponseSizeLimit` + `checkRepositoryAcl` in legacy `run_security_scan`; Phase H `Finding` schema gains Optional `enonic_xp_pattern` + `automation_ref`; routing helpers `_suggest_enonic_xp_pattern` + `_suggest_automation_ref` auto-populate from `check_id` | +3 | — |
+
+**Module-level state changes**
+
+- **i18n parity**: 696 → **721 keys × 3 locales** (EN/NO/ES) — strictly additive, full parity preserved.
+- **Smoke checks** (`backend/tests/smoke_red_cross_qa.py`): 20 → **37 checks**, all green.
+- **Phase H workbench smoke** (`backend/tests/smoke_qa_security.py`): 16/16 PASS unchanged (no regression from the `Finding` schema additions — Optional fields default to None).
+- **In-memory baselines** (new pattern, reused across 5 areas for trend tracking):
+  - `_GRAPHQL_BASELINES`         — schema drift (API & GraphQL)
+  - `_PERF_HOT_QUERY_BASELINES`  — hot query p95 degradation (Performance)
+  - `_DS_COMPLIANCE_BASELINES`   — Designsystemet compliance_score trend
+  - `_ROLE_MATRIX_BASELINES`     — Role Matrix drift (added/removed/changed rows)
+  - `_RESILIENCE_BASELINES`      — Resilience score trend
+  - (Phase H workbench already had `_GRAPHQL_BASELINES` baseline pattern; new areas mirror it.)
+
+**Cross-tool refs (new top-level field across 9 areas)**
+
+A `cross_tool_refs` object on every area response now makes the module self-navigable: a single audit result links to the related sibling endpoints, the Playwright/Cypress specs generated elsewhere, and the relevant skill section. Pattern: `playwright_spec`, `cypress_spec`, `skill_doc` plus area-specific keys (e.g. `nvda_script_endpoint`, `wave_audit_endpoint` for Accessibility; `lighthouse_endpoint`, `loadster_endpoint` for Performance; `phase_h_workbench_scan` for Security & Privacy legacy bridge).
+
+**Documentation**
+
+- New `docs/audits/red-cross-qa-enonic-xp-roundup.md` — consolidated audit retrospective with the priority matrix across all 13 areas, severity counts, smoke deltas and follow-up suggestions.
+- `.claude/skills/enonic-xp/SKILL.md` bumped to 0.2.0 with retro notes from the 13-area application.
+- `README.md` + `.claude/MODULES_REFERENCE.md` updated to reflect new counters.
+
+**Validation**: 37/37 `smoke_red_cross_qa` PASS · 16/16 `smoke_qa_security` PASS · 721 × 3 i18n parity holds.
+
+---
+
 ## [1.14.0] - 2026-05-15
 
 ### Added — Red Cross Web QA · Phase H Pack 4.1 + 4.2: precise scan diffs and real ADO dispatch
