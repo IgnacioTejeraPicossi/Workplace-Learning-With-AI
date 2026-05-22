@@ -88,6 +88,16 @@ red_cross_qa_reports_collection = database.get_collection("red_cross_qa_reports"
 homo_vs_ai_prompt_revisions_collection = database.get_collection("homo_vs_ai_prompt_revisions")
 homo_vs_ai_prompt_audit_collection = database.get_collection("homo_vs_ai_prompt_audit")
 
+# Option A — Log-only feedback (1.15.1, 2026-05-22). Persists every human
+# feedback note the workshop host writes, independent of whether it triggers
+# an Option B re-run or an Option C prompt-revision proposal. Used for
+# post-workshop analysis: which tasks attract the most critique, what
+# wording patterns recur, etc. Each document carries the task code, the
+# raw text, an ISO timestamp, the actor (workshop-host by default), the
+# context (free-text — e.g. "ephemeral-rerun" / "manual-note" / "proposal-trigger")
+# and a deterministic `entry_id` so duplicate-entry guards are possible.
+homo_vs_ai_feedback_log_collection = database.get_collection("homo_vs_ai_feedback_log")
+
 # QA Security & Privacy (Phase H / Pack 2) — backend-driven workbench for
 # the Sikkerhet og personvern tab. Three collections:
 #   • qa_security_scans     — one document per scan run (pass/warn/fail counts,

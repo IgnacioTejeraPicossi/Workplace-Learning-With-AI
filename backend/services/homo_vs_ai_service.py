@@ -317,6 +317,18 @@ async def run_challenge(
             "--- HUMAN IMPROVEMENT NOTES ---\n"
             f"{fb}"
         )
+        # Option A (1.15.1, 2026-05-22) — auto-log every Re-run-with-feedback
+        # invocation so the workshop export captures the full critique trail,
+        # even when the host never explicitly clicks "Save as note". Best-
+        # effort: any failure here MUST NOT block the re-run itself.
+        try:
+            await log_feedback_note(
+                task, fb,
+                context="ephemeral-rerun",
+                previous_ai_output=prev_ai,
+            )
+        except Exception:
+            pass
 
     user_prompt = spec["user_prefix"] + (user_input or "").strip()
 
@@ -916,4 +928,175 @@ async def judge_round(
         "raw": None,
         "istqb_anchors": judge_anchors,
         "istqb_rag": rag_meta,
+    }
+
+
+# ===========================================================================
+# Option A — Log-only feedback persistence (1.15.1, 2026-05-22)
+# ===========================================================================
+# Complements Option B (ephemeral re-run, already shipped) and Option C
+# (persistent prompt evolution / Phase E, already shipped). Option A captures
+# EVERY human-feedback note the workshop host writes — including ones that
+# never trigger a re-run nor a revision proposal — so post-workshop analysis
+# has the full picture.
+#
+# Storage: Mongo collection `homo_vs_ai_feedback_log_collection`. Falls back
+# to an in-memory list when Mongo is unavailable (workshop-demo friendly),
+# behind the same pattern used by `qa_security_repository.py`.
+# ---------------------------------------------------------------------------
+
+# In-memory fallback. Workshop demos without Mongo still get a working log
+# for the duration of the process. Reset on restart — by design (the export
+# endpoint encourages downloading the log at the end of the workshop).
+_FEEDBACK_LOG_MEM: List[Dict[str, Any]] = []
+_FEEDBACK_LOG_MEM_MAX = 5000  # circuit-break — don't bloat memory in long runs
+
+
+def _feedback_entry_id(task: str, text: str, timestamp_iso: str) -> str:
+    """Deterministic SHA-1-based id so the same (task, text, timestamp) tuple
+    de-duplicates if the caller retries. ~10 hex chars is enough collision
+    resistance for a workshop scale (<10k entries)."""
+    import hashlib
+    h = hashlib.sha1(
+        f"{task}|{(text or '').strip()}|{timestamp_iso}".encode("utf-8")
+    ).hexdigest()
+    return f"hva_fb_{h[:12]}"
+
+
+def _now_iso_z() -> str:
+    """UTC ISO-8601 with explicit Z suffix — same convention as the rest of
+    the AGI module (`prompt_evolution.py` etc.)."""
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+async def log_feedback_note(
+    task: str,
+    text: str,
+    *,
+    actor: str = "workshop-host",
+    context: str = "manual-note",
+    previous_ai_output: Optional[str] = None,
+    extra: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Persist a single feedback note to the log.
+
+    Parameters
+    ----------
+    task : str
+        Must be a known TASK_SPECS key (`scenarios`, `risk`, `ambiguities`,
+        `exploratory`, `followups`, `automation`, `testData`, `oracle`,
+        `triage`, `accessibility`) so the log stays consistent with the
+        rest of the module.
+    text : str
+        The raw feedback the human wrote. Trimmed; empty entries are
+        rejected with ValueError (we never log a blank note).
+    actor : str
+        Defaults to "workshop-host". Override when an SSO identity is
+        plumbed in later.
+    context : str
+        Free-text tag for analytics. Three canonical values used by the
+        current frontend:
+          - "manual-note"        — explicit Save-as-note button
+          - "ephemeral-rerun"    — auto-logged from a Re-run with feedback (Option B)
+          - "proposal-trigger"   — auto-logged when the host clicks "Propose revision" (Option C)
+        Other values are allowed; they fall through to the export as-is.
+    previous_ai_output : str | None
+        Optional snapshot of the AI's answer the human was critiquing.
+        Stored only when explicitly passed (export size budget).
+    extra : dict | None
+        Optional bag of additional metadata. Caller decides shape; the log
+        stores it as-is so future fields don't require schema changes.
+    """
+    if task not in TASK_SPECS:
+        raise ValueError(
+            f"Unknown task '{task}'. Expected one of: {list(TASK_SPECS.keys())}"
+        )
+    text_clean = (text or "").strip()
+    if not text_clean:
+        raise ValueError("Feedback text is empty — nothing to log.")
+    ts = _now_iso_z()
+    entry: Dict[str, Any] = {
+        "entry_id":    _feedback_entry_id(task, text_clean, ts),
+        "task":        task,
+        "text":        text_clean,
+        "timestamp":   ts,
+        "actor":       actor or "workshop-host",
+        "context":     context or "manual-note",
+    }
+    if previous_ai_output:
+        # Cap the snapshot to keep export sizes reasonable — full answers
+        # can run several thousand chars; 4 KB is enough for context.
+        entry["previous_ai_output"] = (previous_ai_output or "").strip()[:4000]
+    if extra and isinstance(extra, dict):
+        entry["extra"] = extra
+    try:
+        from backend.db import homo_vs_ai_feedback_log_collection
+        await homo_vs_ai_feedback_log_collection.insert_one(dict(entry))
+    except Exception:
+        # In-memory fallback. Trim from the head if we exceed the cap so
+        # long-running processes don't bloat. The export reads from BOTH
+        # Mongo and memory transparently (see export_feedback_log).
+        _FEEDBACK_LOG_MEM.append(dict(entry))
+        if len(_FEEDBACK_LOG_MEM) > _FEEDBACK_LOG_MEM_MAX:
+            del _FEEDBACK_LOG_MEM[:len(_FEEDBACK_LOG_MEM) - _FEEDBACK_LOG_MEM_MAX]
+    return entry
+
+
+async def export_feedback_log(
+    *,
+    task: Optional[str] = None,
+    since: Optional[str] = None,
+    limit: int = 1000,
+) -> Dict[str, Any]:
+    """Return all persisted feedback entries (Mongo + in-memory fallback),
+    newest first, optionally filtered by task code and `since` ISO timestamp.
+
+    The shape of the returned dict is stable so the frontend can render the
+    export inline OR save it to disk:
+        {
+          "status":    "ok",
+          "count":     <int>,
+          "filtered":  {"task": ..., "since": ...},
+          "generated_at": "<ISO Z>",
+          "entries":   [{ entry_id, task, text, timestamp, actor, context, ... }],
+        }
+    """
+    limit = max(1, min(int(limit or 1000), 5000))
+    out: List[Dict[str, Any]] = []
+    # 1. Read from Mongo (best source of truth).
+    try:
+        from backend.db import homo_vs_ai_feedback_log_collection
+        query: Dict[str, Any] = {}
+        if task:
+            query["task"] = task
+        if since:
+            query["timestamp"] = {"$gte": since}
+        cursor = homo_vs_ai_feedback_log_collection.find(query).sort(
+            "timestamp", -1
+        ).limit(limit)
+        async for doc in cursor:
+            doc.pop("_id", None)
+            out.append(doc)
+    except Exception:
+        pass
+    # 2. Top up with in-memory fallback entries that aren't in Mongo (when
+    # Mongo is unreachable). Newest first.
+    seen_ids = {e.get("entry_id") for e in out if e.get("entry_id")}
+    for entry in reversed(_FEEDBACK_LOG_MEM):
+        if entry.get("entry_id") in seen_ids:
+            continue
+        if task and entry.get("task") != task:
+            continue
+        if since and (entry.get("timestamp") or "") < since:
+            continue
+        out.append(dict(entry))
+        if len(out) >= limit:
+            break
+    return {
+        "status":       "ok",
+        "count":        len(out),
+        "filtered":     {"task": task, "since": since},
+        "generated_at": _now_iso_z(),
+        "entries":      out,
     }

@@ -18,6 +18,8 @@ from backend.services.homo_vs_ai_service import (
     judge_round,
     route_problem,
     run_challenge,
+    log_feedback_note,
+    export_feedback_log,
 )
 from backend.services.istqb_local_rag import istqb_rag_index_stats
 
@@ -263,3 +265,98 @@ async def judge_round_endpoint(body: JudgeRequest, request: Request):
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI judging failed: {e}")
+
+
+# --- Option A · Log-only feedback (1.15.1, 2026-05-22) ---------------------
+# Complements Option B (ephemeral re-run) and Option C (Phase E prompt
+# evolution). Persists every human feedback note for post-workshop analysis,
+# whether or not it triggers a re-run or a revision proposal.
+
+
+class FeedbackLogRequest(BaseModel):
+    task: TaskLiteral = Field(..., description="Which testing task the note refers to.")
+    text: str = Field(
+        ...,
+        min_length=1,
+        max_length=12_000,
+        description="The human's improvement note. Trimmed; empty values rejected.",
+    )
+    actor: Optional[str] = Field(
+        default="workshop-host",
+        description="Free-text actor identifier. Defaults to 'workshop-host'.",
+    )
+    context: Optional[str] = Field(
+        default="manual-note",
+        description=(
+            "Free-text tag for analytics. Canonical values: "
+            "'manual-note' (explicit Save), 'ephemeral-rerun' (auto-logged by "
+            "Re-run with feedback), 'proposal-trigger' (auto-logged when "
+            "Propose revision is clicked)."
+        ),
+    )
+    previous_ai_output: Optional[str] = Field(
+        default=None,
+        max_length=120_000,
+        description="Optional snapshot of the AI's answer the human was critiquing.",
+    )
+
+
+class FeedbackLogEntry(BaseModel):
+    entry_id: str
+    task: str
+    text: str
+    timestamp: str
+    actor: str
+    context: str
+    previous_ai_output: Optional[str] = None
+
+
+class FeedbackLogResponse(BaseModel):
+    status: Literal["ok"] = "ok"
+    entry: FeedbackLogEntry
+
+
+class FeedbackLogExportResponse(BaseModel):
+    status: Literal["ok"] = "ok"
+    count: int
+    filtered: dict
+    generated_at: str
+    entries: List[FeedbackLogEntry]
+
+
+@router.post("/feedback-log", response_model=FeedbackLogResponse)
+async def post_feedback_log(body: FeedbackLogRequest):
+    """Persist a single feedback note. Used by the 'Save as note' button in
+    the frontend and (transparently) by Re-run with feedback (auto-logged by
+    the service layer)."""
+    try:
+        entry = await log_feedback_note(
+            task=body.task,
+            text=body.text,
+            actor=body.actor or "workshop-host",
+            context=body.context or "manual-note",
+            previous_ai_output=body.previous_ai_output,
+        )
+        return FeedbackLogResponse(entry=FeedbackLogEntry(**entry))
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Feedback log persist failed: {e}")
+
+
+@router.get("/feedback-log/export", response_model=FeedbackLogExportResponse)
+async def get_feedback_log_export(
+    task: Optional[str] = None,
+    since: Optional[str] = None,
+    limit: int = 1000,
+):
+    """Export all persisted feedback notes, newest first. Filter by task or
+    by ISO `since` timestamp; cap at `limit` (default 1000, max 5000).
+
+    Designed to be hit by the workshop host at the end of a session — the
+    response is a single JSON document the host can save to disk for offline
+    analysis."""
+    try:
+        return await export_feedback_log(task=task, since=since, limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Feedback log export failed: {e}")

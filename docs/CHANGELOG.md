@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.1] - 2026-05-22
+
+### Added — AGI Hub · Homo Sapiens vs. KI i Test · Option A (log-only feedback) — closes the trilogy
+
+The "Future improvements" footer of the workshop tab listed three design flavours for the per-round feedback loop. Option B (ephemeral re-run) shipped with Pack 3; Option C (persistent prompt evolution) shipped with Phase E. **Option A (log-only feedback) was the only remaining gap** — feedback notes that didn't trigger a re-run nor a revision proposal were lost. This release closes the trilogy.
+
+**Backend**
+
+- `backend/db.py`: new collection `homo_vs_ai_feedback_log_collection` ("homo_vs_ai_feedback_log").
+- `backend/services/homo_vs_ai_service.py`:
+  - New `log_feedback_note(task, text, actor, context, previous_ai_output, extra)` — persists to Mongo with in-memory fallback (~5000 entry cap, sliding-window trim). Deterministic `entry_id` via SHA-1 of `task|text|timestamp` for de-dup.
+  - New `export_feedback_log(task, since, limit)` — returns newest-first entries from BOTH Mongo and the in-memory fallback, with task / since filters. Default cap 1000, max 5000.
+  - `run_challenge` now auto-logs every ephemeral re-run (`context="ephemeral-rerun"`) — best-effort, never blocks the re-run.
+- `backend/routers/homo_vs_ai.py`: 2 new routes added (5 → 7 total):
+  - `POST /api/agi/homo-vs-ai/feedback-log` — explicit log from "Save as note" button.
+  - `GET /api/agi/homo-vs-ai/feedback-log/export?task=&since=&limit=` — download for post-workshop analysis.
+
+**Frontend** (`frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`)
+
+- New "📝 Save as note" button beside Re-run with feedback + Propose revision. Captures the typed critique to the log without re-running the AI or proposing a revision. Useful when the host wants the note on record but neither B nor C is desired in the moment. Inline toast confirmation; clears on textarea edit.
+- Auto-log inside `proposeRevision()` — best-effort `context="proposal-trigger"` entry so every proposal moment is captured even if the LLM refuses.
+- New `FeedbackLogExportPanel` component near the bottom of the workshop tab (between Phase E governance and Future improvements). One-click JSON download via `Blob URL`; filename `workshop-feedback-log-<UTC>.json`. Surfaced with entry count + filename confirmation.
+- `frontend/src/api/agiApi.js`: `logHomoVsAiFeedback(...)` + `exportHomoVsAiFeedbackLog(...)` helpers.
+
+**i18n** — 9 new keys × 3 locales (EN / NO / ES) under `homoVsAi.feedbackLog.*`:
+- `saveBtn`, `saving`, `saved`, `saveTooltip`, `panelKicker`, `panelLead`, `exportBtn`, `exporting`, `exportedCount`
+
+Plus updates to `homoVsAi.future.lead` + `homoVsAi.future.ideas[0].status` + `homoVsAi.future.ideas[0].options[0]` to reflect the new shipped status of Option A.
+
+**Smoke** — new `backend/tests/smoke_feedback_log.py` (8 checks): log shape, auto-log shape, validation (empty text + unknown task rejected), export with task filter, router registration, newest-first ordering. All green.
+
+**Backward compatibility**: 100% additive. Existing flows unchanged. Mock-first: works without Mongo (in-memory fallback).
+
+**Validation**:
+- `python -m backend.tests.smoke_feedback_log` → 8/8 PASS
+- `python -m backend.tests.smoke_prompt_evolution` → 3/3 PASS (Phase E unchanged)
+- i18n parity within `homoVsAi.feedbackLog`: 9 keys × 3 locales identical
+
+**Future-improvements footer** now marks Option A as `shipped · 1.15.1`. The trilogy is complete.
+
+---
+
 ## [1.15.0] - 2026-05-21
 
 ### Added — Red Cross Web QA · Phase H+ : enonic-xp skill applied across 13 audit areas

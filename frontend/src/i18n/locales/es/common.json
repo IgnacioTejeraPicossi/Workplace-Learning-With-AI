@@ -1018,9 +1018,20 @@
         "showSamples": "Mostrar puntuación por muestra"
       }
     },
+    "feedbackLog": {
+      "saveBtn": "Guardar como nota",
+      "saving": "Guardando…",
+      "saved": "Anotado",
+      "saveTooltip": "Guarda esta crítica en el log de feedback del taller sin re-ejecutar la IA. Persiste para exportación post-taller.",
+      "panelKicker": "Log de feedback del taller",
+      "panelLead": "Descarga todas las notas de feedback capturadas durante el taller (guardados manuales + re-runs auto-logueados + disparadores de propuesta auto-logueados). Útil para análisis post-taller y como input para futuras propuestas de revisión.",
+      "exportBtn": "Exportar JSON",
+      "exporting": "Exportando…",
+      "exportedCount": "{{count}} entradas exportadas"
+    },
     "future": {
       "kicker": "Mejoras futuras",
-      "lead": "Los puntos antes aparcados (B + C abajo) ya están implementados; la fase E añade evolución persistente de prompts con panel de gobernanza humano-en-el-bucle. Las anclas A y esta nota siguen para quien mantenga el módulo.",
+      "lead": "Los tres bucles de feedback (A · solo log, B · efímero, C · evolución persistente del prompt) ya están implementados. La Opción A (1.15.1) cierra la trilogía persistiendo cada nota para análisis post-taller. Esta nota se mantiene como changelog histórico para quien mantenga el módulo.",
       "tradeoffPrefix": "Por qué se aplazó (histórico)",
       "ideas": [
         {

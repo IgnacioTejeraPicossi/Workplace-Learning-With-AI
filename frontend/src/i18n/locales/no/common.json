@@ -3041,9 +3041,20 @@
         "showSamples": "Vis per-eksempel-score"
       }
     },
+    "feedbackLog": {
+      "saveBtn": "Lagre som notat",
+      "saving": "Lagrer…",
+      "saved": "Notert",
+      "saveTooltip": "Lagre denne kritikken til workshop-tilbakemeldingsloggen uten å kjøre KI på nytt. Bevares for eksport etter workshop.",
+      "panelKicker": "Workshop-tilbakemeldingslogg",
+      "panelLead": "Last ned alle tilbakemeldinger fra workshopen (manuelle lagringer + auto-loggede re-runs + auto-loggede forslag-triggere). Nyttig for analyse etter workshop og som input til fremtidige revisjons-forslag.",
+      "exportBtn": "Eksporter JSON",
+      "exporting": "Eksporterer…",
+      "exportedCount": "{{count}} oppføringer eksportert"
+    },
     "future": {
       "kicker": "Framtidige forbedringer",
-      "lead": "Tidligere parkerte punkt (B + C under) er nå implementert; fase E legger til vedvarende prompt-evolusjon med menneske-i-løkken-styringspanel. Alternativ A (anchors) og denne loggen er bevart for forvaltere.",
+      "lead": "Alle tre tilbakemeldingsløyper (A · loggføring, B · efemær, C · vedvarende prompt-evolusjon) er nå implementert. Alternativ A (1.15.1) lukker trilogien ved å persistere hvert notat for analyse etter workshop. Denne loggen er bevart for forvaltere.",
       "tradeoffPrefix": "Hvorfor utsatt (historisk)",
       "ideas": [
         {

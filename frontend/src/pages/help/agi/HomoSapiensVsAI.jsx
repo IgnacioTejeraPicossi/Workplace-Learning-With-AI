@@ -26,6 +26,8 @@ import {
   // Phase E — Prompt Evolution governance
   proposePromptRevision, listPromptRevisions, approvePromptRevision,
   rejectPromptRevision, rollbackPromptRevision, runRegressionHarness,
+  // Option A — Log-only feedback (1.15.1)
+  logHomoVsAiFeedback, exportHomoVsAiFeedbackLog,
 } from '../../../api/agiApi';
 
 // ---------------------------------------------------------------------------
@@ -566,10 +568,53 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         actor: 'workshop-host',
       });
       setProposeResult(res);
+      // Option A (1.15.1) — also persist the feedback as a 'proposal-trigger'
+      // note so the workshop log captures the moment a revision was proposed.
+      // Best-effort: never block the proposal flow on this.
+      try {
+        await logHomoVsAiFeedback({
+          task,
+          text: feedbackText.trim(),
+          context: 'proposal-trigger',
+          previousAiOutput: aiOutput.trim(),
+        });
+      } catch (_) { /* ignore */ }
     } catch (e) {
       setProposeErr(String(e.message || e));
     } finally {
       setProposeLoading(false);
+    }
+  };
+
+  // Option A (1.15.1, 2026-05-22) — Save the typed feedback as a note
+  // without re-running the AI. Useful when the host wants to capture
+  // critique for post-workshop analysis but does NOT want to either
+  // burn a re-run on it OR escalate to a persistent revision proposal.
+  // Preserves the textarea content so the host can still act on it
+  // later in the same round.
+  const [saveNoteLoading, setSaveNoteLoading] = useState(false);
+  const [saveNoteResult, setSaveNoteResult] = useState(null);
+  const [saveNoteErr, setSaveNoteErr] = useState(null);
+
+  const saveAsNote = async () => {
+    if (!feedbackText.trim()) return;
+    setSaveNoteLoading(true);
+    setSaveNoteErr(null);
+    setSaveNoteResult(null);
+    try {
+      const res = await logHomoVsAiFeedback({
+        task,
+        text: feedbackText.trim(),
+        context: 'manual-note',
+        previousAiOutput: aiOutput.trim() || null,
+      });
+      setSaveNoteResult(res);
+      // Note is logged; the textarea stays so the host can still
+      // re-run OR propose if they change their mind.
+    } catch (e) {
+      setSaveNoteErr(String(e.message || e));
+    } finally {
+      setSaveNoteLoading(false);
     }
   };
 
@@ -812,7 +857,14 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         </div>
         <textarea
           value={feedbackText}
-          onChange={e => setFeedbackText(e.target.value)}
+          onChange={e => {
+            setFeedbackText(e.target.value);
+            // Option A (1.15.1): clear stale "Noted" / error toasts when the
+            // host edits the critique — the saved note is older than what
+            // they're typing now.
+            if (saveNoteResult) setSaveNoteResult(null);
+            if (saveNoteErr) setSaveNoteErr(null);
+          }}
           rows={3}
           disabled={loading}
           placeholder={t('homoVsAi.demos.feedbackPlaceholder', {
@@ -889,6 +941,53 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
                   ? t('homoVsAi.evolve.proposing', { defaultValue: 'Proposing…' })
                   : t('homoVsAi.evolve.proposeBtn', { defaultValue: 'Propose persistent revision' })}
           </button>
+
+          {/* Option A (1.15.1) — Save the typed feedback as a note WITHOUT
+              re-running the AI or proposing a revision. Captures critique
+              for post-workshop analysis when neither B nor C is desired. */}
+          <button
+            type="button"
+            onClick={saveAsNote}
+            disabled={saveNoteLoading || !feedbackText.trim()}
+            title={t('homoVsAi.feedbackLog.saveTooltip', {
+              defaultValue: 'Save this critique to the workshop feedback log without re-running the AI. Persists for post-workshop export.',
+            })}
+            style={{
+              background: saveNoteLoading || !feedbackText.trim() ? '#f1f5f9' : '#ecfdf5',
+              color: saveNoteLoading || !feedbackText.trim() ? '#94a3b8' : '#047857',
+              border: '1px solid #6ee7b7',
+              padding: '6px 12px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: saveNoteLoading || !feedbackText.trim() ? 'not-allowed' : 'pointer',
+            }}
+          >
+            📝 {saveNoteLoading
+                  ? t('homoVsAi.feedbackLog.saving', { defaultValue: 'Saving…' })
+                  : t('homoVsAi.feedbackLog.saveBtn', { defaultValue: 'Save as note' })}
+          </button>
+
+          {/* Toast-like confirmation after a successful save. Auto-clears next
+              time the host edits the textarea (handled in onChange below). */}
+          {saveNoteResult && (
+            <span style={{
+              fontSize: 11, fontWeight: 600, color: '#047857',
+              background: '#dcfce7', border: '1px solid #6ee7b7',
+              padding: '3px 8px', borderRadius: 999,
+            }} title={saveNoteResult.entry?.entry_id}>
+              ✓ {t('homoVsAi.feedbackLog.saved', { defaultValue: 'Noted' })}
+            </span>
+          )}
+          {saveNoteErr && (
+            <span style={{
+              fontSize: 11, fontWeight: 600, color: '#b91c1c',
+              background: '#fee2e2', border: '1px solid #fecaca',
+              padding: '3px 8px', borderRadius: 999,
+            }}>
+              ⚠ {saveNoteErr}
+            </span>
+          )}
 
           {/* Badge: this round's answer used an evolved prompt (Phase E) */}
           {promptSource?.source === 'evolved' && (
@@ -2169,6 +2268,119 @@ function RegressionView({ reg, t }) {
 // during the live workshop. Each item carries enough context that whoever
 // picks it up later doesn't have to re-run the design discussion from zero.
 
+// ---------------------------------------------------------------------------
+// Option A · Workshop feedback log — export panel (1.15.1, 2026-05-22)
+// ---------------------------------------------------------------------------
+//
+// Tiny, opt-in panel that lets the workshop host download every captured
+// feedback note (manual saves + auto-logged Re-run-with-feedback + auto-logged
+// Propose-revision triggers). Surfaced near the bottom of the page so it does
+// not compete with the live workshop flow but is one click away when the
+// session ends.
+
+function FeedbackLogExportPanel({ t }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [summary, setSummary] = useState(null); // { count, generatedAt, filename }
+
+  const onExport = async () => {
+    setBusy(true); setErr(null);
+    try {
+      const data = await exportHomoVsAiFeedbackLog({ limit: 5000 });
+      // Save as workshop-feedback-log-<UTC>.json. The host downloads this
+      // and can hand it to whoever curates Option C revision proposals
+      // post-workshop.
+      const ts = (data.generated_at || new Date().toISOString()).replace(/[:.]/g, '-');
+      const filename = `workshop-feedback-log-${ts}.json`;
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setSummary({
+        count: data.count || 0,
+        generatedAt: data.generated_at,
+        filename,
+      });
+    } catch (e) {
+      setErr(String(e.message || e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={{
+      marginTop: 16,
+      background: '#ecfdf5',
+      border: '1px dashed #6ee7b7',
+      borderRadius: 10,
+      padding: '14px 18px',
+      color: '#065f46',
+    }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#047857',
+        textTransform: 'uppercase',
+      }}>
+        📝 {t('homoVsAi.feedbackLog.panelKicker', { defaultValue: 'Workshop feedback log' })}
+      </div>
+      <div style={{ fontSize: 12, marginTop: 4, color: '#047857' }}>
+        {t('homoVsAi.feedbackLog.panelLead', {
+          defaultValue: 'Download every feedback note captured during the workshop (manual saves + auto-logged re-runs + auto-logged proposal triggers). Useful for post-workshop analysis and as input to future revision proposals.',
+        })}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10, alignItems: 'center' }}>
+        <button
+          type="button"
+          onClick={onExport}
+          disabled={busy}
+          style={{
+            background: busy ? '#a7f3d0' : '#10b981',
+            color: 'white',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: 6,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: busy ? 'wait' : 'pointer',
+          }}
+        >
+          {busy
+            ? t('homoVsAi.feedbackLog.exporting', { defaultValue: 'Exporting…' })
+            : t('homoVsAi.feedbackLog.exportBtn', { defaultValue: 'Export JSON' })}
+        </button>
+        {summary && (
+          <span style={{
+            fontSize: 12, color: '#047857',
+            background: 'white', border: '1px solid #6ee7b7',
+            padding: '4px 10px', borderRadius: 999,
+          }}>
+            ✓ {t('homoVsAi.feedbackLog.exportedCount', {
+                  count: summary.count,
+                  defaultValue: '{{count}} entries exported',
+                })}
+            {' · '}<code style={{ fontSize: 11 }}>{summary.filename}</code>
+          </span>
+        )}
+        {err && (
+          <span style={{
+            fontSize: 12, color: '#b91c1c',
+            background: '#fef2f2', border: '1px solid #fecaca',
+            padding: '4px 10px', borderRadius: 999,
+          }}>
+            ⚠ {err}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 function FutureImprovementsNote({ t }) {
   const ideas = t('homoVsAi.future.ideas', { returnObjects: true, defaultValue: [] });
   const list = Array.isArray(ideas) ? ideas : [];
@@ -2276,6 +2488,7 @@ export default function HomoSapiensVsAI() {
       />
       <SpeakerCribSheet t={t} />
       <PromptEvolutionPanel t={t} />
+      <FeedbackLogExportPanel t={t} />
       <FutureImprovementsNote t={t} />
     </div>
   );

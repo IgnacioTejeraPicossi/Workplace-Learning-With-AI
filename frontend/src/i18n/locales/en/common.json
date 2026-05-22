@@ -2140,19 +2140,30 @@
         "showSamples": "Show per-sample scores"
       }
     },
+    "feedbackLog": {
+      "saveBtn": "Save as note",
+      "saving": "Saving…",
+      "saved": "Noted",
+      "saveTooltip": "Save this critique to the workshop feedback log without re-running the AI. Persists for post-workshop export.",
+      "panelKicker": "Workshop feedback log",
+      "panelLead": "Download every feedback note captured during the workshop (manual saves + auto-logged re-runs + auto-logged proposal triggers). Useful for post-workshop analysis and as input to future revision proposals.",
+      "exportBtn": "Export JSON",
+      "exporting": "Exporting…",
+      "exportedCount": "{{count}} entries exported"
+    },
     "future": {
       "kicker": "Future improvements",
-      "lead": "Previously parked items (B + C below) are now implemented; Phase E adds persistent prompt evolution with a human-in-the-loop governance panel. Option A anchors + this changelog remain for maintainers.",
+      "lead": "All three feedback loops (A · log-only, B · ephemeral, C · persistent prompt evolution) are now implemented. Option A (1.15.1) closes the trilogy by persisting every captured note for post-workshop analysis. This footer remains as the historical changelog for maintainers.",
       "tradeoffPrefix": "Why deferred (historical)",
       "ideas": [
         {
-          "status": "Shipped · Option B (ephemeral) + Option C (persistent prompt evolution, Phase E) — both feedback paths are now live.",
+          "status": "Shipped · A (log-only, 1.15.1) + B (ephemeral, Pack 3) + C (persistent prompt evolution, Phase E) — the full trilogy is now live.",
           "title": "Per-round feedback loop with AI self-improvement",
-          "summary": "A textarea under 'Who won this round?' where the human writes improvement advice for the AI. Three design flavours were considered, with different risk profiles:",
+          "summary": "A textarea under 'Who won this round?' where the human writes improvement advice for the AI. Three design flavours were considered, with different risk profiles — all three are now shipped:",
           "options": [
             {
-              "label": "A · Log only",
-              "text": "Store feedback as {task, text, timestamp} entries. No prompt change. Exported with the round log for manual review after the workshop. Lowest risk, lowest live-demo value."
+              "label": "A · Log only (shipped · 1.15.1)",
+              "text": "Persists every {task, text, timestamp, actor, context} entry into homo_vs_ai_feedback_log_collection. Auto-logged whenever Re-run with feedback (B) or Propose revision (C) fires; also explicitly via the 'Save as note' button. Exported as JSON via the panel at the bottom of the workshop tab for post-workshop analysis. Lowest risk, complements B + C as the safety net."
             },
             {
               "label": "B · Ephemeral injection (shipped)",

@@ -215,3 +215,44 @@ export function runRegressionHarness(revisionId, { maxSamples = 3 } = {}) {
 export function getActivePromptForTask(task) {
   return _peJson('GET', `/api/agi/homo-vs-ai/prompt-evolution/active/${encodeURIComponent(task)}`);
 }
+
+// ---------------------------------------------------------------------------
+// Option A — Log-only feedback (1.15.1, 2026-05-22)
+// ---------------------------------------------------------------------------
+// Persist a feedback note without triggering a re-run or a revision proposal.
+// Used by the "Save as note" button in HomoSapiensVsAI.jsx. Auto-logging from
+// Re-run with feedback (Option B) happens server-side; this endpoint is for
+// the explicit manual path AND for the export at the end of the workshop.
+
+export async function logHomoVsAiFeedback({ task, text, actor, context, previousAiOutput }) {
+  const body = { task, text };
+  if (actor)              body.actor = actor;
+  if (context)            body.context = context;
+  if (previousAiOutput)   body.previous_ai_output = String(previousAiOutput).trim();
+  const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/feedback-log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const data = await res.json(); detail = data.detail || ''; } catch (_) { /* ignore */ }
+    throw new Error(detail || `Feedback log save failed (${res.status})`);
+  }
+  return res.json();
+}
+
+export async function exportHomoVsAiFeedbackLog({ task, since, limit = 1000 } = {}) {
+  const qs = new URLSearchParams();
+  if (task)  qs.set('task', task);
+  if (since) qs.set('since', since);
+  if (limit) qs.set('limit', String(limit));
+  const url = `${API_BASE}/api/agi/homo-vs-ai/feedback-log/export?${qs.toString()}`;
+  const res = await fetchWithAuth(url);
+  if (!res.ok) {
+    let detail = '';
+    try { const data = await res.json(); detail = data.detail || ''; } catch (_) { /* ignore */ }
+    throw new Error(detail || `Feedback log export failed (${res.status})`);
+  }
+  return res.json();
+}
