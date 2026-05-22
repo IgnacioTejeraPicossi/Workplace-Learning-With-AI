@@ -157,6 +157,235 @@ def istqb_rag_index_stats() -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# 1.15.3 (2026-05-22) — Option 3 · Translate-then-BM25 for Norwegian queries
+# ---------------------------------------------------------------------------
+#
+# Diagnostic on 1.15.2 found a real retrieval gap: Norwegian conceptual
+# queries against English ISTQB syllabi were returning only Norwegian
+# glossary fragments (coincidental language overlap, not topic overlap).
+# Embedding-based RAG would fix this but at the cost of ~470 MB model,
+# new heavyweight dep, and loss of determinism — see CHANGELOG [1.15.3]
+# for the design decision.
+#
+# This module's compromise: a small NO→EN ISTQB terminology dictionary
+# applied to the query BEFORE BM25 tokenization. The original NO query
+# is concatenated with the EN translation so:
+#   - Original NO tokens still find Norwegian glossary matches (good
+#     when the user IS asking about a Norwegian term).
+#   - Translated EN tokens find the English syllabus chunks (the real
+#     testing guidance).
+# BM25 ranks both naturally and surfaces the best hits.
+#
+# Zero new dependencies. 100% deterministic. ~60 terms covers the
+# vocabulary the workshop's 10 tasks use.
+
+_NO_EN_ISTQB_TERMS: Dict[str, str] = {
+    # --- Core ISTQB testing terminology (Norwegian → English) ----------
+    "akseptansetest": "acceptance test",
+    "akseptansekriterier": "acceptance criteria",
+    "akseptansetesting": "acceptance testing",
+    "ekvivalensklasse": "equivalence partitioning",
+    "ekvivalensklasser": "equivalence partitioning",
+    "grenseverdianalyse": "boundary value analysis",
+    "grenseverdier": "boundary values",
+    "regresjonstest": "regression test",
+    "regresjonstesting": "regression testing",
+    "røyktest": "smoke test",
+    "røyktesting": "smoke testing",
+    "ytelsestest": "performance test",
+    "ytelsestesting": "performance testing",
+    "sikkerhetstest": "security test",
+    "sikkerhetstesting": "security testing",
+    "tilgjengelighet": "accessibility",
+    "bruksvennlighet": "usability",
+    "pålitelighet": "reliability",
+    "utforskende": "exploratory",
+    "utforskning": "exploration",
+    # --- Workshop's 10 testing tasks -----------------------------------
+    "scenarier": "scenarios",
+    "scenario": "scenario",
+    "risiko": "risk",
+    "risikoanalyse": "risk analysis",
+    "tvetydighet": "ambiguity",
+    "tvetydigheter": "ambiguities",
+    "oppfølging": "follow-up",
+    "oppfølgingsspørsmål": "follow-up questions",
+    "automatisering": "automation",
+    "testautomatisering": "test automation",
+    "testdata": "test data",
+    "orakel": "oracle",
+    "orakelproblem": "oracle problem",
+    "triage": "triage",
+    # --- Test design / process -----------------------------------------
+    "testdesign": "test design",
+    "testteknikker": "test techniques",
+    "testteknikk": "test technique",
+    "teknikker": "techniques",
+    "testtilfelle": "test case",
+    "testtilfeller": "test cases",
+    "testplan": "test plan",
+    "testleder": "test manager",
+    "testbasis": "test basis",
+    "testdekning": "test coverage",
+    "testresultater": "test results",
+    "testdrevet": "test-driven",
+    "testverktøy": "test tool",
+    "testscript": "test script",
+    "testskript": "test script",
+    "spesifikasjon": "specification",
+    "spesifikasjonsbasert": "specification-based",
+    "strukturbasert": "structure-based",
+    "erfaringsbasert": "experience-based",
+    "svartboks": "black-box",
+    "hvitboks": "white-box",
+    "glassboks": "glass-box",
+    # --- Defects / findings --------------------------------------------
+    "defekt": "defect",
+    "defekter": "defects",
+    "feil": "defect",
+    "avvik": "finding",
+    "krav": "requirements",
+    "uklare": "unclear",
+    "uklart": "unclear",
+    "klare": "clear",
+    "brukerhistorie": "user story",
+    "brukerhistorier": "user stories",
+    "gjennomgang": "review",
+    "inspeksjon": "inspection",
+    # --- Common workshop-context verbs / nouns -------------------------
+    "tester": "test",
+    "testing": "testing",
+    "prøving": "testing",
+    "betalingsflyt": "payment flow",
+    "betalingsprosess": "payment process",
+    # --- Question words / function words (lightly translated to keep BM25
+    # tokens close to the EN syllabus phrasing). We translate only the ones
+    # that meaningfully change the search; "the", "a" etc. are dropped by
+    # the min-length-2 filter in _tokenize so we don't list them here.
+    "hvordan": "how",
+    "hvilken": "which",
+    "hvilke": "which",
+    "hva": "what",
+    "ikke": "not",
+    "uten": "without",
+}
+
+# Function words that are uniquely Norwegian (vs. EN). 2+ hits in a query
+# is a strong signal it's Norwegian. The query may also contain æ/ø/å
+# which is an even stronger signal.
+_NO_FUNCTION_WORDS = frozenset({
+    "jeg", "du", "vi", "dere", "han", "hun", "den", "det",
+    "ikke", "er", "var", "har", "hadde", "skal", "vil", "kan",
+    "må", "bør", "med", "uten", "til", "fra", "av", "på",
+    "som", "når", "hvor", "hvordan", "hva", "hvilken", "hvilke",
+    "og", "eller", "men", "hvis", "fordi",
+    # Heuristic boost on ISTQB-Norwegian vocabulary
+    "krav", "feil", "defekt", "tester", "uklar", "uklare",
+})
+
+# 1.15.3 refinement — Norwegian function words / pronouns / copulas that
+# add no semantic value for ISTQB search but DO heavily match the
+# Norwegian glossary (because every glossary entry uses them). Dropping
+# them after translation cleans up the BM25 query so EN syllabi rise to
+# the top. Excludes terms already in _NO_EN_ISTQB_TERMS — those translate
+# to useful EN tokens (e.g. "hvordan" → "how").
+_NO_STOPWORDS_TO_DROP = frozenset({
+    "jeg", "du", "vi", "dere", "han", "hun", "den", "det",
+    "er", "var", "har", "hadde", "skal", "vil", "kan",
+    "må", "bør", "til", "fra", "av", "på",
+    "som", "når", "hvor",
+    "og", "eller", "men", "hvis", "fordi",
+    # Articles + prepositions
+    "en", "et", "med", "for", "om", "i",
+    "noe", "noen", "dette", "denne",
+})
+
+
+def _is_norwegian_query(text: str) -> bool:
+    """Detect Norwegian queries with three cheap signals:
+      1. æ/ø/å presence (strongest — Norwegian-specific characters)
+      2. ≥2 Norwegian function words ('jeg', 'med', 'hvordan', etc.)
+      3. ≥2 ISTQB-NO vocabulary hits (catches term-only queries like
+         'utforskende testing testdesign teknikker' which have no function
+         words but ARE clearly Norwegian).
+    False on plain English."""
+    if not text:
+        return False
+    text_lower = text.lower()
+    if any(ch in text_lower for ch in "æøå"):
+        return True
+    tokens = set(re.findall(r"\w+", text_lower, flags=re.UNICODE))
+    if sum(1 for w in _NO_FUNCTION_WORDS if w in tokens) >= 2:
+        return True
+    # Third signal — dictionary-vocabulary hits. Catches term-only queries.
+    if sum(1 for w in _NO_EN_ISTQB_TERMS if w in tokens) >= 2:
+        return True
+    return False
+
+
+def _translate_query_if_norwegian(query: str) -> Tuple[str, Dict[str, Any]]:
+    """If the query looks Norwegian, return its English-translated form
+    (in-place substitution of recognised ISTQB terms; untranslated tokens
+    kept verbatim).
+
+    1.15.3 (revised on first diagnostic) — initial design concatenated
+    original + translated, but the Norwegian-token doubling caused the
+    NO glossary to keep dominating BM25 results. The revised design
+    returns the in-place translated query ALONE, which gives BM25 a
+    cleaner EN-leaning token set without losing the untranslatable
+    tokens (proper nouns, numbers, etc.).
+
+    Returns ``(translated_query, metadata)`` where metadata explains
+    what happened (so callers can surface it for transparency):
+        {
+          "detected": "no" | "en",
+          "applied":  bool,           # whether translation actually fired
+          "translated_terms": [{"no": ..., "en": ...}, ...],
+        }
+
+    Pure routing, deterministic, zero deps.
+    """
+    if not _is_norwegian_query(query):
+        return query, {"detected": "en", "applied": False, "translated_terms": []}
+
+    translated_pairs: List[Dict[str, str]] = []
+    out_parts: List[str] = []
+    seen = set()
+    # Walk the original query token by token so we preserve word order +
+    # untranslatable tokens (proper nouns, numbers, code-like fragments).
+    for tok_match in re.finditer(r"\w+|[^\w\s]+|\s+", query, flags=re.UNICODE):
+        tok = tok_match.group(0)
+        key = tok.lower()
+        en = _NO_EN_ISTQB_TERMS.get(key)
+        if en:
+            out_parts.append(en)
+            if key not in seen:
+                translated_pairs.append({"no": key, "en": en})
+                seen.add(key)
+        elif key in _NO_STOPWORDS_TO_DROP:
+            # 1.15.3 refinement — drop pure NO function words after detecting
+            # the query is Norwegian. Keeps the BM25 search clean of tokens
+            # that would heavily match the NO glossary without adding any
+            # ISTQB semantic value. Whitespace handling: replace with a
+            # single space so word boundaries survive.
+            if tok.isspace():
+                out_parts.append(tok)
+            else:
+                out_parts.append(" ")
+        else:
+            # Keep original NO token in place — it may still help on niche
+            # glossary lookups. The translated terms now carry the main
+            # search weight.
+            out_parts.append(tok)
+    translated_query = "".join(out_parts).strip()
+    return translated_query or query.strip(), {
+        "detected": "no",
+        "applied": bool(translated_pairs),
+        "translated_terms": translated_pairs,
+    }
+
+
 def retrieve_chunks(query: str, top_k: int = 4, max_total_chars: int = 3200) -> List[Dict[str, Any]]:
     query = (query or "").strip()
     if not query:
@@ -164,7 +393,13 @@ def retrieve_chunks(query: str, top_k: int = 4, max_total_chars: int = 3200) -> 
     kind, engine, chunks = _ensure_index()
     if kind == "empty" or not chunks:
         return []
-    q_toks = _tokenize(query)
+
+    # 1.15.3 — translate Norwegian queries before tokenization. The combined
+    # query (original + EN translation of recognised terms) lets BM25 surface
+    # both NO glossary matches AND EN syllabus chunks.
+    search_query, _translation_meta = _translate_query_if_norwegian(query)
+
+    q_toks = _tokenize(search_query)
     if not q_toks:
         return []
 
@@ -227,6 +462,9 @@ def build_rag_context_block(
         "chunks_used": 0,
         "sources": [],
         "caveat": None,
+        # 1.15.3 — Surface the NO→EN translation when it fires so consumers
+        # can render a small "translated to match English syllabi" badge.
+        "query_translation": {"detected": "en", "applied": False, "translated_terms": []},
     }
     if not is_local_istqb_rag_provider(request_headers):
         return "", meta
@@ -237,6 +475,11 @@ def build_rag_context_block(
         "If the LLM stack falls back to a cloud provider, prompt text (including these excerpts) "
         "could leave your network — keep LM Studio running for strict on-prem."
     )
+    # 1.15.3 — peek at the translation outcome BEFORE calling retrieve_chunks,
+    # so the metadata is set whether retrieval finds anything or not.
+    _search_query, translation_meta = _translate_query_if_norwegian(query)
+    meta["query_translation"] = translation_meta
+
     chunks = retrieve_chunks(query, top_k=top_k, max_total_chars=max_total_chars)
     if not chunks:
         meta["mode"] = "local_rag_unavailable"

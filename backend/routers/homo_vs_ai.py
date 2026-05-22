@@ -8,7 +8,7 @@ Two endpoints, both delegating to backend.services.homo_vs_ai_service:
                       Section 03 in the frontend.
 """
 
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -70,6 +70,27 @@ class ChallengeRequest(BaseModel):
     )
 
 
+class IstqbQueryTranslation(BaseModel):
+    """1.15.3 — NO→EN translation outcome for the RAG query.
+
+    Surfaced so the frontend can render a small badge ('translated NO→EN
+    to match English ISTQB chunks') when the workshop host types a
+    Norwegian query and the BM25 search runs on a translated form."""
+
+    detected: Literal["en", "no"] = Field(
+        default="en",
+        description="Language inferred from the query. 'no' = Norwegian markers found.",
+    )
+    applied: bool = Field(
+        default=False,
+        description="Whether at least one term was actually translated.",
+    )
+    translated_terms: List[Dict[str, str]] = Field(
+        default_factory=list,
+        description="List of {no, en} pairs that were swapped — useful for transparency / debugging.",
+    )
+
+
 class IstqbRagMeta(BaseModel):
     """Metadata for optional local-only ISTQB PDF retrieval (BM25 over docs-ISTQB/)."""
 
@@ -80,6 +101,10 @@ class IstqbRagMeta(BaseModel):
     chunks_used: int = Field(default=0, ge=0)
     sources: List[str] = Field(default_factory=list, description="e.g. 'ISTQB_CTFL_Syllabus-v4.0.pdf p.12'")
     caveat: Optional[str] = Field(default=None, description="Licensing / fallback warning when relevant.")
+    query_translation: IstqbQueryTranslation = Field(
+        default_factory=IstqbQueryTranslation,
+        description="1.15.3 — NO→EN translation applied to the query before BM25 (when Norwegian detected).",
+    )
 
 
 class IstqbAnchor(BaseModel):

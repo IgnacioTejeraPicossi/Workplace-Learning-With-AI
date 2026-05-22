@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.3] - 2026-05-22
+
+### Added — AGI Hub · ISTQB local RAG · Option 3 (Translate-then-BM25) for Norwegian queries
+
+After 1.15.2 closed the A → C feedback bridge, a follow-up diagnostic exposed a separate gap: **Norwegian conceptual queries against English ISTQB syllabi were returning only Norwegian glossary fragments**, not the actual testing guidance. Workshop hosts (Norwegian-speaking) couldn't get useful RAG context out of the local PDF index without typing in English.
+
+Three options were considered (full notes in `docs/CHANGELOG.md` decisional history): pure embedding replacement, hybrid BM25 + embedding rerank, and translate-then-BM25. **Option 3 (translate-then-BM25) was chosen** because it solves the *measured* gap (NO query language mismatch) with zero new dependencies, full determinism, and ~80 lines of code. Pure embeddings would have added a ~470 MB multilingual sentence-transformers model, ~2 GB install footprint, and lost the deterministic-offline property the original design prioritised.
+
+**Backend** (`backend/services/istqb_local_rag.py`):
+- New `_NO_EN_ISTQB_TERMS` dictionary — **79 ISTQB Norwegian → English term mappings** covering the workshop's 10 tasks + core CTFL / CTAL / CT-AI vocabulary (acceptance test, boundary value analysis, equivalence partitioning, exploratory, risk analysis, ambiguity, oracle, …) + question words (hvordan → how, hva → what).
+- New `_NO_STOPWORDS_TO_DROP` set — **39 Norwegian function words / pronouns / copulas** dropped from the translated query so they don't pull the Norwegian glossary up in BM25 (`jeg`, `med`, `en`, `for`, etc.).
+- New `_is_norwegian_query(text)` — three-signal detection: (1) æ/ø/å presence, (2) ≥2 Norwegian function words, (3) ≥2 dictionary hits. The third signal catches term-only queries like `"utforskende testing testdesign teknikker"` which have no function words but ARE clearly Norwegian.
+- New `_translate_query_if_norwegian(query) → (translated_query, metadata)` — in-place token substitution + stopword filtering. Returns metadata so consumers can render a transparency badge.
+- `retrieve_chunks` calls the translator before tokenization.
+- `build_rag_context_block` surfaces `query_translation` in its metadata dict.
+
+**Router** (`backend/routers/homo_vs_ai.py`):
+- New `IstqbQueryTranslation` Pydantic model (`detected`, `applied`, `translated_terms`).
+- `IstqbRagMeta` extended with `query_translation` field. Default value backward-compatible (`detected="en", applied=false, translated_terms=[]`) — existing API consumers unaffected.
+
+**Smoke** — new `backend/tests/smoke_istqb_rag_translation.py` (6 checks):
+- Language detection across 8 cases (4 EN + 4 NO including term-only).
+- EN passthrough (no translation fires).
+- NO term-only translation (4 terms swapped, correct EN tokens).
+- NO full-sentence translation (stopwords dropped: `jeg`, `en`, `med` filtered).
+- Dictionary sanity (79 terms, 39 stopwords, no key overlaps).
+- `build_rag_context_block` surfaces `query_translation` metadata in both `anchors_only` and `local_rag` modes.
+
+**Validation** — diagnostic on 4 representative queries shows retrieval now lands on EN syllabi instead of NO glossary:
+
+| Query | Before 1.15.3 | After 1.15.3 |
+|------|---------------|--------------|
+| `"Hvordan tester jeg en betalingsflyt med uklare krav?"` | 3/3 NO glossary | 3/3 EN syllabi (Expert_TM + CTAL-TAE + CT-TAE) |
+| `"utforskende testing testdesign teknikker"` | 1/3 NO glossary, 2/3 coincidental EN matches | 3/3 EN syllabi (CTAL-TA Pairwise + CTFL-AT Agile + CTFL v4.0 Branch) |
+| `"risikoanalyse og tvetydigheter i akseptansetest"` | 3/3 NO glossary | 3/3 EN syllabi — incl. CTFL v4.0 §5.2.3 Product Risk Analysis (exact topic match) |
+| `"boundary value analysis test design technique"` (EN baseline) | 3/3 EN syllabi ✓ | 3/3 EN syllabi ✓ (no regression) |
+
+12 of 12 result chunks now correctly come from EN ISTQB syllabi for the three Norwegian queries.
+
+**All other smoke suites stay green**:
+- `smoke_prompt_evolution.py` → 3/3 PASS (Phase E unchanged)
+- `smoke_feedback_log.py` → 11/11 PASS (1.15.1 + 1.15.2 unchanged)
+- `smoke_red_cross_qa.py` → 37/37 PASS
+- `smoke_qa_security.py` → 16/16 PASS
+
+**Backward compatibility**: 100% additive. Existing EN queries pass through unchanged (no translation overhead — detection returns early). Existing API consumers see a new Optional field on `IstqbRagMeta` that defaults to a benign "en, not applied" state.
+
+**Why NOT embeddings (kept on the deferred list)**: The original "Future improvements" note said "Embedding-based RAG remains a possible upgrade; the current design favours fewer moving parts and a deterministic offline index." 1.15.3 chose to respect that decision — embedding-based hybrid retrieval would still help on the unsolved EN-paraphrase case (`"how do I test when requirements are vague?"`) but that gap is partially masked by the curated ISTQB anchors which fire on EVERY query regardless of provider. The workshop's Norwegian gap was the higher-leverage fix.
+
+---
+
 ## [1.15.2] - 2026-05-22
 
 ### Added — AGI Hub · Homo Sapiens vs. KI i Test · A → C bridge (promote log entries to Phase E proposals)

@@ -138,7 +138,8 @@
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_prompt_evolution)",
       "Bash(grep -n \"Future improvements\\\\|future-work\\\\|previously parked\\\\|shipped \\\\\\\\| Phase E\\\\|Phase F\" frontend/src/pages/help/agi/HomoSapiensVsAI.jsx)",
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_feedback_log)",
-      "Bash(PYTHONIOENCODING=utf-8 python -c \"from backend.app import app; print\\(' /homo-vs-ai/* routes:', sum\\(1 for r in app.routes if '/homo-vs-ai' in r.path\\)\\)\")"
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"from backend.app import app; print\\(' /homo-vs-ai/* routes:', sum\\(1 for r in app.routes if '/homo-vs-ai' in r.path\\)\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_istqb_rag_translation)"
     ]
   }
 }
