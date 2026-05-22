@@ -17,7 +17,7 @@
 | 11 | [Installing the App in the Cloud](#11-installing-the-app-in-the-cloud) | Active | None (smoke via endpoints) | Medium |
 | 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
-| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 8/8 prompt-evolution smoke | Low |
+| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
 
 ---
 
@@ -633,7 +633,30 @@ The LLM is explicitly instructed to **refuse** unsafe revisions (removes ISTQB a
 - `homo_vs_ai_prompt_revisions` — versioned prompt history (status: pending / active / rejected / superseded / refused)
 - `homo_vs_ai_prompt_audit` — append-only action log (actor, action, timestamp, detail)
 
-**i18n**: Full **EN / NO / ES** parity. `homoVsAi.*` block under each `common.json` (router, judge, scoreboard, future, istqb, demos.feedback*, **34 new `evolve.*` keys × 3 locales** for Phase E).
+**Option A · Feedback log (1.15.1, 2026-05-22) + A → C bridge (1.15.2, 2026-05-22)**
+
+Closes the trilogy that the workshop's "Future improvements" footer parked since Pack 3. The three feedback flavours are now interconnected:
+
+- **A · Log only** (1.15.1) — persists every captured note to `homo_vs_ai_feedback_log` Mongo collection (in-memory fallback up to 5000 entries). Auto-logged from Re-run with feedback (`context="ephemeral-rerun"`) and from Propose revision (`context="proposal-trigger"`); explicitly via the **📝 Save as note** button (`context="manual-note"`). Deterministic SHA-1 `entry_id` for de-duplication.
+- **A → C bridge** (1.15.2) — the export panel at the bottom of the workshop tab now exposes a `▸ Review & promote entries` toggle. Each promotable row (entries with `user_input` + `previous_ai_output` populated) gets a **🧬 Promote to revision** button that calls the existing `/prompt-evolution/propose` endpoint with the entry's stored fields. The result lands as `pending` in the governance panel above for human approval — identical to a live proposal. Per-entry state machine: `idle → promoting → promoted (revision_id) | error`. Legacy entries without `user_input` show a `⊘ Not promotable` chip with tooltip.
+
+**Endpoints added** (5 → 7 routes on `/api/agi/homo-vs-ai/*`):
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/feedback-log` | POST | Persist a single note. Used by 📝 Save as note + auto-log from Re-run / Propose. |
+| `/feedback-log/export?task=&since=&limit=` | GET | Newest-first export with task / since filters (default 1000, max 5000). Used by JSON download + Review & promote panel. |
+
+**Mongo collection** (Option A):
+- `homo_vs_ai_feedback_log` — `{entry_id, task, text, timestamp, actor, context, previous_ai_output?, user_input?, extra?}`. `user_input` is the 1.15.2 addition that makes the A → C bridge work; legacy entries (pre-1.15.2) naturally lack it and surface as non-promotable.
+
+**Smoke** (`backend/tests/smoke_feedback_log.py` — **11 checks**, 1.15.2):
+- Log shape + auto-log shape + validation × 2 + export filter + router registration + newest-first ordering (1.15.1: 8 checks)
+- `user_input` persistence + export round-trip + promotable filter mirroring frontend (1.15.2: +3 checks)
+
+Run via: `python -m backend.tests.smoke_feedback_log`. Phase E smoke (`smoke_prompt_evolution.py`) unchanged at 3/3 PASS.
+
+**i18n**: Full **EN / NO / ES** parity. `homoVsAi.*` block under each `common.json` (router, judge, scoreboard, future, istqb, demos.feedback*, **34 `evolve.*` keys × 3 locales** for Phase E, **22 `feedbackLog.*` keys × 3 locales** for 1.15.1 + 1.15.2).
 
 **Critical constraints:**
 - **Backward-compatible by design**: if no revision is active or Mongo is unavailable, `run_challenge` keeps using `TASK_SPECS[task]["system"]` exactly as before 1.8.0
@@ -644,10 +667,15 @@ The LLM is explicitly instructed to **refuse** unsafe revisions (removes ISTQB a
 
 **Smoke / verification commands:**
 ```bash
-# Phase E smoke — 8 checks (parses JSON variants, scores outputs, state transitions, harness, router)
+# Phase E smoke — 3 checks (regression harness + router registration + backward compat)
 python -m backend.tests.smoke_prompt_evolution
 
-# Verify all 12 /homo-vs-ai routes registered
+# Option A · Feedback log smoke — 11 checks (1.15.1 + 1.15.2):
+#   log shape, auto-log, validation × 2, export filter, router, ordering,
+#   user_input round-trip, export preserves both fields, promotable filter
+python -m backend.tests.smoke_feedback_log
+
+# Verify all 14 /homo-vs-ai routes registered (5 core + 7 prompt-evolution + 2 feedback-log)
 python -c "from backend.app import app; print(sum(1 for r in app.routes if '/homo-vs-ai' in r.path))"
 
 # Frontend production build — 0 warnings in src/pages/help/agi/
