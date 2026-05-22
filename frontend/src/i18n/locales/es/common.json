@@ -1027,7 +1027,20 @@
       "panelLead": "Descarga todas las notas de feedback capturadas durante el taller (guardados manuales + re-runs auto-logueados + disparadores de propuesta auto-logueados). Útil para análisis post-taller y como input para futuras propuestas de revisión.",
       "exportBtn": "Exportar JSON",
       "exporting": "Exportando…",
-      "exportedCount": "{{count}} entradas exportadas"
+      "exportedCount": "{{count}} entradas exportadas",
+      "showReview": "Revisar y promover entradas",
+      "hideReview": "Ocultar lista de revisión",
+      "reviewTooltip": "Revisa las notas capturadas y (opcionalmente) promociona cualquiera a una propuesta de revisión de la Fase E.",
+      "loadingList": "Cargando entradas…",
+      "emptyList": "Aún no hay notas de feedback capturadas. Aparecerán aquí cuando el host las guarde o re-ejecute con feedback.",
+      "promoteBtn": "Promover a revisión",
+      "promoteTooltip": "Promociona esta nota capturada a una propuesta de revisión de la Fase E. El diff de prompt propuesto aparecerá en el panel de gobernanza de arriba para aprobación humana.",
+      "promoting": "Promoviendo…",
+      "promoted": "Promovida (pendiente de aprobación)",
+      "promoteError": "Promoción fallida",
+      "notPromotable": "No promocionable",
+      "notPromotableTooltip": "Falta user_input o previous_ai_output — la Fase E necesita ambos. Esta entrada se capturó antes de 1.15.2 O via una vía de código que no los pasó.",
+      "truncated": "Mostrando 50 de {{count}} entradas. Exporta JSON para la lista completa."
     },
     "future": {
       "kicker": "Mejoras futuras",

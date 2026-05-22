@@ -2149,7 +2149,20 @@
       "panelLead": "Download every feedback note captured during the workshop (manual saves + auto-logged re-runs + auto-logged proposal triggers). Useful for post-workshop analysis and as input to future revision proposals.",
       "exportBtn": "Export JSON",
       "exporting": "Exporting…",
-      "exportedCount": "{{count}} entries exported"
+      "exportedCount": "{{count}} entries exported",
+      "showReview": "Review & promote entries",
+      "hideReview": "Hide review list",
+      "reviewTooltip": "Review captured notes and (optionally) promote any of them into a Phase E revision proposal.",
+      "loadingList": "Loading entries…",
+      "emptyList": "No feedback notes captured yet. They will appear here once the host saves notes or re-runs with feedback.",
+      "promoteBtn": "Promote to revision",
+      "promoteTooltip": "Promote this captured note to a Phase E revision proposal. The proposed prompt diff will appear in the governance panel above for human approval.",
+      "promoting": "Promoting…",
+      "promoted": "Promoted (pending approval)",
+      "promoteError": "Promote failed",
+      "notPromotable": "Not promotable",
+      "notPromotableTooltip": "Missing user_input or previous_ai_output — Phase E needs both. This entry was captured before 1.15.2 OR via a code path that didn't pass them.",
+      "truncated": "Showing 50 of {{count}} entries. Export JSON for the full list."
     },
     "future": {
       "kicker": "Future improvements",

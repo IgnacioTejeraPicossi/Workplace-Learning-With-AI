@@ -224,11 +224,15 @@ export function getActivePromptForTask(task) {
 // Re-run with feedback (Option B) happens server-side; this endpoint is for
 // the explicit manual path AND for the export at the end of the workshop.
 
-export async function logHomoVsAiFeedback({ task, text, actor, context, previousAiOutput }) {
+export async function logHomoVsAiFeedback({ task, text, actor, context, previousAiOutput, userInput }) {
   const body = { task, text };
   if (actor)              body.actor = actor;
   if (context)            body.context = context;
   if (previousAiOutput)   body.previous_ai_output = String(previousAiOutput).trim();
+  // 1.15.2 — also capture user_input so the A→C bridge can promote this
+  // entry to a Phase E revision proposal without the host re-typing the
+  // input the AI was originally responding to.
+  if (userInput)          body.user_input = String(userInput).trim();
   const res = await fetchWithAuth(`${API_BASE}/api/agi/homo-vs-ai/feedback-log`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

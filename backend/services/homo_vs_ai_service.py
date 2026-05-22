@@ -321,11 +321,14 @@ async def run_challenge(
         # invocation so the workshop export captures the full critique trail,
         # even when the host never explicitly clicks "Save as note". Best-
         # effort: any failure here MUST NOT block the re-run itself.
+        # 1.15.2 — also capture user_input so the A→C bridge has everything
+        # it needs to call proposePromptRevision from a historical log entry.
         try:
             await log_feedback_note(
                 task, fb,
                 context="ephemeral-rerun",
                 previous_ai_output=prev_ai,
+                user_input=(user_input or "").strip() or None,
             )
         except Exception:
             pass
@@ -977,6 +980,7 @@ async def log_feedback_note(
     actor: str = "workshop-host",
     context: str = "manual-note",
     previous_ai_output: Optional[str] = None,
+    user_input: Optional[str] = None,
     extra: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Persist a single feedback note to the log.
@@ -1004,6 +1008,13 @@ async def log_feedback_note(
     previous_ai_output : str | None
         Optional snapshot of the AI's answer the human was critiquing.
         Stored only when explicitly passed (export size budget).
+    user_input : str | None
+        Optional snapshot of the user input the AI was responding to.
+        1.15.2 — enables the A→C bridge ("Promote log entry → Phase E
+        revision proposal"): `proposePromptRevision` needs ALL of (task,
+        userInput, previousAiOutput, humanFeedback), so the log entry must
+        carry the user_input too. Capped at 4 KB to keep export sizes
+        reasonable.
     extra : dict | None
         Optional bag of additional metadata. Caller decides shape; the log
         stores it as-is so future fields don't require schema changes.
@@ -1028,6 +1039,9 @@ async def log_feedback_note(
         # Cap the snapshot to keep export sizes reasonable — full answers
         # can run several thousand chars; 4 KB is enough for context.
         entry["previous_ai_output"] = (previous_ai_output or "").strip()[:4000]
+    if user_input:
+        # 1.15.2 — same cap as previous_ai_output. Enables the A→C bridge.
+        entry["user_input"] = (user_input or "").strip()[:4000]
     if extra and isinstance(extra, dict):
         entry["extra"] = extra
     try:

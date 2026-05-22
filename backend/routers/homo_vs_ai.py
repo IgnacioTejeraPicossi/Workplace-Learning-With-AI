@@ -299,6 +299,17 @@ class FeedbackLogRequest(BaseModel):
         max_length=120_000,
         description="Optional snapshot of the AI's answer the human was critiquing.",
     )
+    user_input: Optional[str] = Field(
+        default=None,
+        max_length=120_000,
+        description=(
+            "Optional snapshot of the user input the AI was responding to. "
+            "1.15.2 — enables the A→C bridge (promote log entry → Phase E "
+            "revision proposal). When set together with previous_ai_output, "
+            "the entry has everything Phase E needs to re-propose without "
+            "the host re-typing."
+        ),
+    )
 
 
 class FeedbackLogEntry(BaseModel):
@@ -309,6 +320,7 @@ class FeedbackLogEntry(BaseModel):
     actor: str
     context: str
     previous_ai_output: Optional[str] = None
+    user_input: Optional[str] = None
 
 
 class FeedbackLogResponse(BaseModel):
@@ -336,6 +348,7 @@ async def post_feedback_log(body: FeedbackLogRequest):
             actor=body.actor or "workshop-host",
             context=body.context or "manual-note",
             previous_ai_output=body.previous_ai_output,
+            user_input=body.user_input,
         )
         return FeedbackLogResponse(entry=FeedbackLogEntry(**entry))
     except ValueError as ve:

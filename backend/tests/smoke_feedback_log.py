@@ -124,6 +124,68 @@ async def main() -> int:
         failures.append("entries not newest-first")
     print(f"[OK] Entries newest-first (first ts={ts_list[0] if ts_list else 'n/a'})")
 
+    # ── 7. 1.15.2 — A→C bridge: user_input round-trip + promotable filter ─
+    # An entry with all 4 fields (task, text, previous_ai_output, user_input)
+    # is "promotable" — Phase E proposePromptRevision can be called with it
+    # WITHOUT the host re-typing anything. Verify both directions:
+    #   (a) log_feedback_note accepts user_input and persists it.
+    #   (b) the export round-trip preserves user_input.
+    #   (c) entries missing user_input OR previous_ai_output are correctly
+    #       NOT promotable (frontend gates the button).
+    promotable = await log_feedback_note(
+        "exploratory", "Probe edge case: empty cart at checkout.",
+        actor="curator",
+        context="manual-note",
+        user_input="Add edge cases for a checkout flow.",
+        previous_ai_output="1. Try empty cart\n2. Try expired card",
+    )
+    if promotable.get("user_input") != "Add edge cases for a checkout flow.":
+        failures.append("user_input field not stored")
+    if not promotable.get("previous_ai_output"):
+        failures.append("previous_ai_output should still be stored")
+    print(f"[OK] 1.15.2 user_input field persisted "
+          f"(entry_id={promotable['entry_id'][:18]}…, "
+          f"user_input len={len(promotable.get('user_input') or '')})")
+
+    # Export round-trip — the new entry surfaces with both fields.
+    export2 = await export_feedback_log(task="exploratory", limit=10)
+    matched = next(
+        (e for e in export2.get("entries", []) if e.get("entry_id") == promotable["entry_id"]),
+        None,
+    )
+    if not matched:
+        failures.append("promotable entry not in export")
+    elif not (matched.get("user_input") and matched.get("previous_ai_output")):
+        failures.append("export round-trip dropped user_input or previous_ai_output")
+    else:
+        print(f"[OK] Export round-trip preserves both fields needed for A→C bridge")
+
+    # Promotable filter — mirror frontend `isPromotable` logic.
+    def _is_promotable(entry):
+        return bool(
+            entry and entry.get("task") and entry.get("text")
+            and (entry.get("user_input") or "").strip()
+            and (entry.get("previous_ai_output") or "").strip()
+        )
+
+    all_export2 = await export_feedback_log(limit=100)
+    promotable_count = sum(1 for e in all_export2.get("entries", []) if _is_promotable(e))
+    non_promotable = [e for e in all_export2.get("entries", [])
+                       if not _is_promotable(e)]
+    if promotable_count < 1:
+        failures.append("expected ≥1 promotable entry after seeding one")
+    # An entry with empty text/user_input shouldn't be promotable.
+    # Also: legacy entries from check 1 (manual-note without user_input)
+    # should NOT be promotable.
+    legacy_manual = [e for e in non_promotable
+                      if e.get("context") == "manual-note" and not e.get("user_input")]
+    if not legacy_manual:
+        failures.append("expected ≥1 legacy manual-note entry without user_input "
+                        "(check 1 created one) to be filtered as non-promotable")
+    print(f"[OK] Promotable filter "
+          f"(promotable: {promotable_count}, non-promotable: {len(non_promotable)}, "
+          f"correctly excludes legacy notes without user_input)")
+
     if failures:
         print()
         print("[FAIL] Smoke check failures:")

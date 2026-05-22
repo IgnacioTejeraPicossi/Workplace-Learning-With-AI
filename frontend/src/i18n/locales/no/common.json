@@ -3050,7 +3050,20 @@
       "panelLead": "Last ned alle tilbakemeldinger fra workshopen (manuelle lagringer + auto-loggede re-runs + auto-loggede forslag-triggere). Nyttig for analyse etter workshop og som input til fremtidige revisjons-forslag.",
       "exportBtn": "Eksporter JSON",
       "exporting": "Eksporterer…",
-      "exportedCount": "{{count}} oppføringer eksportert"
+      "exportedCount": "{{count}} oppføringer eksportert",
+      "showReview": "Gjennomgå og promoter oppføringer",
+      "hideReview": "Skjul gjennomgangsliste",
+      "reviewTooltip": "Gjennomgå lagrede notater og (valgfritt) promoter dem til et fase E revisjons-forslag.",
+      "loadingList": "Laster oppføringer…",
+      "emptyList": "Ingen tilbakemeldinger lagret ennå. De vil vises her når verten lagrer notater eller kjører på nytt med tilbakemelding.",
+      "promoteBtn": "Promoter til revisjon",
+      "promoteTooltip": "Promoter dette lagrede notatet til et fase E revisjons-forslag. Den foreslåtte prompt-endringen vises i styringspanelet over for menneskelig godkjenning.",
+      "promoting": "Promoterer…",
+      "promoted": "Promotert (venter på godkjenning)",
+      "promoteError": "Promotering feilet",
+      "notPromotable": "Ikke promoter-bart",
+      "notPromotableTooltip": "Mangler user_input eller previous_ai_output — fase E trenger begge. Denne oppføringen ble lagret før 1.15.2 ELLER via en kodebane som ikke sendte dem.",
+      "truncated": "Viser 50 av {{count}} oppføringer. Eksporter JSON for hele listen."
     },
     "future": {
       "kicker": "Framtidige forbedringer",

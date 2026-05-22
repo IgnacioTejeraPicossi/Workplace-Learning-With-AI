@@ -571,12 +571,15 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
       // Option A (1.15.1) — also persist the feedback as a 'proposal-trigger'
       // note so the workshop log captures the moment a revision was proposed.
       // Best-effort: never block the proposal flow on this.
+      // 1.15.2 — also capture user_input so the A→C bridge can re-propose
+      // this entry later from the export panel.
       try {
         await logHomoVsAiFeedback({
           task,
           text: feedbackText.trim(),
           context: 'proposal-trigger',
           previousAiOutput: aiOutput.trim(),
+          userInput: input.trim(),
         });
       } catch (_) { /* ignore */ }
     } catch (e) {
@@ -607,6 +610,9 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         text: feedbackText.trim(),
         context: 'manual-note',
         previousAiOutput: aiOutput.trim() || null,
+        // 1.15.2 — also capture user_input (when present) so this manual
+        // note can later be promoted to a Phase E revision proposal.
+        userInput: input.trim() || null,
       });
       setSaveNoteResult(res);
       // Note is logged; the textarea stays so the host can still
@@ -2269,19 +2275,54 @@ function RegressionView({ reg, t }) {
 // picks it up later doesn't have to re-run the design discussion from zero.
 
 // ---------------------------------------------------------------------------
-// Option A · Workshop feedback log — export panel (1.15.1, 2026-05-22)
+// Option A · Workshop feedback log — export panel (1.15.1) + Promote-to-
+// revision bridge A→C (1.15.2, 2026-05-22)
 // ---------------------------------------------------------------------------
 //
-// Tiny, opt-in panel that lets the workshop host download every captured
-// feedback note (manual saves + auto-logged Re-run-with-feedback + auto-logged
-// Propose-revision triggers). Surfaced near the bottom of the page so it does
-// not compete with the live workshop flow but is one click away when the
-// session ends.
+// Two operations side by side:
+//   1. JSON export of every captured feedback note (1.15.1).
+//   2. Inline review list with per-row "Promote to revision" buttons that
+//      close the bridge from Option A (log) to Option C (Phase E revision
+//      proposal). 1.15.2 lets the host curate critiques in cold blood after
+//      the live workshop ends.
+//
+// Surfaced near the bottom of the page so it does not compete with the live
+// workshop flow but is one click away when the session ends.
 
 function FeedbackLogExportPanel({ t }) {
+  // Export download state (1.15.1).
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
   const [summary, setSummary] = useState(null); // { count, generatedAt, filename }
+  // Inline review list state (1.15.2 bridge).
+  const [entries, setEntries] = useState([]);     // Loaded from /export endpoint.
+  const [loadingList, setLoadingList] = useState(false);
+  const [listErr, setListErr] = useState(null);
+  const [expanded, setExpanded] = useState(false);
+  // Per-entry promote state — keyed by entry_id. Values:
+  //   { state: 'idle' | 'promoting' | 'promoted' | 'error', revisionId?, error? }
+  const [promoteState, setPromoteState] = useState({});
+
+  // Load the entries list when the host expands the review section.
+  const loadEntries = async () => {
+    setLoadingList(true); setListErr(null);
+    try {
+      const data = await exportHomoVsAiFeedbackLog({ limit: 200 });
+      setEntries(Array.isArray(data.entries) ? data.entries : []);
+    } catch (e) {
+      setListErr(String(e.message || e));
+    } finally {
+      setLoadingList(false);
+    }
+  };
+
+  const onToggleExpand = () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next && entries.length === 0 && !loadingList) {
+      loadEntries(); // Lazy first load.
+    }
+  };
 
   const onExport = async () => {
     setBusy(true); setErr(null);
@@ -2310,6 +2351,43 @@ function FeedbackLogExportPanel({ t }) {
       setErr(String(e.message || e));
     } finally {
       setBusy(false);
+    }
+  };
+
+  // 1.15.2 — A→C bridge. For a log entry that has task + user_input +
+  // previous_ai_output + text, we can replay it through Phase E's
+  // proposePromptRevision without the host re-typing anything. The
+  // resulting revision lands in the governance panel above (pending
+  // approval), exactly as if it had been proposed live.
+  const isPromotable = (entry) => Boolean(
+    entry && entry.task && entry.text
+    && entry.user_input && entry.user_input.trim()
+    && entry.previous_ai_output && entry.previous_ai_output.trim()
+  );
+
+  const promoteEntry = async (entry) => {
+    const id = entry.entry_id;
+    setPromoteState(s => ({ ...s, [id]: { state: 'promoting' } }));
+    try {
+      const res = await proposePromptRevision({
+        task: entry.task,
+        userInput: entry.user_input,
+        previousAiOutput: entry.previous_ai_output,
+        humanFeedback: entry.text,
+        actor: entry.actor || 'workshop-host',
+      });
+      setPromoteState(s => ({
+        ...s,
+        [id]: {
+          state: 'promoted',
+          revisionId: res?.revision_id || res?.revisionId || null,
+        },
+      }));
+    } catch (e) {
+      setPromoteState(s => ({
+        ...s,
+        [id]: { state: 'error', error: String(e.message || e) },
+      }));
     }
   };
 
@@ -2353,6 +2431,27 @@ function FeedbackLogExportPanel({ t }) {
             ? t('homoVsAi.feedbackLog.exporting', { defaultValue: 'Exporting…' })
             : t('homoVsAi.feedbackLog.exportBtn', { defaultValue: 'Export JSON' })}
         </button>
+        <button
+          type="button"
+          onClick={onToggleExpand}
+          style={{
+            background: 'white',
+            color: '#047857',
+            border: '1px solid #6ee7b7',
+            padding: '8px 16px',
+            borderRadius: 6,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+          title={t('homoVsAi.feedbackLog.reviewTooltip', {
+            defaultValue: 'Review captured notes and (optionally) promote any of them into a Phase E revision proposal.',
+          })}
+        >
+          {expanded
+            ? `▾ ${t('homoVsAi.feedbackLog.hideReview', { defaultValue: 'Hide review list' })}`
+            : `▸ ${t('homoVsAi.feedbackLog.showReview', { defaultValue: 'Review & promote entries' })}`}
+        </button>
         {summary && (
           <span style={{
             fontSize: 12, color: '#047857',
@@ -2376,6 +2475,129 @@ function FeedbackLogExportPanel({ t }) {
           </span>
         )}
       </div>
+
+      {/* 1.15.2 — Inline review list with Promote buttons. */}
+      {expanded && (
+        <div style={{ marginTop: 12 }}>
+          {loadingList && (
+            <div style={{ fontSize: 12, color: '#047857' }}>
+              {t('homoVsAi.feedbackLog.loadingList', { defaultValue: 'Loading entries…' })}
+            </div>
+          )}
+          {listErr && (
+            <div style={{
+              fontSize: 12, color: '#b91c1c',
+              background: '#fef2f2', border: '1px solid #fecaca',
+              padding: '6px 10px', borderRadius: 6,
+            }}>
+              ⚠ {listErr}
+            </div>
+          )}
+          {!loadingList && !listErr && entries.length === 0 && (
+            <div style={{ fontSize: 12, color: '#047857', fontStyle: 'italic' }}>
+              {t('homoVsAi.feedbackLog.emptyList', {
+                defaultValue: 'No feedback notes captured yet. They will appear here once the host saves notes or re-runs with feedback.',
+              })}
+            </div>
+          )}
+          {entries.length > 0 && (
+            <div style={{ display: 'grid', gap: 8 }}>
+              {entries.slice(0, 50).map(entry => {
+                const promotable = isPromotable(entry);
+                const ps = promoteState[entry.entry_id] || { state: 'idle' };
+                return (
+                  <div key={entry.entry_id} style={{
+                    background: 'white',
+                    border: '1px solid #d1fae5',
+                    borderRadius: 6,
+                    padding: '8px 10px',
+                    fontSize: 12,
+                  }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <code style={{ fontSize: 11, color: '#065f46' }}>{entry.task}</code>
+                      <span style={{
+                        fontSize: 10, color: '#047857',
+                        background: '#d1fae5', border: '1px solid #6ee7b7',
+                        padding: '1px 6px', borderRadius: 999,
+                      }}>{entry.context}</span>
+                      <span style={{ fontSize: 10, color: '#64748b', fontFamily: 'monospace' }}>
+                        {entry.timestamp}
+                      </span>
+                      <span style={{ flex: 1 }} />
+                      {promotable ? (
+                        ps.state === 'promoted' ? (
+                          <span style={{
+                            fontSize: 11, color: '#15803d', fontWeight: 600,
+                            background: '#dcfce7', border: '1px solid #86efac',
+                            padding: '3px 8px', borderRadius: 999,
+                          }} title={ps.revisionId || ''}>
+                            ✓ {t('homoVsAi.feedbackLog.promoted', { defaultValue: 'Promoted (pending approval)' })}
+                          </span>
+                        ) : ps.state === 'error' ? (
+                          <span style={{
+                            fontSize: 11, color: '#b91c1c',
+                            background: '#fef2f2', border: '1px solid #fecaca',
+                            padding: '3px 8px', borderRadius: 999,
+                          }} title={ps.error}>
+                            ⚠ {t('homoVsAi.feedbackLog.promoteError', { defaultValue: 'Promote failed' })}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => promoteEntry(entry)}
+                            disabled={ps.state === 'promoting'}
+                            title={t('homoVsAi.feedbackLog.promoteTooltip', {
+                              defaultValue: 'Promote this captured note to a Phase E revision proposal. The proposed prompt diff will appear in the governance panel above for human approval.',
+                            })}
+                            style={{
+                              background: ps.state === 'promoting' ? '#fef3c7' : '#a16207',
+                              color: 'white',
+                              border: '1px solid #ca8a04',
+                              padding: '4px 10px',
+                              borderRadius: 4,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: ps.state === 'promoting' ? 'wait' : 'pointer',
+                            }}
+                          >
+                            🧬 {ps.state === 'promoting'
+                                  ? t('homoVsAi.feedbackLog.promoting', { defaultValue: 'Promoting…' })
+                                  : t('homoVsAi.feedbackLog.promoteBtn', { defaultValue: 'Promote to revision' })}
+                          </button>
+                        )
+                      ) : (
+                        <span style={{
+                          fontSize: 10, color: '#92400e',
+                          background: '#fef3c7', border: '1px solid #fcd34d',
+                          padding: '2px 8px', borderRadius: 999,
+                        }} title={t('homoVsAi.feedbackLog.notPromotableTooltip', {
+                          defaultValue: 'Missing user_input or previous_ai_output — Phase E needs both. This entry was captured before 1.15.2 OR via a code path that didn\'t pass them.',
+                        })}>
+                          ⊘ {t('homoVsAi.feedbackLog.notPromotable', { defaultValue: 'Not promotable' })}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{
+                      marginTop: 4, color: '#0f172a', whiteSpace: 'pre-wrap',
+                      borderLeft: '3px solid #6ee7b7', paddingLeft: 8,
+                    }}>
+                      {entry.text}
+                    </div>
+                  </div>
+                );
+              })}
+              {entries.length > 50 && (
+                <div style={{ fontSize: 11, color: '#64748b', fontStyle: 'italic' }}>
+                  {t('homoVsAi.feedbackLog.truncated', {
+                    count: entries.length,
+                    defaultValue: 'Showing 50 of {{count}} entries. Export JSON for the full list.',
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

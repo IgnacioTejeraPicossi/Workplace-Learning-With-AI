@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.2] - 2026-05-22
+
+### Added — AGI Hub · Homo Sapiens vs. KI i Test · A → C bridge (promote log entries to Phase E proposals)
+
+1.15.1 closed the A + B + C trilogy by shipping Option A (log-only feedback) as a peer to the existing Re-run (B) and Phase E prompt evolution (C). This patch closes the **bridge** between A and C: every captured feedback note can now be promoted to a Phase E revision proposal **without the host re-typing anything** — useful when curating critiques post-workshop in cold blood.
+
+**The gap fixed**: a great critique captured in round 3 lived only in the exported JSON. To turn it into a Phase E proposal the host had to navigate back to that task, re-type the feedback and the original input, then click Propose. 1.15.2 makes this a single-click in the export panel.
+
+**Backend** (additive — backward compatible):
+- `backend/services/homo_vs_ai_service.py`: `log_feedback_note(...)` accepts a new `user_input: Optional[str]` param (capped at 4 KB). Auto-log inside `run_challenge` now also captures the user input, so every ephemeral re-run produces a promotable log entry.
+- `backend/routers/homo_vs_ai.py`: `FeedbackLogRequest` + `FeedbackLogEntry` Pydantic models extended with the new `user_input` field. Existing clients unaffected — field is Optional.
+
+**Frontend** (`frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` + `frontend/src/api/agiApi.js`):
+- `logHomoVsAiFeedback(...)` accepts `userInput`.
+- `saveAsNote` and `proposeRevision` auto-log calls now pass the current `input.trim()` so manual notes AND proposal-trigger entries become promotable.
+- `FeedbackLogExportPanel` rewritten to support TWO operations:
+  1. JSON export (1.15.1, unchanged).
+  2. **NEW inline review list** with a `▸ Review & promote entries` toggle. Lazy-loads up to 200 entries via the existing `/feedback-log/export` endpoint, renders each in a small card with task + context + timestamp + critique text.
+  - Each promotable row gets a `🧬 Promote to revision` button that calls `proposePromptRevision(...)` with the entry's stored `task`, `user_input`, `previous_ai_output` and `text`. The resulting revision lands in the Phase E governance panel above as `pending` — same flow as a live proposal.
+  - Entries lacking `user_input` OR `previous_ai_output` show a yellow `⊘ Not promotable` chip with a tooltip explaining why. Legacy entries (saved before 1.15.2) naturally land here.
+  - Per-entry promote state is session-only: `idle → promoting → promoted (revision_id) | error`. The persistent record is the Phase E revisions collection.
+
+**Promotable filter logic** (mirrored in backend smoke + frontend `isPromotable`):
+```
+entry is promotable iff
+  entry.task   is truthy AND
+  entry.text   is truthy AND
+  entry.user_input          (non-blank) AND
+  entry.previous_ai_output  (non-blank)
+```
+
+**i18n** — 13 new keys × 3 locales (EN / NO / ES) under `homoVsAi.feedbackLog.*`:
+- `showReview`, `hideReview`, `reviewTooltip`, `loadingList`, `emptyList`, `promoteBtn`, `promoteTooltip`, `promoting`, `promoted`, `promoteError`, `notPromotable`, `notPromotableTooltip`, `truncated`
+
+Combined with 1.15.1's 9 keys, the panel now has **22 keys × 3 locales** in `feedbackLog`.
+
+**Smoke** — `backend/tests/smoke_feedback_log.py` extended from 8 → 11 checks:
+- New: `user_input` round-trip persists through Mongo + in-memory paths.
+- New: export round-trip preserves both fields needed for the A→C bridge.
+- New: promotable filter logic (mirrors frontend `isPromotable`); legacy notes without `user_input` correctly classified as non-promotable.
+
+**Backward compatibility**: 100% additive. Legacy entries (pre-1.15.2) display in the review list with a `⊘ Not promotable` chip — they're just for analysis. No data migration required.
+
+**Validation**:
+- `python -m backend.tests.smoke_feedback_log` → **11/11 PASS**
+- `python -m backend.tests.smoke_prompt_evolution` → 3/3 PASS (Phase E unchanged)
+- `python -m backend.tests.smoke_red_cross_qa` → 37/37 PASS
+- `python -m backend.tests.smoke_qa_security` → 16/16 PASS
+
+The trilogy A + B + C is now **interconnected**: A captures, B re-runs, C governs — and any A entry can promote to a C proposal in one click.
+
+---
+
 ## [1.15.1] - 2026-05-22
 
 ### Added — AGI Hub · Homo Sapiens vs. KI i Test · Option A (log-only feedback) — closes the trilogy
