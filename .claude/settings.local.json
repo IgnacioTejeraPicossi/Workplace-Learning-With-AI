@@ -134,7 +134,9 @@
       "Bash(python -m backend.tests.smoke_qa_security)",
       "Bash(npx vite *)",
       "Bash(SET CI=true)",
-      "Bash(mkdir -p \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\enonic-xp\\\\references\")"
+      "Bash(mkdir -p \"C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\.claude\\\\skills\\\\enonic-xp\\\\references\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_prompt_evolution)",
+      "Bash(grep -n \"Future improvements\\\\|future-work\\\\|previously parked\\\\|shipped \\\\\\\\| Phase E\\\\|Phase F\" frontend/src/pages/help/agi/HomoSapiensVsAI.jsx)"
     ]
   }
 }
