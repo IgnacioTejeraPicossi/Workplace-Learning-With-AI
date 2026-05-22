@@ -1920,5 +1920,28 @@
       "OWASP-TOP10_A05": "Configuración de seguridad incorrecta",
       "OWASP-TOP10_A09": "Fallos en registro y monitorización de seguridad"
     }
+  },
+  "hologramGuide": {
+    "title": "Guía Holograma",
+    "modeLabel": "Modo",
+    "modeFast": "Rápido",
+    "modeAccurate": "Preciso",
+    "subheaderHint": "Pregunta sobre módulos, funciones o rutas de aprendizaje en Workplace Learning With AI.",
+    "greeting": "Hola, soy tu Guía Holograma. Puedo ayudarte a explorar Workplace Learning With AI. ¿Sobre qué te gustaría aprender?",
+    "inputPlaceholder": "Pregúntame algo sobre la app…",
+    "sendBtn": "Enviar",
+    "thinking": "El holograma está pensando…",
+    "listening": "Escuchando…",
+    "speaking": "El holograma está hablando…",
+    "sttError": "Error de reconocimiento de voz",
+    "talkToHologram": "Hablar con el Holograma",
+    "stopListening": "Detener escucha",
+    "recordAndTranscribe": "Grabar y transcribir",
+    "stopRecording": "Detener y transcribir",
+    "recFallbackTooltip": "STT del navegador no disponible – grabación como alternativa",
+    "voiceUnsupported": "Entrada de voz no soportada.",
+    "voiceSettings": "Ajustes de voz",
+    "errorReply": "Vaya, tuve problemas accediendo a mi núcleo IA. Por favor inténtalo de nuevo en un momento.",
+    "fallbackReply": "Estoy teniendo problemas accediendo a mi núcleo IA. Por favor inténtalo de nuevo."
   }
 }

@@ -2220,6 +2220,29 @@
       "ragUnavailable": "Local LLM selected, but no ISTQB PDF index was built — add PDFs under docs-ISTQB/ at the repo root and restart the backend.",
       "footnote": "Curated anchors (JSON) apply for every provider. When API Config is set to ItemAI/ItemServerAI, additional verbatim excerpts may be retrieved from your local docs-ISTQB/ PDFs — see the green hint under outputs."
     }
+  },
+  "hologramGuide": {
+    "title": "Hologram Guide",
+    "modeLabel": "Mode",
+    "modeFast": "Fast",
+    "modeAccurate": "Accurate",
+    "subheaderHint": "Ask about modules, features, or learning paths in Workplace Learning With AI.",
+    "greeting": "Hello, I'm your Hologram Guide. I can help you explore Workplace Learning With AI. What would you like to learn about?",
+    "inputPlaceholder": "Ask me something about the app…",
+    "sendBtn": "Send",
+    "thinking": "The hologram is thinking…",
+    "listening": "Listening…",
+    "speaking": "Hologram is speaking…",
+    "sttError": "Speech recognition error",
+    "talkToHologram": "Talk to the Hologram",
+    "stopListening": "Stop listening",
+    "recordAndTranscribe": "Record & transcribe",
+    "stopRecording": "Stop & transcribe",
+    "recFallbackTooltip": "Browser STT not available – recording fallback",
+    "voiceUnsupported": "Voice input not supported.",
+    "voiceSettings": "Voice settings",
+    "errorReply": "Oops, I had trouble accessing my AI core. Please try again in a moment.",
+    "fallbackReply": "I'm having trouble accessing my AI core. Please try again."
   }
 }
 

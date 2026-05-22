@@ -1,15 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHologramAgent } from "./useHologramAgent";
 import { useSpeechCapture } from "./useSpeechCapture";
 import { useSpeechOutput } from "./useSpeechOutput";
 import { VoiceSettingsPanel } from "./VoiceSettingsPanel";
 import { useAudioRecorder } from "./useAudioRecorder";
 
-export default function HologramAgentChat({ onClose }) {
-  const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent();
+// 1.15.4 — Map the active i18n language tag to the BCP-47 code that
+// useSpeechCapture / useSpeechOutput expect for SpeechRecognition + TTS.
+// Defaults to en-US for unknown locales.
+function _voiceLanguageFor(lang) {
+  const l = String(lang || "").toLowerCase();
+  if (l.startsWith("no") || l.startsWith("nb")) return "nb-NO";
+  if (l.startsWith("nn")) return "nn-NO";
+  if (l.startsWith("es")) return "es-ES";
+  return "en-US";
+}
 
-  // Voice state
-  const [voiceLanguage, setVoiceLanguage] = useState("en-US");
+export default function HologramAgentChat({ onClose }) {
+  const { t, i18n } = useTranslation();
+  // Detect the active UI locale and pass it down so:
+  //   1. The backend instructs the LLM to answer in the same language.
+  //   2. The initial greeting / error fallbacks render in the same language.
+  //   3. The voice STT / TTS uses the matching BCP-47 code.
+  const activeLanguage = i18n?.language || "en";
+  const initialGreeting = t("hologramGuide.greeting", {
+    defaultValue:
+      "Hello, I'm your Hologram Guide. I can help you explore Workplace Learning With AI. What would you like to learn about?",
+  });
+  const errorReply = t("hologramGuide.errorReply", {
+    defaultValue:
+      "Oops, I had trouble accessing my AI core. Please try again in a moment.",
+  });
+  const fallbackReply = t("hologramGuide.fallbackReply", {
+    defaultValue: "I'm having trouble accessing my AI core. Please try again.",
+  });
+
+  const { messages, sendMessage, isLoading, mode, setMode } = useHologramAgent({
+    language: activeLanguage,
+    initialGreeting,
+    errorReply,
+    fallbackReply,
+  });
+
+  // Voice state — derived from the active UI locale by default. User can
+  // still override via the gear panel for cases where the UI locale and
+  // speech locale should diverge (e.g. Norwegian UI but English voice).
+  const [voiceLanguage, setVoiceLanguage] = useState(() => _voiceLanguageFor(activeLanguage));
+  // Track whether the user manually overrode the voice locale via the
+  // settings panel. If they didn't, follow i18n changes; if they did,
+  // respect their override.
+  const [voiceLangUserOverride, setVoiceLangUserOverride] = useState(false);
+  useEffect(() => {
+    if (!voiceLangUserOverride) {
+      setVoiceLanguage(_voiceLanguageFor(activeLanguage));
+    }
+  }, [activeLanguage, voiceLangUserOverride]);
+  const setVoiceLanguageManual = (lang) => {
+    setVoiceLanguage(lang);
+    setVoiceLangUserOverride(true);
+  };
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [muted, setMuted] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
@@ -116,16 +166,18 @@ export default function HologramAgentChat({ onClose }) {
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ fontWeight: 700 }}>Hologram Guide</div>
+          <div style={{ fontWeight: 700 }}>
+            {t("hologramGuide.title", { defaultValue: "Hologram Guide" })}
+          </div>
           <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#374151" }}>
-            Mode
+            {t("hologramGuide.modeLabel", { defaultValue: "Mode" })}
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value)}
               style={{ borderRadius: 10, border: "1px solid rgba(0,0,0,0.15)", padding: "2px 6px", fontSize: 12 }}
             >
-              <option value="fast">Fast</option>
-              <option value="accurate">Accurate</option>
+              <option value="fast">{t("hologramGuide.modeFast", { defaultValue: "Fast" })}</option>
+              <option value="accurate">{t("hologramGuide.modeAccurate", { defaultValue: "Accurate" })}</option>
             </select>
           </label>
         </div>
@@ -134,7 +186,7 @@ export default function HologramAgentChat({ onClose }) {
             <button
               type="button"
               onClick={() => setShowVoiceSettings((v) => !v)}
-              title="Voice settings"
+              title={t("hologramGuide.voiceSettings", { defaultValue: "Voice settings" })}
               style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 16 }}
             >
               ⚙️
@@ -144,7 +196,9 @@ export default function HologramAgentChat({ onClose }) {
         </div>
       </div>
       <div style={{ padding: "6px 12px", fontSize: 12, color: "#6b7280" }}>
-        Ask about modules, features, or learning paths in Workplace Learning With AI.
+        {t("hologramGuide.subheaderHint", {
+          defaultValue: "Ask about modules, features, or learning paths in Workplace Learning With AI.",
+        })}
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>
         {messages.map((m, i) => (
@@ -161,16 +215,19 @@ export default function HologramAgentChat({ onClose }) {
           </div>
         ))}
         {isLoading && (
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>The hologram is thinking…</div>
+          <div style={{ fontSize: 12, color: "#9ca3af" }}>
+            {t("hologramGuide.thinking", { defaultValue: "The hologram is thinking…" })}
+          </div>
         )}
         {isListening && (
           <div style={{ fontSize: 12, color: "#2563eb" }}>
-            Listening… {transcript ? `(${transcript})` : ""}
+            {t("hologramGuide.listening", { defaultValue: "Listening…" })}{" "}
+            {transcript ? `(${transcript})` : ""}
           </div>
         )}
         {sttError && (
           <div style={{ fontSize: 12, color: "#ea580c" }}>
-            Speech recognition error: {sttError}
+            {t("hologramGuide.sttError", { defaultValue: "Speech recognition error" })}: {sttError}
           </div>
         )}
       </div>
@@ -179,7 +236,9 @@ export default function HologramAgentChat({ onClose }) {
           name="message"
           value={messageDraft}
           onChange={(e) => setMessageDraft(e.target.value)}
-          placeholder="Ask me something about the app…"
+          placeholder={t("hologramGuide.inputPlaceholder", {
+            defaultValue: "Ask me something about the app…",
+          })}
           style={{
             flex: 1,
             padding: "8px 10px",
@@ -194,7 +253,9 @@ export default function HologramAgentChat({ onClose }) {
           background: "#2563eb",
           color: "white",
           cursor: "pointer"
-        }}>Send</button>
+        }}>
+          {t("hologramGuide.sendBtn", { defaultValue: "Send" })}
+        </button>
       </form>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px 8px 10px", fontSize: 12, color: "#6b7280" }}>
         {sttSupported ? (
@@ -209,7 +270,9 @@ export default function HologramAgentChat({ onClose }) {
               cursor: "pointer"
             }}
           >
-            {isListening ? "🛑 Stop listening" : "🎙️ Talk to the Hologram"}
+            {isListening
+              ? `🛑 ${t("hologramGuide.stopListening", { defaultValue: "Stop listening" })}`
+              : `🎙️ ${t("hologramGuide.talkToHologram", { defaultValue: "Talk to the Hologram" })}`}
           </button>
         ) : recSupported ? (
           <button
@@ -230,20 +293,26 @@ export default function HologramAgentChat({ onClose }) {
               padding: "4px 8px",
               cursor: "pointer"
             }}
-            title="Browser STT not available – recording fallback"
+            title={t("hologramGuide.recFallbackTooltip", {
+              defaultValue: "Browser STT not available – recording fallback",
+            })}
           >
-            {isRecording ? "🛑 Stop & transcribe" : "🎙️ Record & transcribe"}
+            {isRecording
+              ? `🛑 ${t("hologramGuide.stopRecording", { defaultValue: "Stop & transcribe" })}`
+              : `🎙️ ${t("hologramGuide.recordAndTranscribe", { defaultValue: "Record & transcribe" })}`}
           </button>
         ) : (
-          <span>Voice input not supported.</span>
+          <span>{t("hologramGuide.voiceUnsupported", { defaultValue: "Voice input not supported." })}</span>
         )}
-        <div>{isSpeaking && !muted ? <span style={{ color: "#16a34a" }}>Hologram is speaking…</span> : null}</div>
+        <div>{isSpeaking && !muted
+          ? <span style={{ color: "#16a34a" }}>{t("hologramGuide.speaking", { defaultValue: "Hologram is speaking…" })}</span>
+          : null}</div>
       </div>
       <VoiceSettingsPanel
         open={showVoiceSettings}
         onClose={() => setShowVoiceSettings(false)}
         language={voiceLanguage}
-        setLanguage={setVoiceLanguage}
+        setLanguage={setVoiceLanguageManual}
         autoSpeak={autoSpeak}
         setAutoSpeak={setAutoSpeak}
         muted={muted}

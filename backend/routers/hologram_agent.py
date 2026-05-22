@@ -14,6 +14,10 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[Message]
     mode: Optional[Literal["fast", "accurate"]] = "fast"
+    # 1.15.4 — Forward the active UI locale so the model answers in the same
+    # language as the user. Backward-compatible: when omitted, defaults to
+    # English (the legacy behaviour before this field existed).
+    language: Optional[str] = None
 
 class ChatResponse(BaseModel):
     reply: str
@@ -119,6 +123,43 @@ Rules:
 5) If the user goes off-scope, refocus on helping them use WLWAI.
 """.strip()
 
+# 1.15.4 — Locale-aware response hint. Mirrors the pattern used by
+# homo_vs_ai_service.py (Phase E). The active UI locale comes from the
+# frontend (`language` field on ChatRequest); we translate it into a
+# natural-language instruction the LLM follows. Keeping the hint short
+# and explicit (i.e. "Answer in <language>") works across providers
+# (OpenAI / OpenRouter / ItemAI / LM Studio) without prompt-engineering
+# per provider.
+def _build_language_hint(language: Optional[str]) -> str:
+    """Return a system-prompt suffix that instructs the LLM which language
+    to answer in. Empty string when language is missing or unrecognised
+    (keeps the legacy English-default behaviour intact)."""
+    if not language:
+        return ""
+    lang = str(language).strip().lower()
+    # Norwegian variants: 'no', 'nb' (bokmål), 'nn' (nynorsk), 'no-NO', 'nb-NO'.
+    if lang.startswith("no") or lang.startswith("nb") or lang.startswith("nn"):
+        return (
+            "\n\nLANGUAGE: The active UI locale is Norwegian. Answer in "
+            "Norwegian (bokmål). Keep WLWAI module names + technical "
+            "terms (Hologram Portal, Agentic RAG, Future Lab, etc.) in "
+            "their English form — that is how they appear in the app."
+        )
+    # Spanish variants: 'es', 'es-ES', 'es-419'.
+    if lang.startswith("es"):
+        return (
+            "\n\nLANGUAGE: The active UI locale is Spanish. Answer in "
+            "Spanish. Keep WLWAI module names + technical terms (Hologram "
+            "Portal, Agentic RAG, Future Lab, etc.) in their English form "
+            "— that is how they appear in the app."
+        )
+    # English variants: 'en', 'en-US', 'en-GB', etc.
+    if lang.startswith("en"):
+        return "\n\nLANGUAGE: Answer in English."
+    # Unknown locale → no hint, let the LLM mirror the user's language.
+    return ""
+
+
 def _call_unified_llm(messages: List[Dict[str, str]], request_headers=None) -> str:
     # Reuse the unified stack used by other modules
     try:
@@ -165,6 +206,10 @@ async def hologram_chat(req: ChatRequest, http_request: Request) -> ChatResponse
     rag_chunks = retrieve_relevant(last_user.content, k=k)
     context_text = "\n\n---\n\n".join(rag_chunks)[:context_limit]
 
+    # 1.15.4 — Build language hint from the active UI locale (if provided
+    # by the frontend). Empty string when language missing → legacy behaviour.
+    language_hint = _build_language_hint(req.language)
+
     # Build LLM messages
     llm_messages: List[Dict[str, str]] = [
         {
@@ -172,6 +217,7 @@ async def hologram_chat(req: ChatRequest, http_request: Request) -> ChatResponse
             "content": (
                 "You receive WLWAI documentation as CONTEXT. Use ONLY this context to answer.\n\n"
                 f"CONTEXT START\n{context_text}\nCONTEXT END\n\n{SYSTEM_PROMPT}"
+                f"{language_hint}"
             ),
         },
         *[{"role": m.role, "content": m.content} for m in req.messages[-history_keep:]],

@@ -3121,6 +3121,29 @@
       "ragUnavailable": "Lokal KI valgt, men ingen ISTQB-PDF-indeks ble bygd — legg PDF-er i docs-ISTQB/ i prosjektroten og start backend på nytt.",
       "footnote": "Håndplukkede anchors (JSON) gjelder for alle leverandører. Når API-innstilling er ItemAI/ItemServerAI, kan ordrette utdrag hentes fra lokale docs-ISTQB/-PDF-er — se grønt hint under output."
     }
+  },
+  "hologramGuide": {
+    "title": "Hologram-veileder",
+    "modeLabel": "Modus",
+    "modeFast": "Rask",
+    "modeAccurate": "Nøyaktig",
+    "subheaderHint": "Spør om moduler, funksjoner eller læringsstier i Workplace Learning With AI.",
+    "greeting": "Hei, jeg er din Hologram-veileder. Jeg kan hjelpe deg å utforske Workplace Learning With AI. Hva vil du lære om?",
+    "inputPlaceholder": "Spør meg om noe om appen…",
+    "sendBtn": "Send",
+    "thinking": "Hologrammet tenker…",
+    "listening": "Lytter…",
+    "speaking": "Hologrammet snakker…",
+    "sttError": "Talegjenkjenningsfeil",
+    "talkToHologram": "Snakk med hologrammet",
+    "stopListening": "Stopp lytting",
+    "recordAndTranscribe": "Ta opp og transkriber",
+    "stopRecording": "Stopp og transkriber",
+    "recFallbackTooltip": "Nettleser-STT er ikke tilgjengelig – bruker opptak som reserveløsning",
+    "voiceUnsupported": "Stemmeinngang støttes ikke.",
+    "voiceSettings": "Stemmeinnstillinger",
+    "errorReply": "Beklager, jeg hadde problemer med å nå KI-kjernen min. Vennligst prøv igjen om et øyeblikk.",
+    "fallbackReply": "Jeg har problemer med å nå KI-kjernen min. Vennligst prøv igjen."
   }
 }
 
