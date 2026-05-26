@@ -41,6 +41,7 @@ function ReadinessCard({ icon, title, value, status, detail }) {
 }
 
 function ArchSummaryRow({ icon, service, role, provider, phase }) {
+  const { t } = useTranslation();
   const phaseColor = phase === 1
     ? { bg: '#d1fae5', text: '#065f46' }
     : { bg: '#f3f4f6', text: '#6b7280' };
@@ -62,7 +63,7 @@ function ArchSummaryRow({ icon, service, role, provider, phase }) {
           padding: '0.1rem 0.5rem', borderRadius: '9999px',
           backgroundColor: phaseColor.bg, color: phaseColor.text, fontSize: '0.7rem', fontWeight: '600'
         }}>
-          Phase {phase}
+          {t('cloudInstall.arch.phase', { n: phase })}
         </span>
       </div>
     </div>
