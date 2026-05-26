@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import HologramAgentChat from "./HologramAgentChat";
 
 /**
@@ -6,6 +7,7 @@ import HologramAgentChat from "./HologramAgentChat";
  * Non-intrusive: keeps existing hologram navigation intact.
  */
 export default function HologramAgentLauncher() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [chatOnClick, setChatOnClick] = useState(() => {
     const v = localStorage.getItem("holoChatOnClick");
@@ -47,7 +49,7 @@ export default function HologramAgentLauncher() {
         color: "#b9ecff",
         backdropFilter: "blur(6px)"
       }}>
-        <span style={{ fontSize: 12 }}>Chat on click Hologram</span>
+        <span style={{ fontSize: 12 }}>{t('askAI.launcher.chatOnClick', { defaultValue: 'Chat on click Hologram' })}</span>
         <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
           <input
             type="checkbox"
@@ -55,13 +57,15 @@ export default function HologramAgentLauncher() {
             onChange={(e) => setChatOnClick(e.target.checked)}
             style={{ marginRight: 6 }}
           />
-          <span style={{ fontSize: 12 }}>{chatOnClick ? "On" : "Off"}</span>
+          <span style={{ fontSize: 12 }}>{chatOnClick
+            ? t('askAI.launcher.on', { defaultValue: 'On' })
+            : t('askAI.launcher.off', { defaultValue: 'Off' })}</span>
         </label>
       </div>
 
       <button
         onClick={() => setOpen(true)}
-        title="Chat with the Hologram Guide"
+        title={t('askAI.launcher.chatTooltip', { defaultValue: 'Chat with the Hologram Guide' })}
         style={{
           position: "fixed",
           right: 16,
@@ -78,7 +82,7 @@ export default function HologramAgentLauncher() {
         }}
       >
         <span style={{ fontSize: 24, display: "block", lineHeight: "20px" }}>🤖</span>
-        <span style={{ fontSize: 12 }}>Chat</span>
+        <span style={{ fontSize: 12 }}>{t('askAI.launcher.chatLabel', { defaultValue: 'Chat' })}</span>
       </button>
       {open && <HologramAgentChat onClose={() => setOpen(false)} />}
     </>

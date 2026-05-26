@@ -61,16 +61,58 @@
     },
 
     "arch": {
+      "phase": "Fase {{n}}",
       "principleTitle": "Strategisk prinsipp",
       "principleText": "Ikke skriv om stakken. Den riktige strategien er å skymigre den eksisterende arkitekturen trinnvis. Skyversjonen skal føles som det samme produktet — ikke et nytt produkt.",
       "flowTitle": "Skyarkitekturflyt",
+      "flow": {
+        "userBrowser": "Bruker / Nettleser",
+        "vercelFrontend": "Vercel\n(Frontend)",
+        "cloudRunBackend": "Cloud Run\n(FastAPI)",
+        "mongoAtlas": "MongoDB\nAtlas"
+      },
       "spansBoth": "spenner over frontend og backend",
       "servicesTitle": "Tjenester — klikk for å utforske",
       "visitDocs": "Besøk dokumentasjon",
       "keyFeatures": "Nøkkelfunksjoner:",
       "deferredTitle": "Utsatt til fase 2 (ikke inkluder i v1)",
       "deferredDesc": "Disse tjenestene er bevisst ekskludert fra første utrulling for å holde omfanget håndterbart. Legg dem til etter at kjerneutrullingen er stabil.",
+      "deferred": {
+        "sentry": { "name": "Sentry", "role": "Feilsporing og overvåking" },
+        "posthog": { "name": "PostHog", "role": "Produktanalyse" },
+        "resend": { "name": "Resend", "role": "Transaksjonell e-post" },
+        "n8n": { "name": "n8n Cloud", "role": "Arbeidsflytautomatisering" },
+        "webSearch": { "name": "Web Search Backend", "role": "Node.js søketjeneste" }
+      },
       "costTitle": "Estimert månedlig kostnad",
+      "cost": {
+        "services": {
+          "vercelFrontend": "Vercel (Frontend)",
+          "cloudRunBackend": "Cloud Run (Backend)",
+          "mongoAtlas": "MongoDB Atlas",
+          "firebaseAuth": "Firebase Auth",
+          "cloudflareDns": "Cloudflare DNS",
+          "domainName": "Domenenavn"
+        },
+        "tiers": {
+          "hobbyFree": "Hobby (Gratis)",
+          "freeTier": "Gratisnivå",
+          "mongoTier": "M0 Gratis / M2 Delt",
+          "sparkFree": "Spark (Gratis)",
+          "free": "Gratis",
+          "annual": "Årlig"
+        },
+        "budgetTierNames": {
+          "free": "Gratis",
+          "starter": "Starter",
+          "professional": "Profesjonell"
+        },
+        "budgetTiers": {
+          "free": "$0/mnd — Kun gratisnivåer, noen begrensninger",
+          "starter": "$29–59/mnd — M2 Atlas + Vercel Pro + liten Cloud Run",
+          "professional": "$60–120/mnd — M10 Atlas + overvåking + flere regioner"
+        }
+      },
       "deployOrderTitle": "Anbefalt utrullingsrekkefølge",
       "deployOrder": {
         "steps": {
@@ -88,24 +130,34 @@
         ]
       },
       "frontend": {
+        "name": "React Frontend",
         "desc": "Rull ut React-frontend til Vercel. Koble via GitHub for automatisk CI/CD ved hver push til main.",
-        "why": "Vercel er det naturlige valget for en React-frontend. Det gir GitHub-baserte utrullinger, et gratisnivå, edge CDN, egendefinerte domener og en null-konfigurasjonsbygningspipeline for React."
+        "why": "Vercel er det naturlige valget for en React-frontend. Det gir GitHub-baserte utrullinger, et gratisnivå, edge CDN, egendefinerte domener og en null-konfigurasjonsbygningspipeline for React.",
+        "features": ["GitHub-basert CI/CD", "Egendefinert domene + SSL", "Edge-nettverk", "Støtte for ENV-variabler"]
       },
       "backend": {
+        "name": "FastAPI Backend",
         "desc": "Rull ut FastAPI-backend som en container på Google Cloud Run. Serverløs, autoskalering og fakturering per forespørsel.",
-        "why": "Cloud Run er ideelt for den eksisterende FastAPI-backend. Det er container-first (repositoriet har allerede en Dockerfile), skalerer til null når det er inaktivt, og integreres naturlig med Google Cloud Secret Manager."
+        "why": "Cloud Run er ideelt for den eksisterende FastAPI-backend. Det er container-first (repositoriet har allerede en Dockerfile), skalerer til null når det er inaktivt, og integreres naturlig med Google Cloud Secret Manager.",
+        "features": ["Container-basert", "Betaling per forespørsel", "Autoskalering", "Administrert SSL og domene"]
       },
       "database": {
+        "name": "MongoDB",
         "desc": "Flytt MongoDB til Atlas for en fullt administrert, globalt tilgjengelig database med sikkerhetskopier og overvåking.",
-        "why": "MongoDB Atlas er den naturlige fortsettelsen av det nåværende MongoDB-baserte designet. Det krever minimale applikasjonsendringer — bare en ny MONGO_URI-tilkoblingsstreng. Gratisnivået M0 er tilstrekkelig for første utrulling."
+        "why": "MongoDB Atlas er den naturlige fortsettelsen av det nåværende MongoDB-baserte designet. Det krever minimale applikasjonsendringer — bare en ny MONGO_URI-tilkoblingsstreng. Gratisnivået M0 er tilstrekkelig for første utrulling.",
+        "features": ["Gratis M0-nivå tilgjengelig", "Administrerte sikkerhetskopier", "Tilkobling via MONGO_URI", "Globale klynger"]
       },
       "auth": {
+        "name": "Autentisering",
         "desc": "Behold Firebase Auth som den er. Ingen migrering nødvendig. Konfigurer produksjonsdomener og backend-tjenestekonto.",
-        "why": "Firebase Auth er allerede integrert i både frontend og backend. Det er ingen grunn til å migrere den. Den eneste produksjonsendringen som trengs er å legge til Vercel-domenet i Firebase Authorized Domains og sikre at backend-tjenestekontoen er satt i Cloud Run."
+        "why": "Firebase Auth er allerede integrert i både frontend og backend. Det er ingen grunn til å migrere den. Den eneste produksjonsendringen som trengs er å legge til Vercel-domenet i Firebase Authorized Domains og sikre at backend-tjenestekontoen er satt i Cloud Run.",
+        "features": ["Allerede integrert", "E-post / Google / sosiale", "JWT-tokens", "Ingen migrering nødvendig"]
       },
       "dns": {
+        "name": "DNS og SSL",
         "desc": "Legg til Cloudflare for DNS-administrasjon, SSL-terminering og valgfri DDoS-beskyttelse etter at kjerneutrullingen er stabil.",
-        "why": "Cloudflare gir gratis DNS-administrasjon, SSL og et globalt kantnettverk. Det anbefales for fase 2 etter at kjerneutrullingen fungerer, for å unngå unødvendig kompleksitet i første utrulling."
+        "why": "Cloudflare gir gratis DNS-administrasjon, SSL og et globalt kantnettverk. Det anbefales for fase 2 etter at kjerneutrullingen fungerer, for å unngå unødvendig kompleksitet i første utrulling.",
+        "features": ["Gratis DNS-administrasjon", "DDoS-beskyttelse", "Edge-cache", "Egendefinert domenruting"]
       }
     },
 

@@ -61,16 +61,58 @@
     },
 
     "arch": {
+      "phase": "Phase {{n}}",
       "principleTitle": "Strategic Principle",
       "principleText": "Do not rewrite the stack. The correct strategy is to cloudify the current architecture incrementally. The cloud version should feel like the same product — not a rebuilt product.",
       "flowTitle": "Cloud Architecture Flow",
+      "flow": {
+        "userBrowser": "User / Browser",
+        "vercelFrontend": "Vercel\n(Frontend)",
+        "cloudRunBackend": "Cloud Run\n(FastAPI)",
+        "mongoAtlas": "MongoDB\nAtlas"
+      },
       "spansBoth": "spans frontend + backend",
       "servicesTitle": "Services — Click to explore",
       "visitDocs": "Visit docs",
       "keyFeatures": "Key features:",
       "deferredTitle": "Deferred to Phase 2 (do not include in v1)",
       "deferredDesc": "These services are intentionally excluded from the first deployment to keep scope manageable. Add them after the core deployment is stable.",
+      "deferred": {
+        "sentry": { "name": "Sentry", "role": "Error tracking & monitoring" },
+        "posthog": { "name": "PostHog", "role": "Product analytics" },
+        "resend": { "name": "Resend", "role": "Transactional email" },
+        "n8n": { "name": "n8n Cloud", "role": "Workflow automation" },
+        "webSearch": { "name": "Web Search Backend", "role": "Node.js search service" }
+      },
       "costTitle": "Estimated Monthly Cost",
+      "cost": {
+        "services": {
+          "vercelFrontend": "Vercel (Frontend)",
+          "cloudRunBackend": "Cloud Run (Backend)",
+          "mongoAtlas": "MongoDB Atlas",
+          "firebaseAuth": "Firebase Auth",
+          "cloudflareDns": "Cloudflare DNS",
+          "domainName": "Domain name"
+        },
+        "tiers": {
+          "hobbyFree": "Hobby (Free)",
+          "freeTier": "Free tier",
+          "mongoTier": "M0 Free / M2 Shared",
+          "sparkFree": "Spark (Free)",
+          "free": "Free",
+          "annual": "Annual"
+        },
+        "budgetTierNames": {
+          "free": "Free",
+          "starter": "Starter",
+          "professional": "Professional"
+        },
+        "budgetTiers": {
+          "free": "$0/mo — Free tiers only, some limitations",
+          "starter": "$29–59/mo — M2 Atlas + Vercel Pro + small Cloud Run",
+          "professional": "$60–120/mo — M10 Atlas + monitoring + multiple regions"
+        }
+      },
       "deployOrderTitle": "Recommended Deployment Order",
       "deployOrder": {
         "steps": {
@@ -88,24 +130,34 @@
         ]
       },
       "frontend": {
+        "name": "React Frontend",
         "desc": "Deploy the React frontend to Vercel. Connect via GitHub for automatic CI/CD on every push to main.",
-        "why": "Vercel is the natural fit for a React frontend. It provides GitHub-based deployments, a free tier, edge CDN, custom domains, and a zero-configuration build pipeline for React applications."
+        "why": "Vercel is the natural fit for a React frontend. It provides GitHub-based deployments, a free tier, edge CDN, custom domains, and a zero-configuration build pipeline for React applications.",
+        "features": ["GitHub-based CI/CD", "Custom domain + SSL", "Edge network", "ENV variable support"]
       },
       "backend": {
+        "name": "FastAPI Backend",
         "desc": "Deploy the FastAPI backend as a container on Google Cloud Run. Serverless, auto-scaling, and billed per request.",
-        "why": "Cloud Run is ideal for the existing FastAPI backend. It is container-first (the repo already has a Dockerfile), scales to zero when idle, and integrates natively with Google Cloud Secret Manager for secrets."
+        "why": "Cloud Run is ideal for the existing FastAPI backend. It is container-first (the repo already has a Dockerfile), scales to zero when idle, and integrates natively with Google Cloud Secret Manager for secrets.",
+        "features": ["Container-based", "Pay-per-request", "Auto-scaling", "Managed SSL & domain"]
       },
       "database": {
+        "name": "MongoDB",
         "desc": "Move MongoDB to Atlas for a fully managed, globally available database with backups and monitoring.",
-        "why": "MongoDB Atlas is the natural continuation of the current MongoDB-based design. It requires minimal application changes — just a new MONGO_URI connection string. The free M0 tier is sufficient for initial deployment."
+        "why": "MongoDB Atlas is the natural continuation of the current MongoDB-based design. It requires minimal application changes — just a new MONGO_URI connection string. The free M0 tier is sufficient for initial deployment.",
+        "features": ["Free M0 tier available", "Managed backups", "Connection via MONGO_URI", "Global clusters"]
       },
       "auth": {
+        "name": "Authentication",
         "desc": "Keep Firebase Auth as-is. No migration needed. Configure production domains and backend service account.",
-        "why": "Firebase Auth is already integrated in both frontend and backend. There is no reason to migrate it. The only production change needed is adding the Vercel domain to Firebase Authorized Domains and ensuring the backend service account is set in Cloud Run."
+        "why": "Firebase Auth is already integrated in both frontend and backend. There is no reason to migrate it. The only production change needed is adding the Vercel domain to Firebase Authorized Domains and ensuring the backend service account is set in Cloud Run.",
+        "features": ["Already integrated", "Email / Google / social", "JWT tokens", "No migration needed"]
       },
       "dns": {
+        "name": "DNS & SSL",
         "desc": "Add Cloudflare for DNS management, SSL termination, and optional DDoS protection after core deployment is stable.",
-        "why": "Cloudflare provides free DNS management, SSL, and a global edge network. It is recommended for Phase 2 after the core deployment is working, to avoid adding unnecessary complexity in the first rollout."
+        "why": "Cloudflare provides free DNS management, SSL, and a global edge network. It is recommended for Phase 2 after the core deployment is working, to avoid adding unnecessary complexity in the first rollout.",
+        "features": ["Free DNS management", "DDoS protection", "Edge cache", "Custom domain routing"]
       }
     },
 

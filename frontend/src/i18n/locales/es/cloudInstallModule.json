@@ -61,16 +61,58 @@
     },
 
     "arch": {
+      "phase": "Fase {{n}}",
       "principleTitle": "Principio estratégico",
       "principleText": "No reescribas el stack. La estrategia correcta es migrar a la nube la arquitectura actual de forma incremental. La versión en la nube debe sentirse como el mismo producto — no como un producto reconstruido.",
       "flowTitle": "Flujo de arquitectura en la nube",
+      "flow": {
+        "userBrowser": "Usuario / Navegador",
+        "vercelFrontend": "Vercel\n(Frontend)",
+        "cloudRunBackend": "Cloud Run\n(FastAPI)",
+        "mongoAtlas": "MongoDB\nAtlas"
+      },
       "spansBoth": "abarca frontend + backend",
       "servicesTitle": "Servicios — Haz clic para explorar",
       "visitDocs": "Ver documentación",
       "keyFeatures": "Características clave:",
       "deferredTitle": "Aplazado a la Fase 2 (no incluir en v1)",
       "deferredDesc": "Estos servicios se excluyen intencionalmente del primer despliegue para mantener el alcance manejable. Añádelos una vez que el despliegue principal sea estable.",
+      "deferred": {
+        "sentry": { "name": "Sentry", "role": "Seguimiento de errores y monitorización" },
+        "posthog": { "name": "PostHog", "role": "Analítica de producto" },
+        "resend": { "name": "Resend", "role": "Correo transaccional" },
+        "n8n": { "name": "n8n Cloud", "role": "Automatización de flujos de trabajo" },
+        "webSearch": { "name": "Backend de búsqueda web", "role": "Servicio de búsqueda Node.js" }
+      },
       "costTitle": "Coste mensual estimado",
+      "cost": {
+        "services": {
+          "vercelFrontend": "Vercel (Frontend)",
+          "cloudRunBackend": "Cloud Run (Backend)",
+          "mongoAtlas": "MongoDB Atlas",
+          "firebaseAuth": "Firebase Auth",
+          "cloudflareDns": "Cloudflare DNS",
+          "domainName": "Nombre de dominio"
+        },
+        "tiers": {
+          "hobbyFree": "Hobby (Gratis)",
+          "freeTier": "Nivel gratuito",
+          "mongoTier": "M0 Gratis / M2 Compartido",
+          "sparkFree": "Spark (Gratis)",
+          "free": "Gratis",
+          "annual": "Anual"
+        },
+        "budgetTierNames": {
+          "free": "Gratis",
+          "starter": "Inicial",
+          "professional": "Profesional"
+        },
+        "budgetTiers": {
+          "free": "$0/mes — Solo niveles gratuitos, con algunas limitaciones",
+          "starter": "$29–59/mes — M2 Atlas + Vercel Pro + Cloud Run pequeño",
+          "professional": "$60–120/mes — M10 Atlas + monitorización + varias regiones"
+        }
+      },
       "deployOrderTitle": "Orden de despliegue recomendado",
       "deployOrder": {
         "steps": {
@@ -88,24 +130,34 @@
         ]
       },
       "frontend": {
+        "name": "Frontend React",
         "desc": "Despliega el frontend React en Vercel. Conéctalo mediante GitHub para CI/CD automático en cada push a main.",
-        "why": "Vercel es la opción natural para un frontend React. Ofrece despliegues basados en GitHub, un nivel gratuito, CDN en el borde, dominios personalizados y un pipeline de compilación sin configuración para aplicaciones React."
+        "why": "Vercel es la opción natural para un frontend React. Ofrece despliegues basados en GitHub, un nivel gratuito, CDN en el borde, dominios personalizados y un pipeline de compilación sin configuración para aplicaciones React.",
+        "features": ["CI/CD basado en GitHub", "Dominio personalizado + SSL", "Red en el borde", "Soporte de variables ENV"]
       },
       "backend": {
+        "name": "Backend FastAPI",
         "desc": "Despliega el backend FastAPI como contenedor en Google Cloud Run. Serverless, con escalado automático y facturación por solicitud.",
-        "why": "Cloud Run es ideal para el backend FastAPI existente. Es primero contenedor (el repositorio ya tiene un Dockerfile), escala a cero cuando está inactivo e integra de forma nativa con Google Cloud Secret Manager para los secretos."
+        "why": "Cloud Run es ideal para el backend FastAPI existente. Es primero contenedor (el repositorio ya tiene un Dockerfile), escala a cero cuando está inactivo e integra de forma nativa con Google Cloud Secret Manager para los secretos.",
+        "features": ["Basado en contenedores", "Pago por solicitud", "Escalado automático", "SSL y dominio gestionados"]
       },
       "database": {
+        "name": "MongoDB",
         "desc": "Migra MongoDB a Atlas para obtener una base de datos completamente gestionada, disponible globalmente, con copias de seguridad y monitorización.",
-        "why": "MongoDB Atlas es la continuación natural del diseño actual basado en MongoDB. Requiere cambios mínimos en la aplicación — solo una nueva cadena de conexión MONGO_URI. El nivel gratuito M0 es suficiente para el despliegue inicial."
+        "why": "MongoDB Atlas es la continuación natural del diseño actual basado en MongoDB. Requiere cambios mínimos en la aplicación — solo una nueva cadena de conexión MONGO_URI. El nivel gratuito M0 es suficiente para el despliegue inicial.",
+        "features": ["Nivel M0 gratuito disponible", "Copias de seguridad gestionadas", "Conexión vía MONGO_URI", "Clústeres globales"]
       },
       "auth": {
+        "name": "Autenticación",
         "desc": "Mantén Firebase Auth tal como está. No se necesita migración. Configura los dominios de producción y la cuenta de servicio del backend.",
-        "why": "Firebase Auth ya está integrado en el frontend y el backend. No hay razón para migrarlo. El único cambio necesario en producción es añadir el dominio de Vercel a los dominios autorizados de Firebase y asegurarse de que la cuenta de servicio del backend esté configurada en Cloud Run."
+        "why": "Firebase Auth ya está integrado en el frontend y el backend. No hay razón para migrarlo. El único cambio necesario en producción es añadir el dominio de Vercel a los dominios autorizados de Firebase y asegurarse de que la cuenta de servicio del backend esté configurada en Cloud Run.",
+        "features": ["Ya integrado", "Email / Google / redes sociales", "Tokens JWT", "Sin migración necesaria"]
       },
       "dns": {
+        "name": "DNS y SSL",
         "desc": "Añade Cloudflare para gestión de DNS, terminación SSL y protección DDoS opcional una vez que el despliegue principal sea estable.",
-        "why": "Cloudflare ofrece gestión de DNS gratuita, SSL y una red de borde global. Se recomienda para la Fase 2, después de que el despliegue principal esté funcionando, para evitar añadir complejidad innecesaria en el primer lanzamiento."
+        "why": "Cloudflare ofrece gestión de DNS gratuita, SSL y una red de borde global. Se recomienda para la Fase 2, después de que el despliegue principal esté funcionando, para evitar añadir complejidad innecesaria en el primer lanzamiento.",
+        "features": ["Gestión de DNS gratuita", "Protección DDoS", "Caché en el borde", "Enrutamiento de dominio personalizado"]
       }
     },
 

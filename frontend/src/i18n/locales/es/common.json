@@ -133,6 +133,60 @@
     "subtitle": "Tu recorrido de aprendizaje personalizado impulsado por inteligencia artificial"
   },
 
+  "askAI": {
+    "title": "Pregunta a la IA sobre Aprendizaje en el Trabajo",
+    "subtitle": "UX sin interfaz / modo Zero-UI",
+    "inputPlaceholder": "Pregunta a la IA sobre aprendizaje en el trabajo...",
+    "signInMessage": "Inicia sesión para usar las funciones de aprendizaje impulsadas por IA.",
+    "backToApp": "← Volver a la app",
+    "confidence": {
+      "title": "Confianza",
+      "high": "Alta (100%)",
+      "medium": "Media (50%)",
+      "low": "Baja (0%)",
+      "highTooltip": "Sólo coincidencias exactas o muy cercanas (estricto).",
+      "mediumTooltip": "Permite cierta flexibilidad, pero evita coincidencias débiles.",
+      "lowTooltip": "Enruta a la opción más cercana disponible, aunque no sea una coincidencia fuerte."
+    },
+    "suggestions": {
+      "videoLesson": "Muéstrame una lección en vídeo sobre Agile",
+      "microLesson": "Dame una micro-lección sobre liderazgo",
+      "whatNext": "¿Qué debería aprender ahora?"
+    },
+    "quotes": {
+      "ignacio": "No estoy construyendo solo una app de aprendizaje — estoy creando un asistente de aprendizaje con IA co-evolutivo donde los usuarios moldean su crecimiento.",
+      "ignacioAuthor": "— Ignacio Tejera",
+      "jensen": "No estamos reemplazando la creatividad humana — la estamos amplificando 100 veces. Los que ganan son los que tienen las mejores ideas, no los que tienen las habilidades técnicas más avanzadas. Esto cambia todo sobre quién puede construir empresas.",
+      "jensenAuthor": "— Jensen Huang (sobre la IA)"
+    },
+    "hologramPortal": {
+      "title": "Portal Holograma — Módulo Futuro",
+      "subtitle": "Zona experimental: conceptos, prototipos y visualizaciones avanzadas",
+      "enter": "Entrar →",
+      "openTooltip": "Abrir Módulo Futuro"
+    },
+    "commandBar": {
+      "go": "Ir",
+      "loading": "..."
+    },
+    "controls": {
+      "scale": "Escala",
+      "height": "Altura",
+      "source": "Fuente",
+      "sourceLocal": "Local",
+      "sourceRemote": "Remoto",
+      "sourceCustom": "Personalizado",
+      "customUrlPlaceholder": "https://.../model.glb"
+    },
+    "launcher": {
+      "chatOnClick": "Chat al hacer clic en el holograma",
+      "on": "Activado",
+      "off": "Desactivado",
+      "chatLabel": "Chat",
+      "chatTooltip": "Chatear con la Guía Holograma"
+    }
+  },
+
   "aiLearning": {
     "title": "Aprendizaje y formación en IA",
     "subtitle": "Domina conceptos, herramientas y buenas prácticas de IA mediante lecciones interactivas",

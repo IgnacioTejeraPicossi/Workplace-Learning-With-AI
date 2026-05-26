@@ -1,8 +1,14 @@
 import React, { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
-export default function HologramHero({ title = "Future Module", subtitle = "Click to explore prototypes", onClick, children }) {
+export default function HologramHero({ title, subtitle, onClick, children }) {
+  const { t } = useTranslation();
   const cardRef = useRef(null);
   const ctaRef = useRef(null);
+  // Localised defaults — used only when the caller (App.jsx) doesn't pass
+  // explicit title/subtitle props. Keeps the component self-sufficient.
+  const resolvedTitle = title || t('askAI.hologramPortal.title', { defaultValue: 'Future Module' });
+  const resolvedSubtitle = subtitle || t('askAI.hologramPortal.subtitle', { defaultValue: 'Click to explore prototypes' });
 
   const styles = useMemo(() => ({
     wrapper: {
@@ -162,13 +168,13 @@ export default function HologramHero({ title = "Future Module", subtitle = "Clic
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
         onClick={handleClick}
-        title="Open Future Module"
+        title={t('askAI.hologramPortal.openTooltip', { defaultValue: 'Open Future Module' })}
       >
         {/* 3D content slot */}
         <div style={styles.canvasSlot}>{children}</div>
-        <h3 style={styles.heading}>{title}</h3>
-        <div style={styles.sub}>{subtitle}</div>
-        <div ref={ctaRef} style={styles.cta}>Enter →</div>
+        <h3 style={styles.heading}>{resolvedTitle}</h3>
+        <div style={styles.sub}>{resolvedSubtitle}</div>
+        <div ref={ctaRef} style={styles.cta}>{t('askAI.hologramPortal.enter', { defaultValue: 'Enter →' })}</div>
 
         {/* holographic layers */}
         <div style={styles.scanlines} />

@@ -7,7 +7,6 @@ const services = [
   {
     key: 'frontend',
     icon: '⚛️',
-    name: 'React Frontend',
     provider: 'Vercel',
     phase: 1,
     color: '#000000',
@@ -16,13 +15,11 @@ const services = [
     accentColor: '#6366f1',
     descKey: 'cloudInstall.arch.frontend.desc',
     whyKey: 'cloudInstall.arch.frontend.why',
-    features: ['GitHub-based CI/CD', 'Custom domain + SSL', 'Edge network', 'ENV variable support'],
     link: 'https://vercel.com',
   },
   {
     key: 'backend',
     icon: '🐍',
-    name: 'FastAPI Backend',
     provider: 'Google Cloud Run',
     phase: 1,
     color: '#1a73e8',
@@ -31,13 +28,11 @@ const services = [
     accentColor: '#2563eb',
     descKey: 'cloudInstall.arch.backend.desc',
     whyKey: 'cloudInstall.arch.backend.why',
-    features: ['Container-based', 'Pay-per-request', 'Auto-scaling', 'Managed SSL & domain'],
     link: 'https://cloud.google.com/run',
   },
   {
     key: 'database',
     icon: '🍃',
-    name: 'MongoDB',
     provider: 'MongoDB Atlas',
     phase: 1,
     color: '#00684a',
@@ -46,13 +41,11 @@ const services = [
     accentColor: '#16a34a',
     descKey: 'cloudInstall.arch.database.desc',
     whyKey: 'cloudInstall.arch.database.why',
-    features: ['Free M0 tier available', 'Managed backups', 'Connection via MONGO_URI', 'Global clusters'],
     link: 'https://mongodb.com/atlas',
   },
   {
     key: 'auth',
     icon: '🔥',
-    name: 'Authentication',
     provider: 'Firebase Auth',
     phase: 1,
     color: '#f57c00',
@@ -61,13 +54,11 @@ const services = [
     accentColor: '#ea580c',
     descKey: 'cloudInstall.arch.auth.desc',
     whyKey: 'cloudInstall.arch.auth.why',
-    features: ['Already integrated', 'Email / Google / social', 'JWT tokens', 'No migration needed'],
     link: 'https://firebase.google.com/products/auth',
   },
   {
     key: 'dns',
     icon: '☁️',
-    name: 'DNS & SSL',
     provider: 'Cloudflare',
     phase: 2,
     color: '#f38020',
@@ -76,18 +67,45 @@ const services = [
     accentColor: '#d97706',
     descKey: 'cloudInstall.arch.dns.desc',
     whyKey: 'cloudInstall.arch.dns.why',
-    features: ['Free DNS management', 'DDoS protection', 'Edge cache', 'Custom domain routing'],
     link: 'https://cloudflare.com',
   },
 ];
 
 const deferred = [
-  { icon: '📊', name: 'Sentry', role: 'Error tracking & monitoring' },
-  { icon: '📈', name: 'PostHog', role: 'Product analytics' },
-  { icon: '📧', name: 'Resend', role: 'Transactional email' },
-  { icon: '🔄', name: 'n8n Cloud', role: 'Workflow automation' },
-  { icon: '🔍', name: 'Web Search Backend', role: 'Node.js search service' },
+  { icon: '📊', key: 'sentry' },
+  { icon: '📈', key: 'posthog' },
+  { icon: '📧', key: 'resend' },
+  { icon: '🔄', key: 'n8n' },
+  { icon: '🔍', key: 'webSearch' },
 ];
+
+const FLOW_STEPS = [
+  { icon: '👤', labelKey: 'cloudInstall.arch.flow.userBrowser' },
+  { arrow: true },
+  { icon: '⚛️', labelKey: 'cloudInstall.arch.flow.vercelFrontend' },
+  { arrow: true },
+  { icon: '🐍', labelKey: 'cloudInstall.arch.flow.cloudRunBackend' },
+  { arrow: true },
+  { icon: '🍃', labelKey: 'cloudInstall.arch.flow.mongoAtlas' },
+];
+
+const COST_SERVICE_KEYS = {
+  'Vercel (Frontend)': 'vercelFrontend',
+  'Cloud Run (Backend)': 'cloudRunBackend',
+  'MongoDB Atlas': 'mongoAtlas',
+  'Firebase Auth': 'firebaseAuth',
+  'Cloudflare DNS': 'cloudflareDns',
+  'Domain name': 'domainName',
+};
+
+const COST_TIER_KEYS = {
+  'Hobby (Free)': 'hobbyFree',
+  'Free tier': 'freeTier',
+  'M0 Free / M2 Shared': 'mongoTier',
+  'Spark (Free)': 'sparkFree',
+  'Free': 'free',
+  'Annual': 'annual',
+};
 
 function ServiceCard({ service, isSelected, onSelect }) {
   const { t } = useTranslation();
@@ -115,10 +133,12 @@ function ServiceCard({ service, isSelected, onSelect }) {
           backgroundColor: phaseColor.bg, color: phaseColor.text,
           fontSize: '0.7rem', fontWeight: '700'
         }}>
-          Phase {service.phase}
+          {t('cloudInstall.arch.phase', { n: service.phase })}
         </span>
       </div>
-      <div style={{ fontWeight: '700', color: '#1f2937', marginBottom: '0.25rem' }}>{service.name}</div>
+      <div style={{ fontWeight: '700', color: '#1f2937', marginBottom: '0.25rem' }}>
+        {t(`cloudInstall.arch.${service.key}.name`)}
+      </div>
       <div style={{ color: service.accentColor, fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.75rem' }}>
         {service.provider}
       </div>
@@ -154,6 +174,24 @@ export default function CloudTargetArchitecture() {
 
   const selectedService = services.find(s => s.key === selected);
 
+  const tCostService = (service) => {
+    const slug = COST_SERVICE_KEYS[service];
+    return slug
+      ? t(`cloudInstall.arch.cost.services.${slug}`, { defaultValue: service })
+      : service;
+  };
+
+  const tCostTier = (tier) => {
+    const slug = COST_TIER_KEYS[tier];
+    return slug
+      ? t(`cloudInstall.arch.cost.tiers.${slug}`, { defaultValue: tier })
+      : tier;
+  };
+
+  const selectedFeatures = selectedService
+    ? t(`cloudInstall.arch.${selectedService.key}.features`, { returnObjects: true })
+    : [];
+
   return (
     <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
 
@@ -186,15 +224,7 @@ export default function CloudTargetArchitecture() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           gap: '0.5rem', flexWrap: 'wrap'
         }}>
-          {[
-            { icon: '👤', label: 'User / Browser' },
-            { arrow: true },
-            { icon: '⚛️', label: 'Vercel\n(Frontend)' },
-            { arrow: true },
-            { icon: '🐍', label: 'Cloud Run\n(FastAPI)' },
-            { arrow: true },
-            { icon: '🍃', label: 'MongoDB\nAtlas' },
-          ].map((item, i) =>
+          {FLOW_STEPS.map((item, i) =>
             item.arrow ? (
               <span key={i} style={{ color: '#9ca3af', fontSize: '1.25rem', fontWeight: '300' }}>→</span>
             ) : (
@@ -205,7 +235,7 @@ export default function CloudTargetArchitecture() {
               }}>
                 <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
                 <span style={{ fontSize: '0.7rem', color: '#374151', fontWeight: '500', whiteSpace: 'pre-line', lineHeight: 1.3 }}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
               </div>
             )
@@ -254,7 +284,9 @@ export default function CloudTargetArchitecture() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
             <span style={{ fontSize: '1.75rem' }}>{selectedService.icon}</span>
             <div>
-              <div style={{ fontWeight: '700', color: '#1f2937', fontSize: '1.05rem' }}>{selectedService.name}</div>
+              <div style={{ fontWeight: '700', color: '#1f2937', fontSize: '1.05rem' }}>
+                {t(`cloudInstall.arch.${selectedService.key}.name`)}
+              </div>
               <div style={{ color: selectedService.accentColor, fontSize: '0.85rem', fontWeight: '600' }}>
                 {selectedService.provider}
               </div>
@@ -279,7 +311,7 @@ export default function CloudTargetArchitecture() {
             {t('cloudInstall.arch.keyFeatures')}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {selectedService.features.map((f, i) => (
+            {(Array.isArray(selectedFeatures) ? selectedFeatures : []).map((f, i) => (
               <span key={i} style={{
                 padding: '0.25rem 0.65rem', borderRadius: '9999px',
                 backgroundColor: 'white', border: `1px solid ${selectedService.borderColor}`,
@@ -318,18 +350,18 @@ export default function CloudTargetArchitecture() {
                 fontSize: '0.825rem'
               }}>
                 <div>
-                  <span style={{ fontWeight: '600', color: '#374151' }}>{item.service}</span>
+                  <span style={{ fontWeight: '600', color: '#374151' }}>{tCostService(item.service)}</span>
                   <span style={{
                     marginLeft: '0.5rem', padding: '0.1rem 0.4rem', borderRadius: '9999px',
                     backgroundColor: item.phase === 1 ? '#d1fae5' : '#f3f4f6',
                     color: item.phase === 1 ? '#065f46' : '#6b7280',
                     fontSize: '0.65rem', fontWeight: '600'
                   }}>
-                    Phase {item.phase}
+                    {t('cloudInstall.arch.phase', { n: item.phase })}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>{item.tier}</span>
+                  <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>{tCostTier(item.tier)}</span>
                   <span style={{ fontWeight: '600', color: '#1f2937' }}>{item.monthly_estimate}</span>
                 </div>
               </div>
@@ -343,10 +375,12 @@ export default function CloudTargetArchitecture() {
                   flex: 1, minWidth: 200, padding: '0.65rem 0.85rem',
                   borderRadius: '0.5rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb'
                 }}>
-                  <div style={{ fontWeight: '600', color: '#374151', fontSize: '0.8rem', textTransform: 'capitalize', marginBottom: '0.25rem' }}>
-                    {tier}
+                  <div style={{ fontWeight: '600', color: '#374151', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
+                    {t(`cloudInstall.arch.cost.budgetTierNames.${tier}`, { defaultValue: tier })}
                   </div>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>{desc}</div>
+                  <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                    {t(`cloudInstall.arch.cost.budgetTiers.${tier}`, { defaultValue: desc })}
+                  </div>
                 </div>
               ))}
             </div>
@@ -424,8 +458,12 @@ export default function CloudTargetArchitecture() {
             }}>
               <span>{d.icon}</span>
               <div>
-                <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6b7280' }}>{d.name}</div>
-                <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>{d.role}</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6b7280' }}>
+                  {t(`cloudInstall.arch.deferred.${d.key}.name`)}
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>
+                  {t(`cloudInstall.arch.deferred.${d.key}.role`)}
+                </div>
               </div>
             </div>
           ))}

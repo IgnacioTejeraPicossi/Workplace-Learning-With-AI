@@ -1,4 +1,5 @@
 import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, Float, Sparkles } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
@@ -15,6 +16,7 @@ function canCreateWebGLContext() {
 }
 
 export default function HologramPortal3D({ onClick, embed = false }) {
+  const { t } = useTranslation();
   const [modelScale, setModelScale] = useState(0.8);
   const [modelOffsetY, setModelOffsetY] = useState(-0.5);
   const [modelSource, setModelSource] = useState('local'); // 'local' | 'remote' | 'custom'
@@ -89,7 +91,7 @@ export default function HologramPortal3D({ onClick, embed = false }) {
       </Canvas>
       {/* Controls overlay (works even when embed true) */}
       <div style={controlsStyle} onClick={(e) => e.stopPropagation()}>
-        <label style={{ color: '#bfe8ff', fontSize: 12 }}>Scale
+        <label style={{ color: '#bfe8ff', fontSize: 12 }}>{t('askAI.controls.scale', { defaultValue: 'Scale' })}
           <input
             type="range"
             min="0.6"
@@ -100,7 +102,7 @@ export default function HologramPortal3D({ onClick, embed = false }) {
             style={{ marginLeft: 6 }}
           />
         </label>
-        <label style={{ color: '#bfe8ff', fontSize: 12 }}>Height
+        <label style={{ color: '#bfe8ff', fontSize: 12 }}>{t('askAI.controls.height', { defaultValue: 'Height' })}
           <input
             type="range"
             min="-0.8"
@@ -111,22 +113,22 @@ export default function HologramPortal3D({ onClick, embed = false }) {
             style={{ marginLeft: 6 }}
           />
         </label>
-        <label style={{ color: '#bfe8ff', fontSize: 12 }}>Source
+        <label style={{ color: '#bfe8ff', fontSize: 12 }}>{t('askAI.controls.source', { defaultValue: 'Source' })}
           <select
             value={modelSource}
             onChange={(e) => setModelSource(e.target.value)}
             style={{ marginLeft: 6, background: 'rgba(255,255,255,0.12)', color: '#dff5ff', border: '1px solid rgba(120,200,255,0.4)', borderRadius: 6 }}
           >
-            <option value="local">Local</option>
-            <option value="remote">Remote</option>
-            <option value="custom">Custom</option>
+            <option value="local">{t('askAI.controls.sourceLocal', { defaultValue: 'Local' })}</option>
+            <option value="remote">{t('askAI.controls.sourceRemote', { defaultValue: 'Remote' })}</option>
+            <option value="custom">{t('askAI.controls.sourceCustom', { defaultValue: 'Custom' })}</option>
           </select>
         </label>
         {modelSource === 'custom' && (
           <>
             <input
               type="text"
-              placeholder="https://.../model.glb"
+              placeholder={t('askAI.controls.customUrlPlaceholder', { defaultValue: 'https://.../model.glb' })}
               value={customUrl}
               onChange={(e) => setCustomUrl(e.target.value)}
               style={{

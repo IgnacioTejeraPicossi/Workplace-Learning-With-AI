@@ -850,8 +850,35 @@
     },
     "quotes": {
       "ignacio": "I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth.",
+      "ignacioAuthor": "— Ignacio Tejera",
       "jensen": "We are not replacing human creativity — we are amplifying it 100 times. Those who win are those with the best ideas, not those with the most technical skills. This changes everything about who can build companies.",
       "jensenAuthor": "— Jensen Huang (about AI)"
+    },
+    "hologramPortal": {
+      "title": "Hologram Portal — Future Module",
+      "subtitle": "Experimental zone: concepts, prototypes and advanced visualizations",
+      "enter": "Enter →",
+      "openTooltip": "Open Future Module"
+    },
+    "commandBar": {
+      "go": "Go",
+      "loading": "..."
+    },
+    "controls": {
+      "scale": "Scale",
+      "height": "Height",
+      "source": "Source",
+      "sourceLocal": "Local",
+      "sourceRemote": "Remote",
+      "sourceCustom": "Custom",
+      "customUrlPlaceholder": "https://.../model.glb"
+    },
+    "launcher": {
+      "chatOnClick": "Chat on click Hologram",
+      "on": "On",
+      "off": "Off",
+      "chatLabel": "Chat",
+      "chatTooltip": "Chat with the Hologram Guide"
     }
   },
 

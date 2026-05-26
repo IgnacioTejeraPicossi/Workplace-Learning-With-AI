@@ -1033,8 +1033,35 @@
     },
     "quotes": {
       "ignacio": "Jeg bygger ikke bare en læringsapp — jeg skaper en medutviklende AI-læringsassistent hvor brukere former dens vekst.",
+      "ignacioAuthor": "— Ignacio Tejera",
       "jensen": "Vi erstatter ikke menneskelig kreativitet — vi forsterker den 100 ganger. De som vinner er de med de beste ideene, ikke de med de mest tekniske ferdighetene. Dette endrer alt om hvem som kan bygge bedrifter.",
       "jensenAuthor": "— Jensen Huang (om AI)"
+    },
+    "hologramPortal": {
+      "title": "Hologramportal — Fremtidsmodul",
+      "subtitle": "Eksperimentell sone: konsepter, prototyper og avanserte visualiseringer",
+      "enter": "Gå inn →",
+      "openTooltip": "Åpne fremtidsmodulen"
+    },
+    "commandBar": {
+      "go": "Gå",
+      "loading": "..."
+    },
+    "controls": {
+      "scale": "Skala",
+      "height": "Høyde",
+      "source": "Kilde",
+      "sourceLocal": "Lokal",
+      "sourceRemote": "Ekstern",
+      "sourceCustom": "Egendefinert",
+      "customUrlPlaceholder": "https://.../model.glb"
+    },
+    "launcher": {
+      "chatOnClick": "Chat ved klikk på hologrammet",
+      "on": "På",
+      "off": "Av",
+      "chatLabel": "Chat",
+      "chatTooltip": "Chat med Hologram-veilederen"
     }
   },
 

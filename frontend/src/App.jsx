@@ -334,7 +334,7 @@ function AppContent() {
             >
               <strong>{t('askAI.quotes.ignacio')}</strong>
               <br /><br />
-              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>— Ignacio Tejera</span>
+              <span style={{ fontStyle: "italic", fontSize: "1em", color: "rgba(135, 206, 235, 0.8)" }}>{t('askAI.quotes.ignacioAuthor')}</span>
             </div>
             
             {/* Top Right Background Message */}
@@ -413,8 +413,8 @@ function AppContent() {
                     <CommandBar onRoute={handleRoute} inputPlaceholder={t('askAI.inputPlaceholder')} />
                     {/* Hologram card with embedded 3D portal */}
                     <HologramHero
-                      title="Hologram Portal — Future Module"
-                      subtitle="Experimental zone: concepts, prototypes and advanced visualizations"
+                      title={t('askAI.hologramPortal.title')}
+                      subtitle={t('askAI.hologramPortal.subtitle')}
                       onClick={handleOpenFutureApp}
                     >
                       <HologramPortal3D embed />

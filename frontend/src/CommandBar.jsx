@@ -344,7 +344,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
           disabled={loading}
           style={{ padding: '0 18px', borderRadius: 6, fontSize: 16, background: '#007bff', color: '#fff', border: 'none', cursor: 'pointer' }}
         >
-          {loading ? '...' : 'Go'}
+          {loading ? t('askAI.commandBar.loading') : t('askAI.commandBar.go')}
         </button>
         {/*
         <button
