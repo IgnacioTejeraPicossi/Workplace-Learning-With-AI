@@ -11,6 +11,8 @@ from typing import List, Optional, Any, Dict
 try:
     from backend.services.red_cross_qa import (
         generate_test_plan,
+        generate_test_plan_from_ado_item,
+        parse_ado_pasted_text,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -52,6 +54,8 @@ try:
 except ImportError:  # pragma: no cover
     from services.red_cross_qa import (  # type: ignore
         generate_test_plan,
+        generate_test_plan_from_ado_item,
+        parse_ado_pasted_text,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -213,6 +217,15 @@ class RoleMatrixRequest(BaseModel):
 
 
 class AdoDispatchRequest(BaseModel):
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+# Phase H+ (2026-05-27) — Paste-and-Generate: user copies a Sprint item
+# from the live Azure DevOps Board and the agent emits a Røde Kors-aware
+# test plan. No PAT required (parsing is heuristic).
+class AdoPasteToPlanRequest(BaseModel):
+    pasted_text: str = Field(..., description="Raw text copied from an ADO User Story / Task.")
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -467,6 +480,26 @@ async def api_run_role_matrix(body: RoleMatrixRequest):
 async def api_ado_preview(environment: Optional[str] = "test"):
     env = _check_env(environment)
     return await get_ado_bundle_preview(env)
+
+
+# Phase H+ — Paste-and-Generate: user pastes a Sprint item; agent emits
+# the parsed structure + a Røde Kors-aware test plan. Mirror endpoint
+# for parser-only (parse without generating the plan, useful for the
+# UI's "preview parse" hint).
+@router.post("/ado/parse-pasted")
+async def api_ado_parse_pasted(body: AdoPasteToPlanRequest):
+    parsed = parse_ado_pasted_text(body.pasted_text or "")
+    return {"status": "ok", "parsed": parsed}
+
+
+@router.post("/ado/paste-to-plan")
+async def api_ado_paste_to_plan(body: AdoPasteToPlanRequest):
+    env = _check_env(body.environment)
+    if not (body.pasted_text or "").strip():
+        raise HTTPException(status_code=400, detail="pasted_text is required")
+    return await generate_test_plan_from_ado_item(
+        body.pasted_text, env, body.lang or "en",
+    )
 
 
 @router.post("/create-ado-work-items")

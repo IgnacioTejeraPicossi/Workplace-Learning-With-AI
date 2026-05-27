@@ -18,6 +18,7 @@ from backend.services.red_cross_qa import (
     analyze_api, generate_cms_test_cases, run_enonic_performance, run_designsystemet_audit,
     run_role_matrix_audit, run_security_scan,
     generate_nvda_script, run_wave_audit,
+    parse_ado_pasted_text, generate_test_plan_from_ado_item,
 )
 
 
@@ -939,6 +940,79 @@ async def main():
     print(f"[OK] WAVE audit ({cats['errors']} errors, "
           f"{cats['contrast_errors']} contrast, {cats['alerts']} alerts, "
           f"deep link present)")
+
+    # ── Phase H+ (2026-05-27) — Paste-and-Generate ADO Sprint item ─
+    # 1) Parser robust on a realistic NO paste (RedCrossNorway/rkdotno Sprint 2 style)
+    pasted_no = (
+        "Tittel: Donasjonsflyt — Vipps handoff\n"
+        "Arbeidselement-type: User Story\n"
+        "Område-sti: rkdotno\\Web QA\n"
+        "Iterasjons-sti: rkdotno\\Sprint 2\n"
+        "Etiketter: donasjon, vipps, kampanje\n"
+        "Story Points: 5\n"
+        "\n"
+        "Beskrivelse:\n"
+        "Som giver vil jeg fullføre donasjon via Vipps slik at jeg slipper kortdata.\n"
+        "Donasjonen er en del av en pågående giverkampanje.\n"
+        "\n"
+        "Akseptansekriterier:\n"
+        "- AC1: Vipps handoff fungerer på mobil\n"
+        "- AC2: Kvittering vises etter retur\n"
+        "- AC3: Beløp logges i Analytics\n"
+    )
+    parsed = parse_ado_pasted_text(pasted_no)
+    assert parsed["title"] == "Donasjonsflyt — Vipps handoff", \
+        f"title parse failed: {parsed['title']!r}"
+    assert parsed["fields"].get("work_item_type") == "User Story"
+    assert parsed["fields"].get("area_path") == "rkdotno\\Web QA"
+    assert parsed["fields"].get("iteration_path") == "rkdotno\\Sprint 2"
+    assert "donasjon" in parsed["tags"], f"tags missing 'donasjon': {parsed['tags']}"
+    assert "vipps" in parsed["tags"]
+    assert "AC1" in parsed["acceptance_criteria"] and "AC3" in parsed["acceptance_criteria"]
+    assert "Vipps" in parsed["description"]
+    # The paste mentions "donasjon" + "kampanje" + "giverkampanje" so the detector
+    # should land on Kampanje (highest keyword density).
+    assert parsed["rk_content_type"] == "Kampanje", \
+        f"expected Kampanje content type, got {parsed['rk_content_type']!r}"
+    print(f"[OK] ADO paste parser (NO, content_type={parsed['rk_content_type']}, "
+          f"{len(parsed['tags'])} tags, AC captured)")
+
+    # 2) Parser robust on a messy paste with NO field headers at all
+    pasted_messy = (
+        "Build a new Aktivitet card for 'Leksehjelp' in the Distrikt landing page\n"
+        "It should match the Designsystemet Card component.\n"
+    )
+    parsed_messy = parse_ado_pasted_text(pasted_messy)
+    assert parsed_messy["title"], "fallback title from first line missing"
+    assert "Leksehjelp" in parsed_messy["title"]
+    # 'Aktivitet' (1) + 'Distrikt' (1) — tie-break: first wins in dict order ⇒ Distrikt
+    assert parsed_messy["rk_content_type"] in {"Aktivitet", "Distrikt"}, \
+        f"expected Aktivitet or Distrikt, got {parsed_messy['rk_content_type']!r}"
+    print(f"[OK] ADO paste parser (messy free-form, content_type="
+          f"{parsed_messy['rk_content_type']})")
+
+    # 3) generate_test_plan_from_ado_item end-to-end (NO)
+    paste_plan_no = await generate_test_plan_from_ado_item(pasted_no, "test", "no")
+    assert paste_plan_no["status"] == "ok"
+    assert paste_plan_no["lang"] == "no"
+    assert paste_plan_no["parsed"]["rk_content_type"] == "Kampanje"
+    assert "plan" in paste_plan_no and "ado_work_items" in paste_plan_no["plan"]
+    assert paste_plan_no["plan"]["ado_work_items"], "expected ADO work items in plan"
+    # The plan reuses the mock-first fallback so static-review items must
+    # still be there (Enonic XP skill 0.1.0+ guarantee).
+    static_items = [wi for wi in paste_plan_no["plan"]["ado_work_items"]
+                    if wi.get("test_level") == "static-review"]
+    assert static_items, "expected static-review items in paste-derived plan"
+    print(f"[OK] paste-to-plan NO ({len(paste_plan_no['plan']['ado_work_items'])} "
+          f"work items, {len(static_items)} static-review)")
+
+    # 4) Empty paste → still returns a valid (empty) parse so the API can
+    #    surface a graceful "nothing detected" state.
+    empty_parsed = parse_ado_pasted_text("")
+    assert empty_parsed["title"] == ""
+    assert empty_parsed["rk_content_type"] is None
+    assert empty_parsed["risk_level"] == "medium"
+    print("[OK] ADO paste parser (empty input handled)")
 
 
 if __name__ == "__main__":

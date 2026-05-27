@@ -25,6 +25,12 @@ const AzureDevOps = ({ environment }) => {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Phase H+ (2026-05-27) — Paste-and-Generate.
+  const [pastedText, setPastedText] = useState('');
+  const [pasteResult, setPasteResult] = useState(null);
+  const [pasting, setPasting] = useState(false);
+  const [pasteError, setPasteError] = useState('');
+
   useEffect(() => {
     (async () => {
       try {
@@ -34,6 +40,30 @@ const AzureDevOps = ({ environment }) => {
       } catch { /* offline */ }
     })();
   }, [environment]);
+
+  const handlePasteToPlan = async () => {
+    setPasteError('');
+    if (!pastedText.trim()) {
+      setPasteError(t('redCrossWebQaModule.ado.pasteEmpty'));
+      return;
+    }
+    setPasting(true); setPasteResult(null);
+    try {
+      const res = await fetch(`${API}/ado/paste-to-plan`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pasted_text: pastedText, environment, lang: i18n.language }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') setPasteResult(data);
+      else setPasteError(data.detail || data.message || 'Error');
+    } catch (e) {
+      setPasteError('Network error');
+    } finally { setPasting(false); }
+  };
+
+  const handleClearPaste = () => {
+    setPastedText(''); setPasteResult(null); setPasteError('');
+  };
 
   const handleDispatch = async () => {
     setDispatching(true); setResult(null);
@@ -81,6 +111,91 @@ const AzureDevOps = ({ environment }) => {
             <ConfigChip label={t('redCrossWebQaModule.ado.iterationPath')} value={bundle?.iteration_path || 'rodekors-web\\Sprint 1'} color="#0d9488" mono />
             <ConfigChip label={t('redCrossWebQaModule.ado.tags')} value={(bundle?.tags || ['red-cross-qa']).join(', ')} color="#f59e0b" mono />
           </div>
+        </div>
+
+        {/* Phase H+ — Paste-and-Generate panel */}
+        <div style={{ ...panel, borderLeft: '4px solid #2563eb' }}>
+          <h3 style={panelTitle}>📋 {t('redCrossWebQaModule.ado.pasteTitle')}</h3>
+          <p style={{ margin: '0 0 14px', fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+            {t('redCrossWebQaModule.ado.pasteSubtitle')}
+          </p>
+          <textarea
+            value={pastedText}
+            onChange={(e) => setPastedText(e.target.value)}
+            placeholder={t('redCrossWebQaModule.ado.pastePlaceholder')}
+            rows={10}
+            style={{
+              width: '100%', padding: 12, borderRadius: 8,
+              border: '1px solid #cbd5e1', fontSize: 12,
+              fontFamily: 'ui-monospace, monospace', resize: 'vertical',
+              backgroundColor: '#f8fafc', color: '#1e293b',
+            }}
+          />
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
+            <button onClick={handlePasteToPlan} disabled={pasting} style={primaryBtn(pasting, '#2563eb')}>
+              {pasting ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.ado.btnGeneratePlan')}
+            </button>
+            <button onClick={handleClearPaste} disabled={pasting || (!pastedText && !pasteResult)} style={secondaryBtn(pasting || (!pastedText && !pasteResult))}>
+              {t('redCrossWebQaModule.ado.btnClearPaste')}
+            </button>
+          </div>
+          {pasteError && <div style={{ ...errorBox, marginTop: 14 }}>{pasteError}</div>}
+
+          {pasteResult?.parsed && (
+            <div style={{ marginTop: 18 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
+                🧠 {t('redCrossWebQaModule.ado.parsedTitle')}
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+                {pasteResult.parsed.title && (
+                  <ParsedChip label={t('redCrossWebQaModule.ado.parsedTitleField')} value={pasteResult.parsed.title} color="#2563eb" />
+                )}
+                {pasteResult.parsed.fields?.work_item_type && (
+                  <ParsedChip label={t('redCrossWebQaModule.ado.parsedType')} value={pasteResult.parsed.fields.work_item_type} color="#7c3aed" />
+                )}
+                {pasteResult.parsed.fields?.area_path && (
+                  <ParsedChip label={t('redCrossWebQaModule.ado.parsedArea')} value={pasteResult.parsed.fields.area_path} color="#0891b2" mono />
+                )}
+                {pasteResult.parsed.fields?.iteration_path && (
+                  <ParsedChip label={t('redCrossWebQaModule.ado.parsedIteration')} value={pasteResult.parsed.fields.iteration_path} color="#0d9488" mono />
+                )}
+                <ParsedChip
+                  label={t('redCrossWebQaModule.ado.parsedContentType')}
+                  value={pasteResult.parsed.rk_content_type || t('redCrossWebQaModule.ado.noContentTypeDetected')}
+                  color={pasteResult.parsed.rk_content_type ? '#16a34a' : '#94a3b8'}
+                />
+                <ParsedChip label={t('redCrossWebQaModule.ado.parsedRiskLevel')} value={pasteResult.parsed.risk_level} color="#f59e0b" />
+                {pasteResult.parsed.tags?.length > 0 && (
+                  <ParsedChip label={t('redCrossWebQaModule.ado.parsedTags')} value={pasteResult.parsed.tags.join(', ')} color="#db2777" />
+                )}
+              </div>
+              {pasteResult.parsed.acceptance_criteria && (
+                <div style={{ marginTop: 12, padding: 10, borderRadius: 8, backgroundColor: '#eff6ff', border: '1px solid #bfdbfe' }}>
+                  <div style={{ fontSize: 11, color: '#1e3a8a', fontWeight: 600, marginBottom: 4 }}>
+                    {t('redCrossWebQaModule.ado.parsedAcceptance')}
+                  </div>
+                  <pre style={{ margin: 0, fontSize: 12, color: '#1e293b', whiteSpace: 'pre-wrap', fontFamily: 'ui-monospace, monospace' }}>
+                    {pasteResult.parsed.acceptance_criteria}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+
+          {pasteResult?.plan && (
+            <div style={{ marginTop: 18 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
+                🎯 {t('redCrossWebQaModule.ado.planTitle')}
+              </h4>
+              <PlanSection title={t('redCrossWebQaModule.ado.planManualTests')} items={pasteResult.plan.manual_tests} renderItem={(it) => it.title} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planAutomatedCandidates')} items={pasteResult.plan.automated_candidates} renderItem={(it) => `${it.title} (${it.tool || ''})`} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planA11yChecklist')} items={pasteResult.plan.accessibility_checklist} renderItem={(it) => it} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planApiChecks')} items={pasteResult.plan.api_checks} renderItem={(it) => `${it.method || ''} ${it.endpoint || ''} — ${it.check || ''}`} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planRegressionScope')} items={pasteResult.plan.regression_scope} renderItem={(it) => it} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planSuggestedTestData')} items={pasteResult.plan.suggested_test_data} renderItem={(it) => it} />
+              <PlanSection title={t('redCrossWebQaModule.ado.planAdoWorkItems')} items={pasteResult.plan.ado_work_items} renderItem={(it) => `[${it.work_item_type || 'Task'} P${it.priority || 3}${it.test_level ? ' · ' + it.test_level : ''}] ${it.title}`} />
+            </div>
+          )}
         </div>
 
         <div style={panel}>
@@ -172,6 +287,33 @@ const ConfigChip = ({ label, value, color, mono }) => (
   </div>
 );
 
+// Phase H+ — small reusable building blocks for the Paste-and-Generate panel.
+const ParsedChip = ({ label, value, color, mono }) => (
+  <div style={{
+    padding: '8px 12px', borderRadius: 10,
+    backgroundColor: `${color}12`, border: `1px solid ${color}40`,
+  }}>
+    <div style={{ fontSize: 10, color, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.4 }}>{label}</div>
+    <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b', fontFamily: mono ? 'ui-monospace, monospace' : 'inherit', marginTop: 2, wordBreak: 'break-word' }}>{value}</div>
+  </div>
+);
+
+const PlanSection = ({ title, items, renderItem }) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ fontSize: 11, color: '#475569', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 }}>{title}</div>
+      <ul style={{ margin: 0, paddingLeft: 18 }}>
+        {items.map((it, i) => (
+          <li key={i} style={{ fontSize: 12, color: '#1e293b', marginBottom: 2 }}>
+            {renderItem(it)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const panel = {
   backgroundColor: 'white', borderRadius: 12, padding: 24,
   boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
@@ -180,6 +322,13 @@ const panelTitle = { margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '
 const primaryBtn = (disabled, bg) => ({
   padding: '10px 18px', borderRadius: 8, border: 'none',
   backgroundColor: disabled ? '#cbd5e1' : bg, color: 'white',
+  fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+});
+const secondaryBtn = (disabled) => ({
+  padding: '10px 18px', borderRadius: 8,
+  border: '1px solid #cbd5e1',
+  backgroundColor: disabled ? '#f1f5f9' : 'white',
+  color: disabled ? '#94a3b8' : '#1e293b',
   fontWeight: 600, fontSize: 14, cursor: disabled ? 'default' : 'pointer',
 });
 const empty = { fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '20px 0' };

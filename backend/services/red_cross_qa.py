@@ -677,6 +677,256 @@ async def generate_test_plan(ado_work_item: str, acceptance: str, design_link: s
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Tool 1b — Paste-and-Generate (real ADO Sprint item → test plan)
+# ───────────────────────────────────────────────────────────────────
+# Workflow:
+#   User copies a User Story / Task from the live Azure DevOps Board
+#   (e.g. dev.azure.com/RedCrossNorway/rkdotno/_sprints/...) and pastes
+#   the raw text into the agent's Azure DevOps tab. The parser extracts
+#   the structured fields heuristically (no PAT needed) and forwards
+#   them to generate_test_plan so the resulting plan reflects the
+#   actual Sprint backlog item — much more realistic than canned mocks.
+#
+# Design choices (2026-05-27):
+#   - Heuristic parsing only — no LLM call required for extraction so
+#     the function works offline and is deterministic for smoke tests.
+#   - Røde Kors content-type detection by keyword (NO + EN) covers the
+#     8 documented types: Distrikt / Forening / Aktivitet / Kontakt-
+#     person / TjenesteKurs / Tema / Nyhet / Kampanje.
+#   - Returns the parsed structure separately from the test plan so
+#     the UI can show "this is what we understood from your paste".
+# ═══════════════════════════════════════════════════════════════════
+
+# Keyword maps for Røde Kors content-type detection. Lower-cased.
+_RK_CONTENT_TYPE_KEYWORDS: Dict[str, List[str]] = {
+    "Distrikt": ["distrikt", "district", "fylke", "region"],
+    "Forening": ["forening", "lokalforening", "branch", "chapter", "lokallag"],
+    "Aktivitet": ["aktivitet", "activity", "tilbud", "service offering"],
+    "Kontaktperson": ["kontaktperson", "contact person", "ansatt", "frivillig kontakt"],
+    "TjenesteKurs": ["tjeneste", "kurs", "course", "service", "opplaering", "opplæring"],
+    "Tema": ["tema", "theme", "thematic"],
+    "Nyhet": ["nyhet", "news", "artikkel", "article"],
+    "Kampanje": ["kampanje", "campaign", "donasjon", "donation", "giverkampanje"],
+}
+
+# Heuristic patterns for the field headers ADO normally renders when a
+# work item is copied to clipboard. Case-insensitive. Tested against
+# the actual labels in Azure DevOps web UI (NO + EN locale).
+# Note: [\s\-]? between sub-words so we accept both "Arbeidselement-type"
+# and "Arbeidselementtype" (real ADO clipboard outputs vary).
+_ADO_FIELD_PATTERNS: List[Tuple[str, str]] = [
+    ("title",            r"^(?:title|tittel|navn)\s*[:\-]\s*(.+)$"),
+    ("work_item_type",   r"^(?:work[\s\-]?item[\s\-]?type|arbeidselement[\s\-]?type|element[\s\-]?type|wi[\s\-]?type|type)\s*[:\-]\s*(.+)$"),
+    ("state",            r"^(?:state|tilstand|status)\s*[:\-]\s*(.+)$"),
+    ("assigned_to",      r"^(?:assigned[\s\-]?to|tildelt(?:[\s\-]?til)?)\s*[:\-]\s*(.+)$"),
+    ("area_path",        r"^(?:area[\s\-]?path|område[\s\-]?sti|omrade[\s\-]?sti|område|omrade|area)\s*[:\-]\s*(.+)$"),
+    ("iteration_path",   r"^(?:iteration[\s\-]?path|iterasjons[\s\-]?sti|iterasjon|sprint)\s*[:\-]\s*(.+)$"),
+    ("priority",         r"^(?:priority|prioritet)\s*[:\-]\s*(.+)$"),
+    ("tags",             r"^(?:tags|etiketter|tagger)\s*[:\-]\s*(.+)$"),
+    ("story_points",     r"^(?:story[\s\-]?points|estimat|points)\s*[:\-]\s*(.+)$"),
+]
+
+# Section headers that often introduce the descriptive blocks.
+_ADO_SECTION_HEADERS = {
+    "description":          r"(?:description|beskrivelse|details|detaljer)\s*[:\-]?\s*$",
+    "acceptance_criteria":  r"(?:acceptance criteria|godkjenningskriterier|akseptansekriterier|ac)\s*[:\-]?\s*$",
+    "definition_of_done":   r"(?:definition of done|dod|definisjon av ferdig)\s*[:\-]?\s*$",
+    "risk":                 r"(?:risk|risiko|risk level)\s*[:\-]?\s*$",
+}
+
+
+def _detect_rk_content_type(text: str) -> Optional[str]:
+    """Return the first matching Røde Kors content type or None."""
+    if not text:
+        return None
+    lowered = text.lower()
+    # Score-based to favour the most-mentioned type when several keywords hit.
+    best: Tuple[Optional[str], int] = (None, 0)
+    for ctype, keywords in _RK_CONTENT_TYPE_KEYWORDS.items():
+        score = sum(lowered.count(k) for k in keywords)
+        if score > best[1]:
+            best = (ctype, score)
+    return best[0]
+
+
+def _normalise_risk(text: str) -> str:
+    """Map free-form risk keywords to {low, medium, high}."""
+    if not text:
+        return "medium"
+    lowered = text.lower()
+    if any(k in lowered for k in ("high", "høy", "hoy", "kritisk", "critical")):
+        return "high"
+    if any(k in lowered for k in ("low", "lav", "minor")):
+        return "low"
+    return "medium"
+
+
+def parse_ado_pasted_text(pasted_text: str) -> Dict[str, Any]:
+    """Extract a structured ADO work-item dict from raw pasted text.
+
+    Robust against messy clipboard exports — accepts any combination of:
+      - "Title: Donasjonsflyt Vipps-handoff"  ← single-line field
+      - "Description:\\n<multi-line body>"     ← section header + block
+      - "Acceptance Criteria\\n- AC1\\n- AC2"  ← header without colon
+      - Plain free-form text (no headers)     ← first non-empty line becomes title
+    """
+    if not pasted_text:
+        return {
+            "title": "",
+            "description": "",
+            "acceptance_criteria": "",
+            "definition_of_done": "",
+            "risk": "",
+            "fields": {},
+            "tags": [],
+            "rk_content_type": None,
+            "risk_level": "medium",
+        }
+
+    lines = [ln.rstrip() for ln in pasted_text.replace("\r\n", "\n").split("\n")]
+    fields: Dict[str, str] = {}
+    sections: Dict[str, List[str]] = {
+        "description": [],
+        "acceptance_criteria": [],
+        "definition_of_done": [],
+        "risk": [],
+    }
+
+    # Compile patterns once
+    field_regexes = [(k, re.compile(p, re.IGNORECASE)) for k, p in _ADO_FIELD_PATTERNS]
+    section_regexes = {k: re.compile(p, re.IGNORECASE) for k, p in _ADO_SECTION_HEADERS.items()}
+
+    current_section: Optional[str] = None
+
+    for raw_line in lines:
+        line = raw_line.strip()
+
+        # 1) Section headers reset the active section
+        matched_section = False
+        for sec_name, sec_re in section_regexes.items():
+            if sec_re.fullmatch(line):
+                current_section = sec_name
+                matched_section = True
+                break
+        if matched_section:
+            continue
+
+        # 2) Single-line field captures
+        matched_field = False
+        for key, regex in field_regexes:
+            m = regex.match(line)
+            if m:
+                fields[key] = m.group(1).strip()
+                matched_field = True
+                current_section = None  # field lines break sections
+                break
+        if matched_field:
+            continue
+
+        # 3) Inside an active section, accumulate the body
+        if current_section is not None:
+            if line or sections[current_section]:  # keep blank lines inside a started block
+                sections[current_section].append(raw_line)
+            continue
+
+        # 4) Free-floating lines before the first section become description
+        if line:
+            sections["description"].append(raw_line)
+
+    # Auto-derive title: if not provided, use the first non-empty description line
+    title = fields.get("title", "").strip()
+    if not title and sections["description"]:
+        for ln in sections["description"]:
+            if ln.strip():
+                title = ln.strip()
+                break
+
+    tags_raw = fields.get("tags", "")
+    tags = [t.strip() for t in re.split(r"[,;]", tags_raw) if t.strip()] if tags_raw else []
+
+    description = "\n".join(sections["description"]).strip()
+    acceptance_criteria = "\n".join(sections["acceptance_criteria"]).strip()
+    definition_of_done = "\n".join(sections["definition_of_done"]).strip()
+    risk_text = "\n".join(sections["risk"]).strip()
+
+    full_blob = "\n".join([title, description, acceptance_criteria, tags_raw])
+    rk_content_type = _detect_rk_content_type(full_blob)
+    risk_level = _normalise_risk(risk_text or fields.get("priority", ""))
+
+    return {
+        "title": title,
+        "description": description,
+        "acceptance_criteria": acceptance_criteria,
+        "definition_of_done": definition_of_done,
+        "risk": risk_text,
+        "fields": fields,
+        "tags": tags,
+        "rk_content_type": rk_content_type,
+        "risk_level": risk_level,
+    }
+
+
+async def generate_test_plan_from_ado_item(
+    pasted_text: str,
+    environment: str = "test",
+    lang: str = "en",
+) -> Dict[str, Any]:
+    """Parse a pasted ADO Sprint item and produce a Røde Kors-aware test plan.
+
+    Pipeline:
+      1) Heuristic parse → {title, description, AC, tags, rk_content_type, ...}
+      2) Build an enriched work-item string preserving the original paste
+         so generate_test_plan's LLM sees the full Sprint context.
+      3) Reuse generate_test_plan (Tool 1) — keeps the mock-first fallback
+         and the static-review work items intact.
+      4) Annotate the response with the parsed structure so the UI can
+         show "what we understood" alongside the plan.
+    """
+    parsed = parse_ado_pasted_text(pasted_text or "")
+
+    # Build the ADO work-item context string fed to generate_test_plan.
+    ctx_lines: List[str] = []
+    if parsed["title"]:
+        ctx_lines.append(f"Title: {parsed['title']}")
+    if parsed["fields"].get("work_item_type"):
+        ctx_lines.append(f"Work Item Type: {parsed['fields']['work_item_type']}")
+    if parsed["fields"].get("area_path"):
+        ctx_lines.append(f"Area Path: {parsed['fields']['area_path']}")
+    if parsed["fields"].get("iteration_path"):
+        ctx_lines.append(f"Iteration Path: {parsed['fields']['iteration_path']}")
+    if parsed["tags"]:
+        ctx_lines.append(f"Tags: {', '.join(parsed['tags'])}")
+    if parsed["rk_content_type"]:
+        ctx_lines.append(f"Detected Røde Kors content type: {parsed['rk_content_type']}")
+    if parsed["description"]:
+        ctx_lines.append("")
+        ctx_lines.append("Description:")
+        ctx_lines.append(parsed["description"])
+    if parsed["definition_of_done"]:
+        ctx_lines.append("")
+        ctx_lines.append("Definition of Done:")
+        ctx_lines.append(parsed["definition_of_done"])
+
+    work_item_blob = "\n".join(ctx_lines) if ctx_lines else (pasted_text or "")
+    plan = await generate_test_plan(
+        work_item_blob,
+        parsed["acceptance_criteria"],
+        "",  # design_link — not in the paste; UI can extend later
+        parsed["risk_level"],
+        environment,
+        lang,
+    )
+
+    return {
+        "status": "ok",
+        "parsed": parsed,
+        "plan": plan.get("plan", {}),
+        "lang": lang,
+        "environment": environment,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Tool 2 — Playwright generator + runner
 # ═══════════════════════════════════════════════════════════════════
 async def generate_playwright_tests(scopes: List[str], environment: str,
