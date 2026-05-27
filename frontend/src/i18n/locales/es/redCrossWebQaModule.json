@@ -719,6 +719,8 @@
       "thresholdLighthouseSeo": "Lighthouse SEO ≥",
       "thresholdAxeCritical": "Máx. violaciones críticas axe",
       "outsystemsUrl": "URL de despacho OutSystems",
+      "adoTagsPlaceholder": "separados por coma",
+      "savedAt": "Guardado a las {{value}}",
       "btnSave": "Guardar ajustes"
     },
 

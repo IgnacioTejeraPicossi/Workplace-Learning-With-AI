@@ -719,6 +719,8 @@
       "thresholdLighthouseSeo": "Lighthouse SEO ≥",
       "thresholdAxeCritical": "Max critical axe violations",
       "outsystemsUrl": "OutSystems dispatch URL",
+      "adoTagsPlaceholder": "comma, separated",
+      "savedAt": "Saved at {{value}}",
       "btnSave": "Save Settings"
     },
 

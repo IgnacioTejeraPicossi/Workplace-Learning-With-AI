@@ -186,7 +186,8 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
                 <input value={adoIterationPath} onChange={e => setAdoIterationPath(e.target.value)} style={{ ...input, fontFamily: 'ui-monospace, monospace' }} />
               </Field>
               <Field label={t('redCrossWebQaModule.settings.adoTags')}>
-                <input value={adoTags} onChange={e => setAdoTags(e.target.value)} style={input} placeholder="comma, separated" />
+                <input value={adoTags} onChange={e => setAdoTags(e.target.value)} style={input}
+                  placeholder={t('redCrossWebQaModule.settings.adoTagsPlaceholder')} />
               </Field>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
                 <Field label={t('redCrossWebQaModule.settings.currentSprint')}>
@@ -197,7 +198,7 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
                     onChange={e => setSprintLengthWeeks(e.target.value)} style={input} />
                 </Field>
               </div>
-              <Field label="OutSystems URL">
+              <Field label={t('redCrossWebQaModule.settings.outsystemsUrl')}>
                 <input value={outsystemsUrl} onChange={e => setOutsystemsUrl(e.target.value)} style={input} placeholder="https://..." />
               </Field>
             </div>
@@ -318,7 +319,7 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
               backgroundColor: '#d1fae5', color: '#047857', border: '1px solid #6ee7b7',
               fontSize: 12, fontWeight: 600,
             }}>
-              ✓ Saved at {savedAt}
+              ✓ {t('redCrossWebQaModule.settings.savedAt', { value: savedAt })}
             </span>
           )}
         </div>
