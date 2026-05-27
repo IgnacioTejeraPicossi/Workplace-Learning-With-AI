@@ -663,7 +663,21 @@
       "planSuggestedTestData": "Suggested test data",
       "planAdoWorkItems": "Suggested ADO work items",
       "pasteEmpty": "Paste the work item text first.",
-      "noContentTypeDetected": "Not detected"
+      "noContentTypeDetected": "Not detected",
+      "fetchTitle": "Fetch from Azure DevOps",
+      "fetchSubtitle": "Pull live Sprint items via WIQL. When the server has ADO_PAT in its .env, this hits the real Azure DevOps REST API; otherwise it returns a curated mock list so the workshop demo stays green offline. The PAT is never sent from the browser — only read server-side from environment variables.",
+      "fetchIterationOverride": "Iteration path override (optional)",
+      "fetchIterationPlaceholder": "e.g. rkdotno\\Sprint 2",
+      "btnFetchSprint": "Fetch sprint items",
+      "fetchedItemsTitle": "Fetched items",
+      "fetchBadgeMock": "MOCK",
+      "fetchBadgeLive": "LIVE (PAT)",
+      "fetchPatHint": "Live fetch uses the server's ADO_PAT env variable.",
+      "fetchMockHint": "Mock list — set ADO_PAT in the server .env to fetch live.",
+      "btnUseItem": "Use this item",
+      "fetchOpenInAdo": "Open in ADO",
+      "fetchNoItems": "No items found in that iteration.",
+      "fetchError": "Fetch failed"
     },
 
     "sprintReport": {

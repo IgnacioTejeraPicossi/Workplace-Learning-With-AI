@@ -24,6 +24,20 @@ const ROLE_KEY_BY_NAME = {
   'Astri M.M. Fretheim': 'tilgangsstyringFrivillighet',
 };
 
+// Reverse lookup for backend-provided role labels (in Norwegian, per the
+// official 'Roller og ansvar' document). Used to localize the role column
+// of signoff_form.lines[] when the user runs the app in EN or ES. When the
+// label is not recognized (e.g. backend evolves with a new role), we fall
+// back to rendering the raw label as-is.
+const ROLE_KEY_BY_LABEL = {
+  'Produkteier Inntekt CRM': 'poInntektCrm',
+  'Produkteier Frivillighet CRM': 'poFrivillighetCrm',
+  'Tilgangsstyring frivillighet': 'tilgangsstyringFrivillighet',
+  // Defensive: pre-2026-05-28 historic labels (in case old runs are replayed)
+  'Produkteier': 'poInntektCrm',
+  'Fagperson': 'poFrivillighetCrm',
+};
+
 const DECISION_COLOR = {
   godkjent: { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7' },
   'ikke godkjent': { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' },
@@ -228,9 +242,13 @@ const UatSupport = ({ environment }) => {
               <tbody>
                 {report.signoff_form.lines.map((ln, i) => {
                   const c = DECISION_COLOR[(ln.decision || 'pending').toLowerCase()] || DECISION_COLOR.pending;
+                  const roleKey = ROLE_KEY_BY_LABEL[ln.role];
+                  const roleLabel = roleKey
+                    ? t(`redCrossWebQaModule.stakeholders.roles.${roleKey}`)
+                    : (ln.role || '');
                   return (
                     <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={td}>{ln.role}</td>
+                      <td style={td} title={ln.role !== roleLabel ? ln.role : undefined}>{roleLabel}</td>
                       <td style={td}><strong>{ln.name}</strong></td>
                       <td style={td}>
                         <span style={{

@@ -663,7 +663,21 @@
       "planSuggestedTestData": "Foreslåtte testdata",
       "planAdoWorkItems": "Foreslåtte ADO‑arbeidselementer",
       "pasteEmpty": "Lim inn arbeidselement‑teksten først.",
-      "noContentTypeDetected": "Ikke oppdaget"
+      "noContentTypeDetected": "Ikke oppdaget",
+      "fetchTitle": "Hent fra Azure DevOps",
+      "fetchSubtitle": "Hent sprint-saker live via WIQL. Når serveren har ADO_PAT i .env, kalles ekte Azure DevOps REST API; ellers returneres en kuratert mock-liste slik at workshop-demoen alltid fungerer offline. Tokenet sendes aldri fra nettleseren — kun lest server-side fra miljøvariabler.",
+      "fetchIterationOverride": "Iterasjons-sti (overstyring, valgfritt)",
+      "fetchIterationPlaceholder": "f.eks. rkdotno\\Sprint 2",
+      "btnFetchSprint": "Hent sprint-saker",
+      "fetchedItemsTitle": "Hentede saker",
+      "fetchBadgeMock": "MOCK",
+      "fetchBadgeLive": "LIVE (PAT)",
+      "fetchPatHint": "Live-henting bruker serverens ADO_PAT-miljøvariabel.",
+      "fetchMockHint": "Mock-liste — sett ADO_PAT i serverens .env for å hente live.",
+      "btnUseItem": "Bruk denne saken",
+      "fetchOpenInAdo": "Åpne i ADO",
+      "fetchNoItems": "Ingen saker funnet i den iterasjonen.",
+      "fetchError": "Henting feilet"
     },
 
     "sprintReport": {

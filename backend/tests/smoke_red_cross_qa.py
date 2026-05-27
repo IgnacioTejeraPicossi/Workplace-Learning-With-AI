@@ -19,6 +19,7 @@ from backend.services.red_cross_qa import (
     run_role_matrix_audit, run_security_scan,
     generate_nvda_script, run_wave_audit,
     parse_ado_pasted_text, generate_test_plan_from_ado_item,
+    fetch_ado_sprint_items, format_ado_item_as_paste_text,
 )
 
 
@@ -1016,6 +1017,60 @@ async def main():
     assert empty_parsed["rk_content_type"] is None
     assert empty_parsed["risk_level"] == "medium"
     print("[OK] ADO paste parser (empty input handled)")
+
+    # ── Phase H+ (2026-05-28) — ADO REST fetch (mock-first) + formatter ─
+    # 5) Mock-first fetch (no ADO_PAT in env → mock list returned, is_mock=True).
+    #    We do NOT set ADO_PAT to keep the smoke deterministic / hermetic.
+    import os as _os
+    assert not _os.environ.get("ADO_PAT"), \
+        "ADO_PAT must not be set during the smoke run (test would hit live API)"
+    fetched = await fetch_ado_sprint_items(
+        iteration_path="rkdotno\\Sprint 2", environment="test", lang="no",
+    )
+    assert fetched["status"] == "ok"
+    assert fetched["is_mock"] is True, "expected mock path without ADO_PAT"
+    assert fetched["organization"] == "RedCrossNorway"
+    assert fetched["project"] == "rkdotno"
+    assert fetched["iteration_path"] == "rkdotno\\Sprint 2"
+    items = fetched["items"]
+    assert len(items) >= 4, f"expected 4+ mock items, got {len(items)}"
+    sample = items[0]
+    for field in ("id", "title", "work_item_type", "state",
+                  "area_path", "iteration_path",
+                  "description", "acceptance_criteria", "tags", "url"):
+        assert field in sample, f"mock item missing field: {field}"
+    assert sample["url"].startswith("https://dev.azure.com/RedCrossNorway/")
+    print(f"[OK] ADO fetch (mock, {len(items)} items, "
+          f"types={set(it['work_item_type'] for it in items)})")
+
+    # 6) Formatter → parser round-trip: format an ADO item as paste-text,
+    #    feed it through parse_ado_pasted_text, and verify key fields survive.
+    paste_text = format_ado_item_as_paste_text(sample)
+    assert "Title:" in paste_text and sample["title"] in paste_text
+    assert "Work Item Type:" in paste_text and sample["work_item_type"] in paste_text
+    assert "Iteration Path:" in paste_text and sample["iteration_path"] in paste_text
+    roundtrip = parse_ado_pasted_text(paste_text)
+    assert roundtrip["title"] == sample["title"], \
+        f"title round-trip failed: {roundtrip['title']!r} vs {sample['title']!r}"
+    assert roundtrip["fields"].get("work_item_type") == sample["work_item_type"]
+    assert roundtrip["fields"].get("iteration_path") == sample["iteration_path"]
+    # Tags survive the round-trip
+    for tag in sample["tags"]:
+        assert tag in roundtrip["tags"], f"tag missing after round-trip: {tag}"
+    # AC survives (first AC line as a sanity check)
+    if sample["acceptance_criteria"]:
+        first_ac_line = sample["acceptance_criteria"].splitlines()[0]
+        assert first_ac_line in roundtrip["acceptance_criteria"]
+    print("[OK] ADO format-item → parse-pasted round-trip (title, type, "
+          "iteration, tags, AC all preserved)")
+
+    # 7) End-to-end: fetched item → format → paste-to-plan generates a plan.
+    paste_plan = await generate_test_plan_from_ado_item(paste_text, "test", "no")
+    assert paste_plan["status"] == "ok"
+    assert "plan" in paste_plan and paste_plan["plan"].get("ado_work_items")
+    assert paste_plan["parsed"]["title"] == sample["title"]
+    print(f"[OK] ADO fetch → format → paste-to-plan "
+          f"({len(paste_plan['plan']['ado_work_items'])} work items in plan)")
 
 
 if __name__ == "__main__":

@@ -663,7 +663,21 @@
       "planSuggestedTestData": "Datos de prueba sugeridos",
       "planAdoWorkItems": "Elementos ADO sugeridos",
       "pasteEmpty": "Pega primero el texto del elemento de trabajo.",
-      "noContentTypeDetected": "No detectado"
+      "noContentTypeDetected": "No detectado",
+      "fetchTitle": "Traer desde Azure DevOps",
+      "fetchSubtitle": "Trae los items del Sprint en vivo vía WIQL. Cuando el servidor tiene ADO_PAT en su .env, se llama a la API REST real de Azure DevOps; si no, devuelve una lista mock curada para que la demo siga funcionando offline. El token nunca se envía desde el navegador — solo se lee del lado servidor desde variables de entorno.",
+      "fetchIterationOverride": "Ruta de iteración (override, opcional)",
+      "fetchIterationPlaceholder": "p. ej. rkdotno\\Sprint 2",
+      "btnFetchSprint": "Traer items del sprint",
+      "fetchedItemsTitle": "Items traídos",
+      "fetchBadgeMock": "MOCK",
+      "fetchBadgeLive": "EN VIVO (PAT)",
+      "fetchPatHint": "La carga en vivo usa la variable de entorno ADO_PAT del servidor.",
+      "fetchMockHint": "Lista mock — configura ADO_PAT en el .env del servidor para traer en vivo.",
+      "btnUseItem": "Usar este item",
+      "fetchOpenInAdo": "Abrir en ADO",
+      "fetchNoItems": "No se encontraron items en esa iteración.",
+      "fetchError": "Fallo al traer"
     },
 
     "sprintReport": {

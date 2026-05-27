@@ -31,6 +31,12 @@ const AzureDevOps = ({ environment }) => {
   const [pasting, setPasting] = useState(false);
   const [pasteError, setPasteError] = useState('');
 
+  // Phase H+ (2026-05-28) — Fetch-from-ADO (live REST + mock fallback).
+  const [iterationOverride, setIterationOverride] = useState('');
+  const [fetchResult, setFetchResult] = useState(null);
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState('');
+
   useEffect(() => {
     (async () => {
       try {
@@ -63,6 +69,46 @@ const AzureDevOps = ({ environment }) => {
 
   const handleClearPaste = () => {
     setPastedText(''); setPasteResult(null); setPasteError('');
+  };
+
+  const handleFetchSprint = async () => {
+    setFetchError(''); setFetching(true); setFetchResult(null);
+    try {
+      const res = await fetch(`${API}/ado/fetch-sprint`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          iteration_path: iterationOverride.trim() || undefined,
+          environment, lang: i18n.language,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') setFetchResult(data);
+      else setFetchError(data.detail || data.message || 'Error');
+    } catch {
+      setFetchError('Network error');
+    } finally { setFetching(false); }
+  };
+
+  // Pipe a fetched item into the paste textarea via the backend formatter
+  // (single round-trip — the formatter mirrors the parser's expected shape
+  // so paste-to-plan can run unchanged).
+  const handleUseFetchedItem = async (item) => {
+    try {
+      const res = await fetch(`${API}/ado/format-item`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        setPastedText(data.pasted_text || '');
+        setPasteResult(null); setPasteError('');
+        // Scroll the textarea into view so user sees the populated paste.
+        setTimeout(() => {
+          const ta = document.querySelector('textarea');
+          if (ta) ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+      }
+    } catch { /* ignore */ }
   };
 
   const handleDispatch = async () => {
@@ -111,6 +157,118 @@ const AzureDevOps = ({ environment }) => {
             <ConfigChip label={t('redCrossWebQaModule.ado.iterationPath')} value={bundle?.iteration_path || 'rodekors-web\\Sprint 1'} color="#0d9488" mono />
             <ConfigChip label={t('redCrossWebQaModule.ado.tags')} value={(bundle?.tags || ['red-cross-qa']).join(', ')} color="#f59e0b" mono />
           </div>
+        </div>
+
+        {/* Phase H+ — Fetch-from-ADO panel (live REST when ADO_PAT is set,
+            mock list otherwise). Output feeds into the Paste-and-Generate
+            panel below via "Use this item". */}
+        <div style={{ ...panel, borderLeft: '4px solid #0d9488' }}>
+          <h3 style={panelTitle}>📥 {t('redCrossWebQaModule.ado.fetchTitle')}</h3>
+          <p style={{ margin: '0 0 14px', fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+            {t('redCrossWebQaModule.ado.fetchSubtitle')}
+          </p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 12 }}>
+            <label style={{ flex: '1 1 280px', fontSize: 11, color: '#475569', fontWeight: 600 }}>
+              {t('redCrossWebQaModule.ado.fetchIterationOverride')}
+              <input
+                type="text"
+                value={iterationOverride}
+                onChange={(e) => setIterationOverride(e.target.value)}
+                placeholder={t('redCrossWebQaModule.ado.fetchIterationPlaceholder')}
+                style={{
+                  display: 'block', width: '100%', marginTop: 4,
+                  padding: '8px 10px', borderRadius: 8,
+                  border: '1px solid #cbd5e1', fontSize: 13,
+                  fontFamily: 'ui-monospace, monospace',
+                }}
+              />
+            </label>
+            <button onClick={handleFetchSprint} disabled={fetching} style={primaryBtn(fetching, '#0d9488')}>
+              {fetching ? t('redCrossWebQaModule.common.running') : t('redCrossWebQaModule.ado.btnFetchSprint')}
+            </button>
+          </div>
+          {fetchError && <div style={{ ...errorBox, marginTop: 8 }}>{t('redCrossWebQaModule.ado.fetchError')}: {fetchError}</div>}
+
+          {fetchResult && (
+            <>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+                <span style={{
+                  padding: '4px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700,
+                  backgroundColor: fetchResult.is_mock ? '#fef3c7' : '#dcfce7',
+                  color: fetchResult.is_mock ? '#92400e' : '#047857',
+                  border: `1px solid ${fetchResult.is_mock ? '#fcd34d' : '#86efac'}`,
+                }}>
+                  {fetchResult.is_mock
+                    ? t('redCrossWebQaModule.ado.fetchBadgeMock')
+                    : t('redCrossWebQaModule.ado.fetchBadgeLive')}
+                </span>
+                <span style={{ fontSize: 12, color: '#64748b' }}>
+                  {fetchResult.is_mock
+                    ? t('redCrossWebQaModule.ado.fetchMockHint')
+                    : t('redCrossWebQaModule.ado.fetchPatHint')}
+                </span>
+                <span style={{ fontSize: 12, color: '#475569', marginLeft: 'auto' }}>
+                  <strong>{fetchResult.item_count}</strong> · {fetchResult.organization}/{fetchResult.project}
+                  {fetchResult.iteration_path ? ` · ${fetchResult.iteration_path}` : ''}
+                </span>
+              </div>
+
+              {fetchResult.items.length === 0 ? (
+                <p style={empty}>{t('redCrossWebQaModule.ado.fetchNoItems')}</p>
+              ) : (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {fetchResult.items.map((it) => (
+                    <div key={it.id} style={{
+                      padding: '12px 14px', borderRadius: 10,
+                      backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                        <span style={{
+                          padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+                          backgroundColor: '#1e293b', color: 'white', fontFamily: 'ui-monospace, monospace',
+                        }}>#{it.id}</span>
+                        <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>{it.work_item_type}</span>
+                        {it.state && (
+                          <span style={{
+                            padding: '2px 6px', borderRadius: 6, fontSize: 10, color: '#64748b',
+                            backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0',
+                          }}>{it.state}</span>
+                        )}
+                        <strong style={{ fontSize: 13, color: '#1e293b', flex: 1 }}>{it.title}</strong>
+                      </div>
+                      {it.tags?.length > 0 && (
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6 }}>
+                          {it.tags.map((tag, i) => (
+                            <span key={i} style={{
+                              padding: '1px 6px', borderRadius: 4, fontSize: 10,
+                              backgroundColor: '#ede9fe', color: '#5b21b6',
+                            }}>{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                      {it.description && (
+                        <p style={{ margin: '4px 0 8px', fontSize: 12, color: '#475569', lineHeight: 1.4 }}>
+                          {it.description.length > 200 ? it.description.slice(0, 200) + '…' : it.description}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button onClick={() => handleUseFetchedItem(it)} style={primaryBtn(false, '#0d9488')}>
+                          ↓ {t('redCrossWebQaModule.ado.btnUseItem')}
+                        </button>
+                        {it.url && (
+                          <a href={it.url} target="_blank" rel="noopener noreferrer" style={{
+                            padding: '10px 18px', borderRadius: 8, border: '1px solid #cbd5e1',
+                            backgroundColor: 'white', color: '#1e293b', fontWeight: 600, fontSize: 14,
+                            textDecoration: 'none', display: 'inline-block',
+                          }}>↗ {t('redCrossWebQaModule.ado.fetchOpenInAdo')}</a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Phase H+ — Paste-and-Generate panel */}

@@ -13,6 +13,8 @@ try:
         generate_test_plan,
         generate_test_plan_from_ado_item,
         parse_ado_pasted_text,
+        fetch_ado_sprint_items,
+        format_ado_item_as_paste_text,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -56,6 +58,8 @@ except ImportError:  # pragma: no cover
         generate_test_plan,
         generate_test_plan_from_ado_item,
         parse_ado_pasted_text,
+        fetch_ado_sprint_items,
+        format_ado_item_as_paste_text,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -226,6 +230,23 @@ class AdoDispatchRequest(BaseModel):
 # test plan. No PAT required (parsing is heuristic).
 class AdoPasteToPlanRequest(BaseModel):
     pasted_text: str = Field(..., description="Raw text copied from an ADO User Story / Task.")
+    environment: Optional[str] = "test"
+    lang: Optional[str] = "en"
+
+
+# Phase H+ (2026-05-28) — Fetch-from-ADO: pull the live Sprint backlog
+# via WIQL when ADO_PAT is set in the server environment. Falls back to
+# a curated mock list when PAT is absent. PAT is NEVER sent in the body —
+# only read from process env (ADO_PAT / AZURE_DEVOPS_PAT).
+class AdoFetchSprintRequest(BaseModel):
+    iteration_path: Optional[str] = Field(default=None,
+        description="Override iteration path. Defaults to settings.ado_iteration_path.")
+    area_path: Optional[str] = Field(default=None,
+        description="Override area path. Defaults to settings.ado_area_path.")
+    organization: Optional[str] = Field(default=None,
+        description="Override ADO organization. Defaults to settings.ado_organization.")
+    project: Optional[str] = Field(default=None,
+        description="Override ADO project. Defaults to settings.ado_project.")
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -500,6 +521,35 @@ async def api_ado_paste_to_plan(body: AdoPasteToPlanRequest):
     return await generate_test_plan_from_ado_item(
         body.pasted_text, env, body.lang or "en",
     )
+
+
+# Phase H+ (2026-05-28) — Fetch live Sprint items from ADO REST.
+# Companion to /ado/paste-to-plan: instead of pasting, pull directly.
+@router.post("/ado/fetch-sprint")
+async def api_ado_fetch_sprint(body: AdoFetchSprintRequest):
+    env = _check_env(body.environment)
+    return await fetch_ado_sprint_items(
+        iteration_path=body.iteration_path,
+        area_path=body.area_path,
+        organization=body.organization,
+        project=body.project,
+        environment=env,
+        lang=body.lang or "en",
+    )
+
+
+# Format a single fetched ADO item as paste-parser-compatible text. The
+# frontend's "Use this item" button POSTs the item dict here and pipes
+# the response into the existing paste-to-plan textarea.
+class AdoFormatItemRequest(BaseModel):
+    item: Dict[str, Any] = Field(..., description="Single ADO work item as returned by /ado/fetch-sprint.")
+
+
+@router.post("/ado/format-item")
+async def api_ado_format_item(body: AdoFormatItemRequest):
+    if not body.item or not isinstance(body.item, dict):
+        raise HTTPException(status_code=400, detail="item is required")
+    return {"status": "ok", "pasted_text": format_ado_item_as_paste_text(body.item)}
 
 
 @router.post("/create-ado-work-items")

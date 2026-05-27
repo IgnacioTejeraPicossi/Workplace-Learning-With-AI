@@ -90,11 +90,14 @@ DEFAULT_SETTINGS = {
     "env_test_url": "https://test.rodekors.no",
     "env_default": "test",
     "execution_mode": "generate",
-    # Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3)
-    "ado_organization": "rodekors",
-    "ado_project": "rodekors-web",
-    "ado_area_path": "rodekors-web\\Web QA",
-    "ado_iteration_path": "rodekors-web\\Sprint 1",
+    # Azure DevOps (Trine bruker ADO som offisielt testverktøy — Teststrategi 30.3).
+    # Phase H+ (2026-05-28): defaults updated to the actual RedCrossNorway/rkdotno
+    # organization the team uses. Users can still override per project from the
+    # Settings tab; these are first-install / get_settings fallback values.
+    "ado_organization": "RedCrossNorway",
+    "ado_project": "rkdotno",
+    "ado_area_path": "rkdotno\\Web QA",
+    "ado_iteration_path": "rkdotno\\Sprint 2",
     "ado_tags": ["red-cross-qa", "ai-generated"],
     # Sprint context (used by Sprint Report generator)
     "current_sprint": "Sprint 1",
@@ -868,6 +871,318 @@ def parse_ado_pasted_text(pasted_text: str) -> Dict[str, Any]:
         "tags": tags,
         "rk_content_type": rk_content_type,
         "risk_level": risk_level,
+    }
+
+
+def format_ado_item_as_paste_text(item: Dict[str, Any]) -> str:
+    """Render an ADO work item (fetched via REST) as text the paste parser
+    can re-parse. Used by the frontend's "Use this item" button to bridge
+    the fetch → paste-to-plan pipeline without round-tripping through the
+    user clipboard.
+
+    The layout mirrors the headers parse_ado_pasted_text recognises so a
+    round-trip is lossless for the key fields (Title, Work Item Type,
+    Area / Iteration paths, Tags, Description, Acceptance Criteria).
+    """
+    lines: List[str] = []
+    title = item.get("title") or ""
+    if title:
+        lines.append(f"Title: {title}")
+    if item.get("work_item_type"):
+        lines.append(f"Work Item Type: {item['work_item_type']}")
+    if item.get("state"):
+        lines.append(f"State: {item['state']}")
+    if item.get("area_path"):
+        lines.append(f"Area Path: {item['area_path']}")
+    if item.get("iteration_path"):
+        lines.append(f"Iteration Path: {item['iteration_path']}")
+    tags = item.get("tags") or []
+    if isinstance(tags, list) and tags:
+        lines.append(f"Tags: {', '.join(tags)}")
+    description = item.get("description") or ""
+    if description:
+        lines.append("")
+        lines.append("Description:")
+        lines.append(description)
+    ac = item.get("acceptance_criteria") or ""
+    if ac:
+        lines.append("")
+        lines.append("Acceptance Criteria:")
+        lines.append(ac)
+    return "\n".join(lines)
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Tool 1c — Live ADO Sprint ingest (real REST + WIQL when ADO_PAT set)
+# ───────────────────────────────────────────────────────────────────
+# Pairs with Tool 1b (Paste-and-Generate). When the user has an ADO PAT
+# in their .env, the agent can pull the live Sprint backlog directly
+# instead of asking them to copy-paste. The frontend then offers a
+# "Use this item" button that pipes the fetched work item back into
+# the paste-to-plan flow — same downstream pipeline.
+#
+# Security:
+#   - PAT is read from environment only (never from request body)
+#   - PAT is never logged, echoed or persisted
+#   - HTTPS only; mock-first fallback whenever PAT is absent or the
+#     remote call fails, so the workshop demo stays green offline
+#
+# Reference (same pattern as qa_security_service.dispatch_finding_to_ado):
+#   POST https://dev.azure.com/{org}/{project}/_apis/wit/wiql?api-version=7.0
+#   GET  https://dev.azure.com/{org}/{project}/_apis/wit/workitems
+#        ?ids={ids}&fields=System.Id,System.Title,...&api-version=7.0
+# ═══════════════════════════════════════════════════════════════════
+
+_ADO_FIELDS_TO_FETCH = [
+    "System.Id",
+    "System.Title",
+    "System.WorkItemType",
+    "System.State",
+    "System.AreaPath",
+    "System.IterationPath",
+    "System.Description",
+    "System.Tags",
+    "Microsoft.VSTS.Common.AcceptanceCriteria",
+]
+
+
+async def _fetch_ado_via_rest(
+    pat: str,
+    org: str,
+    project: str,
+    iteration_path: Optional[str],
+    area_path: Optional[str],
+) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+    """Live ADO REST + WIQL fetch. Returns (items, error).
+
+    Never raises — all exceptions become a returned `error` string so the
+    caller can fall back to mock cleanly. PAT is base64-encoded with an
+    empty username, matching the `az` CLI and `curl --user :PAT` format.
+    """
+    import base64
+    try:
+        import httpx
+    except ImportError:
+        return None, "httpx not installed"
+
+    token_bytes = f":{pat}".encode("utf-8")
+    basic_auth = base64.b64encode(token_bytes).decode("ascii")
+    headers = {
+        "Authorization": f"Basic {basic_auth}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+
+    # Build WIQL query — escape single quotes in iteration / area paths.
+    def _esc(s: Optional[str]) -> str:
+        return (s or "").replace("'", "''")
+
+    where_clauses = ["[System.TeamProject] = @project"]
+    if iteration_path:
+        where_clauses.append(f"[System.IterationPath] = '{_esc(iteration_path)}'")
+    if area_path:
+        where_clauses.append(f"[System.AreaPath] = '{_esc(area_path)}'")
+    where = " AND ".join(where_clauses)
+    wiql_query = (
+        "SELECT [System.Id] FROM workitems "
+        f"WHERE {where} "
+        "ORDER BY [System.WorkItemType], [System.Id]"
+    )
+
+    wiql_url = (f"https://dev.azure.com/{org}/{project}"
+                  f"/_apis/wit/wiql?api-version=7.0")
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            wiql_resp = await client.post(wiql_url, headers=headers,
+                                            json={"query": wiql_query})
+            if wiql_resp.status_code < 200 or wiql_resp.status_code >= 300:
+                return None, (f"WIQL returned {wiql_resp.status_code}: "
+                              f"{wiql_resp.text[:200]}")
+            wiql_body = wiql_resp.json()
+            id_list = [str(w.get("id")) for w in (wiql_body.get("workItems") or [])
+                       if w.get("id") is not None]
+            if not id_list:
+                return [], None
+
+            # ADO caps batch fetches at 200 ids per request.
+            ids_param = ",".join(id_list[:200])
+            fields_param = ",".join(_ADO_FIELDS_TO_FETCH)
+            wi_url = (f"https://dev.azure.com/{org}/{project}"
+                        f"/_apis/wit/workitems?ids={ids_param}"
+                        f"&fields={fields_param}&api-version=7.0")
+            wi_resp = await client.get(wi_url, headers=headers)
+            if wi_resp.status_code < 200 or wi_resp.status_code >= 300:
+                return None, (f"Work items batch returned {wi_resp.status_code}: "
+                              f"{wi_resp.text[:200]}")
+            wi_body = wi_resp.json()
+            items: List[Dict[str, Any]] = []
+            for raw in (wi_body.get("value") or []):
+                fields = raw.get("fields") or {}
+                tags_raw = fields.get("System.Tags") or ""
+                tags = [t.strip() for t in tags_raw.split(";") if t.strip()]
+                # Strip HTML out of description / AC — ADO returns these as
+                # rich text. A naive strip is fine for the paste-bridge use
+                # case (parser is heuristic, not strict).
+                def _strip_html(s: Optional[str]) -> str:
+                    if not s:
+                        return ""
+                    return re.sub(r"<[^>]+>", "", s).strip()
+                items.append({
+                    "id": raw.get("id"),
+                    "title": fields.get("System.Title") or "",
+                    "work_item_type": fields.get("System.WorkItemType") or "",
+                    "state": fields.get("System.State") or "",
+                    "area_path": fields.get("System.AreaPath") or "",
+                    "iteration_path": fields.get("System.IterationPath") or "",
+                    "description": _strip_html(fields.get("System.Description")),
+                    "acceptance_criteria": _strip_html(
+                        fields.get("Microsoft.VSTS.Common.AcceptanceCriteria")),
+                    "tags": tags,
+                    "url": (raw.get("_links") or {}).get("html", {}).get("href")
+                           or f"https://dev.azure.com/{org}/{project}/_workitems/edit/{raw.get('id')}",
+                })
+            return items, None
+    except Exception as exc:  # pragma: no cover — defensive
+        return None, f"{type(exc).__name__}: {exc}"
+
+
+def _mock_ado_sprint_items(iteration_path: Optional[str]) -> List[Dict[str, Any]]:
+    """Curated mock list mirroring what a real RedCrossNorway/rkdotno Sprint 2
+    pull would return — used when ADO_PAT is absent or the live call fails."""
+    iter_p = iteration_path or "rkdotno\\Sprint 2"
+    area_p = "rkdotno\\Web QA"
+    base_url = "https://dev.azure.com/RedCrossNorway/rkdotno/_workitems/edit"
+    return [
+        {
+            "id": 1024,
+            "title": "Donasjonsflyt — Vipps handoff",
+            "work_item_type": "User Story",
+            "state": "Active",
+            "area_path": area_p,
+            "iteration_path": iter_p,
+            "description": ("Som giver vil jeg fullføre donasjon via Vipps "
+                            "slik at jeg slipper å skrive inn kortdata. "
+                            "Donasjonen er en del av en pågående giverkampanje."),
+            "acceptance_criteria": ("- Vipps handoff fungerer på mobil\n"
+                                     "- Kvittering vises etter retur\n"
+                                     "- Beløp logges i Analytics"),
+            "tags": ["donation", "vipps", "kampanje"],
+            "url": f"{base_url}/1024",
+        },
+        {
+            "id": 1025,
+            "title": "Frivillig-registrering — politiattest upload",
+            "work_item_type": "User Story",
+            "state": "Active",
+            "area_path": area_p,
+            "iteration_path": iter_p,
+            "description": ("Som frivillig vil jeg laste opp politiattest "
+                            "trygt slik at saksbehandling kan starte uten "
+                            "manuelle steg."),
+            "acceptance_criteria": ("- PDF + 5 MB grense respektert\n"
+                                     "- Antivirus-skann passes før lagring\n"
+                                     "- Korrelasjons-id i kvitteringen"),
+            "tags": ["volunteer", "frivillighet", "gdpr"],
+            "url": f"{base_url}/1025",
+        },
+        {
+            "id": 1026,
+            "title": "Lokal redaktør publiserer Aktivitet i sitt distrikt",
+            "work_item_type": "Task",
+            "state": "New",
+            "area_path": area_p,
+            "iteration_path": iter_p,
+            "description": ("Lokal-redaktør skal kun se og publisere "
+                            "Aktivitet i eget distrikt — subtree isolation "
+                            "skal håndheves i Content Studio."),
+            "acceptance_criteria": ("- Tre-strukturen viser kun eget distrikt\n"
+                                     "- Forsøk på cross-distrikt publisering nektes\n"
+                                     "- ISR revalidering < 30 s"),
+            "tags": ["cms-editorial", "aktivitet", "designsystemet"],
+            "url": f"{base_url}/1026",
+        },
+        {
+            "id": 1027,
+            "title": "Søk på lokale tjenester — TTFB regresjon",
+            "work_item_type": "Bug",
+            "state": "Active",
+            "area_path": area_p,
+            "iteration_path": iter_p,
+            "description": ("TTFB på /sok-siden ligger over 800 ms-målet "
+                            "etter at GraphQL-spørringen ble utvidet med "
+                            "ekstra felt for Tema-relasjoner."),
+            "acceptance_criteria": ("- TTFB tilbake under 600 ms p95\n"
+                                     "- Lighthouse Performance ≥ 85"),
+            "tags": ["performance", "graphql"],
+            "url": f"{base_url}/1027",
+        },
+    ]
+
+
+async def fetch_ado_sprint_items(
+    iteration_path: Optional[str] = None,
+    area_path: Optional[str] = None,
+    organization: Optional[str] = None,
+    project: Optional[str] = None,
+    environment: str = "test",
+    lang: str = "en",
+) -> Dict[str, Any]:
+    """Fetch the current Sprint backlog from Azure DevOps.
+
+    Live path (ADO_PAT in env): runs a WIQL query scoped to the iteration
+    path and returns the matching work items with id/title/type/state/
+    description/AC/tags/url.
+
+    Mock path (no PAT or live error): returns a curated set of 4 items
+    mirroring RedCrossNorway/rkdotno Sprint 2 so the workshop demo
+    always renders. The `is_mock` flag is included in the response so
+    the UI can display a "mock" badge.
+
+    NOTE: the PAT is *never* read from the request body — only from the
+    process environment (`ADO_PAT` or `AZURE_DEVOPS_PAT`).
+    """
+    import os
+
+    # Pull defaults from the existing red_cross_qa settings collection
+    # so the user can override org/project from the Settings tab.
+    try:
+        rcqa = await get_settings()
+        rcqa_settings = (rcqa or {}).get("settings") or {}
+    except Exception:
+        rcqa_settings = {}
+
+    org = organization or rcqa_settings.get("ado_organization") or "RedCrossNorway"
+    proj = project or rcqa_settings.get("ado_project") or "rkdotno"
+    iter_p = iteration_path or rcqa_settings.get("ado_iteration_path")
+    area_p = area_path or rcqa_settings.get("ado_area_path")
+
+    pat = os.environ.get("ADO_PAT") or os.environ.get("AZURE_DEVOPS_PAT")
+    items: Optional[List[Dict[str, Any]]] = None
+    live_error: Optional[str] = None
+
+    if pat:
+        items, live_error = await _fetch_ado_via_rest(
+            pat=pat, org=org, project=proj,
+            iteration_path=iter_p, area_path=area_p,
+        )
+
+    is_mock = items is None
+    if is_mock:
+        items = _mock_ado_sprint_items(iter_p)
+
+    return {
+        "status": "ok",
+        "is_mock": is_mock,
+        "live_error": live_error,  # surfaced for diagnostics; PAT never echoed
+        "organization": org,
+        "project": proj,
+        "iteration_path": iter_p,
+        "area_path": area_p,
+        "item_count": len(items or []),
+        "items": items or [],
+        "lang": lang,
+        "environment": environment,
     }
 
 
