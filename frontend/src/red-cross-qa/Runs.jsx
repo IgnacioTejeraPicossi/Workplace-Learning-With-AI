@@ -47,9 +47,9 @@ const Runs = ({ environment }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
           <StatCard label={t('redCrossWebQaModule.runs.totalRuns') || 'Total runs'} value={runs.length} color="#1e293b" />
-          <StatCard label="Pass" value={counts.pass || 0} color="#047857" />
-          <StatCard label="Warn" value={counts.warn || 0} color="#92400e" />
-          <StatCard label="Fail" value={counts.fail || 0} color="#b91c1c" />
+          <StatCard label={t('redCrossWebQaModule.common.statusPass')} value={counts.pass || 0} color="#047857" />
+          <StatCard label={t('redCrossWebQaModule.common.statusWarn')} value={counts.warn || 0} color="#92400e" />
+          <StatCard label={t('redCrossWebQaModule.common.statusFail')} value={counts.fail || 0} color="#b91c1c" />
         </div>
 
         <div style={panel}>

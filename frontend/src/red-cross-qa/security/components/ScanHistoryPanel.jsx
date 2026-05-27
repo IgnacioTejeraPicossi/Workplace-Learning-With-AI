@@ -70,9 +70,9 @@ export default function ScanHistoryPanel({ history }) {
               </div>
 
               <div style={{ display: 'flex', gap: 6 }}>
-                <Stat label="PASS" value={r.pass_count || 0} bg="#dcfce7" fg="#047857" />
-                <Stat label="WARN" value={r.warn_count || 0} bg="#fef3c7" fg="#92400e" />
-                <Stat label="FAIL" value={r.fail_count || 0} bg="#fee2e2" fg="#b91c1c" />
+                <Stat label={t('redCrossWebQaModule.common.statusPass').toUpperCase()} value={r.pass_count || 0} bg="#dcfce7" fg="#047857" />
+                <Stat label={t('redCrossWebQaModule.common.statusWarn').toUpperCase()} value={r.warn_count || 0} bg="#fef3c7" fg="#92400e" />
+                <Stat label={t('redCrossWebQaModule.common.statusFail').toUpperCase()} value={r.fail_count || 0} bg="#fee2e2" fg="#b91c1c" />
               </div>
 
               {trend && (

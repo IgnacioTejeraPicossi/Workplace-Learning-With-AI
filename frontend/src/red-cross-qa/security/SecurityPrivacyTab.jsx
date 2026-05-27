@@ -308,9 +308,9 @@ function SnapshotPanel({ status, onScan, scanning, loading, environment }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
         <SnapshotStat label={t('redCrossWebQaModule.securityPrivacy.statTotal')}    value={status?.total_checks ?? 0} color="#1e293b" />
-        <SnapshotStat label="PASS" value={status?.pass_count ?? 0} color="#047857" />
-        <SnapshotStat label="WARN" value={status?.warn_count ?? 0} color="#92400e" />
-        <SnapshotStat label="FAIL" value={status?.fail_count ?? 0} color="#b91c1c" />
+        <SnapshotStat label={t('redCrossWebQaModule.common.statusPass').toUpperCase()} value={status?.pass_count ?? 0} color="#047857" />
+        <SnapshotStat label={t('redCrossWebQaModule.common.statusWarn').toUpperCase()} value={status?.warn_count ?? 0} color="#92400e" />
+        <SnapshotStat label={t('redCrossWebQaModule.common.statusFail').toUpperCase()} value={status?.fail_count ?? 0} color="#b91c1c" />
         <SnapshotStat label={t('redCrossWebQaModule.securityPrivacy.statOpenFindings')} value={status?.open_findings ?? 0} color="#dc2626" />
       </div>
     </div>

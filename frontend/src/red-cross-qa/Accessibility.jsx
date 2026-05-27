@@ -360,12 +360,12 @@ const Accessibility = ({ environment }) => {
         {tool === 'wave' && wave?.status === 'ok' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
-              <WaveStat label="Errors"        value={wave.categories.errors}          color="#b91c1c" />
-              <WaveStat label="Contrast"      value={wave.categories.contrast_errors} color="#dc2626" />
-              <WaveStat label="Alerts"        value={wave.categories.alerts}          color="#f59e0b" />
-              <WaveStat label="Features"      value={wave.categories.features}        color="#10b981" />
-              <WaveStat label="Structure"     value={wave.categories.structural_elements} color="#0891b2" />
-              <WaveStat label="ARIA"          value={wave.categories.aria}            color="#7c3aed" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.errors')}    value={wave.categories.errors}          color="#b91c1c" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.contrast')}  value={wave.categories.contrast_errors} color="#dc2626" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.alerts')}    value={wave.categories.alerts}          color="#f59e0b" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.features')}  value={wave.categories.features}        color="#10b981" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.structure')} value={wave.categories.structural_elements} color="#0891b2" />
+              <WaveStat label={t('redCrossWebQaModule.accessibility.waveCategories.aria')}      value={wave.categories.aria}            color="#7c3aed" />
             </div>
 
             <div style={{ ...panel, borderTop: '4px solid #0d9488' }}>

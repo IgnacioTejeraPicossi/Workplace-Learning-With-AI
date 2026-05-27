@@ -111,9 +111,15 @@ export default function EnvironmentMatrix({ currentEnv, onPickEnvironment }) {
               </div>
 
               <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
-                <Stat label="P" value={row.pass_count || 0} fg="#047857" />
-                <Stat label="W" value={row.warn_count || 0} fg="#92400e" />
-                <Stat label="F" value={row.fail_count || 0} fg="#b91c1c" />
+                <Stat label={t('redCrossWebQaModule.common.statusPass').charAt(0).toUpperCase()}
+                      value={row.pass_count || 0} fg="#047857"
+                      title={t('redCrossWebQaModule.common.statusPass')} />
+                <Stat label={t('redCrossWebQaModule.common.statusWarn').charAt(0).toUpperCase()}
+                      value={row.warn_count || 0} fg="#92400e"
+                      title={t('redCrossWebQaModule.common.statusWarn')} />
+                <Stat label={t('redCrossWebQaModule.common.statusFail').charAt(0).toUpperCase()}
+                      value={row.fail_count || 0} fg="#b91c1c"
+                      title={t('redCrossWebQaModule.common.statusFail')} />
                 <Stat label="OF" value={row.open_findings || 0} fg="#dc2626"
                        title={t('redCrossWebQaModule.securityPrivacy.statOpenFindings')} />
               </div>
