@@ -7,6 +7,179 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.7] - 2026-05-28
+
+### Added — Red Cross Web QA Agent · Azure DevOps integration (paste + live REST fetch with PAT)
+
+Closes the Azure DevOps integration story end-to-end. The agent can now ingest real Sprint backlog items two ways:
+
+- **Manual** (no PAT): paste a User Story / Task body into a textarea → the agent extracts Title / Description / Acceptance Criteria / Tags / Røde Kors content-type and emits a structured test plan.
+- **Live REST** (with `ADO_PAT` in `.env`): pull the iteration's work items directly via WIQL → list view → "Use this item" pipes a fetched item into the paste flow → same plan generator.
+
+When `ADO_PAT` is absent OR the live call fails, the fetch path falls back to a curated mock list (4 items mirroring RedCrossNorway/rkdotno Sprint 2) so the workshop demo never breaks offline. The `is_mock` flag in the response surfaces a **MOCK** vs **LIVE (PAT)** badge in the UI.
+
+**Backend** (`backend/services/red_cross_qa.py`):
+- New `fetch_ado_sprint_items(iteration_path, area_path, organization, project, environment, lang)` — entry point with mock-first fallback. Reads PAT from `os.environ["ADO_PAT"]` (or `AZURE_DEVOPS_PAT`); **never** from request body.
+- New `_fetch_ado_via_rest(...)` — WIQL POST + batch GET of fields. Mirrors the `dispatch_finding_to_ado` pattern from Pack 4.2: httpx 15 s timeout, Basic auth with empty username, HTTPS only, never raises (errors come back as a string).
+- New `_mock_ado_sprint_items(iteration_path)` — 4 curated items (User Story / Task / Bug, NO descriptions + AC, real-looking IDs 1024-1027).
+- New `format_ado_item_as_paste_text(item)` — renders a fetched item in the exact shape `parse_ado_pasted_text` consumes so the round-trip is lossless.
+- `DEFAULT_SETTINGS` updated to the real org: `ado_organization = "RedCrossNorway"`, `ado_project = "rkdotno"`, `ado_area_path = "rkdotno\\Web QA"`, `ado_iteration_path = "rkdotno\\Sprint 2"`.
+
+**Router** (`backend/routers/red_cross_qa.py`):
+- `POST /api/red-cross-qa/ado/fetch-sprint` (with `AdoFetchSprintRequest` — all overrides optional)
+- `POST /api/red-cross-qa/ado/format-item` — bridge endpoint used by the frontend's "Use this item" button
+
+**Frontend** (`frontend/src/red-cross-qa/AzureDevOps.jsx`):
+- New "📥 Fetch from Azure DevOps" panel above the existing Paste-and-Generate panel
+- Optional iteration-path override input, MOCK / LIVE badge, item count, org/project context line
+- Per-item: ADO id pill, work-item-type, state chip, coloured tags, truncated description, "↓ Use this item" + "↗ Open in ADO" buttons
+
+**Frontend** (`frontend/src/red-cross-qa/UatSupport.jsx`):
+- New `ROLE_KEY_BY_LABEL` reverse map (NO label → roleKey) so `signoff_form.lines[].role` (returned by backend in Norwegian per the official "Roller og ansvar" document) localizes correctly when the UI runs in EN or ES. Defensive: includes pre-2026-05-28 historic labels ("Produkteier", "Fagperson") so replayed legacy runs still localize. Original NO label preserved as `title=` tooltip when it differs from the displayed translation.
+
+**i18n** (`frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json`):
+- 14 new keys under `ado.fetch*` + `ado.btnUseItem` + `ado.fetchOpenInAdo` + badge labels (MOCK / LIVE / mockHint / patHint). Parity preserved (797 → 811 leaves × 3 locales).
+
+**Smoke tests** (`backend/tests/smoke_red_cross_qa.py`) — 3 new checks:
+1. Mock-first fetch verifies `is_mock=True` without PAT, item shape (id/title/type/state/area/iteration/description/AC/tags/url), org defaults.
+2. Formatter → parser **round-trip** — every key field (title, type, iteration, tags, AC) survives unchanged.
+3. End-to-end: fetched item → format → paste-to-plan → 7 work items in plan.
+
+**Security**:
+- PAT only read from env, never from request body, never logged, never echoed in responses
+- Smoke explicitly asserts `ADO_PAT` is NOT set during CI to keep tests hermetic
+- HTTPS-only via httpx, timeout 15 s
+- Description / AC HTML stripped before exposure (ADO returns rich text)
+
+**Validation**: 41/41 smoke checks pass (was 37, +4 new). Backend exposes 41 routes total (+2 new). i18n parity 811 × 3 locales identical.
+
+**See also**: new dedicated user guide `docs/red-cross-qa-azure-devops-guide.md` covers PAT setup, both workflows, troubleshooting.
+
+---
+
+## [1.15.6] - 2026-05-28
+
+### Added — Red Cross Web QA Agent · Status (Pass/Warn/Fail) + WAVE categories localized
+
+Closes two long-standing heads-up items flagged after 1.15.5. The labels `Pass/Warn/Fail/PASS/WARN/FAIL/P/W/F` were hardcoded in 4 components, and the 6 WAVE chip categories (`Errors/Contrast/Alerts/Features/Structure/ARIA`) in Accessibility.jsx were also hardcoded in English. Workshop participants running the UI in Norwegian or Spanish saw mixed-language text.
+
+**Design decision** — one i18n key set, 4 visual styles:
+- A single `common.statusPass/Warn/Fail` set (Title case in JSON: `Pass / Bestått / Aprobado`, `Warn / Advarsel / Advertencia`, `Fail / Feilet / Fallido`)
+- Callers apply transforms per context:
+  - **Title case** (`Runs.jsx`) — `t(key)` directly
+  - **ALL CAPS** (`SecurityPrivacyTab.jsx`, `ScanHistoryPanel.jsx`) — `t(key).toUpperCase()` → `BESTÅTT / APROBADO` etc.
+  - **First letter** (`EnvironmentMatrix.jsx`) — `t(key).charAt(0).toUpperCase()` → `P/B/A` etc. with `title={fullLabel}` tooltip for the screen-reader / hover discoverability
+
+This avoids 3 separate key sets (full / abbreviated / acronymized) and lets a future localizer adjust the single source.
+
+**WAVE categories** — new `accessibility.waveCategories` sub-block (`errors/contrast/alerts/features/structure/aria`) with NO + ES translations. **ARIA** intentionally left untranslated in all locales (W3C technical acronym).
+
+**Spanish-specific note**: "Aprobado" and "Advertencia" both start with "A" — in `EnvironmentMatrix.jsx` both chips show "A" but **colour + tooltip** disambiguate (green "A" = Aprobado, orange "A" = Advertencia). Considered using "Adv" for warn-ES but kept consistency-of-rule over disambiguation-by-letter.
+
+**Files changed (8)**:
+- `frontend/src/red-cross-qa/Runs.jsx` (3 labels)
+- `frontend/src/red-cross-qa/security/SecurityPrivacyTab.jsx` (3 labels, uppercased)
+- `frontend/src/red-cross-qa/security/components/ScanHistoryPanel.jsx` (3 labels, uppercased)
+- `frontend/src/red-cross-qa/security/components/EnvironmentMatrix.jsx` (3 labels, first-letter + tooltip; "OF" kept as Open Findings abbreviation)
+- `frontend/src/red-cross-qa/Accessibility.jsx` (6 WAVE category labels)
+- `frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json` (+3 `common.statusX` + 6 `accessibility.waveCategories.*` = 9 new keys × 3 locales)
+
+**Validation**: i18n parity 788 → 797 leaves × 3 locales identical. Backend smoke 41/41 unchanged (this is a frontend-only change). Grep verifies no `label="Pass|Warn|Fail|PASS|WARN|FAIL|Errors|Contrast|Alerts|Features|Structure|ARIA"` hardcoded strings remain in `frontend/src/red-cross-qa/`.
+
+---
+
+## [1.15.5] - 2026-05-28
+
+### Changed — Red Cross Web QA Agent · Stakeholders data synced to official "Roller og ansvar" document
+
+Before this patch the Stakeholders panel (Settings tab) showed 4 placeholder people with generic roles (Produkteier / Fagperson). The project owner then received the official **"Roller og ansvar"** document from Røde Kors listing the real 10-person team — Hilde / Trine R.S. / Astri were still on it but with **scope-specific** Product Owner / access-management roles, NOT the generic "Fagperson" labels we showed. The project lead (Gry Rønjum) and 5 other team members were missing entirely.
+
+**Factually corrected — 4 → 10 stakeholders**:
+
+| Person | Real role (per doc) | Was shown as |
+|---|---|---|
+| **Gry Rønjum** | Prosjektleder med produktansvar | (missing) |
+| **Terje Christensen** | Teknisk representant fra Røde Kors | (missing) |
+| **Tom Arild Jakobsen** | Tech Lead Item (vendor) | (missing) |
+| **Jah Langleite** | IAM stakeholder | (missing) |
+| **Hilde Forslund** | Produkteier Inntekt CRM | Produkteier (generic) |
+| **Trine Røsand Scheen** | Produkteier Frivillighet CRM | Fagperson |
+| **Astri M.M. Fretheim** | Tilgangsstyring frivillighet | Fagperson (and wrong name) |
+| **Thomas Augestad** | Techlead Applikasjonsplattform | (missing) |
+| **Trine Bruu** | Testleder | Testleder ✓ |
+| **Ignacio Tejera Picossi** | QA / Tester | (missing — the user themselves) |
+
+**Files touched (6)**:
+- `frontend/src/red-cross-qa/Settings.jsx` — STAKEHOLDERS const 4 → 10 entries (slug + roleKey shape)
+- `frontend/src/red-cross-qa/Dashboard.jsx` — local stakeholders array synced (same shape, label rendered via `t()`)
+- `frontend/src/red-cross-qa/UatSupport.jsx` — `STAKEHOLDERS` const includes `Astri M.M. Fretheim` (full name correction); `ROLE_KEY_BY_NAME` map uses i18n keys instead of hardcoded NO
+- `frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json` — `stakeholders.roles` rebuilt (3 → 10 role keys); `stakeholders.people` rebuilt (4 → 10 person sub-blocks × 3 responsibilities). Old `productOwner/testManager/sme` keys removed (verified no lingering refs).
+- `backend/services/red_cross_qa.py` — `DEFAULT_UAT_STAKEHOLDERS` ("Astri Fretheim" → "Astri M.M. Fretheim"), `_UAT_ROLE_BY_NAME` roles updated to real labels ("Produkteier Inntekt CRM" etc.), `UAT_SUPPORT_PROMPT` named-stakeholders block + `signoff_form.lines[].role` defaults updated, UAT-003 mock script stakeholder corrected
+- `backend/tests/smoke_red_cross_qa.py` — UAT assertion updated to new name set + new `Astri M.M. Fretheim` signoff-form presence check
+
+**Design choices preserved across locales**:
+- Names stay hardcoded (proper nouns, no translation)
+- Norwegian role labels canonical in NO locale; EN/ES use "English (Norwegian)" / "Spanish (Norwegian)" format to preserve the source-of-truth label that Trine references in Teststrategi 30.3
+- Trine Bruu's 3 responsibilities (`Koordinere / Strukturere / Rapportere testaktiviteter`) come **literally** from the official document; all other responsibilities are reasonable inferences from each role title
+
+**Validation**: i18n parity 763 → 788 leaves × 3 locales identical. Backend smoke 41/41 pass (UAT-003 stakeholder + new signoff assertion both green).
+
+### Added — Localization bonus (`Settings.jsx` placeholder + savedAt + outsystemsUrl)
+
+Three previously hardcoded strings cleaned up in the same pass:
+- `placeholder="comma, separated"` → `t('settings.adoTagsPlaceholder')` (`kommaseparert` / `separados por coma`)
+- `<Field label="OutSystems URL">` → `t('settings.outsystemsUrl')` (key already existed, was orphaned)
+- `✓ Saved at {savedAt}` → `t('settings.savedAt', { value })` with i18next interpolation (`Lagret kl. {{value}}` / `Guardado a las {{value}}`)
+
+---
+
+## [1.15.4] - 2026-05-27
+
+### Added — Red Cross Web QA Agent · Paste-and-Generate (paste a Sprint item → get a test plan)
+
+The first half of the Azure DevOps integration story. Users can now copy any User Story / Task from their Azure DevOps Board, paste it into a textarea on the Azure DevOps tab, and the agent emits a structured Røde Kors-aware test plan in the user's locale (EN / NO / ES).
+
+**Why paste before fetch**: at the time of the first request (2026-05-27) the user had access to dev.azure.com URLs but no PAT yet, and the workflow is "I want to test the item *I'm working on now*" — paste is intentional, fits the human workflow, and needs zero secrets. Live REST fetch was deferred to 1.15.7 once it was clear the convenience was worth the security model.
+
+**Backend** (`backend/services/red_cross_qa.py`):
+- New `parse_ado_pasted_text(pasted_text) → dict` — heuristic, no LLM needed. Detects field headers in both NO ("Tittel:", "Arbeidselement-type:", "Område-sti:", …) and EN ("Title:", "Work Item Type:", "Area Path:", …) with hyphen-tolerant regex. Handles section headers ("Description:" / "Beskrivelse:" / "Acceptance Criteria" / "Akseptansekriterier") with multi-line bodies. Free-floating text before any header becomes the description; if no Title field is present, the first non-empty line is used.
+- New `_RK_CONTENT_TYPE_KEYWORDS` — 8 Røde Kors content types (Distrikt, Forening, Aktivitet, Kontaktperson, TjenesteKurs, Tema, Nyhet, Kampanje) with NO + EN keyword lists. The parser score-counts keyword occurrences across title + description + AC + tags and surfaces the highest-density match.
+- New `_normalise_risk(text)` — maps free-form risk language (`kritisk` / `critical` / `lav` / `low` / …) to `{low, medium, high}`.
+- New `generate_test_plan_from_ado_item(pasted_text, environment, lang)` — orchestrates parse → build enriched work-item context → reuses the existing `generate_test_plan` (Tool 1) so the LLM and the static-review work-item fallback both still kick in.
+
+**Router** (`backend/routers/red_cross_qa.py`):
+- `POST /api/red-cross-qa/ado/paste-to-plan` — main endpoint
+- `POST /api/red-cross-qa/ado/parse-pasted` — parser-only endpoint useful for UI "preview parse" hints
+
+**Frontend** (`frontend/src/red-cross-qa/AzureDevOps.jsx`):
+- New "📋 Paste a real Sprint item → get a test plan" panel
+- Textarea with multi-line placeholder showing expected format
+- Generate / Clear buttons
+- Result rendering: "What we understood" chip grid (title, work item type, area path, iteration, detected RK content type with grey fallback "Not detected", risk level, tags) + "Suggested test plan" sections (manual tests, automated candidates, accessibility checklist, API checks, regression scope, suggested test data, suggested ADO work items)
+
+**i18n** (`frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json`):
+- 24 new keys under `ado.paste*` / `ado.parsed*` / `ado.plan*` / `ado.btn*` / `ado.pasteEmpty` / `ado.noContentTypeDetected`. Parity preserved across 3 locales.
+
+**Smoke tests** (`backend/tests/smoke_red_cross_qa.py`) — 4 new checks:
+1. NO paste parser — full structured paste with Vipps/donation/kampanje keywords → detects Kampanje content type, 3 tags, AC captured.
+2. Messy free-form parser (no field headers) — first line becomes title, content type still detected from keywords (Aktivitet / Distrikt tie).
+3. End-to-end NO `generate_test_plan_from_ado_item` — plan returned with 7 ADO work items including 3 static-review items (Enonic XP skill mock fallback preserved).
+4. Empty input → returns valid empty parse with `rk_content_type=None` and `risk_level="medium"`.
+
+**Hardening after first run**: smoke check #1 flagged that the regex didn't accept "Arbeidselement-type" with a hyphen — fixed by widening field patterns to `[\s\-]?` between sub-words. Now accepts both "Arbeidselementtype" (no hyphen) and "Arbeidselement-type" (with hyphen) which are both real ADO clipboard outputs.
+
+**Validation**: 37 → 41 smoke checks pass.
+
+### Added — Stakeholders block localized (Settings tab, first pass — placeholder data)
+
+Localizes the Stakeholders panel which until now showed 4 hardcoded English-only responsibility bullets ("UAT sign-off", "Backlog priority", "Release approval", …). Restructured `STAKEHOLDERS` const in `Settings.jsx` with `slug` + `roleKey` properties; render switched to `t(\`stakeholders.roles.\${roleKey}\`)` and `t(\`stakeholders.people.\${slug}.\${rk}\`)`.
+
+**i18n**: new `stakeholders.roles.{productOwner, testManager, sme}` + `stakeholders.people.{hilde, trineBruu, trineScheen, astri}.{r1, r2, r3}` (15 keys × 3 locales).
+
+NB: this version's data was the **placeholder** team (Hilde / Trine Bruu / Trine R.S. / Astri). The official "Roller og ansvar" document arrived after the commit landed and triggered 1.15.5's factual correction to the real 10-person team.
+
+---
+
 ## [1.15.3] - 2026-05-22
 
 ### Added — AGI Hub · ISTQB local RAG · Option 3 (Translate-then-BM25) for Norwegian queries
