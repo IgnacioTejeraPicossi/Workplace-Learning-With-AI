@@ -725,7 +725,34 @@
     "stakeholders": {
       "header": "Interessenter og roller — Røde Kors-team",
       "subheader": "Eneste sannhetskilde for hvem som eier beslutninger på rodekors.no-omleggingen. Brukes av UAT-støtte, sprintrapporter og signeringsskjemaer.",
-      "responsibilities": "Ansvarsområder"
+      "responsibilities": "Ansvarsområder",
+      "roles": {
+        "productOwner": "Produkteier",
+        "testManager": "Testleder",
+        "sme": "Fagperson"
+      },
+      "people": {
+        "hilde": {
+          "r1": "UAT-godkjenning",
+          "r2": "Backlog-prioritering",
+          "r3": "Frigivelsesgodkjenning"
+        },
+        "trineBruu": {
+          "r1": "Teststrategi 30.3",
+          "r2": "Sev1-4 / KatA-C-styring",
+          "r3": "Sprintrapporter"
+        },
+        "trineScheen": {
+          "r1": "Frivillig-flyt review",
+          "r2": "CMS-redaksjonell UAT",
+          "r3": "Beredskapsscenarier"
+        },
+        "astri": {
+          "r1": "Donasjonsflyt review",
+          "r2": "Fundy + Vipps handoff",
+          "r3": "TV-aksjonen-peak"
+        }
+      }
     },
 
     "suites": {

@@ -725,7 +725,34 @@
     "stakeholders": {
       "header": "Stakeholders & Roles — Røde Kors team",
       "subheader": "Single source of truth for who owns decisions on the rodekors.no rebuild. Used by UAT support, sprint reports and sign-off forms.",
-      "responsibilities": "Responsibilities"
+      "responsibilities": "Responsibilities",
+      "roles": {
+        "productOwner": "Product Owner (Produkteier)",
+        "testManager": "Test Manager (Testleder)",
+        "sme": "Subject-Matter Expert (Fagperson)"
+      },
+      "people": {
+        "hilde": {
+          "r1": "UAT sign-off",
+          "r2": "Backlog priority",
+          "r3": "Release approval"
+        },
+        "trineBruu": {
+          "r1": "Teststrategi 30.3",
+          "r2": "Sev1-4 / KatA-C governance",
+          "r3": "Sprint reports"
+        },
+        "trineScheen": {
+          "r1": "Volunteer flow review",
+          "r2": "CMS editorial UAT",
+          "r3": "Beredskap scenarios"
+        },
+        "astri": {
+          "r1": "Donation flow review",
+          "r2": "Fundy + Vipps handoff",
+          "r3": "TV-aksjonen peak"
+        }
+      }
     },
 
     "suites": {

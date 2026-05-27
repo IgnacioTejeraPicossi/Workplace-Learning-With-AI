@@ -14,37 +14,45 @@ const PAYMENT_OPTIONS = [
  * Røde Kors stakeholders + roller — single source of truth (Phase C).
  * Used by Dashboard, UAT-støtte, Sprint Report and Settings to consistently
  * show the named people who own decisions on the rodekors.no rebuild.
+ *
+ * Phase H+ (2026-05-27): role + responsibility strings moved to i18n keys
+ * under redCrossWebQaModule.stakeholders.{roles,people}. Names stay
+ * hardcoded (proper nouns, no translation needed).
  */
 const STAKEHOLDERS = [
   {
+    slug: 'hilde',
     name: 'Hilde Forslund',
-    role: 'Produkteier (Product Owner)',
-    responsibilities: ['UAT sign-off', 'Backlog priority', 'Release approval'],
+    roleKey: 'productOwner',
     color: '#dc2626',
     initials: 'HF',
   },
   {
+    slug: 'trineBruu',
     name: 'Trine Bruu',
-    role: 'Testleder (Test Manager)',
-    responsibilities: ['Teststrategi 30.3', 'Sev1-4 / KatA-C governance', 'Sprint reports'],
+    roleKey: 'testManager',
     color: '#15803d',
     initials: 'TB',
   },
   {
+    slug: 'trineScheen',
     name: 'Trine Røsand Scheen',
-    role: 'Fagperson (Subject-Matter Expert)',
-    responsibilities: ['Volunteer flow review', 'CMS editorial UAT', 'Beredskap scenarios'],
+    roleKey: 'sme',
     color: '#1d4ed8',
     initials: 'TS',
   },
   {
+    slug: 'astri',
     name: 'Astri Fretheim',
-    role: 'Fagperson (Subject-Matter Expert)',
-    responsibilities: ['Donation flow review', 'Fundy + Vipps handoff', 'TV-aksjonen peak'],
+    roleKey: 'sme',
     color: '#7c3aed',
     initials: 'AF',
   },
 ];
+
+// Each stakeholder has exactly 3 responsibility slots (r1, r2, r3) defined
+// per locale under stakeholders.people.{slug}.{r1|r2|r3}.
+const RESPONSIBILITY_KEYS = ['r1', 'r2', 'r3'];
 
 const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode }) => {
   const { t } = useTranslation();
@@ -280,7 +288,7 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
                       {s.name}
                     </div>
                     <div style={{ fontSize: 11, color: s.color, fontWeight: 600, marginTop: 2 }}>
-                      {s.role}
+                      {t(`redCrossWebQaModule.stakeholders.roles.${s.roleKey}`)}
                     </div>
                   </div>
                 </div>
@@ -288,7 +296,9 @@ const Settings = ({ environment, setEnvironment, executionMode, setExecutionMode
                   {t('redCrossWebQaModule.stakeholders.responsibilities')}
                 </div>
                 <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
-                  {s.responsibilities.map((r, i) => <li key={i}>{r}</li>)}
+                  {RESPONSIBILITY_KEYS.map((rk, i) => (
+                    <li key={i}>{t(`redCrossWebQaModule.stakeholders.people.${s.slug}.${rk}`)}</li>
+                  ))}
                 </ul>
               </div>
             ))}

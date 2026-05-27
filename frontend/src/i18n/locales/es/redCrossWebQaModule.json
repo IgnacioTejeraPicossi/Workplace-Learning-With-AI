@@ -725,7 +725,34 @@
     "stakeholders": {
       "header": "Interesados y roles — equipo Cruz Roja",
       "subheader": "Única fuente de verdad sobre quién posee las decisiones en la migración de rodekors.no. Usado por soporte UAT, informes de sprint y formularios de firma.",
-      "responsibilities": "Responsabilidades"
+      "responsibilities": "Responsabilidades",
+      "roles": {
+        "productOwner": "Propietario de Producto (Produkteier)",
+        "testManager": "Jefa de Pruebas (Testleder)",
+        "sme": "Especialista en la materia (Fagperson)"
+      },
+      "people": {
+        "hilde": {
+          "r1": "Aprobación UAT",
+          "r2": "Priorización del backlog",
+          "r3": "Aprobación de releases"
+        },
+        "trineBruu": {
+          "r1": "Teststrategi 30.3",
+          "r2": "Gobernanza Sev1-4 / KatA-C",
+          "r3": "Informes de sprint"
+        },
+        "trineScheen": {
+          "r1": "Revisión del flujo de voluntarios",
+          "r2": "UAT editorial del CMS",
+          "r3": "Escenarios de emergencia (Beredskap)"
+        },
+        "astri": {
+          "r1": "Revisión del flujo de donación",
+          "r2": "Handoff Fundy + Vipps",
+          "r3": "Pico TV-aksjonen"
+        }
+      }
     },
 
     "suites": {
