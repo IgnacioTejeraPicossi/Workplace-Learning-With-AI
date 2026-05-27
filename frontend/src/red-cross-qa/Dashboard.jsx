@@ -92,12 +92,20 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
     { title: 'Missing Content-Security-Policy header on staging',                 severity: 'medium', category: 'security' },
   ];
 
-  // Røde Kors stakeholders — single source of truth (also rendered in Settings)
+  // Røde Kors stakeholders — single source of truth (also rendered in Settings).
+  // Phase H+ (2026-05-28): synced with the official 'Roller og ansvar' document
+  // (10 people). Role labels come from i18n keys to stay in NO/EN/ES sync.
   const stakeholders = [
-    { name: 'Hilde Forslund',        role: 'Produkteier',  initials: 'HF', color: '#dc2626' },
-    { name: 'Trine Bruu',            role: 'Testleder',    initials: 'TB', color: '#15803d' },
-    { name: 'Trine Røsand Scheen',   role: 'Fagperson',    initials: 'TS', color: '#1d4ed8' },
-    { name: 'Astri Fretheim',        role: 'Fagperson',    initials: 'AF', color: '#7c3aed' },
+    { name: 'Gry Rønjum',              roleKey: 'projectManagerProductOwner', initials: 'GR', color: '#dc2626' },
+    { name: 'Terje Christensen',       roleKey: 'rkTechnicalRep',             initials: 'TC', color: '#9333ea' },
+    { name: 'Tom Arild Jakobsen',      roleKey: 'techLeadItem',               initials: 'TJ', color: '#0891b2' },
+    { name: 'Jah Langleite',           roleKey: 'iamStakeholder',             initials: 'JL', color: '#0d9488' },
+    { name: 'Hilde Forslund',          roleKey: 'poInntektCrm',               initials: 'HF', color: '#f59e0b' },
+    { name: 'Trine Røsand Scheen',     roleKey: 'poFrivillighetCrm',          initials: 'TS', color: '#1d4ed8' },
+    { name: 'Astri M.M. Fretheim',     roleKey: 'tilgangsstyringFrivillighet', initials: 'AF', color: '#7c3aed' },
+    { name: 'Thomas Augestad',         roleKey: 'techleadAppPlatform',        initials: 'TA', color: '#be185d' },
+    { name: 'Trine Bruu',              roleKey: 'testleder',                  initials: 'TB', color: '#15803d' },
+    { name: 'Ignacio Tejera Picossi',  roleKey: 'qaTester',                   initials: 'IT', color: '#ea580c' },
   ];
 
   const statusPill = (s) => ({
@@ -248,7 +256,7 @@ const Dashboard = ({ environment, executionMode, onNavigate }) => {
                     {s.name}
                   </div>
                   <div style={{ fontSize: 11, color: s.color, fontWeight: 600, marginTop: 2 }}>
-                    {s.role}
+                    {t(`redCrossWebQaModule.stakeholders.roles.${s.roleKey}`)}
                   </div>
                 </div>
               </div>

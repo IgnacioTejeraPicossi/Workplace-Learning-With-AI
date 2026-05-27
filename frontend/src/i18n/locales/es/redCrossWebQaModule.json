@@ -726,33 +726,70 @@
 
     "stakeholders": {
       "header": "Interesados y roles — equipo Cruz Roja",
-      "subheader": "Única fuente de verdad sobre quién posee las decisiones en la migración de rodekors.no. Usado por soporte UAT, informes de sprint y formularios de firma.",
+      "subheader": "Única fuente de verdad sobre quién posee las decisiones en la migración de rodekors.no. Tomado del documento oficial «Roller og ansvar». Usado por soporte UAT, informes de sprint y formularios de firma.",
       "responsibilities": "Responsabilidades",
       "roles": {
-        "productOwner": "Propietario de Producto (Produkteier)",
-        "testManager": "Jefa de Pruebas (Testleder)",
-        "sme": "Especialista en la materia (Fagperson)"
+        "projectManagerProductOwner": "Jefa de Proyecto con responsabilidad de producto (Prosjektleder)",
+        "rkTechnicalRep": "Representante técnico de la Cruz Roja",
+        "techLeadItem": "Tech Lead — Item (proveedor)",
+        "iamStakeholder": "IAM — gestión de identidad y acceso",
+        "poInntektCrm": "Propietaria de Producto — CRM Ingresos (Inntekt)",
+        "poFrivillighetCrm": "Propietaria de Producto — CRM Voluntariado (Frivillighet)",
+        "tilgangsstyringFrivillighet": "Gestión de accesos — voluntariado",
+        "techleadAppPlatform": "Tech Lead — Plataforma de Aplicaciones",
+        "testleder": "Jefa de Pruebas (Testleder)",
+        "qaTester": "QA / Tester"
       },
       "people": {
-        "hilde": {
-          "r1": "Aprobación UAT",
-          "r2": "Priorización del backlog",
+        "gry": {
+          "r1": "Dirección del proyecto",
+          "r2": "Responsabilidad de producto",
           "r3": "Aprobación de releases"
         },
-        "trineBruu": {
-          "r1": "Teststrategi 30.3",
-          "r2": "Gobernanza Sev1-4 / KatA-C",
-          "r3": "Informes de sprint"
+        "terje": {
+          "r1": "Enlace técnico Cruz Roja",
+          "r2": "Aportaciones de arquitectura",
+          "r3": "Traspaso a operaciones"
+        },
+        "tom": {
+          "r1": "Liderazgo técnico Item",
+          "r2": "Guía de implementación",
+          "r3": "Revisión de código"
+        },
+        "jah": {
+          "r1": "Identidad y acceso",
+          "r2": "Inicio de sesión único (SSO)",
+          "r3": "Revisión del flujo de auth"
+        },
+        "hilde": {
+          "r1": "Propiedad CRM Ingresos",
+          "r2": "Prioridades del flujo de donación",
+          "r3": "Handoff Fundy + Vipps"
         },
         "trineScheen": {
-          "r1": "Revisión del flujo de voluntarios",
-          "r2": "UAT editorial del CMS",
-          "r3": "Escenarios de emergencia (Beredskap)"
+          "r1": "Propiedad CRM Voluntariado",
+          "r2": "Flujo de onboarding voluntario",
+          "r3": "Editorial de Aktivitet"
         },
         "astri": {
-          "r1": "Revisión del flujo de donación",
-          "r2": "Handoff Fundy + Vipps",
-          "r3": "Pico TV-aksjonen"
+          "r1": "Control de acceso voluntario",
+          "r2": "Matriz de roles y permisos",
+          "r3": "Gobernanza de datos de voluntarios"
+        },
+        "thomas": {
+          "r1": "Arquitectura de plataforma",
+          "r2": "Integraciones",
+          "r3": "Operabilidad"
+        },
+        "trineBruu": {
+          "r1": "Coordinar actividades de pruebas",
+          "r2": "Estructurar pruebas técnicas",
+          "r3": "Reportar estado de pruebas"
+        },
+        "ignacio": {
+          "r1": "Ejecución de pruebas",
+          "r2": "Reporte de defectos",
+          "r3": "Pruebas de regresión"
         }
       }
     },

@@ -11,42 +11,88 @@ const PAYMENT_OPTIONS = [
 ];
 
 /**
- * Røde Kors stakeholders + roller — single source of truth (Phase C).
+ * Røde Kors stakeholders + roller — single source of truth.
  * Used by Dashboard, UAT-støtte, Sprint Report and Settings to consistently
  * show the named people who own decisions on the rodekors.no rebuild.
  *
- * Phase H+ (2026-05-27): role + responsibility strings moved to i18n keys
- * under redCrossWebQaModule.stakeholders.{roles,people}. Names stay
- * hardcoded (proper nouns, no translation needed).
+ * Phase H+ (2026-05-28): updated to reflect the OFFICIAL "Roller og ansvar"
+ * document received from Røde Kors. Replaces the earlier 4-person placeholder
+ * with the actual 10-person team (project lead, technical reps, 5 stakeholders,
+ * test lead, QA tester).
+ *
+ * Names stay hardcoded (proper nouns). Role labels + responsibilities live in
+ * i18n keys under redCrossWebQaModule.stakeholders.{roles,people}.
  */
 const STAKEHOLDERS = [
   {
-    slug: 'hilde',
-    name: 'Hilde Forslund',
-    roleKey: 'productOwner',
+    slug: 'gry',
+    name: 'Gry Rønjum',
+    roleKey: 'projectManagerProductOwner',
     color: '#dc2626',
-    initials: 'HF',
+    initials: 'GR',
   },
   {
-    slug: 'trineBruu',
-    name: 'Trine Bruu',
-    roleKey: 'testManager',
-    color: '#15803d',
-    initials: 'TB',
+    slug: 'terje',
+    name: 'Terje Christensen',
+    roleKey: 'rkTechnicalRep',
+    color: '#9333ea',
+    initials: 'TC',
+  },
+  {
+    slug: 'tom',
+    name: 'Tom Arild Jakobsen',
+    roleKey: 'techLeadItem',
+    color: '#0891b2',
+    initials: 'TJ',
+  },
+  {
+    slug: 'jah',
+    name: 'Jah Langleite',
+    roleKey: 'iamStakeholder',
+    color: '#0d9488',
+    initials: 'JL',
+  },
+  {
+    slug: 'hilde',
+    name: 'Hilde Forslund',
+    roleKey: 'poInntektCrm',
+    color: '#f59e0b',
+    initials: 'HF',
   },
   {
     slug: 'trineScheen',
     name: 'Trine Røsand Scheen',
-    roleKey: 'sme',
+    roleKey: 'poFrivillighetCrm',
     color: '#1d4ed8',
     initials: 'TS',
   },
   {
     slug: 'astri',
-    name: 'Astri Fretheim',
-    roleKey: 'sme',
+    name: 'Astri M.M. Fretheim',
+    roleKey: 'tilgangsstyringFrivillighet',
     color: '#7c3aed',
     initials: 'AF',
+  },
+  {
+    slug: 'thomas',
+    name: 'Thomas Augestad',
+    roleKey: 'techleadAppPlatform',
+    color: '#be185d',
+    initials: 'TA',
+  },
+  {
+    slug: 'trineBruu',
+    name: 'Trine Bruu',
+    roleKey: 'testleder',
+    color: '#15803d',
+    initials: 'TB',
+  },
+  {
+    slug: 'ignacio',
+    name: 'Ignacio Tejera Picossi',
+    roleKey: 'qaTester',
+    color: '#ea580c',
+    initials: 'IT',
   },
 ];
 

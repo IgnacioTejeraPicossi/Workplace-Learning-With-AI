@@ -726,33 +726,70 @@
 
     "stakeholders": {
       "header": "Stakeholders & Roles — Røde Kors team",
-      "subheader": "Single source of truth for who owns decisions on the rodekors.no rebuild. Used by UAT support, sprint reports and sign-off forms.",
+      "subheader": "Single source of truth for who owns decisions on the rodekors.no rebuild. Sourced from the official 'Roller og ansvar' document. Used by UAT support, sprint reports and sign-off forms.",
       "responsibilities": "Responsibilities",
       "roles": {
-        "productOwner": "Product Owner (Produkteier)",
-        "testManager": "Test Manager (Testleder)",
-        "sme": "Subject-Matter Expert (Fagperson)"
+        "projectManagerProductOwner": "Project Manager with product responsibility (Prosjektleder)",
+        "rkTechnicalRep": "Røde Kors technical representative",
+        "techLeadItem": "Tech Lead — Item (vendor)",
+        "iamStakeholder": "IAM — Identity & Access Management",
+        "poInntektCrm": "Product Owner — Revenue CRM (Inntekt)",
+        "poFrivillighetCrm": "Product Owner — Volunteer CRM (Frivillighet)",
+        "tilgangsstyringFrivillighet": "Volunteer access management",
+        "techleadAppPlatform": "Tech Lead — Application Platform",
+        "testleder": "Test Manager (Testleder)",
+        "qaTester": "QA / Tester"
       },
       "people": {
-        "hilde": {
-          "r1": "UAT sign-off",
-          "r2": "Backlog priority",
+        "gry": {
+          "r1": "Project leadership",
+          "r2": "Product responsibility",
           "r3": "Release approval"
         },
-        "trineBruu": {
-          "r1": "Teststrategi 30.3",
-          "r2": "Sev1-4 / KatA-C governance",
-          "r3": "Sprint reports"
+        "terje": {
+          "r1": "Røde Kors technical liaison",
+          "r2": "Architecture input",
+          "r3": "Operations handover"
+        },
+        "tom": {
+          "r1": "Item technical leadership",
+          "r2": "Implementation guidance",
+          "r3": "Code review"
+        },
+        "jah": {
+          "r1": "Identity & access",
+          "r2": "Single sign-on",
+          "r3": "Auth flow review"
+        },
+        "hilde": {
+          "r1": "Revenue CRM ownership",
+          "r2": "Donation flow priorities",
+          "r3": "Fundy + Vipps handoff"
         },
         "trineScheen": {
-          "r1": "Volunteer flow review",
-          "r2": "CMS editorial UAT",
-          "r3": "Beredskap scenarios"
+          "r1": "Volunteer CRM ownership",
+          "r2": "Volunteer onboarding flow",
+          "r3": "Aktivitet (Activity) editorial"
         },
         "astri": {
-          "r1": "Donation flow review",
-          "r2": "Fundy + Vipps handoff",
-          "r3": "TV-aksjonen peak"
+          "r1": "Volunteer access control",
+          "r2": "Roles & permissions matrix",
+          "r3": "Volunteer data governance"
+        },
+        "thomas": {
+          "r1": "Platform architecture",
+          "r2": "Integrations",
+          "r3": "Operability"
+        },
+        "trineBruu": {
+          "r1": "Coordinate test activities",
+          "r2": "Structure technical testing",
+          "r3": "Report test status"
+        },
+        "ignacio": {
+          "r1": "Test execution",
+          "r2": "Defect reporting",
+          "r3": "Regression testing"
         }
       }
     },

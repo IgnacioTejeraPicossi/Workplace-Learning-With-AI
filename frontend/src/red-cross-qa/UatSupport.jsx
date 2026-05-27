@@ -13,12 +13,15 @@ const SCOPES = [
   { key: 'beredskap',      icon: '🚨' },
 ];
 
-const STAKEHOLDERS = ['Hilde Forslund', 'Trine Røsand Scheen', 'Astri Fretheim'];
+// UAT signoff stakeholders — the 3 business-side approvers per the
+// official 'Roller og ansvar' document (Phase H+ 2026-05-28: Astri's full
+// name corrected to 'Astri M.M. Fretheim', role labels mapped to i18n keys).
+const STAKEHOLDERS = ['Hilde Forslund', 'Trine Røsand Scheen', 'Astri M.M. Fretheim'];
 
-const ROLE_BY_NAME = {
-  'Hilde Forslund': 'Produkteier',
-  'Trine Røsand Scheen': 'Fagperson',
-  'Astri Fretheim': 'Fagperson',
+const ROLE_KEY_BY_NAME = {
+  'Hilde Forslund': 'poInntektCrm',
+  'Trine Røsand Scheen': 'poFrivillighetCrm',
+  'Astri M.M. Fretheim': 'tilgangsstyringFrivillighet',
 };
 
 const DECISION_COLOR = {
@@ -105,7 +108,9 @@ const UatSupport = ({ environment }) => {
                   border: `1px solid ${active ? '#86efac' : '#e2e8f0'}`,
                 }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: active ? '#15803d' : '#1e293b' }}>{n}</span>
-                  <span style={{ fontSize: 11, color: '#64748b' }}>{ROLE_BY_NAME[n]}</span>
+                  <span style={{ fontSize: 11, color: '#64748b' }}>
+                    {ROLE_KEY_BY_NAME[n] ? t(`redCrossWebQaModule.stakeholders.roles.${ROLE_KEY_BY_NAME[n]}`) : ''}
+                  </span>
                 </label>
               );
             })}

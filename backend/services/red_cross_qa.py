@@ -442,17 +442,22 @@ leverandør ved behov" (per Teststrategi 30.3 §5.4). Your job is to produce UAT
 artifacts: step-by-step scripts, acceptance checklists, and sign-off forms for named
 Røde Kors stakeholders.
 
-Named stakeholders (per organisasjonskart 30.3):
-  - Hilde Forslund (Produkteier / Product Owner)
-  - Trine Røsand Scheen (Fagperson / Subject-matter expert)
-  - Astri Fretheim (Fagperson / Subject-matter expert)
+Named UAT signoff stakeholders (per the official 'Roller og ansvar' document):
+  - Hilde Forslund (Produkteier Inntekt CRM) — owns revenue / donation flows
+  - Trine Røsand Scheen (Produkteier Frivillighet CRM) — owns volunteer flows
+  - Astri M.M. Fretheim (Tilgangsstyring frivillighet) — owns volunteer access control / editorial
+
+Additional team members (not on UAT signoff but relevant for context):
+  - Gry Rønjum (Prosjektleder med produktansvar)
+  - Trine Bruu (Testleder) — coordinates technical testing
+  - Tom Arild Jakobsen (Tech Lead Item), Thomas Augestad (Techlead Applikasjonsplattform)
 
 Return ONLY valid JSON:
 {
   "uat_scripts": [{
     "script_id": "UAT-001",
     "title": "...",
-    "stakeholder": "Hilde Forslund | Trine Røsand Scheen | Astri Fretheim",
+    "stakeholder": "Hilde Forslund | Trine Røsand Scheen | Astri M.M. Fretheim",
     "scope": "donation|volunteer|cms-editorial|search|forms|...",
     "preconditions": ["..."],
     "steps": [{"n": 1, "action": "...", "expected": "..."}],
@@ -468,9 +473,9 @@ Return ONLY valid JSON:
     "sprint": "...",
     "build_attestation": "SHA-256 from latest run",
     "lines": [
-      {"role": "Produkteier", "name": "Hilde Forslund", "decision": "godkjent|ikke godkjent|godkjent med merknader", "comment": ""},
-      {"role": "Fagperson", "name": "Trine Røsand Scheen", "decision": "...", "comment": ""},
-      {"role": "Fagperson", "name": "Astri Fretheim", "decision": "...", "comment": ""}
+      {"role": "Produkteier Inntekt CRM", "name": "Hilde Forslund", "decision": "godkjent|ikke godkjent|godkjent med merknader", "comment": ""},
+      {"role": "Produkteier Frivillighet CRM", "name": "Trine Røsand Scheen", "decision": "...", "comment": ""},
+      {"role": "Tilgangsstyring frivillighet", "name": "Astri M.M. Fretheim", "decision": "...", "comment": ""}
     ]
   },
   "support_notes": ["..."]
@@ -5107,11 +5112,15 @@ async def run_resilience_check(profile: str, scenarios: List[str],
 # ═══════════════════════════════════════════════════════════════════
 # Tool 15 — UAT-støtte (Akseptansetest-støtte for Røde Kors-stakeholders)
 # ═══════════════════════════════════════════════════════════════════
-DEFAULT_UAT_STAKEHOLDERS = ["Hilde Forslund", "Trine Røsand Scheen", "Astri Fretheim"]
+# UAT signoff stakeholders — the 3 business-side approvers per the official
+# 'Roller og ansvar' document (Phase H+ 2026-05-28). Other team members
+# (Gry, Trine Bruu, Tom, Terje, Jah, Thomas, Ignacio) are not on the UAT
+# signoff form by design — they are project lead, technical reps, or QA.
+DEFAULT_UAT_STAKEHOLDERS = ["Hilde Forslund", "Trine Røsand Scheen", "Astri M.M. Fretheim"]
 _UAT_ROLE_BY_NAME = {
-    "Hilde Forslund": "Produkteier",
-    "Trine Røsand Scheen": "Fagperson",
-    "Astri Fretheim": "Fagperson",
+    "Hilde Forslund": "Produkteier Inntekt CRM",
+    "Trine Røsand Scheen": "Produkteier Frivillighet CRM",
+    "Astri M.M. Fretheim": "Tilgangsstyring frivillighet",
 }
 
 
@@ -5191,7 +5200,7 @@ async def generate_uat_support(scopes: List[str], stakeholders: List[str],
         {
             "script_id": "UAT-003",
             "title": "Lokal redaktør publiserer aktivitet i sitt distrikt",
-            "stakeholder": "Astri Fretheim",
+            "stakeholder": "Astri M.M. Fretheim",
             "scope": "cms-editorial",
             "preconditions": ["Content Studio v.6 åpen", "Lokal-redaktør-rolle aktiv"],
             "steps": [

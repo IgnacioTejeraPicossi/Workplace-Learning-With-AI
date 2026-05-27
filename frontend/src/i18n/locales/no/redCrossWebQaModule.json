@@ -726,33 +726,70 @@
 
     "stakeholders": {
       "header": "Interessenter og roller — Røde Kors-team",
-      "subheader": "Eneste sannhetskilde for hvem som eier beslutninger på rodekors.no-omleggingen. Brukes av UAT-støtte, sprintrapporter og signeringsskjemaer.",
+      "subheader": "Eneste sannhetskilde for hvem som eier beslutninger på rodekors.no-omleggingen. Hentet fra det offisielle «Roller og ansvar»-dokumentet. Brukes av UAT-støtte, sprintrapporter og signeringsskjemaer.",
       "responsibilities": "Ansvarsområder",
       "roles": {
-        "productOwner": "Produkteier",
-        "testManager": "Testleder",
-        "sme": "Fagperson"
+        "projectManagerProductOwner": "Prosjektleder med produktansvar",
+        "rkTechnicalRep": "Teknisk representant fra Røde Kors",
+        "techLeadItem": "Tech Lead — Item (leverandør)",
+        "iamStakeholder": "IAM — identitet og tilgang",
+        "poInntektCrm": "Produkteier Inntekt CRM",
+        "poFrivillighetCrm": "Produkteier Frivillighet CRM",
+        "tilgangsstyringFrivillighet": "Tilgangsstyring frivillighet",
+        "techleadAppPlatform": "Techlead Applikasjonsplattform",
+        "testleder": "Testleder",
+        "qaTester": "QA / Tester"
       },
       "people": {
-        "hilde": {
-          "r1": "UAT-godkjenning",
-          "r2": "Backlog-prioritering",
+        "gry": {
+          "r1": "Prosjektledelse",
+          "r2": "Produktansvar",
           "r3": "Frigivelsesgodkjenning"
         },
-        "trineBruu": {
-          "r1": "Teststrategi 30.3",
-          "r2": "Sev1-4 / KatA-C-styring",
-          "r3": "Sprintrapporter"
+        "terje": {
+          "r1": "RK teknisk kontaktperson",
+          "r2": "Arkitektur-innspill",
+          "r3": "Drift-overgang"
+        },
+        "tom": {
+          "r1": "Item teknisk ledelse",
+          "r2": "Implementasjons-veiledning",
+          "r3": "Kode-gjennomgang"
+        },
+        "jah": {
+          "r1": "Identitet og tilgang",
+          "r2": "Single sign-on",
+          "r3": "Auth-flyt-review"
+        },
+        "hilde": {
+          "r1": "Inntekt CRM-eierskap",
+          "r2": "Donasjonsflyt-prioritering",
+          "r3": "Fundy + Vipps handoff"
         },
         "trineScheen": {
-          "r1": "Frivillig-flyt review",
-          "r2": "CMS-redaksjonell UAT",
-          "r3": "Beredskapsscenarier"
+          "r1": "Frivillighet CRM-eierskap",
+          "r2": "Frivillig-onboarding-flyt",
+          "r3": "Aktivitet-redaksjonell"
         },
         "astri": {
-          "r1": "Donasjonsflyt review",
-          "r2": "Fundy + Vipps handoff",
-          "r3": "TV-aksjonen-peak"
+          "r1": "Tilgangskontroll frivillig",
+          "r2": "Roller og rettigheter",
+          "r3": "Frivillig-data styring"
+        },
+        "thomas": {
+          "r1": "Plattformarkitektur",
+          "r2": "Integrasjoner",
+          "r3": "Driftbarhet"
+        },
+        "trineBruu": {
+          "r1": "Koordinere testaktiviteter",
+          "r2": "Strukturere teknisk testing",
+          "r3": "Rapportere teststatus"
+        },
+        "ignacio": {
+          "r1": "Testutførelse",
+          "r2": "Avviksrapportering",
+          "r3": "Regresjonstesting"
         }
       }
     },

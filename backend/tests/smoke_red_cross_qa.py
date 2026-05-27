@@ -148,11 +148,14 @@ async def main():
     assert uat["status"] == "ok"
     assert len(uat["uat_scripts"]) >= 3, "expected 3+ UAT scripts"
     sample_script = uat["uat_scripts"][0]
+    # Per official 'Roller og ansvar' document (2026-05-28): Astri's full name
+    # is 'Astri M.M. Fretheim' — the smoke now asserts against the corrected set.
     assert sample_script["stakeholder"] in {
-        "Hilde Forslund", "Trine Røsand Scheen", "Astri Fretheim",
+        "Hilde Forslund", "Trine Røsand Scheen", "Astri M.M. Fretheim",
     }, "stakeholder must be a named Røde Kors person"
     signoff_names = [ln["name"] for ln in uat["signoff_form"]["lines"]]
     assert "Hilde Forslund" in signoff_names, "Hilde must be on sign-off form"
+    assert "Astri M.M. Fretheim" in signoff_names, "Astri (full name) must be on sign-off form"
     print(
         f"[OK] UAT support ({len(uat['uat_scripts'])} scripts, "
         f"{len(uat['signoff_form']['lines'])} sign-off lines)"
