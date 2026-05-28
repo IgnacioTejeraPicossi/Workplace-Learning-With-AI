@@ -41,9 +41,11 @@ Severity reflects each finding's impact on the audit quality. "High" means a rea
 
 ---
 
-## In-memory baseline pattern (new across 5 areas)
+## Baseline pattern (5 areas — Mongo-backed write-through cache since 1.15.8)
 
-The audit introduced a consistent **in-memory baseline → diff → trend report** pattern, mirroring `_GRAPHQL_BASELINES` from Pack 4.1. Same shape everywhere: keyed by an environment tuple, first call seeds, subsequent calls diff. Pros: zero new dependencies, workshop-demo friendly. Cons: not persisted across process restarts.
+The audit introduced a consistent **baseline → diff → trend report** pattern, mirroring `_GRAPHQL_BASELINES` from Pack 4.1. Same shape everywhere: keyed by an environment tuple, first call seeds, subsequent calls diff. Originally in-memory only; **since 1.15.8 (2026-05-28)** all 5 dicts are write-through caches over the new `red_cross_qa_baselines` Mongo collection, so they survive backend restarts. The in-memory layer remains as fast lookup; Mongo unavailability degrades gracefully back to in-memory-only behaviour (workshop offline path preserved).
+
+Accessed via the helpers `_baseline_load(type, key)` / `_baseline_save(type, key, value)` / `_baseline_list(type?)` / `_baseline_reset(type?)`. Admin endpoints: `GET /api/red-cross-qa/baselines`, `DELETE /api/red-cross-qa/baselines/{type}`.
 
 | Dict | Module | Keyed by | Tracks | Exposed as |
 |------|--------|----------|--------|-----------|
@@ -53,7 +55,7 @@ The audit introduced a consistent **in-memory baseline → diff → trend report
 | `_ROLE_MATRIX_BASELINES` | `red_cross_qa.py` | `environment` | Role matrix row signatures | `matrix_drift` (added/removed/changed) |
 | `_RESILIENCE_BASELINES` | `red_cross_qa.py` | `(env, profile)` | `resilience_score` | `resilience_score_previous` + `delta_pct` |
 
-**Follow-up**: when (if) persistence is needed, all 5 should move to dedicated Mongo collections. The current in-memory approach is documented as "workshop demo + CI smoke friendly".
+**Follow-up resolved (1.15.8)**: persistence was added in a single collection (`red_cross_qa_baselines`) with a `baseline_type` discriminator field rather than 5 dedicated collections — keeps query / admin / reset code uniform across types. Set-valued baselines (GRAPHQL ops/types, ROLE_MATRIX signatures) are serialized to sorted lists on save and rehydrated to sets on load so call sites are unchanged.
 
 ---
 

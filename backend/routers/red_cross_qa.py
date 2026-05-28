@@ -15,6 +15,9 @@ try:
         parse_ado_pasted_text,
         fetch_ado_sprint_items,
         format_ado_item_as_paste_text,
+        _baseline_list,
+        _baseline_reset,
+        BASELINE_TYPES,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -60,6 +63,9 @@ except ImportError:  # pragma: no cover
         parse_ado_pasted_text,
         fetch_ado_sprint_items,
         format_ado_item_as_paste_text,
+        _baseline_list,
+        _baseline_reset,
+        BASELINE_TYPES,
         generate_playwright_tests,
         run_playwright,
         generate_cypress_tests,
@@ -641,3 +647,41 @@ async def api_get_settings():
 async def api_save_settings(body: SettingsRequest):
     payload = body.dict(exclude_unset=True)
     return await save_settings(payload)
+
+
+# ── Baselines admin (Phase H+ · 1.15.8) ───────────────────────────
+# Inspect / reset the 5 persisted baselines. Useful for debugging drift
+# detection or resetting an environment after a planned schema/role
+# change. Mongo-backed; never raises (graceful when Mongo offline).
+@router.get("/baselines")
+async def api_baselines_list(baseline_type: Optional[str] = None):
+    """List persisted baselines. Optional `baseline_type` filter (graphql /
+    perf_hot_query / ds_compliance / role_matrix / resilience)."""
+    if baseline_type and baseline_type not in BASELINE_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid baseline_type. Valid: {sorted(BASELINE_TYPES)}",
+        )
+    entries = await _baseline_list(baseline_type)
+    return {
+        "status": "ok",
+        "baseline_type": baseline_type,
+        "count": len(entries),
+        "entries": entries,
+    }
+
+
+@router.delete("/baselines/{baseline_type}")
+async def api_baselines_reset(baseline_type: str):
+    """Reset a specific baseline type — clears the in-memory cache AND
+    deletes persisted Mongo docs. Use `all` to clear every baseline type."""
+    if baseline_type == "all":
+        result = await _baseline_reset(None)
+        return {"status": "ok", "baseline_type": "all", **result}
+    if baseline_type not in BASELINE_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid baseline_type. Valid: {sorted(BASELINE_TYPES)} or 'all'",
+        )
+    result = await _baseline_reset(baseline_type)
+    return {"status": "ok", "baseline_type": baseline_type, **result}

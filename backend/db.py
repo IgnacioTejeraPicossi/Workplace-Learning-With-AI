@@ -79,6 +79,11 @@ red_cross_qa_generated_scripts_collection = database.get_collection("red_cross_q
 red_cross_qa_jira_dispatches_collection = database.get_collection("red_cross_qa_jira_dispatches")
 red_cross_qa_settings_collection = database.get_collection("red_cross_qa_settings")
 red_cross_qa_reports_collection = database.get_collection("red_cross_qa_reports")
+# Phase H+ (1.15.8, 2026-05-28) — persistence layer for the 5 in-memory baselines
+# (_GRAPHQL_BASELINES, _PERF_HOT_QUERY_BASELINES, _DS_COMPLIANCE_BASELINES,
+# _ROLE_MATRIX_BASELINES, _RESILIENCE_BASELINES). Single collection with
+# `baseline_type` discriminator field; `_id` = "{type}::{key}" for upsert.
+red_cross_qa_baselines_collection = database.get_collection("red_cross_qa_baselines")
 
 # Homo Sapiens vs. KI i Test — Prompt Evolution (Phase E)
 # Versioned system-prompt revisions for the workshop challenges, with

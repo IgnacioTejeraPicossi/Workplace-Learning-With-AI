@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.8] - 2026-05-28
+
+### Added — Red Cross Web QA Agent · Mongo persistence for the 5 in-memory baselines
+
+Closes the deferred work flagged in `docs/audits/red-cross-qa-enonic-xp-roundup.md`: the 5 baselines that drive drift detection across the module (`_GRAPHQL_BASELINES`, `_PERF_HOT_QUERY_BASELINES`, `_DS_COMPLIANCE_BASELINES`, `_ROLE_MATRIX_BASELINES`, `_RESILIENCE_BASELINES`) were previously process-local — every backend restart erased them, and subsequent first-run-after-restart calls always reported `delta 0.0%` even when nothing had changed. They are now Mongo-backed with a write-through cache so they survive restarts while keeping the workshop-demo offline path graceful.
+
+**Architecture** — single collection with discriminator field:
+
+```
+red_cross_qa_baselines  (Mongo)
+  ├─ _id            "graphql::test::https://example.com/graphql"  (compound, upsert-friendly)
+  ├─ baseline_type  "graphql" | "perf_hot_query" | "ds_compliance" | "role_matrix" | "resilience"
+  ├─ baseline_key   "test::https://example.com/graphql"           (without the type prefix)
+  ├─ value          { ... }   (JSON-serialized; sets → sorted lists)
+  └─ updated_at     ISO 8601
+```
+
+**Backend** (`backend/services/red_cross_qa.py`):
+- New module-level constants: `BASELINE_GRAPHQL`, `BASELINE_PERF_HOT_QUERY`, `BASELINE_DS_COMPLIANCE`, `BASELINE_ROLE_MATRIX`, `BASELINE_RESILIENCE`, `BASELINE_TYPES` (tuple of all 5)
+- New `_BASELINE_CACHES` registry that maps each type → its in-memory dict (single source of truth so future contributors can't accidentally desync the registry from a new baseline dict)
+- New async helpers:
+  - `_baseline_load(baseline_type, key) → value | None` — in-memory hit → Mongo hit (rehydrates sets, warms cache) → None. Never raises; Mongo failures degrade silently to in-memory only.
+  - `_baseline_save(baseline_type, key, value)` — updates in-memory cache immediately + best-effort Mongo upsert. Sets serialized to sorted lists.
+  - `_baseline_list(baseline_type?) → [{baseline_type, baseline_key, updated_at}, ...]` — list helper for the admin endpoint.
+  - `_baseline_reset(baseline_type?) → {cleared_memory, deleted_mongo}` — clears in-memory cache AND deletes Mongo docs. `None` clears all 5 types.
+- Serialization helpers preserve set semantics: GRAPHQL's `{"ops": set, "types": set}` → `{"ops": sorted list, "types": sorted list}` and back; ROLE_MATRIX's `set[str]` → sorted list and back.
+- Refactored all 5 baseline access points to use the helpers. Two sync helpers (`_enrich_hot_queries_with_baseline` for PERF_HOT, `_compute_matrix_drift` for ROLE_MATRIX) are now async; their callers (`run_enonic_performance`, `run_role_matrix_audit`) were already async so the change ripples cleanly.
+
+**DB layer** (`backend/db.py`):
+- New `red_cross_qa_baselines_collection` (single collection, see schema above).
+
+**Router** (`backend/routers/red_cross_qa.py`) — 2 admin endpoints:
+- `GET  /api/red-cross-qa/baselines?baseline_type=…` — list persisted baselines (filterable). Returns `{count, entries: [{baseline_type, baseline_key, updated_at}, ...]}`. Values are intentionally omitted from the list response (small but can grow for GRAPHQL); admin can query Mongo directly if needed.
+- `DELETE /api/red-cross-qa/baselines/{baseline_type}` — reset a specific type. Path arg `all` clears every type. Returns `{cleared_memory, deleted_mongo}`. 400 on invalid types.
+
+**Smoke tests** (`backend/tests/smoke_red_cross_qa.py`) — 5 new checks (#8 through #12):
+1. Registry coherence: `BASELINE_TYPES` set equals `_BASELINE_CACHES` keys (5 types).
+2. Scalar round-trip for `ds_compliance` + `perf_hot_query` + `resilience` (int values).
+3. Set round-trip for `graphql` (`{ops, types}` dicts) + `role_matrix` (signature sets) — verifies that sets come back as sets, not lists.
+4. Cache warm-up: clear in-memory, call `_baseline_load`, verify re-warm from Mongo. Reports `warmed from Mongo` when persistence is live, `Mongo unavailable, graceful None` when running offline.
+5. Admin list with type filter (only matching type returned) + type-specific reset (only target cache cleared, others untouched).
+
+**Backward compatibility**: 100% additive. Existing call sites preserve their public signatures — only their internal baseline dict access went through helpers. Existing `delta 0.0%` semantics for first run are unchanged (load returns `None` → seed → 0.0%). On first invocation after this version lands, an empty Mongo collection behaves identically to an empty in-memory dict, so no migration step is required.
+
+**Validation** — smoke 44 → 49 checks, all green:
+- Persistence is **live** during smoke runs (Mongo is available in this repo's dev/test setup, confirmed by `cache warm-up (warmed from Mongo)` output)
+- Backend exposes 43 routes (was 41, +2 admin endpoints)
+- Set serialization verified end-to-end (save dict-of-sets → Mongo upsert → fresh load → dict-of-sets reconstructed)
+
+**Future extensions** unblocked by this change:
+- A future `release_judge.md` prompt could weight the drift deltas across runs/sprints, not just within a single process lifetime.
+- Cross-environment baseline comparison (local vs test vs staging) is now feasible without keeping all envs warm in the same process.
+- A simple grafana-style trend chart over `updated_at` series becomes a pure query problem rather than an in-memory pivot.
+
+---
+
 ## [1.15.7] - 2026-05-28
 
 ### Added — Red Cross Web QA Agent · Azure DevOps integration (paste + live REST fetch with PAT)

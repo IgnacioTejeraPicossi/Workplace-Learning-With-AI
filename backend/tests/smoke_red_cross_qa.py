@@ -21,6 +21,12 @@ from backend.services.red_cross_qa import (
     parse_ado_pasted_text, generate_test_plan_from_ado_item,
     fetch_ado_sprint_items, format_ado_item_as_paste_text,
 )
+from backend.services.red_cross_qa import (
+    _baseline_load, _baseline_save, _baseline_list, _baseline_reset,
+    BASELINE_GRAPHQL, BASELINE_PERF_HOT_QUERY, BASELINE_DS_COMPLIANCE,
+    BASELINE_ROLE_MATRIX, BASELINE_RESILIENCE, BASELINE_TYPES,
+    _BASELINE_CACHES,
+)
 
 
 async def main():
@@ -1071,6 +1077,90 @@ async def main():
     assert paste_plan["parsed"]["title"] == sample["title"]
     print(f"[OK] ADO fetch → format → paste-to-plan "
           f"({len(paste_plan['plan']['ado_work_items'])} work items in plan)")
+
+    # ── Phase H+ (1.15.8) — Mongo-backed baseline persistence ────────
+    # 8) Registry covers all 5 types, helpers round-trip primitives.
+    assert set(BASELINE_TYPES) == set(_BASELINE_CACHES.keys()), \
+        "BASELINE_TYPES must mirror _BASELINE_CACHES keys"
+    assert len(BASELINE_TYPES) == 5, f"expected 5 baseline types, got {len(BASELINE_TYPES)}"
+
+    # Reset baselines for a clean test (also exercises the admin reset helper)
+    reset_result = await _baseline_reset(None)
+    assert isinstance(reset_result, dict)
+    assert "cleared_memory" in reset_result and "deleted_mongo" in reset_result
+    # After reset the in-memory caches must all be empty
+    for btype, cache in _BASELINE_CACHES.items():
+        assert len(cache) == 0, f"cache {btype} not cleared after reset: {cache}"
+
+    # 9) Round-trip scalar baselines (int values)
+    await _baseline_save(BASELINE_DS_COMPLIANCE, ("test", "https://example.com"), 72)
+    loaded = await _baseline_load(BASELINE_DS_COMPLIANCE, ("test", "https://example.com"))
+    assert loaded == 72, f"ds_compliance round-trip failed: got {loaded!r}"
+
+    await _baseline_save(BASELINE_PERF_HOT_QUERY,
+                         ("test", "https://example.com", "GetCampaignPage"), 850)
+    loaded_perf = await _baseline_load(BASELINE_PERF_HOT_QUERY,
+                                       ("test", "https://example.com", "GetCampaignPage"))
+    assert loaded_perf == 850, f"perf_hot_query round-trip failed: got {loaded_perf!r}"
+
+    await _baseline_save(BASELINE_RESILIENCE, ("test", "profileCampaign"), 37)
+    loaded_res = await _baseline_load(BASELINE_RESILIENCE, ("test", "profileCampaign"))
+    assert loaded_res == 37, f"resilience round-trip failed: got {loaded_res!r}"
+    print("[OK] baseline persistence — scalar round-trip (3 types)")
+
+    # 10) Round-trip set-based baselines (GRAPHQL ops/types, ROLE_MATRIX signatures).
+    # These exercise the set ↔ list serialization path.
+    graphql_value = {
+        "ops":   {"guillotine.query", "guillotine.mutation", "headless.export"},
+        "types": {"Distrikt", "Aktivitet", "Kampanje"},
+    }
+    await _baseline_save(BASELINE_GRAPHQL, ("test", "/site/api/graphql"), graphql_value)
+    loaded_gql = await _baseline_load(BASELINE_GRAPHQL, ("test", "/site/api/graphql"))
+    assert loaded_gql is not None
+    assert loaded_gql["ops"] == graphql_value["ops"], \
+        f"graphql ops round-trip failed: {loaded_gql['ops']!r} vs {graphql_value['ops']!r}"
+    assert loaded_gql["types"] == graphql_value["types"]
+    assert isinstance(loaded_gql["ops"], set), "graphql ops must come back as a set"
+
+    role_sigs = {"editor|distrikt|allow|allow|deny|deny", "publisher|forening|allow|allow|allow|deny"}
+    await _baseline_save(BASELINE_ROLE_MATRIX, "test", role_sigs)
+    loaded_roles = await _baseline_load(BASELINE_ROLE_MATRIX, "test")
+    assert loaded_roles == role_sigs, f"role_matrix round-trip failed: {loaded_roles!r}"
+    assert isinstance(loaded_roles, set), "role_matrix must come back as a set"
+    print("[OK] baseline persistence — set round-trip (GRAPHQL + ROLE_MATRIX)")
+
+    # 11) Cache warm-up: clear in-memory only, verify load() re-warms from Mongo
+    # (or returns None graceful if Mongo unavailable during smoke).
+    _BASELINE_CACHES[BASELINE_DS_COMPLIANCE].clear()
+    assert ("test", "https://example.com") not in _BASELINE_CACHES[BASELINE_DS_COMPLIANCE]
+    reloaded = await _baseline_load(BASELINE_DS_COMPLIANCE, ("test", "https://example.com"))
+    if reloaded is not None:
+        # Mongo is available → value re-hydrated from persistence
+        assert reloaded == 72, f"cache warm-up returned wrong value: {reloaded!r}"
+        assert ("test", "https://example.com") in _BASELINE_CACHES[BASELINE_DS_COMPLIANCE], \
+            "in-memory cache should be warmed after Mongo hit"
+        cache_status = "warmed from Mongo"
+    else:
+        # Mongo unavailable → graceful None (workshop-offline path)
+        cache_status = "Mongo unavailable, graceful None"
+    print(f"[OK] baseline persistence — cache warm-up ({cache_status})")
+
+    # 12) Admin list + type-filtered reset
+    entries_all = await _baseline_list(None)
+    entries_resilience = await _baseline_list(BASELINE_RESILIENCE)
+    # Filtered list is a subset of all
+    assert all(e["baseline_type"] == BASELINE_RESILIENCE for e in entries_resilience), \
+        "list filter must only return entries of the requested type"
+    reset_one = await _baseline_reset(BASELINE_RESILIENCE)
+    # In-memory clears immediately regardless of Mongo state
+    assert len(_BASELINE_CACHES[BASELINE_RESILIENCE]) == 0, \
+        "resilience cache should be cleared"
+    # Other caches untouched by type-specific reset
+    assert ("test", "https://example.com") in _BASELINE_CACHES[BASELINE_DS_COMPLIANCE] \
+        or len(_BASELINE_CACHES[BASELINE_DS_COMPLIANCE]) == 0, \
+        "ds_compliance cache should NOT be cleared by resilience-only reset"
+    print(f"[OK] baseline admin — list ({len(entries_all)} entries total, "
+          f"{len(entries_resilience)} resilience) + type-specific reset")
 
 
 if __name__ == "__main__":

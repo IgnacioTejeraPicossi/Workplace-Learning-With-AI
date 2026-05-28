@@ -30,6 +30,7 @@ try:
         red_cross_qa_jira_dispatches_collection,
         red_cross_qa_settings_collection,
         red_cross_qa_reports_collection,
+        red_cross_qa_baselines_collection,
     )
 except ImportError:  # pragma: no cover
     from db import (  # type: ignore
@@ -40,6 +41,7 @@ except ImportError:  # pragma: no cover
         red_cross_qa_jira_dispatches_collection,
         red_cross_qa_settings_collection,
         red_cross_qa_reports_collection,
+        red_cross_qa_baselines_collection,
     )
 
 # ── LLM import (graceful fallback) ──────────────────────────────────
@@ -1807,10 +1809,182 @@ async def run_cypress(scopes: List[str], environment: str) -> Dict[str, Any]:
 # ═══════════════════════════════════════════════════════════════════
 # Tool 4 — API QA
 # ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════
+# Baseline persistence layer (Phase H+ · 1.15.8 · 2026-05-28)
+# ───────────────────────────────────────────────────────────────────
+# The agent computes 5 different "baselines" (snapshots used to detect
+# drift between successive QA runs):
+#   - _GRAPHQL_BASELINES         · GraphQL schema (ops + content types)
+#   - _PERF_HOT_QUERY_BASELINES  · Enonic hot-query p95 latency
+#   - _DS_COMPLIANCE_BASELINES   · Designsystemet compliance score
+#   - _ROLE_MATRIX_BASELINES     · Role × action verdict signatures
+#   - _RESILIENCE_BASELINES      · Resilience composite score
+#
+# Each dict still acts as a fast in-memory cache. The two helpers below
+# add a write-through Mongo layer so baselines survive process restarts:
+#   - _baseline_load(type, key)  → in-memory hit | Mongo hit | None
+#   - _baseline_save(type, key, value) → updates BOTH layers
+#
+# Both helpers are async and degrade gracefully — if Mongo is unreach-
+# able they keep the in-memory behaviour (workshop-demo friendly). Sets
+# (used by GRAPHQL ops/types + ROLE_MATRIX signatures) are serialized
+# to lists before persistence and rehydrated on load.
+# ═══════════════════════════════════════════════════════════════════
+
+BASELINE_GRAPHQL = "graphql"
+BASELINE_PERF_HOT_QUERY = "perf_hot_query"
+BASELINE_DS_COMPLIANCE = "ds_compliance"
+BASELINE_ROLE_MATRIX = "role_matrix"
+BASELINE_RESILIENCE = "resilience"
+
+BASELINE_TYPES = (
+    BASELINE_GRAPHQL, BASELINE_PERF_HOT_QUERY, BASELINE_DS_COMPLIANCE,
+    BASELINE_ROLE_MATRIX, BASELINE_RESILIENCE,
+)
+
+
+def _baseline_key_str(key: Any) -> str:
+    """Serialize a tuple/list/string key to a stable `::`-joined string.
+    None of the actual baseline keys contain '::', so this is unambiguous."""
+    if isinstance(key, str):
+        return key
+    return "::".join("" if p is None else str(p) for p in key)
+
+
+def _baseline_doc_id(baseline_type: str, key: Any) -> str:
+    return f"{baseline_type}::{_baseline_key_str(key)}"
+
+
+def _baseline_cache_key(key: Any) -> Any:
+    """Normalize a key for the in-memory dict lookup.
+    Lists arrive from Mongo / admin endpoints as JSON arrays; the dicts
+    were originally keyed by tuples. Strings stay strings (ROLE_MATRIX)."""
+    if isinstance(key, list):
+        return tuple(key)
+    return key
+
+
+def _baseline_serialize_for_mongo(baseline_type: str, value: Any) -> Any:
+    """Convert in-memory shape → JSON-friendly shape for Mongo."""
+    if baseline_type == BASELINE_GRAPHQL and isinstance(value, dict):
+        return {
+            "ops":   sorted(value.get("ops") or []),
+            "types": sorted(value.get("types") or []),
+        }
+    if baseline_type == BASELINE_ROLE_MATRIX and isinstance(value, (set, frozenset)):
+        return sorted(value)
+    return value
+
+
+def _baseline_deserialize_from_mongo(baseline_type: str, value: Any) -> Any:
+    """Convert Mongo shape → in-memory shape (rebuilds sets)."""
+    if baseline_type == BASELINE_GRAPHQL and isinstance(value, dict):
+        return {
+            "ops":   set(value.get("ops") or []),
+            "types": set(value.get("types") or []),
+        }
+    if baseline_type == BASELINE_ROLE_MATRIX and isinstance(value, list):
+        return set(value)
+    return value
+
+
+async def _baseline_load(baseline_type: str, key: Any) -> Optional[Any]:
+    """Read a persisted baseline. Returns None when not found.
+
+    Order: in-memory cache → Mongo → None. On a Mongo hit the value is
+    rehydrated (sets reconstructed) and the in-memory cache is warmed
+    so subsequent calls skip the round-trip. Mongo unavailability is
+    swallowed silently — the in-memory dict still works.
+    """
+    cache = _BASELINE_CACHES.get(baseline_type)
+    cache_key = _baseline_cache_key(key)
+    if cache is not None and cache_key in cache:
+        return cache[cache_key]
+    try:
+        doc = await red_cross_qa_baselines_collection.find_one(
+            {"_id": _baseline_doc_id(baseline_type, key)}
+        )
+    except Exception:
+        return None
+    if not doc:
+        return None
+    value = _baseline_deserialize_from_mongo(baseline_type, doc.get("value"))
+    if cache is not None:
+        cache[cache_key] = value
+    return value
+
+
+async def _baseline_save(baseline_type: str, key: Any, value: Any) -> None:
+    """Persist a baseline. Updates the in-memory cache immediately and
+    upserts to Mongo on a best-effort basis (errors swallowed)."""
+    cache = _BASELINE_CACHES.get(baseline_type)
+    if cache is not None:
+        cache[_baseline_cache_key(key)] = value
+    doc_id = _baseline_doc_id(baseline_type, key)
+    try:
+        await red_cross_qa_baselines_collection.update_one(
+            {"_id": doc_id},
+            {"$set": {
+                "_id": doc_id,
+                "baseline_type": baseline_type,
+                "baseline_key": _baseline_key_str(key),
+                "value": _baseline_serialize_for_mongo(baseline_type, value),
+                "updated_at": _now(),
+            }},
+            upsert=True,
+        )
+    except Exception:
+        pass
+
+
+async def _baseline_list(baseline_type: Optional[str] = None) -> List[Dict[str, Any]]:
+    """List persisted baselines (admin endpoint helper).
+    Filters by `baseline_type` when provided. Never raises."""
+    try:
+        query = {"baseline_type": baseline_type} if baseline_type else {}
+        cursor = red_cross_qa_baselines_collection.find(query).sort("updated_at", -1)
+        out: List[Dict[str, Any]] = []
+        async for doc in cursor:
+            out.append({
+                "baseline_type": doc.get("baseline_type"),
+                "baseline_key": doc.get("baseline_key"),
+                "updated_at": doc.get("updated_at"),
+                # Value omitted by default — small but can grow for GRAPHQL.
+                # Admin can re-query Mongo directly if needed.
+            })
+        return out
+    except Exception:
+        return []
+
+
+async def _baseline_reset(baseline_type: Optional[str] = None) -> Dict[str, int]:
+    """Delete persisted baselines of `baseline_type` (or all) AND clear the
+    corresponding in-memory caches. Returns counts. Never raises."""
+    cleared_memory = 0
+    if baseline_type is None:
+        for cache in _BASELINE_CACHES.values():
+            cleared_memory += len(cache)
+            cache.clear()
+    else:
+        cache = _BASELINE_CACHES.get(baseline_type)
+        if cache is not None:
+            cleared_memory = len(cache)
+            cache.clear()
+    deleted_mongo = 0
+    try:
+        query = {"baseline_type": baseline_type} if baseline_type else {}
+        result = await red_cross_qa_baselines_collection.delete_many(query)
+        deleted_mongo = int(getattr(result, "deleted_count", 0) or 0)
+    except Exception:
+        pass
+    return {"cleared_memory": cleared_memory, "deleted_mongo": deleted_mongo}
+
+
 # In-memory GraphQL schema baseline cache: keyed by (environment, endpoint).
 # Stores the most-recent introspection snapshot so consecutive analyze_api
 # calls can compute a real `checkSchemaDrift` instead of a hardcoded "pass".
-# Mongo-backed persistence is a TODO; for the workshop demo this is enough.
+# Persistence: Mongo-backed write-through via _baseline_load / _baseline_save
+# (see helpers above). The dict still acts as the fast in-process cache.
 _GRAPHQL_BASELINES: Dict[Tuple[str, str], Dict[str, Any]] = {}
 
 
@@ -1847,9 +2021,10 @@ async def _check_schema_drift_against_baseline(
     current_types = {t.get("name") for t in (introspection.get("content_types") or [])
                        if t.get("name")}
     key = (environment, endpoint)
-    baseline = _GRAPHQL_BASELINES.get(key)
+    baseline = await _baseline_load(BASELINE_GRAPHQL, key)
     if baseline is None:
-        _GRAPHQL_BASELINES[key] = {"ops": current_ops, "types": current_types}
+        await _baseline_save(BASELINE_GRAPHQL, key,
+                             {"ops": current_ops, "types": current_types})
         return "pass", [{
             "severity": "low",
             "title": "Schema drift baseline established",
@@ -1874,7 +2049,8 @@ async def _check_schema_drift_against_baseline(
             ),
         })
     # Refresh baseline so the next call diffs against the most recent snapshot.
-    _GRAPHQL_BASELINES[key] = {"ops": current_ops, "types": current_types}
+    await _baseline_save(BASELINE_GRAPHQL, key,
+                         {"ops": current_ops, "types": current_types})
     if drift == 0:
         return "pass", []
     # Core operation removed (any guillotine.* op) → fail.
@@ -3969,27 +4145,29 @@ async def run_content_migration_audit(scopes: List[str], environment: str,
 _PERF_HOT_QUERY_BASELINES: Dict[Tuple[str, str, str], int] = {}
 
 
-def _enrich_hot_queries_with_baseline(
+async def _enrich_hot_queries_with_baseline(
     hot_queries: List[Dict[str, Any]], environment: str, url: str,
 ) -> List[Dict[str, Any]]:
     """Attach `p95_ms_previous` + `delta_pct` to each hot query by comparing
-    against the in-memory baseline. First run seeds the baseline (delta = 0);
+    against the persisted baseline. First run seeds the baseline (delta = 0);
     subsequent runs report % change.
 
-    Side effect: refreshes the baseline so each call diffs against the
-    most-recent snapshot.
+    Side effect: refreshes the baseline (in-memory + Mongo) so each call
+    diffs against the most-recent snapshot.
+
+    Phase H+ (1.15.8): now async because baseline persistence uses Mongo.
     """
     enriched: List[Dict[str, Any]] = []
     for q in (hot_queries or []):
         name = q.get("name") or ""
         current = int(q.get("p95_ms") or 0)
         key = (environment, url, name)
-        previous = _PERF_HOT_QUERY_BASELINES.get(key)
+        previous = await _baseline_load(BASELINE_PERF_HOT_QUERY, key)
         if previous is None or previous == 0:
             delta_pct = 0.0
         else:
             delta_pct = round(((current - previous) / previous) * 100.0, 1)
-        _PERF_HOT_QUERY_BASELINES[key] = current
+        await _baseline_save(BASELINE_PERF_HOT_QUERY, key, current)
         enriched.append({**q, "p95_ms_previous": previous, "delta_pct": delta_pct})
     return enriched
 
@@ -4094,7 +4272,7 @@ async def run_enonic_performance(url: str, environment: str,
          "fix_hint": "Drop unused fields from query (over-fetching `body` and `_versionKey`)",
          "enonic_xp_pattern": None},
     ]
-    hot_queries = _enrich_hot_queries_with_baseline(raw_hot_queries, environment, url)
+    hot_queries = await _enrich_hot_queries_with_baseline(raw_hot_queries, environment, url)
 
     # Phase H+ — recommendations enriched with enonic_xp_pattern + automation_ref.
     # Plus 2 new server-side recommendations citing the skill.
@@ -4332,13 +4510,14 @@ async def run_designsystemet_audit(url: str, environment: str,
     score = parsed.get("compliance_score") if isinstance(parsed.get("compliance_score"), int) else 72
 
     # Phase H+ — baseline persistence for compliance_score trend tracking.
+    # 1.15.8: Mongo-backed via _baseline_load/_baseline_save.
     baseline_key = (environment, url)
-    previous_score = _DS_COMPLIANCE_BASELINES.get(baseline_key)
+    previous_score = await _baseline_load(BASELINE_DS_COMPLIANCE, baseline_key)
     if previous_score is None or previous_score == 0:
         delta_pct = 0.0
     else:
         delta_pct = round(((score - previous_score) / previous_score) * 100.0, 1)
-    _DS_COMPLIANCE_BASELINES[baseline_key] = score
+    await _baseline_save(BASELINE_DS_COMPLIANCE, baseline_key, score)
 
     statuses = [c.get("status") for c in checks.values()]
     overall = "fail" if "fail" in statuses else "warn" if "warn" in statuses else "pass"
@@ -4392,10 +4571,10 @@ def _row_signature(row: Dict[str, Any]) -> str:
     ])
 
 
-def _compute_matrix_drift(
+async def _compute_matrix_drift(
     matrix: List[Dict[str, Any]], environment: str,
 ) -> Dict[str, Any]:
-    """Compare current matrix signatures vs the in-memory baseline.
+    """Compare current matrix signatures vs the persisted baseline.
 
     Drift categories:
       - added_rows:   signature present now but NOT in baseline
@@ -4404,13 +4583,15 @@ def _compute_matrix_drift(
 
     First call seeds baseline and reports 0 drift. Subsequent calls diff
     and refresh the baseline.
+
+    Phase H+ (1.15.8): now async — baseline persistence uses Mongo.
     """
     current_signatures = {_row_signature(r) for r in matrix}
     current_by_role_scope = {(r.get("role"), r.get("scope")): _row_signature(r)
                               for r in matrix}
-    baseline = _ROLE_MATRIX_BASELINES.get(environment)
+    baseline = await _baseline_load(BASELINE_ROLE_MATRIX, environment)
     if baseline is None:
-        _ROLE_MATRIX_BASELINES[environment] = current_signatures
+        await _baseline_save(BASELINE_ROLE_MATRIX, environment, current_signatures)
         return {"added_rows": 0, "removed_rows": 0, "changed_rows": 0,
                 "note": "First run on this environment — baseline seeded."}
     added = current_signatures - baseline
@@ -4430,7 +4611,7 @@ def _compute_matrix_drift(
             changed += 1
             added.discard(cur_sig)
             removed.discard(prev_sig)
-    _ROLE_MATRIX_BASELINES[environment] = current_signatures
+    await _baseline_save(BASELINE_ROLE_MATRIX, environment, current_signatures)
     return {
         "added_rows":   len(added),
         "removed_rows": len(removed),
@@ -4634,7 +4815,7 @@ async def run_role_matrix_audit(environment: str,
     ]
 
     # Phase H+ — matrix drift baseline tracking.
-    matrix_drift = _compute_matrix_drift(matrix, environment)
+    matrix_drift = await _compute_matrix_drift(matrix, environment)
 
     cross_tool_refs = {
         "playwright_spec": "playwright:cms-preview.spec.ts (preview-mode authorization)",
@@ -5192,6 +5373,19 @@ async def verify_definition_of_done(environment: str,
 _RESILIENCE_BASELINES: Dict[Tuple[str, str], int] = {}
 
 
+# Registry consumed by _baseline_load / _baseline_save (Phase H+ 1.15.8).
+# MUST be defined after all 5 dicts because Python only resolves the names
+# at function-call time, but keeping the registry adjacent to its members
+# helps future contributors discover the persistence wiring.
+_BASELINE_CACHES: Dict[str, Dict[Any, Any]] = {
+    BASELINE_GRAPHQL:         _GRAPHQL_BASELINES,
+    BASELINE_PERF_HOT_QUERY:  _PERF_HOT_QUERY_BASELINES,
+    BASELINE_DS_COMPLIANCE:   _DS_COMPLIANCE_BASELINES,
+    BASELINE_ROLE_MATRIX:     _ROLE_MATRIX_BASELINES,
+    BASELINE_RESILIENCE:      _RESILIENCE_BASELINES,
+}
+
+
 async def run_resilience_check(profile: str, scenarios: List[str],
                                 environment: str, lang: str = "en") -> Dict[str, Any]:
     """Resilience-focused k6 wrapper — emphasizes breakpoint, recovery, and soak
@@ -5374,14 +5568,14 @@ async def run_resilience_check(profile: str, scenarios: List[str],
          "enonic_xp_pattern": "reliability-patterns.md §1 + §2"},
     ]
 
-    # Phase H+ — baseline trend tracking.
+    # Phase H+ — baseline trend tracking. 1.15.8: Mongo-backed via helpers.
     baseline_key = (environment, profile)
-    previous_score = _RESILIENCE_BASELINES.get(baseline_key)
+    previous_score = await _baseline_load(BASELINE_RESILIENCE, baseline_key)
     if previous_score is None or previous_score == 0:
         score_delta_pct = 0.0
     else:
         score_delta_pct = round(((score - previous_score) / previous_score) * 100.0, 1)
-    _RESILIENCE_BASELINES[baseline_key] = score
+    await _baseline_save(BASELINE_RESILIENCE, baseline_key, score)
 
     cross_tool_refs = {
         "k6_endpoint":         "/api/red-cross-qa/run-k6",
