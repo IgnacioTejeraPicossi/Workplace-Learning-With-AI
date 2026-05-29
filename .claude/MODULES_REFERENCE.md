@@ -18,6 +18,7 @@
 | 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
 | 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
+| 15 | Web Lab (1.16.0 · V0 structure only) | Active (placeholder) | None yet (V1+) | Low (V0 frontend-only) |
 
 ---
 

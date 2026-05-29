@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.0] - 2026-05-29
+
+### Added — Web Lab module · V0 structure (sidebar entry + 2 placeholder pages)
+
+New top-level module hosting LOCAL CLONES of real websites, distinct from the Red Cross Web QA Agent. The QA agent stays focused on testing patterns (23 audit suites, ADO integration, Phase H+ security workbench); the Web Lab is the workspace for the actual web pages — clone, serve, browse, modify. The two will eventually connect via a "Use as test env for RC QA Agent" button (V1) that points the QA Agent's `env_test_url` at the local server.
+
+This commit ships **V0 only**: sidebar structure + placeholder pages + full i18n. Real clone / install / start arrive in V1+. Full architecture documented in `docs/web-lab-plan.md` (sections 3-13).
+
+**Conceptual positioning** (per the project owner's explicit request): the new module sits between "Future Item Agents" and "Robomind Clinic" in the sidebar, with two sub-items: "Item.no web" (the company website) and "Redcross.no web" (the rodekors.no clone, with a cross-link to the existing RC QA Agent module). The naming deliberately differs from the QA Agent ("web" vs "web QA") to reinforce that this module is about the pages themselves, not the testing patterns.
+
+**Frontend** — new files:
+- `frontend/src/web-lab/_WebLabPage.jsx` (~200 lines) — shared placeholder layout: hero with icon + gradient + title + subtitle, V0 status badge, project meta grid (production URL + planned local port), intent list (5 items describing what V1+ will do), optional related-agent cross-link panel, roadmap timeline (V0 → V3 with V0 highlighted as current). Pure presentation, no state.
+- `frontend/src/web-lab/ItemNoWeb.jsx` (~23 lines) — Item.no instance: blue gradient (`#1d4ed8 → #2563eb → #0891b2`), 🏢 icon, planned local port 3101, production URL https://www.item.no.
+- `frontend/src/web-lab/RedcrossNoWeb.jsx` (~31 lines) — Redcross.no instance: red gradient (`#b91c1c → #dc2626 → #9d174d`), ❤️‍🩹 icon, planned local port 3102, production URL https://www.rodekors.no. **Includes the related-agent panel** with cross-link button that calls `onNavigate("red-cross-web-qa")` to switch sidebar selection to the existing QA Agent module.
+
+**Frontend** — modified files:
+- `frontend/src/Sidebar.jsx` — new expandable group `web-lab` inserted between Future Item Agents (line 138) and Robomind Clinic (line 141). Icon: 🌐 (globe). Two sub-items with their own icons (🏢 for Item.no, ❤️‍🩹 for Redcross.no).
+- `frontend/src/App.jsx` — +2 imports (`ItemNoWeb`, `RedcrossNoWeb`) + 2 conditional renders alongside the existing `red-cross-web-qa` pattern. RedcrossNoWeb receives `onNavigate={setSection}` so its cross-link button can switch the active sidebar section.
+
+**i18n** (`frontend/src/i18n/locales/{en,no,es}/common.json`):
+- +3 sidebar keys (`webLab`, `webLabItemNo`, `webLabRedcrossNo`) × 3 locales.
+- +1 new top-level `webLab` block × 3 locales with 25 leaves: `moduleTitle`, `moduleSubtitle`, `statusBadge` ("V0 · structure only"), `statusHint`, `intent`, `intentItems.{i1..i5}`, `roadmap`, `roadmapPhases.{v0..v3}`, `itemNo.{title, subtitle, productionUrl, plannedLocalPort}`, `redcrossNo.{title, subtitle, productionUrl, plannedLocalPort, relatedAgent, relatedAgentHint}`. Parity verified: 25 keys × 3 locales identical.
+
+**Norwegian / Spanish translation choices**:
+- Module label: EN "Web Lab" / NO "Web‑lab" / ES "Laboratorio Web"
+- Sub-items: EN "Item.no web" / NO "Item.no‑web" / ES "Item.no web" (Norwegian uses the non-breaking hyphen to follow Røde Kors convention; Spanish kept space as is more natural)
+- Intent list (V0 placeholder, describes what V1+ will do): 5 bullets covering clone, install/serve, browse, modify, compare local-vs-production
+- Roadmap: V0 (now, "structure only") → V1 (registry + clone) → V2 (install/start/stop + logs) → V3 (Playwright + diff)
+
+**Documentation**:
+- `docs/web-lab-plan.md` — new comprehensive plan (13 sections, ~570 lines). Covers: (1) conceptual positioning, (2) versioning roadmap V0→V4 with effort estimates, (3) architecture diagram for V1+ showing GitHub → LOCAL_WEBSITES_ROOT → process_service → local URLs → RC QA Agent integration, (4) Mongo schema for 4 future collections (`web_lab_projects_collection`, `_runs`, `_logs`, `_snapshots`), (5) backend endpoints by version, (6) security model with hard rules (path traversal blocking, whitelisted commands, no shell expansion, pre-clone secret scan) and soft rules (per-project lock, disk space check, port collision check, auto-stop timer), (7) frontend component tree V0→V3, (8) i18n contract for future versions, (9) smoke test list per version, (10) risk register from the pre-implementation analysis (8 risks with mitigations), (11) file map of what V0 shipped, (12) manual validation steps, (13) next concrete step when V1 is greenlit (~600 LOC estimate).
+
+**Why split from the RC QA Agent**: discussed at length in the planning conversation; summary is in `docs/web-lab-plan.md` §1. The QA Agent has 41 routes, 23 audit suites, full ADO integration and a Phase H+ security workbench — adding "local clone management" to it would dilute its purpose and mix two unrelated UX flows. Keeping them separate also lets the two modules evolve at different cadences.
+
+**Backward compatibility**: 100% additive. No existing routes, components, i18n keys, or backend code touched. The new sidebar entry sits between two existing entries without changing any of them.
+
+**Validation**:
+- JSON parity confirmed: `webLab` block has 25 leaves identical across EN/NO/ES; all 3 sidebar keys present in all 3 locales
+- JSX bracket balance verified for the 3 new component files
+- Manual smoke (described in `docs/web-lab-plan.md` §12): navigate to both sub-items in all 3 languages, confirm hero + intent + roadmap render and the cross-link button on Redcross.no opens the RC QA Agent module
+
+**Next step**: V1 (1.17.0) — real `git clone` + Mongo registry + "Use as test env for RC QA Agent" button. Requires explicit green light from the project owner. Expected ~600 LOC across 5-6 files, single commit.
+
+---
+
 ## [1.15.8] - 2026-05-28
 
 ### Added — Red Cross Web QA Agent · Mongo persistence for the 5 in-memory baselines

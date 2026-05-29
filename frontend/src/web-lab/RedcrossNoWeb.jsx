@@ -22,6 +22,8 @@ export default function RedcrossNoWeb({ onNavigate }) {
       subtitleKey="webLab.redcrossNo.subtitle"
       productionUrl="https://www.rodekors.no"
       plannedLocalPort="3102"
+      productionUrlLabelKey="webLab.redcrossNo.productionUrl"
+      plannedLocalPortLabelKey="webLab.redcrossNo.plannedLocalPort"
       relatedAgentKey="webLab.redcrossNo.relatedAgent"
       relatedAgentHintKey="webLab.redcrossNo.relatedAgentHint"
       onOpenRelatedAgent={onNavigate ? () => onNavigate('red-cross-web-qa') : undefined}
