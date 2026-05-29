@@ -8,7 +8,7 @@
 
 - **Automatic testing**: API validation, MCP testing flows, reproducible diagnostics, and troubleshooting-first workflows.
 - **Applied AI engineering**: prompt iteration, LLM orchestration, agentic workflows, and structured analysis pipelines.
-- **System integration**: FastAPI backend, React frontend, MongoDB, n8n, OutSystems bridges, and MCP-compatible tooling.
+- **System integration**: FastAPI backend, React frontend, MongoDB, n8n, OutSystems bridges, and MCP-compatible tooling.Testing.
 - **Experimentation mindset**: fast feedback loops for debugging, validation, prompt refinement, and AI behavior analysis.
 
 ---
