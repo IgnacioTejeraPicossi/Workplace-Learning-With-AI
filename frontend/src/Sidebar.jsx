@@ -136,7 +136,17 @@ const getNavItems = (t) => [
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
     { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" }
   ]},
-  
+
+  // Web Lab (1.16.0, 2026-05-29) — separate module hosting LOCAL CLONES of
+  // real websites (Item.no, Redcross.no). Distinct from Red Cross Web QA
+  // Agent: this module is about working WITH the actual web pages (clone,
+  // serve, browse, modify), not about QA testing patterns. Lives between
+  // Future Item Agents and Robomind Clinic per the project owner's layout.
+  { key: "web-lab", label: t('sidebar.webLab'), icon: "globe", group: "learning", isExpandable: true, subItems: [
+    { key: "web-lab-item-no", label: t('sidebar.webLabItemNo'), icon: "building" },
+    { key: "web-lab-redcross-no", label: t('sidebar.webLabRedcrossNo'), icon: "redcross" }
+  ]},
+
   // Robomind Clinic (moved out of Item Agents, placed above Cybersecurity)
   { key: "robomind-clinic", label: t('sidebar.robomindClinic'), icon: "brain", group: "learning" },
   

@@ -59,6 +59,9 @@ import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import RedCrossWebQAAgent from "./RedCrossWebQAAgent";
+// Web Lab module (1.16.0) — separate from RC QA Agent; hosts local website clones
+import ItemNoWeb from "./web-lab/ItemNoWeb";
+import RedcrossNoWeb from "./web-lab/RedcrossNoWeb";
 import Cybersecurity from "./cyber/Cybersecurity";
 import InstallingAppInCloud from "./cloud-install/InstallingAppInCloud";
 import ReadmeViewer from "./ReadmeViewer";
@@ -533,6 +536,9 @@ function AppContent() {
             {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
             {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
             {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent />}
+            {/* Web Lab routes — local clones of real websites */}
+            {!activeModule && section === "web-lab-item-no" && <ItemNoWeb />}
+            {!activeModule && section === "web-lab-redcross-no" && <RedcrossNoWeb onNavigate={setSection} />}
             {!activeModule && section === "cybersecurity" && <Cybersecurity />}
             {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "ai-study-buddy" && <AIStudyBuddy user={user} />}

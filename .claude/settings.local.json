@@ -140,7 +140,16 @@
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_feedback_log)",
       "Bash(PYTHONIOENCODING=utf-8 python -c \"from backend.app import app; print\\(' /homo-vs-ai/* routes:', sum\\(1 for r in app.routes if '/homo-vs-ai' in r.path\\)\\)\")",
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.tests.smoke_istqb_rag_translation)",
-      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)"
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(pandoc --track-changes=all \"docs-md/New Ideas 31.0 Web QA Lab.docx\" -o /tmp/web_qa_lab_plan.md)",
+      "Read(//tmp/**)",
+      "Bash(python .claude/skills/docx/scripts/office/unpack.py \"docs-md/New Ideas 31.0 Web QA Lab.docx\" /tmp/wqal_unpacked/)",
+      "Bash(python3 /tmp/extract_docx.py)",
+      "Bash(cp /tmp/extract_docx.py ./extract_docx_tmp.py)",
+      "Bash(python ./extract_docx_tmp.py)",
+      "Bash(rm ./extract_docx_tmp.py)",
+      "Bash(python .claude/skills/docx/scripts/office/unpack.py \"docs-md/New Ideas 31.0 Web QA Lab.docx\" ./tmp_wqal/)",
+      "Bash(PYTHONIOENCODING=utf-8 python extract_docx_tmp.py)"
     ]
   }
 }

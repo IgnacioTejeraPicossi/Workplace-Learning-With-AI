@@ -187,6 +187,9 @@
     "opsEfficiencyAgent": "Driftseffektivitet‑agent",
     "atmVvTestCopilot": "ATM V&V Testpilot",
     "redCrossWebQa": "Røde Kors Web QA‑agent",
+    "webLab": "Web‑lab",
+    "webLabItemNo": "Item.no‑web",
+    "webLabRedcrossNo": "Redcross.no‑web",
     "agentopsStudio": "AgentOps Studio",
     "robomindClinic": "Robomind Klinikk",
     "agentTheoryDocs": "Agent-teori og dokumentasjon",
@@ -372,6 +375,41 @@
       "playbookTitle": "Opprett spillbok",
       "playbookDesc": "Design og test programvarearbeidsflyter",
       "playbookBtn": "Opprett spillbok"
+    }
+  },
+  "webLab": {
+    "moduleTitle": "Web‑lab",
+    "moduleSubtitle": "Lokale kloner av ekte nettsider. Atskilt fra Røde Kors Web QA‑agent: dette er arbeidsområdet for selve nettsidene — klone, kjøre, bla, endre — ikke QA‑mønstrene.",
+    "statusBadge": "V0 · kun struktur",
+    "statusHint": "Denne siden er en plassholder for den kommende Web‑lab‑modulen. Full plan dokumentert i docs/web-lab-plan.md.",
+    "intent": "Hva denne modulen vil gjøre",
+    "intentItems": {
+      "i1": "Klone nettside‑repoet til en konfigurert lokal mappe",
+      "i2": "Installere avhengigheter + starte lokal server på dedikert port",
+      "i3": "Bla i den lokale kopien direkte fra WLWAI",
+      "i4": "Endre kode lokalt og se effekten umiddelbart",
+      "i5": "Sammenligne lokal vs produksjon (HTML / skjermbilder / tilgjengelighet)"
+    },
+    "roadmap": "Veikart",
+    "roadmapPhases": {
+      "v0": "V0 (nå) — Sidemeny‑oppføring + plassholdersider",
+      "v1": "V1 — Register + klone + åpne lokal URL (kun lesing)",
+      "v2": "V2 — Installere + start/stopp + helsesjekk + logger",
+      "v3": "V3 — Playwright røyktest + lokal‑vs‑prod sammenligning + snapshot‑grunnlinjer"
+    },
+    "itemNo": {
+      "title": "Item.no‑web",
+      "subtitle": "Lokal klone av firmanettsiden item.no.",
+      "productionUrl": "Produksjons‑URL",
+      "plannedLocalPort": "Planlagt lokal port"
+    },
+    "redcrossNo": {
+      "title": "Redcross.no‑web",
+      "subtitle": "Lokal klone av rodekors.no.",
+      "productionUrl": "Produksjons‑URL",
+      "plannedLocalPort": "Planlagt lokal port",
+      "relatedAgent": "Relatert: Røde Kors Web QA‑agent",
+      "relatedAgentHint": "QA‑testmønstrene for rodekors.no ligger i den eksisterende «Røde Kors Web QA‑agent»‑modulen. Når Web‑lab serverer en lokal klone, vil den agenten kunne peke sin environment.test_url mot den lokale serveren."
     }
   },
   "robomindClinic": {

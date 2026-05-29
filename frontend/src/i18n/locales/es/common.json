@@ -52,6 +52,9 @@
     "atmVvTestCopilot": "ATM V&V Test Copilot",
     "redCrossWebQa": "Cruz Roja Web QA Agent",
     "futureItemAgents": "Agentes Item Futuros",
+    "webLab": "Laboratorio Web",
+    "webLabItemNo": "Item.no web",
+    "webLabRedcrossNo": "Redcross.no web",
     "readmeViewer": "Léame",
     "agiProgress": "Progreso de AGI",
     "cybersecurity": "Ciberseguridad",
@@ -379,6 +382,42 @@
     },
     "showLess": "Mostrar menos",
     "showAll": "Mostrar todos ({{count}} más)"
+  },
+
+  "webLab": {
+    "moduleTitle": "Laboratorio Web",
+    "moduleSubtitle": "Clones locales de páginas web reales. Distinto del Cruz Roja Web QA Agent: este es el espacio de trabajo para las páginas web en sí — clonar, servir, navegar, modificar — no los patrones de QA testing.",
+    "statusBadge": "V0 · solo estructura",
+    "statusHint": "Esta página es un placeholder para el próximo módulo Web Lab. El plan completo está documentado en docs/web-lab-plan.md.",
+    "intent": "Qué hará este módulo",
+    "intentItems": {
+      "i1": "Clonar el repositorio del sitio en una carpeta local configurada",
+      "i2": "Instalar dependencias + arrancar el servidor local en un puerto dedicado",
+      "i3": "Navegar la copia local directamente desde WLWAI",
+      "i4": "Modificar código localmente y ver el efecto inmediatamente",
+      "i5": "Comparar local vs producción (HTML / capturas / accesibilidad)"
+    },
+    "roadmap": "Hoja de ruta",
+    "roadmapPhases": {
+      "v0": "V0 (ahora) — Entrada en sidebar + páginas placeholder",
+      "v1": "V1 — Registro + clone + abrir URL local (solo lectura)",
+      "v2": "V2 — Install + start/stop + health check + logs",
+      "v3": "V3 — Playwright smoke + comparación local‑vs‑prod + baselines de snapshot"
+    },
+    "itemNo": {
+      "title": "Item.no web",
+      "subtitle": "Clon local del sitio corporativo item.no.",
+      "productionUrl": "URL de producción",
+      "plannedLocalPort": "Puerto local previsto"
+    },
+    "redcrossNo": {
+      "title": "Redcross.no web",
+      "subtitle": "Clon local del sitio rodekors.no.",
+      "productionUrl": "URL de producción",
+      "plannedLocalPort": "Puerto local previsto",
+      "relatedAgent": "Relacionado: Cruz Roja Web QA Agent",
+      "relatedAgentHint": "Los patrones de QA testing para rodekors.no viven en el módulo existente «Cruz Roja Web QA Agent». Cuando el Web Lab sirva un clon local, ese agente podrá apuntar su environment.test_url al servidor local."
+    }
   },
 
   "agentopsStudio": {

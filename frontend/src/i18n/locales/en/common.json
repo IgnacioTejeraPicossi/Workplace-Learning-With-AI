@@ -52,6 +52,9 @@
     "atmVvTestCopilot": "ATM V&V Test Copilot",
     "redCrossWebQa": "Red Cross Web QA Agent",
     "futureItemAgents": "Future Item Agents",
+    "webLab": "Web Lab",
+    "webLabItemNo": "Item.no web",
+    "webLabRedcrossNo": "Redcross.no web",
     "readmeViewer": "Readme",
     "agiProgress": "AGI Progress",
     "cybersecurity": "Cybersecurity",
@@ -213,6 +216,42 @@
       "playbookTitle": "Create Playbook",
       "playbookDesc": "Design and test software workflows",
       "playbookBtn": "Create Playbook"
+    }
+  },
+
+  "webLab": {
+    "moduleTitle": "Web Lab",
+    "moduleSubtitle": "Local clones of real websites. Distinct from the Red Cross Web QA Agent: this is the workspace for the actual web pages — clone, serve, browse, modify — not the QA testing patterns.",
+    "statusBadge": "V0 · structure only",
+    "statusHint": "This page is a placeholder for the upcoming Web Lab module. The full plan is documented in docs/web-lab-plan.md.",
+    "intent": "What this module will do",
+    "intentItems": {
+      "i1": "Clone the website repository into a configured local directory",
+      "i2": "Install dependencies + start the local server on a dedicated port",
+      "i3": "Browse the local copy directly from WLWAI",
+      "i4": "Modify code locally and see the effect immediately",
+      "i5": "Compare local vs production (HTML / screenshots / accessibility)"
+    },
+    "roadmap": "Roadmap",
+    "roadmapPhases": {
+      "v0": "V0 (now) — Sidebar entry + placeholder pages",
+      "v1": "V1 — Registry + clone + open local URL (read-only)",
+      "v2": "V2 — Install + start/stop + health check + logs",
+      "v3": "V3 — Playwright smoke + local-vs-prod compare + snapshot baselines"
+    },
+    "itemNo": {
+      "title": "Item.no web",
+      "subtitle": "Local clone of the company website item.no.",
+      "productionUrl": "Production URL",
+      "plannedLocalPort": "Planned local port"
+    },
+    "redcrossNo": {
+      "title": "Redcross.no web",
+      "subtitle": "Local clone of the rodekors.no website.",
+      "productionUrl": "Production URL",
+      "plannedLocalPort": "Planned local port",
+      "relatedAgent": "Related: Red Cross Web QA Agent",
+      "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, that agent will be able to point its environment.test_url at the local server."
     }
   },
 
