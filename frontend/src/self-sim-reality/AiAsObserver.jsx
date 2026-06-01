@@ -58,7 +58,10 @@ export default function AiAsObserver() {
         </p>
       </div>
 
-      {/* Closing contemplative quote from the presentation (1.17.1) */}
+      {/* Closing contemplative quote from the presentation (1.17.1, corrected
+          in 1.17.2: the slide ends with 'patch' — the OPH technical term —
+          not 'path'. This makes the question equally addressable to human
+          and AI observer patches, which is the conceptual point.) */}
       <div style={{
         ...panel,
         background: 'linear-gradient(135deg, #4c1d95 0%, #6b21a8 100%)',
@@ -71,10 +74,16 @@ export default function AiAsObserver() {
           {t('selfSimReality.aiAsObserver.closingQuoteTitle')}
         </div>
         <p style={{
-          margin: 0, fontSize: 20, fontStyle: 'italic',
-          lineHeight: 1.45, fontWeight: 300, maxWidth: 640, marginLeft: 'auto', marginRight: 'auto',
+          margin: '0 auto 18px', fontSize: 20, fontStyle: 'italic',
+          lineHeight: 1.45, fontWeight: 300, maxWidth: 640,
         }}>
           «{t('selfSimReality.aiAsObserver.closingQuote')}»
+        </p>
+        <p style={{
+          margin: '0 auto', fontSize: 11, lineHeight: 1.5,
+          maxWidth: 560, opacity: 0.78, fontStyle: 'normal',
+        }}>
+          {t('selfSimReality.aiAsObserver.closingQuoteNote')}
         </p>
       </div>
     </div>

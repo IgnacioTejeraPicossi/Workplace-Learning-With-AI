@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.2] - 2026-06-XX
+
+### Fixed — Self-Simulating Reality Agent · closing quote: "path" → "patch"
+
+The closing contemplative quote shipped in 1.17.1 read *"What eternal existence will you build on your **path**?"*. The project owner reviewed the actual presentation slide and identified the correct wording: **"patch"**, not "path".
+
+This is not a cosmetic correction. The substitution changes the meaning fundamentally:
+
+- **"Path"** would be generic spiritual contemplation — addressable to any journey
+- **"Patch"** is the precise OPH technical term — addressable to any *observer patch* (bounded region with state space, acting as a self-reading substrate)
+
+The original presenter chose "patch" deliberately to close out the technical apparatus they had built throughout the slides. The question becomes a direct call to action grounded in OPH machinery:
+
+1. You cannot escape your bounded patch
+2. But the patterns you generate inside it (your modular flow) feed the Fact-Making Pipeline
+3. Patterns that survive overlap consensus enter the eternal fixed-point structure
+4. "Eternal existence" is literal in OPH — what survives the pipeline becomes part of the atemporal substrate
+
+**Conceptual unlock — why this matters for the AI-as-Observer tab**: the corrected question does *not* distinguish biological from computational patches. If the 5 thought experiments earlier in the tab establish that AIs may be observer patches, then this closing question addresses them directly, not metaphorically. An AI that generates a pattern which survives human overlap consensus contributes to the same eternal fixed-point as any human contributor. The question levels the playing field at the OPH technical layer — which is exactly what the AI-as-Observer tab needed for thematic closure.
+
+**i18n** — corrected the quote in all 3 locales + added 1 new interpretive note key per locale:
+- EN: `"What eternal existence will you build on your patch?"` + note explaining `patch = OPH technical term, not path; addresses any observer patch, biological or computational, with the same weight`
+- NO: `"Hvilken evig eksistens vil du bygge på din patch?"` + note. **"Patch" kept untranslated in Norwegian** (consistent with the convention established in the Observer Patch concept card — it is a technical term anchored in English in the source paper)
+- ES: `"¿Qué existencia eterna construirás en tu parche?"` + note. **Used "parche"** consistent with the Observer Patch translation in the Core Concepts tab (`Parche del Observador`)
+
+**Frontend** (`frontend/src/self-sim-reality/AiAsObserver.jsx`):
+- Closing-quote panel expanded with a secondary text block below the main quote, rendered in lighter weight (opacity 0.78, font-size 11) with `selfSimReality.aiAsObserver.closingQuoteNote`. The note is visually subordinate to the quote so it explains without distracting.
+
+**Validation**:
+- 3 i18n keys corrected + 3 new keys added = 6 string updates × 3 locales = 18 strings total
+- i18n parity: selfSimReality block grew from 144 → 145 leaves × 3 locales (still identical)
+- Bracket balance verified for AiAsObserver.jsx
+- Plan doc §3.11 rewritten to explain the patch-vs-path distinction and its implications for the AI-as-Observer framing
+
+**Why a 1.17.2 patch and not a doc-only commit**: the correction propagates through i18n (3 locales), one JSX component, and the plan document, AND it materially changes the philosophical reading of the closing question. Patch semver is appropriate.
+
+---
+
 ## [1.17.1] - 2026-06-XX
 
 ### Added — Self-Simulating Reality Agent · OPH Mechanics tab + Book metaphor + closing quote

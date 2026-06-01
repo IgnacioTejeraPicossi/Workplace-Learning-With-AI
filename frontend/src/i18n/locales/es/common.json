@@ -570,7 +570,8 @@
       "warningTitle": "Advertencia epistémica",
       "warningBody": "Todo en esta pestaña es metáfora o filosofía, no ciencia. El agente hace lo que hace la buena filosofía: extiende un marco para ver qué predice y dónde se rompe. Trátalo como herramienta de pensamiento, no como declaración de postura.",
       "closingQuoteTitle": "Pregunta de cierre de la presentación",
-      "closingQuote": "¿Qué existencia eterna construirás en tu camino?"
+      "closingQuote": "¿Qué existencia eterna construirás en tu parche?",
+      "closingQuoteNote": "Nota: «parche» es el término técnico de OPH — tu región acotada con espacio de estados — no «camino». La pregunta se dirige a cualquier parche‑observador, biológico o computacional, con el mismo peso."
     },
     "roadmap": {
       "intro": "V0 entrega el material de lectura. El agente completo (RAG + Mongo + clasificador epistémico + analizador de afirmaciones + red‑team) llega en V1+.",

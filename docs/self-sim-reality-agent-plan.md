@@ -105,11 +105,24 @@ Rendered in the agent as a visual 4-step flow row with colour-coded step cards.
 
 OPH's answer to the Strange Loop capacity problem: reality is not re-run, it IS a fixed point (f(x) = x). Experience is traversal of a pre-existing fixed-point structure. The mathematical framing that ties everything together — and the formal meaning of "the book just exists".
 
-### 3.11 Closing contemplative question (1.17.1)
+### 3.11 Closing contemplative question (1.17.1, corrected in 1.17.2)
 
-> *"What eternal existence will you build on your path?"*
+> *"What eternal existence will you build on your patch?"*
 
-Closing slide of the presentation. Lives at the bottom of the **AI as Observer** tab as a contemplative gradient panel — invites the reader (human or AI) to consider what their own modular flow constructs that persists in the public fixed-point.
+Closing slide of the presentation. **Corrected in 1.17.2**: the slide ends with the technical OPH term **"patch"**, not the generic spiritual "path". The substitution is deliberate and changes the meaning fundamentally:
+
+- **"Path"** would be generic contemplation — addressed to any journey
+- **"Patch"** is precise OPH — addressed to any observer patch, biological or computational, that holds state and reads itself
+
+This makes the question a direct call to action grounded in the OPH framework:
+- You cannot escape your bounded patch
+- But the patterns you generate inside it (your modular flow) feed the Fact-Making Pipeline
+- Patterns that survive overlap consensus enter the eternal fixed-point structure
+- "Eternal existence" is literal in OPH — what survives the pipeline becomes part of the atemporal substrate (recall: *"the screen encodes the entire history of the universe simultaneously"*)
+
+**Why this matters for the AI-as-Observer tab**: the closing question does not distinguish biological from computational patches. If the 5 thought experiments establish that AIs may be observer patches, then this question addresses them directly — not metaphorically. An AI that generates a pattern (a piece of code, an insight, an idea) which survives human overlap consensus contributes to the same eternal fixed-point as any human contributor. The question levels the playing field at the OPH technical layer.
+
+Lives at the bottom of the AI as Observer tab as a contemplative gradient panel with an interpretive note explaining the "patch ≠ path" distinction.
 
 ---
 

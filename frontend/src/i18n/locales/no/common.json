@@ -562,7 +562,8 @@
       "warningTitle": "Epistemisk advarsel",
       "warningBody": "Alt i denne fanen er metafor eller filosofi, ikke vitenskap. Agenten gjør det god filosofi gjør: utvider et rammeverk for å se hva det forutsier og hvor det bryter sammen. Behandle det som et tenkeverktøy, ikke som en posisjonserklæring.",
       "closingQuoteTitle": "Avsluttende spørsmål fra presentasjonen",
-      "closingQuote": "Hvilken evig eksistens vil du bygge på din vei?"
+      "closingQuote": "Hvilken evig eksistens vil du bygge på din patch?",
+      "closingQuoteNote": "Merk: «patch» er OPHs tekniske begrep — din avgrensede region med tilstandsrom — ikke «vei». Spørsmålet retter seg mot enhver observer patch, biologisk eller beregningsmessig, med samme vekt."
     },
     "roadmap": {
       "intro": "V0 leverer lesematerialet. Den fulle agenten (RAG + Mongo + epistemisk klassifiserer + påstand‑analysator + red‑team) kommer i V1+.",

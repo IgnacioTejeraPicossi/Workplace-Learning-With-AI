@@ -405,7 +405,8 @@
       "warningTitle": "Epistemic warning",
       "warningBody": "Everything in this tab is metaphor or philosophy, not science. The agent is doing what good philosophy does: extending a framework to see what it predicts and where it breaks. Treat it as a thinking tool, not a position statement.",
       "closingQuoteTitle": "Closing question from the presentation",
-      "closingQuote": "What eternal existence will you build on your path?"
+      "closingQuote": "What eternal existence will you build on your patch?",
+      "closingQuoteNote": "Note: 'patch' is the technical OPH term — your bounded region with a state space — not 'path'. The question addresses any observer patch, biological or computational, with the same weight."
     },
     "roadmap": {
       "intro": "V0 ships the reading material. The full agent (RAG + Mongo + epistemic classifier + claim analyzer + red-team) arrives in V1+.",
