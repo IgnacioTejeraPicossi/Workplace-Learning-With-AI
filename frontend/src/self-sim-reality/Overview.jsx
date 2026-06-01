@@ -1,10 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { panel, panelTitle, subtle, LEVEL_COLORS } from './_tokens';
+import EpistemicBadge from './EpistemicBadge';
 
 export default function Overview() {
   const { t } = useTranslation();
   const levels = ['established', 'mainstream', 'speculative', 'philosophy', 'metaphor'];
+  const bookLevel = t('selfSimReality.overview.bookMetaphorLevel');
 
   return (
     <div style={{ display: 'grid', gap: 18 }}>
@@ -24,6 +26,28 @@ export default function Overview() {
           lineHeight: 1.5, fontWeight: 500,
         }}>
           «{t('selfSimReality.guidingPhrase')}»
+        </p>
+      </div>
+
+      {/* The Book — intuition pump (1.17.1, added from second screenshot batch) */}
+      <div style={{
+        ...panel, borderLeft: '4px solid #f59e0b',
+        background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+          <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#92400e' }}>
+            📖 {t('selfSimReality.overview.bookMetaphorTitle')}
+          </h4>
+          <EpistemicBadge level={bookLevel} />
+        </div>
+        <blockquote style={{
+          margin: '0 0 10px', padding: 0, borderLeft: 'none',
+          fontStyle: 'italic', fontSize: 15, color: '#78350f', lineHeight: 1.5,
+        }}>
+          «{t('selfSimReality.overview.bookMetaphorQuote')}»
+        </blockquote>
+        <p style={{ margin: 0, fontSize: 12, color: '#78350f', lineHeight: 1.5 }}>
+          {t('selfSimReality.overview.bookMetaphorBody')}
         </p>
       </div>
 

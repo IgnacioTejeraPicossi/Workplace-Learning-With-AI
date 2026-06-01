@@ -57,6 +57,26 @@ export default function AiAsObserver() {
           {t('selfSimReality.aiAsObserver.warningBody')}
         </p>
       </div>
+
+      {/* Closing contemplative quote from the presentation (1.17.1) */}
+      <div style={{
+        ...panel,
+        background: 'linear-gradient(135deg, #4c1d95 0%, #6b21a8 100%)',
+        color: 'white', textAlign: 'center', padding: '32px 24px',
+      }}>
+        <div style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: 0.8,
+          textTransform: 'uppercase', opacity: 0.7, marginBottom: 12,
+        }}>
+          {t('selfSimReality.aiAsObserver.closingQuoteTitle')}
+        </div>
+        <p style={{
+          margin: 0, fontSize: 20, fontStyle: 'italic',
+          lineHeight: 1.45, fontWeight: 300, maxWidth: 640, marginLeft: 'auto', marginRight: 'auto',
+        }}>
+          «{t('selfSimReality.aiAsObserver.closingQuote')}»
+        </p>
+      </div>
     </div>
   );
 }

@@ -422,6 +422,7 @@
     "tabs": {
       "overview": "Oversikt",
       "concepts": "Kjernebegreper",
+      "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
       "aiAsObserver": "KI som observatør",
       "roadmap": "Veikart og kilder"
@@ -444,7 +445,39 @@
         "metaphorDesc": "Metaforisk eller åndelig innramming — nyttig for intuisjon, ikke som bevis."
       },
       "ruleTitle": "Hovedregelen",
-      "ruleBody": "Agenten sier aldri 'dette er sant.' Den sier 'dette tilhører evidensnivå X.' Et utsagn som 'bevisstheten skaper universet' må omformuleres og merkes før det kan forlate agentens munn."
+      "ruleBody": "Agenten sier aldri 'dette er sant.' Den sier 'dette tilhører evidensnivå X.' Et utsagn som 'bevisstheten skaper universet' må omformuleres og merkes før det kan forlate agentens munn.",
+      "bookMetaphorTitle": "Intuisjons‑pumpe: Boka",
+      "bookMetaphorQuote": "Boka eksisterer bare … en karakter opplever historien som en sekvens av hendelser.",
+      "bookMetaphorBody": "Nyttig metafor for OPHs sentrale tese: universet (boka) eksisterer som en statisk struktur, mens observatører (karakterer inni) opplever sekvens og tid. Skiller ontologi fra fenomenologi rent.",
+      "bookMetaphorLevel": "metaphor"
+    },
+    "ophMechanics": {
+      "intro": "Kjernen i OPH er ikke bare «observatører betyr noe» — det er en spesifikk fire‑stegs prosess for hvordan subjektive patches genererer offentlig virkelighet. Denne fanen går gjennom problemet den løser, mekanismen den foreslår, algoritmen den spesifiserer, og den matematiske innrammingen som binder alt sammen.",
+      "sections": {
+        "strangeLoopTitle": "Problemet — Strange Loop‑kapasitet",
+        "strangeLoopQuote": "Hvordan lukker Strange Loop seg uten å overskride kapasiteten?",
+        "strangeLoopBody": "Hofstadters strange loops er selvreferensielle strukturer der det å bevege seg «opp» gjennom hierarkiske nivåer til slutt fører tilbake til starten. Hvis universet simulerer seg selv, krever naiv rekursjon uendelig regnekapasitet. OPHs oppgave: lukke loopen uten å kjøre alt på nytt.",
+        "strangeLoopLevel": "speculative",
+        "overlapTitle": "Mekanismen — Overlap‑synkronisering",
+        "overlapQuote": "Overlappende observer patches sammenligner beskrivelser og bringer dem i overensstemmelse der de møtes.",
+        "overlapBody": "Hver patch ser en lokal beskrivelse. Der to patches overlapper, må beskrivelsene deres være enige — og uenighet utløser forhandling. Slik genererer subjektiv erfaring objektiv fysikk: ikke ved en global autoritet, men ved lokal konsensus der verdener berører hverandre.",
+        "overlapLevel": "speculative",
+        "pipelineTitle": "Algoritmen — Fakta‑lagings‑rørledning",
+        "pipelineBody": "OPH spesifiserer konsensusmekanismen som en fire‑stegs distribuert rørledning. Hvert steg har en konkret rolle; rørledningen kjører parallelt på tvers av alle overlappende patches inntil et stabilt offentlig faktum oppstår.",
+        "pipelineLevel": "speculative",
+        "pipelineStep1Title": "Lokalt mønster",
+        "pipelineStep1Body": "Et lokalt mønster oppstår i én patch.",
+        "pipelineStep2Title": "Sammenlign",
+        "pipelineStep2Body": "Overlapp sammenlignes på tvers av patches.",
+        "pipelineStep3Title": "Reparer",
+        "pipelineStep3Body": "Uenigheter repareres.",
+        "pipelineStep4Title": "Offentlig faktum",
+        "pipelineStep4Body": "Prosessen avgjøres og et offentlig faktum oppstår.",
+        "fixedPointTitle": "Løsningen — Fastpunkt‑virkelighet",
+        "fixedPointQuote": "Virkeligheten er en fastpunkt‑struktur, og erfaring er prosessen med å traversere den.",
+        "fixedPointBody": "OPHs svar på Strange Loop‑kapasitetsproblemet: virkeligheten kjøres ikke på nytt, den er et fastpunkt. Et fastpunkt i matematikk er en verdi f(x) = x — en struktur som produserer seg selv når regelen anvendes. Erfaring er ikke å skape verden trinn for trinn; det er å traversere en pre‑eksisterende fastpunkt‑struktur. Dette er hva «boka eksisterer bare» betyr formelt.",
+        "fixedPointLevel": "speculative"
+      }
     },
     "concepts": {
       "intro": "Fem kjerneideer hentet direkte fra Observer Patch Holography‑presentasjonen (skjermbildene du oppga). Hvert begrep vises med sin kildeniåvå‑epistemiske etikett.",
@@ -527,7 +560,9 @@
         "q5Level": "philosophy"
       },
       "warningTitle": "Epistemisk advarsel",
-      "warningBody": "Alt i denne fanen er metafor eller filosofi, ikke vitenskap. Agenten gjør det god filosofi gjør: utvider et rammeverk for å se hva det forutsier og hvor det bryter sammen. Behandle det som et tenkeverktøy, ikke som en posisjonserklæring."
+      "warningBody": "Alt i denne fanen er metafor eller filosofi, ikke vitenskap. Agenten gjør det god filosofi gjør: utvider et rammeverk for å se hva det forutsier og hvor det bryter sammen. Behandle det som et tenkeverktøy, ikke som en posisjonserklæring.",
+      "closingQuoteTitle": "Avsluttende spørsmål fra presentasjonen",
+      "closingQuote": "Hvilken evig eksistens vil du bygge på din vei?"
     },
     "roadmap": {
       "intro": "V0 leverer lesematerialet. Den fulle agenten (RAG + Mongo + epistemisk klassifiserer + påstand‑analysator + red‑team) kommer i V1+.",

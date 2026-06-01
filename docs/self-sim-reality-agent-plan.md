@@ -70,6 +70,47 @@ Past, present and future coexist on the same substrate. Subjective time is a pro
 
 Time is not a global parameter. Each observer generates its own time through the flow of its state across its information geometry.
 
+### 3.6 The Book metaphor (added in 1.17.1, from second batch of screenshots)
+
+> *"The book just exists... a character experiences the story as a sequence of events."*
+
+The most accessible articulation of OPH's central thesis. Separates ontology (the book IS) from phenomenology (the character EXPERIENCES). Lives in the Overview tab as a pull quote tagged `metaphor`.
+
+### 3.7 The Strange Loop problem (1.17.1)
+
+> *"How does the Strange Loop close without exceeding capacity?"*
+
+Hofstadter's strange loops — self-referential structures where moving "up" returns to start. If the universe simulates itself, naive recursion = infinite capacity. This is the central PROBLEM that OPH's machinery is built to solve. Opens the new **OPH Mechanics** tab.
+
+### 3.8 Overlap Synchronization (1.17.1) — THE MECHANISM
+
+> *"Overlapping observer patches compare descriptions and bring them into agreement where they meet."*
+
+How subjective patches generate objective physics: not by global authority, but by local consensus at the boundaries where patches overlap.
+
+### 3.9 The Fact-Making Pipeline (1.17.1) — THE ALGORITHM
+
+Concrete 4-step distributed process:
+
+1. **Local Pattern** — a local pattern appears in one patch.
+2. **Compare** — overlaps are compared across patches.
+3. **Repair** — disagreements are repaired.
+4. **Public Fact** — process settles and a public fact emerges.
+
+Rendered in the agent as a visual 4-step flow row with colour-coded step cards.
+
+### 3.10 Reality as Fixed Point (1.17.1) — THE RESOLUTION
+
+> *"Reality is a fixed-point structure, and experience is the process of traversing it."*
+
+OPH's answer to the Strange Loop capacity problem: reality is not re-run, it IS a fixed point (f(x) = x). Experience is traversal of a pre-existing fixed-point structure. The mathematical framing that ties everything together — and the formal meaning of "the book just exists".
+
+### 3.11 Closing contemplative question (1.17.1)
+
+> *"What eternal existence will you build on your path?"*
+
+Closing slide of the presentation. Lives at the bottom of the **AI as Observer** tab as a contemplative gradient panel — invites the reader (human or AI) to consider what their own modular flow constructs that persists in the public fixed-point.
+
 ---
 
 ## 4. Epistemic discipline (5 levels)
@@ -189,28 +230,30 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 | Version | Scope | Effort | Status |
 |---|---|---|---|
 | **V0** (1.17.0) | 5 tabs of curated reading material with EpistemicBadge on every claim | 0.5 day | DONE |
-| **V1** (1.18.0) | Backend chat endpoint with RAG over OPH repo + 6 scientific sources. Every answer pre-tagged with epistemic levels. Frontend chat panel as a 6th tab. | 3-4 days | Pending green light |
+| **V0.1** (1.17.1) | 6th tab "OPH Mechanics" + Book metaphor in Overview + closing contemplative quote in AI-as-Observer (incorporates second batch of X screenshots) | 0.3 day | DONE |
+| **V1** (1.18.0) | Backend chat endpoint with RAG over OPH repo + 6 scientific sources. Every answer pre-tagged with epistemic levels. Frontend chat panel as a 7th tab. | 3-4 days | Pending green light |
 | **V2** (1.19.0) | Claim Analyzer (paste claim → scientific core + overreach + reformulation). Source Map (topic → list of relevant chunks with epistemic colour). Red Team panel. | 4-5 days | Pending |
 | **V3** (1.20.0) | Theory Map (interactive graph) + Observer Patch toy simulator (3-5 patches with overlap consistency checker, visualised) + learning path | 5-7 days | Pending |
 
 ---
 
-## 10. Frontend file map (V0 · what shipped now)
+## 10. Frontend file map (V0 + 1.17.1 expansion)
 
 ```
 frontend/src/
-├── SelfSimRealityAgent.jsx                   ← shell with 5 tabs, hero, status strip (~139 lines)
+├── SelfSimRealityAgent.jsx                   ← shell with 6 tabs, hero, status strip (~142 lines)
 └── self-sim-reality/
     ├── _tokens.js                            ← LEVEL_COLORS palette + panel styles
     ├── EpistemicBadge.jsx                    ← pill with localized label per epistemic level
-    ├── Overview.jsx                          ← mission + guiding phrase + 5 levels + core rule
-    ├── CoreConcepts.jsx                      ← 5 cards from the X screenshots
+    ├── Overview.jsx                          ← mission + guiding phrase + Book metaphor [1.17.1] + 5 levels + core rule
+    ├── CoreConcepts.jsx                      ← 5 cards from the first batch of X screenshots
+    ├── OphMechanics.jsx [1.17.1]             ← 4-section narrative: Strange Loop → Overlap Sync → Fact-Making Pipeline (4-step visual) → Fixed Point
     ├── TheoryTour.jsx                        ← 7 theories (Friston, Rovelli, ..., OPH)
-    ├── AiAsObserver.jsx                      ← 5 thought experiments + epistemic warning
+    ├── AiAsObserver.jsx                      ← 5 thought experiments + epistemic warning + closing contemplative quote [1.17.1]
     └── RoadmapAndSources.jsx                 ← V0→V3 + 10 reference links
 ```
 
-Total V0 code: ~470 LOC of JSX + 113 i18n leaves × 3 locales.
+Code growth: V0 (1.17.0) shipped ~470 LOC + 113 i18n leaves. The 1.17.1 expansion added one new component (~155 LOC) + 31 i18n leaves (now 144 × 3 = 432 localized strings across the module). Six tabs instead of five.
 
 ---
 

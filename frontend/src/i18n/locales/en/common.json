@@ -265,6 +265,7 @@
     "tabs": {
       "overview": "Overview",
       "concepts": "Core Concepts",
+      "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
       "aiAsObserver": "AI as Observer",
       "roadmap": "Roadmap & Sources"
@@ -287,7 +288,39 @@
         "metaphorDesc": "Metaphorical or spiritual framing — useful for intuition, not for proof."
       },
       "ruleTitle": "The core rule",
-      "ruleBody": "The agent never says 'this is true.' It says 'this belongs to evidence level X.' Any claim of the form 'consciousness creates the universe' must be reformulated and tagged before it is allowed to leave the agent's mouth."
+      "ruleBody": "The agent never says 'this is true.' It says 'this belongs to evidence level X.' Any claim of the form 'consciousness creates the universe' must be reformulated and tagged before it is allowed to leave the agent's mouth.",
+      "bookMetaphorTitle": "Intuition pump: The Book",
+      "bookMetaphorQuote": "The book just exists... a character experiences the story as a sequence of events.",
+      "bookMetaphorBody": "Useful metaphor for OPH's central thesis: the universe (the book) exists as a static structure, while observers (characters inside) experience sequence and time. Separates ontology from phenomenology cleanly.",
+      "bookMetaphorLevel": "metaphor"
+    },
+    "ophMechanics": {
+      "intro": "OPH's heart is not just 'observers matter' — it's a specific four-step process for how subjective patches generate public reality. This tab walks through the problem it solves, the mechanism it proposes, the algorithm it specifies, and the mathematical framing that ties it together.",
+      "sections": {
+        "strangeLoopTitle": "The Problem — Strange Loop Capacity",
+        "strangeLoopQuote": "How does the Strange Loop close without exceeding capacity?",
+        "strangeLoopBody": "Hofstadter's strange loops are self-referential structures where moving 'up' through hierarchical levels eventually returns to the start. If the universe simulates itself, naive recursion demands infinite computational capacity. OPH's task: close the loop without re-running everything.",
+        "strangeLoopLevel": "speculative",
+        "overlapTitle": "The Mechanism — Overlap Synchronization",
+        "overlapQuote": "Overlapping observer patches compare descriptions and bring them into agreement where they meet.",
+        "overlapBody": "Each patch sees a local description. Where two patches overlap, their descriptions must agree — and disagreement triggers negotiation. This is how subjective experience generates objective physics: not by a global authority, but by local consensus where worlds touch.",
+        "overlapLevel": "speculative",
+        "pipelineTitle": "The Algorithm — Fact-Making Pipeline",
+        "pipelineBody": "OPH specifies the consensus mechanism as a four-step distributed pipeline. Each step has a concrete role; the pipeline runs in parallel across all overlapping patches until a stable public fact emerges.",
+        "pipelineLevel": "speculative",
+        "pipelineStep1Title": "Local Pattern",
+        "pipelineStep1Body": "A local pattern appears in one patch.",
+        "pipelineStep2Title": "Compare",
+        "pipelineStep2Body": "Overlaps are compared across patches.",
+        "pipelineStep3Title": "Repair",
+        "pipelineStep3Body": "Disagreements are repaired.",
+        "pipelineStep4Title": "Public Fact",
+        "pipelineStep4Body": "Process settles and a public fact emerges.",
+        "fixedPointTitle": "The Resolution — Fixed-Point Reality",
+        "fixedPointQuote": "Reality is a fixed-point structure, and experience is the process of traversing it.",
+        "fixedPointBody": "OPH's answer to the Strange Loop capacity problem: reality is not re-run, it is a fixed point. A fixed point in math is a value f(x) = x — a structure that produces itself when its rule is applied. Experience is not creating the world step by step; it is traversing a pre-existing fixed-point structure. This is what 'the book just exists' means formally.",
+        "fixedPointLevel": "speculative"
+      }
     },
     "concepts": {
       "intro": "Five core ideas pulled directly from the Observer Patch Holography presentation (the screenshots you provided). Each concept is shown with its source-level epistemic tag.",
@@ -370,7 +403,9 @@
         "q5Level": "philosophy"
       },
       "warningTitle": "Epistemic warning",
-      "warningBody": "Everything in this tab is metaphor or philosophy, not science. The agent is doing what good philosophy does: extending a framework to see what it predicts and where it breaks. Treat it as a thinking tool, not a position statement."
+      "warningBody": "Everything in this tab is metaphor or philosophy, not science. The agent is doing what good philosophy does: extending a framework to see what it predicts and where it breaks. Treat it as a thinking tool, not a position statement.",
+      "closingQuoteTitle": "Closing question from the presentation",
+      "closingQuote": "What eternal existence will you build on your path?"
     },
     "roadmap": {
       "intro": "V0 ships the reading material. The full agent (RAG + Mongo + epistemic classifier + claim analyzer + red-team) arrives in V1+.",

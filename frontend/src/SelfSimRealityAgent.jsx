@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overview from './self-sim-reality/Overview';
 import CoreConcepts from './self-sim-reality/CoreConcepts';
+import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
 import AiAsObserver from './self-sim-reality/AiAsObserver';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
@@ -38,6 +39,7 @@ const SelfSimRealityAgent = () => {
   const tabs = [
     { id: 'overview',      label: t('selfSimReality.tabs.overview'),      icon: '🎯' },
     { id: 'concepts',      label: t('selfSimReality.tabs.concepts'),      icon: '📚' },
+    { id: 'ophMechanics',  label: t('selfSimReality.tabs.ophMechanics'),  icon: '⚙️' },
     { id: 'theoryTour',    label: t('selfSimReality.tabs.theoryTour'),    icon: '🧭' },
     { id: 'aiAsObserver',  label: t('selfSimReality.tabs.aiAsObserver'),  icon: '🧠' },
     { id: 'roadmap',       label: t('selfSimReality.tabs.roadmap'),       icon: '🗺️' },
@@ -47,6 +49,7 @@ const SelfSimRealityAgent = () => {
     switch (activeTab) {
       case 'overview':     return <Overview />;
       case 'concepts':     return <CoreConcepts />;
+      case 'ophMechanics': return <OphMechanics />;
       case 'theoryTour':   return <TheoryTour />;
       case 'aiAsObserver': return <AiAsObserver />;
       case 'roadmap':      return <RoadmapAndSources />;

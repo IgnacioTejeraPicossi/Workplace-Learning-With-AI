@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.1] - 2026-06-XX
+
+### Added — Self-Simulating Reality Agent · OPH Mechanics tab + Book metaphor + closing quote
+
+Second batch of 5 screenshots from the same Bernhard Mueller X presentation arrived after the 1.17.0 commit landed (the project owner is limited to 5 image uploads per message). These screenshots fill the biggest gap V0 had: the **technical mechanism** of OPH — not just *what* it claims, but *how* the consensus algorithm works.
+
+**New 6th tab: "OPH Mechanics"** (`frontend/src/self-sim-reality/OphMechanics.jsx`, ~155 LOC). Inserted between Core Concepts and Theory Tour so the agent's tab flow now reads: Overview → WHAT (Core Concepts) → **HOW (OPH Mechanics)** → LANDSCAPE (Theory Tour) → EXTENSION (AI as Observer) → META (Roadmap & Sources). Four-section narrative:
+
+1. **The Problem — Strange Loop Capacity** · *"How does the Strange Loop close without exceeding capacity?"* · Hofstadter's strange loops + the infinite-regress problem OPH must solve.
+2. **The Mechanism — Overlap Synchronization** · *"Overlapping observer patches compare descriptions and bring them into agreement where they meet."* · How subjective patches generate objective physics via local consensus.
+3. **The Algorithm — Fact-Making Pipeline** · 4-step distributed process rendered as a visual flow of colour-coded step cards (✨ Local Pattern → 🔍 Compare → 🔧 Repair → 💎 Public Fact). Mirrors the slide layout.
+4. **The Resolution — Fixed-Point Reality** · *"Reality is a fixed-point structure, and experience is the process of traversing it."* · The mathematical answer to the Strange Loop problem: f(x) = x, no re-running needed.
+
+Each section uses a `<Section>` helper component with: section title + EpistemicBadge (all four are `speculative`) + pull-quote (the exact slide caption, styled as a purple-bordered blockquote) + body explanation. The pipeline section has its own `<PipelineFlow>` component rendering the 4 step cards in a responsive grid.
+
+**Overview tab expansion** — new "The Book" intuition-pump panel between the guiding phrase and the 5-level epistemic discipline. Quote: *"The book just exists... a character experiences the story as a sequence of events."* Tagged `metaphor`. Visually distinguished with an amber gradient (`#fffbeb → #fef3c7`) to separate it from the purple guiding-phrase panel. This is the most accessible articulation of OPH's ontology-vs-phenomenology split — it sets up everything else.
+
+**AI as Observer tab expansion** — new contemplative footer panel at the bottom of the tab, after the epistemic warning. Purple gradient background (`#4c1d95 → #6b21a8`), white italic text, 20px font: *"What eternal existence will you build on your path?"* (closing slide of the presentation). The placement is deliberate: after walking through 5 speculative thought experiments about AIs as observer patches, the question invites the reader (human or AI) to consider what their own modular flow constructs that persists in the public fixed-point.
+
+**i18n** — `frontend/src/i18n/locales/{en,no,es}/common.json`:
+- +1 tab key (`tabs.ophMechanics`)
+- +4 keys in `overview.bookMetaphor*` (title, quote, body, level)
+- +24 keys in new `ophMechanics` block (intro + 4 sections × 4 fields + 4 pipeline steps × 2 fields)
+- +2 keys in `aiAsObserver.closingQuote*` (title, quote)
+- **Total: +31 keys × 3 locales = 93 new strings**. selfSimReality block grew 113 → 144 leaves. Parity confirmed identical.
+
+**Translation choices**:
+- "Strange Loop" kept untranslated (Hofstadter's technical term, preserved across all locales as the canonical reference)
+- "Fact-Making Pipeline" / "Fakta‑lagings‑rørledning" / "Tubería de creación de hechos" — translated since the underlying concept is descriptive
+- "Fixed-point" / "fastpunkt" / "punto fijo" — translated using the established math vocabulary in each language
+- "What eternal existence will you build on your path?" → "Hvilken evig eksistens vil du bygge på din vei?" / "¿Qué existencia eterna construirás en tu camino?" — preserved the contemplative cadence in all three
+- Book metaphor quote translated with care to preserve the ontology/phenomenology distinction (the verb tense difference between "exists" and "experiences" is the whole point)
+
+**Why this is a 1.17.1 not 1.18.0**: same module, additive content, 100% backward compatible, no breaking changes, no new dependencies. The version bump matches semver "minor" semantics: feature add within an existing module. The architecture and epistemic discipline established in 1.17.0 are unchanged.
+
+**Validation**:
+- JSON parity confirmed: 144 leaves × 3 locales identical
+- JSX bracket balance verified for all 4 modified files (SelfSimRealityAgent, Overview, AiAsObserver) + 1 new file (OphMechanics)
+- All `ophMechanics.*` + `overview.bookMetaphor*` + `aiAsObserver.closingQuote*` keys present in all 3 locales
+- Manual smoke (described in plan §12): expanded by 3 visual checks (Overview shows amber Book panel, OPH Mechanics tab renders with 4-step pipeline visual, AI-as-Observer ends with purple contemplative panel)
+
+---
+
 ## [1.17.0] - 2026-06-XX
 
 ### Added — Self-Simulating Reality Agent · V0 (philosophical-scientific companion)

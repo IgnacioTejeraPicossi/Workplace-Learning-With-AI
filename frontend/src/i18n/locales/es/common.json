@@ -430,6 +430,7 @@
     "tabs": {
       "overview": "Resumen",
       "concepts": "Conceptos clave",
+      "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
       "aiAsObserver": "IA como observador",
       "roadmap": "Hoja de ruta y fuentes"
@@ -452,7 +453,39 @@
         "metaphorDesc": "Encuadre metafórico o espiritual — útil para la intuición, no como prueba."
       },
       "ruleTitle": "La regla central",
-      "ruleBody": "El agente nunca dice 'esto es verdad.' Dice 'esto pertenece al nivel de evidencia X.' Cualquier afirmación tipo 'la conciencia crea el universo' debe reformularse y etiquetarse antes de salir de la boca del agente."
+      "ruleBody": "El agente nunca dice 'esto es verdad.' Dice 'esto pertenece al nivel de evidencia X.' Cualquier afirmación tipo 'la conciencia crea el universo' debe reformularse y etiquetarse antes de salir de la boca del agente.",
+      "bookMetaphorTitle": "Bomba de intuición: El Libro",
+      "bookMetaphorQuote": "El libro simplemente existe… un personaje experimenta la historia como una secuencia de eventos.",
+      "bookMetaphorBody": "Metáfora útil para la tesis central de OPH: el universo (el libro) existe como estructura estática, mientras los observadores (personajes dentro) experimentan secuencia y tiempo. Separa ontología de fenomenología con claridad.",
+      "bookMetaphorLevel": "metaphor"
+    },
+    "ophMechanics": {
+      "intro": "El corazón de OPH no es solo «los observadores importan» — es un proceso específico de cuatro pasos para que los parches subjetivos generen realidad pública. Esta pestaña recorre el problema que resuelve, el mecanismo que propone, el algoritmo que especifica y el encuadre matemático que une todo.",
+      "sections": {
+        "strangeLoopTitle": "El problema — Capacidad del Strange Loop",
+        "strangeLoopQuote": "¿Cómo se cierra el Strange Loop sin exceder la capacidad?",
+        "strangeLoopBody": "Los strange loops de Hofstadter son estructuras auto‑referenciales en las que moverse «hacia arriba» por niveles jerárquicos eventualmente regresa al inicio. Si el universo se simula a sí mismo, la recursión ingenua exige capacidad computacional infinita. La tarea de OPH: cerrar el bucle sin re‑ejecutar todo.",
+        "strangeLoopLevel": "speculative",
+        "overlapTitle": "El mecanismo — Sincronización de solapamiento",
+        "overlapQuote": "Los parches de observador solapados comparan descripciones y las llevan a acuerdo donde se encuentran.",
+        "overlapBody": "Cada parche ve una descripción local. Donde dos parches se solapan, sus descripciones deben coincidir — y el desacuerdo dispara negociación. Así genera la experiencia subjetiva una física objetiva: no por autoridad global, sino por consenso local donde los mundos se tocan.",
+        "overlapLevel": "speculative",
+        "pipelineTitle": "El algoritmo — Tubería de creación de hechos",
+        "pipelineBody": "OPH especifica el mecanismo de consenso como una tubería distribuida de cuatro pasos. Cada paso tiene un rol concreto; la tubería corre en paralelo a través de todos los parches solapados hasta que emerge un hecho público estable.",
+        "pipelineLevel": "speculative",
+        "pipelineStep1Title": "Patrón local",
+        "pipelineStep1Body": "Aparece un patrón local en un parche.",
+        "pipelineStep2Title": "Comparar",
+        "pipelineStep2Body": "Los solapamientos se comparan entre parches.",
+        "pipelineStep3Title": "Reparar",
+        "pipelineStep3Body": "Los desacuerdos se reparan.",
+        "pipelineStep4Title": "Hecho público",
+        "pipelineStep4Body": "El proceso se estabiliza y emerge un hecho público.",
+        "fixedPointTitle": "La resolución — Realidad como punto fijo",
+        "fixedPointQuote": "La realidad es una estructura de punto fijo, y la experiencia es el proceso de atravesarla.",
+        "fixedPointBody": "Respuesta de OPH al problema de capacidad del Strange Loop: la realidad no se re‑ejecuta, es un punto fijo. Un punto fijo en matemáticas es un valor f(x) = x — una estructura que se produce a sí misma cuando se le aplica su regla. La experiencia no es crear el mundo paso a paso; es atravesar una estructura de punto fijo pre‑existente. Esto es lo que «el libro simplemente existe» significa formalmente.",
+        "fixedPointLevel": "speculative"
+      }
     },
     "concepts": {
       "intro": "Cinco ideas centrales extraídas directamente de la presentación de Observer Patch Holography (las capturas que aportaste). Cada concepto se muestra con su etiqueta epistémica de nivel de fuente.",
@@ -535,7 +568,9 @@
         "q5Level": "philosophy"
       },
       "warningTitle": "Advertencia epistémica",
-      "warningBody": "Todo en esta pestaña es metáfora o filosofía, no ciencia. El agente hace lo que hace la buena filosofía: extiende un marco para ver qué predice y dónde se rompe. Trátalo como herramienta de pensamiento, no como declaración de postura."
+      "warningBody": "Todo en esta pestaña es metáfora o filosofía, no ciencia. El agente hace lo que hace la buena filosofía: extiende un marco para ver qué predice y dónde se rompe. Trátalo como herramienta de pensamiento, no como declaración de postura.",
+      "closingQuoteTitle": "Pregunta de cierre de la presentación",
+      "closingQuote": "¿Qué existencia eterna construirás en tu camino?"
     },
     "roadmap": {
       "intro": "V0 entrega el material de lectura. El agente completo (RAG + Mongo + clasificador epistémico + analizador de afirmaciones + red‑team) llega en V1+.",
