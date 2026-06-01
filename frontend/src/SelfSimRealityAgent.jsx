@@ -5,6 +5,7 @@ import CoreConcepts from './self-sim-reality/CoreConcepts';
 import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
 import AiAsObserver from './self-sim-reality/AiAsObserver';
+import SubstrateQuestion from './self-sim-reality/SubstrateQuestion';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
 
 /**
@@ -37,23 +38,25 @@ const SelfSimRealityAgent = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview',      label: t('selfSimReality.tabs.overview'),      icon: '🎯' },
-    { id: 'concepts',      label: t('selfSimReality.tabs.concepts'),      icon: '📚' },
-    { id: 'ophMechanics',  label: t('selfSimReality.tabs.ophMechanics'),  icon: '⚙️' },
-    { id: 'theoryTour',    label: t('selfSimReality.tabs.theoryTour'),    icon: '🧭' },
-    { id: 'aiAsObserver',  label: t('selfSimReality.tabs.aiAsObserver'),  icon: '🧠' },
-    { id: 'roadmap',       label: t('selfSimReality.tabs.roadmap'),       icon: '🗺️' },
+    { id: 'overview',          label: t('selfSimReality.tabs.overview'),          icon: '🎯' },
+    { id: 'concepts',          label: t('selfSimReality.tabs.concepts'),          icon: '📚' },
+    { id: 'ophMechanics',      label: t('selfSimReality.tabs.ophMechanics'),      icon: '⚙️' },
+    { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
+    { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
+    { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
+    { id: 'roadmap',           label: t('selfSimReality.tabs.roadmap'),           icon: '🗺️' },
   ];
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'overview':     return <Overview />;
-      case 'concepts':     return <CoreConcepts />;
-      case 'ophMechanics': return <OphMechanics />;
-      case 'theoryTour':   return <TheoryTour />;
-      case 'aiAsObserver': return <AiAsObserver />;
-      case 'roadmap':      return <RoadmapAndSources />;
-      default:             return <Overview />;
+      case 'overview':          return <Overview />;
+      case 'concepts':          return <CoreConcepts />;
+      case 'ophMechanics':      return <OphMechanics />;
+      case 'theoryTour':        return <TheoryTour />;
+      case 'aiAsObserver':      return <AiAsObserver />;
+      case 'substrateQuestion': return <SubstrateQuestion />;
+      case 'roadmap':           return <RoadmapAndSources />;
+      default:                  return <Overview />;
     }
   };
 

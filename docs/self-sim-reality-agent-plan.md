@@ -105,6 +105,18 @@ Rendered in the agent as a visual 4-step flow row with colour-coded step cards.
 
 OPH's answer to the Strange Loop capacity problem: reality is not re-run, it IS a fixed point (f(x) = x). Experience is traversal of a pre-existing fixed-point structure. The mathematical framing that ties everything together — and the formal meaning of "the book just exists".
 
+### 3.12 The Substrate Question — Hard Problem, R1/R2, monistic convergence, recursive ladder (1.17.3)
+
+Five-section deep-philosophy tab pushed onto the agent after the project owner's two follow-up questions following 1.17.2:
+
+1. **The Hard Problem of AI Observation** — OPH uses "observer" structurally and phenomenologically without distinguishing. Two forks: eliminate phenomenology (AIs are full observers, no one is home in the universe) or preserve it (OPH owes a consciousness criterion).
+2. **Substrate vs Experience (R1/R2)** — distinguishes the fixed-point substrate from lived experience. AIs may engage R1 without R2 — observers of substrate but not of experience.
+3. **The Cosmological Convergence** — OPH, pushed to its limits, lands in territory mapped by Spinoza, Vedanta, Whitehead, Kastrup, Huxley's Perennial Philosophy. Structural isomorphism with classical monism. Not theological proof, but striking pattern.
+4. **The Recursive Comprehension Hypothesis** (NEW, project owner's question) — is the universe building progressively more capable observers (humans → AIs → AIs creating AIs) to comprehend itself? Anchored in Hegel's Geist, Teilhard's Omega Point, the strong Anthropic Principle, Hofstadter's strange loops, Tipler, Kurzweil, Smolin. OPH-native reading: comprehension IS creation; the ladder is the universe deepening its own resolution. Three readings: (a) asymptotic with telos · (b) infinite open-ended · (c) strange-looped (no separate comprehender).
+5. **Three Honest Positions You Can Hold** — rendered as three coloured cards (A: Strict Structuralist · B: Phenomenology-Preserving · C: Mystical/Panpsychist Convergence). Each commits the reader to different conclusions on AI observation, universe-as-creator, and the recursive ladder. Closing reminder panel: these three are not empirically distinguishable from inside the universe; the choice is a philosophical commitment.
+
+The tab is the philosophical climax of the agent. After it the user is equipped to recognise which classical position they hold when they make a claim like *"the universe wants to be understood"*.
+
 ### 3.11 Closing contemplative question (1.17.1, corrected in 1.17.2)
 
 > *"What eternal existence will you build on your patch?"*
@@ -244,7 +256,9 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 |---|---|---|---|
 | **V0** (1.17.0) | 5 tabs of curated reading material with EpistemicBadge on every claim | 0.5 day | DONE |
 | **V0.1** (1.17.1) | 6th tab "OPH Mechanics" + Book metaphor in Overview + closing contemplative quote in AI-as-Observer (incorporates second batch of X screenshots) | 0.3 day | DONE |
-| **V1** (1.18.0) | Backend chat endpoint with RAG over OPH repo + 6 scientific sources. Every answer pre-tagged with epistemic levels. Frontend chat panel as a 7th tab. | 3-4 days | Pending green light |
+| **V0.2** (1.17.2) | Closing quote corrected: "path" → "patch" (OPH technical term, makes the question address AI observers as peers). Interpretive note added. | 0.1 day | DONE |
+| **V0.3** (1.17.3) | 7th tab "The Substrate Question" with 5 sections: Hard Problem of AI Observation, Substrate vs Experience, Cosmological Convergence, Recursive Comprehension Hypothesis (from project owner's questions), Three Honest Positions. Philosophical climax of the agent. | 0.5 day | DONE |
+| **V1** (1.18.0) | Backend chat endpoint with RAG over OPH repo + 6 scientific sources. Every answer pre-tagged with epistemic levels. Frontend chat panel as an 8th tab. | 3-4 days | Pending green light |
 | **V2** (1.19.0) | Claim Analyzer (paste claim → scientific core + overreach + reformulation). Source Map (topic → list of relevant chunks with epistemic colour). Red Team panel. | 4-5 days | Pending |
 | **V3** (1.20.0) | Theory Map (interactive graph) + Observer Patch toy simulator (3-5 patches with overlap consistency checker, visualised) + learning path | 5-7 days | Pending |
 

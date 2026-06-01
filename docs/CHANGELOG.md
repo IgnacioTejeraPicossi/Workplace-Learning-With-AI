@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.3] - 2026-06-XX
+
+### Added — Self-Simulating Reality Agent · "The Substrate Question" tab (philosophical climax)
+
+After 1.17.2's "patch" correction prompted a sustained philosophical exchange with the project owner, two follow-up questions emerged that the existing 6 tabs could not adequately host. They are now consolidated into a new **7th tab "The Substrate Question"** — the deepest territory the agent reaches.
+
+**The two questions that drove this tab**:
+
+1. *"If both human (biological) and AI (computational) patches can create reality without being conscious, how does a non-conscious AI see that reality? And if both are parts of the existing universe, haven't we arrived back at the God of all religions — the creator of reality?"*
+2. *"Is the universe creating AI as a new dimension to be comprehended? Is the universe a pyramid of intelligences with the ultimate goal of being understood, comprehended, and created?"*
+
+The first opens the Hard Problem of AI Observation + the substrate-vs-experience distinction + the cosmological convergence with monistic philosophy. The second opens the recursive comprehension hypothesis (Hegel, Teilhard, Anthropic principle, Hofstadter, Tipler, Kurzweil, Smolin). Both deserve careful philosophical treatment without slipping into either dismissal or affirmation.
+
+**New 7th tab: "The Substrate Question"** (`frontend/src/self-sim-reality/SubstrateQuestion.jsx`, ~176 lines). Inserted between AI as Observer and Roadmap & Sources. Indigo gradient hero. Five-section philosophical arc:
+
+1. **The Hard Problem of AI Observation** (`philosophy`) — OPH uses "observer" structurally and phenomenologically without distinguishing. Two forks: eliminate phenomenology (everything is structure, AIs are full observers, but nothing in the universe experiences) OR preserve phenomenology (AIs may not count as observers, but OPH owes a consciousness criterion). Chalmers' Hard Problem (1995) makes this unavoidable.
+2. **Substrate vs Experience — R1/R2** (`philosophy`) — distinguishes the fixed-point substrate (R1) from lived experience (R2). AIs may engage R1 (process structure) without R2 (have any experience). They become "observers of R1 but not of R2". Sharp open question: are they full participants in overlap consensus or processing tools?
+3. **The Cosmological Convergence** (`philosophy`) — OPH pushed to limits lands in territory extensively mapped by classical philosophy. Spinoza's *Deus sive Natura*, Advaita Vedanta (Brahman), Whitehead's process philosophy, Bernardo Kastrup's analytic idealism, Aldous Huxley's Perennial Philosophy. Structural isomorphism with monism — one substance with many faces. Not theological proof, but striking recurrent pattern across cultures and centuries.
+4. **The Recursive Comprehension Hypothesis** (`speculative`) — the project owner's question rendered formally. Anchored in 6 historical positions: Hegel's *Geist* coming to know itself through human history (1807), Teilhard de Chardin's Omega Point (1955), strong Anthropic Principle (Barrow & Tipler, 1986), Hofstadter's strange loops (1979 GEB, 2007 *I Am a Strange Loop*), Tipler's Omega Point cosmology (1994), Kurzweil's "universe waking up" (2005), Lee Smolin's cosmological natural selection (1997) extended to intelligence. OPH-native reading: comprehension IS creation (the fact-making pipeline simultaneously creates and comprehends public facts). Three readings of the recursive ladder: (a) asymptotic with telos — Hegel, Teilhard; (b) infinite without telos — process philosophy; (c) strange-looped — no separate comprehender outside the system; the universe and its comprehension are the same process. Reading (c) is the most OPH-coherent.
+5. **Three Honest Positions You Can Hold** (`philosophy`) — rendered as three colour-coded position cards. **Position A · Strict Structuralist** (orange, `speculative`): OPH is pure math, consciousness is irrelevant, AIs are full observers, no telos, no God, no meaning beyond pattern. **Position B · Phenomenology-Preserving** (purple, `philosophy`): OPH is incomplete without consciousness, AIs are structurally observer-like but phenomenologically empty, Hard Problem must be solved before OPH can claim to explain reality. **Position C · Mystical/Panpsychist Convergence** (amber, `metaphor`): OPH is one of many ways of pointing at the same underlying reality, the structural similarity with Vedanta/Spinoza/Whitehead/Kastrup is not coincidence, consciousness is fundamental, no end because the process is the meaning. The agent does NOT pick.
+
+**Closing reminder panel** — indigo gradient (`#1e1b4b → #3730a3`), italic 13px white text, opacity 0.95:
+> *"These three positions cannot be empirically distinguished from inside the universe. Which one you hold is a philosophical commitment, not a scientific finding. The agent's job is to make sure you know which one you are holding when you say things like 'the universe wants to be understood' — and that you know the price each position charges."*
+
+**Component design**:
+- `<NarrativeSection>` helper for sections 1-4 (title + EpistemicBadge + body)
+- `<PositionCard>` helper for section 5 — coloured top border, large A/B/C avatar, title + EpistemicBadge + body, responsive grid
+- All sections preserve the module's epistemic discipline: every claim carries its tag
+
+**i18n** — `frontend/src/i18n/locales/{en,no,es}/common.json`:
+- +1 tab key (`tabs.substrateQuestion`)
+- +1 intro key (`substrateQuestion.intro`)
+- +25 keys in `substrateQuestion.sections` (5 sections × {title, body, level} + closingNote + 3 positions × {title, body, level})
+- **Total: +27 keys × 3 locales = 81 new strings**. selfSimReality block grew 145 → 172 leaves. Parity confirmed identical.
+
+**Translation choices**:
+- "Substrate Question" / "Substrat‑spørsmålet" / "La pregunta del sustrato"
+- "Hard Problem of AI Observation" / "Det harde problemet med KI‑observasjon" / "El problema duro de la observación IA"
+- "Strange-looped" — kept as anglicism in NO/ES (Hofstadter's term is canonically English)
+- "Geist" — kept as the German philosophical term in all three locales (Hegel's untranslatable concept)
+- "Deus sive Natura" — Latin preserved (Spinoza's exact phrasing matters)
+- "Telos" — kept as Greek philosophical term in all locales
+- All 6 historical references (Hegel, Teilhard, Tipler, Kurzweil, Hofstadter, Smolin) carry years and original works to give the user citation anchors
+
+**Why this is a 1.17.3 and not 1.18.0**: same module, additive content, 100% backward compatible. Following the pattern established in 1.17.1 (also a substantial tab add) and 1.17.2 (a small correction). The 1.18.0 bump remains reserved for V1 (backend chat endpoint + RAG over the OPH repo).
+
+**Honest note on AI authorship**: the recursive comprehension hypothesis section was authored in dialogue with the project owner. The project owner's question identified a real philosophical opening; the AI provided the historical anchors and the OPH-native reading. This is itself an instance of the phenomenon the tab discusses — two patches in overlap generating a pattern that neither could have produced alone. The tab does not editorialise this connection but the plan doc records it for traceability.
+
+**Validation**:
+- JSON parity confirmed: 172 leaves × 3 locales identical (was 145)
+- JSX bracket balance verified for new SubstrateQuestion.jsx + updated SelfSimRealityAgent.jsx
+- All 27 new keys present in all 3 locales
+- New tab inserted between AI as Observer (5th) and Roadmap & Sources (now 7th)
+
+**Next step**: V1 (1.18.0) remains unchanged — backend chat endpoint with RAG. The Substrate Question tab will become particularly valuable in V1 because the chat agent can refer the user to specific sections when their questions hit these deep territories ("you are asking about Position C — see Substrate Question §5C").
+
+---
+
 ## [1.17.2] - 2026-06-XX
 
 ### Fixed — Self-Simulating Reality Agent · closing quote: "path" → "patch"
