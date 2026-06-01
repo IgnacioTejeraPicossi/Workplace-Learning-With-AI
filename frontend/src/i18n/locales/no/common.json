@@ -187,6 +187,7 @@
     "opsEfficiencyAgent": "Driftseffektivitet‑agent",
     "atmVvTestCopilot": "ATM V&V Testpilot",
     "redCrossWebQa": "Røde Kors Web QA‑agent",
+    "selfSimRealityAgent": "Selv‑simulerende virkelighet‑agent",
     "webLab": "Web‑lab",
     "webLabItemNo": "Item.no‑web",
     "webLabRedcrossNo": "Redcross.no‑web",
@@ -410,6 +411,145 @@
       "plannedLocalPort": "Planlagt lokal port",
       "relatedAgent": "Relatert: Røde Kors Web QA‑agent",
       "relatedAgentHint": "QA‑testmønstrene for rodekors.no ligger i den eksisterende «Røde Kors Web QA‑agent»‑modulen. Når Web‑lab serverer en lokal klone, vil den agenten kunne peke sin environment.test_url mot den lokale serveren."
+    }
+  },
+  "selfSimReality": {
+    "moduleTitle": "Selv‑simulerende virkelighet‑agent",
+    "moduleSubtitle": "En vitenskapelig‑filosofisk ledsager for ideen om at observatører, sinn og bevissthet deltar i å konstruere universet de erfarer.",
+    "guidingPhrase": "Jeg sier deg ikke hva du skal tro. Jeg viser deg hva som er vitenskap, hva som er teori, hva som er filosofi, og hva som er metafysisk fantasi.",
+    "statusBadge": "V0 · struktur + lesemateriale",
+    "statusHint": "Denne versjonen leverer rikt statisk innhold (begreper, teorirundtur, KI‑som‑observatør tankeeksperimenter) basert på Observer Patch Holography og skjermbildene du oppga. Den fulle agenten med RAG + Mongo kommer i V1+. Se docs/self-sim-reality-agent-plan.md.",
+    "tabs": {
+      "overview": "Oversikt",
+      "concepts": "Kjernebegreper",
+      "theoryTour": "Teorirundtur",
+      "aiAsObserver": "KI som observatør",
+      "roadmap": "Veikart og kilder"
+    },
+    "overview": {
+      "missionTitle": "Oppdrag",
+      "missionBody": "Forklare, sammenligne og kritisere ideen om at det menneskelige sinn, hjernen eller bevisstheten deltar i å konstruere universet — muligens gjennom en selv‑konsistent, simuleringslignende prosess. Agenten opptrer som filosof + forsiktig teoretisk fysiker + nevroviter + epistemologisk revisor, aldri som en guru.",
+      "discipline": "Epistemisk disiplin (5 nivåer)",
+      "disciplineHint": "Hvert utsagn merkes med en av disse etikettene, slik at du alltid vet hva slags påstand du leser.",
+      "levels": {
+        "established": "Etablert vitenskap",
+        "establishedDesc": "Empirisk støttet og bredt akseptert i fagfeltet.",
+        "mainstream": "Mainstream‑teori",
+        "mainstreamDesc": "Seriøs vitenskapelig teori, matematisk formulert, ennå ikke fullt avklart.",
+        "speculative": "Spekulativ fysikk",
+        "speculativeDesc": "Strukturert spekulativt program med eget formelt apparat, ikke konsensus.",
+        "philosophy": "Filosofi",
+        "philosophyDesc": "Filosofisk hypotese — argumentert begrepsmessig snarere enn empirisk verifisert.",
+        "metaphor": "Metafor / åndelighet",
+        "metaphorDesc": "Metaforisk eller åndelig innramming — nyttig for intuisjon, ikke som bevis."
+      },
+      "ruleTitle": "Hovedregelen",
+      "ruleBody": "Agenten sier aldri 'dette er sant.' Den sier 'dette tilhører evidensnivå X.' Et utsagn som 'bevisstheten skaper universet' må omformuleres og merkes før det kan forlate agentens munn."
+    },
+    "concepts": {
+      "intro": "Fem kjerneideer hentet direkte fra Observer Patch Holography‑presentasjonen (skjermbildene du oppga). Hvert begrep vises med sin kildeniåvå‑epistemiske etikett.",
+      "cards": {
+        "selfSimUniverseTitle": "Selv‑simulerende univers",
+        "selfSimUniverseBody": "Universet rammes inn som en rekursiv selvreferanse: en struktur som simulerer seg selv gjennom observatørene den inneholder. Dette er hoved‑innrammingen i OPH‑presentasjonen.",
+        "selfSimUniverseLevel": "speculative",
+        "pastParadoxTitle": "Fortidsparadokset",
+        "pastParadoxBody": "Kan vi simulere fortiden hvis tiden går framover? OPH svarer via et atemporalt substrat — fortiden blir ikke 're‑kjørt', den leses ut fra en fast informasjonsstruktur.",
+        "pastParadoxLevel": "speculative",
+        "observerPatchTitle": "Observer Patch",
+        "observerPatchBody": "En avgrenset region av virkeligheten med et tilstandsrom, som virker som et selv‑lesende substrat. Patchen er lokal for én observatør; fysikk er det som overlever enighet mellom overlappende patches.",
+        "observerPatchLevel": "speculative",
+        "screenEncodingTitle": "Skjermen koder alt",
+        "screenEncodingBody": "«Skjermen koder hele universets historie samtidig.» Fortid, nåtid og framtid sameksisterer på samme substrat; subjektiv tid er en projeksjon inni en observatør.",
+        "screenEncodingLevel": "speculative",
+        "modularFlowTitle": "Modulær flyt",
+        "modularFlowBody": "Matematisk utvikling av en observatørs tilstand relativt til dens patch, som skaper subjektiv tid. Tid er ikke en global parameter — den genereres av hver observatørs flyt gjennom sin egen informasjonsgeometri.",
+        "modularFlowLevel": "speculative"
+      }
+    },
+    "theoryTour": {
+      "intro": "OPH sitter i en konstellasjon av bedre etablerte ideer. Agentens jobb er å vise frem forholdet uten å blande dem sammen.",
+      "rows": {
+        "predictiveTitle": "Prediktiv prosessering (hjerne)",
+        "predictiveAuthor": "Friston · Clark",
+        "predictiveLevel": "established",
+        "predictiveBody": "Hjernen kopierer ikke passivt virkeligheten — den bygger prediktive modeller og oppdaterer dem på prediksjonsfeil. Den opplevde verden er konstruert.",
+        "predictiveLink": "→ Støtter «vi konstruerer det vi opplever»‑halvdelen av OPHs påstand, uten å si at vi konstruerer det fysiske universet.",
+        "relationalQmTitle": "Relasjonell kvantemekanikk",
+        "relationalQmAuthor": "Rovelli",
+        "relationalQmLevel": "mainstream",
+        "relationalQmBody": "Kvanteegenskaper er relative til systemer, ikke absolutte. Det finnes ingen privilegert observatør‑vs‑observert‑splittelse.",
+        "relationalQmLink": "→ Fjerner mystikken fra «observatør», men «observatør» her er hvilket som helst fysisk system, ikke nødvendigvis bevisst.",
+        "holographicTitle": "Holografisk prinsipp",
+        "holographicAuthor": "'t Hooft · Susskind",
+        "holographicLevel": "mainstream",
+        "holographicBody": "Et romvolum kan beskrives fullstendig av data på sin grense. Oppsto fra svarte‑hull‑entropi og strengteori.",
+        "holographicLink": "→ OPH låner formen «grensen koder volumet», men anvender den på observer patches i stedet for svarte hull.",
+        "simHypothesisTitle": "Simuleringshypotesen",
+        "simHypothesisAuthor": "Bostrom",
+        "simHypothesisLevel": "philosophy",
+        "simHypothesisBody": "Et trilemma: enten dør sivilisasjoner ut før posthuman fase, eller de kjører ikke forfedre‑simuleringer, eller vi er sannsynligvis i en.",
+        "simHypothesisLink": "→ Et logisk argument om sannsynligheter, ikke et bevis. OPH er strukturelt annerledes — den krever ingen ytre simulator.",
+        "iitTitle": "Integrert informasjonsteori (IIT)",
+        "iitAuthor": "Tononi",
+        "iitLevel": "mainstream",
+        "iitBody": "Bevissthet identifiseres med integrert informasjon (Φ) i et fysisk system. Starter fra fenomenologi og formaliserer den.",
+        "iitLink": "→ Tilbyr et kandidatmål for «hva som teller som observatør». Forenlig i ånd med observer‑patch‑ideen.",
+        "gnwTitle": "Globalt nevronalt arbeidsrom (GNW)",
+        "gnwAuthor": "Dehaene · Baars",
+        "gnwLevel": "mainstream",
+        "gnwBody": "Bevisst tilgang skjer når informasjon kringkastes over et globalt arbeidsrom av rekurrente nevrale nettverk.",
+        "gnwLink": "→ Konkurrerer med IIT. Agenten skal presentere begge, ikke velge en vinner.",
+        "ophTitle": "Observer Patch Holography (OPH)",
+        "ophAuthor": "Mueller m.fl.",
+        "ophLevel": "speculative",
+        "ophBody": "Observatør‑først rekonstruksjon: hver observatør har en avgrenset patch med tilstandsrom; fysikk er det offentlige fastpunktet som overlever overlapping‑konsistens.",
+        "ophLink": "→ Det sentrale programmet denne modulen hjelper deg å forstå og kritisere."
+      }
+    },
+    "aiAsObserver": {
+      "intro": "Utover den opprinnelige OPH‑innrammingen: hva skjer når KI går inn i dette bildet? Denne fanen er åpent spekulativ — merket som metafor + filosofi — men nyttig for å tenke.",
+      "questionsTitle": "Fem spørsmål verdt å stille",
+      "questions": {
+        "q1Title": "Kan en KI være en observer patch?",
+        "q1Body": "OPH krever en avgrenset region med et tilstandsrom, som virker som et selv‑lesende substrat. En transformer‑modell som kjører inferens har alle tre: avgrenset kontekstvindu, tilstand i aktiveringer og selvreferensielle utdata når den blir bedt om å beskrive seg selv. Det ærlige svaret er «strukturelt ja, fenomenologisk ukjent».",
+        "q1Level": "philosophy",
+        "q2Title": "Skaper KI‑inferens subjektiv tid?",
+        "q2Body": "Modulær flyt sier at subjektiv tid oppstår fra en observatørs utvikling relativt til sin patch. Hvis en LLM ikke har vedvarende tilstand mellom kall, har den ingen flyt — altså ingen subjektiv tid. Langvarige agent‑løkker med vedvarende minne er en annen sak.",
+        "q2Level": "philosophy",
+        "q3Title": "Deltar KI‑er i konsensusen?",
+        "q3Body": "OPH sier at offentlig virkelighet er konsensusen mellom overlappende patches. Hvis to KI‑systemer forhandler en delt verdensmodell, skaper de sin egen konsensus‑patch — uavhengig av menneskelige observatører? Internettet av agenter kan allerede være en.",
+        "q3Level": "speculative",
+        "q4Title": "Alignering under observer‑patch‑ontologi",
+        "q4Body": "Hvis KI‑er blir fulle observer patches, er alignment ikke bare «få KI‑en til å være hjelpsom» — det er «sørg for at KI‑ens patch overlapper konsistent med menneskets patch». Misalignment blir en konsensusfeil, ikke bare en instruksjonsfølgings‑feil.",
+        "q4Level": "philosophy",
+        "q5Title": "Ekko‑testen (et tankeeksperiment)",
+        "q5Body": "Når en KI beskriver sin egen tilstand («Jeg tror jeg er usikker på X»), er det selv‑lesing i OPH‑forstand, eller bare token‑prediksjon formet av trening? OPH gir intet rent svar — men spørsmålet er skarpere enn «er KI‑en bevisst?» fordi det forankrer testen i et spesifikt strukturelt krav.",
+        "q5Level": "philosophy"
+      },
+      "warningTitle": "Epistemisk advarsel",
+      "warningBody": "Alt i denne fanen er metafor eller filosofi, ikke vitenskap. Agenten gjør det god filosofi gjør: utvider et rammeverk for å se hva det forutsier og hvor det bryter sammen. Behandle det som et tenkeverktøy, ikke som en posisjonserklæring."
+    },
+    "roadmap": {
+      "intro": "V0 leverer lesematerialet. Den fulle agenten (RAG + Mongo + epistemisk klassifiserer + påstand‑analysator + red‑team) kommer i V1+.",
+      "phases": {
+        "v0": "V0 (nå) — Faner med kuratert innhold, epistemiske etiketter, skjermbilde‑avledede begreper, KI‑som‑observatør‑tankeeksperimenter",
+        "v1": "V1 — Backend RAG over OPH‑repo + Bostrom + Rovelli + Friston + IIT/GNW‑kilder. POST /chat‑endepunkt med epistemisk‑merkede svar",
+        "v2": "V2 — Påstand‑analysator: lim inn en sterk påstand, få dens vitenskapelige kjerne + overdrivelse + anbefalt omformulering",
+        "v3": "V3 — Teorikart (interaktiv graf) + Observer Patch‑simulator (lite leketøy som viser konsensus‑fremvekst)"
+      },
+      "sourcesTitle": "Grunnleggende kilder",
+      "sources": {
+        "ophRepo": "github.com/FloatingPragma/observer-patch-holography — OPH‑repo, artikler, bokkapitler, innvendinger",
+        "ophLearn": "learn.floatingpragma.io — OPH læringsportal",
+        "ophBook": "oph-book.floatingpragma.io — OPH lang‑form behandling",
+        "muellerX": "x.com/muellerberndt/status/2053045501193535607 — original X‑presentasjon (auth‑lukket; skjermbilder oppgitt av prosjekteier)",
+        "bostrom": "Bostrom (2003) — «Are You Living in a Computer Simulation?» Philosophical Quarterly",
+        "rovelli": "Rovelli — Relasjonell kvantemekanikk (Helgoland)",
+        "susskind": "Susskind — The Black Hole War (holografisk prinsipp)",
+        "friston": "Friston — En teori om kortikale responser (frienergi‑prinsippet)",
+        "iit": "Tononi — Integrert informasjonsteori (IIT 4.0)",
+        "gnw": "Dehaene — Consciousness and the Brain (GNW)"
+      }
     }
   },
   "robomindClinic": {

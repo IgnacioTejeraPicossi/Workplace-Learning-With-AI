@@ -134,7 +134,8 @@ const getNavItems = (t) => [
     { key: "council-agent", label: t('sidebar.councilAgent'), icon: "users" },
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" },
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
-    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" }
+    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" },
+    { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" }
   ]},
 
   // Web Lab (1.16.0, 2026-05-29) — separate module hosting LOCAL CLONES of

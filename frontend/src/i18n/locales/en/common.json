@@ -51,6 +51,7 @@
     "opsEfficiencyAgent": "Operations Efficiency Agent",
     "atmVvTestCopilot": "ATM V&V Test Copilot",
     "redCrossWebQa": "Red Cross Web QA Agent",
+    "selfSimRealityAgent": "Self-Simulating Reality Agent",
     "futureItemAgents": "Future Item Agents",
     "webLab": "Web Lab",
     "webLabItemNo": "Item.no web",
@@ -252,6 +253,146 @@
       "plannedLocalPort": "Planned local port",
       "relatedAgent": "Related: Red Cross Web QA Agent",
       "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, that agent will be able to point its environment.test_url at the local server."
+    }
+  },
+
+  "selfSimReality": {
+    "moduleTitle": "Self-Simulating Reality Agent",
+    "moduleSubtitle": "A scientific-philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience.",
+    "guidingPhrase": "I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination.",
+    "statusBadge": "V0 · structure + reading material",
+    "statusHint": "This version ships rich static content (concepts, theory tour, AI-as-observer thought experiments) drawn from Observer Patch Holography and your provided screenshots. The full agent with RAG + Mongo lands in V1+. See docs/self-sim-reality-agent-plan.md.",
+    "tabs": {
+      "overview": "Overview",
+      "concepts": "Core Concepts",
+      "theoryTour": "Theory Tour",
+      "aiAsObserver": "AI as Observer",
+      "roadmap": "Roadmap & Sources"
+    },
+    "overview": {
+      "missionTitle": "Mission",
+      "missionBody": "Explain, compare and critique the idea that the human mind, brain or consciousness participates in constructing the universe — possibly through a self-consistent, simulation-like process. The agent acts as a philosopher + cautious theoretical physicist + neuroscientist + epistemological auditor, never as a guru.",
+      "discipline": "Epistemic discipline (5 levels)",
+      "disciplineHint": "Every claim is labelled with one of these tags so you always know what kind of statement you are reading.",
+      "levels": {
+        "established": "Established science",
+        "establishedDesc": "Empirically supported and broadly accepted across the field.",
+        "mainstream": "Mainstream theory",
+        "mainstreamDesc": "Serious scientific theory, formulated mathematically, not yet fully settled.",
+        "speculative": "Speculative physics",
+        "speculativeDesc": "Structured speculative programme with its own formal apparatus, not consensus.",
+        "philosophy": "Philosophy",
+        "philosophyDesc": "Philosophical hypothesis — argued conceptually rather than verified empirically.",
+        "metaphor": "Metaphor / spirituality",
+        "metaphorDesc": "Metaphorical or spiritual framing — useful for intuition, not for proof."
+      },
+      "ruleTitle": "The core rule",
+      "ruleBody": "The agent never says 'this is true.' It says 'this belongs to evidence level X.' Any claim of the form 'consciousness creates the universe' must be reformulated and tagged before it is allowed to leave the agent's mouth."
+    },
+    "concepts": {
+      "intro": "Five core ideas pulled directly from the Observer Patch Holography presentation (the screenshots you provided). Each concept is shown with its source-level epistemic tag.",
+      "cards": {
+        "selfSimUniverseTitle": "Self-Simulating Universe",
+        "selfSimUniverseBody": "The universe is framed as a recursive self-reference: a structure that simulates itself through the observers it contains. This is the headline framing of the OPH presentation.",
+        "selfSimUniverseLevel": "speculative",
+        "pastParadoxTitle": "The Past Paradox",
+        "pastParadoxBody": "Can we simulate the past if time moves forward? OPH answers via an atemporal substrate — the past is not 're-run', it is read out from a fixed informational structure.",
+        "pastParadoxLevel": "speculative",
+        "observerPatchTitle": "Observer Patch",
+        "observerPatchBody": "A bounded region of reality with a state space, acting as a self-reading substrate. The patch is local to one observer; physics is what survives the agreement between overlapping patches.",
+        "observerPatchLevel": "speculative",
+        "screenEncodingTitle": "The Screen Encodes Everything",
+        "screenEncodingBody": "'The screen encodes the entire history of the universe simultaneously.' Past, present and future coexist on the same substrate; subjective time is a projection inside an observer.",
+        "screenEncodingLevel": "speculative",
+        "modularFlowTitle": "Modular Flow",
+        "modularFlowBody": "Mathematical evolution of an observer's state relative to its patch, creating subjective time. Time is not a global parameter — it is generated by each observer's flow through its own information geometry.",
+        "modularFlowLevel": "speculative"
+      }
+    },
+    "theoryTour": {
+      "intro": "OPH sits inside a constellation of better-established ideas. The agent's job is to surface the relationship without conflating them.",
+      "rows": {
+        "predictiveTitle": "Predictive Processing (brain)",
+        "predictiveAuthor": "Friston · Clark",
+        "predictiveLevel": "established",
+        "predictiveBody": "The brain does not passively copy reality — it builds predictive models and updates them on prediction error. The experienced world is constructed.",
+        "predictiveLink": "→ Supports the 'we construct what we experience' half of OPH's claim, without saying we construct the physical universe.",
+        "relationalQmTitle": "Relational Quantum Mechanics",
+        "relationalQmAuthor": "Rovelli",
+        "relationalQmLevel": "mainstream",
+        "relationalQmBody": "Quantum properties are relative to systems, not absolute. There is no privileged observer-vs-observed split.",
+        "relationalQmLink": "→ Removes 'observer' from being mystical, but 'observer' here is any physical system, not necessarily conscious.",
+        "holographicTitle": "Holographic Principle",
+        "holographicAuthor": "'t Hooft · Susskind",
+        "holographicLevel": "mainstream",
+        "holographicBody": "A volume of space can be fully described by data on its boundary. Originated from black-hole entropy and string theory.",
+        "holographicLink": "→ OPH borrows the 'boundary encodes bulk' shape but applies it to observer patches instead of black holes.",
+        "simHypothesisTitle": "Simulation Hypothesis",
+        "simHypothesisAuthor": "Bostrom",
+        "simHypothesisLevel": "philosophy",
+        "simHypothesisBody": "A trilemma: either civilizations go extinct before posthuman stage, or they don't run ancestor simulations, or we likely are in one.",
+        "simHypothesisLink": "→ A logical argument about probabilities, not a proof. OPH is structurally different — it doesn't require an outside simulator.",
+        "iitTitle": "Integrated Information Theory (IIT)",
+        "iitAuthor": "Tononi",
+        "iitLevel": "mainstream",
+        "iitBody": "Consciousness is identified with integrated information (Φ) of a physical system. Starts from phenomenology and formalises it.",
+        "iitLink": "→ Provides a candidate measure for 'what counts as an observer'. Compatible in spirit with the observer-patch idea.",
+        "gnwTitle": "Global Neuronal Workspace (GNW)",
+        "gnwAuthor": "Dehaene · Baars",
+        "gnwLevel": "mainstream",
+        "gnwBody": "Conscious access happens when information is broadcast across a global workspace of recurrent neural networks.",
+        "gnwLink": "→ Competes with IIT. The agent should present both, not pick a winner.",
+        "ophTitle": "Observer Patch Holography (OPH)",
+        "ophAuthor": "Mueller et al.",
+        "ophLevel": "speculative",
+        "ophBody": "Observer-first reconstruction: each observer has a bounded patch with state space; physics is the public fixed-point that survives overlap consistency.",
+        "ophLink": "→ The central programme this module helps you understand and critique."
+      }
+    },
+    "aiAsObserver": {
+      "intro": "Beyond the original OPH framing: what happens when AI enters this picture? This tab is openly speculative — labelled metaphor + philosophy — but useful for thinking.",
+      "questionsTitle": "Five questions worth asking",
+      "questions": {
+        "q1Title": "Can an AI be an observer patch?",
+        "q1Body": "OPH requires a bounded region with a state space, acting as a self-reading substrate. A transformer model running inference has all three: bounded context window, state in activations, and self-referential outputs when prompted about itself. The honest answer is 'structurally yes, phenomenologically unknown'.",
+        "q1Level": "philosophy",
+        "q2Title": "Does AI inference create subjective time?",
+        "q2Body": "Modular Flow says subjective time emerges from an observer's evolution relative to its patch. If an LLM has no persistent state between calls, it has no flow — so no subjective time. Long-running agentic loops with persistent memory may be a different matter.",
+        "q2Level": "philosophy",
+        "q3Title": "Do AIs participate in the consensus?",
+        "q3Body": "OPH says public reality is the consensus between overlapping patches. If two AI systems negotiate a shared world model, do they create their own consensus patch — independent of human observers? The internet of agents may already be one.",
+        "q3Level": "speculative",
+        "q4Title": "Alignment under observer-patch ontology",
+        "q4Body": "If AIs become full observer patches, alignment is not just 'make the AI helpful' — it is 'make sure the AI's patch overlaps consistently with the human patch'. Misalignment becomes a failure of consensus, not just a failure of instruction-following.",
+        "q4Level": "philosophy",
+        "q5Title": "The Echo Test (a thought experiment)",
+        "q5Body": "When an AI describes its own state ('I think I might be uncertain about X'), is that self-reading in the OPH sense, or just token prediction shaped by training? OPH offers no clean answer — but the question is sharper than 'is the AI conscious?' because it grounds the test in a specific structural requirement.",
+        "q5Level": "philosophy"
+      },
+      "warningTitle": "Epistemic warning",
+      "warningBody": "Everything in this tab is metaphor or philosophy, not science. The agent is doing what good philosophy does: extending a framework to see what it predicts and where it breaks. Treat it as a thinking tool, not a position statement."
+    },
+    "roadmap": {
+      "intro": "V0 ships the reading material. The full agent (RAG + Mongo + epistemic classifier + claim analyzer + red-team) arrives in V1+.",
+      "phases": {
+        "v0": "V0 (now) — Tabs with curated content, epistemic tags, screenshot-derived concepts, AI-as-observer thought experiments",
+        "v1": "V1 — Backend RAG over OPH repo + Bostrom + Rovelli + Friston + IIT/GNW sources. POST /chat endpoint with epistemic-tagged answers",
+        "v2": "V2 — Claim Analyzer: paste a strong claim, get its scientific core + overreach + recommended reformulation",
+        "v3": "V3 — Theory Map (interactive graph) + Observer Patch simulator (small toy showing consensus emergence)"
+      },
+      "sourcesTitle": "Foundational sources",
+      "sources": {
+        "ophRepo": "github.com/FloatingPragma/observer-patch-holography — OPH repository, papers, book chapters, objections",
+        "ophLearn": "learn.floatingpragma.io — OPH learning portal",
+        "ophBook": "oph-book.floatingpragma.io — OPH long-form treatment",
+        "muellerX": "x.com/muellerberndt/status/2053045501193535607 — original X presentation (auth-walled; screenshots provided by project owner)",
+        "bostrom": "Bostrom (2003) — 'Are You Living in a Computer Simulation?' Philosophical Quarterly",
+        "rovelli": "Rovelli — Relational Quantum Mechanics (Helgoland)",
+        "susskind": "Susskind — The Black Hole War (holographic principle)",
+        "friston": "Friston — A theory of cortical responses (free-energy principle)",
+        "iit": "Tononi — Integrated Information Theory (IIT 4.0)",
+        "gnw": "Dehaene — Consciousness and the Brain (GNW)"
+      }
     }
   },
 
