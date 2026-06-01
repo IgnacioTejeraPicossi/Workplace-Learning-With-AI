@@ -119,7 +119,18 @@ export default function SubstrateQuestion() {
         levelKey="selfSimReality.substrateQuestion.sections.platonicLevel"
       />
 
-      {/* Section 6: Three Honest Positions (rendered as three cards) */}
+      {/* Section 6: The Linguistic Boundary (added in 1.17.5) — post-linguistic
+          knowledge; Wittgenstein → Habermas → Eco lineage + empirical realities
+          of contemporary AI (embeddings, multimodal latents, mech interp);
+          OPH extension: medium of consensus may not be language */}
+      <NarrativeSection
+        t={t}
+        titleKey="selfSimReality.substrateQuestion.sections.linguisticBoundaryTitle"
+        bodyKey="selfSimReality.substrateQuestion.sections.linguisticBoundaryBody"
+        levelKey="selfSimReality.substrateQuestion.sections.linguisticBoundaryLevel"
+      />
+
+      {/* Section 7: Three Honest Positions (rendered as three cards) */}
       <div style={panel}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
           <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
