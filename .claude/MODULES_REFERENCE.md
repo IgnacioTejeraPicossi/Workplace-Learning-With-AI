@@ -19,6 +19,7 @@
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
 | 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
 | 15 | Web Lab (1.16.0 · V0 structure only) | Active (placeholder) | None yet (V1+) | Low (V0 frontend-only) |
+| 16 | Self-Simulating Reality Agent (1.17.0 · V0 reading material) | Active (curated content) | None yet (V1+) | Low (V0 frontend-only) — philosophical/scientific companion for Observer Patch Holography; 5 tabs (Overview · Core Concepts · Theory Tour · AI as Observer · Roadmap & Sources); 113 i18n leaves × 3 locales; EpistemicBadge enforces 5-level discipline (`established/mainstream/speculative/philosophy/metaphor`). See `docs/self-sim-reality-agent-plan.md` |
 
 ---
 

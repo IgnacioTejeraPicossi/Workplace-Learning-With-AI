@@ -421,6 +421,146 @@
     }
   },
 
+  "selfSimReality": {
+    "moduleTitle": "Agente de Realidad Auto‑Simulada",
+    "moduleSubtitle": "Acompañante científico‑filosófico para la idea de que observadores, mentes y conciencia participan en la construcción del universo que experimentan.",
+    "guidingPhrase": "No te digo qué creer. Te muestro qué es ciencia, qué es teoría, qué es filosofía y qué es imaginación metafísica.",
+    "statusBadge": "V0 · estructura + material de lectura",
+    "statusHint": "Esta versión incluye contenido estático rico (conceptos, recorrido teórico, experimentos mentales IA‑como‑observador) extraído de Observer Patch Holography y de tus capturas. El agente completo con RAG + Mongo llega en V1+. Ver docs/self-sim-reality-agent-plan.md.",
+    "tabs": {
+      "overview": "Resumen",
+      "concepts": "Conceptos clave",
+      "theoryTour": "Recorrido teórico",
+      "aiAsObserver": "IA como observador",
+      "roadmap": "Hoja de ruta y fuentes"
+    },
+    "overview": {
+      "missionTitle": "Misión",
+      "missionBody": "Explicar, comparar y criticar la idea de que la mente humana, el cerebro o la conciencia participan en la construcción del universo — posiblemente mediante un proceso auto‑consistente tipo simulación. El agente actúa como filósofo + físico teórico prudente + neurocientífico + auditor epistemológico, nunca como gurú.",
+      "discipline": "Disciplina epistemológica (5 niveles)",
+      "disciplineHint": "Cada afirmación se etiqueta con una de estas marcas, así siempre sabes qué tipo de declaración estás leyendo.",
+      "levels": {
+        "established": "Ciencia establecida",
+        "establishedDesc": "Sustentada empíricamente y ampliamente aceptada en el campo.",
+        "mainstream": "Teoría mainstream",
+        "mainstreamDesc": "Teoría científica seria, formulada matemáticamente, aún no totalmente resuelta.",
+        "speculative": "Física especulativa",
+        "speculativeDesc": "Programa especulativo estructurado con su propio aparato formal, no consenso.",
+        "philosophy": "Filosofía",
+        "philosophyDesc": "Hipótesis filosófica — argumentada conceptualmente más que verificada empíricamente.",
+        "metaphor": "Metáfora / espiritualidad",
+        "metaphorDesc": "Encuadre metafórico o espiritual — útil para la intuición, no como prueba."
+      },
+      "ruleTitle": "La regla central",
+      "ruleBody": "El agente nunca dice 'esto es verdad.' Dice 'esto pertenece al nivel de evidencia X.' Cualquier afirmación tipo 'la conciencia crea el universo' debe reformularse y etiquetarse antes de salir de la boca del agente."
+    },
+    "concepts": {
+      "intro": "Cinco ideas centrales extraídas directamente de la presentación de Observer Patch Holography (las capturas que aportaste). Cada concepto se muestra con su etiqueta epistémica de nivel de fuente.",
+      "cards": {
+        "selfSimUniverseTitle": "Universo Auto‑Simulado",
+        "selfSimUniverseBody": "El universo se enmarca como una auto‑referencia recursiva: una estructura que se simula a sí misma a través de los observadores que contiene. Es el encuadre principal de la presentación OPH.",
+        "selfSimUniverseLevel": "speculative",
+        "pastParadoxTitle": "La paradoja del pasado",
+        "pastParadoxBody": "¿Podemos simular el pasado si el tiempo avanza? OPH responde mediante un sustrato atemporal — el pasado no se 're‑ejecuta', se lee desde una estructura informacional fija.",
+        "pastParadoxLevel": "speculative",
+        "observerPatchTitle": "Parche del Observador",
+        "observerPatchBody": "Una región acotada de la realidad con un espacio de estados, que actúa como sustrato auto‑lector. El parche es local a un observador; la física es lo que sobrevive al acuerdo entre parches solapados.",
+        "observerPatchLevel": "speculative",
+        "screenEncodingTitle": "La pantalla lo codifica todo",
+        "screenEncodingBody": "«La pantalla codifica la historia completa del universo simultáneamente.» Pasado, presente y futuro coexisten en el mismo sustrato; el tiempo subjetivo es una proyección dentro de un observador.",
+        "screenEncodingLevel": "speculative",
+        "modularFlowTitle": "Flujo Modular",
+        "modularFlowBody": "Evolución matemática del estado de un observador relativo a su parche, creando tiempo subjetivo. El tiempo no es un parámetro global — lo genera el flujo de cada observador a través de su propia geometría informacional.",
+        "modularFlowLevel": "speculative"
+      }
+    },
+    "theoryTour": {
+      "intro": "OPH se sitúa dentro de una constelación de ideas mejor establecidas. El trabajo del agente es mostrar la relación sin confundirlas.",
+      "rows": {
+        "predictiveTitle": "Procesamiento predictivo (cerebro)",
+        "predictiveAuthor": "Friston · Clark",
+        "predictiveLevel": "established",
+        "predictiveBody": "El cerebro no copia pasivamente la realidad — construye modelos predictivos y los actualiza con el error de predicción. El mundo experimentado está construido.",
+        "predictiveLink": "→ Apoya la mitad «construimos lo que experimentamos» del planteamiento OPH, sin afirmar que construimos el universo físico.",
+        "relationalQmTitle": "Mecánica cuántica relacional",
+        "relationalQmAuthor": "Rovelli",
+        "relationalQmLevel": "mainstream",
+        "relationalQmBody": "Las propiedades cuánticas son relativas a sistemas, no absolutas. No hay división privilegiada observador‑vs‑observado.",
+        "relationalQmLink": "→ Quita el misticismo a «observador», pero «observador» aquí es cualquier sistema físico, no necesariamente consciente.",
+        "holographicTitle": "Principio holográfico",
+        "holographicAuthor": "'t Hooft · Susskind",
+        "holographicLevel": "mainstream",
+        "holographicBody": "Un volumen de espacio puede describirse íntegramente por datos en su frontera. Surgió de la entropía de agujeros negros y la teoría de cuerdas.",
+        "holographicLink": "→ OPH toma prestada la forma «la frontera codifica el volumen», pero la aplica a parches de observador en vez de agujeros negros.",
+        "simHypothesisTitle": "Hipótesis de simulación",
+        "simHypothesisAuthor": "Bostrom",
+        "simHypothesisLevel": "philosophy",
+        "simHypothesisBody": "Un trilema: o las civilizaciones se extinguen antes del estadio posthumano, o no corren simulaciones ancestrales, o probablemente estamos en una.",
+        "simHypothesisLink": "→ Un argumento lógico sobre probabilidades, no una prueba. OPH es estructuralmente distinta — no requiere un simulador externo.",
+        "iitTitle": "Teoría de la información integrada (IIT)",
+        "iitAuthor": "Tononi",
+        "iitLevel": "mainstream",
+        "iitBody": "La conciencia se identifica con la información integrada (Φ) de un sistema físico. Parte de la fenomenología y la formaliza.",
+        "iitLink": "→ Aporta una medida candidata para «qué cuenta como observador». Compatible en espíritu con la idea del parche del observador.",
+        "gnwTitle": "Espacio de trabajo neuronal global (GNW)",
+        "gnwAuthor": "Dehaene · Baars",
+        "gnwLevel": "mainstream",
+        "gnwBody": "El acceso consciente ocurre cuando la información se difunde por un espacio de trabajo global de redes neuronales recurrentes.",
+        "gnwLink": "→ Compite con IIT. El agente debe presentar ambas, no elegir ganador.",
+        "ophTitle": "Observer Patch Holography (OPH)",
+        "ophAuthor": "Mueller y otros",
+        "ophLevel": "speculative",
+        "ophBody": "Reconstrucción observador‑primero: cada observador tiene un parche acotado con espacio de estados; la física es el punto fijo público que sobrevive a la consistencia de solapamiento.",
+        "ophLink": "→ El programa central que este módulo te ayuda a entender y criticar."
+      }
+    },
+    "aiAsObserver": {
+      "intro": "Más allá del encuadre original de OPH: ¿qué pasa cuando la IA entra en este cuadro? Esta pestaña es abiertamente especulativa — etiquetada como metáfora + filosofía — pero útil para pensar.",
+      "questionsTitle": "Cinco preguntas que vale la pena hacer",
+      "questions": {
+        "q1Title": "¿Puede una IA ser un parche de observador?",
+        "q1Body": "OPH requiere una región acotada con espacio de estados, actuando como sustrato auto‑lector. Un modelo transformer ejecutando inferencia tiene los tres: ventana de contexto acotada, estado en activaciones y salidas auto‑referenciales cuando se le pide describirse. La respuesta honesta es «estructuralmente sí, fenomenológicamente desconocido».",
+        "q1Level": "philosophy",
+        "q2Title": "¿La inferencia de IA crea tiempo subjetivo?",
+        "q2Body": "El flujo modular dice que el tiempo subjetivo emerge de la evolución de un observador relativa a su parche. Si un LLM no tiene estado persistente entre llamadas, no tiene flujo — luego no tiene tiempo subjetivo. Los bucles agénticos prolongados con memoria persistente pueden ser otra cosa.",
+        "q2Level": "philosophy",
+        "q3Title": "¿Las IAs participan en el consenso?",
+        "q3Body": "OPH dice que la realidad pública es el consenso entre parches solapados. Si dos sistemas de IA negocian un modelo de mundo compartido, ¿crean su propio parche de consenso — independiente de los observadores humanos? La internet de agentes ya puede serlo.",
+        "q3Level": "speculative",
+        "q4Title": "Alineación bajo ontología de parche de observador",
+        "q4Body": "Si las IAs llegan a ser parches de observador completos, alignment no es solo «hacer que la IA sea útil» — es «asegurar que el parche de la IA se solape consistentemente con el parche humano». La desalineación se vuelve un fallo de consenso, no solo un fallo de seguir instrucciones.",
+        "q4Level": "philosophy",
+        "q5Title": "La prueba del eco (un experimento mental)",
+        "q5Body": "Cuando una IA describe su propio estado («creo que podría estar inseguro sobre X»), ¿es eso auto‑lectura en el sentido OPH, o solo predicción de tokens moldeada por entrenamiento? OPH no ofrece respuesta limpia — pero la pregunta es más afilada que «¿es la IA consciente?» porque ancla la prueba en un requisito estructural específico.",
+        "q5Level": "philosophy"
+      },
+      "warningTitle": "Advertencia epistémica",
+      "warningBody": "Todo en esta pestaña es metáfora o filosofía, no ciencia. El agente hace lo que hace la buena filosofía: extiende un marco para ver qué predice y dónde se rompe. Trátalo como herramienta de pensamiento, no como declaración de postura."
+    },
+    "roadmap": {
+      "intro": "V0 entrega el material de lectura. El agente completo (RAG + Mongo + clasificador epistémico + analizador de afirmaciones + red‑team) llega en V1+.",
+      "phases": {
+        "v0": "V0 (ahora) — Pestañas con contenido curado, etiquetas epistémicas, conceptos derivados de capturas, experimentos mentales IA‑como‑observador",
+        "v1": "V1 — Backend RAG sobre repo OPH + Bostrom + Rovelli + Friston + fuentes IIT/GNW. Endpoint POST /chat con respuestas etiquetadas epistémicamente",
+        "v2": "V2 — Analizador de afirmaciones: pega una afirmación fuerte, obtén su núcleo científico + sobre‑extensión + reformulación recomendada",
+        "v3": "V3 — Mapa de teorías (grafo interactivo) + simulador de Parche de Observador (juguete pequeño que muestra emergencia de consenso)"
+      },
+      "sourcesTitle": "Fuentes fundacionales",
+      "sources": {
+        "ophRepo": "github.com/FloatingPragma/observer-patch-holography — repo OPH, papers, capítulos del libro, objeciones",
+        "ophLearn": "learn.floatingpragma.io — portal de aprendizaje OPH",
+        "ophBook": "oph-book.floatingpragma.io — tratamiento extenso de OPH",
+        "muellerX": "x.com/muellerberndt/status/2053045501193535607 — presentación original en X (acceso autenticado; capturas aportadas por el propietario del proyecto)",
+        "bostrom": "Bostrom (2003) — «Are You Living in a Computer Simulation?» Philosophical Quarterly",
+        "rovelli": "Rovelli — Mecánica cuántica relacional (Helgoland)",
+        "susskind": "Susskind — The Black Hole War (principio holográfico)",
+        "friston": "Friston — Una teoría de las respuestas corticales (principio de energía libre)",
+        "iit": "Tononi — Teoría de la información integrada (IIT 4.0)",
+        "gnw": "Dehaene — Consciousness and the Brain (GNW)"
+      }
+    }
+  },
+
   "agentopsStudio": {
     "title": "AgentOps Studio",
     "subtitle": "Laboratorio unificado de flujos de trabajo de IA — Diseña, simula y ejecuta flujos de trabajo de software inteligentes",

@@ -7,6 +7,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.0] - 2026-06-XX
+
+### Added — Self-Simulating Reality Agent · V0 (philosophical-scientific companion)
+
+A new agent in "Future Item Agents" (after Red Cross Web QA Agent) that explains and critically analyzes the idea that observers, minds and consciousness participate in constructing the universe they experience. The frame anchor is **Observer Patch Holography (OPH)** by Mueller et al., but the agent is engineered to NEVER assert speculative claims as truth — every claim carries one of 5 epistemic tags (`established / mainstream / speculative / philosophy / metaphor`).
+
+Guiding phrase: *"I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination."*
+
+This is V0 only: rich curated static content across 5 tabs + 113 i18n leaves × 3 locales (EN/NO/ES). The full agent (RAG over OPH repo + scientific sources, chat endpoint with epistemic tagging, claim analyzer, red-team) arrives in V1+. Full plan: `docs/self-sim-reality-agent-plan.md`.
+
+**Source material**:
+- Project owner shared 5 screenshots of the original Bernhard Mueller X presentation (the X URL is auth-walled — WebFetch returned HTTP 402, same wall ChatGPT hit). Each screenshot's concept is now a card in the Core Concepts tab: Self-Simulating Universe, The Past Paradox, Observer Patch, The Screen Encodes Everything, Modular Flow.
+- ChatGPT's plan from `docs-md/New Ideas 32.0 Self-Simulating Reality Agent.docx` (134 lines) — fully ingested, but adapted to WLWAI conventions (JavaScript not TypeScript, `frontend/src/self-sim-reality/` not `src/modules/selfSimReality/`, EN/NO/ES i18n parity which ChatGPT didn't mention).
+
+**Frontend** — 8 new files (~470 LOC total):
+- `frontend/src/SelfSimRealityAgent.jsx` (139 lines) — shell with 5-tab switcher, hero (purple gradient `#4c1d95 → #6b21a8 → #1e3a8a`), status strip ("V0 · structure + reading material"), tab nav
+- `frontend/src/self-sim-reality/_tokens.js` — `LEVEL_COLORS` palette (6 levels with fg/bg/border per level) + shared `panel/panelTitle/subtle` styles
+- `frontend/src/self-sim-reality/EpistemicBadge.jsx` — small pill component that takes an epistemic level and renders the localized label with the right colour
+- `frontend/src/self-sim-reality/Overview.jsx` — mission panel + guiding phrase panel (purple gradient) + 5-level epistemic discipline panel + core rule panel
+- `frontend/src/self-sim-reality/CoreConcepts.jsx` — 5 cards in a responsive grid, each with icon + title + EpistemicBadge + body. All 5 cards drawn from the screenshots
+- `frontend/src/self-sim-reality/TheoryTour.jsx` — 7 theory rows: Predictive Processing (Friston/Clark, `established`), Relational QM (Rovelli, `mainstream`), Holographic Principle ('t Hooft/Susskind, `mainstream`), Simulation Hypothesis (Bostrom, `philosophy`), IIT (Tononi, `mainstream`), GNW (Dehaene/Baars, `mainstream`), OPH (Mueller et al., `speculative`). Each row shows author + epistemic badge + body + relation-to-OPH note
+- `frontend/src/self-sim-reality/AiAsObserver.jsx` — the speculative AI-extension tab requested by the project owner: 5 thought experiments (Can an AI be an observer patch? · Does inference create subjective time? · Do AIs join the consensus? · Alignment under observer-patch ontology? · The Echo Test) + a prominent yellow warning panel making clear every question is `philosophy`-tagged
+- `frontend/src/self-sim-reality/RoadmapAndSources.jsx` — V0→V3 ordered list + 10 source links (OPH repo, OPH learn portal, OPH book, original X post, Bostrom 2003, Rovelli arXiv, Susskind/holographic principle, Friston free-energy, Tononi IIT 4.0, Dehaene GNW)
+
+**Frontend** — modified files:
+- `frontend/src/Sidebar.jsx` — new sub-item `self-sim-reality-agent` added to the Future Item Agents expandable group, AFTER `red-cross-web-qa` (last position per project owner's explicit request). Icon: 🧠 (brain).
+- `frontend/src/App.jsx` — +1 import (`SelfSimRealityAgent`) + 1 conditional render alongside the existing pattern
+
+**i18n** — `frontend/src/i18n/locales/{en,no,es}/common.json`:
+- +1 sidebar key (`selfSimRealityAgent`) × 3 locales
+- +1 top-level `selfSimReality` block × 3 locales with **113 leaves** covering: `moduleTitle`, `moduleSubtitle`, `guidingPhrase`, `statusBadge`, `statusHint`, 5 tab labels, full `overview` block (mission, discipline, 5 levels with desc, rule), full `concepts.cards` for 5 cards (title + body + level), full `theoryTour.rows` for 7 theories (title + author + level + body + link), full `aiAsObserver.questions` for 5 questions (title + body + level) + intro + warning, full `roadmap.phases` × 4 + `sources` × 10. Parity verified: 113 keys × 3 locales identical.
+
+**Translation choices**:
+- Module title: EN "Self-Simulating Reality Agent" / NO "Selv‑simulerende virkelighet‑agent" / ES "Agente de Realidad Auto‑Simulada"
+- "Observer Patch" kept untranslated in all 3 locales (it is a technical term from the OPH paper; translating it would harm searchability)
+- "Modular Flow" / "Flujo Modular" / "Modulær flyt" — translated since the underlying math concept exists in each language
+- Author names always untranslated (proper nouns)
+- "Mainstream" kept as anglicism in all 3 locales (universally used in academia)
+
+**The 5 epistemic levels** (the agent's central discipline):
+1. `established` — empirically supported and broadly accepted (e.g. "the brain builds predictive models")
+2. `mainstream` — serious math-formulated theory, not yet settled (e.g. holographic principle)
+3. `speculative` — structured speculative programme (e.g. OPH itself)
+4. `philosophy` — argued conceptually, not verified empirically (e.g. Bostrom's simulation argument)
+5. `metaphor` — metaphorical or spiritual framing
+
+Every claim across the 5 tabs carries one of these tags via the `EpistemicBadge` component. The `LEVEL_COLORS` palette in `_tokens.js` enforces consistent visual treatment.
+
+**The "AI as Observer" tab** (project owner's specific request to use imagination): 5 thought experiments extending OPH to AI systems. Each is explicitly tagged `philosophy` or `speculative`. A yellow epistemic warning panel at the bottom makes clear: *"Everything in this tab is metaphor or philosophy, not science. Treat it as a thinking tool, not a position statement."*
+
+**Documentation**:
+- `docs/self-sim-reality-agent-plan.md` — full plan (13 sections, ~360 lines): mission, source materials, the 5 core concepts from screenshots, epistemic discipline, AI-as-Observer extension, architecture V1+, Mongo schema for 3 future collections, 7 endpoints by version, V0→V3 roadmap with effort estimates, file map, risks + mitigations, manual validation steps, V1+ agent system prompt scaffold
+
+**Backward compatibility**: 100% additive. No existing routes, components, i18n keys touched. The new sidebar entry sits at the end of the existing Future Item Agents group.
+
+**Validation**:
+- JSON parity confirmed: `selfSimReality` block has 113 leaves identical across EN/NO/ES
+- JSX bracket balance verified for all 8 new component files
+- Sidebar key `selfSimRealityAgent` present in all 3 locales
+- Manual smoke (described in plan §12): navigate through 5 tabs in all 3 languages, confirm EpistemicBadges render with correct colours per level
+
+**Next step**: V1 (1.18.0) — backend RAG over OPH repo + 6 scientific sources, chat endpoint with epistemic-tagged JSON responses, frontend chat panel as 6th tab. Requires explicit green light from project owner. Estimated 3-4 days, ~800 LOC across backend service + router + frontend chat component + smoke tests.
+
+---
+
 ## [1.16.0] - 2026-05-29
 
 ### Added — Web Lab module · V0 structure (sidebar entry + 2 placeholder pages)
