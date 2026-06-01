@@ -109,7 +109,17 @@ export default function SubstrateQuestion() {
         levelKey="selfSimReality.substrateQuestion.sections.recursiveLadderLevel"
       />
 
-      {/* Section 5: Three Honest Positions (rendered as three cards) */}
+      {/* Section 5: The Platonic Question (added in 1.17.4) — ideas as
+          fixed-point; Plato → Penrose → Tegmark → Wolfram lineage;
+          OPH-native reading vs convergent constructivist reading */}
+      <NarrativeSection
+        t={t}
+        titleKey="selfSimReality.substrateQuestion.sections.platonicTitle"
+        bodyKey="selfSimReality.substrateQuestion.sections.platonicBody"
+        levelKey="selfSimReality.substrateQuestion.sections.platonicLevel"
+      />
+
+      {/* Section 6: Three Honest Positions (rendered as three cards) */}
       <div style={panel}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
           <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
