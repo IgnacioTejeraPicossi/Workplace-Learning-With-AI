@@ -453,7 +453,7 @@
       "bookMetaphorLevel": "metaphor"
     },
     "ophMechanics": {
-      "intro": "Kjernen i OPH er ikke bare «observatører betyr noe» — det er en spesifikk fire‑stegs prosess for hvordan subjektive patches genererer offentlig virkelighet. Denne fanen går gjennom problemet den løser, mekanismen den foreslår, algoritmen den spesifiserer, og den matematiske innrammingen som binder alt sammen.",
+      "intro": "OPH (Observer Patch Holography) er det spekulative fysikkprogrammet av Bernhard Mueller m.fl. som hele denne modulen kretser rundt. Kjernen er ikke bare «observatører betyr noe» — det er en spesifikk fire‑stegs prosess for hvordan subjektive patches genererer offentlig virkelighet. Denne fanen går gjennom problemet den løser, mekanismen den foreslår, algoritmen den spesifiserer, og den matematiske innrammingen som binder alt sammen.",
       "sections": {
         "strangeLoopTitle": "Problemet — Strange Loop‑kapasitet",
         "strangeLoopQuote": "Hvordan lukker Strange Loop seg uten å overskride kapasiteten?",

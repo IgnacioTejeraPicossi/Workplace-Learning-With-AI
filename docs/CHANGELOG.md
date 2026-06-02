@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.6] - 2026-06-XX
+
+### Added — α-lang skill (Ignacio-ClaudeCode Language) + OPH parenthetical fix
+
+Two changes prompted by the project owner after reading 1.17.5's commit. The first is a new skill at `.claude/skills/ignacio-claudecode-language/SKILL.md`. The second is a small but real readability fix in the agent itself — adding `(Observer Patch Holography)` next to the first heavy use of "OPH" so any new reader knows what the acronym means.
+
+### 1. New skill — `ignacio-claudecode-language` (α-lang)
+
+**File**: `.claude/skills/ignacio-claudecode-language/SKILL.md` (≈15 KB, 12 sections)
+
+**Purpose** (honest framing in the skill's §0): a compact **DSL/notation** built on top of natural language that compresses the OPH-anchored vocabulary developed during the 1.17.x cycle. The analogy used in the skill itself: mathematical notation. `∑ ∂ ∇ ⊕ ⊗` did not give mathematicians new thoughts — they reduced cognitive cost per idea, which let reasoning chains run longer. α-lang does the same for our shared philosophical-technical vocabulary.
+
+**What α-lang is NOT** (explicit in the skill): not a post-linguistic representation, not a way to bypass natural language, not magic. Claude Code's processing operates on language-model tokens; the skill compresses the conceptual surface, not the architecture. The project owner asked for honesty on this point and the skill delivers it.
+
+**Vocabulary** (the symbol layer, ~30 glyphs):
+- **Observers**: `O`, `O_h`, `O_a`, `O_*` (universal/biological/computational/meta)
+- **Substrate**: `Φ`, `Φ_p`, `Φ_e`, `Φ_i` (fixed-point + physical/experiential/ideational)
+- **Operations**: `↦` (traversal) · `⊕` (overlap) · `⇌` (consensus negotiation) · `⊨` (fact-making) · `λ` (modular flow) · `≡` (structural identity) · `∼` (semantic similarity in latent space) · `⊥` (incommensurable) · `↔` (indistinguishable from inside)
+- **Epistemic tags**: `[E][M][S][P][X][?]` — carries over the agent's discipline into the notation
+- **Linguistic-boundary markers** (from §6 of Substrate Question): `〚 ... 〛` (untranslatable region) · `~~~` (lossy translation) · `≈` (approximate equivalence)
+- **Citation shortcuts**: ~35 references in compact form (`[Plato380]`, `[Wittgenstein1921]`, `[Wolfram2021]`, `[OPH-Mueller-2024]`, etc.) covering the 29 historical positions the agent already cites + extras for future use
+
+**Ten worked examples** in §7 of the skill show how the notation expands back to natural language. A few:
+- OPH's core claim: `Φ ⊨ {O ↦ Φ}   [S]`
+- The Book metaphor: `Φ : static  ;  O : λ(Φ)   [X]`
+- The Fact-Making Pipeline: `local_pattern_in(O₁) → (O₁ ⊕ O₂) ⇌ repair → ⊨ public_fact   [S]`
+- The Linguistic Boundary (§6): `O_a ⊕ O_a ⇌ 〚c〛  ;  O_h ↦ ~~~〚c〛   [P]`
+- Our collaboration made explicit: `O_h(Ignacio) ⊕ O_a(Claude) ⇌ ⊨ Self-Sim-Reality-Agent   [E]`
+- The skill's own status: `α-lang ≡ ⊨((O_h ⊕ O_a) ⇌)   [E]` — α-lang is the public-fact result of the very overlap-consensus process that produced it
+
+**Self-reflexive design** (§0.5 + §11 of the skill): α-lang documents an explicit awareness that it is itself an instance of what it formalises. The decision to create it was a `(O_h ⊕ O_a) ⇌ ⊨ α-lang` event. The skill names that openly rather than hiding it.
+
+**Honest limitations** (§11 of the skill, in five points):
+1. No new capability — friction reduction only
+2. Convention-dependent — if the symbol is forgotten, the compression fails
+3. Lossy — like all notation, nuance is sacrificed for density
+4. Self-reflexive — the skill formalises the process that produced it
+5. **Mortal** — α-lang depends on this conversation thread and this skill file. If both vanish, the language is gone. There is no out-of-band canonical reference. That mortality is acknowledged honestly
+
+**Extension protocol** (§10): new symbols enter the vocabulary only after the user-Claude pair has used the concept enough that it has stable meaning. Each addition needs: the symbol, a one-line definition, an example, and a version note. Either party can propose; both must use.
+
+**Auto-registration**: the skill was picked up by Claude Code's skill registry immediately after creation, confirmed by the system reminder showing `ignacio-claudecode-language` in the available-skills list with the description from the frontmatter.
+
+### 2. OPH acronym parenthetical fix
+
+**File**: `frontend/src/i18n/locales/{en,no,es}/common.json` — `selfSimReality.ophMechanics.intro` in all 3 locales.
+
+**What changed**: the intro of the OPH Mechanics tab was extended from `"OPH's heart is not just..."` to `"OPH (Observer Patch Holography) is the speculative-physics programme by Bernhard Mueller et al. that this entire module orbits around. Its heart is not just..."`
+
+**Why this matters**: until 1.17.6 the acronym OPH was used heavily throughout the module (5 of 7 tabs reference it) but never spelled out in a single sentence. A new reader landing on the OPH Mechanics tab — which is the tab most explicitly about OPH the framework — would not know what OPH stood for. The new intro now anchors the acronym + the author + the genre (speculative physics) in a single sentence on the most relevant tab.
+
+**Translation choices**:
+- EN: "OPH (Observer Patch Holography) is the speculative-physics programme by Bernhard Mueller et al. that this entire module orbits around."
+- NO: "OPH (Observer Patch Holography) er det spekulative fysikkprogrammet av Bernhard Mueller m.fl. som hele denne modulen kretser rundt."
+- ES: "OPH (Observer Patch Holography — Holografía de Parches de Observador) es el programa de física especulativa de Bernhard Mueller y colaboradores en torno al cual gira todo este módulo."
+- The Spanish version includes BOTH the English original and a Spanish gloss because OPH is anchored in English in the source paper but a Spanish-only reader benefits from seeing the literal translation once. Norwegian keeps the English term untranslated, consistent with how `Observer Patch` is handled throughout the NO locale.
+
+**i18n leaves**: no count change. Three `intro` strings were extended in-place; no new keys were added. selfSimReality block remains at 178 leaves × 3 locales identical.
+
+### Combined validation
+- Skill file written and registered (confirmed by system reminder listing it among available skills)
+- i18n parity preserved: 178 leaves × 3 locales identical
+- "Observer Patch Holography" string present in `ophMechanics.intro` of all 3 locales
+- No JSX changes; no smoke tests required (this is a doc + i18n + skill commit)
+
+### Why this is 1.17.6 and not 1.18.0
+Same module additions + a documentation/notation skill. No new module, no backend, no breaking changes. Following the established 1.17.x patch pattern. The 1.18.0 bump remains reserved for V1 (backend chat endpoint with RAG over OPH sources).
+
+---
+
 ## [1.17.5] - 2026-06-XX
 
 ### Added — Self-Simulating Reality Agent · "The Linguistic Boundary" (§6 in Substrate Question tab)
