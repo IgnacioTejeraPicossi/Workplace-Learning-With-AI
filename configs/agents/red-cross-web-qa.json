@@ -1,0 +1,112 @@
+{
+  "id": "red-cross-web-qa",
+  "name": "Red Cross Web QA Agent",
+  "version": "1.16.0",
+  "module": "qa",
+  "description": "24/7 QA copilot for the rodekors.no website rebuild on Enonic XP CMS + Next.js + Digdir Designsystemet. Built to Trine Bruu's Teststrategi 30.3: Azure DevOps as official test tool, Sev1-4 + KatA-C dual severity, V-model test levels, full Fundy donation-flow + Vipps handoff coverage. 41 REST routes across 23 audit suites. Includes a Phase H+ Security & Privacy workbench with persisted baselines, ADO REST dispatch (real with PAT, mock otherwise), and ADO Sprint paste-and-generate / live-fetch integrations.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/red-cross-qa",
+    "tools": [
+      {
+        "name": "generate_test_plan",
+        "description": "Generate a sprint test plan from an Azure DevOps work item / user story. Emits ado_work_items with work_item_type, priority 1-4, test_level (unit/sit/system/uat/performance/static-review)."
+      },
+      {
+        "name": "paste_to_plan",
+        "description": "Paste a real ADO Sprint item (User Story / Task / Bug) and get a Røde Kors-aware test plan. Heuristic parser; bilingual NO + EN; auto-detects Røde Kors content type (Distrikt / Forening / Aktivitet / Kampanje / ...)."
+      },
+      {
+        "name": "fetch_sprint_items",
+        "description": "Pull live Sprint backlog items from Azure DevOps via WIQL when ADO_PAT is in server env. Mock-first fallback when PAT absent. Returns id/title/type/state/area/iteration/description/AC/tags/url."
+      },
+      {
+        "name": "run_security_scan",
+        "description": "OWASP Top 10 + GDPR + secrets + headers (13 checks). Phase H+ adds the qa_security workbench with persisted baselines."
+      },
+      {
+        "name": "run_accessibility_check",
+        "description": "axe-core + Lighthouse + manual checklist (WCAG 2.2 AA, 12 checks). Phase G adds NVDA screen-reader script generator + WAVE WebAIM audit."
+      },
+      {
+        "name": "run_enonic_performance",
+        "description": "Enonic XP-specific perf: Guillotine GraphQL waterfall + N+1, ISR latency, image service, publish ack (10 checks + hot queries with p95 baselines)."
+      },
+      {
+        "name": "dispatch_to_ado",
+        "description": "Push a finding to Azure DevOps as a work item. Real REST when ADO_PAT is set; mock-first otherwise. Idempotent: same finding → same work item."
+      },
+      {
+        "name": "generate_sprint_report",
+        "description": "Auto-generated end-of-sprint report (status, findings, recommendations) for Trine Bruu per Teststrategi 30.3 §8."
+      }
+    ]
+  },
+  "capabilities": [
+    "test-plan.generate",
+    "test-plan.paste-and-generate",
+    "ado.fetch-sprint",
+    "ado.dispatch-finding",
+    "ado.format-item",
+    "playwright.generate",
+    "playwright.run",
+    "cypress.generate",
+    "cypress.run",
+    "accessibility.axe-core",
+    "accessibility.lighthouse",
+    "accessibility.nvda-script",
+    "accessibility.wave-audit",
+    "performance.enonic",
+    "performance.lighthouse",
+    "security.owasp-top-10",
+    "security.gdpr",
+    "security.dpia",
+    "forms.qa",
+    "forms.fundy-donation",
+    "cms.test-cases",
+    "content-migration.audit",
+    "designsystemet.compliance",
+    "role-matrix.audit",
+    "stress-test.k6",
+    "stress-test.loadster",
+    "resilience.check",
+    "uat.support",
+    "risk-matrix.analyze",
+    "definition-of-done.verify",
+    "baselines.list",
+    "baselines.reset",
+    "sprint-report.generate"
+  ],
+  "policy": {
+    "owner_required": true,
+    "test_strategy": "Trine Bruu Teststrategi 30.3",
+    "severity_scheme": "Sev1-4 (dev phase) + KatA-C (ops phase)",
+    "test_levels": ["static-review", "unit", "sit", "system", "uat", "performance"],
+    "official_test_tool": "Azure DevOps",
+    "supported_environments": ["local", "test"],
+    "stakeholders": [
+      "Gry Rønjum (Prosjektleder)",
+      "Trine Bruu (Testleder)",
+      "Hilde Forslund (Produkteier Inntekt CRM)",
+      "Trine Røsand Scheen (Produkteier Frivillighet CRM)",
+      "Astri M.M. Fretheim (Tilgangsstyring frivillighet)",
+      "Tom Arild Jakobsen (Tech Lead Item)",
+      "Thomas Augestad (Techlead Applikasjonsplattform)",
+      "Terje Christensen (Teknisk repr. Røde Kors)",
+      "Jah Langleite (IAM)",
+      "Ignacio Tejera Picossi (QA / Tester)"
+    ]
+  },
+  "security": {
+    "ado_pat_required_for_live": true,
+    "ado_pat_env_var": "ADO_PAT",
+    "audit_logging": true,
+    "mock_first": true,
+    "secrets_in_logs": false
+  },
+  "docs": {
+    "guide": "docs/red-cross-qa-azure-devops-guide.md",
+    "audit": "docs/audits/red-cross-qa-enonic-xp-roundup.md",
+    "skill": ".claude/skills/enonic-xp/"
+  }
+}

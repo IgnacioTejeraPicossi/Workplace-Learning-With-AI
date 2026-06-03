@@ -1,0 +1,84 @@
+{
+  "id": "atm-vv-test-copilot",
+  "name": "ATM V&V Test Copilot",
+  "version": "1.0.0",
+  "module": "aviation",
+  "description": "Verification & Validation copilot for Air Traffic Management systems. Ingests requirement bundles (ED-153, DO-278A, ISO/IEC 25010), generates test designs, builds scenario matrices (nominal / off-nominal / safety-related), and analyzes test-run outcomes with traceability back to requirements.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/atm-copilot",
+    "tools": [
+      {
+        "name": "ingest_requirement_bundle",
+        "description": "Ingest a set of ATM requirements (ED-153, DO-278A, custom) and tag them by source type, criticality and verification method.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "source_type": { "enum": ["ED-153", "DO-278A", "ISO-25010", "custom"] },
+            "requirements": { "type": "array", "items": { "type": "object" } },
+            "bundle_name": { "type": "string" }
+          },
+          "required": ["source_type", "requirements"]
+        }
+      },
+      {
+        "name": "generate_test_design",
+        "description": "Produce a structured test design from an ingested requirement bundle. Maps each requirement to one or more verification objectives.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "bundle_id": { "type": "string" },
+            "coverage_target_pct": { "type": "number" }
+          },
+          "required": ["bundle_id"]
+        }
+      },
+      {
+        "name": "build_scenario_matrix",
+        "description": "Build a scenario matrix from a test design. Generates nominal, off-nominal and safety scenarios with traceability matrix.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "design_id": { "type": "string" },
+            "scenario_types": { "type": "array", "items": { "enum": ["nominal", "off-nominal", "safety", "degraded-mode", "recovery"] } }
+          },
+          "required": ["design_id"]
+        }
+      },
+      {
+        "name": "analyze_test_run",
+        "description": "Analyze a completed test run: pass/fail per scenario, requirement coverage achieved, gaps identified.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "run_id": { "type": "string" },
+            "scenario_results": { "type": "array", "items": { "type": "object" } }
+          },
+          "required": ["run_id", "scenario_results"]
+        }
+      }
+    ]
+  },
+  "capabilities": [
+    "requirements.ingest",
+    "requirements.list",
+    "requirements.tag",
+    "design.generate",
+    "design.export.markdown",
+    "scenarios.build",
+    "scenarios.export.markdown",
+    "runs.analyze",
+    "runs.list",
+    "coverage.compute",
+    "traceability.matrix"
+  ],
+  "policy": {
+    "owner_required": true,
+    "supported_standards": ["ED-153", "DO-278A", "ISO/IEC 25010"],
+    "scenario_types": ["nominal", "off-nominal", "safety", "degraded-mode", "recovery"]
+  },
+  "security": {
+    "audit_logging": true,
+    "data_retention_days": 365
+  }
+}

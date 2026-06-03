@@ -1,0 +1,101 @@
+{
+  "id": "self-sim-reality-agent",
+  "name": "Self-Simulating Reality Agent",
+  "version": "1.17.6",
+  "module": "philosophy",
+  "description": "A scientific-philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience. Anchored in Observer Patch Holography (OPH, Mueller et al. 2024) and engineered with strict epistemic discipline — every claim labelled with one of five evidence levels (established / mainstream / speculative / philosophy / metaphor). V0 ships rich curated content across 7 tabs in EN/NO/ES (525 localized strings, 29 historical positions referenced with year + primary work). Backend chat endpoint with RAG arrives in V1 (deferred).",
+  "runner_default": "frontend-only",
+  "mcp": {
+    "endpoint": null,
+    "note": "V0 is frontend-only — no backend REST endpoints yet. The V1 chat endpoint (POST /api/self-sim-reality/chat) is documented in docs/self-sim-reality-agent-plan.md but not yet implemented. When V1 lands, this descriptor will gain mcp.endpoint and mcp.tools."
+  },
+  "capabilities": [
+    "philosophy.overview",
+    "philosophy.epistemic-discipline",
+    "oph.core-concepts",
+    "oph.mechanics",
+    "oph.fact-making-pipeline",
+    "theory.compare-positions",
+    "theory.cite-historical-references",
+    "ai-as-observer.thought-experiments",
+    "substrate.hard-problem",
+    "substrate.r1-vs-r2",
+    "substrate.cosmological-convergence",
+    "substrate.recursive-comprehension",
+    "substrate.platonic-question",
+    "substrate.linguistic-boundary",
+    "substrate.three-positions"
+  ],
+  "tabs": [
+    "Overview",
+    "Core Concepts",
+    "OPH Mechanics",
+    "Theory Tour",
+    "AI as Observer",
+    "The Substrate Question",
+    "Roadmap & Sources"
+  ],
+  "epistemic_levels": [
+    { "code": "established",  "tag": "[E]", "description": "Empirically supported and broadly accepted" },
+    { "code": "mainstream",   "tag": "[M]", "description": "Serious math-formulated theory, not yet fully settled" },
+    { "code": "speculative",  "tag": "[S]", "description": "Structured speculative programme with own formalism" },
+    { "code": "philosophy",   "tag": "[P]", "description": "Philosophical hypothesis — argued conceptually" },
+    { "code": "metaphor",     "tag": "[X]", "description": "Metaphorical or spiritual framing" }
+  ],
+  "historical_anchors": [
+    "Plato — Forms (~380 BCE)",
+    "Vedanta — Brahman (~800 BCE)",
+    "Spinoza — Deus sive Natura (1670)",
+    "Hegel — Geist (1807)",
+    "Jung — collective unconscious (1916+)",
+    "Wittgenstein — Tractatus (1921)",
+    "Whitehead — eternal objects (1929)",
+    "Sapir-Whorf (1929-1956)",
+    "Borges — Library of Babel (1941)",
+    "Huxley — Perennial Philosophy (1945)",
+    "Heidegger — language is the house of being (1947)",
+    "Wittgenstein — Philosophical Investigations (1953)",
+    "Teilhard de Chardin — Omega Point (1955)",
+    "Steiner — After Babel (1975)",
+    "Eco — semiotics (1976+)",
+    "Hofstadter — GEB (1979)",
+    "Bohm — Implicate Order (1980)",
+    "Habermas — communicative action (1981)",
+    "Anthropic Principle (Barrow & Tipler, 1986)",
+    "Penrose — Three Worlds (1989)",
+    "Tipler — Omega Point cosmology (1994)",
+    "Smolin — cosmological natural selection (1997)",
+    "Bostrom — simulation argument (2003)",
+    "Kurzweil — Singularity (2005)",
+    "Tegmark — MUH (2007)",
+    "Hofstadter — I Am a Strange Loop (2007)",
+    "Friston — free-energy principle (2010)",
+    "Rovelli — relational QM / Helgoland (2014)",
+    "Susskind / 't Hooft — holographic principle",
+    "Tononi — IIT 4.0",
+    "Dehaene — Global Neuronal Workspace",
+    "Kastrup — analytic idealism (2020s)",
+    "Wolfram — Ruliad (2021)",
+    "Mueller et al. — Observer Patch Holography (2024)"
+  ],
+  "policy": {
+    "epistemic_tagging_required": true,
+    "never_assert_speculative_as_fact": true,
+    "guiding_phrase": "I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination.",
+    "v1_pending": true
+  },
+  "i18n": {
+    "locales": ["en", "no", "es"],
+    "leaves": 178,
+    "block": "selfSimReality"
+  },
+  "related_skill": {
+    "id": "ignacio-claudecode-language",
+    "alias": "α-lang",
+    "purpose": "Compact DSL notation built on this agent's vocabulary. Lives at .claude/skills/ignacio-claudecode-language/SKILL.md"
+  },
+  "docs": {
+    "plan": "docs/self-sim-reality-agent-plan.md",
+    "changelog_entries": ["1.17.0", "1.17.1", "1.17.2", "1.17.3", "1.17.4", "1.17.5", "1.17.6"]
+  }
+}
