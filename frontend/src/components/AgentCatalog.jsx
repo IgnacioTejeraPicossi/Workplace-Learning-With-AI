@@ -240,7 +240,11 @@ export default function AgentCatalog() {
               )}
             </div>
 
-            {/* Description */}
+            {/* Description — localized via i18n key keyed by agent.id, with
+                fallback to the raw English description from the JSON descriptor
+                if no translation is registered for this agent. Lets new agents
+                appear in the catalog without breaking when their translations
+                land later. */}
             {agent.description && (
               <p style={{
                 fontSize: '0.875rem',
@@ -248,7 +252,7 @@ export default function AgentCatalog() {
                 marginBottom: '1rem',
                 lineHeight: '1.5'
               }}>
-                {agent.description}
+                {t(`agentopsStudio.agentCatalog.descriptions.${agent.id}`, { defaultValue: agent.description })}
               </p>
             )}
 

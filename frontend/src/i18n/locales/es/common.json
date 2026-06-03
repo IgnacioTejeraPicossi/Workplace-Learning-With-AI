@@ -647,6 +647,20 @@
       "settings": "Configuración"
     },
     "agentCatalog": {
+      "descriptions": {
+        "ai-compliance-agent": "Genera riesgos clave desde una política y ejecuta acciones en Jira/Slack/Sheets vía OutSystems.",
+        "ai-productivity-agent": "Convierte un brief de investigación en múltiples tareas de Jira más Slack/Sheets.",
+        "atm-vv-test-copilot": "Copiloto de verificación y validación para sistemas de Air Traffic Management. Ingesta bundles de requisitos (ED-153, DO-278A, ISO/IEC 25010), genera diseños de prueba, construye matrices de escenarios (nominal / off-nominal / relacionados con seguridad) y analiza resultados de ejecuciones con trazabilidad hasta los requisitos.",
+        "attention-agent": "Ruido→señal a través de canales; programa bloques de foco y envía briefs accionables para Tom Erik Sundal-Ask (Telenor).",
+        "council-agent": "Deliberación multi-persona con puertas de seguridad y briefs auditables. Crea perspectivas diversas para debatir temas complejos y aflorar acuerdos, desacuerdos e incógnitas.",
+        "ea-second-brain": "El vigilante 24/7 de Enterprise Architecture de Ketil que convierte señales en acciones conscientes del portafolio. Monitorea cambios tecnológicos, actualizaciones de proveedores, deprecaciones y nuevos proyectos, ofreciendo insights continuos basados en la estrategia, arquitectura y portafolio de aplicaciones de Norwegian.",
+        "grc-agent": "Detecta problemas de calidad de datos, política y riesgo en Finance/Procurement/Supply Chain/ESG y ejecuta correcciones con auditoría.",
+        "ops-efficiency-agent": "Automatiza el manejo de facturas, sugiere asignaciones de costos y clasifica CVs con explicabilidad para la eficiencia operativa de Posten Bring.",
+        "red-cross-web-qa": "Copiloto QA 24/7 para la migración del sitio rodekors.no sobre Enonic XP CMS + Next.js + Digdir Designsystemet. Construido según la Teststrategi 30.3 de Trine Bruu: Azure DevOps como herramienta oficial de pruebas, severidad dual Sev1-4 + KatA-C, niveles de prueba en modelo V, cobertura completa del flujo de donación Fundy + handoff Vipps. 41 rutas REST a través de 23 suites de auditoría. Incluye un workbench de Seguridad y Privacidad Phase H+ con baselines persistidas, dispatch ADO REST (real con PAT, mock en otro caso) e integraciones ADO Sprint paste-and-generate / live-fetch.",
+        "sales-assistant": "Higiene de pipeline, scoring de riesgo de oportunidades y borradores de seguimiento contextual para Amelie Tique (Yara International). Automatiza actualizaciones de CRM, crea correos de seguimiento y ofrece insights inteligentes sobre la progresión de oportunidades.",
+        "self-sim-reality-agent": "Acompañante científico-filosófico para la idea de que observadores, mentes y conciencia participan en la construcción del universo que experimentan. Anclado en Observer Patch Holography (OPH, Mueller y otros 2024) y construido con disciplina epistemológica estricta — cada afirmación etiquetada con uno de cinco niveles de evidencia (establecido / mainstream / especulativo / filosofía / metáfora). V0 entrega contenido curado rico en 7 pestañas en EN/NO/ES (525 cadenas localizadas, 29 posiciones históricas referenciadas con año + obra primaria). Endpoint de chat backend con RAG llega en V1 (aplazado).",
+        "telco-ops-agent": "Decide y ejecuta órdenes, cambios de plan, citas, comunicaciones y casos de CRM con autonomía segura. Transforma señales telco en operaciones accionables."
+      },
       "heading": "Catálogo de agentes",
       "description": "Agentes reutilizables con endpoints MCP y capacidades para la Internet de Agentes",
       "loading": "Cargando catálogo de agentes...",

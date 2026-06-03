@@ -152,7 +152,8 @@
       "Bash(PYTHONIOENCODING=utf-8 python extract_docx_tmp.py)",
       "Bash(python .claude/skills/docx/scripts/office/unpack.py \"docs-md/New Ideas 32.0 Self-Simulating Reality Agent.docx\" ./tmp_ssra/)",
       "WebFetch(domain:x.com)",
-      "Bash(PYTHONIOENCODING=utf-8 python extract_ssra.py)"
+      "Bash(PYTHONIOENCODING=utf-8 python extract_ssra.py)",
+      "Bash(node check_agent_catalog.js)"
     ]
   }
 }

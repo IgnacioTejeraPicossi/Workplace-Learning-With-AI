@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.8] - 2026-06-XX
+
+### Added — AgentOps Studio · Agent Catalog: 12 agent descriptions translated to NO + ES
+
+After 1.17.7 wired the catalog's UI chrome (Total Agents / Capabilities / Copy MCP / Retry / alerts) to existing i18n keys, the project owner noticed the **agent cards themselves** still rendered in English regardless of locale. The descriptions of each of the 12 cards live in `configs/agents/*.json` and were read raw by `AgentCatalog.jsx`. This commit adds a translation layer with graceful fallback.
+
+**Design** — i18n bridge with fallback to JSON:
+- New nested block `agentopsStudio.agentCatalog.descriptions.<agent-id>` in EN/NO/ES (12 keys × 3 locales = 36 strings)
+- Component calls `t(\`agentopsStudio.agentCatalog.descriptions.\${agent.id}\`, { defaultValue: agent.description })` — if a translation is registered, render it; otherwise fall back to the raw English description from the JSON descriptor
+- The JSON descriptors stay untouched. They remain the English-canonical source. Adding a new agent → it shows up in the catalog with its English description until translations are added; never breaks
+
+**Why a fallback-with-i18n bridge instead of putting translations inside the JSON files**:
+1. Keeps descriptors clean (no translation noise inside what should be a stable API contract)
+2. Translations follow standard i18n convention — one place per locale, easy to audit
+3. New agents can ship before their translations exist (graceful degradation)
+4. JSON descriptors stay in English, which is also the convention for the rest of the agent catalog (capability identifiers like `jira.createIssue`, MCP tool names like `dispatch_action_bundle`, module tags like `compliance` — all English-anchored)
+
+**What does NOT get translated** (intentional):
+- Capability identifiers (`jira.createIssue`, `slack.postMessage`, `accessibility.axe-core`, …) — technical API-like identifiers, English-canonical
+- MCP tool names (`dispatch_action_bundle`, `get_run_status`, `paste_to_plan`, …) — same reasoning
+- Module tags shown as chips (`compliance`, `productivity`, `qa`, `aviation`, `philosophy`) — short tag-like identifiers; widely used as anglicisms in NO/ES business contexts
+- Policy values like Jira project codes (`LEARN`, `COMP`, `PROD`) and Slack channels (`#compliance`) — proper nouns / org-specific identifiers
+- Proper nouns inside descriptions — `Trine Bruu`, `Tom Erik Sundal-Ask`, `Ketil`, `Amelie Tique`, `Yara International`, `Norwegian`, `Posten Bring`, `Mueller et al.` (preserved as-written across all locales)
+- Brand / product names — `Jira`, `Slack`, `Sheets`, `OutSystems`, `Enonic XP`, `Next.js`, `Azure DevOps`, `Digdir Designsystemet`, `Vipps`, `Fundy`, `Telenor` (preserved)
+- Technical acronyms — `OPH`, `ADO`, `PAT`, `MCP`, `REST`, `RAG`, `WCAG`, `GDPR`, `CRM`, `ESG`, `V&V`, `ED-153`, `DO-278A`, `ISO/IEC 25010` (preserved)
+
+**The 12 translations** (NO + ES, EN as canonical):
+
+| Agent | Translation note |
+|---|---|
+| ai-compliance-agent | Short, action-oriented. NO uses "kjør handlinger" / ES "ejecuta acciones" to convey the verb-load of "execute" |
+| ai-productivity-agent | "research brief" kept as anglicism in NO ("research-brief") since the term is common in NO business contexts; translated in ES ("brief de investigación") |
+| atm-vv-test-copilot | Standards (ED-153, DO-278A, ISO/IEC 25010) preserved verbatim. NO uses "Verifiserings- og validerings-kopilot"; ES "Copiloto de verificación y validación" |
+| attention-agent | "Noise→signal" preserved as the visual idiom (Støy→signal / Ruido→señal) |
+| council-agent | "deliberation" → NO "deliberasjon" / ES "deliberación"; "safety gates" → NO "sikkerhetsporter" / ES "puertas de seguridad" |
+| ea-second-brain | "Enterprise Architecture" preserved as anglicism (canonical in both NO and ES enterprise vocabulary) |
+| grc-agent | Domain tags (Finance/Procurement/Supply Chain/ESG) preserved as-is — these are the organisation's internal taxonomy in English |
+| ops-efficiency-agent | "explainability" → NO "forklarbarhet" / ES "explicabilidad" (both are now-canonical AI/ML terms in each language) |
+| red-cross-web-qa | Longest description. All Røde Kors technical terms preserved (Teststrategi, Sev1-4, KatA-C, Fundy, Vipps, ADO, PAT, etc.). "Phase H+" kept as English (versioning label, not translatable) |
+| sales-assistant | "Pipeline hygiene" → NO "pipeline-hygiene" / ES "higiene de pipeline" (anglicism in both, standard CRM vocabulary) |
+| self-sim-reality-agent | All OPH framework terms preserved. NO "fem evidensnivåer (etablert / mainstream / spekulativ / filosofi / metafor)" / ES "cinco niveles de evidencia (establecido / mainstream / especulativo / filosofía / metáfora)" |
+| telco-ops-agent | "safe autonomy" → NO "trygg autonomi" / ES "autonomía segura" |
+
+**Files changed**:
+- `frontend/src/i18n/locales/en/common.json` — added EN canonical block (necessary for parity even though it duplicates the JSON descriptors)
+- `frontend/src/i18n/locales/no/common.json` — added 12 NO translations
+- `frontend/src/i18n/locales/es/common.json` — added 12 ES translations
+- `frontend/src/components/AgentCatalog.jsx` — single line change: render uses `t()` with `defaultValue: agent.description` fallback
+
+**Not changed**:
+- `configs/agents/*.json` — left alone; remains the English-canonical source
+- All other UI labels (totalAgents, capabilities, copyMCP, etc.) — already wired in 1.17.7
+
+**Validation**:
+- JSON parity: 12 description IDs identical across EN/NO/ES (`ai-compliance-agent`, `ai-productivity-agent`, `atm-vv-test-copilot`, `attention-agent`, `council-agent`, `ea-second-brain`, `grc-agent`, `ops-efficiency-agent`, `red-cross-web-qa`, `sales-assistant`, `self-sim-reality-agent`, `telco-ops-agent`)
+- JSX bracket balance: OK (353 lines)
+- Fallback wiring confirmed: component uses `defaultValue: agent.description`
+- Backend descriptors untouched (the JSON files in `configs/agents/` still serve their original English text via `/api/agents/catalog`)
+
+**Combined effect of 1.17.7 + 1.17.8**: with the locale switched to Spanish or Norwegian, the AgentOps Studio → Agent Catalog now renders fully localised — stat cards (Total de agentes / Totalt antall agenter), action buttons (Copiar MCP / Kopier MCP), card labels (Capacidades / Evner, Política, Herramientas MCP), AND the descriptive prose for each of the 12 agents.
+
+---
+
 ## [1.17.7] - 2026-06-XX
 
 ### Fixed — AgentOps Studio · Agent Catalog: 5 hardcoded English strings wired to existing i18n keys

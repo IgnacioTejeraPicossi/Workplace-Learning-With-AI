@@ -180,6 +180,20 @@
       "settings": "Settings"
     },
     "agentCatalog": {
+      "descriptions": {
+        "ai-compliance-agent": "Generate key risks from a policy and execute Jira/Slack/Sheets via OutSystems.",
+        "ai-productivity-agent": "Turn a research brief into multiple Jira tasks plus Slack/Sheets.",
+        "atm-vv-test-copilot": "Verification & Validation copilot for Air Traffic Management systems. Ingests requirement bundles (ED-153, DO-278A, ISO/IEC 25010), generates test designs, builds scenario matrices (nominal / off-nominal / safety-related), and analyzes test-run outcomes with traceability back to requirements.",
+        "attention-agent": "Noise→signal across channels; schedules focus holds and sends actionable briefs for Tom Erik Sundal-Ask (Telenor).",
+        "council-agent": "Multi-persona deliberation with safety gates and auditable briefs. Creates diverse perspectives to debate complex topics and surface agreements, disagreements, and unknowns.",
+        "ea-second-brain": "Ketil's 24/7 Enterprise Architecture watcher that turns signals into portfolio-aware actions. Monitors tech changes, vendor updates, deprecations, and new projects, providing continuous insights based on Norwegian's strategy, architecture, and application portfolio.",
+        "grc-agent": "Detects data-quality, policy, and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit.",
+        "ops-efficiency-agent": "Automates invoice handling, suggests cost allocations, and ranks CVs with explainability for Posten Bring operations efficiency.",
+        "red-cross-web-qa": "24/7 QA copilot for the rodekors.no website rebuild on Enonic XP CMS + Next.js + Digdir Designsystemet. Built to Trine Bruu's Teststrategi 30.3: Azure DevOps as official test tool, Sev1-4 + KatA-C dual severity, V-model test levels, full Fundy donation-flow + Vipps handoff coverage. 41 REST routes across 23 audit suites. Includes a Phase H+ Security & Privacy workbench with persisted baselines, ADO REST dispatch (real with PAT, mock otherwise), and ADO Sprint paste-and-generate / live-fetch integrations.",
+        "sales-assistant": "Pipeline hygiene, deal risk scoring, and contextual follow-up drafts for Amelie Tique (Yara International). Automates CRM updates, creates follow-up emails, and provides intelligent deal progression insights.",
+        "self-sim-reality-agent": "A scientific-philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience. Anchored in Observer Patch Holography (OPH, Mueller et al. 2024) and engineered with strict epistemic discipline — every claim labelled with one of five evidence levels (established / mainstream / speculative / philosophy / metaphor). V0 ships rich curated content across 7 tabs in EN/NO/ES (525 localized strings, 29 historical positions referenced with year + primary work). Backend chat endpoint with RAG arrives in V1 (deferred).",
+        "telco-ops-agent": "Decides and executes orders, plan changes, appointments, comms, and CRM cases with safe autonomy. Transforms telco signals into actionable operations."
+      },
       "heading": "Agent Catalog",
       "description": "Reusable agents with MCP endpoints and capabilities for the Internet of Agents",
       "loading": "Loading Agent Catalog...",

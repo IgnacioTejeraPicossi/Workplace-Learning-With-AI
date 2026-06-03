@@ -339,6 +339,20 @@
       "settings": "Innstillinger"
     },
     "agentCatalog": {
+      "descriptions": {
+        "ai-compliance-agent": "Generer nøkkelrisikoer fra en policy og kjør handlinger i Jira/Slack/Sheets via OutSystems.",
+        "ai-productivity-agent": "Forvandle et research-brief til flere Jira-oppgaver pluss Slack/Sheets.",
+        "atm-vv-test-copilot": "Verifiserings- og validerings-kopilot for Air Traffic Management-systemer. Tar inn kravbundles (ED-153, DO-278A, ISO/IEC 25010), genererer testdesign, bygger scenario-matriser (nominell / off-nominell / sikkerhetsrelatert), og analyserer testkjørings-resultater med sporbarhet tilbake til kravene.",
+        "attention-agent": "Støy→signal på tvers av kanaler; planlegger fokus-blokker og sender handlingsorienterte briefer for Tom Erik Sundal-Ask (Telenor).",
+        "council-agent": "Multi-persona-deliberasjon med sikkerhetsporter og reviderbare briefer. Skaper ulike perspektiver for å debattere komplekse temaer og synliggjøre enigheter, uenigheter og ukjente.",
+        "ea-second-brain": "Ketils 24/7 Enterprise Architecture-vakthund som omdanner signaler til porteføljebevisste handlinger. Overvåker tekniske endringer, leverandøroppdateringer, deprecations og nye prosjekter, og gir kontinuerlige innsikter basert på Norwegians strategi, arkitektur og applikasjonsportefølje.",
+        "grc-agent": "Oppdager datakvalitet-, policy- og risikoproblemer på tvers av Finance/Procurement/Supply Chain/ESG og iverksetter korrigerende tiltak med revisjon.",
+        "ops-efficiency-agent": "Automatiserer fakturahåndtering, foreslår kostnadsallokering og rangerer CV-er med forklarbarhet for Posten Brings driftseffektivitet.",
+        "red-cross-web-qa": "24/7 QA-kopilot for rodekors.no-omleggingen på Enonic XP CMS + Next.js + Digdir Designsystemet. Bygget etter Trine Bruus Teststrategi 30.3: Azure DevOps som offisielt testverktøy, Sev1-4 + KatA-C dobbel alvorlighetsskala, V-modell testnivåer, full Fundy-donasjonsflyt + Vipps-handoff-dekning. 41 REST-ruter på tvers av 23 revisjons-suiter. Inkluderer en Phase H+ Sikkerhet og Personvern-arbeidsbenk med persisterte grunnlinjer, ADO REST-dispatch (ekte med PAT, mock ellers), og ADO Sprint paste-and-generate / live-fetch-integrasjoner.",
+        "sales-assistant": "Pipeline-hygiene, scoring av deal-risiko og kontekstuelle oppfølgings-utkast for Amelie Tique (Yara International). Automatiserer CRM-oppdateringer, lager oppfølgings-eposter og gir intelligente innsikter om deal-progresjon.",
+        "self-sim-reality-agent": "En vitenskapelig-filosofisk ledsager for ideen om at observatører, sinn og bevissthet deltar i å konstruere universet de erfarer. Forankret i Observer Patch Holography (OPH, Mueller m.fl. 2024) og bygget med streng epistemisk disiplin — hver påstand merket med ett av fem evidensnivåer (etablert / mainstream / spekulativ / filosofi / metafor). V0 leverer rikt kuratert innhold over 7 faner på EN/NO/ES (525 lokaliserte strenger, 29 historiske posisjoner referert med år + primærverk). Backend chat-endepunkt med RAG kommer i V1 (utsatt).",
+        "telco-ops-agent": "Beslutter og utfører bestillinger, planendringer, avtaler, kommunikasjon og CRM-saker med trygg autonomi. Transformerer telekom-signaler til handlingsorienterte operasjoner."
+      },
       "heading": "Agentkatalog",
       "description": "Gjenbrukbare agenter med MCP-endepunkter og evner for Internet of Agents",
       "loading": "Laster agentkatalog …",
