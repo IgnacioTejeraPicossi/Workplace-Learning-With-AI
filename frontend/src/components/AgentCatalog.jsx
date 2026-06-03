@@ -34,10 +34,10 @@ export default function AgentCatalog() {
   const copyToClipboard = async (text, label) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`Copied ${label} to clipboard!`);
+      alert(t('agentopsStudio.agentCatalog.copiedToClipboard', { label }));
     } catch (err) {
       console.error('Failed to copy to clipboard:', err);
-      alert('Failed to copy to clipboard');
+      alert(t('agentopsStudio.agentCatalog.copyFailed'));
     }
   };
 
@@ -91,7 +91,7 @@ export default function AgentCatalog() {
             cursor: 'pointer'
           }}
         >
-          Retry
+          {t('agentopsStudio.agentCatalog.retry')}
         </button>
       </div>
     );
@@ -138,7 +138,7 @@ export default function AgentCatalog() {
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6' }}>
             {items.length}
           </div>
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Agents</div>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{t('agentopsStudio.agentCatalog.totalAgents')}</div>
         </div>
         <div style={{
           backgroundColor: 'white',
@@ -235,7 +235,7 @@ export default function AgentCatalog() {
                     fontWeight: '500'
                   }}
                 >
-                  Copy MCP
+                  {t('agentopsStudio.agentCatalog.copyMCP')}
                 </button>
               )}
             </div>
@@ -261,7 +261,7 @@ export default function AgentCatalog() {
                   color: '#374151',
                   marginBottom: '0.5rem'
                 }}>
-                  Capabilities
+                  {t('agentopsStudio.agentCatalog.capabilities')}
                 </div>
                 <div style={{
                   display: 'flex',

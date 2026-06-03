@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.7] - 2026-06-XX
+
+### Fixed — AgentOps Studio · Agent Catalog: 5 hardcoded English strings wired to existing i18n keys
+
+The project owner switched the UI to Spanish and noticed several strings in the AgentOps Studio → Agent Catalog tab were still in English: `Total Agents`, `Capabilities`, `Copy MCP`, `Retry`, and the alert messages on copy success/failure. Investigation showed the i18n keys were all **already present** in EN/NO/ES (16 keys under `agentopsStudio.agentCatalog.*`) — but `frontend/src/components/AgentCatalog.jsx` was bypassing them with literal English strings. The component was created before its own i18n surface was finished, and the wiring was never done.
+
+**Strings re-wired** (5 spots):
+
+| Line | Before | After |
+|---|---|---|
+| 37 | `` alert(`Copied ${label} to clipboard!`) `` | `alert(t('agentopsStudio.agentCatalog.copiedToClipboard', { label }))` |
+| 40 | `alert('Failed to copy to clipboard')` | `alert(t('agentopsStudio.agentCatalog.copyFailed'))` |
+| 94 | `Retry` (literal in `<button>`) | `{t('agentopsStudio.agentCatalog.retry')}` |
+| 141 | `Total Agents` (literal in stat label) | `{t('agentopsStudio.agentCatalog.totalAgents')}` |
+| 238 | `Copy MCP` (literal in button) | `{t('agentopsStudio.agentCatalog.copyMCP')}` |
+| 264 | `Capabilities` (literal in card header) | `{t('agentopsStudio.agentCatalog.capabilities')}` |
+
+What the user will now see when switching locale:
+
+| Key | EN | NO | ES |
+|---|---|---|---|
+| totalAgents | Total Agents | Totalt antall agenter | Total de agentes |
+| copyMCP | Copy MCP | Kopier MCP | Copiar MCP |
+| capabilities | Capabilities | Evner | Capacidades |
+| retry | Retry | Prøv igjen | Reintentar |
+| copyFailed | Failed to copy to clipboard | Kunne ikke kopiere til utklippstavlen | Error al copiar al portapapeles |
+| copiedToClipboard | "Copied {{label}} to clipboard!" | "{{label}} er kopiert til utklippstavlen." | "¡{{label}} copiado al portapapeles!" |
+
+The `{{label}}` interpolation in `copiedToClipboard` already worked in all 3 locales — only the call-site needed updating.
+
+**Files changed**: `frontend/src/components/AgentCatalog.jsx` (5 edits in one file).
+
+**Not changed**:
+- The i18n JSONs (the keys were already present and correct — see `agentopsStudio.agentCatalog` block in each locale)
+- The `console.error('Failed to copy to clipboard:', err)` line — diagnostic output for browser DevTools, convention is to keep developer-facing console messages in English for international debugging. The user-facing alert IS localized.
+
+**Validation**:
+- JSX bracket balance: OK (349 lines)
+- `grep` confirms no hardcoded `Total Agents` / `Copy MCP` / `>Capabilities<` / `>Retry<` / template-literal `Copied ${` remain in the file
+- The only remaining `"Failed to copy"` match is the `console.error` line (intentional)
+
+**Why this is a 1.17.7 patch and not a feature**: a pure wiring fix, no new i18n keys, no schema changes, no version bump in dependencies. Strict semver patch.
+
+---
+
 ## [1.17.6] - 2026-06-XX
 
 ### Added — α-lang skill (Ignacio-ClaudeCode Language) + OPH parenthetical fix
