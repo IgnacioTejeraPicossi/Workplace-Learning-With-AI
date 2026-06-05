@@ -153,7 +153,10 @@
       "Bash(python .claude/skills/docx/scripts/office/unpack.py \"docs-md/New Ideas 32.0 Self-Simulating Reality Agent.docx\" ./tmp_ssra/)",
       "WebFetch(domain:x.com)",
       "Bash(PYTHONIOENCODING=utf-8 python extract_ssra.py)",
-      "Bash(node check_agent_catalog.js)"
+      "Bash(node check_agent_catalog.js)",
+      "Bash(timeout 30 grep -rn \"Checkout sometimes fails\" backend/ frontend/src/)",
+      "Bash(timeout 30 grep -rn \"demos.followups\\\\|demos\\\\[.task.\\\\]\\\\|demos.accessibility\" frontend/src/ --include=\"*.jsx\" --include=\"*.js\")",
+      "Bash(timeout 30 grep -rln \"homoVsAi\\\\.tasks\\\\|HomoSapiensVsAI\\\\|HomoVsAi\" frontend/src/)"
     ]
   }
 }

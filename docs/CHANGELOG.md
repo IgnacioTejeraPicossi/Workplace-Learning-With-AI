@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.10] - 2026-06-XX
+
+### Fixed — Homo Sapiens vs. AI in Testing: input textarea froze on mount, ignored locale changes
+
+The project owner switched the UI to Norwegian and noticed that the "Inndata" textarea on the **Oppfølgingsspørsmål til en bug** round (and on every other round in the same tab) was still showing the English sample text. Investigation showed the issue was **NOT** missing translations — 9 of the 11 sample texts in `homoVsAi.demos.*.sample` were already correctly translated to NO and ES in `common.json`. The bug was in the React component: `DemoCard` was using `useState(sample)` which captured the initial sample at mount time and ignored subsequent locale changes.
+
+A similar pattern was already in place for the `humanText`/`humanAnswer` field (a `humanDirty` flag with a `useEffect` that re-syncs locale changes as long as the user has not typed), but it was never applied to the `input`/`sample` field. This commit replicates that pattern.
+
+**Diagnostic summary** (run before fixing):
+
+| Sample key | Translated in NO? | Translated in ES? |
+|---|---|---|
+| demos.scenarios | ✓ | ✓ |
+| demos.ambiguities | ✓ | ✓ |
+| demos.exploratory | ✓ | ✓ |
+| demos.followups | ✓ | ✓ |
+| demos.automation | ✓ | ✓ |
+| demos.testData | ✓ | ✓ |
+| demos.oracle | ✓ | ✓ |
+| demos.risk | ✓ | ✓ |
+| demos.triage | ✓ | ✓ |
+| demos.accessibility | — (HTML code, intentional) | — (HTML code, intentional) |
+| demos.tests_from_code | — (JS code, intentional) | — (JS code, intentional) |
+
+So the translations were fine. The component just wasn't using them after the first render.
+
+**The fix** — 4 surgical edits to `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx`:
+
+1. **New state**: `const [inputDirty, setInputDirty] = useState(false);` — mirrors the existing `humanDirty` pattern (see lines 461-464 in the same component).
+2. **New useEffect**: re-syncs `input` to the current locale's `sample` whenever `sample` changes AND the user has not typed. Identical shape to the `humanAnswer` effect above it:
+   ```jsx
+   useEffect(() => {
+     if (!inputDirty) setInput(sample);
+   }, [sample, inputDirty]);
+   ```
+3. **Textarea onChange**: marks the input as dirty so locale changes no longer overwrite user edits:
+   ```jsx
+   onChange={e => { setInput(e.target.value); setInputDirty(true); }}
+   ```
+4. **`resetToSample()`**: clears the dirty flag so the textarea re-attaches to the locale stream (lets the user reset after typing, then switch language, then see the sample in the new language).
+5. **`incomingInput` effect (Problem Router)**: sets `inputDirty(true)` because router-injected content is external content; we do NOT want a locale switch to overwrite a routed problem.
+
+**Why the user saw English even though translations existed**: when the page first rendered, the user was on English. `useState(sample)` captured `"Bug: Checkout sometimes fails..."`. Then the user switched to Norwegian. The `sample` variable changed to `"Bug: Checkout feiler av og til..."` because `t()` re-evaluated, but `input` (the textarea's value) was still the initial English string. No effect was wired to bridge the change. With this commit, the bridge exists.
+
+**Two samples (accessibility + tests_from_code) intentionally stay in English** in all three locales — they are code blocks (HTML + JS respectively) where translating would break the educational point. The fix handles this correctly because if NO/ES `sample` equals EN `sample` (identical code), the effect just re-applies the same string, which is a no-op for React.
+
+**Files changed**: `frontend/src/pages/help/agi/HomoSapiensVsAI.jsx` (4 small edits in one component).
+
+**Not changed**:
+- i18n JSONs — all 11 sample translations were already present and correct (3 locales × 11 keys = 33 strings)
+- The `humanText`/`humanDirty` pattern — already worked; only `input`/`inputDirty` needed adding
+- Backend — pure frontend bug
+
+**Validation**:
+- Babel parser confirms valid JSX (the naive `{[(` count from my balance script reported "imbalanced" because of the many template literals in this 2730-line file; that's a false positive of the script, not real)
+- 5 added uses of `inputDirty`/`setInputDirty` across the component (state declaration · useEffect read · resetToSample clear · onChange set · incomingInput set)
+- Pattern is identical to the proven `humanDirty` pattern that already exists 50 lines above
+
+**Why this is a 1.17.10 patch**: pure component bug fix. No new i18n keys, no schema changes, no API changes. The translations were already in the repo since the original `homoVsAi.demos.*.sample` block landed; this fix just makes the component honour them.
+
+---
+
 ## [1.17.9] - 2026-06-XX
 
 ### Changed — Sidebar: "AGI Progress" moved from developer group to sub-item of Item Agents

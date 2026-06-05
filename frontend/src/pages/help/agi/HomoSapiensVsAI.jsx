@@ -456,12 +456,22 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   // a propose call lands.
   const [promptSource, setPromptSource] = useState(null);
 
-  // Follow i18n language changes: if the user switches EN<->NO, refresh the
-  // human panel with the new locale copy as long as they have not edited it.
+  // Follow i18n language changes: if the user switches EN<->NO<->ES, refresh
+  // the human panel with the new locale copy as long as they have not edited it.
   const [humanDirty, setHumanDirty] = useState(false);
   useEffect(() => {
     if (!humanDirty) setHumanText(humanAnswer);
   }, [humanAnswer, humanDirty]);
+
+  // 1.17.10 — same pattern for the Input textarea: until the tester has typed
+  // anything (or the router has pushed external content), follow locale
+  // changes so the sample text re-renders in the active language. Without
+  // this, the textarea froze whatever sample was active at mount and ignored
+  // subsequent locale switches.
+  const [inputDirty, setInputDirty] = useState(false);
+  useEffect(() => {
+    if (!inputDirty) setInput(sample);
+  }, [sample, inputDirty]);
 
   // Problem Router hand-off: when the parent passes a non-empty
   // `incomingInput` (a string timestamped/keyed by the router), overwrite the
@@ -471,6 +481,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
   useEffect(() => {
     if (incomingInput && incomingInput.trim()) {
       setInput(incomingInput);
+      setInputDirty(true);  // router-injected content; do not overwrite on locale change
       setAiOutput('');
       setErr(null);
       setElapsed(null);
@@ -543,6 +554,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
 
   const resetToSample = () => {
     setInput(sample); setAiOutput(''); setErr(null); setElapsed(null);
+    setInputDirty(false);  // 1.17.10 — re-attach input to locale changes
     setJudgeResult(null); setJudgeErr(null); setJudgeElapsed(null);
     setIstqbAnchors([]);
     setIstqbRag(null);
@@ -656,7 +668,7 @@ function DemoCard({ task, icon, color, t, i18n, onVote, incomingInput }) {
         </label>
         <textarea
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={e => { setInput(e.target.value); setInputDirty(true); }}
           rows={task === 'tests_from_code' ? 7 : 5}
           style={{
             width: '100%', marginTop: 4, padding: 10, fontFamily: 'ui-monospace, monospace',
