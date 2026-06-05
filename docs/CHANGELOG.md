@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.9] - 2026-06-XX
+
+### Changed — Sidebar: "AGI Progress" moved from developer group to sub-item of Item Agents
+
+The project owner requested that AGI Progress sit conceptually next to the implemented agents rather than as a top-level developer tool. Specifically: as a sub-item of **Item Agents**, immediately after **AI Productivity Agent**.
+
+**Files changed**: `frontend/src/Sidebar.jsx` (2 edits in one file).
+
+**Move performed**:
+- Removed: top-level `{ key: "agi-progress", ... group: "developer" }` between `run-test` and `api-config` (with its 2-line "promoted from Help submenu" comment)
+- Added: as the 4th sub-item inside the `item-agents` expandable group, after `ai-productivity-agent`. Icon `bar-chart` preserved
+- Added inline comments at both edit sites explaining the move and citing version 1.17.9 so future readers know to look here
+
+**Visual effect**: in the sidebar, the "Item Agents" group now expands to show AgentOps Studio → AI Compliance Agent → AI Productivity Agent → **AGI Progress** (was previously at the bottom of the developer group between Run Test and API Config). The top-level developer block loses one entry.
+
+**Not changed**:
+- `App.jsx` routing — the `section === "agi-progress"` conditional render at line 550 stays as-is. The route is keyed by the `agi-progress` slug, not by which sidebar group hosts it
+- i18n keys — `sidebar.agiProgress` already exists in EN/NO/ES and is reused at the new position
+- The `AgiProgressPage` component and all its content — untouched
+- The icon (`bar-chart`) is preserved at the new position
+
+**Validation**:
+- JSX bracket balance: OK (436 lines)
+- `agi-progress` appears exactly once in `Sidebar.jsx` (the new sub-item entry)
+- App.jsx still has the section-match route at line 550 → `<AgiProgressPage />` continues to render when the user clicks the relocated sidebar entry
+- No i18n updates needed (the label key is reused)
+
+**Why this is 1.17.9 patch**: pure sidebar reorganisation, no schema/state/route changes, zero risk of regression. The route key is the same; only its location in the menu hierarchy moved.
+
+---
+
 ## [1.17.8] - 2026-06-XX
 
 ### Added — AgentOps Studio · Agent Catalog: 12 agent descriptions translated to NO + ES

@@ -118,10 +118,13 @@ const getNavItems = (t) => [
   ]},
   
   // Grupo 1.8: Item Agents (implementados)
+  // 1.17.9 (2026-06): AGI Progress moved here from the developer group as a
+  // sub-item under AI Productivity Agent per project owner's request.
   { key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
     { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
-    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" }
+    { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
+    { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart" }
   ]},
 
   // Nuevo grupo: Future Item Agents (prototipos)
@@ -165,9 +168,8 @@ const getNavItems = (t) => [
   // Grupo 3: Herramientas de desarrollo (fondo azul)
   { key: "security", label: t('sidebar.security'), icon: "shield", group: "developer" },
   { key: "run-test", label: t('sidebar.runTest'), icon: "play", group: "developer" },
-  // AGI Progress: promoted from Help submenu to a top-level developer entry
-  // (tab collection grew to 4 tabs + AI enrichment + workshop module).
-  { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart", group: "developer" },
+  // AGI Progress was here as a top-level developer entry; moved in 1.17.9
+  // to be a sub-item under Item Agents per project owner's request.
   { key: "api-config", label: t('sidebar.apiConfig'), icon: "settings", group: "developer" },
   
   // Grupo 4: Funcionalidades futuras (expandible)
