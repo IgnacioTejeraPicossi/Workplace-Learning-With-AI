@@ -3462,8 +3462,16 @@ def _run_lighthouse_cli(url: str) -> Dict[str, Any]:
         return _fail(f"{type(exc).__name__}: {exc}")
 
     if result.returncode != 0:
-        stderr_tail = (result.stderr or "")[-400:]
-        return _fail(f"lighthouse exited {result.returncode}: {stderr_tail.strip()}")
+        # On Windows, chrome-launcher's destroyTmp / Launcher.kill calls
+        # rimraf (fs.rmSync) to clean up the Chrome temp directory *after*
+        # the audit JSON has already been written to stdout.  That cleanup
+        # can fail with EBUSY / EPERM, causing exit code 1 even though the
+        # report is complete.  Detect this case: if stdout already looks like
+        # JSON, fall through to the normal parse path instead of failing.
+        stdout_probe = (result.stdout or "").strip()
+        if not (stdout_probe and stdout_probe.startswith("{")):
+            stderr_tail = (result.stderr or "")[-400:]
+            return _fail(f"lighthouse exited {result.returncode}: {stderr_tail.strip()}")
 
     stdout = result.stdout or ""
     if not stdout.strip():

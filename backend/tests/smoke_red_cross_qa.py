@@ -1243,6 +1243,64 @@ async def main():
     print(f"[OK] Lighthouse mock still emits {len(lh_mock_v2['bottlenecks'])} bottlenecks "
           f"+ {len(lh_mock_v2['optimizations'])} optimizations (mock UX preserved)")
 
+    # 1.18.3 — the metric-audit exclusion set must contain every Lighthouse
+    # metric audit, so they never leak into the Flaskehalser bottleneck list.
+    # If Lighthouse ships a new metric audit, this list needs updating too.
+    _expected_metric_ids = {
+        "first-contentful-paint",
+        "largest-contentful-paint",
+        "speed-index",
+        "total-blocking-time",
+        "cumulative-layout-shift",
+        "interactive",
+        "max-potential-fid",
+        "interaction-to-next-paint",
+        "experimental-interaction-to-next-paint",
+    }
+    missing = _expected_metric_ids - set(_LIGHTHOUSE_METRIC_AUDIT_IDS)
+    assert not missing, f"_LIGHTHOUSE_METRIC_AUDIT_IDS missing required metric IDs: {missing}"
+    print(f"[OK] _LIGHTHOUSE_METRIC_AUDIT_IDS covers {len(_expected_metric_ids)} metric audits "
+          "(FCP/LCP/SI/TBT/CLS/TTI/MPFID/INP) — won't leak into Flaskehalser (1.18.3)")
+
+    # 1.18.3 — mock-mode INP carries a real value (180ms), so it must NOT have
+    # the "field-data required" explainer note. The note is reserved for the
+    # honest N/A case (live lab run with no INP numeric value).
+    lh_mock_inp = lh_mock_v2["metrics"].get("metricInp", {})
+    assert lh_mock_inp.get("value") == "180ms", \
+        f"mock INP must remain 180ms, got {lh_mock_inp.get('value')!r}"
+    assert "note" not in lh_mock_inp, \
+        f"mock INP must not carry an explainer note (got {lh_mock_inp.get('note')!r})"
+    print("[OK] Mock INP value preserved (180ms) and no spurious explainer note (1.18.3)")
+
+    # 1.18.3 — every backend-emitted `note` string must have a matching i18n
+    # key in performance.metricNotes across all 3 locales. Without this, the
+    # tooltip silently renders blank in the UI. Walk both mock + live metric
+    # payloads and assert their notes round-trip through the locale files.
+    import json as _json
+    from pathlib import Path as _Path
+    _repo_root = _Path(__file__).resolve().parents[2]
+    _locale_notes: dict = {}
+    for _loc in ("en", "no", "es"):
+        _p = _repo_root / "frontend" / "src" / "i18n" / "locales" / _loc / "redCrossWebQaModule.json"
+        with open(_p, encoding="utf-8") as _f:
+            _data = _json.load(_f)
+        _notes_block = _data.get("redCrossWebQaModule", {}).get("performance", {}).get("metricNotes", {})
+        _locale_notes[_loc] = set(_notes_block.keys())
+    # All 3 locales must agree on the same key set (parity).
+    assert _locale_notes["en"] == _locale_notes["no"] == _locale_notes["es"], \
+        f"metricNotes keys diverge across locales: {_locale_notes}"
+    # The 3 backend-emitted notes must all be present.
+    _required_note_keys = {
+        "alias_of_ttfb",
+        "lighthouse_does_not_measure_graphql_see_enonic_tab",
+        "lighthouse_lab_does_not_measure_inp_field_data_required",
+    }
+    _missing_notes = _required_note_keys - _locale_notes["en"]
+    assert not _missing_notes, \
+        f"i18n performance.metricNotes missing keys emitted by backend: {_missing_notes}"
+    print(f"[OK] i18n metricNotes parity EN/NO/ES + {len(_required_note_keys)} backend keys "
+          "all translatable (1.18.3)")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
