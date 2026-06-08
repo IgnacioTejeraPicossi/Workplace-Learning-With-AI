@@ -1206,6 +1206,38 @@ async def main():
     assert _validate_target_url("x" * 3000) is not None  # length cap
     print("[OK] _validate_target_url passes http(s), rejects file/empty/oversized")
 
+    # 1.18.2 — _run_lighthouse_cli returns a dict with the new shape regardless
+    # of success/failure. Test the failure path (no CLI installed) so we do not
+    # depend on Lighthouse being available in the smoke environment.
+    from backend.services.red_cross_qa import _run_lighthouse_cli
+    if _find_lighthouse_binary() is None:
+        cli_dict = _run_lighthouse_cli("https://www.rodekors.no/")
+        # Must be a dict with all 5 expected keys (1.18.2 contract).
+        assert isinstance(cli_dict, dict), f"_run_lighthouse_cli must return dict, got {type(cli_dict)}"
+        for k in ("metrics", "score", "bottlenecks", "optimizations", "error"):
+            assert k in cli_dict, f"missing key {k!r} in _run_lighthouse_cli dict"
+        # On failure all 4 data fields are None or empty; error is populated.
+        assert cli_dict["metrics"] is None
+        assert cli_dict["score"] is None
+        assert cli_dict["bottlenecks"] is None
+        assert cli_dict["optimizations"] is None
+        assert cli_dict["error"] and "lighthouse" in cli_dict["error"].lower()
+        print("[OK] _run_lighthouse_cli dict-shape contract (1.18.2): "
+              "metrics/score/bottlenecks/optimizations/error keys all present")
+    else:
+        print("[SKIP] _run_lighthouse_cli dict-shape failure-path test — CLI is installed locally")
+
+    # 1.18.2 — verify that mock mode still surfaces the canonical mock
+    # bottlenecks + optimizations (regression guard for the workshop demo).
+    lh_mock_v2 = await run_lighthouse("https://www.rodekors.no/", "test", "en", mode="mock")
+    assert lh_mock_v2["is_mock"] is True
+    assert isinstance(lh_mock_v2["bottlenecks"], list) and len(lh_mock_v2["bottlenecks"]) >= 2, \
+        "mock mode must still provide the canonical bottlenecks list"
+    assert isinstance(lh_mock_v2["optimizations"], list) and len(lh_mock_v2["optimizations"]) >= 3, \
+        "mock mode must still provide the canonical optimizations list"
+    print(f"[OK] Lighthouse mock still emits {len(lh_mock_v2['bottlenecks'])} bottlenecks "
+          f"+ {len(lh_mock_v2['optimizations'])} optimizations (mock UX preserved)")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

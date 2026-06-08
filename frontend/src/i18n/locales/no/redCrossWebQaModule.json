@@ -369,7 +369,7 @@
       "badgeMock": "MOCK",
       "badgeLive": "LIVE (CLI)",
       "badgeFallback": "MOCK · LIVE FEILET",
-      "liveHint": "Ekte måling fra den lokale Lighthouse CLI.",
+      "liveHint": "Ekte måling fra den lokale Lighthouse CLI. Tallene kan avvike fra Chrome DevTools' Lighthouse med ~5-15 poeng: DevTools bruker mobil throttling som standard, mens denne kjøringen bruker det ekte nettverket ditt uten simulert tregheten.",
       "mockHint": "Deterministiske eksempeldata — bytt til LIVE for en ekte Lighthouse‑måling.",
       "metricLcp": "LCP",
       "metricCls": "CLS",

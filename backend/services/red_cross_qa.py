@@ -3375,26 +3375,38 @@ def _find_lighthouse_binary() -> Optional[List[str]]:
     return None
 
 
-def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[float], Optional[str]]:
+def _run_lighthouse_cli(url: str) -> Dict[str, Any]:
     """Invoke the Lighthouse CLI against `url` and parse its JSON output.
 
-    Returns `(metrics_dict, score_0_100, error)`. On any failure all three
-    are returned with `metrics_dict=None, score=None, error="<reason>"` so
-    the caller can decide whether to fall back to mock.
+    Returns a dict with keys:
+      • metrics       — Dict[str, {value, status, note?}] mapping the 10 UI cards
+      • score         — performance score 0..100 (None on failure)
+      • bottlenecks   — top 5 audit titles + savings, sorted by impact (1.18.2)
+      • optimizations — top 5 actionable suggestions from audit descriptions (1.18.2)
+      • error         — None on success; "<reason>" on failure (caller decides fallback)
 
     Subprocess is invoked with `shell=False`, an absolute argv list, a 120 s
     timeout, and `--no-enable-error-reporting` so Lighthouse does not phone
     home. Output is captured (not streamed) up to 32 MB.
+
+    1.18.2: changed return type from `(metrics, score, error)` tuple to a dict
+    so we can include the audit-derived bottlenecks + optimizations alongside
+    the metrics. Failure paths return a dict with the same keys (metrics/score/
+    bottlenecks/optimizations all None or empty, error populated).
     """
     import subprocess as _sp
+
+    def _fail(reason: str) -> Dict[str, Any]:
+        return {"metrics": None, "score": None, "bottlenecks": None,
+                "optimizations": None, "error": reason}
 
     bin_cmd = _find_lighthouse_binary()
     if not bin_cmd:
         # 1.18.1 — make the install hint impossible to miss. The previous
         # message was technically correct but easy to skim past. This wording
         # tells the user exactly what command to run to fix it.
-        return None, None, ("Lighthouse CLI not found on PATH. "
-                            "Install it globally with: npm install -g lighthouse")
+        return _fail("Lighthouse CLI not found on PATH. "
+                     "Install it globally with: npm install -g lighthouse")
 
     # Conservative flags:
     #   --output=json            machine-readable
@@ -3425,26 +3437,26 @@ def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[fl
             text=True,
         )
     except _sp.TimeoutExpired:
-        return None, None, f"lighthouse timed out after {_LIGHTHOUSE_TIMEOUT_SECONDS}s"
+        return _fail(f"lighthouse timed out after {_LIGHTHOUSE_TIMEOUT_SECONDS}s")
     except FileNotFoundError as exc:
-        return None, None, f"lighthouse binary not executable: {exc}"
+        return _fail(f"lighthouse binary not executable: {exc}")
     except Exception as exc:  # pragma: no cover — defensive
-        return None, None, f"{type(exc).__name__}: {exc}"
+        return _fail(f"{type(exc).__name__}: {exc}")
 
     if result.returncode != 0:
         stderr_tail = (result.stderr or "")[-400:]
-        return None, None, f"lighthouse exited {result.returncode}: {stderr_tail.strip()}"
+        return _fail(f"lighthouse exited {result.returncode}: {stderr_tail.strip()}")
 
     stdout = result.stdout or ""
     if not stdout.strip():
-        return None, None, "lighthouse produced empty output"
+        return _fail("lighthouse produced empty output")
     if len(stdout) > _LIGHTHOUSE_MAX_OUTPUT_BYTES:
-        return None, None, f"lighthouse output exceeded {_LIGHTHOUSE_MAX_OUTPUT_BYTES} bytes"
+        return _fail(f"lighthouse output exceeded {_LIGHTHOUSE_MAX_OUTPUT_BYTES} bytes")
 
     try:
         report = json.loads(stdout)
     except json.JSONDecodeError as exc:
-        return None, None, f"lighthouse JSON parse failed: {exc}"
+        return _fail(f"lighthouse JSON parse failed: {exc}")
 
     audits = report.get("audits") or {}
     categories = report.get("categories") or {}
@@ -3457,11 +3469,45 @@ def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[fl
         v = a.get("numericValue")
         return float(v) if isinstance(v, (int, float)) else None
 
+    def _score(audit_id: str) -> Optional[float]:
+        """Lighthouse audit score is 0..1 (or None if N/A for this page)."""
+        a = audits.get(audit_id) or {}
+        s = a.get("score")
+        return float(s) if isinstance(s, (int, float)) else None
+
+    def _audit_title(audit_id: str) -> Optional[str]:
+        return (audits.get(audit_id) or {}).get("title")
+
+    def _score_to_status(s: Optional[float]) -> str:
+        """Map Lighthouse 0..1 audit score to our pass/warn/fail/pending palette.
+        Mirrors Lighthouse's own colour thresholds (≥0.9 green / ≥0.5 amber / else red)."""
+        if s is None: return "pending"
+        if s >= 0.9: return "pass"
+        if s >= 0.5: return "warn"
+        return "fail"
+
+    def _worst_score(*audit_ids: str) -> Optional[float]:
+        """Pick the worst (lowest) score among several related audits. Used for
+        `imageOpt` which spans 3 separate Lighthouse audits."""
+        seen: List[float] = []
+        for aid in audit_ids:
+            s = _score(aid)
+            if s is not None:
+                seen.append(s)
+        return min(seen) if seen else None
+
     lcp_ms   = _num("largest-contentful-paint")
     cls_v    = _num("cumulative-layout-shift")
     inp_ms   = _num("interaction-to-next-paint") or _num("experimental-interaction-to-next-paint")
     ttfb_ms  = _num("server-response-time")
     bytes_   = _num("total-byte-weight")
+
+    # 1.18.2 — extract the 3 additional metrics that ARE produced by Lighthouse
+    # but we previously left as `pending` placeholders.
+    image_opt_score = _worst_score("uses-optimized-images", "modern-image-formats",
+                                    "efficient-animated-content", "uses-responsive-images")
+    font_display_score = _score("font-display")
+    cache_ttl_score = _score("uses-long-cache-ttl")
 
     def _fmt_ms(v: Optional[float]) -> str:
         if v is None: return "N/A"
@@ -3471,6 +3517,15 @@ def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[fl
         if v is None: return "N/A"
         return f"{int(round(v / 1024))}kb"
 
+    def _fmt_audit_value(s: Optional[float]) -> str:
+        """User-facing value for an audit-derived metric. 'OK' when >=0.9
+        (Lighthouse considers the audit passing), percentage otherwise."""
+        if s is None: return "N/A"
+        if s >= 0.9: return "OK"
+        return f"{int(round(s * 100))}%"
+
+    ttfb_status = _classify_ttfb(ttfb_ms) if ttfb_ms is not None else "pending"
+
     metrics: Dict[str, Any] = {
         "metricLcp": {"value": _fmt_ms(lcp_ms),
                      "status": _classify_lcp(lcp_ms) if lcp_ms is not None else "pending"},
@@ -3479,18 +3534,90 @@ def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[fl
         "metricInp": {"value": _fmt_ms(inp_ms),
                      "status": _classify_inp(inp_ms) if inp_ms is not None else "pending"},
         "metricTtfb": {"value": _fmt_ms(ttfb_ms),
-                     "status": _classify_ttfb(ttfb_ms) if ttfb_ms is not None else "pending"},
+                     "status": ttfb_status},
         "metricBundleSize": {"value": _fmt_kb(bytes_),
                             "status": _classify_bundle_bytes(int(bytes_)) if bytes_ is not None else "pending"},
-        # The remaining metrics live in Lighthouse audits we don't surface yet —
-        # mark them pending so the UI shows them as "not measured" instead of faking pass/warn.
-        "metricImageOpt":   {"value": "—", "status": "pending"},
-        "metricFontLoad":   {"value": "—", "status": "pending"},
-        "metricServerResp": {"value": "—", "status": "pending"},
-        "metricGraphQL":    {"value": "—", "status": "pending"},
-        "metricCacheHit":   {"value": "—", "status": "pending"},
+        # 1.18.2 — image optimisation worst-score across 4 Lighthouse audits.
+        "metricImageOpt":   {"value": _fmt_audit_value(image_opt_score),
+                             "status": _score_to_status(image_opt_score)},
+        # 1.18.2 — font-display audit.
+        "metricFontLoad":   {"value": _fmt_audit_value(font_display_score),
+                             "status": _score_to_status(font_display_score)},
+        # 1.18.2 — server response is the same dimension as TTFB; alias instead
+        # of leaving the cell blank or faking a different number.
+        "metricServerResp": {"value": _fmt_ms(ttfb_ms) if ttfb_ms is not None else "—",
+                             "status": ttfb_status,
+                             "note": "alias_of_ttfb"},
+        # 1.18.2 — GraphQL timing is NOT in standard Lighthouse. Belongs to the
+        # Enonic-specific tab. Honest "N/A" with a hint instead of fake data.
+        "metricGraphQL":    {"value": "N/A", "status": "pending",
+                             "note": "lighthouse_does_not_measure_graphql_see_enonic_tab"},
+        # 1.18.2 — long-cache-TTL audit.
+        "metricCacheHit":   {"value": _fmt_audit_value(cache_ttl_score),
+                             "status": _score_to_status(cache_ttl_score)},
     }
-    return metrics, score_pct, None
+
+    # 1.18.2 — extract real bottlenecks + optimisations from Lighthouse audits.
+    # An audit is a bottleneck when its score < 0.9 and it has a savings hint.
+    # We rank by `overallSavingsMs` (opportunity audits) then numericValue
+    # (diagnostic audits with raw cost), take the top 5 of each, and format.
+    bottlenecks_real: List[str] = []
+    optimizations_real: List[str] = []
+    opportunity_candidates: List[Tuple[float, str, str]] = []  # (savings_ms, title, audit_id)
+
+    for audit_id, a in audits.items():
+        if not isinstance(a, dict):
+            continue
+        s = a.get("score")
+        if not isinstance(s, (int, float)) or s >= 0.9:
+            continue  # passing audit, skip
+        title = a.get("title") or audit_id
+        details = a.get("details") or {}
+        savings_ms = details.get("overallSavingsMs") if isinstance(details, dict) else None
+        savings_bytes = details.get("overallSavingsBytes") if isinstance(details, dict) else None
+        num_val = a.get("numericValue")
+        # Compute a sort key (higher = bigger problem). Prefer ms savings, then bytes, then raw numeric.
+        sort_key: float = 0.0
+        if isinstance(savings_ms, (int, float)) and savings_ms > 0:
+            sort_key = float(savings_ms)
+        elif isinstance(savings_bytes, (int, float)) and savings_bytes > 0:
+            sort_key = float(savings_bytes) / 1000.0   # rough byte→ms heuristic for ranking only
+        elif isinstance(num_val, (int, float)) and num_val > 0:
+            sort_key = float(num_val) / 10.0           # diagnostic audits (lower priority)
+        opportunity_candidates.append((sort_key, title, audit_id))
+
+    opportunity_candidates.sort(key=lambda t: t[0], reverse=True)
+    for sort_key, title, audit_id in opportunity_candidates[:5]:
+        a = audits.get(audit_id) or {}
+        details = a.get("details") or {}
+        savings_ms = details.get("overallSavingsMs") if isinstance(details, dict) else None
+        savings_bytes = details.get("overallSavingsBytes") if isinstance(details, dict) else None
+        # Bottlenecks: phrase as "what's slowing the page", with the savings.
+        if isinstance(savings_ms, (int, float)) and savings_ms > 0:
+            bottlenecks_real.append(f"{title} (~{int(round(savings_ms))}ms potential savings)")
+        elif isinstance(savings_bytes, (int, float)) and savings_bytes > 0:
+            bottlenecks_real.append(f"{title} (~{int(round(savings_bytes / 1024))}kb savings possible)")
+        else:
+            bottlenecks_real.append(title)
+        # Optimisations: phrase as the actionable fix (use the audit's
+        # `description` if present, fallback to title).
+        description = a.get("description") or ""
+        # Lighthouse descriptions can contain markdown links — strip them.
+        description = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", description)
+        # Keep only the first sentence for compactness.
+        first_sentence = description.split(". ")[0].strip()
+        if first_sentence and len(first_sentence) > 10:
+            optimizations_real.append(first_sentence if first_sentence.endswith(".") else first_sentence + ".")
+        else:
+            optimizations_real.append(title)
+
+    return {
+        "metrics": metrics,
+        "score": score_pct,
+        "bottlenecks": bottlenecks_real,
+        "optimizations": optimizations_real,
+        "error": None,
+    }
 
 
 def _mock_lighthouse_payload() -> Tuple[Dict[str, Any], int, List[str], List[str]]:
@@ -3539,6 +3666,8 @@ async def run_lighthouse(url: str, environment: str,
 
     metrics: Optional[Dict[str, Any]] = None
     score: Optional[float] = None
+    bottlenecks: List[str] = []
+    optimizations: List[str] = []
     live_error: Optional[str] = None
     is_mock = True
 
@@ -3546,12 +3675,17 @@ async def run_lighthouse(url: str, environment: str,
         # Lighthouse CLI is blocking + slow (60-90 s typical). Run it on a
         # worker thread so the async event loop is not blocked.
         import asyncio as _asyncio
-        metrics, score, live_error = await _asyncio.to_thread(_run_lighthouse_cli, url)
+        cli_result = await _asyncio.to_thread(_run_lighthouse_cli, url)
+        metrics = cli_result.get("metrics")
+        score = cli_result.get("score")
+        live_bottlenecks = cli_result.get("bottlenecks") or []
+        live_optimizations = cli_result.get("optimizations") or []
+        live_error = cli_result.get("error")
         if metrics is not None and score is not None:
             is_mock = False
+            bottlenecks = live_bottlenecks
+            optimizations = live_optimizations
 
-    bottlenecks: List[str] = []
-    optimizations: List[str] = []
     if is_mock:
         mock_metrics, mock_score, mock_bottlenecks, mock_opts = _mock_lighthouse_payload()
         metrics = mock_metrics

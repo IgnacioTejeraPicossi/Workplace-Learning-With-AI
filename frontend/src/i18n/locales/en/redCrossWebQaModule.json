@@ -365,7 +365,7 @@
       "badgeMock": "MOCK",
       "badgeLive": "LIVE (CLI)",
       "badgeFallback": "MOCK · LIVE FAILED",
-      "liveHint": "Real measurement from the local Lighthouse CLI.",
+      "liveHint": "Real measurement from the local Lighthouse CLI. Numbers may differ from Chrome DevTools' Lighthouse by ~5-15 points: DevTools applies mobile throttling by default, while this run uses your real network without simulated slowness.",
       "mockHint": "Deterministic example data — switch to LIVE for a real Lighthouse measurement.",
       "presetsTitle": "URL presets",
       "preset_rodekorsProd": "rodekors.no (production)",

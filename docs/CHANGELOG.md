@@ -7,6 +7,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.2] - 2026-06-XX
+
+### Added — Lighthouse live mode now surfaces 8/10 metrics + real bottlenecks + real optimizations
+
+After 1.18.1 fixed the false-positive detection, the project owner installed Lighthouse globally and ran the Ytelse tab in **Live (CLI)** mode against rodekors.no. The result was a real measurement (LCP 663ms, CLS 0.00, TTFB 11ms, JS 2117kb, score 93, **LIVE (CLI)** badge green) — but the UI showed 5 metric cards as `—` (pending) and both the Flaskehalser + Anbefalte optimaliseringer panels were empty. The reason: my live-mode mapping was conservative — I only filled the 5 metrics that map 1:1 to a Lighthouse audit, and I never extracted the audit list. This patch closes those three gaps so that switching to live mode actually delivers more than a single number.
+
+### What changed in `_run_lighthouse_cli`
+
+**1. Three more metrics now populated from real audits** (previously stuck on `pending`):
+
+| App metric | Lighthouse audit(s) used | Mapping |
+|---|---|---|
+| `metricImageOpt` | worst of `uses-optimized-images`, `modern-image-formats`, `efficient-animated-content`, `uses-responsive-images` | OK if all ≥0.9; else worst-score |
+| `metricFontLoad` | `font-display` | score → pass/warn/fail per Lighthouse's own thresholds |
+| `metricCacheHit` | `uses-long-cache-ttl` | score → pass/warn/fail |
+
+**2. Two metrics intentionally honest about not being Lighthouse data**:
+
+- `metricServerResp` — aliased to `metricTtfb` (same dimension, was redundant). The card now shows the same TTFB value with the same status; a `note: "alias_of_ttfb"` field tells future maintainers why.
+- `metricGraphQL` — kept as `"N/A"` with `note: "lighthouse_does_not_measure_graphql_see_enonic_tab"`. Lighthouse genuinely does not measure GraphQL — that lives in the Enonic-specific tab. Honest pointer rather than fake data.
+
+**3. Bottlenecks and Optimizations now extracted from real audits**:
+
+The function now walks `report.audits` and selects audits where `score < 0.9` (i.e., not passing). Each candidate gets a sort key based on `details.overallSavingsMs` (Lighthouse "opportunities") with fallback to `overallSavingsBytes` or raw `numericValue`. Top 5 are formatted as:
+
+- **Bottlenecks** — title + savings: e.g. *"Eliminate render-blocking resources (~340ms potential savings)"*, *"Reduce unused JavaScript (~512kb savings possible)"*
+- **Optimizations** — first sentence of the audit's description, with Lighthouse's markdown links flattened. Actionable, not just diagnostic.
+
+The mock path is untouched — workshop demos still show the canonical 2 bottlenecks and 3 optimizations.
+
+### UI hint updated to explain the DevTools score gap
+
+The project owner observed that Lighthouse-app gave score **93** while Chrome DevTools' built-in Lighthouse on the same URL gave **85**. This is not a bug — it is the throttling default. Chrome DevTools applies mobile throttling (Slow 4G + 4× CPU) by default; our CLI invocation uses `--throttling-method=provided` (no synthesised throttling). Both are "real" but they measure different things.
+
+`performance.liveHint` now spells this out explicitly in all 3 locales:
+
+> EN: *"Real measurement from the local Lighthouse CLI. Numbers may differ from Chrome DevTools' Lighthouse by ~5-15 points: DevTools applies mobile throttling by default, while this run uses your real network without simulated slowness."*
+
+NO + ES translated equivalents.
+
+### Return-type refactor (internal)
+
+`_run_lighthouse_cli` previously returned a 3-tuple `(metrics, score, error)`. To carry the new bottlenecks + optimizations arrays alongside the metrics, the return type is now a dict with 5 keys: `metrics / score / bottlenecks / optimizations / error`. All early-return paths use a new internal `_fail(reason)` helper that builds the canonical failure-shape dict. `run_lighthouse` (the public entry point) was updated to consume the new dict shape and now correctly forwards real bottlenecks + optimizations when live mode succeeds — falls back to the mock arrays when live fails.
+
+### Files changed
+
+- `backend/services/red_cross_qa.py` — `_run_lighthouse_cli` enriched (~70 LOC of new logic for audit extraction, status mapping, top-5 ranking); `run_lighthouse` updated to read the dict-shape return; both bottlenecks + optimizations now wired through to the response
+- `backend/tests/smoke_red_cross_qa.py` — +2 checks: dict-shape contract (skipped if CLI installed locally), mock-bottlenecks regression guard
+- `frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json` — `performance.liveHint` extended with the throttling explanation
+- No frontend component changes needed — the existing UI already renders `report.bottlenecks` and `report.optimizations` as bullet lists. The fix is upstream
+
+### Validation
+
+- ✅ Backend smoke: 55/55 checks pass (was 53 — added 2 new for dict-shape contract + mock regression guard)
+- ✅ Both Lighthouse smoke tests still skip cleanly when CLI is installed locally
+- ✅ Mock mode still produces the canonical 2 bottlenecks + 3 optimizations (regression check)
+- ✅ i18n parity: 12+1 keys in `performance.*` still identical across EN/NO/ES (liveHint just got longer text, same key)
+- ✅ Frontend rendering unchanged — the report consumer was already array-aware
+
+### What the user will see now
+
+Running **🟢 Live (CLI)** on rodekors.no will now show:
+
+1. The same green **LIVE (CLI)** badge
+2. The same real LCP / CLS / INP / TTFB / Bundle metrics
+3. **3 new metrics actually populated**: imageOpt (OK or %), fontLoad (OK or %), cacheHit (OK or %)
+4. `metricServerResp` now mirrors TTFB (no more empty cell)
+5. `metricGraphQL` shows `N/A` with a note pointing to the Enonic tab
+6. **Flaskehalser panel populated** with the top 5 audits Lighthouse flagged, each with potential savings
+7. **Anbefalte optimaliseringer panel populated** with Lighthouse's own actionable descriptions
+8. The hint under the score now explains why the number may differ from Chrome DevTools
+
+### What is still deferred
+
+- **Form-factor toggle** (mobile emulation vs desktop) — not added; current default is Lighthouse's standard mobile emulation. Will revisit if the user wants explicit desktop runs
+- **Throttling toggle** (simulated vs provided) — not added; could be a V1.3 option if user wants DevTools-comparable scores
+- **Persisted run history with per-URL trends** — would reuse the baseline pattern (`_baseline_load / _baseline_save`) but only valuable if the user runs the same URL repeatedly. Deferred until requested
+
+---
+
 ## [1.18.1] - 2026-06-XX
 
 ### Fixed — Lighthouse detection produced confusing npx error when CLI was not globally installed

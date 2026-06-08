@@ -369,7 +369,7 @@
       "badgeMock": "MOCK",
       "badgeLive": "LIVE (CLI)",
       "badgeFallback": "MOCK · LIVE FALLÓ",
-      "liveHint": "Medición real desde el Lighthouse CLI local.",
+      "liveHint": "Medición real desde el Lighthouse CLI local. Los números pueden diferir de Lighthouse en Chrome DevTools por ~5-15 puntos: DevTools aplica throttling móvil por defecto, mientras que esta ejecución usa tu red real sin lentitud simulada.",
       "mockHint": "Datos de ejemplo determinísticos — cambia a LIVE para una medición real con Lighthouse.",
       "metricLcp": "LCP",
       "metricCls": "CLS",
