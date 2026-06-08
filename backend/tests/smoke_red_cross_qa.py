@@ -22,7 +22,12 @@ from backend.services.red_cross_qa import (
     fetch_ado_sprint_items, format_ado_item_as_paste_text,
     run_lighthouse,
 )
-from backend.services.red_cross_qa import _validate_target_url, _find_lighthouse_binary
+from backend.services.red_cross_qa import (
+    _validate_target_url,
+    _find_lighthouse_binary,
+    _LIGHTHOUSE_METRIC_AUDIT_IDS,
+    _run_lighthouse_cli,
+)
 from backend.services.red_cross_qa import (
     _baseline_load, _baseline_save, _baseline_list, _baseline_reset,
     BASELINE_GRAPHQL, BASELINE_PERF_HOT_QUERY, BASELINE_DS_COMPLIANCE,

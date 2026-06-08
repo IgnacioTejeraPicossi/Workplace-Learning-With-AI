@@ -158,7 +158,8 @@
       "Bash(timeout 30 grep -rn \"demos.followups\\\\|demos\\\\[.task.\\\\]\\\\|demos.accessibility\" frontend/src/ --include=\"*.jsx\" --include=\"*.js\")",
       "Bash(timeout 30 grep -rln \"homoVsAi\\\\.tasks\\\\|HomoSapiensVsAI\\\\|HomoVsAi\" frontend/src/)",
       "Bash(npm prefix *)",
-      "Bash(lighthouse --version)"
+      "Bash(lighthouse --version)",
+      "Bash(lighthouse https://www.rodekors.no/ --output=json --output-path=/tmp/rk_lh.json --only-categories=performance --chrome-flags=\"--headless --no-sandbox\" --quiet)"
     ]
   }
 }

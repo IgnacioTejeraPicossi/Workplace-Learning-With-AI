@@ -381,6 +381,11 @@
       "metricServerResp": "Respuesta del servidor",
       "metricGraphQL": "Tiempo de query GraphQL",
       "metricCacheHit": "Ratio de aciertos de caché",
+      "metricNotes": {
+        "alias_of_ttfb": "Misma medición que TTFB — Lighthouse solo reporta un tiempo de respuesta del servidor.",
+        "lighthouse_does_not_measure_graphql_see_enonic_tab": "Lighthouse no mide las consultas GraphQL. Mira la pestaña Enonic para tiempos reales de Guillotine.",
+        "lighthouse_lab_does_not_measure_inp_field_data_required": "INP no se mide en una ejecución de laboratorio sin interacción del usuario — requiere datos de campo (CrUX) de visitas reales."
+      },
       "lighthouseScore": "Puntuación Lighthouse",
       "bottlenecks": "Cuellos de botella",
       "optimizations": "Optimizaciones recomendadas",

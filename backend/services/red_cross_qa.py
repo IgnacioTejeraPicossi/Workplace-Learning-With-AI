@@ -3322,6 +3322,24 @@ async def run_wave_audit(url: str, environment: str,
 _LIGHTHOUSE_TIMEOUT_SECONDS = 120  # generous; cold runs against prod can be 60-90s
 _LIGHTHOUSE_MAX_OUTPUT_BYTES = 32 * 1024 * 1024  # 32 MB cap for the JSON output
 
+# 1.18.3 — Lighthouse "metric" audits (the ones shown in the score strip on
+# any Lighthouse report). They are NOT actionable bottlenecks: each one is
+# already surfaced in its own card above the Flaskehalser panel, and the user
+# cannot directly "fix" FCP or TBT — they fix the underlying opportunities
+# that influence those metrics. Excluding them keeps the bottleneck list
+# focused on real opportunities/diagnostics. Module-scope so tests can import.
+_LIGHTHOUSE_METRIC_AUDIT_IDS: frozenset[str] = frozenset({
+    "first-contentful-paint",
+    "largest-contentful-paint",
+    "speed-index",
+    "total-blocking-time",
+    "cumulative-layout-shift",
+    "interactive",
+    "max-potential-fid",
+    "interaction-to-next-paint",
+    "experimental-interaction-to-next-paint",
+})
+
 # Lighthouse CWV thresholds (Google's published cutoffs for "Good / Needs Improvement / Poor").
 def _classify_lcp(ms: float) -> str:
     return "pass" if ms < 2500 else ("warn" if ms < 4000 else "fail")
@@ -3496,6 +3514,9 @@ def _run_lighthouse_cli(url: str) -> Dict[str, Any]:
                 seen.append(s)
         return min(seen) if seen else None
 
+    # 1.18.3 — see module-level `_LIGHTHOUSE_METRIC_AUDIT_IDS` for the rationale.
+    metric_audit_ids = _LIGHTHOUSE_METRIC_AUDIT_IDS
+
     lcp_ms   = _num("largest-contentful-paint")
     cls_v    = _num("cumulative-layout-shift")
     inp_ms   = _num("interaction-to-next-paint") or _num("experimental-interaction-to-next-paint")
@@ -3531,8 +3552,15 @@ def _run_lighthouse_cli(url: str) -> Dict[str, Any]:
                      "status": _classify_lcp(lcp_ms) if lcp_ms is not None else "pending"},
         "metricCls": {"value": f"{cls_v:.2f}" if cls_v is not None else "N/A",
                      "status": _classify_cls(cls_v) if cls_v is not None else "pending"},
-        "metricInp": {"value": _fmt_ms(inp_ms),
-                     "status": _classify_inp(inp_ms) if inp_ms is not None else "pending"},
+        # 1.18.3 — Lighthouse lab tests do NOT measure INP on a cold-page load
+        # (it needs real user interactions / field data from CrUX). If the
+        # audit didn't return a numericValue we surface the same honest N/A
+        # pattern as GraphQL: value "N/A" + explainer note for the UI tooltip.
+        "metricInp": ({"value": _fmt_ms(inp_ms),
+                      "status": _classify_inp(inp_ms)}
+                     if inp_ms is not None else
+                     {"value": "N/A", "status": "pending",
+                      "note": "lighthouse_lab_does_not_measure_inp_field_data_required"}),
         "metricTtfb": {"value": _fmt_ms(ttfb_ms),
                      "status": ttfb_status},
         "metricBundleSize": {"value": _fmt_kb(bytes_),
@@ -3567,6 +3595,10 @@ def _run_lighthouse_cli(url: str) -> Dict[str, Any]:
 
     for audit_id, a in audits.items():
         if not isinstance(a, dict):
+            continue
+        # 1.18.3 — never list Lighthouse metric audits as bottlenecks; they're
+        # already shown in the metric cards and are not directly actionable.
+        if audit_id in metric_audit_ids:
             continue
         s = a.get("score")
         if not isinstance(s, (int, float)) or s >= 0.9:

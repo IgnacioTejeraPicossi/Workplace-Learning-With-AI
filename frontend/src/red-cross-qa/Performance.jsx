@@ -244,8 +244,14 @@ const Performance = ({ environment }) => {
             {METRICS.map(m => {
               const v = report?.metrics?.[m.key];
               const status = v?.status || 'pending';
+              // 1.18.3 — surface backend `note` (alias_of_ttfb, GraphQL N/A,
+              // INP requires field data, etc.) as both a small italic line
+              // and a hover tooltip on the metric card.
+              const noteText = v?.note
+                ? t(`redCrossWebQaModule.performance.metricNotes.${v.note}`, { defaultValue: '' })
+                : '';
               return (
-                <div key={m.key} style={{
+                <div key={m.key} title={noteText || undefined} style={{
                   padding: 14, borderRadius: 10,
                   backgroundColor: `${m.color}10`,
                   border: `1px solid ${STATUS_BORDER[status]}`,
@@ -257,6 +263,11 @@ const Performance = ({ environment }) => {
                   <div style={{ fontSize: 22, fontWeight: 700, color: '#1e293b', marginTop: 6 }}>
                     {v?.value || '—'}
                   </div>
+                  {noteText && (
+                    <div style={{ marginTop: 6, fontSize: 10, color: '#64748b', fontStyle: 'italic', lineHeight: 1.3 }}>
+                      ℹ️ {noteText}
+                    </div>
+                  )}
                 </div>
               );
             })}
