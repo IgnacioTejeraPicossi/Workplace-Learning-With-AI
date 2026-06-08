@@ -156,7 +156,9 @@
       "Bash(node check_agent_catalog.js)",
       "Bash(timeout 30 grep -rn \"Checkout sometimes fails\" backend/ frontend/src/)",
       "Bash(timeout 30 grep -rn \"demos.followups\\\\|demos\\\\[.task.\\\\]\\\\|demos.accessibility\" frontend/src/ --include=\"*.jsx\" --include=\"*.js\")",
-      "Bash(timeout 30 grep -rln \"homoVsAi\\\\.tasks\\\\|HomoSapiensVsAI\\\\|HomoVsAi\" frontend/src/)"
+      "Bash(timeout 30 grep -rln \"homoVsAi\\\\.tasks\\\\|HomoSapiensVsAI\\\\|HomoVsAi\" frontend/src/)",
+      "Bash(npm prefix *)",
+      "Bash(lighthouse --version)"
     ]
   }
 }
