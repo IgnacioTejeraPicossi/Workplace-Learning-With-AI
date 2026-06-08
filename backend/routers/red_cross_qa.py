@@ -168,6 +168,11 @@ class CmsRequest(BaseModel):
 class UrlRequest(BaseModel):
     url: str
     wcag_version: Optional[str] = "2.2-AA"  # Phase C: explicit WCAG version (Trine §4.1)
+    # 1.18.0 — Lighthouse data-source toggle. "mock" (deterministic, old default),
+    # "live" (require CLI; fall back to mock on error + populate live_error),
+    # "auto" (use CLI if available; silently fall back). Only the Lighthouse
+    # endpoint reads this field; other UrlRequest consumers ignore it.
+    mode: Optional[str] = "auto"
     environment: Optional[str] = "test"
     lang: Optional[str] = "en"
 
@@ -427,7 +432,8 @@ async def api_run_wave_audit(body: WaveAuditRequest):
 @router.post("/run-lighthouse")
 async def api_run_lighthouse(body: UrlRequest):
     env = _check_env(body.environment)
-    return await run_lighthouse(body.url, env, body.lang or "en")
+    return await run_lighthouse(body.url, env, body.lang or "en",
+                                  mode=(body.mode or "auto"))
 
 
 # ── Stress Test ───────────────────────────────────────────────────

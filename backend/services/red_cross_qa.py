@@ -3307,8 +3307,188 @@ async def run_wave_audit(url: str, environment: str,
 # ═══════════════════════════════════════════════════════════════════
 # Tool 7 — Performance / Lighthouse
 # ═══════════════════════════════════════════════════════════════════
-async def run_lighthouse(url: str, environment: str,
-                         lang: str = "en") -> Dict[str, Any]:
+# ─── Lighthouse CLI integration (1.18.0) ────────────────────────────
+# Up to 1.17.10 `run_lighthouse` returned hard-coded mock data regardless
+# of the URL. The project owner flagged this honestly: scoring 86 on every
+# URL is not measurement, it's an example. 1.18.0 adds a real subprocess
+# integration with the Lighthouse Node CLI (`lighthouse https://… --output=json`)
+# while preserving the mock as a deterministic fallback so the workshop demo
+# still works offline. The caller picks via `mode`:
+#   • "mock" → always return mock, ignore CLI
+#   • "live" → require CLI; if it fails, return mock + populate `live_error`
+#   • "auto" → use CLI if available; if not, silently fall back to mock
+# All responses carry `is_mock: bool` so the UI can render a MOCK / LIVE badge.
+
+_LIGHTHOUSE_TIMEOUT_SECONDS = 120  # generous; cold runs against prod can be 60-90s
+_LIGHTHOUSE_MAX_OUTPUT_BYTES = 32 * 1024 * 1024  # 32 MB cap for the JSON output
+
+# Lighthouse CWV thresholds (Google's published cutoffs for "Good / Needs Improvement / Poor").
+def _classify_lcp(ms: float) -> str:
+    return "pass" if ms < 2500 else ("warn" if ms < 4000 else "fail")
+def _classify_cls(v: float) -> str:
+    return "pass" if v < 0.10 else ("warn" if v < 0.25 else "fail")
+def _classify_inp(ms: float) -> str:
+    return "pass" if ms < 200 else ("warn" if ms < 500 else "fail")
+def _classify_ttfb(ms: float) -> str:
+    return "pass" if ms < 800 else ("warn" if ms < 1800 else "fail")
+def _classify_bundle_bytes(b: int) -> str:
+    # Lighthouse "Avoid enormous network payloads" warns at 1.6MB; we mirror that.
+    return "pass" if b < 1_600_000 else ("warn" if b < 4_000_000 else "fail")
+
+
+def _validate_target_url(url: str) -> Optional[str]:
+    """Return None if URL is safe to pass to the Lighthouse subprocess,
+    or a short error string explaining why it was rejected.
+
+    Scheme whitelist (http/https only — no `file://`, `data:`, `javascript:`,
+    `chrome://`, etc.) + length cap. Local addresses (localhost, 127.*) are
+    allowed because the project genuinely tests local dev servers.
+    """
+    if not url or not isinstance(url, str):
+        return "url is required"
+    if len(url) > 2048:
+        return "url exceeds 2048 chars"
+    lowered = url.strip().lower()
+    if not (lowered.startswith("http://") or lowered.startswith("https://")):
+        return "url must start with http:// or https://"
+    return None
+
+
+def _find_lighthouse_binary() -> Optional[List[str]]:
+    """Return the command prefix to invoke Lighthouse, or None if not found.
+
+    Tries direct `lighthouse` first (works when installed globally via
+    `npm install -g lighthouse`), then `npx --no-install lighthouse`
+    (works when installed locally in any node_modules near $PATH). Never
+    triggers an automatic npm download (`--no-install`).
+    """
+    import shutil
+    direct = shutil.which("lighthouse")
+    if direct:
+        return [direct]
+    npx = shutil.which("npx")
+    if npx:
+        return [npx, "--no-install", "lighthouse"]
+    return None
+
+
+def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[float], Optional[str]]:
+    """Invoke the Lighthouse CLI against `url` and parse its JSON output.
+
+    Returns `(metrics_dict, score_0_100, error)`. On any failure all three
+    are returned with `metrics_dict=None, score=None, error="<reason>"` so
+    the caller can decide whether to fall back to mock.
+
+    Subprocess is invoked with `shell=False`, an absolute argv list, a 120 s
+    timeout, and `--no-enable-error-reporting` so Lighthouse does not phone
+    home. Output is captured (not streamed) up to 32 MB.
+    """
+    import subprocess as _sp
+
+    bin_cmd = _find_lighthouse_binary()
+    if not bin_cmd:
+        return None, None, "lighthouse CLI not found in PATH (npm install -g lighthouse)"
+
+    # Conservative flags:
+    #   --output=json            machine-readable
+    #   --quiet                  no progress noise on stderr
+    #   --chrome-flags="..."     headless + no-sandbox for CI / Docker
+    #   --only-categories        performance only; faster + smaller JSON
+    #   --max-wait-for-load      cap idle wait at 45 s
+    #   --throttling-method=provided  do not synthesise throttling on top of system
+    #   --no-enable-error-reporting   never phone home
+    args = bin_cmd + [
+        url,
+        "--output=json",
+        "--quiet",
+        "--chrome-flags=--headless=new --no-sandbox --disable-gpu",
+        "--only-categories=performance",
+        "--max-wait-for-load=45000",
+        "--throttling-method=provided",
+        "--no-enable-error-reporting",
+    ]
+
+    try:
+        result = _sp.run(
+            args,
+            capture_output=True,
+            timeout=_LIGHTHOUSE_TIMEOUT_SECONDS,
+            check=False,
+            shell=False,
+            text=True,
+        )
+    except _sp.TimeoutExpired:
+        return None, None, f"lighthouse timed out after {_LIGHTHOUSE_TIMEOUT_SECONDS}s"
+    except FileNotFoundError as exc:
+        return None, None, f"lighthouse binary not executable: {exc}"
+    except Exception as exc:  # pragma: no cover — defensive
+        return None, None, f"{type(exc).__name__}: {exc}"
+
+    if result.returncode != 0:
+        stderr_tail = (result.stderr or "")[-400:]
+        return None, None, f"lighthouse exited {result.returncode}: {stderr_tail.strip()}"
+
+    stdout = result.stdout or ""
+    if not stdout.strip():
+        return None, None, "lighthouse produced empty output"
+    if len(stdout) > _LIGHTHOUSE_MAX_OUTPUT_BYTES:
+        return None, None, f"lighthouse output exceeded {_LIGHTHOUSE_MAX_OUTPUT_BYTES} bytes"
+
+    try:
+        report = json.loads(stdout)
+    except json.JSONDecodeError as exc:
+        return None, None, f"lighthouse JSON parse failed: {exc}"
+
+    audits = report.get("audits") or {}
+    categories = report.get("categories") or {}
+    perf = (categories.get("performance") or {})
+    raw_score = perf.get("score")
+    score_pct = round(float(raw_score) * 100, 0) if isinstance(raw_score, (int, float)) else None
+
+    def _num(audit_id: str) -> Optional[float]:
+        a = audits.get(audit_id) or {}
+        v = a.get("numericValue")
+        return float(v) if isinstance(v, (int, float)) else None
+
+    lcp_ms   = _num("largest-contentful-paint")
+    cls_v    = _num("cumulative-layout-shift")
+    inp_ms   = _num("interaction-to-next-paint") or _num("experimental-interaction-to-next-paint")
+    ttfb_ms  = _num("server-response-time")
+    bytes_   = _num("total-byte-weight")
+
+    def _fmt_ms(v: Optional[float]) -> str:
+        if v is None: return "N/A"
+        return f"{v / 1000:.1f}s" if v >= 1000 else f"{int(round(v))}ms"
+
+    def _fmt_kb(v: Optional[float]) -> str:
+        if v is None: return "N/A"
+        return f"{int(round(v / 1024))}kb"
+
+    metrics: Dict[str, Any] = {
+        "metricLcp": {"value": _fmt_ms(lcp_ms),
+                     "status": _classify_lcp(lcp_ms) if lcp_ms is not None else "pending"},
+        "metricCls": {"value": f"{cls_v:.2f}" if cls_v is not None else "N/A",
+                     "status": _classify_cls(cls_v) if cls_v is not None else "pending"},
+        "metricInp": {"value": _fmt_ms(inp_ms),
+                     "status": _classify_inp(inp_ms) if inp_ms is not None else "pending"},
+        "metricTtfb": {"value": _fmt_ms(ttfb_ms),
+                     "status": _classify_ttfb(ttfb_ms) if ttfb_ms is not None else "pending"},
+        "metricBundleSize": {"value": _fmt_kb(bytes_),
+                            "status": _classify_bundle_bytes(int(bytes_)) if bytes_ is not None else "pending"},
+        # The remaining metrics live in Lighthouse audits we don't surface yet —
+        # mark them pending so the UI shows them as "not measured" instead of faking pass/warn.
+        "metricImageOpt":   {"value": "—", "status": "pending"},
+        "metricFontLoad":   {"value": "—", "status": "pending"},
+        "metricServerResp": {"value": "—", "status": "pending"},
+        "metricGraphQL":    {"value": "—", "status": "pending"},
+        "metricCacheHit":   {"value": "—", "status": "pending"},
+    }
+    return metrics, score_pct, None
+
+
+def _mock_lighthouse_payload() -> Tuple[Dict[str, Any], int, List[str], List[str]]:
+    """Deterministic mock — preserved for offline workshop demos and as the
+    fallback when live mode fails. Returns (metrics, score, bottlenecks, opts)."""
     metrics = {
         "metricLcp":         {"value": "2.4s", "status": "pass"},
         "metricCls":         {"value": "0.06", "status": "pass"},
@@ -3327,12 +3507,83 @@ async def run_lighthouse(url: str, environment: str,
         "Defer non-critical scripts on donation page",
         "Use AVIF for hero images",
     ]
-    run = await _store_run("redcross-performance-core-web-vitals", environment, "warn",
-                            f"Lighthouse on {url}",
-                            {"url": url, "metrics": metrics})
-    return {"status": "ok", "url": url, "lighthouse_score": 86,
-            "metrics": metrics, "bottlenecks": bottlenecks,
-            "optimizations": optimizations, "run_id": run["run_id"]}
+    return metrics, 86, bottlenecks, optimizations
+
+
+async def run_lighthouse(url: str, environment: str,
+                         lang: str = "en",
+                         mode: str = "auto") -> Dict[str, Any]:
+    """Run Lighthouse on `url`. `mode` ∈ {"mock", "live", "auto"}:
+
+      mock  — always return the deterministic mock (current pre-1.18.0 behavior)
+      live  — require the Lighthouse CLI; on failure, return mock + live_error
+      auto  — try the CLI; on failure (no binary, timeout, etc.), silently fall back
+
+    Response always includes `is_mock: bool` so the UI can render a MOCK / LIVE
+    badge. When live mode falls back, `live_error` is populated with the reason.
+    """
+    if mode not in ("mock", "live", "auto"):
+        mode = "auto"
+
+    url_error = _validate_target_url(url)
+    if url_error:
+        return {"status": "error", "message": url_error,
+                "url": url, "is_mock": True, "mode_requested": mode}
+
+    metrics: Optional[Dict[str, Any]] = None
+    score: Optional[float] = None
+    live_error: Optional[str] = None
+    is_mock = True
+
+    if mode in ("live", "auto"):
+        # Lighthouse CLI is blocking + slow (60-90 s typical). Run it on a
+        # worker thread so the async event loop is not blocked.
+        import asyncio as _asyncio
+        metrics, score, live_error = await _asyncio.to_thread(_run_lighthouse_cli, url)
+        if metrics is not None and score is not None:
+            is_mock = False
+
+    bottlenecks: List[str] = []
+    optimizations: List[str] = []
+    if is_mock:
+        mock_metrics, mock_score, mock_bottlenecks, mock_opts = _mock_lighthouse_payload()
+        metrics = mock_metrics
+        score = mock_score
+        bottlenecks = mock_bottlenecks
+        optimizations = mock_opts
+
+    run_status = "warn"
+    if metrics:
+        statuses = [m.get("status") for m in metrics.values() if isinstance(m, dict)]
+        if "fail" in statuses:
+            run_status = "fail"
+        elif "warn" not in statuses and "pending" not in statuses:
+            run_status = "pass"
+
+    run = await _store_run(
+        "redcross-performance-core-web-vitals", environment, run_status,
+        f"Lighthouse on {url} ({'mock' if is_mock else 'live'})",
+        {"url": url, "mode": mode, "is_mock": is_mock, "metrics": metrics},
+    )
+    response: Dict[str, Any] = {
+        "status": "ok",
+        "url": url,
+        "mode_requested": mode,
+        "is_mock": is_mock,
+        "lighthouse_score": int(score) if score is not None else None,
+        "metrics": metrics,
+        "bottlenecks": bottlenecks,
+        "optimizations": optimizations,
+        "run_id": run["run_id"],
+    }
+    if live_error and mode == "live":
+        response["live_error"] = live_error
+    elif live_error and mode == "auto":
+        # In auto mode we silently fall back, but it is still useful for the
+        # UI to know why CLI was skipped (e.g. "binary not found") so a
+        # diagnostic badge can be rendered.
+        response["live_error"] = live_error
+    return response
 
 
 # ═══════════════════════════════════════════════════════════════════

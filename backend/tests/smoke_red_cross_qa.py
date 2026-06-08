@@ -20,7 +20,9 @@ from backend.services.red_cross_qa import (
     generate_nvda_script, run_wave_audit,
     parse_ado_pasted_text, generate_test_plan_from_ado_item,
     fetch_ado_sprint_items, format_ado_item_as_paste_text,
+    run_lighthouse,
 )
+from backend.services.red_cross_qa import _validate_target_url, _find_lighthouse_binary
 from backend.services.red_cross_qa import (
     _baseline_load, _baseline_save, _baseline_list, _baseline_reset,
     BASELINE_GRAPHQL, BASELINE_PERF_HOT_QUERY, BASELINE_DS_COMPLIANCE,
@@ -1161,6 +1163,48 @@ async def main():
         "ds_compliance cache should NOT be cleared by resilience-only reset"
     print(f"[OK] baseline admin — list ({len(entries_all)} entries total, "
           f"{len(entries_resilience)} resilience) + type-specific reset")
+
+
+    # ── Phase H+ (1.18.0) — Lighthouse mode toggle (mock / live / auto) ─
+    # Test the data-source toggle without requiring the Lighthouse CLI to be
+    # installed. mode="mock" must always return the deterministic data.
+    lh_mock = await run_lighthouse("https://www.rodekors.no/", "test", "en", mode="mock")
+    assert lh_mock["status"] == "ok"
+    assert lh_mock["is_mock"] is True, "mode='mock' must always set is_mock=True"
+    assert lh_mock["lighthouse_score"] == 86, "mock score must be the canonical 86"
+    assert lh_mock["metrics"]["metricLcp"]["value"] == "2.4s", "mock LCP must be 2.4s"
+    assert "live_error" not in lh_mock, "mock mode must not emit live_error"
+    print("[OK] Lighthouse mock mode (deterministic 86, LCP 2.4s, no live_error)")
+
+    # mode="live" without CLI installed → fallback to mock + populate live_error.
+    # In CI we assume Lighthouse CLI is NOT installed; this checks the graceful
+    # fallback path. If a developer has it installed locally the assertion
+    # would fail — gate on _find_lighthouse_binary() to skip then.
+    if _find_lighthouse_binary() is None:
+        lh_live = await run_lighthouse("https://www.rodekors.no/", "test", "en", mode="live")
+        assert lh_live["status"] == "ok"
+        assert lh_live["is_mock"] is True, "live mode without CLI must fall back to mock"
+        assert "live_error" in lh_live and lh_live["live_error"], \
+            "live mode without CLI must populate live_error"
+        assert "lighthouse" in lh_live["live_error"].lower() or "cli" in lh_live["live_error"].lower(), \
+            f"live_error should mention lighthouse/cli; got: {lh_live['live_error']!r}"
+        print(f"[OK] Lighthouse live mode without CLI -> mock fallback (live_error: {lh_live['live_error'][:50]}...)")
+    else:
+        print("[SKIP] Lighthouse live-mode-without-CLI test — CLI is installed locally")
+
+    # URL validation: invalid schemes must be rejected before subprocess fires.
+    for bad in ("file:///etc/passwd", "javascript:alert(1)", "data:text/html,foo", "ftp://x.com"):
+        rejected = await run_lighthouse(bad, "test", "en", mode="live")
+        assert rejected["status"] == "error", f"bad URL {bad!r} must be rejected; got {rejected}"
+    print("[OK] Lighthouse URL validation rejects non-http(s) schemes (4 cases)")
+
+    # _validate_target_url unit check
+    assert _validate_target_url("https://www.rodekors.no/") is None
+    assert _validate_target_url("http://localhost:3000") is None
+    assert _validate_target_url("file:///etc/passwd") is not None
+    assert _validate_target_url("") is not None
+    assert _validate_target_url("x" * 3000) is not None  # length cap
+    print("[OK] _validate_target_url passes http(s), rejects file/empty/oversized")
 
 
 if __name__ == "__main__":

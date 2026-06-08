@@ -76,13 +76,17 @@ const Performance = ({ environment }) => {
   const [report, setReport] = useState(null);
   const [enonicRunning, setEnonicRunning] = useState(false);
   const [enonicReport, setEnonicReport] = useState(null);
+  // 1.18.0 — Lighthouse data-source mode. "auto" tries the CLI and falls
+  // back to mock; "live" forces the CLI and surfaces the error if it fails;
+  // "mock" always returns the deterministic example data.
+  const [lighthouseMode, setLighthouseMode] = useState('auto');
 
   const runLighthouseOn = async (target) => {
     setRunning(true); setReport(null);
     try {
       const res = await fetch(`${API}/run-lighthouse`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: target, environment, lang: i18n.language }),
+        body: JSON.stringify({ url: target, environment, lang: i18n.language, mode: lighthouseMode }),
       });
       setReport(await res.json());
     } catch { setReport({ status: 'error', message: 'Network error' }); }
@@ -178,6 +182,49 @@ const Performance = ({ environment }) => {
             </div>
           </div>
 
+          {/* 1.18.0 — Lighthouse data-source mode selector. Lets the user
+              explicitly choose between deterministic mock data, real CLI
+              measurement (with error if CLI not installed), or auto fall-back. */}
+          <div style={{
+            marginTop: 12, marginBottom: 12, padding: '10px 14px',
+            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8,
+          }}>
+            <div style={{
+              fontSize: 11, color: '#64748b', textTransform: 'uppercase',
+              fontWeight: 600, letterSpacing: 0.4, marginBottom: 6,
+            }}>
+              {t('redCrossWebQaModule.performance.modeTitle', { defaultValue: 'Lighthouse data source' })}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {[
+                { val: 'auto', icon: '⚙️', color: '#3b82f6' },
+                { val: 'live', icon: '🟢', color: '#10b981' },
+                { val: 'mock', icon: '📦', color: '#f59e0b' },
+              ].map(m => {
+                const active = lighthouseMode === m.val;
+                return (
+                  <label key={m.val} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 999, cursor: 'pointer',
+                    backgroundColor: active ? `${m.color}15` : 'white',
+                    border: `1px solid ${active ? `${m.color}80` : '#e2e8f0'}`,
+                    color: active ? m.color : '#475569',
+                    fontSize: 12, fontWeight: active ? 700 : 500,
+                  }}>
+                    <input type="radio" name="lighthouse-mode" value={m.val}
+                      checked={active} onChange={() => setLighthouseMode(m.val)}
+                      style={{ accentColor: m.color, marginRight: 2 }} />
+                    <span style={{ fontSize: 14 }}>{m.icon}</span>
+                    <span>{t(`redCrossWebQaModule.performance.mode_${m.val}`, { defaultValue: m.val })}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <p style={{ margin: '8px 0 0', fontSize: 11, color: '#94a3b8', lineHeight: 1.4 }}>
+              {t(`redCrossWebQaModule.performance.modeHint_${lighthouseMode}`, { defaultValue: '' })}
+            </p>
+          </div>
+
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <input value={url} onChange={e => setUrl(e.target.value)} style={{ ...input, flex: 1, minWidth: 240 }} />
             <button onClick={handleRun} disabled={running} style={primaryBtn(running)}>
@@ -225,6 +272,50 @@ const Performance = ({ environment }) => {
               {score === null ? '—' : score}
             </p>
             <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>Lighthouse</p>
+            {/* 1.18.0 — data-source provenance badge. Tells the user at a glance
+                whether the number above came from a real Lighthouse run or the
+                deterministic mock. live_error tooltip surfaces CLI errors. */}
+            {report && typeof report.is_mock === 'boolean' && (
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                {(() => {
+                  const isMock = report.is_mock;
+                  const hasError = !!report.live_error;
+                  const liveFallback = isMock && hasError;
+                  const badgeStyle = liveFallback
+                    ? { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5', label: t('redCrossWebQaModule.performance.badgeFallback', { defaultValue: 'MOCK · LIVE FAILED' }) }
+                    : isMock
+                      ? { bg: '#fef3c7', fg: '#92400e', border: '#fcd34d', label: t('redCrossWebQaModule.performance.badgeMock', { defaultValue: 'MOCK' }) }
+                      : { bg: '#d1fae5', fg: '#047857', border: '#6ee7b7', label: t('redCrossWebQaModule.performance.badgeLive', { defaultValue: 'LIVE (CLI)' }) };
+                  return (
+                    <>
+                      <span style={{
+                        padding: '4px 10px', borderRadius: 999,
+                        backgroundColor: badgeStyle.bg, color: badgeStyle.fg,
+                        border: `1px solid ${badgeStyle.border}`,
+                        fontSize: 10, fontWeight: 700, letterSpacing: 0.6,
+                      }} title={report.live_error || ''}>
+                        {badgeStyle.label}
+                      </span>
+                      {liveFallback && (
+                        <span style={{ fontSize: 10, color: '#7f1d1d', maxWidth: 280, lineHeight: 1.3 }}>
+                          {report.live_error}
+                        </span>
+                      )}
+                      {!isMock && (
+                        <span style={{ fontSize: 10, color: '#047857' }}>
+                          {t('redCrossWebQaModule.performance.liveHint', { defaultValue: 'Real measurement from the local Lighthouse CLI.' })}
+                        </span>
+                      )}
+                      {isMock && !liveFallback && (
+                        <span style={{ fontSize: 10, color: '#92400e', maxWidth: 280, lineHeight: 1.3 }}>
+                          {t('redCrossWebQaModule.performance.mockHint', { defaultValue: 'Deterministic example data — switch to LIVE for real Lighthouse measurement.' })}
+                        </span>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </div>
 
           <div style={panel}>

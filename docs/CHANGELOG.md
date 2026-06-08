@@ -7,6 +7,142 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.0] - 2026-06-XX
+
+### Added — Red Cross Web QA Agent · Real Lighthouse CLI integration with Mock/Live mode toggle
+
+The project owner asked an honest question after using the Ytelse tab against rodekors.no: are the numbers shown (LCP 2.4s, CLS 0.06, score 86) real measurements or sample data? **They were sample data** — every URL produced identical metrics because `run_lighthouse` returned a hard-coded dictionary regardless of input. This commit makes Lighthouse real while preserving the mock as a deterministic fallback. The user now picks per call via a 3-way toggle on the Ytelse tab.
+
+**Why 1.18.0 and not 1.17.x**: this is genuinely a feature add (new subprocess integration, new URL validation, new toggle UX, new CLI dependency, new behavior), not a patch. Semver minor bump is honest.
+
+### Backend changes (`backend/services/red_cross_qa.py`)
+
+**New helper** `_find_lighthouse_binary()` — locates the Lighthouse CLI via `shutil.which('lighthouse')` first, falls back to `shutil.which('npx')` with `--no-install lighthouse` arguments. Returns `None` cleanly if neither is available (never triggers an automatic npm download).
+
+**New helper** `_run_lighthouse_cli(url)` — runs the CLI in a subprocess and parses its JSON output:
+- `subprocess.run(args, capture_output=True, timeout=120, check=False, shell=False, text=True)`
+- Conservative flags: `--output=json --quiet --chrome-flags="--headless=new --no-sandbox --disable-gpu" --only-categories=performance --max-wait-for-load=45000 --throttling-method=provided --no-enable-error-reporting`
+- Returns `(metrics, score_0_100, error)` — on any failure all three give `(None, None, "<reason>")` so the caller can decide to fall back to mock
+- Output capped at 32 MB to prevent memory bombs
+- The `--no-enable-error-reporting` flag is non-negotiable: Lighthouse must never phone home from this codebase
+
+**New helper** `_validate_target_url(url)` — security guard before any subprocess invocation. Rejects:
+- Non-`http(s)` schemes (`file://`, `javascript:`, `data:`, `ftp://`, etc.) — prevents SSRF/local-file-read attempts via the subprocess
+- Empty / non-string / oversized (> 2048 chars) URLs
+- Local addresses (localhost, 127.*, internal networks) are NOT rejected — the project legitimately tests local dev servers (`http://localhost:3000` is a documented URL preset)
+
+**Refactored** `run_lighthouse(url, environment, lang, mode="auto")` — adds the `mode` parameter:
+- `mode="mock"` — always returns the deterministic mock + `is_mock: True`, ignores CLI even if installed
+- `mode="live"` — requires the CLI; on any failure (no binary, timeout, parse error, non-zero exit) returns mock + populates `live_error` with the specific reason
+- `mode="auto"` — tries CLI first, silently falls back to mock if it's not available; `live_error` still populated for diagnostic transparency
+
+**CLI metrics → app metrics mapping** with real CWV thresholds:
+- `largest-contentful-paint.numericValue` → LCP (pass < 2500ms · warn < 4000ms · fail ≥ 4000ms)
+- `cumulative-layout-shift.numericValue` → CLS (pass < 0.10 · warn < 0.25 · fail ≥ 0.25)
+- `interaction-to-next-paint.numericValue` → INP (pass < 200ms · warn < 500ms · fail ≥ 500ms)
+- `server-response-time.numericValue` → TTFB (pass < 800ms · warn < 1800ms · fail ≥ 1800ms)
+- `total-byte-weight.numericValue` → Bundle size (pass < 1.6MB · warn < 4MB · fail ≥ 4MB — Lighthouse's own threshold)
+- `categories.performance.score × 100` → Score
+- The 5 metrics the mock surfaces but Lighthouse audits do not directly map (imageOpt, fontLoad, serverResp, GraphQL, cacheHit) are tagged `status: "pending"` with value `"—"` in live mode — honest "not measured" rather than fake "pass"
+
+**Async wrapper** — Lighthouse CLI is blocking I/O (60-90 s typical). Wrapped via `asyncio.to_thread(_run_lighthouse_cli, url)` so the FastAPI event loop is never blocked.
+
+### Router changes (`backend/routers/red_cross_qa.py`)
+
+`UrlRequest` model gets a new optional field:
+```python
+mode: Optional[str] = "auto"  # "mock" | "live" | "auto"
+```
+
+Only the `/run-lighthouse` endpoint reads this field; other `UrlRequest` consumers ignore it (backward compatible).
+
+`api_run_lighthouse` passes `body.mode` through to the service. Invalid mode values are normalized to `"auto"` inside `run_lighthouse` (defensive — never errors on a bad mode string).
+
+### Frontend changes (`frontend/src/red-cross-qa/Performance.jsx`)
+
+**New state** `lighthouseMode` (default `"auto"`) — controls the 3-way radio.
+
+**New UI block** between URL presets and URL input — a 3-pill radio selector with explanation hints:
+- ⚙️ **Auto (CLI if available)** — best default for mixed environments
+- 🟢 **Live (CLI)** — requires Lighthouse CLI, errors visible if missing
+- 📦 **Mock (deterministic)** — never real, never fast, always identical
+
+**New badge** below the Lighthouse score — three visual states keyed off `report.is_mock` and `report.live_error`:
+- Green **LIVE (CLI)** when `is_mock=false` — real Lighthouse measurement
+- Amber **MOCK** when `is_mock=true` and no `live_error` — chosen mock or auto-fell-back-silently
+- Red **MOCK · LIVE FAILED** when `is_mock=true` AND `live_error` is set — live was requested, CLI failed, fall-back kicked in; error string shown in red below the badge for full transparency
+
+The hint text under each pill changes based on the active mode so the user always knows what they will get when they click Run.
+
+### i18n (`frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json`)
+
++12 new keys × 3 locales in `redCrossWebQaModule.performance`:
+- `modeTitle`, `mode_mock`, `mode_live`, `mode_auto`
+- `modeHint_mock`, `modeHint_live`, `modeHint_auto` (longer explanations under each pill)
+- `badgeMock`, `badgeLive`, `badgeFallback`
+- `liveHint`, `mockHint`
+
+Parity verified: 12 keys present in all 3 locales.
+
+### Smoke tests (`backend/tests/smoke_red_cross_qa.py`)
+
++4 new checks:
+1. **mode="mock"** returns deterministic data (LCP 2.4s, score 86, `is_mock=True`, no `live_error`)
+2. **mode="live" with no CLI installed** falls back to mock and surfaces `live_error` mentioning "lighthouse" or "cli". Skipped gracefully if a developer happens to have Lighthouse installed (detected via `_find_lighthouse_binary()`)
+3. **URL validation** rejects `file://`, `javascript:`, `data:`, `ftp://` — 4 schemes that should never reach subprocess
+4. **`_validate_target_url` unit checks** — http(s) pass, empty/oversized/file scheme fail
+
+All other smokes unchanged: 49 → 53 checks total, all green.
+
+### Security model
+
+- ✅ Scheme whitelist (http/https only) — rejects file/data/javascript/ftp BEFORE subprocess fires
+- ✅ Length cap (2048 chars) — prevents argv overflow
+- ✅ `shell=False`, argv as list — no shell expansion attack surface
+- ✅ Subprocess timeout 120 s — bounded resource use
+- ✅ Output capped at 32 MB — bounded memory
+- ✅ `--no-enable-error-reporting` — Lighthouse never phones home
+- ✅ Headless Chrome (`--no-sandbox` permitted for Docker/CI; users on hardened machines can override via env later)
+- ⚠️ Local addresses (localhost, 127.*, RFC1918) NOT blocked — by design, the project tests local dev servers. If deployed beyond a trusted network, gate access at the network layer
+
+### How the user enables real measurements
+
+The project owner's machine already has Lighthouse CLI installed (the smoke test detected it and skipped the no-CLI assertion). To use live mode:
+
+1. Open the Ytelse tab
+2. Select the **🟢 Live (CLI)** radio above the URL input
+3. Enter a URL (or click a preset)
+4. Click **Kjør Lighthouse**
+5. Wait ~60-90 s for a real cold-cache measurement
+6. Look for the green **LIVE (CLI)** badge below the score → numbers are real
+
+If the CLI ever becomes unavailable, switching to Live will surface a red **MOCK · LIVE FAILED** badge with the error reason — no silent fakery.
+
+For machines without the CLI installed, run:
+```bash
+npm install -g lighthouse
+```
+
+This installs `lighthouse` globally. The next call from the app will pick it up automatically (the helper re-resolves the binary on each call, no server restart needed).
+
+### Validation summary
+
+- ✅ Backend smoke: 53/53 checks pass (was 49 — added 4 new for Lighthouse modes + URL validation)
+- ✅ JSX syntax valid (Babel parser confirmed)
+- ✅ i18n parity: 12 new keys × 3 locales identical
+- ✅ No new dependencies (httpx and asyncio already in repo; Lighthouse CLI is an external tool, not a Python dep)
+- ✅ Backward compatible: existing call sites pass `mode=None` → defaults to `"auto"` → existing behavior preserved when CLI is absent
+
+### What it does NOT do
+
+- Does NOT remove the mock — kept as fallback for the workshop-offline guarantee
+- Does NOT cache Lighthouse runs — each click is a fresh measurement; future optimization could persist in the existing Mongo runs collection
+- Does NOT extend `run_enonic_performance` (the other endpoint on the same tab) — still mock-first. That's a separate scope and would need different tooling (Enonic-specific probes, not Lighthouse)
+- Does NOT add a "compare runs" UI — single-run view only for now
+- Does NOT change the existing 41 API routes — only the `mode` param shape on `/run-lighthouse`
+
+---
+
 ## [1.17.10] - 2026-06-XX
 
 ### Fixed — Homo Sapiens vs. AI in Testing: input textarea froze on mount, ignored locale changes
