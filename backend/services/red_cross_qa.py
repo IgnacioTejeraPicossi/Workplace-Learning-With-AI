@@ -3357,18 +3357,21 @@ def _validate_target_url(url: str) -> Optional[str]:
 def _find_lighthouse_binary() -> Optional[List[str]]:
     """Return the command prefix to invoke Lighthouse, or None if not found.
 
-    Tries direct `lighthouse` first (works when installed globally via
-    `npm install -g lighthouse`), then `npx --no-install lighthouse`
-    (works when installed locally in any node_modules near $PATH). Never
-    triggers an automatic npm download (`--no-install`).
+    Only looks for `lighthouse` on PATH (global install via
+    `npm install -g lighthouse`). The previous `npx --no-install lighthouse`
+    fallback was removed in 1.18.1: npx only resolves Lighthouse from a
+    `node_modules` folder near the cwd, and the backend runs from the repo
+    root where no such install exists. The fallback therefore promised
+    detection that never worked at runtime, producing the confusing
+    "npx canceled due to missing packages" error reported by the project
+    owner. Removing it makes the detection honest — if this returns None,
+    Lighthouse really cannot run, and the live mode will surface a clear
+    install hint instead of a cryptic npm error.
     """
     import shutil
     direct = shutil.which("lighthouse")
     if direct:
         return [direct]
-    npx = shutil.which("npx")
-    if npx:
-        return [npx, "--no-install", "lighthouse"]
     return None
 
 
@@ -3387,7 +3390,11 @@ def _run_lighthouse_cli(url: str) -> Tuple[Optional[Dict[str, Any]], Optional[fl
 
     bin_cmd = _find_lighthouse_binary()
     if not bin_cmd:
-        return None, None, "lighthouse CLI not found in PATH (npm install -g lighthouse)"
+        # 1.18.1 — make the install hint impossible to miss. The previous
+        # message was technically correct but easy to skim past. This wording
+        # tells the user exactly what command to run to fix it.
+        return None, None, ("Lighthouse CLI not found on PATH. "
+                            "Install it globally with: npm install -g lighthouse")
 
     # Conservative flags:
     #   --output=json            machine-readable

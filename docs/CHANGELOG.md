@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.1] - 2026-06-XX
+
+### Fixed — Lighthouse detection produced confusing npx error when CLI was not globally installed
+
+Right after 1.18.0 landed, the project owner ran the Ytelse tab in Auto mode and got the red **MOCK · LIVE FEILET** badge with the error: *"lighthouse exited 1: npm error npx canceled due to missing packages and no YES option: ['lighthouse@12.8.2']"*. The fallback to mock worked correctly — the badge surfaced the failure exactly as designed — but the underlying detection logic was producing a false positive.
+
+**Root cause**: `_find_lighthouse_binary()` had two fallback paths:
+1. `shutil.which("lighthouse")` — direct binary (intended path)
+2. `shutil.which("npx") + ["--no-install", "lighthouse"]` — npx-based fallback
+
+The project owner's machine had `npx` on PATH (it ships with any Node install) but **no** Lighthouse installed globally. The npx fallback path matched, so the function returned a non-empty command. The smoke test then reported `[SKIP] Lighthouse live-mode-without-CLI test — CLI is installed locally` — a false positive that gave the misleading impression Lighthouse was available. When Auto mode then tried to run the npx command, npx couldn't resolve `lighthouse` (no local `node_modules` near the cwd, `--no-install` blocked auto-download) and exited with the npm error string.
+
+**Why the npx fallback could never work in this codebase**: `npx --no-install lighthouse` only resolves the Lighthouse package from a `node_modules` folder near the working directory. The backend runs from the repo root where no such install exists. So the npx path detected `npx` on PATH but had no way to actually invoke Lighthouse — it promised detection that never worked at runtime.
+
+**The fix**:
+- Removed the npx fallback from `_find_lighthouse_binary()`. The function now only looks for a direct `lighthouse` on PATH. Honest detection — if the function returns `None`, Lighthouse genuinely cannot run.
+- Improved the "not found" error message from the technical `"lighthouse CLI not found in PATH (npm install -g lighthouse)"` to the actionable `"Lighthouse CLI not found on PATH. Install it globally with: npm install -g lighthouse"`. Same information, easier to act on.
+
+**Behaviour now**:
+- Smoke test correctly skips the `live-mode-without-CLI` assertion only when `lighthouse` itself is on PATH (not when `npx` is on PATH)
+- Auto mode falls back to mock silently when Lighthouse is missing — no confusing npm error reaches the user
+- Live mode falls back to mock with the new clear install hint as `live_error` — user sees exactly what command to run
+
+**Files changed**:
+- `backend/services/red_cross_qa.py` — 2 edits (`_find_lighthouse_binary()` body simplified; `_run_lighthouse_cli()` error string clarified)
+
+**Validation**:
+- Smoke: `[OK] Lighthouse live mode without CLI -> mock fallback (live_error: Lighthouse CLI not found on PATH. Install it globa...)` — the assertion now triggers correctly because npx-only setups are no longer treated as Lighthouse-available
+- 53/53 smoke checks still pass
+
+**Action for the project owner**: install Lighthouse globally to enable live measurements:
+```bash
+npm install -g lighthouse
+```
+After that, the next click on **🟢 Live (CLI)** will run a real ~60-90 s headless Chrome measurement against the chosen URL. No server restart needed (the helper re-resolves the binary on every call).
+
+**No npx-only path will be reintroduced** unless someone shows a reproducible setup where it actually delivers a working Lighthouse run from the backend's cwd. The honest detection-vs-pretend tradeoff is settled in favour of honesty.
+
+---
+
 ## [1.18.0] - 2026-06-XX
 
 ### Added — Red Cross Web QA Agent · Real Lighthouse CLI integration with Mock/Live mode toggle
