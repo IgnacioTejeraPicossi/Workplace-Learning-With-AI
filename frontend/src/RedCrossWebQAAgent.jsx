@@ -23,7 +23,7 @@ import Settings from './red-cross-qa/Settings';
 
 /**
  * Red Cross Web QA Agent — main shell.
- * Future Item Agents → Red Cross Web QA Agent (#9, last position).
+ * Item Agents → Red Cross Web QA Agent (after AGI Progress, 1.18.x).
  *
  * Two execution modes (set in Settings, surfaced in header):
  *   - Generate-only: produces scripts & reports for Cursor / Claude / GitHub Actions

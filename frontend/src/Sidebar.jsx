@@ -120,11 +120,14 @@ const getNavItems = (t) => [
   // Grupo 1.8: Item Agents (implementados)
   // 1.17.9 (2026-06): AGI Progress moved here from the developer group as a
   // sub-item under AI Productivity Agent per project owner's request.
+  // 1.18.x (2026-06): Red Cross Web QA Agent moved here from Future Item Agents
+  // — it is now in active use, not a prototype.
   { key: "item-agents", label: t('sidebar.itemAgents'), icon: "robot", group: "learning", isExpandable: true, subItems: [
     { key: "agentops-studio", label: t('sidebar.agentopsStudio'), icon: "robot" },
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
-    { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart" }
+    { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart" },
+    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" }
   ]},
 
   // Nuevo grupo: Future Item Agents (prototipos)
@@ -137,7 +140,6 @@ const getNavItems = (t) => [
     { key: "council-agent", label: t('sidebar.councilAgent'), icon: "users" },
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" },
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
-    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" },
     { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" }
   ]},
 
