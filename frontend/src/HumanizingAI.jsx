@@ -336,11 +336,11 @@ const TabTestHumanitas = () => {
   const [error, setError]                 = useState('');
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/humanizing-ai/dilemmas`)
+    fetch(`${API_BASE}/api/humanizing-ai/dilemmas?lang=${toLang(i18n.language)}`)
       .then((r) => r.json())
       .then((d) => { setCatalogue(d); const codes = Object.keys(d.all_dilemmas || {}); if (codes.length) setSelectedCode(codes[0]); })
       .catch(() => {});
-  }, []);
+  }, [i18n.language]);
 
   const handleRun = async () => {
     if (!selectedCode) return;
