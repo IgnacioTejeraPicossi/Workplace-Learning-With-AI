@@ -240,17 +240,18 @@ const TabHumanize = () => {
 
 // ─── Tab 2: Prompt Humanitas ──────────────────────────────────────────────────
 const TabPromptHumanitas = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [data, setData]       = useState(null);
   const [copied, setCopied]   = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/humanizing-ai/prompt-humanitas`)
+    setLoading(true);
+    fetch(`${API_BASE}/api/humanizing-ai/prompt-humanitas?lang=${toLang(i18n.language)}`)
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, []);
+  }, [i18n.language]);
 
   const handleCopy = () => {
     if (!data?.prompt_text) return;

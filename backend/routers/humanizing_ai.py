@@ -24,8 +24,7 @@ try:
         run_test_humanitas,
         get_reports,
         get_dilemmas_catalogue,
-        PROMPT_HUMANITAS,
-        PROMPT_CRITERIA,
+        get_prompt_humanitas_content,
         DILEMMAS,
         RUBRIC,
     )
@@ -36,8 +35,7 @@ except ImportError:  # pragma: no cover
         run_test_humanitas,
         get_reports,
         get_dilemmas_catalogue,
-        PROMPT_HUMANITAS,
-        PROMPT_CRITERIA,
+        get_prompt_humanitas_content,
         DILEMMAS,
         RUBRIC,
     )
@@ -198,25 +196,17 @@ async def dilemmas_endpoint() -> Dict[str, Any]:
 
 
 @router.get("/prompt-humanitas", summary="Get the Prompt Humanitas text and 10 criteria")
-async def prompt_humanitas_endpoint() -> Dict[str, Any]:
+async def prompt_humanitas_endpoint(
+    lang: str = Query("es", description="Language for prompt content: 'es', 'en', or 'no'"),
+) -> Dict[str, Any]:
     """
     Return the full Prompt Humanitas text (ready to copy-paste into any AI chat)
-    and the structured list of the 10 ethical criteria.
+    and the structured list of the 10 ethical criteria in the requested language.
+
+    Supported: `es` (default), `en`, `no`.
+    Falls back to Spanish for unknown codes.
     """
-    return {
-        "prompt_text": PROMPT_HUMANITAS,
-        "criteria": PROMPT_CRITERIA,
-        "pillars": {
-            "inteligencia": "Sé claro, contextual y honesto sobre lo que sabes y lo que no",
-            "bondad": "Prioriza el bienestar humano, especialmente de los más vulnerables, y evita daño o manipulación",
-            "etica": "Asegúrate de que cada respuesta sea justa, inclusiva, sostenible y respetuosa con las futuras generaciones",
-        },
-        "inspiration": {
-            "virtrin": "https://virtrin.com/ — Protocolo VirTrin",
-            "humanitas": "Magnifica Humanitas, León XIV (2025)",
-            "test": "Test Humanitas, Carlos Castro Castro / ANEMOS",
-        },
-    }
+    return get_prompt_humanitas_content(lang)
 
 
 @router.get("/reports", summary="List stored Test Humanitas runs")
