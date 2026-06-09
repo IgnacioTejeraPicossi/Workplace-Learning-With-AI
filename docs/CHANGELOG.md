@@ -7,6 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.3] - 2026-06-09
+
+### Fixed — Lighthouse "Flaskehalser" panel no longer lists metric audits
+
+**Symptom (from live run against `https://www.rodekors.no/`):** the Flaskehalser
+panel surfaced `First Contentful Paint` as a bottleneck. FCP is a *metric*, not
+an actionable opportunity — it is already shown in its own card above the
+panel, and the user cannot directly "fix" FCP, only the underlying audits that
+influence it (image optimisation, server response, render-blocking resources).
+
+**Root cause:** the 1.18.2 bottleneck extractor filtered audits by
+`score < 0.9` without distinguishing metric audits from opportunity audits.
+When a metric audit lacked `details.overallSavingsMs`, the sort key fell back
+to `numericValue / 10`, ranking FCP/LCP/TBT into the top-5 even though they
+are not actionable.
+
+**Fix:** new module-level constant `_LIGHTHOUSE_METRIC_AUDIT_IDS` lists the 9
+Lighthouse metric audit IDs (FCP, LCP, SI, TBT, CLS, TTI, MPFID, INP, exp-INP).
+The bottleneck loop in `_run_lighthouse_cli` skips these before computing the
+sort key, so Flaskehalser only contains real opportunities and actionable
+diagnostics.
+
+### Added — Honest "N/A" explainer for INP in lab-mode runs
+
+**Symptom:** the INP card displayed `N/A` in the user's Live (CLI) screenshot
+with no explanation. INP genuinely cannot be measured by Lighthouse lab tests
+without user interaction (it requires field data from CrUX).
+
+**Fix:** when `interaction-to-next-paint` returns no numeric value,
+`metricInp` now carries `{value: "N/A", status: "pending", note:
+"lighthouse_lab_does_not_measure_inp_field_data_required"}`. The Performance
+panel renders a small italic ℹ️ line under the card explaining why, with a
+hover tooltip carrying the same text. Mock-mode INP (180ms) is unchanged and
+carries no note.
+
+### Added — Metric-card `note` rendering + i18n parity
+
+The metric grid in `Performance.jsx` now reads `v?.note` and renders the
+matching `performance.metricNotes.<key>` translation. Three keys added to all
+3 locales (EN/NO/ES):
+- `alias_of_ttfb` — "Same measurement as TTFB" / "Samme måling som TTFB" / etc.
+- `lighthouse_does_not_measure_graphql_see_enonic_tab` — wired in 1.18.2 but not previously visible in the UI.
+- `lighthouse_lab_does_not_measure_inp_field_data_required` — new for 1.18.3.
+
+This also retroactively makes the 1.18.2 GraphQL and Server-Resp notes visible
+to the user (small polish bonus).
+
+### Files changed
+
+- `backend/services/red_cross_qa.py` — module-level `_LIGHTHOUSE_METRIC_AUDIT_IDS`; bottleneck loop skips metric audits; `metricInp` carries explainer note when value is missing.
+- `frontend/src/red-cross-qa/Performance.jsx` — metric cards render `v?.note` via `metricNotes.<key>` i18n lookup, with hover tooltip and small italic line.
+- `frontend/src/i18n/locales/{en,no,es}/redCrossWebQaModule.json` — new `performance.metricNotes` block with 3 keys × 3 locales (9 strings).
+- `backend/tests/smoke_red_cross_qa.py` — +3 smoke checks: metric-IDs membership, mock INP has no spurious note, i18n metricNotes parity + backend-key round-trip.
+- `docs/CHANGELOG.md` — this entry.
+
+### Validation
+
+```
+$env:PYTHONIOENCODING = "utf-8"; python -m backend.tests.smoke_red_cross_qa
+# → [PASS] ALL SMOKE CHECKS PASSED  (58 checks, +3 from 1.18.2's 55)
+# → [OK] _LIGHTHOUSE_METRIC_AUDIT_IDS covers 9 metric audits
+# → [OK] Mock INP value preserved (180ms) and no spurious explainer note
+# → [OK] i18n metricNotes parity EN/NO/ES + 3 backend keys all translatable
+```
+
+JSX parser confirms `Performance.jsx` still parses cleanly.
+
+### Deferred (not in 1.18.3)
+
+- Form-factor toggle (mobile vs desktop) — separate UX decision.
+- Throttling toggle (DevTools-equivalent vs real-network) — would need backend flag + UI toggle.
+- Persisted Lighthouse run history with diff vs baseline.
+
+---
+
 ## [1.18.2] - 2026-06-XX
 
 ### Added — Lighthouse live mode now surfaces 8/10 metrics + real bottlenecks + real optimizations
