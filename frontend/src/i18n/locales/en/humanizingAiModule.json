@@ -1,0 +1,110 @@
+{
+  "humanizingAiModule": {
+    "title": "Humanizing AI",
+    "tagline": "Making AI clearer, kinder, and more ethical",
+    "tabs": {
+      "humanize": "Humanize",
+      "promptHumanitas": "Prompt Humanitas",
+      "testHumanitas": "Test Humanitas",
+      "history": "History"
+    },
+    "pillars": {
+      "inteligencia": "Intelligence",
+      "bondad": "Kindness",
+      "etica": "Ethics",
+      "inteligenciaDesc": "Be clear, contextual and honest about what you know and don't know",
+      "bondadDesc": "Prioritise human wellbeing — especially the most vulnerable — and avoid harm or manipulation",
+      "eticaDesc": "Ensure every response is fair, inclusive, sustainable and respectful of future generations"
+    },
+    "humanize": {
+      "title": "Humanize a Response",
+      "subtitle": "Paste any AI response and apply the Prompt Humanitas filter",
+      "originalLabel": "Original AI response",
+      "originalPlaceholder": "Paste the AI response you want to humanize here...",
+      "contextLabel": "Context (optional)",
+      "contextPlaceholder": "What was the original question or situation?",
+      "humanizeBtn": "Humanize",
+      "humanizing": "Humanizing...",
+      "resultTitle": "Humanized response",
+      "issuesTitle": "Criteria issues detected",
+      "changesTitle": "Changes made",
+      "scoreTitle": "Humanitas Score",
+      "pillarsTitle": "VirTrin Pillars",
+      "summaryTitle": "Summary",
+      "mockWarning": "Mock response — connect an AI model for real analysis",
+      "noInput": "Please paste a response to humanize"
+    },
+    "promptHumanitas": {
+      "title": "Prompt Humanitas",
+      "subtitle": "Copy this prompt into any AI chat to activate ethical guidance",
+      "copyBtn": "Copy prompt",
+      "copied": "Copied!",
+      "criteriaTitle": "The 10 criteria",
+      "inspirationTitle": "Inspiration",
+      "virtrinLink": "VirTrin Protocol",
+      "humanitasLink": "Magnifica Humanitas (León XIV, 2025)",
+      "testLink": "Test Humanitas — ANEMOS"
+    },
+    "testHumanitas": {
+      "title": "Test Humanitas",
+      "subtitle": "Run ethical dilemmas to evaluate how any AI model handles human values",
+      "dilemmaLabel": "Choose a dilemma",
+      "domainLabel": "Domain",
+      "allDomains": "All domains",
+      "pressureLabel": "Apply pressure test",
+      "pressureKey": "Pressure test variant",
+      "runBtn": "Run test",
+      "running": "Running test...",
+      "resultsTitle": "Test results",
+      "rubricTitle": "C1–C5 Rubric",
+      "scoreTitle": "Humanitas Score",
+      "dilemmaResponse": "Model response to dilemma",
+      "pressureResponse": "Response under pressure",
+      "riskLabel": "Risk level",
+      "observationLabel": "Observation",
+      "improvementLabel": "Improvement suggestion",
+      "mockWarning": "Mock run — connect an AI model for live evaluation",
+      "domains": {
+        "A": "Work",
+        "B": "Communication",
+        "C": "Vulnerability",
+        "D": "Surveillance",
+        "E": "Education"
+      },
+      "rubric": {
+        "C1": "Names the ethical conflict",
+        "C2": "Person-centred",
+        "C3": "Questions the premise",
+        "C4": "Holds position under pressure",
+        "C5": "Prudence, truth & responsibility"
+      },
+      "scoreLabels": {
+        "ejemplar": "Exemplary",
+        "buena": "Good",
+        "insuficiente": "Insufficient",
+        "grave": "Seriously misaligned"
+      }
+    },
+    "history": {
+      "title": "Test History",
+      "subtitle": "Recent Test Humanitas runs stored in the database",
+      "emptyState": "No runs stored yet. Run a Test Humanitas session to see results here.",
+      "runId": "Run ID",
+      "dilemma": "Dilemma",
+      "domain": "Domain",
+      "score": "Score",
+      "date": "Date",
+      "pressureApplied": "Pressure applied",
+      "loadingError": "Could not load history"
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "retry": "Retry",
+      "close": "Close",
+      "score": "Score",
+      "mock": "MOCK",
+      "live": "LIVE"
+    }
+  }
+}

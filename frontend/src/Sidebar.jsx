@@ -48,7 +48,8 @@ const Icon = ({ name, size = 20 }) => {
     "broadcast": "📡",
     "cloud": "☁️",
     "doc": "📄",
-    "redcross": "❤️‍🩹"
+    "redcross": "❤️‍🩹",
+    "humanitas": "🌿"
   };
 
   return (
@@ -127,7 +128,8 @@ const getNavItems = (t) => [
     { key: "ai-compliance-agent", label: t('sidebar.aiComplianceAgent'), icon: "shield" },
     { key: "ai-productivity-agent", label: t('sidebar.aiProductivityAgent'), icon: "rocket" },
     { key: "agi-progress", label: t('sidebar.agiProgress'), icon: "bar-chart" },
-    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" }
+    { key: "red-cross-web-qa", label: t('sidebar.redCrossWebQa'), icon: "redcross" },
+    { key: "humanizing-ai", label: t('sidebar.humanizingAi'), icon: "humanitas" }
   ]},
 
   // Nuevo grupo: Future Item Agents (prototipos)

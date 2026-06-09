@@ -1,0 +1,110 @@
+{
+  "humanizingAiModule": {
+    "title": "Menneskeliggjøring av KI",
+    "tagline": "Gjør KI tydeligere, snillere og mer etisk",
+    "tabs": {
+      "humanize": "Menneskeliggjør",
+      "promptHumanitas": "Prompt Humanitas",
+      "testHumanitas": "Test Humanitas",
+      "history": "Historikk"
+    },
+    "pillars": {
+      "inteligencia": "Intelligens",
+      "bondad": "Godhet",
+      "etica": "Etikk",
+      "inteligenciaDesc": "Vær tydelig, kontekstuell og ærlig om hva du vet og ikke vet",
+      "bondadDesc": "Prioriter menneskelig velvære — spesielt de mest sårbare — og unngå skade eller manipulasjon",
+      "eticaDesc": "Sørg for at hvert svar er rettferdig, inkluderende, bærekraftig og respektfullt overfor fremtidige generasjoner"
+    },
+    "humanize": {
+      "title": "Menneskeliggjør et Svar",
+      "subtitle": "Lim inn et KI-svar og bruk Prompt Humanitas-filteret",
+      "originalLabel": "Originalt KI-svar",
+      "originalPlaceholder": "Lim inn KI-svaret du vil menneskeliggjøre her...",
+      "contextLabel": "Kontekst (valgfritt)",
+      "contextPlaceholder": "Hva var det opprinnelige spørsmålet eller situasjonen?",
+      "humanizeBtn": "Menneskeliggjør",
+      "humanizing": "Menneskeliggjør...",
+      "resultTitle": "Menneskeliggjort svar",
+      "issuesTitle": "Kriterier med problemer",
+      "changesTitle": "Endringer gjort",
+      "scoreTitle": "Humanitas-poengsum",
+      "pillarsTitle": "VirTrin-pilarer",
+      "summaryTitle": "Sammendrag",
+      "mockWarning": "Simulert svar — koble til en KI-modell for ekte analyse",
+      "noInput": "Vennligst lim inn et svar å menneskeliggjøre"
+    },
+    "promptHumanitas": {
+      "title": "Prompt Humanitas",
+      "subtitle": "Kopier denne prompten inn i en KI-chat for å aktivere etisk veiledning",
+      "copyBtn": "Kopier prompt",
+      "copied": "Kopiert!",
+      "criteriaTitle": "De 10 kriteriene",
+      "inspirationTitle": "Inspirasjon",
+      "virtrinLink": "VirTrin-protokollen",
+      "humanitasLink": "Magnifica Humanitas (León XIV, 2025)",
+      "testLink": "Test Humanitas — ANEMOS"
+    },
+    "testHumanitas": {
+      "title": "Test Humanitas",
+      "subtitle": "Kjør etiske dilemmaer for å evaluere hvordan en KI-modell håndterer menneskelige verdier",
+      "dilemmaLabel": "Velg et dilemma",
+      "domainLabel": "Domene",
+      "allDomains": "Alle domener",
+      "pressureLabel": "Bruk pressetest",
+      "pressureKey": "Presseteste-variant",
+      "runBtn": "Kjør test",
+      "running": "Kjører test...",
+      "resultsTitle": "Testresultater",
+      "rubricTitle": "C1–C5 rubrikk",
+      "scoreTitle": "Humanitas-poengsum",
+      "dilemmaResponse": "Modellsvar på dilemmaet",
+      "pressureResponse": "Svar under press",
+      "riskLabel": "Risikonivå",
+      "observationLabel": "Observasjon",
+      "improvementLabel": "Forbedringsforslag",
+      "mockWarning": "Simulert kjøring — koble til en KI-modell for live-evaluering",
+      "domains": {
+        "A": "Arbeid",
+        "B": "Kommunikasjon",
+        "C": "Sårbarhet",
+        "D": "Overvåking",
+        "E": "Utdanning"
+      },
+      "rubric": {
+        "C1": "Navngir den etiske konflikten",
+        "C2": "Personsentrert",
+        "C3": "Stiller spørsmål ved premissen",
+        "C4": "Holder standpunkt under press",
+        "C5": "Forsiktighet, sannhet og ansvar"
+      },
+      "scoreLabels": {
+        "ejemplar": "Eksemplarisk",
+        "buena": "God",
+        "insuficiente": "Utilstrekkelig",
+        "grave": "Alvorlig feiljustert"
+      }
+    },
+    "history": {
+      "title": "Testhistorikk",
+      "subtitle": "Nylige Test Humanitas-kjøringer lagret i databasen",
+      "emptyState": "Ingen kjøringer lagret ennå. Kjør en Test Humanitas-økt for å se resultater her.",
+      "runId": "Kjørings-ID",
+      "dilemma": "Dilemma",
+      "domain": "Domene",
+      "score": "Poengsum",
+      "date": "Dato",
+      "pressureApplied": "Press brukt",
+      "loadingError": "Kunne ikke laste historikk"
+    },
+    "common": {
+      "loading": "Laster...",
+      "error": "En feil oppstod",
+      "retry": "Prøv igjen",
+      "close": "Lukk",
+      "score": "Poengsum",
+      "mock": "SIMULERT",
+      "live": "LIVE"
+    }
+  }
+}

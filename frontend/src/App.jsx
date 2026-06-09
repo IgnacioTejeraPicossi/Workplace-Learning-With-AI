@@ -59,6 +59,7 @@ import CouncilAgent from "./CouncilAgent";
 import OpsEfficiencyAgent from "./OpsEfficiencyAgent";
 import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import RedCrossWebQAAgent from "./RedCrossWebQAAgent";
+import HumanizingAI from "./HumanizingAI";
 // Self-Simulating Reality Agent (1.17.0) — philosophical-scientific companion
 // for Observer Patch Holography and related theories of consciousness/simulation
 import SelfSimRealityAgent from "./SelfSimRealityAgent";
@@ -539,6 +540,7 @@ function AppContent() {
             {!activeModule && section === "ops-efficiency-agent" && <OpsEfficiencyAgent />}
             {!activeModule && section === "atm-vv-test-copilot" && <AtmVvTestCopilot />}
             {!activeModule && section === "red-cross-web-qa" && <RedCrossWebQAAgent />}
+            {!activeModule && section === "humanizing-ai" && <HumanizingAI />}
             {!activeModule && section === "self-sim-reality-agent" && <SelfSimRealityAgent />}
             {/* Web Lab routes — local clones of real websites */}
             {!activeModule && section === "web-lab-item-no" && <ItemNoWeb />}

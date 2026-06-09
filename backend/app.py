@@ -198,13 +198,21 @@ try:
 except Exception as e:
     print(f"❌ Error including ATM V&V Test Copilot router: {e}")
 
-# Red Cross Web QA Agent router (Agent #9 — Future Item Agents)
+# Red Cross Web QA Agent router (Agent #9 — Item Agents, 1.18.x)
 try:
     from backend.routers.red_cross_qa import router as red_cross_qa_router
     app.include_router(red_cross_qa_router, tags=["Red Cross Web QA Agent"])
     print("✅ Red Cross Web QA Agent router included successfully")
 except Exception as e:
     print(f"❌ Error including Red Cross Web QA Agent router: {e}")
+
+# Humanizing AI Agent router (Agent #10 — Item Agents)
+try:
+    from backend.routers.humanizing_ai import router as humanizing_ai_router
+    app.include_router(humanizing_ai_router, tags=["Humanizing AI"])
+    print("✅ Humanizing AI router included successfully")
+except Exception as e:
+    print(f"❌ Error including Humanizing AI router: {e}")
 
 # AgentOps Studio routers - Direct import method
 try:
