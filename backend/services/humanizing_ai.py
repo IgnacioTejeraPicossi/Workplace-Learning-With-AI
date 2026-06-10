@@ -237,10 +237,14 @@ def get_prompt_humanitas_content(lang: str = "es") -> Dict[str, Any]:
             "etica":        "Asegúrate de que cada respuesta sea justa, inclusiva, sostenible y respetuosa con las futuras generaciones",
         },
         "inspiration": {
-            # `virtrin` is used as an <a href> on the frontend — must be a bare URL.
-            # `humanitas` and `test` are rendered as plain text only (no href).
+            # Each field must be either:
+            #   - a bare URL starting with http(s)://  → rendered as <a>
+            #   - or any other string                  → rendered as <span>
+            # The frontend auto-detects which case via an `isHttpUrl` helper.
             "virtrin":   "https://virtrin.com/",
-            "humanitas": "Magnifica Humanitas, León XIV (2025)",
+            "humanitas": "https://www.vatican.va/content/leo-xiv/es/encyclicals/documents/20260515-magnifica-humanitas.html",
+            # No canonical public URL is available for the Test Humanitas dilemma
+            # battery. Leave as descriptive text; replace with a URL when one exists.
             "test":      "Test Humanitas, Carlos Castro Castro / ANEMOS",
         },
     }

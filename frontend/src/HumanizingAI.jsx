@@ -18,6 +18,23 @@ const toLang = (lng) => {
   return 'en';
 };
 
+/**
+ * Defensive URL guard for backend-provided inspiration fields.
+ * Returns true only if the value is a non-empty string that parses as a real
+ * http(s) URL with a host. Catches malformed entries like
+ * "https://virtrin.com/ — Protocolo VirTrin" (URL + descriptive text glued
+ * together) so we don't render a broken <a> that 404s downstream.
+ */
+const isHttpUrl = (s) => {
+  if (typeof s !== 'string' || !s.trim()) return false;
+  try {
+    const u = new URL(s.trim());
+    return (u.protocol === 'http:' || u.protocol === 'https:') && !!u.host && !/\s/.test(s.trim());
+  } catch {
+    return false;
+  }
+};
+
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const PILLARS = [
   { key: 'inteligencia', icon: '🧠', color: '#4f46e5', light: '#eef2ff', border: '#c7d2fe', labelKey: 'inteligencia', descKey: 'inteligenciaDesc' },
@@ -306,16 +323,30 @@ const TabPromptHumanitas = () => {
         ))}
       </div>
 
-      {/* Inspiration */}
+      {/* Inspiration — renders each entry as <a> when the backend field is a real
+          http(s) URL, otherwise as <span>. Protects against malformed URLs. */}
       {data?.inspiration && (
         <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px' }}>
           <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 10, textTransform: 'uppercase' }}>{t('humanizingAiModule.promptHumanitas.inspirationTitle')}</p>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <a href={data.inspiration.virtrin} target="_blank" rel="noopener noreferrer" style={{ color: '#059669', fontSize: 12, textDecoration: 'none', fontWeight: 600 }}>
-              🌱 {t('humanizingAiModule.hero.inspiration.virtrin')} ↗
-            </a>
-            <span style={{ color: '#6b7280', fontSize: 12 }}>📜 {t('humanizingAiModule.hero.inspiration.humanitas')}</span>
-            <span style={{ color: '#6b7280', fontSize: 12 }}>🧪 {t('humanizingAiModule.hero.inspiration.test')}</span>
+            {[
+              { key: 'virtrin',   icon: '🌱', color: '#059669' },
+              { key: 'humanitas', icon: '📜', color: '#7c3aed' },
+              { key: 'test',      icon: '🧪', color: '#2563eb' },
+            ].map(({ key, icon, color }) => {
+              const value = data.inspiration[key];
+              const label = t(`humanizingAiModule.hero.inspiration.${key}`);
+              return isHttpUrl(value) ? (
+                <a key={key} href={value} target="_blank" rel="noopener noreferrer"
+                   style={{ color, fontSize: 12, textDecoration: 'none', fontWeight: 600 }}>
+                  {icon} {label} ↗
+                </a>
+              ) : (
+                <span key={key} style={{ color: '#6b7280', fontSize: 12 }}>
+                  {icon} {label}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}
