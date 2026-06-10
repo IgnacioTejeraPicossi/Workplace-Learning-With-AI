@@ -237,7 +237,9 @@ def get_prompt_humanitas_content(lang: str = "es") -> Dict[str, Any]:
             "etica":        "Asegúrate de que cada respuesta sea justa, inclusiva, sostenible y respetuosa con las futuras generaciones",
         },
         "inspiration": {
-            "virtrin":   "https://virtrin.com/ — Protocolo VirTrin",
+            # `virtrin` is used as an <a href> on the frontend — must be a bare URL.
+            # `humanitas` and `test` are rendered as plain text only (no href).
+            "virtrin":   "https://virtrin.com/",
             "humanitas": "Magnifica Humanitas, León XIV (2025)",
             "test":      "Test Humanitas, Carlos Castro Castro / ANEMOS",
         },
