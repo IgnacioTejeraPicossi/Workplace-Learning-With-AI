@@ -424,7 +424,9 @@ const TabTestHumanitas = () => {
             <label style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, display: 'block', marginBottom: 5, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('humanizingAiModule.testHumanitas.dilemmaLabel')}</label>
             <select style={{ ...selectStyle, width: '100%' }} value={selectedCode} onChange={(e) => setSelectedCode(e.target.value)}>
               {visibleDilemmas.map(([code, d]) => (
-                <option key={code} value={code}>{code} ({domainLabel(code[0])}) — {d.text.substring(0, 60)}…</option>
+                <option key={code} value={code} title={d.text}>
+                  {code} ({domainLabel(code[0])}) — {d.text.length > 110 ? `${d.text.substring(0, 110)}…` : d.text}
+                </option>
               ))}
             </select>
           </div>
