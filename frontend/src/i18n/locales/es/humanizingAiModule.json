@@ -34,7 +34,13 @@
       "pillarsTitle": "Pilares VirTrin",
       "summaryTitle": "Resumen",
       "mockWarning": "Respuesta simulada — conecta un modelo de IA para análisis real",
-      "noInput": "Por favor, pega una respuesta para humanizar"
+      "noInput": "Por favor, pega una respuesta para humanizar",
+      "beforeAfterTitle": "Antes · Después — comparación visual",
+      "originalCol": "Original",
+      "humanizedCol": "Humanizada",
+      "diffLegendRemoved": "eliminado",
+      "diffLegendAdded": "añadido",
+      "diffNoChange": "No se detectaron diferencias textuales"
     },
     "promptHumanitas": {
       "title": "Prompt Humanitas",

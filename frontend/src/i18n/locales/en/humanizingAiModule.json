@@ -34,7 +34,13 @@
       "pillarsTitle": "VirTrin Pillars",
       "summaryTitle": "Summary",
       "mockWarning": "Mock response — connect an AI model for real analysis",
-      "noInput": "Please paste a response to humanize"
+      "noInput": "Please paste a response to humanize",
+      "beforeAfterTitle": "Before · After — side-by-side",
+      "originalCol": "Original",
+      "humanizedCol": "Humanized",
+      "diffLegendRemoved": "removed",
+      "diffLegendAdded": "added",
+      "diffNoChange": "No textual differences detected"
     },
     "promptHumanitas": {
       "title": "Prompt Humanitas",

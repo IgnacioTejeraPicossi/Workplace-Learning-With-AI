@@ -67,6 +67,55 @@ const scoreLabel = (s, max = 15) => {
   return 'grave';
 };
 
+// ─── Word-level diff (LCS, no dependency) ─────────────────────────────────────
+/**
+ * Returns an array of chunks {type: 'eq'|'del'|'add', text}.
+ *  - 'eq'  — present in both, render as plain text
+ *  - 'del' — only in `a` (original)
+ *  - 'add' — only in `b` (humanized)
+ * Tokenises on whitespace boundaries while preserving the whitespace so the
+ * rebuilt text round-trips. For very large texts (> 30k chars) it falls back
+ * to a single del+add pair to avoid the O(m*n) LCS table blowing up memory.
+ */
+const diffWords = (a, b) => {
+  if (a === b) return [{ type: 'eq', text: a }];
+  if ((a.length + b.length) > 30000) {
+    return [{ type: 'del', text: a }, { type: 'add', text: b }];
+  }
+  const tokenize = (s) => s.split(/(\s+)/).filter((t) => t !== '');
+  const A = tokenize(a), B = tokenize(b);
+  const m = A.length, n = B.length;
+  // LCS DP table
+  const dp = Array.from({ length: m + 1 }, () => new Uint16Array(n + 1));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = A[i - 1] === B[j - 1]
+        ? dp[i - 1][j - 1] + 1
+        : Math.max(dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  const out = [];
+  let i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && A[i - 1] === B[j - 1]) {
+      out.push({ type: 'eq', text: A[i - 1] }); i--; j--;
+    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+      out.push({ type: 'add', text: B[j - 1] }); j--;
+    } else {
+      out.push({ type: 'del', text: A[i - 1] }); i--;
+    }
+  }
+  out.reverse();
+  // Merge consecutive same-type chunks for cleaner rendering
+  const merged = [];
+  for (const c of out) {
+    const last = merged[merged.length - 1];
+    if (last && last.type === c.type) last.text += c.text;
+    else merged.push({ ...c });
+  }
+  return merged;
+};
+
 // ─── Shared UI atoms ──────────────────────────────────────────────────────────
 const SectionLabel = ({ index, label }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
@@ -136,6 +185,60 @@ const MockBadge = ({ isMock, t }) => isMock ? (
 );
 
 // ─── Tab 1: Humanizar ─────────────────────────────────────────────────────────
+/** Side-by-side before/after diff card. Renders `eq + del` on the left and
+    `eq + add` on the right, with red/green highlighting on the changed chunks. */
+const BeforeAfterDiff = ({ original, humanized, t }) => {
+  const chunks = diffWords(original || '', humanized || '');
+  const hasChange = chunks.some((c) => c.type !== 'eq');
+
+  const styleDel = { background: '#fee2e2', color: '#991b1b', textDecoration: 'line-through', borderRadius: 3, padding: '0 2px' };
+  const styleAdd = { background: '#d1fae5', color: '#065f46', borderRadius: 3, padding: '0 2px' };
+
+  const renderSide = (filterType, highlightType, highlightStyle) => (
+    <div style={{ fontSize: 12, lineHeight: 1.75, color: '#374151', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+      {chunks
+        .filter((c) => c.type !== filterType)
+        .map((c, i) => c.type === highlightType
+          ? <span key={i} style={highlightStyle}>{c.text}</span>
+          : <span key={i}>{c.text}</span>)}
+    </div>
+  );
+
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '18px 22px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', marginTop: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
+        <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+          ⇄ {t('humanizingAiModule.humanize.beforeAfterTitle')}
+        </p>
+        <div style={{ display: 'flex', gap: 14, fontSize: 11, color: '#6b7280' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ ...styleDel, padding: '1px 6px' }}>abc</span> {t('humanizingAiModule.humanize.diffLegendRemoved')}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ ...styleAdd, padding: '1px 6px' }}>abc</span> {t('humanizingAiModule.humanize.diffLegendAdded')}
+          </span>
+        </div>
+      </div>
+      {hasChange ? (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderLeft: '4px solid #dc2626', borderRadius: 10, padding: '12px 14px', maxHeight: 420, overflowY: 'auto' }}>
+            <p style={{ color: '#991b1b', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('humanizingAiModule.humanize.originalCol')}</p>
+            {renderSide('add', 'del', styleDel)}
+          </div>
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderLeft: '4px solid #059669', borderRadius: 10, padding: '12px 14px', maxHeight: 420, overflowY: 'auto' }}>
+            <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('humanizingAiModule.humanize.humanizedCol')}</p>
+            {renderSide('del', 'add', styleAdd)}
+          </div>
+        </div>
+      ) : (
+        <p style={{ color: '#9ca3af', fontSize: 12, fontStyle: 'italic', textAlign: 'center', padding: 20 }}>
+          {t('humanizingAiModule.humanize.diffNoChange')}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const TabHumanize = () => {
   const { t, i18n } = useTranslation();
   const [rawResponse, setRawResponse] = useState('');
@@ -251,6 +354,11 @@ const TabHumanize = () => {
           </div>
         )}
       </div>
+
+      {/* Full-width Before / After diff card */}
+      {result && result.humanized_response && (
+        <BeforeAfterDiff original={rawResponse} humanized={result.humanized_response} t={t} />
+      )}
     </div>
   );
 };

@@ -34,7 +34,13 @@
       "pillarsTitle": "VirTrin-pilarer",
       "summaryTitle": "Sammendrag",
       "mockWarning": "Simulert svar — koble til en KI-modell for ekte analyse",
-      "noInput": "Vennligst lim inn et svar å menneskeliggjøre"
+      "noInput": "Vennligst lim inn et svar å menneskeliggjøre",
+      "beforeAfterTitle": "Før · Etter — visuell sammenligning",
+      "originalCol": "Original",
+      "humanizedCol": "Menneskeliggjort",
+      "diffLegendRemoved": "fjernet",
+      "diffLegendAdded": "lagt til",
+      "diffNoChange": "Ingen tekstforskjeller funnet"
     },
     "promptHumanitas": {
       "title": "Prompt Humanitas",
