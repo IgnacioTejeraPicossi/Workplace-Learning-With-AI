@@ -214,6 +214,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Humanizing AI router: {e}")
 
+# Japanese Sensei AI router (Future Item Agents)
+try:
+    from backend.routers.japanese_sensei import router as japanese_sensei_router
+    app.include_router(japanese_sensei_router, tags=["Japanese Sensei AI"])
+    print("✅ Japanese Sensei router included successfully")
+except Exception as e:
+    print(f"❌ Error including Japanese Sensei router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router
