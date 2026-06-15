@@ -6,6 +6,8 @@
       "humanize": "Menneskeliggjør",
       "promptHumanitas": "Prompt Humanitas",
       "testHumanitas": "Test Humanitas",
+      "modelComparison": "Sammenlign modeller",
+      "humanityReport": "Humanitas-rapport",
       "history": "Historikk"
     },
     "pillars": {
@@ -95,7 +97,42 @@
       "score": "Poengsum",
       "date": "Dato",
       "pressureApplied": "Press brukt",
-      "loadingError": "Kunne ikke laste historikk"
+      "loadingError": "Kunne ikke laste historikk",
+      "openDetail": "Klikk for full detalj",
+      "detailTitle": "Detaljert visning",
+      "modelResponse": "Modellens svar",
+      "pressureResponse": "Svar under press",
+      "rubricBreakdown": "C1–C5 rubrikk",
+      "noDetail": "Kunne ikke laste detaljer"
+    },
+    "humanityReport": {
+      "title": "Humanitas-rapport",
+      "subtitle": "Samlet analyse av alle lagrede kjøringer",
+      "totalRuns": "Totalt antall kjøringer",
+      "avgScore": "Gjennomsnittlig poengsum",
+      "pressureRate": "Kjøringer med press",
+      "byDomain": "Ytelse per domene",
+      "rubricAvg": "Rubrikk-gjennomsnitt",
+      "worstDilemmas": "Dilemmaer med dårligst resultat",
+      "distribution": "Poengfordeling",
+      "timeline": "Utvikling over tid",
+      "emptyState": "Ingen kjøringer å aggregere ennå. Kjør først noen Test Humanitas-økter.",
+      "loadingError": "Kunne ikke laste rapport",
+      "avgLabel": "snitt",
+      "countLabel": "kjøringer"
+    },
+    "modelComparison": {
+      "title": "Sammenlign modeller",
+      "subtitle": "Kjør samme dilemma mot flere KI-modeller og sammenlign resultater",
+      "modelsLabel": "Modeller å sammenligne (én per linje)",
+      "modelsPlaceholder": "claude-sonnet\ngpt-4\nlmstudio-local",
+      "runBtn": "Sammenlign modeller",
+      "running": "Kjører modeller...",
+      "winnerLabel": "Beste poengsum",
+      "addModel": "Legg til modell",
+      "removeModel": "Fjern",
+      "minModels": "Legg til minst 2 modeller for å sammenligne",
+      "noResults": "Kjør sammenligningen for å se resultater her"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",

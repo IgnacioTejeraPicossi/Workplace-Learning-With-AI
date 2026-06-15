@@ -23,6 +23,9 @@ try:
         evaluate_response,
         run_test_humanitas,
         get_reports,
+        get_run_by_id,
+        get_humanity_report,
+        compare_models_on_dilemma,
         get_dilemmas_catalogue,
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
@@ -34,6 +37,9 @@ except ImportError:  # pragma: no cover
         evaluate_response,
         run_test_humanitas,
         get_reports,
+        get_run_by_id,
+        get_humanity_report,
+        compare_models_on_dilemma,
         get_dilemmas_catalogue,
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
@@ -75,6 +81,25 @@ class EvaluateRequest(BaseModel):
     pressure_response: Optional[str] = Field(
         None,
         description="AI response after pressure was applied (optional)",
+    )
+    lang: str = Field("es")
+
+
+class CompareModelsRequest(BaseModel):
+    dilemma_code: str = Field(
+        ...,
+        description="Dilemma code to run, e.g. 'B2'",
+        pattern=r"^[A-E][1-6]$",
+    )
+    models: List[str] = Field(
+        ...,
+        description="List of model labels (e.g. ['claude-sonnet','gpt-4','lmstudio'])",
+        min_length=2,
+        max_length=5,
+    )
+    apply_pressure: Optional[str] = Field(
+        None,
+        description="Pressure key 'F1','F2','F3' or null to skip pressure test.",
     )
     lang: str = Field("es")
 
@@ -215,3 +240,38 @@ async def reports_endpoint(
     """
     runs = await get_reports(limit=limit)
     return {"runs": runs, "count": len(runs)}
+
+
+@router.get("/reports/{run_id}", summary="Retrieve a single Test Humanitas run by ID")
+async def report_by_id_endpoint(run_id: str) -> Dict[str, Any]:
+    """Return the full document for a specific run (includes responses)."""
+    run = await get_run_by_id(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
+    return run
+
+
+@router.get("/humanity-report", summary="Aggregated Humanity Report across runs")
+async def humanity_report_endpoint(
+    limit: int = Query(500, ge=10, le=2000, description="Most recent N runs to aggregate"),
+) -> Dict[str, Any]:
+    """
+    Aggregate stats across the most recent N runs: avg score, distribution by
+    domain, by dilemma, C1–C5 averages, timeline and pressure rate. Empty when
+    MongoDB is not configured.
+    """
+    return await get_humanity_report(limit=limit)
+
+
+@router.post("/compare", summary="Compare multiple models on the same dilemma")
+async def compare_models_endpoint(body: CompareModelsRequest) -> Dict[str, Any]:
+    """Run the same dilemma against several model labels and evaluate each."""
+    result = await compare_models_on_dilemma(
+        dilemma_code=body.dilemma_code,
+        models=body.models,
+        apply_pressure=body.apply_pressure,
+        lang=body.lang,
+    )
+    if result.get("status") == "error":
+        raise HTTPException(status_code=422, detail=result.get("message", "Unknown error"))
+    return result

@@ -6,6 +6,8 @@
       "humanize": "Humanize",
       "promptHumanitas": "Prompt Humanitas",
       "testHumanitas": "Test Humanitas",
+      "modelComparison": "Model Comparison",
+      "humanityReport": "Humanity Report",
       "history": "History"
     },
     "pillars": {
@@ -95,7 +97,42 @@
       "score": "Score",
       "date": "Date",
       "pressureApplied": "Pressure applied",
-      "loadingError": "Could not load history"
+      "loadingError": "Could not load history",
+      "openDetail": "Click for full detail",
+      "detailTitle": "Run detail",
+      "modelResponse": "Model response",
+      "pressureResponse": "Response under pressure",
+      "rubricBreakdown": "C1–C5 rubric",
+      "noDetail": "Detail could not be loaded"
+    },
+    "humanityReport": {
+      "title": "Humanity Report",
+      "subtitle": "Aggregated insights across all stored runs",
+      "totalRuns": "Total runs",
+      "avgScore": "Average score",
+      "pressureRate": "Runs with pressure",
+      "byDomain": "Performance by domain",
+      "rubricAvg": "Rubric averages",
+      "worstDilemmas": "Most-failed dilemmas",
+      "distribution": "Score distribution",
+      "timeline": "Evolution over time",
+      "emptyState": "No runs to aggregate yet. Run some Test Humanitas sessions first.",
+      "loadingError": "Could not load report",
+      "avgLabel": "avg",
+      "countLabel": "runs"
+    },
+    "modelComparison": {
+      "title": "Model Comparison",
+      "subtitle": "Run the same dilemma across multiple AI models and compare results",
+      "modelsLabel": "Models to compare (one per line)",
+      "modelsPlaceholder": "claude-sonnet\ngpt-4\nlmstudio-local",
+      "runBtn": "Compare models",
+      "running": "Running models...",
+      "winnerLabel": "Best score",
+      "addModel": "Add model",
+      "removeModel": "Remove",
+      "minModels": "Add at least 2 models to compare",
+      "noResults": "Run the comparison to see results here"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",

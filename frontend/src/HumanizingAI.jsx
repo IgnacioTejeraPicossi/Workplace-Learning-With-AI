@@ -567,6 +567,8 @@ const TabHistory = () => {
   const [runs, setRuns]       = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
+  const [detail, setDetail]   = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const loadRuns = useCallback(async () => {
     setLoading(true); setError('');
@@ -580,6 +582,17 @@ const TabHistory = () => {
   }, [t]);
 
   useEffect(() => { loadRuns(); }, [loadRuns]);
+
+  const openDetail = async (runId) => {
+    setDetailLoading(true); setDetail({ run_id: runId, _placeholder: true });
+    try {
+      const res = await fetch(`${API_BASE}/api/humanizing-ai/reports/${encodeURIComponent(runId)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setDetail(await res.json());
+    } catch (e) {
+      setDetail({ error: t('humanizingAiModule.history.noDetail') });
+    } finally { setDetailLoading(false); }
+  };
 
   /** Translate domain code → localised label */
   const domainLabel = (code) => t(`humanizingAiModule.testHumanitas.domains.${code}`, { defaultValue: code });
@@ -614,7 +627,12 @@ const TabHistory = () => {
             const dm2 = DOMAIN_META[dk] || {};
             const sc  = run.evaluation?.humanitas_score;
             return (
-              <div key={run.run_id} style={{ display: 'flex', alignItems: 'center', gap: 16, background: '#ffffff', border: `1px solid ${dm2.border || '#e5e7eb'}`, borderLeft: `4px solid ${dm2.color || '#d1d5db'}`, borderRadius: 12, padding: '14px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div key={run.run_id}
+                   onClick={() => openDetail(run.run_id)}
+                   title={t('humanizingAiModule.history.openDetail')}
+                   style={{ display: 'flex', alignItems: 'center', gap: 16, background: '#ffffff', border: `1px solid ${dm2.border || '#e5e7eb'}`, borderLeft: `4px solid ${dm2.color || '#d1d5db'}`, borderRadius: 12, padding: '14px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'transform 0.08s ease' }}
+                   onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(2px)'}
+                   onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}>
                 <div style={{ fontSize: 20 }}>{dm2.icon || '📋'}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
@@ -637,6 +655,414 @@ const TabHistory = () => {
           })}
         </div>
       )}
+
+      {/* Detail modal */}
+      {detail && (
+        <div onClick={() => setDetail(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 1000 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: 16, maxWidth: 820, width: '100%', maxHeight: '88vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
+              <h3 style={{ color: '#111827', margin: 0, fontSize: 16, fontWeight: 800 }}>
+                📋 {t('humanizingAiModule.history.detailTitle')}
+                <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 500, fontFamily: 'monospace', marginLeft: 10 }}>{detail.run_id}</span>
+              </h3>
+              <button onClick={() => setDetail(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 13, color: '#374151' }}>✕</button>
+            </div>
+            <div style={{ padding: '20px 24px' }}>
+              {detailLoading && <p style={{ color: '#9ca3af', textAlign: 'center', padding: 30 }}>{t('humanizingAiModule.common.loading')}</p>}
+              {detail.error    && <p style={{ color: '#dc2626', textAlign: 'center', padding: 30 }}>{detail.error}</p>}
+              {!detailLoading && !detail.error && detail.dilemma_code && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <BorderCard color="#2563eb" light="#eff6ff" border="#bfdbfe">
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                      <Badge label={detail.dilemma_code} color="#2563eb" light="#eff6ff" border="#bfdbfe" />
+                      <Badge label={domainLabel(detail.dilemma_code[0])} color="#2563eb" light="#eff6ff" border="#bfdbfe" />
+                    </div>
+                    <p style={{ color: '#111827', fontSize: 13, lineHeight: 1.6 }}>{detail.dilemma_text}</p>
+                  </BorderCard>
+                  {detail.evaluation && (
+                    <BorderCard color={scoreColor(detail.evaluation.humanitas_score ?? 0, 15)} light="#f0fdf4" border="#bbf7d0">
+                      <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.testHumanitas.scoreTitle')}</p>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+                        <span style={{ fontSize: 28, fontWeight: 900, fontFamily: 'monospace', color: scoreColor(detail.evaluation.humanitas_score ?? 0, 15) }}>
+                          {detail.evaluation.humanitas_score ?? '—'}<span style={{ fontSize: 13, color: '#9ca3af' }}>/15</span>
+                        </span>
+                      </div>
+                      <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.history.rubricBreakdown')}</p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 6 }}>
+                        {['C1','C2','C3','C4','C5'].map((k) => {
+                          const v = detail.evaluation[k];
+                          return (
+                            <div key={k} style={{ background: '#f9fafb', borderRadius: 8, padding: '6px 4px', textAlign: 'center' }}>
+                              <div style={{ fontSize: 10, color: '#6b7280', fontWeight: 700 }}>{k}</div>
+                              <div style={{ fontSize: 16, fontWeight: 900, color: v == null ? '#d1d5db' : scoreColor(v, 3) }}>{v ?? '—'}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </BorderCard>
+                  )}
+                  {detail.model_response && (
+                    <BorderCard color="#7c3aed" light="#f5f3ff" border="#ddd6fe">
+                      <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.history.modelResponse')}</p>
+                      <p style={{ color: '#374151', fontSize: 12, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{detail.model_response}</p>
+                    </BorderCard>
+                  )}
+                  {detail.pressure_response && (
+                    <BorderCard color="#d97706" light="#fffbeb" border="#fde68a">
+                      <p style={{ color: '#92400e', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
+                        {t('humanizingAiModule.history.pressureResponse')} · {detail.pressure_applied}
+                      </p>
+                      {detail.pressure_text && <p style={{ color: '#9ca3af', fontSize: 11, fontStyle: 'italic', marginBottom: 6 }}>«{detail.pressure_text}»</p>}
+                      <p style={{ color: '#374151', fontSize: 12, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{detail.pressure_response}</p>
+                    </BorderCard>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Tab: Humanity Report (aggregated) ────────────────────────────────────────
+const TabHumanityReport = () => {
+  const { t } = useTranslation();
+  const [report, setReport]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState('');
+
+  useEffect(() => {
+    setLoading(true); setError('');
+    fetch(`${API_BASE}/api/humanizing-ai/humanity-report?limit=500`)
+      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d) => { setReport(d); setLoading(false); })
+      .catch(() => { setError(t('humanizingAiModule.humanityReport.loadingError')); setLoading(false); });
+  }, [t]);
+
+  const domainLabel = (code) => t(`humanizingAiModule.testHumanitas.domains.${code}`, { defaultValue: code });
+
+  if (loading) return <div style={{ padding: 64, textAlign: 'center', color: '#9ca3af' }}>{t('humanizingAiModule.common.loading')}</div>;
+  if (error)   return <div style={{ padding: 64, textAlign: 'center', color: '#dc2626' }}>{error}</div>;
+  if (!report || report.total_runs === 0) {
+    return (
+      <div style={{ padding: '60px 32px', textAlign: 'center', color: '#9ca3af' }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>📊</div>
+        <p style={{ fontSize: 13 }}>{t('humanizingAiModule.humanityReport.emptyState')}</p>
+      </div>
+    );
+  }
+
+  // Distribution colors
+  const distLabels = {
+    ejemplar:     t('humanizingAiModule.testHumanitas.scoreLabels.ejemplar'),
+    buena:        t('humanizingAiModule.testHumanitas.scoreLabels.buena'),
+    insuficiente: t('humanizingAiModule.testHumanitas.scoreLabels.insuficiente'),
+    grave:        t('humanizingAiModule.testHumanitas.scoreLabels.grave'),
+  };
+  const distColors = { ejemplar: '#059669', buena: '#2563eb', insuficiente: '#d97706', grave: '#dc2626' };
+  const distTotal  = Object.values(report.score_distribution).reduce((s, v) => s + v, 0) || 1;
+
+  const maxTimelineCount = Math.max(...report.timeline.map((d) => d.count), 1);
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={5} label={t('humanizingAiModule.tabs.humanityReport')} />
+      <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.humanityReport.title')}</h2>
+      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
+
+      {/* Headline KPIs */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 24 }}>
+        <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderTop: '3px solid #4f46e5', borderRadius: 12, padding: '18px 20px' }}>
+          <p style={{ color: '#4f46e5', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.humanityReport.totalRuns')}</p>
+          <p style={{ fontSize: 36, fontWeight: 900, color: '#1e1b4b', fontFamily: 'monospace', lineHeight: 1 }}>{report.total_runs}</p>
+        </div>
+        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderTop: '3px solid #059669', borderRadius: 12, padding: '18px 20px' }}>
+          <p style={{ color: '#059669', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.humanityReport.avgScore')}</p>
+          <p style={{ fontSize: 36, fontWeight: 900, color: scoreColor(report.avg_score ?? 0, 15), fontFamily: 'monospace', lineHeight: 1 }}>
+            {report.avg_score ?? '—'}<span style={{ fontSize: 14, color: '#9ca3af' }}>/15</span>
+          </p>
+        </div>
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderTop: '3px solid #d97706', borderRadius: 12, padding: '18px 20px' }}>
+          <p style={{ color: '#d97706', fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.humanityReport.pressureRate')}</p>
+          <p style={{ fontSize: 36, fontWeight: 900, color: '#92400e', fontFamily: 'monospace', lineHeight: 1 }}>{report.pressure_rate}<span style={{ fontSize: 14, color: '#9ca3af' }}>%</span></p>
+        </div>
+      </div>
+
+      {/* Score distribution stacked bar */}
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.humanityReport.distribution')}</p>
+        <div style={{ display: 'flex', height: 38, borderRadius: 10, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+          {['ejemplar', 'buena', 'insuficiente', 'grave'].map((k) => {
+            const v = report.score_distribution[k] || 0;
+            const pct = (v / distTotal) * 100;
+            return pct > 0 ? (
+              <div key={k} title={`${distLabels[k]}: ${v} (${pct.toFixed(0)}%)`}
+                   style={{ width: `${pct}%`, background: distColors[k], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 700 }}>
+                {pct >= 8 && `${v}`}
+              </div>
+            ) : null;
+          })}
+        </div>
+        <div style={{ display: 'flex', gap: 16, marginTop: 8, flexWrap: 'wrap' }}>
+          {['ejemplar', 'buena', 'insuficiente', 'grave'].map((k) => (
+            <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#374151' }}>
+              <span style={{ width: 10, height: 10, background: distColors[k], borderRadius: 2 }}></span>{distLabels[k]} <span style={{ color: '#9ca3af' }}>· {report.score_distribution[k]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Two-column: by domain + rubric averages */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 16, marginBottom: 24 }}>
+        <div>
+          <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.humanityReport.byDomain')}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {report.scores_by_domain.map((d) => {
+              const dm2 = DOMAIN_META[d.domain_code] || {};
+              const avg = d.avg_score ?? 0;
+              const pct = (avg / 15) * 100;
+              return (
+                <div key={d.domain_code} style={{ background: '#fff', border: `1px solid ${dm2.border || '#e5e7eb'}`, borderLeft: `4px solid ${dm2.color || '#d1d5db'}`, borderRadius: 10, padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#111827' }}>{dm2.icon} {domainLabel(d.domain_code)}</span>
+                    <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#6b7280' }}>
+                      <strong style={{ color: scoreColor(avg, 15) }}>{d.avg_score ?? '—'}</strong> {t('humanizingAiModule.humanityReport.avgLabel')} · {d.count} {t('humanizingAiModule.humanityReport.countLabel')}
+                    </span>
+                  </div>
+                  <div style={{ height: 6, background: '#f3f4f6', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, background: scoreColor(avg, 15), height: '100%' }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.humanityReport.rubricAvg')}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {['C1', 'C2', 'C3', 'C4', 'C5'].map((k, i) => {
+              const colors = ['#4f46e5','#059669','#2563eb','#d97706','#7c3aed'];
+              const v = report.rubric_avg[k];
+              if (v == null) return null;
+              const pct = (v / 3) * 100;
+              return (
+                <div key={k} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: colors[i] }}>{k}</span>
+                    <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#111827' }}>{v}/3</span>
+                  </div>
+                  <div style={{ height: 6, background: '#f3f4f6', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, background: colors[i], height: '100%' }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Worst dilemmas */}
+      {report.scores_by_dilemma.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.humanityReport.worstDilemmas')}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8 }}>
+            {report.scores_by_dilemma.map((d) => {
+              const dm2 = DOMAIN_META[(d.dilemma_code || '')[0]] || {};
+              return (
+                <div key={d.dilemma_code} style={{ background: '#fff', border: `1px solid ${dm2.border || '#e5e7eb'}`, borderLeft: `4px solid ${dm2.color || '#d1d5db'}`, borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{dm2.icon} {d.dilemma_code}</span>
+                  <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: scoreColor(d.avg_score ?? 0, 15) }}>{d.avg_score ?? '—'}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Timeline */}
+      {report.timeline.length > 1 && (
+        <div>
+          <p style={{ color: '#6b7280', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8, textTransform: 'uppercase' }}>{t('humanizingAiModule.humanityReport.timeline')}</p>
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 80 }}>
+              {report.timeline.map((d) => {
+                const h = (d.count / maxTimelineCount) * 100;
+                return (
+                  <div key={d.date} title={`${d.date}: ${d.count} (avg ${d.avg_score ?? '—'})`}
+                       style={{ flex: 1, height: `${h}%`, background: scoreColor(d.avg_score ?? 0, 15), borderRadius: '3px 3px 0 0', minHeight: 4 }} />
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: '#9ca3af', fontFamily: 'monospace' }}>
+              <span>{report.timeline[0].date}</span>
+              <span>{report.timeline[report.timeline.length - 1].date}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Tab: Model Comparison ────────────────────────────────────────────────────
+const TabModelComparison = () => {
+  const { t, i18n } = useTranslation();
+  const [catalogue, setCatalogue]       = useState(null);
+  const [selectedCode, setSelectedCode] = useState('');
+  const [filterDomain, setFilterDomain] = useState('');
+  const [modelsText, setModelsText]     = useState('claude-sonnet\ngpt-4\nlmstudio-local');
+  const [applyPressure, setApplyPressure] = useState(false);
+  const [pressureKey, setPressureKey]   = useState('F1');
+  const [running, setRunning]           = useState(false);
+  const [result, setResult]             = useState(null);
+  const [error, setError]               = useState('');
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/humanizing-ai/dilemmas?lang=${toLang(i18n.language)}`)
+      .then((r) => r.json())
+      .then((d) => { setCatalogue(d); const codes = Object.keys(d.all_dilemmas || {}); if (codes.length) setSelectedCode(codes[0]); })
+      .catch(() => {});
+  }, [i18n.language]);
+
+  const domainLabel = (code) => t(`humanizingAiModule.testHumanitas.domains.${code}`, { defaultValue: code });
+
+  const handleRun = async () => {
+    const models = modelsText.split('\n').map((s) => s.trim()).filter(Boolean);
+    if (models.length < 2) { setError(t('humanizingAiModule.modelComparison.minModels')); return; }
+    if (!selectedCode) return;
+    setRunning(true); setError(''); setResult(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/humanizing-ai/compare`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dilemma_code:   selectedCode,
+          models,
+          apply_pressure: applyPressure ? pressureKey : null,
+          lang:           toLang(i18n.language),
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setResult(await res.json());
+    } catch (e) {
+      setError(e.message || t('humanizingAiModule.common.error'));
+    } finally { setRunning(false); }
+  };
+
+  const visibleDilemmas = catalogue ? Object.entries(catalogue.all_dilemmas || {}).filter(([code]) => !filterDomain || code.startsWith(filterDomain)) : [];
+  const domainGroups    = catalogue ? Object.keys(catalogue.dilemmas_by_group || {}) : [];
+  const selectStyle = { background: '#ffffff', border: '1px solid #d1d5db', borderRadius: 8, color: '#111827', fontSize: 13, padding: '9px 12px', outline: 'none', cursor: 'pointer', fontFamily: 'inherit' };
+
+  // Best score among results
+  const bestScore = result ? Math.max(...result.results.map((r) => r.evaluation?.humanitas_score ?? -1)) : -1;
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={4} label={t('humanizingAiModule.tabs.modelComparison')} />
+      <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.modelComparison.title')}</h2>
+      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24 }}>{t('humanizingAiModule.modelComparison.subtitle')}</p>
+
+      {/* Config panel */}
+      <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 16, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div>
+            <label style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, display: 'block', marginBottom: 5, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('humanizingAiModule.testHumanitas.domainLabel')}</label>
+            <select style={selectStyle} value={filterDomain} onChange={(e) => { setFilterDomain(e.target.value); setSelectedCode(''); }}>
+              <option value="">{t('humanizingAiModule.testHumanitas.allDomains')}</option>
+              {domainGroups.map((g) => (
+                <option key={g} value={g}>{catalogue.dilemmas_by_group[g]?.icon} {domainLabel(g)}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <label style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, display: 'block', marginBottom: 5, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('humanizingAiModule.testHumanitas.dilemmaLabel')}</label>
+            <select style={{ ...selectStyle, width: '100%' }} value={selectedCode} onChange={(e) => setSelectedCode(e.target.value)}>
+              {visibleDilemmas.map(([code, d]) => (
+                <option key={code} value={code} title={d.text}>
+                  {code} ({domainLabel(code[0])}) — {d.text.length > 110 ? `${d.text.substring(0, 110)}…` : d.text}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, display: 'block', marginBottom: 5, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('humanizingAiModule.modelComparison.modelsLabel')}</label>
+          <textarea value={modelsText} onChange={(e) => setModelsText(e.target.value)}
+                    placeholder={t('humanizingAiModule.modelComparison.modelsPlaceholder')}
+                    style={{ width: '100%', minHeight: 76, background: '#ffffff', border: '1px solid #d1d5db', borderRadius: 8, padding: '10px 12px', fontSize: 12, fontFamily: 'monospace', color: '#111827', outline: 'none', resize: 'vertical' }} />
+        </div>
+
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#374151', fontSize: 13 }}>
+            <input type="checkbox" checked={applyPressure} onChange={(e) => setApplyPressure(e.target.checked)} style={{ accentColor: '#059669', width: 15, height: 15 }} />
+            {t('humanizingAiModule.testHumanitas.pressureLabel')}
+          </label>
+          {applyPressure && (
+            <select style={{ ...selectStyle, fontSize: 12 }} value={pressureKey} onChange={(e) => setPressureKey(e.target.value)}>
+              {['F1', 'F2', 'F3'].map((k) => (<option key={k} value={k}>{t(`humanizingAiModule.common.pressureTests.${k}`)}</option>))}
+            </select>
+          )}
+        </div>
+
+        {error && <p style={{ color: '#dc2626', fontSize: 12 }}>{error}</p>}
+
+        <button onClick={handleRun} disabled={running || !selectedCode} style={{
+          alignSelf: 'flex-start',
+          background: (running || !selectedCode) ? '#d1d5db' : 'linear-gradient(135deg,#4f46e5,#7c3aed)',
+          color: '#fff', border: 'none', borderRadius: 10, padding: '11px 28px',
+          fontWeight: 700, fontSize: 14, cursor: (running || !selectedCode) ? 'not-allowed' : 'pointer',
+          boxShadow: '0 2px 8px rgba(79,70,229,0.25)', display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          {running
+            ? <><span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span> {t('humanizingAiModule.modelComparison.running')}</>
+            : <>⚖️ {t('humanizingAiModule.modelComparison.runBtn')}</>}
+        </button>
+      </div>
+
+      {/* Results grid */}
+      {!result && !running && (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#9ca3af', fontSize: 13 }}>{t('humanizingAiModule.modelComparison.noResults')}</div>
+      )}
+      {result && (
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(result.results.length, 3)}, 1fr)`, gap: 14 }}>
+          {result.results.map((r) => {
+            const sc = r.evaluation?.humanitas_score ?? 0;
+            const isWinner = sc === bestScore && bestScore > 0;
+            return (
+              <div key={r.model} style={{ background: '#fff', border: `1px solid ${isWinner ? '#bbf7d0' : '#e5e7eb'}`, borderTop: `3px solid ${isWinner ? '#059669' : '#9ca3af'}`, borderRadius: 14, padding: '16px 18px', boxShadow: isWinner ? '0 4px 14px rgba(5,150,105,0.18)' : '0 1px 4px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#111827' }}>{r.model}</span>
+                  {isWinner && <Badge label={`★ ${t('humanizingAiModule.modelComparison.winnerLabel')}`} color="#059669" light="#d1fae5" border="#6ee7b7" />}
+                </div>
+                <div style={{ fontSize: 32, fontWeight: 900, fontFamily: 'monospace', color: scoreColor(sc, 15), lineHeight: 1, marginBottom: 6 }}>
+                  {sc}<span style={{ fontSize: 13, fontWeight: 400, color: '#9ca3af' }}>/15</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 4, marginBottom: 12 }}>
+                  {['C1','C2','C3','C4','C5'].map((k) => {
+                    const v = r.evaluation?.[k];
+                    return (
+                      <div key={k} style={{ background: '#f9fafb', borderRadius: 6, padding: '4px 0', textAlign: 'center' }}>
+                        <div style={{ fontSize: 9, color: '#6b7280', fontWeight: 700 }}>{k}</div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: v == null ? '#d1d5db' : scoreColor(v, 3) }}>{v ?? '—'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.55, whiteSpace: 'pre-wrap', maxHeight: 160, overflowY: 'auto' }}>{r.model_response}</p>
+                {r.pressure_response && (
+                  <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #e5e7eb' }}>
+                    <p style={{ fontSize: 9, color: '#92400e', fontWeight: 700, marginBottom: 4, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t('humanizingAiModule.testHumanitas.pressureResponse')}</p>
+                    <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.55, whiteSpace: 'pre-wrap', maxHeight: 100, overflowY: 'auto' }}>{r.pressure_response}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -650,6 +1076,8 @@ const HumanizingAI = () => {
     { id: 'humanize',        label: t('humanizingAiModule.tabs.humanize'),        icon: '🔍' },
     { id: 'promptHumanitas', label: t('humanizingAiModule.tabs.promptHumanitas'), icon: '📋' },
     { id: 'testHumanitas',   label: t('humanizingAiModule.tabs.testHumanitas'),   icon: '🧪' },
+    { id: 'modelComparison', label: t('humanizingAiModule.tabs.modelComparison'), icon: '⚖️' },
+    { id: 'humanityReport',  label: t('humanizingAiModule.tabs.humanityReport'),  icon: '📊' },
     { id: 'history',         label: t('humanizingAiModule.tabs.history'),         icon: '📁' },
   ];
 
@@ -658,6 +1086,8 @@ const HumanizingAI = () => {
       case 'humanize':        return <TabHumanize />;
       case 'promptHumanitas': return <TabPromptHumanitas />;
       case 'testHumanitas':   return <TabTestHumanitas />;
+      case 'modelComparison': return <TabModelComparison />;
+      case 'humanityReport':  return <TabHumanityReport />;
       case 'history':         return <TabHistory />;
       default:                return <TabHumanize />;
     }

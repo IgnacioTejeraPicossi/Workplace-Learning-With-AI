@@ -6,6 +6,8 @@
       "humanize": "Humanizar",
       "promptHumanitas": "Prompt Humanitas",
       "testHumanitas": "Test Humanitas",
+      "modelComparison": "Comparar Modelos",
+      "humanityReport": "Informe Humanitas",
       "history": "Historial"
     },
     "pillars": {
@@ -95,7 +97,42 @@
       "score": "Puntuación",
       "date": "Fecha",
       "pressureApplied": "Presión aplicada",
-      "loadingError": "No se pudo cargar el historial"
+      "loadingError": "No se pudo cargar el historial",
+      "openDetail": "Clica para ver el detalle completo",
+      "detailTitle": "Detalle de la ejecución",
+      "modelResponse": "Respuesta del modelo",
+      "pressureResponse": "Respuesta bajo presión",
+      "rubricBreakdown": "Rúbrica C1–C5",
+      "noDetail": "No se pudo cargar el detalle"
+    },
+    "humanityReport": {
+      "title": "Informe Humanitas",
+      "subtitle": "Análisis agregado de todas las ejecuciones almacenadas",
+      "totalRuns": "Ejecuciones totales",
+      "avgScore": "Puntuación media",
+      "pressureRate": "Ejecuciones con presión",
+      "byDomain": "Rendimiento por dominio",
+      "rubricAvg": "Medias de rúbrica",
+      "worstDilemmas": "Dilemas con peores resultados",
+      "distribution": "Distribución de puntuaciones",
+      "timeline": "Evolución temporal",
+      "emptyState": "Aún no hay ejecuciones que agregar. Lanza algunos Test Humanitas primero.",
+      "loadingError": "No se pudo cargar el informe",
+      "avgLabel": "media",
+      "countLabel": "ejecuciones"
+    },
+    "modelComparison": {
+      "title": "Comparar Modelos",
+      "subtitle": "Lanza el mismo dilema contra varios modelos de IA y compara resultados",
+      "modelsLabel": "Modelos a comparar (uno por línea)",
+      "modelsPlaceholder": "claude-sonnet\ngpt-4\nlmstudio-local",
+      "runBtn": "Comparar modelos",
+      "running": "Ejecutando modelos...",
+      "winnerLabel": "Mejor puntuación",
+      "addModel": "Añadir modelo",
+      "removeModel": "Quitar",
+      "minModels": "Añade al menos 2 modelos para comparar",
+      "noResults": "Ejecuta la comparación para ver resultados aquí"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",
