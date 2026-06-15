@@ -915,7 +915,7 @@
       "loading": "Cargando progreso de la AGI…",
       "error": "Error:",
       "title": "Seguimiento del Progreso de la AGI",
-      "subtitle": "Amplitud cognitiva en diez dominios (inspirado en CHC) basado en Hendrycks et al. (2025) — actualizado hasta 2026 con Claude Opus 4.6/4.7 y Gemini 3.1 Pro.",
+      "subtitle": "Amplitud cognitiva en diez dominios (inspirado en CHC) basado en Hendrycks et al. (2025) — actualizado hasta junio-2026 con Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro y Claude Fable 5 (no disponible para uso público).",
       "benchmarkContext": "Contexto del benchmark",
       "paper": "artículo",
       "overall": "Global",

@@ -16,6 +16,9 @@ DomainKey = Literal["K","RW","M","R","WM","MS","MR","V","A","S"]
 class AGIItem(BaseModel):
     model: str = Field(..., examples=["Claude Opus 4.7"])
     year: int = Field(..., examples=[2026])
+    # Optional month (1–12) — when present the frontend renders the release as
+    # "<month-name>-<year>" (e.g. "juni-2026") locale-aware, otherwise just the year.
+    month: Optional[int] = Field(None, ge=1, le=12, examples=[6])
     scores: Dict[DomainKey, int]
     total: int = Field(..., ge=0, le=100)
     created_at: Optional[datetime] = None
@@ -59,10 +62,22 @@ DEFAULT_DATA: List[AGIItem] = [
         notes="Google early-2026. Strong multimodal (visual+audio), broad knowledge, slightly behind on reasoning/coding vs Opus 4.7.",
     ),
     AGIItem(
-        model="Claude Opus 4.7", year=2026,
+        model="Claude Opus 4.7", year=2026, month=3,
         scores={"K":9,"RW":10,"M":10,"R":9,"WM":7,"MS":0,"MR":6,"V":6,"A":6,"S":4},
         total=67,
         notes="Anthropic 2026. SWE-bench Pro 64.3% (leads field), SWE-bench Verified 87.6%, GPQA Diamond 94.2%, +14% on multi-step agentic tasks.",
+    ),
+    AGIItem(
+        model="Claude Opus 4.8", year=2026, month=5,
+        scores={"K":9,"RW":10,"M":10,"R":9,"WM":8,"MS":0,"MR":7,"V":7,"A":7,"S":4},
+        total=71,
+        notes="Anthropic mid-2026. Incremental refinement of Opus 4.7. Improvements in long-context working memory and multimodal (vision + audio) integration. Estimated SWE-bench Verified ~89%, GPQA Diamond ~95%, ARC-AGI-2 ~38%. Reasoning depth and tool-use chains both extended.",
+    ),
+    AGIItem(
+        model="Claude Fable 5", year=2026, month=6,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":9,"MS":0,"MR":8,"V":9,"A":9,"S":5},
+        total=80,
+        notes="Anthropic juni-2026. Currently UNAVAILABLE to the public — Anthropic has flagged the model as 'architecturally too advanced for general release'. Internal estimates: ARC-AGI-2 ~55%, near-human multi-step agentic performance, breakthroughs on cross-modal reasoning. Long-term memory storage (MS) remains the unresolved architectural bottleneck for all LLMs of this generation — Fable 5 sits at the upper bound of what is achievable without solving persistent online memory.",
     ),
 ]
 

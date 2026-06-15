@@ -6,8 +6,25 @@ import TrendLine from '../../../components/agi/TrendLine';
 import { useTranslation } from 'react-i18next';
 import AiSuggestions, { ApplyDismissActions, SourceLink } from './AiSuggestions';
 
+/** Locale-aware release label.
+ *  When the item has a numeric `month` (1–12) it renders "<month>-<year>"
+ *  in the active language (es → "junio-2026", en → "june-2026", no → "juni-2026").
+ *  When month is absent it falls back to just the year — keeps backwards
+ *  compatibility with older entries stored without a month field. */
+const formatRelease = (item, lang) => {
+  if (!item || item.year == null) return '';
+  if (!item.month) return String(item.year);
+  try {
+    const d = new Date(item.year, item.month - 1, 1);
+    const monthName = new Intl.DateTimeFormat(lang || 'en', { month: 'long' }).format(d).toLowerCase();
+    return `${monthName}-${item.year}`;
+  } catch {
+    return String(item.year);
+  }
+};
+
 export default function AgiTracker() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
@@ -18,9 +35,10 @@ export default function AgiTracker() {
     fetchAGIProgress()
       .then(data => {
         setItems(data);
-        // Default selection = newest model (by year, then total) so the dropdown
-        // and the charts start in sync on first render.
-        const source = (data || []).slice().sort((a,b)=> (b.year - a.year) || b.total - a.total);
+        // Default selection = newest model (by year, then month, then total)
+        // so the dropdown and the charts start in sync on first render.
+        const source = (data || []).slice().sort((a,b)=>
+          (b.year - a.year) || ((b.month||0) - (a.month||0)) || (b.total - a.total));
         if (source[0]) setSelected(source[0].model);
       })
       .catch(e => setErr(String(e)))
@@ -28,7 +46,8 @@ export default function AgiTracker() {
   }, []);
 
   const latest = useMemo(() => {
-    const source = (items || []).slice().sort((a,b)=> (b.year - a.year) || b.total - a.total);
+    const source = (items || []).slice().sort((a,b)=>
+      (b.year - a.year) || ((b.month||0) - (a.month||0)) || (b.total - a.total));
     return source.find(i => i.model === selected) || source[0];
   }, [items, selected]);
 
@@ -40,7 +59,7 @@ export default function AgiTracker() {
       <div>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{t('help.agiProgress.title', { defaultValue: 'AGI Progress Tracker' })}</h2>
         <div style={{ color: '#64748b', fontSize: 14 }}>
-          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through 2026 with Claude Opus 4.6/4.7 and Gemini 3.1 Pro.' })}
+          {t('help.agiProgress.subtitle', { defaultValue: 'Cognitive breadth across ten domains (CHC-inspired) based on Hendrycks et al. (2025) — updated through june-2026 with Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro, and Claude Fable 5 (unavailable for public release).' })}
           {' ['}
           <a href="https://www.agidefinition.ai/paper.pdf" target="_blank" rel="noreferrer">{t('help.agiProgress.paper', { defaultValue: 'paper' })}</a>
           {']'}
@@ -55,8 +74,8 @@ export default function AgiTracker() {
             <div style={{ marginTop: 12 }}>
               <label style={{ fontSize: 12, color: '#64748b' }}>{t('help.agiProgress.modelLabel', { defaultValue: 'Model:' })}</label>
               <select value={selected} onChange={(e)=>setSelected(e.target.value)} style={{ marginLeft: 8, padding: '6px 8px', borderRadius: 8, border: '1px solid #e5e7eb' }}>
-                {(items||[]).slice().sort((a,b)=>a.year-b.year).map(i => (
-                  <option key={`${i.model}-${i.year}`} value={i.model}>{i.model} ({i.year})</option>
+                {(items||[]).slice().sort((a,b)=> (a.year - b.year) || ((a.month||0) - (b.month||0))).map(i => (
+                  <option key={`${i.model}-${i.year}-${i.month||0}`} value={i.model}>{i.model} ({formatRelease(i, i18n.language)})</option>
                 ))}
               </select>
             </div>

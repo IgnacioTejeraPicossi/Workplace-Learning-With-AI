@@ -1532,7 +1532,7 @@
     },
     "agiProgress": {
       "title": "AGI‑fremdrift",
-      "subtitle": "Kognitiv bredde på tvers av ti domener (CHC‑inspirert) basert på Hendrycks m.fl. (2025) — oppdatert til 2026 med Claude Opus 4.6/4.7 og Gemini 3.1 Pro.",
+      "subtitle": "Kognitiv bredde på tvers av ti domener (CHC‑inspirert) basert på Hendrycks m.fl. (2025) — oppdatert til juni-2026 med Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro og Claude Fable 5 (utilgjengelig for offentlig bruk).",
       "benchmarkContext": "Benchmark‑kontekst",
       "paper": "artikkel",
       "loading": "Laster AGI‑fremdrift …",
