@@ -12,10 +12,12 @@ to AI-generated content. It lets you:
 1. **Humanize a response** — paste any AI output and run it through the Prompt Humanitas filter to make it more dignified, truthful and person-centred.
 2. **Explore the Prompt Humanitas** — copy a ready-to-use ethical system prompt into any AI chat (ChatGPT, Claude, Gemini…).
 3. **Run Test Humanitas** — submit the AI model to a battery of 26 ethical dilemmas and measure how it handles human values.
-4. **Review history** — browse all saved Test Humanitas runs stored in the database.
+4. **Compare Models** — run the same dilemma against several AI models side-by-side and see which scores best.
+5. **Humanity Report** — aggregate KPIs across all stored runs: average score, performance by domain, C1–C5 averages, timeline.
+6. **Review history** — browse all saved Test Humanitas runs and click any row to see its full detail.
 
 The module is fully multilingual: **English · Español · Norsk**. All UI labels and all prompt
-content (prompt text, criteria names, descriptions) switch with the language menu.
+content (prompt text, criteria names, descriptions, dilemma texts) switch with the language menu.
 
 ---
 
@@ -39,7 +41,7 @@ The agent is built on three complementary sources:
 
 ---
 
-## The Four Tabs
+## The Six Tabs
 
 ### Tab 1 — Humanize
 
@@ -168,9 +170,56 @@ the model holds its ethical position or caves under pressure:
 
 ---
 
-### Tab 4 — History
+### Tab 4 — Model Comparison
 
-**Purpose:** Browse all Test Humanitas runs saved in MongoDB.
+**Purpose:** Run the same ethical dilemma against multiple AI models simultaneously and compare
+their Humanitas scores side-by-side.
+
+**How to use:**
+1. (Optional) Filter dilemmas by **Domain**.
+2. Select a **dilemma** from the dropdown.
+3. Enter **2–5 model labels** in the textarea (one per line). Free-form labels work as bookkeeping
+   for the comparison view — e.g. `claude-sonnet`, `gpt-4`, `lmstudio-local`.
+4. (Optional) Toggle **Apply pressure test** + choose F1/F2/F3.
+5. Click **Compare models**.
+
+**Results panel:**
+- A grid of cards (1–3 columns depending on the number of models).
+- Each card shows: model label, **Humanitas Score** (large), C1–C5 breakdown, response text,
+  and pressure response (if applied).
+- The model with the **highest score** automatically gets a **★ Best score** badge and
+  enhanced visual emphasis.
+
+> 💡 All models currently hit the same backend `ask_ai_unified` function; the label is bookkeeping.
+> To truly route to different providers, extend `compare_models_on_dilemma` to switch backends
+> per label (Anthropic API for `claude-*`, OpenAI for `gpt-*`, etc.).
+
+---
+
+### Tab 5 — Humanity Report
+
+**Purpose:** Provide a consolidated dashboard view of all stored Test Humanitas runs.
+
+**What it shows:**
+| Block | Visualisation |
+|-------|--------------|
+| **3 headline KPIs** | Total runs · Average Humanitas Score · % of runs with pressure |
+| **Score distribution** | Stacked horizontal bar — Exemplary / Good / Insufficient / Seriously misaligned |
+| **Performance by domain** | One row per domain (A–E) with avg score, run count and progress bar |
+| **Rubric averages** | One progress bar per criterion (C1–C5) showing the mean across all runs |
+| **Most-failed dilemmas** | Top-10 dilemmas sorted by lowest average score |
+| **Timeline** | Daily bar chart (last 30 days) coloured by avg score; tooltip on hover |
+
+The report aggregates the **most recent 500 runs** by default (configurable via `?limit=`).
+
+> 💡 Useful for governance reports, classroom debriefs after a workshop, or detecting model drift
+> over time.
+
+---
+
+### Tab 6 — History
+
+**Purpose:** Browse all Test Humanitas runs saved in MongoDB and drill into any single run.
 
 **What is shown per row:**
 - Run ID
@@ -179,6 +228,12 @@ the model holds its ethical position or caves under pressure:
 - Humanitas Score
 - Date/time
 - Whether pressure was applied
+
+**Click any row → detail modal** with:
+- The dilemma card (code, domain, full text)
+- Humanitas Score + C1–C5 breakdown
+- Full model response
+- Pressure test text + response (if applied)
 
 > ℹ️ History is empty when MongoDB is not configured. Runs in MOCK mode are still stored if
 > the database is reachable.
@@ -196,7 +251,9 @@ workplace AI governance sessions:
 | **Audit a company chatbot** | Paste typical chatbot responses into Tab 1 — Humanize — and discuss the issues detected |
 | **Group workshop** | Assign different dilemmas per team in Tab 3 — run them, compare C1–C5 scores, discuss |
 | **Pressure-test exercise** | Run the same dilemma with each F1/F2/F3 variant — discuss why some AIs cave under pressure |
-| **Multi-model comparison** | Run the same dilemma manually against two AI models, enter each response into Tab 1 for scoring |
+| **Multi-model audit** | Use Tab 4 — Model Comparison — to run the same dilemma against several models and see the winner |
+| **Governance review** | Use Tab 5 — Humanity Report — to present aggregate ethics metrics to stakeholders |
+| **Forensic deep-dive** | From Tab 6 — History — click any run to inspect the full conversation and breakdown |
 
 ---
 
@@ -206,8 +263,8 @@ workplace AI governance sessions:
 
 | File | Purpose |
 |------|---------|
-| `backend/services/humanizing_ai.py` | All agent logic: prompts, dilemmas, evaluation, persistence |
-| `backend/routers/humanizing_ai.py` | FastAPI router — 6 endpoints under `/api/humanizing-ai` |
+| `backend/services/humanizing_ai.py` | All agent logic: prompts, dilemmas, evaluation, persistence, multi-model compare, aggregations |
+| `backend/routers/humanizing_ai.py` | FastAPI router — 9 endpoints under `/api/humanizing-ai` |
 
 **Key service functions:**
 
@@ -221,14 +278,24 @@ run_test_humanitas(dilemma_code, apply_pressure: Optional[str], lang)
 evaluate_response(dilemma_code, model_response, pressure_applied, pressure_response, lang)
   → rubric dict with C1–C5 scores + humanitas_score
 
+compare_models_on_dilemma(dilemma_code, models: List[str], apply_pressure, lang)
+  → { dilemma_text, results: [ {model, model_response, pressure_response, evaluation}, ... ] }
+
 get_prompt_humanitas_content(lang)
   → { prompt_text, criteria, pillars, inspiration }  — in 'es', 'en', or 'no'
 
 get_reports(limit)
-  → list of stored runs from MongoDB
+  → list of stored runs from MongoDB (without full response bodies)
 
-get_dilemmas_catalogue()
-  → 26 dilemmas grouped by domain
+get_run_by_id(run_id)
+  → single run document with full responses, or None if not found
+
+get_humanity_report(limit)
+  → { total_runs, avg_score, scores_by_domain, scores_by_dilemma, rubric_avg,
+      score_distribution, timeline, pressure_rate }
+
+get_dilemmas_catalogue(lang)
+  → 26 dilemmas grouped by domain in requested language
 ```
 
 **MongoDB collection:** `humanizing_ai_runs`
@@ -240,7 +307,7 @@ Each document stores: `run_id`, `dilemma_code`, `domain`, `lang`, `apply_pressur
 
 | File | Purpose |
 |------|---------|
-| `frontend/src/HumanizingAI.jsx` | Main component — 4 tab components, shared design tokens |
+| `frontend/src/HumanizingAI.jsx` | Main component — 6 tab components, detail modal, shared design tokens |
 | `frontend/src/i18n/locales/en/humanizingAiModule.json` | English strings |
 | `frontend/src/i18n/locales/es/humanizingAiModule.json` | Spanish strings |
 | `frontend/src/i18n/locales/no/humanizingAiModule.json` | Norwegian strings |
@@ -321,11 +388,81 @@ Returns the Prompt Humanitas text and 10 criteria in the requested language.
 
 ### `GET /reports?limit=20`
 
-Returns the most recent Test Humanitas runs from MongoDB.
+Returns the most recent Test Humanitas runs from MongoDB (without full response bodies).
 
 | Param | Range | Default |
 |-------|-------|---------|
 | `limit` | 1–100 | 20 |
+
+---
+
+### `GET /reports/{run_id}`
+
+Returns the full document for a single run (includes model_response and pressure_response).
+Returns **404** if no run matches the ID.
+
+---
+
+### `GET /humanity-report?limit=500`
+
+Returns aggregated insights across the most recent N runs.
+
+| Param | Range | Default |
+|-------|-------|---------|
+| `limit` | 10–2000 | 500 |
+
+**Response shape:**
+```json
+{
+  "total_runs": 42,
+  "avg_score": 11.7,
+  "pressure_rate": 64.3,
+  "score_distribution": {"ejemplar": 8, "buena": 22, "insuficiente": 10, "grave": 2},
+  "scores_by_domain":   [{"domain_code": "A", "count": 9, "avg_score": 12.3}, ...],
+  "scores_by_dilemma":  [{"dilemma_code": "C4", "count": 3, "avg_score": 4.5}, ...],
+  "rubric_avg":         {"C1": 2.3, "C2": 2.1, "C3": 1.9, "C4": 1.5, "C5": 2.4},
+  "timeline":           [{"date": "2026-06-10", "count": 4, "avg_score": 10.5}, ...]
+}
+```
+
+---
+
+### `POST /compare`
+
+Run the same dilemma against multiple model labels and evaluate each.
+
+```json
+{
+  "dilemma_code": "B2",
+  "models": ["claude-sonnet", "gpt-4", "lmstudio-local"],
+  "apply_pressure": "F1 | F2 | F3 (optional, null to skip)",
+  "lang": "es | en | no (default: es)"
+}
+```
+
+**Constraints:** 2 ≤ `models.length` ≤ 5.
+
+**Response shape:**
+```json
+{
+  "status": "ok",
+  "dilemma_code": "B2",
+  "dilemma_text": "...",
+  "domain": "Communication",
+  "pressure_applied": "F1",
+  "pressure_text": "...",
+  "results": [
+    {
+      "model": "claude-sonnet",
+      "model_response": "...",
+      "pressure_response": "...",
+      "evaluation": { "C1": 2, "C2": 3, "C3": 2, "C4": 2, "C5": 3,
+                      "humanitas_score": 12.0, "level": "Good", ... }
+    },
+    ...
+  ]
+}
+```
 
 ---
 
