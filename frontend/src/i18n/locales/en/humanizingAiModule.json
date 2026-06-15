@@ -8,6 +8,7 @@
       "testHumanitas": "Test Humanitas",
       "modelComparison": "Model Comparison",
       "humanityReport": "Humanity Report",
+      "gateway": "Gateway",
       "history": "History"
     },
     "pillars": {
@@ -139,6 +140,28 @@
       "removeModel": "Remove",
       "minModels": "Add at least 2 models to compare",
       "noResults": "Run the comparison to see results here"
+    },
+    "gateway": {
+      "title": "Gateway Filter",
+      "subtitle": "Test the transversal Humanitas filter that any module can call before showing a response",
+      "intro": "Paste any AI response below. The filter scores it and optionally rewrites it based on the mode and threshold you choose.",
+      "rawLabel": "Raw module response",
+      "rawPlaceholder": "Paste the response your module is about to show to the user...",
+      "moduleIdLabel": "Module ID (audit trail)",
+      "moduleIdPlaceholder": "robomind-clinic · j-messages-analyzer · ...",
+      "modeLabel": "Filter mode",
+      "modeAudit": "Audit · score only",
+      "modeEnhance": "Enhance · rewrite if below threshold",
+      "modeAlways": "Always · always rewrite",
+      "thresholdLabel": "Score threshold (only for Enhance)",
+      "runBtn": "Run filter",
+      "running": "Filtering...",
+      "wasModified": "✓ Response was rewritten",
+      "wasNotModified": "→ Response passed through unchanged",
+      "finalLabel": "What the user would see",
+      "originalLabel": "Original (from the module)",
+      "scoreLabel": "Humanitas score",
+      "noInput": "Please paste a response to filter"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",

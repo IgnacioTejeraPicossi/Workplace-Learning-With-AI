@@ -8,6 +8,7 @@
       "testHumanitas": "Test Humanitas",
       "modelComparison": "Comparar Modelos",
       "humanityReport": "Informe Humanitas",
+      "gateway": "Gateway",
       "history": "Historial"
     },
     "pillars": {
@@ -139,6 +140,28 @@
       "removeModel": "Quitar",
       "minModels": "Añade al menos 2 modelos para comparar",
       "noResults": "Ejecuta la comparación para ver resultados aquí"
+    },
+    "gateway": {
+      "title": "Filtro Gateway",
+      "subtitle": "Prueba el filtro transversal Humanitas que cualquier módulo puede invocar antes de mostrar una respuesta",
+      "intro": "Pega cualquier respuesta de IA abajo. El filtro la puntúa y opcionalmente la reescribe según el modo y umbral que elijas.",
+      "rawLabel": "Respuesta original del módulo",
+      "rawPlaceholder": "Pega la respuesta que tu módulo va a mostrar al usuario...",
+      "moduleIdLabel": "ID del módulo (rastro de auditoría)",
+      "moduleIdPlaceholder": "robomind-clinic · j-messages-analyzer · ...",
+      "modeLabel": "Modo del filtro",
+      "modeAudit": "Auditar · sólo puntuar",
+      "modeEnhance": "Mejorar · reescribir si está bajo umbral",
+      "modeAlways": "Siempre · reescribir siempre",
+      "thresholdLabel": "Umbral de puntuación (sólo Mejorar)",
+      "runBtn": "Ejecutar filtro",
+      "running": "Filtrando...",
+      "wasModified": "✓ La respuesta fue reescrita",
+      "wasNotModified": "→ La respuesta pasó sin cambios",
+      "finalLabel": "Lo que vería el usuario",
+      "originalLabel": "Original (del módulo)",
+      "scoreLabel": "Puntuación Humanitas",
+      "noInput": "Por favor, pega una respuesta para filtrar"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",

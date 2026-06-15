@@ -8,6 +8,7 @@
       "testHumanitas": "Test Humanitas",
       "modelComparison": "Sammenlign modeller",
       "humanityReport": "Humanitas-rapport",
+      "gateway": "Gateway",
       "history": "Historikk"
     },
     "pillars": {
@@ -139,6 +140,28 @@
       "removeModel": "Fjern",
       "minModels": "Legg til minst 2 modeller for å sammenligne",
       "noResults": "Kjør sammenligningen for å se resultater her"
+    },
+    "gateway": {
+      "title": "Gateway-filter",
+      "subtitle": "Test det transversale Humanitas-filteret som enhver modul kan kalle før den viser et svar",
+      "intro": "Lim inn et KI-svar nedenfor. Filteret scorer det og kan eventuelt omskrive det basert på modus og terskel du velger.",
+      "rawLabel": "Råsvar fra modul",
+      "rawPlaceholder": "Lim inn svaret modulen er i ferd med å vise brukeren...",
+      "moduleIdLabel": "Modul-ID (revisjonsspor)",
+      "moduleIdPlaceholder": "robomind-clinic · j-messages-analyzer · ...",
+      "modeLabel": "Filtermodus",
+      "modeAudit": "Revisjon · kun scoring",
+      "modeEnhance": "Forbedre · omskriv hvis under terskel",
+      "modeAlways": "Alltid · omskriv alltid",
+      "thresholdLabel": "Poengterskel (kun Forbedre)",
+      "runBtn": "Kjør filter",
+      "running": "Filtrerer...",
+      "wasModified": "✓ Svaret ble omskrevet",
+      "wasNotModified": "→ Svaret ble sluppet gjennom uendret",
+      "finalLabel": "Det brukeren ville se",
+      "originalLabel": "Original (fra modulen)",
+      "scoreLabel": "Humanitas-poengsum",
+      "noInput": "Vennligst lim inn et svar å filtrere"
     },
     "hero": {
       "workspace": "WORKPLACE LEARNING WITH AI",

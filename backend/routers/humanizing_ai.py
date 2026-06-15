@@ -26,6 +26,7 @@ try:
         get_run_by_id,
         get_humanity_report,
         compare_models_on_dilemma,
+        apply_humanitas_filter,
         get_dilemmas_catalogue,
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
@@ -40,6 +41,7 @@ except ImportError:  # pragma: no cover
         get_run_by_id,
         get_humanity_report,
         compare_models_on_dilemma,
+        apply_humanitas_filter,
         get_dilemmas_catalogue,
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
@@ -81,6 +83,26 @@ class EvaluateRequest(BaseModel):
     pressure_response: Optional[str] = Field(
         None,
         description="AI response after pressure was applied (optional)",
+    )
+    lang: str = Field("es")
+
+
+class FilterRequest(BaseModel):
+    text: str = Field(..., description="Raw response text from any module")
+    context: str = Field("", description="Optional context (original question)")
+    mode: str = Field(
+        "enhance",
+        description="'audit' (score only), 'enhance' (rewrite if below threshold), 'always' (always rewrite)",
+        pattern=r"^(audit|enhance|always)$",
+    )
+    threshold: float = Field(
+        70.0,
+        ge=0.0, le=100.0,
+        description="Humanitas score threshold (0–100). Only used when mode='enhance'.",
+    )
+    module_id: Optional[str] = Field(
+        None,
+        description="Free-form identifier of the calling module (audit trail)",
     )
     lang: str = Field("es")
 
@@ -261,6 +283,33 @@ async def humanity_report_endpoint(
     MongoDB is not configured.
     """
     return await get_humanity_report(limit=limit)
+
+
+@router.post("/filter", summary="Transversal Humanitas filter for any module's response")
+async def filter_endpoint(body: FilterRequest) -> Dict[str, Any]:
+    """
+    **Gateway-style transversal filter.** Any module can POST a raw AI response
+    here before showing it to the user. Three modes:
+
+    - **audit** — never modifies the text, only returns score + issues.
+    - **enhance** — rewrites the text ONLY if `humanitas_score < threshold` (default 70).
+    - **always** — always rewrites the text.
+
+    Returns `original_text`, `filtered_text`, `was_modified` (bool),
+    `humanitas_score`, `pillar_scores`, `issues`, `mode`, `threshold`,
+    `module_id` (echoed for audit), `is_mock`.
+
+    For Python in-process integration import `apply_humanitas_filter`
+    directly from `backend.services.humanizing_ai`.
+    """
+    return await apply_humanitas_filter(
+        text=body.text,
+        context=body.context,
+        mode=body.mode,
+        threshold=body.threshold,
+        module_id=body.module_id,
+        lang=body.lang,
+    )
 
 
 @router.post("/compare", summary="Compare multiple models on the same dilemma")

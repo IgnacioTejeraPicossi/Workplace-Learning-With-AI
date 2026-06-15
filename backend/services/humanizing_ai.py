@@ -592,6 +592,84 @@ def _mock_lang(lang: str) -> str:
     return lang if lang in _LANG_NAMES else "es"
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# 0 — Transversal Gateway Filter (any module can call this before showing
+#     a response to the user). Has three modes:
+#       - 'audit':   never modifies, only scores
+#       - 'enhance': rewrites ONLY when score < threshold
+#       - 'always':  always rewrites
+#     Returns a uniform shape so callers can branch on `was_modified`.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_VALID_MODES = {"audit", "enhance", "always"}
+
+
+async def apply_humanitas_filter(
+    text: str,
+    context: str = "",
+    mode: str = "enhance",
+    threshold: float = 70.0,
+    module_id: Optional[str] = None,
+    lang: str = "es",
+) -> Dict[str, Any]:
+    """Gateway-style transversal filter.
+
+    Any service can call this with a raw AI response and get back either the
+    same text (audit), the rewritten text (always), or one of the two depending
+    on the Humanitas score (enhance). The caller decides what to show.
+
+    Returns:
+        original_text, filtered_text, was_modified, humanitas_score,
+        pillar_scores, issues, mode, threshold, module_id, is_mock
+    """
+    if mode not in _VALID_MODES:
+        mode = "enhance"
+    if not text or not text.strip():
+        return {
+            "original_text":   text or "",
+            "filtered_text":   text or "",
+            "was_modified":    False,
+            "humanitas_score": None,
+            "pillar_scores":   {},
+            "issues":          [],
+            "mode":            mode,
+            "threshold":       threshold if mode == "enhance" else None,
+            "module_id":       module_id,
+            "is_mock":         False,
+            "skipped":         True,
+        }
+
+    analysis = await rewrite_with_humanitas(
+        raw_response=text, context=context, lang=lang,
+    )
+    score   = analysis.get("humanitas_score", 0) or 0
+    issues  = analysis.get("issues",  [])
+    rewrite = analysis.get("humanized_response", "") or ""
+    pillars = analysis.get("pillar_scores", {}) or {}
+
+    if mode == "audit":
+        filtered, modified = text, False
+    elif mode == "always":
+        filtered, modified = (rewrite or text), bool(rewrite and rewrite != text)
+    else:  # enhance
+        modified = bool(score < threshold and rewrite and rewrite != text)
+        filtered = rewrite if modified else text
+
+    return {
+        "original_text":   text,
+        "filtered_text":   filtered,
+        "was_modified":    modified,
+        "humanitas_score": score,
+        "pillar_scores":   pillars,
+        "issues":          issues,
+        "mode":            mode,
+        "threshold":       threshold if mode == "enhance" else None,
+        "module_id":       module_id,
+        "is_mock":         analysis.get("is_mock", False),
+        "skipped":         False,
+    }
+
+
 async def rewrite_with_humanitas(
     raw_response: str,
     context: str = "",

@@ -1175,6 +1175,184 @@ const TabModelComparison = () => {
   );
 };
 
+// ─── Tab: Gateway Filter (transversal) ────────────────────────────────────────
+const TabGateway = () => {
+  const { t, i18n } = useTranslation();
+  const [rawText, setRawText]       = useState('');
+  const [moduleId, setModuleId]     = useState('');
+  const [mode, setMode]             = useState('enhance');
+  const [threshold, setThreshold]   = useState(70);
+  const [loading, setLoading]       = useState(false);
+  const [result, setResult]         = useState(null);
+  const [error, setError]           = useState('');
+
+  const handleRun = async () => {
+    if (!rawText.trim()) { setError(t('humanizingAiModule.gateway.noInput')); return; }
+    setLoading(true); setError(''); setResult(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/humanizing-ai/filter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text:      rawText,
+          mode,
+          threshold: Number(threshold),
+          module_id: moduleId || null,
+          lang:      toLang(i18n.language),
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setResult(await res.json());
+    } catch (e) {
+      setError(e.message || t('humanizingAiModule.common.error'));
+    } finally { setLoading(false); }
+  };
+
+  const inputStyle = {
+    width: '100%', background: '#ffffff', border: '1px solid #d1d5db',
+    borderRadius: 10, color: '#111827', fontSize: 13, padding: '12px 14px',
+    outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box',
+  };
+  const selectStyle = { ...inputStyle, cursor: 'pointer', paddingTop: 9, paddingBottom: 9 };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={6} label={t('humanizingAiModule.tabs.gateway')} />
+      <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.gateway.title')}</h2>
+      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24 }}>{t('humanizingAiModule.gateway.subtitle')}</p>
+
+      <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderLeft: '4px solid #4f46e5', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 12, color: '#3730a3', lineHeight: 1.6 }}>
+        ℹ️ {t('humanizingAiModule.gateway.intro')}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 1fr' : '1fr', gap: 24 }}>
+        {/* Inputs */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ color: '#374151', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.gateway.rawLabel')}</label>
+            <textarea style={{ ...inputStyle, height: 160, resize: 'vertical' }}
+              placeholder={t('humanizingAiModule.gateway.rawPlaceholder')}
+              value={rawText} onChange={(e) => setRawText(e.target.value)} />
+          </div>
+          <div>
+            <label style={{ color: '#374151', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.gateway.moduleIdLabel')}</label>
+            <input style={inputStyle} type="text"
+              placeholder={t('humanizingAiModule.gateway.moduleIdPlaceholder')}
+              value={moduleId} onChange={(e) => setModuleId(e.target.value)} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={{ color: '#374151', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.gateway.modeLabel')}</label>
+              <select style={selectStyle} value={mode} onChange={(e) => setMode(e.target.value)}>
+                <option value="audit">{t('humanizingAiModule.gateway.modeAudit')}</option>
+                <option value="enhance">{t('humanizingAiModule.gateway.modeEnhance')}</option>
+                <option value="always">{t('humanizingAiModule.gateway.modeAlways')}</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ color: '#374151', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginBottom: 6, textTransform: 'uppercase' }}>
+                {t('humanizingAiModule.gateway.thresholdLabel')} <span style={{ color: '#059669', fontFamily: 'monospace' }}>{threshold}</span>
+              </label>
+              <input type="range" min={0} max={100} step={5}
+                disabled={mode !== 'enhance'}
+                value={threshold} onChange={(e) => setThreshold(e.target.value)}
+                style={{ width: '100%', accentColor: '#059669', marginTop: 12, opacity: mode === 'enhance' ? 1 : 0.4 }} />
+            </div>
+          </div>
+          {error && <p style={{ color: '#dc2626', fontSize: 12 }}>{error}</p>}
+          <button onClick={handleRun} disabled={loading} style={{
+            alignSelf: 'flex-start',
+            background: loading ? '#a78bfa' : 'linear-gradient(135deg,#4f46e5,#7c3aed)',
+            color: '#fff', border: 'none', borderRadius: 10,
+            padding: '11px 28px', fontWeight: 700, fontSize: 14,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: '0 2px 8px rgba(79,70,229,0.25)',
+          }}>
+            {loading
+              ? <><span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span> {t('humanizingAiModule.gateway.running')}</>
+              : <>🛡️ {t('humanizingAiModule.gateway.runBtn')}</>}
+          </button>
+        </div>
+
+        {/* Result column */}
+        {result && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Decision banner */}
+            <div style={{
+              background: result.was_modified ? '#ecfdf5' : '#eff6ff',
+              border: `1px solid ${result.was_modified ? '#bbf7d0' : '#bfdbfe'}`,
+              borderLeft: `4px solid ${result.was_modified ? '#059669' : '#2563eb'}`,
+              borderRadius: 12, padding: '14px 18px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8,
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: result.was_modified ? '#065f46' : '#1e40af' }}>
+                {result.was_modified ? t('humanizingAiModule.gateway.wasModified') : t('humanizingAiModule.gateway.wasNotModified')}
+              </span>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Badge label={result.mode.toUpperCase()} color="#4f46e5" light="#eef2ff" border="#c7d2fe" />
+                <MockBadge isMock={result.is_mock} t={t} />
+              </div>
+            </div>
+
+            {/* Score */}
+            {result.humanitas_score != null && (
+              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 18px' }}>
+                <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.gateway.scoreLabel')}</p>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  <span style={{ fontSize: 36, fontWeight: 900, fontFamily: 'monospace', color: scoreColor(result.humanitas_score, 100), lineHeight: 1 }}>
+                    {result.humanitas_score}<span style={{ fontSize: 14, color: '#9ca3af' }}>/100</span>
+                  </span>
+                  {result.threshold != null && (
+                    <span style={{ color: '#9ca3af', fontSize: 11 }}>threshold {result.threshold}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Final text (what the user would see) */}
+            <BorderCard color={result.was_modified ? '#059669' : '#2563eb'}
+                        light={result.was_modified ? '#f0fdf4' : '#eff6ff'}
+                        border={result.was_modified ? '#bbf7d0' : '#bfdbfe'}>
+              <p style={{ color: result.was_modified ? '#065f46' : '#1e40af', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>
+                ⬇ {t('humanizingAiModule.gateway.finalLabel')}
+              </p>
+              <p style={{ color: '#111827', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{result.filtered_text}</p>
+            </BorderCard>
+
+            {/* Original (only when modified) */}
+            {result.was_modified && (
+              <BorderCard color="#9ca3af" light="#f9fafb" border="#e5e7eb">
+                <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
+                  {t('humanizingAiModule.gateway.originalLabel')}
+                </p>
+                <p style={{ color: '#6b7280', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{result.original_text}</p>
+              </BorderCard>
+            )}
+
+            {/* Issues */}
+            {result.issues?.length > 0 && (
+              <BorderCard color="#dc2626" light="#fef2f2" border="#fecaca">
+                <p style={{ color: '#991b1b', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>⚠ {t('humanizingAiModule.humanize.issuesTitle')}</p>
+                {result.issues.map((issue, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                    <span style={{ color: '#dc2626', fontSize: 12 }}>•</span>
+                    <span style={{ color: '#374151', fontSize: 12 }}>{issue}</span>
+                  </div>
+                ))}
+              </BorderCard>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Diff under both columns when modified */}
+      {result?.was_modified && result.original_text && result.filtered_text && (
+        <BeforeAfterDiff original={result.original_text} humanized={result.filtered_text} t={t} />
+      )}
+    </div>
+  );
+};
+
 // ─── Main Shell ───────────────────────────────────────────────────────────────
 const HumanizingAI = () => {
   const { t } = useTranslation();
@@ -1186,6 +1364,7 @@ const HumanizingAI = () => {
     { id: 'testHumanitas',   label: t('humanizingAiModule.tabs.testHumanitas'),   icon: '🧪' },
     { id: 'modelComparison', label: t('humanizingAiModule.tabs.modelComparison'), icon: '⚖️' },
     { id: 'humanityReport',  label: t('humanizingAiModule.tabs.humanityReport'),  icon: '📊' },
+    { id: 'gateway',         label: t('humanizingAiModule.tabs.gateway'),         icon: '🛡️' },
     { id: 'history',         label: t('humanizingAiModule.tabs.history'),         icon: '📁' },
   ];
 
@@ -1196,6 +1375,7 @@ const HumanizingAI = () => {
       case 'testHumanitas':   return <TabTestHumanitas />;
       case 'modelComparison': return <TabModelComparison />;
       case 'humanityReport':  return <TabHumanityReport />;
+      case 'gateway':         return <TabGateway />;
       case 'history':         return <TabHistory />;
       default:                return <TabHumanize />;
     }

@@ -14,7 +14,8 @@ to AI-generated content. It lets you:
 3. **Run Test Humanitas** — submit the AI model to a battery of 26 ethical dilemmas and measure how it handles human values.
 4. **Compare Models** — run the same dilemma against several AI models side-by-side and see which scores best.
 5. **Humanity Report** — aggregate KPIs across all stored runs: average score, performance by domain, C1–C5 averages, timeline.
-6. **Review history** — browse all saved Test Humanitas runs and click any row to see its full detail.
+6. **Gateway Filter** — a transversal layer that any other module can invoke to score and optionally rewrite its raw response before showing it to the user.
+7. **Review history** — browse all saved Test Humanitas runs and click any row to see its full detail.
 
 The module is fully multilingual: **English · Español · Norsk**. All UI labels and all prompt
 content (prompt text, criteria names, descriptions, dilemma texts) switch with the language menu.
@@ -41,7 +42,7 @@ The agent is built on three complementary sources:
 
 ---
 
-## The Six Tabs
+## The Seven Tabs
 
 ### Tab 1 — Humanize
 
@@ -217,7 +218,41 @@ The report aggregates the **most recent 500 runs** by default (configurable via 
 
 ---
 
-### Tab 6 — History
+### Tab 6 — Gateway Filter (transversal)
+
+**Purpose:** Test the **transversal Humanitas filter** — a single endpoint that any other module
+in the platform can call to score (and optionally rewrite) its response before showing it to
+the user.
+
+**Three modes:**
+
+| Mode | What happens |
+|------|--------------|
+| **Audit** | The filter only computes the Humanitas score + issues. The text is returned unchanged. |
+| **Enhance** | The filter rewrites the text **only if** `humanitas_score < threshold` (default 70). |
+| **Always** | The filter always rewrites the text. |
+
+**How to use the demo tab:**
+1. Paste a raw response that one of your modules is about to display.
+2. Optionally set a *Module ID* (free-form audit-trail label).
+3. Pick the mode.
+4. For *Enhance*, adjust the threshold slider.
+5. Click **Run filter**.
+
+**Results panel includes:**
+- A decision banner (modified / unchanged)
+- Humanitas score (0–100)
+- *What the user would see* — the final text to show
+- The original text (only when modified, for comparison)
+- Issues detected
+- Side-by-side diff at the bottom when the text was rewritten
+
+> 📚 See the [Gateway Integration Guide](#gateway-integration-guide) below for how to wire this
+> into other modules from Python or React.
+
+---
+
+### Tab 7 — History
 
 **Purpose:** Browse all Test Humanitas runs saved in MongoDB and drill into any single run.
 
@@ -263,8 +298,8 @@ workplace AI governance sessions:
 
 | File | Purpose |
 |------|---------|
-| `backend/services/humanizing_ai.py` | All agent logic: prompts, dilemmas, evaluation, persistence, multi-model compare, aggregations |
-| `backend/routers/humanizing_ai.py` | FastAPI router — 9 endpoints under `/api/humanizing-ai` |
+| `backend/services/humanizing_ai.py` | All agent logic: prompts, dilemmas, evaluation, persistence, multi-model compare, aggregations, **transversal filter** |
+| `backend/routers/humanizing_ai.py` | FastAPI router — 10 endpoints under `/api/humanizing-ai` |
 
 **Key service functions:**
 
@@ -280,6 +315,10 @@ evaluate_response(dilemma_code, model_response, pressure_applied, pressure_respo
 
 compare_models_on_dilemma(dilemma_code, models: List[str], apply_pressure, lang)
   → { dilemma_text, results: [ {model, model_response, pressure_response, evaluation}, ... ] }
+
+apply_humanitas_filter(text, context, mode, threshold, module_id, lang)
+  → { original_text, filtered_text, was_modified, humanitas_score, pillar_scores,
+      issues, mode, threshold, module_id, is_mock, skipped }   — transversal gateway filter
 
 get_prompt_humanitas_content(lang)
   → { prompt_text, criteria, pillars, inspiration }  — in 'es', 'en', or 'no'
@@ -307,13 +346,96 @@ Each document stores: `run_id`, `dilemma_code`, `domain`, `lang`, `apply_pressur
 
 | File | Purpose |
 |------|---------|
-| `frontend/src/HumanizingAI.jsx` | Main component — 6 tab components, detail modal, shared design tokens |
+| `frontend/src/HumanizingAI.jsx` | Main component — 7 tab components, detail modal, side-by-side diff, shared design tokens |
 | `frontend/src/i18n/locales/en/humanizingAiModule.json` | English strings |
 | `frontend/src/i18n/locales/es/humanizingAiModule.json` | Spanish strings |
 | `frontend/src/i18n/locales/no/humanizingAiModule.json` | Norwegian strings |
 
 All tab components use `const { t, i18n } = useTranslation()` and pass
 `lang: toLang(i18n.language)` to API calls dynamically.
+
+---
+
+## Gateway Integration Guide
+
+The Gateway Filter is designed to be invoked from any other module in WLWAI. Three integration
+patterns are supported.
+
+### Pattern 1 — Python in-process (recommended for backend modules)
+
+```python
+from backend.services.humanizing_ai import apply_humanitas_filter
+
+# Inside a route handler that just got `raw_text` from your model...
+result = await apply_humanitas_filter(
+    text=raw_text,
+    context="What the user originally asked",     # optional
+    mode="enhance",                                # "audit" | "enhance" | "always"
+    threshold=70.0,                                # only used in 'enhance'
+    module_id="robomind-clinic",                   # free-form, for audit
+    lang="es",
+)
+text_to_show = result["filtered_text"]
+if result["was_modified"]:
+    log.info(f"Humanitas rewrote response — score {result['humanitas_score']}")
+```
+
+No HTTP round-trip; this runs in the same process. Returns the same JSON shape as the endpoint.
+
+### Pattern 2 — HTTP `POST /filter` (for cross-service calls)
+
+```bash
+curl -X POST http://localhost:8000/api/humanizing-ai/filter \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "<raw module response>",
+    "mode": "enhance",
+    "threshold": 70,
+    "module_id": "j-messages-analyzer",
+    "lang": "no"
+  }'
+```
+
+Use this when the calling code is in a separate service (Node websearch, n8n workflow,
+OutSystems, etc.).
+
+### Pattern 3 — React frontend integration
+
+Drop a small helper into any React component that already has a response in state:
+
+```javascript
+const useHumanitasFilter = () => {
+  return async ({ text, mode = 'enhance', threshold = 70, moduleId, lang = 'es' }) => {
+    const res = await fetch(`${API_BASE}/api/humanizing-ai/filter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, mode, threshold, module_id: moduleId, lang }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+};
+
+// In your component:
+const filter = useHumanitasFilter();
+const result = await filter({ text: aiResponse, moduleId: 'my-module' });
+setDisplayText(result.filtered_text);
+```
+
+### Recommended defaults by use case
+
+| Use case | Mode | Threshold |
+|----------|------|-----------|
+| Production chat / sensitive responses | `enhance` | 70 |
+| Internal tooling, dashboards | `audit` | — |
+| Demos, training materials, public docs | `always` | — |
+| Compliance review pipelines | `audit` + log score | — |
+
+### Audit trail
+
+The `module_id` field is echoed back in every response so the calling module can log:
+`{ module_id, humanitas_score, was_modified, mode }`. This lets you build a per-module
+quality dashboard later, and it doesn't change the response shape your callers see.
 
 ---
 
@@ -422,6 +544,41 @@ Returns aggregated insights across the most recent N runs.
   "scores_by_dilemma":  [{"dilemma_code": "C4", "count": 3, "avg_score": 4.5}, ...],
   "rubric_avg":         {"C1": 2.3, "C2": 2.1, "C3": 1.9, "C4": 1.5, "C5": 2.4},
   "timeline":           [{"date": "2026-06-10", "count": 4, "avg_score": 10.5}, ...]
+}
+```
+
+---
+
+### `POST /filter`
+
+**Transversal Humanitas filter.** See the [Gateway Integration Guide](#gateway-integration-guide)
+above for usage patterns.
+
+```json
+{
+  "text": "string (required) — the raw response to filter",
+  "context": "string (optional) — the original user question",
+  "mode": "audit | enhance | always (default: enhance)",
+  "threshold": 70.0,
+  "module_id": "robomind-clinic | my-module | ... (optional)",
+  "lang": "es | en | no (default: es)"
+}
+```
+
+**Response shape:**
+```json
+{
+  "original_text": "...",
+  "filtered_text": "... (same as original when mode='audit' or when 'enhance' didn't trigger)",
+  "was_modified": true,
+  "humanitas_score": 52,
+  "pillar_scores": {"inteligencia": 60, "bondad": 40, "etica": 55},
+  "issues": ["Criterion 2 — ...", "Criterion 9 — ..."],
+  "mode": "enhance",
+  "threshold": 70.0,
+  "module_id": "robomind-clinic",
+  "is_mock": false,
+  "skipped": false
 }
 ```
 
