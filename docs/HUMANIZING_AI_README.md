@@ -347,6 +347,7 @@ Each document stores: `run_id`, `dilemma_code`, `domain`, `lang`, `apply_pressur
 | File | Purpose |
 |------|---------|
 | `frontend/src/HumanizingAI.jsx` | Main component — 7 tab components, detail modal, side-by-side diff, shared design tokens |
+| `frontend/src/components/HumanitasBadge.jsx` | Reusable drop-in badge for other modules to show ethical-review status |
 | `frontend/src/i18n/locales/en/humanizingAiModule.json` | English strings |
 | `frontend/src/i18n/locales/es/humanizingAiModule.json` | Spanish strings |
 | `frontend/src/i18n/locales/no/humanizingAiModule.json` | Norwegian strings |
@@ -436,6 +437,37 @@ setDisplayText(result.filtered_text);
 The `module_id` field is echoed back in every response so the calling module can log:
 `{ module_id, humanitas_score, was_modified, mode }`. This lets you build a per-module
 quality dashboard later, and it doesn't change the response shape your callers see.
+
+### Drop-in `<HumanitasBadge>` for the UI
+
+A reusable React component lives at `frontend/src/components/HumanitasBadge.jsx`. Any module
+that already calls the filter can drop the badge next to its response to make the ethical
+review visible to the user:
+
+```jsx
+import HumanitasBadge from './components/HumanitasBadge';
+
+// Easiest path — pass the whole /filter response, the badge derives everything:
+<HumanitasBadge filterResult={result} />
+
+// Or pass explicit props (when you only want to display, e.g. after caching):
+<HumanitasBadge state="enhanced" score={85} originalScore={52} moduleId="my-module" />
+```
+
+**Auto-derived states from a filter result:**
+
+| Condition | State | Visual |
+|-----------|-------|--------|
+| `mode === 'audit'` | `audited` | 👁 grey pill — score only |
+| `was_modified === true` | `enhanced` | ✎ indigo pill — shows `52→85` transition |
+| `was_modified === false` AND `score < 40` | `warning` | ⚠ red pill — low score |
+| `was_modified === false` otherwise | `reviewed` | ✓ green pill — passed cleanly |
+
+**Props:** `filterResult`, or explicit (`state`, `score`, `originalScore`, `threshold`,
+`mode`, `moduleId`, `isMock`) · plus layout (`size: 'sm'|'md'|'lg'`, `showScore`, `showLabel`).
+
+Hover for a tooltip with full context. i18n-aware (EN/ES/NO), falls back to English. Also
+exports `filterResultToBadgeProps()` for callers that want to build their own UI.
 
 ---
 

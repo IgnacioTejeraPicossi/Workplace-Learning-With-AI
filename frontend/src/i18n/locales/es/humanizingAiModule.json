@@ -141,6 +141,18 @@
       "minModels": "Añade al menos 2 modelos para comparar",
       "noResults": "Ejecuta la comparación para ver resultados aquí"
     },
+    "badge": {
+      "reviewed": "Revisado por Humanitas",
+      "enhanced": "Mejorado por Humanitas",
+      "audited": "Auditado por Humanitas",
+      "warning": "Advertencia Humanitas",
+      "tooltipScore": "Puntuación",
+      "tooltipMode": "Modo",
+      "tooltipThreshold": "Umbral",
+      "tooltipModule": "Módulo",
+      "tooltipOriginal": "antes",
+      "tooltipMock": "Evaluación simulada"
+    },
     "gateway": {
       "title": "Filtro Gateway",
       "subtitle": "Prueba el filtro transversal Humanitas que cualquier módulo puede invocar antes de mostrar una respuesta",

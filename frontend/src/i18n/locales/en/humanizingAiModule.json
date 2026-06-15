@@ -141,6 +141,18 @@
       "minModels": "Add at least 2 models to compare",
       "noResults": "Run the comparison to see results here"
     },
+    "badge": {
+      "reviewed": "Humanitas Reviewed",
+      "enhanced": "Humanitas Enhanced",
+      "audited": "Humanitas Audited",
+      "warning": "Humanitas Warning",
+      "tooltipScore": "Score",
+      "tooltipMode": "Mode",
+      "tooltipThreshold": "Threshold",
+      "tooltipModule": "Module",
+      "tooltipOriginal": "was",
+      "tooltipMock": "Mock evaluation"
+    },
     "gateway": {
       "title": "Gateway Filter",
       "subtitle": "Test the transversal Humanitas filter that any module can call before showing a response",

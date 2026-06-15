@@ -8,6 +8,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import HumanitasBadge from './components/HumanitasBadge';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -1289,8 +1290,7 @@ const TabGateway = () => {
                 {result.was_modified ? t('humanizingAiModule.gateway.wasModified') : t('humanizingAiModule.gateway.wasNotModified')}
               </span>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Badge label={result.mode.toUpperCase()} color="#4f46e5" light="#eef2ff" border="#c7d2fe" />
-                <MockBadge isMock={result.is_mock} t={t} />
+                <HumanitasBadge filterResult={result} size="md" />
               </div>
             </div>
 

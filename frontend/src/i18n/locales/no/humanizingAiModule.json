@@ -141,6 +141,18 @@
       "minModels": "Legg til minst 2 modeller for å sammenligne",
       "noResults": "Kjør sammenligningen for å se resultater her"
     },
+    "badge": {
+      "reviewed": "Humanitas-vurdert",
+      "enhanced": "Humanitas-forbedret",
+      "audited": "Humanitas-revisjon",
+      "warning": "Humanitas-advarsel",
+      "tooltipScore": "Poengsum",
+      "tooltipMode": "Modus",
+      "tooltipThreshold": "Terskel",
+      "tooltipModule": "Modul",
+      "tooltipOriginal": "før",
+      "tooltipMock": "Simulert vurdering"
+    },
     "gateway": {
       "title": "Gateway-filter",
       "subtitle": "Test det transversale Humanitas-filteret som enhver modul kan kalle før den viser et svar",
