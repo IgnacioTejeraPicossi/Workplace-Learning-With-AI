@@ -73,6 +73,8 @@
       "observationLabel": "Observasjon",
       "improvementLabel": "Forbedringsforslag",
       "mockWarning": "Simulert kjøring — koble til en KI-modell for live-evaluering",
+      "exportPdf": "Eksporter PDF",
+      "exportPdfTitle": "Eksporter denne vurderingen som PDF — åpner utskriftsdialogen",
       "domains": {
         "A": "Arbeid",
         "B": "Kommunikasjon",
@@ -110,7 +112,9 @@
       "modelResponse": "Modellens svar",
       "pressureResponse": "Svar under press",
       "rubricBreakdown": "C1–C5 rubrikk",
-      "noDetail": "Kunne ikke laste detaljer"
+      "noDetail": "Kunne ikke laste detaljer",
+      "exportPdf": "Eksporter PDF",
+      "exportPdfTitle": "Eksporter denne kjøringen som PDF — åpner utskriftsdialogen"
     },
     "humanityReport": {
       "title": "Humanitas-rapport",

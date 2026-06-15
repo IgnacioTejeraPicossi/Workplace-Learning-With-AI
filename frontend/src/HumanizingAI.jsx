@@ -499,6 +499,7 @@ const TabTestHumanitas = () => {
   const [running, setRunning]             = useState(false);
   const [result, setResult]               = useState(null);
   const [error, setError]                 = useState('');
+  const resultPrintableRef = React.useRef(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/humanizing-ai/dilemmas?lang=${toLang(i18n.language)}`)
@@ -633,7 +634,23 @@ const TabTestHumanitas = () => {
 
       {/* Results */}
       {result && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div ref={resultPrintableRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <style>{PRINT_STYLES}</style>
+
+          <PrintHeader
+            title={`${t('humanizingAiModule.testHumanitas.title')} · ${result.dilemma_code} (${domainLabel(result.dilemma_code?.[0])})`}
+            subtitle={result.dilemma_text}
+            version={result.prompt_version}
+            language={i18n.language}
+          />
+
+          {/* Export PDF button (screen only) */}
+          <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <ExportPdfButton targetRef={resultPrintableRef}
+              label={t('humanizingAiModule.testHumanitas.exportPdf')}
+              title={t('humanizingAiModule.testHumanitas.exportPdfTitle')} />
+          </div>
+
           {/* Score hero */}
           <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderLeft: `4px solid ${scoreColor(result.evaluation?.humanitas_score ?? 0, 15)}`, borderRadius: 16, padding: '24px 28px', display: 'flex', gap: 40, alignItems: 'center', flexWrap: 'wrap', boxShadow: '0 2px 8px rgba(5,150,105,0.10)' }}>
             <BigScore
@@ -700,9 +717,10 @@ const TabTestHumanitas = () => {
 
 // ─── Tab 4: Historial ─────────────────────────────────────────────────────────
 const TabHistory = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [runs, setRuns]       = useState([]);
   const [loading, setLoading] = useState(true);
+  const detailPrintableRef    = React.useRef(null);
   const [error, setError]     = useState('');
   const [detail, setDetail]   = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -796,16 +814,32 @@ const TabHistory = () => {
       {/* Detail modal */}
       {detail && (
         <div onClick={() => setDetail(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 1000 }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: 16, maxWidth: 820, width: '100%', maxHeight: '88vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
-            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
+          <div ref={detailPrintableRef} onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: 16, maxWidth: 820, width: '100%', maxHeight: '88vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+            <style>{PRINT_STYLES}</style>
+            <div className="no-print" style={{ padding: '18px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
               <h3 style={{ color: '#111827', margin: 0, fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 📋 {t('humanizingAiModule.history.detailTitle')}
                 <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 500, fontFamily: 'monospace' }}>{detail.run_id}</span>
                 {detail.prompt_version && <PromptVersionChip version={detail.prompt_version} />}
               </h3>
-              <button onClick={() => setDetail(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 13, color: '#374151' }}>✕</button>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {!detailLoading && !detail.error && detail.dilemma_code && (
+                  <ExportPdfButton targetRef={detailPrintableRef}
+                    label={t('humanizingAiModule.history.exportPdf')}
+                    title={t('humanizingAiModule.history.exportPdfTitle')} />
+                )}
+                <button onClick={() => setDetail(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 13, color: '#374151' }}>✕</button>
+              </div>
             </div>
             <div style={{ padding: '20px 24px' }}>
+              {!detailLoading && !detail.error && detail.dilemma_code && (
+                <PrintHeader
+                  title={`${t('humanizingAiModule.history.detailTitle')} · ${detail.dilemma_code}`}
+                  subtitle={detail.dilemma_text}
+                  version={detail.prompt_version}
+                  language={i18n.language}
+                />
+              )}
               {detailLoading && <p style={{ color: '#9ca3af', textAlign: 'center', padding: 30 }}>{t('humanizingAiModule.common.loading')}</p>}
               {detail.error    && <p style={{ color: '#dc2626', textAlign: 'center', padding: 30 }}>{detail.error}</p>}
               {!detailLoading && !detail.error && detail.dilemma_code && (
@@ -865,22 +899,22 @@ const TabHistory = () => {
 };
 
 // ─── Print stylesheet for PDF export ──────────────────────────────────────────
-// Strips app chrome (sidebar, hero, tabs) and shows only the printable region.
-// Adds a header with title + date + version. Triggered by setting the
-// `printing-humanity-report` class on <body> right before window.print().
+// Strips app chrome (sidebar, hero, tabs) and shows ONLY the element marked
+// with the `pdf-export-active` class. Triggered by `exportElementAsPdf` below.
 const PRINT_STYLES = `
 @media print {
-  body.printing-humanity-report * { visibility: hidden !important; }
-  body.printing-humanity-report #humanity-report-printable,
-  body.printing-humanity-report #humanity-report-printable * { visibility: visible !important; }
-  body.printing-humanity-report #humanity-report-printable {
+  body.printing-active * { visibility: hidden !important; }
+  body.printing-active .pdf-export-active,
+  body.printing-active .pdf-export-active * { visibility: visible !important; }
+  body.printing-active .pdf-export-active {
     position: absolute !important; left: 0 !important; top: 0 !important;
     width: 100% !important; padding: 18px 22px !important; background: #ffffff !important;
-    box-shadow: none !important; max-width: 100% !important;
+    box-shadow: none !important; max-width: 100% !important; max-height: none !important;
+    overflow: visible !important;
   }
-  body.printing-humanity-report .no-print { display: none !important; }
-  body.printing-humanity-report .print-only { display: block !important; }
-  body.printing-humanity-report #humanity-report-printable * {
+  body.printing-active .no-print { display: none !important; }
+  body.printing-active .print-only { display: block !important; }
+  body.printing-active .pdf-export-active * {
     box-shadow: none !important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
@@ -889,12 +923,64 @@ const PRINT_STYLES = `
 .print-only { display: none; }
 `;
 
+/** Trigger a print → PDF export for a single DOM element. Adds a class to the
+    target, calls window.print(), and cleans up on afterprint (with timeout
+    fallback for browsers that don't fire the event reliably). */
+const exportElementAsPdf = (el) => {
+  if (!el) return;
+  el.classList.add('pdf-export-active');
+  document.body.classList.add('printing-active');
+  const cleanup = () => {
+    el.classList.remove('pdf-export-active');
+    document.body.classList.remove('printing-active');
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(cleanup, 8000);
+  window.print();
+};
+
+/** Small reusable button used in 3 places to launch the PDF export. */
+const ExportPdfButton = ({ targetRef, label, title }) => (
+  <button onClick={() => exportElementAsPdf(targetRef?.current)}
+    className="no-print"
+    title={title}
+    style={{ background: '#ffffff', border: '1px solid #d1d5db', color: '#111827', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+    📄 {label}
+  </button>
+);
+
+/** Print-only header used at the top of each exportable region. */
+const PrintHeader = ({ title, subtitle, version, language = 'en' }) => {
+  const today = new Date().toLocaleDateString(language, {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
+  return (
+    <div className="print-only" style={{ borderBottom: '2px solid #059669', paddingBottom: 12, marginBottom: 18 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#059669', fontWeight: 700, letterSpacing: '0.15em', fontFamily: 'monospace' }}>🌿 HUMANIZING AI · WORKPLACE LEARNING WITH AI</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#111827', marginTop: 4 }}>{title}</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          {version && (
+            <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#4f46e5', fontWeight: 700 }}>🏷 Prompt v{version}</div>
+          )}
+          <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{today}</div>
+        </div>
+      </div>
+      {subtitle && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8, fontStyle: 'italic' }}>{subtitle}</div>}
+    </div>
+  );
+};
+
 // ─── Tab: Humanity Report (aggregated) ────────────────────────────────────────
 const TabHumanityReport = () => {
   const { t, i18n } = useTranslation();
   const [report, setReport]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
+  const printableRef = React.useRef(null);
 
   useEffect(() => {
     setLoading(true); setError('');
@@ -929,42 +1015,16 @@ const TabHumanityReport = () => {
 
   const maxTimelineCount = Math.max(...report.timeline.map((d) => d.count), 1);
 
-  const handleExportPdf = () => {
-    document.body.classList.add('printing-humanity-report');
-    const cleanup = () => {
-      document.body.classList.remove('printing-humanity-report');
-      window.removeEventListener('afterprint', cleanup);
-    };
-    window.addEventListener('afterprint', cleanup);
-    // Fallback in case afterprint never fires (rare on some browsers)
-    setTimeout(cleanup, 8000);
-    window.print();
-  };
-
-  const today = new Date().toLocaleDateString(i18n.language, {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-
   return (
-    <div id="humanity-report-printable" style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+    <div ref={printableRef} style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
       <style>{PRINT_STYLES}</style>
 
-      {/* Print-only header (visible only when printing) */}
-      <div className="print-only" style={{ borderBottom: '2px solid #059669', paddingBottom: 12, marginBottom: 18 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
-          <div>
-            <div style={{ fontSize: 11, color: '#059669', fontWeight: 700, letterSpacing: '0.15em', fontFamily: 'monospace' }}>🌿 HUMANIZING AI · WORKPLACE LEARNING WITH AI</div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#111827', marginTop: 4 }}>{t('humanizingAiModule.humanityReport.title')}</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            {report.current_prompt_version && (
-              <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#4f46e5', fontWeight: 700 }}>🏷 Prompt v{report.current_prompt_version}</div>
-            )}
-            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{t('humanizingAiModule.humanityReport.printedOn')} {today}</div>
-          </div>
-        </div>
-        <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8, fontStyle: 'italic' }}>{t('humanizingAiModule.humanityReport.printSummary')}</div>
-      </div>
+      <PrintHeader
+        title={t('humanizingAiModule.humanityReport.title')}
+        subtitle={t('humanizingAiModule.humanityReport.printSummary')}
+        version={report.current_prompt_version}
+        language={i18n.language}
+      />
 
       {/* Section label + screen title row (hidden in print) */}
       <div className="no-print">
@@ -975,12 +1035,9 @@ const TabHumanityReport = () => {
           <h2 className="no-print" style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: 0 }}>{t('humanizingAiModule.humanityReport.title')}</h2>
           {report.current_prompt_version && <span className="no-print"><PromptVersionChip version={report.current_prompt_version} color="#4f46e5" /></span>}
         </div>
-        <button onClick={handleExportPdf}
-          className="no-print"
-          title={t('humanizingAiModule.humanityReport.exportPdfTitle')}
-          style={{ background: '#ffffff', border: '1px solid #d1d5db', color: '#111827', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
-          📄 {t('humanizingAiModule.humanityReport.exportPdf')}
-        </button>
+        <ExportPdfButton targetRef={printableRef}
+          label={t('humanizingAiModule.humanityReport.exportPdf')}
+          title={t('humanizingAiModule.humanityReport.exportPdfTitle')} />
       </div>
       <p className="no-print" style={{ color: '#6b7280', fontSize: 13, marginBottom: 16 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
 

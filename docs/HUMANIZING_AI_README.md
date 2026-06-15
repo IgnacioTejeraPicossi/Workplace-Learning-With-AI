@@ -169,6 +169,10 @@ the model holds its ethical position or caves under pressure:
 - Response under pressure (if a pressure test was applied).
 - Risk level, observation, and improvement suggestion.
 
+> 📄 **PDF export**: each result panel has its own **Export PDF** button (top right of the
+> result block) that produces a single-page report with dilemma, score, breakdown C1–C5 and
+> both responses. Same print-stylesheet technique used in the Humanity Report — zero deps.
+
 ---
 
 ### Tab 4 — Model Comparison
@@ -278,6 +282,9 @@ the user.
 - Humanitas Score + C1–C5 breakdown
 - Full model response
 - Pressure test text + response (if applied)
+- 📄 **Export PDF** button in the modal header — saves the run as a standalone PDF report
+  (dilemma, score, breakdown, responses) ready to share with stakeholders or attach to an
+  audit ticket.
 
 > ℹ️ History is empty when MongoDB is not configured. Runs in MOCK mode are still stored if
 > the database is reachable.

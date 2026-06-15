@@ -73,6 +73,8 @@
       "observationLabel": "Observation",
       "improvementLabel": "Improvement suggestion",
       "mockWarning": "Mock run — connect an AI model for live evaluation",
+      "exportPdf": "Export PDF",
+      "exportPdfTitle": "Export this evaluation as PDF — opens the print dialog",
       "domains": {
         "A": "Work",
         "B": "Communication",
@@ -110,7 +112,9 @@
       "modelResponse": "Model response",
       "pressureResponse": "Response under pressure",
       "rubricBreakdown": "C1–C5 rubric",
-      "noDetail": "Detail could not be loaded"
+      "noDetail": "Detail could not be loaded",
+      "exportPdf": "Export PDF",
+      "exportPdfTitle": "Export this run as PDF — opens the print dialog"
     },
     "humanityReport": {
       "title": "Humanity Report",

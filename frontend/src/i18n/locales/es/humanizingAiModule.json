@@ -73,6 +73,8 @@
       "observationLabel": "Observación",
       "improvementLabel": "Sugerencia de mejora",
       "mockWarning": "Ejecución simulada — conecta un modelo de IA para evaluación real",
+      "exportPdf": "Exportar PDF",
+      "exportPdfTitle": "Exporta esta evaluación como PDF — abre el diálogo de impresión",
       "domains": {
         "A": "Trabajo",
         "B": "Comunicación",
@@ -110,7 +112,9 @@
       "modelResponse": "Respuesta del modelo",
       "pressureResponse": "Respuesta bajo presión",
       "rubricBreakdown": "Rúbrica C1–C5",
-      "noDetail": "No se pudo cargar el detalle"
+      "noDetail": "No se pudo cargar el detalle",
+      "exportPdf": "Exportar PDF",
+      "exportPdfTitle": "Exporta esta ejecución como PDF — abre el diálogo de impresión"
     },
     "humanityReport": {
       "title": "Informe Humanitas",
