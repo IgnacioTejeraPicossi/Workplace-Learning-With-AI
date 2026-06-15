@@ -864,9 +864,34 @@ const TabHistory = () => {
   );
 };
 
+// ─── Print stylesheet for PDF export ──────────────────────────────────────────
+// Strips app chrome (sidebar, hero, tabs) and shows only the printable region.
+// Adds a header with title + date + version. Triggered by setting the
+// `printing-humanity-report` class on <body> right before window.print().
+const PRINT_STYLES = `
+@media print {
+  body.printing-humanity-report * { visibility: hidden !important; }
+  body.printing-humanity-report #humanity-report-printable,
+  body.printing-humanity-report #humanity-report-printable * { visibility: visible !important; }
+  body.printing-humanity-report #humanity-report-printable {
+    position: absolute !important; left: 0 !important; top: 0 !important;
+    width: 100% !important; padding: 18px 22px !important; background: #ffffff !important;
+    box-shadow: none !important; max-width: 100% !important;
+  }
+  body.printing-humanity-report .no-print { display: none !important; }
+  body.printing-humanity-report .print-only { display: block !important; }
+  body.printing-humanity-report #humanity-report-printable * {
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  @page { size: A4; margin: 14mm 10mm; }
+}
+.print-only { display: none; }
+`;
+
 // ─── Tab: Humanity Report (aggregated) ────────────────────────────────────────
 const TabHumanityReport = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [report, setReport]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
@@ -904,14 +929,60 @@ const TabHumanityReport = () => {
 
   const maxTimelineCount = Math.max(...report.timeline.map((d) => d.count), 1);
 
+  const handleExportPdf = () => {
+    document.body.classList.add('printing-humanity-report');
+    const cleanup = () => {
+      document.body.classList.remove('printing-humanity-report');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    // Fallback in case afterprint never fires (rare on some browsers)
+    setTimeout(cleanup, 8000);
+    window.print();
+  };
+
+  const today = new Date().toLocaleDateString(i18n.language, {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
+
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
-      <SectionLabel index={5} label={t('humanizingAiModule.tabs.humanityReport')} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
-        <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: 0 }}>{t('humanizingAiModule.humanityReport.title')}</h2>
-        {report.current_prompt_version && <PromptVersionChip version={report.current_prompt_version} color="#4f46e5" />}
+    <div id="humanity-report-printable" style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <style>{PRINT_STYLES}</style>
+
+      {/* Print-only header (visible only when printing) */}
+      <div className="print-only" style={{ borderBottom: '2px solid #059669', paddingBottom: 12, marginBottom: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 11, color: '#059669', fontWeight: 700, letterSpacing: '0.15em', fontFamily: 'monospace' }}>🌿 HUMANIZING AI · WORKPLACE LEARNING WITH AI</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#111827', marginTop: 4 }}>{t('humanizingAiModule.humanityReport.title')}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            {report.current_prompt_version && (
+              <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#4f46e5', fontWeight: 700 }}>🏷 Prompt v{report.current_prompt_version}</div>
+            )}
+            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{t('humanizingAiModule.humanityReport.printedOn')} {today}</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8, fontStyle: 'italic' }}>{t('humanizingAiModule.humanityReport.printSummary')}</div>
       </div>
-      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 16 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
+
+      {/* Section label + screen title row (hidden in print) */}
+      <div className="no-print">
+        <SectionLabel index={5} label={t('humanizingAiModule.tabs.humanityReport')} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <h2 className="no-print" style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: 0 }}>{t('humanizingAiModule.humanityReport.title')}</h2>
+          {report.current_prompt_version && <span className="no-print"><PromptVersionChip version={report.current_prompt_version} color="#4f46e5" /></span>}
+        </div>
+        <button onClick={handleExportPdf}
+          className="no-print"
+          title={t('humanizingAiModule.humanityReport.exportPdfTitle')}
+          style={{ background: '#ffffff', border: '1px solid #d1d5db', color: '#111827', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+          📄 {t('humanizingAiModule.humanityReport.exportPdf')}
+        </button>
+      </div>
+      <p className="no-print" style={{ color: '#6b7280', fontSize: 13, marginBottom: 16 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
 
       {/* Mixed-versions alert */}
       {report.prompt_versions?.length > 1 && (

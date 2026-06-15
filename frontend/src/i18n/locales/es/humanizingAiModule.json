@@ -115,6 +115,10 @@
     "humanityReport": {
       "title": "Informe Humanitas",
       "subtitle": "Análisis agregado de todas las ejecuciones almacenadas",
+      "exportPdf": "Exportar PDF",
+      "exportPdfTitle": "Abre el diálogo de impresión — elige 'Guardar como PDF' como destino",
+      "printedOn": "Generado el",
+      "printSummary": "Informe agregado que abarca las ejecuciones más recientes almacenadas por el agente Humanizing AI.",
       "totalRuns": "Ejecuciones totales",
       "avgScore": "Puntuación media",
       "pressureRate": "Ejecuciones con presión",

@@ -199,6 +199,8 @@ their Humanitas scores side-by-side.
 
 ### Tab 5 — Humanity Report
 
+### Tab 5 — Humanity Report
+
 **Purpose:** Provide a consolidated dashboard view of all stored Test Humanitas runs.
 
 **What it shows:**
@@ -215,6 +217,13 @@ The report aggregates the **most recent 500 runs** by default (configurable via 
 
 > 💡 Useful for governance reports, classroom debriefs after a workshop, or detecting model drift
 > over time.
+
+> 📄 **PDF export**: a one-click **Export PDF** button at the top of the report opens the
+> browser's print dialog where you can choose **"Save as PDF"** as the destination. The
+> print stylesheet automatically strips the app shell (sidebar, hero, tabs) and shows only
+> the report content with a clean header (title, date, prompt version, summary line) so the
+> result is a stakeholder-ready document. Zero dependencies — works on Chrome, Firefox,
+> Edge and Safari.
 
 ---
 

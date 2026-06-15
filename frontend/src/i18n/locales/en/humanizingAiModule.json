@@ -115,6 +115,10 @@
     "humanityReport": {
       "title": "Humanity Report",
       "subtitle": "Aggregated insights across all stored runs",
+      "exportPdf": "Export PDF",
+      "exportPdfTitle": "Opens the print dialog — pick 'Save as PDF' as the destination",
+      "printedOn": "Generated on",
+      "printSummary": "Aggregated report covering the most recent runs stored in the Humanizing AI agent.",
       "totalRuns": "Total runs",
       "avgScore": "Average score",
       "pressureRate": "Runs with pressure",

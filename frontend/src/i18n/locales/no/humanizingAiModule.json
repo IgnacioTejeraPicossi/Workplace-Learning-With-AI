@@ -115,6 +115,10 @@
     "humanityReport": {
       "title": "Humanitas-rapport",
       "subtitle": "Samlet analyse av alle lagrede kjøringer",
+      "exportPdf": "Eksporter PDF",
+      "exportPdfTitle": "Åpner utskriftsdialogen — velg 'Lagre som PDF' som mål",
+      "printedOn": "Generert",
+      "printSummary": "Samlet rapport som dekker de nyeste kjøringene lagret av Humanizing AI-agenten.",
       "totalRuns": "Totalt antall kjøringer",
       "avgScore": "Gjennomsnittlig poengsum",
       "pressureRate": "Kjøringer med press",
