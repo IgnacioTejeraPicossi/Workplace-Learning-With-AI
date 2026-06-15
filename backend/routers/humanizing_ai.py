@@ -31,6 +31,8 @@ try:
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
         RUBRIC,
+        PROMPT_HUMANITAS_VERSION,
+        PROMPT_HUMANITAS_CHANGELOG,
     )
 except ImportError:  # pragma: no cover
     from services.humanizing_ai import (  # type: ignore
@@ -46,6 +48,8 @@ except ImportError:  # pragma: no cover
         get_prompt_humanitas_content,
         _DILEMMAS_BY_LANG,
         RUBRIC,
+        PROMPT_HUMANITAS_VERSION,
+        PROMPT_HUMANITAS_CHANGELOG,
     )
 
 router = APIRouter(prefix="/api/humanizing-ai")
@@ -235,6 +239,19 @@ async def dilemmas_endpoint(
         "dilemmas_by_group": get_dilemmas_catalogue(lang),
         "all_dilemmas": dilemmas,
         "rubric": RUBRIC,
+    }
+
+
+@router.get("/prompt-humanitas/version", summary="Lightweight prompt version + changelog")
+async def prompt_version_endpoint() -> Dict[str, Any]:
+    """
+    Return only the current Prompt Humanitas version + changelog without the
+    full text. Useful for clients that want to detect drift (e.g. show a banner
+    when the prompt has changed since the user's last visit).
+    """
+    return {
+        "version":   PROMPT_HUMANITAS_VERSION,
+        "changelog": PROMPT_HUMANITAS_CHANGELOG,
     }
 
 

@@ -299,7 +299,7 @@ workplace AI governance sessions:
 | File | Purpose |
 |------|---------|
 | `backend/services/humanizing_ai.py` | All agent logic: prompts, dilemmas, evaluation, persistence, multi-model compare, aggregations, **transversal filter** |
-| `backend/routers/humanizing_ai.py` | FastAPI router — 10 endpoints under `/api/humanizing-ai` |
+| `backend/routers/humanizing_ai.py` | FastAPI router — 11 endpoints under `/api/humanizing-ai` |
 
 **Key service functions:**
 
@@ -437,6 +437,41 @@ setDisplayText(result.filtered_text);
 The `module_id` field is echoed back in every response so the calling module can log:
 `{ module_id, humanitas_score, was_modified, mode }`. This lets you build a per-module
 quality dashboard later, and it doesn't change the response shape your callers see.
+
+### Prompt versioning & reproducibility
+
+Every run, rewrite, evaluation, filter call and model comparison records the
+**`prompt_version`** that was active when it executed. This makes historical results
+reproducible even if the prompt evolves.
+
+| Bump | When |
+|------|------|
+| `MAJOR` (1.x.x → 2.0.0) | A criterion is added or removed |
+| `MINOR` (1.0.x → 1.1.0) | New behaviour added (conflict rule, scoring weight) |
+| `PATCH` (1.0.0 → 1.0.1) | Phrasing tweaks, translations, no semantic change |
+
+**Surfacing in the UI:**
+- 🏷 Chip next to the Prompt Humanitas title (current version + release date on hover)
+- 🏷 Chip next to the Test Humanitas score (which version evaluated this run)
+- 🏷 Chip in the History detail modal
+- 🏷 Chip on the Humanity Report header + **mixed-version banner** when the aggregated runs span more than one prompt version
+- 🏷 Chip in the Gateway Filter score card
+
+**Programmatic access:**
+
+```bash
+# Lightweight check — version + changelog only, no full prompt body
+curl http://localhost:8000/api/humanizing-ai/prompt-humanitas/version
+
+# Returns: { "version": "1.0.0", "changelog": [...] }
+```
+
+This lets external services detect when the prompt has changed and re-run regression batches.
+
+The current version is exposed as the `PROMPT_HUMANITAS_VERSION` constant in
+`backend/services/humanizing_ai.py` along with `PROMPT_HUMANITAS_CHANGELOG`.
+
+---
 
 ### Drop-in `<HumanitasBadge>` for the UI
 

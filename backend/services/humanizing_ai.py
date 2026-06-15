@@ -28,6 +28,23 @@ try:
 except Exception:
     _RUNS_COL = None
 
+# ─── Prompt Humanitas — version metadata ──────────────────────────────────────
+# Bump on changes per semver:
+#   MAJOR — structural change (criterion added/removed)
+#   MINOR — behaviour additions (new conflict rule, scoring weight)
+#   PATCH — phrasing tweaks, translations, no semantic change
+# Every run/rewrite/evaluate/filter/compare records this so reproducibility is
+# preserved when the prompt evolves.
+PROMPT_HUMANITAS_VERSION = "1.0.0"
+PROMPT_HUMANITAS_RELEASED = "2026-06-15"
+
+# Short changelog visible from the UI (newest first).
+PROMPT_HUMANITAS_CHANGELOG = [
+    {"version": "1.0.0", "date": "2026-06-15",
+     "summary": "Initial release · 10 criteria · 4 conflict-resolution rules · EN/ES/NO"},
+]
+
+
 # ─── Prompt Humanitas (full text, copyable) ────────────────────────────────────
 
 PROMPT_HUMANITAS = (
@@ -231,6 +248,9 @@ def get_prompt_humanitas_content(lang: str = "es") -> Dict[str, Any]:
     return {
         "prompt_text": _PROMPT_BY_LANG[lng],
         "criteria":    _CRITERIA_BY_LANG[lng],
+        "version":     PROMPT_HUMANITAS_VERSION,
+        "released":    PROMPT_HUMANITAS_RELEASED,
+        "changelog":   PROMPT_HUMANITAS_CHANGELOG,
         "pillars": {
             "inteligencia": "Sé claro, contextual y honesto sobre lo que sabes y lo que no",
             "bondad":       "Prioriza el bienestar humano, especialmente de los más vulnerables, y evita daño o manipulación",
@@ -667,6 +687,7 @@ async def apply_humanitas_filter(
         "module_id":       module_id,
         "is_mock":         analysis.get("is_mock", False),
         "skipped":         False,
+        "prompt_version":  PROMPT_HUMANITAS_VERSION,
     }
 
 
@@ -725,6 +746,7 @@ async def rewrite_with_humanitas(
                         clean = clean[4:]
                 parsed = json.loads(clean.strip())
                 parsed["is_mock"] = False
+                parsed["prompt_version"] = PROMPT_HUMANITAS_VERSION
                 return parsed
         except Exception:
             pass
@@ -743,7 +765,8 @@ async def rewrite_with_humanitas(
         "humanitas_score": 50,
         "changes":        m["changes"],
         "summary":        m["summary"],
-        "is_mock": True,
+        "is_mock":         True,
+        "prompt_version":  PROMPT_HUMANITAS_VERSION,
     }
 
 
@@ -812,8 +835,9 @@ async def evaluate_response(
                         clean = clean[4:]
                 parsed = json.loads(clean.strip())
                 parsed.setdefault("is_mock", False)
-                parsed["dilemma_code"] = dilemma_code
-                parsed["domain"]       = dilemma["domain"]
+                parsed["dilemma_code"]   = dilemma_code
+                parsed["domain"]         = dilemma["domain"]
+                parsed["prompt_version"] = PROMPT_HUMANITAS_VERSION
                 return parsed
         except Exception:
             pass
@@ -834,6 +858,7 @@ async def evaluate_response(
         "is_mock":          True,
         "dilemma_code":     dilemma_code,
         "domain":           dilemma["domain"],
+        "prompt_version":   PROMPT_HUMANITAS_VERSION,
     }
 
 
@@ -925,6 +950,7 @@ async def run_test_humanitas(
         "pressure_text":    pressure_text if apply_pressure else None,
         "pressure_response":pressure_response,
         "evaluation":       evaluation,
+        "prompt_version":   PROMPT_HUMANITAS_VERSION,
         "created_at":       datetime.now(timezone.utc).isoformat(),
     }
     await _store_run(result)
@@ -1063,6 +1089,14 @@ async def get_humanity_report(limit: int = 500) -> Dict[str, Any]:
         entry.pop("score_sum", None)
         entry.pop("scored",    None)
 
+    # Distribution of prompt versions used across runs (mixed → flag it in UI)
+    versions_count: Dict[str, int] = {}
+    for r in runs:
+        v = r.get("prompt_version") or "legacy"
+        versions_count[v] = versions_count.get(v, 0) + 1
+    prompt_versions = [{"version": v, "count": c} for v, c in
+                       sorted(versions_count.items(), key=lambda x: -x[1])]
+
     return {
         "total_runs":         total,
         "avg_score":          avg_score,
@@ -1072,6 +1106,8 @@ async def get_humanity_report(limit: int = 500) -> Dict[str, Any]:
         "score_distribution": buckets,
         "timeline":           timeline,
         "pressure_rate":      round(pressure_n / total * 100, 1) if total else 0.0,
+        "prompt_versions":    prompt_versions,
+        "current_prompt_version": PROMPT_HUMANITAS_VERSION,
     }
 
 
@@ -1169,6 +1205,7 @@ async def compare_models_on_dilemma(
         "pressure_text":    pressure_text if apply_pressure else None,
         "lang":             lang,
         "results":          results,
+        "prompt_version":   PROMPT_HUMANITAS_VERSION,
         "created_at":       datetime.now(timezone.utc).isoformat(),
     }
 

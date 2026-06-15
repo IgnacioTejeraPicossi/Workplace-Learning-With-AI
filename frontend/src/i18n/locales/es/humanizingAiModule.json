@@ -141,6 +141,14 @@
       "minModels": "Añade al menos 2 modelos para comparar",
       "noResults": "Ejecuta la comparación para ver resultados aquí"
     },
+    "promptVersion": {
+      "current": "Versión actual",
+      "usedInRun": "Prompt v",
+      "released": "publicada",
+      "changelog": "Historial de cambios",
+      "mixedVersions": "Las ejecuciones abarcan varias versiones del prompt",
+      "singleVersion": "Todas las ejecuciones usan la versión actual del prompt"
+    },
     "badge": {
       "reviewed": "Revisado por Humanitas",
       "enhanced": "Mejorado por Humanitas",

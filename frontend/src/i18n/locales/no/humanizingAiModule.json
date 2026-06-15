@@ -141,6 +141,14 @@
       "minModels": "Legg til minst 2 modeller for å sammenligne",
       "noResults": "Kjør sammenligningen for å se resultater her"
     },
+    "promptVersion": {
+      "current": "Gjeldende versjon",
+      "usedInRun": "Prompt v",
+      "released": "publisert",
+      "changelog": "Endringslogg",
+      "mixedVersions": "Kjøringene dekker flere prompt-versjoner",
+      "singleVersion": "Alle kjøringer bruker gjeldende prompt-versjon"
+    },
     "badge": {
       "reviewed": "Humanitas-vurdert",
       "enhanced": "Humanitas-forbedret",

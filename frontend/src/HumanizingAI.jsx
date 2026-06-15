@@ -137,6 +137,25 @@ const BorderCard = ({ color, light, border, children, style = {} }) => (
   </div>
 );
 
+/** Small pill displaying a Prompt Humanitas version. Tooltip on hover with
+    optional released date. */
+const PromptVersionChip = ({ version, released = null, label = null, color = '#6b7280' }) => {
+  if (!version) return null;
+  const display = label ? `${label}${version}` : `Prompt v${version}`;
+  return (
+    <span title={released ? `${display} · ${released}` : display}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            background: '#f3f4f6', color,
+            border: '1px solid #e5e7eb', borderRadius: 999,
+            padding: '2px 9px', fontSize: 10, fontWeight: 700,
+            fontFamily: 'monospace', letterSpacing: '0.03em', verticalAlign: 'middle',
+          }}>
+      🏷 {display}
+    </span>
+  );
+};
+
 const Badge = ({ label, color, light, border }) => (
   <span style={{
     background: light || '#f3f4f6', color: color || '#374151',
@@ -314,7 +333,10 @@ const TabHumanize = () => {
             <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 14, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <BigScore value={result.humanitas_score} max={100} label="Humanitas Score" color={scoreColor(result.humanitas_score, 100)} />
-                <MockBadge isMock={result.is_mock} t={t} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <PromptVersionChip version={result.prompt_version} />
+                  <MockBadge isMock={result.is_mock} t={t} />
+                </div>
               </div>
               {PILLARS.map((p) => (
                 <Bar key={p.key} label={t(`humanizingAiModule.pillars.${p.labelKey}`)} value={result.pillar_scores?.[p.key] ?? 0} max={100} color={p.color} />
@@ -389,7 +411,10 @@ const TabPromptHumanitas = () => {
   return (
     <div style={{ padding: '28px 32px', maxWidth: 960, margin: '0 auto' }}>
       <SectionLabel index={2} label={t('humanizingAiModule.tabs.promptHumanitas')} />
-      <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.promptHumanitas.title')}</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
+        <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: 0 }}>{t('humanizingAiModule.promptHumanitas.title')}</h2>
+        <PromptVersionChip version={data?.version} released={data?.released} color="#059669" />
+      </div>
       <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 28 }}>{t('humanizingAiModule.promptHumanitas.subtitle')}</p>
 
       {/* Pillar cards */}
@@ -623,7 +648,10 @@ const TabTestHumanitas = () => {
                 return <Bar key={key} label={`${key} · ${t(`humanizingAiModule.testHumanitas.rubric.${key}`, { defaultValue: rubric[key]?.name || key })}`} value={val ?? 0} max={3} color={colors[i % colors.length]} />;
               })}
             </div>
-            <MockBadge isMock={result.evaluation?.is_mock} t={t} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+              <PromptVersionChip version={result.prompt_version} />
+              <MockBadge isMock={result.evaluation?.is_mock} t={t} />
+            </div>
           </div>
 
           {/* Responses grid */}
@@ -770,9 +798,10 @@ const TabHistory = () => {
         <div onClick={() => setDetail(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 1000 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: 16, maxWidth: 820, width: '100%', maxHeight: '88vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
-              <h3 style={{ color: '#111827', margin: 0, fontSize: 16, fontWeight: 800 }}>
+              <h3 style={{ color: '#111827', margin: 0, fontSize: 16, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 📋 {t('humanizingAiModule.history.detailTitle')}
-                <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 500, fontFamily: 'monospace', marginLeft: 10 }}>{detail.run_id}</span>
+                <span style={{ color: '#9ca3af', fontSize: 11, fontWeight: 500, fontFamily: 'monospace' }}>{detail.run_id}</span>
+                {detail.prompt_version && <PromptVersionChip version={detail.prompt_version} />}
               </h3>
               <button onClick={() => setDetail(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 13, color: '#374151' }}>✕</button>
             </div>
@@ -878,8 +907,25 @@ const TabHumanityReport = () => {
   return (
     <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
       <SectionLabel index={5} label={t('humanizingAiModule.tabs.humanityReport')} />
-      <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('humanizingAiModule.humanityReport.title')}</h2>
-      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 24 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
+        <h2 style={{ color: '#111827', fontSize: 22, fontWeight: 800, margin: 0 }}>{t('humanizingAiModule.humanityReport.title')}</h2>
+        {report.current_prompt_version && <PromptVersionChip version={report.current_prompt_version} color="#4f46e5" />}
+      </div>
+      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 16 }}>{t('humanizingAiModule.humanityReport.subtitle')}</p>
+
+      {/* Mixed-versions alert */}
+      {report.prompt_versions?.length > 1 && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderLeft: '4px solid #d97706', borderRadius: 10, padding: '10px 14px', marginBottom: 20, fontSize: 12, color: '#92400e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <span>⚠ {t('humanizingAiModule.promptVersion.mixedVersions')}</span>
+          <span style={{ display: 'flex', gap: 6 }}>
+            {report.prompt_versions.map((v) => (
+              <span key={v.version} style={{ fontFamily: 'monospace', background: '#fff', border: '1px solid #fde68a', borderRadius: 6, padding: '1px 8px', fontSize: 11 }}>
+                v{v.version} <span style={{ color: '#a16207' }}>×{v.count}</span>
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
 
       {/* Headline KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 24 }}>
@@ -1297,7 +1343,10 @@ const TabGateway = () => {
             {/* Score */}
             {result.humanitas_score != null && (
               <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 18px' }}>
-                <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.gateway.scoreLabel')}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <p style={{ color: '#6b7280', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>{t('humanizingAiModule.gateway.scoreLabel')}</p>
+                  {result.prompt_version && <PromptVersionChip version={result.prompt_version} />}
+                </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
                   <span style={{ fontSize: 36, fontWeight: 900, fontFamily: 'monospace', color: scoreColor(result.humanitas_score, 100), lineHeight: 1 }}>
                     {result.humanitas_score}<span style={{ fontSize: 14, color: '#9ca3af' }}>/100</span>

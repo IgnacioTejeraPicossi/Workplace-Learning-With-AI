@@ -47,6 +47,7 @@ export const filterResultToBadgeProps = (r) => {
     mode:          r.mode,
     moduleId:      r.module_id,
     isMock:        r.is_mock,
+    promptVersion: r.prompt_version,
   };
 };
 
@@ -61,6 +62,7 @@ const HumanitasBadge = ({
   mode     = null,
   moduleId = null,
   isMock   = false,
+  promptVersion = null,
   // Layout
   size       = 'md',
   showScore  = true,
@@ -76,6 +78,7 @@ const HumanitasBadge = ({
   const md  = derived?.mode          ?? mode;
   const mid = derived?.moduleId      ?? moduleId;
   const mock= derived?.isMock        ?? isMock;
+  const pv  = derived?.promptVersion ?? promptVersion;
 
   const palette = STATES[s] || STATES.reviewed;
   const sz      = SIZE[size] || SIZE.md;
@@ -90,6 +93,7 @@ const HumanitasBadge = ({
   if (th != null)  tooltipParts.push(`${t('humanizingAiModule.badge.tooltipThreshold', { defaultValue: 'Threshold' })}: ${th}`);
   if (mid)         tooltipParts.push(`${t('humanizingAiModule.badge.tooltipModule', { defaultValue: 'Module' })}: ${mid}`);
   if (mock)        tooltipParts.push(`⚠ ${t('humanizingAiModule.badge.tooltipMock', { defaultValue: 'Mock evaluation' })}`);
+  if (pv)          tooltipParts.push(`Prompt v${pv}`);
   const tooltip = tooltipParts.join(' · ');
 
   return (

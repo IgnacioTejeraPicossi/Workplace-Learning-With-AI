@@ -141,6 +141,14 @@
       "minModels": "Add at least 2 models to compare",
       "noResults": "Run the comparison to see results here"
     },
+    "promptVersion": {
+      "current": "Current version",
+      "usedInRun": "Prompt v",
+      "released": "released",
+      "changelog": "Changelog",
+      "mixedVersions": "Runs span multiple prompt versions",
+      "singleVersion": "All runs use the current prompt version"
+    },
     "badge": {
       "reviewed": "Humanitas Reviewed",
       "enhanced": "Humanitas Enhanced",
