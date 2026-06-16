@@ -14,6 +14,9 @@ try:
         get_kanji_deck, get_kanji_detail, kanji_mark,
         get_vocab_all, srs_due, srs_review,
         get_overview, conversation_message, scenarios_catalogue,
+        get_grammar_path, get_grammar_point,
+        get_reading_texts, get_reading_text,
+        get_speaking_phrases, speaking_attempt,
     )
 except ImportError:  # pragma: no cover
     from services.japanese_sensei import (  # type: ignore
@@ -21,6 +24,9 @@ except ImportError:  # pragma: no cover
         get_kanji_deck, get_kanji_detail, kanji_mark,
         get_vocab_all, srs_due, srs_review,
         get_overview, conversation_message, scenarios_catalogue,
+        get_grammar_path, get_grammar_point,
+        get_reading_texts, get_reading_text,
+        get_speaking_phrases, speaking_attempt,
     )
 
 router = APIRouter(prefix="/api/japanese")
@@ -129,3 +135,49 @@ async def conversation_endpoint(body: ConversationMessageRequest) -> Dict[str, A
         user_text=body.user_text,
         lang=body.lang,
     )
+
+
+# ─── V2 endpoints ─────────────────────────────────────────────────────────────
+
+@router.get("/grammar/path", summary="Grammar points for a given JLPT level (V2)")
+async def grammar_path_endpoint(level: str = Query("N5", pattern=r"^N[1-5]$")) -> Dict[str, Any]:
+    points = get_grammar_path(level)
+    return {"level": level, "count": len(points), "items": points}
+
+
+@router.get("/grammar/{point_id}", summary="Single grammar point detail (V2)")
+async def grammar_point_endpoint(point_id: str) -> Dict[str, Any]:
+    p = get_grammar_point(point_id)
+    if not p:
+        raise HTTPException(status_code=404, detail=f"Grammar point not found: {point_id}")
+    return p
+
+
+@router.get("/reading/texts", summary="List available reading practice texts (V2)")
+async def reading_list_endpoint() -> Dict[str, Any]:
+    items = get_reading_texts()
+    return {"count": len(items), "items": items}
+
+
+@router.get("/reading/{text_id}", summary="Single reading text with full breakdown (V2)")
+async def reading_text_endpoint(text_id: str) -> Dict[str, Any]:
+    t = get_reading_text(text_id)
+    if not t:
+        raise HTTPException(status_code=404, detail=f"Reading text not found: {text_id}")
+    return t
+
+
+@router.get("/speaking/phrases", summary="Speaking Lab practice phrases (V2)")
+async def speaking_phrases_endpoint() -> Dict[str, Any]:
+    items = get_speaking_phrases()
+    return {"count": len(items), "items": items}
+
+
+class SpeakingAttemptRequest(BaseModel):
+    phrase_id: str = Field(..., description="Phrase being practiced (e.g. 'sp1')")
+    transcript: str = Field(..., description="What Web Speech API heard")
+
+
+@router.post("/speaking/attempt", summary="Record a speaking attempt (V2)")
+async def speaking_attempt_endpoint(body: SpeakingAttemptRequest) -> Dict[str, Any]:
+    return await speaking_attempt(body.phrase_id, body.transcript)

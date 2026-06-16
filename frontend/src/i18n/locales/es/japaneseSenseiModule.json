@@ -9,7 +9,10 @@
       "kana": "Entrenador Kana",
       "kanji": "Dojo Kanji",
       "conversation": "Conversación",
-      "vocabulary": "Vocabulario SRS"
+      "vocabulary": "Vocabulario SRS",
+      "grammar": "Gramática",
+      "reading": "Lectura",
+      "speaking": "Laboratorio de Habla"
     },
     "dashboard": {
       "title": "Hoy",
@@ -106,6 +109,51 @@
       "tags": "Etiquetas",
       "loading": "Cargando deck SRS…",
       "endOfSession": "Fin de sesión — ¡bien hecho!"
+    },
+    "grammar": {
+      "title": "Camino de Gramática",
+      "subtitle": "Puntos gramaticales N5 estilo Bunpro con explicación, ejemplos y mini-quiz",
+      "pattern": "Patrón",
+      "explanation": "Explicación",
+      "examples": "Ejemplos",
+      "commonMistake": "Error común",
+      "miniQuiz": "Mini-quiz",
+      "submit": "Enviar",
+      "next": "Siguiente punto",
+      "correct": "✓ ¡Correcto!",
+      "wrong": "✗ Incorrecto — la respuesta es",
+      "loading": "Cargando puntos gramaticales…",
+      "of": "{{n}} de {{total}}"
+    },
+    "reading": {
+      "title": "Práctica de Lectura",
+      "subtitle": "Textos cortos N5 con furigana, traducción y desglose palabra-por-palabra",
+      "pickText": "Elige un texto",
+      "furigana": "Furigana",
+      "translation": "Traducción",
+      "wordByWord": "Palabra a palabra",
+      "readAloud": "🔊 Leer en voz alta",
+      "stopReading": "⏹ Detener",
+      "questions": "Comprensión",
+      "showAnswer": "Mostrar respuesta",
+      "loading": "Cargando texto…"
+    },
+    "speaking": {
+      "title": "Laboratorio de Habla",
+      "subtitle": "Practica la pronunciación con las APIs nativas de voz del navegador",
+      "pickPhrase": "Frase",
+      "target": "Frase objetivo",
+      "listenBtn": "🔊 Escuchar",
+      "stopBtn": "⏹ Detener",
+      "recordBtn": "🎤 Grabar",
+      "stopRecordBtn": "⏹ Detener grabación",
+      "heard": "Lo que oímos",
+      "selfGrade": "¿Cómo sonó?",
+      "goodMatch": "✓ Sonó bien",
+      "tryAgain": "↻ Intentar de nuevo",
+      "noSupport": "Tu navegador no soporta Web Speech API. Prueba con Chrome o Edge.",
+      "noMatchYet": "Pulsa 🎤 Grabar y di la frase…",
+      "loading": "Cargando frases…"
     },
     "common": {
       "loading": "Cargando…",

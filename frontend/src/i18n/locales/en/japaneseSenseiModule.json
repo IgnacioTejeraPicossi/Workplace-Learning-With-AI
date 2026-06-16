@@ -9,7 +9,10 @@
       "kana": "Kana Trainer",
       "kanji": "Kanji Dojo",
       "conversation": "Conversation Sensei",
-      "vocabulary": "Vocabulary SRS"
+      "vocabulary": "Vocabulary SRS",
+      "grammar": "Grammar Path",
+      "reading": "Reading Practice",
+      "speaking": "Speaking Lab"
     },
     "dashboard": {
       "title": "Today",
@@ -106,6 +109,51 @@
       "tags": "Tags",
       "loading": "Loading SRS deck…",
       "endOfSession": "End of session — well done!"
+    },
+    "grammar": {
+      "title": "Grammar Path",
+      "subtitle": "Bunpro-style N5 grammar points with explanation, examples and quick quiz",
+      "pattern": "Pattern",
+      "explanation": "Explanation",
+      "examples": "Examples",
+      "commonMistake": "Common mistake",
+      "miniQuiz": "Mini quiz",
+      "submit": "Submit",
+      "next": "Next point",
+      "correct": "✓ Correct!",
+      "wrong": "✗ Wrong — answer is",
+      "loading": "Loading grammar points…",
+      "of": "{{n}} of {{total}}"
+    },
+    "reading": {
+      "title": "Reading Practice",
+      "subtitle": "Short N5 texts with furigana, translation and word-by-word breakdown",
+      "pickText": "Choose a text",
+      "furigana": "Furigana",
+      "translation": "Translation",
+      "wordByWord": "Word-by-word",
+      "readAloud": "🔊 Read aloud",
+      "stopReading": "⏹ Stop",
+      "questions": "Comprehension",
+      "showAnswer": "Show answer",
+      "loading": "Loading reading text…"
+    },
+    "speaking": {
+      "title": "Speaking Lab",
+      "subtitle": "Practice pronunciation with native browser speech APIs",
+      "pickPhrase": "Phrase",
+      "target": "Target phrase",
+      "listenBtn": "🔊 Listen",
+      "stopBtn": "⏹ Stop",
+      "recordBtn": "🎤 Record",
+      "stopRecordBtn": "⏹ Stop recording",
+      "heard": "What we heard",
+      "selfGrade": "How did it sound?",
+      "goodMatch": "✓ Sounds good",
+      "tryAgain": "↻ Try again",
+      "noSupport": "Your browser does not support Web Speech API. Try Chrome or Edge.",
+      "noMatchYet": "Press 🎤 Record and say the phrase…",
+      "loading": "Loading phrases…"
     },
     "common": {
       "loading": "Loading…",

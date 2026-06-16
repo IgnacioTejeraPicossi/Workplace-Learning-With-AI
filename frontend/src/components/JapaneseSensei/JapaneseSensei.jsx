@@ -676,6 +676,410 @@ const TabVocabulary = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Grammar Path (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabGrammar = () => {
+  const { t, i18n } = useTranslation();
+  const [points, setPoints]     = useState([]);
+  const [idx, setIdx]           = useState(0);
+  const [loading, setLoading]   = useState(true);
+  const [quizIdx, setQuizIdx]   = useState(0);
+  const [picked, setPicked]     = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/japanese/grammar/path?level=N5`)
+      .then((r) => r.json())
+      .then((d) => { setPoints(d.items || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const lang = toLang(i18n.language);
+  const cur  = points[idx];
+  const quiz = cur?.quiz?.[quizIdx];
+
+  const goNext = () => {
+    setPicked(null); setQuizIdx(0);
+    setIdx((i) => (i + 1) % points.length);
+  };
+  const nextQuiz = () => { setPicked(null); setQuizIdx((q) => Math.min(q + 1, (cur.quiz?.length || 1) - 1)); };
+
+  if (loading) return <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('japaneseSenseiModule.grammar.loading')}</p>;
+  if (!cur) return null;
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 880, margin: '0 auto' }}>
+      <SectionLabel index={6} label={t('japaneseSenseiModule.tabs.grammar')} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+        <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: 0 }}>{t('japaneseSenseiModule.grammar.title')}</h2>
+        <span style={{ color: COLORS.inkSoft, fontSize: 11, fontFamily: 'monospace' }}>
+          {t('japaneseSenseiModule.grammar.of', { n: idx + 1, total: points.length })}
+        </span>
+      </div>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('japaneseSenseiModule.grammar.subtitle')}</p>
+
+      {/* Points strip */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 22, flexWrap: 'wrap' }}>
+        {points.map((p, i) => (
+          <button key={p.id} onClick={() => { setIdx(i); setQuizIdx(0); setPicked(null); }} style={{
+            background: i === idx ? COLORS.accent : COLORS.card,
+            color: i === idx ? '#fff' : COLORS.ink,
+            border: `1px solid ${i === idx ? COLORS.accent : COLORS.border}`,
+            borderRadius: 8, padding: '5px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+          }}>{p.id.toUpperCase()}</button>
+        ))}
+      </div>
+
+      <Card accent={COLORS.accent} style={{ marginBottom: 14 }}>
+        <h3 style={{ color: COLORS.ink, fontSize: 20, fontWeight: 800, margin: 0, marginBottom: 10, fontFamily: '"Yu Mincho","Noto Serif JP",serif' }}>{cur.title}</h3>
+        <div style={{ background: '#fef8f0', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '10px 14px', fontFamily: 'monospace', fontSize: 13, color: COLORS.ink, marginBottom: 10 }}>
+          {cur.pattern}
+        </div>
+        <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 4, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.grammar.explanation')}</p>
+        <p style={{ color: COLORS.ink, fontSize: 13, lineHeight: 1.6 }}>{cur.explanation[lang] || cur.explanation.en}</p>
+      </Card>
+
+      <Card accent="#2563eb" style={{ marginBottom: 14 }}>
+        <p style={{ color: '#1e40af', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.grammar.examples')}</p>
+        {cur.examples.map((ex, i) => (
+          <div key={i} style={{ padding: '8px 0', borderBottom: i < cur.examples.length - 1 ? `1px dashed ${COLORS.border}` : 'none' }}>
+            <p style={{ fontSize: 16, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 700 }}>{ex.jp}</p>
+            <p style={{ fontSize: 12, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif', marginTop: 2 }}>{ex.kana}</p>
+            <p style={{ fontSize: 12, color: COLORS.ink, marginTop: 4, fontStyle: 'italic' }}>{ex[lang] || ex.en}</p>
+          </div>
+        ))}
+      </Card>
+
+      <Card accent={COLORS.gold} style={{ marginBottom: 14 }}>
+        <p style={{ color: '#92400e', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>⚠ {t('japaneseSenseiModule.grammar.commonMistake')}</p>
+        <p style={{ color: COLORS.ink, fontSize: 12, lineHeight: 1.55 }}>{cur.commonMistake[lang] || cur.commonMistake.en}</p>
+      </Card>
+
+      {quiz && (
+        <Card accent="#059669">
+          <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>📝 {t('japaneseSenseiModule.grammar.miniQuiz')}</p>
+          <p style={{ fontSize: 20, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', textAlign: 'center', marginBottom: 14 }}>{quiz.prompt}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+            {quiz.options.map((opt) => {
+              const isPicked  = picked === opt;
+              const isCorrect = opt === quiz.answer;
+              const showState = picked && (isPicked || isCorrect);
+              const c = showState ? (isCorrect ? '#059669' : COLORS.accent) : COLORS.border;
+              const bg = showState ? (isCorrect ? '#ecfdf5' : COLORS.accentLight) : COLORS.card;
+              return (
+                <button key={opt} onClick={() => picked || setPicked(opt)} disabled={!!picked}
+                        style={{ background: bg, color: COLORS.ink, border: `2px solid ${c}`,
+                                 borderRadius: 8, padding: '12px 6px', fontSize: 18, fontWeight: 800,
+                                 cursor: picked ? 'default' : 'pointer',
+                                 fontFamily: '"Yu Mincho","Noto Serif JP",serif' }}>{opt}</button>
+              );
+            })}
+          </div>
+          {picked && (
+            <div style={{ marginTop: 14, textAlign: 'center' }}>
+              <p style={{ fontWeight: 700, color: picked === quiz.answer ? '#059669' : COLORS.accent, marginBottom: 10 }}>
+                {picked === quiz.answer ? t('japaneseSenseiModule.grammar.correct') : `${t('japaneseSenseiModule.grammar.wrong')} "${quiz.answer}"`}
+              </p>
+              {quizIdx < (cur.quiz.length - 1)
+                ? <Button primary onClick={nextQuiz}>{t('japaneseSenseiModule.kana.next')} →</Button>
+                : <Button primary onClick={goNext}>{t('japaneseSenseiModule.grammar.next')} →</Button>}
+            </div>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Reading Practice (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabReading = () => {
+  const { t, i18n } = useTranslation();
+  const [list, setList]     = useState([]);
+  const [activeId, setActiveId] = useState('');
+  const [doc, setDoc]       = useState(null);
+  const [showFurigana, setShowFurigana]   = useState(true);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [showWordByWord, setShowWordByWord]   = useState(false);
+  const [revealedAnswer, setRevealedAnswer]   = useState({});
+  const [speaking, setSpeaking] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/japanese/reading/texts`)
+      .then((r) => r.json())
+      .then((d) => {
+        setList(d.items || []);
+        if ((d.items || [])[0]) setActiveId(d.items[0].id);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!activeId) return;
+    fetch(`${API_BASE}/api/japanese/reading/${activeId}`)
+      .then((r) => r.json())
+      .then(setDoc);
+    setRevealedAnswer({});
+  }, [activeId]);
+
+  const lang = toLang(i18n.language);
+
+  const readAloud = () => {
+    if (!doc || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const text = doc.segments.map((s) => s.jp).join('');
+    const u = new window.SpeechSynthesisUtterance(text);
+    u.lang = 'ja-JP'; u.rate = 0.85;
+    u.onend = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(u);
+  };
+  const stopReading = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 920, margin: '0 auto' }}>
+      <SectionLabel index={7} label={t('japaneseSenseiModule.tabs.reading')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('japaneseSenseiModule.reading.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('japaneseSenseiModule.reading.subtitle')}</p>
+
+      {/* Text picker */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+        {list.map((x) => (
+          <button key={x.id} onClick={() => setActiveId(x.id)} style={{
+            background: activeId === x.id ? COLORS.accent : COLORS.card,
+            color: activeId === x.id ? '#fff' : COLORS.ink,
+            border: `1px solid ${activeId === x.id ? COLORS.accent : COLORS.border}`,
+            borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+          }}>{x.title_translations?.[lang] || x.title}</button>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div style={{ display: 'flex', gap: 14, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showFurigana}    onChange={(e) => setShowFurigana(e.target.checked)}    style={{ accentColor: COLORS.accent }} />
+          {t('japaneseSenseiModule.reading.furigana')}
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showTranslation} onChange={(e) => setShowTranslation(e.target.checked)} style={{ accentColor: COLORS.accent }} />
+          {t('japaneseSenseiModule.reading.translation')}
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showWordByWord}  onChange={(e) => setShowWordByWord(e.target.checked)}  style={{ accentColor: COLORS.accent }} />
+          {t('japaneseSenseiModule.reading.wordByWord')}
+        </label>
+        {('speechSynthesis' in window) && (
+          <Button onClick={speaking ? stopReading : readAloud}>
+            {speaking ? t('japaneseSenseiModule.reading.stopReading') : t('japaneseSenseiModule.reading.readAloud')}
+          </Button>
+        )}
+      </div>
+
+      {!doc ? <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('japaneseSenseiModule.reading.loading')}</p> : (
+        <>
+          <Card accent={COLORS.accent} style={{ marginBottom: 14 }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: COLORS.accent, fontFamily: '"Yu Mincho","Noto Serif JP",serif', marginBottom: 12 }}>
+              📖 {doc.title_translations?.[lang] || doc.title}
+            </p>
+            <div style={{ fontSize: 20, lineHeight: 2, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif' }}>
+              {doc.segments.map((s, i) => (
+                <ruby key={i} style={{ marginRight: 2 }}>
+                  {s.jp}
+                  {showFurigana && s.kana !== s.jp && (
+                    <rt style={{ fontSize: 10, color: COLORS.accent, fontFamily: 'inherit' }}>{s.kana}</rt>
+                  )}
+                </ruby>
+              ))}
+            </div>
+            {showTranslation && (
+              <p style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${COLORS.border}`, color: COLORS.ink, fontSize: 14, fontStyle: 'italic' }}>
+                {doc.translation[lang] || doc.translation.en}
+              </p>
+            )}
+          </Card>
+
+          {showWordByWord && (
+            <Card accent="#7c3aed" style={{ marginBottom: 14 }}>
+              <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.reading.wordByWord')}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px,1fr))', gap: 8 }}>
+                {doc.segments.flatMap((s) => s.words).map((w, i) => (
+                  <div key={i} style={{ background: '#fef8f0', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '8px 10px' }}>
+                    <p style={{ fontSize: 16, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 700 }}>{w.w}</p>
+                    <p style={{ fontSize: 11, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif' }}>{w.k}</p>
+                    <p style={{ fontSize: 11, color: COLORS.ink, marginTop: 2 }}>{w.m}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {doc.questions?.length > 0 && (
+            <Card accent="#059669">
+              <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>❓ {t('japaneseSenseiModule.reading.questions')}</p>
+              {doc.questions.map((q, i) => (
+                <div key={i} style={{ padding: '8px 0', borderBottom: i < doc.questions.length - 1 ? `1px dashed ${COLORS.border}` : 'none' }}>
+                  <p style={{ fontSize: 13, color: COLORS.ink, marginBottom: 6 }}>{q.q[lang] || q.q.en}</p>
+                  {revealedAnswer[i]
+                    ? <p style={{ fontSize: 13, color: '#059669', fontWeight: 700 }}>→ {q.a[lang] || q.a.en}</p>
+                    : <button onClick={() => setRevealedAnswer((r) => ({ ...r, [i]: true }))}
+                              style={{ background: 'transparent', border: 'none', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                        {t('japaneseSenseiModule.reading.showAnswer')} →
+                      </button>}
+                </div>
+              ))}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Speaking Lab (V2 — Web Speech API)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabSpeaking = () => {
+  const { t, i18n } = useTranslation();
+  const [phrases, setPhrases] = useState([]);
+  const [idx, setIdx]         = useState(0);
+  const [speaking, setSpeaking]   = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef(null);
+
+  // Capability detection
+  const hasTTS = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+  const hasASR = !!SpeechRecognition;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/japanese/speaking/phrases`)
+      .then((r) => r.json())
+      .then((d) => setPhrases(d.items || []));
+  }, []);
+
+  useEffect(() => () => {
+    window.speechSynthesis?.cancel();
+    try { recognitionRef.current?.stop(); } catch {}
+  }, []);
+
+  const phrase = phrases[idx];
+  const lang   = toLang(i18n.language);
+
+  const listen = () => {
+    if (!phrase || !hasTTS) return;
+    window.speechSynthesis.cancel();
+    const u = new window.SpeechSynthesisUtterance(phrase.jp);
+    u.lang = 'ja-JP'; u.rate = 0.85;
+    u.onend   = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(u);
+  };
+  const stopListen = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
+
+  const record = () => {
+    if (!hasASR) return;
+    setTranscript('');
+    const rec = new SpeechRecognition();
+    rec.lang = 'ja-JP'; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onresult = (e) => setTranscript(e.results[0][0].transcript);
+    rec.onend    = () => setRecording(false);
+    rec.onerror  = () => setRecording(false);
+    recognitionRef.current = rec;
+    setRecording(true);
+    try { rec.start(); } catch { setRecording(false); }
+  };
+  const stopRecord = () => { try { recognitionRef.current?.stop(); } catch {} };
+
+  const selfGrade = async (good) => {
+    if (!phrase) return;
+    try {
+      await fetch(`${API_BASE}/api/japanese/speaking/attempt`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phrase_id: phrase.id, transcript: `${good ? 'GOOD' : 'AGAIN'}: ${transcript}` }),
+      });
+    } catch {}
+    if (good) {
+      setIdx((i) => (i + 1) % phrases.length);
+      setTranscript('');
+    } else {
+      setTranscript('');
+    }
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 720, margin: '0 auto' }}>
+      <SectionLabel index={8} label={t('japaneseSenseiModule.tabs.speaking')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('japaneseSenseiModule.speaking.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('japaneseSenseiModule.speaking.subtitle')}</p>
+
+      {!hasASR && (
+        <div style={{ background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`, borderLeft: `4px solid ${COLORS.accent}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 18, fontSize: 12, color: '#7f1d1d' }}>
+          ⚠ {t('japaneseSenseiModule.speaking.noSupport')}
+        </div>
+      )}
+
+      {/* Phrase picker strip */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
+        {phrases.map((p, i) => (
+          <button key={p.id} onClick={() => { setIdx(i); setTranscript(''); }} style={{
+            background: i === idx ? COLORS.accent : COLORS.card,
+            color: i === idx ? '#fff' : COLORS.ink,
+            border: `1px solid ${i === idx ? COLORS.accent : COLORS.border}`,
+            borderRadius: 8, padding: '5px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+          }}>{p.id}</button>
+        ))}
+      </div>
+
+      {phrase && (
+        <>
+          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: '30px 22px', marginBottom: 16 }}>
+            <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.speaking.target')}</p>
+            <p style={{ fontSize: 36, fontWeight: 800, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', lineHeight: 1.3, marginBottom: 8 }}>{phrase.jp}</p>
+            <p style={{ fontSize: 14, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif', marginBottom: 4 }}>{phrase.kana}</p>
+            <p style={{ fontSize: 12, color: COLORS.inkSoft, fontStyle: 'italic', marginBottom: 8 }}>{phrase.romaji}</p>
+            <p style={{ fontSize: 13, color: COLORS.ink }}>{phrase.translations?.[lang] || phrase.translations?.en}</p>
+            {hasTTS && (
+              <div style={{ marginTop: 16 }}>
+                <Button onClick={speaking ? stopListen : listen}>
+                  {speaking ? t('japaneseSenseiModule.speaking.stopBtn') : t('japaneseSenseiModule.speaking.listenBtn')}
+                </Button>
+              </div>
+            )}
+          </Card>
+
+          {hasASR && (
+            <Card accent={recording ? '#dc2626' : '#2563eb'} style={{ marginBottom: 16, textAlign: 'center' }}>
+              <Button primary onClick={recording ? stopRecord : record} style={{ marginBottom: 14 }}>
+                {recording ? t('japaneseSenseiModule.speaking.stopRecordBtn') : t('japaneseSenseiModule.speaking.recordBtn')}
+              </Button>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('japaneseSenseiModule.speaking.heard')}</p>
+              {transcript
+                ? <p style={{ fontSize: 22, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 700 }}>{transcript}</p>
+                : <p style={{ fontSize: 13, color: COLORS.inkSoft, fontStyle: 'italic' }}>{t('japaneseSenseiModule.speaking.noMatchYet')}</p>}
+              {transcript && (
+                <div style={{ marginTop: 14 }}>
+                  <p style={{ fontSize: 11, color: COLORS.inkSoft, marginBottom: 8 }}>{t('japaneseSenseiModule.speaking.selfGrade')}</p>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                    <Button onClick={() => selfGrade(false)} style={{ background: COLORS.accentLight, borderColor: COLORS.accentBorder, color: COLORS.accent }}>
+                      {t('japaneseSenseiModule.speaking.tryAgain')}
+                    </Button>
+                    <Button primary onClick={() => selfGrade(true)}>{t('japaneseSenseiModule.speaking.goodMatch')}</Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Main shell
 // ═══════════════════════════════════════════════════════════════════════════════
 const JapaneseSensei = () => {
@@ -688,6 +1092,9 @@ const JapaneseSensei = () => {
     { id: 'kanji',        label: t('japaneseSenseiModule.tabs.kanji'),        icon: '漢' },
     { id: 'conversation', label: t('japaneseSenseiModule.tabs.conversation'), icon: '💬' },
     { id: 'vocabulary',   label: t('japaneseSenseiModule.tabs.vocabulary'),   icon: '📚' },
+    { id: 'grammar',      label: t('japaneseSenseiModule.tabs.grammar'),      icon: '📐' },
+    { id: 'reading',      label: t('japaneseSenseiModule.tabs.reading'),      icon: '📖' },
+    { id: 'speaking',     label: t('japaneseSenseiModule.tabs.speaking'),     icon: '🎤' },
   ];
 
   const renderContent = () => {
@@ -697,6 +1104,9 @@ const JapaneseSensei = () => {
       case 'kanji':        return <TabKanji />;
       case 'conversation': return <TabConversation />;
       case 'vocabulary':   return <TabVocabulary />;
+      case 'grammar':      return <TabGrammar />;
+      case 'reading':      return <TabReading />;
+      case 'speaking':     return <TabSpeaking />;
       default:             return <TabDashboard onJump={(id) => setActiveTab(id)} />;
     }
   };

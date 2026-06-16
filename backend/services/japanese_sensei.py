@@ -559,3 +559,302 @@ def scenarios_catalogue(lang: str = "es") -> List[Dict[str, str]]:
         {"key": k, "label": v.get(lang, v["en"]), "first": v["first"]}
         for k, v in SCENARIOS.items()
     ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 9 — Grammar Path (N5 points, Bunpro-inspired)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_GRAMMAR_POINTS: List[Dict[str, Any]] = [
+    {"id":"g1","level":"N5","title":"は (topic marker)",
+     "pattern":"<noun> + は + <comment>",
+     "explanation":{"en":"は marks the TOPIC of the sentence — 'as for X'. It is NOT 'is'.",
+                    "es":"は marca el TEMA de la frase — 'en cuanto a X'. NO significa 'ser/estar'.",
+                    "no":"は markerer SETNINGENS TEMA — 'når det gjelder X'. Det betyr IKKE 'er'."},
+     "examples":[{"jp":"私は学生です。","kana":"わたしはがくせいです。","en":"As for me, (I) am a student.","es":"En cuanto a mí, soy estudiante.","no":"Når det gjelder meg, er jeg student."},
+                 {"jp":"今日は寒いです。","kana":"きょうはさむいです。","en":"As for today, it's cold.","es":"En cuanto a hoy, hace frío.","no":"I dag er det kaldt."}],
+     "commonMistake":{"en":"Don't translate は mechanically as 'is'. It marks the topic only.",
+                      "es":"No traduzcas は mecánicamente como 'es/está'. Solo marca el tema.",
+                      "no":"Ikke oversett は mekanisk som 'er'. Den markerer bare temaet."},
+     "quiz":[{"prompt":"私 ___ イグナシオです。","options":["は","が","を","に"],"answer":"は"},
+             {"prompt":"今日 ___ 月曜日です。","options":["を","は","で","の"],"answer":"は"}]},
+
+    {"id":"g2","level":"N5","title":"が (subject marker)",
+     "pattern":"<subject> + が + <verb/adjective>",
+     "explanation":{"en":"が marks the SUBJECT — the thing that does or is. Often used to introduce NEW information.",
+                    "es":"が marca el SUJETO — lo que hace o lo que es. A menudo introduce información NUEVA.",
+                    "no":"が markerer SUBJEKTET — det som gjør eller er. Ofte brukt for å introdusere NY informasjon."},
+     "examples":[{"jp":"猫が好きです。","kana":"ねこがすきです。","en":"I like cats. (Lit: cats are likeable)","es":"Me gustan los gatos.","no":"Jeg liker katter."},
+                 {"jp":"雨が降っています。","kana":"あめがふっています。","en":"It is raining.","es":"Está lloviendo.","no":"Det regner."}],
+     "commonMistake":{"en":"With 好き/きらい, use が, not を: 猫が好きです (not 猫を好きです).",
+                      "es":"Con 好き/きらい, usa が, no を: 猫が好きです (no 猫を好きです).",
+                      "no":"Med 好き/きらい, bruk が, ikke を: 猫が好きです (ikke 猫を好きです)."},
+     "quiz":[{"prompt":"犬 ___ 好きです。","options":["を","が","は","に"],"answer":"が"},
+             {"prompt":"雨 ___ 降っています。","options":["は","を","が","に"],"answer":"が"}]},
+
+    {"id":"g3","level":"N5","title":"の (possession / connector)",
+     "pattern":"<noun1> + の + <noun2>",
+     "explanation":{"en":"の links two nouns: possession, type, or origin. 'X's Y' or 'X of Y'.",
+                    "es":"の une dos sustantivos: posesión, tipo u origen. 'Y de X'.",
+                    "no":"の forbinder to substantiver: eierskap, type eller opphav. 'X sin Y'."},
+     "examples":[{"jp":"私の本","kana":"わたしのほん","en":"my book","es":"mi libro","no":"min bok"},
+                 {"jp":"日本の車","kana":"にほんのくるま","en":"Japanese car","es":"coche japonés","no":"japansk bil"}],
+     "commonMistake":{"en":"Don't add の between adjective and noun: 大きい家 (NOT 大きいの家).",
+                      "es":"No pongas の entre adjetivo y sustantivo: 大きい家 (NO 大きいの家).",
+                      "no":"Ikke legg til の mellom adjektiv og substantiv: 大きい家 (IKKE 大きいの家)."},
+     "quiz":[{"prompt":"これは私 ___ 本です。","options":["は","を","の","に"],"answer":"の"},
+             {"prompt":"日本 ___ 車","options":["の","は","を","で"],"answer":"の"}]},
+
+    {"id":"g4","level":"N5","title":"を (object marker)",
+     "pattern":"<noun> + を + <transitive verb>",
+     "explanation":{"en":"を marks the direct OBJECT of a verb (what is being acted upon).",
+                    "es":"を marca el OBJETO directo de un verbo (lo que recibe la acción).",
+                    "no":"を markerer det direkte OBJEKTET for et verb."},
+     "examples":[{"jp":"水を飲みます。","kana":"みずをのみます。","en":"I drink water.","es":"Bebo agua.","no":"Jeg drikker vann."},
+                 {"jp":"本を読みます。","kana":"ほんをよみます。","en":"I read a book.","es":"Leo un libro.","no":"Jeg leser en bok."}],
+     "commonMistake":{"en":"を is only used with transitive verbs that take an object.",
+                      "es":"を solo se usa con verbos transitivos que llevan objeto.",
+                      "no":"を brukes bare med transitive verb som tar et objekt."},
+     "quiz":[{"prompt":"コーヒー ___ 飲みます。","options":["を","は","が","の"],"answer":"を"},
+             {"prompt":"テレビ ___ 見ます。","options":["の","は","を","に"],"answer":"を"}]},
+
+    {"id":"g5","level":"N5","title":"に / で (location & time)",
+     "pattern":"<place> + に (existence/destination) | <place> + で (action location)",
+     "explanation":{"en":"に = destination or location of existence. で = location where an ACTION happens.",
+                    "es":"に = destino o lugar de existencia. で = lugar donde ocurre una ACCIÓN.",
+                    "no":"に = mål eller eksistenssted. で = sted der en HANDLING skjer."},
+     "examples":[{"jp":"学校に行きます。","kana":"がっこうにいきます。","en":"I go TO school.","es":"Voy A la escuela.","no":"Jeg går TIL skolen."},
+                 {"jp":"学校で勉強します。","kana":"がっこうでべんきょうします。","en":"I study AT school.","es":"Estudio EN la escuela.","no":"Jeg studerer PÅ skolen."}],
+     "commonMistake":{"en":"Going TO a place = に. Doing something AT a place = で.",
+                      "es":"Ir A un lugar = に. Hacer algo EN un lugar = で.",
+                      "no":"Gå TIL et sted = に. Gjøre noe PÅ et sted = で."},
+     "quiz":[{"prompt":"駅 ___ 行きます。","options":["で","に","を","は"],"answer":"に"},
+             {"prompt":"家 ___ 食べます。","options":["に","の","で","を"],"answer":"で"}]},
+
+    {"id":"g6","level":"N5","title":"あります / います (existence)",
+     "pattern":"<object> + が + あります | <person/animal> + が + います",
+     "explanation":{"en":"あります = exists (inanimate). います = exists (animate: people, animals).",
+                    "es":"あります = existe (inanimado). います = existe (animado: personas, animales).",
+                    "no":"あります = eksisterer (livløs). います = eksisterer (levende: mennesker, dyr)."},
+     "examples":[{"jp":"机に本があります。","kana":"つくえにほんがあります。","en":"There is a book on the desk.","es":"Hay un libro en la mesa.","no":"Det er en bok på pulten."},
+                 {"jp":"猫がいます。","kana":"ねこがいます。","en":"There is a cat.","es":"Hay un gato.","no":"Det er en katt."}],
+     "commonMistake":{"en":"Use います for living things — including fish and insects.",
+                      "es":"Usa います para seres vivos — incluyendo peces e insectos.",
+                      "no":"Bruk います for levende ting — inkludert fisk og insekter."},
+     "quiz":[{"prompt":"机に本が ___ 。","options":["います","あります","です","ます"],"answer":"あります"},
+             {"prompt":"犬が ___ 。","options":["あります","ます","います","です"],"answer":"います"}]},
+
+    {"id":"g7","level":"N5","title":"て-form (linking verbs)",
+     "pattern":"<verb in て-form> + <next clause>",
+     "explanation":{"en":"The て-form links actions: 'and then', 'because', or makes requests with ください.",
+                    "es":"La forma て conecta acciones: 'y entonces', 'porque', o forma peticiones con ください.",
+                    "no":"て-formen kobler handlinger: 'og så', 'fordi', eller danner forespørsler med ください."},
+     "examples":[{"jp":"朝起きて、コーヒーを飲みます。","kana":"あさおきて、コーヒーをのみます。","en":"I wake up and drink coffee.","es":"Me levanto y bebo café.","no":"Jeg våkner og drikker kaffe."},
+                 {"jp":"待ってください。","kana":"まってください。","en":"Please wait.","es":"Por favor espera.","no":"Vennligst vent."}],
+     "commonMistake":{"en":"て-form conjugation differs per verb group. 食べる→食べて, 飲む→飲んで, 行く→行って.",
+                      "es":"La conjugación de て varía por grupo verbal. 食べる→食べて, 飲む→飲んで, 行く→行って.",
+                      "no":"て-bøying varierer etter verbgruppe. 食べる→食べて, 飲む→飲んで, 行く→行って."},
+     "quiz":[{"prompt":"飲む の て-form は?","options":["飲んで","飲みて","飲まて","飲った"],"answer":"飲んで"},
+             {"prompt":"食べる の て-form は?","options":["食べんで","食べって","食べて","食べた"],"answer":"食べて"}]},
+
+    {"id":"g8","level":"N5","title":"past tense (~ました / ~でした)",
+     "pattern":"<verb stem> + ました | <noun/adj> + でした",
+     "explanation":{"en":"Polite past: ます→ました for verbs, です→でした for nouns/な-adjectives.",
+                    "es":"Pasado cortés: ます→ました para verbos, です→でした para nombres/adj. na.",
+                    "no":"Høflig fortid: ます→ました for verb, です→でした for substantiv/na-adj."},
+     "examples":[{"jp":"昨日寿司を食べました。","kana":"きのうすしをたべました。","en":"I ate sushi yesterday.","es":"Comí sushi ayer.","no":"Jeg spiste sushi i går."},
+                 {"jp":"昨日は暇でした。","kana":"きのうはひまでした。","en":"Yesterday I was free.","es":"Ayer estaba libre.","no":"I går var jeg ledig."}],
+     "commonMistake":{"en":"い-adjective past is different: 寒い → 寒かった (not 寒いでした).",
+                      "es":"El pasado de adj. い es diferente: 寒い → 寒かった (no 寒いでした).",
+                      "no":"Fortid av i-adjektiv er annerledes: 寒い → 寒かった (ikke 寒いでした)."},
+     "quiz":[{"prompt":"昨日寿司を食べ___。","options":["ます","ました","ません","です"],"answer":"ました"},
+             {"prompt":"昨日は学生 ___。","options":["でした","ました","です","だった"],"answer":"でした"}]},
+
+    {"id":"g9","level":"N5","title":"です / ます (politeness)",
+     "pattern":"<noun/adj> + です | <verb stem> + ます",
+     "explanation":{"en":"です follows nouns and adjectives, ます attaches to verb stems. Both signal polite register.",
+                    "es":"です sigue a nombres y adjetivos, ます se une a raíces verbales. Ambos marcan registro cortés.",
+                    "no":"です følger substantiv og adjektiv, ます festes til verbstammer. Begge signaliserer høflig register."},
+     "examples":[{"jp":"これはペンです。","kana":"これはペンです。","en":"This is a pen.","es":"Esto es un bolígrafo.","no":"Dette er en penn."},
+                 {"jp":"日本語を勉強します。","kana":"にほんごをべんきょうします。","en":"I study Japanese.","es":"Estudio japonés.","no":"Jeg studerer japansk."}],
+     "commonMistake":{"en":"Don't pair です with verbs — use ます: 食べます ✓, 食べるです ✗.",
+                      "es":"No pongas です con verbos — usa ます: 食べます ✓, 食べるです ✗.",
+                      "no":"Ikke kombiner です med verb — bruk ます: 食べます ✓, 食べるです ✗."},
+     "quiz":[{"prompt":"これはペン ___。","options":["ます","です","でした","ました"],"answer":"です"},
+             {"prompt":"日本語を勉強し ___。","options":["です","ました","ます","でした"],"answer":"ます"}]},
+
+    {"id":"g10","level":"N5","title":"から (because / from)",
+     "pattern":"<clause A> + から、<clause B>",
+     "explanation":{"en":"から after a complete clause = 'because'. After a noun/time = 'from'.",
+                    "es":"から tras una oración completa = 'porque'. Tras nombre/tiempo = 'desde'.",
+                    "no":"から etter en hel setning = 'fordi'. Etter substantiv/tid = 'fra'."},
+     "examples":[{"jp":"寒いから、コートを着ます。","kana":"さむいから、コートをきます。","en":"I wear a coat because it's cold.","es":"Me pongo un abrigo porque hace frío.","no":"Jeg tar på meg en frakk fordi det er kaldt."},
+                 {"jp":"9時から働きます。","kana":"くじからはたらきます。","en":"I work from 9 o'clock.","es":"Trabajo desde las 9.","no":"Jeg jobber fra klokken 9."}],
+     "commonMistake":{"en":"から needs a complete clause before it, not just a noun, for 'because'.",
+                      "es":"から necesita una oración completa antes para significar 'porque', no solo un nombre.",
+                      "no":"から trenger en hel setning før seg for 'fordi', ikke bare et substantiv."},
+     "quiz":[{"prompt":"寒い ___、コートを着ます。","options":["で","から","の","は"],"answer":"から"},
+             {"prompt":"9時 ___ 働きます。","options":["を","は","から","に"],"answer":"から"}]},
+]
+
+_GRAMMAR_MAP = {g["id"]: g for g in _GRAMMAR_POINTS}
+
+
+def get_grammar_path(level: str = "N5") -> List[Dict[str, Any]]:
+    return [g for g in _GRAMMAR_POINTS if g["level"] == level]
+
+
+def get_grammar_point(point_id: str) -> Optional[Dict[str, Any]]:
+    return _GRAMMAR_MAP.get(point_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 10 — Reading Practice (5 short N5 texts)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_READING_TEXTS: List[Dict[str, Any]] = [
+    {"id":"morning","level":"N5","title":"朝のルーティン",
+     "title_translations":{"en":"Morning routine","es":"Rutina matinal","no":"Morgenrutine"},
+     "segments":[
+         {"jp":"私は","kana":"わたしは","words":[{"w":"私","k":"わたし","m":"I"},{"w":"は","k":"は","m":"(topic)"}]},
+         {"jp":"毎朝","kana":"まいあさ","words":[{"w":"毎朝","k":"まいあさ","m":"every morning"}]},
+         {"jp":"七時に","kana":"しちじに","words":[{"w":"七時","k":"しちじ","m":"7 o'clock"},{"w":"に","k":"に","m":"at"}]},
+         {"jp":"起きます。","kana":"おきます","words":[{"w":"起きます","k":"おきます","m":"get up"}]},
+         {"jp":"そして","kana":"そして","words":[{"w":"そして","k":"そして","m":"and then"}]},
+         {"jp":"コーヒーを","kana":"コーヒーを","words":[{"w":"コーヒー","k":"コーヒー","m":"coffee"},{"w":"を","k":"を","m":"(object)"}]},
+         {"jp":"飲みます。","kana":"のみます","words":[{"w":"飲みます","k":"のみます","m":"drink"}]},
+     ],
+     "translation":{"en":"I get up at 7 every morning. Then I drink coffee.",
+                    "es":"Me levanto a las 7 todas las mañanas. Después bebo café.",
+                    "no":"Jeg står opp klokken 7 hver morgen. Så drikker jeg kaffe."},
+     "questions":[{"q":{"en":"What time do I get up?","es":"¿A qué hora me levanto?","no":"Når står jeg opp?"},
+                   "a":{"en":"7 o'clock","es":"A las 7","no":"Klokken 7"}}]},
+
+    {"id":"school","level":"N5","title":"学校",
+     "title_translations":{"en":"School","es":"La escuela","no":"Skolen"},
+     "segments":[
+         {"jp":"学校は","kana":"がっこうは","words":[{"w":"学校","k":"がっこう","m":"school"},{"w":"は","k":"は","m":"(topic)"}]},
+         {"jp":"駅から","kana":"えきから","words":[{"w":"駅","k":"えき","m":"station"},{"w":"から","k":"から","m":"from"}]},
+         {"jp":"近いです。","kana":"ちかいです","words":[{"w":"近い","k":"ちかい","m":"near"},{"w":"です","k":"です","m":"(copula)"}]},
+         {"jp":"友達と","kana":"ともだちと","words":[{"w":"友達","k":"ともだち","m":"friend"},{"w":"と","k":"と","m":"with"}]},
+         {"jp":"歩いて","kana":"あるいて","words":[{"w":"歩いて","k":"あるいて","m":"walk (て-form)"}]},
+         {"jp":"行きます。","kana":"いきます","words":[{"w":"行きます","k":"いきます","m":"go"}]},
+     ],
+     "translation":{"en":"The school is close to the station. I walk there with a friend.",
+                    "es":"La escuela está cerca de la estación. Voy andando con un amigo.",
+                    "no":"Skolen ligger nær stasjonen. Jeg går dit sammen med en venn."},
+     "questions":[{"q":{"en":"How do I go to school?","es":"¿Cómo voy a la escuela?","no":"Hvordan kommer jeg til skolen?"},
+                   "a":{"en":"Walking with a friend","es":"Andando con un amigo","no":"Til fots med en venn"}}]},
+
+    {"id":"hobby","level":"N5","title":"趣味",
+     "title_translations":{"en":"Hobbies","es":"Aficiones","no":"Hobby"},
+     "segments":[
+         {"jp":"私の","kana":"わたしの","words":[{"w":"私","k":"わたし","m":"I"},{"w":"の","k":"の","m":"(possessive)"}]},
+         {"jp":"趣味は","kana":"しゅみは","words":[{"w":"趣味","k":"しゅみ","m":"hobby"},{"w":"は","k":"は","m":"(topic)"}]},
+         {"jp":"漫画を","kana":"まんがを","words":[{"w":"漫画","k":"まんが","m":"manga"},{"w":"を","k":"を","m":"(object)"}]},
+         {"jp":"読む","kana":"よむ","words":[{"w":"読む","k":"よむ","m":"to read"}]},
+         {"jp":"ことです。","kana":"ことです","words":[{"w":"こと","k":"こと","m":"act of"},{"w":"です","k":"です","m":"(copula)"}]},
+     ],
+     "translation":{"en":"My hobby is reading manga.",
+                    "es":"Mi afición es leer manga.",
+                    "no":"Hobbyen min er å lese manga."},
+     "questions":[{"q":{"en":"What is my hobby?","es":"¿Cuál es mi afición?","no":"Hva er hobbyen min?"},
+                   "a":{"en":"Reading manga","es":"Leer manga","no":"Å lese manga"}}]},
+
+    {"id":"food","level":"N5","title":"好きな食べ物",
+     "title_translations":{"en":"Favourite food","es":"Comida favorita","no":"Yndlingsmat"},
+     "segments":[
+         {"jp":"私は","kana":"わたしは","words":[{"w":"私","k":"わたし","m":"I"},{"w":"は","k":"は","m":"(topic)"}]},
+         {"jp":"寿司が","kana":"すしが","words":[{"w":"寿司","k":"すし","m":"sushi"},{"w":"が","k":"が","m":"(subject)"}]},
+         {"jp":"大好きです。","kana":"だいすきです","words":[{"w":"大好き","k":"だいすき","m":"love (favourite)"},{"w":"です","k":"です","m":"(copula)"}]},
+         {"jp":"特に","kana":"とくに","words":[{"w":"特に","k":"とくに","m":"especially"}]},
+         {"jp":"マグロが","kana":"マグロが","words":[{"w":"マグロ","k":"マグロ","m":"tuna"},{"w":"が","k":"が","m":"(subject)"}]},
+         {"jp":"好きです。","kana":"すきです","words":[{"w":"好き","k":"すき","m":"like"},{"w":"です","k":"です","m":"(copula)"}]},
+     ],
+     "translation":{"en":"I love sushi. I especially like tuna.",
+                    "es":"Me encanta el sushi. Especialmente me gusta el atún.",
+                    "no":"Jeg elsker sushi. Spesielt liker jeg tunfisk."},
+     "questions":[{"q":{"en":"Which sushi do I like most?","es":"¿Qué tipo de sushi me gusta más?","no":"Hvilken sushi liker jeg best?"},
+                   "a":{"en":"Tuna","es":"Atún","no":"Tunfisk"}}]},
+
+    {"id":"weekend","level":"N5","title":"週末",
+     "title_translations":{"en":"Weekend","es":"Fin de semana","no":"Helg"},
+     "segments":[
+         {"jp":"週末は","kana":"しゅうまつは","words":[{"w":"週末","k":"しゅうまつ","m":"weekend"},{"w":"は","k":"は","m":"(topic)"}]},
+         {"jp":"家で","kana":"いえで","words":[{"w":"家","k":"いえ","m":"home"},{"w":"で","k":"で","m":"at"}]},
+         {"jp":"休みます。","kana":"やすみます","words":[{"w":"休みます","k":"やすみます","m":"rest"}]},
+         {"jp":"映画を","kana":"えいがを","words":[{"w":"映画","k":"えいが","m":"movie"},{"w":"を","k":"を","m":"(object)"}]},
+         {"jp":"見たり、","kana":"みたり","words":[{"w":"見たり","k":"みたり","m":"watch (and so on)"}]},
+         {"jp":"本を読んだり","kana":"ほんをよんだり","words":[{"w":"本","k":"ほん","m":"book"},{"w":"読んだり","k":"よんだり","m":"read (and so on)"}]},
+         {"jp":"します。","kana":"します","words":[{"w":"します","k":"します","m":"do"}]},
+     ],
+     "translation":{"en":"On weekends I rest at home. I watch movies, read books, and so on.",
+                    "es":"Los fines de semana descanso en casa. Veo películas, leo libros y cosas así.",
+                    "no":"I helgene hviler jeg hjemme. Jeg ser filmer, leser bøker og lignende."},
+     "questions":[{"q":{"en":"Where do I rest on weekends?","es":"¿Dónde descanso los fines de semana?","no":"Hvor hviler jeg i helgene?"},
+                   "a":{"en":"At home","es":"En casa","no":"Hjemme"}}]},
+]
+
+_READING_MAP = {r["id"]: r for r in _READING_TEXTS}
+
+
+def get_reading_texts() -> List[Dict[str, Any]]:
+    # Return lightweight list for picker
+    return [{"id": r["id"], "title": r["title"],
+             "title_translations": r["title_translations"], "level": r["level"]}
+            for r in _READING_TEXTS]
+
+
+def get_reading_text(text_id: str) -> Optional[Dict[str, Any]]:
+    return _READING_MAP.get(text_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 11 — Speaking Lab phrases
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_SPEAKING_PHRASES: List[Dict[str, Any]] = [
+    {"id":"sp1","jp":"こんにちは。","kana":"こんにちは。","romaji":"konnichiwa.",
+     "translations":{"en":"Hello.","es":"Hola.","no":"Hallo."},"level":"N5","tag":"greeting"},
+    {"id":"sp2","jp":"おはようございます。","kana":"おはようございます。","romaji":"ohayou gozaimasu.",
+     "translations":{"en":"Good morning.","es":"Buenos días.","no":"God morgen."},"level":"N5","tag":"greeting"},
+    {"id":"sp3","jp":"ありがとうございます。","kana":"ありがとうございます。","romaji":"arigatou gozaimasu.",
+     "translations":{"en":"Thank you.","es":"Gracias.","no":"Takk."},"level":"N5","tag":"essential"},
+    {"id":"sp4","jp":"すみません。","kana":"すみません。","romaji":"sumimasen.",
+     "translations":{"en":"Excuse me / Sorry.","es":"Disculpa / Perdón.","no":"Unnskyld."},"level":"N5","tag":"essential"},
+    {"id":"sp5","jp":"私はイグナシオです。","kana":"わたしはイグナシオです。","romaji":"watashi wa Igunashio desu.",
+     "translations":{"en":"I am Ignacio.","es":"Soy Ignacio.","no":"Jeg er Ignacio."},"level":"N5","tag":"intro"},
+    {"id":"sp6","jp":"日本語を勉強しています。","kana":"にほんごをべんきょうしています。","romaji":"nihongo wo benkyou shite imasu.",
+     "translations":{"en":"I am studying Japanese.","es":"Estoy estudiando japonés.","no":"Jeg studerer japansk."},"level":"N5","tag":"intro"},
+    {"id":"sp7","jp":"水をください。","kana":"みずをください。","romaji":"mizu wo kudasai.",
+     "translations":{"en":"Water, please.","es":"Agua, por favor.","no":"Vann, takk."},"level":"N5","tag":"request"},
+    {"id":"sp8","jp":"駅はどこですか？","kana":"えきはどこですか？","romaji":"eki wa doko desu ka?",
+     "translations":{"en":"Where is the station?","es":"¿Dónde está la estación?","no":"Hvor er stasjonen?"},"level":"N5","tag":"question"},
+    {"id":"sp9","jp":"今日はいい天気ですね。","kana":"きょうはいいてんきですね。","romaji":"kyou wa ii tenki desu ne.",
+     "translations":{"en":"Nice weather today, isn't it?","es":"Buen tiempo hoy, ¿verdad?","no":"Fint vær i dag, ikke sant?"},"level":"N5","tag":"smalltalk"},
+    {"id":"sp10","jp":"また明日。","kana":"またあした。","romaji":"mata ashita.",
+     "translations":{"en":"See you tomorrow.","es":"Hasta mañana.","no":"Vi ses i morgen."},"level":"N5","tag":"farewell"},
+]
+
+
+def get_speaking_phrases() -> List[Dict[str, Any]]:
+    return _SPEAKING_PHRASES
+
+
+async def speaking_attempt(phrase_id: str, transcript: str, user_id: str = DEFAULT_USER) -> Dict[str, Any]:
+    """Record a speaking attempt — the user self-grades via the UI for V2.
+    Backend just persists the transcript for later analysis."""
+    record = {
+        "user_id":    user_id,
+        "phrase_id":  phrase_id,
+        "transcript": transcript,
+        "at":         datetime.now(timezone.utc).isoformat(),
+    }
+    if _KANA_COL is not None:   # reuse kana DB conn; speaking has no dedicated collection in V2
+        try:
+            col = _KANA_COL.database.get_collection("japanese_speaking_attempts")
+            await col.insert_one(record)
+            return {"status": "ok", "persisted": True}
+        except Exception:
+            pass
+    return {"status": "ok", "persisted": False}

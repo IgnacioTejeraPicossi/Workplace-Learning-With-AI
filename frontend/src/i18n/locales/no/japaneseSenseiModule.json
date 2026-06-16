@@ -9,7 +9,10 @@
       "kana": "Kana-trener",
       "kanji": "Kanji-dojo",
       "conversation": "Samtale-sensei",
-      "vocabulary": "Ordforråd SRS"
+      "vocabulary": "Ordforråd SRS",
+      "grammar": "Grammatikk",
+      "reading": "Lesetrening",
+      "speaking": "Tale-lab"
     },
     "dashboard": {
       "title": "I dag",
@@ -106,6 +109,51 @@
       "tags": "Etiketter",
       "loading": "Laster SRS-deck…",
       "endOfSession": "Slutt på økt — bra jobbet!"
+    },
+    "grammar": {
+      "title": "Grammatikk-sti",
+      "subtitle": "Bunpro-inspirerte N5 grammatikkpunkter med forklaring, eksempler og mini-quiz",
+      "pattern": "Mønster",
+      "explanation": "Forklaring",
+      "examples": "Eksempler",
+      "commonMistake": "Vanlig feil",
+      "miniQuiz": "Mini-quiz",
+      "submit": "Send",
+      "next": "Neste punkt",
+      "correct": "✓ Riktig!",
+      "wrong": "✗ Feil — svaret er",
+      "loading": "Laster grammatikkpunkter…",
+      "of": "{{n}} av {{total}}"
+    },
+    "reading": {
+      "title": "Lesetrening",
+      "subtitle": "Korte N5-tekster med furigana, oversettelse og ord-for-ord nedbrytning",
+      "pickText": "Velg en tekst",
+      "furigana": "Furigana",
+      "translation": "Oversettelse",
+      "wordByWord": "Ord-for-ord",
+      "readAloud": "🔊 Les høyt",
+      "stopReading": "⏹ Stopp",
+      "questions": "Forståelse",
+      "showAnswer": "Vis svar",
+      "loading": "Laster tekst…"
+    },
+    "speaking": {
+      "title": "Tale-laboratorium",
+      "subtitle": "Øv på uttale med nettleserens innebygde tale-API-er",
+      "pickPhrase": "Frase",
+      "target": "Mål-frase",
+      "listenBtn": "🔊 Hør",
+      "stopBtn": "⏹ Stopp",
+      "recordBtn": "🎤 Ta opp",
+      "stopRecordBtn": "⏹ Stopp opptak",
+      "heard": "Det vi hørte",
+      "selfGrade": "Hvordan hørtes det ut?",
+      "goodMatch": "✓ Hørtes bra ut",
+      "tryAgain": "↻ Prøv igjen",
+      "noSupport": "Nettleseren din støtter ikke Web Speech API. Prøv Chrome eller Edge.",
+      "noMatchYet": "Trykk 🎤 Ta opp og si frasen…",
+      "loading": "Laster fraser…"
     },
     "common": {
       "loading": "Laster…",
