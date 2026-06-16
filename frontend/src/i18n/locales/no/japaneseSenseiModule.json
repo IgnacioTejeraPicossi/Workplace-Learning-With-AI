@@ -151,9 +151,12 @@
       "selfGrade": "Hvordan hørtes det ut?",
       "goodMatch": "✓ Hørtes bra ut",
       "tryAgain": "↻ Prøv igjen",
-      "noSupport": "Nettleseren din støtter ikke Web Speech API. Prøv Chrome eller Edge.",
+      "noSupport": "Nettleseren din støtter ikke talegjenkjenning (mikrofon). Prøv Chrome eller Edge.",
       "noMatchYet": "Trykk 🎤 Ta opp og si frasen…",
-      "loading": "Laster fraser…"
+      "loading": "Laster fraser…",
+      "voiceLabel": "Stemme",
+      "noJaVoice": "Ingen japansk stemme installert på dette systemet. For å aktivere innfødt uttale: Windows → Innstillinger → Tid og språk → Tale → Administrer stemmer → Legg til stemmer → Japansk.",
+      "noTTS": "Nettleseren din støtter ikke talesyntese."
     },
     "common": {
       "loading": "Laster…",

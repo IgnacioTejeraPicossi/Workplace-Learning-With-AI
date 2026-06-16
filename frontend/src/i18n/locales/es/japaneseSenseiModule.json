@@ -151,9 +151,12 @@
       "selfGrade": "¿Cómo sonó?",
       "goodMatch": "✓ Sonó bien",
       "tryAgain": "↻ Intentar de nuevo",
-      "noSupport": "Tu navegador no soporta Web Speech API. Prueba con Chrome o Edge.",
+      "noSupport": "Tu navegador no soporta reconocimiento de voz (micro). Prueba con Chrome o Edge.",
       "noMatchYet": "Pulsa 🎤 Grabar y di la frase…",
-      "loading": "Cargando frases…"
+      "loading": "Cargando frases…",
+      "voiceLabel": "Voz",
+      "noJaVoice": "No hay voz japonesa instalada en este sistema. Para activar pronunciación nativa: Windows → Configuración → Hora e idioma → Voz → Administrar voces → Añadir voces → Japonés.",
+      "noTTS": "Tu navegador no soporta síntesis de voz."
     },
     "common": {
       "loading": "Cargando…",

@@ -151,9 +151,12 @@
       "selfGrade": "How did it sound?",
       "goodMatch": "✓ Sounds good",
       "tryAgain": "↻ Try again",
-      "noSupport": "Your browser does not support Web Speech API. Try Chrome or Edge.",
+      "noSupport": "Your browser does not support voice recognition (mic). Try Chrome or Edge.",
       "noMatchYet": "Press 🎤 Record and say the phrase…",
-      "loading": "Loading phrases…"
+      "loading": "Loading phrases…",
+      "voiceLabel": "Voice",
+      "noJaVoice": "No Japanese voice installed on this system. To enable native pronunciation: Windows → Settings → Time & Language → Speech → Manage voices → Add voices → Japanese.",
+      "noTTS": "Your browser does not support speech synthesis."
     },
     "common": {
       "loading": "Loading…",

@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useJapaneseTTS } from './useJapaneseTTS';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const toLang = (lng) => lng === 'es' ? 'es' : lng === 'no' ? 'no' : 'en';
@@ -802,7 +803,8 @@ const TabReading = () => {
   const [showTranslation, setShowTranslation] = useState(false);
   const [showWordByWord, setShowWordByWord]   = useState(false);
   const [revealedAnswer, setRevealedAnswer]   = useState({});
-  const [speaking, setSpeaking] = useState(false);
+  const tts = useJapaneseTTS();
+  const speaking = tts.speaking;
 
   useEffect(() => {
     fetch(`${API_BASE}/api/japanese/reading/texts`)
@@ -824,18 +826,11 @@ const TabReading = () => {
   const lang = toLang(i18n.language);
 
   const readAloud = () => {
-    if (!doc || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+    if (!doc) return;
     const text = doc.segments.map((s) => s.jp).join('');
-    const u = new window.SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP'; u.rate = 0.85;
-    u.onend = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(u);
+    tts.speak(text);
   };
-  const stopReading = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  const stopReading = () => tts.stop();
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: 920, margin: '0 auto' }}>
@@ -869,12 +864,18 @@ const TabReading = () => {
           <input type="checkbox" checked={showWordByWord}  onChange={(e) => setShowWordByWord(e.target.checked)}  style={{ accentColor: COLORS.accent }} />
           {t('japaneseSenseiModule.reading.wordByWord')}
         </label>
-        {('speechSynthesis' in window) && (
+        {tts.supported && (
           <Button onClick={speaking ? stopReading : readAloud}>
             {speaking ? t('japaneseSenseiModule.reading.stopReading') : t('japaneseSenseiModule.reading.readAloud')}
           </Button>
         )}
       </div>
+      {tts.supported && !tts.jaVoice && tts.voices.length > 0 && (
+        <div style={{ background: COLORS.goldLight, border: `1px solid ${COLORS.goldBorder}`, borderLeft: `4px solid ${COLORS.gold}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: '#78350f' }}>
+          ⚠ {t('japaneseSenseiModule.speaking.noJaVoice')}
+        </div>
+      )}
 
       {!doc ? <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('japaneseSenseiModule.reading.loading')}</p> : (
         <>
@@ -943,13 +944,15 @@ const TabSpeaking = () => {
   const { t, i18n } = useTranslation();
   const [phrases, setPhrases] = useState([]);
   const [idx, setIdx]         = useState(0);
-  const [speaking, setSpeaking]   = useState(false);
   const [recording, setRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef(null);
 
-  // Capability detection
-  const hasTTS = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  // Robust TTS hook (handles voice loading + missing-voice detection)
+  const tts = useJapaneseTTS();
+  const hasTTS = tts.supported;
+
+  // ASR capability detection (separate from TTS)
   const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
   const hasASR = !!SpeechRecognition;
 
@@ -960,24 +963,15 @@ const TabSpeaking = () => {
   }, []);
 
   useEffect(() => () => {
-    window.speechSynthesis?.cancel();
     try { recognitionRef.current?.stop(); } catch {}
   }, []);
 
   const phrase = phrases[idx];
   const lang   = toLang(i18n.language);
 
-  const listen = () => {
-    if (!phrase || !hasTTS) return;
-    window.speechSynthesis.cancel();
-    const u = new window.SpeechSynthesisUtterance(phrase.jp);
-    u.lang = 'ja-JP'; u.rate = 0.85;
-    u.onend   = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(u);
-  };
-  const stopListen = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
+  const listen      = () => phrase && tts.speak(phrase.jp);
+  const stopListen  = () => tts.stop();
+  const speaking    = tts.speaking;
 
   const record = () => {
     if (!hasASR) return;
@@ -1017,8 +1011,25 @@ const TabSpeaking = () => {
 
       {!hasASR && (
         <div style={{ background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`, borderLeft: `4px solid ${COLORS.accent}`,
-                       borderRadius: 10, padding: '10px 14px', marginBottom: 18, fontSize: 12, color: '#7f1d1d' }}>
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#7f1d1d' }}>
           ⚠ {t('japaneseSenseiModule.speaking.noSupport')}
+        </div>
+      )}
+      {hasTTS && !tts.jaVoice && tts.voices.length > 0 && (
+        <div style={{ background: COLORS.goldLight, border: `1px solid ${COLORS.goldBorder}`, borderLeft: `4px solid ${COLORS.gold}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#78350f' }}>
+          ⚠ {t('japaneseSenseiModule.speaking.noJaVoice')}
+        </div>
+      )}
+      {!hasTTS && (
+        <div style={{ background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`, borderLeft: `4px solid ${COLORS.accent}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#7f1d1d' }}>
+          ⚠ {t('japaneseSenseiModule.speaking.noTTS')}
+        </div>
+      )}
+      {hasTTS && tts.jaVoice && (
+        <div style={{ marginBottom: 12, fontSize: 11, color: COLORS.inkSoft }}>
+          🔊 {t('japaneseSenseiModule.speaking.voiceLabel')}: <span style={{ fontFamily: 'monospace', color: COLORS.ink }}>{tts.jaVoice.name}</span> <span style={{ color: COLORS.gold }}>({tts.jaVoice.lang})</span>
         </div>
       )}
 
@@ -1044,9 +1055,16 @@ const TabSpeaking = () => {
             <p style={{ fontSize: 13, color: COLORS.ink }}>{phrase.translations?.[lang] || phrase.translations?.en}</p>
             {hasTTS && (
               <div style={{ marginTop: 16 }}>
-                <Button onClick={speaking ? stopListen : listen}>
+                <Button onClick={speaking ? stopListen : listen}
+                        style={!tts.jaVoice ? { opacity: 0.7 } : {}}>
                   {speaking ? t('japaneseSenseiModule.speaking.stopBtn') : t('japaneseSenseiModule.speaking.listenBtn')}
                 </Button>
+                {tts.status === 'no-voice' && (
+                  <p style={{ marginTop: 8, fontSize: 11, color: COLORS.gold }}>⚠ {t('japaneseSenseiModule.speaking.noJaVoice')}</p>
+                )}
+                {tts.status === 'error' && (
+                  <p style={{ marginTop: 8, fontSize: 11, color: COLORS.accent }}>⚠ {t('japaneseSenseiModule.common.error')}</p>
+                )}
               </div>
             )}
           </Card>
