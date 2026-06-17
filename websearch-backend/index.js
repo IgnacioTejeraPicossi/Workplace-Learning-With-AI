@@ -32,7 +32,7 @@ app.post('/web-search', async (req, res) => {
     // Try to use web search tool if available
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-5.4-mini",
         messages: [
           {
             role: "user",
@@ -70,16 +70,17 @@ app.post('/web-search', async (req, res) => {
     } catch (webSearchError) {
       console.log('Web search failed, falling back to standard response:', webSearchError.message);
       
-      // Fallback to standard GPT response
+      // Fallback to standard GPT response.
+      // NB: GPT-5 family uses `max_completion_tokens` (not `max_tokens`).
       const fallbackResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-5.4-mini",
         messages: [
           {
             role: "user",
             content: `Please provide a comprehensive answer to: ${query}. If this is about current events or recent information, please note that I may not have the most up-to-date information.`
           }
         ],
-        max_tokens: 1000
+        max_completion_tokens: 1000
       });
 
       return res.json({

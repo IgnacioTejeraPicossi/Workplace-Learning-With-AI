@@ -259,7 +259,7 @@ export async function generateVideoSummaryNoAuth(transcript) {
   return response.json();
 }
 
-export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {
+export async function askStream({ prompt, messages, model = "gpt-5.4-mini", max_tokens = 512 }, onData) {
   const response = await fetchWithAuth(`${API_BASE}/llm-stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

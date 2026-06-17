@@ -670,7 +670,7 @@ const RunTest = () => {
             case '/llm-stream':
               testData = { 
                 messages: [{ role: 'user', content: 'test message' }],
-                model: 'gpt-4',
+                model: 'gpt-5.4-mini',
                 max_tokens: 100
               };
               break;
@@ -1199,7 +1199,7 @@ const RunTest = () => {
                   { role: 'assistant', content: 'Hi there.', meta: {} }
                 ],
                 sources: [],
-                meta: { model: 'gpt-4', temperature: 0.7 }
+                meta: { model: 'gpt-5.4-mini', temperature: 0.7 }
               };
               break;
             case '/api/robomind/therapy':

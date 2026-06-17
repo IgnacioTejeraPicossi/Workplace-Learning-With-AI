@@ -71,10 +71,11 @@ class LLMClient:
                 if openai_key and openai_key.strip():
                     openai.api_key = openai_key
                     
+                    # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                     response = openai.chat.completions.create(
-                        model="gpt-3.5-turbo",
+                        model="gpt-5.4-nano",
                         messages=[{"role": "user", "content": prompt}],
-                        max_tokens=800,
+                        max_completion_tokens=800,
                         temperature=0.2
                     )
                     return response.choices[0].message.content.strip()

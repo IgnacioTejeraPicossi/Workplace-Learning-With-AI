@@ -78,7 +78,7 @@ const EnhancedRobomindClinic = () => {
         body: JSON.stringify({
           turns: turns,
           sources: [],
-          meta: { model: 'gpt-4', temperature: 0.7 }
+          meta: { model: 'gpt-5.4-mini', temperature: 0.7 }
         }),
       });
 
@@ -113,7 +113,7 @@ const EnhancedRobomindClinic = () => {
         body: JSON.stringify({
           profile: screeningResult,
           target_issue: targetIssue,
-          context: { model: 'gpt-4', temperature: 0.7 }
+          context: { model: 'gpt-5.4-mini', temperature: 0.7 }
         }),
       });
 
@@ -151,7 +151,7 @@ const EnhancedRobomindClinic = () => {
         body: JSON.stringify({
           input_prompt: inputPrompt,
           plan: plan,
-          meta: { model: 'gpt-4', temperature: 0.7 }
+          meta: { model: 'gpt-5.4-mini', temperature: 0.7 }
         }),
       });
 

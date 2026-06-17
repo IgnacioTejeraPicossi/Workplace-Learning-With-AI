@@ -136,8 +136,9 @@ export default function PromptLabWithClinic() {
             }}
           >
             <option value="qwen2.5-7b-instruct">Qwen2.5 7B</option>
-            <option value="gpt-4">GPT-4</option>
-            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            <option value="gpt-5.5">GPT-5.5</option>
+            <option value="gpt-5.4-mini">GPT-5.4 mini</option>
+            <option value="gpt-5.4-nano">GPT-5.4 nano</option>
           </select>
         </div>
 

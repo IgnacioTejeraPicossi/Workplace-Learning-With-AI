@@ -177,10 +177,11 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                 openai.api_key = openrouter_key
                 openai.api_base = "https://openrouter.ai/api/v1"
                 
+                # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                 response = openai.chat.completions.create(
-                    model="openai/gpt-3.5-turbo",
+                    model="openai/gpt-5.4-nano",
                     messages=messages,
-                    max_tokens=prompt_run.max_tokens,
+                    max_completion_tokens=prompt_run.max_tokens,
                     temperature=prompt_run.temperature
                 )
                 
@@ -191,7 +192,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                         "success": True,
                         "response": completion_text,
                         "ai_provider": "OpenRouter",
-                        "model": "gpt-3.5-turbo",
+                        "model": "gpt-5.4-nano",
                         "safety_check": "PASSED",
                         "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
                     }
@@ -206,13 +207,14 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                 openai.api_key = openai_key
                 openai.api_base = "https://api.openai.com/v1"
                 
+                # GPT-5 family uses `max_completion_tokens` (not `max_tokens`)
                 response = openai.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-5.4-nano",
                     messages=messages,
-                    max_tokens=prompt_run.max_tokens,
+                    max_completion_tokens=prompt_run.max_tokens,
                     temperature=prompt_run.temperature
                 )
-                
+
                 completion_text = response.choices[0].message.content.strip()
                 if completion_text and not completion_text.startswith("[MOCKED RESPONSE"):
                     print("✅ OpenAI successful")
@@ -220,7 +222,7 @@ async def run_prompt_with_apiconfig(payload: Dict[str, Any]):
                         "success": True,
                         "response": completion_text,
                         "ai_provider": "OpenAI",
-                        "model": "gpt-3.5-turbo",
+                        "model": "gpt-5.4-nano",
                         "safety_check": "PASSED",
                         "quality_score": min(100, max(0, len(completion_text.strip()) * 2))
                     }

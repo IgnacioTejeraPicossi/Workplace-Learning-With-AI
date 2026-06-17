@@ -33,12 +33,13 @@ async def test_api_connection(request: APITestRequest):
             if not request.openaiKey:
                 raise HTTPException(status_code=400, detail="OpenAI API key is required")
             
-            # Test OpenAI
+            # Test OpenAI — use lightest current-gen model for cheap connectivity check.
+            # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             openai.api_key = request.openaiKey
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-5.4-nano",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenAI API is working correctly.'"}],
-                max_tokens=50
+                max_completion_tokens=50
             )
             
             return {
@@ -59,10 +60,12 @@ async def test_api_connection(request: APITestRequest):
             openrouter.api_key = request.openrouterKey
             openrouter.api_base = "https://openrouter.ai/api/v1"
             
+            # OpenRouter naming: "openai/<model>" — use cheapest current-gen for connectivity check.
+            # NB: GPT-5 family expects `max_completion_tokens` (not `max_tokens`).
             response = openrouter.ChatCompletion.create(
-                model="openai/gpt-3.5-turbo",
+                model="openai/gpt-5.4-nano",
                 messages=[{"role": "user", "content": "Hello! Please respond with 'OpenRouter API is working correctly.'"}],
-                max_tokens=50
+                max_completion_tokens=50
             )
             
             return {

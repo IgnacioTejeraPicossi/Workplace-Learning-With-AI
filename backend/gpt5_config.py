@@ -10,18 +10,27 @@ This file contains configuration for the new GPT-5 models and their optimal use 
 import os
 
 # Optional overrides (set in your environment or .env)
+# Defaults updated 2026-06-17 to reflect the OpenAI deprecation notice of
+# 2026-06-11 (older GPT-5 / o3 snapshots removed from API on 2026-12-11).
+# Replacements per OpenAI's own table:
+#   gpt-5-2025-08-07       -> gpt-5.5
+#   gpt-5-mini-2025-08-07  -> gpt-5.4-mini
+#   gpt-5-nano-2025-08-07  -> gpt-5.4-nano
+#   gpt-5-pro-2025-10-06   -> gpt-5.5-pro
+#   o3-2025-04-16          -> gpt-5.5
+#   o3-pro-2025-06-10      -> gpt-5.5-pro
 # Examples:
-#   OPENAI_HIGH_MODEL=gpt-5.2
-#   OPENAI_MEDIUM_MODEL=gpt-4o-mini
-#   OPENAI_LOW_MODEL=gpt-3.5-turbo
-OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-5.2"
-OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-4o-mini"
-OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-3.5-turbo"
+#   OPENAI_HIGH_MODEL=gpt-5.5
+#   OPENAI_MEDIUM_MODEL=gpt-5.4-mini
+#   OPENAI_LOW_MODEL=gpt-5.4-nano
+OPENAI_HIGH_MODEL = os.getenv("OPENAI_HIGH_MODEL", "").strip() or "gpt-5.5"
+OPENAI_MEDIUM_MODEL = os.getenv("OPENAI_MEDIUM_MODEL", "").strip() or "gpt-5.4-mini"
+OPENAI_LOW_MODEL = os.getenv("OPENAI_LOW_MODEL", "").strip() or "gpt-5.4-nano"
 
 # GPT-5 Model Variants
 GPT5_MODELS = {
     "gpt-5": {
-        # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-5.2
+        # High complexity model (override via OPENAI_HIGH_MODEL). Default: gpt-5.5
         "name": OPENAI_HIGH_MODEL,
         "description": "Most powerful model, best for complex reasoning and analysis",
         "use_cases": [
@@ -35,7 +44,7 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-mini": {
-        # Medium complexity model (override via OPENAI_MEDIUM_MODEL). Default: gpt-4o-mini
+        # Medium complexity model (override via OPENAI_MEDIUM_MODEL). Default: gpt-5.4-mini
         "name": OPENAI_MEDIUM_MODEL,
         "description": "Balanced performance and cost, good for most tasks",
         "use_cases": [
@@ -49,7 +58,7 @@ GPT5_MODELS = {
         "temperature": 0.7
     },
     "gpt-5-nano": {
-        # Low complexity model (override via OPENAI_LOW_MODEL). Default: gpt-3.5-turbo
+        # Low complexity model (override via OPENAI_LOW_MODEL). Default: gpt-5.4-nano
         "name": OPENAI_LOW_MODEL,
         "description": "Fastest and most cost-effective, good for simple tasks",
         "use_cases": [

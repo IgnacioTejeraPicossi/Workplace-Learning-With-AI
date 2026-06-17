@@ -563,14 +563,16 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
             "invalid model",
         ])
 
-        fallback_model = "gpt-4o"
+        # Fallback default updated 2026-06-17 (OpenAI deprecation 2026-12-11):
+        # gpt-4o → gpt-5.4-mini (per OpenAI's recommended replacement table)
+        fallback_model = "gpt-5.4-mini"
         if likely_model_issue and model_to_use != fallback_model:
             try:
                 print(f"[ask_openai] ↩️ Retrying with fallback model='{fallback_model}'")
-                # For fallback, ensure params are normalized for gpt-4o (uses max_tokens)
+                # For fallback, ensure params are normalized for gpt-5.4-mini (uses max_tokens)
                 fallback_params = params.copy()
                 if "max_completion_tokens" in fallback_params:
-                    # Convert back to max_tokens for gpt-4o
+                    # Convert back to max_tokens for gpt-5.4-mini
                     fallback_params["max_tokens"] = fallback_params.pop("max_completion_tokens")
                 original_params = params
                 params = fallback_params
