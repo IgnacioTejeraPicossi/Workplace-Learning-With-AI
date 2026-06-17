@@ -12,7 +12,8 @@
       "vocabulary": "Ordforråd SRS",
       "grammar": "Grammatikk",
       "reading": "Lesetrening",
-      "speaking": "Tale-lab"
+      "speaking": "Tale-lab",
+      "culture": "Kulturnotater"
     },
     "dashboard": {
       "title": "I dag",
@@ -157,6 +158,31 @@
       "voiceLabel": "Stemme",
       "noJaVoice": "Ingen japansk stemme installert på dette systemet. For å aktivere innfødt uttale: Windows → Innstillinger → Tid og språk → Tale → Administrer stemmer → Legg til stemmer → Japansk.",
       "noTTS": "Nettleseren din støtter ikke talesyntese."
+    },
+    "culture": {
+      "title": "Kulturnotater",
+      "subtitle": "Korte kulturelle innsikter knyttet til N5-nivå japansk — etikette, samfunn, popkultur og festivaler",
+      "loading": "Laster kulturnotater…",
+      "vocab": "Nøkkelord",
+      "didYouKnow": "Visste du?",
+      "category": "Kategori",
+      "categories": {
+        "etiquette": "Etikette",
+        "language": "Språk",
+        "pop_culture": "Popkultur",
+        "society": "Samfunn",
+        "festivals": "Festivaler",
+        "food": "Mat"
+      }
+    },
+    "kanjiStrokes": {
+      "play": "▶ Spill strøk",
+      "playing": "⏵ Spiller…",
+      "showAll": "Vis alle",
+      "numbers": "Tall",
+      "stroke": "Strøk",
+      "of": "{{n}} / {{total}}",
+      "credit": "Strøk © KanjiVG (CC BY-SA 3.0)"
     },
     "common": {
       "loading": "Laster…",

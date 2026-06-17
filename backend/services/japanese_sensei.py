@@ -135,6 +135,17 @@ _KANJI: List[Dict[str, Any]] = [
      "sentence":{"jp":"小さい猫です。","kana":"ちいさいねこです。","en":"It's a small cat."}},
 ]
 
+# KanjiVG codepoint mapping — lowercase 5-char hex, used by the frontend to fetch
+# /kanji-svg/<code>.svg for stroke-order animation.
+_KANJI_CODEPOINTS = {
+    "木":"06728","水":"06c34","火":"0706b","土":"0571f","金":"091d1",
+    "日":"065e5","月":"06708","人":"04eba","大":"05927","小":"05c0f",
+}
+
+# Inject codepoint into each kanji record
+for _k in _KANJI:
+    _k["codepoint"] = _KANJI_CODEPOINTS.get(_k["char"])
+
 _KANJI_MAP = {k["char"]: k for k in _KANJI}
 
 
@@ -839,6 +850,181 @@ _SPEAKING_PHRASES: List[Dict[str, Any]] = [
 
 def get_speaking_phrases() -> List[Dict[str, Any]]:
     return _SPEAKING_PHRASES
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 12 — Culture Notes (V3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_CULTURE_NOTES: List[Dict[str, Any]] = [
+    {"id":"bowing","emoji":"🙇","category":"etiquette",
+     "title":{"jp":"お辞儀","kana":"おじぎ","en":"Bowing","es":"La reverencia","no":"Bukking"},
+     "summary":{
+        "en":"Bowing replaces handshakes in Japan. Three depth levels signal three social registers: casual nod (~15°), polite (~30°), formal apology or deep respect (~45°). Eye contact during the bow is uncommon — looking down is the norm.",
+        "es":"La reverencia sustituye al apretón de manos en Japón. Tres niveles de profundidad marcan tres registros sociales: saludo casual (~15°), cortés (~30°), disculpa formal o respeto profundo (~45°). Mantener la mirada durante la reverencia es poco común — bajar la vista es lo habitual.",
+        "no":"Bukking erstatter håndhilsing i Japan. Tre dybdenivåer signaliserer tre sosiale registre: lett nikk (~15°), høflig (~30°), formell unnskyldning eller dyp respekt (~45°). Øyekontakt under bukk er uvanlig — å se ned er normen."},
+     "vocab":[{"word":"お辞儀","kana":"おじぎ","meaning":"bow"},
+              {"word":"挨拶","kana":"あいさつ","meaning":"greeting"},
+              {"word":"礼","kana":"れい","meaning":"courtesy / bow"}],
+     "didYouKnow":{
+        "en":"In business cards (名刺) exchange, bow while presenting the card with both hands — and never put it in your back pocket. Treat it like the person's face.",
+        "es":"En el intercambio de tarjetas de visita (名刺), inclínate al presentar la tarjeta con ambas manos — y nunca la metas en el bolsillo trasero. Trátala como la cara de la persona.",
+        "no":"Ved utveksling av visittkort (名刺), bukk mens du presenterer kortet med begge hender — og legg det aldri i baklomma. Behandle det som personens ansikt."}},
+
+    {"id":"honorifics","emoji":"🎓","category":"language",
+     "title":{"jp":"敬称","kana":"けいしょう","en":"Honorifics","es":"Sufijos honoríficos","no":"Æresbevisninger"},
+     "summary":{
+        "en":"Japanese names always carry a suffix. -さん (san) is the safe default for adults. -先生 (sensei) for teachers/doctors. -ちゃん (chan) for close friends and children. -くん (kun) for boys and male peers. Dropping the suffix entirely (called yobisute) is reserved for very close intimacy and can sound rude.",
+        "es":"Los nombres japoneses siempre llevan sufijo. -さん (san) es el seguro por defecto para adultos. -先生 (sensei) para profesores/médicos. -ちゃん (chan) para amigos cercanos y niños. -くん (kun) para chicos y compañeros varones. Omitir el sufijo (yobisute) se reserva para mucha intimidad y puede sonar grosero.",
+        "no":"Japanske navn har alltid en suffiks. -さん (san) er den trygge standarden for voksne. -先生 (sensei) for lærere/leger. -ちゃん (chan) for nære venner og barn. -くん (kun) for gutter og mannlige jevnaldrende. Å droppe suffiksen helt (yobisute) er forbeholdt svært nær intimitet og kan høres uhøflig ut."},
+     "vocab":[{"word":"さん","kana":"さん","meaning":"Mr./Ms. (default)"},
+              {"word":"先生","kana":"せんせい","meaning":"teacher/doctor"},
+              {"word":"様","kana":"さま","meaning":"very formal Mr./Ms."},
+              {"word":"ちゃん","kana":"ちゃん","meaning":"affectionate dim."},
+              {"word":"君","kana":"くん","meaning":"young male"}],
+     "didYouKnow":{
+        "en":"You never attach -san to your OWN name. 'I am Tanaka-san' would sound ridiculous — just say 'Tanaka desu'.",
+        "es":"Nunca pongas -san a tu propio nombre. 'Soy Tanaka-san' suena ridículo — di simplemente 'Tanaka desu'.",
+        "no":"Du fester aldri -san til ditt EGET navn. 'Jeg er Tanaka-san' ville høres latterlig ut — bare si 'Tanaka desu'."}},
+
+    {"id":"manga","emoji":"📚","category":"pop_culture",
+     "title":{"jp":"漫画とアニメ","kana":"まんがとアニメ","en":"Manga & Anime","es":"Manga y Anime","no":"Manga og anime"},
+     "summary":{
+        "en":"Manga (漫画) is read right-to-left, top-to-bottom — including individual panels and speech bubbles. Genres are heavily segmented by audience: 少年 (shōnen, young boys), 少女 (shōjo, young girls), 青年 (seinen, adult men), 女性 (josei, adult women). Most anime is a manga adaptation, so reading the source is the deeper experience.",
+        "es":"El manga (漫画) se lee de derecha a izquierda, de arriba a abajo — incluyendo viñetas individuales y bocadillos. Los géneros están muy segmentados por público: 少年 (shōnen, chicos jóvenes), 少女 (shōjo, chicas jóvenes), 青年 (seinen, hombres adultos), 女性 (josei, mujeres adultas). La mayoría del anime es adaptación de manga, así que leer la fuente es la experiencia más profunda.",
+        "no":"Manga (漫画) leses fra høyre til venstre, ovenfra og ned — inkludert enkeltruter og snakkebobler. Sjangrene er sterkt segmentert etter publikum: 少年 (shōnen, unge gutter), 少女 (shōjo, unge jenter), 青年 (seinen, voksne menn), 女性 (josei, voksne kvinner). Det meste av anime er en manga-tilpasning, så å lese kilden er den dypere opplevelsen."},
+     "vocab":[{"word":"漫画","kana":"まんが","meaning":"manga / comic"},
+              {"word":"アニメ","kana":"アニメ","meaning":"anime"},
+              {"word":"作家","kana":"さっか","meaning":"author"},
+              {"word":"連載","kana":"れんさい","meaning":"serialization"},
+              {"word":"巻","kana":"かん","meaning":"volume"}],
+     "didYouKnow":{
+        "en":"Manga magazines like Weekly Shōnen Jump are printed on cheap paper and read once before being discarded. The collected volumes (単行本 / tankōbon) on glossy paper are what you buy to keep.",
+        "es":"Las revistas de manga como Weekly Shōnen Jump se imprimen en papel barato y se leen una vez antes de tirarse. Los tomos recopilatorios (単行本 / tankōbon) en papel satinado son los que compras para conservar.",
+        "no":"Manga-blader som Weekly Shōnen Jump trykkes på billig papir og leses én gang før de kastes. De samlede bindene (単行本 / tankōbon) på glanset papir er det du kjøper for å beholde."}},
+
+    {"id":"food","emoji":"🍱","category":"etiquette",
+     "title":{"jp":"食事のマナー","kana":"しょくじのマナー","en":"Eating etiquette","es":"Modales en la mesa","no":"Bordskikker"},
+     "summary":{
+        "en":"Say いただきます (itadakimasu) before eating — a thank-you to everyone involved, from farmer to cook. Say ごちそうさまでした (gochisousama deshita) when finishing. Slurping noodles loudly is a compliment, not rude. Never stick chopsticks vertically in rice — that resembles funeral incense.",
+        "es":"Di いただきます (itadakimasu) antes de comer — un agradecimiento a todos los implicados, del agricultor al cocinero. Di ごちそうさまでした (gochisousama deshita) al terminar. Sorber los fideos ruidosamente es un cumplido, no es grosero. Nunca claves los palillos verticalmente en el arroz — recuerda al incienso funerario.",
+        "no":"Si いただきます (itadakimasu) før du spiser — en takk til alle involverte, fra bonde til kokk. Si ごちそうさまでした (gochisousama deshita) når du er ferdig. Å slurpe nudler høyt er en kompliment, ikke uhøflig. Stikk aldri spisepinner loddrett ned i risen — det ligner gravlys-røkelse."},
+     "vocab":[{"word":"いただきます","kana":"いただきます","meaning":"I gratefully receive"},
+              {"word":"ごちそうさま","kana":"ごちそうさま","meaning":"thanks for the meal"},
+              {"word":"箸","kana":"はし","meaning":"chopsticks"},
+              {"word":"お茶","kana":"おちゃ","meaning":"tea"},
+              {"word":"美味しい","kana":"おいしい","meaning":"delicious"}],
+     "didYouKnow":{
+        "en":"Tipping is not just unusual in Japan — it's often refused or returned politely. Good service is the baseline, not a bonus.",
+        "es":"Dejar propina no solo es raro en Japón — a menudo se rechaza o se devuelve cortésmente. Un buen servicio es lo normal, no un extra.",
+        "no":"Tips er ikke bare uvanlig i Japan — det blir ofte avvist eller høflig returnert. God service er normen, ikke en bonus."}},
+
+    {"id":"seasons","emoji":"🌸","category":"society",
+     "title":{"jp":"四季","kana":"しき","en":"The four seasons","es":"Las cuatro estaciones","no":"De fire årstidene"},
+     "summary":{
+        "en":"Japan's identity is deeply tied to its four sharply distinct seasons. Spring (春) brings cherry blossoms (桜 / sakura), summer (夏) festivals and humidity, autumn (秋) red leaves (紅葉 / kōyō), winter (冬) snow in the north and onsen culture. Many products, menus and conversations adapt to the season.",
+        "es":"La identidad de Japón está profundamente ligada a sus cuatro estaciones nítidamente diferenciadas. La primavera (春) trae los cerezos en flor (桜 / sakura), el verano (夏) festivales y humedad, el otoño (秋) hojas rojas (紅葉 / kōyō), el invierno (冬) nieve en el norte y cultura del onsen. Muchos productos, menús y conversaciones se adaptan a la estación.",
+        "no":"Japans identitet er dypt knyttet til de fire skarpt forskjellige årstidene. Vår (春) bringer kirsebærblomster (桜 / sakura), sommer (夏) festivaler og fuktighet, høst (秋) røde blader (紅葉 / kōyō), vinter (冬) snø i nord og onsen-kultur. Mange produkter, menyer og samtaler tilpasser seg årstiden."},
+     "vocab":[{"word":"春","kana":"はる","meaning":"spring"},
+              {"word":"夏","kana":"なつ","meaning":"summer"},
+              {"word":"秋","kana":"あき","meaning":"autumn"},
+              {"word":"冬","kana":"ふゆ","meaning":"winter"},
+              {"word":"季節","kana":"きせつ","meaning":"season"}],
+     "didYouKnow":{
+        "en":"Convenience stores rotate their entire snack section by season. Sakura-flavoured Kit Kats appear in March; sweet potato (さつまいも) takes over in October.",
+        "es":"Las tiendas konbini rotan toda su sección de snacks por estación. Los Kit Kats con sabor a sakura aparecen en marzo; el boniato (さつまいも) domina en octubre.",
+        "no":"Nærbutikker roterer hele snacks-seksjonen etter årstid. Sakura-Kit Kats dukker opp i mars; søtpotet (さつまいも) tar over i oktober."}},
+
+    {"id":"konbini","emoji":"🏪","category":"society",
+     "title":{"jp":"コンビニ","kana":"コンビニ","en":"Konbini culture","es":"La cultura konbini","no":"Nærbutikk-kultur"},
+     "summary":{
+        "en":"7-Eleven, Lawson and FamilyMart are not corner shops — they are micro-infrastructure. Open 24/7, they let you pay bills, withdraw cash, buy event tickets, ship packages, print documents, drink free coffee refills (sometimes), and eat genuinely good onigiri (rice balls). The おにぎり is a respected food category.",
+        "es":"7-Eleven, Lawson y FamilyMart no son tiendas de barrio — son microinfraestructura. Abiertas 24/7, te permiten pagar facturas, sacar efectivo, comprar entradas, enviar paquetes, imprimir documentos, beber café con refill gratis (a veces) y comer onigiri realmente buenos. El おにぎり es una categoría gastronómica respetada.",
+        "no":"7-Eleven, Lawson og FamilyMart er ikke kioskhjørner — de er mikroinfrastruktur. Åpne 24/7, lar de deg betale regninger, ta ut kontanter, kjøpe billetter, sende pakker, printe dokumenter, drikke gratis kaffepåfyll (noen ganger), og spise virkelig god onigiri (risballer). おにぎり er en respektert matkategori."},
+     "vocab":[{"word":"コンビニ","kana":"コンビニ","meaning":"convenience store"},
+              {"word":"おにぎり","kana":"おにぎり","meaning":"rice ball"},
+              {"word":"お弁当","kana":"おべんとう","meaning":"lunch box"},
+              {"word":"レジ","kana":"レジ","meaning":"cash register"},
+              {"word":"袋","kana":"ふくろ","meaning":"bag"}],
+     "didYouKnow":{
+        "en":"Konbini onigiri have a clever wrapper that keeps the nori (seaweed) separate from the rice until you unwrap — so it stays crisp. Pull the tab and the plastic peels off in two halves.",
+        "es":"Los onigiri de konbini tienen un envoltorio ingenioso que mantiene el nori (alga) separado del arroz hasta que abres — así sigue crujiente. Tira de la pestaña y el plástico se separa en dos mitades.",
+        "no":"Konbini-onigiri har en smart innpakning som holder nori (tang) atskilt fra risen til du pakker ut — så den forblir sprø. Trekk i fliken og plasten deles i to halvdeler."}},
+
+    {"id":"train","emoji":"🚆","category":"etiquette",
+     "title":{"jp":"電車のマナー","kana":"でんしゃのマナー","en":"Train etiquette","es":"Modales en el tren","no":"Togskikker"},
+     "summary":{
+        "en":"Trains are sacred quiet spaces. Phone calls are forbidden by social code — set your phone to silent mode (マナーモード / 'manner mode'). Don't eat (except on long-distance shinkansen). Form orderly queues at platform marks before doors open. Priority seats (優先席) are for elderly, pregnant or disabled — leave them empty even if you're tired.",
+        "es":"Los trenes son espacios sagrados de silencio. Las llamadas están prohibidas por código social — pon el móvil en silencio (マナーモード / 'manner mode'). No comas (excepto en shinkansen de larga distancia). Forma colas ordenadas en las marcas del andén antes de que abran las puertas. Los asientos preferentes (優先席) son para mayores, embarazadas o discapacitados — déjalos libres aunque estés cansado.",
+        "no":"Tog er hellige stillesoner. Telefonsamtaler er forbudt etter sosial kode — sett mobilen på lydløs (マナーモード / 'manner mode'). Ikke spis (unntatt på langdistanse-shinkansen). Form ordnede køer ved plattformmerkene før dørene åpnes. Prioritetsseter (優先席) er for eldre, gravide eller funksjonshemmede — la dem være tomme selv om du er sliten."},
+     "vocab":[{"word":"電車","kana":"でんしゃ","meaning":"train"},
+              {"word":"駅","kana":"えき","meaning":"station"},
+              {"word":"切符","kana":"きっぷ","meaning":"ticket"},
+              {"word":"優先席","kana":"ゆうせんせき","meaning":"priority seat"},
+              {"word":"乗り換え","kana":"のりかえ","meaning":"transfer"}],
+     "didYouKnow":{
+        "en":"Tokyo's busiest stations have 'pushers' (押し屋 / oshiya) during rush hour — uniformed staff whose job is to compress passengers into the train so doors can close.",
+        "es":"Las estaciones más concurridas de Tokio tienen 'empujadores' (押し屋 / oshiya) en hora punta — personal uniformado cuyo trabajo es comprimir a los pasajeros en el tren para que cierren las puertas.",
+        "no":"Tokyos travleste stasjoner har 'dyttere' (押し屋 / oshiya) i rushtiden — uniformerte ansatte hvis jobb er å komprimere passasjerer inn i toget så dørene kan lukkes."}},
+
+    {"id":"matsuri","emoji":"🎆","category":"festivals",
+     "title":{"jp":"祭り","kana":"まつり","en":"Festivals (matsuri)","es":"Festivales (matsuri)","no":"Festivaler (matsuri)"},
+     "summary":{
+        "en":"Matsuri are seasonal festivals rooted in Shinto shrines. Each town has its own. You'll see portable shrines (神輿 / mikoshi) carried through streets, food stalls (屋台 / yatai), people in yukata cotton kimono, taiko drumming, and fireworks (花火 / hanabi). Summer fireworks festivals (花火大会) draw enormous crowds.",
+        "es":"Los matsuri son festivales estacionales arraigados en los santuarios shinto. Cada pueblo tiene el suyo. Verás santuarios portátiles (神輿 / mikoshi) cargados por las calles, puestos de comida (屋台 / yatai), gente en yukata (kimono de algodón), tambores taiko y fuegos artificiales (花火 / hanabi). Los festivales de fuegos de verano (花火大会) atraen multitudes enormes.",
+        "no":"Matsuri er sesongfestivaler rotfestet i shinto-helligdommer. Hver by har sin egen. Du vil se bærbare helligdommer (神輿 / mikoshi) båret gjennom gatene, matboder (屋台 / yatai), folk i yukata bomullskimono, taiko-trommer og fyrverkeri (花火 / hanabi). Sommerens fyrverkerifestivaler (花火大会) trekker enorme folkemengder."},
+     "vocab":[{"word":"祭り","kana":"まつり","meaning":"festival"},
+              {"word":"花火","kana":"はなび","meaning":"fireworks"},
+              {"word":"神社","kana":"じんじゃ","meaning":"shrine"},
+              {"word":"屋台","kana":"やたい","meaning":"food stall"},
+              {"word":"浴衣","kana":"ゆかた","meaning":"summer kimono"}],
+     "didYouKnow":{
+        "en":"The three biggest matsuri (日本三大祭) are Gion in Kyoto (July), Tenjin in Osaka (July) and Kanda in Tokyo (May). All draw over a million visitors each.",
+        "es":"Los tres mayores matsuri (日本三大祭) son Gion en Kioto (julio), Tenjin en Osaka (julio) y Kanda en Tokio (mayo). Cada uno atrae más de un millón de visitantes.",
+        "no":"De tre største matsuri (日本三大祭) er Gion i Kyoto (juli), Tenjin i Osaka (juli) og Kanda i Tokyo (mai). Hver av dem trekker over en million besøkende."}},
+
+    {"id":"hanami","emoji":"🌸","category":"festivals",
+     "title":{"jp":"花見","kana":"はなみ","en":"Hanami — cherry blossom viewing","es":"Hanami — contemplar los cerezos","no":"Hanami — kirsebærblomster-betraktning"},
+     "summary":{
+        "en":"Hanami is a centuries-old tradition: sitting under blooming cherry trees with friends, eating and drinking. The blossom season lasts only 7-10 days per location. National news broadcasts the 'cherry blossom front' (桜前線) moving north from Okinawa in January to Hokkaido in May. Companies send their youngest employees to reserve spots at dawn.",
+        "es":"Hanami es una tradición de siglos: sentarse bajo los cerezos en flor con amigos, comiendo y bebiendo. La floración dura solo 7-10 días por zona. Las noticias nacionales emiten el 'frente de la flor del cerezo' (桜前線) avanzando hacia el norte desde Okinawa en enero hasta Hokkaido en mayo. Las empresas envían a sus empleados más jóvenes a reservar sitio al amanecer.",
+        "no":"Hanami er en århundregammel tradisjon: å sitte under blomstrende kirsebærtrær med venner, spise og drikke. Blomstringssesongen varer bare 7-10 dager per sted. Riksnyhetene sender 'kirsebærblomster-fronten' (桜前線) som beveger seg nordover fra Okinawa i januar til Hokkaido i mai. Bedrifter sender sine yngste ansatte for å reservere plasser ved daggry."},
+     "vocab":[{"word":"花見","kana":"はなみ","meaning":"flower viewing"},
+              {"word":"桜","kana":"さくら","meaning":"cherry blossom"},
+              {"word":"満開","kana":"まんかい","meaning":"full bloom"},
+              {"word":"公園","kana":"こうえん","meaning":"park"},
+              {"word":"お弁当","kana":"おべんとう","meaning":"lunch box"}],
+     "didYouKnow":{
+        "en":"There's a related concept 'mono no aware' (物の哀れ) — a gentle sadness at the impermanence of beautiful things. Sakura embody it: their beauty is heightened by how briefly it lasts.",
+        "es":"Existe el concepto relacionado 'mono no aware' (物の哀れ) — una tristeza suave ante la transitoriedad de las cosas bellas. Los sakura lo encarnan: su belleza se intensifica por lo breve de su duración.",
+        "no":"Det finnes et beslektet konsept 'mono no aware' (物の哀れ) — en mild sorg over forgjengeligheten av vakre ting. Sakura legemliggjør det: deres skjønnhet forsterkes av hvor kort den varer."}},
+
+    {"id":"onsen","emoji":"♨️","category":"society",
+     "title":{"jp":"温泉","kana":"おんせん","en":"Onsen — hot springs","es":"Onsen — aguas termales","no":"Onsen — varme kilder"},
+     "summary":{
+        "en":"Japan has over 27,000 natural hot springs. Onsen etiquette: wash THOROUGHLY at the seated showers before entering the bath (the water is shared and must stay clean). Bathing is naked — towels stay on your head, not in the water. Most onsen still refuse tattoos due to historical yakuza associations, though this is slowly changing for tourists.",
+        "es":"Japón tiene más de 27.000 aguas termales naturales. Etiqueta del onsen: lávate A FONDO en las duchas sentadas antes de entrar al baño (el agua es compartida y debe permanecer limpia). El baño es desnudo — las toallas van en la cabeza, no en el agua. La mayoría de los onsen todavía rechazan los tatuajes por las asociaciones históricas con la yakuza, aunque esto cambia poco a poco para turistas.",
+        "no":"Japan har over 27 000 naturlige varme kilder. Onsen-etikette: vask deg GRUNDIG i sittedusjene før du går i badet (vannet er felles og må holdes rent). Bading er naken — håndklær blir på hodet, ikke i vannet. De fleste onsen avviser fortsatt tatoveringer på grunn av historiske yakuza-assosiasjoner, selv om dette sakte endrer seg for turister."},
+     "vocab":[{"word":"温泉","kana":"おんせん","meaning":"hot spring"},
+              {"word":"お風呂","kana":"おふろ","meaning":"bath"},
+              {"word":"タオル","kana":"タオル","meaning":"towel"},
+              {"word":"露天風呂","kana":"ろてんぶろ","meaning":"open-air bath"},
+              {"word":"旅館","kana":"りょかん","meaning":"traditional inn"}],
+     "didYouKnow":{
+        "en":"Some onsen towns provide yukata robes and wooden sandals so you can walk the streets between baths. The clip-clop of geta sandals on stone is one of the most distinctive sounds of a Japanese hot spring resort.",
+        "es":"Algunos pueblos onsen prestan yukata y sandalias de madera para que pasees entre baño y baño. El clip-clop de las geta sobre la piedra es uno de los sonidos más característicos de un resort de aguas termales japonés.",
+        "no":"Noen onsen-byer låner ut yukata-kapper og tresandaler så du kan gå i gatene mellom badene. Klipp-klappet av geta-sandaler på stein er en av de mest karakteristiske lydene fra et japansk varme-kilde-resort."}},
+]
+
+_CULTURE_MAP = {c["id"]: c for c in _CULTURE_NOTES}
+
+
+def get_culture_notes() -> List[Dict[str, Any]]:
+    return _CULTURE_NOTES
+
+
+def get_culture_note(note_id: str) -> Optional[Dict[str, Any]]:
+    return _CULTURE_MAP.get(note_id)
 
 
 async def speaking_attempt(phrase_id: str, transcript: str, user_id: str = DEFAULT_USER) -> Dict[str, Any]:

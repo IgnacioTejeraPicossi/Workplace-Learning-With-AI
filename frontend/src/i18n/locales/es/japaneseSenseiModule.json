@@ -12,7 +12,8 @@
       "vocabulary": "Vocabulario SRS",
       "grammar": "Gramática",
       "reading": "Lectura",
-      "speaking": "Laboratorio de Habla"
+      "speaking": "Laboratorio de Habla",
+      "culture": "Notas Culturales"
     },
     "dashboard": {
       "title": "Hoy",
@@ -157,6 +158,31 @@
       "voiceLabel": "Voz",
       "noJaVoice": "No hay voz japonesa instalada en este sistema. Para activar pronunciación nativa: Windows → Configuración → Hora e idioma → Voz → Administrar voces → Añadir voces → Japonés.",
       "noTTS": "Tu navegador no soporta síntesis de voz."
+    },
+    "culture": {
+      "title": "Notas Culturales",
+      "subtitle": "Breves píldoras culturales ligadas al japonés N5 — modales, sociedad, cultura pop y festivales",
+      "loading": "Cargando notas culturales…",
+      "vocab": "Vocabulario clave",
+      "didYouKnow": "¿Sabías que…?",
+      "category": "Categoría",
+      "categories": {
+        "etiquette": "Modales",
+        "language": "Idioma",
+        "pop_culture": "Cultura pop",
+        "society": "Sociedad",
+        "festivals": "Festivales",
+        "food": "Comida"
+      }
+    },
+    "kanjiStrokes": {
+      "play": "▶ Reproducir trazos",
+      "playing": "⏵ Reproduciendo…",
+      "showAll": "Mostrar todo",
+      "numbers": "Números",
+      "stroke": "Trazo",
+      "of": "{{n}} / {{total}}",
+      "credit": "Trazos © KanjiVG (CC BY-SA 3.0)"
     },
     "common": {
       "loading": "Cargando…",

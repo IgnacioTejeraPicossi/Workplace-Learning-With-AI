@@ -11,6 +11,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJapaneseTTS } from './useJapaneseTTS';
+import KanjiStrokeAnimation from './KanjiStrokeAnimation';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const toLang = (lng) => lng === 'es' ? 'es' : lng === 'no' ? 'no' : 'en';
@@ -78,11 +79,11 @@ const Button = ({ children, onClick, primary = false, disabled = false, style = 
   }}>{children}</button>
 );
 
-const Chip = ({ children, color = COLORS.accent, light = COLORS.accentLight, border = COLORS.accentBorder }) => (
+const Chip = ({ children, color = COLORS.accent, light = COLORS.accentLight, border = COLORS.accentBorder, style = {} }) => (
   <span style={{
     background: light, color, border: `1px solid ${border}`, borderRadius: 999,
     padding: '2px 9px', fontSize: 10, fontWeight: 700, letterSpacing: '0.04em',
-    display: 'inline-flex', alignItems: 'center',
+    display: 'inline-flex', alignItems: 'center', ...style,
   }}>{children}</span>
 );
 
@@ -366,10 +367,18 @@ const TabKanji = () => {
 
       {current && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 16 }}>
-          {/* Big character + strokes + JLPT */}
-          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: 28 }}>
-            <p style={{ fontSize: 180, lineHeight: 1, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 800 }}>{current.char}</p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+          {/* Big character + KanjiVG stroke animation + JLPT */}
+          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: 22 }}>
+            {current.codepoint ? (
+              <KanjiStrokeAnimation
+                code={current.codepoint}
+                size={220}
+                tokens={{ ink: COLORS.ink, accent: COLORS.accent, soft: COLORS.inkSoft, grid: COLORS.border }}
+              />
+            ) : (
+              <p style={{ fontSize: 180, lineHeight: 1, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 800 }}>{current.char}</p>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
               <Chip color={COLORS.gold} light={COLORS.goldLight} border={COLORS.goldBorder}>{current.jlpt}</Chip>
               <Chip>{t('japaneseSenseiModule.kanji.strokes')}: {current.strokes}</Chip>
             </div>
@@ -1098,6 +1107,121 @@ const TabSpeaking = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Culture Notes (V3)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabCulture = () => {
+  const { t, i18n } = useTranslation();
+  const [notes, setNotes]     = useState([]);
+  const [activeId, setActiveId] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/japanese/culture/notes`)
+      .then((r) => r.json())
+      .then((d) => {
+        setNotes(d.items || []);
+        if ((d.items || [])[0]) setActiveId(d.items[0].id);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const lang = toLang(i18n.language);
+  const cur  = notes.find((n) => n.id === activeId);
+
+  if (loading) return <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('japaneseSenseiModule.culture.loading')}</p>;
+
+  const categoryColors = {
+    etiquette:   { c: '#dc2626', l: '#fef2f2', b: '#fecaca' },
+    language:    { c: '#7c3aed', l: '#f5f3ff', b: '#ddd6fe' },
+    pop_culture: { c: '#2563eb', l: '#eff6ff', b: '#bfdbfe' },
+    society:     { c: '#0891b2', l: '#ecfeff', b: '#a5f3fc' },
+    festivals:   { c: '#d97706', l: '#fffbeb', b: '#fde68a' },
+    food:        { c: '#059669', l: '#ecfdf5', b: '#a7f3d0' },
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={9} label={t('japaneseSenseiModule.tabs.culture')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('japaneseSenseiModule.culture.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('japaneseSenseiModule.culture.subtitle')}</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16 }}>
+        {/* Notes list */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {notes.map((n) => {
+            const cat = categoryColors[n.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+            const isActive = n.id === activeId;
+            return (
+              <button key={n.id} onClick={() => setActiveId(n.id)} style={{
+                background: isActive ? cat.l : COLORS.card,
+                border: `1px solid ${isActive ? cat.b : COLORS.border}`,
+                borderLeft: `4px solid ${cat.c}`,
+                borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left',
+                fontFamily: 'inherit',
+              }}>
+                <span style={{ fontSize: 22 }}>{n.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 14, fontWeight: 800, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', margin: 0 }}>{n.title.jp}</p>
+                  <p style={{ fontSize: 11, color: cat.c, fontWeight: 700, margin: '2px 0 0' }}>{n.title[lang] || n.title.en}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Active note */}
+        {cur && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {(() => {
+              const cat = categoryColors[cur.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+              return <>
+                <Card accent={cat.c} style={{ background: cat.l, borderColor: cat.b }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                    <span style={{ fontSize: 38 }}>{cur.emoji}</span>
+                    <div>
+                      <p style={{ fontSize: 24, fontWeight: 900, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', margin: 0, lineHeight: 1.1 }}>{cur.title.jp}</p>
+                      <p style={{ fontSize: 12, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif', margin: '2px 0 0' }}>{cur.title.kana}</p>
+                    </div>
+                    <Chip color={cat.c} light="#ffffff" border={cat.b} style={{ marginLeft: 'auto' }}>
+                      {t(`japaneseSenseiModule.culture.categories.${cur.category}`, { defaultValue: cur.category })}
+                    </Chip>
+                  </div>
+                  <p style={{ fontSize: 14, color: COLORS.ink, lineHeight: 1.65 }}>{cur.summary[lang] || cur.summary.en}</p>
+                </Card>
+
+                {cur.vocab?.length > 0 && (
+                  <Card accent="#7c3aed">
+                    <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>📚 {t('japaneseSenseiModule.culture.vocab')}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 8 }}>
+                      {cur.vocab.map((w, i) => (
+                        <div key={i} style={{ background: '#fef8f0', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '8px 10px' }}>
+                          <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: '"Yu Mincho","Noto Serif JP",serif', fontWeight: 700, margin: 0 }}>{w.word}</p>
+                          <p style={{ fontSize: 11, color: COLORS.inkSoft, fontFamily: '"Yu Mincho","Noto Serif JP",serif', margin: '2px 0 0' }}>{w.kana}</p>
+                          <p style={{ fontSize: 11, color: COLORS.ink, margin: '2px 0 0' }}>{w.meaning}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {cur.didYouKnow && (
+                  <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder }}>
+                    <p style={{ color: '#92400e', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>💡 {t('japaneseSenseiModule.culture.didYouKnow')}</p>
+                    <p style={{ fontSize: 13, color: COLORS.ink, lineHeight: 1.6, fontStyle: 'italic' }}>{cur.didYouKnow[lang] || cur.didYouKnow.en}</p>
+                  </Card>
+                )}
+              </>;
+            })()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Main shell
 // ═══════════════════════════════════════════════════════════════════════════════
 const JapaneseSensei = () => {
@@ -1113,6 +1237,7 @@ const JapaneseSensei = () => {
     { id: 'grammar',      label: t('japaneseSenseiModule.tabs.grammar'),      icon: '📐' },
     { id: 'reading',      label: t('japaneseSenseiModule.tabs.reading'),      icon: '📖' },
     { id: 'speaking',     label: t('japaneseSenseiModule.tabs.speaking'),     icon: '🎤' },
+    { id: 'culture',      label: t('japaneseSenseiModule.tabs.culture'),      icon: '⛩️' },
   ];
 
   const renderContent = () => {
@@ -1125,6 +1250,7 @@ const JapaneseSensei = () => {
       case 'grammar':      return <TabGrammar />;
       case 'reading':      return <TabReading />;
       case 'speaking':     return <TabSpeaking />;
+      case 'culture':      return <TabCulture />;
       default:             return <TabDashboard onJump={(id) => setActiveTab(id)} />;
     }
   };

@@ -17,6 +17,7 @@ try:
         get_grammar_path, get_grammar_point,
         get_reading_texts, get_reading_text,
         get_speaking_phrases, speaking_attempt,
+        get_culture_notes, get_culture_note,
     )
 except ImportError:  # pragma: no cover
     from services.japanese_sensei import (  # type: ignore
@@ -27,6 +28,7 @@ except ImportError:  # pragma: no cover
         get_grammar_path, get_grammar_point,
         get_reading_texts, get_reading_text,
         get_speaking_phrases, speaking_attempt,
+        get_culture_notes, get_culture_note,
     )
 
 router = APIRouter(prefix="/api/japanese")
@@ -181,3 +183,19 @@ class SpeakingAttemptRequest(BaseModel):
 @router.post("/speaking/attempt", summary="Record a speaking attempt (V2)")
 async def speaking_attempt_endpoint(body: SpeakingAttemptRequest) -> Dict[str, Any]:
     return await speaking_attempt(body.phrase_id, body.transcript)
+
+
+# ─── V3 endpoints (Culture Notes) ─────────────────────────────────────────────
+
+@router.get("/culture/notes", summary="List all culture notes (V3)")
+async def culture_notes_endpoint() -> Dict[str, Any]:
+    items = get_culture_notes()
+    return {"count": len(items), "items": items}
+
+
+@router.get("/culture/{note_id}", summary="Single culture note detail (V3)")
+async def culture_note_endpoint(note_id: str) -> Dict[str, Any]:
+    n = get_culture_note(note_id)
+    if not n:
+        raise HTTPException(status_code=404, detail=f"Culture note not found: {note_id}")
+    return n

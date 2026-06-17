@@ -12,7 +12,8 @@
       "vocabulary": "Vocabulary SRS",
       "grammar": "Grammar Path",
       "reading": "Reading Practice",
-      "speaking": "Speaking Lab"
+      "speaking": "Speaking Lab",
+      "culture": "Culture Notes"
     },
     "dashboard": {
       "title": "Today",
@@ -157,6 +158,31 @@
       "voiceLabel": "Voice",
       "noJaVoice": "No Japanese voice installed on this system. To enable native pronunciation: Windows → Settings → Time & Language → Speech → Manage voices → Add voices → Japanese.",
       "noTTS": "Your browser does not support speech synthesis."
+    },
+    "culture": {
+      "title": "Culture Notes",
+      "subtitle": "Short cultural insights tied to N5-level Japanese — etiquette, society, pop-culture and festivals",
+      "loading": "Loading culture notes…",
+      "vocab": "Key vocabulary",
+      "didYouKnow": "Did you know?",
+      "category": "Category",
+      "categories": {
+        "etiquette": "Etiquette",
+        "language": "Language",
+        "pop_culture": "Pop culture",
+        "society": "Society",
+        "festivals": "Festivals",
+        "food": "Food"
+      }
+    },
+    "kanjiStrokes": {
+      "play": "▶ Play strokes",
+      "playing": "⏵ Playing…",
+      "showAll": "Show all",
+      "numbers": "Numbers",
+      "stroke": "Stroke",
+      "of": "{{n}} / {{total}}",
+      "credit": "Strokes © KanjiVG (CC BY-SA 3.0)"
     },
     "common": {
       "loading": "Loading…",
