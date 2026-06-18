@@ -13,7 +13,10 @@
       "vocabulary": "Vocabulario SRS",
       "grammar": "Gramática",
       "conversation": "Conversación",
-      "bridge": "Puente Kanji-Hanzi"
+      "bridge": "Puente Kanji-Hanzi",
+      "reading": "Lectura",
+      "speaking": "Laboratorio de Habla",
+      "culture": "Cultura"
     },
     "dashboard": {
       "title": "Hoy",
@@ -148,6 +151,58 @@
       "filterAll": "Todos",
       "filterCurated": "Curados",
       "filterAuto": "Auto-detectados"
+    },
+    "reading": {
+      "title": "Práctica de Lectura",
+      "subtitle": "Textos cortos HSK1 con pinyin, traducción y desglose palabra-por-palabra",
+      "pickText": "Elige un texto",
+      "pinyin": "Pinyin",
+      "translation": "Traducción",
+      "wordByWord": "Palabra a palabra",
+      "readAloud": "🔊 Leer en voz alta",
+      "stopReading": "⏹ Detener",
+      "questions": "Comprensión",
+      "showAnswer": "Mostrar respuesta",
+      "loading": "Cargando texto…"
+    },
+    "speaking": {
+      "title": "Laboratorio de Habla",
+      "subtitle": "Practica tonos y pronunciación con las APIs nativas de voz del navegador",
+      "target": "Frase objetivo",
+      "listenBtn": "🔊 Escuchar",
+      "stopBtn": "⏹ Detener",
+      "recordBtn": "🎤 Grabar",
+      "stopRecordBtn": "⏹ Detener grabación",
+      "heard": "Lo que oímos",
+      "selfGrade": "¿Cómo sonó?",
+      "goodMatch": "✓ Sonó bien",
+      "tryAgain": "↻ Intentar de nuevo",
+      "noSupport": "Tu navegador no soporta reconocimiento de voz. Prueba con Chrome o Edge.",
+      "noMatchYet": "Pulsa 🎤 Grabar y di la frase…"
+    },
+    "culture": {
+      "title": "Notas Culturales",
+      "subtitle": "Breves píldoras culturales — historia del idioma, sociedad, festivales, comida",
+      "loading": "Cargando notas culturales…",
+      "vocab": "Vocabulario clave",
+      "didYouKnow": "¿Sabías que…?",
+      "categories": {
+        "language": "Idioma",
+        "society": "Sociedad",
+        "festivals": "Festivales",
+        "food": "Comida",
+        "etiquette": "Modales",
+        "pop_culture": "Cultura pop"
+      }
+    },
+    "hanziStrokes": {
+      "play": "▶ Reproducir trazos",
+      "playing": "⏵ Reproduciendo…",
+      "showAll": "Mostrar todo",
+      "numbers": "Números",
+      "stroke": "Trazo",
+      "of": "{{n}} / {{total}}",
+      "credit": "Trazos © hanzi-writer-data (MIT)"
     },
     "common": {
       "loading": "Cargando…",

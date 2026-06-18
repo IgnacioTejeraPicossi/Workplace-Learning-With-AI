@@ -1210,7 +1210,323 @@ def get_bridge_entry(char: str) -> Optional[Dict[str, Any]]:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 10 — Dashboard / Overview
+# 10 — Reading Practice (V2) — 5 short HSK1 texts
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_READING_TEXTS: List[Dict[str, Any]] = [
+    {"id":"intro","level":"HSK1","title":"我是西班牙人",
+     "title_translations":{"en":"I am Spanish","es":"Soy español","no":"Jeg er spansk"},
+     "segments":[
+        {"hz":"你好！","py":"Nǐ hǎo!","words":[{"w":"你好","p":"nǐ hǎo","m":"hello"}]},
+        {"hz":"我叫","py":"Wǒ jiào","words":[{"w":"我","p":"wǒ","m":"I"},{"w":"叫","p":"jiào","m":"called"}]},
+        {"hz":"Ignacio。","py":"Ignacio.","words":[{"w":"Ignacio","p":"Ignacio","m":"Ignacio"}]},
+        {"hz":"我是","py":"Wǒ shì","words":[{"w":"我","p":"wǒ","m":"I"},{"w":"是","p":"shì","m":"am"}]},
+        {"hz":"西班牙人。","py":"Xībānyárén.","words":[{"w":"西班牙人","p":"xībānyárén","m":"Spanish person"}]},
+        {"hz":"我学","py":"Wǒ xué","words":[{"w":"学","p":"xué","m":"study"}]},
+        {"hz":"中文。","py":"Zhōngwén.","words":[{"w":"中文","p":"zhōngwén","m":"Chinese language"}]},
+     ],
+     "translation":{"en":"Hello! My name is Ignacio. I am Spanish. I study Chinese.",
+                    "es":"¡Hola! Me llamo Ignacio. Soy español. Estudio chino.",
+                    "no":"Hei! Jeg heter Ignacio. Jeg er spansk. Jeg studerer kinesisk."},
+     "questions":[{"q":{"en":"Where am I from?","es":"¿De dónde soy?","no":"Hvor er jeg fra?"},
+                   "a":{"en":"Spain","es":"España","no":"Spania"}},
+                  {"q":{"en":"What do I study?","es":"¿Qué estudio?","no":"Hva studerer jeg?"},
+                   "a":{"en":"Chinese","es":"Chino","no":"Kinesisk"}}]},
+
+    {"id":"morning","level":"HSK1","title":"早上",
+     "title_translations":{"en":"Morning","es":"La mañana","no":"Morgenen"},
+     "segments":[
+        {"hz":"我","py":"Wǒ","words":[{"w":"我","p":"wǒ","m":"I"}]},
+        {"hz":"每天","py":"měitiān","words":[{"w":"每天","p":"měitiān","m":"every day"}]},
+        {"hz":"七点","py":"qī diǎn","words":[{"w":"七点","p":"qī diǎn","m":"seven o'clock"}]},
+        {"hz":"起床。","py":"qǐchuáng.","words":[{"w":"起床","p":"qǐchuáng","m":"get up"}]},
+        {"hz":"我喝","py":"Wǒ hē","words":[{"w":"喝","p":"hē","m":"drink"}]},
+        {"hz":"咖啡","py":"kāfēi","words":[{"w":"咖啡","p":"kāfēi","m":"coffee"}]},
+        {"hz":"看书。","py":"kàn shū.","words":[{"w":"看","p":"kàn","m":"read"},{"w":"书","p":"shū","m":"book"}]},
+     ],
+     "translation":{"en":"Every day I get up at seven. I drink coffee and read.",
+                    "es":"Cada día me levanto a las siete. Bebo café y leo.",
+                    "no":"Hver dag står jeg opp klokken syv. Jeg drikker kaffe og leser."},
+     "questions":[{"q":{"en":"What time do I get up?","es":"¿A qué hora me levanto?","no":"Når står jeg opp?"},
+                   "a":{"en":"At seven","es":"A las siete","no":"Klokken syv"}}]},
+
+    {"id":"manga","level":"HSK1","title":"我喜欢漫画",
+     "title_translations":{"en":"I like manga","es":"Me gusta el manga","no":"Jeg liker manga"},
+     "segments":[
+        {"hz":"我","py":"Wǒ","words":[{"w":"我","p":"wǒ","m":"I"}]},
+        {"hz":"很喜欢","py":"hěn xǐhuān","words":[{"w":"很","p":"hěn","m":"very"},{"w":"喜欢","p":"xǐhuān","m":"like"}]},
+        {"hz":"漫画。","py":"mànhuà.","words":[{"w":"漫画","p":"mànhuà","m":"manga / comic"}]},
+        {"hz":"日本","py":"Rìběn","words":[{"w":"日本","p":"rìběn","m":"Japan"}]},
+        {"hz":"漫画","py":"mànhuà","words":[{"w":"漫画","p":"mànhuà","m":"manga"}]},
+        {"hz":"和","py":"hé","words":[{"w":"和","p":"hé","m":"and"}]},
+        {"hz":"中国","py":"Zhōngguó","words":[{"w":"中国","p":"zhōngguó","m":"China"}]},
+        {"hz":"汉字","py":"hànzì","words":[{"w":"汉字","p":"hànzì","m":"Chinese character"}]},
+        {"hz":"很有意思。","py":"hěn yǒu yìsi.","words":[{"w":"有意思","p":"yǒu yìsi","m":"interesting"}]},
+     ],
+     "translation":{"en":"I really like manga. Japanese manga and Chinese characters are very interesting.",
+                    "es":"Me gusta mucho el manga. El manga japonés y los caracteres chinos son muy interesantes.",
+                    "no":"Jeg liker manga veldig godt. Japansk manga og kinesiske tegn er veldig interessante."},
+     "questions":[{"q":{"en":"What do I like?","es":"¿Qué me gusta?","no":"Hva liker jeg?"},
+                   "a":{"en":"Manga","es":"El manga","no":"Manga"}}]},
+
+    {"id":"family","level":"HSK1","title":"我的家",
+     "title_translations":{"en":"My family","es":"Mi familia","no":"Familien min"},
+     "segments":[
+        {"hz":"我家","py":"Wǒ jiā","words":[{"w":"我家","p":"wǒ jiā","m":"my family/home"}]},
+        {"hz":"有","py":"yǒu","words":[{"w":"有","p":"yǒu","m":"have"}]},
+        {"hz":"四个人：","py":"sì ge rén:","words":[{"w":"四个人","p":"sì ge rén","m":"four people"}]},
+        {"hz":"爸爸、","py":"bàba,","words":[{"w":"爸爸","p":"bàba","m":"dad"}]},
+        {"hz":"妈妈、","py":"māma,","words":[{"w":"妈妈","p":"māma","m":"mum"}]},
+        {"hz":"哥哥","py":"gēge","words":[{"w":"哥哥","p":"gēge","m":"older brother"}]},
+        {"hz":"和我。","py":"hé wǒ.","words":[{"w":"和","p":"hé","m":"and"}]},
+     ],
+     "translation":{"en":"My family has four people: dad, mum, older brother and me.",
+                    "es":"Mi familia tiene cuatro personas: papá, mamá, mi hermano mayor y yo.",
+                    "no":"Familien min har fire personer: pappa, mamma, eldre bror og meg."},
+     "questions":[{"q":{"en":"How many people in my family?","es":"¿Cuántas personas en mi familia?","no":"Hvor mange i familien?"},
+                   "a":{"en":"Four","es":"Cuatro","no":"Fire"}}]},
+
+    {"id":"weekend","level":"HSK1","title":"周末",
+     "title_translations":{"en":"Weekend","es":"Fin de semana","no":"Helg"},
+     "segments":[
+        {"hz":"周末","py":"Zhōumò","words":[{"w":"周末","p":"zhōumò","m":"weekend"}]},
+        {"hz":"我和","py":"wǒ hé","words":[{"w":"和","p":"hé","m":"and"}]},
+        {"hz":"朋友","py":"péngyou","words":[{"w":"朋友","p":"péngyou","m":"friend"}]},
+        {"hz":"去","py":"qù","words":[{"w":"去","p":"qù","m":"go"}]},
+        {"hz":"中国","py":"Zhōngguó","words":[{"w":"中国","p":"zhōngguó","m":"China"}]},
+        {"hz":"饭馆。","py":"fànguǎn.","words":[{"w":"饭馆","p":"fànguǎn","m":"restaurant"}]},
+        {"hz":"我们","py":"Wǒmen","words":[{"w":"我们","p":"wǒmen","m":"we"}]},
+        {"hz":"喜欢","py":"xǐhuān","words":[{"w":"喜欢","p":"xǐhuān","m":"like"}]},
+        {"hz":"吃","py":"chī","words":[{"w":"吃","p":"chī","m":"eat"}]},
+        {"hz":"中国菜。","py":"Zhōngguó cài.","words":[{"w":"中国菜","p":"zhōngguó cài","m":"Chinese food"}]},
+     ],
+     "translation":{"en":"On weekends I go to a Chinese restaurant with friends. We like to eat Chinese food.",
+                    "es":"Los fines de semana voy a un restaurante chino con amigos. Nos gusta comer comida china.",
+                    "no":"I helgene går jeg på kinesisk restaurant med venner. Vi liker å spise kinesisk mat."},
+     "questions":[{"q":{"en":"Where do we go on weekends?","es":"¿Adónde vamos los fines de semana?","no":"Hvor går vi i helgene?"},
+                   "a":{"en":"Chinese restaurant","es":"Restaurante chino","no":"Kinesisk restaurant"}}]},
+]
+
+_READING_MAP = {r["id"]: r for r in _READING_TEXTS}
+
+
+def get_reading_texts() -> List[Dict[str, Any]]:
+    return [{"id": r["id"], "title": r["title"],
+             "title_translations": r["title_translations"], "level": r["level"]}
+            for r in _READING_TEXTS]
+
+
+def get_reading_text(text_id: str) -> Optional[Dict[str, Any]]:
+    return _READING_MAP.get(text_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 11 — Speaking Lab (V2) — 10 practice phrases
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_SPEAKING_PHRASES: List[Dict[str, Any]] = [
+    {"id":"sp1","hz":"你好。","py":"Nǐ hǎo.",
+     "translations":{"en":"Hello.","es":"Hola.","no":"Hei."},"level":"HSK1","tag":"greeting"},
+    {"id":"sp2","hz":"早上好。","py":"Zǎoshang hǎo.",
+     "translations":{"en":"Good morning.","es":"Buenos días.","no":"God morgen."},"level":"HSK1","tag":"greeting"},
+    {"id":"sp3","hz":"谢谢。","py":"Xièxie.",
+     "translations":{"en":"Thank you.","es":"Gracias.","no":"Takk."},"level":"HSK1","tag":"essential"},
+    {"id":"sp4","hz":"对不起。","py":"Duìbuqǐ.",
+     "translations":{"en":"Sorry.","es":"Perdón.","no":"Unnskyld."},"level":"HSK1","tag":"essential"},
+    {"id":"sp5","hz":"我叫 Ignacio。","py":"Wǒ jiào Ignacio.",
+     "translations":{"en":"My name is Ignacio.","es":"Me llamo Ignacio.","no":"Jeg heter Ignacio."},"level":"HSK1","tag":"intro"},
+    {"id":"sp6","hz":"我学中文。","py":"Wǒ xué Zhōngwén.",
+     "translations":{"en":"I study Chinese.","es":"Estudio chino.","no":"Jeg studerer kinesisk."},"level":"HSK1","tag":"intro"},
+    {"id":"sp7","hz":"请来一杯茶。","py":"Qǐng lái yì bēi chá.",
+     "translations":{"en":"A cup of tea, please.","es":"Un té, por favor.","no":"En kopp te, takk."},"level":"HSK1","tag":"request"},
+    {"id":"sp8","hz":"地铁站在哪里？","py":"Dìtiězhàn zài nǎlǐ?",
+     "translations":{"en":"Where is the metro station?","es":"¿Dónde está la estación de metro?","no":"Hvor er t-banestasjonen?"},"level":"HSK1","tag":"question"},
+    {"id":"sp9","hz":"今天天气很好。","py":"Jīntiān tiānqì hěn hǎo.",
+     "translations":{"en":"The weather is nice today.","es":"Hoy hace buen tiempo.","no":"Det er fint vær i dag."},"level":"HSK1","tag":"smalltalk"},
+    {"id":"sp10","hz":"明天见！","py":"Míngtiān jiàn!",
+     "translations":{"en":"See you tomorrow!","es":"¡Hasta mañana!","no":"Vi ses i morgen!"},"level":"HSK1","tag":"farewell"},
+]
+
+
+def get_speaking_phrases() -> List[Dict[str, Any]]:
+    return _SPEAKING_PHRASES
+
+
+async def speaking_attempt(phrase_id: str, transcript: str, user_id: str = DEFAULT_USER) -> Dict[str, Any]:
+    record = {
+        "user_id": user_id, "phrase_id": phrase_id,
+        "transcript": transcript,
+        "at": datetime.now(timezone.utc).isoformat(),
+    }
+    if _HANZI_COL is not None:
+        try:
+            col = _HANZI_COL.database.get_collection("chinese_speaking_attempts")
+            await col.insert_one(record)
+            return {"status": "ok", "persisted": True}
+        except Exception:
+            pass
+    return {"status": "ok", "persisted": False}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 12 — Culture Notes (V2) — 10 cultural pieces
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_CULTURE_NOTES: List[Dict[str, Any]] = [
+    {"id":"hanzi-origin","emoji":"🦴","category":"language",
+     "title":{"hz":"汉字的起源","py":"Hànzì de qǐyuán","en":"The origin of hanzi","es":"El origen del hanzi","no":"Hanzis opprinnelse"},
+     "summary":{
+        "en":"Hanzi originate from oracle bone script (甲骨文) carved on turtle shells and ox bones around 1200 BCE — used for divination by the Shang dynasty. Many modern characters preserve their pictographic origins: 山 (mountain) shows three peaks, 木 (tree) shows trunk and branches, 日 (sun) was originally a circle with a dot.",
+        "es":"Los hanzi tienen su origen en la escritura sobre huesos oraculares (甲骨文), grabada en caparazones de tortuga y huesos de buey hacia el 1200 a.C. — usada para adivinación por la dinastía Shang. Muchos caracteres modernos conservan su origen pictográfico: 山 (montaña) muestra tres picos, 木 (árbol) tronco y ramas, 日 (sol) era un círculo con un punto.",
+        "no":"Hanzi stammer fra orakelbein-skrift (甲骨文) ristet inn i skilpaddeskall og oksebein rundt 1200 f.Kr. — brukt til spådom av Shang-dynastiet. Mange moderne tegn bevarer sin pictografiske opprinnelse: 山 (fjell) viser tre topper, 木 (tre) stamme og greiner, 日 (sol) var opprinnelig en sirkel med en prikk."},
+     "vocab":[{"w":"汉字","p":"hànzì","m":"Chinese character"},
+              {"w":"甲骨文","p":"jiǎgǔwén","m":"oracle bone script"},
+              {"w":"起源","p":"qǐyuán","m":"origin"}],
+     "didYouKnow":{
+        "en":"There are over 50,000 hanzi in the Kangxi dictionary, but knowing ~3,000 covers 99% of modern texts. HSK6 covers around 2,500.",
+        "es":"Hay más de 50.000 hanzi en el diccionario Kangxi, pero conocer ~3.000 cubre el 99% de los textos modernos. HSK6 cubre unos 2.500.",
+        "no":"Det finnes over 50 000 hanzi i Kangxi-ordboken, men å kunne ~3 000 dekker 99 % av moderne tekster. HSK6 dekker rundt 2 500."}},
+
+    {"id":"simplified-vs-traditional","emoji":"📜","category":"language",
+     "title":{"hz":"简体字与繁体字","py":"Jiǎntǐzì yǔ fántǐzì","en":"Simplified vs Traditional","es":"Simplificado vs Tradicional","no":"Forenklet vs Tradisjonell"},
+     "summary":{
+        "en":"In 1956 the People's Republic introduced 簡化字 (jiǎnhuàzì) — simplified characters that reduced stroke counts to boost literacy. Mainland China and Singapore use simplified; Taiwan, Hong Kong and Macau keep traditional. Japanese kanji is a third path: some characters match simplified Chinese (国), others traditional Chinese (車), and some have unique Japanese forms (図).",
+        "es":"En 1956 la República Popular introdujo los 簡化字 (jiǎnhuàzì) — caracteres simplificados con menos trazos para aumentar la alfabetización. China continental y Singapur usan simplificado; Taiwán, Hong Kong y Macao conservan el tradicional. El kanji japonés es un tercer camino: algunos caracteres coinciden con el chino simplificado (国), otros con el tradicional (車), y otros son formas exclusivas japonesas (図).",
+        "no":"I 1956 innførte Folkerepublikken 簡化字 (jiǎnhuàzì) — forenklede tegn med færre strøk for å øke leseferdigheten. Fastlands-Kina og Singapore bruker forenklet; Taiwan, Hong Kong og Macau beholder det tradisjonelle. Japansk kanji er en tredje vei: noen tegn matcher forenklet kinesisk (国), andre tradisjonelt kinesisk (車), og noen har unike japanske former (図)."},
+     "vocab":[{"w":"简体字","p":"jiǎntǐzì","m":"simplified char."},
+              {"w":"繁体字","p":"fántǐzì","m":"traditional char."},
+              {"w":"汉字","p":"hànzì","m":"Chinese char."}],
+     "didYouKnow":{
+        "en":"The simplification often dramatically reduced strokes: 學 (16 strokes) → 学 (8). Japanese reformed 學 → 学 too, independently, in 1949.",
+        "es":"La simplificación a menudo redujo drásticamente los trazos: 學 (16 trazos) → 学 (8). El japonés también reformó 學 → 学, de forma independiente, en 1949.",
+        "no":"Forenklingen reduserte ofte strøk dramatisk: 學 (16 strøk) → 学 (8). Japansk reformerte 學 → 学 også, uavhengig, i 1949."}},
+
+    {"id":"tones-meaning","emoji":"🎵","category":"language",
+     "title":{"hz":"声调的力量","py":"Shēngdiào de lìliàng","en":"The power of tones","es":"El poder de los tonos","no":"Tonenes makt"},
+     "summary":{
+        "en":"Mandarin tones are not decorative — they change meaning entirely. mā (mother) · má (hemp) · mǎ (horse) · mà (scold) · ma (question particle). A single misplaced tone can turn 'I want to ask you' (问) into 'I want to kiss you' (吻). Tones must be learned together with vocabulary, not afterwards.",
+        "es":"Los tonos del mandarín no son decorativos — cambian el significado por completo. mā (madre) · má (cáñamo) · mǎ (caballo) · mà (regañar) · ma (partícula interrogativa). Un solo tono mal colocado puede convertir 'quiero preguntarte' (问) en 'quiero besarte' (吻). Los tonos deben aprenderse junto al vocabulario, no después.",
+        "no":"Mandarintoner er ikke dekorative — de endrer betydningen helt. mā (mor) · má (hamp) · mǎ (hest) · mà (skjenne) · ma (spørrepartikkel). En feilplassert tone kan gjøre 'jeg vil spørre deg' (问) til 'jeg vil kysse deg' (吻). Toner må læres sammen med vokabular, ikke etterpå."},
+     "vocab":[{"w":"声调","p":"shēngdiào","m":"tone"},
+              {"w":"妈","p":"mā","m":"mother"},
+              {"w":"马","p":"mǎ","m":"horse"}],
+     "didYouKnow":{
+        "en":"Cantonese has 6-9 tones depending on dialect. Mandarin's 4-tone system is comparatively simple — but still notoriously hard for tonal-naive learners.",
+        "es":"El cantonés tiene 6-9 tonos según el dialecto. El sistema de 4 tonos del mandarín es comparativamente simple — pero aún notoriamente difícil para hablantes no acostumbrados a tonos.",
+        "no":"Kantonesisk har 6-9 toner avhengig av dialekt. Mandarins firetonesystem er relativt enkelt — men fortsatt notorisk vanskelig for ikke-tonale elever."}},
+
+    {"id":"tea","emoji":"🍵","category":"society",
+     "title":{"hz":"中国茶文化","py":"Zhōngguó chá wénhuà","en":"Chinese tea culture","es":"La cultura del té chino","no":"Kinesisk te-kultur"},
+     "summary":{
+        "en":"Tea (茶) is more than a beverage in China — it's a 5,000-year-old social ritual. Six categories define Chinese tea: green (绿茶), black (红茶 lit. 'red'), oolong, white, yellow and pu-erh. The gongfu cha (功夫茶) ceremony involves small clay teapots and tiny cups, multiple short infusions, and respectful gestures. Pouring tea for elders is the way younger people show filial respect.",
+        "es":"El té (茶) es más que una bebida en China — es un ritual social de 5.000 años. Seis categorías definen el té chino: verde (绿茶), negro (红茶 lit. 'rojo'), oolong, blanco, amarillo y pu-erh. La ceremonia gongfu cha (功夫茶) implica pequeñas teteras de barro y tazas diminutas, varias infusiones cortas y gestos respetuosos. Servir té a los mayores es la forma en que los jóvenes muestran respeto filial.",
+        "no":"Te (茶) er mer enn en drikk i Kina — det er et 5 000 år gammelt sosialt ritual. Seks kategorier definerer kinesisk te: grønn (绿茶), svart (红茶, lit. 'rød'), oolong, hvit, gul og pu-erh. Gongfu cha-seremonien (功夫茶) involverer små leirtekanner og bittesmå kopper, flere korte infusjoner, og respektfulle gester. Å skjenke te til eldre er måten de yngre viser barnlig respekt."},
+     "vocab":[{"w":"茶","p":"chá","m":"tea"},
+              {"w":"绿茶","p":"lǜchá","m":"green tea"},
+              {"w":"功夫茶","p":"gōngfu chá","m":"gongfu tea"}],
+     "didYouKnow":{
+        "en":"In China you'll see people tapping two fingers on the table after being served tea — a silent thank-you that dates back to a Qing emperor in disguise being served by a servant who couldn't bow.",
+        "es":"En China verás a la gente golpear dos dedos sobre la mesa al recibir té — un agradecimiento silencioso que se remonta a un emperador Qing disfrazado al que servía un criado que no podía hacer reverencia.",
+        "no":"I Kina vil du se folk banke to fingre på bordet etter å ha blitt servert te — en stille takk som går tilbake til en Qing-keiser i forkledning som ble servert av en tjener som ikke kunne bukke."}},
+
+    {"id":"spring-festival","emoji":"🧨","category":"festivals",
+     "title":{"hz":"春节","py":"Chūnjié","en":"Spring Festival (Chinese New Year)","es":"Fiesta de la Primavera (Año Nuevo Chino)","no":"Vårfestival (Kinesisk nyttår)"},
+     "summary":{
+        "en":"春节 is the most important Chinese festival — based on the lunar calendar (late Jan to mid Feb). It triggers the largest human migration on Earth as workers travel home to family. Traditions: red couplets (春联) at doorways, red envelopes (红包) of money for children, dumplings in the north (饺子), fish for prosperity (年年有余 = abundance year after year), firecrackers to scare away the mythical 年 (nián) beast.",
+        "es":"春节 es la fiesta china más importante — basada en el calendario lunar (fines de enero a mediados de febrero). Desencadena la mayor migración humana del planeta cuando los trabajadores viajan a casa con sus familias. Tradiciones: pareados rojos (春联) en las puertas, sobres rojos (红包) con dinero para niños, empanadillas en el norte (饺子), pescado para la prosperidad (年年有余 = abundancia año tras año), petardos para asustar a la mítica bestia 年 (nián).",
+        "no":"春节 er den viktigste kinesiske festivalen — basert på månekalenderen (sent januar til midten av februar). Det utløser den største menneskelige migrasjonen på jorden når arbeidere reiser hjem til familien. Tradisjoner: røde versepar (春联) ved døråpninger, røde konvolutter (红包) med penger til barn, dumplings i nord (饺子), fisk for velstand (年年有余 = overflod år etter år), kinaputter for å skremme bort det mytiske 年 (nián) udyret."},
+     "vocab":[{"w":"春节","p":"chūnjié","m":"Spring Festival"},
+              {"w":"红包","p":"hóngbāo","m":"red envelope"},
+              {"w":"饺子","p":"jiǎozi","m":"dumpling"}],
+     "didYouKnow":{
+        "en":"The amount in a red envelope often contains the digit 8 (eight = 八 / bā, sounds like 发 / fā 'prosper'). 168 is luckier than 200.",
+        "es":"La cantidad en un sobre rojo suele contener el dígito 8 (ocho = 八 / bā, suena como 发 / fā 'prosperar'). 168 da más suerte que 200.",
+        "no":"Beløpet i en rød konvolutt inneholder ofte tallet 8 (åtte = 八 / bā, lyder som 发 / fā 'å blomstre'). 168 bringer mer lykke enn 200."}},
+
+    {"id":"food","emoji":"🥢","category":"food",
+     "title":{"hz":"八大菜系","py":"Bā dà cài xì","en":"Eight great cuisines","es":"Las ocho grandes cocinas","no":"De åtte store kjøkkenene"},
+     "summary":{
+        "en":"China has eight historical regional cuisines (八大菜系): Sichuan (川菜) — spicy, numbing; Cantonese (粤菜) — fresh, lightly seasoned, the dim sum tradition; Shandong (鲁菜) — northern, savoury; Jiangsu (苏菜) — delicate, sweet-savoury; Zhejiang (浙菜) — fresh seafood; Fujian (闽菜) — soups; Hunan (湘菜) — pure heat; Anhui (徽菜) — wild herbs and game. 'Chinese food' as known abroad is mostly a westernised slice of Cantonese.",
+        "es":"China tiene ocho cocinas regionales históricas (八大菜系): Sichuan (川菜) — picante, adormecedor; Cantonesa (粤菜) — fresca, suavemente sazonada, la tradición dim sum; Shandong (鲁菜) — del norte, sabrosa; Jiangsu (苏菜) — delicada, dulce-salada; Zhejiang (浙菜) — mariscos frescos; Fujian (闽菜) — sopas; Hunan (湘菜) — picante puro; Anhui (徽菜) — hierbas silvestres y caza. La 'comida china' que se conoce en el extranjero es casi una porción occidentalizada de la cantonesa.",
+        "no":"Kina har åtte historiske regionale kjøkken (八大菜系): Sichuan (川菜) — krydret, dovende; Kantonesisk (粤菜) — fersk, lett krydret, dim sum-tradisjonen; Shandong (鲁菜) — nordlig, smakfullt; Jiangsu (苏菜) — delikat, søt-salt; Zhejiang (浙菜) — fersk sjømat; Fujian (闽菜) — supper; Hunan (湘菜) — ren varme; Anhui (徽菜) — ville urter og vilt. 'Kinesisk mat' slik den er kjent i utlandet er stort sett en vestliggjort del av kantonesisk."},
+     "vocab":[{"w":"菜","p":"cài","m":"dish, cuisine"},
+              {"w":"川菜","p":"chuāncài","m":"Sichuan cuisine"},
+              {"w":"粤菜","p":"yuècài","m":"Cantonese cuisine"}],
+     "didYouKnow":{
+        "en":"Sichuan peppercorns (花椒, huājiāo) don't just taste 'spicy' — they produce a numbing sensation called 麻 (má). The famous 麻辣 (málà) means 'numb-spicy'.",
+        "es":"La pimienta de Sichuan (花椒, huājiāo) no solo es 'picante' — produce una sensación adormecedora llamada 麻 (má). El famoso 麻辣 (málà) significa 'adormecedor-picante'.",
+        "no":"Sichuan-pepperkorn (花椒, huājiāo) smaker ikke bare 'sterkt' — de gir en dovende følelse kalt 麻 (má). Det berømte 麻辣 (málà) betyr 'dovende-sterkt'."}},
+
+    {"id":"face","emoji":"🙏","category":"society",
+     "title":{"hz":"面子","py":"Miànzi","en":"The concept of face (mianzi)","es":"El concepto de 'cara' (mianzi)","no":"Begrepet 'ansikt' (mianzi)"},
+     "summary":{
+        "en":"面子 (miànzi, 'face') is a central concept in Chinese social life. It refers to dignity, prestige and reputation in the eyes of others. You can 'give face' (给面子, gěi miànzi) by showing respect; 'lose face' (丢面子, diū miànzi) by being publicly embarrassed; 'save face' (保面子) by avoiding direct confrontation. Many business and family interactions are choreographed to preserve face for all parties — direct criticism in public is taboo.",
+        "es":"面子 (miànzi, 'cara') es un concepto central en la vida social china. Se refiere a la dignidad, prestigio y reputación a los ojos de los demás. Puedes 'dar cara' (给面子, gěi miànzi) mostrando respeto; 'perder cara' (丢面子, diū miànzi) al avergonzarse en público; 'salvar la cara' (保面子) evitando la confrontación directa. Muchas interacciones de negocios y familiares están coreografiadas para preservar la cara de todas las partes — la crítica directa en público es tabú.",
+        "no":"面子 (miànzi, 'ansikt') er et sentralt begrep i kinesisk sosialt liv. Det refererer til verdighet, prestisje og omdømme i andres øyne. Du kan 'gi ansikt' (给面子, gěi miànzi) ved å vise respekt; 'miste ansikt' (丢面子, diū miànzi) ved å bli offentlig flau; 'redde ansikt' (保面子) ved å unngå direkte konfrontasjon. Mange forretnings- og familiesamtaler er koreografert for å bevare ansikt for alle parter — direkte kritikk offentlig er tabu."},
+     "vocab":[{"w":"面子","p":"miànzi","m":"face, reputation"},
+              {"w":"给面子","p":"gěi miànzi","m":"give face"},
+              {"w":"丢面子","p":"diū miànzi","m":"lose face"}],
+     "didYouKnow":{
+        "en":"Praising someone's child, home or work is a common way to 'give face' — even if you privately disagree. Returning the praise multiplies the courtesy.",
+        "es":"Elogiar al hijo, casa o trabajo de alguien es una forma común de 'dar cara' — incluso si en privado no estás de acuerdo. Devolver el elogio multiplica la cortesía.",
+        "no":"Å rose noens barn, hjem eller arbeid er en vanlig måte å 'gi ansikt' på — selv om du privat er uenig. Å returnere rosen multipliserer høfligheten."}},
+
+    {"id":"zodiac","emoji":"🐲","category":"society",
+     "title":{"hz":"十二生肖","py":"Shí'èr shēngxiào","en":"The 12 zodiac animals","es":"Los 12 animales del zodiaco","no":"De 12 zodiakdyrene"},
+     "summary":{
+        "en":"The Chinese zodiac cycles 12 animals: 鼠 rat · 牛 ox · 虎 tiger · 兔 rabbit · 龙 dragon · 蛇 snake · 马 horse · 羊 sheep · 猴 monkey · 鸡 rooster · 狗 dog · 猪 pig. Your zodiac is determined by lunar new year, NOT 1 January. The myth: the Jade Emperor held a race; rat tricked ox into carrying him then jumped ahead at the finish, dragon stopped to help a village in need. Each animal has associated personality traits and lucky/unlucky pairings.",
+        "es":"El zodiaco chino cicla 12 animales: 鼠 rata · 牛 buey · 虎 tigre · 兔 conejo · 龙 dragón · 蛇 serpiente · 马 caballo · 羊 oveja · 猴 mono · 鸡 gallo · 狗 perro · 猪 cerdo. Tu signo se determina por el año nuevo lunar, NO el 1 de enero. El mito: el Emperador de Jade celebró una carrera; la rata engañó al buey para que la llevara y saltó por delante en la meta, el dragón se detuvo para ayudar a un pueblo necesitado. Cada animal tiene rasgos de personalidad asociados y emparejamientos afortunados o no.",
+        "no":"Den kinesiske zodiaken sykler 12 dyr: 鼠 rotte · 牛 okse · 虎 tiger · 兔 kanin · 龙 drage · 蛇 slange · 马 hest · 羊 sau · 猴 ape · 鸡 hane · 狗 hund · 猪 gris. Ditt tegn bestemmes av månenyttår, IKKE 1. januar. Myten: Jade-keiseren holdt et løp; rotten lurte oksen til å bære seg og hoppet foran ved målstreken, dragen stoppet for å hjelpe en landsby i nød."},
+     "vocab":[{"w":"生肖","p":"shēngxiào","m":"zodiac animal"},
+              {"w":"龙","p":"lóng","m":"dragon"},
+              {"w":"虎","p":"hǔ","m":"tiger"}],
+     "didYouKnow":{
+        "en":"Dragon (龙) is the most desired zodiac for a child. Spring Festival birth-rate spikes in Dragon years, sometimes causing crowded schools 6 years later.",
+        "es":"El dragón (龙) es el zodiaco más deseado para un hijo. La tasa de natalidad sube en los años del Dragón, a veces causando escuelas saturadas 6 años después.",
+        "no":"Drage (龙) er det mest ettertraktede zodiaktegnet for et barn. Fødselsraten øker i drage-år, noe som av og til fører til overfylte skoler 6 år senere."}},
+
+    {"id":"manga-bridge","emoji":"🌉","category":"language",
+     "title":{"hz":"汉字到日本","py":"Hànzì dào Rìběn","en":"Hanzi's journey to Japan","es":"El viaje del hanzi a Japón","no":"Hanzis reise til Japan"},
+     "summary":{
+        "en":"Hanzi arrived in Japan around the 5th century via the Korean peninsula. Initially Japanese had no script — they adopted Chinese characters (called kanji 漢字, 'Han characters') and used them in three ways: 1) for meaning, 2) for sound (man'yōgana → simplified later into hiragana and katakana), 3) for purely Chinese-loaned vocabulary. Today a Japanese sentence mixes kanji + hiragana + katakana, while Chinese uses hanzi only. This is why you can sometimes guess meaning across languages but rarely the pronunciation.",
+        "es":"El hanzi llegó a Japón hacia el siglo V vía la península coreana. Al principio el japonés no tenía escritura — adoptaron los caracteres chinos (llamados kanji 漢字, 'caracteres Han') y los usaron de tres formas: 1) por significado, 2) por sonido (man'yōgana → más tarde simplificado en hiragana y katakana), 3) para vocabulario directamente prestado del chino. Hoy una frase japonesa mezcla kanji + hiragana + katakana, mientras que el chino usa solo hanzi. Por eso a veces puedes adivinar el significado entre idiomas pero rara vez la pronunciación.",
+        "no":"Hanzi kom til Japan rundt det 5. århundret via Korea-halvøya. Opprinnelig hadde japansk ikke noe skriftsystem — de adopterte kinesiske tegn (kalt kanji 漢字, 'Han-tegn') og brukte dem på tre måter: 1) for betydning, 2) for lyd (man'yōgana → senere forenklet til hiragana og katakana), 3) for rent kinesisk lånt vokabular. I dag blander en japansk setning kanji + hiragana + katakana, mens kinesisk bruker bare hanzi."},
+     "vocab":[{"w":"汉字","p":"hànzì","m":"hanzi"},
+              {"w":"日本","p":"rìběn","m":"Japan"},
+              {"w":"传到","p":"chuán dào","m":"spread to"}],
+     "didYouKnow":{
+        "en":"A literate Chinese reader can guess ~30% of a Japanese newspaper headline from kanji alone — and vice versa. Try it: 中国総理大臣訪問 makes sense in both languages, with different readings.",
+        "es":"Un lector chino alfabetizado puede adivinar ~30% de un titular japonés solo por los kanji — y viceversa. Pruébalo: 中国総理大臣訪問 tiene sentido en ambos idiomas, con lecturas distintas.",
+        "no":"En lesekyndig kineser kan gjette ~30 % av en japansk avisoverskrift fra kanji alene — og omvendt. Prøv: 中国総理大臣訪問 gir mening på begge språk, med ulike lesninger."}},
+
+    {"id":"calligraphy","emoji":"🖌️","category":"society",
+     "title":{"hz":"书法","py":"Shūfǎ","en":"Calligraphy","es":"La caligrafía","no":"Kalligrafi"},
+     "summary":{
+        "en":"书法 (shūfǎ, 'the way of writing') is considered the highest visual art in Chinese culture — above painting. Five major scripts evolved over millennia: seal (篆书 / zhuànshū), clerical (隶书 / lìshū), regular (楷书 / kǎishū, modern standard), running (行书 / xíngshū) and grass (草书 / cǎoshū, almost abstract). A calligrapher's brush stroke is said to reveal their personality — strong vs hesitant, energetic vs calm.",
+        "es":"书法 (shūfǎ, 'el camino de la escritura') se considera el arte visual más elevado de la cultura china — por encima de la pintura. Cinco escrituras principales evolucionaron a lo largo de milenios: sello (篆书 / zhuànshū), clerical (隶书 / lìshū), regular (楷书 / kǎishū, estándar moderno), corriente (行书 / xíngshū) y de hierba (草书 / cǎoshū, casi abstracta). Se dice que el trazo del pincel del calígrafo revela su personalidad — fuerte vs vacilante, enérgico vs sereno.",
+        "no":"书法 (shūfǎ, 'skriftens vei') anses som den høyeste visuelle kunsten i kinesisk kultur — over maleri. Fem hovedskrifter utviklet seg over årtusener: segl (篆书 / zhuànshū), klerikal (隶书 / lìshū), regulær (楷书 / kǎishū, moderne standard), løpende (行书 / xíngshū) og gress (草书 / cǎoshū, nesten abstrakt). Det sies at en kalligrafs penselstrøk avslører personligheten — sterk vs nølende, energisk vs rolig."},
+     "vocab":[{"w":"书法","p":"shūfǎ","m":"calligraphy"},
+              {"w":"毛笔","p":"máobǐ","m":"writing brush"},
+              {"w":"墨","p":"mò","m":"ink"}],
+     "didYouKnow":{
+        "en":"The 'Four Treasures of the Study' (文房四宝) are brush, ink, paper, and ink stone — essential tools for any literate Chinese scholar for over a thousand years.",
+        "es":"Los 'Cuatro Tesoros del Estudio' (文房四宝) son pincel, tinta, papel y piedra de tintero — herramientas esenciales para cualquier letrado chino durante más de mil años.",
+        "no":"Studiet-De fire skatter (文房四宝) er pensel, blekk, papir og blekkstein — essensielle verktøy for enhver lesekyndig kinesisk lærd i over tusen år."}},
+]
+
+_CULTURE_MAP = {c["id"]: c for c in _CULTURE_NOTES}
+
+
+def get_culture_notes() -> List[Dict[str, Any]]:
+    return _CULTURE_NOTES
+
+
+def get_culture_note(note_id: str) -> Optional[Dict[str, Any]]:
+    return _CULTURE_MAP.get(note_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 13 — Dashboard / Overview
 # ═══════════════════════════════════════════════════════════════════════════════
 
 async def get_overview(user_id: str = DEFAULT_USER) -> Dict[str, Any]:

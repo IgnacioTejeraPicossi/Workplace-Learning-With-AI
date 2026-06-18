@@ -14,6 +14,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useChineseTTS } from './useChineseTTS';
+import HanziStrokeAnimation from './HanziStrokeAnimation';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const toLang = (lng) => lng === 'es' ? 'es' : lng === 'no' ? 'no' : 'en';
@@ -313,8 +314,13 @@ const TabHanzi = () => {
 
       {current && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 16 }}>
-          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: 28 }}>
-            <p style={{ fontSize: 170, lineHeight: 1, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 800 }}>{showTrad ? current.trad : current.char}</p>
+          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: 22 }}>
+            {showTrad ? (
+              <p style={{ fontSize: 170, lineHeight: 1, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 800 }}>{current.trad}</p>
+            ) : (
+              <HanziStrokeAnimation char={current.char} size={220}
+                tokens={{ ink: COLORS.ink, accent: COLORS.accent, soft: COLORS.inkSoft, grid: COLORS.border }} />
+            )}
             {current.trad !== current.char && (
               <div style={{ marginTop: 10 }}>
                 <label style={{ fontSize: 11, color: COLORS.inkSoft, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -883,6 +889,382 @@ const TabBridge = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Reading Practice (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabReading = () => {
+  const { t, i18n } = useTranslation();
+  const [list, setList] = useState([]);
+  const [activeId, setActiveId] = useState('');
+  const [doc, setDoc] = useState(null);
+  const [showPinyin, setShowPinyin] = useState(true);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [showWordByWord, setShowWordByWord] = useState(false);
+  const [revealedAnswer, setRevealedAnswer] = useState({});
+  const tts = useChineseTTS();
+  const speaking = tts.speaking;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/chinese/reading/texts`)
+      .then((r) => r.json())
+      .then((d) => {
+        setList(d.items || []);
+        if ((d.items || [])[0]) setActiveId(d.items[0].id);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!activeId) return;
+    fetch(`${API_BASE}/api/chinese/reading/${activeId}`)
+      .then((r) => r.json()).then(setDoc);
+    setRevealedAnswer({});
+  }, [activeId]);
+
+  const lang = toLang(i18n.language);
+
+  const readAloud = () => {
+    if (!doc) return;
+    const text = doc.segments.map((s) => s.hz).join('');
+    tts.speak(text);
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 920, margin: '0 auto' }}>
+      <SectionLabel index={9} label={t('chineseTeacherModule.tabs.reading')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('chineseTeacherModule.reading.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('chineseTeacherModule.reading.subtitle')}</p>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+        {list.map((x) => (
+          <button key={x.id} onClick={() => setActiveId(x.id)} style={{
+            background: activeId === x.id ? COLORS.accent : COLORS.card,
+            color: activeId === x.id ? '#fff' : COLORS.ink,
+            border: `1px solid ${activeId === x.id ? COLORS.accent : COLORS.border}`,
+            borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+          }}>{x.title_translations?.[lang] || x.title}</button>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 14, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showPinyin} onChange={(e) => setShowPinyin(e.target.checked)} style={{ accentColor: COLORS.accent }} />
+          {t('chineseTeacherModule.reading.pinyin')}
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showTranslation} onChange={(e) => setShowTranslation(e.target.checked)} style={{ accentColor: COLORS.accent }} />
+          {t('chineseTeacherModule.reading.translation')}
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: COLORS.ink, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showWordByWord} onChange={(e) => setShowWordByWord(e.target.checked)} style={{ accentColor: COLORS.accent }} />
+          {t('chineseTeacherModule.reading.wordByWord')}
+        </label>
+        {tts.supported && (
+          <Button onClick={speaking ? () => tts.stop() : readAloud}>
+            {speaking ? t('chineseTeacherModule.reading.stopReading') : t('chineseTeacherModule.reading.readAloud')}
+          </Button>
+        )}
+      </div>
+
+      {!doc ? <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('chineseTeacherModule.reading.loading')}</p> : (
+        <>
+          <Card accent={COLORS.accent} style={{ marginBottom: 14 }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: COLORS.accent, fontFamily: CHINESE_FONT, marginBottom: 12 }}>📖 {doc.title_translations?.[lang] || doc.title}</p>
+            <div style={{ fontSize: 22, lineHeight: 2.2, color: COLORS.ink, fontFamily: CHINESE_FONT }}>
+              {doc.segments.map((s, i) => (
+                <ruby key={i} style={{ marginRight: 2 }}>
+                  {s.hz}
+                  {showPinyin && s.py && <rt style={{ fontSize: 11, color: COLORS.accent, fontFamily: 'monospace' }}>{s.py}</rt>}
+                </ruby>
+              ))}
+            </div>
+            {showTranslation && (
+              <p style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${COLORS.border}`, color: COLORS.ink, fontSize: 14, fontStyle: 'italic' }}>
+                {doc.translation[lang] || doc.translation.en}
+              </p>
+            )}
+          </Card>
+
+          {showWordByWord && (
+            <Card accent="#7c3aed" style={{ marginBottom: 14 }}>
+              <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>{t('chineseTeacherModule.reading.wordByWord')}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: 8 }}>
+                {doc.segments.flatMap((s) => s.words).map((w, i) => (
+                  <div key={i} style={{ background: '#fef8f5', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '8px 10px' }}>
+                    <p style={{ fontSize: 16, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 700 }}>{w.w}</p>
+                    <p style={{ fontSize: 11, color: COLORS.accent, fontFamily: 'monospace' }}>{w.p}</p>
+                    <p style={{ fontSize: 11, color: COLORS.ink, marginTop: 2 }}>{w.m}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {doc.questions?.length > 0 && (
+            <Card accent="#059669">
+              <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>❓ {t('chineseTeacherModule.reading.questions')}</p>
+              {doc.questions.map((q, i) => (
+                <div key={i} style={{ padding: '8px 0', borderBottom: i < doc.questions.length - 1 ? `1px dashed ${COLORS.border}` : 'none' }}>
+                  <p style={{ fontSize: 13, color: COLORS.ink, marginBottom: 6 }}>{q.q[lang] || q.q.en}</p>
+                  {revealedAnswer[i]
+                    ? <p style={{ fontSize: 13, color: '#059669', fontWeight: 700 }}>→ {q.a[lang] || q.a.en}</p>
+                    : <button onClick={() => setRevealedAnswer((r) => ({ ...r, [i]: true }))}
+                              style={{ background: 'transparent', border: 'none', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                        {t('chineseTeacherModule.reading.showAnswer')} →
+                      </button>}
+                </div>
+              ))}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Speaking Lab (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabSpeaking = () => {
+  const { t, i18n } = useTranslation();
+  const [phrases, setPhrases] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [recording, setRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef(null);
+  const tts = useChineseTTS();
+  const speaking = tts.speaking;
+
+  const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+  const hasASR = !!SpeechRecognition;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/chinese/speaking/phrases`)
+      .then((r) => r.json()).then((d) => setPhrases(d.items || []));
+  }, []);
+
+  useEffect(() => () => { try { recognitionRef.current?.stop(); } catch {} }, []);
+
+  const phrase = phrases[idx];
+  const lang = toLang(i18n.language);
+
+  const record = () => {
+    if (!hasASR) return;
+    setTranscript('');
+    const rec = new SpeechRecognition();
+    rec.lang = 'zh-CN'; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onresult = (e) => setTranscript(e.results[0][0].transcript);
+    rec.onend = () => setRecording(false);
+    rec.onerror = () => setRecording(false);
+    recognitionRef.current = rec;
+    setRecording(true);
+    try { rec.start(); } catch { setRecording(false); }
+  };
+  const stopRecord = () => { try { recognitionRef.current?.stop(); } catch {} };
+
+  const selfGrade = async (good) => {
+    if (!phrase) return;
+    try {
+      await fetch(`${API_BASE}/api/chinese/speaking/attempt`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phrase_id: phrase.id, transcript: `${good ? 'GOOD' : 'AGAIN'}: ${transcript}` }),
+      });
+    } catch {}
+    if (good) { setIdx((i) => (i + 1) % phrases.length); setTranscript(''); }
+    else      { setTranscript(''); }
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 720, margin: '0 auto' }}>
+      <SectionLabel index={10} label={t('chineseTeacherModule.tabs.speaking')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('chineseTeacherModule.speaking.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('chineseTeacherModule.speaking.subtitle')}</p>
+
+      {!hasASR && (
+        <div style={{ background: COLORS.accentLight, border: `1px solid ${COLORS.accentBorder}`, borderLeft: `4px solid ${COLORS.accent}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#7f1d1d' }}>
+          ⚠ {t('chineseTeacherModule.speaking.noSupport')}
+        </div>
+      )}
+      {tts.supported && !tts.zhVoice && tts.voices.length > 0 && (
+        <div style={{ background: COLORS.goldLight, border: `1px solid ${COLORS.goldBorder}`, borderLeft: `4px solid ${COLORS.gold}`,
+                       borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#78350f' }}>
+          ⚠ {t('chineseTeacherModule.pinyin.noJaVoice')}
+        </div>
+      )}
+      {tts.zhVoice && (
+        <div style={{ marginBottom: 12, fontSize: 11, color: COLORS.inkSoft }}>
+          🔊 <span style={{ fontFamily: 'monospace', color: COLORS.ink }}>{tts.zhVoice.name}</span> <span style={{ color: COLORS.gold }}>({tts.zhVoice.lang})</span>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
+        {phrases.map((p, i) => (
+          <button key={p.id} onClick={() => { setIdx(i); setTranscript(''); }} style={{
+            background: i === idx ? COLORS.accent : COLORS.card,
+            color: i === idx ? '#fff' : COLORS.ink,
+            border: `1px solid ${i === idx ? COLORS.accent : COLORS.border}`,
+            borderRadius: 8, padding: '5px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+          }}>{p.id}</button>
+        ))}
+      </div>
+
+      {phrase && (
+        <>
+          <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: '30px 22px', marginBottom: 16 }}>
+            <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>{t('chineseTeacherModule.speaking.target')}</p>
+            <p style={{ fontSize: 40, fontWeight: 800, color: COLORS.ink, fontFamily: CHINESE_FONT, lineHeight: 1.3, marginBottom: 8 }}>{phrase.hz}</p>
+            <p style={{ fontSize: 16, color: COLORS.accent, fontFamily: 'monospace', marginBottom: 8 }}>{phrase.py}</p>
+            <p style={{ fontSize: 13, color: COLORS.ink }}>{phrase.translations?.[lang] || phrase.translations?.en}</p>
+            {tts.supported && (
+              <div style={{ marginTop: 16 }}>
+                <Button onClick={speaking ? () => tts.stop() : () => tts.speak(phrase.hz)}>
+                  {speaking ? t('chineseTeacherModule.speaking.stopBtn') : t('chineseTeacherModule.speaking.listenBtn')}
+                </Button>
+              </div>
+            )}
+          </Card>
+
+          {hasASR && (
+            <Card accent={recording ? COLORS.accent : '#2563eb'} style={{ marginBottom: 16, textAlign: 'center' }}>
+              <Button primary onClick={recording ? stopRecord : record} style={{ marginBottom: 14 }}>
+                {recording ? t('chineseTeacherModule.speaking.stopRecordBtn') : t('chineseTeacherModule.speaking.recordBtn')}
+              </Button>
+              <p style={{ color: COLORS.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('chineseTeacherModule.speaking.heard')}</p>
+              {transcript
+                ? <p style={{ fontSize: 22, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 700 }}>{transcript}</p>
+                : <p style={{ fontSize: 13, color: COLORS.inkSoft, fontStyle: 'italic' }}>{t('chineseTeacherModule.speaking.noMatchYet')}</p>}
+              {transcript && (
+                <div style={{ marginTop: 14 }}>
+                  <p style={{ fontSize: 11, color: COLORS.inkSoft, marginBottom: 8 }}>{t('chineseTeacherModule.speaking.selfGrade')}</p>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                    <Button onClick={() => selfGrade(false)} style={{ background: COLORS.accentLight, borderColor: COLORS.accentBorder, color: COLORS.accent }}>
+                      {t('chineseTeacherModule.speaking.tryAgain')}
+                    </Button>
+                    <Button primary onClick={() => selfGrade(true)}>{t('chineseTeacherModule.speaking.goodMatch')}</Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Culture Notes (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabCulture = () => {
+  const { t, i18n } = useTranslation();
+  const [notes, setNotes] = useState([]);
+  const [activeId, setActiveId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const tts = useChineseTTS();
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/chinese/culture/notes`)
+      .then((r) => r.json())
+      .then((d) => {
+        setNotes(d.items || []);
+        if ((d.items || [])[0]) setActiveId(d.items[0].id);
+        setLoading(false);
+      });
+  }, []);
+
+  const lang = toLang(i18n.language);
+  const cur = notes.find((n) => n.id === activeId);
+
+  if (loading) return <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('chineseTeacherModule.culture.loading')}</p>;
+
+  const categoryColors = {
+    language:    { c: '#7c3aed', l: '#f5f3ff', b: '#ddd6fe' },
+    society:     { c: '#0891b2', l: '#ecfeff', b: '#a5f3fc' },
+    festivals:   { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder },
+    food:        { c: '#059669', l: '#ecfdf5', b: '#a7f3d0' },
+    etiquette:   { c: '#d97706', l: '#fffbeb', b: '#fde68a' },
+    pop_culture: { c: '#2563eb', l: '#eff6ff', b: '#bfdbfe' },
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={11} label={t('chineseTeacherModule.tabs.culture')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('chineseTeacherModule.culture.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('chineseTeacherModule.culture.subtitle')}</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {notes.map((n) => {
+            const cat = categoryColors[n.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+            const isActive = n.id === activeId;
+            return (
+              <button key={n.id} onClick={() => setActiveId(n.id)} style={{
+                background: isActive ? cat.l : COLORS.card,
+                border: `1px solid ${isActive ? cat.b : COLORS.border}`,
+                borderLeft: `4px solid ${cat.c}`,
+                borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: 'inherit',
+              }}>
+                <span style={{ fontSize: 22 }}>{n.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 14, fontWeight: 800, color: COLORS.ink, fontFamily: CHINESE_FONT, margin: 0 }}>{n.title.hz}</p>
+                  <p style={{ fontSize: 11, color: cat.c, fontWeight: 700, margin: '2px 0 0' }}>{n.title[lang] || n.title.en}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {cur && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {(() => {
+              const cat = categoryColors[cur.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+              return <>
+                <Card accent={cat.c} style={{ background: cat.l, borderColor: cat.b }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                    <span style={{ fontSize: 38 }}>{cur.emoji}</span>
+                    <div>
+                      <p style={{ fontSize: 24, fontWeight: 900, color: COLORS.ink, fontFamily: CHINESE_FONT, margin: 0, lineHeight: 1.1 }}>{cur.title.hz}</p>
+                      <p style={{ fontSize: 12, color: COLORS.accent, fontFamily: 'monospace', margin: '2px 0 0' }}>{cur.title.py}</p>
+                    </div>
+                    <button onClick={() => tts.speak(cur.title.hz)} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16 }}>🔊</button>
+                    <Chip color={cat.c} light="#ffffff" border={cat.b}>
+                      {t(`chineseTeacherModule.culture.categories.${cur.category}`, { defaultValue: cur.category })}
+                    </Chip>
+                  </div>
+                  <p style={{ fontSize: 14, color: COLORS.ink, lineHeight: 1.65 }}>{cur.summary[lang] || cur.summary.en}</p>
+                </Card>
+
+                {cur.vocab?.length > 0 && (
+                  <Card accent="#7c3aed">
+                    <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>📚 {t('chineseTeacherModule.culture.vocab')}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 8 }}>
+                      {cur.vocab.map((w, i) => (
+                        <div key={i} style={{ background: '#fef8f5', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '8px 10px' }}>
+                          <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: CHINESE_FONT, fontWeight: 700, margin: 0 }}>{w.w}</p>
+                          <p style={{ fontSize: 11, color: COLORS.accent, fontFamily: 'monospace', margin: '2px 0 0' }}>{w.p}</p>
+                          <p style={{ fontSize: 11, color: COLORS.ink, margin: '2px 0 0' }}>{w.m}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {cur.didYouKnow && (
+                  <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder }}>
+                    <p style={{ color: '#92400e', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>💡 {t('chineseTeacherModule.culture.didYouKnow')}</p>
+                    <p style={{ fontSize: 13, color: COLORS.ink, lineHeight: 1.6, fontStyle: 'italic' }}>{cur.didYouKnow[lang] || cur.didYouKnow.en}</p>
+                  </Card>
+                )}
+              </>;
+            })()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Main shell
 // ═══════════════════════════════════════════════════════════════════════════════
 const ChineseTeacher = () => {
@@ -897,7 +1279,10 @@ const ChineseTeacher = () => {
     { id: 'vocabulary',   label: t('chineseTeacherModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'grammar',      label: t('chineseTeacherModule.tabs.grammar'),      icon: '📐' },
     { id: 'conversation', label: t('chineseTeacherModule.tabs.conversation'), icon: '💬' },
+    { id: 'reading',      label: t('chineseTeacherModule.tabs.reading'),      icon: '📖' },
+    { id: 'speaking',     label: t('chineseTeacherModule.tabs.speaking'),     icon: '🎤' },
     { id: 'bridge',       label: t('chineseTeacherModule.tabs.bridge'),       icon: '🌉' },
+    { id: 'culture',      label: t('chineseTeacherModule.tabs.culture'),      icon: '🏯' },
   ];
 
   const renderContent = () => {
@@ -909,7 +1294,10 @@ const ChineseTeacher = () => {
       case 'vocabulary':   return <TabVocabulary />;
       case 'grammar':      return <TabGrammar />;
       case 'conversation': return <TabConversation />;
+      case 'reading':      return <TabReading />;
+      case 'speaking':     return <TabSpeaking />;
       case 'bridge':       return <TabBridge />;
+      case 'culture':      return <TabCulture />;
       default:             return <TabDashboard onJump={(id) => setActiveTab(id)} />;
     }
   };

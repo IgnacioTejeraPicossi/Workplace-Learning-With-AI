@@ -17,6 +17,9 @@ try:
         get_grammar_path, get_grammar_point,
         get_overview, conversation_message, scenarios_catalogue,
         get_bridge_entries, get_bridge_entry,
+        get_reading_texts, get_reading_text,
+        get_speaking_phrases, speaking_attempt,
+        get_culture_notes, get_culture_note,
     )
 except ImportError:  # pragma: no cover
     from services.chinese_teacher import (  # type: ignore
@@ -27,6 +30,9 @@ except ImportError:  # pragma: no cover
         get_grammar_path, get_grammar_point,
         get_overview, conversation_message, scenarios_catalogue,
         get_bridge_entries, get_bridge_entry,
+        get_reading_texts, get_reading_text,
+        get_speaking_phrases, speaking_attempt,
+        get_culture_notes, get_culture_note,
     )
 
 router = APIRouter(prefix="/api/chinese")
@@ -150,3 +156,49 @@ async def bridge_char_endpoint(char: str) -> Dict[str, Any]:
     if not entry:
         raise HTTPException(status_code=404, detail=f"Bridge entry not found: {char}")
     return entry
+
+
+# ─── V2 endpoints (Reading, Speaking, Culture) ────────────────────────────────
+
+@router.get("/reading/texts", summary="List available reading practice texts (V2)")
+async def reading_list_endpoint() -> Dict[str, Any]:
+    items = get_reading_texts()
+    return {"count": len(items), "items": items}
+
+
+@router.get("/reading/{text_id}", summary="Single reading text with full breakdown (V2)")
+async def reading_text_endpoint(text_id: str) -> Dict[str, Any]:
+    t = get_reading_text(text_id)
+    if not t:
+        raise HTTPException(status_code=404, detail=f"Reading text not found: {text_id}")
+    return t
+
+
+@router.get("/speaking/phrases", summary="Speaking Lab practice phrases (V2)")
+async def speaking_phrases_endpoint() -> Dict[str, Any]:
+    items = get_speaking_phrases()
+    return {"count": len(items), "items": items}
+
+
+class SpeakingAttemptRequest(BaseModel):
+    phrase_id: str = Field(..., description="Phrase being practiced (e.g. 'sp1')")
+    transcript: str = Field(..., description="What Web Speech API heard")
+
+
+@router.post("/speaking/attempt", summary="Record a speaking attempt (V2)")
+async def speaking_attempt_endpoint(body: SpeakingAttemptRequest) -> Dict[str, Any]:
+    return await speaking_attempt(body.phrase_id, body.transcript)
+
+
+@router.get("/culture/notes", summary="List all culture notes (V2)")
+async def culture_notes_endpoint() -> Dict[str, Any]:
+    items = get_culture_notes()
+    return {"count": len(items), "items": items}
+
+
+@router.get("/culture/{note_id}", summary="Single culture note detail (V2)")
+async def culture_note_endpoint(note_id: str) -> Dict[str, Any]:
+    n = get_culture_note(note_id)
+    if not n:
+        raise HTTPException(status_code=404, detail=f"Culture note not found: {note_id}")
+    return n

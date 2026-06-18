@@ -13,7 +13,10 @@
       "vocabulary": "Ordforråd SRS",
       "grammar": "Grammatikk",
       "conversation": "Samtale",
-      "bridge": "Kanji-Hanzi Bro"
+      "bridge": "Kanji-Hanzi Bro",
+      "reading": "Lesetrening",
+      "speaking": "Tale-lab",
+      "culture": "Kultur"
     },
     "dashboard": {
       "title": "I dag",
@@ -148,6 +151,58 @@
       "filterAll": "Alle",
       "filterCurated": "Kuraterte",
       "filterAuto": "Auto-oppdagede"
+    },
+    "reading": {
+      "title": "Lesetrening",
+      "subtitle": "Korte HSK1-tekster med pinyin, oversettelse og ord-for-ord nedbrytning",
+      "pickText": "Velg en tekst",
+      "pinyin": "Pinyin",
+      "translation": "Oversettelse",
+      "wordByWord": "Ord-for-ord",
+      "readAloud": "🔊 Les høyt",
+      "stopReading": "⏹ Stopp",
+      "questions": "Forståelse",
+      "showAnswer": "Vis svar",
+      "loading": "Laster tekst…"
+    },
+    "speaking": {
+      "title": "Tale-laboratorium",
+      "subtitle": "Øv toner og uttale med nettleserens innebygde tale-API-er",
+      "target": "Mål-frase",
+      "listenBtn": "🔊 Hør",
+      "stopBtn": "⏹ Stopp",
+      "recordBtn": "🎤 Ta opp",
+      "stopRecordBtn": "⏹ Stopp opptak",
+      "heard": "Det vi hørte",
+      "selfGrade": "Hvordan hørtes det ut?",
+      "goodMatch": "✓ Hørtes bra ut",
+      "tryAgain": "↻ Prøv igjen",
+      "noSupport": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge.",
+      "noMatchYet": "Trykk 🎤 Ta opp og si frasen…"
+    },
+    "culture": {
+      "title": "Kulturnotater",
+      "subtitle": "Korte kulturelle innsikter — språkhistorie, samfunn, festivaler, mat",
+      "loading": "Laster kulturnotater…",
+      "vocab": "Nøkkelord",
+      "didYouKnow": "Visste du?",
+      "categories": {
+        "language": "Språk",
+        "society": "Samfunn",
+        "festivals": "Festivaler",
+        "food": "Mat",
+        "etiquette": "Etikette",
+        "pop_culture": "Popkultur"
+      }
+    },
+    "hanziStrokes": {
+      "play": "▶ Spill strøk",
+      "playing": "⏵ Spiller…",
+      "showAll": "Vis alle",
+      "numbers": "Tall",
+      "stroke": "Strøk",
+      "of": "{{n}} / {{total}}",
+      "credit": "Strøk © hanzi-writer-data (MIT)"
     },
     "common": {
       "loading": "Laster…",

@@ -13,7 +13,10 @@
       "vocabulary": "Vocabulary SRS",
       "grammar": "Grammar",
       "conversation": "Conversation",
-      "bridge": "Kanji-Hanzi Bridge"
+      "bridge": "Kanji-Hanzi Bridge",
+      "reading": "Reading",
+      "speaking": "Speaking Lab",
+      "culture": "Culture"
     },
     "dashboard": {
       "title": "Today",
@@ -148,6 +151,58 @@
       "filterAll": "All",
       "filterCurated": "Curated",
       "filterAuto": "Auto-detected"
+    },
+    "reading": {
+      "title": "Reading Practice",
+      "subtitle": "Short HSK1 texts with pinyin, translation and word-by-word breakdown",
+      "pickText": "Choose a text",
+      "pinyin": "Pinyin",
+      "translation": "Translation",
+      "wordByWord": "Word-by-word",
+      "readAloud": "🔊 Read aloud",
+      "stopReading": "⏹ Stop",
+      "questions": "Comprehension",
+      "showAnswer": "Show answer",
+      "loading": "Loading reading text…"
+    },
+    "speaking": {
+      "title": "Speaking Lab",
+      "subtitle": "Practice tones and pronunciation with native browser speech APIs",
+      "target": "Target phrase",
+      "listenBtn": "🔊 Listen",
+      "stopBtn": "⏹ Stop",
+      "recordBtn": "🎤 Record",
+      "stopRecordBtn": "⏹ Stop recording",
+      "heard": "What we heard",
+      "selfGrade": "How did it sound?",
+      "goodMatch": "✓ Sounds good",
+      "tryAgain": "↻ Try again",
+      "noSupport": "Your browser does not support voice recognition. Try Chrome or Edge.",
+      "noMatchYet": "Press 🎤 Record and say the phrase…"
+    },
+    "culture": {
+      "title": "Culture Notes",
+      "subtitle": "Short cultural insights — language history, society, festivals, food",
+      "loading": "Loading culture notes…",
+      "vocab": "Key vocabulary",
+      "didYouKnow": "Did you know?",
+      "categories": {
+        "language": "Language",
+        "society": "Society",
+        "festivals": "Festivals",
+        "food": "Food",
+        "etiquette": "Etiquette",
+        "pop_culture": "Pop culture"
+      }
+    },
+    "hanziStrokes": {
+      "play": "▶ Play strokes",
+      "playing": "⏵ Playing…",
+      "showAll": "Show all",
+      "numbers": "Numbers",
+      "stroke": "Stroke",
+      "of": "{{n}} / {{total}}",
+      "credit": "Strokes © hanzi-writer-data (MIT)"
     },
     "common": {
       "loading": "Loading…",
