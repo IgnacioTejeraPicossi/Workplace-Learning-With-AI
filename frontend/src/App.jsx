@@ -61,6 +61,7 @@ import AtmVvTestCopilot from "./AtmVvTestCopilot";
 import RedCrossWebQAAgent from "./RedCrossWebQAAgent";
 import HumanizingAI from "./HumanizingAI";
 import JapaneseSensei from "./components/JapaneseSensei/JapaneseSensei";
+import ChineseTeacher from "./components/ChineseTeacher/ChineseTeacher";
 // Self-Simulating Reality Agent (1.17.0) — philosophical-scientific companion
 // for Observer Patch Holography and related theories of consciousness/simulation
 import SelfSimRealityAgent from "./SelfSimRealityAgent";
@@ -544,6 +545,7 @@ function AppContent() {
             {!activeModule && section === "humanizing-ai" && <HumanizingAI />}
             {!activeModule && section === "self-sim-reality-agent" && <SelfSimRealityAgent />}
             {!activeModule && section === "japanese-sensei" && <JapaneseSensei />}
+            {!activeModule && section === "chinese-teacher" && <ChineseTeacher />}
             {/* Web Lab routes — local clones of real websites */}
             {!activeModule && section === "web-lab-item-no" && <ItemNoWeb />}
             {!activeModule && section === "web-lab-redcross-no" && <RedcrossNoWeb onNavigate={setSection} />}
