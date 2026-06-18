@@ -2,7 +2,7 @@
 
 ## 🧪 Comprehensive Testing Suite
 
-This application includes a comprehensive testing suite using Cypress for end-to-end testing of all features.
+This application includes a comprehensive testing suite using Cypress for end-to-end testing of all features (test).
 
 ### 📋 Test Coverage
 
