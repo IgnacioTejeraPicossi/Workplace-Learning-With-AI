@@ -222,6 +222,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Japanese Sensei router: {e}")
 
+# Maestro Chino IA router (Future Item Agents — next to Japanese Sensei)
+try:
+    from backend.routers.chinese_teacher import router as chinese_teacher_router
+    app.include_router(chinese_teacher_router, tags=["Maestro Chino IA"])
+    print("✅ Chinese Teacher router included successfully")
+except Exception as e:
+    print(f"❌ Error including Chinese Teacher router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router
