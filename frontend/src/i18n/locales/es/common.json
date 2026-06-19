@@ -903,6 +903,258 @@
   },
 
   "help": {
+    "agentTheory": {
+      "header": "Teoría de Agentes y Documentación",
+      "subheader": "Colección integral de conocimiento y recursos sobre agentes de IA",
+      "searchPlaceholder": "Buscar en documentación, apps o conceptos…",
+      "noResults": "Sin resultados",
+      "tabs": {
+        "overview": "Resumen",
+        "theory": "Teoría",
+        "toolstack": "Stack de herramientas",
+        "webapps": "Apps web",
+        "hackathons": "Hackathons",
+        "resources": "Recursos"
+      },
+      "stats": {
+        "documents": "Documentos",
+        "webApps": "Apps web",
+        "examples": "Ejemplos",
+        "lastUpdated": "Última actualización",
+        "today": "Hoy"
+      },
+      "welcomeTitle": "Bienvenido a Teoría de Agentes y Documentación",
+      "welcomeIntro": "Esta sección recopilará todo el conocimiento acumulado sobre agentes de IA, incluyendo:",
+      "welcome": {
+        "bullets": {
+          "0": "Fundamentos teóricos y conceptos",
+          "1": "Guías prácticas de implementación",
+          "2": "Aplicaciones web y herramientas",
+          "3": "Ejemplos de código y tutoriales",
+          "4": "Artículos de investigación y estudios"
+        },
+        "ready": "¡Listo para añadir tu contenido!",
+        "share": "Comparte tu documentación y la organizaré aquí."
+      },
+      "featured": {
+        "title": "10 tipos centrales de agentes (póster + guía)",
+        "desc": "Desde agentes reactivos hasta sistemas multi-agente — mapa conciso de familias de agentes con sus roles y comportamientos.",
+        "openInTheory": "Abrir en Teoría",
+        "download": "Descargar póster"
+      },
+      "theory": {
+        "title": "Teoría y conceptos de agentes"
+      },
+      "status": {
+        "pending": "⏳ Pendiente",
+        "ready": "✅ Listo"
+      },
+      "by": "Por:",
+      "keySteps": "Pasos clave:",
+      "keyTerms": "7 términos clave:",
+      "useCase": "Caso de uso:",
+      "coreLoop": "Bucle principal:",
+      "keyInsight": "Idea clave:",
+      "quote": "Cita:",
+      "source": "Fuente:",
+      "keyAdvice": "Consejo clave:",
+      "webapps": {
+        "title": "Aplicaciones web y herramientas",
+        "active": "🟢 Activo",
+        "inactive": "🔴 Inactivo",
+        "visit": "Visitar sitio →"
+      },
+      "hackathons": {
+        "title": "Próximos hackathons",
+        "desc": "Información detallada sobre los hackathons en los que participamos. Esta información ayuda a Ignacio, Cursor AI y ChatGPT5 en la planificación.",
+        "upcoming": "📅 Próximos",
+        "completed": "✅ Completados",
+        "date": "Fecha:",
+        "location": "Lugar:",
+        "organizer": "Organizador:",
+        "format": "Formato:",
+        "challenge": "Reto",
+        "platformFeatures": "Funcionalidades de la plataforma",
+        "schedule": "Programa",
+        "recommendedTools": "Herramientas recomendadas",
+        "jury": "Jurado y dirección",
+        "benefits": "Beneficios"
+      },
+      "toolstack": {
+        "title": "El stack completo de herramientas para agentes de IA",
+        "description": "Colección integral de herramientas y plataformas para construir, operar y gobernar agentes de IA en todas las fases",
+        "stats": {
+          "categories": "Categorías",
+          "tools": "Herramientas",
+          "essential": "Herramientas esenciales"
+        }
+      },
+      "resources": {
+        "title": "Recursos de aprendizaje",
+        "video": {
+          "title": "Contenido en vídeo",
+          "watch": "Ver vídeo →"
+        },
+        "other": "Otros recursos",
+        "items": "elementos",
+        "itemsList": {}
+      }
+    },
+    "aiStudyBuddy": {
+      "title": "Compañero de estudio IA",
+      "subtitle": "Tu asistente inteligente de aprendizaje",
+      "welcome": "👋 ¡Hola! Soy tu Compañero de estudio IA. Estoy aquí para ayudarte con cualquier pregunta sobre aprendizaje en el trabajo, micro-lecciones, simulaciones o desarrollo profesional.\n\n¿Sobre qué te gustaría aprender hoy?",
+      "aiThinking": "La IA está pensando...",
+      "suggestedTitle": "💡 Preguntas sugeridas:",
+      "suggested": {
+        "0": "¿Qué son las micro-lecciones y cómo funcionan?",
+        "1": "¿Cómo puede la IA ayudar con el desarrollo profesional?",
+        "2": "¿Qué es la previsión de habilidades?",
+        "3": "Háblame de las simulaciones de escenarios",
+        "4": "¿Cómo puedo seguir mi progreso de aprendizaje?"
+      },
+      "useReadme": "Usar contexto del README",
+      "agentLabel": "Agente:",
+      "selectPlaceholder": "Selecciona un agente…",
+      "inputPlaceholder": "Pregúntame lo que quieras sobre aprendizaje en el trabajo..."
+    },
+    "presentationAgent": {
+      "title": "Agente de Presentación IA",
+      "subtitle": "Agente de presentación impulsado por IA para tu demo de hackathon. Genera guiones, gestiona Q&A y entrega presentaciones en vivo.",
+      "selectMode": "Selecciona modo de presentación:",
+      "generateScript": "Generar guion",
+      "generateScriptDesc": "Crea un guion de presentación de 4 minutos para el hackathon",
+      "generateAgents": "Generar guion Agentes Hackathon",
+      "generateAgentsDesc": "Guion con un clic que presenta todos los agentes implementados en 5 minutos",
+      "qaMode": "Modo Q&A",
+      "qaModeDesc": "Responde a preguntas del jurado y la audiencia",
+      "liveDemo": "Demo en vivo",
+      "liveDemoDesc": "Inicia una presentación automatizada de 4 minutos",
+      "generatingAgents": "Generando guion: Agentes Hackathon en 5 minutos",
+      "generatingScript": "Generando guion de presentación",
+      "generatingAgentsSub": "Resumen de todos los agentes implementados con pasos de demo",
+      "generatingScriptSub": "Presentación Hackathon de 4 minutos",
+      "scriptPlaceholder": "Generando tu guion de presentación...",
+      "speaking": "🔊 Hablando...",
+      "speakScript": "🔊 Leer guion",
+      "stopSpeaking": "🔇 Detener voz",
+      "newScript": "🔄 Nuevo guion",
+      "qaTitle": "Q&A mejorado con datos en vivo",
+      "qaSub": "Respuestas inteligentes con datos de plataforma en tiempo real",
+      "questionCategory": "Categoría de pregunta:",
+      "allCategories": "Todas las categorías",
+      "liveData": "Integración de datos en vivo:",
+      "includeLive": "Incluir datos de plataforma en tiempo real",
+      "questionPlaceholder": "Haz cualquier pregunta sobre nuestra plataforma...",
+      "quickByCategory": "💡 Preguntas rápidas por categoría:",
+      "generatingAnswer": "⏳ Generando respuesta...",
+      "getAnswer": "❓ Obtener respuesta mejorada",
+      "qaPlaceholder": "Las respuestas mejoradas de Q&A con datos en vivo aparecerán aquí...",
+      "statsCategories": "Categorías:",
+      "statsQuestions": "Preguntas:",
+      "statsLiveData": "Datos en vivo:",
+      "statsAccuracy": "Precisión:",
+      "advanced": "Ajustes avanzados",
+      "hide": "🔽 Ocultar",
+      "show": "🔼 Mostrar",
+      "exportTitle": "Opciones de exportación",
+      "exportFormat": "Formato de exportación:",
+      "downloadText": "Descargar como texto",
+      "copyClipboard": "Copiar al portapapeles",
+      "generateFirst": "Genera primero el guion",
+      "exportPresentation": "📄 Exportar presentación",
+      "timingTitle": "Tiempos personalizados",
+      "secondsPerSlide": "Segundos por diapositiva:",
+      "s30": "30s",
+      "s120": "120s",
+      "resetDefault": "🔄 Restablecer (60s)",
+      "languageTitle": "Idioma",
+      "presentationLanguage": "Idioma de presentación:",
+      "languageHint": "Soporte de idioma para generación de guion y respuestas Q&A",
+      "voiceTitle": "Voz",
+      "presentationVoice": "Voz de presentación:",
+      "myVoiceDisabled": "🎤 Mi voz (función eliminada)",
+      "maleVoice": "Voz masculina",
+      "femaleVoice": "Voz femenina",
+      "voiceHint": "Selección de voz para síntesis de voz y presentaciones de audio",
+      "statsTitle": "Estadísticas",
+      "statScriptLen": "Longitud del guion:",
+      "words": "palabras",
+      "statSlides": "Total de diapositivas:",
+      "statDuration": "Duración total:",
+      "statQAPairs": "Pares Q&A:",
+      "liveDesc": "Conecta con datos reales de la app para demos en vivo durante tu presentación",
+      "demoModes": "Modos de demo",
+      "systemStats": "Estadísticas del sistema",
+      "liveMetrics": "Métricas de plataforma en vivo",
+      "userJourney": "Recorrido del usuario",
+      "learningPath": "Ruta de aprendizaje completa",
+      "featureDemos": "Demos de funcionalidades",
+      "agentDemos": "Demos de agentes",
+      "liveIntegration": "Integración en vivo",
+      "liveActive": "Demo en vivo activa:",
+      "useReadme": "Usar contexto del README",
+      "agentHelpPlaceholder": "Selecciona un agente para obtener una explicación concisa orientada a demo...",
+      "stopDemo": "Detener demo",
+      "liveContent": "Contenido de demo en vivo:",
+      "demo": "Demo",
+      "livePlaceholder": "El contenido de demo en vivo aparecerá aquí...",
+      "speakDemo": "🔊 Leer demo",
+      "features": {
+        "ai-concepts": { "name": "Generación de conceptos IA", "desc": "Contenido educativo por streaming en tiempo real" },
+        "micro-lessons": { "name": "Micro-lecciones", "desc": "Aprendizaje en pequeñas dosis con contenido IA" },
+        "scenario-simulator": { "name": "Simulador de escenarios", "desc": "Simulaciones interactivas de trabajo" },
+        "career-coach": { "name": "Coach de carrera IA", "desc": "Orientación profesional personalizada" },
+        "skills-forecast": { "name": "Previsión de habilidades", "desc": "Predicciones de desarrollo de habilidades con IA" },
+        "team-dynamics": { "name": "Analizador de dinámica de equipos", "desc": "Insights sobre colaboración en equipo" },
+        "stats": { "name": "Estadísticas del sistema" }
+      },
+      "agents": {
+        "ai-compliance-agent": {
+          "name": "Agente de Cumplimiento IA",
+          "desc": "Genera riesgos clave de una política y ejecuta acciones en Jira/Slack/Sheets vía OutSystems."
+        },
+        "ai-productivity-agent": {
+          "name": "Agente de Productividad IA",
+          "desc": "Convierte un briefing de investigación en múltiples tareas Jira más Slack/Sheets."
+        },
+        "personal-attention-agent": {
+          "name": "Agente de Atención Personal",
+          "desc": "Convierte ruido en señal entre canales; programa bloques de enfoque y envía briefings accionables."
+        },
+        "council-of-diverse-lenses": {
+          "name": "Consejo de Perspectivas Diversas",
+          "desc": "Deliberación multi-persona con controles de seguridad; perspectivas diversas para debatir temas complejos."
+        },
+        "ea-second-brain-agent": {
+          "name": "Agente Segundo Cerebro EA",
+          "desc": "Observador de Arquitectura Empresarial que convierte señales en acciones conscientes del portfolio; monitoriza cambios tecnológicos."
+        },
+        "responsible-ai-ops-grc": {
+          "name": "AI Ops Responsable (GRC)",
+          "desc": "Detecta problemas de calidad de datos, política y riesgo en Finanzas/Compras/Supply Chain/ESG y ejecuta soluciones con auditoría."
+        },
+        "operations-efficiency-agent": {
+          "name": "Agente de Eficiencia Operativa",
+          "desc": "Automatiza la gestión de facturas, sugiere asignaciones de coste y clasifica CVs con explicabilidad."
+        },
+        "sales-assistant-agent": {
+          "name": "Agente Asistente de Ventas",
+          "desc": "Higiene de pipeline, puntuación de riesgo de deals y seguimientos contextuales; automatiza tareas de CRM."
+        },
+        "telco-ops-decisioning-agent": {
+          "name": "Agente de Decisión Operativa Telco",
+          "desc": "Ejecuta pedidos, cambios de plan y citas; convierte señales telco en autonomía segura."
+        }
+      }
+    },
+    "languages": {},
+    "presentationAgentLangs": {
+      "sv": "Sueco",
+      "es": "Español",
+      "de": "Alemán",
+      "fr": "Francés"
+    },
     "agiHub": {
       "title": "Hub de Progreso de la AGI",
       "subtitle": "Sigue el progreso, explora posibles futuros y comprende los beneficios de la Inteligencia General Artificial"

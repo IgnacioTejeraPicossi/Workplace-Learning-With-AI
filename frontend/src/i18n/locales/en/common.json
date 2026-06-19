@@ -1276,6 +1276,103 @@
   },
 
   "help": {
+    "agentTheory": {
+      "header": "Agent Theory & Documentation",
+      "subheader": "Comprehensive collection of knowledge and resources about AI agents",
+      "searchPlaceholder": "Search documentation, apps or concepts…",
+      "noResults": "No results",
+      "tabs": {
+        "overview": "Overview",
+        "theory": "Theory",
+        "toolstack": "Tool Stack",
+        "webapps": "Web Apps",
+        "hackathons": "Hackathons",
+        "resources": "Resources"
+      },
+      "stats": {
+        "documents": "Documents",
+        "webApps": "Web Apps",
+        "examples": "Examples",
+        "lastUpdated": "Last Updated",
+        "today": "Today"
+      },
+      "welcomeTitle": "Welcome to Agent Theory & Documentation",
+      "welcomeIntro": "This section will contain all your accumulated knowledge about AI agents, including:",
+      "welcome": {
+        "bullets": {
+          "0": "Theoretical foundations and concepts",
+          "1": "Practical implementation guides",
+          "2": "Web applications and tools",
+          "3": "Code examples and tutorials",
+          "4": "Research papers and studies"
+        },
+        "ready": "Ready to add your content!",
+        "share": "Share your documentation and I'll organize it here."
+      },
+      "featured": {
+        "title": "10 Core Agent Types (Poster + Guide)",
+        "desc": "From reactive to multi-agent systems — concise map of agent families with roles and behaviors.",
+        "openInTheory": "Open in Theory",
+        "download": "Download poster"
+      },
+      "theory": {
+        "title": "Agent theory & concepts"
+      },
+      "status": {
+        "pending": "⏳ Pending",
+        "ready": "✅ Ready"
+      },
+      "by": "By:",
+      "keySteps": "Key steps:",
+      "keyTerms": "7 key terms:",
+      "useCase": "Use case:",
+      "coreLoop": "Core loop:",
+      "keyInsight": "Key insight:",
+      "quote": "Quote:",
+      "source": "Source:",
+      "keyAdvice": "Key advice:",
+      "webapps": {
+        "title": "Web applications & tools",
+        "active": "🟢 Active",
+        "inactive": "🔴 Inactive",
+        "visit": "Visit site →"
+      },
+      "hackathons": {
+        "title": "Upcoming hackathons",
+        "desc": "Detailed info on hackathons we participate in. This information helps Ignacio, Cursor AI and ChatGPT5 with planning.",
+        "upcoming": "📅 Upcoming",
+        "completed": "✅ Completed",
+        "date": "Date:",
+        "location": "Location:",
+        "organizer": "Organizer:",
+        "format": "Format:",
+        "challenge": "Challenge",
+        "platformFeatures": "Platform features",
+        "schedule": "Schedule",
+        "recommendedTools": "Recommended tools",
+        "jury": "Jury & leadership",
+        "benefits": "Benefits"
+      },
+      "toolstack": {
+        "title": "The complete AI agents tool stack",
+        "description": "Comprehensive collection of tools and platforms for building, operating and governing AI agents across all phases",
+        "stats": {
+          "categories": "Categories",
+          "tools": "Tools",
+          "essential": "Essential tools"
+        }
+      },
+      "resources": {
+        "title": "Learning resources",
+        "video": {
+          "title": "Video content",
+          "watch": "Watch video →"
+        },
+        "other": "Other resources",
+        "items": "items",
+        "itemsList": {}
+      }
+    },
     "aiStudyBuddy": {
       "title": "AI Study Buddy",
       "subtitle": "Your intelligent learning assistant",
