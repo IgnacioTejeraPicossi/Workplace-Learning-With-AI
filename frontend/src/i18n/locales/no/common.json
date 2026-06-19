@@ -1455,7 +1455,73 @@
         "openInTheory": "Åpne i Teori",
         "download": "Last ned plakat"
       },
-      "theory": { "title": "Agent‑teori og konsepter" },
+      "contentType": {
+        "article": "ARTIKKEL",
+        "video": "VIDEO",
+        "guide": "GUIDE",
+        "tutorial": "OPPLÆRING"
+      },
+      "common": {
+        "high": "Høy",
+        "medium": "Middels",
+        "low": "Lav"
+      },
+      "theory": {
+        "title": "Agent‑teori og konsepter",
+        "sections": {
+          "0": {
+            "title": "Komme i gang-guider",
+            "items": {
+              "0": {
+                "title": "Bygg din første KI-agent: en klar vei!",
+                "description": "Steg-for-steg-metodikk for å bygge KI-agenter med praktisk tilnærming"
+              },
+              "1": {
+                "title": "7 KI-begreper du må kjenne — utover det grunnleggende",
+                "description": "KI-arkitekturbegreper på bedriftsnivå for produksjonssystemer"
+              }
+            }
+          },
+          "1": {
+            "title": "Grunnleggende konsepter",
+            "items": {
+              "0": {
+                "title": "Hva er en KI-agent? (Oversikt)",
+                "description": "Plakat på høyt nivå: hvordan agenter fungerer, egenskaper, verktøy, minne og nøkkelressurser"
+              },
+              "1": {
+                "title": "10 kjerne-agenttyper (plakat + guide)",
+                "description": "Fra reaktive til multi-agent-systemer — kompakt kart over agentfamilier med roller og atferd"
+              },
+              "2": {
+                "title": "Agent-arkitekturer",
+                "description": "Ulike arkitekturmønstre"
+              },
+              "3": {
+                "title": "Multi-agent-systemer",
+                "description": "Koordinering og kommunikasjon"
+              }
+            }
+          },
+          "2": {
+            "title": "Implementeringsmønstre",
+            "items": {
+              "0": {
+                "title": "ReAct-mønsteret",
+                "description": "Resonnering og handling i språkmodeller"
+              },
+              "1": {
+                "title": "Verktøybruk",
+                "description": "Hvordan agenter samhandler med eksterne verktøy"
+              },
+              "2": {
+                "title": "Minnesystemer",
+                "description": "Kort- og langtidsminne for agenter"
+              }
+            }
+          }
+        }
+      },
       "status": { "pending": "⏳ Venter", "ready": "✅ Klar" },
       "by": "Av:",
       "keySteps": "Nøkkelsteg:",
@@ -1470,7 +1536,14 @@
         "title": "Web‑applikasjoner og verktøy",
         "active": "🟢 Aktiv",
         "inactive": "🔴 Inaktiv",
-        "visit": "Besøk nettsted →"
+        "visit": "Besøk nettsted →",
+        "categories": {
+          "0": { "name": "Hackathon-verktøy" },
+          "1": { "name": "KI-agenter for forretning" },
+          "2": { "name": "Automatisering- og arbeidsflyt-agenter" },
+          "3": { "name": "Agent-rammeverk" },
+          "4": { "name": "LLM-leverandører" }
+        }
       },
       "hackathons": {
         "title": "Kommende hackathons",
@@ -1495,6 +1568,14 @@
           "categories": "Kategorier",
           "tools": "Verktøy",
           "essential": "Viktige verktøy"
+        },
+        "categories": {
+          "orchestration-platforms": { "name": "Orkestreringsplattformer", "focus": "Kjør og skaler KI-agenter i reelle arbeidsflyter" },
+          "tool-use-api-integration": { "name": "Verktøybruk og API-integrasjon", "focus": "Verktøy som lar agenter samhandle med virkelige APIer og plattformer" },
+          "agent-safety-guardrails": { "name": "Agent-sikkerhet og rekkverk", "focus": "Sikre trygg, etisk og pålitelig agent-atferd" },
+          "agent-frameworks": { "name": "Agent-rammeverk", "focus": "Bygge, orkestrere og styre KI-agenter med multi-steg resonnering" },
+          "multi-agent-collaboration": { "name": "Multi-agent-samarbeid", "focus": "La agenter snakke, delegere og samarbeide om oppgaver" },
+          "memory-vector-databases": { "name": "Minne og vektordatabaser", "focus": "Lagre og hente langsiktig kontekst og fakta" }
         }
       },
       "resources": {
@@ -1502,7 +1583,13 @@
         "video": { "title": "Videoinnhold", "watch": "Se video →" },
         "other": "Andre ressurser",
         "items": "elementer",
-        "itemsList": {}
+        "itemsList": {
+          "0": { "title": "Forskningsartikler", "description": "Akademiske artikler om agent-teori" },
+          "1": { "title": "Opplæringer", "description": "Steg-for-steg-guider" },
+          "2": { "title": "Kodeeksempler", "description": "Praktiske implementeringer" },
+          "3": { "title": "Videoinnhold", "description": "Læringsvideoer og demoer" },
+          "4": { "title": "Hackathon-planer", "description": "Komplette implementeringsplaner for konkurranser" }
+        }
       }
     },
     "aiStudyBuddy": {
