@@ -1,60 +1,8 @@
 import React from 'react';
-import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTheme } from './ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { buildCategoryTreemap } from './utils/topicCategories';
-
-// Tile renderer: draws a colored rectangle per category and labels it when
-// there is enough room. Detail per topic is shown in the tooltip on hover.
-const CategoryTile = (props) => {
-  const { x, y, width, height, name, value, fill, root } = props;
-  if (width <= 0 || height <= 0) return null;
-
-  const total = (root && root.value) || 0;
-  const pct = total ? Math.round((value / total) * 100) : 0;
-  const showName = width > 64 && height > 30;
-  const showMeta = width > 64 && height > 48;
-
-  return (
-    <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={fill}
-        stroke="#ffffff"
-        strokeWidth={2}
-        rx={4}
-        ry={4}
-      />
-      {showName && (
-        <text
-          x={x + 8}
-          y={y + 20}
-          fill="#ffffff"
-          fontSize={13}
-          fontWeight={700}
-          style={{ pointerEvents: 'none' }}
-        >
-          {name}
-        </text>
-      )}
-      {showMeta && (
-        <text
-          x={x + 8}
-          y={y + 38}
-          fill="#ffffff"
-          fontSize={11}
-          opacity={0.9}
-          style={{ pointerEvents: 'none' }}
-        >
-          {value} · {pct}%
-        </text>
-      )}
-    </g>
-  );
-};
 
 const TopicTooltip = ({ active, payload, colors }) => {
   if (!active || !payload || payload.length === 0) return null;
@@ -109,7 +57,7 @@ const TopicBreakdownChart = ({ data }) => {
     );
   }
 
-  const treemapData = buildCategoryTreemap(data, t);
+  const pieData = buildCategoryTreemap(data, t);
 
   return (
     <div style={{
@@ -126,16 +74,27 @@ const TopicBreakdownChart = ({ data }) => {
       <h3 style={{ marginTop: 0, marginBottom: 12, color: colors.text, fontSize: '1.1rem' }}>{t('dashboard.lessonsByTopic')}</h3>
       <div style={{ width: '100%', height: 250, minWidth: 0, maxWidth: '100%' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <Treemap
-            data={treemapData}
-            dataKey="value"
-            nameKey="name"
-            stroke="#ffffff"
-            isAnimationActive={false}
-            content={<CategoryTile />}
-          >
+          <PieChart>
+            <Pie
+              data={pieData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              innerRadius={42}
+              outerRadius={75}
+              paddingAngle={2}
+              dataKey="value"
+              nameKey="name"
+              isAnimationActive={false}
+            >
+              {pieData.map((entry) => (
+                <Cell key={entry.rawName} fill={entry.fill} stroke={colors.cardBackground} strokeWidth={2} />
+              ))}
+            </Pie>
             <Tooltip content={<TopicTooltip colors={colors} />} />
-          </Treemap>
+            <Legend wrapperStyle={{ color: colors.text, fontSize: '0.8rem' }} />
+          </PieChart>
         </ResponsiveContainer>
       </div>
     </div>
