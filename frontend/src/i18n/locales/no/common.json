@@ -160,6 +160,7 @@
     "greatJob": "Bra jobbet! Fortsett å lære eller prøv et nytt scenario.",
     "lessonsOverTime": "Fullførte leksjoner over tid",
     "lessonsByTopic": "Leksjoner per tema",
+    "lessonsByTopicEmpty": "Ingen fullførte leksjoner ennå. Begynn å lære for å se temafordelingen din!",
     "microLessons": "Mikro-leksjoner",
     "videoLessons": "Video-leksjoner",
     "recommendations": {

@@ -20,6 +20,7 @@
     "greatJob": "Great job! Keep learning or try a new scenario.",
     "lessonsOverTime": "Lessons Completed Over Time",
     "lessonsByTopic": "Lessons by Topic",
+    "lessonsByTopicEmpty": "No lessons completed yet. Start learning to see your topic breakdown!",
     "microLessons": "Micro-lessons",
     "videoLessons": "Video Lessons",
     "recommendations": {

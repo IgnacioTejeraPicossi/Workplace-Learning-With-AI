@@ -20,6 +20,7 @@
     "greatJob": "¡Buen trabajo! Sigue aprendiendo o prueba un nuevo escenario.",
     "lessonsOverTime": "Lecciones completadas a lo largo del tiempo",
     "lessonsByTopic": "Lecciones por tema",
+    "lessonsByTopicEmpty": "Aún no hay lecciones completadas. ¡Empieza a aprender para ver el desglose por tema!",
     "microLessons": "Micro-lecciones",
     "videoLessons": "Lecciones en vídeo",
     "recommendations": {
