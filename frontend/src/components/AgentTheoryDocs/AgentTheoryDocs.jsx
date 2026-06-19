@@ -905,7 +905,7 @@ const AgentTheoryDocs = () => {
                   <div className="article-content">
                     <div className="article-meta">
                       <span className="article-author">{t('help.agentTheory.by', { defaultValue: 'By:' })} {item.content.author}</span>
-                      <span className="article-type">{item.content.type}</span>
+                      <span className="article-type">{t(`help.agentTheory.contentType.${item.content.type}`, { defaultValue: item.content.type })}</span>
                     </div>
                     
                     {item.content.keyPoints && (

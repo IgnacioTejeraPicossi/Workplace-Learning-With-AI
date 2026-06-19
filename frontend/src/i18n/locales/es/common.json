@@ -942,8 +942,72 @@
         "openInTheory": "Abrir en Teoría",
         "download": "Descargar póster"
       },
+      "contentType": {
+        "article": "ARTÍCULO",
+        "video": "VÍDEO",
+        "guide": "GUÍA",
+        "tutorial": "TUTORIAL"
+      },
+      "common": {
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Baja"
+      },
       "theory": {
-        "title": "Teoría y conceptos de agentes"
+        "title": "Teoría y conceptos de agentes",
+        "sections": {
+          "0": {
+            "title": "Guías de inicio",
+            "items": {
+              "0": {
+                "title": "Construye tu primer agente de IA: ¡un camino claro!",
+                "description": "Metodología paso a paso para construir agentes de IA con un enfoque práctico"
+              },
+              "1": {
+                "title": "7 términos de IA que debes conocer — más allá de lo básico",
+                "description": "Términos de arquitectura IA de nivel empresarial para sistemas en producción"
+              }
+            }
+          },
+          "1": {
+            "title": "Conceptos fundamentales",
+            "items": {
+              "0": {
+                "title": "¿Qué es un agente de IA? (Visión general)",
+                "description": "Póster de alto nivel: cómo funcionan los agentes, rasgos, herramientas, memoria y recursos clave"
+              },
+              "1": {
+                "title": "10 tipos centrales de agentes (póster + guía)",
+                "description": "Desde sistemas reactivos hasta multi-agente — mapa conciso de familias de agentes con sus roles y comportamientos"
+              },
+              "2": {
+                "title": "Arquitecturas de agentes",
+                "description": "Distintos patrones arquitectónicos"
+              },
+              "3": {
+                "title": "Sistemas multi-agente",
+                "description": "Coordinación y comunicación"
+              }
+            }
+          },
+          "2": {
+            "title": "Patrones de implementación",
+            "items": {
+              "0": {
+                "title": "Patrón ReAct",
+                "description": "Razonamiento y acción en modelos de lenguaje"
+              },
+              "1": {
+                "title": "Uso de herramientas",
+                "description": "Cómo los agentes interactúan con herramientas externas"
+              },
+              "2": {
+                "title": "Sistemas de memoria",
+                "description": "Memoria a corto y largo plazo para agentes"
+              }
+            }
+          }
+        }
       },
       "status": {
         "pending": "⏳ Pendiente",
@@ -962,7 +1026,14 @@
         "title": "Aplicaciones web y herramientas",
         "active": "🟢 Activo",
         "inactive": "🔴 Inactivo",
-        "visit": "Visitar sitio →"
+        "visit": "Visitar sitio →",
+        "categories": {
+          "0": { "name": "Herramientas de hackathon" },
+          "1": { "name": "Agentes IA de negocio" },
+          "2": { "name": "Agentes de automatización y flujo" },
+          "3": { "name": "Frameworks de agentes" },
+          "4": { "name": "Proveedores de LLM" }
+        }
       },
       "hackathons": {
         "title": "Próximos hackathons",
@@ -987,6 +1058,14 @@
           "categories": "Categorías",
           "tools": "Herramientas",
           "essential": "Herramientas esenciales"
+        },
+        "categories": {
+          "orchestration-platforms": { "name": "Plataformas de orquestación", "focus": "Ejecutar y escalar agentes IA en flujos reales" },
+          "tool-use-api-integration": { "name": "Uso de herramientas e integración de APIs", "focus": "Herramientas que permiten a los agentes interactuar con APIs y plataformas del mundo real" },
+          "agent-safety-guardrails": { "name": "Seguridad y guardarraíles de agentes", "focus": "Garantizar un comportamiento seguro, ético y fiable de los agentes" },
+          "agent-frameworks": { "name": "Frameworks de agentes", "focus": "Construir, orquestar y gestionar agentes IA con razonamiento multi-paso" },
+          "multi-agent-collaboration": { "name": "Colaboración multi-agente", "focus": "Permitir que los agentes dialoguen, deleguen y colaboren en tareas" },
+          "memory-vector-databases": { "name": "Memoria y bases de datos vectoriales", "focus": "Almacenar y recuperar contexto y hechos a largo plazo" }
         }
       },
       "resources": {
@@ -997,7 +1076,13 @@
         },
         "other": "Otros recursos",
         "items": "elementos",
-        "itemsList": {}
+        "itemsList": {
+          "0": { "title": "Artículos de investigación", "description": "Papers académicos sobre teoría de agentes" },
+          "1": { "title": "Tutoriales", "description": "Guías paso a paso" },
+          "2": { "title": "Ejemplos de código", "description": "Implementaciones prácticas" },
+          "3": { "title": "Contenido en vídeo", "description": "Vídeos educativos y demos" },
+          "4": { "title": "Planes de hackathon", "description": "Planes completos de implementación para competiciones" }
+        }
       }
     },
     "aiStudyBuddy": {

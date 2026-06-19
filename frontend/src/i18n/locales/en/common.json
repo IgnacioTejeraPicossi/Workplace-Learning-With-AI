@@ -1315,8 +1315,72 @@
         "openInTheory": "Open in Theory",
         "download": "Download poster"
       },
+      "contentType": {
+        "article": "ARTICLE",
+        "video": "VIDEO",
+        "guide": "GUIDE",
+        "tutorial": "TUTORIAL"
+      },
+      "common": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
       "theory": {
-        "title": "Agent theory & concepts"
+        "title": "Agent theory & concepts",
+        "sections": {
+          "0": {
+            "title": "Getting Started Guides",
+            "items": {
+              "0": {
+                "title": "Building your first AI Agent: A clear path!",
+                "description": "Step-by-step methodology for building AI agents with practical approach"
+              },
+              "1": {
+                "title": "7 AI Terms You Need to Know — Beyond the Basics",
+                "description": "Enterprise-grade AI architecture terms for production systems"
+              }
+            }
+          },
+          "1": {
+            "title": "Fundamental Concepts",
+            "items": {
+              "0": {
+                "title": "What is an AI Agent? (Overview)",
+                "description": "High-level poster: how agents work, traits, tools, memory, and key resources"
+              },
+              "1": {
+                "title": "10 Core Agent Types (Poster + Guide)",
+                "description": "From reactive to multi-agent systems — a concise map of agent families with roles and behaviors"
+              },
+              "2": {
+                "title": "Agent Architectures",
+                "description": "Different architectural patterns"
+              },
+              "3": {
+                "title": "Multi-Agent Systems",
+                "description": "Coordination and communication"
+              }
+            }
+          },
+          "2": {
+            "title": "Implementation Patterns",
+            "items": {
+              "0": {
+                "title": "ReAct Pattern",
+                "description": "Reasoning and Acting in language models"
+              },
+              "1": {
+                "title": "Tool Use",
+                "description": "How agents interact with external tools"
+              },
+              "2": {
+                "title": "Memory Systems",
+                "description": "Short and long-term memory for agents"
+              }
+            }
+          }
+        }
       },
       "status": {
         "pending": "⏳ Pending",
@@ -1335,7 +1399,14 @@
         "title": "Web applications & tools",
         "active": "🟢 Active",
         "inactive": "🔴 Inactive",
-        "visit": "Visit site →"
+        "visit": "Visit site →",
+        "categories": {
+          "0": { "name": "Hackathon Tools" },
+          "1": { "name": "Business AI Agents" },
+          "2": { "name": "Automation & Workflow Agents" },
+          "3": { "name": "Agent Frameworks" },
+          "4": { "name": "LLM Providers" }
+        }
       },
       "hackathons": {
         "title": "Upcoming hackathons",
@@ -1360,6 +1431,14 @@
           "categories": "Categories",
           "tools": "Tools",
           "essential": "Essential tools"
+        },
+        "categories": {
+          "orchestration-platforms": { "name": "Orchestration Platforms", "focus": "Run and scale AI agents in real workflows" },
+          "tool-use-api-integration": { "name": "Tool Use & API Integration", "focus": "Tools that enable agents to interact with real-world APIs and platforms" },
+          "agent-safety-guardrails": { "name": "Agent Safety & Guardrails", "focus": "Ensure secure, ethical, and reliable agent behavior" },
+          "agent-frameworks": { "name": "Agent Frameworks", "focus": "Building, orchestrating, and managing AI agents with multi-step reasoning" },
+          "multi-agent-collaboration": { "name": "Multi-Agent Collaboration", "focus": "Allow agents to talk, delegate, and collaborate on tasks" },
+          "memory-vector-databases": { "name": "Memory & Vector Databases", "focus": "Store and retrieve long-term context and facts" }
         }
       },
       "resources": {
@@ -1370,7 +1449,13 @@
         },
         "other": "Other resources",
         "items": "items",
-        "itemsList": {}
+        "itemsList": {
+          "0": { "title": "Research Papers", "description": "Academic papers on agent theory" },
+          "1": { "title": "Tutorials", "description": "Step-by-step guides" },
+          "2": { "title": "Code Examples", "description": "Practical implementations" },
+          "3": { "title": "Video Content", "description": "Educational videos and demos" },
+          "4": { "title": "Hackathon Plans", "description": "Complete implementation plans for competitions" }
+        }
       }
     },
     "aiStudyBuddy": {
