@@ -9,6 +9,7 @@
       "modelComparison": "Sammenlign modeller",
       "humanityReport": "Humanitas-rapport",
       "gateway": "Gateway",
+      "janteloven": "Nordisk linse",
       "history": "Historikk"
     },
     "pillars": {
@@ -198,6 +199,56 @@
         "virtrin": "VirTrin-protokollen",
         "humanitas": "Magnifica Humanitas · León XIV",
         "test": "Test Humanitas · ANEMOS"
+      }
+    },
+    "janteloven": {
+      "title": "Nordisk linse · Janteloven",
+      "subtitle": "Ydmykhet uten selvutslettelse · Likhet uten middelmådighet · Fellesskap uten konformitet",
+      "introTitle": "Hva er Janteloven?",
+      "loading": "Laster nordisk linse…",
+      "principlesTitle": "De 5 transformerte prinsippene",
+      "shadowLabel": "Jante-skyggen",
+      "humanizedLabel": "Humanisert Jante",
+      "originalLabel": "Opprinnelig KI-svar",
+      "originalPlaceholder": "Lim inn KI-svaret du vil evaluere gjennom den nordiske linsen…",
+      "contextLabel": "Kontekst (valgfritt)",
+      "contextPlaceholder": "Hva var det opprinnelige spørsmålet eller situasjonen?",
+      "modeLabel": "Omskrivingsmodus",
+      "modeRewrite": "Omskriving — sterk transformasjon",
+      "modeBalanced": "Balansert — lett redigering som bevarer brukerens stemme",
+      "evaluateBtn": "Kun evaluere",
+      "rewriteBtn": "Anvend Jante Balance",
+      "compareBtn": "Sammenlign begge linser",
+      "evaluating": "Evaluerer…",
+      "rewriting": "Anvender Jante Balance…",
+      "scoreTitle": "Jante Balance Score",
+      "dimensionsTitle": "5 dimensjoner",
+      "dimensions": {
+        "humility": "Ydmykhet",
+        "dignity": "Verdighet",
+        "community": "Fellesskap",
+        "non_humiliation": "Ikke-ydmykelse",
+        "grounded_recognition": "Jordnær anerkjennelse"
+      },
+      "risksTitle": "Risikoer oppdaget",
+      "strengthsTitle": "Styrker",
+      "rewrittenTitle": "Omskrevet svar",
+      "explanationTitle": "Forklaring",
+      "compareTitle": "Side-ved-side sammenligning",
+      "compareSubtitle": "To kulturelle verdener evaluerer samme svar",
+      "humanitasColumn": "Humanitas (León XIV)",
+      "jantelovenColumn": "Janteloven (Sandemose)",
+      "novelSource": "Kilde",
+      "noInput": "Vennligst lim inn et KI-svar å evaluere",
+      "riskLabels": {
+        "humiliation": "Ydmykelse",
+        "arrogance": "Arroganse",
+        "false_modesty": "Falsk beskjedenhet",
+        "conformity_pressure": "Konformitetspress",
+        "empty_flattery": "Tom smiger",
+        "self_erasure": "Selvutslettelse",
+        "shame_based_correction": "Skambasert korreksjon",
+        "status_assertion": "Statusbekreftelse"
       }
     },
     "common": {

@@ -33,6 +33,14 @@ try:
         RUBRIC,
         PROMPT_HUMANITAS_VERSION,
         PROMPT_HUMANITAS_CHANGELOG,
+        # Nordic Lens · Janteloven (parallel system)
+        get_jante_principles_content,
+        evaluate_janteloven,
+        rewrite_with_janteloven,
+        compare_humanitas_jante,
+        get_jante_reports,
+        JANTE_LENS_VERSION,
+        JANTE_LENS_CHANGELOG,
     )
 except ImportError:  # pragma: no cover
     from services.humanizing_ai import (  # type: ignore
@@ -50,6 +58,13 @@ except ImportError:  # pragma: no cover
         RUBRIC,
         PROMPT_HUMANITAS_VERSION,
         PROMPT_HUMANITAS_CHANGELOG,
+        get_jante_principles_content,
+        evaluate_janteloven,
+        rewrite_with_janteloven,
+        compare_humanitas_jante,
+        get_jante_reports,
+        JANTE_LENS_VERSION,
+        JANTE_LENS_CHANGELOG,
     )
 
 router = APIRouter(prefix="/api/humanizing-ai")
@@ -341,3 +356,99 @@ async def compare_models_endpoint(body: CompareModelsRequest) -> Dict[str, Any]:
     if result.get("status") == "error":
         raise HTTPException(status_code=422, detail=result.get("message", "Unknown error"))
     return result
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NORDIC LENS · JANTELOVEN — parallel endpoints
+# ═══════════════════════════════════════════════════════════════════════════════
+# Kept deliberately separate from the Humanitas endpoints because they come from
+# distinct cultural worlds: Magnifica Humanitas (León XIV / Roman Catholic) vs
+# Janteloven (Sandemose / Nordic social philosophy). Both lenses can be applied
+# to the same text but the results are stored in different MongoDB collections.
+
+class JanteEvaluateRequest(BaseModel):
+    text: str = Field(..., description="AI response to evaluate against the Nordic Lens")
+    context: str = Field("", description="Optional context (the original question)")
+    lang: str = Field("es", description="Language: 'es', 'en' or 'no'")
+
+
+class JanteRewriteRequest(BaseModel):
+    text: str = Field(..., description="AI response to rewrite")
+    context: str = Field("", description="Optional context")
+    mode: str = Field(
+        "rewrite",
+        description="'rewrite' (strong rewrite) or 'balanced' (light edit preserving voice)",
+        pattern=r"^(rewrite|balanced)$",
+    )
+    lang: str = Field("es")
+
+
+class JanteCompareRequest(BaseModel):
+    text: str = Field(..., description="AI response evaluated by BOTH lenses (Humanitas + Janteloven)")
+    context: str = Field("")
+    lang: str = Field("es")
+
+
+@router.get("/jante/principles", summary="Janteloven Lens — intro card, 5 principles, risks")
+async def jante_principles_endpoint(
+    lang: str = Query("es", description="Language: 'es', 'en' or 'no'"),
+) -> Dict[str, Any]:
+    """
+    Return the cultural intro card, the 5 positive principles, the risk
+    catalogue, and the lens version. The intro card includes a clear historical
+    note that this lens does NOT enforce literal Janteloven (which would
+    suppress individuality) — it transforms the shadow into positive principles.
+    """
+    return get_jante_principles_content(lang)
+
+
+@router.post("/jante/evaluate", summary="Score-only Nordic Lens evaluation")
+async def jante_evaluate_endpoint(body: JanteEvaluateRequest) -> Dict[str, Any]:
+    """
+    Score an AI response across 5 Janteloven dimensions (humility, dignity,
+    community, non_humiliation, grounded_recognition — 0-20 each, total 0-100).
+    Returns risks detected and strengths. Does NOT rewrite the text.
+    """
+    return await evaluate_janteloven(body.text, body.context, body.lang)
+
+
+@router.post("/jante/rewrite", summary="Rewrite + score with the Nordic Lens")
+async def jante_rewrite_endpoint(body: JanteRewriteRequest) -> Dict[str, Any]:
+    """
+    Apply the Janteloven Lens to rewrite the text — removing humiliation,
+    arrogance, conformity pressure and empty flattery, while preserving the
+    user's voice. Returns rewritten text + jante_balance_score + risks +
+    explanation. Persists the run in `humanizing_jante_runs` (separate from
+    Humanitas runs).
+    """
+    return await rewrite_with_janteloven(body.text, body.context, body.lang, body.mode)
+
+
+@router.post("/jante/compare", summary="Apply BOTH lenses (Humanitas + Janteloven)")
+async def jante_compare_endpoint(body: JanteCompareRequest) -> Dict[str, Any]:
+    """
+    Side-by-side comparison: apply both Magnifica Humanitas and Janteloven Lens
+    to the same AI response. Useful to see how two distinct cultural worlds
+    (Catholic universalism vs Nordic social philosophy) rate the same text.
+    """
+    return await compare_humanitas_jante(body.text, body.context, body.lang)
+
+
+@router.get("/jante/reports", summary="List recent Janteloven runs")
+async def jante_reports_endpoint(
+    limit: int = Query(20, ge=1, le=100, description="Max results"),
+) -> Dict[str, Any]:
+    """
+    Return the most recent Janteloven runs stored in MongoDB collection
+    `humanizing_jante_runs` (separate from `humanizing_ai_runs`).
+    """
+    runs = await get_jante_reports(limit=limit)
+    return {"runs": runs, "count": len(runs)}
+
+
+@router.get("/jante/version", summary="Lightweight Janteloven lens version + changelog")
+async def jante_version_endpoint() -> Dict[str, Any]:
+    return {
+        "version":   JANTE_LENS_VERSION,
+        "changelog": JANTE_LENS_CHANGELOG,
+    }

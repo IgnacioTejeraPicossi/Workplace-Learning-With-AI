@@ -9,6 +9,7 @@
       "modelComparison": "Model Comparison",
       "humanityReport": "Humanity Report",
       "gateway": "Gateway",
+      "janteloven": "Nordic Lens",
       "history": "History"
     },
     "pillars": {
@@ -198,6 +199,56 @@
         "virtrin": "VirTrin Protocol",
         "humanitas": "Magnifica Humanitas · León XIV",
         "test": "Test Humanitas · ANEMOS"
+      }
+    },
+    "janteloven": {
+      "title": "Nordic Lens · Janteloven",
+      "subtitle": "Humility without self-erasure · Equality without mediocrity · Community without conformity",
+      "introTitle": "What is Janteloven?",
+      "loading": "Loading Nordic Lens…",
+      "principlesTitle": "The 5 transformed principles",
+      "shadowLabel": "Shadow of Jante",
+      "humanizedLabel": "Humanized Jante",
+      "originalLabel": "Original AI response",
+      "originalPlaceholder": "Paste the AI response you want to evaluate through the Nordic Lens…",
+      "contextLabel": "Context (optional)",
+      "contextPlaceholder": "What was the original question or situation?",
+      "modeLabel": "Rewrite mode",
+      "modeRewrite": "Rewrite — strong transformation",
+      "modeBalanced": "Balanced — light edit preserving the user's voice",
+      "evaluateBtn": "Evaluate only",
+      "rewriteBtn": "Apply Jante Balance",
+      "compareBtn": "Compare both lenses",
+      "evaluating": "Evaluating…",
+      "rewriting": "Applying Jante Balance…",
+      "scoreTitle": "Jante Balance Score",
+      "dimensionsTitle": "5 Dimensions",
+      "dimensions": {
+        "humility": "Humility",
+        "dignity": "Dignity",
+        "community": "Community",
+        "non_humiliation": "Non-humiliation",
+        "grounded_recognition": "Grounded recognition"
+      },
+      "risksTitle": "Risks detected",
+      "strengthsTitle": "Strengths",
+      "rewrittenTitle": "Rewritten response",
+      "explanationTitle": "Explanation",
+      "compareTitle": "Side-by-side comparison",
+      "compareSubtitle": "Two cultural worlds rating the same response",
+      "humanitasColumn": "Humanitas (León XIV)",
+      "jantelovenColumn": "Janteloven (Sandemose)",
+      "novelSource": "Source",
+      "noInput": "Please paste an AI response to evaluate",
+      "riskLabels": {
+        "humiliation": "Humiliation",
+        "arrogance": "Arrogance",
+        "false_modesty": "False modesty",
+        "conformity_pressure": "Conformity pressure",
+        "empty_flattery": "Empty flattery",
+        "self_erasure": "Self-erasure",
+        "shame_based_correction": "Shame-based correction",
+        "status_assertion": "Status assertion"
       }
     },
     "common": {

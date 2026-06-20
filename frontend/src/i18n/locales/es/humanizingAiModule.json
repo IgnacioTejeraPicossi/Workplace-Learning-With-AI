@@ -9,6 +9,7 @@
       "modelComparison": "Comparar Modelos",
       "humanityReport": "Informe Humanitas",
       "gateway": "Gateway",
+      "janteloven": "Lente Nórdica",
       "history": "Historial"
     },
     "pillars": {
@@ -198,6 +199,56 @@
         "virtrin": "Protocolo VirTrin",
         "humanitas": "Magnifica Humanitas · León XIV",
         "test": "Test Humanitas · ANEMOS"
+      }
+    },
+    "janteloven": {
+      "title": "Lente Nórdica · Janteloven",
+      "subtitle": "Humildad sin autoanulación · Igualdad sin mediocridad · Comunidad sin conformismo",
+      "introTitle": "¿Qué es Janteloven?",
+      "loading": "Cargando Lente Nórdica…",
+      "principlesTitle": "Los 5 principios transformados",
+      "shadowLabel": "Sombra de Jante",
+      "humanizedLabel": "Jante humanizado",
+      "originalLabel": "Respuesta original de la IA",
+      "originalPlaceholder": "Pega la respuesta de IA que quieres evaluar con la Lente Nórdica…",
+      "contextLabel": "Contexto (opcional)",
+      "contextPlaceholder": "¿Cuál era la pregunta o situación original?",
+      "modeLabel": "Modo de reescritura",
+      "modeRewrite": "Reescritura — transformación fuerte",
+      "modeBalanced": "Equilibrada — edición ligera preservando la voz del usuario",
+      "evaluateBtn": "Solo evaluar",
+      "rewriteBtn": "Aplicar Jante Balance",
+      "compareBtn": "Comparar ambas lentes",
+      "evaluating": "Evaluando…",
+      "rewriting": "Aplicando Jante Balance…",
+      "scoreTitle": "Jante Balance Score",
+      "dimensionsTitle": "5 Dimensiones",
+      "dimensions": {
+        "humility": "Humildad",
+        "dignity": "Dignidad",
+        "community": "Comunidad",
+        "non_humiliation": "No-humillación",
+        "grounded_recognition": "Reconocimiento sano"
+      },
+      "risksTitle": "Riesgos detectados",
+      "strengthsTitle": "Fortalezas",
+      "rewrittenTitle": "Respuesta reescrita",
+      "explanationTitle": "Explicación",
+      "compareTitle": "Comparación lado a lado",
+      "compareSubtitle": "Dos mundos culturales evaluando la misma respuesta",
+      "humanitasColumn": "Humanitas (León XIV)",
+      "jantelovenColumn": "Janteloven (Sandemose)",
+      "novelSource": "Fuente",
+      "noInput": "Por favor pega una respuesta de IA para evaluar",
+      "riskLabels": {
+        "humiliation": "Humillación",
+        "arrogance": "Arrogancia",
+        "false_modesty": "Falsa modestia",
+        "conformity_pressure": "Presión conformista",
+        "empty_flattery": "Adulación vacía",
+        "self_erasure": "Autoanulación",
+        "shame_based_correction": "Corrección con vergüenza",
+        "status_assertion": "Afirmación de estatus"
       }
     },
     "common": {

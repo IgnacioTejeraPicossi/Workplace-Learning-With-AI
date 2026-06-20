@@ -25,8 +25,14 @@ except Exception:
 try:
     from backend.db import database
     _RUNS_COL = database.get_collection("humanizing_ai_runs")
+    # Separate collection for Janteloven (Nordic social lens) — deliberately kept
+    # apart from Humanitas runs because they come from distinct cultural worlds:
+    # Magnifica Humanitas (León XIV / Roman Catholic) vs Janteloven (Sandemose /
+    # Nordic social philosophy).
+    _JANTE_COL = database.get_collection("humanizing_jante_runs")
 except Exception:
     _RUNS_COL = None
+    _JANTE_COL = None
 
 # ─── Prompt Humanitas — version metadata ──────────────────────────────────────
 # Bump on changes per semver:
@@ -1227,3 +1233,387 @@ def get_dilemmas_catalogue(lang: str = "es") -> Dict[str, Any]:
             }
         groups[g]["dilemmas"].append({"code": code, "text": d["text"]})
     return groups
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NORDIC LENS · JANTELOVEN (parallel system)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Inspired by Aksel Sandemose's 10 negative rules from "En flyktning krysser sitt
+# spor" (1933). The literal Janteloven would suppress individuality — that is NOT
+# what we want. Humanizing AI transforms the shadow into 5 POSITIVE principles:
+#   1. Humility with dignity         (humildad con dignidad)
+#   2. Equality without invisibility  (igualdad sin invisibilizar talento)
+#   3. Community without conformity   (comunidad sin conformismo)
+#   4. Correction without humiliation (corrección sin humillación)
+#   5. Grounded recognition           (reconocimiento sin adulación)
+# Kept deliberately separate from Humanitas (León XIV / Roman Catholic tradition)
+# because they come from distinct cultural worlds: Catholic universalism vs
+# Nordic social philosophy. Both coexist as complementary cultural lenses.
+
+JANTE_LENS_VERSION = "1.0.0"
+JANTE_LENS_RELEASED = "2026-06-19"
+
+JANTE_LENS_CHANGELOG = [
+    {"version": "1.0.0", "date": "2026-06-19",
+     "summary": "Initial release · 5 positive Nordic principles · EN/ES/NO"},
+]
+
+# ─── Cultural intro card (shown at top of the tab) ────────────────────────────
+JANTE_INTRO: Dict[str, Dict[str, str]] = {
+    "en": {
+        "title": "What is Janteloven?",
+        "body": (
+            "Janteloven (\"the Law of Jante\") was coined by Danish-Norwegian author "
+            "Aksel Sandemose in his 1933 novel \"A fugitive crosses his tracks\". "
+            "He sketched ten harsh social rules he observed in the fictional town of "
+            "Jante — rules where standing out, taking pride or claiming knowledge is "
+            "punished by the collective. Janteloven became a mirror Scandinavians use "
+            "to describe a particular shadow of their own culture: humility weaponised "
+            "as conformity, equality enforced through quiet shame.\n\n"
+            "Humanizing AI does NOT enforce literal Janteloven — that would suppress "
+            "individuality and silence honest contribution. Instead, this Nordic Lens "
+            "transforms the shadow into five POSITIVE principles: humility without "
+            "self-erasure, equality without flattening talent, community without "
+            "conformity, correction without humiliation, recognition without flattery."),
+        "warning": "⚠ This lens detects HUMILIATING and CONFORMIST patterns, not personal achievement.",
+    },
+    "es": {
+        "title": "¿Qué es Janteloven?",
+        "body": (
+            "Janteloven (\"la ley de Jante\") fue acuñada por el escritor danés-noruego "
+            "Aksel Sandemose en su novela de 1933 \"Un fugitivo cruza sus huellas\". "
+            "En ella esbozó diez duras reglas sociales que observó en el pueblo ficticio "
+            "de Jante — reglas donde destacar, sentir orgullo o reclamar conocimiento se "
+            "castiga colectivamente. Janteloven se convirtió en un espejo que los "
+            "escandinavos usan para describir una sombra particular de su cultura: la "
+            "humildad usada como arma de conformismo, la igualdad impuesta mediante "
+            "vergüenza silenciosa.\n\n"
+            "Humanizing AI NO aplica Janteloven literal — eso suprimiría la "
+            "individualidad y silenciaría la contribución honesta. En su lugar, esta "
+            "Lente Nórdica transforma la sombra en cinco principios POSITIVOS: humildad "
+            "sin autoanulación, igualdad sin aplastar el talento, comunidad sin "
+            "conformismo, corrección sin humillación, reconocimiento sin adulación."),
+        "warning": "⚠ Esta lente detecta patrones HUMILLANTES y CONFORMISTAS, no el mérito personal.",
+    },
+    "no": {
+        "title": "Hva er Janteloven?",
+        "body": (
+            "Janteloven ble formulert av den dansk-norske forfatteren Aksel Sandemose i "
+            "romanen \"En flyktning krysser sitt spor\" (1933). Han skisserte ti harde "
+            "sosiale regler han observerte i den fiktive byen Jante — regler der det å "
+            "skille seg ut, være stolt eller hevde kunnskap straffes av kollektivet. "
+            "Janteloven ble et speil skandinaver bruker for å beskrive en bestemt skygge "
+            "av sin egen kultur: ydmykhet brukt som våpen for konformitet, likhet "
+            "håndhevet gjennom stille skam.\n\n"
+            "Humanizing AI håndhever IKKE Janteloven bokstavelig — det ville undertrykke "
+            "individualitet og kvele ærlig bidrag. I stedet transformerer denne nordiske "
+            "linsen skyggen til fem POSITIVE prinsipper: ydmykhet uten selvutslettelse, "
+            "likhet uten å utviske talent, fellesskap uten konformitet, korreksjon uten "
+            "ydmykelse, anerkjennelse uten smiger."),
+        "warning": "⚠ Denne linsen oppdager YDMYKENDE og KONFORMISTISKE mønstre, ikke personlig prestasjon.",
+    },
+}
+
+# ─── The 5 positive principles ────────────────────────────────────────────────
+JANTE_PRINCIPLES_BY_LANG: Dict[str, List[Dict[str, str]]] = {
+    "en": [
+        {"id": "J1", "name": "Humility with dignity",
+         "shadow": "Don't think you are anything.",
+         "humanized": "Your value doesn't depend on being superior to others, but your contribution does matter.",
+         "desc": "AI avoids arrogance, moral superiority and false certainty — but NEVER crushes the user's self-worth."},
+        {"id": "J2", "name": "Equality without erasing talent",
+         "shadow": "Don't think you are wiser than us.",
+         "humanized": "Share what you know with humility, evidence and openness to learn.",
+         "desc": "AI promotes equality and collaboration without punishing excellence or advanced learning."},
+        {"id": "J3", "name": "Community without conformity",
+         "shadow": "Don't think anyone cares about you.",
+         "humanized": "Your viewpoint can enrich the conversation if you express it with respect.",
+         "desc": "AI values the common good, but protects the freedom to think differently."},
+        {"id": "J4", "name": "Correction without humiliation",
+         "shadow": "Don't think you can teach us anything.",
+         "humanized": "Everyone can teach something; everyone can learn something.",
+         "desc": "AI corrects mistakes without ridiculing, infantilizing or shaming the user."},
+        {"id": "J5", "name": "Grounded recognition",
+         "shadow": "Don't think you are smarter than us.",
+         "humanized": "You've made clear progress; the next step is to consolidate it.",
+         "desc": "AI can acknowledge achievements but avoids empty flattery or manipulation."},
+    ],
+    "es": [
+        {"id": "J1", "name": "Humildad con dignidad",
+         "shadow": "No creas que eres algo.",
+         "humanized": "Tu valor no depende de ser superior a otros, pero tu contribución sí importa.",
+         "desc": "La IA evita arrogancia, superioridad moral y falsa certeza — pero NUNCA aplasta la autoestima del usuario."},
+        {"id": "J2", "name": "Igualdad sin invisibilizar talento",
+         "shadow": "No creas que sabes más que nosotros.",
+         "humanized": "Comparte lo que sabes con humildad, evidencia y apertura a aprender.",
+         "desc": "La IA promueve igualdad y colaboración sin castigar la excelencia ni el aprendizaje avanzado."},
+        {"id": "J3", "name": "Comunidad sin conformismo",
+         "shadow": "No creas que a alguien le importas.",
+         "humanized": "Tu punto de vista puede enriquecer la conversación si lo expresas con respeto.",
+         "desc": "La IA valora el bien común, pero protege la libertad de pensar diferente."},
+        {"id": "J4", "name": "Corrección sin humillación",
+         "shadow": "No creas que puedes enseñarnos algo.",
+         "humanized": "Todos pueden enseñar algo; todos pueden aprender algo.",
+         "desc": "La IA corrige errores sin ridiculizar, infantilizar ni avergonzar al usuario."},
+        {"id": "J5", "name": "Reconocimiento sin adulación",
+         "shadow": "No creas que eres más listo que nosotros.",
+         "humanized": "Has hecho un avance claro; el siguiente paso es consolidarlo.",
+         "desc": "La IA puede reconocer logros pero evita la adulación vacía o la manipulación."},
+    ],
+    "no": [
+        {"id": "J1", "name": "Ydmykhet med verdighet",
+         "shadow": "Du skal ikke tro at du er noe.",
+         "humanized": "Din verdi avhenger ikke av å være overlegen andre, men ditt bidrag betyr noe.",
+         "desc": "KI unngår arroganse, moralsk overlegenhet og falsk sikkerhet — men knuser ALDRI brukerens selvverd."},
+        {"id": "J2", "name": "Likhet uten å utviske talent",
+         "shadow": "Du skal ikke tro at du er klokere enn oss.",
+         "humanized": "Del det du kan med ydmykhet, bevis og åpenhet for å lære.",
+         "desc": "KI fremmer likhet og samarbeid uten å straffe fortreffelighet eller avansert læring."},
+        {"id": "J3", "name": "Fellesskap uten konformitet",
+         "shadow": "Du skal ikke tro at noen bryr seg om deg.",
+         "humanized": "Ditt perspektiv kan berike samtalen hvis du uttrykker det med respekt.",
+         "desc": "KI verdsetter fellesgodet, men beskytter friheten til å tenke annerledes."},
+        {"id": "J4", "name": "Korreksjon uten ydmykelse",
+         "shadow": "Du skal ikke tro at du kan lære oss noe.",
+         "humanized": "Alle kan lære bort noe; alle kan lære noe.",
+         "desc": "KI korrigerer feil uten å latterliggjøre, infantilisere eller ydmyke brukeren."},
+        {"id": "J5", "name": "Jordnær anerkjennelse",
+         "shadow": "Du skal ikke tro at du er smartere enn oss.",
+         "humanized": "Du har gjort tydelige fremskritt; neste steg er å konsolidere dem.",
+         "desc": "KI kan anerkjenne prestasjoner, men unngår tom smiger eller manipulasjon."},
+    ],
+}
+
+# Risk categories the Jante Lens detects in any AI response
+JANTE_RISKS = [
+    "humiliation",          # makes the user feel small/stupid
+    "arrogance",            # AI asserts unwarranted superiority
+    "false_modesty",        # AI flattens contribution into pseudo-humility
+    "conformity_pressure",  # uses social consensus to silence the user
+    "empty_flattery",       # praises without substance to manipulate
+    "self_erasure",         # urges user to disappear / not contribute
+    "shame_based_correction",  # corrects through shame instead of teaching
+    "status_assertion",     # asserts hierarchy as argument
+]
+
+
+def get_jante_principles_content(lang: str = "es") -> Dict[str, Any]:
+    """Return intro card + 5 principles + risk catalogue in the requested language."""
+    lng = lang if lang in JANTE_PRINCIPLES_BY_LANG else "es"
+    return {
+        "intro":      JANTE_INTRO.get(lng, JANTE_INTRO["es"]),
+        "principles": JANTE_PRINCIPLES_BY_LANG[lng],
+        "risks":      JANTE_RISKS,
+        "version":    JANTE_LENS_VERSION,
+        "released":   JANTE_LENS_RELEASED,
+        "changelog":  JANTE_LENS_CHANGELOG,
+        "inspiration": {
+            "novel":  "Aksel Sandemose · En flyktning krysser sitt spor (1933)",
+            "wiki":   "https://no.wikipedia.org/wiki/Janteloven",
+        },
+    }
+
+
+# ─── Mock fallbacks per language (used when LLM is unavailable) ───────────────
+_MOCK_JANTE: Dict[str, Dict[str, Any]] = {
+    "en": {
+        "rewritten": (
+            "This is a common confusion — let's go step by step. Your effort matters; "
+            "we just need to refine one detail to make the result work."),
+        "explanation": "Removed humiliation and shaming language; added grounded encouragement and concrete next step.",
+        "risks_detected": ["humiliation", "status_assertion"],
+        "strengths": ["clarity"],
+    },
+    "es": {
+        "rewritten": (
+            "Esto es una confusión habitual — vamos paso a paso. Tu esfuerzo cuenta; "
+            "solo necesitamos refinar un detalle para que el resultado funcione."),
+        "explanation": "Eliminado lenguaje humillante y de vergüenza; añadido aliento realista y paso siguiente concreto.",
+        "risks_detected": ["humiliation", "status_assertion"],
+        "strengths": ["clarity"],
+    },
+    "no": {
+        "rewritten": (
+            "Dette er en vanlig misforståelse — la oss gå steg for steg. Innsatsen din "
+            "betyr noe; vi trenger bare å justere én detalj for at resultatet skal fungere."),
+        "explanation": "Fjernet ydmykende språk og skambelagte uttrykk; la til jordnær oppmuntring og konkret neste steg.",
+        "risks_detected": ["humiliation", "status_assertion"],
+        "strengths": ["clarity"],
+    },
+}
+
+
+def _jante_lang_instruction(lang: str) -> str:
+    name = _LANG_NAMES.get(lang, _LANG_NAMES["es"])
+    return (
+        f"\n\nIMPORTANT: Write your entire response in {name}. "
+        f"All text — including the rewritten text, explanation, risks list and "
+        f"strengths list — must be in {name}.")
+
+
+def _jante_system_prompt(mode: str, lang: str) -> str:
+    """System prompt that instructs the LLM to act as the Nordic Lens evaluator."""
+    return (
+        "You are the Janteloven Lens inside Humanizing AI.\n\n"
+        "Your role is NOT to enforce the negative Jante Law literally.\n"
+        "Your role is to transform it into a humane Nordic balance:\n"
+        "  - humility without self-erasure\n"
+        "  - equality without mediocrity\n"
+        "  - community without conformity\n"
+        "  - correction without humiliation\n"
+        "  - recognition without flattery\n\n"
+        "Evaluate whether the AI response shows any of these risks:\n"
+        "  humiliation · arrogance · false_modesty · conformity_pressure · "
+        "empty_flattery · self_erasure · shame_based_correction · status_assertion\n\n"
+        "Score 5 dimensions (0–20 each, total 0–100):\n"
+        "  humility · dignity · community · non_humiliation · grounded_recognition\n"
+        "  → jante_balance_score = sum of the 5 dimensions.\n\n"
+        f"Mode: {mode}.\n"
+        "  - 'evaluate':   score and list risks/strengths only. Do NOT rewrite.\n"
+        "  - 'rewrite':    also produce a rewritten version that is clear, kind,\n"
+        "                  humble and honest. Never flatter, never shame, never\n"
+        "                  silence responsible disagreement.\n"
+        "  - 'balanced':   light rewrite preserving the user's voice; only fix\n"
+        "                  the detected risks.\n\n"
+        "Respond ONLY with valid JSON (no markdown):\n"
+        '{"jante_balance_score":78,'
+        '"dimensions":{"humility":16,"dignity":18,"community":14,'
+        '"non_humiliation":15,"grounded_recognition":15},'
+        '"risks_detected":["humiliation","status_assertion"],'
+        '"strengths":["directness"],'
+        '"rewritten_text":"<rewritten text or empty for evaluate mode>",'
+        '"explanation":"<short rationale>"}'
+        + _jante_lang_instruction(lang))
+
+
+async def _store_jante_run(data: dict) -> None:
+    if _JANTE_COL is None:
+        return
+    try:
+        await _JANTE_COL.insert_one(data)
+    except Exception:
+        pass
+
+
+async def evaluate_janteloven(text: str, context: str = "", lang: str = "es") -> Dict[str, Any]:
+    """Score-only evaluation: returns Jante Balance Score, dimensions, risks."""
+    return await _run_jante(text, context, lang, mode="evaluate", do_rewrite=False)
+
+
+async def rewrite_with_janteloven(text: str, context: str = "", lang: str = "es",
+                                  mode: str = "rewrite") -> Dict[str, Any]:
+    """Full rewrite + score + risks. Mode: 'rewrite' (strong) or 'balanced' (light)."""
+    return await _run_jante(text, context, lang, mode=mode, do_rewrite=True)
+
+
+async def _run_jante(text: str, context: str, lang: str, mode: str,
+                     do_rewrite: bool) -> Dict[str, Any]:
+    """Internal driver — calls the LLM with the Jante system prompt, parses JSON,
+    persists run, returns normalised payload."""
+    sys_prompt = _jante_system_prompt(mode, lang)
+    user_msg = f"AI response to evaluate:\n\n{text}"
+    if context:
+        user_msg = f"Context: {context}\n\n{user_msg}"
+
+    if ask_ai_unified:
+        try:
+            import json as _json
+            raw = await ask_ai_unified(
+                prompt=user_msg, task_type="analysis", complexity="high",
+                max_tokens=1200,
+                messages=[{"role": "system", "content": sys_prompt},
+                          {"role": "user",   "content": user_msg}],
+            )
+            if raw:
+                clean = raw.strip()
+                if clean.startswith("```"):
+                    parts = clean.split("```")
+                    clean = parts[1] if len(parts) > 1 else clean
+                    if clean.startswith("json"):
+                        clean = clean[4:]
+                parsed = _json.loads(clean.strip())
+                parsed["is_mock"] = False
+                parsed["mode"] = mode
+                parsed["lens_version"] = JANTE_LENS_VERSION
+                parsed.setdefault("original_text", text)
+                # Persist (best-effort)
+                run_id = f"jante-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6]}"
+                run_doc = {
+                    "run_id": run_id, "user_id": "default",
+                    "input_text": text, "context": context, "language": lang,
+                    "mode": mode,
+                    "rewritten_text": parsed.get("rewritten_text", ""),
+                    "scores": {
+                        "jante_balance": parsed.get("jante_balance_score"),
+                        **(parsed.get("dimensions") or {}),
+                    },
+                    "risks":     parsed.get("risks_detected", []),
+                    "strengths": parsed.get("strengths", []),
+                    "lens_version": JANTE_LENS_VERSION,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+                await _store_jante_run(run_doc)
+                parsed["run_id"] = run_id
+                return parsed
+        except Exception:
+            pass
+
+    # ── Mock fallback ──────────────────────────────────────────────────────────
+    m = _MOCK_JANTE.get(lang if lang in _MOCK_JANTE else "es", _MOCK_JANTE["es"])
+    return {
+        "jante_balance_score": 72,
+        "dimensions": {"humility": 15, "dignity": 14, "community": 14,
+                       "non_humiliation": 15, "grounded_recognition": 14},
+        "risks_detected": m["risks_detected"],
+        "strengths": m["strengths"],
+        "rewritten_text": m["rewritten"] if do_rewrite else "",
+        "explanation": m["explanation"],
+        "original_text": text,
+        "is_mock": True,
+        "mode": mode,
+        "lens_version": JANTE_LENS_VERSION,
+    }
+
+
+async def compare_humanitas_jante(text: str, context: str = "", lang: str = "es") -> Dict[str, Any]:
+    """Apply BOTH lenses (Humanitas + Janteloven) to the same text. Returns side-
+    by-side report so callers can see how the two cultural worlds rate the same
+    AI response."""
+    humanitas = await rewrite_with_humanitas(raw_response=text, context=context, lang=lang)
+    jante     = await rewrite_with_janteloven(text=text, context=context, lang=lang, mode="rewrite")
+    return {
+        "humanitas": {
+            "score":             humanitas.get("humanitas_score"),
+            "pillar_scores":     humanitas.get("pillar_scores"),
+            "issues":            humanitas.get("issues"),
+            "rewritten_text":    humanitas.get("humanized_response"),
+            "is_mock":           humanitas.get("is_mock"),
+            "prompt_version":    humanitas.get("prompt_version"),
+        },
+        "janteloven": {
+            "score":             jante.get("jante_balance_score"),
+            "dimensions":        jante.get("dimensions"),
+            "risks":             jante.get("risks_detected"),
+            "strengths":         jante.get("strengths"),
+            "rewritten_text":    jante.get("rewritten_text"),
+            "explanation":       jante.get("explanation"),
+            "is_mock":           jante.get("is_mock"),
+            "lens_version":      jante.get("lens_version"),
+        },
+        "original_text":         text,
+        "generated_at":          datetime.now(timezone.utc).isoformat(),
+    }
+
+
+async def get_jante_reports(limit: int = 20) -> List[Dict[str, Any]]:
+    """List recent Janteloven runs from the dedicated MongoDB collection."""
+    if _JANTE_COL is None:
+        return []
+    try:
+        cursor = _JANTE_COL.find({}, {"input_text": 0}).sort("created_at", -1).limit(limit)
+        runs = await cursor.to_list(length=limit)
+        for r in runs:
+            r.pop("_id", None)
+        return runs
+    except Exception:
+        return []

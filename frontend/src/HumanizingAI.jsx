@@ -1530,6 +1530,311 @@ const TabGateway = () => {
   );
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Nordic Lens · Janteloven (V3)
+// ═══════════════════════════════════════════════════════════════════════════════
+// Fjord blue Nordic palette to differentiate from the green Humanitas tabs.
+// Cultural intro card explains that this lens does NOT enforce literal
+// Janteloven (which would suppress individuality) but transforms its shadow
+// into 5 positive principles.
+const FJORD = {
+  bg:      'linear-gradient(160deg,#f0f9ff 0%,#fefefe 50%,#e0f2fe 100%)',
+  card:    '#ffffff',
+  border:  '#bae6fd',
+  ink:     '#0c4a6e',
+  inkSoft: '#475569',
+  accent:  '#075985',          // fjord blue
+  accentLight: '#e0f2fe',      // ice
+  accentBorder: '#7dd3fc',
+  warm:    '#ea580c',          // birch / autumn (used for risks)
+  warmLight: '#fff7ed',
+  warmBorder: '#fed7aa',
+};
+
+const TabJanteloven = () => {
+  const { t, i18n } = useTranslation();
+  const [content, setContent]   = useState(null);          // principles + intro
+  const [rawText, setRawText]   = useState('');
+  const [context, setContext]   = useState('');
+  const [mode, setMode]         = useState('rewrite');
+  const [busy, setBusy]         = useState(null);          // 'evaluate' | 'rewrite' | 'compare' | null
+  const [result, setResult]     = useState(null);
+  const [compareResult, setCompareResult] = useState(null);
+  const [error, setError]       = useState('');
+
+  const lang = toLang(i18n.language);
+
+  useEffect(() => {
+    setContent(null);
+    fetch(`${API_BASE}/api/humanizing-ai/jante/principles?lang=${lang}`)
+      .then((r) => r.json())
+      .then(setContent)
+      .catch(() => {});
+  }, [lang]);
+
+  const action = async (kind) => {
+    if (!rawText.trim()) { setError(t('humanizingAiModule.janteloven.noInput')); return; }
+    setBusy(kind); setError(''); setResult(null); setCompareResult(null);
+    try {
+      let payload, url;
+      if (kind === 'evaluate') {
+        url = '/api/humanizing-ai/jante/evaluate';
+        payload = { text: rawText, context, lang };
+      } else if (kind === 'rewrite') {
+        url = '/api/humanizing-ai/jante/rewrite';
+        payload = { text: rawText, context, mode, lang };
+      } else {
+        url = '/api/humanizing-ai/jante/compare';
+        payload = { text: rawText, context, lang };
+      }
+      const res = await fetch(`${API_BASE}${url}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (kind === 'compare') setCompareResult(data);
+      else                    setResult(data);
+    } catch (e) {
+      setError(e.message || t('humanizingAiModule.common.error'));
+    } finally { setBusy(null); }
+  };
+
+  const inputStyle = {
+    width: '100%', background: FJORD.card, border: `1px solid ${FJORD.border}`,
+    borderRadius: 10, color: FJORD.ink, fontSize: 13, padding: '12px 14px',
+    resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box',
+  };
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto', background: FJORD.bg, borderRadius: 16 }}>
+      <SectionLabel index={7} label={t('humanizingAiModule.tabs.janteloven')} />
+      <h2 style={{ color: FJORD.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>⛰ {t('humanizingAiModule.janteloven.title')}</h2>
+      <p style={{ color: FJORD.inkSoft, fontSize: 13, marginBottom: 22 }}>{t('humanizingAiModule.janteloven.subtitle')}</p>
+
+      {!content ? <p style={{ color: FJORD.inkSoft, textAlign: 'center', padding: 40 }}>{t('humanizingAiModule.janteloven.loading')}</p> : (
+        <>
+          {/* Intro card — cultural context */}
+          <div style={{
+            background: FJORD.accentLight, border: `1px solid ${FJORD.accentBorder}`,
+            borderLeft: `4px solid ${FJORD.accent}`, borderRadius: 12,
+            padding: '16px 20px', marginBottom: 20,
+          }}>
+            <p style={{ color: FJORD.accent, fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+              ⛰ {content.intro?.title}
+            </p>
+            <p style={{ color: FJORD.ink, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: 10 }}>
+              {content.intro?.body}
+            </p>
+            {content.intro?.warning && (
+              <p style={{ color: FJORD.warm, fontSize: 11, fontWeight: 700, fontStyle: 'italic', borderTop: `1px dashed ${FJORD.border}`, paddingTop: 8, marginTop: 8 }}>
+                {content.intro.warning}
+              </p>
+            )}
+            <p style={{ color: FJORD.inkSoft, fontSize: 10, marginTop: 10, fontStyle: 'italic' }}>
+              📚 {t('humanizingAiModule.janteloven.novelSource')}: {content.inspiration?.novel} ·
+              {' '}<a href={content.inspiration?.wiki} target="_blank" rel="noopener noreferrer" style={{ color: FJORD.accent }}>Wikipedia ↗</a>
+            </p>
+          </div>
+
+          {/* 5 principle cards */}
+          <p style={{ color: FJORD.inkSoft, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+            {t('humanizingAiModule.janteloven.principlesTitle')}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12, marginBottom: 24 }}>
+            {(content.principles || []).map((p) => (
+              <div key={p.id} style={{
+                background: FJORD.card, border: `1px solid ${FJORD.border}`,
+                borderTop: `3px solid ${FJORD.accent}`, borderRadius: 12,
+                padding: '14px 16px', boxShadow: '0 1px 4px rgba(7,89,133,0.08)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <span style={{ background: FJORD.accent, color: '#fff', borderRadius: 8, padding: '2px 8px', fontSize: 11, fontWeight: 800, fontFamily: 'monospace' }}>{p.id}</span>
+                  <p style={{ color: FJORD.ink, fontSize: 13, fontWeight: 800, margin: 0 }}>{p.name}</p>
+                </div>
+                <p style={{ color: FJORD.warm, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>{t('humanizingAiModule.janteloven.shadowLabel')}</p>
+                <p style={{ color: FJORD.inkSoft, fontSize: 11, lineHeight: 1.5, fontStyle: 'italic', marginBottom: 8 }}>“{p.shadow}”</p>
+                <p style={{ color: FJORD.accent, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 3 }}>{t('humanizingAiModule.janteloven.humanizedLabel')}</p>
+                <p style={{ color: FJORD.ink, fontSize: 12, lineHeight: 1.5 }}>{p.humanized}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Input panel */}
+          <div style={{
+            background: FJORD.card, border: `1px solid ${FJORD.border}`, borderRadius: 14,
+            padding: '18px 22px', marginBottom: 16, boxShadow: '0 1px 4px rgba(7,89,133,0.06)',
+          }}>
+            <label style={{ color: FJORD.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginBottom: 6, textTransform: 'uppercase' }}>
+              {t('humanizingAiModule.janteloven.originalLabel')}
+            </label>
+            <textarea style={{ ...inputStyle, height: 140 }}
+              placeholder={t('humanizingAiModule.janteloven.originalPlaceholder')}
+              value={rawText} onChange={(e) => setRawText(e.target.value)} />
+            <label style={{ color: FJORD.accent, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', display: 'block', marginTop: 12, marginBottom: 6, textTransform: 'uppercase' }}>
+              {t('humanizingAiModule.janteloven.contextLabel')}
+            </label>
+            <textarea style={{ ...inputStyle, height: 56 }}
+              placeholder={t('humanizingAiModule.janteloven.contextPlaceholder')}
+              value={context} onChange={(e) => setContext(e.target.value)} />
+            <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <label style={{ color: FJORD.inkSoft, fontSize: 11, fontWeight: 700 }}>
+                {t('humanizingAiModule.janteloven.modeLabel')}:
+              </label>
+              <select value={mode} onChange={(e) => setMode(e.target.value)} style={{
+                background: FJORD.card, border: `1px solid ${FJORD.border}`, borderRadius: 8,
+                padding: '6px 10px', fontSize: 12, color: FJORD.ink, fontFamily: 'inherit',
+              }}>
+                <option value="rewrite">{t('humanizingAiModule.janteloven.modeRewrite')}</option>
+                <option value="balanced">{t('humanizingAiModule.janteloven.modeBalanced')}</option>
+              </select>
+            </div>
+            {error && <p style={{ color: FJORD.warm, fontSize: 12, marginTop: 10 }}>{error}</p>}
+            <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button onClick={() => action('evaluate')} disabled={busy != null} style={{
+                background: '#ffffff', color: FJORD.accent, border: `1px solid ${FJORD.accent}`,
+                borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13,
+                cursor: busy ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+              }}>{busy === 'evaluate' ? `⟳ ${t('humanizingAiModule.janteloven.evaluating')}` : `🔍 ${t('humanizingAiModule.janteloven.evaluateBtn')}`}</button>
+              <button onClick={() => action('rewrite')} disabled={busy != null} style={{
+                background: busy ? '#7dd3fc' : `linear-gradient(135deg,${FJORD.accent},#0c4a6e)`,
+                color: '#fff', border: 'none', borderRadius: 10, padding: '10px 22px',
+                fontWeight: 700, fontSize: 13,
+                cursor: busy ? 'not-allowed' : 'pointer',
+                boxShadow: '0 2px 8px rgba(7,89,133,0.25)', fontFamily: 'inherit',
+              }}>{busy === 'rewrite' ? `⟳ ${t('humanizingAiModule.janteloven.rewriting')}` : `⛰ ${t('humanizingAiModule.janteloven.rewriteBtn')}`}</button>
+              <button onClick={() => action('compare')} disabled={busy != null} style={{
+                background: FJORD.warmLight, color: FJORD.warm, border: `1px solid ${FJORD.warmBorder}`,
+                borderRadius: 10, padding: '10px 18px', fontWeight: 700, fontSize: 13,
+                cursor: busy ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+              }}>⇄ {t('humanizingAiModule.janteloven.compareBtn')}</button>
+            </div>
+          </div>
+
+          {/* Single-lens result */}
+          {result && <JanteResultPanel result={result} t={t} />}
+
+          {/* Compare result */}
+          {compareResult && <JanteCompareView data={compareResult} t={t} lang={lang} />}
+        </>
+      )}
+    </div>
+  );
+};
+
+// Inner components for the Janteloven result rendering
+const JanteResultPanel = ({ result, t }) => {
+  const score = result.jante_balance_score ?? 0;
+  const scoreColor = score >= 80 ? '#059669' : score >= 60 ? FJORD.accent : score >= 40 ? '#d97706' : '#dc2626';
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 16 }}>
+      {/* Score hero */}
+      <div style={{ background: FJORD.card, border: `1px solid ${FJORD.border}`, borderLeft: `4px solid ${scoreColor}`, borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+        <div>
+          <p style={{ color: FJORD.inkSoft, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{t('humanizingAiModule.janteloven.scoreTitle')}</p>
+          <p style={{ fontSize: 44, fontWeight: 900, color: scoreColor, fontFamily: 'monospace', lineHeight: 1 }}>
+            {score}<span style={{ fontSize: 16, color: FJORD.inkSoft }}>/100</span>
+          </p>
+        </div>
+        {result.dimensions && (
+          <div style={{ flex: 1, minWidth: 200 }}>
+            {Object.entries(result.dimensions).map(([k, v]) => (
+              <div key={k} style={{ marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: FJORD.ink }}>{t(`humanizingAiModule.janteloven.dimensions.${k}`, { defaultValue: k })}</span>
+                  <span style={{ fontFamily: 'monospace', color: FJORD.accent, fontWeight: 700 }}>{v}/20</span>
+                </div>
+                <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ width: `${(v/20)*100}%`, background: FJORD.accent, height: '100%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {result.is_mock && <Badge label={t('humanizingAiModule.common.mock')} color={FJORD.warm} light={FJORD.warmLight} border={FJORD.warmBorder} />}
+      </div>
+
+      {/* Rewritten */}
+      {result.rewritten_text && (
+        <BorderCard color={FJORD.accent} light="#f0f9ff" border={FJORD.border}>
+          <p style={{ color: FJORD.accent, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>⛰ {t('humanizingAiModule.janteloven.rewrittenTitle')}</p>
+          <p style={{ color: FJORD.ink, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{result.rewritten_text}</p>
+        </BorderCard>
+      )}
+
+      {/* Explanation */}
+      {result.explanation && (
+        <BorderCard color="#7c3aed" light="#f5f3ff" border="#ddd6fe">
+          <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{t('humanizingAiModule.janteloven.explanationTitle')}</p>
+          <p style={{ color: '#374151', fontSize: 12, lineHeight: 1.6 }}>{result.explanation}</p>
+        </BorderCard>
+      )}
+
+      {/* Risks */}
+      {result.risks_detected?.length > 0 && (
+        <BorderCard color={FJORD.warm} light={FJORD.warmLight} border={FJORD.warmBorder}>
+          <p style={{ color: FJORD.warm, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>⚠ {t('humanizingAiModule.janteloven.risksTitle')}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {result.risks_detected.map((r, i) => (
+              <span key={i} style={{ background: '#fff7ed', color: FJORD.warm, border: `1px solid ${FJORD.warmBorder}`, borderRadius: 999, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+                {t(`humanizingAiModule.janteloven.riskLabels.${r}`, { defaultValue: r })}
+              </span>
+            ))}
+          </div>
+        </BorderCard>
+      )}
+
+      {/* Strengths */}
+      {result.strengths?.length > 0 && (
+        <BorderCard color="#059669" light="#ecfdf5" border="#a7f3d0">
+          <p style={{ color: '#065f46', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 8, textTransform: 'uppercase' }}>✓ {t('humanizingAiModule.janteloven.strengthsTitle')}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {result.strengths.map((s, i) => (
+              <span key={i} style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', borderRadius: 999, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{s}</span>
+            ))}
+          </div>
+        </BorderCard>
+      )}
+    </div>
+  );
+};
+
+// Side-by-side comparison view: Humanitas (León XIV) vs Janteloven (Sandemose)
+const JanteCompareView = ({ data, t, lang }) => {
+  const h = data.humanitas || {};
+  const j = data.janteloven || {};
+  return (
+    <div style={{ marginTop: 16 }}>
+      <div style={{ marginBottom: 12 }}>
+        <p style={{ color: FJORD.accent, fontSize: 13, fontWeight: 800 }}>⇄ {t('humanizingAiModule.janteloven.compareTitle')}</p>
+        <p style={{ color: FJORD.inkSoft, fontSize: 12, fontStyle: 'italic' }}>{t('humanizingAiModule.janteloven.compareSubtitle')}</p>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        {/* Humanitas column (green) */}
+        <div style={{ background: '#ffffff', border: '1px solid #bbf7d0', borderTop: '3px solid #059669', borderRadius: 12, padding: '16px 18px' }}>
+          <p style={{ color: '#065f46', fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>🌿 {t('humanizingAiModule.janteloven.humanitasColumn')}</p>
+          <p style={{ fontSize: 36, fontWeight: 900, color: '#059669', fontFamily: 'monospace', lineHeight: 1, marginBottom: 8 }}>
+            {h.score ?? '—'}<span style={{ fontSize: 13, color: FJORD.inkSoft }}>/100</span>
+          </p>
+          {h.rewritten_text && (
+            <p style={{ fontSize: 12, color: FJORD.ink, lineHeight: 1.65, whiteSpace: 'pre-wrap', marginTop: 8, paddingTop: 8, borderTop: '1px dashed #d1fae5' }}>{h.rewritten_text}</p>
+          )}
+        </div>
+        {/* Janteloven column (fjord blue) */}
+        <div style={{ background: '#ffffff', border: `1px solid ${FJORD.border}`, borderTop: `3px solid ${FJORD.accent}`, borderRadius: 12, padding: '16px 18px' }}>
+          <p style={{ color: FJORD.accent, fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>⛰ {t('humanizingAiModule.janteloven.jantelovenColumn')}</p>
+          <p style={{ fontSize: 36, fontWeight: 900, color: FJORD.accent, fontFamily: 'monospace', lineHeight: 1, marginBottom: 8 }}>
+            {j.score ?? '—'}<span style={{ fontSize: 13, color: FJORD.inkSoft }}>/100</span>
+          </p>
+          {j.rewritten_text && (
+            <p style={{ fontSize: 12, color: FJORD.ink, lineHeight: 1.65, whiteSpace: 'pre-wrap', marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${FJORD.border}` }}>{j.rewritten_text}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Shell ───────────────────────────────────────────────────────────────
 const HumanizingAI = () => {
   const { t } = useTranslation();
@@ -1542,6 +1847,7 @@ const HumanizingAI = () => {
     { id: 'modelComparison', label: t('humanizingAiModule.tabs.modelComparison'), icon: '⚖️' },
     { id: 'humanityReport',  label: t('humanizingAiModule.tabs.humanityReport'),  icon: '📊' },
     { id: 'gateway',         label: t('humanizingAiModule.tabs.gateway'),         icon: '🛡️' },
+    { id: 'janteloven',      label: t('humanizingAiModule.tabs.janteloven'),      icon: '⛰' },
     { id: 'history',         label: t('humanizingAiModule.tabs.history'),         icon: '📁' },
   ];
 
@@ -1553,6 +1859,7 @@ const HumanizingAI = () => {
       case 'modelComparison': return <TabModelComparison />;
       case 'humanityReport':  return <TabHumanityReport />;
       case 'gateway':         return <TabGateway />;
+      case 'janteloven':      return <TabJanteloven />;
       case 'history':         return <TabHistory />;
       default:                return <TabHumanize />;
     }
