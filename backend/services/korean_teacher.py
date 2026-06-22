@@ -1347,6 +1347,464 @@ async def syllable_attempt(initial: str, medial: str, final: str,
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# V2.A — Reading Practice — 10 short TOPIK1 texts
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_READING_TEXTS: List[Dict[str, Any]] = [
+    {"id":"intro","level":"TOPIK1","title":"저는 Ignacio예요",
+     "title_translations":{"en":"I am Ignacio","es":"Soy Ignacio","no":"Jeg er Ignacio"},
+     "segments":[
+        {"hangul":"안녕하세요!","rom":"Annyeonghaseyo!",
+         "words":[{"w":"안녕하세요","r":"annyeonghaseyo","m":"hello"}]},
+        {"hangul":"저는 Ignacio예요.","rom":"Jeoneun Ignacio-yeyo.",
+         "words":[{"w":"저","r":"jeo","m":"I (humble)"},
+                  {"w":"는","r":"neun","m":"topic"},
+                  {"w":"예요","r":"yeyo","m":"am"}]},
+        {"hangul":"저는 스페인 사람이에요.","rom":"Jeoneun seupein saramieyo.",
+         "words":[{"w":"스페인","r":"seupein","m":"Spain"},
+                  {"w":"사람","r":"saram","m":"person"},
+                  {"w":"이에요","r":"ieyo","m":"am"}]},
+        {"hangul":"저는 한국어를 공부해요.","rom":"Jeoneun hangugeoreul gongbuhaeyo.",
+         "words":[{"w":"한국어","r":"hangugeo","m":"Korean language"},
+                  {"w":"를","r":"reul","m":"object"},
+                  {"w":"공부해요","r":"gongbuhaeyo","m":"study"}]},
+     ],
+     "translation":{
+        "en":"Hello! I'm Ignacio. I'm Spanish. I study Korean.",
+        "es":"¡Hola! Soy Ignacio. Soy español. Estudio coreano.",
+        "no":"Hei! Jeg er Ignacio. Jeg er spansk. Jeg studerer koreansk."},
+     "questions":[
+        {"q":{"en":"Where am I from?","es":"¿De dónde soy?","no":"Hvor er jeg fra?"},
+         "a":{"en":"Spain","es":"España","no":"Spania"}},
+        {"q":{"en":"What do I study?","es":"¿Qué estudio?","no":"Hva studerer jeg?"},
+         "a":{"en":"Korean","es":"Coreano","no":"Koreansk"}}]},
+
+    {"id":"morning","level":"TOPIK1","title":"아침",
+     "title_translations":{"en":"Morning","es":"La mañana","no":"Morgenen"},
+     "segments":[
+        {"hangul":"저는 매일 일곱 시에 일어나요.","rom":"Jeoneun maeil ilgop sie ireonayo.",
+         "words":[{"w":"매일","r":"maeil","m":"every day"},
+                  {"w":"일곱 시","r":"ilgop si","m":"seven o'clock"},
+                  {"w":"일어나요","r":"ireonayo","m":"get up"}]},
+        {"hangul":"아침에 커피를 마셔요.","rom":"Achime keopireul masyeoyo.",
+         "words":[{"w":"아침","r":"achim","m":"morning"},
+                  {"w":"커피","r":"keopi","m":"coffee"},
+                  {"w":"마셔요","r":"masyeoyo","m":"drink"}]},
+        {"hangul":"그리고 책을 읽어요.","rom":"Geurigo chaegeul ilgeoyo.",
+         "words":[{"w":"그리고","r":"geurigo","m":"and"},
+                  {"w":"책","r":"chaek","m":"book"},
+                  {"w":"읽어요","r":"ilgeoyo","m":"read"}]},
+     ],
+     "translation":{
+        "en":"Every day I get up at seven. In the morning I drink coffee and read a book.",
+        "es":"Cada día me levanto a las siete. Por la mañana bebo café y leo un libro.",
+        "no":"Hver dag står jeg opp klokken syv. Om morgenen drikker jeg kaffe og leser en bok."},
+     "questions":[
+        {"q":{"en":"What time do I get up?","es":"¿A qué hora me levanto?","no":"Når står jeg opp?"},
+         "a":{"en":"At seven","es":"A las siete","no":"Klokken syv"}}]},
+
+    {"id":"family","level":"TOPIK1","title":"우리 가족",
+     "title_translations":{"en":"My family","es":"Mi familia","no":"Familien min"},
+     "segments":[
+        {"hangul":"우리 가족은 네 명이에요.","rom":"Uri gajogeun ne myeongieyo.",
+         "words":[{"w":"우리","r":"uri","m":"our"},
+                  {"w":"가족","r":"gajok","m":"family"},
+                  {"w":"네 명","r":"ne myeong","m":"four people"}]},
+        {"hangul":"아버지, 어머니, 형 그리고 저예요.","rom":"Abeoji, eomeoni, hyeong geurigo jeoyeyo.",
+         "words":[{"w":"아버지","r":"abeoji","m":"father"},
+                  {"w":"어머니","r":"eomeoni","m":"mother"},
+                  {"w":"형","r":"hyeong","m":"older brother"}]},
+        {"hangul":"저는 가족을 사랑해요.","rom":"Jeoneun gajogeul saranghaeyo.",
+         "words":[{"w":"사랑해요","r":"saranghaeyo","m":"love"}]},
+     ],
+     "translation":{
+        "en":"My family is four people. Father, mother, older brother and me. I love my family.",
+        "es":"Mi familia somos cuatro personas. Padre, madre, hermano mayor y yo. Quiero a mi familia.",
+        "no":"Familien min er fire personer. Far, mor, eldre bror og meg. Jeg er glad i familien min."},
+     "questions":[
+        {"q":{"en":"How many people in my family?","es":"¿Cuántas personas en mi familia?","no":"Hvor mange i familien?"},
+         "a":{"en":"Four","es":"Cuatro","no":"Fire"}}]},
+
+    {"id":"food","level":"TOPIK1","title":"한국 음식",
+     "title_translations":{"en":"Korean food","es":"Comida coreana","no":"Koreansk mat"},
+     "segments":[
+        {"hangul":"저는 한국 음식을 좋아해요.","rom":"Jeoneun hanguk eumsigeul joahaeyo.",
+         "words":[{"w":"음식","r":"eumsik","m":"food"},
+                  {"w":"좋아해요","r":"joahaeyo","m":"like"}]},
+        {"hangul":"특히 비빔밥과 김치를 좋아해요.","rom":"Teukhi bibimbapgwa gimchireul joahaeyo.",
+         "words":[{"w":"특히","r":"teukhi","m":"especially"},
+                  {"w":"비빔밥","r":"bibimbap","m":"bibimbap"},
+                  {"w":"김치","r":"gimchi","m":"kimchi"}]},
+        {"hangul":"불고기도 맛있어요!","rom":"Bulgogido masisseoyo!",
+         "words":[{"w":"불고기","r":"bulgogi","m":"bulgogi"},
+                  {"w":"도","r":"do","m":"also"},
+                  {"w":"맛있어요","r":"masisseoyo","m":"delicious"}]},
+     ],
+     "translation":{
+        "en":"I like Korean food. I especially like bibimbap and kimchi. Bulgogi is also delicious!",
+        "es":"Me gusta la comida coreana. Me gustan especialmente el bibimbap y el kimchi. ¡El bulgogi también está rico!",
+        "no":"Jeg liker koreansk mat. Jeg liker spesielt bibimbap og kimchi. Bulgogi er også deilig!"},
+     "questions":[
+        {"q":{"en":"Which Korean dish do I especially like?","es":"¿Qué plato coreano me gusta especialmente?","no":"Hvilken koreansk rett liker jeg spesielt?"},
+         "a":{"en":"Bibimbap and kimchi","es":"Bibimbap y kimchi","no":"Bibimbap og kimchi"}}]},
+
+    {"id":"weather","level":"TOPIK1","title":"오늘 날씨",
+     "title_translations":{"en":"Today's weather","es":"El tiempo de hoy","no":"Været i dag"},
+     "segments":[
+        {"hangul":"오늘 날씨가 좋아요.","rom":"Oneul nalssiga joayo.",
+         "words":[{"w":"오늘","r":"oneul","m":"today"},
+                  {"w":"날씨","r":"nalssi","m":"weather"},
+                  {"w":"좋아요","r":"joayo","m":"good"}]},
+        {"hangul":"하늘이 파래요.","rom":"Haneuri paraeyo.",
+         "words":[{"w":"하늘","r":"haneul","m":"sky"},
+                  {"w":"파래요","r":"paraeyo","m":"is blue"}]},
+        {"hangul":"공원에 가고 싶어요.","rom":"Gongwone gago sipeoyo.",
+         "words":[{"w":"공원","r":"gongwon","m":"park"},
+                  {"w":"가고 싶어요","r":"gago sipeoyo","m":"want to go"}]},
+     ],
+     "translation":{
+        "en":"Today the weather is good. The sky is blue. I want to go to the park.",
+        "es":"Hoy hace buen tiempo. El cielo está azul. Quiero ir al parque.",
+        "no":"I dag er været fint. Himmelen er blå. Jeg vil gå til parken."},
+     "questions":[
+        {"q":{"en":"Where do I want to go?","es":"¿Adónde quiero ir?","no":"Hvor vil jeg gå?"},
+         "a":{"en":"To the park","es":"Al parque","no":"Til parken"}}]},
+
+    {"id":"school","level":"TOPIK1","title":"학교 가는 길",
+     "title_translations":{"en":"On the way to school","es":"Camino a la escuela","no":"På vei til skolen"},
+     "segments":[
+        {"hangul":"저는 매일 학교에 가요.","rom":"Jeoneun maeil hakgyoe gayo.",
+         "words":[{"w":"학교","r":"hakgyo","m":"school"}]},
+        {"hangul":"지하철로 가요.","rom":"Jihacheollo gayo.",
+         "words":[{"w":"지하철","r":"jihacheol","m":"subway"},
+                  {"w":"로","r":"ro","m":"by (means)"}]},
+        {"hangul":"학교에서 한국어를 배워요.","rom":"Hakgyoeseo hangugeoreul baewoyo.",
+         "words":[{"w":"에서","r":"eseo","m":"at (action)"},
+                  {"w":"배워요","r":"baewoyo","m":"learn"}]},
+     ],
+     "translation":{
+        "en":"Every day I go to school. I go by subway. At school I learn Korean.",
+        "es":"Cada día voy a la escuela. Voy en metro. En la escuela aprendo coreano.",
+        "no":"Hver dag går jeg på skolen. Jeg drar med t-bane. På skolen lærer jeg koreansk."},
+     "questions":[
+        {"q":{"en":"How do I go to school?","es":"¿Cómo voy a la escuela?","no":"Hvordan kommer jeg til skolen?"},
+         "a":{"en":"By subway","es":"En metro","no":"Med t-bane"}}]},
+
+    {"id":"hobby","level":"TOPIK1","title":"제 취미",
+     "title_translations":{"en":"My hobby","es":"Mi pasatiempo","no":"Hobbyen min"},
+     "segments":[
+        {"hangul":"제 취미는 음악 듣기예요.","rom":"Je chwimineun eumak deutgi-yeyo.",
+         "words":[{"w":"제","r":"je","m":"my"},
+                  {"w":"취미","r":"chwimi","m":"hobby"},
+                  {"w":"음악","r":"eumak","m":"music"},
+                  {"w":"듣기","r":"deutgi","m":"listening"}]},
+        {"hangul":"K-팝을 정말 좋아해요.","rom":"K-pabeul jeongmal joahaeyo.",
+         "words":[{"w":"K-팝","r":"K-pap","m":"K-pop"},
+                  {"w":"정말","r":"jeongmal","m":"really"}]},
+        {"hangul":"BTS와 BLACKPINK를 자주 들어요.","rom":"BTS-wa BLACKPINK-reul jaju deureoyo.",
+         "words":[{"w":"와","r":"wa","m":"and"},
+                  {"w":"자주","r":"jaju","m":"often"},
+                  {"w":"들어요","r":"deureoyo","m":"listen"}]},
+     ],
+     "translation":{
+        "en":"My hobby is listening to music. I really like K-pop. I often listen to BTS and BLACKPINK.",
+        "es":"Mi pasatiempo es escuchar música. Me gusta mucho el K-pop. Escucho mucho a BTS y BLACKPINK.",
+        "no":"Hobbyen min er å lytte til musikk. Jeg liker virkelig K-pop. Jeg lytter ofte til BTS og BLACKPINK."},
+     "questions":[
+        {"q":{"en":"What is my hobby?","es":"¿Cuál es mi pasatiempo?","no":"Hva er hobbyen min?"},
+         "a":{"en":"Listening to music","es":"Escuchar música","no":"Å lytte til musikk"}}]},
+
+    {"id":"kdrama","level":"TOPIK1","title":"K-드라마",
+     "title_translations":{"en":"K-drama","es":"K-drama","no":"K-drama"},
+     "segments":[
+        {"hangul":"저는 한국 드라마를 자주 봐요.","rom":"Jeoneun hanguk deuramareul jaju bwayo.",
+         "words":[{"w":"드라마","r":"deurama","m":"drama"},
+                  {"w":"봐요","r":"bwayo","m":"watch"}]},
+        {"hangul":"드라마로 한국어를 공부해요.","rom":"Deuramaro hangugeoreul gongbuhaeyo.",
+         "words":[{"w":"로","r":"ro","m":"with"}]},
+        {"hangul":"재미있고 유익해요.","rom":"Jaemiitgo yuikhaeyo.",
+         "words":[{"w":"재미있고","r":"jaemiitgo","m":"fun and"},
+                  {"w":"유익해요","r":"yuikhaeyo","m":"useful"}]},
+     ],
+     "translation":{
+        "en":"I often watch Korean dramas. I study Korean with dramas. They are fun and useful.",
+        "es":"Veo a menudo dramas coreanos. Estudio coreano con los dramas. Son divertidos y útiles.",
+        "no":"Jeg ser ofte koreanske dramaer. Jeg studerer koreansk med dramaer. De er morsomme og nyttige."},
+     "questions":[
+        {"q":{"en":"What do I use to study Korean?","es":"¿Qué uso para estudiar coreano?","no":"Hva bruker jeg for å studere koreansk?"},
+         "a":{"en":"K-dramas","es":"K-dramas","no":"K-dramaer"}}]},
+
+    {"id":"weekend","level":"TOPIK1","title":"주말",
+     "title_translations":{"en":"Weekend","es":"Fin de semana","no":"Helg"},
+     "segments":[
+        {"hangul":"주말에 친구를 만나요.","rom":"Jumare chingureul mannayo.",
+         "words":[{"w":"주말","r":"jumal","m":"weekend"},
+                  {"w":"만나요","r":"mannayo","m":"meet"}]},
+        {"hangul":"우리는 카페에서 커피를 마셔요.","rom":"Urineun kapeeseo keopireul masyeoyo.",
+         "words":[{"w":"카페","r":"kape","m":"café"}]},
+        {"hangul":"그리고 산책을 해요.","rom":"Geurigo sanchaegeul haeyo.",
+         "words":[{"w":"산책","r":"sanchaek","m":"walk"},
+                  {"w":"해요","r":"haeyo","m":"do"}]},
+     ],
+     "translation":{
+        "en":"On weekends I meet friends. We drink coffee at a café. And we take a walk.",
+        "es":"Los fines de semana me reúno con amigos. Bebemos café en una cafetería. Y damos un paseo.",
+        "no":"I helgene møter jeg venner. Vi drikker kaffe på kafé. Og vi tar en spasertur."},
+     "questions":[
+        {"q":{"en":"Where do we drink coffee?","es":"¿Dónde bebemos café?","no":"Hvor drikker vi kaffe?"},
+         "a":{"en":"At a café","es":"En una cafetería","no":"På en kafé"}}]},
+
+    {"id":"seoul","level":"TOPIK1","title":"서울 여행",
+     "title_translations":{"en":"Trip to Seoul","es":"Viaje a Seúl","no":"Tur til Seoul"},
+     "segments":[
+        {"hangul":"내년에 서울에 가고 싶어요.","rom":"Naenyeone seoure gago sipeoyo.",
+         "words":[{"w":"내년","r":"naenyeon","m":"next year"},
+                  {"w":"서울","r":"seoul","m":"Seoul"}]},
+        {"hangul":"경복궁과 남산을 보고 싶어요.","rom":"Gyeongbokgunggwa namsaneul bogo sipeoyo.",
+         "words":[{"w":"경복궁","r":"gyeongbokgung","m":"Gyeongbokgung Palace"},
+                  {"w":"남산","r":"namsan","m":"Namsan (Mt.)"}]},
+        {"hangul":"한국 친구와 함께 갈 거예요.","rom":"Hanguk chinguwa hamkke gal geoyeyo.",
+         "words":[{"w":"함께","r":"hamkke","m":"together"},
+                  {"w":"갈 거예요","r":"gal geoyeyo","m":"will go"}]},
+     ],
+     "translation":{
+        "en":"I want to go to Seoul next year. I want to see Gyeongbokgung Palace and Namsan. I'll go together with a Korean friend.",
+        "es":"El año que viene quiero ir a Seúl. Quiero ver el palacio Gyeongbokgung y Namsan. Iré con un amigo coreano.",
+        "no":"Neste år vil jeg dra til Seoul. Jeg vil se Gyeongbokgung-palasset og Namsan. Jeg skal dra sammen med en koreansk venn."},
+     "questions":[
+        {"q":{"en":"When do I want to go?","es":"¿Cuándo quiero ir?","no":"Når vil jeg dra?"},
+         "a":{"en":"Next year","es":"El año que viene","no":"Neste år"}}]},
+]
+
+_READING_MAP = {r["id"]: r for r in _READING_TEXTS}
+
+
+def get_reading_texts() -> List[Dict[str, Any]]:
+    return [{"id": r["id"], "title": r["title"],
+             "title_translations": r["title_translations"], "level": r["level"]}
+            for r in _READING_TEXTS]
+
+
+def get_reading_text(text_id: str) -> Optional[Dict[str, Any]]:
+    return _READING_MAP.get(text_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V2.B — Speaking Lab — 10 phrases for Web Speech API practice
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_SPEAKING_PHRASES: List[Dict[str, Any]] = [
+    {"id":"sp1","hangul":"안녕하세요.","rom":"Annyeonghaseyo.",
+     "translations":{"en":"Hello.","es":"Hola.","no":"Hei."},"level":"TOPIK1","tag":"greeting"},
+    {"id":"sp2","hangul":"감사합니다.","rom":"Gamsahamnida.",
+     "translations":{"en":"Thank you.","es":"Gracias.","no":"Tusen takk."},"level":"TOPIK1","tag":"essential"},
+    {"id":"sp3","hangul":"죄송합니다.","rom":"Joesonghamnida.",
+     "translations":{"en":"I'm sorry.","es":"Lo siento.","no":"Beklager."},"level":"TOPIK1","tag":"essential"},
+    {"id":"sp4","hangul":"제 이름은 Ignacio예요.","rom":"Je ireumeun Ignacio-yeyo.",
+     "translations":{"en":"My name is Ignacio.","es":"Me llamo Ignacio.","no":"Jeg heter Ignacio."},"level":"TOPIK1","tag":"intro"},
+    {"id":"sp5","hangul":"저는 스페인 사람이에요.","rom":"Jeoneun seupein saramieyo.",
+     "translations":{"en":"I am Spanish.","es":"Soy español.","no":"Jeg er spansk."},"level":"TOPIK1","tag":"intro"},
+    {"id":"sp6","hangul":"커피 한 잔 주세요.","rom":"Keopi han jan juseyo.",
+     "translations":{"en":"A cup of coffee, please.","es":"Un café, por favor.","no":"En kopp kaffe, takk."},"level":"TOPIK1","tag":"request"},
+    {"id":"sp7","hangul":"지하철역이 어디예요?","rom":"Jihacheollyeogi eodiyeyo?",
+     "translations":{"en":"Where is the subway station?","es":"¿Dónde está la estación de metro?","no":"Hvor er t-banestasjonen?"},"level":"TOPIK1","tag":"question"},
+    {"id":"sp8","hangul":"이거 얼마예요?","rom":"Igeo eolmayeyo?",
+     "translations":{"en":"How much is this?","es":"¿Cuánto cuesta esto?","no":"Hvor mye koster dette?"},"level":"TOPIK1","tag":"question"},
+    {"id":"sp9","hangul":"한국어를 조금 해요.","rom":"Hangugeoreul jogeum haeyo.",
+     "translations":{"en":"I speak a little Korean.","es":"Hablo un poco de coreano.","no":"Jeg snakker litt koreansk."},"level":"TOPIK1","tag":"smalltalk"},
+    {"id":"sp10","hangul":"내일 또 만나요!","rom":"Naeil tto mannayo!",
+     "translations":{"en":"See you tomorrow!","es":"¡Hasta mañana!","no":"Vi ses i morgen!"},"level":"TOPIK1","tag":"farewell"},
+]
+
+
+def get_speaking_phrases() -> List[Dict[str, Any]]:
+    return _SPEAKING_PHRASES
+
+
+async def speaking_attempt(phrase_id: str, transcript: str, user_id: str = DEFAULT_USER) -> Dict[str, Any]:
+    record = {
+        "user_id": user_id, "phrase_id": phrase_id,
+        "transcript": transcript,
+        "at": datetime.now(timezone.utc).isoformat(),
+    }
+    if _JAMO_COL is not None:
+        try:
+            col = _JAMO_COL.database.get_collection("korean_speaking_attempts")
+            await col.insert_one(record)
+            return {"status": "ok", "persisted": True}
+        except Exception:
+            pass
+    return {"status": "ok", "persisted": False}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# V2.C — Culture Notes — 10 cultural pieces
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_CULTURE_NOTES: List[Dict[str, Any]] = [
+    {"id":"hangul-origin","emoji":"👑","category":"language",
+     "title":{"hangul":"한글의 탄생","rom":"Hangeul-ui tansaeng",
+              "en":"The birth of Hangul","es":"El nacimiento del Hangul","no":"Hanguls fødsel"},
+     "summary":{
+        "en":"Hangul was created in 1443 by King Sejong the Great and officially proclaimed in 1446 in a document called 훈민정음 ('The proper sounds for instructing the people'). Until then, only the educated elite could read Chinese characters (Hanja). Sejong wanted ordinary people to be literate, so he designed a phonetic alphabet whose letter shapes mimic the position of the mouth, tongue and teeth when pronouncing each sound. It is the only writing system in the world whose precise creator and date of invention are documented.",
+        "es":"El Hangul fue creado en 1443 por el rey Sejong el Grande y proclamado oficialmente en 1446 en un documento llamado 훈민정음 ('Los sonidos correctos para instruir al pueblo'). Hasta entonces, solo la élite culta podía leer los caracteres chinos (Hanja). Sejong quería que la gente común supiera leer, así que diseñó un alfabeto fonético cuyas formas imitan la posición de la boca, la lengua y los dientes al pronunciar cada sonido. Es el único sistema de escritura del mundo cuyo creador exacto y fecha de invención están documentados.",
+        "no":"Hangul ble laget i 1443 av Kong Sejong den Store og offisielt kunngjort i 1446 i et dokument kalt 훈민정음 ('De rette lyder for å undervise folket'). Inntil da kunne bare den utdannede eliten lese kinesiske tegn (Hanja). Sejong ønsket at vanlige folk skulle være lesekyndige, så han designet et fonetisk alfabet hvis bokstavformer etterligner posisjonen til munn, tunge og tenner når hver lyd uttales. Det er det eneste skriftsystemet i verden hvis nøyaktige skaper og oppfinnelsesdato er dokumentert."},
+     "vocab":[{"w":"한글","r":"hangeul","m":"Hangul"},
+              {"w":"세종","r":"sejong","m":"Sejong"},
+              {"w":"훈민정음","r":"hunminjeongeum","m":"Hunminjeongeum"}],
+     "didYouKnow":{
+        "en":"October 9th is Hangul Day (한글날) — a public holiday in South Korea celebrating the alphabet. North Korea celebrates it on January 15th.",
+        "es":"El 9 de octubre es el Día del Hangul (한글날) — festivo nacional en Corea del Sur celebrando el alfabeto. Corea del Norte lo celebra el 15 de enero.",
+        "no":"9. oktober er Hangul-dagen (한글날) — en offentlig fridag i Sør-Korea som feirer alfabetet. Nord-Korea feirer den 15. januar."}},
+
+    {"id":"honorifics","emoji":"🙇","category":"language",
+     "title":{"hangul":"존댓말과 반말","rom":"Jondaetmal-gwa banmal",
+              "en":"Honorifics vs casual speech","es":"Lenguaje cortés vs casual","no":"Høflig vs uformell tale"},
+     "summary":{
+        "en":"Korean has multiple speech levels that change depending on who you're talking to. The two main forms are 존댓말 (jondaetmal — honorific/polite) and 반말 (banmal — casual/intimate). Using banmal with someone older or higher-status is a serious insult; using jondaetmal with close friends sounds cold. Verbs add -(으)시- to honor the SUBJECT, and politeness endings (-ㅂ니다, -아요/어요, plain) mark respect to the LISTENER. Some nouns have separate honorific forms too: 집 (jip, home) → 댁 (daek), 이름 (ireum, name) → 성함 (seongham).",
+        "es":"El coreano tiene varios niveles de habla que cambian según con quién hablas. Las dos formas principales son 존댓말 (jondaetmal — honorífico/cortés) y 반말 (banmal — casual/íntimo). Usar banmal con alguien mayor o de mayor estatus es un insulto grave; usar jondaetmal con amigos cercanos suena frío. Los verbos añaden -(으)시- para honrar al SUJETO, y las terminaciones de cortesía (-ㅂ니다, -아요/어요, llana) marcan respeto al OYENTE. Algunos sustantivos tienen formas honoríficas separadas: 집 (jip, casa) → 댁 (daek), 이름 (ireum, nombre) → 성함 (seongham).",
+        "no":"Koreansk har flere talenivåer som endrer seg avhengig av hvem du snakker med. De to hovedformene er 존댓말 (jondaetmal — honorifikk/høflig) og 반말 (banmal — uformell/intim). Å bruke banmal med noen eldre eller av høyere status er en alvorlig fornærmelse; å bruke jondaetmal med nære venner høres kaldt ut. Verb legger til -(으)시- for å hedre SUBJEKTET, og høflighetsendelser markerer respekt for LYTTEREN. Noen substantiver har egne honorifikkformer: 집 → 댁, 이름 → 성함."},
+     "vocab":[{"w":"존댓말","r":"jondaetmal","m":"honorific speech"},
+              {"w":"반말","r":"banmal","m":"casual speech"},
+              {"w":"성함","r":"seongham","m":"name (honorific)"}],
+     "didYouKnow":{
+        "en":"When asking someone's age in Korean, it's not rude — it's necessary, because the answer determines how you must address them. Strangers often ask each other's age within the first minutes of meeting.",
+        "es":"Preguntar la edad en coreano no es de mala educación — es necesario, porque la respuesta determina cómo debes dirigirte a esa persona. Desconocidos suelen preguntarse la edad en los primeros minutos.",
+        "no":"Å spørre noen om alderen på koreansk er ikke uhøflig — det er nødvendig, fordi svaret bestemmer hvordan du må tiltale dem. Fremmede spør ofte hverandre om alderen i løpet av de første minuttene."}},
+
+    {"id":"hanja","emoji":"漢","category":"language",
+     "title":{"hangul":"한자의 역사","rom":"Hanja-ui yeoksa",
+              "en":"The history of Hanja","es":"La historia del Hanja","no":"Hanjas historie"},
+     "summary":{
+        "en":"For more than a thousand years before Hangul, Koreans wrote using Chinese characters (한자, Hanja). Even today, around 60–70% of Korean vocabulary is Sino-Korean — words built from Hanja roots. Knowing Hanja helps you understand abstract vocabulary, distinguish homophones, and learn Japanese and Chinese faster. South Korea still teaches ~1,800 essential Hanja in schools; North Korea banned them. Names are often written in Hanja, and so are formal documents, news headlines, and academic terms.",
+        "es":"Durante más de mil años antes del Hangul, los coreanos escribían con caracteres chinos (한자, Hanja). Aún hoy, alrededor del 60–70% del vocabulario coreano es sino-coreano — palabras construidas a partir de raíces Hanja. Saber Hanja ayuda a entender vocabulario abstracto, distinguir homófonos y aprender japonés y chino más rápido. Corea del Sur sigue enseñando ~1.800 Hanja esenciales en las escuelas; Corea del Norte los prohibió. Los nombres se escriben a menudo en Hanja, así como documentos formales, titulares de prensa y términos académicos.",
+        "no":"I mer enn tusen år før Hangul skrev koreanere ved hjelp av kinesiske tegn (한자, Hanja). Selv i dag er rundt 60–70 % av koreansk ordforråd sino-koreansk — ord bygget fra Hanja-røtter. Å kunne Hanja hjelper deg å forstå abstrakt ordforråd, skille homofoner, og lære japansk og kinesisk raskere. Sør-Korea underviser fortsatt ~1 800 essensielle Hanja på skoler; Nord-Korea forbød dem. Navn skrives ofte i Hanja, og det samme gjør formelle dokumenter, nyhetsoverskrifter og akademiske termer."},
+     "vocab":[{"w":"한자","r":"hanja","m":"Hanja (Chinese chars.)"},
+              {"w":"한자어","r":"hanjaeo","m":"Sino-Korean word"},
+              {"w":"고유어","r":"goyueo","m":"native Korean word"}],
+     "didYouKnow":{
+        "en":"Many Korean given names follow a generational system: siblings or cousins of the same generation share one syllable of their name, taken from a fixed Hanja chart maintained over centuries.",
+        "es":"Muchos nombres coreanos siguen un sistema generacional: hermanos o primos de la misma generación comparten una sílaba del nombre, tomada de una tabla Hanja fija mantenida durante siglos.",
+        "no":"Mange koreanske fornavn følger et generasjonssystem: søsken eller fettere av samme generasjon deler én stavelse av navnet, tatt fra et fast Hanja-skjema bevart gjennom århundrer."}},
+
+    {"id":"kpop","emoji":"🎤","category":"pop_culture",
+     "title":{"hangul":"K-팝 문화","rom":"K-pap munhwa",
+              "en":"K-pop culture","es":"La cultura del K-pop","no":"K-pop-kulturen"},
+     "summary":{
+        "en":"K-pop went global in the 2010s — BTS, BLACKPINK, EXO, TWICE — and pulled Korean language with it. Groups train for years before debut, master singing + dancing + multiple languages, and release synchronised choreographies as carefully edited mini-films. Fan communities (called 팬덤, fandom) coordinate worldwide streaming, voting, and chart actions. Many learners arrive at Korean through K-pop lyrics and decode meaning before grammar — a perfectly valid path.",
+        "es":"El K-pop se globalizó en los 2010 — BTS, BLACKPINK, EXO, TWICE — y arrastró el idioma coreano consigo. Los grupos entrenan años antes de debutar, dominan canto + baile + varios idiomas, y publican coreografías sincronizadas como mini-películas cuidadosamente editadas. Las comunidades de fans (llamadas 팬덤, fandom) coordinan streaming, votaciones y acciones de chart en todo el mundo. Muchos aprendices llegan al coreano por las letras de K-pop y descifran el significado antes que la gramática — un camino perfectamente válido.",
+        "no":"K-pop ble global på 2010-tallet — BTS, BLACKPINK, EXO, TWICE — og tok det koreanske språket med seg. Grupper trener i årevis før debut, mestrer sang + dans + flere språk, og slipper synkroniserte koreografier som nøye redigerte minifilmer. Fan-samfunn (kalt 팬덤, fandom) koordinerer global streaming, stemming og chart-aksjoner. Mange elever kommer til koreansk gjennom K-pop-tekster og dekoder mening før grammatikk — en helt gyldig vei."},
+     "vocab":[{"w":"가수","r":"gasu","m":"singer"},
+              {"w":"노래","r":"norae","m":"song"},
+              {"w":"춤","r":"chum","m":"dance"}],
+     "didYouKnow":{
+        "en":"BTS was the first K-pop group to address the United Nations General Assembly (2018, 2020, 2021). Their RM speaks fluent English thanks to watching the US sitcom 'Friends' as a teenager.",
+        "es":"BTS fue el primer grupo de K-pop en dirigirse a la Asamblea General de la ONU (2018, 2020, 2021). Su líder RM habla inglés fluido gracias a ver la sitcom estadounidense 'Friends' de adolescente.",
+        "no":"BTS var den første K-pop-gruppen som talte til FNs generalforsamling (2018, 2020, 2021). Leder RM snakker flytende engelsk takket være å ha sett den amerikanske sitcomen 'Friends' som tenåring."}},
+
+    {"id":"kdrama","emoji":"📺","category":"pop_culture",
+     "title":{"hangul":"한국 드라마","rom":"Hanguk deurama",
+              "en":"Korean drama","es":"El drama coreano","no":"Koreansk drama"},
+     "summary":{
+        "en":"K-dramas typically run 16–20 episodes per series and follow tight narrative arcs — unlike Western shows that drag across multiple seasons. Genres span romance, historical (사극), thriller, medical and revenge. Shows like 'Squid Game', 'Crash Landing on You', 'Reply 1988' and 'Kingdom' have built global audiences via Netflix. They are an excellent language-learning tool because of their realistic dialogue, repeated daily phrases, and emotional emphasis that makes new vocabulary stick.",
+        "es":"Los K-dramas suelen tener 16–20 episodios por serie y siguen arcos narrativos compactos — a diferencia de las series occidentales que se alargan varias temporadas. Los géneros incluyen romance, histórico (사극), thriller, médico y venganza. Series como 'El juego del calamar', 'Aterrizaje de emergencia en tu corazón', 'Reply 1988' y 'Kingdom' han creado audiencias globales vía Netflix. Son una herramienta excelente para aprender el idioma por su diálogo realista, frases cotidianas repetidas y énfasis emocional que fija el vocabulario nuevo.",
+        "no":"K-dramaer har vanligvis 16–20 episoder per serie og følger stramme narrative buer — i motsetning til vestlige show som drar seg over flere sesonger. Sjangrene spenner fra romantikk, historisk (사극), thriller, medisin og hevn. Serier som 'Squid Game', 'Crash Landing on You', 'Reply 1988' og 'Kingdom' har bygget globalt publikum via Netflix. De er et utmerket språkverktøy på grunn av realistisk dialog, gjentatte hverdagsfraser og emosjonell vekt som gjør at nytt ordforråd fester seg."},
+     "vocab":[{"w":"드라마","r":"deurama","m":"drama"},
+              {"w":"사극","r":"saguk","m":"historical drama"},
+              {"w":"배우","r":"baeu","m":"actor"}],
+     "didYouKnow":{
+        "en":"'Squid Game' (오징어 게임) became Netflix's most-watched series ever within 28 days of release in 2021, with 142 million households watching.",
+        "es":"'El juego del calamar' (오징어 게임) se convirtió en la serie más vista de Netflix en 28 días tras su estreno en 2021, con 142 millones de hogares.",
+        "no":"'Squid Game' (오징어 게임) ble Netflix' mest sette serie noensinne innen 28 dager etter utgivelsen i 2021, med 142 millioner husstander."}},
+
+    {"id":"food","emoji":"🍜","category":"food",
+     "title":{"hangul":"한식","rom":"Hansik",
+              "en":"Korean cuisine","es":"La cocina coreana","no":"Koreansk mat"},
+     "summary":{
+        "en":"A traditional Korean meal centres on rice (밥) and soup (국), surrounded by many small side dishes (반찬). Kimchi (김치) — fermented vegetables, usually napa cabbage — accompanies almost every meal and varies by region and household. Iconic dishes: bibimbap (비빔밥, mixed rice bowl), bulgogi (불고기, marinated grilled beef), tteokbokki (떡볶이, spicy rice cakes), samgyeopsal (삼겹살, grilled pork belly), japchae (잡채, glass noodles). UNESCO recognised the kimjang (kimchi-making) tradition as Intangible Cultural Heritage in 2013.",
+        "es":"Una comida coreana tradicional gira en torno al arroz (밥) y la sopa (국), rodeados de muchos pequeños platos secundarios (반찬). El kimchi (김치) — vegetales fermentados, normalmente col china — acompaña casi cada comida y varía según la región y la familia. Platos icónicos: bibimbap (비빔밥), bulgogi (불고기), tteokbokki (떡볶이, pasteles de arroz picantes), samgyeopsal (삼겹살, panceta a la parrilla), japchae (잡채, fideos transparentes). La UNESCO reconoció la tradición del kimjang (preparación del kimchi) como Patrimonio Cultural Inmaterial en 2013.",
+        "no":"Et tradisjonelt koreansk måltid sentrerer rundt ris (밥) og suppe (국), omgitt av mange små siderretter (반찬). Kimchi (김치) — fermenterte grønnsaker, vanligvis kinakål — følger nesten hvert måltid og varierer etter region og husholdning. Ikoniske retter: bibimbap, bulgogi, tteokbokki, samgyeopsal, japchae. UNESCO anerkjente kimjang (kimchi-laging)-tradisjonen som immateriell kulturarv i 2013."},
+     "vocab":[{"w":"밥","r":"bap","m":"rice / meal"},
+              {"w":"김치","r":"gimchi","m":"kimchi"},
+              {"w":"반찬","r":"banchan","m":"side dish"}],
+     "didYouKnow":{
+        "en":"Koreans say 잘 먹겠습니다 ('I will eat well') before a meal and 잘 먹었습니다 ('I ate well') after. Both are forms of gratitude to whoever prepared or paid for the meal.",
+        "es":"Los coreanos dicen 잘 먹겠습니다 ('comeré bien') antes de comer y 잘 먹었습니다 ('he comido bien') después. Ambas son formas de gratitud hacia quien preparó o pagó la comida.",
+        "no":"Koreanere sier 잘 먹겠습니다 ('jeg skal spise godt') før et måltid og 잘 먹었습니다 ('jeg spiste godt') etter. Begge er former for takknemlighet til den som tilberedte eller betalte for måltidet."}},
+
+    {"id":"etiquette","emoji":"🤝","category":"etiquette",
+     "title":{"hangul":"한국의 예절","rom":"Hanguk-ui yejeol",
+              "en":"Korean etiquette","es":"Etiqueta coreana","no":"Koreansk etikette"},
+     "summary":{
+        "en":"Korean social etiquette is rooted in age and seniority. Use two hands when giving or receiving objects from someone older — especially money, business cards or drinks. Wait for elders to start eating before you do. When pouring a drink for someone older, hold the bottle with two hands and turn your head away when drinking the response. Shoes come off at the entrance to homes and many traditional restaurants. Bows replace handshakes in formal settings: shallow for greeting, deeper for apology or deep gratitude.",
+        "es":"La etiqueta social coreana se basa en la edad y la antigüedad. Usa las dos manos al dar o recibir objetos de alguien mayor — especialmente dinero, tarjetas de visita o bebidas. Espera a que los mayores empiecen a comer antes que tú. Al servir una bebida a alguien mayor, sostén la botella con dos manos y gira la cabeza al beber la respuesta. Los zapatos se quitan en la entrada de las casas y de muchos restaurantes tradicionales. Los saludos sustituyen al apretón de manos en contextos formales: leves para saludar, más profundos para disculparse o agradecer profundamente.",
+        "no":"Koreansk sosial etikette er rotfestet i alder og senioritet. Bruk to hender når du gir eller mottar gjenstander fra noen eldre — spesielt penger, visittkort eller drikke. Vent til de eldre begynner å spise før du gjør det. Når du heller en drink til noen eldre, hold flasken med to hender og snu hodet bort når du drikker svaret. Sko tas av ved inngangen til hjem og mange tradisjonelle restauranter. Bukk erstatter håndtrykk i formelle settinger: grunne for hilsen, dypere for unnskyldning eller dyp takknemlighet."},
+     "vocab":[{"w":"예절","r":"yejeol","m":"etiquette"},
+              {"w":"인사","r":"insa","m":"greeting"},
+              {"w":"존경","r":"jongyeong","m":"respect"}],
+     "didYouKnow":{
+        "en":"Receiving a business card with one hand instead of two is considered rude in Korean business culture. The card should also be read carefully before being put away — never immediately stuffed into a pocket.",
+        "es":"Recibir una tarjeta de visita con una sola mano se considera de mala educación en la cultura empresarial coreana. La tarjeta también debe leerse atentamente antes de guardarla — nunca metida inmediatamente en el bolsillo.",
+        "no":"Å motta et visittkort med én hånd i stedet for to anses som uhøflig i koreansk forretningskultur. Kortet skal også leses nøye før det legges bort — aldri stappes umiddelbart i lommen."}},
+
+    {"id":"festivals","emoji":"🎎","category":"festivals",
+     "title":{"hangul":"설날과 추석","rom":"Seollal-gwa Chuseok",
+              "en":"Seollal & Chuseok","es":"Seollal y Chuseok","no":"Seollal og Chuseok"},
+     "summary":{
+        "en":"The two biggest holidays in Korea are Seollal (설날, Lunar New Year, Jan–Feb) and Chuseok (추석, Korean Thanksgiving, mid-autumn). Families travel home — causing the largest migration in the country each year. Traditions include wearing hanbok (한복, traditional dress), ancestral rites (차례), eating tteokguk (떡국, rice cake soup) on Seollal — eating it adds one year to your age — and songpyeon (송편, half-moon rice cakes) on Chuseok. Children bow deeply to elders (세배) and receive 세뱃돈 (New Year money) in return.",
+        "es":"Las dos mayores fiestas en Corea son Seollal (설날, Año Nuevo Lunar, ene–feb) y Chuseok (추석, Acción de Gracias coreana, mediados de otoño). Las familias viajan a casa — causando la mayor migración del país cada año. Las tradiciones incluyen llevar hanbok (한복, traje tradicional), ritos ancestrales (차례), comer tteokguk (떡국, sopa de pasteles de arroz) en Seollal — comerlo añade un año a tu edad — y songpyeon (송편, pasteles de arroz en media luna) en Chuseok. Los niños hacen una reverencia profunda a los mayores (세배) y reciben 세뱃돈 (dinero de Año Nuevo) a cambio.",
+        "no":"De to største høytidene i Korea er Seollal (설날, månenyttår, jan–feb) og Chuseok (추석, koreansk takkefest, midt på høsten). Familier reiser hjem — noe som forårsaker den største migrasjonen i landet hvert år. Tradisjoner inkluderer å ha på seg hanbok (한복, tradisjonell drakt), forfedreritualer (차례), å spise tteokguk (떡국, riskakesuppe) på Seollal — å spise det legger ett år til alderen din — og songpyeon (송편, halvmåne-riskaker) på Chuseok. Barn bøyer seg dypt for de eldre (세배) og mottar 세뱃돈 (nyttårspenger) til gjengjeld."},
+     "vocab":[{"w":"설날","r":"seollal","m":"Lunar New Year"},
+              {"w":"추석","r":"chuseok","m":"Chuseok"},
+              {"w":"한복","r":"hanbok","m":"hanbok"}],
+     "didYouKnow":{
+        "en":"In Korea, every person traditionally turned one year older on Lunar New Year — not on their birthday. A law passed in 2023 finally aligned official ages with the international system.",
+        "es":"En Corea, cada persona cumplía tradicionalmente un año más en el Año Nuevo Lunar — no en su cumpleaños. Una ley de 2023 alineó por fin las edades oficiales con el sistema internacional.",
+        "no":"I Korea ble alle tradisjonelt ett år eldre på månenyttår — ikke på bursdagen sin. En lov fra 2023 justerte endelig offisielle aldre til det internasjonale systemet."}},
+
+    {"id":"names","emoji":"📛","category":"society",
+     "title":{"hangul":"한국 이름","rom":"Hanguk ireum",
+              "en":"Korean names","es":"Los nombres coreanos","no":"Koreanske navn"},
+     "summary":{
+        "en":"Korean names are written family-name first, then given name. About half the population shares one of just four family names: 김 (Kim), 이 (Lee/Yi), 박 (Park) and 최 (Choi). Given names are usually two syllables, both meaningful — often a generational marker plus a personal syllable. Married women do NOT take their husband's family name; children take the father's. Use someone's title (선생님 teacher, 사장님 boss, 형 older brother) rather than the personal name unless invited to do so.",
+        "es":"Los nombres coreanos se escriben primero el apellido, luego el nombre. Casi la mitad de la población comparte uno de solo cuatro apellidos: 김 (Kim), 이 (Lee/Yi), 박 (Park) y 최 (Choi). Los nombres suelen tener dos sílabas, ambas con significado — a menudo un marcador generacional más una sílaba personal. Las mujeres casadas NO toman el apellido del marido; los hijos toman el del padre. Usa el título de la persona (선생님 profesor, 사장님 jefe, 형 hermano mayor) en lugar del nombre personal, salvo invitación expresa.",
+        "no":"Koreanske navn skrives med etternavn først, deretter fornavn. Omtrent halvparten av befolkningen deler ett av bare fire etternavn: 김 (Kim), 이 (Lee/Yi), 박 (Park) og 최 (Choi). Fornavn har vanligvis to stavelser, begge med mening — ofte en generasjonsmarkør pluss en personlig stavelse. Gifte kvinner tar IKKE mannens etternavn; barna tar farens. Bruk personens tittel (선생님 lærer, 사장님 sjef, 형 eldre bror) i stedet for personnavnet, med mindre du blir invitert til det."},
+     "vocab":[{"w":"이름","r":"ireum","m":"name"},
+              {"w":"성","r":"seong","m":"family name"},
+              {"w":"별명","r":"byeolmyeong","m":"nickname"}],
+     "didYouKnow":{
+        "en":"Because so few family names exist, the Korean government had to introduce 'family name origin' (본관, bongwan) to distinguish lineages. Two Kims might be from completely unrelated clans.",
+        "es":"Como hay tan pocos apellidos, el gobierno coreano tuvo que introducir el 'origen del apellido' (본관, bongwan) para distinguir linajes. Dos Kim pueden ser de clanes totalmente distintos.",
+        "no":"Fordi det finnes så få etternavn, måtte den koreanske regjeringen innføre 'etternavnets opprinnelse' (본관, bongwan) for å skille slekter. To Kim kan være fra helt urelaterte klaner."}},
+
+    {"id":"seoul-city","emoji":"🏙️","category":"society",
+     "title":{"hangul":"서울","rom":"Seoul",
+              "en":"Seoul","es":"Seúl","no":"Seoul"},
+     "summary":{
+        "en":"Seoul (서울) is the capital, with about 10 million people in the city and 26 million in the metropolitan area — roughly half the country's population. It's been Korea's centre since 1394, when King Taejo of Joseon moved the capital here. The Han River (한강) divides the city into Gangbuk ('north of the river', historical centre with palaces) and Gangnam ('south of the river', modern business and luxury). The subway system has 23 lines and is among the cleanest, fastest and most punctual in the world.",
+        "es":"Seúl (서울) es la capital, con unos 10 millones de habitantes en la ciudad y 26 millones en el área metropolitana — alrededor de la mitad del país. Ha sido el centro de Corea desde 1394, cuando el rey Taejo de Joseon trasladó aquí la capital. El río Han (한강) divide la ciudad en Gangbuk ('norte del río', centro histórico con los palacios) y Gangnam ('sur del río', negocios modernos y lujo). El metro tiene 23 líneas y está entre los más limpios, rápidos y puntuales del mundo.",
+        "no":"Seoul (서울) er hovedstaden, med omtrent 10 millioner mennesker i byen og 26 millioner i hovedstadsområdet — omtrent halvparten av landets befolkning. Den har vært Koreas sentrum siden 1394, da Kong Taejo av Joseon flyttet hovedstaden hit. Han-elven (한강) deler byen i Gangbuk ('nord for elven', historisk sentrum med palasser) og Gangnam ('sør for elven', moderne forretning og luksus). T-banesystemet har 23 linjer og er blant de reneste, raskeste og mest punktlige i verden."},
+     "vocab":[{"w":"서울","r":"seoul","m":"Seoul"},
+              {"w":"한강","r":"hangang","m":"Han River"},
+              {"w":"강남","r":"gangnam","m":"Gangnam"}],
+     "didYouKnow":{
+        "en":"The word 서울 itself means simply 'capital' in pure Korean. It's the only major Korean place name with NO Hanja — every other major city has a Sino-Korean origin.",
+        "es":"La palabra 서울 significa simplemente 'capital' en coreano puro. Es el único topónimo importante coreano SIN Hanja — todas las demás grandes ciudades tienen origen sino-coreano.",
+        "no":"Ordet 서울 betyr ganske enkelt 'hovedstad' på rent koreansk. Det er det eneste store koreanske stedsnavnet UTEN Hanja — alle andre store byer har sino-koreansk opprinnelse."}},
+]
+
+_CULTURE_MAP = {n["id"]: n for n in _CULTURE_NOTES}
+
+
+def get_culture_notes() -> List[Dict[str, Any]]:
+    return _CULTURE_NOTES
+
+
+def get_culture_note(note_id: str) -> Optional[Dict[str, Any]]:
+    return _CULTURE_MAP.get(note_id)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # 10 — Dashboard / Overview
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1385,6 +1843,9 @@ async def get_overview(user_id: str = DEFAULT_USER) -> Dict[str, Any]:
             "vocab_total":        len(_VOCAB),
             "grammar_total":      len(_GRAMMAR),
             "cjk_bridge_total":   len(_CJK_BRIDGE),
+            "reading_total":      len(_READING_TEXTS),
+            "speaking_total":     len(_SPEAKING_PHRASES),
+            "culture_total":      len(_CULTURE_NOTES),
             "srs_due_today":      srs_due_n,
             "srs_new_today":      new_today,
         },

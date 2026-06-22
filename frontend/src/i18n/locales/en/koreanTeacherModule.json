@@ -13,6 +13,9 @@
       "vocabulary": "Vocabulary SRS",
       "grammar": "Grammar",
       "conversation": "Conversation",
+      "reading": "Reading",
+      "speaking": "Speaking Lab",
+      "culture": "Culture",
       "bridge": "CJK Bridge"
     },
     "dashboard": {
@@ -167,6 +170,49 @@
       "filterAll": "All",
       "filterCurated": "Curated",
       "filterAuto": "Auto-detected"
+    },
+    "reading": {
+      "title": "Reading Practice",
+      "subtitle": "Short TOPIK1 texts with romanization, translation and word-by-word breakdown",
+      "pickText": "Choose a text",
+      "romanization": "Romanization",
+      "translation": "Translation",
+      "wordByWord": "Word-by-word",
+      "readAloud": "🔊 Read aloud",
+      "stopReading": "⏹ Stop",
+      "questions": "Comprehension",
+      "showAnswer": "Show answer",
+      "loading": "Loading reading text…"
+    },
+    "speaking": {
+      "title": "Speaking Lab",
+      "subtitle": "Practice pronunciation with native browser speech APIs (ko-KR)",
+      "target": "Target phrase",
+      "listenBtn": "🔊 Listen",
+      "stopBtn": "⏹ Stop",
+      "recordBtn": "🎤 Record",
+      "stopRecordBtn": "⏹ Stop recording",
+      "heard": "What we heard",
+      "selfGrade": "How did it sound?",
+      "goodMatch": "✓ Sounds good",
+      "tryAgain": "↻ Try again",
+      "noSupport": "Your browser does not support voice recognition. Try Chrome or Edge.",
+      "noMatchYet": "Press 🎤 Record and say the phrase…"
+    },
+    "culture": {
+      "title": "Culture Notes",
+      "subtitle": "Short cultural insights — language history, society, K-drama, K-pop, food, etiquette",
+      "loading": "Loading culture notes…",
+      "vocab": "Key vocabulary",
+      "didYouKnow": "Did you know?",
+      "categories": {
+        "language": "Language",
+        "society": "Society",
+        "festivals": "Festivals",
+        "food": "Food",
+        "etiquette": "Etiquette",
+        "pop_culture": "Pop culture"
+      }
     },
     "common": {
       "loading": "Loading…",
