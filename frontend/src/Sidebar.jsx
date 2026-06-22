@@ -51,7 +51,8 @@ const Icon = ({ name, size = 20 }) => {
     "redcross": "❤️‍🩹",
     "humanitas": "🌿",
     "torii": "⛩️",
-    "dragon": "🐉"
+    "dragon": "🐉",
+    "taegeuk": "🇰🇷"
   };
 
   return (
@@ -146,7 +147,8 @@ const getNavItems = (t) => [
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
     { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" },
     { key: "japanese-sensei", label: t('sidebar.japaneseSensei'), icon: "torii" },
-    { key: "chinese-teacher", label: t('sidebar.chineseTeacher'), icon: "dragon" }
+    { key: "chinese-teacher", label: t('sidebar.chineseTeacher'), icon: "dragon" },
+    { key: "korean-teacher", label: t('sidebar.koreanTeacher'), icon: "taegeuk" }
   ]},
 
   // Web Lab (1.16.0, 2026-05-29) — separate module hosting LOCAL CLONES of
