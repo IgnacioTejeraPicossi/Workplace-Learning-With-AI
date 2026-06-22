@@ -13,6 +13,9 @@
       "vocabulary": "Ordforråd SRS",
       "grammar": "Grammatikk",
       "conversation": "Samtale",
+      "reading": "Lesing",
+      "speaking": "Talelab",
+      "culture": "Kultur",
       "bridge": "CJK Bridge"
     },
     "dashboard": {
@@ -167,6 +170,49 @@
       "filterAll": "Alle",
       "filterCurated": "Kuraterte",
       "filterAuto": "Auto-oppdaget"
+    },
+    "reading": {
+      "title": "Leseøvelse",
+      "subtitle": "Korte TOPIK1-tekster med romanisering, oversettelse og ord-for-ord-analyse",
+      "pickText": "Velg en tekst",
+      "romanization": "Romanisering",
+      "translation": "Oversettelse",
+      "wordByWord": "Ord for ord",
+      "readAloud": "🔊 Les høyt",
+      "stopReading": "⏹ Stopp",
+      "questions": "Forståelse",
+      "showAnswer": "Vis svar",
+      "loading": "Laster lesetekst…"
+    },
+    "speaking": {
+      "title": "Talelab",
+      "subtitle": "Øv uttalen med nettleserens innebygde tale-API (ko-KR)",
+      "target": "Målfrase",
+      "listenBtn": "🔊 Lytt",
+      "stopBtn": "⏹ Stopp",
+      "recordBtn": "🎤 Spill inn",
+      "stopRecordBtn": "⏹ Stopp opptak",
+      "heard": "Det vi hørte",
+      "selfGrade": "Hvordan hørtes det ut?",
+      "goodMatch": "✓ Høres bra ut",
+      "tryAgain": "↻ Prøv igjen",
+      "noSupport": "Nettleseren din støtter ikke talegjenkjenning. Prøv Chrome eller Edge.",
+      "noMatchYet": "Trykk 🎤 Spill inn og si frasen…"
+    },
+    "culture": {
+      "title": "Kulturnotater",
+      "subtitle": "Korte kulturelle innsikter — språkhistorie, samfunn, K-drama, K-pop, mat, etikette",
+      "loading": "Laster kulturnotater…",
+      "vocab": "Nøkkelvokabular",
+      "didYouKnow": "Visste du at?",
+      "categories": {
+        "language": "Språk",
+        "society": "Samfunn",
+        "festivals": "Høytider",
+        "food": "Mat",
+        "etiquette": "Etikette",
+        "pop_culture": "Popkultur"
+      }
     },
     "common": {
       "loading": "Laster…",

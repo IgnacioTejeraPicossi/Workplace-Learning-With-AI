@@ -842,6 +842,330 @@ const TabBridge = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Reading Practice (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabReading = () => {
+  const { t, i18n } = useTranslation();
+  const lang = toLang(i18n.language);
+  const tts = useKoreanTTS();
+  const [list, setList] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [text, setText] = useState(null);
+  const [revealed, setRevealed] = useState({});
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/korean/reading/texts`).then((r) => r.json()).then((d) => {
+      setList(d.items || []);
+      if ((d.items || []).length > 0) setSelectedId(d.items[0].id);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    setText(null); setRevealed({});
+    fetch(`${API_BASE}/api/korean/reading/${selectedId}`).then((r) => r.json()).then(setText);
+  }, [selectedId]);
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={9} label={t('koreanTeacherModule.tabs.reading')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('koreanTeacherModule.reading.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('koreanTeacherModule.reading.subtitle')}</p>
+
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: COLORS.accent, marginBottom: 6, letterSpacing: '0.06em' }}>{t('koreanTeacherModule.reading.pickText')}</label>
+        <select value={selectedId || ''} onChange={(e) => setSelectedId(e.target.value)} style={{ ...selectStyle, fontSize: 14, fontFamily: 'inherit' }}>
+          {list.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.title} — {r.title_translations[lang] || r.title_translations.en}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {!text ? (
+        <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('koreanTeacherModule.reading.loading')}</p>
+      ) : (
+        <>
+          <Card accent={COLORS.accent} style={{ marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <p style={{ fontSize: 22, fontWeight: 900, color: COLORS.accent, margin: 0, fontFamily: KOREAN_FONT }}>{text.title}</p>
+              <Button onClick={() => tts.speak(text.segments.map((s) => s.hangul).join(' '))}>{t('koreanTeacherModule.reading.readAloud')}</Button>
+            </div>
+            <p style={{ fontSize: 13, color: COLORS.inkSoft, margin: '0 0 14px', fontStyle: 'italic' }}>
+              {text.title_translations[lang] || text.title_translations.en}
+            </p>
+            {text.segments.map((seg, i) => (
+              <div key={i} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: i < text.segments.length - 1 ? `1px dashed ${COLORS.border}` : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <p style={{ fontSize: 18, fontFamily: KOREAN_FONT, fontWeight: 700, color: COLORS.ink, margin: 0 }}>{seg.hangul}</p>
+                  <SpeakBtn text={seg.hangul} tts={tts} />
+                </div>
+                <p style={{ fontSize: 12, color: COLORS.red, fontFamily: 'monospace', margin: '2px 0 6px' }}>{seg.rom}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {seg.words.map((w, j) => (
+                    <span key={j} style={{
+                      background: COLORS.accentLight, color: COLORS.accent, border: `1px solid ${COLORS.accentBorder}`,
+                      borderRadius: 6, padding: '2px 8px', fontSize: 11,
+                    }}>
+                      <span style={{ fontFamily: KOREAN_FONT, fontWeight: 700 }}>{w.w}</span>
+                      <span style={{ marginLeft: 4, fontFamily: 'monospace', opacity: 0.85 }}>{w.r}</span>
+                      <span style={{ marginLeft: 4, color: COLORS.inkSoft }}>· {w.m}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </Card>
+
+          <Card accent={COLORS.red} style={{ background: COLORS.redLight, borderColor: COLORS.redBorder, marginBottom: 14 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: COLORS.red, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+              {t('koreanTeacherModule.reading.translation')}
+            </p>
+            <p style={{ fontSize: 13, color: COLORS.ink, margin: 0, lineHeight: 1.6 }}>{text.translation[lang] || text.translation.en}</p>
+          </Card>
+
+          {text.questions && text.questions.length > 0 && (
+            <Card accent={COLORS.gold} style={{ marginBottom: 14 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: COLORS.gold, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 8px' }}>
+                ? {t('koreanTeacherModule.reading.questions')}
+              </p>
+              {text.questions.map((q, i) => (
+                <div key={i} style={{ marginBottom: 8 }}>
+                  <p style={{ fontSize: 13, color: COLORS.ink, margin: '0 0 4px' }}>{q.q[lang] || q.q.en}</p>
+                  {revealed[i] ? (
+                    <p style={{ fontSize: 13, color: COLORS.gold, fontWeight: 700, margin: 0 }}>→ {q.a[lang] || q.a.en}</p>
+                  ) : (
+                    <Button onClick={() => setRevealed({ ...revealed, [i]: true })} style={{ fontSize: 11, padding: '4px 12px' }}>{t('koreanTeacherModule.reading.showAnswer')}</Button>
+                  )}
+                </div>
+              ))}
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Speaking Lab (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabSpeaking = () => {
+  const { t, i18n } = useTranslation();
+  const lang = toLang(i18n.language);
+  const tts = useKoreanTTS();
+  const [phrases, setPhrases] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [transcript, setTranscript] = useState('');
+  const [listening, setListening] = useState(false);
+  const recognitionRef = React.useRef(null);
+  const SpeechRecognition = typeof window !== 'undefined'
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/korean/speaking/phrases`).then((r) => r.json()).then((d) => setPhrases(d.items || []));
+  }, []);
+
+  const cur = phrases[idx];
+
+  const startRecord = useCallback(() => {
+    if (!SpeechRecognition || !cur) return;
+    setTranscript('');
+    const rec = new SpeechRecognition();
+    rec.lang = 'ko-KR'; rec.continuous = false; rec.interimResults = false;
+    rec.onresult = (e) => {
+      const txt = e.results[0]?.[0]?.transcript || '';
+      setTranscript(txt);
+      fetch(`${API_BASE}/api/korean/speaking/attempt`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phrase_id: cur.id, transcript: txt }),
+      });
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setListening(true);
+  }, [SpeechRecognition, cur]);
+
+  const stopRecord = useCallback(() => {
+    if (recognitionRef.current) recognitionRef.current.stop();
+    setListening(false);
+  }, []);
+
+  if (phrases.length === 0) return <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('koreanTeacherModule.common.loading')}</p>;
+  if (!cur) return null;
+
+  const norm = (s) => (s || '').replace(/[.,!?。、？！\s]/g, '').toLowerCase();
+  const isMatch = transcript && norm(transcript) === norm(cur.hangul);
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 760, margin: '0 auto' }}>
+      <SectionLabel index={10} label={t('koreanTeacherModule.tabs.speaking')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('koreanTeacherModule.speaking.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('koreanTeacherModule.speaking.subtitle')}</p>
+
+      {!SpeechRecognition && (
+        <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder, marginBottom: 14 }}>
+          <p style={{ fontSize: 12, color: '#78350f', margin: 0 }}>⚠ {t('koreanTeacherModule.speaking.noSupport')}</p>
+        </Card>
+      )}
+
+      <p style={{ fontSize: 11, color: COLORS.inkSoft, fontFamily: 'monospace', marginBottom: 10 }}>
+        {idx + 1} / {phrases.length} · <Chip color={COLORS.red} light={COLORS.redLight} border={COLORS.redBorder}>{cur.tag}</Chip>
+      </p>
+
+      <Card accent={COLORS.accent} style={{ textAlign: 'center', padding: '36px 24px', marginBottom: 14 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: COLORS.accent, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 12px' }}>
+          {t('koreanTeacherModule.speaking.target')}
+        </p>
+        <p style={{ fontSize: 32, fontFamily: KOREAN_FONT, fontWeight: 700, color: COLORS.accent, margin: 0, lineHeight: 1.2 }}>{cur.hangul}</p>
+        <p style={{ fontSize: 14, color: COLORS.red, fontFamily: 'monospace', margin: '8px 0 4px' }}>{cur.rom}</p>
+        <p style={{ fontSize: 13, color: COLORS.inkSoft, margin: 0 }}>{cur.translations[lang] || cur.translations.en}</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+          <Button onClick={() => tts.speak(cur.hangul)}>{t('koreanTeacherModule.speaking.listenBtn')}</Button>
+          {!listening ? (
+            <Button primary onClick={startRecord} disabled={!SpeechRecognition}>{t('koreanTeacherModule.speaking.recordBtn')}</Button>
+          ) : (
+            <Button onClick={stopRecord} style={{ background: COLORS.red, color: '#fff', border: 'none' }}>{t('koreanTeacherModule.speaking.stopRecordBtn')}</Button>
+          )}
+        </div>
+      </Card>
+
+      <Card accent={isMatch ? '#15803d' : COLORS.inkSoft} style={{ marginBottom: 14 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: COLORS.inkSoft, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+          {t('koreanTeacherModule.speaking.heard')}
+        </p>
+        <p style={{ fontSize: 18, fontFamily: KOREAN_FONT, color: COLORS.ink, margin: 0 }}>
+          {transcript || <span style={{ color: COLORS.inkSoft, fontStyle: 'italic', fontSize: 13 }}>{t('koreanTeacherModule.speaking.noMatchYet')}</span>}
+        </p>
+        {transcript && isMatch && (
+          <p style={{ color: '#15803d', fontWeight: 700, marginTop: 8, fontSize: 14 }}>{t('koreanTeacherModule.speaking.goodMatch')}</p>
+        )}
+        {transcript && !isMatch && (
+          <Button onClick={startRecord} style={{ marginTop: 8 }}>{t('koreanTeacherModule.speaking.tryAgain')}</Button>
+        )}
+      </Card>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+        <Button onClick={() => { setIdx(Math.max(0, idx - 1)); setTranscript(''); }} disabled={idx === 0}>← {t('koreanTeacherModule.grammar.prev')}</Button>
+        <Button primary onClick={() => { setIdx(Math.min(phrases.length - 1, idx + 1)); setTranscript(''); }} disabled={idx === phrases.length - 1}>
+          {t('koreanTeacherModule.grammar.next')} →
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab: Culture (V2)
+// ═══════════════════════════════════════════════════════════════════════════════
+const TabCulture = () => {
+  const { t, i18n } = useTranslation();
+  const lang = toLang(i18n.language);
+  const tts = useKoreanTTS();
+  const [notes, setNotes] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/korean/culture/notes`).then((r) => r.json()).then((d) => {
+      setNotes(d.items || []);
+      if ((d.items || []).length > 0) setActiveId(d.items[0].id);
+    });
+  }, []);
+
+  if (notes.length === 0) return <p style={{ textAlign: 'center', color: COLORS.inkSoft, padding: 40 }}>{t('koreanTeacherModule.culture.loading')}</p>;
+
+  const categoryColors = {
+    language:    { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder },
+    society:     { c: COLORS.ink,    l: '#f5f5f4',           b: COLORS.border },
+    festivals:   { c: COLORS.red,    l: COLORS.redLight,     b: COLORS.redBorder },
+    food:        { c: '#059669',     l: '#dcfce7',           b: '#86efac' },
+    etiquette:   { c: COLORS.gold,   l: COLORS.goldLight,    b: COLORS.goldBorder },
+    pop_culture: { c: '#7c3aed',     l: '#f5f3ff',           b: '#ddd6fe' },
+  };
+
+  const cur = notes.find((n) => n.id === activeId);
+
+  return (
+    <div style={{ padding: '28px 32px', maxWidth: 1080, margin: '0 auto' }}>
+      <SectionLabel index={11} label={t('koreanTeacherModule.tabs.culture')} />
+      <h2 style={{ color: COLORS.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('koreanTeacherModule.culture.title')}</h2>
+      <p style={{ color: COLORS.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('koreanTeacherModule.culture.subtitle')}</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 18 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {notes.map((n) => {
+            const isActive = n.id === activeId;
+            const cat = categoryColors[n.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+            return (
+              <button key={n.id} onClick={() => setActiveId(n.id)} style={{
+                background: isActive ? cat.l : COLORS.card,
+                border: `1px solid ${isActive ? cat.b : COLORS.border}`,
+                borderLeft: `4px solid ${cat.c}`,
+                borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: 'inherit',
+              }}>
+                <span style={{ fontSize: 22 }}>{n.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 14, fontWeight: 800, color: COLORS.ink, fontFamily: KOREAN_FONT, margin: 0 }}>{n.title.hangul}</p>
+                  <p style={{ fontSize: 11, color: cat.c, fontWeight: 700, margin: '2px 0 0' }}>{n.title[lang] || n.title.en}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {cur && (() => {
+          const cat = categoryColors[cur.category] || { c: COLORS.accent, l: COLORS.accentLight, b: COLORS.accentBorder };
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Card accent={cat.c} style={{ background: cat.l, borderColor: cat.b }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                  <span style={{ fontSize: 38 }}>{cur.emoji}</span>
+                  <div>
+                    <p style={{ fontSize: 24, fontWeight: 900, color: COLORS.ink, fontFamily: KOREAN_FONT, margin: 0, lineHeight: 1.1 }}>{cur.title.hangul}</p>
+                    <p style={{ fontSize: 12, color: COLORS.red, fontFamily: 'monospace', margin: '2px 0 0' }}>{cur.title.rom}</p>
+                  </div>
+                  <button onClick={() => tts.speak(cur.title.hangul)} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16 }}>🔊</button>
+                  <Chip color={cat.c} light="#ffffff" border={cat.b}>
+                    {t(`koreanTeacherModule.culture.categories.${cur.category}`, { defaultValue: cur.category })}
+                  </Chip>
+                </div>
+                <p style={{ fontSize: 14, color: COLORS.ink, lineHeight: 1.65 }}>{cur.summary[lang] || cur.summary.en}</p>
+              </Card>
+
+              {cur.vocab?.length > 0 && (
+                <Card accent="#7c3aed">
+                  <p style={{ color: '#5b21b6', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 10, textTransform: 'uppercase' }}>📚 {t('koreanTeacherModule.culture.vocab')}</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 8 }}>
+                    {cur.vocab.map((w, i) => (
+                      <div key={i} style={{ background: '#faf5ff', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '8px 10px' }}>
+                        <p style={{ fontSize: 18, color: COLORS.ink, fontFamily: KOREAN_FONT, fontWeight: 700, margin: 0 }}>{w.w}</p>
+                        <p style={{ fontSize: 11, color: COLORS.red, fontFamily: 'monospace', margin: '2px 0 0' }}>{w.r}</p>
+                        <p style={{ fontSize: 11, color: COLORS.ink, margin: '2px 0 0' }}>{w.m}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              {cur.didYouKnow && (
+                <Card accent={COLORS.gold} style={{ background: COLORS.goldLight, borderColor: COLORS.goldBorder }}>
+                  <p style={{ color: '#92400e', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>💡 {t('koreanTeacherModule.culture.didYouKnow')}</p>
+                  <p style={{ fontSize: 13, color: COLORS.ink, lineHeight: 1.6, fontStyle: 'italic' }}>{cur.didYouKnow[lang] || cur.didYouKnow.en}</p>
+                </Card>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Main shell
 // ═══════════════════════════════════════════════════════════════════════════════
 const KoreanTeacher = () => {
@@ -856,6 +1180,9 @@ const KoreanTeacher = () => {
     { id: 'vocabulary',   label: t('koreanTeacherModule.tabs.vocabulary'),   icon: '📚' },
     { id: 'grammar',      label: t('koreanTeacherModule.tabs.grammar'),      icon: '📐' },
     { id: 'conversation', label: t('koreanTeacherModule.tabs.conversation'), icon: '💬' },
+    { id: 'reading',      label: t('koreanTeacherModule.tabs.reading'),      icon: '📖' },
+    { id: 'speaking',     label: t('koreanTeacherModule.tabs.speaking'),     icon: '🎤' },
+    { id: 'culture',      label: t('koreanTeacherModule.tabs.culture'),      icon: '🏯' },
     { id: 'bridge',       label: t('koreanTeacherModule.tabs.bridge'),       icon: '🌉' },
   ];
 
@@ -868,6 +1195,9 @@ const KoreanTeacher = () => {
       case 'vocabulary':   return <TabVocabulary />;
       case 'grammar':      return <TabGrammar />;
       case 'conversation': return <TabConversation />;
+      case 'reading':      return <TabReading />;
+      case 'speaking':     return <TabSpeaking />;
+      case 'culture':      return <TabCulture />;
       case 'bridge':       return <TabBridge />;
       default:             return <TabDashboard onJump={(id) => setActiveTab(id)} />;
     }
