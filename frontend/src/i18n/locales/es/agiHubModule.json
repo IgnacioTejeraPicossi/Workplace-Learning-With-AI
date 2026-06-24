@@ -110,83 +110,112 @@
     "items": {
       "health": {
         "title": "Salud y Longevidad",
-        "desc": "La AGI podría acelerar la cura de las principales enfermedades y extender la vida humana saludable en órdenes de magnitud.",
+        "desc": "La IA ya está comprimiendo el ciclo de descubrimiento de fármacos de décadas a meses. La AGI podría acelerar la cura de las principales enfermedades y extender la vida humana saludable en órdenes de magnitud.",
         "examples": [
-          "Diseñar fármacos para el cáncer, el Alzheimer y las enfermedades raras en días en lugar de décadas",
-          "Medicina personalizada adaptada al genoma y microbioma de cada paciente",
-          "Monitoreo de salud en tiempo real e intervención preventiva"
+          { "text": "AlphaFold 3 (DeepMind, mayo 2024) predice interacciones de proteínas con ADN, ARN y ligandos con precisión cercana a la cristalografía.", "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/", "source": "DeepMind" },
+          { "text": "Isomorphic Labs prevé iniciar en 2026 los primeros ensayos clínicos en humanos con fármacos oncológicos diseñados por AlphaFold 3.", "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials", "source": "IntuitionLabs" },
+          { "text": "Insilico Medicine diseñó con su plataforma Chemistry42 un PROTAC dual contra PKMYT1 (cáncer), publicado en Nature Communications; 2025 marcó el mayor salto anual en IND filings de moléculas originadas por IA.", "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/", "source": "DrugDiscoveryTrends" },
+          "Medicina personalizada adaptada al genoma y microbioma de cada paciente y monitoreo de salud en tiempo real"
         ]
       },
       "science": {
         "title": "Descubrimiento Científico",
-        "desc": "La AGI podría comprimir siglos de progreso científico en años simulando, formulando hipótesis y validando a velocidad sobrehumana.",
+        "desc": "La AGI podría comprimir siglos de progreso científico en años — simulando, formulando hipótesis y validando a velocidad sobrehumana. La revolución ya empezó en materiales, proteínas y matemáticas.",
         "examples": [
-          "Unificar la física y resolver problemas matemáticos abiertos",
-          "Diseñar nuevos materiales, proteínas y fuentes de energía",
-          "Ejecutar millones de experimentos virtuales en paralelo"
+          { "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) resolvieron 4/6 problemas de la Olimpiada Internacional de Matemáticas con nivel de medalla de plata (28/42 puntos); publicado en Nature en noviembre de 2025.", "url": "https://www.nature.com/articles/s41586-025-09833-y", "source": "Nature" },
+          { "text": "GNoME (DeepMind) predijo 2,4 millones de nuevos materiales estables — multiplicando por ~10 el catálogo conocido tras décadas de trabajo manual.", "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/", "source": "DeepMind" },
+          "Diseñar nuevas proteínas, baterías y catalizadores en simulación, sintetizándolos luego en laboratorios autónomos como A-Lab (Berkeley)",
+          "Ejecutar millones de experimentos virtuales en paralelo a escala global"
         ]
       },
       "education": {
         "title": "Educación Universal",
-        "desc": "Los tutores impulsados por AGI podrían ofrecer a cada ser humano una educación personalizada de clase mundial, independientemente de su ubicación geográfica o ingresos.",
+        "desc": "Los tutores impulsados por IA podrían ofrecer a cada ser humano una educación personalizada de clase mundial, independientemente de su ubicación geográfica o ingresos.",
         "examples": [
-          "Tutoría adaptativa que se ajusta al ritmo y estilo de cada alumno",
-          "Traducción instantánea en todos los idiomas y culturas",
-          "Compañeros de aprendizaje permanentes que crecen con el aprendiz"
+          { "text": "Khanmigo (Khan Academy + GPT) pasó de 40 000 a más de 700 000 estudiantes en un solo curso escolar (2024-25) y supera los 5 millones de usuarios en 110 países a finales de 2025; gratuito para profesorado de EEUU gracias a una donación de 10 M$ de la Fundación Gates.", "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/", "source": "Khan Academy" },
+          "Tutoría adaptativa que se ajusta al ritmo y estilo de cada alumno, basada en preguntas guiadas en lugar de dar la respuesta",
+          "Traducción instantánea de alta calidad en más de 100 idiomas y dialectos",
+          "Compañeros de aprendizaje permanentes que crecen con el aprendiz desde la infancia hasta la edad adulta"
         ]
       },
       "climate": {
         "title": "Clima y Medio Ambiente",
-        "desc": "La AGI podría ayudar a resolver el cambio climático mediante sistemas energéticos optimizados, captura de carbono y modelado a escala planetaria.",
+        "desc": "La AGI podría ayudar a resolver el cambio climático mediante sistemas energéticos optimizados, captura de carbono y modelado a escala planetaria — y los modelos de IA ya superan a los sistemas tradicionales en predicción meteorológica.",
         "examples": [
-          "Diseñar reactores de fusión y energía limpia de próxima generación",
-          "Optimizar las cadenas de suministro globales para minimizar emisiones",
-          "Restauración de ecosistemas y preservación de la biodiversidad"
+          { "text": "SPARC (Commonwealth Fusion Systems) está construido al 75 %, con primer plasma previsto para 2026 y demostración de net energy gain (Q>1) en 2027 — sería la primera máquina comercial de fusión.", "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/", "source": "CFS" },
+          { "text": "GraphCast (DeepMind) supera al modelo HRES del ECMWF en el 90 % de las 1 380 métricas evaluadas; Aurora (Microsoft) supera al IFS HRES en más del 92 % de los objetivos a 0,1° de resolución.", "url": "https://www.nature.com/articles/s41586-025-09005-y", "source": "Nature" },
+          "Optimización de cadenas de suministro y redes eléctricas globales para minimizar emisiones",
+          "Restauración de ecosistemas y preservación de biodiversidad con sensores inteligentes"
         ]
       },
       "productivity": {
         "title": "Productividad Económica",
-        "desc": "La AGI podría automatizar el trabajo cognitivo, aumentando drásticamente la productividad y permitiendo nuevas formas de trabajo y creatividad.",
+        "desc": "La IA agéntica ya automatiza partes sustanciales del trabajo cognitivo. La AGI podría aumentar drásticamente la productividad y permitir nuevas formas de trabajo y creatividad.",
         "examples": [
-          "Automatizar el trabajo de conocimiento rutinario y liberar tiempo para tareas de mayor orden",
-          "Escalar equipos pequeños para lograr una producción a nivel empresarial",
-          "Habilitar industrias y modelos de negocio completamente nuevos"
+          { "text": "Devin 2.0 (Cognition, abril 2025) resuelve el 13,86 % de issues reales de GitHub en SWE-bench end-to-end — 7× mejor que modelos previos; el 67 % de sus pull requests son fusionados; pasó de 500 $/mes a 20 $/mes.", "url": "https://cognition.ai/blog/devin-annual-performance-review-2025", "source": "Cognition" },
+          "Cobertura de tests subiendo de 50-60 % a 80-90 % en proyectos donde se despliegan agentes IA",
+          "Migraciones de código que pasaban de 30-40 horas humanas a 3-4 horas por archivo en bancos piloto (10×)",
+          "Habilitar industrias y modelos de negocio completamente nuevos donde antes el cuello de botella era el coste cognitivo"
         ]
       },
       "poverty": {
         "title": "Erradicar la Pobreza Extrema",
-        "desc": "Si los beneficios de la AGI se distribuyen equitativamente, podría acabar con la pobreza extrema y proporcionar acceso universal a las necesidades básicas.",
+        "desc": "Si los beneficios de la IA se distribuyen equitativamente, podría reducir la pobreza extrema y proporcionar acceso universal a las necesidades básicas. Algunas aplicaciones ya benefician a cientos de millones.",
         "examples": [
-          "Producción de alimentos automatizada a un coste marginal casi nulo",
-          "Acceso global a vivienda, energía y agua potable",
-          "Servicios básicos universales impulsados por las ganancias de eficiencia de la AGI"
+          { "text": "Plantix diagnostica más de 800 síntomas en 60 cultivos por foto con 90-100 % de precisión en cultivos básicos; gratis para agricultores, 10+ millones de descargas en 150 países.", "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/", "source": "GSMA" },
+          "Asistentes médicos por SMS y voz en zonas sin acceso a doctores",
+          "Producción de alimentos automatizada a coste marginal cada vez más bajo",
+          "Servicios básicos universales financiados con las ganancias de eficiencia de la IA"
         ]
       },
       "creativity": {
         "title": "Creatividad y Cultura",
-        "desc": "La AGI podría amplificar la creatividad humana, permitiendo nuevas formas de arte, narrativa, música y expresión cultural.",
+        "desc": "La IA generativa ya amplifica la creatividad humana — vídeo, audio, ilustración, narrativa — y reduce el coste de producción de obras antes inaccesibles para creadores independientes.",
         "examples": [
-          "Herramientas co-creativas para artistas, escritores y músicos",
+          { "text": "Sora 2 (OpenAI, septiembre 2025) genera vídeo de 10-25 s con audio sincronizado, diálogo y efectos; incluye masking/in-painting y cameos coherentes, usado por cineastas como storyboard digital y para escenas de gran masa o stunts peligrosos.", "url": "https://openai.com/index/sora-2/", "source": "OpenAI" },
+          "Herramientas co-creativas para artistas, escritores y músicos — y nuevos formatos nativos de IA",
           "Preservación y traducción de lenguas y tradiciones en peligro de extinción",
-          "Nuevas experiencias inmersivas en videojuegos, cine y mundos virtuales"
+          "Nuevas experiencias inmersivas en videojuegos, cine y mundos virtuales personalizados"
         ]
       },
       "space": {
         "title": "Exploración Espacial",
         "desc": "La AGI podría acelerar la expansión de la humanidad en el sistema solar y más allá, resolviendo problemas demasiado complejos para equipos humanos solos.",
         "examples": [
-          "Naves espaciales autónomas y exploración planetaria",
+          { "text": "Perseverance (NASA) completó en diciembre de 2024 los primeros desplazamientos en otro planeta planificados por IA generativa — 456 m sin control humano en dos jornadas.", "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/", "source": "NASA" },
+          { "text": "AEGIS (JPL) permite a SuperCam de Perseverance seleccionar y analizar rocas marcianas de forma autónoma — analizando imágenes a bordo sin comunicación con la Tierra.", "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/", "source": "NASA Science" },
           "Diseño de hábitats sostenibles fuera del mundo",
           "Planificación de misiones de larga duración y soporte vital"
         ]
       },
       "governance": {
         "title": "Mejor Gobernanza",
-        "desc": "La AGI podría ayudar a diseñar instituciones más justas, receptivas y transparentes — si se despliega con salvaguardas democráticas sólidas.",
+        "desc": "La IA podría ayudar a diseñar instituciones más justas, receptivas y transparentes — si se despliega con salvaguardas democráticas sólidas y participación ciudadana real.",
         "examples": [
-          "Simulación de políticas y toma de decisiones basada en evidencia",
-          "Participación ciudadana en tiempo real a escala nacional",
-          "Detección y reducción de la corrupción y la ineficiencia burocrática"
+          { "text": "Polis y plataformas similares (Talk to the City, vTaiwan) ya se usan para deliberación masiva en Austria, Uruguay, Nueva Zelanda, Filipinas y Alemania, agrupando miles de aportaciones ciudadanas y preservando posturas minoritarias.", "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html", "source": "OCDE" },
+          "Engaged California utilizó IA en 2025 para procesar a escala las aportaciones ciudadanas tras los incendios de Los Ángeles",
+          "Simulación de políticas públicas y toma de decisiones basada en evidencia",
+          "Detección y reducción de corrupción e ineficiencia burocrática"
+        ]
+      },
+      "mentalHealth": {
+        "title": "Salud Mental",
+        "desc": "Acceso 24/7 a apoyo conversacional respaldado por terapia cognitivo-conductual, especialmente valioso donde los profesionales son escasos. Aún hay debate clínico sobre su lugar exacto en el tratamiento, pero la evidencia empieza a acumularse.",
+        "examples": [
+          { "text": "Woebot mostró tamaños de efecto d=0,57 en ansiedad y d=0,46 en depresión en revisiones sistemáticas — más efectivo que materiales de autoayuda de la OMS tras 2 semanas de uso.", "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352", "source": "World Psychiatry" },
+          { "text": "Wysa logró reducciones notables en PHQ-9 (depresión) y GAD-7 (ansiedad) tras 4 semanas en pacientes con enfermedad crónica (p<0,001); usuarios 3× más propensos a completar sesiones de terapia con su apoyo entre sesiones.", "url": "https://www.jmir.org/2025/1/e67114", "source": "JMIR" },
+          "Apoyo para grupos vulnerables: madres en el periodo perinatal, pacientes con dolor crónico, estudiantes universitarios",
+          "Cobertura nocturna, en idiomas locales y sin barreras de estigma social"
+        ]
+      },
+      "disasters": {
+        "title": "Respuesta a Desastres",
+        "desc": "Sistemas de alerta temprana basados en IA que multiplican el tiempo de reacción ante inundaciones, incendios o terremotos — con impacto demostrado en vidas salvadas y reducción de pérdidas económicas.",
+        "examples": [
+          { "text": "Google Flood Hub protege a más de 460 millones de personas en 80+ países con pronósticos de inundación hasta 7 días por adelantado, capturando el 85-100 % de inundaciones severas registradas por GDACS.", "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/", "source": "Google Research" },
+          { "text": "Groundsource (Google, marzo 2026) extrae datos de décadas de noticias para predecir inundaciones súbitas con hasta 24 h de antelación.", "url": "https://aiforcause.org/stories/google-flood-hub", "source": "AI for Cause" },
+          "Los sistemas de alerta temprana reducen las muertes por inundación hasta un 43 % y las pérdidas económicas un 35-50 %",
+          "Coordinación humanitaria asistida por IA: una autoridad regional en África austral detectó una inundación súbita por alerta IA y desplegó equipos a tiempo"
         ]
       }
     }

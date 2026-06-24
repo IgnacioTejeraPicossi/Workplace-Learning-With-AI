@@ -110,83 +110,112 @@
     "items": {
       "health": {
         "title": "Helse og levetid",
-        "desc": "AGI kan akselerere kuren for store sykdommer og forlenge menneskelig levetid med størrelsesordener.",
+        "desc": "KI komprimerer allerede legemiddeloppdagelses-syklusen fra tiår til måneder. AGI kan akselerere kuren for store sykdommer og forlenge sunn levetid med størrelsesordener.",
         "examples": [
-          "Designe medisiner mot kreft, Alzheimers og sjeldne sykdommer på dager i stedet for tiår",
-          "Personlig medisin tilpasset hver pasients genom og mikrobiom",
-          "Sanntids helseovervåking og forebyggende intervensjon"
+          { "text": "AlphaFold 3 (DeepMind, mai 2024) forutsier interaksjoner mellom proteiner og DNA, RNA og små molekyler med nær-krystallografisk presisjon.", "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/", "source": "DeepMind" },
+          { "text": "Isomorphic Labs planlegger å starte sine første kliniske studier på mennesker i 2026 med kreftmedisiner designet av AlphaFold 3.", "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials", "source": "IntuitionLabs" },
+          { "text": "Insilico Medicine brukte sin Chemistry42-plattform til å designe en første-i-klassen PROTAC mot PKMYT1 (kreft), publisert i Nature Communications; 2025 var året med størst økning i IND-søknader for KI-utviklede molekyler.", "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/", "source": "DrugDiscoveryTrends" },
+          "Personlig medisin tilpasset hver pasients genom og mikrobiom, samt sanntidsovervåking"
         ]
       },
       "science": {
         "title": "Vitenskapelig oppdagelse",
-        "desc": "AGI kan komprimere århundrer med vitenskapelig fremgang til år ved å simulere, hypotetisere og validere med overmenneskelig hastighet.",
+        "desc": "AGI kan komprimere århundrer med vitenskapelig fremgang til år — ved å simulere, hypotetisere og validere med overmenneskelig hastighet. Revolusjonen er allerede i gang innen materialer, proteiner og matematikk.",
         "examples": [
-          "Forene fysikk og løse åpne matematiske problemer",
-          "Designe nye materialer, proteiner og energikilder",
-          "Kjøre millioner av virtuelle eksperimenter parallelt"
+          { "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) løste 4/6 oppgaver i Den internasjonale matematikkolympiaden på sølvmedaljenivå (28/42 poeng); metodikken publisert i Nature i november 2025.", "url": "https://www.nature.com/articles/s41586-025-09833-y", "source": "Nature" },
+          { "text": "GNoME (DeepMind) forutså 2,4 millioner nye stabile materialer — omtrent 10× økning over det kjente katalogen etter tiår med manuell oppdagelse.", "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/", "source": "DeepMind" },
+          "Designe nye proteiner, batterier og katalysatorer i simulering, deretter syntetisere dem i autonome robotlaboratorier som Berkeleys A-Lab",
+          "Kjøre millioner av virtuelle eksperimenter parallelt på planetskala"
         ]
       },
       "education": {
         "title": "Universell utdanning",
-        "desc": "AGI-drevne veiledere kan gi hvert menneske en personlig utdanning i verdensklasse, uavhengig av geografi eller inntekt.",
+        "desc": "KI-drevne veiledere kan gi hvert menneske en personlig utdanning i verdensklasse, uavhengig av geografi eller inntekt.",
         "examples": [
-          "Adaptiv veiledning som matcher hver elevs tempo og stil",
-          "Øyeblikkelig oversettelse mellom alle språk og kulturer",
-          "Livslange læringsledsagere som vokser med eleven"
+          { "text": "Khanmigo (Khan Academy + GPT) vokste fra 40 000 til 700 000+ elever på ett skoleår (2024-25) og passerte 5 millioner brukere i 110 land mot slutten av 2025; gratis for amerikanske lærere takket være 10 M$ gave fra Gates Foundation.", "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/", "source": "Khan Academy" },
+          "Adaptiv veiledning tilpasset hver elevs tempo og stil, basert på ledende spørsmål i stedet for direkte svar",
+          "Øyeblikkelig høykvalitets oversettelse mellom 100+ språk og dialekter",
+          "Livslange læringsledsagere som vokser med eleven fra barndom til voksen alder"
         ]
       },
       "climate": {
         "title": "Klima og miljø",
-        "desc": "AGI kan hjelpe med å løse klimaendringene gjennom optimaliserte energisystemer, karbonfangst og planetskala-modellering.",
+        "desc": "AGI kan hjelpe å løse klimaendringene gjennom optimaliserte energisystemer, karbonfangst og planetskala-modellering — og KI-modeller slår allerede tradisjonelle systemer i værvarsling.",
         "examples": [
-          "Designe fusjonsreaktorer og neste generasjons ren energi",
-          "Optimalisere globale forsyningskjeder for å minimere utslipp",
-          "Økosystemrestaurering og bevaring av biologisk mangfold"
+          { "text": "SPARC (Commonwealth Fusion Systems) er ~75 % bygget, med første plasma forventet i 2026 og net energy gain (Q>1) i 2027 — vil bli den første kommersielt relevante fusjonsmaskinen.", "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/", "source": "CFS" },
+          { "text": "GraphCast (DeepMind) slår ECMWFs HRES-modell på 90 % av 1 380 verifiseringsmål; Aurora (Microsoft) slår IFS HRES ved 0,1° på mer enn 92 % av målene.", "url": "https://www.nature.com/articles/s41586-025-09005-y", "source": "Nature" },
+          "Optimalisere globale forsyningskjeder og strømnett for å minimere utslipp",
+          "Økosystemrestaurering og bevaring av biologisk mangfold med smarte sensorer"
         ]
       },
       "productivity": {
         "title": "Økonomisk produktivitet",
-        "desc": "AGI kan automatisere kognitivt arbeid, dramatisk øke produktiviteten og muliggjøre nye former for arbeid og kreativitet.",
+        "desc": "Agentbasert KI automatiserer allerede betydelige deler av kognitivt arbeid. AGI kan dramatisk øke produktiviteten og muliggjøre nye former for arbeid og kreativitet.",
         "examples": [
-          "Automatisere rutinemessig kunnskapsarbeid og frigjøre tid til høyere ordens oppgaver",
-          "Skalere små team til å oppnå produksjon på bedriftsnivå",
-          "Muliggjøre helt nye bransjer og forretningsmodeller"
+          { "text": "Devin 2.0 (Cognition, april 2025) løser 13,86 % av reelle GitHub-issues end-to-end på SWE-bench — 7× bedre enn tidligere modeller; 67 % av pull-requests blir akseptert; pris falt fra 500 $/måned til 20 $/måned.", "url": "https://cognition.ai/blog/devin-annual-performance-review-2025", "source": "Cognition" },
+          "Testdekning stiger fra 50-60 % til 80-90 % i selskaper som tar i bruk KI-agenter",
+          "Kodemigrasjoner gikk fra 30-40 menneske-timer til 3-4 timer per fil i pilotbanker (10×)",
+          "Muliggjøre helt nye bransjer og forretningsmodeller der den kognitive kostnaden var flaskehalsen"
         ]
       },
       "poverty": {
         "title": "Avslutte ekstrem fattigdom",
-        "desc": "Hvis fordelene med AGI fordeles rettferdig, kan det avslutte ekstrem fattigdom og gi universell tilgang til grunnleggende behov.",
+        "desc": "Hvis KI-fordelene distribueres rettferdig, kan de redusere ekstrem fattigdom og gi universell tilgang til grunnleggende behov. Noen anvendelser betjener allerede hundrevis av millioner.",
         "examples": [
-          "Automatisert matproduksjon til nesten null marginal kostnad",
-          "Global tilgang til bolig, energi og rent vann",
-          "Universelle grunnleggende tjenester drevet av AGIs effektivitetsgevinster"
+          { "text": "Plantix diagnostiserer 800+ symptomer i 60 avlinger via foto med 90-100 % nøyaktighet på basisavlinger; gratis for bønder, 10M+ nedlastinger i 150+ land.", "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/", "source": "GSMA" },
+          "SMS- og stemmebaserte medisinske assistenter i regioner uten lege",
+          "Automatisert matproduksjon til stadig lavere marginalkostnad",
+          "Universelle grunnleggende tjenester finansiert av KIs effektivitetsgevinster"
         ]
       },
       "creativity": {
         "title": "Kreativitet og kultur",
-        "desc": "AGI kan forsterke menneskelig kreativitet og muliggjøre nye former for kunst, historiefortelling, musikk og kulturelle uttrykk.",
+        "desc": "Generativ KI forsterker allerede menneskelig kreativitet — video, lyd, illustrasjon, fortelling — og senker produksjonskostnadene for verk som tidligere var utenfor rekkevidde for uavhengige skapere.",
         "examples": [
-          "Medskapende verktøy for kunstnere, forfattere og musikere",
+          { "text": "Sora 2 (OpenAI, september 2025) genererer 10-25 s video med synkronisert lyd, dialog og lydeffekter; inkluderer masking/in-painting og konsistente cameos, brukt av filmskapere som digital storyboard og for store folkemengder eller risikable scener.", "url": "https://openai.com/index/sora-2/", "source": "OpenAI" },
+          "Medskapende verktøy for kunstnere, forfattere og musikere — pluss helt nye KI-native formater",
           "Bevare og oversette truede språk og tradisjoner",
-          "Nye immersive opplevelser i spill, film og virtuelle verdener"
+          "Nye immersive opplevelser i spill, film og personlige virtuelle verdener"
         ]
       },
       "space": {
         "title": "Romutforskning",
         "desc": "AGI kan akselerere menneskehetens ekspansjon inn i solsystemet og utover, og løse problemer som er for komplekse for menneskelige team alene.",
         "examples": [
-          "Autonome romfartøy og planetutforskning",
+          { "text": "Perseverance (NASA) fullførte i desember 2024 de første kjøreturene på en annen planet planlagt av generativ KI — 456 m uten menneskelig kontroll over to dager.", "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/", "source": "NASA" },
+          { "text": "AEGIS (JPL) lar SuperCam på Perseverance autonomt velge og analysere stein på Mars — analyserer bilder ombord uten å kontakte jorden.", "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/", "source": "NASA Science" },
           "Designe selvforsynende habitater utenfor jorden",
-          "Planlegging av oppdrag med lang varighet og livsstøtte"
+          "Planlegging av lange oppdrag og livsstøtte"
         ]
       },
       "governance": {
         "title": "Bedre styring",
-        "desc": "AGI kan bidra til å designe mer rettferdige, responsive og transparente institusjoner — hvis den implementeres med sterke demokratiske sikkerhetstiltak.",
+        "desc": "KI kan bidra til å designe mer rettferdige, responsive og transparente institusjoner — hvis den implementeres med sterke demokratiske sikkerhetstiltak og reell borgerdeltakelse.",
         "examples": [
+          { "text": "Polis og lignende plattformer (Talk to the City, vTaiwan) brukes allerede til massiv deliberasjon i Østerrike, Uruguay, New Zealand, Filippinene og Tyskland — aggregerer tusenvis av borgerbidrag samtidig som mindretallsposisjoner bevares.", "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html", "source": "OECD" },
+          "Engaged California brukte KI i 2025 til å behandle borgerinnspill i stor skala etter skogbrannene i Los Angeles",
           "Policy-simulering og evidensbasert beslutningstaking",
-          "Sanntids borgerengasjement på nasjonal skala",
           "Oppdage og redusere korrupsjon og byråkratisk ineffektivitet"
+        ]
+      },
+      "mentalHealth": {
+        "title": "Mental helse",
+        "desc": "24/7-tilgang til samtaleterapi støttet av kognitiv atferdsterapi — særlig verdifullt der fagpersoner er knappe. Det er fortsatt klinisk debatt om eksakt rolle, men evidensen begynner å bygge seg opp.",
+        "examples": [
+          { "text": "Woebot viste effektstørrelser d=0,57 for angst og d=0,46 for depresjon i systematiske oversikter — mer effektivt enn WHOs selvhjelpsmateriell etter bare 2 uker.", "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352", "source": "World Psychiatry" },
+          { "text": "Wysa ga merkbare reduksjoner i PHQ-9 (depresjon) og GAD-7 (angst) etter 4 uker hos pasienter med kronisk sykdom (p<0,001); brukerne hadde 3× høyere sannsynlighet for å fullføre terapitimer med Wysa-støtte mellom timene.", "url": "https://www.jmir.org/2025/1/e67114", "source": "JMIR" },
+          "Støtte for sårbare grupper: mødre i den perinatale perioden, kronisk smerte-pasienter, universitetsstudenter",
+          "Dekning på natten, på lokale språk, uten sosiale stigmabarrierer"
+        ]
+      },
+      "disasters": {
+        "title": "Katastroferespons",
+        "desc": "KI-drevne tidlig-varsling-systemer som mangedobler reaksjonstiden før flom, branner eller jordskjelv — med målt effekt på liv reddet og redusert økonomisk tap.",
+        "examples": [
+          { "text": "Google Flood Hub beskytter 460M+ mennesker i 80+ land med flomprognoser opptil 7 dager i forveien, og fanger 85-100 % av alvorlige flommer registrert av GDACS.", "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/", "source": "Google Research" },
+          { "text": "Groundsource (Google, mars 2026) henter data fra tiår med nyhetsmeldinger for å forutsi flash floods opptil 24 timer i forveien.", "url": "https://aiforcause.org/stories/google-flood-hub", "source": "AI for Cause" },
+          "Tidlig-varsling-systemer er bevist å redusere dødelighet ved flom med opptil 43 % og økonomiske tap med 35-50 %",
+          "KI-assistert humanitær koordinering: en regional myndighet i sørlige Afrika fanget en flash-flood-varsel fra KI og mobiliserte hjelpemannskap i tide"
         ]
       }
     }

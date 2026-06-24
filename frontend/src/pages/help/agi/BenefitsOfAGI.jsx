@@ -94,6 +94,27 @@ const benefits = [
     bgColor: '#f9fafb',
     borderColor: '#e5e7eb',
   },
+  // ─── New in 2026-06: Mental Health & Disaster Response ────────────────────
+  {
+    id: 'mentalHealth',
+    icon: '🧠',
+    titleKey: 'agiBenefits.items.mentalHealth.title',
+    descKey: 'agiBenefits.items.mentalHealth.desc',
+    examplesKey: 'agiBenefits.items.mentalHealth.examples',
+    color: '#0d9488',
+    bgColor: '#f0fdfa',
+    borderColor: '#99f6e4',
+  },
+  {
+    id: 'disasters',
+    icon: '🌊',
+    titleKey: 'agiBenefits.items.disasters.title',
+    descKey: 'agiBenefits.items.disasters.desc',
+    examplesKey: 'agiBenefits.items.disasters.examples',
+    color: '#d97706',
+    bgColor: '#fef3c7',
+    borderColor: '#fde68a',
+  },
 ];
 
 function BenefitCard({ benefit, t, extraExamples = [] }) {
@@ -138,30 +159,29 @@ function BenefitCard({ benefit, t, extraExamples = [] }) {
             </div>
             <ul style={{ margin: 0, paddingLeft: 18, color: '#4b5563', fontSize: '0.8rem', lineHeight: 1.5 }}>
               {exampleList.map((ex, i) => {
-                const isAi = typeof ex === 'object' && ex !== null && ex.aiAdded;
-                const text = isAi ? ex.text : ex;
-                const url = isAi ? ex.url : null;
+                const isObj = typeof ex === 'object' && ex !== null;
+                const isAi  = isObj && ex.aiAdded;
+                const text  = isObj ? ex.text : ex;
+                const url   = isObj ? ex.url  : null;
+                const sourceLabel = (isObj && ex.source) ? ex.source : 'source';
                 return (
                   <li key={i}>
                     {text}
-                    {isAi && (
+                    {url && (
                       <>
                         {' '}
-                        <span style={{
-                          background: '#ecfdf5', color: '#065f46',
-                          fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
-                          padding: '1px 5px', borderRadius: 4, marginLeft: 4,
-                        }}>AI</span>
-                        {url && (
-                          <>
-                            {' '}
-                            <a href={url} target="_blank" rel="noreferrer"
-                               style={{ fontSize: 10, color: '#2563eb' }}>
-                              source
-                            </a>
-                          </>
-                        )}
+                        <a href={url} target="_blank" rel="noreferrer"
+                           style={{ fontSize: 10, color: '#2563eb' }}>
+                          {sourceLabel} ↗
+                        </a>
                       </>
+                    )}
+                    {isAi && (
+                      <span style={{
+                        background: '#ecfdf5', color: '#065f46',
+                        fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                        padding: '1px 5px', borderRadius: 4, marginLeft: 6,
+                      }}>AI</span>
                     )}
                   </li>
                 );

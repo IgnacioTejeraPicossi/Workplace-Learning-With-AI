@@ -110,83 +110,112 @@
     "items": {
       "health": {
         "title": "Health & Longevity",
-        "desc": "AGI could accelerate the cure of major diseases and extend healthy human lifespan by orders of magnitude.",
+        "desc": "AI is already collapsing the drug discovery cycle from decades to months. AGI could accelerate the cure of major diseases and extend healthy human lifespan by orders of magnitude.",
         "examples": [
-          "Designing drugs for cancer, Alzheimer's, and rare diseases in days instead of decades",
-          "Personalized medicine tailored to each patient's genome and microbiome",
-          "Real-time health monitoring and preventive intervention"
+          { "text": "AlphaFold 3 (DeepMind, May 2024) predicts protein interactions with DNA, RNA and small molecules at near-crystallographic accuracy.", "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/", "source": "DeepMind" },
+          { "text": "Isomorphic Labs is on track to begin its first human clinical trials in 2026 with AlphaFold-3-designed oncology drugs.", "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials", "source": "IntuitionLabs" },
+          { "text": "Insilico Medicine used its Chemistry42 platform to design a first-in-class dual-action PROTAC targeting PKMYT1 (cancer), published in Nature Communications; 2025 saw the largest single-year jump in IND filings for AI-originated molecules.", "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/", "source": "DrugDiscoveryTrends" },
+          "Personalized medicine tailored to each patient's genome and microbiome, plus real-time monitoring"
         ]
       },
       "science": {
         "title": "Scientific Discovery",
-        "desc": "AGI could compress centuries of scientific progress into years by simulating, hypothesizing, and validating at superhuman speed.",
+        "desc": "AGI could compress centuries of scientific progress into years — simulating, hypothesizing and validating at superhuman speed. The revolution has already started in materials, proteins and mathematics.",
         "examples": [
-          "Unifying physics and solving open mathematical problems",
-          "Designing new materials, proteins, and energy sources",
-          "Running millions of virtual experiments in parallel"
+          { "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) solved 4/6 problems at the International Mathematical Olympiad at silver-medal level (28/42 points); methodology published in Nature in November 2025.", "url": "https://www.nature.com/articles/s41586-025-09833-y", "source": "Nature" },
+          { "text": "GNoME (DeepMind) predicted 2.4 million new stable materials — expanding the known catalogue by roughly 10× over decades of manual discovery.", "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/", "source": "DeepMind" },
+          "Designing new proteins, batteries and catalysts in silico, then synthesizing them in autonomous robotic labs such as Berkeley's A-Lab",
+          "Running millions of virtual experiments in parallel at planetary scale"
         ]
       },
       "education": {
         "title": "Universal Education",
-        "desc": "AGI-powered tutors could offer every human a world-class, personalized education regardless of geography or income.",
+        "desc": "AI-powered tutors could offer every human a world-class, personalized education regardless of geography or income.",
         "examples": [
-          "Adaptive tutoring that matches each student's pace and style",
-          "Instant translation across all languages and cultures",
-          "Lifelong learning companions that grow with the learner"
+          { "text": "Khanmigo (Khan Academy + GPT) grew from 40 000 to 700 000+ K-12 students in one school year (2024-25) and surpassed 5 million users across 110 countries by late 2025; free for US teachers thanks to a $10 M Gates Foundation grant.", "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/", "source": "Khan Academy" },
+          "Adaptive tutoring matched to each student's pace and style, using guided questioning rather than direct answers",
+          "Instant high-quality translation across 100+ languages and dialects",
+          "Lifelong learning companions that grow with the learner from childhood through adulthood"
         ]
       },
       "climate": {
         "title": "Climate & Environment",
-        "desc": "AGI could help solve climate change through optimized energy systems, carbon capture, and planetary-scale modeling.",
+        "desc": "AGI could help solve climate change through optimized energy systems, carbon capture and planetary-scale modeling — and AI models already outperform traditional systems for weather forecasting.",
         "examples": [
-          "Designing fusion reactors and next-generation clean energy",
-          "Optimizing global supply chains to minimize emissions",
-          "Ecosystem restoration and biodiversity preservation"
+          { "text": "SPARC (Commonwealth Fusion Systems) is ~75 % built, with first plasma expected in 2026 and net energy gain (Q>1) targeted for 2027 — would be the first commercial-grade fusion machine.", "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/", "source": "CFS" },
+          { "text": "GraphCast (DeepMind) outperforms ECMWF's HRES on 90 % of 1 380 verification targets; Aurora (Microsoft) outperforms IFS HRES at 0.1° on more than 92 % of targets.", "url": "https://www.nature.com/articles/s41586-025-09005-y", "source": "Nature" },
+          "Optimizing global supply chains and power grids to minimize emissions",
+          "Ecosystem restoration and biodiversity preservation with smart sensors"
         ]
       },
       "productivity": {
         "title": "Economic Productivity",
-        "desc": "AGI could automate cognitive labor, dramatically increasing productivity and enabling new forms of work and creativity.",
+        "desc": "Agentic AI already automates substantial parts of cognitive work. AGI could dramatically increase productivity and enable new forms of work and creativity.",
         "examples": [
-          "Automating routine knowledge work and freeing time for higher-order tasks",
-          "Scaling small teams to achieve enterprise-level output",
-          "Enabling entirely new industries and business models"
+          { "text": "Devin 2.0 (Cognition, April 2025) resolves 13.86 % of real GitHub issues end-to-end on SWE-bench — a 7× jump over previous models; 67 % of its PRs are merged; pricing dropped from $500/month to $20/month.", "url": "https://cognition.ai/blog/devin-annual-performance-review-2025", "source": "Cognition" },
+          "Test coverage rising from 50-60 % to 80-90 % at companies deploying AI agents",
+          "Code migrations going from 30-40 human-hours to 3-4 hours per file in pilot banks (10×)",
+          "Enabling entirely new industries and business models where cognitive cost used to be the bottleneck"
         ]
       },
       "poverty": {
         "title": "Ending Extreme Poverty",
-        "desc": "If the benefits of AGI are distributed equitably, it could end extreme poverty and provide universal access to basic needs.",
+        "desc": "If AI benefits are distributed equitably, they could shrink extreme poverty and provide universal access to basic needs. Some applications already serve hundreds of millions.",
         "examples": [
-          "Automated food production at near-zero marginal cost",
-          "Global access to housing, energy, and clean water",
-          "Universal basic services powered by AGI efficiency gains"
+          { "text": "Plantix diagnoses 800+ symptoms across 60 crops by photo with 90-100 % accuracy on staple crops; free for farmers, 10M+ downloads across 150+ countries.", "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/", "source": "GSMA" },
+          "SMS- and voice-based medical assistants in regions with no doctor access",
+          "Automated food production at progressively lower marginal cost",
+          "Universal basic services funded by AI efficiency gains"
         ]
       },
       "creativity": {
         "title": "Creativity & Culture",
-        "desc": "AGI could amplify human creativity, enabling new forms of art, storytelling, music, and cultural expression.",
+        "desc": "Generative AI already amplifies human creativity — video, audio, illustration, narrative — and lowers the production cost of work previously out of reach for independent creators.",
         "examples": [
-          "Co-creative tools for artists, writers, and musicians",
+          { "text": "Sora 2 (OpenAI, September 2025) generates 10-25 s video with synchronized audio, dialogue and sound effects; includes masking/in-painting and consistent cameos, used by filmmakers as a digital storyboard and for large-crowd or hazardous scenes.", "url": "https://openai.com/index/sora-2/", "source": "OpenAI" },
+          "Co-creative tools for artists, writers and musicians — plus entirely new AI-native formats",
           "Preserving and translating endangered languages and traditions",
-          "New immersive experiences in gaming, film, and virtual worlds"
+          "New immersive experiences in gaming, film and personalized virtual worlds"
         ]
       },
       "space": {
         "title": "Space Exploration",
-        "desc": "AGI could accelerate humanity's expansion into the solar system and beyond, solving problems that are too complex for human teams alone.",
+        "desc": "AGI could accelerate humanity's expansion into the solar system and beyond, solving problems too complex for human teams alone.",
         "examples": [
-          "Autonomous spacecraft and planetary exploration",
+          { "text": "Perseverance (NASA) completed in December 2024 the first drives on another world planned by generative AI — 456 m without human control over two days.", "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/", "source": "NASA" },
+          { "text": "AEGIS (JPL) lets SuperCam on Perseverance autonomously select and analyze Martian rocks — analyzing imagery on-board without contacting Earth.", "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/", "source": "NASA Science" },
           "Designing self-sustaining off-world habitats",
           "Long-duration mission planning and life support"
         ]
       },
       "governance": {
         "title": "Better Governance",
-        "desc": "AGI could help design fairer, more responsive, and more transparent institutions — if deployed with strong democratic safeguards.",
+        "desc": "AI could help design fairer, more responsive and more transparent institutions — if deployed with strong democratic safeguards and real citizen participation.",
         "examples": [
+          { "text": "Polis and similar platforms (Talk to the City, vTaiwan) are already used for mass deliberation in Austria, Uruguay, New Zealand, the Philippines and Germany — aggregating thousands of citizen inputs while preserving minority positions.", "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html", "source": "OECD" },
+          "Engaged California used AI in 2025 to process citizen input at scale after the Los Angeles wildfires",
           "Policy simulation and evidence-based decision making",
-          "Real-time citizen engagement at national scale",
           "Detecting and reducing corruption and bureaucratic inefficiency"
+        ]
+      },
+      "mentalHealth": {
+        "title": "Mental Health",
+        "desc": "24/7 access to conversational support backed by cognitive behavioural therapy — especially valuable where professionals are scarce. There is still clinical debate about its precise role, but evidence is starting to accumulate.",
+        "examples": [
+          { "text": "Woebot showed effect sizes of d=0.57 for anxiety and d=0.46 for depression in systematic reviews — more effective than WHO self-help materials after just 2 weeks.", "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352", "source": "World Psychiatry" },
+          { "text": "Wysa produced notable reductions in PHQ-9 (depression) and GAD-7 (anxiety) after 4 weeks in chronic disease patients (p<0.001); users were 3× more likely to complete therapy sessions with Wysa support between sessions.", "url": "https://www.jmir.org/2025/1/e67114", "source": "JMIR" },
+          "Support for vulnerable groups: mothers in the perinatal period, chronic-pain patients, university students",
+          "Night-time coverage, in local languages, with no social-stigma barrier"
+        ]
+      },
+      "disasters": {
+        "title": "Disaster Response",
+        "desc": "AI-driven early warning systems that multiply reaction time before floods, wildfires or earthquakes — with measured impact on lives saved and economic loss reduction.",
+        "examples": [
+          { "text": "Google Flood Hub protects 460M+ people across 80+ countries with flood forecasts up to 7 days ahead, capturing 85-100 % of severe floods recorded by GDACS.", "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/", "source": "Google Research" },
+          { "text": "Groundsource (Google, March 2026) mines decades of news reports to forecast imminent flash floods up to 24 hours ahead.", "url": "https://aiforcause.org/stories/google-flood-hub", "source": "AI for Cause" },
+          "Early warning systems are proven to cut flood fatalities by up to 43 % and economic losses by 35-50 %",
+          "AI-assisted humanitarian coordination: a regional authority in Southern Africa caught a flash-flood alert from AI and deployed responders in time"
         ]
       }
     }
