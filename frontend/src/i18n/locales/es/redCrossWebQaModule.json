@@ -114,6 +114,33 @@
       "outputAdoWorkItems": "Elementos de trabajo de Azure DevOps"
     },
 
+    "aiUsage": {
+      "title": "Uso de la IA en pruebas técnicas",
+      "subtitle": "Define con precisión para qué se usa la IA, qué NO debe hacer, y quién tiene la responsabilidad final",
+      "usesTitle": "La IA se usa como apoyo para",
+      "uses": [
+        "generación de sugerencias de tests",
+        "análisis de requisitos y criterios de aceptación",
+        "generación de borradores de Playwright / Cypress",
+        "análisis de mensajes de error y logs",
+        "propuesta de tests de regresión",
+        "resumen del estado de las pruebas",
+        "identificación de posibles áreas de riesgo"
+      ],
+      "limitsTitle": "Limitaciones y responsabilidad",
+      "limits": [
+        "No se pueden introducir en la IA datos personales reales, datos de producción, hallazgos de seguridad ni claves de API.",
+        "El tester / desarrollador es el responsable final de la calidad, la seguridad y la privacidad de todo lo producido con apoyo de IA.",
+        "Los tests generados por la IA deben ser revisados y validados por un tester o desarrollador antes de su ejecución.",
+        "La IA no debe usar datos personales reales.",
+        "Los resultados de la IA no pueden ser la única base para una decisión Go / No‑Go.",
+        "Los hallazgos importantes deben verificarse manualmente o mediante ejecución automatizada."
+      ],
+      "ackBtn": "Confirmo que lo he leído y entendido",
+      "acknowledged": "✓ Confirmado",
+      "ackHint": "La confirmación se guarda localmente — es un recordatorio, no un consentimiento legal"
+    },
+
     "playwright": {
       "header": "Generador de pruebas Playwright",
       "subheader": "E2E multi‑navegador + scripts Playwright con apoyo de accesibilidad",

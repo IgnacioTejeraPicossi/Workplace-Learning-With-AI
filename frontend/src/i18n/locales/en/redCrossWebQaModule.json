@@ -114,6 +114,33 @@
       "outputAdoWorkItems": "Azure DevOps work items"
     },
 
+    "aiUsage": {
+      "title": "AI usage in technical testing",
+      "subtitle": "Make explicit what AI is used for, what it must NOT be used for, and who is finally accountable",
+      "usesTitle": "AI is used as support for",
+      "uses": [
+        "generating test suggestions",
+        "analysing requirements and acceptance criteria",
+        "generating Playwright / Cypress drafts",
+        "analysing error messages and logs",
+        "suggesting regression tests",
+        "summarising test status",
+        "identifying possible risk areas"
+      ],
+      "limitsTitle": "Limitations and accountability",
+      "limits": [
+        "No real personal data, production data, security findings or API keys may be entered into AI.",
+        "The tester / developer holds final accountability for quality, security and privacy of anything produced with AI support.",
+        "AI‑generated tests must be reviewed and quality‑assured by a tester or developer before execution.",
+        "AI must not use real personal data.",
+        "AI results must not be the sole basis for a Go / No‑Go decision.",
+        "Important findings must be verified manually or through automated execution."
+      ],
+      "ackBtn": "I confirm I have read and understood",
+      "acknowledged": "✓ Acknowledged",
+      "ackHint": "The acknowledgement is stored locally — treat it as a reminder, not as legal consent"
+    },
+
     "playwright": {
       "header": "Playwright Test Generator",
       "subheader": "Cross-browser E2E + accessibility-assisted Playwright scripts",

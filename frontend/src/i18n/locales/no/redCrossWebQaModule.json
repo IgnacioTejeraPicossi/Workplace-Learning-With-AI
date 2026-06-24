@@ -114,6 +114,33 @@
       "outputAdoWorkItems": "Azure DevOps‑arbeidselementer"
     },
 
+    "aiUsage": {
+      "title": "Bruk av KI i teknisk testing",
+      "subtitle": "Tydeliggjør hva KI brukes til, hva den ikke skal brukes til, og hvem som har endelig ansvar",
+      "usesTitle": "KI brukes som støtte til",
+      "uses": [
+        "generering av test‑forslag",
+        "analyse av krav og akseptansekriterier",
+        "generering av Playwright/Cypress‑utkast",
+        "analyse av feilmeldinger og logger",
+        "forslag til regresjonstester",
+        "oppsummering av teststatus",
+        "identifisering av mulige risikoområder"
+      ],
+      "limitsTitle": "Begrensninger og ansvar",
+      "limits": [
+        "Ingen reelle personopplysninger, produksjonsdata, sikkerhetsfunn eller API‑nøkler skal legges inn i KI.",
+        "Tester/utvikler har endelig ansvar for kvalitet, sikkerhet og personvern i det KI produserer.",
+        "KI‑genererte tester skal kvalitetssikres av tester eller utvikler før kjøring.",
+        "KI skal ikke bruke ekte persondata.",
+        "KI‑resultater skal ikke være eneste grunnlag for Go/No‑Go.",
+        "Viktige funn skal verifiseres manuelt eller gjennom automatisert kjøring."
+      ],
+      "ackBtn": "Jeg bekrefter at jeg har lest og forstått",
+      "acknowledged": "✓ Bekreftet",
+      "ackHint": "Bekreftelsen lagres lokalt — den skal sees som påminnelse, ikke som juridisk samtykke"
+    },
+
     "playwright": {
       "header": "Playwright‑testgenerator",
       "subheader": "Tverrnettleser‑E2E + universell‑utforming‑støttede Playwright‑skript",
