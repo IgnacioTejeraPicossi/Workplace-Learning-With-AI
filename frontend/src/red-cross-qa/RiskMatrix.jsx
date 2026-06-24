@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -63,6 +64,8 @@ const RiskMatrix = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #b45309 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>📥 {t('redCrossWebQaModule.riskMatrix.input')}</h3>

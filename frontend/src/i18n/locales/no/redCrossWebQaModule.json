@@ -138,7 +138,10 @@
       ],
       "ackBtn": "Jeg bekrefter at jeg har lest og forstått",
       "acknowledged": "✓ Bekreftet",
-      "ackHint": "Bekreftelsen lagres lokalt — den skal sees som påminnelse, ikke som juridisk samtykke"
+      "ackHint": "Bekreftelsen lagres lokalt — den skal sees som påminnelse, ikke som juridisk samtykke",
+      "showDetails": "Vis detaljer",
+      "hideDetails": "Skjul detaljer",
+      "compactHeadline": "KI brukes som støtte. Reelle persondata, produksjonsdata og API‑nøkler hører IKKE hjemme i KI."
     },
 
     "playwright": {

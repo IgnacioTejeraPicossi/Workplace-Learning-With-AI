@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -88,6 +89,8 @@ const UatSupport = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #15803d 0%, #16a34a 50%, #65a30d 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>🎯 {t('redCrossWebQaModule.uatSupport.scopes')}</h3>

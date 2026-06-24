@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -42,6 +43,8 @@ const Cypress = ({ environment, executionMode }) => {
           mode={executionMode}
           gradient="linear-gradient(135deg, #047857 0%, #0f766e 50%, #115e59 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         {/* Phase F — Tom (Tech leder) recommends Playwright for this project
             since Storybook bundling is already in place. Cypress stays as a

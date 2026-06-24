@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -147,6 +148,8 @@ const AzureDevOps = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #4f46e5 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>🏷️ {t('redCrossWebQaModule.ado.bundleConfig')}</h3>

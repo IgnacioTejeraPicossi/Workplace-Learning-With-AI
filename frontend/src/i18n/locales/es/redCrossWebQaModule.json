@@ -138,7 +138,10 @@
       ],
       "ackBtn": "Confirmo que lo he leído y entendido",
       "acknowledged": "✓ Confirmado",
-      "ackHint": "La confirmación se guarda localmente — es un recordatorio, no un consentimiento legal"
+      "ackHint": "La confirmación se guarda localmente — es un recordatorio, no un consentimiento legal",
+      "showDetails": "Ver detalles",
+      "hideDetails": "Ocultar detalles",
+      "compactHeadline": "La IA se usa como apoyo. Datos personales reales, datos de producción y claves de API NO deben introducirse en la IA."
     },
 
     "playwright": {

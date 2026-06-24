@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -135,6 +136,8 @@ const Accessibility = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #0369a1 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         {/* Phase G — tool selector */}
         <div style={panel}>

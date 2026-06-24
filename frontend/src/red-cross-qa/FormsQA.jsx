@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -72,6 +73,8 @@ const FormsQA = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #0f766e 0%, #14b8a6 50%, #ec4899 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>🎯 {t('redCrossWebQaModule.formsQa.scopesTitle')}</h3>

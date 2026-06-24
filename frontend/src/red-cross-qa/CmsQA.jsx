@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -47,6 +48,8 @@ const CmsQA = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #4338ca 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>🎯 Editorial coverage</h3>

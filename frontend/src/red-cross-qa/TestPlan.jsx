@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
-const AI_ACK_KEY = 'redCrossQa.aiUsageAck';
 
 // Test-level taxonomy (per Teststrategi 30.3 §5)
 const TEST_LEVEL_COLOR = {
@@ -57,7 +57,7 @@ const TestPlan = ({ environment }) => {
           gradient="linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #831843 100%)"
         />
 
-        <AiUsagePolicyCard />
+        <AiUsagePolicy variant="full" />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 16 }}>
           {/* Inputs */}
@@ -176,110 +176,5 @@ const primaryBtn = (disabled) => ({
   transition: 'background-color 0.2s',
 });
 const empty = { fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '36px 0' };
-
-// ─── AI Usage Policy card ─────────────────────────────────────────────────────
-// Per Teststrategi 30.3 — makes explicit what AI is used for, what it must NOT
-// touch (real personal data, production data, security findings, API keys),
-// and who keeps final accountability for quality, security and privacy.
-const AiUsagePolicyCard = () => {
-  const { t } = useTranslation();
-  const [ack, setAck] = useState(false);
-  const [ackAt, setAckAt] = useState(null);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(AI_ACK_KEY);
-      if (stored) { setAck(true); setAckAt(stored); }
-    } catch { /* ignore */ }
-  }, []);
-
-  const handleAck = () => {
-    const ts = new Date().toISOString();
-    try { localStorage.setItem(AI_ACK_KEY, ts); } catch { /* ignore */ }
-    setAck(true); setAckAt(ts);
-  };
-
-  const uses  = t('redCrossWebQaModule.aiUsage.uses',  { returnObjects: true }) || [];
-  const limits = t('redCrossWebQaModule.aiUsage.limits', { returnObjects: true }) || [];
-
-  return (
-    <div style={{
-      backgroundColor: 'white', borderRadius: 12, padding: 0,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        padding: '14px 20px',
-        background: 'linear-gradient(90deg, #f0fdf4 0%, #ffffff 50%, #fef2f2 100%)',
-        borderBottom: '1px solid #e2e8f0',
-        display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
-      }}>
-        <span style={{ fontSize: 22 }}>🤖</span>
-        <div style={{ flex: 1, minWidth: 240 }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
-            {t('redCrossWebQaModule.aiUsage.title')}
-          </h3>
-          <p style={{ margin: '3px 0 0', fontSize: 12, color: '#64748b' }}>
-            {t('redCrossWebQaModule.aiUsage.subtitle')}
-          </p>
-        </div>
-        {ack ? (
-          <span title={ackAt || ''} style={{
-            backgroundColor: '#dcfce7', color: '#15803d',
-            border: '1px solid #86efac', borderRadius: 999,
-            padding: '4px 12px', fontSize: 12, fontWeight: 700,
-          }}>{t('redCrossWebQaModule.aiUsage.acknowledged')}</span>
-        ) : (
-          <button onClick={handleAck} style={{
-            backgroundColor: '#dc2626', color: 'white',
-            border: 'none', borderRadius: 8,
-            padding: '8px 14px', fontSize: 12, fontWeight: 700,
-            cursor: 'pointer',
-          }}>{t('redCrossWebQaModule.aiUsage.ackBtn')}</button>
-        )}
-      </div>
-
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: 0,
-      }}>
-        {/* Uses (green) */}
-        <div style={{
-          padding: '16px 20px',
-          borderRight: '1px solid #e2e8f0',
-          backgroundColor: '#f0fdf4',
-        }}>
-          <p style={{
-            margin: '0 0 10px', fontSize: 11, fontWeight: 700,
-            color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.08em',
-          }}>✓ {t('redCrossWebQaModule.aiUsage.usesTitle')}</p>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#1e293b', lineHeight: 1.7 }}>
-            {uses.map((u, i) => <li key={i}>{u}</li>)}
-          </ul>
-        </div>
-
-        {/* Limits (red) */}
-        <div style={{ padding: '16px 20px', backgroundColor: '#fef2f2' }}>
-          <p style={{
-            margin: '0 0 10px', fontSize: 11, fontWeight: 700,
-            color: '#b91c1c', textTransform: 'uppercase', letterSpacing: '0.08em',
-          }}>⚠ {t('redCrossWebQaModule.aiUsage.limitsTitle')}</p>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#1e293b', lineHeight: 1.7 }}>
-            {limits.map((l, i) => <li key={i}>{l}</li>)}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{
-        padding: '8px 20px',
-        backgroundColor: '#f8fafc',
-        borderTop: '1px solid #e2e8f0',
-        fontSize: 11, color: '#94a3b8',
-      }}>
-        {t('redCrossWebQaModule.aiUsage.ackHint')}
-      </div>
-    </div>
-  );
-};
 
 export default TestPlan;

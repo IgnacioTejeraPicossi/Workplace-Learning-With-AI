@@ -138,7 +138,10 @@
       ],
       "ackBtn": "I confirm I have read and understood",
       "acknowledged": "✓ Acknowledged",
-      "ackHint": "The acknowledgement is stored locally — treat it as a reminder, not as legal consent"
+      "ackHint": "The acknowledgement is stored locally — treat it as a reminder, not as legal consent",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "compactHeadline": "AI is used as support. Real personal data, production data and API keys do NOT belong in AI."
     },
 
     "playwright": {

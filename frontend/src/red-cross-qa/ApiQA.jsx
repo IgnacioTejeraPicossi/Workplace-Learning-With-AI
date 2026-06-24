@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -114,6 +115,8 @@ const ApiQA = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #312e81 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         {/* Phase F — Tom's tip: Postman is the team's preferred GraphQL workflow tool */}
         <div style={{

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -52,6 +53,8 @@ const Playwright = ({ environment, executionMode }) => {
           mode={executionMode}
           gradient="linear-gradient(135deg, #b91c1c 0%, #be185d 50%, #6b21a8 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         {/* Phase F — Tom's tooling tip banner (NextJS + Storybook + Playwright) */}
         <div style={{

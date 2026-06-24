@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
+import AiUsagePolicy from './_AiUsagePolicy';
 
 const API = 'http://localhost:8000/api/red-cross-qa';
 
@@ -105,6 +106,8 @@ const SprintReport = ({ environment }) => {
           environment={environment}
           gradient="linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%)"
         />
+
+        <AiUsagePolicy variant="compact" />
 
         <div style={panel}>
           <h3 style={panelTitle}>🗓️ {t('redCrossWebQaModule.sprintReport.configTitle')}</h3>
