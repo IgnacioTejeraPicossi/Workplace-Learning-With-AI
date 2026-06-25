@@ -217,6 +217,36 @@
           "Los sistemas de alerta temprana reducen las muertes por inundación hasta un 43 % y las pérdidas económicas un 35-50 %",
           "Coordinación humanitaria asistida por IA: una autoridad regional en África austral detectó una inundación súbita por alerta IA y desplegó equipos a tiempo"
         ]
+      },
+      "accessibility": {
+        "title": "Accesibilidad",
+        "desc": "La IA multimodal está derribando barreras para personas con discapacidad — visión, audición, movilidad y comunicación — convirtiendo en cotidianas capacidades que antes requerían asistencia humana especializada.",
+        "examples": [
+          { "text": "Be My AI (Be My Eyes + GPT-4 Vision) describe imágenes en lenguaje natural a usuarios ciegos o con baja visión, incluyendo lectura de etiquetas, navegación e interpretación de escenas; integrado en el Microsoft Disability Answer Desk resuelve consultas en 4 minutos de media (menos de la mitad que un agente humano).", "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/", "source": "Be My Eyes" },
+          { "text": "Seeing AI (Microsoft) ya identifica personas, productos, monedas y documentos en tiempo real desde el móvil, gratuito y en más de 18 idiomas.", "url": "https://openai.com/index/be-my-eyes/", "source": "OpenAI" },
+          "Traducción en tiempo real de lengua de signos por cámara, sin guantes ni equipo especializado",
+          "Subtítulos automáticos de alta calidad y descripción de audio en streaming en vivo"
+        ]
+      },
+      "humanoidRobotics": {
+        "title": "Robótica Humanoide",
+        "desc": "Los robots humanoides están saliendo del laboratorio a la fábrica. La combinación de modelos de fundación visión-lenguaje-acción y hardware más barato está abriendo el trabajo físico repetitivo o peligroso a la automatización.",
+        "examples": [
+          { "text": "Figure 02 produjo más de 30 000 BMW X3 en Spartanburg durante 10 meses, moviendo 90 000+ piezas en 1 250 horas operativas con >99 % de precisión por turno — el primer despliegue comercial humanoide en una línea de coches reales.", "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time", "source": "BMW Group" },
+          { "text": "Apollo (Apptronik) opera en la fábrica digital de Mercedes en Berlín-Marienfelde y Kecskemét (Hungría), con $403M de Serie A respaldada por Google, B Capital y la propia Mercedes.", "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive", "source": "iFactoryApp" },
+          "Modelo robot-as-a-service (~25 $/hora) que evita capex y abre la automatización a pymes",
+          "Apoyo a cuidados de personas mayores, logística hospitalaria y trabajos peligrosos (limpieza nuclear, rescate)"
+        ]
+      },
+      "conservation": {
+        "title": "Conservación y Biodiversidad",
+        "desc": "La IA permite vigilar ecosistemas, identificar especies y detectar amenazas a escala planetaria — multiplicando la eficacia de equipos de conservación crónicamente infradimensionados.",
+        "examples": [
+          { "text": "Wildbook (Wild Me) cubre 250+ especies con más de 1,4 millones de avistamientos y 280 000 animales identificados individualmente; el sistema catalogó más de 34 millones de avistamientos para 2026.", "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/", "source": "Yenra" },
+          { "text": "PAWS (USC + National Geographic) usa teoría de juegos para planificar patrullas anti-furtivismo; TrailGuard AI (RESOLVE) despliega cámaras camufladas que detectan furtivos en tiempo real.", "url": "https://dl.acm.org/doi/10.1145/3748699.3749780", "source": "ACM" },
+          "El mercado global de IA para conservación supera los 2 200 M$ en software en 2025 — sensores acústicos, drones y telemetría GPS conectados con modelos de visión",
+          "Monitoreo marino: detección de pesca ilegal y blanqueo de corales por satélite"
+        ]
       }
     }
   }

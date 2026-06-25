@@ -217,6 +217,36 @@
           "Early warning systems are proven to cut flood fatalities by up to 43 % and economic losses by 35-50 %",
           "AI-assisted humanitarian coordination: a regional authority in Southern Africa caught a flash-flood alert from AI and deployed responders in time"
         ]
+      },
+      "accessibility": {
+        "title": "Accessibility",
+        "desc": "Multimodal AI is tearing down barriers for people with disabilities — vision, hearing, mobility and communication — turning capabilities that once required specialized human assistance into everyday features.",
+        "examples": [
+          { "text": "Be My AI (Be My Eyes + GPT-4 Vision) describes images in natural language to blind and low-vision users, from reading labels to interpreting scenes; integrated into the Microsoft Disability Answer Desk it resolves queries in ~4 minutes on average — less than half the time of a human agent.", "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/", "source": "Be My Eyes" },
+          { "text": "Seeing AI (Microsoft) recognizes people, products, currency and documents in real time from a phone — free, in 18+ languages.", "url": "https://openai.com/index/be-my-eyes/", "source": "OpenAI" },
+          "Real-time sign-language translation from a camera, no gloves or specialized hardware needed",
+          "High-quality automatic captioning and audio description for live streaming"
+        ]
+      },
+      "humanoidRobotics": {
+        "title": "Humanoid Robotics",
+        "desc": "Humanoid robots are stepping out of the lab and onto the factory floor. The combination of vision-language-action foundation models and cheaper hardware is opening repetitive or dangerous physical work to automation.",
+        "examples": [
+          { "text": "Figure 02 produced 30 000+ BMW X3 vehicles at Spartanburg over 10 months, moving 90 000+ parts in 1 250 operational hours at >99 % per-shift accuracy — the first commercial humanoid deployment on a real auto line.", "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time", "source": "BMW Group" },
+          { "text": "Apollo (Apptronik) operates at Mercedes' Berlin-Marienfelde digital factory and Kecskemét (Hungary) plant, with $403M Series A funding backed by Google, B Capital and Mercedes itself.", "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive", "source": "iFactoryApp" },
+          "Robot-as-a-service pricing (~$25/hour) avoids capex and opens automation to SMEs",
+          "Support for elder care, hospital logistics and hazardous work (nuclear cleanup, search-and-rescue)"
+        ]
+      },
+      "conservation": {
+        "title": "Conservation & Biodiversity",
+        "desc": "AI enables ecosystem monitoring, species identification and threat detection at planetary scale — multiplying the effectiveness of chronically understaffed conservation teams.",
+        "examples": [
+          { "text": "Wildbook (Wild Me) covers 250+ species with 1.4M+ sightings and 280 000 individually tracked animals; the system catalogued 34M+ sightings by 2026.", "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/", "source": "Yenra" },
+          { "text": "PAWS (USC + National Geographic) uses game theory to plan anti-poaching patrols; TrailGuard AI (RESOLVE) deploys camouflaged cameras that detect poachers in real time.", "url": "https://dl.acm.org/doi/10.1145/3748699.3749780", "source": "ACM" },
+          "The global wildlife-conservation AI software market topped $2.2B in 2025 — acoustic sensors, drones and GPS telemetry tied to vision models",
+          "Marine monitoring: illegal-fishing detection and coral-bleaching tracking from satellite imagery"
+        ]
       }
     }
   }

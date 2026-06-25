@@ -217,6 +217,36 @@
           "Tidlig-varsling-systemer er bevist å redusere dødelighet ved flom med opptil 43 % og økonomiske tap med 35-50 %",
           "KI-assistert humanitær koordinering: en regional myndighet i sørlige Afrika fanget en flash-flood-varsel fra KI og mobiliserte hjelpemannskap i tide"
         ]
+      },
+      "accessibility": {
+        "title": "Tilgjengelighet",
+        "desc": "Multimodal KI river ned barrierer for personer med funksjonsnedsettelser — syn, hørsel, mobilitet og kommunikasjon — og gjør evner som før krevde spesialisert menneskelig hjelp til hverdagsfunksjoner.",
+        "examples": [
+          { "text": "Be My AI (Be My Eyes + GPT-4 Vision) beskriver bilder på naturlig språk for blinde og svaksynte brukere — fra etikettlesing til scenetolkning; integrert i Microsoft Disability Answer Desk løser tjenesten henvendelser på ~4 minutter i snitt — mindre enn halvparten av tiden en menneskelig agent bruker.", "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/", "source": "Be My Eyes" },
+          { "text": "Seeing AI (Microsoft) gjenkjenner personer, produkter, valuta og dokumenter i sanntid fra mobilen — gratis, på 18+ språk.", "url": "https://openai.com/index/be-my-eyes/", "source": "OpenAI" },
+          "Sanntids tegnspråk-oversettelse fra kamera, uten hansker eller spesialisert maskinvare",
+          "Høykvalitets automatisk teksting og lydbeskrivelse for direktesendt strømming"
+        ]
+      },
+      "humanoidRobotics": {
+        "title": "Humanoide roboter",
+        "desc": "Humanoide roboter går ut av laben og inn på fabrikkgulvet. Kombinasjonen av visjon-språk-handling-fundamentmodeller og rimeligere maskinvare åpner repeterende eller farlig fysisk arbeid for automatisering.",
+        "examples": [
+          { "text": "Figure 02 produserte 30 000+ BMW X3 ved Spartanburg over 10 måneder, flyttet 90 000+ deler i 1 250 driftstimer med >99 % nøyaktighet per skift — den første kommersielle humanoide utplasseringen på en faktisk bilfabrikklinje.", "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time", "source": "BMW Group" },
+          { "text": "Apollo (Apptronik) opererer ved Mercedes' digitale fabrikk i Berlin-Marienfelde og Kecskemét (Ungarn), med $403M Series A finansiering støttet av Google, B Capital og Mercedes selv.", "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive", "source": "iFactoryApp" },
+          "Robot-as-a-service-modell (~25 $/time) unngår investeringskostnader og åpner automatisering for små og mellomstore bedrifter",
+          "Støtte for eldreomsorg, sykehuslogistikk og farlig arbeid (atomopprydding, søk og redning)"
+        ]
+      },
+      "conservation": {
+        "title": "Bevaring og biologisk mangfold",
+        "desc": "KI muliggjør økosystemovervåking, artsidentifikasjon og trusseldeteksjon på planetarisk skala — og mangedobler effektiviteten til kronisk underbemannede bevaringsteam.",
+        "examples": [
+          { "text": "Wildbook (Wild Me) dekker 250+ arter med 1,4M+ observasjoner og 280 000 individuelt sporede dyr; systemet katalogiserte 34M+ observasjoner innen 2026.", "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/", "source": "Yenra" },
+          { "text": "PAWS (USC + National Geographic) bruker spillteori til å planlegge anti-krypskytter-patruljer; TrailGuard AI (RESOLVE) utplasserer kamuflerte kameraer som oppdager krypskyttere i sanntid.", "url": "https://dl.acm.org/doi/10.1145/3748699.3749780", "source": "ACM" },
+          "Det globale markedet for KI-programvare innen viltforvaltning passerte 2,2 milliarder dollar i 2025 — akustiske sensorer, droner og GPS-telemetri knyttet til synsmodeller",
+          "Havovervåking: deteksjon av ulovlig fiske og korallbleking fra satellittbilder"
+        ]
       }
     }
   }

@@ -115,6 +115,37 @@ const benefits = [
     bgColor: '#fef3c7',
     borderColor: '#fde68a',
   },
+  // ─── Added 2026-06: Accessibility, Humanoid Robotics, Conservation ────────
+  {
+    id: 'accessibility',
+    icon: '🦮',
+    titleKey: 'agiBenefits.items.accessibility.title',
+    descKey: 'agiBenefits.items.accessibility.desc',
+    examplesKey: 'agiBenefits.items.accessibility.examples',
+    color: '#0369a1',
+    bgColor: '#f0f9ff',
+    borderColor: '#bae6fd',
+  },
+  {
+    id: 'humanoidRobotics',
+    icon: '🤖',
+    titleKey: 'agiBenefits.items.humanoidRobotics.title',
+    descKey: 'agiBenefits.items.humanoidRobotics.desc',
+    examplesKey: 'agiBenefits.items.humanoidRobotics.examples',
+    color: '#475569',
+    bgColor: '#f8fafc',
+    borderColor: '#cbd5e1',
+  },
+  {
+    id: 'conservation',
+    icon: '🦁',
+    titleKey: 'agiBenefits.items.conservation.title',
+    descKey: 'agiBenefits.items.conservation.desc',
+    examplesKey: 'agiBenefits.items.conservation.examples',
+    color: '#15803d',
+    bgColor: '#f0fdf4',
+    borderColor: '#86efac',
+  },
 ];
 
 function BenefitCard({ benefit, t, extraExamples = [] }) {
