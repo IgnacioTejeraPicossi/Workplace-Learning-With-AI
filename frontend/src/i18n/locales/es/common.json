@@ -963,11 +963,60 @@
             "items": {
               "0": {
                 "title": "Construye tu primer agente de IA: ¡un camino claro!",
-                "description": "Metodología paso a paso para construir agentes de IA con un enfoque práctico"
+                "description": "Metodología paso a paso para construir agentes de IA con un enfoque práctico",
+                "keyPoints": [
+                  "Elige un problema muy pequeño y muy concreto",
+                  "Escoge un LLM base (GPT, Claude, Gemini, LLaMA, Mistral)",
+                  "Decide cómo interactuará el agente con el mundo exterior",
+                  "Construye el flujo esqueleto (bucle modelo → herramienta → resultado → modelo)",
+                  "Añade memoria con cuidado (empieza con contexto a corto plazo)",
+                  "Envuélvelo en una interfaz usable",
+                  "Itera en ciclos pequeños",
+                  "Mantén el alcance bajo control"
+                ],
+                "coreLoop": "Modelo → Herramienta → Resultado → Modelo (el latido de todo agente)",
+                "advice": "La forma más rápida de aprender es construir un agente concreto de principio a fin. Una vez hecho eso, el siguiente cuesta diez veces menos."
               },
               "1": {
                 "title": "7 términos de IA que debes conocer — más allá de lo básico",
-                "description": "Términos de arquitectura IA de nivel empresarial para sistemas en producción"
+                "description": "Términos de arquitectura IA de nivel empresarial para sistemas en producción",
+                "keyTerms": [
+                  {
+                    "term": "IA agéntica",
+                    "definition": "Filosofía de diseño donde razonamiento, memoria y acciones se ejecutan en bucles hasta alcanzar un objetivo",
+                    "useCase": "Triaje de soporte al cliente, clasificación de tickets, respuesta a incidentes"
+                  },
+                  {
+                    "term": "Orquestación multi-agente",
+                    "definition": "Redes de agentes con roles distintos que se coordinan mediante protocolos compartidos",
+                    "useCase": "Tareas de reporting bancario con agentes planificador, ejecutor y de cumplimiento"
+                  },
+                  {
+                    "term": "Mezcla de Expertos (MoE)",
+                    "definition": "Un router activa solo los 'expertos' necesarios por token — ahorrando cómputo",
+                    "useCase": "Soporte multilingüe, tareas específicas de dominio (jurídico, técnico)"
+                  },
+                  {
+                    "term": "Self-RAG vs Agentic RAG",
+                    "definition": "Self-RAG: el modelo decide cuándo y cómo recuperar. Agentic RAG: la recuperación es un paso planificado dentro del bucle de razonamiento",
+                    "useCase": "Q&A dinámico, investigación de políticas, troubleshooting complejo"
+                  },
+                  {
+                    "term": "Flujos autónomos",
+                    "definition": "Procesos de larga duración con reintentos, escaladas y aprobaciones",
+                    "useCase": "Seguros: registro → verificación → control de fraude → pago"
+                  },
+                  {
+                    "term": "Capas de confianza",
+                    "definition": "Seguridad, identidad, política y observabilidad integradas en el stack",
+                    "useCase": "Redacción de PII en sanidad, registro para cumplimiento"
+                  },
+                  {
+                    "term": "Protocolos AI-native",
+                    "definition": "Estandarizan cómo se comunican agentes, herramientas y modelos",
+                    "useCase": "Esquemas JSON, OpenAPI, MCP para flexibilidad entre modelos"
+                  }
+                ]
               }
             }
           },
@@ -976,11 +1025,34 @@
             "items": {
               "0": {
                 "title": "¿Qué es un agente de IA? (Visión general)",
-                "description": "Póster de alto nivel: cómo funcionan los agentes, rasgos, herramientas, memoria y recursos clave"
+                "description": "Póster de alto nivel: cómo funcionan los agentes, rasgos, herramientas, memoria y recursos clave",
+                "keyPoints": [
+                  "Los agentes reciben objetivos/tareas y un prompt de sistema; perciben el entorno y actúan bajo supervisión humana o de un orquestador",
+                  "Rasgos esenciales: razonar, planificar, actuar, aprender, adaptarse, delegar",
+                  "Superficie de herramientas: web, código, apps, datos, funciones, MCP",
+                  "Memoria: a corto plazo (de trabajo/episódica) + a largo plazo (vector/SQL/fichero)",
+                  "IA agéntica en la práctica: foco en sistemas multi-agente y comportamiento, más allá de los debates terminológicos",
+                  "Recursos iniciales: guías de prompt engineering y tutoriales paso a paso para agentes"
+                ],
+                "advice": "Los agentes de IA son el futuro de la automatización — piensan, actúan y aprenden como humanos",
+                "keyInsight": "En discusiones técnicas, enfatiza los sistemas multi-agente donde los agentes colaboran con o sin orquestación central"
               },
               "1": {
                 "title": "10 tipos centrales de agentes (póster + guía)",
-                "description": "Desde sistemas reactivos hasta multi-agente — mapa conciso de familias de agentes con sus roles y comportamientos"
+                "description": "Desde sistemas reactivos hasta multi-agente — mapa conciso de familias de agentes con sus roles y comportamientos",
+                "keyPoints": [
+                  "Agente específico de tarea — un único flujo concreto (p. ej. resumir/traducir). Proceso fijo; no aprende.",
+                  "Agente reactivo — responde al input inmediato; comportamiento sin estado / reflejo; no planifica.",
+                  "Agente basado en modelo — construye un modelo interno del mundo; simula resultados antes de actuar.",
+                  "Agente basado en objetivos — parte de una meta y planifica los pasos hacia atrás para alcanzarla.",
+                  "Agente basado en utilidad — evalúa opciones y elige la acción de máximo valor esperado.",
+                  "Agente que aprende — mejora con el tiempo usando feedback; actualiza política/estrategia y memoria.",
+                  "Agente planificador — estrategia a largo plazo; define hitos y se adapta sobre la marcha.",
+                  "Agente reflejo con memoria — basado en reglas pero con memoria episódica para contextos recurrentes.",
+                  "Sistema multi-agente — varios agentes coordinan/compiten; roles, negociación, entorno compartido.",
+                  "Agente racional — elige la acción más lógica según su modelo/utilidad y restricciones."
+                ],
+                "advice": "Usa esta taxonomía para elegir el agente más simple que resuelva el problema; evoluciona hacia planificación/aprendizaje o multi-agente solo cuando sea necesario."
               },
               "2": {
                 "title": "Arquitecturas de agentes",

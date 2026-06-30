@@ -1475,11 +1475,60 @@
             "items": {
               "0": {
                 "title": "Bygg din første KI-agent: en klar vei!",
-                "description": "Steg-for-steg-metodikk for å bygge KI-agenter med praktisk tilnærming"
+                "description": "Steg-for-steg-metodikk for å bygge KI-agenter med praktisk tilnærming",
+                "keyPoints": [
+                  "Velg et veldig lite og veldig konkret problem",
+                  "Velg en base-LLM (GPT, Claude, Gemini, LLaMA, Mistral)",
+                  "Bestem hvordan agenten skal samhandle med omverdenen",
+                  "Bygg skjelett-arbeidsflyten (modell → verktøy → resultat → modell-løkke)",
+                  "Legg til minne forsiktig (start med kortvarig kontekst)",
+                  "Pakk det inn i et brukbart grensesnitt",
+                  "Iterer i små sykluser",
+                  "Hold omfanget under kontroll"
+                ],
+                "coreLoop": "Modell → Verktøy → Resultat → Modell (hjerteslaget til enhver agent)",
+                "advice": "Den raskeste måten å lære på er å bygge én konkret agent fra start til slutt. Når du har gjort det, blir den neste ti ganger enklere."
               },
               "1": {
                 "title": "7 KI-begreper du må kjenne — utover det grunnleggende",
-                "description": "KI-arkitekturbegreper på bedriftsnivå for produksjonssystemer"
+                "description": "KI-arkitekturbegreper på bedriftsnivå for produksjonssystemer",
+                "keyTerms": [
+                  {
+                    "term": "Agentisk KI",
+                    "definition": "Designfilosofi der resonnering, minne og handlinger kjører i løkker til et mål er nådd",
+                    "useCase": "Triage av kundestøtte, billettklassifisering, hendelsesrespons"
+                  },
+                  {
+                    "term": "Multi-agent-orkestrering",
+                    "definition": "Nettverk av agenter med distinkte roller som koordineres via delte protokoller",
+                    "useCase": "Bankrapportering med planlegger-, utfører- og compliance-agenter"
+                  },
+                  {
+                    "term": "Mixture of Experts (MoE)",
+                    "definition": "Ruteren aktiverer kun de 'ekspertene' som trengs per token — sparer beregning",
+                    "useCase": "Flerspråklig støtte, domenespesifikke oppgaver (juridisk, teknisk)"
+                  },
+                  {
+                    "term": "Self-RAG vs Agentic RAG",
+                    "definition": "Self-RAG: modellen bestemmer når/hvordan den henter informasjon. Agentic RAG: henting som planlagt steg i resonnerings-løkken",
+                    "useCase": "Dynamisk Q&A, policyforskning, kompleks feilsøking"
+                  },
+                  {
+                    "term": "Autonome arbeidsflyter",
+                    "definition": "Langtidsprosesser med nye forsøk, eskaleringer og godkjenninger",
+                    "useCase": "Forsikring: registrering → verifisering → svindelkontroll → utbetaling"
+                  },
+                  {
+                    "term": "Tillitslag",
+                    "definition": "Sikkerhet, identitet, policy og observerbarhet bygget inn i stacken",
+                    "useCase": "PII-redigering i helsevesenet, etterlevelseslogging"
+                  },
+                  {
+                    "term": "AI-native protokoller",
+                    "definition": "Standardiserer hvordan agenter, verktøy og modeller kommuniserer",
+                    "useCase": "JSON-skjemaer, OpenAPI, MCP for modellfleksibilitet"
+                  }
+                ]
               }
             }
           },
@@ -1488,11 +1537,34 @@
             "items": {
               "0": {
                 "title": "Hva er en KI-agent? (Oversikt)",
-                "description": "Plakat på høyt nivå: hvordan agenter fungerer, egenskaper, verktøy, minne og nøkkelressurser"
+                "description": "Plakat på høyt nivå: hvordan agenter fungerer, egenskaper, verktøy, minne og nøkkelressurser",
+                "keyPoints": [
+                  "Agenter mottar mål/oppgaver og et system-prompt; de oppfatter omgivelsene og handler under menneskelig/orkestrator-tilsyn",
+                  "Kjerneegenskaper: resonnere, planlegge, handle, lære, tilpasse, delegere",
+                  "Verktøy-flate: web, kode, apper, data, funksjoner, MCP",
+                  "Minne: kortvarig (arbeids-/episodisk) + langvarig (vektor/SQL/fil)",
+                  "Agentisk KI i praksis: fokus på multi-agent-systemer og atferd, ikke terminologiske debatter",
+                  "Startressurser: prompt engineering-guider og steg-for-steg agent-tutorialer"
+                ],
+                "advice": "KI-agenter er fremtiden for automatisering — de tenker, handler og lærer som mennesker",
+                "keyInsight": "I tekniske diskusjoner, vektlegg multi-agent-systemer der agenter samarbeider med eller uten sentral orkestrering"
               },
               "1": {
                 "title": "10 kjerne-agenttyper (plakat + guide)",
-                "description": "Fra reaktive til multi-agent-systemer — kompakt kart over agentfamilier med roller og atferd"
+                "description": "Fra reaktive til multi-agent-systemer — kompakt kart over agentfamilier med roller og atferd",
+                "keyPoints": [
+                  "Oppgavespesifikk agent — én fokusert arbeidsflyt (f.eks. oppsummere/oversette). Fast prosess; ingen læring.",
+                  "Reaktiv agent — responderer på umiddelbar input; tilstandsløs/reflekterende atferd; ingen planlegging.",
+                  "Modellbasert agent — bygger intern verdensmodell; simulerer utfall før den handler.",
+                  "Målbasert agent — starter fra et mål og planlegger trinn bakover for å oppnå det.",
+                  "Nyttebasert agent — vurderer alternativer og velger handlingen med høyest forventet verdi.",
+                  "Lærende agent — forbedrer seg over tid via tilbakemelding; oppdaterer policy/strategi og minne.",
+                  "Planleggingsagent — langsiktig strategi; definerer milepæler og tilpasser seg underveis.",
+                  "Refleksagent med minne — regelbasert, men med episodisk minne for tilbakevendende kontekster.",
+                  "Multi-agent-system — flere agenter koordinerer/konkurrerer; roller, forhandling, delt miljø.",
+                  "Rasjonell agent — velger den mest logiske handlingen gitt sin modell/nytte og begrensninger."
+                ],
+                "advice": "Bruk denne taksonomien til å velge den enkleste agenten som løser problemet; utvikle deg mot planlegging/læring eller multi-agent kun når det er nødvendig."
               },
               "2": {
                 "title": "Agent-arkitekturer",

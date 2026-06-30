@@ -913,58 +913,69 @@ const AgentTheoryDocs = () => {
                         <h6>{t('help.agentTheory.keySteps', { defaultValue: 'Key Steps:' })}</h6>
                         <ol>
                           {item.content.keyPoints.map((point, pointIndex) => (
-                            <li key={pointIndex}>{point}</li>
+                            <li key={pointIndex}>
+                              {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.keyPoints.${pointIndex}`, { defaultValue: point })}
+                            </li>
                           ))}
                         </ol>
                       </div>
                     )}
-                    
+
                     {item.content.imageUrl && (
                       <div className="article-image" style={{ marginTop: '10px' }}>
                         <img src={item.content.imageUrl} alt={item.title} style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid #e5e7eb' }} />
                       </div>
                     )}
-                    
+
                     {item.content.keyTerms && (
                       <div className="key-terms">
                         <h6>{t('help.agentTheory.keyTerms', { defaultValue: '7 Key Terms:' })}</h6>
                         <div className="terms-grid">
                           {item.content.keyTerms.map((term, termIndex) => (
                             <div key={termIndex} className="term-card">
-                              <h7 className="term-name">{term.term}</h7>
-                              <p className="term-definition">{term.definition}</p>
+                              <h7 className="term-name">
+                                {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.keyTerms.${termIndex}.term`, { defaultValue: term.term })}
+                              </h7>
+                              <p className="term-definition">
+                                {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.keyTerms.${termIndex}.definition`, { defaultValue: term.definition })}
+                              </p>
                               <div className="term-use-case">
-                                <strong>{t('help.agentTheory.useCase', { defaultValue: 'Use Case:' })}</strong> {term.useCase}
+                                <strong>{t('help.agentTheory.useCase', { defaultValue: 'Use Case:' })}</strong>{' '}
+                                {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.keyTerms.${termIndex}.useCase`, { defaultValue: term.useCase })}
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                    
+
                     {item.content.coreLoop && (
                       <div className="core-loop">
                         <h6>{t('help.agentTheory.coreLoop', { defaultValue: 'Core Loop:' })}</h6>
                         <div className="loop-diagram">
-                          {item.content.coreLoop}
+                          {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.coreLoop`, { defaultValue: item.content.coreLoop })}
                         </div>
                       </div>
                     )}
-                    
+
                     {item.content.keyInsight && (
                       <div className="key-insight">
                         <h6>{t('help.agentTheory.keyInsight', { defaultValue: 'Key Insight:' })}</h6>
-                        <blockquote>{item.content.keyInsight}</blockquote>
+                        <blockquote>
+                          {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.keyInsight`, { defaultValue: item.content.keyInsight })}
+                        </blockquote>
                       </div>
                     )}
-                    
+
                     {item.content.quote && (
                       <div className="article-quote">
                         <h6>{t('help.agentTheory.quote', { defaultValue: 'Quote:' })}</h6>
-                        <blockquote>{item.content.quote}</blockquote>
+                        <blockquote>
+                          {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.quote`, { defaultValue: item.content.quote })}
+                        </blockquote>
                       </div>
                     )}
-                    
+
                     {item.content.source && (
                       <div className="article-source">
                         <h6>{t('help.agentTheory.source', { defaultValue: 'Source:' })}</h6>
@@ -973,11 +984,13 @@ const AgentTheoryDocs = () => {
                         </a>
                       </div>
                     )}
-                    
+
                     {item.content.advice && (
                       <div className="advice">
                         <h6>{t('help.agentTheory.keyAdvice', { defaultValue: 'Key Advice:' })}</h6>
-                        <blockquote>{item.content.advice}</blockquote>
+                        <blockquote>
+                          {t(`help.agentTheory.theory.sections.${index}.items.${itemIndex}.advice`, { defaultValue: item.content.advice })}
+                        </blockquote>
                       </div>
                     )}
                   </div>
