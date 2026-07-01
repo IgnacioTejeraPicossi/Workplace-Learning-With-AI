@@ -59,29 +59,43 @@ def _normalize_temperature(value):
 def _normalize_params_for_model(params: dict, model_name: str) -> dict:
     """
     Normalize parameters for different OpenAI models.
-    GPT-5.2 and newer models require 'max_completion_tokens' instead of 'max_tokens'.
-    
+
+    GPT-5.x / o1 / o3 models have two API-level restrictions:
+      1. They require 'max_completion_tokens' instead of 'max_tokens'
+      2. They only accept the default temperature (1). Passing any other value
+         (e.g. 0.7) returns HTTP 400 with 'unsupported_value'.
+
+    We handle both by rewriting the params dict — the caller doesn't have to
+    know which model needs what.
+
     Args:
         params: Dictionary of parameters to normalize
-        model_name: Name of the model (e.g., 'gpt-5.2', 'gpt-4o')
-    
+        model_name: Name of the model (e.g., 'gpt-5.5', 'gpt-4o')
+
     Returns:
         Normalized parameters dictionary
     """
     params = params.copy()  # Don't modify the original
-    
-    # Check if this is a GPT-5 model (gpt-5.x, gpt-5.2, etc.)
+
+    # Check if this is a GPT-5 / o-series reasoning model
     is_gpt5_model = model_name and (
-        model_name.startswith("gpt-5") or 
-        model_name.startswith("o1") or 
+        model_name.startswith("gpt-5") or
+        model_name.startswith("o1") or
         model_name.startswith("o3")
     )
-    
-    # Convert max_tokens to max_completion_tokens for GPT-5 models
-    if is_gpt5_model and "max_tokens" in params:
-        max_tokens_value = params.pop("max_tokens")
-        params["max_completion_tokens"] = max_tokens_value
-    
+
+    if is_gpt5_model:
+        # Convert max_tokens → max_completion_tokens
+        if "max_tokens" in params:
+            max_tokens_value = params.pop("max_tokens")
+            params["max_completion_tokens"] = max_tokens_value
+
+        # Drop temperature (and top_p, which has the same restriction on these
+        # models). Leaving them out lets the API apply its default of 1, which
+        # is the only value it accepts.
+        for restricted in ("temperature", "top_p"):
+            params.pop(restricted, None)
+
     return params
 
 def get_api_config_from_headers(request_headers=None):
