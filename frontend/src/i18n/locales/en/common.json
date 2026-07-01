@@ -286,6 +286,7 @@
       "concepts": "Core Concepts",
       "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
+      "wiphySearch": "WiPhy Search",
       "aiAsObserver": "AI as Observer",
       "substrateQuestion": "The Substrate Question",
       "roadmap": "Roadmap & Sources"
@@ -395,11 +396,29 @@
         "gnwLevel": "mainstream",
         "gnwBody": "Conscious access happens when information is broadcast across a global workspace of recurrent neural networks.",
         "gnwLink": "→ Competes with IIT. The agent should present both, not pick a winner.",
+        "celestialHolographyTitle": "Celestial Holography",
+        "celestialHolographyAuthor": "Pasterski · Strominger · Simons collaboration",
+        "celestialHolographyLevel": "mainstream",
+        "celestialHolographyBody": "Active research programme in high-energy physics proposing a duality between the gravitational S-matrix in 4D asymptotically flat spacetime and a 2D conformal field theory (CFT) living on the celestial sphere at null infinity. Soft theorems are recast as Ward identities of asymptotic symmetries (organised into the w₁₊∞ algebra). It is the modern holographic principle applied to flat spaces like ours — not to AdS.",
+        "celestialHolographyLink": "→ Close structural parallel to OPH's observer patch: in both, information from a higher-dimensional bulk is encoded on a lower-dimensional boundary. The epistemic difference is key — celestial holography is active peer-reviewed physics research; OPH extends the same shape toward observers/consciousness as a speculative reconstruction.",
         "ophTitle": "Observer Patch Holography (OPH)",
         "ophAuthor": "Mueller et al.",
         "ophLevel": "speculative",
         "ophBody": "Observer-first reconstruction: each observer has a bounded patch with state space; physics is the public fixed-point that survives overlap consistency.",
         "ophLink": "→ The central programme this module helps you understand and critique."
+      },
+      "featured": {
+        "name": "Sabrina Gonzalez Pasterski",
+        "badge": "Featured Researcher",
+        "role": "Faculty, Perimeter Institute · Deputy Director, Simons Collaboration on Celestial Holography",
+        "bio": "American theoretical physicist specialising in quantum gravity, scattering amplitudes and asymptotic symmetries. Together with Andrew Strominger and Alexander Zhiboedov she discovered the gravitational spin memory effect. She is founder and principal investigator of the Celestial Holography Initiative — a coordinated effort to encode the universe as a hologram on the null boundary of flat space, uniting quantum theory and general relativity from the asymptotically-flat side (not AdS).",
+        "relationToOph": "→ Included here because her framework moves higher-dimensional information onto a 2D boundary — the same mathematical shape OPH generalises to the observer patch. Key difference: her programme is peer-reviewed physics research on gravitons and amplitudes, not a thesis about consciousness. Useful as a mainstream anchor to honestly measure how far OPH reaches.",
+        "links": {
+          "perimeter": "Perimeter Institute",
+          "simons": "Simons Collaboration",
+          "personal": "physicsgirl.com",
+          "review": "arXiv 2111.11392 (review)"
+        }
       }
     },
     "aiAsObserver": {
@@ -483,8 +502,44 @@
         "susskind": "Susskind — The Black Hole War (holographic principle)",
         "friston": "Friston — A theory of cortical responses (free-energy principle)",
         "iit": "Tononi — Integrated Information Theory (IIT 4.0)",
-        "gnw": "Dehaene — Consciousness and the Brain (GNW)"
+        "gnw": "Dehaene — Consciousness and the Brain (GNW)",
+        "pasterskiPI": "Sabrina Pasterski — Perimeter Institute (faculty profile)",
+        "simonsCelestial": "Simons Collaboration on Celestial Holography — coordinated research programme",
+        "celestialReview": "arXiv 2111.11392 — 'Celestial Holography' (canonical field review)",
+        "physicsgirl": "physicsgirl.com — Sabrina Pasterski's personal page"
+      },
+      "pendingTitle": "Candidate integrations (V1+, pending verification)",
+      "pendingIntro": "Sources proposed for the RAG agent in V1+. Not yet accepted by the pipeline — pending public documentation access and scope review before being integrated as MCP tools.",
+      "pending": {
+        "wiphyMcp": "wiphy.org/mcp — full MCP integration in backend still pending. Interim solution: the WiPhy Search tab already queries the public /api/search endpoint directly from the browser (no auth, no backend). Full MCP tool integration would let the agent CALL wiphy as a first-class tool during a chat, not just show search results."
       }
+    },
+    "wiphySearch": {
+      "title": "WiPhy — Physics Claims Search",
+      "subtitle": "Live search over the WiPhy corpus (Sabrina Pasterski's MCP server for physics claims). This tab queries the public /api/search endpoint directly from your browser — no backend, no auth, no cached copy of the corpus.",
+      "publicEndpoint": "Public REST endpoint",
+      "source": "Backed by",
+      "placeholder": "e.g. celestial holography, spin memory, w1+infinity, black hole information…",
+      "searchBtn": "Search",
+      "searching": "Searching…",
+      "hint": "Enter a physics concept, author or claim keyword. Results come from the WiPhy corpus of arXiv-indexed papers.",
+      "stats": {
+        "papers": "Papers",
+        "abstractOnly": "Abstract-only",
+        "claims": "Claims",
+        "concepts": "Concepts"
+      },
+      "noResults": "No results for \"{{q}}\". Try a broader query.",
+      "resultsCount": "{{count}} results",
+      "errors": {
+        "corsTitle": "The browser blocked the request (CORS)",
+        "corsBody": "The wiphy.org server did not send the Access-Control-Allow-Origin header for this origin. This is a browser security policy, not a failure of the endpoint. You can still open the URL in a new tab. For a full fix we would need a small backend proxy — flagged in the Roadmap.",
+        "networkTitle": "Network error",
+        "httpTitle": "Server returned HTTP {{status}}",
+        "genericBody": "The request could not complete. Check your connection or try again in a moment.",
+        "openInBrowser": "Open this search on wiphy.org"
+      },
+      "disclaimer": "This is a search interface, not epistemic vetting. WiPhy returns claims extracted from papers — a claim's presence in the corpus does not mean it is settled science. Cross-reference with the epistemic levels used elsewhere in this agent (established / mainstream / speculative / philosophy / metaphor)."
     }
   },
 

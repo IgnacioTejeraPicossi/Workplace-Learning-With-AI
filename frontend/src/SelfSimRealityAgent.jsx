@@ -7,6 +7,7 @@ import TheoryTour from './self-sim-reality/TheoryTour';
 import AiAsObserver from './self-sim-reality/AiAsObserver';
 import SubstrateQuestion from './self-sim-reality/SubstrateQuestion';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
+import WiphySearch from './self-sim-reality/WiphySearch';
 
 /**
  * Self-Simulating Reality Agent · 1.17.0 (V0 · structure + reading material)
@@ -42,6 +43,7 @@ const SelfSimRealityAgent = () => {
     { id: 'concepts',          label: t('selfSimReality.tabs.concepts'),          icon: '📚' },
     { id: 'ophMechanics',      label: t('selfSimReality.tabs.ophMechanics'),      icon: '⚙️' },
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
+    { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
     { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
     { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
     { id: 'roadmap',           label: t('selfSimReality.tabs.roadmap'),           icon: '🗺️' },
@@ -53,6 +55,7 @@ const SelfSimRealityAgent = () => {
       case 'concepts':          return <CoreConcepts />;
       case 'ophMechanics':      return <OphMechanics />;
       case 'theoryTour':        return <TheoryTour />;
+      case 'wiphySearch':       return <WiphySearch />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;
       case 'roadmap':           return <RoadmapAndSources />;

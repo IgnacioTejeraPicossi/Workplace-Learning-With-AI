@@ -443,6 +443,7 @@
       "concepts": "Kjernebegreper",
       "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
+      "wiphySearch": "WiPhy‑søk",
       "aiAsObserver": "KI som observatør",
       "substrateQuestion": "Substrat‑spørsmålet",
       "roadmap": "Veikart og kilder"
@@ -552,11 +553,29 @@
         "gnwLevel": "mainstream",
         "gnwBody": "Bevisst tilgang skjer når informasjon kringkastes over et globalt arbeidsrom av rekurrente nevrale nettverk.",
         "gnwLink": "→ Konkurrerer med IIT. Agenten skal presentere begge, ikke velge en vinner.",
+        "celestialHolographyTitle": "Himmelsk holografi (Celestial Holography)",
+        "celestialHolographyAuthor": "Pasterski · Strominger · Simons-samarbeidet",
+        "celestialHolographyLevel": "mainstream",
+        "celestialHolographyBody": "Aktivt forskningsprogram innen høyenergifysikk som foreslår en dualitet mellom den gravitasjonelle S-matrisen i 4D asymptotisk flat romtid og en 2D konform feltteori (CFT) som lever på en 'himmelsk sfære' i null-uendelig. Myke teoremer omformuleres som Ward-identiteter for asymptotiske symmetrier (organisert i w₁₊∞-algebraen). Det er den moderne versjonen av det holografiske prinsippet anvendt på flate rom som vårt — ikke på AdS.",
+        "celestialHolographyLink": "→ Nær strukturell parallell til OPHs observer-patch: i begge kodes informasjon fra en høyeredimensjonal bulk på en lavere-dimensjonal grense. Den epistemiske forskjellen er avgjørende — himmelsk holografi er aktiv fagfellevurdert fysikkforskning; OPH utvider den samme formen mot observatører/bevissthet som en spekulativ rekonstruksjon.",
         "ophTitle": "Observer Patch Holography (OPH)",
         "ophAuthor": "Mueller m.fl.",
         "ophLevel": "speculative",
         "ophBody": "Observatør‑først rekonstruksjon: hver observatør har en avgrenset patch med tilstandsrom; fysikk er det offentlige fastpunktet som overlever overlapping‑konsistens.",
         "ophLink": "→ Det sentrale programmet denne modulen hjelper deg å forstå og kritisere."
+      },
+      "featured": {
+        "name": "Sabrina Gonzalez Pasterski",
+        "badge": "Utvalgt forsker",
+        "role": "Fakultet, Perimeter Institute · Nestleder, Simons Collaboration on Celestial Holography",
+        "bio": "Amerikansk teoretisk fysiker spesialisert i kvantegravitasjon, spredningsamplituder og asymptotiske symmetrier. Sammen med Andrew Strominger og Alexander Zhiboedov oppdaget hun gravitasjonell spin-memory-effekt. Hun er grunnlegger og hovedforsker for Celestial Holography Initiative — en koordinert innsats for å kode universet som et hologram på null-grensen av flat rom, og forene kvanteteori og generell relativitet fra den asymptotisk flate siden (ikke AdS).",
+        "relationToOph": "→ Inkludert her fordi rammeverket hennes flytter informasjon fra en høyeredimensjonal bulk til en 2D-grense — den samme matematiske formen som OPH generaliserer til observer-patchen. Viktig forskjell: hennes program er fagfellevurdert fysikkforskning på gravitoner og amplituder, ikke en tese om bevissthet. Nyttig som mainstream-anker for å ærlig måle hvor langt OPH rekker.",
+        "links": {
+          "perimeter": "Perimeter Institute",
+          "simons": "Simons Collaboration",
+          "personal": "physicsgirl.com",
+          "review": "arXiv 2111.11392 (oversikt)"
+        }
       }
     },
     "aiAsObserver": {
@@ -640,8 +659,44 @@
         "susskind": "Susskind — The Black Hole War (holografisk prinsipp)",
         "friston": "Friston — En teori om kortikale responser (frienergi‑prinsippet)",
         "iit": "Tononi — Integrert informasjonsteori (IIT 4.0)",
-        "gnw": "Dehaene — Consciousness and the Brain (GNW)"
+        "gnw": "Dehaene — Consciousness and the Brain (GNW)",
+        "pasterskiPI": "Sabrina Pasterski — Perimeter Institute (fakultetsprofil)",
+        "simonsCelestial": "Simons Collaboration on Celestial Holography — koordinert forskningsprogram",
+        "celestialReview": "arXiv 2111.11392 — 'Celestial Holography' (kanonisk feltoversikt)",
+        "physicsgirl": "physicsgirl.com — Sabrina Pasterskis personlige side"
+      },
+      "pendingTitle": "Kandidat-integrasjoner (V1+, avventer verifisering)",
+      "pendingIntro": "Kilder foreslått for RAG-agenten i V1+. Ennå ikke akseptert av pipelinen — avventer tilgang til offentlig dokumentasjon og omfangsvurdering før integrasjon som MCP-verktøy.",
+      "pending": {
+        "wiphyMcp": "wiphy.org/mcp — full MCP-integrasjon i backend gjenstår. Foreløpig løsning: WiPhy-søk-fanen spør allerede den offentlige /api/search-endepunktet direkte fra nettleseren (uten auth, uten backend). Full MCP-verktøy-integrasjon vil la agenten KALLE wiphy som et førsteklasses verktøy under en samtale, ikke bare vise søkeresultater."
       }
+    },
+    "wiphySearch": {
+      "title": "WiPhy — Søk i fysikkpåstander",
+      "subtitle": "Live-søk mot WiPhy-korpuset (Sabrina Pasterskis MCP-server for fysikkpåstander). Denne fanen kaller det offentlige /api/search-endepunktet direkte fra nettleseren din — uten backend, uten auth, uten lokal kopi av korpuset.",
+      "publicEndpoint": "Offentlig REST-endepunkt",
+      "source": "Levert av",
+      "placeholder": "f.eks. celestial holography, spin memory, w1+infinity, informasjon i sorte hull…",
+      "searchBtn": "Søk",
+      "searching": "Søker…",
+      "hint": "Skriv inn et fysikkbegrep, en forfatter eller et nøkkelord. Resultatene kommer fra WiPhy-korpuset av arXiv-indekserte papers.",
+      "stats": {
+        "papers": "Papers",
+        "abstractOnly": "Kun sammendrag",
+        "claims": "Påstander",
+        "concepts": "Begreper"
+      },
+      "noResults": "Ingen treff for «{{q}}». Prøv et bredere søk.",
+      "resultsCount": "{{count}} treff",
+      "errors": {
+        "corsTitle": "Nettleseren blokkerte forespørselen (CORS)",
+        "corsBody": "wiphy.org-serveren sendte ikke Access-Control-Allow-Origin-headeren for dette opprinnelsesstedet. Dette er en nettlesers sikkerhetsregel, ikke en feil ved endepunktet. Du kan fortsatt åpne URL-en i en ny fane. En full løsning krever en liten backend-proxy — notert i veikartet.",
+        "networkTitle": "Nettverksfeil",
+        "httpTitle": "Serveren returnerte HTTP {{status}}",
+        "genericBody": "Forespørselen kunne ikke fullføres. Sjekk tilkoblingen eller prøv igjen om et øyeblikk.",
+        "openInBrowser": "Åpne dette søket på wiphy.org"
+      },
+      "disclaimer": "Dette er et søkegrensesnitt, ikke en epistemisk validering. WiPhy returnerer påstander hentet fra papers — at en påstand finnes i korpuset betyr ikke at den er etablert vitenskap. Kryssjekk med de epistemiske nivåene som brukes andre steder i denne agenten (established / mainstream / speculative / philosophy / metaphor)."
     }
   },
   "robomindClinic": {

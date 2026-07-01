@@ -437,6 +437,7 @@
       "concepts": "Conceptos clave",
       "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
+      "wiphySearch": "Buscador WiPhy",
       "aiAsObserver": "IA como observador",
       "substrateQuestion": "La pregunta del sustrato",
       "roadmap": "Hoja de ruta y fuentes"
@@ -661,8 +662,35 @@
       "pendingTitle": "Integraciones candidatas (V1+, pendientes de verificar)",
       "pendingIntro": "Fuentes propuestas para el agente RAG en V1+. Aún no aceptadas por el pipeline — pendientes de comprobar acceso, documentación pública y alcance antes de integrarlas como herramientas MCP.",
       "pending": {
-        "wiphyMcp": "wiphy.org/docs — MCP server propuesto para verificación de afirmaciones de física (referenciado por Pasterski). Estado: acceso restringido (HTTP 403), documentación no verificable públicamente. Reevaluar cuando el proyecto abra docs o proporcione credenciales."
+        "wiphyMcp": "wiphy.org/mcp — la integración MCP completa en el backend sigue pendiente. Solución intermedia: la pestaña Buscador WiPhy ya consulta el endpoint público /api/search directamente desde el navegador (sin auth, sin backend). La integración MCP completa permitiría al agente INVOCAR wiphy como herramienta de primera clase durante un chat, no solo mostrar resultados de búsqueda."
       }
+    },
+    "wiphySearch": {
+      "title": "WiPhy — Búsqueda de afirmaciones de física",
+      "subtitle": "Búsqueda en vivo sobre el corpus WiPhy (el MCP server de Sabrina Pasterski para afirmaciones de física). Esta pestaña consulta el endpoint público /api/search directamente desde tu navegador — sin backend, sin auth, sin copia local del corpus.",
+      "publicEndpoint": "Endpoint REST público",
+      "source": "Servido por",
+      "placeholder": "p. ej. celestial holography, spin memory, w1+infinity, información en agujeros negros…",
+      "searchBtn": "Buscar",
+      "searching": "Buscando…",
+      "hint": "Introduce un concepto de física, un autor o una palabra clave. Los resultados vienen del corpus WiPhy de papers indexados en arXiv.",
+      "stats": {
+        "papers": "Papers",
+        "abstractOnly": "Solo abstract",
+        "claims": "Afirmaciones",
+        "concepts": "Conceptos"
+      },
+      "noResults": "Sin resultados para «{{q}}». Prueba con una búsqueda más amplia.",
+      "resultsCount": "{{count}} resultados",
+      "errors": {
+        "corsTitle": "El navegador bloqueó la petición (CORS)",
+        "corsBody": "El servidor wiphy.org no envió la cabecera Access-Control-Allow-Origin para este origen. Es una política de seguridad del navegador, no un fallo del endpoint. Puedes abrir la URL en una pestaña nueva. Para una solución completa haría falta un pequeño proxy backend — anotado en la hoja de ruta.",
+        "networkTitle": "Error de red",
+        "httpTitle": "El servidor devolvió HTTP {{status}}",
+        "genericBody": "La petición no pudo completarse. Comprueba tu conexión o inténtalo en unos segundos.",
+        "openInBrowser": "Abrir esta búsqueda en wiphy.org"
+      },
+      "disclaimer": "Esto es una interfaz de búsqueda, no una validación epistémica. WiPhy devuelve afirmaciones extraídas de papers — la presencia de una afirmación en el corpus no significa que sea ciencia asentada. Cruza los resultados con los niveles epistémicos usados en el resto del agente (established / mainstream / speculative / philosophy / metaphor)."
     }
   },
 
