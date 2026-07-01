@@ -445,6 +445,7 @@
       "theoryTour": "Teorirundtur",
       "wiphySearch": "WiPhy‑søk",
       "claimAnalyzer": "Påstandsanalyse",
+      "playground": "Lekeplass",
       "aiAsObserver": "KI som observatør",
       "substrateQuestion": "Substrat‑spørsmålet",
       "roadmap": "Veikart og kilder"
@@ -740,6 +741,49 @@
         "network": "Nettverksfeil. Sjekk at backend kjører og prøv igjen."
       },
       "disclaimer": "Analysatoren markerer hva evidensen støtter kontra hvor du ekstrapolerer — den sier IKKE at påstanden er «sann» eller «falsk». Når LLM-nøkkelen mangler, vises en statisk mock (MOCK-merke)."
+    },
+    "playground": {
+      "introTitle": "V3 · Interaktiv lekeplass",
+      "introBody": "To visuelle verktøy å leke med: et Teorikart som plasserer OPH ved siden av naboene i idé-rommet, og en Observer Patch-simulator som viser hvordan offentlig konsensus kan oppstå fra overlapping alene. Ingen av dem er en fysikk-simulering — begge er intuisjonsverktøy.",
+      "map": {
+        "title": "Teorikart",
+        "subtitle": "De åtte teoriene modulen dekker, plassert rundt OPH. Klikk på en node for å lese den samme teksten / nivået / lenken som brukes i Teorirundturen.",
+        "instruction": "Hold musepekeren over en kant for å se relasjonstypen.",
+        "nodes": {
+          "oph": "OPH",
+          "predictive": "Prediktiv prosessering",
+          "relationalQm": "Relasjonell QM",
+          "holographic": "Holografisk",
+          "simHypothesis": "Sim.-hypotesen",
+          "iit": "IIT",
+          "gnw": "GNW",
+          "celestialHolography": "Himmelsk holografi"
+        },
+        "relations": {
+          "provides_form": "gir matematisk form",
+          "structural_parallel": "strukturell parallell",
+          "competes_with": "konkurrerer med",
+          "candidate_measure": "kandidat observatørmål",
+          "de_mystifies": "avmystifiserer observatøren",
+          "different_framing": "annen innramming",
+          "supports_side": "støtter sinn-konstruerer-siden",
+          "extends_to_flat": "utvider til flat rom"
+        }
+      },
+      "sim": {
+        "title": "Observer Patch-simulator",
+        "subtitle": "Hver sirkel er en patch med en avgrenset tilstand (farge). Patchene beveger seg og, i sonene der de overlapper, konvergerer tilstandene deres mot hverandre. Se offentlig konsensus vokse frem fra lokal overlapping alene — uten noen global koordinator.",
+        "consensusLabel": "Offentlig konsensus",
+        "play": "Spill av",
+        "pause": "Pause",
+        "reset": "Nullstill",
+        "sliders": {
+          "patches": "Antall patcher",
+          "strength": "Konsensusstyrke",
+          "radius": "Patch-radius"
+        },
+        "disclaimer": "Leketøys-modell, ikke fysikk. Tilstandene er 1D-skalarer mappet til fargetone. Det som betyr noe: konsensus oppstår fra overlapping uten noen global koordinator. Det er det pedagogiske poenget OPH gjør når den sier «offentlig virkelighet er fastpunktet for overlappingskonsistens»."
+      }
     }
   },
   "robomindClinic": {

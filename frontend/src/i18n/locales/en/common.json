@@ -288,6 +288,7 @@
       "theoryTour": "Theory Tour",
       "wiphySearch": "WiPhy Search",
       "claimAnalyzer": "Claim Analyzer",
+      "playground": "Playground",
       "aiAsObserver": "AI as Observer",
       "substrateQuestion": "The Substrate Question",
       "roadmap": "Roadmap & Sources"
@@ -583,6 +584,49 @@
         "network": "Network error. Check that the backend is running and try again."
       },
       "disclaimer": "The analyzer flags what the evidence supports vs where you're extrapolating — it does NOT say the claim is 'true' or 'false'. When the LLM key is missing, a static mock is shown (MOCK badge)."
+    },
+    "playground": {
+      "introTitle": "V3 · Interactive Playground",
+      "introBody": "Two visual tools you can play with: a Theory Map that places OPH next to its neighbours in idea-space, and an Observer Patch Simulator that shows how public consensus can emerge from overlap alone. Neither is a physics simulation — both are intuition pumps.",
+      "map": {
+        "title": "Theory Map",
+        "subtitle": "The eight theories the module covers, arranged around OPH. Click a node to read the same body / level / link used in the Theory Tour.",
+        "instruction": "Hover an edge to see the relation type.",
+        "nodes": {
+          "oph": "OPH",
+          "predictive": "Predictive Processing",
+          "relationalQm": "Relational QM",
+          "holographic": "Holographic",
+          "simHypothesis": "Simulation Hyp.",
+          "iit": "IIT",
+          "gnw": "GNW",
+          "celestialHolography": "Celestial Holography"
+        },
+        "relations": {
+          "provides_form": "provides mathematical form",
+          "structural_parallel": "structural parallel",
+          "competes_with": "competes with",
+          "candidate_measure": "candidate observer measure",
+          "de_mystifies": "de-mystifies observer",
+          "different_framing": "different framing",
+          "supports_side": "supports mind-construction side",
+          "extends_to_flat": "extends to flat space"
+        }
+      },
+      "sim": {
+        "title": "Observer Patch Simulator",
+        "subtitle": "Each circle is a patch with a bounded state (colour). Patches drift and, in the zones where they overlap, their states drift toward each other. Watch public consensus emerge from local overlap alone — no global coordinator.",
+        "consensusLabel": "Public consensus",
+        "play": "Play",
+        "pause": "Pause",
+        "reset": "Reset",
+        "sliders": {
+          "patches": "Number of patches",
+          "strength": "Consensus strength",
+          "radius": "Patch radius"
+        },
+        "disclaimer": "Toy model, not physics. States are 1-D scalars mapped to hue. What matters: consensus emerges from overlap without any global coordinator. That is the pedagogical point OPH makes when it says 'public reality is the fixed-point of overlap consistency'."
+      }
     }
   },
 

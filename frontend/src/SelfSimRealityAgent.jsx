@@ -9,6 +9,7 @@ import SubstrateQuestion from './self-sim-reality/SubstrateQuestion';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
 import WiphySearch from './self-sim-reality/WiphySearch';
 import ClaimAnalyzer from './self-sim-reality/ClaimAnalyzer';
+import Playground from './self-sim-reality/Playground';
 
 /**
  * Self-Simulating Reality Agent · 1.17.0 (V0 · structure + reading material)
@@ -55,6 +56,7 @@ const SelfSimRealityAgent = () => {
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
     { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
     { id: 'claimAnalyzer',     label: t('selfSimReality.tabs.claimAnalyzer'),     icon: '🔬' },
+    { id: 'playground',        label: t('selfSimReality.tabs.playground'),        icon: '🎨' },
     { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
     { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
     { id: 'roadmap',           label: t('selfSimReality.tabs.roadmap'),           icon: '🗺️' },
@@ -68,6 +70,7 @@ const SelfSimRealityAgent = () => {
       case 'theoryTour':        return <TheoryTour />;
       case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
       case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} />;
+      case 'playground':        return <Playground />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;
       case 'roadmap':           return <RoadmapAndSources />;

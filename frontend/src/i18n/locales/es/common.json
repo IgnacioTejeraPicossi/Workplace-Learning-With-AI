@@ -439,6 +439,7 @@
       "theoryTour": "Recorrido teórico",
       "wiphySearch": "Buscador WiPhy",
       "claimAnalyzer": "Analizador de afirmaciones",
+      "playground": "Playground",
       "aiAsObserver": "IA como observador",
       "substrateQuestion": "La pregunta del sustrato",
       "roadmap": "Hoja de ruta y fuentes"
@@ -734,6 +735,49 @@
         "network": "Error de red. Comprueba que el backend está funcionando y prueba de nuevo."
       },
       "disclaimer": "El analizador señala qué respalda la evidencia frente a dónde estás extrapolando — NO dice que la afirmación sea «verdadera» o «falsa». Cuando falta la clave del LLM, se muestra un mock estático (badge MOCK)."
+    },
+    "playground": {
+      "introTitle": "V3 · Playground interactivo",
+      "introBody": "Dos herramientas visuales con las que jugar: un Mapa de Teorías que sitúa OPH junto a sus vecinas en el espacio de ideas, y un Simulador de Parches Observadores que muestra cómo el consenso público puede emerger solo del solapamiento. Ninguno es una simulación de física — ambos son bombas de intuición.",
+      "map": {
+        "title": "Mapa de teorías",
+        "subtitle": "Las ocho teorías que cubre el módulo, organizadas en torno a OPH. Pulsa un nodo para leer el mismo cuerpo / nivel / enlace que aparece en el Recorrido teórico.",
+        "instruction": "Pasa el cursor sobre una arista para ver el tipo de relación.",
+        "nodes": {
+          "oph": "OPH",
+          "predictive": "Procesamiento predictivo",
+          "relationalQm": "MC relacional",
+          "holographic": "Holográfico",
+          "simHypothesis": "Hip. simulación",
+          "iit": "IIT",
+          "gnw": "GNW",
+          "celestialHolography": "Holografía celeste"
+        },
+        "relations": {
+          "provides_form": "aporta forma matemática",
+          "structural_parallel": "paralelo estructural",
+          "competes_with": "compite con",
+          "candidate_measure": "medida candidata de observador",
+          "de_mystifies": "desmistifica el observador",
+          "different_framing": "encuadre distinto",
+          "supports_side": "apoya el lado mente-construye",
+          "extends_to_flat": "extiende a espacio plano"
+        }
+      },
+      "sim": {
+        "title": "Simulador de parches observadores",
+        "subtitle": "Cada círculo es un parche con un estado acotado (color). Los parches derivan y, en las zonas donde se solapan, sus estados convergen entre sí. Observa cómo emerge el consenso público desde el solapamiento local — sin coordinador global.",
+        "consensusLabel": "Consenso público",
+        "play": "Reproducir",
+        "pause": "Pausar",
+        "reset": "Reiniciar",
+        "sliders": {
+          "patches": "Número de parches",
+          "strength": "Fuerza del consenso",
+          "radius": "Radio del parche"
+        },
+        "disclaimer": "Modelo de juguete, no física. Los estados son escalares 1D mapeados a tono de color. Lo importante: el consenso emerge del solapamiento sin ningún coordinador global. Ese es el punto pedagógico que OPH sostiene cuando dice «la realidad pública es el punto fijo de la consistencia de solapamiento»."
+      }
     }
   },
 
