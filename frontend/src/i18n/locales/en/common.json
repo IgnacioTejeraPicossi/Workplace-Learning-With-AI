@@ -287,6 +287,7 @@
       "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
       "wiphySearch": "WiPhy Search",
+      "claimAnalyzer": "Claim Analyzer",
       "aiAsObserver": "AI as Observer",
       "substrateQuestion": "The Substrate Question",
       "roadmap": "Roadmap & Sources"
@@ -540,6 +541,48 @@
         "openInBrowser": "Open this search on wiphy.org"
       },
       "disclaimer": "This is a search interface, not epistemic vetting. WiPhy returns claims extracted from papers — a claim's presence in the corpus does not mean it is settled science. Cross-reference with the epistemic levels used elsewhere in this agent (established / mainstream / speculative / philosophy / metaphor)."
+    },
+    "claimAnalyzer": {
+      "title": "Claim Analyzer",
+      "subtitle": "Paste a strong claim about physics, consciousness, cosmology or simulation theory. The analyzer decomposes it into what has evidence, what is overreach, and how to say the same idea with epistemic honesty.",
+      "claimLabel": "The claim to analyze",
+      "placeholder": "e.g. \"The universe is a simulation running on quantum consciousness, and observers create physical reality.\"",
+      "analyzeBtn": "Analyze",
+      "analyzing": "Analyzing…",
+      "orTryExample": "or load an example →",
+      "examples": {
+        "simulation": "The universe is literally a computer simulation, and the fact that quantum mechanics has minimum-resolution effects proves we are living in one.",
+        "consciousness": "Consciousness collapses the quantum wavefunction, which means the mind is what creates physical reality at the fundamental level.",
+        "observer": "General relativity and quantum mechanics both require an observer, so the observer must be a fundamental feature of the universe itself."
+      },
+      "verdictLabel": "Epistemic verdict",
+      "verdict": {
+        "mostly_solid": "Mostly solid",
+        "mixed": "Mixed",
+        "mostly_overreach": "Mostly overreach",
+        "unsupported": "Unsupported"
+      },
+      "sections": {
+        "coreScientific": "Scientific core — what the evidence supports",
+        "overreach": "Overreach — what goes past the evidence",
+        "reformulation": "Reformulation — same idea, honest framing",
+        "keyTerms": "Key terms"
+      },
+      "overreachTypes": {
+        "unsupported": "No evidence",
+        "category_error": "Category error",
+        "conflation": "Conflation",
+        "overgeneralization": "Overgeneralization",
+        "philosophical_leap": "Philosophical leap"
+      },
+      "keyTermsHint": "Click a term to search the WiPhy physics corpus in a new tab.",
+      "keyTermsHintBridge": "Click a term to search the WiPhy physics corpus in the Search tab.",
+      "keyTermTitle": "Search this term in WiPhy",
+      "errors": {
+        "http": "Server returned HTTP {{status}}",
+        "network": "Network error. Check that the backend is running and try again."
+      },
+      "disclaimer": "The analyzer flags what the evidence supports vs where you're extrapolating — it does NOT say the claim is 'true' or 'false'. When the LLM key is missing, a static mock is shown (MOCK badge)."
     }
   },
 

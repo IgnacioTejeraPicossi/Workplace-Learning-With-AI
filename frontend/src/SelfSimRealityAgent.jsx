@@ -8,6 +8,7 @@ import AiAsObserver from './self-sim-reality/AiAsObserver';
 import SubstrateQuestion from './self-sim-reality/SubstrateQuestion';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
 import WiphySearch from './self-sim-reality/WiphySearch';
+import ClaimAnalyzer from './self-sim-reality/ClaimAnalyzer';
 
 /**
  * Self-Simulating Reality Agent · 1.17.0 (V0 · structure + reading material)
@@ -37,6 +38,15 @@ import WiphySearch from './self-sim-reality/WiphySearch';
 const SelfSimRealityAgent = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
+  // Cross-tab bridge: Claim Analyzer sends a term here, WiphySearch reads it.
+  // Bumped nonce forces WiphySearch to re-run the search even if the term is
+  // the same as the previous prefill.
+  const [wiphyPrefill, setWiphyPrefill] = useState({ query: '', nonce: 0 });
+
+  const searchWiphyFromAnalyzer = (term) => {
+    setWiphyPrefill(prev => ({ query: term, nonce: prev.nonce + 1 }));
+    setActiveTab('wiphySearch');
+  };
 
   const tabs = [
     { id: 'overview',          label: t('selfSimReality.tabs.overview'),          icon: '🎯' },
@@ -44,6 +54,7 @@ const SelfSimRealityAgent = () => {
     { id: 'ophMechanics',      label: t('selfSimReality.tabs.ophMechanics'),      icon: '⚙️' },
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
     { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
+    { id: 'claimAnalyzer',     label: t('selfSimReality.tabs.claimAnalyzer'),     icon: '🔬' },
     { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
     { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
     { id: 'roadmap',           label: t('selfSimReality.tabs.roadmap'),           icon: '🗺️' },
@@ -55,7 +66,8 @@ const SelfSimRealityAgent = () => {
       case 'concepts':          return <CoreConcepts />;
       case 'ophMechanics':      return <OphMechanics />;
       case 'theoryTour':        return <TheoryTour />;
-      case 'wiphySearch':       return <WiphySearch />;
+      case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
+      case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;
       case 'roadmap':           return <RoadmapAndSources />;

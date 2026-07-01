@@ -55,7 +55,7 @@ const arxivUrl = (paperId) => {
   return `https://arxiv.org/abs/${clean}`;
 };
 
-export default function WiphySearch() {
+export default function WiphySearch({ prefillQuery, prefillNonce }) {
   const { t } = useTranslation();
   const [query, setQuery]       = useState('celestial holography');
   const [results, setResults]   = useState(null);
@@ -63,6 +63,7 @@ export default function WiphySearch() {
   const [error, setError]       = useState(null);
   const [stats, setStats]       = useState(null);
   const [statsError, setStatsError] = useState(false);
+  const [autoRunNonce, setAutoRunNonce] = useState(0);
 
   // Load corpus stats once (best-effort; failure is fine, we hide the block).
   useEffect(() => {
@@ -73,6 +74,17 @@ export default function WiphySearch() {
       .catch(() => { if (!cancelled) setStatsError(true); });
     return () => { cancelled = true; };
   }, []);
+
+  // Cross-tab bridge from ClaimAnalyzer: when prefillNonce bumps, adopt the
+  // query and mark that we want to auto-run. The autoRunNonce state is what
+  // the search effect actually watches, so runSearch (memoised on `query`)
+  // sees the fresh value.
+  useEffect(() => {
+    if (prefillQuery && prefillNonce != null) {
+      setQuery(prefillQuery);
+      setAutoRunNonce(prefillNonce);
+    }
+  }, [prefillQuery, prefillNonce]);
 
   const runSearch = useCallback(async () => {
     const q = query.trim();
@@ -97,6 +109,14 @@ export default function WiphySearch() {
   }, [query]);
 
   const onSubmit = (e) => { e.preventDefault(); runSearch(); };
+
+  // Auto-run when the ClaimAnalyzer bridge bumps the nonce. `runSearch` closes
+  // over `query`, which was just updated in the previous effect — React batches
+  // the state updates so by the time this effect runs, the new query is live.
+  useEffect(() => {
+    if (autoRunNonce > 0) runSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRunNonce]);
 
   return (
     <div style={{ display: 'grid', gap: 18 }}>

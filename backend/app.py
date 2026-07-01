@@ -238,6 +238,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Korean Teacher router: {e}")
 
+# Claim Analyzer router (Self-Simulating Reality Agent V2)
+try:
+    from backend.routers.claim_analyzer import router as claim_analyzer_router
+    app.include_router(claim_analyzer_router, tags=["Claim Analyzer"])
+    print("✅ Claim Analyzer router included successfully")
+except Exception as e:
+    print(f"❌ Error including Claim Analyzer router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router

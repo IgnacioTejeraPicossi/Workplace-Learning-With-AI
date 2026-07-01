@@ -438,6 +438,7 @@
       "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
       "wiphySearch": "Buscador WiPhy",
+      "claimAnalyzer": "Analizador de afirmaciones",
       "aiAsObserver": "IA como observador",
       "substrateQuestion": "La pregunta del sustrato",
       "roadmap": "Hoja de ruta y fuentes"
@@ -691,6 +692,48 @@
         "openInBrowser": "Abrir esta búsqueda en wiphy.org"
       },
       "disclaimer": "Esto es una interfaz de búsqueda, no una validación epistémica. WiPhy devuelve afirmaciones extraídas de papers — la presencia de una afirmación en el corpus no significa que sea ciencia asentada. Cruza los resultados con los niveles epistémicos usados en el resto del agente (established / mainstream / speculative / philosophy / metaphor)."
+    },
+    "claimAnalyzer": {
+      "title": "Analizador de afirmaciones",
+      "subtitle": "Pega una afirmación fuerte sobre física, consciencia, cosmología o teoría de la simulación. El analizador la descompone en: qué parte tiene evidencia, qué parte es sobre-extensión, y cómo decir lo mismo con honestidad epistémica.",
+      "claimLabel": "La afirmación a analizar",
+      "placeholder": "p. ej. «El universo es una simulación que corre sobre consciencia cuántica, y los observadores crean la realidad física».",
+      "analyzeBtn": "Analizar",
+      "analyzing": "Analizando…",
+      "orTryExample": "o carga un ejemplo →",
+      "examples": {
+        "simulation": "El universo es literalmente una simulación por ordenador, y el hecho de que la mecánica cuántica tenga efectos de resolución mínima demuestra que vivimos en una.",
+        "consciousness": "La consciencia colapsa la función de onda cuántica, lo que significa que la mente es lo que crea la realidad física a nivel fundamental.",
+        "observer": "La relatividad general y la mecánica cuántica requieren un observador, así que el observador debe ser una característica fundamental del universo mismo."
+      },
+      "verdictLabel": "Veredicto epistémico",
+      "verdict": {
+        "mostly_solid": "Mayormente sólido",
+        "mixed": "Mixto",
+        "mostly_overreach": "Mayormente sobre-extensión",
+        "unsupported": "Sin respaldo"
+      },
+      "sections": {
+        "coreScientific": "Núcleo científico — lo que respalda la evidencia",
+        "overreach": "Sobre-extensión — lo que va más allá de la evidencia",
+        "reformulation": "Reformulación — la misma idea, con honestidad",
+        "keyTerms": "Términos clave"
+      },
+      "overreachTypes": {
+        "unsupported": "Sin evidencia",
+        "category_error": "Error de categoría",
+        "conflation": "Confusión de conceptos",
+        "overgeneralization": "Sobregeneralización",
+        "philosophical_leap": "Salto filosófico"
+      },
+      "keyTermsHint": "Pulsa un término para buscarlo en el corpus de física WiPhy (nueva pestaña).",
+      "keyTermsHintBridge": "Pulsa un término para buscarlo en el corpus de física WiPhy dentro de la pestaña Buscador.",
+      "keyTermTitle": "Buscar este término en WiPhy",
+      "errors": {
+        "http": "El servidor devolvió HTTP {{status}}",
+        "network": "Error de red. Comprueba que el backend está funcionando y prueba de nuevo."
+      },
+      "disclaimer": "El analizador señala qué respalda la evidencia frente a dónde estás extrapolando — NO dice que la afirmación sea «verdadera» o «falsa». Cuando falta la clave del LLM, se muestra un mock estático (badge MOCK)."
     }
   },
 

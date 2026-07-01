@@ -444,6 +444,7 @@
       "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
       "wiphySearch": "WiPhy‑søk",
+      "claimAnalyzer": "Påstandsanalyse",
       "aiAsObserver": "KI som observatør",
       "substrateQuestion": "Substrat‑spørsmålet",
       "roadmap": "Veikart og kilder"
@@ -697,6 +698,48 @@
         "openInBrowser": "Åpne dette søket på wiphy.org"
       },
       "disclaimer": "Dette er et søkegrensesnitt, ikke en epistemisk validering. WiPhy returnerer påstander hentet fra papers — at en påstand finnes i korpuset betyr ikke at den er etablert vitenskap. Kryssjekk med de epistemiske nivåene som brukes andre steder i denne agenten (established / mainstream / speculative / philosophy / metaphor)."
+    },
+    "claimAnalyzer": {
+      "title": "Påstandsanalyse",
+      "subtitle": "Lim inn en sterk påstand om fysikk, bevissthet, kosmologi eller simuleringsteori. Analysatoren dekomponerer den i: hva som støttes av evidens, hva som er overekstensjon, og hvordan si det samme med epistemisk ærlighet.",
+      "claimLabel": "Påstanden som skal analyseres",
+      "placeholder": "f.eks. «Universet er en simulering som kjører på kvantebevissthet, og observatører skaper den fysiske virkeligheten.»",
+      "analyzeBtn": "Analyser",
+      "analyzing": "Analyserer…",
+      "orTryExample": "eller last et eksempel →",
+      "examples": {
+        "simulation": "Universet er bokstavelig talt en datasimulering, og det at kvantemekanikken har effekter med minimal oppløsning beviser at vi lever i en.",
+        "consciousness": "Bevissthet får kvantebølgefunksjonen til å kollapse, noe som betyr at sinnet er det som skaper den fysiske virkeligheten på fundamentalt nivå.",
+        "observer": "Generell relativitet og kvantemekanikk krever begge en observatør, så observatøren må være en grunnleggende egenskap ved universet selv."
+      },
+      "verdictLabel": "Epistemisk dom",
+      "verdict": {
+        "mostly_solid": "Stort sett solid",
+        "mixed": "Blandet",
+        "mostly_overreach": "Stort sett overekstensjon",
+        "unsupported": "Uten støtte"
+      },
+      "sections": {
+        "coreScientific": "Vitenskapelig kjerne — det evidensen støtter",
+        "overreach": "Overekstensjon — det som går utover evidensen",
+        "reformulation": "Omformulering — samme idé, ærlig innramming",
+        "keyTerms": "Nøkkelbegreper"
+      },
+      "overreachTypes": {
+        "unsupported": "Ingen evidens",
+        "category_error": "Kategorifeil",
+        "conflation": "Sammenblanding",
+        "overgeneralization": "Overgeneralisering",
+        "philosophical_leap": "Filosofisk sprang"
+      },
+      "keyTermsHint": "Klikk et begrep for å søke i WiPhy fysikk-korpuset i en ny fane.",
+      "keyTermsHintBridge": "Klikk et begrep for å søke i WiPhy fysikk-korpuset inne i Søk-fanen.",
+      "keyTermTitle": "Søk dette begrepet i WiPhy",
+      "errors": {
+        "http": "Serveren returnerte HTTP {{status}}",
+        "network": "Nettverksfeil. Sjekk at backend kjører og prøv igjen."
+      },
+      "disclaimer": "Analysatoren markerer hva evidensen støtter kontra hvor du ekstrapolerer — den sier IKKE at påstanden er «sann» eller «falsk». Når LLM-nøkkelen mangler, vises en statisk mock (MOCK-merke)."
     }
   },
   "robomindClinic": {
