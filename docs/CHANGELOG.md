@@ -7,6 +7,163 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.18.4] - 2026-07-02
+
+### Added — Self-Simulating Reality Agent expanded (V1+V2+V3): 5 → 10 tabs
+
+Five sessions of work land in one release. The agent went from a curated
+reading module to a fully interactive one — retaining its epistemic discipline
+throughout. The five additions, in order of arrival:
+
+**1. Celestial Holography as the 8th theory + Featured Voice: Sabrina Gonzalez Pasterski**
+
+The Theory Tour tab now lists Celestial Holography as an 8th entry with the
+`mainstream` epistemic level — an active peer-reviewed physics programme that
+provides a close structural parallel to OPH (both encode higher-dimensional
+information on a lower-dimensional boundary; the epistemic difference is that
+celestial holography is research on gravitons and amplitudes while OPH
+extends the same shape toward observers/consciousness).
+
+Below the theory rows, a new "Featured Voice" card highlights **Sabrina Gonzalez
+Pasterski** — Faculty at the Perimeter Institute and Deputy Director of the
+Simons Collaboration on Celestial Holography, discoverer (with Strominger and
+Zhiboedov) of the gravitational spin memory effect. The card links to her
+Perimeter profile, the Simons Collaboration site, `physicsgirl.com`, and the
+canonical arXiv review (2111.11392). The role of the card is anchoring: the
+module names a real working researcher, not just a paper.
+
+**2. WiPhy Search tab — live queries against Pasterski's public physics-claims corpus**
+
+New `WiphySearch.jsx` tab (icon 🔍) queries `https://wiphy.org/api/search?q=...`
+directly from the browser — WiPhy is Pasterski's MCP server for physics-claim
+retrieval (`~10 155 papers · 13 508 abstract-only · 361 273 claims · 17 953
+concepts` as of integration). The corpus stats endpoint (`/api/stats`) is
+also called on mount for the header display.
+
+The design is defensive: the JSON parser accepts both camelCase and snake_case
+field names via a `pick(obj, ...keys)` helper, and results are unwrapped from
+any of `[...]`, `{results: [...]}`, `{items: [...]}` or `{hits: [...]}`.
+Errors are differentiated as `cors` / `http` / `network` with distinct copy —
+the CORS panel explicitly recommends the escape hatch link "Open this search
+on wiphy.org" so the user is never stuck. `paper_id` values are linkified to
+`https://arxiv.org/abs/<id>`.
+
+An epistemic disclaimer panel closes the tab: "WiPhy returns claims extracted
+from papers — a claim's presence in the corpus does not mean it is settled
+science. Cross-reference with the epistemic levels used elsewhere in this
+agent."
+
+**3. Claim Analyzer tab (V2) — backend LLM decomposes strong claims**
+
+Two new files:
+- `backend/services/claim_analyzer.py` — `analyze_claim(claim, lang)` calls
+  `ask_ai_unified` with a strict JSON-only system prompt returning
+  `{core_scientific, overreach, reformulation, epistemic_verdict, key_terms}`.
+  Trilingual mock (EN/ES/NO) with a realistic example ("Consciousness creates
+  physical reality" → category_error) so the tab never returns empty.
+- `backend/routers/claim_analyzer.py` — `POST /api/claim-analyzer/analyze`
+  with Pydantic validation (max 4000 chars, `lang ∈ {en,es,no}`).
+
+The frontend `ClaimAnalyzer.jsx` renders 5 panels in fixed order:
+1. **Verdict badge** — `mostly_solid` / `mixed` / `mostly_overreach` / `unsupported`
+2. **Scientific core** (green) — each part with its evidence level as a badge
+3. **Overreach** (red) — each part with one of 5 typed labels: `unsupported`,
+   `category_error`, `conflation`, `overgeneralization`, `philosophical_leap`
+4. **Reformulation** (violet) — the same idea with epistemic honesty preserved
+5. **Key terms** — clickable chips that bridge to WiPhy Search via a shell-level
+   `{query, nonce}` state; the nonce forces re-execution even for the same term
+
+The disciplinary rule of the whole module holds here: the analyzer **never**
+says a claim is "true" or "false". It says what has evidence, where the speaker
+is extrapolating, and how to phrase it honestly.
+
+**4. Playground tab (V3) — Theory Map + Observer Patch Simulator**
+
+Grouped in one tab (icon 🎨) with two vertically-stacked tools:
+
+- `playground/TheoryMap.jsx` — pure SVG (no react-flow), 8 theory nodes with
+  OPH centered and 7 satellites hand-positioned by structural affinity
+  (`holographic` next to `celestialHolography`; `iit` next to `gnw`). 9 typed
+  edges rendered with distinct colours and dash patterns: `provides_form`,
+  `structural_parallel`, `competes_with`, `candidate_measure`, `de_mystifies`,
+  `different_framing`, `supports_side`, `extends_to_flat`. Node click →
+  detail panel reading from the same `theoryTour.rows.*` i18n keys the Tour
+  tab uses (single source of truth — updating a theory's text in the Tour
+  automatically updates it in the Map).
+
+- `playground/ObserverPatchSimulator.jsx` — HTML5 Canvas 720×380,
+  `requestAnimationFrame` loop with `cancelAnimationFrame` cleanup on unmount
+  and on pause. N patches (3-15) with position/velocity/state; per-tick rules
+  are (a) brownian motion + wall bounces + 0.98 damping, (b) pairwise overlap
+  → state convergence with configurable strength (0.001-0.05). Overlap zones
+  render as translucent ellipses tinted with the mean state colour — the user
+  should read those as "public reality". A live consensus metric
+  `1 - std(states)` grows toward 100% without any global coordinator, which
+  is exactly the pedagogical point OPH makes about overlap consistency being
+  the fixed-point.
+
+Both tools carry the module's "toy / not physics" disclaimer.
+
+**5. Sidebar and shell wiring**
+
+`SelfSimRealityAgent.jsx` grew from 7 → 10 tabs and now holds shell-level
+state `wiphyPrefill = {query, nonce}` for the cross-tab bridge from Claim
+Analyzer to WiPhy Search. `WiphySearch` accepts `prefillQuery` and
+`prefillNonce` props and auto-runs the search when the nonce bumps
+(via a nonce-watching effect rather than a plain query-watching effect,
+so clicking the same term twice still re-runs).
+
+### Fixed — GPT-5.x / o1 / o3 models rejecting `temperature=0.7`
+
+**Symptom:** the Claim Analyzer's live LLM call returned HTTP 400 with
+`"Unsupported value: 'temperature' does not support 0.7 with this model.
+Only the default (1) value is supported."` Same failure applied to every
+module that routed through `ask_ai_unified` with a GPT-5 family model —
+Humanizing AI evaluation/rewrite, Japanese/Chinese/Korean Teacher
+conversation, Test Humanitas rubric, AGI benefits enrichment, and Prompt
+Managers all fell back to their mock branches unnecessarily.
+
+**Fix:** `backend/llm.py::_normalize_params_for_model` already identified
+GPT-5 / o1 / o3 models to rewrite `max_tokens → max_completion_tokens`.
+It now also drops `temperature` and `top_p` for those models, letting the
+API apply its enforced default of 1. Dropping is cleaner than forcing 1
+because if OpenAI eventually loosens the restriction, this code doesn't
+need to change again.
+
+**Verification:** re-ran the Claim Analyzer with `gpt-5.5` and confirmed
+`is_mock: False`, 3 core claims, 3 overreaches, verdict `mostly_overreach`,
+6 real physics `key_terms` returned in Spanish.
+
+### Files changed
+
+- `backend/services/claim_analyzer.py` (new — 240 lines)
+- `backend/routers/claim_analyzer.py` (new — 30 lines)
+- `backend/app.py` — registers the claim_analyzer router
+- `backend/llm.py` — extended `_normalize_params_for_model` to drop
+  `temperature` and `top_p` on GPT-5 / o1 / o3
+- `frontend/src/SelfSimRealityAgent.jsx` — 3 new tabs registered (WiPhy Search,
+  Claim Analyzer, Playground); cross-tab bridge state `{query, nonce}`
+- `frontend/src/self-sim-reality/TheoryTour.jsx` — 8th theory row +
+  Featured Voice card
+- `frontend/src/self-sim-reality/RoadmapAndSources.jsx` — 4 new sources
+  (Pasterski Perimeter, Simons, arXiv 2111.11392, physicsgirl.com) +
+  "candidate integrations" block for wiphy.org MCP status
+- `frontend/src/self-sim-reality/WiphySearch.jsx` (new — 316 lines)
+- `frontend/src/self-sim-reality/ClaimAnalyzer.jsx` (new — 350 lines)
+- `frontend/src/self-sim-reality/Playground.jsx` (new — 30 lines)
+- `frontend/src/self-sim-reality/playground/TheoryMap.jsx` (new — 254 lines)
+- `frontend/src/self-sim-reality/playground/ObserverPatchSimulator.jsx` (new — 320 lines)
+- `frontend/src/i18n/locales/{en,es,no}/common.json` — Celestial Holography
+  theory row (5 keys), Featured Voice block (Pasterski, 9 keys), WiPhy Search
+  block (17 keys), Claim Analyzer block (17 keys with nested verdict/section/
+  overreach/example lookups), Playground block (17 keys with node/relation
+  lookups). All three locales updated in parity.
+- `.claude/MODULES_REFERENCE.md` — row 16 rewritten to reflect the 10-tab state
+- `docs/self-sim-reality-agent-plan.md` — new §14 "1.18.4 additions"
+- `docs/CHANGELOG.md` — this entry
+
+---
+
 ## [1.18.3] - 2026-06-09
 
 ### Fixed — Lighthouse "Flaskehalser" panel no longer lists metric audits

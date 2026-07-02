@@ -347,4 +347,192 @@ Never say "this is true". Always say "this belongs to level X".
 
 ---
 
-*Last updated: 2026-06-XX (V0 ships in 1.17.0 alongside this document)*
+## 14. 1.18.4 additions — Celestial Holography, Pasterski, WiPhy, Claim Analyzer, Playground
+
+By 1.18.4 the agent has grown from V0 (curated reading material only) into a
+V0+V1+V2+V3 hybrid: still epistemically disciplined, now interactive. This
+section documents what was added and why.
+
+### 14.1 Celestial Holography as the 8th theory
+
+Added to `TheoryTour.jsx` as `celestialHolographyLevel: "mainstream"` — an
+active peer-reviewed physics programme (Simons Collaboration, arXiv reviews)
+that proposes a duality between the gravitational S-matrix in 4D asymptotically
+flat spacetime and a 2D CFT on the celestial sphere. Soft theorems become
+Ward identities of asymptotic symmetries organised into the w₁₊∞ algebra.
+
+The pedagogical reason this theory is critical: it is the closest mainstream
+analogue of what OPH does structurally (encode higher-dimensional bulk
+information on a lower-dimensional boundary), but stays firmly in physics —
+no consciousness, no observer patches. Having it in the Theory Tour lets a
+reader see how far the "shape" of OPH already lives in accepted physics, and
+where OPH specifically extends past that.
+
+### 14.2 Featured Voice — Sabrina Gonzalez Pasterski
+
+Below the theory rows, TheoryTour now renders a "Featured Voice" card
+highlighting Pasterski (Perimeter Institute faculty, Deputy Director of the
+Simons Collaboration on Celestial Holography, discoverer of the gravitational
+spin memory effect with Strominger and Zhiboedov). The card includes four
+external links:
+
+- `perimeterinstitute.ca/people/sabrina-pasterski` — Perimeter profile
+- `simonscelestialholographycollaboration.org` — the collaboration
+- `physicsgirl.com` — her personal page
+- `arxiv.org/abs/2111.11392` — the canonical Celestial Holography review
+
+The card exists because a philosophical module needs at least one named
+working researcher to feel real — otherwise it reads as a list of ideas
+without anyone doing the work. Pasterski was chosen because she both
+(a) leads the most relevant mainstream programme (celestial holography)
+and (b) publishes the corpus that powers WiPhy (§14.3).
+
+### 14.3 WiPhy Search tab (V1-shaped, frontend-only)
+
+New tab `WiphySearch.jsx` — thin browser UI over `wiphy.org/api/search?q=...`.
+WiPhy is Pasterski's public MCP server for physics-claim retrieval. As of
+integration the corpus reports ~10 155 papers · 13 508 abstract-only · 361 273
+claims · 17 953 concepts.
+
+Two endpoints called from the browser:
+- `GET /api/stats` on mount → header stats block (best-effort; hidden on
+  failure, no error surfaced)
+- `GET /api/search?q=<query>` on submit → result list
+
+The JSON parser is intentionally defensive:
+- `pick(obj, ...keys)` reads a field from any of camelCase or snake_case
+  variants (`paper_id` / `paperId` / `arxiv_id` / `id`, etc.)
+- `extractResults(json)` accepts `[...]`, `{results:[]}`, `{items:[]}` or
+  `{hits:[]}`
+- `paper_id` values are linkified to `arxiv.org/abs/<id>`
+- Errors split into `cors` / `http` / `network` with distinct copy; the
+  CORS panel offers "Open this search on wiphy.org" as an escape hatch
+
+This is **not** a full MCP integration. WiPhy speaks MCP on `/mcp` for
+Claude Desktop / agent-framework clients, not for browsers. The `/api/search`
+REST facade is what browsers can reach without a backend proxy. The
+Roadmap tab flags the full-MCP-tool integration as still pending backend
+work (would let the RAG chat agent invoke WiPhy as a first-class tool
+during a conversation, not just show a result list).
+
+### 14.4 Claim Analyzer tab (V2)
+
+The single most useful pedagogical piece added in this cycle. Two backend
+files:
+
+- `backend/services/claim_analyzer.py` — `analyze_claim(claim, lang)` uses
+  `ask_ai_unified` with a strict JSON-only system prompt. The response
+  schema is `{core_scientific[], overreach[], reformulation, epistemic_verdict, key_terms[]}`.
+  Trilingual mock (EN/ES/NO) with a realistic example so the tab never
+  returns empty.
+- `backend/routers/claim_analyzer.py` — `POST /api/claim-analyzer/analyze`,
+  Pydantic-validated (`lang ∈ {en,es,no}`, `claim` max 4000 chars).
+
+The system prompt discipline mirrors the module's rule: the analyzer never
+says a claim is "true" or "false". It says what has evidence, where the
+speaker is extrapolating, and how to phrase it honestly. Overreach types
+are drawn from a fixed enum: `unsupported` (no evidence for this specific
+part), `category_error` (confuses two categories — e.g. mind & universe),
+`conflation` (merges two distinct concepts — e.g. observer as physical
+system vs conscious observer), `overgeneralization` (extrapolates a domain
+result beyond scope), `philosophical_leap` (valid philosophy dressed as
+physics).
+
+Frontend `ClaimAnalyzer.jsx` renders 5 panels in fixed order — verdict badge
++ scientific core + overreach + reformulation + key terms. The key terms
+are bridged to the WiPhy Search tab through a shell-level `{query, nonce}`
+state. The nonce (not just the query) is what triggers the re-run — this
+means clicking the same term twice still fires the search, whereas a plain
+query-watching effect would bail out.
+
+### 14.5 Playground tab (V3) — Theory Map + Observer Patch simulator
+
+Grouped in one tab because they're a matched pair: the map shows OPH's
+neighbours in idea-space, the simulator shows the mechanism OPH proposes
+in action.
+
+**Theory Map** (`playground/TheoryMap.jsx`) — pure SVG, no library. 8 nodes
+with OPH centered and 7 satellites positioned by structural affinity
+(`holographic` and `celestialHolography` neighbours; `iit` and `gnw`
+neighbours since they compete). 9 typed edges rendered with distinct colours
+and dash patterns. Clicking a node reads from the same `theoryTour.rows.*`
+i18n keys the Theory Tour uses — single source of truth. Update a theory in
+the Tour, and the Map picks up the change automatically.
+
+**Observer Patch Simulator** (`playground/ObserverPatchSimulator.jsx`) —
+HTML5 Canvas 720×380, `requestAnimationFrame` with `cancelAnimationFrame`
+cleanup on unmount and on pause. N patches (3-15 via slider) with
+position/velocity/state ∈ [-1, 1] mapped to hue. Per-tick rules:
+
+1. Brownian motion + wall bounces + 0.98 velocity damping
+2. Pairwise overlap → symmetric state convergence with strength k
+   (0.001-0.05, slider)
+3. In overlap zones a translucent ellipse renders the mean-state colour —
+   the user reads that as "public reality"
+
+Live consensus metric = `1 - std(states)`, plotted as a violet bar that
+grows toward 100% without any global coordinator. This is the pedagogical
+punchline: consensus emerges from local overlap alone, which is exactly
+OPH's claim about "public reality is the fixed-point of overlap consistency".
+
+Both tools carry a disclaimer: not physics, not consciousness, just
+intuition pumps.
+
+### 14.6 Shell wiring changes
+
+`SelfSimRealityAgent.jsx` grew from 7 → 10 tabs. Order matters:
+
+1. Overview
+2. Core Concepts
+3. OPH Mechanics
+4. Theory Tour *(← Celestial Holography + Featured Voice added here)*
+5. **WiPhy Search** *(← new)*
+6. **Claim Analyzer** *(← new)*
+7. **Playground** *(← new)*
+8. AI as Observer
+9. Substrate Question
+10. Roadmap
+
+The three new tabs cluster in the middle — "operational" tools between the
+descriptive tabs (1-4) and the philosophical tabs (8-9). Roadmap stays last.
+
+Shell state added:
+```
+const [wiphyPrefill, setWiphyPrefill] = useState({ query: '', nonce: 0 });
+```
+`ClaimAnalyzer` receives an `onSearchWiphy(term)` callback that bumps the
+nonce and switches to the WiPhy tab. `WiphySearch` reads both props and
+uses a nonce-watching effect to auto-run the search.
+
+### 14.7 GPT-5.x temperature fix
+
+Discovered while smoke-testing the Claim Analyzer: `ask_ai_unified` was
+routing to `gpt-5.5` with `temperature=0.7`, which OpenAI rejects with
+HTTP 400. Every downstream module (Humanizing AI, Japanese/Chinese/Korean
+Teacher conversation, Test Humanitas, AGI benefits enrichment, Prompt
+Managers) was silently falling back to their mocks because of it.
+
+`backend/llm.py::_normalize_params_for_model` already identified GPT-5 /
+o1 / o3 models to rewrite `max_tokens → max_completion_tokens`. Extended
+it to also drop `temperature` and `top_p` for those models. Dropping is
+cleaner than forcing 1 — if OpenAI eventually loosens the restriction,
+this code doesn't need to change.
+
+### 14.8 Reference stats after 1.18.4
+
+- 10 tabs (from 5 in V0, 7 after OPH Mechanics + Substrate Question added
+  earlier in the 1.17.x cycle)
+- 4 new frontend components (WiphySearch, ClaimAnalyzer, Playground, plus
+  playground/{TheoryMap, ObserverPatchSimulator})
+- 2 new backend files (claim_analyzer service + router)
+- 1 shared backend fix (llm.py temperature normalisation) with cascading
+  effect on ~8 other modules
+- 3 new panels in the existing TheoryTour (Celestial Holography row +
+  Featured Voice + updated Roadmap sources)
+- ~60 new i18n keys per locale (Celestial Holography row, Featured Voice
+  card, WiPhy Search tab, Claim Analyzer tab, Playground tab) — full parity
+  across EN/ES/NO
+
+---
+
+*Last updated: 2026-07-02 (1.18.4 documents V0+V1+V2+V3 all shipped)*
