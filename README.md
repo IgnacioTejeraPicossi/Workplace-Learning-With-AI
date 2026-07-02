@@ -145,6 +145,36 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 **Optional environment variables for Red Cross Web QA**:
 - `ADO_PAT` (or `AZURE_DEVOPS_PAT`) — Azure DevOps Personal Access Token with `Work Items: Read & Write` scope. When set, `POST /api/qa/security/findings/{id}/dispatch-ado` creates a real ADO work item via the REST API; when absent, dispatch falls back to a deterministic mock so the workshop UX remains green. Never commit the value — read from `.env` only.
 
+### Self-Simulating Reality Agent (1.18.4 · July 2026 — V0+V1+V2+V3)
+
+A serious-toned, epistemically disciplined companion for the most speculative idea on the roadmap: the proposition that observers, minds or consciousness participate in constructing the universe they experience. The anchor framework is **Observer Patch Holography (OPH)** by Bernhard Mueller et al. The agent's guiding phrase — *"I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination"* — is non-negotiable. Every claim passes through a 5-level epistemic classifier (`established / mainstream / speculative / philosophy / metaphor / unsupported`) before it leaves.
+
+Located in the sidebar under **Future Item Agents** (icon 🌀). **10 tabs**:
+
+1. 🎯 **Overview** — mission, guiding phrase, 5 epistemic levels
+2. 📚 **Core Concepts** — 5 OPH cards from Mueller's presentation
+3. ⚙️ **OPH Mechanics** — technical details of the observer-patch model
+4. 🧭 **Theory Tour** — **8 theories** (Friston Predictive Processing, Rovelli Relational QM, 't Hooft/Susskind Holographic, Bostrom Simulation, Tononi IIT, Dehaene GNW, **Celestial Holography**, OPH) each with author + epistemic level + relation to OPH. Below the theory rows: a **Featured Voice card for Sabrina Gonzalez Pasterski** (Faculty at Perimeter Institute, Deputy Director of the Simons Collaboration on Celestial Holography, discoverer of the gravitational spin memory effect with Strominger and Zhiboedov) with links to her Perimeter profile, Simons Collaboration, `physicsgirl.com`, and the canonical arXiv review 2111.11392.
+5. 🔍 **WiPhy Search** *(NEW · V1)* — live queries against `wiphy.org/api/search`, Pasterski's public MCP server for physics-claim retrieval (~10 155 papers · 361 273 claims · 17 953 concepts). Corpus stats block on mount + defensive JSON parser (accepts multiple field-name and wrapper shapes) + differentiated `cors` / `http` / `network` error copy with "Open on wiphy.org" escape hatch. Paper IDs linkify to arXiv.
+6. 🔬 **Claim Analyzer** *(NEW · V2)* — paste a strong claim (e.g. *"consciousness collapses the wavefunction"*) and the backend LLM returns 5 panels: **epistemic verdict** badge (`mostly_solid / mixed / mostly_overreach / unsupported`), **scientific core** (each part with its evidence level), **overreach** (each part labelled with one of 5 types: `unsupported / category_error / conflation / overgeneralization / philosophical_leap`), **reformulation** in the same idea's honest register, and **key terms** as clickable chips. Clicking a term bridges to the WiPhy Search tab with the search auto-run via a `{query, nonce}` shell-level state.
+7. 🎨 **Playground** *(NEW · V3)* — two matched educational tools stacked vertically: **Theory Map** (pure SVG, 8 nodes with OPH centered and 7 satellites hand-positioned by structural affinity; 9 typed edges with distinct colours: `provides_form`, `structural_parallel`, `competes_with`, `candidate_measure`, `de_mystifies`, `different_framing`, `supports_side`, `extends_to_flat`; click a node → info panel reading from the same i18n keys as Theory Tour) and **Observer Patch Simulator** (HTML5 Canvas 720×380 with `requestAnimationFrame` + `cancelAnimationFrame` cleanup; N patches with brownian motion + wall bounces + pairwise-overlap state convergence; live consensus metric `1 - std(states)` grows toward 100% without any global coordinator — the pedagogical punchline).
+8. 🧠 **AI as Observer** — 5 thought experiments about whether AIs can be observer patches
+9. 🌌 **Substrate Question** — 7 philosophical sections extending OPH's ontology (hard problem, substrate vs experience, cosmological convergence, recursive-understanding hypothesis, Platonic question, linguistic boundary, three honest positions)
+10. 🗺️ **Roadmap & Sources** — V0→V3 phases + 14 reference links (OPH repo/learn/book, Mueller X, Bostrom, Rovelli, Susskind, Friston, IIT, GNW, **Pasterski Perimeter, Simons Collaboration, arXiv 2111.11392, physicsgirl.com**) + candidate integrations block for full `wiphy.org/mcp` MCP tool integration (pending backend work)
+
+**Backend**:
+- `backend/services/claim_analyzer.py` + `backend/routers/claim_analyzer.py` — `POST /api/claim-analyzer/analyze` returning `{core_scientific[], overreach[], reformulation, epistemic_verdict, key_terms[]}` with strict JSON-only LLM prompt and trilingual mock fallback.
+- `backend/llm.py::_normalize_params_for_model` extended in 1.18.4 to drop `temperature` and `top_p` on GPT-5.x / o1 / o3 models (they only accept the default 1) — cascading fix that unblocked ~8 other modules that were silently falling back to their mocks.
+
+**Frontend** (`frontend/src/self-sim-reality/` + `frontend/src/SelfSimRealityAgent.jsx`):
+- 4 new components in 1.18.4: `WiphySearch.jsx` (316 lines), `ClaimAnalyzer.jsx` (350 lines), `Playground.jsx` (30 lines), `playground/TheoryMap.jsx` (254 lines), `playground/ObserverPatchSimulator.jsx` (320 lines).
+- Shell-level cross-tab state `{query, nonce}` bridging Claim Analyzer → WiPhy Search.
+- Single source of truth: Theory Map reads the same `theoryTour.rows.*` i18n keys as the Theory Tour tab, so updating a theory in one place propagates automatically.
+
+**i18n**: Full **EN / ES / NO** parity — ~60 new keys per locale in 1.18.4 (Celestial Holography row, Featured Voice card, WiPhy Search, Claim Analyzer, Playground). Total ~180 leaves per locale for this module.
+
+See `docs/self-sim-reality-agent-plan.md` §14 for the full 1.18.4 retrospective and `docs/CHANGELOG.md` [1.18.4].
+
 ### AGI Hub — "Homo Sapiens vs. KI i Test" tab (April 2026)
 
 Fourth tab in the AGI Progress Hub, purpose-built as a **workshop companion for SOCO** (Norwegian software-testing consultancy). Targeted at the "Homo Sapiens vs. KI" session with Ola Kleiven and Keyhan Farahaninia.
