@@ -1,0 +1,134 @@
+{
+  "norwegianMentorModule": {
+    "title": "Norsk Mester AI",
+    "tagline": "Perfeksjonér norsken din — tonelag, V2-ordstilling og småordene ingen kurs lærer bort",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "SPRÅK-AGENTER",
+    "tabs": {
+      "dashboard": "Panel",
+      "pronunciation": "Uttale & Tonelag",
+      "grammar": "Grammatikk",
+      "smaord": "Småord",
+      "vocabulary": "Ordforråd SRS",
+      "bridge": "Germansk bro",
+      "conversation": "Samtale",
+      "writing": "Skriving og stil",
+      "culture": "Kultur"
+    },
+    "dashboard": {
+      "title": "I dag",
+      "subtitle": "Ditt daglige panel for å perfeksjonere norsken",
+      "level": "Gjeldende nivå",
+      "target": "CEFR-mål",
+      "streak": "Strekk",
+      "days": "dager",
+      "todaysMission": "Dagens oppdrag",
+      "tonemes": "Tonem",
+      "grammar": "Grammatikkpunkter",
+      "smaord": "Småord",
+      "vocabKnown": "Ordforråd kjent",
+      "bridge": "Bro-oppføringer",
+      "continue": "Fortsett å lære",
+      "loading": "Laster panelet…",
+      "missionLabels": {
+        "tonelag": "tonempar",
+        "grammatikk": "grammatikkpunkter",
+        "smaord": "småord",
+        "srs": "ordforrådsgjennomganger",
+        "conversation": "samtale"
+      }
+    },
+    "pronunciation": {
+      "title": "Uttale og tonelag",
+      "subtitle": "Lydene og de to tonemene som får norsk til å høres norsk ut",
+      "noVoice": "Ingen norsk stemme installert. Installer en norsk (nb-NO) TTS-stemme for uttale.",
+      "tonelagTitle": "Tonelag — tonefallet",
+      "tonemesTitle": "Tonempar",
+      "soundsTitle": "Lyder"
+    },
+    "grammar": {
+      "title": "Grammatikk",
+      "subtitle": "De strukturelle vanene som forblir vanskelige: V2-stilling, kjønn, bestemt form",
+      "explanation": "Forklaring",
+      "examples": "Eksempler",
+      "commonMistake": "Vanlig feil",
+      "prev": "Forrige",
+      "next": "Neste",
+      "of": "{{n}} av {{total}}",
+      "levels": {
+        "core": "grunnleggende",
+        "advanced": "avansert"
+      }
+    },
+    "smaord": {
+      "title": "Småord",
+      "subtitle": "De små ordene (jo, da, vel, altså) nordmenn bruker hele tiden — og ingen kurs lærer bort"
+    },
+    "vocabulary": {
+      "title": "Ordforråd SRS",
+      "subtitle": "Spaced repetition med vanlige bokmålsord",
+      "endOfSession": "Slutt på økten — godt jobbet!",
+      "newCard": "NY",
+      "stage": "Trinn",
+      "showAnswer": "Vis svar",
+      "again": "Igjen (feilet)",
+      "good": "Bra",
+      "easy": "Lett"
+    },
+    "bridge": {
+      "title": "Germansk bro — EN ↔ NO",
+      "subtitle": "Beslektede ord som hjelper og falske venner som lurer (du kan engelsk — bruk det)",
+      "tabFalse": "Falske venner",
+      "tabCognates": "Beslektede ord"
+    },
+    "conversation": {
+      "title": "Samtale",
+      "subtitle": "Rollespill hverdags- og jobbnorsk med en mentor som fanger V2-feil og forbedrer formuleringene dine",
+      "scenario": "Scenario",
+      "difficulty": "Nivå",
+      "startBtn": "Start samtale",
+      "yourReply": "Ditt svar på norsk…",
+      "send": "Send",
+      "sending": "Sender…",
+      "newConversation": "← Ny samtale",
+      "correction": "Rettelse",
+      "upgrade": "Mer naturlig måte å si det på",
+      "tip": "Tips"
+    },
+    "writing": {
+      "title": "Skriving og stil",
+      "subtitle": "Lim inn en norsk tekst og få B2/C1-tilbakemelding — ordstilling, kjønn, bestemt form, naturlighet",
+      "placeholder": "Lim inn en e-post, melding eller tekst på norsk…",
+      "register": "Målregister",
+      "analyzing": "Analyserer…",
+      "analyzeBtn": "Analyser",
+      "corrected": "Korrigert tekst",
+      "issues": "Problemer funnet",
+      "upgrades": "Mer innfødte forbedringer",
+      "registers": {
+        "formal": "formell",
+        "neutral": "nøytral",
+        "informal": "uformell"
+      },
+      "types": {
+        "word_order": "Ordstilling (V2)",
+        "gender": "Kjønn",
+        "definite_form": "Bestemt form",
+        "verb": "Verb",
+        "preposition": "Preposisjon",
+        "word_choice": "Ordvalg",
+        "naturalness": "Naturlighet"
+      }
+    },
+    "culture": {
+      "title": "Kultur",
+      "subtitle": "Janteloven, dugnad, kos og arbeidskultur — koden under språket",
+      "phrases": "Nyttige fraser"
+    },
+    "common": {
+      "loading": "Laster…",
+      "error": "Noe gikk galt",
+      "retry": "Prøv igjen"
+    }
+  }
+}

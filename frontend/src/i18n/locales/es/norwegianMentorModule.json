@@ -1,0 +1,134 @@
+{
+  "norwegianMentorModule": {
+    "title": "Norsk Mester AI",
+    "tagline": "Perfecciona tu noruego — acento tonal, orden V2 y las palabritas que ningún curso enseña",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "AGENTES DE IDIOMAS",
+    "tabs": {
+      "dashboard": "Panel",
+      "pronunciation": "Uttale & Tonelag",
+      "grammar": "Gramática",
+      "smaord": "Småord",
+      "vocabulary": "Vocabulario SRS",
+      "bridge": "Puente Germánico",
+      "conversation": "Conversación",
+      "writing": "Escritura y Estilo",
+      "culture": "Kultur"
+    },
+    "dashboard": {
+      "title": "Hoy",
+      "subtitle": "Tu tablero diario de perfeccionamiento del noruego",
+      "level": "Nivel actual",
+      "target": "Objetivo CEFR",
+      "streak": "Racha",
+      "days": "días",
+      "todaysMission": "Misión de hoy",
+      "tonemes": "Tonemas",
+      "grammar": "Puntos de gramática",
+      "smaord": "Småord",
+      "vocabKnown": "Vocabulario aprendido",
+      "bridge": "Entradas del puente",
+      "continue": "Continuar aprendiendo",
+      "loading": "Cargando panel…",
+      "missionLabels": {
+        "tonelag": "pares de tonemas",
+        "grammatikk": "puntos de gramática",
+        "smaord": "småord",
+        "srs": "repasos de vocabulario",
+        "conversation": "conversación"
+      }
+    },
+    "pronunciation": {
+      "title": "Pronunciación y Acento Tonal",
+      "subtitle": "Los sonidos y los dos tonemas que hacen que el noruego suene noruego",
+      "noVoice": "No hay voz noruega instalada. Instala una voz TTS noruega (nb-NO) para la pronunciación.",
+      "tonelagTitle": "Tonelag — el acento tonal",
+      "tonemesTitle": "Pares de tonemas",
+      "soundsTitle": "Sonidos"
+    },
+    "grammar": {
+      "title": "Gramática",
+      "subtitle": "Los hábitos estructurales que siguen costando: orden V2, género, formas definidas",
+      "explanation": "Explicación",
+      "examples": "Ejemplos",
+      "commonMistake": "Error frecuente",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "of": "{{n}} de {{total}}",
+      "levels": {
+        "core": "básico",
+        "advanced": "avanzado"
+      }
+    },
+    "smaord": {
+      "title": "Småord",
+      "subtitle": "Las palabritas (jo, da, vel, altså) que los noruegos usan constantemente — y ningún curso enseña"
+    },
+    "vocabulary": {
+      "title": "Vocabulario SRS",
+      "subtitle": "Repetición espaciada con palabras frecuentes en Bokmål",
+      "endOfSession": "Fin de sesión — ¡godt jobbet!",
+      "newCard": "NUEVO",
+      "stage": "Etapa",
+      "showAnswer": "Mostrar respuesta",
+      "again": "Otra vez (falló)",
+      "good": "Bien",
+      "easy": "Fácil"
+    },
+    "bridge": {
+      "title": "Puente Germánico — EN ↔ NO",
+      "subtitle": "Cognados que ayudan y falsos amigos que engañan (sabes inglés — aprovéchalo)",
+      "tabFalse": "Falsos amigos",
+      "tabCognates": "Cognados"
+    },
+    "conversation": {
+      "title": "Conversación",
+      "subtitle": "Practica noruego cotidiano y laboral con un mentor que detecta errores de V2 y mejora tus frases",
+      "scenario": "Escenario",
+      "difficulty": "Nivel",
+      "startBtn": "Empezar conversación",
+      "yourReply": "Tu respuesta en noruego…",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "newConversation": "← Nueva conversación",
+      "correction": "Corrección",
+      "upgrade": "Forma más natural de decirlo",
+      "tip": "Consejo"
+    },
+    "writing": {
+      "title": "Escritura y Estilo",
+      "subtitle": "Pega un texto en noruego y recibe feedback B2/C1 — orden, género, formas definidas, naturalidad",
+      "placeholder": "Pega un email, mensaje o texto en noruego…",
+      "register": "Registro objetivo",
+      "analyzing": "Analizando…",
+      "analyzeBtn": "Analizar",
+      "corrected": "Texto corregido",
+      "issues": "Problemas encontrados",
+      "upgrades": "Mejoras más nativas",
+      "registers": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      },
+      "types": {
+        "word_order": "Orden (V2)",
+        "gender": "Género",
+        "definite_form": "Forma definida",
+        "verb": "Verbo",
+        "preposition": "Preposición",
+        "word_choice": "Elección de palabra",
+        "naturalness": "Naturalidad"
+      }
+    },
+    "culture": {
+      "title": "Kultur",
+      "subtitle": "Janteloven, dugnad, kos y cultura laboral — el código bajo el idioma",
+      "phrases": "Frases útiles"
+    },
+    "common": {
+      "loading": "Cargando…",
+      "error": "Algo salió mal",
+      "retry": "Reintentar"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "norwegianMentorModule": {
+    "title": "Norsk Mester AI",
+    "tagline": "Perfect your Norwegian — pitch accent, V2 word order, and the tiny words no course teaches",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "LANGUAGE AGENTS",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "pronunciation": "Uttale & Tonelag",
+      "grammar": "Grammatikk",
+      "smaord": "Småord",
+      "vocabulary": "Vocabulary SRS",
+      "bridge": "Germanic Bridge",
+      "conversation": "Conversation",
+      "writing": "Writing & Style",
+      "culture": "Kultur"
+    },
+    "dashboard": {
+      "title": "Today",
+      "subtitle": "Your daily Norwegian perfection board",
+      "level": "Current level",
+      "target": "CEFR target",
+      "streak": "Streak",
+      "days": "days",
+      "todaysMission": "Today's mission",
+      "tonemes": "Tonemes",
+      "grammar": "Grammar points",
+      "smaord": "Småord",
+      "vocabKnown": "Vocabulary known",
+      "bridge": "Bridge entries",
+      "continue": "Continue learning",
+      "loading": "Loading dashboard…",
+      "missionLabels": {
+        "tonelag": "toneme pairs",
+        "grammatikk": "grammar points",
+        "smaord": "småord",
+        "srs": "vocabulary reviews",
+        "conversation": "conversation"
+      }
+    },
+    "pronunciation": {
+      "title": "Pronunciation & Pitch Accent",
+      "subtitle": "The sounds and the two tonemes that make Norwegian sound Norwegian",
+      "noVoice": "No Norwegian voice installed. Install a Norwegian (nb-NO) TTS voice for pronunciation.",
+      "tonelagTitle": "Tonelag — the pitch accent",
+      "tonemesTitle": "Toneme pairs",
+      "soundsTitle": "Sounds"
+    },
+    "grammar": {
+      "title": "Grammatikk",
+      "subtitle": "The structural habits that stay hard: V2 order, gender, definite forms",
+      "explanation": "Explanation",
+      "examples": "Examples",
+      "commonMistake": "Common mistake",
+      "prev": "Previous",
+      "next": "Next",
+      "of": "{{n}} of {{total}}",
+      "levels": {
+        "core": "core",
+        "advanced": "advanced"
+      }
+    },
+    "smaord": {
+      "title": "Småord",
+      "subtitle": "The tiny filler words (jo, da, vel, altså) Norwegians use constantly — and no course teaches"
+    },
+    "vocabulary": {
+      "title": "Vocabulary SRS",
+      "subtitle": "Spaced repetition with frequent Bokmål words",
+      "endOfSession": "End of session — godt jobbet!",
+      "newCard": "NEW",
+      "stage": "Stage",
+      "showAnswer": "Show answer",
+      "again": "Again (failed)",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "bridge": {
+      "title": "Germanic Bridge — EN ↔ NO",
+      "subtitle": "Cognates that help and false friends that trip you up (you know English — use it)",
+      "tabFalse": "False friends",
+      "tabCognates": "Cognates"
+    },
+    "conversation": {
+      "title": "Conversation",
+      "subtitle": "Roleplay everyday & work Norwegian with a mentor that catches V2 errors and upgrades your phrasing",
+      "scenario": "Scenario",
+      "difficulty": "Level",
+      "startBtn": "Start conversation",
+      "yourReply": "Your reply in Norwegian…",
+      "send": "Send",
+      "sending": "Sending…",
+      "newConversation": "← New conversation",
+      "correction": "Correction",
+      "upgrade": "More natural way to say it",
+      "tip": "Tip"
+    },
+    "writing": {
+      "title": "Writing & Style",
+      "subtitle": "Paste a Norwegian text and get B2/C1 feedback — word order, gender, definite forms, naturalness",
+      "placeholder": "Paste an email, message or text in Norwegian…",
+      "register": "Target register",
+      "analyzing": "Analysing…",
+      "analyzeBtn": "Analyse",
+      "corrected": "Corrected text",
+      "issues": "Issues found",
+      "upgrades": "Native-like upgrades",
+      "registers": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      },
+      "types": {
+        "word_order": "Word order (V2)",
+        "gender": "Gender",
+        "definite_form": "Definite form",
+        "verb": "Verb",
+        "preposition": "Preposition",
+        "word_choice": "Word choice",
+        "naturalness": "Naturalness"
+      }
+    },
+    "culture": {
+      "title": "Kultur",
+      "subtitle": "Janteloven, dugnad, kos and work culture — the code beneath the language",
+      "phrases": "Useful phrases"
+    },
+    "common": {
+      "loading": "Loading…",
+      "error": "Something went wrong",
+      "retry": "Retry"
+    }
+  }
+}
