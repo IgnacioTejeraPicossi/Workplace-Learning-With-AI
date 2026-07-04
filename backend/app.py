@@ -254,6 +254,14 @@ try:
 except Exception as e:
     print(f"❌ Error including English Mastery router: {e}")
 
+# Norsk Mester AI router (Language Agents group)
+try:
+    from backend.routers.norwegian_mentor import router as norwegian_mentor_router
+    app.include_router(norwegian_mentor_router, tags=["Norsk Mester AI"])
+    print("✅ Norwegian Mentor router included successfully")
+except Exception as e:
+    print(f"❌ Error including Norwegian Mentor router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router
