@@ -1,0 +1,130 @@
+{
+  "englishMentorModule": {
+    "title": "English Mastery AI",
+    "tagline": "Perfect your advanced English — C1 → C2, tuned for Spanish speakers",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "LANGUAGE AGENTS",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "falseFriends": "False Friends",
+      "collocations": "Collocations",
+      "phrasalVerbs": "Phrasal Verbs",
+      "grammar": "Grammar Nuance",
+      "pronunciation": "Pronunciation",
+      "vocabulary": "Vocabulary SRS",
+      "conversation": "Conversation",
+      "writing": "Writing & Style"
+    },
+    "dashboard": {
+      "title": "Today",
+      "subtitle": "Your daily advanced-English board",
+      "level": "Current level",
+      "target": "CEFR target",
+      "streak": "Streak",
+      "days": "days",
+      "todaysMission": "Today's mission",
+      "falseFriends": "False friends",
+      "collocations": "Collocations",
+      "phrasalVerbs": "Phrasal verbs",
+      "vocabKnown": "Vocabulary known",
+      "srsDue": "SRS due today",
+      "continue": "Continue learning",
+      "loading": "Loading dashboard…",
+      "missionLabels": {
+        "falseFriends": "false friends",
+        "collocations": "collocations",
+        "phrasalVerbs": "phrasal verbs",
+        "srs": "vocabulary reviews",
+        "conversation": "conversation"
+      }
+    },
+    "falseFriends": {
+      "title": "False Friends",
+      "subtitle": "Words that look Spanish but mean something else — the classic advanced trap"
+    },
+    "collocations": {
+      "title": "Collocations",
+      "subtitle": "The right verb-noun pairings — where translating from Spanish goes wrong"
+    },
+    "phrasalVerbs": {
+      "title": "Phrasal Verbs & Idioms",
+      "subtitle": "The wall between C1 and native-like fluency",
+      "tabPhrasal": "Phrasal verbs",
+      "tabIdioms": "Idioms",
+      "separable": "separable",
+      "register": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      }
+    },
+    "grammar": {
+      "title": "Grammar Nuance",
+      "subtitle": "The C1/C2 points where Spanish interference persists",
+      "explanation": "Explanation",
+      "examples": "Examples",
+      "commonMistake": "Common mistake",
+      "prev": "Previous",
+      "next": "Next",
+      "of": "{{n}} of {{total}}"
+    },
+    "pronunciation": {
+      "title": "Pronunciation Lab",
+      "subtitle": "Minimal pairs and sounds Spanish speakers struggle with (UK 🔊 + US 🔊)",
+      "noVoice": "No English voice installed. Install an English TTS voice for pronunciation."
+    },
+    "vocabulary": {
+      "title": "Vocabulary SRS",
+      "subtitle": "Spaced repetition with C1/C2 words",
+      "endOfSession": "End of session — well done!",
+      "newCard": "NEW",
+      "stage": "Stage",
+      "showAnswer": "Show answer",
+      "again": "Again (failed)",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "conversation": {
+      "title": "Conversation",
+      "subtitle": "Roleplay with a register-aware mentor that corrects and upgrades your English",
+      "scenario": "Scenario",
+      "difficulty": "Level",
+      "startBtn": "Start conversation",
+      "yourReply": "Your reply in English…",
+      "send": "Send",
+      "sending": "Sending…",
+      "newConversation": "← New conversation",
+      "registerLabel": {
+        "formal": "Formal register",
+        "neutral": "Neutral register",
+        "informal": "Informal register"
+      },
+      "correction": "Correction",
+      "upgrade": "More native way to say it",
+      "tip": "Tip"
+    },
+    "writing": {
+      "title": "Writing & Style",
+      "subtitle": "Paste an English text and get C1/C2 feedback — errors, naturalness, register",
+      "placeholder": "Paste an email, essay or message in English…",
+      "register": "Target register",
+      "analyzing": "Analysing…",
+      "analyzeBtn": "Analyse",
+      "corrected": "Corrected text",
+      "issues": "Issues found",
+      "upgrades": "Native-like upgrades",
+      "types": {
+        "grammar": "Grammar",
+        "collocation": "Collocation",
+        "register": "Register",
+        "word_choice": "Word choice",
+        "naturalness": "Naturalness"
+      }
+    },
+    "common": {
+      "loading": "Loading…",
+      "error": "Something went wrong",
+      "retry": "Retry"
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "englishMentorModule": {
+    "title": "English Mastery AI",
+    "tagline": "Perfecciona tu inglés avanzado — C1 → C2, pensado para hispanohablantes",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "AGENTES DE IDIOMAS",
+    "tabs": {
+      "dashboard": "Panel",
+      "falseFriends": "Falsos Amigos",
+      "collocations": "Colocaciones",
+      "phrasalVerbs": "Phrasal Verbs",
+      "grammar": "Matices Gramaticales",
+      "pronunciation": "Pronunciación",
+      "vocabulary": "Vocabulario SRS",
+      "conversation": "Conversación",
+      "writing": "Escritura y Estilo"
+    },
+    "dashboard": {
+      "title": "Hoy",
+      "subtitle": "Tu tablero diario de inglés avanzado",
+      "level": "Nivel actual",
+      "target": "Objetivo CEFR",
+      "streak": "Racha",
+      "days": "días",
+      "todaysMission": "Misión de hoy",
+      "falseFriends": "Falsos amigos",
+      "collocations": "Colocaciones",
+      "phrasalVerbs": "Phrasal verbs",
+      "vocabKnown": "Vocabulario aprendido",
+      "srsDue": "SRS pendientes hoy",
+      "continue": "Continuar aprendiendo",
+      "loading": "Cargando panel…",
+      "missionLabels": {
+        "falseFriends": "falsos amigos",
+        "collocations": "colocaciones",
+        "phrasalVerbs": "phrasal verbs",
+        "srs": "repasos de vocabulario",
+        "conversation": "conversación"
+      }
+    },
+    "falseFriends": {
+      "title": "Falsos Amigos",
+      "subtitle": "Palabras que parecen españolas pero significan otra cosa — la trampa clásica del nivel avanzado"
+    },
+    "collocations": {
+      "title": "Colocaciones",
+      "subtitle": "La combinación correcta verbo-sustantivo — donde falla traducir del español"
+    },
+    "phrasalVerbs": {
+      "title": "Phrasal Verbs e Idioms",
+      "subtitle": "El muro entre C1 y la fluidez casi nativa",
+      "tabPhrasal": "Phrasal verbs",
+      "tabIdioms": "Idioms",
+      "separable": "separable",
+      "register": {
+        "formal": "formal",
+        "neutral": "neutral",
+        "informal": "informal"
+      }
+    },
+    "grammar": {
+      "title": "Matices Gramaticales",
+      "subtitle": "Los puntos C1/C2 donde persiste la interferencia del español",
+      "explanation": "Explicación",
+      "examples": "Ejemplos",
+      "commonMistake": "Error frecuente",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "of": "{{n}} de {{total}}"
+    },
+    "pronunciation": {
+      "title": "Laboratorio de Pronunciación",
+      "subtitle": "Pares mínimos y sonidos difíciles para hispanohablantes (UK 🔊 + US 🔊)",
+      "noVoice": "No hay voz inglesa instalada. Instala una voz TTS inglesa para la pronunciación."
+    },
+    "vocabulary": {
+      "title": "Vocabulario SRS",
+      "subtitle": "Repetición espaciada con palabras C1/C2",
+      "endOfSession": "Fin de sesión — ¡bien hecho!",
+      "newCard": "NUEVO",
+      "stage": "Etapa",
+      "showAnswer": "Mostrar respuesta",
+      "again": "Otra vez (falló)",
+      "good": "Bien",
+      "easy": "Fácil"
+    },
+    "conversation": {
+      "title": "Conversación",
+      "subtitle": "Practica con un mentor que corrige tu inglés y te sugiere versiones más nativas",
+      "scenario": "Escenario",
+      "difficulty": "Nivel",
+      "startBtn": "Empezar conversación",
+      "yourReply": "Tu respuesta en inglés…",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "newConversation": "← Nueva conversación",
+      "registerLabel": {
+        "formal": "Registro formal",
+        "neutral": "Registro neutral",
+        "informal": "Registro informal"
+      },
+      "correction": "Corrección",
+      "upgrade": "Forma más nativa de decirlo",
+      "tip": "Consejo"
+    },
+    "writing": {
+      "title": "Escritura y Estilo",
+      "subtitle": "Pega un texto en inglés y recibe feedback C1/C2 — errores, naturalidad, registro",
+      "placeholder": "Pega un email, redacción o mensaje en inglés…",
+      "register": "Registro objetivo",
+      "analyzing": "Analizando…",
+      "analyzeBtn": "Analizar",
+      "corrected": "Texto corregido",
+      "issues": "Problemas encontrados",
+      "upgrades": "Mejoras más nativas",
+      "types": {
+        "grammar": "Gramática",
+        "collocation": "Colocación",
+        "register": "Registro",
+        "word_choice": "Elección de palabra",
+        "naturalness": "Naturalidad"
+      }
+    },
+    "common": {
+      "loading": "Cargando…",
+      "error": "Algo salió mal",
+      "retry": "Reintentar"
+    }
+  }
+}

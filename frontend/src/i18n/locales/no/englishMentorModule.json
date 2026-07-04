@@ -1,0 +1,130 @@
+{
+  "englishMentorModule": {
+    "title": "English Mastery AI",
+    "tagline": "Perfeksjonér avansert engelsk — C1 → C2, tilpasset spansktalende",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "SPRÅK-AGENTER",
+    "tabs": {
+      "dashboard": "Panel",
+      "falseFriends": "Falske venner",
+      "collocations": "Kollokasjoner",
+      "phrasalVerbs": "Phrasal verbs",
+      "grammar": "Grammatikknyanser",
+      "pronunciation": "Uttale",
+      "vocabulary": "Ordforråd SRS",
+      "conversation": "Samtale",
+      "writing": "Skriving og stil"
+    },
+    "dashboard": {
+      "title": "I dag",
+      "subtitle": "Ditt daglige panel for avansert engelsk",
+      "level": "Gjeldende nivå",
+      "target": "CEFR-mål",
+      "streak": "Strekk",
+      "days": "dager",
+      "todaysMission": "Dagens oppdrag",
+      "falseFriends": "Falske venner",
+      "collocations": "Kollokasjoner",
+      "phrasalVerbs": "Phrasal verbs",
+      "vocabKnown": "Ordforråd kjent",
+      "srsDue": "SRS forfaller i dag",
+      "continue": "Fortsett å lære",
+      "loading": "Laster panelet…",
+      "missionLabels": {
+        "falseFriends": "falske venner",
+        "collocations": "kollokasjoner",
+        "phrasalVerbs": "phrasal verbs",
+        "srs": "ordforrådsgjennomganger",
+        "conversation": "samtale"
+      }
+    },
+    "falseFriends": {
+      "title": "Falske venner",
+      "subtitle": "Ord som ser spanske ut men betyr noe annet — den klassiske avanserte fellen"
+    },
+    "collocations": {
+      "title": "Kollokasjoner",
+      "subtitle": "Riktig verb-substantiv-kombinasjon — der oversettelse fra spansk går galt"
+    },
+    "phrasalVerbs": {
+      "title": "Phrasal verbs og idiomer",
+      "subtitle": "Muren mellom C1 og nesten-innfødt flyt",
+      "tabPhrasal": "Phrasal verbs",
+      "tabIdioms": "Idiomer",
+      "separable": "delbar",
+      "register": {
+        "formal": "formell",
+        "neutral": "nøytral",
+        "informal": "uformell"
+      }
+    },
+    "grammar": {
+      "title": "Grammatikknyanser",
+      "subtitle": "C1/C2-punktene der spansk interferens vedvarer",
+      "explanation": "Forklaring",
+      "examples": "Eksempler",
+      "commonMistake": "Vanlig feil",
+      "prev": "Forrige",
+      "next": "Neste",
+      "of": "{{n}} av {{total}}"
+    },
+    "pronunciation": {
+      "title": "Uttalelab",
+      "subtitle": "Minimale par og lyder som er vanskelige for spansktalende (UK 🔊 + US 🔊)",
+      "noVoice": "Ingen engelsk stemme installert. Installer en engelsk TTS-stemme for uttale."
+    },
+    "vocabulary": {
+      "title": "Ordforråd SRS",
+      "subtitle": "Spaced repetition med C1/C2-ord",
+      "endOfSession": "Slutt på økten — godt jobbet!",
+      "newCard": "NY",
+      "stage": "Trinn",
+      "showAnswer": "Vis svar",
+      "again": "Igjen (feilet)",
+      "good": "Bra",
+      "easy": "Lett"
+    },
+    "conversation": {
+      "title": "Samtale",
+      "subtitle": "Rollespill med en mentor som retter engelsken din og foreslår mer innfødte formuleringer",
+      "scenario": "Scenario",
+      "difficulty": "Nivå",
+      "startBtn": "Start samtale",
+      "yourReply": "Ditt svar på engelsk…",
+      "send": "Send",
+      "sending": "Sender…",
+      "newConversation": "← Ny samtale",
+      "registerLabel": {
+        "formal": "Formelt register",
+        "neutral": "Nøytralt register",
+        "informal": "Uformelt register"
+      },
+      "correction": "Rettelse",
+      "upgrade": "Mer innfødt måte å si det på",
+      "tip": "Tips"
+    },
+    "writing": {
+      "title": "Skriving og stil",
+      "subtitle": "Lim inn en engelsk tekst og få C1/C2-tilbakemelding — feil, naturlighet, register",
+      "placeholder": "Lim inn en e-post, tekst eller melding på engelsk…",
+      "register": "Målregister",
+      "analyzing": "Analyserer…",
+      "analyzeBtn": "Analyser",
+      "corrected": "Korrigert tekst",
+      "issues": "Problemer funnet",
+      "upgrades": "Mer innfødte forbedringer",
+      "types": {
+        "grammar": "Grammatikk",
+        "collocation": "Kollokasjon",
+        "register": "Register",
+        "word_choice": "Ordvalg",
+        "naturalness": "Naturlighet"
+      }
+    },
+    "common": {
+      "loading": "Laster…",
+      "error": "Noe gikk galt",
+      "retry": "Prøv igjen"
+    }
+  }
+}
