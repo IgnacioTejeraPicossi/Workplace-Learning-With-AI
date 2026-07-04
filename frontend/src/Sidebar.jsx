@@ -145,7 +145,15 @@ const getNavItems = (t) => [
     { key: "council-agent", label: t('sidebar.councilAgent'), icon: "users" },
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" },
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
-    { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" },
+    { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" }
+  ]},
+
+  // Language Agents (2026-07): dedicated group for CJK+ language learning
+  // agents, spun out of Future Item Agents when the trio (Japanese Sensei,
+  // Chinese Teacher, Korean Teacher) grew coherent enough to warrant its own
+  // section. Ordered by arrival order (Japanese → Chinese → Korean); more
+  // language agents planned.
+  { key: "language-agents", label: t('sidebar.languageAgents'), icon: "globe", group: "learning", isExpandable: true, subItems: [
     { key: "japanese-sensei", label: t('sidebar.japaneseSensei'), icon: "torii" },
     { key: "chinese-teacher", label: t('sidebar.chineseTeacher'), icon: "dragon" },
     { key: "korean-teacher", label: t('sidebar.koreanTeacher'), icon: "taegeuk" }
