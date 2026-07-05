@@ -5,7 +5,8 @@
     "running": "Voicebox conectado",
     "notRunning": "Voicebox no está en marcha — usando la voz del navegador",
     "noteTitle": "Sobre las voces",
-    "note": "Consejo: elige un perfil NATIVO de Voicebox para imitar la pronunciación correcta. Tu voz clonada es para shadowing / motivación — reproduce tu acento, así que no sirve como modelo de sonidos nativos. Voicebox funciona 100% en local en tu PC; tus datos de voz nunca salen de la máquina."
+    "note": "Consejo: elige un perfil NATIVO de Voicebox para imitar la pronunciación correcta. Tu voz clonada es para shadowing / motivación — reproduce tu acento, así que no sirve como modelo de sonidos nativos. Voicebox funciona 100% en local en tu PC; tus datos de voz nunca salen de la máquina.",
+    "noteNative": "Aquí tu voz clonada SÍ es un modelo nativo válido — eres hispanohablante nativo, así que tu clon enseña la pronunciación correcta. Ideal para dar a los alumnos una voz nativa consistente y personal. Voicebox funciona 100% en local; tus datos de voz nunca salen de la máquina."
   },
   "language": "Idioma",
   "english": "Inglés",
@@ -67,6 +68,7 @@
     "koreanTeacher": "Maestro Coreano IA",
     "englishMentor": "English Mastery AI",
     "norwegianMentor": "Norsk Mester AI",
+    "spanishTeacher": "Profesor de Español IA",
     "futureItemAgents": "Agentes Item Futuros",
     "languageAgents": "Agentes de Idiomas",
     "webLab": "Laboratorio Web",

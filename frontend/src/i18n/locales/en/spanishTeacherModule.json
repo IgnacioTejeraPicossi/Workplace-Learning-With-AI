@@ -1,0 +1,132 @@
+{
+  "spanishTeacherModule": {
+    "title": "Spanish Teacher AI",
+    "tagline": "Teach Spanish to the world — with a native voice (yours, cloned)",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "LANGUAGE AGENTS",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "pronunciation": "Pronunciación",
+      "grammar": "Gramática",
+      "conjugation": "Conjugación",
+      "vocabulary": "Vocabulary SRS",
+      "falseFriends": "Falsos Amigos",
+      "conversation": "Conversación",
+      "writing": "Escritura",
+      "culture": "Cultura"
+    },
+    "dashboard": {
+      "title": "Today",
+      "subtitle": "Your daily board for teaching Spanish",
+      "level": "Learner level",
+      "target": "CEFR target",
+      "streak": "Streak",
+      "days": "days",
+      "todaysMission": "Today's mission",
+      "sounds": "Sounds",
+      "grammar": "Grammar points",
+      "conjugation": "Verb tables",
+      "vocabKnown": "Vocabulary known",
+      "falseFriends": "False friends",
+      "continue": "Continue teaching",
+      "loading": "Loading dashboard…",
+      "missionLabels": {
+        "pronunciacion": "sound drills",
+        "gramatica": "grammar points",
+        "conjugacion": "verb tables",
+        "srs": "vocabulary reviews",
+        "conversacion": "conversation"
+      }
+    },
+    "pronunciation": {
+      "title": "Pronunciación",
+      "subtitle": "The sounds learners must master: rr, ñ, j, the 5 pure vowels, seseo, tildes"
+    },
+    "grammar": {
+      "title": "Gramática",
+      "subtitle": "The classic hurdles: ser/estar, por/para, past tenses, subjunctive, gender",
+      "explanation": "Explanation",
+      "examples": "Examples",
+      "commonMistake": "Common mistake",
+      "prev": "Previous",
+      "next": "Next",
+      "of": "{{n}} of {{total}}",
+      "levels": { "core": "core", "advanced": "advanced" }
+    },
+    "conjugation": {
+      "title": "Conjugación",
+      "subtitle": "Verb tables — regular paradigms + key irregulars across five tenses",
+      "tenses": {
+        "presente": "Present",
+        "pretérito": "Preterite",
+        "imperfecto": "Imperfect",
+        "futuro": "Future",
+        "subjuntivo": "Subjunctive"
+      }
+    },
+    "vocabulary": {
+      "title": "Vocabulary SRS",
+      "subtitle": "Spaced repetition with frequent Spanish words",
+      "endOfSession": "End of session — ¡buen trabajo!",
+      "newCard": "NEW",
+      "stage": "Stage",
+      "showAnswer": "Show answer",
+      "again": "Again (failed)",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "falseFriends": {
+      "title": "Falsos Amigos",
+      "subtitle": "English words that look Spanish but mean something else — the classic learner trap"
+    },
+    "conversation": {
+      "title": "Conversación",
+      "subtitle": "The learner speaks Spanish; the teacher replies, corrects and upgrades",
+      "scenario": "Scenario",
+      "difficulty": "Level",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "startBtn": "Start conversation",
+      "yourReply": "Reply in Spanish…",
+      "send": "Send",
+      "sending": "Sending…",
+      "newConversation": "← New conversation",
+      "correction": "Correction",
+      "upgrade": "More native way to say it",
+      "tip": "Teaching tip"
+    },
+    "writing": {
+      "title": "Escritura",
+      "subtitle": "Paste a Spanish text and get feedback — ser/estar, gender, verbs, accents",
+      "placeholder": "Paste an email, essay or message in Spanish…",
+      "register": "Target register",
+      "analyzing": "Analysing…",
+      "analyzeBtn": "Analyse",
+      "corrected": "Corrected text",
+      "issues": "Issues found",
+      "upgrades": "Native-like upgrades",
+      "registers": { "formal": "formal", "neutral": "neutral", "informal": "informal" },
+      "types": {
+        "ser_estar": "ser / estar",
+        "por_para": "por / para",
+        "gender": "Gender",
+        "verb": "Verb",
+        "subjunctive": "Subjunctive",
+        "accent": "Accent (tilde)",
+        "word_choice": "Word choice",
+        "naturalness": "Naturalness"
+      }
+    },
+    "culture": {
+      "title": "Cultura",
+      "subtitle": "Spain vs Latin America, the 20+ countries, and everyday expressions",
+      "phrases": "Useful phrases"
+    },
+    "common": {
+      "loading": "Loading…",
+      "error": "Something went wrong",
+      "retry": "Retry"
+    }
+  }
+}

@@ -262,6 +262,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Norwegian Mentor router: {e}")
 
+# Spanish Teacher AI router (Language Agents group)
+try:
+    from backend.routers.spanish_teacher import router as spanish_teacher_router
+    app.include_router(spanish_teacher_router, tags=["Spanish Teacher AI"])
+    print("✅ Spanish Teacher router included successfully")
+except Exception as e:
+    print(f"❌ Error including Spanish Teacher router: {e}")
+
 # Voicebox proxy router (local voice cloning / high-quality TTS for Language Agents)
 try:
     from backend.routers.voicebox import router as voicebox_router

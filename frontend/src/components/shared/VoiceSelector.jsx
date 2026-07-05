@@ -10,10 +10,13 @@ import { useTranslation } from 'react-i18next';
  * the user's own CLONED voice is for shadowing / fun, not for learning sounds.
  *
  * Props:
- *   voice  — the object returned by useVoiceEngine
- *   accent — hex colour to match the host agent's palette
+ *   voice       — the object returned by useVoiceEngine
+ *   accent      — hex colour to match the host agent's palette
+ *   nativeClone — true when the USER is a native speaker of the taught language
+ *                 (e.g. the Spanish Teacher). Flips the pedagogical note: here a
+ *                 cloned voice IS a valid native model, not a caveat.
  */
-export default function VoiceSelector({ voice, accent = '#012169' }) {
+export default function VoiceSelector({ voice, accent = '#012169', nativeClone = false }) {
   const { t } = useTranslation();
   const [showNote, setShowNote] = useState(false);
   const { engine, setEngine, voiceboxAvailable, profiles, BROWSER } = voice;
@@ -64,7 +67,7 @@ export default function VoiceSelector({ voice, accent = '#012169' }) {
           background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8,
           fontSize: 11, color: '#78350f', lineHeight: 1.5,
         }}>
-          ℹ️ {t('voiceEngine.note')}
+          ℹ️ {nativeClone ? t('voiceEngine.noteNative') : t('voiceEngine.note')}
         </div>
       )}
     </div>

@@ -1,0 +1,132 @@
+{
+  "spanishTeacherModule": {
+    "title": "Profesor de Español IA",
+    "tagline": "Enseña español al mundo — con una voz nativa (la tuya, clonada)",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "AGENTES DE LENGUA",
+    "tabs": {
+      "dashboard": "Panel",
+      "pronunciation": "Pronunciación",
+      "grammar": "Gramática",
+      "conjugation": "Conjugación",
+      "vocabulary": "Vocabulario SRS",
+      "falseFriends": "Falsos Amigos",
+      "conversation": "Conversación",
+      "writing": "Escritura",
+      "culture": "Cultura"
+    },
+    "dashboard": {
+      "title": "Hoy",
+      "subtitle": "Tu panel diario para enseñar español",
+      "level": "Nivel del alumno",
+      "target": "Meta MCER",
+      "streak": "Racha",
+      "days": "días",
+      "todaysMission": "Misión de hoy",
+      "sounds": "Sonidos",
+      "grammar": "Puntos de gramática",
+      "conjugation": "Tablas de verbos",
+      "vocabKnown": "Vocabulario dominado",
+      "falseFriends": "Falsos amigos",
+      "continue": "Seguir enseñando",
+      "loading": "Cargando el panel…",
+      "missionLabels": {
+        "pronunciacion": "ejercicios de sonido",
+        "gramatica": "puntos de gramática",
+        "conjugacion": "tablas de verbos",
+        "srs": "repasos de vocabulario",
+        "conversacion": "conversación"
+      }
+    },
+    "pronunciation": {
+      "title": "Pronunciación",
+      "subtitle": "Los sonidos que el alumno debe dominar: rr, ñ, j, las 5 vocales puras, seseo, tildes"
+    },
+    "grammar": {
+      "title": "Gramática",
+      "subtitle": "Los obstáculos clásicos: ser/estar, por/para, pasados, subjuntivo, género",
+      "explanation": "Explicación",
+      "examples": "Ejemplos",
+      "commonMistake": "Error frecuente",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "of": "{{n}} de {{total}}",
+      "levels": { "core": "básico", "advanced": "avanzado" }
+    },
+    "conjugation": {
+      "title": "Conjugación",
+      "subtitle": "Tablas de verbos — paradigmas regulares + irregulares clave en cinco tiempos",
+      "tenses": {
+        "presente": "Presente",
+        "pretérito": "Pretérito",
+        "imperfecto": "Imperfecto",
+        "futuro": "Futuro",
+        "subjuntivo": "Subjuntivo"
+      }
+    },
+    "vocabulary": {
+      "title": "Vocabulario SRS",
+      "subtitle": "Repetición espaciada con palabras frecuentes del español",
+      "endOfSession": "Fin de la sesión — ¡buen trabajo!",
+      "newCard": "NUEVA",
+      "stage": "Etapa",
+      "showAnswer": "Mostrar respuesta",
+      "again": "Otra vez (fallo)",
+      "good": "Bien",
+      "easy": "Fácil"
+    },
+    "falseFriends": {
+      "title": "Falsos Amigos",
+      "subtitle": "Palabras inglesas que parecen españolas pero significan otra cosa — la trampa clásica"
+    },
+    "conversation": {
+      "title": "Conversación",
+      "subtitle": "El alumno habla español; el profesor responde, corrige y mejora",
+      "scenario": "Escenario",
+      "difficulty": "Nivel",
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "startBtn": "Empezar conversación",
+      "yourReply": "Responde en español…",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "newConversation": "← Nueva conversación",
+      "correction": "Corrección",
+      "upgrade": "Forma más natural de decirlo",
+      "tip": "Consejo docente"
+    },
+    "writing": {
+      "title": "Escritura",
+      "subtitle": "Pega un texto en español y recibe feedback — ser/estar, género, verbos, tildes",
+      "placeholder": "Pega un correo, redacción o mensaje en español…",
+      "register": "Registro objetivo",
+      "analyzing": "Analizando…",
+      "analyzeBtn": "Analizar",
+      "corrected": "Texto corregido",
+      "issues": "Problemas encontrados",
+      "upgrades": "Mejoras hacia lo nativo",
+      "registers": { "formal": "formal", "neutral": "neutral", "informal": "informal" },
+      "types": {
+        "ser_estar": "ser / estar",
+        "por_para": "por / para",
+        "gender": "Género",
+        "verb": "Verbo",
+        "subjunctive": "Subjuntivo",
+        "accent": "Tilde",
+        "word_choice": "Elección de palabra",
+        "naturalness": "Naturalidad"
+      }
+    },
+    "culture": {
+      "title": "Cultura",
+      "subtitle": "España frente a Latinoamérica, los más de 20 países y expresiones cotidianas",
+      "phrases": "Frases útiles"
+    },
+    "common": {
+      "loading": "Cargando…",
+      "error": "Algo salió mal",
+      "retry": "Reintentar"
+    }
+  }
+}

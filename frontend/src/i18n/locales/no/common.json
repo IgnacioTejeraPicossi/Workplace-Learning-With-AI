@@ -5,7 +5,8 @@
     "running": "Voicebox tilkoblet",
     "notRunning": "Voicebox kjører ikke — bruker nettleserstemme",
     "noteTitle": "Om stemmene",
-    "note": "Tips: velg en NATIV Voicebox-profil for å etterligne riktig uttale. Din egen klonede stemme er for shadowing / motivasjon — den gjengir din aksent, så den modellerer ikke innfødte lyder. Voicebox kjører 100% lokalt på PC-en din; stemmedataene dine forlater aldri maskinen."
+    "note": "Tips: velg en NATIV Voicebox-profil for å etterligne riktig uttale. Din egen klonede stemme er for shadowing / motivasjon — den gjengir din aksent, så den modellerer ikke innfødte lyder. Voicebox kjører 100% lokalt på PC-en din; stemmedataene dine forlater aldri maskinen.",
+    "noteNative": "Her ER din egen klonede stemme en gyldig nativ modell — du er innfødt spansktalende, så klonen din lærer bort riktig uttale. Ideelt for å gi elevene en konsistent, personlig nativ stemme. Voicebox kjører 100% lokalt; stemmedataene dine forlater aldri maskinen."
   },
   "language": "Språk",
   "english": "Engelsk",
@@ -204,6 +205,7 @@
     "koreanTeacher": "Koreansk Lærer KI",
     "englishMentor": "English Mastery AI",
     "norwegianMentor": "Norsk Mester AI",
+    "spanishTeacher": "Spansklærer AI",
     "webLab": "Web‑lab",
     "webLabItemNo": "Item.no‑web",
     "webLabRedcrossNo": "Redcross.no‑web",

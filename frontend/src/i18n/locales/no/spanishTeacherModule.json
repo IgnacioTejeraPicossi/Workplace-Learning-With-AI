@@ -1,0 +1,132 @@
+{
+  "spanishTeacherModule": {
+    "title": "Spansklærer AI",
+    "tagline": "Lær bort spansk til verden — med en ekte stemme (din egen, klonet)",
+    "workspace": "WORKPLACE LEARNING WITH AI",
+    "languageAgents": "SPRÅKAGENTER",
+    "tabs": {
+      "dashboard": "Oversikt",
+      "pronunciation": "Pronunciación",
+      "grammar": "Gramática",
+      "conjugation": "Conjugación",
+      "vocabulary": "Vokabular SRS",
+      "falseFriends": "Falsos Amigos",
+      "conversation": "Conversación",
+      "writing": "Escritura",
+      "culture": "Cultura"
+    },
+    "dashboard": {
+      "title": "I dag",
+      "subtitle": "Din daglige tavle for å lære bort spansk",
+      "level": "Elevnivå",
+      "target": "CEFR-mål",
+      "streak": "Rekke",
+      "days": "dager",
+      "todaysMission": "Dagens oppdrag",
+      "sounds": "Lyder",
+      "grammar": "Grammatikkpunkter",
+      "conjugation": "Verbtabeller",
+      "vocabKnown": "Vokabular mestret",
+      "falseFriends": "Falske venner",
+      "continue": "Fortsett å undervise",
+      "loading": "Laster oversikten…",
+      "missionLabels": {
+        "pronunciacion": "lydøvelser",
+        "gramatica": "grammatikkpunkter",
+        "conjugacion": "verbtabeller",
+        "srs": "vokabularrepetisjoner",
+        "conversacion": "samtale"
+      }
+    },
+    "pronunciation": {
+      "title": "Pronunciación",
+      "subtitle": "Lydene eleven må mestre: rr, ñ, j, de 5 rene vokalene, seseo, aksenter"
+    },
+    "grammar": {
+      "title": "Gramática",
+      "subtitle": "De klassiske hindringene: ser/estar, por/para, fortid, konjunktiv, kjønn",
+      "explanation": "Forklaring",
+      "examples": "Eksempler",
+      "commonMistake": "Vanlig feil",
+      "prev": "Forrige",
+      "next": "Neste",
+      "of": "{{n}} av {{total}}",
+      "levels": { "core": "grunnleggende", "advanced": "avansert" }
+    },
+    "conjugation": {
+      "title": "Conjugación",
+      "subtitle": "Verbtabeller — regelrette paradigmer + viktige uregelrette i fem tider",
+      "tenses": {
+        "presente": "Presens",
+        "pretérito": "Preteritum",
+        "imperfecto": "Imperfektum",
+        "futuro": "Futurum",
+        "subjuntivo": "Konjunktiv"
+      }
+    },
+    "vocabulary": {
+      "title": "Vokabular SRS",
+      "subtitle": "Spaced repetition med vanlige spanske ord",
+      "endOfSession": "Slutt på økten — ¡buen trabajo!",
+      "newCard": "NY",
+      "stage": "Trinn",
+      "showAnswer": "Vis svar",
+      "again": "Igjen (feil)",
+      "good": "Bra",
+      "easy": "Lett"
+    },
+    "falseFriends": {
+      "title": "Falsos Amigos",
+      "subtitle": "Engelske ord som ser spanske ut, men betyr noe annet — den klassiske fellen"
+    },
+    "conversation": {
+      "title": "Conversación",
+      "subtitle": "Eleven snakker spansk; læreren svarer, retter og forbedrer",
+      "scenario": "Scenario",
+      "difficulty": "Nivå",
+      "beginner": "Nybegynner",
+      "intermediate": "Middels",
+      "advanced": "Avansert",
+      "startBtn": "Start samtale",
+      "yourReply": "Svar på spansk…",
+      "send": "Send",
+      "sending": "Sender…",
+      "newConversation": "← Ny samtale",
+      "correction": "Rettelse",
+      "upgrade": "Mer naturlig måte å si det på",
+      "tip": "Undervisningstips"
+    },
+    "writing": {
+      "title": "Escritura",
+      "subtitle": "Lim inn en spansk tekst og få tilbakemelding — ser/estar, kjønn, verb, aksenter",
+      "placeholder": "Lim inn en e-post, stil eller melding på spansk…",
+      "register": "Målregister",
+      "analyzing": "Analyserer…",
+      "analyzeBtn": "Analyser",
+      "corrected": "Korrigert tekst",
+      "issues": "Funne problemer",
+      "upgrades": "Forbedringer mot morsmålsnivå",
+      "registers": { "formal": "formell", "neutral": "nøytral", "informal": "uformell" },
+      "types": {
+        "ser_estar": "ser / estar",
+        "por_para": "por / para",
+        "gender": "Kjønn",
+        "verb": "Verb",
+        "subjunctive": "Konjunktiv",
+        "accent": "Aksent (tilde)",
+        "word_choice": "Ordvalg",
+        "naturalness": "Naturlighet"
+      }
+    },
+    "culture": {
+      "title": "Cultura",
+      "subtitle": "Spania vs. Latin-Amerika, de 20+ landene og hverdagsuttrykk",
+      "phrases": "Nyttige fraser"
+    },
+    "common": {
+      "loading": "Laster…",
+      "error": "Noe gikk galt",
+      "retry": "Prøv igjen"
+    }
+  }
+}

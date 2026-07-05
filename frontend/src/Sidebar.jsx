@@ -54,7 +54,8 @@ const Icon = ({ name, size = 20 }) => {
     "dragon": "🐉",
     "taegeuk": "🇰🇷",
     "unionjack": "🇬🇧",
-    "norflag": "🇳🇴"
+    "norflag": "🇳🇴",
+    "esflag": "🇪🇸"
   };
 
   return (
@@ -160,7 +161,8 @@ const getNavItems = (t) => [
     { key: "chinese-teacher", label: t('sidebar.chineseTeacher'), icon: "dragon" },
     { key: "korean-teacher", label: t('sidebar.koreanTeacher'), icon: "taegeuk" },
     { key: "english-mentor", label: t('sidebar.englishMentor'), icon: "unionjack" },
-    { key: "norwegian-mentor", label: t('sidebar.norwegianMentor'), icon: "norflag" }
+    { key: "norwegian-mentor", label: t('sidebar.norwegianMentor'), icon: "norflag" },
+    { key: "spanish-teacher", label: t('sidebar.spanishTeacher'), icon: "esflag" }
   ]},
 
   // Web Lab (1.16.0, 2026-05-29) — separate module hosting LOCAL CLONES of

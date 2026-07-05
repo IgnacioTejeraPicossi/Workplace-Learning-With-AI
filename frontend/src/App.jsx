@@ -65,6 +65,7 @@ import ChineseTeacher from "./components/ChineseTeacher/ChineseTeacher";
 import KoreanTeacher from "./components/KoreanTeacher/KoreanTeacher";
 import EnglishMentor from "./components/EnglishMentor/EnglishMentor";
 import NorwegianMentor from "./components/NorwegianMentor/NorwegianMentor";
+import SpanishTeacher from "./components/SpanishTeacher/SpanishTeacher";
 // Self-Simulating Reality Agent (1.17.0) — philosophical-scientific companion
 // for Observer Patch Holography and related theories of consciousness/simulation
 import SelfSimRealityAgent from "./SelfSimRealityAgent";
@@ -552,6 +553,7 @@ function AppContent() {
             {!activeModule && section === "korean-teacher" && <KoreanTeacher />}
             {!activeModule && section === "english-mentor" && <EnglishMentor />}
             {!activeModule && section === "norwegian-mentor" && <NorwegianMentor />}
+            {!activeModule && section === "spanish-teacher" && <SpanishTeacher />}
             {/* Web Lab routes — local clones of real websites */}
             {!activeModule && section === "web-lab-item-no" && <ItemNoWeb />}
             {!activeModule && section === "web-lab-redcross-no" && <RedcrossNoWeb onNavigate={setSection} />}
