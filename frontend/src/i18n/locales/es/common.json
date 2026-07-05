@@ -1,4 +1,12 @@
 {
+  "voiceEngine": {
+    "label": "Voz",
+    "browser": "Voz del navegador (Web Speech)",
+    "running": "Voicebox conectado",
+    "notRunning": "Voicebox no está en marcha — usando la voz del navegador",
+    "noteTitle": "Sobre las voces",
+    "note": "Consejo: elige un perfil NATIVO de Voicebox para imitar la pronunciación correcta. Tu voz clonada es para shadowing / motivación — reproduce tu acento, así que no sirve como modelo de sonidos nativos. Voicebox funciona 100% en local en tu PC; tus datos de voz nunca salen de la máquina."
+  },
   "language": "Idioma",
   "english": "Inglés",
   "norwegian": "Noruego",

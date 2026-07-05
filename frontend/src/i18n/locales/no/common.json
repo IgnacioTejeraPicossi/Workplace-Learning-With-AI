@@ -1,4 +1,12 @@
 {
+  "voiceEngine": {
+    "label": "Stemme",
+    "browser": "Nettleserstemme (Web Speech)",
+    "running": "Voicebox tilkoblet",
+    "notRunning": "Voicebox kjører ikke — bruker nettleserstemme",
+    "noteTitle": "Om stemmene",
+    "note": "Tips: velg en NATIV Voicebox-profil for å etterligne riktig uttale. Din egen klonede stemme er for shadowing / motivasjon — den gjengir din aksent, så den modellerer ikke innfødte lyder. Voicebox kjører 100% lokalt på PC-en din; stemmedataene dine forlater aldri maskinen."
+  },
   "language": "Språk",
   "english": "Engelsk",
   "norwegian": "Norsk",

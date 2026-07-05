@@ -262,6 +262,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Norwegian Mentor router: {e}")
 
+# Voicebox proxy router (local voice cloning / high-quality TTS for Language Agents)
+try:
+    from backend.routers.voicebox import router as voicebox_router
+    app.include_router(voicebox_router, tags=["Voicebox"])
+    print("✅ Voicebox proxy router included successfully")
+except Exception as e:
+    print(f"❌ Error including Voicebox proxy router: {e}")
+
 # AgentOps Studio routers - Direct import method
 try:
     from backend.routers.agentops import digital, prompt, playbooks, flows, runs, settings, mcp_router

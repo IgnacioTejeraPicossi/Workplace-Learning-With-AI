@@ -12,12 +12,19 @@
  * Backend: /api/norwegian/*
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNorwegianTTS } from './useNorwegianTTS';
+import { useVoiceEngine } from '../shared/useVoiceEngine';
+import VoiceSelector from '../shared/VoiceSelector';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const toLang = (lng) => (lng === 'es' ? 'es' : lng === 'no' ? 'no' : 'en');
+
+// Shared voice engine (browser Web Speech + optional local Voicebox) provided
+// once at the shell and consumed by every tab's 🔊 buttons.
+const VoiceCtx = createContext(null);
+const useVoice = () => useContext(VoiceCtx);
 
 // ─── Design tokens (Norwegian flag red + navy) ────────────────────────────────
 const C = {
@@ -157,7 +164,7 @@ const TabDashboard = ({ onJump }) => {
 const TabPronunciation = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [data, setData] = useState(null);
   useEffect(() => { fetch(`${API_BASE}/api/norwegian/pronunciation`).then(r => r.json()).then(setData); }, []);
   if (!data) return loadingP(t('norwegianMentorModule.common.loading'));
@@ -221,7 +228,7 @@ const TabPronunciation = () => {
 const TabGrammar = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [points, setPoints] = useState([]);
   const [idx, setIdx] = useState(0);
   useEffect(() => { fetch(`${API_BASE}/api/norwegian/grammar/path`).then(r => r.json()).then(d => setPoints(d.items || [])); }, []);
@@ -274,7 +281,7 @@ const TabGrammar = () => {
 const TabSmaord = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [items, setItems] = useState(null);
   useEffect(() => { fetch(`${API_BASE}/api/norwegian/smaord`).then(r => r.json()).then(d => setItems(d.items || [])); }, []);
   if (!items) return loadingP(t('norwegianMentorModule.common.loading'));
@@ -305,7 +312,7 @@ const TabSmaord = () => {
 const TabVocabulary = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [cards, setCards] = useState([]);
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -372,7 +379,7 @@ const TabVocabulary = () => {
 const TabBridge = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [data, setData] = useState(null);
   const [view, setView] = useState('false');
   useEffect(() => { fetch(`${API_BASE}/api/norwegian/bridge`).then(r => r.json()).then(setData); }, []);
@@ -425,7 +432,7 @@ const TabBridge = () => {
 const TabConversation = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [scenarios, setScenarios] = useState([]);
   const [scenario, setScenario] = useState('smalltalk');
   const [difficulty, setDifficulty] = useState('b2');
@@ -597,7 +604,7 @@ const TabWriting = () => {
 const TabCulture = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
-  const tts = useNorwegianTTS();
+  const tts = useVoice();
   const [notes, setNotes] = useState([]);
   const [activeId, setActiveId] = useState(null);
   useEffect(() => { fetch(`${API_BASE}/api/norwegian/culture`).then(r => r.json()).then(d => { setNotes(d.items || []); if ((d.items || []).length) setActiveId(d.items[0].id); }); }, []);
@@ -669,6 +676,8 @@ const miniLabel = (color) => ({ fontSize: 11, fontWeight: 700, color, letterSpac
 const NorwegianMentor = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const browserTts = useNorwegianTTS();
+  const voice = useVoiceEngine(browserTts, 'no');
   const tabs = [
     { id: 'dashboard',     label: t('norwegianMentorModule.tabs.dashboard'),     icon: '📋' },
     { id: 'pronunciation', label: t('norwegianMentorModule.tabs.pronunciation'), icon: '🎵' },
@@ -695,6 +704,7 @@ const NorwegianMentor = () => {
     }
   };
   return (
+    <VoiceCtx.Provider value={voice}>
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: C.bg, fontFamily: 'inherit' }}>
       <div style={{ background: C.card, borderBottom: `2px solid ${C.border}`, padding: '24px 32px 20px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
@@ -706,10 +716,13 @@ const NorwegianMentor = () => {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 54, height: 54, borderRadius: 16, background: `linear-gradient(135deg,${C.accent},${C.navy})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0, boxShadow: '0 4px 14px rgba(186,12,47,0.25)' }}>🇳🇴</div>
-          <div>
+          <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 28, fontWeight: 900, color: C.ink, margin: 0, lineHeight: 1.15 }}>{t('norwegianMentorModule.title')}</h1>
             <p style={{ color: C.inkSoft, fontSize: 13, margin: '4px 0 0' }}>{t('norwegianMentorModule.tagline')}</p>
           </div>
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <VoiceSelector voice={voice} accent={C.accent} />
         </div>
       </div>
       <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto' }}>
@@ -728,6 +741,7 @@ const NorwegianMentor = () => {
       </div>
       <div style={{ flex: 1, overflowY: 'auto' }}>{renderContent()}</div>
     </div>
+    </VoiceCtx.Provider>
   );
 };
 
