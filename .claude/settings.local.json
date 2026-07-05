@@ -159,7 +159,13 @@
       "Bash(timeout 30 grep -rln \"homoVsAi\\\\.tasks\\\\|HomoSapiensVsAI\\\\|HomoVsAi\" frontend/src/)",
       "Bash(npm prefix *)",
       "Bash(lighthouse --version)",
-      "Bash(lighthouse https://www.rodekors.no/ --output=json --output-path=/tmp/rk_lh.json --only-categories=performance --chrome-flags=\"--headless --no-sandbox\" --quiet)"
+      "Bash(lighthouse https://www.rodekors.no/ --output=json --output-path=/tmp/rk_lh.json --only-categories=performance --chrome-flags=\"--headless --no-sandbox\" --quiet)",
+      "Bash(curl -s -m 5 http://localhost:8000/api/voice/health)",
+      "Bash(curl -s -m 5 http://127.0.0.1:17600/profiles)",
+      "Bash(curl -s -m 5 http://127.0.0.1:17493/profiles)",
+      "PowerShell($env:PYTHONIOENCODING = \"utf-8\"; python -m pytest backend/tests/test_language_agents_contracts.py -q 2>&1 | Select-Object -Last 30)",
+      "Bash(curl -s -m 6 http://localhost:8000/api/voice/health)",
+      "Bash(curl -s -m 6 http://127.0.0.1:17600/profiles)"
     ]
   }
 }
