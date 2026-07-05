@@ -30,8 +30,23 @@ from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/voice")
 
-VOICEBOX_URL = os.getenv("VOICEBOX_URL", "http://127.0.0.1:17493").rstrip("/")
-_HEALTH_TIMEOUT = 1.5
+# Voicebox can run two ways, each on a different host port:
+#   - Desktop app (MSI install): native port 17493
+#   - Docker (docker compose up): compose maps host 17600 → container 17493
+# We probe all candidates (env override first) and remember whichever answers.
+_ENV_URL = os.getenv("VOICEBOX_URL", "").rstrip("/")
+_CANDIDATES = [u for u in [
+    _ENV_URL,
+    "http://127.0.0.1:17493",   # desktop app
+    "http://127.0.0.1:17600",   # docker compose
+] if u]
+# De-dupe preserving order.
+_CANDIDATES = list(dict.fromkeys(_CANDIDATES))
+
+# Last base URL that responded — used by /speak so it hits the live instance.
+_ACTIVE_BASE = _CANDIDATES[0] if _CANDIDATES else "http://127.0.0.1:17493"
+
+_HEALTH_TIMEOUT = 1.2
 _SPEAK_TIMEOUT = 30.0
 
 
@@ -61,17 +76,20 @@ def _normalize_profiles(raw: Any) -> List[Dict[str, Any]]:
 
 @router.get("/health", summary="Is a local Voicebox instance reachable?")
 async def health() -> Dict[str, Any]:
-    """Never raises. Returns {available, profiles, base}. available=false when
-    Voicebox is not running — the UI then falls back to the browser voice."""
-    try:
-        async with httpx.AsyncClient(timeout=_HEALTH_TIMEOUT) as client:
-            r = await client.get(f"{VOICEBOX_URL}/profiles")
-            if r.status_code == 200:
-                profiles = _normalize_profiles(r.json())
-                return {"available": True, "profiles": profiles, "base": VOICEBOX_URL}
-    except Exception:
-        pass
-    return {"available": False, "profiles": [], "base": VOICEBOX_URL}
+    """Never raises. Probes each candidate URL (desktop 17493, docker 17600).
+    Returns {available, profiles, base}. available=false when no Voicebox is
+    running — the UI then falls back to the browser voice."""
+    global _ACTIVE_BASE
+    async with httpx.AsyncClient(timeout=_HEALTH_TIMEOUT) as client:
+        for base in _CANDIDATES:
+            try:
+                r = await client.get(f"{base}/profiles")
+                if r.status_code == 200:
+                    _ACTIVE_BASE = base
+                    return {"available": True, "profiles": _normalize_profiles(r.json()), "base": base}
+            except Exception:
+                continue
+    return {"available": False, "profiles": [], "base": _ACTIVE_BASE}
 
 
 @router.post("/speak", summary="Synthesise text via Voicebox (native or cloned profile)")
@@ -92,7 +110,7 @@ async def speak(body: SpeakRequest):
 
     try:
         async with httpx.AsyncClient(timeout=_SPEAK_TIMEOUT) as client:
-            r = await client.post(f"{VOICEBOX_URL}/generate", json=payload)
+            r = await client.post(f"{_ACTIVE_BASE}/generate", json=payload)
     except Exception as e:
         return JSONResponse(status_code=503, content={"available": False, "error": str(e)})
 
