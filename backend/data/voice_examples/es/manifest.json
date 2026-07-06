@@ -4,75 +4,99 @@
   "items": {
     "greet_welcome": {
       "filename": "greet_welcome.wav",
-      "duration": 10.16,
-      "bytes": 487724,
-      "generated_at": "2026-07-06T12:38:17"
+      "duration": 5.23,
+      "bytes": 251084,
+      "generated_at": "2026-07-06T12:38:17",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "greet_howareyou": {
       "filename": "greet_howareyou.wav",
-      "duration": 8.48,
-      "bytes": 407084,
-      "generated_at": "2026-07-06T12:41:55"
+      "duration": 1.87,
+      "bytes": 89804,
+      "generated_at": "2026-07-06T12:41:55",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "instr_repeat": {
       "filename": "instr_repeat.wav",
-      "duration": 7.44,
-      "bytes": 357164,
-      "generated_at": "2026-07-06T12:45:18"
+      "duration": 2.84,
+      "bytes": 136366,
+      "generated_at": "2026-07-06T12:45:18",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "instr_again": {
       "filename": "instr_again.wav",
-      "duration": 7.28,
-      "bytes": 349484,
-      "generated_at": "2026-07-06T12:48:46"
+      "duration": 2.71,
+      "bytes": 130124,
+      "generated_at": "2026-07-06T12:48:46",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "instr_yourturn": {
       "filename": "instr_yourturn.wav",
-      "duration": 6.4,
-      "bytes": 307244,
-      "generated_at": "2026-07-06T12:52:00"
+      "duration": 2.1,
+      "bytes": 100844,
+      "generated_at": "2026-07-06T12:52:00",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "pron_rr": {
       "filename": "pron_rr.wav",
-      "duration": 13.6,
-      "bytes": 652844,
-      "generated_at": "2026-07-06T12:56:38"
+      "duration": 3.66,
+      "bytes": 175724,
+      "generated_at": "2026-07-06T12:56:38",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "pron_ñ": {
       "filename": "pron_ñ.wav",
-      "duration": 8.16,
-      "bytes": 391724,
-      "generated_at": "2026-07-06T12:59:40"
+      "duration": 3.62,
+      "bytes": 173804,
+      "generated_at": "2026-07-06T12:59:40",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "pron_jg": {
       "filename": "pron_jg.wav",
-      "duration": 8.72,
-      "bytes": 418604,
-      "generated_at": "2026-07-06T13:02:59"
+      "duration": 3.52,
+      "bytes": 169004,
+      "generated_at": "2026-07-06T13:02:59",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "pron_ll": {
       "filename": "pron_ll.wav",
-      "duration": 8.08,
-      "bytes": 387884,
-      "generated_at": "2026-07-06T13:05:55"
+      "duration": 3.57,
+      "bytes": 171404,
+      "generated_at": "2026-07-06T13:05:55",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "enc_verygood": {
       "filename": "enc_verygood.wav",
-      "duration": 7.12,
-      "bytes": 341804,
-      "generated_at": "2026-07-06T13:08:38"
+      "duration": 2.55,
+      "bytes": 122444,
+      "generated_at": "2026-07-06T13:08:38",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "enc_keepgoing": {
       "filename": "enc_keepgoing.wav",
-      "duration": 7.12,
-      "bytes": 341804,
-      "generated_at": "2026-07-06T13:11:21"
+      "duration": 2.58,
+      "bytes": 123884,
+      "generated_at": "2026-07-06T13:11:21",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:36:01"
     },
     "enc_seeyou": {
       "filename": "enc_seeyou.wav",
-      "duration": 7.36,
-      "bytes": 353324,
-      "generated_at": "2026-07-06T13:14:08"
+      "duration": 2.68,
+      "bytes": 128684,
+      "generated_at": "2026-07-06T13:14:08",
+      "trimmed": true,
+      "trimmed_at": "2026-07-06T16:41:50"
     }
   }
 }

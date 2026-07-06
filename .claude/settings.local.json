@@ -189,7 +189,15 @@
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); m=[x for x in d['models'] if x['model_name']=='qwen-tts-0.6B'][0]; print\\('downloaded=%s downloading=%s'%\\(m['downloaded'],m['downloading']\\)\\)\")",
       "Bash(curl -s -m 8 \"http://127.0.0.1:17600/history?limit=5\")",
       "Bash(curl -s -m 6 http://localhost:8000/api/voice/examples)",
-      "Bash(curl -s -m 10 http://localhost:8000/api/voice/examples/greet_welcome/audio -o /tmp/ex_gw.wav -w 'HTTP %{http_code} | ct: %{content_type} | bytes: %{size_download} | tiempo: %{time_total}s\\\\n')"
+      "Bash(curl -s -m 10 http://localhost:8000/api/voice/examples/greet_welcome/audio -o /tmp/ex_gw.wav -w 'HTTP %{http_code} | ct: %{content_type} | bytes: %{size_download} | tiempo: %{time_total}s\\\\n')",
+      "Bash(curl -s -m 8 http://127.0.0.1:17600/profiles/f6f43a53-8b13-4d63-9ac6-6ab9ba0177b6)",
+      "Bash(python -c \"import sys,json;d=json.load\\(sys.stdin\\);[print\\(k,'=',repr\\(v\\)[:160]\\) for k,v in d.items\\(\\)]\")",
+      "Bash(python -m py_compile backend/services/voice_examples.py backend/scripts/trim_voice_examples.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only enc_seeyou --regen-failures)",
+      "Bash(python -m py_compile backend/scripts/pregenerate_voice_examples.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m pytest backend/tests/test_voice_examples.py -q)",
+      "Bash(curl -s -m 8 \"http://localhost:8000/api/voice/examples/enc_seeyou/audio\" -o /dev/null -w \"HTTP %{http_code} | %{size_download} bytes | %{time_total}s\\\\n\")"
     ]
   }
 }

@@ -36,9 +36,11 @@ from backend.services.voice_examples import (
     VOICE_EXAMPLES,
     VOICE_EXAMPLES_DIR,
     MANIFEST_PATH,
+    RAW_BACKUP_DIRNAME,
     example_wav_path,
     example_wav_filename,
     load_manifest,
+    trim_leading_prefix,
     EXAMPLE_LANGUAGE,
     EXAMPLE_ENGINE,
     EXAMPLE_MODEL_SIZE,
@@ -178,14 +180,26 @@ def main() -> int:
                 failed += 1
                 continue
 
-            with open(wav_path, "wb") as f:
+            # Qwen cloning prepends the reference audio — trim it. Keep the
+            # untrimmed original under _raw/ so the trim stays reversible, and
+            # fall back to the untrimmed audio if validation rejects the cut.
+            raw_dir = os.path.join(VOICE_EXAMPLES_DIR, RAW_BACKUP_DIRNAME)
+            os.makedirs(raw_dir, exist_ok=True)
+            with open(os.path.join(raw_dir, example_wav_filename(eid)), "wb") as f:
                 f.write(wav_bytes)
+            trimmed_bytes, tinfo = trim_leading_prefix(wav_bytes, expected_chars=len(text))
+            out_bytes = trimmed_bytes if tinfo["ok"] else wav_bytes
+            with open(wav_path, "wb") as f:
+                f.write(out_bytes)
             items[eid] = {
                 "filename": example_wav_filename(eid),
-                "duration": round(duration, 2),
-                "bytes": len(wav_bytes),
+                "duration": round((tinfo["new_sec"] if tinfo["ok"] else duration) or 0, 2),
+                "bytes": len(out_bytes),
+                "trimmed": bool(tinfo["ok"]),
                 "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
             }
+            if not tinfo["ok"]:
+                print(f"    [warn] {eid}: prefix trim skipped ({tinfo['reason']}) — kept full audio", flush=True)
             manifest["generated_at"] = datetime.datetime.now().isoformat(timespec="seconds")
             # Persist after EACH phrase so an interruption keeps partial progress.
             with open(MANIFEST_PATH, "w", encoding="utf-8") as f:

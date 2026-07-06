@@ -20,9 +20,11 @@ smoke tests can import it without a running TTS engine.
 
 from __future__ import annotations
 
+import io
 import json
 import os
-from typing import Any, Dict, List, Optional
+import wave
+from typing import Any, Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------------
 # Storage locations. Cached audio lives under backend/data/voice_examples/es/.
@@ -95,6 +97,105 @@ CATEGORY_ORDER = ["greeting", "instruction", "pronunciation", "encouragement"]
 
 # Set of valid ids — used by the audio endpoint to reject arbitrary paths.
 VALID_EXAMPLE_IDS = frozenset(e["id"] for e in VOICE_EXAMPLES)
+
+
+# Directory (under the cache dir) where untrimmed originals are backed up before
+# the reference-prefix trim is applied, so trimming is always reversible.
+RAW_BACKUP_DIRNAME = "_raw"
+
+
+def trim_leading_prefix(
+    raw: bytes,
+    expected_chars: Optional[int] = None,
+    *,
+    max_boundary_frac: float = 0.72,
+    min_gap: float = 0.40,
+    lead_in: float = 0.08,
+    max_chars_per_sec: float = 22.0,
+) -> Tuple[bytes, Dict[str, Any]]:
+    """Remove the leaked voice-clone REFERENCE prefix from a generated WAV.
+
+    Qwen voice cloning prepends the profile's reference audio (here: a long book
+    passage) before the target phrase. The reference ends with a clear pause, so
+    we cut at the END of the LARGEST silence gap found in the first
+    `max_boundary_frac` of the clip (the prefix→target boundary), keeping a small
+    `lead_in` so the target's first phoneme is not clipped.
+
+    Validation: if `expected_chars` is given, the trimmed speech rate
+    (chars / trimmed_seconds) must be <= `max_chars_per_sec`; a higher rate means
+    we cut into the target, so we report ok=False and DO NOT trim (caller can
+    regenerate). Pure/std-lib only (wave + audioop) so it is unit-testable.
+
+    Returns (out_bytes, info). info = {ok, reason, orig_sec, new_sec, boundary_sec}.
+    On any failure out_bytes is the untouched input.
+    """
+    import audioop  # local import: std-lib, deprecated warning kept out of import time
+
+    fail = {"ok": False, "reason": "", "orig_sec": None, "new_sec": None, "boundary_sec": None}
+    try:
+        with wave.open(io.BytesIO(raw), "rb") as w:
+            sr, sw, ch, n = w.getframerate(), w.getsampwidth(), w.getnchannels(), w.getnframes()
+            frames = w.readframes(n)
+    except Exception as e:
+        fail["reason"] = f"unreadable wav: {e}"
+        return raw, fail
+
+    total = n / sr if sr else 0.0
+    if total <= 0:
+        fail["reason"] = "empty"
+        return raw, fail
+    fail["orig_sec"] = round(total, 2)
+
+    bytes_per_frame = sw * ch
+    win = max(1, int(sr * 0.03))                 # 30 ms analysis window
+    peak = audioop.max(frames, sw) or 1
+    thr = peak * 0.06                            # silence = 6% of peak amplitude
+
+    # Collect silence gaps whose start is within the first max_boundary_frac.
+    gaps: List[Tuple[float, float]] = []          # (start_sec, dur_sec)
+    start: Optional[float] = None
+    step = win * bytes_per_frame
+    for i in range(0, len(frames) - step, step):
+        chunk = frames[i:i + step]
+        rms = audioop.rms(chunk, sw)
+        tt = i / (sr * bytes_per_frame)
+        if rms < thr:
+            if start is None:
+                start = tt
+        else:
+            if start is not None:
+                dur = tt - start
+                if dur >= min_gap and start < total * max_boundary_frac:
+                    gaps.append((start, dur))
+                start = None
+
+    if not gaps:
+        fail["reason"] = "no prefix boundary found"
+        return raw, fail
+
+    gap_start, gap_dur = max(gaps, key=lambda g: g[1])
+    boundary = max(gap_start, gap_start + gap_dur - lead_in)
+    new_sec = total - boundary
+    info = {"ok": True, "reason": "", "orig_sec": round(total, 2),
+            "new_sec": round(new_sec, 2), "boundary_sec": round(boundary, 2)}
+
+    if new_sec < 0.5:
+        info.update(ok=False, reason="trimmed too short")
+        return raw, info
+    if expected_chars and (expected_chars / new_sec) > max_chars_per_sec:
+        info.update(ok=False, reason=f"validation: {expected_chars/new_sec:.1f} chars/s > {max_chars_per_sec}")
+        return raw, info
+
+    # Slice frames from the boundary to the end and repackage as a WAV.
+    start_frame = int(boundary * sr)
+    out_frames = frames[start_frame * bytes_per_frame:]
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as ow:
+        ow.setnchannels(ch)
+        ow.setsampwidth(sw)
+        ow.setframerate(sr)
+        ow.writeframes(out_frames)
+    return buf.getvalue(), info
 
 
 def example_wav_filename(example_id: str) -> str:
