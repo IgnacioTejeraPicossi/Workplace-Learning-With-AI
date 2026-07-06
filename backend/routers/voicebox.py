@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/voice")
@@ -247,3 +247,36 @@ async def speak(body: SpeakRequest):
             "available": True, "audio_fetch_failed": True,
             "generation_id": gen_id, "audio_status": ar.status_code,
         })
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Pre-generated native-voice examples (Spanish Teacher)
+# ---------------------------------------------------------------------------
+# Live CPU synthesis is too slow (~1-3 min/phrase), so a curated set of Spanish
+# example phrases is generated ONCE offline (see scripts/pregenerate_voice_
+# examples.py) with the owner's cloned native voice and cached as WAV files.
+# These endpoints expose the manifest and serve the cached audio for INSTANT
+# playback — no Voicebox round-trip at request time.
+# ═══════════════════════════════════════════════════════════════════════════
+@router.get("/examples", summary="List pre-generated native-voice example phrases")
+async def voice_examples() -> Dict[str, Any]:
+    """Return the curated phrase set merged with cache state. Never raises; when
+    nothing has been generated yet, items come back with cached=false and the UI
+    simply shows them as pending."""
+    from backend.services.voice_examples import build_examples_response
+    return build_examples_response()
+
+
+@router.get("/examples/{example_id}/audio", summary="Serve a cached example WAV")
+async def voice_example_audio(example_id: str):
+    """Stream a cached example WAV. 404 if the id is unknown or not yet generated.
+    The id is validated against the known phrase set so it can never be used to
+    read arbitrary files."""
+    from backend.services.voice_examples import VALID_EXAMPLE_IDS, example_wav_path
+
+    if example_id not in VALID_EXAMPLE_IDS:
+        return JSONResponse(status_code=404, content={"error": "unknown example id"})
+    path = example_wav_path(example_id)
+    if not os.path.exists(path):
+        return JSONResponse(status_code=404, content={"error": "not generated yet", "example_id": example_id})
+    return FileResponse(path, media_type="audio/x-wav", filename=f"{example_id}.wav")

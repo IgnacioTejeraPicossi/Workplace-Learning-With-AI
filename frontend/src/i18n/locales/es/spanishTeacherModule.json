@@ -42,6 +42,20 @@
       "title": "Pronunciación",
       "subtitle": "Los sonidos que el alumno debe dominar: rr, ñ, j, las 5 vocales puras, seseo, tildes"
     },
+    "nativeVoice": {
+      "title": "Ejemplos con voz nativa",
+      "subtitle": "Frases reales en la propia voz nativa clonada del profesor — reproducción instantánea.",
+      "ready": "{{cached}} de {{total}} listas",
+      "pending": "Los ejemplos aún se están generando. Aparecerán aquí a medida que se completen.",
+      "notReady": "Aún no generada",
+      "play": "Reproducir",
+      "categories": {
+        "greeting": "Saludos",
+        "instruction": "Instrucciones de clase",
+        "pronunciation": "Muestra de pronunciación",
+        "encouragement": "Ánimo"
+      }
+    },
     "grammar": {
       "title": "Gramática",
       "subtitle": "Los obstáculos clásicos: ser/estar, por/para, pasados, subjuntivo, género",

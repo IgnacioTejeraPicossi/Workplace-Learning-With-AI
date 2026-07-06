@@ -1,0 +1,36 @@
+{
+  "profile_id": "f6f43a53-8b13-4d63-9ac6-6ab9ba0177b6",
+  "generated_at": "2026-07-06T12:52:00",
+  "items": {
+    "greet_welcome": {
+      "filename": "greet_welcome.wav",
+      "duration": 10.16,
+      "bytes": 487724,
+      "generated_at": "2026-07-06T12:38:17"
+    },
+    "greet_howareyou": {
+      "filename": "greet_howareyou.wav",
+      "duration": 8.48,
+      "bytes": 407084,
+      "generated_at": "2026-07-06T12:41:55"
+    },
+    "instr_repeat": {
+      "filename": "instr_repeat.wav",
+      "duration": 7.44,
+      "bytes": 357164,
+      "generated_at": "2026-07-06T12:45:18"
+    },
+    "instr_again": {
+      "filename": "instr_again.wav",
+      "duration": 7.28,
+      "bytes": 349484,
+      "generated_at": "2026-07-06T12:48:46"
+    },
+    "instr_yourturn": {
+      "filename": "instr_yourturn.wav",
+      "duration": 6.4,
+      "bytes": 307244,
+      "generated_at": "2026-07-06T12:52:00"
+    }
+  }
+}

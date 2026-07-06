@@ -42,6 +42,20 @@
       "title": "Pronunciación",
       "subtitle": "The sounds learners must master: rr, ñ, j, the 5 pure vowels, seseo, tildes"
     },
+    "nativeVoice": {
+      "title": "Native voice examples",
+      "subtitle": "Real phrases in the teacher's own cloned native voice — instant playback.",
+      "ready": "{{cached}} of {{total}} ready",
+      "pending": "Examples are still being generated. They will appear here as each one finishes.",
+      "notReady": "Not generated yet",
+      "play": "Play",
+      "categories": {
+        "greeting": "Greetings",
+        "instruction": "Classroom instructions",
+        "pronunciation": "Pronunciation showcase",
+        "encouragement": "Encouragement"
+      }
+    },
     "grammar": {
       "title": "Gramática",
       "subtitle": "The classic hurdles: ser/estar, por/para, past tenses, subjunctive, gender",

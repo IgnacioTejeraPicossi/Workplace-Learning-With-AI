@@ -42,6 +42,20 @@
       "title": "Pronunciación",
       "subtitle": "Lydene eleven må mestre: rr, ñ, j, de 5 rene vokalene, seseo, aksenter"
     },
+    "nativeVoice": {
+      "title": "Eksempler med innfødt stemme",
+      "subtitle": "Ekte setninger i lærerens egen klonede innfødte stemme — spilles av umiddelbart.",
+      "ready": "{{cached}} av {{total}} klare",
+      "pending": "Eksemplene genereres fortsatt. De dukker opp her etter hvert som de blir ferdige.",
+      "notReady": "Ikke generert ennå",
+      "play": "Spill av",
+      "categories": {
+        "greeting": "Hilsener",
+        "instruction": "Klasseromsinstruksjoner",
+        "pronunciation": "Uttalevisning",
+        "encouragement": "Oppmuntring"
+      }
+    },
     "grammar": {
       "title": "Gramática",
       "subtitle": "De klassiske hindringene: ser/estar, por/para, fortid, konjunktiv, kjønn",

@@ -187,7 +187,9 @@
       "Bash(curl -s -m 20 -X POST http://127.0.0.1:17600/generate -H 'Content-Type: application/json' -d '{\"text\":\"Hola clase.\",\"profile_id\":\"f6f43a53-8b13-4d63-9ac6-6ab9ba0177b6\",\"language\":\"es\",\"engine\":\"qwen_custom_voice\",\"model_size\":\"0.6B\"}' -w '\\\\n[HTTP %{http_code}]\\\\n')",
       "Bash(curl -s -m 15 -X POST http://127.0.0.1:17600/models/download -H 'Content-Type: application/json' -d '{\"model_name\":\"qwen-tts-0.6B\"}' -w '\\\\n[HTTP %{http_code}]\\\\n')",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); m=[x for x in d['models'] if x['model_name']=='qwen-tts-0.6B'][0]; print\\('downloaded=%s downloading=%s'%\\(m['downloaded'],m['downloading']\\)\\)\")",
-      "Bash(curl -s -m 8 \"http://127.0.0.1:17600/history?limit=5\")"
+      "Bash(curl -s -m 8 \"http://127.0.0.1:17600/history?limit=5\")",
+      "Bash(curl -s -m 6 http://localhost:8000/api/voice/examples)",
+      "Bash(curl -s -m 10 http://localhost:8000/api/voice/examples/greet_welcome/audio -o /tmp/ex_gw.wav -w 'HTTP %{http_code} | ct: %{content_type} | bytes: %{size_download} | tiempo: %{time_total}s\\\\n')"
     ]
   }
 }

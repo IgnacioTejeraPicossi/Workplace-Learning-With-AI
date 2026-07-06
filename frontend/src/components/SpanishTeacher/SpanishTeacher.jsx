@@ -12,7 +12,7 @@
  * Backend: /api/spanish/*
  */
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSpanishTTS } from './useSpanishTTS';
 import { useVoiceEngine } from '../shared/useVoiceEngine';
@@ -142,6 +142,99 @@ const TabDashboard = ({ onJump }) => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // Tab: Pronunciación
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// Native-voice examples — plays PRE-GENERATED WAVs of the teacher's cloned
+// native voice INSTANTLY (no live TTS round-trip, which is minutes on CPU).
+// Data comes from /api/voice/examples; audio from /api/voice/examples/{id}/audio.
+const NativeVoiceExamples = () => {
+  const { t } = useTranslation();
+  const [data, setData] = useState(null);
+  const [playingId, setPlayingId] = useState(null);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/api/voice/examples`)
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setData(d); })
+      .catch(() => { if (!cancelled) setData({ items: [], cached_count: 0, total: 0 }); });
+    return () => { cancelled = true; if (audioRef.current) audioRef.current.pause(); };
+  }, []);
+
+  const play = (item) => {
+    if (!item.cached || !item.audio_url) return;
+    if (audioRef.current) { try { audioRef.current.pause(); } catch { /* ignore */ } }
+    const a = new Audio(`${API_BASE}${item.audio_url}`);
+    audioRef.current = a;
+    setPlayingId(item.id);
+    a.onended = () => setPlayingId(null);
+    a.onerror = () => setPlayingId(null);
+    a.play().catch(() => setPlayingId(null));
+  };
+
+  if (!data) return null;
+  const items = data.items || [];
+  if (items.length === 0) return null;
+
+  const catLabel = (c) => t(`spanishTeacherModule.nativeVoice.categories.${c}`, { defaultValue: c });
+  const byCat = {};
+  items.forEach((it) => { (byCat[it.category] = byCat[it.category] || []).push(it); });
+  const cats = (data.categories && data.categories.length ? data.categories : Object.keys(byCat));
+  const anyCached = (data.cached_count || 0) > 0;
+
+  return (
+    <div style={{ marginBottom: 26 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+        <h3 style={{ color: C.ink, fontSize: 17, fontWeight: 800, margin: 0 }}>
+          🎙 {t('spanishTeacherModule.nativeVoice.title')}
+        </h3>
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: anyCached ? C.green : C.inkSoft,
+          background: anyCached ? C.greenLight : '#f1f5f9',
+          border: `1px solid ${anyCached ? C.greenBorder : C.border}`, padding: '2px 8px', borderRadius: 999,
+        }}>
+          {t('spanishTeacherModule.nativeVoice.ready', { cached: data.cached_count || 0, total: data.total || items.length })}
+        </span>
+      </div>
+      <p style={{ color: C.inkSoft, fontSize: 12.5, margin: '0 0 14px' }}>{t('spanishTeacherModule.nativeVoice.subtitle')}</p>
+      {!anyCached && (
+        <Card accent={C.gold} style={{ background: C.goldLight, marginBottom: 12 }}>
+          <p style={{ margin: 0, fontSize: 12.5, color: '#78350f' }}>⏳ {t('spanishTeacherModule.nativeVoice.pending')}</p>
+        </Card>
+      )}
+      {cats.filter((c) => byCat[c]).map((c) => (
+        <div key={c} style={{ marginBottom: 14 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: C.accent, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>{catLabel(c)}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 10 }}>
+            {byCat[c].map((it) => (
+              <div key={it.id} style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                background: C.card, border: `1px solid ${C.border}`, borderRadius: 10,
+                opacity: it.cached ? 1 : 0.55,
+              }}>
+                <button
+                  onClick={() => play(it)}
+                  disabled={!it.cached}
+                  title={it.cached ? t('spanishTeacherModule.nativeVoice.play') : t('spanishTeacherModule.nativeVoice.notReady')}
+                  style={{
+                    flexShrink: 0, width: 34, height: 34, borderRadius: '50%', border: 'none',
+                    background: it.cached ? C.accent : '#cbd5e1', color: '#fff', fontSize: 14,
+                    cursor: it.cached ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >{playingId === it.id ? '▶' : (it.cached ? '🔊' : '⏳')}</button>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: C.ink, fontWeight: 600, lineHeight: 1.35 }}>{it.text}</p>
+                  {it.gloss && <p style={{ margin: '2px 0 0', fontSize: 11, color: C.inkSoft, fontStyle: 'italic' }}>{it.gloss}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const TabPronunciation = () => {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
@@ -154,6 +247,7 @@ const TabPronunciation = () => {
       <SectionLabel index={2} label={t('spanishTeacherModule.tabs.pronunciation')} />
       <h2 style={{ color: C.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('spanishTeacherModule.pronunciation.title')}</h2>
       <p style={{ color: C.inkSoft, fontSize: 13, marginBottom: 20 }}>{t('spanishTeacherModule.pronunciation.subtitle')}</p>
+      <NativeVoiceExamples />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
         {items.map((s, i) => (
           <Card key={i} accent={C.accent}>

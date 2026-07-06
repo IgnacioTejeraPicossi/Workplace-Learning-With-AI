@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.19.0] - 2026-07-06
+
+### Added — Native cloned-voice examples for the Spanish Teacher (pre-generation)
+
+The Spanish Teacher can now play example phrases in the repo owner's **cloned
+native Spanish voice** (via a local Voicebox instance). Because CPU synthesis is
+far too slow for live playback (~1-5 min/phrase on this hardware), the audio is
+**pre-generated once, offline, and cached** — playback is then instant (~0.2s).
+
+**New pieces:**
+- `backend/services/voice_examples.py` — single source of truth: a curated set of
+  12 Spanish phrases (greetings, classroom instructions, pronunciation showcase
+  incl. rr/ñ/j/ll, encouragement), the on-disk cache layout
+  (`backend/data/voice_examples/es/` + `manifest.json`), and `build_examples_response()`.
+- `backend/scripts/pregenerate_voice_examples.py` — offline generator. Talks to
+  Voicebox (engine `qwen`, size `0.6B`, cloned profile), polls each async
+  generation to completion, saves the WAV, and writes the manifest after each
+  phrase so an interrupted run resumes. Flags: `--profile`, `--force`, `--only`.
+- `GET /api/voice/examples` — manifest merged with cache state (each item carries
+  `cached` + `audio_url`).
+- `GET /api/voice/examples/{id}/audio` — serves a cached WAV; id validated against
+  the known set (no arbitrary file reads); 404 when not yet generated.
+- Frontend: `NativeVoiceExamples` panel in the Spanish Teacher's Pronunciation
+  tab — fetches the manifest, groups phrases by category, plays cached audio
+  instantly, shows a "{cached} of {total} ready" badge and a pending hint while
+  generation is still running. i18n EN/NO/ES (`spanishTeacherModule.nativeVoice`).
+
+### Fixed — Voicebox proxy now handles the v0.5.0 asynchronous generation flow
+
+`backend/routers/voicebox.py` `/speak` previously assumed Voicebox returned audio
+synchronously. Voicebox v0.5.0 is async (`POST /generate` → `{id, status:"generating"}`
+→ poll `GET /history/{id}` → `GET /audio/{id}`), so the old proxy always fell back
+to the browser voice. Rewrote `/speak` to drive all three steps behind one call,
+with graceful JSON fallbacks (503 unreachable / 502 generation_failed / 504 timeout)
+and optional `engine`/`model_size` selection (+ `VOICEBOX_ENGINE` / `VOICEBOX_MODEL_SIZE`
+/ `VOICEBOX_POLL_TIMEOUT` env overrides). Also extracted `_probe_active_base()` so
+`/speak` self-resolves the live Voicebox base — fixes a latent bug where a module
+reload left `_ACTIVE_BASE` pointing at the (often dead) desktop port 17493 instead
+of the running docker port 17600.
+
+### Notes / limitations
+
+- **CPU latency:** live synthesis of a cloned voice takes minutes/phrase on this
+  machine (no GPU). Pre-generation is the supported path for the "native example"
+  use case. The async `/speak` proxy remains correct and would be real-time on GPU.
+- **Model matrix (verified against Voicebox):** cloned voices work with `qwen`
+  (TTS 1.7B / 0.6B). `qwen_custom_voice` **rejects** cloned profiles; Kokoro is a
+  fixed-voice model; LuxTTS is English-only. So Qwen TTS 0.6B is the fast+cloning
+  choice for Spanish.
+
+### Validation
+
+- `backend/tests/test_voice_examples.py` — 7 tests (phrase-set integrity, id
+  safety, response shape, graceful manifest, manifest endpoint, audio 404 paths).
+  All pass offline.
+- `py_compile` on `voicebox.py` + `pregenerate_voice_examples.py`; JSX parse on
+  `SpanishTeacher.jsx`; i18n parity EN/NO/ES for the `nativeVoice` block.
+- End-to-end verified: a pre-generated phrase serves via `/api/voice/examples/{id}/audio`
+  in ~0.23s (real WAV of the cloned voice) vs ~285s live.
+
+---
+
 ## [1.18.4] - 2026-07-02
 
 ### Added — Self-Simulating Reality Agent expanded (V1+V2+V3): 5 → 10 tabs
