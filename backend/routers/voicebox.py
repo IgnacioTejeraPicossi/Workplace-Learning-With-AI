@@ -104,21 +104,37 @@ def _normalize_profiles(raw: Any) -> List[Dict[str, Any]]:
     return items
 
 
+async def _probe_active_base(client: httpx.AsyncClient) -> Optional[str]:
+    """Probe candidate URLs (desktop 17493, docker 17600) for a live Voicebox,
+    remember the first that answers /profiles in the module-global _ACTIVE_BASE,
+    and return it (or None if none answer). Shared by /health and /speak so that
+    /speak never depends on /health having been called first — important because
+    a module reload resets _ACTIVE_BASE to the first (possibly dead) candidate."""
+    global _ACTIVE_BASE
+    for base in _CANDIDATES:
+        try:
+            r = await client.get(f"{base}/profiles")
+            if r.status_code == 200:
+                _ACTIVE_BASE = base
+                return base
+        except Exception:
+            continue
+    return None
+
+
 @router.get("/health", summary="Is a local Voicebox instance reachable?")
 async def health() -> Dict[str, Any]:
     """Never raises. Probes each candidate URL (desktop 17493, docker 17600).
     Returns {available, profiles, base}. available=false when no Voicebox is
     running — the UI then falls back to the browser voice."""
-    global _ACTIVE_BASE
     async with httpx.AsyncClient(timeout=_HEALTH_TIMEOUT) as client:
-        for base in _CANDIDATES:
+        base = await _probe_active_base(client)
+        if base is not None:
             try:
                 r = await client.get(f"{base}/profiles")
-                if r.status_code == 200:
-                    _ACTIVE_BASE = base
-                    return {"available": True, "profiles": _normalize_profiles(r.json()), "base": base}
+                return {"available": True, "profiles": _normalize_profiles(r.json()), "base": base}
             except Exception:
-                continue
+                pass
     return {"available": False, "profiles": [], "base": _ACTIVE_BASE}
 
 
@@ -155,9 +171,16 @@ async def speak(body: SpeakRequest):
         payload["model_size"] = model_size
 
     async with httpx.AsyncClient() as client:
+        # Resolve a live Voicebox base first — a module reload resets _ACTIVE_BASE
+        # to the first candidate (desktop 17493), which may be dead while only the
+        # docker instance (17600) is up. Probing here makes /speak self-sufficient.
+        base = await _probe_active_base(client)
+        if base is None:
+            return JSONResponse(status_code=503, content={"available": False, "error": "Voicebox not reachable on any candidate port"})
+
         # --- Step 1: enqueue the generation ---------------------------------
         try:
-            r = await client.post(f"{_ACTIVE_BASE}/generate", json=payload, timeout=_GENERATE_TIMEOUT)
+            r = await client.post(f"{base}/generate", json=payload, timeout=_GENERATE_TIMEOUT)
         except Exception as e:
             return JSONResponse(status_code=503, content={"available": False, "error": str(e)})
 
@@ -196,7 +219,7 @@ async def speak(body: SpeakRequest):
                 })
             await asyncio.sleep(_POLL_INTERVAL)
             try:
-                hr = await client.get(f"{_ACTIVE_BASE}/history/{gen_id}", timeout=_HISTORY_TIMEOUT)
+                hr = await client.get(f"{base}/history/{gen_id}", timeout=_HISTORY_TIMEOUT)
                 if hr.status_code == 200:
                     gen = hr.json()
                     status = (gen.get("status") or "").lower()
@@ -212,7 +235,7 @@ async def speak(body: SpeakRequest):
 
         # --- Step 3: fetch and stream the finished audio --------------------
         try:
-            ar = await client.get(f"{_ACTIVE_BASE}/audio/{gen_id}", timeout=_AUDIO_TIMEOUT)
+            ar = await client.get(f"{base}/audio/{gen_id}", timeout=_AUDIO_TIMEOUT)
         except Exception as e:
             return JSONResponse(status_code=503, content={"available": True, "audio_fetch_error": str(e), "generation_id": gen_id})
 
