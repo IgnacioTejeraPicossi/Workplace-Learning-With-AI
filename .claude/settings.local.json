@@ -174,7 +174,8 @@
       "Bash(curl -s -m 30 -X POST http://127.0.0.1:17600/generate -H 'Content-Type: application/json' -d '{\"text\":\"Hola, soy Ignacio, tu profesor de espanol. Vamos a aprender juntos.\",\"profile_id\":\"__TRACKED_VAR__\",\"language\":\"es\"}' -w '\\\\n[HTTP %{http_code}]\\\\n')",
       "Bash(docker stats *)",
       "Bash(curl -s -m 8 http://127.0.0.1:17600/history/30cfd9fc-5c7b-4443-9a36-a80126979cb0)",
-      "Bash(curl -s -m 20 http://127.0.0.1:17600/audio/30cfd9fc-5c7b-4443-9a36-a80126979cb0 -o /tmp/ignacio_es.wav -w 'HTTP %{http_code} | content-type: %{content_type} | bytes: %{size_download}\\\\n')"
+      "Bash(curl -s -m 20 http://127.0.0.1:17600/audio/30cfd9fc-5c7b-4443-9a36-a80126979cb0 -o /tmp/ignacio_es.wav -w 'HTTP %{http_code} | content-type: %{content_type} | bytes: %{size_download}\\\\n')",
+      "Bash(curl -s -m 8 \"http://127.0.0.1:17600/models/status\")"
     ]
   }
 }
