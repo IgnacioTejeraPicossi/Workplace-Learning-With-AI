@@ -20,7 +20,9 @@ keeps using the browser Web Speech API.
 Config: VOICEBOX_URL env var (default http://127.0.0.1:17493).
 """
 
+import asyncio
 import os
+import time
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -49,11 +51,39 @@ _ACTIVE_BASE = _CANDIDATES[0] if _CANDIDATES else "http://127.0.0.1:17493"
 _HEALTH_TIMEOUT = 1.2
 _SPEAK_TIMEOUT = 30.0
 
+# Voicebox v0.5.0 is ASYNCHRONOUS: POST /generate returns a generation record
+# ({id, status:"generating", audio_path:""}) immediately, does the TTS work in
+# the background, and the audio is fetched later from /audio/{id}. We therefore
+# poll /history/{id} until the generation is terminal, then stream the audio.
+#   - _GENERATE_TIMEOUT: POST /generate returns fast (it only enqueues).
+#   - _POLL_INTERVAL:    seconds between /history/{id} status checks.
+#   - _POLL_TIMEOUT:     hard cap on total wait. CPU synthesis of a 1.7B model
+#                        can take minutes; a light model (e.g. Qwen 0.6B) is
+#                        seconds. Env-tunable so ops can raise it without a deploy.
+#   - _AUDIO_TIMEOUT:    fetching the finished WAV bytes.
+# Terminal statuses observed from Voicebox: "completed" (ok) / "failed" (error).
+_GENERATE_TIMEOUT = 15.0
+_POLL_INTERVAL = float(os.getenv("VOICEBOX_POLL_INTERVAL", "1.5"))
+_POLL_TIMEOUT = float(os.getenv("VOICEBOX_POLL_TIMEOUT", "180"))
+_AUDIO_TIMEOUT = 30.0
+_HISTORY_TIMEOUT = 8.0
+
+_DONE_STATUSES = {"completed", "complete", "done", "success"}
+_FAIL_STATUSES = {"failed", "error", "cancelled", "canceled"}
+
+# Optional model override applied to every /generate call when the caller does
+# not specify one. Lets ops pin a fast/cloning-capable model (e.g. the Qwen
+# CustomVoice 0.6B) without code changes. Empty → use the profile/server default.
+_DEFAULT_ENGINE = (os.getenv("VOICEBOX_ENGINE", "").strip() or None)
+_DEFAULT_MODEL_SIZE = (os.getenv("VOICEBOX_MODEL_SIZE", "").strip() or None)
+
 
 class SpeakRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=2000)
     profile_id: Optional[str] = Field(None, description="Voicebox profile id or name")
     language: Optional[str] = Field(None, description="Language tag, e.g. 'no', 'en'")
+    engine: Optional[str] = Field(None, description="TTS engine override, e.g. 'qwen'")
+    model_size: Optional[str] = Field(None, description="Model size override, e.g. '0.6B'")
 
 
 def _normalize_profiles(raw: Any) -> List[Dict[str, Any]]:
@@ -94,44 +124,103 @@ async def health() -> Dict[str, Any]:
 
 @router.post("/speak", summary="Synthesise text via Voicebox (native or cloned profile)")
 async def speak(body: SpeakRequest):
-    """Proxy to Voicebox POST /generate and stream the audio back to the browser.
+    """Proxy to Voicebox and stream the finished audio back to the browser.
 
-    On any connection error (Voicebox not running) returns HTTP 503 with
-    {available:false} so the frontend can fall back to the browser voice.
+    Voicebox v0.5.0 is asynchronous, so this does three steps behind one call:
+      1. POST /generate            → enqueue, get a generation {id, status}
+      2. poll GET /history/{id}    → until status is terminal (completed/failed)
+      3. GET /audio/{id}           → stream the WAV bytes to the browser
+
+    Every failure path returns JSON with a machine-readable flag (never audio),
+    so the frontend's useVoiceEngine can fall back to the browser voice:
+      - 503 {available:false}      → Voicebox not reachable
+      - 502 {generation_failed}    → Voicebox reported a failed generation
+      - 504 {timeout}              → generation did not finish within _POLL_TIMEOUT
+    A build that returns audio synchronously is still supported (short-circuit).
     """
     payload: Dict[str, Any] = {"text": body.text}
     if body.profile_id:
-        # Voicebox /generate uses profile_id; /speak uses profile. Send both keys
-        # so we work regardless of which the running build expects.
+        # Voicebox /generate uses profile_id; some builds accept profile. Send
+        # both so we work regardless of which the running build expects.
         payload["profile_id"] = body.profile_id
         payload["profile"] = body.profile_id
     if body.language:
         payload["language"] = body.language
+    # Model selection: explicit request wins, else the ops-configured default.
+    engine = body.engine or _DEFAULT_ENGINE
+    model_size = body.model_size or _DEFAULT_MODEL_SIZE
+    if engine:
+        payload["engine"] = engine
+    if model_size:
+        payload["model_size"] = model_size
 
-    try:
-        async with httpx.AsyncClient(timeout=_SPEAK_TIMEOUT) as client:
-            r = await client.post(f"{_ACTIVE_BASE}/generate", json=payload)
-    except Exception as e:
-        return JSONResponse(status_code=503, content={"available": False, "error": str(e)})
-
-    if r.status_code != 200:
-        # Surface Voicebox's own error but keep a machine-readable flag.
-        detail = ""
+    async with httpx.AsyncClient() as client:
+        # --- Step 1: enqueue the generation ---------------------------------
         try:
-            detail = r.text[:400]
+            r = await client.post(f"{_ACTIVE_BASE}/generate", json=payload, timeout=_GENERATE_TIMEOUT)
+        except Exception as e:
+            return JSONResponse(status_code=503, content={"available": False, "error": str(e)})
+
+        if r.status_code != 200:
+            detail = ""
+            try:
+                detail = r.text[:400]
+            except Exception:
+                pass
+            return JSONResponse(status_code=502, content={"available": True, "voicebox_status": r.status_code, "detail": detail})
+
+        content_type = r.headers.get("content-type", "")
+        if content_type.startswith("audio/"):
+            # Synchronous build: audio came straight back. Stream it.
+            return Response(content=r.content, media_type=content_type)
+
+        try:
+            gen = r.json()
         except Exception:
-            pass
-        return JSONResponse(status_code=502, content={"available": True, "voicebox_status": r.status_code, "detail": detail})
+            return JSONResponse(status_code=200, content={"available": True, "non_audio": True, "raw": r.text[:400]})
 
-    content_type = r.headers.get("content-type", "")
-    if content_type.startswith("audio/"):
-        # Happy path: audio bytes → stream straight to the browser <audio>.
-        return Response(content=r.content, media_type=content_type)
+        gen_id = gen.get("id") if isinstance(gen, dict) else None
+        if not gen_id:
+            # No id and no audio — nothing to poll. Pass through untouched.
+            return JSONResponse(status_code=200, content={"available": True, "non_audio": True, "payload": gen})
 
-    # Voicebox returned JSON (e.g. a job/URL/base64). Pass it through so the
-    # frontend can inspect; it will fall back to the browser voice if it can't
-    # play it. Kept non-fatal on purpose.
-    try:
-        return JSONResponse(status_code=200, content={"available": True, "non_audio": True, "payload": r.json()})
-    except Exception:
-        return JSONResponse(status_code=200, content={"available": True, "non_audio": True, "raw": r.text[:400]})
+        # --- Step 2: poll until the generation is terminal ------------------
+        status = (gen.get("status") or "").lower()
+        deadline = time.monotonic() + _POLL_TIMEOUT
+        while status not in _DONE_STATUSES and status not in _FAIL_STATUSES:
+            if time.monotonic() > deadline:
+                return JSONResponse(status_code=504, content={
+                    "available": True, "timeout": True,
+                    "generation_id": gen_id, "status": status or "generating",
+                    "waited_seconds": round(_POLL_TIMEOUT, 1),
+                })
+            await asyncio.sleep(_POLL_INTERVAL)
+            try:
+                hr = await client.get(f"{_ACTIVE_BASE}/history/{gen_id}", timeout=_HISTORY_TIMEOUT)
+                if hr.status_code == 200:
+                    gen = hr.json()
+                    status = (gen.get("status") or "").lower()
+            except Exception:
+                # Transient blip — keep polling until the deadline.
+                continue
+
+        if status in _FAIL_STATUSES:
+            return JSONResponse(status_code=502, content={
+                "available": True, "generation_failed": True,
+                "generation_id": gen_id, "error": gen.get("error"),
+            })
+
+        # --- Step 3: fetch and stream the finished audio --------------------
+        try:
+            ar = await client.get(f"{_ACTIVE_BASE}/audio/{gen_id}", timeout=_AUDIO_TIMEOUT)
+        except Exception as e:
+            return JSONResponse(status_code=503, content={"available": True, "audio_fetch_error": str(e), "generation_id": gen_id})
+
+        ar_ct = ar.headers.get("content-type", "")
+        if ar.status_code == 200 and ar_ct.startswith("audio/"):
+            return Response(content=ar.content, media_type=ar_ct)
+
+        return JSONResponse(status_code=502, content={
+            "available": True, "audio_fetch_failed": True,
+            "generation_id": gen_id, "audio_status": ar.status_code,
+        })
