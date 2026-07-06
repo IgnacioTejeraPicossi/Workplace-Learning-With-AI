@@ -1,6 +1,6 @@
 {
   "profile_id": "f6f43a53-8b13-4d63-9ac6-6ab9ba0177b6",
-  "generated_at": "2026-07-06T12:52:00",
+  "generated_at": "2026-07-06T13:14:08",
   "items": {
     "greet_welcome": {
       "filename": "greet_welcome.wav",
@@ -31,6 +31,48 @@
       "duration": 6.4,
       "bytes": 307244,
       "generated_at": "2026-07-06T12:52:00"
+    },
+    "pron_rr": {
+      "filename": "pron_rr.wav",
+      "duration": 13.6,
+      "bytes": 652844,
+      "generated_at": "2026-07-06T12:56:38"
+    },
+    "pron_ñ": {
+      "filename": "pron_ñ.wav",
+      "duration": 8.16,
+      "bytes": 391724,
+      "generated_at": "2026-07-06T12:59:40"
+    },
+    "pron_jg": {
+      "filename": "pron_jg.wav",
+      "duration": 8.72,
+      "bytes": 418604,
+      "generated_at": "2026-07-06T13:02:59"
+    },
+    "pron_ll": {
+      "filename": "pron_ll.wav",
+      "duration": 8.08,
+      "bytes": 387884,
+      "generated_at": "2026-07-06T13:05:55"
+    },
+    "enc_verygood": {
+      "filename": "enc_verygood.wav",
+      "duration": 7.12,
+      "bytes": 341804,
+      "generated_at": "2026-07-06T13:08:38"
+    },
+    "enc_keepgoing": {
+      "filename": "enc_keepgoing.wav",
+      "duration": 7.12,
+      "bytes": 341804,
+      "generated_at": "2026-07-06T13:11:21"
+    },
+    "enc_seeyou": {
+      "filename": "enc_seeyou.wav",
+      "duration": 7.36,
+      "bytes": 353324,
+      "generated_at": "2026-07-06T13:14:08"
     }
   }
 }
