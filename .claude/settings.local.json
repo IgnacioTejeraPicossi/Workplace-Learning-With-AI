@@ -175,7 +175,11 @@
       "Bash(docker stats *)",
       "Bash(curl -s -m 8 http://127.0.0.1:17600/history/30cfd9fc-5c7b-4443-9a36-a80126979cb0)",
       "Bash(curl -s -m 20 http://127.0.0.1:17600/audio/30cfd9fc-5c7b-4443-9a36-a80126979cb0 -o /tmp/ignacio_es.wav -w 'HTTP %{http_code} | content-type: %{content_type} | bytes: %{size_download}\\\\n')",
-      "Bash(curl -s -m 8 \"http://127.0.0.1:17600/models/status\")"
+      "Bash(curl -s -m 8 \"http://127.0.0.1:17600/models/status\")",
+      "Bash(grep -oE '`/models/[^`]*`|\"/models/[^\"]*\"|/models/[a-z$\\\\{\\\\}._-]*/\\(download|pull|fetch\\)' vb_bundle.js)",
+      "Bash(grep -oE 'model_size[^,;]{0,40}|\"qwen-custom-voice[^\"]*\"|custom_voice|customVoice' vb_bundle.js)",
+      "Bash(curl -s -m 15 -X POST http://127.0.0.1:17600/models/download -H 'Content-Type: application/json' -d '{\"model_name\":\"qwen-custom-voice-0.6B\"}' -w '\\\\n[HTTP %{http_code} | %{content_type}]\\\\n')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(m['model_name'], 'downloaded=',m['downloaded'],'downloading=',m['downloading']\\) for m in d['models'] if 'custom-voice-0.6' in m['model_name'] or 'custom-voice' in m['model_name']]\")"
     ]
   }
 }
