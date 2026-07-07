@@ -25,6 +25,9 @@
       "listening": "Escuchando…",
       "thinking": "El mentor está pensando…",
       "autoSpeak": "Leer en voz alta las respuestas del mentor",
+      "webResearch": "Investigar el tema en la web",
+      "webResearchHint": "Antes de responder, el mentor busca datos actuales sobre tu tema (requiere el servicio de búsqueda web en marcha; si está apagado, responde igual sin datos web).",
+      "webUsed": "Con datos web",
       "noAsr": "Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge para la conversación oral, o la pestaña de Conversación escrita."
     },
     "dashboard": {

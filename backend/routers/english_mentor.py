@@ -41,6 +41,7 @@ class ConversationMessageRequest(BaseModel):
     history: List[Dict[str, str]] = Field(default_factory=list)
     user_text: Optional[str] = Field(None)
     lang: str = Field("es", pattern=r"^(en|es|no)$")
+    web_research: bool = Field(False, description="Research the topic on the web before replying")
 
 
 class WritingRequest(BaseModel):
@@ -132,6 +133,7 @@ async def conversation_endpoint(body: ConversationMessageRequest) -> Dict[str, A
     return await conversation_message(
         scenario=body.scenario, difficulty=body.difficulty,
         history=body.history, user_text=body.user_text, lang=body.lang,
+        web_research=body.web_research,
     )
 
 

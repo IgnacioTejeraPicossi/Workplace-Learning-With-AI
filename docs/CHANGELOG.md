@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.0] - 2026-07-07
+
+### Added — "Conversation Audio": hands-free spoken practice in English Mastery AI
+
+A new **🎙 Conversation Audio** tab in English Mastery AI turns the written
+Conversation into a spoken one: you talk, the mentor answers out loud, in a
+turn-taking loop.
+
+**Phase 1 — spoken loop (frontend-only, reuses existing endpoint):**
+- `frontend/src/components/EnglishMentor/EnglishMentor.jsx` — new `TabConversationAudio`:
+  - Web Speech **ASR** (reuses `hologram/useSpeechCapture`) for speech→text.
+  - Sends the transcript to the existing `/api/english/conversation/message` (no backend change).
+  - Speaks each mentor reply automatically via the existing browser TTS (`useVoiceEngine`, English).
+  - Live interim transcript, mic push-to-talk, "speak replies" toggle, graceful `noAsr` fallback (Chrome/Edge needed).
+- i18n EN/NO/ES (`englishMentorModule.conversationAudio`, `tabs.conversationAudio`).
+- **No Docker / Voicebox dependency** — the English agent uses the browser voice; Voicebox is only for the Spanish cloned-voice examples and already degrades gracefully when off.
+
+**Phase 2 — web-research-augmented replies (optional, graceful):**
+- `backend/services/english_mentor.py` — `_web_research()` helper calls the standalone
+  **Node websearch-backend** (`WEBSEARCH_URL`, default `http://localhost:8080`) to fetch
+  current facts about the user's topic, injected into the mentor's system prompt.
+  `conversation_message()` gains a `web_research` flag and returns `web_used`.
+- `backend/routers/english_mentor.py` — `ConversationMessageRequest.web_research` passed through.
+- Frontend: "🌐 Research topic on the web" toggle + a "Web-informed" badge on replies that used it.
+- **Fully non-fatal:** if the websearch service is down/slow, the mentor replies normally
+  (`web_used=false`). No Docker; the web service itself is optional.
+
+### Validation
+
+- `py_compile` on both English backend files; JSX parse on `EnglishMentor.jsx`.
+- i18n parity EN/NO/ES for the new `conversationAudio` block (12 keys).
+- Verified end-to-end: `web_research=true` with the websearch service OFF still returns a
+  real LLM reply with `web_used=false` (graceful fallback confirmed).
+
+### Notes
+
+- Live spoken TTS uses the browser's English voice (instant), not the slow local
+  cloned voice — the right call for real-time conversation.
+
+---
+
 ## [1.19.0] - 2026-07-06
 
 ### Added — Native cloned-voice examples for the Spanish Teacher (pre-generation)

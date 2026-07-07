@@ -25,6 +25,9 @@
       "listening": "Listening…",
       "thinking": "The mentor is thinking…",
       "autoSpeak": "Speak the mentor's replies",
+      "webResearch": "Research topic on the web",
+      "webResearchHint": "Before replying, the mentor looks up current facts about your topic (needs the web-search service running; falls back silently if it's off).",
+      "webUsed": "Web-informed",
       "noAsr": "Your browser does not support speech recognition. Use Chrome or Edge for the spoken conversation, or the written Conversation tab."
     },
     "dashboard": {

@@ -25,6 +25,9 @@
       "listening": "Lytter…",
       "thinking": "Mentoren tenker…",
       "autoSpeak": "Les mentorens svar høyt",
+      "webResearch": "Undersøk temaet på nettet",
+      "webResearchHint": "Før mentoren svarer, slår den opp aktuelle fakta om temaet ditt (krever at nettsøk-tjenesten kjører; faller stille tilbake hvis den er av).",
+      "webUsed": "Nett-informert",
       "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Bruk Chrome eller Edge for muntlig samtale, eller den skriftlige Samtale-fanen."
     },
     "dashboard": {

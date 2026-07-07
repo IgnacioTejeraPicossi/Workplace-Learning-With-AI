@@ -22,13 +22,44 @@ Meaning fields carry {en, es, no}; es is the primary gloss for the learner.
 """
 
 import json
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
+
+import httpx
 
 try:
     from backend.llm import ask_ai_unified
 except Exception:
     ask_ai_unified = None  # type: ignore
+
+# Optional web-research augmentation for spoken conversation. Points at the
+# standalone Node websearch-backend (NOT Docker). Everything degrades gracefully:
+# if the service is down or slow, the mentor simply replies without fresh facts.
+_WEBSEARCH_URL = os.getenv("WEBSEARCH_URL", "http://localhost:8080").rstrip("/")
+_WEBSEARCH_TIMEOUT = float(os.getenv("WEBSEARCH_TIMEOUT", "15"))
+
+
+async def _web_research(query: str) -> Optional[str]:
+    """Ask the local websearch-backend to research `query` and return a short
+    factual digest, or None if unavailable/failed. Never raises — the caller
+    falls back to a normal reply so this feature never blocks a conversation."""
+    q = (query or "").strip()
+    if not q:
+        return None
+    prompt = (
+        "In 4-6 sentences, give current, factual background a tutor could use to "
+        f"discuss this topic in an English conversation: {q}"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=_WEBSEARCH_TIMEOUT) as client:
+            r = await client.post(f"{_WEBSEARCH_URL}/web-search", json={"query": prompt})
+        if r.status_code != 200:
+            return None
+        text = (r.json().get("result") or "").strip()
+        return text[:1500] if text else None
+    except Exception:
+        return None
 
 try:
     from backend.db import database
@@ -619,16 +650,28 @@ def _mentor_system_prompt(scenario: str, difficulty: str, explain_lang: str) -> 
 
 async def conversation_message(
     scenario: str, difficulty: str, history: List[Dict[str, str]],
-    user_text: Optional[str], lang: str = "es",
+    user_text: Optional[str], lang: str = "es", web_research: bool = False,
 ) -> Dict[str, Any]:
     scen = SCENARIOS.get(scenario, SCENARIOS["smalltalk"])
     if not history and not user_text:
         return {"reply": scen["first"], "register": "neutral", "correction": "",
-                "upgrade": "", "tip": "", "is_mock": False,
+                "upgrade": "", "tip": "", "is_mock": False, "web_used": False,
                 "scenario": scenario, "difficulty": difficulty}
     if ask_ai_unified is None:
         return _mock_reply(scenario, difficulty, user_text or "", lang)
+
+    # Optional: research the user's topic on the web first, then ground the reply.
+    web_context: Optional[str] = None
+    if web_research and user_text:
+        web_context = await _web_research(user_text)
+
     sys_prompt = _mentor_system_prompt(scenario, difficulty, lang)
+    if web_context:
+        sys_prompt += (
+            "\n\nFRESH WEB CONTEXT — use these current facts to make your reply "
+            "accurate and up to date. Weave them in naturally; do NOT quote them "
+            "verbatim or list sources:\n" + web_context
+        )
     messages: List[Dict[str, str]] = [{"role": "system", "content": sys_prompt}]
     for turn in history[-10:]:
         messages.append({"role": turn.get("role", "user"), "content": turn.get("content", "")})
@@ -650,6 +693,7 @@ async def conversation_message(
             parsed["is_mock"] = False
             parsed["scenario"] = scenario
             parsed["difficulty"] = difficulty
+            parsed["web_used"] = bool(web_context)
             parsed.setdefault("register", "neutral")
             for k in ("correction", "upgrade", "tip", "reply"):
                 parsed.setdefault(k, "")

@@ -581,6 +581,7 @@ const TabConversationAudio = () => {
   const [last, setLast] = useState(null);
   const [sending, setSending] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
+  const [webResearch, setWebResearch] = useState(false);
 
   const spokenRef = useRef(null);       // last reply already spoken (avoid repeats)
   const transcriptRef = useRef('');     // latest ASR transcript (fresh in effects)
@@ -621,13 +622,13 @@ const TabConversationAudio = () => {
     try {
       const r = await fetch(`${API_BASE}/api/english/conversation/message`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, difficulty, history: newHist, user_text: text.trim(), lang }),
+        body: JSON.stringify({ scenario, difficulty, history: newHist, user_text: text.trim(), lang, web_research: webResearch }),
       });
       const d = await r.json();
       setLast(d); setHistory([...newHist, { role: 'assistant', content: d.reply }]);
     } catch (e) { /* noop */ }
     setSending(false);
-  }, [history, sending, scenario, difficulty, lang]);
+  }, [history, sending, scenario, difficulty, lang, webResearch]);
 
   useEffect(() => { sendRef.current = sendUserTurn; });
 
@@ -690,6 +691,11 @@ const TabConversationAudio = () => {
             <Card accent={C.accent} style={{ marginTop: 10, background: C.accentLight, borderColor: C.accentBorder }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
                 <Chip color={C.accent}>{t(`englishMentorModule.conversation.registerLabel.${last.register}`, { defaultValue: last.register })}</Chip>
+                {last.web_used && (
+                  <span style={{ fontSize: 10, fontWeight: 700, color: C.green, background: C.greenLight, border: `1px solid ${C.greenBorder}`, padding: '2px 8px', borderRadius: 999 }}>
+                    🌐 {t('englishMentorModule.conversationAudio.webUsed')}
+                  </span>
+                )}
                 <SpeakBtn text={last.reply} tts={tts} style={{ marginLeft: 'auto' }} />
               </div>
               {last.correction && (<div style={{ marginBottom: 6 }}>
@@ -733,6 +739,10 @@ const TabConversationAudio = () => {
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: C.inkSoft, cursor: 'pointer' }}>
             <input type="checkbox" checked={autoSpeak} onChange={(e) => setAutoSpeak(e.target.checked)} />
             {t('englishMentorModule.conversationAudio.autoSpeak')}
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: C.inkSoft, cursor: 'pointer' }} title={t('englishMentorModule.conversationAudio.webResearchHint')}>
+            <input type="checkbox" checked={webResearch} onChange={(e) => setWebResearch(e.target.checked)} />
+            🌐 {t('englishMentorModule.conversationAudio.webResearch')}
           </label>
           <Button onClick={reset} style={{ marginLeft: 'auto' }}>{t('englishMentorModule.conversation.newConversation')}</Button>
         </div>
