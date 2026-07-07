@@ -197,7 +197,12 @@
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only enc_seeyou --regen-failures)",
       "Bash(python -m py_compile backend/scripts/pregenerate_voice_examples.py)",
       "Bash(PYTHONIOENCODING=utf-8 python -m pytest backend/tests/test_voice_examples.py -q)",
-      "Bash(curl -s -m 8 \"http://localhost:8000/api/voice/examples/enc_seeyou/audio\" -o /dev/null -w \"HTTP %{http_code} | %{size_download} bytes | %{time_total}s\\\\n\")"
+      "Bash(curl -s -m 8 \"http://localhost:8000/api/voice/examples/enc_seeyou/audio\" -o /dev/null -w \"HTTP %{http_code} | %{size_download} bytes | %{time_total}s\\\\n\")",
+      "Bash(python -m py_compile backend/services/voice_examples.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only pron_rr --regen-failures)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only greet_howareyou,instr_again --regen-failures)",
+      "Bash(python -m py_compile backend/scripts/trim_voice_examples.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only greet_howareyou,instr_again --regen-failures --attempts 5)"
     ]
   }
 }

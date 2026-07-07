@@ -186,9 +186,26 @@ def trim_leading_prefix(
         info.update(ok=False, reason=f"validation: {expected_chars/new_sec:.1f} chars/s > {max_chars_per_sec}")
         return raw, info
 
-    # Slice frames from the boundary to the end and repackage as a WAV.
+    # Slice frames from the boundary to the end.
     start_frame = int(boundary * sr)
     out_frames = frames[start_frame * bytes_per_frame:]
+
+    # Content check: the trimmed segment must actually contain SPEECH, not just
+    # silence/noise. Catches defective generations where the model dropped the
+    # target after a long reference (the leftover tail is near-silent) — without
+    # this, the endpoint would happily serve background noise.
+    voiced = 0
+    windows = 0
+    for i in range(0, len(out_frames) - step, step):
+        windows += 1
+        if audioop.rms(out_frames[i:i + step], sw) >= thr:
+            voiced += 1
+    voiced_frac = (voiced / windows) if windows else 0.0
+    info["voiced_frac"] = round(voiced_frac, 2)
+    if voiced_frac < 0.30:
+        info.update(ok=False, reason=f"trimmed audio mostly silent (voiced={voiced_frac:.0%})")
+        return raw, info
+
     buf = io.BytesIO()
     with wave.open(buf, "wb") as ow:
         ow.setnchannels(ch)
