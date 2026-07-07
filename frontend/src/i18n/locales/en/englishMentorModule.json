@@ -13,7 +13,19 @@
       "pronunciation": "Pronunciation",
       "vocabulary": "Vocabulary SRS",
       "conversation": "Conversation",
+      "conversationAudio": "Conversation Audio",
       "writing": "Writing & Style"
+    },
+    "conversationAudio": {
+      "title": "Conversation Audio",
+      "subtitle": "Hands-free spoken practice: you talk, the mentor answers out loud. Start a topic and keep the conversation going.",
+      "startBtn": "Start spoken conversation",
+      "speak": "Hold the topic — speak",
+      "stopSpeaking": "Stop & send",
+      "listening": "Listening…",
+      "thinking": "The mentor is thinking…",
+      "autoSpeak": "Speak the mentor's replies",
+      "noAsr": "Your browser does not support speech recognition. Use Chrome or Edge for the spoken conversation, or the written Conversation tab."
     },
     "dashboard": {
       "title": "Today",

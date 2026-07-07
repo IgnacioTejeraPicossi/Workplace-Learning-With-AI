@@ -202,7 +202,8 @@
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only pron_rr --regen-failures)",
       "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only greet_howareyou,instr_again --regen-failures)",
       "Bash(python -m py_compile backend/scripts/trim_voice_examples.py)",
-      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only greet_howareyou,instr_again --regen-failures --attempts 5)"
+      "Bash(PYTHONIOENCODING=utf-8 python -m backend.scripts.trim_voice_examples --only greet_howareyou,instr_again --regen-failures --attempts 5)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('scenarios:', len\\(d.get\\('scenarios',[]\\)\\)\\)\")"
     ]
   }
 }

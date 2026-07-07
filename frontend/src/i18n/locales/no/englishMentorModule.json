@@ -13,7 +13,19 @@
       "pronunciation": "Uttale",
       "vocabulary": "Ordforråd SRS",
       "conversation": "Samtale",
+      "conversationAudio": "Lydsamtale",
       "writing": "Skriving og stil"
+    },
+    "conversationAudio": {
+      "title": "Lydsamtale",
+      "subtitle": "Håndfri muntlig øving: du snakker, mentoren svarer høyt. Start et tema og hold samtalen i gang.",
+      "startBtn": "Start muntlig samtale",
+      "speak": "Snakk om temaet",
+      "stopSpeaking": "Stopp og send",
+      "listening": "Lytter…",
+      "thinking": "Mentoren tenker…",
+      "autoSpeak": "Les mentorens svar høyt",
+      "noAsr": "Nettleseren din støtter ikke talegjenkjenning. Bruk Chrome eller Edge for muntlig samtale, eller den skriftlige Samtale-fanen."
     },
     "dashboard": {
       "title": "I dag",

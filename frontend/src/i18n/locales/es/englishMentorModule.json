@@ -13,7 +13,19 @@
       "pronunciation": "Pronunciación",
       "vocabulary": "Vocabulario SRS",
       "conversation": "Conversación",
+      "conversationAudio": "Conversación Audio",
       "writing": "Escritura y Estilo"
+    },
+    "conversationAudio": {
+      "title": "Conversación Audio",
+      "subtitle": "Práctica oral con manos libres: tú hablas y el mentor responde en voz alta. Empieza un tema y mantén la conversación.",
+      "startBtn": "Iniciar conversación oral",
+      "speak": "Habla del tema",
+      "stopSpeaking": "Parar y enviar",
+      "listening": "Escuchando…",
+      "thinking": "El mentor está pensando…",
+      "autoSpeak": "Leer en voz alta las respuestas del mentor",
+      "noAsr": "Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge para la conversación oral, o la pestaña de Conversación escrita."
     },
     "dashboard": {
       "title": "Hoy",
