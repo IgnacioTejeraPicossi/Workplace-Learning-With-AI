@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.2] - 2026-07-08
+
+### Added — Localized Help documentation (Norwegian + Spanish)
+
+The Help → README Viewer now serves its documents in the language selected in the
+app's menu, matching the frontend i18n. Previously all docs were English-only.
+
+**Backend** (`backend/app.py`): `_resolve_localized_md()` helper + a `lang` query
+param on `GET /api/readme` and `GET /api/docs/read`. For `lang` in {`no`, `es`} it
+serves `<stem>.<lang>.md` (e.g. `README.no.md`, `docs/agents.es.md`) and **falls
+back to the English base** when a translation is absent, returning `lang_served`
+and `fallback` flags.
+
+**Frontend** (`frontend/src/ReadmeViewer.jsx`): reads the current `i18n.language`,
+requests the matching translation, re-fetches on language switch, and shows a small
+"not translated yet — showing English" notice when the backend fell back. The
+viewer's own chrome (title, search, buttons, summaries) is localized inline EN/NO/ES.
+
+**Translations** (prose translated; code, file paths, endpoints, commands, env vars
+and proper nouns kept in English): `README.no.md` + `README.es.md` (full, 430 lines
+each) and the five viewer docs — `docs/{agents,deployment,architecture,n8n,admin-dev}`
+→ `.no.md` + `.es.md` (12 translated files total).
+
+Also fixed a stale websearch port (`3001` → `8080`, `WEBSEARCH_PORT`) in
+`docs/deployment.md` and `docs/agents.md` (English sources) discovered during the pass.
+
+**Validation:** all 12 docs verified end-to-end via `/api/readme?lang=` and
+`/api/docs/read?path=&lang=` — each returns `lang_served` matching the request with
+`fallback=false`; an unsupported language falls back to English cleanly. JSX parses.
+
+---
+
 ## [1.20.1] - 2026-07-08
 
 ### Fixed — Help → README Viewer now renders Markdown like GitHub
