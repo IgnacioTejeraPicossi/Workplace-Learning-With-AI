@@ -34,6 +34,7 @@
 | **Security Center** | 6-module platform security & privacy: local encryption (AES-GCM 256), automatic data deletion, user data control & export, PII anonymization, dynamic security score, real-time event monitoring |
 | **Cybersecurity** | 10-tab security platform: threat library, real vulnerability scanning, NIST CSF 2.0 posture, compliance tracker, secure coding coach, incident drills, knowledge base, agent security monitor |
 | **QA & Test Automation** | Red Cross Web QA Agent (20 tabs / 50 endpoints): Playwright + Cypress generators, Skjemabygger + Fundy forms QA, content migration audit, Enonic-specific perf, Designsystemet (Digdir) compliance, role permission matrix, **Azure DevOps work-item bundle**, **Sprint Report generator**, **DPIA / DoD verifier / Resilience / UAT-støtte / Risk Matrix**, **k6 + Loadster dual load-testing**, **Storybook + Postman + GraphQL introspection** (Phase F), **NVDA + WAVE** accessibility (Phase G), **Phase H · Pack 2 — Sikkerhet og personvern workbench** (backend-driven, persistent, status preserved across re-scans, structured DPIA), **Phase H · Pack 3 — 5 workflow extensions** (📥 Markdown export of findings + DPIA + history, 🎯 idempotent single-finding ADO dispatch with deterministic mock work-item IDs, 🔀 scan-diff with new/fixed/regressed/persisted buckets, ✅ verify-fix flow auto-promoting `fixed` → `verified`, 🌐 environment matrix across local/test/staging/prod), aligned to Trine Bruu's Teststrategi 30.3 |
+| **Language Agents** | 6 language tutors (Japanese, Chinese, Korean, English Mastery, Norwegian, Spanish) — pronunciation, grammar, vocab SRS, conversation; **native cloned-voice examples** (Voicebox, local) and **spoken Conversation Audio** (Web Speech ASR + TTS, optional web research) |
 | **Specialized AI Use Cases** | J-messages Analyzer, compliance/productivity agents, ATM V&V Test Copilot, AI experimentation |
 
 ---
@@ -81,6 +82,54 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 ---
 
 ## 🔄 Recent Work (2024–2026)
+
+### Language Agents — native cloned voice + spoken conversation (July 2026)
+
+The **Language Agents** family (sidebar → **Language Agents**) is a set of six
+language tutors — 🇯🇵 Japanese Sensei · 🇨🇳 Chinese Teacher · 🇰🇷 Korean Teacher ·
+🇬🇧 English Mastery · 🇳🇴 Norwegian Mentor · 🇪🇸 Spanish Teacher — each a multi-tab
+workspace (pronunciation, grammar, vocabulary SRS, conversation, etc.) backed by
+`/api/{japanese|chinese|korean|english|norwegian|spanish}/*`. Contract coverage:
+`backend/tests/test_language_agents_contracts.py` (42 tests across the 6 agents).
+
+Two capabilities landed in July 2026:
+
+**1. Native cloned-voice examples — Spanish Teacher (CHANGELOG [1.19.0])**
+A local, privacy-preserving **voice-cloning** path via **[Voicebox](https://voicebox.sh)**
+(open-source, runs on `127.0.0.1`, keeps all voice data on the user's machine).
+Because live CPU synthesis of a cloned voice is slow (~1-5 min/phrase without a GPU),
+the Spanish Teacher's **Pronunciation** tab plays a curated set of **pre-generated**
+native example phrases (greetings, classroom instructions, rr/ñ/j/ll pronunciation
+showcase, encouragement) — cached as WAV and served for **instant** playback (~0.2s).
+- Backend: `backend/services/voice_examples.py` (phrase set + cache + reference-prefix
+  trimmer with silence-detection + speech-rate + voiced-content validation),
+  `backend/scripts/pregenerate_voice_examples.py` (offline generator, resumable),
+  endpoints `GET /api/voice/examples` + `GET /api/voice/examples/{id}/audio`.
+- Voicebox proxy `backend/routers/voicebox.py` rewritten for Voicebox v0.5.0's
+  **async** generation flow (POST /generate → poll /history/{id} → GET /audio/{id}),
+  with graceful browser-voice fallback and `engine`/`model_size` selection.
+- Frontend: `NativeVoiceExamples` panel in `SpanishTeacher.jsx`; tests
+  `backend/tests/test_voice_examples.py` (10). i18n EN/NO/ES.
+- **Model matrix (verified):** cloned voices work with Qwen TTS (`qwen`, 0.6B/1.7B);
+  `qwen_custom_voice` rejects clones, Kokoro is fixed-voice, LuxTTS is English-only.
+
+**2. Conversation Audio — English Mastery AI (CHANGELOG [1.20.0])**
+A new **🎙 Conversation Audio** tab: hands-free *spoken* practice. You talk (Web Speech
+**ASR**, `hologram/useSpeechCapture`), the mentor answers, and the reply is spoken back
+automatically (browser TTS) in a turn-taking loop — reusing the existing
+`/api/english/conversation/message` endpoint (Phase 1, no backend change). **Phase 2**
+adds an optional **🌐 web-research** toggle: the mentor researches the topic via the
+standalone Node `websearch-backend` (`WEBSEARCH_URL`, default `:8080`) and grounds the
+reply with current facts (`web_research` flag → `web_used` response), degrading
+gracefully to a normal reply when the service is off.
+- Backend: `backend/services/english_mentor.py` (`_web_research` + `web_research`
+  param), `backend/routers/english_mentor.py`. Frontend: `TabConversationAudio` in
+  `EnglishMentor.jsx`. i18n EN/NO/ES.
+- **No Docker dependency:** English Mastery uses the browser voice; Voicebox/Docker is
+  only for the Spanish cloned-voice examples and degrades gracefully when off.
+
+> **Note:** `docs/Voice-Cloning-Discontinuation.md` (Dec 2024) describes an *earlier*,
+> abandoned Coqui-TTS attempt and is **superseded** by the Voicebox approach above.
 
 ### Red Cross Web QA Agent (May 2026 — Teststrategi 30.3 alignment)
 

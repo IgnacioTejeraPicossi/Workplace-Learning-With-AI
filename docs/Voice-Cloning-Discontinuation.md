@@ -1,9 +1,18 @@
 # 🎤 Voice Cloning Feature Discontinuation
 
+> ⚠️ **SUPERSEDED (July 2026).** This document describes an *early* voice-cloning
+> attempt built on **Coqui TTS** that was abandoned in Dec 2024 for the reasons
+> below. Voice cloning was **later re-implemented with a completely different,
+> lightweight, local-first approach** — [Voicebox](https://voicebox.sh) running on
+> `127.0.0.1` — and now powers the Spanish Teacher's native cloned-voice examples.
+> See the **Language Agents** section of the root [`README.md`](../README.md) and
+> `docs/CHANGELOG.md` **[1.19.0]** for the current implementation. This file is kept
+> for historical context only.
+
 ## **📋 Decision Summary**
 
 **Date:** December 2024  
-**Status:** Discontinued  
+**Status:** Discontinued (Coqui TTS attempt) — see superseded note above  
 **Reason:** Technical complexity and large library dependencies
 
 ## **🔍 Why We Discontinued Voice Cloning**
