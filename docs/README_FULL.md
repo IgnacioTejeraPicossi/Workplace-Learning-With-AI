@@ -1604,7 +1604,7 @@ cd agentops-n8n && .\start-n8n.ps1
 ### 🌐 Service Ports
 - **Backend API**: http://localhost:8000
 - **Frontend**: http://localhost:3000
-- **Web Search**: http://localhost:3001
+- **Web Search**: http://localhost:8080 (`WEBSEARCH_PORT`)
 - **n8n Workflows**: http://localhost:5678 (optional)
 - **LM Studio**: http://localhost:1234 (if using local AI)
 

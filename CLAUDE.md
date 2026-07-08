@@ -67,7 +67,7 @@ Do not assume imports will work if started from another directory.
 Default local ports are expected to remain stable unless explicitly changed:
 - backend: `8000`
 - frontend: `3000`
-- websearch backend: `3001`
+- websearch backend: `8080` (env `WEBSEARCH_PORT`)
 - n8n: `5678`
 - LM Studio / local LLM endpoint: `1234`
 - MCP test file server: `8888`

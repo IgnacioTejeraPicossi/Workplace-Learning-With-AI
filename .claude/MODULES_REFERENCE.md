@@ -310,7 +310,7 @@ The Cybersecurity module is the largest Enterprise Agent, with its own dedicated
 **Purpose**: Standalone Node.js service providing web search capabilities to the platform.
 
 **Location**: `websearch-backend/`
-**Port**: 3001
+**Port**: 8080 (override with `WEBSEARCH_PORT`; consumed by callers via `WEBSEARCH_URL`, default `http://localhost:8080`)
 **Entry point**: `index.js`
 **Start**: `cd websearch-backend && node index.js`
 

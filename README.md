@@ -60,7 +60,7 @@
 python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Ports**: Backend 8000, Frontend 3000, Web Search 3001, n8n 5678 (optional), Test file server 8888 (for MCP).
+**Ports**: Backend 8000, Frontend 3000, Web Search 8080 (`WEBSEARCH_PORT`), n8n 5678 (optional), Test file server 8888 (for MCP).
 
 ---
 

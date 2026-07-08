@@ -10,7 +10,7 @@
 |---------|------|------|---------------|
 | Backend | FastAPI (Python) | 8000 | `python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000` |
 | Frontend | React (Vite/CRA) | 3000 | `cd frontend && npm start` |
-| Websearch | Node.js | 3001 | `cd websearch-backend && node index.js` |
+| Websearch | Node.js | 8080 | `cd websearch-backend && node index.js` |
 | n8n | Docker | 5678 | `cd agentops-n8n && docker-compose up` |
 | LM Studio | Local LLM | 1234 | Manual (LM Studio app) |
 | MCP File Server | Python HTTP | 8888 | Manual (test file server) |
