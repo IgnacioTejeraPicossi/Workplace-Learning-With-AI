@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.1] - 2026-07-08
+
+### Fixed — Help → README Viewer now renders Markdown like GitHub
+
+The in-app **README Viewer** (`frontend/src/ReadmeViewer.jsx`, Help → Readme) used a
+minimal parser that joined every consecutive line into one paragraph, so **bulleted /
+numbered lists collapsed into a single run of text**, `---` rules showed literally, and
+Markdown **tables** and fenced **code blocks** rendered as raw pipes/backticks — hard to
+read for anyone using it for help.
+
+Rewrote the lightweight parser + renderer (no external markdown lib) to recognise proper
+block types: **lists** (`- ` / `* ` / `1.`, with wrapped-line continuation) → `<ul>`/`<ol>`,
+**tables** (pipe tables) → `<table>`, **horizontal rules** → `<hr>`, fenced **code blocks**
+→ `<pre>`, and **blockquotes** → styled. Inline formatting (bold / italic / inline-code /
+links) was extracted into a shared `renderInline` helper reused by every block type, and
+the section-level search + table-of-contents behaviour is unchanged (each block still
+contributes its `blobL` to the section search index).
+
+Verified against the real `README.md`: the parser produces 25 lists, 2 tables, 9 rules,
+2 code blocks and 3 blockquotes (previously all flattened into paragraphs). JSX parses clean.
+
+---
+
 ## [1.20.0] - 2026-07-07
 
 ### Added — "Conversation Audio": hands-free spoken practice in English Mastery AI

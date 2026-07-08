@@ -50,6 +50,14 @@ const slugify = (s = '') =>
 
 // ── Parser: markdown → sections[] ───────────────────────────────────────────
 // Returns { id, level, headingText, blocks[], combinedBlobL }
+// Block types: heading (section), paragraph, list, table, hr, code, mermaid,
+// blockquote. Kept intentionally lightweight (no external markdown lib) but
+// covers the constructs used across the repo docs so they render like GitHub.
+const _isHr        = (t) => /^(-{3,}|\*{3,}|_{3,})$/.test(t);
+const _isListItem  = (l) => /^\s*([-*+]|\d+\.)\s+/.test(l);
+const _isTableSep  = (l) => l.includes('|') && l.includes('-') && /^\s*\|?[\s:|-]+\|?\s*$/.test(l);
+const _splitRow    = (l) => l.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+
 const parseMarkdown = (md) => {
   const lines = md.split('\n');
   const sections = [];
@@ -82,26 +90,95 @@ const parseMarkdown = (md) => {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    if (line.trim().startsWith('```mermaid')) {
+    const trimmed = line.trim();
+
+    // Fenced code block (``` or ```mermaid …)
+    if (trimmed.startsWith('```')) {
+      const lang = trimmed.slice(3).trim().toLowerCase();
       let j = i + 1;
       const code = [];
-      while (j < lines.length && !lines[j].startsWith('```')) { code.push(lines[j]); j++; }
+      while (j < lines.length && !lines[j].trim().startsWith('```')) { code.push(lines[j]); j++; }
       const content = code.join('\n');
-      push({ type: 'mermaid', content, blobL: content.toLowerCase() });
+      if (lang === 'mermaid') push({ type: 'mermaid', content, blobL: content.toLowerCase() });
+      else push({ type: 'code', content, blobL: content.toLowerCase() });
       i = j + 1;
       continue;
     }
+
+    // Heading
     const m = /^(#{1,6})\s+(.*)$/.exec(line);
     if (m) { open(m[1].length, m[2]); i++; continue; }
-    if (line.trim() !== '') {
-      let j = i;
-      const para = [];
-      while (j < lines.length && lines[j].trim() !== '') { para.push(lines[j]); j++; }
-      const text = para.join(' ');
-      push({ type: 'paragraph', text, blobL: text.toLowerCase() });
-      i = j + 1;
+
+    // Horizontal rule
+    if (_isHr(trimmed)) { push({ type: 'hr', blobL: '' }); i++; continue; }
+
+    // Table (current row has a pipe AND the next line is a |---|---| separator)
+    if (trimmed.includes('|') && i + 1 < lines.length && _isTableSep(lines[i + 1])) {
+      const headers = _splitRow(line);
+      let j = i + 2;
+      const rows = [];
+      while (j < lines.length && lines[j].includes('|') && lines[j].trim() !== '') {
+        rows.push(_splitRow(lines[j])); j++;
+      }
+      const blob = [headers.join(' '), ...rows.map(r => r.join(' '))].join(' ').toLowerCase();
+      push({ type: 'table', headers, rows, blobL: blob });
+      i = j;
       continue;
     }
+
+    // List (bulleted or ordered) — including wrapped continuation lines
+    if (_isListItem(line)) {
+      const ordered = /^\s*\d+\.\s+/.test(line);
+      const items = [];
+      let j = i;
+      while (j < lines.length && lines[j].trim() !== '') {
+        if (_isListItem(lines[j])) {
+          const indent = (lines[j].match(/^\s*/)[0] || '').length;
+          items.push({ text: lines[j].replace(/^\s*([-*+]|\d+\.)\s+/, ''), indent });
+        } else if (/^\s+\S/.test(lines[j]) && items.length) {
+          items[items.length - 1].text += ' ' + lines[j].trim();  // continuation
+        } else {
+          break;
+        }
+        j++;
+      }
+      push({ type: 'list', ordered, items, blobL: items.map(it => it.text).join(' ').toLowerCase() });
+      i = j;
+      continue;
+    }
+
+    // Blockquote
+    if (trimmed.startsWith('>')) {
+      const quote = [];
+      let j = i;
+      while (j < lines.length && lines[j].trim().startsWith('>')) {
+        quote.push(lines[j].trim().replace(/^>\s?/, '')); j++;
+      }
+      const text = quote.join(' ');
+      push({ type: 'blockquote', text, blobL: text.toLowerCase() });
+      i = j;
+      continue;
+    }
+
+    // Paragraph — gather until a blank line OR the start of another block
+    if (trimmed !== '') {
+      const para = [];
+      let j = i;
+      while (
+        j < lines.length && lines[j].trim() !== '' &&
+        !_isListItem(lines[j]) &&
+        !_isHr(lines[j].trim()) &&
+        !/^(#{1,6})\s+/.test(lines[j]) &&
+        !lines[j].trim().startsWith('```') &&
+        !lines[j].trim().startsWith('>') &&
+        !(lines[j].includes('|') && j + 1 < lines.length && _isTableSep(lines[j + 1]))
+      ) { para.push(lines[j]); j++; }
+      const text = para.join(' ');
+      if (text.trim()) push({ type: 'paragraph', text, blobL: text.toLowerCase() });
+      i = Math.max(j, i + 1);
+      continue;
+    }
+
     i++;
   }
   flush();
@@ -193,17 +270,75 @@ export default function ReadmeViewer() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // Inline markdown → HTML (bold / italic / inline-code / links), search-highlighted.
+  const renderInline = (text) => highlight(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:0.9em;">$1</code>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+
   const renderBlock = (b, idx) => {
     if (b.type === 'paragraph') {
-      const html = highlight(b.text)
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:0.9em;">$1</code>')
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
       return (
         <div key={idx}
-             style={{ lineHeight: 1.6, margin: '4px 0', color: '#1e293b', fontSize: 14 }}
-             dangerouslySetInnerHTML={{ __html: html }} />
+             style={{ lineHeight: 1.6, margin: '8px 0', color: '#1e293b', fontSize: 14 }}
+             dangerouslySetInnerHTML={{ __html: renderInline(b.text) }} />
+      );
+    }
+    if (b.type === 'list') {
+      const Tag = b.ordered ? 'ol' : 'ul';
+      return React.createElement(
+        Tag,
+        { key: idx, style: { margin: '8px 0', paddingLeft: 24, lineHeight: 1.6, color: '#1e293b', fontSize: 14 } },
+        b.items.map((it, k) => (
+          <li key={k}
+              style={{ margin: '4px 0', marginLeft: it.indent > 1 ? 18 : 0 }}
+              dangerouslySetInnerHTML={{ __html: renderInline(it.text) }} />
+        ))
+      );
+    }
+    if (b.type === 'hr') {
+      return <hr key={idx} style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '18px 0' }} />;
+    }
+    if (b.type === 'table') {
+      return (
+        <div key={idx} style={{ overflowX: 'auto', margin: '10px 0' }}>
+          <table style={{ borderCollapse: 'collapse', fontSize: 13, width: '100%' }}>
+            <thead>
+              <tr>{b.headers.map((h, k) => (
+                <th key={k}
+                    style={{ border: '1px solid #e2e8f0', padding: '6px 10px', textAlign: 'left',
+                             background: '#f8fafc', color: '#0f172a', fontWeight: 700 }}
+                    dangerouslySetInnerHTML={{ __html: renderInline(h) }} />
+              ))}</tr>
+            </thead>
+            <tbody>
+              {b.rows.map((r, k) => (
+                <tr key={k}>{r.map((c, ci) => (
+                  <td key={ci}
+                      style={{ border: '1px solid #e2e8f0', padding: '6px 10px', color: '#1e293b', verticalAlign: 'top' }}
+                      dangerouslySetInnerHTML={{ __html: renderInline(c) }} />
+                ))}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    if (b.type === 'code') {
+      return (
+        <pre key={idx} style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8,
+                                overflowX: 'auto', fontSize: 12.5, lineHeight: 1.5, margin: '10px 0' }}>
+          <code>{b.content}</code>
+        </pre>
+      );
+    }
+    if (b.type === 'blockquote') {
+      return (
+        <blockquote key={idx}
+          style={{ borderLeft: '3px solid #cbd5e1', margin: '10px 0', padding: '6px 14px',
+                   color: '#475569', fontStyle: 'italic', background: '#f8fafc', borderRadius: '0 6px 6px 0' }}
+          dangerouslySetInnerHTML={{ __html: renderInline(b.text) }} />
       );
     }
     if (b.type === 'mermaid') {
