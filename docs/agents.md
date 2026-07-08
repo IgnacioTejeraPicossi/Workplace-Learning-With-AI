@@ -20,7 +20,7 @@ Primary module highlights:
 1. Small, reviewable PRs (one primary module/service per PR unless explicitly requested).
 2. Never commit secrets (API keys, tokens, passwords). Use `.env` and env vars.
 3. Preserve stable ports and the documented service topology:
-   - backend 8000, frontend 3000, websearch 3001, n8n 5678, LM Studio 1234, MCP test file server 8888.
+   - backend 8000, frontend 3000, websearch 8080, n8n 5678, LM Studio 1234, MCP test file server 8888.
 4. Backend MUST be started from repo ROOT (not from `backend/`) to avoid import issues.
 5. If changing API contracts, add/adjust contract tests or at minimum a reproducible smoke command in TESTING.md.
 6. Avoid heavyweight dependency bloat: do not reintroduce the discontinued Voice Cloning stack or similar multi-GB deps.
@@ -49,7 +49,7 @@ For any task:
 - UI modules include: J-messages Analyzer, Robomind Clinic, Repo Analyzer Cursor AI, Agent prompt managers, etc.
 
 ### Websearch backend (Node)
-- Runs on 3001. Treat as separate service; keep API stable.
+- Runs on 8080. Treat as separate service; keep API stable.
 
 ### n8n (Docker, optional)
 - Runs on 5678. Used for AgentOps Studio flows; avoid breaking webhook payloads.

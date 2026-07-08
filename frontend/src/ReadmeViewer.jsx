@@ -1,4 +1,37 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+// Chrome strings for the viewer itself, localized inline (kept out of the huge
+// common.json). The DOCUMENT content is localized server-side by serving
+// '<name>.<lang>.md' with English fallback — see backend /api/readme?lang=.
+const toDocLang = (lng) => (String(lng || 'en').startsWith('es') ? 'es'
+                          : String(lng || 'en').startsWith('no') ? 'no' : 'en');
+const UI = {
+  en: {
+    title: 'README Viewer', search: 'Search headings or text…', clear: 'Clear search',
+    hide: '⇤ Hide sections', show: '⇥ Show sections', sections: 'Sections',
+    loading: 'Loading README…', copyLink: 'Copy link to section',
+    fallback: 'This document is not translated yet — showing the English version.',
+    noMatch: (q) => <>❕ No sections match <strong>&quot;{q}&quot;</strong>. Try a broader query, e.g. a single keyword.</>,
+    found: (m, s) => <>🔍 Found <strong>{m}</strong> match{m !== 1 ? 'es' : ''} across <strong>{s}</strong> section{s !== 1 ? 's' : ''}. Whole sections shown so you can read them in context.</>,
+  },
+  no: {
+    title: 'README-visning', search: 'Søk i overskrifter eller tekst…', clear: 'Tøm søk',
+    hide: '⇤ Skjul seksjoner', show: '⇥ Vis seksjoner', sections: 'Seksjoner',
+    loading: 'Laster README…', copyLink: 'Kopier lenke til seksjonen',
+    fallback: 'Dette dokumentet er ikke oversatt ennå — viser den engelske versjonen.',
+    noMatch: (q) => <>❕ Ingen seksjoner samsvarer med <strong>&quot;{q}&quot;</strong>. Prøv et bredere søk, f.eks. ett nøkkelord.</>,
+    found: (m, s) => <>🔍 Fant <strong>{m}</strong> treff i <strong>{s}</strong> seksjon{s !== 1 ? 'er' : ''}. Hele seksjoner vises så du kan lese dem i kontekst.</>,
+  },
+  es: {
+    title: 'Visor de README', search: 'Buscar en títulos o texto…', clear: 'Limpiar búsqueda',
+    hide: '⇤ Ocultar secciones', show: '⇥ Mostrar secciones', sections: 'Secciones',
+    loading: 'Cargando README…', copyLink: 'Copiar enlace a la sección',
+    fallback: 'Este documento aún no está traducido — mostrando la versión en inglés.',
+    noMatch: (q) => <>❕ Ninguna sección coincide con <strong>&quot;{q}&quot;</strong>. Prueba una búsqueda más amplia, p. ej. una sola palabra.</>,
+    found: (m, s) => <>🔍 {m} coincidencia{m !== 1 ? 's' : ''} en <strong>{s}</strong> sección{s !== 1 ? 'es' : ''}. Se muestran secciones completas para leerlas en contexto.</>,
+  },
+};
 
 /**
  * README Viewer — Section-aware markdown reader.
@@ -187,12 +220,16 @@ const parseMarkdown = (md) => {
 
 // ── Component ───────────────────────────────────────────────────────────────
 export default function ReadmeViewer() {
+  const { i18n } = useTranslation();
+  const lang = toDocLang(i18n.language);
+  const ui = UI[lang] || UI.en;
   const [markdown, setMarkdown] = useState('');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [docPath, setDocPath] = useState('README.md');
   const [showToc, setShowToc] = useState(true);
+  const [fallback, setFallback] = useState(false);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -200,14 +237,17 @@ export default function ReadmeViewer() {
       setLoading(true);
       try {
         const res = docPath.startsWith('docs/')
-          ? await fetch(`/api/docs/read?path=${encodeURIComponent(docPath)}`)
-          : await fetch('/api/readme');
+          ? await fetch(`/api/docs/read?path=${encodeURIComponent(docPath)}&lang=${lang}`)
+          : await fetch(`/api/readme?lang=${lang}`);
         const data = await res.json();
         if (data?.markdown) setMarkdown(data.markdown);
+        // Show the "not translated yet" notice only when a non-English UI is
+        // active AND the backend fell back to the English document.
+        setFallback(lang !== 'en' && !!data?.fallback);
       } finally { setLoading(false); }
     };
     load();
-  }, [docPath]);
+  }, [docPath, lang]);
 
   // Debounce search
   useEffect(() => {
@@ -369,14 +409,14 @@ export default function ReadmeViewer() {
     <div style={{ padding: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 22 }}>📘</span>
-        <h3 style={{ margin: 0 }}>README Viewer</h3>
+        <h3 style={{ margin: 0 }}>{ui.title}</h3>
       </div>
 
       {/* Search bar */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
           <input
-            placeholder="Search headings or text…"
+            placeholder={ui.search}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={{ width: '100%', padding: '10px 34px 10px 12px',
@@ -385,7 +425,7 @@ export default function ReadmeViewer() {
           {query && (
             <button
               onClick={() => setQuery('')}
-              title="Clear search"
+              title={ui.clear}
               style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
                        border: 'none', background: 'transparent', cursor: 'pointer',
                        fontSize: 18, color: '#94a3b8', padding: '2px 8px' }}
@@ -401,10 +441,20 @@ export default function ReadmeViewer() {
           <option value="docs/agents.md">docs/agents.md</option>
           <option value="docs/admin-dev.md">docs/admin-dev.md</option>
         </select>
-        <button onClick={() => setShowToc(t => !t)} style={btnStyle} title="Toggle table of contents">
-          {showToc ? '⇤ Hide sections' : '⇥ Show sections'}
+        <button onClick={() => setShowToc(t => !t)} style={btnStyle} title={ui.sections}>
+          {showToc ? ui.hide : ui.show}
         </button>
       </div>
+
+      {/* Translation-fallback notice */}
+      {fallback && (
+        <div style={{
+          marginBottom: 12, padding: '8px 14px', borderRadius: 8, fontSize: 12.5,
+          background: '#fffbeb', border: '1px solid #fde68a', color: '#78350f',
+        }}>
+          🌐 {ui.fallback}
+        </div>
+      )}
 
       {/* Search summary */}
       {debouncedQuery && (
@@ -414,17 +464,13 @@ export default function ReadmeViewer() {
           border: `1px solid ${matchingSectionCount === 0 ? '#fcd34d' : '#bfdbfe'}`,
           color:  matchingSectionCount === 0 ? '#92400e' : '#1e40af',
         }}>
-          {matchingSectionCount === 0 ? (
-            <>❕ No sections match <strong>&quot;{debouncedQuery}&quot;</strong>. Try a broader query, e.g. a single keyword.</>
-          ) : (
-            <>🔍 Found <strong>{totalMatches}</strong> match{totalMatches !== 1 ? 'es' : ''} across <strong>{matchingSectionCount}</strong> section{matchingSectionCount !== 1 ? 's' : ''}. Whole sections shown so you can read them in context.</>
-          )}
+          {matchingSectionCount === 0 ? ui.noMatch(debouncedQuery) : ui.found(totalMatches, matchingSectionCount)}
         </div>
       )}
 
       {/* Content layout */}
       {loading ? (
-        <div style={{ color: '#64748b' }}>Loading README…</div>
+        <div style={{ color: '#64748b' }}>{ui.loading}</div>
       ) : (
         <div style={{
           display: 'grid',

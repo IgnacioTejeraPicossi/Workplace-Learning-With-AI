@@ -25,7 +25,7 @@
 - `REACT_APP_FIREBASE_*` – Firebase public config keys (API_KEY, AUTH_DOMAIN, PROJECT_ID, etc.)
 
 ### Websearch Backend (Phase 2)
-- `PORT` – Websearch backend port (default 3001)
+- `WEBSEARCH_PORT` – Websearch backend port (default 8080)
 - `SERPER_API_KEY` – Serper.dev API key for web search
 - `ALLOWED_ORIGINS` – CORS origins for websearch
 

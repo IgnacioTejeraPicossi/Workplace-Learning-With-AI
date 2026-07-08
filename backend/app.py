@@ -2253,33 +2253,53 @@ async def import_readme_to_library(request: Request):
         return {"success": False, "message": f"Error: {str(e)}"}
 
 # Simple endpoint to read the root README.md so the frontend can use it as context
+# Localized-docs helper: for lang in {no, es} prefer '<stem>.<lang>.md'
+# (e.g. README.no.md, docs/agents.es.md) and fall back to the English base
+# when a translation is absent. English is the default. Returns
+# (resolved_path, lang_served, fell_back).
+_DOC_LANGS = ("no", "es")
+
+def _resolve_localized_md(base_path: str, lang: str):
+    import os
+    lang = (lang or "en").lower()
+    if lang in _DOC_LANGS:
+        stem, ext = os.path.splitext(base_path)
+        localized = f"{stem}.{lang}{ext}"
+        if os.path.exists(localized):
+            return localized, lang, False
+        return base_path, "en", True   # requested translation missing → English fallback
+    return base_path, "en", False
+
+
 @app.get("/api/readme")
-async def get_root_readme():
+async def get_root_readme(lang: str = "en"):
+    path, lang_served, fell_back = _resolve_localized_md("README.md", lang)
     try:
-        # Read README.md from repository root
-        with open("README.md", "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             content = f.read()
-        return {"success": True, "markdown": content}
+        return {"success": True, "markdown": content, "lang_served": lang_served, "fallback": fell_back}
     except FileNotFoundError:
         return {"success": False, "message": "README.md not found"}
     except Exception as e:
         return {"success": False, "message": f"Error reading README: {str(e)}"}
 
-# Read a Markdown file from docs/ (safe, read-only)
+# Read a Markdown file from docs/ (safe, read-only) — with optional localization.
 @app.get("/api/docs/read")
-async def read_docs_md(path: str):
+async def read_docs_md(path: str, lang: str = "en"):
     try:
         import os
         # Only allow files under ./docs and with .md extension
         if not path or not path.endswith(".md"):
             return {"success": False, "message": "Only .md files are allowed"}
+        resolved, lang_served, fell_back = _resolve_localized_md(path, lang)
         safe_root = os.path.abspath("docs")
-        target = os.path.abspath(os.path.join(".", path))
+        target = os.path.abspath(os.path.join(".", resolved))
         if not target.startswith(safe_root):
             return {"success": False, "message": "Access denied"}
         with open(target, "r", encoding="utf-8") as f:
             content = f.read()
-        return {"success": True, "markdown": content, "path": path}
+        return {"success": True, "markdown": content, "path": path,
+                "lang_served": lang_served, "fallback": fell_back}
     except FileNotFoundError:
         return {"success": False, "message": f"File not found: {path}"}
     except Exception as e:
