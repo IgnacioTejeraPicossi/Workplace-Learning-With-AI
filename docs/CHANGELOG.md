@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.3] - 2026-07-09
+
+### Fixed — Agent catalog (Help → AI Presentation Agent) now fully localized
+
+In the Presentation Agent's "Agent demos" grid, most cards showed English names/
+descriptions even under Norwegian/Spanish. Two causes:
+
+1. **Slug mismatch.** `PresentationAgent.jsx` derives each card's i18n key from the
+   agent's `id` (e.g. `council-agent`, `telco-ops-agent`), but the existing
+   `help.presentationAgent.agents.*` keys had been created from the display *name*
+   (`council-of-diverse-lenses`, `telco-ops-decisioning-agent`, …). Only the two
+   agents whose id already matched (`ai-compliance-agent`, `ai-productivity-agent`)
+   were translating; the other seven silently fell back to the English `defaultValue`.
+2. **Three agents added after the last translation pass** had no i18n at all:
+   `atm-vv-test-copilot`, `red-cross-web-qa`, `self-sim-reality-agent`.
+
+Re-keyed the seven existing translation blocks to match the id-derived slug
+(`personal-attention-agent`→`attention-agent`, `council-of-diverse-lenses`→`council-agent`,
+`ea-second-brain-agent`→`ea-second-brain`, `responsible-ai-ops-grc`→`grc-agent`,
+`operations-efficiency-agent`→`ops-efficiency-agent`, `sales-assistant-agent`→`sales-assistant`,
+`telco-ops-decisioning-agent`→`telco-ops-agent`) and added name+desc for the three new
+agents — all in EN/NO/ES (`frontend/src/i18n/locales/{en,no,es}/common.json`). Product
+names (ATM V&V Test Copilot, Red Cross Web QA Agent, Self-Simulating Reality Agent) kept
+in English; descriptions translated.
+
+**Validation:** all 12 catalog slugs now resolve to a name+desc in every locale, with
+EN/NO/ES key parity; the 3 `common.json` files parse cleanly.
+
+---
+
 ## [1.20.2] - 2026-07-08
 
 ### Added — Localized Help documentation (Norwegian + Spanish)

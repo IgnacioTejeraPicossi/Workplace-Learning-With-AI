@@ -1983,33 +1983,45 @@
           "name": "AI‑produktivitetsagent",
           "desc": "Gjør et research‑notat om til flere Jira‑oppgaver + Slack/Sheets."
         },
-        "personal-attention-agent": {
+        "attention-agent": {
           "name": "Personlig oppmerksomhetsagent",
           "desc": "Støy→signal på tvers av kanaler; planlegger fokusperioder og sender handlingsbare brief."
         },
-        "council-of-diverse-lenses": {
+        "council-agent": {
           "name": "Råd for mangfoldige linser",
           "desc": "Fler‑persona drøfting med sikkerhetsporter; ulike perspektiver debatterer komplekse tema."
         },
-        "ea-second-brain-agent": {
+        "ea-second-brain": {
           "name": "EA Second Brain‑agent",
           "desc": "EA‑vokter som gjør signaler til portefølje‑bevisste tiltak; overvåker teknologiske endringer."
         },
-        "responsible-ai-ops-grc": {
+        "grc-agent": {
           "name": "Responsible AI Ops (GRC)",
           "desc": "Avdekker datakvalitet, policy og risikosaker i Finans/Innkjøp/Forsyning/ESG og utfører rettinger med revisjon."
         },
-        "operations-efficiency-agent": {
+        "ops-efficiency-agent": {
           "name": "Driftseffektivitetsagent",
           "desc": "Automatiserer fakturahåndtering, foreslår kostnadsallokeringer og rangerer CV‑er med forklarbarhet."
         },
-        "sales-assistant-agent": {
+        "sales-assistant": {
           "name": "Salgsassistent‑agent",
           "desc": "Pipeline‑hygiene, risiko‑score for avtaler og kontekstuelle oppfølginger; automatiserer CRM‑oppgaver."
         },
-        "telco-ops-decisioning-agent": {
+        "telco-ops-agent": {
           "name": "Telco‑driftsbeslutningsagent",
           "desc": "Utfører ordre, endringer og avtaler; gjør telco‑signaler om til sikker autonomi."
+        },
+        "atm-vv-test-copilot": {
+          "name": "ATM V&V Test Copilot",
+          "desc": "Verifiserings‑ og valideringscopilot for lufttrafikkstyringssystemer. Tar inn kravpakker (ED-153, DO-278A, ISO/IEC 25010), genererer testdesign, bygger scenariomatriser og analyserer testkjøring‑resultater med sporbarhet tilbake til kravene."
+        },
+        "red-cross-web-qa": {
+          "name": "Red Cross Web QA Agent",
+          "desc": "24/7 QA‑copilot for rodekors.no‑gjenoppbyggingen på Enonic XP CMS + Next.js + Digdir Designsystemet. Bygget etter Trine Bruus Teststrategi 30.3: Azure DevOps, Sev1‑4 + KatA‑C dobbel alvorlighet, V‑modell testnivåer, Fundy donasjonsflyt + Vipps‑dekning."
+        },
+        "self-sim-reality-agent": {
+          "name": "Self-Simulating Reality Agent",
+          "desc": "Vitenskapelig‑filosofisk følgesvenn for ideen om at observatører, sinn og bevissthet deltar i å konstruere universet de opplever. Forankret i Observer Patch Holography (OPH) med streng epistemisk disiplin — hver påstand merket med ett av fem bevisnivåer."
         }
       }
     },

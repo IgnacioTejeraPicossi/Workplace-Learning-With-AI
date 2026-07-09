@@ -1733,33 +1733,45 @@
           "name": "AI Productivity Agent",
           "desc": "Turn a research brief into multiple Jira tasks plus Slack/Sheets."
         },
-        "personal-attention-agent": {
+        "attention-agent": {
           "name": "Personal Attention Agent",
           "desc": "Noise→signal across channels; schedules focus holds and sends actionable briefs."
         },
-        "council-of-diverse-lenses": {
+        "council-agent": {
           "name": "Council of Diverse Lenses",
           "desc": "Multi‑persona deliberation with safety gates; diverse perspectives to debate complex topics."
         },
-        "ea-second-brain-agent": {
+        "ea-second-brain": {
           "name": "EA Second Brain Agent",
           "desc": "Enterprise Architecture watcher that turns signals into portfolio‑aware actions; monitors tech changes."
         },
-        "responsible-ai-ops-grc": {
+        "grc-agent": {
           "name": "Responsible AI Ops (GRC)",
           "desc": "Detects data‑quality, policy and risk issues across Finance/Procurement/Supply Chain/ESG and executes fixes with audit."
         },
-        "operations-efficiency-agent": {
+        "ops-efficiency-agent": {
           "name": "Operations Efficiency Agent",
           "desc": "Automates invoice handling, suggests cost allocations, and ranks CVs with explainability."
         },
-        "sales-assistant-agent": {
+        "sales-assistant": {
           "name": "Sales Assistant Agent",
           "desc": "Pipeline hygiene, deal risk scoring and contextual follow‑ups; automates CRM tasks."
         },
-        "telco-ops-decisioning-agent": {
+        "telco-ops-agent": {
           "name": "Telco Ops Decisioning Agent",
           "desc": "Executes orders, plan changes and appointments; transforms telco signals into safe autonomy."
+        },
+        "atm-vv-test-copilot": {
+          "name": "ATM V&V Test Copilot",
+          "desc": "Verification & Validation copilot for Air Traffic Management systems. Ingests requirement bundles (ED-153, DO-278A, ISO/IEC 25010), generates test designs, builds scenario matrices, and analyzes test‑run outcomes with traceability back to requirements."
+        },
+        "red-cross-web-qa": {
+          "name": "Red Cross Web QA Agent",
+          "desc": "24/7 QA copilot for the rodekors.no rebuild on Enonic XP CMS + Next.js + Digdir Designsystemet. Built to Trine Bruu's Teststrategi 30.3: Azure DevOps, Sev1‑4 + KatA‑C dual severity, V‑model test levels, Fundy donation‑flow + Vipps coverage."
+        },
+        "self-sim-reality-agent": {
+          "name": "Self-Simulating Reality Agent",
+          "desc": "Scientific‑philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience. Anchored in Observer Patch Holography (OPH) with strict epistemic discipline — every claim labelled with one of five evidence levels."
         }
       }
     },

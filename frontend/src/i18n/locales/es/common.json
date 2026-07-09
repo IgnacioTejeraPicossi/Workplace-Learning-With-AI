@@ -1432,33 +1432,45 @@
           "name": "Agente de Productividad IA",
           "desc": "Convierte un briefing de investigación en múltiples tareas Jira más Slack/Sheets."
         },
-        "personal-attention-agent": {
+        "attention-agent": {
           "name": "Agente de Atención Personal",
           "desc": "Convierte ruido en señal entre canales; programa bloques de enfoque y envía briefings accionables."
         },
-        "council-of-diverse-lenses": {
+        "council-agent": {
           "name": "Consejo de Perspectivas Diversas",
           "desc": "Deliberación multi-persona con controles de seguridad; perspectivas diversas para debatir temas complejos."
         },
-        "ea-second-brain-agent": {
+        "ea-second-brain": {
           "name": "Agente Segundo Cerebro EA",
           "desc": "Observador de Arquitectura Empresarial que convierte señales en acciones conscientes del portfolio; monitoriza cambios tecnológicos."
         },
-        "responsible-ai-ops-grc": {
+        "grc-agent": {
           "name": "AI Ops Responsable (GRC)",
           "desc": "Detecta problemas de calidad de datos, política y riesgo en Finanzas/Compras/Supply Chain/ESG y ejecuta soluciones con auditoría."
         },
-        "operations-efficiency-agent": {
+        "ops-efficiency-agent": {
           "name": "Agente de Eficiencia Operativa",
           "desc": "Automatiza la gestión de facturas, sugiere asignaciones de coste y clasifica CVs con explicabilidad."
         },
-        "sales-assistant-agent": {
+        "sales-assistant": {
           "name": "Agente Asistente de Ventas",
           "desc": "Higiene de pipeline, puntuación de riesgo de deals y seguimientos contextuales; automatiza tareas de CRM."
         },
-        "telco-ops-decisioning-agent": {
+        "telco-ops-agent": {
           "name": "Agente de Decisión Operativa Telco",
           "desc": "Ejecuta pedidos, cambios de plan y citas; convierte señales telco en autonomía segura."
+        },
+        "atm-vv-test-copilot": {
+          "name": "ATM V&V Test Copilot",
+          "desc": "Copiloto de Verificación y Validación para sistemas de gestión del tránsito aéreo. Ingiere paquetes de requisitos (ED-153, DO-278A, ISO/IEC 25010), genera diseños de prueba, construye matrices de escenarios y analiza los resultados con trazabilidad a los requisitos."
+        },
+        "red-cross-web-qa": {
+          "name": "Red Cross Web QA Agent",
+          "desc": "Copiloto de QA 24/7 para la reconstrucción de rodekors.no sobre Enonic XP CMS + Next.js + Digdir Designsystemet. Creado según la Teststrategi 30.3 de Trine Bruu: Azure DevOps, doble severidad Sev1-4 + KatA-C, niveles de prueba del modelo en V, cobertura del flujo de donaciones Fundy + Vipps."
+        },
+        "self-sim-reality-agent": {
+          "name": "Self-Simulating Reality Agent",
+          "desc": "Compañero científico-filosófico para la idea de que observadores, mentes y consciencia participan en construir el universo que experimentan. Anclado en Observer Patch Holography (OPH) con disciplina epistémica estricta: cada afirmación etiquetada con uno de cinco niveles de evidencia."
         }
       }
     },
