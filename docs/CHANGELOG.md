@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.7] - 2026-07-10
+
+### Fixed — CI frontend "Production build" step (ESLint warnings tripping the build)
+
+After [1.20.6] fixed the `npm install` (ERESOLVE) step, the frontend build ran
+for the first time in CI and failed at **Production build**. Root cause,
+reproduced in a real `node:20` container:
+
+Create React App promotes **all** ESLint warnings to errors when
+`process.env.CI` is truthy ("Treating warnings as errors because
+process.env.CI = true"), and the project carries ~30 pre-existing
+`no-unused-vars` warnings across many components. The build step already set
+`CI: 'false'`, but that override proved unreliable on the GitHub runner — the
+build still saw `CI=true` and failed. (The backend job passed; the same code
+builds cleanly with `CI=false` locally, confirming it is not a real compile
+error or an OOM.)
+
+Fix: add `DISABLE_ESLINT_PLUGIN: 'true'` to the build step env. This disables
+the ESLint plugin at build time, so lint warnings can never fail the production
+build regardless of how `CI` resolves. Warnings still surface during local
+`npm start`. Verified by reproducing the exact failing condition
+(`CI=true npm run build` → *Failed to compile*) and confirming
+`CI=true DISABLE_ESLINT_PLUGIN=true npm run build` → **exit 0**. Follow-up:
+clean up the `no-unused-vars` warnings and then re-enable the ESLint gate.
+
+---
+
 ## [1.20.6] - 2026-07-10
 
 ### Fixed — CI first-run failures (both jobs now green)
