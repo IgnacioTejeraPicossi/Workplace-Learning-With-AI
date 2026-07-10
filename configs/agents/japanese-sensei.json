@@ -1,0 +1,38 @@
+{
+  "id": "japanese-sensei",
+  "name": "Japanese Sensei AI",
+  "version": "1.0.0",
+  "module": "language-learning",
+  "description": "From-zero Japanese tutor: kana (hiragana/katakana) and kanji with stroke-order animation, pitch-accent-aware pronunciation, JLPT-graded grammar path, vocabulary SRS, reading practice with furigana, and a speaking tab with browser speech recognition (ASR) for shadowing. Register-aware conversation practice.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/japanese",
+    "tools": [
+      { "name": "get_overview", "description": "Dashboard: level, JLPT goal, streak and stats." },
+      { "name": "get_pronunciation", "description": "Japanese phonetics: mora timing, pitch accent, long vowels." },
+      { "name": "get_grammar_path", "description": "JLPT-graded grammar path (particles, verb groups, keigo)." },
+      { "name": "get_vocabulary", "description": "Vocabulary items with readings + meaning glosses." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule." },
+      { "name": "get_speaking_phrases", "description": "Phrases for shadowing; browser ASR scores the attempt." },
+      { "name": "get_conversation_scenarios", "description": "Role-play scenarios for spoken/written practice." },
+      { "name": "send_conversation_message", "description": "Register-aware conversation turn that corrects and upgrades the learner's Japanese." }
+    ]
+  },
+  "capabilities": [
+    "script.kana",
+    "script.kanji-stroke-order",
+    "pronunciation.pitch-accent",
+    "grammar.jlpt-path",
+    "vocabulary.srs",
+    "reading.furigana",
+    "speaking.asr",
+    "conversation.roleplay",
+    "voice.tts-browser"
+  ],
+  "policy": {
+    "scripts": ["hiragana", "katakana", "kanji"],
+    "grading": "JLPT N5→N1",
+    "voice_engine": "browser Web Speech (TTS + ASR)"
+  }
+}

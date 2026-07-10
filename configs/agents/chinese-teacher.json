@@ -1,0 +1,37 @@
+{
+  "id": "chinese-teacher",
+  "name": "Chinese Teacher AI",
+  "version": "1.0.0",
+  "module": "language-learning",
+  "description": "From-zero Mandarin Chinese tutor: pinyin and the 4 tones, hanzi with stroke-order animation, HSK-graded grammar path, vocabulary SRS, tone-pair drills, and a speaking tab with browser speech recognition (ASR). Register-aware conversation practice.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/chinese",
+    "tools": [
+      { "name": "get_overview", "description": "Dashboard: level, HSK goal, streak and stats." },
+      { "name": "get_pronunciation", "description": "Pinyin, the 4 tones + neutral tone, tone sandhi, initials/finals." },
+      { "name": "get_grammar_path", "description": "HSK-graded grammar path (measure words, aspect particles, 把/被, topic-comment)." },
+      { "name": "get_vocabulary", "description": "Vocabulary items with pinyin + meaning glosses." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule." },
+      { "name": "get_speaking_phrases", "description": "Phrases for shadowing; browser ASR scores the attempt." },
+      { "name": "get_conversation_scenarios", "description": "Role-play scenarios for spoken/written practice." },
+      { "name": "send_conversation_message", "description": "Register-aware conversation turn that corrects and upgrades the learner's Mandarin." }
+    ]
+  },
+  "capabilities": [
+    "pronunciation.pinyin-tones",
+    "script.hanzi-stroke-order",
+    "grammar.hsk-path",
+    "vocabulary.srs",
+    "tone-pairs.drill",
+    "speaking.asr",
+    "conversation.roleplay",
+    "voice.tts-browser"
+  ],
+  "policy": {
+    "script": "Simplified Hanzi + Pinyin",
+    "grading": "HSK 1→6",
+    "voice_engine": "browser Web Speech (TTS + ASR)"
+  }
+}

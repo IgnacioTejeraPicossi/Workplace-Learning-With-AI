@@ -1,0 +1,46 @@
+{
+  "id": "english-mastery",
+  "name": "English Mastery AI",
+  "version": "1.20.0",
+  "module": "language-learning",
+  "description": "Advanced-English perfection coach for a Spanish speaker aiming C1 → C2. NOT an alphabet learner — a nuance/collocation/pronunciation tool: false friends, collocations, phrasal verbs & idioms, grammar nuance, pronunciation lab, vocabulary SRS, register-aware conversation and C2 writing feedback. Adds a hands-free Conversation Audio mode (speak via Web Speech ASR, the mentor answers out loud) with optional web research to ground replies in current facts.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/english",
+    "tools": [
+      { "name": "get_overview", "description": "Dashboard: level, C1→C2 goal, streak and today's mission." },
+      { "name": "get_false_friends", "description": "Spanish→English false-friend traps (sensible≠sensible, etc.)." },
+      { "name": "get_pronunciation", "description": "Minimal pairs (th, ship/sheep), word stress and intonation." },
+      { "name": "get_grammar_path", "description": "Grammar nuance: perfect aspects, inversion, articles, reported speech." },
+      { "name": "get_vocabulary", "description": "C1/C2 vocabulary with meaning glosses." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule." },
+      { "name": "get_conversation_scenarios", "description": "Register-aware role-play scenarios (small talk, negotiation, etc.)." },
+      { "name": "send_conversation_message", "description": "Conversation turn that corrects + upgrades; optional web_research grounds the reply in current facts (web_used flag). Shared by written and spoken (Conversation Audio) modes." },
+      { "name": "get_writing_feedback", "description": "C1/C2 feedback on a written text with register control." }
+    ]
+  },
+  "capabilities": [
+    "false-friends.detect",
+    "collocations.coach",
+    "phrasal-verbs.coach",
+    "grammar.nuance",
+    "pronunciation.minimal-pairs",
+    "vocabulary.srs",
+    "conversation.roleplay",
+    "conversation.audio-spoken",
+    "conversation.web-research",
+    "writing.feedback",
+    "voice.tts-browser",
+    "asr.web-speech"
+  ],
+  "policy": {
+    "cefr_range": ["C1", "C2"],
+    "learner_l1": "es",
+    "voice_engine": "browser Web Speech (ASR + TTS); no Docker dependency",
+    "web_research": "optional, via the standalone Node websearch-backend (WEBSEARCH_URL, default :8080); graceful fallback when off"
+  },
+  "docs": {
+    "conversation_service": "backend/services/english_mentor.py"
+  }
+}

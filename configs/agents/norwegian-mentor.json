@@ -1,0 +1,37 @@
+{
+  "id": "norwegian-mentor",
+  "name": "Norwegian Mastering AI",
+  "version": "1.0.0",
+  "module": "language-learning",
+  "description": "Mentor for mastering Norwegian (Bokmål) for a Spanish/English speaker. Pronunciation (tonal accents, æøå, retroflex sounds, kj/skj), grammar path (V2 word order, definite forms, adjective agreement), false friends, vocabulary SRS, and register-aware conversation. Optional local Voicebox voice for native/cloned playback.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/norwegian",
+    "tools": [
+      { "name": "get_overview", "description": "Dashboard: level, CEFR goal, streak and stats." },
+      { "name": "get_pronunciation", "description": "Norwegian sounds: pitch accents, æøå, kj/skj, retroflexes." },
+      { "name": "get_grammar_path", "description": "Graded grammar: V2 word order, definite/indefinite forms, adjective agreement, verb tenses." },
+      { "name": "get_vocabulary", "description": "Vocabulary items with meaning glosses." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule." },
+      { "name": "get_false_friends", "description": "Norwegian↔other-language false-friend traps." },
+      { "name": "get_conversation_scenarios", "description": "Role-play scenarios for spoken/written practice." },
+      { "name": "send_conversation_message", "description": "Register-aware conversation turn that corrects and upgrades the learner's Norwegian." },
+      { "name": "get_writing_feedback", "description": "Feedback on a written text (register-aware)." }
+    ]
+  },
+  "capabilities": [
+    "pronunciation.guide",
+    "grammar.learning-path",
+    "vocabulary.srs",
+    "false-friends.detect",
+    "conversation.roleplay",
+    "writing.feedback",
+    "voice.tts-browser",
+    "voice.native-clone"
+  ],
+  "policy": {
+    "variety": "Bokmål",
+    "voice_engine": "browser Web Speech (default) + optional local Voicebox for cloned native playback"
+  }
+}

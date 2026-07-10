@@ -1,0 +1,48 @@
+{
+  "id": "spanish-teacher",
+  "name": "Spanish Teacher AI",
+  "version": "1.19.0",
+  "module": "language-learning",
+  "description": "Teaches Spanish to the world with a native cloned voice. Pronunciation lab (rr/ñ/j/ll), grammar path (ser/estar, por/para, subjunctive), verb conjugation, false friends, vocabulary SRS, register-aware conversation and C1/C2 writing feedback. Includes pre-generated native cloned-voice example phrases via a local Voicebox instance (instant playback, privacy-preserving).",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/spanish",
+    "tools": [
+      { "name": "get_overview", "description": "Daily dashboard: learner level, CEFR goal, streak and stats." },
+      { "name": "get_pronunciation", "description": "Sound guides for the tricky Spanish phonemes (rr, ñ, j, the 5 pure vowels, seseo, tildes)." },
+      { "name": "get_grammar_path", "description": "Graded grammar path (ser/estar, por/para, past tenses, subjunctive, gender)." },
+      { "name": "get_conjugation", "description": "Verb conjugation tables for regular and irregular Spanish verbs." },
+      { "name": "get_vocabulary", "description": "Vocabulary items with meaning glosses (es primary)." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule the next review." },
+      { "name": "get_false_friends", "description": "Spanish↔other-language false-friend traps." },
+      { "name": "get_conversation_scenarios", "description": "Role-play scenarios for spoken/written practice." },
+      { "name": "send_conversation_message", "description": "Register-aware conversation turn that corrects and upgrades the learner's Spanish." },
+      { "name": "get_writing_feedback", "description": "C1/C2 feedback on a written text (register-aware)." },
+      { "name": "get_voice_examples", "description": "List pre-generated native cloned-voice example phrases (served instantly as cached WAV)." }
+    ]
+  },
+  "capabilities": [
+    "pronunciation.guide",
+    "grammar.learning-path",
+    "conjugation.tables",
+    "vocabulary.srs",
+    "false-friends.detect",
+    "culture.notes",
+    "conversation.roleplay",
+    "writing.feedback",
+    "voice.tts-browser",
+    "voice.native-clone",
+    "voice.pregenerated-examples"
+  ],
+  "policy": {
+    "cefr_range": ["A1", "A2", "B1", "B2", "C1", "C2"],
+    "primary_gloss_language": "es",
+    "voice_engine": "browser Web Speech (default) + optional local Voicebox for cloned native examples",
+    "voice_privacy": "Voicebox runs on 127.0.0.1; cloned voice data never leaves the machine"
+  },
+  "docs": {
+    "voice_examples_service": "backend/services/voice_examples.py",
+    "voice_proxy": "backend/routers/voicebox.py"
+  }
+}

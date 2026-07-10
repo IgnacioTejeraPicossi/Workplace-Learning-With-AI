@@ -1,0 +1,37 @@
+{
+  "id": "korean-teacher",
+  "name": "Korean Teacher AI",
+  "version": "1.0.0",
+  "module": "language-learning",
+  "description": "From-zero Korean tutor: Hangul (jamo + syllable-block composition), pronunciation with assimilation rules, TOPIK-graded grammar path (particles, honorifics, verb endings), vocabulary SRS, reading practice, and a speaking tab with browser speech recognition (ASR). Register-aware conversation practice.",
+  "runner_default": "fastapi",
+  "mcp": {
+    "endpoint": "http://localhost:8000/api/korean",
+    "tools": [
+      { "name": "get_overview", "description": "Dashboard: level, TOPIK goal, streak and stats." },
+      { "name": "get_pronunciation", "description": "Hangul sounds, syllable blocks, assimilation and tensification rules." },
+      { "name": "get_grammar_path", "description": "TOPIK-graded grammar path (particles, honorifics, verb/adjective endings)." },
+      { "name": "get_vocabulary", "description": "Vocabulary items with romanization + meaning glosses." },
+      { "name": "get_srs_due", "description": "Spaced-repetition (SM-2) items due for review." },
+      { "name": "submit_srs_review", "description": "Record an SRS grade and reschedule." },
+      { "name": "get_speaking_phrases", "description": "Phrases for shadowing; browser ASR scores the attempt." },
+      { "name": "get_conversation_scenarios", "description": "Role-play scenarios for spoken/written practice." },
+      { "name": "send_conversation_message", "description": "Register-aware conversation turn that corrects and upgrades the learner's Korean." }
+    ]
+  },
+  "capabilities": [
+    "script.hangul-composition",
+    "pronunciation.assimilation-rules",
+    "grammar.topik-path",
+    "vocabulary.srs",
+    "reading.practice",
+    "speaking.asr",
+    "conversation.roleplay",
+    "voice.tts-browser"
+  ],
+  "policy": {
+    "script": "Hangul",
+    "grading": "TOPIK I→II",
+    "voice_engine": "browser Web Speech (TTS + ASR)"
+  }
+}
