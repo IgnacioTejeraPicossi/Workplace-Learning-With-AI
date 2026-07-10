@@ -1,11 +1,14 @@
 name: CI
 
 # Minimal continuous-integration gate for WLWAI.
-# - backend: compile-all syntax check + dependency resolution
+# - backend: compile-all syntax check + dependency resolution + offline tests
 # - frontend: install + production build
 # Kept intentionally lightweight so it stays green and fast; it does NOT
-# require MongoDB, Firebase or any secret. Extend with pytest / cypress once
-# CI-safe fixtures and secrets are available.
+# require MongoDB, Firebase or any secret. The test step runs only the
+# mock-first suites that are verified to pass with no database, no LLM key
+# and no Firebase credentials. Extend with the Mongo-backed suites (e.g.
+# smoke_red_cross_qa baselines, robomind contracts) once a MongoDB service
+# container + CI fixtures are added.
 
 on:
   push:
@@ -15,7 +18,7 @@ on:
 
 jobs:
   backend:
-    name: Backend (syntax + deps)
+    name: Backend (syntax + deps + offline tests)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +34,21 @@ jobs:
 
       - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
+
+      # Offline, mock-first suites only (56 tests): voice examples, the 6
+      # language agents' contracts, and the MCP manifest smoke. These are
+      # verified to pass without MongoDB, an LLM key or Firebase creds.
+      # MONGO_URI points at an unreachable host with a short server-selection
+      # timeout so any accidental DB access fails fast instead of hanging.
+      - name: Run offline test suites (no DB / no secrets)
+        env:
+          MONGO_URI: "mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=2000"
+          PYTHONIOENCODING: "utf-8"
+        run: |
+          python -m pytest -q \
+            backend/tests/test_voice_examples.py \
+            backend/tests/test_language_agents_contracts.py \
+            backend/tests/test_mcp_smoke.py
 
   frontend:
     name: Frontend (install + build)

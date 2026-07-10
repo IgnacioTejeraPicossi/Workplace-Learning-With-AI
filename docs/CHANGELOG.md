@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.5] - 2026-07-10
+
+### Added — CI now runs the offline test suites (regression gate)
+
+Follow-up to the app-wide audit (commit `c7624a3`, Opus 4.8): the CI `backend`
+job previously only did a syntax gate + dependency install. Added a `pytest`
+step that runs the **mock-first suites verified to pass with no MongoDB, no LLM
+key and no Firebase credentials** — 56 tests total:
+
+- `backend/tests/test_voice_examples.py`
+- `backend/tests/test_language_agents_contracts.py` (42 — the 6 language agents)
+- `backend/tests/test_mcp_smoke.py`
+
+`MONGO_URI` is set to an unreachable host with a short `serverSelectionTimeoutMS`
+so any accidental DB access fails fast instead of hanging. The Mongo-backed
+suites (`smoke_red_cross_qa` baselines, `test_robomind_api_contracts`, `test_app`)
+are deliberately excluded — they need a live MongoDB and/or enforce auth and
+would hang or fail in the secret-less CI; add them later behind a MongoDB service
+container. Verified green by running the exact command with MongoDB unreachable
+and `OPENAI_API_KEY` unset (56 passed). `.github/workflows/ci.yml` +
+`docs/TESTING.md` updated.
+
+This turns the CI from "does it compile?" into "does it compile **and not
+regress the covered modules?**" — the audit's Phase 4 follow-up.
+
+---
+
 ## [1.20.4] - 2026-07-10
 
 ### Added — 6 Language Agents in the AgentOps Studio Agent Catalog

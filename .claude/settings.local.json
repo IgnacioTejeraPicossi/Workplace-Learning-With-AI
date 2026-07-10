@@ -215,7 +215,14 @@
       "Bash(git check-ignore *)",
       "Bash(python -m compileall -q backend)",
       "Bash(python -m pytest backend/tests/test_voice_examples.py backend/tests/test_language_agents_contracts.py -q)",
-      "Bash(grep -rnE \"return \\\\{[^}]*\\\\}, [0-9]{3}\" backend/ --include=\"*.py\")"
+      "Bash(grep -rnE \"return \\\\{[^}]*\\\\}, [0-9]{3}\" backend/ --include=\"*.py\")",
+      "Bash(export MONGO_URI=\"mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=2000\")",
+      "Bash(unset OPENAI_API_KEY)",
+      "Bash(timeout 120 python -m pytest backend/tests/test_voice_examples.py backend/tests/test_language_agents_contracts.py -q)",
+      "Bash(timeout 120 python -m backend.tests.smoke_red_cross_qa)",
+      "Bash(xargs -n1 basename)",
+      "Bash(timeout 60 python -m pytest backend/tests/test_mcp_smoke.py -q)",
+      "Bash(timeout 90 python -m pytest backend/tests/test_voice_examples.py backend/tests/test_language_agents_contracts.py backend/tests/test_mcp_smoke.py -q)"
     ]
   }
 }

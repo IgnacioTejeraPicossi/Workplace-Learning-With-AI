@@ -119,12 +119,26 @@ dispatch: `.github/workflows/ci.yml`.
 
 | Job | What it validates |
 |-----|-------------------|
-| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) |
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (56 tests) |
 | `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
 
-The pipeline intentionally requires **no** MongoDB, Firebase or secrets, so it
-stays green and fast. Extend it with `pytest` and Cypress once CI-safe
-fixtures/secrets are wired.
+The `backend` test step runs only the suites verified to pass with **no**
+MongoDB, LLM key or Firebase credentials:
+
+```bash
+python -m pytest \
+  backend/tests/test_voice_examples.py \
+  backend/tests/test_language_agents_contracts.py \
+  backend/tests/test_mcp_smoke.py
+```
+
+`MONGO_URI` is set to an unreachable host with a short `serverSelectionTimeoutMS`
+so any accidental DB access fails fast instead of hanging. The Mongo-backed
+suites (`smoke_red_cross_qa` baselines, `test_robomind_api_contracts`,
+`test_app`) are **deliberately excluded** — they need a live MongoDB and/or
+enforce auth, so they would hang or fail in the secret-less CI. Add them behind
+a MongoDB service container + fixtures later. The pipeline otherwise requires
+**no** secrets, so it stays green and fast.
 
 ## 6) End-to-end tests (Cypress) — directory layout
 
