@@ -222,7 +222,17 @@
       "Bash(timeout 120 python -m backend.tests.smoke_red_cross_qa)",
       "Bash(xargs -n1 basename)",
       "Bash(timeout 60 python -m pytest backend/tests/test_mcp_smoke.py -q)",
-      "Bash(timeout 90 python -m pytest backend/tests/test_voice_examples.py backend/tests/test_language_agents_contracts.py backend/tests/test_mcp_smoke.py -q)"
+      "Bash(timeout 90 python -m pytest backend/tests/test_voice_examples.py backend/tests/test_language_agents_contracts.py backend/tests/test_mcp_smoke.py -q)",
+      "Bash(gh run *)",
+      "Bash(curl -s -m 10 https://api.github.com/repos/__TRACKED_VAR__/actions/runs/29086110181/jobs)",
+      "Bash(timeout 120 npm install --dry-run)",
+      "Bash(export MSYS_NO_PATHCONV=1)",
+      "Bash(docker run --rm -v 'C:\\\\Test\\\\AI\\\\AI Learning with AI:/app' -w /app python:3.11-slim bash -c ' *)",
+      "Bash(docker run --rm -v 'C:\\\\Test\\\\AI\\\\AI Learning with AI:/app' -w /app python:3.11 bash -c ' *)",
+      "Bash(docker run --rm -v 'C:\\\\Test\\\\AI\\\\AI Learning with AI\\\\frontend:/app' -w /app node:20 bash -c ' *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
