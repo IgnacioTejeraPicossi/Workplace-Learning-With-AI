@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const API = 'http://localhost:8000/api/atm-copilot';
+const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/atm-copilot`;
 
 const Overview = ({ onNavigate }) => {
   const { t } = useTranslation();

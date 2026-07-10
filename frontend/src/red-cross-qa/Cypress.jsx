@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import PageHero from './_PageHero';
 import AiUsagePolicy from './_AiUsagePolicy';
 
-const API = 'http://localhost:8000/api/red-cross-qa';
+const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/red-cross-qa`;
 
 const SCOPES = [
   { key: 'scopeComponent',          icon: '🧩', color: '#10b981' },

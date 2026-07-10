@@ -400,8 +400,17 @@ async def favicon():
 def verify_token(request: Request):
     """Verify authentication token (Firebase or MongoDB JWT)"""
     if firebase_admin is None:
-        # Fallback to mock authentication if Firebase is not available
-        return {"uid": "mock_user_id", "sub": "mock_user_id", "email": "test@example.com", "name": "Test User"}
+        # Firebase is not available. Do NOT silently authenticate every request
+        # (that would be a fail-open auth bypass). A mock user is only returned
+        # when explicitly opted in via ALLOW_MOCK_AUTH, which must never be set
+        # in production.
+        if os.getenv("ALLOW_MOCK_AUTH", "false").lower() == "true":
+            print("⚠️ ALLOW_MOCK_AUTH is enabled — returning a MOCK user. Do NOT use this in production.")
+            return {"uid": "mock_user_id", "sub": "mock_user_id", "email": "test@example.com", "name": "Test User"}
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication service unavailable (Firebase not initialized and mock auth disabled)",
+        )
     
     try:
         # Get the Authorization header
@@ -1425,7 +1434,7 @@ async def submit_quiz(request: Request):
             "correct_answers": lesson_answers
         }
     except Exception as e:
-        return {"error": str(e)}, 400
+        return JSONResponse(status_code=400, content={"error": str(e)})
 
 # Get quiz results for a user
 @app.get("/api/quiz/results/{user_id}")
@@ -1635,7 +1644,7 @@ async def update_user_activity(request: Request):
             }
         }
     except Exception as e:
-                return {"error": str(e)}, 400
+                return JSONResponse(status_code=400, content={"error": str(e)})
 
 @app.post("/api/knowledge-map/vector-search")
 async def perform_vector_search(request: Request):
@@ -1646,7 +1655,7 @@ async def perform_vector_search(request: Request):
         limit = data.get("limit", 10)
         
         if not topic:
-            return {"error": "Topic is required"}, 400
+            return JSONResponse(status_code=400, content={"error": "Topic is required"})
         
         print(f"🔍 Vector search for topic: '{topic}'")
         
@@ -1711,7 +1720,7 @@ async def perform_vector_search(request: Request):
         
     except Exception as e:
         print(f"❌ Error in vector search: {e}")
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 def calculate_text_similarity(query, text):
     """Calculate simple text similarity using word overlap"""
@@ -1735,7 +1744,7 @@ async def perform_web_search(request: Request):
         limit = data.get("limit", 10)
         
         if not topic:
-            return {"error": "Topic is required"}, 400
+            return JSONResponse(status_code=400, content={"error": "Topic is required"})
         
         # Perform web search (this would integrate with your existing search service)
         # For now, we'll simulate the search results
@@ -1780,7 +1789,7 @@ async def perform_web_search(request: Request):
         
     except Exception as e:
         print(f"❌ Error in web search: {e}")
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # Saved Videos endpoints
 @app.get("/api/saved-videos/test")
@@ -2114,8 +2123,12 @@ async def get_learning_modules():
 @app.get("/api/learning-modules/{module_id}")
 async def get_learning_module(module_id: str):
     try:
-        # Get specific learning module by ID
-        module = lessons_collection.find_one({"_id": module_id})
+        # Get specific learning module by ID. lessons_collection is a Motor
+        # (async) collection, so the query must be awaited. Fall back to an
+        # ObjectId lookup when the id is a valid ObjectId string.
+        module = await lessons_collection.find_one({"_id": module_id})
+        if not module and ObjectId.is_valid(module_id):
+            module = await lessons_collection.find_one({"_id": ObjectId(module_id)})
         
         if module:
             # Convert ObjectId to string for JSON serialization

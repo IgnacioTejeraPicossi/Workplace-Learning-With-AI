@@ -3,7 +3,7 @@
 // base URL + error handling. All functions return a plain JS object that
 // matches the Pydantic schemas in backend/schemas/qa_security.py.
 
-const API = 'http://localhost:8000/api/qa/security';
+const API = `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/qa/security`;
 
 async function jsonOrThrow(res, action) {
   if (!res.ok) {

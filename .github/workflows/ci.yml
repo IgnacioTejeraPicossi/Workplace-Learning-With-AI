@@ -1,0 +1,60 @@
+name: CI
+
+# Minimal continuous-integration gate for WLWAI.
+# - backend: compile-all syntax check + dependency resolution
+# - frontend: install + production build
+# Kept intentionally lightweight so it stays green and fast; it does NOT
+# require MongoDB, Firebase or any secret. Extend with pytest / cypress once
+# CI-safe fixtures and secrets are available.
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend (syntax + deps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Compile all backend sources (syntax gate)
+        run: python -m compileall -q backend
+
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements.txt
+
+  frontend:
+    name: Frontend (install + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No package-lock.json is committed, so use `npm install` (not `npm ci`).
+      - name: Install dependencies
+        run: npm install
+
+      - name: Production build
+        env:
+          # Create React App promotes ESLint warnings to errors when CI=true.
+          # The project currently has many pre-existing warnings, so we keep
+          # the build green here while still surfacing them in the logs.
+          # Tighten this to 'true' once the warnings are cleaned up.
+          CI: 'false'
+        run: npm run build

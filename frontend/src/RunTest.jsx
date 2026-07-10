@@ -536,7 +536,7 @@ const RunTest = () => {
           try {
             const hdrs = { 'Content-Type': 'application/json' };
             if (accessToken) hdrs['Authorization'] = `Bearer ${accessToken}`;
-            const teamsRes = await fetch('http://localhost:8000/teams', { headers: hdrs });
+            const teamsRes = await fetch(`${API_BASE}/teams`, { headers: hdrs });
             if (teamsRes.ok) {
               const body = await teamsRes.json();
               if (body?.teams?.length) {
@@ -651,7 +651,7 @@ const RunTest = () => {
         }
 
         if (api.method === 'GET') {
-          response = await fetch(`http://localhost:8000${resolvedEndpoint}`, {
+          response = await fetch(`${API_BASE}${resolvedEndpoint}`, {
             method: 'GET',
             headers: headers
           });
@@ -1341,12 +1341,12 @@ const RunTest = () => {
           // Special handling for Document Analyzer analyze endpoint
           if (api.endpoint === '/api/document-analyzer/analyze') {
             // This endpoint expects FormData, so we'll send a GET request instead
-            response = await fetch(`http://localhost:8000${api.endpoint}`, {
+            response = await fetch(`${API_BASE}${api.endpoint}`, {
               method: 'GET',
               headers: headers
             });
           } else {
-            response = await fetch(`http://localhost:8000${resolvedEndpoint}`, {
+            response = await fetch(`${API_BASE}${resolvedEndpoint}`, {
               method: api.method,
               headers: headers,
               body: JSON.stringify(testData)
@@ -1389,7 +1389,7 @@ const RunTest = () => {
             await new Promise(r => setTimeout(r, 200));
             // Verify the team exists and is accessible
             try {
-              const verifyRes = await fetch(`http://localhost:8000/teams/${createdTeamId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': headers['Authorization'] || '' } });
+              const verifyRes = await fetch(`${API_BASE}/teams/${createdTeamId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': headers['Authorization'] || '' } });
               if (!verifyRes.ok) {
                 createdTeamId = null; // force skip of dependent tests
               }

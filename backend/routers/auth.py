@@ -7,6 +7,7 @@ import qrcode
 import io
 from base64 import b64encode
 from datetime import datetime
+from bson import ObjectId
 
 from backend.schemas.auth import (
     RegisterIn, RegisterOut, LoginIn, LoginOut, MfaVerifyIn, MfaSetupOut, 
@@ -40,6 +41,14 @@ def _users():
     from backend.db import database
     return database["users"]
 
+def _oid(user_id):
+    """Coerce a user id (typically a string from a JWT `sub` claim) into the
+    value stored as `_id` in MongoDB. Documents inserted by this router use an
+    auto-generated ObjectId, so string ids must be converted before querying."""
+    if isinstance(user_id, ObjectId):
+        return user_id
+    return ObjectId(user_id) if ObjectId.is_valid(user_id) else user_id
+
 # Registration
 @router.post("/register", response_model=RegisterOut)
 async def register(data: RegisterIn):
@@ -50,10 +59,10 @@ async def register(data: RegisterIn):
     if await _users().find_one({"email": email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Validate role
-    role = data.role.lower()
-    if role not in ("admin", "user"):
-        raise HTTPException(status_code=400, detail="Invalid role")
+    # Self-registration must never grant elevated privileges. Any client-supplied
+    # role is ignored and every new account is created as a plain "user".
+    # Admin roles must be assigned out-of-band (trusted admin tooling / DB).
+    role = "user"
     
     # Create user document
     user_doc = {
@@ -140,7 +149,7 @@ async def mfa_setup(request: Request):
     payload = verify_access(token)
     user_id = payload["sub"]
     
-    user = await _users().find_one({"_id": user_id})
+    user = await _users().find_one({"_id": _oid(user_id)})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
@@ -171,7 +180,7 @@ async def mfa_setup(request: Request):
 @router.post("/mfa/verify", response_model=LoginOut)
 async def mfa_verify(data: MfaVerifyIn, response: Response):
     """Verify MFA code"""
-    user = await _users().find_one({"_id": data.challenge_id})
+    user = await _users().find_one({"_id": _oid(data.challenge_id)})
     if not user or not user.get("mfa", {}).get("secret"):
         raise HTTPException(status_code=400, detail="Invalid challenge")
     
@@ -221,7 +230,7 @@ async def refresh(request: Request, response: Response):
         user_id = payload["sub"]
         jti = payload.get("jti")
         
-        user = await _users().find_one({"_id": user_id})
+        user = await _users().find_one({"_id": _oid(user_id)})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
         
@@ -267,7 +276,7 @@ async def request_email_verify(request: Request):
     payload = verify_access(token)
     user_id = payload["sub"]
     
-    user = await _users().find_one({"_id": user_id})
+    user = await _users().find_one({"_id": _oid(user_id)})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
@@ -290,7 +299,7 @@ async def confirm_email_verify(data: EmailTokenIn):
     
     user_id = payload["sub"]
     await _users().update_one(
-        {"_id": user_id},
+        {"_id": _oid(user_id)},
         {"$set": {"is_email_verified": True}}
     )
     
@@ -323,7 +332,7 @@ async def password_reset(data: ResetPasswordIn):
     user_id = payload["sub"]
     new_hash = hash_password(data.new_password)
     await _users().update_one(
-        {"_id": user_id},
+        {"_id": _oid(user_id)},
         {"$set": {"password_hash": new_hash}}
     )
     
@@ -342,7 +351,7 @@ async def get_user_profile(request: Request):
     payload = verify_access(token)
     user_id = payload["sub"]
     
-    user = await _users().find_one({"_id": user_id})
+    user = await _users().find_one({"_id": _oid(user_id)})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
@@ -360,7 +369,7 @@ async def logout(response: Response, request: Request):
         try:
             payload = verify_refresh(token)
             await _users().update_one(
-                {"_id": payload["sub"]},
+                {"_id": _oid(payload["sub"])},
                 {"$unset": {"refresh_token_hash": "", "refresh_jti": "", "refresh_token_exp": ""}}
             )
         except Exception:

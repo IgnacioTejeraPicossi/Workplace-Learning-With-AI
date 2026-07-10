@@ -17,7 +17,7 @@ This is the single source of truth for smoke tests and validation gates in WLWAI
 python -m venv .venv
 # Windows:
 .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### 1.2 Start backend
@@ -111,3 +111,38 @@ curl http://localhost:8000/api/j-messages/list
 | Cybersecurity | Health endpoint | `curl http://localhost:8000/api/cyber/health` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
+
+## 5) Continuous Integration (GitHub Actions)
+
+A minimal CI pipeline runs on every push/PR to `main`/`master` and on manual
+dispatch: `.github/workflows/ci.yml`.
+
+| Job | What it validates |
+|-----|-------------------|
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) |
+| `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
+
+The pipeline intentionally requires **no** MongoDB, Firebase or secrets, so it
+stays green and fast. Extend it with `pytest` and Cypress once CI-safe
+fixtures/secrets are wired.
+
+## 6) End-to-end tests (Cypress) — directory layout
+
+There are **two** Cypress test areas; be aware of which one you run:
+
+- **`cypress/` (repo root)** — the comprehensive suite (~35 `*.cy.js` specs
+  covering most modules). Run ad-hoc from the repo root, e.g.
+  `npx cypress open` / `npx cypress run`.
+- **`frontend/cypress/`** — a small smoke suite (`basic-tests.cy.js`) wired
+  into the frontend package scripts (`npm run cypress:open`,
+  `npm run cypress:run`, `npm run test:comprehensive`). Cypress is installed
+  as a devDependency here (`frontend/package.json`).
+
+The only Cypress config Cypress actually loads is **`frontend/cypress.config.js`**
+(loaded from the directory where `cypress` is invoked). Redundant stub config
+files previously present under `frontend/cypress/` and `frontend/src/` have been
+removed to avoid confusion.
+
+> Consolidating both suites into a single location is a worthwhile follow-up,
+> but it is a larger, potentially disruptive migration and should be done
+> deliberately (not as part of a quick cleanup).

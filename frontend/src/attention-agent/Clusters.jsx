@@ -74,7 +74,7 @@ const Clusters = () => {
             },
           },
         ],
-        callback_url: 'http://localhost:8000/api/agent-runs/callback',
+        callback_url: `${process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/agent-runs/callback`,
       };
 
       const response = await fetch('/agents/attention/execute', {
