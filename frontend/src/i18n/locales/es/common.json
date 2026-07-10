@@ -1471,6 +1471,30 @@
         "self-sim-reality-agent": {
           "name": "Self-Simulating Reality Agent",
           "desc": "Compañero científico-filosófico para la idea de que observadores, mentes y consciencia participan en construir el universo que experimentan. Anclado en Observer Patch Holography (OPH) con disciplina epistémica estricta: cada afirmación etiquetada con uno de cinco niveles de evidencia."
+        },
+        "spanish-teacher": {
+          "name": "Spanish Teacher AI",
+          "desc": "Enseña español con voz nativa clonada: pronunciación, gramática, conjugación, vocabulario SRS y conversación."
+        },
+        "english-mastery": {
+          "name": "English Mastery AI",
+          "desc": "Coach de inglés avanzado (C1→C2): matices, colocaciones, phrasal verbs y Conversation Audio hablada con manos libres."
+        },
+        "norwegian-mentor": {
+          "name": "Norwegian Mastering AI",
+          "desc": "Mentor de noruego (Bokmål): pronunciación, orden V2, falsos amigos, vocabulario SRS y conversación."
+        },
+        "japanese-sensei": {
+          "name": "Japanese Sensei AI",
+          "desc": "Japonés desde cero: kana + orden de trazos de kanji, gramática JLPT, vocabulario SRS y habla con ASR."
+        },
+        "chinese-teacher": {
+          "name": "Chinese Teacher AI",
+          "desc": "Chino mandarín desde cero: pinyin + 4 tonos, trazos de hanzi, gramática HSK, vocabulario SRS y habla con ASR."
+        },
+        "korean-teacher": {
+          "name": "Korean Teacher AI",
+          "desc": "Coreano desde cero: composición de Hangul, gramática TOPIK, vocabulario SRS y habla con ASR."
         }
       }
     },

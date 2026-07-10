@@ -2022,6 +2022,30 @@
         "self-sim-reality-agent": {
           "name": "Self-Simulating Reality Agent",
           "desc": "Vitenskapelig‑filosofisk følgesvenn for ideen om at observatører, sinn og bevissthet deltar i å konstruere universet de opplever. Forankret i Observer Patch Holography (OPH) med streng epistemisk disiplin — hver påstand merket med ett av fem bevisnivåer."
+        },
+        "spanish-teacher": {
+          "name": "Spanish Teacher AI",
+          "desc": "Lærer bort spansk med innfødt klonet stemme: uttale, grammatikk, bøying, SRS‑vokabular og samtale."
+        },
+        "english-mastery": {
+          "name": "English Mastery AI",
+          "desc": "Coach for avansert engelsk (C1→C2): nyanser, kollokasjoner, phrasal verbs og håndfri muntlig Conversation Audio."
+        },
+        "norwegian-mentor": {
+          "name": "Norwegian Mastering AI",
+          "desc": "Mentor for norsk (bokmål): uttale, V2‑ordstilling, falske venner, SRS‑vokabular og samtale."
+        },
+        "japanese-sensei": {
+          "name": "Japanese Sensei AI",
+          "desc": "Japansk fra bunnen: kana + kanji‑strekrekkefølge, JLPT‑grammatikk, SRS‑vokabular og tale med ASR."
+        },
+        "chinese-teacher": {
+          "name": "Chinese Teacher AI",
+          "desc": "Mandarin fra bunnen: pinyin + 4 toner, hanzi‑strekrekkefølge, HSK‑grammatikk, SRS‑vokabular og tale med ASR."
+        },
+        "korean-teacher": {
+          "name": "Korean Teacher AI",
+          "desc": "Koreansk fra bunnen: Hangul‑sammensetning, TOPIK‑grammatikk, SRS‑vokabular og tale med ASR."
         }
       }
     },

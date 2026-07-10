@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.4] - 2026-07-10
+
+### Added — 6 Language Agents in the AgentOps Studio Agent Catalog
+
+The Agent Catalog (AgentOps Studio, fed by `GET /api/agents/catalog` reading
+`configs/agents/*.json`) hadn't been updated since the last agents were added, so
+the six Language Agents were missing. Added descriptor JSONs for them:
+`configs/agents/{spanish-teacher,english-mastery,norwegian-mentor,japanese-sensei,chinese-teacher,korean-teacher}.json`.
+
+Each descriptor follows the existing schema (id / name / version / module /
+description / `mcp.endpoint` + tools / capabilities / policy) with the agent's real
+REST base (`http://localhost:8000/api/{spanish|english|norwegian|japanese|chinese|korean}`)
+and accurate tools (overview, pronunciation, grammar path, vocabulary SRS, conversation,
+etc.) plus per-agent highlights (Spanish native cloned-voice examples, English hands-free
+Conversation Audio + web research, CJK stroke order + ASR speaking).
+
+Catalog went **12 → 18 agents**, **89 → 121 unique capabilities**, **9 → 16 MCP endpoints**.
+No code/UI change needed — the catalog endpoint reads the directory on each request.
+
+Also added the six agents' name+desc to `help.presentationAgent.agents.*` in EN/NO/ES
+so they are localized in the Presentation Agent's catalog too (product names kept in
+English; descriptions translated). All 18 catalog slugs now resolve to a localized
+name+desc in every locale, with EN/NO/ES key parity.
+
+---
+
 ## [1.20.3] - 2026-07-09
 
 ### Fixed — Agent catalog (Help → AI Presentation Agent) now fully localized
