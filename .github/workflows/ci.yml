@@ -64,14 +64,16 @@ jobs:
         with:
           node-version: '20'
 
-      # No package-lock.json is committed, so use `npm install` (not `npm ci`).
-      # --legacy-peer-deps: the tree has a known peer-dependency conflict
-      # (postprocessing@6.39.2 wants three >=0.168 <0.186, but the project pins
-      # three@^0.155). npm >= 7 treats this ERESOLVE as a hard error; the flag
-      # restores the older, permissive resolution (the app builds and runs fine
-      # with three@0.155). Locally npm 11 tolerates it; CI's npm errors without it.
+      # A committed package-lock.json now pins the exact dependency tree, so use
+      # `npm ci` for a deterministic, reproducible install. This is what makes
+      # the build reliable: `npm install` without a lockfile produced a
+      # non-deterministic tree that intermittently broke (e.g. `ajv-keywords`
+      # resolving against `ajv@6` -> "Cannot find module 'ajv/dist/compile/
+      # codegen'"). The lockfile was generated with --legacy-peer-deps (the tree
+      # has a known peer conflict: postprocessing@6.39.2 wants three >=0.168 but
+      # the project pins three@^0.155), so we keep that flag here for consistency.
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
 
       - name: Production build
         env:

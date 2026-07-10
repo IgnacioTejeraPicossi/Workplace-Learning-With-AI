@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.8] - 2026-07-10
+
+### Fixed — CI frontend build: non-deterministic dep tree (`ajv`/`ajv-keywords`)
+
+With ESLint no longer failing the build ([1.20.7]), the real cause of the
+frontend build failure surfaced in the runner log:
+
+```
+Error: Cannot find module 'ajv/dist/compile/codegen'
+Require stack: … ajv-keywords/dist/definitions/typeof.js → schema-utils →
+terser-webpack-plugin → react-scripts/config/webpack.config.js
+```
+
+`ajv-keywords` (needs `ajv@8`, which provides `dist/compile/codegen`) was
+resolving against `ajv@6`. The trigger is `npm install --legacy-peer-deps` with
+**no committed lockfile**: peer resolution is permissive and the resulting tree
+is non-deterministic, so the nested `ajv@8` that `ajv-keywords` needs is
+sometimes hoisted away. It happened to work on the dev box (and in local Docker)
+but broke on the GitHub runner — the exact non-determinism a lockfile exists to
+prevent.
+
+Fix:
+- **Commit `frontend/package-lock.json`** (generated with `--legacy-peer-deps`,
+  which the three.js/postprocessing peer conflict still requires) pinning the
+  exact, known-good tree.
+- **`.github/workflows/ci.yml`**: install step `npm install --legacy-peer-deps`
+  → **`npm ci --legacy-peer-deps`** so CI reproduces the locked tree exactly.
+
+Verified in a clean `node:20` container: `npm ci` from empty `node_modules`
+using the committed lockfile → `npm run build` → **exit 0** ("The build folder
+is ready to be deployed"). Combined with the backend fix ([1.20.6]) and the
+ESLint gate ([1.20.7]), all CI jobs are now green.
+
+---
+
 ## [1.20.7] - 2026-07-10
 
 ### Fixed — CI frontend "Production build" step (ESLint warnings tripping the build)

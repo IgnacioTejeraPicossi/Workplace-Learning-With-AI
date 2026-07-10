@@ -1,6 +1,11 @@
 # Dependencies
 node_modules/
 package-lock.json
+# Exception: the frontend lockfile IS committed on purpose — it pins a
+# deterministic dependency tree so CI (npm ci) reproduces a known-good build.
+# Without it, npm install produced a non-deterministic tree that broke the CI
+# frontend build (ajv/ajv-keywords resolution). See CHANGELOG [1.20.8].
+!frontend/package-lock.json
 yarn.lock
 
 # Project Documentation
