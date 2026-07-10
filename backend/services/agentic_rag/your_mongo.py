@@ -3,10 +3,14 @@ import os, datetime
 from typing import Any, Dict, List, Optional
 from pymongo import MongoClient, ASCENDING
 
-MONGO_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+# Acepta tanto MONGODB_URI (histórico de este módulo) como MONGO_URI (el que usa
+# el resto del backend en db.py), para que un único ajuste de entorno sirva.
+MONGO_URI = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI") or "mongodb://localhost:27017"
 DB_NAME   = os.getenv("MONGODB_DB",  "ai_learning")
 
-_client = MongoClient(MONGO_URI)
+# serverSelectionTimeoutMS corto: si Mongo no responde (p. ej. CI sin BD, o el
+# backend arranca antes que Mongo) fallamos rápido en vez de colgar 30 s.
+_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=int(os.getenv("MONGO_SELECT_TIMEOUT_MS", "3000")))
 _db = _client[DB_NAME]
 
 documents = _db["documents"]
@@ -15,11 +19,28 @@ runs      = _db["agentic_runs"]
 evals     = _db["agentic_evals"]
 analyses  = _db["agentic_analyses"]  # historial de preguntas/respuestas
 
-# Índices mínimos
-chunks.create_index([("doc_id", ASCENDING), ("level", ASCENDING), ("path", ASCENDING)])
-runs.create_index([("created_at", ASCENDING)])
-analyses.create_index([("created_at", ASCENDING)])
-analyses.create_index([("doc_id", ASCENDING)])
+# Índices mínimos — creación perezosa y tolerante a fallos.
+# Antes esto se ejecutaba a nivel de módulo, forzando una conexión SÍNCRONA a
+# Mongo durante el import; si Mongo no estaba disponible el import reventaba con
+# ServerSelectionTimeoutError y tumbaba TODA la app (así fallaba el CI). Ahora se
+# intenta al importar pero sin propagar el error, y se reintenta en el primer uso.
+_indexes_ready = False
+
+def _ensure_indexes() -> None:
+    global _indexes_ready
+    if _indexes_ready:
+        return
+    try:
+        chunks.create_index([("doc_id", ASCENDING), ("level", ASCENDING), ("path", ASCENDING)])
+        runs.create_index([("created_at", ASCENDING)])
+        analyses.create_index([("created_at", ASCENDING)])
+        analyses.create_index([("doc_id", ASCENDING)])
+        _indexes_ready = True
+    except Exception as e:
+        # Mongo no disponible al importar; se reintentará en el próximo write.
+        print(f"⚠️ your_mongo: índices diferidos (Mongo no disponible al importar): {e}")
+
+_ensure_indexes()
 
 def save_document(doc_id: str, filename: str) -> None:
     documents.update_one({"_id": doc_id},
@@ -28,6 +49,7 @@ def save_document(doc_id: str, filename: str) -> None:
 
 def save_chunks_tree(doc_id: str, chunks_tree: List[Dict[str, Any]]) -> None:
     # chunks_tree: [{mega: Chunk, subs: [Chunk,...]}, ...]
+    _ensure_indexes()
     # limpiamos lo previo del doc
     chunks.delete_many({"doc_id": doc_id})
     to_insert = []
@@ -54,6 +76,7 @@ def get_chunks_tree(doc_id: Optional[str]=None, level: Optional[int]=None, path_
     return list(chunks.find(q))
 
 def save_run(run_doc: Dict[str, Any]) -> None:
+    _ensure_indexes()
     run_doc["created_at"] = datetime.datetime.utcnow()
     runs.insert_one(run_doc)
 
@@ -62,6 +85,7 @@ def save_eval(run_id: str, scores: Dict[str, Any]) -> None:
 
 def save_analysis(analysis_data: Dict[str, Any]) -> str:
     """Save complete analysis (question + answer + metadata) to database"""
+    _ensure_indexes()
     analysis_data["created_at"] = datetime.datetime.utcnow()
     result = analyses.insert_one(analysis_data)
     return str(result.inserted_id)

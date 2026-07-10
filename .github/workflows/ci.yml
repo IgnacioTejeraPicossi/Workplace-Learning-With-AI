@@ -65,8 +65,13 @@ jobs:
           node-version: '20'
 
       # No package-lock.json is committed, so use `npm install` (not `npm ci`).
+      # --legacy-peer-deps: the tree has a known peer-dependency conflict
+      # (postprocessing@6.39.2 wants three >=0.168 <0.186, but the project pins
+      # three@^0.155). npm >= 7 treats this ERESOLVE as a hard error; the flag
+      # restores the older, permissive resolution (the app builds and runs fine
+      # with three@0.155). Locally npm 11 tolerates it; CI's npm errors without it.
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Production build
         env:

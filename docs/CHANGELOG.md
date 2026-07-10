@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.6] - 2026-07-10
+
+### Fixed — CI first-run failures (both jobs now green)
+
+The first real run of the [1.20.5] CI failed on **both** jobs. Root causes, each
+reproduced in a real Linux container (`python:3.11` / `node:20`) since neither
+reproduces on the Windows dev box:
+
+**Backend — `exit 2` (pytest collection error), not a test failure.**
+`backend/services/agentic_rag/your_mongo.py` created its Mongo indexes at
+**module import time** with a **synchronous** `pymongo` client
+(`chunks.create_index(...)` etc. at top level). Importing the app therefore
+forced a blocking `server_selection` against Mongo. On the dev machine a local
+MongoDB is running, so the import succeeded (hence the misleading local
+"56 passed"). In CI there is no Mongo → `ServerSelectionTimeoutError` → the app
+failed to import → 2 collection errors → `exit 2`. It also read `MONGODB_URI`
+(not the project-standard `MONGO_URI`) and had no `serverSelectionTimeoutMS`, so
+it ignored the CI's fast-fail URI and hung on the 30 s default.
+Fix: index creation moved into a lazy, failure-tolerant `_ensure_indexes()`
+(retried on first write); the client now honours `MONGO_URI` too and uses a short
+`serverSelectionTimeoutMS`. Verified: `56 passed` on Linux with **no** Mongo.
+
+**Frontend — `exit 1` (`npm error code ERESOLVE`).**
+`postprocessing@6.39.2` requires `three >= 0.168 < 0.186` but the project pins
+`three@^0.155`. npm ≥ 7 treats this peer conflict as a hard error (CI's npm 10
+failed; the local npm 11 tolerated it). Fix: `npm install --legacy-peer-deps` in
+`.github/workflows/ci.yml`. Verified: install + `npm run build` succeed on
+`node:20`.
+
+**Lesson recorded:** the local "56 passed" was a false positive because the dev
+box has MongoDB up. Offline-CI claims must be verified in a container without
+Mongo — done here via Docker before pushing.
+
+---
+
 ## [1.20.5] - 2026-07-10
 
 ### Added — CI now runs the offline test suites (regression gate)
