@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.9] - 2026-07-11
+
+### Fixed — CI frontend build: `src/firebase.js` was gitignored (not in the repo)
+
+With the lockfile in place ([1.20.8]) the frontend **install** went green and the
+build reached the real remaining error, reproduced from a clean checkout:
+
+```
+Failed to compile.
+Module not found: Error: Can't resolve './firebase' in '…/frontend/src'
+```
+
+`frontend/src/firebase.js` — imported by 7 components (`App.jsx`, `Auth.jsx`,
+`api.js`, `Dashboard.jsx`, `BabelLibrary.jsx`, `KnowledgeMap.jsx`,
+`TeamDynamics.jsx`) for `auth` / `googleProvider` — was excluded by
+`frontend/.gitignore` (`firebase.js`). It builds locally (the file is present on
+the dev box) but a clean CI checkout does not have it, so the build fails to
+resolve `./firebase`. Same class of bug as the backend `prompts` import in
+[1.20.6]: works locally, absent from a fresh clone.
+
+Fix: commit `frontend/src/firebase.js` and add a `!src/firebase.js` exception to
+`frontend/.gitignore`. The file contains only the Firebase **web** config, which
+is a public project identifier (not a secret — access is governed by Firebase
+Security Rules + Authorized Domains, and the app already ships these values to
+every visitor's browser); each field is still overridable via
+`REACT_APP_FIREBASE_*`. A static scan confirmed this was the **only** non-tracked
+file under `frontend/src` imported by tracked code, so no further hidden-file
+breaks remain. This is expected to turn the frontend build green — completing the
+CI recovery started in [1.20.6].
+
+---
+
 ## [1.20.8] - 2026-07-10
 
 ### Fixed — CI frontend build: non-deterministic dep tree (`ajv`/`ajv-keywords`)

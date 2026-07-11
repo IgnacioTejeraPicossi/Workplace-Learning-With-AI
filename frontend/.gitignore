@@ -24,6 +24,14 @@ yarn-error.log*
 
 #firebase
 firebase.js
+# Exception: src/firebase.js IS committed on purpose. It contains only the
+# Firebase *web* config, which is a public project identifier (not a secret) —
+# access is controlled by Firebase Security Rules + Authorized Domains, and the
+# app already ships these values to every visitor's browser. Every field can
+# still be overridden per-environment via REACT_APP_FIREBASE_* build vars.
+# Without committing it, the CI/clean-checkout build fails: "Can't resolve
+# './firebase'". See CHANGELOG [1.20.9].
+!src/firebase.js
 serviceAccountKey.json
 
 # Voice cloning environments (removed feature)
