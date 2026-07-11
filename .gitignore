@@ -1,3 +1,10 @@
+# Claude Code machine-local settings (permissions, local prefs) — never shared.
+# The rest of .claude/ (commands, agents, docs) IS tracked on purpose.
+.claude/settings.local.json
+
+# Office temp / lock files (created while a .docx / .xlsx is open)
+~$*
+
 # Dependencies
 node_modules/
 package-lock.json
