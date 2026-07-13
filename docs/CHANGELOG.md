@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.20.10] - 2026-07-11
+
+### Fixed — Chinese Teacher AI · Hanzi Dojo strokes not drawing
+
+The Hanzi Dojo showed a "…" placeholder instead of the animated stroke order,
+while the Japanese Kanji Dojo drew fine. Root cause: `HanziStrokeAnimation.jsx`
+fetched the stroke data as `/hanzi-data/${encodeURIComponent(char)}.json`, i.e.
+a **CJK-named file** (`我.json`). Browsers always percent-encode non-ASCII path
+segments (`%E6%88%91`), and the static dev server 404s on that encoded form
+(confirmed: literal bytes → 200, percent-encoded → 404). With the fetch failing,
+`strokes` stayed empty and the component rendered its "…" fallback.
+
+Fix (mirrors the working Japanese KanjiVG approach, which uses ASCII hex-code
+filenames):
+- Renamed all 51 `frontend/public/hanzi-data/*.json` from the CJK character to
+  its Unicode code point in lowercase hex (`我.json` → `6211.json`).
+- `HanziStrokeAnimation.jsx` now fetches
+  `/hanzi-data/${char.codePointAt(0).toString(16)}.json`.
+
+Verified against the running dev server: `/hanzi-data/6211.json` → HTTP 200 with
+7 strokes (previously the encoded CJK request was 404). Robust for both dev and
+production static hosting.
+
+---
+
 ## [1.20.9] - 2026-07-11
 
 ### Fixed — CI frontend build: `src/firebase.js` was gitignored (not in the repo)

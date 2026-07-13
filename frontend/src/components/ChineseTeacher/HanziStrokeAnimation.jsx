@@ -1,7 +1,7 @@
 /**
  * HanziStrokeAnimation — animated stroke-order display for a single hanzi.
  *
- * Fetches the hanzi-writer-data JSON from /hanzi-data/{char}.json and renders
+ * Fetches the hanzi-writer-data JSON from /hanzi-data/{codepoint-hex}.json and renders
  * the same React-controlled SVG approach we used for KanjiVG in the Japanese
  * agent. The data format differs slightly:
  *
@@ -43,7 +43,11 @@ const HanziStrokeAnimation = ({ char, size = 220, autoplay = false, tokens = DEF
     let alive = true;
     setStrokes([]); setMedians([]); setPlayed(0); setAnimating(-1); setPlaying(false);
     if (!char) return;
-    fetch(`/hanzi-data/${encodeURIComponent(char)}.json`)
+    // Filenames are the character's Unicode code point in lowercase hex (ASCII),
+    // e.g. 我 (U+6211) -> "6211.json". This avoids serving CJK-named files over
+    // HTTP: browsers always percent-encode non-ASCII path segments and the static
+    // dev server 404s on the encoded form. Mirrors the Japanese KanjiVG approach.
+    fetch(`/hanzi-data/${char.codePointAt(0).toString(16)}.json`)
       .then((r) => r.ok ? r.json() : Promise.reject('not found'))
       .then((data) => {
         if (!alive) return;
