@@ -103,6 +103,7 @@
       "title": "Conversation",
       "subtitle": "Roleplay with a register-aware mentor that corrects and upgrades your English",
       "scenario": "Scenario",
+      "topic": "Topic",
       "difficulty": "Level",
       "startBtn": "Start conversation",
       "yourReply": "Your reply in English…",

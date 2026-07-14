@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.21.0] - 2026-07-11
+
+### Added — English Mastery AI · Conversation "Topic" (subject-matter domain)
+
+New **Topic** selector in the Conversation and Conversation Audio tabs, next to
+Scenario and Level. It fixes the *subject-matter domain* of the roleplay so the
+mentor uses vocabulary and situations from that field:
+
+- **General** (default — unchanged behaviour)
+- **Science / Ciencia** — research, biology, physics, chemistry, medicine, data
+- **IT & Computing / Informática** — programming, systems, cloud, AI, security
+
+Topic is orthogonal to Scenario (the social situation): a "Business meeting" can
+now be about science or IT. Implementation:
+
+- **Backend** (`services/english_mentor.py`): `TOPICS` catalogue + a per-topic
+  `hint` injected as a `TOPIC DOMAIN:` line in the conversation system prompt;
+  `_mentor_system_prompt`, `conversation_message` and `_mock_reply` take a
+  `topic` param (default `"general"`); new `topics_catalogue(lang)`.
+- **Router** (`routers/english_mentor.py`): `topic` field on
+  `ConversationMessageRequest` + new `GET /api/english/conversation/topics`.
+- **Frontend** (`EnglishMentor.jsx`): fetch topics, `topic` state and a localized
+  dropdown in both conversation surfaces; `topic` sent in each request.
+- **i18n**: `englishMentorModule.conversation.topic` (EN "Topic" / ES "Tema" /
+  NO "Tema"); topic option labels come localized from the backend catalogue.
+
+Fully backward compatible — `topic` is optional and defaults to `general`, so
+existing callers behave exactly as before. Verified: `topics` endpoint returns
+localized labels, a message with `topic=science` echoes `topic`, a message with
+no `topic` defaults to `general`, all i18n JSON valid, JSX parses. Note: topic
+steers the **LLM replies** (needs an AI model connected); in mock mode replies
+stay generic.
+
+---
+
 ## [1.20.10] - 2026-07-11
 
 ### Fixed — Chinese Teacher AI · Hanzi Dojo strokes not drawing

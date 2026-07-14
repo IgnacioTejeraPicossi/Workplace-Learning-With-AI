@@ -481,15 +481,18 @@ const TabConversation = () => {
   const [scenarios, setScenarios] = useState([]);
   const [scenario, setScenario] = useState('smalltalk');
   const [difficulty, setDifficulty] = useState('c1');
+  const [topics, setTopics] = useState([]);
+  const [topic, setTopic] = useState('general');
   const [started, setStarted] = useState(false);
   const [history, setHistory] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [last, setLast] = useState(null);
   useEffect(() => { fetch(`${API_BASE}/api/english/conversation/scenarios?lang=${lang}`).then(r => r.json()).then(d => setScenarios(d.scenarios || [])); }, [lang]);
+  useEffect(() => { fetch(`${API_BASE}/api/english/conversation/topics?lang=${lang}`).then(r => r.json()).then(d => setTopics(d.topics || [])).catch(() => {}); }, [lang]);
   const start = async () => {
     setStarted(true); setHistory([]);
-    const r = await fetch(`${API_BASE}/api/english/conversation/message`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, difficulty, history: [], lang }) });
+    const r = await fetch(`${API_BASE}/api/english/conversation/message`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, difficulty, topic, history: [], lang }) });
     const d = await r.json(); setLast(d); setHistory([{ role: 'assistant', content: d.reply }]);
   };
   const send = async () => {
@@ -497,7 +500,7 @@ const TabConversation = () => {
     const newHist = [...history, { role: 'user', content: input }];
     setHistory(newHist); setInput(''); setSending(true);
     try {
-      const r = await fetch(`${API_BASE}/api/english/conversation/message`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, difficulty, history: newHist, user_text: input, lang }) });
+      const r = await fetch(`${API_BASE}/api/english/conversation/message`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, difficulty, topic, history: newHist, user_text: input, lang }) });
       const d = await r.json(); setLast(d); setHistory([...newHist, { role: 'assistant', content: d.reply }]);
     } catch (e) { /* noop */ }
     setSending(false);
@@ -508,10 +511,14 @@ const TabConversation = () => {
       <h2 style={{ color: C.ink, fontSize: 22, fontWeight: 800, margin: '0 0 4px' }}>{t('englishMentorModule.conversation.title')}</h2>
       <p style={{ color: C.inkSoft, fontSize: 13, marginBottom: 18 }}>{t('englishMentorModule.conversation.subtitle')}</p>
       {!started ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 0.9fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
           <div>
             <label style={sublabel}>{t('englishMentorModule.conversation.scenario')}</label>
             <select value={scenario} onChange={e => setScenario(e.target.value)} style={selectStyle}>{scenarios.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}</select>
+          </div>
+          <div>
+            <label style={sublabel}>{t('englishMentorModule.conversation.topic')}</label>
+            <select value={topic} onChange={e => setTopic(e.target.value)} style={selectStyle}>{topics.map(tp => <option key={tp.key} value={tp.key}>{tp.label}</option>)}</select>
           </div>
           <div>
             <label style={sublabel}>{t('englishMentorModule.conversation.difficulty')}</label>
@@ -576,6 +583,8 @@ const TabConversationAudio = () => {
   const [scenarios, setScenarios] = useState([]);
   const [scenario, setScenario] = useState('smalltalk');
   const [difficulty, setDifficulty] = useState('c1');
+  const [topics, setTopics] = useState([]);
+  const [topic, setTopic] = useState('general');
   const [started, setStarted] = useState(false);
   const [history, setHistory] = useState([]);
   const [last, setLast] = useState(null);
@@ -593,6 +602,11 @@ const TabConversationAudio = () => {
       .then((r) => r.json()).then((d) => setScenarios(d.scenarios || [])).catch(() => {});
   }, [lang]);
 
+  useEffect(() => {
+    fetch(`${API_BASE}/api/english/conversation/topics?lang=${lang}`)
+      .then((r) => r.json()).then((d) => setTopics(d.topics || [])).catch(() => {});
+  }, [lang]);
+
   useEffect(() => { transcriptRef.current = asr.transcript; }, [asr.transcript]);
 
   // Auto-speak each new mentor reply once.
@@ -608,7 +622,7 @@ const TabConversationAudio = () => {
     try {
       const r = await fetch(`${API_BASE}/api/english/conversation/message`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, difficulty, history: [], lang }),
+        body: JSON.stringify({ scenario, difficulty, topic, history: [], lang }),
       });
       const d = await r.json();
       setLast(d); setHistory([{ role: 'assistant', content: d.reply }]);
@@ -622,13 +636,13 @@ const TabConversationAudio = () => {
     try {
       const r = await fetch(`${API_BASE}/api/english/conversation/message`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, difficulty, history: newHist, user_text: text.trim(), lang, web_research: webResearch }),
+        body: JSON.stringify({ scenario, difficulty, topic, history: newHist, user_text: text.trim(), lang, web_research: webResearch }),
       });
       const d = await r.json();
       setLast(d); setHistory([...newHist, { role: 'assistant', content: d.reply }]);
     } catch (e) { /* noop */ }
     setSending(false);
-  }, [history, sending, scenario, difficulty, lang, webResearch]);
+  }, [history, sending, scenario, difficulty, topic, lang, webResearch]);
 
   useEffect(() => { sendRef.current = sendUserTurn; });
 
@@ -666,10 +680,14 @@ const TabConversationAudio = () => {
       )}
 
       {!started ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 0.9fr 1fr', gap: 12, alignItems: 'end', marginBottom: 16 }}>
           <div>
             <label style={sublabel}>{t('englishMentorModule.conversation.scenario')}</label>
             <select value={scenario} onChange={(e) => setScenario(e.target.value)} style={selectStyle}>{scenarios.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}</select>
+          </div>
+          <div>
+            <label style={sublabel}>{t('englishMentorModule.conversation.topic')}</label>
+            <select value={topic} onChange={(e) => setTopic(e.target.value)} style={selectStyle}>{topics.map((tp) => <option key={tp.key} value={tp.key}>{tp.label}</option>)}</select>
           </div>
           <div>
             <label style={sublabel}>{t('englishMentorModule.conversation.difficulty')}</label>

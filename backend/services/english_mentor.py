@@ -623,16 +623,40 @@ SCENARIOS: Dict[str, Dict[str, str]] = {
 
 _LANG_NAMES = {"es": "Spanish", "en": "English", "no": "Norwegian"}
 
+# Optional subject-matter domain for the conversation. Orthogonal to SCENARIOS
+# (the social situation): a "Business meeting" can be about science or IT. The
+# `hint` is injected into the system prompt to steer vocabulary and topics.
+# "general" carries no hint, so behaviour is unchanged when topic is omitted.
+TOPICS: Dict[str, Dict[str, str]] = {
+    "general": {"en": "General", "es": "General", "no": "Generelt", "hint": ""},
+    "science": {"en": "Science", "es": "Ciencia", "no": "Vitenskap",
+                "hint": "Anchor the conversation in SCIENCE — research, biology, physics, "
+                        "chemistry, medicine, space, the scientific method, data and "
+                        "evidence. Naturally use accurate scientific vocabulary and nudge "
+                        "the learner to discuss scientific ideas."},
+    "tech":    {"en": "IT & Computing", "es": "Informática", "no": "IT og databehandling",
+                "hint": "Anchor the conversation in IT / SOFTWARE / COMPUTING — programming, "
+                        "systems, cloud, databases, AI, cybersecurity and developer "
+                        "workflows. Naturally use accurate technical vocabulary and nudge "
+                        "the learner to discuss technology topics."},
+}
 
-def _mentor_system_prompt(scenario: str, difficulty: str, explain_lang: str) -> str:
+
+def _mentor_system_prompt(scenario: str, difficulty: str, explain_lang: str,
+                          topic: str = "general") -> str:
     lang_name = _LANG_NAMES.get(explain_lang, "Spanish")
     scen_label = SCENARIOS.get(scenario, {}).get("en", scenario)
+    topic_meta = TOPICS.get(topic, TOPICS["general"])
+    topic_line = ""
+    if topic_meta.get("hint"):
+        topic_line = f"TOPIC DOMAIN: {topic_meta['en']} — {topic_meta['hint']}\n"
     return (
         "You are English Mastery AI, an advanced English conversation partner for a "
         "Spanish-speaking learner aiming for C1–C2. Stay in natural, register-appropriate "
         "English.\n\n"
         f"SCENARIO: {scen_label}\n"
         f"LEARNER TARGET: {difficulty} (C1 default)\n"
+        f"{topic_line}"
         f"CORRECTION-EXPLANATION LANGUAGE: {lang_name}\n\n"
         "Return ONLY valid JSON, no markdown:\n"
         '{"reply":"<your natural English reply>",'
@@ -651,21 +675,22 @@ def _mentor_system_prompt(scenario: str, difficulty: str, explain_lang: str) -> 
 async def conversation_message(
     scenario: str, difficulty: str, history: List[Dict[str, str]],
     user_text: Optional[str], lang: str = "es", web_research: bool = False,
+    topic: str = "general",
 ) -> Dict[str, Any]:
     scen = SCENARIOS.get(scenario, SCENARIOS["smalltalk"])
     if not history and not user_text:
         return {"reply": scen["first"], "register": "neutral", "correction": "",
                 "upgrade": "", "tip": "", "is_mock": False, "web_used": False,
-                "scenario": scenario, "difficulty": difficulty}
+                "scenario": scenario, "difficulty": difficulty, "topic": topic}
     if ask_ai_unified is None:
-        return _mock_reply(scenario, difficulty, user_text or "", lang)
+        return _mock_reply(scenario, difficulty, user_text or "", lang, topic)
 
     # Optional: research the user's topic on the web first, then ground the reply.
     web_context: Optional[str] = None
     if web_research and user_text:
         web_context = await _web_research(user_text)
 
-    sys_prompt = _mentor_system_prompt(scenario, difficulty, lang)
+    sys_prompt = _mentor_system_prompt(scenario, difficulty, lang, topic)
     if web_context:
         sys_prompt += (
             "\n\nFRESH WEB CONTEXT — use these current facts to make your reply "
@@ -693,6 +718,7 @@ async def conversation_message(
             parsed["is_mock"] = False
             parsed["scenario"] = scenario
             parsed["difficulty"] = difficulty
+            parsed["topic"] = topic
             parsed["web_used"] = bool(web_context)
             parsed.setdefault("register", "neutral")
             for k in ("correction", "upgrade", "tip", "reply"):
@@ -703,20 +729,26 @@ async def conversation_message(
     return _mock_reply(scenario, difficulty, user_text or "", lang)
 
 
-def _mock_reply(scenario: str, difficulty: str, user_text: str, lang: str) -> Dict[str, Any]:
+def _mock_reply(scenario: str, difficulty: str, user_text: str, lang: str,
+                topic: str = "general") -> Dict[str, Any]:
     return {
         "reply": "That's a fair point. Could you expand on that a little?",
         "register": "neutral",
         "correction": "",
         "upgrade": "",
         "tip": "[Mock — connect an AI model for live conversation, corrections and upgrades.]",
-        "is_mock": True, "scenario": scenario, "difficulty": difficulty,
+        "is_mock": True, "scenario": scenario, "difficulty": difficulty, "topic": topic,
     }
 
 
 def scenarios_catalogue(lang: str = "es") -> List[Dict[str, str]]:
     return [{"key": k, "label": v.get(lang, v["en"]), "first": v["first"]}
             for k, v in SCENARIOS.items()]
+
+
+def topics_catalogue(lang: str = "es") -> List[Dict[str, str]]:
+    """Subject-matter domains for the conversation (general / science / IT)."""
+    return [{"key": k, "label": v.get(lang, v["en"])} for k, v in TOPICS.items()]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

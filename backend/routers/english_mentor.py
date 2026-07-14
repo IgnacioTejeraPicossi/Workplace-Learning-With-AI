@@ -13,7 +13,7 @@ try:
         get_false_friends, get_collocations, get_phrasal_verbs, get_idioms,
         get_grammar_path, get_grammar_point, get_minimal_pairs,
         get_vocab_all, srs_due, srs_review,
-        get_overview, conversation_message, scenarios_catalogue,
+        get_overview, conversation_message, scenarios_catalogue, topics_catalogue,
         writing_feedback, health,
     )
 except ImportError:  # pragma: no cover
@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
         get_false_friends, get_collocations, get_phrasal_verbs, get_idioms,
         get_grammar_path, get_grammar_point, get_minimal_pairs,
         get_vocab_all, srs_due, srs_review,
-        get_overview, conversation_message, scenarios_catalogue,
+        get_overview, conversation_message, scenarios_catalogue, topics_catalogue,
         writing_feedback, health,
     )
 
@@ -38,6 +38,7 @@ class SrsReviewRequest(BaseModel):
 class ConversationMessageRequest(BaseModel):
     scenario: str = Field("smalltalk")
     difficulty: str = Field("c1", pattern=r"^(c1|c2)$")
+    topic: str = Field("general", description="Subject-matter domain: general | science | tech")
     history: List[Dict[str, str]] = Field(default_factory=list)
     user_text: Optional[str] = Field(None)
     lang: str = Field("es", pattern=r"^(en|es|no)$")
@@ -128,12 +129,17 @@ def scenarios_endpoint(lang: str = Query("es")) -> Dict[str, Any]:
     return {"scenarios": scenarios_catalogue(lang)}
 
 
+@router.get("/conversation/topics", summary="List conversation subject-matter topics")
+def topics_endpoint(lang: str = Query("es")) -> Dict[str, Any]:
+    return {"topics": topics_catalogue(lang)}
+
+
 @router.post("/conversation/message", summary="Send a turn to the English mentor")
 async def conversation_endpoint(body: ConversationMessageRequest) -> Dict[str, Any]:
     return await conversation_message(
         scenario=body.scenario, difficulty=body.difficulty,
         history=body.history, user_text=body.user_text, lang=body.lang,
-        web_research=body.web_research,
+        web_research=body.web_research, topic=body.topic,
     )
 
 
