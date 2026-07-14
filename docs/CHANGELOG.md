@@ -40,6 +40,18 @@ Verified: `/api/app-context` returns the llms.txt map (6 013 chars),
 Note: full answers require an AI model connected (the buddy streams via
 `/llm-stream`); in mock mode replies stay generic.
 
+Two follow-up fixes after first testing:
+- **"List the agents" was hijacked** by a fuzzy keyword matcher that forced an
+  "Answer ONLY about <one agent>" prompt, so a general question got a single
+  wrong agent. The focused-agent prompt now triggers **only** when the user
+  explicitly picks one from the Agent dropdown; otherwise the general prompt runs
+  with the full catalogue. Also raised the catalogue cap 12 → 50 so all 18 agents
+  are listed.
+- **README preview always English** regardless of UI language: the panel fetched
+  `/api/readme` with no `lang`. It now uses `/api/readme?lang=<es|no|en>` (derived
+  from the UI language, re-fetched on change), so the preview shows the localized
+  README (verified: es/no/en all return their own localized file).
+
 ---
 
 ## [1.21.0] - 2026-07-11

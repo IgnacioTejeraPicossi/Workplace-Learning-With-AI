@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 function AIStudyBuddy({ user, query = "" }) {
   const { colors } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // App UI language → README/context localization (en | es | no).
+  const rawLang = (i18n.language || 'en').toLowerCase();
+  const lang = rawLang.startsWith('es') ? 'es' : (rawLang.startsWith('n') ? 'no' : 'en');
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState(query);
   const [isTyping, setIsTyping] = useState(false);
@@ -82,7 +85,7 @@ function AIStudyBuddy({ user, query = "" }) {
           const short = desc.length > 120 ? desc.slice(0, 120) + '…' : desc;
           return `- ${name}: ${short}`;
         });
-        setAgentsBrief(briefLines.slice(0, 12).join('\n'));
+        setAgentsBrief(briefLines.slice(0, 50).join('\n'));
       } catch (e) {
         // ignore silently to keep current behavior
       }
@@ -107,7 +110,7 @@ function AIStudyBuddy({ user, query = "" }) {
     const fetchReadme = async () => {
       if (!useReadme) { setReadmeSnippet(''); return; }
       try {
-        const res = await fetch('/api/readme');
+        const res = await fetch(`/api/readme?lang=${lang}`);
         const data = await res.json();
         if (data?.success && data?.markdown) {
           setReadmeSnippet(data.markdown.slice(0, 2500));
@@ -119,7 +122,7 @@ function AIStudyBuddy({ user, query = "" }) {
       }
     };
     fetchReadme();
-  }, [useReadme]);
+  }, [useReadme, lang]);
 
   // Handle initial query if provided
   useEffect(() => {
@@ -170,27 +173,10 @@ ${appOverview ? `App overview (repo map):\n${appOverview}\n\n` : ''}Agents avail
 ${agentsBrief || '(agent catalogue unavailable)'}${readmeContext}
 ===== END APP CONTEXT =====`;
 
-    // Try to match question to a known agent for a focused answer
-    const findBestAgent = (q) => {
-      try {
-        const ql = q.toLowerCase();
-        const names = (agentsBrief && agentsBrief.split('\n')) || [];
-        // We also keep a parsed list from the catalog fetch by reusing brief lines
-        // Simple match: pick first line containing a word from the question
-        let best = null;
-        let bestScore = 0;
-        const tokens = ql.split(/[^a-z0-9]+/).filter(Boolean);
-        names.forEach((line) => {
-          const name = line.replace(/^[-\s]*/, '').split(':')[0] || '';
-          const nl = name.toLowerCase();
-          const overlap = tokens.filter(t => nl.includes(t)).length;
-          if (overlap > bestScore) { bestScore = overlap; best = name; }
-        });
-        return bestScore > 0 ? best : null;
-      } catch { return null; }
-    };
-
-    const matchedAgentName = findBestAgent(messageText);
+    // Focus on a single agent ONLY when the user explicitly picks one from the
+    // "Agent" dropdown. The previous fuzzy keyword matching hijacked general
+    // questions (e.g. "list the agents") and answered about one wrong agent.
+    const matchedAgentName = selectedAgent || null;
 
     const focusedPromptForAgent = (agentName) => `Answer ONLY about "${agentName}".
 - What it does (1–2 lines)
