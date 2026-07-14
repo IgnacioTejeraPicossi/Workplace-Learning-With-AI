@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.21.1] - 2026-07-11
+
+### Fixed / Added — AI Study Companion is now app-aware (grounded in WLWAI)
+
+The Help → "AI Study Companion" (`AIStudyBuddy.jsx`) answered as a generic AI: it
+sent only the user's question to `/llm-stream` with no knowledge of this app, so
+it couldn't answer things like "which language agents does the app have?".
+
+Two root problems found and fixed:
+- **Dead README context (bug):** the "Use README context" toggle fetched
+  `/api/readme` and showed a preview, but the computed `readmeContext` was
+  **never added to the prompt** — checking the box did nothing for the answer.
+- **No app context injected:** the agent catalogue was loaded but never sent, and
+  there was no system framing identifying the app.
+
+Now the companion is grounded in the real app on every turn:
+1. **App-aware system framing** — it introduces itself as the study companion for
+   *Workplace Learning With AI* and is told to answer from the provided context
+   and not invent features.
+2. **Agent catalogue always injected** — `agentsBrief` (all 18 agents incl. the 6
+   language agents) is included, so "what agents/modules exist?" works.
+3. **README toggle fixed + on by default** — when on, the README excerpt is now
+   actually appended to the prompt.
+4. **Compact repo map (`docs/llms.txt`) always injected** via a new read-only
+   `GET /api/app-context` endpoint (serves `docs/llms.txt`, capped at 6 000 chars,
+   README fallback) — a purpose-built LLM overview of modules, ports and rules.
+
+Backward compatible (no endpoint/contract changes; only richer prompt context).
+Verified: `/api/app-context` returns the llms.txt map (6 013 chars),
+`/api/agents/catalog` lists the 6 language agents, backend compiles, JSX parses.
+Note: full answers require an AI model connected (the buddy streams via
+`/llm-stream`); in mock mode replies stay generic.
+
+---
+
 ## [1.21.0] - 2026-07-11
 
 ### Added — English Mastery AI · Conversation "Topic" (subject-matter domain)

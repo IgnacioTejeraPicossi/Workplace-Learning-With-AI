@@ -18,8 +18,11 @@ function AIStudyBuddy({ user, query = "" }) {
   const [agentsBrief, setAgentsBrief] = useState("");
   const [agentOptions, setAgentOptions] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState("");
-  const [useReadme, setUseReadme] = useState(false);
+  const [useReadme, setUseReadme] = useState(true);
   const [readmeSnippet, setReadmeSnippet] = useState("");
+  // Compact app overview (docs/llms.txt) — always loaded so the companion knows
+  // what THIS app is, its modules and how it works, even without the README toggle.
+  const [appOverview, setAppOverview] = useState("");
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -87,6 +90,18 @@ function AIStudyBuddy({ user, query = "" }) {
     loadAgents();
   }, []);
 
+  // Load the compact app overview (docs/llms.txt) once — always available.
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/app-context');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.success && data?.markdown) setAppOverview(data.markdown);
+      } catch (e) { /* ignore — companion still works without it */ }
+    })();
+  }, []);
+
   // Load README when toggle is on
   useEffect(() => {
     const fetchReadme = async () => {
@@ -141,8 +156,19 @@ function AIStudyBuddy({ user, query = "" }) {
       detail: { progress: updatedProgress, updates: { aiStudyBuddySessions: 1 } } 
     }));
 
-    // Generate AI response using streaming
-    const readmeContext = useReadme && readmeSnippet ? `\n\nREADME context (truncated):\n${readmeSnippet}` : '';
+    // Generate AI response using streaming.
+    // App-aware context: identity + app overview (docs/llms.txt) + agents
+    // catalogue, plus the full README excerpt when the toggle is on. Previously
+    // `readmeContext` was built but never sent — this now actually grounds the
+    // companion in THIS app so it can answer about modules, agents and features.
+    const readmeContext = useReadme && readmeSnippet ? `\n\n## README excerpt\n${readmeSnippet}` : '';
+    const contextPreamble =
+`You are the AI Study Companion built into "Workplace Learning With AI" (WLWAI), a modular AI workplace-learning platform. Your job is to help the user understand and use THIS app: its modules, its agents, its features and how everything works. Ground every answer in the APP CONTEXT below. If something is not covered by the context, say so briefly — do not invent app features. Reply in the same language as the user's question.
+
+===== APP CONTEXT =====
+${appOverview ? `App overview (repo map):\n${appOverview}\n\n` : ''}Agents available in the app:
+${agentsBrief || '(agent catalogue unavailable)'}${readmeContext}
+===== END APP CONTEXT =====`;
 
     // Try to match question to a known agent for a focused answer
     const findBestAgent = (q) => {
@@ -175,9 +201,10 @@ function AIStudyBuddy({ user, query = "" }) {
 Formato: 7–10 líneas, con viñetas, sin preámbulos, sin otros agentes.`;
 
     const generalPrompt = `User question: "${messageText}"
-Responde de forma directa y breve (5–8 líneas). Usa viñetas si ayuda. Evita información no solicitada.`;
+Answer directly and clearly, grounded in the APP CONTEXT above. Use bullets if it helps. If the user asks what the app does or which agents/modules exist, list them from the context.`;
 
-    const promptToUse = matchedAgentName ? focusedPromptForAgent(matchedAgentName) : generalPrompt;
+    const basePrompt = matchedAgentName ? focusedPromptForAgent(matchedAgentName) : generalPrompt;
+    const promptToUse = `${contextPreamble}\n\n${basePrompt}`;
 
     aiStreaming.startStreaming(
       promptToUse,

@@ -2296,6 +2296,28 @@ async def get_root_readme(lang: str = "en"):
     except Exception as e:
         return {"success": False, "message": f"Error reading README: {str(e)}"}
 
+
+@app.get("/api/app-context")
+async def get_app_context():
+    """Compact, LLM-oriented overview of this app (WLWAI) for the AI Study
+    Companion. Serves docs/llms.txt (a purpose-built repo map) with README.md as
+    a fallback. Read-only; content is capped so it stays cheap to inject."""
+    import os
+    MAX_CHARS = 6000
+    for candidate in ("docs/llms.txt", "README.md"):
+        target = os.path.abspath(os.path.join(".", candidate))
+        if not os.path.isfile(target):
+            continue
+        try:
+            with open(target, "r", encoding="utf-8") as f:
+                content = f.read()
+            if len(content) > MAX_CHARS:
+                content = content[:MAX_CHARS] + "\n…(truncated)"
+            return {"success": True, "markdown": content, "source": candidate}
+        except Exception as e:
+            return {"success": False, "message": f"Error reading app context: {str(e)}"}
+    return {"success": False, "message": "No app-context source found"}
+
 # Read a Markdown file from docs/ (safe, read-only) — with optional localization.
 @app.get("/api/docs/read")
 async def read_docs_md(path: str, lang: str = "en"):
