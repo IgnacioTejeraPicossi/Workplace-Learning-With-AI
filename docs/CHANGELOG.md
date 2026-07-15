@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.21.3] - 2026-07-11
+
+### Added — Help doc for the AI Study Buddy (self-documenting)
+
+Documented how the AI Study Buddy works, in the Help area:
+- New `docs/ai-study-buddy.md` (+ localized `.es.md` / `.no.md`) covering its
+  knowledge sources, the keyword-retrieval process, the README-context toggle and
+  Agent selector, the layout, example questions and limitations.
+- Added it to the **Help → README Viewer** dropdown (`ReadmeViewer.jsx`), served
+  localized via `/api/docs/read`.
+- Added it to the Buddy's own `_HELP_DOCS` search set, so the companion can
+  **explain itself** — asking "how does the study buddy work?" now retrieves this
+  doc.
+
+Verified: the doc serves in es/no/en, the search returns its sections for a
+self-referential question, and JSX parses.
+
+---
+
 ## [1.21.2] - 2026-07-11
 
 ### Added — AI Study Companion: keyword retrieval over the help docs (RAG-lite)

@@ -2325,6 +2325,7 @@ async def get_app_context():
 # in the actual documentation without heavyweight dependencies.
 _HELP_DOCS = [
     "README.md",
+    "docs/ai-study-buddy.md",
     "docs/architecture.md",
     "docs/deployment.md",
     "docs/agents.md",
