@@ -52,6 +52,12 @@ Two follow-up fixes after first testing:
   from the UI language, re-fetched on change), so the preview shows the localized
   README (verified: es/no/en all return their own localized file).
 
+Layout polish (this is effectively a single-turn Q&A helper — no history is sent
+to the model): the input row now sits **above** the answers panel (via flex
+`order`), the typed question is **kept** in the input after sending (not cleared),
+and the question is **no longer echoed** as a bubble in the answers panel — so it
+isn't duplicated. JSX parses; usage/progress tracking unchanged.
+
 ---
 
 ## [1.21.0] - 2026-07-11

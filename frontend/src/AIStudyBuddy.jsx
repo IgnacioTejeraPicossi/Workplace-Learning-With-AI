@@ -134,15 +134,9 @@ function AIStudyBuddy({ user, query = "" }) {
   const handleSendMessage = async (messageText) => {
     if (!messageText.trim()) return;
 
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: messageText,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    // UX: the question stays visible in the input field (which sits ABOVE the
+    // answers panel), so we intentionally do NOT echo it as a bubble in the
+    // panel and do NOT clear the input — avoids duplicating the question.
     setIsTyping(true);
 
     // Track AI Study Buddy usage for knowledge map
@@ -265,15 +259,17 @@ Answer directly and clearly, grounded in the APP CONTEXT above. Use bullets if i
         </div>
       </div>
 
-      {/* Messages Container */}
+      {/* Answers Container (below the input — flex order 2) */}
       <div style={{
+        order: 2,
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
         background: colors.background,
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px'
+        gap: '16px',
+        borderRadius: '0 0 12px 12px'
       }}>
         {messages.map((message) => (
           <div
@@ -334,9 +330,10 @@ Answer directly and clearly, grounded in the APP CONTEXT above. Use bullets if i
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Questions */}
+      {/* Suggested Questions (flex order 3 — below the answers) */}
       {messages.length === 1 && (
         <div style={{
+          order: 3,
           padding: '16px',
           background: colors.cardBackground,
           borderTop: `1px solid ${colors.border}`
@@ -375,12 +372,13 @@ Answer directly and clearly, grounded in the APP CONTEXT above. Use bullets if i
         </div>
       )}
 
-      {/* Input Form */}
+      {/* Input Form (moved ABOVE the answers — flex order 1) */}
       <form onSubmit={handleSubmit} style={{
+        order: 1,
         padding: '20px',
         background: colors.cardBackground,
-        borderRadius: '0 0 12px 12px',
-        borderTop: `1px solid ${colors.border}`
+        borderRadius: 0,
+        borderBottom: `1px solid ${colors.border}`
       }}>
         {/* Controls Row: README toggle + Agent selector */}
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: 12 }}>
