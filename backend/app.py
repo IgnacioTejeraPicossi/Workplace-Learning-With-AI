@@ -2318,6 +2318,115 @@ async def get_app_context():
             return {"success": False, "message": f"Error reading app context: {str(e)}"}
     return {"success": False, "message": "No app-context source found"}
 
+
+# ── AI Study Companion: lightweight keyword retrieval over the help docs ───────
+# No embeddings / no DB — splits a curated set of help docs into heading-sections
+# and ranks them by keyword overlap with the question. Keeps the answer grounded
+# in the actual documentation without heavyweight dependencies.
+_HELP_DOCS = [
+    "README.md",
+    "docs/architecture.md",
+    "docs/deployment.md",
+    "docs/agents.md",
+    "docs/admin-dev.md",
+    "docs/n8n.md",
+    "docs/J-messages_Analyzer.md",
+    "docs/MCP_TESTING_GUIDE.md",
+    "docs/TESTING.md",
+]
+_HELP_INDEX_CACHE = {}  # lang -> list[{"doc","heading","text"}]
+
+
+def _norm(s: str) -> str:
+    """Lowercase + strip accents, so 'cómo'→'como' and 'despliega' matches
+    'despliegue' after stemming. Used for both the query and the doc text."""
+    import unicodedata
+    s = (s or "").lower()
+    return "".join(c for c in unicodedata.normalize("NFD", s)
+                   if unicodedata.category(c) != "Mn")
+
+
+_HELP_STOPWORDS = {_norm(w) for w in (
+    "the a an of to in on for and or is are be do does how what which this that with "
+    "your you can it its as at from about una uno los las del que cómo como qué cuál "
+    "cuáles dónde cuándo en de la el y o es son para por con más esta este esto está "
+    "están según app aplicación aplicacion funciona sobre me puedes tiene hay"
+).split()}
+
+
+def _build_help_index(lang: str):
+    if lang in _HELP_INDEX_CACHE:
+        return _HELP_INDEX_CACHE[lang]
+    import os, re
+    sections = []
+    for doc in _HELP_DOCS:
+        try:
+            resolved, _, _ = _resolve_localized_md(doc, lang)
+            target = os.path.abspath(os.path.join(".", resolved))
+            if not os.path.isfile(target):
+                continue
+            with open(target, "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception:
+            continue
+        cur_heading, cur_lines = doc, []
+        for line in content.splitlines():
+            if re.match(r"^#{1,4}\s+", line):
+                if any(l.strip() for l in cur_lines):
+                    sections.append({"doc": doc, "heading": cur_heading,
+                                     "text": "\n".join(cur_lines).strip()})
+                cur_heading = line.lstrip("#").strip()
+                cur_lines = []
+            else:
+                cur_lines.append(line)
+        if any(l.strip() for l in cur_lines):
+            sections.append({"doc": doc, "heading": cur_heading,
+                             "text": "\n".join(cur_lines).strip()})
+    _HELP_INDEX_CACHE[lang] = sections
+    return sections
+
+
+@app.get("/api/help/search")
+async def help_search(q: str = "", lang: str = "en", k: int = 3):
+    """Keyword search over the help docs. Returns the top matching sections plus
+    an index of the available help documents (so the companion knows the map)."""
+    import re
+    try:
+        sections = _build_help_index(lang)
+        index = sorted({s["doc"] for s in sections})
+        terms = [_norm(w) for w in re.split(r"[^0-9a-záéíóúñü]+", (q or "").lower())]
+        terms = [w for w in terms if len(w) > 2 and w not in _HELP_STOPWORDS]
+        # Match on a short stem (first ~6 chars) so morphological variants match
+        # too (e.g. "despliega" in the query finds "despliegue"/"desplegar").
+        stems = [w[:6] for w in terms]
+        results = []
+        if stems:
+            scored = []
+            for s in sections:
+                head = _norm(s["heading"])
+                text = _norm(s["text"])
+                # Heading match is the strong topical signal; body contribution is
+                # CAPPED per term so long sections (e.g. the huge README) don't win
+                # by sheer length over short, focused doc sections.
+                score = 0
+                for st in stems:
+                    if st in head:
+                        score += 6
+                    score += min(text.count(st), 2)
+                if score > 0:
+                    scored.append((score, s))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            total = 0
+            for score, s in scored[:max(1, k)]:
+                txt = s["text"][:1200]
+                results.append({"doc": s["doc"], "heading": s["heading"], "text": txt})
+                total += len(txt)
+                if total > 3600:
+                    break
+        return {"success": True, "index": index, "results": results}
+    except Exception as e:
+        return {"success": False, "message": str(e), "index": [], "results": []}
+
 # Read a Markdown file from docs/ (safe, read-only) — with optional localization.
 @app.get("/api/docs/read")
 async def read_docs_md(path: str, lang: str = "en"):

@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.21.2] - 2026-07-11
+
+### Added — AI Study Companion: keyword retrieval over the help docs (RAG-lite)
+
+The companion could only see a fixed context (llms.txt + agent catalogue + a
+README excerpt), so it couldn't answer about specific modules/features
+documented elsewhere — e.g. "how is the app deployed?" got a vague "not
+described here". Added lightweight, dependency-free retrieval so it now grounds
+answers in the actual documentation.
+
+Backend — new `GET /api/help/search?q=&lang=&k=` (`backend/app.py`):
+- Splits a curated set of help docs into heading-sections
+  (`README.md`, `architecture`, `deployment`, `agents`, `admin-dev`, `n8n`,
+  `J-messages_Analyzer`, `MCP_TESTING_GUIDE`, `TESTING`), localized via
+  `_resolve_localized_md`, cached per language.
+- Ranks sections by keyword overlap with the question and returns the top ~3
+  (capped ~3 600 chars) plus an **index** of available docs (the "touch of A").
+- Robust matching: accent-stripping (`cómo`→`como`) + short-stem prefixes
+  (`despliega`→`despleg…` finds `despliegue`), **heading-weighted** with a
+  per-section body cap so the huge README can't win by length alone.
+
+Frontend (`AIStudyBuddy.jsx`): before each question it calls `/api/help/search`
+and injects the retrieved sections + the docs index into the prompt context
+(best-effort; falls back to the static context on error).
+
+Verified: queries for deployment/architecture/n8n/MCP retrieve the right doc
+sections (localized), and an end-to-end `/llm-stream` answer about deployment now
+cites real artefacts (`deployment/Dockerfile`, `cloudrun.yaml`, Cloud Run) from
+`docs/deployment.md`. Known limitation (inherent to keyword matching): a query in
+one language may not match a doc that exists only in another — the localized
+curated docs cover the common cases; full cross-lingual recall would need
+embeddings (deliberately avoided to keep deps light).
+
+---
+
 ## [1.21.1] - 2026-07-11
 
 ### Fixed / Added — AI Study Companion is now app-aware (grounded in WLWAI)

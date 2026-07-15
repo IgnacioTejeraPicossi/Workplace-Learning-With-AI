@@ -159,11 +159,31 @@ function AIStudyBuddy({ user, query = "" }) {
     // `readmeContext` was built but never sent — this now actually grounds the
     // companion in THIS app so it can answer about modules, agents and features.
     const readmeContext = useReadme && readmeSnippet ? `\n\n## README excerpt\n${readmeSnippet}` : '';
+
+    // Retrieve the most relevant help-doc sections for THIS question (keyword
+    // search over the curated docs) + the index of available help docs. This is
+    // what lets the companion answer about specific modules/features, not just
+    // agents. Best-effort: if it fails, we still have the static context.
+    let helpSections = '';
+    let helpIndex = '';
+    try {
+      const hs = await fetch(`/api/help/search?q=${encodeURIComponent(messageText)}&lang=${lang}`);
+      if (hs.ok) {
+        const hd = await hs.json();
+        if (Array.isArray(hd?.index) && hd.index.length) helpIndex = hd.index.join(', ');
+        if (Array.isArray(hd?.results) && hd.results.length) {
+          helpSections = hd.results
+            .map((r) => `### ${r.doc} — ${r.heading}\n${r.text}`)
+            .join('\n\n');
+        }
+      }
+    } catch (e) { /* keep going with static context */ }
+
     const contextPreamble =
-`You are the AI Study Companion built into "Workplace Learning With AI" (WLWAI), a modular AI workplace-learning platform. Your job is to help the user understand and use THIS app: its modules, its agents, its features and how everything works. Ground every answer in the APP CONTEXT below. If something is not covered by the context, say so briefly — do not invent app features. Reply in the same language as the user's question.
+`You are the AI Study Companion built into "Workplace Learning With AI" (WLWAI), a modular AI workplace-learning platform. Your job is to help the user understand and use THIS app: its modules, its agents, its features and how everything works. Ground every answer in the APP CONTEXT below (especially the "Relevant help sections", which are pulled from the app's documentation for this exact question). If something is not covered by the context, say so briefly and point to the most relevant help document — do not invent app features. Reply in the same language as the user's question.
 
 ===== APP CONTEXT =====
-${appOverview ? `App overview (repo map):\n${appOverview}\n\n` : ''}Agents available in the app:
+${helpIndex ? `Help documents available: ${helpIndex}\n\n` : ''}${helpSections ? `Relevant help sections for this question:\n${helpSections}\n\n` : ''}${appOverview ? `App overview (repo map):\n${appOverview}\n\n` : ''}Agents available in the app:
 ${agentsBrief || '(agent catalogue unavailable)'}${readmeContext}
 ===== END APP CONTEXT =====`;
 
