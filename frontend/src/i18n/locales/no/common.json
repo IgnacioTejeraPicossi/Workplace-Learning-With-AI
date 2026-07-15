@@ -685,6 +685,32 @@
         "test3": "Blind uavhengig transkripsjon — la adskilte observatører transkribere «koden» uten å kommunisere, og sammenlign. En ekte invariant forutsier samsvarende sekvenser; priming/artefakt forutsier lav enighet.",
         "test4": "Absolutt-posisjonssjekk — er et gitt tegn festet til verdensrommet (samme tegn på samme fysiske punkt på tvers av personer og økter) eller til netthinnen/oppmerksomheten? Verdens-låst ville vært ekstraordinært; netthinne-låst er vanlig speckle.",
         "closingNote": "Den ærlige dommen i dag: en ekte, reproduserbar perseptuell effekt, med en sterk ikke-mystisk forklaring og en fengslende, men ubevist metafysisk lesning — pakket inn i viralitet og kommersialisering (konsultasjoner til 150 $, laser-sett til 153 $). Nettopp den blandingen er grunnen til at denne agenten finnes: å holde undringen og den epistemiske disiplinen samtidig, og fortelle deg hvilket lag du står på når du sier «jeg så koden»."
+      },
+      "theory": {
+        "sectionTitle": "Teoretisk forankring — hvor dette hører hjemme på kartet",
+        "intro": "Lasereffekten er (trolig) ikke bevis for en kodet virkelighet — men «virkelighet som informasjon/beregning» er et seriøst, hundreår gammelt forskningsprogram, og nevrovitenskapen om hvorfor en hjerne på psykedelika «maler» kode på støy er godt utviklet. Begge hører hjemme på bordet; ingen av dem avgjøres av en lysende vegg.",
+        "cards": {
+          "digitalPhysicsTitle": "Digital / informasjonsfysikk",
+          "digitalPhysicsAuthor": "Zuse · Wheeler · 't Hooft · Wolfram",
+          "digitalPhysicsBody": "At virkeligheten er fundamentalt beregningsmessig er et seriøst, hundreår gammelt program: Zuses «regnende rom», Wheelers «it from bit», 't Hoofts cellulær-automat-tolkning av kvantemekanikk, Wolframs beregnende univers. Så «en kode bak virkeligheten» er ikke marginalt — men ingen av disse forutsier en kode du kan lese av en vegg med en laser.",
+          "digitalPhysicsLevel": "speculative",
+          "simulationArgumentTitle": "Simuleringsargumentet",
+          "simulationArgumentAuthor": "Nick Bostrom (2003)",
+          "simulationArgumentBody": "Bostroms trilemma hevder at hvis avanserte sivilisasjoner kjører mange forfeder-simuleringer, er vi trolig i én. Det er en sannsynlighetspåstand om vår situasjon — ikke at en simulerings kildekode er perseptuelt tilgjengelig, og det er eksplisitt agnostisk om hvordan en simulering ville føles innenfra.",
+          "simulationArgumentLevel": "philosophy",
+          "predictiveProcessingTitle": "Prediktiv prosessering og den entropiske hjernen",
+          "predictiveProcessingAuthor": "Friston · Carhart-Harris",
+          "predictiveProcessingBody": "Aktiv inferens ser persepsjon som hjernens beste gjetning, som veier forhåndsantakelser mot sensorisk presisjon. Psykedelika (REBUS / entropisk-hjerne-modeller) slapper av høynivå-antakelser og presisjon, så tvetydig input blir «forklart» med selvsikker, strukturert hallusinasjon — og med en følt visshet om at det er ekte. Sparsom laser-speckle er ideelt drivstoff: minimalt signal, maksimal top-down-konstruksjon.",
+          "predictiveProcessingLevel": "mainstream",
+          "geometricHallucinationsTitle": "Modeller for geometrisk hallusinasjon",
+          "geometricHallucinationsAuthor": "Klüver · Ermentrout–Cowan · Bressloff",
+          "geometricHallucinationsBody": "Klüver katalogiserte universelle «form constants» (gitter, bikuber, tunneler). Kortikale feltmodeller (Ermentrout–Cowan, Bressloff) utleder disse gitrene fra den visuelle korteksens egen kobling under destabilisering — de samme gitrene dukker opp ved migrene, flimmer og psykedelika, uten noen ekstern kode. «Kode-aktige» gitter er en signatur av den som ser, ikke av det sette.",
+          "geometricHallucinationsLevel": "established",
+          "informationOntologyTitle": "Informasjonsontologi og den deltakende observatøren",
+          "informationOntologyAuthor": "Wheeler · OPH",
+          "informationOntologyBody": "Hvis informasjon er ontologisk primær («it from bit»), bidrar observatørens handling med å spørre til å feste virkeligheten — Wheelers deltakende univers. Her møter fenomenet agentens kjerne igjen: OPH behandler konsensus som merket på det «virkelige». Det åpne spørsmålet forblir det samme — er en delt kode konvergens mot en invariant, eller en delt forhåndsantakelse forkledd som objektivitet?",
+          "informationOntologyLevel": "philosophy"
+        }
       }
     },
     "roadmap": {

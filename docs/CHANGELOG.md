@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.1] - 2026-07-11
+
+### Added — "The Code of Reality" tab · Theoretical grounding section
+
+Deepened the case study with a **Theoretical grounding** section: five theory
+cards (each with author line + epistemic badge) placing the phenomenon on the
+map, keeping the skeptical-balanced framing:
+
+- **Digital / informational physics** (Zuse · Wheeler · 't Hooft · Wolfram) —
+  the serious lineage of "reality as computation" (speculative).
+- **The simulation argument** (Bostrom 2003) — probabilistic, and agnostic about
+  perceptual access to any "source" (philosophy).
+- **Predictive processing & the entropic brain** (Friston · Carhart-Harris) — why
+  a psychedelic brain confidently paints structure onto sparse laser speckle
+  (mainstream).
+- **Geometric-hallucination models** (Klüver · Ermentrout–Cowan · Bressloff) —
+  code-like lattices as a signature of the visual cortex, not an external code
+  (established).
+- **Information ontology & the participatory observer** (Wheeler · OPH) — rejoins
+  the agent's core question: shared invariant vs shared prior (philosophy).
+
+`CodeOfReality.jsx` renders the cards; i18n EN/NO/ES grew to 52 keys each
+(parity verified). Additive, content-only; JSX parses, JSON valid.
+
+---
+
 ## [1.22.0] - 2026-07-11
 
 ### Added — Self-Simulating Reality Agent · "The Code of Reality" tab (case study)

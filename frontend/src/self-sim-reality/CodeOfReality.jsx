@@ -34,6 +34,10 @@ export default function CodeOfReality() {
   const { t } = useTranslation();
   const K = 'selfSimReality.codeOfReality';
   const tests = ['test1', 'test2', 'test3', 'test4'];
+  const theoryCards = [
+    'digitalPhysics', 'simulationArgument', 'predictiveProcessing',
+    'geometricHallucinations', 'informationOntology',
+  ];
   const sources = [
     { label: 'Code Of Reality (official site)', url: 'https://codeofreality.org/' },
     { label: 'IPI Letters — pilot study (N,N-DMT “Code of Reality”)', url: 'https://ipipublishing.org/index.php/ipil/article/view/158' },
@@ -110,6 +114,39 @@ export default function CodeOfReality() {
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Theoretical grounding — where the phenomenon sits in the theory map */}
+      <div style={panel}>
+        <h4 style={{ margin: '0 0 6px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+          {t(`${K}.theory.sectionTitle`)}
+        </h4>
+        <p style={{ ...subtle, margin: '0 0 14px' }}>{t(`${K}.theory.intro`)}</p>
+        <div style={{
+          display: 'grid', gap: 12,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        }}>
+          {theoryCards.map(id => {
+            const level = t(`${K}.theory.cards.${id}Level`);
+            const accent = (LEVEL_COLORS[level] || LEVEL_COLORS.unsupported).fg;
+            return (
+              <div key={id} style={{ ...panel, padding: 16, borderTop: `4px solid ${accent}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <h5 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
+                    {t(`${K}.theory.cards.${id}Title`)}
+                  </h5>
+                  <EpistemicBadge level={level} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#64748b' }}>
+                  {t(`${K}.theory.cards.${id}Author`)}
+                </div>
+                <p style={{ margin: 0, fontSize: 12, color: '#334155', lineHeight: 1.55 }}>
+                  {t(`${K}.theory.cards.${id}Body`)}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Closing epistemic reminder */}

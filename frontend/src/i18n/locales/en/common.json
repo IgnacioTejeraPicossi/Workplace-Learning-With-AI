@@ -528,6 +528,32 @@
         "test3": "Blind independent transcription — have separated observers transcribe 'the code' with no communication, then compare. A real invariant predicts matching sequences; priming/artifact predicts low agreement.",
         "test4": "Absolute-position check — is a given glyph fixed to world-space (same character at the same physical point across people and sessions) or to the retina/attention? World-locked would be extraordinary; retina-locked is ordinary speckle.",
         "closingNote": "The honest verdict today: a real, reproducible perceptual effect, with a strong non-mystical explanation and a captivating but unproven metaphysical reading — wrapped in virality and commercialization ($150 consultations, $153 laser kits). That mix is exactly why this agent exists: to hold the wonder and the epistemic discipline at once, and to tell you which layer you are standing on when you say 'I saw the code.'"
+      },
+      "theory": {
+        "sectionTitle": "Theoretical grounding — where this sits in the map",
+        "intro": "The laser effect is (probably) not evidence for a coded reality — but 'reality as information/computation' is a serious, century-old research programme, and the neuroscience of why a tripping brain paints 'code' onto noise is well developed. Both belong on the table; neither is settled by a glowing wall.",
+        "cards": {
+          "digitalPhysicsTitle": "Digital / informational physics",
+          "digitalPhysicsAuthor": "Zuse · Wheeler · 't Hooft · Wolfram",
+          "digitalPhysicsBody": "That reality is fundamentally computational is a serious century-old programme: Zuse's 'calculating space', Wheeler's 'it from bit', 't Hooft's cellular-automaton interpretation of quantum mechanics, Wolfram's computational universe. So 'a code behind reality' is not fringe — but none of these predict a code you could read off a wall with a laser.",
+          "digitalPhysicsLevel": "speculative",
+          "simulationArgumentTitle": "The simulation argument",
+          "simulationArgumentAuthor": "Nick Bostrom (2003)",
+          "simulationArgumentBody": "Bostrom's trilemma argues that if advanced civilizations run many ancestor-simulations, we are probably in one. It is a probabilistic claim about our situation — not that a simulation's source code is perceptually accessible, and it is explicitly agnostic about how a simulation would feel from inside.",
+          "simulationArgumentLevel": "philosophy",
+          "predictiveProcessingTitle": "Predictive processing & the entropic brain",
+          "predictiveProcessingAuthor": "Friston · Carhart-Harris",
+          "predictiveProcessingBody": "Active inference casts perception as the brain's best guess, weighting priors against sensory precision. Psychedelics (REBUS / entropic-brain models) relax high-level priors and precision, so ambiguous input gets 'explained' by confident, structured hallucination — and by a felt certainty that it is real. Sparse laser speckle is ideal fuel: minimal signal, maximal top-down construction.",
+          "predictiveProcessingLevel": "mainstream",
+          "geometricHallucinationsTitle": "Geometric-hallucination models",
+          "geometricHallucinationsAuthor": "Klüver · Ermentrout–Cowan · Bressloff",
+          "geometricHallucinationsBody": "Klüver catalogued universal 'form constants' (lattices, honeycombs, tunnels). Cortical-field models (Ermentrout–Cowan, Bressloff) derive these grids from the visual cortex's own wiring under destabilization — the same lattices appear from migraine, flicker and psychedelics with no external code. 'Code-like' grids are a signature of the seer, not the seen.",
+          "geometricHallucinationsLevel": "established",
+          "informationOntologyTitle": "Information ontology & the participatory observer",
+          "informationOntologyAuthor": "Wheeler · OPH",
+          "informationOntologyBody": "If information is ontologically prior ('it from bit'), the observer's act of asking helps fix reality — Wheeler's participatory universe. Here the phenomenon rejoins the agent's core: OPH treats consensus as the mark of the 'real'. The open question stays the same — is a shared code convergence on an invariant, or a shared prior wearing the costume of objectivity?",
+          "informationOntologyLevel": "philosophy"
+        }
       }
     },
     "roadmap": {

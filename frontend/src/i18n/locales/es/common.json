@@ -679,6 +679,32 @@
         "test3": "Transcripción ciega e independiente — que observadores separados transcriban «el código» sin comunicarse, y luego se compare. Un invariante real predice secuencias coincidentes; priming/artefacto predice bajo acuerdo.",
         "test4": "Comprobación de posición absoluta — ¿un glifo dado está fijado al espacio del mundo (mismo carácter en el mismo punto físico entre personas y sesiones) o a la retina/atención? Fijado al mundo sería extraordinario; fijado a la retina es speckle ordinario.",
         "closingNote": "El veredicto honesto hoy: un efecto perceptual real y reproducible, con una explicación no mística sólida y una lectura metafísica cautivadora pero no probada — envuelto en viralidad y comercialización (consultas a 150 $, kits de láser a 153 $). Esa mezcla es justo por lo que existe este agente: sostener a la vez el asombro y la disciplina epistémica, y decirte sobre qué capa estás pisando cuando dices «vi el código»."
+      },
+      "theory": {
+        "sectionTitle": "Base teórica — dónde encaja esto en el mapa",
+        "intro": "El efecto del láser (probablemente) no es evidencia de una realidad codificada — pero «la realidad como información/computación» es un programa de investigación serio y centenario, y la neurociencia de por qué un cerebro bajo psicodélicos «pinta» código sobre el ruido está muy desarrollada. Ambas cosas merecen estar sobre la mesa; ninguna se zanja con una pared iluminada.",
+        "cards": {
+          "digitalPhysicsTitle": "Física digital / informacional",
+          "digitalPhysicsAuthor": "Zuse · Wheeler · 't Hooft · Wolfram",
+          "digitalPhysicsBody": "Que la realidad sea fundamentalmente computacional es un programa serio y centenario: el «espacio de cálculo» de Zuse, el «it from bit» de Wheeler, la interpretación por autómatas celulares de 't Hooft, el universo computacional de Wolfram. Así que «un código tras la realidad» no es marginal — pero ninguno predice un código que puedas leer en una pared con un láser.",
+          "digitalPhysicsLevel": "speculative",
+          "simulationArgumentTitle": "El argumento de la simulación",
+          "simulationArgumentAuthor": "Nick Bostrom (2003)",
+          "simulationArgumentBody": "El trilema de Bostrom sostiene que si las civilizaciones avanzadas ejecutan muchas simulaciones de ancestros, probablemente estemos en una. Es una afirmación probabilística sobre nuestra situación — no que el código fuente de una simulación sea accesible a la percepción, y es explícitamente agnóstico sobre cómo se sentiría una simulación desde dentro.",
+          "simulationArgumentLevel": "philosophy",
+          "predictiveProcessingTitle": "Procesamiento predictivo y el cerebro entrópico",
+          "predictiveProcessingAuthor": "Friston · Carhart-Harris",
+          "predictiveProcessingBody": "La inferencia activa concibe la percepción como la mejor conjetura del cerebro, ponderando priors frente a la precisión sensorial. Los psicodélicos (modelos REBUS / cerebro entrópico) relajan los priors de alto nivel y la precisión, así que la entrada ambigua se «explica» mediante alucinación estructurada y confiada — y con la certeza sentida de que es real. El speckle láser disperso es combustible ideal: señal mínima, construcción top-down máxima.",
+          "predictiveProcessingLevel": "mainstream",
+          "geometricHallucinationsTitle": "Modelos de alucinación geométrica",
+          "geometricHallucinationsAuthor": "Klüver · Ermentrout–Cowan · Bressloff",
+          "geometricHallucinationsBody": "Klüver catalogó las «form constants» universales (retículas, panales, túneles). Los modelos de campo cortical (Ermentrout–Cowan, Bressloff) derivan esas retículas del propio cableado del córtex visual al desestabilizarse — las mismas retículas aparecen con migraña, parpadeo y psicodélicos, sin ningún código externo. Las retículas «tipo código» son una firma del que ve, no de lo visto.",
+          "geometricHallucinationsLevel": "established",
+          "informationOntologyTitle": "Ontología de la información y el observador participativo",
+          "informationOntologyAuthor": "Wheeler · OPH",
+          "informationOntologyBody": "Si la información es ontológicamente prioritaria («it from bit»), el acto del observador de preguntar ayuda a fijar la realidad — el universo participativo de Wheeler. Aquí el fenómeno reconecta con el núcleo del agente: OPH trata el consenso como la marca de lo «real». La pregunta abierta sigue siendo la misma — ¿es un código compartido convergencia sobre un invariante, o un prior compartido disfrazado de objetividad?",
+          "informationOntologyLevel": "philosophy"
+        }
       }
     },
     "roadmap": {
