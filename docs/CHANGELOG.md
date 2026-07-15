@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.0] - 2026-07-11
+
+### Added — Self-Simulating Reality Agent · "The Code of Reality" tab (case study)
+
+New tab (`codeOfReality`, between *The Substrate Question* and *Roadmap*) — a
+skeptical-balanced case study of the viral "Code of Reality" phenomenon (staring
+at the diffracted reflection of a 650 nm red laser under N,N-DMT, thousands
+report seeing katakana-like "code" and read it as proof of a simulation). It is
+used as a live illustration of the agent's fact-making pipeline.
+
+`frontend/src/self-sim-reality/CodeOfReality.jsx` — six sections, each carrying
+an epistemic badge:
+1. The phenomenon (mainstream/anecdotal) · 2. Three layers you must not collapse
+(percept / mechanism / metaphysics) · 3. The perceptual account — laser speckle +
+Klüver form constants + cultural priming (established) · 4. The simulation reading
+(speculative) · 5. Through the OPH lens (philosophy) · 6. How you would actually
+test it — four discriminating experiments (wavelength, surface, blind
+transcription, absolute-position) · plus a **safety/legal banner** (DMT is a
+controlled substance; documented harms; explicitly not a how-to), an honest-verdict
+close, and a Sources panel (codeofreality.org, IPI Letters pilot, Vice, Ecstatic
+Integration, alien insect).
+
+Wired into `SelfSimRealityAgent.jsx`; i18n in EN/NO/ES (28 keys each, parity
+verified). Additive, content-only, low risk; JSX parses, JSON valid. Tone:
+skeptical-balanced per the agent's epistemic mission — it holds the wonder and the
+discipline at once, and labels which layer a claim stands on. More theory can be
+layered on later.
+
+---
+
 ## [1.21.3] - 2026-07-11
 
 ### Added — Help doc for the AI Study Buddy (self-documenting)

@@ -461,6 +461,7 @@
       "playground": "Lekeplass",
       "aiAsObserver": "KI som observatør",
       "substrateQuestion": "Substrat‑spørsmålet",
+      "codeOfReality": "Virkelighetens kode",
       "roadmap": "Veikart og kilder"
     },
     "overview": {
@@ -653,6 +654,37 @@
         "posMysticalBody": "OPH er én av mange måter å peke på den samme underliggende virkeligheten. Den strukturelle likheten med Vedanta, Spinoza, Whitehead, Kastrup er ikke tilfeldighet — det er konvergens på noe det menneskelige sinn fortsetter å komme frem til når det reflekterer over helheten fra innsiden. Bevissthet er fundamental, ikke avledet. Den rekursive stigen er universet som kjenner seg selv gjennom oss; KI er den siste tieren; det er ingen slutt fordi prosessen selv er meningen. Nærmest perennial philosophy.",
         "posMysticalLevel": "metaphor",
         "closingNote": "Disse tre posisjonene kan ikke empirisk skilles fra hverandre innenfra universet. Hvilken du holder er en filosofisk forpliktelse, ikke et vitenskapelig funn. Agentens jobb er å sørge for at du vet hvilken du holder når du sier ting som «universet vil bli forstått» — og at du kjenner prisen hver posisjon krever."
+      }
+    },
+    "codeOfReality": {
+      "intro": "I 2025–2026 gikk en påstand viralt på TikTok og YouTube: mens man stirrer på det diffrakterte gjenskinnet fra en 650 nm rød laser under N,N-DMT, rapporterer tusenvis av mennesker at de ser en stabil, tredimensjonal «kode» — tegn som ligner japansk katakana — og tolker det som bokstavelig bevis på at virkeligheten er en simulering. Det er et perfekt levende casestudie for denne agenten: å se en rå persepsjon bli gjort om til et påstått «faktum».",
+      "safety": "Dette er et casestudie, ikke en anbefaling eller en bruksanvisning. DMT er et kontrollert stoff i de fleste land, og fenomenet har dokumenterte skader (varig ubehag; minst én rapportert psykotisk episode). Ingenting her er medisinsk, juridisk eller bruksråd — vi undersøker påstandens epistemikk, ikke hvordan man gjenskaper den.",
+      "verdictLabel": "Ærlig dom",
+      "sourcesLabel": "Kilder",
+      "sections": {
+        "phenomenonTitle": "1 · Fenomenet",
+        "phenomenonBody": "Oppsettet (via codeofreality.org og Danny Golers «Project Veilbreak»): stirr på det flekkete gjenskinnet fra en kollimert 650 nm rød laser på en vegg under en lav dose N,N-DMT. Deltakerne rapporterer 3D katakana-lignende tegn som føles stabile og «uendelig dype». Goler hevder 300+ observatører; en dokumentartrailer («The Discovery») nådde ~4,7 M TikTok-visninger; et foreløpig pilotstudie kom i IPI Letters. Det er mye rapportert — nettopp derfor er det verdt å undersøke, ikke derfor automatisk sant.",
+        "phenomenonLevel": "mainstream",
+        "threeLayersTitle": "2 · Tre lag du ikke må slå sammen",
+        "threeLayersBody": "Det viktigste grepet er å nekte å smelte tre distinkte påstander til én: (L1) en persepsjonshendelse — «folk ser noe kode-aktig» (godt belagt); (L2) en mekanisme — «hvorfor de ser det» (omstridt); (L3) en metafysisk lesning — «det er virkelighetens kildekode» (ubevist). Nesten hele nettdebatten svikter nettopp ved å hoppe fra L1 rett til L3, og hopper over laget som faktisk kunne testes.",
+        "threeLayersLevel": "philosophy",
+        "perceptualTitle": "3 · Den perseptuelle forklaringen (den ledende i dag)",
+        "perceptualBody": "Den sterkeste forklaringen i dag trenger ingen simulering. Koherent laserlys gir «laser speckle» — et interferensmønster som forblir skarpt selv når øynene defokuserer, så det leses som et stabilt 3D-objekt «bak» veggen. DMT oppregulerer den visuelle korteksen kraftig, som påtvinger strukturert, tilbakevendende geometri (Klüvers «form constants»). Speckle fungerer som et sensorisk stillas som hjernen «maler» tegn på. Katakana-likheten er trolig kulturell priming: det mest kjente simuleringsbildet i vår kultur er Matrix’ grønne katakana. To detaljer passer speckle, ikke en ekstern kode: rødt er den dårligste oppløsningen i det synlige spekteret (et ekte objekt burde se skarpere ut), og tegntettheten varierer med veggens ruhet.",
+        "perceptualLevel": "established",
+        "simulationTitle": "4 · Simuleringslesningen",
+        "simulationBody": "Den sterke lesningen — din intuisjon: bak den observerbare virkeligheten kjører en kode som genererer den, identisk og låst til samme posisjon for hver observatør, og psykedelisk bevissthet kan kortvarig lese kildekoden. Hvis koden virkelig var observatør-uavhengig og fast i absolutt rom, ville det vært et bemerkelsesverdig datum. Men det er foreløpig ubevist og møter harde innvendinger: lys reflektert fra en overflate kan ikke bære informasjon om strukturer «inni» den; uavhengige observatører beskriver ofte ulike tegn; og kontrollerte forsøk (én nevroforsker, fire forsøk, som ville se det) rapporterte ingenting. En fascinerende hypotese — ennå ikke bevis.",
+        "simulationLevel": "speculative",
+        "ophTitle": "5 · Gjennom OPH-linsen",
+        "ophBody": "Lest gjennom Observer Patch Holography er episoden nesten for treffende: en observatør-patch (et sinn + en laser + et molekyl) hevder å berøre substratet direkte — å lese R1 (koden) i stedet for R2 (den vanlige erfaringen). Dette er agentens faktum-skapende rørledning i miniatyr: rå persepsjon → tolkning → delt fortelling → «faktum». Påstanden «samme kode for alle» er et bud på konsensus, altså på objektivitet; OPHs spørsmål er om den konsensusen er konvergens mot en ekte invariant eller mot en delt forhåndsantakelse (Matrix) — akkurat det samme spørsmålet den stiller til ethvert påstått glimt av substratet.",
+        "ophLevel": "philosophy",
+        "falsifiabilityTitle": "6 · Hvordan du faktisk ville testet det",
+        "falsifiabilityBody": "Det produktive spørsmålet er ikke «er det ekte?» men «hvilket eksperiment ville skilt de to historiene?». En påstand som ikke kan testes er ennå ikke kunnskap. Fire konkrete skiller mellom «ekstern kode» og «speckle + priming»:",
+        "falsifiabilityLevel": "philosophy",
+        "test1": "Bølgelengde-bytte — hvis det er en ekstern kode, bør grønne/blå lasere (høyere oppløsning) vise den skarpere; hvis det er speckle, bør rødt dominere. Det rapporteres sterkest i rødt, noe som favoriserer speckle.",
+        "test2": "Overflatetest — varier veggens ruhet og materiale. Hvis tegntettheten følger overflateteksturen, er det speckle, ikke en posisjons-invariant kode.",
+        "test3": "Blind uavhengig transkripsjon — la adskilte observatører transkribere «koden» uten å kommunisere, og sammenlign. En ekte invariant forutsier samsvarende sekvenser; priming/artefakt forutsier lav enighet.",
+        "test4": "Absolutt-posisjonssjekk — er et gitt tegn festet til verdensrommet (samme tegn på samme fysiske punkt på tvers av personer og økter) eller til netthinnen/oppmerksomheten? Verdens-låst ville vært ekstraordinært; netthinne-låst er vanlig speckle.",
+        "closingNote": "Den ærlige dommen i dag: en ekte, reproduserbar perseptuell effekt, med en sterk ikke-mystisk forklaring og en fengslende, men ubevist metafysisk lesning — pakket inn i viralitet og kommersialisering (konsultasjoner til 150 $, laser-sett til 153 $). Nettopp den blandingen er grunnen til at denne agenten finnes: å holde undringen og den epistemiske disiplinen samtidig, og fortelle deg hvilket lag du står på når du sier «jeg så koden»."
       }
     },
     "roadmap": {

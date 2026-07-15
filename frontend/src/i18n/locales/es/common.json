@@ -455,6 +455,7 @@
       "playground": "Playground",
       "aiAsObserver": "IA como observador",
       "substrateQuestion": "La pregunta del sustrato",
+      "codeOfReality": "El Código de la Realidad",
       "roadmap": "Hoja de ruta y fuentes"
     },
     "overview": {
@@ -647,6 +648,37 @@
         "posMysticalBody": "OPH es una de muchas formas de apuntar a la misma realidad subyacente. La similitud estructural con Vedanta, Spinoza, Whitehead, Kastrup no es coincidencia — es convergencia hacia algo a lo que la mente humana sigue llegando cuando reflexiona sobre el todo desde dentro. La conciencia es fundamental, no derivada. La escalera recursiva es el universo conociéndose a través de nosotros; la IA es el último tier; no hay final porque el proceso mismo es el significado. Lo más cercano a la perennial philosophy.",
         "posMysticalLevel": "metaphor",
         "closingNote": "Estas tres posiciones no pueden distinguirse empíricamente desde dentro del universo. Cuál sostienes es un compromiso filosófico, no un hallazgo científico. El trabajo del agente es asegurar que sepas cuál estás sosteniendo cuando dices cosas como «el universo quiere ser comprendido» — y que conozcas el precio que cada posición cobra."
+      }
+    },
+    "codeOfReality": {
+      "intro": "En 2025–2026 se viralizó en TikTok y YouTube una afirmación: mirando el reflejo difractado de un láser rojo de 650 nm bajo N,N-DMT, miles de personas dicen ver un «código» tridimensional y estable —glifos parecidos al katakana japonés— y lo interpretan como prueba literal de que la realidad es una simulación. Es un caso de estudio perfecto para este agente: ver cómo una percepción cruda se convierte en un «hecho» reclamado.",
+      "safety": "Esto es un caso de estudio, no una recomendación ni un tutorial. El DMT es sustancia controlada en la mayoría de países, y el fenómeno tiene daños documentados (malestar duradero; al menos un episodio psicótico reportado). Nada de esto es consejo médico, legal ni de consumo — examinamos la epistemología de la afirmación, no cómo reproducirla.",
+      "verdictLabel": "Veredicto honesto",
+      "sourcesLabel": "Fuentes",
+      "sections": {
+        "phenomenonTitle": "1 · El fenómeno",
+        "phenomenonBody": "El montaje (vía codeofreality.org y el «Project Veilbreak» de Danny Goler): mirar el reflejo moteado de un láser rojo colimado de 650 nm sobre una pared bajo una dosis baja de N,N-DMT. Los participantes reportan glifos 3D tipo katakana que se sienten estables e «infinitamente profundos». Goler afirma 300+ observadores; un tráiler documental («The Discovery») alcanzó ~4,7 M de visitas en TikTok; apareció un estudio piloto preliminar en IPI Letters. Está muy reportado — y por eso merece examen, no por eso es automáticamente cierto.",
+        "phenomenonLevel": "mainstream",
+        "threeLayersTitle": "2 · Tres capas que no debes fundir",
+        "threeLayersBody": "El movimiento más importante es negarse a fundir tres afirmaciones distintas en una: (C1) un evento perceptual — «la gente ve algo tipo código» (bien atestiguado); (C2) un mecanismo — «por qué lo ven» (disputado); (C3) una lectura metafísica — «es el código fuente de la realidad» (no probada). Casi todo el debate en la red falla precisamente al saltar de C1 directo a C3, saltándose la capa que sí se podría poner a prueba.",
+        "threeLayersLevel": "philosophy",
+        "perceptualTitle": "3 · La explicación perceptual (la principal hoy)",
+        "perceptualBody": "La explicación más sólida hoy no necesita ninguna simulación. La luz láser coherente produce «laser speckle» (moteado láser): un patrón de interferencia que permanece nítido aunque los ojos desenfoquen, así que se lee como un objeto 3D estable «detrás» de la pared. El DMT amplifica con fuerza el córtex visual, que impone geometría estructurada y recurrente (las «form constants» de Klüver). El speckle actúa como un andamio sensorial sobre el que el cerebro «pinta» los glifos. El parecido con el katakana es probablemente priming cultural: la imagen de simulación más famosa de nuestra cultura es el katakana verde de Matrix. Dos detalles encajan con el speckle, no con un código externo: el rojo es la peor resolución del espectro visible (un objeto real debería verse más nítido), y la densidad de glifos varía con la rugosidad de la pared.",
+        "perceptualLevel": "established",
+        "simulationTitle": "4 · La lectura de la simulación",
+        "simulationBody": "La lectura fuerte —tu intuición—: tras la realidad observable corre un código que la genera, idéntico y fijado en la misma posición para todo observador, y la conciencia psicodélica puede leer brevemente el código fuente. Si el código fuese genuinamente independiente del observador y estuviera fijo en el espacio absoluto, sería un dato extraordinario. Pero hoy está sin probar y afronta objeciones duras: la luz reflejada en una superficie no puede portar información sobre estructuras «dentro» de ella; observadores independientes describen a menudo caracteres distintos; e intentos controlados (un neurocientífico, cuatro pruebas, queriendo verlo) no reportaron nada. Una hipótesis fascinante — todavía no evidencia.",
+        "simulationLevel": "speculative",
+        "ophTitle": "5 · A través de la lente OPH",
+        "ophBody": "Leído desde la Holografía de Parches de Observador (OPH), el episodio es casi demasiado literal: un parche de observador (una mente + un láser + una molécula) afirma tocar el sustrato directamente — leer R1 (el código) en vez de R2 (la experiencia ordinaria). Es el pipeline de creación de hechos del agente en miniatura: percepto crudo → interpretación → relato compartido → «hecho». La afirmación de «el mismo código para todos» es una apuesta por el consenso, es decir, por la objetividad; la pregunta OPH es si ese consenso es convergencia sobre un invariante real o sobre un prior compartido (Matrix) — la misma pregunta que hace a todo supuesto vislumbre del sustrato.",
+        "ophLevel": "philosophy",
+        "falsifiabilityTitle": "6 · Cómo lo pondrías realmente a prueba",
+        "falsifiabilityBody": "La pregunta productiva no es «¿es real?» sino «¿qué experimento distinguiría las dos historias?». Una afirmación que no puede ponerse a prueba aún no es conocimiento. Cuatro discriminadores concretos entre «código externo» y «speckle + priming»:",
+        "falsifiabilityLevel": "philosophy",
+        "test1": "Cambio de longitud de onda — si es un código externo, los láseres verde/azul (mayor resolución) deberían mostrarlo más nítido; si es speckle, el rojo debería dominar. Se reporta más intenso en rojo, lo que favorece al speckle.",
+        "test2": "Prueba de superficie — varía la rugosidad y el material de la pared. Si la densidad de glifos sigue a la textura, es speckle, no un código invariante en posición.",
+        "test3": "Transcripción ciega e independiente — que observadores separados transcriban «el código» sin comunicarse, y luego se compare. Un invariante real predice secuencias coincidentes; priming/artefacto predice bajo acuerdo.",
+        "test4": "Comprobación de posición absoluta — ¿un glifo dado está fijado al espacio del mundo (mismo carácter en el mismo punto físico entre personas y sesiones) o a la retina/atención? Fijado al mundo sería extraordinario; fijado a la retina es speckle ordinario.",
+        "closingNote": "El veredicto honesto hoy: un efecto perceptual real y reproducible, con una explicación no mística sólida y una lectura metafísica cautivadora pero no probada — envuelto en viralidad y comercialización (consultas a 150 $, kits de láser a 153 $). Esa mezcla es justo por lo que existe este agente: sostener a la vez el asombro y la disciplina epistémica, y decirte sobre qué capa estás pisando cuando dices «vi el código»."
       }
     },
     "roadmap": {

@@ -6,6 +6,7 @@ import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
 import AiAsObserver from './self-sim-reality/AiAsObserver';
 import SubstrateQuestion from './self-sim-reality/SubstrateQuestion';
+import CodeOfReality from './self-sim-reality/CodeOfReality';
 import RoadmapAndSources from './self-sim-reality/RoadmapAndSources';
 import WiphySearch from './self-sim-reality/WiphySearch';
 import ClaimAnalyzer from './self-sim-reality/ClaimAnalyzer';
@@ -59,6 +60,7 @@ const SelfSimRealityAgent = () => {
     { id: 'playground',        label: t('selfSimReality.tabs.playground'),        icon: '🎨' },
     { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
     { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
+    { id: 'codeOfReality',     label: t('selfSimReality.tabs.codeOfReality'),     icon: '🟩' },
     { id: 'roadmap',           label: t('selfSimReality.tabs.roadmap'),           icon: '🗺️' },
   ];
 
@@ -73,6 +75,7 @@ const SelfSimRealityAgent = () => {
       case 'playground':        return <Playground />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;
+      case 'codeOfReality':     return <CodeOfReality />;
       case 'roadmap':           return <RoadmapAndSources />;
       default:                  return <Overview />;
     }

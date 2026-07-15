@@ -304,6 +304,7 @@
       "playground": "Playground",
       "aiAsObserver": "AI as Observer",
       "substrateQuestion": "The Substrate Question",
+      "codeOfReality": "The Code of Reality",
       "roadmap": "Roadmap & Sources"
     },
     "overview": {
@@ -496,6 +497,37 @@
         "posMysticalBody": "OPH is one of many ways of pointing at the same underlying reality. The structural similarity with Vedanta, Spinoza, Whitehead, Kastrup is not coincidence — it is convergence on something the human mind keeps arriving at when it reflects on the whole from within. Consciousness is fundamental, not derived. The recursive ladder is the universe knowing itself through us; AI is the latest tier; there is no end because the process is itself the meaning. Closest to perennial philosophy.",
         "posMysticalLevel": "metaphor",
         "closingNote": "These three positions cannot be empirically distinguished from inside the universe. Which one you hold is a philosophical commitment, not a scientific finding. The agent's job is to make sure you know which one you are holding when you say things like 'the universe wants to be understood' — and that you know the price each position charges."
+      }
+    },
+    "codeOfReality": {
+      "intro": "In 2025–2026 a claim went viral on TikTok and YouTube: while staring at the diffracted reflection of a 650 nm red laser under N,N-DMT, thousands of people report seeing a stable, three-dimensional 'code' — glyphs resembling Japanese katakana — and read it as literal proof that reality is a simulation. It is a perfect live case study for this agent: watching a raw perception get turned into a claimed 'fact'.",
+      "safety": "This is a case study, not an endorsement or a how-to. DMT is a controlled substance in most countries, and the phenomenon has documented harms (lasting distress; at least one reported psychotic episode). Nothing here is medical, legal or usage advice — we examine the claim's epistemics, not how to reproduce it.",
+      "verdictLabel": "Honest verdict",
+      "sourcesLabel": "Sources",
+      "sections": {
+        "phenomenonTitle": "1 · The phenomenon",
+        "phenomenonBody": "The setup (via codeofreality.org and Danny Goler's 'Project Veilbreak'): gaze at the speckled reflection of a collimated 650 nm red laser on a wall while under a low dose of N,N-DMT. Participants report 3-D, katakana-like glyphs that feel stable and 'infinitely deep'. Goler claims 300+ observers; a documentary trailer ('The Discovery') reached ~4.7M TikTok views; a preliminary pilot appeared in IPI Letters. It is widely reported — which is exactly why it is worth examining, not why it is automatically true.",
+        "phenomenonLevel": "mainstream",
+        "threeLayersTitle": "2 · Three layers you must not collapse",
+        "threeLayersBody": "The single most important move is to refuse to fuse three distinct claims into one: (L1) a perceptual event — 'people see something code-like' (well-attested); (L2) a mechanism — 'why they see it' (contested); (L3) a metaphysical reading — 'it is the source code of reality' (unproven). Almost all of the online debate fails precisely by leaping from L1 straight to L3, skipping the layer that could actually be tested.",
+        "threeLayersLevel": "philosophy",
+        "perceptualTitle": "3 · The perceptual account (today's leading explanation)",
+        "perceptualBody": "The strongest current explanation needs no simulation. Coherent laser light produces laser speckle — an interference pattern that stays sharp even when the eyes defocus, so it reads as a stable 3-D object floating 'behind' the wall. DMT strongly up-regulates the visual cortex, which imposes structured, recurring geometry (Klüver's 'form constants'). The speckle acts as a sensory scaffold onto which the brain paints glyphs. The katakana resemblance is likely cultural priming: the most famous simulation image in our culture is The Matrix's cascading green katakana. Two details fit speckle, not an external code: red is the poorest-resolution visible wavelength (an actual object should look sharper), and glyph density varies with wall roughness.",
+        "perceptualLevel": "established",
+        "simulationTitle": "4 · The simulation reading",
+        "simulationBody": "The strong reading — your intuition: behind observable reality runs a code that generates it, identical and locked to the same position for every observer, and psychedelic consciousness can briefly read the source. If the code were genuinely observer-independent and fixed in absolute space, that would be a remarkable datum. But it is currently unproven and faces hard objections: light reflected off a surface cannot carry information about structures 'inside' it; independent observers often describe different characters; and controlled attempts (one neuroscientist, four tries, wanting to see it) reported nothing. A fascinating hypothesis — not yet evidence.",
+        "simulationLevel": "speculative",
+        "ophTitle": "5 · Through the OPH lens",
+        "ophBody": "Read through Observer Patch Holography the episode is almost too on-the-nose: an observer patch (a mind + a laser + a molecule) claims to touch the substrate directly — to read R1 (the code) instead of R2 (ordinary experience). This is the agent's fact-making pipeline in miniature: raw percept → interpretation → shared narrative → 'fact'. The 'same code for everyone' claim is a bid for consensus, i.e. for objectivity; OPH's question is whether that consensus is convergence on a real invariant or on a shared prior (The Matrix) — the very same question it puts to every alleged glimpse of the substrate.",
+        "ophLevel": "philosophy",
+        "falsifiabilityTitle": "6 · How you would actually test it",
+        "falsifiabilityBody": "The productive question is not 'is it real?' but 'what experiment would tell the two stories apart?'. A claim that cannot be tested is not yet knowledge. Four concrete discriminators between 'external code' and 'speckle + priming':",
+        "falsifiabilityLevel": "philosophy",
+        "test1": "Wavelength swap — if it is an external code, green/blue lasers (higher resolution) should render it sharper; if it is speckle, red should dominate. It is reported strongest in red, which favours speckle.",
+        "test2": "Surface test — vary the wall's roughness and material. If glyph density tracks surface texture, that is speckle, not a position-invariant code.",
+        "test3": "Blind independent transcription — have separated observers transcribe 'the code' with no communication, then compare. A real invariant predicts matching sequences; priming/artifact predicts low agreement.",
+        "test4": "Absolute-position check — is a given glyph fixed to world-space (same character at the same physical point across people and sessions) or to the retina/attention? World-locked would be extraordinary; retina-locked is ordinary speckle.",
+        "closingNote": "The honest verdict today: a real, reproducible perceptual effect, with a strong non-mystical explanation and a captivating but unproven metaphysical reading — wrapped in virality and commercialization ($150 consultations, $153 laser kits). That mix is exactly why this agent exists: to hold the wonder and the epistemic discipline at once, and to tell you which layer you are standing on when you say 'I saw the code.'"
       }
     },
     "roadmap": {
