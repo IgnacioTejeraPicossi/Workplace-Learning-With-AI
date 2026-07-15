@@ -504,6 +504,18 @@
       "safety": "This is a case study, not an endorsement or a how-to. DMT is a controlled substance in most countries, and the phenomenon has documented harms (lasting distress; at least one reported psychotic episode). Nothing here is medical, legal or usage advice — we examine the claim's epistemics, not how to reproduce it.",
       "verdictLabel": "Honest verdict",
       "sourcesLabel": "Sources",
+      "analyzeClaimPrompt": "Want to see the strong claim taken apart into its scientific core, its overreach, and an honest reformulation?",
+      "analyzeClaimBtn": "Run it through the Claim Analyzer",
+      "seeInTheoryTour": "See in Theory Tour",
+      "visual": {
+        "title": "Speckle vs. code — the same picture, two readings",
+        "intro": "The whole debate lives in this contrast. The left is what physics puts on your retina; the right is what the strong claim says is 'really there'.",
+        "speckleLabel": "Laser speckle (subjective scaffold)",
+        "speckleCaption": "Random interference grains from coherent light. The brain — especially on DMT — organizes them into apparent glyphs; the structure is added by the seer.",
+        "codeLabel": "External code (the strong claim)",
+        "codeCaption": "A structured, position-locked grid that would be identical for every observer — an objective invariant 'behind' the wall.",
+        "note": "The whole question is which picture you are actually looking at — and the four tests above are how you would tell."
+      },
       "sections": {
         "phenomenonTitle": "1 · The phenomenon",
         "phenomenonBody": "The setup (via codeofreality.org and Danny Goler's 'Project Veilbreak'): gaze at the speckled reflection of a collimated 650 nm red laser on a wall while under a low dose of N,N-DMT. Participants report 3-D, katakana-like glyphs that feel stable and 'infinitely deep'. Goler claims 300+ observers; a documentary trailer ('The Discovery') reached ~4.7M TikTok views; a preliminary pilot appeared in IPI Letters. It is widely reported — which is exactly why it is worth examining, not why it is automatically true.",
@@ -623,6 +635,7 @@
       "analyzing": "Analyzing…",
       "orTryExample": "or load an example →",
       "examples": {
+        "codeOfReality": "There is a code behind observable reality that generates it — the same for every observer, in the same position — and psychedelic consciousness can briefly read this source code, which proves reality is a simulation.",
         "simulation": "The universe is literally a computer simulation, and the fact that quantum mechanics has minimum-resolution effects proves we are living in one.",
         "consciousness": "Consciousness collapses the quantum wavefunction, which means the mind is what creates physical reality at the fundamental level.",
         "observer": "General relativity and quantum mechanics both require an observer, so the observer must be a fundamental feature of the universe itself."

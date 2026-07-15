@@ -655,6 +655,18 @@
       "safety": "Esto es un caso de estudio, no una recomendación ni un tutorial. El DMT es sustancia controlada en la mayoría de países, y el fenómeno tiene daños documentados (malestar duradero; al menos un episodio psicótico reportado). Nada de esto es consejo médico, legal ni de consumo — examinamos la epistemología de la afirmación, no cómo reproducirla.",
       "verdictLabel": "Veredicto honesto",
       "sourcesLabel": "Fuentes",
+      "analyzeClaimPrompt": "¿Quieres ver la afirmación fuerte descompuesta en su núcleo científico, su exceso y una reformulación honesta?",
+      "analyzeClaimBtn": "Analizarla en el Claim Analyzer",
+      "seeInTheoryTour": "Ver en Theory Tour",
+      "visual": {
+        "title": "Speckle vs. código — la misma imagen, dos lecturas",
+        "intro": "Todo el debate vive en este contraste. A la izquierda, lo que la física pone en tu retina; a la derecha, lo que la afirmación fuerte dice que «está realmente ahí».",
+        "speckleLabel": "Speckle láser (andamio subjetivo)",
+        "speckleCaption": "Granos de interferencia aleatorios de la luz coherente. El cerebro —sobre todo con DMT— los organiza en glifos aparentes; la estructura la añade el que ve.",
+        "codeLabel": "Código externo (la afirmación fuerte)",
+        "codeCaption": "Una rejilla estructurada y fijada en posición que sería idéntica para todo observador — un invariante objetivo «tras» la pared.",
+        "note": "Toda la cuestión es qué imagen estás mirando en realidad — y los cuatro tests de arriba son cómo lo distinguirías."
+      },
       "sections": {
         "phenomenonTitle": "1 · El fenómeno",
         "phenomenonBody": "El montaje (vía codeofreality.org y el «Project Veilbreak» de Danny Goler): mirar el reflejo moteado de un láser rojo colimado de 650 nm sobre una pared bajo una dosis baja de N,N-DMT. Los participantes reportan glifos 3D tipo katakana que se sienten estables e «infinitamente profundos». Goler afirma 300+ observadores; un tráiler documental («The Discovery») alcanzó ~4,7 M de visitas en TikTok; apareció un estudio piloto preliminar en IPI Letters. Está muy reportado — y por eso merece examen, no por eso es automáticamente cierto.",
@@ -774,6 +786,7 @@
       "analyzing": "Analizando…",
       "orTryExample": "o carga un ejemplo →",
       "examples": {
+        "codeOfReality": "Tras la realidad observable hay un código que la genera —el mismo para todo observador, en la misma posición— y la conciencia psicodélica puede leer brevemente ese código fuente, lo que prueba que la realidad es una simulación.",
         "simulation": "El universo es literalmente una simulación por ordenador, y el hecho de que la mecánica cuántica tenga efectos de resolución mínima demuestra que vivimos en una.",
         "consciousness": "La consciencia colapsa la función de onda cuántica, lo que significa que la mente es lo que crea la realidad física a nivel fundamental.",
         "observer": "La relatividad general y la mecánica cuántica requieren un observador, así que el observador debe ser una característica fundamental del universo mismo."

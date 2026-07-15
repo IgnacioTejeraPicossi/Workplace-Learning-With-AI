@@ -44,10 +44,24 @@ const SelfSimRealityAgent = () => {
   // Bumped nonce forces WiphySearch to re-run the search even if the term is
   // the same as the previous prefill.
   const [wiphyPrefill, setWiphyPrefill] = useState({ query: '', nonce: 0 });
+  // Code of Reality → Claim Analyzer (prefill the claim) and → Theory Tour
+  // (scroll to a specific theory row). Same nonce-bump bridge pattern as WiPhy.
+  const [claimPrefill, setClaimPrefill] = useState({ text: '', nonce: 0 });
+  const [theoryTarget, setTheoryTarget] = useState({ rowId: '', nonce: 0 });
 
   const searchWiphyFromAnalyzer = (term) => {
     setWiphyPrefill(prev => ({ query: term, nonce: prev.nonce + 1 }));
     setActiveTab('wiphySearch');
+  };
+
+  const analyzeClaim = (text) => {
+    setClaimPrefill(prev => ({ text, nonce: prev.nonce + 1 }));
+    setActiveTab('claimAnalyzer');
+  };
+
+  const goToTheory = (rowId) => {
+    setTheoryTarget(prev => ({ rowId, nonce: prev.nonce + 1 }));
+    setActiveTab('theoryTour');
   };
 
   const tabs = [
@@ -69,13 +83,13 @@ const SelfSimRealityAgent = () => {
       case 'overview':          return <Overview />;
       case 'concepts':          return <CoreConcepts />;
       case 'ophMechanics':      return <OphMechanics />;
-      case 'theoryTour':        return <TheoryTour />;
+      case 'theoryTour':        return <TheoryTour scrollTarget={theoryTarget} />;
       case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
-      case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} />;
+      case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} prefillClaim={claimPrefill.text} prefillNonce={claimPrefill.nonce} />;
       case 'playground':        return <Playground />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;
-      case 'codeOfReality':     return <CodeOfReality />;
+      case 'codeOfReality':     return <CodeOfReality onAnalyzeClaim={analyzeClaim} onOpenTheory={goToTheory} />;
       case 'roadmap':           return <RoadmapAndSources />;
       default:                  return <Overview />;
     }

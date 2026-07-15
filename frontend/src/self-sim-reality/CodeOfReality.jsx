@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { panel, panelTitle, subtle, LEVEL_COLORS } from './_tokens';
 import EpistemicBadge from './EpistemicBadge';
+
+// Which theory cards have a matching row in the Theory Tour tab (for the
+// "See in Theory Tour →" cross-link). geometricHallucinations has no entry yet.
+const THEORY_TO_TOUR = {
+  digitalPhysics: 'holographic',
+  simulationArgument: 'simHypothesis',
+  predictiveProcessing: 'predictive',
+  informationOntology: 'oph',
+};
 
 /**
  * The Code of Reality — 1.17.6+ (case study)
@@ -30,10 +39,17 @@ function NarrativeSection({ titleKey, bodyKey, levelKey, t }) {
   );
 }
 
-export default function CodeOfReality() {
+export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
   const { t } = useTranslation();
   const K = 'selfSimReality.codeOfReality';
   const tests = ['test1', 'test2', 'test3', 'test4'];
+  // Deterministic-ish speckle dots for the mini-visual (computed once).
+  const specks = useMemo(
+    () => Array.from({ length: 70 }, () => ({
+      x: 6 + Math.random() * 158, y: 6 + Math.random() * 128, r: 0.8 + Math.random() * 1.6,
+    })),
+    [],
+  );
   const theoryCards = [
     'digitalPhysics', 'simulationArgument', 'predictiveProcessing',
     'geometricHallucinations', 'informationOntology',
@@ -84,11 +100,71 @@ export default function CodeOfReality() {
         bodyKey={`${K}.sections.perceptualBody`}
         levelKey={`${K}.sections.perceptualLevel`} />
 
+      {/* Mini-visual: laser speckle (subjective scaffold) vs external code */}
+      <div style={panel}>
+        <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+          {t(`${K}.visual.title`)}
+        </h4>
+        <p style={{ ...subtle, margin: '0 0 12px' }}>{t(`${K}.visual.intro`)}</p>
+        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))' }}>
+          {/* Left — laser speckle: random grains the brain scaffolds on */}
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 10, overflow: 'hidden' }}>
+            <svg viewBox="0 0 170 140" width="100%" style={{ display: 'block', background: '#0f172a' }}>
+              {specks.map((s, i) => (
+                <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="#f87171" opacity={0.85} />
+              ))}
+            </svg>
+            <div style={{ padding: '8px 10px' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#991b1b' }}>{t(`${K}.visual.speckleLabel`)}</div>
+              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.4 }}>{t(`${K}.visual.speckleCaption`)}</div>
+            </div>
+          </div>
+          {/* Right — external code: a structured, position-locked grid of glyphs */}
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 10, overflow: 'hidden' }}>
+            <svg viewBox="0 0 170 140" width="100%" style={{ display: 'block', background: '#052e16' }}>
+              {Array.from({ length: 5 }).map((_, r) => Array.from({ length: 8 }).map((__, c) => {
+                const x = 10 + c * 19, y = 16 + r * 26;
+                return (
+                  <g key={`${r}-${c}`} stroke="#4ade80" strokeWidth="1.4" fill="none" strokeLinecap="round">
+                    <line x1={x} y1={y} x2={x + 8} y2={y} />
+                    <line x1={x + 4} y1={y - 5} x2={x + 4} y2={y + 5} />
+                  </g>
+                );
+              }))}
+            </svg>
+            <div style={{ padding: '8px 10px' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#065f46' }}>{t(`${K}.visual.codeLabel`)}</div>
+              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.4 }}>{t(`${K}.visual.codeCaption`)}</div>
+            </div>
+          </div>
+        </div>
+        <p style={{ ...subtle, margin: '12px 0 0', fontStyle: 'italic' }}>{t(`${K}.visual.note`)}</p>
+      </div>
+
       {/* 4 · The simulation reading */}
       <NarrativeSection t={t}
         titleKey={`${K}.sections.simulationTitle`}
         bodyKey={`${K}.sections.simulationBody`}
         levelKey={`${K}.sections.simulationLevel`} />
+
+      {/* Bridge → run the strong claim through the Claim Analyzer */}
+      {onAnalyzeClaim && (
+        <div style={{ ...panel, borderLeft: '4px solid #7c3aed', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 13, color: '#334155', flex: 1, minWidth: 200 }}>
+            {t(`${K}.analyzeClaimPrompt`)}
+          </span>
+          <button
+            type="button"
+            onClick={() => onAnalyzeClaim(t('selfSimReality.claimAnalyzer.examples.codeOfReality'))}
+            style={{
+              background: '#7c3aed', color: 'white', border: 'none', borderRadius: 8,
+              padding: '8px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+            }}
+          >
+            🔬 {t(`${K}.analyzeClaimBtn`)}
+          </button>
+        </div>
+      )}
 
       {/* 5 · Through the OPH lens */}
       <NarrativeSection t={t}
@@ -143,6 +219,18 @@ export default function CodeOfReality() {
                 <p style={{ margin: 0, fontSize: 12, color: '#334155', lineHeight: 1.55 }}>
                   {t(`${K}.theory.cards.${id}Body`)}
                 </p>
+                {onOpenTheory && THEORY_TO_TOUR[id] && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenTheory(THEORY_TO_TOUR[id])}
+                    style={{
+                      alignSelf: 'flex-start', background: 'transparent', border: 'none',
+                      color: '#6b21a8', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', padding: 0,
+                    }}
+                  >
+                    {t(`${K}.seeInTheoryTour`)} →
+                  </button>
+                )}
               </div>
             );
           })}

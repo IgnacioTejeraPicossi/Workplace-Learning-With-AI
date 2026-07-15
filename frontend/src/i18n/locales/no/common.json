@@ -661,6 +661,18 @@
       "safety": "Dette er et casestudie, ikke en anbefaling eller en bruksanvisning. DMT er et kontrollert stoff i de fleste land, og fenomenet har dokumenterte skader (varig ubehag; minst én rapportert psykotisk episode). Ingenting her er medisinsk, juridisk eller bruksråd — vi undersøker påstandens epistemikk, ikke hvordan man gjenskaper den.",
       "verdictLabel": "Ærlig dom",
       "sourcesLabel": "Kilder",
+      "analyzeClaimPrompt": "Vil du se den sterke påstanden brutt ned i sin vitenskapelige kjerne, sin overdrivelse og en ærlig omformulering?",
+      "analyzeClaimBtn": "Kjør den gjennom Claim Analyzer",
+      "seeInTheoryTour": "Se i Theory Tour",
+      "visual": {
+        "title": "Speckle vs. kode — samme bilde, to lesninger",
+        "intro": "Hele debatten bor i denne kontrasten. Til venstre er det fysikken legger på netthinnen din; til høyre er det den sterke påstanden sier «virkelig er der».",
+        "speckleLabel": "Laser-speckle (subjektivt stillas)",
+        "speckleCaption": "Tilfeldige interferenskorn fra koherent lys. Hjernen — særlig på DMT — organiserer dem til tilsynelatende tegn; strukturen legges til av den som ser.",
+        "codeLabel": "Ekstern kode (den sterke påstanden)",
+        "codeCaption": "Et strukturert, posisjonslåst rutenett som ville vært identisk for hver observatør — en objektiv invariant «bak» veggen.",
+        "note": "Hele spørsmålet er hvilket bilde du faktisk ser på — og de fire testene over er hvordan du ville avgjort det."
+      },
       "sections": {
         "phenomenonTitle": "1 · Fenomenet",
         "phenomenonBody": "Oppsettet (via codeofreality.org og Danny Golers «Project Veilbreak»): stirr på det flekkete gjenskinnet fra en kollimert 650 nm rød laser på en vegg under en lav dose N,N-DMT. Deltakerne rapporterer 3D katakana-lignende tegn som føles stabile og «uendelig dype». Goler hevder 300+ observatører; en dokumentartrailer («The Discovery») nådde ~4,7 M TikTok-visninger; et foreløpig pilotstudie kom i IPI Letters. Det er mye rapportert — nettopp derfor er det verdt å undersøke, ikke derfor automatisk sant.",
@@ -780,6 +792,7 @@
       "analyzing": "Analyserer…",
       "orTryExample": "eller last et eksempel →",
       "examples": {
+        "codeOfReality": "Bak den observerbare virkeligheten finnes en kode som genererer den — den samme for hver observatør, på samme posisjon — og psykedelisk bevissthet kan kortvarig lese denne kildekoden, noe som beviser at virkeligheten er en simulering.",
         "simulation": "Universet er bokstavelig talt en datasimulering, og det at kvantemekanikken har effekter med minimal oppløsning beviser at vi lever i en.",
         "consciousness": "Bevissthet får kvantebølgefunksjonen til å kollapse, noe som betyr at sinnet er det som skaper den fysiske virkeligheten på fundamentalt nivå.",
         "observer": "Generell relativitet og kvantemekanikk krever begge en observatør, så observatøren må være en grunnleggende egenskap ved universet selv."

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { panel, panelTitle, subtle, LEVEL_COLORS } from './_tokens';
 import EpistemicBadge from './EpistemicBadge';
@@ -35,7 +35,7 @@ const OVERREACH_ICON = {
   philosophical_leap:  '🪂',
 };
 
-export default function ClaimAnalyzer({ onSearchWiphy }) {
+export default function ClaimAnalyzer({ onSearchWiphy, prefillClaim, prefillNonce }) {
   const { t, i18n } = useTranslation();
   const [claim, setClaim] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,14 @@ export default function ClaimAnalyzer({ onSearchWiphy }) {
 
   const lang = ['en', 'es', 'no'].includes(i18n.language) ? i18n.language : 'en';
 
+  // Cross-tab prefill: when another tab (e.g. Code of Reality) sends a claim,
+  // load it into the textarea and clear any previous result.
+  useEffect(() => {
+    if (prefillClaim) { setClaim(prefillClaim); setResult(null); setError(null); }
+  }, [prefillClaim, prefillNonce]);
+
   const examples = [
+    t('selfSimReality.claimAnalyzer.examples.codeOfReality'),
     t('selfSimReality.claimAnalyzer.examples.simulation'),
     t('selfSimReality.claimAnalyzer.examples.consciousness'),
     t('selfSimReality.claimAnalyzer.examples.observer'),

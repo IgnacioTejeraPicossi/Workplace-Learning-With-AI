@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.2] - 2026-07-11
+
+### Added — "The Code of Reality" tab: Claim Analyzer bridge, mini-visual, Theory Tour links
+
+Three interactivity upgrades to the case study, all additive:
+
+1. **Preloaded claim in the Claim Analyzer** — the strong claim ("there is a code
+   behind reality…") is now a ready example in `ClaimAnalyzer` (first example
+   chip), and a "Run it through the Claim Analyzer" button in the Code of Reality
+   tab prefills it via a cross-tab bridge (`analyzeClaim` in
+   `SelfSimRealityAgent`; `prefillClaim`/`prefillNonce` props on ClaimAnalyzer).
+2. **Mini-visual: speckle vs. code** — an inline SVG contrasting laser speckle
+   (random grains the brain scaffolds into glyphs) with an external, position-
+   locked code grid, with localized captions. Sits under the perceptual section.
+3. **Theory Tour cross-links** — each mapped theory card ("See in Theory Tour →")
+   jumps to the matching Theory Tour row and flashes a highlight ring
+   (`goToTheory` bridge + `scrollTarget` prop + row anchors). Mapping:
+   digitalPhysics→holographic, simulationArgument→simHypothesis,
+   predictiveProcessing→predictive, informationOntology→oph.
+
+Touches `CodeOfReality.jsx`, `ClaimAnalyzer.jsx`, `TheoryTour.jsx`,
+`SelfSimRealityAgent.jsx` + i18n EN/NO/ES (codeOfReality 63 keys each, parity
+verified; new `claimAnalyzer.examples.codeOfReality`). JSX parses, JSON valid.
+
+---
+
 ## [1.22.1] - 2026-07-11
 
 ### Added — "The Code of Reality" tab · Theoretical grounding section

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { panel, panelTitle, subtle } from './_tokens';
 import EpistemicBadge from './EpistemicBadge';
@@ -21,8 +21,22 @@ const PASTERSKI_LINKS = [
   { id: 'review',    href: 'https://arxiv.org/abs/2111.11392' },
 ];
 
-export default function TheoryTour() {
+export default function TheoryTour({ scrollTarget }) {
   const { t } = useTranslation();
+  const [highlightId, setHighlightId] = useState('');
+
+  // When another tab (e.g. Code of Reality) links to a specific theory, scroll
+  // it into view and flash a highlight ring for a couple of seconds.
+  useEffect(() => {
+    const id = scrollTarget && scrollTarget.rowId;
+    if (!id) return;
+    setHighlightId(id);
+    const el = document.getElementById(`theory-row-${id}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const timer = setTimeout(() => setHighlightId(''), 2400);
+    return () => clearTimeout(timer);
+  }, [scrollTarget]);
+
   return (
     <div style={{ display: 'grid', gap: 18 }}>
       <div style={panel}>
@@ -34,7 +48,11 @@ export default function TheoryTour() {
         {ROWS.map(row => {
           const level = t(`selfSimReality.theoryTour.rows.${row.id}Level`);
           return (
-            <div key={row.id} style={panel}>
+            <div key={row.id} id={`theory-row-${row.id}`} style={{
+              ...panel,
+              transition: 'box-shadow 0.3s',
+              ...(highlightId === row.id ? { boxShadow: '0 0 0 3px #7c3aed' } : {}),
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
                 <strong style={{ fontSize: 15, color: '#1e293b' }}>
                   {t(`selfSimReality.theoryTour.rows.${row.id}Title`)}
