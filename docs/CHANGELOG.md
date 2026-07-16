@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.4] - 2026-07-11
+
+### Added — "The Code of Reality" tab: hosted primary document (pilot-study PDF)
+
+The pilot-study PDF (Goler, *IPI Letters* 2025, DOI 10.59973/ipil.158) was placed
+in `frontend/public/IPIL_158_1.pdf` and is now linked from the Recorded-accounts
+section as **"Read the primary document (pilot-study PDF)"** (served at
+`/IPIL_158_1.pdf`).
+
+Its content was read and characterized honestly in a new `records.primaryDoc`
+note, keeping the tab balanced: the paper includes **Figure 3 — an artist's
+rendition** of the experience (not a raw transcription); reports **n > 1000**
+seeing katakana-like characters; and the author **claims the effect is distinct
+from laser speckle and reproduces at 530/450 nm** — a direct challenge to the
+speckle account, now surfaced for fairness. Caveat also stated: it is a
+self-authored "News and Views" reviewed by one person, with no raw data or
+matching transcriptions shown to support "the same code for everyone".
+
+`CodeOfReality.jsx` + i18n EN/NO/ES (codeOfReality 73 keys each, parity verified).
+JSX parses, JSON valid, PDF served (HTTP 200, application/pdf).
+
+---
+
+## [1.22.3] - 2026-07-11
+
+### Added — "The Code of Reality" tab: Recorded accounts section
+
+After a web survey for a documented record of the katakana-like glyphs, added a
+**"What people actually recorded — and why it matters"** section to the Code of
+Reality tab. The honest finding: verbal accounts and at least one artist's
+rendering exist, but there is **no single agreed, reproducible transcription**,
+and observers describe strikingly different things — which is itself the key
+epistemic point (it is exactly the "blind independent transcription" test the tab
+already proposes). Four short, attributed accounts are listed (Colin Harrington's
+"cityscape of error-symbols", Goler's "buckyballs made of characters", a
+"holographic letters/numbers" report, and a counter-account: "not katakana or
+kanji or anything I recognized").
+
+No copyrighted images are reproduced — instead the section links out to the
+primary sources (added to the tab's Sources panel): the IPI Letters pilot study
+(open-access PDF), the Veilbreak protocol, DoubleBlind's feature, and the
+alien-insect analysis that carries the artist's rendering.
+
+`CodeOfReality.jsx` + i18n EN/NO/ES (codeOfReality 71 keys each, parity verified).
+JSX parses, JSON valid.
+
+---
+
 ## [1.22.2] - 2026-07-11
 
 ### Added — "The Code of Reality" tab: Claim Analyzer bridge, mini-visual, Theory Tour links

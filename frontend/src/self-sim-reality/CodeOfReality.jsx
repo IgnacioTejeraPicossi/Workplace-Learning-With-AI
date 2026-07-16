@@ -214,6 +214,15 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
         <p style={{ margin: '12px 0 0', fontSize: 12.5, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.55 }}>
           {t(`${K}.records.note`)}
         </p>
+        <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 8, background: '#faf5ff', border: '1px solid #e9d5ff' }}>
+          <p style={{ margin: '0 0 8px', fontSize: 12, color: '#6b21a8', lineHeight: 1.55 }}>
+            {t(`${K}.records.primaryDoc`)}
+          </p>
+          <a href="/IPIL_158_1.pdf" target="_blank" rel="noopener noreferrer"
+             style={{ fontSize: 12, fontWeight: 700, color: '#6b21a8', textDecoration: 'none' }}>
+            📄 {t(`${K}.records.primaryDocLabel`)} →
+          </a>
+        </div>
       </div>
 
       {/* Theoretical grounding — where the phenomenon sits in the theory map */}
