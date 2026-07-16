@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { panel, panelTitle, subtle, LEVEL_COLORS } from './_tokens';
 import EpistemicBadge from './EpistemicBadge';
@@ -43,6 +43,9 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
   const { t } = useTranslation();
   const K = 'selfSimReality.codeOfReality';
   const tests = ['test1', 'test2', 'test3', 'test4'];
+  // Glyph photo (courtesy of Danny Goler / Code of Reality, used with permission).
+  // Hidden gracefully if the file is not present in public/ yet.
+  const [showGlyphImg, setShowGlyphImg] = useState(true);
   // Deterministic-ish speckle dots for the mini-visual (computed once).
   const specks = useMemo(
     () => Array.from({ length: 70 }, () => ({
@@ -214,6 +217,26 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
         <p style={{ margin: '12px 0 0', fontSize: 12.5, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.55 }}>
           {t(`${K}.records.note`)}
         </p>
+
+        {/* Glyph photo — courtesy of Danny Goler / Code of Reality (with permission) */}
+        {showGlyphImg && (
+          <figure style={{ margin: '14px 0 0' }}>
+            <img
+              src="/code-of-reality-glyphs.jpg"
+              alt={t(`${K}.records.imageCaption`)}
+              onError={() => setShowGlyphImg(false)}
+              style={{
+                maxWidth: 240, width: '100%', borderRadius: 8,
+                border: '1px solid #e2e8f0', display: 'block',
+              }}
+            />
+            <figcaption style={{ marginTop: 6, fontSize: 11, color: '#64748b', lineHeight: 1.45, maxWidth: 460 }}>
+              {t(`${K}.records.imageCaption`)}{' '}
+              <span style={{ fontStyle: 'italic' }}>{t(`${K}.records.imageCredit`)}</span>
+            </figcaption>
+          </figure>
+        )}
+
         <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 8, background: '#faf5ff', border: '1px solid #e9d5ff' }}>
           <p style={{ margin: '0 0 8px', fontSize: 12, color: '#6b21a8', lineHeight: 1.55 }}>
             {t(`${K}.records.primaryDoc`)}

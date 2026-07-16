@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.5] - 2026-07-11
+
+### Added — "The Code of Reality" tab: glyph photo (with permission + credit)
+
+The project owner obtained permission from Danny Goler to show a photo of the
+observed "code" glyphs. The Recorded-accounts section now renders
+`/code-of-reality-glyphs.jpg` as a figure with an epistemic caption ("a
+proponent's rendering… not a verified objective transcription") and a visible
+credit line: "Image courtesy of Danny Goler / Code of Reality
+(codeofreality.org), used with permission." The `<img>` hides itself gracefully
+(`onError`) if the file is not present, so nothing breaks before the image is
+added to `frontend/public/`.
+
+`CodeOfReality.jsx` + i18n EN/NO/ES (codeOfReality 75 keys each, parity verified).
+JSX parses, JSON valid. **Action needed:** drop the image at
+`frontend/public/code-of-reality-glyphs.jpg`.
+
+---
+
 ## [1.22.4] - 2026-07-11
 
 ### Added — "The Code of Reality" tab: hosted primary document (pilot-study PDF)
