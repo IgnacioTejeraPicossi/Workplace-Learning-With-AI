@@ -315,6 +315,32 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
         </div>
       </div>
 
+      {/* Precedent: psychedelic 'code'/'language' is decades old — and not one script */}
+      <div style={panel}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+            {t(`${K}.precedent.title`)}
+          </h4>
+          <EpistemicBadge level="mainstream" />
+        </div>
+        <p style={{ margin: '0 0 10px', fontSize: 13, color: '#334155', lineHeight: 1.6 }}>
+          {t(`${K}.precedent.body`)}
+        </p>
+        <blockquote style={{ margin: '0 0 10px', padding: '10px 14px', background: '#f8fafc', borderLeft: '3px solid #c4b5fd', borderRadius: 6, fontSize: 12.5, color: '#334155', fontStyle: 'italic', lineHeight: 1.55 }}>
+          “{t(`${K}.precedent.quote`)}” <span style={{ fontStyle: 'normal', color: '#64748b' }}>— Allyson Grey</span>
+        </blockquote>
+        <p style={{ margin: '0 0 10px', fontSize: 12.5, color: '#334155', lineHeight: 1.55 }}>
+          {t(`${K}.precedent.match`)}
+        </p>
+        <p style={{ margin: '0 0 10px', fontSize: 12, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.5 }}>
+          {t(`${K}.precedent.note`)}
+        </p>
+        <a href="https://www.allysongrey.com/" target="_blank" rel="noopener noreferrer"
+           style={{ fontSize: 12, fontWeight: 700, color: '#6b21a8', textDecoration: 'none' }}>
+          🔗 {t(`${K}.precedent.linkLabel`)} →
+        </a>
+      </div>
+
       {/* Theoretical grounding — where the phenomenon sits in the theory map */}
       <div style={panel}>
         <h4 style={{ margin: '0 0 6px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
