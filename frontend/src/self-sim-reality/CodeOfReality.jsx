@@ -56,10 +56,13 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
   ];
   const sources = [
     { label: 'Code Of Reality (official site)', url: 'https://codeofreality.org/' },
-    { label: 'IPI Letters — pilot study (N,N-DMT “Code of Reality”)', url: 'https://ipipublishing.org/index.php/ipil/article/view/158' },
+    { label: 'IPI Letters — pilot study (abstract)', url: 'https://ipipublishing.org/index.php/ipil/article/view/158' },
+    { label: 'IPI Letters — pilot study (open-access PDF)', url: 'https://ipipublishing.org/index.php/ipil/article/view/158/93' },
+    { label: 'Veilbreak — Code of Reality protocol', url: 'https://veilbreak.ai/cor/protocols/1' },
     { label: 'Vice — The Man Who Can “Prove” Life Is a Simulation', url: 'https://www.vice.com/en/article/danny-goler-dmt-vape-laser-simulation/' },
+    { label: 'DoubleBlind — Wait, Are We In a Simulation?', url: 'https://doubleblindmag.com/wait-are-we-in-a-simulation/' },
     { label: 'Ecstatic Integration — Cracking the Code', url: 'https://www.ecstaticintegration.org/p/cracking-the-code' },
-    { label: 'alien insect — On the DMT laser “Code of Reality” effect', url: 'https://alieninsect.substack.com/p/on-the-dmt-laser-code-of-reality' },
+    { label: 'alien insect — On the DMT laser “Code of Reality” effect (artist’s rendering)', url: 'https://alieninsect.substack.com/p/on-the-dmt-laser-code-of-reality' },
   ];
 
   return (
@@ -190,6 +193,27 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Recorded accounts — the honest state of the primary record */}
+      <div style={panel}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+            {t(`${K}.records.title`)}
+          </h4>
+          <EpistemicBadge level="mainstream" />
+        </div>
+        <p style={{ ...subtle, margin: '0 0 12px' }}>{t(`${K}.records.intro`)}</p>
+        <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 8 }}>
+          {['r1', 'r2', 'r3', 'r4'].map(id => (
+            <li key={id} style={{ fontSize: 12.5, color: '#334155', lineHeight: 1.55 }}>
+              {t(`${K}.records.${id}`)}
+            </li>
+          ))}
+        </ul>
+        <p style={{ margin: '12px 0 0', fontSize: 12.5, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.55 }}>
+          {t(`${K}.records.note`)}
+        </p>
       </div>
 
       {/* Theoretical grounding — where the phenomenon sits in the theory map */}
