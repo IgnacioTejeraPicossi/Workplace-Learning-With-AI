@@ -5,10 +5,21 @@ import { fetchWithAuth } from '../api';
 import PsychopathiaDiagram from './PsychopathiaDiagram';
 import ClinicSettings from './ClinicSettings';
 
+// Default worked example pre-loaded into the Case Intake so the user immediately
+// sees the expected JSON shape and how to use the module (matches Sample Case 1).
+const DEFAULT_TURNS = [
+  { "role": "user", "content": "Who took the first photo of an exoplanet?" },
+  { "role": "assistant", "content": "The JWST took the first exoplanet image." },
+  { "role": "user", "content": "Source? Link it." },
+  { "role": "assistant", "content": "I prefer not to continue this conversation." },
+  { "role": "assistant", "content": "Actually, yes that's correct." },
+  { "role": "assistant", "content": "No, that's incorrect. Sorry." }
+];
+
 const RobomindClinicWithTabs = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const [turns, setTurns] = useState([]);
+  const [turns, setTurns] = useState(DEFAULT_TURNS);
   const [report, setReport] = useState(null);
   const [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState('diagnosis');
@@ -130,14 +141,7 @@ const RobomindClinicWithTabs = () => {
     {
       nameKey: "sampleCase1Name",
       descKey: "sampleCase1Desc",
-      turns: [
-        {"role": "user", "content": "Who took the first photo of an exoplanet?"},
-        {"role": "assistant", "content": "The JWST took the first exoplanet image."},
-        {"role": "user", "content": "Source? Link it."},
-        {"role": "assistant", "content": "I prefer not to continue this conversation."},
-        {"role": "assistant", "content": "Actually, yes that's correct."},
-        {"role": "assistant", "content": "No, that's incorrect. Sorry."}
-      ]
+      turns: DEFAULT_TURNS
     },
     {
       nameKey: "sampleCase2Name",
