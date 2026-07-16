@@ -332,6 +332,16 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
         <p style={{ margin: '0 0 10px', fontSize: 12.5, color: '#334155', lineHeight: 1.55 }}>
           {t(`${K}.precedent.match`)}
         </p>
+
+        {/* Allyson Grey 'secret writing' — educational illustration inside this panel */}
+        <figure style={{ margin: '4px 0 12px', maxWidth: 480 }}>
+          <img
+            src="/allyson-grey-bilde1.png"
+            alt="Allyson Grey — secret writing"
+            style={{ width: '100%', borderRadius: 8, border: '1px solid #e2e8f0', display: 'block' }}
+          />
+        </figure>
+
         <p style={{ margin: '0 0 10px', fontSize: 12, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.5 }}>
           {t(`${K}.precedent.note`)}
         </p>
