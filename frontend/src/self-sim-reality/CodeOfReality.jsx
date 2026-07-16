@@ -55,7 +55,16 @@ function NarrativeSection({ titleKey, bodyKey, levelKey, t }) {
 export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
   const { t } = useTranslation();
   const K = 'selfSimReality.codeOfReality';
-  const tests = ['test1', 'test2', 'test3', 'test4'];
+  const tests = ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7'];
+  // Epistemic-status summary rows (ChatGPT-review suggestion): first three carry
+  // an epistemic badge; risk/value are qualitative colour pills.
+  const statusRows = [
+    { id: 'phenomenon', level: 'mainstream' },
+    { id: 'mechanism', level: 'established' },
+    { id: 'proof', level: 'unsupported' },
+    { id: 'risk', pill: '#991b1b', pillBg: '#fee2e2' },
+    { id: 'value', pill: '#065f46', pillBg: '#d1fae5' },
+  ];
   // Glyph photo (courtesy of Danny Goler / Code of Reality, used with permission).
   // Hidden gracefully if the file is not present in public/ yet.
   const [showGlyphImg, setShowGlyphImg] = useState(true);
@@ -98,6 +107,13 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
       }}>
         <p style={{ margin: 0, fontSize: 12.5, color: '#7f1d1d', lineHeight: 1.55 }}>
           ⚠️ {t(`${K}.safety`)}
+        </p>
+      </div>
+
+      {/* Pull-quote thesis */}
+      <div style={{ ...panel, background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%)', color: 'white', padding: '20px 26px' }}>
+        <p style={{ margin: 0, fontSize: 16, fontWeight: 700, lineHeight: 1.4, fontStyle: 'italic' }}>
+          “{t(`${K}.pullQuote`)}”
         </p>
       </div>
 
@@ -341,6 +357,30 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Epistemic-status summary table */}
+      <div style={panel}>
+        <h4 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+          {t(`${K}.status.title`)}
+        </h4>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {statusRows.map(row => (
+            <div key={row.id} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', padding: '8px 10px', background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#1e293b', minWidth: 150 }}>
+                {t(`${K}.status.${row.id}Label`)}
+              </div>
+              <div style={{ flex: 1, minWidth: 180, fontSize: 12.5, color: '#334155' }}>
+                {t(`${K}.status.${row.id}Val`)}
+              </div>
+              {row.level
+                ? <EpistemicBadge level={row.level} />
+                : <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.4, color: row.pill, background: row.pillBg, border: `1px solid ${row.pill}44`, padding: '3px 10px', borderRadius: 999 }}>
+                    {t(`${K}.status.${row.id}Tag`)}
+                  </span>}
+            </div>
+          ))}
         </div>
       </div>
 

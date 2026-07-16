@@ -653,6 +653,7 @@
     "codeOfReality": {
       "intro": "En 2025–2026 se viralizó en TikTok y YouTube una afirmación: mirando el reflejo difractado de un láser rojo de 650 nm bajo N,N-DMT, miles de personas dicen ver un «código» tridimensional y estable —glifos parecidos al katakana japonés— y lo interpretan como prueba literal de que la realidad es una simulación. Es un caso de estudio perfecto para este agente: ver cómo una percepción cruda se convierte en un «hecho» reclamado.",
       "safety": "Esto es un caso de estudio, no una recomendación ni un tutorial. El DMT es sustancia controlada en la mayoría de países, y el fenómeno tiene daños documentados (malestar duradero; al menos un episodio psicótico reportado). Nada de esto es consejo médico, legal ni de consumo — examinamos la epistemología de la afirmación, no cómo reproducirla.",
+      "pullQuote": "Ver algo parecido a un código no significa haber leído el código de la realidad.",
       "verdictLabel": "Veredicto honesto",
       "sourcesLabel": "Fuentes",
       "analyzeClaimPrompt": "¿Quieres ver la afirmación fuerte descompuesta en su núcleo científico, su exceso y una reformulación honesta?",
@@ -687,6 +688,21 @@
         "chineseLabel": "Kanji · Hanzi (japonés + chino)",
         "note": "Que sea tan fácil encontrar parecidos es justo lo que predice el «priming cultural»: muestra con qué facilidad el ojo proyecta ruido angular sobre una escritura familiar — no que los glifos sean estos caracteres."
       },
+      "status": {
+        "title": "Estado epistémico — de un vistazo",
+        "phenomenonLabel": "Fenómeno perceptivo",
+        "phenomenonVal": "Plausible / real como experiencia subjetiva — muy reportado.",
+        "mechanismLabel": "Mecanismo científico",
+        "mechanismVal": "Mejor explicación: speckle láser + cerebro predictivo/psicodélico + priming.",
+        "proofLabel": "Prueba de una simulación",
+        "proofVal": "No demostrada — sin evidencia independiente y coincidente.",
+        "riskLabel": "Riesgo de sobreinterpretación",
+        "riskVal": "Un percepto subjetivo puede sentirse como prueba objetiva — más peligroso en personas vulnerables o estados alterados.",
+        "riskTag": "Alto",
+        "valueLabel": "Valor pedagógico",
+        "valueVal": "Un caso de manual de convertir una experiencia en un «hecho» reclamado.",
+        "valueTag": "Muy alto"
+      },
       "sections": {
         "phenomenonTitle": "1 · El fenómeno",
         "phenomenonBody": "El montaje (vía codeofreality.org y el «Project Veilbreak» de Danny Goler): mirar el reflejo moteado de un láser rojo colimado de 650 nm sobre una pared bajo una dosis baja de N,N-DMT. Los participantes reportan glifos 3D tipo katakana que se sienten estables e «infinitamente profundos». Goler afirma 300+ observadores; un tráiler documental («The Discovery») alcanzó ~4,7 M de visitas en TikTok; apareció un estudio piloto preliminar en IPI Letters. Está muy reportado — y por eso merece examen, no por eso es automáticamente cierto.",
@@ -710,6 +726,9 @@
         "test2": "Prueba de superficie — varía la rugosidad y el material de la pared. Si la densidad de glifos sigue a la textura, es speckle, no un código invariante en posición.",
         "test3": "Transcripción ciega e independiente — que observadores separados transcriban «el código» sin comunicarse, y luego se compare. Un invariante real predice secuencias coincidentes; priming/artefacto predice bajo acuerdo.",
         "test4": "Comprobación de posición absoluta — ¿un glifo dado está fijado al espacio del mundo (mismo carácter en el mismo punto físico entre personas y sesiones) o a la retina/atención? Fijado al mundo sería extraordinario; fijado a la retina es speckle ordinario.",
+        "test5": "Control sin expectativa — hazlo con personas que nunca han visto Matrix ni imágenes de «código». Si el parecido al katakana desaparece, el priming cultural era lo que actuaba.",
+        "test6": "Control sin DMT — ¿aparece un «código» similar solo con el láser bajo fatiga visual, migraña, parpadeo o meditación? Si sí, la sustancia no es necesaria y el efecto es perceptual.",
+        "test7": "Registro objetivo — captúralo con cámara y eye-tracking bajo óptica medida, no solo relatos post-sesión. Un patrón externo real debería poder registrarse con instrumentos.",
         "closingNote": "El veredicto honesto hoy: un efecto perceptual real y reproducible, con una explicación no mística sólida y una lectura metafísica cautivadora pero no probada — envuelto en viralidad y comercialización (consultas a 150 $, kits de láser a 153 $). Esa mezcla es justo por lo que existe este agente: sostener a la vez el asombro y la disciplina epistémica, y decirte sobre qué capa estás pisando cuando dices «vi el código»."
       },
       "theory": {

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.22.6] - 2026-07-11
+
+### Added — "The Code of Reality" tab: review-driven epistemic upgrades
+
+Incorporated the genuinely-new ideas from an external ChatGPT review (which
+otherwise endorsed the tab's skeptical framing). Additive, content-only:
+
+- **Pull-quote thesis** banner: "Seeing something that looks like a code is not
+  the same as reading the code of reality."
+- **Three more falsifiability tests** (now 7): no-expectation control (people who
+  never saw The Matrix), no-DMT control (laser alone under fatigue/migraine/
+  meditation), and objective recording (camera + eye-tracking under measured
+  optics).
+- **Epistemic-status summary table** with badges — perceptual phenomenon
+  (mainstream), scientific mechanism (established), simulation proof
+  (unsupported), overinterpretation risk (High), pedagogical value (Very high) —
+  adding the Risk dimension the review emphasized.
+
+Already-present ideas the review suggested (kept as-is): the three-layer
+separation, speckle + predictive-brain + priming, the Claim Analyzer with the
+claim preloaded, the "resemblance ≠ decoding" character panel, and the
+safety/legal banner. `CodeOfReality.jsx` + i18n EN/NO/ES (codeOfReality 99 keys
+each, parity verified). JSX parses, JSON valid.
+
+---
+
 ## [1.22.5] - 2026-07-11
 
 ### Added — "The Code of Reality" tab: glyph photo (with permission + credit)

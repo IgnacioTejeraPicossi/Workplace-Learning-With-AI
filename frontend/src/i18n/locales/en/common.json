@@ -502,6 +502,7 @@
     "codeOfReality": {
       "intro": "In 2025–2026 a claim went viral on TikTok and YouTube: while staring at the diffracted reflection of a 650 nm red laser under N,N-DMT, thousands of people report seeing a stable, three-dimensional 'code' — glyphs resembling Japanese katakana — and read it as literal proof that reality is a simulation. It is a perfect live case study for this agent: watching a raw perception get turned into a claimed 'fact'.",
       "safety": "This is a case study, not an endorsement or a how-to. DMT is a controlled substance in most countries, and the phenomenon has documented harms (lasting distress; at least one reported psychotic episode). Nothing here is medical, legal or usage advice — we examine the claim's epistemics, not how to reproduce it.",
+      "pullQuote": "Seeing something that looks like a code is not the same as reading the code of reality.",
       "verdictLabel": "Honest verdict",
       "sourcesLabel": "Sources",
       "analyzeClaimPrompt": "Want to see the strong claim taken apart into its scientific core, its overreach, and an honest reformulation?",
@@ -536,6 +537,21 @@
         "chineseLabel": "Kanji · Hanzi (Japanese + Chinese)",
         "note": "That look-alikes are this easy to find is exactly what the 'cultural priming' reading predicts: it shows how readily the eye maps angular noise onto a familiar script — not that the glyphs are these characters."
       },
+      "status": {
+        "title": "Epistemic status — at a glance",
+        "phenomenonLabel": "Perceptual phenomenon",
+        "phenomenonVal": "Plausible / real as a subjective experience — widely reported.",
+        "mechanismLabel": "Scientific mechanism",
+        "mechanismVal": "Best explanation: laser speckle + predictive/psychedelic brain + priming.",
+        "proofLabel": "Proof of a simulation",
+        "proofVal": "Not demonstrated — no independent, matching evidence.",
+        "riskLabel": "Overinterpretation risk",
+        "riskVal": "A subjective percept can feel like objective proof — riskier for vulnerable people or altered states.",
+        "riskTag": "High",
+        "valueLabel": "Pedagogical value",
+        "valueVal": "A textbook case of turning an experience into a claimed 'fact'.",
+        "valueTag": "Very high"
+      },
       "sections": {
         "phenomenonTitle": "1 · The phenomenon",
         "phenomenonBody": "The setup (via codeofreality.org and Danny Goler's 'Project Veilbreak'): gaze at the speckled reflection of a collimated 650 nm red laser on a wall while under a low dose of N,N-DMT. Participants report 3-D, katakana-like glyphs that feel stable and 'infinitely deep'. Goler claims 300+ observers; a documentary trailer ('The Discovery') reached ~4.7M TikTok views; a preliminary pilot appeared in IPI Letters. It is widely reported — which is exactly why it is worth examining, not why it is automatically true.",
@@ -559,6 +575,9 @@
         "test2": "Surface test — vary the wall's roughness and material. If glyph density tracks surface texture, that is speckle, not a position-invariant code.",
         "test3": "Blind independent transcription — have separated observers transcribe 'the code' with no communication, then compare. A real invariant predicts matching sequences; priming/artifact predicts low agreement.",
         "test4": "Absolute-position check — is a given glyph fixed to world-space (same character at the same physical point across people and sessions) or to the retina/attention? World-locked would be extraordinary; retina-locked is ordinary speckle.",
+        "test5": "No-expectation control — run it with people who have never seen The Matrix or 'code' imagery. If the katakana resemblance fades, cultural priming was doing the work.",
+        "test6": "No-DMT control — does a similar 'code' appear from the laser alone under visual fatigue, migraine, flicker or meditation? If yes, the substance isn't necessary and the effect is perceptual.",
+        "test7": "Objective recording — capture it with a camera and eye-tracking under measured optics, not just post-session accounts. A real external pattern should be instrument-recordable.",
         "closingNote": "The honest verdict today: a real, reproducible perceptual effect, with a strong non-mystical explanation and a captivating but unproven metaphysical reading — wrapped in virality and commercialization ($150 consultations, $153 laser kits). That mix is exactly why this agent exists: to hold the wonder and the epistemic discipline at once, and to tell you which layer you are standing on when you say 'I saw the code.'"
       },
       "theory": {

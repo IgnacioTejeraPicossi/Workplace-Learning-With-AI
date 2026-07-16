@@ -659,6 +659,7 @@
     "codeOfReality": {
       "intro": "I 2025–2026 gikk en påstand viralt på TikTok og YouTube: mens man stirrer på det diffrakterte gjenskinnet fra en 650 nm rød laser under N,N-DMT, rapporterer tusenvis av mennesker at de ser en stabil, tredimensjonal «kode» — tegn som ligner japansk katakana — og tolker det som bokstavelig bevis på at virkeligheten er en simulering. Det er et perfekt levende casestudie for denne agenten: å se en rå persepsjon bli gjort om til et påstått «faktum».",
       "safety": "Dette er et casestudie, ikke en anbefaling eller en bruksanvisning. DMT er et kontrollert stoff i de fleste land, og fenomenet har dokumenterte skader (varig ubehag; minst én rapportert psykotisk episode). Ingenting her er medisinsk, juridisk eller bruksråd — vi undersøker påstandens epistemikk, ikke hvordan man gjenskaper den.",
+      "pullQuote": "Å se noe som ligner en kode er ikke det samme som å ha lest virkelighetens kode.",
       "verdictLabel": "Ærlig dom",
       "sourcesLabel": "Kilder",
       "analyzeClaimPrompt": "Vil du se den sterke påstanden brutt ned i sin vitenskapelige kjerne, sin overdrivelse og en ærlig omformulering?",
@@ -693,6 +694,21 @@
         "chineseLabel": "Kanji · Hanzi (japansk + kinesisk)",
         "note": "At det er så lett å finne look-alikes er nettopp det «kulturell priming» forutsier: det viser hvor lett øyet projiserer kantete støy på en kjent skrift — ikke at glyfene er disse tegnene."
       },
+      "status": {
+        "title": "Epistemisk status — et overblikk",
+        "phenomenonLabel": "Perseptuelt fenomen",
+        "phenomenonVal": "Plausibelt / ekte som subjektiv opplevelse — mye rapportert.",
+        "mechanismLabel": "Vitenskapelig mekanisme",
+        "mechanismVal": "Beste forklaring: laser-speckle + prediktiv/psykedelisk hjerne + priming.",
+        "proofLabel": "Bevis på en simulering",
+        "proofVal": "Ikke påvist — ingen uavhengig, samsvarende evidens.",
+        "riskLabel": "Risiko for overtolkning",
+        "riskVal": "Et subjektivt persept kan føles som objektivt bevis — mer risikabelt for sårbare personer eller endrede tilstander.",
+        "riskTag": "Høy",
+        "valueLabel": "Pedagogisk verdi",
+        "valueVal": "Et lærebokeksempel på å gjøre en opplevelse til et påstått «faktum».",
+        "valueTag": "Svært høy"
+      },
       "sections": {
         "phenomenonTitle": "1 · Fenomenet",
         "phenomenonBody": "Oppsettet (via codeofreality.org og Danny Golers «Project Veilbreak»): stirr på det flekkete gjenskinnet fra en kollimert 650 nm rød laser på en vegg under en lav dose N,N-DMT. Deltakerne rapporterer 3D katakana-lignende tegn som føles stabile og «uendelig dype». Goler hevder 300+ observatører; en dokumentartrailer («The Discovery») nådde ~4,7 M TikTok-visninger; et foreløpig pilotstudie kom i IPI Letters. Det er mye rapportert — nettopp derfor er det verdt å undersøke, ikke derfor automatisk sant.",
@@ -716,6 +732,9 @@
         "test2": "Overflatetest — varier veggens ruhet og materiale. Hvis tegntettheten følger overflateteksturen, er det speckle, ikke en posisjons-invariant kode.",
         "test3": "Blind uavhengig transkripsjon — la adskilte observatører transkribere «koden» uten å kommunisere, og sammenlign. En ekte invariant forutsier samsvarende sekvenser; priming/artefakt forutsier lav enighet.",
         "test4": "Absolutt-posisjonssjekk — er et gitt tegn festet til verdensrommet (samme tegn på samme fysiske punkt på tvers av personer og økter) eller til netthinnen/oppmerksomheten? Verdens-låst ville vært ekstraordinært; netthinne-låst er vanlig speckle.",
+        "test5": "Kontroll uten forventning — gjør det med folk som aldri har sett The Matrix eller «kode»-bilder. Hvis katakana-likheten forsvinner, var kulturell priming det som virket.",
+        "test6": "Kontroll uten DMT — dukker en lignende «kode» opp fra laseren alene under synstretthet, migrene, flimmer eller meditasjon? Hvis ja, er stoffet ikke nødvendig og effekten er perseptuell.",
+        "test7": "Objektivt opptak — fang det med kamera og eye-tracking under målt optikk, ikke bare beretninger etter økten. Et ekte eksternt mønster bør kunne registreres med instrumenter.",
         "closingNote": "Den ærlige dommen i dag: en ekte, reproduserbar perseptuell effekt, med en sterk ikke-mystisk forklaring og en fengslende, men ubevist metafysisk lesning — pakket inn i viralitet og kommersialisering (konsultasjoner til 150 $, laser-sett til 153 $). Nettopp den blandingen er grunnen til at denne agenten finnes: å holde undringen og den epistemiske disiplinen samtidig, og fortelle deg hvilket lag du står på når du sier «jeg så koden»."
       },
       "theory": {
