@@ -527,7 +527,14 @@
         "primaryDocLabel": "Read the primary document (pilot-study PDF)",
         "primaryDoc": "The primary write-up (Goler, IPI Letters 2025) includes Figure 3 — an artist's rendition of the experience, not a raw transcription. It reports n > 1000 seeing katakana-like characters and claims the effect is distinct from laser speckle and reproduces at 530/450 nm (a direct challenge to the speckle account). Caveat: it is a self-authored 'News and Views' reviewed by one person, showing no raw data or matching transcriptions to back 'the same code for everyone'.",
         "imageCaption": "A proponent's rendering of the observed 'code' — an example of what participants report seeing, not a verified objective transcription.",
-        "imageCredit": "Image courtesy of Danny Goler / Code of Reality (codeofreality.org), used with permission."
+        "imageCredit": "Image courtesy of Danny Goler / Code of Reality (codeofreality.org)."
+      },
+      "glyphMatch": {
+        "title": "Closest real characters (our Japanese + Chinese agents)",
+        "intro": "Drawing on our Japanese and Chinese language agents: the real script characters whose shapes most resemble the blurry glyphs. A visual comparison, not a decoding.",
+        "japaneseLabel": "Katakana (Japanese)",
+        "chineseLabel": "Kanji · Hanzi (Japanese + Chinese)",
+        "note": "That look-alikes are this easy to find is exactly what the 'cultural priming' reading predicts: it shows how readily the eye maps angular noise onto a familiar script — not that the glyphs are these characters."
       },
       "sections": {
         "phenomenonTitle": "1 · The phenomenon",

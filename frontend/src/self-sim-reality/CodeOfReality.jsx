@@ -12,6 +12,19 @@ const THEORY_TO_TOUR = {
   informationOntology: 'oph',
 };
 
+// Closest-looking real characters to the (angular, boxy) glyphs in the photo,
+// curated from what the Japanese and Chinese agents teach. This is a VISUAL
+// comparison, not a decoding. [character, reading].
+const KATAKANA = [
+  ['ロ', 'ro'], ['コ', 'ko'], ['エ', 'e'], ['ヨ', 'yo'], ['ニ', 'ni'], ['キ', 'ki'],
+  ['リ', 'ri'], ['ト', 'to'], ['ハ', 'ha'], ['タ', 'ta'], ['ナ', 'na'], ['フ', 'fu'],
+];
+const KANJI_HANZI = [
+  ['口', 'kǒu'], ['日', 'rì'], ['田', 'tián'], ['目', 'mù'], ['王', 'wáng'], ['工', 'gōng'],
+  ['土', 'tǔ'], ['士', 'shì'], ['十', 'shí'], ['三', 'sān'], ['川', 'chuān'], ['山', 'shān'],
+  ['中', 'zhōng'], ['甲', 'jiǎ'],
+];
+
 /**
  * The Code of Reality — 1.17.6+ (case study)
  *
@@ -218,23 +231,61 @@ export default function CodeOfReality({ onAnalyzeClaim, onOpenTheory }) {
           {t(`${K}.records.note`)}
         </p>
 
-        {/* Glyph photo — courtesy of Danny Goler / Code of Reality (with permission) */}
+        {/* Glyph photo (courtesy of Danny Goler / Code of Reality, with permission)
+            + closest-character comparison from the Japanese/Chinese agents. */}
         {showGlyphImg && (
-          <figure style={{ margin: '14px 0 0' }}>
-            <img
-              src="/code-of-reality-glyphs.jpg"
-              alt={t(`${K}.records.imageCaption`)}
-              onError={() => setShowGlyphImg(false)}
-              style={{
-                maxWidth: 240, width: '100%', borderRadius: 8,
-                border: '1px solid #e2e8f0', display: 'block',
-              }}
-            />
-            <figcaption style={{ marginTop: 6, fontSize: 11, color: '#64748b', lineHeight: 1.45, maxWidth: 460 }}>
-              {t(`${K}.records.imageCaption`)}{' '}
-              <span style={{ fontStyle: 'italic' }}>{t(`${K}.records.imageCredit`)}</span>
-            </figcaption>
-          </figure>
+          <div style={{ margin: '14px 0 0', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <figure style={{ margin: 0, maxWidth: 240 }}>
+              <img
+                src="/code-of-reality-glyphs.jpg"
+                alt={t(`${K}.records.imageCaption`)}
+                onError={() => setShowGlyphImg(false)}
+                style={{ width: '100%', borderRadius: 8, border: '1px solid #e2e8f0', display: 'block' }}
+              />
+              <figcaption style={{ marginTop: 6, fontSize: 11, color: '#64748b', lineHeight: 1.45 }}>
+                {t(`${K}.records.imageCaption`)}{' '}
+                <span style={{ fontStyle: 'italic' }}>{t(`${K}.records.imageCredit`)}</span>
+              </figcaption>
+            </figure>
+
+            {/* Closest real characters (Japanese + Chinese agents) */}
+            <div style={{ flex: 1, minWidth: 250, border: '1px solid #e2e8f0', borderRadius: 10, padding: 14, background: '#fafafa' }}>
+              <h5 style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
+                🀄 {t(`${K}.glyphMatch.title`)}
+              </h5>
+              <p style={{ margin: '0 0 12px', fontSize: 11.5, color: '#64748b', lineHeight: 1.5 }}>
+                {t(`${K}.glyphMatch.intro`)}
+              </p>
+
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#991b1b', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>
+                {t(`${K}.glyphMatch.japaneseLabel`)}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                {KATAKANA.map(([c, r]) => (
+                  <div key={c} title={r} style={{ width: 40, textAlign: 'center', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 0', background: 'white' }}>
+                    <div style={{ fontSize: 20, lineHeight: 1, color: '#0f172a' }}>{c}</div>
+                    <div style={{ fontSize: 8.5, color: '#94a3b8' }}>{r}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#065f46', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>
+                {t(`${K}.glyphMatch.chineseLabel`)}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {KANJI_HANZI.map(([c, r]) => (
+                  <div key={c} title={r} style={{ width: 40, textAlign: 'center', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 0', background: 'white' }}>
+                    <div style={{ fontSize: 20, lineHeight: 1, color: '#0f172a' }}>{c}</div>
+                    <div style={{ fontSize: 8.5, color: '#94a3b8' }}>{r}</div>
+                  </div>
+                ))}
+              </div>
+
+              <p style={{ margin: '12px 0 0', fontSize: 11, color: '#6b21a8', fontStyle: 'italic', lineHeight: 1.5 }}>
+                {t(`${K}.glyphMatch.note`)}
+              </p>
+            </div>
+          </div>
         )}
 
         <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 8, background: '#faf5ff', border: '1px solid #e9d5ff' }}>

@@ -678,7 +678,14 @@
         "primaryDocLabel": "Leer el documento primario (PDF del estudio piloto)",
         "primaryDoc": "El texto primario (Goler, IPI Letters 2025) incluye la Figura 3 — una representación artística de la experiencia, no una transcripción cruda. Reporta n > 1000 viendo caracteres tipo katakana y afirma que el efecto es distinto del speckle láser y que se reproduce a 530/450 nm (un desafío directo a la explicación por speckle). Matiz: es un «News and Views» autofirmado, revisado por una sola persona, sin datos crudos ni transcripciones coincidentes que respalden «el mismo código para todos».",
         "imageCaption": "Una representación de un proponente del «código» observado — un ejemplo de lo que los participantes dicen ver, no una transcripción objetiva verificada.",
-        "imageCredit": "Imagen cortesía de Danny Goler / Code of Reality (codeofreality.org), usada con permiso."
+        "imageCredit": "Imagen cortesía de Danny Goler / Code of Reality (codeofreality.org)."
+      },
+      "glyphMatch": {
+        "title": "Caracteres reales más parecidos (nuestros agentes de japonés + chino)",
+        "intro": "Apoyándonos en nuestros agentes de japonés y chino: los caracteres reales cuya forma más se parece a los glifos borrosos de la foto. Es una comparación visual, no un descifrado.",
+        "japaneseLabel": "Katakana (japonés)",
+        "chineseLabel": "Kanji · Hanzi (japonés + chino)",
+        "note": "Que sea tan fácil encontrar parecidos es justo lo que predice el «priming cultural»: muestra con qué facilidad el ojo proyecta ruido angular sobre una escritura familiar — no que los glifos sean estos caracteres."
       },
       "sections": {
         "phenomenonTitle": "1 · El fenómeno",

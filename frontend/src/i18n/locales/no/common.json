@@ -684,7 +684,14 @@
         "primaryDocLabel": "Les primærdokumentet (pilotstudie-PDF)",
         "primaryDoc": "Primærteksten (Goler, IPI Letters 2025) inkluderer Figur 3 — en kunstners gjengivelse av opplevelsen, ikke en rå transkripsjon. Den rapporterer n > 1000 som ser katakana-lignende tegn og hevder at effekten er forskjellig fra laser-speckle og reproduseres ved 530/450 nm (en direkte utfordring til speckle-forklaringen). Forbehold: det er en selvforfattet «News and Views» vurdert av én person, uten rådata eller samsvarende transkripsjoner som støtter «samme kode for alle».",
         "imageCaption": "En tilhengers gjengivelse av den observerte «koden» — et eksempel på hva deltakere rapporterer å se, ikke en verifisert objektiv transkripsjon.",
-        "imageCredit": "Bilde med tillatelse fra Danny Goler / Code of Reality (codeofreality.org), brukt med tillatelse."
+        "imageCredit": "Bilde med tillatelse fra Danny Goler / Code of Reality (codeofreality.org)."
+      },
+      "glyphMatch": {
+        "title": "Nærmeste ekte tegn (våre japansk- og kinesisk-agenter)",
+        "intro": "Med utgangspunkt i våre japansk- og kinesisk-agenter: de ekte skrifttegnene hvis form ligner mest på de uskarpe glyfene. En visuell sammenligning, ikke en dekoding.",
+        "japaneseLabel": "Katakana (japansk)",
+        "chineseLabel": "Kanji · Hanzi (japansk + kinesisk)",
+        "note": "At det er så lett å finne look-alikes er nettopp det «kulturell priming» forutsier: det viser hvor lett øyet projiserer kantete støy på en kjent skrift — ikke at glyfene er disse tegnene."
       },
       "sections": {
         "phenomenonTitle": "1 · Fenomenet",
