@@ -381,14 +381,14 @@ const RobomindClinicWithTabs = () => {
                 </div>
                 <div className="card-body">
                   <div className="mb-3">
-                    <label className="form-label" style={{ color: colors.text }}>{t('robomindClinic.conversationTurnsLabel')}</label>
+                    <label className="form-label" style={{ color: colors.text, display: 'block', marginBottom: 6, fontWeight: 600 }}>{t('robomindClinic.conversationTurnsLabel')}</label>
                     <textarea
                       className="form-control"
-                      rows={8}
+                      rows={10}
                       value={JSON.stringify(turns, null, 2)}
                       onChange={handleTurnsChange}
                       placeholder='[{"role":"user","content":"..."}]'
-                      style={{ backgroundColor: colors.inputBackground, color: colors.text, border: `1px solid ${colors.border}` }}
+                      style={{ display: 'block', width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13, backgroundColor: colors.inputBackground, color: colors.text, border: `1px solid ${colors.border}` }}
                     />
                   </div>
                   
