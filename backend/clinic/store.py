@@ -5,7 +5,12 @@ from datetime import datetime, timedelta
 
 from .pii import scrub_pii_deep
 
-mongo = AsyncIOMotorClient(os.getenv("MONGO_URI", "mongodb://localhost:27017")).app
+# Short server-selection timeout: if Mongo is unreachable, fail fast (~3s)
+# instead of hanging for the 30s driver default on every operation.
+mongo = AsyncIOMotorClient(
+    os.getenv("MONGO_URI", "mongodb://localhost:27017"),
+    serverSelectionTimeoutMS=int(os.getenv("MONGO_SELECT_TIMEOUT_MS", "3000")),
+).app
 
 # A3: Retention config (days). Raw screenings/therapies; metrics aggregated from screenings.
 RETENTION_DAYS_RAW = int(os.getenv("ROBOMIND_RETENTION_DAYS_RAW", "30"))

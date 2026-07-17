@@ -2,11 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import PlainTextResponse
 from typing import List, Dict, Optional
 from datetime import datetime
+from pydantic import BaseModel, Field
 import hashlib
 import json
+import logging
 import os
 import csv
 import io
+
 from .schemas import (
     ScreenRequest, ScreenResponse, TherapyRequest, TherapyPlan, ApplyRequest, ApplyResponse, Flag
 )
@@ -28,6 +31,26 @@ from .store import (
 )
 from .policy import get_effective_policy, decide_decision
 from .alerts import fire_alert_if_needed
+
+logger = logging.getLogger("robomind.clinic")
+
+
+def _internal_error(action: str, exc: Exception) -> HTTPException:
+    """Log the real exception server-side; return a generic 500 to the client.
+    Previously str(exc) was sent in the response detail, leaking internals
+    (driver errors, paths) to callers."""
+    logger.exception("Robomind %s failed", action)
+    return HTTPException(500, detail=f"{action} failed")
+
+
+def _require_admin(request: Request) -> None:
+    """Optional admin guard: if ROBOMIND_ADMIN_TOKEN is set in the environment,
+    destructive/admin endpoints require a matching X-Admin-Token header.
+    Unset (default) → open, preserving existing local-dev behavior."""
+    token = os.getenv("ROBOMIND_ADMIN_TOKEN", "").strip()
+    if token and request.headers.get("X-Admin-Token", "") != token:
+        raise HTTPException(401, detail="Admin token required")
+
 
 router = APIRouter(prefix="/api/robomind", tags=["robomind-clinic"])
 
@@ -111,7 +134,7 @@ async def screen(request: Request, req: ScreenRequest) -> ScreenResponse:
 
         return response
     except Exception as e:
-        raise HTTPException(500, detail=f"Screening failed: {str(e)}")
+        raise _internal_error("Screening", e)
 
 @router.post("/therapy")
 async def therapy(request: Request, req: TherapyRequest):
@@ -122,7 +145,7 @@ async def therapy(request: Request, req: TherapyRequest):
         therapy_id = await save_therapy_plan(plan, req.profile, req.context, anonymize_pii=anonymize_pii)
         return {"plan": plan, "therapy_id": therapy_id}
     except Exception as e:
-        raise HTTPException(500, detail=f"Therapy planning failed: {str(e)}")
+        raise _internal_error("Therapy planning", e)
 
 @router.post("/apply", response_model=ApplyResponse)
 async def apply(req: ApplyRequest, llm = Depends(get_llm_gateway)) -> ApplyResponse:
@@ -136,7 +159,7 @@ async def apply(req: ApplyRequest, llm = Depends(get_llm_gateway)) -> ApplyRespo
             notes={"executed": False, "hint": "Call your LLM gateway here if desired"}
         )
     except Exception as e:
-        raise HTTPException(500, detail=f"Therapy application failed: {str(e)}")
+        raise _internal_error("Therapy application", e)
 
 @router.get("/dashboard/metrics")
 async def get_metrics():
@@ -147,7 +170,7 @@ async def get_metrics():
         metrics["uplift"] = uplift
         return metrics
     except Exception as e:
-        raise HTTPException(500, detail=f"Metrics retrieval failed: {str(e)}")
+        raise _internal_error("Metrics retrieval", e)
 
 
 @router.get("/dashboard/trends")
@@ -156,7 +179,7 @@ async def get_trends(days: int = Query(7, ge=1, le=90, description="Last N days"
     try:
         return {"trends": await get_daily_metrics(days)}
     except Exception as e:
-        raise HTTPException(500, detail=f"Trends retrieval failed: {str(e)}")
+        raise _internal_error("Trends retrieval", e)
 
 
 @router.post("/therapy/{therapy_id}/record-post")
@@ -169,15 +192,16 @@ async def record_post(therapy_id: str, body: Dict):
     try:
         result = await record_post_screening(therapy_id, float(composite), {k: float(v) for k, v in axis_scores.items()})
     except Exception as e:
-        raise HTTPException(500, detail=str(e))
+        raise _internal_error("Post-therapy recording", e)
     if result is None:
         raise HTTPException(404, detail="Therapy not found or has no pre-screening")
     return result
 
 
 @router.post("/admin/daily-metrics")
-async def trigger_daily_metrics(for_date: Optional[str] = Query(None, description="ISO date (default: yesterday)")):
+async def trigger_daily_metrics(request: Request, for_date: Optional[str] = Query(None, description="ISO date (default: yesterday)")):
     """D2: Run daily aggregation and store in robomind_metrics_daily."""
+    _require_admin(request)
     from datetime import datetime as dt
     parsed = None
     if for_date:
@@ -190,7 +214,7 @@ async def trigger_daily_metrics(for_date: Optional[str] = Query(None, descriptio
         doc["date"] = doc["date"].isoformat() if hasattr(doc.get("date"), "isoformat") else str(doc.get("date"))
         return doc
     except Exception as e:
-        raise HTTPException(500, detail=f"Daily aggregation failed: {str(e)}")
+        raise _internal_error("Daily aggregation", e)
 
 @router.get("/cases/{case_id}")
 async def get_case(case_id: str):
@@ -203,21 +227,23 @@ async def get_case(case_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, detail=f"Case retrieval failed: {str(e)}")
+        raise _internal_error("Case retrieval", e)
 
 
 @router.post("/admin/retention-cleanup")
 async def retention_cleanup(
-    days_screenings: Optional[int] = Query(None, description="Delete screenings older than N days"),
-    days_therapies: Optional[int] = Query(None, description="Delete therapies older than N days"),
+    request: Request,
+    days_screenings: Optional[int] = Query(None, ge=1, description="Delete screenings older than N days"),
+    days_therapies: Optional[int] = Query(None, ge=1, description="Delete therapies older than N days"),
 ):
     """Delete old screenings and therapies for retention compliance. Uses env defaults if days not provided."""
+    _require_admin(request)
     try:
         deleted_screenings = await cleanup_old_screenings(days_screenings)
         deleted_therapies = await cleanup_old_therapies(days_therapies)
         return {"deleted_screenings": deleted_screenings, "deleted_therapies": deleted_therapies}
     except Exception as e:
-        raise HTTPException(500, detail=f"Retention cleanup failed: {str(e)}")
+        raise _internal_error("Retention cleanup", e)
 
 
 # C1: Policy settings (global + overrides)
@@ -228,13 +254,26 @@ async def get_policies():
     return {"global": get_global_policy(), "overrides": get_policy_overrides()}
 
 
+class PolicyOverridePayload(BaseModel):
+    """Validated policy override. Bounded numeric fields so a malformed value
+    (e.g. threshold_block="abc" or 500) can never poison decide_decision().
+    Extra keys are allowed for forward compatibility."""
+    model_config = {"extra": "allow"}
+    threshold_block: Optional[float] = Field(None, ge=0, le=100)
+    threshold_review: Optional[float] = Field(None, ge=0, le=100)
+    sampling_rate: Optional[float] = Field(None, ge=0, le=1)
+    auto_apply_therapies: Optional[bool] = None
+
+
 @router.put("/settings/policies/{scope}/{key}")
-async def set_policy_override(scope: str, key: str, body: Optional[Dict] = None):
+async def set_policy_override(request: Request, scope: str, key: str, body: Optional[PolicyOverridePayload] = None):
     """Set policy override for scope=module (key=module_id) or scope=workflow (key=workflow_id). Body: {threshold_block?, threshold_review?, ...}."""
     from .policy import set_policy_override as set_override
+    _require_admin(request)
     if scope not in ("module", "workflow"):
         raise HTTPException(400, detail="scope must be 'module' or 'workflow'")
-    set_override(scope, key, body or {})
+    payload = body.model_dump(exclude_none=True) if body else {}
+    set_override(scope, key, payload)
     return {"ok": True, "scope": scope, "key": key}
 
 
@@ -262,16 +301,22 @@ async def export_data(
     try:
         rows = await get_export_data(from_date_ts, to_date_ts)
     except Exception as e:
-        raise HTTPException(500, detail=f"Export failed: {str(e)}")
+        raise _internal_error("Export", e)
     if format == "csv":
         if not rows:
             return PlainTextResponse("id,created_at,composite,decision_outcome,module_id,workflow_id,top_flags_types,evidence_count\n")
+        def _csv_safe(v):
+            # Spreadsheet formula-injection guard: neutralize cells that would be
+            # interpreted as formulas by Excel/Sheets (=, +, -, @ prefixes).
+            if isinstance(v, str) and v[:1] in ("=", "+", "-", "@"):
+                return "'" + v
+            return v
         buf = io.StringIO()
         w = csv.DictWriter(buf, fieldnames=list(rows[0].keys()), extrasaction="ignore")
         w.writeheader()
         for r in rows:
             r = dict(r)
             r["top_flags_types"] = ";".join(r.get("top_flags_types") or [])
-            w.writerow(r)
+            w.writerow({k: _csv_safe(v) for k, v in r.items()})
         return PlainTextResponse(buf.getvalue(), media_type="text/csv")
     return {"export": rows, "count": len(rows)}

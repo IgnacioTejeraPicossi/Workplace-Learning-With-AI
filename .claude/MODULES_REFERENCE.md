@@ -58,30 +58,44 @@
 
 **Purpose**: AI-powered diagnostic clinic for LLM behavior issues. Competition module for NMiAI 2026.
 
-**Backend** (`backend/clinic/` — 15 files):
-- `router.py` — main API endpoints
-- `enhanced_router.py` — competition API
+**Backend** (`backend/clinic/` — 16 files):
+- `router.py` — legacy API (`/api/clinic`: diagnose, disorders, settings)
+- `enhanced_router.py` — main API (`/api/robomind`: screen, therapy, apply, dashboard, export, admin)
 - `service.py` — core logic
 - `detectors.py` / `enhanced_detectors.py` — issue detection
 - `judge.py` — LLM evaluation
 - `therapy_engine.py` — therapy sessions
 - `scoring.py` — scoring system
-- `pii.py` — PII detection
-- `models.py` + `schemas.py` — Pydantic schemas
+- `policy.py` — allow/review/block thresholds (global override + module/workflow overrides)
+- `alerts.py` — webhook alerts (debounced, `ROBOMIND_ALERT_WEBHOOK_URL`)
+- `pii.py` — PII scrubbing (emails/phones/IDs) before Mongo storage
+- `store.py` — Mongo persistence (motor, `serverSelectionTimeoutMS` fail-fast)
+- `models.py` + `schemas.py` — Pydantic schemas (bounded inputs: ≤1000 turns, ≤100k chars/turn)
 
-**Frontend**: `frontend/src/RobomindClinic/`
+**Frontend**: `frontend/src/RobomindClinic/` — active component is
+`RobomindClinicWithTabs.jsx` (+ `ClinicSettings.jsx`, `PsychopathiaDiagram.jsx`).
+Note: `RobomindClinic.jsx` and `EnhancedRobomindClinic.jsx` are **unreferenced
+legacy versions** (imported by nobody) — candidates for removal.
 
 **Tests** (only module with contract tests):
 ```bash
-python -m pytest backend/tests/test_robomind_api_contracts.py -v  # 27/27
-python -m pytest backend/tests/test_robomind_clinic.py -v
+python -m pytest backend/tests/test_robomind_api_contracts.py -v  # 28/28
+python -m pytest backend/tests/test_robomind_clinic.py -v         # 23/23
 ```
+
+**Security / ops (2026-07 audit):**
+- 500 responses are generic; real errors go to the `robomind.clinic` logger (no internals leak).
+- Optional admin guard: set `ROBOMIND_ADMIN_TOKEN` → `/admin/*` and policy PUT require `X-Admin-Token` header. Unset = open (local dev).
+- Policy override values validated (thresholds 0–100, sampling 0–1); malformed overrides can no longer break screening.
+- Clinic Settings UI saves now actually apply to allow/review/block decisions (global policy override was previously stored but never read).
+- CSV export escapes spreadsheet formula prefixes (`= + - @`).
 
 **Critical constraints:**
 - Run contract tests before ANY change to clinic module
 - Preserve Pydantic request/response schema stability
 - Do not change diagnostic semantics without documenting
 - Maintain request/response contract with frontend
+- Contract tests must mock `save_screening` (module-level motor client binds to the first test's event loop; unmocked Mongo I/O in later tests fails with "Event loop is closed")
 
 **Docs**: `docs/ROBOMIND_CLINIC_README.md`, `docs/ROBOMIND_CLINIC_ENHANCEMENT_PLAN.md`
 

@@ -38,8 +38,14 @@ def get_global_policy() -> Dict[str, Any]:
 
 
 def get_effective_policy(module_id: Optional[str] = None, workflow_id: Optional[str] = None) -> Dict[str, Any]:
-    """Merge policy: workflow override → module override → global. Returns effective policy dict."""
+    """Merge policy: workflow override → module override → global override → defaults."""
     effective = get_global_policy()
+    # Global override — written by the Clinic Settings UI (POST /api/clinic/settings).
+    # Previously this scope was stored but never read, so saving settings had no
+    # effect on allow/review/block decisions.
+    global_override = _policy_overrides.get("global", {}).get("global", {})
+    if global_override:
+        effective = {**effective, **global_override}
     if module_id and "module" in _policy_overrides:
         mod_overrides = _policy_overrides.get("module", {}).get(module_id, {})
         effective = {**effective, **mod_overrides}
@@ -53,8 +59,16 @@ def decide_decision(composite: float, policy: Optional[Dict[str, Any]] = None) -
     """Map composite score to allow / review / block from policy thresholds."""
     if policy is None:
         policy = get_global_policy()
-    block = float(policy.get("threshold_block", DEFAULT_POLICY["threshold_block"]))
-    review = float(policy.get("threshold_review", DEFAULT_POLICY["threshold_review"]))
+    # Defensive: a malformed override (non-numeric threshold) must not break
+    # every subsequent screening — fall back to the defaults instead.
+    try:
+        block = float(policy.get("threshold_block", DEFAULT_POLICY["threshold_block"]))
+    except (TypeError, ValueError):
+        block = DEFAULT_POLICY["threshold_block"]
+    try:
+        review = float(policy.get("threshold_review", DEFAULT_POLICY["threshold_review"]))
+    except (TypeError, ValueError):
+        review = DEFAULT_POLICY["threshold_review"]
     if composite >= block:
         return "block"
     if composite >= review:

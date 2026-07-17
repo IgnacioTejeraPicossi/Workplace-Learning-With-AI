@@ -521,6 +521,53 @@ MONGO_URI=mongodb://localhost:27017/app
 
 ---
 
-**Last updated**: April 2026
-**Version**: 0.2.0
-**Status**: All 32 pathologies implemented and validated
+## Security & Operations (July 2026 audit)
+
+A full module audit (code quality + security + docs) was performed in July 2026.
+Fixes applied — all backward compatible:
+
+### Hardening
+- **No internal-error leakage**: all 500 responses now return a generic message;
+  the real exception (driver errors, paths) goes to the `robomind.clinic`
+  logger only.
+- **Optional admin guard**: set `ROBOMIND_ADMIN_TOKEN=<secret>` in the backend
+  environment and the destructive/admin endpoints
+  (`POST /api/robomind/admin/retention-cleanup`,
+  `POST /api/robomind/admin/daily-metrics`,
+  `PUT /api/robomind/settings/policies/{scope}/{key}`) require a matching
+  `X-Admin-Token` header. When the variable is unset (default), behavior is
+  unchanged (open, local-dev friendly).
+- **Validated inputs**: policy overrides are schema-validated (thresholds 0–100,
+  sampling rate 0–1) — a malformed override can no longer poison every
+  subsequent screening decision. Clinic Settings percentages are bounded 0–100.
+  Screening payloads are bounded (≤ 1000 turns, ≤ 100 000 chars per turn) as a
+  DoS guard.
+- **CSV export**: cells starting with `=`, `+`, `-`, `@` are escaped to prevent
+  spreadsheet formula injection.
+- **Fail-fast Mongo**: the store's motor client uses a short
+  `serverSelectionTimeoutMS` (env `MONGO_SELECT_TIMEOUT_MS`, default 3000 ms)
+  instead of the 30 s driver default.
+
+### Bug fixes
+- **Clinic Settings now take effect**: `POST /api/clinic/settings` stored a
+  global policy override that `get_effective_policy()` never read — saving
+  settings had no effect on allow/review/block decisions. The global override
+  is now merged (order: defaults/env → global → module → workflow).
+- **Deterministic contract suite**: `test_enhanced_screen_rejects_empty_turns`
+  failed only in full-file runs ("Event loop is closed") because it was the one
+  test doing an unmocked Mongo write after the module-level motor client had
+  bound to an earlier test's event loop. It now mocks `save_screening` like its
+  siblings. Suites: 28/28 contracts + 23/23 clinic = **51/51**.
+
+### Known follow-ups (not yet done)
+- `RobomindClinic.jsx` and `EnhancedRobomindClinic.jsx` in the frontend are
+  unreferenced legacy versions (the live component is
+  `RobomindClinicWithTabs.jsx`) — safe to delete in a dedicated cleanup.
+- Endpoints other than the admin ones remain unauthenticated by design (local
+  tool); revisit if the module is ever exposed beyond localhost.
+
+---
+
+**Last updated**: July 2026
+**Version**: 0.2.1
+**Status**: All 32 pathologies implemented and validated · 51/51 tests green

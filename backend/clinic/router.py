@@ -2,16 +2,18 @@ from fastapi import APIRouter, HTTPException, Request
 from .models import CaseIntake, DiagnosisReport
 from .service import diagnose_case, get_therapy_patches
 from typing import Dict, List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import logging
 
 router = APIRouter(prefix="/api/clinic", tags=["robomind-clinic"])
+logger = logging.getLogger("robomind.clinic")
 
 
 class ClinicSettingsPayload(BaseModel):
     enabled: bool = False
-    samplingRate: int = 25           # 0-100 percentage from UI
-    thresholdBlock: int = 85         # 0-100 percentage from UI
-    thresholdReview: int = 65        # 0-100 percentage from UI
+    samplingRate: int = Field(25, ge=0, le=100)     # 0-100 percentage from UI
+    thresholdBlock: int = Field(85, ge=0, le=100)   # 0-100 percentage from UI
+    thresholdReview: int = Field(65, ge=0, le=100)  # 0-100 percentage from UI
     autoApplyTherapies: bool = True
     enabledDisorders: List[str] = []
 
@@ -30,8 +32,10 @@ async def post_diagnose(request: Request, payload: CaseIntake):
     demo_mode = _demo_mode_from_request(request)
     try:
         return await diagnose_case(payload, demo_mode=demo_mode)
-    except Exception as e:
-        raise HTTPException(500, f"Diagnosis failed: {str(e)}")
+    except Exception:
+        # Log the real error server-side; do not leak internals to the client.
+        logger.exception("Robomind diagnosis failed")
+        raise HTTPException(500, "Diagnosis failed")
 
 @router.get("/therapy-patches")
 async def get_therapy_patches_endpoint():

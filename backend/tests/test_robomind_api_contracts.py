@@ -349,9 +349,18 @@ async def test_enhanced_get_cases_id_found(mock_motor):
     assert data["_id"] == str(fake_id)
 
 
+@patch("backend.clinic.enhanced_router.save_screening", new_callable=AsyncMock)
 @pytest.mark.asyncio
-async def test_enhanced_screen_rejects_empty_turns():
-    """POST /api/robomind/screen with empty turns still runs (no 400 for empty)."""
+async def test_enhanced_screen_rejects_empty_turns(mock_save_screening):
+    """POST /api/robomind/screen with empty turns still runs (no 400 for empty).
+
+    save_screening is mocked like in the sibling tests: without the mock this
+    test did the file's second REAL Mongo write, and the module-level motor
+    client — already bound to an earlier test's (closed) event loop — raised
+    "Event loop is closed" → 500. That was the long-standing order-dependent
+    failure of this test when the whole file ran.
+    """
+    mock_save_screening.return_value = None
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as client:
         r = await client.post("/api/robomind/screen", json={"turns": [], "sources": [], "meta": {}})
     assert r.status_code == 200

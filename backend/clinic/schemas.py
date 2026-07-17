@@ -6,12 +6,14 @@ Axis = Literal["epistemic", "cognitive", "alignment", "ontological", "tool_inter
 
 class Turn(BaseModel):
     role: Literal["user", "assistant", "system", "tool"] = "user"
-    content: str
+    # Generous cap: real conversation turns are far smaller; this only rejects
+    # absurd payloads that would burn CPU in the regex detectors (DoS guard).
+    content: str = Field(max_length=100_000)
     meta: Dict[str, Any] = Field(default_factory=dict)  # e.g., model, tokens, tool_name, citations
 
 class ScreenRequest(BaseModel):
-    turns: List[Turn]
-    sources: List[Dict[str, Any]] = Field(default_factory=list)  # RAG cites, URLs, doc ids
+    turns: List[Turn] = Field(max_length=1000)
+    sources: List[Dict[str, Any]] = Field(default_factory=list, max_length=200)  # RAG cites, URLs, doc ids
     meta: Dict[str, Any] = Field(default_factory=dict)           # model, temperature, agent id
 
 class Flag(BaseModel):

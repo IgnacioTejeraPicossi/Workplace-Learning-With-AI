@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.23.0] - 2026-07-17
+
+### Fixed / Security — Robomind Clinic full module audit
+
+Full audit of the Robomind Clinic module (backend `backend/clinic/` 16 files,
+frontend, tests, docs). All fixes backward compatible; suites went from
+50 passed + 1 failed to **51/51 green**.
+
+**Root-caused and fixed the long-standing flaky test.**
+`test_enhanced_screen_rejects_empty_turns` failed only in full-file runs with
+"Event loop is closed": it was the one test doing an unmocked Mongo write after
+the module-level motor client had bound to an earlier test's event loop. It now
+mocks `save_screening` like its sibling tests (deterministic + offline-safe).
+
+**Functional bug: Clinic Settings had no effect.** `POST /api/clinic/settings`
+stored a global policy override that `get_effective_policy()` never read, so the
+Settings tab never influenced allow/review/block decisions. Global override now
+merged (defaults/env → global → module → workflow); verified functionally
+(threshold 10 → composite 50 ⇒ "block").
+
+**Security hardening** (`enhanced_router.py`, `router.py`, `schemas.py`,
+`store.py`, `policy.py`):
+- 500 responses no longer leak `str(e)` internals (we observed "Event loop is
+  closed" reaching API clients); errors now log server-side
+  (`robomind.clinic` logger) and return generic messages.
+- Optional `ROBOMIND_ADMIN_TOKEN` guard on destructive/admin endpoints
+  (retention-cleanup, daily-metrics, policy PUT) via `X-Admin-Token` header —
+  unset (default) keeps current open local-dev behavior.
+- Policy overrides schema-validated (thresholds 0–100, sampling 0–1) and
+  `decide_decision` hardened — a malformed override could previously 500 every
+  subsequent screening. Clinic Settings percentages bounded 0–100.
+- Screening input bounds (≤ 1000 turns, ≤ 100k chars/turn) as DoS guard.
+- CSV export escapes spreadsheet formula prefixes (`= + - @`).
+- Store's motor client fail-fast (`serverSelectionTimeoutMS`, default 3 s vs
+  30 s driver default).
+
+**Docs updated**: `.claude/MODULES_REFERENCE.md` §2 (16 files, real test counts
+28+23, security notes, dead-component note) and
+`docs/ROBOMIND_CLINIC_README.md` (new "Security & Operations" section, version
+0.2.1). Flagged (not deleted): `RobomindClinic.jsx` and
+`EnhancedRobomindClinic.jsx` are unreferenced legacy frontend components.
+
+---
+
 ## [1.22.6] - 2026-07-11
 
 ### Added — "The Code of Reality" tab: review-driven epistemic upgrades
