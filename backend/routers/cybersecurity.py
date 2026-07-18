@@ -8,7 +8,6 @@ from typing import List, Dict, Optional
 import asyncio
 import json
 import subprocess
-import shlex
 import logging
 import os
 from datetime import datetime
@@ -23,6 +22,12 @@ from backend.models.cyber_models import (
     DrillScenario, DrillStep, DrillSession, KnowledgeArticle
 )
 import uuid
+
+# Real LLM (graceful: module works fully without it — canned fallback answers)
+try:
+    from backend.llm import ask_ai_unified
+except ImportError:  # pragma: no cover
+    ask_ai_unified = None  # type: ignore
 
 router = APIRouter(prefix="/api/cyber", tags=["Cybersecurity"])
 
@@ -296,7 +301,7 @@ async def _run_npm_audit() -> ScanResult:
         logger.warning("npm audit failed: %s — returning mock result", e)
         return ScanResult(scan_type="npm-audit", vulnerabilities_found=2,
                           execution_time=0.5, success=True,
-                          error_message=f"npm audit error: {e}; mock result returned")
+                          error_message="npm audit unavailable; mock result returned")
 
 
 async def _run_pip_audit() -> ScanResult:
@@ -331,7 +336,7 @@ async def _run_pip_audit() -> ScanResult:
         logger.warning("pip-audit failed: %s — returning mock result", e)
         return ScanResult(scan_type="pip-audit", vulnerabilities_found=1,
                           execution_time=0.3, success=True,
-                          error_message=f"pip-audit error: {e}; mock result returned")
+                          error_message="pip-audit unavailable; mock result returned")
 
 
 async def _run_secret_scan() -> ScanResult:
@@ -394,7 +399,7 @@ async def _run_secret_scan() -> ScanResult:
         logger.warning("Secret scan failed: %s", e)
         return ScanResult(scan_type="secret-scan", vulnerabilities_found=0,
                           execution_time=0.1, success=True,
-                          error_message=f"Secret scan error: {e}")
+                          error_message="Secret scan unavailable")
 
 @router.get("/posture/kpis", response_model=List[PostureKPI])
 async def get_posture_kpis():
@@ -442,35 +447,91 @@ async def get_risk_score():
         trend=trend
     )
 
+def _retrieve_cyber_context(question: str, max_items: int = 4):
+    """Keyword retrieval over the module's own content (knowledge articles,
+    threats, controls). Returns (context_text, source_labels). No embeddings —
+    same lightweight approach as the AI Study Buddy help search."""
+    import re
+    terms = [w for w in re.split(r"[^a-z0-9]+", question.lower()) if len(w) > 3]
+    scored = []
+    # Knowledge articles (defined later in this module; resolved at call time)
+    for art in _KNOWLEDGE_ARTICLES:
+        hay = (art.title + " " + art.summary + " " + " ".join(art.tags) + " " + art.content[:2000]).lower()
+        score = sum(hay.count(t) for t in terms)
+        if score > 0:
+            scored.append((score, f"KB: {art.title}", art.summary + "\n" + art.content[:1200]))
+    for th in _MOCK_THREATS:
+        hay = (th.name + " " + th.description + " " + " ".join(th.tags)).lower()
+        score = sum(hay.count(t) * 2 for t in terms)
+        if score > 0:
+            scored.append((score, f"Threat: {th.name}", f"{th.description} Controls: {', '.join(th.controls)}"))
+    for c in _MOCK_CONTROLS:
+        hay = (c.title + " " + c.description + " " + " ".join(c.tags)).lower()
+        score = sum(hay.count(t) for t in terms)
+        if score > 0:
+            scored.append((score, f"Control {c.id}: {c.title}", c.implementation_guidance))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top = scored[:max_items]
+    ctx = "\n\n".join(f"[{label}]\n{text}" for _, label, text in top)
+    return ctx, [label for _, label, _ in top]
+
+
+def _canned_rag_answer(question: str):
+    """Deterministic offline fallback (the original mock)."""
+    q = question.lower()
+    if "phishing" in q:
+        return ("Phishing is a social engineering attack that uses deceptive emails or websites to steal sensitive information. Key prevention measures include user training, email filtering, and multi-factor authentication.",
+                ["NIST Cybersecurity Framework", "OWASP Top 10"])
+    if "vulnerability" in q:
+        return ("Vulnerabilities are weaknesses in systems that can be exploited by attackers. Regular vulnerability scanning, patch management, and secure coding practices are essential for mitigation.",
+                ["CVE Database", "NIST Guidelines"])
+    return ("This is a general cybersecurity question. Please refer to established frameworks like NIST CSF, ISO 27001, or OWASP for comprehensive guidance.",
+            ["Cybersecurity Best Practices"])
+
+
 @router.post("/rag/ask", response_model=CyberRAGResponse)
 async def ask_cyber_rag(request: CyberRAGRequest):
-    """Ask cybersecurity questions using RAG"""
-    # This will integrate with your existing Agentic RAG system
-    # For now, return a mock response
-    
+    """Ask cybersecurity questions. Real RAG: retrieves the most relevant module
+    content (knowledge articles, threat library, controls) and asks the LLM,
+    grounded in that context. Falls back to deterministic canned answers when no
+    LLM is available (is_mock=true in the response)."""
     start_time = datetime.utcnow()
-    
-    # Simulate RAG processing
-    await asyncio.sleep(0.3)
-    
-    # Mock response based on question
-    if "phishing" in request.question.lower():
-        answer = "Phishing is a social engineering attack that uses deceptive emails or websites to steal sensitive information. Key prevention measures include user training, email filtering, and multi-factor authentication."
-        sources = ["NIST Cybersecurity Framework", "OWASP Top 10"]
-    elif "vulnerability" in request.question.lower():
-        answer = "Vulnerabilities are weaknesses in systems that can be exploited by attackers. Regular vulnerability scanning, patch management, and secure coding practices are essential for mitigation."
-        sources = ["CVE Database", "NIST Guidelines"]
-    else:
-        answer = "This is a general cybersecurity question. Please refer to established frameworks like NIST CSF, ISO 27001, or OWASP for comprehensive guidance."
-        sources = ["Cybersecurity Best Practices"]
-    
-    processing_time = (datetime.utcnow() - start_time).total_seconds()
-    
+
+    context, sources = _retrieve_cyber_context(request.question)
+    if request.context:
+        context = (context + "\n\n[User-provided context]\n" + request.context).strip()
+
+    if ask_ai_unified is not None and context:
+        prompt = (
+            "You are the Cybersecurity assistant of the WLWAI platform. Answer the "
+            "user's security question clearly and practically, grounded in the "
+            "CONTEXT below (the platform's own threat library, controls and "
+            "knowledge base). Cite frameworks (NIST CSF, ISO 27001, CIS, OWASP) "
+            "where relevant. If the context does not cover the question, say so "
+            f"and give established best-practice guidance. Max {request.max_paragraphs} short paragraphs.\n\n"
+            f"===== CONTEXT =====\n{context}\n===== END CONTEXT =====\n\n"
+            f"Question: {request.question}"
+        )
+        try:
+            raw = await ask_ai_unified(prompt=prompt, task_type="qa", complexity="medium", max_tokens=700)
+            if raw and raw.strip():
+                return CyberRAGResponse(
+                    answer=raw.strip(),
+                    sources=sources or ["WLWAI Cybersecurity knowledge base"],
+                    confidence=0.9,
+                    processing_time=(datetime.utcnow() - start_time).total_seconds(),
+                    is_mock=False,
+                )
+        except Exception as e:
+            logger.warning("Cyber RAG LLM call failed, using fallback: %s", e)
+
+    answer, fb_sources = _canned_rag_answer(request.question)
     return CyberRAGResponse(
         answer=answer,
-        sources=sources,
+        sources=fb_sources,
         confidence=0.85,
-        processing_time=processing_time
+        processing_time=(datetime.utcnow() - start_time).total_seconds(),
+        is_mock=True,
     )
 
 @router.post("/coach/lesson", response_model=SecureCodingLessonResponse)
@@ -1016,6 +1077,9 @@ def _get_drill_steps(scenario_id: str) -> List[DrillStep]:
     ]
 
 _DRILL_SESSIONS: Dict[str, DrillSession] = {}
+# Cap the in-memory session store: without it, spamming /drills/start grows the
+# dict without bound (memory DoS). Oldest sessions are evicted first.
+_DRILL_SESSIONS_MAX = 500
 
 
 @router.get("/drills/scenarios", response_model=List[DrillScenario])
@@ -1045,6 +1109,10 @@ async def start_drill(scenario_id: str):
         total_steps=len(steps),
         max_score=len(steps),
     )
+    if len(_DRILL_SESSIONS) >= _DRILL_SESSIONS_MAX:
+        # Evict oldest sessions (insertion order) to stay bounded.
+        for old_key in list(_DRILL_SESSIONS.keys())[: len(_DRILL_SESSIONS) - _DRILL_SESSIONS_MAX + 1]:
+            _DRILL_SESSIONS.pop(old_key, None)
     _DRILL_SESSIONS[session_id] = session
 
     # Return session + first step

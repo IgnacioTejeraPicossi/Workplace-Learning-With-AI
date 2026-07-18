@@ -225,9 +225,22 @@ The Security Center is the platform-level security and privacy module. Fully fro
 
 The Cybersecurity module is the largest Enterprise Agent, with its own dedicated section due to scope.
 
-**Backend**: `backend/routers/cybersecurity.py` (1499 lines), `backend/routers/agent_security.py` (785 lines)
-**Models**: `backend/models/cyber_models.py` (13 models + enums)
+**Backend**: `backend/routers/cybersecurity.py` (~1560 lines), `backend/routers/agent_security.py` (836 lines)
+**Models**: `backend/models/cyber_models.py` (13 models + enums; validated `ComplianceUpdateRequest.status` Literal, bounded RAG request)
 **Frontend**: `frontend/src/cyber/` (11 components)
+**Tests**: `backend/tests/test_cyber_api_contracts.py` — 14/14, fully offline (module is in-memory), included in CI.
+
+**Security / quality (2026-07 audit):**
+- `/rag/ask` is now **real RAG**: keyword retrieval over the module's own KB
+  articles + threat library + controls, answered by the LLM (`ask_ai_unified`);
+  deterministic canned fallback with `is_mock: true` when no LLM is available.
+- Scan commands use fixed argv (no user input in commands — verified); scan
+  error messages to clients are generic (details go to the logger).
+- Compliance status updates validated (`Literal`); invalid values → 422 instead
+  of silently corrupting summary counters.
+- Drill sessions capped at 500 in memory (oldest evicted) — unbounded before.
+- Known limitation: compliance status + drill history are **in-memory** (reset
+  on backend restart/reload). Mongo persistence is a possible follow-up.
 
 **10 Sub-tabs (all implemented):**
 
@@ -242,7 +255,7 @@ The Cybersecurity module is the largest Enterprise Agent, with its own dedicated
 | Secure Coding Coach | `SecureCodingCoach.jsx` | `/coach/topics`, `/coach/lesson/topic/{id}` | 10 topics, lesson generator with markdown, history |
 | Compliance Tracker | `ComplianceTracker.jsx` | `/compliance/*` | 22 controls, inline edit, progress per framework |
 | Incident Drills | `IncidentDrills.jsx` | `/drills/*` | 6 scenarios, step-by-step with feedback, scoring |
-| Knowledge Base | `KnowledgeBase.jsx` | `/knowledge/*`, `/rag/ask` | 8 articles, reader, AI Q&A |
+| Knowledge Base | `KnowledgeBase.jsx` | `/knowledge/*`, `/rag/ask` | 8 articles, reader, AI Q&A (real RAG over module content, `is_mock` fallback) |
 
 **Key API endpoints (`/api/cyber/`):**
 

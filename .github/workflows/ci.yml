@@ -48,7 +48,8 @@ jobs:
           python -m pytest -q \
             backend/tests/test_voice_examples.py \
             backend/tests/test_language_agents_contracts.py \
-            backend/tests/test_mcp_smoke.py
+            backend/tests/test_mcp_smoke.py \
+            backend/tests/test_cyber_api_contracts.py
 
   frontend:
     name: Frontend (install + build)

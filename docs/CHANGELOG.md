@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.24.0] - 2026-07-18
+
+### Fixed / Added — Cybersecurity module full audit + real RAG
+
+Full audit of the Cybersecurity module (backend `cybersecurity.py` +
+`agent_security.py` + `cyber_models.py`, 11 frontend components). Baseline: all
+20 GET endpoints respond 200; scan subprocess calls use **fixed argv** (no user
+input reaches commands — verified). The module had **zero tests** and a fake
+RAG; both fixed.
+
+**Upgrade — `/api/cyber/rag/ask` is now real RAG.** It previously returned three
+canned answers while claiming to be RAG. Now it does keyword retrieval over the
+module's own content (8 KB articles + threat library + 22 controls), asks the
+real LLM (`ask_ai_unified`) grounded in that context, and returns the retrieved
+source labels. Deterministic canned fallback (now flagged `is_mock: true` —
+additive response field) when no LLM is available. Verified live: ransomware
+question → grounded answer citing the module's Zero Trust / IR / Ransomware
+entries, `is_mock: false`.
+
+**Hardening / correctness:**
+- `ComplianceUpdateRequest.status` validated (`Literal`) — an arbitrary string
+  previously corrupted the compliance summary counters silently; now 422.
+  Evidence/reviewer length-bounded; RAG question bounded (1–4000 chars).
+- Drill sessions capped at 500 in memory with oldest-first eviction (unbounded
+  growth / memory-DoS before).
+- Scan error messages to clients genericized (real errors already logged);
+  removed unused `shlex` import.
+
+**New: 14-test offline contract suite** `backend/tests/test_cyber_api_contracts.py`
+(health, threats+404, controls, KB, risk-score bounds, compliance
+status/summary consistency + PUT valid/422/404 with seed restore, scan
+unknown-type, RAG offline-fallback contract + 422 empty question, full drill
+flow, coach topics, agent-security). The module is in-memory (no Mongo), so the
+suite is CI-safe — **added to the CI pytest step** (now 70 offline tests) and to
+`docs/TESTING.md` (Cybersecurity gate: health curl → 14/14 contract tests).
+
+**Known limitation (flagged, not changed):** compliance status and drill history
+live in memory and reset on backend restart; Mongo persistence is a candidate
+follow-up. `.claude/MODULES_REFERENCE.md` Cybersecurity section updated.
+
+---
+
 ## [1.23.0] - 2026-07-17
 
 ### Fixed / Security — Robomind Clinic full module audit
