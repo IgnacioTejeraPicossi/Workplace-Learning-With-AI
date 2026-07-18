@@ -116,3 +116,15 @@ homo_vs_ai_feedback_log_collection = database.get_collection("homo_vs_ai_feedbac
 qa_security_scans_collection = database.get_collection("qa_security_scans")
 qa_security_findings_collection = database.get_collection("qa_security_findings")
 qa_security_dpia_collection = database.get_collection("qa_security_dpia")
+
+# Cybersecurity module (1.24.1) — persistence for the two in-memory stores that
+# previously reset on every backend restart/hot-reload:
+#   • cyber_compliance_status — one doc per control override; `_id` =
+#     "{framework}:{control_id}" for upsert. The 22-control seed stays in code;
+#     Mongo only stores user edits, merged over the seed on first access.
+#   • cyber_drill_history    — one doc per COMPLETED drill session (`_id` =
+#     session id). Active sessions remain in memory (they are transient).
+# All access is best-effort with short timeouts: with Mongo down the module
+# still works fully from the in-memory seed (CI-safe).
+cyber_compliance_collection = database.get_collection("cyber_compliance_status")
+cyber_drill_history_collection = database.get_collection("cyber_drill_history")

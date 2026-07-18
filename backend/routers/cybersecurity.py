@@ -29,6 +29,38 @@ try:
 except ImportError:  # pragma: no cover
     ask_ai_unified = None  # type: ignore
 
+# Mongo persistence for compliance edits + completed drill history (1.24.1).
+# Best-effort: with Mongo down everything still works from the in-memory seed.
+try:
+    from backend.db import cyber_compliance_collection, cyber_drill_history_collection
+except ImportError:  # pragma: no cover
+    cyber_compliance_collection = None  # type: ignore
+    cyber_drill_history_collection = None  # type: ignore
+
+_MONGO_TIMEOUT_S = 3.0
+# Circuit breaker: after the first failed Mongo call we stop trying for the
+# process lifetime, so an offline environment (e.g. CI) pays the timeout once.
+_mongo_available = True
+
+
+async def _mongo_call(fn):
+    """Run a zero-arg callable returning a Mongo coroutine, with a short timeout;
+    trip the breaker on failure. Returns (ok, result).
+
+    Takes a CALLABLE (not a coroutine) on purpose: motor operations can raise
+    synchronously at creation time (e.g. "Event loop is closed" when the shared
+    client is bound to a previous test's loop), so the object must be built
+    inside this try block, after the breaker check."""
+    global _mongo_available
+    if not _mongo_available:
+        return False, None
+    try:
+        return True, await asyncio.wait_for(fn(), timeout=_MONGO_TIMEOUT_S)
+    except Exception as e:
+        _mongo_available = False
+        logger.warning("Cyber persistence unavailable (%s) — continuing in-memory", e)
+        return False, None
+
 router = APIRouter(prefix="/api/cyber", tags=["Cybersecurity"])
 
 # Mock data for initial implementation
@@ -629,10 +661,38 @@ def _init_compliance():
 
 _init_compliance()
 
+# Lazily merge persisted user edits over the code seed, once per process.
+_compliance_hydrated = False
+
+
+async def _hydrate_compliance():
+    """Merge Mongo-stored compliance edits over the in-memory seed (once)."""
+    global _compliance_hydrated
+    if _compliance_hydrated or cyber_compliance_collection is None:
+        return
+    _compliance_hydrated = True  # try once; breaker handles Mongo-down
+    ok, docs = await _mongo_call(lambda: cyber_compliance_collection.find({}).to_list(length=500))
+    if not ok or not docs:
+        return
+    for d in docs:
+        key = d.get("_id")
+        existing = _COMPLIANCE_STATUS.get(key)
+        if not existing:
+            continue  # ignore docs for controls no longer in the seed
+        existing.status = d.get("status", existing.status)
+        if d.get("evidence") is not None:
+            existing.evidence = d["evidence"]
+        if d.get("reviewer") is not None:
+            existing.reviewer = d["reviewer"]
+        if d.get("last_reviewed") is not None:
+            existing.last_reviewed = d["last_reviewed"]
+    logger.info("Compliance: merged %d persisted edits over seed", len(docs))
+
 
 @router.get("/compliance/status", response_model=List[ComplianceStatus])
 async def get_compliance_status(framework: Optional[str] = None):
     """Get compliance status for all controls, optionally filtered by framework."""
+    await _hydrate_compliance()
     statuses = list(_COMPLIANCE_STATUS.values())
     if framework:
         statuses = [s for s in statuses if s.framework == framework]
@@ -641,7 +701,9 @@ async def get_compliance_status(framework: Optional[str] = None):
 
 @router.put("/compliance/{framework}/{control_id}")
 async def update_compliance_status(framework: str, control_id: str, request: ComplianceUpdateRequest):
-    """Update the compliance status for a specific control."""
+    """Update the compliance status for a specific control. Persisted to Mongo
+    (best-effort) so edits survive backend restarts."""
+    await _hydrate_compliance()
     key = f"{framework}:{control_id}"
     existing = _COMPLIANCE_STATUS.get(key)
     if not existing:
@@ -652,12 +714,26 @@ async def update_compliance_status(framework: str, control_id: str, request: Com
     if request.reviewer is not None:
         existing.reviewer = request.reviewer
     existing.last_reviewed = datetime.utcnow()
+    if cyber_compliance_collection is not None:
+        await _mongo_call(lambda: cyber_compliance_collection.update_one(
+            {"_id": key},
+            {"$set": {
+                "framework": existing.framework,
+                "control_id": existing.control_id,
+                "status": existing.status,
+                "evidence": existing.evidence,
+                "reviewer": existing.reviewer,
+                "last_reviewed": existing.last_reviewed,
+            }},
+            upsert=True,
+        ))
     return existing
 
 
 @router.get("/compliance/summary")
 async def get_compliance_summary():
     """Get compliance summary with counts per framework and overall percentages."""
+    await _hydrate_compliance()
     by_framework: Dict[str, Dict[str, int]] = {}
     for s in _COMPLIANCE_STATUS.values():
         fw = s.framework
@@ -1160,6 +1236,13 @@ async def submit_drill_action(session_id: str, chosen_option: str):
 
     if session.current_step >= len(steps):
         session.completed = True
+        # Persist the finished session so drill history survives restarts.
+        if cyber_drill_history_collection is not None:
+            doc = session.dict()
+            doc["_id"] = session.id
+            await _mongo_call(lambda: cyber_drill_history_collection.replace_one(
+                {"_id": session.id}, doc, upsert=True,
+            ))
 
     next_step = steps[session.current_step].dict() if session.current_step < len(steps) else None
 
@@ -1176,9 +1259,28 @@ async def submit_drill_action(session_id: str, chosen_option: str):
 
 @router.get("/drills/history/list")
 async def get_drill_history(limit: int = 20):
-    """Get completed drill sessions."""
-    completed = [s.dict() for s in _DRILL_SESSIONS.values() if s.completed]
-    return sorted(completed, key=lambda s: s["started_at"], reverse=True)[:limit]
+    """Get completed drill sessions (persisted history + current process)."""
+    limit = max(1, min(limit, 100))
+    by_id: Dict[str, Dict] = {}
+    # Persisted history first (survives restarts)
+    if cyber_drill_history_collection is not None:
+        ok, docs = await _mongo_call(
+            lambda: cyber_drill_history_collection.find({}).sort("started_at", -1).to_list(length=limit)
+        )
+        if ok and docs:
+            for d in docs:
+                d.pop("_id", None)
+                by_id[d.get("id", str(len(by_id)))] = d
+    # Merge in-memory completed sessions (covers Mongo-down and this process)
+    for s in _DRILL_SESSIONS.values():
+        if s.completed:
+            by_id[s.id] = s.dict()
+    completed = list(by_id.values())
+    # Normalize started_at for a uniform sort (datetime vs isoformat string)
+    def _key(d):
+        v = d.get("started_at")
+        return v.isoformat() if hasattr(v, "isoformat") else str(v or "")
+    return sorted(completed, key=_key, reverse=True)[:limit]
 
 
 ## ──────────────────────────────────────────────

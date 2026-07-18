@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.24.1] - 2026-07-18
+
+### Added — Cybersecurity: Mongo persistence for compliance edits + drill history
+
+Follow-up to the [1.24.0] audit, closing its flagged limitation: compliance
+status edits and completed incident drills previously lived only in memory and
+reset on every backend restart/hot-reload.
+
+- **New collections** (`backend/db.py`): `cyber_compliance_status` (one doc per
+  edited control, `_id` = "framework:control_id") and `cyber_drill_history`
+  (one doc per completed session). The 22-control seed stays in code; Mongo
+  stores only user edits, merged over the seed on first access.
+- **Best-effort by design** (`cybersecurity.py`): all Mongo access goes through
+  `_mongo_call()` — 3 s timeout + a process-lifetime circuit breaker. With Mongo
+  down the module runs fully from the in-memory seed, so the offline CI suite is
+  unaffected (verified: 14/14 and the 4 CI suites 70/70 with Mongo unreachable).
+- **Motor gotcha fixed during implementation**: `_mongo_call` takes a *lambda*,
+  not a coroutine — motor operations can raise "Event loop is closed"
+  synchronously at creation time when the shared client is bound to a previous
+  pytest loop, so the operation must be built inside the guarded try block.
+- **Verified end-to-end live**: PUT CIS/4.1 → doc in Mongo → forced backend
+  restart → edit **survives** (status/evidence intact) → seed restored. Full
+  drill completed (4/4) → history doc in Mongo → `/drills/history/list` merges
+  persisted + in-process sessions with normalized sort.
+
+`.claude/MODULES_REFERENCE.md` Cybersecurity section updated (limitation →
+persistence notes).
+
+---
+
 ## [1.24.0] - 2026-07-18
 
 ### Fixed / Added — Cybersecurity module full audit + real RAG

@@ -239,8 +239,14 @@ The Cybersecurity module is the largest Enterprise Agent, with its own dedicated
 - Compliance status updates validated (`Literal`); invalid values → 422 instead
   of silently corrupting summary counters.
 - Drill sessions capped at 500 in memory (oldest evicted) — unbounded before.
-- Known limitation: compliance status + drill history are **in-memory** (reset
-  on backend restart/reload). Mongo persistence is a possible follow-up.
+- **Persistence (1.24.1)**: compliance edits and completed drill sessions are
+  persisted to Mongo (`cyber_compliance_status`, `cyber_drill_history`) and
+  survive backend restarts/hot-reloads. Best-effort with a 3 s timeout and a
+  process-lifetime circuit breaker: with Mongo down the module runs fully from
+  the in-memory seed (CI-safe). The 22-control seed lives in code; Mongo stores
+  only user edits, merged over the seed on first access. NOTE: motor operations
+  must be built INSIDE `_mongo_call` (pass a lambda) — creating them outside can
+  raise "Event loop is closed" synchronously under pytest's per-test loops.
 
 **10 Sub-tabs (all implemented):**
 
