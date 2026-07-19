@@ -109,6 +109,7 @@ curl http://localhost:8000/api/j-messages/list
 | MCP | 4/4 smoke tests | `python -m pytest backend/tests/test_mcp_smoke.py -v` |
 | Security Center | Frontend build + i18n parity | `cd frontend && npx react-scripts build` |
 | Cybersecurity | 14/14 contract tests | `python -m pytest backend/tests/test_cyber_api_contracts.py -v` |
+| Self-Correcting Loop | 4/4 contract tests (offline fallback) | `python -m pytest backend/tests/test_self_correcting_loop_contracts.py -v` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
 
@@ -119,7 +120,7 @@ dispatch: `.github/workflows/ci.yml`.
 
 | Job | What it validates |
 |-----|-------------------|
-| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (70 tests) |
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (74 tests) |
 | `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
 
 The `backend` test step runs only the suites verified to pass with **no**
@@ -130,7 +131,8 @@ python -m pytest \
   backend/tests/test_voice_examples.py \
   backend/tests/test_language_agents_contracts.py \
   backend/tests/test_mcp_smoke.py \
-  backend/tests/test_cyber_api_contracts.py
+  backend/tests/test_cyber_api_contracts.py \
+  backend/tests/test_self_correcting_loop_contracts.py
 ```
 
 `MONGO_URI` is set to an unreachable host with a short `serverSelectionTimeoutMS`

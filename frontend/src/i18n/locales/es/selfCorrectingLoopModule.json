@@ -131,7 +131,16 @@
       "c3": "Añade la condición de parada como lógica real y dura desde la primerísima versión.",
       "c4": "Ejecuta las cuatro pruebas de estrés antes de confiarle nada que importe.",
       "c5": "Solo cuando corra sin vigilancia y pare limpio, construye el segundo bucle.",
-      "disclaimer": "Estos son andamiajes iniciales, no prompts terminados. La verdad de referencia del Juez y las cifras de parada te toca definirlas para la tarea específica."
+      "disclaimer": "Estos son andamiajes iniciales, no prompts terminados. La verdad de referencia del Juez y las cifras de parada te toca definirlas para la tarea específica.",
+      "customizeTitle": "Personalizar con IA",
+      "customizeLead": "Describe tu tarea específica y deja que el modelo adapte el andamiaje Constructor / Juez / Gestor y las condiciones de parada a ella.",
+      "taskPlaceholder": "p. ej. Convertir la transcripción de un ticket de soporte en un informe de error de 200 palabras que siga nuestra plantilla…",
+      "customizeBtn": "Personalizar con IA",
+      "customizing": "Adaptando tu bucle…",
+      "customizeError": "No se pudo contactar con el modelo. Se muestra un andamiaje genérico que aún puedes adaptar.",
+      "aiBadge": "Adaptado por IA",
+      "mockBadge": "Alternativa genérica",
+      "resultTitle": "Tu bucle adaptado"
     }
   }
 }

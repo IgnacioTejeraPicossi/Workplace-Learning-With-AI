@@ -246,6 +246,13 @@ try:
 except Exception as e:
     print(f"❌ Error including Claim Analyzer router: {e}")
 
+try:
+    from backend.routers.self_correcting_loop import router as self_correcting_loop_router
+    app.include_router(self_correcting_loop_router, tags=["Self-Correcting Loop"])
+    print("✅ Self-Correcting Loop router included successfully")
+except Exception as e:
+    print(f"❌ Error including Self-Correcting Loop router: {e}")
+
 # English Mastery AI router (Language Agents group)
 try:
     from backend.routers.english_mentor import router as english_mentor_router

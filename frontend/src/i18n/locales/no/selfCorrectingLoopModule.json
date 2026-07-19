@@ -131,7 +131,16 @@
       "c3": "Legg til stoppbetingelsen som ekte, hard logikk fra aller første versjon.",
       "c4": "Kjør de fire stresstestene før du stoler på den med noe som betyr noe.",
       "c5": "Først når den kjører ubevoktet og stopper rent, bygg den andre løkken.",
-      "disclaimer": "Dette er start-stillas, ikke ferdige ledetekster. Dommerens fasit og stopptallene er dine å definere for den spesifikke oppgaven."
+      "disclaimer": "Dette er start-stillas, ikke ferdige ledetekster. Dommerens fasit og stopptallene er dine å definere for den spesifikke oppgaven.",
+      "customizeTitle": "Tilpass med KI",
+      "customizeLead": "Beskriv din spesifikke oppgave og la modellen skreddersy Bygger- / Dommer- / Leder-stillaset og stoppbetingelsene til den.",
+      "taskPlaceholder": "f.eks. Gjør et support-sak-transkript om til en 200-ords feilrapport som følger malen vår…",
+      "customizeBtn": "Tilpass med KI",
+      "customizing": "Skreddersyr løkken din…",
+      "customizeError": "Fikk ikke kontakt med modellen. Viser et generisk stillas du fortsatt kan tilpasse.",
+      "aiBadge": "KI-tilpasset",
+      "mockBadge": "Generisk reserve",
+      "resultTitle": "Din skreddersydde løkke"
     }
   }
 }

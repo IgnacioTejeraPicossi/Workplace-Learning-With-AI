@@ -131,7 +131,16 @@
       "c3": "Add the stop condition as real, hard logic from the very first version.",
       "c4": "Run the four stress tests before trusting it with anything that matters.",
       "c5": "Only once it runs unattended and stops cleanly, build the second loop.",
-      "disclaimer": "These are starting scaffolds, not finished prompts. The Judge's ground truth and the stop numbers are yours to define for the specific task."
+      "disclaimer": "These are starting scaffolds, not finished prompts. The Judge's ground truth and the stop numbers are yours to define for the specific task.",
+      "customizeTitle": "Customize with AI",
+      "customizeLead": "Describe your specific task and let the model tailor the Builder / Judge / Manager scaffold and stop conditions to it.",
+      "taskPlaceholder": "e.g. Turn a support-ticket transcript into a 200-word bug report that matches our template…",
+      "customizeBtn": "Customize with AI",
+      "customizing": "Tailoring your loop…",
+      "customizeError": "Couldn't reach the model. Showing a generic scaffold you can still adapt.",
+      "aiBadge": "AI-tailored",
+      "mockBadge": "Generic fallback",
+      "resultTitle": "Your tailored loop"
     }
   }
 }

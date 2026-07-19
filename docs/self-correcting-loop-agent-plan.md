@@ -60,11 +60,22 @@ Sidebar label `sidebar.selfCorrectingLoop` in `common.json` ×3.
 - **No backend / CI-safe**: entirely client-side (the Loop Builder uses only the
   browser clipboard API), so nothing to test server-side and no CI impact.
 
-## Possible V1+ (not built)
+## V1 (shipped 1.26.1) — "Customize with AI"
 
-- An **LLM "customize for my task"** button in the Loop Builder that turns the
-  generic scaffold into a task-specific one via `ask_ai_unified` (with the
-  current deterministic templates as the offline fallback).
+The Loop Builder can now tailor the scaffold to a specific task:
+- Backend `services/self_correcting_loop.py` + `routers/self_correcting_loop.py`
+  → `POST /api/self-correcting-loop/customize` (task_type, task_description, lang).
+- `ask_ai_unified` with JSON output; deterministic fallback injects the user's
+  task into a generic scaffold (`is_mock: true`) when no LLM. System prompt steers
+  the Judge to the correct ground truth per task type; stop block forced to hard
+  logic.
+- Frontend: task textarea + "Customize with AI" button + result panel with
+  AI-tailored / Generic-fallback badge; degrades to the local generic scaffold if
+  the backend is unreachable.
+- 4 offline contract tests, added to CI (now 5 files / 74 tests).
+
+## Possible V2+ (not built)
+
 - A **saved loops** library (Mongo), same best-effort pattern as the Cybersecurity
   persistence (1.24.1).
 - A **live demo**: run a toy Builder/Judge/Manager loop against a sample task in

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.26.1] - 2026-07-19
+
+### Added — Self-Correcting Loop: "Customize with AI" in the Loop Builder
+
+The Loop Builder tab gains its first backend-powered feature: describe your
+specific task and the model tailors the Builder / Judge / Manager scaffold and
+stop conditions to it (the V1 idea flagged in the 1.26.0 plan).
+
+- **Backend**: `backend/services/self_correcting_loop.py` (`customize_loop`) via
+  `ask_ai_unified` with JSON structured output, plus a **deterministic fallback**
+  that injects the user's task into a generic scaffold when no LLM is available
+  (flagged `is_mock: true`). The system prompt steers the Judge toward the right
+  **ground truth per task type** (writing → source+brief, code → test suite/lint/
+  build, research → source docs) and forces the stop block to be hard logic.
+  Router `backend/routers/self_correcting_loop.py` (`POST /api/self-correcting-loop/customize`
+  + `/health`), registered in `app.py`.
+- **Frontend**: `LoopBuilder.jsx` gains a task-description textarea + "Customize
+  with AI" button + a tailored-result panel with copy buttons and an
+  `AI-tailored` / `Generic fallback` badge. If the backend is unreachable it
+  degrades to the local generic scaffold. New i18n keys (9 × EN/NO/ES) — namespace
+  now 132 keys at parity.
+- **Tests**: `backend/tests/test_self_correcting_loop_contracts.py` — 4 offline
+  tests (health, fallback contract + task injection, ground-truth-varies-by-type,
+  422 validation), LLM patched to None. **Added to the CI suite** (now 5 files /
+  74 offline tests). Verified live: real endpoint returns `is_mock: false` with a
+  task-specific scaffold.
+
+`docs/self-correcting-loop-agent-plan.md` updated (V1 item shipped).
+
+---
+
 ## [1.26.0] - 2026-07-19
 
 ### Added — New agent: "Self-Correcting AI Loop" (Builder / Judge / Manager)
