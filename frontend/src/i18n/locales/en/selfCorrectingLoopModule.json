@@ -1,0 +1,137 @@
+{
+  "selfCorrectingLoop": {
+    "statusBadge": "V0 · Reference + Loop Builder",
+    "moduleTitle": "Self-Correcting AI Loop",
+    "moduleSubtitle": "Build a system that catches its own mistakes before you see them — generate, review, test, and revise automatically.",
+    "hintStrip": "A practical architecture for AI quality control: separate producing an answer from judging it, give the judge real ground truth, and stop on hard logic — not hope.",
+    "sourceNote": "Adapted and paraphrased from “How to Build a Self-Correcting AI Loop That Catches Its Own Mistakes” by @cyrilXBT (X). Concepts summarized for learning; original wording not reproduced.",
+    "tabs": {
+      "overview": "Overview",
+      "roles": "The Three Roles",
+      "handoffs": "Handoffs & Stops",
+      "examples": "Worked Examples",
+      "testScale": "Test & Scale",
+      "builder": "Loop Builder"
+    },
+    "overview": {
+      "title": "Stop being the verification layer",
+      "lead": "There is a moment that separates using AI casually from running it as a system: the moment you stop being the one who catches the mistake.",
+      "shiftTitle": "The shift",
+      "shiftFrom": "You ask → read → notice something wrong → point it out → get a fix → notice something else → point it out again. You are the verification layer, manually, every single time.",
+      "shiftTo": "The system generates, checks its own work against a real standard, fixes what it got wrong, and only then shows you the result. What is left for you is judgment, not proofreading a machine's first draft.",
+      "defaultLoopTitle": "The default loop",
+      "defaultLoopText": "For most people the human is the verification step on every task — slow, tiring, and easy to skip when you are busy.",
+      "selfLoopTitle": "The self-correcting loop",
+      "selfLoopText": "By the time you see the output, the obvious mistakes have already been caught and handled. You spend attention only on what genuinely needs a human.",
+      "notTwiceTitle": "Why this isn't just “asking twice”",
+      "notTwiceText": "A model reviewing its own output in the same context — with the same reasoning that produced the mistake — tends to defend its work rather than scrutinize it. Asking “are you sure?” produces reassurance more often than re-examination. The fix is not asking better; it is architecture: separate producing an answer from judging it, using a different pass, a different prompt, and ideally a different frame of reference.",
+      "keyIdeaTitle": "The one principle to carry",
+      "keyIdeaText": "Verification must reference something outside the producer's own reasoning — a test suite, a source document, a written checklist, or a genuinely different model. Not “the same model, asked again, in the same breath.”"
+    },
+    "roles": {
+      "title": "The three roles every loop needs",
+      "lead": "Every working self-correcting system reduces to three distinct roles. Get these right and you can build a loop for almost any task by filling in the specifics.",
+      "builder": {
+        "name": "The Builder",
+        "role": "Produces the actual output",
+        "detail": "Writes the code, drafts the content, does the research. Give it the most creative latitude and the least constraint — its job is a first attempt, not a perfect one."
+      },
+      "judge": {
+        "name": "The Judge",
+        "role": "Evaluates against a written standard",
+        "detail": "Builds nothing. Checks the Builder's output against a specific, written standard — not a vague sense of quality. It should have access to something the Builder does not (the source, the test suite, the requirements) so it has independent ground truth."
+      },
+      "manager": {
+        "name": "The Manager",
+        "role": "Decides what happens next",
+        "detail": "Reads the Judge's verdict and routes: send back to the Builder with specific feedback, escalate to a human, or mark complete. This is also where the stop condition lives — the rule that prevents the loop from running forever."
+      },
+      "principleTitle": "The critical design principle",
+      "principleText": "Verification needs to reference something outside the Builder's own reasoning. A test suite, a source document, a checklist, or a second AI call with a genuinely different framing — anything that is not simply the same model asked again."
+    },
+    "handoffs": {
+      "title": "Handoffs & stop conditions",
+      "lead": "The real engineering isn't clever prompts — it's the structure of what passes between the roles. Most first loops skip this and then behave unpredictably.",
+      "propsTitle": "A handoff needs three properties",
+      "prop1": "A defined format — the receiving role isn't parsing loose prose and guessing what matters.",
+      "prop2": "A defined trigger — the Builder isn't the one deciding when it's finished.",
+      "prop3": "A defined failure path — when something doesn't go cleanly, there's a specified next step instead of silent breakage or an infinite loop.",
+      "templateTitle": "A handoff template that works across tasks",
+      "templateNote": "Structured output, not conversational text. This upfront cost is what makes the system behave the same on the hundredth run as the first.",
+      "groundTruthTitle": "The Judge needs ground truth, not an opinion",
+      "groundTruthLead": "A Judge that only sees the Builder's output can evaluate internal consistency — never correctness. A confidently wrong, well-formatted answer sails straight past it.",
+      "gtCode": "Code → the test suite, the actual run output, lint results, build status. Not “does this look right,” but “did it pass when executed.”",
+      "gtContent": "Content → the original source and the brief, side by side with the draft. Not “does this read well,” but “does every claim trace back to the source, and does it satisfy every requirement.”",
+      "gtResearch": "Research → the actual search results and source documents. Not “does this sound authoritative,” but “can every claim be traced to a specific source.”",
+      "gtWarn": "If you can't name the Judge's ground truth for your task, you don't have a self-correcting loop — you have a rephrasing loop, where a confident mistake gets confidently rephrased.",
+      "stopTitle": "The stop condition is not optional",
+      "stopLead": "Without an explicit hard stop, a Builder and Judge can cycle indefinitely while cost climbs. A real stop condition has three parts — all enforced as logic, not left to the model.",
+      "stop1": "A maximum iteration count — a hard ceiling on revision cycles, after which the Manager must escalate to a human.",
+      "stop2": "A measurable quality threshold — “all 11 tests pass,” not “good enough” (which is a suggestion the model can talk itself past).",
+      "stop3": "A cost or time ceiling — an absolute budget the task cannot exceed, whatever state it's in when the ceiling hits.",
+      "stopWarn": "Write these into the Manager's actual logic, not as a soft instruction inside a longer prompt."
+    },
+    "examples": {
+      "title": "Two worked examples",
+      "lead": "The same skeleton looks different across domains but follows identical logic. Seeing both side by side shows how little actually changes.",
+      "contentTitle": "Self-correcting content production",
+      "contentBuilder": "Builder: receives source + brief, produces a draft plus an explicit confidence statement and a list of anything it was unsure about.",
+      "contentJudge": "Judge: sees the draft and the source side by side. Checks, each with its own pass/fail — does every claim trace to the source? does it satisfy every brief requirement? is the core hook present and undiluted?",
+      "contentManager": "Manager: a clean pass ships it. A fact-check failure returns it with the specific unverified claim flagged. After 3 failed cycles on the same check, it escalates to a human with full history.",
+      "codeTitle": "Self-correcting code",
+      "codeBuilder": "Builder: a coding agent whose structured output includes the actual run — test results, lint, build status — not just the diff. Code that never executed isn't a finished Builder step.",
+      "codeJudge": "Judge: did it pass the existing tests without the tests being modified? is static analysis clean? does the diff address the assigned task, not a different one it found more interesting?",
+      "codeManager": "Manager: a failing test returns with the exact failing output attached. A scope mismatch escalates immediately — that's a judgment failure, not a mechanical defect the Builder can iterate out of.",
+      "skeletonTitle": "The shared skeleton",
+      "skeletonText": "Builder produces and submits with evidence → Judge checks against specific named criteria with a per-check verdict → Manager routes based on which check failed. Applying it to a new task is mostly writing a new checklist for the Judge — not redesigning the architecture."
+    },
+    "testScale": {
+      "title": "Test it before you trust it — then scale carefully",
+      "lead": "Most loops that fail in real use would have failed one of these tests immediately, if anyone had checked first.",
+      "testsTitle": "Four stress tests",
+      "t1Title": "The unsolvable task",
+      "t1Text": "Give the Builder a task it cannot complete to the Judge's standard, on purpose. Does the Manager hit the iteration ceiling and escalate — or spin forever, burning cost?",
+      "t2Title": "The confidently wrong",
+      "t2Text": "Feed the Judge an output you know is subtly wrong. Does its ground truth catch it? If it passes something you know is broken, the check is too shallow.",
+      "t3Title": "The same-model blind spot",
+      "t3Text": "If Builder and Judge share a model, feed the Judge the kind of mistake that model characteristically makes. If it waves it through, the roles share blind spots — use a different model or framing for the Judge.",
+      "t4Title": "The cost runaway",
+      "t4Text": "Calculate the worst-case path — max revisions, priciest calls, longest content. If that number would alarm you on an invoice, your stop conditions aren't tight enough.",
+      "mistakesTitle": "Common mistakes that quietly break a good design",
+      "m1": "Letting the Judge see only the Builder's output, with no independent reference — turns a correctness check into a coherence check.",
+      "m2": "Same model for every role with only a thin “be critical” instruction — it inherits the Builder's blind spots.",
+      "m3": "A Manager with no memory of prior attempts — it resends the same failed feedback and gets the same failed result.",
+      "m4": "Skipping the stress tests because the one watched demo worked — unattended behavior is a different claim.",
+      "m5": "Writing the stop condition as a soft instruction instead of hard logic the Manager checks mechanically.",
+      "scaleTitle": "Scaling to multiple loops",
+      "scaleText": "Once one loop is genuinely reliable, resist spinning up five at once. Each new loop is another place a stop condition can fail silently and cost can run away.",
+      "scale1": "Sequential expansion with a trust threshold — add a second loop only after you've stopped checking the first one's output closely.",
+      "scale2": "A shared cost dashboard across all loops — ten loops each within budget can still add up to an alarming total.",
+      "scale3": "Log every stop-condition trigger, not just successes — one loop hitting its ceiling constantly signals a miscalibrated Judge."
+    },
+    "builder": {
+      "title": "Loop Builder",
+      "lead": "Pick a task type to generate a starting Builder / Judge / Manager scaffold plus a hard stop condition. Copy it, then replace the bracketed parts with your specifics.",
+      "taskTypeLabel": "Task type",
+      "types": {
+        "writing": "Writing / content",
+        "code": "Code",
+        "research": "Research",
+        "custom": "Generic / custom"
+      },
+      "builderLabel": "Builder prompt",
+      "judgeLabel": "Judge checklist",
+      "managerLabel": "Manager rules",
+      "stopLabel": "Stop conditions",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "checklistTitle": "Where to start this week",
+      "c1": "Pick one specific, narrow task you already do regularly, with a standard you could write down.",
+      "c2": "Write the Judge's checklist first — before the Builder's prompt. The standard should shape what you ask for.",
+      "c3": "Add the stop condition as real, hard logic from the very first version.",
+      "c4": "Run the four stress tests before trusting it with anything that matters.",
+      "c5": "Only once it runs unattended and stops cleanly, build the second loop.",
+      "disclaimer": "These are starting scaffolds, not finished prompts. The Judge's ground truth and the stop numbers are yours to define for the specific task."
+    }
+  }
+}

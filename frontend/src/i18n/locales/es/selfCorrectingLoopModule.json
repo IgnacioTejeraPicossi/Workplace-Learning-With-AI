@@ -1,0 +1,137 @@
+{
+  "selfCorrectingLoop": {
+    "statusBadge": "V0 · Referencia + Constructor de bucles",
+    "moduleTitle": "Bucle de IA Autocorrectivo",
+    "moduleSubtitle": "Construye un sistema que detecta sus propios errores antes de que tú los veas — generar, revisar, probar y corregir automáticamente.",
+    "hintStrip": "Una arquitectura práctica de control de calidad de IA: separa producir una respuesta de juzgarla, dale al juez una verdad de referencia real, y detente con lógica dura — no con esperanza.",
+    "sourceNote": "Adaptado y parafraseado de «How to Build a Self-Correcting AI Loop That Catches Its Own Mistakes» de @cyrilXBT (X). Conceptos resumidos con fines de aprendizaje; no se reproduce la redacción original.",
+    "tabs": {
+      "overview": "Visión general",
+      "roles": "Los tres roles",
+      "handoffs": "Entregas y paradas",
+      "examples": "Ejemplos resueltos",
+      "testScale": "Probar y escalar",
+      "builder": "Constructor de bucles"
+    },
+    "overview": {
+      "title": "Deja de ser la capa de verificación",
+      "lead": "Hay un momento que separa usar la IA de forma casual de ejecutarla como un sistema: el momento en que dejas de ser quien detecta el error.",
+      "shiftTitle": "El cambio",
+      "shiftFrom": "Preguntas → lees → notas algo mal → lo señalas → obtienes una corrección → notas otra cosa → la señalas de nuevo. Eres la capa de verificación, manualmente, cada vez.",
+      "shiftTo": "El sistema genera, contrasta su propio trabajo con un estándar real, corrige lo que falló, y solo entonces te muestra el resultado. Lo que te queda es juicio, no corregir el primer borrador de una máquina.",
+      "defaultLoopTitle": "El bucle por defecto",
+      "defaultLoopText": "Para la mayoría, el humano es el paso de verificación en cada tarea — lento, agotador y fácil de saltarse cuando tienes prisa.",
+      "selfLoopTitle": "El bucle autocorrectivo",
+      "selfLoopText": "Para cuando ves el resultado, los errores obvios ya han sido detectados y resueltos. Dedicas atención solo a lo que realmente necesita un humano.",
+      "notTwiceTitle": "Por qué esto no es solo «preguntar dos veces»",
+      "notTwiceText": "Un modelo que revisa su propia salida en el mismo contexto — con el mismo razonamiento que produjo el error — tiende a defender su trabajo en lugar de escrutarlo. Preguntar «¿estás seguro?» produce tranquilidad más a menudo que reexamen. El arreglo no es preguntar mejor; es arquitectura: separa producir una respuesta de juzgarla, con otra pasada, otro prompt, e idealmente otro marco de referencia.",
+      "keyIdeaTitle": "El único principio que llevarte",
+      "keyIdeaText": "La verificación debe referirse a algo fuera del razonamiento del propio productor — un conjunto de pruebas, un documento fuente, una lista de comprobación escrita, o un modelo genuinamente distinto. No «el mismo modelo, preguntado de nuevo, en el mismo aliento»."
+    },
+    "roles": {
+      "title": "Los tres roles que todo bucle necesita",
+      "lead": "Todo sistema autocorrectivo que funciona se reduce a tres roles distintos. Aciértalos y podrás construir un bucle para casi cualquier tarea rellenando los detalles.",
+      "builder": {
+        "name": "El Constructor",
+        "role": "Produce el resultado real",
+        "detail": "Escribe el código, redacta el contenido, hace la investigación. Dale la mayor libertad creativa y la menor restricción — su trabajo es un primer intento, no uno perfecto."
+      },
+      "judge": {
+        "name": "El Juez",
+        "role": "Evalúa contra un estándar escrito",
+        "detail": "No construye nada. Contrasta la salida del Constructor con un estándar específico y escrito — no una noción vaga de calidad. Debe tener acceso a algo que el Constructor no tiene (la fuente, las pruebas, los requisitos) para disponer de verdad de referencia independiente."
+      },
+      "manager": {
+        "name": "El Gestor",
+        "role": "Decide qué pasa después",
+        "detail": "Lee el veredicto del Juez y encamina: devolver al Constructor con retroalimentación específica, escalar a un humano, o marcar como completo. Aquí también vive la condición de parada — la regla que impide que el bucle corra para siempre."
+      },
+      "principleTitle": "El principio de diseño crítico",
+      "principleText": "La verificación debe referirse a algo fuera del razonamiento del propio Constructor. Un conjunto de pruebas, un documento fuente, una lista de comprobación, o una segunda llamada de IA con un enfoque genuinamente distinto — cualquier cosa que no sea simplemente el mismo modelo preguntado de nuevo."
+    },
+    "handoffs": {
+      "title": "Entregas y condiciones de parada",
+      "lead": "La verdadera ingeniería no son prompts ingeniosos — es la estructura de lo que pasa entre los roles. La mayoría de los primeros bucles se saltan esto y luego se comportan de forma impredecible.",
+      "propsTitle": "Una entrega necesita tres propiedades",
+      "prop1": "Un formato definido — el rol receptor no analiza prosa suelta adivinando qué importa.",
+      "prop2": "Un disparador definido — el Constructor no es quien decide cuándo ha terminado.",
+      "prop3": "Una ruta de fallo definida — cuando algo no sale limpio, hay un siguiente paso especificado en vez de una rotura silenciosa o un bucle infinito.",
+      "templateTitle": "Una plantilla de entrega que sirve para varias tareas",
+      "templateNote": "Salida estructurada, no texto conversacional. Ese coste inicial es lo que hace que el sistema se comporte igual en la centésima ejecución que en la primera.",
+      "groundTruthTitle": "El Juez necesita verdad de referencia, no una opinión",
+      "groundTruthLead": "Un Juez que solo ve la salida del Constructor puede evaluar la consistencia interna — nunca la corrección. Una respuesta segura pero errónea, bien formateada, pasa de largo.",
+      "gtCode": "Código → el conjunto de pruebas, la salida real de la ejecución, el lint, el estado del build. No «¿esto se ve bien?», sino «¿pasó al ejecutarse?».",
+      "gtContent": "Contenido → la fuente original y el brief, junto al borrador. No «¿se lee bien?», sino «¿cada afirmación se rastrea a la fuente y cumple cada requisito?».",
+      "gtResearch": "Investigación → los resultados de búsqueda y los documentos fuente reales. No «¿suena autoritativo?», sino «¿cada afirmación se rastrea a una fuente específica?».",
+      "gtWarn": "Si no puedes nombrar la verdad de referencia del Juez para tu tarea, no tienes un bucle autocorrectivo — tienes un bucle de reformulación, donde un error seguro se reformula con seguridad.",
+      "stopTitle": "La condición de parada no es opcional",
+      "stopLead": "Sin una parada dura y explícita, un Constructor y un Juez pueden ciclar indefinidamente mientras el coste sube. Una condición de parada real tiene tres partes — todas impuestas como lógica, no dejadas al modelo.",
+      "stop1": "Un número máximo de iteraciones — un techo duro de ciclos de revisión, tras el cual el Gestor debe escalar a un humano.",
+      "stop2": "Un umbral de calidad medible — «pasan las 11 pruebas», no «suficientemente bueno» (que es una sugerencia que el modelo puede sortear).",
+      "stop3": "Un techo de coste o tiempo — un presupuesto absoluto que la tarea no puede exceder, sea cual sea su estado al alcanzarlo.",
+      "stopWarn": "Escribe esto en la lógica real del Gestor, no como una instrucción blanda dentro de un prompt más largo."
+    },
+    "examples": {
+      "title": "Dos ejemplos resueltos",
+      "lead": "El mismo esqueleto se ve distinto entre dominios pero sigue una lógica idéntica. Verlos juntos muestra lo poco que realmente cambia.",
+      "contentTitle": "Producción de contenido autocorrectiva",
+      "contentBuilder": "Constructor: recibe fuente + brief, produce un borrador más una declaración explícita de confianza y una lista de aquello de lo que no estaba seguro.",
+      "contentJudge": "Juez: ve el borrador y la fuente juntos. Comprueba, cada uno con su propio aprobado/fallo — ¿cada afirmación se rastrea a la fuente? ¿cumple cada requisito del brief? ¿está el mensaje central presente y sin diluir?",
+      "contentManager": "Gestor: un aprobado limpio lo publica. Un fallo de verificación lo devuelve con la afirmación no verificada específica marcada. Tras 3 ciclos fallidos en la misma comprobación, escala a un humano con el historial completo.",
+      "codeTitle": "Código autocorrectivo",
+      "codeBuilder": "Constructor: un agente de código cuya salida estructurada incluye la ejecución real — resultados de pruebas, lint, estado del build — no solo el diff. Código que nunca se ejecutó no es un paso de Constructor terminado.",
+      "codeJudge": "Juez: ¿pasó las pruebas existentes sin que se modificaran las pruebas? ¿está limpio el análisis estático? ¿aborda el diff la tarea asignada, no otra que le pareció más interesante?",
+      "codeManager": "Gestor: una prueba fallida vuelve con la salida de fallo exacta adjunta. Un desajuste de alcance escala de inmediato — es un fallo de juicio, no un defecto mecánico del que el Constructor pueda salir iterando.",
+      "skeletonTitle": "El esqueleto compartido",
+      "skeletonText": "El Constructor produce y entrega con evidencia → el Juez comprueba contra criterios nombrados específicos con un veredicto por comprobación → el Gestor encamina según qué comprobación falló. Aplicarlo a una nueva tarea es sobre todo escribir una nueva lista para el Juez — no rediseñar la arquitectura."
+    },
+    "testScale": {
+      "title": "Pruébalo antes de confiar en él — luego escala con cuidado",
+      "lead": "La mayoría de los bucles que fallan en uso real habrían fallado una de estas pruebas de inmediato, si alguien hubiera comprobado antes.",
+      "testsTitle": "Cuatro pruebas de estrés",
+      "t1Title": "La tarea irresoluble",
+      "t1Text": "Dale al Constructor una tarea que no pueda completar al estándar del Juez, a propósito. ¿Alcanza el Gestor el techo de iteraciones y escala — o gira para siempre quemando coste?",
+      "t2Title": "El seguro pero equivocado",
+      "t2Text": "Alimenta al Juez con una salida que sabes sutilmente errónea. ¿La detecta su verdad de referencia? Si aprueba algo que sabes roto, la comprobación es demasiado superficial.",
+      "t3Title": "El punto ciego compartido",
+      "t3Text": "Si Constructor y Juez comparten modelo, alimenta al Juez con el tipo de error que ese modelo comete característicamente. Si lo deja pasar, los roles comparten puntos ciegos — usa otro modelo o enfoque para el Juez.",
+      "t4Title": "El desbocamiento de coste",
+      "t4Text": "Calcula el peor camino — máximas revisiones, llamadas más caras, contenido más largo. Si esa cifra te alarmaría en una factura, tus condiciones de parada no son lo bastante estrictas.",
+      "mistakesTitle": "Errores comunes que rompen en silencio un buen diseño",
+      "m1": "Dejar que el Juez vea solo la salida del Constructor, sin referencia independiente — convierte una comprobación de corrección en una de coherencia.",
+      "m2": "El mismo modelo para cada rol con solo una fina instrucción de «sé crítico» — hereda los puntos ciegos del Constructor.",
+      "m3": "Un Gestor sin memoria de intentos previos — reenvía la misma retroalimentación fallida y obtiene el mismo resultado fallido.",
+      "m4": "Saltarse las pruebas de estrés porque la única demo vigilada funcionó — el comportamiento sin vigilancia es otra afirmación.",
+      "m5": "Escribir la condición de parada como instrucción blanda en vez de lógica dura que el Gestor comprueba mecánicamente.",
+      "scaleTitle": "Escalar a múltiples bucles",
+      "scaleText": "Una vez que un bucle es genuinamente fiable, resiste arrancar cinco a la vez. Cada bucle nuevo es otro lugar donde una condición de parada puede fallar en silencio y el coste desbocarse.",
+      "scale1": "Expansión secuencial con un umbral de confianza — añade un segundo bucle solo cuando hayas dejado de revisar de cerca la salida del primero.",
+      "scale2": "Un panel de coste compartido entre todos los bucles — diez bucles cada uno dentro de presupuesto pueden sumar un total alarmante.",
+      "scale3": "Registra cada disparo de condición de parada, no solo los éxitos — un bucle que alcanza su techo constantemente señala un Juez mal calibrado."
+    },
+    "builder": {
+      "title": "Constructor de bucles",
+      "lead": "Elige un tipo de tarea para generar un andamiaje inicial de Constructor / Juez / Gestor más una condición de parada dura. Cópialo y luego sustituye las partes entre corchetes por tus detalles.",
+      "taskTypeLabel": "Tipo de tarea",
+      "types": {
+        "writing": "Redacción / contenido",
+        "code": "Código",
+        "research": "Investigación",
+        "custom": "Genérico / personalizado"
+      },
+      "builderLabel": "Prompt del Constructor",
+      "judgeLabel": "Lista del Juez",
+      "managerLabel": "Reglas del Gestor",
+      "stopLabel": "Condiciones de parada",
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "checklistTitle": "Por dónde empezar esta semana",
+      "c1": "Elige una tarea específica y acotada que ya hagas con regularidad, con un estándar que podrías escribir.",
+      "c2": "Escribe primero la lista del Juez — antes que el prompt del Constructor. El estándar debe dar forma a lo que pides.",
+      "c3": "Añade la condición de parada como lógica real y dura desde la primerísima versión.",
+      "c4": "Ejecuta las cuatro pruebas de estrés antes de confiarle nada que importe.",
+      "c5": "Solo cuando corra sin vigilancia y pare limpio, construye el segundo bucle.",
+      "disclaimer": "Estos son andamiajes iniciales, no prompts terminados. La verdad de referencia del Juez y las cifras de parada te toca definirlas para la tarea específica."
+    }
+  }
+}

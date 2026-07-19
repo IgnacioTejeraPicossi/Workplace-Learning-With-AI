@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.26.0] - 2026-07-19
+
+### Added — New agent: "Self-Correcting AI Loop" (Builder / Judge / Manager)
+
+New standalone agent in the sidebar (Future Item Agents, after the
+Self-Simulating Reality Agent · `🔄 Self-Correcting AI Loop`). Second of the two
+@cyrilXBT (X) pieces the owner flagged — the first became the AGI Hub "Voices on
+AGI" tab (1.25.0); this one is a full agent because it's an actionable
+methodology, not a reading feed. Content **paraphrased**, not reproduced;
+source credited in every tab footer.
+
+- **Shell** `SelfCorrectingLoop.jsx` (teal/emerald hero) + route in `App.jsx`
+  (`self-correcting-loop`) + sidebar item (icon `refresh-cw`).
+- **6 tabs** under `frontend/src/self-correcting-loop/`: Overview · The Three
+  Roles (Builder/Judge/Manager) · Handoffs & Stops (structured handoff template,
+  ground truth per domain, 3-part stop condition) · Worked Examples (content +
+  code, shared skeleton) · Test & Scale (4 stress tests, 5 common mistakes,
+  scaling) · **Loop Builder**.
+- **Loop Builder is interactive**: pick a task type (writing / code / research /
+  custom) → generated Builder / Judge / Manager scaffolds + a hard stop-condition
+  block, each copy-to-clipboard, plus a "where to start this week" checklist.
+  Scaffolds live in `_templates.js` (English prompt artifacts with editable
+  `[PLACEHOLDERS]`). Entirely client-side — no backend, no CI impact, offline.
+- **i18n**: new `selfCorrectingLoopModule.json` namespace (registered in
+  `i18n/index.js`, merged into `common`), **123 keys × EN/NO/ES at exact
+  parity**, + `sidebar.selfCorrectingLoop` ×3.
+
+Validated: all 8 new JS/JSX files + App.jsx/Sidebar.jsx/i18n index parse
+(Babel); all locale JSON valid; i18n key parity 123×3 zero diff; used-vs-defined
+key cross-check clean. Plan: `docs/self-correcting-loop-agent-plan.md`. Visual
+check deferred to the user (app is auth-gated).
+
+---
+
 ## [1.25.0] - 2026-07-19
 
 ### Added — AGI Progress Hub: "Voices on AGI" tab (curated, epistemically-honest feed)

@@ -124,7 +124,8 @@
       "futureApp": "Aplicación futura",
       "ideaLog": "Registro de ideas",
       "featureRoadmap": "Hoja de ruta de funciones"
-    }
+    },
+    "selfCorrectingLoop": "Bucle de IA Autocorrectivo"
   },
   "actions": {
     "refreshData": "Actualizar datos",

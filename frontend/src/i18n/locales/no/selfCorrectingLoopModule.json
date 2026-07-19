@@ -1,0 +1,137 @@
+{
+  "selfCorrectingLoop": {
+    "statusBadge": "V0 · Referanse + Løkkebygger",
+    "moduleTitle": "Selvkorrigerende KI-løkke",
+    "moduleSubtitle": "Bygg et system som fanger sine egne feil før du ser dem — generer, gjennomgå, test og revider automatisk.",
+    "hintStrip": "En praktisk arkitektur for KI-kvalitetskontroll: skill produksjonen av et svar fra vurderingen av det, gi dommeren ekte fasit, og stopp på hard logikk — ikke håp.",
+    "sourceNote": "Tilpasset og parafrasert fra «How to Build a Self-Correcting AI Loop That Catches Its Own Mistakes» av @cyrilXBT (X). Konsepter oppsummert for læring; original ordlyd er ikke gjengitt.",
+    "tabs": {
+      "overview": "Oversikt",
+      "roles": "De tre rollene",
+      "handoffs": "Overleveringer & stopp",
+      "examples": "Gjennomgåtte eksempler",
+      "testScale": "Test & skaler",
+      "builder": "Løkkebygger"
+    },
+    "overview": {
+      "title": "Slutt å være verifiseringslaget",
+      "lead": "Det finnes et øyeblikk som skiller det å bruke KI tilfeldig fra å kjøre den som et system: øyeblikket du slutter å være den som fanger feilen.",
+      "shiftTitle": "Skiftet",
+      "shiftFrom": "Du spør → leser → merker noe galt → påpeker det → får en retting → merker noe annet → påpeker det igjen. Du er verifiseringslaget, manuelt, hver eneste gang.",
+      "shiftTo": "Systemet genererer, sjekker sitt eget arbeid mot en ekte standard, retter det som var galt, og viser deg resultatet først da. Det som gjenstår for deg er skjønn, ikke korrekturlesing av en maskins førsteutkast.",
+      "defaultLoopTitle": "Standardløkken",
+      "defaultLoopText": "For de fleste er mennesket verifiseringssteget i hver oppgave — tregt, slitsomt og lett å hoppe over når du har det travelt.",
+      "selfLoopTitle": "Den selvkorrigerende løkken",
+      "selfLoopText": "Når du ser resultatet, er de åpenbare feilene allerede fanget og håndtert. Du bruker oppmerksomhet kun på det som virkelig trenger et menneske.",
+      "notTwiceTitle": "Hvorfor dette ikke bare er «å spørre to ganger»",
+      "notTwiceText": "En modell som gjennomgår sitt eget svar i samme kontekst — med samme resonnement som skapte feilen — har en tendens til å forsvare arbeidet sitt heller enn å granske det. Å spørre «er du sikker?» gir betryggelse oftere enn ny undersøkelse. Løsningen er ikke å spørre bedre; det er arkitektur: skill produksjonen av et svar fra vurderingen av det, med en annen kjøring, en annen ledetekst, og helst en annen referanseramme.",
+      "keyIdeaTitle": "Det ene prinsippet å ta med",
+      "keyIdeaText": "Verifisering må referere til noe utenfor produsentens eget resonnement — en testsuite, et kildedokument, en skriftlig sjekkliste, eller en genuint annen modell. Ikke «samme modell, spurt igjen, i samme åndedrag»."
+    },
+    "roles": {
+      "title": "De tre rollene enhver løkke trenger",
+      "lead": "Ethvert fungerende selvkorrigerende system reduseres til tre distinkte roller. Får du disse riktig, kan du bygge en løkke for nesten enhver oppgave ved å fylle inn detaljene.",
+      "builder": {
+        "name": "Byggeren",
+        "role": "Produserer selve resultatet",
+        "detail": "Skriver koden, utformer innholdet, gjør research. Gi den mest kreativ frihet og minst begrensning — jobben dens er et førsteforsøk, ikke et perfekt et."
+      },
+      "judge": {
+        "name": "Dommeren",
+        "role": "Vurderer mot en skriftlig standard",
+        "detail": "Bygger ingenting. Sjekker Byggerens resultat mot en spesifikk, skriftlig standard — ikke en vag følelse av kvalitet. Den bør ha tilgang til noe Byggeren ikke har (kilden, testsuiten, kravene) så den har uavhengig fasit."
+      },
+      "manager": {
+        "name": "Lederen",
+        "role": "Bestemmer hva som skjer videre",
+        "detail": "Leser Dommerens dom og ruter: send tilbake til Byggeren med spesifikk tilbakemelding, eskaler til et menneske, eller merk som ferdig. Her bor også stoppbetingelsen — regelen som hindrer løkken i å kjøre for evig."
+      },
+      "principleTitle": "Det avgjørende designprinsippet",
+      "principleText": "Verifisering må referere til noe utenfor Byggerens eget resonnement. En testsuite, et kildedokument, en sjekkliste, eller et andre KI-kall med en genuint annen innramming — hva som helst som ikke bare er samme modell spurt igjen."
+    },
+    "handoffs": {
+      "title": "Overleveringer & stoppbetingelser",
+      "lead": "Den ekte ingeniørkunsten er ikke smarte ledetekster — det er strukturen på det som overleveres mellom rollene. De fleste første løkker hopper over dette og oppfører seg så uforutsigbart.",
+      "propsTitle": "En overlevering trenger tre egenskaper",
+      "prop1": "Et definert format — mottakerrollen tolker ikke løs prosa og gjetter hva som betyr noe.",
+      "prop2": "En definert utløser — Byggeren er ikke den som avgjør når den er ferdig.",
+      "prop3": "En definert feilsti — når noe ikke går rent, finnes et spesifisert neste steg i stedet for stille brudd eller en uendelig løkke.",
+      "templateTitle": "En overleveringsmal som fungerer på tvers av oppgaver",
+      "templateNote": "Strukturert utdata, ikke samtaletekst. Denne forhåndskostnaden er det som gjør at systemet oppfører seg likt på den hundrede kjøringen som den første.",
+      "groundTruthTitle": "Dommeren trenger fasit, ikke en mening",
+      "groundTruthLead": "En dommer som bare ser Byggerens resultat kan vurdere intern konsistens — aldri korrekthet. Et selvsikkert feil, velformatert svar seiler rett forbi den.",
+      "gtCode": "Kode → testsuiten, den faktiske kjøreutdataen, lint-resultater, byggestatus. Ikke «ser dette riktig ut», men «besto det da det ble kjørt».",
+      "gtContent": "Innhold → originalkilden og briefen, side om side med utkastet. Ikke «leses dette godt», men «kan hver påstand spores til kilden, og oppfyller det hvert krav».",
+      "gtResearch": "Research → de faktiske søkeresultatene og kildedokumentene. Ikke «høres dette autoritativt ut», men «kan hver påstand spores til en spesifikk kilde».",
+      "gtWarn": "Kan du ikke navngi Dommerens fasit for oppgaven din, har du ikke en selvkorrigerende løkke — du har en omformuleringsløkke, der en selvsikker feil blir selvsikkert omformulert.",
+      "stopTitle": "Stoppbetingelsen er ikke valgfri",
+      "stopLead": "Uten en eksplisitt hard stopp kan en Bygger og Dommer sykle i det uendelige mens kostnaden stiger. En ekte stoppbetingelse har tre deler — alle håndhevet som logikk, ikke overlatt til modellen.",
+      "stop1": "Et maksimalt antall iterasjoner — et hardt tak på revisjonssykluser, hvoretter Lederen må eskalere til et menneske.",
+      "stop2": "En målbar kvalitetsterskel — «alle 11 tester består», ikke «godt nok» (som er et forslag modellen kan prate seg forbi).",
+      "stop3": "Et kostnads- eller tidstak — et absolutt budsjett oppgaven ikke kan overskride, uansett tilstand når taket nås.",
+      "stopWarn": "Skriv disse inn i Lederens faktiske logikk, ikke som en myk instruksjon inne i en lengre ledetekst."
+    },
+    "examples": {
+      "title": "To gjennomgåtte eksempler",
+      "lead": "Samme skjelett ser forskjellig ut på tvers av domener, men følger identisk logikk. Å se begge side om side viser hvor lite som faktisk endres.",
+      "contentTitle": "Selvkorrigerende innholdsproduksjon",
+      "contentBuilder": "Bygger: mottar kilde + brief, produserer et utkast pluss en eksplisitt tillitserklæring og en liste over det den var usikker på.",
+      "contentJudge": "Dommer: ser utkastet og kilden side om side. Sjekker, hver med sitt eget bestått/ikke bestått — spores hver påstand til kilden? oppfyller den hvert brief-krav? er kjernebudskapet til stede og ufortynnet?",
+      "contentManager": "Leder: en ren beståelse sender det videre. En faktasjekk-feil returnerer det med den spesifikke uverifiserte påstanden merket. Etter 3 mislykkede sykluser på samme sjekk eskalerer den til et menneske med full historikk.",
+      "codeTitle": "Selvkorrigerende kode",
+      "codeBuilder": "Bygger: en kodeagent hvis strukturerte utdata inkluderer selve kjøringen — testresultater, lint, byggestatus — ikke bare diffen. Kode som aldri ble kjørt er ikke et ferdig Bygger-steg.",
+      "codeJudge": "Dommer: besto den de eksisterende testene uten at testene ble endret? er statisk analyse ren? adresserer diffen den tildelte oppgaven, ikke en annen den fant mer interessant?",
+      "codeManager": "Leder: en feilende test returnerer med den nøyaktige feilutdataen vedlagt. Et omfangsavvik eskalerer umiddelbart — det er en skjønnsfeil, ikke en mekanisk defekt Byggeren kan iterere seg ut av.",
+      "skeletonTitle": "Det felles skjelettet",
+      "skeletonText": "Bygger produserer og leverer med bevis → Dommer sjekker mot spesifikke navngitte kriterier med en dom per sjekk → Leder ruter basert på hvilken sjekk som feilet. Å anvende det på en ny oppgave er stort sett å skrive en ny sjekkliste for Dommeren — ikke å redesigne arkitekturen."
+    },
+    "testScale": {
+      "title": "Test den før du stoler på den — skaler så forsiktig",
+      "lead": "De fleste løkker som feiler i reell bruk ville feilet en av disse testene umiddelbart, hvis noen hadde sjekket først.",
+      "testsTitle": "Fire stresstester",
+      "t1Title": "Den uløselige oppgaven",
+      "t1Text": "Gi Byggeren en oppgave den ikke kan fullføre til Dommerens standard, med vilje. Treffer Lederen iterasjonstaket og eskalerer — eller snurrer den for evig og brenner kostnad?",
+      "t2Title": "Det selvsikkert feilaktige",
+      "t2Text": "Mat Dommeren et resultat du vet er subtilt feil. Fanger fasiten det? Slipper den gjennom noe du vet er ødelagt, er sjekken for grunn.",
+      "t3Title": "Den delte blindsonen",
+      "t3Text": "Deler Bygger og Dommer modell, mat Dommeren den typen feil den modellen typisk gjør. Vinker den det gjennom, deler rollene blindsoner — bruk en annen modell eller innramming for Dommeren.",
+      "t4Title": "Kostnadsløpet",
+      "t4Text": "Regn ut verste-fall-stien — maks revisjoner, dyreste kall, lengste innhold. Om det tallet ville skremt deg på en faktura, er ikke stoppbetingelsene stramme nok.",
+      "mistakesTitle": "Vanlige feil som stille bryter et godt design",
+      "m1": "La Dommeren bare se Byggerens resultat, uten uavhengig referanse — gjør en korrekthetssjekk om til en konsistenssjekk.",
+      "m2": "Samme modell for hver rolle med bare en tynn «vær kritisk»-instruksjon — den arver Byggerens blindsoner.",
+      "m3": "En Leder uten minne om tidligere forsøk — den sender samme mislykkede tilbakemelding og får samme mislykkede resultat.",
+      "m4": "Å hoppe over stresstestene fordi den ene overvåkede demoen fungerte — ubevoktet oppførsel er en annen påstand.",
+      "m5": "Å skrive stoppbetingelsen som en myk instruksjon i stedet for hard logikk Lederen sjekker mekanisk.",
+      "scaleTitle": "Skalere til flere løkker",
+      "scaleText": "Når én løkke er genuint pålitelig, motstå å starte fem samtidig. Hver ny løkke er nok et sted en stoppbetingelse kan feile stille og kostnad kan løpe løpsk.",
+      "scale1": "Sekvensiell utvidelse med en tillitsterskel — legg til en andre løkke først når du har sluttet å sjekke den førstes resultat nøye.",
+      "scale2": "Et delt kostnadsdashbord på tvers av alle løkker — ti løkker hver innenfor budsjett kan likevel summere til en skremmende total.",
+      "scale3": "Logg hver utløsning av stoppbetingelse, ikke bare suksesser — én løkke som treffer taket konstant signaliserer en feilkalibrert Dommer."
+    },
+    "builder": {
+      "title": "Løkkebygger",
+      "lead": "Velg en oppgavetype for å generere et start-stillas for Bygger / Dommer / Leder pluss en hard stoppbetingelse. Kopier det, og erstatt så delene i klammer med dine detaljer.",
+      "taskTypeLabel": "Oppgavetype",
+      "types": {
+        "writing": "Skriving / innhold",
+        "code": "Kode",
+        "research": "Research",
+        "custom": "Generisk / egendefinert"
+      },
+      "builderLabel": "Bygger-ledetekst",
+      "judgeLabel": "Dommer-sjekkliste",
+      "managerLabel": "Leder-regler",
+      "stopLabel": "Stoppbetingelser",
+      "copy": "Kopier",
+      "copied": "Kopiert!",
+      "checklistTitle": "Hvor du starter denne uken",
+      "c1": "Velg én spesifikk, smal oppgave du allerede gjør jevnlig, med en standard du kunne skrevet ned.",
+      "c2": "Skriv Dommerens sjekkliste først — før Byggerens ledetekst. Standarden bør forme det du ber om.",
+      "c3": "Legg til stoppbetingelsen som ekte, hard logikk fra aller første versjon.",
+      "c4": "Kjør de fire stresstestene før du stoler på den med noe som betyr noe.",
+      "c5": "Først når den kjører ubevoktet og stopper rent, bygg den andre løkken.",
+      "disclaimer": "Dette er start-stillas, ikke ferdige ledetekster. Dommerens fasit og stopptallene er dine å definere for den spesifikke oppgaven."
+    }
+  }
+}

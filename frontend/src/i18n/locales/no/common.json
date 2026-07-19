@@ -395,7 +395,8 @@
       "futureApp": "Fremtidsapp",
       "ideaLog": "Ide-loggbok",
       "featureRoadmap": "Funksjonskart"
-    }
+    },
+    "selfCorrectingLoop": "Selvkorrigerende KI-løkke"
   },
   "agents": {
     "compliance": {
