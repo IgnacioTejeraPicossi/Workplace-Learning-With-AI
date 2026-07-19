@@ -70,6 +70,21 @@
         "label": "Documentación",
         "preview": "Genera documentación en markdown para la funcionalidad."
       }
+    },
+    "loop": {
+      "button": "Diseñar bucle",
+      "buttonTitle": "Diseña un bucle autocorrectivo Constructor/Juez/Gestor para esta funcionalidad",
+      "modalTitle": "Bucle autocorrectivo — {{name}}",
+      "modalLead": "El agente Bucle de IA Autocorrectivo convirtió esta funcionalidad en un andamiaje Constructor / Juez / Gestor con condiciones de parada duras. Copia cada bloque a tu construcción.",
+      "loading": "Diseñando el bucle…",
+      "error": "No se pudo contactar con el agente Bucle Autocorrectivo. Inténtalo de nuevo.",
+      "aiBadge": "Adaptado por IA",
+      "mockBadge": "Alternativa genérica",
+      "builderLabel": "Prompt del Constructor",
+      "judgeLabel": "Lista del Juez",
+      "managerLabel": "Reglas del Gestor",
+      "stopLabel": "Condiciones de parada",
+      "copy": "Copiar"
     }
   }
 }

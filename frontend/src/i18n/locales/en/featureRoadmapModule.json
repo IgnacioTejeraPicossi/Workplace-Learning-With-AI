@@ -70,6 +70,21 @@
         "label": "Docs",
         "preview": "Generates markdown documentation for the feature."
       }
+    },
+    "loop": {
+      "button": "Design Loop",
+      "buttonTitle": "Design a self-correcting Builder/Judge/Manager loop for this feature",
+      "modalTitle": "Self-Correcting Loop — {{name}}",
+      "modalLead": "The Self-Correcting AI Loop agent turned this feature into a Builder / Judge / Manager scaffold with hard stop conditions. Copy each block into your build.",
+      "loading": "Designing the loop…",
+      "error": "Couldn't reach the Self-Correcting Loop agent. Try again.",
+      "aiBadge": "AI-tailored",
+      "mockBadge": "Generic fallback",
+      "builderLabel": "Builder prompt",
+      "judgeLabel": "Judge checklist",
+      "managerLabel": "Manager rules",
+      "stopLabel": "Stop conditions",
+      "copy": "Copy"
     }
   }
 }

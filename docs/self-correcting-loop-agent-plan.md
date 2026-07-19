@@ -74,9 +74,23 @@ The Loop Builder can now tailor the scaffold to a specific task:
   the backend is unreachable.
 - 4 offline contract tests, added to CI (now 5 files / 74 tests).
 
+## V1.1 (shipped 1.26.3) — wired into the Future pipeline
+
+The Feature Roadmap (Future module) gained a **🔄 Design Loop** button in each
+feature's admin cell. It calls `POST /api/self-correcting-loop/customize`
+(`task_type: code`, feature name + summary) and shows the tailored
+Builder/Judge/Manager/Stop scaffold in a modal (copy per block + is_mock badge).
+This upgrades the module's one-shot `generate_scaffold` into a self-correcting
+loop design step — the recursion made concrete (an agent that designs the loops
+to build the app's own features). Reuses the existing endpoint; no new backend.
+
 ## Possible V2+ (not built)
 
 - A **saved loops** library (Mongo), same best-effort pattern as the Cybersecurity
-  persistence (1.24.1).
+  persistence (1.24.1) — persist a designed loop against its roadmap feature.
+- **Option B** from the Future audit: make `generate_scaffold` itself run a real
+  Builder→Judge→Manager loop (generate code → Judge checks against lint/tests →
+  Manager regenerates or escalates to the existing admin approve), with a max
+  iteration stop.
 - A **live demo**: run a toy Builder/Judge/Manager loop against a sample task in
   the browser to show the cycle and a stop condition firing.

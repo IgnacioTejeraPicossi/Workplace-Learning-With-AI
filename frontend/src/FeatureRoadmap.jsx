@@ -46,6 +46,9 @@ function FeatureRoadmap() {
   const [scaffoldType, setScaffoldType] = useState("API Route");
   const [historyModal, setHistoryModal] = useState({ open: false, idea: null, history: [] });
   const [loadingHistory, setLoadingHistory] = useState(false);
+  // Self-Correcting Loop integration: turn a roadmap feature into a
+  // Builder/Judge/Manager scaffold via the Self-Correcting Loop agent's endpoint.
+  const [loopModal, setLoopModal] = useState({ open: false, idea: null, data: null, loading: false, error: false });
   const { colors } = useTheme();
 
   const dateLocale = i18n.language?.startsWith("no") ? "nb-NO" : undefined;
@@ -150,6 +153,39 @@ function FeatureRoadmap() {
       codeStub = `${mockHead}\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
     }
     setScaffoldModal({ open: true, code: codeStub, feature: idea });
+  };
+
+  const loopLang = () => {
+    const l = (i18n.language || "en").slice(0, 2);
+    return ["en", "no", "es"].includes(l) ? l : "en";
+  };
+
+  // Ask the Self-Correcting AI Loop agent to turn this feature into a
+  // Builder / Judge / Manager scaffold + hard stop conditions. Reuses the
+  // agent's already-tested endpoint (validated, offline fallback, read-only).
+  const handleDesignLoop = async (idea) => {
+    const featureName = idea.classification?.new_feature || idea.user_input;
+    const summary = idea.classification?.intent || idea.user_input || "";
+    setLoopModal({ open: true, idea, data: null, loading: true, error: false });
+    try {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+      const res = await fetch(`${API_BASE}/api/self-correcting-loop/customize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          task_type: "code",
+          task_description: `Build this app feature: ${featureName}. ${summary}`.slice(0, 2000),
+          lang: loopLang(),
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setLoopModal({ open: true, idea, data, loading: false, error: false });
+    } catch (err) {
+      console.error("design-loop failed:", err);
+      setLoopModal({ open: true, idea, data: null, loading: false, error: true });
+    }
   };
 
   const handleShowHistory = async (idea) => {
@@ -425,6 +461,23 @@ function FeatureRoadmap() {
                     >
                       📜 {t("featureRoadmapModule.history")}
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDesignLoop(idea)}
+                      style={{
+                        background: "#0d9488",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "2px 10px",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        marginTop: 2,
+                      }}
+                      title={t("featureRoadmapModule.loop.buttonTitle")}
+                    >
+                      🔄 {t("featureRoadmapModule.loop.button")}
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -470,6 +523,71 @@ function FeatureRoadmap() {
         >
           {t("featureRoadmapModule.copyCode")}
         </button>
+      </ModalDialog>
+      <ModalDialog
+        isOpen={loopModal.open}
+        onRequestClose={() => setLoopModal({ open: false, idea: null, data: null, loading: false, error: false })}
+        title={t("featureRoadmapModule.loop.modalTitle", { name: modalName(loopModal.idea) })}
+      >
+        <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 12, lineHeight: 1.5 }}>
+          {t("featureRoadmapModule.loop.modalLead")}
+        </div>
+        {loopModal.loading ? (
+          <div>{t("featureRoadmapModule.loop.loading")}</div>
+        ) : loopModal.error ? (
+          <div style={{ color: "#b91c1c" }}>{t("featureRoadmapModule.loop.error")}</div>
+        ) : loopModal.data ? (
+          <div style={{ maxHeight: 460, overflowY: "auto" }}>
+            <span style={{
+              display: "inline-block", marginBottom: 12, padding: "2px 10px", borderRadius: 999,
+              fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
+              background: loopModal.data.is_mock ? "#fef3c7" : "#d1fae5",
+              color: loopModal.data.is_mock ? "#92400e" : "#065f46",
+              border: `1px solid ${loopModal.data.is_mock ? "#fde68a" : "#6ee7b7"}`,
+            }}>
+              {loopModal.data.is_mock
+                ? t("featureRoadmapModule.loop.mockBadge")
+                : t("featureRoadmapModule.loop.aiBadge")}
+            </span>
+            {[
+              { key: "builder", icon: "🔨" },
+              { key: "judge", icon: "⚖️" },
+              { key: "manager", icon: "🧭" },
+              { key: "stop", icon: "🛑" },
+            ].map(({ key, icon }) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  marginBottom: 4,
+                }}>
+                  <b style={{ fontSize: 13.5, color: colors.text }}>
+                    {icon} {t(`featureRoadmapModule.loop.${key}Label`)}
+                  </b>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(loopModal.data[key] || "");
+                      alert(t("featureRoadmapModule.codeCopied"));
+                    }}
+                    style={{
+                      background: "#0d9488", color: "#fff", border: 0, borderRadius: 6,
+                      padding: "2px 10px", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                    }}
+                  >
+                    📋 {t("featureRoadmapModule.loop.copy")}
+                  </button>
+                </div>
+                <pre style={{
+                  background: "#0f172a", color: "#e2e8f0", padding: 12, borderRadius: 6,
+                  fontSize: 12.5, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowX: "auto",
+                  margin: 0,
+                }}>
+                  {loopModal.data[key]}
+                </pre>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </ModalDialog>
       <ModalDialog
         isOpen={historyModal.open}

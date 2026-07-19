@@ -70,6 +70,21 @@
         "label": "Dokumentasjon",
         "preview": "Genererer Markdown-dokumentasjon for funksjonen."
       }
+    },
+    "loop": {
+      "button": "Design løkke",
+      "buttonTitle": "Design en selvkorrigerende Bygger/Dommer/Leder-løkke for denne funksjonen",
+      "modalTitle": "Selvkorrigerende løkke — {{name}}",
+      "modalLead": "Den selvkorrigerende KI-løkke-agenten gjorde denne funksjonen om til et Bygger / Dommer / Leder-stillas med harde stoppbetingelser. Kopier hver blokk inn i byggingen din.",
+      "loading": "Designer løkken…",
+      "error": "Fikk ikke kontakt med Selvkorrigerende løkke-agenten. Prøv igjen.",
+      "aiBadge": "KI-tilpasset",
+      "mockBadge": "Generisk reserve",
+      "builderLabel": "Bygger-ledetekst",
+      "judgeLabel": "Dommer-sjekkliste",
+      "managerLabel": "Leder-regler",
+      "stopLabel": "Stoppbetingelser",
+      "copy": "Kopier"
     }
   }
 }

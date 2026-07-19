@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.26.3] - 2026-07-19
+
+### Fixed — Idea Log never captured unrecognized requests
+
+`CommandBar.jsx` (the "Ask AI About Workplace Learning" zero-UI intake) only
+called `POST /classify-intent` — the endpoint that logs to `unknown_intents` —
+on the **recognized-and-routed** path. An unrecognized request (the exact case
+the "Idea Log (Unknown Requests)" exists to capture) hit the `else` branch,
+which just opened the modal: nothing was logged, and the modal stayed stuck on
+"Classifying your request…" because `unknownIntent` was never set. The `else`
+branch now calls `/classify-intent` (which classifies **and** logs the idea) and
+populates the modal with the result, with an error fallback so it can't hang.
+Backend verified working throughout (classified + stored live).
+
+### Added — Self-Correcting Loop wired into the Future feature pipeline
+
+The Feature Roadmap's admin cell gains a **🔄 Design Loop** button next to
+*Generate Scaffold*. It calls the Self-Correcting AI Loop agent's existing,
+tested endpoint (`POST /api/self-correcting-loop/customize`, `task_type: code`,
+feature name + summary, current locale) and opens a modal with the tailored
+**Builder / Judge / Manager / Stop** blocks — each copy-to-clipboard, with an
+`AI-tailored` / `Generic fallback` badge and loading/error states.
+
+This turns the one-shot `generate_scaffold` (a Builder with no Judge/Manager)
+into "here is the self-correcting loop to build this feature properly" — the
+recursion from the LinkedIn post (an agent that designs the loops to build the
+app's own features), now inside the pipeline. Chosen for being low-risk:
+reuses the validated endpoint, adds no new backend/auth surface, and is
+read-only (generates text, no DB write). i18n: `featureRoadmapModule.loop.*`
+(13 keys × EN/NO/ES at parity). Verified live: real endpoint returns an
+`is_mock: false` scaffold tailored to a roadmap feature ("Goal Loop Agent").
+
+---
+
 ## [1.26.2] - 2026-07-19
 
 ### Fixed / Security — Future module audit (Idea Log · Feature Roadmap · scaffolds)
