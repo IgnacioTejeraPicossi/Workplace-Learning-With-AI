@@ -242,8 +242,31 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         setInput("");
         await askStream({ prompt }, (output) => setStreamedOutput(output));
       } else {
-        // No known module, show modal as fallback
+        // Unrecognized request — this is exactly what the Idea Log exists to
+        // capture. Previously this branch only opened the modal and NEVER called
+        // /classify-intent, so (a) the idea was never logged to unknown_intents
+        // and (b) the modal stayed stuck on "Classifying your request…" because
+        // `unknownIntent` was never set. Classify now (which also logs it) and
+        // populate the modal with the result.
+        setUnknownIntent(null);
         setModalOpen(true);
+        try {
+          const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+          const classifyRes = await fetch(`${API_BASE}/classify-intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: prompt })
+          });
+          const classifyData = await classifyRes.json();
+          setUnknownIntent(classifyData);
+        } catch (e) {
+          console.error('classify-intent (fallback) failed:', e);
+          setUnknownIntent({
+            intent: null, module_match: null, new_feature: null,
+            confidence: 'Low',
+            follow_up_question: 'Sorry, something went wrong logging your request. Please try again.'
+          });
+        }
       }
       setLoading(false);
       return;
