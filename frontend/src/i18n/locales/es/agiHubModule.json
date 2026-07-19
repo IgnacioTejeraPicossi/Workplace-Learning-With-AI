@@ -98,7 +98,6 @@
       }
     }
   },
-
   "agiBenefits": {
     "title": "Los beneficios de la AGI",
     "subtitle": "Si se desarrolla de forma segura y equitativa, la Inteligencia General Artificial podría desbloquear beneficios transformadores para la humanidad.",
@@ -112,9 +111,21 @@
         "title": "Salud y Longevidad",
         "desc": "La IA ya está comprimiendo el ciclo de descubrimiento de fármacos de décadas a meses. La AGI podría acelerar la cura de las principales enfermedades y extender la vida humana saludable en órdenes de magnitud.",
         "examples": [
-          { "text": "AlphaFold 3 (DeepMind, mayo 2024) predice interacciones de proteínas con ADN, ARN y ligandos con precisión cercana a la cristalografía.", "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/", "source": "DeepMind" },
-          { "text": "Isomorphic Labs prevé iniciar en 2026 los primeros ensayos clínicos en humanos con fármacos oncológicos diseñados por AlphaFold 3.", "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials", "source": "IntuitionLabs" },
-          { "text": "Insilico Medicine diseñó con su plataforma Chemistry42 un PROTAC dual contra PKMYT1 (cáncer), publicado en Nature Communications; 2025 marcó el mayor salto anual en IND filings de moléculas originadas por IA.", "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/", "source": "DrugDiscoveryTrends" },
+          {
+            "text": "AlphaFold 3 (DeepMind, mayo 2024) predice interacciones de proteínas con ADN, ARN y ligandos con precisión cercana a la cristalografía.",
+            "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/",
+            "source": "DeepMind"
+          },
+          {
+            "text": "Isomorphic Labs prevé iniciar en 2026 los primeros ensayos clínicos en humanos con fármacos oncológicos diseñados por AlphaFold 3.",
+            "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials",
+            "source": "IntuitionLabs"
+          },
+          {
+            "text": "Insilico Medicine diseñó con su plataforma Chemistry42 un PROTAC dual contra PKMYT1 (cáncer), publicado en Nature Communications; 2025 marcó el mayor salto anual en IND filings de moléculas originadas por IA.",
+            "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/",
+            "source": "DrugDiscoveryTrends"
+          },
           "Medicina personalizada adaptada al genoma y microbioma de cada paciente y monitoreo de salud en tiempo real"
         ]
       },
@@ -122,8 +133,16 @@
         "title": "Descubrimiento Científico",
         "desc": "La AGI podría comprimir siglos de progreso científico en años — simulando, formulando hipótesis y validando a velocidad sobrehumana. La revolución ya empezó en materiales, proteínas y matemáticas.",
         "examples": [
-          { "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) resolvieron 4/6 problemas de la Olimpiada Internacional de Matemáticas con nivel de medalla de plata (28/42 puntos); publicado en Nature en noviembre de 2025.", "url": "https://www.nature.com/articles/s41586-025-09833-y", "source": "Nature" },
-          { "text": "GNoME (DeepMind) predijo 2,4 millones de nuevos materiales estables — multiplicando por ~10 el catálogo conocido tras décadas de trabajo manual.", "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/", "source": "DeepMind" },
+          {
+            "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) resolvieron 4/6 problemas de la Olimpiada Internacional de Matemáticas con nivel de medalla de plata (28/42 puntos); publicado en Nature en noviembre de 2025.",
+            "url": "https://www.nature.com/articles/s41586-025-09833-y",
+            "source": "Nature"
+          },
+          {
+            "text": "GNoME (DeepMind) predijo 2,4 millones de nuevos materiales estables — multiplicando por ~10 el catálogo conocido tras décadas de trabajo manual.",
+            "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/",
+            "source": "DeepMind"
+          },
           "Diseñar nuevas proteínas, baterías y catalizadores en simulación, sintetizándolos luego en laboratorios autónomos como A-Lab (Berkeley)",
           "Ejecutar millones de experimentos virtuales en paralelo a escala global"
         ]
@@ -132,7 +151,11 @@
         "title": "Educación Universal",
         "desc": "Los tutores impulsados por IA podrían ofrecer a cada ser humano una educación personalizada de clase mundial, independientemente de su ubicación geográfica o ingresos.",
         "examples": [
-          { "text": "Khanmigo (Khan Academy + GPT) pasó de 40 000 a más de 700 000 estudiantes en un solo curso escolar (2024-25) y supera los 5 millones de usuarios en 110 países a finales de 2025; gratuito para profesorado de EEUU gracias a una donación de 10 M$ de la Fundación Gates.", "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/", "source": "Khan Academy" },
+          {
+            "text": "Khanmigo (Khan Academy + GPT) pasó de 40 000 a más de 700 000 estudiantes en un solo curso escolar (2024-25) y supera los 5 millones de usuarios en 110 países a finales de 2025; gratuito para profesorado de EEUU gracias a una donación de 10 M$ de la Fundación Gates.",
+            "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/",
+            "source": "Khan Academy"
+          },
           "Tutoría adaptativa que se ajusta al ritmo y estilo de cada alumno, basada en preguntas guiadas en lugar de dar la respuesta",
           "Traducción instantánea de alta calidad en más de 100 idiomas y dialectos",
           "Compañeros de aprendizaje permanentes que crecen con el aprendiz desde la infancia hasta la edad adulta"
@@ -142,8 +165,16 @@
         "title": "Clima y Medio Ambiente",
         "desc": "La AGI podría ayudar a resolver el cambio climático mediante sistemas energéticos optimizados, captura de carbono y modelado a escala planetaria — y los modelos de IA ya superan a los sistemas tradicionales en predicción meteorológica.",
         "examples": [
-          { "text": "SPARC (Commonwealth Fusion Systems) está construido al 75 %, con primer plasma previsto para 2026 y demostración de net energy gain (Q>1) en 2027 — sería la primera máquina comercial de fusión.", "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/", "source": "CFS" },
-          { "text": "GraphCast (DeepMind) supera al modelo HRES del ECMWF en el 90 % de las 1 380 métricas evaluadas; Aurora (Microsoft) supera al IFS HRES en más del 92 % de los objetivos a 0,1° de resolución.", "url": "https://www.nature.com/articles/s41586-025-09005-y", "source": "Nature" },
+          {
+            "text": "SPARC (Commonwealth Fusion Systems) está construido al 75 %, con primer plasma previsto para 2026 y demostración de net energy gain (Q>1) en 2027 — sería la primera máquina comercial de fusión.",
+            "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/",
+            "source": "CFS"
+          },
+          {
+            "text": "GraphCast (DeepMind) supera al modelo HRES del ECMWF en el 90 % de las 1 380 métricas evaluadas; Aurora (Microsoft) supera al IFS HRES en más del 92 % de los objetivos a 0,1° de resolución.",
+            "url": "https://www.nature.com/articles/s41586-025-09005-y",
+            "source": "Nature"
+          },
           "Optimización de cadenas de suministro y redes eléctricas globales para minimizar emisiones",
           "Restauración de ecosistemas y preservación de biodiversidad con sensores inteligentes"
         ]
@@ -152,7 +183,11 @@
         "title": "Productividad Económica",
         "desc": "La IA agéntica ya automatiza partes sustanciales del trabajo cognitivo. La AGI podría aumentar drásticamente la productividad y permitir nuevas formas de trabajo y creatividad.",
         "examples": [
-          { "text": "Devin 2.0 (Cognition, abril 2025) resuelve el 13,86 % de issues reales de GitHub en SWE-bench end-to-end — 7× mejor que modelos previos; el 67 % de sus pull requests son fusionados; pasó de 500 $/mes a 20 $/mes.", "url": "https://cognition.ai/blog/devin-annual-performance-review-2025", "source": "Cognition" },
+          {
+            "text": "Devin 2.0 (Cognition, abril 2025) resuelve el 13,86 % de issues reales de GitHub en SWE-bench end-to-end — 7× mejor que modelos previos; el 67 % de sus pull requests son fusionados; pasó de 500 $/mes a 20 $/mes.",
+            "url": "https://cognition.ai/blog/devin-annual-performance-review-2025",
+            "source": "Cognition"
+          },
           "Cobertura de tests subiendo de 50-60 % a 80-90 % en proyectos donde se despliegan agentes IA",
           "Migraciones de código que pasaban de 30-40 horas humanas a 3-4 horas por archivo en bancos piloto (10×)",
           "Habilitar industrias y modelos de negocio completamente nuevos donde antes el cuello de botella era el coste cognitivo"
@@ -162,7 +197,11 @@
         "title": "Erradicar la Pobreza Extrema",
         "desc": "Si los beneficios de la IA se distribuyen equitativamente, podría reducir la pobreza extrema y proporcionar acceso universal a las necesidades básicas. Algunas aplicaciones ya benefician a cientos de millones.",
         "examples": [
-          { "text": "Plantix diagnostica más de 800 síntomas en 60 cultivos por foto con 90-100 % de precisión en cultivos básicos; gratis para agricultores, 10+ millones de descargas en 150 países.", "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/", "source": "GSMA" },
+          {
+            "text": "Plantix diagnostica más de 800 síntomas en 60 cultivos por foto con 90-100 % de precisión en cultivos básicos; gratis para agricultores, 10+ millones de descargas en 150 países.",
+            "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/",
+            "source": "GSMA"
+          },
           "Asistentes médicos por SMS y voz en zonas sin acceso a doctores",
           "Producción de alimentos automatizada a coste marginal cada vez más bajo",
           "Servicios básicos universales financiados con las ganancias de eficiencia de la IA"
@@ -172,7 +211,11 @@
         "title": "Creatividad y Cultura",
         "desc": "La IA generativa ya amplifica la creatividad humana — vídeo, audio, ilustración, narrativa — y reduce el coste de producción de obras antes inaccesibles para creadores independientes.",
         "examples": [
-          { "text": "Sora 2 (OpenAI, septiembre 2025) genera vídeo de 10-25 s con audio sincronizado, diálogo y efectos; incluye masking/in-painting y cameos coherentes, usado por cineastas como storyboard digital y para escenas de gran masa o stunts peligrosos.", "url": "https://openai.com/index/sora-2/", "source": "OpenAI" },
+          {
+            "text": "Sora 2 (OpenAI, septiembre 2025) genera vídeo de 10-25 s con audio sincronizado, diálogo y efectos; incluye masking/in-painting y cameos coherentes, usado por cineastas como storyboard digital y para escenas de gran masa o stunts peligrosos.",
+            "url": "https://openai.com/index/sora-2/",
+            "source": "OpenAI"
+          },
           "Herramientas co-creativas para artistas, escritores y músicos — y nuevos formatos nativos de IA",
           "Preservación y traducción de lenguas y tradiciones en peligro de extinción",
           "Nuevas experiencias inmersivas en videojuegos, cine y mundos virtuales personalizados"
@@ -182,8 +225,16 @@
         "title": "Exploración Espacial",
         "desc": "La AGI podría acelerar la expansión de la humanidad en el sistema solar y más allá, resolviendo problemas demasiado complejos para equipos humanos solos.",
         "examples": [
-          { "text": "Perseverance (NASA) completó en diciembre de 2024 los primeros desplazamientos en otro planeta planificados por IA generativa — 456 m sin control humano en dos jornadas.", "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/", "source": "NASA" },
-          { "text": "AEGIS (JPL) permite a SuperCam de Perseverance seleccionar y analizar rocas marcianas de forma autónoma — analizando imágenes a bordo sin comunicación con la Tierra.", "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/", "source": "NASA Science" },
+          {
+            "text": "Perseverance (NASA) completó en diciembre de 2024 los primeros desplazamientos en otro planeta planificados por IA generativa — 456 m sin control humano en dos jornadas.",
+            "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/",
+            "source": "NASA"
+          },
+          {
+            "text": "AEGIS (JPL) permite a SuperCam de Perseverance seleccionar y analizar rocas marcianas de forma autónoma — analizando imágenes a bordo sin comunicación con la Tierra.",
+            "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/",
+            "source": "NASA Science"
+          },
           "Diseño de hábitats sostenibles fuera del mundo",
           "Planificación de misiones de larga duración y soporte vital"
         ]
@@ -192,7 +243,11 @@
         "title": "Mejor Gobernanza",
         "desc": "La IA podría ayudar a diseñar instituciones más justas, receptivas y transparentes — si se despliega con salvaguardas democráticas sólidas y participación ciudadana real.",
         "examples": [
-          { "text": "Polis y plataformas similares (Talk to the City, vTaiwan) ya se usan para deliberación masiva en Austria, Uruguay, Nueva Zelanda, Filipinas y Alemania, agrupando miles de aportaciones ciudadanas y preservando posturas minoritarias.", "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html", "source": "OCDE" },
+          {
+            "text": "Polis y plataformas similares (Talk to the City, vTaiwan) ya se usan para deliberación masiva en Austria, Uruguay, Nueva Zelanda, Filipinas y Alemania, agrupando miles de aportaciones ciudadanas y preservando posturas minoritarias.",
+            "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html",
+            "source": "OCDE"
+          },
           "Engaged California utilizó IA en 2025 para procesar a escala las aportaciones ciudadanas tras los incendios de Los Ángeles",
           "Simulación de políticas públicas y toma de decisiones basada en evidencia",
           "Detección y reducción de corrupción e ineficiencia burocrática"
@@ -202,8 +257,16 @@
         "title": "Salud Mental",
         "desc": "Acceso 24/7 a apoyo conversacional respaldado por terapia cognitivo-conductual, especialmente valioso donde los profesionales son escasos. Aún hay debate clínico sobre su lugar exacto en el tratamiento, pero la evidencia empieza a acumularse.",
         "examples": [
-          { "text": "Woebot mostró tamaños de efecto d=0,57 en ansiedad y d=0,46 en depresión en revisiones sistemáticas — más efectivo que materiales de autoayuda de la OMS tras 2 semanas de uso.", "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352", "source": "World Psychiatry" },
-          { "text": "Wysa logró reducciones notables en PHQ-9 (depresión) y GAD-7 (ansiedad) tras 4 semanas en pacientes con enfermedad crónica (p<0,001); usuarios 3× más propensos a completar sesiones de terapia con su apoyo entre sesiones.", "url": "https://www.jmir.org/2025/1/e67114", "source": "JMIR" },
+          {
+            "text": "Woebot mostró tamaños de efecto d=0,57 en ansiedad y d=0,46 en depresión en revisiones sistemáticas — más efectivo que materiales de autoayuda de la OMS tras 2 semanas de uso.",
+            "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352",
+            "source": "World Psychiatry"
+          },
+          {
+            "text": "Wysa logró reducciones notables en PHQ-9 (depresión) y GAD-7 (ansiedad) tras 4 semanas en pacientes con enfermedad crónica (p<0,001); usuarios 3× más propensos a completar sesiones de terapia con su apoyo entre sesiones.",
+            "url": "https://www.jmir.org/2025/1/e67114",
+            "source": "JMIR"
+          },
           "Apoyo para grupos vulnerables: madres en el periodo perinatal, pacientes con dolor crónico, estudiantes universitarios",
           "Cobertura nocturna, en idiomas locales y sin barreras de estigma social"
         ]
@@ -212,8 +275,16 @@
         "title": "Respuesta a Desastres",
         "desc": "Sistemas de alerta temprana basados en IA que multiplican el tiempo de reacción ante inundaciones, incendios o terremotos — con impacto demostrado en vidas salvadas y reducción de pérdidas económicas.",
         "examples": [
-          { "text": "Google Flood Hub protege a más de 460 millones de personas en 80+ países con pronósticos de inundación hasta 7 días por adelantado, capturando el 85-100 % de inundaciones severas registradas por GDACS.", "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/", "source": "Google Research" },
-          { "text": "Groundsource (Google, marzo 2026) extrae datos de décadas de noticias para predecir inundaciones súbitas con hasta 24 h de antelación.", "url": "https://aiforcause.org/stories/google-flood-hub", "source": "AI for Cause" },
+          {
+            "text": "Google Flood Hub protege a más de 460 millones de personas en 80+ países con pronósticos de inundación hasta 7 días por adelantado, capturando el 85-100 % de inundaciones severas registradas por GDACS.",
+            "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/",
+            "source": "Google Research"
+          },
+          {
+            "text": "Groundsource (Google, marzo 2026) extrae datos de décadas de noticias para predecir inundaciones súbitas con hasta 24 h de antelación.",
+            "url": "https://aiforcause.org/stories/google-flood-hub",
+            "source": "AI for Cause"
+          },
           "Los sistemas de alerta temprana reducen las muertes por inundación hasta un 43 % y las pérdidas económicas un 35-50 %",
           "Coordinación humanitaria asistida por IA: una autoridad regional en África austral detectó una inundación súbita por alerta IA y desplegó equipos a tiempo"
         ]
@@ -222,8 +293,16 @@
         "title": "Accesibilidad",
         "desc": "La IA multimodal está derribando barreras para personas con discapacidad — visión, audición, movilidad y comunicación — convirtiendo en cotidianas capacidades que antes requerían asistencia humana especializada.",
         "examples": [
-          { "text": "Be My AI (Be My Eyes + GPT-4 Vision) describe imágenes en lenguaje natural a usuarios ciegos o con baja visión, incluyendo lectura de etiquetas, navegación e interpretación de escenas; integrado en el Microsoft Disability Answer Desk resuelve consultas en 4 minutos de media (menos de la mitad que un agente humano).", "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/", "source": "Be My Eyes" },
-          { "text": "Seeing AI (Microsoft) ya identifica personas, productos, monedas y documentos en tiempo real desde el móvil, gratuito y en más de 18 idiomas.", "url": "https://openai.com/index/be-my-eyes/", "source": "OpenAI" },
+          {
+            "text": "Be My AI (Be My Eyes + GPT-4 Vision) describe imágenes en lenguaje natural a usuarios ciegos o con baja visión, incluyendo lectura de etiquetas, navegación e interpretación de escenas; integrado en el Microsoft Disability Answer Desk resuelve consultas en 4 minutos de media (menos de la mitad que un agente humano).",
+            "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/",
+            "source": "Be My Eyes"
+          },
+          {
+            "text": "Seeing AI (Microsoft) ya identifica personas, productos, monedas y documentos en tiempo real desde el móvil, gratuito y en más de 18 idiomas.",
+            "url": "https://openai.com/index/be-my-eyes/",
+            "source": "OpenAI"
+          },
           "Traducción en tiempo real de lengua de signos por cámara, sin guantes ni equipo especializado",
           "Subtítulos automáticos de alta calidad y descripción de audio en streaming en vivo"
         ]
@@ -232,8 +311,16 @@
         "title": "Robótica Humanoide",
         "desc": "Los robots humanoides están saliendo del laboratorio a la fábrica. La combinación de modelos de fundación visión-lenguaje-acción y hardware más barato está abriendo el trabajo físico repetitivo o peligroso a la automatización.",
         "examples": [
-          { "text": "Figure 02 produjo más de 30 000 BMW X3 en Spartanburg durante 10 meses, moviendo 90 000+ piezas en 1 250 horas operativas con >99 % de precisión por turno — el primer despliegue comercial humanoide en una línea de coches reales.", "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time", "source": "BMW Group" },
-          { "text": "Apollo (Apptronik) opera en la fábrica digital de Mercedes en Berlín-Marienfelde y Kecskemét (Hungría), con $403M de Serie A respaldada por Google, B Capital y la propia Mercedes.", "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive", "source": "iFactoryApp" },
+          {
+            "text": "Figure 02 produjo más de 30 000 BMW X3 en Spartanburg durante 10 meses, moviendo 90 000+ piezas en 1 250 horas operativas con >99 % de precisión por turno — el primer despliegue comercial humanoide en una línea de coches reales.",
+            "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time",
+            "source": "BMW Group"
+          },
+          {
+            "text": "Apollo (Apptronik) opera en la fábrica digital de Mercedes en Berlín-Marienfelde y Kecskemét (Hungría), con $403M de Serie A respaldada por Google, B Capital y la propia Mercedes.",
+            "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive",
+            "source": "iFactoryApp"
+          },
           "Modelo robot-as-a-service (~25 $/hora) que evita capex y abre la automatización a pymes",
           "Apoyo a cuidados de personas mayores, logística hospitalaria y trabajos peligrosos (limpieza nuclear, rescate)"
         ]
@@ -242,11 +329,121 @@
         "title": "Conservación y Biodiversidad",
         "desc": "La IA permite vigilar ecosistemas, identificar especies y detectar amenazas a escala planetaria — multiplicando la eficacia de equipos de conservación crónicamente infradimensionados.",
         "examples": [
-          { "text": "Wildbook (Wild Me) cubre 250+ especies con más de 1,4 millones de avistamientos y 280 000 animales identificados individualmente; el sistema catalogó más de 34 millones de avistamientos para 2026.", "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/", "source": "Yenra" },
-          { "text": "PAWS (USC + National Geographic) usa teoría de juegos para planificar patrullas anti-furtivismo; TrailGuard AI (RESOLVE) despliega cámaras camufladas que detectan furtivos en tiempo real.", "url": "https://dl.acm.org/doi/10.1145/3748699.3749780", "source": "ACM" },
+          {
+            "text": "Wildbook (Wild Me) cubre 250+ especies con más de 1,4 millones de avistamientos y 280 000 animales identificados individualmente; el sistema catalogó más de 34 millones de avistamientos para 2026.",
+            "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/",
+            "source": "Yenra"
+          },
+          {
+            "text": "PAWS (USC + National Geographic) usa teoría de juegos para planificar patrullas anti-furtivismo; TrailGuard AI (RESOLVE) despliega cámaras camufladas que detectan furtivos en tiempo real.",
+            "url": "https://dl.acm.org/doi/10.1145/3748699.3749780",
+            "source": "ACM"
+          },
           "El mercado global de IA para conservación supera los 2 200 M$ en software en 2025 — sensores acústicos, drones y telemetría GPS conectados con modelos de visión",
           "Monitoreo marino: detección de pesca ilegal y blanqueo de corales por satélite"
         ]
+      }
+    }
+  },
+  "agiVoices": {
+    "title": "Voces sobre la AGI",
+    "subtitle": "Un flujo curado y epistémicamente honesto de afirmaciones y anécdotas destacadas sobre el estado de la AGI — cada una etiquetada según lo que realmente es.",
+    "banner": {
+      "title": "Léelas como afirmaciones, no como hechos establecidos",
+      "text": "Varias de estas son opiniones declaradas de Marc Andreessen y anécdotas de segunda mano, no hechos verificados de forma independiente. Cuando afirmaciones fuertes tienen contraevidencia publicada, se muestra al lado. Trata las cifras como puntos de partida para verificar, no como conclusiones."
+    },
+    "attribution": {
+      "sourceLabel": "Fuente",
+      "source": "Marc Andreessen en The Joe Rogan Experience (entrevista de más de 3 horas).",
+      "via": "Resumen de 17 puntos vía @cyrilXBT en X.",
+      "watch": "Mira la entrevista completa antes de dar por zanjada cualquier cifra concreta."
+    },
+    "badges": {
+      "view": "Opinión de Andreessen",
+      "technique": "Técnica de uso",
+      "anecdote": "Anécdota de segunda mano",
+      "contested": "Discutido"
+    },
+    "filters": {
+      "all": "Todas"
+    },
+    "counterpointLabel": "Contrapunto",
+    "legendTitle": "Qué significan las etiquetas",
+    "legend": {
+      "view": "Una opinión o afirmación declarada — su interpretación, no un hecho establecido.",
+      "technique": "Una forma concreta en que usa la IA que puedes probar tú mismo.",
+      "anecdote": "Una historia de segunda mano («según se dice») — ilustrativa, no verificada.",
+      "contested": "Una afirmación fuerte que tiene contraevidencia publicada."
+    },
+    "items": {
+      "p1": {
+        "title": "La AGI ya está aquí",
+        "body": "En su opinión, el umbral se cruzó silenciosamente hace unos tres meses — con GPT-5.5, Claude 4.6, Gemini 3 y Grok 4.3 — y casi nadie lo notó, porque el campo se mueve ahora demasiado rápido para registrar hitos."
+      },
+      "p2": {
+        "title": "Los mejores modelos superan a expertos de talla mundial",
+        "body": "Dice que, para casi cualquier tema, los modelos líderes le dan mejores respuestas que los expertos de talla mundial a los que podría llamar personalmente — y puede llamar a casi cualquiera. No se han publicado datos que lo respalden.",
+        "counterpoint": "Un estudio en Nature Medicine sobre una herramienta de salud con IA comparable halló que pasaba por alto emergencias reales más de la mitad de las veces. Toma la afirmación en serio, pero verifícala tú mismo."
+      },
+      "p3": {
+        "title": "Los médicos ya escriben tus síntomas en ChatGPT",
+        "body": "Afirma que los médicos usan ChatGPT en la consulta, tecleando tus síntomas en el momento en que dejas de hablar — y pregunta, en sus palabras, «¿para qué te necesito?»"
+      },
+      "p4": {
+        "title": "El truco de «estoy escribiendo una novela»",
+        "body": "Según se dice, cuando un modelo se niega a responder, le dice que está escribiendo una novela para sortear el rechazo."
+      },
+      "p5": {
+        "title": "Simplicidad escalonada",
+        "body": "Según se dice, para temas difíciles pide al modelo que se lo explique como si tuviera 10 años, luego 5, luego 2 — hasta que encaja."
+      },
+      "p6": {
+        "title": "Defender con fuerza ambos lados",
+        "body": "Según se dice, en vez de pedir la respuesta «correcta», hace que la IA defienda el argumento más fuerte de cada lado de una cuestión difícil, y luego decide él mismo."
+      },
+      "p7": {
+        "title": "Interpretar un panel de expertos",
+        "body": "Según se dice, para grandes preguntas hace que la IA interprete a un panel de expertos discutiendo entre sí."
+      },
+      "p8": {
+        "title": "Abre la IA justo cuando te rendirías",
+        "body": "Su punto más amplio: el momento en que piensas «no sé cómo resolver esto» es cuando la mayoría abandona — y justo cuando deberías abrir la IA en su lugar."
+      },
+      "p9": {
+        "title": "La única habilidad que queda es saber qué preguntar",
+        "body": "En su opinión, el cuello de botella está ahora en tu cabeza, no en el modelo — la verdadera habilidad restante es hacer la pregunta correcta."
+      },
+      "p10": {
+        "title": "Fotos, sarpullidos y análisis de sangre para una segunda opinión",
+        "body": "Describe enviar imágenes a la IA — sarpullidos, análisis de sangre — para una segunda opinión rápida, ya que los modelos actuales leen imágenes directamente."
+      },
+      "p11": {
+        "title": "La IA puede plausiblemente impartir TCC",
+        "body": "Señala la terapia cognitivo-conductual como el único tipo de terapia clínicamente probado que una IA podría plausiblemente impartir por sí sola — haciendo el apoyo terapéutico real gratuito y a gran escala."
+      },
+      "p12": {
+        "title": "La IA resuelve problemas sin resolver",
+        "body": "Cita a la IA resolviendo problemas matemáticos antes sin resolver, con señales tempranas de lo mismo en física, química y biología."
+      },
+      "p13": {
+        "title": "Programadores de IA de 50 M$ al año",
+        "body": "Según se dice, afirma que los mejores programadores de IA de Silicon Valley ganan ahora hasta 50 millones de dólares al año — presentado como señal de la magnitud del cambio."
+      },
+      "p14": {
+        "title": "Un panel de salud alimentado con ADN",
+        "body": "Según se dice, un amigo secuenció su propio ADN, lo alimentó a una IA junto con análisis de sangre y datos de wearables, y obtuvo un panel de salud funcional."
+      },
+      "p15": {
+        "title": "Entrenador de jiu-jitsu con IA",
+        "body": "Según se dice, otro amigo instaló cámaras en su gimnasio de jiu-jitsu casero para que una IA revisara su sparring y le diera notas de técnica."
+      },
+      "p16": {
+        "title": "El «vampiro de IA»",
+        "body": "Acuñó «vampiro de IA» para el patrón de gente que trabaja más y duerme menos porque la IA sigue haciendo posible más producción."
+      },
+      "p17": {
+        "title": "Una persona, muchos agentes revisándose entre sí",
+        "body": "Su extrapolación: una sola persona ejecutando con el tiempo muchos agentes de IA de código que se revisan entre sí — algo que describe como cercano, no a años de distancia."
       }
     }
   }

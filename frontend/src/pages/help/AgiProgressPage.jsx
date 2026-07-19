@@ -4,6 +4,7 @@ import AgiTracker from './agi/AgiTracker';
 import PossibleEndings from './agi/PossibleEndings';
 import BenefitsOfAGI from './agi/BenefitsOfAGI';
 import HomoSapiensVsAI from './agi/HomoSapiensVsAI';
+import VoicesOnAGI from './agi/VoicesOnAGI';
 
 export default function AgiProgressPage() {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ export default function AgiProgressPage() {
     { id: 'endings', labelKey: 'help.agiTabs.endings', fallback: 'Possible Endings for AGI', icon: '🧊' },
     { id: 'benefits', labelKey: 'help.agiTabs.benefits', fallback: 'The Benefits of AGI', icon: '✨' },
     { id: 'homoVsAi', labelKey: 'help.agiTabs.homoVsAi', fallback: 'Homo Sapiens vs. KI i Test', icon: '🧑‍💻' },
+    { id: 'voices', labelKey: 'help.agiTabs.voices', fallback: 'Voices on AGI', icon: '🎙️' },
   ];
 
   const renderContent = () => {
@@ -26,6 +28,8 @@ export default function AgiProgressPage() {
         return <BenefitsOfAGI />;
       case 'homoVsAi':
         return <HomoSapiensVsAI />;
+      case 'voices':
+        return <VoicesOnAGI />;
       default:
         return <AgiTracker />;
     }

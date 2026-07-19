@@ -17,7 +17,7 @@
 | 11 | [Installing the App in the Cloud](#11-installing-the-app-in-the-cloud) | Active | None (smoke via endpoints) | Medium |
 | 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
-| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
+| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active (5 tabs) | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
 | 15 | Web Lab (1.16.0 · V0 structure only) | Active (placeholder) | None yet (V1+) | Low (V0 frontend-only) |
 | 16 | Self-Simulating Reality Agent (1.18.4 · V0+V1+V2+V3) | Active (curated content + backend claim analyzer + live physics search + interactive playground) | Backend `/api/claim-analyzer/analyze` smoke via TestClient (mock + LLM paths) | Medium — philosophical/scientific companion for Observer Patch Holography; **10 tabs**: Overview · Core Concepts · OPH Mechanics · Theory Tour (8 theories incl. **Celestial Holography** + **Featured Voice Sabrina Gonzalez Pasterski**, Perimeter Institute · Simons Collaboration Deputy Director) · WiPhy Search (live queries against `wiphy.org/api/search`, Pasterski's public physics-claims corpus) · Claim Analyzer (backend LLM decomposes strong claims into scientific core / overreach / reformulation with 5 overreach types; cross-tab bridge to WiPhy) · AI as Observer · Substrate Question · Playground (SVG Theory Map with 8 nodes + 9 typed edges, HTML5 Canvas Observer Patch simulator with brownian motion + overlap consensus metric) · Roadmap. EpistemicBadge enforces 5-level discipline (`established/mainstream/speculative/philosophy/metaphor/unsupported`). See `docs/self-sim-reality-agent-plan.md` |
 | 17 | Language Agents | Active | 42 contract tests (`test_language_agents_contracts.py`) + 10 voice-examples tests | Low-Medium — 6 tutors (🇯🇵 Japanese · 🇨🇳 Chinese · 🇰🇷 Korean · 🇬🇧 English Mastery · 🇳🇴 Norwegian · 🇪🇸 Spanish). **[1.19.0]** Spanish native **cloned-voice** examples via local **Voicebox** (pre-generated + cached WAVs, instant playback; async proxy `backend/routers/voicebox.py`). **[1.20.0]** English **🎙 Conversation Audio** — spoken loop (Web Speech ASR + browser TTS) + optional web-research (Node `websearch-backend`). **No Docker dependency** for the agents; Voicebox is optional and degrades to browser voice |
@@ -627,7 +627,18 @@ curl -X POST http://localhost:8000/api/red-cross-qa/generate-sprint-report -H "C
 
 ## 14) AGI Progress Hub + Homo vs. AI Workshop
 
-**Purpose**: Sidebar-level module (`📊 AGI Progress`) with 4 tabs. Three tabs cover AGI tracking, possible endings and benefits. The fourth tab — **Homo Sapiens vs. KI i Test** — is the SOCO workshop companion: 10 live head-to-head testing challenges (scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility) where a human tester and the AI answer the same prompt side-by-side. Every AI call is grounded in real ISTQB syllabi sections (CTFL v4.0 + CT-AI v1.0) via curated anchors + optional local PDF RAG when the provider is ItemAI / ItemServerAI.
+**Purpose**: Sidebar-level module (`📊 AGI Progress`) with 5 tabs (page: `frontend/src/pages/help/AgiProgressPage.jsx`; tab components under `frontend/src/pages/help/agi/`). Four tabs cover AGI tracking, possible endings, benefits and the Homo-vs-AI workshop. The fourth tab — **Homo Sapiens vs. KI i Test** — is the SOCO workshop companion: 10 live head-to-head testing challenges (scenarios, risk, ambiguities, exploratory, followups, automation, testData, oracle, triage, accessibility) where a human tester and the AI answer the same prompt side-by-side. Every AI call is grounded in real ISTQB syllabi sections (CTFL v4.0 + CT-AI v1.0) via curated anchors + optional local PDF RAG when the provider is ItemAI / ItemServerAI.
+
+**Tab 5 — Voices on AGI (1.25.0)** — `agi/VoicesOnAGI.jsx`. A curated,
+epistemically-honest feed of notable claims/anecdotes about the state of AGI.
+First entry: Marc Andreessen on The Joe Rogan Experience, 17 points (via
+@cyrilXBT), **paraphrased not verbatim**. Each point carries a 4-level badge —
+`view` / `technique` / `anecdote` / `contested` — with a caution banner and a
+published counterpoint on the strongest health claim (Nature Medicine). Posture
+matches the Code of Reality case study: present, don't evangelize. i18n:
+`help.agiTabs.voices` (common) + `agiVoices.*` (77 keys) in `agiHubModule.json`,
+EN/NO/ES at parity. Intended as the home for the future "constantly-updating"
+AGI signals feed.
 
 **Phase E (1.9.0) — Persistent Prompt Evolution governance**
 

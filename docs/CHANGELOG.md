@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.25.0] - 2026-07-19
+
+### Added — AGI Progress Hub: "Voices on AGI" tab (curated, epistemically-honest feed)
+
+New 5th tab in the AGI Progress Hub, alongside Tracker / Endings / Benefits /
+Homo-vs-AI. First entry: Marc Andreessen's 3+ hour appearance on The Joe Rogan
+Experience, summarized as 17 points (source: @cyrilXBT on X), paraphrased (not
+reproduced verbatim).
+
+- **Component**: `frontend/src/pages/help/agi/VoicesOnAGI.jsx`, wired into
+  `AgiProgressPage.jsx` (import + tab entry `voices` 🎙️ + switch case).
+- **Epistemic honesty by design** (same posture as the Code of Reality case
+  study — present, don't evangelize): every one of the 17 points carries a
+  4-level badge — `view` (his opinion/claim), `technique` (a usage tip),
+  `anecdote` (second-hand "reportedly" story), `contested` (has published
+  counter-evidence). A caution banner surfaces the source's own caveat up
+  front, and point 2's strong health claim shows the published counterpoint
+  (Nature Medicine study: comparable AI health tool missed real emergencies
+  >50% of the time). Clear attribution + "watch the full interview" note.
+- **Filter chips** by badge type + a legend explaining each badge.
+- **i18n**: `help.agiTabs.voices` in `common.json` and a full `agiVoices.*`
+  block (77 keys) in `agiHubModule.json`, all three locales EN/NO/ES at exact
+  parity.
+- This tab is also the intended home for the "constantly-updating" curated
+  feed of AGI voices/signals — more entries can be appended over time.
+
+Validated: both JSX files parse (Babel), all three locale JSON files valid,
+i18n key parity 77×3 with zero diff. Visual check deferred to the user (app is
+auth-gated). Next up (user's choice): Text 2 ("Self-Correcting AI Loop") as a
+new standalone agent.
+
+---
+
 ## [1.24.1] - 2026-07-18
 
 ### Added — Cybersecurity: Mongo persistence for compliance edits + drill history

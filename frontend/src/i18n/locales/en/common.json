@@ -12,7 +12,6 @@
   "english": "English",
   "norwegian": "Norwegian",
   "spanish": "Spanish",
-
   "dashboard": {
     "title": "Dashboard",
     "progress": {
@@ -38,7 +37,6 @@
       "aimForBetter": "Aim for more 'good' responses in simulations!"
     }
   },
-
   "sidebar": {
     "dashboard": "Dashboard",
     "learningModules": "Learning Modules",
@@ -85,7 +83,6 @@
     "presentationAgent": "Presentation Agent",
     "aiStudyBuddy": "AI Study Buddy",
     "security": "Security",
-
     "learningModulesSubmenu": {
       "videoLessons": "Video Lessons",
       "microLessons": "Micro-lessons",
@@ -98,20 +95,17 @@
       "aiLearning": "AI Learning & Training",
       "babelLibrary": "Babel Library"
     },
-
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Repo Analyzer",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Learning Repo"
     },
-
     "documentAnalyzerSubmenu": {
       "documentsAnalyzer": "Documents Analyzer",
       "learningDocument": "Learning Document",
       "agenticRAGAnalyzer": "Agentic RAG Analyzer",
       "agenticRAGDocuments": "Agentic RAG Documents"
     },
-
     "jMessagesAnalyzer": {
       "title": "J-messages Analyzer",
       "submenu": {
@@ -121,20 +115,17 @@
         "pairsLibrary": "J-messages pairs Library"
       }
     },
-
     "enterpriseArchitectureSubmenu": {
       "eaDashboard": "EA Dashboard",
       "processDesigner": "Process Designer",
       "catalogManager": "Catalog Manager"
     },
-
     "futureSubmenu": {
       "futureApp": "Future App",
       "ideaLog": "Idea Log",
       "featureRoadmap": "Feature Roadmap"
     }
   },
-
   "agents": {
     "compliance": {
       "dispatchTitle": "Send to n8n/OutSystems Agent"
@@ -184,7 +175,6 @@
     "showLess": "Show less",
     "showAll": "Show all ({{count}} more)"
   },
-
   "agentopsStudio": {
     "title": "AgentOps Studio",
     "subtitle": "Unified AI Workflow Lab - Design, simulate, and execute intelligent software workflows",
@@ -251,7 +241,6 @@
       "playbookBtn": "Create Playbook"
     }
   },
-
   "webLab": {
     "moduleTitle": "Web Lab",
     "moduleSubtitle": "Local clones of real websites. Distinct from the Red Cross Web QA Agent: this is the workspace for the actual web pages — clone, serve, browse, modify — not the QA testing patterns.",
@@ -287,7 +276,6 @@
       "relatedAgentHint": "The QA testing patterns for rodekors.no live in the existing 'Red Cross Web QA Agent' module. Once the Web Lab serves a local clone, that agent will be able to point its environment.test_url at the local server."
     }
   },
-
   "selfSimReality": {
     "moduleTitle": "Self-Simulating Reality Agent",
     "moduleSubtitle": "A scientific-philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience.",
@@ -760,7 +748,6 @@
       }
     }
   },
-
   "robomindClinic": {
     "title": "Robomind Clinic",
     "subtitle": "Screen AI runs for Psychopathia Machinalis patterns and get therapy recommendations.",
@@ -982,7 +969,6 @@
       "samplingRateLabel": "Sampling Rate:"
     }
   },
-
   "security": {
     "title": "Security Center",
     "localInstallation": {
@@ -1352,7 +1338,6 @@
       }
     }
   },
-
   "actions": {
     "refreshData": "Refresh Data",
     "signOut": "Sign Out",
@@ -1367,12 +1352,10 @@
     "create": "Create",
     "update": "Update"
   },
-
   "welcome": {
     "title": "Welcome to AI Learning with AI",
     "subtitle": "Your personalized learning journey powered by artificial intelligence"
   },
-
   "askAI": {
     "title": "Ask AI About Workplace Learning",
     "subtitle": "Interface-less UX / Zero-UI mode",
@@ -1426,7 +1409,6 @@
       "chatTooltip": "Chat with the Hologram Guide"
     }
   },
-
   "aiLearning": {
     "title": "AI Learning & Training",
     "subtitle": "Master AI concepts, tools, and best practices through interactive lessons",
@@ -1468,7 +1450,6 @@
     "openAgenticFail": "Could not open Agentic RAG with dataset",
     "openHologram": "Open Hologram & Chat"
   },
-
   "videoBasedLearning": {
     "title": "Video-Based Learning",
     "howToUse": "How to Use Video Lessons",
@@ -1525,7 +1506,6 @@
     "tooltipSaving": "Saving video...",
     "tooltipSaveLibrary": "Save video to your library"
   },
-
   "savedVideos": {
     "title": "Saved Videos",
     "loading": "Loading saved videos...",
@@ -1549,7 +1529,6 @@
     "noMatch": "No videos match your filter.",
     "empty": "No saved videos yet."
   },
-
   "help": {
     "agentTheory": {
       "header": "Agent Theory & Documentation",
@@ -1676,11 +1655,21 @@
         "inactive": "🔴 Inactive",
         "visit": "Visit site →",
         "categories": {
-          "0": { "name": "Hackathon Tools" },
-          "1": { "name": "Business AI Agents" },
-          "2": { "name": "Automation & Workflow Agents" },
-          "3": { "name": "Agent Frameworks" },
-          "4": { "name": "LLM Providers" }
+          "0": {
+            "name": "Hackathon Tools"
+          },
+          "1": {
+            "name": "Business AI Agents"
+          },
+          "2": {
+            "name": "Automation & Workflow Agents"
+          },
+          "3": {
+            "name": "Agent Frameworks"
+          },
+          "4": {
+            "name": "LLM Providers"
+          }
         }
       },
       "hackathons": {
@@ -1708,12 +1697,30 @@
           "essential": "Essential tools"
         },
         "categories": {
-          "orchestration-platforms": { "name": "Orchestration Platforms", "focus": "Run and scale AI agents in real workflows" },
-          "tool-use-api-integration": { "name": "Tool Use & API Integration", "focus": "Tools that enable agents to interact with real-world APIs and platforms" },
-          "agent-safety-guardrails": { "name": "Agent Safety & Guardrails", "focus": "Ensure secure, ethical, and reliable agent behavior" },
-          "agent-frameworks": { "name": "Agent Frameworks", "focus": "Building, orchestrating, and managing AI agents with multi-step reasoning" },
-          "multi-agent-collaboration": { "name": "Multi-Agent Collaboration", "focus": "Allow agents to talk, delegate, and collaborate on tasks" },
-          "memory-vector-databases": { "name": "Memory & Vector Databases", "focus": "Store and retrieve long-term context and facts" }
+          "orchestration-platforms": {
+            "name": "Orchestration Platforms",
+            "focus": "Run and scale AI agents in real workflows"
+          },
+          "tool-use-api-integration": {
+            "name": "Tool Use & API Integration",
+            "focus": "Tools that enable agents to interact with real-world APIs and platforms"
+          },
+          "agent-safety-guardrails": {
+            "name": "Agent Safety & Guardrails",
+            "focus": "Ensure secure, ethical, and reliable agent behavior"
+          },
+          "agent-frameworks": {
+            "name": "Agent Frameworks",
+            "focus": "Building, orchestrating, and managing AI agents with multi-step reasoning"
+          },
+          "multi-agent-collaboration": {
+            "name": "Multi-Agent Collaboration",
+            "focus": "Allow agents to talk, delegate, and collaborate on tasks"
+          },
+          "memory-vector-databases": {
+            "name": "Memory & Vector Databases",
+            "focus": "Store and retrieve long-term context and facts"
+          }
         }
       },
       "resources": {
@@ -1725,11 +1732,26 @@
         "other": "Other resources",
         "items": "items",
         "itemsList": {
-          "0": { "title": "Research Papers", "description": "Academic papers on agent theory" },
-          "1": { "title": "Tutorials", "description": "Step-by-step guides" },
-          "2": { "title": "Code Examples", "description": "Practical implementations" },
-          "3": { "title": "Video Content", "description": "Educational videos and demos" },
-          "4": { "title": "Hackathon Plans", "description": "Complete implementation plans for competitions" }
+          "0": {
+            "title": "Research Papers",
+            "description": "Academic papers on agent theory"
+          },
+          "1": {
+            "title": "Tutorials",
+            "description": "Step-by-step guides"
+          },
+          "2": {
+            "title": "Code Examples",
+            "description": "Practical implementations"
+          },
+          "3": {
+            "title": "Video Content",
+            "description": "Educational videos and demos"
+          },
+          "4": {
+            "title": "Hackathon Plans",
+            "description": "Complete implementation plans for competitions"
+          }
         }
       }
     },
@@ -1834,13 +1856,33 @@
       "livePlaceholder": "Live demo content will appear here...",
       "speakDemo": "🔊 Speak Demo",
       "features": {
-        "ai-concepts": { "name": "AI Concepts Generation", "desc": "Real-time streaming educational content" },
-        "micro-lessons": { "name": "Micro-lessons", "desc": "Bite-sized learning with AI-powered content" },
-        "scenario-simulator": { "name": "Scenario Simulator", "desc": "Interactive workplace simulations" },
-        "career-coach": { "name": "AI Career Coach", "desc": "Personalized career guidance" },
-        "skills-forecast": { "name": "Skills Forecasting", "desc": "AI-powered skill development predictions" },
-        "team-dynamics": { "name": "Team Dynamics Analyzer", "desc": "Team collaboration insights" },
-        "stats": { "name": "System Statistics" }
+        "ai-concepts": {
+          "name": "AI Concepts Generation",
+          "desc": "Real-time streaming educational content"
+        },
+        "micro-lessons": {
+          "name": "Micro-lessons",
+          "desc": "Bite-sized learning with AI-powered content"
+        },
+        "scenario-simulator": {
+          "name": "Scenario Simulator",
+          "desc": "Interactive workplace simulations"
+        },
+        "career-coach": {
+          "name": "AI Career Coach",
+          "desc": "Personalized career guidance"
+        },
+        "skills-forecast": {
+          "name": "Skills Forecasting",
+          "desc": "AI-powered skill development predictions"
+        },
+        "team-dynamics": {
+          "name": "Team Dynamics Analyzer",
+          "desc": "Team collaboration insights"
+        },
+        "stats": {
+          "name": "System Statistics"
+        }
       },
       "agents": {
         "ai-compliance-agent": {
@@ -1932,7 +1974,8 @@
       "tracker": "AGI Progress Tracker",
       "endings": "Possible Endings for AGI",
       "benefits": "The Benefits of AGI",
-      "homoVsAi": "Homo Sapiens vs. AI in Testing"
+      "homoVsAi": "Homo Sapiens vs. AI in Testing",
+      "voices": "Voices on AGI"
     },
     "agiProgress": {
       "title": "AGI Progress Tracker",
@@ -1970,7 +2013,6 @@
       }
     }
   },
-
   "jMessages": {
     "analyzer": {
       "title": "J-messages Analyzer",
@@ -2168,11 +2210,9 @@
       }
     }
   },
-
   "cyber": {
     "title": "Cybersecurity",
     "subtitle": "Comprehensive security management and threat intelligence platform",
-
     "tabs": {
       "dashboard": "Dashboard",
       "agentSecurity": "Agent Security",
@@ -2185,7 +2225,6 @@
       "incidentDrills": "Incident Drills",
       "knowledge": "Knowledge"
     },
-
     "common": {
       "loading": "Loading...",
       "save": "Save",
@@ -2215,7 +2254,6 @@
       "intermediate": "Intermediate",
       "advanced": "Advanced"
     },
-
     "dashboard": {
       "loading": "Loading cybersecurity dashboard...",
       "title": "Cybersecurity Dashboard",
@@ -2270,7 +2308,6 @@
         "signalsAnalyzed": "Signals analyzed daily by Microsoft"
       }
     },
-
     "agentSecurity": {
       "loading": "Loading agent security data...",
       "title": "Agent Security Monitor",
@@ -2300,7 +2337,6 @@
       "recentIncidents": "Recent Security Incidents",
       "securityMetrics": "Security Metrics"
     },
-
     "threatLibrary": {
       "loading": "Loading threat library...",
       "title": "Threat Library",
@@ -2319,7 +2355,6 @@
       "tags": "Tags",
       "moreTag": "+{{count}} more"
     },
-
     "toolsFrameworks": {
       "title": "Tools & Frameworks",
       "subtitle": "Quick utilities for OWASP Top 10 checks and MITRE ATT&CK mapping. Use this as a lightweight companion to PenTesting/Red Team activities.",
@@ -2365,7 +2400,6 @@
       "noPreset": "No preset found for this project.",
       "settingsSaved": "Settings saved."
     },
-
     "postureRisk": {
       "loading": "Loading posture assessment...",
       "title": "Posture & Risk Assessment",
@@ -2403,7 +2437,6 @@
       "recover": "Recover",
       "recoverDesc": "Restore capabilities after incidents"
     },
-
     "vulnerabilities": {
       "loading": "Loading vulnerabilities...",
       "title": "Vulnerability Management",
@@ -2429,7 +2462,6 @@
       "recommendation": "Recommendation",
       "file": "File:"
     },
-
     "compliance": {
       "loading": "Loading compliance data…",
       "totalControls": "Total Controls",
@@ -2452,7 +2484,6 @@
       "notApplicable": "N/A",
       "noMatch": "No controls match your filters"
     },
-
     "coach": {
       "loading": "Loading coach…",
       "topicCatalog": "Topic Catalog",
@@ -2471,7 +2502,6 @@
       "generatedAt": "Generated At",
       "min": "min"
     },
-
     "drills": {
       "loading": "Loading drill scenarios…",
       "scenarios": "Scenarios",
@@ -2496,7 +2526,6 @@
       "noDrills": "No completed drills yet. Start one from the Scenarios tab!",
       "scenario": "Scenario"
     },
-
     "knowledge": {
       "loading": "Loading knowledge base…",
       "articles": "Articles",
@@ -3035,4 +3064,3 @@
     "fallbackReply": "I'm having trouble accessing my AI core. Please try again."
   }
 }
-

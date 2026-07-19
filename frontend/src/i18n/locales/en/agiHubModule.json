@@ -98,7 +98,6 @@
       }
     }
   },
-
   "agiBenefits": {
     "title": "The Benefits of AGI",
     "subtitle": "If developed safely and equitably, Artificial General Intelligence could unlock transformative benefits for humanity.",
@@ -112,9 +111,21 @@
         "title": "Health & Longevity",
         "desc": "AI is already collapsing the drug discovery cycle from decades to months. AGI could accelerate the cure of major diseases and extend healthy human lifespan by orders of magnitude.",
         "examples": [
-          { "text": "AlphaFold 3 (DeepMind, May 2024) predicts protein interactions with DNA, RNA and small molecules at near-crystallographic accuracy.", "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/", "source": "DeepMind" },
-          { "text": "Isomorphic Labs is on track to begin its first human clinical trials in 2026 with AlphaFold-3-designed oncology drugs.", "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials", "source": "IntuitionLabs" },
-          { "text": "Insilico Medicine used its Chemistry42 platform to design a first-in-class dual-action PROTAC targeting PKMYT1 (cancer), published in Nature Communications; 2025 saw the largest single-year jump in IND filings for AI-originated molecules.", "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/", "source": "DrugDiscoveryTrends" },
+          {
+            "text": "AlphaFold 3 (DeepMind, May 2024) predicts protein interactions with DNA, RNA and small molecules at near-crystallographic accuracy.",
+            "url": "https://deepmind.google/blog/alphafold-five-years-of-impact/",
+            "source": "DeepMind"
+          },
+          {
+            "text": "Isomorphic Labs is on track to begin its first human clinical trials in 2026 with AlphaFold-3-designed oncology drugs.",
+            "url": "https://intuitionlabs.ai/articles/isomorphic-labs-alphafold-ai-drug-discovery-trials",
+            "source": "IntuitionLabs"
+          },
+          {
+            "text": "Insilico Medicine used its Chemistry42 platform to design a first-in-class dual-action PROTAC targeting PKMYT1 (cancer), published in Nature Communications; 2025 saw the largest single-year jump in IND filings for AI-originated molecules.",
+            "url": "https://www.drugdiscoverytrends.com/insilico-medicine-ai-drug-discovery-breakthrough/",
+            "source": "DrugDiscoveryTrends"
+          },
           "Personalized medicine tailored to each patient's genome and microbiome, plus real-time monitoring"
         ]
       },
@@ -122,8 +133,16 @@
         "title": "Scientific Discovery",
         "desc": "AGI could compress centuries of scientific progress into years — simulating, hypothesizing and validating at superhuman speed. The revolution has already started in materials, proteins and mathematics.",
         "examples": [
-          { "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) solved 4/6 problems at the International Mathematical Olympiad at silver-medal level (28/42 points); methodology published in Nature in November 2025.", "url": "https://www.nature.com/articles/s41586-025-09833-y", "source": "Nature" },
-          { "text": "GNoME (DeepMind) predicted 2.4 million new stable materials — expanding the known catalogue by roughly 10× over decades of manual discovery.", "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/", "source": "DeepMind" },
+          {
+            "text": "AlphaProof + AlphaGeometry 2 (DeepMind, 2024) solved 4/6 problems at the International Mathematical Olympiad at silver-medal level (28/42 points); methodology published in Nature in November 2025.",
+            "url": "https://www.nature.com/articles/s41586-025-09833-y",
+            "source": "Nature"
+          },
+          {
+            "text": "GNoME (DeepMind) predicted 2.4 million new stable materials — expanding the known catalogue by roughly 10× over decades of manual discovery.",
+            "url": "https://deepmind.google/discover/blog/millions-of-new-materials-discovered-with-deep-learning/",
+            "source": "DeepMind"
+          },
           "Designing new proteins, batteries and catalysts in silico, then synthesizing them in autonomous robotic labs such as Berkeley's A-Lab",
           "Running millions of virtual experiments in parallel at planetary scale"
         ]
@@ -132,7 +151,11 @@
         "title": "Universal Education",
         "desc": "AI-powered tutors could offer every human a world-class, personalized education regardless of geography or income.",
         "examples": [
-          { "text": "Khanmigo (Khan Academy + GPT) grew from 40 000 to 700 000+ K-12 students in one school year (2024-25) and surpassed 5 million users across 110 countries by late 2025; free for US teachers thanks to a $10 M Gates Foundation grant.", "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/", "source": "Khan Academy" },
+          {
+            "text": "Khanmigo (Khan Academy + GPT) grew from 40 000 to 700 000+ K-12 students in one school year (2024-25) and surpassed 5 million users across 110 countries by late 2025; free for US teachers thanks to a $10 M Gates Foundation grant.",
+            "url": "https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/",
+            "source": "Khan Academy"
+          },
           "Adaptive tutoring matched to each student's pace and style, using guided questioning rather than direct answers",
           "Instant high-quality translation across 100+ languages and dialects",
           "Lifelong learning companions that grow with the learner from childhood through adulthood"
@@ -142,8 +165,16 @@
         "title": "Climate & Environment",
         "desc": "AGI could help solve climate change through optimized energy systems, carbon capture and planetary-scale modeling — and AI models already outperform traditional systems for weather forecasting.",
         "examples": [
-          { "text": "SPARC (Commonwealth Fusion Systems) is ~75 % built, with first plasma expected in 2026 and net energy gain (Q>1) targeted for 2027 — would be the first commercial-grade fusion machine.", "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/", "source": "CFS" },
-          { "text": "GraphCast (DeepMind) outperforms ECMWF's HRES on 90 % of 1 380 verification targets; Aurora (Microsoft) outperforms IFS HRES at 0.1° on more than 92 % of targets.", "url": "https://www.nature.com/articles/s41586-025-09005-y", "source": "Nature" },
+          {
+            "text": "SPARC (Commonwealth Fusion Systems) is ~75 % built, with first plasma expected in 2026 and net energy gain (Q>1) targeted for 2027 — would be the first commercial-grade fusion machine.",
+            "url": "https://blog.cfs.energy/our-sparc-fusion-facility-is-now-about-75-done-take-a-virtual-tour-of-the-progress/",
+            "source": "CFS"
+          },
+          {
+            "text": "GraphCast (DeepMind) outperforms ECMWF's HRES on 90 % of 1 380 verification targets; Aurora (Microsoft) outperforms IFS HRES at 0.1° on more than 92 % of targets.",
+            "url": "https://www.nature.com/articles/s41586-025-09005-y",
+            "source": "Nature"
+          },
           "Optimizing global supply chains and power grids to minimize emissions",
           "Ecosystem restoration and biodiversity preservation with smart sensors"
         ]
@@ -152,7 +183,11 @@
         "title": "Economic Productivity",
         "desc": "Agentic AI already automates substantial parts of cognitive work. AGI could dramatically increase productivity and enable new forms of work and creativity.",
         "examples": [
-          { "text": "Devin 2.0 (Cognition, April 2025) resolves 13.86 % of real GitHub issues end-to-end on SWE-bench — a 7× jump over previous models; 67 % of its PRs are merged; pricing dropped from $500/month to $20/month.", "url": "https://cognition.ai/blog/devin-annual-performance-review-2025", "source": "Cognition" },
+          {
+            "text": "Devin 2.0 (Cognition, April 2025) resolves 13.86 % of real GitHub issues end-to-end on SWE-bench — a 7× jump over previous models; 67 % of its PRs are merged; pricing dropped from $500/month to $20/month.",
+            "url": "https://cognition.ai/blog/devin-annual-performance-review-2025",
+            "source": "Cognition"
+          },
           "Test coverage rising from 50-60 % to 80-90 % at companies deploying AI agents",
           "Code migrations going from 30-40 human-hours to 3-4 hours per file in pilot banks (10×)",
           "Enabling entirely new industries and business models where cognitive cost used to be the bottleneck"
@@ -162,7 +197,11 @@
         "title": "Ending Extreme Poverty",
         "desc": "If AI benefits are distributed equitably, they could shrink extreme poverty and provide universal access to basic needs. Some applications already serve hundreds of millions.",
         "examples": [
-          { "text": "Plantix diagnoses 800+ symptoms across 60 crops by photo with 90-100 % accuracy on staple crops; free for farmers, 10M+ downloads across 150+ countries.", "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/", "source": "GSMA" },
+          {
+            "text": "Plantix diagnoses 800+ symptoms across 60 crops by photo with 90-100 % accuracy on staple crops; free for farmers, 10M+ downloads across 150+ countries.",
+            "url": "https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/agritech/detecting-and-managing-crop-pests-and-diseases-with-ai-insights-from-plantix/",
+            "source": "GSMA"
+          },
           "SMS- and voice-based medical assistants in regions with no doctor access",
           "Automated food production at progressively lower marginal cost",
           "Universal basic services funded by AI efficiency gains"
@@ -172,7 +211,11 @@
         "title": "Creativity & Culture",
         "desc": "Generative AI already amplifies human creativity — video, audio, illustration, narrative — and lowers the production cost of work previously out of reach for independent creators.",
         "examples": [
-          { "text": "Sora 2 (OpenAI, September 2025) generates 10-25 s video with synchronized audio, dialogue and sound effects; includes masking/in-painting and consistent cameos, used by filmmakers as a digital storyboard and for large-crowd or hazardous scenes.", "url": "https://openai.com/index/sora-2/", "source": "OpenAI" },
+          {
+            "text": "Sora 2 (OpenAI, September 2025) generates 10-25 s video with synchronized audio, dialogue and sound effects; includes masking/in-painting and consistent cameos, used by filmmakers as a digital storyboard and for large-crowd or hazardous scenes.",
+            "url": "https://openai.com/index/sora-2/",
+            "source": "OpenAI"
+          },
           "Co-creative tools for artists, writers and musicians — plus entirely new AI-native formats",
           "Preserving and translating endangered languages and traditions",
           "New immersive experiences in gaming, film and personalized virtual worlds"
@@ -182,8 +225,16 @@
         "title": "Space Exploration",
         "desc": "AGI could accelerate humanity's expansion into the solar system and beyond, solving problems too complex for human teams alone.",
         "examples": [
-          { "text": "Perseverance (NASA) completed in December 2024 the first drives on another world planned by generative AI — 456 m without human control over two days.", "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/", "source": "NASA" },
-          { "text": "AEGIS (JPL) lets SuperCam on Perseverance autonomously select and analyze Martian rocks — analyzing imagery on-board without contacting Earth.", "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/", "source": "NASA Science" },
+          {
+            "text": "Perseverance (NASA) completed in December 2024 the first drives on another world planned by generative AI — 456 m without human control over two days.",
+            "url": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-completes-first-ai-planned-drive-on-mars/",
+            "source": "NASA"
+          },
+          {
+            "text": "AEGIS (JPL) lets SuperCam on Perseverance autonomously select and analyze Martian rocks — analyzing imagery on-board without contacting Earth.",
+            "url": "https://science.nasa.gov/resource/perseverances-supercam-uses-aegis-for-the-first-time/",
+            "source": "NASA Science"
+          },
           "Designing self-sustaining off-world habitats",
           "Long-duration mission planning and life support"
         ]
@@ -192,7 +243,11 @@
         "title": "Better Governance",
         "desc": "AI could help design fairer, more responsive and more transparent institutions — if deployed with strong democratic safeguards and real citizen participation.",
         "examples": [
-          { "text": "Polis and similar platforms (Talk to the City, vTaiwan) are already used for mass deliberation in Austria, Uruguay, New Zealand, the Philippines and Germany — aggregating thousands of citizen inputs while preserving minority positions.", "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html", "source": "OECD" },
+          {
+            "text": "Polis and similar platforms (Talk to the City, vTaiwan) are already used for mass deliberation in Austria, Uruguay, New Zealand, the Philippines and Germany — aggregating thousands of citizen inputs while preserving minority positions.",
+            "url": "https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-civic-participation-and-open-government_51227ce7.html",
+            "source": "OECD"
+          },
           "Engaged California used AI in 2025 to process citizen input at scale after the Los Angeles wildfires",
           "Policy simulation and evidence-based decision making",
           "Detecting and reducing corruption and bureaucratic inefficiency"
@@ -202,8 +257,16 @@
         "title": "Mental Health",
         "desc": "24/7 access to conversational support backed by cognitive behavioural therapy — especially valuable where professionals are scarce. There is still clinical debate about its precise role, but evidence is starting to accumulate.",
         "examples": [
-          { "text": "Woebot showed effect sizes of d=0.57 for anxiety and d=0.46 for depression in systematic reviews — more effective than WHO self-help materials after just 2 weeks.", "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352", "source": "World Psychiatry" },
-          { "text": "Wysa produced notable reductions in PHQ-9 (depression) and GAD-7 (anxiety) after 4 weeks in chronic disease patients (p<0.001); users were 3× more likely to complete therapy sessions with Wysa support between sessions.", "url": "https://www.jmir.org/2025/1/e67114", "source": "JMIR" },
+          {
+            "text": "Woebot showed effect sizes of d=0.57 for anxiety and d=0.46 for depression in systematic reviews — more effective than WHO self-help materials after just 2 weeks.",
+            "url": "https://onlinelibrary.wiley.com/doi/10.1002/wps.21352",
+            "source": "World Psychiatry"
+          },
+          {
+            "text": "Wysa produced notable reductions in PHQ-9 (depression) and GAD-7 (anxiety) after 4 weeks in chronic disease patients (p<0.001); users were 3× more likely to complete therapy sessions with Wysa support between sessions.",
+            "url": "https://www.jmir.org/2025/1/e67114",
+            "source": "JMIR"
+          },
           "Support for vulnerable groups: mothers in the perinatal period, chronic-pain patients, university students",
           "Night-time coverage, in local languages, with no social-stigma barrier"
         ]
@@ -212,8 +275,16 @@
         "title": "Disaster Response",
         "desc": "AI-driven early warning systems that multiply reaction time before floods, wildfires or earthquakes — with measured impact on lives saved and economic loss reduction.",
         "examples": [
-          { "text": "Google Flood Hub protects 460M+ people across 80+ countries with flood forecasts up to 7 days ahead, capturing 85-100 % of severe floods recorded by GDACS.", "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/", "source": "Google Research" },
-          { "text": "Groundsource (Google, March 2026) mines decades of news reports to forecast imminent flash floods up to 24 hours ahead.", "url": "https://aiforcause.org/stories/google-flood-hub", "source": "AI for Cause" },
+          {
+            "text": "Google Flood Hub protects 460M+ people across 80+ countries with flood forecasts up to 7 days ahead, capturing 85-100 % of severe floods recorded by GDACS.",
+            "url": "https://research.google/blog/protecting-cities-with-ai-driven-flash-flood-forecasting/",
+            "source": "Google Research"
+          },
+          {
+            "text": "Groundsource (Google, March 2026) mines decades of news reports to forecast imminent flash floods up to 24 hours ahead.",
+            "url": "https://aiforcause.org/stories/google-flood-hub",
+            "source": "AI for Cause"
+          },
           "Early warning systems are proven to cut flood fatalities by up to 43 % and economic losses by 35-50 %",
           "AI-assisted humanitarian coordination: a regional authority in Southern Africa caught a flash-flood alert from AI and deployed responders in time"
         ]
@@ -222,8 +293,16 @@
         "title": "Accessibility",
         "desc": "Multimodal AI is tearing down barriers for people with disabilities — vision, hearing, mobility and communication — turning capabilities that once required specialized human assistance into everyday features.",
         "examples": [
-          { "text": "Be My AI (Be My Eyes + GPT-4 Vision) describes images in natural language to blind and low-vision users, from reading labels to interpreting scenes; integrated into the Microsoft Disability Answer Desk it resolves queries in ~4 minutes on average — less than half the time of a human agent.", "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/", "source": "Be My Eyes" },
-          { "text": "Seeing AI (Microsoft) recognizes people, products, currency and documents in real time from a phone — free, in 18+ languages.", "url": "https://openai.com/index/be-my-eyes/", "source": "OpenAI" },
+          {
+            "text": "Be My AI (Be My Eyes + GPT-4 Vision) describes images in natural language to blind and low-vision users, from reading labels to interpreting scenes; integrated into the Microsoft Disability Answer Desk it resolves queries in ~4 minutes on average — less than half the time of a human agent.",
+            "url": "https://www.bemyeyes.com/news/introducing-be-my-ai-formerly-virtual-volunteer-for-people-who-are-blind-or-have-low-vision-powered-by-openais-gpt-4/",
+            "source": "Be My Eyes"
+          },
+          {
+            "text": "Seeing AI (Microsoft) recognizes people, products, currency and documents in real time from a phone — free, in 18+ languages.",
+            "url": "https://openai.com/index/be-my-eyes/",
+            "source": "OpenAI"
+          },
           "Real-time sign-language translation from a camera, no gloves or specialized hardware needed",
           "High-quality automatic captioning and audio description for live streaming"
         ]
@@ -232,8 +311,16 @@
         "title": "Humanoid Robotics",
         "desc": "Humanoid robots are stepping out of the lab and onto the factory floor. The combination of vision-language-action foundation models and cheaper hardware is opening repetitive or dangerous physical work to automation.",
         "examples": [
-          { "text": "Figure 02 produced 30 000+ BMW X3 vehicles at Spartanburg over 10 months, moving 90 000+ parts in 1 250 operational hours at >99 % per-shift accuracy — the first commercial humanoid deployment on a real auto line.", "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time", "source": "BMW Group" },
-          { "text": "Apollo (Apptronik) operates at Mercedes' Berlin-Marienfelde digital factory and Kecskemét (Hungary) plant, with $403M Series A funding backed by Google, B Capital and Mercedes itself.", "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive", "source": "iFactoryApp" },
+          {
+            "text": "Figure 02 produced 30 000+ BMW X3 vehicles at Spartanburg over 10 months, moving 90 000+ parts in 1 250 operational hours at >99 % per-shift accuracy — the first commercial humanoid deployment on a real auto line.",
+            "url": "https://www.press.bmwgroup.com/global/article/detail/T0455864EN/bmw-group-to-deploy-humanoid-robots-in-production-in-germany-for-the-first-time",
+            "source": "BMW Group"
+          },
+          {
+            "text": "Apollo (Apptronik) operates at Mercedes' Berlin-Marienfelde digital factory and Kecskemét (Hungary) plant, with $403M Series A funding backed by Google, B Capital and Mercedes itself.",
+            "url": "https://ifactoryapp.com/industries/automotive-manufacturing/apollo-mercedes-apptronik-humanoid-automotive",
+            "source": "iFactoryApp"
+          },
           "Robot-as-a-service pricing (~$25/hour) avoids capex and opens automation to SMEs",
           "Support for elder care, hospital logistics and hazardous work (nuclear cleanup, search-and-rescue)"
         ]
@@ -242,11 +329,121 @@
         "title": "Conservation & Biodiversity",
         "desc": "AI enables ecosystem monitoring, species identification and threat detection at planetary scale — multiplying the effectiveness of chronically understaffed conservation teams.",
         "examples": [
-          { "text": "Wildbook (Wild Me) covers 250+ species with 1.4M+ sightings and 280 000 individually tracked animals; the system catalogued 34M+ sightings by 2026.", "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/", "source": "Yenra" },
-          { "text": "PAWS (USC + National Geographic) uses game theory to plan anti-poaching patrols; TrailGuard AI (RESOLVE) deploys camouflaged cameras that detect poachers in real time.", "url": "https://dl.acm.org/doi/10.1145/3748699.3749780", "source": "ACM" },
+          {
+            "text": "Wildbook (Wild Me) covers 250+ species with 1.4M+ sightings and 280 000 individually tracked animals; the system catalogued 34M+ sightings by 2026.",
+            "url": "https://yenra.com/ai-tech/animal-tracking-and-conservation/",
+            "source": "Yenra"
+          },
+          {
+            "text": "PAWS (USC + National Geographic) uses game theory to plan anti-poaching patrols; TrailGuard AI (RESOLVE) deploys camouflaged cameras that detect poachers in real time.",
+            "url": "https://dl.acm.org/doi/10.1145/3748699.3749780",
+            "source": "ACM"
+          },
           "The global wildlife-conservation AI software market topped $2.2B in 2025 — acoustic sensors, drones and GPS telemetry tied to vision models",
           "Marine monitoring: illegal-fishing detection and coral-bleaching tracking from satellite imagery"
         ]
+      }
+    }
+  },
+  "agiVoices": {
+    "title": "Voices on AGI",
+    "subtitle": "A curated, epistemically-honest feed of notable claims and anecdotes about the state of AGI — each tagged for what it actually is.",
+    "banner": {
+      "title": "Read these as claims, not settled facts",
+      "text": "Several of these are Marc Andreessen’s stated views and second-hand anecdotes, not independently verified facts. Where strong claims have published counter-evidence, it is shown alongside. Treat the numbers as starting points to verify, not conclusions."
+    },
+    "attribution": {
+      "sourceLabel": "Source",
+      "source": "Marc Andreessen on The Joe Rogan Experience (3+ hour interview).",
+      "via": "Summary of 17 points via @cyrilXBT on X.",
+      "watch": "Watch the full interview before treating any single number as settled."
+    },
+    "badges": {
+      "view": "Andreessen’s view",
+      "technique": "Usage technique",
+      "anecdote": "Second-hand anecdote",
+      "contested": "Contested"
+    },
+    "filters": {
+      "all": "All"
+    },
+    "counterpointLabel": "Counterpoint",
+    "legendTitle": "What the badges mean",
+    "legend": {
+      "view": "A stated opinion or claim — his interpretation, not an established fact.",
+      "technique": "A concrete way he uses AI that you can try yourself.",
+      "anecdote": "A second-hand story (‘reportedly’) — illustrative, not verified.",
+      "contested": "A strong claim that has published counter-evidence."
+    },
+    "items": {
+      "p1": {
+        "title": "AGI is already here",
+        "body": "In his view the threshold was quietly crossed about three months ago — with GPT-5.5, Claude 4.6, Gemini 3 and Grok 4.3 — and almost nobody noticed, because the field now moves too fast to register milestones."
+      },
+      "p2": {
+        "title": "Top models beat world-class experts",
+        "body": "He says that for almost any topic the leading models give him better answers than the world-class experts he could personally call — and he can call almost anyone. No supporting data has been published.",
+        "counterpoint": "A Nature Medicine study on a comparable AI health tool found it missed real emergencies more than half the time. Take the claim seriously, but verify it yourself."
+      },
+      "p3": {
+        "title": "Doctors already type your symptoms into ChatGPT",
+        "body": "He claims doctors are using ChatGPT in the exam room, typing in your symptoms the moment you stop talking — and asks, in his words, “what do I need you for.”"
+      },
+      "p4": {
+        "title": "The ‘I’m writing a novel’ bypass",
+        "body": "Reportedly, when a model declines to answer, he tells it he is writing a novel to get past the refusal."
+      },
+      "p5": {
+        "title": "Escalating simplicity",
+        "body": "Reportedly, for hard topics he asks the model to explain it as if he were 10, then 5, then 2 years old — until it clicks."
+      },
+      "p6": {
+        "title": "Steelman both sides",
+        "body": "Reportedly, instead of asking for the ‘right’ answer, he has the AI argue the strongest case for each side of a hard question, then decides himself."
+      },
+      "p7": {
+        "title": "Role-play an expert panel",
+        "body": "Reportedly, for big questions he has the AI role-play a panel of experts arguing with each other."
+      },
+      "p8": {
+        "title": "Open the AI exactly when you’d give up",
+        "body": "His broader point: the moment you think ‘I don’t know how to figure this out’ is when most people quit — and exactly when you should open the AI instead."
+      },
+      "p9": {
+        "title": "The only skill left is knowing what to ask",
+        "body": "In his view the bottleneck is now in your head, not the model — the real remaining skill is asking the right question."
+      },
+      "p10": {
+        "title": "Photos, rashes and blood tests for a second opinion",
+        "body": "He describes sending the AI images — rashes, blood tests — for a fast second opinion, since current models read images directly."
+      },
+      "p11": {
+        "title": "AI can plausibly deliver CBT",
+        "body": "He points to cognitive behavioral therapy as the one clinically proven therapy type an AI could plausibly deliver on its own — making real therapeutic support freely available at scale."
+      },
+      "p12": {
+        "title": "AI cracking unsolved problems",
+        "body": "He cites AI solving previously unsolved math problems, with early signs of the same beginning in physics, chemistry and biology."
+      },
+      "p13": {
+        "title": "$50M/year AI coders",
+        "body": "Reportedly, he claims the very top AI coders in Silicon Valley now earn as much as $50 million a year — offered as a signal of how large the shift is."
+      },
+      "p14": {
+        "title": "A DNA-fed health dashboard",
+        "body": "Reportedly, a friend sequenced his own DNA, fed it to an AI along with blood work and wearable data, and got back a working health dashboard."
+      },
+      "p15": {
+        "title": "AI jiu-jitsu coach",
+        "body": "Reportedly, another friend set up cameras in his home jiu-jitsu gym so an AI could review his sparring and give technique notes."
+      },
+      "p16": {
+        "title": "The ‘AI vampire’",
+        "body": "He coined ‘AI vampire’ for the pattern of people working more and sleeping less because AI keeps making more output possible."
+      },
+      "p17": {
+        "title": "One person, many agents reviewing each other",
+        "body": "His extrapolation: a single person eventually running many AI coding agents that review one another — something he describes as close, not years away."
       }
     }
   }

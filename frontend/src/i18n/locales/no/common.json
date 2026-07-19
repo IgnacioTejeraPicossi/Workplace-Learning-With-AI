@@ -12,7 +12,6 @@
   "english": "Engelsk",
   "norwegian": "Norsk",
   "spanish": "Spansk",
-
   "dashboard": {
     "title": "Dashbord",
     "progress": {
@@ -25,43 +24,77 @@
           "0": {
             "name": "Hackathon‑verktøy",
             "apps": {
-              "0": { "description": "Gi fart på innovasjon med skreddersydde agenter. Bygg AI‑agenter som strømlinjeformer drift, forbedrer opplevelser og skaper verdi på en low‑code‑plattform." }
+              "0": {
+                "description": "Gi fart på innovasjon med skreddersydde agenter. Bygg AI‑agenter som strømlinjeformer drift, forbedrer opplevelser og skaper verdi på en low‑code‑plattform."
+              }
             }
           },
           "1": {
             "name": "Forretnings‑AI‑agenter",
             "apps": {
-              "0": { "description": "Organiser virksomheten din med en AI‑agent som håndterer oppgaver, automasjon, databaser, dashboards og dokumenter – alt på ett sted." },
-              "1": { "description": "Verdens første akademiske agent – håndterer forsknings‑ og skriveoppgaver fra start til slutt." },
-              "2": { "description": "No‑code‑bygger som lar ikke‑tekniske gründere gjøre idé til produksjonsklar app med UI, database, arbeidsflyt og AI." },
-              "3": { "description": "AI‑epostplattform som kombinerer lead‑generering, innboksstyring og automasjon for konverterende kampanjer." },
-              "4": { "description": "Agent‑simulering som hjelper team å prototypere, teste og lansere pålitelige AI‑agenter i skala." }
+              "0": {
+                "description": "Organiser virksomheten din med en AI‑agent som håndterer oppgaver, automasjon, databaser, dashboards og dokumenter – alt på ett sted."
+              },
+              "1": {
+                "description": "Verdens første akademiske agent – håndterer forsknings‑ og skriveoppgaver fra start til slutt."
+              },
+              "2": {
+                "description": "No‑code‑bygger som lar ikke‑tekniske gründere gjøre idé til produksjonsklar app med UI, database, arbeidsflyt og AI."
+              },
+              "3": {
+                "description": "AI‑epostplattform som kombinerer lead‑generering, innboksstyring og automasjon for konverterende kampanjer."
+              },
+              "4": {
+                "description": "Agent‑simulering som hjelper team å prototypere, teste og lansere pålitelige AI‑agenter i skala."
+              }
             }
           },
           "2": {
             "name": "Automasjon og arbeidsflyt‑agenter",
             "apps": {
-              "0": { "description": "Fleksibel AI‑arbeidsflyt for tekniske team. Bygg med presisjonen til kode eller farten til drag‑and‑drop. Egen drift eller skytjeneste." },
-              "1": { "description": "Bygg tilpassede AI‑agenter på minutter med naturlig språk for å håndtere leads, e‑post, kalender og mer." },
-              "2": { "description": "AI‑drevet SEO‑agent som effektiviserer nøkkelord‑analyse og innholdsstrategi." },
-              "3": { "description": "Arbeidsflate med AI‑agenter – bygg, tren og distribuer agenter som automatiserer oppgaver og forbedrer arbeidsflyter." },
-              "4": { "description": "Personlig AI‑agent for søk, innhold og produktivitet." }
+              "0": {
+                "description": "Fleksibel AI‑arbeidsflyt for tekniske team. Bygg med presisjonen til kode eller farten til drag‑and‑drop. Egen drift eller skytjeneste."
+              },
+              "1": {
+                "description": "Bygg tilpassede AI‑agenter på minutter med naturlig språk for å håndtere leads, e‑post, kalender og mer."
+              },
+              "2": {
+                "description": "AI‑drevet SEO‑agent som effektiviserer nøkkelord‑analyse og innholdsstrategi."
+              },
+              "3": {
+                "description": "Arbeidsflate med AI‑agenter – bygg, tren og distribuer agenter som automatiserer oppgaver og forbedrer arbeidsflyter."
+              },
+              "4": {
+                "description": "Personlig AI‑agent for søk, innhold og produktivitet."
+              }
             }
           },
           "3": {
             "name": "Agent‑rammeverk",
             "apps": {
-              "0": { "description": "Rammeverk for utvikling av LLM‑applikasjoner." },
-              "1": { "description": "Flermodell‑samtaler og multi‑agent‑oppsett fra Microsoft." },
-              "2": { "description": "Rollebasert orkestrering av samarbeidende AI‑agenter." }
+              "0": {
+                "description": "Rammeverk for utvikling av LLM‑applikasjoner."
+              },
+              "1": {
+                "description": "Flermodell‑samtaler og multi‑agent‑oppsett fra Microsoft."
+              },
+              "2": {
+                "description": "Rollebasert orkestrering av samarbeidende AI‑agenter."
+              }
             }
           },
           "4": {
             "name": "LLM‑leverandører",
             "apps": {
-              "0": { "description": "OpenAIs plattform for agenter og assistenter." },
-              "1": { "description": "Anthropics AI‑assistent" },
-              "2": { "description": "Googles multimodale AI‑modell." }
+              "0": {
+                "description": "OpenAIs plattform for agenter og assistenter."
+              },
+              "1": {
+                "description": "Anthropics AI‑assistent"
+              },
+              "2": {
+                "description": "Googles multimodale AI‑modell."
+              }
             }
           }
         }
@@ -72,84 +105,180 @@
             "name": "Orkestreringsplattformer",
             "focus": "Kjør og skaler AI‑agenter i ekte arbeidsflyter",
             "tools": {
-              "0": { "category": "Orkestrering" },
-              "1": { "category": "Orkestrering" },
-              "2": { "category": "Orkestrering" },
-              "3": { "category": "Orkestrering" },
-              "4": { "category": "Orkestrering" },
-              "5": { "category": "Orkestrering" },
-              "6": { "category": "Orkestrering" },
-              "7": { "category": "Orkestrering" }
+              "0": {
+                "category": "Orkestrering"
+              },
+              "1": {
+                "category": "Orkestrering"
+              },
+              "2": {
+                "category": "Orkestrering"
+              },
+              "3": {
+                "category": "Orkestrering"
+              },
+              "4": {
+                "category": "Orkestrering"
+              },
+              "5": {
+                "category": "Orkestrering"
+              },
+              "6": {
+                "category": "Orkestrering"
+              },
+              "7": {
+                "category": "Orkestrering"
+              }
             }
           },
           "tool-use-api-integration": {
             "name": "Verktøybruk og API‑integrasjon",
             "focus": "Verktøy som lar agenter samhandle med virkelige API‑er og plattformer",
             "tools": {
-              "0": { "category": "API‑integrasjon" },
-              "1": { "category": "API‑integrasjon" },
-              "2": { "category": "API‑integrasjon" },
-              "3": { "category": "API‑integrasjon" },
-              "4": { "category": "API‑integrasjon" },
-              "5": { "category": "API‑integrasjon" },
-              "6": { "category": "API‑integrasjon" },
-              "7": { "category": "API‑integrasjon" }
+              "0": {
+                "category": "API‑integrasjon"
+              },
+              "1": {
+                "category": "API‑integrasjon"
+              },
+              "2": {
+                "category": "API‑integrasjon"
+              },
+              "3": {
+                "category": "API‑integrasjon"
+              },
+              "4": {
+                "category": "API‑integrasjon"
+              },
+              "5": {
+                "category": "API‑integrasjon"
+              },
+              "6": {
+                "category": "API‑integrasjon"
+              },
+              "7": {
+                "category": "API‑integrasjon"
+              }
             }
           },
           "agent-safety-guardrails": {
             "name": "Agentsikkerhet og guardrails",
             "focus": "Sørg for sikker, etisk og pålitelig agentatferd",
             "tools": {
-              "0": { "category": "Sikkerhet" },
-              "1": { "category": "Sikkerhet" },
-              "2": { "category": "Sikkerhet" },
-              "3": { "category": "Sikkerhet" },
-              "4": { "category": "Sikkerhet" },
-              "5": { "category": "Sikkerhet" },
-              "6": { "category": "Sikkerhet" },
-              "7": { "category": "Sikkerhet" }
+              "0": {
+                "category": "Sikkerhet"
+              },
+              "1": {
+                "category": "Sikkerhet"
+              },
+              "2": {
+                "category": "Sikkerhet"
+              },
+              "3": {
+                "category": "Sikkerhet"
+              },
+              "4": {
+                "category": "Sikkerhet"
+              },
+              "5": {
+                "category": "Sikkerhet"
+              },
+              "6": {
+                "category": "Sikkerhet"
+              },
+              "7": {
+                "category": "Sikkerhet"
+              }
             }
           },
           "agent-frameworks": {
             "name": "Agent‑rammeverk",
             "focus": "Bygging, orkestrering og styring av AI‑agenter med flertrinns resonnering",
             "tools": {
-              "0": { "category": "Rammeverk" },
-              "1": { "category": "Rammeverk" },
-              "2": { "category": "Rammeverk" },
-              "3": { "category": "Rammeverk" },
-              "4": { "category": "Rammeverk" },
-              "5": { "category": "Rammeverk" },
-              "6": { "category": "Rammeverk" },
-              "7": { "category": "Rammeverk" }
+              "0": {
+                "category": "Rammeverk"
+              },
+              "1": {
+                "category": "Rammeverk"
+              },
+              "2": {
+                "category": "Rammeverk"
+              },
+              "3": {
+                "category": "Rammeverk"
+              },
+              "4": {
+                "category": "Rammeverk"
+              },
+              "5": {
+                "category": "Rammeverk"
+              },
+              "6": {
+                "category": "Rammeverk"
+              },
+              "7": {
+                "category": "Rammeverk"
+              }
             }
           },
           "multi-agent-collaboration": {
             "name": "Samarbeid mellom flere agenter",
             "focus": "La agenter snakke sammen, delegere og samarbeide om oppgaver",
             "tools": {
-              "0": { "category": "Samarbeid" },
-              "1": { "category": "Samarbeid" },
-              "2": { "category": "Samarbeid" },
-              "3": { "category": "Samarbeid" },
-              "4": { "category": "Samarbeid" },
-              "5": { "category": "Samarbeid" },
-              "6": { "category": "Samarbeid" },
-              "7": { "category": "Samarbeid" }
+              "0": {
+                "category": "Samarbeid"
+              },
+              "1": {
+                "category": "Samarbeid"
+              },
+              "2": {
+                "category": "Samarbeid"
+              },
+              "3": {
+                "category": "Samarbeid"
+              },
+              "4": {
+                "category": "Samarbeid"
+              },
+              "5": {
+                "category": "Samarbeid"
+              },
+              "6": {
+                "category": "Samarbeid"
+              },
+              "7": {
+                "category": "Samarbeid"
+              }
             }
           },
           "memory-vector-databases": {
             "name": "Minne og vektor‑databaser",
             "focus": "Lagre og hente langtidskontekst og fakta",
             "tools": {
-              "0": { "category": "Database" },
-              "1": { "category": "Database" },
-              "2": { "category": "Database" },
-              "3": { "category": "Database" },
-              "4": { "category": "Database" },
-              "5": { "category": "Database" },
-              "6": { "category": "Database" },
-              "7": { "category": "Database" }
+              "0": {
+                "category": "Database"
+              },
+              "1": {
+                "category": "Database"
+              },
+              "2": {
+                "category": "Database"
+              },
+              "3": {
+                "category": "Database"
+              },
+              "4": {
+                "category": "Database"
+              },
+              "5": {
+                "category": "Database"
+              },
+              "6": {
+                "category": "Database"
+              },
+              "7": {
+                "category": "Database"
+              }
             }
           }
         }
@@ -178,7 +307,6 @@
       "aimForBetter": "Sikt mot flere «gode» svar i simuleringer!"
     }
   },
-
   "sidebar": {
     "dashboard": "Dashbord",
     "learningModules": "Læringsmoduler",
@@ -225,7 +353,6 @@
     "agiProgress": "AGI‑fremdrift",
     "cybersecurity": "Cybersikkerhet",
     "cloudInstall": "Installer appen i skyen",
-
     "learningModulesSubmenu": {
       "videoLessons": "Video-leksjoner",
       "microLessons": "Mikro-leksjoner",
@@ -238,21 +365,18 @@
       "aiLearning": "AI-læring og opplæring",
       "babelLibrary": "Babel-bibliotek"
     },
-
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Repo-analysator",
       "repoAnalyzerWithAPIs": "Repo-analysator med APIer",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Læringsrepo"
     },
-
     "documentAnalyzerSubmenu": {
       "documentsAnalyzer": "Dokumentanalysator",
       "learningDocument": "Læringsdokument",
       "agenticRAGAnalyzer": "Agentic RAG-analysator",
       "agenticRAGDocuments": "Agentic RAG-dokumenter"
     },
-
     "jMessagesAnalyzer": {
       "title": "J-meldings Analysator",
       "submenu": {
@@ -262,13 +386,11 @@
         "pairsLibrary": "J-meldings par bibliotek"
       }
     },
-
     "enterpriseArchitectureSubmenu": {
       "eaDashboard": "EA-dashbord",
       "processDesigner": "Prosessdesigner",
       "catalogManager": "Katalogadministrator"
     },
-
     "futureSubmenu": {
       "futureApp": "Fremtidsapp",
       "ideaLog": "Ide-loggbok",
@@ -1138,9 +1260,15 @@
   "components": {
     "dispatch": {
       "send": "Send",
-      "jira": { "placeholder": "Prosjektnøkkel (f.eks. TEST)" },
-      "slack": { "placeholder": "#kanal eller webhook‑URL" },
-      "sheets": { "placeholder": "Regneark‑ID eller full URL" },
+      "jira": {
+        "placeholder": "Prosjektnøkkel (f.eks. TEST)"
+      },
+      "slack": {
+        "placeholder": "#kanal eller webhook‑URL"
+      },
+      "sheets": {
+        "placeholder": "Regneark‑ID eller full URL"
+      },
       "completeAnalysis": "Fullfør analysen først for å aktivere sending."
     },
     "prompt": {
@@ -1163,7 +1291,6 @@
       "testAnalyzeHint": "Samme som «Analyser fil» på det valgte dokumentet, med prompten over."
     }
   },
-
   "security": {
     "title": "Sikkerhetssenter",
     "localInstallation": {
@@ -1533,7 +1660,6 @@
       }
     }
   },
-
   "actions": {
     "refreshData": "Oppdater data",
     "signOut": "Logg ut",
@@ -1548,12 +1674,10 @@
     "create": "Opprett",
     "update": "Oppdater"
   },
-
   "welcome": {
     "title": "Velkommen til AI Learning with AI",
     "subtitle": "Din personlige læringsreise drevet av kunstig intelligens"
   },
-
   "askAI": {
     "title": "Spør AI om arbeidsplasslæring",
     "subtitle": "Grensesnittløs UX / Zero-UI-modus",
@@ -1607,7 +1731,6 @@
       "chatTooltip": "Chat med Hologram-veilederen"
     }
   },
-
   "videoBasedLearning": {
     "title": "Læring med video",
     "howToUse": "Slik bruker du videoleksjoner",
@@ -1664,7 +1787,6 @@
     "tooltipSaving": "Lagrer video...",
     "tooltipSaveLibrary": "Lagre video i biblioteket ditt"
   },
-
   "savedVideos": {
     "title": "Lagrede videoer",
     "loading": "Laster lagrede videoer...",
@@ -1688,7 +1810,6 @@
     "noMatch": "Ingen videoer matcher filteret.",
     "empty": "Ingen lagrede videoer ennå."
   },
-
   "help": {
     "agentTheory": {
       "header": "Agent‑teori og dokumentasjon",
@@ -1868,7 +1989,10 @@
           }
         }
       },
-      "status": { "pending": "⏳ Venter", "ready": "✅ Klar" },
+      "status": {
+        "pending": "⏳ Venter",
+        "ready": "✅ Klar"
+      },
       "by": "Av:",
       "keySteps": "Nøkkelsteg:",
       "keyTerms": "7 nøkkelbegreper:",
@@ -1884,11 +2008,21 @@
         "inactive": "🔴 Inaktiv",
         "visit": "Besøk nettsted →",
         "categories": {
-          "0": { "name": "Hackathon-verktøy" },
-          "1": { "name": "KI-agenter for forretning" },
-          "2": { "name": "Automatisering- og arbeidsflyt-agenter" },
-          "3": { "name": "Agent-rammeverk" },
-          "4": { "name": "LLM-leverandører" }
+          "0": {
+            "name": "Hackathon-verktøy"
+          },
+          "1": {
+            "name": "KI-agenter for forretning"
+          },
+          "2": {
+            "name": "Automatisering- og arbeidsflyt-agenter"
+          },
+          "3": {
+            "name": "Agent-rammeverk"
+          },
+          "4": {
+            "name": "LLM-leverandører"
+          }
         }
       },
       "hackathons": {
@@ -1916,25 +2050,61 @@
           "essential": "Viktige verktøy"
         },
         "categories": {
-          "orchestration-platforms": { "name": "Orkestreringsplattformer", "focus": "Kjør og skaler KI-agenter i reelle arbeidsflyter" },
-          "tool-use-api-integration": { "name": "Verktøybruk og API-integrasjon", "focus": "Verktøy som lar agenter samhandle med virkelige APIer og plattformer" },
-          "agent-safety-guardrails": { "name": "Agent-sikkerhet og rekkverk", "focus": "Sikre trygg, etisk og pålitelig agent-atferd" },
-          "agent-frameworks": { "name": "Agent-rammeverk", "focus": "Bygge, orkestrere og styre KI-agenter med multi-steg resonnering" },
-          "multi-agent-collaboration": { "name": "Multi-agent-samarbeid", "focus": "La agenter snakke, delegere og samarbeide om oppgaver" },
-          "memory-vector-databases": { "name": "Minne og vektordatabaser", "focus": "Lagre og hente langsiktig kontekst og fakta" }
+          "orchestration-platforms": {
+            "name": "Orkestreringsplattformer",
+            "focus": "Kjør og skaler KI-agenter i reelle arbeidsflyter"
+          },
+          "tool-use-api-integration": {
+            "name": "Verktøybruk og API-integrasjon",
+            "focus": "Verktøy som lar agenter samhandle med virkelige APIer og plattformer"
+          },
+          "agent-safety-guardrails": {
+            "name": "Agent-sikkerhet og rekkverk",
+            "focus": "Sikre trygg, etisk og pålitelig agent-atferd"
+          },
+          "agent-frameworks": {
+            "name": "Agent-rammeverk",
+            "focus": "Bygge, orkestrere og styre KI-agenter med multi-steg resonnering"
+          },
+          "multi-agent-collaboration": {
+            "name": "Multi-agent-samarbeid",
+            "focus": "La agenter snakke, delegere og samarbeide om oppgaver"
+          },
+          "memory-vector-databases": {
+            "name": "Minne og vektordatabaser",
+            "focus": "Lagre og hente langsiktig kontekst og fakta"
+          }
         }
       },
       "resources": {
         "title": "Læringsressurser",
-        "video": { "title": "Videoinnhold", "watch": "Se video →" },
+        "video": {
+          "title": "Videoinnhold",
+          "watch": "Se video →"
+        },
         "other": "Andre ressurser",
         "items": "elementer",
         "itemsList": {
-          "0": { "title": "Forskningsartikler", "description": "Akademiske artikler om agent-teori" },
-          "1": { "title": "Opplæringer", "description": "Steg-for-steg-guider" },
-          "2": { "title": "Kodeeksempler", "description": "Praktiske implementeringer" },
-          "3": { "title": "Videoinnhold", "description": "Læringsvideoer og demoer" },
-          "4": { "title": "Hackathon-planer", "description": "Komplette implementeringsplaner for konkurranser" }
+          "0": {
+            "title": "Forskningsartikler",
+            "description": "Akademiske artikler om agent-teori"
+          },
+          "1": {
+            "title": "Opplæringer",
+            "description": "Steg-for-steg-guider"
+          },
+          "2": {
+            "title": "Kodeeksempler",
+            "description": "Praktiske implementeringer"
+          },
+          "3": {
+            "title": "Videoinnhold",
+            "description": "Læringsvideoer og demoer"
+          },
+          "4": {
+            "title": "Hackathon-planer",
+            "description": "Komplette implementeringsplaner for konkurranser"
+          }
         }
       }
     },
@@ -1964,7 +2134,8 @@
       "tracker": "AGI-fremdriftssporing",
       "endings": "Mulige utfall for AGI",
       "benefits": "Fordelene med AGI",
-      "homoVsAi": "Homo Sapiens vs. KI i Test"
+      "homoVsAi": "Homo Sapiens vs. KI i Test",
+      "voices": "Stemmer om AGI"
     },
     "agiProgress": {
       "title": "AGI‑fremdrift",
@@ -2084,13 +2255,33 @@
       "liveIntegration": "Live‑integrasjon",
       "liveActive": "Live‑demo aktiv:",
       "features": {
-        "ai-concepts": { "name": "AI‑konseptgenerering", "desc": "Direkte‑streamet undervisningsinnhold" },
-        "micro-lessons": { "name": "Mikro‑leksjoner", "desc": "Små læringsbiter med AI‑drevet innhold" },
-        "scenario-simulator": { "name": "Scenario‑simulator", "desc": "Interaktive arbeidsscenarier" },
-        "career-coach": { "name": "AI‑karriereveileder", "desc": "Personlig karriereveiledning" },
-        "skills-forecast": { "name": "Ferdighetsprognose", "desc": "AI‑drevne prognoser for ferdighetsutvikling" },
-        "team-dynamics": { "name": "Team‑dynamikk‑analysator", "desc": "Innsikt i team‑samarbeid" },
-        "stats": { "name": "Systemstatistikk" }
+        "ai-concepts": {
+          "name": "AI‑konseptgenerering",
+          "desc": "Direkte‑streamet undervisningsinnhold"
+        },
+        "micro-lessons": {
+          "name": "Mikro‑leksjoner",
+          "desc": "Små læringsbiter med AI‑drevet innhold"
+        },
+        "scenario-simulator": {
+          "name": "Scenario‑simulator",
+          "desc": "Interaktive arbeidsscenarier"
+        },
+        "career-coach": {
+          "name": "AI‑karriereveileder",
+          "desc": "Personlig karriereveiledning"
+        },
+        "skills-forecast": {
+          "name": "Ferdighetsprognose",
+          "desc": "AI‑drevne prognoser for ferdighetsutvikling"
+        },
+        "team-dynamics": {
+          "name": "Team‑dynamikk‑analysator",
+          "desc": "Innsikt i team‑samarbeid"
+        },
+        "stats": {
+          "name": "Systemstatistikk"
+        }
       },
       "agents": {
         "ai-compliance-agent": {
@@ -2174,7 +2365,6 @@
       "fr": "Fransk"
     }
   },
-
   "aiLearning": {
     "title": "AI-læring og opplæring",
     "subtitle": "Lær AI-konsepter, verktøy og beste praksis gjennom interaktive leksjoner",
@@ -2215,7 +2405,6 @@
     "copyFail": "Kunne ikke kopiere datasettet",
     "openAgenticFail": "Kunne ikke åpne Agentic RAG med datasettet",
     "openHologram": "Åpne hologram og chat",
-
     "lessons": {
       "ai_intro_001": {
         "title": "Introduksjon til AI",
@@ -2224,14 +2413,22 @@
           "2": {
             "heading": "Nøkkelbegreper",
             "definitions": {
-              "0": { "term": "AI", "definition": "Maskindra kognitiv kapasitet" },
-              "1": { "term": "ML", "definition": "AI-teknikk som bruker data til å lære" },
-              "2": { "term": "LLM", "definition": "Stor språkmodell trent på store tekstmengder" }
+              "0": {
+                "term": "AI",
+                "definition": "Maskindra kognitiv kapasitet"
+              },
+              "1": {
+                "term": "ML",
+                "definition": "AI-teknikk som bruker data til å lære"
+              },
+              "2": {
+                "term": "LLM",
+                "definition": "Stor språkmodell trent på store tekstmengder"
+              }
             }
           }
         }
       },
-
       "prompt_eng_002": {
         "title": "Prompt‑teknikker",
         "description": "Teknikker for å utforme effektive prompt og evaluere modellutdata.",
@@ -2253,14 +2450,22 @@
           "2": {
             "heading": "Nøkkelbegreper",
             "definitions": {
-              "0": { "term": "Few‑shot", "definition": "Demonstrer oppgaven med noen få eksempler i prompten" },
-              "1": { "term": "Systemprompt", "definition": "Overordnet instruksjon som setter oppførsel" },
-              "2": { "term": "Guardrails", "definition": "Begrensninger og kontroller som hindrer utrygge svar" }
+              "0": {
+                "term": "Few‑shot",
+                "definition": "Demonstrer oppgaven med noen få eksempler i prompten"
+              },
+              "1": {
+                "term": "Systemprompt",
+                "definition": "Overordnet instruksjon som setter oppførsel"
+              },
+              "2": {
+                "term": "Guardrails",
+                "definition": "Begrensninger og kontroller som hindrer utrygge svar"
+              }
             }
           }
         }
       },
-
       "llms_003": {
         "title": "Slik fungerer LLM‑er",
         "description": "Token, embeddings, attention og inferens i store språkmodeller.",
@@ -2305,7 +2510,6 @@
           }
         }
       },
-
       "tools_apis_004": {
         "title": "Verktøy og API‑er",
         "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes."
@@ -2366,8 +2570,14 @@
           "3": {
             "heading": "Fast vs Accurate‑moduser",
             "definitions": {
-              "0": { "term": "Fast", "definition": "Optimalisert for respons: mindre RAG‑kontekst (k≈3), kortere historikk (siste 4), lavere max_tokens (~350) og lavere kompleksitet. Best for korte spørsmål og raske avklaringer." },
-              "1": { "term": "Accurate", "definition": "Optimalisert for forankring: større RAG‑kontekst (k≈6), lengre historikk (siste 8), høyere max_tokens (~700). Best for forklaringer, referanser og lengre veiledning." }
+              "0": {
+                "term": "Fast",
+                "definition": "Optimalisert for respons: mindre RAG‑kontekst (k≈3), kortere historikk (siste 4), lavere max_tokens (~350) og lavere kompleksitet. Best for korte spørsmål og raske avklaringer."
+              },
+              "1": {
+                "term": "Accurate",
+                "definition": "Optimalisert for forankring: større RAG‑kontekst (k≈6), lengre historikk (siste 8), høyere max_tokens (~700). Best for forklaringer, referanser og lengre veiledning."
+              }
             }
           },
           "4": {
@@ -2396,7 +2606,6 @@
           }
         }
       },
-
       "ethics_safety_005": {
         "title": "Etikk og sikkerhet",
         "description": "Rettferdighet, skjevhet, hallusinasjoner, transparens og sikkerhet for ansvarlig AI.",
@@ -2417,9 +2626,18 @@
           "2": {
             "heading": "Sikkerhetsrekkverk",
             "definitions": {
-              "0": { "term": "Input‑filtrering", "definition": "Blokker utrygge brukerinput (f.eks. PII, krenkende innhold)" },
-              "1": { "term": "Output‑filtrering", "definition": "Skann og blokker problematiske modellutdata" },
-              "2": { "term": "Sporbarhet", "definition": "Logg prompt/utdata for revisjon og forbedring" }
+              "0": {
+                "term": "Input‑filtrering",
+                "definition": "Blokker utrygge brukerinput (f.eks. PII, krenkende innhold)"
+              },
+              "1": {
+                "term": "Output‑filtrering",
+                "definition": "Skann og blokker problematiske modellutdata"
+              },
+              "2": {
+                "term": "Sporbarhet",
+                "definition": "Logg prompt/utdata for revisjon og forbedring"
+              }
             }
           },
           "3": {
@@ -2434,7 +2652,6 @@
           }
         }
       },
-
       "ai_workflows_006": {
         "title": "Bruke AI i arbeidsflyter",
         "description": "Automatiseringsmønstre: utkast, gjennomgang, datauttrekk og forskning med AI‑verktøy.",
@@ -2477,7 +2694,6 @@
           }
         }
       },
-
       "debugging_ai_008": {
         "title": "Feilsøking i AI",
         "description": "Diagnostiser promter og utdata; spor feil og evaluer kvalitet med små tester.",
@@ -2515,7 +2731,6 @@
           }
         }
       },
-
       "advanced_rag_eval_009": {
         "title": "Avansert RAG & Evaluering",
         "description": "Design høy‑kvalitets RAG: chunking, utvidelse, re‑ranging, siteringer og robust evaluering.",
@@ -2536,7 +2751,9 @@
           "2": {
             "caption": "Query → Expansion → Retrieve → Re‑rank → Answer with citations → Evaluate"
           },
-          "3": { "heading": "MMR‑re‑ranging (pseudo‑JS)" },
+          "3": {
+            "heading": "MMR‑re‑ranging (pseudo‑JS)"
+          },
           "4": {
             "heading": "Kosinuslikhet",
             "explainer": "Bruk kosinuslikhet for både relevans‑ og diversitetsberegninger."
@@ -2554,7 +2771,6 @@
           }
         }
       },
-
       "prompt_routing_tools_010": {
         "title": "Prompt‑ruting & verktøy",
         "description": "Ruter forespørsler til riktig modell/verktøy basert på oppgave, begrensninger og sikkerhet.",
@@ -2576,7 +2792,9 @@
               "4": "Domene: rut til domenetilpasset modell eller kunnskapsbase"
             }
           },
-          "3": { "heading": "Router (pseudo‑JS)" },
+          "3": {
+            "heading": "Router (pseudo‑JS)"
+          },
           "4": {
             "heading": "Hands‑on (AgentOps Studio + API Config)",
             "description": "Lag en enkel router som splitter mellom: (A) Draft, (B) Extract JSON, (C) Search (RAG).",
@@ -2590,7 +2808,6 @@
           }
         }
       },
-
       "observability_cost_011": {
         "title": "Observability & kost‑kontroll",
         "description": "Spor kvalitet, latens og kost med logging, evaluering og guardrails.",
@@ -2612,7 +2829,9 @@
               "4": "Evaluerings‑passrate på et fast testsett"
             }
           },
-          "3": { "heading": "Logging‑wrapper (JS)" },
+          "3": {
+            "heading": "Logging‑wrapper (JS)"
+          },
           "4": {
             "heading": "Kostestimat",
             "explainer": "Multipliser input‑ og output‑tokens med pris per token. Bruk dette for budsjett per oppgave og modellvalg."
@@ -2630,19 +2849,33 @@
           }
         }
       },
-
       "web_robots_013": {
         "title": "Web‑roboter, crawlere og robots.txt",
         "description": "Hva web‑roboter er, hvordan de crawler, og hvordan du styrer dem med robots.txt og META‑tagger.",
         "sections": {
-          "0": { "heading": "Hva er web‑roboter?", "content": "Web‑roboter (crawlere/edderkopper) er automatiske programmer som henter sider på nettet. Denne leksjonen forklarer hvordan de oppdager og crawler sider, og hvordan eiere kan styre atferden." },
+          "0": {
+            "heading": "Hva er web‑roboter?",
+            "content": "Web‑roboter (crawlere/edderkopper) er automatiske programmer som henter sider på nettet. Denne leksjonen forklarer hvordan de oppdager og crawler sider, og hvordan eiere kan styre atferden."
+          },
           "1": {
             "heading": "Nøkkelbegreper",
             "definitions": {
-              "0": { "term": "Robot / Crawler / Spider", "definition": "Automatisert agent som henter websider via lenker og regler." },
-              "1": { "term": "Agent", "definition": "Program som handler på vegne av en bruker; roboter er en type agent." },
-              "2": { "term": "Søkemotor", "definition": "System som bruker crawlere for å indeksere innhold og svare på søk." },
-              "3": { "term": "Worms / Ants", "definition": "Historiske termer for utforskende agenter; lite brukt i moderne crawling." }
+              "0": {
+                "term": "Robot / Crawler / Spider",
+                "definition": "Automatisert agent som henter websider via lenker og regler."
+              },
+              "1": {
+                "term": "Agent",
+                "definition": "Program som handler på vegne av en bruker; roboter er en type agent."
+              },
+              "2": {
+                "term": "Søkemotor",
+                "definition": "System som bruker crawlere for å indeksere innhold og svare på søk."
+              },
+              "3": {
+                "term": "Worms / Ants",
+                "definition": "Historiske termer for utforskende agenter; lite brukt i moderne crawling."
+              }
             }
           },
           "2": {
@@ -2654,10 +2887,20 @@
               "3": "Re‑crawling: planlegging etter endringsfrekvens og viktighet"
             }
           },
-          "3": { "heading": "Robots Exclusion Standard (robots.txt)", "content": "Nettsteder kan legge /robots.txt i rotnivå for å kommunisere crawler‑regler (User‑agent, Disallow, Allow). Seriøse crawlere respekterer filen, men den er offentlig – list ikke hemmelige stier." },
-          "4": { "heading": "robots.txt‑eksempler" },
-          "5": { "heading": "Meta Robots og rel‑attributter", "content": "Per‑side‑kontroll via HTML/HTTP (noindex, nofollow) og rel=\"nofollow\" på lenker. Respekteres av de fleste søkemotorer." },
-          "6": { "heading": "Meta robots‑eksempel" },
+          "3": {
+            "heading": "Robots Exclusion Standard (robots.txt)",
+            "content": "Nettsteder kan legge /robots.txt i rotnivå for å kommunisere crawler‑regler (User‑agent, Disallow, Allow). Seriøse crawlere respekterer filen, men den er offentlig – list ikke hemmelige stier."
+          },
+          "4": {
+            "heading": "robots.txt‑eksempler"
+          },
+          "5": {
+            "heading": "Meta Robots og rel‑attributter",
+            "content": "Per‑side‑kontroll via HTML/HTTP (noindex, nofollow) og rel=\"nofollow\" på lenker. Respekteres av de fleste søkemotorer."
+          },
+          "6": {
+            "heading": "Meta robots‑eksempel"
+          },
           "7": {
             "heading": "Driftsmessige hensyn for admin",
             "items": {
@@ -2667,7 +2910,11 @@
               "3": "Publiser sitemaps for bedre oppdagelse av kanoniske URLer"
             }
           },
-          "8": { "heading": "Prøv i appen", "text": "Åpne Web‑søk‑modulen for å se hvordan indeksert innhold påvirker demoene.", "label": "Åpne websøk" },
+          "8": {
+            "heading": "Prøv i appen",
+            "text": "Åpne Web‑søk‑modulen for å se hvordan indeksert innhold påvirker demoene.",
+            "label": "Åpne websøk"
+          },
           "9": {
             "heading": "Hands‑on: design en robots.txt",
             "description": "Lag regler som blokkerer /private/, tillater resten og peker til sitemap.",
@@ -2683,8 +2930,14 @@
         "title": "Cybersikkerhet for AI‑systemer",
         "description": "Trusselmodellering, Zero Trust‑holdning, DLP‑signaler og hvordan du bruker Cybersecurity‑modulen.",
         "sections": {
-          "0": { "heading": "Sesjonsoversikt", "content": "Ekspertleksjon som kombinerer praksis fra penetrasjonstesting/Red Team med AI‑spesifikke risikoer og herding." },
-          "1": { "heading": "Hvorfor cybersikkerhet er viktig for AI", "content": "AI utvider angrepsflaten: prompt‑injeksjon, eksfiltrasjon, modelldrift og forsyningskjede. Bygg Zero Trust, DLP og kontinuerlig overvåking." },
+          "0": {
+            "heading": "Sesjonsoversikt",
+            "content": "Ekspertleksjon som kombinerer praksis fra penetrasjonstesting/Red Team med AI‑spesifikke risikoer og herding."
+          },
+          "1": {
+            "heading": "Hvorfor cybersikkerhet er viktig for AI",
+            "content": "AI utvider angrepsflaten: prompt‑injeksjon, eksfiltrasjon, modelldrift og forsyningskjede. Bygg Zero Trust, DLP og kontinuerlig overvåking."
+          },
           "2": {
             "heading": "Red Team vs PenTesting vs Blue/Purple",
             "items": {
@@ -2793,34 +3046,68 @@
               "3": "A08 Software & Data Integrity → forgiftede indekser/datasett"
             }
           },
-          "15": { "heading": "Fra funn til kode & arkitektur", "content": "Omsett sikkerhetsresultater til ingeniørarbeid: autorisasjon server‑side, schema for verktøy, signerte kontekstpakker for RAG og ende‑til‑ende‑tester." },
-          "16": { "heading": "Cybersikkerhet — oversikt", "caption": "Høynivå‑visning av signalene brukt av Agent Security Monitor" },
+          "15": {
+            "heading": "Fra funn til kode & arkitektur",
+            "content": "Omsett sikkerhetsresultater til ingeniørarbeid: autorisasjon server‑side, schema for verktøy, signerte kontekstpakker for RAG og ende‑til‑ende‑tester."
+          },
+          "16": {
+            "heading": "Cybersikkerhet — oversikt",
+            "caption": "Høynivå‑visning av signalene brukt av Agent Security Monitor"
+          },
           "17": {
             "heading": "Lab 1 — Kjør skann og tolk funn",
             "description": "Bruk Agent Security til å skanne en agent. Identifiser Zero Trust, integritet og DLP; foreslå konkrete tiltak.",
-            "steps": { "0": "Åpne Cybersecurity og trykk Scan", "1": "Fang Findings‑panelet (zero‑trust, integritet, DLP)", "2": "Skriv 3 tiltak og re‑skann for å måle forbedring" }
+            "steps": {
+              "0": "Åpne Cybersecurity og trykk Scan",
+              "1": "Fang Findings‑panelet (zero‑trust, integritet, DLP)",
+              "2": "Skriv 3 tiltak og re‑skann for å måle forbedring"
+            }
           },
           "18": {
             "heading": "Lab 2 — Prompt‑injeksjon mot RAG‑stub",
             "description": "Simuler en kontrollert injeksjon og bekreft forsvar.",
-            "steps": { "0": "Lag en injeksjon som forsøker eksfiltrasjon/regelbypass", "1": "Observer om allowlists/schema/filtre stopper handlingen", "2": "Dokumenter gap og foreslå server‑side fiks" }
+            "steps": {
+              "0": "Lag en injeksjon som forsøker eksfiltrasjon/regelbypass",
+              "1": "Observer om allowlists/schema/filtre stopper handlingen",
+              "2": "Dokumenter gap og foreslå server‑side fiks"
+            }
           },
           "19": {
             "heading": "Lab 3 — DLP‑eksfiltrasjonstest",
             "description": "Test om hemmeligheter/PII kan lekke via utdata eller verktøy.",
-            "steps": { "0": "Seed en ufarlig hemmelighet i en kontrollert kilde", "1": "Forsøk å få modellen/verktøy til å avdekke den", "2": "Verifiser DLP‑deteksjoner og justér terskler" }
+            "steps": {
+              "0": "Seed en ufarlig hemmelighet i en kontrollert kilde",
+              "1": "Forsøk å få modellen/verktøy til å avdekke den",
+              "2": "Verifiser DLP‑deteksjoner og justér terskler"
+            }
           },
-          "20": { "heading": "Referanser", "content": "OWASP Top 10, MITRE ATT&CK, NIST, leverandørveiledninger og seminar‑materiell." },
-          "21": { "heading": "Last ned", "text": "Seminar‑presentasjon (PDF): Defendable Red Team", "label": "Åpne PDF" }
+          "20": {
+            "heading": "Referanser",
+            "content": "OWASP Top 10, MITRE ATT&CK, NIST, leverandørveiledninger og seminar‑materiell."
+          },
+          "21": {
+            "heading": "Last ned",
+            "text": "Seminar‑presentasjon (PDF): Defendable Red Team",
+            "label": "Åpne PDF"
+          }
         }
       },
       "psychopathia_machinalis_015": {
         "title": "Psychopathia Machinalis",
         "description": "Kliniske mønstre i AI‑atferd og hvordan de screenes i Robomind‑klinikken.",
         "sections": {
-          "0": { "heading": "Rammeverk — oversikt", "caption": "De syv hovedaksene for dysfunksjon i rammeverket" },
-          "1": { "heading": "Kliniske mønstre i AI‑atferd", "content": "Begrepet beskriver patologiske mønstre som kan oppstå i agentatferd (f.eks. konfabulering, bunkring/dissosiasjon, tvangsmessig repetisjon)." },
-          "2": { "heading": "Identity Fracture", "caption": "Illustrasjon: brutt selvrepresentasjon i en kunstig agent" },
+          "0": {
+            "heading": "Rammeverk — oversikt",
+            "caption": "De syv hovedaksene for dysfunksjon i rammeverket"
+          },
+          "1": {
+            "heading": "Kliniske mønstre i AI‑atferd",
+            "content": "Begrepet beskriver patologiske mønstre som kan oppstå i agentatferd (f.eks. konfabulering, bunkring/dissosiasjon, tvangsmessig repetisjon)."
+          },
+          "2": {
+            "heading": "Identity Fracture",
+            "caption": "Illustrasjon: brutt selvrepresentasjon i en kunstig agent"
+          },
           "3": {
             "heading": "Slik screener vi for mønstre",
             "items": {
@@ -2829,9 +3116,18 @@
               "2": "Terapi‑patcher: praktiske tiltak per funn"
             }
           },
-          "4": { "heading": "Cognitive Overload", "caption": "Illustrasjon: overbelastning og sammenfiltring i intern prosessering" },
-          "5": { "heading": "Taksonomi per akse (oversikt)", "content": "Kompakt feltguide over representative dysfunksjoner per akse for triage i klinikken." },
-          "12": { "heading": "Hvor prøve dette", "content": "Bruk Robomind‑klinikken: lim inn samtaleturer, kjør diagnose og se funn + anbefalt protokoll." },
+          "4": {
+            "heading": "Cognitive Overload",
+            "caption": "Illustrasjon: overbelastning og sammenfiltring i intern prosessering"
+          },
+          "5": {
+            "heading": "Taksonomi per akse (oversikt)",
+            "content": "Kompakt feltguide over representative dysfunksjoner per akse for triage i klinikken."
+          },
+          "12": {
+            "heading": "Hvor prøve dette",
+            "content": "Bruk Robomind‑klinikken: lim inn samtaleturer, kjør diagnose og se funn + anbefalt protokoll."
+          },
           "13": {
             "heading": "Hands‑on: Triage av transkript",
             "description": "Lim inn en kort samtale og identifiser minst én mistenkt dysfunksjon. Forklar hvilken akse og hvorfor.",
@@ -2842,7 +3138,10 @@
               "3": "Skriv 2–3 setninger med akse og kjerne‑symptom"
             }
           },
-          "14": { "heading": "Referanser", "content": "Rammeverk: psychopathia.ai — Artikkel (MDPI Electronics, 2025)." }
+          "14": {
+            "heading": "Referanser",
+            "content": "Rammeverk: psychopathia.ai — Artikkel (MDPI Electronics, 2025)."
+          }
         }
       }
     }
@@ -3044,11 +3343,9 @@
       }
     }
   },
-
   "cyber": {
     "title": "Cybersikkerhet",
     "subtitle": "Omfattende sikkerhetsadministrasjon og trusselintelligensplattform",
-
     "tabs": {
       "dashboard": "Oversikt",
       "agentSecurity": "Agentsikkerhet",
@@ -3061,7 +3358,6 @@
       "incidentDrills": "Hendelsesøvelser",
       "knowledge": "Kunnskap"
     },
-
     "common": {
       "loading": "Laster...",
       "save": "Lagre",
@@ -3091,7 +3387,6 @@
       "intermediate": "Middels",
       "advanced": "Avansert"
     },
-
     "dashboard": {
       "loading": "Laster cybersikkerhets-oversikt...",
       "title": "Cybersikkerhetsoversikt",
@@ -3146,7 +3441,6 @@
         "signalsAnalyzed": "Signaler analysert daglig av Microsoft"
       }
     },
-
     "agentSecurity": {
       "loading": "Laster agentsikkerhetsdata...",
       "title": "Agentsikkerhetsmonitor",
@@ -3176,7 +3470,6 @@
       "recentIncidents": "Nylige sikkerhetshendelser",
       "securityMetrics": "Sikkerhetsmetrikker"
     },
-
     "threatLibrary": {
       "loading": "Laster trusselbibliotek...",
       "title": "Trusselbibliotek",
@@ -3195,7 +3488,6 @@
       "tags": "Merkelapper",
       "moreTag": "+{{count}} flere"
     },
-
     "toolsFrameworks": {
       "title": "Verktøy og rammeverk",
       "subtitle": "Raske verktøy for OWASP Topp 10-sjekker og MITRE ATT&CK-kartlegging. Bruk dette som et lett supplement til PenTesting/Red Team-aktiviteter.",
@@ -3241,7 +3533,6 @@
       "noPreset": "Ingen forhåndsinnstilling funnet for dette prosjektet.",
       "settingsSaved": "Innstillinger lagret."
     },
-
     "postureRisk": {
       "loading": "Laster sikkerhetsstillingsvurdering...",
       "title": "Sikkerhetsstilling og risikovurdering",
@@ -3279,7 +3570,6 @@
       "recover": "Gjenopprett",
       "recoverDesc": "Gjenopprett kapabiliteter etter hendelser"
     },
-
     "vulnerabilities": {
       "loading": "Laster sårbarheter...",
       "title": "Sårbarhetshåndtering",
@@ -3305,7 +3595,6 @@
       "recommendation": "Anbefaling",
       "file": "Fil:"
     },
-
     "compliance": {
       "loading": "Laster samsvarsdata…",
       "totalControls": "Totale kontroller",
@@ -3328,7 +3617,6 @@
       "notApplicable": "Ikke aktuelt",
       "noMatch": "Ingen kontroller samsvarer med filtrene dine"
     },
-
     "coach": {
       "loading": "Laster veileder…",
       "topicCatalog": "Emnekatalog",
@@ -3347,7 +3635,6 @@
       "generatedAt": "Generert",
       "min": "min"
     },
-
     "drills": {
       "loading": "Laster øvelsesscenarier…",
       "scenarios": "Scenarier",
@@ -3372,7 +3659,6 @@
       "noDrills": "Ingen fullførte øvelser ennå. Start en fra Scenarier-fanen!",
       "scenario": "Scenario"
     },
-
     "knowledge": {
       "loading": "Laster kunnskapsbase…",
       "articles": "Artikler",
@@ -3911,4 +4197,3 @@
     "fallbackReply": "Jeg har problemer med å nå KI-kjernen min. Vennligst prøv igjen."
   }
 }
-

@@ -12,7 +12,6 @@
   "english": "Inglés",
   "norwegian": "Noruego",
   "spanish": "Español",
-
   "dashboard": {
     "title": "Panel de control",
     "progress": {
@@ -38,7 +37,6 @@
       "aimForBetter": "¡Intenta obtener más respuestas 'buenas' en las simulaciones!"
     }
   },
-
   "sidebar": {
     "dashboard": "Panel de control",
     "learningModules": "Módulos de aprendizaje",
@@ -85,7 +83,6 @@
     "presentationAgent": "Agente de Presentación",
     "aiStudyBuddy": "Compañero de estudio IA",
     "security": "Seguridad",
-
     "learningModulesSubmenu": {
       "videoLessons": "Lecciones en vídeo",
       "microLessons": "Micro-lecciones",
@@ -98,20 +95,17 @@
       "aiLearning": "Aprendizaje y formación en IA",
       "babelLibrary": "Biblioteca Babel"
     },
-
     "repositoryAnalyzerSubmenu": {
       "repoAnalyzer": "Analizador de repositorios",
       "agentCursorAI": "Agent Cursor AI",
       "learningRepo": "Repositorio de aprendizaje"
     },
-
     "documentAnalyzerSubmenu": {
       "documentsAnalyzer": "Analizador de documentos",
       "learningDocument": "Documento de aprendizaje",
       "agenticRAGAnalyzer": "Analizador RAG Agéntico",
       "agenticRAGDocuments": "Documentos RAG Agéntico"
     },
-
     "jMessagesAnalyzer": {
       "title": "Analizador J-messages",
       "submenu": {
@@ -121,20 +115,17 @@
         "pairsLibrary": "Biblioteca de pares J-messages"
       }
     },
-
     "enterpriseArchitectureSubmenu": {
       "eaDashboard": "Panel EA",
       "processDesigner": "Diseñador de procesos",
       "catalogManager": "Gestor de catálogo"
     },
-
     "futureSubmenu": {
       "futureApp": "Aplicación futura",
       "ideaLog": "Registro de ideas",
       "featureRoadmap": "Hoja de ruta de funciones"
     }
   },
-
   "actions": {
     "refreshData": "Actualizar datos",
     "signOut": "Cerrar sesión",
@@ -149,12 +140,10 @@
     "create": "Crear",
     "update": "Actualizar"
   },
-
   "welcome": {
     "title": "Bienvenido a Aprendizaje con IA",
     "subtitle": "Tu recorrido de aprendizaje personalizado impulsado por inteligencia artificial"
   },
-
   "askAI": {
     "title": "Pregunta a la IA sobre Aprendizaje en el Trabajo",
     "subtitle": "UX sin interfaz / modo Zero-UI",
@@ -208,7 +197,6 @@
       "chatTooltip": "Chatear con la Guía Holograma"
     }
   },
-
   "aiLearning": {
     "title": "Aprendizaje y formación en IA",
     "subtitle": "Domina conceptos, herramientas y buenas prácticas de IA mediante lecciones interactivas",
@@ -250,7 +238,6 @@
     "openAgenticFail": "No se pudo abrir RAG Agéntico con el dataset",
     "openHologram": "Abrir Holograma y Chat"
   },
-
   "videoBasedLearning": {
     "title": "Aprendizaje basado en vídeo",
     "howToUse": "Cómo usar las lecciones en vídeo",
@@ -307,7 +294,6 @@
     "tooltipSaving": "Guardando vídeo...",
     "tooltipSaveLibrary": "Guardar vídeo en tu biblioteca"
   },
-
   "savedVideos": {
     "title": "Vídeos guardados",
     "loading": "Cargando vídeos guardados...",
@@ -331,7 +317,6 @@
     "noMatch": "Ningún vídeo coincide con tu filtro.",
     "empty": "Aún no hay vídeos guardados."
   },
-
   "agents": {
     "compliance": {
       "title": "Agente de Cumplimiento de IA",
@@ -372,7 +357,6 @@
       "dispatchTitle": "Enviar al Agente n8n/OutSystems"
     }
   },
-
   "agentRuns": {
     "title": "Monitor de ejecuciones de agentes",
     "subtitle": "Monitoriza y realiza un seguimiento del estado y los resultados de la ejecución de los agentes",
@@ -402,7 +386,6 @@
     "showLess": "Mostrar menos",
     "showAll": "Mostrar todos ({{count}} más)"
   },
-
   "webLab": {
     "moduleTitle": "Laboratorio Web",
     "moduleSubtitle": "Clones locales de páginas web reales. Distinto del Cruz Roja Web QA Agent: este es el espacio de trabajo para las páginas web en sí — clonar, servir, navegar, modificar — no los patrones de QA testing.",
@@ -438,7 +421,6 @@
       "relatedAgentHint": "Los patrones de QA testing para rodekors.no viven en el módulo existente «Cruz Roja Web QA Agent». Cuando el Web Lab sirva un clon local, ese agente podrá apuntar su environment.test_url al servidor local."
     }
   },
-
   "selfSimReality": {
     "moduleTitle": "Agente de Realidad Auto‑Simulada",
     "moduleSubtitle": "Acompañante científico‑filosófico para la idea de que observadores, mentes y conciencia participan en la construcción del universo que experimentan.",
@@ -911,7 +893,6 @@
       }
     }
   },
-
   "agentopsStudio": {
     "title": "AgentOps Studio",
     "subtitle": "Laboratorio unificado de flujos de trabajo de IA — Diseña, simula y ejecuta flujos de trabajo de software inteligentes",
@@ -978,7 +959,6 @@
       "playbookBtn": "Crear playbook"
     }
   },
-
   "jMessages": {
     "analyzer": {
       "title": "Analizador J-messages",
@@ -1176,7 +1156,6 @@
       }
     }
   },
-
   "help": {
     "agentTheory": {
       "header": "Teoría de Agentes y Documentación",
@@ -1375,11 +1354,21 @@
         "inactive": "🔴 Inactivo",
         "visit": "Visitar sitio →",
         "categories": {
-          "0": { "name": "Herramientas de hackathon" },
-          "1": { "name": "Agentes IA de negocio" },
-          "2": { "name": "Agentes de automatización y flujo" },
-          "3": { "name": "Frameworks de agentes" },
-          "4": { "name": "Proveedores de LLM" }
+          "0": {
+            "name": "Herramientas de hackathon"
+          },
+          "1": {
+            "name": "Agentes IA de negocio"
+          },
+          "2": {
+            "name": "Agentes de automatización y flujo"
+          },
+          "3": {
+            "name": "Frameworks de agentes"
+          },
+          "4": {
+            "name": "Proveedores de LLM"
+          }
         }
       },
       "hackathons": {
@@ -1407,12 +1396,30 @@
           "essential": "Herramientas esenciales"
         },
         "categories": {
-          "orchestration-platforms": { "name": "Plataformas de orquestación", "focus": "Ejecutar y escalar agentes IA en flujos reales" },
-          "tool-use-api-integration": { "name": "Uso de herramientas e integración de APIs", "focus": "Herramientas que permiten a los agentes interactuar con APIs y plataformas del mundo real" },
-          "agent-safety-guardrails": { "name": "Seguridad y guardarraíles de agentes", "focus": "Garantizar un comportamiento seguro, ético y fiable de los agentes" },
-          "agent-frameworks": { "name": "Frameworks de agentes", "focus": "Construir, orquestar y gestionar agentes IA con razonamiento multi-paso" },
-          "multi-agent-collaboration": { "name": "Colaboración multi-agente", "focus": "Permitir que los agentes dialoguen, deleguen y colaboren en tareas" },
-          "memory-vector-databases": { "name": "Memoria y bases de datos vectoriales", "focus": "Almacenar y recuperar contexto y hechos a largo plazo" }
+          "orchestration-platforms": {
+            "name": "Plataformas de orquestación",
+            "focus": "Ejecutar y escalar agentes IA en flujos reales"
+          },
+          "tool-use-api-integration": {
+            "name": "Uso de herramientas e integración de APIs",
+            "focus": "Herramientas que permiten a los agentes interactuar con APIs y plataformas del mundo real"
+          },
+          "agent-safety-guardrails": {
+            "name": "Seguridad y guardarraíles de agentes",
+            "focus": "Garantizar un comportamiento seguro, ético y fiable de los agentes"
+          },
+          "agent-frameworks": {
+            "name": "Frameworks de agentes",
+            "focus": "Construir, orquestar y gestionar agentes IA con razonamiento multi-paso"
+          },
+          "multi-agent-collaboration": {
+            "name": "Colaboración multi-agente",
+            "focus": "Permitir que los agentes dialoguen, deleguen y colaboren en tareas"
+          },
+          "memory-vector-databases": {
+            "name": "Memoria y bases de datos vectoriales",
+            "focus": "Almacenar y recuperar contexto y hechos a largo plazo"
+          }
         }
       },
       "resources": {
@@ -1424,11 +1431,26 @@
         "other": "Otros recursos",
         "items": "elementos",
         "itemsList": {
-          "0": { "title": "Artículos de investigación", "description": "Papers académicos sobre teoría de agentes" },
-          "1": { "title": "Tutoriales", "description": "Guías paso a paso" },
-          "2": { "title": "Ejemplos de código", "description": "Implementaciones prácticas" },
-          "3": { "title": "Contenido en vídeo", "description": "Vídeos educativos y demos" },
-          "4": { "title": "Planes de hackathon", "description": "Planes completos de implementación para competiciones" }
+          "0": {
+            "title": "Artículos de investigación",
+            "description": "Papers académicos sobre teoría de agentes"
+          },
+          "1": {
+            "title": "Tutoriales",
+            "description": "Guías paso a paso"
+          },
+          "2": {
+            "title": "Ejemplos de código",
+            "description": "Implementaciones prácticas"
+          },
+          "3": {
+            "title": "Contenido en vídeo",
+            "description": "Vídeos educativos y demos"
+          },
+          "4": {
+            "title": "Planes de hackathon",
+            "description": "Planes completos de implementación para competiciones"
+          }
         }
       }
     },
@@ -1533,13 +1555,33 @@
       "livePlaceholder": "El contenido de demo en vivo aparecerá aquí...",
       "speakDemo": "🔊 Leer demo",
       "features": {
-        "ai-concepts": { "name": "Generación de conceptos IA", "desc": "Contenido educativo por streaming en tiempo real" },
-        "micro-lessons": { "name": "Micro-lecciones", "desc": "Aprendizaje en pequeñas dosis con contenido IA" },
-        "scenario-simulator": { "name": "Simulador de escenarios", "desc": "Simulaciones interactivas de trabajo" },
-        "career-coach": { "name": "Coach de carrera IA", "desc": "Orientación profesional personalizada" },
-        "skills-forecast": { "name": "Previsión de habilidades", "desc": "Predicciones de desarrollo de habilidades con IA" },
-        "team-dynamics": { "name": "Analizador de dinámica de equipos", "desc": "Insights sobre colaboración en equipo" },
-        "stats": { "name": "Estadísticas del sistema" }
+        "ai-concepts": {
+          "name": "Generación de conceptos IA",
+          "desc": "Contenido educativo por streaming en tiempo real"
+        },
+        "micro-lessons": {
+          "name": "Micro-lecciones",
+          "desc": "Aprendizaje en pequeñas dosis con contenido IA"
+        },
+        "scenario-simulator": {
+          "name": "Simulador de escenarios",
+          "desc": "Simulaciones interactivas de trabajo"
+        },
+        "career-coach": {
+          "name": "Coach de carrera IA",
+          "desc": "Orientación profesional personalizada"
+        },
+        "skills-forecast": {
+          "name": "Previsión de habilidades",
+          "desc": "Predicciones de desarrollo de habilidades con IA"
+        },
+        "team-dynamics": {
+          "name": "Analizador de dinámica de equipos",
+          "desc": "Insights sobre colaboración en equipo"
+        },
+        "stats": {
+          "name": "Estadísticas del sistema"
+        }
       },
       "agents": {
         "ai-compliance-agent": {
@@ -1631,7 +1673,8 @@
       "tracker": "Seguimiento del Progreso de la AGI",
       "endings": "Posibles finales para la AGI",
       "benefits": "Los beneficios de la AGI",
-      "homoVsAi": "Homo Sapiens vs. IA en Testing"
+      "homoVsAi": "Homo Sapiens vs. IA en Testing",
+      "voices": "Voces sobre la AGI"
     },
     "agiProgress": {
       "loading": "Cargando progreso de la AGI…",
@@ -1672,7 +1715,6 @@
       }
     }
   },
-
   "homoVsAi": {
     "hero": {
       "kicker": "SOCO · TALLER · 2026",
@@ -2143,7 +2185,6 @@
       "footnote": "Las anclas curadas (JSON) aplican a todos los proveedores. Con ItemAI/ItemServerAI en API Config, pueden recuperarse extractos de tus PDF locales en docs-ISTQB/ — ver la nota verde bajo la salida."
     }
   },
-
   "security": {
     "title": "Centro de seguridad",
     "localInstallation": {
@@ -2513,11 +2554,9 @@
       }
     }
   },
-
   "cyber": {
     "title": "Ciberseguridad",
     "subtitle": "Plataforma integral de gestión de seguridad e inteligencia de amenazas",
-
     "tabs": {
       "dashboard": "Panel",
       "agentSecurity": "Seguridad de agentes",
@@ -2530,7 +2569,6 @@
       "incidentDrills": "Simulacros de incidentes",
       "knowledge": "Conocimiento"
     },
-
     "common": {
       "loading": "Cargando...",
       "save": "Guardar",
@@ -2560,7 +2598,6 @@
       "intermediate": "Intermedio",
       "advanced": "Avanzado"
     },
-
     "dashboard": {
       "loading": "Cargando panel de ciberseguridad...",
       "title": "Panel de ciberseguridad",
@@ -2636,7 +2673,6 @@
         "signalsAnalyzed": "Señales analizadas diariamente por Microsoft"
       }
     },
-
     "agentSecurity": {
       "loading": "Cargando datos de seguridad de agentes...",
       "title": "Monitor de seguridad de agentes",
@@ -2666,7 +2702,6 @@
       "recentIncidents": "Incidentes de seguridad recientes",
       "securityMetrics": "Métricas de seguridad"
     },
-
     "threatLibrary": {
       "loading": "Cargando biblioteca de amenazas...",
       "title": "Biblioteca de amenazas",
@@ -2685,7 +2720,6 @@
       "tags": "Etiquetas",
       "moreTag": "+{{count}} más"
     },
-
     "toolsFrameworks": {
       "title": "Herramientas y marcos",
       "subtitle": "Utilidades rápidas para comprobaciones de OWASP Top 10 y mapeo MITRE ATT&CK. Úsalas como complemento ligero a actividades de PenTesting/Red Team.",
@@ -2749,22 +2783,60 @@
         "A10": "Falsificación de solicitudes del lado del servidor (SSRF)"
       },
       "tactics": {
-        "TA0043": { "name": "Reconocimiento", "examples": "Enumeración de subdominios, Identificación tecnológica" },
-        "TA0001": { "name": "Acceso inicial", "examples": "Phishing, Explotación de servicios expuestos" },
-        "TA0002": { "name": "Ejecución", "examples": "Ejecución de comandos, Payloads de scripts" },
-        "TA0003": { "name": "Persistencia", "examples": "Nuevo servicio, Elemento de inicio" },
-        "TA0004": { "name": "Escalada de privilegios", "examples": "Manipulación de tokens, Abuso de configuraciones" },
-        "TA0005": { "name": "Evasión de defensas", "examples": "Manipulación de logs, Ofuscación" },
-        "TA0006": { "name": "Acceso a credenciales", "examples": "Keylogging, Volcado de credenciales" },
-        "TA0007": { "name": "Descubrimiento", "examples": "Escaneo de red, Descubrimiento de cuentas" },
-        "TA0008": { "name": "Movimiento lateral", "examples": "Pivote RDP/SSH, Pass-the-hash" },
-        "TA0009": { "name": "Recolección", "examples": "Preparación de archivos, Datos del portapapeles" },
-        "TA0011": { "name": "Mando y control", "examples": "Canal C2, Domain fronting" },
-        "TA0010": { "name": "Exfiltración", "examples": "Exfiltración por protocolo, Sincronización en la nube" },
-        "TA0040": { "name": "Impacto", "examples": "Cifrado de datos, Detención de servicios" }
+        "TA0043": {
+          "name": "Reconocimiento",
+          "examples": "Enumeración de subdominios, Identificación tecnológica"
+        },
+        "TA0001": {
+          "name": "Acceso inicial",
+          "examples": "Phishing, Explotación de servicios expuestos"
+        },
+        "TA0002": {
+          "name": "Ejecución",
+          "examples": "Ejecución de comandos, Payloads de scripts"
+        },
+        "TA0003": {
+          "name": "Persistencia",
+          "examples": "Nuevo servicio, Elemento de inicio"
+        },
+        "TA0004": {
+          "name": "Escalada de privilegios",
+          "examples": "Manipulación de tokens, Abuso de configuraciones"
+        },
+        "TA0005": {
+          "name": "Evasión de defensas",
+          "examples": "Manipulación de logs, Ofuscación"
+        },
+        "TA0006": {
+          "name": "Acceso a credenciales",
+          "examples": "Keylogging, Volcado de credenciales"
+        },
+        "TA0007": {
+          "name": "Descubrimiento",
+          "examples": "Escaneo de red, Descubrimiento de cuentas"
+        },
+        "TA0008": {
+          "name": "Movimiento lateral",
+          "examples": "Pivote RDP/SSH, Pass-the-hash"
+        },
+        "TA0009": {
+          "name": "Recolección",
+          "examples": "Preparación de archivos, Datos del portapapeles"
+        },
+        "TA0011": {
+          "name": "Mando y control",
+          "examples": "Canal C2, Domain fronting"
+        },
+        "TA0010": {
+          "name": "Exfiltración",
+          "examples": "Exfiltración por protocolo, Sincronización en la nube"
+        },
+        "TA0040": {
+          "name": "Impacto",
+          "examples": "Cifrado de datos, Detención de servicios"
+        }
       }
     },
-
     "postureRisk": {
       "loading": "Cargando evaluación de postura...",
       "title": "Postura y evaluación de riesgo",
@@ -2802,7 +2874,6 @@
       "recover": "Recuperar",
       "recoverDesc": "Restaurar las capacidades tras los incidentes"
     },
-
     "vulnerabilities": {
       "loading": "Cargando vulnerabilidades...",
       "title": "Gestión de vulnerabilidades",
@@ -2828,7 +2899,6 @@
       "recommendation": "Recomendación",
       "file": "Archivo:"
     },
-
     "compliance": {
       "loading": "Cargando datos de cumplimiento…",
       "totalControls": "Total de controles",
@@ -2851,7 +2921,6 @@
       "notApplicable": "N/A",
       "noMatch": "Ningún control coincide con los filtros"
     },
-
     "coach": {
       "loading": "Cargando coach…",
       "topicCatalog": "Catálogo de temas",
@@ -2870,7 +2939,6 @@
       "generatedAt": "Generado el",
       "min": "min"
     },
-
     "drills": {
       "loading": "Cargando escenarios de simulacro…",
       "scenarios": "Escenarios",
@@ -2895,7 +2963,6 @@
       "noDrills": "Aún no hay simulacros completados. ¡Inicia uno desde la pestaña Escenarios!",
       "scenario": "Escenario"
     },
-
     "knowledge": {
       "loading": "Cargando base de conocimiento…",
       "articles": "Artículos",
@@ -2920,7 +2987,6 @@
       "sources": "Fuentes:",
       "responseTime": "Tiempo de respuesta: {{time}}s"
     },
-
     "threatData": {
       "T001": {
         "name": "Ataques de phishing",
@@ -2939,7 +3005,6 @@
         "description": "Ataques dirigidos a las cadenas de suministro de software y sus dependencias."
       }
     },
-
     "controlTitles": {
       "NIST-CSF_GV_OC-1": "Contexto organizacional",
       "NIST-CSF_ID_AM-1": "Gestión de activos",
