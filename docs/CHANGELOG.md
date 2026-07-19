@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.26.2] - 2026-07-19
+
+### Fixed / Security — Future module audit (Idea Log · Feature Roadmap · scaffolds)
+
+Read-only audit of the long-untouched Future module (the "user idea → AI-assisted
+feature" pipeline: intake `CommandBar.jsx` → `/classify-intent` → `unknown_intents`
+collection → Idea Log / Feature Roadmap views → `/generate-scaffold` + admin
+approve). Fixes applied to the endpoints in `backend/app.py`:
+
+- **Malformed ObjectId → 500 (confirmed live) now 400.** Added a `_oid()` helper;
+  the 5 id-addressed endpoints (upvote / subscribe / status / delete on
+  unknown-intents, approve on scaffold-history) previously leaked
+  `bson.errors.InvalidId` as a 500. Verified live: all now return a clean 400.
+- **Input validation.** `/status` restricted to the 5 roadmap states the UI can
+  render (`Idea/Planned/In Review/Coming Soon/Implemented`) — an unknown value
+  used to silently corrupt the roadmap render; now 400. `/subscribe` validates
+  the email shape. `ScaffoldRequest.feature_name` bounded (1–200) → empty is 422.
+- **`/generate-scaffold` honesty.** When no LLM key is set, `ask_openai` returned
+  a useless `"[MOCKED RESPONSE] …"` string. The endpoint now detects that, swaps
+  in a **real deterministic code stub** (API Route / DB Model / Background Job)
+  the admin can build on, and returns `is_mock: true` (also stored in history) so
+  the UI can label it. Backward compatible — `code` is still returned.
+
+**New: 5 offline contract tests** `backend/tests/test_future_module_contracts.py`
+(malformed id → 400, invalid status → 400, bad email → 400, scaffold is_mock +
+real stub with the Mongo insert mocked, empty feature_name → 422). **Added to CI**
+(now 6 files / 79 offline tests). `.claude/MODULES_REFERENCE.md` updated.
+
+**Known follow-ups (flagged, not changed):** the admin endpoints are still
+unauthenticated (`isAdmin = true` hardcoded in `FeatureRoadmap.jsx`) — an optional
+token guard is the next safe step; `/classify-intent` logs every query (Idea Log
+noise); the module lives inline in `app.py` rather than a router. Next planned:
+integrate the **Self-Correcting AI Loop** agent into the scaffold pipeline.
+
+---
+
 ## [1.26.1] - 2026-07-19
 
 ### Added — Self-Correcting Loop: "Customize with AI" in the Loop Builder

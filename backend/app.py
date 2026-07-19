@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Body, HTTPException, Depends, status, UploadFile, Form, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pathlib import Path
 import json
 import os
@@ -50,6 +50,8 @@ except ImportError:
     from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
 
 from bson import ObjectId
+from bson.errors import InvalidId
+import re
 
 # Firebase Authentication
 import firebase_admin
@@ -1237,6 +1239,20 @@ async def handle_intent(input_data: IntentInput):
     })
     return result 
 
+def _oid(id_str: str) -> ObjectId:
+    """Parse a Mongo ObjectId, returning HTTP 400 (not a leaked 500) on a
+    malformed id. Used by the Future module's id-addressed endpoints."""
+    try:
+        return ObjectId(id_str)
+    except (InvalidId, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid id")
+
+
+# Roadmap status values the Feature Roadmap UI knows how to render.
+FUTURE_STATUS_VALUES = {"Idea", "Planned", "In Review", "Coming Soon", "Implemented"}
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
 @app.get("/admin/unknown-intents")
 async def get_unknown_intents():
     ideas = []
@@ -1248,18 +1264,20 @@ async def get_unknown_intents():
 @app.post("/admin/unknown-intents/{idea_id}/upvote")
 async def upvote_idea(idea_id: str):
     result = await unknown_intents_collection.update_one(
-        {"_id": ObjectId(idea_id)},
+        {"_id": _oid(idea_id)},
         {"$inc": {"upvotes": 1}}
     )
     return {"success": result.modified_count == 1}
 
 @app.post("/admin/unknown-intents/{idea_id}/subscribe")
 async def subscribe_idea(idea_id: str, data: dict = Body(...)):
-    email = data.get("email")
+    email = (data.get("email") or "").strip()
     if not email:
         return {"success": False, "error": "Email required"}
+    if not _EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email")
     result = await unknown_intents_collection.update_one(
-        {"_id": ObjectId(idea_id)},
+        {"_id": _oid(idea_id)},
         {"$addToSet": {"subscribers": email}}
     )
     return {"success": result.modified_count == 1}
@@ -1269,35 +1287,79 @@ async def update_idea_status(idea_id: str, data: dict = Body(...)):
     status_val = data.get("status")
     if not status_val:
         return {"success": False, "error": "Status required"}
+    if status_val not in FUTURE_STATUS_VALUES:
+        # Guard the roadmap render: an unknown status breaks STATUS_ORDER/colors.
+        raise HTTPException(status_code=400, detail=f"Invalid status; must be one of {sorted(FUTURE_STATUS_VALUES)}")
     result = await unknown_intents_collection.update_one(
-        {"_id": ObjectId(idea_id)},
+        {"_id": _oid(idea_id)},
         {"$set": {"status": status_val}}
     )
-    return {"success": result.modified_count == 1} 
+    return {"success": result.modified_count == 1}
 
 @app.delete("/admin/unknown-intents/{idea_id}")
 async def delete_unknown_intent(idea_id: str):
-    result = await unknown_intents_collection.delete_one({"_id": ObjectId(idea_id)})
+    result = await unknown_intents_collection.delete_one({"_id": _oid(idea_id)})
     return {"success": result.deleted_count == 1}
 
 class ScaffoldRequest(BaseModel):
-    feature_name: str
-    feature_summary: str
+    feature_name: str = Field(..., min_length=1, max_length=200)
+    feature_summary: str = Field("", max_length=4000)
     scaffold_type: str = "API Route"
+
+
+def _deterministic_scaffold(feature_name: str, feature_summary: str, scaffold_type: str) -> str:
+    """Useful offline stub when no LLM key is present — a real code skeleton the
+    admin can build on, instead of the bare '[MOCKED RESPONSE]' placeholder."""
+    slug = re.sub(r"[^a-z0-9]+", "_", (feature_name or "feature").lower()).strip("_") or "feature"
+    header = f"# {scaffold_type} for: {feature_name}\n# {feature_summary}\n# (offline stub — no LLM key; replace with real logic)\n\n"
+    if scaffold_type == "DB Model":
+        return header + (
+            "from pydantic import BaseModel, Field\n"
+            "from datetime import datetime\n\n"
+            f"class {slug.title().replace('_','')}(BaseModel):\n"
+            "    id: str | None = None\n"
+            "    created_at: datetime = Field(default_factory=datetime.utcnow)\n"
+        )
+    if scaffold_type == "Background Job":
+        return header + (
+            "from fastapi import BackgroundTasks\n\n"
+            f"async def {slug}_job(payload: dict) -> None:\n"
+            "    \"\"\"Do the background work here.\"\"\"\n"
+            "    ...\n"
+        )
+    # Default: API Route
+    return header + (
+        "from fastapi import APIRouter\n"
+        "from pydantic import BaseModel\n\n"
+        f"router = APIRouter(prefix='/api/{slug}')\n\n"
+        f"class {slug.title().replace('_','')}Request(BaseModel):\n"
+        "    pass\n\n"
+        f"@router.post('/')\n"
+        f"async def create_{slug}(body: {slug.title().replace('_','')}Request):\n"
+        "    return {'ok': True}\n"
+    )
+
 
 @app.post("/generate-scaffold")
 async def generate_scaffold_endpoint(req: ScaffoldRequest, user: Optional[str] = None):
     code = generate_scaffold(req.feature_name, req.feature_summary, req.scaffold_type)
+    # ask_openai returns a "[MOCKED RESPONSE] ..." string when no LLM key is set.
+    # Swap that useless placeholder for a real deterministic stub and flag it so
+    # the UI can label the result honestly.
+    is_mock = isinstance(code, str) and code.strip().startswith("[MOCKED RESPONSE]")
+    if is_mock:
+        code = _deterministic_scaffold(req.feature_name, req.feature_summary, req.scaffold_type)
     # Save scaffold history
     await scaffold_history_collection.insert_one({
         "idea": req.feature_name,
         "feature_summary": req.feature_summary,
         "scaffold_type": req.scaffold_type,
         "code": code,
+        "is_mock": is_mock,
         "created_at": datetime.utcnow(),
         "user": user or "anonymous"
     })
-    return {"code": code} 
+    return {"code": code, "is_mock": is_mock}
 
 @app.get("/scaffold-history/{idea}")
 async def get_scaffold_history(idea: str):
@@ -1312,7 +1374,7 @@ async def approve_scaffold(scaffold_id: str, data: dict = Body(...)):
     admin_comment = data.get("admin_comment", "")
     approved_by = data.get("approved_by", "admin")
     result = await scaffold_history_collection.update_one(
-        {"_id": ObjectId(scaffold_id)},
+        {"_id": _oid(scaffold_id)},
         {"$set": {
             "approved": True,
             "admin_comment": admin_comment,
