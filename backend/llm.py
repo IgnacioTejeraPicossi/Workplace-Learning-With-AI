@@ -558,9 +558,30 @@ def ask_openai(prompt=None, task_type=None, complexity="medium", max_tokens=512,
         
         # Use old OpenAI syntax for compatibility with openai==0.28.1
         openai.api_key = effective_openai_key
-        
+
         response = _call_openai(model_to_use)
-        return response.choices[0].message.content.strip()
+        content = (response.choices[0].message.content or "").strip()
+        finish = getattr(response.choices[0], "finish_reason", None)
+        # GPT-5 / o-series are REASONING models: reasoning tokens count against
+        # max_completion_tokens. With a small budget (e.g. 800–900 for code
+        # generation), reasoning can consume the entire budget and return EMPTY
+        # content with finish_reason="length". Detected live: gpt-5.5 @ 900 →
+        # reasoning_tokens=900, content_len=0. Retry once with a much larger
+        # budget so there is room for the actual answer after reasoning.
+        _is_reasoning = bool(model_to_use) and (
+            model_to_use.startswith("gpt-5") or model_to_use.startswith("o1") or model_to_use.startswith("o3")
+        )
+        if not content and finish == "length" and _is_reasoning:
+            current = params.get("max_completion_tokens") or params.get("max_tokens") or 900
+            bigger = max(int(current) * 4, 4096)
+            retry_params = _normalize_params_for_model({**params, "max_tokens": bigger}, model_to_use)
+            print(f"[ask_openai] ⚠️ empty content (reasoning starved budget={current}). Retrying model='{model_to_use}' with max_completion_tokens={bigger}")
+            if messages:
+                r2 = openai.chat.completions.create(model=model_to_use, messages=messages, **retry_params)
+            else:
+                r2 = openai.chat.completions.create(model=model_to_use, messages=[{"role": "user", "content": prompt}], **retry_params)
+            content = (r2.choices[0].message.content or "").strip()
+        return content
     except Exception as e:
         # Log the full error so we can see whether it's "model not found", "no access", etc.
         err_str = str(e)
@@ -1087,12 +1108,14 @@ def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
         feature_name=feature_name,
         feature_summary=feature_summary
     )
-    # Use GPT-5 for scaffold generation (complex task)
+    # Use GPT-5 for scaffold generation (complex task).
+    # 4096, not 800: gpt-5.x reasoning tokens count against the completion
+    # budget — a small budget returns EMPTY content (see ask_openai retry note).
     return ask_openai(
-        prompt=prompt, 
-        task_type="code_generation", 
-        complexity="high", 
-        max_tokens=800
+        prompt=prompt,
+        task_type="code_generation",
+        complexity="high",
+        max_tokens=4096
     )
 
 async def generate_summary(filename: str, content: str) -> str:

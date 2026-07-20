@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.27.1] - 2026-07-20
+
+### Fixed — `ask_openai` returned EMPTY content for code generation (reasoning budget starvation)
+
+Root cause found and fixed for the empty `code` flagged in [1.27.0]. GPT-5 / o-series
+are **reasoning models**: reasoning tokens count against `max_completion_tokens`.
+`code_generation` at `complexity="high"` selects `gpt-5.5` (per `gpt5_config.py`)
+but the callers passed only 800–900 tokens, so reasoning consumed the entire
+budget and the API returned **empty content with `finish_reason="length"`**.
+
+Confirmed live with the OpenAI API:
+
+| model | max_completion_tokens | finish | content | reasoning_tokens |
+|-------|----------------------|--------|---------|------------------|
+| gpt-5.5 | 900 | length | **0** | **900** |
+| gpt-5.5 | 4096 | stop | 5557 | 276 |
+| gpt-5.4-mini | 900 | length | 3639 | 0 |
+
+Fixes (in order of generality):
+- **`backend/llm.py` — central safety net in `ask_openai`**: if a reasoning
+  model returns empty content with `finish_reason="length"`, retry once with a
+  4× / ≥4096 completion budget. Benefits every caller, not just scaffolds.
+- **`backend/gpt5_config.py`**: added a `code_generation` branch with
+  `max_tokens: 4096` headroom.
+- **Callers bumped**: `generate_scaffold` (800→4096) and `scaffold_loop._build`
+  (900→4096) so the common path succeeds on the first call without a retry.
+
+**Verified live**: `/generate-scaffold` now returns real code (~11k chars,
+`is_mock:false`) and `/generate-scaffold-loop` passes in 1 iteration (~12.5k
+chars) instead of escalating with an empty/stub result. The mock/offline path is
+untouched (guarded by the reasoning-model + `finish_reason` check), so the 84
+offline CI tests are unaffected.
+
+**Aside**: the repo `.env` is UTF-16/BOM-encoded, which is why python-dotenv
+prints "could not parse statement" warnings; the key still loads because the
+process environment carries it. Worth re-saving as UTF-8 later.
+
+---
+
 ## [1.27.0] - 2026-07-19
 
 ### Added — Option B: self-correcting scaffold generation (Builder→Judge→Manager)

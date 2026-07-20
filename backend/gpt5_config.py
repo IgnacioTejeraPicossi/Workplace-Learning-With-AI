@@ -138,6 +138,15 @@ def get_gpt5_parameters(model: str, task_type: str = None) -> dict:
             "temperature": 0.4,  # Balanced for documentation
             "max_tokens": 2048
         }
+    elif task_type == "code_generation":
+        return {
+            "model": base_params.get("name", model),
+            "temperature": 0.3,   # Focused for code
+            # Reasoning models (gpt-5.x) count reasoning tokens against the
+            # completion budget — a small budget returns EMPTY content. Give
+            # code generation generous headroom so output survives reasoning.
+            "max_tokens": 4096,
+        }
     elif task_type == "classification":
         return {
             "model": base_params.get("name", model),

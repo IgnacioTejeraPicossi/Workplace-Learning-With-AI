@@ -121,7 +121,8 @@ def _build(feature_name: str, feature_summary: str, scaffold_type: str,
             "\n\nYour previous attempt was rejected by a reviewer for these "
             f"reasons:\n{feedback}\nReturn a corrected version. Output only code."
         )
-    raw = ask_openai(prompt=prompt, task_type="code_generation", complexity="high", max_tokens=900)
+    # 4096: reasoning models starve output on a small completion budget.
+    raw = ask_openai(prompt=prompt, task_type="code_generation", complexity="high", max_tokens=4096)
     return raw or ""
 
 
