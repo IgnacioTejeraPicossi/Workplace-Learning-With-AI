@@ -110,7 +110,7 @@ curl http://localhost:8000/api/j-messages/list
 | Security Center | Frontend build + i18n parity | `cd frontend && npx react-scripts build` |
 | Cybersecurity | 14/14 contract tests | `python -m pytest backend/tests/test_cyber_api_contracts.py -v` |
 | Self-Correcting Loop | 4/4 contract tests (offline fallback) | `python -m pytest backend/tests/test_self_correcting_loop_contracts.py -v` |
-| Future (Idea Log / Roadmap) | 5/5 contract tests (offline) | `python -m pytest backend/tests/test_future_module_contracts.py -v` |
+| Future (Idea Log / Roadmap) | 7/7 contract tests (offline, incl. Notify emails) | `python -m pytest backend/tests/test_future_module_contracts.py -v` |
 | Self-Correcting Scaffold Loop | 5/5 contract tests (offline, ast ground truth) | `python -m pytest backend/tests/test_scaffold_loop_contracts.py -v` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
@@ -122,7 +122,7 @@ dispatch: `.github/workflows/ci.yml`.
 
 | Job | What it validates |
 |-----|-------------------|
-| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (84 tests) |
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (86 tests) |
 | `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
 
 The `backend` test step runs only the suites verified to pass with **no**

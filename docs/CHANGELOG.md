@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.27.2] - 2026-07-20
+
+### Fixed — "Notify Me" now actually sends email (was store-only)
+
+The Feature Roadmap's **Notify Me** button only stored the subscriber's email in
+Mongo (`$addToSet subscribers`) — nothing was ever sent, and a status change
+didn't notify anyone. The repo already had a ready email abstraction
+(`backend/core/email.py`, `get_email_service()` — dev-console / SMTP / SendGrid),
+used by auth but not by the Future module. Wired it in:
+
+- **New helper** `_send_email_best_effort()` in `app.py` — sends via
+  `get_email_service()` in an executor, wrapped in try/except so it can **never
+  break the endpoint**. With `EMAIL_PROVIDER=dev` (default) it prints to the
+  backend console; set `EMAIL_PROVIDER=smtp` (+ `SMTP_HOST/USER/PASS`) or
+  `sendgrid` (+ `SENDGRID_API_KEY`) for real delivery.
+- **On subscribe** → a confirmation email to the subscriber ("You'll be notified
+  about: <feature>").
+- **On status change** → an email to every subscriber of that feature
+  ("Update: <feature> is now <status>") — the missing trigger.
+- **Tests**: 2 new offline tests in `test_future_module_contracts.py` (email
+  service patched, Mongo mocked) assert subscribe sends 1 email and a status
+  change emails all subscribers. CI now 86 offline tests. Verified live: subscribe
+  → 200, invalid email → 400.
+
+Note: real delivery requires configuring a provider; until then it's dev-console.
+
+---
+
 ## [1.27.1] - 2026-07-20
 
 ### Fixed — `ask_openai` returned EMPTY content for code generation (reasoning budget starvation)

@@ -9,12 +9,14 @@ so it is CI-safe with no database and no LLM key.
 Run:  python -m pytest backend/tests/test_future_module_contracts.py -v
 """
 import pytest
+from types import SimpleNamespace
 from unittest.mock import patch, AsyncMock
 from httpx import AsyncClient, ASGITransport
 
 from backend.app import app
 
 BASE = "http://test"
+OID = "000000000000000000000000"
 
 
 # ── ObjectId guard: malformed id → 400 (was 500) ─────────────────────────────
@@ -78,3 +80,36 @@ async def test_scaffold_requires_feature_name():
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
         r = await c.post("/generate-scaffold", json={"feature_name": "", "feature_summary": "x"})
     assert r.status_code == 422
+
+
+# ── Notify Me: subscribe → confirmation email; status change → notify subs ───
+
+@patch("backend.app._send_email_best_effort", new_callable=AsyncMock)
+@patch("backend.app.unknown_intents_collection")
+@pytest.mark.asyncio
+async def test_subscribe_sends_confirmation_email(mock_coll, mock_send):
+    mock_coll.update_one = AsyncMock(return_value=SimpleNamespace(modified_count=1))
+    mock_coll.find_one = AsyncMock(return_value={
+        "user_input": "VR Learning", "classification": {"new_feature": "VR Learning"},
+    })
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post(f"/admin/unknown-intents/{OID}/subscribe", json={"email": "a@b.com"})
+    assert r.status_code == 200
+    # One confirmation email to the subscriber
+    assert mock_send.await_count == 1
+    assert mock_send.await_args.args[0] == "a@b.com"
+
+
+@patch("backend.app._send_email_best_effort", new_callable=AsyncMock)
+@patch("backend.app.unknown_intents_collection")
+@pytest.mark.asyncio
+async def test_status_change_notifies_all_subscribers(mock_coll, mock_send):
+    mock_coll.update_one = AsyncMock(return_value=SimpleNamespace(modified_count=1))
+    mock_coll.find_one = AsyncMock(return_value={
+        "user_input": "VR Learning", "subscribers": ["a@b.com", "c@d.com"],
+    })
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post(f"/admin/unknown-intents/{OID}/status", json={"status": "Implemented"})
+    assert r.status_code == 200
+    # One email per subscriber
+    assert mock_send.await_count == 2

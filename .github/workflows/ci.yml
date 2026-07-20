@@ -5,7 +5,7 @@ name: CI
 # - frontend: install + production build
 # Kept intentionally lightweight so it stays green and fast; it does NOT
 # require MongoDB, Firebase or any secret. The test step runs only the
-# mock-first suites (7 files, 84 tests) that are verified to pass with no database, no LLM key
+# mock-first suites (7 files, 86 tests) that are verified to pass with no database, no LLM key
 # and no Firebase credentials. Extend with the Mongo-backed suites (e.g.
 # smoke_red_cross_qa baselines, robomind contracts) once a MongoDB service
 # container + CI fixtures are added.

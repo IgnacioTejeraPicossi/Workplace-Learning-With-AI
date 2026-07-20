@@ -1253,6 +1253,33 @@ FUTURE_STATUS_VALUES = {"Idea", "Planned", "In Review", "Coming Soon", "Implemen
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
+def _feature_display_name(doc) -> str:
+    """The name the Feature Roadmap shows for an idea (new_feature or the raw input)."""
+    c = ((doc or {}).get("classification") or {})
+    return c.get("new_feature") or (doc or {}).get("user_input") or "your requested feature"
+
+
+async def _send_email_best_effort(to: str, subject: str, text: str, html: str = None):
+    """Send a notification email via the configured provider (core/email.py),
+    best-effort. NEVER raises — logs and returns on failure so it can't break the
+    endpoint. With EMAIL_PROVIDER=dev (default) it just prints to the backend
+    console; set EMAIL_PROVIDER=smtp/sendgrid (+ creds) for real delivery."""
+    import logging as _logging
+    try:
+        from backend.core.email import get_email_service
+    except ImportError:  # pragma: no cover
+        try:
+            from core.email import get_email_service
+        except Exception:
+            return
+    try:
+        svc = get_email_service()
+        import asyncio
+        await asyncio.get_event_loop().run_in_executor(None, lambda: svc.send(to, subject, html, text))
+    except Exception as e:
+        _logging.getLogger("future.notify").warning("Notify email to %s failed: %s", to, e)
+
+
 @app.get("/admin/unknown-intents")
 async def get_unknown_intents():
     ideas = []
@@ -1276,9 +1303,19 @@ async def subscribe_idea(idea_id: str, data: dict = Body(...)):
         return {"success": False, "error": "Email required"}
     if not _EMAIL_RE.match(email):
         raise HTTPException(status_code=400, detail="Invalid email")
+    oid = _oid(idea_id)
     result = await unknown_intents_collection.update_one(
-        {"_id": _oid(idea_id)},
+        {"_id": oid},
         {"$addToSet": {"subscribers": email}}
+    )
+    # Confirmation email (best-effort — console in dev mode).
+    doc = await unknown_intents_collection.find_one({"_id": oid})
+    name = _feature_display_name(doc)
+    await _send_email_best_effort(
+        email,
+        f"You'll be notified about: {name}",
+        text=(f"Thanks for subscribing.\n\nWe'll email you when there's an update on "
+              f"\"{name}\" on the Workplace Learning With AI roadmap."),
     )
     return {"success": result.modified_count == 1}
 
@@ -1290,10 +1327,21 @@ async def update_idea_status(idea_id: str, data: dict = Body(...)):
     if status_val not in FUTURE_STATUS_VALUES:
         # Guard the roadmap render: an unknown status breaks STATUS_ORDER/colors.
         raise HTTPException(status_code=400, detail=f"Invalid status; must be one of {sorted(FUTURE_STATUS_VALUES)}")
+    oid = _oid(idea_id)
     result = await unknown_intents_collection.update_one(
-        {"_id": _oid(idea_id)},
+        {"_id": oid},
         {"$set": {"status": status_val}}
     )
+    # Notify everyone who clicked "Notify Me" on this feature (best-effort).
+    doc = await unknown_intents_collection.find_one({"_id": oid})
+    name = _feature_display_name(doc)
+    for sub in ((doc or {}).get("subscribers") or []):
+        await _send_email_best_effort(
+            sub,
+            f"Update: \"{name}\" is now {status_val}",
+            text=(f"The feature \"{name}\" you subscribed to on the Workplace Learning "
+                  f"With AI roadmap is now marked \"{status_val}\"."),
+        )
     return {"success": result.modified_count == 1}
 
 @app.delete("/admin/unknown-intents/{idea_id}")
