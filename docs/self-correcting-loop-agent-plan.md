@@ -84,13 +84,24 @@ This upgrades the module's one-shot `generate_scaffold` into a self-correcting
 loop design step — the recursion made concrete (an agent that designs the loops
 to build the app's own features). Reuses the existing endpoint; no new backend.
 
+## V1.2 (shipped 1.27.0) — Option B: self-correcting scaffold generation
+
+`generate_scaffold` now has a self-correcting sibling: `backend/services/scaffold_loop.py`
++ `POST /generate-scaffold-loop`. Builder→Judge→Manager loop with **`ast.parse`
+as deterministic ground truth** + LLM checklist; escalates to the existing admin
+approve after `max_iterations`; delivers a deterministic stub if it can't produce
+usable code. Frontend: **🔁 Self-Correcting** button in the Feature Roadmap +
+loop metadata (pass/escalate, iterations) in the scaffold modal. 5 offline tests
+in CI. This is the recursion fully closed: the Self-Correcting Loop discipline
+now builds the app's own features.
+
 ## Possible V2+ (not built)
 
 - A **saved loops** library (Mongo), same best-effort pattern as the Cybersecurity
   persistence (1.24.1) — persist a designed loop against its roadmap feature.
-- **Option B** from the Future audit: make `generate_scaffold` itself run a real
-  Builder→Judge→Manager loop (generate code → Judge checks against lint/tests →
-  Manager regenerates or escalates to the existing admin approve), with a max
-  iteration stop.
+- Extend the scaffold Judge's ground truth beyond syntax: run the generated code
+  in a sandbox, or lint it, for a stronger correctness gate.
+- Investigate the pre-existing empty `ask_openai` code-generation responses
+  (see CHANGELOG [1.27.0] note).
 - A **live demo**: run a toy Builder/Judge/Manager loop against a sample task in
   the browser to show the cycle and a stop condition firing.

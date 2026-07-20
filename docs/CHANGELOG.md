@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.27.0] - 2026-07-19
+
+### Added — Option B: self-correcting scaffold generation (Builder→Judge→Manager)
+
+Upgrades the Future module's one-shot `generate_scaffold` into a real
+self-correcting loop, per the Self-Correcting Loop agent's own discipline.
+
+- **Service** `backend/services/scaffold_loop.py` (`generate_scaffold_loop`):
+  - **Builder** generates the scaffold (LLM), with the Judge's feedback fed back
+    in on each retry.
+  - **Judge** uses *real ground truth*, not opinion: **`ast.parse`** on the
+    generated code (does it actually parse as Python? — deterministic) + an LLM
+    checklist (right scaffold type, addresses the feature, not a bare stub).
+  - **Manager** retries with feedback up to `max_iterations`, then sets
+    `escalate=True` — the "escalate to a human" path, wired to the existing
+    admin-approve flow. If the loop never yields usable code (empty or
+    unparseable), it delivers a **deterministic stub** (`fell_back_to_stub`) so
+    the admin always gets something buildable.
+  - Fully offline-safe: no LLM key → deterministic stub, 1 iteration, is_mock.
+- **Endpoint** `POST /generate-scaffold-loop` in `app.py` (validated 1–5
+  iterations; stores final code + loop metadata to `scaffold_history`). The
+  original `/generate-scaffold` is untouched (backward compatible).
+- **Frontend**: Feature Roadmap admin cell gets a **🔁 Self-Correcting** button
+  next to *Generate Scaffold*. The scaffold modal now shows loop metadata — a
+  pass/escalate banner, the iteration count, and a "fell back to stub" note.
+  i18n `featureRoadmapModule.scaffoldLoop.*` (8 keys × EN/NO/ES at parity).
+- **Tests**: `backend/tests/test_scaffold_loop_contracts.py` — 5 offline tests
+  (offline short-circuit; **self-correction: bad code → good in 2 iterations**;
+  never-valid → escalate + stub fallback; endpoint contract with Mongo mocked;
+  422 validation). **Added to CI** (now 7 files / 84 offline tests).
+
+**Verified live**: the loop's self-correction proven via mocked bad→good (2
+iterations → pass) and the deterministic ground truth (`ast.parse`) confirmed.
+
+### Note — pre-existing: code-generation LLM returns empty in this environment
+
+While testing, the existing `/generate-scaffold` was observed returning empty
+`code` (`is_mock: false`, length 0) for `task_type="code_generation"` — i.e. the
+LLM itself is returning empty content right now (likely a reasoning-model /
+token issue), independent of this change. The new loop **handles this
+gracefully** (detects empty output, escalates, and delivers a usable stub), but
+the underlying empty-response behaviour of `ask_openai` for code generation is
+worth a separate look.
+
+---
+
 ## [1.26.3] - 2026-07-19
 
 ### Fixed — Idea Log never captured unrecognized requests

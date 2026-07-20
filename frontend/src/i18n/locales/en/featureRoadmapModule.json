@@ -85,6 +85,16 @@
       "managerLabel": "Manager rules",
       "stopLabel": "Stop conditions",
       "copy": "Copy"
+    },
+    "scaffoldLoop": {
+      "button": "Self-Correcting",
+      "buttonTitle": "Generate the scaffold via a Builder→Judge→Manager loop (syntax-checked, auto-revised, escalates to review if needed)",
+      "loading": "Running the Builder→Judge→Manager loop…",
+      "error": "Couldn't run the self-correcting loop. Try again.",
+      "pass": "Passed self-review",
+      "escalate": "Escalated for human review",
+      "iterations": "{{n}} iteration(s)",
+      "fellBack": "The loop couldn't produce clean code, so a deterministic stub is shown — review before use."
     }
   }
 }

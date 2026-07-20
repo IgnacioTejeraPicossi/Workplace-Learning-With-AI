@@ -85,6 +85,16 @@
       "managerLabel": "Reglas del Gestor",
       "stopLabel": "Condiciones de parada",
       "copy": "Copiar"
+    },
+    "scaffoldLoop": {
+      "button": "Autocorrectivo",
+      "buttonTitle": "Genera el andamiaje mediante un bucle Constructor→Juez→Gestor (con verificación de sintaxis, auto-revisado, escala a revisión si es necesario)",
+      "loading": "Ejecutando el bucle Constructor→Juez→Gestor…",
+      "error": "No se pudo ejecutar el bucle autocorrectivo. Inténtalo de nuevo.",
+      "pass": "Pasó la autorrevisión",
+      "escalate": "Escalado a revisión humana",
+      "iterations": "{{n}} iteración(es)",
+      "fellBack": "El bucle no pudo producir código limpio, así que se muestra un andamiaje determinista — revísalo antes de usarlo."
     }
   }
 }

@@ -85,6 +85,16 @@
       "managerLabel": "Leder-regler",
       "stopLabel": "Stoppbetingelser",
       "copy": "Kopier"
+    },
+    "scaffoldLoop": {
+      "button": "Selvkorrigerende",
+      "buttonTitle": "Generer stillaset via en Bygger→Dommer→Leder-løkke (syntakssjekket, auto-revidert, eskalerer til gjennomgang ved behov)",
+      "loading": "Kjører Bygger→Dommer→Leder-løkken…",
+      "error": "Kunne ikke kjøre den selvkorrigerende løkken. Prøv igjen.",
+      "pass": "Bestod selvgjennomgang",
+      "escalate": "Eskalert for menneskelig gjennomgang",
+      "iterations": "{{n}} iterasjon(er)",
+      "fellBack": "Løkken klarte ikke å produsere ren kode, så et deterministisk stillas vises — gjennomgå før bruk."
     }
   }
 }

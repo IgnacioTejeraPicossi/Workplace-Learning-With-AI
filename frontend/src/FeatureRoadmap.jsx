@@ -152,7 +152,36 @@ function FeatureRoadmap() {
       const mockHead = t("featureRoadmapModule.scaffoldMockHead", { name: featureName });
       codeStub = `${mockHead}\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
     }
-    setScaffoldModal({ open: true, code: codeStub, feature: idea });
+    setScaffoldModal({ open: true, code: codeStub, feature: idea, loop: null });
+  };
+
+  // Option B: self-correcting scaffold. Runs the Builder→Judge→Manager loop on
+  // the backend (ast syntax ground truth + LLM checklist) and shows the result
+  // plus loop metadata (iterations / verdict / escalate) in the scaffold modal.
+  const handleSelfCorrectingScaffold = async (idea) => {
+    const featureName = idea.classification?.new_feature || idea.user_input;
+    setScaffoldModal({ open: true, code: "", feature: idea, loop: { loading: true } });
+    try {
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+      const res = await fetch(`${API_BASE}/generate-scaffold-loop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feature_name: featureName,
+          feature_summary: idea.classification?.intent || idea.user_input,
+          scaffold_type: scaffoldType,
+          max_iterations: 3,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setScaffoldModal({ open: true, code: data.code || "", feature: idea, loop: data });
+    } catch (err) {
+      setScaffoldModal({
+        open: true, code: "", feature: idea,
+        loop: { error: true },
+      });
+    }
   };
 
   const loopLang = () => {
@@ -446,6 +475,23 @@ function FeatureRoadmap() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => handleSelfCorrectingScaffold(idea)}
+                      style={{
+                        background: "#6d28d9",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "2px 10px",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        marginTop: 2,
+                      }}
+                      title={t("featureRoadmapModule.scaffoldLoop.buttonTitle")}
+                    >
+                      🔁 {t("featureRoadmapModule.scaffoldLoop.button")}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleShowHistory(idea)}
                       style={{
                         background: "#f4e2b8",
@@ -492,6 +538,31 @@ function FeatureRoadmap() {
           name: modalName(scaffoldModal.feature),
         })}
       >
+        {scaffoldModal.loop && (
+          scaffoldModal.loop.loading ? (
+            <div style={{ marginBottom: 12 }}>{t("featureRoadmapModule.scaffoldLoop.loading")}</div>
+          ) : scaffoldModal.loop.error ? (
+            <div style={{ marginBottom: 12, color: "#b91c1c" }}>{t("featureRoadmapModule.scaffoldLoop.error")}</div>
+          ) : (
+            <div style={{
+              marginBottom: 12, padding: "10px 12px", borderRadius: 8,
+              background: scaffoldModal.loop.verdict === "pass" ? "#ecfdf5" : "#fffbeb",
+              border: `1px solid ${scaffoldModal.loop.verdict === "pass" ? "#6ee7b7" : "#fde68a"}`,
+              fontSize: 13, color: colors.text, lineHeight: 1.6,
+            }}>
+              <b>{scaffoldModal.loop.verdict === "pass"
+                ? `✅ ${t("featureRoadmapModule.scaffoldLoop.pass")}`
+                : `⚠️ ${t("featureRoadmapModule.scaffoldLoop.escalate")}`}</b>
+              {" — "}
+              {t("featureRoadmapModule.scaffoldLoop.iterations", { n: scaffoldModal.loop.iterations })}
+              {scaffoldModal.loop.fell_back_to_stub && (
+                <div style={{ marginTop: 4, color: "#92400e" }}>
+                  ↳ {t("featureRoadmapModule.scaffoldLoop.fellBack")}
+                </div>
+              )}
+            </div>
+          )
+        )}
         <pre
           style={{
             background: "#f4f4f4",

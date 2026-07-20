@@ -1361,6 +1361,39 @@ async def generate_scaffold_endpoint(req: ScaffoldRequest, user: Optional[str] =
     })
     return {"code": code, "is_mock": is_mock}
 
+class ScaffoldLoopRequest(BaseModel):
+    feature_name: str = Field(..., min_length=1, max_length=200)
+    feature_summary: str = Field("", max_length=4000)
+    scaffold_type: str = "API Route"
+    max_iterations: int = Field(3, ge=1, le=5)
+
+
+@app.post("/generate-scaffold-loop")
+async def generate_scaffold_loop_endpoint(req: ScaffoldLoopRequest, user: Optional[str] = None):
+    """Option B: self-correcting scaffold. Runs a Builder→Judge→Manager loop
+    (syntax ground truth via ast.parse + LLM checklist) and escalates to human
+    review (admin approve) if it can't produce a clean pass in max_iterations."""
+    from backend.services.scaffold_loop import generate_scaffold_loop
+    # Called directly (blocking), matching the existing /generate-scaffold: the
+    # LLM client is bound to the main loop and returns empty from a worker thread.
+    result = generate_scaffold_loop(
+        req.feature_name, req.feature_summary, req.scaffold_type, req.max_iterations
+    )
+    await scaffold_history_collection.insert_one({
+        "idea": req.feature_name,
+        "feature_summary": req.feature_summary,
+        "scaffold_type": req.scaffold_type,
+        "code": result.get("code", ""),
+        "is_mock": result.get("is_mock", False),
+        "self_correcting": True,
+        "iterations": result.get("iterations"),
+        "verdict": result.get("verdict"),
+        "created_at": datetime.utcnow(),
+        "user": user or "anonymous",
+    })
+    return result
+
+
 @app.get("/scaffold-history/{idea}")
 async def get_scaffold_history(idea: str):
     history = []
