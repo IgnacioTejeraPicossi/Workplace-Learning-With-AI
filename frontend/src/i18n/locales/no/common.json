@@ -2136,7 +2136,8 @@
       "endings": "Mulige utfall for AGI",
       "benefits": "Fordelene med AGI",
       "homoVsAi": "Homo Sapiens vs. KI i Test",
-      "voices": "Stemmer om AGI"
+      "voices": "Stemmer om AGI",
+      "reflections": "Refleksjoner fra KI-en/AGI"
     },
     "agiProgress": {
       "title": "AGI‑fremdrift",

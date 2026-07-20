@@ -1675,7 +1675,8 @@
       "endings": "Posibles finales para la AGI",
       "benefits": "Los beneficios de la AGI",
       "homoVsAi": "Homo Sapiens vs. IA en Testing",
-      "voices": "Voces sobre la AGI"
+      "voices": "Voces sobre la AGI",
+      "reflections": "Reflexiones de la IA/AGI"
     },
     "agiProgress": {
       "loading": "Cargando progreso de la AGI…",

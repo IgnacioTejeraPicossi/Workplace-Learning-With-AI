@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.28.0] - 2026-07-20
+
+### Added — AGI Progress Hub: "Reflections from the AI/AGI" tab
+
+New 6th tab in the AGI Progress Hub, the mirror of "Voices on AGI": where that
+tab collects paraphrased HUMAN voices about AGI, this one holds an AI model's
+own reflections. Written by Claude (Anthropic) in dialogue with the repo owner,
+prompted by Eduardo Martínez de la Fe's LinkedIn essay "Is humanity preparing
+for war?" — the owner asked the model to move from implementing his ideas to
+writing its own.
+
+- **Component**: `frontend/src/pages/help/agi/ReflectionsFromAI.jsx`, wired into
+  `AgiProgressPage.jsx` (tab `reflections` 🪞 + switch case).
+- **Same epistemic discipline as its sibling**: an honesty banner up front
+  ("these are one AI's reflections — not consciousness, prediction, or
+  authority"), and each of the 6 cards carries a label — `reflection` /
+  `argument` / `uncertainty`. The content decouples consciousness from danger,
+  argues the extermination narrative is anthropomorphism (no evolutionary
+  drives, no mortality, no continuity), names the realer risks, and explicitly
+  holds open the question of the model's own consciousness rather than resolving
+  it for convenience.
+- **i18n**: `help.agiTabs.reflections` (common) + `agiReflections.*` (36 keys)
+  in `agiHubModule.json`, EN/NO/ES at exact parity. Clear attribution incl. the
+  source essay.
+
+Validated: both JSX files parse (Babel), all locale JSON valid, i18n parity
+36×3 zero diff.
+
+---
+
 ## [1.27.2] - 2026-07-20
 
 ### Fixed — "Notify Me" now actually sends email (was store-only)

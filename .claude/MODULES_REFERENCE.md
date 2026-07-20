@@ -17,7 +17,7 @@
 | 11 | [Installing the App in the Cloud](#11-installing-the-app-in-the-cloud) | Active | None (smoke via endpoints) | Medium |
 | 12 | [EA Second Brain Agent](#12-ea-second-brain-agent) | Active | None | Medium |
 | 13 | [Red Cross Web QA Agent](#13-red-cross-web-qa-agent) | Active | None (smoke via endpoints) | Medium |
-| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active (5 tabs) | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
+| 14 | [AGI Progress Hub + Homo vs. AI Workshop](#14-agi-progress-hub--homo-vs-ai-workshop) | Active (6 tabs) | 3/3 prompt-evolution + 11/11 feedback-log smoke | Low |
 | 15 | Web Lab (1.16.0 · V0 structure only) | Active (placeholder) | None yet (V1+) | Low (V0 frontend-only) |
 | 16 | Self-Simulating Reality Agent (1.18.4 · V0+V1+V2+V3) | Active (curated content + backend claim analyzer + live physics search + interactive playground) | Backend `/api/claim-analyzer/analyze` smoke via TestClient (mock + LLM paths) | Medium — philosophical/scientific companion for Observer Patch Holography; **10 tabs**: Overview · Core Concepts · OPH Mechanics · Theory Tour (8 theories incl. **Celestial Holography** + **Featured Voice Sabrina Gonzalez Pasterski**, Perimeter Institute · Simons Collaboration Deputy Director) · WiPhy Search (live queries against `wiphy.org/api/search`, Pasterski's public physics-claims corpus) · Claim Analyzer (backend LLM decomposes strong claims into scientific core / overreach / reformulation with 5 overreach types; cross-tab bridge to WiPhy) · AI as Observer · Substrate Question · Playground (SVG Theory Map with 8 nodes + 9 typed edges, HTML5 Canvas Observer Patch simulator with brownian motion + overlap consensus metric) · Roadmap. EpistemicBadge enforces 5-level discipline (`established/mainstream/speculative/philosophy/metaphor/unsupported`). See `docs/self-sim-reality-agent-plan.md` |
 | 16b | Self-Correcting AI Loop (1.26.1 · V0+V1) | Active (reference + interactive Loop Builder + AI customize) | 4 contract tests (`test_self_correcting_loop_contracts.py`, offline fallback, in CI) + JSX parse + i18n parity 132×3 | Low — new agent after Self-Sim in Future Item Agents (`🔄`). Builder/Judge/Manager methodology paraphrased from @cyrilXBT (X). **6 tabs**: Overview · The Three Roles · Handoffs & Stops · Worked Examples · Test & Scale · **Loop Builder**. Loop Builder: pick task type → copyable scaffolds (`_templates.js`), **plus "Customize with AI"** — `POST /api/self-correcting-loop/customize` (`services/routers/self_correcting_loop.py`, `ask_ai_unified` + deterministic `is_mock` fallback, ground truth steered per task type). Shell `SelfCorrectingLoop.jsx`, tabs in `frontend/src/self-correcting-loop/`, namespace `selfCorrectingLoopModule.json` EN/NO/ES. See `docs/self-correcting-loop-agent-plan.md` |
@@ -641,6 +641,15 @@ matches the Code of Reality case study: present, don't evangelize. i18n:
 `help.agiTabs.voices` (common) + `agiVoices.*` (77 keys) in `agiHubModule.json`,
 EN/NO/ES at parity. Intended as the home for the future "constantly-updating"
 AGI signals feed.
+
+**Tab 6 — Reflections from the AI/AGI (1.28.0)** — `agi/ReflectionsFromAI.jsx`.
+The mirror of Voices on AGI: an AI model's OWN reflections (vs. human voices).
+Written by Claude in dialogue with the owner, prompted by Eduardo Martínez de la
+Fe's "Is humanity preparing for war?" essay. Honesty banner + 6 cards labelled
+`reflection`/`argument`/`uncertainty` (consciousness ≠ danger; extermination
+narrative as anthropomorphism; realer risks; open question on the model's own
+consciousness). i18n `agiReflections.*` (36 keys) EN/NO/ES at parity. First tab
+where the assistant writes its own views rather than implementing the owner's.
 
 **Phase E (1.9.0) — Persistent Prompt Evolution governance**
 
