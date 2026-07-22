@@ -24,7 +24,10 @@ peer-reviewed in mainstream venues, offers no testable predictions or accepted
 mathematical formalism, and is tied to intelligent-design claims — mainstream
 scientists regard it as fringe metaphysics, not physics. Added as `{ id: 'ctmu' }`
 in `TheoryTour.jsx` + 5 i18n keys (Title/Author/Level/Body/Link) in
-`selfSimReality.theoryTour.rows`, EN/NO/ES at parity. Sources:
+`selfSimReality.theoryTour.rows`, EN/NO/ES at parity. Also added to the
+**Foundational sources** list (Roadmap & Sources tab): `ctmuWiki` (overview) and
+`ctmuReviews` (Physics Forums skeptical reception), keeping the balanced framing.
+Sources:
 [CTMU Wiki](https://ctmucommunity.org/wiki/Cognitive-Theoretic_Model_of_the_Universe),
 [Physics Forums discussion](https://www.physicsforums.com/threads/chris-langans-ctmu-scientific-reviews.487548/).
 

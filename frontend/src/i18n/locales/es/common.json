@@ -777,7 +777,9 @@
         "pasterskiPI": "Sabrina Pasterski — Perimeter Institute (perfil de facultad)",
         "simonsCelestial": "Simons Collaboration on Celestial Holography — programa de investigación coordinado",
         "celestialReview": "arXiv 2111.11392 — «Celestial Holography» (revisión canónica del campo)",
-        "physicsgirl": "physicsgirl.com — página personal de Sabrina Pasterski"
+        "physicsgirl": "physicsgirl.com — página personal de Sabrina Pasterski",
+        "ctmuWiki": "CTMU Wiki — Modelo Cognitivo-Teórico del Universo (Langan, resumen)",
+        "ctmuReviews": "Physics Forums — reseñas científicas de la CTMU (recepción escéptica)"
       },
       "pendingTitle": "Integraciones candidatas (V1+, pendientes de verificar)",
       "pendingIntro": "Fuentes propuestas para el agente RAG en V1+. Aún no aceptadas por el pipeline — pendientes de comprobar acceso, documentación pública y alcance antes de integrarlas como herramientas MCP.",

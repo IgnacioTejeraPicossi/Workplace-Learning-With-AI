@@ -19,6 +19,8 @@ const SOURCES = [
   { id: 'simonsCelestial',href: 'https://simonscelestialholographycollaboration.org/' },
   { id: 'celestialReview',href: 'https://arxiv.org/abs/2111.11392' },
   { id: 'physicsgirl',    href: 'https://physicsgirl.com' },
+  { id: 'ctmuWiki',       href: 'https://ctmucommunity.org/wiki/Cognitive-Theoretic_Model_of_the_Universe' },
+  { id: 'ctmuReviews',    href: 'https://www.physicsforums.com/threads/chris-langans-ctmu-scientific-reviews.487548/' },
 ];
 
 // V1+ candidate integrations — kept out of SOURCES until verified
