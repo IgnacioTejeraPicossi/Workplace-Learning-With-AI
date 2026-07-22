@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.28.1] - 2026-07-21
+
+### Added — Self-Simulating Reality Agent: CTMU added to the Theory Tour
+
+New 9th theory in the Theory Tour: **the Cognitive-Theoretic Model of the
+Universe (CTMU)** by Christopher M. Langan — reality as a “self-configuring,
+self-processing language” (SCSPL), arguably the most literal “self-simulating
+universe” of the tour, hence a natural fit for this agent. Covers syndiffeonesis,
+conspansion and telic recursion, plus its relation to OPH and the simulation
+hypothesis (all make mind/observation constitutive of reality).
+
+Framed with the module's epistemic discipline (present, don't evangelize): badge
+`philosophy`, and an explicit honesty note that CTMU is self-published, not
+peer-reviewed in mainstream venues, offers no testable predictions or accepted
+mathematical formalism, and is tied to intelligent-design claims — mainstream
+scientists regard it as fringe metaphysics, not physics. Added as `{ id: 'ctmu' }`
+in `TheoryTour.jsx` + 5 i18n keys (Title/Author/Level/Body/Link) in
+`selfSimReality.theoryTour.rows`, EN/NO/ES at parity. Sources:
+[CTMU Wiki](https://ctmucommunity.org/wiki/Cognitive-Theoretic_Model_of_the_Universe),
+[Physics Forums discussion](https://www.physicsforums.com/threads/chris-langans-ctmu-scientific-reviews.487548/).
+
+---
+
 ## [1.28.0] - 2026-07-20
 
 ### Added — AGI Progress Hub: "Reflections from the AI/AGI" tab

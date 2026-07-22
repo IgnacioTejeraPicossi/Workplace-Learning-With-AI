@@ -410,7 +410,12 @@
         "ophAuthor": "Mueller et al.",
         "ophLevel": "speculative",
         "ophBody": "Observer-first reconstruction: each observer has a bounded patch with state space; physics is the public fixed-point that survives overlap consistency.",
-        "ophLink": "→ The central programme this module helps you understand and critique."
+        "ophLink": "→ The central programme this module helps you understand and critique.",
+        "ctmuTitle": "The Cognitive-Theoretic Model of the Universe (CTMU)",
+        "ctmuAuthor": "Christopher M. Langan",
+        "ctmuLevel": "philosophy",
+        "ctmuBody": "Reality framed as a “self-configuring, self-processing language” (SCSPL) that runs and interprets itself — arguably the most literal “self-simulating universe” on this list, which is why it belongs in this agent. Core ideas: syndiffeonesis (any difference presupposes a shared medium), conspansion (an inner, self-contained alternative to spatial expansion), and telic recursion (reality recursively self-configures toward a purpose/telos). Honesty note: CTMU is self-published and not peer-reviewed in mainstream venues, offers no testable predictions or accepted mathematical formalism, and is tied to intelligent-design claims (Langan states it “proves the existence of God”). Mainstream scientists regard it as fringe metaphysics, not physics. Included as an on-theme idea to examine — not an endorsement.",
+        "ctmuLink": "Relation to OPH & the simulation hypothesis: all three make mind/observation constitutive of reality — but CTMU frames this as a metaphysical “supertautology” claimed to be logically necessary, rather than testable physics. Overviews: ctmucommunity.org; Langan explains it in long-form interviews (e.g. YouTube)."
       },
       "featured": {
         "name": "Sabrina Gonzalez Pasterski",
