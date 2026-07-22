@@ -9,13 +9,15 @@ import ReflectionsFromAI from './agi/ReflectionsFromAI';
 
 export default function AgiProgressPage() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('tracker');
+  // Default to the Homo-vs-AI workshop tab: the agent's most hands-on testing
+  // utility should be the first thing the user meets.
+  const [activeTab, setActiveTab] = useState('homoVsAi');
 
   const tabs = [
+    { id: 'homoVsAi', labelKey: 'help.agiTabs.homoVsAi', fallback: 'Homo Sapiens vs. KI i Test', icon: '🧑‍💻' },
     { id: 'tracker', labelKey: 'help.agiTabs.tracker', fallback: 'AGI Progress Tracker', icon: '📈' },
     { id: 'endings', labelKey: 'help.agiTabs.endings', fallback: 'Possible Endings for AGI', icon: '🧊' },
     { id: 'benefits', labelKey: 'help.agiTabs.benefits', fallback: 'The Benefits of AGI', icon: '✨' },
-    { id: 'homoVsAi', labelKey: 'help.agiTabs.homoVsAi', fallback: 'Homo Sapiens vs. KI i Test', icon: '🧑‍💻' },
     { id: 'voices', labelKey: 'help.agiTabs.voices', fallback: 'Voices on AGI', icon: '🎙️' },
     { id: 'reflections', labelKey: 'help.agiTabs.reflections', fallback: 'Reflections from the AI/AGI', icon: '🪞' },
   ];
