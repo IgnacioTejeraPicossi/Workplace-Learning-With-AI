@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.28.2] - 2026-07-21
+
+### Added / Fixed — Video Lessons audit: TikTok + YouTube Shorts support, hardening
+
+Audit of the Video-Based Learning module (`VideoLesson.jsx` + `/video-summary`,
+`/video-quiz`, `/api/saved-videos`). The YouTube path works as specified
+(auto-embed + oEmbed title, save-to-library per user, transcript→summary→quiz).
+The owner noticed TikTok "worked" — accurate but partial: save/summary/quiz
+operate on pasted text so they were URL-agnostic, but the **embedded player never
+rendered for TikTok** (validity required `/embed/` or `.mp4`) and the **title
+wasn't auto-extracted**. Improvements:
+
+- **TikTok support**: new `getEmbedInfo()` detects `tiktok.com/@user/video/ID`,
+  converts to the TikTok player embed, and renders it in a portrait (9:16) frame.
+  Title auto-extracted via TikTok oEmbed (best-effort, generic fallback).
+- **YouTube Shorts support**: `youtube.com/shorts/ID` now auto-converts to an
+  embed like watch/youtu.be URLs.
+- **Broader URL handling**: the change/paste handlers now process YouTube (watch/
+  youtu.be/Shorts) and TikTok; the player picks the right renderer
+  (`isYouTubeEmbed` / `isTikTokEmbed` / direct file).
+- **i18n**: placeholder/hint/instruction updated to mention YouTube · Shorts ·
+  TikTok · MP4 (EN/NO/ES at parity).
+- **Backend hardening**: `saved-videos` delete/update now parse the id via
+  `_oid()` (malformed id → 400, not a leaked 500), and re-raise `HTTPException`
+  before the generic handler — which also fixes a pre-existing bug where the
+  404 "not found" was being masked as a 500.
+
+Validated: `VideoLesson.jsx` parses (Babel), backend compiles, i18n parity 54×3.
+
+---
+
 ## [1.28.1] - 2026-07-21
 
 ### Added — Self-Simulating Reality Agent: CTMU added to the Theory Tour

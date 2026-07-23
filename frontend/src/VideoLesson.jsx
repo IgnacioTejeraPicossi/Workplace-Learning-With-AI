@@ -186,67 +186,100 @@ function VideoLesson({ user }) {
     return '';
   };
 
-  // Convert YouTube URL to embed format
-  const convertToEmbedUrl = (url) => {
-    if (!url) return '';
-    
-    // If already embed format, return as is
-    if (url.includes('/embed/')) return url;
-    
-    // Convert watch URLs to embed
-    if (url.includes('youtube.com/watch?v=')) {
-      const videoId = url.split('v=')[1]?.split('&')[0];
-      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  // Detect the platform and build an embeddable URL.
+  // Supports: YouTube (watch / youtu.be / Shorts / already-embed), TikTok
+  // (canonical @user/video/ID → TikTok player embed), and direct MP4/webm/ogg.
+  const getEmbedInfo = (url) => {
+    if (!url) return { platform: null, embedUrl: '' };
+
+    // Already-embedded forms
+    if (url.includes('youtube.com/embed/')) return { platform: 'youtube', embedUrl: url };
+    if (url.includes('tiktok.com/player/') || url.includes('tiktok.com/embed/')) {
+      return { platform: 'tiktok', embedUrl: url };
     }
-    
-    // Convert youtu.be URLs to embed
-    if (url.includes('youtu.be/')) {
-      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
-    }
-    
-    // If it's an MP4 or other direct link, return as is
-    if (url.match(/\.(mp4|webm|ogg)$/i)) return url;
-    
-    return url; // Return original if can't convert
+
+    // YouTube: watch, youtu.be, Shorts → /embed/{id}
+    let ytId = null;
+    if (url.includes('youtube.com/watch?v=')) ytId = url.split('v=')[1]?.split('&')[0];
+    else if (url.includes('youtu.be/')) ytId = url.split('youtu.be/')[1]?.split(/[?&]/)[0];
+    else if (url.includes('youtube.com/shorts/')) ytId = url.split('/shorts/')[1]?.split(/[?/&]/)[0];
+    if (ytId) return { platform: 'youtube', embedUrl: `https://www.youtube.com/embed/${ytId}` };
+
+    // TikTok: https://www.tiktok.com/@user/video/123... → player embed
+    const tk = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/) || url.match(/tiktok\.com\/v\/(\d+)/);
+    if (tk) return { platform: 'tiktok', embedUrl: `https://www.tiktok.com/player/v1/${tk[1]}` };
+
+    // Direct video file
+    if (url.match(/\.(mp4|webm|ogg)$/i)) return { platform: 'file', embedUrl: url };
+
+    return { platform: null, embedUrl: url };
   };
 
-  // Handle URL input change with auto-conversion and title extraction
+  // Backwards-compatible wrapper (kept for the URL-change handler).
+  const convertToEmbedUrl = (url) => getEmbedInfo(url).embedUrl;
+
+  // Extract a TikTok video's title via oEmbed (best-effort; falls back to a
+  // generic label). Called with the ORIGINAL canonical URL, not the player URL.
+  const extractTikTokTitle = async (originalUrl) => {
+    const idMatch = originalUrl.match(/\/video\/(\d+)/);
+    setExtractingTitle(true);
+    try {
+      const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(originalUrl)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const title = data.title || (data.author_name ? `TikTok — ${data.author_name}` : '');
+        if (title) {
+          setVideoTitle(title);
+          const suggested = suggestTopicFromTitle(title);
+          if (suggested && !videoTopic.trim()) setVideoTopic(suggested);
+          return;
+        }
+      }
+      setVideoTitle(idMatch ? `TikTok Video ${idMatch[1]}` : 'TikTok Video');
+    } catch (e) {
+      setVideoTitle(idMatch ? `TikTok Video ${idMatch[1]}` : 'TikTok Video');
+    } finally {
+      setExtractingTitle(false);
+    }
+  };
+
+  // Handle URL input change with auto-conversion and title extraction.
+  // Works for YouTube (watch / youtu.be / Shorts) and TikTok.
   const handleUrlChange = async (e) => {
     const url = e.target.value;
     setVideoUrl(url);
-    
-    // Auto-convert and update the URL field
-    if (url && (url.includes('youtube.com/watch') || url.includes('youtu.be/'))) {
-      const embedUrl = convertToEmbedUrl(url);
-      if (embedUrl !== url) {
-        setVideoUrl(embedUrl);
-      }
-      
-      // Suggest topic based on URL first
-      const suggestedTopic = suggestTopicFromUrl(url);
-      if (suggestedTopic && !videoTopic.trim()) {
-        setVideoTopic(suggestedTopic);
-        console.log(`🔍 [VideoLesson] Suggested topic from URL: ${suggestedTopic}`);
-      }
-      
-      // Extract title automatically
-      const videoId = extractVideoId(url);
-      if (videoId) {
-        await extractYouTubeTitle(videoId);
-      }
+
+    const info = getEmbedInfo(url);
+    // Auto-convert the field to the embeddable form.
+    if (info.embedUrl && info.embedUrl !== url) {
+      setVideoUrl(info.embedUrl);
+    }
+
+    // Suggest topic from the URL (platform-agnostic).
+    const suggestedTopic = suggestTopicFromUrl(url);
+    if (suggestedTopic && !videoTopic.trim()) {
+      setVideoTopic(suggestedTopic);
+    }
+
+    // Auto-extract the title per platform (best-effort).
+    if (info.platform === 'youtube') {
+      const videoId = extractVideoId(info.embedUrl || url);
+      if (videoId) await extractYouTubeTitle(videoId);
+    } else if (info.platform === 'tiktok' && /\/video\/\d+/.test(url)) {
+      await extractTikTokTitle(url);
     }
   };
 
-  // Handle URL paste (for better title extraction)
+  // Handle URL paste (for better title extraction on the original URL).
   const handleUrlPaste = async (e) => {
     const pastedText = e.clipboardData.getData('text');
-    if (pastedText && (pastedText.includes('youtube.com/watch') || pastedText.includes('youtu.be/'))) {
-      // Extract title immediately when pasting
+    if (!pastedText) return;
+    const info = getEmbedInfo(pastedText);
+    if (info.platform === 'youtube') {
       const videoId = extractVideoId(pastedText);
-      if (videoId) {
-        await extractYouTubeTitle(videoId);
-      }
+      if (videoId) await extractYouTubeTitle(videoId);
+    } else if (info.platform === 'tiktok' && /\/video\/\d+/.test(pastedText)) {
+      await extractTikTokTitle(pastedText);
     }
   };
 
@@ -413,8 +446,11 @@ function VideoLesson({ user }) {
   const score = quiz.length > 0 ? Math.round((correctCount / quiz.length) * 100) : 0;
   const showBadge = score >= 80 && quiz.length > 0;
 
-  // Check if URL is valid for display
-  const isValidVideoUrl = videoUrl && (videoUrl.includes('/embed/') || videoUrl.match(/\.(mp4|webm|ogg)$/i));
+  // Check if URL is valid for display, and which player to use.
+  const isYouTubeEmbed = !!(videoUrl && videoUrl.includes('youtube.com/embed/'));
+  const isTikTokEmbed = !!(videoUrl && (videoUrl.includes('tiktok.com/player/') || videoUrl.includes('tiktok.com/embed/')));
+  const isDirectFile = !!(videoUrl && videoUrl.match(/\.(mp4|webm|ogg)$/i));
+  const isValidVideoUrl = isYouTubeEmbed || isTikTokEmbed || isDirectFile;
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
@@ -591,7 +627,7 @@ function VideoLesson({ user }) {
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <h3 style={{ margin: 0, color: colors.text }}>🎬 {t('videoBasedLearning.videoPlayer')}</h3>
-            {videoUrl.includes('/embed/') && (
+            {isYouTubeEmbed && (
               <button
                 onClick={() => window.open(videoUrl.replace('/embed/', '/watch?v='), '_blank')}
                 style={{
@@ -608,7 +644,7 @@ function VideoLesson({ user }) {
               </button>
             )}
           </div>
-          {videoUrl.includes('/embed/') ? (
+          {isYouTubeEmbed ? (
             <iframe
               width="100%"
               height="315"
@@ -618,6 +654,18 @@ function VideoLesson({ user }) {
               allowFullScreen
               title="Video"
               style={{ borderRadius: 8 }}
+            />
+          ) : isTikTokEmbed ? (
+            // TikTok videos are portrait (9:16) — center a taller, narrower frame.
+            <iframe
+              width="325"
+              height="580"
+              src={videoUrl}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              title="Video"
+              style={{ borderRadius: 8, display: 'block', margin: '0 auto', maxWidth: '100%' }}
             />
           ) : (
             <video

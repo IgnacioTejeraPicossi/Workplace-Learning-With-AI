@@ -2054,7 +2054,7 @@ async def delete_saved_video(video_id: str, user=Depends(verify_token)):
     try:
         user_id = user.get("uid")
         result = await saved_videos_collection.delete_one({
-            "_id": ObjectId(video_id),
+            "_id": _oid(video_id),
             "user_id": user_id
         })
         
@@ -2062,6 +2062,8 @@ async def delete_saved_video(video_id: str, user=Depends(verify_token)):
             raise HTTPException(status_code=404, detail="Video not found or not owned by user")
         
         return {"message": "Video deleted successfully"}
+    except HTTPException:
+        raise  # preserve 400 (bad id) / 404 (not found) instead of masking as 500
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting video: {str(e)}")
 
@@ -2073,7 +2075,7 @@ async def update_saved_video(video_id: str, request: Request, user=Depends(verif
         update_data = await request.json()
         
         result = await saved_videos_collection.update_one(
-            {"_id": ObjectId(video_id), "user_id": user_id},
+            {"_id": _oid(video_id), "user_id": user_id},
             {"$set": update_data}
         )
         
@@ -2081,6 +2083,8 @@ async def update_saved_video(video_id: str, request: Request, user=Depends(verif
             raise HTTPException(status_code=404, detail="Video not found or not owned by user")
         
         return {"message": "Video updated successfully"}
+    except HTTPException:
+        raise  # preserve 400 (bad id) / 404 (not found) instead of masking as 500
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating video: {str(e)}")
 
