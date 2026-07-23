@@ -227,10 +227,17 @@ function VideoLesson({ user }) {
       const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(originalUrl)}`);
       if (res.ok) {
         const data = await res.json();
-        const title = data.title || (data.author_name ? `TikTok — ${data.author_name}` : '');
+        // TikTok's oEmbed "title" is the full caption, which can be very long.
+        // Keep a short, legible title (word-boundary cut ~80 chars) and add the
+        // author for context; the user can still edit it before saving.
+        const raw = (data.title || '').trim();
+        let short = raw;
+        if (raw.length > 80) short = raw.slice(0, 80).replace(/\s+\S*$/, '') + '…';
+        const author = data.author_name ? ` — ${data.author_name}` : '';
+        const title = short ? short + author : (data.author_name ? `TikTok — ${data.author_name}` : '');
         if (title) {
           setVideoTitle(title);
-          const suggested = suggestTopicFromTitle(title);
+          const suggested = suggestTopicFromTitle(raw || title);
           if (suggested && !videoTopic.trim()) setVideoTopic(suggested);
           return;
         }

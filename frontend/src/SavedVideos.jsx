@@ -261,15 +261,25 @@ function SavedVideos({ user }) {
               boxShadow: colors.shadow
             }}
           >
-                                      <div style={{ 
-               display: 'grid', 
-               gridTemplateColumns: '1fr auto',
+                                      <div style={{
+               display: 'flex',
+               flexWrap: 'wrap',
                gap: '1rem',
                alignItems: 'start',
+               justifyContent: 'space-between',
                width: '100%'
              }}>
-               <div style={{ minWidth: 0 }}>
-                 <h3 style={{ margin: '0 0 0.5rem 0', color: colors.text }}>
+               <div style={{ minWidth: 0, flex: '1 1 260px' }}>
+                 <h3
+                   title={video.title}
+                   style={{
+                     margin: '0 0 0.5rem 0', color: colors.text,
+                     // Clamp long titles (e.g. TikTok captions) to 2 lines so a
+                     // long caption can't stretch the card into a tall strip.
+                     display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                     overflow: 'hidden', wordBreak: 'break-word',
+                   }}
+                 >
                    🎥 {video.title}
                  </h3>
                  <p style={{ margin: '0 0 0.5rem 0', color: colors.textSecondary, fontSize: '0.9rem' }}>

@@ -34,7 +34,16 @@ wasn't auto-extracted**. Improvements:
   before the generic handler — which also fixes a pre-existing bug where the
   404 "not found" was being masked as a 500.
 
-Validated: `VideoLesson.jsx` parses (Babel), backend compiles, i18n parity 54×3.
+**Follow-up — long-title legibility**: TikTok's oEmbed "title" is the full
+caption (can be very long). Now truncated at extraction (word-boundary ~80 chars
++ author) so the stored title stays short. Also, the Saved Videos card title is
+**clamped to 2 lines** (ellipsis + `title` tooltip for the full text) and the
+card header switched to a wrapping flex layout so a long title/caption can no
+longer stretch the card into an unreadable vertical strip — this also fixes
+already-saved long titles without re-saving.
+
+Validated: `VideoLesson.jsx` + `SavedVideos.jsx` parse (Babel), backend compiles,
+i18n parity 54×3.
 
 ---
 
