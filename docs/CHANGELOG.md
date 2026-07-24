@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.1] - 2026-07-24
+
+### Added — Self-Simulating Reality Agent · Theory Tour: Willow / many-worlds row
+
+- New Theory Tour row **"Willow & Quantum Computation Across 'Many Worlds'"**
+  (`willowMultiverse`, epistemic level **speculative**), added after the CTMU row
+  in `frontend/src/self-sim-reality/TheoryTour.jsx` (`ROWS` array) with 5 i18n
+  leaves (`Title/Author/Level/Body/Link`) in EN/NO/ES.
+- Content covers the **real, contrastable** facts: Google's **Willow** chip
+  (Dec 2024) completing a Random Circuit Sampling benchmark in <5 min, Hartmut
+  Neven's remark that this lends credence to quantum computation across parallel
+  universes, and its root in **David Deutsch**'s many-worlds account of quantum
+  computing (*The Fabric of Reality*, 1997).
+- Keeps the agent's epistemic discipline: an explicit **honesty note** that the
+  hardware result is real but the multiverse reading is *interpretation, not
+  proof* (RCS is Google's own benchmark; many-worlds is one of several QM
+  interpretations), and that sensationalist "a quantum computer answered who
+  created the universe" framing is **not** part of the science. Sources cited
+  (blog.google, The Quantum Insider, Futurism); content paraphrased, no video
+  clickbait cited as a source.
+- Origin: owner brought a YouTube video on the topic; the clickbait premise was
+  rejected and only the verifiable core was folded in.
+- Validated: `@babel/parser` JSX parse OK; EN/NO/ES parity 5/5 keys identical;
+  `speculative` level resolves in all three locales.
+
+---
+
 ## [1.30.0] - 2026-07-22
 
 ### Added — AI Learning & Training: server-side progress + quiz persistence (revived intent)

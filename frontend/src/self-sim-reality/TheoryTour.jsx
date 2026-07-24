@@ -13,6 +13,7 @@ const ROWS = [
   { id: 'celestialHolography' },
   { id: 'oph' },
   { id: 'ctmu' },
+  { id: 'willowMultiverse' },
 ];
 
 const PASTERSKI_LINKS = [
