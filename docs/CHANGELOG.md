@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.29.0] - 2026-07-22
+
+### Audit + Added — AI Learning & Training: 2026 theory refresh + didactic callouts
+
+Read-only audit of the AI Learning & Training module (`AITrainingModule.jsx`,
+15 lessons served from `public/ai-lessons/index.json` + per-lesson JSON; the
+component tries an `aiLearning.lessons.{id}…` i18n override and falls back to the
+English JSON). Findings recorded:
+- **i18n coverage gap**: Norwegian has the full lesson content localized
+  (`aiLearning.lessons`, ~368 keys); **Spanish does not** — ES users read the
+  English lesson bodies via fallback. (Full ES localization deferred — big.)
+- **Dead backend endpoints**: `/api/ai-lessons`, `/api/ai-lessons/{id}`,
+  `/api/quiz/submit`, `/api/quiz/results` are unused by this module (content from
+  `public/`, quiz is client-side) and return stale single-lesson mock data.
+  (Left in place; flagged for a later cleanup.)
+- **Stale fallback**: the in-component `embeddedLessons` (13 modules) diverges
+  from the real 15. (Left; only used if `index.json` fails to load.)
+
+Implemented (theory update + presentation, combined):
+- **New `callout` section type** (`AITrainingModule.jsx`): a didactic info box
+  with variants `update` 💡 / `tip` ✅ / `warning` ⚠️ / `note` 📌 (colored
+  left-border card; renders its own titled header so the outer heading is
+  skipped). Same i18n-with-JSON-fallback pattern as every other section type.
+- **"What's new in 2026" callouts** added to the 6 core lessons (AI Basics, How
+  LLMs Work, Prompt Engineering, Building AI Apps, Ethics & Safety, Tools &
+  APIs) with current context — agentic AI, reasoning/“thinking” models, longer
+  context + mixture-of-experts, MCP (Model Context Protocol), structured outputs
+  / tool calling, and the EU AI Act phase-in. Content is EN in the JSON (source
+  of truth) **plus Norwegian i18n overrides** so NO stays fully localized.
+
+Validated: `AITrainingModule.jsx` parses (Babel), all 6 content JSONs + NO
+`common.json` valid, dev server serves the new callouts.
+
+---
+
 ## [1.28.2] - 2026-07-21
 
 ### Added / Fixed — Video Lessons audit: TikTok + YouTube Shorts support, hardening
