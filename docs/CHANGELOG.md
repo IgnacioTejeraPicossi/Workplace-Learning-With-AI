@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.29.1] - 2026-07-22
+
+### Added — AI Learning & Training: Spanish localization (Beginner tier)
+
+Closes part of the 1.29.0 audit gap (Spanish users read English lesson bodies).
+Localized the **6 Beginner lessons** into Spanish via the `aiLearning.lessons.*`
+i18n overrides in `es/common.json` (same mechanism Norwegian already uses; the
+component falls back to the English JSON where no override exists):
+
+- **AI Basics** (Fundamentos de la IA), **Prompt Engineering** (Ingeniería de
+  prompts), **Tools & APIs** (Herramientas y APIs), **Ethics & Safety** (Ética y
+  seguridad), **Using AI in Workflows** (Usar IA en flujos de trabajo),
+  **Debugging AI** (Depurar IA).
+- Each lesson's title, section headings, text, list items, definitions, exercise
+  steps/descriptions and the "What's new in 2026" callout are translated. Code
+  blocks and formulas are left as-is (language-neutral).
+
+Validated: `es/common.json` valid; the render keys (`sections.{i}.items`,
+`.definitions.{i}.{term,definition}`, `.steps.{i}`) match the ES structure.
+
+**Remaining (next batch):** Intermediate (How LLMs Work, Building AI Apps,
+Hologram Guide Chat), Advanced (RAG & Eval, Prompt Routing, Observability) and
+Expert (Web Robots, Cybersecurity, Psychopathia Machinalis) tiers — 9 lessons,
+two of them large. Also still open from the audit: remove the dead
+`/api/ai-lessons` + `/api/quiz/*` endpoints and sync the `embeddedLessons`
+fallback.
+
+---
+
 ## [1.29.0] - 2026-07-22
 
 ### Audit + Added — AI Learning & Training: 2026 theory refresh + didactic callouts

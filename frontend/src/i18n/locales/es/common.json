@@ -237,7 +237,267 @@
     "copySuccess": "Dataset copiado al portapapeles",
     "copyFail": "No se pudo copiar el dataset",
     "openAgenticFail": "No se pudo abrir RAG Agéntico con el dataset",
-    "openHologram": "Abrir Holograma y Chat"
+    "openHologram": "Abrir Holograma y Chat",
+    "lessons": {
+      "ai_intro_001": {
+        "title": "Fundamentos de la IA",
+        "sections": {
+          "0": {
+            "heading": "¿Qué es la Inteligencia Artificial?",
+            "content": "La Inteligencia Artificial (IA) se refiere a sistemas que simulan funciones cognitivas humanas como aprender, razonar y resolver problemas. La IA impulsa chatbots, motores de recomendación, asistentes de código y mucho más."
+          },
+          "1": {
+            "heading": "Subcampos de la IA",
+            "items": {
+              "0": "Aprendizaje automático (ML): aprende patrones a partir de datos",
+              "1": "Procesamiento del lenguaje natural (NLP): entiende y genera lenguaje humano",
+              "2": "Visión por computador (CV): interpreta imágenes y vídeo",
+              "3": "Voz: texto a voz (TTS) y voz a texto (ASR)"
+            }
+          },
+          "2": {
+            "heading": "Conceptos clave",
+            "definitions": {
+              "0": {
+                "term": "IA",
+                "definition": "Capacidad cognitiva impulsada por máquinas"
+              },
+              "1": {
+                "term": "ML",
+                "definition": "Técnica de IA que aprende de los datos"
+              },
+              "2": {
+                "term": "LLM",
+                "definition": "Gran modelo de lenguaje entrenado con enormes corpus de texto"
+              },
+              "3": {
+                "term": "Alucinación",
+                "definition": "Respuesta segura pero incorrecta de un modelo"
+              }
+            }
+          },
+          "3": {
+            "heading": "Novedad en 2026",
+            "content": "En 2026 la IA es cada vez más agéntica — los modelos no solo responden, planifican y usan herramientas para completar tareas de varios pasos. La frontera es multimodal (texto, imágenes, audio y vídeo en un mismo modelo) y los modelos de razonamiento que «piensan» antes de responder. Las ideas centrales de esta lección siguen vigentes; lo que cambió es la escala, la autonomía y lo integrada que está ahora la IA en el software cotidiano."
+          }
+        }
+      },
+      "prompt_eng_002": {
+        "title": "Ingeniería de prompts",
+        "sections": {
+          "0": {
+            "heading": "Principios",
+            "content": "Un buen prompt es claro sobre la tarea, el formato y las restricciones. Aporta contexto, rol, ejemplos y criterios de evaluación. Itera y compara resultados."
+          },
+          "1": {
+            "heading": "Tácticas",
+            "items": {
+              "0": "Especifica un rol («Eres un revisor de seguridad…»)",
+              "1": "Da estructura (encabezados, tablas, esquema JSON)",
+              "2": "Aporta ejemplos (few-shot)",
+              "3": "Restringe estilo/longitud/tono",
+              "4": "Pide autocomprobación o razonamiento (conciso)"
+            }
+          },
+          "2": {
+            "heading": "Términos clave",
+            "definitions": {
+              "0": {
+                "term": "Few-shot",
+                "definition": "Demostrar la tarea con unos pocos ejemplos en el prompt"
+              },
+              "1": {
+                "term": "System prompt",
+                "definition": "Instrucción de alto nivel que fija el comportamiento"
+              },
+              "2": {
+                "term": "Guardrails",
+                "definition": "Restricciones y comprobaciones para evitar salidas inseguras"
+              }
+            }
+          },
+          "3": {
+            "heading": "Novedad en 2026",
+            "content": "Con los modelos de razonamiento de 2026, la forma de hacer prompts cambia: a menudo especificas qué significa «terminado» y dejas que el modelo planifique, en vez de microgestionar cada paso. Las salidas estructuradas (esquemas JSON) y el uso de herramientas/funciones son ya de primera clase. Y un bucle autocorrectivo Constructor→Juez→Gestor (ver el agente Bucle de IA Autocorrectivo) supera a un único prompt largo en fiabilidad para tareas que importan."
+          }
+        }
+      },
+      "tools_apis_004": {
+        "title": "Herramientas y APIs",
+        "sections": {
+          "0": {
+            "heading": "Por qué herramientas y APIs",
+            "content": "Las apps de IA modernas combinan varias capacidades: generación de texto, embeddings, voz, visión y bases de datos vectoriales. Entender las herramientas te ayuda a elegir los bloques adecuados."
+          },
+          "1": {
+            "heading": "Proveedores comunes",
+            "items": {
+              "0": "API de OpenAI: texto, embeddings, audio, imagen",
+              "1": "HuggingFace Inference: modelos y pipelines alojados",
+              "2": "Inferencia local (LM Studio): desarrollo privado y sin conexión",
+              "3": "Bases de datos vectoriales: FAISS, Milvus, Pinecone (para recuperación)"
+            }
+          },
+          "2": {
+            "heading": "Términos clave",
+            "definitions": {
+              "0": {
+                "term": "Modelo de embeddings",
+                "definition": "Convierte texto en vectores para búsqueda/recuperación"
+              },
+              "1": {
+                "term": "Modelo de generación",
+                "definition": "Crea texto/imágenes/audio a partir de prompts"
+              },
+              "2": {
+                "term": "Servidor de inferencia",
+                "definition": "Servicio que ejecuta modelos y expone APIs HTTP"
+              }
+            }
+          },
+          "3": {
+            "heading": "Práctica",
+            "steps": {
+              "0": "Ve a Configuración de API",
+              "1": "Elige tu proveedor (ItemAI, OpenAI u OpenRouter)",
+              "2": "Guarda las claves / prueba la conexión",
+              "3": "Envía: completion('Di hola')",
+              "4": "Envía: embeddings('hola mundo') e inspecciona la longitud del vector"
+            },
+            "description": "Abre el módulo de Configuración de API y verifica que tu proveedor funciona (ItemAI, OpenAI u OpenRouter). Prueba una pequeña llamada de completado y una de embeddings."
+          },
+          "4": {
+            "heading": "Novedad en 2026",
+            "content": "En 2026, el uso de herramientas/funciones (tool calling) es cómo actúan los modelos, y MCP (Model Context Protocol) ha surgido como estándar común para que una sola integración funcione con muchos modelos. El patrón: el modelo decide qué herramienta llamar, tu código la ejecuta y el resultado vuelve a la conversación — la base de todo agente de IA."
+          }
+        }
+      },
+      "ethics_safety_005": {
+        "title": "Ética y seguridad",
+        "sections": {
+          "0": {
+            "heading": "Por qué importa la ética",
+            "content": "A medida que la IA se vuelve omnipresente, debemos asegurar que los sistemas sean justos, transparentes y responsables. La ética reduce el riesgo y genera confianza."
+          },
+          "1": {
+            "heading": "Riesgos típicos",
+            "items": {
+              "0": "Sesgo e injusticia",
+              "1": "Privacidad y fuga de datos",
+              "2": "Alucinaciones y desinformación",
+              "3": "Seguridad e inyección de prompts"
+            }
+          },
+          "2": {
+            "heading": "Guardrails",
+            "definitions": {
+              "0": {
+                "term": "Filtrado de entrada",
+                "definition": "Bloquear entradas inseguras del usuario (p. ej. datos personales, contenido abusivo)"
+              },
+              "1": {
+                "term": "Filtrado de salida",
+                "definition": "Analizar y bloquear salidas problemáticas del modelo"
+              },
+              "2": {
+                "term": "Trazabilidad",
+                "definition": "Registrar prompts/salidas para auditoría y mejora"
+              }
+            }
+          },
+          "3": {
+            "heading": "Aplica guardrails",
+            "steps": {
+              "0": "Abre el módulo de Ciberseguridad",
+              "1": "Lee los ejemplos de inyección de prompts",
+              "2": "Redacta una lista de permitidos/denegados para tu caso de uso",
+              "3": "Añade un post-filtro para bloquear categorías prohibidas"
+            },
+            "description": "Abre el módulo de Ciberseguridad y revisa cómo se detecta la inyección de prompts. Considera añadir una lista de permitidos/denegados en tus prompts."
+          },
+          "4": {
+            "heading": "Novedad en 2026",
+            "content": "2026 agudizó dos frentes. Riesgo agéntico: cuando los modelos actúan de forma autónoma (ejecutan herramientas, código, incluso compras), los guardrails, la aprobación con humano en el bucle y los registros de auditoría importan más que nunca. Regulación: las obligaciones de la Ley de IA de la UE se están implantando por fases, exigiendo transparencia, clasificación de riesgo y documentación. Los principios de esta lección (justicia, transparencia, responsabilidad, privacidad) son cada vez más requisitos legales, no solo buenas prácticas."
+          }
+        }
+      },
+      "ai_workflows_006": {
+        "title": "Usar IA en flujos de trabajo",
+        "sections": {
+          "0": {
+            "heading": "Dónde ayuda la IA hoy",
+            "content": "Pasos comunes de un flujo de trabajo donde la IA aporta valor: redactar, refinar, clasificar, extraer, traducir y resumir. La clave es mantener a un humano en el bucle para las decisiones críticas."
+          },
+          "1": {
+            "heading": "Patrones",
+            "items": {
+              "0": "Borrador → Revisión: la IA prepara una primera versión; un humano edita y aprueba",
+              "1": "Extraer → Estructurar: la IA extrae hechos de documentos y devuelve JSON/tablas",
+              "2": "Investigar → Sintetizar: la IA agrega fuentes y compila un informe con citas",
+              "3": "Clasificar → Enrutar: la IA clasifica tickets/correos y los enruta al equipo adecuado"
+            }
+          },
+          "2": {
+            "heading": "Caja de herramientas",
+            "items": {
+              "0": "Proveedores de LLM: ItemAI (LM Studio), OpenAI, OpenRouter",
+              "1": "Orquestadores: n8n, AgentOps Studio, Node/Python a medida",
+              "2": "Almacenes: BD vectorial (FAISS/Pinecone), BD documental, almacén de objetos",
+              "3": "Mensajería: Slack, correo, webhooks para el humano en el bucle"
+            }
+          },
+          "3": {
+            "heading": "Orquestación mínima (pseudo-JS)"
+          },
+          "4": {
+            "heading": "Práctica (Agente de Productividad)",
+            "steps": {
+              "0": "Abre el AI Productivity Agent",
+              "1": "Pega la URL de una noticia o blog",
+              "2": "Genera el informe y las 5 próximas acciones principales",
+              "3": "Decide qué acciones merece la pena conservar; cópialas a tu tablero",
+              "4": "Reflexiona: ¿qué parte todavía necesita un humano?"
+            },
+            "description": "Usa el AI Productivity Agent para convertir una URL en un informe con próximas acciones. Luego copia las acciones a tu sistema de tareas."
+          }
+        }
+      },
+      "debugging_ai_008": {
+        "title": "Depurar IA",
+        "sections": {
+          "0": {
+            "heading": "Por qué depurar es distinto",
+            "content": "Los LLM son estocásticos. La depuración se centra en los prompts, el contexto y la evaluación. Trátalo como diseño iterativo, no solo como corregir código."
+          },
+          "1": {
+            "heading": "Lista de comprobación",
+            "items": {
+              "0": "¿La instrucción es clara y específica?",
+              "1": "¿Hay suficiente contexto (ejemplos, esquema)?",
+              "2": "¿Estamos restringiendo el formato de salida?",
+              "3": "¿Tenemos pruebas para evitar regresiones?"
+            }
+          },
+          "2": {
+            "heading": "Precisión y exhaustividad (recall)"
+          },
+          "3": {
+            "heading": "Mini-arnés de evaluación (JS)"
+          },
+          "4": {
+            "heading": "Práctica (Run Test)",
+            "steps": {
+              "0": "Abre Run Test",
+              "1": "Escribe un prompt simple y 2 salidas esperadas",
+              "2": "Ejecuta las pruebas e inspecciona los fallos",
+              "3": "Añade ejemplos/restricciones para corregir problemas",
+              "4": "Vuelve a ejecutar las pruebas y conserva los casos que pasan"
+            },
+            "description": "Crea 2-3 pruebas pequeñas para un prompt (salidas esperadas), ejecútalas y ajusta el prompt hasta que pasen."
+          }
+        }
+      }
+    }
   },
   "videoBasedLearning": {
     "title": "Aprendizaje basado en vídeo",
