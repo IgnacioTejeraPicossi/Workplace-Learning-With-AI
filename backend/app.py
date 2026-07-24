@@ -37,7 +37,7 @@ try:
     from backend.cursor_readme_routes import router as cursor_readme_router
     from backend.cursor_agent_routes import router as cursor_agent_router
     from backend.simple_web_search import router as simple_web_search_router
-    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
@@ -47,7 +47,7 @@ except ImportError:
     from cursor_readme_routes import router as cursor_readme_router
     from cursor_agent_routes import router as cursor_agent_router
     from simple_web_search import router as simple_web_search_router
-    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection
+    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -2087,6 +2087,68 @@ async def update_saved_video(video_id: str, request: Request, user=Depends(verif
         raise  # preserve 400 (bad id) / 404 (not found) instead of masking as 500
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating video: {str(e)}")
+
+
+# ── AI Learning & Training: per-user progress + quiz persistence (1.30.0) ─────
+# Server-side replacement for the module's previous localStorage-only storage,
+# so course progress and quiz history follow the user across devices. All three
+# endpoints are auth-guarded (verify_token) and keyed by the user's uid.
+
+class AiProgressPayload(BaseModel):
+    lesson_id: str = Field(..., min_length=1, max_length=100)
+    section: int = Field(0, ge=0, le=1000)
+    quiz_completed: bool = False
+
+class AiQuizResultPayload(BaseModel):
+    lesson_id: str = Field(..., min_length=1, max_length=100)
+    answers: Dict[str, Any] = Field(default_factory=dict)
+    score: Dict[str, Any] = Field(default_factory=dict)
+    timestamp: Optional[str] = None
+
+
+@app.get("/api/ai-training/state")
+async def get_ai_training_state(user=Depends(verify_token)):
+    """Return the authenticated user's saved course progress + quiz results."""
+    uid = user.get("uid")
+    doc = await ai_training_progress_collection.find_one({"user_id": uid})
+    if not doc:
+        return {"progress": {}, "quiz_results": []}
+    return {"progress": doc.get("progress", {}), "quiz_results": doc.get("quiz_results", [])}
+
+
+@app.put("/api/ai-training/progress")
+async def save_ai_training_progress(body: AiProgressPayload, user=Depends(verify_token)):
+    """Upsert progress for one lesson (which section, whether the quiz is done)."""
+    uid = user.get("uid")
+    await ai_training_progress_collection.update_one(
+        {"user_id": uid},
+        {"$set": {
+            f"progress.{body.lesson_id}": {"section": body.section, "quizCompleted": body.quiz_completed},
+            "updated_at": datetime.utcnow().isoformat(),
+        }},
+        upsert=True,
+    )
+    return {"ok": True}
+
+
+@app.post("/api/ai-training/quiz-result")
+async def save_ai_quiz_result(body: AiQuizResultPayload, user=Depends(verify_token)):
+    """Append a quiz result to the user's history (capped to the last 200)."""
+    uid = user.get("uid")
+    entry = {
+        "lessonId": body.lesson_id,
+        "answers": body.answers,
+        "score": body.score,
+        "timestamp": body.timestamp or datetime.utcnow().isoformat(),
+    }
+    await ai_training_progress_collection.update_one(
+        {"user_id": uid},
+        {"$push": {"quiz_results": {"$each": [entry], "$slice": -200}},
+         "$set": {"updated_at": datetime.utcnow().isoformat()}},
+        upsert=True,
+    )
+    return {"ok": True}
+
 
 @app.get("/api/knowledge-map/recommendations/{user_id}")
 async def get_learning_recommendations(user_id: str):

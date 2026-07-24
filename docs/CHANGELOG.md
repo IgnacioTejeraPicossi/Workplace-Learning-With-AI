@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.0] - 2026-07-22
+
+### Added — AI Learning & Training: server-side progress + quiz persistence (revived intent)
+
+Fase A, option (b): instead of deleting the dead scaffolding, the module's
+original intent is now real. Course progress and quiz history persist **per user
+in MongoDB** and survive across devices/browsers, replacing the previous
+localStorage-only storage.
+
+- **New collection** `ai_training_progress` (`db.py`) — one document per user
+  (`user_id`) with a `progress` map (lessonId → {section, quizCompleted}) and a
+  capped `quiz_results` list (last 200).
+- **3 auth-guarded endpoints** in `app.py` (all `Depends(verify_token)`, keyed by
+  uid): `GET /api/ai-training/state`, `PUT /api/ai-training/progress` (validated
+  upsert), `POST /api/ai-training/quiz-result` (push with `$slice: -200`).
+- **Frontend hybrid** (`AITrainingModule.jsx` + api.js helpers): localStorage is
+  kept as an instant/offline cache; on mount a signed-in user hydrates from the
+  server, and every save writes to both stores best-effort. Guests and
+  offline/unreachable-server cases keep working on localStorage alone — nothing
+  breaks.
+- **Tests**: `backend/tests/test_ai_training_progress_contracts.py` — 5 offline
+  tests (empty state, saved state, progress upsert, quiz-result push, 422
+  validation; auth dependency overridden + Mongo mocked, cleaned up via an
+  autouse fixture so it can't leak to other suites). **Added to CI** (now 8 files
+  / 91 offline tests, all green together).
+
+The `/api/ai-lessons` + `/api/quiz/*` stubs remain (harmless, superseded); they
+can be removed in a dedicated cleanup if desired.
+
+---
+
 ## [1.29.2] - 2026-07-22
 
 ### Added — AI Learning & Training: Spanish localization complete (all 15 lessons)

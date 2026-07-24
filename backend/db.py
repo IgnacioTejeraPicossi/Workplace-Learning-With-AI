@@ -28,6 +28,13 @@ scaffold_history_collection = database.get_collection("scaffold_history")
 # Video Collections
 saved_videos_collection = database.get_collection("saved_videos")
 
+# AI Learning & Training — per-user progress + quiz history (1.30.0). Replaces
+# the previous localStorage-only storage so a user's course progress and quiz
+# results survive across devices and browsers. One document per user
+# (`user_id`), with a `progress` map (lessonId → {section, quizCompleted}) and a
+# capped `quiz_results` list.
+ai_training_progress_collection = database.get_collection("ai_training_progress")
+
 # Document Analysis Collections
 document_analyses_collection = database.get_collection("document_analyses")
 

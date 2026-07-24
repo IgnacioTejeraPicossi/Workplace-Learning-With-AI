@@ -334,6 +334,19 @@ export async function updateSavedVideo(videoId, data) {
   return apiCall(`/api/saved-videos/${videoId}`, "PUT", data);
 }
 
+// AI Learning & Training — server-side progress + quiz persistence (per user).
+export async function getAiTrainingState() {
+  return apiCall('/api/ai-training/state', 'GET');
+}
+export async function saveAiTrainingProgress(data) {
+  // data: { lesson_id, section, quiz_completed }
+  return apiCall('/api/ai-training/progress', 'PUT', data);
+}
+export async function saveAiQuizResult(data) {
+  // data: { lesson_id, answers, score, timestamp }
+  return apiCall('/api/ai-training/quiz-result', 'POST', data);
+}
+
 // Repo Analyzer Cursor AI API Functions
 export async function analyzeRepository(repoUrl, branch = null) {
   return apiCall("/api/analyze-repo", "POST", {

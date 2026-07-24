@@ -3,6 +3,7 @@ import { useTheme } from './ThemeContext';
 import Quiz from './Quiz';
 import CertificationBadge from './CertificationBadge';
 import { useTranslation } from 'react-i18next';
+import { getAiTrainingState, saveAiTrainingProgress, saveAiQuizResult } from './api';
 
 const AITrainingModule = ({ user }) => {
   const { colors } = useTheme();
@@ -609,24 +610,50 @@ const AITrainingModule = ({ user }) => {
   ];
 
   useEffect(() => {
-    // Load user progress from localStorage
+    // Load progress: localStorage first for an instant paint, then — if the
+    // user is logged in — hydrate from the server (which survives device/browser
+    // changes) and cache it back to localStorage. Best-effort: on any failure we
+    // simply keep the localStorage copy, and guests stay localStorage-only.
     const savedProgress = localStorage.getItem(`ai_training_progress_${user?.uid || 'guest'}`);
     if (savedProgress) {
-      setProgress(JSON.parse(savedProgress));
+      try { setProgress(JSON.parse(savedProgress)); } catch { /* ignore corrupt cache */ }
     }
-    setLoading(false);
+    let cancelled = false;
+    (async () => {
+      if (user?.uid) {
+        try {
+          const state = await getAiTrainingState();
+          if (!cancelled && state && state.progress && Object.keys(state.progress).length > 0) {
+            setProgress(state.progress);
+            localStorage.setItem(`ai_training_progress_${user.uid}`, JSON.stringify(state.progress));
+          }
+          if (!cancelled && Array.isArray(state?.quiz_results)) {
+            localStorage.setItem(`ai_quiz_results_${user.uid}`, JSON.stringify(state.quiz_results));
+          }
+        } catch (e) {
+          // Server unreachable / not signed in on the backend — keep localStorage.
+          console.debug('[AITraining] server state unavailable, using local cache:', e?.message);
+        }
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   const saveProgress = (lessonId, sectionIndex, quizCompleted = false) => {
-    const newProgress = { 
-      ...progress, 
-      [lessonId]: { 
-        section: sectionIndex, 
-        quizCompleted: quizCompleted || progress[lessonId]?.quizCompleted || false 
-      } 
+    const merged = quizCompleted || progress[lessonId]?.quizCompleted || false;
+    const newProgress = {
+      ...progress,
+      [lessonId]: { section: sectionIndex, quizCompleted: merged }
     };
     setProgress(newProgress);
+    // Offline cache
     localStorage.setItem(`ai_training_progress_${user?.uid || 'guest'}`, JSON.stringify(newProgress));
+    // Server persistence (best-effort; only when signed in)
+    if (user?.uid) {
+      saveAiTrainingProgress({ lesson_id: lessonId, section: sectionIndex, quiz_completed: merged })
+        .catch((e) => console.debug('[AITraining] progress sync failed:', e?.message));
+    }
   };
 
   const handleLessonSelect = (lesson) => {
@@ -706,6 +733,15 @@ const AITrainingModule = ({ user }) => {
     const existingResults = JSON.parse(localStorage.getItem(`ai_quiz_results_${user?.uid || 'guest'}`) || '[]');
     existingResults.push(quizResults);
     localStorage.setItem(`ai_quiz_results_${user?.uid || 'guest'}`, JSON.stringify(existingResults));
+    // Server persistence (best-effort; only when signed in)
+    if (user?.uid) {
+      saveAiQuizResult({
+        lesson_id: currentLesson.id,
+        answers,
+        score: scoreData,
+        timestamp: quizResults.timestamp,
+      }).catch((e) => console.debug('[AITraining] quiz-result sync failed:', e?.message));
+    }
   };
 
   const handleQuizComplete = (scoreData) => {
