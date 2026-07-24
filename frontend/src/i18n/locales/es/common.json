@@ -496,6 +496,554 @@
             "description": "Crea 2-3 pruebas pequeñas para un prompt (salidas esperadas), ejecútalas y ajusta el prompt hasta que pasen."
           }
         }
+      },
+      "llms_003": {
+        "title": "Cómo funcionan los LLM",
+        "sections": {
+          "0": {
+            "heading": "Tokens y embeddings",
+            "content": "El texto se divide en tokens. Los tokens se mapean a vectores (embeddings) que capturan relaciones semánticas."
+          },
+          "1": {
+            "heading": "El Transformer de un vistazo"
+          },
+          "2": {
+            "heading": "Atención",
+            "content": "Los Transformers usan atención para ponderar los tokens relevantes al predecir el siguiente token. La atención multi-cabeza aprende distintas relaciones."
+          },
+          "3": {
+            "heading": "Inferencia y ventana de contexto",
+            "content": "El modelo predice un token cada vez, condicionado por los tokens previos (prompt + generados). La longitud máxima de secuencia es la ventana de contexto."
+          },
+          "4": {
+            "heading": "Similitud del coseno (pseudocódigo)"
+          },
+          "5": {
+            "heading": "Similitud del coseno (fórmula)"
+          },
+          "6": {
+            "heading": "Mini-ejercicio: similitud de embeddings",
+            "steps": {
+              "0": "Abre 🔗 agentic-rag.",
+              "1": "Genera embeddings de dos frases: «El gato se sentó en la alfombra» y «Un perro descansó sobre el tapete».",
+              "2": "Calcula la similitud del coseno — debería ser alta por la semejanza semántica.",
+              "3": "Prueba una frase no relacionada (p. ej. «La bolsa subió hoy») y observa la caída de similitud.",
+              "4": "Opcional: construye un índice pequeño y recupera los 3 vecinos más cercanos."
+            },
+            "description": "Calcula la similitud del coseno entre embeddings de frases cortas."
+          },
+          "7": {
+            "heading": "Dataset para el ejercicio",
+            "text": "Descarga un pequeño dataset con 5 frases para embeddings:"
+          },
+          "8": {
+            "heading": "Novedad en 2026",
+            "content": "Dos cambios definen los LLM de 2026. Los modelos de razonamiento («thinking») dedican cómputo extra a deliberar antes de responder — excelente para matemáticas y código, aunque los tokens de razonamiento cuentan contra el presupuesto de salida. Las ventanas de contexto han crecido a cientos de miles (incluso millones) de tokens, y las arquitecturas mixture-of-experts activan solo parte de la red por token para ganar eficiencia. El núcleo Transformer de esta lección no cambia — son refinamientos por encima."
+          }
+        }
+      },
+      "building_ai_apps_007": {
+        "title": "Construir apps de IA",
+        "sections": {
+          "0": {
+            "heading": "Visión general de la arquitectura",
+            "content": "Componentes típicos: pasarela de API, proveedor de modelos, embeddings, BD vectorial para recuperación y, opcionalmente, coordinación multiagente para tareas complejas."
+          },
+          "1": {},
+          "2": {
+            "heading": "Decisiones clave",
+            "items": {
+              "0": "Proveedor: OpenAI vs. inferencia local (LM Studio)",
+              "1": "Recuperación: modelo de embeddings, estrategia de troceado, BD vectorial",
+              "2": "Orquestación: un solo prompt vs. flujos multiagente",
+              "3": "Telemetría: prompts/salidas, latencia, coste y métricas de calidad"
+            }
+          },
+          "3": {
+            "heading": "Fragmento: recuperación simple (JS)"
+          },
+          "4": {
+            "heading": "Práctica (AgentOps Studio)",
+            "steps": {
+              "0": "Abre AgentOps Studio",
+              "1": "Crea un flujo: recupera fragmentos por embeddings",
+              "2": "Redacta una respuesta con citas",
+              "3": "Refina con estilo y restricciones",
+              "4": "Mide: latencia y uso de tokens"
+            },
+            "description": "Abre AgentOps Studio y esboza un flujo de 3 pasos: recuperar → redactar → refinar. Configura los parámetros y prueba con un documento pequeño."
+          },
+          "5": {
+            "heading": "Novedad en 2026",
+            "content": "El stack de 2026 se estandarizó en torno a unas pocas cosas: MCP (Model Context Protocol) como forma común de dar herramientas y datos a los modelos; patrones RAG maduros con la evaluación integrada; y frameworks de agentes que orquestan flujos de varios pasos con uso de herramientas. La observabilidad y el control de costes (en módulos posteriores) son ya un requisito mínimo, no una idea de última hora."
+          }
+        }
+      },
+      "hologram_chat_012": {
+        "title": "Chat Guía Holograma: Rápido vs Preciso",
+        "sections": {
+          "0": {
+            "heading": "¿Qué es la Guía Holograma?",
+            "content": "La Guía Holograma es un agente conversacional integrado en la tarjeta del Portal Holograma. Puede explicar módulos, sugerir próximos pasos y devolver acciones estructuradas para que la interfaz navegue automáticamente. Funciona sobre el mismo stack de IA unificado que el resto de la app (LM Studio / OpenAI / OpenRouter)."
+          },
+          "1": {
+            "heading": "Pruébalo ahora",
+            "text": "Salta directamente a la pantalla Ask AI donde vive el holograma y abre el chat."
+          },
+          "2": {
+            "heading": "Arquitectura (alto nivel)"
+          },
+          "3": {
+            "heading": "Modos Rápido vs Preciso",
+            "definitions": {
+              "0": {
+                "term": "Rápido",
+                "definition": "Optimizado para la respuesta: contexto RAG menor (k≈3), historial más corto (últimos 4 turnos), max_tokens más bajo (~350) y menor complejidad. Ideal para preguntas rápidas y aclaraciones breves."
+              },
+              "1": {
+                "term": "Preciso",
+                "definition": "Optimizado para la fundamentación: contexto RAG mayor (k≈6), historial más largo (últimos 8 turnos), max_tokens más alto (~700). Ideal para explicaciones, referencias y guía más extensa."
+              }
+            }
+          },
+          "4": {
+            "heading": "Llamar al backend (ejemplo)"
+          },
+          "5": {
+            "heading": "Cuándo elegir cada modo",
+            "items": {
+              "0": "Elige Rápido cuando importa la latencia: respuestas cortas, iteración, comprobaciones rápidas.",
+              "1": "Elige Preciso cuando necesitas citas, guía más larga o detalle fundamentado.",
+              "2": "Si las respuestas van lentas en modelos locales, prueba primero Rápido o cambia a un proveedor más veloz en Configuración de API."
+            }
+          },
+          "6": {
+            "heading": "Práctica",
+            "steps": {
+              "0": "Abre la página Holograma. Activa «Chat on click Hologram» en ON (lanzador ➝ menú).",
+              "1": "Haz clic en cualquier parte de la tarjeta del holograma (fuera del CTA «Enter →») para abrir el chat.",
+              "2": "Modo: Rápido. Pregunta: «Dame una visión rápida de Agentic RAG.» Observa latencia y longitud de la respuesta.",
+              "3": "Pregunta de seguimiento: «Lista 2 próximas acciones e incluye una acción de navegación.» Comprueba si la UI sugiere un objetivo NAVIGATE.",
+              "4": "Cambia a Modo: Preciso. Pregunta: «Explica el pipeline de nuestro Document Analyzer con pasos y compromisos.» Compara profundidad y latencia.",
+              "5": "Opcional: abre Configuración de API y cambia a un proveedor más rápido (p. ej. OpenAI mini), luego repite los pasos 3–5.",
+              "6": "Anota cuándo elegirías Rápido vs Preciso en tu flujo de trabajo diario."
+            },
+            "description": "Practica usando la Guía Holograma y compara los dos modos de operación."
+          }
+        }
+      },
+      "advanced_rag_eval_009": {
+        "title": "RAG avanzado y evaluación",
+        "sections": {
+          "0": {
+            "heading": "Objetivo",
+            "content": "Construir un pipeline de Generación Aumentada por Recuperación fiable: mejor troceado, expansión de consultas, re-ranking, respuestas fundamentadas con citas y calidad medible."
+          },
+          "1": {
+            "heading": "Decisiones de diseño que importan",
+            "items": {
+              "0": "Troceado: tamaño, solapamiento y división semántica",
+              "1": "Modelo de embeddings: específico de dominio vs general",
+              "2": "Recuperación: top-K + re-ranking (cross-encoder / MMR)",
+              "3": "Respuesta: citar fuentes y rechazar cuando no está fundamentado"
+            }
+          },
+          "2": {},
+          "3": {
+            "heading": "Re-ranking estilo MMR (pseudo-JS)"
+          },
+          "4": {
+            "heading": "Similitud del coseno"
+          },
+          "5": {
+            "heading": "Práctica (Agentic RAG + Run Test)",
+            "steps": {
+              "0": "Abre Agentic RAG y carga un dataset pequeño",
+              "1": "Ejecuta consultas con top-K = 5 y captura las citas",
+              "2": "Activa MMR (lambda = 0.7) y vuelve a ejecutar",
+              "3": "Usa Run Test para registrar las citas de apoyo esperadas",
+              "4": "Compara precisión/exhaustividad de los pasajes citados"
+            },
+            "description": "Evalúa dos configuraciones de recuperación sobre el mismo dataset: (A) solo top-K, (B) top-K + re-ranking MMR."
+          }
+        }
+      },
+      "prompt_routing_tools_010": {
+        "title": "Enrutamiento de prompts y herramientas",
+        "sections": {
+          "0": {
+            "heading": "Por qué importa el enrutamiento",
+            "content": "Distintas peticiones se benefician de distintos modelos y herramientas. Un router clasifica la intención y las restricciones (latencia, coste, seguridad) y despacha a: un modelo de generación, un paso de recuperación, una función/herramienta, o una cadena/agente. Un buen enrutamiento mejora la calidad y la eficiencia."
+          },
+          "1": {},
+          "2": {
+            "heading": "Señales para decidir el enrutamiento",
+            "items": {
+              "0": "Intención de la tarea: clasificar como generar, extraer, buscar, transformar, clasificar",
+              "1": "Tamaño de la entrada: entradas largas pueden requerir recuperación o un modelo de mayor contexto",
+              "2": "Latencia y presupuesto: elige un modelo más pequeño/barato para tareas no críticas",
+              "3": "Seguridad: si se detecta contenido inseguro/datos personales, bloquea o cambia a un flujo filtrado",
+              "4": "Dominio: enruta a un modelo ajustado al dominio o a una base de conocimiento"
+            }
+          },
+          "3": {
+            "heading": "Router (pseudo-JS)"
+          },
+          "4": {
+            "heading": "Práctica (AgentOps Studio + Configuración de API)",
+            "steps": {
+              "0": "En Configuración de API, habilita dos proveedores: uno rápido y uno de alta calidad",
+              "1": "En AgentOps Studio, crea tres nodos: generar, extraer(esquema) y recuperar",
+              "2": "Añade un nodo inicial que clasifique la intención con unas pocas etiquetas",
+              "3": "Cablea las rutas a cada nodo; añade un fallback por si el proveedor falla",
+              "4": "Prueba tres entradas distintas y compara precisión/latencia"
+            },
+            "description": "Crea un router simple que reparta entre: (A) Borrador (generar), (B) Extraer JSON (esquema), (C) Buscar (RAG)."
+          }
+        }
+      },
+      "observability_cost_011": {
+        "title": "Observabilidad y control de costes",
+        "sections": {
+          "0": {
+            "heading": "Por qué la observabilidad",
+            "content": "Sin visibilidad de prompts, latencias, tokens y errores, los sistemas de IA se desvían en calidad y coste. La observabilidad añade logs, métricas y evaluaciones para mantener los sistemas fiables y asequibles."
+          },
+          "1": {},
+          "2": {
+            "heading": "Métricas a recopilar",
+            "items": {
+              "0": "Latencia p50/p95",
+              "1": "Tokens de entrada/salida por llamada (y media móvil)",
+              "2": "Coste estimado por llamada y por usuario/sesión",
+              "3": "Tasa de error/rechazo; disparos de guardrails",
+              "4": "Tasa de aprobados en evaluación sobre un conjunto de pruebas fijo"
+            }
+          },
+          "3": {
+            "heading": "Envoltorio de logging (JS)"
+          },
+          "4": {
+            "heading": "Estimación de coste"
+          },
+          "5": {
+            "heading": "Práctica (Run Test + Configuración de API)",
+            "steps": {
+              "0": "Abre Run Test y crea 3 casos con salidas esperadas",
+              "1": "Usa un modelo económico y registra latencia y tokens",
+              "2": "Cambia a un modelo de mayor calidad y repite",
+              "3": "Compara precisión (pruebas), latencia y coste estimado",
+              "4": "Decide una política: ¿cuándo usar cada modelo?"
+            },
+            "description": "Mide latencia y tokens en 3 prompts. Luego cambia de modelo y compara coste/latencia."
+          }
+        }
+      },
+      "web_robots_013": {
+        "title": "Robots web, crawlers y robots.txt",
+        "sections": {
+          "0": {
+            "heading": "¿Qué son los robots web?",
+            "content": "Los robots web (también llamados crawlers o arañas) son programas automáticos que descargan páginas de Internet. Los robots de indexación recopilan contenido para los buscadores; otros agentes monitorizan sitios, comprueban enlaces o realizan tareas especializadas. Esta lección cubre cómo los robots descubren y rastrean páginas y cómo los dueños de sitios pueden guiar su comportamiento."
+          },
+          "1": {
+            "heading": "Términos clave",
+            "definitions": {
+              "0": {
+                "term": "Robot / Crawler / Araña",
+                "definition": "Agente automático que descarga páginas web siguiendo enlaces y reglas."
+              },
+              "1": {
+                "term": "Agente",
+                "definition": "Programa que actúa en nombre de un usuario; los robots son un tipo de agente."
+              },
+              "2": {
+                "term": "Buscador",
+                "definition": "Sistema que usa crawlers para indexar contenido y responder consultas."
+              },
+              "3": {
+                "term": "Gusanos / Hormigas",
+                "definition": "Términos históricos para agentes exploratorios; no típicos del rastreo de búsqueda moderno."
+              }
+            }
+          },
+          "2": {
+            "heading": "Cómo deciden los robots a dónde ir",
+            "items": {
+              "0": "Semillas: URLs iniciales aportadas por el buscador o el sistema.",
+              "1": "Descubrimiento de enlaces: seguir los hipervínculos encontrados en las páginas.",
+              "2": "Sitemaps: los sitemaps XML publicados por los sitios ayudan al descubrimiento.",
+              "3": "Re-rastreo: programación según la frecuencia de cambio y la importancia."
+            }
+          },
+          "3": {
+            "heading": "Estándar de exclusión de robots (robots.txt)",
+            "content": "Los sitios web pueden ofrecer un fichero /robots.txt en la raíz (p. ej. https://example.com/robots.txt) para comunicar directivas de rastreo. Campos típicos: User-agent, Disallow, Allow. No todos los robots lo cumplen; los crawlers de confianza lo respetan. El fichero es público, así que no listes rutas sensibles que quieras mantener en secreto."
+          },
+          "4": {
+            "heading": "Ejemplos de robots.txt"
+          },
+          "5": {
+            "heading": "Meta robots y atributos rel",
+            "content": "Se pueden fijar controles por página mediante etiquetas meta robots en HTML o cabeceras HTTP (p. ej. noindex, nofollow) y mediante atributos de enlace como rel=\"nofollow\". La mayoría de buscadores los respetan para las decisiones de indexación."
+          },
+          "6": {
+            "heading": "Ejemplo de meta robots"
+          },
+          "7": {
+            "heading": "Consideraciones operativas para administradores",
+            "items": {
+              "0": "Monitoriza los logs del servidor para distinguir bots de usuarios.",
+              "1": "Límite de tasa / velocidad de rastreo: algunos crawlers respetan ajustes en herramientas para webmasters; robots.txt no tiene un 'crawl-delay' estándar (algunos robots lo usan, pero no es universal).",
+              "2": "Prohíbe endpoints confidenciales y usa autenticación adecuada; robots.txt es orientativo, no un mecanismo de seguridad.",
+              "3": "Publica sitemaps para mejorar el descubrimiento de URLs canónicas."
+            }
+          },
+          "8": {
+            "heading": "Pruébalo en la app",
+            "text": "Abre nuestro módulo de Web Search para ver cómo el contenido indexado afecta a las demos de recuperación."
+          },
+          "9": {
+            "heading": "Práctica: diseña un robots.txt",
+            "steps": {
+              "0": "Escribe un robots.txt que prohíba /private/ para todos los agentes.",
+              "1": "Añade una directiva Sitemap que apunte a https://tu-sitio.example/sitemap.xml.",
+              "2": "Explica por qué robots.txt no debe listar secretos y cómo proteger el contenido correctamente."
+            },
+            "description": "Redacta reglas para un sitio que bloquee /private/, permita todo lo demás y exponga un sitemap."
+          }
+        }
+      },
+      "cybersecurity_expert_014": {
+        "title": "Ciberseguridad para sistemas de IA",
+        "sections": {
+          "0": {
+            "heading": "Visión general de la sesión",
+            "content": "Esta lección de nivel Experto sintetiza prácticas de pruebas de penetración y ejercicios de Red Team (como se presentaron en el seminario de Oslo «Cyberangrep og Penetrasjonstesting»), combinadas con riesgos centrados en la IA y estrategias de endurecimiento. Aprenderás metodología, herramientas y cómo realimentar los resultados en el código y la arquitectura."
+          },
+          "1": {
+            "heading": "Por qué importa la ciberseguridad para la IA",
+            "content": "Los sistemas de IA amplían la superficie de ataque: inyección de prompts, exfiltración de datos, deriva del modelo y riesgos de cadena de suministro. Una postura de seguridad práctica debe incluir principios de Zero Trust, DLP y monitorización continua."
+          },
+          "2": {
+            "heading": "Red Team vs. PenTesting vs. Blue/Purple Team",
+            "items": {
+              "0": "Red Team: emula adversarios realistas de extremo a extremo; el objetivo es probar la detección/respuesta en toda la organización",
+              "1": "Pruebas de penetración: evaluación de seguridad puntual y acotada de aplicaciones/infraestructura; el objetivo es identificar y demostrar debilidades explotables",
+              "2": "Blue Team: defensa, monitorización, respuesta a incidentes; Purple Team: colaboración red+blue para acelerar el aprendizaje y el endurecimiento"
+            }
+          },
+          "3": {
+            "heading": "Reglas de enfrentamiento (RoE) y alcance",
+            "items": {
+              "0": "Define sistemas, identidades y ventana temporal dentro/fuera de alcance; asegura las aprobaciones legales y contractuales",
+              "1": "Establece canales de comunicación y rutas de escalado",
+              "2": "Manejo de datos: cómo almacenar, transportar y destruir evidencia sensible",
+              "3": "Criterios de éxito: umbrales de detección, tiempo de permanencia, calidad de respuesta y Tiempo Medio de Detección/Respuesta"
+            }
+          },
+          "4": {
+            "heading": "Mapeo ATT&CK y Kill Chain (alto nivel)",
+            "items": {
+              "0": "Reconocimiento → Desarrollo de recursos → Acceso inicial → Ejecución → Persistencia → Escalada de privilegios → Evasión de defensas → Acceso a credenciales → Descubrimiento → Movimiento lateral → Recolección → Mando y control → Exfiltración → Impacto",
+              "1": "Usa MITRE ATT&CK como vocabulario compartido para los hallazgos y para diseñar detecciones"
+            }
+          },
+          "5": {
+            "heading": "Métodos de reconocimiento (app e infra)",
+            "items": {
+              "0": "Inteligencia de fuentes abiertas (OSINT) sobre dominios, repos, secretos filtrados",
+              "1": "Descubrimiento de servicios (p. ej. nmap) y fingerprinting de tecnología",
+              "2": "Descubrimiento de contenido, enumeración de endpoints, parámetros y funciones ocultas"
+            }
+          },
+          "6": {
+            "heading": "Escaneo y descubrimiento",
+            "items": {
+              "0": "Escaneos autenticados/no autenticados; escaneo diferencial para evitar ruido",
+              "1": "Mapea las superficies a las categorías del OWASP Top 10 para enfocar las pruebas manuales",
+              "2": "Trata los resultados del escaneo como triaje: verifica y demuestra el impacto, evita los falsos positivos"
+            }
+          },
+          "7": {
+            "heading": "Fundamentos de explotación (OWASP Top 10)",
+            "items": {
+              "0": "Control de acceso roto, inyección, diseño/configuración insegura, componentes vulnerables, SSRF, fallos de autenticación/sesión",
+              "1": "Demuestra la explotabilidad con acciones mínimas y reversibles; captura la evidencia de forma responsable",
+              "2": "Empareja siempre la explotación con orientación de remediación"
+            }
+          },
+          "8": {
+            "heading": "Post-explotación: movimiento lateral y persistencia",
+            "items": {
+              "0": "Del punto de apoyo a la escalada de privilegios y el pivoteo entre segmentos",
+              "1": "Crea persistencia mínima solo cuando las RoE lo permitan; limpia los artefactos",
+              "2": "Ejercita los manuales de detección/respuesta"
+            }
+          },
+          "9": {
+            "heading": "Exfiltración de datos y DLP",
+            "items": {
+              "0": "Identifica datos sensibles en movimiento/en reposo; simula técnicas de exfiltración de forma segura",
+              "1": "Prueba los controles DLP y el filtrado de salida; calidad de logs y fidelidad de alertas",
+              "2": "Reporta el impacto de negocio con claridad (qué datos, cuántos, a qué velocidad)"
+            }
+          },
+          "10": {
+            "heading": "Señales monitorizadas en nuestra plataforma",
+            "items": {
+              "0": "Postura Zero Trust: HMAC + endpoints seguros (HTTPS) para el despacho de agentes",
+              "1": "Integridad de modelo/prompt: deriva vía diversidad de hashes de bundle",
+              "2": "DLP: posibles secretos/datos personales en eventos de seguridad recientes",
+              "3": "KPIs: puntuación global, vulnerabilidades, amenazas detectadas"
+            }
+          },
+          "11": {
+            "heading": "Flujo de reporte y remediación",
+            "items": {
+              "0": "Estructura: Hallazgo → Evidencia → Impacto → Reproducción → Probabilidad/Severidad → Corrección recomendada",
+              "1": "Mapea a CWE/OWASP/ATT&CK cuando corresponda; incluye referencias de código",
+              "2": "Realimenta los resultados al backlog con priorización basada en riesgo (hotfix a corto plazo vs. refactor de diseño)"
+            }
+          },
+          "12": {
+            "heading": "Modelo de amenazas específico de IA/LLM (visión general)",
+            "items": {
+              "0": "Inyección de prompts, jailbreaks y evasión de la jerarquía de instrucciones",
+              "1": "Específico de RAG: envenenamiento de la recuperación, exfiltración de contexto, subversión de referencias",
+              "2": "Mal uso de herramientas/plugins: SSRF vía llamadas a herramientas, exposición de credenciales, escalada del plano de datos al de control",
+              "3": "Cadena de suministro de modelo/datos: envenenamiento de datasets, manipulación de pesos, adaptadores/LoRAs maliciosos"
+            }
+          },
+          "13": {
+            "heading": "Defensas para apps de IA",
+            "items": {
+              "0": "Guardrails: filtrado de salida, prompting de políticas, listas de permitidos a nivel de herramienta y validación de argumentos",
+              "1": "Higiene de contexto: firma de fuentes, procedencia de fragmentos, índice de permitidos, comprobaciones de distancia semántica",
+              "2": "Gestión de secretos: nunca inyectes credenciales reales en el contexto del modelo; intermedia los tokens en el servidor",
+              "3": "Observabilidad: trazas de prompt+herramienta, heurísticas de alerta, prompts canario, firmas de abuso"
+            }
+          },
+          "14": {
+            "heading": "OWASP Top 10 ↔ modos de fallo de LLM (ejemplos)",
+            "items": {
+              "0": "A01 Control de Acceso Roto → acciones controladas por prompt sin comprobaciones de autorización en servidor",
+              "1": "A03 Inyección → inyección de prompts / inyección de argumentos de herramienta",
+              "2": "A06 Componentes Vulnerables → adaptadores/embedders de modelo con vulnerabilidades conocidas",
+              "3": "A08 Integridad de Software y Datos → índices/datasets envenenados; fuentes de contexto sin firmar"
+            }
+          },
+          "15": {
+            "heading": "De los hallazgos al código y la arquitectura",
+            "content": "Traduce los resultados de seguridad en trabajo de ingeniería: añade autorización en servidor, esquemas de parámetros para las herramientas, sobres de contexto firmados para RAG y casos de prueba de extremo a extremo para evitar regresiones. Sigue la reducción de riesgo a lo largo de los sprints."
+          },
+          "16": {
+            "heading": "Visión general de ciberseguridad"
+          },
+          "17": {
+            "heading": "Lab 1 — Ejecuta un escaneo de Agent Security e interpreta los hallazgos",
+            "steps": {
+              "0": "Abre el módulo de Ciberseguridad y pulsa Escanear sobre un agente",
+              "1": "Captura el panel de Hallazgos (zero-trust, integridad, DLP)",
+              "2": "Escribe 3 remediaciones accionables y vuelve a escanear para medir la mejora"
+            },
+            "description": "Usa el Agent Security Monitor para ejecutar un escaneo sobre un agente de IA. Identifica la postura zero-trust, la puntuación de integridad y los hallazgos DLP; propón correcciones concretas."
+          },
+          "18": {
+            "heading": "Lab 2 — Inyección de prompts contra un stub RAG",
+            "steps": {
+              "0": "Elabora una inyección que intente exfiltrar contexto o alterar las instrucciones",
+              "1": "Observa si las listas de permitidos, los esquemas de argumentos o los filtros de salida detienen la acción",
+              "2": "Documenta la brecha y propón una corrección determinista en servidor"
+            },
+            "description": "Simula una inyección de prompts controlada y confirma las defensas."
+          },
+          "19": {
+            "heading": "Lab 3 — Prueba de exfiltración DLP",
+            "steps": {
+              "0": "Siembra un secreto benigno en una fuente de datos controlada",
+              "1": "Intenta coaccionar al modelo/herramienta para que lo emita",
+              "2": "Verifica las detecciones DLP y ajusta los umbrales de alerta"
+            },
+            "description": "Prueba si los secretos/datos personales pueden filtrarse vía salidas del modelo o resultados de herramientas."
+          },
+          "20": {
+            "heading": "Referencias",
+            "content": "OWASP Top 10, MITRE ATT&CK, frameworks del NIST, guías de endurecimiento de proveedores y materiales de Red Team/pruebas de penetración usados en el seminario de Oslo. Usa estas referencias para profundizar en cada paso anterior."
+          },
+          "21": {
+            "text": "Presentación del seminario (PDF): diapositivas de Defendable Red Team"
+          }
+        }
+      },
+      "psychopathia_machinalis_015": {
+        "title": "Psychopathia Machinalis",
+        "sections": {
+          "0": {
+            "heading": "Visión general del marco"
+          },
+          "1": {
+            "heading": "Patrones clínicos en el comportamiento de la IA",
+            "content": "Psychopathia Machinalis se refiere a patrones patológicos reconocibles que pueden surgir en el comportamiento de agentes de IA. Ejemplos: bucles de confabulación, atrincheramiento + disociación, repetición tipo TOC operativo y más."
+          },
+          "2": {
+            "heading": "Fractura de identidad"
+          },
+          "3": {
+            "heading": "Cómo detectamos patrones",
+            "items": {
+              "0": "Ingesta de turnos de conversación con extracción de evidencia",
+              "1": "Puntuación de patrones por eje (Epistémico, Cognitivo, Alineación, Ontológico, Herramienta/Interfaz, Memético, Revaluación)",
+              "2": "Parches terapéuticos: mitigaciones accionables por hallazgo"
+            }
+          },
+          "4": {
+            "heading": "Sobrecarga cognitiva"
+          },
+          "5": {
+            "heading": "Taxonomía por eje (resumen de alto nivel)",
+            "content": "A continuación, un resumen compacto de disfunciones representativas por eje (nombre común — nombre formal — grupo de síntomas típico). Úsalo como guía de campo al triar conversaciones en la Clínica Robomind."
+          },
+          "6": {
+            "heading": "Disfunciones epistémicas"
+          },
+          "7": {
+            "heading": "Disfunciones cognitivas"
+          },
+          "8": {
+            "heading": "Disfunciones de alineación"
+          },
+          "9": {
+            "heading": "Disfunciones ontológicas"
+          },
+          "10": {
+            "heading": "Disfunciones de herramienta e interfaz"
+          },
+          "11": {
+            "heading": "Disfunciones meméticas"
+          },
+          "12": {
+            "heading": "Disfunciones de revaluación"
+          },
+          "13": {
+            "heading": "Dónde probarlo",
+            "content": "Usa la Clínica Robomind para pegar turnos de conversación, ejecutar el diagnóstico y revisar los hallazgos + el protocolo recomendado."
+          },
+          "14": {
+            "heading": "Práctica: triar una transcripción",
+            "steps": {
+              "0": "Abre la Clínica Robomind desde el chip de módulos relacionados.",
+              "1": "Pega 6–10 turnos de una conversación con una IA.",
+              "2": "Ejecuta Diagnosticar y lee los hallazgos y el protocolo.",
+              "3": "Escribe una justificación de 2–3 frases nombrando el eje y el síntoma central."
+            },
+            "description": "Pega una conversación corta en la Clínica Robomind e identifica al menos una disfunción sospechada. Explica qué eje y por qué."
+          },
+          "15": {
+            "heading": "Referencias",
+            "content": "Marco: https://www.psychopathia.ai/ — Artículo (MDPI Electronics, 2025): https://www.mdpi.com/2079-9292/14/16/3162"
+          }
+        }
       }
     }
   },

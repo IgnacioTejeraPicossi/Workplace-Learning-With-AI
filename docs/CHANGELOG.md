@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.29.2] - 2026-07-22
+
+### Added — AI Learning & Training: Spanish localization complete (all 15 lessons)
+
+Finishes Fase D of the module audit: the remaining **9 lessons** are now
+localized into Spanish (`aiLearning.lessons.*` in `es/common.json`), so ES covers
+the whole curriculum at parity with Norwegian (15 = 15).
+
+- **Intermediate**: How LLMs Work (Cómo funcionan los LLM), Building AI Apps
+  (Construir apps de IA), Hologram Guide Chat (Chat Guía Holograma).
+- **Advanced**: Advanced RAG & Evaluation (RAG avanzado y evaluación), Prompt
+  Routing & Tools (Enrutamiento de prompts y herramientas), Observability & Cost
+  Control (Observabilidad y control de costes).
+- **Expert**: Web Robots (Robots web, crawlers y robots.txt), Cybersecurity for
+  AI Systems (Ciberseguridad para sistemas de IA, 22 sections), Psychopathia
+  Machinalis.
+
+**Known render limitation** (found during localization): the `dysfunctionTable`
+list format in Psychopathia renders its rows straight from the English JSON
+`section.content` (that branch does not call `tr()`), so those ~30 taxonomy rows
+stay English regardless of locale — a render gap, not a translation gap. The rest
+of that lesson (headings, narrative text, exercise) is localized. Fixing the
+table to honor i18n is a possible follow-up.
+
+Validated: `es/common.json` valid; ES lesson-id set == NO lesson-id set (15/15);
+render keys (`sections.{i}.items`/`.definitions`/`.steps`) match the ES structure.
+
+**Still open (awaiting a decision):** Fase A cleanup of the dead
+`/api/ai-lessons` + `/api/quiz/*` endpoints — investigation showed they were
+unfinished server-side persistence stubs (not AI-interactive), unused by the
+module (which uses `public/` + localStorage). Options: delete them, or revive the
+intent (persist progress + quiz results per user in Mongo).
+
+---
+
 ## [1.29.1] - 2026-07-22
 
 ### Added — AI Learning & Training: Spanish localization (Beginner tier)
