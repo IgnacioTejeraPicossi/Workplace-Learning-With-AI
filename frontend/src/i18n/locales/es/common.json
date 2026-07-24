@@ -280,7 +280,8 @@
             "heading": "Novedad en 2026",
             "content": "En 2026 la IA es cada vez más agéntica — los modelos no solo responden, planifican y usan herramientas para completar tareas de varios pasos. La frontera es multimodal (texto, imágenes, audio y vídeo en un mismo modelo) y los modelos de razonamiento que «piensan» antes de responder. Las ideas centrales de esta lección siguen vigentes; lo que cambió es la escala, la autonomía y lo integrada que está ahora la IA en el software cotidiano."
           }
-        }
+        },
+        "description": "Fundamentos de la IA: qué es, sus subcampos, conceptos clave y riesgos."
       },
       "prompt_eng_002": {
         "title": "Ingeniería de prompts",
@@ -320,7 +321,8 @@
             "heading": "Novedad en 2026",
             "content": "Con los modelos de razonamiento de 2026, la forma de hacer prompts cambia: a menudo especificas qué significa «terminado» y dejas que el modelo planifique, en vez de microgestionar cada paso. Las salidas estructuradas (esquemas JSON) y el uso de herramientas/funciones son ya de primera clase. Y un bucle autocorrectivo Constructor→Juez→Gestor (ver el agente Bucle de IA Autocorrectivo) supera a un único prompt largo en fiabilidad para tareas que importan."
           }
-        }
+        },
+        "description": "Técnicas para diseñar prompts eficaces y evaluar las respuestas del modelo."
       },
       "tools_apis_004": {
         "title": "Herramientas y APIs",
@@ -370,7 +372,8 @@
             "heading": "Novedad en 2026",
             "content": "En 2026, el uso de herramientas/funciones (tool calling) es cómo actúan los modelos, y MCP (Model Context Protocol) ha surgido como estándar común para que una sola integración funcione con muchos modelos. El patrón: el modelo decide qué herramienta llamar, tu código la ejecuta y el resultado vuelve a la conversación — la base de todo agente de IA."
           }
-        }
+        },
+        "description": "Panorama de las APIs de OpenAI, HuggingFace, voz y visión, y cuándo usar cada una."
       },
       "ethics_safety_005": {
         "title": "Ética y seguridad",
@@ -419,7 +422,8 @@
             "heading": "Novedad en 2026",
             "content": "2026 agudizó dos frentes. Riesgo agéntico: cuando los modelos actúan de forma autónoma (ejecutan herramientas, código, incluso compras), los guardrails, la aprobación con humano en el bucle y los registros de auditoría importan más que nunca. Regulación: las obligaciones de la Ley de IA de la UE se están implantando por fases, exigiendo transparencia, clasificación de riesgo y documentación. Los principios de esta lección (justicia, transparencia, responsabilidad, privacidad) son cada vez más requisitos legales, no solo buenas prácticas."
           }
-        }
+        },
+        "description": "Equidad, sesgos, alucinaciones, transparencia y salvaguardas para una IA responsable."
       },
       "ai_workflows_006": {
         "title": "Usar IA en flujos de trabajo",
@@ -460,7 +464,8 @@
             },
             "description": "Usa el AI Productivity Agent para convertir una URL en un informe con próximas acciones. Luego copia las acciones a tu sistema de tareas."
           }
-        }
+        },
+        "description": "Patrones de automatización: redacción, revisión, extracción de datos e investigación con herramientas de IA."
       },
       "debugging_ai_008": {
         "title": "Depurar IA",
@@ -495,7 +500,8 @@
             },
             "description": "Crea 2-3 pruebas pequeñas para un prompt (salidas esperadas), ejecútalas y ajusta el prompt hasta que pasen."
           }
-        }
+        },
+        "description": "Diagnostica prompts y respuestas, rastrea errores y evalúa la calidad con pruebas pequeñas."
       },
       "llms_003": {
         "title": "Cómo funcionan los LLM",
@@ -540,7 +546,8 @@
             "heading": "Novedad en 2026",
             "content": "Dos cambios definen los LLM de 2026. Los modelos de razonamiento («thinking») dedican cómputo extra a deliberar antes de responder — excelente para matemáticas y código, aunque los tokens de razonamiento cuentan contra el presupuesto de salida. Las ventanas de contexto han crecido a cientos de miles (incluso millones) de tokens, y las arquitecturas mixture-of-experts activan solo parte de la red por token para ganar eficiencia. El núcleo Transformer de esta lección no cambia — son refinamientos por encima."
           }
-        }
+        },
+        "description": "Tokens, embeddings, atención e inferencia en los grandes modelos de lenguaje."
       },
       "building_ai_apps_007": {
         "title": "Construir apps de IA",
@@ -577,7 +584,8 @@
             "heading": "Novedad en 2026",
             "content": "El stack de 2026 se estandarizó en torno a unas pocas cosas: MCP (Model Context Protocol) como forma común de dar herramientas y datos a los modelos; patrones RAG maduros con la evaluación integrada; y frameworks de agentes que orquestan flujos de varios pasos con uso de herramientas. La observabilidad y el control de costes (en módulos posteriores) son ya un requisito mínimo, no una idea de última hora."
           }
-        }
+        },
+        "description": "Del prompt al producto: APIs, embeddings, recuperación y orquestación multiagente."
       },
       "hologram_chat_012": {
         "title": "Chat Guía Holograma: Rápido vs Preciso",
@@ -630,7 +638,8 @@
             },
             "description": "Practica usando la Guía Holograma y compara los dos modos de operación."
           }
-        }
+        },
+        "description": "Cómo funciona el chat holograma, su enrutamiento de IA y cuándo elegir el modo Rápido o Preciso."
       },
       "advanced_rag_eval_009": {
         "title": "RAG avanzado y evaluación",
@@ -666,7 +675,8 @@
             },
             "description": "Evalúa dos configuraciones de recuperación sobre el mismo dataset: (A) solo top-K, (B) top-K + re-ranking MMR."
           }
-        }
+        },
+        "description": "Diseña una generación aumentada por recuperación (RAG) de alta calidad: fragmentación, reordenamiento, citas y evaluación robusta."
       },
       "prompt_routing_tools_010": {
         "title": "Enrutamiento de prompts y herramientas",
@@ -700,7 +710,8 @@
             },
             "description": "Crea un router simple que reparta entre: (A) Borrador (generar), (B) Extraer JSON (esquema), (C) Buscar (RAG)."
           }
-        }
+        },
+        "description": "Dirige cada solicitud al modelo o herramienta adecuada según la tarea, las restricciones y la seguridad."
       },
       "observability_cost_011": {
         "title": "Observabilidad y control de costes",
@@ -737,7 +748,8 @@
             },
             "description": "Mide latencia y tokens en 3 prompts. Luego cambia de modelo y compara coste/latencia."
           }
-        }
+        },
+        "description": "Controla calidad, latencia y coste con registro, evaluación y salvaguardas."
       },
       "web_robots_013": {
         "title": "Robots web, crawlers y robots.txt",
@@ -812,7 +824,8 @@
             },
             "description": "Redacta reglas para un sitio que bloquee /private/, permita todo lo demás y exponga un sitemap."
           }
-        }
+        },
+        "description": "Qué son los robots web, cómo rastrean y cómo controlarlos con robots.txt y etiquetas META."
       },
       "cybersecurity_expert_014": {
         "title": "Ciberseguridad para sistemas de IA",
@@ -974,7 +987,8 @@
           "21": {
             "text": "Presentación del seminario (PDF): diapositivas de Defendable Red Team"
           }
-        }
+        },
+        "description": "Modelado de amenazas, postura Zero Trust, señales DLP y cómo usar el módulo de Ciberseguridad."
       },
       "psychopathia_machinalis_015": {
         "title": "Psychopathia Machinalis",
@@ -1043,7 +1057,8 @@
             "heading": "Referencias",
             "content": "Marco: https://www.psychopathia.ai/ — Artículo (MDPI Electronics, 2025): https://www.mdpi.com/2079-9292/14/16/3162"
           }
-        }
+        },
+        "description": "Patrones clínicos en el comportamiento de la IA y cómo detectarlos con la Robomind Clinic."
       }
     }
   },
