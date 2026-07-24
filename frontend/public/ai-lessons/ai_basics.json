@@ -23,37 +23,72 @@
       "type": "definitions",
       "heading": "Key Concepts",
       "definitions": [
-        { "term": "AI", "definition": "Machine‑driven cognitive capability" },
-        { "term": "ML", "definition": "AI technique that learns from data" },
-        { "term": "LLM", "definition": "Large Language Model trained on huge text corpora" },
-        { "term": "Hallucination", "definition": "Confident but incorrect response from a model" }
+        {
+          "term": "AI",
+          "definition": "Machine‑driven cognitive capability"
+        },
+        {
+          "term": "ML",
+          "definition": "AI technique that learns from data"
+        },
+        {
+          "term": "LLM",
+          "definition": "Large Language Model trained on huge text corpora"
+        },
+        {
+          "term": "Hallucination",
+          "definition": "Confident but incorrect response from a model"
+        }
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "AI in 2026 is increasingly agentic — models don't just answer, they plan and use tools to complete multi-step tasks. The frontier is multimodal (text, images, audio and video in one model) and reasoning models that “think” before responding. The core ideas in this lesson still hold; what changed is the scale, the autonomy, and how tightly AI is now woven into everyday software."
     }
   ],
   "quiz": [
     {
       "question": "What does AI simulate?",
-      "options": { "a": "Human cognition", "b": "Weather", "c": "File systems" },
+      "options": {
+        "a": "Human cognition",
+        "b": "Weather",
+        "c": "File systems"
+      },
       "correct_answer": "a"
     },
     {
       "question": "Which is a subfield of AI?",
-      "options": { "a": "Photosynthesis", "b": "NLP", "c": "Tectonics" },
+      "options": {
+        "a": "Photosynthesis",
+        "b": "NLP",
+        "c": "Tectonics"
+      },
       "correct_answer": "b"
     },
     {
       "question": "What does LLM stand for?",
-      "options": { "a": "Large Language Model", "b": "Local Logic Machine", "c": "Lattice Linear Method" },
+      "options": {
+        "a": "Large Language Model",
+        "b": "Local Logic Machine",
+        "c": "Lattice Linear Method"
+      },
       "correct_answer": "a"
     }
   ],
   "resources": [
-    { "label": "Stanford CS229 Notes (ML)", "url": "https://cs229.stanford.edu/" },
-    { "label": "OpenAI Intro", "url": "https://platform.openai.com/docs/introduction" }
+    {
+      "label": "Stanford CS229 Notes (ML)",
+      "url": "https://cs229.stanford.edu/"
+    },
+    {
+      "label": "OpenAI Intro",
+      "url": "https://platform.openai.com/docs/introduction"
+    }
   ],
   "relatedModules": [
     "ai-study-buddy",
     "simulations"
   ]
 }
-

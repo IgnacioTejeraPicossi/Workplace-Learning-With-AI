@@ -23,9 +23,18 @@
       "type": "definitions",
       "heading": "Key Terms",
       "definitions": [
-        { "term": "Embedding model", "definition": "Turns text into vectors for search/retrieval" },
-        { "term": "Generation model", "definition": "Creates text/images/audio based on prompts" },
-        { "term": "Inference server", "definition": "Service that runs models and exposes HTTP APIs" }
+        {
+          "term": "Embedding model",
+          "definition": "Turns text into vectors for search/retrieval"
+        },
+        {
+          "term": "Generation model",
+          "definition": "Creates text/images/audio based on prompts"
+        },
+        {
+          "term": "Inference server",
+          "definition": "Service that runs models and exposes HTTP APIs"
+        }
       ]
     },
     {
@@ -39,17 +48,31 @@
         "Send: completion('Say hello')",
         "Send: embeddings('hello world') and inspect vector length"
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "In 2026, tool/function calling is how models act, and MCP (Model Context Protocol) has emerged as a shared standard so one integration works across many models. The pattern: the model decides which tool to call, your code runs it, and the result goes back into the conversation — the basis of every AI agent."
     }
   ],
   "quiz": [
     {
       "question": "Which model type is used for retrieval?",
-      "options": { "a": "Text generation", "b": "Embeddings", "c": "Image generation" },
+      "options": {
+        "a": "Text generation",
+        "b": "Embeddings",
+        "c": "Image generation"
+      },
       "correct_answer": "b"
     },
     {
       "question": "Which option is private and runs locally?",
-      "options": { "a": "OpenAI", "b": "HuggingFace Hub", "c": "LM Studio" },
+      "options": {
+        "a": "OpenAI",
+        "b": "HuggingFace Hub",
+        "c": "LM Studio"
+      },
       "correct_answer": "c"
     }
   ],
@@ -57,4 +80,3 @@
     "api-config"
   ]
 }
-

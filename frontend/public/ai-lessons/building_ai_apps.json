@@ -41,17 +41,31 @@
         "Refine with style and constraints",
         "Measure: latency and token usage"
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "The 2026 stack standardised around a few things: MCP (Model Context Protocol) as a common way to give models tools and data; mature RAG patterns with evaluation baked in; and agent frameworks that orchestrate multi-step, tool-using workflows. Observability and cost control (covered in later modules) are now table stakes, not afterthoughts."
     }
   ],
   "quiz": [
     {
       "question": "Which component stores vector representations?",
-      "options": { "a": "Relational DB", "b": "Vector DB", "c": "Object store" },
+      "options": {
+        "a": "Relational DB",
+        "b": "Vector DB",
+        "c": "Object store"
+      },
       "correct_answer": "b"
     },
     {
       "question": "Why chunk documents for retrieval?",
-      "options": { "a": "To make files larger", "b": "To fit in context and improve search precision", "c": "To reduce text quality" },
+      "options": {
+        "a": "To make files larger",
+        "b": "To fit in context and improve search precision",
+        "c": "To reduce text quality"
+      },
       "correct_answer": "b"
     }
   ],
@@ -61,4 +75,3 @@
     "api-config"
   ]
 }
-

@@ -754,7 +754,34 @@ const AITrainingModule = ({ user }) => {
     switch (section.type) {
       case 'text':
         return <p style={{ lineHeight: 1.6, color: colors.text }}>{tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.content`, section.content)}</p>;
-      
+
+      case 'callout': {
+        // Didactic info box. `variant`: update (2026 refresh) / tip / warning / note.
+        const variants = {
+          update:  { icon: '💡', bg: '#eff6ff', border: '#bfdbfe', accent: '#1d4ed8' },
+          tip:     { icon: '✅', bg: '#ecfdf5', border: '#a7f3d0', accent: '#047857' },
+          warning: { icon: '⚠️', bg: '#fffbeb', border: '#fde68a', accent: '#b45309' },
+          note:    { icon: '📌', bg: '#f8fafc', border: '#e2e8f0', accent: '#475569' },
+        };
+        const v = variants[section.variant] || variants.note;
+        return (
+          <div style={{
+            background: v.bg, border: `1px solid ${v.border}`, borderLeft: `4px solid ${v.accent}`,
+            borderRadius: 8, padding: '12px 16px', margin: '4px 0',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: '1.1em' }}>{v.icon}</span>
+              <strong style={{ color: v.accent }}>
+                {tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.heading`, section.heading)}
+              </strong>
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.6, color: colors.text }}>
+              {tr(`aiLearning.lessons.${lessonId}.sections.${sectionIndex}.content`, section.content)}
+            </p>
+          </div>
+        );
+      }
+
       case 'list':
         if (section.format === 'dysfunctionTable') {
           const headerStyle = { textAlign: 'left', padding: '8px 10px', borderBottom: `1px solid ${colors.border}`, color: colors.textSecondary, fontSize: '0.9em' };
@@ -1534,9 +1561,12 @@ const AITrainingModule = ({ user }) => {
                 </div>
 
                 <div style={{ marginBottom: 32 }}>
-                  <h3 style={{ color: colors.text, marginBottom: 16 }}>
-                    {tr(`aiLearning.lessons.${currentLesson.id}.sections.${currentSection}.heading`, currentLesson.sections[currentSection].heading)}
-                  </h3>
+                  {/* callout sections render their own titled box — skip the outer heading */}
+                  {currentLesson.sections[currentSection].type !== 'callout' && (
+                    <h3 style={{ color: colors.text, marginBottom: 16 }}>
+                      {tr(`aiLearning.lessons.${currentLesson.id}.sections.${currentSection}.heading`, currentLesson.sections[currentSection].heading)}
+                    </h3>
+                  )}
                   {renderSection(currentLesson.sections[currentSection], currentSection, currentLesson.id)}
                 </div>
 

@@ -24,21 +24,44 @@
       "type": "definitions",
       "heading": "Key Terms",
       "definitions": [
-        { "term": "Few-shot", "definition": "Demonstrate task with a few examples in the prompt" },
-        { "term": "System prompt", "definition": "High‑level instruction that sets behavior" },
-        { "term": "Guardrails", "definition": "Constraints and checks to prevent unsafe outputs" }
+        {
+          "term": "Few-shot",
+          "definition": "Demonstrate task with a few examples in the prompt"
+        },
+        {
+          "term": "System prompt",
+          "definition": "High‑level instruction that sets behavior"
+        },
+        {
+          "term": "Guardrails",
+          "definition": "Constraints and checks to prevent unsafe outputs"
+        }
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "With 2026 reasoning models, prompting shifts: you often specify what “done” looks like and let the model plan, rather than micromanaging every step. Structured outputs (JSON schemas) and tool/function calling are now first-class. And a self-correcting Builder→Judge→Manager loop (see the Self-Correcting AI Loop agent) beats one long prompt for reliability on tasks that matter."
     }
   ],
   "quiz": [
     {
       "question": "Which tactic improves reliability?",
-      "options": { "a": "Add random text", "b": "Provide examples", "c": "Remove instructions" },
+      "options": {
+        "a": "Add random text",
+        "b": "Provide examples",
+        "c": "Remove instructions"
+      },
       "correct_answer": "b"
     },
     {
       "question": "What is a system prompt?",
-      "options": { "a": "A log file", "b": "A high-level behavior instruction", "c": "A dataset" },
+      "options": {
+        "a": "A log file",
+        "b": "A high-level behavior instruction",
+        "c": "A dataset"
+      },
       "correct_answer": "b"
     }
   ],
@@ -47,4 +70,3 @@
     "agentops-studio"
   ]
 }
-

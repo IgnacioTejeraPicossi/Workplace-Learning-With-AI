@@ -57,17 +57,31 @@
       "copyLabel": "Copy JSON",
       "openLabel": "Open in Agentic RAG",
       "href": "/ai-lessons/embedding_dataset.json"
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "Two shifts define 2026 LLMs. Reasoning (“thinking”) models spend extra compute deliberating before answering — great for maths and code, though the reasoning tokens count against the output budget. Context windows have grown to hundreds of thousands (even millions) of tokens, and mixture-of-experts architectures activate only part of the network per token for efficiency. The transformer core in this lesson is unchanged — these are refinements on top."
     }
   ],
   "quiz": [
     {
       "question": "What is an embedding?",
-      "options": { "a": "A picture", "b": "A vector representation", "c": "A stylesheet" },
+      "options": {
+        "a": "A picture",
+        "b": "A vector representation",
+        "c": "A stylesheet"
+      },
       "correct_answer": "b"
     },
     {
       "question": "What does attention do?",
-      "options": { "a": "Ignores input", "b": "Weighs relevant tokens", "c": "Changes temperature" },
+      "options": {
+        "a": "Ignores input",
+        "b": "Weighs relevant tokens",
+        "c": "Changes temperature"
+      },
       "correct_answer": "b"
     }
   ],
@@ -76,4 +90,3 @@
     "documents-analyzer"
   ]
 }
-

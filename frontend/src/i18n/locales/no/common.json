@@ -2435,6 +2435,10 @@
                 "definition": "Stor språkmodell trent på store tekstmengder"
               }
             }
+          },
+          "3": {
+            "heading": "Nytt i 2026",
+            "content": "AI i 2026 er stadig mer agentisk — modeller svarer ikke bare, de planlegger og bruker verktøy for å fullføre oppgaver i flere trinn. Fronten er multimodal (tekst, bilder, lyd og video i én modell) og resonneringsmodeller som «tenker» før de svarer. Kjerneideene i denne leksjonen holder fortsatt; det som endret seg er skala, autonomi og hvor tett AI nå er vevd inn i hverdagslig programvare."
           }
         }
       },
@@ -2472,6 +2476,10 @@
                 "definition": "Begrensninger og kontroller som hindrer utrygge svar"
               }
             }
+          },
+          "3": {
+            "heading": "Nytt i 2026",
+            "content": "Med 2026-resonneringsmodeller endres ledeteksting: du spesifiserer ofte hva «ferdig» betyr og lar modellen planlegge, i stedet for å detaljstyre hvert trinn. Strukturerte utdata (JSON-skjemaer) og verktøy-/funksjonskall er nå førsteklasses. Og en selvkorrigerende Bygger→Dommer→Leder-løkke (se Selvkorrigerende KI-løkke-agenten) slår én lang ledetekst for pålitelighet på oppgaver som betyr noe."
           }
         }
       },
@@ -2516,12 +2524,22 @@
           "7": {
             "heading": "Datasett til øvelsen",
             "text": "Last ned et lite datasett med 5 fraser for embedding‑beregninger:"
+          },
+          "8": {
+            "heading": "Nytt i 2026",
+            "content": "To skift preger 2026-LLM-er. Resonneringsmodeller («tenkende») bruker ekstra beregning på å overveie før de svarer — utmerket for matematikk og kode, men resonneringstokenene teller mot budsjettet. Kontekstvinduer har vokst til hundretusener (til og med millioner) av tokens, og mixture-of-experts-arkitekturer aktiverer bare deler av nettverket per token for effektivitet. Transformer-kjernen i denne leksjonen er uendret — dette er forbedringer på toppen."
           }
         }
       },
       "tools_apis_004": {
         "title": "Verktøy og API‑er",
-        "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes."
+        "description": "Oversikt over OpenAI, HuggingFace, tale‑ og bilde‑API‑er, og når de bør brukes.",
+        "sections": {
+          "4": {
+            "heading": "Nytt i 2026",
+            "content": "I 2026 er verktøy-/funksjonskall måten modeller handler på, og MCP (Model Context Protocol) har blitt en felles standard slik at én integrasjon fungerer på tvers av mange modeller. Mønsteret: modellen bestemmer hvilket verktøy som skal kalles, koden din kjører det, og resultatet går tilbake i samtalen — grunnlaget for enhver KI-agent."
+          }
+        }
       },
       "building_ai_apps_007": {
         "title": "Bygging av AI‑apper",
@@ -2556,6 +2574,10 @@
               "3": "Forbedre med stil og begrensninger",
               "4": "Mål: latens og tokenbruk"
             }
+          },
+          "5": {
+            "heading": "Nytt i 2026",
+            "content": "2026-stakken standardiserte seg rundt noen ting: MCP (Model Context Protocol) som en felles måte å gi modeller verktøy og data på; modne RAG-mønstre med evaluering innebygd; og agent-rammeverk som orkestrerer arbeidsflyter i flere trinn med verktøybruk. Observerbarhet og kostnadskontroll (dekket i senere moduler) er nå et minstekrav, ikke en ettertanke."
           }
         }
       },
@@ -2658,6 +2680,10 @@
               "2": "Utarbeid allow/deny‑liste for din bruk",
               "3": "Legg til et etter‑filter for å blokkere forbudte kategorier"
             }
+          },
+          "4": {
+            "heading": "Nytt i 2026",
+            "content": "2026 skjerpet to fronter. Agentisk risiko: når modeller handler autonomt (kjører verktøy, kode, til og med kjøp), betyr sikkerhetsrækkverk, menneske-i-løkken-godkjenning og revisjonsspor mer enn noensinne. Regulering: EU AI Act sine forpliktelser innføres gradvis og krever åpenhet, risikoklassifisering og dokumentasjon. Prinsippene i denne leksjonen (rettferdighet, åpenhet, ansvarlighet, personvern) er i økende grad lovkrav, ikke bare god praksis."
           }
         }
       },

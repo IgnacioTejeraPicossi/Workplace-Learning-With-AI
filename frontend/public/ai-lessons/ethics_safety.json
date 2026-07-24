@@ -23,9 +23,18 @@
       "type": "definitions",
       "heading": "Guardrails",
       "definitions": [
-        { "term": "Input filtering", "definition": "Block unsafe user inputs (e.g., PII, abusive content)" },
-        { "term": "Output filtering", "definition": "Scan and block problematic model outputs" },
-        { "term": "Traceability", "definition": "Log prompts/outputs for audit and improvement" }
+        {
+          "term": "Input filtering",
+          "definition": "Block unsafe user inputs (e.g., PII, abusive content)"
+        },
+        {
+          "term": "Output filtering",
+          "definition": "Scan and block problematic model outputs"
+        },
+        {
+          "term": "Traceability",
+          "definition": "Log prompts/outputs for audit and improvement"
+        }
       ]
     },
     {
@@ -38,17 +47,31 @@
         "Draft an allow/deny list for your use case",
         "Add a post‑filter to block banned categories"
       ]
+    },
+    {
+      "type": "callout",
+      "variant": "update",
+      "heading": "What's new in 2026",
+      "content": "2026 sharpened two fronts. Agentic risk: as models act autonomously (running tools, code, even purchases), guardrails, human-in-the-loop approval and audit trails matter more than ever. Regulation: the EU AI Act's obligations are phasing in, pushing transparency, risk classification and documentation. The principles in this lesson (fairness, transparency, accountability, privacy) are increasingly legal requirements, not just good practice."
     }
   ],
   "quiz": [
     {
       "question": "Which risk relates to 'confident but wrong' model output?",
-      "options": { "a": "Bias", "b": "Hallucination", "c": "Privacy" },
+      "options": {
+        "a": "Bias",
+        "b": "Hallucination",
+        "c": "Privacy"
+      },
       "correct_answer": "b"
     },
     {
       "question": "Which control reduces exposure of sensitive data?",
-      "options": { "a": "Input filtering", "b": "Temperature", "c": "Max tokens" },
+      "options": {
+        "a": "Input filtering",
+        "b": "Temperature",
+        "c": "Max tokens"
+      },
       "correct_answer": "a"
     }
   ],
@@ -56,4 +79,3 @@
     "cybersecurity"
   ]
 }
-
