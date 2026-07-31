@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.5] - 2026-07-31
+
+### Added — Scenario Simulator: per-user progress persistence in Mongo (audit Fase 4)
+
+Mirrors the AI Training pattern from [1.30.0]: the "Save/Load Progress" feature
+was localStorage-only, so an in-progress interactive simulation did not follow
+the user across devices or browsers.
+
+- **Backend**: new `simulation_progress_collection` (`backend/db.py`, one doc per
+  `user_id`) + two auth-guarded endpoints in `backend/app.py`:
+  `GET /api/simulator/state` (returns the latest saved run or `null`) and
+  `PUT /api/simulator/progress` (upserts the run: scenario type, custom topic,
+  current step, selected option, response, completed flag). `SimulatorProgressPayload`
+  validates inputs (non-empty scenario_type, step 0–100, bounded strings).
+- **Frontend**: hybrid, non-breaking. `localStorage` stays as the instant cache /
+  offline / guest fallback; `handleSaveProgress` now *also* syncs to the server
+  when logged in (`auth.currentUser`), and `handleLoadProgress` prefers the
+  server copy (cross-device) and falls back to `localStorage`. New api helpers
+  `getSimulatorState` / `saveSimulatorProgress` in `frontend/src/api.js`. The
+  server stores progress in the same camelCase shape the UI uses, so no mapping.
+- **Tests / CI**: `backend/tests/test_simulator_progress_contracts.py` (4 offline
+  tests, auth + Mongo mocked with a scoped autouse override). Added to
+  `.github/workflows/ci.yml`; the offline gate is now **9 files / 95 tests**.
+  `docs/TESTING.md` updated (count + gate row + command list).
+- Validated: backend `compileall` OK; `@babel/parser` parse OK for
+  `Simulator.jsx` + `api.js`; new suite 4/4; all 9 offline suites together 95/95.
+
+Note (pre-existing, out of scope): the loaded interactive view is still gated
+behind a completed streaming generation, so a loaded run restores its saved
+state but the step UI only re-renders after a fresh generation — a separate UX
+follow-up, not part of this persistence change.
+
+---
+
 ## [1.30.4] - 2026-07-31
 
 ### Changed — Scenario Simulator: per-type scenarios + localized fallback (audit Fase 3, A+B1)

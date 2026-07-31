@@ -35,6 +35,12 @@ saved_videos_collection = database.get_collection("saved_videos")
 # capped `quiz_results` list.
 ai_training_progress_collection = database.get_collection("ai_training_progress")
 
+# Scenario Simulator — per-user interactive-run progress (1.30.5). Replaces the
+# previous localStorage-only "Save/Load Progress" so an in-progress simulation
+# survives across devices and browsers. One document per user (`user_id`) with a
+# `progress` object (scenario_type, current_step, selected_option, ...).
+simulation_progress_collection = database.get_collection("simulation_progress")
+
 # Document Analysis Collections
 document_analyses_collection = database.get_collection("document_analyses")
 

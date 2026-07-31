@@ -37,7 +37,7 @@ try:
     from backend.cursor_readme_routes import router as cursor_readme_router
     from backend.cursor_agent_routes import router as cursor_agent_router
     from backend.simple_web_search import router as simple_web_search_router
-    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection
+    from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection, simulation_progress_collection
 except ImportError:
     # Fallback for when running from root directory
     from prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
@@ -47,7 +47,7 @@ except ImportError:
     from cursor_readme_routes import router as cursor_readme_router
     from cursor_agent_routes import router as cursor_agent_router
     from simple_web_search import router as simple_web_search_router
-    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection
+    from db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection, saved_videos_collection, ai_training_progress_collection, simulation_progress_collection
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -2145,6 +2145,52 @@ async def save_ai_quiz_result(body: AiQuizResultPayload, user=Depends(verify_tok
         {"user_id": uid},
         {"$push": {"quiz_results": {"$each": [entry], "$slice": -200}},
          "$set": {"updated_at": datetime.utcnow().isoformat()}},
+        upsert=True,
+    )
+    return {"ok": True}
+
+
+# ── Scenario Simulator: per-user interactive-run persistence (1.30.5) ─────────
+# Server-side replacement for the module's localStorage-only "Save/Load Progress"
+# so an in-progress interactive simulation follows the user across devices. Both
+# endpoints are auth-guarded (verify_token) and keyed by the user's uid; one doc
+# per user holds the latest saved run.
+
+class SimulatorProgressPayload(BaseModel):
+    scenario_type: str = Field(..., min_length=1, max_length=100)
+    custom_scenario: Optional[str] = Field(None, max_length=500)
+    current_step: int = Field(0, ge=0, le=100)
+    selected_option: Optional[str] = Field(None, max_length=10)
+    simulation_response: Optional[str] = Field(None, max_length=20000)
+    completed: bool = False
+
+
+@app.get("/api/simulator/state")
+async def get_simulator_state(user=Depends(verify_token)):
+    """Return the authenticated user's latest saved simulation progress (or null)."""
+    uid = user.get("uid")
+    doc = await simulation_progress_collection.find_one({"user_id": uid})
+    if not doc:
+        return {"progress": None}
+    return {"progress": doc.get("progress")}
+
+
+@app.put("/api/simulator/progress")
+async def save_simulator_progress(body: SimulatorProgressPayload, user=Depends(verify_token)):
+    """Upsert the user's latest interactive-run progress (one doc per user)."""
+    uid = user.get("uid")
+    progress = {
+        "scenarioType": body.scenario_type,
+        "customScenario": body.custom_scenario or "",
+        "currentStep": body.current_step,
+        "selectedOption": body.selected_option,
+        "simulationResponse": body.simulation_response or "",
+        "completed": body.completed,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    await simulation_progress_collection.update_one(
+        {"user_id": uid},
+        {"$set": {"progress": progress, "updated_at": datetime.utcnow().isoformat()}},
         upsert=True,
     )
     return {"ok": True}

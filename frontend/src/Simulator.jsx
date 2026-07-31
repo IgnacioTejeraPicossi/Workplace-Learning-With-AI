@@ -1,7 +1,8 @@
 // Scenario Simulator component skeleton
 import React, { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { askStream, saveSimulationResult } from "./api";
+import { askStream, saveSimulationResult, getSimulatorState, saveSimulatorProgress } from "./api";
+import { auth } from "./firebase";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
 import { useStreaming } from "./hooks/useStreaming";
@@ -267,11 +268,23 @@ Keep it educational and specific to this scenario (step ${currentStep + 1}).`;
     
     setSavedProgress(progress);
     
-    // Save to localStorage
+    // Save to localStorage (instant cache / offline / guest fallback)
     const savedSimulations = JSON.parse(localStorage.getItem('simulationProgress') || '[]');
     savedSimulations.push(progress);
     localStorage.setItem('simulationProgress', JSON.stringify(savedSimulations));
-    
+
+    // Best-effort sync to the server so progress follows the user across devices.
+    if (auth.currentUser?.uid) {
+      saveSimulatorProgress({
+        scenario_type: scenarioType || 'custom',
+        custom_scenario: customScenario,
+        current_step: currentStep,
+        selected_option: selectedOption,
+        simulation_response: simulationResponse,
+        completed: currentStep >= 3,
+      }).catch((e) => console.warn('Simulator progress server sync failed:', e));
+    }
+
     // If simulation is completed, update Dashboard progress
     if (currentStep >= 3) {
       const simulationKey = runIdRef.current || `simulation_${scenarioType}_${Date.now()}`;
@@ -291,14 +304,33 @@ Keep it educational and specific to this scenario (step ${currentStep + 1}).`;
     alert(t("scenarioSimulator.alerts.progressSaved"));
   };
 
-  const handleLoadProgress = () => {
-    const savedSimulations = JSON.parse(localStorage.getItem('simulationProgress') || '[]');
-    if (savedSimulations.length > 0) {
-      const latestProgress = savedSimulations[savedSimulations.length - 1];
+  const handleLoadProgress = async () => {
+    let latestProgress = null;
+
+    // Prefer the server copy (cross-device) when logged in; fall back to the
+    // localStorage cache on failure or for guests.
+    if (auth.currentUser?.uid) {
+      try {
+        const state = await getSimulatorState();
+        if (state && state.progress) latestProgress = state.progress;
+      } catch (e) {
+        console.warn('Simulator state server load failed, using localStorage:', e);
+      }
+    }
+    if (!latestProgress) {
+      const savedSimulations = JSON.parse(localStorage.getItem('simulationProgress') || '[]');
+      if (savedSimulations.length > 0) {
+        latestProgress = savedSimulations[savedSimulations.length - 1];
+      }
+    }
+
+    if (latestProgress) {
       setSavedProgress(latestProgress);
-      setCurrentStep(latestProgress.currentStep);
+      setScenarioType(latestProgress.scenarioType || '');
+      setCustomScenario(latestProgress.customScenario || '');
+      setCurrentStep(latestProgress.currentStep || 0);
       setSelectedOption(latestProgress.selectedOption);
-      setSimulationResponse(latestProgress.simulationResponse);
+      setSimulationResponse(latestProgress.simulationResponse || '');
       setSimulationActive(true);
       setShowOptions(!latestProgress.selectedOption);
       // Fresh run id for the loaded session so its completion counts once.

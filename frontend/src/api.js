@@ -347,6 +347,16 @@ export async function saveAiQuizResult(data) {
   return apiCall('/api/ai-training/quiz-result', 'POST', data);
 }
 
+// Scenario Simulator — server-side interactive-run progress (per user).
+export async function getSimulatorState() {
+  return apiCall('/api/simulator/state', 'GET');
+}
+export async function saveSimulatorProgress(data) {
+  // data: { scenario_type, custom_scenario, current_step, selected_option,
+  //         simulation_response, completed }
+  return apiCall('/api/simulator/progress', 'PUT', data);
+}
+
 // Repo Analyzer Cursor AI API Functions
 export async function analyzeRepository(repoUrl, branch = null) {
   return apiCall("/api/analyze-repo", "POST", {
