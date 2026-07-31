@@ -75,43 +75,273 @@
         "description": "Deliver effective presentations and pitches"
       }
     },
-    "steps": [
-      {
-        "question": "What is your immediate course of action?",
-        "options": {
-          "A": "Ignore the issue and hope the team can catch up.",
-          "B": "Inform the stakeholders about the delay.",
-          "C": "Reassign the work to a different team.",
-          "D": "Pressure the team to work overtime."
+    "scenarios": {
+      "customerService": [
+        {
+          "question": "An irate customer says their order arrived damaged. What's your first move?",
+          "options": {
+            "A": "Listen fully, acknowledge the problem and apologize sincerely.",
+            "B": "Immediately offer a refund just to end the call quickly.",
+            "C": "Ask them to email photos before you'll do anything.",
+            "D": "Explain that damage in transit isn't your company's fault."
+          }
+        },
+        {
+          "question": "The customer is still upset after your apology. How do you proceed?",
+          "options": {
+            "A": "Ask what outcome would make things right for them.",
+            "B": "Restate the policy and wait for them to accept it.",
+            "C": "Transfer them to a supervisor to avoid the conflict.",
+            "D": "Put them on a long hold to let them cool down."
+          }
+        },
+        {
+          "question": "You've agreed on a replacement. How do you set expectations?",
+          "options": {
+            "A": "Give a clear timeline and a way to track it.",
+            "B": "Promise it 'as soon as possible' with no specifics.",
+            "C": "Say you'll 'try', but make no real commitment.",
+            "D": "Overpromise next-day delivery you can't guarantee."
+          }
+        },
+        {
+          "question": "The issue is resolved. How do you prevent a repeat?",
+          "options": {
+            "A": "Log the root cause and flag the packaging problem.",
+            "B": "Close the ticket and move on to the next call.",
+            "C": "Blame the courier in your notes and leave it.",
+            "D": "Add a private note to avoid this customer next time."
+          }
         }
-      },
-      {
-        "question": "How do you handle the team's response to your decision?",
-        "options": {
-          "A": "Schedule a team meeting to discuss the situation openly.",
-          "B": "Send an email update and wait for responses.",
-          "C": "Meet with team leaders individually.",
-          "D": "Let the team figure it out on their own."
+      ],
+      "teamLeadership": [
+        {
+          "question": "Two team members start arguing openly in your meeting. What do you do?",
+          "options": {
+            "A": "Pause and set a respectful ground rule before continuing.",
+            "B": "Take the side of whoever is technically correct.",
+            "C": "Ignore it and push through the agenda.",
+            "D": "End the meeting abruptly to stop the tension."
+          }
+        },
+        {
+          "question": "After the meeting, how do you address the conflict?",
+          "options": {
+            "A": "Meet each person privately to understand their view.",
+            "B": "Send a group email telling everyone to stay professional.",
+            "C": "Wait and hope it resolves itself.",
+            "D": "Reassign one of them to a different team."
+          }
+        },
+        {
+          "question": "You've heard both sides. How do you move forward?",
+          "options": {
+            "A": "Facilitate a joint conversation focused on shared goals.",
+            "B": "Impose a solution and expect everyone to comply.",
+            "C": "Let the more senior person decide for the group.",
+            "D": "Avoid the topic entirely to keep the peace."
+          }
+        },
+        {
+          "question": "How do you prevent clashes like this in future?",
+          "options": {
+            "A": "Agree on team norms for handling disagreement together.",
+            "B": "Add more status meetings to keep an eye on things.",
+            "C": "Monitor their messages closely for tension.",
+            "D": "Assume it was a one-off and do nothing."
+          }
         }
-      },
-      {
-        "question": "What's your approach to stakeholder communication?",
-        "options": {
-          "A": "Provide detailed weekly progress reports.",
-          "B": "Set up a crisis management meeting.",
-          "C": "Create a revised project timeline with milestones.",
-          "D": "Minimize communication to avoid panic."
+      ],
+      "salesNegotiation": [
+        {
+          "question": "A prospect loves the product but says your price is too high. Your response?",
+          "options": {
+            "A": "Ask what value or budget target they're working toward.",
+            "B": "Immediately drop the price to win the deal.",
+            "C": "Insist the price is final and non-negotiable.",
+            "D": "Criticize competitors' cheaper offers."
+          }
+        },
+        {
+          "question": "They reveal a limited budget. How do you proceed?",
+          "options": {
+            "A": "Propose a scoped package that fits their budget.",
+            "B": "Give them the full product at a loss.",
+            "C": "Walk away from the deal on the spot.",
+            "D": "Hide some fees to make the price look lower."
+          }
+        },
+        {
+          "question": "They ask for one more concession before signing. What do you do?",
+          "options": {
+            "A": "Trade the concession for a longer commitment.",
+            "B": "Give it away for free to avoid any friction.",
+            "C": "Refuse flatly and hold your position.",
+            "D": "Agree verbally but leave it out of the contract."
+          }
+        },
+        {
+          "question": "The deal is nearly closed. How do you finalize it?",
+          "options": {
+            "A": "Confirm all terms in writing and set next steps.",
+            "B": "Rush the signature before they change their mind.",
+            "C": "Leave the details vague to close faster.",
+            "D": "Add a few surprise terms at the moment of signing."
+          }
         }
-      },
-      {
-        "question": "How do you ensure project recovery and future prevention?",
-        "options": {
-          "A": "Implement new project management processes.",
-          "B": "Conduct a post-mortem analysis with the team.",
-          "C": "Hire additional resources for the project.",
-          "D": "Move on and focus on the next project."
+      ],
+      "projectManagement": [
+        {
+          "question": "Your project is falling behind schedule. What is your immediate action?",
+          "options": {
+            "A": "Assess the root cause with the team before reacting.",
+            "B": "Inform stakeholders about the delay transparently.",
+            "C": "Reassign the work to a different team.",
+            "D": "Pressure the team to work overtime."
+          }
+        },
+        {
+          "question": "How do you handle the team's response to your decision?",
+          "options": {
+            "A": "Hold an open meeting to discuss the situation together.",
+            "B": "Send an email update and wait for replies.",
+            "C": "Meet team leads individually to gather detail.",
+            "D": "Let the team figure it out on their own."
+          }
+        },
+        {
+          "question": "What's your approach to stakeholder communication?",
+          "options": {
+            "A": "Share a revised timeline with clear milestones.",
+            "B": "Provide detailed weekly progress reports.",
+            "C": "Call an urgent crisis meeting with everyone.",
+            "D": "Minimize communication to avoid causing panic."
+          }
+        },
+        {
+          "question": "How do you ensure recovery and prevent a repeat?",
+          "options": {
+            "A": "Run a post-mortem and adjust the process.",
+            "B": "Add resources without changing how you work.",
+            "C": "Impose rigid new controls immediately.",
+            "D": "Move on and focus on the next project."
+          }
         }
-      }
-    ]
+      ],
+      "conflictResolution": [
+        {
+          "question": "Two departments blame each other for a missed handoff. Your first step?",
+          "options": {
+            "A": "Gather the facts from both sides neutrally.",
+            "B": "Decide who's at fault from first impressions.",
+            "C": "Escalate to senior management immediately.",
+            "D": "Tell them to sort it out among themselves."
+          }
+        },
+        {
+          "question": "Emotions are running high in the room. How do you manage the discussion?",
+          "options": {
+            "A": "Set ground rules and focus on the problem, not the people.",
+            "B": "Let everyone vent freely with no structure.",
+            "C": "Cut the discussion short to save time.",
+            "D": "Side with whichever group is louder."
+          }
+        },
+        {
+          "question": "You've found the root cause. How do you resolve it?",
+          "options": {
+            "A": "Agree on a shared fix with clear ownership.",
+            "B": "Assign blame and require an apology.",
+            "C": "Add a rule without addressing the real cause.",
+            "D": "Paper over it just to keep the peace."
+          }
+        },
+        {
+          "question": "How do you rebuild trust between the teams?",
+          "options": {
+            "A": "Set up a shared process and a follow-up check-in.",
+            "B": "Keep the teams apart to avoid more friction.",
+            "C": "Reorganize the reporting lines instead.",
+            "D": "Assume trust will simply return on its own."
+          }
+        }
+      ],
+      "presentation": [
+        {
+          "question": "You're about to pitch a proposal to skeptical executives. How do you open?",
+          "options": {
+            "A": "Lead with the problem and the outcome they care about.",
+            "B": "Start with a long company-history slide.",
+            "C": "Open by apologizing for taking their time.",
+            "D": "Dive straight into deep technical detail."
+          }
+        },
+        {
+          "question": "An executive interrupts with a tough question. What do you do?",
+          "options": {
+            "A": "Answer directly, then return to your thread.",
+            "B": "Deflect and say you'll cover it later (then don't).",
+            "C": "Guess an answer to sound confident.",
+            "D": "Get defensive about being interrupted."
+          }
+        },
+        {
+          "question": "You're running short on time. How do you adapt?",
+          "options": {
+            "A": "Skip to your key ask and the evidence for it.",
+            "B": "Speed-read through every remaining slide.",
+            "C": "Drop the ask entirely to save time.",
+            "D": "Run over and ignore the clock."
+          }
+        },
+        {
+          "question": "You've finished presenting. How do you close?",
+          "options": {
+            "A": "Restate the ask and propose a clear next step.",
+            "B": "End with a vague 'so, that's it, thanks'.",
+            "C": "Leave without any call to action.",
+            "D": "Promise to 'send everything over sometime'."
+          }
+        }
+      ],
+      "generic": [
+        {
+          "question": "What is your immediate course of action?",
+          "options": {
+            "A": "Assess the situation and gather the facts first.",
+            "B": "Communicate openly with the people affected.",
+            "C": "Delegate the whole problem to someone else.",
+            "D": "Act quickly without consulting anyone."
+          }
+        },
+        {
+          "question": "How do you involve the people affected?",
+          "options": {
+            "A": "Ask for their input before you decide.",
+            "B": "Inform them once you've already decided.",
+            "C": "Keep them out of it to move faster.",
+            "D": "Leave them to handle it entirely alone."
+          }
+        },
+        {
+          "question": "How do you communicate your plan?",
+          "options": {
+            "A": "Share clear steps, owners and timelines.",
+            "B": "Give a rough idea and adjust as you go.",
+            "C": "Say as little as possible for now.",
+            "D": "Overpromise to reassure everyone."
+          }
+        },
+        {
+          "question": "How do you prevent the problem from recurring?",
+          "options": {
+            "A": "Review what happened and improve the process.",
+            "B": "Add controls without diagnosing the cause.",
+            "C": "Move on and hope it doesn't happen again.",
+            "D": "Blame external factors and leave it there."
+          }
+        }
+      ]
+    }
   }
 }

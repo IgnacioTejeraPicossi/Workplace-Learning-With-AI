@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.4] - 2026-07-31
+
+### Changed — Scenario Simulator: per-type scenarios + localized fallback (audit Fase 3, A+B1)
+
+Previously the interactive 4-step game used a single fixed project-management
+arc for **every** scenario type, and the offline consequence texts were a
+~150-line hardcoded English block (also project-management-themed) shown for any
+choice. So picking "Customer Service" or "Sales & Negotiation" still gave
+project/deadline questions and English feedback.
+
+- **Part A — per-type scenarios.** Replaced the flat `scenarioSimulator.steps`
+  array with `scenarioSimulator.scenarios.{typeKey}.steps[]` — a distinct 4-step
+  arc (question + 4 options) for each of the 6 types plus a neutral `generic`
+  arc used for custom scenarios. 140 new content leaves per locale, authored in
+  EN and translated to ES + NO. `stepQuestions` now resolves steps by the chosen
+  type (`SCENARIO_TYPE_KEYS` → `typeKey`, falling back to `generic`).
+- **Part B1 — localized offline fallback.** Removed the ~150-line hardcoded
+  English `fallbackResponses` object from `handleOptionSelect`. When the live LLM
+  call fails, the UI now shows the already-localized
+  `scenarioSimulator.actions.genericFallback` (with option/step) instead of the
+  wrong-themed English. When the LLM is available (normal case) responses are
+  generated live as before — the per-choice prompt is now scenario-aware (it
+  includes the scenario label and the current question, no longer hardcoding
+  "the project").
+- Files: `frontend/src/Simulator.jsx`,
+  `frontend/src/i18n/locales/{en,es,no}/scenarioSimulator.json`.
+- Validated: `@babel/parser` JSX parse OK; per-type scenario parity 140/140
+  leaves identical across EN/ES/NO; full namespace parity 191/191; no remaining
+  reference to the old `scenarioSimulator.steps`.
+
+---
+
+## [1.30.3] - 2026-07-31
+
+### Fixed — Scenario Simulator: double-count of completed simulations (audit Fase 2)
+
+- The Dashboard "already counted" guard never worked: `simulationKey` embedded
+  `Date.now()`, so `completedSimulations.includes(simulationKey)` was always
+  false. Combined with the same run being counted in **two** places
+  (`handleNextStep` on the final step *and* `handleSaveProgress` when
+  `currentStep >= 3`), a single completed simulation could increment the
+  Dashboard counter twice.
+- Fix: introduced a **stable per-run id** (`runIdRef`) set when an interactive
+  run starts (and when a saved run is loaded), cleared on end/clear. Both count
+  sites now key off `runIdRef.current`, so completing and saving the same run
+  share one key and dedup correctly.
+- Files: `frontend/src/Simulator.jsx`. Validated: `@babel/parser` JSX parse OK.
+
+---
+
 ## [1.30.2] - 2026-07-31
 
 ### Fixed — Scenario Simulator: i18n leakage + hover/cleanup (audit Fase 1)

@@ -75,43 +75,273 @@
         "description": "Realiza presentaciones y exposiciones efectivas"
       }
     },
-    "steps": [
-      {
-        "question": "¿Cuál es tu curso de acción inmediato?",
-        "options": {
-          "A": "Ignorar el problema y esperar a que el equipo se ponga al día.",
-          "B": "Informar a los interesados sobre el retraso.",
-          "C": "Reasignar el trabajo a un equipo diferente.",
-          "D": "Presionar al equipo para que haga horas extra."
+    "scenarios": {
+      "customerService": [
+        {
+          "question": "Un cliente furioso dice que su pedido llegó dañado. ¿Cuál es tu primer paso?",
+          "options": {
+            "A": "Escuchar del todo, reconocer el problema y disculparte con sinceridad.",
+            "B": "Ofrecer de inmediato un reembolso solo para cortar la llamada rápido.",
+            "C": "Pedirle que envíe fotos por correo antes de hacer nada.",
+            "D": "Explicarle que los daños en el transporte no son culpa de tu empresa."
+          }
+        },
+        {
+          "question": "El cliente sigue molesto tras tu disculpa. ¿Cómo continúas?",
+          "options": {
+            "A": "Preguntar qué solución le dejaría satisfecho.",
+            "B": "Repetir la política y esperar a que la acepte.",
+            "C": "Pasarlo a un supervisor para evitar el conflicto.",
+            "D": "Dejarlo en espera un buen rato para que se calme."
+          }
+        },
+        {
+          "question": "Habéis acordado un reemplazo. ¿Cómo fijas las expectativas?",
+          "options": {
+            "A": "Dar un plazo claro y una forma de hacer seguimiento.",
+            "B": "Prometer que llegará «lo antes posible» sin concretar.",
+            "C": "Decir que «lo intentarás», sin comprometerte de verdad.",
+            "D": "Prometer una entrega al día siguiente que no puedes garantizar."
+          }
+        },
+        {
+          "question": "El problema está resuelto. ¿Cómo evitas que se repita?",
+          "options": {
+            "A": "Registrar la causa raíz y señalar el problema de embalaje.",
+            "B": "Cerrar el ticket y pasar a la siguiente llamada.",
+            "C": "Culpar al mensajero en tus notas y dejarlo así.",
+            "D": "Añadir una nota privada para evitar a este cliente la próxima vez."
+          }
         }
-      },
-      {
-        "question": "¿Cómo gestionas la respuesta del equipo a tu decisión?",
-        "options": {
-          "A": "Organiza una reunión de equipo para hablar abiertamente de la situación.",
-          "B": "Envía una actualización por correo y espera respuestas.",
-          "C": "Reúnete individualmente con los líderes del equipo.",
-          "D": "Deja que el equipo lo resuelva por su cuenta."
+      ],
+      "teamLeadership": [
+        {
+          "question": "Dos miembros del equipo empiezan a discutir abiertamente en tu reunión. ¿Qué haces?",
+          "options": {
+            "A": "Pausar y fijar una norma de respeto antes de continuar.",
+            "B": "Ponerte del lado de quien tiene razón técnicamente.",
+            "C": "Ignorarlo y seguir con la agenda.",
+            "D": "Terminar la reunión de golpe para cortar la tensión."
+          }
+        },
+        {
+          "question": "Tras la reunión, ¿cómo abordas el conflicto?",
+          "options": {
+            "A": "Reunirte con cada persona en privado para entender su punto de vista.",
+            "B": "Enviar un correo al grupo pidiendo que todos sean profesionales.",
+            "C": "Esperar y confiar en que se resuelva solo.",
+            "D": "Reasignar a uno de ellos a otro equipo."
+          }
+        },
+        {
+          "question": "Has escuchado a ambas partes. ¿Cómo avanzas?",
+          "options": {
+            "A": "Facilitar una conversación conjunta centrada en objetivos comunes.",
+            "B": "Imponer una solución y esperar que todos la acaten.",
+            "C": "Dejar que decida la persona con más antigüedad.",
+            "D": "Evitar el tema por completo para mantener la paz."
+          }
+        },
+        {
+          "question": "¿Cómo evitas conflictos así en el futuro?",
+          "options": {
+            "A": "Acordar juntos normas de equipo para gestionar los desacuerdos.",
+            "B": "Añadir más reuniones de seguimiento para vigilar.",
+            "C": "Vigilar de cerca sus mensajes buscando tensión.",
+            "D": "Suponer que fue algo puntual y no hacer nada."
+          }
         }
-      },
-      {
-        "question": "¿Cuál es tu enfoque para comunicarte con los interesados?",
-        "options": {
-          "A": "Proporcionar informes semanales detallados de progreso.",
-          "B": "Convocar una reunión de gestión de crisis.",
-          "C": "Crear un cronograma de proyecto revisado con hitos.",
-          "D": "Minimizar la comunicación para evitar alarmar."
+      ],
+      "salesNegotiation": [
+        {
+          "question": "A un prospecto le encanta el producto pero dice que el precio es muy alto. ¿Tu respuesta?",
+          "options": {
+            "A": "Preguntar qué valor o qué presupuesto objetivo maneja.",
+            "B": "Bajar el precio de inmediato para cerrar la venta.",
+            "C": "Insistir en que el precio es final e innegociable.",
+            "D": "Criticar las ofertas más baratas de la competencia."
+          }
+        },
+        {
+          "question": "Revela que tiene un presupuesto limitado. ¿Cómo continúas?",
+          "options": {
+            "A": "Proponer un paquete ajustado que encaje en su presupuesto.",
+            "B": "Darle el producto completo a pérdida.",
+            "C": "Abandonar la negociación en el acto.",
+            "D": "Ocultar algunas tarifas para que el precio parezca menor."
+          }
+        },
+        {
+          "question": "Pide una concesión más antes de firmar. ¿Qué haces?",
+          "options": {
+            "A": "Cambiar la concesión por un compromiso más largo.",
+            "B": "Regalarla para evitar cualquier fricción.",
+            "C": "Negarte en redondo y mantener tu posición.",
+            "D": "Aceptar de palabra pero dejarlo fuera del contrato."
+          }
+        },
+        {
+          "question": "La venta está casi cerrada. ¿Cómo la finalizas?",
+          "options": {
+            "A": "Confirmar todos los términos por escrito y fijar los siguientes pasos.",
+            "B": "Apresurar la firma antes de que cambie de idea.",
+            "C": "Dejar los detalles vagos para cerrar más rápido.",
+            "D": "Añadir términos sorpresa en el momento de firmar."
+          }
         }
-      },
-      {
-        "question": "¿Cómo aseguras la recuperación del proyecto y evitas problemas futuros?",
-        "options": {
-          "A": "Implementar nuevos procesos de gestión de proyectos.",
-          "B": "Realizar un análisis post-mortem con el equipo.",
-          "C": "Contratar recursos adicionales para el proyecto.",
-          "D": "Seguir adelante y centrarse en el próximo proyecto."
+      ],
+      "projectManagement": [
+        {
+          "question": "Tu proyecto se está retrasando. ¿Cuál es tu acción inmediata?",
+          "options": {
+            "A": "Evaluar la causa raíz con el equipo antes de reaccionar.",
+            "B": "Informar a los interesados del retraso con transparencia.",
+            "C": "Reasignar el trabajo a otro equipo.",
+            "D": "Presionar al equipo para que haga horas extra."
+          }
+        },
+        {
+          "question": "¿Cómo gestionas la reacción del equipo a tu decisión?",
+          "options": {
+            "A": "Convocar una reunión abierta para hablarlo juntos.",
+            "B": "Enviar un correo con la novedad y esperar respuestas.",
+            "C": "Reunirte con los responsables uno a uno para el detalle.",
+            "D": "Dejar que el equipo se las arregle solo."
+          }
+        },
+        {
+          "question": "¿Cuál es tu enfoque para comunicar con los interesados?",
+          "options": {
+            "A": "Compartir un calendario revisado con hitos claros.",
+            "B": "Entregar informes de avance semanales detallados.",
+            "C": "Convocar una reunión de crisis urgente con todos.",
+            "D": "Minimizar la comunicación para no generar pánico."
+          }
+        },
+        {
+          "question": "¿Cómo aseguras la recuperación y evitas que se repita?",
+          "options": {
+            "A": "Hacer un post-mortem y ajustar el proceso.",
+            "B": "Añadir recursos sin cambiar la forma de trabajar.",
+            "C": "Imponer controles nuevos y rígidos de inmediato.",
+            "D": "Pasar página y centrarte en el siguiente proyecto."
+          }
         }
-      }
-    ]
+      ],
+      "conflictResolution": [
+        {
+          "question": "Dos departamentos se culpan mutuamente por un traspaso fallido. ¿Tu primer paso?",
+          "options": {
+            "A": "Reunir los hechos de ambas partes con neutralidad.",
+            "B": "Decidir de quién es la culpa por las primeras impresiones.",
+            "C": "Escalar a la dirección de inmediato.",
+            "D": "Decirles que lo resuelvan entre ellos."
+          }
+        },
+        {
+          "question": "Los ánimos están caldeados. ¿Cómo gestionas la conversación?",
+          "options": {
+            "A": "Fijar reglas y centrarte en el problema, no en las personas.",
+            "B": "Dejar que todos se desahoguen sin ninguna estructura.",
+            "C": "Cortar la conversación para ahorrar tiempo.",
+            "D": "Ponerte del lado del grupo que grita más."
+          }
+        },
+        {
+          "question": "Has encontrado la causa raíz. ¿Cómo la resuelves?",
+          "options": {
+            "A": "Acordar una solución compartida con responsables claros.",
+            "B": "Repartir culpas y exigir una disculpa.",
+            "C": "Añadir una norma sin abordar la causa real.",
+            "D": "Taparlo solo para mantener la paz."
+          }
+        },
+        {
+          "question": "¿Cómo reconstruyes la confianza entre los equipos?",
+          "options": {
+            "A": "Establecer un proceso compartido y una reunión de seguimiento.",
+            "B": "Mantener a los equipos separados para evitar más roces.",
+            "C": "Reorganizar las líneas de reporte en su lugar.",
+            "D": "Suponer que la confianza volverá por sí sola."
+          }
+        }
+      ],
+      "presentation": [
+        {
+          "question": "Vas a presentar una propuesta a directivos escépticos. ¿Cómo abres?",
+          "options": {
+            "A": "Empezar por el problema y el resultado que les importa.",
+            "B": "Empezar con una diapositiva larga de historia de la empresa.",
+            "C": "Abrir disculpándote por quitarles tiempo.",
+            "D": "Meterte de lleno en el detalle técnico más profundo."
+          }
+        },
+        {
+          "question": "Un directivo te interrumpe con una pregunta difícil. ¿Qué haces?",
+          "options": {
+            "A": "Responder directamente y volver a tu hilo.",
+            "B": "Esquivarla diciendo que la verás luego (y no lo haces).",
+            "C": "Inventar una respuesta para parecer seguro.",
+            "D": "Ponerte a la defensiva por la interrupción."
+          }
+        },
+        {
+          "question": "Vas justo de tiempo. ¿Cómo te adaptas?",
+          "options": {
+            "A": "Ir directo a tu petición clave y a la evidencia que la respalda.",
+            "B": "Leer a toda prisa todas las diapositivas que quedan.",
+            "C": "Eliminar la petición por completo para ahorrar tiempo.",
+            "D": "Alargarte e ignorar el reloj."
+          }
+        },
+        {
+          "question": "Has terminado de presentar. ¿Cómo cierras?",
+          "options": {
+            "A": "Repetir la petición y proponer un siguiente paso claro.",
+            "B": "Terminar con un vago «bueno, eso es todo, gracias».",
+            "C": "Marcharte sin ninguna llamada a la acción.",
+            "D": "Prometer «enviarlo todo en algún momento»."
+          }
+        }
+      ],
+      "generic": [
+        {
+          "question": "¿Cuál es tu curso de acción inmediato?",
+          "options": {
+            "A": "Evaluar la situación y reunir los hechos primero.",
+            "B": "Comunicarte abiertamente con las personas afectadas.",
+            "C": "Delegar todo el problema en otra persona.",
+            "D": "Actuar rápido sin consultar con nadie."
+          }
+        },
+        {
+          "question": "¿Cómo involucras a las personas afectadas?",
+          "options": {
+            "A": "Pedir su opinión antes de decidir.",
+            "B": "Informarles una vez ya has decidido.",
+            "C": "Dejarlas fuera para avanzar más rápido.",
+            "D": "Dejar que lo gestionen completamente solas."
+          }
+        },
+        {
+          "question": "¿Cómo comunicas tu plan?",
+          "options": {
+            "A": "Compartir pasos claros, responsables y plazos.",
+            "B": "Dar una idea aproximada y ajustar sobre la marcha.",
+            "C": "Decir lo mínimo por ahora.",
+            "D": "Prometer de más para tranquilizar a todos."
+          }
+        },
+        {
+          "question": "¿Cómo evitas que el problema se repita?",
+          "options": {
+            "A": "Revisar qué pasó y mejorar el proceso.",
+            "B": "Añadir controles sin diagnosticar la causa.",
+            "C": "Pasar página y confiar en que no vuelva a ocurrir.",
+            "D": "Culpar a factores externos y dejarlo ahí."
+          }
+        }
+      ]
+    }
   }
 }

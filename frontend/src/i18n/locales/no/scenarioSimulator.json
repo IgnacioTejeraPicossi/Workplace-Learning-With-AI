@@ -75,43 +75,273 @@
         "description": "Lever effektive presentasjoner og pitcher"
       }
     },
-    "steps": [
-      {
-        "question": "Hva er din umiddelbare tiltak?",
-        "options": {
-          "A": "Ignorere problemet og håpe teamet henter seg inn.",
-          "B": "Informere interessenter om forsinkelsen.",
-          "C": "Flytte arbeidet til et annet team.",
-          "D": "Presse teamet til overtid."
+    "scenarios": {
+      "customerService": [
+        {
+          "question": "En rasende kunde sier at bestillingen kom skadet. Hva gjør du først?",
+          "options": {
+            "A": "Lytt fullt ut, erkjenn problemet og beklag oppriktig.",
+            "B": "Tilby refusjon med en gang bare for å avslutte samtalen raskt.",
+            "C": "Be dem sende bilder på e-post før du gjør noe.",
+            "D": "Forklar at transportskade ikke er selskapets feil."
+          }
+        },
+        {
+          "question": "Kunden er fortsatt opprørt etter unnskyldningen. Hvordan går du videre?",
+          "options": {
+            "A": "Spør hva slags utfall som ville gjøre det godt igjen for dem.",
+            "B": "Gjenta retningslinjene og vent på at de godtar dem.",
+            "C": "Sett dem over til en leder for å unngå konflikten.",
+            "D": "Sett dem på lang vent så de får roet seg ned."
+          }
+        },
+        {
+          "question": "Dere er enige om en erstatning. Hvordan setter du forventninger?",
+          "options": {
+            "A": "Gi en tydelig tidsramme og en måte å følge den på.",
+            "B": "Lov «så snart som mulig» uten noe konkret.",
+            "C": "Si at du «skal prøve», men uten reell forpliktelse.",
+            "D": "Lov levering neste dag som du ikke kan garantere."
+          }
+        },
+        {
+          "question": "Saken er løst. Hvordan hindrer du gjentakelse?",
+          "options": {
+            "A": "Logg rotårsaken og flagg emballasjeproblemet.",
+            "B": "Lukk saken og gå videre til neste samtale.",
+            "C": "Skyld på budet i notatene og la det ligge.",
+            "D": "Legg til et privat notat for å unngå denne kunden neste gang."
+          }
         }
-      },
-      {
-        "question": "Hvordan håndterer du teamets respons på beslutningen din?",
-        "options": {
-          "A": "Kalle inn teammøte for å diskutere situasjonen åpent.",
-          "B": "Sende e-postoppdatering og vente på svar.",
-          "C": "Møte teamledere individuelt.",
-          "D": "La teamet finne ut av det selv."
+      ],
+      "teamLeadership": [
+        {
+          "question": "To teammedlemmer begynner å krangle åpent i møtet ditt. Hva gjør du?",
+          "options": {
+            "A": "Ta en pause og sett en respektfull kjøreregel før dere fortsetter.",
+            "B": "Ta parti med den som har teknisk rett.",
+            "C": "Ignorer det og pløy gjennom agendaen.",
+            "D": "Avslutt møtet brått for å stoppe spenningen."
+          }
+        },
+        {
+          "question": "Etter møtet, hvordan håndterer du konflikten?",
+          "options": {
+            "A": "Møt hver person privat for å forstå deres syn.",
+            "B": "Send en gruppe-e-post som ber alle være profesjonelle.",
+            "C": "Vent og håp at det løser seg selv.",
+            "D": "Flytt en av dem til et annet team."
+          }
+        },
+        {
+          "question": "Du har hørt begge sider. Hvordan går du videre?",
+          "options": {
+            "A": "Legg til rette for en felles samtale om delte mål.",
+            "B": "Påtving en løsning og forvent at alle føyer seg.",
+            "C": "La den mest erfarne bestemme for gruppen.",
+            "D": "Unngå temaet helt for å bevare freden."
+          }
+        },
+        {
+          "question": "Hvordan hindrer du slike sammenstøt i framtiden?",
+          "options": {
+            "A": "Bli enige om teamnormer for uenighet sammen.",
+            "B": "Legg til flere statusmøter for å holde øye med det.",
+            "C": "Overvåk meldingene deres nøye for spenning.",
+            "D": "Anta at det var et engangstilfelle og gjør ingenting."
+          }
         }
-      },
-      {
-        "question": "Hva er din tilnærming til kommunikasjon med interessenter?",
-        "options": {
-          "A": "Levere detaljerte ukentlige fremdriftsrapporter.",
-          "B": "Sette opp krisemøte.",
-          "C": "Lage revidert tidsplan med milepæler.",
-          "D": "Minimere kommunikasjon for å unngå panikk."
+      ],
+      "salesNegotiation": [
+        {
+          "question": "En kunde elsker produktet, men sier prisen er for høy. Ditt svar?",
+          "options": {
+            "A": "Spør hvilken verdi eller hvilket budsjettmål de jobber mot.",
+            "B": "Sett ned prisen med en gang for å vinne avtalen.",
+            "C": "Insister på at prisen er endelig og ikke til forhandling.",
+            "D": "Kritiser konkurrentenes billigere tilbud."
+          }
+        },
+        {
+          "question": "De avslører et begrenset budsjett. Hvordan går du videre?",
+          "options": {
+            "A": "Foreslå en tilpasset pakke som passer budsjettet.",
+            "B": "Gi dem hele produktet med tap.",
+            "C": "Gå fra avtalen på flekken.",
+            "D": "Skjul noen gebyrer så prisen ser lavere ut."
+          }
+        },
+        {
+          "question": "De ber om én innrømmelse til før signering. Hva gjør du?",
+          "options": {
+            "A": "Bytt innrømmelsen mot en lengre forpliktelse.",
+            "B": "Gi den gratis for å unngå enhver friksjon.",
+            "C": "Avslå blankt og hold posisjonen din.",
+            "D": "Si ja muntlig, men utelat det fra kontrakten."
+          }
+        },
+        {
+          "question": "Avtalen er nesten i havn. Hvordan sluttfører du?",
+          "options": {
+            "A": "Bekreft alle vilkår skriftlig og sett neste steg.",
+            "B": "Skynd på signaturen før de ombestemmer seg.",
+            "C": "La detaljene være vage for å lukke raskere.",
+            "D": "Legg til noen overraskelsesvilkår i signeringsøyeblikket."
+          }
         }
-      },
-      {
-        "question": "Hvordan sikrer du gjenoppretting av prosjektet og forebygging framover?",
-        "options": {
-          "A": "Innføre nye prosjektstyringsprosesser.",
-          "B": "Gjennomføre retrospektiv analyse med teamet.",
-          "C": "Ansette ekstra ressurser til prosjektet.",
-          "D": "Gå videre og fokusere på neste prosjekt."
+      ],
+      "projectManagement": [
+        {
+          "question": "Prosjektet ditt sakker akterut. Hva er ditt umiddelbare grep?",
+          "options": {
+            "A": "Vurder rotårsaken med teamet før du reagerer.",
+            "B": "Informer interessentene om forsinkelsen åpent.",
+            "C": "Flytt arbeidet til et annet team.",
+            "D": "Press teamet til å jobbe overtid."
+          }
+        },
+        {
+          "question": "Hvordan håndterer du teamets reaksjon på beslutningen din?",
+          "options": {
+            "A": "Hold et åpent møte for å diskutere situasjonen sammen.",
+            "B": "Send en e-postoppdatering og vent på svar.",
+            "C": "Møt teamlederne enkeltvis for detaljer.",
+            "D": "La teamet finne ut av det på egen hånd."
+          }
+        },
+        {
+          "question": "Hva er din tilnærming til kommunikasjon med interessenter?",
+          "options": {
+            "A": "Del en revidert tidsplan med tydelige milepæler.",
+            "B": "Gi detaljerte ukentlige framdriftsrapporter.",
+            "C": "Kall inn til et hastemøte om krisen med alle.",
+            "D": "Minimer kommunikasjon for å unngå panikk."
+          }
+        },
+        {
+          "question": "Hvordan sikrer du gjenoppretting og hindrer gjentakelse?",
+          "options": {
+            "A": "Kjør en evaluering i etterkant og juster prosessen.",
+            "B": "Legg til ressurser uten å endre måten dere jobber på.",
+            "C": "Innfør strenge nye kontroller umiddelbart.",
+            "D": "Gå videre og fokuser på neste prosjekt."
+          }
         }
-      }
-    ]
+      ],
+      "conflictResolution": [
+        {
+          "question": "To avdelinger skylder på hverandre for en mislykket overlevering. Ditt første steg?",
+          "options": {
+            "A": "Samle fakta fra begge sider nøytralt.",
+            "B": "Avgjør hvem som har skylden ut fra førsteinntrykk.",
+            "C": "Eskaler til toppledelsen umiddelbart.",
+            "D": "Be dem ordne opp seg imellom."
+          }
+        },
+        {
+          "question": "Følelsene er sterke i rommet. Hvordan styrer du diskusjonen?",
+          "options": {
+            "A": "Sett kjøreregler og fokuser på problemet, ikke personene.",
+            "B": "La alle lufte seg fritt uten struktur.",
+            "C": "Kutt diskusjonen kort for å spare tid.",
+            "D": "Ta parti med gruppen som roper høyest."
+          }
+        },
+        {
+          "question": "Du har funnet rotårsaken. Hvordan løser du den?",
+          "options": {
+            "A": "Bli enige om en felles løsning med tydelig ansvar.",
+            "B": "Fordel skyld og krev en unnskyldning.",
+            "C": "Legg til en regel uten å ta tak i den egentlige årsaken.",
+            "D": "Dekk over det bare for å bevare freden."
+          }
+        },
+        {
+          "question": "Hvordan gjenoppbygger du tillit mellom teamene?",
+          "options": {
+            "A": "Sett opp en felles prosess og et oppfølgingsmøte.",
+            "B": "Hold teamene fra hverandre for å unngå mer friksjon.",
+            "C": "Omorganiser rapporteringslinjene i stedet.",
+            "D": "Anta at tilliten kommer tilbake av seg selv."
+          }
+        }
+      ],
+      "presentation": [
+        {
+          "question": "Du skal pitche et forslag til skeptiske ledere. Hvordan åpner du?",
+          "options": {
+            "A": "Start med problemet og resultatet de bryr seg om.",
+            "B": "Start med et langt lysbilde om selskapets historie.",
+            "C": "Åpne med å beklage at du tar tiden deres.",
+            "D": "Kast deg rett inn i dype tekniske detaljer."
+          }
+        },
+        {
+          "question": "En leder avbryter med et vanskelig spørsmål. Hva gjør du?",
+          "options": {
+            "A": "Svar direkte, og vend så tilbake til tråden din.",
+            "B": "Vri deg unna og si at du tar det senere (og gjør det ikke).",
+            "C": "Gjett et svar for å virke selvsikker.",
+            "D": "Bli defensiv over å bli avbrutt."
+          }
+        },
+        {
+          "question": "Du er i ferd med å gå tom for tid. Hvordan tilpasser du deg?",
+          "options": {
+            "A": "Hopp til hovedbudskapet ditt og bevisene for det.",
+            "B": "Hastelese gjennom alle gjenværende lysbilder.",
+            "C": "Dropp forespørselen helt for å spare tid.",
+            "D": "Kjør over tiden og ignorer klokka."
+          }
+        },
+        {
+          "question": "Du er ferdig med presentasjonen. Hvordan avslutter du?",
+          "options": {
+            "A": "Gjenta budskapet og foreslå et tydelig neste steg.",
+            "B": "Avslutt med et vagt «ja, det var det, takk».",
+            "C": "Gå uten noen oppfordring til handling.",
+            "D": "Lov å «sende over alt en gang»."
+          }
+        }
+      ],
+      "generic": [
+        {
+          "question": "Hva er ditt umiddelbare handlingsvalg?",
+          "options": {
+            "A": "Vurder situasjonen og samle fakta først.",
+            "B": "Kommuniser åpent med de berørte.",
+            "C": "Deleger hele problemet til noen andre.",
+            "D": "Handle raskt uten å rådføre deg med noen."
+          }
+        },
+        {
+          "question": "Hvordan involverer du de berørte?",
+          "options": {
+            "A": "Be om innspillene deres før du bestemmer.",
+            "B": "Informer dem når du allerede har bestemt deg.",
+            "C": "Hold dem utenfor for å gå raskere.",
+            "D": "La dem håndtere det helt alene."
+          }
+        },
+        {
+          "question": "Hvordan kommuniserer du planen din?",
+          "options": {
+            "A": "Del tydelige steg, ansvarlige og tidsrammer.",
+            "B": "Gi en grov idé og juster underveis.",
+            "C": "Si så lite som mulig foreløpig.",
+            "D": "Lov for mye for å berolige alle."
+          }
+        },
+        {
+          "question": "Hvordan hindrer du at problemet gjentar seg?",
+          "options": {
+            "A": "Gjennomgå hva som skjedde og forbedre prosessen.",
+            "B": "Legg til kontroller uten å diagnostisere årsaken.",
+            "C": "Gå videre og håp det ikke skjer igjen.",
+            "D": "Skyld på ytre faktorer og la det ligge."
+          }
+        }
+      ]
+    }
   }
 }

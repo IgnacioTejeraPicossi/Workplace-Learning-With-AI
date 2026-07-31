@@ -1,5 +1,5 @@
 // Scenario Simulator component skeleton
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { askStream, saveSimulationResult } from "./api";
 import StreamingProgress from "./StreamingProgress";
@@ -29,6 +29,10 @@ function Simulator() {
   const [simulationResponse, setSimulationResponse] = useState("");
   const [showOptions, setShowOptions] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
+  // Stable id for the current interactive run, so the "already counted" guard
+  // actually dedups: completing and saving the same run share one key. Set when
+  // an interactive run starts (or is loaded); cleared when the run ends.
+  const runIdRef = useRef(null);
   const { colors } = useTheme();
 
   const simulationStatusMessages = useMemo(() => {
@@ -48,13 +52,17 @@ function Simulator() {
   );
 
   const stepQuestions = useMemo(() => {
-    const arr = t("scenarioSimulator.steps", { returnObjects: true });
+    // Steps are now per scenario type; custom/unknown types fall back to a
+    // neutral "generic" arc so the interactive questions match the chosen card.
+    const typeKey =
+      SCENARIO_TYPE_KEYS.find((s) => s.key === scenarioType)?.typeKey || "generic";
+    const arr = t(`scenarioSimulator.scenarios.${typeKey}.steps`, { returnObjects: true });
+    const empty = { question: "", options: { A: "", B: "", C: "", D: "" } };
     if (!Array.isArray(arr) || arr.length < 4) {
-      const empty = { question: "", options: { A: "", B: "", C: "", D: "" } };
       return { 0: empty, 1: empty, 2: empty, 3: empty };
     }
     return { 0: arr[0], 1: arr[1], 2: arr[2], 3: arr[3] };
-  }, [t]);
+  }, [t, scenarioType]);
 
   const simulationStreaming = useStreaming(t("scenarioSimulator.ready"));
 
@@ -165,6 +173,7 @@ function Simulator() {
     setSimulationResponse("");
     setShowOptions(false);
     setSavedProgress(null);
+    runIdRef.current = null;
     simulationStreaming.clearStreaming();
   };
 
@@ -175,188 +184,41 @@ function Simulator() {
     setSimulationResponse("");
     setShowOptions(true);
     setSavedProgress(null);
-    console.log('Starting interactive simulation...');
+    // One stable id per interactive run (used by the completion-dedup guard).
+    runIdRef.current = `simulation_${scenarioType}_${Date.now()}`;
   };
 
   const handleOptionSelect = async (option) => {
     setSelectedOption(option);
     setShowOptions(false);
     
+    const scenarioLabel =
+      scenarioType === 'custom'
+        ? customScenario
+        : scenarioTypes.find((st) => st.key === scenarioType)?.label;
     const currentQuestion = stepQuestions[currentStep];
     const optionText = currentQuestion.options[option];
-    
-    const promptText = `Based on the user's choice of Option ${option}: "${optionText}" in step ${currentStep + 1}, provide a detailed response including:
-1. Immediate consequences of this action
-2. Long-term implications for the project
-3. What the user should do next
-4. Learning points from this decision
 
-Make it educational and realistic for step ${currentStep + 1} of the simulation.`;
+    const promptText = `In a "${scenarioLabel}" workplace training simulation, the situation is: "${currentQuestion.question}"
+The user chose Option ${option}: "${optionText}".
+Provide a detailed, realistic response including:
+1. Immediate consequences of this choice
+2. Longer-term implications for the situation
+3. What the user should do next
+4. Key learning points
+
+Keep it educational and specific to this scenario (step ${currentStep + 1}).`;
     
     try {
       const response = await askStream({ prompt: promptText });
       setSimulationResponse(response);
     } catch (error) {
-      // Fallback responses for each step
-      const fallbackResponses = {
-        0: {
-          'A': `Step 1 - Option A: Ignore the issue and hope the team can catch up.
-
-Immediate consequences: The issue may escalate as the team struggles without support, leading to missed deadlines and increased stress.
-
-Long-term implications: This approach can damage team morale and trust in leadership, potentially causing higher turnover rates.
-
-What to do next: Schedule a team meeting to address the challenges and provide necessary resources and support.
-
-Learning points: Proactive communication and support are essential for maintaining team productivity and morale. Ignoring problems rarely leads to positive outcomes.`,
-          'B': `Step 1 - Option B: Inform the stakeholders about the delay.
-
-Immediate consequences: Stakeholders are aware of the situation and can adjust their expectations and plans accordingly.
-
-Long-term implications: This builds trust and transparency with stakeholders, potentially leading to better collaboration and support in future projects.
-
-What to do next: Work with the team to create a revised timeline and identify areas where additional resources might help.
-
-Learning points: Transparency and proactive communication with stakeholders is crucial for maintaining professional relationships and managing expectations effectively.`,
-          'C': `Step 1 - Option C: Reassign the work to a different team.
-
-Immediate consequences: The new team may need time to understand the project context, potentially causing further delays initially.
-
-Long-term implications: This could strain relationships between teams and may not address the root cause of the original team's challenges.
-
-What to do next: Ensure proper knowledge transfer and provide the new team with all necessary documentation and context.
-
-Learning points: Before reassigning work, it's important to understand why the original team is struggling and whether additional support might be more effective than reassignment.`,
-          'D': `Step 1 - Option D: Pressure the team to work overtime.
-
-Immediate consequences: The team may deliver rushed, flawed work due to stress and fatigue, potentially creating more problems.
-
-Long-term implications: This approach can lead to burnout, decreased morale, and higher turnover rates, damaging team productivity in the long run.
-
-What to do next: Instead of pressuring for overtime, focus on identifying and removing obstacles that are slowing the team down.
-
-Learning points: Sustainable productivity comes from addressing root causes rather than pushing teams beyond their limits. Quality often suffers when teams are overworked.`
-        },
-        1: {
-          'A': `Step 2 - Option A: Schedule a team meeting to discuss the situation openly.
-
-Immediate consequences: Team members feel heard and involved in the decision-making process, leading to better buy-in and collaboration.
-
-Long-term implications: This builds a culture of transparency and trust, improving team dynamics and future project success.
-
-What to do next: Prepare an agenda and gather feedback from team members before the meeting.
-
-Learning points: Open communication and team involvement are key to successful project management and team morale.`,
-          'B': `Step 2 - Option B: Send an email update and wait for responses.
-
-Immediate consequences: Information is disseminated quickly but may lack personal touch and immediate feedback.
-
-Long-term implications: This approach may create distance between leadership and team, potentially affecting future communication.
-
-What to do next: Follow up with individual team members who haven't responded and schedule one-on-one meetings if needed.
-
-Learning points: While email is efficient, personal interaction is often more effective for complex or sensitive situations.`,
-          'C': `Step 2 - Option C: Meet with team leaders individually.
-
-Immediate consequences: You get detailed insights from key team members and can address specific concerns privately.
-
-Long-term implications: This builds strong relationships with team leaders and creates a support network for future challenges.
-
-What to do next: Compile feedback from all leaders and create a comprehensive action plan to address common concerns.
-
-Learning points: Individual meetings allow for deeper discussions and can reveal issues that might not surface in group settings.`,
-          'D': `Step 2 - Option D: Let the team figure it out on their own.
-
-Immediate consequences: Team members may feel abandoned and uncertain about expectations and support.
-
-Long-term implications: This can create a culture of self-preservation rather than collaboration, damaging team cohesion.
-
-What to do next: Reconsider this approach and provide clear guidance and support to the team.
-
-Learning points: While autonomy is important, teams need clear direction and support, especially during challenging times.`
-        },
-        2: {
-          'A': `Step 3 - Option A: Provide detailed weekly progress reports.
-
-Immediate consequences: Stakeholders receive comprehensive updates and can make informed decisions about their own timelines.
-
-Long-term implications: This establishes a reputation for transparency and reliability, strengthening business relationships.
-
-What to do next: Create a standardized reporting template and schedule regular update meetings.
-
-Learning points: Consistent, detailed communication builds trust and helps stakeholders manage their own expectations effectively.`,
-          'B': `Step 3 - Option B: Set up a crisis management meeting.
-
-Immediate consequences: All stakeholders are immediately engaged and can contribute to problem-solving efforts.
-
-Long-term implications: This demonstrates proactive leadership and can strengthen stakeholder relationships through collaborative problem-solving.
-
-What to do next: Prepare a clear agenda and gather all relevant data before the meeting to ensure productive discussion.
-
-Learning points: Crisis management meetings can be effective but require careful preparation to avoid creating unnecessary panic.`,
-          'C': `Step 3 - Option C: Create a revised project timeline with milestones.
-
-Immediate consequences: Stakeholders have clear expectations about new deadlines and can adjust their own plans accordingly.
-
-Long-term implications: This shows professional project management skills and builds confidence in your ability to handle challenges.
-
-What to do next: Present the timeline to stakeholders and get their buy-in on the new milestones.
-
-Learning points: Clear, realistic timelines with specific milestones help manage expectations and provide a roadmap for recovery.`,
-          'D': `Step 3 - Option D: Minimize communication to avoid panic.
-
-Immediate consequences: Stakeholders may become suspicious and lose trust due to lack of information.
-
-Long-term implications: This approach can damage relationships and make future communication more difficult.
-
-What to do next: Reconsider this strategy and provide honest, timely updates to maintain trust.
-
-Learning points: While avoiding panic is important, transparency and regular communication are essential for maintaining stakeholder trust.`
-        },
-        3: {
-          'A': `Step 4 - Option A: Implement new project management processes.
-
-Immediate consequences: The team has clear guidelines and tools to prevent similar issues in future projects.
-
-Long-term implications: This creates a more efficient and predictable project delivery system, improving overall organizational performance.
-
-What to do next: Train the team on new processes and gather feedback to ensure they're practical and effective.
-
-Learning points: Continuous improvement in processes is essential for organizational growth and preventing recurring problems.`,
-          'B': `Step 4 - Option B: Conduct a post-mortem analysis with the team.
-
-Immediate consequences: Team members gain insights into what went wrong and can contribute to solutions.
-
-Long-term implications: This creates a learning culture where mistakes are viewed as opportunities for improvement.
-
-What to do next: Document findings and create action items to address identified issues.
-
-Learning points: Post-mortem analyses are valuable tools for organizational learning and preventing similar issues in the future.`,
-          'C': `Step 4 - Option C: Hire additional resources for the project.
-
-Immediate consequences: The team gets additional support, potentially improving current project outcomes.
-
-Long-term implications: This may address immediate needs but doesn't solve underlying process or communication issues.
-
-What to do next: Ensure new team members are properly onboarded and integrated into existing processes.
-
-Learning points: While additional resources can help, they should be part of a broader strategy that addresses root causes of problems.`,
-          'D': `Step 4 - Option D: Move on and focus on the next project.
-
-Immediate consequences: The team can start fresh without dwelling on past issues.
-
-Long-term implications: This approach may lead to repeated problems if underlying issues aren't addressed.
-
-What to do next: Consider whether this approach truly serves the team and organization's long-term interests.
-
-Learning points: While moving forward is important, learning from past experiences is crucial for continuous improvement and preventing recurring issues.`
-        }
-      };
-      
-      const stepResponses = fallbackResponses[currentStep] || fallbackResponses[0];
+      // Offline fallback: the LLM call failed. Show the localized generic
+      // response instead of the old hardcoded English, project-management-
+      // themed consequences (removed in 1.30.4 — they were shown for every
+      // scenario type regardless of the choice).
       setSimulationResponse(
-        stepResponses[option] ||
-          t("scenarioSimulator.actions.genericFallback", { option, step: currentStep + 1 })
+        t("scenarioSimulator.actions.genericFallback", { option, step: currentStep + 1 })
       );
     }
   };
@@ -371,10 +233,11 @@ Learning points: While moving forward is important, learning from past experienc
       // Simulation completed
       setSimulationActive(false);
       
-      // Check if this simulation was already counted
-      const simulationKey = `simulation_${scenarioType}_${Date.now()}`;
+      // Check if this simulation was already counted. Use the stable per-run id
+      // so completing and saving the same run don't both increment the counter.
+      const simulationKey = runIdRef.current || `simulation_${scenarioType}_${Date.now()}`;
       const completedSimulations = JSON.parse(localStorage.getItem('completedSimulations') || '[]');
-      
+
       if (!completedSimulations.includes(simulationKey)) {
         // Update Dashboard progress only if not already counted
         updateProgress({
@@ -411,9 +274,9 @@ Learning points: While moving forward is important, learning from past experienc
     
     // If simulation is completed, update Dashboard progress
     if (currentStep >= 3) {
-      const simulationKey = `simulation_${scenarioType}_${Date.now()}`;
+      const simulationKey = runIdRef.current || `simulation_${scenarioType}_${Date.now()}`;
       const completedSimulations = JSON.parse(localStorage.getItem('completedSimulations') || '[]');
-      
+
       if (!completedSimulations.includes(simulationKey)) {
         updateProgress({
           simulationsCompleted: 1,
@@ -438,6 +301,8 @@ Learning points: While moving forward is important, learning from past experienc
       setSimulationResponse(latestProgress.simulationResponse);
       setSimulationActive(true);
       setShowOptions(!latestProgress.selectedOption);
+      // Fresh run id for the loaded session so its completion counts once.
+      runIdRef.current = `simulation_${latestProgress.scenarioType || scenarioType}_${Date.now()}`;
       alert(t("scenarioSimulator.alerts.progressLoaded"));
     } else {
       alert(t("scenarioSimulator.alerts.noSavedProgress"));
@@ -451,6 +316,7 @@ Learning points: While moving forward is important, learning from past experienc
     setSimulationResponse("");
     setShowOptions(false);
     setSavedProgress(null);
+    runIdRef.current = null;
   };
 
   return (
