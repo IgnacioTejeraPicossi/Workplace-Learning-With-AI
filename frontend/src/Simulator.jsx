@@ -6,7 +6,7 @@ import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
 import { useStreaming } from "./hooks/useStreaming";
 import { useTheme } from "./ThemeContext";
-import { updateProgress, getCurrentProgress } from "./Dashboard";
+import { updateProgress } from "./Dashboard";
 import SimulationResults from "./SimulationResults";
 
 const SCENARIO_TYPE_KEYS = [
@@ -372,7 +372,6 @@ Learning points: While moving forward is important, learning from past experienc
       setSimulationActive(false);
       
       // Check if this simulation was already counted
-      const currentProgress = getCurrentProgress();
       const simulationKey = `simulation_${scenarioType}_${Date.now()}`;
       const completedSimulations = JSON.parse(localStorage.getItem('completedSimulations') || '[]');
       
@@ -412,7 +411,6 @@ Learning points: While moving forward is important, learning from past experienc
     
     // If simulation is completed, update Dashboard progress
     if (currentStep >= 3) {
-      const currentProgress = getCurrentProgress();
       const simulationKey = `simulation_${scenarioType}_${Date.now()}`;
       const completedSimulations = JSON.parse(localStorage.getItem('completedSimulations') || '[]');
       
@@ -480,8 +478,8 @@ Learning points: While moving forward is important, learning from past experienc
                   transition: 'all 0.2s ease',
                   textAlign: 'center'
                 }}
-                onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
-                onMouseLeave={(e) => e.target.style.borderColor = colors.border}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = colors.primary}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = colors.border}
               >
                 <div style={{ fontSize: '2.5em', marginBottom: 12 }}>
                   {type.icon}
@@ -571,7 +569,7 @@ Learning points: While moving forward is important, learning from past experienc
                       fontSize: '0.9em',
                       marginBottom: 8
                     }}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleStartCustomSimulation();
                       }
@@ -632,14 +630,14 @@ Learning points: While moving forward is important, learning from past experienc
             borderRadius: 8
           }}>
             <span style={{ fontSize: '1.5em' }}>
-              {scenarioType === 'custom' ? '✨' : scenarioTypes.find(t => t.key === scenarioType)?.icon}
+              {scenarioType === 'custom' ? '✨' : scenarioTypes.find(st => st.key === scenarioType)?.icon}
             </span>
             <div>
               <h3 style={{ margin: 0, color: colors.text }}>
-                {scenarioType === 'custom' ? `${customScenario} Simulation` : `${scenarioTypes.find(t => t.key === scenarioType)?.label} Simulation`}
+                {t("scenarioSimulator.session.simulationTitle", { name: scenarioType === 'custom' ? customScenario : scenarioTypes.find(st => st.key === scenarioType)?.label })}
               </h3>
               <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
-                Interactive Training Scenario
+                {t("scenarioSimulator.session.subtitle")}
               </p>
             </div>
           </div>
@@ -658,7 +656,7 @@ Learning points: While moving forward is important, learning from past experienc
           <StreamingText 
             content={simulationStreaming.content}
             loading={simulationStreaming.loading}
-            placeholder="Creating your interactive simulation..."
+            placeholder={t("scenarioSimulator.creatingPlaceholder")}
             style={{ minHeight: '300px' }}
           />
 
@@ -681,7 +679,7 @@ Learning points: While moving forward is important, learning from past experienc
                   cursor: 'pointer'
                 }}
               >
-                🎮 Start Simulation
+                🎮 {t("scenarioSimulator.startSimulation")}
               </button>
               <button
                 onClick={handleSaveProgress}
@@ -694,7 +692,7 @@ Learning points: While moving forward is important, learning from past experienc
                   cursor: 'pointer'
                 }}
               >
-                📋 Save Progress
+                📋 {t("scenarioSimulator.actions.saveProgress")}
               </button>
               <button
                 onClick={handleLoadProgress}
@@ -707,7 +705,7 @@ Learning points: While moving forward is important, learning from past experienc
                   cursor: 'pointer'
                 }}
               >
-                📂 Load Progress
+                📂 {t("scenarioSimulator.actions.loadProgress")}
               </button>
               <button
                 onClick={handleClear}
@@ -720,7 +718,7 @@ Learning points: While moving forward is important, learning from past experienc
                   cursor: 'pointer'
                 }}
               >
-                🔄 New Scenario
+                🔄 {t("scenarioSimulator.actions.newScenario")}
               </button>
             </div>
           )}
@@ -735,7 +733,7 @@ Learning points: While moving forward is important, learning from past experienc
               border: `2px solid ${colors.primary}`,
             }}>
               <h4 style={{ color: colors.text, marginTop: 0, marginBottom: 16 }}>
-                🎯 Interactive Simulation Active
+                🎯 {t("scenarioSimulator.actions.interactiveActive")}
               </h4>
               
               {/* Step Indicator */}
@@ -747,7 +745,7 @@ Learning points: While moving forward is important, learning from past experienc
                 textAlign: 'center'
               }}>
                 <span style={{ color: colors.text, fontWeight: 'bold' }}>
-                  Step {currentStep + 1} of 4
+                  {t("scenarioSimulator.actions.stepOf", { current: currentStep + 1, total: 4 })}
                 </span>
               </div>
 
@@ -772,7 +770,7 @@ Learning points: While moving forward is important, learning from past experienc
               {showOptions && (
                 <div style={{ marginBottom: 20 }}>
                   <h5 style={{ color: colors.text, marginBottom: 12 }}>
-                    {stepQuestions[currentStep]?.question || "What is your immediate course of action?"}
+                    {stepQuestions[currentStep]?.question}
                   </h5>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {['A', 'B', 'C', 'D'].map((option) => (
@@ -790,11 +788,11 @@ Learning points: While moving forward is important, learning from past experienc
                           fontSize: '0.9em',
                           transition: 'all 0.2s ease'
                         }}
-                        onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
-                        onMouseLeave={(e) => e.target.style.borderColor = colors.border}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = colors.primary}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = colors.border}
                       >
                         <strong style={{ marginRight: 8 }}>{option})</strong>
-                        {stepQuestions[currentStep]?.options[option] || 'Option not defined'}
+                        {stepQuestions[currentStep]?.options[option] || t("scenarioSimulator.actions.optionNotDefined")}
                       </button>
                     ))}
                   </div>
@@ -810,9 +808,9 @@ Learning points: While moving forward is important, learning from past experienc
                     borderRadius: 8,
                     marginBottom: 12
                   }}>
-                    <strong style={{ color: colors.text }}>Your Choice:</strong>
+                    <strong style={{ color: colors.text }}>{t("scenarioSimulator.actions.yourChoice")}</strong>
                     <span style={{ color: colors.textSecondary, marginLeft: 8 }}>
-                      Option {selectedOption} - Step {currentStep + 1}
+                      {t("scenarioSimulator.actions.choiceDetail", { option: selectedOption, step: currentStep + 1 })}
                     </span>
                   </div>
                   
@@ -825,7 +823,7 @@ Learning points: While moving forward is important, learning from past experienc
                       marginBottom: 16
                     }}>
                       <h6 style={{ color: colors.text, marginTop: 0, marginBottom: 8 }}>
-                        System Response:
+                        {t("scenarioSimulator.actions.systemResponse")}
                       </h6>
                       <div style={{
                         color: colors.textSecondary,
@@ -851,7 +849,7 @@ Learning points: While moving forward is important, learning from past experienc
                         fontSize: '0.9em'
                       }}
                     >
-                      {currentStep < 3 ? 'Continue to Next Step' : 'Complete Simulation'}
+                      {currentStep < 3 ? t("scenarioSimulator.actions.continueNext") : t("scenarioSimulator.actions.completeSimulation")}
                     </button>
                     <button
                       onClick={handleSaveProgress}
@@ -865,7 +863,7 @@ Learning points: While moving forward is important, learning from past experienc
                         fontSize: '0.9em'
                       }}
                     >
-                      Save Progress
+                      {t("scenarioSimulator.actions.saveProgress")}
                     </button>
                     <button
                       onClick={handleEndSimulation}
@@ -879,7 +877,7 @@ Learning points: While moving forward is important, learning from past experienc
                         fontSize: '0.9em'
                       }}
                     >
-                      End Simulation
+                      {t("scenarioSimulator.actions.endSimulation")}
                     </button>
                   </div>
                 </div>
@@ -893,9 +891,9 @@ Learning points: While moving forward is important, learning from past experienc
                   borderRadius: 8,
                   marginBottom: 16
                 }}>
-                  <strong style={{ color: colors.text }}>Status:</strong> 
+                  <strong style={{ color: colors.text }}>{t("scenarioSimulator.actions.statusLabel")}</strong>
                   <span style={{ color: colors.textSecondary, marginLeft: 8 }}>
-                    Please select an option to continue to Step {currentStep + 1}
+                    {t("scenarioSimulator.actions.selectOptionHint", { step: currentStep + 1 })}
                   </span>
                 </div>
               )}
@@ -910,7 +908,7 @@ Learning points: While moving forward is important, learning from past experienc
                   textAlign: 'center'
                 }}>
                   <span style={{ color: '#2e7d32', fontSize: '0.9em' }}>
-                    ✅ Progress saved at {new Date(savedProgress.timestamp).toLocaleTimeString()}
+                    ✅ {t("scenarioSimulator.actions.progressSavedAt", { time: new Date(savedProgress.timestamp).toLocaleTimeString() })}
                   </span>
                 </div>
               )}
@@ -926,7 +924,7 @@ Learning points: While moving forward is important, learning from past experienc
               borderRadius: 8,
               marginBottom: 16
             }}>
-              <strong>Error:</strong> {simulationStreaming.error}
+              <strong>{t("scenarioSimulator.actions.errorPrefix")}</strong> {simulationStreaming.error}
               <button
                 onClick={handleClear}
                 style={{
@@ -940,7 +938,7 @@ Learning points: While moving forward is important, learning from past experienc
                   fontSize: '0.8em'
                 }}
               >
-                Try Again
+                {t("scenarioSimulator.actions.tryAgain")}
               </button>
             </div>
           )}

@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.2] - 2026-07-31
+
+### Fixed — Scenario Simulator: i18n leakage + hover/cleanup (audit Fase 1)
+
+Audit of `frontend/src/Simulator.jsx` found an **unfinished i18n migration**: the
+`scenarioSimulator` namespace already had every key in EN/NO/ES (71/71 parity),
+but the simulation-session UI still rendered ~20 hardcoded English strings, so in
+Spanish/Norwegian most of the session view showed English once a scenario started.
+
+- **Wired ~20 existing i18n keys** into the JSX (no new translations): session
+  title/subtitle, "Creating…" placeholder, the Start/Save/Load/New-Scenario
+  action buttons, "Interactive Simulation Active", "Step X of N", "Your Choice"/
+  choice detail, "System Response", Continue/Complete/Save/End buttons, the
+  Status label + select-option hint, "Progress saved at …", the error prefix +
+  "Try Again", and the "Option not defined" fallback. 37 `t()` keys now resolve.
+- **Hover bug**: card and option-button hover handlers used `e.target` (the child
+  under the cursor) instead of `e.currentTarget`, so the border highlight could
+  apply to the wrong element or get stuck. Fixed in both places.
+- **Removed dead code**: `const currentProgress = getCurrentProgress()` was
+  assigned twice and never read; dropped both, and removed the now-unused
+  `getCurrentProgress` import from `./Dashboard`.
+- **Deprecated event**: `onKeyPress` on the custom-scenario input → `onKeyDown`.
+- Removed a latent `t` shadowing in `scenarioTypes.find(t => …)` (renamed to `st`).
+- Validated: `@babel/parser` JSX parse OK; all 37 referenced keys exist in EN;
+  no residual targeted English strings remain.
+
+Deferred to later phases (not in this change): broken double-count guard
+(`simulationKey` uses `Date.now()` so the dedup never triggers — Fase 2),
+per-scenario-type step sets + localizing the ~150-line `fallbackResponses`
+block (Fase 3), and per-user Mongo persistence of interactive progress (Fase 4).
+
+---
+
 ## [1.30.1] - 2026-07-24
 
 ### Added — Self-Simulating Reality Agent · Theory Tour: Willow / many-worlds row
