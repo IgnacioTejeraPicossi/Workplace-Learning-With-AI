@@ -1,7 +1,7 @@
 {
   "webSearchModule": {
     "pageTitle": "Búsqueda web (IA + Internet)",
-    "placeholder": "🔍 Pregunta lo que quieras...",
+    "placeholder": "Pregunta lo que quieras...",
     "searching": "⏳ Buscando...",
     "searchBtn": "🔎 Buscar",
     "clearBtn": "🗑️ Limpiar",
@@ -14,6 +14,11 @@
     "match": "% coincidencia",
     "rankLabel": "Posición #{{rank}}",
     "sourceMicroLesson": "📚 Micro-lección",
-    "sourceVideo": "🎥 Vídeo"
+    "sourceVideo": "🎥 Vídeo",
+    "openOnProvider": "Abrir esta búsqueda en DuckDuckGo ↗",
+    "aiAnswerHeading": "🤖 Respuesta de IA",
+    "sourcesHeading": "Fuentes",
+    "groundedNote": "Fundamentado en {{count}} fuentes web",
+    "offlineNote": "⚠️ Síntesis de IA no disponible — se muestran extractos de las fuentes"
   }
 }

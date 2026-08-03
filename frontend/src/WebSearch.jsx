@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { webSearch, saveWebSearchResult } from "./api";
+import { webSearchAi, saveWebSearchResult } from "./api";
 import { useTheme } from "./ThemeContext";
 import { useTranslation } from 'react-i18next';
 
 function WebSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null); // array of {title, url, snippet} or string fallback
+  const [answer, setAnswer] = useState("");      // AI-synthesized answer
+  const [isMock, setIsMock] = useState(false);   // true when the answer is the offline fallback
   const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
   const { t } = useTranslation('common');
@@ -13,12 +15,14 @@ function WebSearch() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const data = await webSearch(query);
+      // AI + Internet: fresh search + AI-synthesized, cited answer.
+      const data = await webSearchAi(query);
 
-      // /api/simple-search returns { results: [{title,url,snippet}], query, provider }
-      // Fallback for any legacy string response
+      // { query, answer, citations, results, is_mock, provider }
       const resultContent = data.results || data.result || JSON.stringify(data, null, 2);
       setResults(resultContent);
+      setAnswer(data.answer || "");
+      setIsMock(!!data.is_mock);
 
       // Save search result summary to MongoDB
       if (query && resultContent) {
@@ -41,6 +45,7 @@ function WebSearch() {
     } catch (error) {
       console.error("Failed to search:", error);
       setResults(t('webSearchModule.errorSearch'));
+      setAnswer("");
     }
     setLoading(false);
   };
@@ -48,6 +53,8 @@ function WebSearch() {
   const handleClear = () => {
     setQuery("");
     setResults(null);
+    setAnswer("");
+    setIsMock(false);
   };
 
   const handleKeyDown = (e) => {
@@ -101,9 +108,9 @@ function WebSearch() {
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)", transition: "transform 0.1s ease",
               minWidth: "100px", whiteSpace: "nowrap"
             }}
-            onMouseDown={(e) => e.target.style.transform = "scale(0.98)"}
-            onMouseUp={(e) => e.target.style.transform = "scale(1)"}
-            onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+            onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.98)"}
+            onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
+            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
             {loading ? t('webSearchModule.searching') : t('webSearchModule.searchBtn')}
           </button>
@@ -137,8 +144,55 @@ function WebSearch() {
             {t('webSearchModule.resultsHeading', { query })}
           </h3>
 
+          {/* AI-synthesized answer, grounded in the sources listed below */}
+          {answer && (
+            <div style={{
+              margin: "12px 0 16px 0", padding: "14px 16px", borderRadius: 8,
+              background: colors.primaryLight || colors.background,
+              border: `1px solid ${colors.primary}`
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                <strong style={{ color: colors.text, fontSize: 15 }}>{t('webSearchModule.aiAnswerHeading')}</strong>
+                {Array.isArray(results) && results.length > 0 && (
+                  <span style={{ fontSize: 12, color: colors.textSecondary }}>
+                    · {t('webSearchModule.groundedNote', { count: results.length })}
+                  </span>
+                )}
+              </div>
+              <div style={{ color: colors.text, fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                {answer}
+              </div>
+              {isMock && (
+                <div style={{ marginTop: 8, fontSize: 12, color: colors.textSecondary, fontStyle: "italic" }}>
+                  {t('webSearchModule.offlineNote')}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Sources heading (only when there are structured results) */}
+          {Array.isArray(results) && results.length > 0 && (
+            <h4 style={{ margin: "0 0 8px 0", color: colors.text, fontSize: 14, fontWeight: 600 }}>
+              {t('webSearchModule.sourcesHeading')}
+            </h4>
+          )}
+
           {/* Structured results (DuckDuckGo array) */}
-          {Array.isArray(results) ? (
+          {Array.isArray(results) && results.length === 0 ? (
+            /* Honest empty state (parsing returned nothing) + link to run the
+               same query on DuckDuckGo, instead of fabricated fake results. */
+            <div style={{ color: colors.textSecondary, fontSize: 14, lineHeight: 1.6 }}>
+              <p style={{ margin: "0 0 10px 0" }}>{t('webSearchModule.noResults')}</p>
+              <a
+                href={`https://duckduckgo.com/?q=${encodeURIComponent(query)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: colors.primary, fontWeight: 600, textDecoration: "none" }}
+              >
+                {t('webSearchModule.openOnProvider')}
+              </a>
+            </div>
+          ) : Array.isArray(results) ? (
             <>
               <p style={{ marginTop: 0, marginBottom: 16, fontSize: "13px", color: colors.textSecondary }}>
                 {t('webSearchModule.foundResults', { count: results.length })}

@@ -1,7 +1,7 @@
 {
   "webSearchModule": {
     "pageTitle": "Web Search (AI + Internet)",
-    "placeholder": "🔍 Ask anything...",
+    "placeholder": "Ask anything...",
     "searching": "⏳ Searching...",
     "searchBtn": "🔎 Search",
     "clearBtn": "🗑️ Clear",
@@ -14,6 +14,11 @@
     "match": "% match",
     "rankLabel": "Rank #{{rank}}",
     "sourceMicroLesson": "📚 Micro-lesson",
-    "sourceVideo": "🎥 Video"
+    "sourceVideo": "🎥 Video",
+    "openOnProvider": "Open this search on DuckDuckGo ↗",
+    "aiAnswerHeading": "🤖 AI Answer",
+    "sourcesHeading": "Sources",
+    "groundedNote": "Grounded in {{count}} web sources",
+    "offlineNote": "⚠️ AI synthesis unavailable — showing grounded source extracts"
   }
 }

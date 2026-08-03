@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.6] - 2026-08-03
+
+### Fixed — Web Search: query mangling, fake fallback results, double icon (audit Fase 1)
+
+- **Query mangling**: `backend/simple_web_search.py` appended
+  `" best practices tutorial guide"` to **every** query, skewing all results
+  toward tutorials and breaking news/factual/fresh lookups. Now the user's query
+  is used verbatim (empty query → 422).
+- **Fabricated fallback results**: on parse failure the endpoint returned 10
+  hardcoded, English-only "results" that were just DuckDuckGo search URLs with
+  invented titles/snippets — they looked real but were not. Replaced with an
+  honest empty response (`results: []` + a `fallback_url`); the UI now shows a
+  localized "no results" state plus a link to run the same query on DuckDuckGo.
+- **Frontend** (`frontend/src/WebSearch.jsx`): added the empty-state branch
+  (wires the previously-unused `noResults` key + new `openOnProvider` link),
+  removed the duplicate 🔍 (the placeholder carried its own magnifier on top of
+  the input's overlay icon — dropped from the placeholder in EN/ES/NO), and
+  switched the button press/hover handlers to `e.currentTarget`.
+- i18n: `openOnProvider` added in EN/ES/NO (parity 16/16).
+- Validated: backend `compileall` OK; `@babel/parser` JSX parse OK; i18n parity.
+
+---
+
 ## [1.30.5] - 2026-07-31
 
 ### Added — Scenario Simulator: per-user progress persistence in Mongo (audit Fase 4)

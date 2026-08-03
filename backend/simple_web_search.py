@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
+from urllib.parse import quote_plus
 import httpx
 import re
 
@@ -19,8 +20,12 @@ class SearchResult(BaseModel):
 async def simple_web_search(request: SimpleSearchRequest):
     """Simple web search using DuckDuckGo (no API key required)"""
     try:
-        # DuckDuckGo search URL
-        query = f"{request.topic} best practices tutorial guide"
+        # Use the user's query verbatim. (Previously we appended
+        # "best practices tutorial guide" to every query, which skewed all
+        # results toward tutorials and broke news/factual/fresh lookups.)
+        query = (request.topic or "").strip()
+        if not query:
+            raise HTTPException(status_code=422, detail="Empty search query")
         url = "https://html.duckduckgo.com/html/"
         params = {"q": query}
         
@@ -72,62 +77,20 @@ async def simple_web_search(request: SimpleSearchRequest):
                     snippet=snippet[:200] + "..." if len(snippet) > 200 else snippet
                 ))
             
-            # If regex parsing didn't work well, provide fallback results
+            # If parsing yielded nothing, be honest: return an empty result set
+            # (the frontend shows a localized "no results" state) plus a link to
+            # run the same query on DuckDuckGo. Previously this fabricated 10
+            # fake, English-only "results" that looked real but were not.
             if not results:
-                print(f"⚠️ DuckDuckGo parsing failed, using fallback results for: {request.topic}")
-                results = [
-                    SearchResult(
-                        title=f"{request.topic} - Tutorial and Best Practices",
-                        url=f"https://duckduckgo.com/?q={request.topic}+tutorial+best+practices",
-                        snippet=f"Search results for {request.topic} with tutorials, best practices, and guides. Click to view full results on DuckDuckGo."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Learning Resources",
-                        url=f"https://duckduckgo.com/?q={request.topic}+learning+resources",
-                        snippet=f"Find learning resources, documentation, and educational content about {request.topic}."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Official Documentation",
-                        url=f"https://duckduckgo.com/?q={request.topic}+official+documentation",
-                        snippet=f"Official documentation and guides for {request.topic}. Comprehensive reference materials and API documentation."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Community Forum",
-                        url=f"https://duckduckgo.com/?q={request.topic}+community+forum+discussion",
-                        snippet=f"Community discussions, Q&A, and support forums for {request.topic}. Get help from other users and experts."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Video Tutorials",
-                        url=f"https://duckduckgo.com/?q={request.topic}+video+tutorial+youtube",
-                        snippet=f"Video tutorials and step-by-step guides for {request.topic}. Learn through visual demonstrations and examples."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Best Practices Guide",
-                        url=f"https://duckduckgo.com/?q={request.topic}+best+practices+guide",
-                        snippet=f"Best practices, tips, and advanced techniques for {request.topic}. Optimize your workflow and avoid common pitfalls."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Examples and Use Cases",
-                        url=f"https://duckduckgo.com/?q={request.topic}+examples+use+cases",
-                        snippet=f"Real-world examples and practical use cases for {request.topic}. See how others are using it successfully."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Troubleshooting Guide",
-                        url=f"https://duckduckgo.com/?q={request.topic}+troubleshooting+problems+solutions",
-                        snippet=f"Common problems and solutions for {request.topic}. Troubleshooting guide and FAQ section."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Advanced Features",
-                        url=f"https://duckduckgo.com/?q={request.topic}+advanced+features+capabilities",
-                        snippet=f"Advanced features and capabilities of {request.topic}. Explore powerful tools and hidden functionality."
-                    ),
-                    SearchResult(
-                        title=f"{request.topic} - Integration Guide",
-                        url=f"https://duckduckgo.com/?q={request.topic}+integration+setup+configuration",
-                        snippet=f"Integration and setup guide for {request.topic}. Learn how to integrate it with other tools and systems."
-                    )
-                ]
-            
+                print(f"⚠️ DuckDuckGo parsing returned no results for: {query}")
+                ddg_url = f"https://duckduckgo.com/?q={quote_plus(query)}"
+                return {
+                    "results": [],
+                    "query": query,
+                    "provider": "DuckDuckGo",
+                    "fallback_url": ddg_url,
+                }
+
             return {"results": results[:request.limit], "query": query, "provider": "DuckDuckGo"}
             
     except httpx.HTTPStatusError as e:
@@ -139,3 +102,76 @@ async def simple_web_search(request: SimpleSearchRequest):
 async def search_health():
     """Health check for search service"""
     return {"status": "healthy", "service": "duckduckgo-web-search"}
+
+
+# ── AI + Internet: grounded answer with citations (1.30.7) ───────────────────
+# Makes the "Web Search (AI + Internet)" module actually AI-grounded: it runs a
+# fresh DuckDuckGo search and asks the LLM to synthesize a concise, cited answer
+# using ONLY those sources. Reusable by other modules that need current info.
+# Offline-safe: if no LLM is configured the answer falls back to a deterministic
+# grounded extract of the top sources and is flagged is_mock=True.
+
+def _deterministic_answer(query: str, results: List[SearchResult]) -> str:
+    """Honest offline summary: the top source extracts, no fabrication."""
+    lines = [f'Top sources found for "{query}":']
+    for i, r in enumerate(results[:3]):
+        snip = (r.snippet or "").strip()
+        lines.append(f"[{i + 1}] {r.title}" + (f" — {snip}" if snip else ""))
+    lines.append("(AI synthesis is unavailable offline — showing grounded source extracts.)")
+    return "\n".join(lines)
+
+
+def _synthesize_answer(query: str, results: List[SearchResult]):
+    """Return (answer, is_mock). Never raises; falls back deterministically."""
+    if not results:
+        return "", False
+    context = "\n".join(
+        f"[{i + 1}] {r.title}\n{(r.snippet or '').strip()}\n({r.url})"
+        for i, r in enumerate(results)
+    )
+    prompt = (
+        "You are a research assistant. Using ONLY the numbered web sources below, "
+        "write a concise, accurate answer to the user's query in 3-6 sentences. "
+        "Cite sources inline as [n]. If the sources do not cover the query, say so "
+        "plainly. Do not invent facts, numbers or URLs.\n\n"
+        f"User query: {query}\n\nSources:\n{context}\n\nAnswer:"
+    )
+    try:
+        try:
+            from backend.llm import ask_ai_unified_sync
+        except ImportError:
+            from llm import ask_ai_unified_sync
+        result = ask_ai_unified_sync(
+            prompt=prompt, task_type="web_search", complexity="medium", max_tokens=500
+        )
+    except Exception as e:  # pragma: no cover - defensive
+        print(f"⚠️ AI web-search synthesis failed: {e}")
+        result = None
+
+    if not result or result.startswith("[MOCKED RESPONSE"):
+        return _deterministic_answer(query, results), True
+    return result.strip(), False
+
+
+@router.post("/web-search-ai")
+async def web_search_ai(request: SimpleSearchRequest):
+    """Fresh web search + AI-synthesized, cited answer (reusable across modules)."""
+    query = (request.topic or "").strip()
+    if not query:
+        raise HTTPException(status_code=422, detail="Empty search query")
+
+    search = await simple_web_search(SimpleSearchRequest(topic=query, limit=request.limit or 6))
+    results = search.get("results", [])
+    answer, is_mock = _synthesize_answer(query, results)
+    citations = [
+        {"n": i + 1, "title": r.title, "url": r.url} for i, r in enumerate(results)
+    ]
+    return {
+        "query": query,
+        "answer": answer,
+        "citations": citations,
+        "results": results,
+        "is_mock": is_mock,
+        "provider": "DuckDuckGo + AI",
+        "fallback_url": search.get("fallback_url"),
+    }

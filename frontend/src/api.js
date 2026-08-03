@@ -155,6 +155,18 @@ export async function webSearch(query) {
   return res.json();
 }
 
+// AI + Internet: fresh search + AI-synthesized, cited answer. Returns
+// { query, answer, citations, results, is_mock, provider, fallback_url }.
+// Reusable by other modules that need current, grounded information.
+export async function webSearchAi(query, limit = 6) {
+  const res = await fetchWithAuth(`${API_BASE}/api/web-search-ai`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic: query, limit }),
+  });
+  return res.json();
+}
+
 export async function fetchCareerSessions() {
   const res = await fetchWithAuth(`${API_BASE}/user/career-sessions`);
   return res.json();

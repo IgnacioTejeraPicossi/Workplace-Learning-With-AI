@@ -1,7 +1,7 @@
 {
   "webSearchModule": {
     "pageTitle": "Nettsøk (AI + Internett)",
-    "placeholder": "🔍 Spør om hva som helst...",
+    "placeholder": "Spør om hva som helst...",
     "searching": "⏳ Søker...",
     "searchBtn": "🔎 Søk",
     "clearBtn": "🗑️ Tøm",
@@ -14,6 +14,11 @@
     "match": "% treff",
     "rankLabel": "Rang #{{rank}}",
     "sourceMicroLesson": "📚 Mikro-leksjon",
-    "sourceVideo": "🎥 Video"
+    "sourceVideo": "🎥 Video",
+    "openOnProvider": "Åpne dette søket i DuckDuckGo ↗",
+    "aiAnswerHeading": "🤖 AI-svar",
+    "sourcesHeading": "Kilder",
+    "groundedNote": "Basert på {{count}} nettkilder",
+    "offlineNote": "⚠️ AI-syntese utilgjengelig — viser utdrag fra kildene"
   }
 }
