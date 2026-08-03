@@ -351,6 +351,23 @@ The Cybersecurity module is the largest Enterprise Agent, with its own dedicated
 
 Treat as a **separate service boundary** — keep API stable, do not couple to Python backend internals.
 
+### Web-search architecture map (the 6 paths are NOT duplicates)
+
+Audited 2026-08-03 ([1.30.6]–[1.30.8]). Several routes look like duplicates but
+serve **different consumers** — do not merge them blindly:
+
+| Path / service | Purpose | Consumer(s) |
+|---|---|---|
+| `POST /api/web-search-ai` (`simple_web_search.py`) | Fresh DuckDuckGo search **+ AI-synthesized cited answer** (`is_mock` offline fallback) | **Web Search UI** (`WebSearch.jsx` → `webSearchAi`). Reusable by other modules needing current info. |
+| `POST /api/simple-search` (`simple_web_search.py`) | DuckDuckGo scrape → raw links (POST form; a GET gets a 202 anti-bot page) | **KnowledgeMap.jsx** (direct `fetch`); also called internally by `/api/web-search-ai` |
+| `POST/GET/DELETE /api/web-search/` (`web_search.py`) | **Persistence** of saved search results in Mongo | **Babel Library** + Web Search "save" |
+| Node **`websearch-backend`** `POST /web-search` (port 8080) | Standalone DDG research service | `services/agi_ai_enrich_service.py` + `services/english_mentor.py` (both degrade gracefully to DDG). **Active — do not remove.** |
+| `POST /web-search` (`app.py` → `web_search_query`) | LLM-native web search tool | Only the **RunTest** API harness |
+
+Removed in [1.30.8] as provably dead (0 callers): the `webSearch` wrapper in
+`api.js` and the `POST /api/knowledge-map/web-search` endpoint (it returned
+hardcoded fake `example.com` results).
+
 ---
 
 ## 10) n8n Workflows

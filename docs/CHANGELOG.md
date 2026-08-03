@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.8] - 2026-08-03
+
+### Removed / Docs — Web Search: dead-code cleanup + architecture map (audit Fase 3)
+
+Fase 3 was scoped as "consolidate duplicate search routes / maybe drop the Node
+backend". Investigation showed the routes are **not** duplicates — they serve
+different consumers — and the Node `websearch-backend` is **actively used** by
+`agi_ai_enrich_service.py` and `english_mentor.py` (kept). Only two things were
+provably dead (0 callers, verified across frontend + backend):
+
+- Removed the unused `webSearch` wrapper from `frontend/src/api.js` (the Web
+  Search UI uses `webSearchAi`; KnowledgeMap calls `/api/simple-search` directly).
+- Removed the dead `POST /api/knowledge-map/web-search` endpoint
+  (`perform_web_search` in `backend/app.py`) — it returned hardcoded fake
+  `example.com` results, was never finished, and had no callers.
+- **Documented** the 6-path web-search architecture map in
+  `.claude/MODULES_REFERENCE.md` (§9) so the routes are not mistaken for
+  duplicates again, and marked the Node backend "do not remove".
+- Validated: `app.py` compiles; `api.js` parses; no remaining references to
+  either removed symbol; all 10 offline suites still green (99/99).
+
+---
+
 ## [1.30.7] - 2026-08-03
 
 ### Added — Web Search: real "AI + Internet" grounded answer with citations (audit Fase 2)

@@ -1885,61 +1885,9 @@ def calculate_text_similarity(query, text):
     
     return len(intersection) / len(union) if union else 0.0
 
-@app.post("/api/knowledge-map/web-search")
-async def perform_web_search(request: Request):
-    """Perform web search for a topic and prepare results for future library integration"""
-    try:
-        data = await request.json()
-        topic = data.get("topic", "")
-        limit = data.get("limit", 10)
-        
-        if not topic:
-            return JSONResponse(status_code=400, content={"error": "Topic is required"})
-        
-        # Perform web search (this would integrate with your existing search service)
-        # For now, we'll simulate the search results
-        search_results = [
-            {
-                "title": f"Search result 1 for {topic}",
-                "url": f"https://example.com/result1",
-                "snippet": f"This is a search result about {topic}",
-                "score": 0.95,
-                "topic": topic,
-                "search_timestamp": "2025-01-30T10:00:00Z",
-                "ready_for_library": True,
-                "library_metadata": {
-                    "type": "web_article",
-                    "source": "web_search",
-                    "topic": topic,
-                    "relevance_score": 0.95
-                }
-            },
-            {
-                "title": f"Search result 2 for {topic}",
-                "url": f"https://example.com/result2",
-                "snippet": f"Another search result about {topic}",
-                "score": 0.87,
-                "topic": topic,
-                "search_timestamp": "2025-01-30T10:00:00Z",
-                "ready_for_library": True,
-                "library_metadata": {
-                    "type": "web_article",
-                    "source": "web_search",
-                    "topic": topic,
-                    "relevance_score": 0.87
-                }
-            }
-        ]
-        
-        # Limit results
-        search_results = search_results[:limit]
-        
-        print(f"🔍 Web search for '{topic}' returned {len(search_results)} results")
-        return {"results": search_results}
-        
-    except Exception as e:
-        print(f"❌ Error in web search: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+# (Removed the dead `/api/knowledge-map/web-search` endpoint — it returned
+# hardcoded fake example.com results, was never finished, and had no callers.
+# Real search lives in /api/web-search-ai and /api/simple-search. 1.30.8)
 
 # Saved Videos endpoints
 @app.get("/api/saved-videos/test")

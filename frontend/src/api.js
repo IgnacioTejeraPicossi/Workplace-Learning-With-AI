@@ -145,15 +145,8 @@ export async function postSkillsForecast(input) {
 
 // Removed old lesson APIs - now using MongoDB micro-lessons API
 
-export async function webSearch(query) {
-  // Uses DuckDuckGo via FastAPI /api/simple-search (no external API key required)
-  const res = await fetchWithAuth(`${API_BASE}/api/simple-search`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic: query, limit: 8 }),
-  });
-  return res.json();
-}
+// (Removed the unused `webSearch` wrapper — the Web Search UI uses `webSearchAi`
+// below, and KnowledgeMap calls /api/simple-search directly. 1.30.8)
 
 // AI + Internet: fresh search + AI-synthesized, cited answer. Returns
 // { query, answer, citations, results, is_mock, provider, fallback_url }.
