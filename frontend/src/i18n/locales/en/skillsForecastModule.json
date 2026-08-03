@@ -67,6 +67,11 @@
       "sample1": "I'm a junior developer with 2 years of experience in JavaScript and React. I want to advance to a senior role.",
       "sample2": "I'm a project manager looking to transition into product management. I have experience with Agile methodologies.",
       "sample3": "I'm a marketing specialist wanting to learn data analysis and digital marketing automation."
+    },
+    "freshTrends": {
+      "title": "🌐 Emerging skills & trends",
+      "intro": "Fresh, AI-summarized in-demand skills and industry trends for your profile — grounded in live web sources with citations.",
+      "query": "emerging in-demand skills and industry trends for this professional profile: {{topic}} (2026)"
     }
   }
 }

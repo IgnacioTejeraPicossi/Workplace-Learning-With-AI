@@ -67,6 +67,11 @@
       "sample1": "Jeg er juniorutvikler med 2 års erfaring i JavaScript og React. Jeg vil bli senior.",
       "sample2": "Jeg er prosjektleder og vil gå over til produktledelse. Jeg har erfaring med smidige metoder.",
       "sample3": "Jeg jobber med markedsføring og vil lære dataanalyse og automatisering av digital markedsføring."
+    },
+    "freshTrends": {
+      "title": "🌐 Nye ferdigheter og trender",
+      "intro": "Ferske, AI-oppsummerte etterspurte ferdigheter og bransjetrender for profilen din — basert på nettkilder med kildehenvisninger.",
+      "query": "nye etterspurte ferdigheter og bransjetrender for denne profesjonelle profilen: {{topic}} (2026)"
     }
   }
 }

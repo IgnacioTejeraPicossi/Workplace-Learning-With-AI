@@ -67,6 +67,11 @@
       "sample1": "Soy un desarrollador junior con 2 años de experiencia en JavaScript y React. Quiero avanzar a un rol senior.",
       "sample2": "Soy un gestor de proyectos que quiere pasar a la gestión de producto. Tengo experiencia con metodologías Agile.",
       "sample3": "Soy especialista en marketing y quiero aprender análisis de datos y automatización del marketing digital."
+    },
+    "freshTrends": {
+      "title": "🌐 Habilidades y tendencias emergentes",
+      "intro": "Habilidades más demandadas y tendencias del sector para tu perfil, resumidas por IA — fundamentadas en fuentes web con citas.",
+      "query": "habilidades más demandadas y tendencias del sector emergentes para este perfil profesional: {{topic}} (2026)"
     }
   }
 }

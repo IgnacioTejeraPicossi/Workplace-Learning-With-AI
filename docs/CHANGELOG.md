@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.11] - 2026-08-03
+
+### Added — FreshInsights: Skills Forecast consumer (rollout complete)
+
+- **Skills Forecast** (`SkillsForecast.jsx`): after a forecast completes, a
+  `FreshInsights` panel ("🌐 Emerging skills & trends", `autoLoad=false`) offers
+  on-demand in-demand skills & industry trends grounded in fresh web sources,
+  built from the user's profile input (localized query via
+  `skillsForecastModule.freshTrends.*`).
+- Completes the `/api/web-search-ai` rollout begun in [1.30.9]–[1.30.10]:
+  consumers are now AGI Hub (Live Signals), AI Career Coach, Cybersecurity
+  (Threat Intel), KnowledgeMap (upgraded search) and Skills Forecast.
+- i18n EN/ES/NO parity: `skillsForecastModule` 49/49. Frontend-only.
+- Validated: `@babel/parser` parse OK; i18n parity.
+
+---
+
 ## [1.30.10] - 2026-08-03
 
 ### Added — FreshInsights rolled out to Career Coach, Cybersecurity + KnowledgeMap upgrade

@@ -5,6 +5,7 @@ import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
 import { useStreaming } from "./hooks/useStreaming";
 import { useTheme } from "./ThemeContext";
+import FreshInsights from "./FreshInsights";
 
 function SkillsForecast() {
   const [input, setInput] = useState("");
@@ -508,6 +509,18 @@ function SkillsForecast() {
               >
                 {t("skillsForecastModule.postActions.scheduleReview")}
               </button>
+            </div>
+          )}
+
+          {/* Fresh, web-grounded emerging skills & trends for this profile (on demand) */}
+          {forecastStreaming.isComplete && (
+            <div style={{ marginTop: 24, borderTop: `1px solid ${colors.border}`, paddingTop: 20 }}>
+              <FreshInsights
+                query={t("skillsForecastModule.freshTrends.query", { topic: input })}
+                title={t("skillsForecastModule.freshTrends.title")}
+                intro={t("skillsForecastModule.freshTrends.intro")}
+                autoLoad={false}
+              />
             </div>
           )}
         </div>
