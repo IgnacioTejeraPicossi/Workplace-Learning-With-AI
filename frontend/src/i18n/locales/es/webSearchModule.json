@@ -19,6 +19,12 @@
     "aiAnswerHeading": "🤖 Respuesta de IA",
     "sourcesHeading": "Fuentes",
     "groundedNote": "Fundamentado en {{count}} fuentes web",
-    "offlineNote": "⚠️ Síntesis de IA no disponible — se muestran extractos de las fuentes"
+    "offlineNote": "⚠️ Síntesis de IA no disponible — se muestran extractos de las fuentes",
+    "freshInsights": {
+      "defaultTitle": "🌐 Novedades (IA + Internet)",
+      "refreshBtn": "🔄 Traer novedades",
+      "loading": "Buscando lo más reciente…",
+      "poweredBy": "IA + Internet · fundamentado en fuentes web en vivo"
+    }
   }
 }

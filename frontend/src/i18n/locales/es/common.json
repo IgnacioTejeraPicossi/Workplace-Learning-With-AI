@@ -2511,7 +2511,8 @@
       "benefits": "Los beneficios de la AGI",
       "homoVsAi": "Homo Sapiens vs. IA en Testing",
       "voices": "Voces sobre la AGI",
-      "reflections": "Reflexiones de la IA/AGI"
+      "reflections": "Reflexiones de la IA/AGI",
+      "liveSignals": "Señales en vivo"
     },
     "agiProgress": {
       "loading": "Cargando progreso de la AGI…",
@@ -2550,6 +2551,11 @@
         "A": "Auditivo",
         "S": "Velocidad"
       }
+    },
+    "agiLiveSignals": {
+      "title": "🛰️ Últimas señales AGI",
+      "intro": "Un pulso en vivo, resumido por IA, del progreso reciente hacia la AGI — fundamentado en fuentes web frescas con citas. Pulsa «Traer novedades» para actualizar.",
+      "query": "últimos avances y hitos en inteligencia artificial general AGI 2026"
     }
   },
   "homoVsAi": {

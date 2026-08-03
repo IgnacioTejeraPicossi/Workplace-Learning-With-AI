@@ -2149,7 +2149,8 @@
       "benefits": "Fordelene med AGI",
       "homoVsAi": "Homo Sapiens vs. KI i Test",
       "voices": "Stemmer om AGI",
-      "reflections": "Refleksjoner fra KI-en/AGI"
+      "reflections": "Refleksjoner fra KI-en/AGI",
+      "liveSignals": "Sanntidssignaler"
     },
     "agiProgress": {
       "title": "AGI‑fremdrift",
@@ -2377,6 +2378,11 @@
       "es": "Spansk",
       "de": "Tysk",
       "fr": "Fransk"
+    },
+    "agiLiveSignals": {
+      "title": "🛰️ Siste AGI-signaler",
+      "intro": "En sanntids, AI-oppsummert puls av nylige AGI-fremskritt — basert på ferske nettkilder med kildehenvisninger. Trykk «Hent siste» for å oppdatere.",
+      "query": "siste fremskritt og milepæler innen kunstig generell intelligens AGI 2026"
     }
   },
   "aiLearning": {

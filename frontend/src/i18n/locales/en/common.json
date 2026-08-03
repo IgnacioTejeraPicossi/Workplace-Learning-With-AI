@@ -1989,7 +1989,8 @@
       "benefits": "The Benefits of AGI",
       "homoVsAi": "Homo Sapiens vs. AI in Testing",
       "voices": "Voices on AGI",
-      "reflections": "Reflections from the AI/AGI"
+      "reflections": "Reflections from the AI/AGI",
+      "liveSignals": "Live Signals"
     },
     "agiProgress": {
       "title": "AGI Progress Tracker",
@@ -2025,6 +2026,11 @@
         "A": "Auditory",
         "S": "Speed"
       }
+    },
+    "agiLiveSignals": {
+      "title": "🛰️ Latest AGI Signals",
+      "intro": "A live, AI-summarized pulse of recent AGI progress — grounded in fresh web sources with citations. Press “Get latest” to refresh.",
+      "query": "latest artificial general intelligence AGI research progress and milestones 2026"
     }
   },
   "jMessages": {

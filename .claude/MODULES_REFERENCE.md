@@ -368,6 +368,15 @@ Removed in [1.30.8] as provably dead (0 callers): the `webSearch` wrapper in
 `api.js` and the `POST /api/knowledge-map/web-search` endpoint (it returned
 hardcoded fake `example.com` results).
 
+**Reusable consumer — `FreshInsights`** ([1.30.9], `frontend/src/FreshInsights.jsx`):
+a drop-in "AI + Internet" freshness panel any module can embed. Props
+`query` / `title` / `intro` / `autoLoad`; it calls `webSearchAi` and renders the
+AI answer + citations + sources (i18n via `webSearchModule.*` + the
+`webSearchModule.freshInsights.*` block; `is_mock`-aware). First consumer: the
+**AGI Progress Hub** "🛰️ Live Signals" tab (`AgiProgressPage.jsx`). Planned next
+consumers: AI Career Coach / Skills Forecast, Cybersecurity, and a KnowledgeMap
+upgrade from `/api/simple-search` to `/api/web-search-ai`.
+
 ---
 
 ## 10) n8n Workflows

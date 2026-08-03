@@ -19,6 +19,12 @@
     "aiAnswerHeading": "🤖 AI-svar",
     "sourcesHeading": "Kilder",
     "groundedNote": "Basert på {{count}} nettkilder",
-    "offlineNote": "⚠️ AI-syntese utilgjengelig — viser utdrag fra kildene"
+    "offlineNote": "⚠️ AI-syntese utilgjengelig — viser utdrag fra kildene",
+    "freshInsights": {
+      "defaultTitle": "🌐 Ferske innsikter (AI + Internett)",
+      "refreshBtn": "🔄 Hent siste",
+      "loading": "Henter det nyeste…",
+      "poweredBy": "AI + Internett · basert på ferske nettkilder"
+    }
   }
 }

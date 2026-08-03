@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.9] - 2026-08-03
+
+### Added — FreshInsights: reusable "AI + Internet" panel + AGI Hub first consumer
+
+Lets other modules reuse the `/api/web-search-ai` endpoint for current, cited,
+web-grounded information.
+
+- **`frontend/src/FreshInsights.jsx`** — a drop-in panel: props `query` / `title`
+  / `intro` / `autoLoad` (default true). Calls `webSearchAi`, renders the AI
+  answer (with "grounded in N sources" + `is_mock` offline notice) above a cited
+  sources list, plus a "🔄 Get latest" refresh button. Honest empty state with a
+  DuckDuckGo link when there are no sources. Fully themed and i18n.
+- **First consumer**: AGI Progress Hub gains a 7th tab **"🛰️ Live Signals"**
+  (`AgiProgressPage.jsx`) that renders `FreshInsights` with a localized AGI query
+  — a live, AI-summarized pulse of recent AGI progress. (The owner wanted the AGI
+  Hub to stay "constantly updating"; this is that feed.)
+- **i18n** (EN/ES/NO): `webSearchModule.freshInsights.*` (panel chrome) +
+  `help.agiTabs.liveSignals` + `help.agiLiveSignals.{title,intro,query}`.
+  Localized query so sources come back in the user's language.
+- Frontend-only; the endpoint already has offline contract tests
+  (`test_web_search_ai_contracts.py`). Validated: `@babel/parser` parse OK for
+  `FreshInsights.jsx` + `AgiProgressPage.jsx`; i18n parity (webSearchModule 24/24;
+  AGI keys present in all three locales).
+- Planned next consumers: AI Career Coach / Skills Forecast, Cybersecurity, and a
+  KnowledgeMap upgrade to `/api/web-search-ai`.
+
+---
+
 ## [1.30.8] - 2026-08-03
 
 ### Removed / Docs — Web Search: dead-code cleanup + architecture map (audit Fase 3)

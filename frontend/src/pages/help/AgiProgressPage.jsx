@@ -6,6 +6,7 @@ import BenefitsOfAGI from './agi/BenefitsOfAGI';
 import HomoSapiensVsAI from './agi/HomoSapiensVsAI';
 import VoicesOnAGI from './agi/VoicesOnAGI';
 import ReflectionsFromAI from './agi/ReflectionsFromAI';
+import FreshInsights from '../../FreshInsights';
 
 export default function AgiProgressPage() {
   const { t } = useTranslation();
@@ -20,6 +21,7 @@ export default function AgiProgressPage() {
     { id: 'benefits', labelKey: 'help.agiTabs.benefits', fallback: 'The Benefits of AGI', icon: '✨' },
     { id: 'voices', labelKey: 'help.agiTabs.voices', fallback: 'Voices on AGI', icon: '🎙️' },
     { id: 'reflections', labelKey: 'help.agiTabs.reflections', fallback: 'Reflections from the AI/AGI', icon: '🪞' },
+    { id: 'liveSignals', labelKey: 'help.agiTabs.liveSignals', fallback: 'Live Signals', icon: '🛰️' },
   ];
 
   const renderContent = () => {
@@ -36,6 +38,14 @@ export default function AgiProgressPage() {
         return <VoicesOnAGI />;
       case 'reflections':
         return <ReflectionsFromAI />;
+      case 'liveSignals':
+        return (
+          <FreshInsights
+            query={t('help.agiLiveSignals.query')}
+            title={t('help.agiLiveSignals.title')}
+            intro={t('help.agiLiveSignals.intro')}
+          />
+        );
       default:
         return <AgiTracker />;
     }

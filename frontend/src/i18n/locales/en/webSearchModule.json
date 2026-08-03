@@ -19,6 +19,12 @@
     "aiAnswerHeading": "🤖 AI Answer",
     "sourcesHeading": "Sources",
     "groundedNote": "Grounded in {{count}} web sources",
-    "offlineNote": "⚠️ AI synthesis unavailable — showing grounded source extracts"
+    "offlineNote": "⚠️ AI synthesis unavailable — showing grounded source extracts",
+    "freshInsights": {
+      "defaultTitle": "🌐 Fresh Insights (AI + Internet)",
+      "refreshBtn": "🔄 Get latest",
+      "loading": "Fetching the latest…",
+      "poweredBy": "AI + Internet · grounded in live web sources"
+    }
   }
 }
