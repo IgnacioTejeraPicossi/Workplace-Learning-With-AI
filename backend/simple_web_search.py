@@ -143,10 +143,13 @@ def _synthesize_answer(query: str, results: List[SearchResult]):
         for i, r in enumerate(results)
     )
     prompt = (
-        "You are a research assistant. Using ONLY the numbered web sources below, "
-        "write a concise, accurate answer to the user's query in 3-6 sentences. "
-        "Cite sources inline as [n]. If the sources do not cover the query, say so "
-        "plainly. Do not invent facts, numbers or URLs.\n\n"
+        "You are a research assistant. Using ONLY the numbered web sources below "
+        "(their titles and snippets), write a concise, useful answer to the user's "
+        "query in 3-6 sentences, citing sources inline as [n]. The snippets may be "
+        "short — when they don't contain full details, still summarize the main "
+        "themes and signals the sources point to, and note briefly that it is based "
+        "on titles/snippets rather than refusing to answer. Do not invent specific "
+        "facts, numbers or URLs beyond what the sources state.\n\n"
         f"User query: {query}\n\nSources:\n{context}\n\nAnswer:"
     )
     try:
