@@ -39,6 +39,8 @@ const KnowledgeMap = () => {
   
   // Web search states
   const [webSearchResults, setWebSearchResults] = useState([]);
+  const [webSearchAnswer, setWebSearchAnswer] = useState('');
+  const [webSearchIsMock, setWebSearchIsMock] = useState(false);
   const [webSearchLoading, setWebSearchLoading] = useState(false);
   const [webSearchTopic, setWebSearchTopic] = useState('');
   const [showWebSearch, setShowWebSearch] = useState(false);
@@ -96,31 +98,35 @@ const KnowledgeMap = () => {
     
     try {
       const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      console.log('📡 Making request to:', `${API_BASE}/api/simple-search`);
-      const response = await fetch(`${API_BASE}/api/simple-search`, {
+      // Upgraded from /api/simple-search (raw links) to /api/web-search-ai
+      // (fresh search + AI-synthesized cited answer). 1.30.10
+      console.log('📡 Making request to:', `${API_BASE}/api/web-search-ai`);
+      const response = await fetch(`${API_BASE}/api/web-search-ai`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           topic: topic,
-          limit: 10
+          limit: 6
         })
       });
-      
+
       console.log('📡 Response status:', response.status);
       console.log('📡 Response ok:', response.ok);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('📡 Response data:', data);
-        
-        // Use results directly as in original
+
         setWebSearchResults(data.results || []);
+        setWebSearchAnswer(data.answer || '');
+        setWebSearchIsMock(!!data.is_mock);
       } else {
         const errorText = await response.text();
         console.error('❌ Web search failed:', response.status, response.statusText, errorText);
         setWebSearchResults([]);
+        setWebSearchAnswer('');
       }
     } catch (error) {
       console.error('❌ Web search error:', error);
@@ -1298,6 +1304,8 @@ const KnowledgeMap = () => {
           <WebSearchResults
             topic={webSearchTopic}
             results={webSearchResults}
+            answer={webSearchAnswer}
+            isMock={webSearchIsMock}
             isLoading={webSearchLoading}
             onClose={() => setShowWebSearch(false)}
           />

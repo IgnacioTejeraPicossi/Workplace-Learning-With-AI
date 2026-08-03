@@ -63,6 +63,11 @@
       "continueSession": "💬 Fortsett økt",
       "saveSession": "📋 Lagre økt",
       "newSession": "🔄 Ny økt"
+    },
+    "freshTrends": {
+      "title": "🌐 Siste trender for dette området",
+      "intro": "Ferske, AI-oppsummerte trender og etterspurte ferdigheter — basert på nettkilder med kildehenvisninger.",
+      "query": "nylige trender og mest etterspurte ferdigheter innen {{topic}} for karriereutvikling i 2026"
     }
   }
 }

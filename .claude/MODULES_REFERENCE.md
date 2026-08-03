@@ -373,9 +373,12 @@ a drop-in "AI + Internet" freshness panel any module can embed. Props
 `query` / `title` / `intro` / `autoLoad`; it calls `webSearchAi` and renders the
 AI answer + citations + sources (i18n via `webSearchModule.*` + the
 `webSearchModule.freshInsights.*` block; `is_mock`-aware). First consumer: the
-**AGI Progress Hub** "🛰️ Live Signals" tab (`AgiProgressPage.jsx`). Planned next
-consumers: AI Career Coach / Skills Forecast, Cybersecurity, and a KnowledgeMap
-upgrade from `/api/simple-search` to `/api/web-search-ai`.
+**AGI Progress Hub** "🛰️ Live Signals" tab (`AgiProgressPage.jsx`). Rolled out
+[1.30.10] to: **AI Career Coach** (on-demand "latest trends" panel after a
+session), **Cybersecurity** (11th tab "🛰️ Threat Intel (live)"), and
+**KnowledgeMap** (per-topic search upgraded from `/api/simple-search` to
+`/api/web-search-ai`; `WebSearchResults.jsx` now shows an AI answer above the
+sources). Remaining optional consumer: Skills Forecast.
 
 ---
 

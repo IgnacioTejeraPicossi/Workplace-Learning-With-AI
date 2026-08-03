@@ -3402,7 +3402,8 @@
       "secureCodingCoach": "Sikker kode-veileder",
       "complianceTracker": "Samsvarssporing",
       "incidentDrills": "Hendelsesøvelser",
-      "knowledge": "Kunnskap"
+      "knowledge": "Kunnskap",
+      "threatIntel": "Trusselinfo (live)"
     },
     "common": {
       "loading": "Laster...",
@@ -3728,6 +3729,11 @@
       "confidence": "Konfidens: {{pct}} %",
       "sources": "Kilder:",
       "responseTime": "Responstid: {{time}} s"
+    },
+    "threatIntel": {
+      "title": "🛰️ Nylig trusselinformasjon",
+      "intro": "Et sanntids, AI-oppsummert sammendrag av nylige cybersikkerhetstrusler, CVE-er og varsler — basert på ferske nettkilder med kildehenvisninger. Trykk «Hent siste» for å oppdatere.",
+      "query": "nylige cybersikkerhetstrusler sårbarheter CVE og varsler 2026"
     }
   },
   "ai": {

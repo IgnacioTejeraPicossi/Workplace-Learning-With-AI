@@ -2243,7 +2243,8 @@
       "secureCodingCoach": "Secure Coding Coach",
       "complianceTracker": "Compliance Tracker",
       "incidentDrills": "Incident Drills",
-      "knowledge": "Knowledge"
+      "knowledge": "Knowledge",
+      "threatIntel": "Threat Intel (live)"
     },
     "common": {
       "loading": "Loading...",
@@ -2569,6 +2570,11 @@
       "confidence": "Confidence: {{pct}}%",
       "sources": "Sources:",
       "responseTime": "Response time: {{time}}s"
+    },
+    "threatIntel": {
+      "title": "🛰️ Recent Threat Intelligence",
+      "intro": "A live, AI-summarized digest of recent cybersecurity threats, CVEs and advisories — grounded in fresh web sources with citations. Press “Get latest” to refresh.",
+      "query": "recent cybersecurity threats vulnerabilities CVE and advisories 2026"
     }
   },
   "ai": {

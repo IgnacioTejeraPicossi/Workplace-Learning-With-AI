@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
+const WebSearchResults = ({ topic, results, onClose, isLoading, answer, isMock }) => {
   const { t } = useTranslation('common');
   if (isLoading) {
     return (
@@ -78,8 +78,8 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
       boxShadow: '-2px 0 10px rgba(0,0,0,0.1)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3>🔍 Results for "{topic}"</h3>
-        <button 
+        <h3>{t('webSearchModule.panelHeading', { topic })}</h3>
+        <button
           onClick={onClose}
           style={{
             background: 'none',
@@ -92,9 +92,23 @@ const WebSearchResults = ({ topic, results, onClose, isLoading }) => {
           ✕
         </button>
       </div>
-      
-      <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
-        {t('webSearchModule.foundResults', { count: results.length })}
+
+      {/* AI-synthesized answer grounded in the sources below */}
+      {answer && (
+        <div style={{ marginBottom: '18px', padding: '12px 14px', borderRadius: '8px', background: '#eff6ff', border: '1px solid #3b82f6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
+            <strong style={{ fontSize: '14px', color: '#1f2937' }}>{t('webSearchModule.aiAnswerHeading')}</strong>
+            <span style={{ fontSize: '12px', color: '#6b7280' }}>· {t('webSearchModule.groundedNote', { count: results.length })}</span>
+          </div>
+          <div style={{ fontSize: '13px', color: '#1f2937', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{answer}</div>
+          {isMock && (
+            <div style={{ marginTop: '6px', fontSize: '12px', color: '#6b7280', fontStyle: 'italic' }}>{t('webSearchModule.offlineNote')}</div>
+          )}
+        </div>
+      )}
+
+      <div style={{ marginBottom: '12px', fontSize: '14px', color: '#666' }}>
+        {t('webSearchModule.sourcesHeading')} · {t('webSearchModule.foundResults', { count: results.length })}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

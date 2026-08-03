@@ -5,6 +5,7 @@ import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
 import { useStreaming } from './hooks/useStreaming';
 import { useTheme } from './ThemeContext';
+import FreshInsights from './FreshInsights';
 
 export default function CareerCoach() {
   const [growthArea, setGrowthArea] = useState('');
@@ -661,6 +662,20 @@ export default function CareerCoach() {
               >
                 {t('careerCoachModule.actions.newSession')}
               </button>
+            </div>
+          )}
+
+          {/* Fresh, web-grounded trends for the chosen area (on demand) */}
+          {coachingStreaming.isComplete && (
+            <div style={{ marginTop: 24, borderTop: `1px solid ${colors.border}`, paddingTop: 20 }}>
+              <FreshInsights
+                query={t('careerCoachModule.freshTrends.query', {
+                  topic: growthArea === 'custom' ? customTopic : growthAreas.find(a => a.key === growthArea)?.label
+                })}
+                title={t('careerCoachModule.freshTrends.title')}
+                intro={t('careerCoachModule.freshTrends.intro')}
+                autoLoad={false}
+              />
             </div>
           )}
         </div>

@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.10] - 2026-08-03
+
+### Added — FreshInsights rolled out to Career Coach, Cybersecurity + KnowledgeMap upgrade
+
+Continues the [1.30.9] rollout so more modules consume `/api/web-search-ai` for
+current, cited, web-grounded info.
+
+- **AI Career Coach** (`CareerCoach.jsx`): after a coaching session completes, a
+  `FreshInsights` panel ("🌐 Latest trends for this area", `autoLoad=false`)
+  offers on-demand recent trends & in-demand skills for the chosen area/topic
+  (localized query via `careerCoachModule.freshTrends.*`).
+- **Cybersecurity** (`cyber/Cybersecurity.jsx`): new 11th tab **"🛰️ Threat Intel
+  (live)"** rendering `FreshInsights` with a recent-threats/CVE query
+  (`cyber.threatIntel.*`).
+- **KnowledgeMap** (`KnowledgeMap.jsx` + `WebSearchResults.jsx`): upgraded its
+  per-topic search from `/api/simple-search` (raw links) to `/api/web-search-ai`
+  — the slide-in panel now shows an **AI Answer** card (with `is_mock` notice)
+  above the sources. Also localized a hardcoded English panel heading.
+- **Backend**: refined the `_synthesize_answer` prompt so broad "pulse/overview"
+  queries summarize themes/signals from titles+snippets (noting the basis)
+  instead of refusing when snippets are thin — improves every consumer.
+- i18n EN/ES/NO parity: `careerCoachModule` 43/43, `webSearchModule` 24/24,
+  `cyber.threatIntel` present in all three. Frontend-only wiring; endpoint keeps
+  its 4 offline contract tests.
+- Validated: `@babel/parser` parse OK for all 5 touched components; backend
+  `compileall` OK; offline suites green.
+
+---
+
 ## [1.30.9] - 2026-08-03
 
 ### Added — FreshInsights: reusable "AI + Internet" panel + AGI Hub first consumer

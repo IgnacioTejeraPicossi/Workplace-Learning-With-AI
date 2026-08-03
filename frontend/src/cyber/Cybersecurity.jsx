@@ -11,6 +11,7 @@ import ComplianceTracker from './ComplianceTracker';
 import SecureCodingCoach from './SecureCodingCoach';
 import IncidentDrills from './IncidentDrills';
 import KnowledgeBase from './KnowledgeBase';
+import FreshInsights from '../FreshInsights';
 
 export default function Cybersecurity() {
   const { t } = useTranslation();
@@ -26,7 +27,8 @@ export default function Cybersecurity() {
     { id: 'coach', label: t('cyber.tabs.secureCodingCoach'), icon: '👨‍🏫' },
     { id: 'compliance', label: t('cyber.tabs.complianceTracker'), icon: '📋' },
     { id: 'drills', label: t('cyber.tabs.incidentDrills'), icon: '🚨' },
-    { id: 'knowledge', label: t('cyber.tabs.knowledge'), icon: '📚' }
+    { id: 'knowledge', label: t('cyber.tabs.knowledge'), icon: '📚' },
+    { id: 'threatIntel', label: t('cyber.tabs.threatIntel'), icon: '🛰️' }
   ];
 
   const renderContent = () => {
@@ -51,6 +53,16 @@ export default function Cybersecurity() {
         return <IncidentDrills />;
       case 'knowledge':
         return <KnowledgeBase />;
+      case 'threatIntel':
+        return (
+          <div style={{ padding: '1.5rem' }}>
+            <FreshInsights
+              query={t('cyber.threatIntel.query')}
+              title={t('cyber.threatIntel.title')}
+              intro={t('cyber.threatIntel.intro')}
+            />
+          </div>
+        );
       default:
         return <CyberDashboard />;
     }

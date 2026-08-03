@@ -63,6 +63,11 @@
       "continueSession": "💬 Continuar sesión",
       "saveSession": "📋 Guardar sesión",
       "newSession": "🔄 Nueva sesión"
+    },
+    "freshTrends": {
+      "title": "🌐 Tendencias recientes en esta área",
+      "intro": "Tendencias y habilidades más demandadas, resumidas por IA — fundamentadas en fuentes web con citas.",
+      "query": "tendencias recientes y habilidades más demandadas en {{topic}} para el desarrollo profesional en 2026"
     }
   }
 }

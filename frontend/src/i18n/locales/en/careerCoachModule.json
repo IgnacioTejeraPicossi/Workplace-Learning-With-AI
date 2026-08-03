@@ -63,6 +63,11 @@
       "continueSession": "💬 Continue Session",
       "saveSession": "📋 Save Session",
       "newSession": "🔄 New Session"
+    },
+    "freshTrends": {
+      "title": "🌐 Latest trends for this area",
+      "intro": "Fresh, AI-summarized trends and in-demand skills — grounded in live web sources with citations.",
+      "query": "recent trends and most in-demand skills in {{topic}} for career development in 2026"
     }
   }
 }

@@ -3410,7 +3410,8 @@
       "secureCodingCoach": "Coach de codificación segura",
       "complianceTracker": "Seguimiento de cumplimiento",
       "incidentDrills": "Simulacros de incidentes",
-      "knowledge": "Conocimiento"
+      "knowledge": "Conocimiento",
+      "threatIntel": "Amenazas recientes"
     },
     "common": {
       "loading": "Cargando...",
@@ -3871,6 +3872,11 @@
       "OWASP-TOP10_A03": "Inyección",
       "OWASP-TOP10_A05": "Configuración de seguridad incorrecta",
       "OWASP-TOP10_A09": "Fallos en registro y monitorización de seguridad"
+    },
+    "threatIntel": {
+      "title": "🛰️ Inteligencia de amenazas reciente",
+      "intro": "Un resumen en vivo, hecho por IA, de amenazas de ciberseguridad, CVEs y avisos recientes — fundamentado en fuentes web frescas con citas. Pulsa «Traer novedades» para actualizar.",
+      "query": "amenazas de ciberseguridad vulnerabilidades CVE y avisos recientes 2026"
     }
   },
   "hologramGuide": {
