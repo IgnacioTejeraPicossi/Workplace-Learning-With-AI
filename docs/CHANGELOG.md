@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.7] - 2026-08-03
+
+### Added — Web Search: real "AI + Internet" grounded answer with citations (audit Fase 2)
+
+The module was titled "Web Search (AI + Internet)" but used no AI — it only
+returned raw DuckDuckGo links. This adds the AI layer and makes it reusable by
+other modules that need current, grounded information.
+
+- **Backend** (`backend/simple_web_search.py`): new `POST /api/web-search-ai`.
+  It runs a fresh DuckDuckGo search and asks the LLM (`ask_ai_unified_sync`,
+  `task_type="web_search"`) to synthesize a concise, **cited** answer using ONLY
+  those sources (explicit "do not invent facts/URLs" instruction). Returns
+  `{ query, answer, citations, results, is_mock, provider, fallback_url }`.
+  **Offline-safe**: when no LLM is configured the answer falls back to a
+  deterministic grounded extract of the top sources, flagged `is_mock=True`
+  (no fabrication). Never raises on LLM failure.
+- **Frontend** (`frontend/src/WebSearch.jsx`, `frontend/src/api.js`): the Search
+  button now calls `webSearchAi`; the results panel shows an **AI Answer** card
+  (with a "grounded in N sources" note and an offline-fallback notice when
+  `is_mock`) above a **Sources** list. New api helper `webSearchAi`.
+- **i18n**: `aiAnswerHeading`, `sourcesHeading`, `groundedNote`, `offlineNote`
+  added in EN/ES/NO (parity 20/20).
+- **Tests / CI**: `backend/tests/test_web_search_ai_contracts.py` (4 offline
+  tests — search + LLM mocked: grounded answer, mock fallback, no-results, empty
+  query → 422). Added to `.github/workflows/ci.yml`; offline gate now
+  **10 files / 99 tests**. `docs/TESTING.md` updated.
+- **DuckDuckGo GET→POST fix**: the scrape used `GET html.duckduckgo.com/html/`,
+  which DuckDuckGo answers with a **202 anti-bot "please wait" page** (0 results)
+  for many queries — so the AI answer came back empty and the UI showed the
+  honest "no results" state even when fresh sources existed. Switched to the
+  **POST form submission** (returns 200 + real results for the same query),
+  refreshed the user-agent, and added a guard that treats any non-200 as an
+  honest empty result instead of parsing the challenge page. Verified live: the
+  query "Cual es el ultimo modelo de IA de China…" now returns 6 fresh Spanish
+  sources (Kimi K3 — El País/CNN/Hipertextual).
+- Validated: backend `compileall` OK; `@babel/parser` parse OK for
+  `WebSearch.jsx` + `api.js`; new suite 4/4; all 10 offline suites together 99/99;
+  live endpoint returns real grounded results.
+
+---
+
 ## [1.30.6] - 2026-08-03
 
 ### Fixed — Web Search: query mangling, fake fallback results, double icon (audit Fase 1)

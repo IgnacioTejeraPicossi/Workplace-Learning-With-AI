@@ -28,16 +28,29 @@ async def simple_web_search(request: SimpleSearchRequest):
             raise HTTPException(status_code=422, detail="Empty search query")
         url = "https://html.duckduckgo.com/html/"
         params = {"q": query}
-        
-        # Use a realistic user agent to avoid blocking
+
+        # Use a realistic, current user agent to avoid blocking.
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.9",
         }
-        
-        async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.get(url, headers=headers, params=params)
+
+        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+            # POST (form submit) instead of GET: DuckDuckGo answers a GET to the
+            # html endpoint with a 202 anti-bot "please wait" page (0 results),
+            # but returns real results to the POST form submission.
+            response = await client.post(url, headers=headers, data=params)
             response.raise_for_status()
-            
+
+            # A 202 (or any non-200) is DuckDuckGo's rate-limit / challenge page,
+            # not results — treat it as an honest "no results" instead of parsing
+            # the challenge HTML into garbage.
+            if response.status_code != 200:
+                print(f"⚠️ DuckDuckGo returned status {response.status_code} for: {query}")
+                ddg_url = f"https://duckduckgo.com/?q={quote_plus(query)}"
+                return {"results": [], "query": query, "provider": "DuckDuckGo", "fallback_url": ddg_url}
+
             # Parse HTML response to extract search results
             html_content = response.text
             
