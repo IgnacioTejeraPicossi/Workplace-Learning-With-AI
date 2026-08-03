@@ -14,6 +14,7 @@ const ROWS = [
   { id: 'oph' },
   { id: 'ctmu' },
   { id: 'willowMultiverse' },
+  { id: 'hoffmanInterface' },
 ];
 
 const PASTERSKI_LINKS = [

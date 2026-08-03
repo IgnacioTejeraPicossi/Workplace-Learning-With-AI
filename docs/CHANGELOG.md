@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.12] - 2026-08-04
+
+### Added — Self-Simulating Reality Agent · Theory Tour: Donald Hoffman row
+
+- New Theory Tour row **"The Interface Theory of Perception & Conscious Realism"**
+  (`hoffmanInterface`, epistemic level **speculative**), added after the
+  Willow/many-worlds row in `frontend/src/self-sim-reality/TheoryTour.jsx`
+  (`ROWS`) with 5 i18n leaves (`Title/Author/Level/Body/Link`) in EN/NO/ES.
+- Content covers Donald Hoffman's **Interface Theory of Perception** and the
+  **Fitness-Beats-Truth** theorem (peer-reviewed evolutionary game theory: fitness-
+  tuned perception out-competes truth-tuned perception → spacetime/objects as a
+  species-specific "desktop interface"), and his further **conscious realism**
+  (spacetime not fundamental; reality as a network of interacting "conscious
+  agents" modelled with Markov chains; world rendered by observation) — directly
+  on-theme with OPH and the substrate question.
+- Keeps the agent's epistemic discipline: an explicit **honesty note** separating
+  the *peer-reviewed* ITP/Fitness-Beats-Truth from the *speculative* metaphysical
+  conscious-realism step (no accepted empirical test yet). Sources cited: the
+  StarTalk podcast (Neil deGrasse Tyson × Donald Hoffman, 2026), Hoffman-Singh-
+  Prakash (Psychonomic Bulletin & Review, 2015), the Fitness-Beats-Truth theorem,
+  and Hoffman's research institute; content paraphrased (copyright), video not
+  cited as a factual source.
+- Origin: owner brought the StarTalk/Hoffman podcast to fold into the agent.
+- Validated: `@babel/parser` JSX parse OK; EN/NO/ES parity 5/5 keys identical;
+  `speculative` level resolves in all three locales.
+
+---
+
 ## [1.30.11] - 2026-08-03
 
 ### Added — FreshInsights: Skills Forecast consumer (rollout complete)
