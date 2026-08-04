@@ -22,6 +22,7 @@
 | 16 | Self-Simulating Reality Agent (1.18.4 · V0+V1+V2+V3) | Active (curated content + backend claim analyzer + live physics search + interactive playground) | Backend `/api/claim-analyzer/analyze` smoke via TestClient (mock + LLM paths) | Medium — philosophical/scientific companion for Observer Patch Holography; **10 tabs**: Overview · Core Concepts · OPH Mechanics · Theory Tour (9 theories incl. **Celestial Holography** + **CTMU** (Langan · badge `philosophy`, honest fringe caveat) + **Featured Voice Sabrina Gonzalez Pasterski**, Perimeter Institute · Simons Collaboration Deputy Director) · WiPhy Search (live queries against `wiphy.org/api/search`, Pasterski's public physics-claims corpus) · Claim Analyzer (backend LLM decomposes strong claims into scientific core / overreach / reformulation with 5 overreach types; cross-tab bridge to WiPhy) · AI as Observer · Substrate Question · Playground (SVG Theory Map with 8 nodes + 9 typed edges, HTML5 Canvas Observer Patch simulator with brownian motion + overlap consensus metric) · Roadmap. EpistemicBadge enforces 5-level discipline (`established/mainstream/speculative/philosophy/metaphor/unsupported`). See `docs/self-sim-reality-agent-plan.md` |
 | 16b | Self-Correcting AI Loop (1.26.1 · V0+V1) | Active (reference + interactive Loop Builder + AI customize) | 4 contract tests (`test_self_correcting_loop_contracts.py`, offline fallback, in CI) + JSX parse + i18n parity 132×3 | Low — new agent after Self-Sim in Future Item Agents (`🔄`). Builder/Judge/Manager methodology paraphrased from @cyrilXBT (X). **6 tabs**: Overview · The Three Roles · Handoffs & Stops · Worked Examples · Test & Scale · **Loop Builder**. Loop Builder: pick task type → copyable scaffolds (`_templates.js`), **plus "Customize with AI"** — `POST /api/self-correcting-loop/customize` (`services/routers/self_correcting_loop.py`, `ask_ai_unified` + deterministic `is_mock` fallback, ground truth steered per task type). Shell `SelfCorrectingLoop.jsx`, tabs in `frontend/src/self-correcting-loop/`, namespace `selfCorrectingLoopModule.json` EN/NO/ES. See `docs/self-correcting-loop-agent-plan.md` |
 | 16c | Future (Idea Log · Feature Roadmap · Scaffolds) (1.26.2 audit) | Active | 5 contract tests (`test_future_module_contracts.py`, offline, in CI) | Medium — "user idea → AI-assisted feature" pipeline. Intake `CommandBar.jsx` → `POST /classify-intent` (`classify_intent` in `llm.py`, GPT-5-mini + keyword fallback) → **`unknown_intents` collection** → viewed as **Idea Log** (`IdeaLog.jsx`) and **Feature Roadmap** (`FeatureRoadmap.jsx`: status/upvotes/subscribe + **Generate Scaffold** `POST /generate-scaffold` → `generate_scaffold` GPT-5, `is_mock` + real stub fallback + admin approve → `scaffold_history`). Static vision: `FutureApp.jsx` (5 phases). Endpoints inline in `backend/app.py` (~1240–1360). **Audit [1.26.2]**: `_oid()` guard (malformed id → 400 not 500), status/email validation, scaffold `is_mock`. **[1.26.3]**: fixed `CommandBar.jsx` so unrecognized requests are actually logged to the Idea Log (the `else` branch now calls `/classify-intent`); added **🔄 Design Loop** in Feature Roadmap → calls `POST /api/self-correcting-loop/customize` and shows the Builder/Judge/Manager/Stop scaffold (the Self-Correcting Loop agent integrated into the pipeline). **[1.27.0] Option B**: **🔁 Self-Correcting** scaffold button → `POST /generate-scaffold-loop` (`services/scaffold_loop.py`) runs a real Builder→Judge→Manager loop with **`ast.parse` ground truth** + LLM checklist, escalates to admin approve, falls back to a deterministic stub; 5 offline tests (`test_scaffold_loop_contracts.py`) in CI. **Known**: admin endpoints unauthenticated (`isAdmin=true` hardcoded); `ask_openai` code-generation returns empty in this env (loop handles gracefully). |
+| B | [Babel Library](#babel-library) | Active | 14/14 contract tests (`test_babel_contracts.py`) | Medium — centralized knowledge aggregator; decomposed into `babel/` tab components + `BabelContext` ([1.30.17]) |
 | 17 | Language Agents | Active | 42 contract tests (`test_language_agents_contracts.py`) + 10 voice-examples tests | Low-Medium — 6 tutors (🇯🇵 Japanese · 🇨🇳 Chinese · 🇰🇷 Korean · 🇬🇧 English Mastery · 🇳🇴 Norwegian · 🇪🇸 Spanish). **[1.19.0]** Spanish native **cloned-voice** examples via local **Voicebox** (pre-generated + cached WAVs, instant playback; async proxy `backend/routers/voicebox.py`). **[1.20.0]** English **🎙 Conversation Audio** — spoken loop (Web Speech ASR + browser TTS) + optional web-research (Node `websearch-backend`). **No Docker dependency** for the agents; Voicebox is optional and degrades to browser voice |
 
 ---
@@ -775,6 +776,52 @@ curl http://localhost:8000/api/agi/homo-vs-ai/prompt-evolution/revisions
 ```
 
 **Docs**: covered in `README.md` (AGI Hub section), `docs/README_FULL.md` (Tab 4 — full backend + frontend catalogue + Phase E governance subsection), and `docs/CHANGELOG.md` [1.9.0] for the Phase E rollout notes.
+
+---
+
+## Babel Library
+
+_Audited 2026-08-04, [1.30.13]–[1.30.17]._
+
+**Purpose**: "Our world's knowledge repository" — a centralized module that
+**aggregates** learning resources from ~10 other modules (videos, micro-lessons,
+web-search saves, skills forecasts, career-coach sessions, simulations,
+certifications, document/repository/agentic-RAG analyses) into one searchable
+catalog, plus an AI intelligence layer (classification, embeddings, semantic
+search, content generation, predictive analytics) and a per-user learning
+profile (recommendations, learning paths).
+
+**Frontend** (`frontend/src/`):
+- `BabelLibrary.jsx` — the state/handler **owner + context provider** (1227
+  lines, was 3625 before the Fase-3 decomposition).
+- `babel/BabelContext.js` — `BabelContext` + `useBabel()`; the parent provides a
+  single `babelCtx` (72 keys) so tabs don't prop-drill.
+- `babel/CatalogTab.jsx`, `babel/AISearchTab.jsx` — the two large tabs, consume
+  the context.
+- `babel/AddResourceTab.jsx`, `babel/AdvancedSearchTab.jsx` — self-contained tabs
+  (AdvancedSearch owns its own filter state).
+- `babel/resourceHelpers.js` — pure helpers (`getTypeIcon/Color`,
+  `isDemoResource`) + `DEMO_BOOKS` (5 illustrative **sample** entries, always
+  rendered with a localized "Sample" badge — never presented as real content).
+
+**Backend**:
+- `routers/babel_intelligence.py` → `/api/babel/intelligence/*` (classify,
+  search [hybrid/semantic], batch, stats, generate-content, predictive/*);
+  services `babel_intelligence.py`, `babel_predictive.py`.
+- `routers/learning_profile.py` → `/api/babel/profile/*` (interaction, search,
+  summary, recommendations, learning-path); services `learning_profile.py`,
+  `recommendation_engine.py`.
+- Saved-resource persistence reuses `/api/web-search/` (`web_search.py`).
+
+**Tests**: `backend/tests/test_babel_contracts.py` — 14 offline contract tests
+(services mocked; in CI). i18n `babelLibraryModule.json` EN/NO/ES (314 keys, full
+parity).
+
+**Notes / risks**: heavy aggregator (reads many collections); the demo books are
+localStorage **sample** data (labelled), not real MongoDB content; delete flows
+reach ~10 collections' endpoints. Audit history: [1.30.13] sample-data labelling
++ console cleanup, [1.30.14] contract tests, [1.30.15]–[1.30.17] component
+decomposition via `babel/` + `BabelContext` (all build-verified).
 
 ---
 

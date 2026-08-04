@@ -3408,11 +3408,15 @@ POST   /api/babel/profile/{user_id}/learning-path            # Generate learning
 ```
 
 #### 🎨 **Frontend Components**
-- **BabelLibrary.jsx**: Main library interface (~3200 lines) with 4 tabs:
-  - **Library Catalog**: Resource cards with classification badges, AI content panels, CRUD operations
-  - **Add Resource**: Form to manually add books, videos, articles, courses, analyses
-  - **Advanced Search**: Full-text search with type/topic/author filters and sort options
-  - **AI Search**: Hybrid search, recommendations panel, learning path generator, predictive dashboard, batch admin
+- **BabelLibrary.jsx**: state/handler owner + context provider (~1230 lines;
+  decomposed from a ~3600-line monolith in [1.30.17]). The four tabs are their
+  own components under `frontend/src/babel/`, sharing state via `BabelContext`
+  (`useBabel()`), with pure helpers + illustrative "Sample" seed data in
+  `babel/resourceHelpers.js`:
+  - **Library Catalog** (`babel/CatalogTab.jsx`): Resource cards with classification badges, AI content panels, CRUD operations
+  - **Add Resource** (`babel/AddResourceTab.jsx`): Form to manually add books, videos, articles, courses, analyses
+  - **Advanced Search** (`babel/AdvancedSearchTab.jsx`): Full-text search with type/topic/author filters and sort options
+  - **AI Search** (`babel/AISearchTab.jsx`): Hybrid search, recommendations panel, learning path generator, predictive dashboard, batch admin
 - **Resource Cards**: Classification domain/difficulty badges, tag chips, expandable AI Content (summary, questions, hints)
 - **Filter System**: Advanced search and filtering interface with active filter display
 - **Statistics Dashboard**: Resource count overview + AI intelligence stats (classified, embedded, content generated)
