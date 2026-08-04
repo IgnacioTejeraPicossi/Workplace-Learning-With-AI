@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.17] - 2026-08-04
+
+### Changed — Babel Library: Catalog + AI-Search extracted via Context (audit Fase 3, complete)
+
+The deep refactor: the two remaining large tabs now live in their own components,
+reading shared state through a React Context instead of prop-drilling. **`BabelLibrary.jsx`
+stays the single owner** of all state and handlers — it just *provides* them.
+
+- New `babel/BabelContext.js` (`BabelContext` + `useBabel()` hook).
+- `babel/CatalogTab.jsx` (was ~796 lines inline) and `babel/AISearchTab.jsx`
+  (was ~1054 lines inline) now consume the context.
+- `BabelLibrary.jsx` builds one `babelCtx` value (72 keys) and wraps the render
+  in `<BabelContext.Provider>`; the tab area is now just
+  `{activeTab === 'catalog' && <CatalogTab />}` etc.
+- **`BabelLibrary.jsx`: 3625 → 1227 lines (−2398, −66%)** across all of Fase 3.
+- **Method (rigor over guesswork)**: each extracted block's dependencies were
+  found by `@babel/traverse` free-variable analysis (not by eye), then verified
+  by AST that `babelCtx` provides exactly the union of what both tabs consume
+  (72/72, zero unused), and finally by a **full production build**
+  (`react-scripts build`) after each extraction — the strongest static gate.
+- No behaviour change: same state, same handlers, same JSX, just relocated. The
+  Context value is recreated per render exactly as the inline JSX was, so there
+  is no new memoization/perf behaviour to reason about.
+
+Babel Library decomposition summary: `resourceHelpers` + 4 tab components
+(`AddResourceTab`, `AdvancedSearchTab`, `CatalogTab`, `AISearchTab`) + a shared
+`BabelContext`; the parent is now a focused state/handler owner.
+
+---
+
 ## [1.30.16] - 2026-08-04
 
 ### Changed — Babel Library: extract Add-Resource + Advanced-Search tabs (audit Fase 3, step 2)
