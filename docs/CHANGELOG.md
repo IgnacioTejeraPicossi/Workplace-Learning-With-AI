@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.16] - 2026-08-04
+
+### Changed — Babel Library: extract Add-Resource + Advanced-Search tabs (audit Fase 3, step 2)
+
+Continues the decomposition of `BabelLibrary.jsx`, this time **runtime-verified
+with a full production build** (`react-scripts build`) after each extraction —
+not just a parse check.
+
+- **`babel/AddResourceTab.jsx`** — the "Add Resource" form. Parent still owns the
+  `newBook` state + `handleAddBook`; passed as props (`newBook`, `setNewBook`,
+  `onSubmit`). Removed ~190 lines from the parent.
+- **`babel/AdvancedSearchTab.jsx`** — the "Advanced Search" tab. Its 6 filter
+  state hooks were used only here, so they now live **inside** the component
+  (removed from the parent); it receives `allResources`, `topics`, `typeLabel`,
+  `authorLabel` and imports the pure helpers. Removed ~339 lines from the parent.
+- `BabelLibrary.jsx`: **3625 → 3043 lines** across Fase 3 so far (−582).
+- Validated: `react-scripts build` compiles the whole app cleanly after each
+  step (only pre-existing unrelated source-map warnings); no `advSearch*`
+  references remain in the parent.
+
+Deliberately **kept in the parent** (not force-extracted): the **Catalog** and
+**AI Search** tabs. They own the shared aggregation (`allResources`), the
+cross-collection delete handlers and the intelligence/profile dashboard state;
+splitting them would mean threading 20+ props (fragile) or a deeper
+context/reducer refactor — a separate, deliberate task, not a quick cleanup.
+
+---
+
 ## [1.30.15] - 2026-08-04
 
 ### Changed — Babel Library: extract pure helpers + seed data (audit Fase 3, step 1)
