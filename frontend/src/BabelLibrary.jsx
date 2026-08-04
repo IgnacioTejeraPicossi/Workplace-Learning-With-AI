@@ -16,6 +16,16 @@ import {
 } from './api';
 import { auth } from './firebase';
 
+// Illustrative sample content seeded when the local catalog is empty. Kept for a
+// non-empty first impression, but clearly labelled so it is never mistaken for
+// real library resources. Detection covers both the new `isDemo` flag and older
+// localStorage entries seeded before the flag existed (matched by author).
+const DEMO_AUTHORS = new Set([
+  'Dr. Sarah Chen', 'Prof. Michael Rodriguez', 'Dr. Emily Watson',
+  'Prof. David Kim', 'Dr. Lisa Thompson',
+]);
+const isDemoResource = (resource) => !!(resource && (resource.isDemo || DEMO_AUTHORS.has(resource.author)));
+
 const BabelLibrary = () => {
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('catalog');
@@ -316,7 +326,6 @@ const BabelLibrary = () => {
   const loadCertifications = async () => {
     try {
       const data = await fetchCertifications();
-      console.log('Certifications loaded:', data);
       if (data) {
         setCertifications(data);
       }
@@ -329,7 +338,6 @@ const BabelLibrary = () => {
   const loadMicroLessons = async () => {
     try {
       const data = await fetchMicroLessons();
-      console.log('Micro-lessons loaded:', data);
       if (data) {
         setMicroLessons(data);
       }
@@ -342,7 +350,6 @@ const BabelLibrary = () => {
   const loadWebSearchResults = async () => {
     try {
       const data = await fetchWebSearchResults();
-      console.log('Web search results loaded:', data);
       if (data) {
         setWebSearchResults(data);
       }
@@ -355,7 +362,6 @@ const BabelLibrary = () => {
   const loadSkillsForecasts = async () => {
     try {
       const data = await fetchSkillsForecasts();
-      console.log('Skills forecasts loaded:', data);
       if (data) {
         setSkillsForecasts(data);
       }
@@ -368,7 +374,6 @@ const BabelLibrary = () => {
   const loadCareerCoachSessions = async () => {
     try {
       const data = await fetchCareerCoachSessions();
-      console.log('Career coach sessions loaded:', data);
       if (data) {
         setCareerCoachSessions(data);
       }
@@ -381,7 +386,6 @@ const BabelLibrary = () => {
   const loadSimulationResults = async () => {
     try {
       const data = await fetchSimulationResults();
-      console.log('Simulation results loaded:', data);
       if (data) {
         setSimulationResults(data);
       }
@@ -394,7 +398,6 @@ const BabelLibrary = () => {
   const loadDocumentAnalyses = async () => {
     try {
       const data = await fetchDocumentAnalyses();
-      console.log('Document analyses loaded:', data);
       if (data && data.analyses) {
         setDocumentAnalyses(data.analyses);
       }
@@ -407,7 +410,6 @@ const BabelLibrary = () => {
   const loadRepositoryAnalyses = async () => {
     try {
       const data = await fetchRepositoryAnalyses();
-      console.log('Repository analyses loaded:', data);
       if (data && data.analyses) {
         setRepositoryAnalyses(data.analyses);
       }
@@ -420,7 +422,6 @@ const BabelLibrary = () => {
   const loadAgenticRAGAnalyses = async () => {
     try {
       const data = await fetchAgenticRAGAnalyses();
-      console.log('Agentic RAG analyses loaded:', data);
       if (data && data.analyses) {
         setAgenticRAGAnalyses(data.analyses);
       }
@@ -496,7 +497,7 @@ const BabelLibrary = () => {
           type: "article",
           addedDate: "2024-01-12"
         }
-      ];
+      ].map(b => ({ ...b, isDemo: true }));  // flag illustrative sample content
       setBooks(demoBooks);
       localStorage.setItem(key, JSON.stringify(demoBooks));
     }
@@ -1544,10 +1545,21 @@ const BabelLibrary = () => {
                     {getTypeIcon(resource.type)} {typeLabel(resource.type)}
                   </div>
 
+                  {/* Sample/demo label — never present illustrative seed data as real */}
+                  {isDemoResource(resource) && (
+                    <span style={{
+                      display: 'inline-block', marginBottom: 8,
+                      background: '#9ca3af', color: 'white', padding: '2px 8px',
+                      borderRadius: '10px', fontSize: '0.72em', fontWeight: 'bold'
+                    }}>
+                      {t('babelLibraryModule.sampleBadge')}
+                    </span>
+                  )}
+
                   {/* Content */}
-                  <h3 style={{ 
-                    color: colors.text, 
-                    marginBottom: 8, 
+                  <h3 style={{
+                    color: colors.text,
+                    marginBottom: 8,
                     fontSize: '1.2em',
                     paddingRight: '80px'
                   }}>
@@ -2538,6 +2550,15 @@ const BabelLibrary = () => {
                               {getTypeIcon(resource.type)} {typeLabel(resource.type)}
                             </span>
                           </div>
+                          {isDemoResource(resource) && (
+                            <span style={{
+                              display: 'inline-block', alignSelf: 'flex-start',
+                              background: '#9ca3af', color: 'white', padding: '2px 8px',
+                              borderRadius: '10px', fontSize: '0.72em', fontWeight: 'bold'
+                            }}>
+                              {t('babelLibraryModule.sampleBadge')}
+                            </span>
+                          )}
                           <div style={{ fontSize: '0.85em', color: colors.textSecondary }}>
                             👤 {highlightMatch(authorLabel(resource.author))}
                           </div>

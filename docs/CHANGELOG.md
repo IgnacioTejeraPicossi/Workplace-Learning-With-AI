@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.13] - 2026-08-04
+
+### Fixed — Babel Library: label sample data + debug cleanup (audit Fase 1)
+
+- **Sample data honesty**: the catalog seeds 6 hardcoded demo books with
+  fabricated authors ("Dr. Sarah Chen", "Prof. Michael Rodriguez", …) into
+  `localStorage` when empty, and showed them as if they were real library
+  resources. They now carry an `isDemo` flag and render a localized **"Sample"**
+  badge (EN "Sample" / ES "Ejemplo" / NO "Eksempel") in both the Catalog and
+  Advanced Search cards. A module-level `isDemoResource()` helper matches the
+  flag *and* the known demo authors, so entries seeded before the flag existed
+  are labelled too. (AI Search is backend-driven and never returns these.)
+- **Debug cleanup**: removed 9 stray `console.log('… loaded:', data)` statements
+  from the `loadXxx` helpers (kept the `console.error/warn` inside catch blocks).
+- i18n: `babelLibraryModule.sampleBadge` added in EN/ES/NO (parity 314/314).
+- Frontend-only, no behaviour change beyond labelling. Validated: `@babel/parser`
+  parse OK; i18n parity.
+
+Deferred to later phases: offline contract tests for the `babel_intelligence` /
+`learning_profile` subsystems (Fase 2); decomposing the 3.6k-line component
+(Fase 3).
+
+---
+
 ## [1.30.12] - 2026-08-04
 
 ### Added — Self-Simulating Reality Agent · Theory Tour: Donald Hoffman row

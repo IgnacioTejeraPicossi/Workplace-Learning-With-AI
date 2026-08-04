@@ -350,6 +350,7 @@
       "demandSignals": "Etterspørselssignaler",
       "totalResources": "Totalt ressurser",
       "generatedAt": "Generert"
-    }
+    },
+    "sampleBadge": "Eksempel"
   }
 }

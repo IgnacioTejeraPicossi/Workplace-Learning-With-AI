@@ -350,6 +350,7 @@
       "demandSignals": "Demand signals",
       "totalResources": "Total resources",
       "generatedAt": "Generated at"
-    }
+    },
+    "sampleBadge": "Sample"
   }
 }
