@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.15] - 2026-08-04
+
+### Changed — Babel Library: extract pure helpers + seed data (audit Fase 3, step 1)
+
+A **safe, incremental** first step of the decomposition. The full tab-component
+split of the 3.6k-line `BabelLibrary.jsx` (with its 41 interlinked `useState`
+hooks) is genuinely high-risk and should be done with the app running to verify
+each extracted piece at runtime, so it is deliberately **deferred**. This step
+only moves out pieces that are pure/stateless and therefore verifiable by parse:
+
+- New `frontend/src/babel/resourceHelpers.js` exports `DEMO_BOOKS` (the 5
+  illustrative sample entries, pre-flagged `isDemo`), `DEMO_AUTHORS`,
+  `isDemoResource()`, `getTypeIcon()` and `getTypeColor()`.
+- `BabelLibrary.jsx` now imports them; removed the inline 48-line demo array (now
+  `DEMO_BOOKS`), the module-level demo helpers (added in 1.30.13), and the two
+  in-component `getType*` switch functions. Net −~90 lines, no behaviour change.
+- Validated: `@babel/parser` parse OK for both files; no duplicate definitions;
+  all call sites (`getTypeIcon` ×11, `getTypeColor` ×8, `isDemoResource` ×2)
+  still resolve via the import.
+
+Remaining (deferred, do live): split the Catalog / Advanced Search / AI Search
+tabs into their own components with explicit props.
+
+---
+
+## [1.30.14] - 2026-08-04
+
+### Added — Babel Library: offline contract tests for intelligence + profile (audit Fase 2)
+
+- `backend/tests/test_babel_contracts.py` (14 offline tests) covers the two
+  previously-untested Babel backend subsystems, mocking the service layer (no DB,
+  no LLM, no auth):
+  - **Intelligence router** (`/api/babel/intelligence/*`): stats, batch status,
+    classify (ok / LLM-fallback / with-id strips the large embedding from the
+    response / missing-title 422), hybrid + semantic search, search validation
+    (bad mode & over-limit → 422), and the batch "already running" branch.
+  - **Learning-profile router** (`/api/babel/profile/*`): interaction (asserts
+    `user_id` is split out of the stored interaction dict), recommendations
+    (asserts the `limit` is capped at 30), learning-path, and its `max_steps`
+    validation (< 3 → 422).
+- Added to `.github/workflows/ci.yml`; the offline gate is now **11 files /
+  113 tests**. `docs/TESTING.md` updated (count + gate row + command list).
+- Validated: new suite 14/14; all 11 offline suites together 113/113.
+
+---
+
 ## [1.30.13] - 2026-08-04
 
 ### Fixed — Babel Library: label sample data + debug cleanup (audit Fase 1)

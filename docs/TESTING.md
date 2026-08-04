@@ -115,6 +115,7 @@ curl http://localhost:8000/api/j-messages/list
 | AI Training progress persistence | 5/5 contract tests (offline, auth+Mongo mocked) | `python -m pytest backend/tests/test_ai_training_progress_contracts.py -v` |
 | Scenario Simulator progress persistence | 4/4 contract tests (offline, auth+Mongo mocked) | `python -m pytest backend/tests/test_simulator_progress_contracts.py -v` |
 | Web Search AI (grounded answer) | 4/4 contract tests (offline, search+LLM mocked) | `python -m pytest backend/tests/test_web_search_ai_contracts.py -v` |
+| Babel Library (intelligence + profile) | 14/14 contract tests (offline, services mocked) | `python -m pytest backend/tests/test_babel_contracts.py -v` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
 
@@ -125,7 +126,7 @@ dispatch: `.github/workflows/ci.yml`.
 
 | Job | What it validates |
 |-----|-------------------|
-| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (99 tests) |
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (113 tests) |
 | `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
 
 The `backend` test step runs only the suites verified to pass with **no**
@@ -142,7 +143,8 @@ python -m pytest \
   backend/tests/test_scaffold_loop_contracts.py \
   backend/tests/test_ai_training_progress_contracts.py \
   backend/tests/test_simulator_progress_contracts.py \
-  backend/tests/test_web_search_ai_contracts.py
+  backend/tests/test_web_search_ai_contracts.py \
+  backend/tests/test_babel_contracts.py
 ```
 
 `MONGO_URI` is set to an unreachable host with a short `serverSelectionTimeoutMS`

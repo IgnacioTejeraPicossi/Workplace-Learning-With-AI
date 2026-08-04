@@ -15,16 +15,7 @@ import {
   apiCall
 } from './api';
 import { auth } from './firebase';
-
-// Illustrative sample content seeded when the local catalog is empty. Kept for a
-// non-empty first impression, but clearly labelled so it is never mistaken for
-// real library resources. Detection covers both the new `isDemo` flag and older
-// localStorage entries seeded before the flag existed (matched by author).
-const DEMO_AUTHORS = new Set([
-  'Dr. Sarah Chen', 'Prof. Michael Rodriguez', 'Dr. Emily Watson',
-  'Prof. David Kim', 'Dr. Lisa Thompson',
-]);
-const isDemoResource = (resource) => !!(resource && (resource.isDemo || DEMO_AUTHORS.has(resource.author)));
+import { DEMO_BOOKS, isDemoResource, getTypeIcon, getTypeColor } from './babel/resourceHelpers';
 
 const BabelLibrary = () => {
   const { colors } = useTheme();
@@ -451,53 +442,7 @@ const BabelLibrary = () => {
     }
 
     function seedDemoBooks(key) {
-      const demoBooks = [
-        {
-          id: 1,
-          title: "The Art of Artificial Intelligence",
-          author: "Dr. Sarah Chen",
-          topic: "AI & Machine Learning",
-          description: "Comprehensive guide to modern AI techniques and applications",
-          type: "book",
-          addedDate: "2024-01-15"
-        },
-        {
-          id: 2,
-          title: "Digital Transformation Strategies",
-          author: "Prof. Michael Rodriguez",
-          topic: "Business Strategy",
-          description: "How organizations can successfully navigate digital transformation",
-          type: "book",
-          addedDate: "2024-01-10"
-        },
-        {
-          id: 3,
-          title: "Future of Work: AI Integration",
-          author: "Dr. Emily Watson",
-          topic: "Workplace Innovation",
-          description: "Exploring how AI will reshape the modern workplace",
-          type: "book",
-          addedDate: "2024-01-05"
-        },
-        {
-          id: 4,
-          title: "Machine Learning Fundamentals",
-          author: "Prof. David Kim",
-          topic: "AI & Machine Learning",
-          description: "Core concepts and practical applications of ML",
-          type: "video",
-          addedDate: "2024-01-20"
-        },
-        {
-          id: 5,
-          title: "Leadership in the Digital Age",
-          author: "Dr. Lisa Thompson",
-          topic: "Leadership",
-          description: "Essential leadership skills for the technology-driven era",
-          type: "article",
-          addedDate: "2024-01-12"
-        }
-      ].map(b => ({ ...b, isDemo: true }));  // flag illustrative sample content
+      const demoBooks = DEMO_BOOKS;  // illustrative sample content (flagged isDemo)
       setBooks(demoBooks);
       localStorage.setItem(key, JSON.stringify(demoBooks));
     }
@@ -1002,29 +947,7 @@ const BabelLibrary = () => {
     ...skillsForecasts.map(forecast => forecast.industry)
   ]))];
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'book': return '📚';
-      case 'video': return '🎥';
-      case 'article': return '📄';
-      case 'course': return '🎓';
-      case 'simulation': return '🎮';
-      case 'analysis': return '📊';
-      default: return '📖';
-    }
-  };
-
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'book': return '#007bff';
-      case 'video': return '#28a745';
-      case 'article': return '#ffc107';
-      case 'course': return '#6f42c1';
-      case 'simulation': return '#fd7e14';
-      case 'analysis': return '#17a2b8';
-      default: return '#6c757d';
-    }
-  };
+  // (getTypeIcon / getTypeColor extracted to ./babel/resourceHelpers — 1.30.15)
 
   // ──── AI Search Engine ────
 

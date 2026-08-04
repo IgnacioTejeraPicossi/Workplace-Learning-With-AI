@@ -5,7 +5,7 @@ name: CI
 # - frontend: install + production build
 # Kept intentionally lightweight so it stays green and fast; it does NOT
 # require MongoDB, Firebase or any secret. The test step runs only the
-# mock-first suites (10 files, 99 tests) that are verified to pass with no database, no LLM key
+# mock-first suites (11 files, 113 tests) that are verified to pass with no database, no LLM key
 # and no Firebase credentials. Extend with the Mongo-backed suites (e.g.
 # smoke_red_cross_qa baselines, robomind contracts) once a MongoDB service
 # container + CI fixtures are added.
@@ -55,7 +55,8 @@ jobs:
             backend/tests/test_scaffold_loop_contracts.py \
             backend/tests/test_ai_training_progress_contracts.py \
             backend/tests/test_simulator_progress_contracts.py \
-            backend/tests/test_web_search_ai_contracts.py
+            backend/tests/test_web_search_ai_contracts.py \
+            backend/tests/test_babel_contracts.py
 
   frontend:
     name: Frontend (install + build)
