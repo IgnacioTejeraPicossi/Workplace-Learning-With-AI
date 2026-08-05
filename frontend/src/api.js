@@ -263,6 +263,31 @@ export async function getAndresArtifacts() {
 export async function deleteAndresArtifact(artifactId) {
   return apiCall(`/api/andres/creative/${artifactId}`, "DELETE");
 }
+// Andrés V4 — skills
+export async function draftAndresSkill(task) {
+  return apiCall("/api/andres/skills/draft", "POST", { task });
+}
+export async function proposeAndresSkill(skill) {
+  return apiCall("/api/andres/skills/propose", "POST", skill);
+}
+export async function getAndresSkills() {
+  return apiCall("/api/andres/skills", "GET");
+}
+export async function getAndresSkillMetrics() {
+  return apiCall("/api/andres/skills/metrics", "GET");
+}
+export async function approveAndresSkill(skillId) {
+  return apiCall(`/api/andres/skills/${skillId}/approve`, "POST", {});
+}
+export async function rejectAndresSkill(skillId) {
+  return apiCall(`/api/andres/skills/${skillId}/reject`, "POST", {});
+}
+export async function runAndresSkill(skillId, input) {
+  return apiCall(`/api/andres/skills/${skillId}/run`, "POST", { input });
+}
+export async function deleteAndresSkill(skillId) {
+  return apiCall(`/api/andres/skills/${skillId}`, "DELETE");
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

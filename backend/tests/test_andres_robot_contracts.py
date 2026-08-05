@@ -446,3 +446,94 @@ async def test_creative_list(mock_art):
         r = await c.get("/api/andres/creative")
     assert r.status_code == 200
     assert r.json()["count"] == 1
+
+
+# ── V4: skills (static safety gate + sandbox run + human approval) ────────────
+
+_SAFE_SKILL = "def skill(x):\n    return sum(range(x))"
+_UNSAFE_SKILL = "import os\ndef skill(x):\n    return os.listdir('.')"
+
+
+@patch("backend.services.andres.skill_service.andres_skills")
+@pytest.mark.asyncio
+async def test_skill_propose_safe_is_pending(mock_skills):
+    mock_skills.insert_one = AsyncMock(return_value=MagicMock(inserted_id="s1"))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/skills/propose",
+                         json={"name": "sum_to", "description": "sum", "code": _SAFE_SKILL})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["status"] == "pending"
+    assert d["safety"]["ok"] is True
+
+
+@patch("backend.services.andres.skill_service.andres_skills")
+@pytest.mark.asyncio
+async def test_skill_propose_unsafe_is_blocked(mock_skills):
+    mock_skills.insert_one = AsyncMock(return_value=MagicMock(inserted_id="s2"))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/skills/propose",
+                         json={"name": "peek", "description": "bad", "code": _UNSAFE_SKILL})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["status"] == "blocked"
+    assert d["safety"]["ok"] is False
+    assert any("Imports" in reason for reason in d["safety"]["reasons"])
+
+
+@patch("backend.services.andres.skill_service.andres_profiles")
+@patch("backend.services.andres.skill_service.andres_skills")
+@pytest.mark.asyncio
+async def test_skill_approve_requires_pending(mock_skills, mock_skill_profiles):
+    # a blocked skill can never be approved
+    mock_skills.find_one = AsyncMock(return_value={
+        "_id": "s3", "user_id": "u1", "status": "blocked",
+        "safety": {"ok": False, "reasons": ["Imports are not allowed."]}})
+    mock_skill_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/skills/507f1f77bcf86cd799439011/approve")
+    assert r.status_code == 409
+
+
+@patch("backend.services.andres.skill_service.andres_skills")
+@patch("backend.services.andres.skill_service.andres_skill_runs")
+@pytest.mark.asyncio
+async def test_skill_run_sandbox_executes(mock_runs, mock_skills):
+    mock_skills.find_one = AsyncMock(return_value={
+        "_id": "s4", "user_id": "u1", "status": "active",
+        "code": _SAFE_SKILL, "safety": {"ok": True, "reasons": []}})
+    mock_skills.update_one = AsyncMock(return_value=None)
+    mock_runs.insert_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/skills/507f1f77bcf86cd799439011/run",
+                         json={"input": 5})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["ok"] is True
+    assert d["output"] == 10   # sum(range(5))
+
+
+@patch("backend.services.andres.skill_service.andres_skills")
+@patch("backend.services.andres.skill_service.andres_skill_runs")
+@pytest.mark.asyncio
+async def test_skill_run_blocked_cannot_run(mock_runs, mock_skills):
+    mock_skills.find_one = AsyncMock(return_value={
+        "_id": "s5", "user_id": "u1", "status": "blocked",
+        "code": _UNSAFE_SKILL, "safety": {"ok": False, "reasons": ["Imports are not allowed."]}})
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/skills/507f1f77bcf86cd799439011/run",
+                         json={"input": 1})
+    assert r.status_code == 409
+
+
+def test_sandbox_blocks_escape_attempts():
+    """Direct unit checks on the safety core (Andrés' chief V4 concern)."""
+    from backend.services.andres.sandbox import static_safety_check, run_in_sandbox
+    assert static_safety_check(_SAFE_SKILL)["ok"] is True
+    assert static_safety_check("def skill(x):\n    return x.__class__")["ok"] is False
+    assert static_safety_check("def skill(x):\n    return eval(x)")["ok"] is False
+    assert static_safety_check("def skill(x):\n    return open(x)")["ok"] is False
+    assert static_safety_check("def other(x):\n    return 1")["ok"] is False  # no skill fn
+    # a runaway loop is stopped by the wall-clock timeout
+    res = run_in_sandbox("def skill(x):\n    while True:\n        pass", 1, timeout=0.5)
+    assert res["ok"] is False and "imed out" in res["error"]

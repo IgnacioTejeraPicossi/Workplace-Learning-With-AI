@@ -20,9 +20,11 @@ from backend.services.andres.identity_service import (
     developmental_age_days,
 )
 from backend.services.andres.prompt_assembler import assemble_system_prompt
+from typing import Any
+
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
-    evolution_manager, creativity_engine,
+    evolution_manager, creativity_engine, skill_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -85,6 +87,20 @@ class CreativeRequest(BaseModel):
     seed: str = Field("", max_length=500)
     concept_a: str = Field("", max_length=200)
     concept_b: str = Field("", max_length=200)
+
+
+class SkillDraftRequest(BaseModel):
+    task: str = Field(..., min_length=1, max_length=1000)
+
+
+class SkillProposal(BaseModel):
+    name: str = Field("skill", max_length=80)
+    description: str = Field("", max_length=500)
+    code: str = Field(..., min_length=1, max_length=4000)
+
+
+class SkillRunRequest(BaseModel):
+    input: Any = None
 
 
 @router.get("/health")
@@ -353,3 +369,52 @@ async def creative_list(user=Depends(_verify_token)):
 @router.delete("/creative/{artifact_id}")
 async def creative_delete(artifact_id: str, user=Depends(_verify_token)):
     return await creativity_engine.delete_artifact(user.get("uid"), artifact_id)
+
+
+# ── V4: skills (draft → safety-gated propose → user approves → sandbox run) ────
+
+@router.post("/skills/draft")
+async def skills_draft(body: SkillDraftRequest, http_request: Request, user=Depends(_verify_token)):
+    """Andrés drafts a candidate skill (not stored) with a static safety verdict."""
+    return await skill_service.draft_skill(
+        user.get("uid"), body.task, request_headers=http_request.headers
+    )
+
+
+@router.post("/skills/propose")
+async def skills_propose(body: SkillProposal, user=Depends(_verify_token)):
+    """Store a proposed skill. Safety-gated: unsafe code is stored as 'blocked'."""
+    return await skill_service.propose_skill(user.get("uid"), body.model_dump())
+
+
+@router.get("/skills")
+async def skills_list(user=Depends(_verify_token)):
+    items = await skill_service.list_skills(user.get("uid"))
+    return {"skills": items, "count": len(items)}
+
+
+@router.get("/skills/metrics")
+async def skills_metrics(user=Depends(_verify_token)):
+    return await skill_service.metrics(user.get("uid"))
+
+
+@router.post("/skills/{skill_id}/approve")
+async def skills_approve(skill_id: str, user=Depends(_verify_token)):
+    """Activate a pending skill — the only way a skill becomes usable."""
+    return await skill_service.approve_skill(user.get("uid"), skill_id)
+
+
+@router.post("/skills/{skill_id}/reject")
+async def skills_reject(skill_id: str, user=Depends(_verify_token)):
+    return await skill_service.reject_skill(user.get("uid"), skill_id)
+
+
+@router.post("/skills/{skill_id}/run")
+async def skills_run(skill_id: str, body: SkillRunRequest, user=Depends(_verify_token)):
+    """Sandbox-run a pending/active skill against an explicit input."""
+    return await skill_service.run_skill(user.get("uid"), skill_id, body.input)
+
+
+@router.delete("/skills/{skill_id}")
+async def skills_delete(skill_id: str, user=Depends(_verify_token)):
+    return await skill_service.delete_skill(user.get("uid"), skill_id)

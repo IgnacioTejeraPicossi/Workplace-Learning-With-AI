@@ -170,6 +170,36 @@
       "offlineTag": "frakoblet — deterministisk plassholder",
       "delete": "Slett"
     },
+    "skills": {
+      "title": "🧰 Ferdigheter",
+      "intro": "Et avgrenset, sporbart ferdighetsbibliotek. Hver ferdighet er en ren `def skill(x)` som må klare en streng statisk sikkerhetssjekk før den kan kjøre, og må godkjennes av deg før den regnes som aktiv. Ferdigheter kjører kun i et innskrenket sandkasse — ingen import, ingen filer, ingen nettverk, ingen app-tilgang.",
+      "metrics": {
+        "active": "Aktive",
+        "pending": "Venter",
+        "blocked": "Blokkert",
+        "runs": "Kjøringer"
+      },
+      "proposeTitle": "Foreslå en ferdighet",
+      "taskPlaceholder": "Beskriv en oppgave Andrés skal skissere…",
+      "draft": "Skisser med KI",
+      "namePlaceholder": "Ferdighetsnavn…",
+      "descPlaceholder": "Hva gjør den?",
+      "safetyNote": "Må definere `def skill(x)`. Ingen import, ingen dunder/private navn, ingen eval/open. Usikker kode lagres som blokkert og kan aldri kjøre.",
+      "propose": "Foreslå (sikkerhetssjekk)",
+      "empty": "Ingen ferdigheter ennå. Skisser en ovenfor, eller skriv en `def skill(x)` for hånd.",
+      "status": {
+        "active": "Aktiv",
+        "pending": "Venter på godkjenning",
+        "blocked": "Blokkert (usikker)",
+        "rejected": "Avvist"
+      },
+      "blockedTitle": "Blokkert av sikkerhetssjekk",
+      "inputPlaceholder": "Inndata (JSON, f.eks. 5 eller [1,2,3])",
+      "run": "Kjør i sandkasse",
+      "approve": "Godkjenn",
+      "reject": "Avvis",
+      "delete": "Slett"
+    },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
     },

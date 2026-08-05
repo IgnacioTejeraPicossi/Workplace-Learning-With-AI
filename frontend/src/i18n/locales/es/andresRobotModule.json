@@ -170,6 +170,36 @@
       "offlineTag": "sin conexión — texto determinista",
       "delete": "Eliminar"
     },
+    "skills": {
+      "title": "🧰 Habilidades",
+      "intro": "Una biblioteca de habilidades acotada y auditable. Cada habilidad es una función pura `def skill(x)` que debe pasar un control de seguridad estático estricto antes de poder ejecutarse, y debe ser aprobada por ti antes de contar como activa. Las habilidades solo se ejecutan en un sandbox restringido — sin imports, sin archivos, sin red, sin acceso a la app.",
+      "metrics": {
+        "active": "Activas",
+        "pending": "Pendientes",
+        "blocked": "Bloqueadas",
+        "runs": "Ejecuciones"
+      },
+      "proposeTitle": "Proponer una habilidad",
+      "taskPlaceholder": "Describe una tarea para que Andrés la esboce…",
+      "draft": "Esbozar con IA",
+      "namePlaceholder": "Nombre de la habilidad…",
+      "descPlaceholder": "¿Qué hace?",
+      "safetyNote": "Debe definir `def skill(x)`. Sin imports, sin nombres dunder/privados, sin eval/open. El código inseguro se guarda como bloqueado y nunca se ejecuta.",
+      "propose": "Proponer (control de seguridad)",
+      "empty": "Aún no hay habilidades. Esboza una arriba o escribe una `def skill(x)` a mano.",
+      "status": {
+        "active": "Activa",
+        "pending": "Pendiente de aprobación",
+        "blocked": "Bloqueada (insegura)",
+        "rejected": "Rechazada"
+      },
+      "blockedTitle": "Bloqueada por el control de seguridad",
+      "inputPlaceholder": "Entrada (JSON, p. ej. 5 o [1,2,3])",
+      "run": "Ejecutar en sandbox",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "delete": "Eliminar"
+    },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."
     },
