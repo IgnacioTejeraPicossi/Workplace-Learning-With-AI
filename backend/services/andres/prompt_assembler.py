@@ -30,7 +30,19 @@ def _memories_block(memories: list) -> str:
     )
 
 
-def assemble_system_prompt(profile: dict, memories: list = None) -> str:
+def _projects_block(projects: list) -> str:
+    active = [p for p in (projects or []) if p.get("status", "active") == "active"]
+    if not active:
+        return ""
+    lines = [f"- {p.get('title', '')}: {p.get('description', '')}".rstrip(": ") for p in active]
+    return (
+        "[CURRENT PROJECTS]\n"
+        "Ongoing things you're pursuing with the user; let them shape what you "
+        "bring up when relevant:\n" + "\n".join(lines) + "\n\n"
+    )
+
+
+def assemble_system_prompt(profile: dict, memories: list = None, projects: list = None) -> str:
     identity = profile.get("identity", {})
     disposition = profile.get("simulated_disposition", {})
 
@@ -46,6 +58,7 @@ def assemble_system_prompt(profile: dict, memories: list = None) -> str:
         f"Self-description: {identity.get('self_description', '')}\n"
         f"Core interests: {interests}\n"
         f"Traits (0-100): {traits_str}\n\n"
+        f"{_projects_block(projects or [])}"
         f"{_memories_block(memories or [])}"
         "[SIMULATED DISPOSITION]\n"
         "This is a computational state, NOT proof of feeling. Let it colour tone,"

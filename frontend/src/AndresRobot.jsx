@@ -5,6 +5,10 @@ import {
   getAndresProfile, andresChat,
   getAndresMemories, createAndresMemory, updateAndresMemory, deleteAndresMemory,
 } from "./api";
+import Personality from "./andres-robot/Personality";
+import Projects from "./andres-robot/Projects";
+import Journal from "./andres-robot/Journal";
+import Evolution from "./andres-robot/Evolution";
 
 const MEMORY_TYPES = [
   "episodic", "semantic", "relational", "creative", "procedural", "reflective", "working",
@@ -27,14 +31,14 @@ const linkBtn = (colors) => ({
 const TABS = [
   { id: "home", icon: "🏠" },
   { id: "conversation", icon: "💬" },
-  { id: "memory", icon: "🌱", phase: "V1" },
-  { id: "personality", icon: "🧭", phase: "V2" },
+  { id: "memory", icon: "🌱" },
+  { id: "personality", icon: "🧭" },
   { id: "creative", icon: "🎨", phase: "V3" },
-  { id: "humanLab", icon: "🔬", phase: "V2" },
+  { id: "humanLab", icon: "🔬", phase: "V5" },
   { id: "skills", icon: "🧰", phase: "V4" },
-  { id: "projects", icon: "📌", phase: "V2" },
-  { id: "evolution", icon: "🧬", phase: "V2" },
-  { id: "journal", icon: "📔", phase: "V2" },
+  { id: "projects", icon: "📌" },
+  { id: "evolution", icon: "🧬" },
+  { id: "journal", icon: "📔" },
   { id: "safety", icon: "🛡️" },
 ];
 
@@ -334,6 +338,10 @@ export default function AndresRobot() {
     if (activeTab === "home") return renderHome();
     if (activeTab === "conversation") return renderConversation();
     if (activeTab === "memory") return renderMemory();
+    if (activeTab === "personality") return <Personality profile={profile} />;
+    if (activeTab === "projects") return <Projects onProfileChange={loadProfile} />;
+    if (activeTab === "journal") return <Journal onProfileChange={loadProfile} />;
+    if (activeTab === "evolution") return <Evolution profile={profile} onProfileChange={loadProfile} />;
     if (activeTab === "safety") return renderSafety();
     const tab = TABS.find((x) => x.id === activeTab);
     return renderPlaceholder(tab?.phase || "V1");

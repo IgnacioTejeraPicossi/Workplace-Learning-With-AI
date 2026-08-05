@@ -64,6 +64,91 @@
       "loading": "Recalling…",
       "empty": "No memories yet. Talk with Andrés, or teach him something above."
     },
+    "common": {
+      "loading": "Loading…"
+    },
+    "personality": {
+      "title": "Personality",
+      "loading": "Loading Andrés' personality…",
+      "interests": "Core interests",
+      "traits": "Traits",
+      "traitsNote": "Numeric dispositions (0–100) that shade how Andrés expresses himself. They change only through approved evolution.",
+      "traitNames": {
+        "curiosity": "Curiosity",
+        "playfulness": "Playfulness",
+        "warmth": "Warmth",
+        "independence": "Independence",
+        "imagination": "Imagination",
+        "skepticism": "Skepticism",
+        "patience": "Patience",
+        "formality": "Formality",
+        "spontaneity": "Spontaneity",
+        "constructive_disagreement": "Constructive disagreement"
+      }
+    },
+    "projects": {
+      "title": "📌 Projects",
+      "intro": "Small things Andrés is pursuing with you. Active projects shape how he shows up in conversation.",
+      "titlePlaceholder": "Project title…",
+      "descPlaceholder": "What is it about?",
+      "add": "Add project",
+      "empty": "No projects yet.",
+      "delete": "Delete",
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "done": "Done",
+        "abandoned": "Abandoned"
+      }
+    },
+    "journal": {
+      "reflectionsTitle": "📔 Reflections",
+      "reflectionsIntro": "Andrés looks back over recent experience and writes an honest reflection — verbal self-improvement, no retraining.",
+      "reflectNow": "Reflect now",
+      "reflecting": "Reflecting…",
+      "noReflections": "No reflections yet. Ask Andrés to reflect.",
+      "offlineTag": "offline — deterministic placeholder",
+      "wonderingsTitle": "💭 Wonderings",
+      "wonderingsIntro": "Spontaneous questions Andrés would like to explore. Wondering means thinking or asking — never external actions.",
+      "wonder": "Wonder about something",
+      "wonderingBusy": "Wondering…",
+      "noWonderings": "No wonderings yet.",
+      "markExplored": "Mark explored",
+      "dismiss": "Dismiss",
+      "curiosityStatus": {
+        "open": "Open",
+        "explored": "Explored",
+        "dismissed": "Dismissed"
+      }
+    },
+    "evolution": {
+      "title": "🧬 Evolution",
+      "currentVersion": "current v{{v}}",
+      "intro": "The only place Andrés' identity changes — and only when you approve. Every approval is versioned and reversible; his immutable core is never touched.",
+      "proposeTitle": "Propose a change",
+      "rationalePlaceholder": "Why this change? (rationale)",
+      "selfPlaceholder": "New self-description (optional)…",
+      "interestPlaceholder": "Add a core interest (optional)…",
+      "traitLabel": "Adjust trait",
+      "capNote": "max ±20",
+      "propose": "Propose",
+      "emptyError": "Add at least one change (self-description, interest, or trait).",
+      "failError": "Could not submit the proposal.",
+      "pendingTitle": "Pending your approval",
+      "changes": "Changes",
+      "changeSelf": "new self-description",
+      "approve": "Approve",
+      "reject": "Reject",
+      "historyTitle": "Version history",
+      "noHistory": "No prior versions yet — Andrés is still on his first identity.",
+      "rollback": "Roll back",
+      "decidedTitle": "Past proposals",
+      "proposalStatus": {
+        "approved": "approved",
+        "rejected": "rejected",
+        "pending": "pending"
+      }
+    },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."
     },

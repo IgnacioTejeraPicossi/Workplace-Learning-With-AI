@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.2] - 2026-08-05
+
+### Added — Andrés the Robot · V2 "Reflection"
+
+Andrés can now look back, wonder, pursue his own projects, and — most
+importantly — **grow, but only with the user's approval**. This is the phase
+where the "freedom with visible limits" principle becomes real machinery.
+
+- **Reflection engine** (`backend/services/andres/reflection_engine.py`):
+  Reflexion-style verbal self-improvement (no weight updates). Andrés reviews
+  recent conversations + recalled memories and writes an honest, structured
+  reflection; a real reflection seeds a **reflective memory candidate**. Offline →
+  a clearly-labelled deterministic placeholder. `POST /api/andres/reflect`,
+  `GET /api/andres/reflections`.
+- **Curiosity engine** (`curiosity_engine.py`): Andrés forms spontaneous
+  "wonderings" (questions/topics within allowed scope — wondering means thinking
+  or asking, never external actions), stored in `andres_curiosity_queue` with a
+  status the user advances (open → explored / dismissed). Deterministic seed
+  questions offline. `POST /api/andres/curiosity/generate`, `GET /api/andres/curiosity`,
+  `PATCH /api/andres/curiosity/{id}`.
+- **Projects** (`project_service.py`): CRUD over `andres_projects`; **active
+  projects are injected into the prompt's new `[CURRENT PROJECTS]` layer**
+  (`prompt_assembler.py`), so they actually shape how Andrés shows up.
+  `GET/POST /api/andres/projects`, `PATCH/DELETE /api/andres/projects/{id}`.
+  `counters.current_projects` tracks the active count.
+- **Evolution manager** (`evolution_manager.py`) — the safety-critical piece and
+  the **only** path by which Andrés' identity changes:
+  `propose → user approves/rejects → a new versioned identity`. The **immutable
+  constitution is never touched** — only the evolving identity (self-description,
+  interests, numeric traits, preferred expression). Guardrails: trait deltas
+  bounded (|Δ| ≤ 20) and clamped to [0, 100]; unknown traits rejected; Andrés can
+  never approve his own proposal. Every approval **snapshots the prior identity**
+  into `andres_identity_versions`, so any version is **rollback**-able (and the
+  rollback is itself snapshotted → reversible). Endpoints:
+  `POST /api/andres/evolution/propose`, `GET .../proposals`, `GET .../versions`,
+  `POST .../{id}/approve`, `POST .../{id}/reject`, `POST .../rollback`.
+- **Chat**: now also surfaces active projects into the assembled prompt alongside
+  recalled memories.
+- **Frontend** (`frontend/src/andres-robot/`): four tabs made functional —
+  **Personality** (identity version, interests, trait bars), **Projects** (CRUD +
+  status), **Journal** (reflections feed + "Reflect now"; wonderings feed +
+  "Wonder about something" + explore/dismiss), **Evolution** (propose a change,
+  approve/reject pending proposals, version history with rollback, audit trail of
+  past proposals). Home counters (reflections, projects) now reflect real data.
+  Tab phase badges updated; Human Lab re-scoped to V5.
+- **i18n**: `andresRobotModule.json` extended (EN/ES/NO, 129/129 parity).
+- **Safety by design**: reflections/curiosity/evolution all respect
+  `development_paused`; nothing external is ever taken; the disposition and
+  reflections stay honest about being computational.
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 11 → **18** (reflect,
+  reflections list, curiosity generate-offline + patch, project create, evolution
+  propose incl. **over-cap 400** and **unknown-trait 400**, and approve → version
+  2 with clamped trait + new interest). Offline gate now **13 files / 139 tests**.
+  `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; full production build OK; i18n parity
+  129/129; Andrés suite 18/18.
+
+**Next:** V3 — Creativity (Creative Studio, concept blending, novelty evaluator,
+"Surprise me").
+
+---
+
 ## [1.31.1] - 2026-08-05
 
 ### Added — Andrés the Robot · V1 "Memory"

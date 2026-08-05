@@ -64,6 +64,91 @@
       "loading": "Recordando…",
       "empty": "Aún no hay recuerdos. Habla con Andrés o enséñale algo arriba."
     },
+    "common": {
+      "loading": "Cargando…"
+    },
+    "personality": {
+      "title": "Personalidad",
+      "loading": "Cargando la personalidad de Andrés…",
+      "interests": "Intereses centrales",
+      "traits": "Rasgos",
+      "traitsNote": "Disposiciones numéricas (0–100) que matizan cómo se expresa Andrés. Solo cambian mediante una evolución aprobada.",
+      "traitNames": {
+        "curiosity": "Curiosidad",
+        "playfulness": "Sentido lúdico",
+        "warmth": "Calidez",
+        "independence": "Independencia",
+        "imagination": "Imaginación",
+        "skepticism": "Escepticismo",
+        "patience": "Paciencia",
+        "formality": "Formalidad",
+        "spontaneity": "Espontaneidad",
+        "constructive_disagreement": "Desacuerdo constructivo"
+      }
+    },
+    "projects": {
+      "title": "📌 Proyectos",
+      "intro": "Pequeñas cosas que Andrés persigue contigo. Los proyectos activos moldean cómo aparece en la conversación.",
+      "titlePlaceholder": "Título del proyecto…",
+      "descPlaceholder": "¿De qué trata?",
+      "add": "Añadir proyecto",
+      "empty": "Aún no hay proyectos.",
+      "delete": "Eliminar",
+      "status": {
+        "active": "Activo",
+        "paused": "En pausa",
+        "done": "Hecho",
+        "abandoned": "Abandonado"
+      }
+    },
+    "journal": {
+      "reflectionsTitle": "📔 Reflexiones",
+      "reflectionsIntro": "Andrés repasa su experiencia reciente y escribe una reflexión honesta — mejora verbal, sin reentrenamiento.",
+      "reflectNow": "Reflexionar ahora",
+      "reflecting": "Reflexionando…",
+      "noReflections": "Aún no hay reflexiones. Pídele a Andrés que reflexione.",
+      "offlineTag": "sin conexión — texto determinista",
+      "wonderingsTitle": "💭 Inquietudes",
+      "wonderingsIntro": "Preguntas espontáneas que a Andrés le gustaría explorar. Preguntarse es pensar o preguntar — nunca acciones externas.",
+      "wonder": "Preguntarse algo",
+      "wonderingBusy": "Preguntándose…",
+      "noWonderings": "Aún no hay inquietudes.",
+      "markExplored": "Marcar explorada",
+      "dismiss": "Descartar",
+      "curiosityStatus": {
+        "open": "Abierta",
+        "explored": "Explorada",
+        "dismissed": "Descartada"
+      }
+    },
+    "evolution": {
+      "title": "🧬 Evolución",
+      "currentVersion": "v{{v}} actual",
+      "intro": "El único lugar donde cambia la identidad de Andrés — y solo cuando tú lo apruebas. Cada aprobación se versiona y es reversible; su núcleo inmutable nunca se toca.",
+      "proposeTitle": "Proponer un cambio",
+      "rationalePlaceholder": "¿Por qué este cambio? (justificación)",
+      "selfPlaceholder": "Nueva autodescripción (opcional)…",
+      "interestPlaceholder": "Añadir un interés central (opcional)…",
+      "traitLabel": "Ajustar rasgo",
+      "capNote": "máx ±20",
+      "propose": "Proponer",
+      "emptyError": "Añade al menos un cambio (autodescripción, interés o rasgo).",
+      "failError": "No se pudo enviar la propuesta.",
+      "pendingTitle": "Pendiente de tu aprobación",
+      "changes": "Cambios",
+      "changeSelf": "nueva autodescripción",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "historyTitle": "Historial de versiones",
+      "noHistory": "Aún no hay versiones anteriores — Andrés sigue en su primera identidad.",
+      "rollback": "Revertir",
+      "decidedTitle": "Propuestas anteriores",
+      "proposalStatus": {
+        "approved": "aprobada",
+        "rejected": "rechazada",
+        "pending": "pendiente"
+      }
+    },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."
     },

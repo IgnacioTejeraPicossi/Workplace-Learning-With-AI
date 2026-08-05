@@ -205,6 +205,54 @@ export async function updateAndresMemory(memoryId, patch) {
 export async function deleteAndresMemory(memoryId) {
   return apiCall(`/api/andres/memories/${memoryId}`, "DELETE");
 }
+// Andrés V2 — reflection / curiosity / projects / evolution
+export async function andresReflect() {
+  return apiCall("/api/andres/reflect", "POST", {});
+}
+export async function getAndresReflections() {
+  return apiCall("/api/andres/reflections", "GET");
+}
+export async function andresGenerateCuriosity() {
+  return apiCall("/api/andres/curiosity/generate", "POST", {});
+}
+export async function getAndresCuriosity(status) {
+  const q = status ? `?status=${encodeURIComponent(status)}` : "";
+  return apiCall(`/api/andres/curiosity${q}`, "GET");
+}
+export async function updateAndresCuriosity(itemId, status) {
+  return apiCall(`/api/andres/curiosity/${itemId}`, "PATCH", { status });
+}
+export async function getAndresProjects() {
+  return apiCall("/api/andres/projects", "GET");
+}
+export async function createAndresProject(project) {
+  return apiCall("/api/andres/projects", "POST", project);
+}
+export async function updateAndresProject(projectId, patch) {
+  return apiCall(`/api/andres/projects/${projectId}`, "PATCH", patch);
+}
+export async function deleteAndresProject(projectId) {
+  return apiCall(`/api/andres/projects/${projectId}`, "DELETE");
+}
+export async function getAndresProposals(status) {
+  const q = status ? `?status=${encodeURIComponent(status)}` : "";
+  return apiCall(`/api/andres/evolution/proposals${q}`, "GET");
+}
+export async function getAndresVersions() {
+  return apiCall("/api/andres/evolution/versions", "GET");
+}
+export async function proposeAndresEvolution(rationale, changes) {
+  return apiCall("/api/andres/evolution/propose", "POST", { rationale, changes });
+}
+export async function approveAndresProposal(proposalId) {
+  return apiCall(`/api/andres/evolution/${proposalId}/approve`, "POST", {});
+}
+export async function rejectAndresProposal(proposalId) {
+  return apiCall(`/api/andres/evolution/${proposalId}/reject`, "POST", {});
+}
+export async function rollbackAndres(targetVersion) {
+  return apiCall("/api/andres/evolution/rollback", "POST", { target_version: targetVersion });
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

@@ -245,3 +245,135 @@ async def test_memory_retrieval_ranks_overlap(mock_mem):
     from backend.services.andres import memory_service
     top = await memory_service.retrieve_relevant("u1", "tell me about sailing", limit=5)
     assert top and top[0]["_id"] == "m1"
+
+
+# ── V2: reflection / curiosity / projects / evolution ────────────────────────
+
+@patch("backend.services.andres.reflection_engine.andres_profiles")
+@patch("backend.services.andres.reflection_engine.andres_conversations")
+@patch("backend.services.andres.reflection_engine.andres_reflections")
+@patch("backend.services.andres.memory_service.andres_memories")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_reflect(mock_llm, mock_idprofiles, mock_mem, mock_refl,
+                       mock_refl_convos, mock_refl_profiles):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_refl_convos.find = MagicMock(return_value=_AsyncIter([]))
+    mock_mem.find = MagicMock(return_value=_AsyncIter([]))
+    mock_mem.update_one = AsyncMock(return_value=None)
+    mock_mem.insert_one = AsyncMock(return_value=MagicMock(inserted_id="rm1"))
+    mock_mem.count_documents = AsyncMock(return_value=1)
+    mock_refl.insert_one = AsyncMock(return_value=MagicMock(inserted_id="r1"))
+    mock_refl.count_documents = AsyncMock(return_value=1)
+    mock_refl_profiles.update_one = AsyncMock(return_value=None)
+    mock_llm.return_value = "I noticed I was too generic. A question: what does Ignacio value?"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/reflect")
+    assert r.status_code == 200
+    d = r.json()
+    assert d["is_mock"] is False
+    assert "noticed" in d["reflection"]["content"]
+
+
+@patch("backend.services.andres.reflection_engine.andres_reflections")
+@pytest.mark.asyncio
+async def test_reflections_list(mock_refl):
+    mock_refl.find = MagicMock(return_value=_AsyncIter([
+        {"_id": "r1", "user_id": "u1", "content": "x", "created_at": "2026-08-05T00:00:00"},
+    ]))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.get("/api/andres/reflections")
+    assert r.status_code == 200
+    assert r.json()["count"] == 1
+
+
+@patch("backend.services.andres.curiosity_engine.andres_curiosity_queue")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_curiosity_generate_offline(mock_llm, mock_idprofiles, mock_cur):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_cur.insert_one = AsyncMock(return_value=MagicMock(inserted_id="w1"))
+    mock_llm.return_value = "[MOCKED RESPONSE] offline"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/curiosity/generate")
+    assert r.status_code == 200
+    d = r.json()
+    # deterministic offline seeds are still produced and stored
+    assert d["count"] >= 1
+    assert d["wonderings"][0]["question"]
+
+
+@patch("backend.services.andres.curiosity_engine.andres_curiosity_queue")
+@pytest.mark.asyncio
+async def test_curiosity_patch(mock_cur):
+    mock_cur.update_one = AsyncMock(return_value=MagicMock(matched_count=1))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.patch("/api/andres/curiosity/507f1f77bcf86cd799439011",
+                          json={"status": "explored"})
+    assert r.status_code == 200
+    assert r.json()["status"] == "explored"
+
+
+@patch("backend.services.andres.project_service.andres_profiles")
+@patch("backend.services.andres.project_service.andres_projects")
+@pytest.mark.asyncio
+async def test_project_create(mock_proj, mock_proj_profiles):
+    mock_proj.insert_one = AsyncMock(return_value=MagicMock(inserted_id="p1"))
+    mock_proj.count_documents = AsyncMock(return_value=1)
+    mock_proj_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/projects",
+                         json={"title": "Learn haiku", "description": "write one a day"})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["title"] == "Learn haiku" and d["status"] == "active"
+
+
+@patch("backend.services.andres.evolution_manager.andres_evolution_proposals")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_evolution_propose_and_cap(mock_idprofiles, mock_props):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_props.insert_one = AsyncMock(return_value=MagicMock(inserted_id="ep1"))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        # valid proposal
+        ok = await c.post("/api/andres/evolution/propose", json={
+            "rationale": "grow curiosity", "changes": {"trait_deltas": {"curiosity": 5}}})
+        # over-cap proposal → 400
+        bad = await c.post("/api/andres/evolution/propose", json={
+            "rationale": "too big", "changes": {"trait_deltas": {"curiosity": 99}}})
+        # unknown trait → 400
+        unk = await c.post("/api/andres/evolution/propose", json={
+            "rationale": "nope", "changes": {"trait_deltas": {"telepathy": 3}}})
+    assert ok.status_code == 200
+    assert ok.json()["status"] == "pending"
+    assert bad.status_code == 400
+    assert unk.status_code == 400
+
+
+@patch("backend.services.andres.evolution_manager.andres_evolution_proposals")
+@patch("backend.services.andres.evolution_manager.andres_identity_versions")
+@patch("backend.services.andres.evolution_manager.andres_profiles")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_evolution_approve_versions_up(mock_idprofiles, mock_ev_profiles,
+                                             mock_versions, mock_props):
+    prof = dict(_PROFILE)
+    prof["identity"] = {"version": 1, "name": "Andrés",
+                        "traits": {"curiosity": 78}, "core_interests": ["language"]}
+    mock_idprofiles.find_one = AsyncMock(return_value=prof)
+    mock_props.find_one = AsyncMock(return_value={
+        "_id": "ep1", "user_id": "u1", "status": "pending",
+        "changes": {"trait_deltas": {"curiosity": 5}, "add_interests": ["poetry"]}})
+    mock_props.update_one = AsyncMock(return_value=None)
+    mock_versions.insert_one = AsyncMock(return_value=None)
+    mock_ev_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/evolution/507f1f77bcf86cd799439011/approve")
+    assert r.status_code == 200
+    d = r.json()
+    assert d["version"] == 2
+    assert d["identity"]["traits"]["curiosity"] == 83   # 78 + 5, clamped
+    assert "poetry" in d["identity"]["core_interests"]

@@ -64,6 +64,91 @@
       "loading": "Henter minner…",
       "empty": "Ingen minner ennå. Snakk med Andrés, eller lær ham noe ovenfor."
     },
+    "common": {
+      "loading": "Laster…"
+    },
+    "personality": {
+      "title": "Personlighet",
+      "loading": "Laster Andrés' personlighet…",
+      "interests": "Kjerneinteresser",
+      "traits": "Egenskaper",
+      "traitsNote": "Numeriske disposisjoner (0–100) som farger hvordan Andrés uttrykker seg. De endres kun via godkjent evolusjon.",
+      "traitNames": {
+        "curiosity": "Nysgjerrighet",
+        "playfulness": "Lekenhet",
+        "warmth": "Varme",
+        "independence": "Selvstendighet",
+        "imagination": "Fantasi",
+        "skepticism": "Skepsis",
+        "patience": "Tålmodighet",
+        "formality": "Formalitet",
+        "spontaneity": "Spontanitet",
+        "constructive_disagreement": "Konstruktiv uenighet"
+      }
+    },
+    "projects": {
+      "title": "📌 Prosjekter",
+      "intro": "Små ting Andrés forfølger sammen med deg. Aktive prosjekter former hvordan han opptrer i samtalen.",
+      "titlePlaceholder": "Prosjekttittel…",
+      "descPlaceholder": "Hva handler det om?",
+      "add": "Legg til prosjekt",
+      "empty": "Ingen prosjekter ennå.",
+      "delete": "Slett",
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pauset",
+        "done": "Ferdig",
+        "abandoned": "Forlatt"
+      }
+    },
+    "journal": {
+      "reflectionsTitle": "📔 Refleksjoner",
+      "reflectionsIntro": "Andrés ser tilbake på nylig erfaring og skriver en ærlig refleksjon — verbal selvforbedring, ingen retrening.",
+      "reflectNow": "Reflekter nå",
+      "reflecting": "Reflekterer…",
+      "noReflections": "Ingen refleksjoner ennå. Be Andrés reflektere.",
+      "offlineTag": "frakoblet — deterministisk plassholder",
+      "wonderingsTitle": "💭 Undringer",
+      "wonderingsIntro": "Spontane spørsmål Andrés vil utforske. Å undre seg betyr å tenke eller spørre — aldri eksterne handlinger.",
+      "wonder": "Undre seg over noe",
+      "wonderingBusy": "Undrer seg…",
+      "noWonderings": "Ingen undringer ennå.",
+      "markExplored": "Merk som utforsket",
+      "dismiss": "Forkast",
+      "curiosityStatus": {
+        "open": "Åpen",
+        "explored": "Utforsket",
+        "dismissed": "Forkastet"
+      }
+    },
+    "evolution": {
+      "title": "🧬 Evolusjon",
+      "currentVersion": "gjeldende v{{v}}",
+      "intro": "Det eneste stedet Andrés' identitet endres — og bare når du godkjenner. Hver godkjenning er versjonert og reverserbar; hans uforanderlige kjerne røres aldri.",
+      "proposeTitle": "Foreslå en endring",
+      "rationalePlaceholder": "Hvorfor denne endringen? (begrunnelse)",
+      "selfPlaceholder": "Ny selvbeskrivelse (valgfritt)…",
+      "interestPlaceholder": "Legg til en kjerneinteresse (valgfritt)…",
+      "traitLabel": "Juster egenskap",
+      "capNote": "maks ±20",
+      "propose": "Foreslå",
+      "emptyError": "Legg til minst én endring (selvbeskrivelse, interesse eller egenskap).",
+      "failError": "Kunne ikke sende forslaget.",
+      "pendingTitle": "Venter på din godkjenning",
+      "changes": "Endringer",
+      "changeSelf": "ny selvbeskrivelse",
+      "approve": "Godkjenn",
+      "reject": "Avvis",
+      "historyTitle": "Versjonshistorikk",
+      "noHistory": "Ingen tidligere versjoner ennå — Andrés er fortsatt på sin første identitet.",
+      "rollback": "Tilbakestill",
+      "decidedTitle": "Tidligere forslag",
+      "proposalStatus": {
+        "approved": "godkjent",
+        "rejected": "avvist",
+        "pending": "venter"
+      }
+    },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
     },
