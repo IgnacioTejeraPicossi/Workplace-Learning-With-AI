@@ -38,6 +38,32 @@
       "offlineNote": "⚠️ No AI provider configured — this is an honest limitation, not a mood.",
       "errorNote": "Something went wrong reaching Andrés. Please try again."
     },
+    "memory": {
+      "title": "🌱 Memory Garden",
+      "intro": "Andrés grows through what he remembers. Memories he forms on his own are candidates until you verify them — you can correct, protect or forget any of them. Nothing here is treated as fact until you say so.",
+      "addPlaceholder": "Teach Andrés something to remember…",
+      "add": "Remember",
+      "all": "All",
+      "types": {
+        "episodic": "Episodic",
+        "semantic": "Semantic",
+        "relational": "Relational",
+        "creative": "Creative",
+        "procedural": "Procedural",
+        "reflective": "Reflective",
+        "working": "Working"
+      },
+      "verified": "Verified",
+      "candidate": "Candidate",
+      "protectedTag": "Protected",
+      "verify": "Verify",
+      "unverify": "Unverify",
+      "protect": "Protect",
+      "unprotect": "Unprotect",
+      "forget": "Forget",
+      "loading": "Recalling…",
+      "empty": "No memories yet. Talk with Andrés, or teach him something above."
+    },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."
     },

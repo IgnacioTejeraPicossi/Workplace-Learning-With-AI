@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.1] - 2026-08-05
+
+### Added — Andrés the Robot · V1 "Memory"
+
+The second phase of Andrés: he now **remembers**. Memory is the first mechanism
+by which his biography — and therefore his uniqueness — actually accumulates.
+
+- **Backend memory system**: `backend/services/andres/memory_service.py` — seven
+  memory types (working, episodic, semantic, relational, creative, procedural,
+  reflective) persisted per user with importance / novelty / confidence /
+  sensitivity and a `user_verified` flag. `save_memory`, `list_memories`,
+  `update_memory`, `delete_memory`, and `retrieve_relevant` (keyword-overlap +
+  importance + verified-bonus ranking — no embeddings yet; verified and
+  unverified memories both compete so recall isn't purely self-confirming).
+- **Consent model**: memories Andrés forms on his own are **candidates**
+  (`user_verified=False`); memories the user authors by hand are verified. Nothing
+  is treated as fact until the user verifies it. No hidden chain-of-thought is
+  stored — only event summaries.
+- **New endpoints** on `backend/routers/andres_robot.py`:
+  `GET/POST /api/andres/memories`, `PATCH/DELETE /api/andres/memories/{id}`
+  (invalid id → 400, missing → 404).
+- **Chat integration**: `/api/andres/chat` now recalls the top relevant memories,
+  injects a new `[RELEVANT MEMORIES]` layer into the assembled prompt
+  (`prompt_assembler.py`, verified vs unverified marked; "never invent memories"),
+  and — after a real (non-mock) exchange, when autonomy ≥ 1 and not paused —
+  stores an episodic memory **candidate**. Response `development_signals` now
+  reports `new_memory_candidates` and `memories_recalled`.
+- **Frontend Memory Garden**: `AndresRobot.jsx` Memory tab is now functional —
+  list memories (filter by type), add a memory by hand, and **verify / protect /
+  forget** each one. Home "Memories" counter reflects real data.
+- **i18n**: `andresRobotModule.json` extended (EN/ES/NO, 62/62 parity) with the
+  `memory.*` block (types, actions, states).
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 5 → **11** (memory list /
+  create / patch-verify / bad-id-400 / delete / retrieval-ranking, plus chat now
+  asserts candidate-stored vs offline-skipped). Offline gate now
+  **13 files / 132 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; full production build OK; i18n parity 62/62;
+  Andrés suite 11/11.
+
+**Next:** V2 — Reflection / Curiosity / Projects / Evolution (+ rollback).
+
+---
+
 ## [1.31.0] - 2026-08-05
 
 ### Added — Andrés the Robot (developmental AI companion) · V0 "Birth"

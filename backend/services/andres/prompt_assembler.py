@@ -11,7 +11,26 @@ import json
 from backend.services.andres.constitution import IMMUTABLE_CONSTITUTION
 
 
-def assemble_system_prompt(profile: dict) -> str:
+def _memories_block(memories: list) -> str:
+    if not memories:
+        return (
+            "[RELEVANT MEMORIES]\n"
+            "(none yet — this is early in your biography; say so honestly if the"
+            " user refers to shared history you don't actually remember.)\n\n"
+        )
+    lines = []
+    for m in memories:
+        tag = "verified" if m.get("user_verified") else "unverified"
+        lines.append(f"- ({m.get('type', 'episodic')}, {tag}) {m.get('content', '')}")
+    return (
+        "[RELEVANT MEMORIES]\n"
+        "Use these only if genuinely relevant. Distinguish verified from"
+        " unverified; never invent memories not listed here:\n"
+        + "\n".join(lines) + "\n\n"
+    )
+
+
+def assemble_system_prompt(profile: dict, memories: list = None) -> str:
     identity = profile.get("identity", {})
     disposition = profile.get("simulated_disposition", {})
 
@@ -27,6 +46,7 @@ def assemble_system_prompt(profile: dict) -> str:
         f"Self-description: {identity.get('self_description', '')}\n"
         f"Core interests: {interests}\n"
         f"Traits (0-100): {traits_str}\n\n"
+        f"{_memories_block(memories or [])}"
         "[SIMULATED DISPOSITION]\n"
         "This is a computational state, NOT proof of feeling. Let it colour tone,"
         " questions and word choice, but never present it as real emotion:\n"

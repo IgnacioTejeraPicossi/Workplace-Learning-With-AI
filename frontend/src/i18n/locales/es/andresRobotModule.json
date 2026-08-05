@@ -38,6 +38,32 @@
       "offlineNote": "⚠️ Sin proveedor de IA configurado — es una limitación honesta, no un estado de ánimo.",
       "errorNote": "Algo falló al contactar con Andrés. Inténtalo de nuevo."
     },
+    "memory": {
+      "title": "🌱 Jardín de memoria",
+      "intro": "Andrés crece a través de lo que recuerda. Los recuerdos que forma por su cuenta son candidatos hasta que tú los verificas — puedes corregir, proteger u olvidar cualquiera de ellos. Nada aquí se toma como un hecho hasta que tú lo digas.",
+      "addPlaceholder": "Enséñale a Andrés algo que recordar…",
+      "add": "Recordar",
+      "all": "Todos",
+      "types": {
+        "episodic": "Episódica",
+        "semantic": "Semántica",
+        "relational": "Relacional",
+        "creative": "Creativa",
+        "procedural": "Procedimental",
+        "reflective": "Reflexiva",
+        "working": "De trabajo"
+      },
+      "verified": "Verificado",
+      "candidate": "Candidato",
+      "protectedTag": "Protegido",
+      "verify": "Verificar",
+      "unverify": "Quitar verificación",
+      "protect": "Proteger",
+      "unprotect": "Desproteger",
+      "forget": "Olvidar",
+      "loading": "Recordando…",
+      "empty": "Aún no hay recuerdos. Habla con Andrés o enséñale algo arriba."
+    },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."
     },

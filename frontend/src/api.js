@@ -192,6 +192,19 @@ export async function getAndresProfile() {
 export async function andresChat(message) {
   return apiCall("/api/andres/chat", "POST", { message });
 }
+export async function getAndresMemories(type) {
+  const q = type ? `?type=${encodeURIComponent(type)}` : "";
+  return apiCall(`/api/andres/memories${q}`, "GET");
+}
+export async function createAndresMemory(mem) {
+  return apiCall("/api/andres/memories", "POST", mem);
+}
+export async function updateAndresMemory(memoryId, patch) {
+  return apiCall(`/api/andres/memories/${memoryId}`, "PATCH", patch);
+}
+export async function deleteAndresMemory(memoryId) {
+  return apiCall(`/api/andres/memories/${memoryId}`, "DELETE");
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

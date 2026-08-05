@@ -38,6 +38,32 @@
       "offlineNote": "⚠️ Ingen AI-leverandør konfigurert — en ærlig begrensning, ikke en stemning.",
       "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen."
     },
+    "memory": {
+      "title": "🌱 Minnehage",
+      "intro": "Andrés vokser gjennom det han husker. Minner han danner på egen hånd er kandidater til du bekrefter dem — du kan rette, beskytte eller glemme hvilket som helst av dem. Ingenting her regnes som fakta før du sier det.",
+      "addPlaceholder": "Lær Andrés noe å huske…",
+      "add": "Husk",
+      "all": "Alle",
+      "types": {
+        "episodic": "Episodisk",
+        "semantic": "Semantisk",
+        "relational": "Relasjonell",
+        "creative": "Kreativ",
+        "procedural": "Prosedyre",
+        "reflective": "Reflekterende",
+        "working": "Arbeids"
+      },
+      "verified": "Bekreftet",
+      "candidate": "Kandidat",
+      "protectedTag": "Beskyttet",
+      "verify": "Bekreft",
+      "unverify": "Fjern bekreftelse",
+      "protect": "Beskytt",
+      "unprotect": "Fjern beskyttelse",
+      "forget": "Glem",
+      "loading": "Henter minner…",
+      "empty": "Ingen minner ennå. Snakk med Andrés, eller lær ham noe ovenfor."
+    },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
     },
