@@ -50,6 +50,7 @@
       "signInAnalytics": "Por favor, inicia sesión para ver los análisis del equipo.",
       "noTeamsAnalytics": "No hay equipos disponibles. Crea un equipo primero para ver los análisis.",
       "dashboardComingSoon": "¡El panel de análisis de equipo llegará pronto! Incluirá:\n\n• Métricas de rendimiento del equipo\n• Patrones de colaboración\n• Análisis de brechas de habilidades\n• Seguimiento del progreso\n• Insights generados por IA\n\n¡Permanece atento!"
-    }
+    },
+    "analyticsOfflineNotice": "El análisis de IA no está disponible ahora (no hay proveedor de IA configurado). Inténtalo de nuevo cuando haya una clave de IA."
   }
 }

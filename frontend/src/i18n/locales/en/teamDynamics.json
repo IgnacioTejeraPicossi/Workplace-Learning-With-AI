@@ -50,6 +50,7 @@
       "signInAnalytics": "Please sign in to view team analytics.",
       "noTeamsAnalytics": "No teams available. Create a team first to view analytics.",
       "dashboardComingSoon": "Team Analytics Dashboard is coming soon! This will include:\n\n• Team performance metrics\n• Collaboration patterns\n• Skill gap analysis\n• Progress tracking\n• AI-powered insights\n\nStay tuned for updates!"
-    }
+    },
+    "analyticsOfflineNotice": "AI analysis is unavailable right now (no AI provider configured). Try again once an AI key is set."
   }
 }

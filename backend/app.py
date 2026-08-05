@@ -789,7 +789,7 @@ async def get_team(team_id: str, user=Depends(verify_token)):
     """Get specific team details with members."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -812,7 +812,7 @@ async def update_team(team_id: str, request: TeamUpdateRequest, user=Depends(ver
     """Update team details."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -827,7 +827,7 @@ async def update_team(team_id: str, request: TeamUpdateRequest, user=Depends(ver
         update_data["description"] = request.description
     
     await teams_collection.update_one(
-        {"_id": ObjectId(team_id)},
+        {"_id": _oid(team_id)},
         {"$set": update_data}
     )
     
@@ -838,7 +838,7 @@ async def delete_team(team_id: str, user=Depends(verify_token)):
     """Delete a team and all its members."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -849,7 +849,7 @@ async def delete_team(team_id: str, user=Depends(verify_token)):
     await team_members_collection.delete_many({"team_id": team_id})
     
     # Delete team
-    await teams_collection.delete_one({"_id": ObjectId(team_id)})
+    await teams_collection.delete_one({"_id": _oid(team_id)})
     
     return {"message": "Team deleted successfully"}
 
@@ -858,7 +858,7 @@ async def add_team_member(team_id: str, member: TeamMember, user=Depends(verify_
     """Add a new member to a team."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -890,7 +890,7 @@ async def update_team_member(
     """Update a team member's details."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -912,7 +912,7 @@ async def update_team_member(
         raise HTTPException(status_code=400, detail="No fields to update")
     
     result = await team_members_collection.update_one(
-        {"_id": ObjectId(member_id), "team_id": team_id},
+        {"_id": _oid(member_id), "team_id": team_id},
         {"$set": update_data}
     )
     
@@ -926,7 +926,7 @@ async def remove_team_member(team_id: str, member_id: str, user=Depends(verify_t
     """Remove a member from a team."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -934,7 +934,7 @@ async def remove_team_member(team_id: str, member_id: str, user=Depends(verify_t
         raise HTTPException(status_code=404, detail="Team not found")
     
     result = await team_members_collection.delete_one({
-        "_id": ObjectId(member_id),
+        "_id": _oid(member_id),
         "team_id": team_id
     })
     
@@ -948,7 +948,7 @@ async def generate_team_analytics(team_id: str, analytics_request: TeamAnalytics
     """Generate AI-powered team analytics."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     
@@ -976,7 +976,7 @@ async def generate_team_analytics(team_id: str, analytics_request: TeamAnalytics
     Description: {team_data['team_description']}
     
     Team Members:
-    {chr(10).join([f"- {m['name']} ({m['role']}): Skills: {', '.join(m['skills'])}" for m in members])}
+    {chr(10).join([f"- {m['name']} ({m['role']}): Skills: {', '.join(m.get('skills', []))}" for m in members])}
     
     Requested Metrics: {', '.join(analytics_request.metrics)}
     
@@ -988,26 +988,32 @@ async def generate_team_analytics(team_id: str, analytics_request: TeamAnalytics
     """
     
     analysis_result = ask_ai_unified_sync(analysis_prompt, task_type="team_analytics", complexity="high", max_tokens=1000, request_headers=http_request.headers)
-    
-    # Save analytics
+
+    # Detect the "no AI provider" mock so the frontend can show a friendly notice
+    # instead of the raw "[MOCKED RESPONSE] ..." string. Don't persist the mock.
+    is_mock = bool(analysis_result) and analysis_result.startswith("[MOCKED RESPONSE")
+    clean_analysis = "" if is_mock else analysis_result
+
+    # Save analytics (only real analyses are persisted)
     analytics_doc = {
         "team_id": team_id,
         "user_id": user["uid"],
         "metrics": analytics_request.metrics,
-        "analysis": analysis_result,
+        "analysis": clean_analysis,
+        "is_mock": is_mock,
         "created_at": datetime.utcnow()
     }
-    
+
     await team_analytics_collection.insert_one(analytics_doc)
-    
-    return {"analysis": analysis_result}
+
+    return {"analysis": clean_analysis, "is_mock": is_mock}
 
 @app.get("/teams/{team_id}/analytics")
 async def get_team_analytics(team_id: str, user=Depends(verify_token)):
     """Get historical analytics for a team."""
     # Verify team ownership
     team = await teams_collection.find_one({
-        "_id": ObjectId(team_id),
+        "_id": _oid(team_id),
         "created_by": user["uid"]
     })
     

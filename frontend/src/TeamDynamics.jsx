@@ -27,7 +27,6 @@ function TeamDynamics() {
   const loadTeams = async () => {
     // Check if user is authenticated
     if (!auth.currentUser) {
-      console.log("User not authenticated, skipping team load");
       setTeams([]);
       return;
     }
@@ -39,7 +38,6 @@ function TeamDynamics() {
     } catch (error) {
       console.error("Error loading teams:", error);
       if (error.response?.status === 401) {
-        console.log("User not authenticated, clearing teams");
         setTeams([]);
       }
     } finally {
@@ -77,8 +75,6 @@ function TeamDynamics() {
       return;
     }
     
-    console.log("Creating team with members:", validMembers);
-    console.log("User authenticated:", auth.currentUser.email);
     
     try {
       setLoading(true);
@@ -88,7 +84,6 @@ function TeamDynamics() {
         members: validMembers
       });
       
-      console.log("Team created successfully:", response);
       
       // Reload teams to get the updated list
       await loadTeams();
@@ -112,10 +107,10 @@ function TeamDynamics() {
     try {
       setLoading(true);
       const response = await generateTeamAnalytics(teamId, ["collaboration", "productivity", "communication"]);
-      
+
       setAnalytics(prev => ({
         ...prev,
-        [teamId]: response.analysis
+        [teamId]: { text: response.analysis || "", isMock: !!response.is_mock }
       }));
     } catch (error) {
       console.error("Error generating analytics:", error);
@@ -578,14 +573,20 @@ function TeamDynamics() {
                    border: `1px solid ${colors.border}`
                  }}>
                    <h5 style={{ color: colors.text, marginTop: 0, marginBottom: 12 }}>{t("teamDynamics.aiAnalysis")}</h5>
-                   <div style={{ 
-                     color: colors.textSecondary, 
-                     fontSize: 14, 
-                     lineHeight: 1.5,
-                     whiteSpace: "pre-wrap"
-                   }}>
-                     {analytics[team._id]}
-                   </div>
+                   {analytics[team._id].isMock ? (
+                     <div style={{ color: colors.textSecondary, fontSize: 14, fontStyle: "italic" }}>
+                       ⚠️ {t("teamDynamics.analyticsOfflineNotice")}
+                     </div>
+                   ) : (
+                     <div style={{
+                       color: colors.textSecondary,
+                       fontSize: 14,
+                       lineHeight: 1.5,
+                       whiteSpace: "pre-wrap"
+                     }}>
+                       {analytics[team._id].text}
+                     </div>
+                   )}
                  </div>
                )}
             </div>

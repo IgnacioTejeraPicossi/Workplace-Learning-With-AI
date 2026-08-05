@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.18] - 2026-08-05
+
+### Fixed / Added — Team Dynamics: backend hardening + contract tests (audit Fase 1 + 2)
+
+**Fase 1 — backend robustness + cleanup:**
+- **Malformed id → 500**: the 12 team/member endpoints parsed the route id with
+  raw `ObjectId(team_id)` / `ObjectId(member_id)`, so an invalid id raised an
+  uncaught `InvalidId` → **500**. Switched all 12 to the existing `_oid()` guard
+  → **400** "Invalid id" (same fix pattern as the Future module [1.26.2]).
+- **Analytics `is_mock`**: `generate_team_analytics` returned the raw LLM output,
+  so when no AI provider is configured the user saw the literal
+  `[MOCKED RESPONSE] All AI providers unavailable` string as the "AI analysis".
+  Now it detects the mock, returns `is_mock: true` with an empty analysis (and
+  does not persist the junk); the frontend shows a localized offline notice
+  (`teamDynamics.analyticsOfflineNotice`, EN/ES/NO) instead.
+- **KeyError guard**: `m['skills']` in the analysis prompt → `m.get('skills', [])`
+  (a member without skills no longer 500s).
+- **Frontend cleanup**: removed 5 debug `console.log` from `TeamDynamics.jsx`;
+  analytics state is now `{ text, isMock }`.
+
+**Fase 2 — tests**: `backend/tests/test_team_dynamics_contracts.py` (7 offline
+tests, auth + Mongo + LLM mocked): invalid-id→400 (get + analytics), create-team
+ok, duplicate-emails→400, analytics is_mock vs real, team-not-found→404. Added to
+`.github/workflows/ci.yml`; offline gate now **12 files / 120 tests**.
+`docs/TESTING.md` updated.
+
+- Validated: backend `compileall` OK; `@babel/parser` JSX parse OK; i18n parity
+  50/50 EN/ES/NO; new suite 7/7; all 12 offline suites together 120/120.
+
+Deferred (Fase 3, product decision): the two "coming soon" buttons ("Start Team
+Simulation", "View Team Analytics") still only show placeholder alerts.
+
+---
+
 ## [1.30.17] - 2026-08-04
 
 ### Changed — Babel Library: Catalog + AI-Search extracted via Context (audit Fase 3, complete)

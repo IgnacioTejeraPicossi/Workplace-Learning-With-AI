@@ -50,6 +50,7 @@
       "signInAnalytics": "Logg inn for å se teamanalyse.",
       "noTeamsAnalytics": "Ingen team tilgjengelig. Opprett et team først for å se analyse.",
       "dashboardComingSoon": "Teamanalyse-dashbord kommer snart! Dette vil inkludere:\n\n• Prestasjonsmålinger\n• Samarbeidsmønstre\n• Kompetansegapanalyse\n• Fremdriftssporing\n• KI-drevne innsikter\n\nFølg med for oppdateringer!"
-    }
+    },
+    "analyticsOfflineNotice": "AI-analyse er utilgjengelig akkurat nå (ingen AI-leverandør konfigurert). Prøv igjen når en AI-nøkkel er satt."
   }
 }
