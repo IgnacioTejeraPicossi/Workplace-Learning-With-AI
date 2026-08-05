@@ -70,6 +70,7 @@ import SpanishTeacher from "./components/SpanishTeacher/SpanishTeacher";
 // for Observer Patch Holography and related theories of consciousness/simulation
 import SelfSimRealityAgent from "./SelfSimRealityAgent";
 import SelfCorrectingLoop from "./SelfCorrectingLoop";
+import AndresRobot from "./AndresRobot";
 // Web Lab module (1.16.0) — separate from RC QA Agent; hosts local website clones
 import ItemNoWeb from "./web-lab/ItemNoWeb";
 import RedcrossNoWeb from "./web-lab/RedcrossNoWeb";
@@ -550,6 +551,7 @@ function AppContent() {
             {!activeModule && section === "humanizing-ai" && <HumanizingAI />}
             {!activeModule && section === "self-sim-reality-agent" && <SelfSimRealityAgent />}
             {!activeModule && section === "self-correcting-loop" && <SelfCorrectingLoop />}
+            {!activeModule && section === "andres-robot" && <AndresRobot />}
             {!activeModule && section === "japanese-sensei" && <JapaneseSensei />}
             {!activeModule && section === "chinese-teacher" && <ChineseTeacher />}
             {!activeModule && section === "korean-teacher" && <KoreanTeacher />}

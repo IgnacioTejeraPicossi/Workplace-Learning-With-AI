@@ -41,6 +41,25 @@ ai_training_progress_collection = database.get_collection("ai_training_progress"
 # `progress` object (scenario_type, current_step, selected_option, ...).
 simulation_progress_collection = database.get_collection("simulation_progress")
 
+# Andrés the Robot — developmental AI companion (V0, 2026-08). One document per
+# user for the profile; the rest hold the growing biography (memory, reflections,
+# skills, projects, evolution, safety events). See docs/andres-robot-plan.md.
+andres_profiles = database.get_collection("andres_profiles")
+andres_identity_versions = database.get_collection("andres_identity_versions")
+andres_conversations = database.get_collection("andres_conversations")
+andres_memories = database.get_collection("andres_memories")
+andres_memory_links = database.get_collection("andres_memory_links")
+andres_reflections = database.get_collection("andres_reflections")
+andres_curiosity_queue = database.get_collection("andres_curiosity_queue")
+andres_skills = database.get_collection("andres_skills")
+andres_skill_runs = database.get_collection("andres_skill_runs")
+andres_projects = database.get_collection("andres_projects")
+andres_creative_artifacts = database.get_collection("andres_creative_artifacts")
+andres_evolution_proposals = database.get_collection("andres_evolution_proposals")
+andres_feedback = database.get_collection("andres_feedback")
+andres_development_metrics = database.get_collection("andres_development_metrics")
+andres_safety_events = database.get_collection("andres_safety_events")
+
 # Document Analysis Collections
 document_analyses_collection = database.get_collection("document_analyses")
 

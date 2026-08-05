@@ -125,7 +125,8 @@
       "ideaLog": "Idea Log",
       "featureRoadmap": "Feature Roadmap"
     },
-    "selfCorrectingLoop": "Self-Correcting AI Loop"
+    "selfCorrectingLoop": "Self-Correcting AI Loop",
+    "andresRobot": "Andrés the Robot"
   },
   "agents": {
     "compliance": {

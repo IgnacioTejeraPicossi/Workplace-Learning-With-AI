@@ -192,6 +192,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Learning Profile router: {e}")
 
+# Andrés the Robot router (developmental AI companion — V0)
+try:
+    from backend.routers.andres_robot import router as andres_robot_router
+    app.include_router(andres_robot_router)
+    print("✅ Andrés the Robot router included successfully")
+except Exception as e:
+    print(f"❌ Error including Andrés the Robot router: {e}")
+
 # ATM V&V Test Copilot router
 try:
     from backend.routers.atm_copilot import router as atm_copilot_router

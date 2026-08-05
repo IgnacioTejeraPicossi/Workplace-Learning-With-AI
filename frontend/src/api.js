@@ -185,6 +185,14 @@ export async function getTeamAnalyticsHistory(teamId) {
   return apiCall(`/teams/${teamId}/analytics`, "GET");
 }
 
+// Andrés the Robot — developmental AI companion (V0).
+export async function getAndresProfile() {
+  return apiCall("/api/andres/profile", "GET");
+}
+export async function andresChat(message) {
+  return apiCall("/api/andres/chat", "POST", { message });
+}
+
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);
 }

@@ -396,7 +396,8 @@
       "ideaLog": "Ide-loggbok",
       "featureRoadmap": "Funksjonskart"
     },
-    "selfCorrectingLoop": "Selvkorrigerende KI-løkke"
+    "selfCorrectingLoop": "Selvkorrigerende KI-løkke",
+    "andresRobot": "Andrés the Robot"
   },
   "agents": {
     "compliance": {

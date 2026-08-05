@@ -149,7 +149,8 @@ const getNavItems = (t) => [
     { key: "ops-efficiency-agent", label: t('sidebar.opsEfficiencyAgent'), icon: "settings" },
     { key: "atm-vv-test-copilot", label: t('sidebar.atmVvTestCopilot'), icon: "plane" },
     { key: "self-sim-reality-agent", label: t('sidebar.selfSimRealityAgent'), icon: "brain" },
-    { key: "self-correcting-loop", label: t('sidebar.selfCorrectingLoop'), icon: "refresh-cw" }
+    { key: "self-correcting-loop", label: t('sidebar.selfCorrectingLoop'), icon: "refresh-cw" },
+    { key: "andres-robot", label: t('sidebar.andresRobot'), icon: "robot" }
   ]},
 
   // Language Agents (2026-07): dedicated group for CJK+ language learning

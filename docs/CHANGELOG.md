@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.0] - 2026-08-05
+
+### Added — Andrés the Robot (developmental AI companion) · V0 "Birth"
+
+A new module inspired by *Bicentennial Man*: a companion whose uniqueness will
+emerge from an accumulated, verifiable, reversible **digital biography** (memory,
+versioned identity, reflection, creativity, user-approved evolution) around the
+base model — **not** from claims of consciousness. Full phased plan:
+`docs/andres-robot-plan.md`. This ships **V0 "Birth"** only.
+
+- **Backend**: `backend/routers/andres_robot.py` (registered in `app.py`) with
+  `GET /api/andres/health`, `GET /api/andres/profile` (get-or-create the V0
+  "birth" profile), `POST /api/andres/chat` (real turn via `ask_ai_unified`, the
+  system prompt assembled from an **immutable constitution** + the V0 identity;
+  `is_mock` offline fallback with an honest notice; conversation persisted).
+  Services in `backend/services/andres/` (`constitution.py`, `identity_service.py`,
+  `prompt_assembler.py`). 15 `andres_*` Mongo collections added to `db.py`.
+  Auth-guarded via a lazy `_verify_token` wrapper (no import cycle).
+- **Frontend**: `frontend/src/AndresRobot.jsx` — module shell with 11 tabs; the
+  **Home** dashboard (reads the profile: developmental age, identity version,
+  counters, simulated disposition) and **Conversation** (real chat) are
+  functional; the other 9 tabs are honest "arrives in phase Vx" placeholders. A
+  **Safety** tab states the immutable-core guarantees. Sidebar entry under Future
+  Item Agents; routed in `App.jsx`; api helpers `getAndresProfile` / `andresChat`.
+- **i18n**: new `andresRobotModule.json` (EN/ES/NO, 40/40 parity) +
+  `sidebar.andresRobot`.
+- **Honesty by design**: the simulated disposition is labelled a computational
+  state, never real emotion; the offline fallback is explicitly "an honest
+  limitation, not a mood".
+- **Tests / CI**: `backend/tests/test_andres_robot_contracts.py` (5 offline:
+  health, profile, chat real vs `is_mock`, empty-message → 422). Offline gate now
+  **13 files / 126 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; full production build OK; i18n parity
+  40/40; suite 5/5; all 13 offline suites together 126/126.
+
+**Next (later phases, per the plan):** V1 Memory (7 memory types + Memory
+Garden), V2 Reflection/Curiosity/Projects/Evolution, V3 Creativity, V4 Skills,
+V5 Developmental Companion + Personality Capsule, V6 embodiment adapters.
+
+---
+
 ## [1.30.19] - 2026-08-05
 
 ### Added — Team Dynamics: wire the two placeholder buttons (audit Fase 3, Option A)

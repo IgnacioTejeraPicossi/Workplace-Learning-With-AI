@@ -125,7 +125,8 @@
       "ideaLog": "Registro de ideas",
       "featureRoadmap": "Hoja de ruta de funciones"
     },
-    "selfCorrectingLoop": "Bucle de IA Autocorrectivo"
+    "selfCorrectingLoop": "Bucle de IA Autocorrectivo",
+    "andresRobot": "Andrés the Robot"
   },
   "actions": {
     "refreshData": "Actualizar datos",

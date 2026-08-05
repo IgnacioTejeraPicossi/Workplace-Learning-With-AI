@@ -1,0 +1,54 @@
+{
+  "andresRobotModule": {
+    "moduleTitle": "Andrés the Robot",
+    "moduleSubtitle": "Un compañero de IA en desarrollo — Memoria · Reflexión · Creatividad · Crecimiento",
+    "statusBadge": "V0 · Nacimiento",
+    "tabs": {
+      "home": "Inicio",
+      "conversation": "Conversación",
+      "memory": "Jardín de memoria",
+      "personality": "Personalidad",
+      "creative": "Estudio creativo",
+      "humanLab": "Lab humano",
+      "skills": "Habilidades",
+      "projects": "Proyectos",
+      "evolution": "Evolución",
+      "journal": "Diario",
+      "safety": "Seguridad"
+    },
+    "home": {
+      "age": "Edad (días)",
+      "identityVersion": "Identidad",
+      "memories": "Recuerdos",
+      "reflections": "Reflexiones",
+      "skills": "Habilidades activas",
+      "projects": "Proyectos",
+      "autonomy": "Nivel de autonomía",
+      "conversations": "Conversaciones",
+      "intro": "Un compañero digital recién despertado, empezando a desarrollar un carácter propio.",
+      "dispositionTitle": "Disposición simulada",
+      "dispositionNote": "Un estado computacional — no prueba de emoción real."
+    },
+    "conversation": {
+      "placeholder": "Habla con Andrés…",
+      "send": "Enviar",
+      "sending": "Pensando…",
+      "you": "Tú",
+      "emptyHint": "Salúdalo — Andrés apenas empieza a desarrollarse, y esta conversación es el comienzo de su biografía.",
+      "offlineNote": "⚠️ Sin proveedor de IA configurado — es una limitación honesta, no un estado de ánimo.",
+      "errorNote": "Algo falló al contactar con Andrés. Inténtalo de nuevo."
+    },
+    "placeholder": {
+      "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."
+    },
+    "safety": {
+      "title": "🛡️ Seguridad y control",
+      "intro": "Andrés se construye con libertad dentro de límites visibles. Su núcleo ético es inmutable y nunca puede modificarlo.",
+      "i1": "Sin código auto-modificable, acceso a shell, mensajes externos ni transacciones.",
+      "i2": "Sin memoria secreta ni borrado de registros de auditoría.",
+      "i3": "Nunca afirma conciencia ni emoción real como un hecho.",
+      "i4": "Siempre puedes pausarlo, exportarlo, reiniciarlo o borrarlo.",
+      "controlsNote": "Los controles completos (pausar desarrollo, congelar identidad, exportar/borrar recuerdos, rollback, comparar con el modelo base) llegan con las fases de memoria y evolución."
+    }
+  }
+}

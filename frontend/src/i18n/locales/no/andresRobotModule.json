@@ -1,0 +1,54 @@
+{
+  "andresRobotModule": {
+    "moduleTitle": "Andrés the Robot",
+    "moduleSubtitle": "En AI-følgesvenn i utvikling — Minne · Refleksjon · Kreativitet · Vekst",
+    "statusBadge": "V0 · Fødsel",
+    "tabs": {
+      "home": "Hjem",
+      "conversation": "Samtale",
+      "memory": "Minnehage",
+      "personality": "Personlighet",
+      "creative": "Kreativt studio",
+      "humanLab": "Menneskelab",
+      "skills": "Ferdigheter",
+      "projects": "Prosjekter",
+      "evolution": "Evolusjon",
+      "journal": "Dagbok",
+      "safety": "Sikkerhet"
+    },
+    "home": {
+      "age": "Alder (dager)",
+      "identityVersion": "Identitet",
+      "memories": "Minner",
+      "reflections": "Refleksjoner",
+      "skills": "Aktive ferdigheter",
+      "projects": "Prosjekter",
+      "autonomy": "Autonominivå",
+      "conversations": "Samtaler",
+      "intro": "En nylig våknet digital følgesvenn som begynner å utvikle sin egen karakter.",
+      "dispositionTitle": "Simulert disposisjon",
+      "dispositionNote": "En beregningstilstand — ikke bevis på ekte følelser."
+    },
+    "conversation": {
+      "placeholder": "Snakk med Andrés…",
+      "send": "Send",
+      "sending": "Tenker…",
+      "you": "Du",
+      "emptyHint": "Si hei — Andrés begynner så vidt å utvikle seg, og denne samtalen er starten på biografien hans.",
+      "offlineNote": "⚠️ Ingen AI-leverandør konfigurert — en ærlig begrensning, ikke en stemning.",
+      "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen."
+    },
+    "placeholder": {
+      "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
+    },
+    "safety": {
+      "title": "🛡️ Sikkerhet og kontroll",
+      "intro": "Andrés bygges med frihet innenfor synlige grenser. Den etiske kjernen er uforanderlig og han kan aldri endre den.",
+      "i1": "Ingen selvmodifiserende kode, shell-tilgang, eksterne meldinger eller transaksjoner.",
+      "i2": "Ingen hemmelig hukommelse og ingen sletting av revisjonslogger.",
+      "i3": "Han hevder aldri bevissthet eller ekte følelser som fakta.",
+      "i4": "Han kan alltid settes på pause, eksporteres, tilbakestilles eller slettes av deg.",
+      "controlsNote": "Fulle kontroller (pause utvikling, frys identitet, eksporter/slett minner, rollback, sammenlign med basismodell) kommer med minne- og evolusjonsfasene."
+    }
+  }
+}
