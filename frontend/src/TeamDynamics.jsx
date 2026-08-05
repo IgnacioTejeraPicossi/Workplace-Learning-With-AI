@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
-import { getTeams, createTeam, generateTeamAnalytics, getTeam } from "./api";
+import { getTeams, createTeam, generateTeamAnalytics, getTeam, getTeamAnalyticsHistory } from "./api";
 import { auth } from "./firebase";
 
 function TeamDynamics() {
@@ -17,6 +17,8 @@ function TeamDynamics() {
   const [showCreateTeam, setShowCreateTeam] = useState(false);
   const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState({});
+  const [showAnalyticsOverview, setShowAnalyticsOverview] = useState(false);
+  const [analyticsOverview, setAnalyticsOverview] = useState({}); // teamId → { teamName, latest, count }
   const { colors } = useTheme();
 
   // Load teams on component mount
@@ -142,11 +144,11 @@ function TeamDynamics() {
       alert(t("teamDynamics.alerts.signInSimulation"));
       return;
     }
-
-    alert(t("teamDynamics.alerts.simulationComingSoon"));
+    // Open the Scenario Simulator module (team-oriented practice scenarios).
+    window.dispatchEvent(new CustomEvent('navigateToModule', { detail: { module: 'simulations' } }));
   };
 
-  const handleViewTeamAnalytics = () => {
+  const handleViewTeamAnalytics = async () => {
     if (!auth.currentUser) {
       alert(t("teamDynamics.alerts.signInAnalytics"));
       return;
@@ -157,7 +159,34 @@ function TeamDynamics() {
       return;
     }
 
-    alert(t("teamDynamics.alerts.dashboardComingSoon"));
+    // Toggle off if already open
+    if (showAnalyticsOverview) {
+      setShowAnalyticsOverview(false);
+      return;
+    }
+
+    // Aggregate overview: the latest real saved analysis per team (historical
+    // endpoint GET /teams/{id}/analytics). Mock/empty entries are skipped.
+    try {
+      setLoading(true);
+      const entries = await Promise.all(teams.map(async (team) => {
+        try {
+          const res = await getTeamAnalyticsHistory(team._id);
+          const list = res.analytics || [];
+          const latest = list.find(a => a.analysis && !a.is_mock) || null;
+          return [team._id, { teamName: team.name, latest, count: list.length }];
+        } catch {
+          return [team._id, { teamName: team.name, latest: null, count: 0 }];
+        }
+      }));
+      setAnalyticsOverview(Object.fromEntries(entries));
+      setShowAnalyticsOverview(true);
+    } catch (error) {
+      console.error("Error loading analytics overview:", error);
+      alert(t("teamDynamics.alerts.analyticsFailed"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addMemberToTeam = () => {
@@ -642,8 +671,55 @@ function TeamDynamics() {
            </button>
         </div>
       </div>
+
+      {/* Team Analytics Overview — aggregate of the latest saved analysis per team */}
+      {showAnalyticsOverview && (
+        <div style={{
+          background: colors.cardBackground,
+          borderRadius: 12,
+          padding: 24,
+          marginTop: 24,
+          boxShadow: colors.shadow,
+          border: `1px solid ${colors.border}`
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ color: colors.text, margin: 0 }}>{t("teamDynamics.analyticsOverviewTitle")}</h3>
+            <button
+              onClick={() => setShowAnalyticsOverview(false)}
+              style={{
+                background: colors.buttonDanger, color: "#fff", border: 0,
+                borderRadius: 4, padding: "4px 10px", cursor: "pointer", fontSize: 12
+              }}
+            >
+              {t("teamDynamics.close")}
+            </button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {teams.map((team) => {
+              const ov = analyticsOverview[team._id] || {};
+              return (
+                <div key={team._id} style={{
+                  padding: 16, background: colors.background, borderRadius: 8,
+                  border: `1px solid ${colors.border}`
+                }}>
+                  <h4 style={{ color: colors.text, margin: "0 0 8px 0" }}>{team.name}</h4>
+                  {ov.latest ? (
+                    <div style={{ color: colors.textSecondary, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                      {ov.latest.analysis}
+                    </div>
+                  ) : (
+                    <p style={{ color: colors.textSecondary, fontSize: 14, fontStyle: "italic", margin: 0 }}>
+                      {t("teamDynamics.noAnalysisYet")}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default TeamDynamics; 
+export default TeamDynamics;

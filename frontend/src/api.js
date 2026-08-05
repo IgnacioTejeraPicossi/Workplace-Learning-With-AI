@@ -180,6 +180,11 @@ export async function getTeam(teamId) {
   return apiCall(`/teams/${teamId}`, "GET");
 }
 
+// Historical saved analyses for a team (newest first) → { analytics: [...] }.
+export async function getTeamAnalyticsHistory(teamId) {
+  return apiCall(`/teams/${teamId}/analytics`, "GET");
+}
+
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);
 }

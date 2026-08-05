@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.30.19] - 2026-08-05
+
+### Added — Team Dynamics: wire the two placeholder buttons (audit Fase 3, Option A)
+
+The "Start Team Simulation" and "View Team Analytics" buttons previously only
+showed "coming soon" alerts. Both now do real work:
+
+- **View Team Analytics** → opens a real **Analytics Overview** panel showing the
+  latest saved analysis per team, powered by the existing-but-unused
+  `GET /teams/{id}/analytics` endpoint (new api helper `getTeamAnalyticsHistory`).
+  Mock/empty saved entries are skipped; teams with none show a localized
+  "no analysis yet" hint. Toggles closed on a second click.
+- **Start Team Simulation** → navigates to the Scenario Simulator module via the
+  app's `navigateToModule` custom event (`{ module: 'simulations' }`), instead of
+  a dead alert.
+- i18n EN/ES/NO: `analyticsOverviewTitle`, `noAnalysisYet` (parity 52/52).
+- Tests: added `test_get_analytics_history` to
+  `backend/tests/test_team_dynamics_contracts.py` (now 8/8) covering the
+  now-active history endpoint (mocked cursor). Offline gate: **12 files / 121
+  tests**.
+- Validated: `@babel/parser` parse OK for `TeamDynamics.jsx` + `api.js`; full
+  production build OK; i18n parity 52/52; team suite 8/8.
+
+---
+
 ## [1.30.18] - 2026-08-05
 
 ### Fixed / Added — Team Dynamics: backend hardening + contract tests (audit Fase 1 + 2)

@@ -130,3 +130,24 @@ async def test_analytics_team_not_found_404(mock_teams):
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
         r = await c.post(f"/teams/{VALID_OID}/analytics", json={"metrics": ["x"]})
     assert r.status_code == 404
+
+
+# ── historical analytics (GET) — powers the "View Team Analytics" overview ────
+@patch("backend.app.team_analytics_collection")
+@patch("backend.app.teams_collection")
+@pytest.mark.asyncio
+async def test_get_analytics_history(mock_teams, mock_analytics):
+    from bson import ObjectId
+    mock_teams.find_one = AsyncMock(return_value={"_id": VALID_OID, "name": "Alpha"})
+    # find(...).sort(...) is async-iterated; mock the chain.
+    cursor = MagicMock()
+    cursor.sort = MagicMock(return_value=_AsyncIter([
+        {"_id": ObjectId(VALID_OID), "analysis": "Great teamwork.", "is_mock": False},
+    ]))
+    mock_analytics.find = MagicMock(return_value=cursor)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.get(f"/teams/{VALID_OID}/analytics")
+    assert r.status_code == 200
+    d = r.json()
+    assert len(d["analytics"]) == 1
+    assert d["analytics"][0]["analysis"] == "Great teamwork."
