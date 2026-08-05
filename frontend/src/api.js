@@ -253,6 +253,16 @@ export async function rejectAndresProposal(proposalId) {
 export async function rollbackAndres(targetVersion) {
   return apiCall("/api/andres/evolution/rollback", "POST", { target_version: targetVersion });
 }
+// Andrés V3 — creativity
+export async function andresCreate(payload) {
+  return apiCall("/api/andres/creative/generate", "POST", payload);
+}
+export async function getAndresArtifacts() {
+  return apiCall("/api/andres/creative", "GET");
+}
+export async function deleteAndresArtifact(artifactId) {
+  return apiCall(`/api/andres/creative/${artifactId}`, "DELETE");
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

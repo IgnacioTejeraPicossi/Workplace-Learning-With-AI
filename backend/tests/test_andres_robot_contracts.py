@@ -377,3 +377,72 @@ async def test_evolution_approve_versions_up(mock_idprofiles, mock_ev_profiles,
     assert d["version"] == 2
     assert d["identity"]["traits"]["curiosity"] == 83   # 78 + 5, clamped
     assert "poetry" in d["identity"]["core_interests"]
+
+
+# ── V3: creativity (surprise WITH usefulness + self-critique; concept blend) ──
+
+@patch("backend.services.andres.creativity_engine.andres_profiles")
+@patch("backend.services.andres.creativity_engine.andres_creative_artifacts")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_creative_generate_real_with_eval(mock_llm, mock_idprofiles, mock_art, mock_art_profiles):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_art.insert_one = AsyncMock(return_value=MagicMock(inserted_id="a1"))
+    mock_art.count_documents = AsyncMock(return_value=1)
+    mock_art_profiles.update_one = AsyncMock(return_value=None)
+    # first call = artifact text, second call = evaluator JSON
+    mock_llm.side_effect = [
+        "A tiny museum of your own discarded ideas, revisited yearly.",
+        '{"novelty": 0.8, "usefulness": 0.7, "self_critique": "Could be too whimsical to act on."}',
+    ]
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/creative/generate",
+                         json={"mode": "surprise_useful", "seed": "memory"})
+    assert r.status_code == 200
+    d = r.json()["artifact"]
+    assert d["is_mock"] is False
+    assert d["novelty"] == 0.8 and d["usefulness"] == 0.7
+    assert "whimsical" in d["self_critique"]
+
+
+@patch("backend.services.andres.creativity_engine.andres_profiles")
+@patch("backend.services.andres.creativity_engine.andres_creative_artifacts")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_creative_generate_offline_heuristic(mock_llm, mock_idprofiles, mock_art, mock_art_profiles):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_art.insert_one = AsyncMock(return_value=MagicMock(inserted_id="a2"))
+    mock_art.count_documents = AsyncMock(return_value=1)
+    mock_art_profiles.update_one = AsyncMock(return_value=None)
+    mock_llm.return_value = "[MOCKED RESPONSE] offline"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/creative/generate",
+                         json={"mode": "blend", "concept_a": "sailing", "concept_b": "grammar"})
+    assert r.status_code == 200
+    d = r.json()["artifact"]
+    assert d["is_mock"] is True
+    # even offline, an evaluation is always attached (heuristic)
+    assert 0.0 <= d["novelty"] <= 1.0
+    assert "self_critique" in d
+
+
+@pytest.mark.asyncio
+async def test_creative_mode_validation():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/creative/generate", json={"mode": "not-a-mode"})
+    assert r.status_code == 422
+
+
+@patch("backend.services.andres.creativity_engine.andres_creative_artifacts")
+@pytest.mark.asyncio
+async def test_creative_list(mock_art):
+    mock_art.find = MagicMock(return_value=_AsyncIter([
+        {"_id": "a1", "user_id": "u1", "mode": "surprise", "content": "x",
+         "novelty": 0.6, "usefulness": 0.5, "self_critique": "ok"},
+    ]))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.get("/api/andres/creative")
+    assert r.status_code == 200
+    assert r.json()["count"] == 1

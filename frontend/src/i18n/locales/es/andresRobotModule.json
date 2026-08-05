@@ -149,6 +149,27 @@
         "pending": "pendiente"
       }
     },
+    "creative": {
+      "title": "🎨 Estudio creativo",
+      "intro": "Creatividad con criterio — la propia petición de diseño de Andrés. Cada idea se genera y se evalúa al instante por novedad Y utilidad, con una autocrítica honesta. La novedad por sí sola nunca basta.",
+      "modes": {
+        "surprise_useful": "Sorpréndeme — con utilidad",
+        "surprise": "Sorpréndeme",
+        "self_critique": "Sorpréndeme y luego critícate",
+        "blend": "Mezcla dos conceptos"
+      },
+      "seedPlaceholder": "¿Sobre qué? (opcional — déjalo vacío para una sorpresa libre)",
+      "conceptA": "Primer concepto…",
+      "conceptB": "Segundo concepto…",
+      "create": "Crear",
+      "creating": "Creando…",
+      "empty": "Aún no hay artefactos. Pídele a Andrés que te sorprenda — con utilidad.",
+      "novelty": "Novedad",
+      "usefulness": "Utilidad",
+      "selfCritique": "Autocrítica",
+      "offlineTag": "sin conexión — texto determinista",
+      "delete": "Eliminar"
+    },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."
     },

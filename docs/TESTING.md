@@ -117,7 +117,7 @@ curl http://localhost:8000/api/j-messages/list
 | Web Search AI (grounded answer) | 4/4 contract tests (offline, search+LLM mocked) | `python -m pytest backend/tests/test_web_search_ai_contracts.py -v` |
 | Babel Library (intelligence + profile) | 14/14 contract tests (offline, services mocked) | `python -m pytest backend/tests/test_babel_contracts.py -v` |
 | Team Dynamics (CRUD + analytics) | 8/8 contract tests (offline, auth+Mongo+LLM mocked) | `python -m pytest backend/tests/test_team_dynamics_contracts.py -v` |
-| Andrés the Robot (V0–V2) | 18/18 contract tests (offline, auth+Mongo+LLM mocked; chat, memory CRUD + retrieval, reflection, curiosity, projects, evolution propose/approve + trait cap) | `python -m pytest backend/tests/test_andres_robot_contracts.py -v` |
+| Andrés the Robot (V0–V3) | 22/22 contract tests (offline, auth+Mongo+LLM mocked; chat, memory CRUD + retrieval, reflection, curiosity, projects, evolution propose/approve + trait cap, creativity generate + novelty/usefulness eval + self-critique) | `python -m pytest backend/tests/test_andres_robot_contracts.py -v` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
 

@@ -149,6 +149,27 @@
         "pending": "pending"
       }
     },
+    "creative": {
+      "title": "🎨 Creative Studio",
+      "intro": "Creativity with criterion — Andrés' own design ask. Every idea is generated and immediately evaluated for novelty AND usefulness, with an honest self-critique. Novelty alone is never enough.",
+      "modes": {
+        "surprise_useful": "Surprise me — with usefulness",
+        "surprise": "Surprise me",
+        "self_critique": "Surprise, then self-critique",
+        "blend": "Blend two concepts"
+      },
+      "seedPlaceholder": "About what? (optional — leave blank for a free surprise)",
+      "conceptA": "First concept…",
+      "conceptB": "Second concept…",
+      "create": "Create",
+      "creating": "Creating…",
+      "empty": "No artifacts yet. Ask Andrés to surprise you — with usefulness.",
+      "novelty": "Novelty",
+      "usefulness": "Usefulness",
+      "selfCritique": "Self-critique",
+      "offlineTag": "offline — deterministic placeholder",
+      "delete": "Delete"
+    },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."
     },

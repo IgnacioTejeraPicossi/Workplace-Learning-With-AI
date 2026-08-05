@@ -22,7 +22,7 @@ from backend.services.andres.identity_service import (
 from backend.services.andres.prompt_assembler import assemble_system_prompt
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
-    evolution_manager,
+    evolution_manager, creativity_engine,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -78,6 +78,13 @@ class EvolutionProposal(BaseModel):
 
 class RollbackRequest(BaseModel):
     target_version: int = Field(..., ge=1)
+
+
+class CreativeRequest(BaseModel):
+    mode: str = Field("surprise_useful", pattern="^(surprise|surprise_useful|self_critique|blend)$")
+    seed: str = Field("", max_length=500)
+    concept_a: str = Field("", max_length=200)
+    concept_b: str = Field("", max_length=200)
 
 
 @router.get("/health")
@@ -318,3 +325,31 @@ async def evolution_rollback(body: RollbackRequest, user=Depends(_verify_token))
     uid = user.get("uid")
     profile_doc = await get_or_create_profile(uid)
     return await evolution_manager.rollback(uid, profile_doc, body.target_version)
+
+
+# ── V3: creativity (surprise WITH usefulness → self-critique; concept blending) ─
+
+@router.post("/creative/generate")
+async def creative_generate(body: CreativeRequest, http_request: Request, user=Depends(_verify_token)):
+    """Create one artifact and immediately evaluate it (novelty + usefulness + critique)."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    if profile_doc.get("development_paused"):
+        return {"paused": True, "artifact": None}
+    doc = await creativity_engine.generate(
+        uid, profile_doc, body.mode, seed=body.seed,
+        concept_a=body.concept_a, concept_b=body.concept_b,
+        request_headers=http_request.headers,
+    )
+    return {"artifact": doc, "is_mock": doc.get("is_mock", False)}
+
+
+@router.get("/creative")
+async def creative_list(user=Depends(_verify_token)):
+    items = await creativity_engine.list_artifacts(user.get("uid"))
+    return {"artifacts": items, "count": len(items)}
+
+
+@router.delete("/creative/{artifact_id}")
+async def creative_delete(artifact_id: str, user=Depends(_verify_token)):
+    return await creativity_engine.delete_artifact(user.get("uid"), artifact_id)

@@ -149,6 +149,27 @@
         "pending": "venter"
       }
     },
+    "creative": {
+      "title": "🎨 Kreativt studio",
+      "intro": "Kreativitet med kriterium — Andrés' eget designønske. Hver idé genereres og vurderes umiddelbart for både nyhet OG nytte, med en ærlig selvkritikk. Nyhet alene er aldri nok.",
+      "modes": {
+        "surprise_useful": "Overrask meg — med nytte",
+        "surprise": "Overrask meg",
+        "self_critique": "Overrask, så selvkritikk",
+        "blend": "Bland to konsepter"
+      },
+      "seedPlaceholder": "Om hva? (valgfritt — la stå tomt for en fri overraskelse)",
+      "conceptA": "Første konsept…",
+      "conceptB": "Andre konsept…",
+      "create": "Lag",
+      "creating": "Lager…",
+      "empty": "Ingen artefakter ennå. Be Andrés overraske deg — med nytte.",
+      "novelty": "Nyhet",
+      "usefulness": "Nytte",
+      "selfCritique": "Selvkritikk",
+      "offlineTag": "frakoblet — deterministisk plassholder",
+      "delete": "Slett"
+    },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
     },

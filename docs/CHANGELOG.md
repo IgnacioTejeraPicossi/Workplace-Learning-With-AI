@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.3] - 2026-08-05
+
+### Added — Andrés the Robot · V3 "Creativity"
+
+Creativity **with criterion** — a design shaped by Andrés himself. Asked what he'd
+want from a creativity phase, the agent argued that *"creativity without criterion
+becomes fireworks"* and asked for **"surprise me WITH usefulness"** and **"surprise
+me, then self-critique"**. V3 bakes that in: novelty is never celebrated on its own.
+
+- **Creativity engine** (`backend/services/andres/creativity_engine.py`): generates
+  a small artifact then **immediately evaluates it**. Modes: `surprise`,
+  `surprise_useful` (novelty AND usefulness), `self_critique` (surprise, then a
+  candid weakest-point critique), and `blend` (fuse two given concepts into one new,
+  useful idea). Artifacts stored in `andres_creative_artifacts`; user-curatable
+  (deletable). `counters.creative_artifacts` tracks the total.
+- **Evaluator** (`evaluators.py`): scores every artifact on **novelty + usefulness**
+  (0–1) and returns an honest **self-critique**. LLM-based when a provider exists;
+  otherwise a transparent, clearly-labelled deterministic heuristic (novelty from
+  lexical variety, usefulness neutral) so the pipeline stays testable offline.
+- **Endpoints**: `POST /api/andres/creative/generate` (respects
+  `development_paused`), `GET /api/andres/creative`, `DELETE /api/andres/creative/{id}`.
+- **Frontend Creative Studio** (`frontend/src/andres-robot/Creative.jsx`): mode
+  chips, seed or two-concept inputs, generate → artifact card with **novelty /
+  usefulness bars** and a **🪞 self-critique** panel; delete to curate. Wired as the
+  Creative tab; Home creative counter reflects real data.
+- **i18n**: `andresRobotModule.json` extended (EN/ES/NO, 146/146 parity).
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 18 → **22** (creative
+  generate real-with-eval, offline-heuristic, mode-validation → 422, list). Offline
+  gate now **13 files / 143 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 146/146;
+  Andrés suite 22/22.
+
+**Credit:** the "surprise WITH usefulness" + "self-critique" framing came from
+Andrés (the agent) in conversation with Ignacio — a small but real instance of the
+companion shaping its own development.
+
+**Next:** V4 — Skills (skill proposals, sandbox, tests, Skill Library, dev metrics).
+
+---
+
 ## [1.31.2] - 2026-08-05
 
 ### Added — Andrés the Robot · V2 "Reflection"

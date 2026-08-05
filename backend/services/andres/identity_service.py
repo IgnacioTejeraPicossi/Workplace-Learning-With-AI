@@ -33,6 +33,7 @@ async def get_or_create_profile(user_id: str) -> dict:
             "active_skills": 0,
             "current_projects": 0,
             "conversations": 0,
+            "creative_artifacts": 0,
         },
         "last_evolution": None,
         "simulated_disposition": {
