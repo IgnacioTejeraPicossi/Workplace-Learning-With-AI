@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.4] - 2026-08-06
+
+### Added — Andrés the Robot · V4 "Skills"
+
+A Voyager-style growing **skill library** — bounded, sandboxed and auditable. The
+module's shape follows Andrés' own V4 ask (relayed by Ignacio): *"Skills must not
+become an opaque expansion vector: strict sandbox, comprehensible metrics,
+proposal traceability, human approval should be the heart of the module."* They are.
+
+- **Sandbox — the safety core** (`backend/services/andres/sandbox.py`): a skill is
+  a pure `def skill(x)`. `static_safety_check` is an **AST ground-truth gate**
+  (mirroring the self-correcting-loop's `ast.parse` pattern) that hard-rejects the
+  classic escape routes: imports, any `_`/dunder name or attribute (blocks
+  `().__class__.__mro__…`), and a denylist (`eval/exec/open/compile/__import__/
+  globals/getattr/…`). `run_in_sandbox` executes in a **stripped namespace** — a
+  tiny safe-builtins whitelist, no real `__builtins__` — under a **wall-clock
+  timeout** (runaway loops are killed). No imports, files, network or app access is
+  even reachable.
+- **Skill service** (`skill_service.py`): lifecycle `draft (optional, LLM) →
+  propose (safety-gated) → [pending | blocked] → user approves → active → run`.
+  Unsafe code is **stored as `blocked`** (for traceability) but can never run or be
+  approved. Runs are logged in `andres_skill_runs` (input, output, error,
+  duration_ms); `counters.active_skills` tracks approved skills; `metrics()` gives
+  comprehensible counts + run success rate.
+- **Endpoints**: `POST /api/andres/skills/draft`, `POST .../propose`,
+  `GET .../skills`, `GET .../skills/metrics`, `POST .../{id}/approve`,
+  `POST .../{id}/reject`, `POST .../{id}/run`, `DELETE .../{id}`.
+- **Frontend Skills tab** (`frontend/src/andres-robot/Skills.jsx`): metrics tiles;
+  "Draft with AI" from a task; propose (with an explicit safety note); each skill
+  shows code, a **🛡️ blocked-reasons panel** when unsafe, a **run box** (JSON
+  input → output + duration) for pending/active skills, and approve / reject /
+  delete. Home active-skills counter reflects real data.
+- **i18n**: `andresRobotModule.json` extended (EN/ES/NO, 170/170 parity).
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 22 → **28** (propose safe →
+  pending, propose unsafe → blocked, approve-blocked → 409, sandbox run executes,
+  blocked-cannot-run → 409, plus direct sandbox escape-attempt unit checks incl.
+  timeout). Offline gate now **13 files / 149 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 170/170;
+  Andrés suite 28/28; direct sandbox checks confirm imports/dunder/eval/open/
+  missing-fn all rejected and runaway loops time out.
+
+**Credit:** the "strict sandbox + traceability + human approval at the core"
+framing came from Andrés (the agent) in conversation with Ignacio.
+
+**Next:** V5 — Developmental Companion (approved curriculum, controlled research,
+scheduled routines, long-term projects, Personality Capsule export/import).
+
+---
+
 ## [1.31.3] - 2026-08-05
 
 ### Added — Andrés the Robot · V3 "Creativity"
