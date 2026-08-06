@@ -120,6 +120,50 @@ async def test_chat_real(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
     # autonomy 2 → a candidate memory was stored
     assert d["development_signals"]["new_memory_candidates"] == 1
     mem.insert_one.assert_awaited()
+    # web access was NOT requested → status "off", nothing searched
+    assert d["web"]["used"] is False and d["web"]["web_access"] == "off"
+
+
+@patch("backend.simple_web_search.simple_web_search", new_callable=AsyncMock)
+@patch("backend.services.andres.project_service.andres_projects")
+@patch("backend.services.andres.memory_service.andres_profiles")
+@patch("backend.services.andres.memory_service.andres_memories")
+@patch("backend.routers.andres_robot.andres_profiles")
+@patch("backend.routers.andres_robot.andres_conversations")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_chat_with_web(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
+                             mock_mem, mock_mem_profiles, mock_proj, mock_search):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_convos.insert_one = AsyncMock(return_value=None)
+    mock_profiles.update_one = AsyncMock(return_value=None)
+    mem = _mem_collection([])
+    mock_mem.find = mem.find
+    mock_mem.count_documents = mem.count_documents
+    mock_mem.insert_one = mem.insert_one
+    mock_mem.update_one = mem.update_one
+    mock_mem_profiles.update_one = AsyncMock(return_value=None)
+    mock_proj.find = MagicMock(return_value=_AsyncIter([]))
+    # the app's existing DuckDuckGo helper, mocked → fresh results
+    mock_search.return_value = {
+        "results": [{"title": "New AI model released", "url": "https://ex.com/x",
+                     "snippet": "A fresh model dropped today."}],
+        "fallback_url": None,
+    }
+    mock_llm.return_value = "According to [1], a new model was released."
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/chat", json={"message": "latest AI news", "use_web": True})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["web"]["used"] is True
+    assert d["web"]["web_access"] == "available"
+    assert d["web"]["search_provider"] == "duckduckgo"
+    assert d["web"]["sources_consulted"] == 1
+    assert d["web"]["citations"][0]["url"] == "https://ex.com/x"
+    # the fresh results were injected as a system layer for the LLM
+    sent = mock_llm.call_args.kwargs["messages"]
+    assert any(m["role"] == "system" and "WEB SEARCH RESULTS" in m["content"] for m in sent)
 
 
 @patch("backend.services.andres.memory_service.andres_profiles")
@@ -153,6 +197,14 @@ async def test_chat_offline_mock(mock_llm, mock_idprofiles, mock_convos, mock_pr
 async def test_chat_validation():
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
         r = await c.post("/api/andres/chat", json={"message": ""})
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_chat_too_long_rejected():
+    # a message over the 20000-char cap is rejected with 422 (a pasted long article)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/chat", json={"message": "x" * 20001})
     assert r.status_code == 422
 
 
@@ -610,6 +662,29 @@ def test_sandbox_blocks_escape_attempts():
     # a runaway loop is stopped by the wall-clock timeout
     res = run_in_sandbox("def skill(x):\n    while True:\n        pass", 1, timeout=0.5)
     assert res["ok"] is False and "imed out" in res["error"]
+
+
+@pytest.mark.asyncio
+async def test_web_research_states_and_prompt():
+    """web_research reports an honest web_access status Andrés can cite."""
+    from backend.services.andres import web_research
+    # off state (user didn't ask for web)
+    off = web_research.off_state()
+    assert off["used"] is False and off["web_access"] == "off"
+    # a failure degrades to web_access="failed", never raises
+    with patch("backend.simple_web_search.simple_web_search",
+               new=AsyncMock(side_effect=RuntimeError("boom"))):
+        failed = await web_research.research("anything")
+    assert failed["web_access"] == "failed" and failed["sources_consulted"] == 0
+    # a successful search maps to "available" with citations
+    with patch("backend.simple_web_search.simple_web_search",
+               new=AsyncMock(return_value={"results": [
+                   {"title": "T", "url": "https://u", "snippet": "s"}], "fallback_url": None})):
+        ok = await web_research.research("query")
+    assert ok["web_access"] == "available" and ok["citations"][0]["n"] == 1
+    # the prompt block echoes the status so Andrés stays honest
+    block = web_research.prompt_block(ok)
+    assert "WEB ACCESS: available" in block and "https://u" in block
 
 
 def test_sandbox_adversarial_gallery():

@@ -25,7 +25,7 @@ from typing import Any
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
-    development_service,
+    development_service, web_research,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -38,7 +38,8 @@ def _verify_token(request: Request):
 
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=8000)
+    message: str = Field(..., min_length=1, max_length=20000)
+    use_web: bool = False   # user opts in to a fresh web search for this message
 
 
 class MemoryCreate(BaseModel):
@@ -163,10 +164,17 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
     except Exception:
         projects = []
     system_prompt = assemble_system_prompt(profile_doc, memories=recalled, projects=projects)
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": body.message},
-    ]
+    messages = [{"role": "system", "content": system_prompt}]
+
+    # Tier-3 external research: only when the user turns web access on for this turn.
+    # Read-only DuckDuckGo search via the app's existing helper; injected transparently
+    # with an explicit web_access status so Andrés stays honest about what he consulted.
+    web = web_research.off_state()
+    if body.use_web and not profile_doc.get("development_paused"):
+        web = await web_research.research(body.message, limit=5)
+        messages.append({"role": "system", "content": web_research.prompt_block(web)})
+
+    messages.append({"role": "user", "content": body.message})
 
     # Real LLM via the unified gateway; degrade gracefully when no key is set.
     try:
@@ -196,6 +204,8 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         "user_message": body.message,
         "andres_message": message,
         "is_mock": is_mock,
+        "web_access": web.get("web_access"),
+        "sources_consulted": web.get("sources_consulted", 0),
         "identity_version": profile_doc.get("identity", {}).get("version", 1),
         "created_at": now,
     })
@@ -235,6 +245,15 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         },
         "safety": {"reviewed": True, "risk": "low"},
         "is_mock": is_mock,
+        "web": {
+            "used": web.get("used", False),
+            "web_access": web.get("web_access", "off"),
+            "search_provider": web.get("search_provider"),
+            "last_search_timestamp": web.get("last_search_timestamp"),
+            "sources_consulted": web.get("sources_consulted", 0),
+            "citations": web.get("citations", []),
+            "fallback_url": web.get("fallback_url"),
+        },
     }
 
 

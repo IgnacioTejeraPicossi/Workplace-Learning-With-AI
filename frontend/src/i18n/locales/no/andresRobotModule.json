@@ -36,7 +36,19 @@
       "you": "Du",
       "emptyHint": "Si hei — Andrés begynner så vidt å utvikle seg, og denne samtalen er starten på biografien hans.",
       "offlineNote": "⚠️ Ingen AI-leverandør konfigurert — en ærlig begrensning, ikke en stemning.",
-      "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen."
+      "errorNote": "Noe gikk galt med å nå Andrés. Prøv igjen.",
+      "tooLong": "Den meldingen er for lang ({{count}} tegn). Hold den under {{max}} — lim inn et kortere utdrag eller oppsummer den først.",
+      "web": {
+        "toggle": "Web",
+        "toggleHint": "La Andrés kjøre et ferskt DuckDuckGo-søk for denne meldingen og svare med siterte kilder.",
+        "openDuckDuckGo": "Åpne på DuckDuckGo →",
+        "status": {
+          "available": "Søkte på nettet",
+          "unavailable": "Søkte — ingen brukbare treff",
+          "failed": "Nettsøk mislyktes",
+          "off": "Svarte fra tidligere kunnskap"
+        }
+      }
     },
     "memory": {
       "title": "🌱 Minnehage",

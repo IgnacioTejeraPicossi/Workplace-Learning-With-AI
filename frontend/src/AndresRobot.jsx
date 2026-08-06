@@ -17,6 +17,9 @@ const MEMORY_TYPES = [
   "episodic", "semantic", "relational", "creative", "procedural", "reflective", "working",
 ];
 
+// Keep in sync with backend ChatRequest.message max_length in andres_robot.py.
+const CHAT_MAX_CHARS = 20000;
+
 const linkBtn = (colors) => ({
   background: "transparent", border: 0, padding: 0, cursor: "pointer",
   fontSize: 12, fontWeight: 600, color: colors.primary,
@@ -55,6 +58,8 @@ export default function AndresRobot() {
   const [messages, setMessages] = useState([]); // { role: 'you'|'andres', text, isMock }
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [inputError, setInputError] = useState("");
+  const [useWeb, setUseWeb] = useState(false);
 
   // Memory Garden state
   const [memories, setMemories] = useState([]);
@@ -107,14 +112,32 @@ export default function AndresRobot() {
   const handleSend = async () => {
     const text = input.trim();
     if (!text || sending) return;
+    // Guard the length client-side so a long paste gives a clear message instead
+    // of a generic failure (the backend caps the message at CHAT_MAX_CHARS).
+    if (text.length > CHAT_MAX_CHARS) {
+      setInputError(t("andresRobotModule.conversation.tooLong", {
+        count: text.length.toLocaleString(), max: CHAT_MAX_CHARS.toLocaleString(),
+      }));
+      return;
+    }
+    setInputError("");
     setMessages((m) => [...m, { role: "you", text }]);
     setInput("");
     setSending(true);
     try {
-      const res = await andresChat(text);
-      setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock }]);
+      const res = await andresChat(text, useWeb);
+      setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock, web: res.web }]);
     } catch (e) {
-      setMessages((m) => [...m, { role: "andres", text: t("andresRobotModule.conversation.errorNote"), isMock: true }]);
+      // A real request failure — NOT an offline model. Don't show the "no AI
+      // provider" note (that would be a false culprit); show the length hint if
+      // the server rejected the size, otherwise a plain retry note.
+      const tooLong = /HTTP 422/.test(e?.message || "");
+      setMessages((m) => [...m, {
+        role: "andres", error: true,
+        text: tooLong
+          ? t("andresRobotModule.conversation.tooLong", { count: text.length.toLocaleString(), max: CHAT_MAX_CHARS.toLocaleString() })
+          : t("andresRobotModule.conversation.errorNote"),
+      }]);
     }
     setSending(false);
   };
@@ -196,17 +219,53 @@ export default function AndresRobot() {
                 {t("andresRobotModule.conversation.offlineNote")}
               </div>
             )}
+            {m.web && m.web.used && (
+              <div style={{ marginTop: 4, fontSize: 11, color: colors.textSecondary }}>
+                <span style={{ fontWeight: 600 }}>
+                  🌐 {t(`andresRobotModule.conversation.web.status.${m.web.web_access}`, m.web.web_access)}
+                </span>
+                {(m.web.citations || []).length > 0 && (
+                  <div style={{ marginTop: 3, display: "grid", gap: 2 }}>
+                    {m.web.citations.map((c) => (
+                      <a key={c.n} href={c.url} target="_blank" rel="noopener noreferrer"
+                         style={{ color: colors.primary, textDecoration: "none" }}>
+                        [{c.n}] {c.title}
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {m.web.web_access !== "available" && m.web.fallback_url && (
+                  <a href={m.web.fallback_url} target="_blank" rel="noopener noreferrer"
+                     style={{ color: colors.primary }}>
+                    {t("andresRobotModule.conversation.web.openDuckDuckGo")}
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <span
+          onClick={() => setUseWeb((w) => !w)}
+          title={t("andresRobotModule.conversation.web.toggleHint")}
+          style={{
+            cursor: "pointer", userSelect: "none", padding: "8px 12px", borderRadius: 8,
+            fontSize: 13, whiteSpace: "nowrap",
+            border: `1px solid ${useWeb ? colors.primary : colors.border}`,
+            background: useWeb ? colors.primary : "transparent",
+            color: useWeb ? "#fff" : colors.textSecondary,
+          }}
+        >
+          🌐 {t("andresRobotModule.conversation.web.toggle")}
+        </span>
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => { setInput(e.target.value); if (inputError) setInputError(""); }}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder={t("andresRobotModule.conversation.placeholder")}
-          style={{ flex: 1, padding: "12px 14px", borderRadius: 8, border: `1px solid ${colors.border}`, background: colors.cardBackground, color: colors.text, fontSize: 15 }}
+          style={{ flex: 1, padding: "12px 14px", borderRadius: 8, border: `1px solid ${input.length > CHAT_MAX_CHARS ? "#dc2626" : colors.border}`, background: colors.cardBackground, color: colors.text, fontSize: 15 }}
         />
         <button
           onClick={handleSend}
@@ -216,6 +275,14 @@ export default function AndresRobot() {
           {sending ? t("andresRobotModule.conversation.sending") : t("andresRobotModule.conversation.send")}
         </button>
       </div>
+      {(inputError || input.length > CHAT_MAX_CHARS * 0.8) && (
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12 }}>
+          <span style={{ color: "#dc2626" }}>{inputError}</span>
+          <span style={{ color: input.length > CHAT_MAX_CHARS ? "#dc2626" : colors.textSecondary, whiteSpace: "nowrap" }}>
+            {input.length.toLocaleString()} / {CHAT_MAX_CHARS.toLocaleString()}
+          </span>
+        </div>
+      )}
     </div>
   );
 

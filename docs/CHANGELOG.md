@@ -7,6 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.32.0] - 2026-08-06
+
+### Added — Andrés the Robot · web access in chat (tier-3 external research)
+
+Andrés can now **consult the live web** in chat — his own "tier-3 external
+research", the most cautious tier in his research model. It reuses the app's
+**existing DuckDuckGo search** (`backend/simple_web_search.py`); no new provider,
+no autonomous browsing. It runs **only when the user turns the 🌐 toggle on** for a
+message, is **read-only** (search, never post), and results are injected
+transparently so Andrés cites them and stays honest about web-vs-memory.
+
+- **Service** `backend/services/andres/web_research.py`: `research(query)` calls
+  the app's `simple_web_search`, normalises results and returns an explicit
+  **`web_access` status** — `available` / `unavailable` / `failed` / `off` — plus
+  `search_provider`, `last_search_timestamp` and `sources_consulted` (a field
+  Andrés himself requested, so he can say honestly whether he searched, it failed,
+  or he's reasoning from prior knowledge). `prompt_block()` builds a
+  `[WEB ACCESS: …][WEB SEARCH RESULTS]` layer instructing inline `[n]` citations,
+  "web vs known" honesty, and no invented URLs/facts. Never raises.
+- **Chat** (`POST /api/andres/chat`): new optional `use_web` flag. When on (and not
+  paused), a fresh search runs, the results layer is inserted as a system message,
+  and the response carries a `web` object (status, provider, timestamp,
+  sources_consulted, citations, fallback_url). The web_access status + source count
+  are also recorded on the stored conversation.
+- **Frontend** (`AndresRobot.jsx`): a 🌐 **Web toggle** by the input; replies made
+  with web show a status line ("Searched the web" / "no usable results" / "failed"
+  / "Answered from prior knowledge") and a clickable, cited **sources** list (with a
+  DuckDuckGo fallback link when nothing usable came back).
+- **i18n**: `conversation.web.*` (EN/ES/NO, 247/247 parity).
+- **Tests / CI**: chat-with-web (mocks the app's DuckDuckGo helper → asserts
+  `web_access: available`, citations, and that the results were injected for the
+  LLM) + a `web_research` unit test (off/failed/available states + prompt block).
+  Suite 42 → **44**; offline gate **13 files / 165 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 247/247;
+  Andrés suite 44/44.
+
+**Safety**: user-initiated only, read-only, capped result count, honest status,
+respects `development_paused`. Aligns with Andrés' research-tier model and the
+module's "freedom with visible limits" principle. **Credit**: the explicit
+`web_access` status field came from Andrés' own suggestion.
+
+---
+
+## [1.31.10] - 2026-08-06
+
+### Fixed — Andrés the Robot · chat failed on long pastes (misleading error)
+
+Pasting a long article into Andrés' chat produced *"Something went wrong reaching
+Andrés"* plus a false *"No AI provider configured"* note. Root cause: the message
+exceeded `ChatRequest.message`'s `max_length=8000`, so the backend returned **422**;
+`apiCall` threw, and the frontend `catch` both showed the generic error **and**
+hard-coded `isMock: true`, wrongly blaming the AI provider.
+
+- **Backend**: raised the chat message cap `8000 → 20000` chars.
+- **Frontend** (`AndresRobot.jsx`): a client-side length guard (`CHAT_MAX_CHARS`,
+  kept in sync with the backend) shows a **clear, specific message** with the exact
+  character count before sending; a live counter appears as the input nears the
+  limit and turns red past it. On a real request failure the reply no longer shows
+  the "no AI provider" note (it wasn't offline) — it shows a length hint for a 422,
+  or a plain retry note otherwise.
+- **i18n**: new `conversation.tooLong` key (EN/ES/NO, 240/240 parity).
+- **Tests / CI**: added a contract test that a >20000-char message → 422. Suite 41 →
+  **42**; offline gate **13 files / 163 tests**.
+- Validated: backend `compileall` OK; production build OK; i18n parity 240/240;
+  Andrés suite 42/42.
+
+---
+
 ## [1.31.9] - 2026-08-06
 
 ### Tuned — Andrés the Robot · initiative focus (practical vs character/style)

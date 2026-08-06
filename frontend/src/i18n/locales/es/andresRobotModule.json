@@ -36,7 +36,19 @@
       "you": "Tú",
       "emptyHint": "Salúdalo — Andrés apenas empieza a desarrollarse, y esta conversación es el comienzo de su biografía.",
       "offlineNote": "⚠️ Sin proveedor de IA configurado — es una limitación honesta, no un estado de ánimo.",
-      "errorNote": "Algo falló al contactar con Andrés. Inténtalo de nuevo."
+      "errorNote": "Algo falló al contactar con Andrés. Inténtalo de nuevo.",
+      "tooLong": "Ese mensaje es demasiado largo ({{count}} caracteres). Mantenlo por debajo de {{max}} — pega un fragmento más corto o resúmelo primero.",
+      "web": {
+        "toggle": "Web",
+        "toggleHint": "Deja que Andrés haga una búsqueda fresca en DuckDuckGo para este mensaje y responda citando fuentes.",
+        "openDuckDuckGo": "Abrir en DuckDuckGo →",
+        "status": {
+          "available": "Buscó en la web",
+          "unavailable": "Buscó — sin resultados útiles",
+          "failed": "La búsqueda web falló",
+          "off": "Respondió con conocimiento previo"
+        }
+      }
     },
     "memory": {
       "title": "🌱 Jardín de memoria",

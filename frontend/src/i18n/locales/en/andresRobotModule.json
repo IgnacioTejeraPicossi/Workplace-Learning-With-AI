@@ -36,7 +36,19 @@
       "you": "You",
       "emptyHint": "Say hello — Andrés is just starting to develop, and this conversation is the beginning of his biography.",
       "offlineNote": "⚠️ No AI provider configured — this is an honest limitation, not a mood.",
-      "errorNote": "Something went wrong reaching Andrés. Please try again."
+      "errorNote": "Something went wrong reaching Andrés. Please try again.",
+      "tooLong": "That message is too long ({{count}} characters). Please keep it under {{max}} — paste a shorter excerpt or summarise it first.",
+      "web": {
+        "toggle": "Web",
+        "toggleHint": "Let Andrés run a fresh DuckDuckGo search for this message and answer with cited sources.",
+        "openDuckDuckGo": "Open on DuckDuckGo →",
+        "status": {
+          "available": "Searched the web",
+          "unavailable": "Searched — no usable results",
+          "failed": "Web search failed",
+          "off": "Answered from prior knowledge"
+        }
+      }
     },
     "memory": {
       "title": "🌱 Memory Garden",
