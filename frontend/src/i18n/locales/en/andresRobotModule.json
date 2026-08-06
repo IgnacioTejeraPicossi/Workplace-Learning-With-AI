@@ -9,7 +9,7 @@
       "memory": "Memory Garden",
       "personality": "Personality",
       "creative": "Creative Studio",
-      "humanLab": "Human Lab",
+      "humanLab": "Development Lab",
       "skills": "Skills",
       "projects": "Projects",
       "evolution": "Evolution",
@@ -199,6 +199,47 @@
       "approve": "Approve",
       "reject": "Reject",
       "delete": "Delete"
+    },
+    "humanLab": {
+      "initiativeTitle": "🌱 Andrés' own suggestions",
+      "initiativeIntro": "On his own initiative, Andrés proposes what he'd like to explore, build or become next. He proposes; you decide. Nothing consolidates without your approval.",
+      "propose": "Ask Andrés to propose",
+      "thinking": "Thinking…",
+      "noSuggestions": "No suggestions yet. Ask Andrés what he'd like to develop.",
+      "offlineTag": "offline — deterministic placeholder",
+      "kinds": {
+        "interest": "Interest",
+        "project": "Project",
+        "curriculum": "Curriculum",
+        "reflection_focus": "Reflection focus",
+        "trait_nudge": "Trait nudge"
+      },
+      "suggestionStatus": {
+        "open": "Open",
+        "accepted": "Accepted",
+        "dismissed": "Dismissed"
+      },
+      "accept": "Accept",
+      "dismiss": "Dismiss",
+      "historyTitle": "🧬 Identity history",
+      "historyIntro": "Every version of Andrés' identity, with what changed. He can develop, but never rewrite himself in silence.",
+      "noHistory": "Only the first identity so far.",
+      "currentTag": "current",
+      "capsuleTitle": "📦 Personality Capsule",
+      "capsuleIntro": "A portable snapshot of who Andrés is. Export is read-only. Import applies identity only, reversibly, after showing you a diff.",
+      "export": "Export capsule",
+      "importTitle": "Import a capsule",
+      "importPlaceholder": "Paste a capsule JSON here…",
+      "preview": "Preview changes",
+      "applyImport": "Apply import",
+      "badJson": "That isn't valid JSON.",
+      "previewFail": "Could not preview the capsule.",
+      "importFail": "Could not import the capsule.",
+      "imported": "Imported — identity is now v{{v}} (reversible in the history above).",
+      "diffTitle": "This import would change:",
+      "diffSelf": "self-description",
+      "diffNone": "No identity changes.",
+      "capsuleNote": "Memories, projects and skills in a capsule are reported but never auto-imported."
     },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."

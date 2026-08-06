@@ -537,3 +537,142 @@ def test_sandbox_blocks_escape_attempts():
     # a runaway loop is stopped by the wall-clock timeout
     res = run_in_sandbox("def skill(x):\n    while True:\n        pass", 1, timeout=0.5)
     assert res["ok"] is False and "imed out" in res["error"]
+
+
+def test_sandbox_adversarial_gallery():
+    """Andrés' 'gallery of ugly bugs' — hardening cases he suggested in review."""
+    from backend.services.andres.sandbox import static_safety_check, run_in_sandbox
+    # indirect class access via dunder → blocked statically
+    assert static_safety_check("def skill(x):\n    return (1).__class__")["ok"] is False
+    # deep recursion → RecursionError is caught, not fatal
+    rec = run_in_sandbox("def skill(x):\n    return skill(x)", 1)
+    assert rec["ok"] is False and "RecursionError" in rec["error"]
+    # giant string / list outputs → size-capped
+    big_str = run_in_sandbox("def skill(x):\n    return 'x' * 10000000", 0)
+    assert big_str["ok"] is False and "too large" in big_str["error"]
+    big_list = run_in_sandbox("def skill(x):\n    return [0] * 10000000", 0)
+    assert big_list["ok"] is False and "too large" in big_list["error"]
+    # the skill receives a COPY — it cannot mutate the caller's value
+    caller = {"a": 1}
+    mut = run_in_sandbox("def skill(x):\n    x['changed'] = True\n    return x", caller)
+    assert mut["ok"] is True and "changed" not in caller
+    # oversized input → rejected before running
+    too_big = run_in_sandbox("def skill(x):\n    return 1", [0] * 50000)
+    assert too_big["ok"] is False and "Input too large" in too_big["error"]
+    # naming a forbidden-looking string is fine (naming != executing)
+    named = run_in_sandbox("def skill(x):\n    return chr(95) + chr(95)", 0)
+    assert named["ok"] is True and named["output"] == "__"
+
+
+# ── V5: Personality Capsule + identity history + developmental initiative ─────
+
+_CAPSULE_PROFILE = {
+    "_id": "pid1", "user_id": "u1",
+    "identity": {"version": 3, "name": "Andrés",
+                 "self_description": "current self",
+                 "core_interests": ["language", "creativity"],
+                 "traits": {"curiosity": 78, "warmth": 70},
+                 "preferred_expression": []},
+    "autonomy_level": 2, "created_at": "2026-08-01T00:00:00",
+    "simulated_disposition": {}, "counters": {},
+}
+
+
+@patch("backend.services.andres.capsule_service.andres_skills")
+@patch("backend.services.andres.capsule_service.andres_projects")
+@patch("backend.services.andres.capsule_service.andres_memories")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_capsule_export(mock_idprofiles, mock_mem, mock_proj, mock_skills):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_CAPSULE_PROFILE))
+    mock_mem.count_documents = AsyncMock(return_value=4)
+    mock_proj.count_documents = AsyncMock(return_value=1)
+    mock_skills.count_documents = AsyncMock(return_value=2)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.get("/api/andres/capsule/export")
+    assert r.status_code == 200
+    d = r.json()
+    assert d["identity"]["version"] == 3
+    assert d["manifest"]["memories_total"] == 4
+    assert d["identity"]["traits"]["curiosity"] == 78
+
+
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_capsule_preview_diff_changes_nothing(mock_idprofiles):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_CAPSULE_PROFILE))
+    capsule = {"identity": {"self_description": "a bolder self",
+                            "core_interests": ["language", "music"],
+                            "traits": {"curiosity": 85, "warmth": 70}}}
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/capsule/preview", json={"capsule": capsule})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["self_description_changes"] is True
+    assert {"trait": "curiosity", "from": 78, "to": 85} in d["trait_changes"]
+    assert "music" in d["interests_added"]
+    assert "creativity" in d["interests_removed"]
+
+
+@patch("backend.services.andres.capsule_service.andres_identity_versions")
+@patch("backend.services.andres.capsule_service.andres_profiles")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_capsule_import_versions_up_reversibly(mock_idprofiles, mock_cap_profiles, mock_versions):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_CAPSULE_PROFILE))
+    mock_versions.insert_one = AsyncMock(return_value=None)   # snapshot-current call
+    mock_cap_profiles.update_one = AsyncMock(return_value=None)
+    capsule = {"identity": {"traits": {"curiosity": 90}, "core_interests": ["language"]}}
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/capsule/import", json={"capsule": capsule})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["version"] == 4                       # 3 → 4
+    assert d["identity"]["traits"]["curiosity"] == 90
+    mock_versions.insert_one.assert_awaited()      # prior identity was snapshotted
+
+
+@pytest.mark.asyncio
+async def test_capsule_import_rejects_malformed():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/capsule/import", json={"capsule": {"identity": {}}})
+    assert r.status_code == 400
+
+
+@patch("backend.services.andres.development_service.andres_reflections")
+@patch("backend.services.andres.development_service.andres_development_suggestions")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_development_suggest_offline(mock_llm, mock_idprofiles, mock_sugg, mock_refl):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_CAPSULE_PROFILE))
+    mock_refl.find = MagicMock(return_value=_AsyncIter([]))
+    mock_sugg.insert_one = AsyncMock(return_value=MagicMock(inserted_id="d1"))
+    mock_llm.return_value = "[MOCKED RESPONSE] offline"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/development/suggest")
+    assert r.status_code == 200
+    d = r.json()
+    # even offline, Andrés proposes deterministic developmental moves
+    assert d["count"] >= 1
+    assert d["suggestions"][0]["kind"] in {
+        "interest", "project", "curriculum", "reflection_focus", "trait_nudge"}
+
+
+@patch("backend.services.andres.development_service.andres_projects")
+@patch("backend.services.andres.development_service.andres_development_suggestions")
+@pytest.mark.asyncio
+async def test_development_accept_project_creates_project(mock_sugg, mock_proj):
+    mock_sugg.find_one = AsyncMock(return_value={
+        "_id": "d2", "user_id": "u1", "kind": "project",
+        "title": "Dev journal", "rationale": "spine", "status": "open"})
+    mock_sugg.update_one = AsyncMock(return_value=None)
+    mock_proj.insert_one = AsyncMock(return_value=MagicMock(inserted_id="p9"))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/development/suggestions/507f1f77bcf86cd799439011",
+                         json={"action": "accept"})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["status"] == "accepted"
+    assert d["created"]["project_id"] == "p9"
+    mock_proj.insert_one.assert_awaited()

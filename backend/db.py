@@ -59,6 +59,7 @@ andres_evolution_proposals = database.get_collection("andres_evolution_proposals
 andres_feedback = database.get_collection("andres_feedback")
 andres_development_metrics = database.get_collection("andres_development_metrics")
 andres_safety_events = database.get_collection("andres_safety_events")
+andres_development_suggestions = database.get_collection("andres_development_suggestions")
 
 # Document Analysis Collections
 document_analyses_collection = database.get_collection("document_analyses")

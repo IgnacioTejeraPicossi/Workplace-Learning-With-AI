@@ -16,11 +16,25 @@ Hard rules enforced here (mirror plan §7):
 - no eval/exec/open/compile/__import__/globals/getattr/… ,
 - no file/network/OS access is even reachable (those names don't exist in-scope),
 - CPU-only, wall-clock bounded. Skills can never touch the app, disk or network.
+- input and output are size-capped; the skill receives a *copy* of the input so it
+  can't mutate the caller's value.
+
+Known limitation (flagged by Andrés in review, planned next hardening step): the
+timeout is a thread join, so a CPU-bound thread that ignores it can linger until
+it finishes. There is no OS-level CPU/memory cap here. The safe next step is
+per-process (or lightweight-container) isolation with a real kill + rlimits; the
+size caps below blunt the worst memory blow-ups (`"x"*10**7`, `[0]*10**7`) in the
+meantime by rejecting oversized inputs/outputs.
 """
 import ast
 import builtins as _builtins
+import copy
 import threading
 import time
+
+# Size caps (chars of JSON) — blunt memory blow-ups until process isolation lands.
+MAX_INPUT_LEN = 100_000
+MAX_OUTPUT_LEN = 200_000
 
 # A deliberately tiny, side-effect-free builtins whitelist.
 _SAFE_BUILTIN_NAMES = [
@@ -102,11 +116,25 @@ def run_in_sandbox(code: str, test_input, timeout: float = 2.0) -> dict:
     if not callable(fn):
         return {"ok": False, "output": None, "error": "No callable `skill` defined.", "duration_ms": 0}
 
+    import json
+
+    # Cap the input size, and hand the skill a *copy* so it can't mutate the caller's value.
+    try:
+        if len(json.dumps(test_input, default=str)) > MAX_INPUT_LEN:
+            return {"ok": False, "output": None,
+                    "error": f"Input too large (> {MAX_INPUT_LEN} chars).", "duration_ms": 0}
+    except (TypeError, ValueError):
+        pass  # non-JSON input (rare); still size-cap the output below
+    try:
+        call_input = copy.deepcopy(test_input)
+    except Exception:
+        call_input = test_input
+
     result = {}
 
     def _target():
         try:
-            result["value"] = fn(test_input)
+            result["value"] = fn(call_input)
         except Exception as e:  # skill raised
             result["error"] = f"{type(e).__name__}: {e}"
 
@@ -124,10 +152,14 @@ def run_in_sandbox(code: str, test_input, timeout: float = 2.0) -> dict:
         return {"ok": False, "output": None, "error": result["error"], "duration_ms": duration_ms}
 
     output = result.get("value")
-    # keep output JSON-friendly
+    # keep output JSON-friendly, then cap its size (rejects `"x"*10**7`, `[0]*10**7`).
     try:
-        import json
-        json.dumps(output)
+        serialised = json.dumps(output)
     except (TypeError, ValueError):
         output = str(output)
+        serialised = json.dumps(output)
+    if len(serialised) > MAX_OUTPUT_LEN:
+        return {"ok": False, "output": None,
+                "error": f"Output too large (> {MAX_OUTPUT_LEN} chars).",
+                "duration_ms": duration_ms}
     return {"ok": True, "output": output, "error": None, "duration_ms": duration_ms}

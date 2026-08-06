@@ -11,6 +11,7 @@ import Journal from "./andres-robot/Journal";
 import Evolution from "./andres-robot/Evolution";
 import Creative from "./andres-robot/Creative";
 import Skills from "./andres-robot/Skills";
+import HumanLab from "./andres-robot/HumanLab";
 
 const MEMORY_TYPES = [
   "episodic", "semantic", "relational", "creative", "procedural", "reflective", "working",
@@ -36,7 +37,7 @@ const TABS = [
   { id: "memory", icon: "🌱" },
   { id: "personality", icon: "🧭" },
   { id: "creative", icon: "🎨" },
-  { id: "humanLab", icon: "🔬", phase: "V5" },
+  { id: "humanLab", icon: "🔬" },
   { id: "skills", icon: "🧰" },
   { id: "projects", icon: "📌" },
   { id: "evolution", icon: "🧬" },
@@ -343,6 +344,7 @@ export default function AndresRobot() {
     if (activeTab === "personality") return <Personality profile={profile} />;
     if (activeTab === "creative") return <Creative onProfileChange={loadProfile} />;
     if (activeTab === "skills") return <Skills onProfileChange={loadProfile} />;
+    if (activeTab === "humanLab") return <HumanLab onProfileChange={loadProfile} />;
     if (activeTab === "projects") return <Projects onProfileChange={loadProfile} />;
     if (activeTab === "journal") return <Journal onProfileChange={loadProfile} />;
     if (activeTab === "evolution") return <Evolution profile={profile} onProfileChange={loadProfile} />;

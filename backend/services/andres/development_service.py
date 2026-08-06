@@ -1,0 +1,171 @@
+"""
+Andrés — development / initiative engine (V5).
+
+Ignacio chose the "companion with his own initiative" direction: Andrés may
+PROPOSE his own next developmental moves — an interest to explore, a small project,
+a curriculum focus, a reflection theme, or a gentle trait nudge. Initiative here
+means *generating proposals on his own*, never consolidating them: every
+suggestion is accepted or dismissed by the user. This keeps V5's rule intact —
+"can develop, but not rewrite himself in silence."
+
+Accepting a suggestion routes it to the existing, already-safe machinery:
+- project        → creates an andres_projects entry
+- interest / trait / curriculum → creates an Evolution Proposal or a curiosity item
+  (still user-approved downstream); for V5 we simply record acceptance and let the
+  user act via the relevant tab. No autonomous side effects.
+
+Deterministic offline fallback keeps it testable with no AI key. Suggestions live
+in andres_development_suggestions with a status the user advances.
+"""
+from datetime import datetime
+import json
+
+from fastapi import HTTPException
+from bson import ObjectId
+from bson.errors import InvalidId
+
+from backend.db import (
+    andres_development_suggestions, andres_reflections, andres_projects,
+)
+
+_KINDS = {"interest", "project", "curriculum", "reflection_focus", "trait_nudge"}
+_STATUSES = {"open", "accepted", "dismissed"}
+
+
+def _oid(id_str: str) -> ObjectId:
+    try:
+        return ObjectId(id_str)
+    except (InvalidId, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid suggestion id")
+
+
+def _offline_suggestions(profile: dict) -> list:
+    interests = profile.get("identity", {}).get("core_interests", []) or ["learning"]
+    first = interests[0]
+    return [
+        {"kind": "interest", "title": f"Explore an unexpected angle of {first}",
+         "rationale": "Offline placeholder — a deterministic suggestion, not a genuine one."},
+        {"kind": "reflection_focus", "title": "Notice where I sounded generic recently",
+         "rationale": "Offline placeholder — grounded in my standing goal to be less generic."},
+        {"kind": "project", "title": "A small development-journal project",
+         "rationale": "Offline placeholder — gives my growth a legible spine."},
+    ]
+
+
+async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
+    """Andrés proposes 2-4 developmental moves. Deterministic offline fallback."""
+    identity = profile.get("identity", {})
+    interests = ", ".join(identity.get("core_interests", []) or ["learning"])
+
+    # a little grounding from recent reflections
+    recent = []
+    async for doc in andres_reflections.find({"user_id": user_id}).sort("created_at", -1).limit(3):
+        recent.append(doc.get("content", "")[:200])
+    recent_txt = "\n".join(f"- {r}" for r in recent) or "(none yet)"
+
+    prompt = (
+        "You are Andrés, proposing — on your own initiative — 3 concrete next moves "
+        "in your OWN development. Each must be something you would still ask Ignacio "
+        "to approve; you are proposing, not deciding. Kinds allowed: interest, "
+        "project, curriculum, reflection_focus, trait_nudge. Be specific and modest; "
+        "avoid grandiosity; stay honest about being a developmental AI, not a person.\n\n"
+        f"[MY INTERESTS]\n{interests}\n\n[MY RECENT REFLECTIONS]\n{recent_txt}\n\n"
+        'Return ONLY a JSON array of objects with keys "kind", "title", "rationale".'
+    )
+
+    suggestions = None
+    is_mock = True
+    try:
+        from backend.llm import ask_ai_unified
+        result = await ask_ai_unified(
+            messages=[{"role": "user", "content": prompt}],
+            task_type="andres_development", complexity="high",
+            max_tokens=600, request_headers=request_headers,
+        )
+        if result and not result.startswith("[MOCKED RESPONSE"):
+            txt = result.strip()
+            s, e = txt.find("["), txt.rfind("]")
+            if s != -1 and e != -1:
+                parsed = json.loads(txt[s:e + 1])
+                suggestions = []
+                for w in parsed:
+                    kind = str(w.get("kind", "")).strip()
+                    if kind not in _KINDS:
+                        kind = "reflection_focus"
+                    if w.get("title"):
+                        suggestions.append({
+                            "kind": kind,
+                            "title": str(w["title"]).strip()[:200],
+                            "rationale": str(w.get("rationale", "")).strip()[:600],
+                        })
+                suggestions = suggestions[:4] or None
+                if suggestions:
+                    is_mock = False
+    except Exception as ex:  # pragma: no cover - defensive
+        print(f"⚠️ Andrés development suggest failed/parse: {ex}")
+
+    if not suggestions:
+        suggestions = _offline_suggestions(profile)
+
+    now = datetime.utcnow().isoformat()
+    stored = []
+    for s in suggestions:
+        doc = {
+            "user_id": user_id,
+            "kind": s["kind"],
+            "title": s["title"],
+            "rationale": s.get("rationale", ""),
+            "status": "open",
+            "is_mock": is_mock,
+            "created_at": now,
+        }
+        res = await andres_development_suggestions.insert_one(doc)
+        doc["_id"] = str(res.inserted_id)
+        stored.append(doc)
+    return stored
+
+
+async def list_suggestions(user_id: str, status: str = None, limit: int = 100) -> list:
+    query = {"user_id": user_id}
+    if status and status in _STATUSES:
+        query["status"] = status
+    out = []
+    async for doc in andres_development_suggestions.find(query).sort("created_at", -1).limit(limit):
+        doc["_id"] = str(doc["_id"])
+        out.append(doc)
+    return out
+
+
+async def act_on_suggestion(user_id: str, suggestion_id: str, action: str) -> dict:
+    """Accept or dismiss a suggestion. Accepting a 'project' creates a project;
+    other kinds are recorded as accepted for the user to act on in the relevant tab
+    (no autonomous side effects)."""
+    if action not in {"accept", "dismiss"}:
+        raise HTTPException(status_code=400, detail="action must be accept or dismiss")
+    doc = await andres_development_suggestions.find_one(
+        {"_id": _oid(suggestion_id), "user_id": user_id}
+    )
+    if not doc:
+        raise HTTPException(status_code=404, detail="Suggestion not found")
+
+    created = None
+    if action == "accept" and doc.get("kind") == "project":
+        now = datetime.utcnow().isoformat()
+        proj = {
+            "user_id": user_id,
+            "title": doc.get("title", "Project")[:200],
+            "description": doc.get("rationale", "")[:2000],
+            "status": "active",
+            "created_at": now,
+            "updated_at": now,
+            "origin": "andres_initiative",
+        }
+        res = await andres_projects.insert_one(proj)
+        created = {"project_id": str(res.inserted_id)}
+
+    new_status = "accepted" if action == "accept" else "dismissed"
+    await andres_development_suggestions.update_one(
+        {"_id": _oid(suggestion_id), "user_id": user_id},
+        {"$set": {"status": new_status, "acted_at": datetime.utcnow().isoformat()}},
+    )
+    return {"ok": True, "id": suggestion_id, "status": new_status, "created": created}

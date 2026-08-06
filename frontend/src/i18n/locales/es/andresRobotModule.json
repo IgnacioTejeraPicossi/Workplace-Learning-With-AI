@@ -9,7 +9,7 @@
       "memory": "Jardín de memoria",
       "personality": "Personalidad",
       "creative": "Estudio creativo",
-      "humanLab": "Lab humano",
+      "humanLab": "Laboratorio de desarrollo",
       "skills": "Habilidades",
       "projects": "Proyectos",
       "evolution": "Evolución",
@@ -199,6 +199,47 @@
       "approve": "Aprobar",
       "reject": "Rechazar",
       "delete": "Eliminar"
+    },
+    "humanLab": {
+      "initiativeTitle": "🌱 Sugerencias propias de Andrés",
+      "initiativeIntro": "Por iniciativa propia, Andrés propone qué le gustaría explorar, construir o llegar a ser. Él propone; tú decides. Nada se consolida sin tu aprobación.",
+      "propose": "Pedir a Andrés que proponga",
+      "thinking": "Pensando…",
+      "noSuggestions": "Aún no hay sugerencias. Pregúntale a Andrés qué le gustaría desarrollar.",
+      "offlineTag": "sin conexión — texto determinista",
+      "kinds": {
+        "interest": "Interés",
+        "project": "Proyecto",
+        "curriculum": "Currículo",
+        "reflection_focus": "Foco de reflexión",
+        "trait_nudge": "Ajuste de rasgo"
+      },
+      "suggestionStatus": {
+        "open": "Abierta",
+        "accepted": "Aceptada",
+        "dismissed": "Descartada"
+      },
+      "accept": "Aceptar",
+      "dismiss": "Descartar",
+      "historyTitle": "🧬 Historial de identidad",
+      "historyIntro": "Cada versión de la identidad de Andrés, con lo que cambió. Puede desarrollarse, pero nunca reescribirse en silencio.",
+      "noHistory": "De momento solo la primera identidad.",
+      "currentTag": "actual",
+      "capsuleTitle": "📦 Cápsula de personalidad",
+      "capsuleIntro": "Una instantánea portátil de quién es Andrés. La exportación es de solo lectura. La importación aplica solo la identidad, de forma reversible, tras mostrarte un diff.",
+      "export": "Exportar cápsula",
+      "importTitle": "Importar una cápsula",
+      "importPlaceholder": "Pega aquí un JSON de cápsula…",
+      "preview": "Previsualizar cambios",
+      "applyImport": "Aplicar importación",
+      "badJson": "Eso no es un JSON válido.",
+      "previewFail": "No se pudo previsualizar la cápsula.",
+      "importFail": "No se pudo importar la cápsula.",
+      "imported": "Importada — la identidad es ahora v{{v}} (reversible en el historial de arriba).",
+      "diffTitle": "Esta importación cambiaría:",
+      "diffSelf": "autodescripción",
+      "diffNone": "Sin cambios de identidad.",
+      "capsuleNote": "Las memorias, proyectos y habilidades de una cápsula se informan pero nunca se importan automáticamente."
     },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."

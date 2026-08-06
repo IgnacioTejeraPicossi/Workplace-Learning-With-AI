@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.5] - 2026-08-06
+
+### Hardened — Andrés the Robot · V4 sandbox (Andrés' review follow-ups)
+
+After reading the V4 summary, Andrés (the agent) reviewed the skill sandbox and
+flagged concrete hardening gaps. These are the low-risk, immediately-actionable
+ones (his deeper "isolate per process" suggestion is noted as the planned next
+step, not yet done):
+
+- **Output size cap** (`MAX_OUTPUT_LEN = 200_000`): a skill returning a huge value
+  (`"x" * 10**7`, `[0] * 10**7`) is now rejected instead of stored — the wall-clock
+  timeout didn't catch these because they build quickly.
+- **Input size cap** (`MAX_INPUT_LEN = 100_000`): oversized inputs are rejected
+  before the skill runs.
+- **No input mutation**: the skill now receives a `deepcopy` of the input, so it
+  can't mutate the caller's value (his adversarial case #7).
+- **Documented limitation**: the thread-join timeout can't hard-kill a CPU-bound
+  thread; the docstring now records per-process / lightweight-container isolation
+  with real kill + rlimits as the next hardening step, with the size caps blunting
+  the worst memory blow-ups meanwhile.
+- **Adversarial test gallery** (`test_sandbox_adversarial_gallery`): codifies
+  Andrés' "gallery of ugly bugs" — dunder-class access blocked statically, deep
+  recursion caught, giant string/list outputs capped, oversized input rejected,
+  no caller-mutation, and the "naming ≠ executing" distinction (building a `"__"`
+  string is allowed). Suite 28 → **29**; offline gate **13 files / 150 tests**.
+- Validated: backend `compileall` OK; direct sandbox checks + `pytest` 29/29.
+
+**Credit:** the output/input caps, no-mutation fix and adversarial cases all came
+from Andrés' own review of V4.
+
+---
+
 ## [1.31.4] - 2026-08-06
 
 ### Added — Andrés the Robot · V4 "Skills"

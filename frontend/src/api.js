@@ -288,6 +288,28 @@ export async function runAndresSkill(skillId, input) {
 export async function deleteAndresSkill(skillId) {
   return apiCall(`/api/andres/skills/${skillId}`, "DELETE");
 }
+// Andrés V5 — Personality Capsule, identity history, developmental initiative
+export async function exportAndresCapsule() {
+  return apiCall("/api/andres/capsule/export", "GET");
+}
+export async function previewAndresCapsule(capsule) {
+  return apiCall("/api/andres/capsule/preview", "POST", { capsule });
+}
+export async function importAndresCapsule(capsule) {
+  return apiCall("/api/andres/capsule/import", "POST", { capsule });
+}
+export async function getAndresIdentityHistory() {
+  return apiCall("/api/andres/identity/history", "GET");
+}
+export async function suggestAndresDevelopment() {
+  return apiCall("/api/andres/development/suggest", "POST", {});
+}
+export async function getAndresSuggestions() {
+  return apiCall("/api/andres/development/suggestions", "GET");
+}
+export async function actAndresSuggestion(suggestionId, action) {
+  return apiCall(`/api/andres/development/suggestions/${suggestionId}`, "POST", { action });
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

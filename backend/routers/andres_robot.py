@@ -24,7 +24,8 @@ from typing import Any
 
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
-    evolution_manager, creativity_engine, skill_service,
+    evolution_manager, creativity_engine, skill_service, capsule_service,
+    development_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -101,6 +102,14 @@ class SkillProposal(BaseModel):
 
 class SkillRunRequest(BaseModel):
     input: Any = None
+
+
+class CapsuleBody(BaseModel):
+    capsule: Dict = Field(default_factory=dict)
+
+
+class SuggestionAction(BaseModel):
+    action: str = Field(..., pattern="^(accept|dismiss)$")
 
 
 @router.get("/health")
@@ -418,3 +427,63 @@ async def skills_run(skill_id: str, body: SkillRunRequest, user=Depends(_verify_
 @router.delete("/skills/{skill_id}")
 async def skills_delete(skill_id: str, user=Depends(_verify_token)):
     return await skill_service.delete_skill(user.get("uid"), skill_id)
+
+
+# ── V5: Personality Capsule + identity history (user-initiated, reversible) ────
+
+@router.get("/capsule/export")
+async def capsule_export(user=Depends(_verify_token)):
+    """A portable, read-only snapshot of Andrés' personality + content manifest."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    return await capsule_service.export_capsule(uid, profile_doc)
+
+
+@router.post("/capsule/preview")
+async def capsule_preview(body: CapsuleBody, user=Depends(_verify_token)):
+    """Show what importing this capsule's identity WOULD change. Changes nothing."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    return capsule_service.diff_capsule(profile_doc, body.capsule)
+
+
+@router.post("/capsule/import")
+async def capsule_import(body: CapsuleBody, user=Depends(_verify_token)):
+    """Apply the capsule's identity, reversibly (snapshots current identity first)."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    return await capsule_service.import_capsule(uid, profile_doc, body.capsule)
+
+
+@router.get("/identity/history")
+async def identity_history(user=Depends(_verify_token)):
+    """Identity version timeline with a readable diff between versions."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    items = await capsule_service.identity_history(uid, profile_doc)
+    return {"history": items, "count": len(items)}
+
+
+# ── V5: Andrés' own developmental initiative (proposes; the user approves) ─────
+
+@router.post("/development/suggest")
+async def development_suggest(http_request: Request, user=Depends(_verify_token)):
+    """Andrés proposes, on his own initiative, a few next developmental moves."""
+    uid = user.get("uid")
+    profile_doc = await get_or_create_profile(uid)
+    if profile_doc.get("development_paused"):
+        return {"paused": True, "suggestions": []}
+    items = await development_service.suggest(uid, profile_doc, request_headers=http_request.headers)
+    return {"suggestions": items, "count": len(items)}
+
+
+@router.get("/development/suggestions")
+async def development_list(status: str = None, user=Depends(_verify_token)):
+    items = await development_service.list_suggestions(user.get("uid"), status=status)
+    return {"suggestions": items, "count": len(items)}
+
+
+@router.post("/development/suggestions/{suggestion_id}")
+async def development_act(suggestion_id: str, body: SuggestionAction, user=Depends(_verify_token)):
+    """Accept (may create a project) or dismiss one of Andrés' suggestions."""
+    return await development_service.act_on_suggestion(user.get("uid"), suggestion_id, body.action)

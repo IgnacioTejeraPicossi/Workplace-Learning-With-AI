@@ -9,7 +9,7 @@
       "memory": "Minnehage",
       "personality": "Personlighet",
       "creative": "Kreativt studio",
-      "humanLab": "Menneskelab",
+      "humanLab": "Utviklingslab",
       "skills": "Ferdigheter",
       "projects": "Prosjekter",
       "evolution": "Evolusjon",
@@ -199,6 +199,47 @@
       "approve": "Godkjenn",
       "reject": "Avvis",
       "delete": "Slett"
+    },
+    "humanLab": {
+      "initiativeTitle": "🌱 Andrés' egne forslag",
+      "initiativeIntro": "På eget initiativ foreslår Andrés hva han vil utforske, bygge eller bli. Han foreslår; du bestemmer. Ingenting konsolideres uten din godkjenning.",
+      "propose": "Be Andrés foreslå",
+      "thinking": "Tenker…",
+      "noSuggestions": "Ingen forslag ennå. Spør Andrés hva han vil utvikle.",
+      "offlineTag": "frakoblet — deterministisk plassholder",
+      "kinds": {
+        "interest": "Interesse",
+        "project": "Prosjekt",
+        "curriculum": "Læreplan",
+        "reflection_focus": "Refleksjonsfokus",
+        "trait_nudge": "Egenskapsjustering"
+      },
+      "suggestionStatus": {
+        "open": "Åpen",
+        "accepted": "Godtatt",
+        "dismissed": "Forkastet"
+      },
+      "accept": "Godta",
+      "dismiss": "Forkast",
+      "historyTitle": "🧬 Identitetshistorikk",
+      "historyIntro": "Hver versjon av Andrés' identitet, med hva som endret seg. Han kan utvikle seg, men aldri skrive seg selv om i stillhet.",
+      "noHistory": "Bare den første identiteten så langt.",
+      "currentTag": "gjeldende",
+      "capsuleTitle": "📦 Personlighetskapsel",
+      "capsuleIntro": "Et flyttbart øyeblikksbilde av hvem Andrés er. Eksport er skrivebeskyttet. Import gjelder kun identitet, reversibelt, etter å ha vist deg en diff.",
+      "export": "Eksporter kapsel",
+      "importTitle": "Importer en kapsel",
+      "importPlaceholder": "Lim inn en kapsel-JSON her…",
+      "preview": "Forhåndsvis endringer",
+      "applyImport": "Bruk import",
+      "badJson": "Det er ikke gyldig JSON.",
+      "previewFail": "Kunne ikke forhåndsvise kapselen.",
+      "importFail": "Kunne ikke importere kapselen.",
+      "imported": "Importert — identiteten er nå v{{v}} (reversibel i historikken over).",
+      "diffTitle": "Denne importen ville endre:",
+      "diffSelf": "selvbeskrivelse",
+      "diffNone": "Ingen identitetsendringer.",
+      "capsuleNote": "Minner, prosjekter og ferdigheter i en kapsel rapporteres, men importeres aldri automatisk."
     },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
