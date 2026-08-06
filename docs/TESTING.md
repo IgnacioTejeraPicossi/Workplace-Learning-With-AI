@@ -117,7 +117,7 @@ curl http://localhost:8000/api/j-messages/list
 | Web Search AI (grounded answer) | 4/4 contract tests (offline, search+LLM mocked) | `python -m pytest backend/tests/test_web_search_ai_contracts.py -v` |
 | Babel Library (intelligence + profile) | 14/14 contract tests (offline, services mocked) | `python -m pytest backend/tests/test_babel_contracts.py -v` |
 | Team Dynamics (CRUD + analytics) | 8/8 contract tests (offline, auth+Mongo+LLM mocked) | `python -m pytest backend/tests/test_team_dynamics_contracts.py -v` |
-| Andrés the Robot (V0–V4) | 29/29 contract tests (offline, auth+Mongo+LLM mocked; chat, memory CRUD + retrieval, reflection, curiosity, projects, evolution propose/approve + trait cap, creativity + novelty/usefulness eval + self-critique, skills safety-gate + sandbox run + escape-attempt blocks + adversarial gallery: recursion/output-cap/input-cap/no-mutation) | `python -m pytest backend/tests/test_andres_robot_contracts.py -v` |
+| Andrés the Robot (V0–V5) | 35/35 contract tests (offline, auth+Mongo+LLM mocked; chat, memory, reflection, curiosity, projects, evolution + trait cap, creativity + eval, skills safety-gate + sandbox + adversarial gallery, capsule export/preview-diff/import-reversible/malformed-400, development initiative suggest + accept→project) | `python -m pytest backend/tests/test_andres_robot_contracts.py -v` |
 | Agent Security | Health endpoint | `curl http://localhost:8000/api/agent-security/health` |
 | Frontend | Loads without crash | `cd frontend && npm start` (verify in browser) |
 
@@ -128,7 +128,7 @@ dispatch: `.github/workflows/ci.yml`.
 
 | Job | What it validates |
 |-----|-------------------|
-| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (150 tests) |
+| `backend` | `python -m compileall backend` (syntax gate for all backend sources) + `pip install -r backend/requirements.txt` (dependency resolution) + **`pytest` on the offline, mock-first suites** (156 tests) |
 | `frontend` | `npm install` + `npm run build` (production build). Runs with `CI=false` so pre-existing ESLint warnings do not fail the build yet. |
 
 The `backend` test step runs only the suites verified to pass with **no**

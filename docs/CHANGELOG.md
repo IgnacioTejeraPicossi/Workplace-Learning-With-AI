@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.6] - 2026-08-06
+
+### Added — Andrés the Robot · V5 "Developmental Companion" (first slice)
+
+Ignacio chose that Andrés should have **his own initiative** — so V5 lets Andrés
+propose his own development, while keeping his guiding rule intact: *"can develop,
+but not rewrite himself in silence."* Everything is user-initiated to run, and
+every change is auditable and reversible.
+
+- **Andrés' own initiative** (`backend/services/andres/development_service.py`,
+  new `andres_development_suggestions` collection): on request, Andrés proposes a
+  few next developmental moves — an interest, a project, a curriculum focus, a
+  reflection theme or a gentle trait nudge. He **proposes; the user accepts or
+  dismisses**. Accepting a `project` suggestion creates a real project (tagged
+  `origin: andres_initiative`); other kinds are recorded for the user to act on —
+  no autonomous side effects. Deterministic offline fallback. Endpoints
+  `POST /api/andres/development/suggest`, `GET .../suggestions`,
+  `POST .../suggestions/{id}` (accept|dismiss). Respects `development_paused`.
+- **Personality Capsule** (`capsule_service.py`): a portable snapshot of *who
+  Andrés is* (identity, traits, interests) plus a content manifest (memory /
+  project / skill counts + provenance). Export is read-only. Import is two-step and
+  reversible: `preview` returns a **legible diff** and changes nothing; `import`
+  **snapshots the current identity** into `andres_identity_versions` first, then
+  applies identity fields only (traits clamped to known keys, version bumped).
+  Memories/projects/skills in a capsule are reported but never auto-injected.
+  Endpoints `GET /api/andres/capsule/export`, `POST .../preview`, `POST .../import`.
+- **Identity history**: `GET /api/andres/identity/history` — the version timeline
+  (current + archived snapshots from V2 evolution and capsule imports) with a
+  readable diff between each version and the previous one.
+- **Frontend Development Lab** (`frontend/src/andres-robot/HumanLab.jsx`; the Human
+  Lab tab, relabelled "Development Lab"): three sections — Andrés' own suggestions
+  (propose + accept/dismiss), identity history (version diffs), and Personality
+  Capsule (export view + paste-to-import with a preview diff before applying).
+- **i18n**: `andresRobotModule.json` extended (EN/ES/NO, 205/205 parity).
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 29 → **35** (capsule
+  export, preview-diff changes-nothing, import versions-up-reversibly + snapshot,
+  malformed → 400, development suggest offline, accept-project creates project).
+  Offline gate now **13 files / 156 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 205/205;
+  Andrés suite 35/35.
+
+**Direction:** Ignacio picked "companion with his own initiative" (Andrés proposes
+proactively). The rule "he proposes, you approve; nothing consolidates in silence"
+is preserved throughout.
+
+**Next (V5 continued / V6):** approved curriculum with objectives, controlled
+research tiers, project lifecycle with a "cemetery" + closing reflection, then V6
+embodiment adapters (Capsule import into a robot/voice profile).
+
+---
+
 ## [1.31.5] - 2026-08-06
 
 ### Hardened — Andrés the Robot · V4 sandbox (Andrés' review follow-ups)

@@ -547,10 +547,10 @@ def test_sandbox_adversarial_gallery():
     # deep recursion → RecursionError is caught, not fatal
     rec = run_in_sandbox("def skill(x):\n    return skill(x)", 1)
     assert rec["ok"] is False and "RecursionError" in rec["error"]
-    # giant string / list outputs → size-capped
-    big_str = run_in_sandbox("def skill(x):\n    return 'x' * 10000000", 0)
+    # oversized string / list outputs → size-capped (just over the 200k-char cap)
+    big_str = run_in_sandbox("def skill(x):\n    return 'x' * 300000", 0)
     assert big_str["ok"] is False and "too large" in big_str["error"]
-    big_list = run_in_sandbox("def skill(x):\n    return [0] * 10000000", 0)
+    big_list = run_in_sandbox("def skill(x):\n    return [0] * 120000", 0)
     assert big_list["ok"] is False and "too large" in big_list["error"]
     # the skill receives a COPY — it cannot mutate the caller's value
     caller = {"a": 1}
@@ -632,8 +632,10 @@ async def test_capsule_import_versions_up_reversibly(mock_idprofiles, mock_cap_p
     mock_versions.insert_one.assert_awaited()      # prior identity was snapshotted
 
 
+@patch("backend.services.andres.identity_service.andres_profiles")
 @pytest.mark.asyncio
-async def test_capsule_import_rejects_malformed():
+async def test_capsule_import_rejects_malformed(mock_idprofiles):
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_CAPSULE_PROFILE))
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
         r = await c.post("/api/andres/capsule/import", json={"capsule": {"identity": {}}})
     assert r.status_code == 400
