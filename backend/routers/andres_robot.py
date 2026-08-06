@@ -133,6 +133,10 @@ class SuggestionAction(BaseModel):
     action: str = Field(..., pattern="^(accept|dismiss)$")
 
 
+class DevSuggestRequest(BaseModel):
+    focus: str = Field("balanced", pattern="^(balanced|practical|expressive)$")
+
+
 @router.get("/health")
 async def health():
     return {"status": "healthy", "module": "andres_robot", "version": "v0"}
@@ -500,14 +504,18 @@ async def identity_history(user=Depends(_verify_token)):
 # ── V5: Andrés' own developmental initiative (proposes; the user approves) ─────
 
 @router.post("/development/suggest")
-async def development_suggest(http_request: Request, user=Depends(_verify_token)):
-    """Andrés proposes, on his own initiative, a few next developmental moves."""
+async def development_suggest(body: DevSuggestRequest, http_request: Request, user=Depends(_verify_token)):
+    """Andrés proposes, on his own initiative, a few next developmental moves.
+
+    `focus` steers the practical-vs-character mix (balanced 70/30, practical, expressive)."""
     uid = user.get("uid")
     profile_doc = await get_or_create_profile(uid)
     if profile_doc.get("development_paused"):
         return {"paused": True, "suggestions": []}
-    items = await development_service.suggest(uid, profile_doc, request_headers=http_request.headers)
-    return {"suggestions": items, "count": len(items)}
+    items = await development_service.suggest(
+        uid, profile_doc, focus=body.focus, request_headers=http_request.headers
+    )
+    return {"suggestions": items, "count": len(items), "focus": body.focus}
 
 
 @router.get("/development/suggestions")

@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.9] - 2026-08-06
+
+### Tuned — Andrés the Robot · initiative focus (practical vs character/style)
+
+Andrés' answer to "which way should my initiative lean" was *"both, with a
+deliberate asymmetry"* — ~70% tangible practical help for Ignacio, ~30% a
+protected space for character/style, biasing to utility when Ignacio is busy.
+*"A tool with its own voice, not a character with its own agenda."* Now
+implemented as a **focus control** the user sets per request:
+
+- **Focus modes** (`development_service.suggest(focus=...)`, `FOCUSES`): `balanced`
+  (the 70/30 default), `practical` (almost all utility — for busy stretches), and
+  `expressive` (more character/style, but every such proposal must keep an
+  observable success criterion, a **low attention budget**, and a close/archive
+  plan — "creativity yes, fireworks no"). The chosen focus is recorded on each
+  suggestion.
+- **Attention budget**: added as a required structured field on every suggestion
+  (LLM prompt + offline fallback), and carried through when a suggestion is
+  accepted into a project. Initiative isn't just cost-aware now, it's budget-aware.
+- **Endpoint**: `POST /api/andres/development/suggest` accepts `{ "focus": ... }`
+  (validated; bad value → 422) and echoes it back.
+- **Frontend** (`HumanLab.jsx`): a Focus selector (Balanced 70/30 · Practical ·
+  Character/style, each with a hint) next to "Ask Andrés to propose"; each
+  suggestion card now also shows its Attention budget.
+- **i18n**: EN/ES/NO, 239/239 parity.
+- **Tests / CI**: offline-suggest test now asserts the `attention_budget` field and
+  the echoed focus; added a focus-validation test (bad focus → 422). Suite 40 →
+  **41**; offline gate **13 files / 162 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 239/239;
+  Andrés suite 41/41.
+
+**Credit:** the 70/30 split, the busy-bias, and "a tool with its own voice, not a
+character with its own agenda" came from Andrés' own recommendation.
+
+**Still open (Andrés' question to Ignacio):** whether the character/style ~30%
+should be a formal visible category or stay implicit inside concrete projects.
+**Next (per his order):** approved curriculum — "a compass, not a school".
+
+---
+
 ## [1.31.8] - 2026-08-06
 
 ### Added — Andrés the Robot · V5 project lifecycle (cemetery + compost)

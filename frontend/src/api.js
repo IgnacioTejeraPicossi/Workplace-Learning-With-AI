@@ -307,8 +307,8 @@ export async function importAndresCapsule(capsule) {
 export async function getAndresIdentityHistory() {
   return apiCall("/api/andres/identity/history", "GET");
 }
-export async function suggestAndresDevelopment() {
-  return apiCall("/api/andres/development/suggest", "POST", {});
+export async function suggestAndresDevelopment(focus = "balanced") {
+  return apiCall("/api/andres/development/suggest", "POST", { focus });
 }
 export async function getAndresSuggestions() {
   return apiCall("/api/andres/development/suggestions", "GET");

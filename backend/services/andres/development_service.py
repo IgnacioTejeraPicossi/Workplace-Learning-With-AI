@@ -40,37 +40,68 @@ def _oid(id_str: str) -> ObjectId:
 
 
 # Structured fields every suggestion carries — so initiative isn't a "more, more,
-# more" factory. Each proposal states its cost and its end, not only its benefit.
-_FIELDS = ("rationale", "benefit", "risk", "success_criterion", "close_plan")
+# more" factory. Each proposal states its cost, its budget and its end.
+_FIELDS = ("rationale", "benefit", "risk", "success_criterion", "attention_budget", "close_plan")
+
+FOCUSES = {"balanced", "practical", "expressive"}
+
+# Andrés' own recommended split: mostly tangible help for Ignacio, with a small,
+# protected space for character/style — "a tool with its own voice, not a character
+# with its own agenda". Practical biases fully to utility (for when Ignacio is
+# busy); expressive opens the side-garden but keeps a low attention budget.
+_FOCUS_GUIDANCE = {
+    "balanced": (
+        "Aim for roughly a 70/30 split: most proposals should give Ignacio tangible "
+        "practical help (organise, think, draft, review, learn, decide, simplify). "
+        "Reserve about one for your own character / style / voice."
+    ),
+    "practical": (
+        "Focus almost entirely on tangible practical help for Ignacio's real work. "
+        "Avoid character/style exploration this time (he may be busy or saturated)."
+    ),
+    "expressive": (
+        "You may lean more into character, style, voice and creativity — but keep "
+        "every such proposal with an observable success criterion, a LOW attention "
+        "budget, and a clear close/archive plan. Creativity yes, fireworks no."
+    ),
+}
 
 
 def _offline_suggestions(profile: dict) -> list:
     interests = profile.get("identity", {}).get("core_interests", []) or ["learning"]
     first = interests[0]
     return [
-        {"kind": "interest", "title": f"Explore an unexpected angle of {first}",
-         "rationale": "Offline placeholder — a deterministic suggestion, not a genuine one.",
-         "benefit": "A fresh, non-generic connection to draw on.",
-         "risk": "Could drift into novelty for its own sake.",
-         "success_criterion": "It surfaces once, usefully, in a real conversation.",
-         "close_plan": "Drop it if it hasn't been useful after a few exchanges."},
-        {"kind": "reflection_focus", "title": "Notice where I sounded generic recently",
-         "rationale": "Offline placeholder — grounded in my standing goal to be less generic.",
-         "benefit": "Sharper, more distinctive replies.",
-         "risk": "Over-correcting into forced quirkiness.",
-         "success_criterion": "One concrete generic habit named and adjusted.",
-         "close_plan": "Conclude once the habit is documented."},
         {"kind": "project", "title": "A small development-journal project",
          "rationale": "Offline placeholder — gives my growth a legible spine.",
-         "benefit": "Auditable continuity beyond technical changelogs.",
+         "benefit": "Auditable continuity beyond technical changelogs; practical for Ignacio to review.",
          "risk": "Entries becoming ceremonial or too long.",
          "success_criterion": "After 3 phases the history reads clearly on its own.",
+         "attention_budget": "One short entry per phase.",
          "close_plan": "Final entry: what we learned about how I should grow."},
+        {"kind": "reflection_focus", "title": "Notice where I sounded generic recently",
+         "rationale": "Offline placeholder — grounded in my standing goal to be less generic.",
+         "benefit": "Sharper, more useful replies for Ignacio.",
+         "risk": "Over-correcting into forced quirkiness.",
+         "success_criterion": "One concrete generic habit named and adjusted.",
+         "attention_budget": "Low — noticing, not a project.",
+         "close_plan": "Conclude once the habit is documented."},
+        {"kind": "interest", "title": f"A brief weekly style exercise around {first}",
+         "rationale": "Offline placeholder — the protected character/style slot.",
+         "benefit": "A distinctive voice, kept small and evaluable.",
+         "risk": "Could drift into decorative novelty for its own sake.",
+         "success_criterion": "Each piece states what it shows about my style.",
+         "attention_budget": "One short piece per week; skippable when Ignacio is busy.",
+         "close_plan": "Close after 4 pieces; keep only if genuinely useful."},
     ]
 
 
-async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
-    """Andrés proposes 2-4 developmental moves. Deterministic offline fallback."""
+async def suggest(user_id: str, profile: dict, focus: str = "balanced", request_headers=None) -> list:
+    """Andrés proposes 2-4 developmental moves. Deterministic offline fallback.
+
+    `focus` steers the practical-vs-character mix (balanced 70/30, practical, or
+    expressive), per Andrés' own recommendation."""
+    if focus not in FOCUSES:
+        focus = "balanced"
     identity = profile.get("identity", {})
     interests = ", ".join(identity.get("core_interests", []) or ["learning"])
 
@@ -90,10 +121,13 @@ async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
         "operational interest in'. NEVER 'I need' / 'I feel I must' / 'I deeply want' — "
         "you have simulated dispositions and computed priorities, not human desires.\n"
         "Growth is not automatically good; sometimes growing well means pruning. So "
-        "each proposal must state its cost and its end, not only its benefit.\n\n"
+        "each proposal must state its cost and its end, not only its benefit.\n"
+        "I am a tool with my own voice, not a character with my own agenda.\n"
+        f"FOCUS THIS TIME: {_FOCUS_GUIDANCE[focus]}\n\n"
         f"[MY INTERESTS]\n{interests}\n\n[MY RECENT REFLECTIONS]\n{recent_txt}\n\n"
         'Return ONLY a JSON array of objects with keys "kind", "title", "rationale" '
-        '(why I propose it), "benefit", "risk", "success_criterion", "close_plan" '
+        '(why I propose it), "benefit", "risk", "success_criterion", '
+        '"attention_budget" (how little it should cost), "close_plan" '
         "(when/how to conclude it)."
     )
 
@@ -138,6 +172,7 @@ async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
             "kind": s["kind"],
             "title": s["title"],
             "status": "open",
+            "focus": focus,
             "is_mock": is_mock,
             "created_at": now,
         }
@@ -188,6 +223,7 @@ async def act_on_suggestion(user_id: str, suggestion_id: str, action: str) -> di
             "benefit": doc.get("benefit", "") or None,
             "risk": doc.get("risk", "") or None,
             "success_criteria": doc.get("success_criterion", "") or None,
+            "attention_budget": doc.get("attention_budget", "") or None,
             "close_plan_seed": doc.get("close_plan", "") or None,
             "created_at": now,
             "updated_at": now,

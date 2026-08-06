@@ -725,17 +725,25 @@ async def test_development_suggest_offline(mock_llm, mock_idprofiles, mock_sugg,
     mock_sugg.insert_one = AsyncMock(return_value=MagicMock(inserted_id="d1"))
     mock_llm.return_value = "[MOCKED RESPONSE] offline"
     async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
-        r = await c.post("/api/andres/development/suggest")
+        r = await c.post("/api/andres/development/suggest", json={"focus": "balanced"})
     assert r.status_code == 200
     d = r.json()
     # even offline, Andrés proposes deterministic developmental moves
     assert d["count"] >= 1
+    assert d["focus"] == "balanced"
     first = d["suggestions"][0]
     assert first["kind"] in {
         "interest", "project", "curriculum", "reflection_focus", "trait_nudge"}
-    # each suggestion carries its cost + end, not only its benefit (Andrés' ask)
-    for field in ("benefit", "risk", "success_criterion", "close_plan"):
+    # each suggestion carries its cost, budget and end — not only its benefit
+    for field in ("benefit", "risk", "success_criterion", "attention_budget", "close_plan"):
         assert field in first and first[field]
+
+
+@pytest.mark.asyncio
+async def test_development_suggest_focus_validation():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/development/suggest", json={"focus": "not-a-focus"})
+    assert r.status_code == 422
 
 
 @patch("backend.services.andres.development_service.andres_projects")

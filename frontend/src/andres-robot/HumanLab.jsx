@@ -21,6 +21,7 @@ export default function HumanLab({ onProfileChange }) {
 
   const [suggestions, setSuggestions] = useState([]);
   const [suggesting, setSuggesting] = useState(false);
+  const [focus, setFocus] = useState("balanced");
   const [history, setHistory] = useState([]);
   const [capsule, setCapsule] = useState(null);
   const [importText, setImportText] = useState("");
@@ -42,7 +43,7 @@ export default function HumanLab({ onProfileChange }) {
 
   const generate = async () => {
     setSuggesting(true);
-    try { await suggestAndresDevelopment(); await load(); }
+    try { await suggestAndresDevelopment(focus); await load(); }
     catch (e) { /* offline */ }
     setSuggesting(false);
   };
@@ -93,16 +94,30 @@ export default function HumanLab({ onProfileChange }) {
   return (
     <div style={{ display: "grid", gap: 16 }}>
       {/* 1. Andrés' initiative */}
-      <div style={{ ...card, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <div>
-          <strong style={{ color: colors.text }}>{t("andresRobotModule.humanLab.initiativeTitle")}</strong>
-          <p style={{ fontSize: 13, color: colors.textSecondary, margin: "4px 0 0", maxWidth: 640 }}>
-            {t("andresRobotModule.humanLab.initiativeIntro")}
-          </p>
+      <div style={{ ...card, display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div>
+            <strong style={{ color: colors.text }}>{t("andresRobotModule.humanLab.initiativeTitle")}</strong>
+            <p style={{ fontSize: 13, color: colors.textSecondary, margin: "4px 0 0", maxWidth: 640 }}>
+              {t("andresRobotModule.humanLab.initiativeIntro")}
+            </p>
+          </div>
+          <button onClick={generate} disabled={suggesting} style={btn(suggesting)}>
+            {suggesting ? t("andresRobotModule.humanLab.thinking") : t("andresRobotModule.humanLab.propose")}
+          </button>
         </div>
-        <button onClick={generate} disabled={suggesting} style={btn(suggesting)}>
-          {suggesting ? t("andresRobotModule.humanLab.thinking") : t("andresRobotModule.humanLab.propose")}
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ fontSize: 12, color: colors.textSecondary }}>{t("andresRobotModule.humanLab.focusLabel")}:</span>
+          {["balanced", "practical", "expressive"].map((f) => (
+            <span key={f} onClick={() => setFocus(f)} title={t(`andresRobotModule.humanLab.focus_${f}_hint`)}
+                  style={{ cursor: "pointer", padding: "4px 11px", borderRadius: 999, fontSize: 12,
+                    border: `1px solid ${focus === f ? colors.primary : colors.border}`,
+                    background: focus === f ? colors.primary : "transparent",
+                    color: focus === f ? "#fff" : colors.textSecondary }}>
+              {t(`andresRobotModule.humanLab.focus_${f}`)}
+            </span>
+          ))}
+        </div>
       </div>
 
       {suggestions.length === 0 ? (
@@ -131,6 +146,7 @@ export default function HumanLab({ onProfileChange }) {
                   {s.benefit && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.benefit")}: </span>{s.benefit}</div>}
                   {s.risk && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.risk")}: </span>{s.risk}</div>}
                   {s.success_criterion && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.success")}: </span>{s.success_criterion}</div>}
+                  {s.attention_budget && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.attentionBudget")}: </span>{s.attention_budget}</div>}
                   {s.close_plan && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.closePlan")}: </span>{s.close_plan}</div>}
                 </div>
               )}
