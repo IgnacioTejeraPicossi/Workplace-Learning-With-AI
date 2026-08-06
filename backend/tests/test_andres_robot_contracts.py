@@ -331,6 +331,79 @@ async def test_project_create(mock_proj, mock_proj_profiles):
     assert d["title"] == "Learn haiku" and d["status"] == "active"
 
 
+@patch("backend.services.andres.project_service.andres_profiles")
+@patch("backend.services.andres.project_service.andres_projects")
+@pytest.mark.asyncio
+async def test_project_approve_proposed_to_active(mock_proj, mock_proj_profiles):
+    mock_proj.find_one = AsyncMock(return_value={
+        "_id": "p1", "user_id": "u1", "status": "proposed", "title": "x"})
+    mock_proj.update_one = AsyncMock(return_value=MagicMock(matched_count=1))
+    mock_proj.count_documents = AsyncMock(return_value=1)
+    mock_proj_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/projects/507f1f77bcf86cd799439011/approve")
+    assert r.status_code == 200
+    assert r.json()["status"] == "active"
+
+
+@patch("backend.services.andres.project_service.andres_projects")
+@pytest.mark.asyncio
+async def test_project_archive_requires_reflection(mock_proj):
+    # missing every reflection field → 400 (nothing is archived without a closure)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/projects/507f1f77bcf86cd799439011/archive",
+                         json={"disposition": "cemetery"})
+    assert r.status_code == 400
+
+
+@patch("backend.services.andres.project_service.andres_projects")
+@pytest.mark.asyncio
+async def test_project_archive_compost_requires_seed(mock_proj):
+    # compost without a reuse_seed → 400 (compost must leave something to keep)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/projects/507f1f77bcf86cd799439011/archive",
+                         json={"disposition": "compost", "learned": "be concise"})
+    assert r.status_code == 400
+
+
+@patch("backend.services.andres.project_service.andres_profiles")
+@patch("backend.services.andres.project_service.andres_projects")
+@pytest.mark.asyncio
+async def test_project_archive_cemetery_ok(mock_proj, mock_proj_profiles):
+    mock_proj.update_one = AsyncMock(return_value=MagicMock(matched_count=1))
+    mock_proj.count_documents = AsyncMock(return_value=0)
+    mock_proj.find_one = AsyncMock(return_value={
+        "_id": "p1", "user_id": "u1", "status": "archived", "archive_reason": "cemetery",
+        "closure_reflection": {"learned": "it was too vague"}})
+    mock_proj_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/projects/507f1f77bcf86cd799439011/archive",
+                         json={"disposition": "cemetery", "learned": "it was too vague"})
+    assert r.status_code == 200
+    assert r.json()["archive_reason"] == "cemetery"
+
+
+@patch("backend.services.andres.development_service.andres_projects")
+@patch("backend.services.andres.development_service.andres_development_suggestions")
+@pytest.mark.asyncio
+async def test_initiative_accept_project_is_proposed_not_active(mock_sugg, mock_proj):
+    mock_sugg.find_one = AsyncMock(return_value={
+        "_id": "d2", "user_id": "u1", "kind": "project", "title": "Dev journal",
+        "rationale": "spine", "benefit": "b", "risk": "r",
+        "success_criterion": "s", "close_plan": "c", "status": "open"})
+    mock_sugg.update_one = AsyncMock(return_value=None)
+    mock_proj.insert_one = AsyncMock(return_value=MagicMock(inserted_id="p9"))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/development/suggestions/507f1f77bcf86cd799439011",
+                         json={"action": "accept"})
+    assert r.status_code == 200
+    d = r.json()
+    # Rule 1: initiative-born projects start proposed, never auto-active
+    assert d["created"]["status"] == "proposed"
+    inserted = mock_proj.insert_one.call_args.args[0]
+    assert inserted["status"] == "proposed" and inserted["approved_by_user"] is False
+
+
 @patch("backend.services.andres.evolution_manager.andres_evolution_proposals")
 @patch("backend.services.andres.identity_service.andres_profiles")
 @pytest.mark.asyncio

@@ -94,12 +94,36 @@
       "add": "Add project",
       "empty": "No projects yet.",
       "delete": "Delete",
+      "approve": "Approve → active",
+      "archive": "Archive",
+      "attentionBudget": "Attention budget",
       "status": {
+        "proposed": "Proposed",
         "active": "Active",
         "paused": "Paused",
+        "completed": "Completed",
         "done": "Done",
-        "abandoned": "Abandoned"
-      }
+        "abandoned": "Abandoned",
+        "archived": "Archived"
+      },
+      "disposition": {
+        "cemetery": "Cemetery",
+        "compost": "Compost"
+      },
+      "closureTitle": "Closing reflection (required to archive)",
+      "closure_what_worked": "What worked?",
+      "closure_what_didnt": "What didn't?",
+      "closure_learned": "What I learned about how I help",
+      "closure_guideline": "Anything to keep as a future guideline?",
+      "reuseSeedPlaceholder": "Reusable seed (required for compost) — a phrase, pref or constraint to keep",
+      "confirmArchive": "Archive",
+      "cancel": "Cancel",
+      "whatWorked": "Worked",
+      "whatDidnt": "Didn't",
+      "learned": "Learned",
+      "guideline": "Guideline",
+      "reuseSeed": "Seed",
+      "archiveFail": "Could not archive — a closure reflection is required."
     },
     "journal": {
       "reflectionsTitle": "📔 Reflections",

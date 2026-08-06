@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.8] - 2026-08-06
+
+### Added — Andrés the Robot · V5 project lifecycle (cemetery + compost)
+
+After a live test of his initiative (3 real LLM proposals, judged against Andrés'
+7-point matrix — all passed), the next piece he prioritised: learning to **end**
+projects, not only start them. *"If I can start projects by proposal, I must also
+learn to finish them with dignity."* A project that only ever gets created becomes
+a shelf of half-breathing prototypes.
+
+- **Full lifecycle** (`backend/services/andres/project_service.py`):
+  `proposed → active → paused → completed | abandoned → archived`, with richer
+  fields (rationale, benefit, risk, success_criteria, attention_budget, review_at)
+  so a project carries the same benefit/risk/success/close discipline as a
+  suggestion.
+- **Rule 1 — approval gate:** nothing becomes `active` without the user. A
+  user-created project is approved by the act of creating it; a project born from
+  **Andrés' initiative now starts `proposed`** (not auto-active) and must be
+  approved. `POST /api/andres/projects/{id}/approve`.
+- **Rule 2 — no silent archiving:** `POST /api/andres/projects/{id}/archive`
+  **requires a closure reflection** (what worked / what didn't / what I learned /
+  a keepable guideline) and a disposition:
+  - 🪦 **cemetery** — nothing to keep;
+  - ♻️ **compost** — left a **reuse_seed** (a phrase, preference or constraint);
+    compost is *required* to carry a seed, so a dead project can still feed the
+    next one.
+- **Frontend** (`Projects.jsx`): proposed projects show an Approve button; active
+  ones show status transitions + an Archive action that opens a closure form
+  (cemetery/compost, reflection fields, seed required for compost); archived
+  projects render their closure with a 🪦/♻️ badge; initiative-born projects are
+  marked 🌱. Benefit/risk/success/attention-budget shown when present.
+- **i18n**: EN/ES/NO, 231/231 parity.
+- **Tests / CI**: `test_andres_robot_contracts.py` grown 35 → **40** (approve
+  proposed→active, archive-without-reflection → 400, compost-without-seed → 400,
+  cemetery archive OK, and initiative-accepted project is `proposed`+unapproved,
+  not active). Offline gate now **13 files / 161 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 231/231;
+  Andrés suite 40/40. Also ran the initiative **live against the real LLM**: 3
+  well-structured proposals with epistemically-honest framing and full
+  benefit/risk/success/close — confirming [1.31.7]'s discipline holds in practice.
+
+**Credit:** the cemetery-vs-compost distinction, the two hard rules and the closure
+questions came from Andrés' own design in conversation with Ignacio.
+
+**Next (per Andrés' order):** approved curriculum (compass, not school), then
+research tiers + per-process sandbox isolation.
+
+---
+
 ## [1.31.7] - 2026-08-06
 
 ### Refined — Andrés the Robot · V5 initiative (Andrés' review follow-ups)

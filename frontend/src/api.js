@@ -234,6 +234,12 @@ export async function updateAndresProject(projectId, patch) {
 export async function deleteAndresProject(projectId) {
   return apiCall(`/api/andres/projects/${projectId}`, "DELETE");
 }
+export async function approveAndresProject(projectId) {
+  return apiCall(`/api/andres/projects/${projectId}/approve`, "POST", {});
+}
+export async function archiveAndresProject(projectId, closure) {
+  return apiCall(`/api/andres/projects/${projectId}/archive`, "POST", closure);
+}
 export async function getAndresProposals(status) {
   const q = status ? `?status=${encodeURIComponent(status)}` : "";
   return apiCall(`/api/andres/evolution/proposals${q}`, "GET");

@@ -66,12 +66,33 @@ class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: str = Field("", max_length=2000)
     status: str = "active"
+    rationale: Optional[str] = None
+    benefit: Optional[str] = None
+    risk: Optional[str] = None
+    success_criteria: Optional[str] = None
+    attention_budget: Optional[str] = None
+    review_at: Optional[str] = None
 
 
 class ProjectPatch(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[str] = None
+    rationale: Optional[str] = None
+    benefit: Optional[str] = None
+    risk: Optional[str] = None
+    success_criteria: Optional[str] = None
+    attention_budget: Optional[str] = None
+    review_at: Optional[str] = None
+
+
+class ProjectArchive(BaseModel):
+    disposition: str = Field(..., pattern="^(cemetery|compost)$")
+    what_worked: str = Field("", max_length=1000)
+    what_didnt: str = Field("", max_length=1000)
+    learned: str = Field("", max_length=1000)
+    guideline: str = Field("", max_length=1000)
+    reuse_seed: str = Field("", max_length=1000)
 
 
 class EvolutionProposal(BaseModel):
@@ -302,6 +323,18 @@ async def projects_create(body: ProjectCreate, user=Depends(_verify_token)):
 @router.patch("/projects/{project_id}")
 async def projects_update(project_id: str, body: ProjectPatch, user=Depends(_verify_token)):
     return await project_service.update_project(user.get("uid"), project_id, body.model_dump())
+
+
+@router.post("/projects/{project_id}/approve")
+async def projects_approve(project_id: str, user=Depends(_verify_token)):
+    """Rule 1: a proposed project only becomes active with the user's approval."""
+    return await project_service.approve_project(user.get("uid"), project_id)
+
+
+@router.post("/projects/{project_id}/archive")
+async def projects_archive(project_id: str, body: ProjectArchive, user=Depends(_verify_token)):
+    """Rule 2: archiving requires a closure reflection (cemetery or compost+seed)."""
+    return await project_service.archive_project(user.get("uid"), project_id, body.model_dump())
 
 
 @router.delete("/projects/{project_id}")

@@ -94,12 +94,36 @@
       "add": "Añadir proyecto",
       "empty": "Aún no hay proyectos.",
       "delete": "Eliminar",
+      "approve": "Aprobar → activo",
+      "archive": "Archivar",
+      "attentionBudget": "Presupuesto de atención",
       "status": {
+        "proposed": "Propuesto",
         "active": "Activo",
         "paused": "En pausa",
+        "completed": "Completado",
         "done": "Hecho",
-        "abandoned": "Abandonado"
-      }
+        "abandoned": "Abandonado",
+        "archived": "Archivado"
+      },
+      "disposition": {
+        "cemetery": "Cementerio",
+        "compost": "Compost"
+      },
+      "closureTitle": "Reflexión de cierre (obligatoria para archivar)",
+      "closure_what_worked": "¿Qué funcionó?",
+      "closure_what_didnt": "¿Qué no funcionó?",
+      "closure_learned": "Qué aprendí sobre cómo ayudo",
+      "closure_guideline": "¿Algo que conservar como pauta futura?",
+      "reuseSeedPlaceholder": "Semilla reutilizable (obligatoria para compost) — una frase, preferencia o restricción que conservar",
+      "confirmArchive": "Archivar",
+      "cancel": "Cancelar",
+      "whatWorked": "Funcionó",
+      "whatDidnt": "No funcionó",
+      "learned": "Aprendí",
+      "guideline": "Pauta",
+      "reuseSeed": "Semilla",
+      "archiveFail": "No se pudo archivar — se requiere una reflexión de cierre."
     },
     "journal": {
       "reflectionsTitle": "📔 Reflexiones",

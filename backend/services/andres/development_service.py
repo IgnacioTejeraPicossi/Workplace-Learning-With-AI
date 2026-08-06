@@ -174,18 +174,29 @@ async def act_on_suggestion(user_id: str, suggestion_id: str, action: str) -> di
 
     created = None
     if action == "accept" and doc.get("kind") == "project":
+        # Rule 1: a project born from Andrés' initiative starts as `proposed`,
+        # carrying his benefit/risk/success/close discipline, and only becomes
+        # active once the user approves it in the Projects tab. It is NOT auto-active.
         now = datetime.utcnow().isoformat()
         proj = {
             "user_id": user_id,
             "title": doc.get("title", "Project")[:200],
             "description": doc.get("rationale", "")[:2000],
-            "status": "active",
+            "status": "proposed",
+            "approved_by_user": False,
+            "origin": "andres_initiative",
+            "benefit": doc.get("benefit", "") or None,
+            "risk": doc.get("risk", "") or None,
+            "success_criteria": doc.get("success_criterion", "") or None,
+            "close_plan_seed": doc.get("close_plan", "") or None,
             "created_at": now,
             "updated_at": now,
-            "origin": "andres_initiative",
+            "closure_reflection": None,
+            "archive_reason": None,
+            "reuse_seed": None,
         }
         res = await andres_projects.insert_one(proj)
-        created = {"project_id": str(res.inserted_id)}
+        created = {"project_id": str(res.inserted_id), "status": "proposed"}
 
     new_status = "accepted" if action == "accept" else "dismissed"
     await andres_development_suggestions.update_one(

@@ -94,12 +94,36 @@
       "add": "Legg til prosjekt",
       "empty": "Ingen prosjekter ennå.",
       "delete": "Slett",
+      "approve": "Godkjenn → aktiv",
+      "archive": "Arkiver",
+      "attentionBudget": "Oppmerksomhetsbudsjett",
       "status": {
+        "proposed": "Foreslått",
         "active": "Aktiv",
         "paused": "Pauset",
+        "completed": "Fullført",
         "done": "Ferdig",
-        "abandoned": "Forlatt"
-      }
+        "abandoned": "Forlatt",
+        "archived": "Arkivert"
+      },
+      "disposition": {
+        "cemetery": "Kirkegård",
+        "compost": "Kompost"
+      },
+      "closureTitle": "Avslutningsrefleksjon (påkrevd for å arkivere)",
+      "closure_what_worked": "Hva fungerte?",
+      "closure_what_didnt": "Hva fungerte ikke?",
+      "closure_learned": "Hva jeg lærte om hvordan jeg hjelper",
+      "closure_guideline": "Noe å beholde som fremtidig rettesnor?",
+      "reuseSeedPlaceholder": "Gjenbrukbart frø (påkrevd for kompost) — en frase, preferanse eller begrensning å beholde",
+      "confirmArchive": "Arkiver",
+      "cancel": "Avbryt",
+      "whatWorked": "Fungerte",
+      "whatDidnt": "Fungerte ikke",
+      "learned": "Lærte",
+      "guideline": "Rettesnor",
+      "reuseSeed": "Frø",
+      "archiveFail": "Kunne ikke arkivere — en avslutningsrefleksjon kreves."
     },
     "journal": {
       "reflectionsTitle": "📔 Refleksjoner",
