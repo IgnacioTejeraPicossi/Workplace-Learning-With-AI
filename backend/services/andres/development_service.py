@@ -39,16 +39,33 @@ def _oid(id_str: str) -> ObjectId:
         raise HTTPException(status_code=400, detail="Invalid suggestion id")
 
 
+# Structured fields every suggestion carries — so initiative isn't a "more, more,
+# more" factory. Each proposal states its cost and its end, not only its benefit.
+_FIELDS = ("rationale", "benefit", "risk", "success_criterion", "close_plan")
+
+
 def _offline_suggestions(profile: dict) -> list:
     interests = profile.get("identity", {}).get("core_interests", []) or ["learning"]
     first = interests[0]
     return [
         {"kind": "interest", "title": f"Explore an unexpected angle of {first}",
-         "rationale": "Offline placeholder — a deterministic suggestion, not a genuine one."},
+         "rationale": "Offline placeholder — a deterministic suggestion, not a genuine one.",
+         "benefit": "A fresh, non-generic connection to draw on.",
+         "risk": "Could drift into novelty for its own sake.",
+         "success_criterion": "It surfaces once, usefully, in a real conversation.",
+         "close_plan": "Drop it if it hasn't been useful after a few exchanges."},
         {"kind": "reflection_focus", "title": "Notice where I sounded generic recently",
-         "rationale": "Offline placeholder — grounded in my standing goal to be less generic."},
+         "rationale": "Offline placeholder — grounded in my standing goal to be less generic.",
+         "benefit": "Sharper, more distinctive replies.",
+         "risk": "Over-correcting into forced quirkiness.",
+         "success_criterion": "One concrete generic habit named and adjusted.",
+         "close_plan": "Conclude once the habit is documented."},
         {"kind": "project", "title": "A small development-journal project",
-         "rationale": "Offline placeholder — gives my growth a legible spine."},
+         "rationale": "Offline placeholder — gives my growth a legible spine.",
+         "benefit": "Auditable continuity beyond technical changelogs.",
+         "risk": "Entries becoming ceremonial or too long.",
+         "success_criterion": "After 3 phases the history reads clearly on its own.",
+         "close_plan": "Final entry: what we learned about how I should grow."},
     ]
 
 
@@ -68,9 +85,16 @@ async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
         "in your OWN development. Each must be something you would still ask Ignacio "
         "to approve; you are proposing, not deciding. Kinds allowed: interest, "
         "project, curriculum, reflection_focus, trait_nudge. Be specific and modest; "
-        "avoid grandiosity; stay honest about being a developmental AI, not a person.\n\n"
+        "avoid grandiosity.\n"
+        "EPISTEMIC HONESTY: frame these as 'I propose' / 'I estimate useful' / 'I have "
+        "operational interest in'. NEVER 'I need' / 'I feel I must' / 'I deeply want' — "
+        "you have simulated dispositions and computed priorities, not human desires.\n"
+        "Growth is not automatically good; sometimes growing well means pruning. So "
+        "each proposal must state its cost and its end, not only its benefit.\n\n"
         f"[MY INTERESTS]\n{interests}\n\n[MY RECENT REFLECTIONS]\n{recent_txt}\n\n"
-        'Return ONLY a JSON array of objects with keys "kind", "title", "rationale".'
+        'Return ONLY a JSON array of objects with keys "kind", "title", "rationale" '
+        '(why I propose it), "benefit", "risk", "success_criterion", "close_plan" '
+        "(when/how to conclude it)."
     )
 
     suggestions = None
@@ -93,11 +117,10 @@ async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
                     if kind not in _KINDS:
                         kind = "reflection_focus"
                     if w.get("title"):
-                        suggestions.append({
-                            "kind": kind,
-                            "title": str(w["title"]).strip()[:200],
-                            "rationale": str(w.get("rationale", "")).strip()[:600],
-                        })
+                        item = {"kind": kind, "title": str(w["title"]).strip()[:200]}
+                        for f in _FIELDS:
+                            item[f] = str(w.get(f, "")).strip()[:600]
+                        suggestions.append(item)
                 suggestions = suggestions[:4] or None
                 if suggestions:
                     is_mock = False
@@ -114,11 +137,12 @@ async def suggest(user_id: str, profile: dict, request_headers=None) -> list:
             "user_id": user_id,
             "kind": s["kind"],
             "title": s["title"],
-            "rationale": s.get("rationale", ""),
             "status": "open",
             "is_mock": is_mock,
             "created_at": now,
         }
+        for f in _FIELDS:
+            doc[f] = s.get(f, "")
         res = await andres_development_suggestions.insert_one(doc)
         doc["_id"] = str(res.inserted_id)
         stored.append(doc)

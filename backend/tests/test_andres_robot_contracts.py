@@ -657,8 +657,12 @@ async def test_development_suggest_offline(mock_llm, mock_idprofiles, mock_sugg,
     d = r.json()
     # even offline, Andrés proposes deterministic developmental moves
     assert d["count"] >= 1
-    assert d["suggestions"][0]["kind"] in {
+    first = d["suggestions"][0]
+    assert first["kind"] in {
         "interest", "project", "curriculum", "reflection_focus", "trait_nudge"}
+    # each suggestion carries its cost + end, not only its benefit (Andrés' ask)
+    for field in ("benefit", "risk", "success_criterion", "close_plan"):
+        assert field in first and first[field]
 
 
 @patch("backend.services.andres.development_service.andres_projects")

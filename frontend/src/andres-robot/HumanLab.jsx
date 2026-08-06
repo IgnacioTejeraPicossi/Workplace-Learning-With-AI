@@ -126,6 +126,14 @@ export default function HumanLab({ onProfileChange }) {
               </div>
               <div style={{ color: colors.text, fontSize: 14, fontWeight: 600 }}>{s.title}</div>
               {s.rationale && <p style={{ color: colors.textSecondary, fontSize: 13, margin: "4px 0 0" }}>{s.rationale}</p>}
+              {(s.benefit || s.risk || s.success_criterion || s.close_plan) && (
+                <div style={{ display: "grid", gap: 4, marginTop: 8, fontSize: 12.5, color: colors.text }}>
+                  {s.benefit && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.benefit")}: </span>{s.benefit}</div>}
+                  {s.risk && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.risk")}: </span>{s.risk}</div>}
+                  {s.success_criterion && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.success")}: </span>{s.success_criterion}</div>}
+                  {s.close_plan && <div><span style={{ color: colors.textSecondary }}>{t("andresRobotModule.humanLab.closePlan")}: </span>{s.close_plan}</div>}
+                </div>
+              )}
               {s.status === "open" && (
                 <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
                   <button onClick={() => act(s, "accept")}

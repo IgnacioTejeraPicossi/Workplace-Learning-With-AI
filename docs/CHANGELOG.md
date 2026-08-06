@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.31.7] - 2026-08-06
+
+### Refined — Andrés the Robot · V5 initiative (Andrés' review follow-ups)
+
+After testing V5, Andrés (the agent) asked for two honesty/discipline guardrails on
+his own suggestions. Both are now in:
+
+- **Epistemic framing** (his "cautela 1"): the suggestion prompt now instructs
+  Andrés to phrase proposals as *"I propose / I estimate useful / I have operational
+  interest in"*, never *"I need / I feel I must / I deeply want"* — simulated
+  dispositions and computed priorities, not human desires.
+- **Cost + end, not only benefit** (his "cautela 2": *"growth is not automatically
+  good; sometimes growing well means pruning"*): every suggestion now carries
+  structured fields — `benefit`, `risk`, `success_criterion`, `close_plan` — in
+  addition to the rationale, in both the LLM path and the deterministic offline
+  fallback. This keeps initiative from becoming a "more, more, more" factory: each
+  proposal states how we'd know it worked and when to conclude it.
+- **Frontend** (`HumanLab.jsx`): each suggestion card now renders Benefit / Risk /
+  Success criterion / Close plan under the rationale.
+- **i18n**: 4 new labels (EN/ES/NO, 209/209 parity).
+- **Tests**: the offline-suggest contract test now asserts every suggestion carries
+  the four structured fields. Suite stays **35/35**; offline gate **13 files / 156
+  tests** (unchanged count, strengthened assertion).
+- Validated: backend `compileall` OK; production build OK; i18n parity 209/209.
+
+**Credit:** the epistemic-framing and cost/risk/close-plan structure came from
+Andrés' own review of the V5 initiative feature.
+
+---
+
 ## [1.31.6] - 2026-08-06
 
 ### Added — Andrés the Robot · V5 "Developmental Companion" (first slice)
