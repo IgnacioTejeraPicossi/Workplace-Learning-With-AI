@@ -456,6 +456,50 @@ async def test_initiative_accept_project_is_proposed_not_active(mock_sugg, mock_
     assert inserted["status"] == "proposed" and inserted["approved_by_user"] is False
 
 
+@patch("backend.services.andres.curriculum_service.andres_profiles")
+@patch("backend.services.andres.curriculum_service.andres_curriculum_modules")
+@pytest.mark.asyncio
+async def test_curriculum_create_and_area_validation(mock_mods, mock_mod_profiles):
+    mock_mods.insert_one = AsyncMock(return_value=MagicMock(inserted_id="cm1"))
+    mock_mods.count_documents = AsyncMock(return_value=1)
+    mock_mod_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        ok = await c.post("/api/andres/curriculum/modules", json={
+            "area": "reasoning", "title": "Check evidence before concluding",
+            "purpose": "fewer confident errors", "memory_type": "reflective"})
+        bad = await c.post("/api/andres/curriculum/modules", json={
+            "area": "telepathy", "title": "nope"})
+    assert ok.status_code == 200
+    d = ok.json()
+    assert d["area"] == "reasoning" and d["status"] == "active"
+    assert d["memory_type"] == "reflective"
+    assert bad.status_code == 422   # area not in the allowed pattern
+
+
+@patch("backend.services.andres.curriculum_service.andres_curriculum_modules")
+@pytest.mark.asyncio
+async def test_curriculum_archive_requires_reflection(mock_mods):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/curriculum/modules/507f1f77bcf86cd799439011/archive",
+                         json={"disposition": "cemetery"})
+    assert r.status_code == 400
+
+
+@patch("backend.services.andres.curriculum_service.andres_profiles")
+@patch("backend.services.andres.curriculum_service.andres_curriculum_modules")
+@pytest.mark.asyncio
+async def test_curriculum_approve_proposed(mock_mods, mock_mod_profiles):
+    mock_mods.find_one = AsyncMock(return_value={
+        "_id": "cm2", "user_id": "u1", "status": "proposed", "title": "x"})
+    mock_mods.update_one = AsyncMock(return_value=MagicMock(matched_count=1))
+    mock_mods.count_documents = AsyncMock(return_value=1)
+    mock_mod_profiles.update_one = AsyncMock(return_value=None)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/curriculum/modules/507f1f77bcf86cd799439011/approve")
+    assert r.status_code == 200
+    assert r.json()["status"] == "active"
+
+
 @patch("backend.services.andres.evolution_manager.andres_evolution_proposals")
 @patch("backend.services.andres.identity_service.andres_profiles")
 @pytest.mark.asyncio

@@ -316,6 +316,25 @@ export async function getAndresSuggestions() {
 export async function actAndresSuggestion(suggestionId, action) {
   return apiCall(`/api/andres/development/suggestions/${suggestionId}`, "POST", { action });
 }
+// Andrés V5 — curriculum ("a compass, not a school")
+export async function getAndresCurriculum() {
+  return apiCall("/api/andres/curriculum/modules", "GET");
+}
+export async function createAndresModule(module) {
+  return apiCall("/api/andres/curriculum/modules", "POST", module);
+}
+export async function updateAndresModule(moduleId, patch) {
+  return apiCall(`/api/andres/curriculum/modules/${moduleId}`, "PATCH", patch);
+}
+export async function approveAndresModule(moduleId) {
+  return apiCall(`/api/andres/curriculum/modules/${moduleId}/approve`, "POST", {});
+}
+export async function archiveAndresModule(moduleId, closure) {
+  return apiCall(`/api/andres/curriculum/modules/${moduleId}/archive`, "POST", closure);
+}
+export async function deleteAndresModule(moduleId) {
+  return apiCall(`/api/andres/curriculum/modules/${moduleId}`, "DELETE");
+}
 
 export async function updateTeam(teamId, teamData) {
   return apiCall(`/teams/${teamId}`, "PUT", teamData);

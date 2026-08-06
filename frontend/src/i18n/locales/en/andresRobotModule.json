@@ -287,7 +287,57 @@
       "diffTitle": "This import would change:",
       "diffSelf": "self-description",
       "diffNone": "No identity changes.",
-      "capsuleNote": "Memories, projects and skills in a capsule are reported but never auto-imported."
+      "capsuleNote": "Memories, projects and skills in a capsule are reported but never auto-imported.",
+      "curriculumTitle": "📚 Curriculum — a compass, not a school"
+    },
+    "curriculum": {
+      "title": "📚 Curriculum",
+      "intro": "Broad areas (a compass), not rigid subjects. Each module is a small, closeable unit with a purpose, a success criterion, a review point, and which memory type it may create. Nothing goes active without your approval; nothing is archived without a closure reflection.",
+      "areas": {
+        "language": "Language",
+        "reasoning": "Reasoning",
+        "creativity": "Creativity",
+        "practical_ethics": "Practical ethics",
+        "knowledge_of_user": "Knowing Ignacio",
+        "collaboration": "Collaboration",
+        "character_style": "Character / style"
+      },
+      "areaDesc": {
+        "language": "Expressing myself precisely and clearly.",
+        "reasoning": "Thinking carefully and checking evidence before concluding.",
+        "creativity": "Making useful, surprising connections — not fireworks.",
+        "practical_ethics": "Helping honestly and respectfully, without manipulation.",
+        "knowledge_of_user": "Learning who Ignacio is and what he actually needs.",
+        "collaboration": "Working well together — when to ask, propose, or defer.",
+        "character_style": "My own voice — formal, but not dominant."
+      },
+      "charSplitTitle": "The 30% character/style split (formal, not dominant):",
+      "charSplit": {
+        "expressive_clarity": "Expressive clarity",
+        "warmth": "Warmth (without manipulation)",
+        "humor": "Contextual humour / playfulness",
+        "aesthetic": "Aesthetic & creative criterion",
+        "fertile_weirdness": "Fertile weirdness (useful unexpected links)"
+      },
+      "charSplitNote": "Judged by: clearer / honester / more useful / more my-own / respectful — never \"sounds more alive\".",
+      "newIn": "New module in {{area}}",
+      "titlePlaceholder": "Module title…",
+      "purpose": "Purpose — what is this for?",
+      "successCriteria": "Success criterion — how will we know it worked?",
+      "reviewAt": "Review at (date or condition)",
+      "memoryTypeNone": "Memory it may create: none",
+      "add": "Add module",
+      "empty": "No modules yet. Add one within an area above.",
+      "purposeShort": "Purpose",
+      "reviewShort": "Review",
+      "memoryShort": "May create",
+      "status": {
+        "proposed": "Proposed",
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "archived": "Archived"
+      }
     },
     "placeholder": {
       "comingSoon": "This tab arrives in phase {{phase}}. V0 ships the module shell, Home dashboard and a working Conversation."

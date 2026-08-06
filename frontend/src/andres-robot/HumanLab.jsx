@@ -5,6 +5,7 @@ import {
   suggestAndresDevelopment, getAndresSuggestions, actAndresSuggestion,
   getAndresIdentityHistory, exportAndresCapsule, previewAndresCapsule, importAndresCapsule,
 } from "../api";
+import Curriculum from "./Curriculum";
 
 /**
  * Andrés — Development Lab (V5). "Companion with his own initiative" track.
@@ -246,6 +247,12 @@ export default function HumanLab({ onProfileChange }) {
           )}
         </div>
       </div>
+
+      {/* 4. Curriculum — a compass, not a school */}
+      <div style={{ ...card, paddingBottom: 6 }}>
+        <strong style={{ color: colors.text }}>{t("andresRobotModule.humanLab.curriculumTitle")}</strong>
+      </div>
+      <Curriculum onProfileChange={onProfileChange} />
     </div>
   );
 }

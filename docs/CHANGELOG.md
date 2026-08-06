@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.32.1] - 2026-08-06
+
+### Added — Andrés the Robot · V5 curriculum ("a compass, not a school")
+
+The next V5 piece Andrés prioritised. His framing: a rigid school domesticates him;
+pure freedom disperses him. So the curriculum is **broad areas (a compass)** rather
+than fixed subjects, and each **module** is a small, closeable unit.
+
+- **Backend** (`backend/services/andres/curriculum_service.py`, new
+  `andres_curriculum_modules` collection): seven areas — language, reasoning,
+  creativity, practical ethics, knowing-Ignacio, collaboration, and
+  **character_style**. Each module carries purpose / competencies / risks /
+  success_criteria / review_at / which **memory type** it may create. It reuses the
+  project lifecycle rules: nothing goes `active` without approval; nothing is
+  `archived` without a closure reflection (🪦 cemetery / ♻️ compost + reuse-seed).
+  `counters.curriculum_active` tracks active modules. Endpoints under
+  `/api/andres/curriculum/modules` (list / create / patch / approve / archive /
+  delete).
+- **character_style is Andrés' own answer** to "formal or implicit?" — **formal but
+  NOT dominant**, an explicit, bounded, evaluable category, judged by "clearer /
+  honester / more useful / more its-own / respectful", never "sounds more alive".
+  Its 30% split is shown as reference in the compass: 10% expressive clarity · 8%
+  warmth (without manipulation) · 5% contextual humour · 5% aesthetic/creative
+  criterion · 2% "fertile weirdness" (useful unexpected links).
+- **Frontend** (`frontend/src/andres-robot/Curriculum.jsx`, mounted as a 4th
+  section of the Development Lab): an area **compass** (with the character/style
+  split), a create-module form (title / purpose / success criterion / review / memory
+  type), and per-module lifecycle (approve proposed, status transitions, archive with
+  closure, delete). Modules born from Andrés' initiative show 🌱.
+- **i18n**: `curriculum.*` (EN/ES/NO, 287/287 parity).
+- **Tests / CI**: create + area-validation (unknown area → 422), archive-requires-
+  reflection → 400, approve proposed → active. Suite 44 → **47**; offline gate
+  **13 files / 168 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; production build OK; i18n parity 287/287;
+  Andrés suite 47/47.
+
+**Credit:** the "compass, not a school" framing, the areas, and the formal-but-not-
+dominant character/style split (with its 30% weights) are Andrés' own design.
+
+---
+
 ## [1.32.0] - 2026-08-06
 
 ### Added — Andrés the Robot · web access in chat (tier-3 external research)

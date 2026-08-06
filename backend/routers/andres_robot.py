@@ -25,7 +25,7 @@ from typing import Any
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
-    development_service, web_research,
+    development_service, web_research, curriculum_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -136,6 +136,29 @@ class SuggestionAction(BaseModel):
 
 class DevSuggestRequest(BaseModel):
     focus: str = Field("balanced", pattern="^(balanced|practical|expressive)$")
+
+
+class CurriculumCreate(BaseModel):
+    area: str = Field(..., pattern="^(language|reasoning|creativity|practical_ethics|knowledge_of_user|collaboration|character_style)$")
+    title: str = Field(..., min_length=1, max_length=200)
+    purpose: Optional[str] = None
+    competencies: Optional[str] = None
+    risks: Optional[str] = None
+    success_criteria: Optional[str] = None
+    review_at: Optional[str] = None
+    memory_type: Optional[str] = None
+    status: str = "active"
+
+
+class CurriculumPatch(BaseModel):
+    title: Optional[str] = None
+    status: Optional[str] = None
+    memory_type: Optional[str] = None
+    purpose: Optional[str] = None
+    competencies: Optional[str] = None
+    risks: Optional[str] = None
+    success_criteria: Optional[str] = None
+    review_at: Optional[str] = None
 
 
 @router.get("/health")
@@ -547,3 +570,38 @@ async def development_list(status: str = None, user=Depends(_verify_token)):
 async def development_act(suggestion_id: str, body: SuggestionAction, user=Depends(_verify_token)):
     """Accept (may create a project) or dismiss one of Andrés' suggestions."""
     return await development_service.act_on_suggestion(user.get("uid"), suggestion_id, body.action)
+
+
+# ── V5: curriculum ("a compass, not a school"; modules share the archive lifecycle) ─
+
+@router.get("/curriculum/modules")
+async def curriculum_list(user=Depends(_verify_token)):
+    items = await curriculum_service.list_modules(user.get("uid"))
+    return {"modules": items, "count": len(items)}
+
+
+@router.post("/curriculum/modules")
+async def curriculum_create(body: CurriculumCreate, user=Depends(_verify_token)):
+    return await curriculum_service.create_module(user.get("uid"), body.model_dump())
+
+
+@router.patch("/curriculum/modules/{module_id}")
+async def curriculum_update(module_id: str, body: CurriculumPatch, user=Depends(_verify_token)):
+    return await curriculum_service.update_module(user.get("uid"), module_id, body.model_dump())
+
+
+@router.post("/curriculum/modules/{module_id}/approve")
+async def curriculum_approve(module_id: str, user=Depends(_verify_token)):
+    """A module only becomes active with the user's approval."""
+    return await curriculum_service.approve_module(user.get("uid"), module_id)
+
+
+@router.post("/curriculum/modules/{module_id}/archive")
+async def curriculum_archive(module_id: str, body: ProjectArchive, user=Depends(_verify_token)):
+    """Abandoning a module still requires a closure reflection (cemetery / compost)."""
+    return await curriculum_service.archive_module(user.get("uid"), module_id, body.model_dump())
+
+
+@router.delete("/curriculum/modules/{module_id}")
+async def curriculum_delete(module_id: str, user=Depends(_verify_token)):
+    return await curriculum_service.delete_module(user.get("uid"), module_id)

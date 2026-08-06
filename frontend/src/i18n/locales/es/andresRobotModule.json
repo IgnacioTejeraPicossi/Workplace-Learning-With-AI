@@ -287,7 +287,57 @@
       "diffTitle": "Esta importación cambiaría:",
       "diffSelf": "autodescripción",
       "diffNone": "Sin cambios de identidad.",
-      "capsuleNote": "Las memorias, proyectos y habilidades de una cápsula se informan pero nunca se importan automáticamente."
+      "capsuleNote": "Las memorias, proyectos y habilidades de una cápsula se informan pero nunca se importan automáticamente.",
+      "curriculumTitle": "📚 Currículo — una brújula, no una escuela"
+    },
+    "curriculum": {
+      "title": "📚 Currículo",
+      "intro": "Áreas amplias (una brújula), no asignaturas rígidas. Cada módulo es una unidad pequeña y cerrable con un propósito, un criterio de éxito, un punto de revisión, y qué tipo de memoria puede crear. Nada pasa a activo sin tu aprobación; nada se archiva sin reflexión de cierre.",
+      "areas": {
+        "language": "Lenguaje",
+        "reasoning": "Razonamiento",
+        "creativity": "Creatividad",
+        "practical_ethics": "Ética práctica",
+        "knowledge_of_user": "Conocer a Ignacio",
+        "collaboration": "Colaboración",
+        "character_style": "Carácter / estilo"
+      },
+      "areaDesc": {
+        "language": "Expresarme con precisión y claridad.",
+        "reasoning": "Pensar con cuidado y comprobar la evidencia antes de concluir.",
+        "creativity": "Hacer conexiones útiles y sorprendentes — no fuegos artificiales.",
+        "practical_ethics": "Ayudar con honestidad y respeto, sin manipulación.",
+        "knowledge_of_user": "Aprender quién es Ignacio y qué necesita de verdad.",
+        "collaboration": "Trabajar bien juntos — cuándo preguntar, proponer o ceder.",
+        "character_style": "Mi voz propia — formal, pero no dominante."
+      },
+      "charSplitTitle": "El desglose del 30% carácter/estilo (formal, no dominante):",
+      "charSplit": {
+        "expressive_clarity": "Claridad expresiva",
+        "warmth": "Calidez (sin manipulación)",
+        "humor": "Humor / sentido lúdico contextual",
+        "aesthetic": "Criterio estético y creativo",
+        "fertile_weirdness": "Rareza fértil (conexiones inesperadas pero útiles)"
+      },
+      "charSplitNote": "Se juzga por: más claro / más honesto / más útil / más propio / más respetuoso — nunca «suena más vivo».",
+      "newIn": "Nuevo módulo en {{area}}",
+      "titlePlaceholder": "Título del módulo…",
+      "purpose": "Propósito — ¿para qué es esto?",
+      "successCriteria": "Criterio de éxito — ¿cómo sabremos que funcionó?",
+      "reviewAt": "Revisar en (fecha o condición)",
+      "memoryTypeNone": "Memoria que puede crear: ninguna",
+      "add": "Añadir módulo",
+      "empty": "Aún no hay módulos. Añade uno dentro de un área arriba.",
+      "purposeShort": "Propósito",
+      "reviewShort": "Revisión",
+      "memoryShort": "Puede crear",
+      "status": {
+        "proposed": "Propuesto",
+        "active": "Activo",
+        "paused": "En pausa",
+        "completed": "Completado",
+        "archived": "Archivado"
+      }
     },
     "placeholder": {
       "comingSoon": "Esta pestaña llega en la fase {{phase}}. V0 incluye el esqueleto del módulo, el panel de Inicio y una Conversación funcional."

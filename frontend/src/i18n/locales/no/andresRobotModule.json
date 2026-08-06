@@ -287,7 +287,57 @@
       "diffTitle": "Denne importen ville endre:",
       "diffSelf": "selvbeskrivelse",
       "diffNone": "Ingen identitetsendringer.",
-      "capsuleNote": "Minner, prosjekter og ferdigheter i en kapsel rapporteres, men importeres aldri automatisk."
+      "capsuleNote": "Minner, prosjekter og ferdigheter i en kapsel rapporteres, men importeres aldri automatisk.",
+      "curriculumTitle": "📚 Læreplan — et kompass, ikke en skole"
+    },
+    "curriculum": {
+      "title": "📚 Læreplan",
+      "intro": "Brede områder (et kompass), ikke rigide fag. Hver modul er en liten, avsluttbar enhet med et formål, et suksesskriterium, et gjennomgangspunkt, og hvilken minnetype den kan skape. Ingenting blir aktivt uten din godkjenning; ingenting arkiveres uten en avslutningsrefleksjon.",
+      "areas": {
+        "language": "Språk",
+        "reasoning": "Resonnering",
+        "creativity": "Kreativitet",
+        "practical_ethics": "Praktisk etikk",
+        "knowledge_of_user": "Kjenne Ignacio",
+        "collaboration": "Samarbeid",
+        "character_style": "Karakter / stil"
+      },
+      "areaDesc": {
+        "language": "Uttrykke meg presist og tydelig.",
+        "reasoning": "Tenke nøye og sjekke bevis før jeg konkluderer.",
+        "creativity": "Lage nyttige, overraskende koblinger — ikke fyrverkeri.",
+        "practical_ethics": "Hjelpe ærlig og respektfullt, uten manipulasjon.",
+        "knowledge_of_user": "Lære hvem Ignacio er og hva han faktisk trenger.",
+        "collaboration": "Samarbeide godt — når jeg skal spørre, foreslå eller vike.",
+        "character_style": "Min egen stemme — formell, men ikke dominerende."
+      },
+      "charSplitTitle": "30 %-fordelingen for karakter/stil (formell, ikke dominerende):",
+      "charSplit": {
+        "expressive_clarity": "Uttrykksmessig klarhet",
+        "warmth": "Varme (uten manipulasjon)",
+        "humor": "Kontekstuell humor / lekenhet",
+        "aesthetic": "Estetisk og kreativt skjønn",
+        "fertile_weirdness": "Fruktbar rarhet (nyttige uventede koblinger)"
+      },
+      "charSplitNote": "Vurderes etter: klarere / ærligere / mer nyttig / mer meg-selv / mer respektfull — aldri «høres mer levende ut».",
+      "newIn": "Ny modul i {{area}}",
+      "titlePlaceholder": "Modultittel…",
+      "purpose": "Formål — hva er dette til for?",
+      "successCriteria": "Suksesskriterium — hvordan vet vi at det virket?",
+      "reviewAt": "Gjennomgå ved (dato eller betingelse)",
+      "memoryTypeNone": "Minne den kan skape: ingen",
+      "add": "Legg til modul",
+      "empty": "Ingen moduler ennå. Legg til en innenfor et område ovenfor.",
+      "purposeShort": "Formål",
+      "reviewShort": "Gjennomgang",
+      "memoryShort": "Kan skape",
+      "status": {
+        "proposed": "Foreslått",
+        "active": "Aktiv",
+        "paused": "Pauset",
+        "completed": "Fullført",
+        "archived": "Arkivert"
+      }
     },
     "placeholder": {
       "comingSoon": "Denne fanen kommer i fase {{phase}}. V0 leverer modulskallet, Hjem-panelet og en fungerende Samtale."
