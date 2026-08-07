@@ -46,7 +46,8 @@
           "available": "Searched the web",
           "unavailable": "Searched — no usable results",
           "failed": "Web search failed",
-          "off": "Answered from prior knowledge"
+          "off": "Answered from prior knowledge",
+          "disabled": "Web is off in your research tiers"
         }
       }
     },
@@ -337,6 +338,25 @@
         "paused": "Paused",
         "completed": "Completed",
         "archived": "Archived"
+      }
+    },
+    "tiers": {
+      "title": "🔎 Research tiers",
+      "intro": "What Andrés may consult, from least to most exposed. He can research inside these bounds only.",
+      "on": "On",
+      "off": "Off",
+      "note": "Turning a tier off is enforced: with internal off he won't consult his stored memory or projects; with web off the 🌐 toggle can't actually search.",
+      "internal": {
+        "name": "Internal",
+        "desc": "His own biography — remembered memories and active projects."
+      },
+      "documents": {
+        "name": "Documents",
+        "desc": "Text you explicitly hand him for a message (grounding), kept separate from his memory."
+      },
+      "web": {
+        "name": "Web",
+        "desc": "External DuckDuckGo search via the 🌐 toggle. Off by default — the most cautious tier."
       }
     },
     "placeholder": {

@@ -46,7 +46,8 @@
           "available": "Buscó en la web",
           "unavailable": "Buscó — sin resultados útiles",
           "failed": "La búsqueda web falló",
-          "off": "Respondió con conocimiento previo"
+          "off": "Respondió con conocimiento previo",
+          "disabled": "La web está apagada en tus niveles de investigación"
         }
       }
     },
@@ -337,6 +338,25 @@
         "paused": "En pausa",
         "completed": "Completado",
         "archived": "Archivado"
+      }
+    },
+    "tiers": {
+      "title": "🔎 Niveles de investigación",
+      "intro": "Qué puede consultar Andrés, de menor a mayor exposición. Solo puede investigar dentro de estos límites.",
+      "on": "Activado",
+      "off": "Apagado",
+      "note": "Apagar un nivel se cumple de verdad: con «interno» apagado no consultará su memoria ni sus proyectos; con «web» apagado el toggle 🌐 no puede buscar.",
+      "internal": {
+        "name": "Interno",
+        "desc": "Su propia biografía — memorias recordadas y proyectos activos."
+      },
+      "documents": {
+        "name": "Documentos",
+        "desc": "Texto que le das explícitamente para un mensaje (contexto), separado de su memoria."
+      },
+      "web": {
+        "name": "Web",
+        "desc": "Búsqueda externa en DuckDuckGo vía el toggle 🌐. Apagado por defecto — el nivel más cauto."
       }
     },
     "placeholder": {

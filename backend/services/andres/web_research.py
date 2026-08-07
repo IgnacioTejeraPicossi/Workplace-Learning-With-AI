@@ -30,6 +30,12 @@ def off_state() -> dict:
             "sources_consulted": 0, "citations": []}
 
 
+def disabled_state() -> dict:
+    """The user asked for web (🌐) but the web research tier is turned off."""
+    return {"used": False, "web_access": "disabled", "search_provider": SEARCH_PROVIDER,
+            "sources_consulted": 0, "citations": []}
+
+
 async def research(query: str, limit: int = 5) -> dict:
     """Run a fresh web search for `query`. Returns a dict; never raises."""
     now = datetime.utcnow().isoformat()

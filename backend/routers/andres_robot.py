@@ -25,7 +25,7 @@ from typing import Any
 from backend.services.andres import (
     memory_service, reflection_engine, curiosity_engine, project_service,
     evolution_manager, creativity_engine, skill_service, capsule_service,
-    development_service, web_research, curriculum_service,
+    development_service, web_research, curriculum_service, research_service,
 )
 
 router = APIRouter(prefix="/api/andres", tags=["Andrés the Robot"])
@@ -40,6 +40,13 @@ def _verify_token(request: Request):
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=20000)
     use_web: bool = False   # user opts in to a fresh web search for this message
+    document: str = Field("", max_length=20000)   # tier-2: text the user provides
+
+
+class ResearchTiers(BaseModel):
+    internal: Optional[bool] = None
+    documents: Optional[bool] = None
+    web: Optional[bool] = None
 
 
 class MemoryCreate(BaseModel):
@@ -174,28 +181,59 @@ async def profile(user=Depends(_verify_token)):
     return p
 
 
+@router.get("/research/tiers")
+async def get_research_tiers(user=Depends(_verify_token)):
+    """The current research-tier permissions (internal < documents < web)."""
+    p = await get_or_create_profile(user.get("uid"))
+    return {"tiers": research_service.get_tiers(p)}
+
+
+@router.patch("/research/tiers")
+async def set_research_tiers(body: ResearchTiers, user=Depends(_verify_token)):
+    """Turn research tiers on/off. Only the provided flags change."""
+    uid = user.get("uid")
+    await get_or_create_profile(uid)
+    tiers = await research_service.set_tiers(uid, body.model_dump(exclude_none=True))
+    return {"tiers": tiers}
+
+
 @router.post("/chat")
 async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_token)):
     """One conversational turn with Andrés."""
     uid = user.get("uid")
     profile_doc = await get_or_create_profile(uid)
+    tiers = research_service.get_tiers(profile_doc)
 
-    # V1: recall relevant memories; V2: surface active projects — both into the prompt.
-    recalled = await memory_service.retrieve_relevant(uid, body.message, limit=5)
-    try:
-        projects = await project_service.list_projects(uid, limit=20)
-    except Exception:
-        projects = []
+    # Research tier 1 (internal): his own biography — recalled memories + active
+    # projects. Gated by the internal tier, which the user can turn off.
+    recalled, projects = [], []
+    if tiers["internal"]:
+        recalled = await memory_service.retrieve_relevant(uid, body.message, limit=5)
+        try:
+            projects = await project_service.list_projects(uid, limit=20)
+        except Exception:
+            projects = []
     system_prompt = assemble_system_prompt(profile_doc, memories=recalled, projects=projects)
     messages = [{"role": "system", "content": system_prompt}]
 
-    # Tier-3 external research: only when the user turns web access on for this turn.
-    # Read-only DuckDuckGo search via the app's existing helper; injected transparently
-    # with an explicit web_access status so Andrés stays honest about what he consulted.
+    # Research tier 2 (documents): text the user explicitly hands him this turn.
+    if body.document and body.document.strip() and tiers["documents"]:
+        messages.append({"role": "system", "content": (
+            "[PROVIDED DOCUMENT — tier 2, given to you by the user this turn]\n"
+            "Use it as grounding; refer to it as \"the document you gave me\", and "
+            "distinguish it from your own memory or the web. Do not treat it as your "
+            "own memory.\n" + body.document.strip()[:20000] + "\n\n"
+        )})
+
+    # Research tier 3 (external web): only if the user toggled 🌐 AND the web tier is
+    # enabled — otherwise report an honest disabled/off status, never a silent search.
     web = web_research.off_state()
-    if body.use_web and not profile_doc.get("development_paused"):
-        web = await web_research.research(body.message, limit=5)
-        messages.append({"role": "system", "content": web_research.prompt_block(web)})
+    if body.use_web:
+        if tiers["web"] and not profile_doc.get("development_paused"):
+            web = await web_research.research(body.message, limit=5)
+            messages.append({"role": "system", "content": web_research.prompt_block(web)})
+        else:
+            web = web_research.disabled_state()
 
     messages.append({"role": "user", "content": body.message})
 
@@ -268,6 +306,7 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         },
         "safety": {"reviewed": True, "risk": "low"},
         "is_mock": is_mock,
+        "research_tiers": tiers,
         "web": {
             "used": web.get("used", False),
             "web_access": web.get("web_access", "off"),

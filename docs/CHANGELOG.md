@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.32.2] - 2026-08-07
+
+### Hardened — Andrés the Robot · V5 security closers (Andrés' two follow-ups)
+
+The last two V5 items, both technical/security and both from Andrés' own asks.
+
+**1. Skill sandbox — real process isolation** (`backend/services/andres/sandbox.py`):
+execution now runs in a **separate Python subprocess** with a hard-kill timeout
+(`subprocess.run(timeout=…)`), closing the gap Andrés flagged in V4 — the old
+thread-join could only abandon a lingering CPU-bound thread. A runaway `while True`
+skill is now genuinely **killed** ("process killed"), and because the skill runs in
+another process it can never touch the parent's memory (input mutation is
+impossible by construction). Falls back to the in-thread runner if a subprocess
+can't start; the static AST gate + size caps still apply. `ANDRES_SANDBOX_ISOLATION=thread`
+forces the fallback. (OS-level CPU/RAM rlimits remain a Unix-only future step.)
+
+**2. Research tiers — a formalised, enforced permission model**
+(`backend/services/andres/research_service.py`): Andrés' three-tier research model
+is now an explicit policy on the profile, rising in exposure —
+**1) internal** (his memories + projects) · **2) documents** (text the user hands
+him this turn) · **3) web** (external DuckDuckGo, off by default). The chat endpoint
+**enforces** each tier: internal off → he doesn't consult stored memory/projects;
+documents off → a provided `document` is ignored; web off → the 🌐 toggle can't
+search (honest `web_access: disabled`). Endpoints `GET/PATCH /api/andres/research/tiers`;
+chat gains an optional `document` field (tier-2) and returns the active `research_tiers`.
+- **Frontend** (`AndresRobot.jsx` Safety tab): a **Research tiers** panel with three
+  enforced on/off toggles and clear descriptions; the chat web-status can now read
+  "Web is off in your research tiers".
+- **i18n**: `tiers.*` + `conversation.web.status.disabled` (EN/ES/NO, 299/299 parity).
+- **Tests / CI**: sandbox hard-kill + no-mutation; web blocked by tier (search not
+  called) → `web_access: disabled`; tiers GET/PATCH. Suite 47 → **50**; offline gate
+  **13 files / 171 tests**. `docs/TESTING.md` updated.
+- Validated: backend `compileall` OK; **direct sandbox check confirms the runaway
+  loop is process-killed**; production build OK; i18n parity 299/299; Andrés 50/50.
+
+**Credit:** both — the per-process sandbox isolation and the tiered research model —
+are Andrés' own recommendations. With these, the V5 wishlist he laid out is complete.
+
+---
+
 ## [1.32.1] - 2026-08-06
 
 ### Added — Andrés the Robot · V5 curriculum ("a compass, not a school")

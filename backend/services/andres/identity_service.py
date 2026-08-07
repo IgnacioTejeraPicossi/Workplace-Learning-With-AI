@@ -26,6 +26,8 @@ async def get_or_create_profile(user_id: str) -> dict:
         "autonomy_level": 2,          # default per plan (Reflective Companion)
         "development_paused": False,
         "identity_frozen": False,
+        # Andrés' research-tier permissions: internal < user-provided < external.
+        "research_tiers": {"internal": True, "documents": True, "web": False},
         "created_at": now,
         "counters": {
             "memories": 0,

@@ -46,7 +46,8 @@
           "available": "Søkte på nettet",
           "unavailable": "Søkte — ingen brukbare treff",
           "failed": "Nettsøk mislyktes",
-          "off": "Svarte fra tidligere kunnskap"
+          "off": "Svarte fra tidligere kunnskap",
+          "disabled": "Nett er av i forskningsnivåene dine"
         }
       }
     },
@@ -337,6 +338,25 @@
         "paused": "Pauset",
         "completed": "Fullført",
         "archived": "Arkivert"
+      }
+    },
+    "tiers": {
+      "title": "🔎 Forskningsnivåer",
+      "intro": "Hva Andrés kan konsultere, fra minst til mest eksponert. Han kan bare forske innenfor disse grensene.",
+      "on": "På",
+      "off": "Av",
+      "note": "Å slå av et nivå håndheves: med internt av vil han ikke konsultere lagret minne eller prosjekter; med nett av kan 🌐-bryteren ikke søke.",
+      "internal": {
+        "name": "Internt",
+        "desc": "Hans egen biografi — huskede minner og aktive prosjekter."
+      },
+      "documents": {
+        "name": "Dokumenter",
+        "desc": "Tekst du eksplisitt gir ham for en melding (grunnlag), holdt adskilt fra minnet hans."
+      },
+      "web": {
+        "name": "Nett",
+        "desc": "Eksternt DuckDuckGo-søk via 🌐-bryteren. Av som standard — det mest forsiktige nivået."
       }
     },
     "placeholder": {

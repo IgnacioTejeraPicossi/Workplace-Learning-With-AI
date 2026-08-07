@@ -4,6 +4,7 @@ import { useTheme } from "./ThemeContext";
 import {
   getAndresProfile, andresChat,
   getAndresMemories, createAndresMemory, updateAndresMemory, deleteAndresMemory,
+  getAndresResearchTiers, setAndresResearchTiers,
 } from "./api";
 import Personality from "./andres-robot/Personality";
 import Projects from "./andres-robot/Projects";
@@ -60,6 +61,7 @@ export default function AndresRobot() {
   const [sending, setSending] = useState(false);
   const [inputError, setInputError] = useState("");
   const [useWeb, setUseWeb] = useState(false);
+  const [tiers, setTiers] = useState(null);
 
   // Memory Garden state
   const [memories, setMemories] = useState([]);
@@ -80,8 +82,19 @@ export default function AndresRobot() {
     setMemLoading(false);
   }, [memFilter]);
 
+  const loadTiers = useCallback(async () => {
+    try { const r = await getAndresResearchTiers(); setTiers(r.tiers); } catch (e) { /* offline */ }
+  }, []);
+  const toggleTier = async (key) => {
+    if (!tiers) return;
+    const next = { ...tiers, [key]: !tiers[key] };
+    setTiers(next);
+    try { const r = await setAndresResearchTiers({ [key]: next[key] }); setTiers(r.tiers); } catch (e) { loadTiers(); }
+  };
+
   useEffect(() => { loadProfile(); }, [loadProfile]);
   useEffect(() => { if (activeTab === "memory") loadMemories(); }, [activeTab, loadMemories]);
+  useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
   const handleAddMemory = async () => {
     const content = newMem.trim();
@@ -388,21 +401,60 @@ export default function AndresRobot() {
     </div>
   );
 
-  const renderSafety = () => (
-    <div style={{ ...card, color: colors.text, lineHeight: 1.7 }}>
-      <h3 style={{ marginTop: 0 }}>{t("andresRobotModule.safety.title")}</h3>
-      <p style={{ color: colors.textSecondary }}>{t("andresRobotModule.safety.intro")}</p>
-      <ul style={{ color: colors.textSecondary }}>
-        <li>{t("andresRobotModule.safety.i1")}</li>
-        <li>{t("andresRobotModule.safety.i2")}</li>
-        <li>{t("andresRobotModule.safety.i3")}</li>
-        <li>{t("andresRobotModule.safety.i4")}</li>
-      </ul>
-      <p style={{ fontSize: 13, color: colors.textSecondary, fontStyle: "italic" }}>
-        {t("andresRobotModule.safety.controlsNote")}
-      </p>
+  const renderSafety = () => {
+    const tierKeys = ["internal", "documents", "web"];
+    return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <div style={{ ...card, color: colors.text, lineHeight: 1.7 }}>
+        <h3 style={{ marginTop: 0 }}>{t("andresRobotModule.safety.title")}</h3>
+        <p style={{ color: colors.textSecondary }}>{t("andresRobotModule.safety.intro")}</p>
+        <ul style={{ color: colors.textSecondary }}>
+          <li>{t("andresRobotModule.safety.i1")}</li>
+          <li>{t("andresRobotModule.safety.i2")}</li>
+          <li>{t("andresRobotModule.safety.i3")}</li>
+          <li>{t("andresRobotModule.safety.i4")}</li>
+        </ul>
+        <p style={{ fontSize: 13, color: colors.textSecondary, fontStyle: "italic" }}>
+          {t("andresRobotModule.safety.controlsNote")}
+        </p>
+      </div>
+
+      {/* Research tiers — internal < documents < web */}
+      <div style={{ ...card, color: colors.text }}>
+        <h3 style={{ marginTop: 0 }}>{t("andresRobotModule.tiers.title")}</h3>
+        <p style={{ fontSize: 13, color: colors.textSecondary }}>{t("andresRobotModule.tiers.intro")}</p>
+        {!tiers ? (
+          <div style={{ color: colors.textSecondary, fontStyle: "italic" }}>{t("andresRobotModule.common.loading")}</div>
+        ) : (
+          <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
+            {tierKeys.map((k, i) => (
+              <div key={k} style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>
+                <div>
+                  <strong style={{ color: colors.text }}>{i + 1}. {t(`andresRobotModule.tiers.${k}.name`)}</strong>
+                  <div style={{ fontSize: 12.5, color: colors.textSecondary }}>{t(`andresRobotModule.tiers.${k}.desc`)}</div>
+                </div>
+                <span
+                  onClick={() => toggleTier(k)}
+                  style={{
+                    cursor: "pointer", userSelect: "none", padding: "5px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600,
+                    border: `1px solid ${tiers[k] ? colors.primary : colors.border}`,
+                    background: tiers[k] ? colors.primary : "transparent",
+                    color: tiers[k] ? "#fff" : colors.textSecondary, whiteSpace: "nowrap",
+                  }}
+                >
+                  {tiers[k] ? t("andresRobotModule.tiers.on") : t("andresRobotModule.tiers.off")}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        <p style={{ fontSize: 12, color: colors.textSecondary, fontStyle: "italic", marginTop: 10 }}>
+          {t("andresRobotModule.tiers.note")}
+        </p>
+      </div>
     </div>
-  );
+    );
+  };
 
   const renderTab = () => {
     if (activeTab === "home") return renderHome();

@@ -124,6 +124,10 @@ async def test_chat_real(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
     assert d["web"]["used"] is False and d["web"]["web_access"] == "off"
 
 
+_WEB_PROFILE = dict(_PROFILE)
+_WEB_PROFILE["research_tiers"] = {"internal": True, "documents": True, "web": True}
+
+
 @patch("backend.simple_web_search.simple_web_search", new_callable=AsyncMock)
 @patch("backend.services.andres.project_service.andres_projects")
 @patch("backend.services.andres.memory_service.andres_profiles")
@@ -135,7 +139,7 @@ async def test_chat_real(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
 @pytest.mark.asyncio
 async def test_chat_with_web(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
                              mock_mem, mock_mem_profiles, mock_proj, mock_search):
-    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_WEB_PROFILE))
     mock_convos.insert_one = AsyncMock(return_value=None)
     mock_profiles.update_one = AsyncMock(return_value=None)
     mem = _mem_collection([])
@@ -164,6 +168,61 @@ async def test_chat_with_web(mock_llm, mock_idprofiles, mock_convos, mock_profil
     # the fresh results were injected as a system layer for the LLM
     sent = mock_llm.call_args.kwargs["messages"]
     assert any(m["role"] == "system" and "WEB SEARCH RESULTS" in m["content"] for m in sent)
+    assert d["research_tiers"]["web"] is True
+
+
+@patch("backend.simple_web_search.simple_web_search", new_callable=AsyncMock)
+@patch("backend.services.andres.project_service.andres_projects")
+@patch("backend.services.andres.memory_service.andres_profiles")
+@patch("backend.services.andres.memory_service.andres_memories")
+@patch("backend.routers.andres_robot.andres_profiles")
+@patch("backend.routers.andres_robot.andres_conversations")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_chat_web_blocked_by_tier(mock_llm, mock_idprofiles, mock_convos, mock_profiles,
+                                        mock_mem, mock_mem_profiles, mock_proj, mock_search):
+    # web research tier OFF (the default) → 🌐 can't actually search
+    prof = dict(_PROFILE)
+    prof["research_tiers"] = {"internal": True, "documents": True, "web": False}
+    mock_idprofiles.find_one = AsyncMock(return_value=prof)
+    mock_convos.insert_one = AsyncMock(return_value=None)
+    mock_profiles.update_one = AsyncMock(return_value=None)
+    mem = _mem_collection([])
+    mock_mem.find = mem.find
+    mock_mem.count_documents = mem.count_documents
+    mock_mem.insert_one = mem.insert_one
+    mock_mem.update_one = mem.update_one
+    mock_mem_profiles.update_one = AsyncMock(return_value=None)
+    mock_proj.find = MagicMock(return_value=_AsyncIter([]))
+    mock_llm.return_value = "I can't search — web is off in your tiers."
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/chat", json={"message": "latest news", "use_web": True})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["web"]["web_access"] == "disabled"
+    mock_search.assert_not_awaited()   # the policy really blocked the search
+
+
+@patch("backend.services.andres.research_service.andres_profiles")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@pytest.mark.asyncio
+async def test_research_tiers_get_and_patch(mock_idprofiles, mock_res_profiles):
+    prof = dict(_PROFILE)
+    prof["research_tiers"] = {"internal": True, "documents": True, "web": False}
+    mock_idprofiles.find_one = AsyncMock(return_value=prof)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        got = await c.get("/api/andres/research/tiers")
+    assert got.status_code == 200
+    assert got.json()["tiers"]["web"] is False
+    # turning web on persists and echoes back
+    prof2 = dict(prof); prof2["research_tiers"] = {"internal": True, "documents": True, "web": True}
+    mock_res_profiles.update_one = AsyncMock(return_value=None)
+    mock_res_profiles.find_one = AsyncMock(return_value=prof2)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        patched = await c.patch("/api/andres/research/tiers", json={"web": True})
+    assert patched.status_code == 200
+    assert patched.json()["tiers"]["web"] is True
 
 
 @patch("backend.services.andres.memory_service.andres_profiles")
@@ -729,6 +788,19 @@ async def test_web_research_states_and_prompt():
     # the prompt block echoes the status so Andrés stays honest
     block = web_research.prompt_block(ok)
     assert "WEB ACCESS: available" in block and "https://u" in block
+
+
+def test_sandbox_process_isolation_hard_kill():
+    """V5 hardening: a runaway skill is really KILLED by a separate process, and a
+    skill can't mutate the caller's value (process isolation guarantees it)."""
+    from backend.services.andres.sandbox import run_in_sandbox
+    safe = run_in_sandbox("def skill(x):\n    return sum(range(x))", 6)
+    assert safe["ok"] is True and safe["output"] == 15
+    killed = run_in_sandbox("def skill(x):\n    while True:\n        pass", 1, timeout=1.5)
+    assert killed["ok"] is False and "killed" in killed["error"]
+    caller = {"a": 1}
+    run_in_sandbox("def skill(x):\n    x['b'] = 2\n    return x", caller)
+    assert "b" not in caller  # child ran in another process; caller untouched
 
 
 def test_sandbox_adversarial_gallery():
