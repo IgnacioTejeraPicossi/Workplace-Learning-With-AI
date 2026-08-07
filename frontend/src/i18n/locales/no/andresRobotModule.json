@@ -62,6 +62,13 @@
         "micUnsupported": "Mikrofon krever Chrome eller Edge.",
         "heard": "Hørte",
         "langLabel": "Talespråk",
+        "avatar": "Avatar",
+        "avatarNote": "funksjonelle tilstander, ikke følelser",
+        "avatarState": {
+          "idle": "🟦 I ro",
+          "listening": "🟢 Lytter",
+          "speaking": "🔵 Snakker"
+        },
         "reviewHint": "Dette er det jeg hørte — rett det om nødvendig og trykk Send.",
         "notUnderstood": "Jeg oppfattet ikke det. Kan du si det igjen, eller skrive det?",
         "notice": "Mikrofonen ber om tillatelse; transkripsjon kan bruke nettleserens taletjeneste; ingen lyd lagres; en stemme er ikke bevissthet. Du kan dempe eller stoppe når som helst.",

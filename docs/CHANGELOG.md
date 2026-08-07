@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.34.0] - 2026-08-07
+
+### Added — Andrés the Robot · V6.1 "Holographic presence" (avatar in chat)
+
+With voice stable, Andrés gets a face: the app's existing 3D hologram, embedded in
+his Conversation, reacting to what he's doing. Per Andrés' own rule, the avatar
+signals **functional states, not exaggerated human emotions**.
+
+- **Reusable 3D avatar**: `HologramPortal3D` (Three.js) gains two backward-compatible
+  props — `activity` (`idle` | `listening` | `speaking`) and `showControls`. On
+  `idle` it renders exactly as before (no change to the Hologram Guide / hero uses);
+  `listening` gives a calm green steady glow, `speaking` livelier motion + more
+  sparkles. Nothing exaggerated or "emotional".
+- **In Andrés' Conversation** (`AndresRobot.jsx`): when Voice mode is on, an embedded
+  hologram appears (toggle 👤 Avatar, on by default) with a caption showing the
+  current functional state (🟦 Idle / 🟢 Listening / 🔵 Speaking) and the honest note
+  "functional states, not emotions". Its activity is driven by the real voice state
+  (mic listening / TTS speaking). Degrades gracefully where WebGL is unavailable
+  (the 3D component returns null).
+- Deliberately **separate from voice** (V6.0) so audio and 3D can be diagnosed
+  independently; only mounts while Voice mode is on, so the Three.js cost is opt-in.
+- **i18n**: `conversation.voice.{avatar,avatarNote,avatarState.*}` (EN/ES/NO, 321/321).
+- Validated: production build OK; i18n parity 321/321; JSX parses; `idle` path keeps
+  the shared component's original behaviour for its other consumers.
+
+**Honest framing**: an on-screen avatar is expressive *presence*, still not a body or
+consciousness. Default model is the shared robot; a custom "Andrés" GLTF can be set
+later via the component's model-source option.
+
+---
+
 ## [1.33.3] - 2026-08-07
 
 ### Fixed — Andrés the Robot · voice recognizer language (the real Spanish cause)

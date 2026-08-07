@@ -8,6 +8,7 @@ import {
 } from "./api";
 import { useSpeechCapture } from "./components/hologram/useSpeechCapture";
 import { useSpeechOutput } from "./components/hologram/useSpeechOutput";
+import HologramPortal3D from "./components/HologramPortal3D";
 import Personality from "./andres-robot/Personality";
 import Projects from "./andres-robot/Projects";
 import Journal from "./andres-robot/Journal";
@@ -109,6 +110,7 @@ export default function AndresRobot() {
   // disposition-coloured, with a user-chosen tempo. Honest, not theatrical.
   const [voiceMode, setVoiceMode] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
+  const [showAvatar, setShowAvatar] = useState(true); // V6.1 holographic presence
   const [voiceTempo, setVoiceTempo] = useState("balanced"); // calm | balanced | agile
   const [voiceHint, setVoiceHint] = useState("");
   // Voice/recognizer language — defaults to the UI locale but the user can override
@@ -342,6 +344,9 @@ export default function AndresRobot() {
             <span onClick={() => setAutoSpeak((s) => !s)} style={{ cursor: "pointer", fontSize: 12, color: colors.textSecondary }}>
               {autoSpeak ? "🔊" : "🔇"} {t(autoSpeak ? "andresRobotModule.conversation.voice.speakOn" : "andresRobotModule.conversation.voice.speakOff")}
             </span>
+            <span onClick={() => setShowAvatar((s) => !s)} style={{ cursor: "pointer", fontSize: 12, color: showAvatar ? colors.primary : colors.textSecondary }}>
+              {showAvatar ? "👤" : "🚫"} {t("andresRobotModule.conversation.voice.avatar")}
+            </span>
             {/* Tempo — your control over "quiet vs agile" (Andrés' question). */}
             <span style={{ fontSize: 12, color: colors.textSecondary }}>·</span>
             {["calm", "balanced", "agile"].map((tp) => (
@@ -396,6 +401,28 @@ export default function AndresRobot() {
           </div>
           <div style={{ fontSize: 11, color: colors.textSecondary, fontStyle: "italic" }}>
             {t("andresRobotModule.conversation.voice.notice")}
+          </div>
+        </div>
+      )}
+      {/* V6.1 — holographic presence. Indicates FUNCTIONAL states (listening /
+          speaking / idle), never faked human emotion. */}
+      {voiceMode && showAvatar && (
+        <div style={{ display: "grid", gap: 4 }}>
+          <div style={{ height: 260, borderRadius: 12, overflow: "hidden", border: `1px solid ${colors.border}`, background: "#0b1220" }}>
+            <HologramPortal3D
+              embed
+              showControls={false}
+              activity={tts.isSpeaking ? "speaking" : (asr.isListening ? "listening" : "idle")}
+            />
+          </div>
+          <div style={{ fontSize: 11, color: colors.textSecondary, textAlign: "center" }}>
+            {tts.isSpeaking
+              ? t("andresRobotModule.conversation.voice.avatarState.speaking")
+              : asr.isListening
+                ? t("andresRobotModule.conversation.voice.avatarState.listening")
+                : t("andresRobotModule.conversation.voice.avatarState.idle")}
+            {" · "}
+            <span style={{ fontStyle: "italic" }}>{t("andresRobotModule.conversation.voice.avatarNote")}</span>
           </div>
         </div>
       )}

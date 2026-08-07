@@ -15,7 +15,7 @@ function canCreateWebGLContext() {
   }
 }
 
-export default function HologramPortal3D({ onClick, embed = false }) {
+export default function HologramPortal3D({ onClick, embed = false, activity = 'idle', showControls = true }) {
   const { t } = useTranslation();
   const [modelScale, setModelScale] = useState(0.8);
   const [modelOffsetY, setModelOffsetY] = useState(-0.5);
@@ -82,14 +82,15 @@ export default function HologramPortal3D({ onClick, embed = false }) {
         style={{ pointerEvents: embed ? 'none' : 'auto' }}
       >
         <Suspense fallback={null}>
-          <Scene modelScale={modelScale} modelOffsetY={modelOffsetY} modelUrl={activeUrl} />
+          <Scene modelScale={modelScale} modelOffsetY={modelOffsetY} modelUrl={activeUrl} activity={activity} />
         </Suspense>
         <EffectComposer>
           <Bloom intensity={0.8} luminanceThreshold={0.2} luminanceSmoothing={0.9} />
           <Vignette eskil={false} offset={0.2} darkness={0.8} />
         </EffectComposer>
       </Canvas>
-      {/* Controls overlay (works even when embed true) */}
+      {/* Controls overlay (works even when embed true; hidden when showControls=false) */}
+      {showControls && (
       <div style={controlsStyle} onClick={(e) => e.stopPropagation()}>
         <label style={{ color: '#bfe8ff', fontSize: 12 }}>{t('askAI.controls.scale', { defaultValue: 'Scale' })}
           <input
@@ -156,57 +157,75 @@ export default function HologramPortal3D({ onClick, embed = false }) {
           </>
         )}
       </div>
+      )}
     </div>
   );
 }
 
-function Scene({ modelScale, modelOffsetY, modelUrl }) {
+function Scene({ modelScale, modelOffsetY, modelUrl, activity = 'idle' }) {
+  // Avatar reacts to FUNCTIONAL states (Andrés' ask), not human emotions:
+  // idle = current gentle look; listening = calm green steady glow; speaking =
+  // livelier motion + more sparkles. idle is identical to the original behaviour.
+  const speaking = activity === 'speaking';
+  const listening = activity === 'listening';
   return (
     <group>
       <ambientLight intensity={0.6} />
       <directionalLight intensity={1.2} position={[3, 3, 5]} color="#89d8ff" />
       <Environment preset="city" />
 
-      <PulsingRing />
+      <PulsingRing activity={activity} />
 
-      <Float speed={1.5} rotationIntensity={0.25} floatIntensity={0.6}>
+      <Float speed={speaking ? 2.4 : 1.5} rotationIntensity={0.25} floatIntensity={speaking ? 1.0 : 0.6}>
         <group position={[0, modelOffsetY, 0.2]}>
-          <Robot scale={modelScale} url={modelUrl} />
+          <Robot scale={modelScale} url={modelUrl} activity={activity} />
         </group>
       </Float>
 
-      <Sparkles count={70} scale={[6, 3, 1]} size={3} speed={0.35} color="#8fe8ff" opacity={0.6} />
+      <Sparkles
+        count={speaking ? 110 : 70}
+        scale={[6, 3, 1]}
+        size={3}
+        speed={speaking ? 0.9 : (listening ? 0.5 : 0.35)}
+        color={listening ? '#7cffb2' : '#8fe8ff'}
+        opacity={0.6}
+      />
     </group>
   );
 }
 
-function PulsingRing() {
+function PulsingRing({ activity = 'idle' }) {
   const ref = useRef();
+  const speaking = activity === 'speaking';
+  const listening = activity === 'listening';
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (ref.current) {
-      ref.current.material.emissiveIntensity = 0.7 + Math.sin(t * 3.0) * 0.35;
-      ref.current.rotation.z = t * 0.25;
-    }
+    if (!ref.current) return;
+    const freq = speaking ? 6.0 : 3.0;
+    const amp = speaking ? 0.5 : 0.35;
+    const base = listening ? 1.0 : 0.7;
+    ref.current.material.emissiveIntensity = base + Math.sin(t * freq) * amp;
+    ref.current.rotation.z = t * (speaking ? 0.5 : 0.25);
   });
+  const color = listening ? '#7cffb2' : '#69d7ff';
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <torusGeometry args={[2.2, 0.25, 64, 256]} />
-      <meshStandardMaterial color="#69d7ff" emissive="#69d7ff" metalness={0.4} roughness={0.1} />
+      <meshStandardMaterial color={color} emissive={color} metalness={0.4} roughness={0.1} />
     </mesh>
   );
 }
 
-function Robot({ url, ...props }) {
+function Robot({ url, activity = 'idle', ...props }) {
   // Replace with '/models/robot.glb' (public/) for offline
   const { scene } = useGLTF(url);
   const ref = useRef();
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (ref.current) {
-      ref.current.rotation.y = Math.sin(t * 0.5) * 0.4;
-      ref.current.position.y = Math.sin(t * 0.9) * 0.15;
-    }
+    if (!ref.current) return;
+    const speaking = activity === 'speaking';
+    ref.current.rotation.y = Math.sin(t * 0.5) * 0.4;
+    ref.current.position.y = Math.sin(t * (speaking ? 1.6 : 0.9)) * (speaking ? 0.22 : 0.15);
   });
   return <primitive ref={ref} object={scene} {...props} />;
 }

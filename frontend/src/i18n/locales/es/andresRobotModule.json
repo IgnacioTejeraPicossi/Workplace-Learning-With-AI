@@ -62,6 +62,13 @@
         "micUnsupported": "El micrófono necesita Chrome o Edge.",
         "heard": "Oí",
         "langLabel": "Idioma de voz",
+        "avatar": "Avatar",
+        "avatarNote": "estados funcionales, no emociones",
+        "avatarState": {
+          "idle": "🟦 En reposo",
+          "listening": "🟢 Escuchando",
+          "speaking": "🔵 Hablando"
+        },
         "reviewHint": "Esto es lo que oí — corrígelo si hace falta y pulsa Enviar.",
         "notUnderstood": "No te he entendido bien. ¿Puedes repetirlo o prefieres escribirlo?",
         "notice": "El micrófono pide permiso; la transcripción puede usar el servicio de voz del navegador; no se guarda audio; una voz no es conciencia. Puedes silenciar o parar cuando quieras.",
