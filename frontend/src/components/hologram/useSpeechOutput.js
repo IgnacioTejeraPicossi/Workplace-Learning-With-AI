@@ -12,9 +12,17 @@ export function useSpeechOutput(options = {}) {
     typeof window !== "undefined" && "speechSynthesis" in window;
 
   const resolveVoice = () => {
-    if (!supported || !voiceName) return null;
+    if (!supported) return null;
     const voices = window.speechSynthesis.getVoices();
-    return voices.find((v) => v.name === voiceName) || null;
+    if (voiceName) return voices.find((v) => v.name === voiceName) || null;
+    // No explicit voice: pick one that matches the target language, so e.g. an
+    // English default voice doesn't end up reading Spanish text. Prefer a local
+    // (on-device) voice when several match.
+    const base = String(lang || "").slice(0, 2).toLowerCase();
+    if (!base) return null;
+    const matches = voices.filter((v) => String(v.lang || "").toLowerCase().startsWith(base));
+    if (!matches.length) return null;
+    return matches.find((v) => v.localService) || matches[0];
   };
 
   const speak = (text) => {

@@ -52,14 +52,21 @@
       },
       "voice": {
         "toggle": "Stemme",
-        "toggleHint": "Snakk med Andrés høyt: mikrofonen din for å snakke, PC-høyttalerne for svaret hans. Stemmen hans gjenspeiler hans simulerte disposisjon.",
+        "toggleHint": "Snakk med Andrés via nettleserens tale-APIer: mikrofonen for å snakke, PC-høyttalerne for svaret. Stemmen gjenspeiler hans simulerte disposisjon.",
         "tapToSpeak": "Snakk",
         "listening": "Lytter…",
         "speaking": "Andrés snakker…",
         "stop": "stopp",
         "speakOn": "Stemme på",
         "speakOff": "Stemme dempet",
-        "micUnsupported": "Mikrofon krever Chrome eller Edge."
+        "micUnsupported": "Mikrofon krever Chrome eller Edge.",
+        "notUnderstood": "Jeg oppfattet ikke det. Kan du si det igjen, eller skrive det?",
+        "notice": "Mikrofonen ber om tillatelse; transkripsjon kan bruke nettleserens taletjeneste; ingen lyd lagres; en stemme er ikke bevissthet. Du kan dempe eller stoppe når som helst.",
+        "tempo": {
+          "calm": "Rolig",
+          "balanced": "Balansert",
+          "agile": "Kvikk"
+        }
       }
     },
     "memory": {

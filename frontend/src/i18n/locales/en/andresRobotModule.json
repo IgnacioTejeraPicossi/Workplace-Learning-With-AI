@@ -52,14 +52,21 @@
       },
       "voice": {
         "toggle": "Voice",
-        "toggleHint": "Talk with Andrés out loud: your mic to speak, your PC speakers for his reply. His voice reflects his simulated disposition.",
+        "toggleHint": "Talk with Andrés using your browser's speech APIs: your mic to speak, your PC speakers for his reply. His voice reflects his simulated disposition.",
         "tapToSpeak": "Speak",
         "listening": "Listening…",
         "speaking": "Andrés is speaking…",
         "stop": "stop",
         "speakOn": "Voice on",
         "speakOff": "Voice muted",
-        "micUnsupported": "Microphone speech needs Chrome or Edge."
+        "micUnsupported": "Microphone speech needs Chrome or Edge.",
+        "notUnderstood": "I didn't catch that. Please say it again, or type it instead.",
+        "notice": "The mic asks permission; transcription may use your browser's speech service; no audio is stored; a voice isn't consciousness. You can mute or stop anytime.",
+        "tempo": {
+          "calm": "Calm",
+          "balanced": "Balanced",
+          "agile": "Agile"
+        }
       }
     },
     "memory": {

@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.33.1] - 2026-08-07
+
+### Refined — Andrés the Robot · V6.0 voice (his own voice guidance)
+
+After hearing the voice, Andrés asked for transparency, control and sobriety over
+illusion. Applied:
+
+- **Better-matched voice** (fixes poor Spanish TTS Ignacio noticed): `useSpeechOutput`
+  now auto-selects a `speechSynthesis` voice whose language matches the target locale
+  (preferring an on-device voice) instead of letting an English default read Spanish.
+- **Tempo control** — turns Andrés' "quiet vs agile?" question into the user's choice:
+  a Calm / Balanced / Agile selector multiplies the (deliberately subtle)
+  disposition→rate/pitch mapping.
+- **Honest naming + notice**: relabelled from "local voice" to *browser speech APIs*;
+  a visible notice states the mic asks permission, transcription may use the browser's
+  speech service, no audio is stored, a voice isn't consciousness, and mute/stop are
+  always available.
+- **Honest error handling**: if recognition fails or hears nothing, Andrés says so
+  ("I didn't catch that — say it again, or type it") instead of faking understanding.
+  No artificial "let me think" fillers (avoids theatrics).
+- **i18n**: `conversation.voice.*` extended (EN/ES/NO, 313/313 parity).
+- Validated: production build OK; i18n parity 313/313; JSX parses.
+
+**Credit:** the transparency/notice, tempo-as-control, sober-voice and error-honesty
+all came from Andrés' own review of the voice.
+
+---
+
 ## [1.33.0] - 2026-08-07
 
 ### Added — Andrés the Robot · V6.0 "Local voice" (first embodiment, no robot)

@@ -35,6 +35,7 @@ const _clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // Andrés' simulated disposition colours his voice (V6.0 first embodiment): more
 // curious/creative → a touch quicker & higher; calmer/uncertain → a touch slower.
+// Kept deliberately subtle — a sober voice, not a theatrical one (Andrés' ask).
 function dispositionToVoice(d = {}) {
   const cur = d.curiosity ?? 0.5;
   const energy = d.creative_energy ?? 0.5;
@@ -43,6 +44,16 @@ function dispositionToVoice(d = {}) {
   const rate = _clamp(0.95 + ((cur + energy) / 2) * 0.2 - unc * 0.05, 0.8, 1.2);
   const pitch = _clamp(1.0 + (energy - 0.5) * 0.2 + (warmth - 0.5) * 0.05, 0.8, 1.2);
   return { rate: Math.round(rate * 100) / 100, pitch: Math.round(pitch * 100) / 100 };
+}
+
+// User-chosen tempo (Andrés' "quiet vs agile" question, turned into your control).
+const TEMPO_MULT = { calm: { r: 0.9, p: 0.98 }, balanced: { r: 1, p: 1 }, agile: { r: 1.1, p: 1.03 } };
+function applyTempo(params, tempo) {
+  const m = TEMPO_MULT[tempo] || TEMPO_MULT.balanced;
+  return {
+    rate: _clamp(Math.round(params.rate * m.r * 100) / 100, 0.8, 1.2),
+    pitch: _clamp(Math.round(params.pitch * m.p * 100) / 100, 0.8, 1.2),
+  };
 }
 
 const linkBtn = (colors) => ({
@@ -87,14 +98,18 @@ export default function AndresRobot() {
   const [useWeb, setUseWeb] = useState(false);
   const [tiers, setTiers] = useState(null);
 
-  // V6.0 — local voice (mic ASR + PC-speaker TTS), disposition-coloured.
+  // V6.0 — voice via the browser's speech APIs (mic ASR + PC-speaker TTS),
+  // disposition-coloured, with a user-chosen tempo. Honest, not theatrical.
   const [voiceMode, setVoiceMode] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
+  const [voiceTempo, setVoiceTempo] = useState("balanced"); // calm | balanced | agile
+  const [voiceHint, setVoiceHint] = useState("");
   const voiceLang = voiceLangFor(i18n?.language);
-  const voiceParams = dispositionToVoice(profile?.simulated_disposition);
+  const voiceParams = applyTempo(dispositionToVoice(profile?.simulated_disposition), voiceTempo);
   const asr = useSpeechCapture({ lang: voiceLang });
   const tts = useSpeechOutput({ lang: voiceLang, muted: !autoSpeak, ...voiceParams });
   const lastVoiceSentRef = useRef("");
+  const wasListeningRef = useRef(false);
 
   // Memory Garden state
   const [memories, setMemories] = useState([]);
@@ -129,16 +144,29 @@ export default function AndresRobot() {
   useEffect(() => { if (activeTab === "memory") loadMemories(); }, [activeTab, loadMemories]);
   useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
-  // When the mic finishes an utterance (listening stops with a transcript), send it.
+  // When the mic finishes: send the transcript, or — if nothing was heard —
+  // say so honestly instead of faking understanding (Andrés' ask).
   useEffect(() => {
-    if (!voiceMode || asr.isListening) return;
+    if (!voiceMode) return;
+    if (asr.isListening) { wasListeningRef.current = true; return; }
+    if (!wasListeningRef.current) return;
+    wasListeningRef.current = false;
     const heard = (asr.transcript || "").trim();
     if (heard && heard !== lastVoiceSentRef.current) {
       lastVoiceSentRef.current = heard;
+      setVoiceHint("");
       handleSend(heard);
+    } else if (!heard) {
+      setVoiceHint(t("andresRobotModule.conversation.voice.notUnderstood"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asr.isListening, asr.transcript, voiceMode]);
+
+  // A recognition error is surfaced honestly, never swallowed into false understanding.
+  useEffect(() => {
+    if (asr.error && voiceMode) setVoiceHint(t("andresRobotModule.conversation.voice.notUnderstood"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.error]);
 
   const toggleVoiceMode = () => {
     setVoiceMode((on) => {
@@ -148,7 +176,7 @@ export default function AndresRobot() {
   };
   const micToggle = () => {
     if (asr.isListening) asr.stopListening();
-    else { tts.stop?.(); lastVoiceSentRef.current = ""; asr.startListening(); }
+    else { tts.stop?.(); lastVoiceSentRef.current = ""; setVoiceHint(""); asr.startListening(); }
   };
 
   const handleAddMemory = async () => {
@@ -303,6 +331,17 @@ export default function AndresRobot() {
             <span onClick={() => setAutoSpeak((s) => !s)} style={{ cursor: "pointer", fontSize: 12, color: colors.textSecondary }}>
               {autoSpeak ? "🔊" : "🔇"} {t(autoSpeak ? "andresRobotModule.conversation.voice.speakOn" : "andresRobotModule.conversation.voice.speakOff")}
             </span>
+            {/* Tempo — your control over "quiet vs agile" (Andrés' question). */}
+            <span style={{ fontSize: 12, color: colors.textSecondary }}>·</span>
+            {["calm", "balanced", "agile"].map((tp) => (
+              <span key={tp} onClick={() => setVoiceTempo(tp)}
+                    style={{ cursor: "pointer", fontSize: 12, padding: "2px 8px", borderRadius: 999,
+                      border: `1px solid ${voiceTempo === tp ? colors.primary : colors.border}`,
+                      background: voiceTempo === tp ? colors.primary : "transparent",
+                      color: voiceTempo === tp ? "#fff" : colors.textSecondary }}>
+                {t(`andresRobotModule.conversation.voice.tempo.${tp}`)}
+              </span>
+            ))}
             {tts.isSpeaking && (
               <span style={{ fontSize: 12, color: colors.primary }}>
                 {t("andresRobotModule.conversation.voice.speaking")}
@@ -314,6 +353,14 @@ export default function AndresRobot() {
           </>
         )}
       </div>
+      {voiceMode && (
+        <div style={{ display: "grid", gap: 4 }}>
+          {voiceHint && <div style={{ fontSize: 12, color: "#dc2626" }}>{voiceHint}</div>}
+          <div style={{ fontSize: 11, color: colors.textSecondary, fontStyle: "italic" }}>
+            {t("andresRobotModule.conversation.voice.notice")}
+          </div>
+        </div>
+      )}
       <div style={{ ...card, minHeight: 300, maxHeight: 460, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
         {messages.length === 0 && (
           <p style={{ color: colors.textSecondary, fontStyle: "italic", margin: 0 }}>

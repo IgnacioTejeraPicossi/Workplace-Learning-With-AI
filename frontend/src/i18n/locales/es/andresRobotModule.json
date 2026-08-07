@@ -52,14 +52,21 @@
       },
       "voice": {
         "toggle": "Voz",
-        "toggleHint": "Habla con Andrés en voz alta: tu micro para hablar, los altavoces del PC para su respuesta. Su voz refleja su disposición simulada.",
+        "toggleHint": "Habla con Andrés mediante las APIs de voz del navegador: tu micro para hablar, los altavoces del PC para su respuesta. Su voz refleja su disposición simulada.",
         "tapToSpeak": "Hablar",
         "listening": "Escuchando…",
         "speaking": "Andrés está hablando…",
         "stop": "parar",
         "speakOn": "Voz activada",
         "speakOff": "Voz silenciada",
-        "micUnsupported": "El micrófono necesita Chrome o Edge."
+        "micUnsupported": "El micrófono necesita Chrome o Edge.",
+        "notUnderstood": "No te he entendido bien. ¿Puedes repetirlo o prefieres escribirlo?",
+        "notice": "El micrófono pide permiso; la transcripción puede usar el servicio de voz del navegador; no se guarda audio; una voz no es conciencia. Puedes silenciar o parar cuando quieras.",
+        "tempo": {
+          "calm": "Tranquila",
+          "balanced": "Equilibrada",
+          "agile": "Ágil"
+        }
       }
     },
     "memory": {
