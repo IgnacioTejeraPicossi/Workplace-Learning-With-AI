@@ -189,8 +189,8 @@ export async function getTeamAnalyticsHistory(teamId) {
 export async function getAndresProfile() {
   return apiCall("/api/andres/profile", "GET");
 }
-export async function andresChat(message, useWeb = false, document = "") {
-  return apiCall("/api/andres/chat", "POST", { message, use_web: useWeb, document });
+export async function andresChat(message, useWeb = false, document = "", image = "") {
+  return apiCall("/api/andres/chat", "POST", { message, use_web: useWeb, document, image });
 }
 export async function getAndresResearchTiers() {
   return apiCall("/api/andres/research/tiers", "GET");

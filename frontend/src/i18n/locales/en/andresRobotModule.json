@@ -50,6 +50,19 @@
           "disabled": "Web is off in your research tiers"
         }
       },
+      "image": {
+        "attach": "Image",
+        "attachHint": "Show Andrés one picture with this message. It's downscaled in your browser and sent to the model to be interpreted this turn — limited perception, with your consent. Gated by the 'documents' research tier.",
+        "processing": "Preparing…",
+        "remove": "Remove",
+        "stagedNote": "This picture will be sent with your next message.",
+        "previewAlt": "Attached picture preview",
+        "sentAlt": "Picture you shared with Andrés",
+        "invalidType": "That doesn't look like an image file. Please choose a picture (PNG, JPG…).",
+        "tooLarge": "That image is too large. Please choose a smaller one.",
+        "defaultPrompt": "What do you see in this picture?",
+        "tierOffNote": "Andrés couldn't look — the 'documents' research tier is off. Turn it on under Safety & Tiers to let him see pictures you share."
+      },
       "voice": {
         "toggle": "Voice",
         "toggleHint": "Talk with Andrés using your browser's speech APIs: your mic to speak, your PC speakers for his reply. His voice reflects his simulated disposition.",

@@ -41,6 +41,12 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=20000)
     use_web: bool = False   # user opts in to a fresh web search for this message
     document: str = Field("", max_length=20000)   # tier-2: text the user provides
+    # V6.2 — limited visual perception WITH explicit per-turn consent. A base64
+    # `data:image/...` URL the user chooses to show him this turn. Gated by the
+    # SAME "documents" tier (it is user-provided content), sent to the model to be
+    # interpreted, and never stored as memory unless the user saves it by hand.
+    # ~8M chars ≈ a ~5.8 MB image; the frontend downscales to keep this small.
+    image: str = Field("", max_length=8_000_000)
 
 
 class ResearchTiers(BaseModel):
@@ -235,7 +241,39 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         else:
             web = web_research.disabled_state()
 
-    messages.append({"role": "user", "content": body.message})
+    # Research tier 2b (image / limited perception): a picture the user shows him
+    # this turn. Reuses the documents-tier consent (it is user-provided content).
+    # When present and allowed, the user turn becomes multimodal content the
+    # vision-capable model can actually look at.
+    has_image = bool(body.image) and body.image.startswith("data:image/")
+    image_seen = has_image and tiers["documents"]
+    if has_image and not tiers["documents"]:
+        # He should honestly say he can't look while the documents tier is off,
+        # rather than silently ignore the picture.
+        messages.append({"role": "system", "content": (
+            "[SHARED IMAGE — the user tried to show you a picture this turn, but the "
+            "'documents' research tier is OFF, so you must NOT interpret it. Tell them "
+            "honestly that you can't look until they re-enable that tier.]"
+        )})
+    elif image_seen:
+        messages.append({"role": "system", "content": (
+            "[SHARED IMAGE — tier 2b, the user is showing you a picture this turn with "
+            "their explicit consent]\n"
+            "Describe what you LITERALLY see, and clearly separate observation from "
+            "inference (\"I see …\" vs \"which might mean …\"). Do not guess or assert "
+            "the identity of any specific real person. This is limited perception with "
+            "consent, not permanent sight or awareness — the image was sent to the model "
+            "to be interpreted this turn and is not kept as a memory unless the user "
+            "saves it. Be honest about what is unclear or ambiguous in the picture."
+        )})
+
+    if image_seen:
+        messages.append({"role": "user", "content": [
+            {"type": "text", "text": body.message},
+            {"type": "image_url", "image_url": {"url": body.image}},
+        ]})
+    else:
+        messages.append({"role": "user", "content": body.message})
 
     # Real LLM via the unified gateway; degrade gracefully when no key is set.
     try:
@@ -286,7 +324,9 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
             await memory_service.save_memory(uid, {
                 "type": "episodic",
                 "content": f"The user said: “{body.message.strip()[:400]}”. "
-                           f"I replied about: {message[:200]}",
+                           + ("The user also showed me an image (not stored). "
+                              if image_seen else "")
+                           + f"I replied about: {message[:200]}",
                 "source": "auto",
                 "importance": 0.4,
                 "user_verified": False,
@@ -307,6 +347,14 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
         "safety": {"reviewed": True, "risk": "low"},
         "is_mock": is_mock,
         "research_tiers": tiers,
+        # V6.2 — whether the picture the user attached was actually looked at, and
+        # if not, why (so the UI can be honest instead of pretending he saw it).
+        "vision": {
+            "image_received": image_seen,
+            "reason": (None if image_seen
+                       else "documents_tier_off" if has_image
+                       else None),
+        },
         "web": {
             "used": web.get("used", False),
             "web_access": web.get("web_access", "off"),

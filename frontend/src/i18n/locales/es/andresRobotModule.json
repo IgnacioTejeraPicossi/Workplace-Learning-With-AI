@@ -50,6 +50,19 @@
           "disabled": "La web está apagada en tus niveles de investigación"
         }
       },
+      "image": {
+        "attach": "Imagen",
+        "attachHint": "Muéstrale a Andrés una foto con este mensaje. Se reduce en tu navegador y se envía al modelo para interpretarla en este turno — percepción limitada, con tu consentimiento. Depende del nivel de investigación 'documentos'.",
+        "processing": "Preparando…",
+        "remove": "Quitar",
+        "stagedNote": "Esta foto se enviará con tu próximo mensaje.",
+        "previewAlt": "Vista previa de la foto adjunta",
+        "sentAlt": "Foto que compartiste con Andrés",
+        "invalidType": "Eso no parece un archivo de imagen. Elige una foto (PNG, JPG…).",
+        "tooLarge": "Esa imagen es demasiado grande. Elige una más pequeña.",
+        "defaultPrompt": "¿Qué ves en esta foto?",
+        "tierOffNote": "Andrés no pudo mirar — el nivel de investigación 'documentos' está apagado. Actívalo en Seguridad y Niveles para que pueda ver las fotos que compartes."
+      },
       "voice": {
         "toggle": "Voz",
         "toggleHint": "Habla con Andrés mediante las APIs de voz del navegador: tu micro para hablar, los altavoces del PC para su respuesta. Su voz refleja su disposición simulada.",

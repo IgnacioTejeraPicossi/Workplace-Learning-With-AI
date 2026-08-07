@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.35.0] - 2026-08-07
+
+### Added — Andrés the Robot · V6.2 "Limited visual perception" (image input)
+
+Andrés' chat now accepts **one picture per message**, so the user can show him part
+of the visual world — the same multimodal mechanism Claude uses. Framed honestly as
+**limited perception with explicit per-turn consent**, not permanent sight or awareness.
+
+- **No LLM-gateway change needed**: `ask_ai_unified → ask_openai` already pass the
+  `messages` array straight to `openai.chat.completions.create`. When an image is
+  attached, the user turn is built as multimodal `content` (`[{type:text}, {type:image_url}]`),
+  which the vision-capable gpt-5.x model interprets.
+- **Backend** (`backend/routers/andres_robot.py`): `ChatRequest` gains an `image`
+  field (base64 `data:image/…` URL, capped ~8M chars). The picture is gated by the
+  **existing "documents" research tier** (it is user-provided content): when that
+  tier is off, the image is *not* interpreted and an honest system note tells him to
+  say he can't look. When allowed, a "SHARED IMAGE" system layer instructs him to
+  describe what he literally sees, separate observation from inference, and not guess
+  a real person's identity. The episodic memory candidate only notes "[showed an
+  image]" — **the image bytes are never stored**. Response adds a `vision`
+  block (`image_received`, `reason`).
+- **Frontend** (`AndresRobot.jsx`, `api.js`): a 🖼️ attach button stages one image,
+  **downscaled in the browser** (canvas, ≤1280px, JPEG q0.85) to keep the payload
+  small and cheap; a thumbnail preview with ✕ remove; the sent picture renders in the
+  user's chat bubble; an image with no text uses a neutral default prompt; an honest
+  banner appears if the documents tier blocked the look.
+- **i18n** EN/NO/ES parity (332/332). **Tests**: 2 new offline contract tests
+  (multimodal path built when allowed; image ignored + `documents_tier_off` when the
+  tier is off) → suite 52 passing. Validated: backend compile, JSX parse, i18n parity,
+  production build (exit 0).
+
+---
+
 ## [1.34.0] - 2026-08-07
 
 ### Added — Andrés the Robot · V6.1 "Holographic presence" (avatar in chat)

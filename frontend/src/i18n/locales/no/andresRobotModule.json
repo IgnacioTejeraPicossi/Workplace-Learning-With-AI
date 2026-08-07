@@ -50,6 +50,19 @@
           "disabled": "Nett er av i forskningsnivåene dine"
         }
       },
+      "image": {
+        "attach": "Bilde",
+        "attachHint": "Vis Andrés ett bilde sammen med denne meldingen. Det nedskaleres i nettleseren din og sendes til modellen for tolkning denne omgangen — begrenset persepsjon, med ditt samtykke. Styres av forskningsnivået «dokumenter».",
+        "processing": "Forbereder…",
+        "remove": "Fjern",
+        "stagedNote": "Dette bildet sendes med din neste melding.",
+        "previewAlt": "Forhåndsvisning av vedlagt bilde",
+        "sentAlt": "Bilde du delte med Andrés",
+        "invalidType": "Det ser ikke ut som en bildefil. Velg et bilde (PNG, JPG…).",
+        "tooLarge": "Bildet er for stort. Velg et mindre.",
+        "defaultPrompt": "Hva ser du på dette bildet?",
+        "tierOffNote": "Andrés kunne ikke se — forskningsnivået «dokumenter» er av. Slå det på under Sikkerhet og nivåer for at han skal kunne se bilder du deler."
+      },
       "voice": {
         "toggle": "Stemme",
         "toggleHint": "Snakk med Andrés via nettleserens tale-APIer: mikrofonen for å snakke, PC-høyttalerne for svaret. Stemmen gjenspeiler hans simulerte disposisjon.",

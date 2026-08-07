@@ -204,6 +204,89 @@ async def test_chat_web_blocked_by_tier(mock_llm, mock_idprofiles, mock_convos, 
     mock_search.assert_not_awaited()   # the policy really blocked the search
 
 
+# ── V6.2: limited visual perception (image input, with per-turn consent) ──────
+
+# a 1×1 transparent PNG as a data URL — enough to exercise the multimodal path
+_TINY_PNG = ("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1"
+             "HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")
+
+
+@patch("backend.services.andres.memory_service.andres_profiles")
+@patch("backend.services.andres.memory_service.andres_memories")
+@patch("backend.routers.andres_robot.andres_profiles")
+@patch("backend.routers.andres_robot.andres_conversations")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_chat_with_image_is_multimodal(mock_llm, mock_idprofiles, mock_convos,
+                                             mock_profiles, mock_mem, mock_mem_profiles):
+    # documents tier is ON by default → the picture is actually looked at
+    mock_idprofiles.find_one = AsyncMock(return_value=dict(_PROFILE))
+    mock_convos.insert_one = AsyncMock(return_value=None)
+    mock_profiles.update_one = AsyncMock(return_value=None)
+    mem = _mem_collection([])
+    mock_mem.find = mem.find
+    mock_mem.count_documents = mem.count_documents
+    mock_mem.insert_one = mem.insert_one
+    mock_mem.update_one = mem.update_one
+    mock_mem_profiles.update_one = AsyncMock(return_value=None)
+    mock_llm.return_value = "I see a small blue shape near the top."
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/chat",
+                         json={"message": "What is this?", "image": _TINY_PNG})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["vision"]["image_received"] is True
+    # the user turn became multimodal content (text + image_url)
+    sent = mock_llm.call_args.kwargs["messages"]
+    user_turn = [m for m in sent if m["role"] == "user"][-1]
+    assert isinstance(user_turn["content"], list)
+    parts = {p["type"] for p in user_turn["content"]}
+    assert parts == {"text", "image_url"}
+    img_part = next(p for p in user_turn["content"] if p["type"] == "image_url")
+    assert img_part["image_url"]["url"].startswith("data:image/")
+    # an honest "shared image" system layer is present for the model
+    assert any(m["role"] == "system" and "SHARED IMAGE" in m["content"] for m in sent)
+
+
+@patch("backend.services.andres.memory_service.andres_profiles")
+@patch("backend.services.andres.memory_service.andres_memories")
+@patch("backend.routers.andres_robot.andres_profiles")
+@patch("backend.routers.andres_robot.andres_conversations")
+@patch("backend.services.andres.identity_service.andres_profiles")
+@patch("backend.llm.ask_ai_unified", new_callable=AsyncMock)
+@pytest.mark.asyncio
+async def test_chat_image_blocked_by_documents_tier(mock_llm, mock_idprofiles, mock_convos,
+                                                    mock_profiles, mock_mem, mock_mem_profiles):
+    # documents tier OFF → he must NOT interpret the picture
+    prof = dict(_PROFILE)
+    prof["research_tiers"] = {"internal": True, "documents": False, "web": False}
+    mock_idprofiles.find_one = AsyncMock(return_value=prof)
+    mock_convos.insert_one = AsyncMock(return_value=None)
+    mock_profiles.update_one = AsyncMock(return_value=None)
+    mem = _mem_collection([])
+    mock_mem.find = mem.find
+    mock_mem.count_documents = mem.count_documents
+    mock_mem.insert_one = mem.insert_one
+    mock_mem.update_one = mem.update_one
+    mock_mem_profiles.update_one = AsyncMock(return_value=None)
+    mock_llm.return_value = "I can't look while the documents tier is off."
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=BASE) as c:
+        r = await c.post("/api/andres/chat",
+                         json={"message": "What is this?", "image": _TINY_PNG})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["vision"]["image_received"] is False
+    assert d["vision"]["reason"] == "documents_tier_off"
+    # the user turn stays a plain string — no image bytes were sent to the model
+    sent = mock_llm.call_args.kwargs["messages"]
+    user_turn = [m for m in sent if m["role"] == "user"][-1]
+    assert isinstance(user_turn["content"], str)
+    assert not any(
+        isinstance(m.get("content"), list) for m in sent
+    )
+
+
 @patch("backend.services.andres.research_service.andres_profiles")
 @patch("backend.services.andres.identity_service.andres_profiles")
 @pytest.mark.asyncio

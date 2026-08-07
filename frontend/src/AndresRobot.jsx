@@ -24,6 +24,39 @@ const MEMORY_TYPES = [
 // Keep in sync with backend ChatRequest.message max_length in andres_robot.py.
 const CHAT_MAX_CHARS = 20000;
 
+// V6.2 — limited visual perception. The user may attach ONE picture per turn.
+// We downscale it in the browser (canvas) so the payload stays small and cheap,
+// then send it as a base64 data URL. The backend caps `image` at ~8M chars.
+const IMAGE_MAX_DIM = 1280;         // longest edge after downscale (px)
+const IMAGE_INPUT_MAX_BYTES = 12 * 1024 * 1024; // reject huge originals up-front
+
+// Read a File, downscale to at most IMAGE_MAX_DIM on its longest edge, and return
+// a JPEG data URL. Resolves to null if the file can't be decoded as an image.
+function downscaleImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onerror = () => resolve(null);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => resolve(null);
+      img.onload = () => {
+        const scale = Math.min(1, IMAGE_MAX_DIM / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(null); return; }
+        ctx.drawImage(img, 0, 0, w, h);
+        try { resolve(canvas.toDataURL("image/jpeg", 0.85)); }
+        catch (_) { resolve(null); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // Map the active i18n locale to a BCP-47 tag for browser STT/TTS (mirror hologram).
 function voiceLangFor(lang) {
   const l = String(lang || "").toLowerCase();
@@ -105,6 +138,10 @@ export default function AndresRobot() {
   const [inputError, setInputError] = useState("");
   const [useWeb, setUseWeb] = useState(false);
   const [tiers, setTiers] = useState(null);
+  // V6.2 — one attached picture for the next turn (base64 data URL) + a preview.
+  const [attachedImage, setAttachedImage] = useState(null);
+  const [imageBusy, setImageBusy] = useState(false);
+  const fileInputRef = useRef(null);
 
   // V6.0 — voice via the browser's speech APIs (mic ASR + PC-speaker TTS),
   // disposition-coloured, with a user-chosen tempo. Honest, not theatrical.
@@ -218,11 +255,40 @@ export default function AndresRobot() {
     catch (e) { /* offline */ }
   };
 
+  // V6.2 — the user picked a picture to show him. Validate, downscale in the
+  // browser, and hold it for the next turn. Never uploaded until they press Send.
+  const handlePickImage = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+    if (!file.type || !file.type.startsWith("image/")) {
+      setInputError(t("andresRobotModule.conversation.image.invalidType"));
+      return;
+    }
+    if (file.size > IMAGE_INPUT_MAX_BYTES) {
+      setInputError(t("andresRobotModule.conversation.image.tooLarge"));
+      return;
+    }
+    setImageBusy(true);
+    const dataUrl = await downscaleImage(file);
+    setImageBusy(false);
+    if (!dataUrl) {
+      setInputError(t("andresRobotModule.conversation.image.invalidType"));
+      return;
+    }
+    setInputError("");
+    setAttachedImage(dataUrl);
+  };
+
   const handleSend = async (spoken) => {
     // `spoken` (a string) comes from the mic; otherwise use the text input.
     const fromVoice = typeof spoken === "string";
-    const text = (fromVoice ? spoken : input).trim();
-    if (!text || sending) return;
+    const image = attachedImage;
+    let text = (fromVoice ? spoken : input).trim();
+    // A picture with no words is a valid turn ("look at this"): give it a neutral
+    // default prompt so the backend (message min length 1) still accepts it.
+    if (!text && image) text = t("andresRobotModule.conversation.image.defaultPrompt");
+    if ((!text && !image) || sending) return;
     // Guard the length client-side so a long paste gives a clear message instead
     // of a generic failure (the backend caps the message at CHAT_MAX_CHARS).
     if (text.length > CHAT_MAX_CHARS) {
@@ -232,12 +298,13 @@ export default function AndresRobot() {
       return;
     }
     setInputError("");
-    setMessages((m) => [...m, { role: "you", text }]);
+    setMessages((m) => [...m, { role: "you", text, image }]);
     if (!fromVoice) setInput("");
+    setAttachedImage(null);
     setSending(true);
     try {
-      const res = await andresChat(text, useWeb);
-      setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock, web: res.web }]);
+      const res = await andresChat(text, useWeb, "", image || "");
+      setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock, web: res.web, vision: res.vision }]);
       // V6.0: speak the reply through the PC speakers when voice mode is on.
       if (voiceMode && autoSpeak && tts.supported && res.message) tts.speak(res.message);
     } catch (e) {
@@ -442,8 +509,20 @@ export default function AndresRobot() {
               color: m.role === "you" ? "#fff" : colors.text,
               padding: "10px 14px", borderRadius: 10, whiteSpace: "pre-wrap", lineHeight: 1.5, fontSize: 14,
             }}>
+              {m.image && (
+                <img
+                  src={m.image}
+                  alt={t("andresRobotModule.conversation.image.sentAlt")}
+                  style={{ display: "block", maxWidth: "100%", maxHeight: 220, borderRadius: 8, marginBottom: m.text ? 8 : 0 }}
+                />
+              )}
               {m.text}
             </div>
+            {m.vision && m.vision.reason === "documents_tier_off" && (
+              <div style={{ fontSize: 11, color: "#b45309", fontStyle: "italic", marginTop: 2 }}>
+                🚫 {t("andresRobotModule.conversation.image.tierOffNote")}
+              </div>
+            )}
             {m.isMock && (
               <div style={{ fontSize: 11, color: colors.textSecondary, fontStyle: "italic", marginTop: 2 }}>
                 {t("andresRobotModule.conversation.offlineNote")}
@@ -475,6 +554,25 @@ export default function AndresRobot() {
           </div>
         ))}
       </div>
+      {/* V6.2 — preview of the picture staged for the next turn, with a remove ✕. */}
+      {attachedImage && (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, ...card, padding: 10 }}>
+          <img
+            src={attachedImage}
+            alt={t("andresRobotModule.conversation.image.previewAlt")}
+            style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+          />
+          <span style={{ flex: 1, fontSize: 12, color: colors.textSecondary }}>
+            {t("andresRobotModule.conversation.image.stagedNote")}
+          </span>
+          <button
+            onClick={() => setAttachedImage(null)}
+            style={{ background: "transparent", border: `1px solid ${colors.border}`, borderRadius: 8, color: colors.textSecondary, cursor: "pointer", padding: "6px 10px", fontSize: 13 }}
+          >
+            ✕ {t("andresRobotModule.conversation.image.remove")}
+          </button>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <span
           onClick={() => setUseWeb((w) => !w)}
@@ -490,6 +588,27 @@ export default function AndresRobot() {
           🌐 {t("andresRobotModule.conversation.web.toggle")}
         </span>
         <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handlePickImage}
+          style={{ display: "none" }}
+        />
+        <span
+          onClick={() => !imageBusy && fileInputRef.current && fileInputRef.current.click()}
+          title={t("andresRobotModule.conversation.image.attachHint")}
+          style={{
+            cursor: imageBusy ? "wait" : "pointer", userSelect: "none", padding: "8px 12px", borderRadius: 8,
+            fontSize: 13, whiteSpace: "nowrap",
+            border: `1px solid ${attachedImage ? colors.primary : colors.border}`,
+            background: attachedImage ? colors.primary : "transparent",
+            color: attachedImage ? "#fff" : colors.textSecondary,
+            opacity: imageBusy ? 0.6 : 1,
+          }}
+        >
+          🖼️ {imageBusy ? t("andresRobotModule.conversation.image.processing") : t("andresRobotModule.conversation.image.attach")}
+        </span>
+        <input
           type="text"
           value={input}
           onChange={(e) => { setInput(e.target.value); if (inputError) setInputError(""); }}
@@ -499,8 +618,8 @@ export default function AndresRobot() {
         />
         <button
           onClick={handleSend}
-          disabled={sending || !input.trim()}
-          style={{ background: colors.primary, color: "#fff", border: 0, borderRadius: 8, padding: "12px 20px", fontWeight: 600, cursor: sending || !input.trim() ? "not-allowed" : "pointer", opacity: sending || !input.trim() ? 0.6 : 1 }}
+          disabled={sending || (!input.trim() && !attachedImage)}
+          style={{ background: colors.primary, color: "#fff", border: 0, borderRadius: 8, padding: "12px 20px", fontWeight: 600, cursor: sending || (!input.trim() && !attachedImage) ? "not-allowed" : "pointer", opacity: sending || (!input.trim() && !attachedImage) ? 0.6 : 1 }}
         >
           {sending ? t("andresRobotModule.conversation.sending") : t("andresRobotModule.conversation.send")}
         </button>
