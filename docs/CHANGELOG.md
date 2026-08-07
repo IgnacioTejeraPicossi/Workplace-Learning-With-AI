@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.32.3] - 2026-08-07
+
+### Added — Andrés the Robot · V5-milestone memory seed + live confidence check
+
+- **Live confidence check** (Andrés' request, beyond the green suite): ran the real
+  sandbox and the chat tier matrix by hand. Sandbox: a `while True` skill is
+  process-**killed**; a skill that mutates its input leaves the caller's value
+  untouched (process isolation); global/dunder/`open`/`__import__` blocked. Chat
+  tiers: web off + 🌐 → honest `web_access: disabled` (search not run); internal off
+  → memory/projects not consulted; documents off → a provided document is not
+  injected; each on → the corresponding layer appears. All as designed.
+- **Milestone seed** (`backend/scripts/seed_v5_milestone_memory.py`): at the owner's
+  explicit request, a one-shot, idempotent script that records the V5 closure as a
+  **verified, protected reflective memory** in Andrés' Memory Garden (auto-picks the
+  single Andrés profile, or takes a USER_ID). Run once from the repo root:
+  `python -m backend.scripts.seed_v5_milestone_memory`.
+
+---
+
 ## [1.32.2] - 2026-08-07
 
 ### Hardened — Andrés the Robot · V5 security closers (Andrés' two follow-ups)
