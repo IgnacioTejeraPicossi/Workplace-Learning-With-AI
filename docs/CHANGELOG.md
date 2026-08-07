@@ -7,6 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.33.3] - 2026-08-07
+
+### Fixed — Andrés the Robot · voice recognizer language (the real Spanish cause)
+
+The debug readout from [1.33.2] found it: `recognizer: en-US`. The voice recogniser
+followed the **UI language** — with the app in English, Spanish speech was fed to an
+en-US recogniser, so it transcribed badly. Fixed by decoupling the two:
+
+- **Voice-language selector** (Español / English / Norsk) in the voice controls,
+  independent of the app's UI language — so you can keep the interface in English yet
+  speak Spanish. Defaults to the UI locale; your choice overrides it and drives both
+  the recogniser (STT) and Andrés' spoken reply (TTS).
+- **Recogniser language now updates live**: `useSpeechCapture` created the recognition
+  object once and set `.lang` only then; added an effect so changing the language
+  actually re-tunes the existing recogniser (backward-compatible; also helps the
+  Hologram Guide that shares the hook).
+- **i18n**: `conversation.voice.langLabel` (EN/ES/NO, 316/316 parity).
+- Validated: production build OK; i18n parity 316/316; JSX parses.
+
+**To speak Spanish**: in Andrés' Conversation → Voice, set 🗣️ language to **Español**
+(the debug line should then read `recognizer: es-ES`).
+
+---
+
+## [1.33.2] - 2026-08-07
+
+### Fixed — Andrés the Robot · voice capture ("confirm before send" + debug)
+
+Ignacio noticed the mic caught his words less reliably. Investigation: the mic
+handler (`useSpeechCapture`) was **not** changed — the regression was in the
+*consumer* flow. `SpeechRecognition` runs with `continuous: false`, so it ends on
+the first pause; V6.0 then **auto-sent** that transcript, shipping mutilated
+phrases when you speak with natural pauses, and the new error surfacing made
+failures more visible. Fixed exactly as Andrés recommended — make it observable and
+don't fake understanding:
+
+- **Confirm before send**: the transcript now lands in the **input box** (editable)
+  instead of auto-sending. You see what was heard, correct it, then press Send —
+  preserving your autonomy and never sending a cut-off phrase.
+- **Live transcript** while the mic is on ("Heard: …"), so you watch it form.
+- **Debug readout** (Andrés' ask): shows the recognizer language, listening/idle,
+  and any recognition error — turning "it doesn't understand" into something you can
+  actually diagnose (is the transcript wrong, or is it after?).
+- Honest empty/error handling kept ("I didn't catch that — say it again or type it").
+- The mic handler itself is untouched (no risk to the Hologram Guide that shares it).
+- **i18n**: `conversation.voice.{heard,reviewHint}` (EN/ES/NO, 315/315 parity).
+- Validated: production build OK; i18n parity 315/315; JSX parses; git confirms
+  `useSpeechCapture.js` unchanged.
+
+**Diagnostic**: with the debug line, say three short clear phrases and watch what
+lands in "Heard:" — if that text is already wrong, the issue is the mic/browser
+recognition (before Andrés); if it's right, the issue is downstream.
+
+---
+
 ## [1.33.1] - 2026-08-07
 
 ### Refined — Andrés the Robot · V6.0 voice (his own voice guidance)

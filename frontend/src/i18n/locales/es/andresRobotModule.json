@@ -60,6 +60,9 @@
         "speakOn": "Voz activada",
         "speakOff": "Voz silenciada",
         "micUnsupported": "El micrófono necesita Chrome o Edge.",
+        "heard": "Oí",
+        "langLabel": "Idioma de voz",
+        "reviewHint": "Esto es lo que oí — corrígelo si hace falta y pulsa Enviar.",
         "notUnderstood": "No te he entendido bien. ¿Puedes repetirlo o prefieres escribirlo?",
         "notice": "El micrófono pide permiso; la transcripción puede usar el servicio de voz del navegador; no se guarda audio; una voz no es conciencia. Puedes silenciar o parar cuando quieras.",
         "tempo": {

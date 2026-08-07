@@ -72,6 +72,15 @@ export function useSpeechCapture(options = {}) {
     setError(null);
   };
 
+  // Keep the recognizer's language in sync when `lang` changes (the recognition
+  // object is created once and memoised, so its .lang must be updated here — else
+  // e.g. picking Spanish after it was created would keep transcribing as English).
+  useEffect(() => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.lang = lang; } catch (_) {}
+    }
+  }, [lang]);
+
   useEffect(() => {
     return () => {
       const rec = recognitionRef.current;

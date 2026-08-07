@@ -60,6 +60,9 @@
         "speakOn": "Stemme på",
         "speakOff": "Stemme dempet",
         "micUnsupported": "Mikrofon krever Chrome eller Edge.",
+        "heard": "Hørte",
+        "langLabel": "Talespråk",
+        "reviewHint": "Dette er det jeg hørte — rett det om nødvendig og trykk Send.",
         "notUnderstood": "Jeg oppfattet ikke det. Kan du si det igjen, eller skrive det?",
         "notice": "Mikrofonen ber om tillatelse; transkripsjon kan bruke nettleserens taletjeneste; ingen lyd lagres; en stemme er ikke bevissthet. Du kan dempe eller stoppe når som helst.",
         "tempo": {

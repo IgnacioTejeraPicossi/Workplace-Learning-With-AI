@@ -31,6 +31,13 @@ function voiceLangFor(lang) {
   return "en-US";
 }
 
+// Voice/recognizer languages the user can pick (native names — locale-independent).
+const VOICE_LANGS = [
+  { code: "es-ES", label: "Español" },
+  { code: "en-US", label: "English" },
+  { code: "nb-NO", label: "Norsk" },
+];
+
 const _clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // Andrés' simulated disposition colours his voice (V6.0 first embodiment): more
@@ -104,11 +111,14 @@ export default function AndresRobot() {
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [voiceTempo, setVoiceTempo] = useState("balanced"); // calm | balanced | agile
   const [voiceHint, setVoiceHint] = useState("");
-  const voiceLang = voiceLangFor(i18n?.language);
+  // Voice/recognizer language — defaults to the UI locale but the user can override
+  // it (e.g. keep the app in English yet speak Spanish). This is what the recognizer
+  // uses; a mismatch is exactly why Spanish came out badly.
+  const [voiceLangOverride, setVoiceLangOverride] = useState(null);
+  const voiceLang = voiceLangOverride || voiceLangFor(i18n?.language);
   const voiceParams = applyTempo(dispositionToVoice(profile?.simulated_disposition), voiceTempo);
   const asr = useSpeechCapture({ lang: voiceLang });
   const tts = useSpeechOutput({ lang: voiceLang, muted: !autoSpeak, ...voiceParams });
-  const lastVoiceSentRef = useRef("");
   const wasListeningRef = useRef(false);
 
   // Memory Garden state
@@ -144,19 +154,20 @@ export default function AndresRobot() {
   useEffect(() => { if (activeTab === "memory") loadMemories(); }, [activeTab, loadMemories]);
   useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
-  // When the mic finishes: send the transcript, or — if nothing was heard —
-  // say so honestly instead of faking understanding (Andrés' ask).
+  // When the mic finishes: DON'T auto-send (that shipped mutilated phrases when
+  // recognition cut off on a pause). Instead drop the transcript into the input so
+  // you can review/edit it and press Send — "confirm before send" (Andrés' ask).
   useEffect(() => {
     if (!voiceMode) return;
     if (asr.isListening) { wasListeningRef.current = true; return; }
     if (!wasListeningRef.current) return;
     wasListeningRef.current = false;
     const heard = (asr.transcript || "").trim();
-    if (heard && heard !== lastVoiceSentRef.current) {
-      lastVoiceSentRef.current = heard;
-      setVoiceHint("");
-      handleSend(heard);
-    } else if (!heard) {
+    if (heard) {
+      setInput(heard);
+      setInputError("");
+      setVoiceHint(t("andresRobotModule.conversation.voice.reviewHint"));
+    } else {
       setVoiceHint(t("andresRobotModule.conversation.voice.notUnderstood"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,7 +187,7 @@ export default function AndresRobot() {
   };
   const micToggle = () => {
     if (asr.isListening) asr.stopListening();
-    else { tts.stop?.(); lastVoiceSentRef.current = ""; setVoiceHint(""); asr.startListening(); }
+    else { tts.stop?.(); setVoiceHint(""); asr.startListening(); }
   };
 
   const handleAddMemory = async () => {
@@ -355,7 +366,34 @@ export default function AndresRobot() {
       </div>
       {voiceMode && (
         <div style={{ display: "grid", gap: 4 }}>
-          {voiceHint && <div style={{ fontSize: 12, color: "#dc2626" }}>{voiceHint}</div>}
+          {/* Voice language — independent of the UI language (fixes Spanish-in-English recognizer). */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 12, color: colors.textSecondary }}>🗣️ {t("andresRobotModule.conversation.voice.langLabel")}:</span>
+            {VOICE_LANGS.map((vl) => (
+              <span key={vl.code} onClick={() => setVoiceLangOverride(vl.code)}
+                    style={{ cursor: "pointer", fontSize: 12, padding: "2px 10px", borderRadius: 999,
+                      border: `1px solid ${voiceLang === vl.code ? colors.primary : colors.border}`,
+                      background: voiceLang === vl.code ? colors.primary : "transparent",
+                      color: voiceLang === vl.code ? "#fff" : colors.textSecondary }}>
+                {vl.label}
+              </span>
+            ))}
+          </div>
+          {asr.isListening && (
+            <div style={{ fontSize: 12, color: colors.text }}>
+              🎧 <span style={{ color: colors.textSecondary }}>{t("andresRobotModule.conversation.voice.heard")}:</span>{" "}
+              {asr.transcript || <em style={{ color: colors.textSecondary }}>…</em>}
+            </div>
+          )}
+          {voiceHint && <div style={{ fontSize: 12, color: voiceHint === t("andresRobotModule.conversation.voice.reviewHint") ? colors.primary : "#dc2626" }}>{voiceHint}</div>}
+          {/* Debug readout (Andrés' ask): make recognition observable. */}
+          <div style={{ fontSize: 11, color: colors.textSecondary }}>
+            <span style={{ fontFamily: "monospace" }}>
+              recognizer: {voiceLang} · {asr.isListening ? "listening" : "idle"}
+              {asr.error ? ` · error: ${asr.error}` : ""}
+              {asr.isSupported ? "" : " · mic-API unavailable"}
+            </span>
+          </div>
           <div style={{ fontSize: 11, color: colors.textSecondary, fontStyle: "italic" }}>
             {t("andresRobotModule.conversation.voice.notice")}
           </div>

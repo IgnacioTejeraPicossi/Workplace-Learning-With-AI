@@ -60,6 +60,9 @@
         "speakOn": "Voice on",
         "speakOff": "Voice muted",
         "micUnsupported": "Microphone speech needs Chrome or Edge.",
+        "heard": "Heard",
+        "langLabel": "Voice language",
+        "reviewHint": "Here's what I heard — edit it if needed, then press Send.",
         "notUnderstood": "I didn't catch that. Please say it again, or type it instead.",
         "notice": "The mic asks permission; transcription may use your browser's speech service; no audio is stored; a voice isn't consciousness. You can mute or stop anytime.",
         "tempo": {
