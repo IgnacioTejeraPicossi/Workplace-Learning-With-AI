@@ -49,6 +49,17 @@
           "off": "Svarte fra tidligere kunnskap",
           "disabled": "Nett er av i forskningsnivåene dine"
         }
+      },
+      "voice": {
+        "toggle": "Stemme",
+        "toggleHint": "Snakk med Andrés høyt: mikrofonen din for å snakke, PC-høyttalerne for svaret hans. Stemmen hans gjenspeiler hans simulerte disposisjon.",
+        "tapToSpeak": "Snakk",
+        "listening": "Lytter…",
+        "speaking": "Andrés snakker…",
+        "stop": "stopp",
+        "speakOn": "Stemme på",
+        "speakOff": "Stemme dempet",
+        "micUnsupported": "Mikrofon krever Chrome eller Edge."
       }
     },
     "memory": {

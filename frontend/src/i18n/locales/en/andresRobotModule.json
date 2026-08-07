@@ -49,6 +49,17 @@
           "off": "Answered from prior knowledge",
           "disabled": "Web is off in your research tiers"
         }
+      },
+      "voice": {
+        "toggle": "Voice",
+        "toggleHint": "Talk with Andrés out loud: your mic to speak, your PC speakers for his reply. His voice reflects his simulated disposition.",
+        "tapToSpeak": "Speak",
+        "listening": "Listening…",
+        "speaking": "Andrés is speaking…",
+        "stop": "stop",
+        "speakOn": "Voice on",
+        "speakOff": "Voice muted",
+        "micUnsupported": "Microphone speech needs Chrome or Edge."
       }
     },
     "memory": {

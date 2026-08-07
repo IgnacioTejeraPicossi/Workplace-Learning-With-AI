@@ -49,6 +49,17 @@
           "off": "Respondió con conocimiento previo",
           "disabled": "La web está apagada en tus niveles de investigación"
         }
+      },
+      "voice": {
+        "toggle": "Voz",
+        "toggleHint": "Habla con Andrés en voz alta: tu micro para hablar, los altavoces del PC para su respuesta. Su voz refleja su disposición simulada.",
+        "tapToSpeak": "Hablar",
+        "listening": "Escuchando…",
+        "speaking": "Andrés está hablando…",
+        "stop": "parar",
+        "speakOn": "Voz activada",
+        "speakOff": "Voz silenciada",
+        "micUnsupported": "El micrófono necesita Chrome o Edge."
       }
     },
     "memory": {

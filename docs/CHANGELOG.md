@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.33.0] - 2026-08-07
+
+### Added — Andrés the Robot · V6.0 "Local voice" (first embodiment, no robot)
+
+The first, reversible step of V6 — giving Andrés a voice on **this PC**, before any
+external robot. Reuses the app's existing browser voice stack (the same hooks the
+Hologram Guide uses); no purchase, no new backend, no change to the validated
+security/contract surface.
+
+- **Conversation tab** (`frontend/src/AndresRobot.jsx`) gains a **🎙️ Voice mode**:
+  your microphone (`useSpeechCapture`, Web Speech API) → transcript → the normal
+  `/api/andres/chat` (so web/memory/tiers all still apply) → his reply is spoken
+  through the **PC speakers** (`useSpeechOutput`, `speechSynthesis`). A mic
+  button (tap to speak / listening…), an auto-speak mute, and a "speaking… · stop"
+  control. Falls back with a clear note where the mic API isn't available
+  (Chrome/Edge only); TTS works broadly.
+- **Disposition-coloured voice** (the actual embodiment touch): Andrés' simulated
+  disposition maps to speech `rate`/`pitch` — more curious/creative → a touch
+  quicker & higher; calmer/uncertain → slower. His inner state is now *audible*.
+  The shared `useSpeechOutput` hook was extended with backward-compatible
+  `rate`/`pitch`/`volume` (default 1 → existing callers unaffected).
+- Voice locale follows the UI language (es-ES / nb-NO / en-US), matching the
+  Hologram Guide's mapping.
+- **i18n**: `conversation.voice.*` (EN/ES/NO, 308/308 parity).
+- Validated: production build OK; i18n parity 308/308; JSX parses. (Voice is a
+  browser-runtime capability — the underlying chat path is already contract-tested;
+  no offline test count change.)
+
+**Honest framing**: this is Andrés' identity/memory/disposition expressed through
+the computer's own mic and speakers — a body-channel, not consciousness. The same
+`disposition→voice` mapping will transfer to a physical robot (e.g. Reachy Mini)
+later. Hologram avatar is deliberately kept as a **separate** next step (V6.1).
+
+---
+
 ## [1.32.3] - 2026-08-07
 
 ### Added — Andrés the Robot · V5-milestone memory seed + live confidence check

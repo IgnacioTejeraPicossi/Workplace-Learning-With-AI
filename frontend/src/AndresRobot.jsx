@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "./ThemeContext";
 import {
@@ -6,6 +6,8 @@ import {
   getAndresMemories, createAndresMemory, updateAndresMemory, deleteAndresMemory,
   getAndresResearchTiers, setAndresResearchTiers,
 } from "./api";
+import { useSpeechCapture } from "./components/hologram/useSpeechCapture";
+import { useSpeechOutput } from "./components/hologram/useSpeechOutput";
 import Personality from "./andres-robot/Personality";
 import Projects from "./andres-robot/Projects";
 import Journal from "./andres-robot/Journal";
@@ -20,6 +22,28 @@ const MEMORY_TYPES = [
 
 // Keep in sync with backend ChatRequest.message max_length in andres_robot.py.
 const CHAT_MAX_CHARS = 20000;
+
+// Map the active i18n locale to a BCP-47 tag for browser STT/TTS (mirror hologram).
+function voiceLangFor(lang) {
+  const l = String(lang || "").toLowerCase();
+  if (l.startsWith("no") || l.startsWith("nb")) return "nb-NO";
+  if (l.startsWith("es")) return "es-ES";
+  return "en-US";
+}
+
+const _clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+// Andrés' simulated disposition colours his voice (V6.0 first embodiment): more
+// curious/creative → a touch quicker & higher; calmer/uncertain → a touch slower.
+function dispositionToVoice(d = {}) {
+  const cur = d.curiosity ?? 0.5;
+  const energy = d.creative_energy ?? 0.5;
+  const warmth = d.social_warmth ?? 0.6;
+  const unc = d.uncertainty ?? 0.5;
+  const rate = _clamp(0.95 + ((cur + energy) / 2) * 0.2 - unc * 0.05, 0.8, 1.2);
+  const pitch = _clamp(1.0 + (energy - 0.5) * 0.2 + (warmth - 0.5) * 0.05, 0.8, 1.2);
+  return { rate: Math.round(rate * 100) / 100, pitch: Math.round(pitch * 100) / 100 };
+}
 
 const linkBtn = (colors) => ({
   background: "transparent", border: 0, padding: 0, cursor: "pointer",
@@ -50,7 +74,7 @@ const TABS = [
 ];
 
 export default function AndresRobot() {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState("home");
   const [profile, setProfile] = useState(null);
@@ -62,6 +86,15 @@ export default function AndresRobot() {
   const [inputError, setInputError] = useState("");
   const [useWeb, setUseWeb] = useState(false);
   const [tiers, setTiers] = useState(null);
+
+  // V6.0 — local voice (mic ASR + PC-speaker TTS), disposition-coloured.
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const voiceLang = voiceLangFor(i18n?.language);
+  const voiceParams = dispositionToVoice(profile?.simulated_disposition);
+  const asr = useSpeechCapture({ lang: voiceLang });
+  const tts = useSpeechOutput({ lang: voiceLang, muted: !autoSpeak, ...voiceParams });
+  const lastVoiceSentRef = useRef("");
 
   // Memory Garden state
   const [memories, setMemories] = useState([]);
@@ -96,6 +129,28 @@ export default function AndresRobot() {
   useEffect(() => { if (activeTab === "memory") loadMemories(); }, [activeTab, loadMemories]);
   useEffect(() => { if (activeTab === "safety") loadTiers(); }, [activeTab, loadTiers]);
 
+  // When the mic finishes an utterance (listening stops with a transcript), send it.
+  useEffect(() => {
+    if (!voiceMode || asr.isListening) return;
+    const heard = (asr.transcript || "").trim();
+    if (heard && heard !== lastVoiceSentRef.current) {
+      lastVoiceSentRef.current = heard;
+      handleSend(heard);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asr.isListening, asr.transcript, voiceMode]);
+
+  const toggleVoiceMode = () => {
+    setVoiceMode((on) => {
+      if (on) { asr.stopListening?.(); tts.stop?.(); }
+      return !on;
+    });
+  };
+  const micToggle = () => {
+    if (asr.isListening) asr.stopListening();
+    else { tts.stop?.(); lastVoiceSentRef.current = ""; asr.startListening(); }
+  };
+
   const handleAddMemory = async () => {
     const content = newMem.trim();
     if (!content) return;
@@ -122,8 +177,10 @@ export default function AndresRobot() {
     catch (e) { /* offline */ }
   };
 
-  const handleSend = async () => {
-    const text = input.trim();
+  const handleSend = async (spoken) => {
+    // `spoken` (a string) comes from the mic; otherwise use the text input.
+    const fromVoice = typeof spoken === "string";
+    const text = (fromVoice ? spoken : input).trim();
     if (!text || sending) return;
     // Guard the length client-side so a long paste gives a clear message instead
     // of a generic failure (the backend caps the message at CHAT_MAX_CHARS).
@@ -135,11 +192,13 @@ export default function AndresRobot() {
     }
     setInputError("");
     setMessages((m) => [...m, { role: "you", text }]);
-    setInput("");
+    if (!fromVoice) setInput("");
     setSending(true);
     try {
       const res = await andresChat(text, useWeb);
       setMessages((m) => [...m, { role: "andres", text: res.message, isMock: res.is_mock, web: res.web }]);
+      // V6.0: speak the reply through the PC speakers when voice mode is on.
+      if (voiceMode && autoSpeak && tts.supported && res.message) tts.speak(res.message);
     } catch (e) {
       // A real request failure — NOT an offline model. Don't show the "no AI
       // provider" note (that would be a false culprit); show the length hint if
@@ -209,6 +268,52 @@ export default function AndresRobot() {
 
   const renderConversation = () => (
     <div style={{ display: "grid", gap: 12 }}>
+      {/* V6.0 — local voice controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <span
+          onClick={toggleVoiceMode}
+          title={t("andresRobotModule.conversation.voice.toggleHint")}
+          style={{
+            cursor: "pointer", userSelect: "none", padding: "6px 12px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+            border: `1px solid ${voiceMode ? colors.primary : colors.border}`,
+            background: voiceMode ? colors.primary : "transparent",
+            color: voiceMode ? "#fff" : colors.textSecondary,
+          }}
+        >
+          🎙️ {t("andresRobotModule.conversation.voice.toggle")}
+        </span>
+        {voiceMode && (
+          <>
+            {asr.isSupported ? (
+              <button
+                onClick={micToggle}
+                disabled={sending}
+                style={{
+                  border: 0, borderRadius: 999, padding: "6px 14px", fontWeight: 600, cursor: sending ? "not-allowed" : "pointer",
+                  background: asr.isListening ? "#dc2626" : colors.primaryLight, color: asr.isListening ? "#fff" : colors.primary,
+                }}
+              >
+                {asr.isListening ? "● " + t("andresRobotModule.conversation.voice.listening") : "🎤 " + t("andresRobotModule.conversation.voice.tapToSpeak")}
+              </button>
+            ) : (
+              <span style={{ fontSize: 12, color: colors.textSecondary, fontStyle: "italic" }}>
+                {t("andresRobotModule.conversation.voice.micUnsupported")}
+              </span>
+            )}
+            <span onClick={() => setAutoSpeak((s) => !s)} style={{ cursor: "pointer", fontSize: 12, color: colors.textSecondary }}>
+              {autoSpeak ? "🔊" : "🔇"} {t(autoSpeak ? "andresRobotModule.conversation.voice.speakOn" : "andresRobotModule.conversation.voice.speakOff")}
+            </span>
+            {tts.isSpeaking && (
+              <span style={{ fontSize: 12, color: colors.primary }}>
+                {t("andresRobotModule.conversation.voice.speaking")}
+                <span onClick={tts.stop} style={{ cursor: "pointer", marginLeft: 6, textDecoration: "underline" }}>
+                  {t("andresRobotModule.conversation.voice.stop")}
+                </span>
+              </span>
+            )}
+          </>
+        )}
+      </div>
       <div style={{ ...card, minHeight: 300, maxHeight: 460, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
         {messages.length === 0 && (
           <p style={{ color: colors.textSecondary, fontStyle: "italic", margin: 0 }}>
