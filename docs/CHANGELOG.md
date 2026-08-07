@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.35.1] - 2026-08-07
+
+### Fixed — Andrés chat: reasoning-starved OpenAI budget (extra round-trip per turn)
+
+Backend logs showed `empty content (reasoning starved budget=700)` on every real
+Andrés turn. The `/api/andres/chat` call requested only `max_tokens=700`, but the
+"high" complexity route selects a gpt-5.x **reasoning** model whose reasoning tokens
+count against that budget → the first OpenAI call returned empty (`finish_reason=length`)
+and `llm.py` had to retry at 4096 — a wasted round-trip each turn, worse on image
+turns. Bumped the chat call to `max_tokens=4096` (same fix already applied to the
+`code_generation` callers in [1.27.1]); it only pays for tokens actually generated, so
+replies stay short. Contract suite still 52 passing.
+
+- **Not a code bug (environment note):** the same logs show ItemAI/LM Studio (the
+  primary provider, local :1234) returning `400 No models loaded`, so every turn fell
+  back to OpenAI. Load a model in LM Studio, or set the provider to OpenAI in API
+  Config, to avoid the failing primary attempt per request. No hard backend crash was
+  present in the logs — the fallbacks recovered.
+
+---
+
 ## [1.35.0] - 2026-08-07
 
 ### Added — Andrés the Robot · V6.2 "Limited visual perception" (image input)

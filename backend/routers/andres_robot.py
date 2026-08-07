@@ -278,9 +278,15 @@ async def chat(body: ChatRequest, http_request: Request, user=Depends(_verify_to
     # Real LLM via the unified gateway; degrade gracefully when no key is set.
     try:
         from backend.llm import ask_ai_unified
+        # 4096, not 700: the "high" route picks a gpt-5.x REASONING model whose
+        # reasoning tokens count against the budget. At 700 the first call comes
+        # back EMPTY (finish_reason=length) and llm.py has to retry at 4096 —
+        # one wasted round-trip per turn (and extra latency on image turns). Give
+        # it head-room up front. It only pays for tokens actually generated, so
+        # short replies stay short. Same fix as the code_generation callers [1.27.1].
         result = await ask_ai_unified(
             messages=messages, task_type="andres_chat", complexity="high",
-            max_tokens=700, request_headers=http_request.headers,
+            max_tokens=4096, request_headers=http_request.headers,
         )
     except Exception as e:  # pragma: no cover - defensive
         print(f"⚠️ Andrés chat LLM failed: {e}")
