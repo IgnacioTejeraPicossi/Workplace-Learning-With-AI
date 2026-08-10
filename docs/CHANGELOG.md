@@ -25,6 +25,13 @@ user-facing help for the agent. Added a full guide and wired it into the viewer.
   to the document dropdown. Served via the existing `/api/docs/read?path=&lang=` route
   with the standard `<name>.<lang>.md` localization + English fallback (verified EN/ES/NO
   resolve to their own file, other languages fall back to English).
+- **Discoverability fix**: the viewer's search only scans the *selected* document, so
+  searching "Andrés" while `README.md` was selected found nothing. Added an **Andrés the
+  Robot cross-reference** (Documentation link + a short "Recent Work" section) to
+  `README.md` / `README.es.md` / `README.no.md`, each linking to the guide. Now a search
+  in the default README surfaces it live (README is served fresh by the backend, so this
+  needs **no** frontend rebuild); the dedicated dropdown entry appears after the frontend
+  is rebuilt.
 - Validated: ReadmeViewer JSX parse, all three docs present, localized-path resolution.
 
 ---

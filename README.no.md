@@ -78,10 +78,22 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Hurtigindeks**: [docs/README_INDEX.md](docs/README_INDEX.md) — arkitektur, utrulling, agenter, administrasjon
 - **Autonom bot-sandkasse**: [grocery_bot/README.md](grocery_bot/README.md)
 - **MCP / Postman-testing**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer via MCP eller HTTP
+- **Andrés the Robot** (AI-følgesvenn under utvikling — brukerveiledning): [docs/andres-robot-help.md](docs/andres-robot-help.md)
 
 ---
 
 ## 🔄 Nylig arbeid (2024–2026)
+
+### Andrés the Robot — AI-følgesvenn under utvikling (august 2026)
+
+**Andrés the Robot** (sidemeny → **Future Item Agents → Andrés the Robot**) er en
+AI-følgesvenn under utvikling som bygger en **verifiserbar, reverserbar digital biografi**
+(minne, versjonert identitet, refleksjon, kreativitet, sandkasse-ferdigheter) oppå en
+språkmodell — uttrykkelig **ikke** en påstand om bevissthet. Han snakker via tekst, stemme
+og en valgfri 3D-avatar, og kan se på **ett bilde per melding** (begrenset persepsjon med
+samtykke per runde, styrt av forskningsnivået «Dokumenter»). Alt han husker eller endrer er
+**foreslått → gjennomgått → godkjent av deg**.
+**Brukerveiledning:** [docs/andres-robot-help.md](docs/andres-robot-help.md).
 
 ### Språkagenter — innfødt klonet stemme + muntlig samtale (juli 2026)
 

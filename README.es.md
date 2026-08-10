@@ -78,10 +78,23 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Índice rápido**: [docs/README_INDEX.md](docs/README_INDEX.md) — arquitectura, despliegue, agentes, administración
 - **Sandbox del bot autónomo**: [grocery_bot/README.md](grocery_bot/README.md)
 - **Pruebas MCP / Postman**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer vía MCP o HTTP
+- **Andrés the Robot** (compañero de IA en desarrollo — guía de usuario): [docs/andres-robot-help.md](docs/andres-robot-help.md)
 
 ---
 
 ## 🔄 Trabajo reciente (2024–2026)
+
+### Andrés the Robot — compañero de IA en desarrollo (agosto de 2026)
+
+**Andrés the Robot** (barra lateral → **Future Item Agents → Andrés the Robot**) es un
+compañero de IA en desarrollo que construye una **biografía digital verificable y
+reversible** (memoria, identidad versionada, reflexión, creatividad, habilidades en
+sandbox) sobre un modelo de lenguaje — explícitamente **no** una afirmación de conciencia.
+Habla por texto, voz y un avatar 3D opcional, y puede mirar **una imagen por mensaje**
+(percepción limitada con consentimiento por turno, condicionada por el nivel de
+investigación "Documentos"). Todo lo que recuerda o cambia es **propuesto → revisado →
+aprobado por ti**.
+**Guía de usuario:** [docs/andres-robot-help.md](docs/andres-robot-help.md).
 
 ### Agentes de idiomas — voz nativa clonada + conversación hablada (julio 2026)
 
