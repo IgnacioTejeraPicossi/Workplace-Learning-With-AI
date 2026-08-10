@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.35.2] - 2026-08-10
+
+### Added — Andrés the Robot user guide in the README Viewer
+
+Searching "Andres the robot" in the README Viewer returned nothing — there was no
+user-facing help for the agent. Added a full guide and wired it into the viewer.
+
+- **New docs**: `docs/andres-robot-help.md` (EN) + `.es.md` + `.no.md` — a user guide,
+  not the internal dev plan: honest framing (not conscious; functional states, not
+  emotions), quick start, the Conversation tab (text / voice / avatar / image, incl. how
+  to show a picture and the documents-tier gate), the Memory Garden, Safety & Research
+  Tiers, how Andrés develops (reflection, curiosity, projects, creativity, sandboxed
+  skills, versioned evolution), and an FAQ (consciousness, perception, "no AI provider"
+  message, first-reply latency).
+- **README Viewer** (`frontend/src/ReadmeViewer.jsx`): added `docs/andres-robot-help.md`
+  to the document dropdown. Served via the existing `/api/docs/read?path=&lang=` route
+  with the standard `<name>.<lang>.md` localization + English fallback (verified EN/ES/NO
+  resolve to their own file, other languages fall back to English).
+- Validated: ReadmeViewer JSX parse, all three docs present, localized-path resolution.
+
+---
+
 ## [1.35.1] - 2026-08-07
 
 ### Fixed — Andrés chat: reasoning-starved OpenAI budget (extra round-trip per turn)
