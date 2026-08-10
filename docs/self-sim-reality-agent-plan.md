@@ -241,15 +241,16 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 
 ## 8. Endpoints (V1+)
 
-| Method | Path | Purpose | Version |
-|---|---|---|---|
-| POST | `/api/self-sim-reality/chat` | Main conversational endpoint | V1 |
-| POST | `/api/self-sim-reality/analyze-claim` | Tag + reformulate a strong claim | V2 |
-| POST | `/api/self-sim-reality/source-map` | Return source chunks supporting a topic | V2 |
-| POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison panel | V2 |
-| POST | `/api/self-sim-reality/red-team` | Generate objections to a given claim | V2 |
-| GET | `/api/self-sim-reality/concepts` | The 5 core OPH concepts (V0 has them in i18n) | V1 |
-| GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 |
+| Method | Path | Purpose | Version | Status |
+|---|---|---|---|---|
+| POST | `/api/self-sim-reality/chat` | Main conversational endpoint (structured, epistemically-tagged) | V1 | **DONE 1.36.0** |
+| GET | `/api/self-sim-reality/concepts` | The curated OPH + science knowledge base (12 chunks, each level-tagged) | V1 | **DONE 1.36.0** |
+| GET | `/api/self-sim-reality/health` | Health probe (KB size, LLM availability) | V1 | **DONE 1.36.0** |
+| POST | `/api/claim-analyzer/analyze` | Tag + reformulate a strong claim (shipped under its own prefix) | V2 | DONE 1.18.4 |
+| POST | `/api/self-sim-reality/source-map` | Return source chunks supporting a topic | V2 | Pending |
+| POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison panel | V2 | Pending |
+| POST | `/api/self-sim-reality/red-team` | Generate objections to a given claim | V2 | Pending |
+| GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 | Pending |
 
 ---
 
@@ -535,4 +536,83 @@ this code doesn't need to change.
 
 ---
 
-*Last updated: 2026-07-02 (1.18.4 documents V0+V1+V2+V3 all shipped)*
+## 15. 1.36.0 — V1 "Dialogue" (the conversational agent)
+
+The plan's V1 (§8, §13) — a back-and-forth chat where **every answer is structured
+and tagged by evidence level** — shipped in 1.36.0. It closes the last genuinely
+pending roadmap item (the Claim Analyzer and Playground had already landed as V2/V3
+in 1.18.4).
+
+### 15.1 What it is
+
+A new **💬 Dialogue** tab (after Theory Tour). You ask about observers, minds,
+consciousness, simulation, holography or OPH; the agent answers with a structured,
+per-section epistemically-tagged response — never bare prose that could pass
+speculation off as fact. It preserves the module's core rule: *never "this is true",
+always "this belongs to level X"*, and OPH is always tagged `speculative`.
+
+### 15.2 "RAG" the honest way (RAG-lite)
+
+Rather than clone/scrape the OPH repo at request time (needs infra + network), V1
+grounds answers in a **curated knowledge base** baked into the service — 12 source
+chunks, each carrying its own epistemic level and citations (OPH observer patch,
+self-simulating universe, fixed point, overlap/fact-making pipeline; Rovelli RQM;
+holographic & celestial holography; Friston FEP; Tononi IIT; Dehaene GNW; Bostrom;
+AI-as-observer). A deterministic **keyword-overlap retriever** selects the most
+relevant chunks per turn and injects them as a grounding block. This is the same
+"RAG-lite" pattern used elsewhere in the repo (Andrés memory recall, claim_analyzer);
+a vector store is the documented upgrade seam for V1.5, not a requirement now.
+
+### 15.3 Response contract
+
+The LLM returns JSON, sanitized before it leaves the backend (off-palette levels are
+clamped to `speculative`, all keys backfilled):
+
+```json
+{
+  "short_answer": "one plain-language paragraph",
+  "sections": [
+    {"kind": "scientific_grounding|speculative_extension|oph_interpretation",
+     "level": "established|mainstream|speculative|philosophy|metaphor",
+     "text": "2-4 sentences", "sources": ["…"]}
+  ],
+  "objections": ["red-team critique", "…"],
+  "safer_reformulation": "only when the question contained an over-claim",
+  "suggested_next_question": "one good follow-up",
+  "sources_consulted": ["…"],
+  "is_mock": false
+}
+```
+
+The system prompt also forces the agent to flag the classic conflation — "observer"
+as a physical measuring system (physics) vs "observer" as a conscious mind
+(philosophy) — whenever it appears.
+
+### 15.4 Files
+
+- Backend service `backend/services/self_sim_reality_chat.py` — `KNOWLEDGE_BASE`,
+  `retrieve()`, `_system_prompt(lang)`, `answer()`, `concepts()`, `health()`;
+  trilingual mock keeps the tab alive offline (`is_mock=True`).
+- Backend router `backend/routers/self_sim_reality.py` (prefix
+  `/api/self-sim-reality`) — `POST /chat`, `GET /concepts`, `GET /health`;
+  Pydantic-validated (`lang ∈ {en,es,no}`, message ≤ 4000, optional `history`).
+  Registered in `backend/app.py`.
+- Frontend `frontend/src/self-sim-reality/Dialogue.jsx` + wired into
+  `SelfSimRealityAgent.jsx` as the `dialogue` tab. Direct `fetch` to the API
+  (ClaimAnalyzer pattern), per-section `EpistemicBadge`, objections / reformulation /
+  sources panels, clickable suggested-next-question, seed examples, discipline banner.
+- i18n `selfSimReality.dialogue.*` + `tabs.dialogue` EN/ES/NO (parity 423×3).
+- Tests `backend/tests/test_self_sim_reality_chat.py` (6 offline: retrieval
+  determinism + grounding fallback, structured+tagged mock, real-JSON sanitize/clamp,
+  request validation, concepts endpoint).
+
+### 15.5 Roadmap state after 1.36.0
+
+V0 (reading material), V1 (Dialogue chat), plus the already-shipped V2 Claim Analyzer
+and V3 Playground/Theory Map are all live. Genuinely pending: real RAG / vector store
+over the OPH repo, and the source-map / compare-theories / red-team / learning-path
+endpoints (§8).
+
+---
+
+*Last updated: 2026-08-10 (1.36.0 — V1 "Dialogue" conversational agent shipped)*
