@@ -1257,6 +1257,7 @@
       "concepts": "Conceptos clave",
       "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
+      "dialogue": "Diálogo",
       "wiphySearch": "Buscador WiPhy",
       "claimAnalyzer": "Analizador de afirmaciones",
       "playground": "Playground",
@@ -1264,6 +1265,35 @@
       "substrateQuestion": "La pregunta del sustrato",
       "codeOfReality": "El Código de la Realidad",
       "roadmap": "Hoja de ruta y fuentes"
+    },
+    "dialogue": {
+      "title": "Diálogo con el agente",
+      "subtitle": "Pregunta sobre observadores, mentes, consciencia, simulación, holografía u OPH. Cada respuesta se ancla en fuentes curadas y se etiqueta por nivel de evidencia — el agente nunca dice «esto es verdad», dice «esto pertenece al nivel X».",
+      "emptyHint": "Empieza con una pregunta o prueba una de estas:",
+      "placeholder": "Pregunta sobre observadores, consciencia, simulación, OPH…",
+      "send": "Enviar",
+      "thinking": "Anclando la respuesta y clasificando por nivel de evidencia…",
+      "you": "Tú",
+      "agent": "Agente",
+      "objections": "Objeciones (red-team)",
+      "reformulation": "Reformulación honesta",
+      "sourcesConsulted": "Fuentes consultadas",
+      "disclaimer": "Este es un compañero con disciplina epistémica, no un oráculo. Las respuestas se anclan en una base de conocimiento curada (OPH + ciencia establecida + filosofía) y cada parte se etiqueta por nivel de evidencia. Las teorías especulativas (como OPH) siempre se marcan como especulativas — nunca se presentan como hecho establecido.",
+      "sectionKinds": {
+        "scientific_grounding": "Anclaje científico",
+        "speculative_extension": "Extensión especulativa",
+        "oph_interpretation": "Interpretación OPH"
+      },
+      "examples": {
+        "observer": "¿El observador crea la realidad en la mecánica cuántica?",
+        "simulation": "¿Vivimos en una simulación?",
+        "fixedPoint": "¿Qué significa en OPH que «la realidad es un punto fijo»?",
+        "ai": "¿Podría una IA ser un parche de observador?"
+      },
+      "errors": {
+        "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
+        "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."
+      }
     },
     "overview": {
       "missionTitle": "Misión",
@@ -1589,10 +1619,10 @@
       }
     },
     "roadmap": {
-      "intro": "V0 entrega el material de lectura. El agente completo (RAG + Mongo + clasificador epistémico + analizador de afirmaciones + red‑team) llega en V1+.",
+      "intro": "V0 entregó el material de lectura; V1 añade el agente conversacional. El Analizador de afirmaciones y el Playground (V2–V3) ya están operativos también.",
       "phases": {
-        "v0": "V0 (ahora) — Pestañas con contenido curado, etiquetas epistémicas, conceptos derivados de capturas, experimentos mentales IA‑como‑observador",
-        "v1": "V1 — Backend RAG sobre repo OPH + Bostrom + Rovelli + Friston + fuentes IIT/GNW. Endpoint POST /chat con respuestas etiquetadas epistémicamente",
+        "v0": "✓ V0 — Pestañas con contenido curado, etiquetas epistémicas, conceptos derivados de capturas, experimentos mentales IA‑como‑observador",
+        "v1": "✓ V1 (ahora) — Agente conversacional operativo en la pestaña Diálogo: POST /chat anclado en una base de conocimiento curada OPH + ciencia (RAG‑lite), cada respuesta etiquetada por nivel de evidencia",
         "v2": "V2 — Analizador de afirmaciones: pega una afirmación fuerte, obtén su núcleo científico + sobre‑extensión + reformulación recomendada",
         "v3": "V3 — Mapa de teorías (grafo interactivo) + simulador de Parche de Observador (juguete pequeño que muestra emergencia de consenso)"
       },

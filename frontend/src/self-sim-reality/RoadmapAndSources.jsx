@@ -36,14 +36,20 @@ export default function RoadmapAndSources() {
         <h3 style={panelTitle}>🗺️ {t('selfSimReality.tabs.roadmap')}</h3>
         <p style={{ ...subtle, margin: '0 0 14px' }}>{t('selfSimReality.roadmap.intro')}</p>
         <ol style={{ margin: 0, paddingLeft: 22, display: 'grid', gap: 8 }}>
-          {PHASES.map((p, i) => (
-            <li key={p} style={{
-              fontSize: 13, color: i === 0 ? '#047857' : '#475569',
-              fontWeight: i === 0 ? 600 : 400, lineHeight: 1.5,
-            }}>
-              {t(`selfSimReality.roadmap.phases.${p}`)}
-            </li>
-          ))}
+          {PHASES.map((p, i) => {
+            // V1 (the conversational agent) is now shipped; phases up to and
+            // including it read as done (green), V1 highlighted as the newest.
+            const CURRENT_INDEX = 1;
+            const done = i <= CURRENT_INDEX;
+            return (
+              <li key={p} style={{
+                fontSize: 13, color: done ? '#047857' : '#475569',
+                fontWeight: i === CURRENT_INDEX ? 600 : 400, lineHeight: 1.5,
+              }}>
+                {t(`selfSimReality.roadmap.phases.${p}`)}
+              </li>
+            );
+          })}
         </ol>
       </div>
 

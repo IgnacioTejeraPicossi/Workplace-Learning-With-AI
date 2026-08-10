@@ -580,6 +580,7 @@
       "concepts": "Kjernebegreper",
       "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
+      "dialogue": "Dialog",
       "wiphySearch": "WiPhy‑søk",
       "claimAnalyzer": "Påstandsanalyse",
       "playground": "Lekeplass",
@@ -587,6 +588,35 @@
       "substrateQuestion": "Substrat‑spørsmålet",
       "codeOfReality": "Virkelighetens kode",
       "roadmap": "Veikart og kilder"
+    },
+    "dialogue": {
+      "title": "Dialog med agenten",
+      "subtitle": "Spør om observatører, sinn, bevissthet, simulering, holografi eller OPH. Hvert svar er forankret i kuraterte kilder og merket etter evidensnivå — agenten sier aldri «dette er sant», den sier «dette hører til nivå X».",
+      "emptyHint": "Start med et spørsmål, eller prøv ett av disse:",
+      "placeholder": "Spør om observatører, bevissthet, simulering, OPH…",
+      "send": "Send",
+      "thinking": "Forankrer svaret og klassifiserer etter evidensnivå…",
+      "you": "Du",
+      "agent": "Agent",
+      "objections": "Innvendinger (red-team)",
+      "reformulation": "Ærlig omformulering",
+      "sourcesConsulted": "Kilder brukt",
+      "disclaimer": "Dette er en epistemisk disiplinert følgesvenn, ikke et orakel. Svarene er forankret i en kuratert kunnskapsbase (OPH + etablert vitenskap + filosofi), og hver del er merket etter evidensnivå. Spekulative teorier (som OPH) merkes alltid som spekulative — aldri presentert som etablert faktum.",
+      "sectionKinds": {
+        "scientific_grounding": "Vitenskapelig forankring",
+        "speculative_extension": "Spekulativ utvidelse",
+        "oph_interpretation": "OPH-tolkning"
+      },
+      "examples": {
+        "observer": "Skaper observatøren virkeligheten i kvantemekanikk?",
+        "simulation": "Lever vi i en simulering?",
+        "fixedPoint": "Hva mener OPH med at «virkeligheten er et fikspunkt»?",
+        "ai": "Kan en KI være en observatørflekk?"
+      },
+      "errors": {
+        "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
+        "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
+      }
     },
     "overview": {
       "missionTitle": "Oppdrag",
@@ -912,10 +942,10 @@
       }
     },
     "roadmap": {
-      "intro": "V0 leverer lesematerialet. Den fulle agenten (RAG + Mongo + epistemisk klassifiserer + påstand‑analysator + red‑team) kommer i V1+.",
+      "intro": "V0 leverte lesematerialet; V1 legger til den samtalebaserte agenten. Påstandsanalysatoren og Lekeplassen (V2–V3) er også allerede i drift.",
       "phases": {
-        "v0": "V0 (nå) — Faner med kuratert innhold, epistemiske etiketter, skjermbilde‑avledede begreper, KI‑som‑observatør‑tankeeksperimenter",
-        "v1": "V1 — Backend RAG over OPH‑repo + Bostrom + Rovelli + Friston + IIT/GNW‑kilder. POST /chat‑endepunkt med epistemisk‑merkede svar",
+        "v0": "✓ V0 — Faner med kuratert innhold, epistemiske etiketter, skjermbilde‑avledede begreper, KI‑som‑observatør‑tankeeksperimenter",
+        "v1": "✓ V1 (nå) — Samtalebasert agent i drift i Dialog‑fanen: POST /chat forankret i en kuratert OPH + vitenskap‑kunnskapsbase (RAG‑lite), hvert svar merket etter evidensnivå",
         "v2": "V2 — Påstand‑analysator: lim inn en sterk påstand, få dens vitenskapelige kjerne + overdrivelse + anbefalt omformulering",
         "v3": "V3 — Teorikart (interaktiv graf) + Observer Patch‑simulator (lite leketøy som viser konsensus‑fremvekst)"
       },

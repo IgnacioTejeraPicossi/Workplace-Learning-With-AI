@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overview from './self-sim-reality/Overview';
+import Dialogue from './self-sim-reality/Dialogue';
 import CoreConcepts from './self-sim-reality/CoreConcepts';
 import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
@@ -69,6 +70,7 @@ const SelfSimRealityAgent = () => {
     { id: 'concepts',          label: t('selfSimReality.tabs.concepts'),          icon: '📚' },
     { id: 'ophMechanics',      label: t('selfSimReality.tabs.ophMechanics'),      icon: '⚙️' },
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
+    { id: 'dialogue',          label: t('selfSimReality.tabs.dialogue'),          icon: '💬' },
     { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
     { id: 'claimAnalyzer',     label: t('selfSimReality.tabs.claimAnalyzer'),     icon: '🔬' },
     { id: 'playground',        label: t('selfSimReality.tabs.playground'),        icon: '🎨' },
@@ -84,6 +86,7 @@ const SelfSimRealityAgent = () => {
       case 'concepts':          return <CoreConcepts />;
       case 'ophMechanics':      return <OphMechanics />;
       case 'theoryTour':        return <TheoryTour scrollTarget={theoryTarget} />;
+      case 'dialogue':          return <Dialogue />;
       case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
       case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} prefillClaim={claimPrefill.text} prefillNonce={claimPrefill.nonce} />;
       case 'playground':        return <Playground />;

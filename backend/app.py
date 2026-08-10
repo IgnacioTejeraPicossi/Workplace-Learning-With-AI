@@ -256,6 +256,14 @@ try:
 except Exception as e:
     print(f"❌ Error including Claim Analyzer router: {e}")
 
+# Self-Simulating Reality Agent — conversational chat (V1)
+try:
+    from backend.routers.self_sim_reality import router as self_sim_reality_router
+    app.include_router(self_sim_reality_router, tags=["Self-Simulating Reality"])
+    print("✅ Self-Simulating Reality router included successfully")
+except Exception as e:
+    print(f"❌ Error including Self-Simulating Reality router: {e}")
+
 try:
     from backend.routers.self_correcting_loop import router as self_correcting_loop_router
     app.include_router(self_correcting_loop_router, tags=["Self-Correcting Loop"])

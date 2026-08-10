@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.36.0] - 2026-08-10
+
+### Added — Self-Simulating Reality Agent · V1 "Dialogue" (conversational, epistemically-tagged)
+
+The one piece the roadmap still marked pending: a **conversational agent** where
+**every answer is structured and tagged by evidence level** — never bare prose that
+could pass speculation off as fact.
+
+- **Backend service** `backend/services/self_sim_reality_chat.py`: a curated OPH +
+  science **knowledge base** (12 chunks, each with its epistemic level + citations),
+  retrieved by keyword overlap ("RAG-lite" — same pattern as Andrés memory recall and
+  the claim analyzer; a vector store is the later upgrade seam, not required now). The
+  system prompt enforces the module's rule — never "this is true", always "this belongs
+  to level X"; OPH is always `speculative`; flags the observer-as-device vs
+  observer-as-mind conflation. Structured JSON out: `short_answer`, `sections[]`
+  (scientific_grounding / speculative_extension / oph_interpretation, each level-tagged),
+  `objections[]` (red-team), `safer_reformulation`, `suggested_next_question`. Off-palette
+  levels are clamped. Trilingual mock keeps the tab alive offline (`is_mock`).
+- **Backend router** `backend/routers/self_sim_reality.py` (registered in `app.py`):
+  `POST /api/self-sim-reality/chat` (message + lang + optional history),
+  `GET /concepts` (the curated KB), `GET /health`. Pydantic-validated (`lang ∈ {en,es,no}`,
+  message ≤ 4000).
+- **Frontend** `self-sim-reality/Dialogue.jsx` + new **💬 Dialogue** tab in the shell
+  (after Theory Tour). Chat UI with per-section `EpistemicBadge`, red-team objections,
+  honest reformulation, sources consulted, clickable suggested-next-question, seed
+  examples, and a discipline reminder. Direct `fetch` (same pattern as ClaimAnalyzer).
+- **Roadmap** tab + status now show V1 as shipped (Dialogue live). **i18n** EN/ES/NO
+  parity (selfSimReality 423/423). **Tests**: `backend/tests/test_self_sim_reality_chat.py`
+  (6 offline — retrieval determinism, structured+tagged mock, JSON sanitize/clamp,
+  validation, concepts). Validated: backend compile + live LLM smoke (real tagged answer),
+  JSX parse, i18n parity, production build (exit 0).
+
+---
+
 ## [1.35.2] - 2026-08-10
 
 ### Added — Andrés the Robot user guide in the README Viewer

@@ -289,6 +289,7 @@
       "concepts": "Core Concepts",
       "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
+      "dialogue": "Dialogue",
       "wiphySearch": "WiPhy Search",
       "claimAnalyzer": "Claim Analyzer",
       "playground": "Playground",
@@ -296,6 +297,35 @@
       "substrateQuestion": "The Substrate Question",
       "codeOfReality": "The Code of Reality",
       "roadmap": "Roadmap & Sources"
+    },
+    "dialogue": {
+      "title": "Dialogue with the agent",
+      "subtitle": "Ask about observers, minds, consciousness, simulation, holography or OPH. Every answer is grounded in curated sources and tagged by evidence level — the agent never says 'this is true', it says 'this belongs to level X'.",
+      "emptyHint": "Start with a question, or try one of these:",
+      "placeholder": "Ask about observers, consciousness, simulation, OPH…",
+      "send": "Send",
+      "thinking": "Grounding the answer and classifying by evidence level…",
+      "you": "You",
+      "agent": "Agent",
+      "objections": "Objections (red-team)",
+      "reformulation": "Honest reformulation",
+      "sourcesConsulted": "Sources consulted",
+      "disclaimer": "This is an epistemically-disciplined companion, not an oracle. Answers are grounded in a curated knowledge base (OPH + mainstream science + philosophy) and every part is tagged by evidence level. Speculative theories (like OPH) are always labelled speculative — never presented as established fact.",
+      "sectionKinds": {
+        "scientific_grounding": "Scientific grounding",
+        "speculative_extension": "Speculative extension",
+        "oph_interpretation": "OPH interpretation"
+      },
+      "examples": {
+        "observer": "Does the observer create reality in quantum mechanics?",
+        "simulation": "Are we living in a simulation?",
+        "fixedPoint": "What does OPH mean by 'reality is a fixed point'?",
+        "ai": "Could an AI be an observer patch?"
+      },
+      "errors": {
+        "http": "The server returned an error (HTTP {{status}}). Please try again.",
+        "network": "Couldn't reach the agent. Check that the backend is running."
+      }
     },
     "overview": {
       "missionTitle": "Mission",
@@ -621,10 +651,10 @@
       }
     },
     "roadmap": {
-      "intro": "V0 ships the reading material. The full agent (RAG + Mongo + epistemic classifier + claim analyzer + red-team) arrives in V1+.",
+      "intro": "V0 shipped the reading material; V1 adds the conversational agent. The Claim Analyzer and Playground (V2–V3) are already live too.",
       "phases": {
-        "v0": "V0 (now) — Tabs with curated content, epistemic tags, screenshot-derived concepts, AI-as-observer thought experiments",
-        "v1": "V1 — Backend RAG over OPH repo + Bostrom + Rovelli + Friston + IIT/GNW sources. POST /chat endpoint with epistemic-tagged answers",
+        "v0": "✓ V0 — Tabs with curated content, epistemic tags, screenshot-derived concepts, AI-as-observer thought experiments",
+        "v1": "✓ V1 (now) — Conversational agent live in the Dialogue tab: POST /chat grounded in a curated OPH + science knowledge base (RAG-lite), every answer tagged by evidence level",
         "v2": "V2 — Claim Analyzer: paste a strong claim, get its scientific core + overreach + recommended reformulation",
         "v3": "V3 — Theory Map (interactive graph) + Observer Patch simulator (small toy showing consensus emergence)"
       },
