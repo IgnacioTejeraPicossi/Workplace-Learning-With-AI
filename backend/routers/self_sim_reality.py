@@ -15,8 +15,10 @@ from typing import Any, Dict, List, Optional
 
 try:
     from backend.services.self_sim_reality_chat import answer, concepts, health
+    from backend.services import self_sim_reality_vectorstore as vectorstore
 except ImportError:  # pragma: no cover
     from services.self_sim_reality_chat import answer, concepts, health  # type: ignore
+    from services import self_sim_reality_vectorstore as vectorstore  # type: ignore
 
 router = APIRouter(prefix="/api/self-sim-reality")
 
@@ -50,3 +52,21 @@ def concepts_endpoint() -> Dict[str, Any]:
 async def chat_endpoint(body: ChatRequest) -> Dict[str, Any]:
     hist = [t.model_dump() for t in body.history] if body.history else None
     return await answer(body.message, body.lang, hist)
+
+
+class SourceMapRequest(BaseModel):
+    topic: str = Field(..., min_length=1, max_length=500,
+                       description="A topic or question to map to source chunks")
+    k: int = Field(5, ge=1, le=12, description="How many sources to return")
+    backend: str = Field("auto", pattern=r"^(auto|embeddings|tfidf)$")
+
+
+@router.get("/vectorstore/health", summary="Vector store health (backend, KB size)")
+def vectorstore_health() -> Dict[str, Any]:
+    return vectorstore.health()
+
+
+@router.post("/source-map", summary="Map a topic to ranked, epistemically-tagged sources")
+def source_map_endpoint(body: SourceMapRequest) -> Dict[str, Any]:
+    res = vectorstore.search(body.topic, k=body.k, backend=body.backend)
+    return {"topic": body.topic, **res}

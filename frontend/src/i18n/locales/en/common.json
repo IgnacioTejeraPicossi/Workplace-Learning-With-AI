@@ -290,6 +290,7 @@
       "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
       "dialogue": "Dialogue",
+      "sourceMap": "Source Map",
       "wiphySearch": "WiPhy Search",
       "claimAnalyzer": "Claim Analyzer",
       "playground": "Playground",
@@ -325,6 +326,30 @@
       "errors": {
         "http": "The server returned an error (HTTP {{status}}). Please try again.",
         "network": "Couldn't reach the agent. Check that the backend is running."
+      }
+    },
+    "sourceMap": {
+      "title": "Source Map",
+      "subtitle": "Type a topic and get the most relevant sources from the curated OPH + science knowledge base, ranked by a real vector store and each tagged by evidence level. No AI answer — just retrieval, so it's fast and honest.",
+      "placeholder": "A topic or question, e.g. 'the observer effect' or 'is reality a fixed point?'",
+      "mapBtn": "Map sources",
+      "mapping": "Searching…",
+      "foundCount": "{{count}} sources ranked by relevance",
+      "relevance": "relevance",
+      "backend": {
+        "embeddings": "Semantic (embeddings)",
+        "tfidf": "Keyword (TF-IDF)"
+      },
+      "examples": {
+        "observer": "The observer effect in quantum mechanics",
+        "simulation": "Are we living in a simulation?",
+        "time": "Where does subjective time come from?",
+        "ai": "Can an AI be an observer?"
+      },
+      "disclaimer": "This maps a topic to curated sources by vector similarity — it does not judge truth. Each source keeps its evidence level (OPH is always speculative). The semantic backend (embeddings) finds paraphrases with no shared words; offline it falls back to keyword (TF-IDF) matching.",
+      "errors": {
+        "http": "The server returned an error (HTTP {{status}}). Please try again.",
+        "network": "Couldn't reach the vector store. Check that the backend is running."
       }
     },
     "overview": {

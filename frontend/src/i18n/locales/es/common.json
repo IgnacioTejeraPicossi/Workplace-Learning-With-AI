@@ -1258,6 +1258,7 @@
       "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
       "dialogue": "Diálogo",
+      "sourceMap": "Mapa de fuentes",
       "wiphySearch": "Buscador WiPhy",
       "claimAnalyzer": "Analizador de afirmaciones",
       "playground": "Playground",
@@ -1293,6 +1294,30 @@
       "errors": {
         "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
         "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."
+      }
+    },
+    "sourceMap": {
+      "title": "Mapa de fuentes",
+      "subtitle": "Escribe un tema y obtén las fuentes más relevantes de la base de conocimiento curada OPH + ciencia, ordenadas por un vector store real y cada una etiquetada por nivel de evidencia. Sin respuesta de IA — solo recuperación, así que es rápido y honesto.",
+      "placeholder": "Un tema o pregunta, p. ej. «el efecto del observador» o «¿es la realidad un punto fijo?»",
+      "mapBtn": "Mapear fuentes",
+      "mapping": "Buscando…",
+      "foundCount": "{{count}} fuentes ordenadas por relevancia",
+      "relevance": "relevancia",
+      "backend": {
+        "embeddings": "Semántico (embeddings)",
+        "tfidf": "Palabras clave (TF-IDF)"
+      },
+      "examples": {
+        "observer": "El efecto del observador en la mecánica cuántica",
+        "simulation": "¿Vivimos en una simulación?",
+        "time": "¿De dónde viene el tiempo subjetivo?",
+        "ai": "¿Puede una IA ser un observador?"
+      },
+      "disclaimer": "Esto mapea un tema a fuentes curadas por similitud vectorial — no juzga la verdad. Cada fuente conserva su nivel de evidencia (OPH siempre es especulativo). El backend semántico (embeddings) encuentra paráfrasis sin palabras compartidas; offline recurre a coincidencia por palabras clave (TF-IDF).",
+      "errors": {
+        "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
+        "network": "No se pudo contactar con el vector store. Comprueba que el backend esté en marcha."
       }
     },
     "overview": {

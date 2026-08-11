@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.37.0] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent · V2 "real vector store + Source Map"
+
+Upgrades the V1 "RAG-lite" keyword retriever to a **real vector store** (cosine
+similarity over vectors) and adds a **Source Map** tool that maps a topic to ranked,
+epistemically-tagged sources.
+
+- **Vector store** `backend/services/self_sim_reality_vectorstore.py` — two pluggable
+  backends over the curated 12-chunk KB:
+  - **embeddings** — dense semantic vectors via OpenAI `text-embedding-3-small`, cached
+    per KB content-hash. Real semantic recall: the paraphrase *"is everything around me
+    maybe just a dream?"* (no shared keywords) retrieves the fixed-point / self-simulating
+    chunks. Used when a key is available.
+  - **tfidf** — sparse TF-IDF vectors + cosine, pure-Python, deterministic and offline.
+    A genuine vector store (no deps), used as fallback and by the test-suite.
+  Any embeddings failure degrades gracefully to TF-IDF; never raises. `search(query, k,
+  backend)` returns ranked chunks + which backend answered.
+- **Endpoints** (`backend/routers/self_sim_reality.py`): `POST /api/self-sim-reality/source-map`
+  (topic → ranked sources with level + score + backend; no LLM, so fast/cheap/offline),
+  `GET /vectorstore/health`. Validated (`topic` 1–500, `k` 1–12, `backend ∈ {auto,embeddings,tfidf}`).
+- **Chat retrieval** now routes through the vector store (TF-IDF backend — deterministic
+  and free per turn; embeddings reserved for Source Map), keeping the OPH-core fallback.
+- **Frontend** `self-sim-reality/SourceMap.jsx` + new **🗂️ Source Map** tab (after Dialogue).
+  Topic input + examples → source cards with `EpistemicBadge`, a relevance bar, source
+  citations, and an honest badge showing whether the **semantic (embeddings)** or **keyword
+  (TF-IDF)** backend answered.
+- i18n EN/ES/NO parity (selfSimReality 440/440). **Tests**
+  `backend/tests/test_self_sim_reality_vectorstore.py` (7 offline — TF-IDF ranking,
+  simulation topic, empty-on-no-overlap, health, source-map endpoint with embeddings forced
+  off, validation, vectorstore health). Verified live: embeddings backend retrieves
+  keyword-free paraphrases. Backend compile, JSX parse, i18n parity, production build (exit 0).
+
+---
+
 ## [1.36.1] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent user guide in the README Viewer

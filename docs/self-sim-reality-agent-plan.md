@@ -247,7 +247,8 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 | GET | `/api/self-sim-reality/concepts` | The curated OPH + science knowledge base (12 chunks, each level-tagged) | V1 | **DONE 1.36.0** |
 | GET | `/api/self-sim-reality/health` | Health probe (KB size, LLM availability) | V1 | **DONE 1.36.0** |
 | POST | `/api/claim-analyzer/analyze` | Tag + reformulate a strong claim (shipped under its own prefix) | V2 | DONE 1.18.4 |
-| POST | `/api/self-sim-reality/source-map` | Return source chunks supporting a topic | V2 | Pending |
+| POST | `/api/self-sim-reality/source-map` | Return ranked source chunks (real vector store) for a topic | V2 | **DONE 1.37.0** |
+| GET | `/api/self-sim-reality/vectorstore/health` | Vector store health (backend, KB size) | V2 | **DONE 1.37.0** |
 | POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison panel | V2 | Pending |
 | POST | `/api/self-sim-reality/red-team` | Generate objections to a given claim | V2 | Pending |
 | GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 | Pending |
@@ -615,4 +616,58 @@ endpoints (§8).
 
 ---
 
-*Last updated: 2026-08-10 (1.36.0 — V1 "Dialogue" conversational agent shipped)*
+## 16. 1.37.0 — V2 "real vector store + Source Map"
+
+V1 grounded answers with a keyword-count retriever ("RAG-lite"). V2 replaces that with a
+**real vector store** — cosine similarity over vectors — and exposes it as a **Source Map**
+tool (plan §8: "topic → list of relevant chunks with epistemic colour").
+
+### 16.1 The vector store (`backend/services/self_sim_reality_vectorstore.py`)
+
+Two pluggable backends over the curated 12-chunk KB, chosen automatically:
+
+- **embeddings** — dense semantic vectors via OpenAI `text-embedding-3-small`, cached per
+  KB content-hash (the KB is embedded once). Real semantic recall: a paraphrase with **no
+  shared keywords** (e.g. *"is everything around me maybe just a dream?"*) still retrieves
+  the fixed-point / self-simulating chunks. Used when an OpenAI key is available.
+- **tfidf** — sparse TF-IDF vectors + cosine, pure-Python, **deterministic and offline**. A
+  genuine vector store with no external dependency; used as the fallback and by the offline
+  test-suite.
+
+`search(query, k, backend="auto"|"embeddings"|"tfidf")` returns ranked chunks (id, title,
+level, claim, sources, tags, **score**) plus which backend answered. Any embeddings failure
+degrades to TF-IDF; the store never raises.
+
+### 16.2 Where it is used
+
+- **Source Map** (`POST /api/self-sim-reality/source-map`) uses `backend="auto"` → the best
+  semantic recall online, deterministic offline. No LLM in the loop, so it is fast, cheap and
+  always available. Frontend tab `🗂️ Source Map` renders ranked source cards with an
+  `EpistemicBadge`, a relevance bar, citations, and an honest "semantic vs keyword" badge.
+- **Dialogue retrieval** now routes grounding through the vector store with `backend="tfidf"`
+  (deterministic, no per-turn embedding cost/latency), keeping the OPH-core fallback.
+
+### 16.3 Why not a hosted vector DB?
+
+For a 12-chunk KB an in-process store (dense embeddings + cosine, or TF-IDF) is the right
+size — no server, no schema migration, and the offline path stays deterministic for CI. When
+the KB grows (real OPH-repo ingestion), the seam to swap in a persistent/ANN index (e.g. a
+Mongo vector index or FAISS) is `vectorstore.search()`; nothing else changes.
+
+### 16.4 Files & tests
+
+- Service `self_sim_reality_vectorstore.py`; router adds `POST /source-map` +
+  `GET /vectorstore/health`; chat `retrieve()` re-routed through it.
+- Frontend `self-sim-reality/SourceMap.jsx` + `sourceMap` tab; i18n `selfSimReality.sourceMap.*`
+  EN/ES/NO (parity 440×3).
+- Tests `backend/tests/test_self_sim_reality_vectorstore.py` (7 offline, embeddings forced off
+  for determinism).
+
+### 16.5 Still pending
+
+`compare-theories` and `red-team` endpoints (§8), a persistent/ANN index if the KB grows, and
+real OPH-repo ingestion to widen the corpus.
+
+---
+
+*Last updated: 2026-08-11 (1.37.0 — V2 real vector store + Source Map shipped)*

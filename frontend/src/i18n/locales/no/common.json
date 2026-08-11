@@ -581,6 +581,7 @@
       "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
       "dialogue": "Dialog",
+      "sourceMap": "Kildekart",
       "wiphySearch": "WiPhy‑søk",
       "claimAnalyzer": "Påstandsanalyse",
       "playground": "Lekeplass",
@@ -616,6 +617,30 @@
       "errors": {
         "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
         "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
+      }
+    },
+    "sourceMap": {
+      "title": "Kildekart",
+      "subtitle": "Skriv et tema og få de mest relevante kildene fra den kuraterte OPH + vitenskap-kunnskapsbasen, rangert av en ekte vektorbutikk og hver merket etter evidensnivå. Ikke et AI-svar — bare gjenfinning, så det er raskt og ærlig.",
+      "placeholder": "Et tema eller spørsmål, f.eks. «observatøreffekten» eller «er virkeligheten et fikspunkt?»",
+      "mapBtn": "Kartlegg kilder",
+      "mapping": "Søker…",
+      "foundCount": "{{count}} kilder rangert etter relevans",
+      "relevance": "relevans",
+      "backend": {
+        "embeddings": "Semantisk (embeddings)",
+        "tfidf": "Nøkkelord (TF-IDF)"
+      },
+      "examples": {
+        "observer": "Observatøreffekten i kvantemekanikk",
+        "simulation": "Lever vi i en simulering?",
+        "time": "Hvor kommer subjektiv tid fra?",
+        "ai": "Kan en KI være en observatør?"
+      },
+      "disclaimer": "Dette kartlegger et tema til kuraterte kilder via vektorlikhet — det dømmer ikke sannhet. Hver kilde beholder sitt evidensnivå (OPH er alltid spekulativ). Den semantiske backenden (embeddings) finner omskrivninger uten felles ord; offline faller den tilbake til nøkkelord-treff (TF-IDF).",
+      "errors": {
+        "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
+        "network": "Kunne ikke nå vektorbutikken. Sjekk at backend kjører."
       }
     },
     "overview": {

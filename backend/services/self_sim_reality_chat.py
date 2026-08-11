@@ -203,11 +203,24 @@ def _tokens(text: str) -> set:
 
 
 def retrieve(message: str, k: int = _RETRIEVE_K) -> List[Dict[str, Any]]:
-    """Rank KB chunks by keyword overlap with the message. Deterministic; no LLM.
+    """Rank KB chunks for grounding. Deterministic; no LLM.
 
-    Falls back to the OPH core chunks when nothing overlaps, so an answer is
-    always grounded in something rather than free-floating.
+    V2: routes through the real vector store (TF-IDF cosine — deterministic and
+    free per turn; the semantic embeddings backend is reserved for the Source Map
+    tool). Falls back to keyword overlap, and finally to the OPH core chunks when
+    nothing matches, so an answer is always grounded in something.
     """
+    try:
+        from backend.services import self_sim_reality_vectorstore as vs
+        res = vs.search(message, k=k, backend="tfidf")
+        by_id = {c["id"]: c for c in KNOWLEDGE_BASE}
+        chunks = [by_id[r["id"]] for r in res["results"] if r["id"] in by_id]
+        if chunks:
+            return chunks
+    except Exception:
+        pass
+
+    # Fallback: keyword overlap (V1 behaviour), then OPH-core default.
     q = _tokens(message)
     scored = []
     for chunk in KNOWLEDGE_BASE:
