@@ -1254,6 +1254,7 @@
     "statusHint": "Esta versión incluye contenido estático rico (conceptos, recorrido teórico, experimentos mentales IA‑como‑observador) extraído de Observer Patch Holography y de tus capturas. El agente completo con RAG + Mongo llega en V1+. Ver docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Resumen",
+      "learningPath": "Ruta de aprendizaje",
       "concepts": "Conceptos clave",
       "ophMechanics": "Mecánica de OPH",
       "theoryTour": "Recorrido teórico",
@@ -1292,6 +1293,69 @@
         "simulation": "¿Vivimos en una simulación?",
         "fixedPoint": "¿Qué significa en OPH que «la realidad es un punto fijo»?",
         "ai": "¿Podría una IA ser un parche de observador?"
+      },
+      "errors": {
+        "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
+        "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."
+      }
+    },
+    "learningPath": {
+      "title": "Ruta de aprendizaje",
+      "subtitle": "Un orden de lectura sugerido — la evidencia primero: ciencia establecida, luego teoría mainstream, luego el núcleo especulativo de OPH, luego filosofía, y por fin práctica. Escribe un objetivo y el vector store elige por dónde empezar; los pasos anteriores quedan como requisitos previos.",
+      "placeholder": "Opcional: ¿qué quieres entender? p. ej. «la idea del punto fijo»",
+      "findBtn": "Encontrar mi inicio",
+      "reset": "Limpiar",
+      "recommendedFor": "Para «{{goal}}», un buen punto de partida es el paso: {{stage}}. Los pasos anteriores se muestran como requisitos previos.",
+      "startHere": "Empieza aquí",
+      "prereq": "requisito previo",
+      "goToTab": "Léelo en: {{tab}}",
+      "disclaimer": "Es un orden curado, no un temario — salta libremente. La idea de ir con la evidencia primero es construir base epistémica antes de encontrar el material especulativo; cada paso conserva su nivel de evidencia, y OPH sigue siendo especulativo en todo momento.",
+      "stages": {
+        "rules": {
+          "title": "Las reglas del juego",
+          "what": "Conoce la frase guía y los 5 niveles de evidencia. Aprende a leer la insignia antes de valorar una afirmación.",
+          "why": "Todo lo demás solo cobra sentido cuando sabes qué tipo de afirmación tienes delante."
+        },
+        "established_brain": {
+          "title": "Empieza en terreno firme: el cerebro predictivo",
+          "what": "Procesamiento predictivo / principio de energía libre (Friston): el cerebro construye un modelo del mundo para minimizar el error de predicción.",
+          "why": "Es ciencia establecida, y dice que el cerebro modela el mundo — no que la mente lo construya. Una base limpia antes de las afirmaciones mayores."
+        },
+        "mainstream_physics": {
+          "title": "Física mainstream: holografía y MC relacional",
+          "what": "El principio holográfico, la holografía celeste y la MC relacional de Rovelli — «observador» aquí significa cualquier sistema físico.",
+          "why": "Así de lejos vive ya la «forma» de OPH (la frontera codifica el volumen; la dependencia del observador) en la física aceptada."
+        },
+        "consciousness_science": {
+          "title": "Ciencia de la consciencia: IIT y GNW",
+          "what": "La Teoría de la Información Integrada y el Espacio de Trabajo Neuronal Global — dos teorías serias, rivales y aún no resueltas.",
+          "why": "Muestran cómo es una teoría mainstream de la consciencia, para poder distinguirla de la especulación."
+        },
+        "oph_core": {
+          "title": "El núcleo especulativo: Observer Patch Holography",
+          "what": "El parche de observador, el universo auto-simulado y la pantalla que lo codifica todo.",
+          "why": "Es la idea ancla del módulo — y siempre se etiqueta como especulativa. Ahora ves exactamente dónde se aparta del mainstream."
+        },
+        "oph_mechanism": {
+          "title": "Cómo funciona OPH: solapamiento y punto fijo",
+          "what": "La sincronización por solapamiento, la Tubería de Creación de Hechos y la realidad como punto fijo.",
+          "why": "La maquinaria que OPH propone para hacer física pública a partir de parches subjetivos sin recursión infinita."
+        },
+        "philosophy": {
+          "title": "Donde se vuelve filosofía",
+          "what": "El argumento de la simulación de Bostrom y la Pregunta del Sustrato — el problema difícil, sustrato vs experiencia, la pregunta platónica.",
+          "why": "Se argumentan, no se prueban. Mantenerlas en el registro filosófico es toda la disciplina del módulo."
+        },
+        "ai_frontier": {
+          "title": "La frontera: ¿podría una IA ser un observador?",
+          "what": "Cinco experimentos mentales sobre las IAs como parches de observador — estructuralmente quizá, fenomenológicamente desconocido.",
+          "why": "La extensión especulativa del módulo. Cada pregunta aquí es filosofía, no una afirmación de consciencia en IA."
+        },
+        "practice": {
+          "title": "Ahora practica con las herramientas",
+          "what": "Pregunta en Diálogo, mapea un tema en el Mapa de fuentes, compara dos teorías y haz red-team a una afirmación.",
+          "why": "La lectura te da el mapa; las herramientas te dejan probar tus propias preguntas contra él, siempre con el nivel de evidencia adjunto."
+        }
       },
       "errors": {
         "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",

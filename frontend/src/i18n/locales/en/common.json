@@ -286,6 +286,7 @@
     "statusHint": "This version ships rich static content (concepts, theory tour, AI-as-observer thought experiments) drawn from Observer Patch Holography and your provided screenshots. The full agent with RAG + Mongo lands in V1+. See docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Overview",
+      "learningPath": "Learning Path",
       "concepts": "Core Concepts",
       "ophMechanics": "OPH Mechanics",
       "theoryTour": "Theory Tour",
@@ -324,6 +325,69 @@
         "simulation": "Are we living in a simulation?",
         "fixedPoint": "What does OPH mean by 'reality is a fixed point'?",
         "ai": "Could an AI be an observer patch?"
+      },
+      "errors": {
+        "http": "The server returned an error (HTTP {{status}}). Please try again.",
+        "network": "Couldn't reach the agent. Check that the backend is running."
+      }
+    },
+    "learningPath": {
+      "title": "Learning Path",
+      "subtitle": "A suggested reading order — evidence first: established science, then mainstream theory, then the speculative OPH core, then philosophy, then hands-on practice. Type a goal and the vector store picks where to start; earlier steps stay as prerequisites.",
+      "placeholder": "Optional: what do you want to understand? e.g. 'the fixed-point idea'",
+      "findBtn": "Find my start",
+      "reset": "Clear",
+      "recommendedFor": "For \"{{goal}}\", a good place to start is step: {{stage}}. The earlier steps are shown as prerequisites.",
+      "startHere": "Start here",
+      "prereq": "prerequisite",
+      "goToTab": "Read it in: {{tab}}",
+      "disclaimer": "This is a curated order, not a syllabus — jump around freely. The point of going evidence-first is to build epistemic footing before meeting the speculative material; each step keeps its evidence level, and OPH stays speculative throughout.",
+      "stages": {
+        "rules": {
+          "title": "The ground rules",
+          "what": "Meet the guiding phrase and the 5 evidence levels. Learn to read the badge before you weigh a claim.",
+          "why": "Everything else only makes sense once you know what kind of statement you're looking at."
+        },
+        "established_brain": {
+          "title": "Start with solid ground: the predictive brain",
+          "what": "Predictive processing / the free-energy principle (Friston): the brain builds a model of the world to minimise prediction error.",
+          "why": "It is established science, and it says the brain models the world — not that the mind builds it. A clean baseline before the bigger claims."
+        },
+        "mainstream_physics": {
+          "title": "Mainstream physics: holography & relational QM",
+          "what": "The holographic principle, celestial holography, and Rovelli's relational QM — 'observer' here means any physical system.",
+          "why": "This is how far the 'shape' of OPH (boundary encodes bulk; observer-dependence) already lives in accepted physics."
+        },
+        "consciousness_science": {
+          "title": "Consciousness science: IIT & GNW",
+          "what": "Integrated Information Theory and the Global Neuronal Workspace — two serious, competing, not-yet-settled theories.",
+          "why": "They show what a mainstream theory of consciousness looks like, so you can tell it apart from speculation."
+        },
+        "oph_core": {
+          "title": "The speculative core: Observer Patch Holography",
+          "what": "The observer patch, the self-simulating universe, and the screen that encodes everything.",
+          "why": "This is the module's anchor idea — and it is always tagged speculative. Now you can see exactly where it departs from the mainstream."
+        },
+        "oph_mechanism": {
+          "title": "How OPH works: overlap & fixed point",
+          "what": "Overlap synchronization, the Fact-Making Pipeline, and reality as a fixed point.",
+          "why": "The machinery OPH proposes to make public physics from subjective patches without infinite recursion."
+        },
+        "philosophy": {
+          "title": "Where it turns into philosophy",
+          "what": "Bostrom's simulation argument and the Substrate Question — the hard problem, substrate vs experience, the Platonic question.",
+          "why": "These are argued, not tested. Keeping them in the philosophy register is the whole discipline of the module."
+        },
+        "ai_frontier": {
+          "title": "The frontier: could an AI be an observer?",
+          "what": "Five thought experiments about AIs as observer patches — structurally maybe, phenomenologically unknown.",
+          "why": "The module's speculative extension. Every question here is philosophy, not an AI-consciousness claim."
+        },
+        "practice": {
+          "title": "Now practise with the tools",
+          "what": "Ask in Dialogue, map a topic in Source Map, compare two theories, and red-team a claim.",
+          "why": "Reading tells you the landscape; the tools let you test your own questions against it, always with the evidence level attached."
+        }
       },
       "errors": {
         "http": "The server returned an error (HTTP {{status}}). Please try again.",

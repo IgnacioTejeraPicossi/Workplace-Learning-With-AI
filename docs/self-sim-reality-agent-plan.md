@@ -251,7 +251,7 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 | GET | `/api/self-sim-reality/vectorstore/health` | Vector store health (backend, KB size) | V2 | **DONE 1.37.0** |
 | POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison (vector-store-grounded, epistemically tagged) | V2 | **DONE 1.37.1** |
 | POST | `/api/self-sim-reality/red-team` | Good-faith adversarial critique (steelman + typed objections + verdict) | V2 | **DONE 1.37.2** |
-| GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 | Pending |
+| GET | `/api/self-sim-reality/learning-path` | Suggested reading order (evidence-first, goal-aware start via vector store) | V3 | **DONE 1.38.0** |
 
 ---
 
@@ -688,11 +688,24 @@ Off-list types/strengths/verdicts are clamped; trilingual mock; frontend **⚔�
 (`RedTeam.jsx`); 3 offline tests. With this, **all five V2 endpoints in §8 are shipped**
 (chat, source-map, vectorstore health, compare-theories, red-team).
 
-### 16.7 Still pending
+### 16.7 Learning Path (1.38.0) — the last planned endpoint
 
-A persistent/ANN index if the KB grows, real OPH-repo ingestion to widen the corpus, and the
-V3 learning-path endpoint. The module now has **14 tabs**.
+`GET /api/self-sim-reality/learning-path?goal=...` (`backend/services/self_sim_reality_learning.py`)
+returns a deterministic, LLM-free curriculum ordered **evidence-first** (established → mainstream
+→ speculative OPH → philosophy → practice; 9 stages, each mapped to a tab + evidence level + KB
+concept ids). An optional `goal` is routed to its entry stage via the vector store
+(`search(..., backend="tfidf")` → top chunk → the stage that covers it), with earlier stages
+shown as prerequisites. Stage text is localized in i18n; frontend **🎓 Learning Path** tab
+(`LearningPath.jsx`, placed right after Overview). 4 offline tests. **With this, every endpoint
+in §8 is shipped.**
+
+### 16.8 Still pending (optional scaling only)
+
+A persistent/ANN index and real OPH-repo ingestion — both only matter once the curated 12-chunk
+KB grows. The upgrade seam is `vectorstore.search()`. The module now has **15 tabs** and all 6
+planned endpoints (chat, source-map, vectorstore health, compare-theories, red-team,
+learning-path) are live.
 
 ---
 
-*Last updated: 2026-08-11 (1.37.2 — V2 Red Team shipped; all V2 endpoints complete)*
+*Last updated: 2026-08-11 (1.38.0 — V3 Learning Path shipped; ALL planned endpoints complete)*

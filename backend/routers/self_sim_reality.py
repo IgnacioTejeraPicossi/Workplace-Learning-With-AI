@@ -9,7 +9,7 @@ Endpoints (plan §8):
   GET  /api/self-sim-reality/health    — health probe
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional
 
@@ -18,11 +18,13 @@ try:
     from backend.services import self_sim_reality_vectorstore as vectorstore
     from backend.services.self_sim_reality_compare import compare as compare_theories
     from backend.services.self_sim_reality_redteam import red_team as red_team_claim
+    from backend.services.self_sim_reality_learning import learning_path
 except ImportError:  # pragma: no cover
     from services.self_sim_reality_chat import answer, concepts, health  # type: ignore
     from services import self_sim_reality_vectorstore as vectorstore  # type: ignore
     from services.self_sim_reality_compare import compare as compare_theories  # type: ignore
     from services.self_sim_reality_redteam import red_team as red_team_claim  # type: ignore
+    from services.self_sim_reality_learning import learning_path  # type: ignore
 
 router = APIRouter(prefix="/api/self-sim-reality")
 
@@ -96,3 +98,10 @@ class RedTeamRequest(BaseModel):
 @router.post("/red-team", summary="Good-faith adversarial critique of a claim (steelman + objections + verdict)")
 async def red_team_endpoint(body: RedTeamRequest) -> Dict[str, Any]:
     return await red_team_claim(body.claim, body.lang)
+
+
+@router.get("/learning-path", summary="Suggested reading order (evidence-first), with a goal-aware start")
+def learning_path_endpoint(
+    goal: str = Query("", max_length=300, description="Optional learning goal to pick a start"),
+) -> Dict[str, Any]:
+    return learning_path(goal)

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overview from './self-sim-reality/Overview';
+import LearningPath from './self-sim-reality/LearningPath';
 import Dialogue from './self-sim-reality/Dialogue';
 import SourceMap from './self-sim-reality/SourceMap';
 import CompareTheories from './self-sim-reality/CompareTheories';
@@ -70,6 +71,7 @@ const SelfSimRealityAgent = () => {
 
   const tabs = [
     { id: 'overview',          label: t('selfSimReality.tabs.overview'),          icon: '🎯' },
+    { id: 'learningPath',      label: t('selfSimReality.tabs.learningPath'),      icon: '🎓' },
     { id: 'concepts',          label: t('selfSimReality.tabs.concepts'),          icon: '📚' },
     { id: 'ophMechanics',      label: t('selfSimReality.tabs.ophMechanics'),      icon: '⚙️' },
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
@@ -89,6 +91,7 @@ const SelfSimRealityAgent = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':          return <Overview />;
+      case 'learningPath':      return <LearningPath />;
       case 'concepts':          return <CoreConcepts />;
       case 'ophMechanics':      return <OphMechanics />;
       case 'theoryTour':        return <TheoryTour scrollTarget={theoryTarget} />;

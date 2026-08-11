@@ -577,6 +577,7 @@
     "statusHint": "Denne versjonen leverer rikt statisk innhold (begreper, teorirundtur, KI‑som‑observatør tankeeksperimenter) basert på Observer Patch Holography og skjermbildene du oppga. Den fulle agenten med RAG + Mongo kommer i V1+. Se docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Oversikt",
+      "learningPath": "Læringssti",
       "concepts": "Kjernebegreper",
       "ophMechanics": "OPH‑mekanikk",
       "theoryTour": "Teorirundtur",
@@ -615,6 +616,69 @@
         "simulation": "Lever vi i en simulering?",
         "fixedPoint": "Hva mener OPH med at «virkeligheten er et fikspunkt»?",
         "ai": "Kan en KI være en observatørflekk?"
+      },
+      "errors": {
+        "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
+        "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
+      }
+    },
+    "learningPath": {
+      "title": "Læringssti",
+      "subtitle": "En foreslått leserekkefølge — evidens først: etablert vitenskap, så mainstream-teori, så den spekulative OPH-kjernen, så filosofi, og til slutt praksis. Skriv et mål, og vektorbutikken velger hvor du skal begynne; tidligere trinn står som forutsetninger.",
+      "placeholder": "Valgfritt: hva vil du forstå? f.eks. «fikspunkt-ideen»",
+      "findBtn": "Finn starten min",
+      "reset": "Tøm",
+      "recommendedFor": "For «{{goal}}» er et godt sted å begynne trinnet: {{stage}}. De tidligere trinnene vises som forutsetninger.",
+      "startHere": "Start her",
+      "prereq": "forutsetning",
+      "goToTab": "Les det i: {{tab}}",
+      "disclaimer": "Dette er en kuratert rekkefølge, ikke en pensumplan — hopp fritt rundt. Poenget med å gå evidens-først er å bygge epistemisk fotfeste før du møter det spekulative stoffet; hvert trinn beholder sitt evidensnivå, og OPH forblir spekulativ hele veien.",
+      "stages": {
+        "rules": {
+          "title": "Spillereglene",
+          "what": "Møt ledesetningen og de 5 evidensnivåene. Lær å lese merket før du vurderer en påstand.",
+          "why": "Alt annet gir bare mening når du vet hva slags utsagn du ser på."
+        },
+        "established_brain": {
+          "title": "Start på fast grunn: den prediktive hjernen",
+          "what": "Prediktiv prosessering / fri-energi-prinsippet (Friston): hjernen bygger en modell av verden for å minimere prediksjonsfeil.",
+          "why": "Det er etablert vitenskap, og den sier at hjernen modellerer verden — ikke at sinnet bygger den. En ren grunnlinje før de større påstandene."
+        },
+        "mainstream_physics": {
+          "title": "Mainstream-fysikk: holografi og relasjonell QM",
+          "what": "Det holografiske prinsippet, celestial holography og Rovellis relasjonelle QM — «observatør» betyr her ethvert fysisk system.",
+          "why": "Så langt lever allerede OPHs «form» (grensen koder volumet; observatøravhengighet) i akseptert fysikk."
+        },
+        "consciousness_science": {
+          "title": "Bevissthetsvitenskap: IIT og GNW",
+          "what": "Integrert informasjonsteori og det globale nevronale arbeidsområdet — to seriøse, konkurrerende, ennå uavgjorte teorier.",
+          "why": "De viser hvordan en mainstream-teori om bevissthet ser ut, så du kan skille den fra spekulasjon."
+        },
+        "oph_core": {
+          "title": "Den spekulative kjernen: Observer Patch Holography",
+          "what": "Observatørflekken, det selv-simulerende universet og skjermen som koder alt.",
+          "why": "Det er modulens ankeridé — og den merkes alltid spekulativ. Nå ser du nøyaktig hvor den bryter med mainstream."
+        },
+        "oph_mechanism": {
+          "title": "Hvordan OPH virker: overlapp og fikspunkt",
+          "what": "Overlapp-synkronisering, Fakta-skapende rørledning og virkelighet som fikspunkt.",
+          "why": "Maskineriet OPH foreslår for å lage offentlig fysikk fra subjektive flekker uten uendelig rekursjon."
+        },
+        "philosophy": {
+          "title": "Der det blir filosofi",
+          "what": "Bostroms simuleringsargument og Substrat-spørsmålet — det harde problemet, substrat vs opplevelse, det platonske spørsmålet.",
+          "why": "De argumenteres, ikke testes. Å holde dem i det filosofiske registeret er hele disiplinen i modulen."
+        },
+        "ai_frontier": {
+          "title": "Fronten: kan en KI være en observatør?",
+          "what": "Fem tankeeksperimenter om KI-er som observatørflekker — strukturelt kanskje, fenomenologisk ukjent.",
+          "why": "Modulens spekulative utvidelse. Hvert spørsmål her er filosofi, ikke en påstand om KI-bevissthet."
+        },
+        "practice": {
+          "title": "Øv nå med verktøyene",
+          "what": "Spør i Dialog, kartlegg et tema i Kildekart, sammenlign to teorier og red-team en påstand.",
+          "why": "Lesing gir deg landskapet; verktøyene lar deg teste dine egne spørsmål mot det, alltid med evidensnivået vedlagt."
+        }
       },
       "errors": {
         "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",

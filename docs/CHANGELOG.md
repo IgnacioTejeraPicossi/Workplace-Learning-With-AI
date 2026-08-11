@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.38.0] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent · V3 "Learning Path" (last planned endpoint)
+
+The final endpoint from the plan (§8): a suggested reading order through the module.
+With this, **every endpoint in the plan is shipped**.
+
+- **Service** `backend/services/self_sim_reality_learning.py` — a deterministic, LLM-free
+  curriculum ordered **evidence-first** (established science → mainstream → speculative OPH
+  core → philosophy → hands-on practice), so a reader builds epistemic footing before
+  meeting the speculative material. Each of the 9 stages maps to a module tab, carries the
+  dominant evidence level, and lists the KB concept ids it covers. The only "smart" part
+  uses the **vector store**: an optional `goal` is routed to its entry stage via
+  `search(..., backend="tfidf")` (its top KB chunk → the stage that covers it); earlier
+  stages remain as prerequisites. Stage text lives in i18n so it stays fully localized.
+- **Endpoint** `GET /api/self-sim-reality/learning-path?goal=...` (goal ≤ 300, optional).
+- **Frontend** `self-sim-reality/LearningPath.jsx` + new **🎓 Learning Path** tab (placed
+  second, right after Overview — the natural "where do I start" tab). Numbered evidence-first
+  journey with per-stage `EpistemicBadge`, what/why, and the target tab; an optional goal
+  input highlights the recommended starting step and dims earlier steps as prerequisites.
+- i18n EN/ES/NO parity (selfSimReality 535/535). **Tests**
+  `backend/tests/test_self_sim_reality_learning.py` (4 offline — evidence-first ordering,
+  goal→stage routing incl. no-overlap fallback, endpoint, goal-too-long 422). Full offline
+  self-sim suite now 24 tests. Verified: no goal → start at "rules"; "fixed point" →
+  oph_mechanism; "simulation" → philosophy. Backend compile, JSX parse, i18n parity,
+  production build (exit 0).
+
+**Module status:** all 6 planned endpoints live (chat, source-map, vectorstore health,
+compare-theories, red-team, learning-path); 15 tabs. Remaining future work is optional
+scaling: a persistent/ANN index and real OPH-repo ingestion if the KB grows.
+
+---
+
 ## [1.37.2] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent · V2 "Red Team" (completes the V2 endpoints)
