@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.36.1] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent user guide in the README Viewer
+
+A user-facing guide for the agent, mirroring the Andrés the Robot help doc.
+
+- **New docs**: `docs/self-sim-reality-help.md` (EN) + `.es.md` + `.no.md` — the one rule
+  (never "this is true", always "this belongs to level X"; OPH always speculative), the 5
+  epistemic levels, quick start, a walkthrough of all 11 tabs (incl. the 💬 Dialogue
+  conversational agent and what MOCK means), and an FAQ (is OPH real physics, "observer" =
+  conscious mind?, AI-consciousness, how the Dialogue is grounded).
+- **README Viewer** (`frontend/src/ReadmeViewer.jsx`): added `docs/self-sim-reality-help.md`
+  to the document dropdown. Served via the existing `/api/docs/read?path=&lang=` route with
+  `<name>.<lang>.md` localization + English fallback (EN/ES/NO verified; other languages
+  fall back to English).
+- **README cross-reference** in `README.md` / `README.es.md` / `README.no.md`: a
+  Documentation link + a "User guide" line in the agent's section, so a search surfaces it
+  live (no frontend rebuild needed); the dropdown entry appears after the next rebuild.
+- Validated: ReadmeViewer JSX parse, all three docs present, localized-path resolution.
+
+---
+
 ## [1.36.0] - 2026-08-10
 
 ### Added — Self-Simulating Reality Agent · V1 "Dialogue" (conversational, epistemically-tagged)

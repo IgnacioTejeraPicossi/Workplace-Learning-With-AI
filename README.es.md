@@ -79,6 +79,7 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Sandbox del bot autónomo**: [grocery_bot/README.md](grocery_bot/README.md)
 - **Pruebas MCP / Postman**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer vía MCP o HTTP
 - **Andrés the Robot** (compañero de IA en desarrollo — guía de usuario): [docs/andres-robot-help.md](docs/andres-robot-help.md)
+- **Agente de Realidad Auto-Simulada** (compañero de filosofía OPH — guía de usuario): [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md)
 
 ---
 
@@ -182,6 +183,8 @@ Sistema de diseño con estilos inline igual que el módulo ATM V&V Test Copilot 
 ### Self-Simulating Reality Agent (1.36.0 · agosto 2026 — V0+V1+V2+V3)
 
 Un compañero de tono serio y disciplina epistémica para la idea más especulativa de la hoja de ruta: la propuesta de que los observadores, las mentes o la consciencia participan en la construcción del universo que experimentan. El marco de anclaje es **Observer Patch Holography (OPH)** de Bernhard Mueller et al. La frase guía del agente — *"No te digo qué creer. Te muestro qué es ciencia, qué es teoría, qué es filosofía y qué es imaginación metafísica"* — es innegociable. Cada afirmación pasa por un clasificador epistémico de 5 niveles (`established / mainstream / speculative / philosophy / metaphor / unsupported`) antes de salir.
+
+**Guía de usuario:** [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md) (también en el Visor de README de la app).
 
 Ubicado en la barra lateral bajo **Future Item Agents** (icono 🌀). **11 pestañas**:
 

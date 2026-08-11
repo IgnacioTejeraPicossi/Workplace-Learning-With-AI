@@ -79,6 +79,7 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Autonomous Bot Sandbox**: [grocery_bot/README.md](grocery_bot/README.md)
 - **MCP / Postman testing**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer via MCP or HTTP
 - **Andrés the Robot** (developmental AI companion — user guide): [docs/andres-robot-help.md](docs/andres-robot-help.md)
+- **Self-Simulating Reality Agent** (OPH philosophy companion — user guide): [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md)
 
 ---
 
@@ -209,6 +210,8 @@ Inline-style design system matching the ATM V&V Test Copilot module — gradient
 ### Self-Simulating Reality Agent (1.36.0 · August 2026 — V0+V1+V2+V3)
 
 A serious-toned, epistemically disciplined companion for the most speculative idea on the roadmap: the proposition that observers, minds or consciousness participate in constructing the universe they experience. The anchor framework is **Observer Patch Holography (OPH)** by Bernhard Mueller et al. The agent's guiding phrase — *"I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination"* — is non-negotiable. Every claim passes through a 5-level epistemic classifier (`established / mainstream / speculative / philosophy / metaphor / unsupported`) before it leaves.
+
+**User guide:** [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md) (also in the in-app README Viewer).
 
 Located in the sidebar under **Future Item Agents** (icon 🌀). **11 tabs**:
 

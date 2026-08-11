@@ -79,6 +79,7 @@ python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
 - **Autonom bot-sandkasse**: [grocery_bot/README.md](grocery_bot/README.md)
 - **MCP / Postman-testing**: [docs/POSTMAN_MCP_TESTING.md](docs/POSTMAN_MCP_TESTING.md) — J-messages Analyzer via MCP eller HTTP
 - **Andrés the Robot** (AI-følgesvenn under utvikling — brukerveiledning): [docs/andres-robot-help.md](docs/andres-robot-help.md)
+- **Self-Simulating Reality Agent** (OPH-filosofifølgesvenn — brukerveiledning): [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md)
 
 ---
 
@@ -181,6 +182,8 @@ Inline-stil designsystem som matcher ATM V&V Test Copilot-modulen — gradient s
 ### Self-Simulating Reality Agent (1.36.0 · august 2026 — V0+V1+V2+V3)
 
 En seriøst anlagt, epistemisk disiplinert følgesvenn for den mest spekulative ideen på veikartet: forslaget om at observatører, sinn eller bevissthet deltar i konstruksjonen av universet de opplever. Ankerrammeverket er **Observer Patch Holography (OPH)** av Bernhard Mueller et al. Agentens ledesetning — *"Jeg forteller deg ikke hva du skal tro. Jeg viser deg hva som er vitenskap, hva som er teori, hva som er filosofi, og hva som er metafysisk fantasi"* — er ufravikelig. Hver påstand går gjennom en 5-nivås epistemisk klassifikator (`established / mainstream / speculative / philosophy / metaphor / unsupported`) før den slippes.
+
+**Brukerveiledning:** [docs/self-sim-reality-help.md](docs/self-sim-reality-help.md) (også i appens README-visning).
 
 Plassert i sidemenyen under **Future Item Agents** (ikon 🌀). **11 faner**:
 

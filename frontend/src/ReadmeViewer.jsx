@@ -436,6 +436,7 @@ export default function ReadmeViewer() {
                 style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0' }}>
           <option value="README.md">README.md</option>
           <option value="docs/andres-robot-help.md">docs/andres-robot-help.md</option>
+          <option value="docs/self-sim-reality-help.md">docs/self-sim-reality-help.md</option>
           <option value="docs/ai-study-buddy.md">docs/ai-study-buddy.md</option>
           <option value="docs/architecture.md">docs/architecture.md</option>
           <option value="docs/deployment.md">docs/deployment.md</option>
