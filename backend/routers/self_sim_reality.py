@@ -17,10 +17,12 @@ try:
     from backend.services.self_sim_reality_chat import answer, concepts, health
     from backend.services import self_sim_reality_vectorstore as vectorstore
     from backend.services.self_sim_reality_compare import compare as compare_theories
+    from backend.services.self_sim_reality_redteam import red_team as red_team_claim
 except ImportError:  # pragma: no cover
     from services.self_sim_reality_chat import answer, concepts, health  # type: ignore
     from services import self_sim_reality_vectorstore as vectorstore  # type: ignore
     from services.self_sim_reality_compare import compare as compare_theories  # type: ignore
+    from services.self_sim_reality_redteam import red_team as red_team_claim  # type: ignore
 
 router = APIRouter(prefix="/api/self-sim-reality")
 
@@ -83,3 +85,14 @@ class CompareRequest(BaseModel):
 @router.post("/compare-theories", summary="Structured, epistemically-tagged comparison of two theories")
 async def compare_theories_endpoint(body: CompareRequest) -> Dict[str, Any]:
     return await compare_theories(body.a, body.b, body.lang)
+
+
+class RedTeamRequest(BaseModel):
+    claim: str = Field(..., min_length=1, max_length=2000,
+                       description="A claim to stress-test in good faith")
+    lang: str = Field("en", pattern=r"^(en|es|no)$")
+
+
+@router.post("/red-team", summary="Good-faith adversarial critique of a claim (steelman + objections + verdict)")
+async def red_team_endpoint(body: RedTeamRequest) -> Dict[str, Any]:
+    return await red_team_claim(body.claim, body.lang)

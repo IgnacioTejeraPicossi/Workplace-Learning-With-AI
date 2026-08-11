@@ -294,6 +294,7 @@
       "compare": "Compare",
       "wiphySearch": "WiPhy Search",
       "claimAnalyzer": "Claim Analyzer",
+      "redTeam": "Red Team",
       "playground": "Playground",
       "aiAsObserver": "AI as Observer",
       "substrateQuestion": "The Substrate Question",
@@ -378,6 +379,46 @@
         "rovelli": { "a": "Relational QM (Rovelli)", "b": "Consciousness creates reality" }
       },
       "disclaimer": "This compares two positions by evidence level and structure — it does not rank them as true or false. Speculative theories (like OPH) stay tagged speculative; the honest note flags what neither theory settles.",
+      "errors": {
+        "http": "The server returned an error (HTTP {{status}}). Please try again.",
+        "network": "Couldn't reach the agent. Check that the backend is running."
+      }
+    },
+    "redTeam": {
+      "title": "Red Team",
+      "subtitle": "Paste a claim and have it stress-tested in good faith: first the strongest fair version (steelman), then typed objections with honest strength ratings, what would change the verdict, and what part survives. It never claims a speculative idea is 'disproven'.",
+      "placeholder": "A claim to challenge, e.g. 'consciousness collapses the wavefunction' or 'the universe simulates itself'",
+      "challengeBtn": "Challenge it",
+      "challenging": "Stress-testing…",
+      "orTry": "or try:",
+      "verdictLabel": "Verdict",
+      "steelman": "Steelman (strongest fair version)",
+      "objections": "Objections",
+      "changeMind": "What would change my mind",
+      "survivingCore": "What survives",
+      "verdicts": {
+        "holds_up": "Holds up",
+        "weakened": "Weakened",
+        "does_not_survive": "Does not survive"
+      },
+      "types": {
+        "empirical": "Empirical",
+        "logical": "Logical",
+        "conceptual": "Conceptual",
+        "methodological": "Methodological",
+        "parsimony": "Parsimony"
+      },
+      "strengths": {
+        "strong": "Strong",
+        "moderate": "Moderate",
+        "weak": "Weak"
+      },
+      "examples": {
+        "selfSim": "The universe is a self-simulating structure that reads itself into existence",
+        "consciousness": "Consciousness collapses the quantum wavefunction",
+        "simulation": "We are almost certainly living in a computer simulation"
+      },
+      "disclaimer": "A good-faith adversarial critique — it attacks the strongest form of the claim, rates each objection honestly, and states what survives. Speculative ideas (like OPH) are critiqued on evidence status, never declared 'false'.",
       "errors": {
         "http": "The server returned an error (HTTP {{status}}). Please try again.",
         "network": "Couldn't reach the agent. Check that the backend is running."

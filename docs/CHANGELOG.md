@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.37.2] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent · V2 "Red Team" (completes the V2 endpoints)
+
+The last V2 endpoint from the plan (§8): a standalone, good-faith "challenge this claim"
+tool. All five V2 endpoints (chat, source-map, vectorstore health, compare-theories,
+red-team) are now live.
+
+- **Service** `backend/services/self_sim_reality_redteam.py` — grounds the claim via the
+  vector store, then an LLM produces `{steelman, objections[], what_would_change_my_mind[],
+  surviving_core, verdict}`. Method is disciplined: **steelman first** (attack the strongest
+  fair version, never a strawman); objections are **typed** (empirical / logical / conceptual
+  / methodological / parsimony) with an honest **strength** (strong / moderate / weak);
+  states what evidence would change the verdict and what part survives. Speculative ideas
+  (OPH) are critiqued on evidence status, **never declared "disproven"**. Off-list types /
+  strengths / verdicts are clamped; trilingual mock.
+- **Endpoint** `POST /api/self-sim-reality/red-team` (`claim` ≤ 2000, `lang ∈ {en,es,no}`).
+- **Frontend** `self-sim-reality/RedTeam.jsx` + new **⚔️ Red Team** tab (after Claim
+  Analyzer): claim input + examples → verdict badge, steelman panel, typed objection cards
+  with strength ratings, "what would change my mind", and the surviving core.
+- i18n EN/ES/NO parity (selfSimReality 495/495). **Tests**
+  `backend/tests/test_self_sim_reality_redteam.py` (3 offline — structured mock, JSON
+  sanitize/clamp of type+strength+verdict, validation). Verified live: red-teaming "the
+  universe is self-simulating" → steelman + 4 typed objections (empirical/methodological/
+  conceptual/logical) + 5 change-my-mind items + surviving core, verdict "weakened". Backend
+  compile, JSX parse, i18n parity, production build (exit 0).
+
+---
+
 ## [1.37.1] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent · V2 "Compare Theories"

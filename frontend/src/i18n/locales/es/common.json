@@ -1262,6 +1262,7 @@
       "compare": "Comparar",
       "wiphySearch": "Buscador WiPhy",
       "claimAnalyzer": "Analizador de afirmaciones",
+      "redTeam": "Red Team",
       "playground": "Playground",
       "aiAsObserver": "IA como observador",
       "substrateQuestion": "La pregunta del sustrato",
@@ -1346,6 +1347,46 @@
         "rovelli": { "a": "MC Relacional (Rovelli)", "b": "La consciencia crea la realidad" }
       },
       "disclaimer": "Esto compara dos posiciones por nivel de evidencia y estructura — no las clasifica como verdaderas o falsas. Las teorías especulativas (como OPH) siguen etiquetadas como especulativas; la nota honesta señala qué no resuelve ninguna.",
+      "errors": {
+        "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
+        "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."
+      }
+    },
+    "redTeam": {
+      "title": "Red Team",
+      "subtitle": "Pega una afirmación y ponla a prueba con buena fe: primero su versión más fuerte y justa (steelman), luego objeciones tipadas con su fuerza honesta, qué cambiaría el veredicto y qué parte sobrevive. Nunca declara «refutada» una idea especulativa.",
+      "placeholder": "Una afirmación a desafiar, p. ej. «la consciencia colapsa la función de onda» o «el universo se simula a sí mismo»",
+      "challengeBtn": "Desafiarla",
+      "challenging": "Poniendo a prueba…",
+      "orTry": "o prueba:",
+      "verdictLabel": "Veredicto",
+      "steelman": "Steelman (versión más fuerte y justa)",
+      "objections": "Objeciones",
+      "changeMind": "Qué me haría cambiar de opinión",
+      "survivingCore": "Qué sobrevive",
+      "verdicts": {
+        "holds_up": "Se sostiene",
+        "weakened": "Debilitada",
+        "does_not_survive": "No sobrevive"
+      },
+      "types": {
+        "empirical": "Empírica",
+        "logical": "Lógica",
+        "conceptual": "Conceptual",
+        "methodological": "Metodológica",
+        "parsimony": "Parsimonia"
+      },
+      "strengths": {
+        "strong": "Fuerte",
+        "moderate": "Moderada",
+        "weak": "Débil"
+      },
+      "examples": {
+        "selfSim": "El universo es una estructura auto-simulada que se lee a sí misma hacia la existencia",
+        "consciousness": "La consciencia colapsa la función de onda cuántica",
+        "simulation": "Casi con certeza vivimos en una simulación por ordenador"
+      },
+      "disclaimer": "Una crítica adversarial de buena fe — ataca la forma más fuerte de la afirmación, valora cada objeción con honestidad y dice qué sobrevive. Las ideas especulativas (como OPH) se critican por su estatus de evidencia, nunca se declaran «falsas».",
       "errors": {
         "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
         "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."

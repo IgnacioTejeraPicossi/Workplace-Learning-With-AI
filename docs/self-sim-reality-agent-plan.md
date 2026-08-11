@@ -250,7 +250,7 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 | POST | `/api/self-sim-reality/source-map` | Return ranked source chunks (real vector store) for a topic | V2 | **DONE 1.37.0** |
 | GET | `/api/self-sim-reality/vectorstore/health` | Vector store health (backend, KB size) | V2 | **DONE 1.37.0** |
 | POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison (vector-store-grounded, epistemically tagged) | V2 | **DONE 1.37.1** |
-| POST | `/api/self-sim-reality/red-team` | Generate objections to a given claim | V2 | Pending |
+| POST | `/api/self-sim-reality/red-team` | Good-faith adversarial critique (steelman + typed objections + verdict) | V2 | **DONE 1.37.2** |
 | GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 | Pending |
 
 ---
@@ -675,12 +675,24 @@ a winner and always ends on what neither theory settles. Frontend **⚖️ Compa
 (`test_self_sim_reality_compare.py`). This is a nice V2 synergy — the vector store built for
 Source Map also grounds the comparison.
 
-### 16.6 Still pending
+### 16.6 Red Team (1.37.2) — completes the V2 endpoints
 
-`red-team` endpoint (§8; the Dialogue already emits objections, so this is a focused
-standalone challenge tool), a persistent/ANN index if the KB grows, real OPH-repo ingestion
-to widen the corpus, and the V3 learning-path endpoint.
+`POST /api/self-sim-reality/red-team` (`backend/services/self_sim_reality_redteam.py`) is a
+standalone, good-faith "challenge this claim" tool. It grounds the claim via the vector
+store, then produces `{steelman, objections[], what_would_change_my_mind[], surviving_core,
+verdict}`. Method: **steelman first** (attack the strongest fair form), **typed** objections
+(empirical / logical / conceptual / methodological / parsimony) each with an honest
+**strength** (strong / moderate / weak), what evidence would change the verdict, and the
+surviving core. Speculative ideas are critiqued on evidence status, **never "disproven"**.
+Off-list types/strengths/verdicts are clamped; trilingual mock; frontend **⚔️ Red Team** tab
+(`RedTeam.jsx`); 3 offline tests. With this, **all five V2 endpoints in §8 are shipped**
+(chat, source-map, vectorstore health, compare-theories, red-team).
+
+### 16.7 Still pending
+
+A persistent/ANN index if the KB grows, real OPH-repo ingestion to widen the corpus, and the
+V3 learning-path endpoint. The module now has **14 tabs**.
 
 ---
 
-*Last updated: 2026-08-11 (1.37.1 — V2 Compare Theories shipped; vector store + Source Map in 1.37.0)*
+*Last updated: 2026-08-11 (1.37.2 — V2 Red Team shipped; all V2 endpoints complete)*

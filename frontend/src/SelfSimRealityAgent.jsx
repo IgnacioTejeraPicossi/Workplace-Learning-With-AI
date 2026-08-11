@@ -4,6 +4,7 @@ import Overview from './self-sim-reality/Overview';
 import Dialogue from './self-sim-reality/Dialogue';
 import SourceMap from './self-sim-reality/SourceMap';
 import CompareTheories from './self-sim-reality/CompareTheories';
+import RedTeam from './self-sim-reality/RedTeam';
 import CoreConcepts from './self-sim-reality/CoreConcepts';
 import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
@@ -77,6 +78,7 @@ const SelfSimRealityAgent = () => {
     { id: 'compare',           label: t('selfSimReality.tabs.compare'),           icon: '⚖️' },
     { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
     { id: 'claimAnalyzer',     label: t('selfSimReality.tabs.claimAnalyzer'),     icon: '🔬' },
+    { id: 'redTeam',           label: t('selfSimReality.tabs.redTeam'),           icon: '⚔️' },
     { id: 'playground',        label: t('selfSimReality.tabs.playground'),        icon: '🎨' },
     { id: 'aiAsObserver',      label: t('selfSimReality.tabs.aiAsObserver'),      icon: '🧠' },
     { id: 'substrateQuestion', label: t('selfSimReality.tabs.substrateQuestion'), icon: '🌌' },
@@ -95,6 +97,7 @@ const SelfSimRealityAgent = () => {
       case 'compare':           return <CompareTheories />;
       case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
       case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} prefillClaim={claimPrefill.text} prefillNonce={claimPrefill.nonce} />;
+      case 'redTeam':           return <RedTeam />;
       case 'playground':        return <Playground />;
       case 'aiAsObserver':      return <AiAsObserver />;
       case 'substrateQuestion': return <SubstrateQuestion />;

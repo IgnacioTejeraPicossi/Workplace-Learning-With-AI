@@ -585,6 +585,7 @@
       "compare": "Sammenlign",
       "wiphySearch": "WiPhy‑søk",
       "claimAnalyzer": "Påstandsanalyse",
+      "redTeam": "Red Team",
       "playground": "Lekeplass",
       "aiAsObserver": "KI som observatør",
       "substrateQuestion": "Substrat‑spørsmålet",
@@ -669,6 +670,46 @@
         "rovelli": { "a": "Relasjonell QM (Rovelli)", "b": "Bevissthet skaper virkelighet" }
       },
       "disclaimer": "Dette sammenligner to posisjoner etter evidensnivå og struktur — det rangerer dem ikke som sanne eller falske. Spekulative teorier (som OPH) forblir merket spekulative; den ærlige merknaden flagger hva ingen av teoriene avgjør.",
+      "errors": {
+        "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
+        "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
+      }
+    },
+    "redTeam": {
+      "title": "Red Team",
+      "subtitle": "Lim inn en påstand og få den stresstestet i god tro: først den sterkeste rimelige versjonen (steelman), så typede innvendinger med ærlig styrkevurdering, hva som ville endre dommen, og hvilken del som overlever. Den erklærer aldri en spekulativ idé «motbevist».",
+      "placeholder": "En påstand å utfordre, f.eks. «bevissthet kollapser bølgefunksjonen» eller «universet simulerer seg selv»",
+      "challengeBtn": "Utfordre den",
+      "challenging": "Stresstester…",
+      "orTry": "eller prøv:",
+      "verdictLabel": "Dom",
+      "steelman": "Steelman (sterkeste rimelige versjon)",
+      "objections": "Innvendinger",
+      "changeMind": "Hva ville endre meningen min",
+      "survivingCore": "Hva overlever",
+      "verdicts": {
+        "holds_up": "Holder stand",
+        "weakened": "Svekket",
+        "does_not_survive": "Overlever ikke"
+      },
+      "types": {
+        "empirical": "Empirisk",
+        "logical": "Logisk",
+        "conceptual": "Konseptuell",
+        "methodological": "Metodologisk",
+        "parsimony": "Parsimoni"
+      },
+      "strengths": {
+        "strong": "Sterk",
+        "moderate": "Moderat",
+        "weak": "Svak"
+      },
+      "examples": {
+        "selfSim": "Universet er en selv-simulerende struktur som leser seg selv til eksistens",
+        "consciousness": "Bevissthet kollapser den kvantemekaniske bølgefunksjonen",
+        "simulation": "Vi lever nesten helt sikkert i en datasimulering"
+      },
+      "disclaimer": "En kritikk i god tro — den angriper den sterkeste formen av påstanden, vurderer hver innvending ærlig og sier hva som overlever. Spekulative ideer (som OPH) kritiseres på evidensstatus, aldri erklært «falske».",
       "errors": {
         "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
         "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
