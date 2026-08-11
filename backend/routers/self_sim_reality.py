@@ -16,9 +16,11 @@ from typing import Any, Dict, List, Optional
 try:
     from backend.services.self_sim_reality_chat import answer, concepts, health
     from backend.services import self_sim_reality_vectorstore as vectorstore
+    from backend.services.self_sim_reality_compare import compare as compare_theories
 except ImportError:  # pragma: no cover
     from services.self_sim_reality_chat import answer, concepts, health  # type: ignore
     from services import self_sim_reality_vectorstore as vectorstore  # type: ignore
+    from services.self_sim_reality_compare import compare as compare_theories  # type: ignore
 
 router = APIRouter(prefix="/api/self-sim-reality")
 
@@ -70,3 +72,14 @@ def vectorstore_health() -> Dict[str, Any]:
 def source_map_endpoint(body: SourceMapRequest) -> Dict[str, Any]:
     res = vectorstore.search(body.topic, k=body.k, backend=body.backend)
     return {"topic": body.topic, **res}
+
+
+class CompareRequest(BaseModel):
+    a: str = Field(..., min_length=1, max_length=200, description="First theory / position")
+    b: str = Field(..., min_length=1, max_length=200, description="Second theory / position")
+    lang: str = Field("en", pattern=r"^(en|es|no)$")
+
+
+@router.post("/compare-theories", summary="Structured, epistemically-tagged comparison of two theories")
+async def compare_theories_endpoint(body: CompareRequest) -> Dict[str, Any]:
+    return await compare_theories(body.a, body.b, body.lang)

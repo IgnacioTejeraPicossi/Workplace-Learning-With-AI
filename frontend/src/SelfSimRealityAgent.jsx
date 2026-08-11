@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Overview from './self-sim-reality/Overview';
 import Dialogue from './self-sim-reality/Dialogue';
 import SourceMap from './self-sim-reality/SourceMap';
+import CompareTheories from './self-sim-reality/CompareTheories';
 import CoreConcepts from './self-sim-reality/CoreConcepts';
 import OphMechanics from './self-sim-reality/OphMechanics';
 import TheoryTour from './self-sim-reality/TheoryTour';
@@ -73,6 +74,7 @@ const SelfSimRealityAgent = () => {
     { id: 'theoryTour',        label: t('selfSimReality.tabs.theoryTour'),        icon: '🧭' },
     { id: 'dialogue',          label: t('selfSimReality.tabs.dialogue'),          icon: '💬' },
     { id: 'sourceMap',         label: t('selfSimReality.tabs.sourceMap'),         icon: '🗂️' },
+    { id: 'compare',           label: t('selfSimReality.tabs.compare'),           icon: '⚖️' },
     { id: 'wiphySearch',       label: t('selfSimReality.tabs.wiphySearch'),       icon: '🔍' },
     { id: 'claimAnalyzer',     label: t('selfSimReality.tabs.claimAnalyzer'),     icon: '🔬' },
     { id: 'playground',        label: t('selfSimReality.tabs.playground'),        icon: '🎨' },
@@ -90,6 +92,7 @@ const SelfSimRealityAgent = () => {
       case 'theoryTour':        return <TheoryTour scrollTarget={theoryTarget} />;
       case 'dialogue':          return <Dialogue />;
       case 'sourceMap':         return <SourceMap />;
+      case 'compare':           return <CompareTheories />;
       case 'wiphySearch':       return <WiphySearch prefillQuery={wiphyPrefill.query} prefillNonce={wiphyPrefill.nonce} />;
       case 'claimAnalyzer':     return <ClaimAnalyzer onSearchWiphy={searchWiphyFromAnalyzer} prefillClaim={claimPrefill.text} prefillNonce={claimPrefill.nonce} />;
       case 'playground':        return <Playground />;

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.37.1] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent · V2 "Compare Theories"
+
+Rounds out V2 (plan §8): a structured, epistemically-tagged side-by-side of two
+theories — and it **reuses the vector store** to ground each side.
+
+- **Service** `backend/services/self_sim_reality_compare.py` — each side is first
+  grounded via `vectorstore.search(..., backend="tfidf")` (its top KB chunk supplies the
+  title + evidence level), then an LLM produces `{a, b, agreements[], differences[], relation,
+  relation_note, honest_note}`. Discipline preserved: every side level-tagged, OPH stays
+  speculative, off-palette levels and off-list relations are clamped, and the tool **never
+  declares a winner** — it ends on what neither theory settles. Trilingual mock.
+- **Endpoint** `POST /api/self-sim-reality/compare-theories` (`a`, `b` ≤ 200, `lang ∈ {en,es,no}`).
+- **Frontend** `self-sim-reality/CompareTheories.jsx` + new **⚖️ Compare** tab (after Source
+  Map): two inputs + preset pairs (IIT vs GNW, OPH vs Celestial Holography, Rovelli RQM vs
+  "consciousness creates reality") → side-by-side cards with `EpistemicBadge`, a relation
+  banner, agreements / per-axis differences, and an honest "what neither settles" note.
+- i18n EN/ES/NO parity (selfSimReality 466/466). **Tests**
+  `backend/tests/test_self_sim_reality_compare.py` (4 offline — vector-store grounding,
+  structured mock, JSON sanitize/clamp of level + relation, validation). Verified live: real
+  comparison of IIT vs GNW (both mainstream, relation "competing"). Backend compile, JSX
+  parse, i18n parity, production build (exit 0).
+
+---
+
 ## [1.37.0] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent · V2 "real vector store + Source Map"

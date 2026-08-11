@@ -249,7 +249,7 @@ User-submitted strong claims with the analyzer output. Used for the Claim Analyz
 | POST | `/api/claim-analyzer/analyze` | Tag + reformulate a strong claim (shipped under its own prefix) | V2 | DONE 1.18.4 |
 | POST | `/api/self-sim-reality/source-map` | Return ranked source chunks (real vector store) for a topic | V2 | **DONE 1.37.0** |
 | GET | `/api/self-sim-reality/vectorstore/health` | Vector store health (backend, KB size) | V2 | **DONE 1.37.0** |
-| POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison panel | V2 | Pending |
+| POST | `/api/self-sim-reality/compare-theories` | Side-by-side comparison (vector-store-grounded, epistemically tagged) | V2 | **DONE 1.37.1** |
 | POST | `/api/self-sim-reality/red-team` | Generate objections to a given claim | V2 | Pending |
 | GET | `/api/self-sim-reality/learning-path` | Suggested reading order | V3 | Pending |
 
@@ -663,11 +663,24 @@ Mongo vector index or FAISS) is `vectorstore.search()`; nothing else changes.
 - Tests `backend/tests/test_self_sim_reality_vectorstore.py` (7 offline, embeddings forced off
   for determinism).
 
-### 16.5 Still pending
+### 16.5 Compare Theories (1.37.1)
 
-`compare-theories` and `red-team` endpoints (§8), a persistent/ANN index if the KB grows, and
-real OPH-repo ingestion to widen the corpus.
+`POST /api/self-sim-reality/compare-theories` (`backend/services/self_sim_reality_compare.py`)
+puts two theories side by side. Each side is **grounded through the vector store**
+(`search(..., backend="tfidf")` → the top KB chunk supplies its title + evidence level),
+then an LLM produces `{a, b, agreements[], differences[], relation, relation_note,
+honest_note}`. Off-palette levels and off-list relations are clamped; the tool never declares
+a winner and always ends on what neither theory settles. Frontend **⚖️ Compare** tab
+(`CompareTheories.jsx`) with preset pairs; trilingual mock; 4 offline tests
+(`test_self_sim_reality_compare.py`). This is a nice V2 synergy — the vector store built for
+Source Map also grounds the comparison.
+
+### 16.6 Still pending
+
+`red-team` endpoint (§8; the Dialogue already emits objections, so this is a focused
+standalone challenge tool), a persistent/ANN index if the KB grows, real OPH-repo ingestion
+to widen the corpus, and the V3 learning-path endpoint.
 
 ---
 
-*Last updated: 2026-08-11 (1.37.0 — V2 real vector store + Source Map shipped)*
+*Last updated: 2026-08-11 (1.37.1 — V2 Compare Theories shipped; vector store + Source Map in 1.37.0)*

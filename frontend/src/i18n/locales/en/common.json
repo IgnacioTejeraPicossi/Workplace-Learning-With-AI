@@ -291,6 +291,7 @@
       "theoryTour": "Theory Tour",
       "dialogue": "Dialogue",
       "sourceMap": "Source Map",
+      "compare": "Compare",
       "wiphySearch": "WiPhy Search",
       "claimAnalyzer": "Claim Analyzer",
       "playground": "Playground",
@@ -350,6 +351,36 @@
       "errors": {
         "http": "The server returned an error (HTTP {{status}}). Please try again.",
         "network": "Couldn't reach the vector store. Check that the backend is running."
+      }
+    },
+    "compare": {
+      "title": "Compare Theories",
+      "subtitle": "Put two theories or positions side by side. Each side is grounded via the vector store (its evidence level), then compared honestly — agreements, differences, how they relate, and what neither settles. The tool never picks a winner.",
+      "placeholderA": "First theory, e.g. 'IIT'",
+      "placeholderB": "Second theory, e.g. 'GNW'",
+      "compareBtn": "Compare",
+      "comparing": "Comparing…",
+      "orTryPair": "or try a pair:",
+      "relationLabel": "Relation",
+      "agreements": "Where they agree",
+      "differences": "Where they differ",
+      "honestNote": "What neither settles",
+      "relations": {
+        "competing": "Competing",
+        "complementary": "Complementary",
+        "nested": "Nested (one is a special case)",
+        "orthogonal": "Orthogonal (different questions)",
+        "unrelated": "Unrelated"
+      },
+      "pairs": {
+        "iit": { "a": "IIT (integrated information)", "b": "GNW (global workspace)" },
+        "oph": { "a": "Observer Patch Holography", "b": "Celestial Holography" },
+        "rovelli": { "a": "Relational QM (Rovelli)", "b": "Consciousness creates reality" }
+      },
+      "disclaimer": "This compares two positions by evidence level and structure — it does not rank them as true or false. Speculative theories (like OPH) stay tagged speculative; the honest note flags what neither theory settles.",
+      "errors": {
+        "http": "The server returned an error (HTTP {{status}}). Please try again.",
+        "network": "Couldn't reach the agent. Check that the backend is running."
       }
     },
     "overview": {

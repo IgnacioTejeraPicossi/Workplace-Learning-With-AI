@@ -1259,6 +1259,7 @@
       "theoryTour": "Recorrido teórico",
       "dialogue": "Diálogo",
       "sourceMap": "Mapa de fuentes",
+      "compare": "Comparar",
       "wiphySearch": "Buscador WiPhy",
       "claimAnalyzer": "Analizador de afirmaciones",
       "playground": "Playground",
@@ -1318,6 +1319,36 @@
       "errors": {
         "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
         "network": "No se pudo contactar con el vector store. Comprueba que el backend esté en marcha."
+      }
+    },
+    "compare": {
+      "title": "Comparar teorías",
+      "subtitle": "Pon dos teorías o posiciones lado a lado. Cada lado se ancla mediante el vector store (su nivel de evidencia) y luego se comparan con honestidad — acuerdos, diferencias, cómo se relacionan y qué no resuelve ninguna. La herramienta nunca elige un ganador.",
+      "placeholderA": "Primera teoría, p. ej. «IIT»",
+      "placeholderB": "Segunda teoría, p. ej. «GNW»",
+      "compareBtn": "Comparar",
+      "comparing": "Comparando…",
+      "orTryPair": "o prueba un par:",
+      "relationLabel": "Relación",
+      "agreements": "En qué coinciden",
+      "differences": "En qué difieren",
+      "honestNote": "Qué no resuelve ninguna",
+      "relations": {
+        "competing": "Compiten",
+        "complementary": "Complementarias",
+        "nested": "Anidadas (una es un caso especial)",
+        "orthogonal": "Ortogonales (preguntas distintas)",
+        "unrelated": "Sin relación"
+      },
+      "pairs": {
+        "iit": { "a": "IIT (información integrada)", "b": "GNW (espacio de trabajo global)" },
+        "oph": { "a": "Observer Patch Holography", "b": "Holografía Celeste" },
+        "rovelli": { "a": "MC Relacional (Rovelli)", "b": "La consciencia crea la realidad" }
+      },
+      "disclaimer": "Esto compara dos posiciones por nivel de evidencia y estructura — no las clasifica como verdaderas o falsas. Las teorías especulativas (como OPH) siguen etiquetadas como especulativas; la nota honesta señala qué no resuelve ninguna.",
+      "errors": {
+        "http": "El servidor devolvió un error (HTTP {{status}}). Inténtalo de nuevo.",
+        "network": "No se pudo contactar con el agente. Comprueba que el backend esté en marcha."
       }
     },
     "overview": {

@@ -582,6 +582,7 @@
       "theoryTour": "Teorirundtur",
       "dialogue": "Dialog",
       "sourceMap": "Kildekart",
+      "compare": "Sammenlign",
       "wiphySearch": "WiPhy‑søk",
       "claimAnalyzer": "Påstandsanalyse",
       "playground": "Lekeplass",
@@ -641,6 +642,36 @@
       "errors": {
         "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
         "network": "Kunne ikke nå vektorbutikken. Sjekk at backend kjører."
+      }
+    },
+    "compare": {
+      "title": "Sammenlign teorier",
+      "subtitle": "Sett to teorier eller posisjoner side om side. Hver side forankres via vektorbutikken (dens evidensnivå), og sammenlignes så ærlig — enigheter, forskjeller, hvordan de forholder seg, og hva ingen av dem avgjør. Verktøyet kårer aldri en vinner.",
+      "placeholderA": "Første teori, f.eks. «IIT»",
+      "placeholderB": "Andre teori, f.eks. «GNW»",
+      "compareBtn": "Sammenlign",
+      "comparing": "Sammenligner…",
+      "orTryPair": "eller prøv et par:",
+      "relationLabel": "Relasjon",
+      "agreements": "Der de er enige",
+      "differences": "Der de er uenige",
+      "honestNote": "Hva ingen av dem avgjør",
+      "relations": {
+        "competing": "Konkurrerer",
+        "complementary": "Utfyllende",
+        "nested": "Nøstet (én er et spesialtilfelle)",
+        "orthogonal": "Ortogonale (ulike spørsmål)",
+        "unrelated": "Uten sammenheng"
+      },
+      "pairs": {
+        "iit": { "a": "IIT (integrert informasjon)", "b": "GNW (globalt arbeidsområde)" },
+        "oph": { "a": "Observer Patch Holography", "b": "Celestial Holography" },
+        "rovelli": { "a": "Relasjonell QM (Rovelli)", "b": "Bevissthet skaper virkelighet" }
+      },
+      "disclaimer": "Dette sammenligner to posisjoner etter evidensnivå og struktur — det rangerer dem ikke som sanne eller falske. Spekulative teorier (som OPH) forblir merket spekulative; den ærlige merknaden flagger hva ingen av teoriene avgjør.",
+      "errors": {
+        "http": "Serveren returnerte en feil (HTTP {{status}}). Prøv igjen.",
+        "network": "Kunne ikke nå agenten. Sjekk at backend kjører."
       }
     },
     "overview": {
