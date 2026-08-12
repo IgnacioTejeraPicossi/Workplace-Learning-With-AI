@@ -28,6 +28,23 @@ def test_retrieve_is_deterministic_and_grounded():
     assert fallback and all(c["id"].startswith("oph-") for c in fallback)
 
 
+def test_kb_expansion_is_wellformed():
+    # The hand-curated OPH expansion (2026-08-11) widened the KB; every chunk must
+    # stay well-formed and tagged, and OPH-book-sourced chunks stay speculative
+    # (or philosophy for the metaphysics chapter) — never presented as established.
+    kb = svc.KNOWLEDGE_BASE
+    assert len(kb) >= 23
+    ids = [c["id"] for c in kb]
+    assert len(ids) == len(set(ids))            # no duplicate ids
+    for c in kb:
+        assert c["id"] and c["title"] and c["text"]
+        assert c["level"] in _ALLOWED_LEVELS
+        assert c["sources"] and c["tags"]
+        # a chunk crediting the OPH book must never be tagged as settled science
+        if any("OPH book" in s for s in c["sources"]):
+            assert c["level"] in {"speculative", "philosophy"}
+
+
 def test_health_and_concepts():
     h = svc.health()
     assert h["status"] == "ok" and h["kb_chunks"] >= 10

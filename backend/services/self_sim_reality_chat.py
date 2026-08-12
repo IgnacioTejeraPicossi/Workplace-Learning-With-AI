@@ -185,6 +185,133 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
         "sources": ["Self-Simulating Reality Agent — AI-as-Observer tab"],
         "tags": ["ai", "observer", "consciousness", "subjective time", "agent", "echo test"],
     },
+    # ── Curated OPH concept expansion (paraphrased commentary, source-credited).
+    # OPH-specific readings are always tagged `speculative`; the underlying physics
+    # they lean on is tagged `mainstream`. Attribution points at the OPH book
+    # chapters (CC BY-NC-SA) without reproducing their text. Added 2026-08-11.
+    {
+        "id": "oph-consistency",
+        "title": "The consistency principle (OPH)",
+        "level": "speculative",
+        "text": ("OPH's starting move: reality is what survives global consistency between "
+                 "many overlapping local descriptions. There is no master copy — a fact is "
+                 "'real' when no patch can consistently disagree with it. Speculative framing "
+                 "of physics as a consistency-satisfaction problem."),
+        "sources": ["OPH book — Ch.1 Consistency (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["consistency", "overlap", "oph", "constraint satisfaction", "public fact"],
+    },
+    {
+        "id": "oph-entropy-area",
+        "title": "Entropy and the area law (OPH reading)",
+        "level": "speculative",
+        "text": ("OPH leans on the physics result that a region's information capacity scales "
+                 "with its boundary area, not its volume, and reads it as each patch carrying "
+                 "a bounded, boundary-encoded state. The area-law/holographic-entropy result "
+                 "itself is mainstream; OPH's observer-patch interpretation is speculative."),
+        "sources": ["OPH book — Ch.4 Entropy (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["entropy", "area law", "capacity", "boundary", "bekenstein", "oph"],
+    },
+    {
+        "id": "oph-error-correction",
+        "title": "Reality as an error-correcting code (OPH)",
+        "level": "speculative",
+        "text": ("OPH frames robust public facts as protected 'logical' information in a "
+                 "quantum error-correcting code: local noise on individual patches is "
+                 "corrected by redundancy across overlaps. The AdS/CFT-as-a-code idea in "
+                 "physics is mainstream; OPH's use of it as the mechanism of objectivity is "
+                 "speculative."),
+        "sources": ["OPH book — Ch.10 Error Correction (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["error correction", "qec", "redundancy", "robustness", "oph", "logical"],
+    },
+    {
+        "id": "oph-entanglement",
+        "title": "Entanglement as shared overlap (OPH)",
+        "level": "speculative",
+        "text": ("OPH reads entanglement between systems as structure shared where their "
+                 "patches overlap — correlations are the overlap being consistent, not a "
+                 "signal passing between distant points. A speculative reinterpretation of "
+                 "standard entanglement, not a new empirical claim."),
+        "sources": ["OPH book — Ch.9 Entanglement (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["entanglement", "overlap", "correlation", "nonlocality", "oph"],
+    },
+    {
+        "id": "oph-maxent",
+        "title": "Maximum-entropy inference as the engine (OPH)",
+        "level": "speculative",
+        "text": ("OPH uses a least-assumption / maximum-entropy principle to fix what a patch "
+                 "should read given its constraints: assume no more than the overlaps force. "
+                 "Max-entropy inference is an established tool in statistics and physics; OPH's "
+                 "use of it as the rule that generates public physics is speculative."),
+        "sources": ["OPH book — Ch.11 MaxEnt (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["maximum entropy", "inference", "least assumption", "jaynes", "oph"],
+    },
+    {
+        "id": "oph-standard-model",
+        "title": "Deriving particle structure from a finite port symmetry (OPH)",
+        "level": "speculative",
+        "text": ("One of OPH's most ambitious and least-supported moves: it tries to recover "
+                 "Standard-Model-like structure from a finite icosahedral (A5) symmetry of a "
+                 "twelve-port carrier. This is a highly speculative derivation programme, far "
+                 "from experimental confirmation — read it as a research bet, not a result."),
+        "sources": ["OPH book — Ch.14 Standard Model (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["standard model", "a5", "icosahedral", "symmetry", "particles", "oph"],
+    },
+    {
+        "id": "oph-relativity",
+        "title": "Recovering spacetime and relativity from patch flow (OPH)",
+        "level": "speculative",
+        "text": ("OPH aims to recover smooth spacetime and relativistic structure as an "
+                 "emergent, coarse-grained description of how patch states flow and agree, "
+                 "rather than as a fundamental backdrop. Emergent-spacetime programmes exist "
+                 "in mainstream physics; OPH's observer-patch version is speculative."),
+        "sources": ["OPH book — Ch.15 Relativity (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["relativity", "spacetime", "emergence", "lorentz", "flow", "oph"],
+    },
+    {
+        "id": "oph-darwin",
+        "title": "A selection dynamic over descriptions (OPH)",
+        "level": "speculative",
+        "text": ("OPH describes a quasi-Darwinian dynamic: descriptions that stay consistent "
+                 "across overlaps get reinforced and 'proliferate' into shared reality, while "
+                 "inconsistent ones are repaired away. A speculative analogy to selection, not "
+                 "a claim of biological evolution."),
+        "sources": ["OPH book — Ch.17 Darwin (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["selection", "darwinian", "reinforcement", "consistency", "oph"],
+    },
+    {
+        "id": "oph-metaphysics",
+        "title": "What OPH does and doesn't claim about mind (OPH metaphysics)",
+        "level": "philosophy",
+        "text": ("OPH's metaphysical chapter is careful: 'observer' is used structurally (a "
+                 "self-reading patch), and it does not, by itself, assert that patches are "
+                 "conscious. Whether experience must be added is left open — which is exactly "
+                 "why the module tags the consciousness questions as philosophy, not physics."),
+        "sources": ["OPH book — Ch.20 Metaphysics (github.com/FloatingPragma/observer-patch-holography)"],
+        "tags": ["metaphysics", "mind", "consciousness", "structural observer", "oph"],
+    },
+    {
+        "id": "bell-nonlocality",
+        "title": "Bell's theorem and nonlocal correlations",
+        "level": "mainstream",
+        "text": ("Bell's theorem shows no theory that is both local and realistic can "
+                 "reproduce all quantum correlations; Aspect-style experiments confirm the "
+                 "quantum predictions and rule out local hidden variables. Established, "
+                 "peer-reviewed physics — the empirical backdrop many interpretations "
+                 "(including OPH's overlap picture) must respect."),
+        "sources": ["Bell (1964); Aspect et al. (1982); 2022 Nobel Prize in Physics"],
+        "tags": ["bell theorem", "local realism", "hidden variables", "correlations", "aspect"],
+    },
+    {
+        "id": "qec-holography",
+        "title": "Quantum error correction & holography (AdS/CFT as a code)",
+        "level": "mainstream",
+        "text": ("A mainstream result: in AdS/CFT the bulk can be reconstructed from the "
+                 "boundary the way a logical qubit is protected in a quantum error-correcting "
+                 "code (Almheiri–Dong–Harlow). Actively researched physics — and the concrete "
+                 "template OPH borrows for its 'reality as a code' reading."),
+        "sources": ["Almheiri, Dong & Harlow (2015), 'Bulk locality and quantum error correction in AdS/CFT'"],
+        "tags": ["quantum error correction", "holography", "ads/cft", "bulk reconstruction", "code"],
+    },
 ]
 
 _STOPWORDS = {

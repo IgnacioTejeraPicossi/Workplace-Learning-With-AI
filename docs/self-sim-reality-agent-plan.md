@@ -699,13 +699,25 @@ shown as prerequisites. Stage text is localized in i18n; frontend **🎓 Learnin
 (`LearningPath.jsx`, placed right after Overview). 4 offline tests. **With this, every endpoint
 in §8 is shipped.**
 
-### 16.8 Still pending (optional scaling only)
+### 16.8 Corpus widening — hand-curated, not bulk-ingested (1.38.2)
 
-A persistent/ANN index and real OPH-repo ingestion — both only matter once the curated 12-chunk
-KB grows. The upgrade seam is `vectorstore.search()`. The module now has **15 tabs** and all 6
-planned endpoints (chat, source-map, vectorstore health, compare-theories, red-team,
-learning-path) are live.
+The corpus grew **12 → 23 chunks**. We investigated real OPH-repo ingestion and found the
+repo's `book/` is licensed **CC BY-NC-SA 4.0** (NonCommercial + ShareAlike) — even
+paraphrased summaries are derivative works under ShareAlike, which would pull NC/SA
+obligations into the app's KB. So instead of bulk-ingesting, the owner chose to **hand-extend
+the curated KB** with 11 original paraphrased-commentary chunks (OPH consistency, entropy/area,
+error-correction, entanglement, max-entropy, A5/Standard-Model, emergent relativity, selection
+dynamic, metaphysics; plus mainstream Bell nonlocality and QEC/holography), each crediting the
+relevant OPH book chapter for attribution. OPH-book-sourced chunks stay `speculative`/`philosophy`,
+never `established`. `test_kb_expansion_is_wellformed` guards this. The Apache-2.0 `code/`
+material remains available for a future permissive ingestion if desired.
+
+### 16.9 Still pending (optional scaling only)
+
+A persistent/ANN index — only matters once the curated KB grows much larger (the upgrade seam
+is `vectorstore.search()`). Bulk `book/` ingestion is gated on the CC BY-NC-SA licensing
+decision above. The module has **15 tabs** and all 6 planned endpoints are live.
 
 ---
 
-*Last updated: 2026-08-11 (1.38.0 — V3 Learning Path shipped; ALL planned endpoints complete)*
+*Last updated: 2026-08-11 (1.38.2 — KB widened to 23 chunks by hand-curated commentary; OPH `book/` is CC BY-NC-SA so not bulk-ingested)*

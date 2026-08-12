@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.38.2] - 2026-08-11
+
+### Added — Self-Simulating Reality Agent: hand-curated OPH knowledge-base expansion
+
+Widened the retrieval corpus from **12 → 23 chunks** so Source Map, Compare, Red Team,
+Dialogue and Learning Path all draw on a richer OPH concept map — done the disciplined
+way (curation, not bulk ingestion).
+
+- **Licensing decision (why this, not repo ingestion):** the OPH repo's `book/` is
+  **CC BY-NC-SA 4.0** (NonCommercial + ShareAlike) — even paraphrased summaries are
+  derivative works under ShareAlike. Rather than pull those obligations into the app,
+  the owner chose to hand-extend the curated KB. The new chunks are **original paraphrased
+  commentary** (not reproductions), each crediting the relevant OPH book chapter for
+  attribution.
+- **11 new chunks** in `backend/services/self_sim_reality_chat.py::KNOWLEDGE_BASE`: OPH
+  readings (consistency, entropy/area law, error-correction, entanglement, max-entropy,
+  A5/Standard-Model derivation, emergent relativity, selection dynamic — all
+  `speculative`; the metaphysics chapter `philosophy`) plus two mainstream physics anchors
+  they lean on (Bell's theorem / nonlocality; quantum error correction & holography in
+  AdS/CFT). Every OPH-book-sourced chunk stays `speculative`/`philosophy` — never presented
+  as settled science.
+- **Learning Path** stage `concept_ids` extended so the new concepts route goals to the
+  right entry stage.
+- **Tests**: new `test_kb_expansion_is_wellformed` (KB ≥ 23, no dup ids, all chunks tagged
+  + sourced, OPH-book chunks never `established`). Full offline self-sim suite now 25 tests.
+  Verified: KB = 23; the observer/measurement query still tops Rovelli RQM (rankings
+  preserved); all 25 pass. Backend-only change (no frontend rebuild needed).
+
+---
+
 ## [1.38.1] - 2026-08-11
 
 ### Fixed — Self-Simulating Reality Agent: stale "V0" hero/status copy
