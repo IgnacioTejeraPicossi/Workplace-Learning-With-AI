@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.38.1] - 2026-08-11
+
+### Fixed — Self-Simulating Reality Agent: stale "V0" hero/status copy
+
+The hero badge still read "V0 · structure + reading material" and the status hint still
+said the full agent "lands in V1+", even though V1–V3 are all shipped. Refreshed the
+`statusBadge`, `statusHint`, roadmap `intro`, and roadmap phases `v2`/`v3` (EN/ES/NO) to
+reflect the live agent (Dialogue, vector store / Source Map, Compare, Red Team, Learning
+Path). The Roadmap tab now renders all four V0–V3 phases as done (green). i18n parity
+unchanged (535/535); build exit 0.
+
+---
+
 ## [1.38.0] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent · V3 "Learning Path" (last planned endpoint)

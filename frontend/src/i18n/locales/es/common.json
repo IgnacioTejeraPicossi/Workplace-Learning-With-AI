@@ -1250,8 +1250,8 @@
     "moduleTitle": "Agente de Realidad Auto‑Simulada",
     "moduleSubtitle": "Acompañante científico‑filosófico para la idea de que observadores, mentes y conciencia participan en la construcción del universo que experimentan.",
     "guidingPhrase": "No te digo qué creer. Te muestro qué es ciencia, qué es teoría, qué es filosofía y qué es imaginación metafísica.",
-    "statusBadge": "V0 · estructura + material de lectura",
-    "statusHint": "Esta versión incluye contenido estático rico (conceptos, recorrido teórico, experimentos mentales IA‑como‑observador) extraído de Observer Patch Holography y de tus capturas. El agente completo con RAG + Mongo llega en V1+. Ver docs/self-sim-reality-agent-plan.md.",
+    "statusBadge": "Agente completo · chat, recuperación y herramientas",
+    "statusHint": "El agente completo está operativo: un Diálogo etiquetado epistémicamente, un vector store real (Mapa de fuentes), Comparar teorías, Red Team y una Ruta de aprendizaje con la evidencia primero — además de las pestañas de lectura curadas, el Analizador de afirmaciones y el Playground. Cada afirmación conserva su etiqueta de evidencia de 5 niveles, y OPH sigue siendo especulativo. Ver docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Resumen",
       "learningPath": "Ruta de aprendizaje",
@@ -1780,12 +1780,12 @@
       }
     },
     "roadmap": {
-      "intro": "V0 entregó el material de lectura; V1 añade el agente conversacional. El Analizador de afirmaciones y el Playground (V2–V3) ya están operativos también.",
+      "intro": "Todas las fases planificadas están operativas: V0 material de lectura, V1 Diálogo conversacional, la suite completa de herramientas V2 (vector store real, Mapa de fuentes, Comparar teorías, Red Team) y V3 (Playground + Ruta de aprendizaje con la evidencia primero).",
       "phases": {
         "v0": "✓ V0 — Pestañas con contenido curado, etiquetas epistémicas, conceptos derivados de capturas, experimentos mentales IA‑como‑observador",
         "v1": "✓ V1 (ahora) — Agente conversacional operativo en la pestaña Diálogo: POST /chat anclado en una base de conocimiento curada OPH + ciencia (RAG‑lite), cada respuesta etiquetada por nivel de evidencia",
-        "v2": "V2 — Analizador de afirmaciones: pega una afirmación fuerte, obtén su núcleo científico + sobre‑extensión + reformulación recomendada",
-        "v3": "V3 — Mapa de teorías (grafo interactivo) + simulador de Parche de Observador (juguete pequeño que muestra emergencia de consenso)"
+        "v2": "✓ V2 — Vector store real + Mapa de fuentes, Comparar teorías, Red Team y el Analizador de afirmaciones — todo etiquetado epistémicamente, con endpoints /api/self-sim-reality/*",
+        "v3": "✓ V3 — Mapa de teorías + simulador de Parche de Observador + una Ruta de aprendizaje con la evidencia primero (inicio según objetivo vía el vector store)"
       },
       "sourcesTitle": "Fuentes fundacionales",
       "sources": {

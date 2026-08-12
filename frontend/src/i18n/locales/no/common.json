@@ -573,8 +573,8 @@
     "moduleTitle": "Selv‑simulerende virkelighet‑agent",
     "moduleSubtitle": "En vitenskapelig‑filosofisk ledsager for ideen om at observatører, sinn og bevissthet deltar i å konstruere universet de erfarer.",
     "guidingPhrase": "Jeg sier deg ikke hva du skal tro. Jeg viser deg hva som er vitenskap, hva som er teori, hva som er filosofi, og hva som er metafysisk fantasi.",
-    "statusBadge": "V0 · struktur + lesemateriale",
-    "statusHint": "Denne versjonen leverer rikt statisk innhold (begreper, teorirundtur, KI‑som‑observatør tankeeksperimenter) basert på Observer Patch Holography og skjermbildene du oppga. Den fulle agenten med RAG + Mongo kommer i V1+. Se docs/self-sim-reality-agent-plan.md.",
+    "statusBadge": "Full agent · chat, gjenfinning og verktøy",
+    "statusHint": "Den fulle agenten er i drift: en epistemisk merket Dialog, en ekte vektorbutikk (Kildekart), Sammenlign teorier, Red Team og en Læringssti med evidens først — pluss de kuraterte lesefanene, Påstandsanalysatoren og Lekeplassen. Hver påstand beholder sitt 5-nivås evidensmerke, og OPH forblir spekulativ. Se docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Oversikt",
       "learningPath": "Læringssti",
@@ -1103,12 +1103,12 @@
       }
     },
     "roadmap": {
-      "intro": "V0 leverte lesematerialet; V1 legger til den samtalebaserte agenten. Påstandsanalysatoren og Lekeplassen (V2–V3) er også allerede i drift.",
+      "intro": "Alle planlagte faser er i drift: V0 lesemateriale, V1 samtalebasert Dialog, hele V2-verktøysuiten (ekte vektorbutikk, Kildekart, Sammenlign teorier, Red Team) og V3 (Lekeplass + Læringssti med evidens først).",
       "phases": {
         "v0": "✓ V0 — Faner med kuratert innhold, epistemiske etiketter, skjermbilde‑avledede begreper, KI‑som‑observatør‑tankeeksperimenter",
         "v1": "✓ V1 (nå) — Samtalebasert agent i drift i Dialog‑fanen: POST /chat forankret i en kuratert OPH + vitenskap‑kunnskapsbase (RAG‑lite), hvert svar merket etter evidensnivå",
-        "v2": "V2 — Påstand‑analysator: lim inn en sterk påstand, få dens vitenskapelige kjerne + overdrivelse + anbefalt omformulering",
-        "v3": "V3 — Teorikart (interaktiv graf) + Observer Patch‑simulator (lite leketøy som viser konsensus‑fremvekst)"
+        "v2": "✓ V2 — Ekte vektorbutikk + Kildekart, Sammenlign teorier, Red Team og Påstandsanalysatoren — alt epistemisk merket, drevet av /api/self-sim-reality/*-endepunkter",
+        "v3": "✓ V3 — Teorikart + Observer Patch-simulator + en Læringssti med evidens først (målstyrt start via vektorbutikken)"
       },
       "sourcesTitle": "Grunnleggende kilder",
       "sources": {

@@ -282,8 +282,8 @@
     "moduleTitle": "Self-Simulating Reality Agent",
     "moduleSubtitle": "A scientific-philosophical companion for the idea that observers, minds and consciousness participate in constructing the universe they experience.",
     "guidingPhrase": "I don't tell you what to believe. I show you what is science, what is theory, what is philosophy, and what is metaphysical imagination.",
-    "statusBadge": "V0 · structure + reading material",
-    "statusHint": "This version ships rich static content (concepts, theory tour, AI-as-observer thought experiments) drawn from Observer Patch Holography and your provided screenshots. The full agent with RAG + Mongo lands in V1+. See docs/self-sim-reality-agent-plan.md.",
+    "statusBadge": "Full agent · chat, retrieval & tools",
+    "statusHint": "The full agent is live: an epistemically-tagged Dialogue, a real vector store (Source Map), Compare Theories, Red Team, and an evidence-first Learning Path — plus the curated reading tabs, Claim Analyzer and Playground. Every claim keeps its 5-level evidence tag, and OPH stays speculative. See docs/self-sim-reality-agent-plan.md.",
     "tabs": {
       "overview": "Overview",
       "learningPath": "Learning Path",
@@ -812,12 +812,12 @@
       }
     },
     "roadmap": {
-      "intro": "V0 shipped the reading material; V1 adds the conversational agent. The Claim Analyzer and Playground (V2–V3) are already live too.",
+      "intro": "All planned phases are live: V0 reading material, V1 conversational Dialogue, the full V2 tool suite (real vector store, Source Map, Compare Theories, Red Team) and V3 (Playground + evidence-first Learning Path).",
       "phases": {
         "v0": "✓ V0 — Tabs with curated content, epistemic tags, screenshot-derived concepts, AI-as-observer thought experiments",
         "v1": "✓ V1 (now) — Conversational agent live in the Dialogue tab: POST /chat grounded in a curated OPH + science knowledge base (RAG-lite), every answer tagged by evidence level",
-        "v2": "V2 — Claim Analyzer: paste a strong claim, get its scientific core + overreach + recommended reformulation",
-        "v3": "V3 — Theory Map (interactive graph) + Observer Patch simulator (small toy showing consensus emergence)"
+        "v2": "✓ V2 — Real vector store + Source Map, Compare Theories, Red Team, and the Claim Analyzer — all epistemically tagged, backed by /api/self-sim-reality/* endpoints",
+        "v3": "✓ V3 — Theory Map + Observer Patch simulator + an evidence-first Learning Path (goal-aware start via the vector store)"
       },
       "sourcesTitle": "Foundational sources",
       "sources": {

@@ -37,9 +37,9 @@ export default function RoadmapAndSources() {
         <p style={{ ...subtle, margin: '0 0 14px' }}>{t('selfSimReality.roadmap.intro')}</p>
         <ol style={{ margin: 0, paddingLeft: 22, display: 'grid', gap: 8 }}>
           {PHASES.map((p, i) => {
-            // V1 (the conversational agent) is now shipped; phases up to and
-            // including it read as done (green), V1 highlighted as the newest.
-            const CURRENT_INDEX = 1;
+            // All planned phases (V0–V3) are shipped; every phase reads as done
+            // (green). No single "current" — the module is functionally complete.
+            const CURRENT_INDEX = PHASES.length - 1;
             const done = i <= CURRENT_INDEX;
             return (
               <li key={p} style={{
