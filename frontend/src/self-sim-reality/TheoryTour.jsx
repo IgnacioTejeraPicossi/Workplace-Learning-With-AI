@@ -15,6 +15,11 @@ const ROWS = [
   { id: 'ctmu' },
   { id: 'willowMultiverse' },
   { id: 'hoffmanInterface' },
+  // The "mind co-constructs reality" lineage (Pribram → Bohm → Grinberg),
+  // added from a documentary the project owner brought in. Historical order.
+  { id: 'pribramHolonomic' },
+  { id: 'bohmImplicate' },
+  { id: 'grinbergSyntergic' },
 ];
 
 const PASTERSKI_LINKS = [

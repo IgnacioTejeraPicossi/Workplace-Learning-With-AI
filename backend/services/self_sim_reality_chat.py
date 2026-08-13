@@ -301,6 +301,55 @@ KNOWLEDGE_BASE: List[Dict[str, Any]] = [
         "sources": ["Bell (1964); Aspect et al. (1982); 2022 Nobel Prize in Physics"],
         "tags": ["bell theorem", "local realism", "hidden variables", "correlations", "aspect"],
     },
+    # ── "Mind co-constructs reality" lineage (Pribram → Bohm → Grinberg), added
+    # 2026-08-13 from a documentary the owner brought in. Precursors to OPH's
+    # observer-first stance; tagged honestly (Grinberg's key experiment is
+    # unreplicated and not accepted — never presented as fact).
+    {
+        "id": "pribram-holonomic",
+        "title": "The holonomic (holographic) brain (Pribram)",
+        "level": "speculative",
+        "text": ("Karl Pribram's holonomic brain theory (Languages of the Brain, 1971) proposes "
+                 "the brain stores/processes information as distributed wave-interference "
+                 "patterns — a 'holographic' code — explaining associative recall and memory's "
+                 "resilience to local damage. Distributed coding has partial support, but the "
+                 "full holonomic theory is a minority, non-mainstream programme. A neural-level "
+                 "ancestor of 'the observer reconstructs its world'; Pribram collaborated with "
+                 "David Bohm on the 'holographic paradigm'."),
+        "sources": ["Pribram, Languages of the Brain (1971)"],
+        "tags": ["pribram", "holonomic", "holographic brain", "perception", "memory", "interference"],
+    },
+    {
+        "id": "bohm-implicate",
+        "title": "The implicate order (Bohm)",
+        "level": "philosophy",
+        "text": ("David Bohm's implicate order (Wholeness and the Implicate Order, 1980): the "
+                 "perceived 'explicate' world of separate objects unfolds from a deeper, "
+                 "enfolded, holographically-interconnected 'implicate order'. A philosophical "
+                 "interpretation (distinct from his testable pilot-wave mechanics), argued "
+                 "conceptually. A direct ancestor of OPH's 'reality read out from a deeper "
+                 "atemporal substrate'."),
+        "sources": ["Bohm, Wholeness and the Implicate Order (1980)"],
+        "tags": ["bohm", "implicate order", "enfolded", "wholeness", "holographic universe", "substrate"],
+    },
+    {
+        "id": "grinberg-syntergic",
+        "title": "Syntergic theory & the transferred potential (Grinberg)",
+        "level": "speculative",
+        "text": ("Jacobo Grinberg's syntergic theory (La Construcción de la Realidad): the "
+                 "brain's neuronal field interacts with a pre-space 'lattice' (syntergic field), "
+                 "so each mind co-constructs the perceived world; a shared field would explain "
+                 "why everyone sees the same thing. His 'transferred potential' EEG experiments "
+                 "(1994) claimed EPR-like nonlocal correlation between separated brains — but were "
+                 "never independently replicated (weak controls, possible EM artifacts; later "
+                 "attempts found only subtle inconsistent signals). Unreplicated and not accepted; "
+                 "speculative and parapsychology-adjacent. Structurally echoes OPH's overlap-"
+                 "consensus without its testable machinery."),
+        "sources": ["Grinberg-Zylberbaum, La Construcción de la Realidad",
+                    "Grinberg-Zylberbaum et al., 'The EPR Paradox in the Brain: The Transferred Potential', Physics Essays (1994)"],
+        "tags": ["grinberg", "syntergic", "transferred potential", "neuronal field", "lattice",
+                 "constructed reality", "consciousness", "epr"],
+    },
     {
         "id": "qec-holography",
         "title": "Quantum error correction & holography (AdS/CFT as a code)",

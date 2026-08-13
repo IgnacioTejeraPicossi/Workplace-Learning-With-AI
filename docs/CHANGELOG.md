@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.40.0] - 2026-08-13
+
+### Added — Self-Simulating Reality Agent: the "mind co-constructs reality" lineage (Pribram → Bohm → Grinberg)
+
+New content the project owner brought from a documentary crossing **Jacobo Grinberg's
+Syntergic Theory**, **David Bohm's implicate order** and **Karl Pribram's holographic
+brain** — the historical chain behind "the reality you perceive is something your brain
+helps construct." Integrated two ways so it connects to the rest of the agent:
+
+- **Theory Tour**: three new rows (`pribramHolonomic` · speculative, `bohmImplicate` ·
+  philosophy, `grinbergSyntergic` · speculative), each with author, epistemic badge, a
+  paraphrased body and an explicit relation-to-OPH note. Web-grounded and honestly labelled
+  — in particular **Grinberg's "transferred potential" experiment is flagged as unreplicated
+  and not accepted** (weak controls, possible EM artifacts; Wackermann et al. found only
+  subtle, inconsistent signals). Content paraphrased, sources credited (books + the 1994
+  Physics Essays paper + the SPR Psi Encyclopedia). i18n EN/ES/NO (selfSimReality 550/550).
+- **Knowledge base** (`backend/services/self_sim_reality_chat.py`): three matching chunks
+  (`pribram-holonomic`, `bohm-implicate`, `grinberg-syntergic`) so the vector store powers
+  the whole agent — Dialogue, Source Map, Compare Theories, Red Team and Learning Path now
+  retrieve this lineage and relate it to OPH automatically. KB 23 → 26.
+- **The connection**: all three are precursors to OPH's observer-first stance; the notes
+  make the lineage explicit (Pribram's holographic brain → Bohm's implicate order → OPH's
+  screen/fixed-point; Grinberg's shared field ↔ OPH's overlap-consensus, but without OPH's
+  testable machinery). Verified: a query like "why do we all see the same reality if each
+  mind constructs it?" now retrieves the Grinberg chunk first — the documentary's own question.
+- Validated: backend compile; full offline self-sim suite **25 tests** (KB-integrity bump to
+  ≥26, OPH-book chunks still never `established`); observer/measurement query still tops
+  Rovelli (rankings preserved); JSX parse; i18n parity 550/550; production build.
+
+---
+
 ## [1.39.0] - 2026-08-13
 
 ### Changed — AGI Progress Hub: tracker refreshed through August 2026 (+ Kimi)

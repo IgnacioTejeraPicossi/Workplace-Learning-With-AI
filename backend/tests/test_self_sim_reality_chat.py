@@ -33,7 +33,7 @@ def test_kb_expansion_is_wellformed():
     # stay well-formed and tagged, and OPH-book-sourced chunks stay speculative
     # (or philosophy for the metaphysics chapter) — never presented as established.
     kb = svc.KNOWLEDGE_BASE
-    assert len(kb) >= 23
+    assert len(kb) >= 26
     ids = [c["id"] for c in kb]
     assert len(ids) == len(set(ids))            # no duplicate ids
     for c in kb:
