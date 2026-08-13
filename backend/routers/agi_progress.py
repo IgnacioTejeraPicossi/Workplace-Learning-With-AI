@@ -77,7 +77,7 @@ DEFAULT_DATA: List[AGIItem] = [
         model="Claude Fable 5", year=2026, month=6,
         scores={"K":10,"RW":10,"M":10,"R":10,"WM":9,"MS":0,"MR":8,"V":9,"A":9,"S":5},
         total=80,
-        notes="Anthropic juni-2026. Currently UNAVAILABLE to the public — Anthropic has flagged the model as 'architecturally too advanced for general release'. Internal estimates: ARC-AGI-2 ~55%, near-human multi-step agentic performance, breakthroughs on cross-modal reasoning. Long-term memory storage (MS) remains the unresolved architectural bottleneck for all LLMs of this generation — Fable 5 sits at the upper bound of what is achievable without solving persistent online memory.",
+        notes="Anthropic juni-2026. Available, but gated behind a special access tier that requires usage credits (not a default/free model). Now publicly ranked on Artificial Analysis (Intelligence Index ~60, Agentic ~52.8). Estimates: ARC-AGI-2 ~55%, near-human multi-step agentic performance, breakthroughs on cross-modal reasoning. Long-term memory storage (MS) remains the unresolved architectural bottleneck for all LLMs of this generation — Fable 5 sits at the upper bound of what is achievable without solving persistent online memory.",
     ),
     # ── Refresh through August 2026 (added 2026-08-13, web-sourced). Scores are
     # CHC-breadth approximations mapped from public benchmarks + leaderboards —

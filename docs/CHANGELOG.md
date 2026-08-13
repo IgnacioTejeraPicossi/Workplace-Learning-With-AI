@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.39.0] - 2026-08-13
+
+### Changed — AGI Progress Hub: tracker refreshed through August 2026 (+ Kimi)
+
+Audit + data refresh of the AGI Progress Tracker, which was last current to June 2026.
+Frontier data was **web-sourced** (my knowledge cutoff predates these releases) so the
+additions are grounded in real August-2026 benchmarks/leaderboards, not invented.
+
+- **4 new models** in `backend/routers/agi_progress.py::DEFAULT_DATA` (CHC 10-domain
+  breadth approximations; MS=0 as always; totals = sum of the ten domains):
+  - **Kimi K2.6** (Moonshot AI, Apr 2026, 1T open-weight MoE) — total 59. The famous
+    Chinese frontier model: SWE-bench Pro 58.6% (> GPT-5.4, Opus 4.6), SWE Verified 80.2%,
+    GPQA-Diamond 90.5%, AIME 2026 96.4%; #4 of 346 models / #1 open-weight on Artificial
+    Analysis. Text-first → native vision/audio keep its *breadth* score below the
+    multimodal frontier despite elite coding/reasoning (explained in the note).
+  - **Kimi K3** (Moonshot AI, mid-2026, 2.8T open-weight MoE) — total 66. #3 overall on
+    the Artificial Analysis Intelligence Index; top open-weight model.
+  - **GPT-5.6 "Sol"** (OpenAI, GA 9 Jul 2026) — total 75. Top on the LLM Stats snapshot.
+  - **Claude Opus 5** (Anthropic, 24 Jul 2026) — total 76. Current overall leader on
+    Artificial Analysis (Intelligence 61 / Agentic 55.3).
+- **Corrected Claude Fable 5 note**: it is **available but gated behind a special
+  usage-credits tier** (per the app's own model picker) and now publicly ranked on
+  Artificial Analysis — not "unavailable / too advanced for release" as previously worded.
+  Scores unchanged (owner's editorial estimate, total 80).
+- **Subtitle** updated "june-2026 → august-2026" and model list refreshed (EN/ES/NO +
+  JSX default).
+- **Audit gap fixed** — there was **no test** for the tracker seed. Added
+  `backend/tests/test_agi_progress.py` (4 offline: every model well-formed with the ten CHC
+  domains 0–10, `total == sum(scores)`, MS=0, unique names, the Aug-2026 refresh present,
+  and the `/api/agi/progress` endpoint returns the seed). Backend compile OK; frontend
+  JSON/JSX/build (exit 0). Data lives in `DEFAULT_DATA` (idempotently upserted); no schema
+  change — the frontend renders the new rows automatically.
+
+---
+
 ## [1.38.2] - 2026-08-11
 
 ### Added — Self-Simulating Reality Agent: hand-curated OPH knowledge-base expansion
