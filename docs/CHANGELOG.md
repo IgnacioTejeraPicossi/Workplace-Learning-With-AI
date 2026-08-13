@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.40.1] - 2026-08-13
+
+### Added — Dev tooling: "prompt-shortcuts" skill + 6 curated slash commands
+
+A workflow convenience for the Claude Code side of the project (not app functionality).
+The owner brought a "99 Claude commands" cheat sheet (by @adarschetan, X/LinkedIn). Honest
+framing: those are **prompt-pattern shortcuts, not hidden system commands** — the behaviors
+are things Claude can already do; this just makes the shorthand explicit, discoverable and
+reusable.
+
+- **`.claude/skills/prompt-shortcuts/SKILL.md`** — documents the ~99 shortcuts (paraphrased,
+  source-credited) grouped by category, with rules for when to apply them (`/eli10`,
+  `/premortem`, `/steelman`, `/tldr`, …) and a call-out of the ones most useful for a dev
+  repo. Auto-discovered by the harness.
+- **6 real slash commands** in `.claude/commands/` — the genuinely dev-useful, standard
+  techniques promoted to first-class `/commands`: `/premortem`, `/mintest`, `/steelman`,
+  `/blindspot`, `/checklist`, `/retro`. Each tailored to this repo's conventions (offline
+  test gates, `is_mock` fallbacks, owner-commits rule).
+- Deliberately did NOT install all 99 as slash commands (most are email/social/career
+  prompts, off-topic for a coding repo, and would clutter the `/` menu).
+
+---
+
 ## [1.40.0] - 2026-08-13
 
 ### Added — Self-Simulating Reality Agent: the "mind co-constructs reality" lineage (Pribram → Bohm → Grinberg)
