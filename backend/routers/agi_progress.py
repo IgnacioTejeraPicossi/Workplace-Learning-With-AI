@@ -79,6 +79,36 @@ DEFAULT_DATA: List[AGIItem] = [
         total=80,
         notes="Anthropic juni-2026. Currently UNAVAILABLE to the public — Anthropic has flagged the model as 'architecturally too advanced for general release'. Internal estimates: ARC-AGI-2 ~55%, near-human multi-step agentic performance, breakthroughs on cross-modal reasoning. Long-term memory storage (MS) remains the unresolved architectural bottleneck for all LLMs of this generation — Fable 5 sits at the upper bound of what is achievable without solving persistent online memory.",
     ),
+    # ── Refresh through August 2026 (added 2026-08-13, web-sourced). Scores are
+    # CHC-breadth approximations mapped from public benchmarks + leaderboards —
+    # a directional indicator, NOT a task-benchmark ranking. Note the deliberate
+    # divergence for text-first open-weight models (Kimi): they can lead coding /
+    # reasoning benchmarks yet score lower HERE because this metric weights native
+    # vision (V) and audio (A) equally with the other domains.
+    AGIItem(
+        model="Kimi K2.6", year=2026, month=4,
+        scores={"K":9,"RW":9,"M":10,"R":9,"WM":6,"MS":0,"MR":5,"V":3,"A":2,"S":6},
+        total=59,
+        notes="Moonshot AI (China), April 2026. 1T-parameter open-weight MoE — the most famous Chinese frontier model. Benchmark-competitive with the proprietary frontier on text tasks: SWE-bench Pro 58.6% (ahead of GPT-5.4 and Opus 4.6), SWE-bench Verified 80.2%, GPQA-Diamond 90.5%, AIME 2026 96.4%. Ranked #4 of 346 models and #1 open-weight on Artificial Analysis. Text-first: limited native vision/audio keeps its CHC-breadth score below the multimodal frontier despite elite coding/reasoning.",
+    ),
+    AGIItem(
+        model="Kimi K3", year=2026, month=7,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":7,"MS":0,"MR":6,"V":4,"A":3,"S":6},
+        total=66,
+        notes="Moonshot AI (China), mid-2026. 2.8T-parameter open-weight MoE — #3 overall on the Artificial Analysis Intelligence Index, ahead of every proprietary model except Claude Fable 5 and GPT-5.6 Sol, and the top open-weight model. Frontier-level knowledge and reasoning; still text-centric, so native vision/audio breadth trails the fully-multimodal leaders.",
+    ),
+    AGIItem(
+        model="GPT-5.6 Sol", year=2026, month=7,
+        scores={"K":10,"RW":10,"M":10,"R":9,"WM":8,"MS":0,"MR":7,"V":8,"A":7,"S":6},
+        total=75,
+        notes="OpenAI, general availability 9 July 2026. Top overall on the LLM Stats snapshot (57.2); Artificial Analysis Intelligence 59 / Agentic 54.0. Its sibling GPT-5.5 Pro leads FrontierMath Tier 4 (39.6%). Strong across reasoning, coding and multimodality.",
+    ),
+    AGIItem(
+        model="Claude Opus 5", year=2026, month=7,
+        scores={"K":10,"RW":10,"M":10,"R":10,"WM":8,"MS":0,"MR":7,"V":8,"A":8,"S":5},
+        total=76,
+        notes="Anthropic, 24 July 2026. Top model overall on Artificial Analysis's rebased leaderboard (Intelligence Index 61) and leads the Agentic Index (55.3). Frontier reasoning + agentic tool-use with strong multimodal (vision + audio). MS (persistent long-term memory) remains the shared architectural bottleneck for this LLM generation.",
+    ),
 ]
 
 
