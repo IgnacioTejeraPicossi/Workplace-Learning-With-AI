@@ -39,7 +39,8 @@ def test_models_unique():
 def test_august_2026_refresh_present():
     names = {it.model for it in DEFAULT_DATA}
     # the 2026-08 refresh (incl. the Chinese Kimi models the tracker was updated for)
-    for expected in ("Kimi K2.6", "Kimi K3", "GPT-5.6 Sol", "Claude Opus 5"):
+    for expected in ("Kimi K2.6", "Kimi K3", "GPT-5.6 Sol", "Claude Opus 5",
+                     "Gemini 3.6 Flash", "Grok 4.5"):
         assert expected in names, f"missing refreshed model: {expected}"
 
 

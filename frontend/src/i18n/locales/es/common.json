@@ -2715,7 +2715,7 @@
       "loading": "Cargando progreso de la AGI…",
       "error": "Error:",
       "title": "Seguimiento del Progreso de la AGI",
-      "subtitle": "Amplitud cognitiva en diez dominios (inspirado en CHC) basado en Hendrycks et al. (2025) — actualizado hasta agosto-2026 con Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro, Claude Fable 5, más Kimi K2.6 y K3 (Moonshot AI), GPT-5.6 Sol y Claude Opus 5.",
+      "subtitle": "Amplitud cognitiva en diez dominios (inspirado en CHC) basado en Hendrycks et al. (2025) — actualizado hasta agosto-2026 con Claude Opus 4.6/4.7/4.8, Gemini 3.1 Pro, Claude Fable 5, más Kimi K2.6 y K3 (Moonshot AI), GPT-5.6 Sol, Claude Opus 5, Gemini 3.6 Flash y Grok 4.5.",
       "benchmarkContext": "Contexto del benchmark",
       "paper": "artículo",
       "overall": "Global",

@@ -27,6 +27,13 @@ additions are grounded in real August-2026 benchmarks/leaderboards, not invented
   - **GPT-5.6 "Sol"** (OpenAI, GA 9 Jul 2026) — total 75. Top on the LLM Stats snapshot.
   - **Claude Opus 5** (Anthropic, 24 Jul 2026) — total 76. Current overall leader on
     Artificial Analysis (Intelligence 61 / Agentic 55.3).
+  - **Gemini 3.6 Flash** (Google DeepMind, 21 Jul 2026) — total 66. Newest Gemini release:
+    fast/low-cost workhorse, improved coding/knowledge/multimodal, ~17% fewer tokens (high
+    Speed). The Gemini *Pro* flagship line was last updated Feb 2026.
+  - **Grok 4.5** (xAI, 2026) — total 68. Strong agentic/coding (SWE-bench Pro 64.7%; leads
+    Humanity's Last Exam 50.7%); did not publish classic academic benchmarks at launch.
+  - Also refreshed the **Gemini 3.1 Pro** note (it now leads reasoning, GPQA-Diamond ~94%;
+    the old "behind on reasoning" wording was stale) and gave it a release month (Feb).
 - **Corrected Claude Fable 5 note**: it is **available but gated behind a special
   usage-credits tier** (per the app's own model picker) and now publicly ranked on
   Artificial Analysis — not "unavailable / too advanced for release" as previously worded.
